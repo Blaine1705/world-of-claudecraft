@@ -956,17 +956,17 @@ export const cs_CZ: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Sklepení",
+        "state": "Reprezentační patro",
+        "residence": "Obytné patro",
+        "tower": "Strážní věž"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Zahradní patro",
+        "solar": "Sluneční komnata"
       }
     },
     "compass": {
@@ -12397,7 +12397,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Nedotčený dráp"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Kytička ze zahrady zámku Dawnhold"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -13245,13 +13245,13 @@ export const cs_CZ: EnTranslations = {
         "name": "Cvičný panák"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Panák přátelského hráče"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Panák normálního bosse"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Panák hrdinského bosse"
       },
       "ridge_stalker": {
         "name": "Hřebenový slídil"
@@ -16893,9 +16893,9 @@ export const cs_CZ: EnTranslations = {
         "leaveText": "Zavíráš bránu tvrze za sebou a vracíš se do větru Dračích zemí."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Zámek Dawnhold",
+        "enterText": "Vstupuješ do teplých, květinami provoněných síní zámku Dawnhold.",
+        "leaveText": "Vyklouzneš zpátky na sluncem zalitý zahradní trávník."
       },
       "drowned_temple": {
         "name": "Utopený chrám",

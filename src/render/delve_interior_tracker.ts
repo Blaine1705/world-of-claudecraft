@@ -31,19 +31,24 @@ export class DelveInteriorTracker {
   ) {}
 
   private schedule(key: string, moduleId: DelveModuleId, ox: number, oz: number): void {
-    const next = { moduleId, ox, oz };
-    const action = delveInteriorBuildAction(this.placementAt.get(key), next, this.pending.has(key));
+    const placement: DelveInteriorPlacement = { moduleId, ox, oz };
+    const action = delveInteriorBuildAction(
+      this.placementAt.get(key),
+      placement,
+      this.pending.has(key),
+    );
     if (action === 'skip') return;
     if (action === 'rebuild') {
       const stale = this.groups.get(key);
       if (stale) this.retire(stale);
+      this.placementAt.delete(key);
       this.groups.delete(key);
       this.built.delete(key);
     }
     this.pending.add(key);
     void buildDelveModule(this.dungeons(), moduleId, ox, oz)
       .then((group) => {
-        this.placementAt.set(key, next);
+        this.placementAt.set(key, placement);
         this.groups.set(key, group);
         this.built.add(key);
         this.pending.delete(key);

@@ -24,6 +24,7 @@
 // normalizeAppearance unchanged (a typo'd style id would silently clamp to the
 // default), and no two NPCs share an appearance.
 
+import type { EntityKind } from '../../sim/types';
 import {
   type ArmorLoadout,
   type ArmorSetId,
@@ -1796,7 +1797,8 @@ const resolved = new Map<string, ModularLook | null>();
 
 /** The authored look for an NPC templateId, or null for one with no entry
  *  (which keeps its fixed rig, the same null the player path uses). */
-export function npcLookFor(templateId: string): ModularLook | null {
+export function npcLookFor(templateId: string, kind: EntityKind = 'npc'): ModularLook | null {
+  if (kind !== 'npc') return null;
   if (aldricKeepsHisRig(templateId)) return null;
   const id = baseId(templateId);
   let look = resolved.get(id);

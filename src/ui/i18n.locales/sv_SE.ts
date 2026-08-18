@@ -2,6 +2,21 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'entities.mobs.heroic_boss_dummy.name': 'Heroisk bossdocka',
+  'entities.mobs.normal_boss_dummy.name': 'Normal bossdocka',
+  'entities.mobs.friendly_player_dummy.name': 'Vänlig spelardocka',
+  'entities.items.dawnhold_posy.name': 'Bukett från Dawnholds trädgård',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Du kliver ut igen på trädgårdens solbelysta gräsmatta.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Du kliver in i de varma, blomsterdoftande salarna i Dawnholds slott.',
+  'entities.dungeons.dawnhold_castle.name': 'Dawnholds slott',
+  'hudChrome.lastkeepMap.story.tower': 'Vakttornet',
+  'hudChrome.lastkeepMap.story.residence': 'Bostadsvåningen',
+  'hudChrome.lastkeepMap.story.state': 'Paradvåningen',
+  'hudChrome.lastkeepMap.story.undercroft': 'Källarvalven',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Solkammaren',
+  'hudChrome.dawnholdMap.story.ground': 'Trädgårdsvåningen',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Slagfält.',
   'guide.social.chanBattlegroundBody': 'Prata med alla stridande i ditt slagfält, båda sidorna. Bara medan en match pågår.',
   'hud.chat.templates.battleground': '[Slagfält] {name}: {message}',

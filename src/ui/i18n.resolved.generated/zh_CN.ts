@@ -954,7 +954,7 @@ export const zh_CN: EnTranslations = {
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "lastkeepMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "undercroft": "地下穹室",
         "state": "正殿层",
@@ -963,7 +963,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "dawnholdMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "ground": "庭园层",
         "solar": "日光厅"

@@ -956,17 +956,17 @@ export const it_IT: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "I sotterranei",
+        "state": "Il piano nobile",
+        "residence": "La residenza",
+        "tower": "La torre di guardia"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Il piano del giardino",
+        "solar": "La sala del sole"
       }
     },
     "compass": {
@@ -12397,7 +12397,7 @@ export const it_IT: EnTranslations = {
         "name": "Artiglio Immacolato"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Mazzolino del giardino di Dawnhold"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
@@ -13245,13 +13245,13 @@ export const it_IT: EnTranslations = {
         "name": "Manichino d'allenamento"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Manichino di giocatore alleato"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Manichino di boss normale"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Manichino di boss eroico"
       },
       "ridge_stalker": {
         "name": "Braccatore della cresta"
@@ -16893,9 +16893,9 @@ export const it_IT: EnTranslations = {
         "leaveText": "Chiudi il portone della rocca e torni nel vento delle Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Castello Dawnhold",
+        "enterText": "Metti piede nelle sale calde e profumate di fiori del Castello Dawnhold.",
+        "leaveText": "Esci di nuovo sul prato soleggiato del giardino."
       },
       "drowned_temple": {
         "name": "Il Tempio Annegato",

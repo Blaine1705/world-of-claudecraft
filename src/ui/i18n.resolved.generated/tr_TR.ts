@@ -956,17 +956,17 @@ export const tr_TR: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Mahzen",
+        "state": "Tören Katı",
+        "residence": "Yaşam Katı",
+        "tower": "Gözetleme Kulesi"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Bahçe Katı",
+        "solar": "Güneş Odası"
       }
     },
     "compass": {
@@ -12397,7 +12397,7 @@ export const tr_TR: EnTranslations = {
         "name": "Kusursuz Pençe"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Dawnhold Bahçesi Çiçek Demeti"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
@@ -13245,13 +13245,13 @@ export const tr_TR: EnTranslations = {
         "name": "Antrenman Kuklası"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Dost Oyuncu Kuklası"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Normal Boss Kuklası"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Kahramanca Boss Kuklası"
       },
       "ridge_stalker": {
         "name": "Sırt Sinsisi"
@@ -16893,9 +16893,9 @@ export const tr_TR: EnTranslations = {
         "leaveText": "Kale kapısını arkandan kapatıp Ejder Topraklarının rüzgarına geri dönüyorsun."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Dawnhold Şatosu",
+        "enterText": "Dawnhold Şatosu'nun sıcak, çiçek kokulu salonlarına adım atıyorsun.",
+        "leaveText": "Güneşli bahçe çimenliğine geri süzülüyorsun."
       },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",

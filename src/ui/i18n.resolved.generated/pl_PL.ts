@@ -956,17 +956,17 @@ export const pl_PL: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Podziemia",
+        "state": "Piętro reprezentacyjne",
+        "residence": "Piętro mieszkalne",
+        "tower": "Wieża strażnicza"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Parter ogrodowy",
+        "solar": "Komnata słoneczna"
       }
     },
     "compass": {
@@ -12397,7 +12397,7 @@ export const pl_PL: EnTranslations = {
         "name": "Nieskazitelny Pazur"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bukiecik z ogrodu zamku Dawnhold"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
@@ -13245,13 +13245,13 @@ export const pl_PL: EnTranslations = {
         "name": "Manekin treningowy"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Manekin przyjaznego gracza"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Manekin normalnego bossa"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Manekin heroicznego bossa"
       },
       "ridge_stalker": {
         "name": "Grzbietowy Tropiciel"
@@ -16893,9 +16893,9 @@ export const pl_PL: EnTranslations = {
         "leaveText": "Zamykasz za sobą bramę twierdzy i wracasz w wiatr Smoczych Ziem."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Zamek Dawnhold",
+        "enterText": "Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.",
+        "leaveText": "Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik."
       },
       "drowned_temple": {
         "name": "Zatopiona Świątynia",

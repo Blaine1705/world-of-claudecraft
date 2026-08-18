@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.lastkeepMap.title': '{keep}：{story}',
+  'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': '狼形态',
   'guide.gear.slotOffhand': '副手',
   'guide.glossary.claudiumTerm': 'Claudium',

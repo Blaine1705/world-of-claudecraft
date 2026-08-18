@@ -956,17 +956,17 @@ export const pt_BR: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Os porões",
+        "state": "O andar nobre",
+        "residence": "A residência",
+        "tower": "A torre de vigia"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "O andar do jardim",
+        "solar": "A sala do sol"
       }
     },
     "compass": {
@@ -12397,7 +12397,7 @@ export const pt_BR: EnTranslations = {
         "name": "Garra Imaculada"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Ramalhete do jardim de Dawnhold"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
@@ -13245,13 +13245,13 @@ export const pt_BR: EnTranslations = {
         "name": "Boneco de Treino"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Boneco de Jogador Aliado"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Boneco de Chefe Normal"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Boneco de Chefe Heroico"
       },
       "ridge_stalker": {
         "name": "Rastreador da crista"
@@ -16893,9 +16893,9 @@ export const pt_BR: EnTranslations = {
         "leaveText": "Você fecha o portão do reduto e volta para o vento das Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Castelo Dawnhold",
+        "enterText": "Você entra nos salões quentes e perfumados de flores do Castelo Dawnhold.",
+        "leaveText": "Você volta a sair para o gramado ensolarado do jardim."
       },
       "drowned_temple": {
         "name": "O Templo Afogado",

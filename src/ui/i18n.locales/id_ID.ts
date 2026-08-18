@@ -2,6 +2,21 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'entities.mobs.heroic_boss_dummy.name': 'Boneka Bos Heroik',
+  'entities.mobs.normal_boss_dummy.name': 'Boneka Bos Normal',
+  'entities.mobs.friendly_player_dummy.name': 'Boneka Pemain Sekutu',
+  'entities.items.dawnhold_posy.name': 'Buket Taman Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Kau menyelinap keluar lagi ke halaman rumput taman yang bermandikan cahaya matahari.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Kau melangkah masuk ke aula Kastil Dawnhold yang hangat dan harum bunga.',
+  'entities.dungeons.dawnhold_castle.name': 'Kastil Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Menara Pengawas',
+  'hudChrome.lastkeepMap.story.residence': 'Lantai Hunian',
+  'hudChrome.lastkeepMap.story.state': 'Lantai Kebesaran',
+  'hudChrome.lastkeepMap.story.undercroft': 'Ruang Bawah Tanah',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Ruang Matahari',
+  'hudChrome.dawnholdMap.story.ground': 'Lantai Taman',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Medan Thornhollow.',
   'guide.social.chanBattlegroundBody': 'Bicaralah dengan setiap petarung di Medan Thornhollow-mu, dari kedua pihak. Hanya berlaku selama pertandingan sedang berlangsung.',
   'hud.chat.templates.battleground': '[Medan Thornhollow] {name}: {message}',

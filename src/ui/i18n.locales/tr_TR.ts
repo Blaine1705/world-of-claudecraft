@@ -2,6 +2,21 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'entities.mobs.heroic_boss_dummy.name': 'Kahramanca Boss Kuklası',
+  'entities.mobs.normal_boss_dummy.name': 'Normal Boss Kuklası',
+  'entities.mobs.friendly_player_dummy.name': 'Dost Oyuncu Kuklası',
+  'entities.items.dawnhold_posy.name': 'Dawnhold Bahçesi Çiçek Demeti',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Güneşli bahçe çimenliğine geri süzülüyorsun.',
+  'entities.dungeons.dawnhold_castle.enterText': "Dawnhold Şatosu'nun sıcak, çiçek kokulu salonlarına adım atıyorsun.",
+  'entities.dungeons.dawnhold_castle.name': 'Dawnhold Şatosu',
+  'hudChrome.lastkeepMap.story.tower': 'Gözetleme Kulesi',
+  'hudChrome.lastkeepMap.story.residence': 'Yaşam Katı',
+  'hudChrome.lastkeepMap.story.state': 'Tören Katı',
+  'hudChrome.lastkeepMap.story.undercroft': 'Mahzen',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Güneş Odası',
+  'hudChrome.dawnholdMap.story.ground': 'Bahçe Katı',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Savaş Alanı.',
   'guide.social.chanBattlegroundBody': 'Savaş alanındaki iki taraftan da tüm dövüşçülerle konuş. Yalnızca bir maç sürerken işler.',
   'hud.chat.templates.battleground': '[Savaş Alanı] {name}: {message}',

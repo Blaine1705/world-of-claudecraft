@@ -44,7 +44,7 @@ import { solveLockActions } from '../src/sim/lockpick';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Rng } from '../src/sim/rng';
 import { DELVE_IMPLEMENTED_AFFIXES, Sim } from '../src/sim/sim';
-import { type DelveRun, DT, type WorldContent } from '../src/sim/types';
+import { type DelveRun, DT, INSTANCE_EMPTY_TIMEOUT, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const DELVE_TEST_WORLD: WorldContent = {
@@ -801,6 +801,134 @@ describe('delve interactables and affixes', () => {
     expect(run.restlessPending.length).toBe(0);
   });
 
+  it('exit portal waits for pending Restless Graves spawns instead of racing them', () => {
+    // Live wedge (prod, 2026-08-17): killing the LAST trash in a room opened the
+    // portal inside the 3s grave delay, so the risen Bonewalkers appeared behind
+    // an already-latched portal and followed the run into the next room's gate.
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.affixes = ['restless_graves'];
+    run.modules = ['reliquary_bell_niche', 'reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const killAllLiveRunMobs = () => {
+      for (const id of [...run.mobIds]) {
+        const mob = sim.entities.get(id);
+        if (mob && !mob.dead)
+          (sim as any).dealDamage(
+            sim.player,
+            mob,
+            mob.maxHp + 1,
+            false,
+            'physical',
+            null,
+            'hit',
+            true,
+          );
+      }
+    };
+    killAllLiveRunMobs();
+    sim.tick();
+    // The kills queued delayed Bonewalkers; the portal must stay sealed for the
+    // whole pending window even though no live mob exists yet.
+    expect(run.restlessPending.length).toBeGreaterThanOrEqual(1);
+    expect(run.exitPortalOpen).toBe(false);
+    for (let i = 0; i < 20 * 4; i++) sim.tick();
+    // The graves rose: still sealed, now by the live risen.
+    expect(run.restlessPending.length).toBe(0);
+    expect(
+      [...sim.entities.values()].some((e) => e.templateId === 'reliquary_bonewalker' && !e.dead),
+    ).toBe(true);
+    expect(run.exitPortalOpen).toBe(false);
+    // Killing the risen (affix-spawned, so they queue nothing) releases the gate.
+    killAllLiveRunMobs();
+    sim.tick();
+    expect(run.restlessPending.length).toBe(0);
+    expect(run.exitPortalOpen).toBe(true);
+  });
+
+  it('advancing to the next room drops pending Restless Graves spawns with the room', () => {
+    // The pending list is room state: a spawn queued in room N must never rise
+    // after the party advanced (it would land in the OLD room but join the new
+    // room's mob list, sealing that room's portal forever).
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.affixes = ['restless_graves'];
+    run.modules = ['reliquary_bell_niche', 'reliquary_sunken_ossuary', 'reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const origin = run.origin;
+    // Queue a due spawn exactly as a trash death would, then advance rooms.
+    run.restlessPending.push({
+      at: 0,
+      x: origin.x,
+      z: origin.z + 10,
+      mobId: 'reliquary_bonewalker',
+    });
+    run.moduleIndex = 1;
+    (sim as any).spawnDelveModule(run);
+    expect(run.restlessPending.length).toBe(0);
+    const mobCountAfterAdvance = run.mobIds.length;
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    expect(
+      [...sim.entities.values()].some((e) => e.templateId === 'reliquary_bonewalker' && !e.dead),
+    ).toBe(false);
+    expect(run.mobIds.length).toBe(mobCountAfterAdvance);
+  });
+
+  it('a player south of the run origin (the neighbor slot band) does not pin the run occupied', () => {
+    // Rooms extend only NORTH of a run's origin, but the empty-run sweep used a
+    // symmetric +-radius band. With slots 620u apart and a ~528u radius, the
+    // southern half overlapped the neighbor slot's rooms, so busy neighbors
+    // pinned a wedged run claimed forever.
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    teleport(sim, run.origin.x, run.origin.z - 400);
+    run.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
+    for (let i = 0; i < 21; i++) sim.tick();
+    expect(run.partyKey).toBe(null);
+  });
+
+  it('a player inside the run rooms still pins it occupied', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    teleport(sim, run.origin.x, run.origin.z + 60);
+    run.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
+    for (let i = 0; i < 21; i++) sim.tick();
+    expect(run.partyKey).not.toBe(null);
+    expect(run.emptyFor).toBe(0);
+  });
+
+  it('a player on module 0 south lip (just south of the origin) still pins the run', () => {
+    // Module 0 starts at DELVE_MODULE_Z_START + layout.zMin (about -11), so the
+    // south margin must reach past the walkable lip. This pins the margin from
+    // the inside: shrinking -40 toward 0 frees a run under a standing player.
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    teleport(sim, run.origin.x, run.origin.z - 10);
+    run.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
+    for (let i = 0; i < 21; i++) sim.tick();
+    expect(run.partyKey).not.toBe(null);
+    expect(run.emptyFor).toBe(0);
+  });
+
+  it('the south margin ends just past the lip, well before the neighbor band', () => {
+    // Pins the margin from the outside: growing -40 back toward the old
+    // symmetric radius re-opens the neighbor-slot pinning bug.
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    teleport(sim, run.origin.x, run.origin.z - 45);
+    run.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
+    for (let i = 0; i < 21; i++) sim.tick();
+    expect(run.partyKey).toBe(null);
+  });
+
   it('bad_air affix applies a periodic Bad Air DoT to the party (PRD §6.7)', () => {
     const sim = makeSim();
     enterReliquary(sim);
@@ -885,6 +1013,17 @@ describe('delve reward chest + surface exit flow', () => {
     (sim as any).dealDamage(sim.player, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
     const events = sim.tick();
     return { boss, events };
+  }
+
+  function spawnBossAdd(
+    sim: ReturnType<typeof makeSim>,
+    run: ReturnType<typeof enterFinale>,
+    pos: { x: number; y: number; z: number },
+  ) {
+    const add = createMob((sim as any).nextId++, MOBS.reliquary_ledger_wraith, 9, { ...pos });
+    (sim as any).addEntity(add);
+    run.mobIds.push(add.id);
+    return add;
   }
 
   // Drive the lockpicking minigame to a flawless solve. Returns the chest id.
@@ -1004,11 +1143,7 @@ describe('delve reward chest + surface exit flow', () => {
     sim.player.pos = { ...chestEnt.pos };
     sim.player.prevPos = { ...chestEnt.pos };
 
-    const add = createMob((sim as any).nextId++, MOBS.reliquary_ledger_wraith, 9, {
-      ...chestEnt.pos,
-    });
-    (sim as any).addEntity(add);
-    run.mobIds.push(add.id);
+    const add = spawnBossAdd(sim, run, chestEnt.pos);
 
     expect(sim.delveInteract(chestId)).toBe(false);
     const events = sim.tick();
@@ -1026,6 +1161,77 @@ describe('delve reward chest + surface exit flow', () => {
     expect(sim.delveInteract(chestId)).toBe(true);
     const offer = sim.tick().find((e) => e.type === 'lockpickOffer');
     expect(offer).toBeDefined();
+  });
+
+  it('direct lockpick engage cannot bypass a live boss-summoned add', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+    spawnBossAdd(sim, run, chestEnt.pos);
+
+    sim.lockpickEngage(chestId, 1);
+    const events = sim.tick();
+
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+    expect(events.some((e) => e.type === 'lockpickSession')).toBe(false);
+    expect(run.lockpick).toBeNull();
+    expect(run.completed).toBe(false);
+    expect(run.surfaceExitId).toBeNull();
+    expect(run.objectState[chestId].looted).not.toBe(true);
+    expect(run.objectState[chestId].open).not.toBe(true);
+  });
+
+  it('direct lockpick success cannot grant or open the exit if an add becomes live mid-session', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+
+    sim.lockpickEngage(chestId, 1);
+    expect(run.lockpick?.state).toBe('IN_PROGRESS');
+    sim.drainEvents();
+    const add = spawnBossAdd(sim, run, chestEnt.pos);
+
+    let guard = 0;
+    while (run.lockpick && run.lockpick.state === 'IN_PROGRESS' && guard++ < 12) {
+      const actions = solveLockActions(run.lockpick.pages[run.lockpick.pageIndex])!;
+      for (const a of actions) sim.lockpickAction(a);
+    }
+    const events = sim.drainEvents();
+
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+    expect(
+      events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'abandoned'),
+    ).toBeDefined();
+    expect(events.some((e) => e.type === 'delveChestLoot')).toBe(false);
+    expect(run.lockpick).toBeNull();
+    expect(run.completed).toBe(false);
+    expect(run.surfaceExitId).toBeNull();
+    expect(run.objectState[chestId].looted).not.toBe(true);
+    expect(run.objectState[chestId].attemptAvailable).toBe(true);
+
+    add.dead = true;
+    pickLockFlawless(sim, run, 1);
+    expect(run.completed).toBe(true);
+    expect(run.surfaceExitId).not.toBeNull();
+    expect(run.objectState[chestId].looted).toBe(true);
   });
 
   it('flawless solve grants marks (premium tier), completes the run, and spawns the surface exit', () => {

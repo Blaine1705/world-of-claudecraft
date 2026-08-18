@@ -244,6 +244,28 @@ describe('the lock, threaded through save/load', () => {
     const loaded = inventoryOf(sim2, pid2).find((s) => s.itemId === COMMON_WEAPON);
     expect(loaded?.instance?.locked).toBe(true);
   });
+
+  it('round-trips a locked counted stack without capping the count to one', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
+    meta.inventory.length = 0;
+    meta.inventory.push({ itemId: 'bone_fragments', count: 5 });
+
+    expect(setItemLocked(ctxOf(sim), 'bone_fragments', true, pid, 0)).toEqual({
+      ok: true,
+      itemId: 'bone_fragments',
+      locked: true,
+    });
+    const state = sim.serializeCharacter(pid);
+    const saved = state?.inventory.find((s) => s.itemId === 'bone_fragments');
+    expect(saved).toEqual({ itemId: 'bone_fragments', count: 5, instance: { locked: true } });
+
+    const sim2 = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true });
+    const pid2 = sim2.addPlayer('warrior', 'Lockwright', { state: state ?? undefined });
+    const loaded = inventoryOf(sim2, pid2).find((s) => s.itemId === 'bone_fragments');
+    expect(loaded).toEqual({ itemId: 'bone_fragments', count: 5, instance: { locked: true } });
+  });
 });
 
 describe('salvage refuses a locked copy', () => {

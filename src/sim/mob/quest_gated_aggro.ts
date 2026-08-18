@@ -27,3 +27,27 @@ export function questGateBlocksAggro(
   const qp = owner?.questLog.get(gateQuest);
   return !qp || (qp.state !== 'active' && qp.state !== 'ready');
 }
+
+export function questGateBlocksCombat(
+  players: Map<number, PlayerMeta>,
+  a: Entity,
+  b: Entity,
+): boolean {
+  const aPlayerDriven = a.kind === 'player' || a.ownerId !== null;
+  const bPlayerDriven = b.kind === 'player' || b.ownerId !== null;
+  if (
+    bPlayerDriven &&
+    a.kind === 'mob' &&
+    a.ownerId === null &&
+    questGateBlocksAggro(players, a, b)
+  )
+    return true;
+  if (
+    aPlayerDriven &&
+    b.kind === 'mob' &&
+    b.ownerId === null &&
+    questGateBlocksAggro(players, b, a)
+  )
+    return true;
+  return false;
+}

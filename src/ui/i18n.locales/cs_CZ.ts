@@ -2,6 +2,21 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'entities.mobs.heroic_boss_dummy.name': 'Panák hrdinského bosse',
+  'entities.mobs.normal_boss_dummy.name': 'Panák normálního bosse',
+  'entities.mobs.friendly_player_dummy.name': 'Panák přátelského hráče',
+  'entities.items.dawnhold_posy.name': 'Kytička ze zahrady zámku Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Vyklouzneš zpátky na sluncem zalitý zahradní trávník.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Vstupuješ do teplých, květinami provoněných síní zámku Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Zámek Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Strážní věž',
+  'hudChrome.lastkeepMap.story.residence': 'Obytné patro',
+  'hudChrome.lastkeepMap.story.state': 'Reprezentační patro',
+  'hudChrome.lastkeepMap.story.undercroft': 'Sklepení',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Sluneční komnata',
+  'hudChrome.dawnholdMap.story.ground': 'Zahradní patro',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Bitevní pole.',
   'guide.social.chanBattlegroundBody': 'Mluv se všemi bojovníky ve svém bitevním poli, na obou stranách. Jen dokud probíhá zápas.',
   'hud.chat.templates.battleground': '[Bitevní pole] {name}: {message}',

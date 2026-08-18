@@ -954,7 +954,7 @@ export const ja_JP: EnTranslations = {
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "lastkeepMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "undercroft": "地下蔵",
         "state": "公務の階",
@@ -963,7 +963,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "dawnholdMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "ground": "庭園の階",
         "solar": "日だまりの間"

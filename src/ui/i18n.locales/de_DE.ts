@@ -13,6 +13,21 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'entities.mobs.heroic_boss_dummy.name': 'Heroische Bosspuppe',
+  'entities.mobs.normal_boss_dummy.name': 'Normale Bosspuppe',
+  'entities.mobs.friendly_player_dummy.name': 'Freundliche Spielerpuppe',
+  'entities.items.dawnhold_posy.name': 'Gartensträußchen von Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Du schlüpfst wieder hinaus auf den sonnenbeschienenen Gartenrasen.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Du trittst in die warmen, blumenduftenden Hallen von Schloss Dawnhold ein.',
+  'entities.dungeons.dawnhold_castle.name': 'Schloss Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Der Wachturm',
+  'hudChrome.lastkeepMap.story.residence': 'Das Wohngeschoss',
+  'hudChrome.lastkeepMap.story.state': 'Die Beletage',
+  'hudChrome.lastkeepMap.story.undercroft': 'Das Untergewölbe',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Das Sonnengemach',
+  'hudChrome.dawnholdMap.story.ground': 'Das Gartengeschoss',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Schlachtfeld.',
   'guide.social.chanBattlegroundBody': 'Sprich mit jedem Kämpfer in deinem Schlachtfeld, auf beiden Seiten. Nur während ein Match läuft.',
   'hud.chat.templates.battleground': '[Schlachtfeld] {name}: {message}',

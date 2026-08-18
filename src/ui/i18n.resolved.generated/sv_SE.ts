@@ -956,17 +956,17 @@ export const sv_SE: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Källarvalven",
+        "state": "Paradvåningen",
+        "residence": "Bostadsvåningen",
+        "tower": "Vakttornet"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Trädgårdsvåningen",
+        "solar": "Solkammaren"
       }
     },
     "compass": {
@@ -12397,7 +12397,7 @@ export const sv_SE: EnTranslations = {
         "name": "Orörd klo"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bukett från Dawnholds trädgård"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
@@ -13245,13 +13245,13 @@ export const sv_SE: EnTranslations = {
         "name": "Träningsdocka"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Vänlig spelardocka"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Normal bossdocka"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Heroisk bossdocka"
       },
       "ridge_stalker": {
         "name": "Åssmygare"
@@ -16893,9 +16893,9 @@ export const sv_SE: EnTranslations = {
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Dawnholds slott",
+        "enterText": "Du kliver in i de varma, blomsterdoftande salarna i Dawnholds slott.",
+        "leaveText": "Du kliver ut igen på trädgårdens solbelysta gräsmatta."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",
