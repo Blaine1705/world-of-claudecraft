@@ -4793,7 +4793,13 @@ export const TARGETS = [
   {
     key: 'nameplate-border',
     label: 'Rank-5 Curator border on the own nameplate and portrait ring, in world',
-    when: ['ui/deed_border_view', 'render/nameplate_view', 'reliquary_phase22_closeout'],
+    when: [
+      'ui/deed_border_view',
+      'render/nameplate_view',
+      'render/nameplate_canvas',
+      'render/nameplate_cartouche_core',
+      'reliquary_phase22_closeout',
+    ],
     // Desktop only: the plate paints identically on the compact tier and the
     // full frame is the evidence (a canvas plate cannot be DOM-clipped).
     variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],

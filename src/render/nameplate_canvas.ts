@@ -1,5 +1,14 @@
 import { borderAccent } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
+import {
+  createNameplateCartouche,
+  NAMEPLATE_CARTOUCHE_EXTRA_LIFT,
+  NAMEPLATE_CARTOUCHE_TITLE_STEP,
+  NAMEPLATE_CARTOUCHE_WELL_ALPHA,
+  NAMEPLATE_CARTOUCHE_WELL_FILL,
+  type NameplateCartoucheInput,
+  nameplateCartoucheInto,
+} from './nameplate_cartouche_core';
 import { drawNameplateLootIcon } from './nameplate_loot_icon';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
@@ -188,25 +197,14 @@ const EMOTE_STYLE: TextSpriteStyle = {
   lineWidth: 1,
 };
 
-// The Book of Deeds border accent around the name row. Authored as SHAPES, so it
-// needs no text sprite and no cache key, and sized to add NO vertical step: it
-// pads the existing row outward horizontally and upward only, ending flush with
-// the row's bottom edge, so the drawEmote anchor walk (which mirrors drawBase's
-// y-steps) stays exact and the title line below keeps its clearance.
-const BORDER_ACCENT_PAD_X = 5;
-// The upward pad has a ceiling it is tuned under but is not mechanically tied
-// to: the accent's outer ink reaches topY - (PAD_TOP + EDGE_WIDTH/2), and the
-// quest-marker row anchor sits at topY - (NAMEPLATE_MARKER_ROW_HEIGHT - 21) = 5
-// (marker geometry lives in a different constant block). Raising PAD_TOP toward
-// that ceiling would put the accent under the marker glyph. It cannot bite today
-// because a border is only ever set on the player branch and players carry no
-// quest marker, but keep this pad below the marker row if that ever changes.
-const BORDER_ACCENT_PAD_TOP = 3;
-const BORDER_ACCENT_RADIUS = 6;
-const BORDER_ACCENT_EDGE_WIDTH = 3;
-const BORDER_ACCENT_FRAME_WIDTH = 1.5;
-const BORDER_ACCENT_INNER_INSET = 2.5;
-const BORDER_ACCENT_INNER_WIDTH = 1;
+// Cartouche stroke widths. Geometry (pad, well, hardware, extraLift) lives on
+// nameplate_cartouche_core.ts; these are the canvas pen sizes for the three-layer
+// metal edge and the shared hardware.
+const CARTOUCHE_EDGE_WIDTH = 3;
+const CARTOUCHE_FRAME_WIDTH = 1.5;
+const CARTOUCHE_INNER_WIDTH = 1;
+const CARTOUCHE_HARDWARE_WIDTH = 1.5;
+const CARTOUCHE_CLASP_RADIUS = 2;
 
 interface CachedImage {
   image: HTMLImageElement;
@@ -325,6 +323,15 @@ export class NameplateCanvasSurface {
   private readonly emoteStyle: TextSpriteStyle = { ...EMOTE_STYLE };
   private width = 0;
   private height = 0;
+  private readonly cartouche = createNameplateCartouche();
+  private readonly cartoucheInput: NameplateCartoucheInput = {
+    screenX: 0,
+    nameRowBottomY: 0,
+    nameRowWidth: 0,
+    nameRowHeight: 0,
+    titleWidth: 0,
+    slug: '',
+  };
 
   constructor(parent: HTMLElement) {
     const canvas = document.createElement('canvas');
@@ -407,16 +414,8 @@ export class NameplateCanvasSurface {
         this.configureTextStyle(guildStyle, GUILD_STYLE.fill),
       );
     }
-    if (state.title) {
-      y -= 11;
-      this.text.draw(
-        ctx,
-        state.title,
-        screenX,
-        y + 9,
-        this.configureTextStyle(this.titleStyle, TITLE_STYLE.fill),
-      );
-    }
+    if (state.title) y -= NAMEPLATE_CARTOUCHE_TITLE_STEP;
+    y -= this.cartoucheLift(state);
 
     const rowHeight = this.drawNameRow(state, screenX, y);
     y -= rowHeight;
@@ -487,7 +486,8 @@ export class NameplateCanvasSurface {
     if (state.castVisible) y -= 10;
     if (state.hpVisible) y -= 7;
     if (state.guild) y -= state.currentTarget ? 14 : 12;
-    if (state.title) y -= 11;
+    if (state.title) y -= NAMEPLATE_CARTOUCHE_TITLE_STEP;
+    y -= this.cartoucheLift(state);
     y -= this.nameRowHeight(state);
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.comboPips > 0) y -= 9;
@@ -529,6 +529,10 @@ export class NameplateCanvasSurface {
     this.text.clear();
   };
 
+  private cartoucheLift(state: NameplateCanvasState): number {
+    return state.border && borderAccent(state.border) ? NAMEPLATE_CARTOUCHE_EXTRA_LIFT : 0;
+  }
+
   private nameRowHeight(state: NameplateCanvasState): number {
     let height = state.currentTarget ? 18 : 16;
     for (const badge of state.badges) height = Math.max(height, badge.size);
@@ -543,6 +547,7 @@ export class NameplateCanvasSurface {
     this.configureTextStyle(this.levelStyle, state.levelColor);
     this.configureTextStyle(this.aiStyle, AI_STYLE.fill);
     this.configureTextStyle(this.cheaterStyle, CHEATER_STYLE.fill);
+    const titleStyle = this.configureTextStyle(this.titleStyle, TITLE_STYLE.fill);
     const nameWidth = this.text.measureAdvance(state.name, nameStyle);
     const levelWidth = state.level ? this.text.measureAdvance(state.level, this.levelStyle) + 6 : 0;
     const aiWidth = state.aiLabel ? this.text.measureAdvance(state.aiLabel, this.aiStyle) + 3 : 0;
@@ -552,9 +557,19 @@ export class NameplateCanvasSurface {
     let badgeWidth = 0;
     for (const badge of state.badges) badgeWidth += badge.size + 3;
     const rowWidth = badgeWidth + cheaterWidth + aiWidth + levelWidth + nameWidth;
-    let x = screenX - rowWidth / 2;
-    const topY = bottomY - rowHeight;
-    if (state.border) this.drawBorderAccent(state.border, screenX, topY, bottomY, rowWidth);
+    const titleWidth = state.title ? this.text.measureAdvance(state.title, titleStyle) : 0;
+    const input = this.cartoucheInput;
+    input.screenX = screenX;
+    input.nameRowBottomY = bottomY;
+    input.nameRowWidth = rowWidth;
+    input.nameRowHeight = rowHeight;
+    input.titleWidth = titleWidth;
+    input.slug = borderAccent(state.border) ? state.border : '';
+    const cartouche = nameplateCartoucheInto(this.cartouche, input);
+    if (cartouche.active) this.drawBorderAccent(state.border, state.opacity);
+    let x = cartouche.nameRowLeft;
+    const topY = cartouche.nameRowTop;
+    const nameBaseline = cartouche.nameBaseline;
     for (const badge of state.badges) {
       this.drawBadge(badge, x, topY + (rowHeight - badge.size) / 2);
       x += badge.size + 3;
@@ -563,17 +578,17 @@ export class NameplateCanvasSurface {
     // sanction is the first thing the row should say about this player.
     if (state.cheaterLabel) {
       const width = cheaterWidth - 3;
-      this.text.draw(this.ctx, state.cheaterLabel, x + width / 2, bottomY - 3, this.cheaterStyle);
+      this.text.draw(this.ctx, state.cheaterLabel, x + width / 2, nameBaseline, this.cheaterStyle);
       x += cheaterWidth;
     }
     if (state.aiLabel) {
       const width = aiWidth - 3;
-      this.text.draw(this.ctx, state.aiLabel, x + width / 2, bottomY - 3, this.aiStyle);
+      this.text.draw(this.ctx, state.aiLabel, x + width / 2, nameBaseline, this.aiStyle);
       x += aiWidth;
     }
     if (state.level) {
       const width = levelWidth - 6;
-      this.text.draw(this.ctx, state.level, x + width / 2, bottomY - 2, this.levelStyle);
+      this.text.draw(this.ctx, state.level, x + width / 2, nameBaseline + 1, this.levelStyle);
       x += levelWidth;
     }
     const nameX = x + nameWidth / 2;
@@ -582,54 +597,98 @@ export class NameplateCanvasSurface {
       devStyle.fill = nameStyle.fill;
       devStyle.stroke = this.forcedColorsActive() ? 'Highlight' : state.devOutline;
       devStyle.lineWidth = 4;
-      this.text.draw(this.ctx, state.name, nameX, bottomY - 3, devStyle);
+      this.text.draw(this.ctx, state.name, nameX, nameBaseline, devStyle);
     }
-    this.text.draw(this.ctx, state.name, nameX, bottomY - 3, nameStyle);
+    this.text.draw(this.ctx, state.name, nameX, nameBaseline, nameStyle);
+    if (state.title) {
+      this.text.draw(
+        this.ctx,
+        state.title,
+        cartouche.titleCenterX,
+        cartouche.titleBaseline,
+        titleStyle,
+      );
+    }
     return rowHeight;
   }
 
-  // The Book of Deeds accent around the name row: a dark contour, the slug's
-  // bright frame line over it, and a light inner hairline (the classic gilt
-  // double edge). Shapes only, so it creates no text sprite and no cache entry,
-  // and the palette record is the frozen table row, so a plate allocates nothing
-  // per frame. Drawn BEFORE the row content so the name always sits on top.
+  // The Book of Deeds cartouche: midnight well, three-layer metal edge, shared
+  // L-brackets and top clasp. Shapes only, so it creates no text sprite and no
+  // cache entry. Geometry comes from the caller-owned cartouche record. Drawn
+  // BEFORE the row content so the name and title sit on top of the well.
   // Cosmetic identity only: it encodes no health, range, rank, or threat, so
   // collapsing all four slugs onto one system-color pair under forced colors
   // hides nothing a player acts on (unlike the quest marker tones, which earn a
   // redundant non-color cue).
-  private drawBorderAccent(
-    slug: string,
-    centerX: number,
-    topY: number,
-    bottomY: number,
-    rowWidth: number,
-  ): void {
+  private drawBorderAccent(slug: string, plateAlpha: number): void {
     const accent = borderAccent(slug);
-    if (!accent) return;
+    const cartouche = this.cartouche;
+    if (!accent || !cartouche.active) return;
     const ctx = this.ctx;
     const forcedColors = this.forcedColorsActive();
-    const x = centerX - rowWidth / 2 - BORDER_ACCENT_PAD_X;
-    const y = topY - BORDER_ACCENT_PAD_TOP;
-    const width = rowWidth + BORDER_ACCENT_PAD_X * 2;
-    const height = bottomY - y;
-    roundedRect(ctx, x, y, width, height, BORDER_ACCENT_RADIUS);
-    ctx.lineWidth = BORDER_ACCENT_EDGE_WIDTH;
-    ctx.strokeStyle = forcedColors ? 'Canvas' : accent.edge;
-    ctx.stroke();
-    ctx.lineWidth = BORDER_ACCENT_FRAME_WIDTH;
-    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
-    ctx.stroke();
-    const inset = BORDER_ACCENT_INNER_INSET;
     roundedRect(
       ctx,
-      x + inset,
-      y + inset,
-      Math.max(1, width - inset * 2),
-      Math.max(1, height - inset * 2),
-      BORDER_ACCENT_RADIUS - inset,
+      cartouche.well.x,
+      cartouche.well.y,
+      cartouche.well.w,
+      cartouche.well.h,
+      cartouche.radius,
     );
-    ctx.lineWidth = BORDER_ACCENT_INNER_WIDTH;
+    if (forcedColors) {
+      ctx.fillStyle = 'Canvas';
+      ctx.fill();
+    } else {
+      ctx.globalAlpha = plateAlpha * NAMEPLATE_CARTOUCHE_WELL_ALPHA;
+      ctx.fillStyle = NAMEPLATE_CARTOUCHE_WELL_FILL;
+      ctx.fill();
+      ctx.globalAlpha = plateAlpha;
+    }
+    roundedRect(
+      ctx,
+      cartouche.outer.x,
+      cartouche.outer.y,
+      cartouche.outer.w,
+      cartouche.outer.h,
+      cartouche.radius,
+    );
+    ctx.lineWidth = CARTOUCHE_EDGE_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'Canvas' : accent.edge;
+    ctx.stroke();
+    ctx.lineWidth = CARTOUCHE_FRAME_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
+    ctx.stroke();
+    roundedRect(
+      ctx,
+      cartouche.inner.x,
+      cartouche.inner.y,
+      cartouche.inner.w,
+      cartouche.inner.h,
+      cartouche.innerRadius,
+    );
+    ctx.lineWidth = CARTOUCHE_INNER_WIDTH;
     ctx.strokeStyle = forcedColors ? 'Canvas' : accent.glow;
+    ctx.stroke();
+    ctx.beginPath();
+    for (const bracket of cartouche.brackets) {
+      ctx.moveTo(bracket.endX, bracket.cornerY);
+      ctx.lineTo(bracket.cornerX, bracket.cornerY);
+      ctx.lineTo(bracket.cornerX, bracket.endY);
+    }
+    ctx.lineWidth = CARTOUCHE_HARDWARE_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
+    ctx.stroke();
+    roundedRect(
+      ctx,
+      cartouche.clasp.x,
+      cartouche.clasp.y,
+      cartouche.clasp.w,
+      cartouche.clasp.h,
+      CARTOUCHE_CLASP_RADIUS,
+    );
+    ctx.fillStyle = forcedColors ? 'Canvas' : NAMEPLATE_CARTOUCHE_WELL_FILL;
+    ctx.fill();
+    ctx.lineWidth = CARTOUCHE_HARDWARE_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
     ctx.stroke();
   }
 

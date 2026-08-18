@@ -43,6 +43,7 @@ const RING_RULE = HUD_CSS.match(
 const ACCENT_PATH = [
   'src/ui/deed_border_view.ts',
   'src/render/nameplate_canvas.ts',
+  'src/render/nameplate_cartouche_core.ts',
   'src/render/nameplate_painter.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_frame_painter.ts',
@@ -217,6 +218,8 @@ describe('the portrait ring consumes the palette table, and holds no colors of i
     const body = cartouche.slice(0, cartouche.indexOf('private drawHealth('));
     expect(body).toContain("forcedColors ? 'CanvasText' : accent.frame");
     expect(body).toContain("forcedColors ? 'Canvas' : accent.edge");
+    expect(body).toContain("forcedColors ? 'Canvas' : NAMEPLATE_CARTOUCHE_WELL_FILL");
+    expect(body).toContain("forcedColors ? 'Canvas' : accent.glow");
   });
 
   it('gives the inspect header accent the same forced-colors arm', () => {

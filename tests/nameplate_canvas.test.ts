@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createNameplateCanvasState,
@@ -9,7 +10,15 @@ import {
   NAMEPLATE_TEXT_SPRITE_LIMIT,
   NameplateCanvasSurface,
 } from '../src/render/nameplate_canvas';
+import {
+  NAMEPLATE_CARTOUCHE_EXTRA_LIFT,
+  NAMEPLATE_CARTOUCHE_WELL_FILL,
+} from '../src/render/nameplate_cartouche_core';
 import { BORDER_ACCENT_SLUGS, borderAccent } from '../src/ui/deed_border_view';
+
+// jsdom rewrites a literal `new URL('...', import.meta.url)` to an http URL.
+// Keep the relative path in a variable so readFileSync still sees a file URL.
+const readSource = (rel: string): string => readFileSync(new URL(rel, import.meta.url), 'utf8');
 
 interface ContextTrace {
   canvas: HTMLCanvasElement;
@@ -554,8 +563,10 @@ describe('nameplate canvas surface', () => {
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
 
-    // Three strokes: the dark contour, the slug's frame line, the inner hairline.
-    expect(traces[0].stroke).toHaveBeenCalledTimes(3);
+    // Five strokes: dark contour, frame, inner hairline, shared brackets, clasp.
+    expect(traces[0].stroke).toHaveBeenCalledTimes(5);
+    expect(traces[0].fill).toHaveBeenCalledTimes(2);
+    expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
     expect(traces[0].strokeStyles).toEqual(
       expect.arrayContaining([accent?.frame, accent?.edge, accent?.glow]),
     );
@@ -577,9 +588,9 @@ describe('nameplate canvas surface', () => {
     }
   });
 
-  it('adds no vertical space, so the emote anchor walk still lands on the name row', () => {
-    // drawEmote re-walks drawBase's y-steps to find its anchor. An accent that
-    // added height would desync the two silently, floating the emote plate.
+  it('E22: drawEmote and drawBase share extraLift so the bubble sits above the clasp', () => {
+    // drawEmote re-walks drawBase's y-steps to find its anchor. Both consume
+    // the same named extraLift, so the bubble stays above the clasp.
     vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
     vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(32);
     const surface = new NameplateCanvasSurface(document.createElement('div'));
@@ -600,13 +611,17 @@ describe('nameplate canvas surface', () => {
     surface.drawBase(state, 320, 220);
     surface.drawEmote(state, 320, 220);
     const withoutAccent = emoteBlits().at(-1);
+    expect(withoutAccent).toBeDefined();
 
     state.border = 'deepward';
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     surface.drawEmote(state, 320, 220);
-
-    expect(emoteBlits().at(-1)).toEqual(withoutAccent);
+    const withAccent = emoteBlits().at(-1);
+    expect(withAccent).toBeDefined();
+    expect(withAccent?.[1]).toBe(withoutAccent?.[1]);
+    expect(withAccent?.[2]).toBe((withoutAccent?.[2] as number) - NAMEPLATE_CARTOUCHE_EXTRA_LIFT);
+    expect(NAMEPLATE_CARTOUCHE_EXTRA_LIFT).toBe(14);
   });
 
   it('uses system colors for actionable shapes and text in forced-colors mode', () => {
@@ -649,7 +664,13 @@ describe('nameplate canvas surface', () => {
       // survives, and the identity it carries is cosmetic, so nothing is lost.
       const accent = borderAccent('deepward');
       expect(strokeStyles).not.toContain(accent?.frame);
+      expect(strokeStyles).not.toContain(accent?.edge);
       expect(strokeStyles).not.toContain(accent?.glow);
+      expect(fillStyles).not.toContain(accent?.frame);
+      expect(fillStyles).not.toContain(accent?.edge);
+      expect(fillStyles).not.toContain(accent?.glow);
+      expect(fillStyles).not.toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+      expect(fillStyles).toContain('Canvas');
     } finally {
       if (previousMatchMedia) {
         Object.defineProperty(window, 'matchMedia', previousMatchMedia);
@@ -695,6 +716,178 @@ describe('nameplate canvas surface', () => {
         Reflect.deleteProperty(window, 'matchMedia');
       }
     }
+  });
+
+  it('E2: a worn border draws the title with the name, inside the well', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Gilded One',
+      title: 'Gate Keeper',
+      border: 'deepward',
+    });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    const rasterizedText = traces.flatMap((trace) =>
+      trace.fillText.mock.calls.map(([value]) => value),
+    );
+    expect(rasterizedText).toContain('Gate Keeper');
+    expect(rasterizedText).toContain('Gilded One');
+    expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+    expect(traces[0].stroke).toHaveBeenCalledTimes(5);
+  });
+
+  it('E9: draws the dev-tier name outline after the well, never under it', () => {
+    const source = readSource('../src/render/nameplate_canvas.ts');
+    const accentAt = source.indexOf('if (cartouche.active) this.drawBorderAccent');
+    const outlineAt = source.indexOf(
+      'this.text.draw(this.ctx, state.name, nameX, nameBaseline, devStyle)',
+    );
+    expect(accentAt).toBeGreaterThan(-1);
+    expect(outlineAt).toBeGreaterThan(accentAt);
+  });
+
+  it('E11: guild stays outside the plaque, below the health bar and above the cartouche', () => {
+    const source = readSource('../src/render/nameplate_canvas.ts');
+    const guildAt = source.indexOf('if (state.guild)');
+    const liftAt = source.indexOf('y -= this.cartoucheLift(state)');
+    expect(guildAt).toBeGreaterThan(-1);
+    expect(liftAt).toBeGreaterThan(guildAt);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Guilded',
+      guild: 'The Testers',
+      guildLabel: '<The Testers>',
+      border: 'deepward',
+    });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    const rasterizedText = traces.flatMap((trace) =>
+      trace.fillText.mock.calls.map(([value]) => value),
+    );
+    expect(rasterizedText).toContain('<The Testers>');
+    expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+  });
+
+  it('E12: HP, cast, combo, and raid-mark slots stay on their existing y-steps', () => {
+    const source = readSource('../src/render/nameplate_canvas.ts');
+    expect(source).toContain('if (state.castVisible) {\n      y -= 10;');
+    expect(source).toContain('if (state.hpVisible) {\n      y -= 7;');
+    expect(source).toContain('if (state.comboPips > 0) {\n      y -= 9;');
+    expect(source).toContain('if (state.raidMarkerUrl) {\n      y -= 31;');
+    expect(source).toContain('y -= 47;');
+  });
+
+  it('E13: a dead player still draws the plaque when a border is worn', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Fallen',
+      hpVisible: false,
+      deadEnemy: true,
+      border: 'prestige_laurels',
+    });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+    expect(traces[0].stroke).toHaveBeenCalledTimes(5);
+  });
+
+  it('E14: stealth opacity applies to the plaque as well as the text', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Sneak',
+      opacity: 0.55,
+      border: 'deepward',
+    });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    expect(traces[0].globalAlphas).toContain(0.55);
+    expect(traces[0].globalAlphas).toContain(0.55 * 0.4);
+    expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+  });
+
+  it('E19: hostile name stays red inside the same slug metal, not a hostile recolor', () => {
+    const accent = borderAccent('curators_gilt');
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Rival',
+      hostile: true,
+      border: 'curators_gilt',
+    });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    expect(traces[0].strokeStyles).toEqual(
+      expect.arrayContaining([accent?.frame, accent?.edge, accent?.glow]),
+    );
+    expect(traces[0].strokeStyles).not.toContain('#ff5555');
+  });
+
+  it('E21: a borderless plate draws no well and no hardware', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Plain',
+      title: 'Veteran',
+    });
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    expect(traces[0].fillStyles).not.toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+    expect(traces[0].stroke).toHaveBeenCalledTimes(0);
+    const rasterizedText = traces.flatMap((trace) =>
+      trace.fillText.mock.calls.map(([value]) => value),
+    );
+    expect(rasterizedText).toContain('Veteran');
+    expect(rasterizedText).toContain('Plain');
+  });
+
+  it('E15: unknown and empty slugs draw no plaque', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    state.initialized = true;
+    state.name = 'No Accent';
+    for (const slug of ['', 'slug_with_no_palette']) {
+      traces[0].fillStyles.length = 0;
+      traces[0].stroke.mockClear();
+      state.border = slug;
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 220);
+      expect(traces[0].fillStyles, slug || '(empty)').not.toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
+      expect(traces[0].stroke, slug || '(empty)').toHaveBeenCalledTimes(0);
+    }
+  });
+
+  it('E17: extraLift is applied in CSS pixels, not multiplied by DPR', () => {
+    const source = readSource('../src/render/nameplate_canvas.ts');
+    expect(source).toContain('y -= this.cartoucheLift(state)');
+    expect(source).not.toContain('cartoucheLift(state) *');
+    expect(source).not.toContain('EXTRA_LIFT *');
+    expect(NAMEPLATE_CARTOUCHE_EXTRA_LIFT).toBe(14);
+  });
+
+  it('E18 / E20: self-hide and non-player paths never assign a worn slug after reset', () => {
+    const painter = readSource('../src/render/nameplate_painter.ts');
+    const resetAt = painter.indexOf("state.border = '';");
+    const playerBorderAt = painter.indexOf('state.border = deedBorderSlug(entity.border);');
+    const suppressAt = painter.indexOf('if (suppressSelf)');
+    const objectReturnAt = painter.indexOf("if (entity.kind === 'object')");
+    const playerAt = painter.indexOf("if (entity.kind === 'player')");
+    expect(resetAt).toBeGreaterThan(-1);
+    expect(playerBorderAt).toBeGreaterThan(playerAt);
+    expect(suppressAt).toBeGreaterThan(playerAt);
+    expect(suppressAt).toBeLessThan(playerBorderAt);
+    expect(objectReturnAt).toBeGreaterThan(-1);
+    expect(objectReturnAt).toBeLessThan(playerAt);
+    expect(painter.split('state.border = deedBorderSlug').length - 1).toBe(1);
   });
 
   it('removes its font listener and canvas when the renderer host disposes it', async () => {
