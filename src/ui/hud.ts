@@ -41,9 +41,6 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
-import { resolveActionReplacement } from '../sim/combat/action_replacement';
-import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
-import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
 import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
@@ -388,6 +385,7 @@ import {
   createGroundAimState,
   enterGroundAim,
   type GroundAimState,
+  groundTargetAimPoint,
   shouldUseGroundAim,
 } from './hud/action_bar/ground_aim';
 import {
@@ -415,6 +413,7 @@ import {
 } from './hud/action_bar/mobile_action_page_view';
 import { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
+import { resolveSlotAbility } from './hud/action_bar/slot_ability_core';
 import {
   BattlegroundKillFeed,
   BattlegroundMapPainter,
@@ -441,6 +440,7 @@ import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/
 import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
+import { CrossHotbarController, type CrossHotbarHold } from './hud/cross_hotbar';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
@@ -833,6 +833,10 @@ export interface GamepadBindingsHooks {
   // Detected brand of the connected pad, so the panel labels each button with the
   // glyph printed on that controller ('generic' combined labels when none/unknown).
   kind(): GamepadKind;
+  // The cross hotbar layout: the action-bar slot each position casts, per set.
+  crossHotbarSets(): readonly (readonly number[])[];
+  bindCrossHotbar(set: number, position: number, actionBarSlot: number): void;
+  resetCrossHotbar(): void;
 }
 
 export interface ReportHooks {
@@ -1315,6 +1319,7 @@ export class Hud {
   private mobileActionPage = 0;
   private mobileActionRingView: ActionBarView | undefined;
   private mobileActionRingPainter: MobileActionRingPainter | undefined;
+  private crossHotbar: CrossHotbarController | undefined;
   // Consumables quick bar (touch): the auto-populated potion/elixir/food/drink
   // row behind the chevron chip next to the top-left trio. consumableBarIds is
   // the ONE reused array the pure core fills WHEN THE ROW OPENS and that stays
@@ -6721,19 +6726,7 @@ export class Hud {
     const action = this.actionForSlot(barSlot);
     if (action?.type !== 'ability') return null;
     const known = this.sim.known.find((entry) => entry.def.id === action.id) ?? null;
-    if (!known) return null;
-    // Action-slot replacement: the saved binding keeps the base id while the
-    // painted button follows the aura state, the same pure resolution the sim
-    // cast path uses (rogue engine transforms for every class, plus the
-    // hunter-specific resolvers below).
-    const resolved = resolveActionReplacement(known, this.sim.player);
-    if (this.sim.cfg.playerClass !== 'hunter') return resolved;
-    const coldsight = resolveColdsightAbilityForSpec(
-      resolved,
-      this.sim.player,
-      this.sim.talents.spec,
-    );
-    return resolveHunterSharedAbilityForTalents(coldsight, this.sim.player, this.sim.talents);
+    return resolveSlotAbility(known, this.sim.player, this.sim.talents, this.sim.cfg.playerClass);
   }
 
   private itemForSlot(barSlot: number): ItemDef | null {
@@ -6748,15 +6741,9 @@ export class Hud {
     );
   }
 
-  // Where a ground-targeted ability should land: the current target's position if
-  // one is selected (the usual "cast on that pack" intent), else the caster's own
-  // spot for an open-ground cast. The sim clamps this to the ability's range.
   private groundTargetAim(): { x: number; z: number } {
-    const me = this.sim.player;
-    const tid = me.targetId;
-    const t = tid !== null ? this.sim.entities.get(tid) : null;
-    if (t && !t.dead && t.id !== me.id) return { x: t.pos.x, z: t.pos.z };
-    return { x: me.pos.x, z: me.pos.z };
+    const tid = this.sim.player.targetId;
+    return groundTargetAimPoint(this.sim.player, tid !== null ? this.sim.entities.get(tid) : null);
   }
 
   // The Vale Cup sport moves are AUTOCAST on press: no ground-target reticle, no
@@ -7545,6 +7532,9 @@ export class Hud {
       (iconKey) => this.actionBarIconBg(iconKey),
     );
 
+    this.crossHotbar = CrossHotbarController.create(this.writerFacet, (k) =>
+      this.actionBarIconBg(k),
+    );
     this.buildMobileActionRing();
     this.buildMobileConsumableBar();
   }
@@ -9471,7 +9461,9 @@ export class Hud {
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
-    this.actionBarPainter.paint(this.actionBarView.tick(actionBarWorld));
+    const actionBarState = this.actionBarView.tick(actionBarWorld);
+    this.actionBarPainter.paint(actionBarState);
+    this.crossHotbar?.paint(actionBarState);
 
     // mobile action ring: the paged touch combat cluster, gated on the touch-mode
     // signal so desktop skips the tick+paint entirely (both the view and painter
@@ -19083,6 +19075,11 @@ export class Hud {
 
   /** Called by main.ts when a pad connects/disconnects: re-label the Controller
    *  panel with the newly detected brand's glyphs if that panel is open. */
+  /** Open or close the controller cross hotbar (the pad's held-trigger bar). */
+  setCrossHotbar(hold: CrossHotbarHold | null): void {
+    this.crossHotbar?.setHold(hold?.layer ?? null, hold?.slots ?? [], hold?.expanded ?? false);
+  }
+
   refreshControllerLabels(): void {
     this.optionsWindow.refreshControllerLabels();
   }

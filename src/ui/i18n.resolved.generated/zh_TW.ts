@@ -1449,7 +1449,19 @@ export const zh_TW: EnTranslations = {
       "menuAction": "遊戲選單",
       "zoomIn": "放大",
       "zoomOut": "縮小",
-      "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。"
+      "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarExpandHelp": "Tapping the opposite trigger while holding swaps to the second set.",
+      "crossHotbarSet": "Set {set}",
+      "crossHotbarSetPrimary": "First Set",
+      "crossHotbarSetExpanded": "Second Set",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarSlot": "Action Bar {slot}",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOverlay": "Cross hotbar"
     },
     "perf": {
       "title": "效能監視器",

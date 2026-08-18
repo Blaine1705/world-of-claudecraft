@@ -187,6 +187,13 @@ export const BOOL_SETTINGS = {
   // off by default: invert the vertical axis of the right-stick camera, the
   // classic console/flight-sim preference. Independent of mouse/touch invert.
   gamepadInvertY: { def: false },
+  // on by default: the trigger-modifier cross hotbar. Holding a trigger lights
+  // eight action-bar slots on the d-pad and face diamonds. Off restores the flat
+  // one-action-per-button pad layout, triggers included.
+  gamepadCrossHotbar: { def: true },
+  // on by default: tapping the opposite trigger while holding swaps the cross
+  // hotbar to its second set. Off pins it to the first sixteen slots.
+  gamepadCrossHotbarExpand: { def: true },
   // off by default: mirrors the touch layout so the movement joystick sits on
   // the right and the camera joystick on the left, for left-thumb-dominant
   // players. CSS-only swap gated on body.mobile-left-handed; ignored on desktop.

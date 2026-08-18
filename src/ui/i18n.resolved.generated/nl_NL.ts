@@ -1449,7 +1449,19 @@ export const nl_NL: EnTranslations = {
       "menuAction": "Spelmenu",
       "zoomIn": "Inzoomen",
       "zoomOut": "Uitzoomen",
-      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken."
+      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarExpandHelp": "Tapping the opposite trigger while holding swaps to the second set.",
+      "crossHotbarSet": "Set {set}",
+      "crossHotbarSetPrimary": "First Set",
+      "crossHotbarSetExpanded": "Second Set",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarSlot": "Action Bar {slot}",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOverlay": "Cross hotbar"
     },
     "perf": {
       "title": "Prestatie-overlay",

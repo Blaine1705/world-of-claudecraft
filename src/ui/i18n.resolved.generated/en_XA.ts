@@ -1449,7 +1449,19 @@ export const en_XA: EnTranslations = {
       "menuAction": "[Ĝáɱé Ɱéñú]",
       "zoomIn": "[Žóóɱ Íñ]",
       "zoomOut": "[Žóóɱ Óúţ]",
-      "help": "[Ļéƒţ šţíçķ ɱóʋéš, ŕíĝĥţ šţíçķ ļóóķš. Óþéñ á ŵíñðóŵ ţó úšé ţĥé óñ-šçŕééñ þóíñţéŕ.]"
+      "help": "[Ļéƒţ šţíçķ ɱóʋéš, ŕíĝĥţ šţíçķ ļóóķš. Óþéñ á ŵíñðóŵ ţó úšé ţĥé óñ-šçŕééñ þóíñţéŕ.]",
+      "crossHotbar": "[Çŕóšš Ĥóţƀáŕ]",
+      "crossHotbarEnable": "[Éñáƀļé Çŕóšš Ĥóţƀáŕ]",
+      "crossHotbarExpand": "[Ðóúƀļé Çŕóšš Ĥóţƀáŕ]",
+      "crossHotbarHelp": "[Ĥóļð á ţŕíĝĝéŕ ţó ļíĝĥţ éíĝĥţ áçţíóñ-ƀáŕ šļóţš óñ ţĥé ð-þáð áñð ƒáçé ƀúţţóñš. Ţáþ ţĥé óţĥéŕ ţŕíĝĝéŕ ţó šŵáþ ţó ţĥé šéçóñð šéţ.]",
+      "crossHotbarExpandHelp": "[Ţáþþíñĝ ţĥé óþþóšíţé ţŕíĝĝéŕ ŵĥíļé ĥóļðíñĝ šŵáþš ţó ţĥé šéçóñð šéţ.]",
+      "crossHotbarSet": "[Šéţ {set}]",
+      "crossHotbarSetPrimary": "[Ƒíŕšţ Šéţ]",
+      "crossHotbarSetExpanded": "[Šéçóñð Šéţ]",
+      "crossHotbarResetLayout": "[Ŕéšéţ Çŕóšš Ĥóţƀáŕ]",
+      "crossHotbarSlot": "[Áçţíóñ Ɓáŕ {slot}]",
+      "crossHotbarPosition": "[{trigger} + {button}]",
+      "crossHotbarOverlay": "[Çŕóšš ĥóţƀáŕ]"
     },
     "perf": {
       "title": "[Þéŕƒóŕɱáñçé Óʋéŕļáý]",

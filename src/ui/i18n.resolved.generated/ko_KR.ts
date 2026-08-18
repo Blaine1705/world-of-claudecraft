@@ -1449,7 +1449,19 @@ export const ko_KR: EnTranslations = {
       "menuAction": "게임 메뉴",
       "zoomIn": "확대",
       "zoomOut": "축소",
-      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
+      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarExpandHelp": "Tapping the opposite trigger while holding swaps to the second set.",
+      "crossHotbarSet": "Set {set}",
+      "crossHotbarSetPrimary": "First Set",
+      "crossHotbarSetExpanded": "Second Set",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarSlot": "Action Bar {slot}",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOverlay": "Cross hotbar"
     },
     "perf": {
       "title": "성능 오버레이",

@@ -1449,7 +1449,19 @@ export const id_ID: EnTranslations = {
       "menuAction": "Menu Game",
       "zoomIn": "Perbesar",
       "zoomOut": "Perkecil",
-      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar."
+      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarExpandHelp": "Tapping the opposite trigger while holding swaps to the second set.",
+      "crossHotbarSet": "Set {set}",
+      "crossHotbarSetPrimary": "First Set",
+      "crossHotbarSetExpanded": "Second Set",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarSlot": "Action Bar {slot}",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOverlay": "Cross hotbar"
     },
     "perf": {
       "title": "Lapisan Performa",

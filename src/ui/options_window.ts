@@ -21,6 +21,14 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
+import {
+  CROSS_HOTBAR_LAYER_BUTTONS,
+  CROSS_HOTBAR_PRIMARY_SET,
+  CROSS_HOTBAR_SLOTS_PER_LAYER,
+  CROSS_HOTBAR_SLOTS_PER_SET,
+  CROSS_HOTBAR_TRIGGERS,
+  type CrossHotbarLayer,
+} from '../game/cross_hotbar';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
@@ -39,6 +47,7 @@ import {
   stageGraphicsDraftChange,
 } from '../game/graphics_rebuild_core';
 import {
+  ACTION_BAR_SLOTS,
   BIND_ACTIONS,
   BIND_CATEGORIES,
   isReservedCode,
@@ -1859,8 +1868,76 @@ export class OptionsWindow {
         this.renderController();
       });
       body.appendChild(reset);
+      this.renderCrossHotbarRows(body, hooks);
     }
     this.settingsViewFooter(controls);
+  }
+
+  // Which action-bar slot each cross-hotbar position casts. One row per position,
+  // grouped by set and by the trigger that reaches it; the row is named for the
+  // physical pair a player presses (both halves are hardware glyphs, so the pair
+  // is assembled from a t() template rather than concatenated).
+  private renderCrossHotbarRows(body: HTMLElement, hooks: OptionsHooks): void {
+    const kind = hooks.gamepad.kind();
+    const slotOptions = Array.from({ length: ACTION_BAR_SLOTS }, (_, slot) => ({
+      value: String(slot),
+      label: this.actionDisplayName(`slot${slot}`, String(slot + 1)),
+    }));
+    const head = document.createElement('div');
+    head.className = 'kb-cat';
+    head.textContent = t('hudChrome.controller.crossHotbar');
+    body.appendChild(head);
+
+    const help = document.createElement('div');
+    help.className = 'set-note';
+    help.textContent = t('hudChrome.controller.crossHotbarHelp');
+    body.appendChild(help);
+
+    const sets = hooks.gamepad.crossHotbarSets();
+    for (let set = 0; set < sets.length; set++) {
+      const setHead = document.createElement('div');
+      setHead.className = 'kb-cat';
+      setHead.textContent = t(
+        set === CROSS_HOTBAR_PRIMARY_SET
+          ? 'hudChrome.controller.crossHotbarSetPrimary'
+          : 'hudChrome.controller.crossHotbarSetExpanded',
+      );
+      body.appendChild(setHead);
+
+      for (let position = 0; position < CROSS_HOTBAR_SLOTS_PER_SET; position++) {
+        const layer: CrossHotbarLayer = position < CROSS_HOTBAR_SLOTS_PER_LAYER ? 'left' : 'right';
+        const button = CROSS_HOTBAR_LAYER_BUTTONS[position % CROSS_HOTBAR_SLOTS_PER_LAYER] ?? 0;
+        const pair = t('hudChrome.controller.crossHotbarPosition', {
+          trigger: gamepadButtonLabel(CROSS_HOTBAR_TRIGGERS[layer], kind),
+          button: gamepadButtonLabel(button, kind),
+        });
+        const row = document.createElement('div');
+        row.className = 'set-row';
+        const name = document.createElement('span');
+        name.className = 'set-name';
+        name.textContent = pair;
+        const dd = this.deps.buildDropdown(
+          slotOptions,
+          String(sets[set][position] ?? 0),
+          (v) => hooks.gamepad.bindCrossHotbar(set, position, Number(v)),
+          undefined,
+          { ariaLabel: pair },
+        );
+        row.append(name, dd);
+        body.appendChild(row);
+      }
+    }
+
+    const resetLayout = document.createElement('button');
+    resetLayout.type = 'button';
+    resetLayout.className = 'btn';
+    resetLayout.textContent = t('hudChrome.controller.crossHotbarResetLayout');
+    resetLayout.addEventListener('click', () => {
+      audio.click();
+      hooks.gamepad.resetCrossHotbar();
+      this.renderController();
+    });
+    body.appendChild(resetLayout);
   }
 
   // -------------------------------------------------------------------------

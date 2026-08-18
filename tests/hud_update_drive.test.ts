@@ -694,11 +694,25 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the ONLY window on the per-frame band, and since #2519 BOTH of its halves are gated: the guard proved below (knownChanged, an in-place walk of the resolved-ability numbers, no signature string built per frame) gates the rebuild, and the fall-through hotbar-control refresh takes its own change check (takeControlChange) over the three bar inputs its toggles render, so an unchanged frame makes no lookup, no allocation and no DOM write',
   },
   {
+    call: 'this.actionBarView.tick',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: "derives this frame's action-bar slot states; hoisted into a local so the desktop bar, the touch ring and the controller cross hotbar all paint from ONE tick rather than re-deriving it per surface; no DOM write",
+  },
+  {
     call: 'this.actionBarPainter.paint',
     band: 'frame',
     gate: '',
     surface: 'chrome',
     why: 'the desktop action bar, facet-routed',
+  },
+  {
+    call: 'this.crossHotbar.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the controller cross hotbar, facet-routed; it re-presents cells from the action-bar state above rather than ticking its own view, and a frame with no trigger held stops after one elided display write',
   },
   {
     call: 'this.currentMobileActionPage',
@@ -1644,7 +1658,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // release's own window/chrome churn), so it cannot be reconciled by
       // arithmetic across a merge. The numbers below were set from a suite run
       // on the merged tree, not from either side's narrative.
-    ).toEqual({ window: 47, chrome: 82, none: 17 });
+    ).toEqual({ window: 47, chrome: 83, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -1449,7 +1449,19 @@ export const tr_TR: EnTranslations = {
       "menuAction": "Oyun Menüsü",
       "zoomIn": "Yakınlaştır",
       "zoomOut": "Uzaklaştır",
-      "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın."
+      "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarExpandHelp": "Tapping the opposite trigger while holding swaps to the second set.",
+      "crossHotbarSet": "Set {set}",
+      "crossHotbarSetPrimary": "First Set",
+      "crossHotbarSetExpanded": "Second Set",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarSlot": "Action Bar {slot}",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOverlay": "Cross hotbar"
     },
     "perf": {
       "title": "Performans Katmanı",

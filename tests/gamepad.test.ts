@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
 import { type GamepadCallbacks, GamepadManager } from '../src/game/gamepad';
 import { GamepadBindings } from '../src/game/gamepad_bindings';
 import {
@@ -714,5 +715,196 @@ describe('GamepadManager: onActivity', () => {
     } satisfies GamepadCallbacks);
     (manager as unknown as { index: number | null }).index = 0;
     expect(() => manager.poll(1 / 60)).not.toThrow();
+  });
+});
+
+// The cross hotbar turns the two triggers into modifiers: holding one lights
+// eight slots (the d-pad and face diamonds), and those presses cast action-bar
+// slots instead of the buttons' own flat bindings. With the setting off, every
+// button must behave exactly as it did before the cross hotbar existed.
+describe('GamepadManager cross hotbar', () => {
+  // Own the DOM globals poll() and stop() read (the focus gate and the connect
+  // listeners), the same way withRealInput above does, so these cases do not
+  // inherit whatever an earlier suite left on globalThis.
+  afterEach(() => vi.unstubAllGlobals());
+
+  function setupCrossHotbar(enabled: boolean) {
+    vi.stubGlobal('document', {
+      hasFocus: () => true,
+      // Cursor mode builds the virtual pointer element on entry.
+      createElement: () => ({ className: '', style: {}, setAttribute: vi.fn() }),
+      body: { appendChild: vi.fn() },
+    });
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+    let pad = gamepadWithPressed();
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const onAction = vi.fn();
+    const onCrossHotbar = vi.fn();
+    const triggerGamepadJump = vi.fn();
+    const input = {
+      applyGamepadLook: vi.fn(),
+      setGamepadLookActive: vi.fn(),
+      setGamepadMove: vi.fn(),
+      clearGamepadMove: vi.fn(),
+      triggerGamepadJump,
+      toggleAutorun: vi.fn(),
+      zoomBy: vi.fn(),
+    } as unknown as Input;
+    let pointerMode = false;
+    const manager = new GamepadManager(input, new GamepadBindings(), {
+      onAction,
+      onInputEdge: vi.fn(),
+      isPointerMode: () => pointerMode,
+      onCrossHotbar,
+    } satisfies GamepadCallbacks);
+    manager.setCrossHotbarBindings(new CrossHotbarBindings());
+    (manager as unknown as { index: number | null }).index = 0;
+    manager.setCrossHotbar(enabled);
+    return {
+      manager,
+      onAction,
+      onCrossHotbar,
+      triggerGamepadJump,
+      press: (...buttons: number[]) => {
+        pad = gamepadWithPressed(...buttons);
+        manager.poll(1 / 60);
+      },
+      setPointerMode: (on: boolean) => {
+        pointerMode = on;
+      },
+    };
+  }
+
+  it('casts the mirrored action-bar slot for a left-trigger d-pad press', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.DPAD_UP);
+    // D-pad up is the first position of the left layer -> action-bar slot 0.
+    expect(h.onAction).toHaveBeenCalledWith('slot0');
+    // Never its own flat binding, which is slot5.
+    expect(h.onAction).not.toHaveBeenCalledWith('slot5');
+  });
+
+  it('reaches the second eight through the right trigger', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    expect(h.onAction).toHaveBeenCalledWith('slot15');
+    expect(h.triggerGamepadJump).not.toHaveBeenCalled();
+  });
+
+  it('resolves a trigger and a button pressed in the same poll', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onAction).toHaveBeenCalledWith('slot0');
+  });
+
+  it('never fires a trigger own flat binding while the cross hotbar is on', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.RT);
+    // The default flat layout puts slot4 on LT and slot3 on RT.
+    expect(h.onAction).not.toHaveBeenCalledWith('slot4');
+    expect(h.onAction).not.toHaveBeenCalledWith('slot3');
+  });
+
+  it('swaps to the second set when the opposite trigger is tapped', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.RT);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onAction).toHaveBeenCalledWith('slot16');
+    expect(h.onAction).not.toHaveBeenCalledWith('slot0');
+  });
+
+  it('stays on the primary set when the double bar is switched off', () => {
+    const h = setupCrossHotbar(true);
+    h.manager.setCrossHotbarExpand(false);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.RT);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onAction).toHaveBeenCalledWith('slot0');
+    expect(h.onAction).not.toHaveBeenCalledWith('slot16');
+  });
+
+  it('leaves buttons the cross hotbar does not claim on their flat binding', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.LB);
+    // LB is neither a diamond button nor a trigger, so its default slot2 stands.
+    expect(h.onAction).toHaveBeenCalledWith('slot2');
+  });
+
+  it('leaves a diamond button on its flat binding while no trigger is held', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.DPAD_UP);
+    expect(h.onAction).toHaveBeenCalledWith('slot5');
+  });
+
+  it('preserves the flat layout exactly when the cross hotbar is off', () => {
+    const h = setupCrossHotbar(false);
+    h.press(GP.LT);
+    expect(h.onAction).toHaveBeenCalledWith('slot4');
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onAction).toHaveBeenCalledWith('slot5');
+    h.press();
+    h.press(GP.A);
+    expect(h.triggerGamepadJump).toHaveBeenCalled();
+    expect(h.onCrossHotbar).not.toHaveBeenCalled();
+  });
+
+  it('tells the overlay when the hotbar opens, swaps sets, and closes', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith('left', 0);
+    h.press(GP.LT, GP.RT);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith('left', 1);
+    h.press();
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
+    expect(h.onCrossHotbar).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not re-notify the overlay on an unchanged hold', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes the hotbar when a HUD window takes the pad into cursor mode', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.setPointerMode(true);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
+  });
+
+  it('closes the hotbar when the setting is turned off mid-hold', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.manager.setCrossHotbar(false);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
+    // The trigger is still physically down, but its flat binding takes over again
+    // only on the NEXT press, never as a phantom edge from the release.
+    h.press(GP.LT);
+    expect(h.onAction).not.toHaveBeenCalledWith('slot4');
+  });
+
+  it('closes the hotbar when the pad is stopped', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.manager.stop();
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
   });
 });

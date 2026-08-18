@@ -1511,6 +1511,22 @@ export const hudChromeStrings = {
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',
     help: 'Left stick moves, right stick looks. Open a window to use the on-screen pointer.',
+    // Cross hotbar: the trigger-modifier hotbar. The trigger and button names
+    // shown beside each row are hardware glyphs from gamepad_map, so only the
+    // chrome around them is keyed here.
+    crossHotbar: 'Cross Hotbar',
+    crossHotbarEnable: 'Enable Cross Hotbar',
+    crossHotbarExpand: 'Double Cross Hotbar',
+    crossHotbarHelp:
+      'Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.',
+    crossHotbarExpandHelp: 'Tapping the opposite trigger while holding swaps to the second set.',
+    crossHotbarSet: 'Set {set}',
+    crossHotbarSetPrimary: 'First Set',
+    crossHotbarSetExpanded: 'Second Set',
+    crossHotbarResetLayout: 'Reset Cross Hotbar',
+    crossHotbarSlot: 'Action Bar {slot}',
+    crossHotbarPosition: '{trigger} + {button}',
+    crossHotbarOverlay: 'Cross hotbar',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in

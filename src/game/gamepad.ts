@@ -5,6 +5,15 @@
 // the host's onAction callback, the virtual-cursor UI-navigation mode, and
 // haptic rumble. Modeled structurally on MobileControls.
 
+import {
+  type CrossHotbarLayer,
+  type CrossHotbarTriggerState,
+  crossHotbarActiveSet,
+  INITIAL_CROSS_HOTBAR_TRIGGER_STATE,
+  isCrossHotbarButton,
+  nextCrossHotbarTriggerState,
+} from './cross_hotbar';
+import type { CrossHotbarBindings } from './cross_hotbar_bindings';
 import type { GamepadBindings } from './gamepad_bindings';
 import {
   AXIS,
@@ -44,6 +53,10 @@ export interface GamepadCallbacks {
   // the OS cannot see: pad input never reaches the window as an event. A held
   // still pad, a connection, and an unfocused window are all silent. Optional.
   onActivity?(): void;
+  // The cross hotbar opened, closed, or swapped sets. `layer` is null once no
+  // trigger is held, which is the overlay's cue to hide. Fired only on a CHANGE,
+  // never per poll. Optional.
+  onCrossHotbar?(layer: CrossHotbarLayer | null, set: number): void;
 }
 
 const CURSOR_SPEED = 900; // px/sec at full stick deflection in UI cursor mode
@@ -57,6 +70,9 @@ export class GamepadManager {
   private invertY = false;
   private vibration = 1;
   private lastHealth: number | null = null;
+  private crossHotbar = false;
+  private crossHotbarExpand = true;
+  private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
   private cursorEl: HTMLDivElement | null = null;
   private cursorX = 0;
   private cursorY = 0;
@@ -64,11 +80,19 @@ export class GamepadManager {
   private boundConnect = (e: GamepadEvent) => this.onConnect(e);
   private boundDisconnect = (e: GamepadEvent) => this.onDisconnect(e);
 
+  private crossHotbarBindings: CrossHotbarBindings | undefined;
+
   constructor(
     private input: Input,
     private bindings: GamepadBindings,
     private cb: GamepadCallbacks,
   ) {}
+
+  /** Supply the persisted cross-hotbar layout a held trigger resolves against.
+   *  Without it the cross hotbar stays inert even when the setting is on. */
+  setCrossHotbarBindings(bindings: CrossHotbarBindings): void {
+    this.crossHotbarBindings = bindings;
+  }
 
   start(): void {
     if (typeof navigator === 'undefined' || typeof navigator.getGamepads !== 'function') return;
@@ -99,6 +123,7 @@ export class GamepadManager {
     this.prevPressed.fill(false);
     this.input.clearGamepadMove();
     this.input.setGamepadLookActive(false);
+    this.releaseCrossHotbar();
     this.hideCursor();
   }
 
@@ -113,6 +138,36 @@ export class GamepadManager {
   }
   setVibration(v: number): void {
     this.vibration = Math.min(1, Math.max(0, v));
+  }
+  /** Turn the trigger-modifier cross hotbar on or off. Off restores the flat
+   *  one-action-per-button layout exactly, triggers included. */
+  setCrossHotbar(on: boolean): void {
+    if (this.crossHotbar === on) return;
+    this.crossHotbar = on;
+    this.releaseCrossHotbar();
+  }
+  /** Whether tapping the opposite trigger swaps to the second set. */
+  setCrossHotbarExpand(on: boolean): void {
+    this.crossHotbarExpand = on;
+    if (!on && this.triggerState.expanded) {
+      this.triggerState = { ...this.triggerState, expanded: false };
+      this.notifyCrossHotbar();
+    }
+  }
+
+  // Drop any held trigger and tell the overlay to hide. Shared by every path
+  // that stops feeding the pad: disable, blur, disconnect, pointer mode, stop().
+  private releaseCrossHotbar(): void {
+    if (this.triggerState.hold === null && !this.triggerState.expanded) {
+      this.triggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
+      return;
+    }
+    this.triggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
+    this.notifyCrossHotbar();
+  }
+
+  private notifyCrossHotbar(): void {
+    this.cb.onCrossHotbar?.(this.triggerState.hold, crossHotbarActiveSet(this.triggerState));
   }
 
   isConnected(): boolean {
@@ -145,6 +200,7 @@ export class GamepadManager {
       this.prevPressed.fill(false);
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
+      this.releaseCrossHotbar();
       this.hideCursor();
       this.cb.onConnectionChange?.();
     }
@@ -186,6 +242,7 @@ export class GamepadManager {
     if (!this.windowFocused()) {
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
+      this.releaseCrossHotbar();
       this.hideCursor();
       this.prevPressed = cur;
       return;
@@ -199,11 +256,17 @@ export class GamepadManager {
       // movement on its own) and skip camera/ability dispatch.
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
+      this.releaseCrossHotbar();
       if (this.updateCursor(pad, cur, dt)) this.cb.onActivity?.();
       this.prevPressed = cur;
       return;
     }
     this.hideCursor();
+
+    // The cross hotbar's trigger state advances BEFORE this poll's edges are
+    // dispatched, so a trigger and a face button pressed in the same poll cast
+    // the cross-hotbar slot rather than the button's flat binding.
+    this.updateCrossHotbarTriggers(cur);
 
     // Movement: left stick.
     const lx = pad.axes[AXIS.LEFT_X] ?? 0;
@@ -240,7 +303,52 @@ export class GamepadManager {
     this.prevPressed = cur;
   }
 
+  // Advance the trigger reducer from this poll's button snapshot and tell the
+  // overlay when the held trigger or the active set actually changed.
+  private updateCrossHotbarTriggers(cur: readonly boolean[]): void {
+    if (!this.crossHotbar) {
+      this.releaseCrossHotbar();
+      return;
+    }
+    const prev = this.triggerState;
+    this.triggerState = nextCrossHotbarTriggerState(
+      prev,
+      cur[GP.LT] ?? false,
+      cur[GP.RT] ?? false,
+      this.crossHotbarExpand,
+    );
+    if (this.triggerState.hold !== prev.hold || this.triggerState.expanded !== prev.expanded) {
+      this.notifyCrossHotbar();
+    }
+  }
+
+  /** The action-bar slot a button press casts through the cross hotbar right now,
+   *  or null when the cross hotbar does not claim this press. */
+  private crossHotbarSlotFor(buttonIndex: number): number | null {
+    const layer = this.triggerState.hold;
+    if (!this.crossHotbar || layer === null || !this.crossHotbarBindings) return null;
+    return this.crossHotbarBindings.actionBarSlot(
+      crossHotbarActiveSet(this.triggerState),
+      layer,
+      buttonIndex,
+    );
+  }
+
   private dispatch(buttonIndex: number): void {
+    if (this.crossHotbar) {
+      // The triggers are the modifier while the cross hotbar is on: they never
+      // fire their own flat binding, the way a Shift key does not type.
+      if (buttonIndex === GP.LT || buttonIndex === GP.RT) return;
+      const slot = this.crossHotbarSlotFor(buttonIndex);
+      if (slot !== null) {
+        this.cb.onAction(`slot${slot}`);
+        return;
+      }
+      // A claimed button pressed with a trigger held but no slot mapped stays
+      // swallowed: falling through to the flat binding would cast the wrong
+      // thing at the exact moment the player is reading the cross hotbar.
+      if (this.triggerState.hold !== null && isCrossHotbarButton(buttonIndex)) return;
+    }
     const action = this.bindings.actionFor(buttonIndex);
     if (action === GAMEPAD_NONE) return;
     if (action === 'jump') {

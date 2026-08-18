@@ -1449,7 +1449,19 @@ export const vi_VN: EnTranslations = {
       "menuAction": "Menu Trò Chơi",
       "zoomIn": "Phóng To",
       "zoomOut": "Thu Nhỏ",
-      "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình."
+      "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarExpandHelp": "Tapping the opposite trigger while holding swaps to the second set.",
+      "crossHotbarSet": "Set {set}",
+      "crossHotbarSetPrimary": "First Set",
+      "crossHotbarSetExpanded": "Second Set",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarSlot": "Action Bar {slot}",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOverlay": "Cross hotbar"
     },
     "perf": {
       "title": "Lớp Phủ Hiệu Năng",

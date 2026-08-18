@@ -39,6 +39,7 @@ import {
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
+import { createCrossHotbar } from './game/cross_hotbar_wiring';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
 import {
@@ -2164,6 +2165,7 @@ async function startGame(
     });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
+  const crossHotbar = createCrossHotbar(() => hud);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
     if (id === 'escape') {
@@ -2324,7 +2326,9 @@ async function startGame(
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
+    onCrossHotbar: crossHotbar.onHold,
   });
+  gamepad.setCrossHotbarBindings(crossHotbar.bindings);
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
 
@@ -2619,6 +2623,7 @@ async function startGame(
       gamepad.setInvertY(settings.set('gamepadInvertY', !!value));
       return;
     }
+    if (crossHotbar.applySetting(gamepad, settings, key, value)) return;
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
       return;
@@ -3072,6 +3077,7 @@ async function startGame(
       entries: () => gamepadBindings.entries(),
       bind: (button, action) => gamepadBindings.bind(button, action),
       reset: () => gamepadBindings.reset(),
+      ...crossHotbar.hooks,
       // The connected pad's brand lives on the manager, not the (hardware-agnostic)
       // bindings, so surface it here for the Controller panel's glyph labels.
       kind: () => gamepad.getKind(),

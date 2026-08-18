@@ -15,6 +15,7 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
 | `interactions.ts` | `handlePickedEntity`: routes a click-pick to target/loot/quest/enter-dungeon via injected `PickInteractionWorld`/`PickInteractionHud` (one of the world-touching modules; see the first invariant below). |
 | `autoloot.ts` | `AutoLoot`: the walk-by loot pass; fires `IWorld.autoLoot(id)` for corpses the local player looks eligible for (best-effort only, the sim's `autoLootForParty` gate stays authoritative). Caller passes the clock in, so it unit-tests deterministically. |
 | `gamepad.ts` / `gamepad_map.ts` / `gamepad_bindings.ts` | pad support: thin polling consumer + pure deterministic mapping core + a separate remappable pad layout (deliberately NOT folded into `Keybinds`; different input space). Stick movement feeds `Input.setGamepadMove` (merged into `readMoveInput()`), camera via `applyGamepadLook`, edge buttons dispatch through the host's `onAction(id)` keybind path. Tests: `tests/gamepad.test.ts`, `tests/gamepad_map.test.ts`. |
+| `cross_hotbar.ts` / `cross_hotbar_bindings.ts` / `cross_hotbar_wiring.ts` | the trigger-modifier cross hotbar (the console-MMO bar a held trigger opens): pure core (layer/trigger reducer, position to action-bar slot resolution, sanitize) + its own persisted layout (`woc_gamepad_xhb`) + the composition seam `main.ts` calls once. It MIRRORS the action bar rather than storing its own actions, so pad and keyboard share one loadout. Consumed by `gamepad.ts`; the overlay lives in `src/ui/hud/cross_hotbar/`. Tests: `tests/cross_hotbar.test.ts`, `tests/cross_hotbar_bindings.test.ts`, the cross-hotbar block in `tests/gamepad.test.ts`. |
 | `touch_router.ts` | Pure, DOM-free touch ownership router: `getTouchOwner`/`isInteractiveHudElement`/`isCameraDragAllowedAt` + a per-pointer `TouchOwnerLedger`, consumed by `mobile_controls.ts` to keep move/combat/camera/menu touches from fighting over the same finger. |
 | `audio.ts` | `GameAudio` (`audio` singleton): the personal UI/event cue surface (facade contract in the music invariant below). |
 | `music.ts` / `music_tracks.ts` | `MusicDirector` (`music` singleton): streamed remastered zone/combat soundtrack (`public/audio/music/`, catalog + combat pick in `music_tracks.ts`); the note-data compositions and `MusicSynth` remain here for the music editor and offline render tooling. |
@@ -83,8 +84,8 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
 - **Each module owns its `localStorage` key:** keybinds `woc_keybinds` (namespaced
   per character: `woc_keybinds:char:<id>` online, `woc_keybinds:offline:<class>:<name>`
   offline, with the bare key kept as a read-only legacy seed for fresh characters),
-  settings `woc_settings`, music on/off `ev_music_on`; `gamepad_bindings.ts` has its
-  own key too. All reads are try/catch-guarded (private mode / corrupt JSON fall
+  settings `woc_settings`, music on/off `ev_music_on`; `gamepad_bindings.ts` and
+  `cross_hotbar_bindings.ts` (`woc_gamepad_xhb`) have their own keys too. All reads are try/catch-guarded (private mode / corrupt JSON fall
   back to defaults).
 - **Keybinds:** `Escape` is reserved (`isReservedCode`) and never bindable, it
   always toggles the game menu. A code lives on at most one action (rebinding
