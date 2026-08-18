@@ -1472,7 +1472,7 @@ export const ja_JP: EnTranslations = {
       "crossHotbarDisplayFull": "通常",
       "crossHotbarDisplayCompact": "コンパクト",
       "crossHotbarDisplayMinimal": "押している間のみ",
-      "crossHotbarArrangeChord": "{bumper} + {button} で配置変更",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "{action}を持っています。マスで決定を押すと置き、キャンセルで戻します。",
       "crossHotbarEditHint": "配置変更中：決定でマスまたはスペルブックからアクションを持ち上げてマスに置き、キャンセルでマスを空にします。",
       "crossHotbarEditHelp": "左バンパーを押しながら上の面ボタンを押すと、コントローラーでバーを配置変更できます。"

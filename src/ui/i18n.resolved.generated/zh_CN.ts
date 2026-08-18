@@ -1472,7 +1472,7 @@ export const zh_CN: EnTranslations = {
       "crossHotbarDisplayFull": "完整",
       "crossHotbarDisplayCompact": "精简",
       "crossHotbarDisplayMinimal": "仅按住时显示",
-      "crossHotbarArrangeChord": "{bumper} + {button} 整理",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "正在拿着{action}：在格子上按确认放置，按取消放回。",
       "crossHotbarEditHint": "整理中：确认键可从格子或法术书中拿起技能并放到格子上，取消键清空格子。",
       "crossHotbarEditHelp": "按住左肩键并按上方面键，即可用手柄整理十字热键栏。"

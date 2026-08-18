@@ -1472,7 +1472,7 @@ export const ru_RU: EnTranslations = {
       "crossHotbarDisplayFull": "Полное",
       "crossHotbarDisplayCompact": "Компактное",
       "crossHotbarDisplayMinimal": "Только при удержании",
-      "crossHotbarArrangeChord": "{bumper} + {button} для перестановки",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "В руках {action}: подтверждение на ячейке кладет действие, отмена возвращает его.",
       "crossHotbarEditHint": "Перестановка: подтверждение берет действие из ячейки или книги заклинаний и кладет его в ячейку, отмена очищает ячейку.",
       "crossHotbarEditHelp": "Удерживайте левый бампер и нажмите верхнюю лицевую кнопку, чтобы переставить панель геймпадом."

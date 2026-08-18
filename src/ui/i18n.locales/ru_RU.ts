@@ -36,7 +36,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarDisplayFull': 'Полное',
   'hudChrome.controller.crossHotbarDisplayCompact': 'Компактное',
   'hudChrome.controller.crossHotbarDisplayMinimal': 'Только при удержании',
-  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button} для перестановки',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
   'hudChrome.controller.crossHotbarCarrying': 'В руках {action}: подтверждение на ячейке кладет действие, отмена возвращает его.',
   'hudChrome.controller.crossHotbarEditHint': 'Перестановка: подтверждение берет действие из ячейки или книги заклинаний и кладет его в ячейку, отмена очищает ячейку.',
   'hudChrome.controller.crossHotbarEditHelp': 'Удерживайте левый бампер и нажмите верхнюю лицевую кнопку, чтобы переставить панель геймпадом.',

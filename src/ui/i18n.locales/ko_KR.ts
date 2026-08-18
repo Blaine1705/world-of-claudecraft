@@ -36,7 +36,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarDisplayFull': '전체',
   'hudChrome.controller.crossHotbarDisplayCompact': '간소',
   'hudChrome.controller.crossHotbarDisplayMinimal': '누르고 있을 때만',
-  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button} 정렬',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
   'hudChrome.controller.crossHotbarCarrying': '{action} 을(를) 들고 있습니다. 칸에서 확인을 누르면 놓고, 취소하면 되돌립니다.',
   'hudChrome.controller.crossHotbarEditHint': '정렬 중: 확인으로 칸이나 마법서에서 액션을 집어 칸에 놓고, 취소로 칸을 비웁니다.',
   'hudChrome.controller.crossHotbarEditHelp': '왼쪽 범퍼를 누른 채 위쪽 페이스 버튼을 누르면 컨트롤러로 바를 정렬할 수 있습니다.',

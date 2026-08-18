@@ -36,7 +36,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarDisplayFull': '完整',
   'hudChrome.controller.crossHotbarDisplayCompact': '精簡',
   'hudChrome.controller.crossHotbarDisplayMinimal': '僅按住時顯示',
-  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button} 整理',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
   'hudChrome.controller.crossHotbarCarrying': '正在拿著{action}：在格子上按確認放置，按取消放回。',
   'hudChrome.controller.crossHotbarEditHint': '整理中：確認鍵可從格子或法術書中拿起技能並放到格子上，取消鍵清空格子。',
   'hudChrome.controller.crossHotbarEditHelp': '按住左肩鍵並按上方面鍵，即可用手把整理十字熱鍵列。',

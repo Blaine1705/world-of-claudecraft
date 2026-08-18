@@ -1472,7 +1472,7 @@ export const pt_BR: EnTranslations = {
       "crossHotbarDisplayFull": "Full",
       "crossHotbarDisplayCompact": "Compact",
       "crossHotbarDisplayMinimal": "Only While Held",
-      "crossHotbarArrangeChord": "{bumper} + {button} to arrange",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
       "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
       "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."

@@ -181,6 +181,25 @@ export const CROSS_HOTBAR_DISPLAY_CLASSES = ['xhb-full', 'xhb-compact', 'xhb-min
  * A layout read, deliberately: it runs when the bar appears, its preset changes,
  * or the window resizes. Never per frame.
  */
+let liftObserver: ResizeObserver | null = null;
+
+/**
+ * Re-measure whenever the bar's own box changes size.
+ *
+ * The explicit calls all fire at moments the bar is still hidden (pad connect and
+ * the startup settings pass both run long before the world is entered), so they
+ * measured zero, gave up and never came back. The bar getting its size IS the
+ * event worth listening to, and it covers the rest for free: a preset change, an
+ * interface-scale change, a window resize.
+ */
+function watchBarForLift(): void {
+  if (liftObserver || typeof ResizeObserver === 'undefined') return;
+  const bar = document.getElementById('cross-hotbar');
+  if (!bar) return;
+  liftObserver = new ResizeObserver(() => measureCrossHotbarLift());
+  liftObserver.observe(bar);
+}
+
 export function measureCrossHotbarLift(): void {
   // Deferred a frame: every caller runs at the moment the bar is turned on or its
   // preset changes, which is BEFORE the browser has laid it out. Measured there it
@@ -226,6 +245,7 @@ function applyDisplayClass(preset: number): void {
     for (const cls of CROSS_HOTBAR_DISPLAY_CLASSES) {
       document.body.classList.toggle(cls, cls === wanted);
     }
+    watchBarForLift();
     measureCrossHotbarLift();
   } catch {
     /* no DOM (headless/tests) */
@@ -260,7 +280,10 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
       bindings.seedOnce(seed.bar, seed.extras);
     }
     ui.setCrossHotbar(on ? crossHotbarResting(bindings, pad.getKind()) : null);
-    if (on) measureCrossHotbarLift();
+    if (on) {
+      watchBarForLift();
+      measureCrossHotbarLift();
+    }
   };
   return {
     bindings,
