@@ -2137,7 +2137,7 @@ describe('a lapsed staged quote never reaches the wallet', () => {
 describe('the QA session closures: settlement hygiene, the claim is not a payment, one click one request', () => {
   const settled = (id = 5) => ({
     ok: true,
-    settlement: { id, amountCents: 100 },
+    settlement: { id, amountCents: 100, deadlineAtMs: 1_800_000_270_000 },
     quote: {
       reference: `ref_${id}`,
       transactionBase64: 'dHg=',
@@ -2153,7 +2153,12 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
   type Ctl = {
     wocTradeOffer: WocPendingOffer | null;
     wocTradeQuote: { offerId: number; totalTokens: number | null; usdCents: number } | null;
-    wocTradeSettlement: { offerId: number; id: number; usdCents: number } | null;
+    wocTradeSettlement: {
+      offerId: number;
+      id: number;
+      usdCents: number;
+      deadlineAtMs: number | null;
+    } | null;
     wocTradeCancelPendingFor: number | null;
     wocTradeSigning: boolean;
     wocTradePaying: boolean;
@@ -2201,15 +2206,30 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
     // The staged figures are announced (and kept in the log) for the reader
     // a live region minted mid-rebuild would miss.
     expect(r.host.logs.some((l) => l.includes(usdText(100)) && l.includes('812.5'))).toBe(true);
-    // The settlement is keyed to THIS offer, with the USD it settles.
-    expect(c.wocTradeSettlement).toEqual({ offerId: 7, id: 5, usdCents: 100 });
+    // The settlement is keyed to THIS offer, with the USD it settles and its
+    // own payment deadline (the claim lock, shorter than the directed hold).
+    expect(c.wocTradeSettlement).toEqual({
+      offerId: 7,
+      id: 5,
+      usdCents: 100,
+      deadlineAtMs: settled().settlement.deadlineAtMs,
+    });
+    // ...which the pay face and the quote face render from now on.
+    expect(document.querySelector('#trade-window .trade-woc-arm')?.textContent).toContain(
+      t('hudChrome.trade.woc.p2pPaymentDueAt', {
+        time: formatDateTime(settled().settlement.deadlineAtMs, { timeStyle: 'short' }),
+      }),
+    );
   });
 
-  it('a claim that answers after the deal ended leaves NOTHING behind for the next deal', async () => {
+  it('a claim that answers after the deal ended stages nothing, and can never pay the NEXT deal', async () => {
     // The T1 leak: Pay pressed, the trade ends mid-claim (partner cancelled,
-    // window closed), the claim answers ok. The old code stored the settlement
-    // and staged the quote anyway, so the NEXT deal's Pay re-quoted the OLD
-    // settlement and Sign paid it.
+    // window closed), the claim answers ok. The old code staged the quote
+    // anyway, so the NEXT deal's Pay re-quoted the OLD settlement and Sign
+    // paid it. The claim itself EXISTS server-side (lock + settlement), so it
+    // is kept, KEYED to its offer: the same deal re-adopted a moment later
+    // re-quotes it (a second claim would be refused over the buyer's own
+    // lock), while a different deal never touches it.
     const h = fakeHooks();
     const gate = deferred<unknown>();
     h.state.buyNowImpl = () => gate.promise;
@@ -2219,9 +2239,13 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
     c.wocTradeOffer = null;
     gate.resolve(settled());
     await inFlight;
-    expect(c.wocTradeSettlement, 'no settlement survives the deal').toBeNull();
     expect(c.wocTradeQuote, 'no quote is staged for a dead deal').toBeNull();
-    // A NEW deal starts clean: its Pay claims its own lock.
+    expect(c.wocTradeSettlement, 'the claim is kept, keyed to ITS offer').toMatchObject({
+      offerId: 7,
+      id: 5,
+    });
+    // A NEW deal starts clean: its Pay claims its own lock and the old
+    // settlement is dropped, never re-quoted under the new price.
     c.wocTradeOffer = heldOffer({
       id: 8,
       role: 'buyer',
@@ -2233,7 +2257,45 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
     h.state.buyNowImpl = () => Promise.resolve(settled(9));
     await c.payWocTradeOffer();
     expect(h.state.calls.buyNows).toBe(2);
-    expect(c.wocTradeSettlement).toEqual({ offerId: 8, id: 9, usdCents: 100 });
+    expect(c.wocTradeSettlement).toMatchObject({ offerId: 8, id: 9, usdCents: 100 });
+  });
+
+  it('the same deal re-adopted after a close re-quotes the KEPT claim: no second buyNow, no own-lock refusal', async () => {
+    // Pay, Not now, the window closes (partner walked away), the pair trades
+    // again inside the lock window: the poll re-adopts the SAME offer id and
+    // Pay must re-quote the settlement it already holds. A second claim would
+    // be refused buy_now_locked over the buyer's own lock (no same-account
+    // arm server-side) while the settlement lapsed into a strike.
+    const h = fakeHooks();
+    h.state.buyNowImpl = () => Promise.resolve(settled());
+    let quotes = 0;
+    h.state.settlementQuoteImpl = () => {
+      quotes += 1;
+      return Promise.resolve({ ok: true, quote: settled().quote });
+    };
+    const { r, c } = await escrowedBuyer(h);
+    await c.payWocTradeOffer();
+    c.wocTradeQuote = null; // Not now
+    // The window closes: the offer clears, the claim stays keyed.
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(c.wocTradeOffer).toBeNull();
+    expect(c.wocTradeSettlement).toMatchObject({ offerId: 7, id: 5 });
+    // The pair trades again; the poll re-adopts the same accepted deal.
+    openTrade(r);
+    await flushAsync();
+    c.wocTradeOffer = heldOffer({
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    await c.payWocTradeOffer();
+    expect(h.state.calls.buyNows, 'one claim for the whole deal').toBe(1);
+    expect(quotes, 'the held settlement is re-quoted').toBe(1);
+    expect((c.wocTradeQuote as { totalTokens: number | null } | null)?.totalTokens).toBe(812.5);
   });
 
   it('adopting a DIFFERENT offer drops a held settlement and staged quote; Sign refuses a foreign one', async () => {
@@ -2266,7 +2328,7 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
     expect(c.wocTradeSettlement, 'the old settlement dies with its deal').toBeNull();
     expect(c.wocTradeQuote, 'and so does its quote').toBeNull();
     // A settlement smuggled in under another offer id never signs.
-    c.wocTradeSettlement = { offerId: 7, id: 5, usdCents: 100 };
+    c.wocTradeSettlement = { offerId: 7, id: 5, usdCents: 100, deadlineAtMs: null };
     c.wocTradeQuote = {
       offerId: 7,
       totalTokens: 1,
@@ -2534,6 +2596,116 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
       await flushAsync();
       expect(r.host.logs, JSON.stringify(row)).toContain(line);
     }
+  });
+
+  it('a quote that answers after the deal ended stages nothing either (the second guard)', async () => {
+    // The claim's own quote lacked a transaction (an older service), so the
+    // re-quote round trip runs; the deal ends while it is out.
+    const h = fakeHooks();
+    h.state.buyNowImpl = () =>
+      Promise.resolve({ ...settled(), quote: { ...settled().quote, transactionBase64: null } });
+    const gate = deferred<unknown>();
+    h.state.settlementQuoteImpl = () => gate.promise;
+    const { c } = await escrowedBuyer(h);
+    const inFlight = c.payWocTradeOffer();
+    await flushAsync();
+    c.wocTradeOffer = null;
+    gate.resolve({ ok: true, quote: settled().quote });
+    await inFlight;
+    expect(c.wocTradeQuote, 'no quote staged for a dead deal').toBeNull();
+    expect(c.wocTradeSettlement, 'the claim stays keyed').toMatchObject({ offerId: 7, id: 5 });
+  });
+
+  it('Sign refuses a settlement keyed to ANOTHER offer even when the quote names this one', async () => {
+    const h = fakeHooks();
+    let confirms = 0;
+    h.state.confirmSettlementImpl = () => {
+      confirms += 1;
+      return Promise.resolve({ ok: true, state: 'settled' });
+    };
+    const { c } = await escrowedBuyer(h);
+    c.wocTradeOffer = heldOffer({
+      id: 8,
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 42,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    c.wocTradeSettlement = { offerId: 7, id: 5, usdCents: 100, deadlineAtMs: null };
+    c.wocTradeQuote = {
+      offerId: 8,
+      totalTokens: 1,
+      sellerTokens: null,
+      burnTokens: null,
+      treasuryTokens: null,
+      usdCents: 100,
+      expiresAtMs: null,
+      reference: 'x',
+      transactionBase64: 'dHg=',
+      signatureRequired: false,
+    } as unknown as Ctl['wocTradeQuote'];
+    await c.signWocTradeQuote();
+    expect(confirms).toBe(0);
+  });
+
+  it('a double tap on Cancel sale sends ONE cancel', async () => {
+    const h = fakeHooks();
+    const gate = deferred<unknown>();
+    h.state.cancelListingImpl = () => gate.promise;
+    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as Ctl;
+    openTrade(r);
+    await flushAsync();
+    c.wocTradeOffer = heldOffer({
+      role: 'seller',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    const first = c.cancelWocDirectedSale();
+    const second = c.cancelWocDirectedSale();
+    gate.resolve({ ok: true });
+    await Promise.all([first, second]);
+    expect(h.state.calls.cancelListings).toEqual([41]);
+  });
+
+  it('closing the window while the signature is out never prints the strike warning', async () => {
+    // The row still reads 'offered' (the signature is not in yet); the buyer
+    // is mid-payment, so the close-time line says the payment continues, not
+    // that the deal awaits payment on pain of a strike.
+    const h = fakeHooks();
+    h.state.buyNowImpl = () =>
+      Promise.resolve({ ...settled(), quote: { ...settled().quote, signatureRequired: true } });
+    const gate = deferred<string>();
+    h.state.signAndSendImpl = () => gate.promise;
+    h.state.confirmSettlementImpl = () => Promise.resolve({ ok: true, state: 'confirming' });
+    h.state.offersResult = {
+      ok: true,
+      offers: [
+        offerRow({
+          status: 'accepted',
+          listingId: 41,
+          listingStatus: 'active',
+          settlementState: 'offered',
+          buyerAccepted: true,
+          sellerAccepted: true,
+        }),
+      ],
+    };
+    const { r, c } = await escrowedBuyer(h);
+    await c.payWocTradeOffer();
+    const signing = c.signWocTradeQuote();
+    expect(c.wocTradeSigning).toBe(true);
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(r.host.logs).toContain(t('hudChrome.trade.woc.closePaymentContinuesBuyer'));
+    expect(r.host.logs).not.toContain(t('hudChrome.trade.woc.dealAwaitsPayment'));
+    gate.resolve('sig');
+    await signing;
   });
 
   it('the /status answer supplies the payment hold the commitment note names', async () => {

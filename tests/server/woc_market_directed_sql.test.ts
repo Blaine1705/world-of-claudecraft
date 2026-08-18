@@ -118,6 +118,7 @@ describe('the schema carries the directed column additively', () => {
     expect(schema).toContain('DROP INDEX IF EXISTS woc_market_offers_buyer_pending;');
     expect(schema).toContain('DROP INDEX IF EXISTS woc_market_offers_seller_pending;');
     expect(schema).not.toContain('CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_pending');
+    expect(schema).not.toContain('CREATE INDEX IF NOT EXISTS woc_market_offers_seller_pending');
   });
 
   it('creates the pair-pending index with its exact columns and partial predicate', async () => {

@@ -215,6 +215,10 @@ export interface WocTradeInput {
    *  shell; the host that knows the page origin passes it in, so this core
    *  and its painter stay host-agnostic). Absent renders the site path. */
   termsHref?: string;
+  /** The claimed settlement's payment deadline for THIS deal (a pressed Pay
+   *  opens a window shorter than the directed hold), or null/absent before
+   *  any claim. Rendered on the buyer's pay and quote faces. */
+  paymentDueAtMs?: number | null;
   /** Paint-time clock for the staged quote's expiry face. Absent means the
    *  face never shows expired (the sign handler still guards the click). */
   nowMs?: number;
@@ -318,6 +322,10 @@ export interface WocTradeModel {
   showBindingNote: boolean;
   /** The consent link's href (see input.termsHref). */
   termsHref: string;
+  /** The claimed settlement's payment deadline to render, or null: the
+   *  buyer's pay and quote faces name it once a claim exists (the pressed
+   *  Pay shortened the window the pre-commitment note announced). */
+  paymentDueAtMs: number | null;
   /** True once the staged quote's deadline passed at paint time: Sign renders
    *  disabled. The click handler re-checks the clock either way (a face
    *  painted before the lapse keeps its enabled button until a repaint), so
@@ -631,6 +639,12 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
       input.pendingOffer?.role === 'buyer' &&
       (input.pendingOffer.phase === 'review' || input.pendingOffer.phase === 'awaiting_payment'),
     termsHref: input.termsHref ?? TERMS_PATH,
+    paymentDueAtMs:
+      input.pendingOffer?.role === 'buyer' &&
+      (input.pendingOffer.phase === 'awaiting_payment' || input.pendingOffer.phase === 'paying') &&
+      typeof input.paymentDueAtMs === 'number'
+        ? input.paymentDueAtMs
+        : null,
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,

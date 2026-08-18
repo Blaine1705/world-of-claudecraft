@@ -74,6 +74,8 @@ export interface WocTradePanelDeps {
   directedHoldSeconds?: number | null;
   /** The consent link's href, resolved per shell by the host (terms_link.ts). */
   termsHref?: string;
+  /** The claimed settlement's payment deadline for this deal, or null. */
+  paymentDueAtMs?: number | null;
   /** Paint-time clock, for the staged quote's expiry face only. */
   nowMs?: number;
   pendingOffer: WocPendingOffer | null;
@@ -142,6 +144,7 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     cancelPending: deps.cancelPending,
     directedHoldSeconds: deps.directedHoldSeconds,
     termsHref: deps.termsHref,
+    paymentDueAtMs: deps.paymentDueAtMs,
     nowMs: deps.nowMs,
     pendingOffer: deps.pendingOffer,
     goldOffered: deps.goldCopper > 0 || deps.partnerGoldCopper > 0,
@@ -254,15 +257,27 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
           leg('hudChrome.wocMarket.quoteSeller', q.sellerTokens) +
           leg('hudChrome.wocMarket.quoteBurn', q.burnTokens) +
           leg('hudChrome.wocMarket.quoteTreasury', q.treasuryTokens);
-        // A lapsed quote SAYS so beside the disabled Sign (the Exchange's
-        // quoteExpired line), instead of a dead button under a past time.
+        // A lapsed quote SAYS so beside the disabled Sign, in this arm's own
+        // words (the way back here is Not now, then Pay: there is no request
+        // control), instead of a dead button under a past time.
         const quoteExpiry = model.quoteExpired
-          ? `<p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.quoteExpired'))}</p>`
+          ? `<p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.quoteExpiredTrade'))}</p>`
           : q.expiresAtMs === null
             ? ''
             : `<p class="trade-woc-note">${esc(
                 t('hudChrome.wocMarket.quoteExpiresAt', {
                   time: formatDateTime(q.expiresAtMs, { timeStyle: 'short' }),
+                }),
+              )}</p>`;
+        // The claim's OWN payment deadline (shorter than the directed hold the
+        // pre-commitment note announced): Not now keeps it running, so the
+        // buyer reads it here too.
+        const dueLine =
+          model.paymentDueAtMs === null
+            ? ''
+            : `<p class="trade-woc-warn">${esc(
+                t('hudChrome.trade.woc.p2pPaymentDueAt', {
+                  time: formatDateTime(model.paymentDueAtMs, { timeStyle: 'short' }),
                 }),
               )}</p>`;
         // No consent row here: the claim that staged this quote was the
@@ -272,6 +287,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
           <p>${esc(t('hudChrome.trade.woc.payNow', { usd: usd(q.usdCents) }))}</p>
           ${legs}
           ${quoteExpiry}
+          ${dueLine}
           <p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>
           <button type="button" class="btn trade-woc-pay" data-woc-sign data-focus-key="trade-woc-sign"${
             model.quoteExpired ? ' disabled' : ''
@@ -282,9 +298,19 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
           <p class="trade-woc-hint" data-woc-hint role="status"></p>
         </div>`;
       }
+      // Once a claim exists its own deadline is the honest figure; before
+      // one, the pre-commitment note (the hold) still stands.
+      const dueOrNote =
+        model.paymentDueAtMs === null
+          ? bindingNote
+          : `<p class="trade-woc-warn">${esc(
+              t('hudChrome.trade.woc.p2pPaymentDueAt', {
+                time: formatDateTime(model.paymentDueAtMs, { timeStyle: 'short' }),
+              }),
+            )}</p>`;
       const body =
         model.canPay && o.role === 'buyer'
-          ? `${bindingNote}${termsRow}<button type="button" class="btn trade-woc-pay" data-woc-pay data-focus-key="trade-woc-pay"${
+          ? `${dueOrNote}${termsRow}<button type="button" class="btn trade-woc-pay" data-woc-pay data-focus-key="trade-woc-pay"${
               model.busy ? ' disabled' : ''
             }>${
               model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
@@ -456,6 +482,10 @@ const WOC_TRADE_FOCUS_LADDER = [
   'trade-woc-cancel-sale',
   'trade-woc-terms',
   'trade-woc-usd',
+  // The mode tabs last: on a face with nothing else keyed and enabled (a
+  // pressed Pay under durable consent) focus still lands inside the arm.
+  'trade-woc-tab-woc',
+  'trade-woc-tab-gold',
 ];
 
 /**

@@ -1425,6 +1425,7 @@ describeDb('woc market directed rail against real Postgres', () => {
       // pending-only partial indexes, so without these two every 2-second
       // poll seq-scans a table that grows per offer. Existence-pinned so a
       // schema edit cannot silently put the seq scan back.
+      const marketDbMod = await import('../server/woc_market_db');
       const res = await pool.query(
         `SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'woc_market_directed_offers'`,
       );
@@ -1442,9 +1443,27 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect(def('woc_market_offers_seller_all')).toContain(
         '(realm, seller_account, created_at DESC)',
       );
-      // The retired pending-only pair is gone from a freshly applied schema.
+      // The retired pending-only pair is gone from a freshly applied schema...
       expect(names).not.toContain('woc_market_offers_buyer_pending');
       expect(names).not.toContain('woc_market_offers_seller_pending');
+      // ...AND from a database that already carried them (the upgrade path a
+      // fresh-schema pin cannot see: production booted the CREATE in an
+      // earlier round, so re-applying the schema must retire them there).
+      await pool.query(`CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_pending
+        ON woc_market_directed_offers(realm, buyer_account, created_at DESC)
+        WHERE status = 'pending'`);
+      await pool.query(`CREATE INDEX IF NOT EXISTS woc_market_offers_seller_pending
+        ON woc_market_directed_offers(realm, seller_account, created_at DESC)
+        WHERE status = 'pending'`);
+      await pool.query(marketDbMod.WOC_MARKET_SCHEMA);
+      const again = await pool.query(
+        `SELECT indexname FROM pg_indexes WHERE tablename = 'woc_market_directed_offers'`,
+      );
+      const after = again.rows.map((r) => String(r.indexname));
+      expect(after).not.toContain('woc_market_offers_buyer_pending');
+      expect(after).not.toContain('woc_market_offers_seller_pending');
+      expect(after).toContain('woc_market_offers_buyer_all');
+      expect(after).toContain('woc_market_offers_seller_all');
     });
 
     it('the poll read PLANS on those indexes (no seq scan of the offers table)', async () => {
@@ -1482,8 +1501,11 @@ describeDb('woc market directed rail against real Postgres', () => {
         const lines = plan.rows.map((r) => String(r['QUERY PLAN'])).join('\n');
         expect(lines).not.toMatch(/Seq Scan on woc_market_directed_offers/);
         expect(lines).toMatch(/woc_market_offers_(buyer|seller)_all/);
-        await client.query('ROLLBACK');
       } finally {
+        // ROLLBACK on every path: a red assertion must not hand a client
+        // back to the shared pool inside an open transaction (with
+        // enable_seqscan still off in it).
+        await client.query('ROLLBACK').catch(() => {});
         client.release();
       }
     });

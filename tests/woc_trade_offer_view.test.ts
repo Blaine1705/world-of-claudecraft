@@ -244,8 +244,8 @@ describe('the canonical deal walks review -> awaiting_payment -> paying -> settl
   });
 
   it('a settlement-state move alone forces a repaint (confirming -> confirmed)', () => {
-    // Phase stays 'paying' across the move, but the status sentence the
-    // player reads changes; an id-phase-flags comparison kept the stale
+    // wocOfferPhase stays 'paying' across the move, but the status sentence the
+    // player reads changes; an id-face-flags comparison kept the stale
     // "confirming on the network" through the whole delivery.
     const mine = row({
       status: 'accepted',
@@ -301,7 +301,7 @@ describe('the two settlement-state vocabularies stay nested', () => {
 });
 
 describe('wocOfferPhase (the direct pins, moved beside the module they test)', () => {
-  it('derives the phase from the LISTING, not the offer status', () => {
+  it('derives wocOfferPhase from the LISTING, not the offer status', () => {
     // The offer says only "agreed"; what decides whether money is still owed is
     // the listing, which exists from acceptance and closes when the deal ends
     // (sold, cancelled, suspended, or unpaid: the H13 fix splits those).

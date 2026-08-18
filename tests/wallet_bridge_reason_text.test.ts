@@ -102,6 +102,11 @@ describe('the Claudium checkout channel', () => {
     expect(
       claudiumCheckoutErrorText(new Error('wallet returned an invalid transaction authorization')),
     ).toBe(t('hudChrome.walletBridge.badResponse'));
+    // The game server's own shape failure names no wallet's answer: the
+    // reconnect line, never "your wallet returned an unusable answer".
+    expect(
+      claudiumCheckoutErrorText(new Error('server returned an invalid wallet authorization')),
+    ).toBe(t('hudChrome.walletBridge.unavailable'));
   });
 
   it('passes an UNKNOWN message through: the channel mixes in the checkout own t() throws', () => {

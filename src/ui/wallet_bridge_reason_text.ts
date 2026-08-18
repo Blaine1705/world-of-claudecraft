@@ -44,7 +44,9 @@ export const WALLET_BRIDGE_MESSAGE_REASONS: Readonly<Record<string, WalletBridge
   'wallet app did not return in time': 'timeout',
   'wallet connection timed out': 'timeout',
   // The desktop shell's browser hand-off (src/net/desktop_wallet_handoff.ts):
-  // the Claudium checkout rides it on the Electron shell.
+  // the Claudium checkout rides it on the Electron shell. 'expired' covers
+  // an entry the server no longer holds (expired, or a restarted store): the
+  // hand-off did not complete in time either way.
   'wallet authorization timed out': 'timeout',
   'wallet authorization expired': 'timeout',
   // Not connected.
@@ -61,6 +63,10 @@ export const WALLET_BRIDGE_MESSAGE_REASONS: Readonly<Record<string, WalletBridge
   'wallet app could not be opened': 'unavailable',
   'desktop wallet browser is unavailable': 'unavailable',
   'could not open wallet authorization in the browser': 'unavailable',
+  // The GAME SERVER's hand-off answer failing the shape check: no wallet
+  // spoke, so 'unavailable' (reconnect and retry), never a line that blames
+  // the wallet's answer.
+  'server returned an invalid wallet authorization': 'unavailable',
   // Unusable answers.
   'wallet returned an invalid signature': 'bad_response',
   'wallet modified the message before signing': 'bad_response',
@@ -74,7 +80,6 @@ export const WALLET_BRIDGE_MESSAGE_REASONS: Readonly<Record<string, WalletBridge
   'native wallet returned no address': 'bad_response',
   'native wallet returned no signature': 'bad_response',
   'native wallet returned no transaction signature': 'bad_response',
-  'server returned an invalid wallet authorization': 'bad_response',
   'wallet returned an invalid transaction authorization': 'bad_response',
 };
 

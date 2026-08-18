@@ -8447,4 +8447,58 @@ describe('review-round closures (the shared strike gate and the cooldown params)
       params: { retryAfterSeconds: Math.ceil((retryAtMs - h.now()) / 1000) },
     });
   });
+
+  it('the announced retry moment is the FIRST admissible one on both arms, in the fake too', async () => {
+    // The Pg twin claims at EXACTLY retryAtMs; the fake's two strict filters
+    // must agree, or the CI floor (fake-driven) would let a >= drift keep
+    // refusing at the announced moment while Postgres admits it.
+    // Per-listing arm: one abandon on THIS listing at BASE_MS - 1s.
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    await h.db.recordBuyNowAbandon(REALM, listing.id, BUYER_A, BASE_MS - 1_000);
+    const claim = () =>
+      h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      });
+    const refused = await claim();
+    if (refused.ok || refused.reason !== 'claim_cooldown') {
+      throw new Error(`expected a cooldown refusal, got ${JSON.stringify(refused)}`);
+    }
+    const retryAtMs = h.now() + Number(refused.params?.retryAfterSeconds ?? 0) * 1000;
+    expect(retryAtMs).toBeGreaterThan(h.now());
+    h.setNow(retryAtMs - 1_000);
+    expect((await claim()).ok, 'one second before: still refused').toBe(false);
+    h.setNow(retryAtMs);
+    expect((await claim()).ok, 'at the announced moment: admitted').toBe(true);
+    // Cap arm: three abandons on OTHER listings, a fresh one claimed at the
+    // moment the cap-th newest leaves the rolling window.
+    const h2 = makeHarness();
+    for (let i = 0; i < 3; i++) {
+      h2.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+      const other = await listEpic(h2, { format: 'buy_now', buyNowCents: 8000 });
+      await h2.db.recordBuyNowAbandon(REALM, other.id, BUYER_A, BASE_MS - (i + 1) * 60_000);
+    }
+    h2.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const fresh = await listEpic(h2, { format: 'buy_now', buyNowCents: 8000 });
+    const claim2 = () =>
+      h2.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: fresh.id,
+        acceptTerms: true,
+      });
+    const capped = await claim2();
+    if (capped.ok || capped.reason !== 'claim_cooldown') {
+      throw new Error(`expected a cap refusal, got ${JSON.stringify(capped)}`);
+    }
+    const capAtMs = h2.now() + Number(capped.params?.retryAfterSeconds ?? 0) * 1000;
+    expect(capAtMs).toBeGreaterThan(h2.now());
+    h2.setNow(capAtMs - 1_000);
+    expect((await claim2()).ok, 'cap: one second before, still refused').toBe(false);
+    h2.setNow(capAtMs);
+    expect((await claim2()).ok, 'cap: at the announced moment, admitted').toBe(true);
+  });
 });

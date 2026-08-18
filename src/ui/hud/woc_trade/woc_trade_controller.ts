@@ -133,7 +133,15 @@ export class WocTradeController {
    *  and both the pay and sign paths refuse one that names another offer.
    *  The USD it settles rides along (the re-quote path has no other
    *  authoritative source for it). */
-  private wocTradeSettlement: { offerId: number; id: number; usdCents: number } | null = null;
+  private wocTradeSettlement: {
+    offerId: number;
+    id: number;
+    usdCents: number;
+    /** The settlement's own payment deadline (the claim lock, shorter than
+     *  the directed hold): rendered on the pay and quote faces, since a
+     *  pressed Pay shortens the window the pre-commitment note announced. */
+    deadlineAtMs: number | null;
+  } | null = null;
   /** The staged settlement quote awaiting the buyer's explicit Sign and pay.
    *  Its presence renders the review panel; spent or abandoned, it clears.
    *  The structural half (WocTradeQuoteReview) is what the face renders and
@@ -257,6 +265,13 @@ export class WocTradeController {
       split: this.wocTradeSplit,
       minPriceCents: this.wocTradeMinPriceCents,
       directedHoldSeconds: this.wocTradeDirectedHoldSeconds,
+      // The claimed settlement's deadline for THIS deal, once one exists.
+      paymentDueAtMs:
+        this.wocTradeSettlement !== null &&
+        this.wocTradeOffer !== null &&
+        this.wocTradeSettlement.offerId === this.wocTradeOffer.id
+          ? this.wocTradeSettlement.deadlineAtMs
+          : null,
       // The consent link per shell (this module owns the browser state the
       // painter must not read).
       termsHref: termsUrlFor(globalThis.location?.origin ?? ''),
@@ -504,13 +519,17 @@ export class WocTradeController {
    * window entirely. The server keeps the row readable for a grace window
    * precisely so this lookup can still find it.
    */
-  private resolveClosedWocTrade(): void {
+  private resolveClosedWocTrade(signing: boolean): void {
     const hooks = this.wocMarketHooks;
     const offer = this.wocTradeOffer;
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
     this.wocTradeQuote = null;
-    this.wocTradeSettlement = null;
+    // The claimed settlement is deliberately KEPT (keyed to its offer): the
+    // buyer who closed after Not now can re-trade the same deal and Pay
+    // re-quotes it; a second claim would be refused over their own lock. It
+    // dies with the deal on every terminal path (settled, closed, resolved,
+    // a different offer adopted).
     this.wocTradeCancelPendingFor = null;
     if (!hooks || !offer || this.wocTradeFinished.has(offer.id)) return;
     void hooks.client.offers().then((res) => {
@@ -545,10 +564,15 @@ export class WocTradeController {
           '#ffd100',
         );
       } else if (phase === 'awaiting_payment') {
+        // A signature still out with the wallet is a payment in progress,
+        // whatever the row says (its signature is not in yet): the strike
+        // warning would contradict the confirmation that follows.
         this.log(
           t(
             row.role === 'buyer'
-              ? 'hudChrome.trade.woc.dealAwaitsPayment'
+              ? signing
+                ? 'hudChrome.trade.woc.closePaymentContinuesBuyer'
+                : 'hudChrome.trade.woc.dealAwaitsPayment'
               : 'hudChrome.trade.woc.closeSellerHold',
           ),
           '#ffd100',
@@ -744,9 +768,18 @@ export class WocTradeController {
           // consent row's checkbox on this very face. Never a bare true.
           acceptTerms: this.wocTradeTermsAccepted || this.wocTradeTermsChecked,
         });
-        if (this.wocTradeOffer?.id !== offer.id) return; // the deal moved on
+        // The deal moved on while the claim was out (partner cancelled, the
+        // window closed): a refusal has nothing left to say, but a SUCCESSFUL
+        // claim exists server-side (the lock and its settlement), so it is
+        // KEPT, keyed to this offer, or the same deal re-adopted a moment
+        // later would claim again and be refused buy_now_locked over the
+        // buyer's own lock while the settlement lapsed into a strike. The key
+        // is what keeps it unpayable under any other offer.
+        const movedOn = this.wocTradeOffer?.id !== offer.id;
         if (!bought.ok) {
-          this.log(userFacingApiError({ code: bought.code, params: bought.params }), '#ff6b6b');
+          if (!movedOn) {
+            this.log(userFacingApiError({ code: bought.code, params: bought.params }), '#ff6b6b');
+          }
           return;
         }
         // The server recorded the acceptance this send carried.
@@ -755,8 +788,13 @@ export class WocTradeController {
           offerId: offer.id,
           id: bought.settlement.id,
           usdCents: bought.settlement.amountCents,
+          deadlineAtMs:
+            typeof bought.settlement.deadlineAtMs === 'number'
+              ? bought.settlement.deadlineAtMs
+              : null,
         };
         this.wocTradeSettlement = held;
+        if (movedOn) return;
         // The claim's own quote is fresh: a second round trip would only
         // supersede it service-side for nothing (the Exchange stages it too).
         quote = bought.quote?.transactionBase64 ? bought.quote : null;
@@ -1121,7 +1159,8 @@ export class WocTradeController {
         // Before clearing it: a deal that was still live when the window shut
         // may have settled, and this side may not have seen it yet. Clears
         // wocTradeOffer itself, so the assignment it replaces is not repeated.
-        this.resolveClosedWocTrade();
+        // The signing flag is read BEFORE the reset below.
+        this.resolveClosedWocTrade(this.wocTradeSigning);
         this.wocTradeOfferPolledAtMs = 0;
         // Clear any in-flight guard on close: the desktop wallet-standard signer
         // has no timeout, so a dismissed popup would otherwise leave the Accept
@@ -1221,6 +1260,15 @@ export class WocTradeController {
             this.wocTradeQuote.expiresAtMs,
           ],
       this.wocTradeTermsAccepted,
+      // The claimed settlement's identity and deadline: the pay face renders
+      // the deadline once a claim exists.
+      this.wocTradeSettlement === null
+        ? null
+        : [
+            this.wocTradeSettlement.offerId,
+            this.wocTradeSettlement.id,
+            this.wocTradeSettlement.deadlineAtMs,
+          ],
       // The Pay claim in flight disables the button, so it is render state;
       // so are a resolve in flight (Decline / Withdraw / Cancel sale
       // disabled) and the seller's recorded cancel-pending answer.

@@ -229,6 +229,23 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     expect(code.slice(arm, arm + 200)).toContain("'hudChrome.wocMarket.settlementReview'");
   });
 
+  it('labels a CONFIRMED or DELIVERING settlement as decided money still delivering, never as confirming', () => {
+    // The chain answered: 'Confirming' for a confirmed payment is the claim
+    // the trade arm stopped making for the same server state. ASSOCIATIVE:
+    // the label sits inside the confirmed/delivering arm, and confirming
+    // keeps its own.
+    const arm = code.indexOf("case 'confirmed':\n        case 'delivering':");
+    expect(arm, 'anchor missing: the confirmed/delivering arm').toBeGreaterThanOrEqual(0);
+    const window = code.slice(arm, arm + 160);
+    expect(window).toContain("'hudChrome.wocMarket.settlementConfirmedDelivering'");
+    expect(window).not.toContain("'hudChrome.wocMarket.settlementConfirming'");
+    const confirming = code.indexOf("case 'confirming':\n          return");
+    expect(confirming).toBeGreaterThanOrEqual(0);
+    expect(code.slice(confirming, confirming + 120)).toContain(
+      "'hudChrome.wocMarket.settlementConfirming'",
+    );
+  });
+
   it('never toasts purchase-complete for a review-parked confirm outcome', () => {
     // The outcome arm can answer state 'review' on a recorded-signature
     // retry, and "purchase complete" for money awaiting an operator verdict

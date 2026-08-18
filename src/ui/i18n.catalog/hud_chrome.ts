@@ -244,7 +244,7 @@ export const hudChromeStrings = {
       // Role-neutral: it renders on the buyer's compose face and on BOTH
       // review faces.
       notInstant:
-        'A $WOC sale is not instant. The item moves into escrow when the seller accepts, and reaches the buyer once payment is verified.',
+        'A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.',
       blockDisabled: 'The $WOC Exchange is not available on this realm.',
       blockNoWallet: 'Link and verify a wallet to sell items for $WOC.',
       blockPartnerUnknown: 'Checking whether that player can accept $WOC...',
@@ -331,9 +331,15 @@ export const hudChromeStrings = {
       // for the buyer whose accept escrows the copy): shown before the
       // shared Accept and again on the pay face.
       p2pBindingNote:
-        'Once both sides accept, payment is due within {duration}. Not paying earns a Marketplace strike.',
+        'Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.',
       p2pBindingNoteUntimed:
-        'Once both sides accept, payment is due shortly after. Not paying earns a Marketplace strike.',
+        'Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.',
+      // The claim's own deadline, once Pay was pressed (Not now keeps it
+      // running): the figure the pay and quote faces show from then on.
+      p2pPaymentDueAt: 'Payment is due by {time}. Not paying earns a Marketplace strike.',
+      // The lapsed staged quote, in this arm's words: there is no request
+      // control here, the way back is Not now, then Pay.
+      quoteExpiredTrade: 'The quote expired. Press Not now, then Pay again for a fresh one.',
       // Announced (and kept in the log) when the review face appears, so a
       // screen reader hears the figures the face was built to show.
       quoteStaged: 'Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.',
@@ -5248,7 +5254,7 @@ export const hudChromeStrings = {
       'If the winner does not pay, you may become the buyer at your own bid: your bond is held again and payment is due within the settlement window. Not paying then forfeits the bond and earns a strike.',
     // Buy now claims the listing; walking away has a cost of its own.
     buyNowNote:
-      'Buy now holds this listing for you for a short time. Walking away without paying pauses your Buy Now for a while.',
+      'Buy now holds this listing for you for a short time. Walking away without paying blocks this listing for you for a while, and repeated walk-aways pause Buy Now for you altogether.',
     variableTokenWarning:
       'You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.',
     settlementDeadlineNote: 'If you win, payment is due within {duration} of the auction closing.',

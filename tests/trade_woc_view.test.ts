@@ -705,7 +705,7 @@ describe('the confirmed-awaiting-delivery status sentences', () => {
     ).toBe('hudChrome.trade.woc.statusPayingSeller');
   });
 
-  it('the quote review renders on the paying phase too (the wallet-return repaint)', () => {
+  it('the quote review renders on the paying face too (the wallet-return repaint)', () => {
     const model = buildWocTradeModel({
       ...base,
       pendingOffer: paying('buyer', 'confirming'),
@@ -719,7 +719,7 @@ describe('the confirmed-awaiting-delivery status sentences', () => {
       },
     });
     expect(model.quoteReview).not.toBeNull();
-    // Never for the seller, whatever the phase.
+    // Never for the seller, whatever the face.
     const seller = buildWocTradeModel({
       ...base,
       pendingOffer: paying('seller', 'confirming'),

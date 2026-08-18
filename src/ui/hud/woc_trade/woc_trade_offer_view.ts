@@ -134,11 +134,11 @@ export type WocOfferPollStep =
  * has nothing left to offer. 'closed': the deal DIED (cancelled / suspended /
  * unpaid) and the honest reason gets reported exactly once, then the arm
  * returns to the compose form. 'keep': nothing a repaint would show has moved.
- * Compare the phase AND the acceptance flags AND the settlement state, not
+ * Compare the wocOfferPhase AND the acceptance flags AND the settlement state, not
  * just the id: one side accepting moves neither the id nor the phase, so an
- * id-and-phase check left the button reading "Accept" after the player had
+ * id-and-face check left the button reading "Accept" after the player had
  * already accepted; and a payment moving from confirming to confirmed keeps
- * phase 'paying' while the status sentence it owes the player changes.
+ * wocOfferPhase 'paying' while the status sentence it owes the player changes.
  */
 export function wocOfferPollStep(
   cur: WocPendingOffer | null,

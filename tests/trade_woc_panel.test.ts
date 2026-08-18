@@ -12,7 +12,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { durationText } from '../src/ui/duration_text';
 import { captureFocusKey } from '../src/ui/focus_restore';
-import { t } from '../src/ui/i18n';
+import { formatDateTime, t } from '../src/ui/i18n';
 import {
   refreshWocTradeArm,
   restoreWocTradeFocus,
@@ -763,7 +763,7 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     expect(CONTROLLER.indexOf('\n  }', updateStart)).toBe(updateEnd);
     const update = CONTROLLER.slice(updateStart, updateEnd);
     expect(update, 'the window-closed branch must invoke it').toContain(
-      'this.resolveClosedWocTrade()',
+      'this.resolveClosedWocTrade(this.wocTradeSigning)',
     );
   });
 
@@ -1172,8 +1172,43 @@ describe('the QA session faces: fee block, commitment note, quote legs, focus la
     // Never for the seller (their accept is not the one that owes payment).
     const seller = paint(deps({ pendingOffer: { ...review, role: 'seller' } }));
     expect(seller.querySelector('[data-woc-binding]')).toBeNull();
-    // A hold figure that never renders raw seconds.
+    // A hold figure that never renders raw seconds; a zero or negative hold
+    // is no figure at all (the untimed twin).
     expect(durationText(600)).not.toContain('600');
+    for (const bad of [0, -5]) {
+      const zero = paint(deps({ pendingOffer: review, directedHoldSeconds: bad }));
+      expect(zero.querySelector('[data-woc-binding]')?.textContent, String(bad)).toBe(
+        t('hudChrome.trade.woc.p2pBindingNoteUntimed'),
+      );
+    }
+    // Once a claim exists, its OWN deadline replaces the note on the pay face
+    // (the pressed Pay shortened the window) and the quote face shows it too.
+    const claimed = paint(deps({ pendingOffer: escrowed, paymentDueAtMs: 1_800_000_270_000 }));
+    const due = t('hudChrome.trade.woc.p2pPaymentDueAt', {
+      time: formatDateTime(1_800_000_270_000, { timeStyle: 'short' }),
+    });
+    expect(claimed.textContent).toContain(due);
+    expect(claimed.querySelector('[data-woc-binding]')).toBeNull();
+    const quoteFace = paint(
+      deps({
+        pendingOffer: escrowed,
+        paymentDueAtMs: 1_800_000_270_000,
+        quote: {
+          totalTokens: 1,
+          sellerTokens: null,
+          burnTokens: null,
+          treasuryTokens: null,
+          usdCents: 100,
+          expiresAtMs: null,
+        },
+      }),
+    );
+    expect(quoteFace.textContent).toContain(due);
+    // Never on the seller's face, and never for the review (pre-claim) face.
+    const sellerWait = paint(
+      deps({ pendingOffer: { ...escrowed, role: 'seller' }, paymentDueAtMs: 1_800_000_270_000 }),
+    );
+    expect(sellerWait.textContent).not.toContain(due);
   });
 
   it('the quote face shows the fee legs beside the total, and says so when the quote lapsed', () => {
@@ -1190,14 +1225,18 @@ describe('the QA session faces: fee block, commitment note, quote legs, focus la
     expect(text).toContain(t('hudChrome.wocMarket.quoteSeller', { tokens: '4,500' }));
     expect(text).toContain(t('hudChrome.wocMarket.quoteBurn', { tokens: '350' }));
     expect(text).toContain(t('hudChrome.wocMarket.quoteTreasury', { tokens: '150' }));
-    expect(text).not.toContain(t('hudChrome.wocMarket.quoteExpired'));
+    expect(text).not.toContain(t('hudChrome.trade.woc.quoteExpiredTrade'));
     // No consent row here: the claim that staged the quote was the
     // terms-gated send, so acceptance is durable by the time it renders.
     expect(live.querySelector('[data-woc-terms]')).toBeNull();
+    // In this arm's own words: no request control here, the way back is Not
+    // now, then Pay.
     const lapsed = paint(deps({ pendingOffer: escrowed, quote, nowMs: 2_000 }));
-    expect(lapsed.textContent).toContain(t('hudChrome.wocMarket.quoteExpired'));
+    expect(lapsed.textContent).toContain(t('hudChrome.trade.woc.quoteExpiredTrade'));
+    expect(lapsed.textContent).not.toContain(t('hudChrome.wocMarket.quoteExpired'));
     expect(lapsed.querySelector<HTMLButtonElement>('[data-woc-sign]')?.disabled).toBe(true);
-    // Absent legs render nothing (an older service answers no split).
+    // Absent legs render nothing (an older service answers no split), and a
+    // leg a stub left UNDEFINED renders nothing rather than NaN.
     const bare = paint(
       deps({
         pendingOffer: escrowed,
@@ -1205,6 +1244,19 @@ describe('the QA session faces: fee block, commitment note, quote legs, focus la
       }),
     );
     expect(bare.textContent).not.toContain('Seller receives');
+    const undef = paint(
+      deps({
+        pendingOffer: escrowed,
+        quote: {
+          ...quote,
+          sellerTokens: undefined as unknown as null,
+          burnTokens: undefined as unknown as null,
+          treasuryTokens: undefined as unknown as null,
+        },
+      }),
+    );
+    expect(undef.textContent).not.toContain('NaN');
+    expect(undef.textContent).not.toContain('Seller receives');
   });
 
   it('a resolve in flight disables Decline, Withdraw and Cancel sale (one click, one request)', () => {
@@ -1306,10 +1358,17 @@ describe('the QA session faces: fee block, commitment note, quote legs, focus la
     root.innerHTML = wocTradeArmHtml(wocTradeModelFrom(quoted), quoted.usdCents);
     restoreWocTradeFocus(root, 'trade-woc-pay');
     expect(document.activeElement?.hasAttribute('data-woc-sign')).toBe(true);
-    // The tabs are keyed too.
+    // The tabs are keyed too, and they are the ladder's last rungs: a pressed
+    // Pay under DURABLE consent (no consent row, no other keyed control) still
+    // keeps focus inside the arm rather than dropping it to body.
     expect(
       root.querySelector('[data-woc-mode="gold"][data-focus-key="trade-woc-tab-gold"]'),
     ).not.toBeNull();
+    const durable = deps({ pendingOffer: escrowed, paying: true, termsAccepted: true });
+    root.innerHTML = wocTradeArmHtml(wocTradeModelFrom(durable), durable.usdCents);
+    restoreWocTradeFocus(root, 'trade-woc-pay');
+    expect(document.activeElement, 'not body').not.toBe(document.body);
+    expect(root.contains(document.activeElement)).toBe(true);
   });
 
   it('the consent row names the same document on both surfaces, through one resolver', () => {

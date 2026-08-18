@@ -629,20 +629,22 @@ CREATE TABLE IF NOT EXISTS woc_market_directed_offers (
 -- of a table that grows per offer. A BitmapOr over the pair turns it into
 -- per-account probes (measured: 2398 buffers to 206 on 200k rows). The
 -- discriminator (status / updated_at) stays a heap filter, so the cost is
--- linear in the account's RETAINED offer history (WOC_MARKET_OFFERS_RETENTION_
--- DAYS is the control), not in its live offers: measure the per-account
--- discard before enable. Two full indexes cost roughly a third more WAL per
--- offer transition (status sits in partial predicates, so no HOT update).
--- Boot DDL, not concurrent_indexes.ts: pre-enable the table is empty.
+-- linear in the account's RETAINED offer history (the retention knob
+-- WOC_MARKET_OFFERS_RETENTION_DAYS is the control), not in its live offers:
+-- measure the per-account discard before enable. Two full indexes cost
+-- roughly a third more WAL per offer transition (status sits in partial
+-- predicates, so no HOT update). Boot DDL, not concurrent_indexes.ts:
+-- pre-enable the table is empty.
 CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_all
   ON woc_market_directed_offers(realm, buyer_account, created_at DESC);
 CREATE INDEX IF NOT EXISTS woc_market_offers_seller_all
   ON woc_market_directed_offers(realm, seller_account, created_at DESC);
--- The pending-only inbox/outbox partials are retired: no statement can use a
--- status = 'pending' partial any more (the poll read above admits accepted
--- and just-resolved rows, the pair-pending unique index below serves the
--- reopen probes, woc_market_offers_due the expiry sweep), so they were pure
--- write amplification on every offer insert and transition.
+-- The pending-only ACCOUNT partials (inbox/outbox) are retired: no reader is
+-- left for them (the poll read above admits accepted and just-resolved rows,
+-- so it cannot imply their predicate; the pair-pending unique index below and
+-- woc_market_offers_due keep their own readers, the reopen probes and the
+-- expiry sweep), so they were pure write amplification on every offer insert
+-- and transition.
 DROP INDEX IF EXISTS woc_market_offers_buyer_pending;
 DROP INDEX IF EXISTS woc_market_offers_seller_pending;
 -- The expiry sweep's due-claim seek.
@@ -3455,9 +3457,10 @@ export class PgWocMarketDb implements WocMarketDb {
     // per row, bounded by the LIMIT (measured plan-identical to a JOIN). The
     // correlation is table-qualified: an unqualified listing_id would rebind
     // to the INNER table the day woc_market_listings gains a column of that
-    // name and the statement would start erroring. The '' arm below is a
-    // type-level default only: bids CASCADE with their listing, so a
-    // surviving row always resolves its item.
+    // name (the inner scope wins name resolution) and silently answer NULL
+    // item ids with no error anywhere. The '' arm below is a type-level
+    // default only: bids CASCADE with their listing, so a surviving row
+    // always resolves its item.
     const res = await this.pool.query(
       `SELECT ${BID_COLS},
               (SELECT l.item_id FROM woc_market_listings l
