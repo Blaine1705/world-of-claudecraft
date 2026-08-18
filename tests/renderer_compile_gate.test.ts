@@ -252,6 +252,35 @@ describe('Renderer live shader compile rejection recovery', () => {
     );
   });
 
+  it('gates every buildInterior return path except the caldera light rig', () => {
+    // The authored room-graph floors (Last Keep, Dawnhold, the Infernal
+    // Citadel) returned early through a bare this.scene.add(group), so those
+    // interiors linked their programs on their first visible frame. The
+    // Wildheart caldera arm stays a bare add on purpose: its rig adds a
+    // hemisphere and a directional light, which relinks every lit material in
+    // the scene at the reveal whatever the group's own gate compiled (a gate
+    // compiles the group at the OLD light census, so it would only add a hidden
+    // window); pre-linking a scene-wide light census is a backlog item.
+    const dungeonSource = readFileSync(
+      new URL('../src/render/dungeon.ts', import.meta.url),
+      'utf8',
+    );
+    const start = dungeonSource.indexOf('  async buildInterior(');
+    expect(start).toBeGreaterThan(-1);
+    const body = dungeonSource.slice(start, dungeonSource.indexOf('\n  }', start));
+    const returns = body.split('return group;').length - 1;
+    const gated =
+      body.split('await attachSceneGroupGated(this.scene, group, this.compileGate)').length - 1;
+    const bareAdds = body.split('this.scene.add(group);').length - 1;
+    expect(returns).toBeGreaterThanOrEqual(3);
+    expect(bareAdds).toBe(1);
+    expect(gated).toBe(returns - 1);
+    const wildheart = body.indexOf("if (interior === 'wildheart')");
+    expect(wildheart).toBeGreaterThan(-1);
+    const wildheartArm = body.slice(wildheart, body.indexOf('return group;', wildheart));
+    expect(wildheartArm).toContain('this.scene.add(group);');
+  });
+
   it('ignores a rejection after renderer shutdown starts', async () => {
     const renderer = harness();
     let reject!: (error: unknown) => void;
