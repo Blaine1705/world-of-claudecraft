@@ -383,6 +383,10 @@ async function capturePortrait(request: PortraitCaptureRequest): Promise<void> {
       if (!prewarmRig) return Promise.resolve();
       const activeRig = prewarmRig;
       activeRig.mount.add(visual.root);
+      // Settle the pose FIRST, exactly as renderPortraitFrame will before it
+      // draws: a swap or a lazily built child that update() introduces must be
+      // in the scene compileAsync walks, or the render links it instead.
+      visual.update(0.4, PORTRAIT_ANIM_STATE, true);
       const compiled = activeRig.renderer.compileAsync(activeRig.scene, activeRig.camera);
       activeRig.mount.remove(visual.root);
       return compiled.then(() => undefined);
