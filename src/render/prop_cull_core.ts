@@ -19,6 +19,15 @@
 // gate itself arms at world entry, not under the curtain (props.ts
 // setBandRevealGate).
 //
+// The camera-ghost HIDEABLES (props.ts registerHideable: one building, tent
+// or campfire group each, individual so the chase cam can fade through them)
+// ride the same policy through the `propHideable*` entries below. Their fog
+// cull is a sphere reach (centre distance against fogFar + cull) and their
+// analogue of the band's box distance is the distance to that sphere's
+// surface, so the reach floor and the near line keep their meaning. Before
+// this a hideable's first sight was a bare visible flip: the Eastbrook Grand
+// Armoury's five unique materials linked cold at first draw on the ride in.
+//
 // Pure core contract: no three import, no DOM, no clocks, no randomness.
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts); tested by
 // tests/prop_cull_core.test.ts.
@@ -92,24 +101,35 @@ export function propCullKey(index: number): string {
   return `cull:${index}`;
 }
 
+/** The reveal-gate key of the hideable at `index` (its slot in the view's
+ *  hideable list); the `hideable:` prefix keeps it disjoint from the far-cell
+ *  grid keys and the `cull:` band keys on the shared props gate. */
+export function propHideableKey(index: number): string {
+  return `hideable:${index}`;
+}
+
 /** The compile roots behind one props gate key: a far cell's bake meshes,
- *  or the one band object behind a cullable key, or nothing for a stranger
- *  (which the gate then settles at once, the fail-soft arm).
+ *  the one band object behind a cullable key, the one group behind a
+ *  hideable key, or nothing for a stranger (which the gate then settles at
+ *  once, the fail-soft arm).
  *
- *  Neither consult reveals piecewise, unlike the towns. A band key is one
- *  root, so there is nothing to split. A far cell has several bake meshes but
- *  swaps as ONE representation (the near individuals hide as the bake shows),
- *  and revealing half a bake beside the individuals it replaces would draw
- *  that half twice. */
+ *  None of the consults reveals piecewise, unlike the towns. A band or a
+ *  hideable key is one root, so there is nothing to split. A far cell has
+ *  several bake meshes but swaps as ONE representation (the near individuals
+ *  hide as the bake shows), and revealing half a bake beside the individuals
+ *  it replaces would draw that half twice. */
 export function propRevealRoots<T>(
   farCells: { get(key: string): { meshes: readonly T[] } | undefined },
   bands: { get(key: string): { obj: T } | undefined },
+  hideables: { get(key: string): { group: T } | undefined },
   key: string,
 ): readonly T[] {
   const cell = farCells.get(key);
   if (cell) return cell.meshes;
   const band = bands.get(key);
-  return band ? [band.obj] : [];
+  if (band) return [band.obj];
+  const hideable = hideables.get(key);
+  return hideable ? [hideable.group] : [];
 }
 
 /** XZ distance squared from the camera to the cullable's box (0 inside). */
@@ -182,12 +202,18 @@ export function propCullReveal(
 /** One cullable the caller owns, with the live three object under it. */
 export type PropCullable = PropCullBounds & PropCullRevealState & { obj: { visible: boolean } };
 
-function applyPropCullReveal(c: PropCullable, reveal: PropCullReveal): void {
+/** Latch a consult's answer on its state: 'revealed' ends the gate's part
+ *  for good, 'held' ends the imminent window (see PropCullRevealState). */
+export function latchPropCullReveal(state: PropCullRevealState, reveal: PropCullReveal): void {
   if (reveal === 'revealed') {
-    if (!c.revealed) c.revealed = true;
+    if (!state.revealed) state.revealed = true;
   } else if (reveal === 'held') {
-    c.held = true;
+    state.held = true;
   }
+}
+
+function applyPropCullReveal(c: PropCullable, reveal: PropCullReveal): void {
+  latchPropCullReveal(c, reveal);
   c.obj.visible = reveal === 'revealed';
 }
 
@@ -262,4 +288,63 @@ export function updatePropCullables(
     const c = cullables[index];
     applyPropCullReveal(c, propCullReveal(true, distSq[index], fogFar, c, gate));
   }
+}
+
+// ---------------------------------------------------------------------------
+// The hideables' arm: the same consult over a sphere footprint.
+// ---------------------------------------------------------------------------
+
+/** The historical hideable fog cull: the structure draws while its centre is
+ *  within fogFar plus its bounding radius (`cull`); past that the whole
+ *  group is dropped, shadow included. */
+export function propHideableInFog(centerDistSq: number, cull: number, fogFar: number): boolean {
+  const reach = fogFar + cull;
+  return centerDistSq < reach * reach;
+}
+
+/** Squared XZ distance from the camera to the hideable's cull sphere surface
+ *  (0 inside): the hideable's box distance for the reach floor and the near
+ *  line. Costs a square root, so the callers below evaluate it only on a
+ *  first-sight consult, never on the latched per-frame path. */
+export function propHideableSurfaceDistSq(centerDistSq: number, cull: number): number {
+  if (centerDistSq <= cull * cull) return 0;
+  const surface = Math.sqrt(centerDistSq) - cull;
+  return surface * surface;
+}
+
+/** Whether this frame's consult for the hideable would be IMMINENT (see
+ *  propCullConsultImminent): answered without consulting anything, so a
+ *  caller can collect the frame's imminent hideables and consult them
+ *  nearest first. The cheap latches are read before the square root. */
+export function propHideableConsultImminent(
+  centerDistSq: number,
+  cull: number,
+  fogFar: number,
+  state: PropCullRevealState,
+  gate: PropCullRevealGate | null | undefined,
+): boolean {
+  if (state.revealed || state.held || !gate) return false;
+  if (!propHideableInFog(centerDistSq, cull, fogFar)) return false;
+  const surfaceDistSq = propHideableSurfaceDistSq(centerDistSq, cull);
+  return propCullConsultImminent(true, surfaceDistSq, fogFar, state, gate);
+}
+
+/**
+ * The per-frame decision for one hideable: 'hidden' past the fog reach,
+ * 'revealed' once latched (or with no gate, the historical immediate flip,
+ * which the caller latches), else the band consult over the surface
+ * distance: instant inside PROP_CULL_REVEAL_REACH, imminent inside the near
+ * line, held while the gate is cold. The caller latches the answer with
+ * latchPropCullReveal and owns the group's visibility.
+ */
+export function propHideableReveal(
+  centerDistSq: number,
+  cull: number,
+  fogFar: number,
+  state: PropCullRevealState,
+  gate: PropCullRevealGate | null | undefined,
+): PropCullReveal {
+  if (!propHideableInFog(centerDistSq, cull, fogFar)) return 'hidden';
+  if (state.revealed || !gate) return 'revealed';
+  return propCullReveal(true, propHideableSurfaceDistSq(centerDistSq, cull), fogFar, state, gate);
 }

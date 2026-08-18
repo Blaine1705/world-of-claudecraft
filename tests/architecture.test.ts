@@ -478,6 +478,7 @@ const RENDER_PURE_CORES = [
   'src/render/camera_boom_core.ts',
   'src/render/compile_gate.ts',
   'src/render/link_piece_core.ts',
+  'src/render/program_variant_settle_core.ts',
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',

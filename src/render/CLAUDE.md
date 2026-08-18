@@ -232,7 +232,25 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   that record, because three latches `programReady` false after one missed poll,
   so `isReady()` on a program that has been linked and drawing for a minute
   re-issues COMPLETION_STATUS synchronously (5558 ms on the main thread in the
-  2026-08-18 production capture, with eighteen reveal units parked behind it). A settled gate links
+  2026-08-18 production capture, with eighteen reveal units parked behind it).
+  A settle means EVERY VARIANT, not the one slot three polled: `compileAsync`
+  polls `materialProperties.currentProgram` per material, while a material
+  can carry several program variants in `materialProperties.programs` (skinned
+  and rigid, morph counts, the depth twin's own map) and a material SHARED by
+  concurrent gates (the composed bodies' skin detail, jewels, class tints) has
+  that slot repointed by another gate's prologue mid-poll, so the sibling
+  variants linked unpolled, were never marked, and paid their link at first
+  draw or first uniform query in a live frame (28 raced pending links, 39 to
+  125 ms each, in the same capture). Every gate piece therefore runs a THIRD
+  arm after its colour and shadow compiles, the variant settle
+  (`program_variant_settle.ts`, enumeration and pass in the pure
+  `program_variant_settle_core.ts`, the depth twins found through
+  `prewarmDepthMaterialsOf`): an asynchronous poll of every program of the
+  piece's materials at three's own compileAsync cadence and backoff, bounded
+  by the piece's deadline (`PieceDeadline`, handed to each piece by
+  `runPieces`), recording each program as it answers ready. That poll is the
+  ONE place this code asks `isReady()`; a piece is settled only when every
+  variant answered, timed out otherwise. A settled gate links
   programs but uploads NOTHING (three's `compileAsync` never reaches
   `WebGLTextures`), so the same gates also run an upload lane: one budgeted
   queue unit per non-resident texture under the root (`texture_prep_lane.ts`,
@@ -259,7 +277,12 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the SAME program three's `WebGLShadowMap` draws, so it never sets
   `depthPacking` and keys one instance per caster shape; a three bump is
   re-read from three's source, pinned by `tests/prewarm_depth_material.test.ts`,
-  never guessed). Use these, never a bespoke idle loop.
+  never guessed). The shadow arm (`renderer.ts` `compileShadowPrograms`)
+  swaps a twin onto EVERY mesh under the gated root, casting at gate time or
+  not: `castShadow` is a runtime distance toggle (entity shadow band, zone
+  shadow volume, gather nodes) that flips frames after the gate ran, and a
+  rig gated beyond the band otherwise links its depth program cold at its
+  first shadow draw. Use these, never a bespoke idle loop.
 - **Streamed decor reveals PIECEWISE, per root, nearest first.** The reveal
   gates (`reveal_gate_core.ts` policy, `reveal_gate.ts` host adapter over the
   one `reveal_compile_host.ts`) hold a cull's FIRST hidden-to-visible flip
@@ -272,9 +295,11 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   static batch plus every building group and flipping all of them on the frame
   the slowest link settles IS the burst the gate exists to prevent. A root
   once shown is never hidden again (`numPointLights` is in three's program
-  cache key, so a hide and re-show links fresh programs). The props bands and
-  the foliage buckets are one root per key, and a far cell's bake meshes swap
-  as one representation, so those consults stay all-or-nothing.
+  cache key, so a hide and re-show links fresh programs). The props bands, the
+  props hideables (each camera-ghost building, tent or campfire group, on the
+  band gate under `hideable:<slot>` keys, `prop_cull_core.ts` `propHideable*`)
+  and the foliage buckets are one root per key, and a far cell's bake meshes
+  swap as one representation, so those consults stay all-or-nothing.
   The two consults that used to SKIP the gate (a prop band already inside half
   the fog, a camera already inside a town's cull radius: the teleport-arrival
   shape) are IMMINENT HOLDS now, because the premise that such an arrival rides
@@ -297,8 +322,8 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   frame with two or more of them). `gpu_prep_events.ts` counts the marked keys
   as `imminentHolds`.
   TWO REACH FLOORS, and they are the only reveals that may draw a root
-  unlinked: colliders are never invisible at arm's length. Bands keep
-  `PROP_CULL_REVEAL_REACH` (40 yd, instant, gate or not). Towns get
+  unlinked: colliders are never invisible at arm's length. Bands and hideables
+  keep `PROP_CULL_REVEAL_REACH` (40 yd, instant, gate or not). Towns get
   `TOWN_REVEAL_REACH_YD` (12 yd, applied in the piecewise pass on the first held
   frame, budget-free, counted as `rootsReach`), and it is DELIBERATELY the
   smaller one: a town kit's programs are shared across its buildings, so
@@ -442,8 +467,9 @@ GPU work signs. Each rule names its seam and its guard.
   compile gate submits one unit per material group and variant of its root
   (the material tuple plus what three's program cache key reads off the node:
   skinning, instancing, morph targets, the geometry attributes), one
-  representative compile per group (`CompileGateQueue.runPieces` over
-  `linkPieceWork`, `compile_gate_pieces.ts`), never a whole root in one unit:
+  representative compile per group plus its variant settle
+  (`CompileGateQueue.runPieces` over `linkPieceWork`, `compile_gate_pieces.ts`,
+  the settle arm bound by `pieceProgramSettle`), never a whole root in one unit:
   the queue paces between units, and a driver that compiles shader source at
   submission charged every program of a root to the one unit. Each piece arms
   the gate timeout for its OWN work (the driver latency of one unit), so queue

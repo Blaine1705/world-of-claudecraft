@@ -14,10 +14,12 @@
 // absorb it, and the GPU-work rule (src/render/CLAUDE.md) forbids exactly that.
 //
 // Readiness therefore comes from what this code already knows. A compileAsync
-// that SETTLED over a target proved every program under it linked (three's own
+// that SETTLED over a target proved the program it polled linked (three's own
 // compileAsync drops a material from its pending set once its `currentProgram`
 // reports ready), so the gate's tail records those programs here and the walk
-// reads the record instead of the driver.
+// reads the record instead of the driver. The gate's variant settle
+// (program_variant_settle.ts) records the OTHER variants of a piece's
+// materials one by one, as its own asynchronous poll proves each ready.
 import type * as THREE from 'three';
 import type { LinkedProgramLike, MaterialPropertiesLike } from './linked_program_touch';
 
@@ -30,6 +32,19 @@ interface MaterialCurrentProgramLike {
 // Weak so a program dropped with its material (a rebuilt view, a released
 // context) leaves with it; nothing here keeps a program alive.
 const knownReady = new WeakSet<LinkedProgramLike>();
+
+/**
+ * Record ONE program as linked, and return whether it was newly recorded.
+ *
+ * Call it ONLY with a program the driver actually reported ready (a
+ * compileAsync that settled over it, or a poll of its own completion query
+ * that answered true): that answer is the whole proof.
+ */
+export function markProgramReady(program: LinkedProgramLike): boolean {
+  if (knownReady.has(program)) return false;
+  knownReady.add(program);
+  return true;
+}
 
 /**
  * Record every material's current program under `target` as linked, and return
@@ -52,9 +67,7 @@ export function markProgramsReadyUnder(
       if (!material) continue;
       const current = (properties.get(material) as MaterialCurrentProgramLike | undefined)
         ?.currentProgram;
-      if (!current || knownReady.has(current)) continue;
-      knownReady.add(current);
-      marked++;
+      if (current && markProgramReady(current)) marked++;
     }
   });
   return marked;

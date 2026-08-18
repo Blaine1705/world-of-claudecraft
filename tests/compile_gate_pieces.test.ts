@@ -7,6 +7,7 @@
 
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import type { PieceDeadline } from '../src/render/compile_gate';
 import { linkPiecesOf, linkPieceWork } from '../src/render/compile_gate_pieces';
 
 function mesh(material: THREE.Material | THREE.Material[], name = ''): THREE.Mesh {
@@ -100,10 +101,12 @@ describe('linkPiecesOf', () => {
     ]);
   });
 
-  it('splits a caster from a non-caster of the same material: the shadow arm compiles casters only', () => {
-    // The host's shadow arm links a depth program for a castShadow node and
-    // nothing for the others, so a caster riding a non-caster's piece would
-    // link its depth program synchronously at the first shadow pass.
+  it('ignores castShadow: the shadow arm twins every mesh, so a caster and a non-caster share one piece', () => {
+    // Casting is a runtime distance toggle, so the host's shadow arm swaps a
+    // depth twin onto every mesh of the piece whatever castShadow reads at
+    // gate time; a caster and a non-caster of one material and variant link
+    // exactly the same programs, and a second piece would be a cache hit
+    // paying a whole-scene light walk for nothing.
     const shared = new THREE.MeshStandardMaterial();
     const decal = mesh(shared, 'decal');
     const wall = mesh(shared, 'wall');
@@ -112,7 +115,7 @@ describe('linkPiecesOf', () => {
     fence.castShadow = true;
     const root = new THREE.Group();
     root.add(decal, wall, fence);
-    expect(linkPiecesOf(root)).toEqual([[decal], [wall, fence]]);
+    expect(linkPiecesOf(root)).toEqual([[decal, wall, fence]]);
   });
 
   it('ignores receiveShadow: three feeds it as a uniform, not a program key input', () => {
@@ -133,7 +136,10 @@ describe('linkPiecesOf', () => {
 });
 
 describe('linkPieceWork', () => {
-  it('runs ONE colour arm then ONE shadow arm per piece, on its representative, nothing reparented', async () => {
+  const live: PieceDeadline = { fired: false };
+  const noSettle = () => Promise.resolve();
+
+  it('runs ONE colour arm, ONE shadow arm, then ONE settle per piece, on its representative, nothing reparented', async () => {
     // legs shares torso's key (same material, both static): a cache hit that
     // would only repeat the whole-scene light walk, so it is not compiled.
     const skin = new THREE.MeshStandardMaterial();
@@ -151,16 +157,68 @@ describe('linkPieceWork', () => {
       arms.push(`shadow:${node.name}`);
       return Promise.resolve();
     });
-    const work = linkPieceWork(root, color, shadow);
+    const settle = vi.fn((node: THREE.Object3D, _deadline: PieceDeadline) => {
+      arms.push(`settle:${node.name}`);
+      return Promise.resolve();
+    });
+    const work = linkPieceWork(root, color, shadow, settle);
     expect(work).toHaveLength(2);
-    await work[0]();
-    expect(arms).toEqual(['color:torso', 'shadow:torso']);
-    await work[1]();
-    expect(arms.slice(2)).toEqual(['color:eyes', 'shadow:eyes']);
+    await work[0](live);
+    expect(arms).toEqual(['color:torso', 'shadow:torso', 'settle:torso']);
+    await work[1](live);
+    expect(arms.slice(3)).toEqual(['color:eyes', 'shadow:eyes', 'settle:eyes']);
     expect(color).toHaveBeenCalledTimes(2);
     expect(shadow).toHaveBeenCalledTimes(2);
+    expect(settle).toHaveBeenCalledTimes(2);
     expect(color).not.toHaveBeenCalledWith(legs);
+    expect(settle).not.toHaveBeenCalledWith(legs, expect.anything());
     for (const node of [torso, legs, eyes]) expect(node.parent).toBe(root);
+  });
+
+  it('hands the settle the piece OWN deadline, after both compiles resolved', async () => {
+    // The settle polls the driver until every variant is ready or the piece's
+    // deadline fires: it must see the deadline the gate armed for THIS piece,
+    // and it must not start before the shadow arm resolved (its programs are
+    // among the variants).
+    const root = mesh(new THREE.MeshStandardMaterial(), 'batch');
+    const deadline: PieceDeadline = { fired: false };
+    let resolveShadow!: () => void;
+    const seen: Array<{ node: THREE.Object3D; deadline: PieceDeadline }> = [];
+    const work = linkPieceWork(
+      root,
+      () => Promise.resolve(),
+      () => new Promise<void>((resolve) => (resolveShadow = resolve)),
+      (node, handed) => {
+        seen.push({ node, deadline: handed });
+        return Promise.resolve();
+      },
+    );
+    const piece = work[0](deadline);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(seen).toEqual([]);
+    resolveShadow();
+    await piece;
+    expect(seen).toEqual([{ node: root, deadline }]);
+    expect(seen[0].deadline).toBe(deadline);
+  });
+
+  it('resolves the piece only once its settle resolved, so a gate settles no earlier than its slowest variant', async () => {
+    const root = mesh(new THREE.MeshStandardMaterial(), 'batch');
+    let resolveSettle!: () => void;
+    const work = linkPieceWork(
+      root,
+      () => Promise.resolve(),
+      () => Promise.resolve(),
+      () => new Promise<void>((resolve) => (resolveSettle = resolve)),
+    );
+    let done = false;
+    const piece = work[0](live).then(() => (done = true));
+    for (let index = 0; index < 6; index++) await Promise.resolve();
+    expect(done).toBe(false);
+    resolveSettle();
+    await piece;
+    expect(done).toBe(true);
   });
 
   it('compiles a skinned node of the same material as its own piece: a different program', async () => {
@@ -175,9 +233,9 @@ describe('linkPieceWork', () => {
       compiled.push(node.name);
       return Promise.resolve();
     };
-    const work = linkPieceWork(root, arm, arm);
+    const work = linkPieceWork(root, arm, arm, noSettle);
     expect(work).toHaveLength(2);
-    for (const piece of work) await piece();
+    for (const piece of work) await piece(live);
     expect(compiled).toEqual(['statue', 'statue', 'torso', 'torso']);
   });
 
@@ -195,12 +253,13 @@ describe('linkPieceWork', () => {
         return new Promise(() => {});
       },
       () => Promise.resolve(),
+      noSettle,
     );
-    void work[0]();
+    void work[0](live);
     expect(started).toBe(true);
   });
 
   it('is empty for a root without a material carrier', () => {
-    expect(linkPieceWork(new THREE.Group(), vi.fn(), vi.fn())).toEqual([]);
+    expect(linkPieceWork(new THREE.Group(), vi.fn(), vi.fn(), noSettle)).toEqual([]);
   });
 });

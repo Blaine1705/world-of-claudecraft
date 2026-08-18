@@ -152,7 +152,13 @@ const MONOLITHS: MonolithRow[] = [
     // the start-of-sync reading and the aligned end-of-sync sample), which
     // paid for its wiring by extracting the perfStats last-frame deep copy
     // into src/render/renderer_frame_stats_snapshot.ts (net -21).
-    ceiling: 13451,
+    // Lowered again by the compile gate's variant settle
+    // (program_variant_settle.ts, the third piece arm both gates bind), which
+    // paid for its wiring by moving the open-air fog predicate beside the
+    // FogSceneState it classifies (interior_light_rig.ts isOpenAirFogState),
+    // landing with the shadow arm's every-mesh twin swap in the same change
+    // (net -3).
+    ceiling: 13448,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

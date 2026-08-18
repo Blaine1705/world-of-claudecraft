@@ -351,7 +351,12 @@ import { idleSlot } from './idle_queue';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
-import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
+import {
+  applyInteriorLightRig,
+  applyRiftLightRig,
+  type FogSceneState,
+  isOpenAirFogState,
+} from './interior_light_rig';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -514,6 +519,7 @@ import {
 } from './prewarm_resume';
 import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
+import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
@@ -2524,6 +2530,7 @@ export class Renderer {
           this.liveCompileGates.runPieces(pieces, VIEW_COMPILE_GATE_MAX_MS, options),
         compileColor: (target) => this.compilePrewarmColorPrograms(target, false),
         compileShadow: (target) => this.compileShadowPrograms(target),
+        settle: pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials),
         upload: (target, priority) => this.uploadGateTexturesGated(target, priority),
         touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),
         predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),
@@ -4942,7 +4949,7 @@ export class Renderer {
     // The dome rides the camera, so it serves every open-air state: the
     // overworld, Wildheart's field, and the Thornhollow Fields hollow (hiding
     // it there left a black void above the ramparts).
-    this.sky.visible = this.isOpenAirFog();
+    this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       if (!this.lowGfx) {
@@ -5359,33 +5366,30 @@ export class Renderer {
 
   /**
    * compileAsync(scene, camera) does not enumerate Three's renderer-owned
-   * shadow materials. Temporarily put equivalent MeshDepthMaterials on the
-   * real casters, skinned or not, so KHR_parallel_shader_compile can link
-   * those variants before the synchronous shadow warm pass asks getUniforms
-   * for them. Static and instanced casters count: their missing depth arm
-   * was 12 of the initial frame's 64 residual synchronous links.
+   * shadow materials. Temporarily put equivalent MeshDepthMaterials on EVERY
+   * mesh under the root, skinned or not, so KHR_parallel_shader_compile links
+   * those variants before the shadow pass asks getUniforms for them: static
+   * and instanced casters (12 of the initial frame's 64 residual synchronous
+   * links), and meshes NOT casting at gate time, because castShadow is toggled
+   * at runtime by distance (entity shadow band, zone shadow volume, gather
+   * nodes) frames after this arm ran, so a rig created beyond the band linked
+   * cold at its first shadow draw (eleven depth programs of 20 to 41 ms in
+   * 0.3 s on the 3090 ride, ten through Eastbrook in production). Depth twins
+   * are few, cached per (material inputs x mesh shape): a cache hit, no link.
    */
   private async compileShadowPrograms(root: THREE.Object3D): Promise<void> {
     if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;
     const swaps: { mesh: THREE.Mesh; material: THREE.Material | THREE.Material[] }[] = [];
-    let casters = 0;
     // Walked inside the try below so a throw mid-walk still restores every swap.
     const swapMaterials = (): void => {
       root.traverse((obj) => {
         const mesh = obj as THREE.Mesh;
-        if (!mesh.isMesh) return;
+        if (!mesh.isMesh || !mesh.material) return;
         const material = mesh.material;
         swaps.push({ mesh, material });
-        if (mesh.castShadow) {
-          casters++;
-          mesh.material = Array.isArray(material)
-            ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
-            : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
-        } else {
-          // A non-caster has no shadow program: left in place its colour material
-          // relinks as a fog-less twin the scene never draws. compile skips null.
-          mesh.material = null as unknown as THREE.Material;
-        }
+        mesh.material = Array.isArray(material)
+          ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
+          : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
       });
     };
     // Match the real shadow pass's program key exactly. A bare
@@ -5408,7 +5412,7 @@ export class Renderer {
     let compilePromise: Promise<THREE.Object3D> | null = null;
     try {
       swapMaterials();
-      if (casters > 0) {
+      if (swaps.length > 0) {
         this.scene.fog = null;
         this.webgl.setRenderTarget(this.prewarmRenderTarget);
         compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
@@ -8697,8 +8701,9 @@ export class Renderer {
     // programs' uniform tables so the reveal draw issues no synchronous query.
     const color = (node: THREE.Object3D) => this.compilePrewarmColorPrograms(node, false);
     const shadow = (node: THREE.Object3D) => this.compileShadowPrograms(node);
+    const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);
     const linked = this.liveCompileGates.runPieces(
-      linkPieceWork(target, color, shadow),
+      linkPieceWork(target, color, shadow, settle),
       VIEW_COMPILE_GATE_MAX_MS,
       { priority, label: `live-gate:${target.name || target.type}` },
     );
@@ -10130,14 +10135,6 @@ export class Renderer {
       }
     }
     for (const view of this.bgViews.values()) view.setWardState(state);
-  }
-
-  private isOpenAirFog(): boolean {
-    return (
-      this.fogState === 'outdoor' ||
-      this.fogState === 'wildheartField' ||
-      this.fogState === 'battleground'
-    );
   }
 
   private updateCelestialSprites(): void {
@@ -12403,7 +12400,7 @@ export class Renderer {
     // OPEN-AIR: dome, sun, and weather render over the band exactly like the
     // overworld (hiding them left a black void above the ramparts).
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    this.sky.visible = this.isOpenAirFog();
+    this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       if (!this.lowGfx) {

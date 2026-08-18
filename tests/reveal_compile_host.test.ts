@@ -5,13 +5,18 @@
 // ordinary reveal stays at VISIBLE_PREWARM under the live entity gates, and in
 // both cases the link comes before the upload, which comes before the touch.
 // The link itself is cut into one gate piece per material group of the root
-// (compile_gate_pieces.ts), each running the colour arm then the shadow arm
-// on the group's representative node, all under the one gate.
+// (compile_gate_pieces.ts), each running the colour arm, then the shadow arm,
+// then the variant settle on the group's representative node, all under the
+// one gate.
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
-import type { CompileGateResult } from '../src/render/compile_gate';
+import type {
+  CompileGatePiece,
+  CompileGateResult,
+  PieceDeadline,
+} from '../src/render/compile_gate';
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from '../src/render/reveal_compile_host';
 import { REVEAL_GATE_WATCHDOG_MS, REVEAL_SOFT_DEADLINE_MIN_MS } from '../src/render/reveal_gate';
 
@@ -26,18 +31,24 @@ function recordingDeps(predictRevealMs = 0, result: CompileGateResult = SETTLED)
     gate?: CompileGateResult;
     node?: THREE.Object3D;
     pieces?: number;
+    deadline?: PieceDeadline;
   }[] = [];
+  const deadline: PieceDeadline = { fired: false };
   const deps = {
-    gate(pieces: Array<() => Promise<unknown>>, options: { priority: number; label: string }) {
+    gate(pieces: CompileGatePiece[], options: { priority: number; label: string }) {
       calls.push({
         arm: 'gate',
         priority: options.priority,
         label: options.label,
         pieces: pieces.length,
       });
-      // serial, like the local fallback: the pieces' arms land in order
+      // serial, like the local fallback: the pieces' arms land in order, each
+      // piece handed the deadline the gate armed for it
       return pieces
-        .reduce<Promise<unknown>>((chain, piece) => chain.then(piece), Promise.resolve())
+        .reduce<Promise<unknown>>(
+          (chain, piece) => chain.then(() => piece(deadline)),
+          Promise.resolve(),
+        )
         .then(() => result);
     },
     compileColor(node: THREE.Object3D) {
@@ -46,6 +57,10 @@ function recordingDeps(predictRevealMs = 0, result: CompileGateResult = SETTLED)
     },
     compileShadow(node: THREE.Object3D) {
       calls.push({ arm: 'shadow', priority: Number.NaN, node });
+      return Promise.resolve();
+    },
+    settle(node: THREE.Object3D, handed: PieceDeadline) {
+      calls.push({ arm: 'settle', priority: Number.NaN, node, deadline: handed });
       return Promise.resolve();
     },
     upload(_target: object, priority: number) {
@@ -58,7 +73,7 @@ function recordingDeps(predictRevealMs = 0, result: CompileGateResult = SETTLED)
     },
     predictRevealMs: () => predictRevealMs,
   };
-  return { calls, host: createRevealCompileHost(deps) };
+  return { calls, deadline, host: createRevealCompileHost(deps) };
 }
 
 /** A one-material root: one piece, one colour arm, one shadow arm. */
@@ -111,11 +126,31 @@ describe('reveal compile host priority', () => {
     for (const imminent of [true, false]) {
       const { calls, host } = recordingDeps();
       await host.compile(root, imminent);
-      expect(calls.map((call) => call.arm)).toEqual(['gate', 'color', 'shadow', 'upload', 'touch']);
+      expect(calls.map((call) => call.arm)).toEqual([
+        'gate',
+        'color',
+        'shadow',
+        'settle',
+        'upload',
+        'touch',
+      ]);
     }
   });
 
-  it('cuts the link into one gate piece per material group, colour then shadow per representative', async () => {
+  it('settles every piece over its representative under the deadline the gate armed for it', async () => {
+    // The settle is what turns "the slot compileAsync polled is ready" into
+    // "every variant of the piece is ready" (program_variant_settle.ts); it
+    // must run on the piece's node with the piece's own deadline, or its poll
+    // has no bound.
+    const { calls, deadline, host } = recordingDeps();
+    await host.compile(root, false);
+    const settles = calls.filter((call) => call.arm === 'settle');
+    expect(settles).toHaveLength(1);
+    expect(settles[0].node).toBe(root);
+    expect(settles[0].deadline).toBe(deadline);
+  });
+
+  it('cuts the link into one gate piece per material group, colour then shadow then settle per representative', async () => {
     // A town kit root: two batches share one material, a third wears another,
     // and the bare group carries none. Two pieces, one representative node
     // compiled in place per piece (the arms get the NODE, never the root), the
@@ -134,14 +169,16 @@ describe('reveal compile host priority', () => {
       pieces: 2,
       label: 'reveal-gate:eastbrookTownKit',
     });
-    expect(calls.slice(1, 5).map((call) => `${call.arm}:${call.node?.uuid}`)).toEqual([
+    expect(calls.slice(1, 7).map((call) => `${call.arm}:${call.node?.uuid}`)).toEqual([
       `color:${first.uuid}`,
       `shadow:${first.uuid}`,
+      `settle:${first.uuid}`,
       `color:${second.uuid}`,
       `shadow:${second.uuid}`,
+      `settle:${second.uuid}`,
     ]);
     expect(calls.some((call) => call.node === third)).toBe(false);
-    expect(calls.slice(5).map((call) => call.arm)).toEqual(['upload', 'touch']);
+    expect(calls.slice(7).map((call) => call.arm)).toEqual(['upload', 'touch']);
   });
 
   it('hands the tail the gate own result, so a timed-out link proves nothing ready', async () => {

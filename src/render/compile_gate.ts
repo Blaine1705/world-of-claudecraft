@@ -33,6 +33,19 @@ export interface CompileGateOptions {
   scheduler?: CompileGateScheduler;
 }
 
+/** What a gate piece may read of its OWN deadline: whether it has fired. A
+ *  piece that keeps polling the driver after its compile resolves (the
+ *  variant settle, program_variant_settle.ts) ends that poll here, so the one
+ *  timeout constant still bounds the whole piece; a closed gate (its queue
+ *  rejected) reads as fired, so nothing polls a context that is going away. */
+export interface PieceDeadline {
+  readonly fired: boolean;
+}
+
+/** One queue unit of a pieced gate: the compile of one material group, handed
+ *  its own deadline. */
+export type CompileGatePiece = (deadline: PieceDeadline) => Promise<unknown>;
+
 export interface CompileGateWorkQueue {
   run<T>(
     work: () => T | Promise<T>,
@@ -150,10 +163,12 @@ export class CompileGateQueue {
    * the first piece to fire). The result aggregates the pieces (any failure
    * fails it) and resolves only when every piece settled, so readiness
    * marking and the reveal happen exactly as for a whole-root gate. Serial
-   * on the local fallback.
+   * on the local fallback. Each piece receives its own deadline, so work it
+   * runs after its compile resolves (the variant settle) ends when that
+   * deadline fires: such a piece resolves with the gate already timed out.
    */
   runPieces(
-    pieces: Array<() => Promise<unknown>>,
+    pieces: CompileGatePiece[],
     timeoutMs: number,
     options: CompileGateOptions = {},
   ): Promise<CompileGateResult> {
@@ -169,20 +184,30 @@ export class CompileGateQueue {
       for (const guard of armed) scheduler.clearTimeout(guard);
       armed.clear();
     };
+    const closedDeadline: PieceDeadline = { fired: true };
     const settled = pieces.map((piece, index) =>
       this.submit(
         () => {
-          if (closed) return settleCompilePiece(piece);
+          if (closed) return settleCompilePiece(() => piece(closedDeadline));
           let pieceSettled = false;
+          let fired = false;
+          // Reads the closed flag too: a disarmed timer never fires, and a
+          // piece still polling past that must stop as if it had.
+          const deadline: PieceDeadline = {
+            get fired() {
+              return fired || closed;
+            },
+          };
           const guard = scheduler.setTimeout(() => {
             armed.delete(guard);
             if (pieceSettled) return;
+            fired = true;
             const first = !timedOut;
             timedOut = true;
             if (first) reportGateTimeout(timeoutMs, options);
           }, timeoutMs);
           armed.add(guard);
-          return settleCompilePiece(piece).then((failed) => {
+          return settleCompilePiece(() => piece(deadline)).then((failed) => {
             pieceSettled = true;
             if (armed.delete(guard)) scheduler.clearTimeout(guard);
             return failed;

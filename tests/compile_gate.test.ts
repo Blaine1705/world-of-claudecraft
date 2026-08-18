@@ -4,6 +4,7 @@ import {
   awaitCompileGate,
   CompileGateQueue,
   type CompileGateScheduler,
+  type PieceDeadline,
   SerialGateLane,
   settlePendingSwap,
 } from '../src/render/compile_gate';
@@ -609,6 +610,57 @@ describe('CompileGateQueue.runPieces', () => {
     expect(started).toEqual([0, 1]);
   });
 
+  it('hands each piece its OWN deadline, which reads fired only once that piece timer fired', async () => {
+    // A piece that keeps polling the driver after its compile resolves (the
+    // variant settle) ends that poll on this flag, so the one constant bounds
+    // the whole piece; a sibling piece's timeout must not end it early.
+    const scheduler = multiScheduler();
+    const { sharedQueue } = recordingSharedQueue();
+    const queue = new CompileGateQueue(sharedQueue);
+    const deadlines: PieceDeadline[] = [];
+    const resolvers: Array<() => void> = [];
+    const piece = (deadline: PieceDeadline) => {
+      deadlines.push(deadline);
+      return new Promise<void>((resolve) => resolvers.push(resolve));
+    };
+    const gate = queue.runPieces([piece, piece], 1500, {
+      scheduler,
+      label: 'live-gate:Group',
+      recordTimeoutEvent: false,
+    });
+    for (let index = 0; index < 4; index++) await Promise.resolve();
+    expect(deadlines).toHaveLength(2);
+    expect(deadlines[0]).not.toBe(deadlines[1]);
+    expect(deadlines.map((deadline) => deadline.fired)).toEqual([false, false]);
+    scheduler.fire(2);
+    expect(deadlines.map((deadline) => deadline.fired)).toEqual([false, true]);
+    scheduler.fire(1);
+    expect(deadlines.map((deadline) => deadline.fired)).toEqual([true, true]);
+    resolvers[0]();
+    resolvers[1]();
+    await expect(gate).resolves.toEqual({ failed: false, timedOut: true });
+  });
+
+  it('a piece deadline never fires while the piece settles in time', async () => {
+    const scheduler = multiScheduler();
+    const queue = new CompileGateQueue();
+    let seen: PieceDeadline | null = null;
+    const gate = queue.runPieces(
+      [
+        (deadline) => {
+          seen = deadline;
+          return Promise.resolve();
+        },
+      ],
+      1500,
+      { scheduler },
+    );
+    await expect(gate).resolves.toEqual({ failed: false, timedOut: false });
+    expect(seen).not.toBeNull();
+    expect((seen as unknown as PieceDeadline).fired).toBe(false);
+    expect(scheduler.live).toEqual([]);
+  });
+
   it('propagates a queue rejection (shutdown) and disarms the live piece deadlines', async () => {
     // The piece STARTS (its deadline arms) and never settles; the queue then
     // rejects the unit (shutdown): the live timer is cleared, and a piece the
@@ -630,16 +682,34 @@ describe('CompileGateQueue.runPieces', () => {
       },
     };
     const queue = new CompileGateQueue(sharedQueue);
-    const gate = queue.runPieces([() => new Promise(() => {}), () => Promise.resolve()], 1500, {
-      scheduler,
-      label: 'gone',
-    });
+    const deadlines: PieceDeadline[] = [];
+    const gate = queue.runPieces(
+      [
+        (deadline) => {
+          deadlines.push(deadline);
+          return new Promise(() => {});
+        },
+        (deadline) => {
+          deadlines.push(deadline);
+          return Promise.resolve();
+        },
+      ],
+      1500,
+      { scheduler, label: 'gone' },
+    );
     await expect(gate).rejects.toBe(shutdown);
     expect(scheduler.armedMs).toEqual([1500]);
     expect(scheduler.live).toEqual([]);
+    // the disarmed piece's deadline reads FIRED, so a poll it still runs
+    // (the variant settle) stops instead of asking a dying context forever
+    expect(deadlines).toHaveLength(1);
+    expect(deadlines[0].fired).toBe(true);
     expect(late).toHaveLength(1);
     await late[0]();
     expect(scheduler.armedMs).toEqual([1500]);
+    // and the piece released after the close is handed a fired deadline too
+    expect(deadlines).toHaveLength(2);
+    expect(deadlines[1].fired).toBe(true);
     expect(gpuPrepEventsSnapshot().total).toBe(0);
   });
 });

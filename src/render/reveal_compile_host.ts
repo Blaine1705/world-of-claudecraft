@@ -22,8 +22,8 @@
 
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
-import type { CompileGateResult } from './compile_gate';
-import { linkPiecesOf, linkPieceWork } from './compile_gate_pieces';
+import type { CompileGatePiece, CompileGateResult } from './compile_gate';
+import { linkPiecesOf, linkPieceWork, type PieceSettle } from './compile_gate_pieces';
 import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
 
 /** The gpu-prep label prefix, and therefore the budget's cost KIND, of every
@@ -37,11 +37,16 @@ export interface RevealCompileHostDeps {
    *  result says whether the whole link SETTLED, which is what the touch
    *  tail's readiness rests on. */
   gate(
-    pieces: Array<() => Promise<unknown>>,
+    pieces: CompileGatePiece[],
     options: { priority: number; label: string },
   ): Promise<CompileGateResult>;
   compileColor(target: THREE.Object3D): Promise<unknown>;
   compileShadow(target: THREE.Object3D): Promise<unknown>;
+  /** The piece's settle over every program variant its materials carry, the
+   *  depth twins included, under the piece's own deadline
+   *  (program_variant_settle.ts): what makes a settled gate mean "every
+   *  variant ready", not "the one slot compileAsync polled". */
+  settle: PieceSettle;
   /** Every cold texture under the root, one budgeted queue unit each. Between
    *  the link and the touch: the touch's driver round trip flushes behind
    *  everything already queued, so uploads paid after it are measured by it. */
@@ -70,7 +75,7 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
     compile(root: object, imminent: boolean): Promise<unknown> {
       const target = root as THREE.Object3D;
       const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;
-      const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow);
+      const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow, deps.settle);
       submittedPieces.set(target, pieces.length);
       const linked = deps.gate(pieces, {
         priority,

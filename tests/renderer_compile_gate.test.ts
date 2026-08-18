@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import * as characters from '../src/render/characters';
+import { prewarmDepthMaterialKey } from '../src/render/prewarm_depth_material';
 import { type EntityView, Renderer } from '../src/render/renderer';
 
 interface CompileGateHarness {
@@ -35,6 +36,8 @@ function harness(): CompileGateHarness & Record<string, unknown> {
   renderer.asyncCompileSupported = true;
   renderer.lifecycleGeneration = 7;
   renderer.shutdownStarted = false;
+  // the shadow arm's depth-twin cache, read by every gate piece's variant settle
+  renderer.prewarmDepthMaterials = new Map();
   return renderer;
 }
 
@@ -179,9 +182,10 @@ describe('Renderer live shader compile rejection recovery', () => {
     await renderer.compileGate(target);
 
     expect(order).toEqual(['color:false', 'shadow']);
-    // Twice for the one material: the settle's marking walk, then the collect
-    // walk. Neither of them asks the driver anything.
-    expect(properties.get).toHaveBeenCalledTimes(2);
+    // Three times for the one material: the piece's variant settle (which
+    // finds no program to poll here), the tail's marking walk, then the
+    // collect walk. None of them asks the driver anything.
+    expect(properties.get).toHaveBeenCalledTimes(3);
     // The arms compile the material carrier itself, in place, never the root:
     // three prepares materials only under the node it is handed, so this is
     // exactly the mesh's programs, and one queue unit per material group.
@@ -246,7 +250,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(node, false)');
     expect(gateMethod).toContain('this.compileShadowPrograms(node)');
     expect(gateMethod).toContain('this.liveCompileGates.runPieces(');
-    expect(gateMethod).toContain('linkPieceWork(target, color, shadow),');
+    expect(gateMethod).toContain('linkPieceWork(target, color, shadow, settle),');
     expect(gateMethod).not.toContain('this.liveCompileGates.run(');
     expect(gateMethod).toContain('this.uploadGateTexturesGated(target, priority)');
     // The tail carries the GATE's result: a timed-out or failed link proved
@@ -377,11 +381,15 @@ describe('the compile gate touch tail, per program', () => {
     renderer.sim = { player: { targetId: null } };
     // The queue resolves the gate RESULT, which is what tells the tail whether
     // anything was proved linked. One piece per material (each mesh below
-    // wears its own), run serially here like the local fallback.
+    // wears its own), run serially here like the local fallback, each handed
+    // a live deadline the way runPieces does.
     renderer.liveCompileGates = {
-      runPieces: (pieces: Array<() => Promise<unknown>>) =>
+      runPieces: (pieces: Array<(deadline: { fired: boolean }) => Promise<unknown>>) =>
         pieces
-          .reduce<Promise<unknown>>((chain, piece) => chain.then(piece), Promise.resolve())
+          .reduce<Promise<unknown>>(
+            (chain, piece) => chain.then(() => piece({ fired: false })),
+            Promise.resolve(),
+          )
           .then(() => ({ failed: false, timedOut: false })),
     };
     renderer.compilePrewarmColorPrograms = () => {
@@ -392,8 +400,15 @@ describe('the compile gate touch tail, per program', () => {
       order.push('shadow');
       return Promise.resolve();
     };
+    // The driver is asked ONLY by the piece's variant settle, inside the gate
+    // (program_variant_settle.ts); from the first touch unit on, readiness is
+    // the record (src/render/linked_program_readiness.ts), so a query issued
+    // once the tail has started is the 5.6 s production freeze coming back and
+    // fails the harness outright.
+    let touching = false;
     renderer.backgroundGpuWork = {
       run: (work: () => unknown, priority?: number, label?: string) => {
+        touching = true;
         queued.push({ label, priority });
         order.push(`unit:${queued.length}`);
         work();
@@ -401,16 +416,16 @@ describe('the compile gate touch tail, per program', () => {
       },
     };
     // One material per program, each with the variant a settled compile
-    // resolved to: that record, not a driver query, is what the walk reads
-    // (src/render/linked_program_readiness.ts). The stubs throw from isReady so
-    // the 5.6 s production freeze cannot come back through this path.
+    // resolved to.
     const linked = new Map<unknown, { programs: Map<string, unknown>; currentProgram: unknown }>();
     const target = new THREE.Group();
     for (let index = 0; index < programs; index++) {
       const material = new THREE.MeshStandardMaterial();
       const variant = {
         isReady: () => {
-          throw new Error('the touch tail must never query the driver for readiness');
+          if (touching) throw new Error('the touch tail must never query the driver for readiness');
+          order.push('poll');
+          return true;
         },
         getUniforms: vi.fn(),
         getAttributes: vi.fn(),
@@ -437,13 +452,19 @@ describe('the compile gate touch tail, per program', () => {
 
     await renderer.compileGate(renderer.touchTarget as THREE.Object3D);
 
+    // Each piece: its two compiles, then its settle's poll (one query per
+    // variant, all ready at once here); the touch units come after every
+    // piece settled and issue no query of their own.
     expect(renderer.order).toEqual([
       'color',
       'shadow',
+      'poll',
       'color',
       'shadow',
+      'poll',
       'color',
       'shadow',
+      'poll',
       'unit:1',
       'unit:2',
       'unit:3',
@@ -519,12 +540,15 @@ describe('the compile gate touch tail, per program', () => {
   });
 });
 
-describe('the shadow arm compiles casters only', () => {
-  // A non-caster mesh (a composed far mesh, a click proxy, a halo) has no
-  // shadow-pass program. Left on the mesh during the shadow-camera compile
-  // its colour material relinks as a fog-less twin the scene pass never
-  // draws: four wasted driver links per far bake, queued ahead of the
-  // programs the reveal actually waits on (measured on both GPUs).
+describe('the shadow arm compiles a depth twin for every mesh, caster or not', () => {
+  // castShadow is a runtime toggle (entity views flip it with the shadow
+  // band, zone features with the shadow volume, gather nodes likewise) and
+  // the gate runs frames after a group appeared, so a rig created beyond the
+  // band would have its depth arm skipped and link cold at its first shadow
+  // draw as the player rides closer (eleven unnamed depth programs of 20 to
+  // 41 ms in 0.3 s on the 3090 ride, ten at first draw through Eastbrook in
+  // production). Depth twins are cached per (material inputs x mesh shape),
+  // so a mesh that never casts costs a cache hit, never a wasted colour link.
   function shadowHarness() {
     const renderer = harness();
     renderer.sun = { shadow: { camera: new THREE.PerspectiveCamera() } };
@@ -540,7 +564,7 @@ describe('the shadow arm compiles casters only', () => {
     };
   }
 
-  it('swaps casters to depth materials and takes non-caster materials off for the prologue, restoring both BEFORE the awaited link', async () => {
+  it('swaps every mesh to its depth twin for the prologue, castShadow false included, restoring all BEFORE the awaited link', async () => {
     const renderer = shadowHarness();
     const seen: string[] = [];
     let compiledRoot: THREE.Object3D | null = null;
@@ -566,10 +590,12 @@ describe('the shadow arm compiles casters only', () => {
       },
     };
     const wrap = new THREE.Group();
-    const farMesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
-    farMesh.name = 'far';
-    (farMesh.material as THREE.Material).name = 'far_body';
-    farMesh.castShadow = false;
+    // A rig created beyond the shadow band: castShadow false at gate time,
+    // flipped true by the band a few hundred yards later.
+    const farRig = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
+    farRig.name = 'far';
+    (farRig.material as THREE.Material).name = 'far_body';
+    farRig.castShadow = false;
     const proxy = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
     proxy.name = 'proxy';
     (proxy.material as THREE.Material).name = 'shadow_only';
@@ -580,17 +606,18 @@ describe('the shadow arm compiles casters only', () => {
     ]);
     multi.name = 'multi';
     multi.castShadow = true;
-    wrap.add(farMesh, proxy, multi);
-    const farMaterial = farMesh.material;
+    wrap.add(farRig, proxy, multi);
+    const farMaterial = farRig.material;
     const proxyMaterial = proxy.material;
     const multiMaterial = multi.material;
 
     const pending = renderer.compileShadowPrograms(wrap);
 
     expect(compiledRoot).toBe(wrap);
-    // during the prologue: casters wear their depth twins (each material of a
-    // multi-material caster), the non-caster nothing
-    expect(seen.sort()).toEqual(['far:null', 'multi:depth|depth', 'proxy:depth']);
+    // during the prologue: every mesh wears its depth twin (each material of a
+    // multi-material mesh), the non-caster too: never null, never its colour
+    // material (which would relink as a fog-less twin the scene never draws)
+    expect(seen.sort()).toEqual(['far:depth', 'multi:depth|depth', 'proxy:depth']);
     // and those twins came from the shared factory cache, not a hand-built
     // MeshDepthMaterial in the renderer (the depth-packing regression).
     expect(renderer.prewarmDepthMaterials.size).toBeGreaterThan(0);
@@ -598,9 +625,14 @@ describe('the shadow arm compiles casters only', () => {
       expect(twin.isMeshDepthMaterial).toBe(true);
       expect(twin.name.startsWith('prewarm-depth:')).toBe(true);
     }
+    // The non-caster's twin is the SAME cached instance a caster of the same
+    // shape and material inputs gets: a cache hit, not a new variant.
+    expect(prewarmDepthMaterialKey(farRig.material as THREE.Material, farRig)).toBe(
+      prewarmDepthMaterialKey((multi.material as THREE.Material[])[0], multi),
+    );
     // and every material is back on its mesh while the link is still pending
-    // (a late restore would draw a visible non-caster as NOTHING for the link)
-    expect(farMesh.material).toBe(farMaterial);
+    // (a late restore would draw a visible mesh as depth noise for the link)
+    expect(farRig.material).toBe(farMaterial);
     expect(proxy.material).toBe(proxyMaterial);
     expect(multi.material).toBe(multiMaterial);
     resolveLink(wrap);
@@ -637,7 +669,7 @@ describe('the shadow arm compiles casters only', () => {
     expect(compileAsync).not.toHaveBeenCalled();
   });
 
-  it('compiles nothing for a root without casters, and leaves its materials alone', async () => {
+  it('compiles the depth twin of a root whose only mesh is a non-caster (the rig beyond the band)', async () => {
     const renderer = shadowHarness();
     const compileAsync = vi.fn(() => Promise.resolve());
     renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
@@ -649,8 +681,25 @@ describe('the shadow arm compiles casters only', () => {
 
     await renderer.compileShadowPrograms(root);
 
-    expect(compileAsync).not.toHaveBeenCalled();
+    expect(compileAsync).toHaveBeenCalledTimes(1);
+    expect(renderer.prewarmDepthMaterials.size).toBe(1);
     expect(mesh.material).toBe(material);
+  });
+
+  it('compiles nothing for a root without meshes, or whose meshes carry no material', async () => {
+    const renderer = shadowHarness();
+    const compileAsync = vi.fn(() => Promise.resolve());
+    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    const bare = new THREE.Mesh(new THREE.BufferGeometry());
+    bare.material = null as unknown as THREE.Material;
+    const root = new THREE.Group();
+    root.add(new THREE.Group(), bare);
+
+    await renderer.compileShadowPrograms(root);
+
+    expect(compileAsync).not.toHaveBeenCalled();
+    expect(renderer.prewarmDepthMaterials.size).toBe(0);
+    expect(bare.material).toBeNull();
   });
 });
 

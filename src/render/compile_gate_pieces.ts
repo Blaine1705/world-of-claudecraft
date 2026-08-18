@@ -7,6 +7,7 @@
 // composed crowd.
 
 import type * as THREE from 'three';
+import type { CompileGatePiece, PieceDeadline } from './compile_gate';
 import { enumerateLinkPieces, linkPieceKey } from './link_piece_core';
 
 type MaterialCarrier = THREE.Object3D & {
@@ -30,14 +31,15 @@ type MaterialCarrier = THREE.Object3D & {
  *  points-uv path, the morph attribute set and count, and the geometry
  *  attributes the parameters read (normal, tangent, a 4-wide colour, uv,
  *  position). `receiveShadow` is a uniform, not a key input, so it is not
- *  here; `castShadow` IS, because the host's shadow arm compiles a depth
- *  program only for a caster, so a caster must never ride a non-caster's
- *  piece as a cache hit. Every carrier has a geometry, so the attribute set
- *  is always part of the string (the plain static mesh is `Anup`). */
+ *  here; neither is `castShadow`: the host's shadow arm swaps a depth twin
+ *  onto EVERY mesh of the piece (casting is a runtime distance toggle), so a
+ *  caster and a non-caster of one tuple and variant link exactly the same
+ *  programs and share one piece. Every carrier has a geometry, so the
+ *  attribute set is always part of the string (the plain static mesh is
+ *  `Anup`). */
 function programVariantOf(carrier: MaterialCarrier): string {
   let variant = '';
   if (carrier.isSkinnedMesh) variant += 's';
-  if (carrier.castShadow) variant += 'w';
   if (carrier.isInstancedMesh) {
     variant += 'i';
     if (carrier.instanceColor) variant += 'c';
@@ -86,22 +88,35 @@ export function linkPiecesOf(target: THREE.Object3D): THREE.Object3D[][] {
   }).map((piece) => piece.meshes);
 }
 
-/** One work function per piece: the representative's colour compile then its
- *  shadow compile, through the host's own per-object arms. The other nodes
- *  of the group share its programs (same material tuple, same variant), so
- *  compiling them would only repeat the whole-scene light walk for a cache
- *  hit. Nothing is reparented: each arm compiles the node in place. The
- *  first arm runs synchronously inside the work call, so the queue's syncMs
- *  (and the budget it feeds) sees the piece's compile prologue, as it saw
- *  the whole root's before. */
+/** The piece's third arm: after both compiles resolved, poll every program
+ *  variant the representative's materials carry (its own tuple plus the depth
+ *  twins the shadow arm used) until each is ready or the piece's deadline
+ *  fires, recording the ready ones for the touch tail
+ *  (program_variant_settle.ts). */
+export type PieceSettle = (node: THREE.Object3D, deadline: PieceDeadline) => Promise<unknown>;
+
+/** One work function per piece: the representative's colour compile, then its
+ *  shadow compile, then the settle over its variants, through the host's own
+ *  per-object arms. The other nodes of the group share its programs (same
+ *  material tuple, same variant), so compiling them would only repeat the
+ *  whole-scene light walk for a cache hit. Nothing is reparented: each arm
+ *  compiles the node in place. The first arm runs synchronously inside the
+ *  work call, so the queue's syncMs (and the budget it feeds) sees the
+ *  piece's compile prologue, as it saw the whole root's before. The settle
+ *  gets the piece's own deadline, so its poll ends where the gate's timeout
+ *  fires (the compiles themselves are never cut: a driver link is not
+ *  cancellable), and a piece that settled proved every variant it carries. */
 export function linkPieceWork(
   target: THREE.Object3D,
   compileColor: (node: THREE.Object3D) => Promise<unknown>,
   compileShadow: (node: THREE.Object3D) => Promise<unknown>,
-): Array<() => Promise<unknown>> {
+  settle: PieceSettle,
+): CompileGatePiece[] {
   return linkPiecesOf(target).map(
     ([representative]) =>
-      () =>
-        compileColor(representative).then(() => compileShadow(representative)),
+      (deadline) =>
+        compileColor(representative)
+          .then(() => compileShadow(representative))
+          .then(() => settle(representative, deadline)),
   );
 }

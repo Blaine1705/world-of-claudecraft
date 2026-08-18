@@ -49,10 +49,14 @@ import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occl
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
+  latchPropCullReveal,
   newPropCullPass,
   type PropCullBounds,
   type PropCullRevealState,
   propCullKey,
+  propHideableConsultImminent,
+  propHideableKey,
+  propHideableReveal,
   propRevealRoots,
   updatePropCullables,
 } from './prop_cull_core';
@@ -106,17 +110,18 @@ export interface PropsResult {
    */
   setRevealGate(gate: RevealGateCore | null): void;
   /**
-   * The same gate for the merged and instanced BANDS: a band's first fog
-   * reveal on a walking approach is held hidden until the gate warms its key
-   * (prop_cull_core). Armed separately, at world entry: under the curtain
-   * the bands beyond half the fog would otherwise queue their compiles
-   * beside the manifest's near-first units, while the initial frame links
-   * whatever is visible anyway; unarmed, a band keeps the historical
-   * immediate cull and latches as revealed.
+   * The same gate for the merged and instanced BANDS and for the individual
+   * HIDEABLES (buildings, tents, campfires): a first fog reveal on a walking
+   * approach is held hidden until the gate warms its key (prop_cull_core).
+   * Armed separately, at world entry: under the curtain the bands beyond
+   * half the fog would otherwise queue their compiles beside the manifest's
+   * near-first units, while the initial frame links whatever is visible
+   * anyway; unarmed, a band or hideable keeps the historical immediate cull
+   * and latches as revealed.
    */
   setBandRevealGate(gate: RevealGateCore | null): void;
-  /** The compile roots behind a gate key: a far cell's bake meshes, or the
-   *  one band behind a cullable key. */
+  /** The compile roots behind a gate key: a far cell's bake meshes, the one
+   *  band behind a cullable key, or the one group behind a hideable key. */
   revealRoots(key: string): readonly THREE.Object3D[];
 }
 
@@ -1231,6 +1236,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       cellKey: propCellKey(fp.x, fp.z),
       bakeMeshes,
       suppressed: false,
+      key: propHideableKey(hideables.length),
+      revealed: false,
+      held: false,
       ...fp,
     });
   }
@@ -2320,7 +2328,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
   const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
+  const hideablesByKey = new Map(hideables.map((hideable) => [hideable.key, hideable]));
   const cullPass = newPropCullPass();
+  const hideablePass = newPropCullPass();
   let revealGate: RevealGateCore | null = null;
   let bandRevealGate: RevealGateCore | null = null;
 
@@ -2336,7 +2346,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       bandRevealGate = gate;
     },
     revealRoots(key: string): readonly THREE.Object3D[] {
-      return propRevealRoots<THREE.Object3D>(farCellsByKey, cullablesByKey, key);
+      return propRevealRoots<THREE.Object3D>(farCellsByKey, cullablesByKey, hideablesByKey, key);
     },
     update(
       camX: number,
@@ -2363,41 +2373,88 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       for (const cell of farCells) {
         updatePropCell(cell, camX, camZ, fogFar, undefined, revealGate);
       }
+      // Hideables (prop_cull_core, the hideable arm): the fog cull, then a
+      // FIRST sight rides the same gate as the bands, held hidden while its
+      // group's programs link; a hold ends on the compile, the reach floor
+      // or the gate's watchdog, never on a clock. Same as the bands, a
+      // frame's imminent first sights are collected and consulted nearest
+      // first (by centre distance) after the plain ones.
+      const { order: imminent, distSq: imminentDistSq } = hideablePass;
+      imminent.length = 0;
       for (let i = 0; i < hideables.length; i++) {
         const h = hideables[i];
         const dx = camX - h.x,
           dz = camZ - h.z;
-        const reach = fogFar + h.cull;
-        if (dx * dx + dz * dz >= reach * reach) {
-          h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
+        const centerDistSq = dx * dx + dz * dz;
+        if (propHideableConsultImminent(centerDistSq, h.cull, fogFar, h, bandRevealGate)) {
+          imminentDistSq[i] = centerDistSq;
+          imminent.push(i);
+          h.group.visible = false;
           continue;
         }
-        // LOAD-BEARING ORDER: visible=true must be restored BEFORE the
-        // suppressed continue, or a group culled on the prior frame would
-        // stay stranded invisible when its cell enters far mode.
-        h.group.visible = true;
-        // Far mode: the merged cell bake draws instead; flames/transparent
-        // members stay live on the group, and the ghost fade cannot fire. Put
-        // the local clone back at its authored alpha before it can return to
-        // near mode.
-        if (h.suppressed) {
-          h.hidden = false;
-          if (h.alpha !== 1) {
-            h.alpha = 1;
-            applyOccluderFade(h.mats, 1);
-          }
+        const reveal = propHideableReveal(centerDistSq, h.cull, fogFar, h, bandRevealGate);
+        latchPropCullReveal(h, reveal);
+        if (reveal !== 'revealed') {
+          h.group.visible = false; // fully fogged (shadow is out of range too) or held cold
           continue;
         }
-        // Ghost on every tier with the same timing while keeping the obstacle's
-        // silhouette and shadow. Per-structure clones keep the change local.
-        const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
-        h.hidden = hide;
-        if (occluderFadeSettled(h.alpha, hide)) continue;
-        h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
-        applyOccluderFade(h.mats, h.alpha);
+        showHideable(h, eyeX, eyeY, eyeZ, camX, camY, camZ, dt, reducedMotion);
+      }
+      if (imminent.length > 1) imminent.sort(hideablePass.compare);
+      for (let n = 0; n < imminent.length; n++) {
+        const h = hideables[imminent[n]];
+        const reveal = propHideableReveal(
+          imminentDistSq[imminent[n]],
+          h.cull,
+          fogFar,
+          h,
+          bandRevealGate,
+        );
+        latchPropCullReveal(h, reveal);
+        if (reveal === 'revealed') {
+          showHideable(h, eyeX, eyeY, eyeZ, camX, camY, camZ, dt, reducedMotion);
+        }
       }
     },
   };
+}
+
+/** The per-frame body of a hideable that draws this frame: restore the
+ *  group, then the far-mode reset or the chase-cam ghost fade. */
+function showHideable(
+  h: Hideable,
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  camX: number,
+  camY: number,
+  camZ: number,
+  dt: number,
+  reducedMotion: boolean,
+): void {
+  // LOAD-BEARING ORDER: visible=true must be restored BEFORE the
+  // suppressed return, or a group culled on the prior frame would
+  // stay stranded invisible when its cell enters far mode.
+  h.group.visible = true;
+  // Far mode: the merged cell bake draws instead; flames/transparent
+  // members stay live on the group, and the ghost fade cannot fire. Put
+  // the local clone back at its authored alpha before it can return to
+  // near mode.
+  if (h.suppressed) {
+    h.hidden = false;
+    if (h.alpha !== 1) {
+      h.alpha = 1;
+      applyOccluderFade(h.mats, 1);
+    }
+    return;
+  }
+  // Ghost on every tier with the same timing while keeping the obstacle's
+  // silhouette and shadow. Per-structure clones keep the change local.
+  const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
+  h.hidden = hide;
+  if (occluderFadeSettled(h.alpha, hide)) return;
+  h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
+  applyOccluderFade(h.mats, h.alpha);
 }
 
 // One mesh of a hideable structure plus its pre-clone shared material, the
@@ -2413,7 +2470,9 @@ interface HideableBakeMesh {
 // collider it mirrors. Near the camera, the fade animates via
 // occluder_fade_core. Far away, prop_cell_core swaps its opaque baked meshes
 // into the cell merge while transparent and animated members stay live.
-interface Hideable {
+// Its first sight rides the props reveal gate under `key` (prop_cull_core,
+// the hideable arm), so `revealed`/`held` are the band latches.
+interface Hideable extends PropCullRevealState {
   group: THREE.Group;
   mats: OccluderFadeMat[]; // cloned per-structure so the fade is local
   hidden: boolean; // whether the structure occludes the view this frame
@@ -2450,7 +2509,16 @@ interface FarPropCell {
 
 type Footprint = Omit<
   Hideable,
-  'group' | 'mats' | 'hidden' | 'alpha' | 'cellKey' | 'bakeMeshes' | 'suppressed'
+  | 'group'
+  | 'mats'
+  | 'hidden'
+  | 'alpha'
+  | 'cellKey'
+  | 'bakeMeshes'
+  | 'suppressed'
+  | 'key'
+  | 'revealed'
+  | 'held'
 >;
 
 function circleFootprint(x: number, z: number, r: number, topY: number, cull = r): Footprint {

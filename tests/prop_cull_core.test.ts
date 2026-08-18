@@ -18,6 +18,7 @@ import {
   propCullInFog,
   propCullKey,
   propCullReveal,
+  propHideableKey,
   propRevealRoots,
   updatePropCullable,
   updatePropCullables,
@@ -99,16 +100,29 @@ describe('prop cull gate keys and roots', () => {
     }
   });
 
-  it('resolves a far cell to its bake meshes, a band to its one object, a stranger to nothing', () => {
+  it('mints hideable keys disjoint from the band and far-cell namespaces', () => {
+    expect([0, 1, 7].map(propHideableKey)).toEqual(['hideable:0', 'hideable:1', 'hideable:7']);
+    for (let i = 0; i < 3; i++) {
+      expect(propHideableKey(i)).not.toMatch(/^cull:/);
+      expect(propCullKey(i)).not.toMatch(/^hideable:/);
+      expect(propCellKey(i * 120, -i * 120)).not.toMatch(/^hideable:/);
+    }
+  });
+
+  it('resolves a far cell to its bake meshes, a band to its one object, a hideable to its group, a stranger to nothing', () => {
     const bakeA = { name: 'bake-a' };
     const bakeB = { name: 'bake-b' };
     const band = { name: 'band' };
+    const building = { name: 'armoury' };
     const farCells = new Map([['0:1', { meshes: [bakeA, bakeB] }]]);
     const bands = new Map([['cull:3', { obj: band }]]);
-    expect(propRevealRoots(farCells, bands, '0:1')).toEqual([bakeA, bakeB]);
-    expect(propRevealRoots(farCells, bands, 'cull:3')).toEqual([band]);
-    expect(propRevealRoots(farCells, bands, 'cull:4')).toEqual([]);
-    expect(propRevealRoots(farCells, bands, '9:9')).toEqual([]);
+    const hideables = new Map([['hideable:5', { group: building }]]);
+    expect(propRevealRoots(farCells, bands, hideables, '0:1')).toEqual([bakeA, bakeB]);
+    expect(propRevealRoots(farCells, bands, hideables, 'cull:3')).toEqual([band]);
+    expect(propRevealRoots(farCells, bands, hideables, 'hideable:5')).toEqual([building]);
+    expect(propRevealRoots(farCells, bands, hideables, 'hideable:6')).toEqual([]);
+    expect(propRevealRoots(farCells, bands, hideables, 'cull:4')).toEqual([]);
+    expect(propRevealRoots(farCells, bands, hideables, '9:9')).toEqual([]);
   });
 });
 

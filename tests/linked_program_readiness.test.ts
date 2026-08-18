@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   isProgramKnownReady,
+  markProgramReady,
   markProgramsReadyUnder,
 } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike, MaterialPropertiesLike } from '../src/render/linked_program_touch';
@@ -80,6 +81,33 @@ describe('markProgramsReadyUnder', () => {
     target.add(meshOf(unseen));
 
     expect(markProgramsReadyUnder(propertiesFor(new Map()), target)).toBe(0);
+  });
+});
+
+describe('markProgramReady', () => {
+  it('records ONE program, whichever material or slot carries it, and reports whether it was new', () => {
+    // The variant settle proves programs one at a time as its poll answers
+    // ready, including the variants no material's current slot names.
+    const sibling = program('sibling-variant');
+    expect(isProgramKnownReady(sibling)).toBe(false);
+    expect(markProgramReady(sibling)).toBe(true);
+    expect(isProgramKnownReady(sibling)).toBe(true);
+    expect(markProgramReady(sibling)).toBe(false);
+  });
+
+  it('is what the walk-level marking counts, so the two records never disagree', () => {
+    const material = new THREE.MeshStandardMaterial({ name: 'both-paths' });
+    const current = program('current');
+    markProgramReady(current);
+    const target = new THREE.Group();
+    target.add(meshOf(material));
+    // already proved by the per-program record: nothing new to count
+    expect(
+      markProgramsReadyUnder(
+        propertiesFor(new Map([[material, { currentProgram: current }]])),
+        target,
+      ),
+    ).toBe(0);
   });
 });
 

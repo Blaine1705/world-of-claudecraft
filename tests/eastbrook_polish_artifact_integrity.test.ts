@@ -792,10 +792,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the hitch sample alignment (the top-of-sync reading and the
 // aligned end-of-sync sample): renderer.ts moved, the seals follow the swept
 // evidence bytes. No capture was retaken.
+// Re-minted for the compile gate's variant settle (the third piece arm) and
+// the shadow arm's every-mesh depth twin: renderer.ts moved, the seals follow
+// the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b5dd84ad70624c12688d25be9b1dafb3f4307b0843d82982d5aff4ef2626588e';
+  'f9d09259871d76a41575fbfef368bb6e247bb29925c5c214ba7834584bb71244';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '099632e165aec851c5c35813288da0893f5f5dc0bd0b39f1515c590da4055bce';
+  'e2abd42f6eaca5064e26c011ae17aebf03a0da85c526c6d3b432d1d8040a8514';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1818,10 +1821,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // composite first, then this seal. No capture was retaken.
     // Re-minted for the hitch sample alignment (renderer.ts): same order, the
     // composite first, then this seal. No capture was retaken.
+    // Re-minted for the compile gate's variant settle and the every-mesh depth
+    // twin (renderer.ts): same order, the composite first, then this seal. No
+    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('f4686a5727ecb977f95739b8591b2b2ec844e7c4d4f52882693c9258de8ebd86');
+    ).toBe('d6811d3683f14cfa72acf2eaa2e2317b2c5d5c1ecebc46493baf9c982bc1ed37');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

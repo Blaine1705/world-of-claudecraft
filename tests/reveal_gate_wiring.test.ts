@@ -66,11 +66,12 @@ describe('reveal gate wiring (source pins)', () => {
     );
     expect(host).toContain('label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`');
     // The link is cut into one queue unit per material group of the root
-    // (compile_gate_pieces.ts), each running the colour arm then the shadow
-    // arm on that group's representative node, each under its own deadline.
+    // (compile_gate_pieces.ts), each running the colour arm, the shadow arm,
+    // then the variant settle on that group's representative node, each under
+    // its own deadline.
     const colourAt = anchor(
       host,
-      'const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow);',
+      'const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow, deps.settle);',
     );
     // Uploads sit BETWEEN the link and the touch: the touch's driver round trip
     // flushes behind everything already queued, so an upload paid after it is
@@ -105,6 +106,12 @@ describe('reveal gate wiring (source pins)', () => {
       'compileColor: (target) => this.compilePrewarmColorPrograms(target, false),',
     );
     expect(wiring).toContain('compileShadow: (target) => this.compileShadowPrograms(target),');
+    // The settle arm is bound to the SAME material properties the touch tail
+    // reads and the SAME depth-twin cache the shadow arm fills, so the depth
+    // programs are polled under the twins that own them.
+    expect(wiring).toContain(
+      'settle: pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials),',
+    );
     expect(wiring).toContain(
       'upload: (target, priority) => this.uploadGateTexturesGated(target, priority),',
     );
@@ -180,10 +187,28 @@ describe('reveal gate wiring (source pins)', () => {
     expect(propsSource).toContain(
       'cullableBounds(obj, propCullKey(cullables.length), box, sphere)',
     );
+    // The hideables (buildings, tents, campfires) are the third namespace on
+    // the same gate: keyed from their slot at registration, resolved to the
+    // one group, and consulted through the band gate (armed at world entry,
+    // never under the curtain), never a bare `visible = true` on first sight.
+    expect(propsSource).toContain('new Map(hideables.map((hideable) => [hideable.key, hideable]))');
+    expect(propsSource).toContain('key: propHideableKey(hideables.length),');
+    expect(propsSource).toContain(
+      'propHideableConsultImminent(centerDistSq, h.cull, fogFar, h, bandRevealGate)',
+    );
+    expect(propsSource).toContain(
+      'const reveal = propHideableReveal(centerDistSq, h.cull, fogFar, h, bandRevealGate);',
+    );
+    expect(propsSource).toContain('const hideablePass = newPropCullPass();');
+    // The ONLY visible=true write on a hideable group is inside showHideable,
+    // reached after the consult (a second writer would be a bare reveal).
+    expect(propsSource.match(/h\.group\.visible = true;/g) ?? []).toHaveLength(1);
+    const showAt = anchor(propsSource, 'function showHideable(');
+    expect(anchor(propsSource, 'h.group.visible = true;')).toBeGreaterThan(showAt);
     const rootsAt = anchor(propsSource, 'revealRoots(key: string): readonly THREE.Object3D[] {');
     const roots = propsSource.slice(rootsAt, rootsAt + 200);
     expect(roots).toContain(
-      'return propRevealRoots<THREE.Object3D>(farCellsByKey, cullablesByKey, key);',
+      'return propRevealRoots<THREE.Object3D>(farCellsByKey, cullablesByKey, hideablesByKey, key);',
     );
     // Every band goes through the ONE gated cull entry: no raw `.obj.visible =`
     // write anywhere in props.ts (the pre-change loop had exactly one). The
