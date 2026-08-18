@@ -365,17 +365,20 @@ function townMaterial(
   independent = false,
   doubleSided = false,
 ): THREE.Material {
-  const shared = surfaceMat({
+  const options = {
     ...materialOptions(emissive, textures),
     side: doubleSided ? THREE.DoubleSide : THREE.FrontSide,
-  });
+  };
+  // The shared response texture packs roughness in green and semantic metalness
+  // in blue, so aged iron/brass can read distinctly without a fourth town-wide
+  // texture allocation. It rides in the OPTIONS: surfaceMat dedupes by key and
+  // metalnessMap is a program-cache-key input, so writing it onto the returned
+  // shared entry relinked every material already drawing with it.
+  const shared = surfaceMat(
+    options.normalMap ? { ...options, metalness: 1, metalnessMap: options.roughnessMap } : options,
+  );
   if (shared instanceof THREE.MeshStandardMaterial && shared.normalMap) {
     shared.normalScale.setScalar(FENBRIDGE_SURFACE_NORMAL_SCALE);
-    // The shared response texture packs roughness in green and semantic
-    // metalness in blue, so aged iron/brass can read distinctly without a
-    // fourth town-wide texture allocation.
-    shared.metalness = 1;
-    shared.metalnessMap = shared.roughnessMap;
   }
   // Hook-preserving clone: a bare clone dropped the zone-haze hook and split
   // the program cache key, so each independent building material linked a new

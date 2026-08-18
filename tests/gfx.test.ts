@@ -19,6 +19,7 @@ import {
   isWeakIntegratedGpu,
   resolveDefaultGraphicsPreset,
   shouldUseAutoGovernor,
+  surfaceMat,
   tierFromHints,
 } from '../src/render/gfx';
 
@@ -1257,6 +1258,37 @@ describe('animated far character band: per-tier ceiling', () => {
     for (const tier of ['medium', 'high', 'ultra'] as const) {
       expect(gfxInternalsForTest.settingsFor(tier, nativeIos).farCharacterAnimScale).toBe(1);
       expect(gfxInternalsForTest.settingsFor(tier, constrained).farCharacterAnimScale).toBe(1);
+    }
+  });
+});
+
+describe('surfaceMat dedupe key', () => {
+  it('splits two option sets that differ only in metalnessMap', () => {
+    // The key folded map / normalMap / roughnessMap / aoMap but not
+    // metalnessMap, so a caller that wanted the metallic arm got the SAME
+    // cached material as one that did not, and wrote the slot on afterwards.
+    // Slot presence is a program-cache-key input, so that write relinked every
+    // material already drawing with the shared entry, live.
+    const response = new THREE.Texture();
+    const base = { color: 0x808080, roughnessMap: response };
+    const plain = surfaceMat(base);
+    expect(surfaceMat({ ...base })).toBe(plain);
+
+    const metallic = surfaceMat({ ...base, metalness: 1, metalnessMap: response });
+
+    expect(metallic).not.toBe(plain);
+    if (metallic instanceof THREE.MeshStandardMaterial) {
+      expect(metallic.metalnessMap).toBe(response);
+      expect((plain as THREE.MeshStandardMaterial).metalnessMap).toBeNull();
+    }
+  });
+
+  it('leaves no consumer writing the slot onto a shared material', () => {
+    for (const file of ['quest_objects.ts', 'fenbridge_town.ts']) {
+      const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
+      expect(source, `${file} writes metalnessMap after surfaceMat`).not.toMatch(
+        /\.metalnessMap = /,
+      );
     }
   });
 });
