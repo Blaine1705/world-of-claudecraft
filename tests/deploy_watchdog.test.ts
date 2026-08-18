@@ -280,25 +280,27 @@ exit "\${SHIM_FLOCK_EXIT:-0}"
 `;
   writeFileSync(join(dir, 'flock'), flockShim);
   chmodSync(join(dir, 'flock'), 0o755);
-  const timeoutShim = `#!/usr/bin/env node
-const { spawn } = require('node:child_process');
-const args = process.argv.slice(2);
-if (args[0] === '-k') args.splice(0, 2);
-const seconds = Number(args.shift());
-const child = spawn(args.shift(), args, { stdio: 'inherit' });
-let timedOut = false;
-const timer = setTimeout(() => {
-  timedOut = true;
-  child.kill('SIGTERM');
-}, seconds * 1000);
-child.on('error', () => {
-  clearTimeout(timer);
-  process.exit(125);
-});
-child.on('exit', (code) => {
-  clearTimeout(timer);
-  process.exit(timedOut ? 124 : (code ?? 125));
-});
+  const timeoutShim = `#!/usr/bin/env bash
+if [ "\${1:-}" = "-k" ]; then shift 2; fi
+seconds="$1"
+shift
+"$@" &
+child=$!
+deadline=$((SECONDS + seconds))
+while kill -0 "$child" 2>/dev/null; do
+  if [ "$SECONDS" -ge "$deadline" ]; then
+    kill -TERM "$child" 2>/dev/null || true
+    wait "$child" 2>/dev/null || true
+    exit 124
+  fi
+  sleep 0.05
+done
+wait "$child"
+rc=$?
+if [ "$rc" -ge 128 ] && [ "$SECONDS" -ge "$deadline" ]; then
+  exit 124
+fi
+exit "$rc"
 `;
   writeFileSync(join(dir, 'timeout'), timeoutShim);
   chmodSync(join(dir, 'timeout'), 0o755);
