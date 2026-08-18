@@ -12,6 +12,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { freshDeedStats } from '../src/sim/deeds';
+import { borderAccent, deedBorderSlug } from '../src/ui/deed_border_view';
+import { deedName } from '../src/ui/deed_i18n';
 import { DeedsWindow, type DeedsWindowDeps } from '../src/ui/deeds_window';
 
 // jsdom ships no 2D canvas, so the procedural crest compositor cannot run
@@ -239,6 +241,53 @@ describe('Book of Deeds border picker', () => {
       expect(group.getAttribute('aria-label')).toBeNull();
     }
   });
+
+  it('E28: picker None is empty, not a fake metal swatch', () => {
+    const state = baseState();
+    state.deedsEarned.set(PRESTIGE, '2026-08-01');
+    const { el } = makeWindow(state);
+    const none = el.querySelector<HTMLElement>('[data-border-pick=""]');
+    const swatch = none?.querySelector('.deed-border-swatch');
+    expect(swatch, 'None must keep an empty swatch slot').toBeTruthy();
+    expect(swatch?.classList.contains('deed-border-swatch-empty')).toBe(true);
+    expect(swatch?.getAttribute('style') ?? '').toBe('');
+    expect(swatch?.textContent).toBe('');
+    const style = swatch?.getAttribute('style') ?? '';
+    expect(style).not.toContain('--border-accent-frame');
+    expect(style).not.toContain('#');
+  });
+
+  it('E29: earned options show the live 3-color swatch; active and 40x40 stay', () => {
+    const state = baseState({ activeBorder: DEEPWARD });
+    state.deedsEarned.set(PRESTIGE, '2026-08-01');
+    state.deedsEarned.set(DEEPWARD, '2026-08-02');
+    const { el } = makeWindow(state);
+    for (const id of [PRESTIGE, DEEPWARD]) {
+      const btn = el.querySelector<HTMLElement>(`[data-border-pick="${id}"]`);
+      expect(btn?.classList.contains('deed-title-option')).toBe(true);
+      const swatch = btn?.querySelector('.deed-border-swatch');
+      expect(swatch?.classList.contains('deed-border-swatch-empty')).toBe(false);
+      const slug = deedBorderSlug(id);
+      const accent = borderAccent(slug);
+      expect(accent).not.toBeNull();
+      const style = swatch?.getAttribute('style') ?? '';
+      expect(style).toContain(`--border-accent-frame:${accent?.frame}`);
+      expect(style).toContain(`--border-accent-edge:${accent?.edge}`);
+      expect(style).toContain(`--border-accent-glow:${accent?.glow}`);
+      expect(btn?.textContent).toContain(deedName(id));
+    }
+    expect(el.querySelector(`[data-border-pick="${DEEPWARD}"]`)?.classList.contains('active')).toBe(
+      true,
+    );
+    const components = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+    expect(components).toMatch(
+      /\.deed-title-option:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
+    );
+    expect(components).toMatch(
+      /body\.mobile-touch \.deed-title-option \{\s*min-width: 40px;\s*min-height: 40px;/,
+    );
+    expect(components).toMatch(/\.deed-title-option\.active \{/);
+  });
 });
 
 // CSS REACH, not class presence: every selector this feature added rides a
@@ -274,6 +323,14 @@ describe('picker and note CSS reach (grouped selectors, not just classes)', () =
     const worn = components.match(/\.ms-badge\.ms-deed-border\.ms-active \{([^}]*)\}/)?.[1];
     expect(worn, 'the worn-border badge must keep its compound rule').toBeTruthy();
     expect(worn).toContain('border-color:');
+  });
+
+  it('E28: the empty swatch rule paints no metal', () => {
+    const empty = components.match(/\n\s*\.deed-border-swatch-empty \{([^}]*)\}/)?.[1];
+    expect(empty, '.deed-border-swatch-empty must have a rule').toBeTruthy();
+    expect(empty).toContain('background: none;');
+    expect(empty).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    expect(empty).not.toContain('--border-accent-frame');
   });
 
   it('styles the Reliquary border note through its grouping with the uniques note', () => {

@@ -19,6 +19,7 @@ import type { EquipSlot, ItemInstancePayload, PlayerClass, SkinCatalog } from '.
 import { attachAvatarFallback } from './avatar_fallback';
 import type { PaperdollSlot } from './char_view';
 import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
+import { cartoucheChromeStyle } from './deed_border_view';
 import { deedTitleText } from './deed_i18n';
 import {
   devCardBadgeClass,
@@ -329,7 +330,7 @@ export class InspectWindow {
     // values against a hex pattern instead of leaning on this escape.
     return (
       ` data-border="${esc(border.slug)}"` +
-      ` style="--border-accent-frame:${esc(border.frame)};--border-accent-edge:${esc(border.edge)};--border-accent-glow:${esc(border.glow)}"`
+      ` style="--border-accent-frame:${esc(border.frame)};--border-accent-edge:${esc(border.edge)};--border-accent-glow:${esc(border.glow)};${cartoucheChromeStyle()}"`
     );
   }
 

@@ -8048,6 +8048,31 @@
     min-width: 40px;
     min-height: 40px;
   }
+  /* Border picker only: keep the shared .deed-title-option a11y/focus/tap
+     rules and add a 3-color swatch (frame / edge / glow). None is an empty
+     slot, never a fake metal. */
+  .deeds-borders .deed-title-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .deed-border-swatch {
+    flex: none;
+    width: 18px;
+    height: 12px;
+    border-radius: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--border-accent-frame, transparent) 0 33.34%,
+      var(--border-accent-edge, transparent) 33.34% 66.67%,
+      var(--border-accent-glow, transparent) 66.67% 100%
+    );
+  }
+  .deed-border-swatch-empty {
+    background: none;
+    box-shadow: none;
+    border: 0;
+  }
   .deeds-filterbar {
     flex: none;
     display: flex;

@@ -11,7 +11,23 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { borderAccent } from '../src/ui/deed_border_view';
+import {
+  borderAccent,
+  CARTOUCHE_CHROME_CLASP_HEIGHT,
+  CARTOUCHE_CHROME_CLASP_WIDTH,
+  CARTOUCHE_CHROME_PAD_X,
+  CARTOUCHE_CHROME_PAD_Y,
+  CARTOUCHE_CHROME_RADIUS,
+  CARTOUCHE_CHROME_WELL_ALPHA,
+  CARTOUCHE_CHROME_WELL_FILL,
+  CARTOUCHE_CLASP_HEIGHT_PROP,
+  CARTOUCHE_CLASP_WIDTH_PROP,
+  CARTOUCHE_PAD_X_PROP,
+  CARTOUCHE_PAD_Y_PROP,
+  CARTOUCHE_RADIUS_PROP,
+  CARTOUCHE_WELL_ALPHA_PROP,
+  CARTOUCHE_WELL_FILL_PROP,
+} from '../src/ui/deed_border_view';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import { type UnitFrameDescriptor, unitFrameView } from '../src/ui/unit_frame';
@@ -402,6 +418,34 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
       m: 'setStyleProp',
       args: [PORTRAIT_BORDER, PORTRAIT_BORDER_GLOW_PROP, ACCENT?.glow],
     });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, CARTOUCHE_PAD_X_PROP, `${CARTOUCHE_CHROME_PAD_X}px`],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, CARTOUCHE_PAD_Y_PROP, `${CARTOUCHE_CHROME_PAD_Y}px`],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, CARTOUCHE_RADIUS_PROP, `${CARTOUCHE_CHROME_RADIUS}px`],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, CARTOUCHE_WELL_ALPHA_PROP, String(CARTOUCHE_CHROME_WELL_ALPHA)],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, CARTOUCHE_WELL_FILL_PROP, CARTOUCHE_CHROME_WELL_FILL],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, CARTOUCHE_CLASP_WIDTH_PROP, `${CARTOUCHE_CHROME_CLASP_WIDTH}px`],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, CARTOUCHE_CLASP_HEIGHT_PROP, `${CARTOUCHE_CHROME_CLASP_HEIGHT}px`],
+    });
   });
 
   it('clears all four slots for a borderless unit (a cleared border removes the ring)', () => {
@@ -418,6 +462,13 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
       PORTRAIT_BORDER_FRAME_PROP,
       PORTRAIT_BORDER_EDGE_PROP,
       PORTRAIT_BORDER_GLOW_PROP,
+      CARTOUCHE_PAD_X_PROP,
+      CARTOUCHE_PAD_Y_PROP,
+      CARTOUCHE_RADIUS_PROP,
+      CARTOUCHE_WELL_ALPHA_PROP,
+      CARTOUCHE_WELL_FILL_PROP,
+      CARTOUCHE_CLASP_WIDTH_PROP,
+      CARTOUCHE_CLASP_HEIGHT_PROP,
     ]) {
       expect(calls).toContainEqual({ m: 'setStyleProp', args: [PORTRAIT_BORDER, prop, ''] });
     }
@@ -432,7 +483,8 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
     const calls = paint(playerDescriptor({ borderSlug: 'slug_with_no_palette' }), BORDERED_ELEMENTS)
       .filter((c) => c.args[0] === PORTRAIT_BORDER)
       .map((c) => c.args[2]);
-    expect(calls).toEqual(['', '', '', '']);
+    expect(calls.every((value) => value === '')).toBe(true);
+    expect(calls.length).toBeGreaterThanOrEqual(4);
   });
 
   it('elides every border write on a repeat paint (the facet caches, no local field)', () => {

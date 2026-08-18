@@ -6133,12 +6133,34 @@
      graphics tier; only the decorative outer bloom scales with --fx-shadow, like
      the ring. */
   .inspect-name[data-border]:not([data-border=""]) {
-    padding: 2px 12px;
+    position: relative;
+    padding: var(--cartouche-pad-y) var(--cartouche-pad-x);
     border: 2px solid var(--border-accent-frame, transparent);
-    border-radius: 8px;
+    border-radius: var(--cartouche-radius);
     outline: 1px solid var(--border-accent-edge, transparent);
-    outline-offset: -4px;
+    outline-offset: -3px;
+    background-color: color-mix(
+      in srgb,
+      var(--cartouche-well-fill) calc(var(--cartouche-well-alpha) * 100%),
+      transparent
+    );
     box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
+  }
+  /* Top-center clasp: the same hardware piece the nameplate cartouche draws.
+     Driven by the chassis custom properties the painter writes from the named
+     exports, never a restated hex or magic px. */
+  .inspect-name[data-border]:not([data-border=""])::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: var(--cartouche-clasp-width);
+    height: var(--cartouche-clasp-height);
+    transform: translate(-50%, -50%);
+    border: 1.5px solid var(--border-accent-frame, transparent);
+    border-radius: 2px;
+    background-color: var(--cartouche-well-fill);
+    pointer-events: none;
   }
   /* The forced palette does not blank the accent custom properties (the card
      writes all three together with the data-border slug this rule gates on, so
@@ -6157,6 +6179,12 @@
     .inspect-name[data-border]:not([data-border=""]) {
       border-color: CanvasText;
       outline-color: Canvas;
+      box-shadow: none;
+      background-color: Canvas;
+    }
+    .inspect-name[data-border]:not([data-border=""])::before {
+      border-color: CanvasText;
+      background-color: Canvas;
       box-shadow: none;
     }
   }

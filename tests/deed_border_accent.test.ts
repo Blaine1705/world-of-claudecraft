@@ -15,7 +15,21 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
-import { BORDER_ACCENT_SLUGS, borderAccent, deedBorderSlug } from '../src/ui/deed_border_view';
+import { charSheetRefreshSig } from '../src/ui/char_sheet_sig_core';
+import {
+  BORDER_ACCENT_SLUGS,
+  borderAccent,
+  CARTOUCHE_CHROME_CLASP_HEIGHT,
+  CARTOUCHE_CHROME_CLASP_WIDTH,
+  CARTOUCHE_CHROME_PAD_X,
+  CARTOUCHE_CHROME_PAD_Y,
+  CARTOUCHE_CHROME_RADIUS,
+  CARTOUCHE_CHROME_WELL_ALPHA,
+  CARTOUCHE_CHROME_WELL_FILL,
+  cartoucheChromeStyle,
+  deedBorderSlug,
+} from '../src/ui/deed_border_view';
+import { PRESET_ORDER, THEME_PRESETS, themeCssVars } from '../src/ui/theme';
 import {
   PORTRAIT_BORDER_ATTR,
   PORTRAIT_BORDER_EDGE_PROP,
@@ -97,6 +111,12 @@ describe('borderAccent: slug -> palette', () => {
   it('gives every slug a frame line no other slug uses (the four read apart)', () => {
     const frames = BORDER_ACCENT_SLUGS.map((slug) => borderAccent(slug)?.frame);
     expect(new Set(frames).size).toBe(BORDER_ACCENT_SLUGS.length);
+  });
+
+  it('gives every slug a distinct motif kind', () => {
+    const kinds = BORDER_ACCENT_SLUGS.map((slug) => borderAccent(slug)?.motif);
+    expect(kinds).toEqual(['catalogue', 'ward', 'laurel', 'vault']);
+    expect(new Set(kinds).size).toBe(BORDER_ACCENT_SLUGS.length);
   });
 
   it('answers null for no border and for an unknown slug', () => {
@@ -448,6 +468,178 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
         ).toBe(false);
       }
     }
+  });
+
+  it('E27: canvas metal is static; inspect and picker metal still read on parchment', () => {
+    expect(PRESET_ORDER).toEqual(['classic', 'midnight', 'parchment', 'highContrast']);
+    expect(THEME_PRESETS.parchment.panel).toBe('#ece0c4');
+    const themeSource = read('src/ui/theme.ts');
+    expect(themeSource).not.toContain('--border-accent-frame');
+    expect(themeSource).not.toContain('--border-accent-edge');
+    expect(themeSource).not.toContain('--border-accent-glow');
+    const vars = Object.keys(themeCssVars(THEME_PRESETS.parchment));
+    expect(vars.some((name) => name.startsWith('--border-accent-'))).toBe(false);
+    expect(vars.some((name) => name.startsWith('--cartouche-'))).toBe(false);
+    const canvas = read('src/render/nameplate_canvas.ts');
+    expect(canvas).not.toContain('themeCssVars');
+    expect(canvas).not.toContain('THEME_PRESETS');
+    expect(canvas).not.toContain('parchment');
+    const inspectRule = read('src/styles/shell.css').match(
+      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+    )?.[1];
+    expect(inspectRule, 'inspect header rule missing').toBeTruthy();
+    expect(inspectRule).toContain('var(--border-accent-frame');
+    expect(inspectRule).toContain('var(--border-accent-edge');
+    expect(inspectRule).toContain('var(--border-accent-glow');
+    expect(inspectRule).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    const swatch = read('src/styles/components.css').match(
+      /\n {2}\.deed-border-swatch \{([^}]*)\}/,
+    )?.[1];
+    expect(swatch, 'picker swatch rule missing').toBeTruthy();
+    expect(swatch).toContain('var(--border-accent-frame');
+    expect(swatch).toContain('var(--border-accent-edge');
+    expect(swatch).toContain('var(--border-accent-glow');
+    expect(swatch).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+  });
+
+  it('E30: inspect header is a CSS cartouche (well + edge + clasp) with forced-colors', () => {
+    const shell = read('src/styles/shell.css');
+    const rule = shell.match(
+      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+    )?.[1];
+    const clasp = shell.match(
+      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    )?.[1];
+    expect(rule).toContain('var(--cartouche-well-fill)');
+    expect(rule).toContain('var(--cartouche-radius)');
+    expect(rule).toContain('var(--cartouche-pad-x)');
+    expect(rule).toContain('var(--cartouche-pad-y)');
+    expect(rule).toContain('var(--border-accent-frame');
+    expect(rule).toContain('var(--border-accent-edge');
+    expect(clasp, 'inspect clasp missing').toBeTruthy();
+    expect(clasp).toContain('left: 50%;');
+    expect(clasp).toContain('var(--cartouche-clasp-width)');
+    expect(clasp).toContain('var(--cartouche-clasp-height)');
+    expect(clasp).toContain('var(--border-accent-frame');
+    expect(clasp).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    const chrome = cartoucheChromeStyle();
+    expect(chrome).toContain(`${CARTOUCHE_CHROME_PAD_X}px`);
+    expect(chrome).toContain(`${CARTOUCHE_CHROME_PAD_Y}px`);
+    expect(chrome).toContain(`${CARTOUCHE_CHROME_RADIUS}px`);
+    expect(chrome).toContain(CARTOUCHE_CHROME_WELL_FILL);
+    expect(chrome).toContain(String(CARTOUCHE_CHROME_WELL_ALPHA));
+    expect(chrome).toContain(`${CARTOUCHE_CHROME_CLASP_WIDTH}px`);
+    expect(chrome).toContain(`${CARTOUCHE_CHROME_CLASP_HEIGHT}px`);
+    const painter = read('src/ui/inspect_window.ts');
+    expect(painter).toContain('cartoucheChromeStyle()');
+    const forcedClasp = shell.match(
+      /@media \(forced-colors: active\) \{[\s\S]*?\.inspect-name\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    )?.[1];
+    expect(forcedClasp, 'inspect clasp forced-colors arm missing').toBeTruthy();
+    expect(forcedClasp).toContain('border-color: CanvasText;');
+    expect(forcedClasp).toContain('background-color: Canvas;');
+    expect(forcedClasp).toContain('box-shadow: none;');
+  });
+
+  it('E31: portrait ring stays a circle; clasp sits at 12 o clock under the level chip', () => {
+    expect(RING_RULE, 'the portrait ring rule is missing from hud.css').toBeTruthy();
+    expect(RING_RULE).toContain('border-radius: 50%;');
+    expect(RING_RULE).toContain('z-index: 2;');
+    const clasp = HUD_CSS.match(
+      /\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    )?.[1];
+    expect(clasp, 'portrait clasp rule missing').toBeTruthy();
+    expect(clasp).toContain('left: 30px;');
+    expect(clasp).toContain('top: -6px;');
+    expect(clasp).toContain('z-index: 2;');
+    expect(clasp).toContain('var(--cartouche-clasp-width)');
+    expect(clasp).toContain('var(--border-accent-frame');
+    expect(clasp).not.toContain('border-radius: 50%');
+    expect(clasp).not.toContain('--fx-shadow');
+    expect(HUD_CSS, 'the level chip must sit above the ring').toMatch(
+      /\n {2}\.level-chip \{[^}]*z-index: 3;/,
+    );
+    expect(HUD_CSS, 'the combat flash must sit above the ring').toMatch(
+      /\n {2}\.combat-flash \{[^}]*z-index: 4;/,
+    );
+    expect(HUD_CSS).toContain('#target-frame.boss > .portrait-wrap::before {');
+    const forcedClasp = HUD_CSS.match(
+      /@media \(forced-colors: active\) \{\s*\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::after \{[^}]*\}\s*\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    )?.[1];
+    expect(forcedClasp, 'portrait clasp forced-colors arm missing').toBeTruthy();
+    expect(forcedClasp).toContain('border-color: CanvasText;');
+    expect(forcedClasp).toContain('background-color: Canvas;');
+  });
+
+  it('E33: Catalogue brass does not collide with Eternal Spoils gold or elite gold', () => {
+    const catalogue = borderAccent('curators_gilt');
+    const spoils = borderAccent('reliquary_gilt');
+    expect(catalogue?.frame).toBe('#c9b17a');
+    expect(catalogue?.edge).toBe('#2a2214');
+    expect(catalogue?.glow).toBe('#f3ebcf');
+    expect(catalogue?.motif).toBe('catalogue');
+    expect(spoils?.frame).toBe('#f4ca43');
+    const eliteGold = '#f2c84b';
+    for (const color of [catalogue?.frame, catalogue?.edge, catalogue?.glow]) {
+      expect(color).not.toBe(spoils?.frame);
+      expect(color).not.toBe(spoils?.edge);
+      expect(color).not.toBe(spoils?.glow);
+      expect(color).not.toBe(eliteGold);
+    }
+  });
+
+  it('E34: cartouche identity adds no motion', () => {
+    const inspectRule = read('src/styles/shell.css').match(
+      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+    )?.[1];
+    const inspectClasp = read('src/styles/shell.css').match(
+      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    )?.[1];
+    const swatch = read('src/styles/components.css').match(
+      /\n {2}\.deed-border-swatch \{([^}]*)\}/,
+    )?.[1];
+    const clasp = HUD_CSS.match(
+      /\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    )?.[1];
+    for (const [name, body] of [
+      ['inspect', inspectRule],
+      ['inspect clasp', inspectClasp],
+      ['picker swatch', swatch],
+      ['ring clasp', clasp],
+    ] as const) {
+      expect(body, `${name} rule missing`).toBeTruthy();
+      expect(body, `${name} must not animate`).not.toMatch(/animation|@keyframes|transition/);
+    }
+    const core = read('src/render/nameplate_cartouche_core.ts');
+    expect(core).not.toMatch(/requestAnimationFrame|setInterval|@keyframes/);
+  });
+
+  it('E35: changing activeBorder busts the character sheet refresh signature', () => {
+    const base = {
+      activeTitle: null as string | null,
+      activeBorder: null as string | null,
+      deedsEarned: 1,
+      itemsDiscovered: 0,
+      marks: 0,
+      mounts: 0,
+    };
+    expect(charSheetRefreshSig(base)).not.toBe(
+      charSheetRefreshSig({ ...base, activeBorder: 'col_reliquary_rank_5' }),
+    );
+    expect(charSheetRefreshSig({ ...base, activeBorder: 'col_discovery_250' })).not.toBe(
+      charSheetRefreshSig({ ...base, activeBorder: 'col_reliquary_rank_5' }),
+    );
+    expect(read('src/ui/char_sheet_sig_core.ts')).toContain('parts.activeBorder');
+  });
+
+  it('E36: worn slug still arrives on entity.border with no world_api change', () => {
+    expect(deedBorderSlug('prog_prestige_10')).toBe('prestige_laurels');
+    expect(deedBorderSlug('col_discovery_250')).toBe('curators_gilt');
+    const painter = read('src/render/nameplate_painter.ts');
+    expect(painter).toContain('state.border = deedBorderSlug(entity.border);');
+    const view = read('src/ui/deed_border_view.ts');
+    expect(view).not.toContain('world_api');
+    expect(read('src/render/nameplate_cartouche_core.ts')).not.toContain('world_api');
   });
 
   it('resolves borderSlug at the hud.ts call sites without a tier read', () => {

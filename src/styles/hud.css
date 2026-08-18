@@ -1222,6 +1222,26 @@
     z-index: 2;
     pointer-events: none;
   }
+  /* 12-o'clock clasp on the circular ring. ::before, not a rectangle replacing
+     the disc: the ring stays on ::after at border-radius 50%. z-index 2 keeps
+     it under the level chip (3) and the combat flash (4). left 30px is the
+     disc center (60x60 portrait at the top-left of the 64x64 wrap), the same
+     offset the asymmetric ring inset already documents. Boss targets keep
+     their own higher-specificity ::before dragon emblem. */
+  .portrait-wrap[data-border]:not([data-border=""])::before {
+    content: "";
+    position: absolute;
+    left: 30px;
+    top: -6px;
+    width: var(--cartouche-clasp-width);
+    height: var(--cartouche-clasp-height);
+    transform: translate(-50%, -50%);
+    border: 1.5px solid var(--border-accent-frame, transparent);
+    border-radius: 2px;
+    background-color: var(--cartouche-well-fill);
+    z-index: 2;
+    pointer-events: none;
+  }
   /* The forced-colors arm the nameplate cartouche already had and the ring did
      not (recorded at Phase 19 QA, completed here). The accent custom properties
      are never missing here: paintPortraitBorder writes all three together with
@@ -1243,6 +1263,11 @@
     .portrait-wrap[data-border]:not([data-border=""])::after {
       border-color: CanvasText;
       outline-color: Canvas;
+      box-shadow: none;
+    }
+    .portrait-wrap[data-border]:not([data-border=""])::before {
+      border-color: CanvasText;
+      background-color: Canvas;
       box-shadow: none;
     }
   }

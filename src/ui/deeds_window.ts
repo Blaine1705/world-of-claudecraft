@@ -11,6 +11,7 @@ import { audio } from '../game/audio';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { DEEDS_RECENT_CAP } from '../sim/deeds';
 import type { DeedsRarity, IWorld } from '../world_api';
+import { borderAccent, deedBorderSlug } from './deed_border_view';
 import { deedDesc, deedName, deedTitleText } from './deed_i18n';
 import {
   buildDeedsView,
@@ -636,7 +637,25 @@ export class DeedsWindow {
         emptyKey: 'hudChrome.deeds.bordersEmpty',
         options: model.borders,
         label: (id) => (id === null ? t('hudChrome.deeds.bordersNone') : deedName(id)),
+        decorate: (id, label) => this.borderOptionInner(id, label),
       })
+    );
+  }
+
+  /** 3-color swatch plus the deed name. None is an empty slot, not a fake
+   *  metal. Palette custom properties come from the live table. */
+  private borderOptionInner(id: string | null, label: string): string {
+    const name = esc(label);
+    if (!id) {
+      return `<span class="deed-border-swatch deed-border-swatch-empty" aria-hidden="true"></span>${name}`;
+    }
+    const accent = borderAccent(deedBorderSlug(id));
+    if (!accent) {
+      return `<span class="deed-border-swatch deed-border-swatch-empty" aria-hidden="true"></span>${name}`;
+    }
+    return (
+      `<span class="deed-border-swatch" aria-hidden="true" style="--border-accent-frame:${esc(accent.frame)};--border-accent-edge:${esc(accent.edge)};--border-accent-glow:${esc(accent.glow)}"></span>` +
+      name
     );
   }
 
@@ -657,12 +676,14 @@ export class DeedsWindow {
     emptyKey: TranslationKey;
     options: readonly { id: string | null; active: boolean }[];
     label(id: string | null): string;
+    decorate?(id: string | null, label: string): string;
   }): string {
     const rows = group.options
-      .map(
-        (option) =>
-          `<button type="button" class="deed-title-option${option.active ? ' active' : ''}" ${group.pickAttr}="${esc(option.id ?? '')}" aria-pressed="${option.active}">${esc(group.label(option.id))}</button>`,
-      )
+      .map((option) => {
+        const label = group.label(option.id);
+        const inner = group.decorate ? group.decorate(option.id, label) : esc(label);
+        return `<button type="button" class="deed-title-option${option.active ? ' active' : ''}" ${group.pickAttr}="${esc(option.id ?? '')}" aria-pressed="${option.active}">${inner}</button>`;
+      })
       .join('');
     const empty =
       group.options.length <= 1 ? `<div class="deeds-empty">${esc(t(group.emptyKey))}</div>` : '';

@@ -27,7 +27,23 @@
 // are never touched here, so folding the resource-type class into toggleClass does
 // not clobber the low-power pulse.
 
-import { borderAccent } from './deed_border_view';
+import {
+  borderAccent,
+  CARTOUCHE_CHROME_CLASP_HEIGHT,
+  CARTOUCHE_CHROME_CLASP_WIDTH,
+  CARTOUCHE_CHROME_PAD_X,
+  CARTOUCHE_CHROME_PAD_Y,
+  CARTOUCHE_CHROME_RADIUS,
+  CARTOUCHE_CHROME_WELL_ALPHA,
+  CARTOUCHE_CHROME_WELL_FILL,
+  CARTOUCHE_CLASP_HEIGHT_PROP,
+  CARTOUCHE_CLASP_WIDTH_PROP,
+  CARTOUCHE_PAD_X_PROP,
+  CARTOUCHE_PAD_Y_PROP,
+  CARTOUCHE_RADIUS_PROP,
+  CARTOUCHE_WELL_ALPHA_PROP,
+  CARTOUCHE_WELL_FILL_PROP,
+} from './deed_border_view';
 import type { PainterHostWriters } from './painter_host';
 import type { UnitFrameView } from './unit_frame';
 
@@ -176,6 +192,41 @@ export class UnitFramePainter {
     this.writers.setStyleProp(host, PORTRAIT_BORDER_FRAME_PROP, accent ? accent.frame : '');
     this.writers.setStyleProp(host, PORTRAIT_BORDER_EDGE_PROP, accent ? accent.edge : '');
     this.writers.setStyleProp(host, PORTRAIT_BORDER_GLOW_PROP, accent ? accent.glow : '');
+    this.writers.setStyleProp(
+      host,
+      CARTOUCHE_PAD_X_PROP,
+      accent ? `${CARTOUCHE_CHROME_PAD_X}px` : '',
+    );
+    this.writers.setStyleProp(
+      host,
+      CARTOUCHE_PAD_Y_PROP,
+      accent ? `${CARTOUCHE_CHROME_PAD_Y}px` : '',
+    );
+    this.writers.setStyleProp(
+      host,
+      CARTOUCHE_RADIUS_PROP,
+      accent ? `${CARTOUCHE_CHROME_RADIUS}px` : '',
+    );
+    this.writers.setStyleProp(
+      host,
+      CARTOUCHE_WELL_ALPHA_PROP,
+      accent ? String(CARTOUCHE_CHROME_WELL_ALPHA) : '',
+    );
+    this.writers.setStyleProp(
+      host,
+      CARTOUCHE_WELL_FILL_PROP,
+      accent ? CARTOUCHE_CHROME_WELL_FILL : '',
+    );
+    this.writers.setStyleProp(
+      host,
+      CARTOUCHE_CLASP_WIDTH_PROP,
+      accent ? `${CARTOUCHE_CHROME_CLASP_WIDTH}px` : '',
+    );
+    this.writers.setStyleProp(
+      host,
+      CARTOUCHE_CLASP_HEIGHT_PROP,
+      accent ? `${CARTOUCHE_CHROME_CLASP_HEIGHT}px` : '',
+    );
   }
 
   // The shield overlay: a scaleX transform to (hp + absorb)/maxHp plus the

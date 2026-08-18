@@ -183,6 +183,7 @@ describe('inspect_window: the Curator standing surfaces', () => {
     expect(body).toContain('--border-accent-frame:${esc(border.frame)}');
     expect(body).toContain('--border-accent-edge:${esc(border.edge)}');
     expect(body).toContain('--border-accent-glow:${esc(border.glow)}');
+    expect(body).toContain('cartoucheChromeStyle()');
   });
 
   it('feeds the entity border and Curator standing into the pure core', () => {
@@ -384,6 +385,8 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     // gate, not the deed id itself: the stylesheet keys on the slug.
     expect(name?.getAttribute('data-border')).toBe('reliquary_gilt');
     expect(name?.getAttribute('style')).toContain('--border-accent-frame');
+    expect(name?.getAttribute('style')).toContain('--cartouche-well-fill');
+    expect(name?.getAttribute('style')).toContain('--cartouche-radius');
   });
 
   it('leaves data-border OFF a borderless name row (absence, not an empty value)', () => {
