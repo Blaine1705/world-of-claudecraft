@@ -9325,6 +9325,113 @@ export const TARGETS = [
     },
   },
   {
+    // Auto-unshift (src/sim/combat/form_auto_unshift.ts). The change is a
+    // behavior, so the evidence is a MOMENT, not a window: the same press, one
+    // second in. Before the change the druid is still wearing the beast and the
+    // refusal is on screen; after it, the beast is gone and the heal is casting.
+    // Both variants press through sim.castAbility rather than a bar slot,
+    // because the bear bar is a separate page a player has to populate and the
+    // shot must not depend on that.
+    key: 'druid-auto-unshift',
+    label: 'Wildmend pressed while shapeshifted: the form falls away and the cast runs',
+    when: ['sim/combat/form_auto_unshift', 'ui/hud/action_bar/action_bar_view.ts'],
+    variants: [
+      {
+        key: 'bruin-form-desktop',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'bear_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'fleet-form-desktop',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'travel_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'bruin-form-mobile',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'bear_form',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      // Stage: high enough to know every rank of the kit, full mana, self-targeted
+      // so the friendly heal has somewhere to land, then shift through the REAL
+      // cast so the form aura, the parked mana, and the beast model are all live.
+      const staged = await page.evaluate((formAbility) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(20, player.id);
+        player.resource = player.maxResource;
+        sim.targetEntity?.(player.id, player.id);
+        sim.castAbility?.(formAbility, player.id);
+        return { ok: true };
+      }, variant.formAbility);
+      if (!staged.ok) throw new Error(staged.reason);
+      // Wait for the shift to resolve AND its global cooldown to lapse. Polled,
+      // not slept: the offline sim advances on animation frames, so the seconds
+      // just after game-active run at whatever rate the loading tail leaves, and
+      // a press inside the GCD returns silently (classic spams that button), which
+      // would shoot a frame where nothing happened at all.
+      await page.waitForFunction(
+        () => {
+          const player = window.__game?.sim?.player;
+          return (
+            !!player &&
+            player.auras.some((a) => a.kind.startsWith('form_')) &&
+            player.gcdRemaining <= 0 &&
+            player.castingAbility === null
+          );
+        },
+        { timeout: 30000, polling: 100 },
+      );
+      // The press, with an explicit pid (an omitted one is a silent no-op here,
+      // which shoots a frame where nothing happened at all). Read the event
+      // buffer's LENGTH around the call rather than draining it: draining would
+      // eat the very refusal the before-arm frame is supposed to show, and both
+      // arms must run this same recipe.
+      const pressed = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        const before = sim.events?.length ?? 0;
+        sim.castAbility?.('healing_touch', player.id);
+        return {
+          ok: (sim.events?.length ?? 0) > before || player.castingAbility !== null,
+          reason: 'the press reached no gate: no cast started and the sim said nothing',
+        };
+      });
+      if (!pressed.ok) throw new Error(pressed.reason);
+      // One second in: long enough for the refusal to be painted on the old
+      // behavior, and short enough that the 2.5s heal is still visibly casting
+      // on the new one.
+      await wait(1000);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'swing-timer',
     label: 'Swing-timer bar sweep for a Wolf Form druid on a slow staff',
     when: ['src/ui/swing_timer', 'src/sim/combat/form_swing'],

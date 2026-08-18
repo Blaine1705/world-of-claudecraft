@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -38,6 +39,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "es_ES": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -66,6 +68,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "fr_FR": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -94,6 +97,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "fr_CA": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -123,6 +127,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -151,6 +156,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "de_DE": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -195,6 +201,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet"
   ],
   "pt_BR": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -227,6 +234,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet"
   ],
   "cs_CZ": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -255,6 +263,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "nl_NL": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -283,6 +292,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "pl_PL": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -311,6 +321,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "id_ID": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -339,6 +350,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "tr_TR": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -367,6 +379,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "sv_SE": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -395,6 +408,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "vi_VN": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -423,6 +437,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.subcommandsAction"
   ],
   "da_DK": [
+    "guide.classPage.formsAutoUnshift",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",

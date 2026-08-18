@@ -4904,6 +4904,7 @@ export type TranslationKeyFlat =
   | 'guide.classPage.formName.form_bear'
   | 'guide.classPage.formName.form_cat'
   | 'guide.classPage.formName.form_travel'
+  | 'guide.classPage.formsAutoUnshift'
   | 'guide.classPage.formsHeading'
   | 'guide.classPage.formsMoonwing'
   | 'guide.classPage.formsNote'
