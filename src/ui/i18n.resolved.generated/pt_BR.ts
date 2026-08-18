@@ -7826,6 +7826,9 @@ export const pt_BR: EnTranslations = {
       "reload": "Recarregar",
       "quit": "Sair",
       "fatalBody": "O World of ClaudeCraft encontrou um erro inesperado e precisa fechar."
+    },
+    "window": {
+      "exitToDesktop": "Exit to Desktop"
     }
   },
   "gpuNotice": {

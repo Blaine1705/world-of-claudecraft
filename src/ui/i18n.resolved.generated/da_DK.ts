@@ -7826,6 +7826,9 @@ export const da_DK: EnTranslations = {
       "reload": "Genindlæs",
       "quit": "Afslut",
       "fatalBody": "World of ClaudeCraft stødte på en uventet fejl og skal lukke."
+    },
+    "window": {
+      "exitToDesktop": "Exit to Desktop"
     }
   },
   "gpuNotice": {

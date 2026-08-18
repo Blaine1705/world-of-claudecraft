@@ -7826,6 +7826,9 @@ export const zh_TW: EnTranslations = {
       "reload": "重新載入",
       "quit": "離開",
       "fatalBody": "World of ClaudeCraft 發生未預期的錯誤，必須關閉。"
+    },
+    "window": {
+      "exitToDesktop": "離開至桌面"
     }
   },
   "gpuNotice": {
