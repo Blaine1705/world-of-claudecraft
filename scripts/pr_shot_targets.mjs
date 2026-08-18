@@ -9475,7 +9475,7 @@ export const TARGETS = [
       { key: 'no-pad' },
       { key: 'resting', beforeLoad: fakePadSeed, pad: [] },
       { key: 'left-trigger', beforeLoad: fakePadSeed, pad: [GP_LT] },
-      { key: 'expanded', beforeLoad: fakePadSeed, pad: [GP_LT, GP_RT] },
+      { key: 'expanded', beforeLoad: fakePadSeed, expand: true },
       { key: 'arranging', beforeLoad: fakePadSeed, pad: [], arrange: true },
     ],
     async capture(page, variant) {
@@ -9491,7 +9491,17 @@ export const TARGETS = [
       // Arrange mode is a CHORD, so it has to be pressed and released like one
       // rather than set as a steady state; the poll runs on the render loop, so
       // each step needs frames either side of it.
-      if (variant.arrange) {
+      // The expanded set is reached by HOLDING one trigger and TAPPING the other,
+      // not by pressing both: pressed in the same poll they tie and resolve to the
+      // left half, which is why setting both at once photographed the plain bar.
+      if (variant.expand) {
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(300);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}, ${GP_RT}]`);
+        await wait(300);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(500);
+      } else if (variant.arrange) {
         await page.evaluate(`window.__fakePad.pressed = [${GP_LB}]`);
         await wait(200);
         await page.evaluate(`window.__fakePad.pressed = [${GP_LB}, ${GP_Y}]`);

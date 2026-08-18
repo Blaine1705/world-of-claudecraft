@@ -2,7 +2,6 @@
 // Esc options menu. Pure + persisted to localStorage; main.ts applies each
 // value to the live subsystem (Input / GameAudio / MusicDirector / Renderer).
 
-import { isBootMuted, isMutedVolumeKey, MUTED_VOLUME_KEYS } from './boot_mute';
 import { parseStoredJson } from './local_storage_json';
 
 // Camera default is 0.7: the old fixed speed (1.0) was near the top of the
@@ -492,17 +491,9 @@ export function clickMoveButtonLabel(value: number): string {
 
 export class Settings {
   private values: GameSettings;
-  // Resolved once at construction: the flag cannot change mid-session, and this
-  // keeps the per-read check to a boolean rather than a URL parse.
-  private readonly muted = isBootMuted();
 
   constructor() {
     this.values = this.load();
-  }
-
-  /** Whether this boot is silenced by `?mute` (the saved levels are untouched). */
-  isMuted(): boolean {
-    return this.muted;
   }
 
   private load(): GameSettings {
@@ -529,16 +520,11 @@ export class Settings {
   }
 
   get<K extends keyof GameSettings>(key: K): GameSettings[K] {
-    // Mute overrides on READ, never on load: the player's saved levels stay
-    // exactly as they were, so a normal boot comes back at full volume.
-    if (this.muted && isMutedVolumeKey(key)) return 0 as GameSettings[K];
     return this.values[key];
   }
 
   all(): GameSettings {
-    const out = { ...this.values };
-    if (this.muted) for (const key of MUTED_VOLUME_KEYS) out[key] = 0;
-    return out;
+    return { ...this.values };
   }
 
   /** Validate every value, apply the whole patch, then persist the settings blob once. */

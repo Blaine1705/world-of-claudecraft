@@ -12,7 +12,6 @@ import {
 } from './game/app_viewport';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
-import { isBootMuted } from './game/boot_mute';
 import {
   BROWSER_BODY_CLASSES,
   browserBodyClasses,
@@ -7835,7 +7834,7 @@ function syncHomepageMusicToggle(): void {
 
 function playHomepageMusic(): void {
   const el = homepageMusic;
-  if (!el || homepageMusicMuted || homepageMusicStarted || isBootMuted()) return;
+  if (!el || homepageMusicMuted || homepageMusicStarted) return;
   // Route the theme through its dedicated AudioContext BEFORE it plays: a bare
   // media stream playing when the world-entry inits open the first game
   // AudioContext cracks audibly on Android (see src/game/landing_theme.ts).

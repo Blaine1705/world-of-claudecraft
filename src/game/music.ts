@@ -11,7 +11,6 @@
 
 import type { BiomeId } from '../sim/types';
 import { resumeWhenAllowed } from './audio_unlock';
-import { isBootMuted } from './boot_mute';
 import type { MusicMixState } from './music_mix_policy';
 import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
@@ -4803,9 +4802,6 @@ export class MusicDirector {
   private combat = false;
   // try/catch: sandboxed documents throw on the localStorage property access itself
   private _enabled = (() => {
-    // The boot-mute flag beats the persisted preference: it exists precisely for
-    // the sessions where sound is unwanted whatever the player normally chooses.
-    if (isBootMuted()) return false;
     try {
       return typeof localStorage === 'undefined' || localStorage.getItem(STORAGE_KEY) !== '0';
     } catch {
@@ -5188,13 +5184,9 @@ export class MusicDirector {
   }
 
   setEnabled(on: boolean): void {
-    // Clamp rather than return early: a muted boot must END disabled whatever
-    // state it was in, and the persisted preference must not be overwritten with
-    // the flag's silence (the next normal boot should sound as the player left it).
-    const muted = isBootMuted();
-    this._enabled = on && !muted;
+    this._enabled = on;
     try {
-      if (!muted) localStorage.setItem(STORAGE_KEY, on ? '1' : '0');
+      localStorage.setItem(STORAGE_KEY, on ? '1' : '0');
     } catch {
       /* private mode */
     }
