@@ -7203,6 +7203,7 @@ export const ko_KR: EnTranslations = {
       "shopMarksRequired": "{name}을(를) 구매하려면 탐굴 증표 {marks}개가 필요합니다.",
       "shopSealPremiumOnly": "이 봉인은 대가의 손에만 응합니다. 최상급 베팅만이 열 수 있습니다.",
       "passageSealed": "통로가 봉인되어 있습니다.",
+      "enemiesRemain": "남은 적을 먼저 처치하세요.",
       "moveCloserPassage": "통로에 더 가까이 다가가세요.",
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
       "moveCloserReliquary": "성물함에 더 가까이 다가가세요.",
@@ -10012,7 +10013,7 @@ export const ko_KR: EnTranslations = {
       },
       "fear": {
         "name": "번민",
-        "description": "적에게 공포를 심어 최대 8초 동안 떨게 만듭니다. 피해를 받으면 효과가 해제됩니다."
+        "description": "적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다."
       },
       "searing_pain": {
         "name": "지지기",
@@ -10090,7 +10091,7 @@ export const ko_KR: EnTranslations = {
       "ferocious_bite": {
         "name": "유혈 물어뜯기",
         "description": "결정타로 {damage}의 피해를 입힙니다. 늑대 변신 전용.",
-        "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 91 더하기 연계 점수당 55의 피해를 입히는 물어뜯기로, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히고 기력 30을 회복합니다."
+        "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 오랜 피를 소모하는 더 강력한 물어뜯기로, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히고 기력을 회복합니다."
       },
       "swipe": {
         "name": "휩쓰는 발톱",
@@ -10153,7 +10154,7 @@ export const ko_KR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "늑대의 피",
-        "description": "전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용."
+        "description": "기력을 {rage}만큼 즉시 회복하고 전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용."
       },
       "rip": {
         "name": "피의 균열",
@@ -10258,7 +10259,7 @@ export const ko_KR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "납골 표식",
-        "description": "적에게 12초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다."
+        "description": "적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다."
       },
       "unholy_command": {
         "name": "부정한 명령",
@@ -10357,8 +10358,8 @@ export const ko_KR: EnTranslations = {
         "description": "달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)"
       },
       "feral_charge": {
-        "name": "야성의 돌진",
-        "description": "적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)"
+        "name": "원시 쇄도",
+        "description": "원시의 힘을 폭발시킵니다. 늑대 변신 상태에서는 10초 동안 기력 회복 속도가 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. (야성 전문화 상징)"
       },
       "swiftmend": {
         "name": "신속한 치유",
@@ -10374,7 +10375,7 @@ export const ko_KR: EnTranslations = {
       },
       "redharvest": {
         "name": "피의 수확",
-        "description": "오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히며, 두 출혈 효과를 제거하고 기력 30을 회복합니다. 연계 점수가 없어도 사용할 수 있습니다."
+        "description": "오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히며, 두 출혈 효과를 제거하고 기력을 {rage}만큼 회복합니다. 연계 점수가 없어도 사용할 수 있습니다."
       },
       "marrowbreak": {
         "name": "골수분쇄",
@@ -10614,7 +10615,7 @@ export const ko_KR: EnTranslations = {
       },
       "evocation": {
         "name": "에테르샘",
-        "description": "마나를 빠르게 회복합니다. (마법사 특성)"
+        "description": "6초 동안 정신을 집중합니다. 매초 마나를 100 회복하고 주문력이 8 증가합니다. 이 효과는 정신 집중 중 중첩되며 15초 동안 지속됩니다. (마법사 특성)"
       },
       "flurry_of_knives": {
         "name": "칼날 난무",
@@ -10622,7 +10623,7 @@ export const ko_KR: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "야성 치유",
-        "description": "10초에 걸쳐 생명력을 180 회복합니다. 곰 변신 상태에서만 사용할 수 있습니다. (드루이드 특성)"
+        "description": "10초에 걸쳐 최대 생명력의 40%를 회복합니다. 곰 변신 상태에서만 사용할 수 있습니다. (드루이드 특성)"
       },
       "frost_trap": {
         "name": "서리덫",
@@ -10642,11 +10643,11 @@ export const ko_KR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "공포의 울부짖음",
-        "description": "주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 해제될 수 있습니다. (흑마법사 특성)"
+        "description": "주위 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)"
       },
       "ice_block": {
         "name": "차가운 관",
-        "description": "자신을 얼음 속에 가두어 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (마법사 특성)"
+        "description": "8초 동안 단단한 얼음 속에 자신을 가두어 모든 피해에 면역이 됩니다. 이미 활성화된 일반적인 해로운 효과를 제거하고 새로운 일반 제어 효과가 적용되는 것을 방지합니다. 기절 또는 변이 상태에서도 사용할 수 있습니다. 갇힌 동안에는 행동할 수 없습니다. 다시 사용하면 취소됩니다. (마법사)"
       },
       "inner_focus": {
         "name": "고요한 마음",
@@ -10855,7 +10856,7 @@ export const ko_KR: EnTranslations = {
       },
       "prowl": {
         "name": "몰래 접근",
-        "description": "늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다."
+        "description": "늑대 변신 상태에서 은신하고 이동 속도가 5% 감소합니다. 전투 중에는 사용할 수 없습니다."
       },
       "rake": {
         "name": "저미기",
@@ -13257,6 +13258,15 @@ export const ko_KR: EnTranslations = {
       },
       "training_dummy": {
         "name": "훈련용 허수아비"
+      },
+      "friendly_player_dummy": {
+        "name": "아군 플레이어 허수아비"
+      },
+      "normal_boss_dummy": {
+        "name": "일반 보스 허수아비"
+      },
+      "heroic_boss_dummy": {
+        "name": "영웅 보스 허수아비"
       },
       "ridge_stalker": {
         "name": "산등성이 추적자"

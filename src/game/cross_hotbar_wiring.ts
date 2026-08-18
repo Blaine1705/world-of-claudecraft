@@ -59,6 +59,11 @@ export interface CrossHotbarPad extends CrossHotbarPadState {
   setCrossHotbarExpand(on: boolean): void;
 }
 
+/** The pad the layout is handed to once it exists. */
+export interface CrossHotbarPadTarget {
+  setCrossHotbarBindings(bindings: CrossHotbarBindings): void;
+}
+
 /** The persisted-settings store the arm writes through. */
 export interface CrossHotbarSettingsStore {
   set(key: 'gamepadCrossHotbar' | 'gamepadCrossHotbarExpand', value: boolean): boolean;
@@ -91,6 +96,9 @@ export interface CrossHotbarWiring {
     onCrossHotbarEdit(active: boolean, carriedFrom: number | null): void;
     focusedCrossHotbarCell(): number | null;
   };
+  /** Hand the layout to the pad. Separate from construction because the pad is
+   *  built after this wiring, from callbacks this wiring supplies. */
+  attach(pad: CrossHotbarPadTarget): void;
   /** Re-evaluate pad mode after a connect, disconnect, or settings change. */
   syncPadMode(pad: CrossHotbarPadState): void;
 }
@@ -172,6 +180,7 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
   };
   return {
     bindings,
+    attach: (pad) => pad.setCrossHotbarBindings(bindings),
     syncPadMode,
     onHold: (layer, set, kind) =>
       host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind)),

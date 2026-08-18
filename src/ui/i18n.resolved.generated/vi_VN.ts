@@ -956,17 +956,17 @@ export const vi_VN: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Tầng Hầm",
+        "state": "Tầng Nghi Lễ",
+        "residence": "Tầng Sinh Hoạt",
+        "tower": "Tháp Canh"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Tầng Vườn",
+        "solar": "Phòng Nắng"
       }
     },
     "compass": {
@@ -7203,6 +7203,7 @@ export const vi_VN: EnTranslations = {
       "shopMarksRequired": "Bạn cần {marks} Dấu Ấn Thám Hiểm để mua {name}.",
       "shopSealPremiumOnly": "Dấu niêm này chỉ chịu khuất phục trước bàn tay bậc thầy. Chỉ có mức cược Cao Cấp mới mở được nó.",
       "passageSealed": "Lối đi đã bị niêm phong.",
+      "enemiesRemain": "Hãy đánh bại những kẻ địch còn lại trước.",
       "moveCloserPassage": "Hãy lại gần lối đi hơn.",
       "moveCloserChest": "Hãy lại gần chiếc rương hơn.",
       "moveCloserReliquary": "Hãy lại gần hộp thánh tích hơn.",
@@ -10012,7 +10013,7 @@ export const vi_VN: EnTranslations = {
       },
       "fear": {
         "name": "Giày Vò",
-        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 8 giây. Mọi sát thương sẽ phá vỡ hiệu ứng."
+        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng."
       },
       "searing_pain": {
         "name": "Nung Đốt",
@@ -10090,7 +10091,7 @@ export const vi_VN: EnTranslations = {
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
         "description": "Chiêu kết liễu gây {damage} sát thương. Chỉ dùng được ở Hình Sói.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ: một cú cắn gây 70 cộng 43 mỗi điểm liên hoàn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi 30 năng lượng."
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
@@ -10153,7 +10154,7 @@ export const vi_VN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Huyết Sói",
-        "description": "Tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
+        "description": "Trào dâng {rage} năng lượng và tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
       },
       "rip": {
         "name": "Vết Nứt Máu",
@@ -10258,7 +10259,7 @@ export const vi_VN: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Dấu Ấn Cốt Táng",
-        "description": "Đánh dấu một kẻ địch trong 12 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
+        "description": "Đánh dấu một kẻ địch trong 15 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
       },
       "unholy_command": {
         "name": "Mệnh Lệnh Tà Ác",
@@ -10357,8 +10358,8 @@ export const vi_VN: EnTranslations = {
         "description": "Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)"
       },
       "feral_charge": {
-        "name": "Xung Phong Hoang Dã",
-        "description": "Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)"
+        "name": "Dâng Trào Nguyên Thủy",
+        "description": "Giải phóng một đợt dâng trào nguyên thủy. Trong Hình Sói, tốc độ hồi Năng Lượng tăng 100% trong 10 giây. Trong Hình Bruin, lập tức tạo 50 Nộ Khí. (dấu ấn Hoang Dã)"
       },
       "swiftmend": {
         "name": "Hồi Phục Nhanh",
@@ -10374,7 +10375,7 @@ export const vi_VN: EnTranslations = {
       },
       "redharvest": {
         "name": "Thu Hoạch Đỏ",
-        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi 30 năng lượng. Dùng được cả khi không có điểm liên hoàn."
+        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn."
       },
       "marrowbreak": {
         "name": "Đoạn Tủy",
@@ -10614,7 +10615,7 @@ export const vi_VN: EnTranslations = {
       },
       "evocation": {
         "name": "Giếng Ête",
-        "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
+        "description": "Vận sức trong 6 giây: mỗi giây hồi 100 mana và cộng dồn 8 sức mạnh phép thuật. Hiệu ứng cộng dồn trong khi vận sức và kéo dài 15 giây. (thiên phú pháp sư)"
       },
       "flurry_of_knives": {
         "name": "Loạt Dao Xoáy",
@@ -10622,7 +10623,7 @@ export const vi_VN: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Hồi Phục Hoang Dã",
-        "description": "Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
+        "description": "Hồi 40% máu tối đa trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
       },
       "frost_trap": {
         "name": "Bẫy Sương Giá",
@@ -10642,11 +10643,11 @@ export const vi_VN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Tiếng Hú Kinh Hoàng",
-        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)"
+        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)"
       },
       "ice_block": {
         "name": "Quan Tài Lạnh",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)"
+        "description": "Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)"
       },
       "inner_focus": {
         "name": "Tâm Trí Tĩnh",
@@ -10738,7 +10739,7 @@ export const vi_VN: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Tâm Trí Tăng Tốc",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)"
+        "description": "Khiến phép tiếp theo có thời gian niệm của bạn được thi triển tức thì. Kéo dài 60 giây. (thiên phú pháp sư)"
       },
       "psychic_scream": {
         "name": "Tiếng Thét Tâm Linh",
@@ -10855,7 +10856,7 @@ export const vi_VN: EnTranslations = {
       },
       "prowl": {
         "name": "Rình Rập",
-        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu."
+        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 5%. Không thể dùng trong chiến đấu."
       },
       "rake": {
         "name": "Lóc Xé",
@@ -12411,7 +12412,7 @@ export const vi_VN: EnTranslations = {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bó Hoa Vườn Dawnhold"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -13257,6 +13258,15 @@ export const vi_VN: EnTranslations = {
       },
       "training_dummy": {
         "name": "Hình Nộm Tập Luyện"
+      },
+      "friendly_player_dummy": {
+        "name": "Hình Nộm Người Chơi Đồng Minh"
+      },
+      "normal_boss_dummy": {
+        "name": "Hình Nộm Trùm Thường"
+      },
+      "heroic_boss_dummy": {
+        "name": "Hình Nộm Trùm Anh Hùng"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"
@@ -16898,9 +16908,9 @@ export const vi_VN: EnTranslations = {
         "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Lâu Đài Dawnhold",
+        "enterText": "Bạn bước vào những sảnh đường ấm áp, thơm ngát hương hoa của Lâu Đài Dawnhold.",
+        "leaveText": "Bạn lách ra ngoài, trở lại bãi cỏ vườn ngập nắng."
       },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",

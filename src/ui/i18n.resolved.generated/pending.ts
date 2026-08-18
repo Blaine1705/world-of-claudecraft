@@ -10,10 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -29,21 +25,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "es_ES": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -59,21 +43,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "fr_FR": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -89,21 +61,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "fr_CA": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -119,22 +79,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -150,21 +98,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "de_DE": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -180,45 +116,25 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "zh_CN": [
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.controller.crossHotbarSet",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSet"
   ],
   "zh_TW": [
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.controller.crossHotbarSet",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSet"
   ],
   "ko_KR": [
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.controller.crossHotbarSet",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSet"
   ],
   "ja_JP": [
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.controller.crossHotbarSet",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSet"
   ],
   "pt_BR": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -234,27 +150,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "ru_RU": [
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.controller.crossHotbarSet",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSet"
   ],
   "cs_CZ": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -270,21 +172,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "nl_NL": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -300,21 +190,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "pl_PL": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -330,21 +208,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "id_ID": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -360,21 +226,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "tr_TR": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -390,21 +244,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "sv_SE": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -420,21 +262,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "vi_VN": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -450,21 +280,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ],
   "da_DK": [
-    "entities.dungeons.dawnhold_castle.enterText",
-    "entities.dungeons.dawnhold_castle.leaveText",
-    "entities.dungeons.dawnhold_castle.name",
-    "entities.items.dawnhold_posy.name",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarEditHelp",
@@ -480,14 +298,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot",
-    "hudChrome.dawnholdMap.story.ground",
-    "hudChrome.dawnholdMap.story.solar",
-    "hudChrome.dawnholdMap.title",
-    "hudChrome.lastkeepMap.story.residence",
-    "hudChrome.lastkeepMap.story.state",
-    "hudChrome.lastkeepMap.story.tower",
-    "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.controller.crossHotbarSlot"
   ]
 };
