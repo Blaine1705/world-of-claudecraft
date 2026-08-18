@@ -1861,9 +1861,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // biped skeleton, KAYKIT_CLIP_PLAN vocabulary. The dummy never casts or
   // jumps (sim's dummy handling holds it stationary and ability-less), so
   // those two clips are stripped from the shipped GLB rather than carried as
-  // dead weight. It appears in exactly one hub (zone3.ts, count: 1, radius:
-  // 0), so it is lazy-preloaded rather than joining every client's eager
-  // boot set.
+  // dead weight. Shared by the whole Highwatch practice row (MOB_VISUALS below
+  // points all four dummy templates here), which is still exactly one hub, so
+  // it stays lazy-preloaded rather than joining every client's eager boot set.
   mob_training_dummy: {
     url: `${CREATURES}/training_dummy.glb`,
     height: 2.3,
@@ -2960,7 +2960,14 @@ const MOB_KEYS: Record<string, string> = {
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
+  // The Highwatch practice row (sim/content/practice_dummies.ts) is four
+  // dummies on one body: same GLB, told apart by the entity tint the visual
+  // already applies (tint: 'entity'), so a boss dummy reads as a dummy rather
+  // than as a 3.1-scale dragon standing two yards from the training post.
   training_dummy: 'mob_training_dummy',
+  friendly_player_dummy: 'mob_training_dummy',
+  normal_boss_dummy: 'mob_training_dummy',
+  heroic_boss_dummy: 'mob_training_dummy',
   emberkin: 'mob_emberkin',
   gloomshade: 'mob_gloomshade',
   pyre_colossus: 'mob_pyre_colossus',

@@ -162,7 +162,7 @@ import {
   auraEffectMaximumFractionDigits,
 } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
-import { auraIconCssBackground, createAuraIconResolver } from './aura_icon_view';
+import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
 import { AuraOverlayController } from './aura_overlay_controller';
 import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
@@ -244,7 +244,7 @@ import {
   craftOwnsTab,
 } from './crafting_view';
 import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
-import { classCrestId, crestIconUrl } from './crest_icon_art';
+import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -488,16 +488,7 @@ import {
   tOptional,
   tPlural,
 } from './i18n';
-import {
-  abilityImageUrl,
-  cachedProceduralIconDataUrl,
-  hasAbilityIconIdentity,
-  hasAuraRecipe,
-  iconDataUrl,
-  proceduralIconDataUrl,
-  QUALITY_COLOR,
-  raidMarkerDataUrl,
-} from './icons';
+import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
@@ -894,17 +885,6 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
-const resolveHudAuraIconId = createAuraIconResolver(hasAbilityIconIdentity, hasAuraRecipe);
-const HUD_AURA_STATIC_FALLBACK_URL = crestIconUrl('status_combat');
-if (!HUD_AURA_STATIC_FALLBACK_URL) throw new Error('Missing painted combat-status crest');
-const resolveHudAuraIconUrl = (iconId: string): string =>
-  auraIconCssBackground(
-    iconId,
-    abilityImageUrl,
-    (id) => cachedProceduralIconDataUrl('aura', id),
-    HUD_AURA_STATIC_FALLBACK_URL,
-    (id) => proceduralIconDataUrl('aura', id),
-  );
 // Vale Cup hold-to-charge shoot: full power after this long held, and the charge
 // a NON-held tap (touch / gamepad / a mouse click on the slot) fires at.
 const SHOOT_CHARGE_MS = 850;
@@ -6785,16 +6765,20 @@ export class Hud {
     this.castSportMove(abilityId, abilityId === 'sport_shoot' ? SHOOT_TAP_CHARGE * range : range);
   }
 
-  // My first sport move (Shoot) while seated in a Vale Cup match, else null. Used
-  // so key 1 (the class Attack slot, inert under the harvest truce) casts a real
-  // move on the pitch instead of toggling a useless auto-attack.
-  private firstSportAbilityId(): string | null {
+  // My first sport move (Shoot) while seated in a Vale Cup match, else null. The
+  // fixed primary action seat uses this same resolved record for its cast, art,
+  // cooldown, range state, accessible name, and tooltip.
+  private firstSportAbility(): ResolvedAbility | null {
     // Seated in a match => my known list IS the sport kit (Shoot first). Keyed off
     // cupInfo.match, not the bar form, so it holds the instant the whistle swaps
     // the kit in (the bar-form flip can lag a frame behind).
     if (!this.sim.cupInfo?.match) return null;
     const first = this.sim.known[0];
-    return first && this.isSportAbilityId(first.def.id) ? first.def.id : null;
+    return first && this.isSportAbilityId(first.def.id) ? first : null;
+  }
+
+  private firstSportAbilityId(): string | null {
+    return this.firstSportAbility()?.def.id ?? null;
   }
 
   // The ability a bar slot would cast right now (slot 0 remaps to the first sport
@@ -6810,7 +6794,7 @@ export class Hud {
   }
 
   private shootRangeForSlot(slot: number): number {
-    if (slot === 0) return this.sim.known[0]?.def.range ?? MELEE_RANGE;
+    if (slot === 0) return this.firstSportAbility()?.def.range ?? MELEE_RANGE;
     return this.abilityForSlot(slot)?.def.range ?? MELEE_RANGE;
   }
 
@@ -6998,9 +6982,9 @@ export class Hud {
     // On the pitch, key 1 casts your first sport move (Kick) instead of the
     // harvest-truce-inert auto-attack, which would be a dead key with no useful
     // effect. Off the pitch it is the normal auto-attack toggle.
-    const sportFirst = this.firstSportAbilityId();
+    const sportFirst = this.firstSportAbility();
     if (sportFirst) {
-      this.castSportTap(sportFirst, this.sim.known[0]?.def.range ?? MELEE_RANGE);
+      this.castSportTap(sportFirst.def.id, sportFirst.def.range);
       this.flashActionSlot(0);
       return;
     }
@@ -7282,6 +7266,8 @@ export class Hud {
       });
       this.attachTooltip(btn, () => {
         if (slot === 0 && this.attackSlotIsAttack()) {
+          const sportFirst = this.firstSportAbility();
+          if (sportFirst) return this.abilityTooltip(sportFirst);
           return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
         }
         const known = this.abilityForSlot(slot);
@@ -7509,12 +7495,16 @@ export class Hud {
             slotIndex: i,
             // Live accessor: slot 0 stops being the Attack toggle when the player
             // removes it (Interface option showAttackButton off / right-click).
-            isAttack: () => i === 0 && this.attackSlotIsAttack(),
+            isAttack: () =>
+              i === 0 && this.attackSlotIsAttack() && this.firstSportAbility() === null,
             // Raw binding presence (any assigned slot, even one whose ability is
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
             hasAction: () => this.actionForSlot(i) !== null,
-            ability: () => this.abilityForSlot(i),
+            ability: () =>
+              i === 0 && this.attackSlotIsAttack()
+                ? this.firstSportAbility()
+                : this.abilityForSlot(i),
             item: () => this.itemForSlot(i),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };
@@ -7613,6 +7603,11 @@ export class Hud {
       this.hideTooltip();
       audio.click();
       const p = this.sim.player;
+      if (this.firstSportAbility()) {
+        this.activateFixedAttackSlot();
+        attackBtn.blur();
+        return;
+      }
       const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
       const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
       handleMobileAttackTap(
@@ -7664,9 +7659,9 @@ export class Hud {
         slots: [
           {
             slotIndex: 0,
-            isAttack: () => true,
-            hasAction: () => false,
-            ability: () => null,
+            isAttack: () => this.firstSportAbility() === null,
+            hasAction: () => this.firstSportAbility() !== null,
+            ability: () => this.firstSportAbility(),
             item: () => null,
             keybindLabel: () => '',
           },
@@ -18385,7 +18380,7 @@ export class Hud {
         current === i
           ? t('hud.markers.markerSelectedAria', { marker: markerName })
           : t('hud.markers.markerAria', { marker: markerName });
-      const check = current === i ? ' ✓' : '';
+      const check = current === i ? `<span class="ctx-selected">${svgIcon('check')}</span>` : '';
       html += `<div class="ctx-item" role="button" tabindex="0" data-act="m${i}" aria-label="${esc(aria)}"><span class="ctx-mark" style="background-image:url(${raidMarkerDataUrl(i)})"></span>${esc(markerName)}${check}</div>`;
     }
     html += `<div class="ctx-item" role="button" tabindex="0" data-act="clear">${esc(t('hud.markers.clear'))}</div>`;

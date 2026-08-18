@@ -10075,7 +10075,7 @@ export const zh_CN: EnTranslations = {
       "ferocious_bite": {
         "name": "血噬",
         "description": "终结技，造成 {damage}。仅限狼形态。",
-        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为血收：一次撕咬，造成91点伤害，每个连击点额外造成55点，并立即引爆你的剐削与血裂的全部剩余伤害，同时恢复30点能量。"
+        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为血收：消耗古血发动一次更强的撕咬，立即引爆你的剐削与血裂的全部剩余伤害，同时恢复能量。"
       },
       "swipe": {
         "name": "横扫利爪",
@@ -10138,7 +10138,7 @@ export const zh_CN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼血",
-        "description": "使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。"
+        "description": "涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。"
       },
       "rip": {
         "name": "血隙",
@@ -10359,7 +10359,7 @@ export const zh_CN: EnTranslations = {
       },
       "redharvest": {
         "name": "血收",
-        "description": "消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复30点能量。无需连击点也可使用。"
+        "description": "消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。"
       },
       "marrowbreak": {
         "name": "碎髓",
@@ -10607,7 +10607,7 @@ export const zh_CN: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "野性愈合",
-        "description": "在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）"
+        "description": "在10秒内恢复相当于最大生命值40%的生命。只能在熊形态下使用。（德鲁伊天赋）"
       },
       "frost_trap": {
         "name": "霜纹陷阱",
@@ -10840,7 +10840,7 @@ export const zh_CN: EnTranslations = {
       },
       "prowl": {
         "name": "潜行",
-        "description": "在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。"
+        "description": "在狼形态下进入潜行状态，移动速度降低 5%。无法在战斗中使用。"
       },
       "rake": {
         "name": "剐削",
@@ -13242,6 +13242,15 @@ export const zh_CN: EnTranslations = {
       },
       "training_dummy": {
         "name": "训练假人"
+      },
+      "friendly_player_dummy": {
+        "name": "友方玩家假人"
+      },
+      "normal_boss_dummy": {
+        "name": "普通首领假人"
+      },
+      "heroic_boss_dummy": {
+        "name": "英雄首领假人"
       },
       "ridge_stalker": {
         "name": "山脊潜猎者"

@@ -1540,6 +1540,12 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
+  // A `dummy` that is an ALLY rather than a target: spawns non-hostile and
+  // carries Entity.friendlyPracticeTarget, which is what opens it to heals in
+  // sim.isFriendlyTo. It rests below full health and sheds healing back down
+  // (mob/practice_dummies.ts) so a healer always has something real to heal and
+  // the target resets itself for the next player.
+  friendlyPracticeTarget?: boolean;
   // Take PASSIVE idle draws off the shared world stream (Entity.offStreamRng).
   // CampDef.offStream covers a wholly new camp; this covers a template that
   // REPLACED shipped content in an existing camp slot, where the spawn draws
@@ -2696,7 +2702,10 @@ export type AbilityEffect =
       falloff: number;
       radius: number;
     }
-  | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
+  // pctOfMax: when set, the heal total is this fraction of the TARGET's max
+  // health at cast time instead of the flat total, so the heal scales with
+  // gear and any future pool retune (Savage Mending is the first user).
+  | { type: 'hot'; total: number; duration: number; interval: number; pctOfMax?: number } // renew, rejuvenation
   | {
       type: 'absorb';
       amount: number;
