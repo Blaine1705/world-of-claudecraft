@@ -174,7 +174,7 @@ repeat at every growth. It owes a release-note line whenever a growth ships.
 | HUD tracker | Always-on pinned-page strip beside the deed tracker; pins persist per character. |
 | Live toast / combat log | Relic logged; page Illumination; rank up. All four emitters are node-built and clickable, deep-linking to the page. |
 | Book of Deeds | Unchanged; optional soft links from collection deeds. Also hosts the "Titles and Borders" shelf where a border is picked. |
-| Nameplate and portrait rings | The active border renders in-world as a slug-keyed accent (cosmetic only; carries no actionable information). |
+| Nameplate and portrait rings | The active border renders in-world as a cartouche, not a slug-keyed outline (cosmetic only; carries no actionable information). |
 | Inspect card | Curator standing line, border accent, and the rank-5 Curator sigil (identity-wire note below). |
 | Character sheet / public sheet | Completion pair, Curator rank (labeled set/scope), and the capped recent-finds strip (ids and kinds; privacy note below). |
 | Wiki `/wiki` | Spoiler-safe catalog of pages and relic names, with the rule-7 outside-completion label (Retired / Personal tag plus note) on flagged pages; no personal progress. Also indexed by guide search. |

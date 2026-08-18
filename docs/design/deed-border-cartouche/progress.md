@@ -4,14 +4,14 @@
 |---|---|---|
 | 1. Cartouche chassis | complete | Core + canvas rewire landed. extraLift is 14. Declutter Y is 32 / 34. |
 | 2. QA: chassis | complete | Coverage map audited. Vacuous Object.keys pins replaced. E5/E7/E18/E22/E24 now have decisive assertions. Screenshots committed. Reviewers verified. `node scripts/gate_select.mjs` PASS (12 steps). |
-| 3. Identity and family | blocked on operator | Motifs, Catalogue brass, picker, inspect, ring clasp, E27-E36 tests. |
-| 4. QA: identity and family | blocked on Phase 3 | Full matrix, family screenshots, reviewers, merge bar. |
+| 3. Identity and family | complete | Motifs, Catalogue brass, picker swatches, inspect cartouche, ring clasp, E27-E36 tests. |
+| 4. QA: identity and family | blocked on operator | Full matrix, family screenshots, reviewers, merge bar. |
 
-Phase 2 closed 2026-08-18 on `feature/deed-border-cartouche`. Resume at Phase 3 (`phase-03-identity.md`) only when asked.
+Phase 3 closed 2026-08-18 on `feature/deed-border-cartouche`. Resume at Phase 4 (`phase-04-qa-identity.md`) only when asked.
 
 ## Coverage map (filled by QA phases)
 
-Every E1-E26 row names the assertion that would fail on a wrong pad, a missing well, a title left outside, a 24px Discord portrait kissing the floor, a leaked palette hex under forced-colors, or a y-walk desync. Load-bearing numbers are literals. E27-E35 stay Phase 3. E36 is the Phase 2 "no IWorld change" pin.
+Every E1-E26 row names the assertion that would fail on a wrong pad, a missing well, a title left outside, a 24px Discord portrait kissing the floor, a leaked palette hex under forced-colors, or a y-walk desync. Load-bearing numbers are literals. E27-E36 now name Phase 3 tests. E36 is still the no-IWorld pin.
 
 | Id | Test file / name | Status |
 |---|---|---|
@@ -41,16 +41,25 @@ Every E1-E26 row names the assertion that would fail on a wrong pad, a missing w
 | E24 | `tests/nameplate_cartouche_core.test.ts` "bumps the same-row threshold and stack pitch by the extra lift" (32 / 34 literals); `tests/nameplate_declutter.test.ts` "E24: two plates 25px apart vertically now collide" (stack gap 34) | audited |
 | E25 | `tests/nameplate_cartouche_core.test.ts` "takes no gfx, governor, or effects-profile argument"; `tests/deed_border_accent.test.ts` fairness path includes the core and forbids `--fx-shadow` / `gfxTier` / `data-fx-level` | audited |
 | E26 | same fairness scan: identity strokes have no tier input; only the CSS ring bloom uses `--fx-shadow` (exactly one `box-shadow`). Phase 1 canvas has no clasp glint. Low-preset screenshots show the well and hardware. | audited |
-| E27 | | pending (Phase 3) |
-| E28 | | pending (Phase 3) |
-| E29 | | pending (Phase 3) |
-| E30 | | pending (Phase 3) |
-| E31 | | pending (Phase 3) |
-| E32 | | pending (Phase 3) |
-| E33 | | pending (Phase 3) |
-| E34 | | pending (Phase 3) |
-| E35 | | pending (Phase 3) |
-| E36 | `git diff --name-only origin/release/v0.39.0...HEAD` has no `src/world_api*`, `src/net/`, `server/`, or `src/sim/` files. Worn slug still resolves (`tests/nameplate_ai_tag.test.ts` `prog_prestige_10` -> `prestige_laurels`). | audited (Phase 2) |
+| E27 | `tests/deed_border_accent.test.ts` "E27: canvas metal is static; inspect and picker metal still read on parchment" (`PRESET_ORDER` classic/midnight/parchment/highContrast; theme emits no `--border-accent-*`; inspect and picker rules consume `var(--border-accent-*)` with no hex) | written (Phase 3) |
+| E28 | `tests/deeds_border_picker.test.ts` "E28: picker None is empty, not a fake metal swatch"; "E28: the empty swatch rule paints no metal" (empty class, no style hex, `background: none`) | written (Phase 3) |
+| E29 | `tests/deeds_border_picker.test.ts` "E29: earned options show the live 3-color swatch; active and 40x40 stay" (live palette vars, `.active`, `:focus-visible`, `body.mobile-touch .deed-title-option` 40x40) | written (Phase 3) |
+| E30 | `tests/deed_border_accent.test.ts` "E30: inspect header is a CSS cartouche (well + edge + clasp) with forced-colors"; `tests/inspect_window.test.ts` style contains `--cartouche-well-fill` / `--cartouche-radius` | written (Phase 3) |
+| E31 | `tests/deed_border_accent.test.ts` "E31: portrait ring stays a circle; clasp sits at 12 o clock under the level chip" (`::after` `border-radius: 50%`, clasp `left: 30px` / `top: -6px` / `z-index: 2`, chip 3, flash 4) | written (Phase 3) |
+| E32 | `tests/nameplate_cartouche_core.test.ts` "dispatches four different motif kinds and four different line sets"; "would fail if two slugs emitted the same side-primitive set"; canvas E23 stroke count is 6 | written (Phase 3) |
+| E33 | `tests/deed_border_accent.test.ts` "E33: Catalogue brass does not collide with Eternal Spoils gold or elite gold" (`#c9b17a` / `#2a2214` / `#f3ebcf` vs `#f4ca43` and `#f2c84b`); single-source color scan still green | written (Phase 3) |
+| E34 | `tests/deed_border_accent.test.ts` "E34: cartouche identity adds no motion" (inspect, clasp, swatch, ring clasp have no animation/transition) | written (Phase 3) |
+| E35 | `tests/deed_border_accent.test.ts` "E35: changing activeBorder busts the character sheet refresh signature" (`charSheetRefreshSig` moves on wear and on slug swap) | written (Phase 3) |
+| E36 | `tests/deed_border_accent.test.ts` "E36: worn slug still arrives on entity.border with no world_api change"; `tests/nameplate_ai_tag.test.ts` `prog_prestige_10` -> `prestige_laurels`. `git diff --name-only origin/release/v0.39.0...HEAD` still has no `src/world_api*`, `src/net/`, `server/`, or `src/sim/` files. | written (Phase 3) |
+
+## Phase 3 notes
+
+- Motif kinds: catalogue / vault / ward / laurel. Four distinct line sets in the cartouche core. Canvas strokes those primitives; no second layout.
+- `curators_gilt` is antique brass `#c9b17a` / `#2a2214` / `#f3ebcf`. Does not collide with `reliquary_gilt` `#f4ca43` or elite/quest `#f2c84b`.
+- Inspect header is a CSS cartouche (well + edge + clasp). Portrait ring stays a circle; clasp is `::before` at 12 o'clock, z-index 2.
+- Picker reuses `.deed-title-option`. Earned options show a 3-color swatch. None is empty.
+- Shot recipes added: `deed-border-picker` and `inspect-border-cartouche`. Phase 4 owns the album.
+- No sim / server / wire / IWorld change. No new player-facing strings. No Phase 4 screenshots.
 
 ## Phase 2 notes
 

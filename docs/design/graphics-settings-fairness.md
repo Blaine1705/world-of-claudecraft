@@ -69,7 +69,8 @@ COSMETIC (may be tiered down on lower presets):
   hidden, but its outer glow is pure richness. The identity arms are tier-invariant by
   construction: the nameplate cartouche is canvas shapes resolved from entity state on the
   same cadence as the title text (no tier input on the accent path, pinned by the path scan
-  in `tests/deed_border_accent.test.ts`), and the portrait ring's frame border, edge outline,
+  in `tests/deed_border_accent.test.ts`), the per-slug side motif is identity and draws on
+  every graphics tier, and the portrait ring's frame border, edge outline,
   and inset shadow never read a tier token (pinned by the CSS arm of the same suite). The ONE
   tier-scaled quantity is the ring's outer box-shadow bloom, which rides `--fx-shadow` (0 at
   low) exactly like the sibling portrait combat glow. The ring also repaints on the existing

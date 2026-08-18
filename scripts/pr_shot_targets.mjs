@@ -223,6 +223,12 @@ async function seedLowGraphicsPreset(page) {
   );
 }
 
+/** Parchment on the low preset: the light-panel acid test for inspect and picker metal. */
+async function seedParchmentOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await themeSeed('parchment')(page);
+}
+
 /** The tracker variants need BOTH pre-load seeds: the pin-store wipe and the
  *  low preset (a variant carries one beforeLoad, so this composes the pair). */
 async function clearPinsOnLowPreset(page) {
@@ -4831,6 +4837,87 @@ export const TARGETS = [
       // repaint with the border before the frame is taken.
       await wait(1200);
       return {};
+    },
+  },
+  {
+    key: 'deed-border-picker',
+    label: 'Book of Deeds Titles and Borders shelf: empty None plus earned 3-color swatches',
+    when: [
+      'ui/deed_border_view',
+      'ui/deeds_window',
+      'styles/components.css',
+      'render/nameplate_cartouche_core',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        sim.deedsEarned.set('prog_prestige_10', '2026-08-01');
+        sim.deedsEarned.set('dgn_deepward', '2026-08-02');
+        sim.deedsEarned.set('col_discovery_250', '2026-08-03');
+        sim.setActiveBorder('col_discovery_250');
+        window.__game?.hud?.openDeeds?.('titles');
+        return { ok: true };
+      });
+      if (!seeded.ok) throw new Error(`deed border picker seeding failed: ${seeded.reason}`);
+      const opened = await pollForSize(page, '#deeds-window');
+      if (!opened) throw new Error('deeds window did not open');
+      await page.evaluate(() => {
+        document.querySelector('#deeds-window .deeds-borders')?.scrollIntoView({
+          block: 'center',
+        });
+      });
+      await wait(200);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
+    key: 'inspect-border-cartouche',
+    label: 'Inspect header cartouche: well, edge, and top clasp on a worn border',
+    when: [
+      'ui/deed_border_view',
+      'ui/inspect_window',
+      'ui/inspect_view',
+      'styles/shell.css',
+      'render/nameplate_cartouche_core',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(`(async () => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const mod = await import('/src/sim/content/reliquary.ts');
+        for (const pageDef of mod.RELIQUARY_PAGES) {
+          for (const relic of pageDef.relics) {
+            if (relic.kind === 'item') sim.primary.deedStats.itemsDiscovered.add(relic.itemId);
+          }
+        }
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-01');
+        sim.setActiveBorder('col_reliquary_rank_5');
+        window.__game.hud.openInspect(sim.playerId);
+        return { ok: true, border: sim.players?.get?.(sim.playerId)?.activeBorder ?? null };
+      })()`);
+      if (!seeded.ok) throw new Error(`inspect cartouche seeding failed: ${seeded.reason}`);
+      if (seeded.border !== 'col_reliquary_rank_5') {
+        throw new Error(`activeBorder is ${seeded.border}, expected col_reliquary_rank_5`);
+      }
+      const opened = await pollForSize(page, '#inspect-window');
+      if (!opened) throw new Error('inspect window did not open');
+      return { clip: '#inspect-window' };
     },
   },
   {

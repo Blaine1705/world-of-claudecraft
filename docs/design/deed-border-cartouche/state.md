@@ -5,10 +5,10 @@ Resume here. Do not re-litigate locked decisions; they live in
 
 ## Resume point
 
-Phase 2 is complete on `feature/deed-border-cartouche` in worktree
+Phase 3 is complete on `feature/deed-border-cartouche` in worktree
 `/Users/fernando/Documents/wocc-deed-border-cartouche`. Next action: run
-Phase 3 from `phase-03-identity.md` in that worktree. Do not start
-Phase 3 unless the operator asks.
+Phase 4 from `phase-04-qa-identity.md` in that worktree. Do not start
+Phase 4 unless the operator asks.
 
 ## Blocker
 
@@ -17,9 +17,9 @@ None.
 ## Next action
 
 1. Work in `/Users/fernando/Documents/wocc-deed-border-cartouche`.
-2. Execute Phase 3 (`phase-03-identity.md`): motifs, Catalogue brass
-   retune, picker swatches, inspect header, portrait-ring clasp.
-3. Do not start Phase 4 until Phase 3 tests for E27-E36 exist and are green.
+2. Execute Phase 4 (`phase-04-qa-identity.md`): full matrix audit,
+   family screenshots, reviewers, selective gate.
+3. Do not call the feature done until Phase 4 is green.
 
 ## Locked decisions (cheat sheet)
 
@@ -28,7 +28,7 @@ None.
 - Wrap name + title. No title: hug the name row, still padded.
 - Guild, HP, cast, markers stay outside.
 - Shapes only. Shared ink well. Shared brackets + clasp.
-- Catalogue brass retune and motifs wait for Phase 3.
+- Catalogue brass retune and motifs landed in Phase 3.
 - Title centered on `screenX`. Name-row text vertically centered with badges.
 - Width is `max(nameRow, title) + padX * 2`.
 - Extra lift is a named value both y-walks consume. It is 14.
@@ -47,6 +47,13 @@ None.
 - Fairness scan includes the core. `--fx-shadow` is forbidden on the TS path.
 - Screenshots under `docs/screenshots/deed-border-cartouche/phase-01/`.
 - `node scripts/gate_select.mjs` passed (12 steps).
+
+## Closed in Phase 3
+
+- Motif kinds catalogue / vault / ward / laurel. Four distinct primitive sets.
+- `curators_gilt` retuned to `#c9b17a` / `#2a2214` / `#f3ebcf`.
+- Inspect CSS cartouche, portrait-ring clasp, picker 3-color swatch.
+- E27-E36 tests named in `progress.md`.
 
 ## Surfaces in play
 
