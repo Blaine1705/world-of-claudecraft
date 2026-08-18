@@ -5,19 +5,19 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-14-ux-honesty.md`
-  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH
-  session, newest origin/release/** sync first). 13 QA COMPLETE
-  (PASS-WITH-FOLLOWUPS, 2026-08-17, PUSHED per R4: feature/woc-marketplace at
-  the 13 QA tip; the release sync merge 220b9b018f rode with it). The 13 ledger
-  entry below carries a 13 QA ROUND bullet: read its JUDGED-no-change and
-  DEFERRED lists and do NOT re-raise them. 14 OWNS (called out in the DEFERRED
-  list): the wallet bridge's own thrown English still renders untranslated at
-  the two step-up decline sinks (src/net/wallet.ts + mobile_wallet_deeplink.ts,
-  shared with the payment path). R11 (the relink follow-up) stays a pre-enable
-  launch gate for Fernando, NOT a 14 blocker. Both session-start rulings remain
-  RESOLVED (R1 threshold: step-up on EVERY custody-moving call, no env knob;
-  R10: locked copies refuse $WOC listing).
+- Next file to run: `docs/woc-marketplace-hardening/phase-14-qa.md` (GAME
+  repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session,
+  newest origin/release/** sync first). 14 IMPLEMENT COMPLETE (2026-08-17,
+  LOCAL not pushed per R4; session start d3b15f6057, release sync a NO-OP at
+  origin/release/v0.39.0 tip f48c7a3a9b already merged; seven code/doc
+  commits, see the 14 ledger entry below, which is the registry the 14-qa
+  session consumes, incl. the REWORDED-KEYS release list and the review
+  round's outcomes). R9 RESOLVED at session start (see Rulings). R11 (the
+  relink follow-up) stays a pre-enable launch gate for Fernando. The 13 QA
+  ROUND's JUDGED and DEFERRED lists remain binding: do NOT re-raise them;
+  the 15-owned items (R10 hint dead end, sell-picker lock filter, stale TOTP
+  screenshots, the wallet busy label, the WocMarketWindow behavioral rig)
+  were deliberately NOT pulled forward.
 - LOUD deploy handoff (DEPLOY.md records it): enable the market only with
   BOTH sides at or after the contract tips (game: the build that sends
   bidCents; service: PR #31 270e337+, the build whose bond quote answers
@@ -621,17 +621,20 @@ Still open (a phase that hits one asks at session start):
   player wiki/guide page, game-side audited runtime pause, numeric reserve guard. They
   stay in the follow-ups queue; if he opts any in later, add it as a new numbered phase
   before phase 21 and update progress.md and the plan table.
-- R9 (phases 07/14/22, raised by the 06 QA round 2026-08-13): the trade window's
-  $WOC arm records IMPLIED terms consent. Both its money sends (the offer create,
-  and the pay arm since it shipped) hard-code acceptTerms: true while the panel
-  renders no terms text or link, and guardTerms durably RECORDS the acceptance,
-  so a buyer who never opened the Exchange gets a stored consent row that later
-  backs strikes and suspensions. Inert while WOC_MARKET_ENABLED stays off.
-  Options: (a) keep the posture and land a panel terms affordance (the Exchange
-  window's checkbox is the model) before enable; (b) have the panel send the
-  player's real choice once 07's terms drafts exist. Either way the pre-enable
-  audit (22) must not pass while the panel records consent it never showed.
-  07 owns the terms drafts, 14/15 own the panel surface.
+- R9 (phases 07/14/22, raised by the 06 QA round 2026-08-13): RESOLVED
+  (Fernando, 2026-08-17, directed in the 14 session prompt): the trade
+  window's $WOC arm gains its terms affordance modeled on the Exchange
+  checkbox, using the 07 draft's adopted language, and the offer-send and
+  pay arm STOP hard-coding acceptTerms: both sends carry the player's real
+  choice (durable acceptance learned from /me, or the consent row's own
+  checkbox). IMPLEMENTED in 14: the consent row (checkbox + a live /terms
+  link, draft 10.3) renders on the buyer's compose and pay faces and hides
+  once acceptance is durable; the Exchange checkbox gained the same link
+  and both labels now name the Marketplace terms; the reworded
+  termsLabel/terms_required copy is on the release re-translation list.
+  Residual for 22's pre-enable audit: verify both surfaces against the
+  counsel-approved terms text once R6 grants (the /terms page must carry
+  the marketplace sections before enable).
 - R11 (phase 13 security follow-up, raised by the 13 fresh security re-review
   2026-08-17, UNANSWERED; a pre-enable launch gate): the step-up RAISES the bar
   on a stolen bearer but is NOT an absolute "a stolen session cannot move
@@ -723,6 +726,319 @@ Still open (a phase that hits one asks at session start):
 
 ## Per-phase ledger (append as phases complete)
 
+- 14 ux-honesty (2026-08-17, GAME repo, session start d3b15f6057 = the 13 QA
+  tip; release sync NO-OP (origin/release/v0.39.0 f48c7a3a9b already an
+  ancestor, no merge, no release-merge-audit owed); commits 22de5a4107
+  (server honesty), fe5165c2eb (trade honesty + seller controls), 1de30be50e
+  (informed commitment), 76bacd06ed (localized money surface), 8a0d55d3ca
+  (docs + quote_expired reword), df79314e15 (lint floor), plus the review
+  fix round and this entry's docs commit; LOCAL not pushed per R4.
+  Validation: npx tsc --noEmit clean; all market suites + trade suites +
+  snapshots/env_protocol/bandwidth + architecture/monolith/hud_update/
+  dialog_root/fanout/perf + i18n gates green; the FIVE market pg suites
+  142/142 zero skips WITH TEST_DATABASE_URL; ci:changed exit 0. Closes H13,
+  the wallet-bridge i18n medium, and the wocUsdText currency medium, plus
+  the 14-owned deferrals from 02/04/06/07/11/12/13. The registry the 14-qa
+  session consumes:
+  - R9 RECORDED FIRST (see Rulings: resolved by Fernando in the session
+    prompt; both money sends now carry the player's REAL consent and both
+    consent controls link /terms).
+  - SELLER CONTROLS (H13): the decline/withdraw routes PRE-EXISTED (the 06
+    handoff was right; no new server command): the client wiring was dead in
+    three layers and is now live. The seller's review face carries Decline
+    (resolveOffer 'decline', youDeclined line, wocTradeFinished pre-marked
+    so the lingering row cannot double-report); the buyer keeps Withdraw
+    (now with its own youWithdrew line). Cancel sale: the seller's
+    awaiting_payment face (trade arm) and the Activity "My listings" rows
+    (the ONLY surface a directed listing renders on; gate mirrors the
+    browse pane: active, no cancel-intent, unbid) both drive the ordinary
+    cancel route; a cancelPending answer keeps the deal held (the buyer may
+    still pay; the poll converges the outcome), a plain ok ends it.
+  - HONEST ENDINGS (H13's false-payment line): wocOfferPhase MOVED into
+    src/ui/hud/woc_trade/woc_trade_offer_view.ts (the 01 deferral) and
+    'settled' now requires listingResolution 'sold'; a closed-not-sold
+    listing is the new 'closed' phase, with wocOfferClosedReason naming
+    cancelled/suspended/unpaid (unknown resolutions read UNPAID, never an
+    invented cause). finishClosedWocTrade reports once per offer id and
+    KEEPS the trade session open (a dead deal leaves two players at a live
+    window); resolveClosedWocTrade handles settled AND closed after the
+    window shut, and tells a buyer whose deal is still LIVE what remains
+    (offerStandsUntil with the TTL time / dealAwaitsPayment). The other
+    side's decline/withdraw/expiry reports once off the lingering row's
+    status. A CONFIRMED or DELIVERING confirm answer gets its own log line
+    (paymentConfirmed) and role-split status sentences; "on its way by
+    mail" now waits for delivered/sold. The poll's keep-comparison gained
+    the settlementState dimension so confirming -> confirmed repaints.
+  - INFORMED COMMITMENT: the p2p Pay flow is TWO-STEP: payWocTradeOffer
+    claims the lock once (stores wocTradeSettlementId; a Not-now retry
+    re-quotes THAT settlement, never a second buyNow into its own
+    buy_now_locked) and stages the quote; the review face shows the token
+    total, USD, quote expiry (static time; no countdown driver), and only
+    signWocTradeQuote drives the wallet. Pre-bid disclosures land BEFORE
+    the first bond charge: bidBindingNote (binding once the bond signs, no
+    withdraw, forfeit + strike on non-payment: draft 10.4/10.5),
+    bidCloseNote (anti-snipe extension + a late payment refunds, the 04
+    behavior notes), offerNextNote (the second-chance disclosure, gated on
+    the listing's offerNext). The offer's expiry renders on the review face
+    (offerExpiresAt); price edits blank stale fee lines IMMEDIATELY; a
+    below-min courtesy hint names the floor from ONE /status fetch per
+    controller (hint-only, the server refusal stays the authority; NO wire
+    change was needed, minPriceCents already rode /status).
+  - LOCALIZED MONEY SURFACE: src/ui/wallet_bridge_reason_text.ts classifies
+    bridge failures (structural cancel names; a byte-exact map over the
+    bridge-authored strings DRIFT-PINNED against src/net + the launcher; a
+    conservative decline-prose heuristic; flavored generics so a failed
+    SIGNATURE never says payment); all four market sinks + the Claudium
+    checkout render classified lines and console.warn the raw error.
+    claudiumCheckoutErrorText keeps the unknown-message passthrough because
+    that channel MIXES the checkout's own t() throws (scoped + documented);
+    main.ts SHRANK 11490 -> 11486. The Exchange notice stores UNRESOLVED
+    state (key/api/pending/bondPending/bridge kinds) resolved at render
+    (resolveNotice), closing the 12-deferred language-switch staleness. The
+    bond leg gained its own pending voice (wocBondPendingText + 4 keys);
+    the five common fail reasons (quote_expired / transaction_failed /
+    refunded / superseded / confirming_overdue) each explain themselves
+    (FAIL_KEYS; the generic remainder pin shrank 20 -> 15). usd_text.ts is
+    the ONE USD spelling (Intl currency; negatives and suffix locales):
+    wocUsdText delegates, the window/Claudium/daily-rewards sites converted,
+    and tests/usd_text.test.ts sweeps src/ui for the `$${` class with a
+    positive control. rateNote names the venue price print (the 11/12
+    as-of re-judge); pausedBanner and sellFeeNote trued to the draft;
+    item_mismatch explains the lock/state arm; quote_expired stops
+    promising a quote the lapse-straddle arm cannot grant.
+  - SERVER HONESTY: strikeDefaultingBuyer is the ONE strike-fairness path
+    for all three arms (the auction-default arm rode bare strikeAccount and
+    struck outage-locked winners); the bond FORFEIT stays ungated per R2
+    and the outage-forfeit question is RECORDED FOR 22 (needs Fernando).
+    claim_cooldown carries WHEN a retry can first succeed (cooldownRefused
+    returns retryAtMs; BOTH arms probed, the LATER wins: per-listing
+    newest-abandon + reclaim window, cap = the cap-th-newest in-window row
+    leaving the rolling hour; pg pins assert EXACT retry moments incl. the
+    max-combining case; the service refuses with params.retryAfterSeconds
+    ceiled with a 1s floor; throwRefusal passes params to HttpError; the
+    client renders hudChrome.wocMarket.claimCooldownRetry via formatDuration
+    with the plain sentence as the no-params arm: the parametric leaf lives
+    under hudChrome because the apiError catalog is a strict bijection with
+    the code registry). Activity bid/settlement rows are ITEM-NAMED
+    (bidsByAccount/settlementsByAccount join the listing item id via a
+    correlated PK subquery, since the shared unqualified COLS lists make a
+    JOIN ambiguous; '' when the listing is pruned, collapsing to null on
+    the wire; WocActivityBidRow/WocActivitySettlementRow types; FakeDb
+    mirrors; wire pins + value arms updated; the window renders item cells
+    with keys activity:bid:/activity:settle: inside the pinned namespace).
+    The two admin 409 envelope arms emit REGISTERED codes (the 02-owed
+    admin-envelope conversion; serializeAdmin already carries codes; no
+    admin-UI consumer exists in-repo). WocMarketFail gained params (the
+    parsed error body, the ApiError convention) so parametric codes render;
+    fail()/userFacingApiError sites pass params through. Comment truth-ups:
+    the offer-status prose (decline=seller, withdraw=buyer) and the SDK's
+    inverted resolveOffer comment.
+  - REWORDED KEYS FOR THE RELEASE FILL (per Fernando's in-session
+    instruction, existing translations NOT refreshed; the pending-based
+    worklist CANNOT see rewords, so THIS LIST is the release re-translation
+    to-do): hudChrome.wocMarket.termsLabel, rateNote, pausedBanner,
+    sellFeeNote; apiError.woc_market.terms_required, item_mismatch,
+    quote_expired. NEW keys carried ONLY the five forced non-Latin fills
+    (M16 floor): 16 trade.woc keys, 6 walletBridge, 9 wocMarket bond/fail,
+    claimCooldownRetry, termsLink, quoteExpiresAt, bidBindingNote,
+    bidCloseNote, offerNextNote (Latin locales re-pend as usual).
+  - JUDGED, no code change (do not re-raise): the outage-window bond
+    FORFEIT left per R2 (a money-policy call recorded for 22, not 14's);
+    the 06-suggested server-side staged-shape check DECLINED (the table is
+    consensual and visible to both, the money side pins exactly one copy
+    server-side, and a cross-system trade-shape validator adds coupling
+    for no custody hole); keep-last-known-good adoption estimates kept
+    (12's judgment; the immediate-blank rule covers the price-edit case);
+    the trade window's relocalize stays DEFERRED to 15 with the fanout
+    exemption row's reason REWRITTEN to record this round's re-judgment
+    (consent SEND is a boolean judged server-side; live money flows have
+    data motion within a poll beat); the Claudium unknown-message
+    passthrough kept (channel mixes its own localized throws); the
+    daily-rewards/claudium hardcoded-$ fixes taken IN scope (same defect
+    class, and they make the repo-wide sweep pin possible); cancel-intent
+    client marker confirmed already satisfied by 12's badges.
+  - MUTATION/RED registry (for the QA red-proof lane): M1 closed-collapses-
+    to-settled (the H13 defect restored) bit 4 tests across two suites; M2
+    the decline button rendered dead again bit 2; M3 the activity-cancel
+    unbid gate dropped bit the window pin; M4 raw err.message passthrough
+    restored in the bridge module bit 3; the strike-gate mutant (auction
+    arm back to bare strikeAccount) bit the outage service test by name.
+    Development reds observed before their fixes: the one-step payTo driver
+    failed the review-line ladder until the sign step existed; the raw
+    'user declined in wallet' render failed the classified-decline
+    assertion; the wire-pin key sets and the cooldown toBe('claim_cooldown')
+    pins ran red against the new shapes before their updates. NOTE the
+    M2-restore wrong-occurrence trap fired for real (the python restore
+    replaced BOTH ': \'\';' occurrences and left a stray Decline on the
+    awaiting-payment face; caught by re-read, fixed in the same commit).
+  - REVIEW ROUND (three fresh lanes over d3b15f6057..HEAD, coverage
+    prompts; fixes in 6349b61f62): the xplat CRITICAL was the resolved-offer
+    verdict lines being UNREACHABLE (the offers read filtered resolved rows
+    the instant they resolved and my test rode an impossible fixture); the
+    fix extends the closed-listing grace precedent to just-resolved rows on
+    o.updated_at (both resolve paths stamp it), rebuilds the FAKE read to
+    full Pg fidelity (pending AND accepted rows, the listing/settlement
+    join fields, both grace clauses; the old fake was 'pending'-only, a
+    pre-existing gap this pass made load-bearing), and pins the lingering
+    verdict + its exit in the directed pg suite. The coverage lane's four
+    blockers all closed: the send-arm consent mutant (unconsented send
+    pinned FALSE; ok-implies-durable recorded as the semantics), the
+    auction arm's exempt-vocabulary dimension (service_unavailable spares
+    the strike under a healthy oracle; default + forfeit still land, the
+    mid-outage bond state pinned at its observed 'forfeited'), the SDK
+    params echo pin (a real param now rides; params scoped to coded bodies
+    per the apiErrorFromBody convention), and the item-join SQL (both
+    activity reads pinned against real Postgres; the pruned-'' arm is
+    UNREACHABLE under the CASCADE FKs, recorded as defensive). Also landed:
+    throwRefusal takes the WHOLE refusal (params can never be dropped at a
+    call site again), the strict no-prose Claudium classification (a
+    localized fill containing a cancel-family word can never rewrite an
+    unrelated checkout sentence into the cancel copy), hasOwn on the
+    message map, the comment-stripped drift corpus, the widened
+    src/{ui,game,net} usd sweep, per-role delivering-status pins, the
+    retired-ledger re-adoption pin, all three close-time arms with the
+    exact expiry line, the cooldown floor/cap-arm/error-code-params
+    assertions, and the admin envelope proven end to end through
+    withErrors (body = { success:false, data:null, error: <code> }).
+    JUDGED from the round, no change: the raw-source main.ts pin (the
+    naive block-comment strip swallows glob strings; anti-pins fail loud);
+    the "$4.00 USD" doubling in dailyRewards.usd matches its pre-existing
+    sibling call sites (a copy decision for the release fill pass); the
+    bidBindingNote states the strike unconditionally while the gate spares
+    outages, asymmetry in the player's favor.
+  - REVIEWER-DEATH RESIDUAL for the 14-qa session: the frontend-seam lane
+    died silently TWICE (the typed reviewer, then a general-purpose retry;
+    both unresponsive to two nudges each, the 13 round's usage-limit death
+    mode). Their dimensions were covered by a careful main-loop self-review
+    with files open (verdict: no blocking findings; 15-notes recorded: the
+    CLOSED_KEYS log-line table lives in the controller rather than the
+    view core, the consent checkbox carries no data-focus-key across a
+    rebuild, mobile consent-row sizing). The QA session MUST re-run a fresh
+    frontend-seam lane with MOBILE explicitly in scope (the consent row's
+    11px label and the checkbox/link touch targets on a money surface
+    cannot be judged from CSS text; the qa-checklist report flagged the
+    same two residuals).
+  - The qa-checklist agent, presumed dead in the first write of this entry,
+    DELIVERED a full report late: verdict READY, zero blocking, four
+    action items, all applied in the follow-up round below. Its remaining
+    VERIFY items, owned by the QA session: the frontend-seam mobile arm
+    (above); a database-performance lane over the market SQL deltas (the
+    cooldown probes, the correlated item lookups, the offers-read grace OR,
+    and NOW the two indexes the fix round added, which are themselves
+    unreviewed DDL); no scripts E2E click-through covers the consent row,
+    quote review, seller Decline / Cancel sale, or item-named Activity rows
+    (unit-covered only). Pre-existing residuals it surfaced, already owned
+    elsewhere: public/terms.html carries no Marketplace section yet (22's
+    pre-enable audit, TERMS.HTML DRIFT); the sellFeeNote burn/treasury
+    percentages restate service-side tunables with no pin coupling copy to
+    the constants (recorded for 22 with the terms drift).
+  - QA-round fixes (commit after the review-round one): the consent link's
+    var() named a custom property defined NOWHERE so its fallback always
+    won (now var(--gold), matching .wm-terms-link); an explicit closed-deal
+    face in trade_woc_panel so a dead deal can never fall through to the
+    review face and offer Decline / Withdraw (panel pin, both roles); the
+    2s offer poll could never use the pending-only partial indexes once the
+    grace OR landed and seq-scanned per poll, MEASURED on a 200k-row scratch
+    rig (2398 buffers to 206, 6.8ms to 0.15ms) and fixed with two additive
+    non-partial (realm, account, created_at DESC) indexes, existence-pinned
+    in the directed pg suite; the fake's offers read now mirrors ORDER BY
+    created_at DESC LIMIT 50 and stamps real creation clocks (new fidelity
+    suite tests/server/fake_woc_market_db.test.ts).
+  - GATE LESSON (recorded so the QA session does not repeat it): running
+    gate_select with the whole main-checkout .env exported (set -a; source)
+    poisons tests/server/http/characterization.test.ts, whose leaderboard
+    and project-stats goldens expect the empty-degrade payloads of its
+    dummy DATABASE_URL (the file only ||= -defaults it). Seven goldens
+    red against the populated dev db. Pass ONLY TEST_DATABASE_URL on the
+    gate command line; never export DATABASE_URL.
+  - GATE RESULT: node scripts/gate_select.mjs PASS, all 12 steps green
+    (the planner fell back to the FULL vitest suite for this diff, so the
+    pass covers the whole matrix: 41k tests, tsc, all builds, the browser
+    suite, i18n gen + freshness), run on the final committed tree with
+    TEST_DATABASE_URL only, tree clean after. Re-run after the seam round
+    below; the result line for that run is appended at the bottom of this
+    entry.
+  - SEAM ROUND (the two frontend-seam lanes recorded dead above both
+    DELIVERED late, independent and thorough; every finding applied or
+    judged, so the reviewer-death residual is VOID and the QA session's
+    owed re-run narrows to the true VERIFY arms: the mobile E2E/capture
+    pass and the Capacitor _blank check). Applied (one commit): the
+    35-row refill of the five non-Latin overlays for the SEVEN reworded
+    keys (both lanes escalated it: pausedBanner told ja/ko/ru/zh players
+    the OPPOSITE about an in-flight payment, the consent caption and its
+    link named different documents, sellFeeNote asserted the exactness
+    the reword retracted; Latin locales stay on the release list, which
+    now covers ONLY them); the pressed-Pay busy face (deps.paying,
+    disabled + spinner through the claim RTTs); the lapsed-quote guard
+    (Sign re-checks the clock at the click, spends the stale quote with
+    the quote_expired line, Pay re-quotes the HELD settlement; paint-time
+    disabled via deps.nowMs, deliberately outside the sig); focus keys on
+    all seven actionable controls + a capture/restore pin; the mobile
+    touch floors for the consent row and BOTH terms links (40px label,
+    24px box, inline-flex link floors; the Exchange link lacked one too);
+    the sig's quote projection (structural fields, not the transaction
+    blob); WOC_TRADE_CLOSED_KEYS hoisted; rel noreferrer on both links;
+    /terms proxied in dev (it 404ed on :5173); the fanout reason narrowed
+    (the quote review and consent row are deliberately STATIC faces, so
+    "data motion covers it" was false; posture stands on the
+    boolean-not-label ground, 15 owns relocalize + form_draft); the
+    role=status announce on the quote title; the CLAUDE.md caveat that
+    public/terms.html does not yet carry the linked Marketplace section
+    (22's pre-enable publication).
+  - SEAM ROUND JUDGED, no change (rationales the QA session should not
+    re-litigate without new evidence): confirm-refusal keeps the paying
+    face until the 2s poll adopts server truth (a signature may already
+    be broadcast; re-arming Pay invites a second wallet prompt for money
+    in flight; the wallet-DECLINE branch restores because nothing was
+    sent); DECLINE_PROSE stays on for the market wallet sinks (they are
+    sign-only channels where "User rejected the request" is the standard
+    decline; a subclass/symbol marking of bridge-authored throws is the
+    15 hardening); the Claudium collision claim is FALSE at the tip
+    (claudiumCheckoutErrorText passes proseDeclines false, the heuristic
+    never runs there); the usd_text sweep note was stale (the widened
+    src/{ui,game,net} sweep + positive control landed in the review
+    round); the "{amount} USD" suffix doubling stays a release-fill copy
+    decision, now recorded WITH the suffix-locale rationale (drop the
+    suffix when the formatter supplies the currency); canSend/canPay
+    staying un-gated on the checkbox is the Exchange's own posture and
+    the server refusal renders localized (15 may add the hint-ladder
+    arm); the activity item cells pass no instance payload because the
+    wire ships itemId only (a follow-up only if instanced copies trade
+    here); the two bare-named cores follow the local reason_text family
+    and are triple-registered; daily_rewards' err.message line is
+    pre-existing debt outside this pass; the quote-face termsRow stays
+    as belt-and-braces; no focus-steal on the quote face's appearance
+    (the family has no such idiom; role=status announces it).
+  - FOR THE QA SESSION from the seam round: run the mobile E2E arm
+    (scripts/mobile_*.mjs + a landscape capture) over the consent row
+    and quote face; verify the /terms link opens on the Capacitor shells
+    (target=_blank vs the native Browser.open idiom, see
+    src/net/native_discord.ts); the seam fixes themselves are UNREVIEWED
+    code (the review-the-fix-round rule).
+  - GATE, second and third runs: the post-seam-round full run FAILED on
+    exactly one test, the delivery pg suite's finalize-vs-suspend
+    interleave, whose accepted set named only two of the race's three
+    legal serializations: under full-suite load finalize committed WHOLE
+    before suspend took its locks, so the guard correctly refused over
+    the closed listing with not_active while every downstream invariant
+    held (finalized, exactly one sale). Judged a pre-existing
+    outcome-set gap, not a regression (no server code in the round
+    touches that flow); the set now names the third arm with its
+    rationale, and the suite ran green three consecutive times after.
+  - GATE, FINAL: node scripts/gate_select.mjs PASS on the finished tree,
+    all 12 steps green (full-suite fallback, 41k tests incl. the widened
+    interleave, tsc, all builds, the browser suite), TEST_DATABASE_URL
+    only, tree clean after. This is the run the QA session diffs against.
+  - DEFERRED with owners: 15 (visual polish of the NEW faces: the quote
+    review layout, consent-row styling incl. mobile, the activity cancel
+    button placement; plus the standing 15 list: R10 hint dead end,
+    sell-picker lock filter silence, stale TOTP screenshots, wallet busy
+    label, WocMarketWindow behavioral rig, trade-window relocalize
+    decision); 16 (per-actor offer fan-out watch continues; woc_market.ts
+    extraction); 21 (devnet observes the real cooldown params, the bond
+    pending voice, and the quote-review flow end to end); 22 (the
+    outage-forfeit ruling for Fernando; R11; verify both consent surfaces
+    against counsel text; the R9 residual above).
 - 13 listing-step-up (2026-08-16/17, GAME repo, session start 19e4cd87ce =
   the 12 QA docs tip, release sync a no-op at 0 behind origin/release/v0.39.0
   tip d2d1a8ad5c; ~16 code and doc commits to tip 813e2a51e0, LOCAL not pushed

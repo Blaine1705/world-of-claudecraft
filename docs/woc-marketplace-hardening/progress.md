@@ -30,6 +30,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 12 | wire-completeness | game | DONE (QA PASS) | a6ff42f1c5 | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); H8 + env truth + health-rail honesty closed AND the four cross-repo owed items adopted (service-owned bond quote, anti-snipe awaiting_finality allowlist, two-settled-per-memoRef tolerance, verdict localization; asOfMs pass-through verified untouched); 8 code and doc commits to tip bd089672f9 plus the ledger docs commit; four review lanes + a fresh fix-round re-review + qa-checklist READY (0 blocking), every finding applied or judged; ~12 mutants bit by name incl. wire-pin drop/rename, vocab delete, echo recompute, sig drop, env guard both directions; real-SQL suites green zero skips WITH TEST_DATABASE_URL; gate GREEN at the docs tip (gate_select full-suite fallback, all 12 steps, 2854 files / 40604 tests, browser 129, WITH TEST_DATABASE_URL); LOCAL, not pushed per R4 |
 | 12 QA | phase-12-qa | game | DONE | 90c007e36f | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open (section below); release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); ten audit lanes over a6ff42f1c5..bd089672f9 (cross-platform-sync, frontend-seam, test-coverage via Agent; server/client correctness, serializer sweep, fee edges, env sweep, dead code, docs truth via workflow) + red proof (all 7 registry claims reproduced or verified, wire pins exactly 14 red on the pre-fix build) + three mutation batteries (17 round-1: 16 BIT, the one survivor a REAL devSplit pin gap; 18/18 new-pin; 10/10 wave-3); seven fix commits (spine in the section below), the fix round re-reviewed FRESH (two lenses: 1 blocking test gap + 11 should-fix, all applied); qa-checklist READY (0 blocking, 0 should-fix; its adversarial pass independently cleared the ladder, the devsig arm, the browse booleans, the ceil change, and SETTLING_STATES); gate GREEN at 4377a38458 (gate_select full-suite fallback, all 12 steps, 2854 files / 40635 tests + 2 expected fails, browser 129, WITH TEST_DATABASE_URL; the final ledger amendment rides on top docs-only); pushed per R4 (no open PR on this branch, pre-push floor green) |
 | 13 | listing-step-up | game | DONE | 19e4cd87ce | release sync no-op (0 behind origin/release/v0.39.0 tip d2d1a8ad5c); B6 + browser-only-gate medium closed; both rulings recorded first (R1 threshold: step-up on every custody-moving call, no env knob; R10: locked copies refuse listing); step-up challenge protocol (own sibling module + store, real-SQL pg suite), enforcement in both service methods, client flows in both surfaces, TOTP retired; four fresh review lanes + a fresh three-lane re-review of the fix round + qa-checklist READY + migration-safety & database-performance (both PASS, the account-id FK index fixed), every finding applied or judged; 22 mutants across three fix rounds all bit; R11 relink follow-up recorded (pre-enable gate); GATE GREEN at ae1ba36b87 (gate_select full-suite fallback, all 12 steps, 2855 files + browser 19, WITH TEST_DATABASE_URL); LOCAL, not pushed per R4 (13-qa pushes on PASS) |
+| 14 | ux-honesty | game | DONE | d3b15f6057 | release sync NO-OP (v0.39.0 f48c7a3a9b already an ancestor); H13 + wallet-bridge i18n + wocUsdText currency closed, plus the 14-owned deferrals from 02/04/06/07/11/12/13; R9 resolved at session start (Fernando, in the session prompt) and implemented on BOTH consent surfaces; three fresh reviewers (frontend-seam, cross-platform-sync, test-coverage) prompted for coverage; the xplat CRITICAL (the resolved-offer verdict lines were unreachable behind the offers read's status filter) fixed with the grace-window extension + full fake read fidelity + pg pins; every coverage blocker/should-fix/nit applied or judged (registry in the state.md 14 ledger entry); five market pg suites green zero skips WITH TEST_DATABASE_URL; ci:changed exit 0; gate run recorded below; LOCAL, not pushed per R4 (14-qa pushes on PASS) |
 | 13 QA | phase-13-qa | game | DONE (QA PASS) | 220b9b018f | PASS-WITH-FOLLOWUPS, every finding applied or judged; release/v0.39.0 re-synced (merge 220b9b018f, tip f48c7a3a9b, 2 conflicts: i18n pending regenerated + hud.ts ceiling re-derived to 19170; release-merge-audit CLEAN, both usage-limit trap lanes re-run inline); independent mutation battery 21/22 bit, the 1 survivor a REAL safeMessagePiece code+pin gap closed; two code fixes (sanitizer C1/Cf + non-string coerce; window close-reset) + a test-pin batch incl. the devsig-wiring total-bypass pin, all mutation-proven; the fe BLOCKING (R10 lock-hint dead end) reclassified should-fix and deferred to 15 (no custody hole; offer pin always unlocked); gate GREEN (see 13 QA ROUND); pushed per R4 |
 | 14 | ux-honesty | game | NOT STARTED | | |
 | 14 QA | phase-14-qa | game | NOT STARTED | | |
@@ -49,6 +50,67 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
 | 22 QA | phase-22-qa | all three | NOT STARTED | | |
+
+## 14 implement round (UX honesty on the money surface)
+
+Commit spine (all LOCAL, on top of d3b15f6057): 22de5a4107 server honesty
+(shared strike gate incl. the auction arm, claim_cooldown retryAfterSeconds
+end to end, item-named activity reads, admin envelope codes, Refused.params);
+fe5165c2eb trade honesty (closed is not settled + per-reason report lines,
+seller Decline + Cancel sale on both surfaces, expiry line, immediate
+fee-line blanking, below-min hint, item cells + Activity cancel in the
+window, the usd_text extraction); 1de30be50e informed commitment (two-step
+pay with the quote review, pre-bid disclosures incl. offer-next, the R9
+consent rows + /terms links on BOTH surfaces); 76bacd06ed localized money
+surface (wallet_bridge_reason_text + five sinks, the render-time notice
+union, bond pending voice, five specific fail lines, Intl USD everywhere +
+the grep-proof, copy truth-ups); 8a0d55d3ca docs + the quote_expired
+lapse-straddle reword; df79314e15 the changed-files lint floor; 6349b61f62
+the review round's findings (spine in the commit body; the CRITICAL was the
+unreachable resolved-offer verdict lines, fixed at the offers read with the
+grace-window precedent + full fake fidelity + pg pins).
+
+Review round: frontend-seam-reviewer, cross-platform-sync, and
+test-coverage-auditor dispatched FRESH in parallel over d3b15f6057..HEAD,
+each prompted for coverage. The xplat lane found the one CRITICAL above and
+verified the whole params/itemId wire both directions; the coverage lane's
+four blockers (the send-arm consent mutant, the auction exempt-vocabulary
+arm, the SDK params echo pin, the un-covered item-join SQL) and its full
+should-fix/nit list were applied, with three deliberate judgments recorded
+in the state.md ledger (ok-implies-durable consent semantics; the
+mid-outage bond state pinned at its observed 'forfeited'; the raw-source
+main.ts pin because the naive comment strip swallows glob strings). The
+Claudium channel gained the STRICT no-prose classification after the xplat
+lane's latent-misclassification observation. Residual recorded for QA: the
+cooldown SQL rewrite's exact-moment pins live in the pg-gated suite (run
+green here zero-skip; CI has no Postgres leg, the 20-owned posture), with
+the fake-side twins covering both arms on pg-less legs.
+
+QA round: the qa-checklist lane reported late but in full (verdict READY,
+zero blocking). Its four action items landed as 98f4cc1afb: the phantom
+consent-link token (now var(--gold)), the explicit closed-deal face in the
+trade arm (a dead deal can never fall through to Decline / Withdraw), the
+two additive non-partial account indexes the 2s offer poll needs (measured
+on a 200k-row scratch rig, seq scan to BitmapOr, existence-pinned in the pg
+suite), and the fake's ORDER BY created_at DESC LIMIT 50 mirror with real
+creation clocks (new fidelity suite). Remaining VERIFY items and the gate
+env lesson (never export DATABASE_URL around gate_select; the
+characterization goldens read it) are in the state.md ledger for the QA
+session.
+
+Seam round: BOTH frontend-seam lanes recorded dead also delivered late,
+independent and thorough (one blocking + eight should-fix + ten notes;
+two blocking + six should-fix + seven nits), voiding the reviewer-death
+residual. Everything applied or judged in 433841c53f: the 35-row
+non-Latin refill of the seven reworded keys (three stale fills actively
+contradicted the honesty corrections; Latin stays on the release list),
+the pressed-Pay busy face, the lapsed-quote Sign guard + paint-time
+disable, focus keys on every actionable control, the mobile consent-row
+touch floors on both surfaces, the sig's structural quote projection,
+rel noreferrer, the /terms dev proxy, the narrowed language-fanout
+reason, and the CLAUDE.md terms.html caveat. The judged-no-change list
+and the QA session's remaining VERIFY arms (mobile E2E, Capacitor
+_blank) are in the state.md ledger.
 
 ## 13 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
 
