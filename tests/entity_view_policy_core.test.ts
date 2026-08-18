@@ -140,7 +140,7 @@ describe('entity view admission', () => {
   // A dead mob's corpseTimer (60s by default) is independent of its
   // respawnTimer, which for a self-scheduled rare/elite can run far longer
   // (Grix the Tunnelking: 15 to 30 minutes). Without this, a decayed corpse
-  // keeps its view — a rendered, unclickable body — for the whole gap.
+  // keeps its view (a rendered, unclickable body) for the whole gap.
   it('drops a decayed corpse even though nothing hides it and it is not quest-gated', () => {
     const alwaysShow: QuestObjectGate = () => false;
     const decayedCorpse = entity(4, 'mob', { dead: true, corpseTimer: 0 });
