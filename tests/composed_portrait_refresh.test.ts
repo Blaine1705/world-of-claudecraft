@@ -72,7 +72,7 @@ describe('a landed composed portrait reaches its consumers', () => {
     // AFTER the row was built, which is the regression this pins: the row used
     // to repaint only on the assets-ready event and kept the class crest for
     // the session when the capture was the thing it was waiting on.
-    expect(main).toContain('trackComposedRow(row, rebuildChip);');
+    expect(main).toContain('trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));');
     expect(charselectRefresh).toContain('if (!isComposedPortraitKey(key)) return;');
     // The registry outlives one roster load, so the rebuild drops the previous
     // load's rows where the list is cleared.

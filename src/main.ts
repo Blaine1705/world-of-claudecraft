@@ -276,10 +276,8 @@ import {
   inWorldLookFor,
 } from './render/characters/player_look_core';
 import {
-  onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
-  portraitsReady,
   resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
@@ -370,7 +368,7 @@ import {
   maybeShowFirstRunCameraPrompt,
 } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
-import { resetComposedRows, trackComposedRow } from './ui/charselect_composed_refresh';
+import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -6767,24 +6765,9 @@ async function refreshCharacters(): Promise<void> {
           catalog: c.skinCatalog ?? 'class',
         });
       // A composed chip cannot hydrate from data attributes, so the row
-      // re-renders its own chip: once the assets land, and again once the
-      // composed capture behind it lands (the crest shows until then).
-      const rebuildChip = () => {
-        const chip = row.querySelector('.portrait-chip[data-portrait-composed]');
-        if (!chip?.isConnected) return;
-        chip.outerHTML = chipHtml();
-        // The module-scope onPortraitsReady listener in portrait_chip.ts
-        // (which arms crest-image fallbacks document-wide) is registered
-        // at import time, before this per-row callback, so it already ran
-        // by the time the swap above lands new elements in the DOM. Re-arm
-        // this row's fresh badge/portrait img explicitly, or a blocked or
-        // missing crest asset on it never falls back.
-        hydratePortraits(row);
-      };
-      if (charselectLook(c)) {
-        trackComposedRow(row, rebuildChip);
-        if (!portraitsReady()) onPortraitsReady(rebuildChip);
-      }
+      // repaints its own chip once the assets land and again once the composed
+      // capture behind it lands (the crest shows until then).
+      if (charselectLook(c)) trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));
       row.innerHTML = `${chipHtml()}
         <div class="char-id">
           <span class="char-name">${escapeHtml(c.name)}</span>

@@ -127,7 +127,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Lowered after the character-select roster's composed-chip repaint moved
+    // into src/ui/charselect_composed_refresh.ts (net -13).
+    ceiling: 11470,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

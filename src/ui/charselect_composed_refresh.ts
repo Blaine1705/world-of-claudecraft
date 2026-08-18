@@ -1,4 +1,9 @@
-import { isComposedPortraitKey, onPortraitUpdate } from '../render/characters/portrait';
+import {
+  isComposedPortraitKey,
+  onPortraitsReady,
+  onPortraitUpdate,
+  portraitsReady,
+} from '../render/characters/portrait';
 
 /** The character-select roster's repaint hook for composed portraits.
  *
@@ -40,4 +45,34 @@ export function trackComposedRow(row: ComposedRowTarget, rebuild: RowRebuild): v
  *  the previous load stay registered for the rest of the session. */
 export function resetComposedRows(): void {
   tracked.length = 0;
+}
+
+/** The slice of a roster row the chip repaint reads: the row's liveness and
+ *  its composed chip element (an outerHTML swap replaces it). */
+export interface ComposedChipRow extends ComposedRowTarget {
+  querySelector(selector: string): { readonly isConnected: boolean; outerHTML: string } | null;
+}
+
+/**
+ * The roster's own repaint: swap the row's composed chip for a fresh
+ * `chipHtml()` and re-arm its crest fallbacks through `hydrate` (the
+ * module-scope onPortraitsReady arming in portrait_chip.ts ran at import time,
+ * before this row existed, so the fresh img needs its own arming or a blocked
+ * crest asset never falls back). Registered for the landed capture, and also
+ * once for the assets landing when the row is built before the portrait
+ * renderer is ready (the crest shows until then).
+ */
+export function trackComposedChipRow(
+  row: ComposedChipRow,
+  chipHtml: () => string,
+  hydrate: () => void,
+): void {
+  const rebuild = (): void => {
+    const chip = row.querySelector('.portrait-chip[data-portrait-composed]');
+    if (!chip?.isConnected) return;
+    chip.outerHTML = chipHtml();
+    hydrate();
+  };
+  trackComposedRow(row, rebuild);
+  if (!portraitsReady()) onPortraitsReady(rebuild);
 }
