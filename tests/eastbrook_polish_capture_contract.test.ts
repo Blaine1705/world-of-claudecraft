@@ -184,10 +184,11 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
-// Re-minted after extracting the delve interior build-cache scheduling into
-// src/render/delve_interior_tracker.ts (renderer.ts moved again, no capture retaken).
+// Re-minted for the PR #3428 merge: the composite follows the merged
+// renderer.ts bytes (release tip plus self-spirit prewarm). No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f2c08dc012f05502a6a230a2c6d695918d32cb7c90aae03343bfc9e05ce2fe78';
+  '3bdf19b47f6b841e05e618752f8541da1221865704da7883ea29bc7b5358aeb7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -766,12 +766,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the r185 frozen-camera aim fix: the first-order composite
 // follows renderer.ts, then this seal follows the swept evidence bytes. No
 // capture was retaken.
-// Re-minted again after extracting the delve interior build-cache scheduling
-// into src/render/delve_interior_tracker.ts (renderer.ts moved, no capture retaken).
+// Re-minted for the PR #3428 merge: the first-order composite follows the
+// merged renderer.ts bytes (release tip plus self-spirit prewarm), then this
+// seal follows the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '80920e22bd9d4f2224f8b285ea692b1c6fced9c09841ce1db2f0df4cb7bea075';
+  'aee9fbaf6f5151aaae8da061e61e59f98cebc544c855309f2fdda7f3009889c8';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f2c08dc012f05502a6a230a2c6d695918d32cb7c90aae03343bfc9e05ce2fe78';
+  '3bdf19b47f6b841e05e618752f8541da1221865704da7883ea29bc7b5358aeb7';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1774,12 +1775,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the r185 frozen-camera aim fix. The first-order composite
     // follows renderer.ts, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
-    // Re-minted again after extracting the delve interior build-cache
-    // scheduling into src/render/delve_interior_tracker.ts. No capture retaken.
+    // Re-minted for the PR #3428 merge. The first-order composite follows the
+    // merged renderer.ts bytes (release tip plus self-spirit prewarm), then this
+    // second-order performance seal follows the swept evidence bytes. No capture
+    // was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('0c39176f1d37c6831dcd7d2cf263cd822e170358f9a599cf301ba4daac9d61c4');
+    ).toBe('9e8a6ab7bdd5db58d4deacd79850bebaf8dfc2aade7d2a98407f1bab7993d406');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
