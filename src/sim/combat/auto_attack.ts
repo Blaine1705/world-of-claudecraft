@@ -167,8 +167,10 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     t.ownerId === null &&
     t.aiState !== 'evade'
   ) {
-    if (t.aiState === 'idle') ctx.aggroMob(t, p, true);
-    else if (t.aggroTargetId === null) t.aggroTargetId = p.id;
+    if (t.aiState === 'idle' && !ctx.aggroMob(t, p, true)) {
+      p.autoAttack = false;
+      return;
+    } else if (t.aiState !== 'idle' && t.aggroTargetId === null) t.aggroTargetId = p.id;
     addThreat(t, p.id, 1);
     p.combatTimer = 0;
     p.inCombat = true;

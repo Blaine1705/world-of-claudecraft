@@ -692,7 +692,7 @@ export interface SimContextCallbacks {
   fleeMoveSpeed(e: Entity): number;
   // --- mob-AI helpers the dispatcher consults ---
   maybeFlee(mob: Entity, target: Entity): boolean;
-  aggroMob(mob: Entity, target: Entity, social: boolean): void;
+  aggroMob(mob: Entity, target: Entity, social: boolean): boolean;
   isStunned(e: Entity): boolean;
   isRooted(e: Entity): boolean;
   moveSpeedMult(e: Entity): number;
