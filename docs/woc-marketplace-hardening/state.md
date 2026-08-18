@@ -5,9 +5,51 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-15-ui-polish.md` (GAME
-  repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session,
-  newest origin/release/** sync first). 14 QA COMPLETE (2026-08-17,
+- Next file to run: `docs/woc-marketplace-hardening/phase-15-qa.md` (GAME repo,
+  worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session, newest
+  origin/release/** sync first; its PASS requires Fernando's sign-off on the
+  screenshot set, and it is the session that PUSHES per R4).
+- 15 IMPLEMENT COMPLETE (2026-08-18, LOCAL not pushed per R4). Release sync
+  first: merge 3a98604c83 of origin/release/v0.39.0 tip b650d9d7d2, 150
+  commits, NON-trivial (four conflicts), so the `release-merge-audit` skill ran
+  on it: five lanes plus an adversarial verify, 14 verdicts all REAL, every one
+  applied (commits a4fcac14d8, 01faddadf8). Its highest-value catch was a
+  MARKETPLACE defect the release surfaced: the escrow-compensation add-back
+  (`restoreInto`) granted without `movement: true`, so undoing an extraction
+  moved a catalogued relic's Reliquary obtain tally; fixed test-first. It also
+  corrected this phase file's own premises (the capture slug is
+  `docs/screenshots/woc-market/`, the one the five CI sparse cones list; ten of
+  sixteen captures predate the step-up, not all sixteen).
+  The phase itself: the written DESIGN.md audit is
+  `docs/woc-marketplace-hardening/phase-15-design-audit.md` (seven read-only
+  lanes, roughly 215 findings, every row APPLIED / DEFERRED with an owner /
+  JUDGED with a reason), then the work top to bottom in three commits
+  (92da32bbb1 style, e6c054232d test, be35080962 scripts) plus the docs and
+  capture commits. Presentation only: no view-core file changed.
+  Highest-value catches: `var(--accent)` was declared NOWHERE, so seven
+  marketplace declarations shipped resolving to inherit/currentColor (the money
+  row's accent, the net and settled lines, the selected currency toggle, both
+  spinner arcs) and a new css var() resolution ratchet now makes that class
+  impossible; on the mobile sheet the bags window (z 95 !important) covered the
+  ENTIRE trade window, arm included, so a phone player could not reach the offer
+  (the two now split the sheet like the vendor dock, verified in a real 900x420
+  viewport with zero overlap and every control still top-most at its centre);
+  neither money sheet cleared the safe-area insets; the trade arm's spinner was
+  an inline box inside the pressed Pay button, so it never spun; the browse
+  table re-flowed every column on each per-second countdown rebuild; the toast
+  strip shifted the control the player had just pressed; the sell form's money
+  inputs and the arm's price field missed the touch floor; the seller never saw
+  a resolved fee (the note named a percentage the economy SERVICE owns, so the
+  fee now comes from the server's own split for the typed price); the bond note
+  resolved the wrong bid's bond; the paused and suspended lines asserted a cause
+  they cannot know and named only some of the actions they refuse; and the
+  Exchange window had NO behavioral test at all (now
+  `tests/woc_market_window_rig.test.ts`, 21 live cases incl. the busyGen close
+  guard against a competing second run). Captures: the fresh set under
+  `docs/screenshots/woc-market/` (desktop + landscape phone, lowest preset,
+  stress and zero states, and a ru_RU pass for the wordiest fills); every
+  TOTP-bearing capture is gone. Deferrals with owners are in the 15 section of
+  progress.md; the audit checklist is the row-by-row record. 14 QA COMPLETE (2026-08-17,
   PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open,
   PUSHED per R4; release sync merge 8c0370585c of origin/release/v0.39.0 tip
   f42a67f341, trivial). Nine workflow audit lanes + six typed reviewers + the

@@ -336,7 +336,7 @@ pool and pins the predicate on every sort. Every gate above is mutation-tested.
    the settlement machinery so the existing expiry sweep supplies the strike
    and the sale flows into the public history unchanged.
 4. **The trade window's $WOC arm.** The pure view core and panel are
-   `src/ui/trade_woc_view.ts` and `src/ui/trade_woc_panel.ts`; the offer
+   `src/ui/trade_woc_view.ts` and `src/ui/trade_woc_arm_painter.ts`; the offer
    machine (controller plus `woc_trade_offer_view.ts`) lives in
    `src/ui/hud/woc_trade/`. USD entry showing the $WOC equivalent, net AND
    fee from the server split, gold/$WOC mutual exclusivity, filtering to

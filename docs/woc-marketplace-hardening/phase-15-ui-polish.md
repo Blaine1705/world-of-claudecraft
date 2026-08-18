@@ -27,9 +27,11 @@ on desktop and mobile.
 
 The review rates the player UI well built (real pure-core/painter split, ARIA 1.2
 combobox, honest degraded states, thoughtful mobile CSS). Phases 12 to 14 landed the
-behavior fixes. This phase is presentation only, and it is deep, not a touch-up. Every
-committed "after" screenshot currently shows the removed TOTP field and must be
-replaced.
+behavior fixes. This phase is presentation only, and it is deep, not a touch-up. Of the
+sixteen committed captures under `docs/screenshots/woc-market/`, the ten that predate
+the step-up (nine desktop plus `after-mobile-browse.png`) must be re-taken, four of them
+still showing the retired TOTP field; the six 14-QA mobile captures are TOTP-free and
+are re-taken anyway wherever this pass changes their faces.
 
 ## Deliverables
 
@@ -59,8 +61,11 @@ replaced.
 4. Mobile: phone-width layouts, safe areas, touch targets, the landscape-only in-game
    rule; verify with the mobile screenshot scripts.
 5. Fresh before/after screenshot set, desktop AND mobile, at the LOWEST graphics preset
-   (standing memory rule), committed under `docs/screenshots/woc-marketplace/`, every
-   stale TOTP-bearing capture deleted, referenced from the eventual PR body
+   (standing memory rule), committed under `docs/screenshots/woc-market/` (the ONE
+   marketplace capture directory: it is the slug the five CI sparse-cone blocks in
+   `.github/workflows/ci.yml` and `tests/ci_workflow.test.ts` already list, and both
+   rigs default to it; a new slug would need those cones extended in the same change),
+   every stale TOTP-bearing capture deleted, referenced from the eventual PR body
    (`pr-screenshots` skill owns the recipe). Include at least one long-name /
    large-number stress capture per surface, not just pristine data.
 
@@ -73,7 +78,9 @@ refactor of another window is not).
 ## Validation
 
 `npx tsc --noEmit`; the styles/HUD suites the Explore agent identifies plus
-`npx vitest run tests/monolith_budget.test.ts` (hud.ts must not regrow);
+`npx vitest run tests/monolith_budget.test.ts` (hud.ts must not regrow: after the third
+v0.39.0 sync it sits at exactly 19069, zero headroom, like sim.ts 12527, main.ts 11493,
+renderer.ts 13744 and server/game.ts 10807);
 `npm run ci:changed`; the screenshot scripts; commit, then `node scripts/gate_select.mjs`.
 
 ## Reviewers

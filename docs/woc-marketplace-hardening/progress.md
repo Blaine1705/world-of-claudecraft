@@ -33,7 +33,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 14 | ux-honesty | game | DONE (QA PASS) | d3b15f6057 | release sync NO-OP (v0.39.0 f48c7a3a9b already an ancestor); H13 + wallet-bridge i18n + wocUsdText currency closed, plus the 14-owned deferrals from 02/04/06/07/11/12/13; R9 resolved at session start (Fernando, in the session prompt) and implemented on BOTH consent surfaces; three fresh reviewers (frontend-seam, cross-platform-sync, test-coverage) prompted for coverage; the xplat CRITICAL (the resolved-offer verdict lines were unreachable behind the offers read's status filter) fixed with the grace-window extension + full fake read fidelity + pg pins; every coverage blocker/should-fix/nit applied or judged (registry in the state.md 14 ledger entry); five market pg suites green zero skips WITH TEST_DATABASE_URL; ci:changed exit 0; gate run recorded below; LOCAL, not pushed per R4 (14-qa pushes on PASS) |
 | 13 QA | phase-13-qa | game | DONE (QA PASS) | 220b9b018f | PASS-WITH-FOLLOWUPS, every finding applied or judged; release/v0.39.0 re-synced (merge 220b9b018f, tip f48c7a3a9b, 2 conflicts: i18n pending regenerated + hud.ts ceiling re-derived to 19170; release-merge-audit CLEAN, both usage-limit trap lanes re-run inline); independent mutation battery 21/22 bit, the 1 survivor a REAL safeMessagePiece code+pin gap closed; two code fixes (sanitizer C1/Cf + non-string coerce; window close-reset) + a test-pin batch incl. the devsig-wiring total-bypass pin, all mutation-proven; the fe BLOCKING (R10 lock-hint dead end) reclassified should-fix and deferred to 15 (no custody hole; offer pin always unlocked); gate GREEN (see 13 QA ROUND); pushed per R4 |
 | 14 QA | phase-14-qa | game | DONE (QA PASS) | 8c0370585c | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open; release/v0.39.0 re-synced (merge 8c0370585c, tip f42a67f341, trivial); nine workflow audit lanes + six typed reviewers (frontend-seam MOBILE, cross-platform, database-performance, migration-safety, security; test-coverage silent, covered by two mutation batteries: 43 mutants 36 bit + 50 mutants 44 bit, every survivor a real pin gap closed) + the session's own mobile E2E arm (two dev-only rigs measuring the money faces in a landscape phone viewport, six captures) + the Capacitor /terms check (dead on iOS + packaged desktop, rebooted Android; fixed with the wiki_link resolver idiom); fix commits e68227b6bb, d1e3eb2199, ea08ac4711, and 6f67a96057 after a fresh four-lane re-review of the fix round; gate GREEN (see the 14 QA round section); pushed per R4 |
-| 15 | ui-polish | game | NOT STARTED | | |
+| 15 | ui-polish | game | DONE (impl) | 01faddadf8 | release/v0.39.0 re-synced FIRST (merge 3a98604c83, release tip b650d9d7d2, 150 commits, NON-trivial: four conflicts, release-merge-audit run and its findings applied, see the section below); the DESIGN.md conformance audit written first (docs/woc-marketplace-hardening/phase-15-design-audit.md: seven read-only lanes, 215 findings, every row APPLIED, DEFERRED with an owner, or JUDGED with a reason) and then worked top to bottom; presentation only, zero view-core diffs; five commits (a4fcac14d8 + 01faddadf8 from the merge audit, then 92da32bbb1 style, e6c054232d test, be35080962 scripts, plus the docs and capture commits below); highest-value catches: var(--accent) was declared NOWHERE so seven marketplace declarations shipped resolving to inherit/currentColor, the mobile bags sheet covered the whole trade window on touch (the arm unreachable), neither money sheet cleared the safe-area insets, the trade arm's spinner was an inline box that never spun inside the pressed Pay button, the browse table re-flowed every column on each per-second countdown rebuild, the toast strip shifted the control under the pointer, the sell form's money inputs and the arm's price field missed the touch floor, the seller never saw a resolved fee (the note named a percentage the SERVICE owns), the bond note resolved the wrong bid's bond, the paused and suspended lines named a cause they cannot know and actions they do not cover, and the Exchange window had no behavioral test at all; new guards: the css var() resolution ratchet (the --accent class cannot recur), the copy-to-constants pins, the shared token spelling, the widened ticker grep-proof, and tests/woc_market_window_rig.test.ts (the first live rig for WocMarketWindow, 21 cases); LOCAL, not pushed per R4 (15-qa pushes on PASS) |
 | 15 QA | phase-15-qa | game | NOT STARTED | | PASS requires Fernando's screenshot sign-off |
 | 16 | hot-path-scale | game | NOT STARTED | | |
 | 16 QA | phase-16-qa | game | NOT STARTED | | |
@@ -2904,3 +2904,112 @@ green in the clean final run.
   - wocOfferPhase stayed in src/ui/trade_woc_panel.ts while its sibling
     decisions moved to the pure core; a Node-env suite now imports a DOM
     adapter for it (safe today, verified no module-scope DOM): 14/15.
+
+## 15 ui-polish (2026-08-18, GAME repo, IMPLEMENT session)
+
+Release sync first: merge 3a98604c83 brought origin/release/v0.39.0 tip
+b650d9d7d2 (150 commits: the ogre body replacement, the practice-dummy row, the
+NPC-look pass, the login prewarm trim, the ability-description extraction). Four
+conflicts, all resolved from the merged tree rather than from either side:
+hud.ts dropped BOTH contested imports (`AbilityEffect` died with the release's
+`abilityEffectText` extraction; `ALL_CLASSES` is owned by this branch's
+`preview_prewarm_wiring.ts`) and the release's login-trim flags now ride that
+wiring module (three forwarded deps, pinned); the resolved i18n bundles
+regenerated via `i18n:gen`; the armory lifecycle pins keep both sides; the
+monolith rows re-derived to the exact merged counts (hud.ts 19069, sim.ts 12527,
+main.ts 11493).
+
+The `release-merge-audit` skill ran on that merge (non-trivial by its own
+test): five parallel lanes plus an adversarial verify pass over every finding,
+14 verdicts, all REAL. What it caught and what was done:
+
+- `restoreInto` (server/woc_market_custody.ts), the escrow-compensation
+  add-back, granted with `silent: true` alone, so the add hubs ran
+  `noteRelicObtain` and a catalogued relic's Reliquary obtain tally moved every
+  time an extraction was undone. Every sibling relocation grant passes
+  `movement: true`. FIXED test-first (a custody test seeds a catalogued relic,
+  forces the teardown-race undo and asserts the tally does not move; red at 2,
+  green at 1), commit 01faddadf8.
+- The `server/game.ts` monolith row kept 10818 while the merged file is 10807
+  (the release moved the mech-chroma reconcile out), under a comment claiming
+  zero headroom. Re-pinned, commit a4fcac14d8, with the sim.ts row comment
+  corrected to name what actually grew that file and the $WOC firewall's
+  non-vacuity floor moved toward the merged tree's real file count.
+- `src/sim/item_lock_flag.ts`'s extraction rationale went stale when the
+  release dropped `item_lock.ts`'s `./bags` import: reworded to the reason that
+  still holds.
+- This phase file's own premises were corrected before the work started: the
+  capture directory is `docs/screenshots/woc-market/` (the slug the five CI
+  sparse cones list), ten of sixteen captures predate the step-up rather than
+  all sixteen, and the ratchet numbers are the merged ones.
+- Verified clean by the same audit: every branch-owned overlap file keeps both
+  sides' intent, the release added no route, RouteDef, WS command or IWorld
+  member, no injected helper changed shape, no db-mock export list went stale,
+  and the i18n reconcile is a pure regeneration (byte-identical to a fresh
+  build into a scratch dir).
+
+Then the phase proper. The written audit is
+`docs/woc-marketplace-hardening/phase-15-design-audit.md` (produced first, as
+deliverable 1 demands): seven read-only lanes over the merged tree (Exchange
+chrome, trade arm, content robustness, tooltip and disclosure copy, mobile, test
+pins, i18n obligations), roughly 215 findings, each row now APPLIED, DEFERRED
+with an owner, or JUDGED with a reason. Every claim was verified against the live
+token set rather than DESIGN.md prose: `--radius-window`, `--dur-*`,
+`--color-ink-*`, `--panel-fill-strong`, `--color-text-secondary` and
+`--color-accent-hover` have not landed, so the pass composes only tokens that
+exist plus `color-mix()` over them.
+
+Commits: 92da32bbb1 (the presentation pass: CSS, painters, catalog English, the
+five non-Latin overlays, the regenerated bundles), e6c054232d (the live rig, the
+three new guards, the repaired pins), be35080962 (the capture rigs), then the
+docs and capture commits.
+
+### 15 deferrals, each with an owner
+
+- **16 or a wire change.** Copy that still cannot resolve a live figure because
+  it is not on `/status`: the sell-empty line's quality floor and the two
+  collectible switches, the bond schedule for an arbitrary typed bid (5 percent,
+  $1 to $50), and the bond-pending TTL. Each is written figure-free rather than
+  wrong, and `tests/woc_market_copy_figures.test.ts` records the constants so a
+  retune cannot pass silently. Shipping them on `/status` (or a bond-for-amount
+  estimate) is the honest fix.
+- **16.** The mobile detail pane renders below the table on the one-column
+  sheet, so a row tap on a full page paints the bid form off screen. The cure is
+  `scrollIntoView` on select, which is behavior, not presentation.
+- **A behavior pass.** The over-balance red on the trade arm's equivalent line
+  is driven independently of the ranked send hint, so with two problems staged
+  the figure can turn red while the hint names the other one. The ranking lives
+  in the frozen view core.
+- **A behavior pass.** The R10 lock-hint dead end is only half closed: the hint
+  now names the escape (unlock, then re-stage the item), because the robust fix
+  is a sim trade-snapshot refresh with acceptance-reset side effects.
+- **22 (product debt).** `#trade-window` still predates the HUD-chrome dialog
+  contract (no `markDialogRoot`, no focus trap). Adding them changes keyboard
+  and Esc behavior, so it needs its own pass with tests rather than a line in a
+  presentation commit.
+- **The DESIGN.md rollout (1 and 2).** The accent knob's retune, the latent
+  text and ink tokens, the radius and duration families, and the shared
+  primitives the marketplace inherits (`.btn` at 12.5px in the display face,
+  `.panel-title`'s gold, `.x-btn`'s sub-36px target, the 3px focus ring).
+  Restyling them from a marketplace section would be the per-component copy
+  DESIGN.md 13.4 forbids.
+- **A catalog-wide decision.** Title case on buttons (DESIGN.md 5.4): this
+  catalog is mixed, so a marketplace-only sweep would create a new
+  inconsistency and stale every locale row it touched.
+- **Recorded, no change.** The three native `<select>` controls stay native (the
+  themed `.ui-dd` swap is wiring); the Exchange stays a fitted 960x700 rather
+  than the large-window target; the store's dead portrait media query stays;
+  insetting the SHARED mobile sheet base for all 24 windows is a maintainer
+  call, so this pass insets only the two money sheets it owns.
+
+### 15 items closed from earlier phases' deferral lists
+
+The `refreshWocTradeArm` write cache now lives in a real painter file
+(`trade_woc_arm_painter.ts`, registered in the perf gate with an exact write
+allowance); `updateTradeWindow` resolves `#trade-window` once per controller
+instead of on every medium-band tick; the log-tone triple is named once
+(`woc_log_tones.ts`); the `[hud]` render-catch prefix names its own module; the
+sell picker says why a locked copy is missing; the wallet busy label appears
+only at the handoff that actually opens a wallet (never during the challenge
+mint, never in the dev economy's devsig arm); and the stale TOTP-bearing
+captures are replaced by the fresh set below.

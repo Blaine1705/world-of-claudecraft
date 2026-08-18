@@ -63,6 +63,12 @@ the throw (#2499, #2502).
   `tests/fct_mobile_css.test.ts`.
 - **Bug fixes are test-first** (root `CLAUDE.md` owns the workflow); the guard tests above
   are where the new pins land.
+- **A `var(--name)` read must name something that DECLARES it.** `tests/css_token_resolution.test.ts`
+  resolves every fallback-free `var()` in this directory against the sheets, the
+  `themeCssVars` emissions and the inline `--name:` setters, with today's known-undeclared
+  names ratcheted as an exact set (a new one fails; a fixed one must leave the list). It
+  exists because `var(--accent)`, defined nowhere, shipped for months resolving to
+  `inherit` / `currentColor` on the marketplace's accent text and both spinner arcs.
 
 ## Token system + NO magic values in painters
 - **Tokens, not literals.** Colors, accents, and tunables live as `--color-*` / `--fx-*`

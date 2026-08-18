@@ -629,10 +629,23 @@ same file), and each module's header carries its own contract.
   multi-unit durations (countdowns, the claim cooldown's retry time, the p2p payment
   hold) through `duration_text.ts`, never a raw `formatDuration` seconds count. The
   seller's Cancel gate is ONE predicate, `canCancelListing` in the view core, for the
-  browse detail pane and the Activity rows alike.
+  browse detail pane and the Activity rows alike. TOKEN figures spell through
+  `woc_tokens_text.ts` (one fraction-digit count for the Exchange, the trade arm and the
+  bag chip, which each formatted their own; `tests/woc_tokens_text.test.ts` pins that no
+  caller re-spells them), and the bag's balance chip itself is `woc_balance_chip.ts`, not
+  a `hud.ts` member. BEHAVIOR lives in `tests/woc_market_window_rig.test.ts` (the real
+  window over happy-dom with a recording fake client: the busyGen close guard, the poll
+  gate, the draft and focus carry, the combobox, the settlement faces);
+  `tests/woc_market_window.test.ts` is its source-scan twin and holds only what a regex
+  can (no magic values, no layout read, no driver, CSS specificity order, class
+  coverage). Copy that spells a server rule in words (the anti-snipe window, the Buy Now
+  hold and cooldowns, the strike ladder) is pinned to those constants in
+  `tests/woc_market_copy_figures.test.ts`; the seller's fee is RESOLVED from the
+  estimate's split rather than named as a percentage, because the schedule is economy
+  SERVICE configuration and is not on `/status`.
   The trade window's $WOC arm is `trade_woc_view.ts` (pure model: faces, the fee block
   for both sides, the buyer's commitment note, review/delivering status keys) plus the
-  cold painter `trade_woc_panel.ts`, driven by `hud/woc_trade/` (the controller and
+  cold painter `trade_woc_arm_painter.ts`, driven by `hud/woc_trade/` (the controller and
   `woc_trade_offer_view.ts`, which owns `wocOfferPhase`/`wocOfferClosedReason`: 'settled'
   requires resolution 'sold', a closed-not-sold listing is 'closed', a delivered or
   review-parked settlement is still 'paying'). The controller keys the claimed
@@ -640,7 +653,7 @@ same file), and each module's header carries its own contract.
   the deal still standing, and holds the local 'paying' face only while a signature is
   out with the wallet (never through the claim round trips).
   Both consent controls satisfy draft Terms 10.3: the Exchange checkbox and the
-  trade arm's consent row (`trade_woc_panel.ts`) share ONE label key, link the
+  trade arm's consent row (`trade_woc_arm_painter.ts`) share ONE label key, link the
   Marketplace terms, and send the player's REAL choice; the R9 hard-coded
   `acceptTerms: true` posture is closed (`docs/woc-marketplace-hardening/state.md`).
   The link's href comes from `terms_link.ts` (same-origin on the site, the canonical
