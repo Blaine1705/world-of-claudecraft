@@ -56,7 +56,14 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
+    // Merging PR #3428 atop the castle repin lands at the exact merged count
+    // below; any further growth reds again.
+    ceiling: 19492,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -80,7 +87,15 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging release/v0.39.0: upstream re-pinned 13754 (its own extractions),
+    // this branch pinned 13680; the merged file is the exact count below, so the
+    // ceiling follows it per the ratchet's merge rule (any further growth reds).
+    // Merging PR #3428 with the release tip lands below both parent pins, so
+    // the ratchet tightens to the exact merged count.
+    ceiling: 13686,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

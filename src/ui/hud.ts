@@ -16733,12 +16733,21 @@ export class Hud {
    *  here with the real preview thunks. `includeCharFamily` is forwarded
    *  verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
   private postEntryPreviewPrewarmUnits(includeCharFamily: boolean): PreviewPrewarmUnit[] {
+    // Login trims the schedule to what the local player hits unprompted or
+    // cheaply: skins only for a fixed rig (a modular body ignores the char-skin
+    // setSkin), no card poses (rare, lazy on Player Card open), headshots only
+    // (body is Inspect-only, lazy on open). See each flag's doc on the plan.
+    const self = this.sim.player;
+    const looksModular = !isMechWearer(self) && modularLookFor(self) != null;
     return buildPostEntryPreviewPrewarmUnits<(typeof CARD_POSES)[number]>({
       playerClass: this.sim.cfg.playerClass,
       allClasses: ALL_CLASSES,
       skinCount,
       cardPoses: CARD_POSES,
       includeCharFamily,
+      warmCharSkins: !looksModular,
+      includeCardPoses: false,
+      portraitFramings: ['headshot'],
       renderCharShell: () => {
         if (!this.charPreview) this.charWindow.render();
       },
