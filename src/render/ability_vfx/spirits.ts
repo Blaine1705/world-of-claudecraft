@@ -3,6 +3,7 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { ABILITIES } from '../../sim/data';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { loadGltf } from '../assets/loader';
+import { noteSpiritSpawnRefused } from '../gpu_prep_events';
 import { clamp01 } from '../num_clamp';
 
 // Spirit apparitions (the gallery's spawnSpirit/updateSpirits): ghost-tinted
@@ -438,14 +439,21 @@ export class SpiritApparitions {
     // wear the same shared ghost material as its skinned ones, and each of
     // those mesh kinds is its own program, so drawing an ungated puppet links
     // them inside a combat frame (production 2026-08-18: three programs, 59.5
-    // ms, the run's only live escape). The spirit is ONE layer of a ceremony
-    // that plays without it (the caller still draws its ring, burst and light
-    // pulse), so a refused spawn is the same silent miss a model still in
-    // flight already takes, and the puppet goes to the front of the warm-up
-    // queue so the next cast has it. Hosts without a gate keep the historical
+    // ms, the run's only live escape). The spirit is ONE optional beat of
+    // an impact sequence that runs without it (sequencer.ts keeps the impact
+    // flash, the shake, the archetype extras, the motifs and the linger
+    // whatever this answers; what goes with the spirit is its own entrance
+    // dust, ring and light pulse in fx.ts spiritAt, which play only on a
+    // successful spawn), so a refused spawn is the same silent miss a model
+    // still in flight already takes, and the puppet goes to the front of the
+    // warm-up queue so the next cast has it. Hosts without a gate keep the historical
     // one-frame visible compile pass and spawn immediately.
     if (this.compileGate && !puppet.compiled) {
       this.warmNext(puppet);
+      // Counted in perfStats().gpuPrep: a refusal is a cast the player made
+      // whose spirit layer never appeared, so how often the gate fires is the
+      // measure of whether the trade stays fair.
+      noteSpiritSpawnRefused();
       return false;
     }
     let slot: SpiritSlot | null = null;

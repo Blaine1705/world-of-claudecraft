@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SpiritApparitions } from '../src/render/ability_vfx/spirits';
+import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 
 const loadGltf = vi.fn();
 
@@ -130,7 +131,10 @@ async function warmOnePuppet(pool: SpiritApparitions, probe: PuppetProbe): Promi
 beforeEach(() => {
   loadGltf.mockReset();
   loadGltf.mockResolvedValue(skinnedGltf());
+  resetGpuPrepEventsForTest();
 });
+
+const refusedSpawns = (): number => gpuPrepEventsSnapshot().gates.spiritSpawnsRefused;
 
 describe('the gated puppet warm-up', () => {
   it('never makes the compile group visible', async () => {
@@ -356,6 +360,39 @@ describe('every material the puppet can draw goes through the gate', () => {
     expect(puppet.compiled).toBe(true);
     expect(pool.spawn({ ...SPAWN })).toBe(true);
     expect(pool.activeCount()).toBe(1);
+  });
+
+  it('counts every refused spawn in the gpu-prep capture, and only those', async () => {
+    // The gate refuses rather than holds, so the cast simply has no spirit
+    // layer. That is fair only while it stays rare, and a capture is the only
+    // way to know: nothing about a missing spectacle beat is visible
+    // otherwise. The count must be of GATE refusals alone, never of the misses
+    // the pool already took before it (a model still loading, both slots run).
+    const { pool, probe } = makePool();
+    pool.setCompileGate(() => new Promise(() => {}));
+
+    // A model that has not loaded yet is not a gate refusal: it is the
+    // historical silent miss, and counting it would drown the signal.
+    expect(pool.spawn({ ...SPAWN })).toBe(false);
+    expect(refusedSpawns()).toBe(0);
+
+    await vi.waitFor(() => expect(probe.puppets.has(WOLF)).toBe(true));
+    const puppet = probe.puppets.get(WOLF);
+    expect(puppet).toBeDefined();
+    if (!puppet) return;
+    expect(puppet.compiled).toBe(false);
+
+    expect(pool.spawn({ ...SPAWN })).toBe(false);
+    expect(pool.spawn({ ...SPAWN })).toBe(false);
+    expect(refusedSpawns()).toBe(2);
+    expect(pool.activeCount()).toBe(0);
+
+    // A host with NO gate keeps the historical immediate spawn, so it can
+    // never refuse and never counts.
+    const { pool: ungated, probe: ungatedProbe } = makePool();
+    await warmOnePuppet(ungated, ungatedProbe);
+    expect(ungated.spawn({ ...SPAWN })).toBe(true);
+    expect(refusedSpawns()).toBe(2);
   });
 
   it('warms a refused NON-tail puppet first, ahead of the rest of the queue', async () => {

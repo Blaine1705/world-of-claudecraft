@@ -8,6 +8,7 @@ import {
   noteRevealRootPiecewise,
   noteRevealRootReach,
   noteRevealRootsAtWatchdog,
+  noteSpiritSpawnRefused,
   recordGpuPrepEvent,
   resetGpuPrepEventsForTest,
   setGpuPrepClockForTest,
@@ -46,6 +47,7 @@ describe('gpu preparation event ring', () => {
       rootsAtWatchdog: 0,
       imminentHolds: 0,
     });
+    expect(snapshot.gates).toEqual({ spiritSpawnsRefused: 0 });
   });
 
   it('records an event with its kind, key, age, and a clock stamp', () => {
@@ -313,5 +315,30 @@ describe('gpu preparation reveal counters', () => {
       rootsAtWatchdog: 0,
       imminentHolds: 0,
     });
+  });
+});
+
+describe('gpu preparation gate counters', () => {
+  it('counts a refused spirit spawn without minting an event kind', () => {
+    // The spirit compile gate REFUSES rather than holds: the cast simply has
+    // no apparition, which nothing else in a capture could say. It is a
+    // counter and not an event because it can fire once per cast in a fight,
+    // and a population of them would flush the ring of everything rarer.
+    noteSpiritSpawnRefused();
+    noteSpiritSpawnRefused();
+    noteSpiritSpawnRefused();
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.gates.spiritSpawnsRefused).toBe(3);
+    expect(snapshot.total).toBe(0);
+    expect(snapshot.events).toEqual([]);
+    // ...and it is its OWN population: none of the reveal counters moved.
+    expect(snapshot.reveal.keysHeld).toBe(0);
+    expect(snapshot.reveal.rootsHeld).toBe(0);
+  });
+
+  it('reset clears the gate counters too', () => {
+    noteSpiritSpawnRefused();
+    resetGpuPrepEventsForTest();
+    expect(gpuPrepEventsSnapshot().gates).toEqual({ spiritSpawnsRefused: 0 });
   });
 });

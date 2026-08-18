@@ -11,8 +11,10 @@ import {
   anyCharacterRigDrawing,
   applyCharacterFormVisibility,
   ENTITY_GATE_STAND_INS,
+  type EntityGateStandIn,
   entityHasNoBody,
 } from '../src/render/entity_gate_stand_in_core';
+import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 
 // THE INVERSE INVARIANT of the live compile gates: never leave an entity with
 // no representation. A gate exists so a still-linking program is not drawn; it
@@ -22,8 +24,45 @@ import {
 // ENTITY_GATE_STAND_INS, this file drives that stand-in, and the coverage pin
 // below reds on any gate call site that has not registered one.
 
-const rendererSource = () =>
-  readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+const sourceOf = (path: string): string =>
+  readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+
+/**
+ * Where each gate's call sites live, and the text that IS a call site there.
+ * The scan below is only as wide as this table, so a gate shape missing from
+ * it is a gate nobody has to register: the case after it diffs the table
+ * against the gate names the registry uses, both ways.
+ *
+ * `spiritCompileGate` is the one that is not a renderer wrapper. The puppet
+ * pool takes the host's gate through `setSpiritCompileGate` and consults it in
+ * its own spawn, so the call site is that consult.
+ */
+const GATE_CALL_SITES: readonly {
+  gate: EntityGateStandIn['gate'];
+  file: string;
+  marker: string;
+}[] = [
+  {
+    gate: 'gateViewOnCompile',
+    file: 'src/render/renderer.ts',
+    marker: 'this.gateViewOnCompile(',
+  },
+  {
+    gate: 'gateSwapOnCompile',
+    file: 'src/render/renderer.ts',
+    marker: 'this.gateSwapOnCompile(',
+  },
+  {
+    gate: 'gateSwapFlagOnCompile',
+    file: 'src/render/renderer.ts',
+    marker: 'this.gateSwapFlagOnCompile(',
+  },
+  {
+    gate: 'spiritCompileGate',
+    file: 'src/render/ability_vfx/spirits.ts',
+    marker: 'this.compileGate && !puppet.compiled',
+  },
+];
 
 function rig(visible: boolean): { root: { visible: boolean }; setActive(on: boolean): void } {
   const node = {
@@ -58,11 +97,19 @@ describe('entity gate stand-in registry', () => {
     }
   });
 
-  it('covers every live gate call site in the renderer (a new gate must register one)', () => {
-    const gates = ['gateViewOnCompile', 'gateSwapOnCompile', 'gateSwapFlagOnCompile'] as const;
-    const lines = rendererSource().split('\n');
-    for (const gate of gates) {
-      const callSites = lines.filter((line) => line.includes(`this.${gate}(`));
+  it('scans every gate shape the registry names, and no phantom one', () => {
+    // The scan can only see what GATE_CALL_SITES lists, so a gate shape
+    // missing from it would silently need no stand-in at all.
+    expect(new Set(GATE_CALL_SITES.map((entry) => entry.gate))).toEqual(
+      new Set(ENTITY_GATE_STAND_INS.map((row) => row.gate)),
+    );
+    expect(GATE_CALL_SITES.length).toBe(4);
+  });
+
+  it('covers every live gate call site (a new gate must register one)', () => {
+    for (const { gate, file, marker } of GATE_CALL_SITES) {
+      const lines = sourceOf(file).split('\n');
+      const callSites = lines.filter((line) => line.includes(marker));
       expect(callSites.length, `${gate} has call sites`).toBeGreaterThan(0);
       const registered = ENTITY_GATE_STAND_INS.filter((row) => row.gate === gate);
       for (const line of callSites) {
@@ -72,8 +119,10 @@ describe('entity gate stand-in registry', () => {
           `unregistered ${gate} call site (name its stand-in in ENTITY_GATE_STAND_INS): ${line.trim()}`,
         ).toBeTruthy();
       }
-      // ...and no row may pin a call site that has been moved or dropped.
+      // ...and no row may pin a call site that has been moved or dropped, in
+      // a file the scan does not read.
       for (const row of registered) {
+        expect(row.file, `${row.callSite} is scanned where it says it lives`).toBe(file);
         expect(
           callSites.some((line) => line.includes(row.callSite)),
           `stale registry row: ${row.callSite}`,
@@ -147,6 +196,36 @@ describe('entity gate stand-ins actually stand in', () => {
     const body = rig(true);
     expect(anyCharacterRigDrawing(slots({ visual: body }))).toBe(true);
     expect(entityHasNoBody(false, true, true)).toBe(false);
+  });
+
+  it('spirit gate: the impact sequence plays on without the apparition', () => {
+    // The one gate that REFUSES instead of holding: a spirit that pops in late
+    // is worse than one that never came. What stands in is the rest of the
+    // impact sequence, so the claim to check is that the sequencer's other
+    // beats do not depend on the spirit answer.
+    const sequencer = sourceOf('src/render/ability_vfx/sequencer.ts');
+    const spiritAt = sequencer.indexOf('host.spiritAt?.(');
+    expect(spiritAt).toBeGreaterThan(0);
+    // Every impact beat above it runs unconditionally; only the apparition's
+    // own bookkeeping and its creature call sit inside the guard.
+    expect(sequencer.indexOf('this.archetypeImpact(host, slot, gy);')).toBeLessThan(spiritAt);
+    expect(sequencer.indexOf('host.shakeAt(')).toBeLessThan(spiritAt);
+    expect(
+      sequencer.indexOf('if (spec.motifs && slot.tier <= 1) this.runMotifs(host, slot);'),
+    ).toBeGreaterThan(spiritAt);
+    const guarded = sequencer.slice(spiritAt, sequencer.indexOf('impact-phase motifs', spiritAt));
+    expect(guarded).toContain('host.countPrimitive(slot.abilityId, 1);');
+    expect(guarded).toContain("host.abilityAudio?.('spirit',");
+
+    // The refusal is silent by construction: spawn just answers false.
+    const spirits = sourceOf('src/render/ability_vfx/spirits.ts');
+    const refusal = spirits.indexOf('if (this.compileGate && !puppet.compiled) {');
+    expect(refusal).toBeGreaterThan(0);
+    expect(spirits.slice(refusal, refusal + 400)).toContain('noteSpiritSpawnRefused();');
+
+    // ...and the refusals are readable in a capture rather than invisible.
+    resetGpuPrepEventsForTest();
+    expect(gpuPrepEventsSnapshot().gates.spiritSpawnsRefused).toBe(0);
   });
 
   it('counts the bespoke fireball travel body, and leaves rigless object views alone', () => {

@@ -396,6 +396,7 @@ function snapshot(): PerfSnapshot {
             rootsAtWatchdog: 0,
             imminentHolds: 0,
           },
+          gates: { spiritSpawnsRefused: 0 },
         },
       },
       autoGovernor: true,

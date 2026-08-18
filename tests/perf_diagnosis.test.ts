@@ -188,6 +188,7 @@ function baseSnapshot(): PerfSnapshot {
             rootsAtWatchdog: 0,
             imminentHolds: 0,
           },
+          gates: { spiritSpawnsRefused: 0 },
         },
       },
     },

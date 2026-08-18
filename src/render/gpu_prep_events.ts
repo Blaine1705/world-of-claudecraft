@@ -107,6 +107,20 @@ export interface GpuPrepRevealCounters {
   imminentHolds: number;
 }
 
+/**
+ * Lifetime totals for the gates that REFUSE rather than hold: a gate whose
+ * subject is a one-shot spawn cannot defer it, so the entity is simply not
+ * drawn this time and its stand-in carries the moment alone. That is a fair
+ * trade only while it stays rare, and nothing else in a capture could say how
+ * often it fired.
+ */
+export interface GpuPrepGateCounters {
+  /** Spirit apparitions the puppet compile gate refused to put on stage
+   *  because the puppet's programs were still linking (ability_vfx/spirits).
+   *  The cast's ring, burst and light pulse still play. */
+  spiritSpawnsRefused: number;
+}
+
 export interface GpuPrepEventsSnapshot {
   /** Events recorded since the last reset, across every kind. */
   total: number;
@@ -116,6 +130,7 @@ export interface GpuPrepEventsSnapshot {
   /** Oldest to newest, at most GPU_PREP_EVENT_RING_SIZE entries. */
   events: readonly Readonly<GpuPrepEvent>[];
   reveal: Readonly<GpuPrepRevealCounters>;
+  gates: Readonly<GpuPrepGateCounters>;
 }
 
 const defaultNow = (): number =>
@@ -156,6 +171,10 @@ const reveal: GpuPrepRevealCounters = {
   imminentHolds: 0,
 };
 
+const gates: GpuPrepGateCounters = {
+  spiritSpawnsRefused: 0,
+};
+
 /** A non-negative finite count, so a caller's bad arithmetic cannot poison a
  *  lifetime total that a capture reads back as truth. */
 const countOf = (value: number | undefined): number =>
@@ -192,6 +211,11 @@ export function noteRevealRootsAtWatchdog(count: number): void {
 /** An imminent consult marked a key (reveal_gate_core). */
 export function noteRevealImminentHold(): void {
   reveal.imminentHolds++;
+}
+
+/** The spirit compile gate refused one spawn (ability_vfx/spirits). */
+export function noteSpiritSpawnRefused(): void {
+  gates.spiritSpawnsRefused++;
 }
 
 export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
@@ -232,6 +256,7 @@ const snapshot: GpuPrepEventsSnapshot & { events: GpuPrepEvent[] } = {
   counts,
   events: snapshotEvents,
   reveal,
+  gates,
 };
 
 /**
@@ -261,4 +286,5 @@ export function resetGpuPrepEventsForTest(): void {
   reveal.rootsReach = 0;
   reveal.rootsAtWatchdog = 0;
   reveal.imminentHolds = 0;
+  gates.spiritSpawnsRefused = 0;
 }

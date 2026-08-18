@@ -109,8 +109,10 @@ export function entityHasNoBody(
 
 /** One live compile-gate call site and the representation that survives it. */
 export interface EntityGateStandIn {
-  /** the gate wrapper the call site invokes */
-  gate: 'gateViewOnCompile' | 'gateSwapOnCompile' | 'gateSwapFlagOnCompile';
+  /** the gate wrapper the call site invokes. `spiritCompileGate` is the one
+   *  that is not a renderer wrapper: the puppet pool takes the host's gate
+   *  through `setSpiritCompileGate` and consults it inside its own spawn. */
+  gate: 'gateViewOnCompile' | 'gateSwapOnCompile' | 'gateSwapFlagOnCompile' | 'spiritCompileGate';
   /** repo-relative source file the call site lives in */
   file: string;
   /** exact call-site text, so the pin fails when the wiring moves or is dropped */
@@ -170,5 +172,14 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     callSite: 'if (changed) for (const node of changed) this.gateSwapOnCompile(node);',
     hides: 'only the swapped weapon, offhand or weapon-skin node',
     standIn: 'the whole character, which keeps animating and drawing',
+  },
+  {
+    gate: 'spiritCompileGate',
+    file: 'src/render/ability_vfx/spirits.ts',
+    callSite: 'if (this.compileGate && !puppet.compiled) {',
+    hides:
+      'the spirit apparition of ONE cast, plus the entrance beat fx.ts spiritAt plays only on a successful spawn (its dust, its ring and its light pulse) and the creature call: the gate REFUSES the spawn rather than holding it, because a spirit that pops in late is worse than one that never came, and the puppet goes to the front of the warm-up queue for the next cast',
+    standIn:
+      "the rest of the ability's impact sequence, which sequencer.ts runs whatever spiritAt answers: the impact flash and shake, the archetype extras, the motifs and the authored linger. The apparition is one optional beat of a spectacle, never the entity a player acts on, and the refusals are counted as gpuPrep.gates.spiritSpawnsRefused",
   },
 ];
