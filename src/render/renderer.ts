@@ -446,6 +446,7 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import { createPostEffectPrewarmLane } from './post_effect_prewarm';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
   createPrewarmCompileLifecycle,
@@ -521,6 +522,8 @@ import {
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
 import {
   beginRendererFrameTelemetry,
+  emptyFramePhaseMs,
+  emptyWorldPhaseMs,
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
@@ -1153,38 +1156,6 @@ function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
   root.traverse((o) => {
     if ((o as THREE.Mesh).isMesh && (o as THREE.Mesh).castShadow) into.push(o);
   });
-}
-
-function emptyFramePhaseMs(): RendererFramePhaseMs {
-  return {
-    setup: 0,
-    entities: 0,
-    world: 0,
-    nameplates: 0,
-    submit: 0,
-    total: 0,
-  };
-}
-
-function emptyWorldPhaseMs(): RendererWorldPhaseMs {
-  return {
-    lights: 0,
-    water: 0,
-    terrain: 0,
-    props: 0,
-    foliage: 0,
-    fish: 0,
-    ambientScenery: 0,
-    zoneVisibility: 0,
-    zoneFeatures: 0,
-    vfx: 0,
-    camera: 0,
-    ambience: 0,
-    shadows: 0,
-    sky: 0,
-    sunSprites: 0,
-    godRays: 0,
-  };
 }
 
 function emptyFoliagePerfStats(): FoliagePerfStats {
@@ -5845,6 +5816,14 @@ export class Renderer {
     const landmarkSlot = createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>
       buildImpactSitePrewarmGroup(this.impactSite.group, p.pos),
     );
+    const postEffectLane = createPostEffectPrewarmLane({
+      webgl: this.webgl,
+      camera: this.camera,
+      scene: this.scene,
+      post: () => this.post,
+      offscreenTarget: () => (this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8)),
+      awaitDeadlineMs: () => compileAwaitDeadline,
+    });
     let surfaceDetailTexturesWarmed = 0;
 
     let renderPasses = 0;
@@ -6874,6 +6853,21 @@ export class Renderer {
             this.prewarmMaterialTextures(renderable.material);
           });
         },
+      },
+      {
+        // The composer's full-screen passes are the one draw path no compile
+        // root reaches: their materials wear no scene object, so the settle
+        // render below is the first thing that ever draws them and linked all
+        // sixteen inside that one frame (496.1 ms, production 2026-08-18).
+        // Ordered here so both output-colour-space variants are linked before
+        // world.initial-frame runs the composer for real.
+        id: 'post.effect-programs',
+        category: 'post',
+        priority: 68,
+        required: false,
+        resumeUnits: postEffectLane.units,
+        run: postEffectLane.run,
+        detail: postEffectLane.detail,
       },
       {
         // A 2k RGBA16F dome upload blocked a live Mirefen frame for 183ms.

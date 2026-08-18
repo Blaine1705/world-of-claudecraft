@@ -84,6 +84,7 @@ const MANIFEST_IDS = [
   'vfx.atlas',
   'vfx.weapon-skins',
   'vfx.ability-primitives',
+  'post.effect-programs',
   'sky.nearby-biomes',
   'world.initial-frame',
   'programs.compile',
@@ -311,6 +312,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'programs.compile-submit',
       'textures.scene',
       'surface-detail.textures',
+      'post.effect-programs',
     ]) {
       expect(manifestIds.has(id), `debt id ${id} is not a manifest entry`).toBe(true);
       expect(prewarmResumeIsDebt(id)).toBe(true);

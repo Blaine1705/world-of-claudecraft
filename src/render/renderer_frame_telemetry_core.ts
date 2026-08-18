@@ -26,6 +26,40 @@ export interface RendererWorldPhaseMs {
   godRays: number;
 }
 
+/** The zero frame-phase record. Lives with the type it zeroes: renderer.ts
+ *  only ever needs a fresh one, never the literal that spells it out. */
+export function emptyFramePhaseMs(): RendererFramePhaseMs {
+  return {
+    setup: 0,
+    entities: 0,
+    world: 0,
+    nameplates: 0,
+    submit: 0,
+    total: 0,
+  };
+}
+
+export function emptyWorldPhaseMs(): RendererWorldPhaseMs {
+  return {
+    lights: 0,
+    water: 0,
+    terrain: 0,
+    props: 0,
+    foliage: 0,
+    fish: 0,
+    ambientScenery: 0,
+    zoneVisibility: 0,
+    zoneFeatures: 0,
+    vfx: 0,
+    camera: 0,
+    ambience: 0,
+    shadows: 0,
+    sky: 0,
+    sunSprites: 0,
+    godRays: 0,
+  };
+}
+
 export interface RendererFrameTimingSink {
   submitMs: number;
   totalMs: number;

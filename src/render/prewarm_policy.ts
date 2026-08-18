@@ -57,6 +57,12 @@ export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primi
  * monolith and the initial frame, the two consumers the alignment mostly
  * serves. */
 export const BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE: readonly string[] = [
+  // post.effect-programs is not a whole-scene submit, but without the
+  // extension its compileAsync links the composer's whole full-screen chain
+  // synchronously, and the frame that would otherwise link it
+  // (world.initial-frame) is skipped here too: the cost is the same either
+  // way, so it is not worth an uninterruptible block inside the entry window.
+  'post.effect-programs',
   'world.settle-state',
   'world.initial-frame',
   'programs.compile-submit',
@@ -322,6 +328,9 @@ export function prewarmSubmitShouldStop(
  * a specific event, so its dropped units pay on the debt arm too.
  */
 const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
+  // The composer's full-screen chain draws on EVERY frame, not on an event,
+  // so a dropped post.effect-programs is ambient debt of the purest kind.
+  'post.effect-programs',
   'programs.compile',
   'programs.compile-submit',
   'textures.scene',
