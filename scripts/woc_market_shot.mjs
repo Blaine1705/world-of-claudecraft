@@ -101,6 +101,13 @@ const BUY_NOW_ITEM = 'wyrmshadow_harness';
 fs.mkdirSync(OUT, { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// One assertion ledger for the whole run (the desktop stress arm asserts its
+// rows opened, the mobile arm its floors), drained at the end.
+const fails = [];
+const check = (cond, msg) => {
+  console.log(`${cond ? 'OK  ' : 'FAIL'}  ${msg}`);
+  if (!cond) fails.push(msg);
+};
 const uniq = Date.now().toString(36).slice(-6);
 // Character names are letters only (2 to 16), so the name suffix maps digits
 // onto letters; usernames may keep the raw base36.
@@ -158,6 +165,38 @@ async function stepUpFor(token, secret, params) {
   const c = ch.body.challenge ?? ch.body;
   const signature = bs58.encode(ed25519.sign(new TextEncoder().encode(c.message), secret));
   return { nonce: c.nonce, signature };
+}
+
+/** Log in to an account this rig seeded earlier (SEED=0 reuse). */
+async function loginAccount(username) {
+  const res = await api('/api/login', { username, password: 'hunter22' });
+  if (res.status !== 200) throw new Error(`login ${username} failed: ${res.status}`);
+  return { username, token: res.body.token };
+}
+
+/**
+ * Listing ids by item, read from the REAL browse endpoint rather than by
+ * matching row TEXT: a price or an item name renders in the client's locale
+ * ("250,00 $" in ru), so every English needle silently found no row and the
+ * whole detail-pane arm then measured a pane that was never opened. Newest id
+ * per item wins (this rig seeds the same ids repeatedly).
+ */
+async function listingIdsByItem(token) {
+  const byItem = new Map();
+  for (let page = 0; page < 4; page++) {
+    const res = await api(
+      `/api/woc-market/listings?page=${page}&sort=newest`,
+      undefined,
+      token,
+      'GET',
+    );
+    if (res.status !== 200) break;
+    for (const row of res.body.listings ?? []) {
+      if (!byItem.has(row.itemId)) byItem.set(row.itemId, row.id);
+    }
+    if (!res.body.hasMore) break;
+  }
+  return byItem;
 }
 
 async function registerAccount(prefix) {
@@ -618,19 +657,51 @@ async function clickTab(page, tab) {
   await sleep(600);
 }
 
-async function clickRowContaining(page, needle) {
-  const ok = await page.evaluate((n) => {
-    const row = [...document.querySelectorAll('#woc-market-window .wm-row')].find((r) =>
-      (r.textContent || '').includes(n),
-    );
-    if (row instanceof HTMLElement) {
-      row.click();
+/**
+ * Open a listing by id, WALKING the pager until its row is on screen.
+ *
+ * A listing id says nothing about which page it lands on: the sheet's default
+ * order is "ending soonest" and a reused database holds pages of older rows, so
+ * a direct click found no row and every detail-pane assertion after it then
+ * measured a pane that was never opened. Sort NEWEST first (the rig's own seeds
+ * lead that order), then page forward a bounded number of times.
+ */
+async function clickListing(page, listingId, { sortNewest = true } = {}) {
+  if (sortNewest) {
+    await page.evaluate(() => {
+      const sel = document.querySelector('#woc-market-window [data-field="sort"]');
+      if (sel instanceof HTMLSelectElement && sel.value !== 'newest') {
+        sel.value = 'newest';
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    await sleep(1500);
+  }
+  for (let page_ = 0; page_ < 6; page_++) {
+    const clicked = await page.evaluate((id) => {
+      const row = document.querySelector(`#woc-market-window .wm-row[data-listing="${id}"]`);
+      if (row instanceof HTMLElement) {
+        row.click();
+        return true;
+      }
+      return false;
+    }, listingId);
+    if (clicked) {
+      await sleep(1500);
       return true;
     }
-    return false;
-  }, needle);
-  await sleep(1500);
-  return ok;
+    const advanced = await page.evaluate(() => {
+      const next = document.querySelector('#woc-market-window [data-action="page-next"]');
+      if (next instanceof HTMLButtonElement && !next.disabled) {
+        next.click();
+        return true;
+      }
+      return false;
+    });
+    if (!advanced) return false;
+    await sleep(1400);
+  }
+  return false;
 }
 
 async function main() {
@@ -674,6 +745,11 @@ async function main() {
       })),
     });
   }
+  // The authenticated read that maps items to listing ids (locale-proof row
+  // selection); a reused buyer logs in for its token.
+  const buyerToken = buyer.token ?? (await loginAccount(buyer.username)).token;
+  const listingIds = await listingIdsByItem(buyerToken);
+  console.log(`listing ids: ${listingIds.size} items on the newest pages`);
   const page = await browser.newPage();
   await page.setViewport({ width: 1600, height: 1000 });
   await enterWorldInBrowser(page, {
@@ -707,23 +783,23 @@ async function main() {
   await sleep(1500);
   await shoot(page, shotName('desktop-browse'));
   if (STRESS) {
-    // Sort NEWEST for the stress pair: the default "ending soonest" order puts
-    // whatever this database already held on page 1, and the stress rows are
-    // what these captures are about.
-    await page.evaluate(() => {
-      const sel = document.querySelector('#woc-market-window [data-field="sort"]');
-      if (sel instanceof HTMLSelectElement) {
-        sel.value = 'newest';
-        sel.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    });
-    await sleep(1500);
     // The maximum price on the longest mount name (the buy-now pane), then the
-    // longest equipment name at a maximum starting bid (the bid form).
-    await clickRowContaining(page, '$1,000.00');
-    await shoot(page, shotName('desktop-browse-stress-max-price'));
-    await clickRowContaining(page, 'Voidsong');
-    await shoot(page, shotName('desktop-browse-stress-long-name'));
+    // longest equipment name at a maximum starting bid (the bid form). Both by
+    // listing id, never by rendered text (see listingIdsByItem).
+    if (listingIds.has(LONG_MOUNT)) {
+      check(
+        await clickListing(page, listingIds.get(LONG_MOUNT)),
+        'stress: the max-price mount row opened',
+      );
+      await shoot(page, shotName('desktop-browse-stress-max-price'));
+    }
+    if (listingIds.has(LONG_ITEM)) {
+      check(
+        await clickListing(page, listingIds.get(LONG_ITEM)),
+        'stress: the long-name auction row opened',
+      );
+      await shoot(page, shotName('desktop-browse-stress-long-name'));
+    }
     // The last page of a full browse: page-next until it disables.
     for (let i = 0; i < 4; i++) {
       const more = await page.evaluate(() => {
@@ -815,25 +891,7 @@ async function main() {
   // The money-surface floors, in a REAL phone viewport: open each listing
   // shape's detail pane and measure what the DOM units cannot (rendered tap
   // heights, on-screen after scroll, the disclosures' DOM order).
-  const fails = [];
-  const check = (cond, msg) => {
-    console.log(`${cond ? 'OK  ' : 'FAIL'}  ${msg}`);
-    if (!cond) fails.push(msg);
-  };
-  const openRow = async (needle) => {
-    const ok = await mobile.evaluate((n) => {
-      const row = [...document.querySelectorAll('#woc-market-window .wm-row')].find((r) =>
-        (r.textContent || '').includes(n),
-      );
-      if (row instanceof HTMLElement) {
-        row.click();
-        return true;
-      }
-      return false;
-    }, needle);
-    await sleep(1500);
-    return ok;
-  };
+  const openRow = (listingId) => clickListing(mobile, listingId);
   const measureDetail = async () =>
     mobile.evaluate(() => {
       const detail = document.querySelector('#woc-market-window .wm-detail');
@@ -918,22 +976,50 @@ async function main() {
   };
   await sweepFloors('mobile browse');
   // The BUY-NOW pane (no bid form): the consent row plus the walk-away note.
-  check(await openRow('$250'), 'buy-now listing row opened');
+  check(
+    listingIds.has(BUY_NOW_ITEM) && (await openRow(listingIds.get(BUY_NOW_ITEM))),
+    'buy-now listing row opened',
+  );
   const bn = await measureDetail();
   floors(bn, 'buy-now');
   check(bn.buyNow && bn.buyNow.h >= 40, `buy-now: Buy now button height ${bn.buyNow?.h} >= 40`);
-  const noteIdx = bn.order.findIndex((o) => o.startsWith('note:Buy now holds'));
   const buyIdx = bn.order.findIndex((o) => o.startsWith('buy-now:'));
-  check(noteIdx >= 0 && noteIdx < buyIdx, 'buy-now: the walk-away note precedes the button');
+  // Two checks, because a locale pass renders its own wording: the STRUCTURAL
+  // one (a disclosure sits above the action) holds in every locale, and the
+  // English needle runs only where the source copy is authored. Matching the
+  // English text under a fill would pin the needle, not the layout.
+  check(
+    bn.order.findIndex((o) => o.startsWith('note:')) >= 0 &&
+      bn.order.findIndex((o) => o.startsWith('note:')) < buyIdx,
+    'buy-now: a disclosure precedes the button',
+  );
+  if (!SHOT_LANG)
+    check(
+      bn.order.findIndex((o) => o.startsWith('note:Buy now holds')) >= 0 &&
+        bn.order.findIndex((o) => o.startsWith('note:Buy now holds')) < buyIdx,
+      'buy-now: the walk-away note precedes the button',
+    );
   await shoot(mobile, shotName('mobile-buy-now-consent'), null);
   await sweepFloors('mobile buy-now detail');
   // The AUCTION pane: the bid form with the disclosures BEFORE Place bid.
-  check(await openRow('No bids yet'), 'auction listing row opened');
+  check(
+    listingIds.has(EPIC_ITEM) && (await openRow(listingIds.get(EPIC_ITEM))),
+    'auction listing row opened',
+  );
   const au = await measureDetail();
   floors(au, 'auction');
-  const bindIdx = au.order.findIndex((o) => /binding/i.test(o));
   const bidIdx = au.order.findIndex((o) => o.startsWith('place-bid:'));
-  check(bindIdx >= 0 && bindIdx < bidIdx, 'auction: the binding disclosure precedes Place bid');
+  check(
+    au.order.findIndex((o) => o.startsWith('note:')) >= 0 &&
+      au.order.findIndex((o) => o.startsWith('note:')) < bidIdx,
+    'auction: a disclosure precedes Place bid',
+  );
+  if (!SHOT_LANG)
+    check(
+      au.order.findIndex((o) => /binding/i.test(o)) >= 0 &&
+        au.order.findIndex((o) => /binding/i.test(o)) < bidIdx,
+      'auction: the binding disclosure precedes Place bid',
+    );
   check(au.placeBid && au.placeBid.h >= 40, `auction: Place bid height ${au.placeBid?.h} >= 40`);
   check(au.bidUsd && au.bidUsd.h >= 40, `auction: bid field height ${au.bidUsd?.h} >= 40`);
   await shoot(mobile, shotName('mobile-auction-disclosures'), null);

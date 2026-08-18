@@ -3603,6 +3603,14 @@
      mobile capture rig asserts that top-most fact per control. */
   body.mobile-touch #trade-window {
     scroll-padding-bottom: 72px;
+    /* The same fact at the TOP edge, and the one the bottom fix did not cover:
+       .window > .panel-title is sticky (layout.css) and paints over the sheet
+       scrolling beneath it, so a control the browser scrolls to the top of the
+       scrollport (focusing a money field does exactly that) came to rest
+       UNDER the header. The centre-point hit test missed it because a control
+       half-covered still answers at its own centre. The inset mirrors the
+       mobile header's 48px floor declared above, plus a gap. */
+    scroll-padding-top: calc(48px + var(--spacing-sm));
   }
   body.mobile-touch #trade-window .trade-actions {
     position: sticky;

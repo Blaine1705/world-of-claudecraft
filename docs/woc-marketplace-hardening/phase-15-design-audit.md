@@ -310,6 +310,15 @@ exist plus `color-mix()` over them (the `hud.css` precedent).
       half-width split state.
 - [x] APPLIED. The window's Accept / Cancel row is a real row that sticks to the
       sheet's bottom edge, so the commit control cannot sit below the fold.
+- [x] APPLIED. The same fact at the TOP edge, found in the fresh captures and
+      missed by the first sweep: `.window > .panel-title` is sticky and paints
+      over the sheet scrolling beneath it, so a control the browser scrolls to
+      the top of the scrollport (focusing a money field does exactly that) came
+      to rest UNDER the header. The centre-point hit test could not see it,
+      because a control covered down to its middle still answers at its own
+      centre. `#trade-window` now carries a `scroll-padding-top` mirroring the
+      mobile header floor, and the rig measures the header's live bottom edge
+      after every scroll and asserts each control clears it.
 - [x] APPLIED. Touch floors the CSS claimed but missed: the sell form's three
       number inputs and two selects, the combobox text input (all about 38px),
       the trade arm's price field (about 26px: it lives in the arm, not in

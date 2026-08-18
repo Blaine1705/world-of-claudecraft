@@ -172,13 +172,25 @@ async function measure(label) {
   const m = await page.evaluate(() => {
     const win = document.querySelector('#trade-window');
     const wr = win.getBoundingClientRect();
+    // The sticky window header paints OVER the sheet scrolling beneath it, so
+    // it is measured after each scroll, not once: a control the browser parks
+    // at the top of the scrollport must come to rest below it. The centre-point
+    // hit test alone cannot see this, because a control covered down to its
+    // middle still answers at its own centre.
+    const headerBottom = () => {
+      const h = win.querySelector(':scope > .panel-title');
+      return h ? Math.round(h.getBoundingClientRect().bottom) : null;
+    };
     const rect = (el) => {
       if (!el) return null;
       el.scrollIntoView({ block: 'nearest' });
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
       const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      const hb = headerBottom();
       return {
+        headerBottom: hb,
+        underHeader: hb !== null && r.top < hb && r.bottom > 0 && r.width > 0,
         w: Math.round(r.width),
         h: Math.round(r.height),
         top: Math.round(r.top),
@@ -237,6 +249,11 @@ async function measure(label) {
     if (c.tag === 'input' && String(c.cls).includes('trade-woc-price'))
       check(r.h >= 40, `${label}: price field height ${r.h} >= 40`);
     if (r) check(r.onScreen, `${label}: "${c.text || c.tag}" fully on screen after scrollIntoView`);
+    if (r)
+      check(
+        !r.underHeader,
+        `${label}: "${c.text || c.tag}" clears the sticky header (top ${r.top} >= ${r.headerBottom})`,
+      );
     if (r)
       check(
         r.tappable,
