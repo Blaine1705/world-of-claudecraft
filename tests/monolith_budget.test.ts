@@ -74,8 +74,10 @@ const MONOLITHS: MonolithRow[] = [
     // reach the ability list; the toggle beside it would have closed it instead.
     // castCrossHotbarAction is the other: it routes a pad press back through
     // castSlot so a cross-hotbar cast keeps the SAME semantics a key press has
-    // (reticle, empower, sport, mouseover) instead of growing a second cast path.
-    ceiling: 19444,
+    // (reticle, empower, sport, mouseover) instead of growing a second cast path,
+    // with the Attack branch beside it: Attack is the fixed slot-0 toggle rather
+    // than an ability, so it is the one action the seed cannot copy off the bar.
+    ceiling: 19458,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -12,10 +12,14 @@
 // Keyboard and mouse never reach this; only the pad's arrange mode calls it.
 
 import type { CrossHotbarAction } from './cross_hotbar';
+import { CROSS_HOTBAR_ATTACK_ID } from './cross_hotbar';
 import { padMouseHovered } from './pad_mouse_cursor';
 
 // Carried by the spellbook's rows and its hotbar-toggle buttons.
 const ABILITY_ID_ATTR = 'data-ability-id';
+// The Attack row carries no ability id (Attack is not an ability); its own toggle
+// is what marks it, the same marker the spellbook uses to find that row again.
+const ATTACK_ROW_MARKER = '[data-attack-toggle]';
 
 function actionOn(el: Element | null): CrossHotbarAction {
   // Walk up to the draggable row: focus (and the pointer) often lands on a child
@@ -25,7 +29,10 @@ function actionOn(el: Element | null): CrossHotbarAction {
   const node = row ?? (el as HTMLElement | null);
   if (!node || node.draggable !== true) return null;
   const id = node.getAttribute?.(ABILITY_ID_ATTR);
-  return id ? { type: 'ability', id } : null;
+  if (id) return { type: 'ability', id };
+  return node.querySelector?.(ATTACK_ROW_MARKER)
+    ? { type: 'ability', id: CROSS_HOTBAR_ATTACK_ID }
+    : null;
 }
 
 /**

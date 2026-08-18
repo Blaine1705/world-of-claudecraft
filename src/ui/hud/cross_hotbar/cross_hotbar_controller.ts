@@ -8,6 +8,7 @@
 // select a cell. Each cell carries the shared action-bar painter's own aria-label,
 // so what is announced is the ability on it.
 
+import { CROSS_HOTBAR_ATTACK_ID } from '../../../game/cross_hotbar';
 import { resolveActionReplacement } from '../../../sim/combat/action_replacement';
 import { resolveColdsightAbilityForSpec } from '../../../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../../../sim/combat/hunter_shared';
@@ -179,7 +180,9 @@ export class CrossHotbarController {
       {
         slots: CROSS_HOTBAR_CELLS.map((cell) => ({
           slotIndex: cell.index,
-          isAttack: () => false,
+          // Reuses the shared bar's whole attack branch (its icon, the auto-attack
+          // queued glow, the melee range check) rather than a second render path.
+          isAttack: () => this.state.cellActions[cell.index]?.id === CROSS_HOTBAR_ATTACK_ID,
           hasAction: () => this.state.cellActions[cell.index] !== null,
           ability: () => {
             const a = this.state.cellActions[cell.index];

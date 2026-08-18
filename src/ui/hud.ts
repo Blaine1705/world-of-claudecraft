@@ -1,5 +1,6 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
+import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
@@ -7014,9 +7015,17 @@ export class Hud {
    * which is the one case without a reticle.
    */
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
-    const slot = this.hotbarActions.findIndex(
-      (onBar) => onBar?.type === action.type && onBar.id === action.id,
-    );
+    // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
+    if (action.id === CROSS_HOTBAR_ATTACK_ID) return this.activateFixedAttackSlot();
+    // Matched against the EFFECTIVE action of each slot, never the raw array: with
+    // the Attack button on, slot 0 IS Attack and whatever the array holds at index
+    // 0 is not reachable there, so delegating by array index fired auto-attack
+    // instead of the ability the player pressed.
+    let slot = -1;
+    for (let i = 0; i < this.hotbarActions.length && slot < 0; i++) {
+      const onBar = this.actionForSlot(i);
+      if (onBar?.type === action.type && onBar.id === action.id) slot = i;
+    }
     if (slot >= 0) this.castSlot(slot);
     else if (action.type === 'ability') this.sim.castAbility(action.id);
   }
@@ -19129,9 +19138,14 @@ export class Hud {
   crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
     return {
       bar: this.hotbarActions.map((a) => (a ? { type: a.type, id: a.id } : null)),
-      extras: this.sim.known
-        .filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
-        .map((k) => k.def.id),
+      // Attack leads: it is on no hotbar slot to copy (the desktop bar draws it as
+      // a fixed button), so a pad player would otherwise have no auto-attack at all.
+      extras: [
+        CROSS_HOTBAR_ATTACK_ID,
+        ...this.sim.known
+          .filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
+          .map((k) => k.def.id),
+      ],
     };
   }
 

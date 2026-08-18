@@ -12,6 +12,14 @@
 
 import { GP } from './gamepad_map';
 
+/**
+ * The basic Attack, as the bar holds it. Attack is not an ability and has no id of
+ * its own: it is the action bar's fixed slot-0 toggle. The spellbook already names
+ * it 'attack' when it asks for an icon, so the bar reuses that spelling rather than
+ * inventing a second one, and every consumer branches on this constant.
+ */
+export const CROSS_HOTBAR_ATTACK_ID = 'attack';
+
 /** The chord that opens arrange mode. One definition, so the pad that reads it and
  *  the hint that names it can never drift apart. */
 export const CROSS_HOTBAR_ARRANGE_CHORD = { bumper: GP.LB, button: GP.Y } as const;

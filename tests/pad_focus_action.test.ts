@@ -100,3 +100,34 @@ describe('focusedPadAction from a child of the row', () => {
     expect(focusedPadAction()).toEqual({ type: 'ability', id: 'thunder_clap' });
   });
 });
+
+describe('focusedPadAction on the spellbook Attack row', () => {
+  it('picks Attack up even though it carries no ability id', () => {
+    // Attack is the action bar's fixed slot-0 toggle, not an ability, so the row
+    // has no data-ability-id: its own toggle is what marks it. Without this the
+    // pad could pick up every spell in the book except auto-attack.
+    const attackRow = {
+      draggable: true,
+      getAttribute: () => null,
+      closest: function (this: unknown, sel: string) {
+        return sel === '[draggable="true"]' ? this : null;
+      },
+      querySelector: (sel: string) => (sel === '[data-attack-toggle]' ? {} : null),
+    };
+    vi.stubGlobal('document', { activeElement: attackRow, body: {} });
+    expect(focusedPadAction()).toEqual({ type: 'ability', id: 'attack' });
+  });
+
+  it('does not mistake an ordinary row for Attack', () => {
+    const plain = {
+      draggable: true,
+      getAttribute: () => null,
+      closest: function (this: unknown, sel: string) {
+        return sel === '[draggable="true"]' ? this : null;
+      },
+      querySelector: () => null,
+    };
+    vi.stubGlobal('document', { activeElement: plain, body: {} });
+    expect(focusedPadAction()).toBeNull();
+  });
+});
