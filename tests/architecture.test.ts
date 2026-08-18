@@ -411,6 +411,7 @@ const UI_PURE_CORES = [
   'src/ui/chat_bubble_style.ts',
   'src/ui/hud/action_bar/slot_ability_core.ts',
   'src/ui/hud/cross_hotbar/cross_hotbar_view.ts',
+  'src/ui/dpad_nav_core.ts',
   'src/game/graphics_rebuild_core.ts',
   'src/game/presentation_gate.ts',
   'src/game/perf_diagnosis_core.ts',

@@ -5,6 +5,7 @@
 // the host's onAction callback, the virtual-cursor UI-navigation mode, and
 // haptic rumble. Modeled structurally on MobileControls.
 
+import type { NavDirection } from '../ui/dpad_nav_core';
 import {
   type CrossHotbarLayer,
   type CrossHotbarTriggerState,
@@ -14,6 +15,7 @@ import {
   nextCrossHotbarTriggerState,
 } from './cross_hotbar';
 import type { CrossHotbarBindings } from './cross_hotbar_bindings';
+import { moveDpadFocus, pressDpadFocus } from './dpad_focus_nav';
 import type { GamepadBindings } from './gamepad_bindings';
 import {
   AXIS,
@@ -60,6 +62,15 @@ export interface GamepadCallbacks {
 }
 
 const CURSOR_SPEED = 900; // px/sec at full stick deflection in UI cursor mode
+const CURSOR_DPAD_STEP = 48; // px per d-pad press when there is nothing to focus
+
+// Which way each d-pad button steps focus while a window is open.
+const DPAD_NAV_DIRECTIONS: Record<number, NavDirection> = {
+  [GP.DPAD_UP]: 'up',
+  [GP.DPAD_DOWN]: 'down',
+  [GP.DPAD_LEFT]: 'left',
+  [GP.DPAD_RIGHT]: 'right',
+};
 
 export class GamepadManager {
   private index: number | null = null;
@@ -446,10 +457,6 @@ export class GamepadManager {
       mx = 0;
       my = 0;
     }
-    if (cur[GP.DPAD_LEFT]) mx = -1;
-    if (cur[GP.DPAD_RIGHT]) mx = 1;
-    if (cur[GP.DPAD_UP]) my = -1;
-    if (cur[GP.DPAD_DOWN]) my = 1;
     this.cursorX = Math.min(window.innerWidth, Math.max(0, this.cursorX + mx * CURSOR_SPEED * dt));
     this.cursorY = Math.min(window.innerHeight, Math.max(0, this.cursorY + my * CURSOR_SPEED * dt));
     el.style.left = `${this.cursorX}px`;
@@ -461,10 +468,38 @@ export class GamepadManager {
     for (const idx of risingEdges(this.prevPressed, cur)) {
       acted = true;
       this.cb.onInputEdge();
-      if (idx === GP.A) this.clickAtCursor();
-      else if (idx === GP.B || idx === GP.START) this.cb.onAction('escape');
+      // The d-pad steps between the open window's controls rather than nudging the
+      // cursor a few pixels: a cursor has to be steered to a button, focus lands on
+      // it. The stick keeps the free cursor for what focus order cannot reach (an
+      // item drag, a spot on the map), so nothing is lost.
+      const dir = DPAD_NAV_DIRECTIONS[idx];
+      if (dir !== undefined) {
+        // Fall back to nudging the free cursor when the open surface has nothing
+        // focusable to step between: the d-pad used to move the cursor, and a
+        // window the focus order cannot reach must not lose that.
+        if (!moveDpadFocus(dir)) this.nudgeCursor(dir);
+        continue;
+      }
+      // A presses the focused control, falling back to the cursor when the d-pad
+      // has not focused anything the navigation owns.
+      if (idx === GP.A) {
+        if (!pressDpadFocus()) this.clickAtCursor();
+      } else if (idx === GP.B || idx === GP.START) this.cb.onAction('escape');
     }
     return acted;
+  }
+
+  // One d-pad step of the free cursor, for a surface with no focusable controls.
+  private nudgeCursor(dir: NavDirection): void {
+    const step = CURSOR_DPAD_STEP;
+    if (dir === 'left') this.cursorX = Math.max(0, this.cursorX - step);
+    else if (dir === 'right') this.cursorX = Math.min(window.innerWidth, this.cursorX + step);
+    else if (dir === 'up') this.cursorY = Math.max(0, this.cursorY - step);
+    else this.cursorY = Math.min(window.innerHeight, this.cursorY + step);
+    if (this.cursorEl) {
+      this.cursorEl.style.left = `${this.cursorX}px`;
+      this.cursorEl.style.top = `${this.cursorY}px`;
+    }
   }
 
   // Synthesizes mousedown/mouseup/click at the cursor, reusing every existing DOM
