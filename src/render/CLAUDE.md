@@ -297,19 +297,35 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   frame, budget-free, counted as `rootsReach`), and it is DELIBERATELY the
   smaller one: a town kit's programs are shared across its buildings, so
   revealing one unlinked building links the whole kit cold in that live frame.
-  It is the fairness floor, not a comfort radius.
+  It is the fairness floor, not a comfort radius. It also applies ONLY to
+  FOOTPRINT-anchored roots (`TownPiecewiseReveal.footprint`, set by each town
+  view): every town-spanning static batch anchors at the town centre, so a
+  camera standing there is at arm's length of all of them at once, and reach is
+  a collider argument a batch cannot make.
   The ARRIVAL COVER (`arrival_cover.ts`, raised by `src/game/arrival_warmup.ts`
   for the whole blocking teleport chain, and at world entry) does two things and
   neither of them reveals anything. It makes the curtain WAIT on the gates
   (`awaitArrivalReveals`, at most `ARRIVAL_REVEAL_SETTLE_MAX_MS`, zero online)
-  so an arrival lifts with its decor linked the way boot does, and it switches
+  so an arrival lifts with its decor linked the way boot does. Its first check
+  happens after ONE poll interval, never synchronously: the wait starts before
+  any cull has consulted a gate at the new position, so a synchronous check read
+  "nothing held" because nothing had been asked yet. At world entry that wait
+  sits behind `afterActiveAnimationMs`, which is driven by
+  `requestAnimationFrame`, so a HIDDEN TAB keeps the cover raised until frames
+  resume; nothing renders meanwhile, so nothing is being hidden from anyone. It
+  also switches
   `gpu_prep_admission.ts` onto the cover rule (`gpu_prep_budget_core.ts`
   `gpuPrepCoverAdmits`): under a curtain there is no frame to protect, so
   everything from `TAIL_PIECE` up is admitted on the `cover` reason, and
   `BOOT_DEBT` / `BACKGROUND` / `BOOT_RESUME` are refused on
   `cover-not-arrival`. Admitting those too is what starved the arrival
   (measured: after a second of hold, 0 of 1 roots ready per band key and 0 of 12
-  on the town, because the debt lane drained ahead of them).
+  on the town, because the debt lane drained ahead of them). A
+  `cover-not-arrival` refusal does NOT age: the adapter answers `agesDeferral`
+  false for it (`background_gpu_queue.ts` consults the hook in `noteFrame`),
+  because ticking `deferredFrames` through a whole curtain left every one of
+  those units past `maxDeferFrames` and admitted the entire debt lane as
+  `starvation` on the first live frame after the drop.
   Two deadlines beside it, and only one of them reveals: a SOFT deadline per key, from
   the budget's learned reveal cost times the root count clamped into
   [`REVEAL_SOFT_DEADLINE_MIN_MS`, `REVEAL_GATE_WATCHDOG_MS`], records a
@@ -336,7 +352,13 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   nameplate painter uses to force a plate on OVER the player's nameplate toggles
   for the one gate with no in-world stand-in (the arrival gate hides the whole
   group). A new gate adds a row AND a case to `tests/entity_gate_stand_in.test.ts`;
-  its coverage pin reds on any unregistered call site.
+  its coverage pin reds on any unregistered call site, over the gate shapes its
+  `GATE_CALL_SITES` table names (the three renderer wrappers plus
+  `spiritCompileGate`, the puppet pool's own consult of the host gate it takes
+  through `setSpiritCompileGate`). That one REFUSES the spawn instead of
+  holding it, because an apparition that pops in late is worse than one that
+  never came: the rest of the impact sequence is the stand-in, and the refusals
+  are counted as `gpuPrep.gates.spiritSpawnsRefused`.
   The rule has a SECOND-CONTEXT arm: the paperdoll / Inspect preview holds its
   own draws on a cold open (`characters/preview_open_gate_core.ts`, armed from
   `Hud.mountSharedPreview`) while that context links, uploads and touches, and

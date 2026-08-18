@@ -81,11 +81,71 @@ describe('arrival cover flag', () => {
 });
 
 describe('awaitArrivalReveals', () => {
-  it('resolves at once when nothing is held', async () => {
+  it('waits ONE poll before its first check, then resolves with nothing held', async () => {
+    // The wait starts the moment the teleport lands, BEFORE any cull has
+    // consulted a gate at the new position. A synchronous first check
+    // therefore read "nothing held" because nothing had been asked yet, and
+    // lifted the curtain on the very frame the reveals were about to be
+    // requested in. One poll of floor is what gives the culls a frame to ask.
     const timer = fakeTimer();
-    registerRevealGateForArrival(fakeGate(0));
-    await awaitArrivalReveals(3_000, { now: () => 0, schedule: timer.schedule });
+    const gate = fakeGate(0);
+    registerRevealGateForArrival(gate);
+    let settled = false;
+    const wait = awaitArrivalReveals(3_000, { now: () => 0, schedule: timer.schedule }).then(() => {
+      settled = true;
+    });
+
+    await Promise.resolve();
+    expect(settled).toBe(false);
+    expect(timer.pending()).toBe(1);
+    expect(timer.armedMs).toEqual([ARRIVAL_REVEAL_POLL_MS]);
+
+    timer.flush();
+    await wait;
+    expect(settled).toBe(true);
     expect(timer.pending()).toBe(0);
+  });
+
+  it('holds the wait for a key a cull only requests after the floor', async () => {
+    // The defect in one case: nothing is held at the call, and the first cull
+    // of the new position marks a key imminent one poll later. The wait must
+    // still be running to see it.
+    const gate = fakeGate(0);
+    registerRevealGateForArrival(gate);
+    const timer = fakeTimer();
+    let settled = false;
+    const wait = awaitArrivalReveals(3_000, { now: () => 0, schedule: timer.schedule }).then(() => {
+      settled = true;
+    });
+
+    gate.held = 3;
+    timer.flush();
+    await Promise.resolve();
+    expect(settled).toBe(false);
+
+    gate.held = 0;
+    timer.flush();
+    await wait;
+    expect(settled).toBe(true);
+  });
+
+  it('keeps the floor inside maxMs, so a zero-budget wait still costs nothing', async () => {
+    // The online arrival asks for no wait at all. The floor may not turn that
+    // into a poll interval of curtain.
+    const timer = fakeTimer();
+    registerRevealGateForArrival(fakeGate(4));
+    await awaitArrivalReveals(0, { now: () => 0, schedule: timer.schedule });
+    expect(timer.pending()).toBe(0);
+    expect(timer.armedMs).toEqual([]);
+
+    // ...and a budget SHORTER than one poll is armed at the budget, never at
+    // the poll interval.
+    const short = fakeTimer();
+    void awaitArrivalReveals(ARRIVAL_REVEAL_POLL_MS / 2, {
+      now: () => 0,
+      schedule: short.schedule,
+    });
+    expect(short.armedMs).toEqual([ARRIVAL_REVEAL_POLL_MS / 2]);
   });
 
   it('polls until the last held key settles', async () => {

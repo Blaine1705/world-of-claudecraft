@@ -87,6 +87,14 @@ export function setArrivalCover(active: boolean): void {
  * the duration, so `maxMs` is what keeps a stuck driver link from holding a
  * loading screen open forever: it bounds the WAIT, never the hold, and a key
  * still held when it expires simply stays hidden past the lift.
+ *
+ * The first check happens after ONE poll interval, never synchronously. A wait
+ * is started by the arrival chain the moment the teleport lands, which is
+ * before any cull has consulted a gate at the new position: at that instant no
+ * key is held yet simply because none has been asked, so a synchronous first
+ * check read "nothing held" and lifted the curtain on the frame the reveals
+ * were about to be requested in. The floor stays bounded by `maxMs`, so a
+ * caller that asks for no wait at all still gets none.
  */
 export function awaitArrivalReveals(
   maxMs: number,
@@ -108,7 +116,12 @@ export function awaitArrivalReveals(
       }
       schedule(poll, pollMs);
     };
-    poll();
+    const firstDelay = Math.min(pollMs, deadline - now());
+    if (firstDelay <= 0) {
+      poll();
+      return;
+    }
+    schedule(poll, firstDelay);
   });
 }
 
