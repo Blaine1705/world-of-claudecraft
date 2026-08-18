@@ -956,17 +956,17 @@ export const da_DK: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Kælderhvælvingen",
+        "state": "Repræsentationsetagen",
+        "residence": "Boligetagen",
+        "tower": "Vagttårnet"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Haveetagen",
+        "solar": "Solgemakket"
       }
     },
     "compass": {
@@ -12396,7 +12396,7 @@ export const da_DK: EnTranslations = {
         "name": "Uberørt Klo"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Buket fra Dawnholds have"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
@@ -13244,13 +13244,13 @@ export const da_DK: EnTranslations = {
         "name": "Træningsdukke"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Venlig spillerdukke"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Normal bossdukke"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Heroisk bossdukke"
       },
       "ridge_stalker": {
         "name": "Bjergkamssniger"
@@ -16892,9 +16892,9 @@ export const da_DK: EnTranslations = {
         "leaveText": "Du trækker borgdøren i og træder tilbage ud i Dragelandets vind."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Dawnhold Slot",
+        "enterText": "Du træder ind i Dawnhold Slots varme, blomsterduftende sale.",
+        "leaveText": "Du smutter ud igen på havens solbeskinnede græsplæne."
       },
       "drowned_temple": {
         "name": "Det Druknede Tempel",

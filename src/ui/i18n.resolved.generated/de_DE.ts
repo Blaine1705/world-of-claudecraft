@@ -956,17 +956,17 @@ export const de_DE: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Das Untergewölbe",
+        "state": "Die Beletage",
+        "residence": "Das Wohngeschoss",
+        "tower": "Der Wachturm"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Das Gartengeschoss",
+        "solar": "Das Sonnengemach"
       }
     },
     "compass": {
@@ -12396,7 +12396,7 @@ export const de_DE: EnTranslations = {
         "name": "Unberührte Klaue"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Gartensträußchen von Dawnhold"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
@@ -13244,13 +13244,13 @@ export const de_DE: EnTranslations = {
         "name": "Trainingspuppe"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Freundliche Spielerpuppe"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Normale Bosspuppe"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Heroische Bosspuppe"
       },
       "ridge_stalker": {
         "name": "Gratpirscher"
@@ -16892,9 +16892,9 @@ export const de_DE: EnTranslations = {
         "leaveText": "Du ziehst die Burgtür zu und trittst zurück in den Wind von Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Schloss Dawnhold",
+        "enterText": "Du trittst in die warmen, blumenduftenden Hallen von Schloss Dawnhold ein.",
+        "leaveText": "Du schlüpfst wieder hinaus auf den sonnenbeschienenen Gartenrasen."
       },
       "drowned_temple": {
         "name": "Der Ertränkte Tempel",

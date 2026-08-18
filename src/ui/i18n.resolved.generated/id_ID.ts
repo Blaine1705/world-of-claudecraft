@@ -956,17 +956,17 @@ export const id_ID: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Ruang Bawah Tanah",
+        "state": "Lantai Kebesaran",
+        "residence": "Lantai Hunian",
+        "tower": "Menara Pengawas"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Lantai Taman",
+        "solar": "Ruang Matahari"
       }
     },
     "compass": {
@@ -12396,7 +12396,7 @@ export const id_ID: EnTranslations = {
         "name": "Cakar Murni"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Buket Taman Dawnhold"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
@@ -13244,13 +13244,13 @@ export const id_ID: EnTranslations = {
         "name": "Boneka Latihan"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Boneka Pemain Sekutu"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Boneka Bos Normal"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Boneka Bos Heroik"
       },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"
@@ -16892,9 +16892,9 @@ export const id_ID: EnTranslations = {
         "leaveText": "Kau menutup pintu benteng itu dan melangkah kembali ke angin Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Kastil Dawnhold",
+        "enterText": "Kau melangkah masuk ke aula Kastil Dawnhold yang hangat dan harum bunga.",
+        "leaveText": "Kau menyelinap keluar lagi ke halaman rumput taman yang bermandikan cahaya matahari."
       },
       "drowned_temple": {
         "name": "Kuil Tenggelam",

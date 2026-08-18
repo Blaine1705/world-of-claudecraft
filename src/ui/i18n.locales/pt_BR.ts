@@ -13,6 +13,21 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'entities.mobs.heroic_boss_dummy.name': 'Boneco de Chefe Heroico',
+  'entities.mobs.normal_boss_dummy.name': 'Boneco de Chefe Normal',
+  'entities.mobs.friendly_player_dummy.name': 'Boneco de Jogador Aliado',
+  'entities.items.dawnhold_posy.name': 'Ramalhete do jardim de Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Você volta a sair para o gramado ensolarado do jardim.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Você entra nos salões quentes e perfumados de flores do Castelo Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Castelo Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'A torre de vigia',
+  'hudChrome.lastkeepMap.story.residence': 'A residência',
+  'hudChrome.lastkeepMap.story.state': 'O andar nobre',
+  'hudChrome.lastkeepMap.story.undercroft': 'Os porões',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'A sala do sol',
+  'hudChrome.dawnholdMap.story.ground': 'O andar do jardim',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Campo de Batalha.',
   'guide.social.chanBattlegroundBody': 'Fale com todos os lutadores do seu campo de batalha, dos dois lados. Só enquanto uma partida estiver em andamento.',
   'hud.chat.templates.battleground': '[Campo de batalha] {name}: {message}',

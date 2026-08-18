@@ -2,6 +2,21 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'entities.mobs.heroic_boss_dummy.name': 'Hình Nộm Trùm Anh Hùng',
+  'entities.mobs.normal_boss_dummy.name': 'Hình Nộm Trùm Thường',
+  'entities.mobs.friendly_player_dummy.name': 'Hình Nộm Người Chơi Đồng Minh',
+  'entities.items.dawnhold_posy.name': 'Bó Hoa Vườn Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Bạn lách ra ngoài, trở lại bãi cỏ vườn ngập nắng.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Bạn bước vào những sảnh đường ấm áp, thơm ngát hương hoa của Lâu Đài Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Lâu Đài Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Tháp Canh',
+  'hudChrome.lastkeepMap.story.residence': 'Tầng Sinh Hoạt',
+  'hudChrome.lastkeepMap.story.state': 'Tầng Nghi Lễ',
+  'hudChrome.lastkeepMap.story.undercroft': 'Tầng Hầm',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Phòng Nắng',
+  'hudChrome.dawnholdMap.story.ground': 'Tầng Vườn',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Chiến Trường.',
   'guide.social.chanBattlegroundBody': 'Trò chuyện với mọi người tham chiến trong chiến trường của bạn, cả hai phe. Chỉ trong khi trận đấu đang diễn ra.',
   'hud.chat.templates.battleground': '[Chiến Trường] {name}: {message}',

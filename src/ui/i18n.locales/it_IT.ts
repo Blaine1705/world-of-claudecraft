@@ -13,6 +13,21 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'entities.mobs.heroic_boss_dummy.name': 'Manichino di boss eroico',
+  'entities.mobs.normal_boss_dummy.name': 'Manichino di boss normale',
+  'entities.mobs.friendly_player_dummy.name': 'Manichino di giocatore alleato',
+  'entities.items.dawnhold_posy.name': 'Mazzolino del giardino di Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Esci di nuovo sul prato soleggiato del giardino.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Metti piede nelle sale calde e profumate di fiori del Castello Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Castello Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'La torre di guardia',
+  'hudChrome.lastkeepMap.story.residence': 'La residenza',
+  'hudChrome.lastkeepMap.story.state': 'Il piano nobile',
+  'hudChrome.lastkeepMap.story.undercroft': 'I sotterranei',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'La sala del sole',
+  'hudChrome.dawnholdMap.story.ground': 'Il piano del giardino',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Campo di battaglia.',
   'guide.social.chanBattlegroundBody': 'Parla con tutti i combattenti nel tuo campo di battaglia, di entrambe le squadre. Solo mentre una partita è in corso.',
   'hud.chat.templates.battleground': '[Campo di battaglia] {name}: {message}',

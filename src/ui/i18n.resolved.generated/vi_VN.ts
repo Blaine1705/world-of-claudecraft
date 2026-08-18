@@ -956,17 +956,17 @@ export const vi_VN: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Tầng Hầm",
+        "state": "Tầng Nghi Lễ",
+        "residence": "Tầng Sinh Hoạt",
+        "tower": "Tháp Canh"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Tầng Vườn",
+        "solar": "Phòng Nắng"
       }
     },
     "compass": {
@@ -12396,7 +12396,7 @@ export const vi_VN: EnTranslations = {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bó Hoa Vườn Dawnhold"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -13244,13 +13244,13 @@ export const vi_VN: EnTranslations = {
         "name": "Hình Nộm Tập Luyện"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Hình Nộm Người Chơi Đồng Minh"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Hình Nộm Trùm Thường"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Hình Nộm Trùm Anh Hùng"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"
@@ -16892,9 +16892,9 @@ export const vi_VN: EnTranslations = {
         "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Lâu Đài Dawnhold",
+        "enterText": "Bạn bước vào những sảnh đường ấm áp, thơm ngát hương hoa của Lâu Đài Dawnhold.",
+        "leaveText": "Bạn lách ra ngoài, trở lại bãi cỏ vườn ngập nắng."
       },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",

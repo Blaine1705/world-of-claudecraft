@@ -954,19 +954,19 @@ export const fr_FR: EnTranslations = {
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "lastkeepMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep} : {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "La salle basse",
+        "state": "L'étage d'apparat",
+        "residence": "Le logis",
+        "tower": "La tour de guet"
       }
     },
     "dawnholdMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep} : {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Le rez-de-jardin",
+        "solar": "La chambre du soleil"
       }
     },
     "compass": {
@@ -12396,7 +12396,7 @@ export const fr_FR: EnTranslations = {
         "name": "Griffe immaculée"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bouquet du jardin de Dawnhold"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"
@@ -13244,13 +13244,13 @@ export const fr_FR: EnTranslations = {
         "name": "Mannequin d'entraînement"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Mannequin de joueur allié"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Mannequin de boss normal"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Mannequin de boss héroïque"
       },
       "ridge_stalker": {
         "name": "Traqueur de crête"
@@ -16892,9 +16892,9 @@ export const fr_FR: EnTranslations = {
         "leaveText": "Vous refermez la porte du donjon et retrouvez le vent des Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Château Dawnhold",
+        "enterText": "Vous pénétrez dans les salles chaudes et parfumées de fleurs du Château Dawnhold.",
+        "leaveText": "Vous ressortez sur la pelouse ensoleillée du jardin."
       },
       "drowned_temple": {
         "name": "Le Temple noyé",
