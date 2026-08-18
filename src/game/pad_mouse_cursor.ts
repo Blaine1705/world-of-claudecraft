@@ -61,16 +61,31 @@ function mouseInit(extra: Record<string, unknown> = {}): MouseEventInit {
  * enter/leave are dispatched non-bubbling on the element itself (that is their
  * contract) while over/out bubble, so both direct and delegated handlers fire.
  */
+// The chain a real pointer considers "entered": the element and every ancestor.
+// enter/leave do not bubble, so this is how a listener on a container (which is
+// where tooltips actually live, not on the icon inside the button) ever hears.
+function hoverChain(el: Element | null): Element[] {
+  const chain: Element[] = [];
+  for (let node = el; node; node = node.parentElement) chain.push(node);
+  return chain;
+}
+
 function announceHover(): void {
   const next = elementUnderPointer();
   if (next === hovered) {
     next?.dispatchEvent(new MouseEvent('mousemove', mouseInit()));
     return;
   }
+  const from = hoverChain(hovered);
+  const to = hoverChain(next);
   if (hovered) {
     hovered.classList?.remove(HOVER_CLASS);
     hovered.dispatchEvent(new MouseEvent('mouseout', mouseInit({ relatedTarget: next })));
-    hovered.dispatchEvent(
+  }
+  // Left innermost-first, entered outermost-first, exactly as a real pointer does.
+  for (const node of from) {
+    if (to.includes(node)) continue;
+    node.dispatchEvent(
       new MouseEvent('mouseleave', mouseInit({ bubbles: false, relatedTarget: next })),
     );
   }
@@ -78,9 +93,13 @@ function announceHover(): void {
   if (next) {
     next.classList?.add(HOVER_CLASS);
     next.dispatchEvent(new MouseEvent('mouseover', mouseInit({ relatedTarget: null })));
-    next.dispatchEvent(new MouseEvent('mouseenter', mouseInit({ bubbles: false })));
-    next.dispatchEvent(new MouseEvent('mousemove', mouseInit()));
   }
+  for (let i = to.length - 1; i >= 0; i--) {
+    if (from.includes(to[i])) continue;
+    to[i].dispatchEvent(new MouseEvent('mouseenter', mouseInit({ bubbles: false })));
+  }
+  // After the enters, so a handler armed by mouseenter sees this move.
+  next?.dispatchEvent(new MouseEvent('mousemove', mouseInit()));
 }
 
 /** What the virtual pointer is currently over, for a caller that needs to act on

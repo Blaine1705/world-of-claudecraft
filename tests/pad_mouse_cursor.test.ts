@@ -13,9 +13,10 @@ interface FakeNode {
   style: Record<string, string>;
   setAttribute(name: string, value: string): void;
   id: string;
+  parentElement: FakeNode | null;
 }
 
-function node(): FakeNode {
+function node(parent: FakeNode | null = null): FakeNode {
   const n: FakeNode = {
     events: [],
     classes: new Set<string>(),
@@ -35,6 +36,7 @@ function node(): FakeNode {
     style: {},
     setAttribute: () => {},
     id: '',
+    parentElement: parent,
   };
   return n;
 }
@@ -142,5 +144,35 @@ describe('virtual pointer hover', () => {
     clickPadMouse(2);
     expect(target.events).toContain('contextmenu');
     expect(target.events).not.toContain('click');
+  });
+});
+
+describe('hover reaches the container, not only the deepest element', () => {
+  it('enters every ancestor the pointer moved into', () => {
+    // Tooltips are bound on the BUTTON, while elementFromPoint returns the icon
+    // inside it, and mouseenter does not bubble. Firing it only on the deepest
+    // element meant hovering a menu item showed no tooltip at all.
+    const button = node();
+    const icon = node(button);
+    under = icon;
+    updatePadMouse(1, 0, 0.1);
+    expect(icon.events).toContain('mouseenter');
+    expect(button.events).toContain('mouseenter');
+  });
+
+  it('leaves the ancestors it actually left, and keeps the ones it did not', () => {
+    const button = node();
+    const iconA = node(button);
+    const iconB = node(button);
+    under = iconA;
+    updatePadMouse(1, 0, 0.1);
+    button.events.length = 0;
+    iconA.events.length = 0;
+    // Moving between two children of the same button never leaves the button.
+    under = iconB;
+    updatePadMouse(1, 0, 0.1);
+    expect(iconA.events).toContain('mouseleave');
+    expect(button.events).not.toContain('mouseleave');
+    expect(button.events).not.toContain('mouseenter');
   });
 });
