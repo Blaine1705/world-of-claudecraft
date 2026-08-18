@@ -120,8 +120,10 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the production-named coverage fixes, which paid their
     // wiring by moving the empty phase-ms fixtures into
     // renderer_frame_telemetry_core.ts and canvasDataUrlAsync into
-    // canvas_data_url.ts (net -26).
-    ceiling: 13525,
+    // canvas_data_url.ts (net -26); the post-effect prewarm lane was then
+    // removed after the bench (its entry never ran inside the boot budget and
+    // resumed live), keeping the extraction (net -24).
+    ceiling: 13501,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

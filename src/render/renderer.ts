@@ -448,7 +448,6 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
-import { createPostEffectPrewarmLane } from './post_effect_prewarm';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
   createPrewarmCompileLifecycle,
@@ -5791,14 +5790,6 @@ export class Renderer {
       'ability-materials',
       buildAbilityMaterialPrewarmGroup,
     );
-    const postEffectLane = createPostEffectPrewarmLane({
-      webgl: this.webgl,
-      camera: this.camera,
-      scene: this.scene,
-      post: () => this.post,
-      offscreenTarget: () => (this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8)),
-      awaitDeadlineMs: () => compileAwaitDeadline,
-    });
     let surfaceDetailTexturesWarmed = 0;
 
     let renderPasses = 0;
@@ -6833,21 +6824,6 @@ export class Renderer {
             this.prewarmMaterialTextures(renderable.material);
           });
         },
-      },
-      {
-        // The composer's full-screen passes are the one draw path no compile
-        // root reaches: their materials wear no scene object, so the settle
-        // render below is the first thing that ever draws them and linked all
-        // sixteen inside that one frame (496.1 ms, production 2026-08-18).
-        // Ordered here so both output-colour-space variants are linked before
-        // world.initial-frame runs the composer for real.
-        id: 'post.effect-programs',
-        category: 'post',
-        priority: 68,
-        required: false,
-        resumeUnits: postEffectLane.units,
-        run: postEffectLane.run,
-        detail: postEffectLane.detail,
       },
       {
         // A 2k RGBA16F dome upload blocked a live Mirefen frame for 183ms.
