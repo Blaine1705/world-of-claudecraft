@@ -132,6 +132,17 @@ describe('Warlock Soulwell', () => {
     expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(0);
   });
 
+  it('lets a player who joins the group after summoning use the active well', () => {
+    const { sim, owner, ownerId, strangerId } = world();
+    const well = summon(sim, owner);
+
+    sim.partyInvite(strangerId, ownerId);
+    sim.partyAccept(strangerId);
+
+    expect(sim.pickUpObject(well.id, strangerId)).toBe(true);
+    expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(3);
+  });
+
   it('keeps the summoned group roster eligible after the owner disconnects', () => {
     const { sim, owner, ownerId, allyId } = world();
     const well = summon(sim, owner);
