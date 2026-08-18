@@ -9346,6 +9346,17 @@ body.xhb-mode #player-frame {
   color: var(--gold-dim);
   opacity: 0.75;
   text-shadow: 0 1px 2px #000;
+  /* One line, always: wrapped, the longer arrange-mode line ran off the bottom
+     of the screen instead of growing the bar. */
+  white-space: nowrap;
+}
+/* The arrange line is a sentence rather than two glyphs, and there is no room
+   for it under the bar, so it sits above one. */
+.xhb.xhb-editing .xhb-hint {
+  bottom: auto;
+  top: -16px;
+  color: var(--gold);
+  opacity: 1;
 }
 .xhb.xhb-expanded .xhb-hint {
   color: var(--gold);

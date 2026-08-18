@@ -321,6 +321,10 @@ export class GamepadManager {
     // FFXIV's toggle for the virtual mouse: LB + right-stick-click. Checked as a
     // CHORD (either button rising while the other is held) so the order the two
     // are pressed in does not matter.
+    // A chord's completing button must not ALSO fire its own binding, or opening
+    // arrange mode jumps and toggling the pointer targets something. The trigger
+    // modifiers already work this way; this is the same rule for a chord.
+    let chordButton: number | null = null;
     const chordRise =
       (cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.R3]) ||
       (cur[GP.R3] && !this.prevPressed[GP.R3] && cur[GP.LB]);
@@ -330,6 +334,7 @@ export class GamepadManager {
       (cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.Y]) ||
       (cur[GP.Y] && !this.prevPressed[GP.Y] && cur[GP.LB]);
     if (editChord && this.crossHotbar) {
+      chordButton = cur[GP.Y] && !this.prevPressed[GP.Y] ? GP.Y : GP.LB;
       const toggled = toggleEdit(this.edit);
       this.edit = toggled.state;
       if (toggled.restore) {
@@ -343,6 +348,7 @@ export class GamepadManager {
     }
 
     if (chordRise) {
+      chordButton = cur[GP.R3] && !this.prevPressed[GP.R3] ? GP.R3 : GP.LB;
       this.mouseMode = !this.mouseMode;
       if (this.mouseMode) clearPadFocus();
       else hidePadMouse();
@@ -436,6 +442,7 @@ export class GamepadManager {
     for (const idx of risingEdges(this.prevPressed, cur)) {
       acted = true;
       this.cb.onInputEdge();
+      if (idx === chordButton) continue;
       // The d-pad steps through the HUD WHILE the world keeps running: movement,
       // camera and the cross hotbar are all still live above and below this. Only
       // a press that would otherwise do nothing is taken, so nothing is stolen.

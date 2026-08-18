@@ -1222,6 +1222,14 @@ describe('GamepadManager cross hotbar', () => {
       expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a0' });
     });
 
+    it('does not jump on the way into arrange mode', () => {
+      // The chord's completing button must not also fire its own binding, or
+      // every trip into arrange mode makes the character hop.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      expect(h.triggerGamepadJump).not.toHaveBeenCalled();
+    });
+
     it('picks an ability out of the spellbook and drops it on a cell', () => {
       // The other half of arranging: slot-to-slot moves what is already there,
       // this is how something NEW reaches the bar.
