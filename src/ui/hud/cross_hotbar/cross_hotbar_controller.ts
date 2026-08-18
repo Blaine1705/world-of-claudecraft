@@ -8,9 +8,21 @@
 // select a cell. Each cell carries the shared action-bar painter's own aria-label,
 // so what is announced is the ability on it.
 
+import { resolveActionReplacement } from '../../../sim/combat/action_replacement';
+import { resolveColdsightAbilityForSpec } from '../../../sim/combat/hunter_coldsight';
+import { resolveHunterSharedAbilityForTalents } from '../../../sim/combat/hunter_shared';
+import type { TalentAllocation } from '../../../sim/content/talents';
+import type { ResolvedAbility } from '../../../sim/sim';
+import type { AbilityDef, Entity, ItemDef, PlayerClass } from '../../../sim/types';
+import { formatNumber, t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarSlotElements } from '../action_bar/action_bar_painter';
-import type { ActionBarState } from '../action_bar/action_bar_view';
+import type {
+  ActionBarAbility,
+  ActionBarView,
+  ActionBarWorldInput,
+} from '../action_bar/action_bar_view';
+import { createActionBarView } from '../action_bar/action_bar_view';
 import { CrossHotbarPainter } from './cross_hotbar_painter';
 import {
   CROSS_HOTBAR_CELLS,
@@ -29,6 +41,8 @@ const CELL_POSITION_ATTR = 'data-xhb-point';
 const CELL_INDEX_ATTR = 'data-xhb-index';
 const HALF_LAYER_ATTR = 'data-xhb-half';
 const GLYPH_CLASS = 'xhb-glyph';
+// Painted at nothing while hidden: the painter returns after its display write.
+const EMPTY_BAR_STATE = { slots: [], manySpells: false };
 const TRIGGER_CLASS = 'xhb-trigger';
 const HINT_CLASS = 'xhb-hint';
 
@@ -59,8 +73,50 @@ function buildCell(cell: CrossHotbarCell): ActionBarSlotElements {
   return { btn, label, countEl, keybindEl, cdOverlay, cdText, rechargeOverlay };
 }
 
+/** How the overlay turns a cell's action id into something paintable. The bar owns
+ *  its actions now, so it cannot read cells out of the desktop bar's state array
+ *  and has to resolve them itself. */
+export interface CrossHotbarResolvers {
+  abilityById(id: string): ActionBarAbility | null;
+  itemById(id: string): ItemDef | null;
+  abilityName(def: AbilityDef): string;
+  itemName(item: ItemDef): string;
+}
+
+/** The resolver bag, built from the world the HUD already holds. Lives here rather
+ *  than inline at the call site so src/ui/hud.ts carries a call, not a shape. */
+export function crossHotbarResolvers(
+  sim: {
+    known: readonly ResolvedAbility[];
+    player: Entity;
+    talents: TalentAllocation;
+    cfg: { playerClass: PlayerClass };
+  },
+  items: Record<string, ItemDef>,
+  abilityName: (def: AbilityDef) => string,
+  itemName: (item: ItemDef) => string,
+): CrossHotbarResolvers {
+  return {
+    // Same resolution the action bar performs on its own slots: a saved binding
+    // keeps the BASE ability id while the painted cell follows aura and talent
+    // state, so a transformed ability shows what would actually be cast.
+    abilityById: (id) => {
+      const known = sim.known.find((k) => k.def.id === id) ?? null;
+      if (!known) return null;
+      const resolved = resolveActionReplacement(known, sim.player);
+      if (sim.cfg.playerClass !== 'hunter') return resolved;
+      const coldsight = resolveColdsightAbilityForSpec(resolved, sim.player, sim.talents.spec);
+      return resolveHunterSharedAbilityForTalents(coldsight, sim.player, sim.talents);
+    },
+    itemById: (id) => items[id] ?? null,
+    abilityName,
+    itemName,
+  };
+}
+
 export class CrossHotbarController {
   private readonly painter: CrossHotbarPainter;
+  private readonly view: ActionBarView;
   private readonly glyphs: HTMLElement[] = [];
   private readonly triggerLabels = new Map<string, HTMLElement>();
   private readonly hint: HTMLElement;
@@ -70,6 +126,7 @@ export class CrossHotbarController {
     root: HTMLElement,
     writers: PainterHostWriters,
     iconBg: (k: string) => string,
+    resolve: CrossHotbarResolvers,
   ) {
     const cells: ActionBarSlotElements[] = [];
     const halfEls = new Map<string, HTMLElement>();
@@ -105,6 +162,34 @@ export class CrossHotbarController {
     this.hint = document.createElement('div');
     this.hint.className = HINT_CLASS;
     root.appendChild(this.hint);
+    // The overlay's OWN view: sixteen slots resolved from this bar's actions, not
+    // from the desktop bar. That is what lets a pad layout hold something the
+    // action bar does not (a warrior's stance) and be arranged independently.
+    this.view = createActionBarView(
+      {
+        slots: CROSS_HOTBAR_CELLS.map((cell) => ({
+          slotIndex: cell.index,
+          isAttack: () => false,
+          hasAction: () => this.state.cellActions[cell.index] !== null,
+          ability: () => {
+            const a = this.state.cellActions[cell.index];
+            return a?.type === 'ability' ? resolve.abilityById(a.id) : null;
+          },
+          item: () => {
+            const a = this.state.cellActions[cell.index];
+            return a?.type === 'item' ? resolve.itemById(a.id) : null;
+          },
+          keybindLabel: () => '',
+        })),
+      },
+      {
+        t,
+        abilityName: (def) => resolve.abilityName(def),
+        itemName: (item) => resolve.itemName(item),
+        slotLabel: (i) => formatNumber(i + 1, { maximumFractionDigits: 0 }),
+        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+      },
+    );
     this.painter = new CrossHotbarPainter(
       writers,
       {
@@ -122,9 +207,10 @@ export class CrossHotbarController {
   static create(
     writers: PainterHostWriters,
     iconBg: (iconKey: string) => string,
+    resolve: CrossHotbarResolvers,
   ): CrossHotbarController | undefined {
     const root = document.getElementById(ROOT_ID);
-    return root ? new CrossHotbarController(root, writers, iconBg) : undefined;
+    return root ? new CrossHotbarController(root, writers, iconBg, resolve) : undefined;
   }
 
   /** Show the bar (arming at most one half), or hide it with null. The glyphs are
@@ -156,8 +242,13 @@ export class CrossHotbarController {
     if (this.hint.textContent !== bothTriggers) this.hint.textContent = bothTriggers;
   }
 
-  /** Paint from the frame's already-ticked action-bar state. */
-  paint(bar: ActionBarState): void {
-    this.painter.paint(this.state, bar);
+  /** Tick this bar's own slot states from the frame's world snapshot, then paint.
+   *  Skipped entirely while hidden, so a player with no pad pays nothing for it. */
+  paint(world: ActionBarWorldInput): void {
+    if (!this.state.visible) {
+      this.painter.paint(this.state, EMPTY_BAR_STATE);
+      return;
+    }
+    this.painter.paint(this.state, this.view.tick(world));
   }
 }

@@ -61,8 +61,12 @@ describe('overlay cells match the pad button order', () => {
 });
 
 describe('crossHotbarOverlayState', () => {
-  const set16 = Array.from({ length: 16 }, (_, i) => i + 4);
-  const hold = (layer: 'left' | 'right' | null, slots = set16, expanded = false) => ({
+  const set16 = Array.from({ length: 16 }, (_, i) => ({ type: 'ability' as const, id: `a${i}` }));
+  const hold = (
+    layer: 'left' | 'right' | null,
+    slots: readonly ({ type: 'ability'; id: string } | null)[] = set16,
+    expanded = false,
+  ) => ({
     layer,
     slots,
     expanded,
@@ -79,7 +83,7 @@ describe('crossHotbarOverlayState', () => {
     const state = crossHotbarOverlayState(hold(null));
     expect(state.visible).toBe(true);
     expect(state.activeLayer).toBeNull();
-    expect(state.cellSlots).toEqual(set16);
+    expect(state.cellActions).toEqual(set16);
   });
 
   it('arms one half without changing what either half shows', () => {
@@ -88,7 +92,7 @@ describe('crossHotbarOverlayState', () => {
     expect(left.activeLayer).toBe('left');
     expect(right.activeLayer).toBe('right');
     // The contents are identical: holding a trigger highlights, never swaps.
-    expect(left.cellSlots).toEqual(right.cellSlots);
+    expect(left.cellActions).toEqual(right.cellActions);
   });
 
   it('carries the double-set marker', () => {
@@ -96,18 +100,16 @@ describe('crossHotbarOverlayState', () => {
     expect(crossHotbarOverlayState(hold('right')).expanded).toBe(false);
   });
 
-  it('always yields sixteen cells, so a short slot list cannot overrun the painter', () => {
-    const state = crossHotbarOverlayState(hold(null, [1, 2]));
-    expect(state.cellSlots).toHaveLength(CROSS_HOTBAR_CELL_COUNT);
-    expect(state.cellSlots.slice(2).every((s) => s === -1)).toBe(true);
+  it('always yields sixteen cells, so a short action list cannot overrun the painter', () => {
+    const state = crossHotbarOverlayState(hold(null, set16.slice(0, 2)));
+    expect(state.cellActions).toHaveLength(CROSS_HOTBAR_CELL_COUNT);
+    expect(state.cellActions.slice(2).every((a) => a === null)).toBe(true);
   });
 
-  it('marks a negative or non-numeric entry as unfilled', () => {
-    const state = crossHotbarOverlayState(hold(null, [-3, Number.NaN, 2, ...set16.slice(3)]));
-    expect(state.cellSlots[0]).toBe(-1);
-    // NaN is typeof number but fails the >= 0 gate, so it lands as unfilled rather
-    // than reaching the painter as an index.
-    expect(state.cellSlots[1]).toBe(-1);
-    expect(state.cellSlots[2]).toBe(2);
+  it('carries an empty cell through as empty', () => {
+    const sparse = [null, set16[1], null, ...set16.slice(3)];
+    const state = crossHotbarOverlayState(hold(null, sparse));
+    expect(state.cellActions[0]).toBeNull();
+    expect(state.cellActions[1]).toEqual(set16[1]);
   });
 });

@@ -52,10 +52,11 @@ function fakePad(connected: boolean, kind = 'xbox' as const) {
   };
 }
 
-function fakeHost() {
+function fakeHost(bar: CrossHotbarHoldInfo['slots'] = [], extras: string[] = []) {
   return {
     setCrossHotbar: vi.fn<(hold: CrossHotbarHoldInfo | null) => void>(),
     refreshControllerLabels: vi.fn(),
+    crossHotbarSeed: () => ({ bar, extras }),
   };
 }
 
@@ -102,8 +103,8 @@ describe('crossHotbarResting', () => {
     const resting = crossHotbarResting(new CrossHotbarBindings(), 'xbox');
     expect(resting.layer).toBeNull();
     expect(resting.expanded).toBe(false);
-    // All SIXTEEN, not just one trigger's eight.
-    expect(resting.slots).toEqual(Array.from({ length: 16 }, (_, i) => i));
+    // All SIXTEEN cells, empty until the bar is seeded.
+    expect(resting.slots).toHaveLength(16);
     expect(resting.buttons).toEqual(crossHotbarButtonLabels('xbox'));
     // Each half says which trigger opens it, in the connected pad's own names.
     expect(resting.triggers).toEqual({ left: 'LT', right: 'RT' });
@@ -126,8 +127,7 @@ describe('crossHotbarHold', () => {
     const hold = crossHotbarHold(new CrossHotbarBindings(), 'right', 1, 'playstation');
     expect(hold.layer).toBe('right');
     expect(hold.expanded).toBe(true);
-    // The expanded set is action-bar slots 16..31, both halves.
-    expect(hold.slots).toEqual(Array.from({ length: 16 }, (_, i) => i + 16));
+    expect(hold.slots).toHaveLength(16);
     expect(hold.buttons[7]).toBe('Cross');
   });
 
@@ -183,6 +183,28 @@ describe('pad mode', () => {
     // The desktop rows come back WITHOUT waiting for a reconnect.
     expect(bodyClasses.has(PAD_MODE_CLASS)).toBe(false);
     expect(host.setCrossHotbar).toHaveBeenLastCalledWith(null);
+  });
+
+  it('seeds the bar from the action bar the first time a pad appears', () => {
+    const host = fakeHost([{ type: 'ability', id: 'heroic_strike' }], ['battle_stance']);
+    const wiring = createCrossHotbar(() => host);
+    wiring.bindings.reset();
+    wiring.syncPadMode(fakePad(true));
+    const slots = wiring.bindings.setActions(0);
+    expect(slots[0]).toEqual({ type: 'ability', id: 'heroic_strike' });
+    // the class extra lands in the first free cell, so a stance is reachable
+    expect(slots[1]).toEqual({ type: 'ability', id: 'battle_stance' });
+  });
+
+  it('does not re-seed over a bar the player has arranged', () => {
+    const host = fakeHost([{ type: 'ability', id: 'heroic_strike' }], []);
+    const wiring = createCrossHotbar(() => host);
+    wiring.bindings.reset();
+    wiring.syncPadMode(fakePad(true));
+    wiring.bindings.bind(0, 0, { type: 'ability', id: 'mine' });
+    wiring.syncPadMode(fakePad(false));
+    wiring.syncPadMode(fakePad(true));
+    expect(wiring.bindings.setActions(0)[0]).toEqual({ type: 'ability', id: 'mine' });
   });
 
   it('leaves an unrelated setting alone', () => {

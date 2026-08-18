@@ -11,6 +11,7 @@ import {
   CROSS_HOTBAR_LAYER_BUTTONS,
   CROSS_HOTBAR_PRIMARY_SET,
   CROSS_HOTBAR_TRIGGERS,
+  type CrossHotbarAction,
   type CrossHotbarLayer,
 } from './cross_hotbar';
 import { CrossHotbarBindings } from './cross_hotbar_bindings';
@@ -19,7 +20,7 @@ import { type GamepadKind, gamepadButtonLabel } from './gamepad_map';
 export interface CrossHotbarHoldInfo {
   /** The armed half, or null for the resting bar (which still shows). */
   layer: CrossHotbarLayer | null;
-  slots: readonly number[];
+  slots: readonly CrossHotbarAction[];
   expanded: boolean;
   /** The hardware glyph under each cell, for the connected pad's brand. */
   buttons: readonly string[];
@@ -31,6 +32,10 @@ export interface CrossHotbarHoldInfo {
 export interface CrossHotbarOverlayHost {
   setCrossHotbar(hold: CrossHotbarHoldInfo | null): void;
   refreshControllerLabels(): void;
+  /** What to fill an untouched bar from: the player's action bar, plus the class
+   *  abilities a pad needs that the bar does not carry (a stance is known at
+   *  level one yet unbound, so a pad player could never otherwise reach it). */
+  crossHotbarSeed(): { bar: readonly CrossHotbarAction[]; extras: readonly string[] };
 }
 
 /** The live pad, for the connection-driven half of pad mode. */
@@ -52,8 +57,8 @@ export interface CrossHotbarSettingsStore {
 
 /** The rebind surface the Controller options panel consumes. */
 export interface CrossHotbarPanelHooks {
-  crossHotbarSets(): readonly (readonly number[])[];
-  bindCrossHotbar(set: number, position: number, actionBarSlot: number): void;
+  crossHotbarSets(): readonly (readonly CrossHotbarAction[])[];
+  bindCrossHotbar(set: number, position: number, action: CrossHotbarAction): void;
   resetCrossHotbar(): void;
 }
 
@@ -85,7 +90,7 @@ export function crossHotbarHold(
   return {
     layer,
     // The WHOLE set: the bar shows both halves and only ARMS one.
-    slots: bindings.setSlots(set),
+    slots: bindings.setActions(set),
     expanded: set === CROSS_HOTBAR_EXPANDED_SET,
     buttons: crossHotbarButtonLabels(kind),
     triggers: {
@@ -142,6 +147,12 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
     applyPadModeClass(on);
     const ui = host();
     ui.refreshControllerLabels();
+    // Seed on the first poll where a pad is actually present: the action bar has
+    // loaded by then, and seeding earlier would fill from an empty one.
+    if (on) {
+      const seed = ui.crossHotbarSeed();
+      bindings.seedOnce(seed.bar, seed.extras);
+    }
     ui.setCrossHotbar(on ? crossHotbarResting(bindings, pad.getKind()) : null);
   };
   return {
@@ -164,7 +175,7 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
     },
     hooks: {
       crossHotbarSets: () => bindings.all(),
-      bindCrossHotbar: (set, position, slot) => bindings.bind(set, position, slot),
+      bindCrossHotbar: (set, position, action) => bindings.bind(set, position, action),
       resetCrossHotbar: () => bindings.reset(),
     },
   };

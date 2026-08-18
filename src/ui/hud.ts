@@ -41,6 +41,9 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { resolveActionReplacement } from '../sim/combat/action_replacement';
+import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
+import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
 import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
@@ -385,7 +388,6 @@ import {
   createGroundAimState,
   enterGroundAim,
   type GroundAimState,
-  groundTargetAimPoint,
   shouldUseGroundAim,
 } from './hud/action_bar/ground_aim';
 import {
@@ -413,7 +415,6 @@ import {
 } from './hud/action_bar/mobile_action_page_view';
 import { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
-import { resolveSlotAbility } from './hud/action_bar/slot_ability_core';
 import {
   BattlegroundKillFeed,
   BattlegroundMapPainter,
@@ -440,7 +441,13 @@ import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/
 import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
-import { CrossHotbarController, type CrossHotbarHold } from './hud/cross_hotbar';
+import {
+  CrossHotbarController,
+  type CrossHotbarHold,
+  type CrossHotbarOverlayAction,
+  type CrossHotbarPanelHooks,
+  crossHotbarResolvers,
+} from './hud/cross_hotbar';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
@@ -826,7 +833,7 @@ export interface ThemeHooks {
 }
 
 // Read/rebind the gamepad's button→action layout from the options panel.
-export interface GamepadBindingsHooks {
+export interface GamepadBindingsHooks extends CrossHotbarPanelHooks {
   entries(): { button: number; action: string }[];
   bind(button: number, action: string): void;
   reset(): void;
@@ -834,9 +841,6 @@ export interface GamepadBindingsHooks {
   // glyph printed on that controller ('generic' combined labels when none/unknown).
   kind(): GamepadKind;
   // The cross hotbar layout: the action-bar slot each position casts, per set.
-  crossHotbarSets(): readonly (readonly number[])[];
-  bindCrossHotbar(set: number, position: number, actionBarSlot: number): void;
-  resetCrossHotbar(): void;
 }
 
 export interface ReportHooks {
@@ -6726,7 +6730,19 @@ export class Hud {
     const action = this.actionForSlot(barSlot);
     if (action?.type !== 'ability') return null;
     const known = this.sim.known.find((entry) => entry.def.id === action.id) ?? null;
-    return resolveSlotAbility(known, this.sim.player, this.sim.talents, this.sim.cfg.playerClass);
+    if (!known) return null;
+    // Action-slot replacement: the saved binding keeps the base id while the
+    // painted button follows the aura state, the same pure resolution the sim
+    // cast path uses (rogue engine transforms for every class, plus the
+    // hunter-specific resolvers below).
+    const resolved = resolveActionReplacement(known, this.sim.player);
+    if (this.sim.cfg.playerClass !== 'hunter') return resolved;
+    const coldsight = resolveColdsightAbilityForSpec(
+      resolved,
+      this.sim.player,
+      this.sim.talents.spec,
+    );
+    return resolveHunterSharedAbilityForTalents(coldsight, this.sim.player, this.sim.talents);
   }
 
   private itemForSlot(barSlot: number): ItemDef | null {
@@ -6741,9 +6757,15 @@ export class Hud {
     );
   }
 
+  // Where a ground-targeted ability should land: the current target's position if
+  // one is selected (the usual "cast on that pack" intent), else the caster's own
+  // spot for an open-ground cast. The sim clamps this to the ability's range.
   private groundTargetAim(): { x: number; z: number } {
-    const tid = this.sim.player.targetId;
-    return groundTargetAimPoint(this.sim.player, tid !== null ? this.sim.entities.get(tid) : null);
+    const me = this.sim.player;
+    const tid = me.targetId;
+    const t = tid !== null ? this.sim.entities.get(tid) : null;
+    if (t && !t.dead && t.id !== me.id) return { x: t.pos.x, z: t.pos.z };
+    return { x: me.pos.x, z: me.pos.z };
   }
 
   // The Vale Cup sport moves are AUTOCAST on press: no ground-target reticle, no
@@ -7532,8 +7554,10 @@ export class Hud {
       (iconKey) => this.actionBarIconBg(iconKey),
     );
 
-    this.crossHotbar = CrossHotbarController.create(this.writerFacet, (k) =>
-      this.actionBarIconBg(k),
+    this.crossHotbar = CrossHotbarController.create(
+      this.writerFacet,
+      (k) => this.actionBarIconBg(k),
+      crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName),
     );
     this.buildMobileActionRing();
     this.buildMobileConsumableBar();
@@ -9463,7 +9487,7 @@ export class Hud {
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
     const actionBarState = this.actionBarView.tick(actionBarWorld);
     this.actionBarPainter.paint(actionBarState);
-    this.crossHotbar?.paint(actionBarState);
+    this.crossHotbar?.paint(actionBarWorld);
 
     // mobile action ring: the paged touch combat cluster, gated on the touch-mode
     // signal so desktop skips the tick+paint entirely (both the view and painter
@@ -19075,6 +19099,18 @@ export class Hud {
 
   /** Called by main.ts when a pad connects/disconnects: re-label the Controller
    *  panel with the newly detected brand's glyphs if that panel is open. */
+  /** What an untouched cross hotbar is filled from: this character's action bar,
+   *  plus its stance-style abilities, which are known but unbound and so would be
+   *  unreachable on a pad. */
+  crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
+    return {
+      bar: this.hotbarActions.map((a) => (a ? { type: a.type, id: a.id } : null)),
+      extras: this.sim.known
+        .filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
+        .map((k) => k.def.id),
+    };
+  }
+
   /** Open or close the controller cross hotbar (the pad's held-trigger bar). */
   setCrossHotbar(hold: CrossHotbarHold | null): void {
     this.crossHotbar?.setHold(hold);

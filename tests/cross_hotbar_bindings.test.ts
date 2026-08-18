@@ -7,7 +7,6 @@ import {
 } from '../src/game/cross_hotbar';
 import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
 import { GP } from '../src/game/gamepad_map';
-import { ACTION_BAR_SLOTS } from '../src/game/keybinds';
 
 const STORE_KEY = 'woc_gamepad_xhb';
 
@@ -29,79 +28,138 @@ function installStorage(): void {
 beforeEach(() => installStorage());
 
 describe('CrossHotbarBindings', () => {
-  it('starts on the sequential default layout', () => {
-    expect(new CrossHotbarBindings().all()).toEqual(defaultCrossHotbarLayout());
+  const ability = (id: string) => ({ type: 'ability' as const, id });
+  const bar = (n: number) => Array.from({ length: n }, (_, i) => ability(`a${i}`));
+
+  it('starts empty and unseeded', () => {
+    const b = new CrossHotbarBindings();
+    expect(b.all()).toEqual(defaultCrossHotbarLayout());
+    expect(b.isSeeded()).toBe(false);
   });
 
-  it('resolves a trigger-plus-button press to its action-bar slot', () => {
+  it('seeds once from the action bar and persists it', () => {
     const b = new CrossHotbarBindings();
-    expect(b.actionBarSlot(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toBe(0);
-    expect(b.actionBarSlot(CROSS_HOTBAR_EXPANDED_SET, 'right', GP.A)).toBe(31);
+    expect(b.seedOnce(bar(4))).toBe(true);
+    expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(ability('a0'));
+    expect(new CrossHotbarBindings().isSeeded()).toBe(true);
+  });
+
+  it('never re-seeds over a bar the player has arranged', () => {
+    const b = new CrossHotbarBindings();
+    b.seedOnce(bar(4));
+    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('rearranged'));
+    expect(b.seedOnce(bar(4))).toBe(false);
+    expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(
+      ability('rearranged'),
+    );
+  });
+
+  it('stays unseeded when there is nothing yet to seed FROM', () => {
+    // A bar of empty slots must not count as seeded, or the real seed would be
+    // skipped forever once the player has abilities.
+    const b = new CrossHotbarBindings();
+    expect(b.seedOnce([null, null])).toBe(false);
+    expect(b.isSeeded()).toBe(false);
+  });
+
+  it('carries class extras onto the bar', () => {
+    const b = new CrossHotbarBindings();
+    b.seedOnce([ability('heroic_strike'), null], ['battle_stance']);
+    expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_LEFT)).toEqual(
+      ability('battle_stance'),
+    );
+  });
+
+  it('resolves a trigger-plus-button press to the action on that cell', () => {
+    const b = new CrossHotbarBindings();
+    b.seedOnce(bar(32));
+    expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(ability('a0'));
+    expect(b.actionFor(CROSS_HOTBAR_EXPANDED_SET, 'right', GP.A)).toEqual(ability('a31'));
   });
 
   it('persists a rebind and reloads it', () => {
     const b = new CrossHotbarBindings();
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, 21);
-    expect(b.actionBarSlot(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toBe(21);
+    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('shield_block'));
     expect(
-      new CrossHotbarBindings().actionBarSlot(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP),
-    ).toBe(21);
+      new CrossHotbarBindings().actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP),
+    ).toEqual(ability('shield_block'));
   });
 
   it('rebinds by the physical trigger-plus-button pair', () => {
     const b = new CrossHotbarBindings();
-    b.bindButton(CROSS_HOTBAR_PRIMARY_SET, 'right', GP.B, 5);
-    expect(b.actionBarSlot(CROSS_HOTBAR_PRIMARY_SET, 'right', GP.B)).toBe(5);
-    // The same button on the OTHER layer is a different position and must not move.
-    expect(b.actionBarSlot(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.B)).toBe(6);
+    b.seedOnce(bar(32));
+    b.bindButton(CROSS_HOTBAR_PRIMARY_SET, 'right', GP.B, ability('x'));
+    expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'right', GP.B)).toEqual(ability('x'));
+    // the same button on the OTHER layer is a different cell and must not move
+    expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.B)).toEqual(ability('a6'));
+  });
+
+  it('clears a cell when bound to nothing', () => {
+    const b = new CrossHotbarBindings();
+    b.seedOnce(bar(4));
+    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, null);
+    expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toBeNull();
   });
 
   it('ignores a rebind of a button the cross hotbar does not claim', () => {
     const b = new CrossHotbarBindings();
-    b.bindButton(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.LB, 9);
-    expect(b.all()).toEqual(defaultCrossHotbarLayout());
+    b.bindButton(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.LB, ability('x'));
+    expect(b.isSeeded()).toBe(false);
   });
 
-  it('ignores an out-of-range set, position, or action-bar slot', () => {
+  it('ignores an out-of-range set or position', () => {
     const b = new CrossHotbarBindings();
-    b.bind(9, 0, 5);
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, -1, 5);
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, CROSS_HOTBAR_SLOTS_PER_SET, 5);
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ACTION_BAR_SLOTS);
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, -1);
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, 1.5);
-    expect(b.all()).toEqual(defaultCrossHotbarLayout());
+    b.bind(9, 0, ability('x'));
+    b.bind(CROSS_HOTBAR_PRIMARY_SET, -1, ability('x'));
+    b.bind(CROSS_HOTBAR_PRIMARY_SET, CROSS_HOTBAR_SLOTS_PER_SET, ability('x'));
+    expect(b.isSeeded()).toBe(false);
   });
 
-  it('allows two positions to cast the same action-bar slot', () => {
+  it('swaps two cells, which is what an edit-mode drag does', () => {
     const b = new CrossHotbarBindings();
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, 7);
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, 1, 7);
-    expect(b.setSlots(CROSS_HOTBAR_PRIMARY_SET)[0]).toBe(7);
-    expect(b.setSlots(CROSS_HOTBAR_PRIMARY_SET)[1]).toBe(7);
+    b.seedOnce(bar(4));
+    b.swap(CROSS_HOTBAR_PRIMARY_SET, 0, CROSS_HOTBAR_PRIMARY_SET, 1);
+    expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET)[0]).toEqual(ability('a1'));
+    expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET)[1]).toEqual(ability('a0'));
   });
 
-  it('resets every set back to the default', () => {
+  it('swaps across sets too', () => {
     const b = new CrossHotbarBindings();
-    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, 20);
-    b.bind(CROSS_HOTBAR_EXPANDED_SET, 3, 2);
+    b.seedOnce(bar(32));
+    b.swap(CROSS_HOTBAR_PRIMARY_SET, 0, CROSS_HOTBAR_EXPANDED_SET, 0);
+    expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET)[0]).toEqual(ability('a16'));
+    expect(b.setActions(CROSS_HOTBAR_EXPANDED_SET)[0]).toEqual(ability('a0'));
+  });
+
+  it('leaves the bar alone when a swap names a cell that does not exist', () => {
+    const b = new CrossHotbarBindings();
+    b.seedOnce(bar(4));
+    const before = JSON.stringify(b.all());
+    b.swap(CROSS_HOTBAR_PRIMARY_SET, 0, 9, 0);
+    expect(JSON.stringify(b.all())).toBe(before);
+  });
+
+  it('allows two cells to hold the same action', () => {
+    const b = new CrossHotbarBindings();
+    b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('x'));
+    b.bind(CROSS_HOTBAR_PRIMARY_SET, 1, ability('x'));
+    expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET).slice(0, 2)).toEqual([
+      ability('x'),
+      ability('x'),
+    ]);
+  });
+
+  it('resets back to empty so the next seed refills it', () => {
+    const b = new CrossHotbarBindings();
+    b.seedOnce(bar(4));
     b.reset();
-    expect(b.all()).toEqual(defaultCrossHotbarLayout());
-    expect(new CrossHotbarBindings().all()).toEqual(defaultCrossHotbarLayout());
+    expect(b.isSeeded()).toBe(false);
+    expect(new CrossHotbarBindings().isSeeded()).toBe(false);
   });
 
-  it('falls back to the default when the stored value is corrupt', () => {
+  it('falls back to empty when the stored value is corrupt', () => {
     localStorage.setItem(STORE_KEY, '{not json');
     expect(new CrossHotbarBindings().all()).toEqual(defaultCrossHotbarLayout());
-  });
-
-  it('repairs an out-of-range stored slot on load', () => {
-    const stored = defaultCrossHotbarLayout();
-    stored[0][0] = 999;
-    localStorage.setItem(STORE_KEY, JSON.stringify(stored));
-    expect(
-      new CrossHotbarBindings().actionBarSlot(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP),
-    ).toBe(0);
   });
 
   it('survives storage being unavailable', () => {
@@ -109,7 +167,7 @@ describe('CrossHotbarBindings', () => {
     vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
       throw new Error('quota');
     });
-    expect(() => b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, 4)).not.toThrow();
-    expect(b.actionBarSlot(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toBe(4);
+    expect(() => b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('x'))).not.toThrow();
+    expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(ability('x'));
   });
 });

@@ -7,6 +7,7 @@
 
 import type { NavDirection } from '../ui/dpad_nav_core';
 import {
+  type CrossHotbarAction,
   type CrossHotbarLayer,
   type CrossHotbarTriggerState,
   crossHotbarActiveSet,
@@ -68,6 +69,10 @@ export interface GamepadCallbacks {
   // trigger is held, which is the overlay's cue to hide. Fired only on a CHANGE,
   // never per poll. Optional.
   onCrossHotbar?(layer: CrossHotbarLayer | null, set: number): void;
+  // Cast what a cross-hotbar cell holds. The bar owns its own actions, so this is
+  // an ability or item id rather than an action-bar slot: IWorld.castAbility is
+  // deliberately id-based so the client never depends on slot semantics.
+  onCrossHotbarCast?(action: { type: 'ability' | 'item'; id: string }): void;
 }
 
 // Which way each d-pad button steps focus while a window is open.
@@ -408,12 +413,12 @@ export class GamepadManager {
     }
   }
 
-  /** The action-bar slot a button press casts through the cross hotbar right now,
-   *  or null when the cross hotbar does not claim this press. */
-  private crossHotbarSlotFor(buttonIndex: number): number | null {
+  /** The action a button press casts through the cross hotbar right now, or null
+   *  when the cross hotbar does not claim this press. */
+  private crossHotbarActionFor(buttonIndex: number): CrossHotbarAction {
     const layer = this.triggerState.hold;
     if (!this.crossHotbar || layer === null || !this.crossHotbarBindings) return null;
-    return this.crossHotbarBindings.actionBarSlot(
+    return this.crossHotbarBindings.actionFor(
       crossHotbarActiveSet(this.triggerState),
       layer,
       buttonIndex,
@@ -437,9 +442,9 @@ export class GamepadManager {
       // The triggers are the modifier while the cross hotbar is on: they never
       // fire their own flat binding, the way a Shift key does not type.
       if (buttonIndex === GP.LT || buttonIndex === GP.RT) return;
-      const slot = this.crossHotbarSlotFor(buttonIndex);
-      if (slot !== null) {
-        this.cb.onAction(`slot${slot}`);
+      const action = this.crossHotbarActionFor(buttonIndex);
+      if (action !== null) {
+        this.cb.onCrossHotbarCast?.(action);
         return;
       }
       // A claimed button pressed with a trigger held but no slot mapped stays

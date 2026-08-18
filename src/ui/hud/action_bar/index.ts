@@ -13,4 +13,3 @@ export * from './hotbar';
 export * from './mobile_action_page_view';
 export * from './mobile_action_ring_painter';
 export * from './player_stealthed';
-export * from './slot_ability_core';

@@ -59,25 +59,63 @@ export const CROSS_HOTBAR_SET_COUNT = 2;
 export const CROSS_HOTBAR_PRIMARY_SET = 0;
 export const CROSS_HOTBAR_EXPANDED_SET = 1;
 
-/** Per set, the action-bar slot each of the sixteen cross-hotbar positions casts.
- *  Mirroring the action bar rather than storing its own actions is deliberate:
- *  pad and keyboard players share one loadout, and there is no second store to
- *  keep in sync. */
-export type CrossHotbarLayout = readonly (readonly number[])[];
+/** One cross-hotbar cell: the ability or item on it, or nothing. Structurally the
+ *  HUD's HotbarAction, redeclared here so this pure game core owns no UI import. */
+export type CrossHotbarAction = { type: 'ability' | 'item'; id: string } | null;
 
-/** Sequential default: the first set mirrors action-bar slots 0 to 15, the second
- *  16 to 31. Slot 0 is the Attack control, which is a legitimate cross-hotbar
- *  entry (the overlay paints it exactly as the action bar does). */
-export function defaultCrossHotbarLayout(): number[][] {
-  const sets: number[][] = [];
-  for (let set = 0; set < CROSS_HOTBAR_SET_COUNT; set++) {
-    const slots: number[] = [];
-    for (let i = 0; i < CROSS_HOTBAR_SLOTS_PER_SET; i++) {
-      slots.push(set * CROSS_HOTBAR_SLOTS_PER_SET + i);
-    }
-    sets.push(slots);
+/** Per set, the sixteen actions the cross hotbar casts.
+ *
+ *  The bar owns its actions rather than pointing at action-bar slots. Mirroring
+ *  the slots kept one loadout for both input devices, which sounds tidy and is
+ *  wrong: the best pad layout is not the best keyboard layout, and a player
+ *  arranging one was silently rearranging the other. It is SEEDED from the action
+ *  bar once so nobody starts empty, and independent from then on. */
+export type CrossHotbarLayout = readonly (readonly CrossHotbarAction[])[];
+
+/** An empty bar: every cell unset, awaiting the one-time seed from the action bar. */
+export function defaultCrossHotbarLayout(): CrossHotbarAction[][] {
+  return Array.from({ length: CROSS_HOTBAR_SET_COUNT }, () =>
+    Array.from({ length: CROSS_HOTBAR_SLOTS_PER_SET }, () => null as CrossHotbarAction),
+  );
+}
+
+/** True once anything at all sits on the bar, so the one-time seed runs exactly
+ *  once and never overwrites a layout the player has arranged. */
+export function isCrossHotbarSeeded(layout: CrossHotbarLayout): boolean {
+  return layout.some((set) => set.some((cell) => cell !== null));
+}
+
+/**
+ * The one-time seed: the player's action bar in order, then the class's signature
+ * extras appended to the first free cells. `extras` exists for actions a class
+ * needs on a pad but that the action bar does not carry by default (a warrior's
+ * stance is KNOWN at level one yet unbound, so a pad player could never reach it).
+ * Anything already seeded from the bar is not added twice.
+ */
+export function seedCrossHotbarLayout(
+  barActions: readonly CrossHotbarAction[],
+  extras: readonly string[] = [],
+): CrossHotbarAction[][] {
+  const layout = defaultCrossHotbarLayout();
+  const flat: CrossHotbarAction[] = [];
+  for (const action of barActions) flat.push(action ?? null);
+  const already = new Set(
+    flat.filter((a): a is { type: 'ability' | 'item'; id: string } => a !== null).map((a) => a.id),
+  );
+  for (const id of extras) {
+    if (already.has(id)) continue;
+    already.add(id);
+    const free = flat.indexOf(null);
+    const cell: CrossHotbarAction = { type: 'ability', id };
+    if (free >= 0) flat[free] = cell;
+    else flat.push(cell);
   }
-  return sets;
+  for (let set = 0; set < CROSS_HOTBAR_SET_COUNT; set++) {
+    for (let i = 0; i < CROSS_HOTBAR_SLOTS_PER_SET; i++) {
+      layout[set][i] = flat[set * CROSS_HOTBAR_SLOTS_PER_SET + i] ?? null;
+    }
+  }
+  return layout;
 }
 
 /** Position within a set (0 to 15) for a physical button under a held trigger, or
@@ -94,35 +132,24 @@ export function isCrossHotbarButton(button: number): boolean {
   return CROSS_HOTBAR_LAYER_BUTTONS.includes(button);
 }
 
-/** The action-bar slot a press resolves to, or null when the button is unclaimed
- *  or the layout has no entry for that position. */
-export function crossHotbarActionBarSlot(
+/** The action a press casts, or null when the button is unclaimed or the cell is
+ *  empty. */
+export function crossHotbarActionFor(
   layout: CrossHotbarLayout,
   set: number,
   layer: CrossHotbarLayer,
   button: number,
-): number | null {
+): CrossHotbarAction {
   const position = crossHotbarPosition(layer, button);
   if (position === null) return null;
   return layout[set]?.[position] ?? null;
 }
 
-/** The eight action-bar slots ONE held trigger reaches, in display order. The
- *  overlay shows exactly this: two diamonds of four, swapping contents with the
- *  trigger rather than showing all sixteen at once. */
-export function crossHotbarLayerSlots(
+/** The sixteen actions of one set, in display order, for the overlay. */
+export function crossHotbarSetActions(
   layout: CrossHotbarLayout,
   set: number,
-  layer: CrossHotbarLayer,
-): readonly number[] {
-  const offset = layer === 'left' ? 0 : CROSS_HOTBAR_SLOTS_PER_LAYER;
-  const slots = layout[set];
-  if (!slots) return [];
-  return slots.slice(offset, offset + CROSS_HOTBAR_SLOTS_PER_LAYER);
-}
-
-/** The sixteen action-bar slots of one set, in display order, for the overlay. */
-export function crossHotbarSetSlots(layout: CrossHotbarLayout, set: number): readonly number[] {
+): readonly CrossHotbarAction[] {
   return layout[set] ?? [];
 }
 
@@ -188,17 +215,24 @@ export function crossHotbarActiveSet(state: CrossHotbarTriggerState): number {
  * rest. A shrunk or grown ACTION_BAR_SLOTS, a hand-edited storage value, and a
  * layout written by an older build all land here.
  */
-export function sanitizeCrossHotbarLayout(raw: unknown, actionBarSlots: number): number[][] {
+export function sanitizeCrossHotbarLayout(raw: unknown): CrossHotbarAction[][] {
   const fallback = defaultCrossHotbarLayout();
   if (!Array.isArray(raw)) return fallback;
   return fallback.map((defaults, set) => {
     const storedSet = raw[set];
     if (!Array.isArray(storedSet)) return defaults;
-    return defaults.map((defaultSlot, position) => {
+    return defaults.map((_empty, position) => {
       const stored = storedSet[position];
-      if (typeof stored !== 'number' || !Number.isInteger(stored)) return defaultSlot;
-      if (stored < 0 || stored >= actionBarSlots) return defaultSlot;
-      return stored;
+      // A layout written before the bar owned its actions stored slot NUMBERS.
+      // There is no way to resolve one here without the action bar, so it reads
+      // as unset and the one-time seed refills the bar from the player's own
+      // slots, which is what that migration should produce anyway.
+      if (!stored || typeof stored !== 'object') return null;
+      const { type, id } = stored as { type?: unknown; id?: unknown };
+      if ((type !== 'ability' && type !== 'item') || typeof id !== 'string' || id === '') {
+        return null;
+      }
+      return { type, id };
     });
   });
 }

@@ -12,9 +12,8 @@
 import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarPaintDescriptor } from '../action_bar/action_bar_painter';
 import { ActionBarPainter } from '../action_bar/action_bar_painter';
-import type { ActionBarSlotState, ActionBarState } from '../action_bar/action_bar_view';
-import { makeSlotState } from '../action_bar/action_bar_view';
-import { CROSS_HOTBAR_CELLS, type CrossHotbarOverlayState } from './cross_hotbar_view';
+import type { ActionBarState } from '../action_bar/action_bar_view';
+import type { CrossHotbarOverlayState } from './cross_hotbar_view';
 
 const DISPLAY_SHOWN = '';
 const DISPLAY_HIDDEN = 'none';
@@ -33,11 +32,6 @@ export interface CrossHotbarPaintDescriptor {
 
 export class CrossHotbarPainter {
   private readonly barPainter: ActionBarPainter;
-  // Reused every frame: the entries are reassigned to point at the desktop state's
-  // slots, so painting allocates nothing.
-  private readonly adapter: ActionBarState;
-  // Stands in for a cell whose layout entry names no real action-bar slot.
-  private readonly blank: ActionBarSlotState = makeSlotState();
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -45,13 +39,13 @@ export class CrossHotbarPainter {
     resolveBackgroundImage: (iconKey: string) => string,
   ) {
     this.barPainter = new ActionBarPainter(writers, descriptor.bar, resolveBackgroundImage);
-    this.adapter = { slots: CROSS_HOTBAR_CELLS.map(() => this.blank), manySpells: false };
   }
 
   /**
-   * Paint one frame. `bar` is the desktop action bar's state for THIS frame; the
-   * overlay reads its cells straight out of it. A hidden overlay stops after the
-   * display write, so a player with no pad pays one elided write per frame.
+   * Paint one frame. `bar` is the overlay's OWN ticked state (the bar owns its
+   * actions now, so it cannot read cells out of the desktop bar's array). A
+   * hidden overlay stops after the display write, so a player with no pad pays
+   * one elided write per frame.
    */
   paint(state: CrossHotbarOverlayState, bar: ActionBarState): void {
     this.writers.setDisplay(this.descriptor.root, state.visible ? DISPLAY_SHOWN : DISPLAY_HIDDEN);
@@ -69,10 +63,6 @@ export class CrossHotbarPainter {
       state.activeLayer === 'right',
     );
 
-    for (let i = 0; i < this.adapter.slots.length; i++) {
-      const slot = state.cellSlots[i];
-      this.adapter.slots[i] = bar.slots[slot] ?? this.blank;
-    }
-    this.barPainter.paint(this.adapter);
+    this.barPainter.paint(bar);
   }
 }

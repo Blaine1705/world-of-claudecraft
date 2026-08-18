@@ -20,6 +20,10 @@
 /** Which trigger a half belongs to. Structurally the game core's CrossHotbarLayer. */
 export type CrossHotbarOverlayLayer = 'left' | 'right';
 
+/** One cell's action. Structurally the game core's CrossHotbarAction; redeclared
+ *  so this registered pure core stays host-agnostic and imports no src/game. */
+export type CrossHotbarOverlayAction = { type: 'ability' | 'item'; id: string } | null;
+
 export type CrossHotbarCluster = 'dpad' | 'face';
 export type CrossHotbarPoint = 'top' | 'left' | 'right' | 'bottom';
 
@@ -56,23 +60,23 @@ export interface CrossHotbarOverlayState {
   activeLayer: CrossHotbarOverlayLayer | null;
   /** Whether the second (double) set is showing, for the overlay's set marker. */
   expanded: boolean;
-  /** Action-bar slot per cell, always sixteen entries; -1 where the layout has none. */
-  cellSlots: readonly number[];
+  /** The action on each cell, always sixteen entries; null where empty. */
+  cellActions: readonly CrossHotbarOverlayAction[];
 }
 
 export const HIDDEN_CROSS_HOTBAR: CrossHotbarOverlayState = {
   visible: false,
   activeLayer: null,
   expanded: false,
-  cellSlots: CROSS_HOTBAR_CELLS.map(() => -1),
+  cellActions: CROSS_HOTBAR_CELLS.map(() => null),
 };
 
 /** What the HUD is handed: the whole set, plus which half (if any) is armed. */
 export interface CrossHotbarHold {
   /** The armed half, or null for the resting bar (still shown). */
   layer: CrossHotbarOverlayLayer | null;
-  /** The SIXTEEN action-bar slots of the active set, in cell order. */
-  slots: readonly number[];
+  /** The SIXTEEN actions of the active set, in cell order. */
+  slots: readonly CrossHotbarOverlayAction[];
   expanded: boolean;
   /** The hardware glyph under each cell, in CROSS_HOTBAR_CELLS order. */
   buttons: readonly string[];
@@ -89,10 +93,17 @@ export interface CrossHotbarHold {
  */
 export function crossHotbarOverlayState(hold: CrossHotbarHold | null): CrossHotbarOverlayState {
   if (hold === null) return HIDDEN_CROSS_HOTBAR;
-  const cellSlots: number[] = [];
+  const cellActions: CrossHotbarOverlayAction[] = [];
   for (let i = 0; i < CROSS_HOTBAR_CELL_COUNT; i++) {
-    const slot = hold.slots[i];
-    cellSlots.push(typeof slot === 'number' && slot >= 0 ? slot : -1);
+    cellActions.push(hold.slots[i] ?? null);
   }
-  return { visible: true, activeLayer: hold.layer, expanded: hold.expanded, cellSlots };
+  return { visible: true, activeLayer: hold.layer, expanded: hold.expanded, cellActions };
+}
+
+/** The rebind surface the options panel and any edit mode both consume. Declared
+ *  here so the HUD's hooks interface can extend it rather than restate it. */
+export interface CrossHotbarPanelHooks {
+  crossHotbarSets(): readonly (readonly CrossHotbarOverlayAction[])[];
+  bindCrossHotbar(set: number, position: number, action: CrossHotbarOverlayAction): void;
+  resetCrossHotbar(): void;
 }

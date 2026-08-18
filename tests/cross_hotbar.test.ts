@@ -8,18 +8,19 @@ import {
   CROSS_HOTBAR_SLOTS_PER_SET,
   CROSS_HOTBAR_TRIGGERS,
   type CrossHotbarTriggerState,
-  crossHotbarActionBarSlot,
+  crossHotbarActionFor,
   crossHotbarActiveSet,
   crossHotbarPosition,
-  crossHotbarSetSlots,
+  crossHotbarSetActions,
   defaultCrossHotbarLayout,
   INITIAL_CROSS_HOTBAR_TRIGGER_STATE,
   isCrossHotbarButton,
+  isCrossHotbarSeeded,
   nextCrossHotbarTriggerState,
   sanitizeCrossHotbarLayout,
+  seedCrossHotbarLayout,
 } from '../src/game/cross_hotbar';
 import { GP } from '../src/game/gamepad_map';
-import { ACTION_BAR_SLOTS } from '../src/game/keybinds';
 
 // Advance the reducer over a scripted sequence of [lt, rt] polls.
 function run(
@@ -83,56 +84,107 @@ describe('cross hotbar geometry', () => {
 });
 
 describe('defaultCrossHotbarLayout', () => {
-  it('mirrors consecutive action-bar slots across both sets', () => {
+  it('starts empty, awaiting the one-time seed', () => {
     const layout = defaultCrossHotbarLayout();
     expect(layout).toHaveLength(CROSS_HOTBAR_SET_COUNT);
-    expect(layout[CROSS_HOTBAR_PRIMARY_SET]).toEqual([
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-    ]);
-    expect(layout[CROSS_HOTBAR_EXPANDED_SET]).toEqual([
-      16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-    ]);
+    for (const set of layout) {
+      expect(set).toHaveLength(CROSS_HOTBAR_SLOTS_PER_SET);
+      expect(set.every((cell) => cell === null)).toBe(true);
+    }
+    expect(isCrossHotbarSeeded(layout)).toBe(false);
   });
 
-  it('fits inside the real action bar', () => {
-    // The default is generated from the set geometry, so a future action bar that
-    // shrank below 32 slots would silently point the cross hotbar off the end.
-    const highest = Math.max(...defaultCrossHotbarLayout().flat());
-    expect(highest).toBeLessThan(ACTION_BAR_SLOTS);
+  it('counts as seeded the moment anything sits on it', () => {
+    const layout = defaultCrossHotbarLayout();
+    layout[1][7] = { type: 'ability', id: 'heroic_strike' };
+    expect(isCrossHotbarSeeded(layout)).toBe(true);
   });
 });
 
-describe('crossHotbarActionBarSlot', () => {
-  const layout = defaultCrossHotbarLayout();
+describe('seedCrossHotbarLayout', () => {
+  const ability = (id: string) => ({ type: 'ability' as const, id });
 
-  it('resolves a held-trigger press to its mirrored action-bar slot', () => {
-    expect(crossHotbarActionBarSlot(layout, 0, 'left', GP.DPAD_UP)).toBe(0);
-    expect(crossHotbarActionBarSlot(layout, 0, 'right', GP.A)).toBe(15);
-    expect(crossHotbarActionBarSlot(layout, 1, 'left', GP.DPAD_UP)).toBe(16);
-    expect(crossHotbarActionBarSlot(layout, 1, 'right', GP.A)).toBe(31);
+  it('lays the action bar out across the sets in order', () => {
+    const bar = [ability('a'), ability('b'), null, ability('c')];
+    const layout = seedCrossHotbarLayout(bar);
+    expect(layout[0][0]).toEqual(ability('a'));
+    expect(layout[0][1]).toEqual(ability('b'));
+    expect(layout[0][2]).toBeNull();
+    expect(layout[0][3]).toEqual(ability('c'));
+  });
+
+  it('spills past the first set into the second', () => {
+    const bar = Array.from({ length: 20 }, (_, i) => ability(`a${i}`));
+    const layout = seedCrossHotbarLayout(bar);
+    expect(layout[0][15]).toEqual(ability('a15'));
+    expect(layout[1][0]).toEqual(ability('a16'));
+  });
+
+  it('puts a class extra in the first free cell', () => {
+    // A warrior's stance is KNOWN at level one yet unbound, so a pad player could
+    // never reach it: the seed is the only thing that puts it within reach.
+    const layout = seedCrossHotbarLayout([ability('heroic_strike'), null], ['battle_stance']);
+    expect(layout[0][0]).toEqual(ability('heroic_strike'));
+    expect(layout[0][1]).toEqual(ability('battle_stance'));
+  });
+
+  it('does not add an extra the bar already carries', () => {
+    const layout = seedCrossHotbarLayout([ability('battle_stance'), null], ['battle_stance']);
+    expect(layout[0][1]).toBeNull();
+    const count = layout.flat().filter((c) => c?.id === 'battle_stance').length;
+    expect(count).toBe(1);
+  });
+
+  it('appends an extra after a full bar rather than dropping it', () => {
+    const bar = Array.from({ length: 16 }, (_, i) => ability(`a${i}`));
+    const layout = seedCrossHotbarLayout(bar, ['battle_stance']);
+    expect(layout[1][0]).toEqual(ability('battle_stance'));
+  });
+});
+
+describe('crossHotbarActionFor', () => {
+  const layout = seedCrossHotbarLayout(
+    Array.from({ length: 32 }, (_, i) => ({ type: 'ability' as const, id: `a${i}` })),
+  );
+
+  it('resolves a held-trigger press to the action on that cell', () => {
+    expect(crossHotbarActionFor(layout, 0, 'left', GP.DPAD_UP)).toEqual({
+      type: 'ability',
+      id: 'a0',
+    });
+    expect(crossHotbarActionFor(layout, 0, 'right', GP.A)).toEqual({
+      type: 'ability',
+      id: 'a15',
+    });
+    expect(crossHotbarActionFor(layout, 1, 'left', GP.DPAD_UP)).toEqual({
+      type: 'ability',
+      id: 'a16',
+    });
   });
 
   it('resolves nothing for an unclaimed button or a set that does not exist', () => {
-    expect(crossHotbarActionBarSlot(layout, 0, 'left', GP.LB)).toBeNull();
-    expect(crossHotbarActionBarSlot(layout, 7, 'left', GP.DPAD_UP)).toBeNull();
+    expect(crossHotbarActionFor(layout, 0, 'left', GP.LB)).toBeNull();
+    expect(crossHotbarActionFor(layout, 7, 'left', GP.DPAD_UP)).toBeNull();
   });
 
-  it('follows a remapped layout rather than the sequential default', () => {
-    const remapped = defaultCrossHotbarLayout();
-    remapped[0][0] = 33;
-    expect(crossHotbarActionBarSlot(remapped, 0, 'left', GP.DPAD_UP)).toBe(33);
+  it('resolves nothing for an empty cell', () => {
+    const sparse = defaultCrossHotbarLayout();
+    expect(crossHotbarActionFor(sparse, 0, 'left', GP.DPAD_UP)).toBeNull();
   });
 });
 
-describe('crossHotbarSetSlots', () => {
-  it('hands the overlay the sixteen slots of a set in display order', () => {
-    const slots = crossHotbarSetSlots(defaultCrossHotbarLayout(), CROSS_HOTBAR_EXPANDED_SET);
-    expect(slots).toHaveLength(CROSS_HOTBAR_SLOTS_PER_SET);
-    expect(slots[0]).toBe(16);
+describe('crossHotbarSetActions', () => {
+  it('hands the overlay the sixteen actions of a set in display order', () => {
+    const layout = seedCrossHotbarLayout(
+      Array.from({ length: 32 }, (_, i) => ({ type: 'ability' as const, id: `a${i}` })),
+    );
+    const actions = crossHotbarSetActions(layout, CROSS_HOTBAR_EXPANDED_SET);
+    expect(actions).toHaveLength(CROSS_HOTBAR_SLOTS_PER_SET);
+    expect(actions[0]).toEqual({ type: 'ability', id: 'a16' });
   });
 
   it('is empty for a set outside the layout', () => {
-    expect(crossHotbarSetSlots(defaultCrossHotbarLayout(), 9)).toEqual([]);
+    expect(crossHotbarSetActions(defaultCrossHotbarLayout(), 9)).toEqual([]);
   });
 });
 
@@ -233,52 +285,55 @@ describe('nextCrossHotbarTriggerState', () => {
 });
 
 describe('sanitizeCrossHotbarLayout', () => {
+  const ability = { type: 'ability' as const, id: 'heroic_strike' };
+
   it('falls back wholesale for a non-array value', () => {
-    expect(sanitizeCrossHotbarLayout(null, ACTION_BAR_SLOTS)).toEqual(defaultCrossHotbarLayout());
-    expect(sanitizeCrossHotbarLayout('nope', ACTION_BAR_SLOTS)).toEqual(defaultCrossHotbarLayout());
+    expect(sanitizeCrossHotbarLayout(null)).toEqual(defaultCrossHotbarLayout());
+    expect(sanitizeCrossHotbarLayout('nope')).toEqual(defaultCrossHotbarLayout());
   });
 
-  it('keeps stored entries that name a real slot', () => {
+  it('keeps a well-formed stored action', () => {
     const stored = defaultCrossHotbarLayout();
-    stored[0][3] = 30;
-    const clean = sanitizeCrossHotbarLayout(stored, ACTION_BAR_SLOTS);
-    expect(clean[0][3]).toBe(30);
+    stored[0][3] = ability;
+    expect(sanitizeCrossHotbarLayout(stored)[0][3]).toEqual(ability);
   });
 
-  it('replaces an out-of-range slot with its default, per position', () => {
-    const stored = defaultCrossHotbarLayout();
-    stored[0][0] = ACTION_BAR_SLOTS; // one past the end
-    stored[0][1] = -1;
-    stored[0][2] = 9;
-    const clean = sanitizeCrossHotbarLayout(stored, ACTION_BAR_SLOTS);
-    expect(clean[0][0]).toBe(0);
-    expect(clean[0][1]).toBe(1);
-    expect(clean[0][2]).toBe(9);
+  it('drops a malformed entry per cell rather than the whole bar', () => {
+    const stored = defaultCrossHotbarLayout() as unknown[][];
+    stored[0][0] = { type: 'spell', id: 'x' }; // not a kind we store
+    stored[0][1] = { type: 'ability' }; // no id
+    stored[0][2] = { type: 'ability', id: '' }; // empty id
+    stored[0][3] = ability;
+    const clean = sanitizeCrossHotbarLayout(stored);
+    expect(clean[0].slice(0, 3)).toEqual([null, null, null]);
+    expect(clean[0][3]).toEqual(ability);
   });
 
-  it('replaces a non-integer entry with its default', () => {
-    const stored = defaultCrossHotbarLayout();
-    stored[1][0] = 4.5;
-    const clean = sanitizeCrossHotbarLayout(stored, ACTION_BAR_SLOTS);
-    expect(clean[1][0]).toBe(16);
+  it('reads a LEGACY slot-number layout as unseeded so the seed refills it', () => {
+    // Before the bar owned its actions it stored action-bar slot indices. There is
+    // no way to resolve one here without the action bar, and re-seeding from the
+    // player's own slots is what that migration should produce anyway.
+    const legacy = [
+      Array.from({ length: 16 }, (_, i) => i),
+      Array.from({ length: 16 }, (_, i) => i + 16),
+    ];
+    const clean = sanitizeCrossHotbarLayout(legacy);
+    expect(isCrossHotbarSeeded(clean)).toBe(false);
   });
 
   it('restores a set that is missing or the wrong shape', () => {
-    const clean = sanitizeCrossHotbarLayout([undefined, 'gone'], ACTION_BAR_SLOTS);
-    expect(clean).toEqual(defaultCrossHotbarLayout());
+    expect(sanitizeCrossHotbarLayout([undefined, 'gone'])).toEqual(defaultCrossHotbarLayout());
   });
 
-  it('pads a short stored set back to sixteen positions', () => {
-    const clean = sanitizeCrossHotbarLayout([[5, 6]], ACTION_BAR_SLOTS);
+  it('pads a short stored set back to sixteen cells', () => {
+    const clean = sanitizeCrossHotbarLayout([[ability]]);
     expect(clean[0]).toHaveLength(CROSS_HOTBAR_SLOTS_PER_SET);
-    expect(clean[0][0]).toBe(5);
-    expect(clean[0][2]).toBe(2);
+    expect(clean[0][0]).toEqual(ability);
+    expect(clean[0][1]).toBeNull();
   });
 
   it('drops extra sets a longer stored value carries', () => {
-    const stored = [...defaultCrossHotbarLayout(), Array(16).fill(0)];
-    expect(sanitizeCrossHotbarLayout(stored, ACTION_BAR_SLOTS)).toHaveLength(
-      CROSS_HOTBAR_SET_COUNT,
-    );
+    const stored = [...defaultCrossHotbarLayout(), Array(16).fill(null)];
+    expect(sanitizeCrossHotbarLayout(stored)).toHaveLength(CROSS_HOTBAR_SET_COUNT);
   });
 });

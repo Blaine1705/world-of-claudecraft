@@ -78,17 +78,3 @@ export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): nu
   if (effect?.type === 'temporalHourglass') return effect.captureRadius;
   return effect && 'radius' in effect ? effect.radius : DEFAULT_GROUND_AOE_RADIUS;
 }
-
-/** Where a ground-targeted ability should land: the selected target's spot (the
- *  usual "cast on that pack" intent), else the caster's own for an open-ground
- *  cast. A dead target, or the caster itself, falls back to the caster. The sim
- *  clamps the result to the ability's range. */
-export function groundTargetAimPoint(
-  caster: Pick<Entity, 'id' | 'pos'>,
-  target: Pick<Entity, 'id' | 'pos' | 'dead'> | null | undefined,
-): AimPoint {
-  if (target && !target.dead && target.id !== caster.id) {
-    return { x: target.pos.x, z: target.pos.z };
-  }
-  return { x: caster.pos.x, z: caster.pos.z };
-}

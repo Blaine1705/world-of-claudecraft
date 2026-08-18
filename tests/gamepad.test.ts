@@ -763,6 +763,7 @@ describe('GamepadManager cross hotbar', () => {
     });
     const onAction = vi.fn();
     const onCrossHotbar = vi.fn();
+    const onCrossHotbarCast = vi.fn();
     const triggerGamepadJump = vi.fn();
     const input = {
       applyGamepadLook: vi.fn(),
@@ -780,15 +781,24 @@ describe('GamepadManager cross hotbar', () => {
       onInputEdge: vi.fn(),
       isPointerMode: () => pointerMode,
       onCrossHotbar,
+      onCrossHotbarCast,
     } satisfies GamepadCallbacks);
-    manager.setCrossHotbarBindings(new CrossHotbarBindings());
+    const xhb = new CrossHotbarBindings();
+    // Seed a known bar so a cell's action is predictable: cell N holds ability aN.
+    // Reset first: seedOnce is a no-op on an already-seeded bar, and this Node has
+    // a real localStorage, so a layout persisted by an earlier case would survive.
+    xhb.reset();
+    xhb.seedOnce(Array.from({ length: 32 }, (_, i) => ({ type: 'ability' as const, id: `a${i}` })));
+    manager.setCrossHotbarBindings(xhb);
     (manager as unknown as { index: number | null }).index = 0;
     manager.setCrossHotbar(enabled);
     return {
       manager,
       bindings,
+      xhb,
       input,
       onAction,
+      onCrossHotbarCast,
       onCrossHotbar,
       triggerGamepadJump,
       press: (...buttons: number[]) => {
@@ -801,28 +811,27 @@ describe('GamepadManager cross hotbar', () => {
     };
   }
 
-  it('casts the mirrored action-bar slot for a left-trigger d-pad press', () => {
+  it('casts the action on the cell for a left-trigger d-pad press', () => {
     const h = setupCrossHotbar(true);
     h.press(GP.LT);
     h.press(GP.LT, GP.DPAD_UP);
-    // D-pad up is the first position of the left layer -> action-bar slot 0.
-    expect(h.onAction).toHaveBeenCalledWith('slot0');
-    // Never its own flat binding, which is slot5.
-    expect(h.onAction).not.toHaveBeenCalledWith('slot5');
+    // D-pad up is the first cell of the left half.
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
+    // The bar owns its actions, so nothing goes out as an action-bar slot.
+    expect(h.onAction).not.toHaveBeenCalled();
   });
 
   it('reaches the second eight through the right trigger', () => {
     const h = setupCrossHotbar(true);
     h.press(GP.RT);
     h.press(GP.RT, GP.A);
-    expect(h.onAction).toHaveBeenCalledWith('slot15');
-    expect(h.triggerGamepadJump).not.toHaveBeenCalled();
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a15' });
   });
 
   it('resolves a trigger and a button pressed in the same poll', () => {
     const h = setupCrossHotbar(true);
     h.press(GP.LT, GP.DPAD_UP);
-    expect(h.onAction).toHaveBeenCalledWith('slot0');
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
   });
 
   it('never fires a trigger own flat binding while the cross hotbar is on', () => {
@@ -840,8 +849,8 @@ describe('GamepadManager cross hotbar', () => {
     h.press(GP.LT, GP.RT);
     h.press(GP.LT);
     h.press(GP.LT, GP.DPAD_UP);
-    expect(h.onAction).toHaveBeenCalledWith('slot16');
-    expect(h.onAction).not.toHaveBeenCalledWith('slot0');
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a16' });
+    expect(h.onCrossHotbarCast).not.toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
   });
 
   it('stays on the primary set when the double bar is switched off', () => {
@@ -851,8 +860,8 @@ describe('GamepadManager cross hotbar', () => {
     h.press(GP.LT, GP.RT);
     h.press(GP.LT);
     h.press(GP.LT, GP.DPAD_UP);
-    expect(h.onAction).toHaveBeenCalledWith('slot0');
-    expect(h.onAction).not.toHaveBeenCalledWith('slot16');
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
+    expect(h.onCrossHotbarCast).not.toHaveBeenCalledWith({ type: 'ability', id: 'a16' });
   });
 
   it('leaves buttons the cross hotbar does not claim on their flat binding', () => {
@@ -914,8 +923,8 @@ describe('GamepadManager cross hotbar', () => {
     const h = setupCrossHotbar(true);
     h.press(GP.LT);
     h.press(GP.LT, GP.DPAD_UP);
-    // The cross hotbar took it: slot0 is the first cell of the left half.
-    expect(h.onAction).toHaveBeenCalledWith('slot0');
+    // The cross hotbar took it: the first cell of the left half.
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
   });
 
   it('never casts an action-bar slot from a bare diamond press', () => {

@@ -56,7 +56,16 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Raised 19488 -> 19525 for the controller cross hotbar. The additions are
+    // thin-consumer wiring to an extracted domain (src/ui/hud/cross_hotbar/): the
+    // overlay's construction, its per-frame paint, and the one public seam the pad
+    // drives it through. Everything with substance (the view, painter, resolvers,
+    // panel-hooks shape) lives in that domain, and the earlier attempt to buy
+    // these lines by extracting UNRELATED pre-existing helpers out of hud.ts was
+    // reverted: refactoring code a change does not own to fit a budget inflates
+    // the diff and risks regressions elsewhere. A maintainer decision, taken
+    // rather than paid for with someone else's code.
+    ceiling: 19525,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
