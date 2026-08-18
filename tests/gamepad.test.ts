@@ -1093,8 +1093,44 @@ describe('GamepadManager cross hotbar', () => {
     h.setPointerMode(true);
     h.press(); // window opens, focus lands inside it
     h.setPointerMode(false);
-    h.press(); // window closes
+    // The drop is no longer decided on the closing frame: the pad waits a few
+    // frames for the window to hand focus back. With nothing to return to
+    // (activeElement stays null) it still gives up, just not instantly.
+    for (let i = 0; i < 20; i++) h.press();
     expect(removed).toContain('pad-focus');
+  });
+
+  it('returns the selection to the opener instead of dropping it', () => {
+    // The whole point: closing a window puts the cursor back on the thing the
+    // player opened it from, not in the middle of the screen.
+    const h = setupCrossHotbar(true);
+    const added: string[] = [];
+    const opener = {
+      focus: () => {},
+      classList: { add: (c: string) => added.push(c), remove: () => {} },
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+        width: 10,
+        height: 10,
+      }),
+      hasAttribute: () => false,
+    };
+    const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+    (globalThis as unknown as { document: Record<string, unknown> }).document = {
+      ...baseDoc,
+      // No window is open any more, and focus has come back to the opener.
+      querySelectorAll: (sel: string) => (sel.includes('dialog') ? [] : [opener]),
+      activeElement: opener,
+      body: {},
+    };
+    h.setPointerMode(true);
+    h.press();
+    h.setPointerMode(false);
+    h.press();
+    expect(added).toContain('pad-focus');
   });
 
   it('closes the hotbar when a HUD window takes the pad into cursor mode', () => {

@@ -29,6 +29,7 @@ import {
   focusFirstInWindow,
   moveDpadFocus,
   pressDpadFocus,
+  restorePadFocus,
   syncWindowFocus,
 } from './dpad_focus_nav';
 import type { GamepadBindings } from './gamepad_bindings';
@@ -98,6 +99,12 @@ const DPAD_NAV_DIRECTIONS: Record<number, NavDirection> = {
   [GP.DPAD_RIGHT]: 'right',
 };
 
+// How long to wait for a closing window to hand focus back before the pad drops
+// its selection. A handful of frames: long enough for a return dispatched a tick
+// after the close, short enough that a genuine exit does not leave a stale
+// highlight on screen.
+const FOCUS_RETURN_FRAMES = 12;
+
 export class GamepadManager {
   private index: number | null = null;
   private kind: GamepadKind = 'generic';
@@ -126,6 +133,8 @@ export class GamepadManager {
   // the focused CELL rather than casting, so a player cannot fire an ability by
   // trying to move it.
   private edit: CrossHotbarEditState = IDLE_EDIT_STATE;
+  // Frames left to wait for a closing window's focus return before giving up on it.
+  private restoreFocusFrames = 0;
   private crossHotbar = false;
   private crossHotbarExpand = true;
   private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
@@ -368,9 +377,15 @@ export class GamepadManager {
     // with a live pad, so a keyboard-and-mouse session never reaches it.
     const pointerMode = this.cb.isPointerMode();
     if (pointerMode && !this.prevPointerMode) focusFirstInWindow();
-    // The window closed: drop the highlight and the pointer with it, or they hang
-    // over a surface that is no longer there.
+    // The window closed: put the selection back where the player opened it from,
+    // or drop the highlight and the pointer when there is nothing to go back to,
+    // rather than leaving them over a surface that is no longer there.
     if (!pointerMode && this.prevPointerMode) this.exitNavMode();
+    else if (this.restoreFocusFrames > 0) {
+      this.restoreFocusFrames--;
+      if (restorePadFocus()) this.restoreFocusFrames = 0;
+      else if (this.restoreFocusFrames === 0) clearPadFocus();
+    }
     this.prevPointerMode = pointerMode;
 
     if (pointerMode && this.resyncFocus) {
@@ -658,8 +673,15 @@ export class GamepadManager {
     return acted;
   }
 
-  // Drop the HUD highlight and the pad pointer.
+  // Follow the focus the closing window restored; drop the highlight and the pad
+  // pointer only once it is clear nothing is coming back.
+  //
+  // Retried across frames rather than decided on the closing one: the window's
+  // focus return does not always land before the poll that first sees the window
+  // gone, and answering on that single frame threw the selection away a moment
+  // before the thing to return to appeared.
   private exitNavMode(): void {
-    clearPadFocus();
+    if (restorePadFocus()) return;
+    this.restoreFocusFrames = FOCUS_RETURN_FRAMES;
   }
 }

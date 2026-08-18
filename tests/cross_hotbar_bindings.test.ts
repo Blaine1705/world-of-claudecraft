@@ -191,7 +191,7 @@ describe('seeding waits for the action bar', () => {
   it('latches once the bar has something on it, extras included', () => {
     const xhb = new CrossHotbarBindings();
     xhb.reset();
-    const bar = Array.from({ length: 32 }, () => null as CrossHotbarAction);
+    const bar: ({ type: 'ability'; id: string } | null)[] = Array.from({ length: 32 }, () => null);
     bar[0] = { type: 'ability', id: 'heroic_strike' };
     expect(xhb.seedOnce(bar, ['battle_stance'])).toBe(true);
     const flat = xhb.all().flat();

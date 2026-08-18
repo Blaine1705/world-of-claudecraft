@@ -4,6 +4,7 @@ import {
   focusFirstInWindow,
   moveDpadFocus,
   pressDpadFocus,
+  restorePadFocus,
   syncWindowFocus,
 } from '../src/game/dpad_focus_nav';
 
@@ -389,5 +390,53 @@ describe('pressDpadFocus', () => {
     outside.focus();
     expect(pressDpadFocus()).toBe(false);
     expect(outside.clicks).toBe(0);
+  });
+});
+
+describe('restorePadFocus', () => {
+  it('returns the highlight and the cursor to whatever focus was restored to', () => {
+    // The shared FocusManager already refocuses a window's opener on close; this
+    // only follows it, which is what makes closing a window land the selection
+    // back where the player opened it instead of in the middle of the screen.
+    const opener = el('BUTTON', 200, 400);
+    allEls = [opener];
+    install();
+    active = opener;
+
+    expect(restorePadFocus()).toBe(true);
+    expect(opener.classes.has('pad-focus')).toBe(true);
+  });
+
+  it('refuses when nothing holds focus, so the caller can clear instead', () => {
+    allEls = [el('BUTTON', 0, 0)];
+    install();
+    active = null;
+    expect(restorePadFocus()).toBe(false);
+  });
+
+  it('returns to an opener OUTSIDE the window that just closed', () => {
+    // The regression this guards: scoping the check to the top-most window
+    // rejects every legitimate return, because the opener is by definition not
+    // inside the window it opened.
+    const dialog = el('DIV', 0, 0, { role: 'dialog' });
+    dialog.rect = { left: 0, top: 0, right: 300, bottom: 300 };
+    const inside = el('BUTTON', 10, 10);
+    const opener = el('BUTTON', 900, 500);
+    allEls = [dialog, inside, opener];
+    install();
+    active = opener;
+
+    expect(restorePadFocus()).toBe(true);
+    expect(opener.classes.has('pad-focus')).toBe(true);
+  });
+
+  it('refuses an element the pad could never have navigated to', () => {
+    // Same rule pressDpadFocus applies: focus parked on an unrelated control (a
+    // chat input) is not where the pad was, so returning there would be a guess.
+    const stray = el('INPUT', 0, 0, { visible: false });
+    allEls = [stray];
+    install();
+    active = stray;
+    expect(restorePadFocus()).toBe(false);
   });
 });

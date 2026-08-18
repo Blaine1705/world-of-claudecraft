@@ -153,6 +153,29 @@ function markPadFocus(el: HTMLElement): void {
   cursor.style.display = 'block';
 }
 
+/**
+ * Put the highlight and the pointer back on whatever holds focus now, for the
+ * moment a window closes. The element to return to is NOT tracked here: the HUD's
+ * shared FocusManager already records each window's opener and refocuses it on
+ * release, so this only has to follow the focus that restore produced. Keeping one
+ * opener stack (and not a second pad-only one) is why closing a window lands the
+ * cursor where the player left it rather than back in the middle.
+ *
+ * Answers false when there is nothing sensible to return to (the window was opened
+ * from the world, or nothing restored focus), leaving the caller to clear instead.
+ */
+export function restorePadFocus(): boolean {
+  if (typeof document === 'undefined') return false;
+  const active = document.activeElement as HTMLElement | null;
+  if (!active || active === document.body) return false;
+  // Checked against the DOCUMENT, never activeRoot(): what focus came back to sits
+  // OUTSIDE the window that just closed (that is what "the opener" means), so
+  // scoping this to the top-most window would reject every legitimate return.
+  if (!focusables(document).includes(active)) return false;
+  markPadFocus(active);
+  return true;
+}
+
 /** Drop the highlight and park the pointer when the pad leaves UI navigation. */
 export function clearPadFocus(): void {
   marked?.classList?.remove(PAD_FOCUS_CLASS);
