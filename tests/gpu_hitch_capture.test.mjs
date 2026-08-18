@@ -4,7 +4,10 @@ import { describe, expect, it } from 'vitest';
 import {
   browserFlags,
   buildCapture,
+  CROWD_ARRIVE_STAGING_OFFSET,
   crowdCenter,
+  crowdStagingCenter,
+  harnessTimelineEvents,
   parseArgs,
   prepareOnlineGearedRoster,
   runTimedWindow,
@@ -196,6 +199,131 @@ describe('gpu hitch capture CLI', () => {
     expect(plain.hops).toEqual([]);
   });
 
+  it('parses --crowd-arrive, defaults it off, and stages the crowd out of range until it fires', () => {
+    const args = parseArgs(['--mode', 'online-geared', '--crowd-arrive', '12000']);
+    expect(args.crowdArriveMs).toBe(12000);
+    expect(parseArgs(['--mode', 'online-geared']).crowdArriveMs).toBeNull();
+    expect(parseArgs([]).crowdArriveMs).toBeNull();
+    expect(() => parseArgs(['--crowd-arrive', '12000'])).toThrow(/online-geared/);
+    expect(() =>
+      parseArgs(['--mode', 'online-geared', '--crowd-arrive', '90000', '--duration-ms', '60000']),
+    ).toThrow(/inside --duration-ms/);
+    expect(() => parseArgs(['--mode', 'online-geared', '--crowd-arrive', '-1'])).toThrow(
+      /non-negative/,
+    );
+    // the staging spot is the crowd's own spot pushed 400 yd down Z: past the
+    // 96 yd view destroy range, so the walk-in streams every body in cold
+    expect(CROWD_ARRIVE_STAGING_OFFSET).toEqual({ dx: 0, dz: 400 });
+    expect(crowdStagingCenter({ x: 0, z: 640 }, { dx: 80, dz: -0.5 })).toEqual({
+      x: 80,
+      z: 1039.5,
+    });
+    expect(crowdStagingCenter({ x: 0, z: 640 }, null)).toEqual({ x: 0, z: 1040 });
+  });
+
+  it('fires the crowd walk-in on the hop schedule, records it, and puts it on the probe timeline', async () => {
+    let clock = 1000;
+    const waits = [];
+    const placed = [];
+    let waitCalls = 0;
+    const page = {
+      waitForFunction: async () => {
+        waitCalls++;
+        clock += waitCalls === 1 ? 1000 : 6000;
+      },
+      evaluate: async (fn, entry) => {
+        globalThis.window = {
+          __game: {
+            world: { player: { pos: { x: 0, y: 0, z: 640 } } },
+            renderer: { camera: { matrixWorld: { elements: new THREE.Matrix4().elements } } },
+            online: { devCmd: () => {} },
+          },
+        };
+        try {
+          return await fn(entry);
+        } finally {
+          globalThis.window = undefined;
+        }
+      },
+    };
+    const wait = async (ms) => {
+      waits.push(ms);
+      clock += ms;
+    };
+    const roster = { placeAll: (center) => placed.push(center) };
+    const hops = [{ atMs: 30000, retreat: 82 }];
+    const args = {
+      durationMs: 60000,
+      hops,
+      crowdArriveMs: 12000,
+      observer: { x: 0, z: 640 },
+      crowdOffset: { dx: 80, dz: -0.5 },
+    };
+    await runTimedWindow(page, args, wait, () => clock, roster);
+    // anchored on the reveal (+7 s) like the hops: the walk-in at +19 s, the
+    // hop at +37 s, the window closes at anchor + 60 s
+    expect(waits).toEqual([12000, 18000, 30000]);
+    expect(placed).toEqual([{ x: 80, z: 639.5 }]);
+    expect(args.crowdArrive).toEqual({
+      atMs: 12000,
+      firedAtMs: 19000,
+      firedAtEpochMs: 20000,
+      from: { x: 80, z: 1039.5 },
+      to: { x: 80, z: 639.5 },
+    });
+    expect(hops[0].firedAtMs).toBe(37000);
+    // the artifact carries it beside the hops, and as a probe-time mark
+    expect(harnessTimelineEvents(args, 20000 - 15000)).toEqual([
+      { atMs: 15000, event: 'crowd-arrive' },
+    ]);
+    expect(harnessTimelineEvents({ crowdArrive: null }, 0)).toEqual([]);
+    const snapshot = {
+      startedAtEpochMs: 5000,
+      elapsedMs: 1,
+      stopReason: 'duration',
+      transitions: [],
+      links: [],
+      queries: [],
+      frames: [],
+      longTasks: [],
+      uploads: [],
+      programs: [],
+      sceneRoots: [],
+      rendererStats: null,
+    };
+    const raw = buildCapture({
+      args,
+      url: 'http://localhost:5173/?perf',
+      snapshot,
+      browserVersion: 'Chrome/1',
+      flags: [],
+      provenance: {},
+    });
+    expect(raw.capture.crowdArrive).toEqual(args.crowdArrive);
+    expect(raw.timeline.events).toEqual([{ atMs: 15000, event: 'crowd-arrive' }]);
+    // a walk-in with no roster to move is recorded, not thrown, like a failed hop
+    const alone = { durationMs: 1000, hops: [], crowdArriveMs: 0 };
+    waitCalls = 0;
+    await runTimedWindow(page, alone, wait, () => clock, null);
+    expect(alone.crowdArrive.error).toBe('no roster to move');
+    // without the flag nothing is recorded and the window is unchanged
+    const plain = { durationMs: 1234, hops: [] };
+    waits.length = 0;
+    await runTimedWindow(page, plain, wait, () => clock);
+    expect(waits).toEqual([1234]);
+    expect(plain.crowdArrive).toBeUndefined();
+    expect(
+      buildCapture({
+        args: plain,
+        url: 'http://localhost:5173/',
+        snapshot,
+        browserVersion: 'x',
+        flags: [],
+        provenance: {},
+      }).timeline.events,
+    ).toEqual([]);
+  });
+
   it('rejects far-band options that cannot mean anything', () => {
     expect(() => parseArgs(['--crowd-offset', '80,0'])).toThrow(/online-geared/);
     expect(() => parseArgs(['--mode', 'online-geared', '--crowd-offset', '80'])).toThrow(/DX,DZ/);
@@ -305,7 +433,9 @@ describe('gpu hitch capture CLI', () => {
       captureStart,
       source.indexOf('\nif (import.meta.url', captureStart),
     );
-    expect(captureBody).toContain('await runTimedWindow(page, args);');
+    expect(captureBody).toContain(
+      'await runTimedWindow(page, args, sleep, () => Date.now(), roster ?? null);',
+    );
     expect(captureBody).not.toContain('await sleep(args.durationMs)');
   });
 
@@ -640,9 +770,22 @@ describe('gpu hitch capture CLI', () => {
         crowdOffset: null,
       },
     });
+    // --crowd-arrive: prepared at the staging spot, the walk-in brings it home
+    await prepareOnlineGearedRoster({
+      ...common,
+      args: {
+        url: 'http://localhost:5173/?perf',
+        serverUrl: 'http://localhost:8787',
+        bots: 2,
+        observer: { x: 0, z: 640 },
+        crowdOffset: { dx: 80, dz: -0.5 },
+        crowdArriveMs: 12000,
+      },
+    });
     expect(centers).toEqual([
       { x: 80, z: 639.5 },
       { x: 0, z: 640 },
+      { x: 80, z: 1039.5 },
     ]);
   });
 

@@ -51,6 +51,12 @@ const BROWSER_ARGS = Object.freeze([
 // appear before the hop anchor falls back to the window opening.
 const HOP_COVER_GRACE_MS = 3000;
 
+// Where --crowd-arrive stages the geared roster until it walks in: straight
+// down Z from the crowd's own spot, well past the 96 yd view destroy range and
+// the interest range, so at the arrival every body streams in as a never-seen
+// look (the production "portal return / crowd walk-in" shape).
+export const CROWD_ARRIVE_STAGING_OFFSET = Object.freeze({ dx: 0, dz: 400 });
+
 const usage = `GPU hitch capture
 
   node scripts/gpu_hitch_capture.mjs [options]
@@ -78,6 +84,12 @@ const usage = `GPU hitch capture
                          With hops the timed window also counts from that
                          reveal. Where each hop landed is recorded in the
                          artifact; changes what is measured like --observer does.
+  --crowd-arrive MS      online-geared only: stage the geared crowd 400 yd
+                         down Z from its spot (past the view destroy range) and
+                         MS after the observer's arrival reveal teleport the
+                         whole roster to its spot, so every composed body
+                         streams in at once with never-seen styles. Rides the
+                         hop schedule and anchor; recorded in the artifact.
   --angle BACKEND        pass --use-angle=BACKEND to the browser (gl-egl lets the
                          EGL vendor env pick the GPU: unset for the Intel iGPU,
                          __EGL_VENDOR_LIBRARY_FILENAMES=.../10_nvidia.json for
@@ -96,6 +108,13 @@ function integer(value, label) {
   const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed <= 0)
     throw new Error(`${label} must be a positive integer`);
+  return parsed;
+}
+
+function delayMs(value, label) {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 0)
+    throw new Error(`${label} must be a non-negative integer of milliseconds`);
   return parsed;
 }
 
@@ -148,6 +167,12 @@ export function crowdCenter(observer, offset) {
   return { x: observer.x + offset.dx, z: observer.z + offset.dz };
 }
 
+/** The spot the geared crowd occupies from prepare until --crowd-arrive fires:
+ *  its own spot displaced by the staging offset. */
+export function crowdStagingCenter(observer, offset) {
+  return crowdCenter(crowdCenter(observer, offset), CROWD_ARRIVE_STAGING_OFFSET);
+}
+
 function viewport(value) {
   const match = /^(\d+)x(\d+)$/i.exec(value);
   const width = Number(match?.[1]);
@@ -170,6 +195,7 @@ export function parseArgs(argv) {
     observer: null,
     crowdOffset: null,
     hops: [],
+    crowdArriveMs: null,
     angle: null,
     out: null,
     groupId: null,
@@ -207,6 +233,7 @@ export function parseArgs(argv) {
     else if (option === '--observer') args.observer = observerSpot(next());
     else if (option === '--crowd-offset') args.crowdOffset = crowdOffset(next());
     else if (option === '--hop') args.hops.push(hop(next()));
+    else if (option === '--crowd-arrive') args.crowdArriveMs = delayMs(next(), '--crowd-arrive');
     else if (option === '--angle') args.angle = campaignToken(next(), '--angle');
     else if (option === '--out') args.out = next();
     else if (option === '--group-id') args.groupId = campaignToken(next(), '--group-id');
@@ -236,6 +263,10 @@ export function parseArgs(argv) {
     throw new Error('every --hop must land inside --duration-ms');
   if (args.hops.length > 0 && args.mode !== 'online-geared')
     throw new Error('--hop only applies to --mode online-geared');
+  if (args.crowdArriveMs !== null && args.mode !== 'online-geared')
+    throw new Error('--crowd-arrive only applies to --mode online-geared');
+  if (args.crowdArriveMs !== null && args.crowdArriveMs >= args.durationMs)
+    throw new Error('--crowd-arrive must land inside --duration-ms');
   return args;
 }
 
@@ -363,6 +394,14 @@ function compileUnitsOnProbeTimeline(units, probeStartedAtPerformanceMs) {
   });
 }
 
+/** The harness's own timeline marks, in probe time. Only the crowd walk-in
+ *  today (hops are recorded on their entries, with their landing). */
+export function harnessTimelineEvents(args, probeStartedAtEpochMs) {
+  const arrive = args.crowdArrive;
+  if (!arrive || typeof arrive.firedAtEpochMs !== 'number') return [];
+  return [{ atMs: arrive.firedAtEpochMs - probeStartedAtEpochMs, event: 'crowd-arrive' }];
+}
+
 export function buildCapture({ args, url, snapshot, browserVersion, flags, provenance }) {
   const receipt = snapshot.runtimeReceipt;
   const effective = receipt
@@ -403,6 +442,7 @@ export function buildCapture({ args, url, snapshot, browserVersion, flags, prove
       crowdOffset: args.crowdOffset ?? null,
       hops: args.hops ?? [],
       hopAnchorMs: args.hopAnchorMs ?? null,
+      crowdArrive: args.crowdArrive ?? null,
       fixture: args.fixtureEvidence ?? null,
     },
     provenance: {
@@ -424,6 +464,9 @@ export function buildCapture({ args, url, snapshot, browserVersion, flags, prove
       ),
       uploadBucketWidthMs: snapshot.uploadBucketWidthMs,
       uploadBuckets: snapshot.uploadBuckets,
+      // Harness-side marks on the probe's own clock (its start epoch), so a
+      // reader lines the crowd's walk-in up with the phases and links.
+      events: harnessTimelineEvents(args, snapshot.startedAtEpochMs),
     },
     diagnostics: {
       controls: snapshot.controls,
@@ -485,6 +528,27 @@ async function enterOnlineGearedGame(page, args, runId) {
   );
 }
 
+/** --crowd-arrive: teleport the staged roster to the crowd's own spot, and
+ *  record where it went (the walk-in is what the leg measures). A missing
+ *  roster is recorded as an error rather than thrown, like a failed hop. */
+function fireCrowdArrival(args, roster, firedAtMs, firedAtEpochMs) {
+  const to = crowdCenter(args.observer ?? GEARED_ARRIVAL_OBSERVER, args.crowdOffset);
+  const record = {
+    atMs: args.crowdArriveMs,
+    firedAtMs,
+    firedAtEpochMs,
+    from: crowdStagingCenter(args.observer ?? GEARED_ARRIVAL_OBSERVER, args.crowdOffset),
+    to,
+  };
+  try {
+    if (!roster) throw new Error('no roster to move');
+    roster.placeAll(to);
+  } catch (error) {
+    record.error = String(error?.message ?? error).slice(0, 300);
+  }
+  args.crowdArrive = record;
+}
+
 /** The timed window. With hops, delays count from the observer's ARRIVAL
  *  reveal (the online entry teleports the observer and that destination
  *  streams under a cover for a variable time), never from the window opening,
@@ -500,11 +564,18 @@ async function enterOnlineGearedGame(page, args, runId) {
  *  crowd it walks away from stays in view. A hop whose page call fails is
  *  recorded (`error`) and the run continues: the artifact keeps its provenance
  *  instead of vanishing with the browser. */
-export async function runTimedWindow(page, args, wait = sleep, now = () => Date.now()) {
+export async function runTimedWindow(
+  page,
+  args,
+  wait = sleep,
+  now = () => Date.now(),
+  roster = null,
+) {
   const opened = now();
   const hops = [...args.hops].sort((a, b) => a.atMs - b.atMs);
+  const crowdArriveMs = args.crowdArriveMs ?? null;
   let anchor = opened;
-  if (hops.length > 0) {
+  if (hops.length > 0 || crowdArriveMs !== null) {
     const covered = await page
       .waitForFunction(() => window.__wocGpuHitchProbe?.snapshot().phase === 'cover', {
         timeout: HOP_COVER_GRACE_MS,
@@ -525,8 +596,16 @@ export async function runTimedWindow(page, args, wait = sleep, now = () => Date.
     anchor = now();
     args.hopAnchorMs = anchor - opened;
   }
-  for (const entry of hops) {
-    await wait(Math.max(0, anchor + entry.atMs - now()));
+  // The crowd walk-in rides the same schedule as the hops, in delay order.
+  const schedule = hops.map((entry) => ({ atMs: entry.atMs, hop: entry }));
+  if (crowdArriveMs !== null) schedule.push({ atMs: crowdArriveMs, hop: null });
+  schedule.sort((a, b) => a.atMs - b.atMs);
+  for (const { atMs, hop: entry } of schedule) {
+    await wait(Math.max(0, anchor + atMs - now()));
+    if (!entry) {
+      fireCrowdArrival(args, roster, Math.round(now() - opened), now());
+      continue;
+    }
     entry.firedAtMs = Math.round(now() - opened);
     try {
       const landed = await page.evaluate(({ x, z, retreat }) => {
@@ -587,8 +666,13 @@ export async function prepareOnlineGearedRoster({
   // already created: the caller's finally only sees a roster this function
   // RETURNED. Close it here, then rethrow the original failure.
   try {
+    const observer = args.observer ?? GEARED_ARRIVAL_OBSERVER;
     await roster.prepare({
-      center: crowdCenter(args.observer ?? GEARED_ARRIVAL_OBSERVER, args.crowdOffset),
+      // With --crowd-arrive the crowd waits out of range until the walk-in.
+      center:
+        (args.crowdArriveMs ?? null) !== null
+          ? crowdStagingCenter(observer, args.crowdOffset)
+          : crowdCenter(observer, args.crowdOffset),
     });
   } catch (error) {
     await roster.close().catch(() => {});
@@ -679,7 +763,7 @@ export async function capture(args) {
     } else {
       await enterOnlineGearedGame(page, { ...args, url: requestedUrl.toString() }, captureId);
     }
-    await runTimedWindow(page, args);
+    await runTimedWindow(page, args, sleep, () => Date.now(), roster ?? null);
     const snapshot = await page.evaluate(() => window.__wocGpuHitchProbe?.stop('duration'));
     if (!snapshot) throw new Error('GPU hitch probe was not installed');
     const browserVersion = await browser.version();
