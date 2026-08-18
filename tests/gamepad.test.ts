@@ -1294,6 +1294,23 @@ describe('GamepadManager cross hotbar', () => {
       expect(h.onAction).not.toHaveBeenCalledWith('slot0');
     });
 
+    it('picks a spell up with a window open, where the poll used to bail out', () => {
+      // With a window up the poll returned before dispatch, so confirm on a
+      // spellbook row did nothing at all: the one press the whole flow needs.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.setPointerMode(true);
+      h.focusSpell('mortal_strike');
+      h.press(GP.A);
+      h.press();
+      h.setPointerMode(false);
+      h.focusSpell(null);
+      h.focus(7);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[7]).toEqual({ type: 'ability', id: 'mortal_strike' });
+    });
+
     it('opens the spellbook when confirm lands on an empty cell', () => {
       // "Put something here" is what an empty cell means; answering with nothing
       // left no way in at all.

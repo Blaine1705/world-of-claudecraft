@@ -20,8 +20,19 @@ function isVisible(el: HTMLElement): boolean {
   return style.visibility !== 'hidden' && style.display !== 'none';
 }
 
+// While arranging, navigation must reach BOTH the spellbook and the bar: the whole
+// act is carrying something from one to the other, and a window-scoped walk traps
+// the player in whichever one they are standing in.
+let spanWindows = false;
+
+/** Whether the d-pad currently walks the whole document rather than one window. */
+export function setPadNavSpansWindows(on: boolean): void {
+  spanWindows = on;
+}
+
 /** The open window the d-pad should navigate inside, or null for the document. */
 function activeRoot(): HTMLElement | null {
+  if (spanWindows) return null;
   const open = [...document.querySelectorAll<HTMLElement>(WINDOW_SELECTOR)].filter(isVisible);
   // Last in document order is the most recently mounted, which is the one on top.
   return open.length > 0 ? open[open.length - 1] : null;

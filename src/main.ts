@@ -2333,6 +2333,7 @@ async function startGame(
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
+    onCrossHotbarCast: (action) => hud.castCrossHotbarAction(action),
     onOpenSpellbook: () => hud.openSpellbook(),
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });

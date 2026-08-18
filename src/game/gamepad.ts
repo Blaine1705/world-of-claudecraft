@@ -30,6 +30,7 @@ import {
   moveDpadFocus,
   pressDpadFocus,
   restorePadFocus,
+  setPadNavSpansWindows,
   syncWindowFocus,
 } from './dpad_focus_nav';
 import type { GamepadBindings } from './gamepad_bindings';
@@ -339,6 +340,9 @@ export class GamepadManager {
       chordButton = cur[GP.Y] && !this.prevPressed[GP.Y] ? GP.Y : GP.LB;
       const toggled = toggleEdit(this.edit);
       this.edit = toggled.state;
+      // Carrying an action means moving between the spellbook and the bar, so the
+      // d-pad walks the whole screen rather than the window it started in.
+      setPadNavSpansWindows(this.edit.active);
       if (toggled.restore) {
         this.crossHotbarBindings?.bind(
           toggled.restore.cell.set,
@@ -384,7 +388,9 @@ export class GamepadManager {
     // so the player is already inside it. This runs only from the pad's own poll
     // with a live pad, so a keyboard-and-mouse session never reaches it.
     const pointerMode = this.cb.isPointerMode();
-    if (pointerMode && !this.prevPointerMode) focusFirstInWindow();
+    // Not while arranging: the spellbook opens BECAUSE the player asked for
+    // something to put on a cell, and yanking focus into it loses the cell.
+    if (pointerMode && !this.prevPointerMode && !this.edit.active) focusFirstInWindow();
     // The window closed: put the selection back where the player opened it from,
     // or drop the highlight and the pointer when there is nothing to go back to,
     // rather than leaving them over a surface that is no longer there.
@@ -396,7 +402,7 @@ export class GamepadManager {
     }
     this.prevPointerMode = pointerMode;
 
-    if (pointerMode && this.resyncFocus) {
+    if (pointerMode && this.resyncFocus && !this.edit.active) {
       this.resyncFocus = false;
       syncWindowFocus();
     }
@@ -408,7 +414,16 @@ export class GamepadManager {
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
       this.releaseCrossHotbar();
-      if (this.updateNavigation(cur)) this.cb.onActivity?.();
+      // Arranging still works with a window open, and has to: the spellbook is
+      // where a new action comes FROM. Without this the poll returned here and
+      // dispatch never ran, so confirm on a spell did nothing at all.
+      let arranged = false;
+      if (this.edit.active) {
+        for (const idx of risingEdges(this.prevPressed, cur)) {
+          if (this.editPress(idx)) arranged = true;
+        }
+      }
+      if (!arranged && this.updateNavigation(cur)) this.cb.onActivity?.();
       this.prevPressed = cur;
       return;
     }

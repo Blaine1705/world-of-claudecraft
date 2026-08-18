@@ -7003,6 +7003,24 @@ export class Hud {
   }
 
   // Shared entry point for hotbar clicks and the 1..0-= keybinds.
+  /**
+   * Fire an action the cross hotbar holds. Routed through castSlot by finding the
+   * action on the bar, so a pad press gets the SAME semantics a key press does
+   * (ground-aim reticle, empower release, sport tap, mouseover cast, the
+   * auto-attack QoL) rather than a second cast path that would drift from it.
+   *
+   * The bar is seeded from the action bar, so the lookup almost always hits. An
+   * action arranged onto the pad and nowhere else falls back to a plain cast,
+   * which is the one case without a reticle.
+   */
+  castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    const slot = this.hotbarActions.findIndex(
+      (onBar) => onBar?.type === action.type && onBar.id === action.id,
+    );
+    if (slot >= 0) this.castSlot(slot);
+    else if (action.type === 'ability') this.sim.castAbility(action.id);
+  }
+
   castSlot(barSlot: number): void {
     if (this.isGroundAimActive()) {
       if (this.groundAim.activeSlot === barSlot) {

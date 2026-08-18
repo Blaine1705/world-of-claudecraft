@@ -72,7 +72,10 @@ const MONOLITHS: MonolithRow[] = [
     // decision, taken rather than paid for with someone else's code. The last
     // line is openSpellbook, which the pad needs so a confirm on an empty cell can
     // reach the ability list; the toggle beside it would have closed it instead.
-    ceiling: 19426,
+    // castCrossHotbarAction is the other: it routes a pad press back through
+    // castSlot so a cross-hotbar cast keeps the SAME semantics a key press has
+    // (reticle, empower, sport, mouseover) instead of growing a second cast path.
+    ceiling: 19444,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -147,8 +150,9 @@ const MONOLITHS: MonolithRow[] = [
     // The cross hotbar's share is two imports and the composition calls that
     // create it, hand it the pad, and route its settings; everything with
     // substance is in src/game/cross_hotbar_wiring.ts, which is what this file's
-    // seam asks for. Exact merged count: any further growth reds again.
-    ceiling: 11497,
+    // seam asks for, plus the cast handler the bar dispatches through. Exact
+    // count: any further growth reds again.
+    ceiling: 11498,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

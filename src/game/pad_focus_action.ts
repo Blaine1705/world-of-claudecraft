@@ -18,7 +18,11 @@ import { padMouseHovered } from './pad_mouse_cursor';
 const ABILITY_ID_ATTR = 'data-ability-id';
 
 function actionOn(el: Element | null): CrossHotbarAction {
-  const node = el as HTMLElement | null;
+  // Walk up to the draggable row: focus (and the pointer) often lands on a child
+  // of it, the spellbook's own +/- toggle being the one a player hits most, and a
+  // strict check on the focused node alone made those presses do nothing.
+  const row = (el as HTMLElement | null)?.closest?.('[draggable="true"]') as HTMLElement | null;
+  const node = row ?? (el as HTMLElement | null);
   if (!node || node.draggable !== true) return null;
   const id = node.getAttribute?.(ABILITY_ID_ATTR);
   return id ? { type: 'ability', id } : null;

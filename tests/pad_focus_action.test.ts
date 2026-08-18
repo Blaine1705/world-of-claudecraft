@@ -12,6 +12,10 @@ function row(attrs: { id?: string; draggable?: boolean }) {
     // can reach has to accept events and a class.
     dispatchEvent: () => true,
     classList: { add: () => {}, remove: () => {} },
+    // The reader walks up to the draggable row; a row IS its own nearest match.
+    closest: function (this: unknown, sel: string) {
+      return sel === '[draggable="true"]' && (attrs.draggable ?? false) ? this : null;
+    },
   };
 }
 
@@ -79,5 +83,20 @@ describe('focusedPadAction with the virtual mouse', () => {
     updatePadMouse(1, 0, 0.1);
     expect(focusedPadAction()).toEqual({ type: 'ability', id: 'rend' });
     hidePadMouse();
+  });
+});
+
+describe('focusedPadAction from a child of the row', () => {
+  it('walks up to the draggable row', () => {
+    // Focus lands on the spellbook's own +/- toggle as often as on the row, and a
+    // strict check on the focused node alone made those presses do nothing.
+    const spellRow = row({ id: 'thunder_clap', draggable: true });
+    const toggle = {
+      draggable: false,
+      getAttribute: () => null,
+      closest: (sel: string) => (sel === '[draggable="true"]' ? spellRow : null),
+    };
+    vi.stubGlobal('document', { activeElement: toggle, body: {} });
+    expect(focusedPadAction()).toEqual({ type: 'ability', id: 'thunder_clap' });
   });
 });
