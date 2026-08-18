@@ -269,7 +269,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
   });
 
-  it('orders resume entries debt first, stable within each class', () => {
+  it('orders resume entries program debt, upload debt, then cosmetic, stable within each class', () => {
     // The resume lane is strictly serial in array order, so this ordering is
     // the ONLY thing that can put the link/upload debt ahead of the cosmetic
     // entries (BOOT_DEBT priority arbitrates against other lanes, never
@@ -281,10 +281,12 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       { id: 'programs.compile' },
       { id: 'programs.compile-submit' },
     ]);
+    // Program links lead the debt class (a met unlinked program blocks the
+    // frame; a texture upload is paced), then the upload debt, then cosmetic.
     expect(ordered.map((entry) => entry.id)).toEqual([
-      'textures.scene',
       'programs.compile',
       'programs.compile-submit',
+      'textures.scene',
       'props.ghost-fade-variants',
       'vfx.weapon-skins',
     ]);

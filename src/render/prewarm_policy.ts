@@ -344,12 +344,20 @@ export function prewarmResumeIsDebt(entryId: string): boolean {
  * preserved.
  */
 export function orderPrewarmResumeEntries<T extends { id: string }>(entries: readonly T[]): T[] {
-  const debt: T[] = [];
+  // Inside the debt class, program links go before texture uploads: a program
+  // the live frame meets unlinked blocks it (a freeze), an unresident texture
+  // is a paced piece. On the iGPU stepped ride the lane spent its first 100 s
+  // on surface-detail + textures.scene (151 units) and never reached the 19
+  // programs.compile-submit units, so the town's unique materials linked cold.
+  const programDebt: T[] = [];
+  const otherDebt: T[] = [];
   const cosmetic: T[] = [];
   for (const entry of entries) {
-    (prewarmResumeIsDebt(entry.id) ? debt : cosmetic).push(entry);
+    if (!prewarmResumeIsDebt(entry.id)) cosmetic.push(entry);
+    else if (entry.id.startsWith('programs.')) programDebt.push(entry);
+    else otherDebt.push(entry);
   }
-  return [...debt, ...cosmetic];
+  return [...programDebt, ...otherDebt, ...cosmetic];
 }
 
 /** The mesh-shape bits three folds into a program's cache key, structurally

@@ -215,8 +215,11 @@ interface AttributionTargetFixture {
 // Re-minted for the compile gate's variant settle (the third piece arm) and
 // the shadow arm's every-mesh depth twin: renderer.ts moved, the seals follow
 // the swept evidence bytes. No capture was retaken.
+// Re-minted for the resume lane ordering (program debt before upload debt):
+// prewarm_policy.ts moved, the seals follow the swept evidence bytes. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e2abd42f6eaca5064e26c011ae17aebf03a0da85c526c6d3b432d1d8040a8514';
+  'd4dd19c141c56aba8a6e13dcfe4d91d91b539011d7d5379e9d751382e36f1ae9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
