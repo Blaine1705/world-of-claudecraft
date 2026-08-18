@@ -17,6 +17,7 @@ import { resolvePosition } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import {
   bgOriginAt,
+  battlegroundOrigin,
   INSTANCE_X_BASE,
   isArenaPos,
   isBgPos,
@@ -131,7 +132,7 @@ export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): Loca
   if (isBgPos(pos.x)) {
     const match = ctx.bgMatches.get(pid);
     if (!match || match.slot !== bgOriginAt(pos.z).slot) return null;
-    const origin = bgOriginAt(pos.z);
+    const origin = battlegroundOrigin(match.slot);
     return located(
       {
         kind: 'battleground',
