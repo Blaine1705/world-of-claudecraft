@@ -199,6 +199,9 @@ interface DevPerfTraceFrame {
     memoryUsedMb: number | null;
   };
   stallAttribution?: DevRenderStallAttribution;
+  /** Materials and objects the local render diagnostics saw for the first
+   *  time in this frame's sample: names for a program a long frame minted. */
+  firstSeen?: { materials: string[]; objects: string[] };
 }
 
 interface DevPerfTraceSpan {
@@ -906,6 +909,12 @@ export class PerfMonitor {
           return frame;
         })()
       : null;
+    const diagnostics = rendererFrame?.renderDiagnostics;
+    const firstSeen =
+      diagnostics &&
+      (diagnostics.newMaterials.length > 0 || diagnostics.firstVisibleObjects.length > 0)
+        ? { materials: diagnostics.newMaterials, objects: diagnostics.firstVisibleObjects }
+        : undefined;
     const stallAttribution =
       renderer && rendererFrame ? renderStallAttribution(renderer, rendererFrame) : undefined;
     const frame: DevPerfTraceFrame = {
@@ -939,6 +948,7 @@ export class PerfMonitor {
         memoryUsedMb: memory?.usedMB ?? null,
       },
       ...(stallAttribution ? { stallAttribution } : {}),
+      ...(firstSeen ? { firstSeen } : {}),
     };
     this.devTraceFrames.push(frame);
     this.devTraceFrames.sort(
