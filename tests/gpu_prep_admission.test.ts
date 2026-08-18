@@ -40,14 +40,22 @@ describe('createGpuPrepAdmission', () => {
     admission.spend(40, 'reveal-gate:tavern:1');
     expect(budget.snapshot().kinds).toEqual([{ kind: 'reveal-gate', emaMs: 40, samples: 1 }]);
 
-    // ...so a DIFFERENT instance of the same family is priced by it, not by the
-    // unknown prior, and 40 ms does not fit a frame already at its target
-    // (the frame has spent, so the per-frame progress slot is closed).
+    // ...so a DIFFERENT instance of the same family is priced by it, not by
+    // the unknown prior, and 40 ms does not fit a frame already at its target.
+    // The frame's one progress slot goes to the first approaching piece; the
+    // next one of the family is refused on the headroom.
     budget.noteFrame(16.7);
     budget.spend(0.1);
     expect(
       admission.admit({
         label: 'reveal-gate:forge:7',
+        priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        deferredFrames: 0,
+      }),
+    ).toBe(true);
+    expect(
+      admission.admit({
+        label: 'reveal-gate:forge:8',
         priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
         deferredFrames: 0,
       }),
@@ -96,8 +104,11 @@ describe('createGpuPrepAdmission', () => {
     const candidate = { label: 'touch:program', priority: GPU_WORK_PRIORITY.BACKGROUND };
     expect(admission.admit({ ...candidate, deferredFrames: 4 })).toBe(false);
     expect(admission.admit({ ...candidate, deferredFrames: 6 })).toBe(true);
-    // VISIBLE_PREWARM is approaching: the general bound.
+    // VISIBLE_PREWARM is approaching: the general bound. Its per-frame
+    // progress slot comes first, so consume it and let the bound be what the
+    // two arms below actually test.
     const approaching = { label: 'touch:program', priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM };
+    expect(admission.admit({ ...approaching, deferredFrames: 0 })).toBe(true);
     expect(admission.admit({ ...approaching, deferredFrames: 3 })).toBe(false);
     expect(admission.admit({ ...approaching, deferredFrames: 4 })).toBe(true);
     expect(budget.snapshot().decisions.starvation).toBe(2);

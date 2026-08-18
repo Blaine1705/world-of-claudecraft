@@ -184,7 +184,13 @@ describe('gpu prep admission rules, in order', () => {
     expect(budget.admit({ kind: 'live-gate:Group', cls: 'actionable', deferredFrames: 0 })).toEqual(
       { admit: true, reason: 'actionable-floor', predictedMs: 8 },
     );
-    // Same kind, same zero headroom: only the class saved it.
+    // Same kind, same zero headroom: the visible class gets the frame's one
+    // progress slot, and the next piece behind it is refused.
+    expect(budget.admit({ kind: 'live-gate:Group', cls: 'visible', deferredFrames: 0 })).toEqual({
+      admit: true,
+      reason: 'progress',
+      predictedMs: 8,
+    });
     expect(budget.admit({ kind: 'live-gate:Group', cls: 'visible', deferredFrames: 0 })).toEqual({
       admit: false,
       reason: 'no-headroom',
@@ -290,8 +296,15 @@ describe('gpu prep admission rules, in order', () => {
     expect(
       budget.admit({ kind: 'texture-chunk-upload', cls: 'cosmetic', deferredFrames: 0 }),
     ).toEqual({ admit: false, reason: 'no-headroom', predictedMs: 4.5, headroomMs: 4 });
-    // ...and the charged frame moves the line under the kind that just fitted.
+    // ...and the charged frame moves the line under the kind that just fitted:
+    // the visible piece takes the frame's progress slot once (a spend does not
+    // close it), and the one behind it is refused on the smaller headroom.
     budget.spend(0.5);
+    expect(budget.admit({ kind: 'reveal-gate:b', cls: 'visible', deferredFrames: 0 })).toEqual({
+      admit: true,
+      reason: 'progress',
+      predictedMs: 4,
+    });
     expect(budget.admit({ kind: 'reveal-gate:b', cls: 'visible', deferredFrames: 0 })).toEqual({
       admit: false,
       reason: 'no-headroom',
@@ -412,7 +425,7 @@ describe('gpu prep defaults', () => {
 });
 
 describe('gpu prep budget: progress and class-specific starvation', () => {
-  it('lets one oversized visible piece through per frame while nothing was spent', () => {
+  it('lets one oversized visible piece through per frame', () => {
     const budget = budgetAt(40); // headroom = floor 2 ms
     budget.record('touch:0', 15);
     expect(budget.admit({ kind: 'touch:1', cls: 'visible', deferredFrames: 0 })).toEqual({
@@ -433,11 +446,19 @@ describe('gpu prep budget: progress and class-specific starvation', () => {
     });
   });
 
-  it('does not use the progress slot once the frame has spent, and never for cosmetic', () => {
+  it('keeps the progress slot open on a frame that already spent, never for cosmetic', () => {
+    // The slot is per FRAME, not per unspent frame: gating it on a frame that
+    // had spent nothing let any actionable unit that ran first close it for
+    // every visible and approaching piece behind it.
     const budget = budgetAt(40);
     budget.record('touch:0', 15);
     budget.spend(0.5);
     expect(budget.admit({ kind: 'touch:1', cls: 'visible', deferredFrames: 0 })).toMatchObject({
+      admit: true,
+      reason: 'progress',
+    });
+    // Still one per frame: the second oversized piece of the frame waits.
+    expect(budget.admit({ kind: 'touch:2', cls: 'visible', deferredFrames: 0 })).toMatchObject({
       admit: false,
       reason: 'no-headroom',
     });
@@ -473,6 +494,22 @@ describe('gpu prep budget: progress and class-specific starvation', () => {
       admit: true,
       reason: 'progress',
     });
+  });
+
+  it('takes a live frame target from noteFrame, so a tier change moves the headroom', () => {
+    // GFX is REASSIGNED on a tier change, so a target captured once at
+    // construction leaves the session pacing against the tier it booted on.
+    const budget = budgetAt(20); // 24 ms target, 20 ms frames: 4 ms of headroom
+    expect(budget.headroomMs()).toBe(4);
+    budget.noteFrame(20, 30);
+    expect(budget.headroomMs()).toBe(10);
+    // Junk keeps the target that is running.
+    budget.noteFrame(20, Number.NaN);
+    expect(budget.headroomMs()).toBe(10);
+    budget.noteFrame(20, -5);
+    expect(budget.headroomMs()).toBe(10);
+    budget.noteFrame(20);
+    expect(budget.headroomMs()).toBe(10);
   });
 
   it('gives cosmetic work its own, longer starvation bound', () => {

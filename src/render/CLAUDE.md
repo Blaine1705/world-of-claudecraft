@@ -221,7 +221,9 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   learns a syncMs per label kind and spends the headroom left by the tier's
   drop-frame threshold, defers a refused unit frame by frame under a starvation
   bound, and arms only once the frame clock runs, with `?prep=legacy` restoring
-  the old admit-everything behaviour. The touch tail runs as one budgeted queue
+  the old ADMISSION only (every unit admitted at once, the ledger still
+  learning); the reveal-gate policy has no legacy arm and keeps revealing
+  piecewise under its soft deadline whatever that flag says. The touch tail runs as one budgeted queue
   unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates AND on the
   reveal host, which previously ended at the shadow arm and left streamed decor
   paying the uniform-table round trip on its reveal draw. `idle_queue.ts`
@@ -250,7 +252,10 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the budget's learned reveal cost times the root count clamped into
   [`REVEAL_SOFT_DEADLINE_MIN_MS`, `REVEAL_GATE_WATCHDOG_MS`], records a
   `reveal-soft-deadline` gpu-prep event with the key's ready/total roots and
-  changes nothing; the `REVEAL_GATE_WATCHDOG_MS` hard watchdog still reveals ungated and now
+  changes nothing. That learned cost is the compileAsync PROLOGUE (1 to 3 ms),
+  not the driver's link wall time, so the deadline sits at its floor in
+  practice: a learned wall time is future work, and it is telemetry either
+  way; the `REVEAL_GATE_WATCHDOG_MS` hard watchdog still reveals ungated and now
   carries the same counts, plus the `reveal` aggregate in
   `gpu_prep_events.ts` (keys held, roots held, roots revealed piecewise, roots
   still compiling at a watchdog), so a capture can attribute a first-draw
@@ -273,10 +278,11 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   The rule has a SECOND-CONTEXT arm: the paperdoll / Inspect preview holds its
   own draws on a cold open (`characters/preview_open_gate_core.ts`, armed from
   `Hud.mountSharedPreview`) while that context links, uploads and touches, and
-  its stand-in is a 2D layer, the class crest or a cached portrait, painted
-  over the empty canvas by `src/ui/preview_stand_in.ts` with `aria-busy` (a
-  rebuild in the SAME container keeps the retained previous frame instead: no
-  resize, so the canvas still holds it, and it is truer than any crest). It
+  its stand-in is a 2D layer, a cached portrait or the class crest, painted
+  over the empty canvas by `src/ui/preview_stand_in.ts` with `aria-busy`, on
+  EVERY arm including a rebuild in the same container (the mount resizes the
+  renderer first, and `setSize` reassigns `canvas.width`, which clears the
+  drawing buffer: there is no retained frame left to stand in). It
   needs no `ENTITY_GATE_STAND_INS` row: that table is world ENTITIES the
   renderer hides in the live scene, and this gate hides nothing in the world.
   Its escape is the reveal gates' rule, a soft deadline that records a

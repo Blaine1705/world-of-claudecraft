@@ -64,11 +64,7 @@ import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
-import {
-  type BackgroundGpuQueueStats,
-  createBackgroundGpuQueue,
-  GPU_WORK_PRIORITY,
-} from './background_gpu_queue';
+import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BattlegroundView, buildBattleground } from './battleground';
 import { BattlegroundFx } from './battleground_fx';
@@ -313,7 +309,6 @@ import { attachSceneGroupGated } from './gated_scene_attach';
 import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
 import {
   GFX,
-  type GfxBucketBands,
   type GfxBucketLevels,
   initGfxTier,
   SUN_ANCHOR,
@@ -521,7 +516,6 @@ import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
   RenderDiagnostics,
-  type RenderDiagnosticsSnapshot,
 } from './render_diagnostics';
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
 import {
@@ -4683,12 +4677,9 @@ export class Renderer {
     sample.minRenderScale = resolutionRange.minRenderScale;
     sample.maxRenderScale = resolutionRange.maxRenderScale;
     const state = this.renderBudgetGovernor.update(sample, this.renderBudgetState);
-    // sample.frameMs is the PREVIOUS frame's wall period (dt), clamped past a
-    // tab-hide discontinuity: the right signal for pacing, because preparation
-    // admitted last frame lands in exactly that number, which a submit-only
-    // measure would never see. Pressure follows the governor: while it is
-    // shedding quality, cosmetic preparation waits.
-    this.gpuPrepBudget.noteFrame(sample.frameMs);
+    // Pressure follows the governor: while it is shedding quality, cosmetic
+    // preparation waits. The budget's frame boundary is fed in sync() instead,
+    // where it lands on every frame rather than only on a presented one.
     this.gpuPrepBudget.notePressure(state.mode === 'degrading');
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
@@ -10474,6 +10465,12 @@ export class Renderer {
     const totalStart = performance.now();
     // Feed the background lane the live frame clock (see its header).
     this.backgroundGpuWork.noteFrame(totalStart);
+    // The pacing budget opens its frame on the SAME boundary, unconditionally:
+    // behind the present/dt guards below it never reset a hidden tab's spend,
+    // so both per-frame slots latched while the queue's clock kept aging. Same
+    // dt-derived ms the governor samples, and the tier's live drop-frame
+    // threshold, which a tier change reassigns.
+    this.gpuPrepBudget.noteFrame(Math.min(250, dt * 1000), GFX.budget.dropFrameMs);
     let phaseStart = totalStart;
     const frameStats = this.lastFrameStats;
     const framePhaseMs = frameStats.phaseMs;

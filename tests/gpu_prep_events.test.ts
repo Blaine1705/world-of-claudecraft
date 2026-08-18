@@ -231,6 +231,18 @@ describe('gpu preparation reveal counters', () => {
     expect(second.keysHeld).toBe(1);
   });
 
+  it('normalizes a nonsense age like every other numeric field', () => {
+    // The age is the one field a capture reads as a duration, so a NaN from a
+    // caller's arithmetic must not land in the ring verbatim.
+    recordGpuPrepEvent({ kind: 'gate-timeout', key: 'preview-open', ageMs: Number.NaN });
+    recordGpuPrepEvent({ kind: 'reveal-watchdog', key: 'town', ageMs: -12 });
+    // A sub-millisecond age is real and survives: the guard rejects, it does
+    // not round.
+    recordGpuPrepEvent({ kind: 'attach-watchdog', key: 'feature', ageMs: 0.25 });
+    const events = gpuPrepEventsSnapshot().events;
+    expect(events.map((event) => event.ageMs)).toEqual([0, 0, 0.25]);
+  });
+
   it('ignores a nonsense root count instead of poisoning the totals', () => {
     noteRevealKeyHeld(Number.NaN);
     noteRevealRootsAtWatchdog(-4);

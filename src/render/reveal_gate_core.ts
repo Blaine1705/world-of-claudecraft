@@ -39,7 +39,8 @@ export interface RevealGateCore {
   allow(key: string): boolean;
   /** Mark a key revealable. Idempotent; an unknown key becomes warm (the
    *  fail-soft arm: a settle must always end the hold, whatever came first),
-   *  and every root behind it counts as ready. */
+   *  and every root behind it counts as ready, so a late per-root settle
+   *  cannot push the ready count past the total. */
   settle(key: string): void;
   state(key: string): RevealGateState;
   /** Host: declare the roots behind a key, once, right after its request
@@ -87,6 +88,10 @@ export function createRevealGateCore(request: (key: string) => void): RevealGate
     settle(key: string): void {
       const entry = entryFor(key);
       entry.state = 'warm';
+      // Every root is marked ready, not just the count: a root left false here
+      // would settle again later and carry `ready` past `total` into the
+      // telemetry (a 41-root key reporting 71 of 41).
+      for (const root of entry.roots.keys()) entry.roots.set(root, true);
       entry.ready = entry.total;
     },
     state(key: string): RevealGateState {

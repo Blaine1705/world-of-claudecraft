@@ -151,6 +151,23 @@ describe('reveal gate core per-root readiness', () => {
     expect(gate.rootReady('town', b)).toBe(true);
   });
 
+  it('a per-root settle after a whole-key settle cannot push ready past total', () => {
+    // settle() ends the hold for every root, so a link that lands afterwards
+    // has nothing left to report: counting it again put a 41-root key in the
+    // telemetry as 71 of 41.
+    const gate = createRevealGateCore(() => undefined);
+    const a = {};
+    const b = {};
+    gate.allow('town');
+    gate.noteRoots('town', [a, b]);
+    gate.settleRoot('town', a);
+    gate.settle('town');
+    gate.settleRoot('town', a);
+    gate.settleRoot('town', b);
+    expect(gate.readiness('town', { ready: 0, total: 0 })).toEqual({ ready: 2, total: 2 });
+    expect(gate.state('town')).toBe('warm');
+  });
+
   it('a duplicated root is counted once and settles once', () => {
     const gate = createRevealGateCore(() => undefined);
     const shared = {};

@@ -23,12 +23,13 @@
 //                 this layer or the real splat terrain underneath it
 
 // Beside the ?<name>=off layer switches, one MODE flag with its own accessor:
-//   ?prep=legacy - restores the pre-scheduler GPU-preparation behaviour, both
-//                  the queue admission and the reveal gating, for one family at
-//                  a time. It is the rollout kill switch: if an adaptive family
-//                  regresses on a machine, ?prep=legacy is the A/B that says so
-//                  without a rebuild, and the same flag is what a rollback ships
-//                  as the default.
+//   ?prep=legacy - restores the pre-scheduler queue ADMISSION only: every unit
+//                  is admitted as its turn comes and the ledger keeps learning.
+//                  It does NOT revert the reveal-gate policy (piecewise reveal,
+//                  soft deadline), which has no legacy arm. It is the rollout
+//                  kill switch for pacing: if the budget regresses on a machine,
+//                  ?prep=legacy is the A/B that says so without a rebuild, and
+//                  the same flag is what a rollback ships as the default.
 
 /** Which GPU-preparation behaviour this session runs. */
 export type GpuPrepMode = 'adaptive' | 'legacy';

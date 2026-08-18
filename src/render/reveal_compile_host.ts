@@ -31,7 +31,11 @@ export interface RevealCompileHostDeps {
   compileShadow(target: THREE.Object3D): Promise<unknown>;
   touch(target: THREE.Object3D, priority: number): Promise<unknown>;
   /** The frame budget's learned cost of ONE reveal compile, which becomes the
-   *  key's soft deadline once multiplied by its root count. */
+   *  key's soft deadline once multiplied by its root count. What it learns is
+   *  the compileAsync PROLOGUE (1 to 3 ms), not the driver's link wall time,
+   *  so the deadline sits at its REVEAL_SOFT_DEADLINE_MIN_MS floor in
+   *  practice; a learned wall time is future work. Harmless either way: the
+   *  soft deadline is telemetry and never reveals anything. */
   predictRevealMs(): number;
 }
 

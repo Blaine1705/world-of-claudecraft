@@ -134,6 +134,11 @@ const reveal: GpuPrepRevealCounters = {
 const countOf = (value: number | undefined): number =>
   typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
 
+/** A non-negative finite age. Same guard as the counts, without their floor:
+ *  a sub-millisecond age is real, a NaN one is not. */
+const ageOf = (value: number): number =>
+  typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0;
+
 /** One key entered a hold, with the roots the host is about to compile. */
 export function noteRevealKeyHeld(rootCount: number): void {
   reveal.keysHeld++;
@@ -152,6 +157,7 @@ export function noteRevealRootsAtWatchdog(count: number): void {
 
 export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
   const atMs = clock();
+  const ageMs = ageOf(event.ageMs);
   const readyRoots = countOf(event.readyRoots);
   const totalRoots = countOf(event.totalRoots);
   const units = countOf(event.units);
@@ -159,7 +165,7 @@ export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
     ring.push({
       kind: event.kind,
       key: event.key,
-      ageMs: event.ageMs,
+      ageMs,
       atMs,
       readyRoots,
       totalRoots,
@@ -169,7 +175,7 @@ export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
     const slot = ring[writeIndex];
     slot.kind = event.kind;
     slot.key = event.key;
-    slot.ageMs = event.ageMs;
+    slot.ageMs = ageMs;
     slot.atMs = atMs;
     slot.readyRoots = readyRoots;
     slot.totalRoots = totalRoots;

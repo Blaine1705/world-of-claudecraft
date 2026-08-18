@@ -171,8 +171,11 @@ export interface GpuPrepBudgetSnapshot {
 
 export interface GpuPrepBudget {
   /** The last rendered frame's duration. Opens a new frame: the frame's spend
-   *  and its first-sample slot both reset here. */
-  noteFrame(frameMs: number): void;
+   *  and its first-sample slot both reset here. The optional target is the
+   *  tier's live drop-frame threshold: GFX is REASSIGNED on a tier change, so
+   *  a target captured once at construction leaves a session pacing against
+   *  the tier it booted on. Junk values keep the current target. */
+  noteFrame(frameMs: number, targetFrameMs?: number): void;
   /** The frame governor's pressure. While degrading, cosmetic candidates
    *  defer; actionable and visible work is never touched by it. */
   notePressure(degrading: boolean): void;
@@ -270,7 +273,14 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
   };
 
   return {
-    noteFrame(frameMs: number): void {
+    noteFrame(frameMs: number, targetFrameMs?: number): void {
+      if (
+        typeof targetFrameMs === 'number' &&
+        Number.isFinite(targetFrameMs) &&
+        targetFrameMs > 0
+      ) {
+        cfg.targetFrameMs = targetFrameMs;
+      }
       spentThisFrameMs = 0;
       firstSampleUsedThisFrame = false;
       progressUsedThisFrame = false;
@@ -314,9 +324,13 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
       // because delaying it never makes the frame faster and a gated root
       // revealed by an escape before its pieces are done pays the whole link
       // on the live path, which costs more than the piece.
+      //
+      // The slot is per frame, NOT per unspent frame: gating it on a frame
+      // that had spent nothing let any actionable unit that ran first close
+      // it for every visible and approaching piece behind it, which on a busy
+      // frame is all of them.
       if (
         (input.cls === 'visible' || input.cls === 'approaching') &&
-        spentThisFrameMs === 0 &&
         !progressUsedThisFrame &&
         ledgerOf(input.kind) !== undefined &&
         predictedMs > headroom()

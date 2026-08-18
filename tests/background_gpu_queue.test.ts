@@ -1709,6 +1709,220 @@ describe('createBackgroundGpuQueue admission', () => {
     expect(stats.slowest.every((unit) => unit.deferredFrames === 0)).toBe(true);
   });
 
+  it('owes a starving tail-free piece a slot, whatever the priority storm', async () => {
+    // The starvation strict priority cannot escape on its own: while higher
+    // units keep arriving AND being admitted, a piece is never OFFERED, so its
+    // deferral counter never runs, the budget's starvation bound cannot fire,
+    // and the gate whose touch pieces ride at TAIL_PIECE never settles.
+    //
+    // The storm is a BOOT-DEBT drain: those batches keep their tail HELD, so
+    // each occupies the loop for its whole link, spanning several frames, and
+    // they are tail-free units themselves. That is why the slot is keyed on the
+    // LOWEST-priority tail-free candidate: the highest one would be the storm's
+    // own next batch, and the piece would still never run.
+    const gate = probe(() => true);
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    const ran: string[] = [];
+    const releases: Array<() => void> = [];
+    const debt = (index: number): Promise<unknown> =>
+      queue.run(
+        () => {
+          ran.push(`debt:${index}`);
+          return new Promise<void>((resolve) => releases.push(resolve));
+        },
+        GPU_WORK_PRIORITY.BOOT_DEBT,
+        `zone-prepare:${index}`,
+      );
+    queue.noteFrame(0);
+
+    const piece = queue.run(
+      () => void ran.push('piece'),
+      GPU_WORK_PRIORITY.TAIL_PIECE,
+      'touch:program',
+    );
+    const first = debt(0);
+    await settle();
+    expect(ran).toEqual(['debt:0']);
+
+    // Frame 0 ended: it STARTED a tail-free unit, so nothing is owed yet, and
+    // the drain lands its next batch while the first one is still linking.
+    queue.noteFrame(16);
+    const second = debt(1);
+    await settle();
+    expect(ran).toEqual(['debt:0']);
+
+    // Frame 1 ended with the piece pending and no tail-free unit started in
+    // it: the next selection owes the piece its slot, ahead of the drain.
+    queue.noteFrame(32);
+    releases[0]();
+    await piece;
+
+    expect(ran).toEqual(['debt:0', 'piece', 'debt:1']);
+    expect(queue.stats().admission.parks).toBe(0);
+    releases[1]();
+    await Promise.all([first, second]);
+  });
+
+  it('leaves selection alone in a frame that already started a tail-free unit', async () => {
+    const gate = probe(() => true);
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    const ran: string[] = [];
+    let releaseDebt!: () => void;
+    queue.noteFrame(0);
+
+    const debt = queue.run(
+      () => {
+        ran.push('debt');
+        return new Promise<void>((resolve) => {
+          releaseDebt = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.BOOT_DEBT,
+      'zone-prepare:eastbrook',
+    );
+    const piece = queue.run(
+      () => void ran.push('piece'),
+      GPU_WORK_PRIORITY.TAIL_PIECE,
+      'touch:program',
+    );
+    await settle();
+    // The debt batch started inside frame 0, so frame 1 owes no slot and the
+    // higher-priority arrival keeps its place ahead of the piece.
+    queue.noteFrame(16);
+    const reveal = queue.run(
+      () => void ran.push('reveal-gate:a'),
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'reveal-gate:a',
+      { releaseTail: true },
+    );
+    releaseDebt();
+    await Promise.all([piece, debt, reveal]);
+
+    expect(ran).toEqual(['debt', 'reveal-gate:a', 'piece']);
+  });
+
+  it('counts a cap park with a refused piece as an admission park, not a tail-cap one', async () => {
+    // The combined park: the cap is full AND every tail-free candidate was
+    // refused by the budget. Attributing it to the tail cap inflates the cap
+    // counters once per frame (the frame clock wakes the park, which re-parks)
+    // and marks a purely budget-driven wait waitedOnTailCap.
+    let clock = 0;
+    let admitPiece = false;
+    const gate = probe((candidate) =>
+      candidate.priority === GPU_WORK_PRIORITY.TAIL_PIECE ? admitPiece : true,
+    );
+    const queue = createBackgroundGpuQueue({
+      now: () => clock,
+      admission: gate.admission,
+      tailLimit: 1,
+    });
+    const ran: string[] = [];
+    queue.noteFrame(0);
+
+    void queue.run(
+      () => {
+        ran.push('gate');
+        return new Promise<void>(() => {});
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'reveal-gate:tavern',
+      { releaseTail: true },
+    );
+    const piece = queue.run(
+      () => void ran.push('piece'),
+      GPU_WORK_PRIORITY.TAIL_PIECE,
+      'touch:program',
+    );
+    await settle();
+    expect(ran).toEqual(['gate']);
+    expect(queue.stats().admission.parks).toBe(1);
+
+    queue.noteFrame(16);
+    await settle();
+    queue.noteFrame(32);
+    await settle();
+    // Re-parked per frame, and every one of those parks is the budget's.
+    expect(queue.stats().admission.parks).toBe(3);
+
+    admitPiece = true;
+    clock = 50;
+    queue.noteFrame(48);
+    await piece;
+
+    expect(ran).toEqual(['gate', 'piece']);
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'touch:program');
+    expect(wait?.waitedOnTailCap).toBe(false);
+    expect(wait?.tails).toEqual([]);
+  });
+
+  it('still counts a park with no tail-free candidate as the tail-cap park it is', async () => {
+    // The other arm: nothing tail-free is pending, so the cap really is what
+    // this loop is waiting on, and the delayed unit must say so.
+    let clock = 0;
+    const gate = probe(() => true);
+    const queue = createBackgroundGpuQueue({
+      now: () => clock,
+      admission: gate.admission,
+      tailLimit: 1,
+    });
+    const ran: string[] = [];
+    queue.noteFrame(0);
+    let releaseLink!: () => void;
+
+    void queue.run(
+      () => {
+        ran.push('first');
+        return new Promise<void>((resolve) => {
+          releaseLink = resolve;
+        });
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'reveal-gate:first',
+      { releaseTail: true },
+    );
+    const second = queue.run(
+      () => {
+        ran.push('second');
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'reveal-gate:second',
+      { releaseTail: true },
+    );
+    await settle();
+    expect(ran).toEqual(['first']);
+    expect(queue.stats().admission.parks).toBe(0);
+
+    clock = 30;
+    releaseLink();
+    await second;
+
+    const wait = queue.stats().longestWaits.find((entry) => entry.label === 'reveal-gate:second');
+    expect(wait?.waitedOnTailCap).toBe(true);
+    expect(wait?.tails).toEqual(['reveal-gate:first']);
+  });
+
+  it('charges the admission for a unit whose prologue threw', async () => {
+    // The throwing unit still ran on the main thread for as long as it took to
+    // throw: leaving it uncharged hands the rest of the frame's budget away.
+    let clock = 0;
+    const gate = probe(() => true);
+    const queue = createBackgroundGpuQueue({ now: () => clock, admission: gate.admission });
+    queue.noteFrame(0);
+
+    const failed = queue.run(
+      () => {
+        clock += 7;
+        throw new Error('prologue failed');
+      },
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      'reveal-gate:forge',
+    );
+
+    await expect(failed).rejects.toThrow('prologue failed');
+    expect(gate.spent).toEqual([{ syncMs: 7, label: 'reveal-gate:forge' }]);
+    expect(queue.stats().slowest[0]).toMatchObject({ label: 'reveal-gate:forge', syncMs: 7 });
+  });
+
   it('releases a loop parked on the admission when the queue shuts down', async () => {
     // Nothing feeds a frame after shutdown and the pending set just emptied, so
     // without an explicit wake the shutdown promise would never settle.

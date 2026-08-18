@@ -80,6 +80,19 @@
 // requestAnimationFrame is ever armed, so a queue that admitted against a
 // budget with no frames to protect would park under the curtain with nothing
 // able to wake it. There is no live frame to protect before the first one.
+//
+// The PIECE SLOT is the one exception to strict priority order, and it is what
+// keeps the admission's own starvation bound reachable. Under a storm of
+// higher-priority units that keep arriving AND being admitted (a boot-debt
+// drain, a teleport reveal storm) a tail-free piece further down is never even
+// OFFERED to the admission, so its deferral counter never runs, the starvation
+// rule never fires, and a gate whose touch pieces ride at TAIL_PIECE never
+// settles: its entity sits on its stand-in for as long as the storm lasts. So
+// a frame that ends with pieces pending and no piece run owes one: the next
+// selection offers the LOWEST-priority tail-free candidate first, still
+// through the admission (the storm that starves a piece is itself tail-free
+// when it is a boot-debt drain, so the highest one would be the storm again). At least one piece per frame whenever pieces wait;
+// strict priority still orders everything else.
 import { createGpuQueueWindow, type GpuQueueWindowStats } from './gpu_queue_window_core';
 
 export const GPU_WORK_PRIORITY = {
@@ -448,6 +461,10 @@ export function createBackgroundGpuQueue(opts?: {
   let admissionParks = 0;
   let selectionPass = 0;
   let admissionNotify: (() => void) | null = null;
+  // The per-frame piece slot (see the header): whether a tail-free unit ran in
+  // the frame under way, and whether the frame that just ended left one owed.
+  let tailFreeRanThisFrame = false;
+  let pieceSlotOwed = false;
   // True while the drain loop is parked waiting for a cap slot. Read at enqueue
   // so a unit arriving mid-park is attributed the wait it really had.
   let parkedOnTailCap = false;
@@ -649,6 +666,28 @@ export function createBackgroundGpuQueue(opts?: {
   const outranks = (a: PendingGpuWork<unknown>, b: PendingGpuWork<unknown>): boolean =>
     a.priority > b.priority || (a.priority === b.priority && a.order < b.order);
 
+  /** Index of the LOWEST-priority pending unit that holds no tail, FIFO among
+   *  equals, or -1. Lowest, because the slot exists for the candidate strict
+   *  priority starves: the storm that starves a touch piece is itself made of
+   *  tail-free units (a boot-debt drain holds its tails), so offering the
+   *  highest-priority one would re-offer the storm its own next unit. */
+  const lowestTailFree = (): number => {
+    let found = -1;
+    for (let index = 0; index < pending.length; index++) {
+      const candidate = pending[index];
+      if (candidate.releaseTail) continue;
+      const held = found < 0 ? null : pending[found];
+      if (
+        held === null ||
+        candidate.priority < held.priority ||
+        (candidate.priority === held.priority && candidate.order < held.order)
+      ) {
+        found = index;
+      }
+    }
+    return found;
+  };
+
   /**
    * Index of the unit to start next: highest priority, FIFO within a priority,
    * and with an armed admission the first such candidate it admits. Returns -1
@@ -669,6 +708,27 @@ export function createBackgroundGpuQueue(opts?: {
       return selectedIndex;
     }
     selectionPass++;
+    if (pieceSlotOwed) {
+      // Offered FIRST, still through the admission: the slot buys the piece a
+      // hearing, never an exemption from the budget. A refusal at least starts
+      // its deferral counter, which is what the starvation bound counts in.
+      const pieceIndex = lowestTailFree();
+      if (pieceIndex >= 0) {
+        const piece = pending[pieceIndex];
+        if (
+          admission.admit({
+            label: piece.label,
+            priority: piece.priority,
+            deferredFrames: piece.deferredFrames,
+          })
+        ) {
+          return pieceIndex;
+        }
+        piece.refusedPass = selectionPass;
+        piece.refusedAdmission = true;
+        admissionDeferred++;
+      }
+    }
     for (;;) {
       let selectedIndex = -1;
       for (let index = 0; index < pending.length; index++) {
@@ -714,9 +774,19 @@ export function createBackgroundGpuQueue(opts?: {
           // a long wait cannot be told apart from waiting behind an ordinary
           // holder. A tail settling wakes it; so does the frame clock or an
           // arrival, in case a tail-free candidate was only budget-refused.
-          tailCapParks++;
-          lastCapOccupants = [...waitingTails].map((tail) => tail.entry.label);
-          parkedOnTailCap = true;
+          //
+          // Only a PURE cap wait is that park, though: with a tail-free
+          // candidate pending, the cap is full but it is not what held this
+          // loop, the budget is, and counting it here would inflate the cap
+          // counters every frame (the wake re-parks) and mark a purely
+          // budget-driven wait waitedOnTailCap.
+          if (lowestTailFree() < 0) {
+            tailCapParks++;
+            lastCapOccupants = [...waitingTails].map((tail) => tail.entry.label);
+            parkedOnTailCap = true;
+          } else {
+            admissionParks++;
+          }
           try {
             await new Promise<void>((resolve) => {
               tailNotify = resolve;
@@ -725,9 +795,12 @@ export function createBackgroundGpuQueue(opts?: {
           } finally {
             // Backstop only: the settle path above clears this the moment a
             // slot frees. This covers the paths that leave the park without
-            // one (shutdown), and re-clearing is idempotent.
+            // one (shutdown), and re-clearing is idempotent. The tail notifier
+            // is stale once the park ends on the admission side, and the
+            // settle path clears its own.
             parkedOnTailCap = false;
             admissionNotify = null;
+            tailNotify = null;
           }
           continue;
         }
@@ -741,6 +814,10 @@ export function createBackgroundGpuQueue(opts?: {
         continue;
       }
       const [next] = pending.splice(selectedIndex, 1);
+      if (!next.releaseTail) {
+        tailFreeRanThisFrame = true;
+        pieceSlotOwed = false;
+      }
       const startedAt = now();
       const unit: RunningGpuWork = {
         entry: next,
@@ -758,11 +835,13 @@ export function createBackgroundGpuQueue(opts?: {
       lastHolderPriority = next.priority;
       let syncMs = 0;
       let released = false;
+      let charged = false;
       try {
         const returned = next.work();
         syncMs = now() - unit.startedAt;
         // Charged whether or not the tail is released, and whether or not the
         // admission is armed yet: the ledger learns from boot units too.
+        charged = true;
         admission?.spend(syncMs, next.label);
         if (
           next.releaseTail &&
@@ -776,7 +855,14 @@ export function createBackgroundGpuQueue(opts?: {
           next.resolve(await returned);
         }
       } catch (error) {
-        if (syncMs === 0) syncMs = now() - unit.startedAt;
+        if (!charged) {
+          // A unit that threw synchronously still cost the main thread what it
+          // ran before throwing: leaving it uncharged hands the rest of the
+          // frame budget away on the strength of work that did happen.
+          syncMs = now() - unit.startedAt;
+          charged = true;
+          admission?.spend(syncMs, next.label);
+        }
         next.reject(error);
       } finally {
         running = null;
@@ -843,6 +929,10 @@ export function createBackgroundGpuQueue(opts?: {
         // bound counts in, and the new frame re-opens the budget: wake the loop
         // so it reconsiders everything it parked on.
         for (const entry of pending) if (entry.refusedAdmission) entry.deferredFrames++;
+        // The frame that just ended owes a piece when one waited through it
+        // without any tail-free unit running (see the header's piece slot).
+        pieceSlotOwed = !tailFreeRanThisFrame && lowestTailFree() >= 0;
+        tailFreeRanThisFrame = false;
         wakeAdmission();
       }
       const previous = lastFrameAt;

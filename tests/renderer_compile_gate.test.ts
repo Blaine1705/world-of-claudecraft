@@ -371,6 +371,24 @@ describe('the compile gate touch tail, per program', () => {
     expect(source).not.toContain('touchLinkedPrograms(');
     expect(source).toContain('runLinkedProgramTouchLane(');
   });
+
+  it('opens both GPU-preparation frame clocks in the same unconditional sync prologue', () => {
+    // The queue's frame clock kept arming and aging while the budget's frame
+    // never opened: its noteFrame sat behind the present/dt guards, so a
+    // hidden tab left spentThisFrameMs charged and both per-frame slots
+    // latched. One prologue, both clocks, every frame.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const syncStart = source.indexOf('    const totalStart = performance.now();');
+    expect(syncStart).toBeGreaterThan(-1);
+    const prologue = source.slice(syncStart, source.indexOf('if (present)', syncStart));
+    expect(prologue).toContain('this.backgroundGpuWork.noteFrame(totalStart);');
+    expect(prologue).toContain('this.gpuPrepBudget.noteFrame(');
+    // The tier's live drop-frame threshold rides along: GFX is reassigned on a
+    // tier change, so a target captured at construction goes stale.
+    expect(prologue).toContain('GFX.budget.dropFrameMs');
+    // And nowhere else: a second, conditional frame boundary is the defect.
+    expect(source.split('this.gpuPrepBudget.noteFrame(').length - 1).toBe(1);
+  });
 });
 
 describe('the shadow arm compiles casters only', () => {
