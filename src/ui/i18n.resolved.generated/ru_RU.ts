@@ -13242,6 +13242,15 @@ export const ru_RU: EnTranslations = {
       "training_dummy": {
         "name": "Тренировочный манекен"
       },
+      "friendly_player_dummy": {
+        "name": "Дружественный манекен игрока"
+      },
+      "normal_boss_dummy": {
+        "name": "Обычный манекен босса"
+      },
+      "heroic_boss_dummy": {
+        "name": "Героический манекен босса"
+      },
       "ridge_stalker": {
         "name": "Хребтовый охотник"
       },

@@ -13242,6 +13242,15 @@ export const zh_TW: EnTranslations = {
       "training_dummy": {
         "name": "訓練假人"
       },
+      "friendly_player_dummy": {
+        "name": "友方玩家假人"
+      },
+      "normal_boss_dummy": {
+        "name": "普通首領假人"
+      },
+      "heroic_boss_dummy": {
+        "name": "英雄首領假人"
+      },
       "ridge_stalker": {
         "name": "山脊潛獵者"
       },
