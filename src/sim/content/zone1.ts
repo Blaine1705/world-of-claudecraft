@@ -53,13 +53,26 @@ export const TOWN_PLAT_TERRAIN_EDITS: HeightStamp[] = [
 // slope through the band stays under 0.2 and the beach band runs 12yd plus
 // at every sampled x. Sea cells under a stamp stay sea (verified: below
 // waterline ground inside a stamp still reads water -4.3).
+// The harbor quay (wave A of the site plan): a flat-falloff pad at working
+// grade fronting the carved cove, read as a built edge (the quay wall props
+// face the drop in the dock wave), with a smooth approach blend from the
+// flank so the walk onto the pad never exceeds the movement slope gate.
+// The flat stamps stop at x -99; the cove's water starts near x -102, so
+// no wet cell is lifted (the Mirror Lake lesson).
+export const EASTBROOK_QUAY_TERRAIN_EDITS: HeightStamp[] = [
+  { x: -84, z: -54, radius: 18, delta: -1.6, falloff: 'smooth', mode: 'level' },
+  { x: -92, z: -46, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -92, z: -54, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -92, z: -62, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
+];
+
 export const SOWFIELD_BEACH_TERRAIN_EDITS: HeightStamp[] = [
-  { x: -64, z: -160, radius: 30, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -52, z: -161, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -40, z: -164, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -28, z: -166, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -16, z: -162, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -4, z: -160, radius: 30, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -64, z: -154, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -52, z: -156, radius: 29, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -40, z: -158, radius: 29, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -28, z: -160, radius: 30, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -16, z: -156, radius: 26, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -4, z: -154, radius: 26, delta: -3.9, falloff: 'smooth', mode: 'level' },
   { x: 8, z: -151, radius: 30, delta: -3.9, falloff: 'smooth', mode: 'level' },
   { x: 20, z: -148, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
   { x: 32, z: -146, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },

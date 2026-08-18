@@ -21,6 +21,7 @@ export const VALE_LAND_LOBES = [
   { x: 150, z: -46, r: 44 }, // the west point: the causeway's mainland root
 ] as const;
 export const VALE_BAYS = [
+  { x: -112, z: -52, r: 40 }, // New Eastbrook's harbor cove: carves the sea into the freed dig flank for the quay and ferry berth (site-plan.md section 3)
   { x: -192, z: 25, r: 60 }, // the west bay
   { x: 30, z: -196, r: 66 }, // the south bay
   { x: 196, z: 104, r: 56 }, // the east bay, north of the causeway
