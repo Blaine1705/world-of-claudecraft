@@ -5,10 +5,9 @@ Resume here. Do not re-litigate locked decisions; they live in
 
 ## Resume point
 
-Phase 3 is complete on `feature/deed-border-cartouche` in worktree
-`/Users/fernando/Documents/wocc-deed-border-cartouche`. Next action: run
-Phase 4 from `phase-04-qa-identity.md` in that worktree. Do not start
-Phase 4 unless the operator asks.
+Phase 4 is complete on `feature/deed-border-cartouche` in worktree
+`/Users/fernando/Documents/wocc-deed-border-cartouche`. The operator
+may open the PR. Do not push unless asked.
 
 ## Blocker
 
@@ -17,9 +16,8 @@ None.
 ## Next action
 
 1. Work in `/Users/fernando/Documents/wocc-deed-border-cartouche`.
-2. Execute Phase 4 (`phase-04-qa-identity.md`): full matrix audit,
-   family screenshots, reviewers, selective gate.
-3. Do not call the feature done until Phase 4 is green.
+2. Open the PR off `origin/release/v0.39.0` when asked. Stage only this
+   packet's files. Do not base on `main`.
 
 ## Locked decisions (cheat sheet)
 
@@ -55,6 +53,14 @@ None.
 - Inspect CSS cartouche, portrait-ring clasp, picker 3-color swatch.
 - E27-E36 tests named in `progress.md`.
 
+## Closed in Phase 4
+
+- Coverage map E1-E36 audited. Phase 1 rows still green after motifs.
+- Family screenshots under `docs/screenshots/deed-border-cartouche/phase-03/`.
+- Reviewers READY WITH NOTES. Confirmed gaps fixed (CI cone, picker
+  `when` list, chrome literals, Reliquary cartouche wording).
+- `node scripts/gate_select.mjs` PASS (12 steps).
+
 ## Surfaces in play
 
 - `src/ui/deed_border_view.ts`
@@ -65,7 +71,7 @@ None.
 - `src/styles/hud.css` (Phase 3 ring)
 - `src/styles/shell.css` (Phase 3 inspect)
 - `src/ui/deeds_window.ts` + `src/styles/components.css` (Phase 3 picker)
-- `scripts/pr_shot_targets.mjs` (`nameplate-border` when-list is ready)
+- `scripts/pr_shot_targets.mjs` (`nameplate-border`, picker, inspect)
 - Tests listed in `progress.md`
 
 ## Review dispatch (QA phases)
