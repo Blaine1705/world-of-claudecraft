@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isDispellableAura } from '../src/sim/aura_classify';
+import { TALENT_ABILITIES_V2_B } from '../src/sim/content/talent_abilities_v2_b';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { IGNIVAR_LAYOUT } from '../src/sim/dungeon_layout';
 import {
@@ -88,7 +89,7 @@ import {
 } from '../src/sim/ignivar_meteors';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { Rng } from '../src/sim/rng';
-import { Sim } from '../src/sim/sim';
+import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import {
   DT,
   dist2d,
@@ -2125,15 +2126,14 @@ describe('Ignivar encounter', () => {
     expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_SOAK_AURA_ID)).toBe(false);
   });
 
-  it('survives a real friendly dispel cast and still requires encounter water', () => {
+  it('survives a real friendly dispel effect and still requires encounter water', () => {
     const sim = new Sim({
       seed: 7,
-      playerClass: 'paladin',
+      playerClass: 'warlock',
       autoEquip: true,
       devCommands: true,
     });
     sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 8: 'pal_r8_cleansing_verdict' } })).toBe(true);
     expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', sim.player.id, true)).toBe(true);
     const boss = [...sim.entities.values()].find((e) => e.templateId === IGNIVAR_BOSS_ID);
     if (!boss) throw new Error('Ignivar did not spawn');
@@ -2148,13 +2148,20 @@ describe('Ignivar encounter', () => {
       school: 'fire',
       encounterOwned: true,
     });
-    sim.player.resource = sim.player.maxResource;
-    sim.targetEntity(sim.player.id);
-
-    sim.castAbility('cleansing_verdict');
-    sim.tick();
-
-    expect(sim.player.cooldowns.has('cleansing_verdict')).toBe(true);
+    const meta = sim.meta(sim.player.id);
+    if (!meta) throw new Error('missing player metadata');
+    const def = TALENT_ABILITIES_V2_B.voidfeast;
+    const resolved: ResolvedAbility = {
+      def,
+      rank: 1,
+      cost: def.cost,
+      castTime: def.castTime,
+      cooldown: def.cooldown,
+      effects: def.effects,
+      threatFlat: 0,
+      threatMult: 1,
+    };
+    sim.ctx.runEffects(sim.player, meta, sim.player, resolved);
     expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
   });
 

@@ -1,20 +1,25 @@
 {
   "items": [
     {
-      "src": "tmp/asset_src/ignivar_herald/ignivar_herald_kaykit_custom.glb",
+      "src": "tmp/asset_src/ignivar_herald/ignivar_colossus.glb",
       "out": "models/creatures/ignivar_herald.glb",
       "type": "character",
       "keepClips": [
-        "ForgeIdle",
-        "Walking_A",
-        "Running_A",
-        "ForgeSlam",
-        "ForgeCast",
-        "Hit_A",
-        "Death_A",
-        "Cheer"
+        "Attack",
+        "Channel",
+        "ChannelEnd",
+        "ChannelStart",
+        "Death",
+        "FistSpin360",
+        "Idle",
+        "Idle2",
+        "Idle3",
+        "JumpAttack",
+        "Run",
+        "Walk"
       ],
-      "keepExtras": true
+      "keepExtras": true,
+      "losslessMeshopt": true
     }
   ]
 }

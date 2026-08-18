@@ -28,6 +28,7 @@ export type IgnivarVisualEntity = {
   castRemaining?: number;
   castTotal?: number;
   channeling?: boolean;
+  dead?: boolean;
   facing?: number;
   auras: readonly {
     id: string;

@@ -12,9 +12,9 @@ import {
   strongerQuestMarker,
 } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { cheaterTagLabel } from '../ui/cheater_tag';
 import { deedBorderSlug } from '../ui/deed_border_view';
-import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { deedTitleText } from '../ui/deed_i18n';
 import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';

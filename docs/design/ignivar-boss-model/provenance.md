@@ -68,7 +68,28 @@ cost auditing.
 - Approval: the user explicitly approved the generated 3D turntable and requested
   in-game integration with the non-waving cast motion
 
-The earlier HIFI asset above remains part of the design history but is no longer the
-shipping model. `scripts/assets/ignivar_herald/finalize_kaykit.mjs` owns the current
-deterministic finalization stage. The paid generation job and local manual-rig job remain
-under `tmp/asset_pipeline/` for cost auditing and clip review.
+The earlier HIFI asset above remains part of the design history. The paid generation job
+and local manual-rig job remain under `tmp/asset_pipeline/` for cost auditing and clip
+review. The KayKit replacement shipped until the contributor handoff below superseded it.
+
+## Contributor Colossus and fire VFX (current)
+
+- Handoff archive: `ignivar_fire_vfx.zip`
+- Archive SHA-256: `a942d097629f2c1303ef142808697fc131e383448e173647b5f46e4e5e90195b`
+- Source model: `public/models/chars/enemies/ignivar_colossus.glb` in the handoff archive
+- Source VFX: `src/render/ignivar_vfx.ts` plus
+  `public/textures/vfx/ignivar_flame_6x6.webp` in the handoff archive
+- Rig: one 25-joint skin with authored core, vent, eye, and hand sockets
+- Animation: 12 authored clips (`Attack`, the `Channel` sequence, `Death`,
+  `FistSpin360`, three idles, `JumpAttack`, `Run`, and `Walk`)
+- Shipping finalization: meshopt geometry/animation compression followed by KTX2/Basis
+  conversion of all four embedded PBR textures
+- Runtime integration: vent plumes, smoke ribbons, heat shimmer, emissive pulse,
+  channel flame breath, muzzle fire, impact shockwave, and meteor ground-fire circles
+
+The raw handoff model is expected at
+`tmp/asset_src/ignivar_herald/ignivar_colossus.glb` when rebuilding through
+`scripts/assets/specs/ignivar_herald.json`. The committed shipping GLB is the durable
+artifact; the original archive remains contributor-owned project source. The historical
+KayKit authoring and fingerprint scripts are retained for provenance and rollback, but no
+longer own the shipping model.

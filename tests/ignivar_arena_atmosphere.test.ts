@@ -15,6 +15,7 @@ import {
   IGNIVAR_OBSIDIAN_OUTER_BAND_NAME,
   IGNIVAR_RUNIC_INLAYS_NAME,
 } from '../src/render/ignivar_arena_atmosphere';
+import { applyInteriorLightRig } from '../src/render/interior_light_rig';
 import { IGNIVAR_CONDUITS } from '../src/sim/ignivar_arena';
 
 const SEMANTIC_LAYERS = [
@@ -267,7 +268,7 @@ describe('Ignivar arena atmosphere', () => {
     const source = readFileSync(new URL('../src/render/dungeon.ts', import.meta.url), 'utf8');
     expect(source).toContain("from './ignivar_arena_atmosphere'");
     expect(source).toMatch(
-      /if \(variant === 'ignivar'\) \{\s+group\.add\(buildIgnivarArenaAtmosphere\(\{ lowGfx: this\.lowGfx \}\)\);\s+\}/,
+      /if \(interior === 'ignivar'\) \{\s+group\.add\(buildIgnivarArenaAtmosphere\(\{ lowGfx: this\.lowGfx \}\)\);\s+\}/,
     );
     expect(source.match(/buildIgnivarArenaAtmosphere\(/g)).toHaveLength(1);
   });
@@ -305,13 +306,38 @@ describe('Ignivar arena atmosphere', () => {
 
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
-    expect(source).toContain("const inIgnivar = interior === 'ignivar';");
-    expect(source).toContain("const ignivarForge = desired === 'ignivar';");
+    expect(source).toContain(
+      "const inIgnivar = interior === 'ignivar' || interior === 'ignivar_depths';",
+    );
     expect(source).toMatch(
       /else if \(desired === 'ignivar'\) \{[\s\S]{0,400}?applyIgnivarArenaFog\(fog\);[\s\S]{0,80}?\} else if/,
     );
-    expect(source).toMatch(
-      /else if \(ignivarForge\) \{\s+applyIgnivarArenaLighting\(\{[\s\S]{0,250}?\}\);\s+\} else if \(underground\)/,
+
+    const routedSun = new THREE.DirectionalLight(0, 0);
+    const routedHemi = new THREE.HemisphereLight(0, 0, 0);
+    const routedScene = new THREE.Scene();
+    const routedRim = { value: 0 };
+    applyInteriorLightRig(
+      'ignivar',
+      { sun: routedSun, hemi: routedHemi, scene: routedScene, rim: routedRim },
+      { sunIntensity: 9, hemiIntensity: 9, envIntensity: 9 },
     );
+    expect({
+      sunColor: routedSun.color.getHex(),
+      sunIntensity: routedSun.intensity,
+      hemiSkyColor: routedHemi.color.getHex(),
+      hemiGroundColor: routedHemi.groundColor.getHex(),
+      hemiIntensity: routedHemi.intensity,
+      envIntensity: routedScene.environmentIntensity,
+      rimIntensity: routedRim.value,
+    }).toEqual({
+      sunColor: IGNIVAR_ARENA_LIGHTING.sunColor,
+      sunIntensity: IGNIVAR_ARENA_LIGHTING.sunIntensity,
+      hemiSkyColor: IGNIVAR_ARENA_LIGHTING.hemiSkyColor,
+      hemiGroundColor: IGNIVAR_ARENA_LIGHTING.hemiGroundColor,
+      hemiIntensity: IGNIVAR_ARENA_LIGHTING.hemiIntensity,
+      envIntensity: IGNIVAR_ARENA_LIGHTING.envIntensity,
+      rimIntensity: IGNIVAR_ARENA_LIGHTING.rimIntensity,
+    });
   });
 });

@@ -161,7 +161,7 @@ describe('Ignivar raid arena', () => {
     expect(ignivarPointInRotatingRay(origin, 0, { x: 0, z: 35 })).toBe(false);
   });
 
-  it('registers a hidden ten-player development room with four inert conductors', () => {
+  it('registers the hidden raid room with four conductors and its sealed inner gate', () => {
     const dungeon = DUNGEONS.ignivar_raid_arena;
     expect(dungeon).toMatchObject({
       id: 'ignivar_raid_arena',
@@ -172,7 +172,7 @@ describe('Ignivar raid arena', () => {
       entry: { x: 0, z: -27 },
       exitOffset: { x: 0, z: -30 },
     });
-    expect(dungeon.objects).toEqual(
+    expect(dungeon.objects?.slice(0, IGNIVAR_CONDUITS.length)).toEqual(
       IGNIVAR_CONDUITS.map((conduit) => ({
         itemId: '',
         name: expect.any(String),
@@ -182,6 +182,12 @@ describe('Ignivar raid arena', () => {
         lootable: false,
       })),
     );
+    expect(dungeon.objects?.at(-1)).toMatchObject({
+      name: 'Sealed Inner Crucible Gate',
+      templateId: 'ignivar_raid_gate_locked',
+      dungeonId: 'ignivar_inner_crucible',
+      lootable: false,
+    });
   });
 
   it('keeps the hidden raid room behind an explicit dev bypass for solo testing', () => {

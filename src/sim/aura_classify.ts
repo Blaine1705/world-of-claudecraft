@@ -80,10 +80,7 @@ export function isPlayerRemovableAura(
 export function isDispellableAura(
   aura: Pick<Aura, 'kind' | 'value' | 'school'> &
     Partial<
-      Pick<
-        Aura,
-        'id' | 'unbreakableControl' | 'encounterOwned' | 'undispellable' | 'permanent'
-      >
+      Pick<Aura, 'id' | 'unbreakableControl' | 'encounterOwned' | 'undispellable' | 'permanent'>
     >,
   offensive: boolean,
 ): boolean {

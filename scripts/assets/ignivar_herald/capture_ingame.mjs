@@ -8,9 +8,7 @@ import { enterOfflineGame } from '../../enter_offline_game.mjs';
 import { suppressGpuNotice } from '../../lib/gpu_notice_suppress.mjs';
 
 const gameUrl = process.env.GAME_URL ?? 'http://127.0.0.1:5173';
-const output = path.resolve(
-  process.env.SHOT_OUT ?? 'docs/screenshots/ignivar-raid/boss-model-ingame-kaykit.png',
-);
+const output = path.resolve(process.env.SHOT_OUT ?? 'tmp/ignivar-boss-model-ingame-colossus.png');
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 mkdirSync(path.dirname(output), { recursive: true });
@@ -133,33 +131,43 @@ try {
         );
         hasRuntimeReadabilityMaterial ||= materials.some(
           (material) =>
-            material?.emissiveMap === material?.map &&
-            Math.abs((material?.emissiveIntensity ?? 0) - 0.2) < 0.001 &&
+            Boolean(material?.emissiveMap) &&
+            (material?.emissiveIntensity ?? 0) > 0 &&
             Math.abs((material?.envMapIntensity ?? 0) - 1.6) < 0.001,
         );
       }
     });
     return {
       viewExists: Boolean(view),
-      hasDedicatedRoot: names.includes('IgnivarHerald'),
-      hasRigMedium: names.includes('Rig_Medium'),
-      hasChestFire: names.includes('ignivarChestFurnaceFire'),
-      hasLeftShoulderFire: names.includes('ignivarShoulderForgeFireLeft'),
-      hasRightShoulderFire: names.includes('ignivarShoulderForgeFireRight'),
+      hasDedicatedRoot: names.includes('IgnivarRig'),
+      hasCoreSocket: names.includes('vfx_core'),
+      hasLeftVentSocket: names.some((name) =>
+        ['vfx_vent.l', 'vfx_ventl', 'vfx_vent_l'].includes(name),
+      ),
+      hasRightVentSocket: names.some((name) =>
+        ['vfx_vent.r', 'vfx_ventr', 'vfx_vent_r'].includes(name),
+      ),
+      hasCorePlume: names.includes('vfx_core__plume'),
+      hasLeftVentPlume: names.some((name) => /^vfx_vent(?:\.|_)?l__plume$/.test(name)),
+      hasRightVentPlume: names.some((name) => /^vfx_vent(?:\.|_)?r__plume$/.test(name)),
+      hasCoreFlame: names.includes('vfx_core__flame'),
+      hasPulse: names.includes('ignivar__pulse_shell'),
+      hasShockwave: names.includes('ignivar__shockwave'),
       skinnedMeshes,
       maxJointCount,
       hasPbrTextures,
       hasRuntimeReadabilityMaterial,
-      socketParents: {
-        chest: view?.group?.getObjectByName('Socket_ChestCore')?.parent?.name ?? null,
-        left: view?.group?.getObjectByName('Socket_ShoulderLeft')?.parent?.name ?? null,
-        right: view?.group?.getObjectByName('Socket_ShoulderRight')?.parent?.name ?? null,
-      },
       registeredViewLights: view?.viewLights?.length ?? 0,
     };
   }, state.bossId);
 
   if (errors.length) throw new Error(`page errors: ${errors.join('; ')}`);
+  const unexpectedConsoleErrors = consoleErrors.filter(
+    (message) => !message.includes('status of 502 (Bad Gateway)'),
+  );
+  if (unexpectedConsoleErrors.length) {
+    throw new Error(`console errors: ${unexpectedConsoleErrors.join('; ')}`);
+  }
   if (!assetResponses.some((response) => response.status === 200)) {
     throw new Error(`Ignivar GLB did not load successfully: ${JSON.stringify(assetResponses)}`);
   }
@@ -167,18 +175,19 @@ try {
     throw new Error(`dedicated Ignivar view missing: ${JSON.stringify(renderState)}`);
   }
   if (
-    !renderState.hasRigMedium ||
-    !renderState.hasChestFire ||
-    !renderState.hasLeftShoulderFire ||
-    !renderState.hasRightShoulderFire ||
+    !renderState.hasCoreSocket ||
+    !renderState.hasLeftVentSocket ||
+    !renderState.hasRightVentSocket ||
+    !renderState.hasCorePlume ||
+    !renderState.hasLeftVentPlume ||
+    !renderState.hasRightVentPlume ||
+    !renderState.hasCoreFlame ||
+    !renderState.hasPulse ||
+    !renderState.hasShockwave ||
     renderState.skinnedMeshes !== 1 ||
-    renderState.maxJointCount !== 21 ||
+    renderState.maxJointCount < 17 ||
     !renderState.hasPbrTextures ||
-    !renderState.hasRuntimeReadabilityMaterial ||
-    renderState.socketParents.chest !== 'chest' ||
-    renderState.socketParents.left !== 'chest' ||
-    renderState.socketParents.right !== 'chest' ||
-    renderState.registeredViewLights < 3
+    !renderState.hasRuntimeReadabilityMaterial
   ) {
     throw new Error(`Ignivar animation/shadow contract failed: ${JSON.stringify(renderState)}`);
   }

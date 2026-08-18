@@ -235,7 +235,13 @@ export function syncIgnivarEncounterVisuals(
       bodyRoot.rotation.y = bodyLock.baseRotation;
       delete group.userData.ignivarRotatingRaysBodyLock;
     }
-    if (syncModelVfx) syncIgnivarModelVfx(group, dt, vfx);
+    if (syncModelVfx) {
+      syncIgnivarModelVfx(group, dt, vfx, {
+        dead: entity.dead,
+        castingAbility: entity.castingAbility,
+        channeling: entity.channeling,
+      });
+    }
     let frontal = group.getObjectByName(IGNIVAR_FRONTAL_VISUAL_NAME);
     if (!frontal) {
       frontal = buildIgnivarFrontalTelegraph();

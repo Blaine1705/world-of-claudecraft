@@ -7,7 +7,6 @@ import {
   DrainLifeVfx,
 } from './drain_life_vfx';
 import { GFX } from './gfx';
-import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
 import {
   type IgnivarJudgmentFireSample,
   ignivarJudgmentFireAllowsSmoke,
@@ -16,6 +15,7 @@ import {
   ignivarJudgmentFireRate,
   writeIgnivarJudgmentFireSample,
 } from './ignivar_judgment_fire_core';
+import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import {
   insertActiveParticleSlot,

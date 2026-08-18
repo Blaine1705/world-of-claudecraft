@@ -685,20 +685,17 @@ const WATER_ELEMENTAL: ClipMap = {
   death: 'Death',
 };
 
-// Ignivar uses the same KayKit Rig_Medium skeleton as player characters, but
-// its three boss clips deliberately avoid the stock two-hand spellcasting
-// gestures: ForgeCast stays restrained, ForgeSlam moves the complete rig through
-// one rigid lunge, and ForgeIdle holds the asymmetric arms without hand waving.
-// ForgeHit remains planted because stock Hit_A deforms this custom boss skin.
+// The contributor-authored Colossus ships a dedicated rigid-rock rig and a
+// complete boss animation set. Its channel loop drives the socket-mounted
+// furnace/flamethrower VFX; impact pulses are synchronized by the encounter.
 const IGNIVAR: ClipMap = {
-  idle: 'ForgeIdle',
-  walk: 'Walking_A',
-  run: 'Running_A',
-  attack: ['ForgeSlam'],
-  hit: ['ForgeHit'],
-  death: 'Death_A',
-  cast: 'ForgeCast',
-  flourish: 'Cheer',
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  death: 'Death',
+  cast: 'Channel',
+  flourish: 'FistSpin360',
 };
 
 const SPIDER: ClipMap = {
@@ -2180,7 +2177,7 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,
     height: 2.65,
-    // The local manual rig is authored directly onto KayKit's +Z-facing bind.
+    // The contributor rig is authored directly onto the game's +Z-facing bind.
     yaw: 0,
     // Preserve the furnace read in the dark coliseum without restoring the
     // glossy HIFI treatment that clashed with the game's faceted materials.

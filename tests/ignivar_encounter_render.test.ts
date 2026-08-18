@@ -337,7 +337,16 @@ describe('Ignivar encounter renderer', () => {
       });
     }
 
-    expect(windup).toHaveBeenNthCalledWith(1, 77, 0xff4a12, 0.5, 'vortex', false);
+    expect(windup).toHaveBeenNthCalledWith(
+      1,
+      77,
+      0xff4a12,
+      0.5,
+      'vortex',
+      false,
+      expect.any(Number),
+      expect.any(Number),
+    );
     expect(windup).toHaveBeenCalledTimes(4);
     expect(bodyGlow).not.toHaveBeenCalled();
 

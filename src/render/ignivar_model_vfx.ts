@@ -2,11 +2,15 @@
 // body. Geometry stays model-local so it follows character normalization,
 // facing, and entity scale; particles are emitted in world space.
 import * as THREE from 'three';
+import { IGNIVAR_FORGE_WAVE_CAST_ID } from '../sim/encounters/ignivar';
+import { GFX } from './gfx';
+import { attachIgnivarVfx, type IgnivarVfxHandle } from './ignivar_fire_vfx';
 import type { Vfx } from './vfx';
 
 export const IGNIVAR_CHEST_FIRE_NAME = 'ignivarChestFurnaceFire';
 export const IGNIVAR_SHOULDER_FIRE_LEFT_NAME = 'ignivarShoulderForgeFireLeft';
 export const IGNIVAR_SHOULDER_FIRE_RIGHT_NAME = 'ignivarShoulderForgeFireRight';
+const IGNIVAR_FIRE_VFX_HANDLE = 'ignivarFireVfxHandle';
 
 const FLAME_VERTEX = /* glsl */ `
   uniform float uTime;
@@ -149,6 +153,17 @@ export function ensureIgnivarModelVfxSockets(model: THREE.Object3D): boolean {
 }
 
 export function attachIgnivarModelVfx(model: THREE.Object3D): boolean {
+  if (model.getObjectByName('ignivar__shockwave')) return false;
+  if (model.getObjectByName('vfx_core')) {
+    const handle = attachIgnivarVfx(model, {
+      count: GFX.tier === 'low' ? 40 : GFX.tier === 'medium' ? 64 : 96,
+      shimmer: GFX.tier !== 'low',
+      flameLight: GFX.tier !== 'low',
+      flameTexUrl: '/textures/vfx/ignivar_flame_6x6.webp',
+    });
+    model.userData[IGNIVAR_FIRE_VFX_HANDLE] = handle;
+    return true;
+  }
   if (model.getObjectByName(IGNIVAR_CHEST_FIRE_NAME)) return false;
   ensureIgnivarModelVfxSockets(model);
   const chest = model.getObjectByName('Socket_ChestCore');
@@ -165,7 +180,46 @@ const socketWorld = new THREE.Vector3();
 const socketWorldRotation = new THREE.Quaternion();
 const socketLocalDown = new THREE.Vector3();
 
-export function syncIgnivarModelVfx(model: THREE.Object3D, dt: number, vfx?: Vfx): void {
+export interface IgnivarModelVfxState {
+  dead?: boolean;
+  castingAbility?: string | null;
+  channeling?: boolean;
+}
+
+function authoredVfxOwner(model: THREE.Object3D): THREE.Object3D | null {
+  const shockwave = model.getObjectByName('ignivar__shockwave');
+  return shockwave?.parent ?? null;
+}
+
+export function syncIgnivarModelVfx(
+  model: THREE.Object3D,
+  dt: number,
+  vfx?: Vfx,
+  state?: IgnivarModelVfxState,
+): void {
+  const owner = authoredVfxOwner(model);
+  const handle = owner?.userData[IGNIVAR_FIRE_VFX_HANDLE] as IgnivarVfxHandle | undefined;
+  if (handle && owner) {
+    const dead = state?.dead === true;
+    const channeling = state?.channeling === true && !dead;
+    const castingAbility = state?.castingAbility ?? null;
+    const previousChanneling = owner?.userData.ignivarVfxChanneling === true;
+    const previousCast = (owner?.userData.ignivarVfxCast as string | null | undefined) ?? null;
+    handle.setIntensity(dead ? 0 : channeling ? 1.35 : 1);
+    handle.setFlame(channeling);
+    if (previousChanneling && !channeling && !dead) handle.pulse();
+    if (
+      previousCast === IGNIVAR_FORGE_WAVE_CAST_ID &&
+      castingAbility !== IGNIVAR_FORGE_WAVE_CAST_ID &&
+      !dead
+    ) {
+      handle.shockwave();
+    }
+    owner.userData.ignivarVfxChanneling = channeling;
+    owner.userData.ignivarVfxCast = castingAbility;
+    handle.update(dt);
+    return;
+  }
   const elapsed = (model.userData.ignivarModelVfxTime ?? 0) + dt;
   model.userData.ignivarModelVfxTime = elapsed;
   for (const name of [IGNIVAR_SHOULDER_FIRE_LEFT_NAME, IGNIVAR_SHOULDER_FIRE_RIGHT_NAME]) {
@@ -209,6 +263,15 @@ function disposeNamed(model: THREE.Object3D, name: string): void {
 }
 
 export function disposeIgnivarModelVfx(model: THREE.Object3D): void {
+  const owner = authoredVfxOwner(model);
+  const handle = owner?.userData[IGNIVAR_FIRE_VFX_HANDLE] as IgnivarVfxHandle | undefined;
+  if (handle && owner) {
+    handle.dispose();
+    delete owner.userData[IGNIVAR_FIRE_VFX_HANDLE];
+    delete owner.userData.ignivarVfxChanneling;
+    delete owner.userData.ignivarVfxCast;
+    return;
+  }
   disposeNamed(model, IGNIVAR_CHEST_FIRE_NAME);
   disposeNamed(model, IGNIVAR_SHOULDER_FIRE_LEFT_NAME);
   disposeNamed(model, IGNIVAR_SHOULDER_FIRE_RIGHT_NAME);

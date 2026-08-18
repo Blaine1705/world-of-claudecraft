@@ -19,6 +19,7 @@
 // cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
+import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 import { SCHOOL_COLORS } from './vfx';
 
 /** HSL lightness ceiling applied before a rune ring's additive brightening
@@ -133,6 +134,7 @@ interface MeteorFx {
   elapsed: number;
   landed: boolean;
   spawn: MeteorFallSpawn;
+  ignivarFireAoe: GroundFireAoeHandle | null;
 }
 
 interface RuneFx {
@@ -380,6 +382,18 @@ export class MageGroundFx {
     const warning = this.buildMeteorTelegraph(opts, geometry.flame, initialElapsed / duration);
     warning.group.visible = opts.showTelegraph !== false;
     root.add(warning.group);
+    const ignivarFireAoe = opts.persistentId
+      ? createGroundFireAoe({
+          radius: opts.radius,
+          count: 36,
+          flameTexUrl: '/textures/vfx/ignivar_flame_6x6.webp',
+        })
+      : null;
+    if (ignivarFireAoe) {
+      ignivarFireAoe.group.position.set(opts.x, gy, opts.z);
+      ignivarFireAoe.heatup();
+      this.scene.add(ignivarFireAoe.group);
+    }
     this.scene.add(root);
     this.meteors.push({
       persistentId: opts.persistentId,
@@ -416,6 +430,7 @@ export class MageGroundFx {
       elapsed: initialElapsed,
       landed: false,
       spawn: { ...opts },
+      ignivarFireAoe,
     });
   }
 
@@ -472,12 +487,22 @@ export class MageGroundFx {
     }
     const meteor = this.meteors[index];
     const shouldBurst = !meteor.landed;
-    this.disposeMeteor(meteor);
-    this.meteors.splice(index, 1);
-    if (shouldBurst) this.onMeteorLand(x, z);
+    if (!shouldBurst) return;
+    meteor.landed = true;
+    meteor.elapsed = meteor.duration;
+    meteor.body.visible = false;
+    meteor.trail.visible = false;
+    meteor.boundaryMat.opacity = 0;
+    meteor.flameMat.opacity = 0;
+    meteor.flames.visible = false;
+    meteor.beaconEmberMat.opacity = 0;
+    meteor.beaconEmbers.visible = false;
+    meteor.ignivarFireAoe?.erupt();
+    this.onMeteorLand(x, z);
   }
 
   private disposeMeteor(meteor: MeteorFx): void {
+    meteor.ignivarFireAoe?.dispose();
     this.scene.remove(meteor.root);
     this.releaseMaterial('meteor-rock', meteor.rockMat);
     this.releaseMaterial('meteor-magma', meteor.magmaMat);
@@ -1215,6 +1240,7 @@ export class MageGroundFx {
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const m = this.meteors[i];
       m.elapsed += dt;
+      m.ignivarFireAoe?.update(dt);
       const t = Math.min(1, m.elapsed / m.duration);
       if (!m.landed && t >= 1) {
         m.landed = true;
@@ -1225,6 +1251,7 @@ export class MageGroundFx {
         m.flames.visible = false;
         m.beaconEmberMat.opacity = 0;
         m.beaconEmbers.visible = false;
+        m.ignivarFireAoe?.erupt();
         this.onMeteorLand(m.x, m.z, m.spawn);
       }
       if (m.landed) {
@@ -1235,6 +1262,7 @@ export class MageGroundFx {
           m.footprintMat.opacity = 0.14 * fade;
           m.countdownMat.opacity = 0.58 * fade * firePulse;
           m.veinMat.opacity = 0.56 * fade * (0.88 + Math.sin(scorchElapsed * 8 + 0.7) * 0.12);
+          if (scorchElapsed > METEOR_SCORCH_LINGER - 1) m.ignivarFireAoe?.stop();
           continue;
         }
         this.disposeMeteor(m);

@@ -32,7 +32,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Mode, toktx } from '@gltf-transform/cli';
 import { NodeIO } from '@gltf-transform/core';
-import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extensions';
 import { meshopt, textureCompress } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import {
@@ -95,6 +95,8 @@ async function convertFile(io, file, { dryRun }) {
   const srcBuf = fs.readFileSync(file);
   const srcJson = glbJsonChunk(srcBuf);
   const cls = classifyGlb(srcJson);
+  const losslessMeshopt =
+    cls.hadMeshopt && !(srcJson.extensionsUsed ?? []).includes('KHR_mesh_quantization');
   if (cls.skip) return { file, status: 'skipped', before: srcBuf.length, after: srcBuf.length };
   if (dryRun) return { file, status: 'would-convert', before: srcBuf.length, after: srcBuf.length };
 
@@ -106,8 +108,16 @@ async function convertFile(io, file, { dryRun }) {
     toktx({ mode: Mode.UASTC, slots: UASTC_SLOTS, jobs: 2, encoder: sharp }),
     toktx({ mode: Mode.ETC1S, jobs: 2, encoder: sharp }),
   ];
-  if (cls.hadMeshopt) transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
+  if (cls.hadMeshopt && !losslessMeshopt) {
+    transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
+  }
   await doc.transform(...transforms);
+  if (losslessMeshopt) {
+    doc
+      .createExtension(EXTMeshoptCompression)
+      .setRequired(true)
+      .setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.FILTER });
+  }
   const outBuf = Buffer.from(await io.writeBinary(doc));
 
   const outJson = glbJsonChunk(outBuf);
