@@ -1,7 +1,8 @@
 // The compile host every streamed-decor reveal gate shares (reveal_gate.ts):
-// one root in, its programs linked and its uniform tables warmed out. Lifted
-// out of the renderer constructor so the reveal lane's policy is nameable and
-// testable on its own; the renderer keeps only the five bindings below.
+// one root in, its programs linked, its cold textures uploaded and its
+// uniform tables warmed out. Lifted out of the renderer constructor so the
+// reveal lane's policy is nameable and testable on its own; the renderer keeps
+// only the bindings below.
 //
 // Reveal compiles ride BELOW the live entity gates (VISIBLE_PREWARM, not
 // LIVE_VIEW): a teleport can queue dozens of far cells at once, and cosmetic
@@ -29,6 +30,10 @@ export interface RevealCompileHostDeps {
   ): Promise<unknown>;
   compileColor(target: THREE.Object3D): Promise<unknown>;
   compileShadow(target: THREE.Object3D): Promise<unknown>;
+  /** Every cold texture under the root, one budgeted queue unit each. Between
+   *  the link and the touch: the touch's driver round trip flushes behind
+   *  everything already queued, so uploads paid after it are measured by it. */
+  upload(target: THREE.Object3D, priority: number): Promise<unknown>;
   touch(target: THREE.Object3D, priority: number): Promise<unknown>;
   /** The frame budget's learned cost of ONE reveal compile, which becomes the
    *  key's soft deadline once multiplied by its root count. What it learns is
@@ -50,7 +55,9 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
           label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`,
         },
       );
-      return linked.then(() => deps.touch(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM));
+      return linked
+        .then(() => deps.upload(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))
+        .then(() => deps.touch(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM));
     },
     expectedMs(_key: string, rootCount: number): number {
       return revealSoftDeadlineMs(deps.predictRevealMs(), rootCount);

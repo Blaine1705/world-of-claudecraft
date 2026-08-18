@@ -42,8 +42,13 @@ describe('reveal gate wiring (source pins)', () => {
       host,
       'deps.compileColor(target).then(() => deps.compileShadow(target))',
     );
-    const touchAt = anchor(host, 'linked.then(() => deps.touch(target, GPU_WORK_PRIORITY');
-    expect(colourAt).toBeLessThan(touchAt);
+    // Uploads sit BETWEEN the link and the touch: the touch's driver round trip
+    // flushes behind everything already queued, so an upload paid after it is
+    // measured by it instead of being its own budgeted piece.
+    const uploadAt = anchor(host, '.then(() => deps.upload(target, GPU_WORK_PRIORITY');
+    const touchAt = anchor(host, '.then(() => deps.touch(target, GPU_WORK_PRIORITY');
+    expect(colourAt).toBeLessThan(uploadAt);
+    expect(uploadAt).toBeLessThan(touchAt);
     // The soft deadline is the budget's learned cost times the key's roots,
     // and it is the host's answer, not a second policy in the renderer.
     expect(host).toContain('return revealSoftDeadlineMs(deps.predictRevealMs(), rootCount);');
@@ -59,6 +64,9 @@ describe('reveal gate wiring (source pins)', () => {
       'compileColor: (target) => this.compilePrewarmColorPrograms(target, false),',
     );
     expect(wiring).toContain('compileShadow: (target) => this.compileShadowPrograms(target),');
+    expect(wiring).toContain(
+      'upload: (target, priority) => this.uploadGateTexturesGated(target, priority),',
+    );
     expect(wiring).toContain(
       'touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),',
     );

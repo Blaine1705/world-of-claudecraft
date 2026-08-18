@@ -7,6 +7,12 @@ import {
   gpuPrepClassForPriority,
   gpuPrepKindOfLabel,
 } from '../src/render/gpu_prep_budget_core';
+import { LINKED_PROGRAM_TOUCH_LABEL } from '../src/render/linked_program_touch_lane';
+import {
+  PREVIEW_TEXTURE_PREP_LABEL,
+  TEXTURE_PREP_LABEL,
+  texturePrepPriority,
+} from '../src/render/texture_prep_lane';
 
 // targetFrameMs 24 with a 2 ms floor makes every headroom below an exact
 // integer, so a wrong clamp or a missed spend shows up as a number, not as a
@@ -74,6 +80,45 @@ describe('gpu prep kind of label', () => {
     const kind = gpuPrepKindOfLabel('k'.repeat(200));
     expect(kind.length).toBe(48);
     expect(gpuPrepKindOfLabel(`${'k'.repeat(200)}:tail`).length).toBe(48);
+  });
+});
+
+describe('gpu prep budget: the gate upload pieces (upload:texture)', () => {
+  const label = TEXTURE_PREP_LABEL;
+  const kind = gpuPrepKindOfLabel(label);
+
+  it('prices the uploads apart from the touch tail and the sky chunk path', () => {
+    expect(kind).toBe('upload');
+    expect(kind).not.toBe(gpuPrepKindOfLabel(LINKED_PROGRAM_TOUCH_LABEL));
+    expect(kind).not.toBe(gpuPrepKindOfLabel('texture-chunk-upload'));
+    expect(gpuPrepKindOfLabel(PREVIEW_TEXTURE_PREP_LABEL)).toBe('upload-preview');
+  });
+
+  it('classes a gate upload piece approaching at TAIL_PIECE, actionable on the floor', () => {
+    expect(gpuPrepClassForPriority(texturePrepPriority(GPU_WORK_PRIORITY.VISIBLE_PREWARM))).toBe(
+      'approaching',
+    );
+    expect(gpuPrepClassForPriority(texturePrepPriority(GPU_WORK_PRIORITY.ACTIONABLE_VIEW))).toBe(
+      'actionable',
+    );
+  });
+
+  it('takes the unknown prior and exactly one first-sample slot per frame', () => {
+    const budget = budgetAt(20);
+    const cls = gpuPrepClassForPriority(GPU_WORK_PRIORITY.TAIL_PIECE);
+    expect(budget.predictMs(label)).toBe(CONFIG.unknownCostMs);
+
+    const first = budget.admit({ kind: label, cls, deferredFrames: 0 });
+    const second = budget.admit({ kind: label, cls, deferredFrames: 0 });
+
+    expect(first).toMatchObject({ admit: true, reason: 'first-sample' });
+    expect(second).toMatchObject({ admit: false, reason: 'unknown-cap' });
+
+    // One sample is all it takes: the kind now has a learned cost, and a
+    // sibling label of the same kind reads it too.
+    budget.record(label, 3);
+    expect(budget.predictMs(label)).toBe(3);
+    expect(budget.predictMs('upload:whatever')).toBe(3);
   });
 });
 

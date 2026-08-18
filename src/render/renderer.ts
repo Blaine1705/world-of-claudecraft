@@ -364,7 +364,7 @@ import {
 } from './mage_barrier_visual';
 import { MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
-import { collectObjectTextures, materialSlotTextures } from './material_texture_slots';
+import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
@@ -593,6 +593,8 @@ import {
   type TemporalHourglassVisual,
 } from './temporal_hourglass_visual';
 import { buildTerrain, hasTerrainSplatAssets, type TerrainView } from './terrain';
+import { runTexturePrepLane } from './texture_prep_lane';
+import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { uploadDataTextureInChunks } from './texture_upload';
 import { sparkleTexture } from './textures';
 import { targetIntensityFromValues } from './travel_speed_fx';
@@ -2604,6 +2606,7 @@ export class Renderer {
         gate: (work, options) => this.liveCompileGates.run(work, VIEW_COMPILE_GATE_MAX_MS, options),
         compileColor: (target) => this.compilePrewarmColorPrograms(target, false),
         compileShadow: (target) => this.compileShadowPrograms(target),
+        upload: (target, priority) => this.uploadGateTexturesGated(target, priority),
         touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),
         predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),
       });
@@ -5435,32 +5438,17 @@ export class Renderer {
     return task;
   }
 
+  private readonly textureSweepHost = {
+    upload: (texture: THREE.Texture | null | undefined): void => this.prewarmTexture(texture),
+    textureCount: (): number => this.webgl.info.memory.textures,
+  };
+
   private prewarmMaterialTextures(material: THREE.Material | THREE.Material[] | undefined): void {
-    const mats = Array.isArray(material) ? material : material ? [material] : [];
-    for (const mat of mats) {
-      for (const texture of materialSlotTextures(mat)) this.prewarmTexture(texture);
-      // ShaderMaterials (ability-vfx pools, custom fx) hold their textures in
-      // uniforms, invisible to the standard-key walk above.
-      const shaderMat = mat as THREE.ShaderMaterial;
-      if (shaderMat.isShaderMaterial) {
-        for (const uniform of Object.values(shaderMat.uniforms)) {
-          const value = uniform?.value as { isTexture?: boolean } | null | undefined;
-          if (value?.isTexture) this.prewarmTexture(value as THREE.Texture);
-        }
-      }
-    }
+    sweepMaterialTextures(this.textureSweepHost, material);
   }
 
   private prewarmObjectTextures(obj: THREE.Object3D): number {
-    let count = 0;
-    obj.traverse((child) => {
-      const renderable = child as RenderableDiagnosticObject;
-      if (!renderable.material) return;
-      const before = this.webgl.info.memory.textures;
-      this.prewarmMaterialTextures(renderable.material);
-      count += Math.max(0, this.webgl.info.memory.textures - before);
-    });
-    return count;
+    return sweepObjectTextures(this.textureSweepHost, obj);
   }
 
   /**
@@ -8838,12 +8826,24 @@ export class Renderer {
       VIEW_COMPILE_GATE_MAX_MS,
       { priority, label: `live-gate:${target.name || target.type}` },
     );
-    // The touch tail rides OUTSIDE the gate's own queue unit, and must: its
-    // pieces are queue units themselves, so awaiting them from inside a unit
-    // holding a released-tail cap slot would park the drain loop on a slot only
-    // that unit can free. The gate still settles after them, so a gated reveal
-    // is no earlier than it was before.
-    return linked.then(() => this.touchLinkedProgramsGated(target, priority));
+    // The uploads and the touch tail ride OUTSIDE the gate's own queue unit,
+    // and must: their pieces are queue units themselves, so awaiting them from
+    // inside a unit holding a released-tail cap slot would park the drain loop
+    // on a slot only that unit can free. The gate still settles after them, so
+    // a gated reveal is no earlier than it was before.
+    return linked
+      .then(() => this.uploadGateTexturesGated(target, priority))
+      .then(() => this.touchLinkedProgramsGated(target, priority));
+  }
+
+  /** The gate's upload step: one budgeted queue unit per cold texture under
+   *  `target` (src/render/texture_prep_lane.ts), between the link and the
+   *  touch tail. */
+  private uploadGateTexturesGated(target: THREE.Object3D, priority: number): Promise<number> {
+    const { properties } = this.webgl;
+    return runTexturePrepLane(this.backgroundGpuWork, properties, this.webgl, target, priority, {
+      inFlight: this.textureUploadTasks,
+    });
   }
 
   /** The gate's tail: every linked program under `target`, one budgeted queue

@@ -226,7 +226,21 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   piecewise under its soft deadline whatever that flag says. The touch tail runs as one budgeted queue
   unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates AND on the
   reveal host, which previously ended at the shadow arm and left streamed decor
-  paying the uniform-table round trip on its reveal draw. `idle_queue.ts`
+  paying the uniform-table round trip on its reveal draw. A settled gate links
+  programs but uploads NOTHING (three's `compileAsync` never reaches
+  `WebGLTextures`), so the same gates also run an upload lane: one budgeted
+  queue unit per non-resident texture under the root (`texture_prep_lane.ts`,
+  enumeration and the residency predicate in the pure `texture_prep_core.ts`,
+  label kind `upload:texture`, `upload-preview:texture` on a second context).
+  **The order inside a gate is LINK, then UPLOADS, then the TOUCH tail, then
+  settle**, because the touch's driver round trip flushes behind everything
+  already queued, so uploads paid after it are simply measured by it. The lane
+  never releases its tail (an upload is main-thread driver work with no
+  off-thread arm), never re-arms `needsUpdate` (a KTX2 texture whose CPU mips
+  were released comes back black), and never wraps its uploads in
+  `compilePrewarmColorPrograms`' render-target dance (`initTexture` dispatches
+  on the texture's own flags and unbinds itself, so there is nothing to
+  restore). `idle_queue.ts`
   (idle-slot queue draining),
   `prewarm_depth_material.ts` (the shadow arm's depth material: it must link
   the SAME program three's `WebGLShadowMap` draws, so it never sets

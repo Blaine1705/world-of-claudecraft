@@ -187,6 +187,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     // linear one: route through the same variant pair the boot prewarm uses.
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(target, false)');
     expect(gateMethod).toContain('this.compileShadowPrograms(target)');
+    expect(gateMethod).toContain('this.uploadGateTexturesGated(target, priority)');
     expect(gateMethod).toContain('this.touchLinkedProgramsGated(target, priority)');
     expect(gateMethod).not.toContain('this.webgl.compileAsync');
   });
@@ -360,12 +361,15 @@ describe('the compile gate touch tail, per program', () => {
     expect(source).toContain(
       'touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),',
     );
+    // The same host also pays the cold textures, between the link and the tail.
+    expect(source).toContain(
+      'upload: (target, priority) => this.uploadGateTexturesGated(target, priority),',
+    );
+    expect(host).toContain('.then(() => deps.upload(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))');
     // Streamed decor paid the uniform-table round trip on its reveal DRAW
     // (40 to 390 ms on the Intel iGPU) because the reveal host's chain ended at
     // the shadow arm: it now pays the same tail the live gates do.
-    expect(host).toContain(
-      'linked.then(() => deps.touch(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))',
-    );
+    expect(host).toContain('.then(() => deps.touch(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))');
     // The one-shot burst is gone from the renderer entirely: it cannot be paced,
     // and a call left behind would silently reinstate the whole cost in one frame.
     expect(source).not.toContain('touchLinkedPrograms(');

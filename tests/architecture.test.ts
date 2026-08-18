@@ -558,6 +558,7 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
   'src/render/terrain_region_core.ts',
+  'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
   'src/render/vfx_pool_core.ts',
   'src/render/view_candidate_pool_core.ts',
