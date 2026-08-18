@@ -83,6 +83,9 @@ export interface CrossHotbarHold {
   /** The two trigger glyphs, so each half says which trigger opens it and the
    *  bar can advertise the both-triggers route to the second set. */
   triggers: { left: string; right: string };
+  /** The arrange chord's glyphs, so the resting bar can name the way into edit
+   *  mode instead of hiding it in the options panel. */
+  arrange: { bumper: string; button: string };
 }
 
 /**

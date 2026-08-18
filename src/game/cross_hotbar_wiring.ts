@@ -6,6 +6,7 @@
 // shape of a feature.
 
 import {
+  CROSS_HOTBAR_ARRANGE_CHORD,
   CROSS_HOTBAR_DPAD_GLYPHS,
   CROSS_HOTBAR_EXPANDED_SET,
   CROSS_HOTBAR_LAYER_BUTTONS,
@@ -26,6 +27,9 @@ export interface CrossHotbarHoldInfo {
   buttons: readonly string[];
   /** The two trigger glyphs (LT/RT, L2/R2, ZL/ZR) for the half labels. */
   triggers: { left: string; right: string };
+  /** The arrange chord's own glyphs, so the way into edit mode is on the bar
+   *  rather than only in the options panel. */
+  arrange: { bumper: string; button: string };
 }
 
 /** The HUD surface the overlay is driven through. */
@@ -119,6 +123,10 @@ export function crossHotbarHold(
     triggers: {
       left: gamepadButtonLabel(CROSS_HOTBAR_TRIGGERS.left, kind),
       right: gamepadButtonLabel(CROSS_HOTBAR_TRIGGERS.right, kind),
+    },
+    arrange: {
+      bumper: gamepadButtonLabel(CROSS_HOTBAR_ARRANGE_CHORD.bumper, kind),
+      button: gamepadButtonLabel(CROSS_HOTBAR_ARRANGE_CHORD.button, kind),
     },
   };
 }

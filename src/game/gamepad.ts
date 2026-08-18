@@ -89,6 +89,8 @@ export interface GamepadCallbacks {
   // Which cell the bar has focused, so a press can act on it. Answered by the HUD
   // because focus lives in the DOM.
   focusedCrossHotbarCell?(): number | null;
+  // Open the spellbook, for a confirm on an empty cell while arranging.
+  onOpenSpellbook?(): void;
 }
 
 // Which way each d-pad button steps focus while a window is open.
@@ -432,6 +434,17 @@ export class GamepadManager {
     this.input.applyGamepadLook(look.yaw, look.pitch);
     this.input.setGamepadLookActive(look.active);
 
+    // Moving is playing, not pointing. Drop the pad selection the moment the stick
+    // does anything, so a reflexive confirm does what the player expects instead of
+    // activating whatever the cursor happened to be resting on. Only outside pointer
+    // mode: with a window open the stick is not driving the character anyway.
+    if (
+      !this.cb.isPointerMode() &&
+      (move.forward || move.back || move.strafeLeft || move.strafeRight)
+    ) {
+      clearPadFocus();
+    }
+
     // Real input this frame, for the activity notify below: either stick past
     // its deadzone (the flags and look.active are already the deadzone verdict,
     // so this costs four reads, not another hypot) or a button edge. A pad
@@ -523,6 +536,12 @@ export class GamepadManager {
     // The focused index addresses the ACTIVE set: the bar shows one set at a time.
     const cell = { set: crossHotbarActiveSet(this.triggerState), position: index };
     if (isConfirm) {
+      // An empty cell with empty hands: the player is saying "put something here",
+      // so open the spellbook rather than answering with nothing.
+      if (this.edit.carried === null && store.setActions(cell.set)[cell.position] == null) {
+        this.cb.onOpenSpellbook?.();
+        return true;
+      }
       const r = confirmCell(this.edit, cell, (c) => store.setActions(c.set)[c.position] ?? null);
       this.edit = r.state;
       if (r.swap)
@@ -564,7 +583,14 @@ export class GamepadManager {
       if (buttonIndex === GP.LT || buttonIndex === GP.RT) return;
       // Arranging is not playing: nothing on the bar fires while a cell is being
       // moved, or the player casts the very thing they are trying to relocate.
-      if (this.edit.active && isCrossHotbarButton(buttonIndex)) return;
+      // CONFIRM is exempt: arranging needs the spellbook, and swallowing confirm
+      // left the player unable to press anything in the HUD once the mode was on.
+      if (
+        this.edit.active &&
+        isCrossHotbarButton(buttonIndex) &&
+        this.bindings.actionFor(buttonIndex) !== GAMEPAD_CONFIRM
+      )
+        return;
       const action = this.crossHotbarActionFor(buttonIndex);
       if (action !== null) {
         this.cb.onCrossHotbarCast?.(action);

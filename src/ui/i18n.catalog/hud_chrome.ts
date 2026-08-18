@@ -1530,6 +1530,7 @@ export const hudChromeStrings = {
     crossHotbarOverlay: 'Cross hotbar',
     crossHotbarOwnsButtons:
       'The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.',
+    crossHotbarArrangeChord: '{bumper} + {button} to arrange',
     crossHotbarEditHint:
       'Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.',
     crossHotbarEditHelp:

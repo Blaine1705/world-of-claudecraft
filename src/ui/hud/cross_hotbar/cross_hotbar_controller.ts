@@ -249,9 +249,18 @@ export class CrossHotbarController {
       if (el.textContent !== next) el.textContent = next;
     }
     // Advertises the route to the expanded bank: hold one trigger, tap the other.
-    this.restingHint = bothTriggers;
-    if (!this.editing && this.hint.textContent !== bothTriggers) {
-      this.hint.textContent = bothTriggers;
+    // The resting bar carries the way INTO arrange mode; a chord nothing names is
+    // a chord nobody finds. Once a trigger is held the expanded route matters more,
+    // so the arrange line gives way to it.
+    this.restingHint =
+      hold.layer === null
+        ? t('hudChrome.controller.crossHotbarArrangeChord', {
+            bumper: hold.arrange.bumper,
+            button: hold.arrange.button,
+          })
+        : bothTriggers;
+    if (!this.editing && this.hint.textContent !== this.restingHint) {
+      this.hint.textContent = this.restingHint;
     }
   }
 

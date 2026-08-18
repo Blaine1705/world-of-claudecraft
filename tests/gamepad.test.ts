@@ -765,6 +765,7 @@ describe('GamepadManager cross hotbar', () => {
     const onCrossHotbar = vi.fn();
     const onCrossHotbarCast = vi.fn();
     const onCrossHotbarEdit = vi.fn();
+    const onOpenSpellbook = vi.fn();
     // Which cell the bar reports as focused, driven per case; null is "focus is
     // somewhere else", which arranging must ignore.
     let focusedCell: number | null = null;
@@ -787,6 +788,7 @@ describe('GamepadManager cross hotbar', () => {
       onCrossHotbar,
       onCrossHotbarCast,
       onCrossHotbarEdit,
+      onOpenSpellbook,
       focusedCrossHotbarCell: () => focusedCell,
     } satisfies GamepadCallbacks);
     const xhb = new CrossHotbarBindings();
@@ -807,6 +809,7 @@ describe('GamepadManager cross hotbar', () => {
       onCrossHotbarCast,
       onCrossHotbar,
       onCrossHotbarEdit,
+      onOpenSpellbook,
       triggerGamepadJump,
       focus: (cell: number | null) => {
         focusedCell = cell;
@@ -832,6 +835,12 @@ describe('GamepadManager cross hotbar', () => {
       },
       press: (...buttons: number[]) => {
         pad = gamepadWithPressed(...buttons);
+        manager.poll(1 / 60);
+      },
+      // Push the left stick past the deadzone for one poll.
+      move: () => {
+        pad = gamepadWithPressed();
+        (pad as unknown as { axes: number[] }).axes = [0, -1, 0, 0];
         manager.poll(1 / 60);
       },
       setPointerMode: (on: boolean) => {
@@ -1233,6 +1242,67 @@ describe('GamepadManager cross hotbar', () => {
       h.press();
       h.press(GP.B);
       expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a0' });
+    });
+
+    it('drops the pad selection the moment the player moves', () => {
+      // Pressing confirm out of instinct while running should not activate
+      // whatever the cursor was left resting on, so moving puts it away.
+      const h = setupCrossHotbar(true);
+      const removed: string[] = [];
+      const marked = {
+        focus: () => {},
+        classList: { add: () => {}, remove: (c: string) => removed.push(c) },
+        getBoundingClientRect: () => ({
+          left: 0,
+          top: 0,
+          right: 10,
+          bottom: 10,
+          width: 10,
+          height: 10,
+        }),
+        hasAttribute: () => false,
+      };
+      const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+      const doc = {
+        ...baseDoc,
+        querySelectorAll: (sel: string) => (sel.includes('dialog') ? [] : [marked]),
+        // Nothing focused yet, so the first d-pad step lands on (and marks) it.
+        activeElement: null as unknown,
+        body: {},
+      };
+      (globalThis as unknown as { document: Record<string, unknown> }).document = doc;
+      marked.focus = () => {
+        doc.activeElement = marked;
+      };
+      h.setPointerMode(false);
+      h.press(GP.DPAD_DOWN); // the pad marks what it stepped onto
+      h.move();
+      expect(removed).toContain('pad-focus');
+      Reflect.deleteProperty(globalThis, 'document');
+    });
+
+    it('still lets confirm drive the HUD while arranging', () => {
+      // Arrange mode swallowed confirm along with the casts, which left the player
+      // unable to press anything (the spellbook included) once the mode was on.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(null);
+      h.focusSpell(null);
+      h.press(GP.A);
+      expect(h.onCrossHotbarCast).not.toHaveBeenCalled();
+      // Consumed by the focus stepper rather than dropped on the floor.
+      expect(h.onAction).not.toHaveBeenCalledWith('slot0');
+    });
+
+    it('opens the spellbook when confirm lands on an empty cell', () => {
+      // "Put something here" is what an empty cell means; answering with nothing
+      // left no way in at all.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.xhb.bind(0, 6, null);
+      h.focus(6);
+      h.press(GP.A);
+      expect(h.onOpenSpellbook).toHaveBeenCalled();
     });
 
     it('does not jump on the way into arrange mode', () => {

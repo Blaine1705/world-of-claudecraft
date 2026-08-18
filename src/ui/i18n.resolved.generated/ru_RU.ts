@@ -1464,6 +1464,7 @@ export const ru_RU: EnTranslations = {
       "crossHotbarPosition": "{trigger} + {button}",
       "crossHotbarOverlay": "Крестовая панель",
       "crossHotbarOwnsButtons": "Пока крестовая панель включена, курки и крестовина принадлежат ей: настройте их ниже, а не здесь.",
+      "crossHotbarArrangeChord": "{bumper} + {button} для перестановки",
       "crossHotbarEditHint": "Перестановка: подтверждение берет действие из ячейки или книги заклинаний и кладет его в ячейку, отмена очищает ячейку.",
       "crossHotbarEditHelp": "Удерживайте левый бампер и нажмите верхнюю лицевую кнопку, чтобы переставить панель геймпадом."
     },

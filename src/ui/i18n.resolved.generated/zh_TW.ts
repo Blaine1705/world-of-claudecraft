@@ -1464,6 +1464,7 @@ export const zh_TW: EnTranslations = {
       "crossHotbarPosition": "{trigger} + {button}",
       "crossHotbarOverlay": "十字熱鍵欄",
       "crossHotbarOwnsButtons": "十字熱鍵欄啟用時，扳機鍵和方向鍵歸它所有，請在下方設定，而非此處。",
+      "crossHotbarArrangeChord": "{bumper} + {button} 整理",
       "crossHotbarEditHint": "整理中：確認鍵可從格子或法術書中拿起技能並放到格子上，取消鍵清空格子。",
       "crossHotbarEditHelp": "按住左肩鍵並按上方面鍵，即可用手把整理十字熱鍵列。"
     },

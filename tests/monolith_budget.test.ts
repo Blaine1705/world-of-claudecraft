@@ -69,8 +69,10 @@ const MONOLITHS: MonolithRow[] = [
     // the earlier attempt to buy these lines by extracting UNRELATED pre-existing
     // helpers out of hud.ts was reverted: refactoring code a change does not own to
     // fit a budget inflates the diff and risks regressions elsewhere. A maintainer
-    // decision, taken rather than paid for with someone else's code.
-    ceiling: 19425,
+    // decision, taken rather than paid for with someone else's code. The last
+    // line is openSpellbook, which the pad needs so a confirm on an empty cell can
+    // reach the ability list; the toggle beside it would have closed it instead.
+    ceiling: 19426,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

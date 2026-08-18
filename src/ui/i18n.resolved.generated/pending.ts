@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -30,6 +31,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -48,6 +50,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -66,6 +69,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -85,6 +89,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -103,6 +108,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -137,6 +143,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -159,6 +166,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -177,6 +185,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -195,6 +204,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -213,6 +223,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -231,6 +242,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -249,6 +261,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -267,6 +280,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",
@@ -285,6 +299,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
+    "hudChrome.controller.crossHotbarArrangeChord",
     "hudChrome.controller.crossHotbarEditHelp",
     "hudChrome.controller.crossHotbarEditHint",
     "hudChrome.controller.crossHotbarEnable",

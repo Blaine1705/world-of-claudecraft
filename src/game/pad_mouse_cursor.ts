@@ -83,6 +83,12 @@ function announceHover(): void {
   }
 }
 
+/** What the virtual pointer is currently over, for a caller that needs to act on
+ *  it rather than click it (arranging picks an ability up off a hovered row). */
+export function padMouseHovered(): Element | null {
+  return hovered;
+}
+
 /** Screen position of the virtual pointer, for a caller that needs to aim. */
 export function padMousePosition(): { x: number; y: number } {
   return { x, y };

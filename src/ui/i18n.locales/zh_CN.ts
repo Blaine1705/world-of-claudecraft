@@ -28,6 +28,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.zoomIn': '放大',
   'hudChrome.controller.zoomOut': '缩小',
   'hudChrome.controller.confirmAction': '确认 / 选择',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button} 整理',
   'hudChrome.controller.crossHotbarEditHint': '整理中：确认键可从格子或法术书中拿起技能并放到格子上，取消键清空格子。',
   'hudChrome.controller.crossHotbarEditHelp': '按住左肩键并按上方面键，即可用手柄整理十字热键栏。',
   'hudChrome.controller.crossHotbarOwnsButtons': '十字热键栏启用时，扳机键和方向键归它所有，请在下方设置，而非此处。',

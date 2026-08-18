@@ -12,16 +12,27 @@
 // Keyboard and mouse never reach this; only the pad's arrange mode calls it.
 
 import type { CrossHotbarAction } from './cross_hotbar';
+import { padMouseHovered } from './pad_mouse_cursor';
 
 // Carried by the spellbook's rows and its hotbar-toggle buttons.
 const ABILITY_ID_ATTR = 'data-ability-id';
 
-/** The action the focused control stands for, or null when focus is on something
- *  the bar cannot hold. */
+function actionOn(el: Element | null): CrossHotbarAction {
+  const node = el as HTMLElement | null;
+  if (!node || node.draggable !== true) return null;
+  const id = node.getAttribute?.(ABILITY_ID_ATTR);
+  return id ? { type: 'ability', id } : null;
+}
+
+/**
+ * The action the pad is pointing at, or null when it is on something the bar
+ * cannot hold.
+ *
+ * Both pointing devices count. The d-pad moves FOCUS, but the virtual mouse only
+ * HOVERS, so reading focus alone left a player steering the cursor onto a spell
+ * and finding that picking it up did nothing.
+ */
 export function focusedPadAction(): CrossHotbarAction {
   if (typeof document === 'undefined') return null;
-  const active = document.activeElement as HTMLElement | null;
-  if (!active || active.draggable !== true) return null;
-  const id = active.getAttribute?.(ABILITY_ID_ATTR);
-  return id ? { type: 'ability', id } : null;
+  return actionOn(document.activeElement) ?? actionOn(padMouseHovered());
 }

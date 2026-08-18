@@ -12,6 +12,10 @@
 
 import { GP } from './gamepad_map';
 
+/** The chord that opens arrange mode. One definition, so the pad that reads it and
+ *  the hint that names it can never drift apart. */
+export const CROSS_HOTBAR_ARRANGE_CHORD = { bumper: GP.LB, button: GP.Y } as const;
+
 /** Which trigger is currently held, naming the eight slots it reaches. */
 export type CrossHotbarLayer = 'left' | 'right';
 

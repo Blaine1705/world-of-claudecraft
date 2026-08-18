@@ -28,6 +28,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.zoomIn': 'Приблизить',
   'hudChrome.controller.zoomOut': 'Отдалить',
   'hudChrome.controller.confirmAction': 'Подтвердить / выбрать',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button} для перестановки',
   'hudChrome.controller.crossHotbarEditHint': 'Перестановка: подтверждение берет действие из ячейки или книги заклинаний и кладет его в ячейку, отмена очищает ячейку.',
   'hudChrome.controller.crossHotbarEditHelp': 'Удерживайте левый бампер и нажмите верхнюю лицевую кнопку, чтобы переставить панель геймпадом.',
   'hudChrome.controller.crossHotbarOwnsButtons': 'Пока крестовая панель включена, курки и крестовина принадлежат ей: настройте их ниже, а не здесь.',

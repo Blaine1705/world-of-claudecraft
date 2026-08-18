@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { focusedPadAction } from '../src/game/pad_focus_action';
+import { hidePadMouse, updatePadMouse } from '../src/game/pad_mouse_cursor';
 
 // Only what the reader touches: what has focus, and the two things it asks that
 // element. jsdom is not a dependency here (tests/CLAUDE.md, "DOM in tests").
@@ -7,6 +8,10 @@ function row(attrs: { id?: string; draggable?: boolean }) {
   return {
     draggable: attrs.draggable ?? false,
     getAttribute: (name: string) => (name === 'data-ability-id' ? (attrs.id ?? null) : null),
+    // The virtual pointer announces hover on whatever it moves onto, so a row it
+    // can reach has to accept events and a class.
+    dispatchEvent: () => true,
+    classList: { add: () => {}, remove: () => {} },
   };
 }
 
@@ -41,5 +46,38 @@ describe('focusedPadAction', () => {
     // The headless env server and unit stubs import this module too.
     vi.stubGlobal('document', undefined);
     expect(focusedPadAction()).toBeNull();
+  });
+});
+
+describe('focusedPadAction with the virtual mouse', () => {
+  it('reads the ability off the row the virtual pointer is OVER', () => {
+    // The d-pad moves focus, but the virtual mouse only hovers. Reading focus
+    // alone left a player steering the cursor onto a spell and finding that
+    // picking it up did nothing.
+    const spell = row({ id: 'rend', draggable: true });
+    // elementFromPoint is what the pointer reads; nothing holds keyboard focus.
+    vi.stubGlobal('window', { innerWidth: 800, innerHeight: 600 });
+    vi.stubGlobal(
+      'MouseEvent',
+      class {
+        type: string;
+        constructor(type: string) {
+          this.type = type;
+        }
+      },
+    );
+    vi.stubGlobal('document', {
+      activeElement: null,
+      body: { appendChild: () => {} },
+      createElement: () => ({
+        style: {},
+        setAttribute: () => {},
+        classList: { add: () => {}, remove: () => {} },
+      }),
+      elementFromPoint: () => spell,
+    });
+    updatePadMouse(1, 0, 0.1);
+    expect(focusedPadAction()).toEqual({ type: 'ability', id: 'rend' });
+    hidePadMouse();
   });
 });
