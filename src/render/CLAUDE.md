@@ -250,7 +250,7 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the budget's learned reveal cost times the root count clamped into
   [`REVEAL_SOFT_DEADLINE_MIN_MS`, `REVEAL_GATE_WATCHDOG_MS`], records a
   `reveal-soft-deadline` gpu-prep event with the key's ready/total roots and
-  changes nothing; the 10 s hard watchdog still reveals ungated and now
+  changes nothing; the `REVEAL_GATE_WATCHDOG_MS` hard watchdog still reveals ungated and now
   carries the same counts, plus the `reveal` aggregate in
   `gpu_prep_events.ts` (keys held, roots held, roots revealed piecewise, roots
   still compiling at a watchdog), so a capture can attribute a first-draw

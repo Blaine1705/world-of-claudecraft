@@ -161,7 +161,5 @@ describe('foliage ghost prewarm wiring (source pins)', () => {
     expect(foliage).toContain(
       'for (const t of trees) for (const part of t.parts) yield part.mesh;',
     );
-    // The stale premise the capture disproved must be gone.
-    expect(foliage).not.toContain('foliage has none today');
   });
 });

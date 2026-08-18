@@ -1477,6 +1477,84 @@ describe('createBackgroundGpuQueue admission', () => {
     expect(queue.stats().admission).toEqual({ enabled: true, deferred: 0, parks: 0 });
   });
 
+  it('wakes a cap-full park on the frame clock and on an arrival, and runs the tail-free unit under the cap', async () => {
+    // The one park that serves BOTH notifiers: the cap is full (a released
+    // tail in flight) and the only tail-free candidate is budget-refused, so
+    // neither the tail settling nor the admission alone can be the wake. A
+    // regression that drops the admission notifier from the cap-park branch
+    // wedges the queue until the tail settles; this pins the frame wake and
+    // the arrival wake while the tail is STILL in flight.
+    let admit = false;
+    const gate = probe(() => admit);
+    const queue = createBackgroundGpuQueue({ admission: gate.admission, tailLimit: 1 });
+    const ran: string[] = [];
+    queue.noteFrame(0);
+    admit = true;
+    let settleLink!: () => void;
+    const tail = queue.run(
+      () =>
+        new Promise<void>((resolve) => {
+          settleLink = resolve;
+        }),
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate:crowd',
+      { releaseTail: true },
+    );
+    await settle();
+    expect(queue.stats().waitingTails.map((t) => t.label)).toEqual(['live-gate:crowd']);
+
+    admit = false;
+    const touch = queue.run(
+      () => {
+        ran.push('touch');
+      },
+      GPU_WORK_PRIORITY.TAIL_PIECE,
+      'touch:program',
+    );
+    await settle();
+    // Cap full AND refused: parked, nothing ran, the park is counted on the cap.
+    expect(ran).toEqual([]);
+    expect(queue.stats().pending).toBe(1);
+
+    // The frame clock wakes the park; the budget now admits; the touch piece
+    // runs while the tail is still settling.
+    admit = true;
+    queue.noteFrame(16);
+    await touch;
+    expect(ran).toEqual(['touch']);
+    expect(queue.stats().waitingTails.map((t) => t.label)).toEqual(['live-gate:crowd']);
+
+    // Same park, woken by an ARRIVAL: refuse again, park, then a new admissible
+    // tail-free unit arrives and runs (the refused one waits for its frame).
+    admit = false;
+    const refused = queue.run(
+      () => {
+        ran.push('refused');
+      },
+      GPU_WORK_PRIORITY.TAIL_PIECE,
+      'touch:program',
+    );
+    await settle();
+    expect(ran).toEqual(['touch']);
+    gate.admission.admit = (candidate) => candidate.label === 'upload:chunk';
+    const arrival = queue.run(
+      () => {
+        ran.push('arrival');
+      },
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      'upload:chunk',
+    );
+    await arrival;
+    expect(ran).toEqual(['touch', 'arrival']);
+
+    settleLink();
+    gate.admission.admit = () => true;
+    queue.noteFrame(32);
+    await Promise.all([tail, refused]);
+    expect(ran).toEqual(['touch', 'arrival', 'refused']);
+    expect(queue.stats().waitingTails).toEqual([]);
+  });
+
   it('defers a refused unit and runs it once a later frame admits it', async () => {
     let admit = false;
     const gate = probe(() => admit);

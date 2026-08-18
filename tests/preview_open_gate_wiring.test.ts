@@ -315,6 +315,12 @@ describe('CharacterPreview cold-open gate', () => {
   });
 });
 
+const withoutLineComments = (source: string): string =>
+  source
+    .split('\n')
+    .filter((line) => !line.trimStart().startsWith('//'))
+    .join('\n');
+
 describe('the second live draw site is gated too', () => {
   // The animate loop is a class-field arrow function, so it exists only on a
   // fully constructed preview (which needs a real WebGL context). Its gate is
@@ -323,7 +329,8 @@ describe('the second live draw site is gated too', () => {
   it('the animate loop consults the same gate before its render', () => {
     const src = readFileSync('src/render/characters/preview.ts', 'utf8');
     const animate = src.slice(src.indexOf('private animate = ('));
-    const body = animate.slice(0, animate.indexOf('\n  };'));
+    // Code only: a commented-out gate must not satisfy the pin.
+    const body = withoutLineComments(animate.slice(0, animate.indexOf('\n  };')));
     expect(body).toContain('if (!this.gateAllowsDraw()) return;');
     expect(body.indexOf('this.gateAllowsDraw()')).toBeLessThan(
       body.indexOf('this.renderer.render(this.scene, this.camera)'),
@@ -335,7 +342,7 @@ describe('the second live draw site is gated too', () => {
   it('every mount of the shared preview arms the gate', () => {
     const hud = readFileSync('src/ui/hud.ts', 'utf8');
     const mount = hud.slice(hud.indexOf('private mountSharedPreview('));
-    const body = mount.slice(0, mount.indexOf('\n  }'));
+    const body = withoutLineComments(mount.slice(0, mount.indexOf('\n  }')));
     expect(body).toContain(
       'armPreviewOpen(this.charPreview, container, { cls: opts.cls }, this.renderer)',
     );

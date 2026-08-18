@@ -90,6 +90,16 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(entityHasNoBody(true, true, false)).toBe(true);
   });
 
+  it('a character view whose every rig is hidden forces the plate too', () => {
+    // The second disjunct on its own: the view is not compile-pending, it has
+    // character rigs, and none of them draws (a base swap whose incoming rig
+    // is still linking after the outgoing one was torn down, or a form whose
+    // stand-in the loop failed to keep). The plate is the last representation.
+    expect(entityHasNoBody(false, true, false)).toBe(true);
+    // A view without character rigs (a door, a node) is never "bodiless".
+    expect(entityHasNoBody(false, false, false)).toBe(false);
+  });
+
   it('shapeshift form gate: the base body draws, so no plate is forced', () => {
     const sheep = rig(false);
     const base = rig(true);
