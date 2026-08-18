@@ -284,17 +284,19 @@ describe('isHarvestableCorpse', () => {
     // was only ever tagged ogre from the generic-giant era), which puts it under
     // the every-beast-pays-in-components rule and so gives it hide/fang/meat.
     expect(included).toHaveLength(46);
-    // ...and the untagged templates are counted rather than assumed: 185 of
+    // ...and the untagged templates are counted rather than assumed: 187 of
     // them ship, all excluded before this change and all excluded after it,
     // since fen_troll was already tagged (claw, tusk) and only moves from
     // `excluded` into this list, never through `untagged`. (184 before the
     // v0.32.0 base merge, plus the untagged dragonkin egg from the brood and
     // the four untagged camp mobs the quest-dedupe pass added, minus
-    // shoal_scuttler once it gained a mapped tag.) 184 once frostmane_yeti
-    // gained hide/fang/meat with its move into the beast family, which is the
-    // same template the `included` count above picked up.
+    // shoal_scuttler once it gained a mapped tag. Plus the three practice
+    // dummies the Highwatch row added: a straw target carries no components.
+    // Minus frostmane_yeti, which gained hide/fang/meat with its move into
+    // the beast family: the same template the `included` count above picked
+    // up.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(184);
+    expect(untagged).toHaveLength(187);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

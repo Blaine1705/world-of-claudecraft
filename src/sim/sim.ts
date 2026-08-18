@@ -319,6 +319,7 @@ import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { findNearbyAllies } from './mob/nearby_allies';
+import { applyPlayerDummyVitals } from './mob/practice_dummies';
 import {
   createMobScanCounters,
   type MobScanCounters,
@@ -2403,6 +2404,11 @@ export class Sim {
           );
           mob.facing = 0;
           mob.prevFacing = 0;
+          // A friendly practice dummy simulates a geared level-20 ally, so its
+          // body comes from the reference kit rather than its own template
+          // numbers (which cannot reach the item tables from content/). Pure and
+          // rng-free, like the rest of this branch.
+          if (template.friendlyPracticeTarget) applyPlayerDummyVitals(mob);
           this.addEntity(mob);
           continue;
         }
