@@ -9253,8 +9253,12 @@ body.reduce-motion .breath-bar.breath-bar-drowning {
   width: max-content;
   max-width: 100%;
   pointer-events: none;
-  background: var(--panel-bg);
-  border: 1px solid var(--border);
+  /* No panel behind it, ever. A filled slab is the single heaviest thing the bar
+     put on screen, and the cells already read as a bar on their own. The labels
+     carry their own contrast instead (see the outlines below), which is what a
+     slab was really buying. */
+  background: none;
+  border: 1px solid transparent;
   border-radius: 8px;
 }
 /* One trigger's eight: its d-pad diamond and its face diamond, side by side.
@@ -9342,12 +9346,15 @@ body.xhb-mode #player-frame {
   padding: 1px 6px;
   border: 1px solid var(--border);
   border-radius: 4px;
+  /* The trigger chips keep a fill of their own. They are two small labels rather
+     than a slab behind sixteen cells, and a chip is what makes LT/RT read as a
+     button name instead of floating text. */
   background: var(--panel-bg);
   font-family: var(--ui-font);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: bold;
   line-height: 1.3;
-  color: var(--gold-dim);
+  color: var(--gold);
 }
 .xhb-half {
   position: relative;
@@ -9364,11 +9371,16 @@ body.xhb-mode #player-frame {
   bottom: -15px;
   transform: translateX(-50%);
   font-family: var(--ui-font);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.04em;
-  color: var(--gold-dim);
-  opacity: 0.75;
-  text-shadow: 0 1px 2px #000;
+  color: var(--gold);
+  opacity: 0.9;
+  text-shadow:
+    0 0 3px #000,
+    0 1px 2px #000,
+    1px 0 2px #000,
+    -1px 0 2px #000,
+    0 -1px 2px #000;
   /* One line, always: wrapped, the longer arrange-mode line ran off the bottom
      of the screen instead of growing the bar. */
   white-space: nowrap;
@@ -9376,6 +9388,7 @@ body.xhb-mode #player-frame {
 /* The arrange line is a sentence rather than two glyphs, and there is no room
    for it under the bar, so it sits above one. */
 .xhb.xhb-editing .xhb-hint {
+  display: block;
   bottom: auto;
   top: -16px;
   color: var(--gold);
@@ -9394,11 +9407,19 @@ body.xhb-mode #player-frame {
   bottom: -12px;
   transform: translateX(-50%);
   font-family: var(--ui-font);
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: bold;
   line-height: 1;
   white-space: nowrap;
-  color: var(--gold-dim);
-  text-shadow: 0 1px 2px #000;
+  color: var(--gold);
+  /* A halo, not a drop shadow: the button hints sit over open world now, so they
+     need contrast from every side rather than only below. */
+  text-shadow:
+    0 0 3px #000,
+    0 1px 2px #000,
+    1px 0 2px #000,
+    -1px 0 2px #000,
+    0 -1px 2px #000;
 }
 .xhb-diamond {
   display: grid;
@@ -9531,37 +9552,18 @@ body.pad-nav * {
    between them mid-session without the bar rebuilding.
    Full is the default and needs no rules of its own. */
 
-/* Compact: the frame carries most of the bar's visual weight, so it goes first.
-   The cells alone still read as a bar, and the labels stay only where they are
-   still telling the player something (the half a trigger has armed). */
-body.xhb-compact .xhb {
-  background: none;
-  border-color: transparent;
-  box-shadow: none;
-}
+/* Compact: no panel to remove any more, so this preset is purely about the
+   LABELS. They stay on the half a trigger has armed, where they are still saying
+   something, and go everywhere else. */
 body.xhb-compact .xhb-hint,
 body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-glyph,
 body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-trigger {
   display: none;
 }
-/* Arranging is the one time the frame earns its keep: it says the bar is a thing
-   being edited rather than played, so the preset stands aside for it. */
-body.xhb-compact .xhb.xhb-editing {
-  background: var(--panel-bg, rgba(12, 10, 8, 0.82));
-  border-color: var(--gold);
-}
-body.xhb-compact .xhb.xhb-editing .xhb-hint {
-  display: block;
-}
 
 /* Minimal: nothing at all until a trigger is held, for a player who knows the
    layout and wants the screen back. The bar keeps its box (visibility, not
    display) so the HUD above it never moves. */
-body.xhb-minimal .xhb {
-  background: none;
-  border-color: transparent;
-  box-shadow: none;
-}
 body.xhb-minimal .xhb-hint {
   display: none;
 }
