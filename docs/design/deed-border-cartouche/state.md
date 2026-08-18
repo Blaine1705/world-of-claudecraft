@@ -5,10 +5,10 @@ Resume here. Do not re-litigate locked decisions; they live in
 
 ## Resume point
 
-Packet committed on `feature/deed-border-cartouche` in worktree
-`/Users/fernando/Documents/wocc-deed-border-cartouche`, based on
-`origin/release/v0.39.0`. Next action: run Phase 1 from
-`phase-01-chassis.md` in that worktree.
+Phase 1 is complete on `feature/deed-border-cartouche` in worktree
+`/Users/fernando/Documents/wocc-deed-border-cartouche`. Next action: run
+Phase 2 from `phase-02-qa-chassis.md` in that worktree. Do not start
+Phase 3.
 
 ## Blocker
 
@@ -17,11 +17,10 @@ None.
 ## Next action
 
 1. Work in `/Users/fernando/Documents/wocc-deed-border-cartouche`.
-2. `pnpm install --frozen-lockfile` if `node_modules` is not present.
-3. Execute Phase 1 (`phase-01-chassis.md`): cartouche core + tests first,
-   then rewire `nameplate_canvas.ts`.
-4. Do not start Phase 2 until Phase 1 exit criteria are met.
-5. Do not start Phase 3 until Phase 2 is green.
+2. Execute Phase 2 (`phase-02-qa-chassis.md`): coverage audit of E1-E26,
+   graphics-tier fairness, before/after screenshots, reviewers,
+   `node scripts/gate_select.mjs`.
+3. Do not start Phase 3 until Phase 2 is green.
 
 ## Locked decisions (cheat sheet)
 
@@ -33,29 +32,28 @@ None.
 - Catalogue brass retune and motifs wait for Phase 3.
 - Title centered on `screenX`. Name-row text vertically centered with badges.
 - Width is `max(nameRow, title) + padX * 2`.
-- Extra lift is a named value both y-walks consume.
+- Extra lift is a named value both y-walks consume. It is 14.
 - Identity on every graphics tier. Only bloom sheds. Core takes no tier arg.
 - Geometry core in render. Palettes stay in `deed_border_view.ts`.
 - No sim / server / wire / IWorld change.
 
-## Open only if Phase 1 measurement forces it
+## Closed in Phase 1
 
-- Exact pad px (plan target: 8-10 x, 4-5 y) after the 24px Discord
-  portrait is optically centered.
-- Whether `OVERLAP_THRESHOLD_Y_PX` / `STACK_OFFSET_PX` in
-  `nameplate_declutter.ts` must rise with `extraLift`.
+- Pad is 9 x and 5 y. Radius 6. Well alpha 0.4. Well fill `#14110c`.
+- `OVERLAP_THRESHOLD_Y_PX` is 32 and `STACK_OFFSET_PX` is 34 (old 18/20 plus extraLift).
 
 ## Surfaces in play
 
 - `src/ui/deed_border_view.ts`
+- `src/render/nameplate_cartouche_core.ts` (new)
 - `src/render/nameplate_canvas.ts`
 - `src/render/nameplate_painter.ts`
-- `src/render/nameplate_declutter.ts` (constants only, if lift requires)
+- `src/render/nameplate_declutter.ts` (Y constants now include extraLift)
 - `src/styles/hud.css` (Phase 3 ring)
 - `src/styles/shell.css` (Phase 3 inspect)
 - `src/ui/deeds_window.ts` + `src/styles/components.css` (Phase 3 picker)
-- `scripts/pr_shot_targets.mjs` (`nameplate-border` and later picker/inspect)
-- Tests listed in the plan
+- `scripts/pr_shot_targets.mjs` (`nameplate-border` when-list is ready)
+- Tests listed in `progress.md`
 
 ## Review dispatch (QA phases)
 
