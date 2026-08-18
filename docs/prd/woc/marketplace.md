@@ -103,12 +103,18 @@ The game side enforces what it can observe, and fails closed:
 
 A bid is a commitment to pay a USD value in $WOC, not a fixed token count. The
 bid form shows the bid in USD, the current estimated $WOC requirement with the
-price timestamp, a warning that the final token amount may change, and the
-settlement deadline that applies if the bid wins.
+price timestamp, a warning that the final token amount may change, the
+settlement deadline that applies if the bid wins, and, before the first bond
+charge, the commitment disclosures: a bid binds once its bond signs (no
+withdraw; forfeit and a strike on non-payment), the anti-snipe close extension
+and the late-payment refund, and, when the seller opted in, the automatic
+second-chance cascade (the outbid bidder can become the buyer at their own bid
+with the bond re-held).
 
 Every bid requires: a verified linked wallet (`server/wallet.ts`), sufficient
 $WOC balance at bid time (`server/woc_balance.ts` cached read), an established
-account, and acceptance of the variable-token settlement terms (recorded).
+account, and acceptance of the Marketplace terms (recorded; linked beside the
+checkbox at the moment of acceptance).
 The custody-moving operations (`createListing` and the seller side of
 `acceptDirectedOffer`) additionally require a wallet-signature STEP-UP
 (ruling R1, closing finding B6): a fresh single-use server-built challenge

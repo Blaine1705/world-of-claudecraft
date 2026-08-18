@@ -121,7 +121,10 @@ mitigations that cost no custody:
 1. **The window is already short.** `WOC_MARKET_SETTLEMENT_WINDOW_SECONDS` is 600.
 2. **The seller can cancel before payment.** A directed listing has no standing
    bid, so the `has_bids` guard that blocks cancelling a live auction never fires.
-   Worth confirming that cancel is reachable for this shape.
+   Confirmed reachable: the trade arm's Cancel sale on the seller's
+   awaiting-payment face and the Activity "My listings" rows both drive the
+   ordinary cancel route (cancel-pending on a locked window, recorded on the
+   face until the poll converges).
 3. **A strike still applies.** The progressive ladder is bond-independent, so
    non-payment can carry its consequence without anything at risk up front. This
    is the cheapest teeth available and I would take it.
@@ -279,7 +282,17 @@ trade window's $WOC arm (`src/ui/hud/woc_trade/`); the strike on a
 never-paying buyer with the auto-close return flight; the agreed-copy
 fingerprint (`item_pin`); the one-pending-offer-per-pair bound; and terms
 acceptance gating both money paths (`guardTerms`). It ships disabled behind
-`WOC_MARKET_ENABLED` with the rest of the marketplace. The directed-rail
+`WOC_MARKET_ENABLED` with the rest of the marketplace.
+
+Updated 2026-08-17 (the honesty round on the money surface): the seller's
+Decline and Cancel sale are live client controls; a closed-not-sold listing
+renders its own ending (cancelled / suspended / unpaid, never a false payment
+line) and a review-parked or delivered settlement its own status; the p2p Pay
+flow is two-step (claim, then a quote-review face with the token total, the fee
+legs and the expiry, then Sign); the buyer reads the payment hold and the strike
+before the shared Accept, and both sides read the fee and the net on the review
+face; the consent row (checkbox plus the linked Marketplace terms) sends the
+player's real choice on the offer send and the pay claim. The directed-rail
 hardening record lives in the packet ledger
 (`docs/woc-marketplace-hardening/state.md`); the sections below are the design
 history plus, in "Landed", the original foundation table.

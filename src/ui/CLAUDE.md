@@ -617,17 +617,35 @@ same file), and each module's header carries its own contract.
   `woc_market_reason_text.ts`, which owns the word-to-copy maps with a generic
   fallback in each direction; never map a verdict word to text inline in a painter.
   Wallet-bridge failures classify through `wallet_bridge_reason_text.ts` (structural
-  cancel names, a byte-exact map over the bridge's thrown strings with a drift pin,
-  caller-flavored generics): a catch site never renders `err.message`, it logs the
-  raw error on the dev channel and renders the classified line. The window's toast
+  cancel names, a byte-exact map over the bridge's thrown strings with a drift pin
+  over src/net plus `mobile_wallet_launcher.ts` and the desktop hand-off's throw
+  sites, caller-flavored generics): a catch site never renders `err.message`, it logs
+  the raw error on the dev channel and renders the classified line; rewording one of
+  those throws updates the map in the same change. The window's toast
   (`notice`) stores UNRESOLVED state (keys, codes, screened words) and resolves at
   render via `resolveNotice`, so a language switch never strands stale text. USD
-  amounts spell through `usd_text.ts` (Intl currency; the src/ui-wide grep pin in
-  `tests/usd_text.test.ts` keeps the hardcoded-`$` class extinct).
+  amounts spell through `usd_text.ts` (Intl currency; the src/{ui,game,net} grep pin in
+  `tests/usd_text.test.ts` keeps the hardcoded-`$` and appended-code classes extinct);
+  multi-unit durations (countdowns, the claim cooldown's retry time, the p2p payment
+  hold) through `duration_text.ts`, never a raw `formatDuration` seconds count. The
+  seller's Cancel gate is ONE predicate, `canCancelListing` in the view core, for the
+  browse detail pane and the Activity rows alike.
+  The trade window's $WOC arm is `trade_woc_view.ts` (pure model: faces, the fee block
+  for both sides, the buyer's commitment note, review/delivering status keys) plus the
+  cold painter `trade_woc_panel.ts`, driven by `hud/woc_trade/` (the controller and
+  `woc_trade_offer_view.ts`, which owns `wocOfferPhase`/`wocOfferClosedReason`: 'settled'
+  requires resolution 'sold', a closed-not-sold listing is 'closed', a delivered or
+  review-parked settlement is still 'paying'). The controller keys the claimed
+  settlement and the staged quote to their offer id, guards every post-await write on
+  the deal still standing, and holds the local 'paying' face only while a signature is
+  out with the wallet (never through the claim round trips).
   Both consent controls satisfy draft Terms 10.3: the Exchange checkbox and the
-  trade arm's consent row (`trade_woc_panel.ts`) each name the Marketplace terms,
-  link them (`/terms`), and send the player's REAL choice; the R9 hard-coded
+  trade arm's consent row (`trade_woc_panel.ts`) share ONE label key, link the
+  Marketplace terms, and send the player's REAL choice; the R9 hard-coded
   `acceptTerms: true` posture is closed (`docs/woc-marketplace-hardening/state.md`).
+  The link's href comes from `terms_link.ts` (same-origin on the site, the canonical
+  page from the packaged desktop and Capacitor shells, where a bare '/terms' was a
+  dead link or an in-app navigation); the DOM host passes the origin in.
   CAVEAT the code cannot show: the deployed `public/terms.html` does not yet carry
   its Marketplace section (the draft lives at the repo root), so the link points at
   a page missing the terms being accepted until the pre-enable Terms publication

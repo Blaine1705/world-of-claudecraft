@@ -5,19 +5,42 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-14-qa.md` (GAME
+- Next file to run: `docs/woc-marketplace-hardening/phase-15-ui-polish.md` (GAME
   repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session,
-  newest origin/release/** sync first). 14 IMPLEMENT COMPLETE (2026-08-17,
-  LOCAL not pushed per R4; session start d3b15f6057, release sync a NO-OP at
-  origin/release/v0.39.0 tip f48c7a3a9b already merged; seven code/doc
-  commits, see the 14 ledger entry below, which is the registry the 14-qa
-  session consumes, incl. the REWORDED-KEYS release list and the review
-  round's outcomes). R9 RESOLVED at session start (see Rulings). R11 (the
-  relink follow-up) stays a pre-enable launch gate for Fernando. The 13 QA
-  ROUND's JUDGED and DEFERRED lists remain binding: do NOT re-raise them;
-  the 15-owned items (R10 hint dead end, sell-picker lock filter, stale TOTP
-  screenshots, the wallet busy label, the WocMarketWindow behavioral rig)
-  were deliberately NOT pulled forward.
+  newest origin/release/** sync first). 14 QA COMPLETE (2026-08-17,
+  PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open,
+  PUSHED per R4; release sync merge 8c0370585c of origin/release/v0.39.0 tip
+  f42a67f341, trivial). Nine workflow audit lanes + six typed reviewers + the
+  session's own mobile E2E arm over d3b15f6057..ffd8d63963; roughly 150
+  findings; fix commits e68227b6bb / d1e3eb2199 / ea08ac4711, a FRESH
+  four-lane re-review of that fix round (25 more, 50-mutant battery 44 BIT,
+  6 survivors closed) and 6f67a96057. Highest-value catches: the client held
+  its claimed settlement UNKEYED (a claim answering after the deal ended could
+  be re-quoted and paid under the NEXT deal), the poll held the buyer's face at
+  'paying' through the claim round trips (a false 'Confirming your payment'
+  after a refused claim), the seller never saw the fee before accepting, the
+  buyer read no payment deadline and no strike (and a pressed Pay silently
+  shortens the window: its own deadline now renders), a review-parked or
+  delivered settlement rendered the confirming sentences, and the /terms
+  consent link was DEAD on iOS and the packaged desktop shell and REBOOTED the
+  game on Android (fixed with the wiki_link resolver idiom; the seam round's
+  Vite proxy that broke dev /terms is gone). The 14 QA ROUND bullet in the 14
+  ledger entry below is the registry 15 consumes (JUDGED and DEFERRED lists
+  are binding: do not re-raise; the 15-owned polish list grew: the mobile
+  BAGS-over-trade-window stacking, the missing safe-area insets on
+  #trade-window, the tablist named after one tab, the panel's bare name
+  outside the perf gate's painter regex, the 4-vs-2 digit token precision,
+  the Claudium ticker suffixes; 16 owns /me metering + the 50-row inbox cap
+  decision; 17 the settlements (listing_id, id DESC) index; 22 the Not-now
+  lock release question, the outage-forfeit ruling, R11, the terms text
+  re-consent question and the fail-then-pay-again service contract).
+- 14 IMPLEMENT COMPLETE (2026-08-17; session start d3b15f6057; seven code/doc
+  commits, see the 14 ledger entry below). R9 RESOLVED at that session start
+  (see Rulings). R11 (the relink follow-up) stays a pre-enable launch gate for
+  Fernando. The 13 QA ROUND's JUDGED and DEFERRED lists remain binding: do NOT
+  re-raise them; the 15-owned items (R10 hint dead end, sell-picker lock
+  filter, stale TOTP screenshots, the wallet busy label, the WocMarketWindow
+  behavioral rig) were deliberately NOT pulled forward.
 - LOUD deploy handoff (DEPLOY.md records it): enable the market only with
   BOTH sides at or after the contract tips (game: the build that sends
   bidCents; service: PR #31 270e337+, the build whose bond quote answers
@@ -839,9 +862,15 @@ Still open (a phase that hits one asks at session start):
     to-do): hudChrome.wocMarket.termsLabel, rateNote, pausedBanner,
     sellFeeNote; apiError.woc_market.terms_required, item_mismatch,
     quote_expired. NEW keys carried ONLY the five forced non-Latin fills
-    (M16 floor): 16 trade.woc keys, 6 walletBridge, 9 wocMarket bond/fail,
-    claimCooldownRetry, termsLink, quoteExpiresAt, bidBindingNote,
-    bidCloseNote, offerNextNote (Latin locales re-pend as usual).
+    (M16 floor): 17 trade.woc keys (cancelSale included; the QA audit
+    corrected the count from 16, 38 new keys in all), 6 walletBridge, 9
+    wocMarket bond/fail, claimCooldownRetry, termsLink, quoteExpiresAt,
+    bidBindingNote, bidCloseNote, offerNextNote (Latin locales re-pend as
+    usual). QA CORRECTION to the reword rationale: the seven reworded keys
+    had NO Latin translations at all (pending everywhere), so the ordinary
+    pending worklist covers them; the reword list stays only as the reminder
+    that the English changed. The 14 QA round reworded and added more keys
+    (see its bullet); the same posture applies.
   - JUDGED, no code change (do not re-raise): the outage-window bond
     FORFEIT left per R2 (a money-policy call recorded for 22, not 14's);
     the 06-suggested server-side staged-shape check DECLINED (the table is
@@ -1039,6 +1068,229 @@ Still open (a phase that hits one asks at session start):
     pending voice, and the quote-review flow end to end); 22 (the
     outage-forfeit ruling for Fernando; R11; verify both consent surfaces
     against counsel text; the R9 residual above).
+  - 14 QA ROUND (2026-08-17, GAME repo, verdict PASS-WITH-FOLLOWUPS, every
+    finding applied or judged with the file open; PUSHED per R4). Release sync:
+    merge 8c0370585c brought origin/release/v0.39.0 tip f42a67f341 (5 commits,
+    druid feral enablement + its i18n fills; no marketplace overlap, no
+    conflicts, tsc + the four count-pin suites green on the merged tree, no
+    release-merge-audit owed). QA range d3b15f6057..ffd8d63963 (11 commits).
+    NINE workflow audit lanes (server honesty, state-machine truth table,
+    trade-arm client, Exchange + money surface, the four fix rounds re-reviewed
+    incl. 6349b61f62, i18n/hygiene, dead code/docs truth, the /terms shell
+    lane, a 43-mutant battery in a scratch worktree) plus SIX typed reviewers
+    via Agent (frontend-seam with MOBILE in scope, cross-platform-sync,
+    database-performance with a measured 200k-row rig, migration-safety with an
+    empirical triple re-apply of the DDL, privacy-security, test-coverage: the
+    last one went silent and its dimension was covered by the two mutation
+    batteries) and the QA session's own mobile E2E arm. The adversarial verify
+    stage was stopped after 30 votes (29 confirmed, 1 severity refute) because
+    at three lenses per finding it would have run for hours; every finding was
+    judged in the main loop with the file open instead. Findings: roughly 150 across the lanes and reviewers (9 audit
+    lanes 91 incl. 4 blocking-rated; frontend-seam 9 should-fix + 11 notes;
+    security 1 blocking + 2 should-fix + 4 nits; migration-safety 3 + 4 + 4
+    info; database-performance 5 P1 + 6 P2; cross-platform 3 + 4), plus the
+    session's own four (the seller's 'Payment received' line, the buyer-voice
+    compose copy, the seller never seeing the fee before accepting, the /terms
+    shells). Everything applied except the JUDGED and DEFERRED lists below;
+    the fixes landed as e68227b6bb (server/DB), d1e3eb2199 (the money faces),
+    ea08ac4711 (the capture rigs) and, after a FRESH four-lane re-review of
+    that fix round (client correctness, server/DB + pins, i18n fills, a
+    50-mutant battery: 44 BIT, the 6 survivors REAL pin gaps closed) found 25
+    more, 6f67a96057 (the kept keyed claim, its own deadline on the faces, the
+    re-review's pins and refills; self-reviewed with the files open, every
+    new pin proven by the battery's described mutants).
+    Mutation battery round 1: 43 mutants, 36 BIT, 4 SURVIVED (all four REAL
+    pin gaps, closed: the index column list, the fake db's two grace clauses,
+    the bondPending resolve dispatch; the fifth survivor was the defensive
+    finishClosed double-report guard, recorded), 1 INVALID (the pruned-listing
+    '' arm is unreachable under the CASCADE FKs, its comment reworded).
+    THE MOBILE E2E ARM (owed by the seam round): two dev-only rigs now render
+    the money faces in a REAL landscape phone viewport at the lowest preset
+    and MEASURE them: scripts/woc_trade_mobile_shot.mjs (every $WOC arm face
+    through the real controller/panel/CSS in the offline game: 40px consent
+    label, terms link and buttons, 24px checkbox, on screen and top-most at
+    the tap point) and scripts/woc_market_shot.mjs (whose seed was DEAD since
+    the step-up landed and now performs the listing step-up plus lists by the
+    real bag index; its mobile arm opens the buy-now and auction panes and
+    asserts the consent row, the bid field, and the disclosures' DOM order
+    ahead of Place bid). All floors PASS; the one real miss was the bid amount
+    field at 37px, floored to 40. Six landscape captures landed under
+    docs/screenshots/woc-market/ (after-mobile-trade-* and after-mobile-buy-now
+    -consent / -auction-disclosures) as the round's visual evidence. Observed
+    and recorded for 15: on the mobile sheet layout the BAGS window the trade
+    open shows stacks OVER the trade window (the rig hides it to measure); a
+    pre-existing stacking question, not this round's.
+    THE CAPACITOR CHECK (owed): a relative target=_blank href="/terms" is a
+    DEAD link on iOS (capacitor://localhost/terms handed to UIApplication.open,
+    an unregistered scheme), NAVIGATES the game WebView on Android (no
+    multiple-window support; http://localhost is the in-app host; the
+    WebViewLocalServer html5 fallback serves index.html: the game reboots
+    mid-flow), and is DENIED by the packaged desktop shell (it loads
+    app://worldofclaudecraft, whose window-open handler opens only http(s)).
+    Verified from the Capacitor and Electron sources; fixed with the wiki_link
+    idiom, not Browser.open: src/ui/terms_link.ts (pure resolveTermsUrl:
+    same-origin '/terms' only for an http(s) origin outside the native app,
+    the canonical https URL otherwise; CANONICAL_TERMS_URL shared from
+    client_origin.ts with wallet_connect.ts), the DOM hosts pass
+    location.origin in (the panel stays host-agnostic; the controller and the
+    Exchange window resolve it), pinned in tests/terms_link.test.ts across
+    the web / dev / app:// / capacitor:// / http://localhost arms. The seam
+    round's Vite '/terms' proxy was REMOVED: it rested on a false 404 premise
+    (STATIC_PAGE_ALIASES already served public/terms.html; measured 200
+    without it, 502 with it and no server) and had made dev /terms depend on
+    a running server with a built dist.
+    THE DATABASE-PERFORMANCE LANE (owed): the two new account indexes are a
+    measured WIN (BitmapOr, 3258 -> 170 buffers on the reviewer's own 200k rig;
+    the schema comment's figures reproduce) and stay exactly as shaped; the
+    residual is that the cost is linear in the account's RETAINED offer
+    history (WOC_MARKET_OFFERS_RETENTION_DAYS is the control; recorded at the
+    DDL, pre-enable measurement owed to 21/22). The two pending-only partials
+    were DEAD (no statement could use them once accepted rows rode the read)
+    and are RETIRED by idempotent DROPs; the correlated item lookups are
+    plan-identical to a JOIN (measured) and now qualify their outer column
+    (an unqualified listing_id would rebind the day the listings table grows
+    such a column: a silent NULL item id, or a hard error when several rows
+    match, both reproduced by the reviewers); the two cooldown probes
+    run in ONE round trip with a bound OFFSET (the in-transaction re-check
+    holds the listing row lock); the read takes the SERVICE clock through the
+    seam and orders by id after created_at (the fake was deterministic where
+    Pg was not); pins: the DB-free floor now covers the verdict grace arm,
+    the tiebreak, both index definitions and the retirement; the pg suite
+    pins the indexdef columns, EXPLAINs the real statement under SET LOCAL
+    enable_seqscan off (no Seq Scan on the offers table), and claims at
+    EXACTLY retryAtMs on both cooldown arms (one second before refuses); the
+    fake gained the twins of both grace clauses under the seam's clock.
+    Deferred with owners from this lane: /me is UNMETERED and its 6-way fan-out
+    draws 6 of 10 pool clients (16, H11); the 50-row inbox cap truncates the
+    OLDEST live offers with an abuse angle (16/22, a pagination decision); the
+    settlements (listing_id, id DESC) index for the LATERAL per-row sort (17).
+    THE FIX-ROUND RE-REVIEW'S OWN CATCHES (all applied): the round's guard
+    DROPPED a successful claim when the deal moved on mid-claim, and the close
+    path cleared the held settlement, so the same deal re-adopted inside the
+    lock window claimed again and was refused buy_now_locked over the buyer's
+    OWN lock (no same-account arm server-side) while the settlement lapsed
+    into a strike: the claim is now KEPT, keyed to its offer, and re-quoted;
+    p2pBindingNote promised the 10-minute hold while a pressed Pay opens the
+    270s lock window (Not now keeps it running): the settlement's own
+    deadlineAtMs now renders on the pay and quote faces and the note names
+    the shorter window; a pressed Pay under durable consent still dropped
+    focus to body (no other rung): the tabs end the ladder; the lapsed-quote
+    line borrowed the Exchange's 'Request a fresh one' with no such control
+    (own key: Not now, then Pay); a window closed mid-signature printed the
+    strike warning (the close arm reads the signing flag first); notInstant
+    said escrow happens when the SELLER accepts (both must); the game
+    server's hand-off shape failure was mapped to 'bad_response' (blames the
+    wallet: now 'unavailable'); ja/zh_CN/zh_TW closeSellerHold named an
+    Activity tab the Exchange labels 取引履歴 / 动态 / 動態; ru
+    settlementConfirmedDelivering read as a noun; ru rateNote borrowed the
+    Marketplace brand word for the external venue; ko variableWarning lost
+    the buyer address; the ru variableWarning refill had dropped its native
+    dash; the index retirement was pinned on a FRESH database only (now on
+    the upgrade path too); the plan pin's ROLLBACK moved into finally; the
+    fake's cooldown boundary twin on both arms; the seller CREATE's negative
+    pin; three comment truth-ups (a rebound column answers NULL silently, the
+    retired pair is the ACCOUNT partials, the retention knob on one line);
+    the moved test title and three docblocks reworded off the bare word.
+    THE FIX ROUNDS RE-REVIEWED (98f4cc1afb, 433841c53f, 0609cfaf75 and
+    6349b61f62 too): 0609cfaf75's third serialization is LEGAL under the
+    exactly-once invariants (suspend pre-locks the winner bid then the
+    listing; finalize-first commits closed/sold and suspend reads not_active
+    having written nothing) and the widened set still fails on double sale,
+    suspend-after-finalize, and no sale; the seam round's non-Latin refill of
+    rateNote translated 'venue' as the game's own Exchange (取引所 / 거래소 /
+    биржа / 交易所, a mis-attributed price source on a money surface),
+    refilled as the external trading market; the /terms proxy above; the
+    lapsed quote now SAYS so beside the disabled Sign; the four new trade.woc
+    fills that dropped the Ravenpost brand were aligned to the sibling rows.
+    THE HONESTY FIXES the lanes found ON TOP of the round (all applied, all
+    pinned): the client held its claimed settlement UNKEYED, so a claim
+    answering after the deal ended (partner cancelled, window closed) left a
+    settlement and a staged quote for the NEXT deal's Pay to re-quote and
+    Sign to pay (reproduced by the trade-arm lane against the tip; the
+    security lane found the same class through an adopted-offer swap): the
+    settlement and quote are keyed to their offer id, every post-await write
+    bails unless the deal still stands, the adopt branch drops a foreign
+    settlement, and Sign refuses one; the poll held the buyer's face at
+    'paying' through the CLAIM round trips (a poll beat mid-claim rendered
+    'Confirming your payment on the network...' with no Pay and no consent
+    row after a refused claim or Not now): a separate signing flag now holds
+    it only while a signature is out; a review-parked settlement rendered the
+    confirming sentences with a spinner (own review keys per side, no
+    spinner); a delivered answer left a live Pay button until the poll's
+    finalize ('delivered' is a settling state); the seller's paying line
+    claimed 'Payment received' for money the chain had not decided; the
+    buyer's compose face spoke in the seller's voice ('You receive', 'when the
+    buyer pays', 'Your item moves into escrow'): buyer-perspective copy, and
+    the fee + net now render on BOTH review faces before the commit click
+    (the seller never saw the fee before accepting; the adopted split had NO
+    consumer, contradicting the H8 closure's rendering claim); the buyer read
+    no payment deadline and no strike (the auction arm's bidBindingNote had
+    no p2p twin): p2pBindingNote from the new /status directedHoldSeconds
+    (untimed twin while unknown), an unpaid ending names the strike to the
+    buyer, dealAwaitsPayment names it; the buyer's settled/paymentConfirmed
+    lines promised mail for a copy handToBuyer puts in the bags; closing the
+    window mid-deal printed only the sim's 'Trade cancelled.' (now: the
+    seller's held copy, a payment that continues, a parked review, and a
+    verdict that landed since the last poll is reported at close); Decline /
+    Withdraw / Cancel sale had no in-flight guard and a raced answer rendered
+    the bid-bond copy (one click one request, a trade-flavored not_pending
+    line); a cancel answered cancel-pending left Cancel sale live (recorded on
+    the face); the quote face lacked the fee legs the Exchange shows for the
+    same answer and no quoteExpired line; the claim's own quote was discarded
+    for a second round trip; Pay/Sign/resolve did not repaint synchronously;
+    the pressed Pay dropped focus to body (a single-candidate restore; now a
+    ladder); the Exchange labelled confirmed/delivering 'Confirming' and
+    toasted 'Purchase complete' for them; the browse pane offered Cancel on a
+    cancel-pending listing and the Activity digest omitted currentCents (a
+    landing bid left a dead Cancel and the start price); claim_cooldown said
+    'Try again in 1,800 seconds' (a shared duration_text core: 30 minutes);
+    the moneyUsd '{usd} USD' suffix doubled the currency under Intl in every
+    non-en locale (pl 'USD USD', en-CA 'US$1.00 USD'; dropped, with
+    dailyRewards.usd); the offer-next, bond and close disclosures understated
+    the mechanics (the outbid bidder is auto-promoted into a BINDING
+    settlement); buy now disclosed no walk-away cost; the desktop wallet
+    hand-off's six bridge strings were outside the map (raw English on the
+    Electron Claudium checkout); the consent caption was 11px on mobile;
+    settlementFailConfirmingOverdue said 'under review' on FAILED rows only;
+    the last inline-English admin arm; the SDK's empty-code arm; the fake db's
+    default zero clock made every row linger forever; the wocUsdText alias;
+    the duplicated termsLabel key (10 non-Latin rows retired); the usd sweep
+    hand-rolled its walker (now the shared one, self-audited, wider shapes);
+    the main.ts ceiling lowered to its real size; the direct wocOfferPhase
+    pins moved beside their module; CLAUDE.md upkeep (src/ui: the trade arm's
+    home, duration_text, terms_link, canCancelListing, the drift corpus;
+    server: the poll read's grace + indexes + retirement + the one-trip probe
+    + directedHoldSeconds; src/net: the drift corpus) and both PRDs trued.
+    JUDGED, no code change (do not re-raise): "Not now" keeps the buy-now
+    lock until it lapses (a release route is a new server feature: recorded
+    for 22 as product debt, bounded by the lock TTL and the seller's cancel);
+    the sim's 'Trade cancelled.' sentence on the window's Cancel/X during a
+    live payment stays (the sim session's shared teardown; the honesty lines
+    now follow it; routing Cancel/X to tradeClose past review is a sim-seam
+    change for 15/22 to judge); DECLINE_PROSE and the Claudium passthrough
+    stay judged; the bond leg's one-step sign is the Exchange's own posture
+    (recorded); the trade arm's 4-digit vs the Exchange's 2-digit token
+    precision (15 polish); Activity bid/settlement cells colour by def
+    quality (recorded); the offer wire carries no cancelPending (the trade
+    face records the seller's OWN answer instead; a wire field only if the
+    buyer's face ever needs the intent); the drift pin is one-directional by
+    design (a new bridge throw degrades to the localized generic); the word
+    'phase' in the round's prose and one commit body is the wocOfferPhase
+    domain sense (the new prose was reworded to 'payment machinery' / 'the
+    wocOfferPhase'; the commit body stays: no rewrite of the pushed spine);
+    the panel's bare name escaping the perf gate's painter regex, the trade
+    window's missing safe-area insets and the tablist named after one tab
+    (15); the R11 relink gate and the terms.html content stay 22's.
+    RESIDUAL for 22's pre-enable audit: durable consent recorded under the
+    OLD checkbox label ('variable-token settlement terms') hides the row for
+    players who accepted before the reword (whether the reword needs
+    re-consent is the R6/R9 counsel question); pausedBanner tells a winner
+    payments wait while the settlement window keeps running (the outage
+    forfeit ruling); the fail-then-'pay again' copy on quote_expired /
+    transaction_failed presumes no tokens moved (a service-contract question
+    for 21's devnet run).
+    GATE: run after this docs commit on the fully committed tree; the result
+    line is appended below by the closing docs commit.
 - 13 listing-step-up (2026-08-16/17, GAME repo, session start 19e4cd87ce =
   the 12 QA docs tip, release sync a no-op at 0 behind origin/release/v0.39.0
   tip d2d1a8ad5c; ~16 code and doc commits to tip 813e2a51e0, LOCAL not pushed
