@@ -93,3 +93,50 @@ describe('Settings under the mute flag', () => {
     });
   });
 });
+
+// The first version of this flag only zeroed the settings volumes, and the
+// landing-page theme and the music director both play through paths that never
+// read them: the page still made noise. These pin every audio source.
+describe('every audio source honours the flag', () => {
+  function withSearch<T>(search: string, run: () => T): T {
+    const had = Object.hasOwn(globalThis, 'location');
+    const prev = (globalThis as { location?: unknown }).location;
+    Object.defineProperty(globalThis, 'location', { configurable: true, value: { search } });
+    try {
+      return run();
+    } finally {
+      if (had) Object.defineProperty(globalThis, 'location', { configurable: true, value: prev });
+      else delete (globalThis as { location?: unknown }).location;
+    }
+  }
+
+  it('clamps the SFX bus to silence whatever a caller asks for', async () => {
+    const { sfx } = await import('../src/game/sfx');
+    withSearch('?mute=1', () => {
+      sfx.setVolume(1);
+      expect((sfx as unknown as { vol: number }).vol).toBe(0);
+    });
+    withSearch('', () => {
+      sfx.setVolume(0.8);
+      expect((sfx as unknown as { vol: number }).vol).toBeCloseTo(0.8);
+    });
+  });
+
+  it('clamps the voice bus the same way', async () => {
+    const { voice } = await import('../src/game/voice');
+    withSearch('?mute=1', () => {
+      voice.setVolume(1);
+      expect((voice as unknown as { vol: number }).vol).toBe(0);
+    });
+  });
+
+  it('refuses to re-arm the music director while muted', async () => {
+    const { music } = await import('../src/game/music');
+    withSearch('?mute=1', () => {
+      // setEnabled(true) is what the options toggle and the startup apply loop
+      // both call; under the flag it must be inert rather than starting playback.
+      music.setEnabled(true);
+      expect(music.enabled).toBe(false);
+    });
+  });
+});

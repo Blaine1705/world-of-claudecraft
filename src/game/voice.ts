@@ -7,6 +7,7 @@
 // `quest__<questId>__complete`) against the generated manifest; unknown keys and
 // missing files are silent no-ops, so the game runs fine before any audio exists.
 
+import { isBootMuted } from './boot_mute';
 import { VOICE_LINES } from './voice_manifest.generated';
 
 // Voices sit slightly under their slider value so NPC dialogue doesn't overpower
@@ -45,7 +46,7 @@ class GameVoice {
 
   /** Set voice volume (0..1). Safe any time. */
   setVolume(v: number): void {
-    this.vol = Math.min(1, Math.max(0, v));
+    this.vol = isBootMuted() ? 0 : Math.min(1, Math.max(0, v));
     this.applyVolume();
   }
 

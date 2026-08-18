@@ -14,6 +14,7 @@ import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
+import { isBootMuted } from './boot_mute';
 import {
   advanceMountEngine,
   type MountEngineEntry,
@@ -206,7 +207,9 @@ class Sfx {
 
   /** Set SFX volume (0..1). Shares the `sfxVolume` slider with `audio`. */
   setVolume(v: number): void {
-    this.vol = Math.min(1, Math.max(0, v));
+    // The boot-mute flag wins over every caller: a per-cue gain or a settings
+    // push must not be able to raise the floor back off zero.
+    this.vol = isBootMuted() ? 0 : Math.min(1, Math.max(0, v));
     if (this.master) this.master.gain.value = SAMPLE_GAIN * this.vol;
   }
 
