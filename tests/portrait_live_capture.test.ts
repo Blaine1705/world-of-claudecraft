@@ -17,7 +17,6 @@ const rig = vi.hoisted(() => ({
   renders: 0,
   drawn: '',
   encodes: [] as Array<{ tag: string; cb: (blob: Blob | null) => void }>,
-  syncDataUrl: 'data:image/png;base64,SYNCCAPTURE',
 }));
 
 /** What jsdom's FileReader makes of the fake toBlob payload below. */
@@ -31,12 +30,11 @@ vi.mock('three', async (importOriginal) => {
     domElement: HTMLCanvasElement;
     constructor(params: { canvas: HTMLCanvasElement }) {
       this.domElement = params.canvas;
-      // The async twin snapshots through toBlob; the composed path still uses
-      // the synchronous toDataURL.
+      // Every capture, class-keyed or composed, snapshots through toBlob: no
+      // portrait path reads the canvas back synchronously any more.
       this.domElement.toBlob = ((cb: (blob: Blob | null) => void) => {
         rig.encodes.push({ tag: rig.drawn, cb });
       }) as HTMLCanvasElement['toBlob'];
-      this.domElement.toDataURL = () => rig.syncDataUrl;
     }
     setPixelRatio() {}
     setSize() {}
@@ -66,7 +64,7 @@ vi.mock('../src/render/characters/assets', () => ({
   ensureSkinTexture: () => null,
 }));
 vi.mock('../src/render/characters/modular', () => ({
-  modularSignature: () => 'sig',
+  modularSignature: (app: { sig?: string }) => app?.sig ?? 'sig',
 }));
 vi.mock('../src/render/texture_prewarm', () => ({
   collectPrewarmTextures: () => undefined,
@@ -78,9 +76,19 @@ vi.mock('../src/render/characters/visual', async () => {
   return {
     CharacterVisual: class {
       root = new THREE.Object3D();
-      constructor(visualKey: string, _color: number, skin = 0) {
+      constructor(
+        visualKey: string,
+        _color: number,
+        skin = 0,
+        _weapon?: unknown,
+        _offhand?: unknown,
+        _form?: unknown,
+        look?: { app?: { sig?: string } },
+      ) {
         rig.builds.push(visualKey);
-        this.root.userData.tag = `${visualKey}:${skin}`;
+        this.root.userData.tag = look
+          ? `${visualKey}:mod:${look.app?.sig}`
+          : `${visualKey}:${skin}`;
       }
       update() {}
       dispose() {}
@@ -90,6 +98,8 @@ vi.mock('../src/render/characters/visual', async () => {
 
 import type { ModularLook } from '../src/render/characters/modular';
 import {
+  COMPOSED_PORTRAIT_SKIN,
+  MODULAR_PORTRAIT_CACHE_MAX,
   modularPortraitDataUrl,
   onPortraitUpdate,
   playerPortraitDataUrl,
@@ -105,6 +115,14 @@ import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
 const clock = { now: 100_000 };
 
 const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+// A composed look is identified here by the one field the faked
+// modularSignature reads, so each case picks its own cache key and its own
+// encode tag.
+const MODULAR_KEY = 'player_warrior_modular';
+const lookOf = (sig: string): ModularLook => ({ app: { sig }, worn: {} }) as unknown as ModularLook;
+const modTag = (sig: string) => `${MODULAR_KEY}:mod:${sig}`;
+const modKey = (sig: string) => `${MODULAR_KEY}:mod:${sig}:headshot`;
 
 /** Hand the capture drawn from `tag` its PNG (or fail its encode). Waits for
  *  that capture to reach its encode, so no case depends on how many turns the
@@ -221,10 +239,117 @@ describe('live portrait capture', () => {
     await vi.waitFor(() => expect(playerPortraitDataUrl('priest')).toBe(ASYNC_URL));
   });
 
-  it('leaves the composed path on its synchronous capture', async () => {
-    const look = { app: {}, worn: {} } as unknown as ModularLook;
-    expect(modularPortraitDataUrl('player_warrior_modular', look)).toBe(rig.syncDataUrl);
-    expect(rig.builds).toEqual(['player_warrior_modular']);
+  it('answers null on a COMPOSED miss and kicks ONE async capture', async () => {
+    const look = lookOf('one');
+    // The char sheet and the player frame both ask, every frame they paint.
+    for (let i = 0; i < 5; i++) expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBeNull();
+    await vi.waitFor(() => expect(rig.encodes).toHaveLength(1));
+
+    expect(rig.builds).toEqual([MODULAR_KEY]);
+    expect(rig.renders).toBe(1);
+    await settleCapture(modTag('one'));
+    await vi.waitFor(() => expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBe(ASYNC_URL));
+  });
+
+  it('dedupes a composed capture by look SIGNATURE, not by look object', async () => {
+    // Two asks for the same appearance (the sheet holds its own ModularLook,
+    // the player frame resolves another) are one capture; a changed slider is
+    // its own.
+    expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('same'))).toBeNull();
+    expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('same'))).toBeNull();
+    expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('other'))).toBeNull();
+    await vi.waitFor(() => expect(rig.encodes).toHaveLength(2));
+
+    expect(rig.builds).toEqual([MODULAR_KEY, MODULAR_KEY]);
+    await settleCapture(modTag('same'));
+    await settleCapture(modTag('other'));
+    await vi.waitFor(() => {
+      expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('same'))).toBe(ASYNC_URL);
+      expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('other'))).toBe(ASYNC_URL);
+    });
+  });
+
+  it('fills the cache and notifies with the composed KEY, which is what names it', async () => {
+    const updated = vi.fn();
+    onPortraitUpdate(updated);
+    const look = lookOf('notify');
+    expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBeNull();
+
+    await settleCapture(modTag('notify'));
+    // No (class, skin) pair describes a composed body, so the cache key is the
+    // third argument and the skin is the non-index COMPOSED_PORTRAIT_SKIN.
+    await vi.waitFor(() =>
+      expect(updated).toHaveBeenCalledWith(MODULAR_KEY, COMPOSED_PORTRAIT_SKIN, modKey('notify')),
+    );
+    expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBe(ASYNC_URL);
+  });
+
+  it('keeps two-argument listeners valid across a composed update', async () => {
+    // The widening is source-compatible on purpose: portrait_chip, main.ts and
+    // the skin-event controller all subscribe with (visualKey, skin).
+    const seen: Array<[string, number]> = [];
+    const legacy = (visualKey: string, skin: number): void => {
+      seen.push([visualKey, skin]);
+    };
+    onPortraitUpdate(legacy);
+    expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('legacy'))).toBeNull();
+
+    await settleCapture(modTag('legacy'));
+    await vi.waitFor(() => expect(seen).toContainEqual([MODULAR_KEY, COMPOSED_PORTRAIT_SKIN]));
+  });
+
+  it('BACKS OFF a composed key whose capture cached nothing', async () => {
+    const look = lookOf('backoff');
+    expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBeNull();
+
+    await settleCapture(modTag('backoff'), false);
+    await flush();
+    for (let i = 0; i < 5; i++) expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBeNull();
+    clock.now += PORTRAIT_CAPTURE_RETRY_BASE_MS - 1;
+    expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBeNull();
+    await flush();
+    expect(rig.builds).toEqual([MODULAR_KEY]);
     expect(rig.encodes).toEqual([]);
+
+    clock.now += 1;
+    expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBeNull();
+    await vi.waitFor(() => expect(rig.builds).toEqual([MODULAR_KEY, MODULAR_KEY]));
+    await settleCapture(modTag('backoff'));
+    await vi.waitFor(() => expect(modularPortraitDataUrl(MODULAR_KEY, look)).toBe(ASYNC_URL));
+  });
+
+  it('still bounds the composed cache: the oldest look is evicted past the cap', async () => {
+    // A creation session drags a colour wheel around, so the key space is
+    // unbounded and only the FIFO keeps the PNGs off the heap.
+    const sigs = Array.from({ length: MODULAR_PORTRAIT_CACHE_MAX + 1 }, (_, i) => `cap${i}`);
+    for (const sig of sigs) expect(modularPortraitDataUrl(MODULAR_KEY, lookOf(sig))).toBeNull();
+    await vi.waitFor(() => expect(rig.encodes).toHaveLength(sigs.length));
+    for (const sig of sigs) await settleCapture(modTag(sig));
+
+    await vi.waitFor(() =>
+      expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('cap1'))).toBe(ASYNC_URL),
+    );
+    expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('cap0'))).toBeNull();
+    // That miss kicked its own capture; settle it so no case inherits one.
+    await settleCapture(modTag('cap0'));
+  });
+
+  it('a graphics rebuild clears the composed FIFO, so a re-captured look survives', async () => {
+    // The rebuild clears the cache; a FIFO left holding those dead keys evicts
+    // the fresh entry a re-captured look just committed, under its own name.
+    const sigs = Array.from({ length: MODULAR_PORTRAIT_CACHE_MAX }, (_, i) => `rb${i}`);
+    for (const sig of sigs) expect(modularPortraitDataUrl(MODULAR_KEY, lookOf(sig))).toBeNull();
+    await vi.waitFor(() => expect(rig.encodes).toHaveLength(sigs.length));
+    for (const sig of sigs) await settleCapture(modTag(sig));
+    await vi.waitFor(() =>
+      expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('rb0'))).toBe(ASYNC_URL),
+    );
+
+    resetPortraitRendererForGraphicsRebuild();
+    expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('rb0'))).toBeNull();
+    await settleCapture(modTag('rb0'));
+    await vi.waitFor(() =>
+      expect(modularPortraitDataUrl(MODULAR_KEY, lookOf('rb0'))).toBe(ASYNC_URL),
+    );
   });
 });

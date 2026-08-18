@@ -32,6 +32,10 @@ import { iconDataUrl } from './icons';
 // layer (char_window's paperdoll boundary test) get it without their own
 // render import.
 export { modularLookFor } from '../render/characters';
+// The composed-capture signal rides the same crossing: a composed chip is a
+// full HTML rebuild rather than a src swap (hydratePortraits skips it below),
+// so its builder listens for the capture landing and re-renders itself.
+export { isComposedPortraitKey, onPortraitUpdate } from '../render/characters/portrait';
 
 export type PortraitVariant = 'sm' | 'md' | 'lg';
 

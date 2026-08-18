@@ -65,9 +65,11 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`) +
   `portrait_prewarm_core.ts` (the async capture's step order) +
   `portrait_capture_lane_core.ts` (one live capture per cache key). The LIVE
-  getters never capture on the calling frame: a miss answers null, kicks the
-  async capture through the lane, and fires `onPortraitUpdate` when it lands
-  (the composed `modularPortraitDataUrl` is still synchronous).
+  getters never capture on the calling frame, the composed
+  `modularPortraitDataUrl` included: a miss answers null, kicks the async
+  capture through the lane, and fires `onPortraitUpdate` when it lands (a
+  composed capture is named by its cache key, the listener's third argument,
+  since no (class, skin) pair describes one).
 - Weapons/props: `weapon_grip.ts`, `held_item_grips.ts`, `back_grips.ts`,
   `stow_transition.ts`, `skin_attack.ts`, `weapon_skin_materials.ts`, and
   `weapon_attack_style_core.ts`, a CROSS-SUBSYSTEM seam
