@@ -10342,8 +10342,8 @@ export const fr_FR: EnTranslations = {
         "description": "Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)"
       },
       "feral_charge": {
-        "name": "Charge farouche",
-        "description": "Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)"
+        "name": "Déferlante primordiale",
+        "description": "Libère une déferlante primordiale. En Forme de loup, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)"
       },
       "swiftmend": {
         "name": "Prompte guérison",
@@ -10599,7 +10599,7 @@ export const fr_FR: EnTranslations = {
       },
       "evocation": {
         "name": "Puits d’éther",
-        "description": "Restaura mana rápidamente. (talent de mage)"
+        "description": "Canalisez pendant 6 s : chaque seconde, vous récupérez 100 points de mana et gagnez 8 points de puissance des sorts. Le bonus se cumule pendant la canalisation et dure 15 s. (talent de Mage)"
       },
       "flurry_of_knives": {
         "name": "Rafale de couteaux",
@@ -10631,7 +10631,7 @@ export const fr_FR: EnTranslations = {
       },
       "ice_block": {
         "name": "Cercueil froid",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent de mage)"
+        "description": "Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)"
       },
       "inner_focus": {
         "name": "Esprit apaisé",
@@ -10723,7 +10723,7 @@ export const fr_FR: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Esprit fulgurant",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent de mage)"
+        "description": "Votre prochain sort ayant un temps d’incantation devient instantané. Dure 60 s. (talent de Mage)"
       },
       "psychic_scream": {
         "name": "Cri psychique",
