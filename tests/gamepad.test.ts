@@ -772,7 +772,7 @@ describe('GamepadManager cross hotbar', () => {
       triggerGamepadJump,
       toggleAutorun: vi.fn(),
       zoomBy: vi.fn(),
-    } as unknown as Input;
+    } as unknown as Input & Record<string, ReturnType<typeof vi.fn>>;
     let pointerMode = false;
     const bindings = new GamepadBindings();
     const manager = new GamepadManager(input, bindings, {
@@ -787,6 +787,7 @@ describe('GamepadManager cross hotbar', () => {
     return {
       manager,
       bindings,
+      input,
       onAction,
       onCrossHotbar,
       triggerGamepadJump,
@@ -862,31 +863,24 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onAction).toHaveBeenCalledWith('slot2');
   });
 
-  it('opens UI navigation from the world on a bare d-pad press', () => {
-    // Pointer mode is otherwise gated on a HUD window already being open, which
-    // left a pad with no way in: the d-pad claims nothing in the world, so it
-    // read as completely dead. This is the entry point.
+  it('navigates the HUD WITHOUT taking the world away', () => {
+    // The d-pad steps through menus while the character keeps playing: movement
+    // and the camera must still be driven on the very same poll. An earlier
+    // version suspended the world whenever the d-pad was used, which meant a
+    // player could not walk and read a window at the same time.
     const h = setupCrossHotbar(true);
     h.press(GP.DPAD_UP);
-    expect((h.manager as unknown as { navEngaged: boolean }).navEngaged).toBe(true);
+    expect(h.input.setGamepadMove).toHaveBeenCalled();
+    expect(h.input.applyGamepadLook).toHaveBeenCalled();
+    expect(h.input.clearGamepadMove).not.toHaveBeenCalled();
   });
 
-  it('does not open UI navigation while a trigger is held (that is the hotbar)', () => {
+  it('leaves a d-pad press alone while a trigger is held (that is the hotbar)', () => {
     const h = setupCrossHotbar(true);
     h.press(GP.LT);
     h.press(GP.LT, GP.DPAD_UP);
-    expect((h.manager as unknown as { navEngaged: boolean }).navEngaged).toBe(false);
-  });
-
-  it('backs out of UI navigation on B without closing anything else', () => {
-    const h = setupCrossHotbar(true);
-    h.press(GP.DPAD_UP);
-    expect((h.manager as unknown as { navEngaged: boolean }).navEngaged).toBe(true);
-    h.press();
-    h.press(GP.B);
-    expect((h.manager as unknown as { navEngaged: boolean }).navEngaged).toBe(false);
-    // B exited navigation rather than firing the host's escape.
-    expect(h.onAction).not.toHaveBeenCalledWith('escape');
+    // The cross hotbar took it: slot0 is the first cell of the left half.
+    expect(h.onAction).toHaveBeenCalledWith('slot0');
   });
 
   it('never casts an action-bar slot from a bare diamond press', () => {
@@ -987,6 +981,47 @@ describe('GamepadManager cross hotbar', () => {
     h.press();
     h.press();
     expect(focused).toEqual(['focus']);
+  });
+
+  it('drops the pad pointer when the window closes', () => {
+    // It used to hang in mid-air over a surface that was no longer there.
+    const h = setupCrossHotbar(true);
+    const removed: string[] = [];
+    const btn = {
+      focus: () => {},
+      classList: { add: () => {}, remove: (c: string) => removed.push(c) },
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+        width: 10,
+        height: 10,
+      }),
+      hasAttribute: () => false,
+    };
+    const dialog = {
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 99,
+        bottom: 99,
+        width: 99,
+        height: 99,
+      }),
+      querySelectorAll: () => [btn],
+    };
+    const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+    (globalThis as unknown as { document: Record<string, unknown> }).document = {
+      ...baseDoc,
+      querySelectorAll: (sel: string) => (sel.includes('dialog') ? [dialog] : [btn]),
+      activeElement: null,
+    };
+    h.setPointerMode(true);
+    h.press(); // window opens, focus lands inside it
+    h.setPointerMode(false);
+    h.press(); // window closes
+    expect(removed).toContain('pad-focus');
   });
 
   it('closes the hotbar when a HUD window takes the pad into cursor mode', () => {

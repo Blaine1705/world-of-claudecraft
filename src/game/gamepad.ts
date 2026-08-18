@@ -82,8 +82,8 @@ export class GamepadManager {
   // The player has opened UI navigation from the world with the d-pad. Pointer
   // mode is otherwise gated on a HUD window being open, which leaves a pad with
   // no way IN: the d-pad claims nothing in the world, so it read as dead.
-  private navEngaged = false;
-  // Edge-detects a window opening, so focus lands inside it exactly once.
+  // Edge-detects a window opening and closing, so focus lands inside it exactly
+  // once and the pointer leaves with it.
   private prevPointerMode = false;
   private crossHotbar = false;
   private crossHotbarExpand = true;
@@ -264,26 +264,15 @@ export class GamepadManager {
     // with a live pad, so a keyboard-and-mouse session never reaches it.
     const pointerMode = this.cb.isPointerMode();
     if (pointerMode && !this.prevPointerMode) focusFirstInWindow();
+    // The window closed: drop the highlight and the pointer with it, or they hang
+    // over a surface that is no longer there.
+    if (!pointerMode && this.prevPointerMode) this.exitNavMode();
     this.prevPointerMode = pointerMode;
 
-    // A bare d-pad press that would otherwise do NOTHING opens UI navigation, so
-    // the pad can reach the HUD without a keyboard. Read the triggers from THIS
-    // poll rather than the reducer, which still holds last poll's value here: a
-    // trigger and a button pressed together must reach the cross hotbar, not this.
-    const triggerHeld = (cur[GP.LT] ?? false) || (cur[GP.RT] ?? false);
-    if (!pointerMode && !this.navEngaged && !triggerHeld) {
-      for (const idx of risingEdges(this.prevPressed, cur)) {
-        if (DPAD_NAV_DIRECTIONS[idx] !== undefined && this.pressWouldDoNothing(idx)) {
-          this.navEngaged = true;
-          break;
-        }
-      }
-    }
-
-    if (pointerMode || this.navEngaged) {
-      // UI navigation: the pad is driving the HUD, not the world. Clear any
-      // lingering stick movement (a non-modal window like bags doesn't freeze
-      // movement on its own) and skip camera/ability dispatch.
+    if (pointerMode) {
+      // A modal surface owns the pad: clear any lingering stick movement (a
+      // non-modal window like bags doesn't freeze movement on its own) and skip
+      // camera/ability dispatch.
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
       this.releaseCrossHotbar();
@@ -291,8 +280,6 @@ export class GamepadManager {
       this.prevPressed = cur;
       return;
     }
-    // Back in the world: the pad is no longer driving the HUD.
-    if (this.navEngaged) this.exitNavMode();
 
     // The cross hotbar's trigger state advances BEFORE this poll's edges are
     // dispatched, so a trigger and a face button pressed in the same poll cast
@@ -325,6 +312,14 @@ export class GamepadManager {
     for (const idx of risingEdges(this.prevPressed, cur)) {
       acted = true;
       this.cb.onInputEdge();
+      // The d-pad steps through the HUD WHILE the world keeps running: movement,
+      // camera and the cross hotbar are all still live above and below this. Only
+      // a press that would otherwise do nothing is taken, so nothing is stolen.
+      const dir = DPAD_NAV_DIRECTIONS[idx];
+      if (dir !== undefined && this.triggerState.hold === null && this.pressWouldDoNothing(idx)) {
+        moveDpadFocus(dir);
+        continue;
+      }
       this.dispatch(idx);
     }
     // Once per poll, never once per edge: the shell only needs to hear that the
@@ -488,18 +483,14 @@ export class GamepadManager {
       if (this.bindings.actionFor(idx) === GAMEPAD_CONFIRM) {
         pressDpadFocus();
       } else if (idx === GP.B || idx === GP.START) {
-        // B backs out of navigation the pad opened itself; otherwise it is the
-        // host's escape (closing the window that put us here).
-        if (this.navEngaged && !this.cb.isPointerMode()) this.exitNavMode();
-        else this.cb.onAction('escape');
+        this.cb.onAction('escape');
       }
     }
     return acted;
   }
 
-  // Leave the d-pad's UI navigation and give the world back.
+  // Drop the HUD highlight and the pad pointer.
   private exitNavMode(): void {
-    this.navEngaged = false;
     clearPadFocus();
   }
 }
