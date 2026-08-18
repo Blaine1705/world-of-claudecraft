@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { presentFrame } from '../src/render/frame_present';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
+import * as liveProgramWatch from '../src/render/live_program_watch';
 import {
   armLiveProgramWatch,
   recordNewLivePrograms,
@@ -147,6 +148,28 @@ describe('the renderer-facing watch', () => {
     expect(event?.ageMs).toBe(0);
   });
 
+  it('rides the present host: the renderer injects the module, a bare host draws unwatched', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(source).toContain('programWatch: liveProgramWatch,');
+    resetGpuPrepEventsForTest();
+    const programs = [program(1, 'MeshStandardMaterial')];
+    armLiveProgramWatch(infoHost(programs));
+    const bare = {
+      vfx: { prepareDraw(): void {} },
+      post: null,
+      webgl: {
+        info: { programs },
+        render(): void {
+          programs.push(program(2, 'MeshBasicMaterial'));
+        },
+      },
+      scene: {},
+      camera: {},
+    };
+    expect(presentFrame(bare, 1 / 60, true)).toBe(true);
+    expect(gpuPrepEventsSnapshot().counts['live-program']).toBe(0);
+  });
+
   it('is armed from the renderer reveal receipt', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const reveal = source.indexOf('markGpuHitchReveal(): void {');
@@ -174,6 +197,8 @@ describe('the renderer-facing watch', () => {
       webgl,
       scene: {},
       camera: {},
+      // The renderer hands the module itself to its present host.
+      programWatch: liveProgramWatch,
     };
     expect(presentFrame(host, 1 / 60, true)).toBe(true);
 
@@ -200,6 +225,8 @@ describe('the renderer-facing watch', () => {
       webgl,
       scene: {},
       camera: {},
+      // The renderer hands the module itself to its present host.
+      programWatch: liveProgramWatch,
     };
 
     // A hidden window: a gate's compileAsync prologue keeps minting while

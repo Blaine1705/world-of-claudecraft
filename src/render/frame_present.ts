@@ -9,13 +9,17 @@
 // The draw is also where a program ESCAPE is visible: a variant no prewarm
 // covered links synchronously inside this render call, so the live-program
 // watch brackets exactly it (absorb before, record after) and nothing else. A
-// skipped frame absorbs too: see presentFrame.
+// skipped frame absorbs too: see presentFrame. The watch rides the host like
+// every other effect here (injected, so this file stays a pure core and a
+// stub host draws with no watch at all).
 
-import {
-  absorbLivePrograms,
-  type ProgramListHost,
-  recordNewLivePrograms,
-} from './live_program_watch';
+import type { ProgramListHost } from './live_program_watch';
+
+/** The live-program watch as the draw sees it (src/render/live_program_watch.ts). */
+export interface FramePresentProgramWatch {
+  absorbLivePrograms(webgl: ProgramListHost): void;
+  recordNewLivePrograms(webgl: ProgramListHost): void;
+}
 
 export interface FramePresentHost {
   vfx: { prepareDraw(camera: unknown): void };
@@ -23,6 +27,7 @@ export interface FramePresentHost {
   webgl: { render(scene: unknown, camera: unknown): void } & ProgramListHost;
   scene: unknown;
   camera: unknown;
+  programWatch?: FramePresentProgramWatch | null;
 }
 
 /**
@@ -37,7 +42,7 @@ export function presentFrame(host: FramePresentHost, dt: number, present: boolea
   // Ahead of the skip: a program minted while frames are skipped is prep by
   // definition (nothing drew it), so absorbing only on the drawing arm would
   // hand a whole hidden-window backlog to the next real draw as escapes.
-  absorbLivePrograms(host.webgl);
+  host.programWatch?.absorbLivePrograms(host.webgl);
   if (!present) {
     host.post?.updateScreenFx(dt);
     return false;
@@ -49,6 +54,6 @@ export function presentFrame(host: FramePresentHost, dt: number, present: boolea
     host.post.updateScreenFx(dt);
     host.post.render();
   } else host.webgl.render(host.scene, host.camera);
-  recordNewLivePrograms(host.webgl);
+  host.programWatch?.recordNewLivePrograms(host.webgl);
   return true;
 }

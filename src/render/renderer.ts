@@ -348,7 +348,7 @@ import {
   type PrewarmPacingHandle,
 } from './link_rate_budget';
 import { runLinkedProgramTouchLane } from './linked_program_touch_lane';
-import { armLiveProgramWatch, programCounts } from './live_program_watch';
+import * as liveProgramWatch from './live_program_watch';
 import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
@@ -3429,13 +3429,10 @@ export class Renderer {
 
   // Reused presentFrame host, refreshed field-by-field each sync (see the call
   // site): class-field init runs before the constructor assigns the real
-  // surfaces, so it starts empty and is never read before the first refresh.
+  // surfaces, so only the constant watch is set here and nothing is read before
+  // the first refresh.
   private readonly framePresentHost = {
-    vfx: null,
-    post: null,
-    webgl: null,
-    scene: null,
-    camera: null,
+    programWatch: liveProgramWatch,
   } as unknown as FramePresentHost;
 
   // Frames whose terminal draw actually submitted, counted at the one
@@ -4476,7 +4473,7 @@ export class Renderer {
   markGpuHitchReveal(): void {
     this.gpuHitchCompileLifecycle?.markReveal();
     markPrewarmPacingReveal(this.gpuHitchPacing, this.lastPrewarmStats);
-    armLiveProgramWatch(this.webgl);
+    liveProgramWatch.armLiveProgramWatch(this.webgl);
   }
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
@@ -5784,7 +5781,7 @@ export class Renderer {
       PREWARM_COMPILE_AWAIT_RESERVE_MS,
     );
     const manifestEntries: RendererPrewarmManifestEntryStats[] = [];
-    const startCounts = programCounts(this.webgl);
+    const startCounts = liveProgramWatch.programCounts(this.webgl);
     const createdViewTypes: string[] = [];
     const p = this.sim.player;
     const activeZone = zoneAt(p.pos.x, p.pos.z);
@@ -6167,7 +6164,7 @@ export class Renderer {
       // reads this.lastPrewarmStats after a resume (#2571 review).
       target: RendererPrewarmManifestEntryStats[] = manifestEntries,
     ): Promise<void> => {
-      const before = programCounts(this.webgl);
+      const before = liveProgramWatch.programCounts(this.webgl);
       const entryStarted = performance.now();
       if (
         prewarmEntryShouldDefer(
@@ -6216,7 +6213,7 @@ export class Renderer {
       // its counts, never 'completed'.
       const progress = entry.progress?.() ?? null;
       if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
-      const after = programCounts(this.webgl);
+      const after = liveProgramWatch.programCounts(this.webgl);
       const entryEnded = performance.now();
       target.push({
         id: entry.id,
@@ -7199,7 +7196,7 @@ export class Renderer {
         // (CONSTRAINED_PREWARM_RESUME): those hand over their explicit small
         // units, which run after entry instead of never.
         if (!prewarmEntryRuns(entry.id, policy)) {
-          const counts = programCounts(this.webgl);
+          const counts = liveProgramWatch.programCounts(this.webgl);
           const skipUnits = prewarmEntryResumesAfterSkip(entry.id, policy)
             ? (entry.resumeUnits?.() ?? [])
             : [];
@@ -7409,7 +7406,7 @@ export class Renderer {
     }
 
     const elapsed = performance.now() - started;
-    const finalCounts = programCounts(this.webgl);
+    const finalCounts = liveProgramWatch.programCounts(this.webgl);
     const stats: RendererPrewarmStats = {
       elapsedMs: roundMs(elapsed),
       maxMs: roundMs(maxMs),

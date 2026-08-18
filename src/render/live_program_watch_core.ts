@@ -19,8 +19,10 @@
 // is what makes it testable without a GL context.
 //
 // Allocation discipline (this runs every frame): the list LENGTH is compared
-// first and the walk happens only when it grew, the labels land in a
-// caller-owned array, and the identity set holds strings, not program objects.
+// first and the walk happens only when it moved, the walk itself is one
+// number compare per entry against the id high-water mark (three's program
+// ids are monotonic), and the labels land in a caller-owned array; only a
+// program that IS new costs a string.
 
 /** The fields this core reads off three's WebGLProgram. */
 export interface LiveProgramEntry {
@@ -32,14 +34,20 @@ export interface LiveProgramEntry {
 }
 
 export interface LiveProgramWatch {
-  /** Identities already seen, so a program is reported exactly once. */
-  known: Set<string>;
+  /** The highest program id adopted so far: three mints ids monotonically
+   *  (WebGLProgram's programIdCount), so everything at or below it is known
+   *  and a walk needs one number compare per entry, no allocation. */
+  maxId: number;
+  /** Identities of programs that carry no numeric id (a host other than
+   *  three's), so a walk can still tell them apart. Bounded by such programs
+   *  ever seen, which is none with three. */
+  knownWithoutId: Set<string>;
   lastLength: number;
   armed: boolean;
 }
 
 export function createLiveProgramWatch(): LiveProgramWatch {
-  return { known: new Set<string>(), lastLength: 0, armed: false };
+  return { maxId: -1, knownWithoutId: new Set<string>(), lastLength: 0, armed: false };
 }
 
 /**
@@ -58,6 +66,20 @@ export function liveProgramLabel(program: LiveProgramEntry): string {
   return program.name || program.cacheKey || 'program';
 }
 
+/** True when `program` is not yet known to `watch`; adopting it as known is
+ *  the caller's call (absorb and collect both do, collect reports it too). */
+function adopt(watch: LiveProgramWatch, program: LiveProgramEntry): boolean {
+  if (typeof program.id === 'number') {
+    if (program.id <= watch.maxId) return false;
+    watch.maxId = program.id;
+    return true;
+  }
+  const identity = program.cacheKey ?? program.name ?? '';
+  if (watch.knownWithoutId.has(identity)) return false;
+  watch.knownWithoutId.add(identity);
+  return true;
+}
+
 /**
  * Adopt the current list as the baseline and start watching. Called at the
  * reveal receipt: every program linked behind the curtain is prep, not an
@@ -67,17 +89,17 @@ export function armLiveProgramWatch(
   watch: LiveProgramWatch,
   programs: readonly LiveProgramEntry[] | undefined,
 ): void {
-  watch.known.clear();
+  disarmLiveProgramWatch(watch);
   watch.armed = true;
-  watch.lastLength = 0;
   if (!programs) return;
-  for (const program of programs) watch.known.add(liveProgramIdentity(program));
+  for (const program of programs) adopt(watch, program);
   watch.lastLength = programs.length;
 }
 
 export function disarmLiveProgramWatch(watch: LiveProgramWatch): void {
   watch.armed = false;
-  watch.known.clear();
+  watch.maxId = -1;
+  watch.knownWithoutId.clear();
   watch.lastLength = 0;
 }
 
@@ -92,23 +114,23 @@ export function absorbLivePrograms(
   programs: readonly LiveProgramEntry[] | undefined,
 ): void {
   if (!watch.armed || !programs) return;
-  if (programs.length <= watch.lastLength) {
-    watch.lastLength = programs.length;
-    return;
-  }
-  for (const program of programs) watch.known.add(liveProgramIdentity(program));
+  if (programs.length === watch.lastLength) return;
+  for (const program of programs) adopt(watch, program);
   watch.lastLength = programs.length;
 }
 
 /**
  * Labels of the programs that appeared since the last absorb or collect,
  * pushed into `out` (caller-owned, cleared here). Zero work before the arm,
- * and zero beyond a length compare on a draw that linked nothing.
+ * and zero beyond a length compare on a draw that left the list as long as
+ * it was; a walk (when the length moved either way) is one number compare
+ * per entry, and only a NEW program costs a label.
  *
- * A SHORTER list is three releasing a program with its last material: the
- * length is re-seated so the next mint is still seen as new, and the released
- * identity stays in the set, which is harmless because a relink takes a fresh
- * id. The set is therefore bounded by the programs a session ever linked.
+ * A list that shrank is three releasing a program with its last material;
+ * the walk still runs, so a release and a mint inside the same interval that
+ * happen to cancel out in length are the one shape this misses (a released id
+ * is never reused, so nothing else is). Memory is two numbers with three:
+ * the id high-water mark and the last length.
  */
 export function collectNewLivePrograms(
   watch: LiveProgramWatch,
@@ -117,15 +139,9 @@ export function collectNewLivePrograms(
 ): number {
   out.length = 0;
   if (!watch.armed || !programs) return 0;
-  if (programs.length <= watch.lastLength) {
-    watch.lastLength = programs.length;
-    return 0;
-  }
+  if (programs.length === watch.lastLength) return 0;
   for (const program of programs) {
-    const identity = liveProgramIdentity(program);
-    if (watch.known.has(identity)) continue;
-    watch.known.add(identity);
-    out.push(liveProgramLabel(program));
+    if (adopt(watch, program)) out.push(liveProgramLabel(program));
   }
   watch.lastLength = programs.length;
   return out.length;

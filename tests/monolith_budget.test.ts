@@ -114,7 +114,9 @@ const MONOLITHS: MonolithRow[] = [
     // extracting the renderer's info.programs readouts into
     // src/render/live_program_watch.ts; the per-draw bracket lives in
     // frame_present.ts, where the draw is (net -5).
-    ceiling: 13552,
+    // Lowered again when the watch moved onto the injected present host: the
+    // host's placeholder fields went with it (net -3).
+    ceiling: 13549,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
