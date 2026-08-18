@@ -29,6 +29,7 @@ import {
 import {
   buildGroundDecorPrewarmTwins,
   clearGroundDecorPrewarmDraws,
+  type GroundDecorPrewarmDraw,
   groundDecorPrewarmDraws,
   groundDecorPrewarmKey,
   registerGroundDecorPrewarmDraw,
@@ -36,6 +37,27 @@ import {
 import { buildNightAccents, nightAccentGlowMaterial } from '../src/render/night_accents';
 import { materialProgramSignature } from '../src/render/prewarm_policy';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
+
+/**
+ * Every registration as it happens, in order. The registry itself folds two
+ * draws that share a program key onto one entry, and on a plain Node tier the
+ * grass card and the flower card DO share one (no cap band, the same merged
+ * two-quad shape), so reading the registry back cannot say whether the flower
+ * arm was published at all. This records the calls instead, which is the only
+ * observable that survives the fold.
+ */
+const registrations = vi.hoisted(() => [] as GroundDecorPrewarmDraw[]);
+
+vi.mock('../src/render/ground_decor_prewarm', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/render/ground_decor_prewarm')>();
+  return {
+    ...actual,
+    registerGroundDecorPrewarmDraw: (draw: GroundDecorPrewarmDraw): void => {
+      registrations.push(draw);
+      actual.registerGroundDecorPrewarmDraw(draw);
+    },
+  };
+});
 
 /** Sources are read comment-STRIPPED: every pin below names a line of code that
  *  is explained in prose right beside itself, so a raw read would stay green
@@ -92,6 +114,7 @@ function cardGeometry(withCapAttribute: boolean): THREE.BufferGeometry {
 
 beforeEach(() => {
   clearGroundDecorPrewarmDraws();
+  registrations.length = 0;
 });
 
 afterEach(() => {
@@ -152,6 +175,36 @@ describe('the real pools publish themselves (the twins=0 floor)', () => {
     // nothing warms nothing.
     expect(buildGroundDecorPrewarmTwins()).toHaveLength(draws.length);
     for (const draw of draws) expect(draw.instanceColor).toBe(true);
+  });
+
+  it('publishes the FLOWER palettes at ring build too, before any chunk exists', () => {
+    // The flower material is minted lazily, per biome palette, by the chunk
+    // builder's flowerMatFor. The ring primes every palette up front, and that
+    // is what puts the flower program in the boot twin set: without it the
+    // first palette is minted long after buildFoliageMaterialPrewarmGroup ran,
+    // and its program links in whatever frame the walk reaches that biome.
+    installCanvasStub();
+    let frameMs = 0;
+    const ring = foliageGrassInternalsForTest.buildGrassRing(
+      new THREE.Group(),
+      42,
+      () => (frameMs += 1),
+    );
+    // No chunk was ever built: update() is what builds them, and it has not
+    // run. So every registration below happened at BUILD time.
+    expect(ring.perfStats().grassBuiltChunks).toBe(0);
+    expect(ring.perfStats().grassChunks).toBe(0);
+
+    // The card and the flower card are two distinct geometries, whatever the
+    // tier's cap arm folds their program keys into.
+    const geometries = new Set(registrations.map((draw) => draw.geometry));
+    const materials = new Set(registrations.map((draw) => draw.material));
+    expect(registrations.length).toBeGreaterThanOrEqual(2);
+    expect(geometries.size).toBeGreaterThanOrEqual(2);
+    // One material per palette, all published before the first chunk: a lazy
+    // registration would leave exactly one material here (the card's).
+    expect(materials.size).toBeGreaterThanOrEqual(3);
+    for (const draw of registrations) expect(draw.instanceColor).toBe(true);
   });
 });
 
@@ -285,6 +338,34 @@ describe('the prewarm manifest wiring (source pins)', () => {
     expect(foliage).toContain(
       'for (const twin of buildGroundDecorPrewarmTwins()) group.add(twin);',
     );
+  });
+
+  it('is cleared by the graphics rebuild, so the registry restarts empty', () => {
+    // A rebuild retires every profile-derived material and mints new ones. The
+    // registry holds the LIVE materials of the outgoing generation, so without
+    // this the next boot manifest links programs for materials nothing will
+    // ever draw, and the twins keep the retired ones alive.
+    const profile = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/assets/graphics_profile.ts', import.meta.url), 'utf8'),
+    );
+    expect(profile).toContain(
+      "import { clearGroundDecorPrewarmDraws } from '../ground_decor_prewarm';",
+    );
+    // Beside the other module caches the same rebuild resets, on the one
+    // RESETTERS table resetGraphicsProfileDerivedCaches drives.
+    expect(profile).toContain("['ground_decor_prewarm', clearGroundDecorPrewarmDraws],");
+    expect(profile).toContain('for (const [, reset] of RESETTERS) reset();');
+
+    // ...and the clear really restarts the registry from nothing.
+    registerGroundDecorPrewarmDraw({
+      geometry: cardGeometry(false),
+      material: grassCardMaterial(null),
+      instanceColor: true,
+    });
+    expect(groundDecorPrewarmDraws()).toHaveLength(1);
+    clearGroundDecorPrewarmDraws();
+    expect(groundDecorPrewarmDraws()).toEqual([]);
+    expect(buildGroundDecorPrewarmTwins()).toEqual([]);
   });
 
   it('rides the existing foliage.materials manifest entry, not a new lane', () => {
