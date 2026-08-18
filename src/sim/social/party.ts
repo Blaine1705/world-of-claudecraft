@@ -16,11 +16,12 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { ABILITIES } from '../content/classes';
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
-import { DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
+import { type Aura, DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
 // from sim.ts with the code that reads them; do NOT inline new numbers.
@@ -34,6 +35,9 @@ const RAID_MIN = 5;
 // wire bound too, which is the intent.
 export const RAID_MAX = 10;
 const RAID_GROUP_MAX = 5;
+function isPersistentPaladinAura(aura: Aura): boolean {
+  return aura.permanent === true && ABILITIES[aura.id]?.class === 'paladin';
+}
 
 // One indivisible Dungeon Finder unit as the formation seam receives it: a
 // whole existing party (partyId set, roster snapshot included) or one solo
@@ -547,6 +551,12 @@ export class PartyMachine {
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
     this.partyByPid.delete(pid);
+    // Paladin auras are tied to the party relationship. Keep the caster's own
+    // aura intact, but remove paladin auras from the remaining members.
+    for (const mPid of party.members) {
+      const member = this.ctx.resolve(mPid)?.e;
+      if (member) this.ctx.clearAurasFromSource(member, pid, isPersistentPaladinAura);
+    }
     // Drop the leaver from any in-flight ready check so the remaining members can
     // still early-finalize once everyone left has answered (their pending slot
     // would otherwise block it for the full timeout).
