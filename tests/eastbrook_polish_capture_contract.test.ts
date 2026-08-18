@@ -184,12 +184,13 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
-// Re-minted for the GPU-preparation scheduler batch and its second pass
-// (extractions, the upload lane, the present-host watch, the program signature
-// fields in prewarm_policy.ts): both fingerprinted inputs moved, so the
-// composite follows their bytes. No capture was retaken.
+// Re-minted for the GPU-preparation scheduler batch and its second and third
+// passes (extractions, the upload lane, the present-host watch, the program
+// signature fields and manifest ids in prewarm_policy.ts, the arrival and
+// coverage wiring): both fingerprinted inputs moved, so the composite follows
+// their bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '31f8df445c96c69fc7bbe63c70baf8193375bd0b90ffd9901971e9cd1683b8ec';
+  '0c2bb76e95be6b476d7bae0f3ccc8afe35b1aa4ad6ea7a7deebb23906676886b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
