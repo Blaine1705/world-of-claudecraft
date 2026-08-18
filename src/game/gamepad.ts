@@ -348,6 +348,16 @@ export class GamepadManager {
       // swallowed: falling through to the flat binding would cast the wrong
       // thing at the exact moment the player is reading the cross hotbar.
       if (this.triggerState.hold !== null && isCrossHotbarButton(buttonIndex)) return;
+      // No trigger held: the diamond buttons keep their SYSTEM verbs (jump,
+      // interact, target) but never their action-bar slot. A button that casts an
+      // ability bare AND a different one under a trigger is the "random cast"
+      // problem, and the whole set is already a trigger away. Checked at dispatch
+      // rather than only in the defaults so a remap cannot reintroduce it.
+      if (
+        isCrossHotbarButton(buttonIndex) &&
+        this.bindings.actionFor(buttonIndex).startsWith('slot')
+      )
+        return;
     }
     const action = this.bindings.actionFor(buttonIndex);
     if (action === GAMEPAD_NONE) return;

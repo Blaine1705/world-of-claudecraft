@@ -213,7 +213,6 @@ export const GAMEPAD_ZOOM_STEP = 1.4;
 export const DEFAULT_GAMEPAD_BINDINGS: Record<number, GamepadActionId> = {
   [GP.A]: 'jump',
   [GP.B]: 'interact',
-  [GP.X]: 'slot0', // Attack
   [GP.Y]: 'target',
   [GP.RB]: 'slot1',
   [GP.LB]: 'slot2',
@@ -221,10 +220,10 @@ export const DEFAULT_GAMEPAD_BINDINGS: Record<number, GamepadActionId> = {
   // a modifier that also fires an ability reads as a random cast every time the
   // player reaches for the bar. They stay free for a player who switches the cross
   // hotbar off and wants them back.
-  [GP.DPAD_UP]: 'slot5',
-  [GP.DPAD_RIGHT]: 'slot6',
-  [GP.DPAD_DOWN]: 'slot7',
-  [GP.DPAD_LEFT]: 'slot8',
+  // The d-pad and X carry no bare action: they are cross-hotbar cells, and the
+  // whole set is one trigger away. FFXIV reserves the same buttons for system
+  // verbs (jump, cancel, confirm, sub-command) rather than abilities. They stay
+  // free for the targeting/menu pass.
   [GP.BACK]: 'map',
   [GP.START]: 'escape',
   [GP.L3]: 'autorun',

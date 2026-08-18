@@ -759,7 +759,8 @@ describe('GamepadManager cross hotbar', () => {
       zoomBy: vi.fn(),
     } as unknown as Input;
     let pointerMode = false;
-    const manager = new GamepadManager(input, new GamepadBindings(), {
+    const bindings = new GamepadBindings();
+    const manager = new GamepadManager(input, bindings, {
       onAction,
       onInputEdge: vi.fn(),
       isPointerMode: () => pointerMode,
@@ -770,6 +771,7 @@ describe('GamepadManager cross hotbar', () => {
     manager.setCrossHotbar(enabled);
     return {
       manager,
+      bindings,
       onAction,
       onCrossHotbar,
       triggerGamepadJump,
@@ -845,10 +847,27 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onAction).toHaveBeenCalledWith('slot2');
   });
 
-  it('leaves a diamond button on its flat binding while no trigger is held', () => {
+  it('never casts an action-bar slot from a bare diamond press', () => {
     const h = setupCrossHotbar(true);
+    // A button that casts one ability bare and a DIFFERENT one under a trigger is
+    // the random-cast problem; the whole set is a trigger away, so bare presses of
+    // a cross-hotbar button never reach a slot.
     h.press(GP.DPAD_UP);
-    expect(h.onAction).toHaveBeenCalledWith('slot5');
+    expect(h.onAction).not.toHaveBeenCalled();
+  });
+
+  it('keeps the SYSTEM verbs on the diamond buttons when no trigger is held', () => {
+    const h = setupCrossHotbar(true);
+    // B is 'interact' by default, which is not a slot, so a bare press still works.
+    h.press(GP.B);
+    expect(h.onAction).toHaveBeenCalledWith('interact');
+  });
+
+  it('suppresses a slot a player REMAPPED onto a diamond button too', () => {
+    const h = setupCrossHotbar(true);
+    h.bindings.bind(GP.B, 'slot9');
+    h.press(GP.B);
+    expect(h.onAction).not.toHaveBeenCalledWith('slot9');
   });
 
   it('preserves the flat layout exactly when the cross hotbar is off', () => {
@@ -857,6 +876,9 @@ describe('GamepadManager cross hotbar', () => {
     // the cross hotbar OFF they simply do nothing until a player remaps them.
     h.press(GP.LT);
     expect(h.onAction).not.toHaveBeenCalled();
+    // With the cross hotbar OFF a diamond button DOES fire whatever it is bound to,
+    // slot or not: the suppression above exists only to protect the cross hotbar.
+    h.bindings.bind(GP.DPAD_UP, 'slot5');
     h.press(GP.LT, GP.DPAD_UP);
     expect(h.onAction).toHaveBeenCalledWith('slot5');
     h.press();
