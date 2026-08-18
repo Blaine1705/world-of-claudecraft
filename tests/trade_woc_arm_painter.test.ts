@@ -93,6 +93,32 @@ beforeEach(() => {
   document.body.innerHTML = '';
 });
 
+describe('trade_woc_arm_painter: no magic values', () => {
+  // The no-magic guard is DECENTRALIZED (src/styles/CLAUDE.md): each migrated
+  // painter scans its OWN source, and this file had none of its own after the
+  // rename pulled it into the *_painter.ts namespace. It is clean today, which
+  // is exactly when a guard is worth adding.
+  const PAINTER = stripComments(readFileSync('src/ui/trade_woc_arm_painter.ts', 'utf8'));
+
+  it('carries no raw hex, rgb() or hsl() colour literal', () => {
+    // The (?<!&) guard skips numeric HTML entities, whose digits are hex
+    // characters but are not colours.
+    const hex = PAINTER.match(/(?<!&)#[0-9a-fA-F]{3,8}\b/g) ?? [];
+    expect(hex, `colours belong in the stylesheet: ${hex.join(', ')}`).toEqual([]);
+    expect(PAINTER).not.toMatch(/\b(?:rgba?|hsla?)\(/);
+  });
+
+  it('sizes and spaces nothing from the painter: no px, rem, em or vh literal', () => {
+    const units = PAINTER.match(/\b\d+(?:\.\d+)?(?:px|rem|em|vh|vw)\b/g) ?? [];
+    expect(units, `sizing belongs in the stylesheet: ${units.join(', ')}`).toEqual([]);
+  });
+
+  it('positive control: the scan sees a literal it is given', () => {
+    expect(stripComments("const c = '#a335ee';")).toContain('#a335ee');
+    expect(stripComments("const w = '12px';")).toContain('12px');
+  });
+});
+
 describe('what the arm renders', () => {
   it('shows the price field, the equivalent, and both money lines', () => {
     const root = paint(deps());
@@ -102,6 +128,28 @@ describe('what the arm renders', () => {
     // from the server split, never from a percentage computed here.
     expect(root.querySelector('[data-woc-fee]')?.textContent).toContain('5.00');
     expect(root.querySelector('[data-woc-net]')?.textContent).toContain('45.00');
+  });
+
+  it('renders the ineligible count and its reason as two lines, never one joined string', () => {
+    // An item the table does not carry is ineligible by the predicate, which is
+    // the cheapest way to arm this line. The two sentences render into their own
+    // elements: joining them in code with a hard ' ' would be this caller
+    // deciding a locale's sentence spacing (CJK sets none) and its order.
+    const root = paint(deps({ theirStaged: [slot(EPIC.id), slot('not_in_the_table')] }));
+    const count = root.querySelector('[data-woc-ineligible]')?.textContent ?? '';
+    const why = root.querySelector('[data-woc-ineligible-why]')?.textContent ?? '';
+    expect(count).toContain('1');
+    expect(count).toContain(t('hudChrome.plurals.wocTradeIneligible.one').replace('{count}', '1'));
+    expect(why).toBe(t('hudChrome.trade.woc.ineligibleReason'));
+    // Neither line carries the other's sentence.
+    expect(count).not.toContain(t('hudChrome.trade.woc.ineligibleReason'));
+    expect(why).not.toContain('1');
+  });
+
+  it('clears both ineligible lines when everything staged is sellable', () => {
+    const root = paint(deps({ theirStaged: [slot(EPIC.id)] }));
+    expect(root.querySelector('[data-woc-ineligible]')?.textContent).toBe('');
+    expect(root.querySelector('[data-woc-ineligible-why]')?.textContent).toBe('');
   });
 
   it('renders the block reason instead of the form, and keeps the tabs', () => {

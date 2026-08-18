@@ -86,7 +86,11 @@ the throw (#2499, #2502).
   custom property per plate per frame, and the portrait ring receives those same literals
   through the painter rather than duplicating them in `hud.css`
   (`tests/deed_border_accent.test.ts` pins the single source); `arena_window` renders DOM
-  from the stylesheet, not canvas. Guarded by the per-painter no-magic source scans (e.g.
+  from the stylesheet, not canvas; `woc_log_tones.ts` is the sanctioned home of the three
+  chat-log tone literals (good, bad, note), because a chat line is written as an inline
+  `color:` on a span the log owns and cannot read a stylesheet rule, and naming them once
+  replaced the same three values repeated across the $WOC log call sites
+  (`tests/woc_log_tones.test.ts` pins the single source). Guarded by the per-painter no-magic source scans (e.g.
   `tests/auras_painter.test.ts`, `tests/minimap_painter.test.ts`,
   `tests/action_bar_painter.test.ts`) and `tests/focus_visible_guard.test.ts`; there is no
   single central no-magic guard, each migrated painter scans its own source.

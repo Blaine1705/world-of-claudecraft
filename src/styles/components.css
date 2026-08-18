@@ -16669,7 +16669,12 @@
     align-self: start;
     position: sticky;
     top: 0;
-    max-height: calc(min(84vh, 700px) - 132px);
+    /* The pane stops at the window's own cap minus the chrome above and below
+       it (title, tab strip, strip, foot). --app-vh, not raw vh: the file's
+       idiom, and the only one that follows the mobile browser's live viewport.
+       The mobile sheet drops the cap entirely (position: static there), so this
+       is the desktop pane's rule alone. */
+    max-height: calc(min(var(--app-vh) * 0.84, 700px) - 132px);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: var(--window-pad);
@@ -17044,6 +17049,16 @@
     font-size: 13px;
     line-height: 17px;
     color: var(--color-text-light);
+  }
+  /* The consent box the listing and bid actions gate on, floored at the 24px
+     absolute minimum on desktop too: it shipped at the 13px UA default, which
+     is under the floor for the control that stands in for acceptance. */
+  #woc-market-window label.wm-terms input[type="checkbox"],
+  #woc-market-window label.wm-offer-next input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    flex: 0 0 auto;
   }
   #woc-market-window .wm-sort select {
     min-width: 160px;

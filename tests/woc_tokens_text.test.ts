@@ -20,8 +20,10 @@ describe('formatting', () => {
     expect(WOC_TOKEN_FRACTION_DIGITS).toBe(2);
     expect(wocTokensText(7812.5)).toBe('7,812.5');
     expect(wocTokensText(1234.5678)).toBe('1,234.57');
-    expect(wocTokensText(0.004)).toBe('0');
     expect(wocTokensText(78)).toBe('78');
+    // 0.004 is NOT rounded away: see the small-amount case below, which is the
+    // one deliberate exception to the two-digit spelling.
+    expect(wocTokensText(0.05)).toBe('0.05');
   });
 
   it('follows the locale grouping and decimal marks', () => {
@@ -47,5 +49,23 @@ describe('every $WOC readout spells its tokens through this module', () => {
       const hits = src.match(/formatNumber\([^)]*tokens[^)]*maximumFractionDigits/gi) ?? [];
       expect(hits, `${rel} hand-formats a token figure: ${hits.join(' | ')}`).toEqual([]);
     }
+  });
+});
+
+describe('a small but real amount never prints as zero', () => {
+  it('keeps digits for a leg under the standard precision, and zero stays zero', () => {
+    // The quote legs (burn, treasury) are a fraction of the total. Once $WOC is
+    // worth enough, a leg falls under half a hundredth of a token and the
+    // two-digit spelling rounds it flat: the player would read a zero the
+    // server never sent.
+    expect(wocTokensText(0.004)).not.toBe('0');
+    expect(wocTokensText(0.004)).toContain('0.004');
+    expect(wocTokensText(0.000012)).toContain('0.000012');
+    expect(wocTokensText(-0.004)).toContain('0.004');
+    // A true zero is still a plain zero, and anything at or above the threshold
+    // keeps the one shared two-digit spelling.
+    expect(wocTokensText(0)).toBe('0');
+    expect(wocTokensText(0.005)).toBe('0.01');
+    expect(wocTokensText(1234.5678)).toBe('1,234.57');
   });
 });

@@ -451,7 +451,23 @@ async function enterWorldInBrowser(
     if (!filled) await sleep(400);
   }
   if (!filled) throw new Error('login form never stabilized');
-  await page.waitForSelector('#realm-list .realm-row', { timeout: 20000 });
+  // A REGISTER submit lands back on the site's own landing card (the account
+  // is authenticated, the nav even flips to Logout) rather than straight into
+  // the realm list, so the realm list simply never appears for the flow that
+  // waited on it. Press PLAY again and re-check, the same shape as the realm
+  // and enter-world retries below.
+  let onRealms = false;
+  for (let attempt = 0; attempt < 4 && !onRealms; attempt++) {
+    onRealms = await page
+      .waitForSelector('#realm-list .realm-row', { timeout: 8000 })
+      .then(() => true)
+      .catch(() => false);
+    if (onRealms) break;
+    console.log('realm list did not appear; pressing PLAY again');
+    await page.evaluate(() => document.querySelector('#btn-online')?.click());
+    await sleep(800);
+  }
+  if (!onRealms) throw new Error('realm list never appeared after the login submit');
   // The realm press occasionally lands before the row is wired (the realm list
   // paints from one fetch and wires from another), and the flow then waited out
   // its timeout at a panel that never opened: press until a panel answers.
@@ -498,10 +514,30 @@ async function enterWorldInBrowser(
       cls,
     );
   }
-  await page.waitForFunction(
-    () => !document.querySelector('#charselect-panel')?.hasAttribute('hidden'),
-    { timeout: 10000, polling: 200 },
-  );
+  // Dump the panel state rather than dying on a bare timeout: every stall in
+  // this flow so far (a taken name, a refused register, a lease held by the
+  // previous run) shows up as one of these fields, and a bare TimeoutError
+  // named none of them.
+  await page
+    .waitForFunction(() => !document.querySelector('#charselect-panel')?.hasAttribute('hidden'), {
+      timeout: 10000,
+      polling: 200,
+    })
+    .catch(async (err) => {
+      const state = await page.evaluate(() => ({
+        login: document.querySelector('#login-panel')?.hasAttribute('hidden'),
+        loginErr: document.querySelector('#login-error')?.textContent ?? '',
+        realmRows: document.querySelectorAll('#realm-list .realm-row').length,
+        charcreate: document.querySelector('#charcreate-panel')?.hasAttribute('hidden'),
+        charselect: document.querySelector('#charselect-panel')?.hasAttribute('hidden'),
+        createErr: document.querySelector('#charcreate-error')?.textContent ?? '',
+        selectErr: document.querySelector('#charselect-error')?.textContent ?? '',
+        rows: document.querySelectorAll('#char-list .char-row').length,
+      }));
+      console.error('character panel never opened:', JSON.stringify(state));
+      await page.screenshot({ path: `${OUT}/debug-charselect.png` });
+      throw err;
+    });
   // WAIT for the list, do not sleep at it: an account whose character was
   // seeded over the wire (the buyer's own listings) lands on a select panel
   // that populates from a REST read, and a fixed sleep clicked an empty list

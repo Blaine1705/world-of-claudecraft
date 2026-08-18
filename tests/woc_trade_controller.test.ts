@@ -8,15 +8,18 @@
 // (the unstage click mutates it in place), setStaged must replace it on the
 // open and close transitions, and the completion report fires exactly once.
 
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WocOfferView } from '../src/net/woc_market_sdk';
 import { ITEMS } from '../src/sim/data';
+import { bagQualityKey } from '../src/ui/bags_view';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   WocTradeController,
   type WocTradeControllerDeps,
 } from '../src/ui/hud/woc_trade/woc_trade_controller';
 import { formatDateTime, t } from '../src/ui/i18n';
+import { QUALITY_COLOR } from '../src/ui/icons';
 import type { WocPendingOffer } from '../src/ui/trade_woc_view';
 import { usdText } from '../src/ui/usd_text';
 import type { WocMarketHooks } from '../src/ui/woc_market_window';
@@ -374,6 +377,58 @@ describe('the open transition', () => {
     el?.firstElementChild?.setAttribute('data-probe', 'survives');
     r.controller.updateTradeWindow();
     expect(el?.querySelector('[data-probe]')).not.toBeNull();
+  });
+});
+
+describe('an unusable offer expiry falls back to the untimed line', () => {
+  it('treats NaN as no expiry, because NaN passes a typeof number test', () => {
+    // The server projects this column through a Date parse: a missing or
+    // unparseable value comes across as NaN, and NaN IS a number. The guard
+    // that asked typeof therefore rendered "Invalid Date" into a money line.
+    expect(Number.isFinite(Number.NaN)).toBe(false);
+    expect(typeof Number.NaN).toBe('number');
+    const timed = t('hudChrome.trade.woc.offerSentUntil', { name: 'Aldan', time: '9:28 PM' });
+    const untimed = t('hudChrome.trade.woc.offerSent', { name: 'Aldan' });
+    expect(timed).not.toBe(untimed);
+    // Both expiry reads take the finite test. Comments are stripped first, or
+    // the prose above each read would satisfy the scan on its own.
+    const src = readFileSync('src/ui/hud/woc_trade/woc_trade_controller.ts', 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(src).toContain('Number.isFinite(res.offer.expiresAtMs)');
+    expect(src).toContain('Number.isFinite(row.expiresAtMs)');
+    expect(src, 'the typeof form passes NaN').not.toContain(
+      "typeof res.offer.expiresAtMs === 'number'",
+    );
+    expect(src, 'a truthy check passes NaN').not.toContain(
+      "row.role === 'buyer' && row.expiresAtMs",
+    );
+  });
+});
+
+describe('a staged item renders its name in the quality colour', () => {
+  it('carries an inline colour off QUALITY_COLOR, not the icon-frame class', () => {
+    // The regression this pins: the row once wrote the .q-<rung> FRAME class
+    // onto a bare text span. That family carries border-color plus an epic and
+    // legendary glow and no text colour at all, so an epic name rendered in the
+    // inherited grey behind a stray halo, and a rare name showed nothing. Every
+    // sibling row family (bags, bank, the Exchange's own rows) writes an inline
+    // colour off the same map, which is what is asserted here.
+    const epic = Object.entries(ITEMS).find(([, def]) => bagQualityKey(def) === 'epic');
+    expect(epic, 'the content table still carries an epic item to render').toBeDefined();
+    const [epicId] = epic ?? ['', null];
+    const r = rig();
+    openTrade(r, [{ itemId: epicId, count: 1 }]);
+    r.controller.updateTradeWindow();
+    const row = document.querySelector<HTMLElement>('#trade-window .trade-item');
+    expect(row, 'the staged row renders').not.toBeNull();
+    const span = row?.querySelector<HTMLElement>('span[style*="color"]') ?? null;
+    expect(span, 'the name span carries an inline colour').not.toBeNull();
+    expect(span?.style.color.replace(/\s/g, '')).toBe(QUALITY_COLOR.epic);
+    expect(span?.textContent).toBe(itemDisplayName(ITEMS[epicId]));
+    // And the frame class is NOT what carries it: a rung class on the text span
+    // would paint the halo again.
+    expect(row?.innerHTML).not.toContain('class="q-');
   });
 });
 

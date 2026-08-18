@@ -3088,14 +3088,28 @@
      Same shape as #crafting-window below. */
   body.mobile-touch #woc-market-window {
     height: auto;
-    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
     /* A money sheet under a landscape notch: the close button and the pager
-       sit inside the corner bands unless the pins clear the safe-area insets
-       (the #bags rule's shape). A re-pinned left re-declares transform. */
-    left: max(10px, env(safe-area-inset-left));
-    right: max(10px, env(safe-area-inset-right));
-    top: max(10px, env(safe-area-inset-top));
+       sit inside the corner bands unless the pins clear the safe-area insets.
+       A re-pinned left re-declares transform. Every inset is divided by the UI
+       scale, because these pins are authored
+       INSIDE #ui's zoom: a raw 44px notch renders at 37px on the 0.85 floor and
+       leaves the corner controls inside the band the pin exists to clear (the
+       #social-window shape, which documents the same reasoning). The BOTTOM
+       edge is pinned too, and the height cap subtracts both insets rather than
+       a flat 20px: with a top inset above 10px the sheet's bottom edge fell
+       BELOW the viewport, and a fixed sheet cannot be scrolled back, so a
+       sticky commit row pinned to that edge went out of reach entirely. */
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
+    max-height: calc(
+      var(--app-vh) /
+      var(--ui-scale, 1) -
+      (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))
+    );
     transform: none;
   }
   /* 16px and no-wrap follow .opt-tab: at 13px in a verbose locale the three
@@ -3579,12 +3593,26 @@
        Accept row never sit in a corner band; the raw-vw clamp is dropped
        because it under-fills the pinned sheet below uiScale 1 (the #bags
        comment). A re-pinned left re-declares transform. */
-    left: max(10px, env(safe-area-inset-left));
-    right: max(10px, env(safe-area-inset-right));
-    top: max(10px, env(safe-area-inset-top));
+    /* Every inset is divided by the UI scale, because these pins are authored
+       INSIDE #ui's zoom: a raw 44px notch renders at 37px on the 0.85 floor and
+       leaves the corner controls inside the band the pin exists to clear (the
+       #social-window shape, which documents the same reasoning). The BOTTOM
+       edge is pinned too, and the height cap subtracts both insets rather than
+       a flat 20px: with a top inset above 10px the sheet's bottom edge fell
+       BELOW the viewport, and a fixed sheet cannot be scrolled back, so a
+       sticky commit row pinned to that edge went out of reach entirely. */
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
     max-width: none;
     transform: none;
-    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    max-height: calc(
+      var(--app-vh) /
+      var(--ui-scale, 1) -
+      (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))
+    );
     overflow-y: auto;
   }
   /* In-game mobile is landscape only, so the two offer columns stay side by
@@ -3653,8 +3681,11 @@
   body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
     #bags {
     position: fixed;
-    top: max(10px, env(safe-area-inset-top));
-    bottom: max(10px, env(safe-area-inset-bottom));
+    /* Divided by the UI scale like the un-split pins above: authored inside
+       #ui's zoom, a raw inset shrinks with the scale and stops clearing the
+       band it names. */
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
     width: auto;
     max-width: none;
     max-height: none;
@@ -3665,7 +3696,7 @@
   }
   body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
     #trade-window {
-    left: max(10px, env(safe-area-inset-left));
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
     right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
     overflow-y: auto;
     border-top-right-radius: 0;
@@ -3679,7 +3710,7 @@
   body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
     #bags {
     left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
-    right: max(10px, env(safe-area-inset-right));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
     overflow: hidden;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;

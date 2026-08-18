@@ -400,6 +400,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     <p class="trade-woc-equiv" data-woc-equiv></p>
     ${feeLines}
     <p class="trade-woc-note" data-woc-ineligible></p>
+    <p class="trade-woc-note" data-woc-ineligible-why></p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.variableWarning'))}</p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
     ${termsRow}
@@ -467,14 +468,21 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
           }),
   );
   // The count through the plurals base (a Slavic locale has three forms for
-  // it), then WHY: the exchange lock predicate's arms in one sentence.
+  // it), then WHY: the exchange lock predicate's arms. TWO rendered lines, not
+  // one string joined in code: a hard ' ' between two sentences is the caller
+  // deciding a locale's spacing (wrong in CJK, which sets no inter-sentence
+  // space), and it is the same reason the fee and the net each own their line.
   setText(
     '[data-woc-ineligible]',
     model.ineligible.length === 0
       ? ''
-      : `${tPlural('hudChrome.plurals.wocTradeIneligible', model.ineligible.length, {
+      : tPlural('hudChrome.plurals.wocTradeIneligible', model.ineligible.length, {
           count: formatNumber(model.ineligible.length, { maximumFractionDigits: 0 }),
-        })} ${t('hudChrome.trade.woc.ineligibleReason')}`,
+        }),
+  );
+  setText(
+    '[data-woc-ineligible-why]',
+    model.ineligible.length === 0 ? '' : t('hudChrome.trade.woc.ineligibleReason'),
   );
   // A disabled affordance always says why: the hint rides beside it and
   // clears the moment the action becomes available. The model picks the

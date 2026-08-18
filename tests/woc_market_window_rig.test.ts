@@ -170,6 +170,10 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
       usdCents: 100,
       amount: { base: '0', tokens: 78.1 },
       asOfMs: NOW,
+      // The seller's resolved fee rides the same estimate call. Present here so
+      // a case can drive the sell form's fee line; an older service sends none,
+      // which the window renders as no figure at all.
+      split: { sellerCents: 90, burnCents: 3, treasuryCents: 7 },
     }),
     history: async () => ({ ok: true, sales: [] }),
     me: async () => ({ ok: true, activity: EMPTY_ACTIVITY }),
@@ -384,7 +388,10 @@ describe('WocMarketWindow live rig: tabs, rebuild, focus and scroll', () => {
     const r = rig();
     r.fake.answers.me = async () => ({
       ...({ ok: true } as const),
-      activity: { ...EMPTY_ACTIVITY, listings: [listing(5, { mine: true, currentBidCents: null })] },
+      activity: {
+        ...EMPTY_ACTIVITY,
+        listings: [listing(5, { mine: true, currentBidCents: null })],
+      },
     });
     r.fake.answers.cancelListing = async () => ({ ok: false, code: 'woc_market.not_yours' });
     r.win.open();
@@ -564,6 +571,65 @@ describe('WocMarketWindow live rig: the sell combobox', () => {
     q<HTMLButtonElement>(r.root, 'button[data-action="sell-clear"]').click();
     expect(r.root.querySelector('.wm-combo-input')).not.toBeNull();
     expect(r.root.querySelector('.wm-sell-form')).toBeNull();
+  });
+});
+
+describe('WocMarketWindow live rig: the seller fee figure', () => {
+  it('re-derives the fee when the format changes, instead of leaving the old one up', async () => {
+    // The fee is resolved by the SERVER for the price typed, and the format
+    // select rebuilds the form under it (an auction keeps an optional buy-now
+    // beside its reserve; a pure buy-now forbids the reserve). The contract
+    // pinned here: after a format change the figure on screen was asked for
+    // again, never carried over from the previous form. Leaving it up is how a
+    // stale money figure would sit in the one spot the copy promises the fee
+    // for the price entered.
+    const r = rig();
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    const input = q<HTMLInputElement>(r.root, '.wm-combo-input');
+    input.focus();
+    input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    q(r.root, '.wm-combo-item').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    const format = q<HTMLSelectElement>(r.root, '[data-field="sell-format"]');
+    format.value = 'buy_now';
+    format.dispatchEvent(new Event('change', { bubbles: true }));
+    const price = q<HTMLInputElement>(r.root, '[data-field="sell-buy-now"]');
+    price.value = '100';
+    price.dispatchEvent(new Event('input', { bubbles: true }));
+    await flush();
+    expect(r.root.querySelectorAll('.wm-sell-fee').length).toBe(2);
+    const before = r.fake.calls.filter((c) => c.startsWith('estimate:')).length;
+    // Swap the format. The typed price rides the form draft, so the fee is
+    // still true, but it must be RE-ASKED rather than left standing.
+    const swap = q<HTMLSelectElement>(r.root, '[data-field="sell-format"]');
+    swap.value = 'auction';
+    swap.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    expect(q<HTMLInputElement>(r.root, '[data-field="sell-buy-now"]').value).toBe('100');
+    expect(r.fake.calls.filter((c) => c.startsWith('estimate:')).length).toBeGreaterThan(before);
+    expect(r.root.querySelectorAll('.wm-sell-fee').length).toBe(2);
+  });
+
+  it('takes the fee line away when the price the form carried is emptied', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    const input = q<HTMLInputElement>(r.root, '.wm-combo-input');
+    input.focus();
+    input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    q(r.root, '.wm-combo-item').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    const price = q<HTMLInputElement>(r.root, '[data-field="sell-start"]');
+    price.value = '25';
+    price.dispatchEvent(new Event('input', { bubbles: true }));
+    await flush();
+    expect(r.root.querySelectorAll('.wm-sell-fee').length).toBe(2);
+    const cleared = q<HTMLInputElement>(r.root, '[data-field="sell-start"]');
+    cleared.value = '';
+    cleared.dispatchEvent(new Event('input', { bubbles: true }));
+    await flush();
+    expect(r.root.querySelectorAll('.wm-sell-fee').length).toBe(0);
   });
 });
 

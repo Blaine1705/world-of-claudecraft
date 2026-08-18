@@ -7652,7 +7652,6 @@
     border: 0;
     border-bottom: 2px solid transparent;
     border-radius: 0;
-    outline: 0;
     box-shadow: none;
     text-shadow: none;
     color: var(--color-text-muted);
@@ -7750,9 +7749,14 @@
     font-size: 12px;
     color: var(--color-text-light);
   }
+  /* 24px is the absolute minimum target in src/ui/CLAUDE.md, and a consent box
+     is the one control the server will not take money without: 18px cleared the
+     13px UA default but stopped short of the floor. The mobile sheet already
+     floors both consent boxes at 24 (hud.mobile.css); this is the desktop half
+     of the same rule. */
   .trade-woc-terms input {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     margin: 0;
   }
   .trade-woc-terms-link {

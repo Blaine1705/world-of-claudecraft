@@ -37,6 +37,19 @@ interface MonolithRow {
 // Ceilings set 2026-08-10 at roughly current size + 200 lines of headroom.
 const MONOLITHS: MonolithRow[] = [
   {
+    // The Exchange window, ratcheted at its exact size with ZERO headroom the
+    // moment it became the largest unpinned UI module (2201 -> 2623 lines
+    // across the polish pass: markup, copy and six small private helpers, none
+    // of it added to a coordinator). It is its own module, so the prime
+    // directive was never broken, but nothing stopped it growing either. The
+    // next line added here fails, and the fix is a sibling module behind the
+    // window's own seam (a pure view-core plus this thin consumer, the
+    // unit_portrait recipe), never a raise.
+    file: 'src/ui/woc_market_window.ts',
+    ceiling: 2623,
+    seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
+  },
+  {
     // Deliberately ZERO headroom (the woc marketplace baseline ratchet): the
     // next line added here fails, and the fix is extraction behind the seam,
     // never a raise. A raise stays a maintainer decision, per the header.

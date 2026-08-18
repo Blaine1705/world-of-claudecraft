@@ -1259,11 +1259,17 @@ export class WocMarketWindow {
     const feeLines =
       fee === null
         ? ''
-        : `<p class="wm-note wm-sell-fee">${esc(
+        : // Each sentence renders as its own line rather than being joined here
+          // with a hard ' ': the space between two sentences is a locale's call
+          // (CJK sets none), and the arm renders the same pair the same way.
+          `<p class="wm-note wm-sell-fee">${esc(
             t('hudChrome.trade.woc.feeLine', {
               fee: this.usd(fee.burnCents + fee.treasuryCents),
             }),
-          )} ${esc(t('hudChrome.trade.woc.netLine', { net: this.usd(fee.sellerCents) }))}</p>`;
+          )}</p>` +
+          `<p class="wm-note wm-sell-fee">${esc(
+            t('hudChrome.trade.woc.netLine', { net: this.usd(fee.sellerCents) }),
+          )}</p>`;
     const form = selected
       ? `<div class="wm-sell-form">` +
         `<label>${esc(t('hudChrome.wocMarket.sellFormat'))}` +
@@ -2000,7 +2006,17 @@ export class WocMarketWindow {
       // longer creatable (existing ones still render and settle).
       if (value === 'auction' || value === 'buy_now') {
         this.sellFormat = value;
+        // The format swaps WHICH price field exists (a buy-now price on an
+        // auction is refused, and the reverse), so a fee resolved for the old
+        // field describes a price that is no longer on screen. Drop it, and any
+        // in-flight want, before the re-render: leaving it up put a stale
+        // "$10.00 fee, you receive $90.00" under a form whose price had just
+        // become $5, in the exact spot the copy promises the fee for the price
+        // entered. Re-deriving after the render re-asks when a price survived.
+        this.sellFeeSplit = null;
+        this.sellFeeWanted = null;
         this.render();
+        this.onSellPriceInput();
       }
       return;
     }

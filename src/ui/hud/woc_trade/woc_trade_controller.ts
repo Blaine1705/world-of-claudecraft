@@ -25,7 +25,9 @@ import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
 import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
+import { QUALITY_COLOR } from '../../icons';
 import { knownItemDef } from '../../known_item';
+
 import { termsUrlFor } from '../../terms_link';
 import { buildTradeItemRow, tradeRowTooltipTarget } from '../../trade_view';
 import {
@@ -63,6 +65,9 @@ import {
   wocOfferPollStep,
 } from './woc_trade_offer_view';
 
+// The unranked fallback, the same token spelling the bag, bank and character
+// windows use for a quality the wire did not rank.
+const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 
 /** How often the trade window re-reads the standing $WOC offer. Slow on
@@ -559,7 +564,8 @@ export class WocTradeController {
       // seller needs no line (their next move, accept or decline, reopens a
       // trade anyway, and the offer lapses on its own); every other live
       // state carries money or an escrowed copy and says so.
-      if (row.status === 'pending' && row.role === 'buyer' && row.expiresAtMs) {
+      // Same finite test as the send path above: a truthy check passes NaN.
+      if (row.status === 'pending' && row.role === 'buyer' && Number.isFinite(row.expiresAtMs)) {
         this.log(
           t('hudChrome.trade.woc.offerStandsUntil', {
             time: formatDateTime(row.expiresAtMs, { timeStyle: 'short' }),
@@ -1129,10 +1135,13 @@ export class WocTradeController {
       // The window STAYS OPEN. The offer now sits in it for both players to
       // read, and the seller accepts from there; closing it here left both
       // sides staring at nothing, with no way to agree.
-      // The real expiry when the wire carries one; the untimed twin otherwise
-      // (an older server), never a hard-coded figure.
+      // The real expiry when the wire carries a usable one; the untimed twin
+      // otherwise, never a hard-coded figure. Number.isFinite, not a typeof
+      // test: the server projects this column through a Date parse that yields
+      // NaN for a missing or unparseable value, and NaN IS a number, so the
+      // typeof form let a "Invalid Date" through to a money line.
       this.log(
-        typeof res.offer.expiresAtMs === 'number'
+        Number.isFinite(res.offer.expiresAtMs)
           ? t('hudChrome.trade.woc.offerSentUntil', {
               name: otherName,
               time: formatDateTime(res.offer.expiresAtMs, { timeStyle: 'short' }),
@@ -1359,9 +1368,16 @@ export class WocTradeController {
         // missing def (the shipped failure shape threw here and froze the offer
         // display behind the already-set repaint signature).
         const { item, label } = buildTradeItemRow(s, ITEMS);
-        // The name in its quality colour (the bag, bank and mail rows' family),
-        // so the staged epic reads as one at a glance.
-        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span class="q-${item ? bagQualityKey(item) : 'common'}">${esc(label)}</span>`;
+        // The name in its quality colour, the way every sibling row family
+        // writes it: an inline colour off QUALITY_COLOR (bags_window,
+        // bank_window, the Exchange's own rows). NOT the .q-<rung> class, which
+        // is the icon FRAME family: it carries border-color plus an epic and
+        // legendary glow and never a text colour, so on a bare span it painted
+        // a stray halo and left the name the inherited grey.
+        const qColor = item
+          ? (QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR)
+          : QUALITY_DEFAULT_COLOR;
+        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
         return mine
           ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
           : `<div class="trade-item">${inner}</div>`;
