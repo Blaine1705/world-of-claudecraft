@@ -48,7 +48,26 @@ actually reads.
   guard against a competing second run). Captures: the fresh set under
   `docs/screenshots/woc-market/` (desktop + landscape phone, lowest preset,
   stress and zero states, and a ru_RU pass for the wordiest fills); every
-  TOTP-bearing capture is gone. Deferrals with owners are in the 15 section of
+  TOTP-bearing capture is gone. Then TWO independent
+  `frontend-seam-reviewer` passes with MOBILE in scope plus an i18n fill audit,
+  every finding applied or judged with the file open (commits c3704ee08c,
+  13f174395a, cd225ebe10, 6f823fe274), and a FRESH review of that fix round.
+  What the review round added: the staged item's name took the icon FRAME class
+  instead of a text colour (an epic read grey behind a stray halo); two
+  sentences were joined in code with a hard space, deciding a locale's spacing
+  and order; a fee resolved for one price field survived the format swap that
+  rebuilt the form under it; a token amount under half a hundredth printed a
+  flat zero; both offer-expiry reads used tests that do not reject NaN, which is
+  exactly what the server's date projection yields; and the money sheets' height
+  cap could push their bottom edge (with the sticky commit row pinned to it)
+  BELOW the viewport once a top inset exceeded 10px. The session's own captures
+  also found the mirror of the sticky-row defect at the TOP edge: the window
+  header is sticky and a focus-scrolled control came to rest under it, invisible
+  to a centre-point hit test, so the rig now measures the header's live bottom
+  edge after every scroll (116 assertions). One DEFERRAL was created rather than
+  shipped: `--panel-border` stays undeclared, because its only consumers are 13
+  Dungeon Finder borders and declaring it repaints a window this pass never
+  captured. Deferrals with owners are in the 15 section of
   progress.md; the audit checklist is the row-by-row record. 14 QA COMPLETE (2026-08-17,
   PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open,
   PUSHED per R4; release sync merge 8c0370585c of origin/release/v0.39.0 tip

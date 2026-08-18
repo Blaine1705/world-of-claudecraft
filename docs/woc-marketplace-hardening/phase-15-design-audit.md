@@ -350,9 +350,12 @@ exist plus `color-mix()` over them (the `hud.css` precedent).
       to exactly that edge, went out of reach. The raw insets also shrank with
       the zoom, clearing only 37px of a 44px notch at the 0.85 scale floor.
 - [x] APPLIED. The sticky row's scroll reserve is derived from the tokens the
-      row is built from (a 40px button floor between two `--spacing-sm` bands
-      plus a `--spacing-xs` gap) rather than a 72px literal that silently stops
-      covering the row when either moves.
+      row is built from rather than a bare literal. The first derivation was
+      WRONG and the rig caught it inside one run: scroll-padding resolves against
+      the SCROLLPORT's bottom edge, and the window's own bottom padding sits
+      below the sticky row inside that scrollport, so the band is 12px taller
+      than the row. The rig now MEASURES the band and asserts the computed
+      reserve covers it, which is a stronger guard than either number.
 - [x] APPLIED. Both consent checkboxes reach the 24px floor on DESKTOP too: the
       trade arm's was 18px and the Exchange's was still the 13px UA default, on
       the one control the server will not take money without.

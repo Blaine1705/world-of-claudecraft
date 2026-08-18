@@ -202,6 +202,16 @@ async function measure(label) {
           r.left >= 0 &&
           r.right <= window.innerWidth,
         tappable: hit === el || el.contains(hit) || (hit !== null && hit.contains(el)),
+        // Name what is actually on top: "not tappable" without the blocker's
+        // identity cost a rerun every time this fired.
+        hitBy:
+          hit === null
+            ? 'nothing'
+            : `${hit.tagName.toLowerCase()}${hit.id ? `#${hit.id}` : ''}${
+                typeof hit.className === 'string' && hit.className
+                  ? `.${hit.className.split(' ').join('.')}`
+                  : ''
+              }`,
         display: cs.display,
         fontSize: cs.fontSize,
       };
@@ -258,7 +268,7 @@ async function measure(label) {
     if (r)
       check(
         r.tappable,
-        `${label}: "${c.text || c.tag}" is the top-most element at its center (tappable)`,
+        `${label}: "${c.text || c.tag}" is the top-most element at its center (tappable, hit ${r.hitBy})`,
       );
   }
   return m;
@@ -297,9 +307,32 @@ async function measureWindowChrome(label) {
         w: Math.round(r.width),
       });
     }
-    return rows;
+    // The sticky commit row's BAND, measured from the scrollport's bottom edge
+    // (where scroll-padding resolves) rather than derived on paper: the row's
+    // own height is not the whole story, because the window's bottom padding
+    // sits below it INSIDE the scrollport. A reserve smaller than this band
+    // parks a scrolled control under the row, which is untappable, and that is
+    // exactly how a paper derivation of the reserve went 12px short.
+    const actions = win?.querySelector('.trade-actions');
+    const winRect = win?.getBoundingClientRect() ?? null;
+    const rowRect = actions?.getBoundingClientRect() ?? null;
+    const reserve = win
+      ? Number.parseFloat(getComputedStyle(win).scrollPaddingBottom.replace('px', ''))
+      : Number.NaN;
+    return {
+      rows,
+      band: winRect && rowRect ? Math.round(winRect.bottom - rowRect.top) : null,
+      reserve: Number.isFinite(reserve) ? Math.round(reserve) : null,
+    };
   });
-  for (const c of m) {
+  // The reserve must cover the band, or the CSS is quietly lying about it.
+  if (m.band !== null && m.reserve !== null) {
+    check(
+      m.reserve >= m.band,
+      `${label}: sticky-row scroll reserve ${m.reserve} >= its measured band ${m.band}`,
+    );
+  }
+  for (const c of m.rows) {
     check(c.h >= 40, `${label}: window chrome "${c.text || c.what}" height ${c.h} >= 40`);
   }
 }
