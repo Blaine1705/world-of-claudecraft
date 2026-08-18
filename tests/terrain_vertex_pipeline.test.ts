@@ -46,8 +46,15 @@ describe('terrain vertex pipeline', () => {
     // diagonal split follows vertex heights, so the natural-relief terrain
     // re-minted it). It ignores only triangle submission order, retaining
     // each triangle's winding exactly.
+    // Re-minted 2026-08 for the harbor move (d19aa33f76, the New Eastbrook
+    // program, docs/design/eastbrook-revamp/site-plan.md): the probe chunk
+    // spans the vacated old town ground and the rotated Wolf Run camps,
+    // whose re-grades flip diagonal splits. Re-minted once more when the
+    // street re-threads and camp spacing fixes rode the same change (roads
+    // are height appliers). Computed twice in separate processes on the
+    // live tree, identical both times.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      'f3d917b6699065b024e7ece57b8c2fddb03c3c4a63ebfaf67baf947cebca6198',
+      '2dc5a1066281463530255cb18b8594fb7592e2604ad34caca24406866fa0176d',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

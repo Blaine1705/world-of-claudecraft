@@ -103,6 +103,9 @@ describe('active-world noticeboard service', () => {
     const withBoard = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
     const board = noticeboard(withBoard);
 
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the board moved to the civic
+    // square at (5, -89), facing the well (facingToward the civic center).
     expect(board).toMatchObject({
       id: EASTBROOK_LAYOUT.services.noticeboard.entityId,
       kind: 'object',
@@ -110,10 +113,10 @@ describe('active-world noticeboard service', () => {
       name: 'Notice Board',
       objectItemId: null,
       lootable: true,
-      facing: -0.7853981633974483,
-      prevFacing: -0.7853981633974483,
+      facing: -2.17084654019665,
+      prevFacing: -2.17084654019665,
     });
-    expect({ x: board.pos.x, z: board.pos.z }).toEqual({ x: 10, z: -8 });
+    expect({ x: board.pos.x, z: board.pos.z }).toEqual({ x: 5, z: -89 });
     expect(withBoard.nextId).toBe(withoutBoard.nextId);
 
     const stableProjection = (sim: Sim) =>
@@ -192,9 +195,9 @@ describe('active-world noticeboard service', () => {
           Math.hypot(right.pos.x - board.pos.x, right.pos.z - board.pos.z),
       )[0];
     if (!nearestService) throw new Error('missing service NPC near noticeboard');
-    expect(nearestService.templateId).toBe('tinker_gizzel');
+    expect(nearestService.templateId).toBe('chronicler_saul');
     expect(Math.hypot(nearestService.pos.x - board.pos.x, nearestService.pos.z - board.pos.z)).toBe(
-      6.553027797228726,
+      5.412023651093922,
     );
 
     const talkToNpc = vi.spyOn(sim, 'talkToNpc');

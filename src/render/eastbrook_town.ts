@@ -14,6 +14,7 @@ import {
   setEastbrookCivicMask,
   updateEastbrookCivicBeaconMotion,
 } from './eastbrook_civic_beacon';
+import { buildEastbrookHarbor } from './eastbrook_harbor';
 import {
   applyEastbrookTownSurfaceDetail,
   EASTBROOK_SURFACE_ATLAS_URL,
@@ -1009,12 +1010,18 @@ export function buildEastbrookTownView(seed: number): EastbrookTownView {
     return buildFromTemplates(preparedTemplates, () => 0, false, undefined);
   }
   prepareTemplates(loadedSources, preparedTemplates, true);
-  return buildFromTemplates(
+  const view = buildFromTemplates(
     preparedTemplates,
     (x, z) => terrainHeight(x, z, seed),
     true,
     eastbrookSurfaceAtlasTexture(),
   );
+  // The harbor waterfront rides the town view's group: quay boardwalk and
+  // piers from the same deck rectangles groundHeight walks
+  // (render/eastbrook_harbor.ts), so the parent's category tag and matrix
+  // freeze cover it.
+  view.group.add(buildEastbrookHarbor(seed));
+  return view;
 }
 
 function sameNumber(left: number, right: number): boolean {

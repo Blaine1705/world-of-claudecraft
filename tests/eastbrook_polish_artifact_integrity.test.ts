@@ -23,6 +23,7 @@ const {
   EASTBROOK_TOWN_CAPTURE_CONTRACTS,
   EASTBROOK_TOWN_CAPTURE_PROFILES,
   EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
+  EASTBROOK_TOWN_CAPTURE_VIEWS,
   EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
   EASTBROOK_TOWN_PERF_SCENARIOS,
 } = captureContract;
@@ -611,6 +612,125 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(readFileSync(filePath, 'utf8')) as T;
 }
 
+// FROZEN capture framing: the camera/target pairs the accepted polish captures
+// were actually taken with. The Eastbrook harbor move (layout v3, commit
+// d19aa33f76, docs/design/eastbrook-revamp/site-plan.md, re-pinned 2026-08-18)
+// re-aimed the live polish views and matched-view overrides at the new lots
+// WITHOUT retaking a capture, so the committed metadata records must keep validating
+// against the framing they were shot with, not the live one. These literals
+// move only if the captures themselves are retaken; the divergence from the
+// live views is declared as its own literal test below, mirroring how the
+// frozen townTriangles staleness is declared.
+const ACCEPTED_POLISH_V2_VIEW_OVERRIDES: Readonly<Record<string, { camera: Vec3; target: Vec3 }>> =
+  {
+    'bank-and-chest': {
+      camera: { x: 5, y: 7, z: 2 },
+      target: { x: 14.156943251329539, y: 3.2, z: 8.685223202016726 },
+    },
+    'smithy-and-forge': {
+      camera: { x: 10, y: 7, z: 8 },
+      target: { x: 3.687633548766497, y: 3, z: 15.598153967032626 },
+    },
+    'inn-and-kitchens': {
+      camera: { x: 0, y: 8, z: 8 },
+      target: { x: -10.018829436136041, y: 3, z: 13.621842145917809 },
+    },
+    'chapel-and-weaving': {
+      camera: { x: 0, y: 12, z: 4 },
+      target: { x: -13.2, y: 3, z: -10.5 },
+    },
+    'toolworks-service-perimeter': {
+      camera: { x: 4, y: 7, z: -9 },
+      target: { x: 5, y: 5, z: -14.25 },
+    },
+    'stall-world-market': {
+      camera: { x: -6, y: 6, z: 0 },
+      target: { x: -5.75, y: 2.5, z: 7 },
+    },
+  };
+const ACCEPTED_POLISH_V2_POLISH_VIEWS: ReadonlyArray<{
+  name: string;
+  camera: Vec3;
+  target: Vec3;
+}> = [
+  {
+    name: 'stall-world-market',
+    camera: { x: -2.54, y: 6, z: 5.47 },
+    target: { x: -4.55381837226296, y: 2.5, z: 8.20975183498178 },
+  },
+  {
+    name: 'stall-provisions',
+    camera: { x: -3, y: 6, z: 0 },
+    target: { x: -7.421769629642221, y: 2.5, z: 0.7630378263298812 },
+  },
+  {
+    name: 'apothecary-lin',
+    camera: { x: 1.8, y: 6, z: 6 },
+    target: { x: 2.8431593444121797, y: 2.5, z: 9.717148252611294 },
+  },
+  {
+    name: 'ravenpost-mailbox',
+    camera: { x: 0, y: 5, z: -2 },
+    target: { x: 0, y: 2, z: -6.2 },
+  },
+  {
+    name: 'noticeboard',
+    camera: { x: 5, y: 6, z: -4 },
+    target: { x: 9.010050506338834, y: 2.2, z: -7.010050506338834 },
+  },
+  {
+    name: 'civic-motion',
+    camera: { x: -10, y: 6, z: -7 },
+    target: { x: -0.75, y: 2.8, z: 0 },
+  },
+  {
+    name: 'ravenpost-chronicler',
+    camera: { x: -10, y: 6.5, z: -11 },
+    target: { x: 0, y: 2.5, z: -14.5 },
+  },
+  {
+    name: 'west-wall-quartermaster',
+    camera: { x: -16, y: 6, z: -3 },
+    target: { x: -22.5, y: 2.5, z: -7.5 },
+  },
+];
+// Composed exactly the way the live matched list is composed from its parts:
+// the immutable rebuild-v1 base views with the frozen overrides applied, then
+// the frozen polish views with the same overrides applied.
+const ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS: readonly CaptureViewContract[] = [
+  ...(EASTBROOK_TOWN_CAPTURE_VIEWS as readonly CaptureViewContract[]).map((view) => ({
+    name: view.name,
+    ...(ACCEPTED_POLISH_V2_VIEW_OVERRIDES[view.name] ?? {
+      camera: view.camera,
+      target: view.target,
+    }),
+  })),
+  ...ACCEPTED_POLISH_V2_POLISH_VIEWS.map((view) => ({
+    name: view.name,
+    ...(ACCEPTED_POLISH_V2_VIEW_OVERRIDES[view.name] ?? {
+      camera: view.camera,
+      target: view.target,
+    }),
+  })),
+];
+// The 13 views the harbor move re-aimed; every other matched view still shares
+// its live framing with the frozen records.
+const HARBOR_MOVED_VIEW_NAMES: ReadonlySet<string> = new Set([
+  'bank-and-chest',
+  'smithy-and-forge',
+  'inn-and-kitchens',
+  'chapel-and-weaving',
+  'toolworks-service-perimeter',
+  'stall-world-market',
+  'stall-provisions',
+  'apothecary-lin',
+  'ravenpost-mailbox',
+  'noticeboard',
+  'civic-motion',
+  'ravenpost-chronicler',
+  'west-wall-quartermaster',
+]);
+
 // FROZEN, and no longer equal to the live town fingerprint: this is the identity of
 // the tree the v2 polish captures were taken against, not a mirror of the current
 // one. It first diverged when a lockfile-only dependency bump re-minted the town
@@ -769,10 +889,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Sowfield demolition: the Vale Cup removal moves
 // renderer.ts, the first-order composite follows it, and this seal follows
 // the swept evidence bytes. No capture was retaken.
+// Re-minted 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+// d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the move commits
+// the authoritativeLayout, townRuntime and rendererIntegration leaves, and
+// the re-aimed polish views move the captureContract leaf, so the composite
+// mints anew and this metadata authority sha follows the swept bytes. No
+// capture was retaken; the records keep their frozen pre-move framing.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'c5d14420c917c06d85b1b775fe16e5a695ef4e9e7fb1c3fe7f53f25561b3d26d';
+  '327449f1c57d077f921e6bd7b1fa10da484bacb42414f085b6a108de7c6f0c81';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '934253e0843a03fa49e37aa9d2c77aa86e98bb50eb515502a1d60340854072eb';
+  '531316b96ba02ada714745b50b179690e520041f8b76044de0eed5d5b05af7c7';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1085,6 +1211,35 @@ describe('Eastbrook polish committed capture artifacts', () => {
     expect(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2'].townTriangles).toBe(28_902);
   });
 
+  // Same pattern as the triangle declaration above: the harbor move (layout
+  // v3, commit d19aa33f76, docs/design/eastbrook-revamp/site-plan.md) re-aimed
+  // 13 live views at the new lots without retaking a capture, so the frozen
+  // framing the records validate against deliberately diverges from the live
+  // matched views for exactly those names and matches them everywhere else.
+  // If the polish captures are ever retaken at the harbor site, this test goes
+  // red first: refresh the frozen framing literals to the retake's views (and
+  // move ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT with them).
+  it('declares the frozen capture framing as deliberately stale against the re-aimed live views', () => {
+    const liveViews = EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[];
+    expect(ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS.map((view) => view.name)).toEqual(
+      liveViews.map((view) => view.name),
+    );
+    for (const [index, frozen] of ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS.entries()) {
+      const live = liveViews[index];
+      const framing = (view: CaptureViewContract) => ({ camera: view.camera, target: view.target });
+      if (HARBOR_MOVED_VIEW_NAMES.has(frozen.name)) {
+        expect(
+          framing(frozen),
+          `${frozen.name} must stay frozen at its captured framing`,
+        ).not.toEqual(framing(live));
+      } else {
+        expect(framing(frozen), `${frozen.name} still shares the live framing`).toEqual(
+          framing(live),
+        );
+      }
+    }
+  });
+
   it('pins the exact historical metadata inventory to every base capture and motion frame', () => {
     const expectedTownSourceFingerprint = ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT;
     const metadataRoot = path.join(POLISH_ROOT, 'metadata');
@@ -1134,9 +1289,10 @@ describe('Eastbrook polish committed capture artifacts', () => {
         const canonicalSource = metadata.records[0]?.source;
         if (!canonicalSource) throw new Error(`missing canonical source for ${fileName}`);
         for (const [index, record] of metadata.records.entries()) {
-          const view = (
-            EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[]
-          )[index];
+          // Frozen framing, not the live matched views: the records were shot
+          // before the harbor move re-aimed the live cameras (see the
+          // ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS header).
+          const view = ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS[index];
           if (!view) throw new Error(`missing capture view ${index} for ${fileName}`);
           expect(record).toMatchObject({
             schemaVersion: 2,
@@ -1247,9 +1403,9 @@ describe('Eastbrook polish committed capture artifacts', () => {
                 expectedTown: true,
                 expectedArmoury: true,
                 profile: contractProfile,
-                view: (
-                  EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[]
-                ).find((candidate) => candidate.name === 'civic-motion'),
+                view: ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS.find(
+                  (candidate) => candidate.name === 'civic-motion',
+                ),
                 playerState: EASTBROOK_ARMOURY_PLAYER_STATE,
                 expectedSeed: EASTBROOK_ARMOURY_CAPTURE_SEED,
                 settleMs: EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
@@ -1778,10 +1934,16 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the Sowfield demolition. The first-order composite follows
     // the Vale Cup removal in renderer.ts, then this second-order performance
     // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-minted 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the first-order
+    // composite follows the moved authoritativeLayout, townRuntime and
+    // rendererIntegration leaves plus the re-aimed captureContract leaf, then
+    // this second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('12bcbb7665f6264f6d7c4d4fe762b6d6ae581866f3cf5ff6c89493b9fd025c25');
+    ).toBe('1993bfc10fbc2ce16a14a039014027117a8b175d20a860021ca64c1409cec39a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

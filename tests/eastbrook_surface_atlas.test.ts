@@ -130,7 +130,11 @@ describe('Eastbrook shared surface atlas', () => {
     );
     const roots = [town.group, armoury, chest];
     const maps = roots.flatMap((root) => atlasMaps(root, atlas));
-    const expectedBindings = [9, 1, 1];
+    // Town bindings re-pinned 2026-08: the harbor move's layout v3 retired the
+    // ring wall (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), so the
+    // two wall materials (opaque and emissive, each shared across its
+    // original/mirrored batch pair) are no longer created: 9 became 7.
+    const expectedBindings = [7, 1, 1];
 
     expect(maps.length).toBeGreaterThan(0);
     expect(new Set(maps)).toEqual(new Set([atlas]));

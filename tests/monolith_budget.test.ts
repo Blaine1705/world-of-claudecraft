@@ -110,7 +110,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/world.ts',
-    ceiling: 5247,
+    ceiling: 5232,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

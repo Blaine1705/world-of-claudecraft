@@ -60,7 +60,11 @@ export const TOWN_PLAT_TERRAIN_EDITS: HeightStamp[] = [
 // The flat stamps stop at x -99; the cove's water starts near x -102, so
 // no wet cell is lifted (the Mirror Lake lesson).
 export const EASTBROOK_QUAY_TERRAIN_EDITS: HeightStamp[] = [
-  { x: -84, z: -54, radius: 18, delta: -1.6, falloff: 'smooth', mode: 'level' },
+  { x: -84, z: -54, radius: 18, delta: -1.9, falloff: 'smooth', mode: 'level' },
+  { x: -92, z: -46, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
+  { x: -92, z: -54, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
+  { x: -92, z: -62, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
+  { x: -88, z: -67, radius: 10, delta: -2.0, falloff: 'smooth', mode: 'level' },
   { x: -92, z: -46, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
   { x: -92, z: -54, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
   { x: -92, z: -62, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
@@ -671,7 +675,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.apothecary_lin.facing,
     color: 0x7d3c98,
     questIds: ['q_spiders'],
-    greeting: 'Careful where you step in the eastern woods, friend.',
+    greeting: 'Careful where you step in the northeastern woods, friend.',
   },
   brother_aldric: {
     id: 'brother_aldric',
@@ -941,7 +945,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Bristly Boar Hides',
     giverNpcId: 'trader_wilkes',
     turnInNpcId: 'trader_wilkes',
-    text: 'Boar hide makes the finest travel packs, and the meadows west of town are crawling with the beasts. Bring me 5 Bristly Boar Hides and I will make it worth your time.',
+    text: 'Boar hide makes the finest travel packs, and the meadows northwest of town are crawling with the beasts. Bring me 5 Bristly Boar Hides and I will make it worth your time.',
     completionText: 'Ah, fine bristly hides! These will fetch a good price.',
     objectives: [{ type: 'collect', itemId: 'boar_hide', count: 5, label: 'Bristly Boar Hide' }],
     xpReward: 350,
@@ -953,7 +957,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Sableweb Menace',
     giverNpcId: 'apothecary_lin',
     turnInNpcId: 'apothecary_lin',
-    text: 'The lurkers in the eastern woods spin a silk I need for my poultices — and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.',
+    text: 'The lurkers in the northeastern woods spin a silk I need for my poultices — and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.',
     completionText: "Ugh, still twitching. Perfect. Here, you've earned this.",
     objectives: [
       { type: 'kill', targetMobId: 'webwood_spider', count: 6, label: 'Sableweb Lurker slain' },
@@ -1020,7 +1024,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Stolen Supplies',
     giverNpcId: 'trader_wilkes',
     turnInNpcId: 'trader_wilkes',
-    text: 'Those bandits hit my last wagon and made off with four crates of goods: tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?',
+    text: 'Those bandits hit my last wagon and made off with four crates of goods: tools, salt, good Eastbrook linen. The crates are stacked around their camp in the northwest hills. Steal them back for me, would you?',
     completionText: 'My crates! Barely a scratch on them. You are a wonder.',
     objectives: [
       { type: 'collect', itemId: 'supply_crate', count: 4, label: 'Stolen Supply Crate' },
@@ -1190,7 +1194,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Bandits of the Vale',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: 'A pack of cutthroats has made camp in the southwest hills. They have robbed three wagons this week. Drive them out — slay 10 Vale Bandits.',
+    text: 'A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out — slay 10 Vale Bandits.',
     completionText: 'Ten fewer knives in the dark. Take this — you have earned it.',
     objectives: [
       { type: 'kill', targetMobId: 'vale_bandit', count: 10, label: 'Vale Bandit slain' },
@@ -1359,7 +1363,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Threads Rejoined',
     giverNpcId: 'weaver_ottilie',
     turnInNpcId: 'weaver_ottilie',
-    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the Sableweb Lurkers crowding the eastern woods, and the labor will settle your hands before they touch good silk again.',
+    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the Sableweb Lurkers crowding the northeastern woods, and the labor will settle your hands before they touch good silk again.',
     completionText:
       'Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.',
     objectives: [
@@ -1378,7 +1382,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Back on the Stove',
     giverNpcId: 'cook_marlow',
     turnInNpcId: 'cook_marlow',
-    text: 'Well, look who is back at my pot. No hard feelings, $N, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the west meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.',
+    text: 'Well, look who is back at my pot. No hard feelings, $N, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the northwest meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.',
     completionText:
       'There is the old flavor. Alchemy and Cooking are back on your stove as majors. Stay a while this time.',
     objectives: [{ type: 'kill', targetMobId: 'wild_boar', count: 5, label: 'Wild Boar hunted' }],
@@ -1597,7 +1601,7 @@ export const ZONE1_CAMPS: CampDef[] = [
   // against that note, never against raw signs.
   // Wolves: north woods
   { mobId: 'forest_wolf', center: { x: -10, z: 6 }, radius: 28.5, count: 6 },
-  { mobId: 'forest_wolf', center: { x: 10, z: 44 }, radius: 26, count: 5 },
+  { mobId: 'forest_wolf', center: { x: 12, z: 52 }, radius: 26, count: 5 },
   // Nudged north to stay ahead of the widened wolf runs (q_greyjaw sends the
   // player to "the deep woods north of the wolf runs").
   { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
@@ -1606,7 +1610,7 @@ export const ZONE1_CAMPS: CampDef[] = [
   { mobId: 'wild_boar', center: { x: 84, z: -27 }, radius: 23.5, count: 4 },
   { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
   // Spiders: eastern woods
-  { mobId: 'webwood_spider', center: { x: -68, z: 2 }, radius: 28.5, count: 6 },
+  { mobId: 'webwood_spider', center: { x: -70, z: 2 }, radius: 28.5, count: 6 },
   // Murlocs: lake shore northeast, camp still straddles the waterline. This camp is
   // radius-capped by Mirror Lake, not by its neighbours: the terrain flatten disc is
   // radius * 1.8, so a radius wide enough for 11.5 yd spacing drags a 59 yd flatten
@@ -1692,7 +1696,7 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
 export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [
     ...EASTBROOK_LAYOUT.roads[0].points,
-    { x: -4, z: -30 },
+    { x: -2, z: -34 },
     { x: 2, z: -4 },
     { x: -8, z: 30 },
     { x: -15, z: 55 },
@@ -1704,6 +1708,7 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [...EASTBROOK_LAYOUT.roads[1].points], // the main street: market square east to the harbor quay
   [
     ...EASTBROOK_LAYOUT.roads[2].points,
+    { x: -24, z: -132 },
     { x: -14, z: -138 },
     { x: 10, z: -140 },
     { x: 30, z: -30 },
@@ -1712,10 +1717,7 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
   ], // crafts lane, then the coast track southwest to the bandit camp
   [...EASTBROOK_LAYOUT.roads[3].points], // the beach promenade
   [...EASTBROOK_LAYOUT.roads[4].points], // civic link across the squares
-  [
-    ...EASTBROOK_LAYOUT.roads[5].points,
-    { x: -96, z: -66 },
-  ], // the quay walk, joining the flank track (the freed dig ground)
+  [...EASTBROOK_LAYOUT.roads[5].points, { x: -96, z: -66 }], // the quay walk, joining the flank track (the freed dig ground)
 ];
 
 // ---------------------------------------------------------------------------

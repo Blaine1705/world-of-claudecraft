@@ -1149,14 +1149,23 @@ describe('persistence', () => {
 
   it('every visited mark a live sim writes stays inside the authored namespaces', () => {
     const sim = makeSim();
-    const { meta } = primary(sim);
+    const { meta, e } = primary(sim);
+    const poi = ZONES.find((z) => z.id === 'eastbrook_vale')!.pois.find(
+      (p) => p.id === 'eastbrook',
+    )!;
+    e.pos.x = poi.x;
+    e.pos.z = poi.z;
+    e.prevPos = { ...e.pos };
     for (let i = 0; i < 25; i++) sim.tick(); // let the 1 Hz proximity sweep run
     for (const mark of meta.deedStats.visited) {
       expect(mark).toMatch(
         /^(poi|gather|gather_event|fish|npc|slain|quality|fiesta|dungeon|witness):/,
       );
     }
-    // The spawn-square sweep marked the hub POI (bounded, authored input).
+    // Parked on the hub POI (the harbor-town spawn quay sits outside every POI
+    // radius), the sweep marked it (bounded, authored input). Re-pinned 2026-08
+    // for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md).
     expect(meta.deedStats.visited.has('poi:eastbrook_vale:eastbrook')).toBe(true);
   });
 });

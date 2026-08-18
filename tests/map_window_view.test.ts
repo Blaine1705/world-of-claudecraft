@@ -385,7 +385,14 @@ describe('buildOverworldMapModel (pure draw model)', () => {
   });
 
   it('maps every rebuilt Eastbrook building, civic prop, stall, and authored wall segment', () => {
-    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), MAP_MAX_ZOOM));
+    // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the town now spans the
+    // harbor district (z -78..-128) while the preserved armoury stays at
+    // (17.5,-5.5), a z spread no MAP_MAX_ZOOM viewport (span 60 + detail
+    // margin) can contain. Zoom 1 frames the whole zone and keeps the detail
+    // overlay non-null (span 360 < DETAIL_SPAN), same convention as the
+    // zone-scale decoration test above.
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
     const detail = model.detail;
     expect(detail).not.toBeNull();
     if (!detail) return;

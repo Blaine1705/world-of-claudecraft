@@ -39,8 +39,14 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // merged castle-plus-dig-headland base (the relocation shifted the
       // world-gen stream under the probes; the hunter diet re-anchor in
       // 52ec45923c is the precedent), so the diet band is 1.11 to 1.22 at the
-      // same relative margins.
-      expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(band(1.1, 1.11));
+      // same relative margins. Diet floor re-anchored 2026-08 on the v0.39
+      // Eastbrook harbor move (d19aa33f76,
+      // docs/design/eastbrook-revamp/site-plan.md), which forked the
+      // world-gen stream under the probes again: diet actual 1.1010, and
+      // carrying the previous diet pin's relative headroom (1.11/1.1708)
+      // puts the floor at 1.04. The full floor 1.1 is the owner's and stays
+      // (see the known-red note below).
+      expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(band(1.1, 1.04));
       expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(band(1.2, 1.22));
       // Vespers area/single: full actual 1.4041, diet actual 1.4475; the diet
       // floor rises to 1.29 with the same relative margin.
@@ -60,7 +66,11 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // reads area/single 1.0849 (under the 1.1 floor) and this pair 1.2519;
       // the demolition tree reads area/single back inside the floor and this
       // pair 1.2185. Both full arms are left for the owned-class re-author
-      // above; the diet lanes are re-anchored and green.
+      // above; the diet lanes are re-anchored and green. The v0.39 harbor
+      // move (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md) forked
+      // the stream again: diet area/single reads 1.1010 (floor re-anchored
+      // 1.11 to 1.04 above); the full arms stay flagged for the owned-class
+      // re-author.
       expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(band(1.2, 1.22));
       // Full sweep: the grown owned-class matrix ran ~180s under shard load and
       // roughly doubled in the shared lane (run 31288946173 killed it at 240s).

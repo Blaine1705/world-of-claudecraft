@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { campSpawnOffset } from '../src/sim/camp_scatter';
 import { isBlocked } from '../src/sim/colliders';
-import { LAKE, ZONE1_CAMPS } from '../src/sim/content/zone1';
+import { LAKE, ZONE1_CAMPS, ZONE1_ZONE } from '../src/sim/content/zone1';
 import { QUESTS } from '../src/sim/data';
 import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { rideSteepnessAt } from '../src/sim/ride_height';
@@ -31,7 +31,7 @@ const NOMINAL_SPACING = (camp: CampDef) => camp.radius / Math.sqrt(camp.count);
 
 // Floors this suite enforces.
 const MIN_NEIGHBOUR_SPACING = 11.5; // yd between adjacent mobs in one camp
-const MIN_TOWN_CLEARANCE = 38; // yd from the town hub at origin to a camp's disc edge
+const MIN_TOWN_CLEARANCE = 38; // yd from the LIVE town hub to a camp's disc edge
 const CROSS_POPULATION_GAP = 2; // yd of clear ground between two DIFFERENT families
 const SAME_POPULATION_SLOPE = 0.75; // one family split in two may still abut
 const SAME_POPULATION_INTERCEPT = 8;
@@ -40,6 +40,16 @@ const MAX_BEARING_DRIFT_DEG = 15; // camps push outward, they do not relocate ac
 
 const centerDistance = (c: CampDef) => Math.hypot(c.center.x, c.center.z);
 const discEdgeToTown = (c: CampDef) => centerDistance(c) - c.radius;
+// Re-anchored 2026-08: the town hub moved from the origin to the harbor site
+// (-14,-100) with the Eastbrook harbor move (d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md), and the Wolf Run deliberately
+// parked on the vacated origin ground. The "calm ground around town" rule
+// therefore reads the LIVE hub. The origin frame above stays as the historical
+// starter-field frame on purpose: the starter-band derivation and the shipped
+// bearings below are pinned against it, and re-anchoring them would silently
+// re-derive the governed set.
+const discEdgeToHub = (c: CampDef) =>
+  Math.hypot(c.center.x - ZONE1_ZONE.hub.x, c.center.z - ZONE1_ZONE.hub.z) - c.radius;
 const campDistance = (a: CampDef, b: CampDef) =>
   Math.hypot(a.center.x - b.center.x, a.center.z - b.center.z);
 
@@ -94,7 +104,12 @@ const GOVERNED_INDICES = [0, 1, 3, 4, 6, 7, 9, 12];
 // outward push along the same bearing rather than a relocation. Index-aligned with
 // GOVERNED_INDICES.
 const SHIPPED_PLACEMENT: { x: number; z: number }[] = [
-  { x: -15, z: 55 },
+  // Camp 0 (forest_wolf) re-pinned 2026-08: the west Wolf Run rotated onto the
+  // vacated old-town ground when Eastbrook moved to its harbor site
+  // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), a
+  // maintainer-approved relocation rather than a spacing push, so the baseline
+  // follows it (was { x: -15, z: 55 }, the pre-move north-woods spot).
+  { x: -10, z: 6 },
   { x: 20, z: 70 },
   { x: 55, z: 12 },
   { x: 80, z: -15 },
@@ -299,8 +314,8 @@ describe('eastbrook starter camp spacing', () => {
   it('leaves the road ring out of town calm', () => {
     for (const camp of governed()) {
       expect(
-        discEdgeToTown(camp),
-        `${label(camp)} disc reaches ${discEdgeToTown(camp).toFixed(2)} yd from the town hub`,
+        discEdgeToHub(camp),
+        `${label(camp)} disc reaches ${discEdgeToHub(camp).toFixed(2)} yd from the town hub`,
       ).toBeGreaterThanOrEqual(MIN_TOWN_CLEARANCE);
     }
   });

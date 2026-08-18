@@ -14,7 +14,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "36d5a127",
+      "state": "1f8c7fa8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -91,7 +91,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 54,
           "id": 960,
@@ -105,17 +105,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -139,7 +139,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 966,
-      "state": "8420df50",
+      "state": "19136ecd",
       "events": "c3025021",
       "rng": {
         "draws": 3,
@@ -150,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 966,
-      "state": "b301b6e6",
+      "state": "5ccb9f0e",
       "events": "6ee017d8",
       "rng": {
         "draws": 3,
@@ -161,7 +161,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 966,
-      "state": "7f8db0ab",
+      "state": "ba13d281",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -172,7 +172,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 966,
-      "state": "04524724",
+      "state": "9c4c59ee",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -183,7 +183,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 966,
-      "state": "cfdf1287",
+      "state": "a1138af5",
       "events": "f4ee6d68",
       "rng": {
         "draws": 72,
@@ -194,7 +194,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 966,
-      "state": "b3b85e0b",
+      "state": "7681e8e1",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -205,7 +205,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 966,
-      "state": "1638eb26",
+      "state": "ebd1d046",
       "events": "741638a5",
       "rng": {
         "draws": 241,
@@ -216,7 +216,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 966,
-      "state": "f51d9534",
+      "state": "ddac04be",
       "events": "abcc035d",
       "rng": {
         "draws": 329,
@@ -227,7 +227,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 966,
-      "state": "08183a59",
+      "state": "210af7e7",
       "events": "9eb6c081",
       "rng": {
         "draws": 414,
@@ -238,7 +238,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 966,
-      "state": "085459be",
+      "state": "60ac63f8",
       "events": "741638a5",
       "rng": {
         "draws": 509,
@@ -249,7 +249,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 966,
-      "state": "4d7bc2d9",
+      "state": "cb826301",
       "events": "741638a5",
       "rng": {
         "draws": 609,
@@ -260,7 +260,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 966,
-      "state": "f64cd6b0",
+      "state": "f3be3bf0",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -271,7 +271,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 966,
-      "state": "f64cd6b0",
+      "state": "f3be3bf0",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -316,7 +316,6 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
               "quality:epic"
             ]
           },
@@ -418,7 +417,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 2.05,
           "hitBonus": 0.17,
           "hitRating": 170,
@@ -435,17 +434,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 2063,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 62,
           "stats": {
@@ -487,7 +486,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49807,
@@ -495,8 +494,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5
+            "x": -94,
+            "y": -2,
+            "z": -56
           },
           "level": 23,
           "lootFfaTimer": "Infinity",
@@ -506,13 +506,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5
+            "x": -94,
+            "y": -2,
+            "z": -56
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5
+            "x": -94,
+            "y": -2,
+            "z": -56
           },
           "stats": {
             "armor": 220
@@ -538,7 +540,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 966,
-      "state": "f64cd6b0",
+      "state": "f3be3bf0",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -583,7 +585,6 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
               "quality:epic"
             ]
           },
@@ -685,7 +686,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 2.05,
           "hitBonus": 0.17,
           "hitRating": 170,
@@ -702,17 +703,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 2063,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 62,
           "stats": {
@@ -754,7 +755,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49807,
@@ -762,8 +763,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5
+            "x": -94,
+            "y": -2,
+            "z": -56
           },
           "level": 23,
           "lootFfaTimer": "Infinity",
@@ -773,13 +775,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5
+            "x": -94,
+            "y": -2,
+            "z": -56
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5
+            "x": -94,
+            "y": -2,
+            "z": -56
           },
           "stats": {
             "armor": 220

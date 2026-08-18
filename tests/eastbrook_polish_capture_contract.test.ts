@@ -188,8 +188,17 @@ interface AttributionTargetFixture {
 // piece, ball, team rings, practice sky and fireworks arms from renderer.ts,
 // so the rendererIntegration leaf moves and the composite follows its bytes.
 // No capture was retaken.
+// Re-minted 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+// d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the town move
+// commits the authoritativeLayout leaf (src/sim/eastbrook_layout.ts), the
+// townRuntime leaf (src/render/eastbrook_town.ts) and the rendererIntegration
+// leaf (the wave D harbor wiring in src/render/renderer.ts), and re-aiming
+// the polish views and matched-view overrides at the v3 lots moves the
+// captureContract leaf too. No capture was retaken: the accepted evidence
+// keeps its pre-move framing (frozen in the artifact-integrity suite) and
+// only the swept provenance bytes follow the merged inputs.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '934253e0843a03fa49e37aa9d2c77aa86e98bb50eb515502a1d60340854072eb';
+  '531316b96ba02ada714745b50b179690e520041f8b76044de0eed5d5b05af7c7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -567,30 +576,34 @@ describe('Eastbrook polish capture contract', () => {
   });
 
   it('literal-pins v2 service framing overrides without mutating historical rebuild views', () => {
+    // Re-pinned 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): every override
+    // re-derived to the v3 lots (targets on the buildings' front standing
+    // points, cameras collision-clear on the public faces).
     expect(EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES).toEqual({
       'bank-and-chest': {
-        camera: { x: 5, y: 7, z: 2 },
-        target: { x: 14.156943251329539, y: 3.2, z: 8.685223202016726 },
+        camera: { x: 5, y: 7, z: -101 },
+        target: { x: 8.994796179957174, y: 3.2, z: -97.00520382004282 },
       },
       'smithy-and-forge': {
-        camera: { x: 10, y: 7, z: 8 },
-        target: { x: 3.687633548766497, y: 3, z: 15.598153967032626 },
+        camera: { x: -9.5, y: 7, z: -126 },
+        target: { x: -5.801315561749643, y: 3, z: -123.90065778087482 },
       },
       'inn-and-kitchens': {
-        camera: { x: 0, y: 8, z: 8 },
-        target: { x: -10.018829436136041, y: 3, z: 13.621842145917809 },
+        camera: { x: -43, y: 8, z: -94 },
+        target: { x: -40.10786074565587, y: 3, z: -91.1617911184838 },
       },
       'chapel-and-weaving': {
-        camera: { x: 0, y: 12, z: 4 },
-        target: { x: -13.2, y: 3, z: -10.5 },
+        camera: { x: 26, y: 12, z: -100 },
+        target: { x: -13, y: 3, z: -100 },
       },
       'toolworks-service-perimeter': {
-        camera: { x: 4, y: 7, z: -9 },
-        target: { x: 5, y: 5, z: -14.25 },
+        camera: { x: -11, y: 7, z: -120 },
+        target: { x: -13.919874264155391, y: 5, z: -124.87981139623308 },
       },
       'stall-world-market': {
-        camera: { x: -6, y: 6, z: 0 },
-        target: { x: -5.75, y: 2.5, z: 7 },
+        camera: { x: -13, y: 6, z: -96.5 },
+        target: { x: -16.517695018376127, y: 2.5, z: -98.76296354780212 },
       },
     });
     expect(EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS).toHaveLength(23);
@@ -689,10 +702,13 @@ describe('Eastbrook polish capture contract', () => {
     expect(toolworks).toBeDefined();
     expect(toolworksView).toBeDefined();
     if (!toolworks || !toolworksView) throw new Error('missing toolworks capture seam');
+    // Re-pinned 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the toolworks
+    // was re-lotted to the crafts lane.
     expect(toolworks).toMatchObject({
-      position: { x: 6.2, z: -18 },
-      rotation: -0.3006056700423954,
-      frontStandingPoint: { x: 5.089629608322198, z: -14.4181600268458 },
+      position: { x: -16, z: -128 },
+      rotation: 0.5880026035475675,
+      frontStandingPoint: { x: -13.919874264155391, z: -124.87981139623308 },
     });
     expect(toolworksStation?.position).toEqual(toolworks?.frontStandingPoint);
     expect(
@@ -864,21 +880,25 @@ describe('Eastbrook polish capture contract', () => {
   });
 
   it('pins public-facing NPC portraits at Lin, Saul, and FURY authored positions', () => {
+    // Re-pinned 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): Lin now serves
+    // the market square, Saul the Ravenpost mailbox lane, and FURY the
+    // graveyard approach (the view name stays immutable evidence naming).
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
-        camera: { x: 1.8, y: 6, z: 6 },
-        target: { x: 2.8431593444121797, y: 2.5, z: 9.717148252611294 },
+        camera: { x: -15, y: 6, z: -104 },
+        target: { x: -12, y: 2.5, z: -97.5 },
       },
       'ravenpost-chronicler': {
         subject: 'chronicler_saul',
-        camera: { x: -10, y: 6.5, z: -11 },
-        target: { x: 0, y: 2.5, z: -14.5 },
+        camera: { x: 10.5, y: 6.5, z: -85 },
+        target: { x: 10.2, y: 2.5, z: -87.5 },
       },
       'west-wall-quartermaster': {
         subject: 'fury',
-        camera: { x: -16, y: 6, z: -3 },
-        target: { x: -22.5, y: 2.5, z: -7.5 },
+        camera: { x: -7, y: 6, z: -81 },
+        target: { x: -2, y: 2.5, z: -74 },
       },
     };
     for (const [name, expected] of Object.entries(expectedViews)) {

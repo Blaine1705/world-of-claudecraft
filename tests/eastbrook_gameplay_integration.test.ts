@@ -160,6 +160,21 @@ function placeEntity(sim: Sim, entity: Entity, point: { x: number; z: number }):
   sim.rebucket(entity);
 }
 
+// Re-minted 2026-08-18 for the harbor move (commit d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md): the fixture's premise is "the
+// same world with the town expressed as plain legacy prop rows", so both
+// worlds present identical collision everywhere. The old-town rows that used
+// to sit here now stand on ground that became Wolf Run open country, and a
+// scattered wolf spawn deflected off a house row that existed only in this
+// fixture. Every row below is probed from the live derived ZONE1_PROPS and
+// EASTBROOK_LAYOUT values: the six harbor lots as plain building rows (the
+// chapel keeps its assetId because an assetId-less chapel collides as the
+// legacy COMPOSED tower-and-hall pair, not the authored single OBB the live
+// town presents), the well beacon row at its civic square position, the two
+// sized market stalls (w/d/height drive the authored OBB collider), the
+// three smithy-yard fences at their probed endpoints, and no town campfire
+// (the retired [3, -4] row sat inside what is now Wolf Run: exactly the
+// class of collider that forked the wolf projection).
 function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   const townBuildingIds = new Set(
     [...EASTBROOK_LAYOUT.preservedBuildings, ...EASTBROOK_LAYOUT.buildings].map(
@@ -169,8 +184,6 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   return {
     ...current,
     buildings: [
-      { kind: 'house', x: 10, z: 12, w: 7, d: 6, rot: -0.4 },
-      { kind: 'house', x: -10, z: 10, w: 6, d: 5, rot: 0.5 },
       {
         kind: 'inn',
         landmark: 'eastbrook_grand_armoury',
@@ -180,23 +193,72 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
         d: 9,
         rot: -Math.PI / 2,
       },
-      { kind: 'chapel', x: -16, z: -8, w: 5, d: 7, rot: 0.9 },
+      { kind: 'house', x: 12, z: -94, w: 7, d: 5.5, rot: -2.356194490192345 },
+      { kind: 'house', x: -2, z: -122, w: 7, d: 5.5, rot: -2.0344439357957027 },
+      { kind: 'inn', x: -38, z: -88, w: 7.5, d: 6, rot: -2.5535900500422257 },
+      {
+        kind: 'chapel',
+        assetId: '/models/props/eastbrook_chapel.glb',
+        x: 2,
+        z: -78,
+        w: 5.5,
+        d: 6,
+        rot: 0.7853981633974483,
+      },
+      { kind: 'house', x: -28, z: -122, w: 5.5, d: 4.5, rot: 2.5535900500422257 },
+      { kind: 'house', x: -16, z: -128, w: 5.5, d: 4.5, rot: 0.5880026035475675 },
       ...current.buildings.filter((building) => !building.id || !townBuildingIds.has(building.id)),
     ],
     wells: [
-      { x: 0, z: 2, r: 1.5 },
+      { x: -14.75, z: -102, r: 1.5 },
       ...current.wells.filter((well) => well.id !== EASTBROOK_LAYOUT.civic.wellBeacon.id),
     ],
     stalls: [
-      { x: -8.5, z: 3, rot: Math.PI / 2, r: 1.7 },
-      { x: 9.5, z: 17.5, rot: -2.7, r: 1.7, smithy: true },
-      { x: 0, z: 11.5, rot: Math.PI, r: 1.8 },
+      {
+        x: -17.5,
+        z: -97.5,
+        rot: 2.4805494847391065,
+        r: 1.7804493814764857,
+        w: 2.8,
+        d: 2.2,
+        height: 2.7,
+      },
+      {
+        x: -17.5,
+        z: -106.5,
+        rot: 0.6610431688506869,
+        r: 1.7804493814764857,
+        w: 2.8,
+        d: 2.2,
+        height: 2.7,
+      },
       ...current.stalls.filter((stall) => !stall.id?.startsWith('eastbrook_market_stall_')),
     ],
-    campfires: [[3, -4], ...current.campfires],
     fences: [
-      { x1: 16, z1: 16, x2: 22, z2: 4 },
-      { x1: -16, z1: 14, x2: -20, z2: 2 },
+      {
+        x1: 4.395154415649398,
+        z1: -123.83357574154984,
+        x2: 2.8746281909495415,
+        z2: -124.59383885389975,
+        width: 0.28,
+        height: 0.9,
+      },
+      {
+        x1: 4.529318494299386,
+        z1: -123.43108350559987,
+        x2: 0.7727242920997393,
+        z2: -115.91789510120057,
+        width: 0.28,
+        height: 0.9,
+      },
+      {
+        x1: 0.37023205614977694,
+        z1: -115.78373102255058,
+        x2: -1.1502941685500798,
+        z2: -116.5439941349005,
+        width: 0.28,
+        height: 0.9,
+      },
       ...current.fences.filter((fence) => !fence.id?.startsWith('eastbrook_fence_')),
     ],
     benches: current.benches?.filter((bench) => !bench.id.startsWith('eastbrook_')),
@@ -220,11 +282,14 @@ describe('Eastbrook authored gameplay data integration', () => {
       d: 9,
       rot: -Math.PI / 2,
     });
+    // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the well beacon moved with
+    // the civic square to the harbor site.
     expect(ZONE1_PROPS.wells).toEqual([
       expect.objectContaining({
         id: EASTBROOK_LAYOUT.civic.wellBeacon.id,
-        x: -0.75,
-        z: 2,
+        x: -14.75,
+        z: -102,
         r: 1.5,
       }),
     ]);
@@ -284,31 +349,36 @@ describe('Eastbrook authored gameplay data integration', () => {
       { x: 80, z: 78, ringR: 7, columns: 7 },
       { x: -5, z: -60, ringR: 8, columns: 6 },
     ]);
+    // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76): the
+    // Eastbrook graveyard row moved to the chapel green; the second
+    // (exterior) row is unchanged.
     expect(ZONE1_PROPS.graveyards).toEqual([
-      { x: -14, z: -14 },
+      { x: -2, z: -70 },
       { x: 4, z: -56 },
     ]);
     expect(ZONE1_PROPS.delveMarkers).toEqual([{ x: -5, z: -52, delveId: 'collapsed_reliquary' }]);
   });
 
-  it('routes every preserved exterior road through its authoritative five-yard gate', () => {
+  // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): the wall and its gates are
+  // retired by design, so every road carries gateId null and there is no
+  // gate crossing to contain. The exterior tie-in tails re-tied with the
+  // zone1 re-tie; three roads now end at their authored last point (no
+  // exterior extension).
+  it('keeps every preserved exterior road on its authored prefix with no gate crossing', () => {
     expect(ZONE1_ROADS).toHaveLength(6);
     for (let index = 0; index < EASTBROOK_LAYOUT.roads.length; index++) {
       const authored = EASTBROOK_LAYOUT.roads[index];
       expect(ZONE1_ROADS[index].slice(0, authored.points.length)).toEqual(authored.points);
-      const gate = EASTBROOK_LAYOUT.wall.gates.find(
-        (candidate) => candidate.id === authored.gateId,
-      );
-      if (!gate) throw new Error(`missing gate ${authored.gateId}`);
-      expect(ZONE1_ROADS[index]).toContainEqual(gate.crossing);
+      expect(authored.gateId).toBeNull();
     }
     expect(ZONE1_ROADS.map((road) => road.at(-1))).toEqual([
       { x: -32, z: 140 },
-      { x: 55, z: 12 },
+      { x: -92, z: -56 },
       { x: 65, z: -65 },
-      { x: -66, z: 58 },
+      { x: -10, z: -142 },
+      { x: -9, z: -100.4 },
       { x: -96, z: -66 },
-      { x: 78, z: 74 },
     ]);
   });
 
@@ -382,8 +452,19 @@ describe('Eastbrook authored gameplay data integration', () => {
       'simple_fishing_pole',
       'arcanite_bar',
     ]);
+    // Re-minted a fourth time (2026-08-18) for the harbor move (commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md; the reword
+    // itself landed with the wave D waterfront, 88f14c6078): exactly one
+    // non-placement field moved, Apothecary Lin's greeting, because the
+    // spider wood she warns about sits northeast of the harbor site instead
+    // of east of the old ring. Asserted BEFORE the digest, same as the
+    // vendor rows above, so the one moved field is described where it can
+    // actually fail.
+    expect(ZONE1_NPCS.apothecary_lin.greeting).toBe(
+      'Careful where you step in the northeastern woods, friend.',
+    );
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '1195be83990758fcddd9fb49fdec6b34d217999281c66b8af0cae7691c0a0003',
+      '2f6072ad2baa2341ce32484144915a0d6cbc9836d0ed4c9d70112e3dbeb87146',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
@@ -393,18 +474,21 @@ describe('Eastbrook authored gameplay data integration', () => {
     }
   });
 
+  // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): FURY moved with the chapel
+  // to the chapel green; position and facing probed from the live layout.
   it('spawns layout-authored FURY under a reserved id without shifting nextId or RNG', () => {
     expect(EASTBROOK_NPC_PLACEMENTS_BY_ID.fury).toEqual({
       id: 'fury',
-      position: { x: -22.5, z: -7.5 },
-      facing: 1.171280832795522,
+      position: { x: -2, z: -74 },
+      facing: -2.7367008673047097,
       anchorId: 'eastbrook_chapel',
       bodyRadius: 0.6,
     });
     expect(BUILTIN_WORLD.npcs[FURY_NPC_ID]).toMatchObject({
       id: 'fury',
-      pos: { x: -22.5, z: -7.5 },
-      facing: 1.171280832795522,
+      pos: { x: -2, z: -74 },
+      facing: -2.7367008673047097,
       dynamic: true,
     });
     expect(FURY_ENTITY_ID).toBe(1_000_000_001);
@@ -439,12 +523,12 @@ describe('Eastbrook authored gameplay data integration', () => {
       id: 1_000_000_001,
       kind: 'npc',
       templateId: 'fury',
-      x: -22.5,
-      z: -7.5,
-      spawnX: -22.5,
-      spawnZ: -7.5,
-      facing: 1.171280832795522,
-      prevFacing: 1.171280832795522,
+      x: -2,
+      z: -74,
+      spawnX: -2,
+      spawnZ: -74,
+      facing: -2.7367008673047097,
+      prevFacing: -2.7367008673047097,
     });
     expect([...withFury.entities.keys()].filter((id) => id !== FURY_ENTITY_ID)).toEqual([
       ...withoutFury.entities.keys(),
@@ -511,9 +595,14 @@ describe('Eastbrook authored gameplay data integration', () => {
       { x: 427, z: 355 },
       { x: 299, z: 76 },
     ]);
-    expect(PLAYER_START).toEqual({ x: 2, z: -2 });
-    expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: -14, z: -14 });
-    expect(EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint).toEqual({ x: -12, z: -14 });
+    // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the spawn moved to the
+    // harbor quay and the graveyard contract to the chapel green. Every
+    // behavioral test in this file consumes PLAYER_START symbolically, so
+    // the moved spawn is re-pinned here as exported data.
+    expect(PLAYER_START).toEqual({ x: -94, z: -58 });
+    expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: -2, z: -70 });
+    expect(EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint).toEqual({ x: 0, z: -70 });
   });
 });
 
@@ -594,19 +683,21 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
       groundHeight(well.position.x, well.position.z, SEED) + well.height,
     );
 
-    const wall = EASTBROOK_LAYOUT.wall.segments[0];
-    const wallCollider = colliders.find(
-      (collider) =>
-        collider.type === 'obb' &&
-        collider.x === wall.footprint.center.x &&
-        collider.z === wall.footprint.center.z,
-    );
-    expect(wallCollider).toMatchObject({
-      type: 'obb',
-      hw: wall.footprint.halfWidth,
-      hd: wall.footprint.halfDepth,
-      rot: wall.footprint.rotation,
-    });
+    // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the town wall is retired
+    // by design, so this is now an ABSENCE pin, mirroring the retired
+    // artisan stall above: the layout exposes zero segments and no static
+    // OBB stands on the old wall ring.
+    expect(EASTBROOK_LAYOUT.wall.segments).toHaveLength(0);
+    expect(EASTBROOK_LAYOUT.wall.gates).toHaveLength(0);
+    expect(
+      colliders.filter(
+        (collider) =>
+          collider.type === 'obb' &&
+          Math.abs(Math.hypot(collider.x, collider.z) - EASTBROOK_LAYOUT.wall.radius) < 1.5,
+      ),
+      'retired wall ring colliders',
+    ).toHaveLength(0);
 
     const fence = EASTBROOK_LAYOUT.fences[0];
     const fenceCenter = midpoint(fence.start, fence.end);
@@ -683,12 +774,16 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     }
   });
 
-  it('pathfinds bidirectionally from the square to every gate, service, NPC, station, and entrance', () => {
-    // East side of the civic ring: inside the square, clear of the offset well
-    // and benches, and directly connected to the start/east-road circulation.
-    const square = { x: 3, z: 0 };
+  // Re-anchored 2026-08-18 for the harbor move (commit d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): the square anchor moved to
+  // the new market square and the six retired gate destinations left the
+  // list with the wall (36 became 30).
+  it('pathfinds bidirectionally from the square to every service, NPC, station, and entrance', () => {
+    // Middle of the new market square: inside the civic ring, clear of the
+    // well beacon and the benches, and directly connected to the east-road
+    // circulation (the east road's authored tail ends beside it at -11,-101).
+    const square = { x: -12.5, z: -100.5 };
     const destinations = [
-      ...EASTBROOK_LAYOUT.wall.gates.map((gate) => ({ id: gate.id, point: gate.crossing })),
       ...EASTBROOK_LAYOUT.services.npcs.map((npc) => ({ id: npc.id, point: npc.position })),
       ...EASTBROOK_LAYOUT.services.stations.map((station) => ({
         id: station.id,
@@ -710,7 +805,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         (building) => ({ id: `${building.id}:entrance`, point: building.frontStandingPoint }),
       ),
     ];
-    expect(destinations).toHaveLength(36);
+    expect(destinations).toHaveLength(30);
     const moverProfiles = [
       { id: 'player', bodyRadius: PLAYER_BODY_RADIUS },
       // Pet locomotion deliberately shares PLAYER_BODY_RADIUS; keep this
@@ -801,11 +896,18 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     const saul = npcEntity(sim, 'chronicler_saul');
     const mailbox = sim.entities.get(sim.postOffice.mailboxIds[0]);
     if (!mailbox) throw new Error('missing Eastbrook mailbox');
-    const facePoint = { x: -0.44414815667112084, z: -13.06726401073832 };
+    // Re-measured 2026-08-18 for the harbor move (commit d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): Saul now works beside the
+    // noticeboard at the bank corner and the mailbox pillar moved across the
+    // square, so the measured face point (saul.pos plus 1.5 yd along his
+    // facing, taken from the runtime entity) is far outside mailbox reach
+    // rather than a stride from it. The targetless-interact regression this
+    // stages is unchanged.
+    const facePoint = { x: 11.032050294337843, z: -86.25192455849323 };
 
     expect(Math.hypot(facePoint.x - saul.pos.x, facePoint.z - saul.pos.z)).toBeCloseTo(1.5, 12);
     const mailboxDistance = Math.hypot(facePoint.x - mailbox.pos.x, facePoint.z - mailbox.pos.z);
-    expect(mailboxDistance).toBe(5.584952654260954);
+    expect(mailboxDistance).toBe(24.090753748334464);
     expect(mailboxDistance).toBeGreaterThan(INTERACT_RANGE);
 
     const talkToNpc = vi.spyOn(sim, 'talkToNpc');

@@ -25,7 +25,10 @@ describe('Eastbrook town grass exclusion', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
     expect(BUILTIN_NOTICEBOARDS).toHaveLength(1);
     // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see fenbridge_layout).
-    expect(exclusions).toHaveLength(113);
+    // Re-pinned 2026-08: the harbor-move layout v3 retired the ring wall
+    // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), dropping the
+    // 26 wall-chord OBB exclusions (61 obb + 26 circle remain).
+    expect(exclusions).toHaveLength(87);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
@@ -75,7 +78,9 @@ describe('Eastbrook town grass exclusion', () => {
       kind: 'obb',
       halfWidth: 1.2,
       halfDepth: 0.3,
-      rotation: -0.7853981633974483,
+      // Re-pinned 2026-08: the noticeboard was re-laid with the harbor move
+      // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md).
+      rotation: -2.17084654019665,
     });
     expect(byId.get('eastbrook_noticeboard:serviceApron')).toMatchObject({
       kind: 'circle',
@@ -99,28 +104,22 @@ describe('Eastbrook town grass exclusion', () => {
       [1.4, 1.1],
     ]);
     const fenceDimensions = dimensionsFor(EASTBROOK_LAYOUT.fences.map((fence) => fence.id));
+    // Re-pinned 2026-08: the smithy fences moved with the smithy in the
+    // harbor move (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md),
+    // so the derived half widths carry different float noise.
     expect(fenceDimensions.map(([halfWidth]) => halfWidth)).toEqual([
-      0.8499999999999994, 4.200000000000001, 0.8499999999999995,
+      0.8499999999999975, 4.200000000000004, 0.8499999999999975,
     ]);
     expect(fenceDimensions.map(([, halfDepth]) => halfDepth)).toEqual([0.14, 0.14, 0.14]);
 
     const wallDimensions = dimensionsFor(
       EASTBROOK_LAYOUT.wall.segments.map((segment) => segment.id),
     );
-    expect(wallDimensions).toHaveLength(26);
+    // Re-pinned 2026-08: the harbor-move layout v3 retired the ring wall
+    // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md); WALL_SEGMENTS
+    // is empty, so there are no wall-chord OBBs left to pin.
+    expect(wallDimensions).toHaveLength(0);
     expect(wallDimensions.every(([, halfDepth]) => halfDepth === 0.325)).toBe(true);
-    const expectedWallHalfWidths = [
-      2.6446667111981697, 2.6446667111981723, 2.979520542277603, 2.9795205422776054,
-      2.979520542277606, 2.9795205422776063, 2.4349948994293773, 2.434994899429382,
-      2.4349948994293755, 2.8391225437014658, 2.8391225437014667, 2.8391225437014724,
-      2.8391225437014658, 2.8391225437014658, 2.8391225437014667, 2.8866575680317688,
-      2.886657568031776, 2.886657568031762, 2.8866575680317634, 2.8866575680317754,
-      2.8866575680317763, 2.8866575680317617, 3.0804197164194327, 3.0804197164194336,
-      3.0804197164194336, 3.080419716419433,
-    ];
-    for (const [index, [halfWidth]] of wallDimensions.entries()) {
-      expect(halfWidth).toBeCloseTo(expectedWallHalfWidths[index], 12);
-    }
   });
 
   it('keeps every exclusion just inside its padded boundary and rejects just outside', () => {

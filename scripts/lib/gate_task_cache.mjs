@@ -43,6 +43,13 @@ export const GATE_NON_CACHEABLE_TASKS = Object.freeze([
 export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
   'i18n:gen': {
     inputs: [
+      // The resolved tables embed quest and NPC prose bundled from the sim
+      // and server sources, so those trees are cache-key inputs: without
+      // them a warm cache restores stale artifacts over a sim-prose change
+      // and the gate fails its own freshness diff (the harbor-town move,
+      // 2026-08-19).
+      'src/sim/**',
+      'server/**',
       'src/ui/i18n.catalog/**',
       'src/ui/i18n.locales/**',
       'src/ui/i18n.ts',

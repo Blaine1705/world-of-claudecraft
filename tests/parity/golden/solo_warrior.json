@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "649d4b7d",
+      "state": "c93011c6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -105,7 +105,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 100,
           "id": 960,
@@ -120,16 +120,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -153,7 +153,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 966,
-      "state": "172ff460",
+      "state": "a5e6bb18",
       "events": "dd785be7",
       "rng": {
         "draws": 7,
@@ -164,7 +164,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 966,
-      "state": "0b01b938",
+      "state": "37a0d626",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -175,7 +175,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 966,
-      "state": "2cc0b55c",
+      "state": "a1146208",
       "events": "58ce4f03",
       "rng": {
         "draws": 174,
@@ -186,7 +186,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 966,
-      "state": "253f7c1a",
+      "state": "97f5f25e",
       "events": "e3f6bb42",
       "rng": {
         "draws": 263,
@@ -227,9 +227,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -300,7 +297,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "facing": 1.570796,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 102.6,
           "hp": 49995,
           "id": 960,
@@ -316,17 +313,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2.5,
-            "y": 1.5,
-            "z": -2
+            "x": -93.5,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -355,16 +352,16 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4,
-            "y": 1.5,
-            "z": -2
+            "x": -92,
+            "y": -2,
+            "z": -58
           },
           "level": 2,
           "loot": {
@@ -387,16 +384,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -2
+            "x": -92,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -2
+            "x": -92,
+            "y": -2,
+            "z": -58
           },
           "stats": {
             "armor": 10
@@ -417,7 +414,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 966,
-      "state": "88aba21e",
+      "state": "05f5b03c",
       "events": "de996439",
       "rng": {
         "draws": 309,
@@ -458,9 +455,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -536,7 +530,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "facing": 1.570796,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 102.8,
           "hp": 49995,
           "id": 960,
@@ -552,17 +546,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2.5,
-            "y": 1.5,
-            "z": -2
+            "x": -93.5,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -591,16 +585,16 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4,
-            "y": 1.5,
-            "z": -2
+            "x": -92,
+            "y": -2,
+            "z": -58
           },
           "level": 2,
           "loot": {
@@ -623,16 +617,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -2
+            "x": -92,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 59.8,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -2
+            "x": -92,
+            "y": -2,
+            "z": -58
           },
           "stats": {
             "armor": 10

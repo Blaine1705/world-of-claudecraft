@@ -305,8 +305,12 @@ describe('parties', () => {
   it('party members share kill xp with the group bonus and quest credit', () => {
     const { sim, a, b } = makeDuo(makeFullWorld()); // hunts a live camp wolf
     // both accept the wolf quest
-    teleport(sim, a, 4, 4);
-    teleport(sim, b, 4, 5);
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): marshal_redbrook (the
+    // q_wolves giver) now stands at (10, -97.5) by the noticeboard; stand the
+    // duo just south of him so acceptQuest's interact-range gate passes.
+    teleport(sim, a, 10, -95.5);
+    teleport(sim, b, 10, -94.5);
     sim.acceptQuest('q_wolves', a);
     sim.acceptQuest('q_wolves', b);
     const wolf = nearestMob(sim, 'forest_wolf');

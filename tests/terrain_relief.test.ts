@@ -60,19 +60,28 @@ describe('the calm field keeps graded features on their exact classic terrain', 
   // to full float precision; a drift here means a road, camp pad, or graded
   // bench no longer stands on the terrain it was built against.
   const goldens: [string, number, number, number][] = [
-    // The road pin moved from (0,160) with phase 0b of the New Eastbrook
-    // program: the Copper Dig's level stamp (r 64 from (-32,144)) and the
-    // relocated kobold camp's flatten skirt now re-grade the road there on
-    // purpose; (0,80) is the same road, calm exactly 0, clear of every
-    // authored layer.
-    ['vale road', 0, 80, -1.4539035084008747],
+    // Re-minted 2026-08 for the harbor move (d19aa33f76, the New Eastbrook
+    // program, docs/design/eastbrook-revamp/site-plan.md): the road pin moved
+    // again because the whole north road now threads authored layers end to
+    // end (the rotated Wolf Run camps' flatten skirts through the old town
+    // ground, then the Copper Dig level stamp), so the pin rides the vale
+    // coast track instead; (30,-30) is a ZONE1_ROADS[2] centerline vertex,
+    // calm exactly 0, clear of every authored layer, and byte-identical to
+    // the pre-move field (verified against a worktree at the last-minted
+    // tree).
+    ['vale road', 30, -30, -1.871079984441121],
     ['peaks road', -98, 727, 10.139872348652359],
     ['marsh road', 20, 470, -1.769678368869094],
     ['frost road', -73, 1696, 13.619770689175878],
     ['peaks camp core', -90, 700, 12.536439409032718],
     ['tiny camp core', -78, 716, 13.501711523786856],
     ['ember camp core', 392, 2296, 10.399999999999999],
-    ['vale hub core', 0, 0, 1.5],
+    // Re-minted 2026-08: the hub core moved with the town to the civic
+    // square on the harbor plat (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md); calm is exactly 0 there
+    // and the value is the town-plat grade the square is built on, the same
+    // authored-grade family as the ember camp core and bench rows below.
+    ['vale hub core', -14, -102, -0.8902171227961108],
     ['drakemaw bench n', 390, 2330, 13.5055094022491],
     ['drakemaw bench s', 390, 2308, 13.4],
     ['drakemaw bench e', 402, 2320, 13.4],

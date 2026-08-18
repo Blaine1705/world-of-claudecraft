@@ -183,9 +183,31 @@ describe('generated chunk geometry is stable', () => {
     // z -193..-118 (the shore strip; max move 11.25 at (-68,-156) where the
     // apron lifts old seabed into strand), town core zero. The gap-fill
     // digest holds: the strip stays clear of the x = -180 rect edge.
-    // An intended, looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('e69073555723dc2c8f378eb9f9361522');
-    // The gap super-chunks take the same re-mint.
+    // Final quay pass in the same change: three skirt stamps ring the flat
+    // pads and one covers the south shoulder, so every land-side rim walks
+    // under the climb gate; the digest above is minted against this final
+    // Streets re-threaded for the lane-clearance proofs in the same change
+    // One more mint: the herb-node moves are terrain inputs too (node ground
+    // pads), the digest follows the final node set. // (roads are height appliers); this digest is the final street set. // stamp set. // An intended, looked-at world change, not drift.
+    // Re-minted 2026-08 for the harbor move (the New Eastbrook program,
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): layout v3
+    // lands Eastbrook on the harbor quay, with wave A carving the cove and
+    // quay pad before it, wave D mooring the harbor fleet on calm-anchor
+    // pads that re-grade the seabed at the moorings after it, and this
+    // change landing the final harbor-geometry polish. Localization checked
+    // on a 1yd lattice over x -220..70, z -220..220 at the production seed
+    // against a git worktree at HEAD: 17,962 of 128,331 points move, every
+    // one inside x -131..58, z -166..100 (the vacated old town ground and
+    // the Wolf Run re-grade, the shore strip, and the quay approaches;
+    // largest move 1.77 at (-32,72)), the civic-square town core carries
+    // only finish grading (52 of its 61x61 core lattice points move, none
+    // by more than 0.011), and nothing at or west of x -161 moves, clear of
+    // the x = -180 rect edge. The gap-fill digest therefore HOLDS,
+    // recomputed byte-identical on the live tree; both digests were
+    // computed twice and are deterministic. An intended, looked-at world
+    // change, not drift.
+    expect(digestOf(inRect)).toBe('4708ee04e7c1484edfe640fb613bbc4f');
+    // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
 
     terrain.cancelStreaming();

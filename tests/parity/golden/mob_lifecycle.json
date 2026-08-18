@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "24547bf4",
+      "state": "da34bf7e",
       "events": "34d113d3",
       "rng": {
         "draws": 5,
@@ -126,7 +126,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 100,
           "id": 964,
@@ -142,16 +142,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -177,16 +177,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "loot": {
@@ -213,16 +213,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -255,7 +255,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -263,9 +263,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -275,15 +275,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -321,7 +321,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -329,9 +329,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -341,15 +341,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -374,7 +374,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 102,
@@ -388,15 +388,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "stats": {
             "armor": 56
@@ -414,7 +414,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 970,
-      "state": "11125e71",
+      "state": "18ea1339",
       "events": "3a573865",
       "rng": {
         "draws": 8,
@@ -516,7 +516,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 100,
           "id": 964,
@@ -532,16 +532,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -567,16 +567,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "loot": {
@@ -603,16 +603,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -645,7 +645,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -653,9 +653,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -665,15 +665,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -711,7 +711,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -719,9 +719,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -731,15 +731,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -764,7 +764,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 102,
@@ -778,15 +778,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "stats": {
             "armor": 56
@@ -806,15 +806,16 @@
           "dead": true,
           "detonateTimer": 1.5,
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 969,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "level": 10,
           "loot": {
@@ -831,14 +832,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "stats": {
             "armor": 81
@@ -857,7 +860,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 970,
-      "state": "baa2f87b",
+      "state": "f811965d",
       "events": "f6e154d6",
       "rng": {
         "draws": 9,
@@ -960,7 +963,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 999984,
           "id": 964,
@@ -976,17 +979,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1.76,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1012,16 +1015,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "loot": {
@@ -1048,16 +1051,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -1090,7 +1093,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -1098,9 +1101,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1110,15 +1113,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -1156,7 +1159,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -1164,9 +1167,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1176,15 +1179,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -1209,7 +1212,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 102,
@@ -1223,15 +1226,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "stats": {
             "armor": 56
@@ -1251,15 +1254,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 969,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "level": 10,
           "loot": {
@@ -1276,14 +1280,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 58.45,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "stats": {
             "armor": 81
@@ -1302,7 +1308,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "aba297f6",
+      "state": "72411758",
       "events": "3493469f",
       "rng": {
         "draws": 15,
@@ -1405,7 +1411,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 999984,
           "id": 964,
@@ -1421,17 +1427,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1.76,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1457,16 +1463,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "loot": {
@@ -1493,16 +1499,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -1535,7 +1541,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -1543,9 +1549,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1555,15 +1561,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -1601,7 +1607,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -1609,9 +1615,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1621,15 +1627,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -1654,7 +1660,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 102,
@@ -1668,15 +1674,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "stats": {
             "armor": 56
@@ -1696,15 +1702,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 969,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "level": 10,
           "loot": {
@@ -1721,14 +1728,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 58.45,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "stats": {
             "armor": 81
@@ -1790,7 +1799,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 973,
-      "state": "41c10186",
+      "state": "afc163f8",
       "events": "0dfa5c3d",
       "rng": {
         "draws": 20,
@@ -1897,7 +1906,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 999984,
           "id": 964,
@@ -1913,17 +1922,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1.76,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1949,16 +1958,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "loot": {
@@ -1985,16 +1994,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -2027,7 +2036,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -2035,9 +2044,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2047,15 +2056,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -2093,7 +2102,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -2101,9 +2110,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2113,15 +2122,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -2146,7 +2155,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 102,
@@ -2160,15 +2169,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "stats": {
             "armor": 56
@@ -2188,15 +2197,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 969,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "level": 10,
           "loot": {
@@ -2213,14 +2223,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 58.45,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "stats": {
             "armor": 81
@@ -2337,7 +2349,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 973,
-      "state": "41c10186",
+      "state": "afc163f8",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2444,7 +2456,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 999984,
           "id": 964,
@@ -2460,17 +2472,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1.76,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2496,16 +2508,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "loot": {
@@ -2532,16 +2544,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": 1
+            "x": -91,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -2574,7 +2586,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -2582,9 +2594,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2594,15 +2606,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 7,
-            "y": 1.5,
-            "z": 1
+            "x": -89,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -2640,7 +2652,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -2648,9 +2660,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2660,15 +2672,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 9,
-            "y": 1.5,
-            "z": 1
+            "x": -87,
+            "y": -2,
+            "z": -55
           },
           "stats": {
             "armor": 40
@@ -2693,7 +2705,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 102,
@@ -2707,15 +2719,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 6,
-            "y": 1.5,
-            "z": 2
+            "x": -90,
+            "y": -2,
+            "z": -54
           },
           "stats": {
             "armor": 56
@@ -2735,15 +2747,16 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 969,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "level": 10,
           "loot": {
@@ -2760,14 +2773,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 58.45,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5
+            "x": -92,
+            "y": -2,
+            "z": -56
           },
           "stats": {
             "armor": 81

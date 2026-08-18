@@ -52,11 +52,11 @@ describe('zone1 quest text direction (issue #2680)', () => {
   it("names the bandit camp's real direction in Trader Wilkes's quest text", () => {
     const quest = ZONE1_QUESTS.q_supplies;
     expect(quest, 'q_supplies should be registered').toBeTruthy();
-    expect(quest.text).toContain('camp in the southwest hills');
-    expect(quest.text).not.toContain('camp in the southeast hills');
+    expect(quest.text).toContain('camp in the northwest hills');
+    expect(quest.text).not.toContain('camp in the northeast hills');
     const resolved = en.entities.quests.q_supplies.text;
-    expect(resolved).toContain('camp in the southwest hills');
-    expect(resolved).not.toContain('camp in the southeast hills');
+    expect(resolved).toContain('camp in the northwest hills');
+    expect(resolved).not.toContain('camp in the northeast hills');
   });
 
   it('places Mogger west of town (positive x)', () => {
@@ -87,11 +87,11 @@ describe('zone1 quest text direction (issue #2680)', () => {
   it("names the spiders' real direction in Weaver Ottilie's quest text", () => {
     const quest = ZONE1_QUESTS.q_prof_amends_outfitter;
     expect(quest, 'q_prof_amends_outfitter should be registered').toBeTruthy();
-    expect(quest.text).toContain('crowding the eastern woods');
-    expect(quest.text).not.toContain('crowding the western woods');
+    expect(quest.text).toContain('crowding the northeastern woods');
+    expect(quest.text).not.toContain('crowding the northwestern woods');
     const resolved = en.entities.quests.q_prof_amends_outfitter.text;
-    expect(resolved).toContain('crowding the eastern woods');
-    expect(resolved).not.toContain('crowding the western woods');
+    expect(resolved).toContain('crowding the northeastern woods');
+    expect(resolved).not.toContain('crowding the northwestern woods');
   });
 
   it('places the wild boars west of town (positive x)', () => {
@@ -102,10 +102,10 @@ describe('zone1 quest text direction (issue #2680)', () => {
   it("names the boars' real direction in Cook Marlow's quest text", () => {
     const quest = ZONE1_QUESTS.q_prof_amends_apothecary;
     expect(quest, 'q_prof_amends_apothecary should be registered').toBeTruthy();
-    expect(quest.text).toContain('wild boars in the west meadow');
-    expect(quest.text).not.toContain('wild boars in the east meadow');
+    expect(quest.text).toContain('wild boars in the northwest meadow');
+    expect(quest.text).not.toContain('wild boars in the northeast meadow');
     const resolved = en.entities.quests.q_prof_amends_apothecary.text;
-    expect(resolved).toContain('wild boars in the west meadow');
-    expect(resolved).not.toContain('wild boars in the east meadow');
+    expect(resolved).toContain('wild boars in the northwest meadow');
+    expect(resolved).not.toContain('wild boars in the northeast meadow');
   });
 });

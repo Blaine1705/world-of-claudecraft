@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_HARBOR_DECKS } from '../sim/eastbrook_harbor';
-import { WATER_LEVEL, terrainHeight } from '../sim/world';
+import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { buildDeckWood } from './deck_render';
 
 // merge a pile of box geometries into one mesh (position + normal only; the

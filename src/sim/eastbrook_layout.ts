@@ -534,7 +534,7 @@ const CIVIC_CENTER = { x: -14, z: -102 } as const;
 // Keep the feature visually central while leaving the default spawn's east-side
 // lane through the square clear for player and pet bodies. The old exact-center
 // placement made x=2 a tangent for the player and an overlap for larger movers.
-const CIVIC_FEATURE_CENTER = { x: -0.75, z: 2 } as const;
+const CIVIC_FEATURE_CENTER = { x: -14.75, z: -102 } as const;
 const FRONT_CLEARANCE = 1.5;
 
 function makeBuilding(
@@ -714,8 +714,8 @@ const BENCHES = [
 ];
 
 const MARKET_STALL_SPECS = [
-  ['eastbrook_market_stall_world_market', 'gold', { x: -17.5, z: -99 }, 2.279422598922567],
-  ['eastbrook_market_stall_provisions', 'green', { x: -17.5, z: -105 }, 0.8621700546672264],
+  ['eastbrook_market_stall_world_market', 'gold', { x: -17.5, z: -97.5 }, 2.4805494847391065],
+  ['eastbrook_market_stall_provisions', 'green', { x: -17.5, z: -106.5 }, 0.6610431688506869],
 ] as const;
 const MARKET_STALLS = MARKET_STALL_SPECS.map(([id, canopyVariant, position, rotation]) => {
   const base = makeObbPlacement(
@@ -829,15 +829,15 @@ function gateCrossing(id: string): Point2 {
 const ROADS = [
   {
     id: 'north',
-    existingRoadPoint: { x: 2, z: -70 },
+    existingRoadPoint: { x: 6, z: -72 },
     gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: 10, z: -94.5 },
-      { x: 8, z: -86 },
-      { x: 4, z: -76 },
-      { x: 2, z: -70 },
-      { x: -2, z: -56 },
+      { x: 14, z: -89 },
+      { x: 12, z: -85 },
+      { x: 10, z: -80 },
+      { x: 6, z: -72 },
+      { x: 0, z: -58 },
     ],
   },
   {
@@ -846,8 +846,8 @@ const ROADS = [
     gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: -12.5, z: -102 },
-      { x: -26, z: -100 },
+      { x: -20, z: -102 },
+      { x: -26, z: -101 },
       { x: -44, z: -98 },
       { x: -56, z: -88 },
       { x: -62, z: -76 },
@@ -859,15 +859,15 @@ const ROADS = [
   },
   {
     id: 'bandit',
-    existingRoadPoint: { x: -6, z: -124 },
+    existingRoadPoint: { x: -10, z: -112 },
     gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: -12, z: -104 },
+      { x: -11, z: -105.5 },
       { x: -10, z: -112 },
-      { x: -6, z: -124 },
-      { x: -16, z: -126 },
-      { x: -26, z: -125 },
+      { x: -9, z: -119 },
+      { x: -12, z: -123 },
+      { x: -22, z: -120.5 },
     ],
   },
   {
@@ -876,8 +876,8 @@ const ROADS = [
     gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: -14, z: -104.5 },
-      { x: -12, z: -118 },
+      { x: -12, z: -107.5 },
+      { x: -11.5, z: -118 },
       { x: -10, z: -132 },
       { x: -10, z: -142 },
     ],
@@ -888,9 +888,9 @@ const ROADS = [
     gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: 8, z: -96 },
+      { x: 7.6, z: -96.4 },
       { x: 0, z: -99 },
-      { x: -11, z: -101 },
+      { x: -9, z: -100.4 },
     ],
   },
   {
@@ -968,39 +968,24 @@ const TRADER_POSITION = localToWorld(
 // position without inventing a replacement stall or blocking the smithy sightline.
 const APOTHECARY_POSITION = { x: -12, z: -97.5 } as const;
 const SMITH_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, -2, 0);
-const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 2, 0);
+const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 2.5, 0);
 const COOK_POSITION = localToWorld(KITCHENS_STATION.position, INN.rotation, 1.75, 0);
 const WEAVER_POSITION = localToWorld(LOOM_STATION.position, WEAVING_HOUSE.rotation, 2, 0);
 const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS.rotation, 2, 0);
-const SAUL_POSITION = { x: 7, z: -92.5 } as const;
+const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
 const FURY_POSITION = { x: -2, z: -74 } as const;
 
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
-  makeNpc(
-    'marshal_redbrook',
-    { x: 10, z: -97.5 },
-    0.0,
-    'eastbrook_noticeboard',
-  ),
+  makeNpc('marshal_redbrook', { x: 10, z: -97.5 }, 0.0, 'eastbrook_noticeboard'),
   makeNpc('trader_wilkes', TRADER_POSITION, MARKET_STALLS[1].rotation, MARKET_STALLS[1].id),
   makeNpc('apothecary_lin', APOTHECARY_POSITION, -2.723368324010564, 'eastbrook_civic_well_beacon'),
   makeNpc('brother_aldric', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
   makeNpc('smith_haldren', SMITH_POSITION, SMITHY.rotation, FORGE_STATION.id),
-  makeNpc(
-    'fisherman_brandt',
-    { x: -95, z: -50 },
-    -1.5707963267948966,
-    'eastbrook_quay',
-  ),
+  makeNpc('fisherman_brandt', { x: -95, z: -50 }, -1.5707963267948966, 'eastbrook_quay'),
   makeNpc('foreman_odell', { x: -84, z: -63 }, 0.6747409422235526, 'eastbrook_quay'),
   makeNpc('bursar_fernando', BANK.frontStandingPoint, BANK.rotation, BANK.id),
-  makeNpc(
-    'card_master',
-    { x: -34, z: -92 },
-    -0.7853981633974483,
-    'eastbrook_inn',
-  ),
+  makeNpc('card_master', { x: -34, z: -92 }, -0.7853981633974483, 'eastbrook_inn'),
   makeNpc('chronicler_saul', SAUL_POSITION, TOOLWORKS.rotation, 'mailbox_eastbrook'),
   makeNpc('forgemistress_darva', DARVA_POSITION, SMITHY.rotation, FORGE_STATION.id),
   makeNpc('cook_marlow', COOK_POSITION, INN.rotation, KITCHENS_STATION.id),
@@ -1033,7 +1018,7 @@ for (let column = 0; column < 9; column++) {
 // Keep both its body and standing point outside F-range of every service NPC:
 // proximity interaction prioritizes lootable objects before NPCs, so a closer
 // placement could otherwise steal the player's service interaction.
-const NOTICEBOARD_POSITION = { x: 8, z: -93 } as const;
+const NOTICEBOARD_POSITION = { x: 5, z: -89 } as const;
 const NOTICEBOARD_ROTATION = facingToward(NOTICEBOARD_POSITION, CIVIC_CENTER);
 const NOTICEBOARD_WIDTH = 2.4;
 const NOTICEBOARD_DEPTH = 0.6;
@@ -1059,7 +1044,7 @@ const SERVICES = {
     interactionRadius: 7,
     // The pillar is a solid collider (the noticeboard pattern), so walkers
     // aim for the posting spot in front of it, not the pillar's own point.
-    frontStandingPoint: { x: 0, z: -6.4 },
+    frontStandingPoint: { x: -10, z: -96.9 },
   },
   noticeboard: {
     id: 'eastbrook_noticeboard',
@@ -1116,15 +1101,15 @@ const SERVICES = {
       // Ends at the pillar's standing point, not inside it: the Ravenpost
       // is a solid collider now, and mail opens from interactionRadius 7.
       points: [
-        { x: 2, z: -2 },
-        { x: 1, z: -5 },
-        { x: 0, z: -6.4 },
+        { x: -12, z: -97.5 },
+        { x: -10.8, z: -95.8 },
+        { x: -10, z: -96.9 },
       ],
     },
     {
       id: 'eastbrook_noticeboard_route',
       bodyRadius: 0.5,
-      points: [{ x: 2.85, z: -1.8 }, { x: 6, z: -6 }, NOTICEBOARD_FRONT_STANDING_POINT],
+      points: [{ x: 4.5, z: -95 }, { x: 5, z: -92.5 }, NOTICEBOARD_FRONT_STANDING_POINT],
     },
     {
       id: 'eastbrook_graveyard_route',
@@ -1134,21 +1119,23 @@ const SERVICES = {
       // may no longer run down the x -14 column straight through the middle
       // stone. The Spirit Healer's anchor stone itself stays scenery.
       points: [
-        { x: -2.85, z: -1.8 },
-        { x: -6, z: -6 },
-        { x: -10, z: -8 },
-        { x: -12.9, z: -10 },
-        { x: -12.9, z: -12.6 },
-        { x: -14, z: -14 },
+        { x: 14, z: -89 },
+        { x: 12, z: -85 },
+        { x: 9, z: -79 },
+        { x: 3, z: -72.5 },
+        { x: -1, z: -71.4 },
       ],
     },
     {
       id: 'eastbrook_armoury_approach',
       bodyRadius: 0.8,
+      // The Armoury stayed behind as the preserved landmark on the Wolf
+      // Run's ground: the approach now leaves the north road at the old
+      // town's heart rather than a civic ring that no longer exists.
       points: [
-        { x: 4.75, z: 2 },
-        { x: 8, z: 0 },
-        { x: 10, z: -3 },
+        { x: 2, z: -4 },
+        { x: 8, z: -4.5 },
+        { x: 10, z: -5 },
         { x: 12, z: -5.5 },
       ],
     },

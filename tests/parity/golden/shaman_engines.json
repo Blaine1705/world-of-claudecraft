@@ -11,8 +11,8 @@
     "Spiritmend Tidecall deposit and Cascading Mend consumption",
     "Shaman spec state in deterministic headless snapshots"
   ],
-  "draws": 2568,
-  "drawDigest": "79076f6d",
+  "draws": 2597,
+  "drawDigest": "33caca96",
   "frames": [
     {
       "tick": 0,
@@ -32,7 +32,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 969,
-      "state": "4840d992",
+      "state": "a3f0d7a5",
       "events": "b5859331",
       "rng": {
         "draws": 0,
@@ -43,7 +43,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 969,
-      "state": "0f18ee82",
+      "state": "78c21cad",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 969,
-      "state": "63ec85a0",
+      "state": "46eae9da",
       "events": "d019fe0d",
       "rng": {
         "draws": 154,
@@ -65,7 +65,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 969,
-      "state": "d62accef",
+      "state": "671337b3",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -76,7 +76,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 969,
-      "state": "5c1993b5",
+      "state": "ea1f06c7",
       "events": "eb38ae90",
       "rng": {
         "draws": 508,
@@ -87,7 +87,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 969,
-      "state": "5c1993b5",
+      "state": "ea1f06c7",
       "events": "741638a5",
       "rng": {
         "draws": 508,
@@ -124,9 +124,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -219,9 +216,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -314,9 +308,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -409,9 +400,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -508,7 +496,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 1,
           "gcdRemaining": 0.363636,
           "hp": 733,
@@ -524,17 +512,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1133,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 32,
@@ -562,7 +550,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 104,
           "hp": 733,
           "id": 965,
@@ -577,17 +565,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1098,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -614,7 +602,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 104,
           "hp": 733,
           "id": 966,
@@ -628,17 +616,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1158,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -677,7 +665,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 104,
           "hp": 822,
           "id": 967,
@@ -692,16 +680,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -726,7 +714,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 999774,
@@ -734,9 +722,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -745,15 +733,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "stats": {},
           "tappedById": 964,
@@ -774,55 +762,55 @@
       "tick": 120,
       "time": 6,
       "nextId": 969,
-      "state": "b7e36b02",
+      "state": "59ddb318",
       "events": "00613fac",
       "rng": {
-        "draws": 695,
-        "digest": "ff70d1e3"
+        "draws": 696,
+        "digest": "b7ac8b45"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 969,
-      "state": "cbc3acfb",
+      "state": "a57a43a5",
       "events": "741638a5",
       "rng": {
-        "draws": 923,
-        "digest": "0ac0a2b6"
+        "draws": 921,
+        "digest": "75d6fbca"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 969,
-      "state": "4e99c576",
-      "events": "f325ce3f",
+      "state": "57747fc7",
+      "events": "8223f706",
       "rng": {
-        "draws": 1157,
-        "digest": "0901d425"
+        "draws": 1159,
+        "digest": "34b764c3"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 969,
-      "state": "828678f2",
+      "state": "b1d46943",
       "events": "741638a5",
       "rng": {
-        "draws": 1413,
-        "digest": "77cb1437"
+        "draws": 1423,
+        "digest": "0600cb5e"
       }
     },
     {
       "tick": 182,
       "time": 9.1,
       "nextId": 969,
-      "state": "dc58c98e",
+      "state": "148c7dc5",
       "events": "741638a5",
       "rng": {
-        "draws": 1440,
-        "digest": "e0c89283"
+        "draws": 1452,
+        "digest": "56a220df"
       },
       "label": "warspirit-cadence",
       "players": [
@@ -855,9 +843,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -941,12 +926,12 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 125
+            "damageDealt": 154
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 125
+              "dummyDamage": 154
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -954,9 +939,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1050,9 +1032,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1145,9 +1124,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1244,7 +1220,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 5.1,
           "hp": 733,
           "id": 964,
@@ -1259,17 +1235,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1149,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 32,
@@ -1354,7 +1330,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
           "dualWielding": true,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 4.1,
           "hp": 733,
           "id": 965,
@@ -1377,17 +1353,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1089,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -1415,7 +1391,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 108.1,
           "hp": 733,
           "id": 966,
@@ -1429,17 +1405,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1158,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -1478,7 +1454,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 108.1,
           "hp": 822,
           "id": 967,
@@ -1493,16 +1469,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1527,17 +1503,17 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999649,
+          "hp": 999620,
           "id": 968,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1546,15 +1522,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "stats": {},
           "tappedById": 964,
@@ -1566,7 +1542,7 @@
             ],
             [
               965,
-              125
+              154
             ]
           ],
           "weapon": {
@@ -1579,33 +1555,33 @@
       "tick": 200,
       "time": 10,
       "nextId": 969,
-      "state": "02f74b18",
-      "events": "001081bf",
+      "state": "9d60100d",
+      "events": "a15732d6",
       "rng": {
-        "draws": 1681,
-        "digest": "40b82402"
+        "draws": 1710,
+        "digest": "d846842a"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 969,
-      "state": "2819c211",
+      "state": "a6618a00",
       "events": "741638a5",
       "rng": {
-        "draws": 1834,
-        "digest": "533b0dee"
+        "draws": 1863,
+        "digest": "95c9e244"
       }
     },
     {
       "tick": 224,
       "time": 11.2,
       "nextId": 969,
-      "state": "37af8d1e",
+      "state": "59b48345",
       "events": "741638a5",
       "rng": {
-        "draws": 1870,
-        "digest": "894237fd"
+        "draws": 1883,
+        "digest": "e2f23fb9"
       },
       "label": "stonebound-posture",
       "players": [
@@ -1638,9 +1614,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1724,12 +1697,12 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 281
+            "damageDealt": 309
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 281
+              "dummyDamage": 309
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1737,9 +1710,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1833,9 +1803,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1928,9 +1895,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2013,7 +1977,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 7.2,
           "hp": 733,
           "id": 964,
@@ -2027,17 +1991,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1176,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 32,
@@ -2157,7 +2121,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
           "dualWielding": true,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 2,
           "hp": 853,
           "id": 965,
@@ -2180,17 +2144,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1080,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -2218,7 +2182,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 110.2,
           "hp": 733,
           "id": 966,
@@ -2232,17 +2196,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1158,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -2281,7 +2245,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 110.2,
           "hp": 822,
           "id": 967,
@@ -2296,16 +2260,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2330,17 +2294,17 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999493,
+          "hp": 999465,
           "id": 968,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2349,15 +2313,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "stats": {},
           "tappedById": 964,
@@ -2369,7 +2333,7 @@
             ],
             [
               965,
-              554
+              580.25
             ]
           ],
           "weapon": {
@@ -2382,55 +2346,55 @@
       "tick": 240,
       "time": 12,
       "nextId": 969,
-      "state": "718fa999",
-      "events": "29bd6e55",
+      "state": "059a9cd4",
+      "events": "7f149eb6",
       "rng": {
-        "draws": 1978,
-        "digest": "73bb4fb1"
+        "draws": 2010,
+        "digest": "2524f6e4"
       }
     },
     {
       "tick": 260,
       "time": 13,
       "nextId": 969,
-      "state": "47427c8c",
-      "events": "e1bf1dc1",
+      "state": "866d29ac",
+      "events": "d0390ef7",
       "rng": {
-        "draws": 2123,
-        "digest": "b7c4e5fd"
+        "draws": 2184,
+        "digest": "69ad0270"
       }
     },
     {
       "tick": 280,
       "time": 14,
       "nextId": 969,
-      "state": "3cd3c303",
-      "events": "d7884150",
+      "state": "9220903a",
+      "events": "38757ded",
       "rng": {
-        "draws": 2315,
-        "digest": "1866b130"
+        "draws": 2340,
+        "digest": "54a3667a"
       }
     },
     {
       "tick": 300,
       "time": 15,
       "nextId": 969,
-      "state": "d3c5664b",
-      "events": "70d13274",
+      "state": "14520a19",
+      "events": "8209fa08",
       "rng": {
-        "draws": 2513,
-        "digest": "52a850b9"
+        "draws": 2535,
+        "digest": "3fea000a"
       }
     },
     {
       "tick": 306,
       "time": 15.3,
       "nextId": 969,
-      "state": "aa75d220",
+      "state": "b872e4bc",
       "events": "741638a5",
       "rng": {
-        "draws": 2568,
-        "digest": "79076f6d"
+        "draws": 2597,
+        "digest": "33caca96"
       },
       "label": "spiritmend-consume",
       "players": [
@@ -2463,9 +2427,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2549,12 +2510,12 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 415
+            "damageDealt": 444
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 415
+              "dummyDamage": 444
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2562,9 +2523,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2658,9 +2616,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2753,9 +2708,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2838,7 +2790,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 11.3,
           "hp": 733,
           "id": 964,
@@ -2852,17 +2804,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1188,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 32,
@@ -2968,7 +2920,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
           "dualWielding": true,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 6.1,
           "hp": 853,
           "id": 965,
@@ -2988,20 +2940,20 @@
             "speed": 2.6
           },
           "onGround": true,
-          "overpowerUntil": 17.35,
+          "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1096,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -3041,7 +2993,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 1.55,
           "hp": 733,
           "id": 966,
@@ -3055,17 +3007,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -4
+            "x": -94,
+            "y": -2,
+            "z": -60
           },
           "potionCooldownUntil": -1,
           "resource": 1118,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -3105,9 +3057,9 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 114.3,
-          "hp": 787,
+          "hp": 730,
           "id": 967,
           "kind": "player",
           "level": 20,
@@ -3120,16 +3072,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -3154,17 +3106,17 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999359,
+          "hp": 999330,
           "id": 968,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3173,15 +3125,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "stats": {},
           "tappedById": 964,
@@ -3193,7 +3145,7 @@
             ],
             [
               965,
-              922.5
+              951.5
             ]
           ],
           "weapon": {
@@ -3206,11 +3158,11 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 969,
-      "state": "aa75d220",
+      "state": "b872e4bc",
       "events": "741638a5",
       "rng": {
-        "draws": 2568,
-        "digest": "79076f6d"
+        "draws": 2597,
+        "digest": "33caca96"
       },
       "label": "final",
       "players": [
@@ -3243,9 +3195,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -3329,12 +3278,12 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 415
+            "damageDealt": 444
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 415
+              "dummyDamage": 444
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3342,9 +3291,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -3438,9 +3384,6 @@
               "footpad_jerkin",
               "spring_water",
               "training_mace"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -3533,9 +3476,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -3618,7 +3558,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 11.3,
           "hp": 733,
           "id": 964,
@@ -3632,17 +3572,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1188,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 32,
@@ -3748,7 +3688,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
           "dualWielding": true,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 6.1,
           "hp": 853,
           "id": 965,
@@ -3768,20 +3708,20 @@
             "speed": 2.6
           },
           "onGround": true,
-          "overpowerUntil": 17.35,
+          "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 3
+            "x": -94,
+            "y": -2,
+            "z": -53
           },
           "potionCooldownUntil": -1,
           "resource": 1096,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -3821,7 +3761,7 @@
           "critChance": 0.0675,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0675,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 1.55,
           "hp": 733,
           "id": 966,
@@ -3835,17 +3775,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -4
+            "x": -94,
+            "y": -2,
+            "z": -60
           },
           "potionCooldownUntil": -1,
           "resource": 1118,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -3885,9 +3825,9 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 114.3,
-          "hp": 787,
+          "hp": 730,
           "id": 967,
           "kind": "player",
           "level": 20,
@@ -3900,16 +3840,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -3934,17 +3874,17 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999359,
+          "hp": 999330,
           "id": 968,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3953,15 +3893,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 6
+            "x": -94,
+            "y": -2,
+            "z": -50
           },
           "stats": {},
           "tappedById": 964,
@@ -3973,7 +3913,7 @@
             ],
             [
               965,
-              922.5
+              951.5
             ]
           ],
           "weapon": {

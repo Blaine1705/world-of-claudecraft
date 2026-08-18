@@ -36,14 +36,22 @@ function world(props: Partial<WorldContent['props']>): WorldContent {
 }
 
 // Flat, dry, collider-free ground to build fixtures on.
+// Widened 2026-08 with the harbor move (d19aa33f76): probe a PATCH, not just
+// the fixture's own z strip. The stall test also approaches from the side
+// (x - 2.95), and the harbor coast rebuild put a steep bank right beside the
+// first z-strip-flat cell, ground the strip probe never validated (the
+// findLevelSpot precedent: grow the helper when a test's needs exceed the
+// flat-spot guarantee).
 function findFlatSpot(): { x: number; z: number } {
   for (let x = -110; x <= 110; x += 3) {
     for (let z = -110; z <= 110; z += 3) {
       if (terrainHeight(x, z, SEED) < WATER_LEVEL + 2) continue;
       let ok = true;
-      for (let dz = -3; dz <= 5 && ok; dz += 1) {
-        if (terrainSteepnessAt(x, z + dz, SEED) > 0.3) ok = false;
-        if (isBlocked(SEED, x, z + dz, 2.2)) ok = false;
+      for (let dx = -3; dx <= 3 && ok; dx += 1) {
+        for (let dz = -3; dz <= 5 && ok; dz += 1) {
+          if (terrainSteepnessAt(x + dx, z + dz, SEED) > 0.3) ok = false;
+          if (isBlocked(SEED, x + dx, z + dz, 2.2)) ok = false;
+        }
       }
       if (ok) return { x, z };
     }
@@ -418,7 +426,13 @@ describe('the climb against real world geometry', () => {
     setActiveWorldContent(null);
     // Eastbrook's cemetery, stone 1: a cross, and the anchor stone beside it
     // is deliberately uncollided (a Spirit Healer stands there).
-    const gy = { x: -14, z: -14 };
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76, the New Eastbrook
+    // program, docs/design/eastbrook-revamp/site-plan.md): the cemetery is
+    // authored at (-2, -70) at the harbor town. Approach from the NORTH: the
+    // re-laid ground falls northward, and from the south the floor sits
+    // inside the silent-vault band (top minus floor 1.963 vs
+    // CLIMB_MIN_OVERHEAD 2.025), so the pull-up correctly refuses there.
+    const gy = { x: -2, z: -70 };
     const off = graveOffset(1);
     const sx = gy.x + off.x;
     const sz = gy.z + off.z;
@@ -428,10 +442,10 @@ describe('the climb against real world geometry', () => {
     sim.setPlayerLevel(60);
     const p = sim.player;
     p.pos.x = sx;
-    p.pos.z = sz - 1.6;
+    p.pos.z = sz + 1.6;
     p.pos.y = terrainHeight(p.pos.x, p.pos.z, SEED);
     p.prevPos = { ...p.pos };
-    p.facing = 0; // +z, at the stone
+    p.facing = Math.PI; // -z, at the stone
     p.onGround = true;
     const meta = sim.players.get(p.id);
     if (!meta) throw new Error('missing meta');

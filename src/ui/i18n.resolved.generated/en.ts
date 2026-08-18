@@ -13710,7 +13710,7 @@ export const en: EnTranslations = {
       "apothecary_lin": {
         "name": "Apothecary Lin",
         "title": "Herbalist",
-        "greeting": "Careful where you step in the eastern woods, friend."
+        "greeting": "Careful where you step in the northeastern woods, friend."
       },
       "brother_aldric": {
         "name": "Brother Aldric",
@@ -14176,7 +14176,7 @@ export const en: EnTranslations = {
       },
       "q_boars": {
         "title": "Bristly Boar Hides",
-        "text": "Boar hide makes the finest travel packs, and the meadows west of town are crawling with the beasts. Bring me 5 Bristly Boar Hides and I will make it worth your time.",
+        "text": "Boar hide makes the finest travel packs, and the meadows northwest of town are crawling with the beasts. Bring me 5 Bristly Boar Hides and I will make it worth your time.",
         "completion": "Ah, fine bristly hides! These will fetch a good price.",
         "objectives": {
           "0": {
@@ -14186,7 +14186,7 @@ export const en: EnTranslations = {
       },
       "q_spiders": {
         "title": "Sableweb Menace",
-        "text": "The lurkers in the eastern woods spin a silk I need for my poultices - and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.",
+        "text": "The lurkers in the northeastern woods spin a silk I need for my poultices - and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.",
         "completion": "Ugh, still twitching. Perfect. Here, you've earned this.",
         "objectives": {
           "0": {
@@ -14229,7 +14229,7 @@ export const en: EnTranslations = {
       },
       "q_supplies": {
         "title": "Stolen Supplies",
-        "text": "Those bandits hit my last wagon and made off with four crates of goods: tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?",
+        "text": "Those bandits hit my last wagon and made off with four crates of goods: tools, salt, good Eastbrook linen. The crates are stacked around their camp in the northwest hills. Steal them back for me, would you?",
         "completion": "My crates! Barely a scratch on them. You are a wonder.",
         "objectives": {
           "0": {
@@ -14322,7 +14322,7 @@ export const en: EnTranslations = {
       },
       "q_bandits": {
         "title": "Bandits of the Vale",
-        "text": "A pack of cutthroats has made camp in the southwest hills. They have robbed three wagons this week. Drive them out - slay 10 Vale Bandits.",
+        "text": "A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out - slay 10 Vale Bandits.",
         "completion": "Ten fewer knives in the dark. Take this - you have earned it.",
         "objectives": {
           "0": {
@@ -15002,7 +15002,7 @@ export const en: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Threads Rejoined",
-        "text": "Back at my loom after all. I hold no grudge, {playerName}, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the Sableweb Lurkers crowding the eastern woods, and the labor will settle your hands before they touch good silk again.",
+        "text": "Back at my loom after all. I hold no grudge, {playerName}, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the Sableweb Lurkers crowding the northeastern woods, and the labor will settle your hands before they touch good silk again.",
         "completion": "Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.",
         "objectives": {
           "0": {
@@ -15012,7 +15012,7 @@ export const en: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Back on the Stove",
-        "text": "Well, look who is back at my pot. No hard feelings, {playerName}, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the west meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.",
+        "text": "Well, look who is back at my pot. No hard feelings, {playerName}, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the northwest meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.",
         "completion": "There is the old flavor. Alchemy and Cooking are back on your stove as majors. Stay a while this time.",
         "objectives": {
           "0": {

@@ -364,7 +364,13 @@ const MAZE_WALL_FLOOD = floodFrom(ZONES[0].hub, MAZE_WALL_FLOOD_BOX);
 // The Eastbrook lake dock's plank surface: groundHeight rides dockSurfaceHeight
 // above the shore terrain here, so the two really differ.
 const ON_A_DOCK_PLANK = { x: PROPS.docks[0].x, z: PROPS.docks[0].z };
-const INSIDE_A_TOWN_COLLIDER = { x: -29, z: 0 };
+// Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md): the old fixture (-29,0) sat
+// inside the origin town's ring wall, and the move demolished the wall and
+// emptied that ground. This point sits just inside the relocated smithy's
+// west wall at the crafts district (smithy lot (-2,-122)), with standable
+// ground a yard away, the same shallow shape the old fixture had.
+const INSIDE_A_TOWN_COLLIDER = { x: -7, z: -123 };
 // Genuinely enclosed, not merely overlapping: the nearest ground a player
 // can hold is 4.5yd away, three times the widest clearance a node's own
 // body can account for, and still inside the harvest reach the sweep

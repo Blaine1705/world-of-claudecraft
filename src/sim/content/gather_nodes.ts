@@ -228,7 +228,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_eastbrook_1',
     zoneId: 'eastbrook_vale',
     type: 'herb',
-    pos: { x: -59, z: 91 },
+    pos: { x: -58, z: 91 },
     level: 4,
     tier: 1,
   },
@@ -263,7 +263,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     // the harbor town on that basin), but the meadow spot above the ground
     // keeps 8.0yd of sea freeboard and 5.4yd across the whole harvest reach,
     // and the basin below is reserved construction ground now anyway.
-    pos: { x: 6, z: -69 },
+    pos: { x: 12, z: -63 },
     level: 4,
     tier: 1,
   },

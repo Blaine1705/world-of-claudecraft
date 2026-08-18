@@ -175,17 +175,22 @@ describe('Eastbrook town renderer', () => {
     const wallBatches = meshesOf(view.group).filter(
       (mesh) => mesh.userData.eastbrookWallInstances,
     ) as THREE.InstancedMesh[];
-    expect(wallBatches).toHaveLength(4);
+    // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): layout v3 deliberately
+    // retired the ring wall (WALL_SEGMENTS and WALL_GATES are empty while the
+    // batching machinery stays), so zero wall batches and zero gates are the
+    // authored state.
+    expect(wallBatches).toHaveLength(0);
     expect(wallBatches.every((mesh) => mesh instanceof THREE.InstancedMesh)).toBe(true);
-    expect(wallBatches.filter((mesh) => mesh.userData.handedness === 'mirrored')).toHaveLength(2);
-    expect(wallBatches.filter((mesh) => mesh.userData.handedness === 'original')).toHaveLength(2);
+    expect(wallBatches.filter((mesh) => mesh.userData.handedness === 'mirrored')).toHaveLength(0);
+    expect(wallBatches.filter((mesh) => mesh.userData.handedness === 'original')).toHaveLength(0);
     expect(
       wallBatches
         .filter((mesh) => !mesh.name.includes('Emissive'))
         .reduce((sum, mesh) => sum + mesh.count, 0),
     ).toBe(EASTBROOK_LAYOUT.wall.segments.length);
     expect(view.group.userData.wallSegmentCount).toBe(EASTBROOK_LAYOUT.wall.segments.length);
-    expect(view.group.userData.gateCount).toBe(6);
+    expect(view.group.userData.gateCount).toBe(0);
     expect(view.group.userData.roofHideTargetCount).toBe(EASTBROOK_LAYOUT.buildings.length);
     expect(view.group.userData.microPlacementIds).toEqual([
       EASTBROOK_LAYOUT.civic.wellBeacon.id,
@@ -196,14 +201,14 @@ describe('Eastbrook town renderer', () => {
     ]);
     expect(view.group.userData.microPlacementIds).not.toContain('eastbrook_market_stall_artisans');
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({
-      colorDraws: 18,
-      shadowDraws: 9,
+      colorDraws: 14,
+      shadowDraws: 7,
       buildingCount: 6,
       roofHideTargetCount: 6,
       microBatchCount: 2,
-      wallBatchCount: 4,
-      wallSegmentCount: 26,
-      gateCount: 6,
+      wallBatchCount: 0,
+      wallSegmentCount: 0,
+      gateCount: 0,
     });
   });
 
@@ -319,14 +324,18 @@ describe('Eastbrook town renderer', () => {
     setStandardMaterials(false);
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     const meshes = meshesOf(view.group);
-    expect(meshes).toHaveLength(18);
+    // Re-pinned 2026-08 for the harbor move's wall retirement (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): 14 meshes are the 6 building
+    // opaque+emissive pairs plus the 2 micro batches; the 4 wall InstancedMeshes
+    // no longer exist.
+    expect(meshes).toHaveLength(14);
     expect(
       meshes.every((mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial'),
     ).toBe(true);
     expect(meshes.every((mesh) => (mesh.material as THREE.MeshLambertMaterial).vertexColors)).toBe(
       true,
     );
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 7 });
   });
 
   it('mirrors exactly the first real wall chord after each asymmetric gate socket', async () => {
@@ -361,31 +370,16 @@ describe('Eastbrook town renderer', () => {
       ).toBe(true);
     }
 
+    // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): with the ring wall retired
+    // (zero segments, zero gates) the mirror machinery selects zero chords and
+    // buildWallBatches creates no instanced meshes at all, so the group carries
+    // no mirroredWallSegmentIds and neither wall batch exists. The GLB socket
+    // asymmetry contract on eastbrook_wall_wing.glb stays pinned above.
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
-    expect(view.group.userData.mirroredWallSegmentIds).toEqual(
-      expectedMirrored.map((segment) => segment.id),
-    );
-    const mirrored = view.group.getObjectByName(
-      'eastbrookTownWallOpaqueMirroredInstances',
-    ) as THREE.InstancedMesh;
-    const original = view.group.getObjectByName(
-      'eastbrookTownWallOpaqueInstances',
-    ) as THREE.InstancedMesh;
-    expect(mirrored.count).toBe(6);
-    expect(original.count).toBe(EASTBROOK_LAYOUT.wall.segments.length - 6);
-    expect(mirrored.geometry).not.toBe(original.geometry);
-
-    const position = mirrored.geometry.getAttribute('position');
-    const normal = mirrored.geometry.getAttribute('normal');
-    const index = mirrored.geometry.getIndex();
-    const a = new THREE.Vector3().fromBufferAttribute(position, index?.getX(0) ?? 0);
-    const b = new THREE.Vector3().fromBufferAttribute(position, index?.getX(1) ?? 1);
-    const c = new THREE.Vector3().fromBufferAttribute(position, index?.getX(2) ?? 2);
-    const faceNormal = b.clone().sub(a).cross(c.clone().sub(a)).normalize();
-    const storedNormal = new THREE.Vector3()
-      .fromBufferAttribute(normal, index?.getX(0) ?? 0)
-      .normalize();
-    expect(faceNormal.dot(storedNormal)).toBeGreaterThan(0);
+    expect(view.group.userData.mirroredWallSegmentIds).toBeUndefined();
+    expect(view.group.getObjectByName('eastbrookTownWallOpaqueMirroredInstances')).toBeUndefined();
+    expect(view.group.getObjectByName('eastbrookTownWallOpaqueInstances')).toBeUndefined();
   });
 
   it('keeps pitched wall and fence spans terrain-supported across their full footprints', () => {
@@ -473,7 +467,10 @@ describe('Eastbrook town renderer', () => {
     const staticBatches = meshesOf(view.group).filter(
       (mesh) => mesh.userData.eastbrookMicroBatch || mesh.userData.eastbrookWallInstances,
     );
-    expect(staticBatches).toHaveLength(6);
+    // Re-pinned 2026-08: only the 2 micro batches remain after the harbor
+    // move's wall retirement (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md).
+    expect(staticBatches).toHaveLength(2);
     view.update(1000, 5, 1000, 1000, 5, 1000, 100, 1);
     expect(staticBatches.every((mesh) => !mesh.visible)).toBe(true);
     view.update(0, 5, 0, 0, 5, 0, 100, 1);
@@ -571,9 +568,13 @@ describe('Eastbrook repeated placement triangle budget', () => {
     }
 
     const budget = eastbrookTownTriangleBudget(triangleCountByAsset);
+    // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the wall wing stays
+    // registered and preloaded with zero placements, so the budget carries its
+    // zero-instance row while the placement-derived constant omits the key.
     expect(
       Object.fromEntries(budget.assets.map((asset) => [asset.assetUrl, asset.instances])),
-    ).toEqual(EASTBROOK_TOWN_ASSET_INSTANCE_COUNTS);
+    ).toEqual({ ...EASTBROOK_TOWN_ASSET_INSTANCE_COUNTS, [EASTBROOK_LAYOUT.wall.assetId]: 0 });
     expect(
       budget.assets.find((asset) => asset.assetUrl.endsWith('eastbrook_market_stall.glb')),
     ).toMatchObject({ instances: 2 });
@@ -581,12 +582,15 @@ describe('Eastbrook repeated placement triangle budget', () => {
       budget.assets.find((asset) => asset.assetUrl.endsWith('eastbrook_wall_wing.glb')),
     ).toMatchObject({ instances: EASTBROOK_LAYOUT.wall.segments.length });
     expect(budget.maximumFoundationTriangles).toBe(EASTBROOK_LAYOUT.buildings.length * 12);
-    expect(budget.assetTriangles).toBe(28_830);
+    // Re-minted 2026-08: the 26 retired wall instances took 5,356 triangles
+    // with them in the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md).
+    expect(budget.assetTriangles).toBe(23_474);
     expect(budget.maximumFoundationTriangles).toBe(72);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(28_902);
+    expect(budget.maximumRuntimeTriangles).toBe(23_546);
     expect(
       budget.maximumRuntimeTriangles,
       JSON.stringify({

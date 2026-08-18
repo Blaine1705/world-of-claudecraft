@@ -4669,8 +4669,11 @@ describe('full self-state snapshot delta fixture', () => {
     meta.craftSkills.weaponcrafting = 25; // forgeguard is weaponcrafting
     meta.copper = 10000;
     // Stand at the Eastbrook forge: training is gated on the STATIC station.
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): station_eastbrook_forge moved
+    // with the smithy to (-5.80, -123.90); stand ~0.2yd from its center.
     const player = server.sim.entities.get(session.pid)!;
-    player.pos = { ...player.pos, x: 7, z: 16.5 };
+    player.pos = { ...player.pos, x: -6, z: -124 };
     player.prevPos = { ...player.pos };
 
     broadcast(server);

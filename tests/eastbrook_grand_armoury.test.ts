@@ -48,7 +48,13 @@ import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SEED = WORLD_SEED;
-const ALTERNATE_SEED = 4717;
+// Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md): the wave A terrain re-sculpt is
+// seed-independent world-gen, and under it seed 4717 lost the positive-skirt
+// premise this suite exercises (its envelope now yields foundationSkirtDepth
+// 0, which nulls the skirt). Seed 162 restores a skirt depth nearly identical
+// to the old fixture's.
+const ALTERNATE_SEED = 162;
 
 afterEach(() => setActiveWorldContent(null));
 
@@ -193,7 +199,11 @@ describe('Eastbrook Grand Armoury lot', () => {
       hw: 6.5,
       hd: 4.5,
       rot: -Math.PI / 2,
-      cameraTopY: 16.5,
+      // Re-derived 2026-08: the harbor move's terrain re-sculpt (d19aa33f76,
+      // docs/design/eastbrook-revamp/site-plan.md) changed the ground under
+      // the unmoved armoury entrance, so pin against the live terrain the way
+      // the render-seam placement test below does.
+      cameraTopY: terrainHeight(13, -5.5, SEED) + 15,
     });
   });
 
@@ -226,10 +236,13 @@ describe('Eastbrook Grand Armoury lot', () => {
       building,
       (x, z) => terrainHeight(x, z, ALTERNATE_SEED),
     );
-    expect(alternatePlacement.entranceGroundY).toBeCloseTo(1.5, 8);
-    expect(alternatePlacement.minGroundY).toBeCloseTo(-0.8266606569, 8);
-    expect(alternatePlacement.y).toBeCloseTo(0.15, 8);
-    expect(alternatePlacement.foundationSkirtDepth).toBeCloseTo(0.9766606569, 8);
+    // Re-pinned 2026-08 to the seed-162 envelope after the Eastbrook harbor
+    // move's terrain re-sculpt (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md).
+    expect(alternatePlacement.entranceGroundY).toBeCloseTo(7.886894391475175, 8);
+    expect(alternatePlacement.minGroundY).toBeCloseTo(5.559724942256701, 8);
+    expect(alternatePlacement.y).toBeCloseTo(6.536894391475174, 8);
+    expect(alternatePlacement.foundationSkirtDepth).toBeCloseTo(0.977169449218473, 8);
 
     const group = new THREE.Group();
     const stone = new THREE.MeshStandardMaterial({ vertexColors: true });
@@ -311,7 +324,12 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     player.pos.x = NPCS.card_master.pos.x;
     player.pos.z = NPCS.card_master.pos.z;
     expect(buildingRestPadding(building)).toBe(0.9);
-    expect(isResting(player)).toBe(false);
+    // Flipped 2026-08: the card table moved with the town in the harbor move
+    // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md) and now sits on
+    // the inn porch (anchored to eastbrook_inn), inside the inn's authored
+    // rest footprint, so resting there is the authored behavior. The armoury
+    // grants-no-rest discrimination stays covered by the exterior point above.
+    expect(isResting(player)).toBe(true);
   });
 
   it('does not leak the built-in rest area into a custom world without buildings', () => {

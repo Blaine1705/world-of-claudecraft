@@ -239,7 +239,10 @@ describe('Eastbrook civic beacon shader animation', () => {
       maskAttribute: EASTBROOK_CIVIC_MASK_ATTRIBUTE,
       programCacheKey: 'eastbrook-civic-beacon-v1',
     });
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
+    // Draw stats re-pinned 2026-08: harbor-move layout v3 retired the ring
+    // wall (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), removing
+    // the 4 wall color draws and 2 wall shadow draws.
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 7 });
 
     view.update(0, 5, 0, 0, 0, 0, 100, 1, true);
     const shader = compileMaterial(micro.material as THREE.Material);
@@ -312,7 +315,9 @@ describe('Eastbrook civic beacon shader animation', () => {
       }
     });
     expect(decoratedMeshes).toEqual(['eastbrookTownMicroEmissiveBatch']);
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
+    // Re-pinned 2026-08 with the harbor move's wall retirement (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md).
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 7 });
   });
 
   it('does not instantiate the animation or any town geometry for a custom world', () => {
@@ -326,7 +331,11 @@ describe('Eastbrook civic beacon shader animation', () => {
     });
   });
 
-  it('preserves the committed 28,902 runtime triangle budget without another draw', async () => {
+  // Committed budget re-minted 2026-08: 26 wall-wing instances (5,356
+  // triangles) left the layout with the Eastbrook harbor move (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): 23,474 asset triangles plus
+  // the 72-triangle foundation allowance.
+  it('preserves the committed 23,546 runtime triangle budget without another draw', async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -346,7 +355,7 @@ describe('Eastbrook civic beacon shader animation', () => {
       triangleCountByAsset[assetUrl] = triangles;
     }
     expect(eastbrookTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      maximumRuntimeTriangles: 28_902,
+      maximumRuntimeTriangles: 23_546,
       withinHardCeiling: true,
       meetsTarget: true,
     });

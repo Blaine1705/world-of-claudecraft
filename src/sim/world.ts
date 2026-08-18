@@ -37,9 +37,10 @@ import {
   zoneAt,
 } from './data';
 import { dawnholdLift, dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
-import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import { dockSurfaceHeight } from './deck_surfaces';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
+import { eastbrookDeckSurface } from './eastbrook_harbor';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -47,7 +48,6 @@ import {
   emberNearestOnLink,
 } from './ember_lava_layout';
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
-import { eastbrookDeckSurface } from './eastbrook_harbor';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import {
@@ -3643,47 +3643,6 @@ export function stableFlattenWeight(x: number, z: number): number {
   return 1 - smoothstep(0, 1, d / f.falloff);
 }
 
-// The renderer seats each dock section relative to its shore anchor, then uses
-// the plank top as a raised walkable surface. Return the matching absolute
-// surface height, or -Infinity outside every deck footprint.
-function dockSurfaceHeight(x: number, z: number, seed: number): number {
-  // Wickharbor's stilt piers and boardwalk ride the same raised-surface arm
-  // (an absolute plank plane, never a terrain lift; see sim/gale_harbor.ts).
-  let surface = galeDeckSurface(
-    x,
-    z,
-    (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
-    WATER_LEVEL,
-  );
-  // ...New Eastbrook's quay boardwalk and piers, the same idiom
-  surface = Math.max(
-    surface,
-    eastbrookDeckSurface(
-      x,
-      z,
-      (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
-      WATER_LEVEL,
-    ),
-  );
-  // ...and the Palmreach's river bridges and lagoon decks, the same idiom
-  surface = Math.max(
-    surface,
-    reachDeckSurface(
-      x,
-      z,
-      (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
-      WATER_LEVEL,
-    ),
-  );
-  for (const dock of getActiveWorldContent().props.docks) {
-    const local = dockLocalPoint(dock, x, z);
-    if (dockSectionAtLocal(local.x, local.z) < 0) continue;
-    const line = dockSurfaceLine(dock, (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed));
-    surface = Math.max(surface, dockSurfaceYAt(line, local.z));
-  }
-  return surface;
-}
-
 // ---------------------------------------------------------------------------
 // Declared-lake grading: two arms that keep inland water escapable on foot
 // (the terrain-side counterpart of the movement kernel's ride_height.ts).
@@ -3952,7 +3911,16 @@ export function groundHeight(x: number, z: number, seed: number): number {
     castleLift(x, z) +
     dawnholdLift(x, z) +
     bulwarkLift(x, z);
-  return Math.max(terrain, dockSurfaceHeight(x, z, seed));
+  return Math.max(
+    terrain,
+    dockSurfaceHeight(
+      x,
+      z,
+      (sx, sz) => terrainHeight(sx, sz, seed),
+      WATER_LEVEL,
+      getActiveWorldContent().props.docks,
+    ),
+  );
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
@@ -5143,7 +5111,9 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   if (galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
     return null;
   }
-  if (eastbrookDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
+  if (
+    eastbrookDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity
+  ) {
     return null;
   }
   if (!reachDeckClear(x, z, 1)) return null;

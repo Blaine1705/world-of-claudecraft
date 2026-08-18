@@ -45,6 +45,13 @@ const WORD_CLAIM: Readonly<Record<string, { claims: readonly Component[]; domina
   western: { claims: ['west'], dominant: true },
   eastern: { claims: ['east'], dominant: true },
   northeast: { claims: ['north', 'east'], dominant: false },
+  // "northeastern" needs its own key: \bnortheast\b cannot match inside
+  // "northeastern" (the whole-word test is the point), so the adjectival form
+  // carries the same two-component claim under its own spelling. Added
+  // 2026-08 with the harbor-move prose re-derivation (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md).
+  northeastern: { claims: ['north', 'east'], dominant: false },
+  northwest: { claims: ['north', 'west'], dominant: false },
   southwest: { claims: ['south', 'west'], dominant: false },
 };
 
@@ -111,12 +118,15 @@ const ROWS: readonly CompassRow[] = [
     to: poi(VALE, 'copper_dig'),
     target: 'the copper_dig POI',
   },
-  // "The crates are stacked around their camp in the southwest hills": the
+  // "The crates are stacked around their camp in the northwest hills": the
   // camp is the bandits' own (zone1.ts ZONE1_CAMPS vale_bandit, first entry);
-  // the crate objects themselves sit in the same quadrant.
+  // the crate objects themselves sit in the same quadrant. Re-derived 2026-08:
+  // the harbor move (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md)
+  // moved the town hub while the camps stayed, so the bearing from town
+  // swung from southwest to northwest and the prose moved with it.
   {
     id: 'q_supplies',
-    word: 'southwest',
+    word: 'northwest',
     from: hub(VALE),
     to: camp('vale_bandit'),
     target: 'the first vale_bandit camp',
@@ -130,20 +140,26 @@ const ROWS: readonly CompassRow[] = [
     to: camp('mogger'),
     target: "Mogger's camp",
   },
-  // "Cull the webwood spiders crowding the eastern woods": the spiders have
-  // exactly one camp (zone1.ts ZONE1_CAMPS webwood_spider).
+  // "Cull the Sableweb Lurkers crowding the northeastern woods": the spiders
+  // have exactly one camp (zone1.ts ZONE1_CAMPS webwood_spider). Re-derived
+  // 2026-08 from the harbor-move hub (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): the woods now sit
+  // north-dominant of town, so the pure cardinal became an intercardinal.
   {
     id: 'q_prof_amends_outfitter',
-    word: 'eastern',
+    word: 'northeastern',
     from: hub(VALE),
     to: camp('webwood_spider'),
     target: 'the webwood_spider camp',
   },
-  // "Go thin the wild boars in the west meadow": the boars' first camp
+  // "Go thin the wild boars in the northwest meadow": the boars' first camp
   // (zone1.ts ZONE1_CAMPS wild_boar), the one the meadow POI sits in.
+  // Re-derived 2026-08 from the harbor-move hub (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): the meadow is north-dominant
+  // of town now, so the pure cardinal became an intercardinal.
   {
     id: 'q_prof_amends_apothecary',
-    word: 'west',
+    word: 'northwest',
     from: hub(VALE),
     to: camp('wild_boar'),
     target: 'the first wild_boar camp',
@@ -178,24 +194,26 @@ const ROWS: readonly CompassRow[] = [
   // CONTROL ROWS: already-correct claims the phase did not have to touch.
   // They are here so a convention flip, a sign slip in the checks below, or a
   // camp migration cannot quietly turn this file into a table of one-sided
-  // passes.
+  // passes. Words re-derived 2026-08 with the harbor move (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): the hub moved, the camps
+  // stayed, and the prose re-derived from the new bearings.
   {
     id: 'q_spiders',
-    word: 'eastern',
+    word: 'northeastern',
     from: hub(VALE),
     to: camp('webwood_spider'),
     target: 'the webwood_spider camp',
   },
   {
     id: 'q_bandits',
-    word: 'southwest',
+    word: 'northwest',
     from: hub(VALE),
     to: camp('vale_bandit'),
     target: 'the first vale_bandit camp',
   },
   {
     id: 'q_boars',
-    word: 'west',
+    word: 'northwest',
     from: hub(VALE),
     to: camp('wild_boar'),
     target: 'the first wild_boar camp',
@@ -276,7 +294,11 @@ describe('quest direction words match the world (the compass-truth guard)', () =
     const words = new Set(ROWS.map((r) => r.word));
     expect(words.has('west') || words.has('western')).toBe(true);
     expect(words.has('eastern')).toBe(true);
-    expect(words.has('southwest')).toBe(true);
+    // Re-pinned 2026-08: the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md) retired the last southwest
+    // claim; northwest and northeast(ern) now cover both X signs among the
+    // intercardinals, and western plus eastern cover the cardinals.
+    expect(words.has('northwest')).toBe(true);
     expect(words.has('northeast')).toBe(true);
     const dxs = ROWS.map((r) => r.to.x - r.from.x);
     expect(dxs.some((dx) => dx > 0)).toBe(true);

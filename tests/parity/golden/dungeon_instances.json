@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 980,
-      "state": "98179ab5",
+      "state": "93b46089",
       "events": "377121be",
       "rng": {
         "draws": 39,
@@ -215,9 +215,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -264,9 +264,9 @@
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -912,7 +912,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 980,
-      "state": "5c5d0252",
+      "state": "60f7e28e",
       "events": "c2669e40",
       "rng": {
         "draws": 42,
@@ -1099,9 +1099,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1148,9 +1148,9 @@
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -1796,7 +1796,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 980,
-      "state": "46290881",
+      "state": "a4f7f029",
       "events": "eff496f8",
       "rng": {
         "draws": 42,
@@ -1807,7 +1807,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 980,
-      "state": "c6fac2e3",
+      "state": "e1429cf3",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1818,7 +1818,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 980,
-      "state": "22efebed",
+      "state": "1e69b505",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1829,7 +1829,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 980,
-      "state": "b91952ef",
+      "state": "b1fa3637",
       "events": "f1768bb6",
       "rng": {
         "draws": 44,
@@ -1840,7 +1840,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 980,
-      "state": "a4b3840f",
+      "state": "c10061d7",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -2039,9 +2039,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2089,9 +2089,9 @@
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -2115,7 +2115,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 980,
-      "state": "a4b3840f",
+      "state": "c10061d7",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -2314,9 +2314,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2364,9 +2364,9 @@
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {

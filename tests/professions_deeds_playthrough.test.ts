@@ -260,10 +260,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits at index 16 in the shared
+  // 90s budget: the re-hunted koi session sits at index 18 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (17 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (19 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -305,10 +305,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded with the
     // craft-cast system: shared-stream draws shift vs the instant-craft era.
-    // The merged world lands the koi on session index 0 (re-hunted on the
-    // castle-wave plus dig-headland merged base; both sides of that merge
-    // had re-hunted this independently, and the castle world already read 0).
-    expect(koiSession).toBe(0);
+    // Re-hunted 2026-08 for the Eastbrook harbor move (layout v3, d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the relocated town, camps,
+    // harbor decks, and retuned terrain shift the world-gen draws and every
+    // shared-stream index downstream; the koi now lands on session index 18.
+    expect(koiSession).toBe(18);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -339,19 +340,23 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // castle-wave merged base: the moved camps, veins, road, and terrain
     // shift the world-gen draws and so every shared-stream index downstream,
     // the same cause as the quest-dedupe re-record above.
+    // Re-hunted again 2026-08 for the Eastbrook harbor move (layout v3,
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the relocated
+    // town, camps, harbor decks, and retuned terrain shift the world-gen
+    // draws, the same cause as the dig-headland re-record.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 338 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 78 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 130,
+        hitAt: 154,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 25,
+        hitAt: 37,
       },
     ];
     for (const hunt of hunts) {
@@ -411,9 +416,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded with the
     // craft-cast system: the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 8 (re-hunted on the castle-wave plus
-    // dig-headland merged base, same cause as the beat 12 to 14 hunts).
-    expect(hitAt).toBe(8);
+    // specimen lands on attempt index 0 (re-hunted 2026-08 for the Eastbrook
+    // harbor move, layout v3, d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md, same cause as the beat 12 to
+    // 14 hunts).
+    expect(hitAt).toBe(0);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

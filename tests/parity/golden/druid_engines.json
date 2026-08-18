@@ -9,8 +9,8 @@
     "Old Blood landed-strike bank across Wolf and Bruin with both payoffs",
     "Verdance completed-HoT bank and Overbloom harvest"
   ],
-  "draws": 10661,
-  "drawDigest": "64154b6c",
+  "draws": 10673,
+  "drawDigest": "4d86fa5a",
   "frames": [
     {
       "tick": 0,
@@ -30,7 +30,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 968,
-      "state": "5edfe077",
+      "state": "fb448b36",
       "events": "929e091e",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 968,
-      "state": "9c9340b9",
+      "state": "6d5f884a",
       "events": "7f78c4c8",
       "rng": {
         "draws": 0,
@@ -52,7 +52,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 968,
-      "state": "41ac9037",
+      "state": "8b1aa852",
       "events": "741638a5",
       "rng": {
         "draws": 147,
@@ -63,7 +63,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 968,
-      "state": "58ab6bba",
+      "state": "aa67e0f0",
       "events": "744434ab",
       "rng": {
         "draws": 331,
@@ -74,7 +74,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 968,
-      "state": "51d16d16",
+      "state": "b59a9e78",
       "events": "7f78c4c8",
       "rng": {
         "draws": 497,
@@ -85,7 +85,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 968,
-      "state": "b6557d56",
+      "state": "71d87d78",
       "events": "e30e7a37",
       "rng": {
         "draws": 708,
@@ -96,7 +96,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 968,
-      "state": "3be17302",
+      "state": "9e041a70",
       "events": "7f78c4c8",
       "rng": {
         "draws": 932,
@@ -107,7 +107,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 968,
-      "state": "b806dcb4",
+      "state": "fe956050",
       "events": "741638a5",
       "rng": {
         "draws": 1168,
@@ -118,7 +118,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 968,
-      "state": "f2235e1e",
+      "state": "80590abc",
       "events": "6fb3c39f",
       "rng": {
         "draws": 1444,
@@ -129,7 +129,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 968,
-      "state": "fcc193c6",
+      "state": "7f0d39cc",
       "events": "9dffc7c2",
       "rng": {
         "draws": 1714,
@@ -140,7 +140,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 968,
-      "state": "cdd1ce27",
+      "state": "0c1b1165",
       "events": "7f78c4c8",
       "rng": {
         "draws": 1893,
@@ -151,7 +151,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 968,
-      "state": "081d510c",
+      "state": "a9650654",
       "events": "3908e8a2",
       "rng": {
         "draws": 2034,
@@ -162,7 +162,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 968,
-      "state": "6d4c90d8",
+      "state": "cbae6134",
       "events": "7f78c4c8",
       "rng": {
         "draws": 2189,
@@ -173,7 +173,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 968,
-      "state": "6f987bee",
+      "state": "deeb1204",
       "events": "741638a5",
       "rng": {
         "draws": 2349,
@@ -184,7 +184,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 968,
-      "state": "50cdf16e",
+      "state": "f23fefa8",
       "events": "fd4b16b2",
       "rng": {
         "draws": 2525,
@@ -195,7 +195,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 968,
-      "state": "5519f2df",
+      "state": "e144d3a7",
       "events": "7f78c4c8",
       "rng": {
         "draws": 2698,
@@ -206,7 +206,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 968,
-      "state": "ee663d5e",
+      "state": "524b0df8",
       "events": "44570d4d",
       "rng": {
         "draws": 2916,
@@ -217,7 +217,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 968,
-      "state": "676de3f8",
+      "state": "a6aea738",
       "events": "e0e87c32",
       "rng": {
         "draws": 3094,
@@ -228,7 +228,7 @@
       "tick": 375,
       "time": 18.75,
       "nextId": 968,
-      "state": "1e1462c0",
+      "state": "ee04439e",
       "events": "741638a5",
       "rng": {
         "draws": 3243,
@@ -265,9 +265,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -360,9 +357,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -455,9 +449,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -556,7 +547,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 1,
           "gcdRemaining": 0.363636,
           "hp": 662,
@@ -572,17 +563,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1146,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 31,
@@ -610,7 +601,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 117.75,
           "hp": 802,
           "id": 965,
@@ -624,17 +615,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1103,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -660,7 +651,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 117.75,
           "hp": 662,
           "id": 966,
@@ -674,17 +665,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1148,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -723,7 +714,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 999013,
@@ -731,9 +722,9 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -742,15 +733,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "stats": {},
           "tappedById": 964,
@@ -771,7 +762,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 968,
-      "state": "76527fd5",
+      "state": "e93e320d",
       "events": "550c5178",
       "rng": {
         "draws": 3287,
@@ -782,7 +773,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 968,
-      "state": "c39b7221",
+      "state": "dfe28a87",
       "events": "741638a5",
       "rng": {
         "draws": 3464,
@@ -793,7 +784,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 968,
-      "state": "b26b402d",
+      "state": "d30ab981",
       "events": "836873e7",
       "rng": {
         "draws": 3647,
@@ -804,7 +795,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 968,
-      "state": "fc41534b",
+      "state": "4436437d",
       "events": "741638a5",
       "rng": {
         "draws": 3808,
@@ -815,7 +806,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 968,
-      "state": "56c9d981",
+      "state": "638e78a5",
       "events": "06c07797",
       "rng": {
         "draws": 3974,
@@ -826,7 +817,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 968,
-      "state": "a3a0c9a9",
+      "state": "011ed9af",
       "events": "5b4bd9df",
       "rng": {
         "draws": 4157,
@@ -837,7 +828,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 968,
-      "state": "bf0b5f1f",
+      "state": "8148b731",
       "events": "1c2112e0",
       "rng": {
         "draws": 4341,
@@ -848,7 +839,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 968,
-      "state": "c6d4f140",
+      "state": "ab465806",
       "events": "7f0c88ca",
       "rng": {
         "draws": 4492,
@@ -859,7 +850,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 968,
-      "state": "acf4e316",
+      "state": "ae4b4dd2",
       "events": "b680d23e",
       "rng": {
         "draws": 4670,
@@ -870,7 +861,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 968,
-      "state": "eadde818",
+      "state": "c50b2748",
       "events": "b9dfd462",
       "rng": {
         "draws": 4857,
@@ -881,7 +872,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 968,
-      "state": "c894f84c",
+      "state": "73222dbc",
       "events": "741638a5",
       "rng": {
         "draws": 5018,
@@ -892,7 +883,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 968,
-      "state": "6f486a96",
+      "state": "31a1290e",
       "events": "fb0429ff",
       "rng": {
         "draws": 5211,
@@ -903,7 +894,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 968,
-      "state": "49e77cc4",
+      "state": "1cc35f18",
       "events": "741638a5",
       "rng": {
         "draws": 5358,
@@ -914,107 +905,107 @@
       "tick": 640,
       "time": 32,
       "nextId": 968,
-      "state": "079b1f6a",
+      "state": "a4a0dc4a",
       "events": "86e73dad",
       "rng": {
-        "draws": 5522,
-        "digest": "ca5bbaef"
+        "draws": 5523,
+        "digest": "3a8fbce6"
       }
     },
     {
       "tick": 660,
       "time": 33,
       "nextId": 968,
-      "state": "bb76f71c",
+      "state": "4c828c3c",
       "events": "cbf14f29",
       "rng": {
-        "draws": 5686,
-        "digest": "6fd5769e"
+        "draws": 5688,
+        "digest": "43090894"
       }
     },
     {
       "tick": 680,
       "time": 34,
       "nextId": 968,
-      "state": "c73058e2",
+      "state": "5c14064c",
       "events": "741638a5",
       "rng": {
-        "draws": 5852,
-        "digest": "4d206c9d"
+        "draws": 5856,
+        "digest": "918203bb"
       }
     },
     {
       "tick": 700,
       "time": 35,
       "nextId": 968,
-      "state": "157d84c1",
-      "events": "a91aa342",
+      "state": "0f575e1a",
+      "events": "8431765d",
       "rng": {
-        "draws": 6025,
-        "digest": "352fe5fd"
+        "draws": 6024,
+        "digest": "a9f8823e"
       }
     },
     {
       "tick": 720,
       "time": 36,
       "nextId": 968,
-      "state": "beb6b97b",
+      "state": "8ee8205a",
       "events": "741638a5",
       "rng": {
-        "draws": 6204,
-        "digest": "3ab932bf"
+        "draws": 6192,
+        "digest": "87491ed7"
       }
     },
     {
       "tick": 740,
       "time": 37,
       "nextId": 968,
-      "state": "9e1d13be",
-      "events": "86e73dad",
+      "state": "4cff301a",
+      "events": "06c07797",
       "rng": {
-        "draws": 6377,
-        "digest": "530c96cd"
+        "draws": 6371,
+        "digest": "e3a08dd4"
       }
     },
     {
       "tick": 760,
       "time": 38,
       "nextId": 968,
-      "state": "8e4d650f",
+      "state": "db5765e9",
       "events": "741638a5",
       "rng": {
-        "draws": 6541,
-        "digest": "0240508a"
+        "draws": 6538,
+        "digest": "4fe36f0f"
       }
     },
     {
       "tick": 780,
       "time": 39,
       "nextId": 968,
-      "state": "11702018",
-      "events": "06c07797",
+      "state": "6ea3fa0c",
+      "events": "158a06f9",
       "rng": {
-        "draws": 6721,
-        "digest": "2c93ad96"
+        "draws": 6715,
+        "digest": "9cff7de9"
       }
     },
     {
       "tick": 800,
       "time": 40,
       "nextId": 968,
-      "state": "07defb45",
+      "state": "f2b07ab5",
       "events": "741638a5",
       "rng": {
-        "draws": 6911,
-        "digest": "eda4f64a"
+        "draws": 6913,
+        "digest": "f7c13595"
       }
     },
     {
       "tick": 820,
       "time": 41,
       "nextId": 968,
-      "state": "79ac4502",
-      "events": "1c2112e0",
+      "state": "ded17d1f",
+      "events": "bbb410cc",
       "rng": {
         "draws": 7095,
         "digest": "c5e098f2"
@@ -1024,110 +1015,110 @@
       "tick": 840,
       "time": 42,
       "nextId": 968,
-      "state": "c5819186",
-      "events": "7395ea43",
+      "state": "ed1ce237",
+      "events": "bf78385c",
       "rng": {
-        "draws": 7264,
-        "digest": "696e485b"
+        "draws": 7287,
+        "digest": "67271172"
       }
     },
     {
       "tick": 860,
       "time": 43,
       "nextId": 968,
-      "state": "86281e26",
+      "state": "61cea815",
       "events": "741638a5",
       "rng": {
-        "draws": 7435,
-        "digest": "01dc12e6"
+        "draws": 7444,
+        "digest": "62744385"
       }
     },
     {
       "tick": 880,
       "time": 44,
       "nextId": 968,
-      "state": "ae25ab3c",
+      "state": "2ecc9705",
       "events": "fb0429ff",
       "rng": {
-        "draws": 7623,
-        "digest": "247c62ae"
+        "draws": 7626,
+        "digest": "b48fe67d"
       }
     },
     {
       "tick": 900,
       "time": 45,
       "nextId": 968,
-      "state": "18a8f9b2",
+      "state": "d4116dc1",
       "events": "741638a5",
       "rng": {
-        "draws": 7779,
-        "digest": "db7c22d8"
+        "draws": 7797,
+        "digest": "a3ee600f"
       }
     },
     {
       "tick": 920,
       "time": 46,
       "nextId": 968,
-      "state": "68d320f7",
-      "events": "7e9a480e",
+      "state": "458c3ee2",
+      "events": "fb0429ff",
       "rng": {
-        "draws": 7976,
-        "digest": "e64923d1"
+        "draws": 7985,
+        "digest": "6f7c93d3"
       }
     },
     {
       "tick": 940,
       "time": 47,
       "nextId": 968,
-      "state": "8fba3441",
+      "state": "595b33fa",
       "events": "741638a5",
       "rng": {
-        "draws": 8170,
-        "digest": "be672cb7"
+        "draws": 8162,
+        "digest": "ce249cb8"
       }
     },
     {
       "tick": 960,
       "time": 48,
       "nextId": 968,
-      "state": "099171ad",
+      "state": "7b6fa7ea",
       "events": "fb0429ff",
       "rng": {
-        "draws": 8342,
-        "digest": "1f4771ab"
+        "draws": 8337,
+        "digest": "bb44c495"
       }
     },
     {
       "tick": 980,
       "time": 49,
       "nextId": 968,
-      "state": "d8c42bb5",
+      "state": "225c926c",
       "events": "2f5d6067",
       "rng": {
-        "draws": 8543,
-        "digest": "a7fb5fc6"
+        "draws": 8525,
+        "digest": "15b5c324"
       }
     },
     {
       "tick": 1000,
       "time": 50,
       "nextId": 968,
-      "state": "fa9ba0b9",
+      "state": "99f9c90a",
       "events": "741638a5",
       "rng": {
-        "draws": 8718,
-        "digest": "68910d36"
+        "draws": 8679,
+        "digest": "0034dd67"
       }
     },
     {
       "tick": 1015,
       "time": 50.75,
       "nextId": 968,
-      "state": "75b0030d",
-      "events": "b327a800",
+      "state": "a1a1c90c",
+      "events": "47482db3",
       "rng": {
-        "draws": 8850,
-        "digest": "1b4b4b09"
+        "draws": 8811,
+        "digest": "ff07aeed"
       },
       "label": "wildfang-spend",
       "players": [
@@ -1160,9 +1151,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1250,12 +1238,12 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 2215
+            "damageDealt": 2324
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 2215
+              "dummyDamage": 2324
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1263,9 +1251,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1362,9 +1347,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1463,7 +1445,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 33,
           "hp": 662,
           "id": 964,
@@ -1477,17 +1459,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1148,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 31,
@@ -1528,7 +1510,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 32,
           "gcdRemaining": 1.25,
           "hp": 782,
@@ -1541,21 +1523,21 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": 41.5,
+          "overpowerUntil": 36,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -1
+            "x": -94,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "resource": 85,
           "resourceType": "rage",
           "savedMana": 1043,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -1582,7 +1564,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 149.75,
           "hp": 662,
           "id": 966,
@@ -1596,17 +1578,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1148,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -1631,17 +1613,17 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 996744,
+          "hp": 996635,
           "id": 967,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1650,15 +1632,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "stats": {},
           "tappedById": 964,
@@ -1670,7 +1652,7 @@
             ],
             [
               965,
-              3261.1755
+              3391.9875
             ]
           ],
           "weapon": {
@@ -1683,132 +1665,132 @@
       "tick": 1020,
       "time": 51,
       "nextId": 968,
-      "state": "3a5265a9",
+      "state": "523b5cac",
       "events": "37836a8c",
       "rng": {
-        "draws": 8883,
-        "digest": "4b227427"
+        "draws": 8846,
+        "digest": "6f3661ed"
       }
     },
     {
       "tick": 1040,
       "time": 52,
       "nextId": 968,
-      "state": "fd3ed5e0",
+      "state": "605ddd09",
       "events": "741638a5",
       "rng": {
-        "draws": 9044,
-        "digest": "47b973b0"
+        "draws": 9026,
+        "digest": "ee19ee4f"
       }
     },
     {
       "tick": 1060,
       "time": 53,
       "nextId": 968,
-      "state": "233ac17c",
+      "state": "4d88b89d",
       "events": "dcab54de",
       "rng": {
-        "draws": 9231,
-        "digest": "a5adbf7f"
+        "draws": 9241,
+        "digest": "e41f78e1"
       }
     },
     {
       "tick": 1080,
       "time": 54,
       "nextId": 968,
-      "state": "c727fa94",
+      "state": "4a5e2b59",
       "events": "15db2192",
       "rng": {
-        "draws": 9390,
-        "digest": "dd4a2d5b"
+        "draws": 9418,
+        "digest": "3882cd90"
       }
     },
     {
       "tick": 1100,
       "time": 55,
       "nextId": 968,
-      "state": "5eb2676c",
-      "events": "92f3f1fd",
+      "state": "26a984ee",
+      "events": "dcd14908",
       "rng": {
-        "draws": 9556,
-        "digest": "d3ecda98"
+        "draws": 9596,
+        "digest": "1a557503"
       }
     },
     {
       "tick": 1120,
       "time": 56,
       "nextId": 968,
-      "state": "039e1def",
+      "state": "272deb15",
       "events": "11131049",
       "rng": {
-        "draws": 9713,
-        "digest": "af746a1f"
+        "draws": 9767,
+        "digest": "c224710c"
       }
     },
     {
       "tick": 1140,
       "time": 57,
       "nextId": 968,
-      "state": "aaea7934",
+      "state": "a650b770",
       "events": "025fd779",
       "rng": {
-        "draws": 9914,
-        "digest": "313f035c"
+        "draws": 9932,
+        "digest": "7b830d75"
       }
     },
     {
       "tick": 1160,
       "time": 58,
       "nextId": 968,
-      "state": "a1044b9a",
+      "state": "63aedbe6",
       "events": "740b529b",
       "rng": {
-        "draws": 10084,
-        "digest": "d6e21ba0"
+        "draws": 10092,
+        "digest": "4fca8582"
       }
     },
     {
       "tick": 1180,
       "time": 59,
       "nextId": 968,
-      "state": "65139ae3",
-      "events": "d8996c67",
+      "state": "59f2e0a2",
+      "events": "46ea431e",
       "rng": {
-        "draws": 10236,
-        "digest": "b184ad02"
+        "draws": 10257,
+        "digest": "8b5d4ce5"
       }
     },
     {
       "tick": 1200,
       "time": 60,
       "nextId": 968,
-      "state": "93c95b49",
+      "state": "764a0bbf",
       "events": "b87b14f5",
       "rng": {
-        "draws": 10459,
-        "digest": "950be1f6"
+        "draws": 10447,
+        "digest": "6dd8f7a7"
       }
     },
     {
       "tick": 1220,
       "time": 61,
       "nextId": 968,
-      "state": "16edab49",
-      "events": "7e144e24",
+      "state": "e11aaefe",
+      "events": "25df6696",
       "rng": {
-        "draws": 10626,
-        "digest": "899be801"
+        "draws": 10625,
+        "digest": "28490bf3"
       }
     },
     {
       "tick": 1225,
       "time": 61.25,
       "nextId": 968,
-      "state": "57685d74",
+      "state": "0bd5dfdf",
       "events": "797dff39",
       "rng": {
-        "draws": 10661,
-        "digest": "64154b6c"
+        "draws": 10673,
+        "digest": "4d86fa5a"
       },
       "label": "groveheart-harvest",
       "players": [
@@ -1841,9 +1823,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1931,12 +1910,12 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 2215
+            "damageDealt": 2324
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 2215
+              "dummyDamage": 2324
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1944,9 +1923,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2043,9 +2019,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2144,7 +2117,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 43.5,
           "hp": 662,
           "id": 964,
@@ -2158,17 +2131,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1148,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 31,
@@ -2209,7 +2182,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 42.5,
           "hp": 751,
           "id": 965,
@@ -2220,21 +2193,21 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": 41.5,
+          "overpowerUntil": 36,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -1
+            "x": -94,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "resource": 79,
           "resourceType": "rage",
           "savedMana": 1043,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -2282,7 +2255,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 0.25,
           "gcdRemaining": 1.25,
           "hp": 662,
@@ -2297,17 +2270,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1093,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -2333,16 +2306,16 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1000000,
           "id": 967,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2351,15 +2324,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "stats": {},
           "tappedById": 964,
@@ -2374,11 +2347,11 @@
       "tick": 1225,
       "time": 61.25,
       "nextId": 968,
-      "state": "57685d74",
+      "state": "0bd5dfdf",
       "events": "741638a5",
       "rng": {
-        "draws": 10661,
-        "digest": "64154b6c"
+        "draws": 10673,
+        "digest": "4d86fa5a"
       },
       "label": "final",
       "players": [
@@ -2411,9 +2384,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2501,12 +2471,12 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 2215
+            "damageDealt": 2324
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 2215
+              "dummyDamage": 2324
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2514,9 +2484,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2613,9 +2580,6 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -2714,7 +2678,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 43.5,
           "hp": 662,
           "id": 964,
@@ -2728,17 +2692,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1148,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellHaste": 0.1,
           "spellPower": 31,
@@ -2779,7 +2743,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 42.5,
           "hp": 751,
           "id": 965,
@@ -2790,21 +2754,21 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": 41.5,
+          "overpowerUntil": 36,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -1
+            "x": -94,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "resource": 79,
           "resourceType": "rage",
           "savedMana": 1043,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 29,
           "stats": {
@@ -2852,7 +2816,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 0.25,
           "gcdRemaining": 1.25,
           "hp": 662,
@@ -2867,17 +2831,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 1093,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 31,
           "stats": {
@@ -2903,16 +2867,16 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1000000,
           "id": 967,
           "kind": "mob",
           "leashAnchor": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2921,15 +2885,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": 1
+            "x": -94,
+            "y": -2,
+            "z": -55
           },
           "stats": {},
           "tappedById": 964,
