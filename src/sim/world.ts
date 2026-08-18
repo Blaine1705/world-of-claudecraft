@@ -47,6 +47,7 @@ import {
   emberNearestOnLink,
 } from './ember_lava_layout';
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
+import { eastbrookDeckSurface } from './eastbrook_harbor';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import {
@@ -3654,6 +3655,16 @@ function dockSurfaceHeight(x: number, z: number, seed: number): number {
     (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
     WATER_LEVEL,
   );
+  // ...New Eastbrook's quay boardwalk and piers, the same idiom
+  surface = Math.max(
+    surface,
+    eastbrookDeckSurface(
+      x,
+      z,
+      (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
+      WATER_LEVEL,
+    ),
+  );
   // ...and the Palmreach's river bridges and lagoon decks, the same idiom
   surface = Math.max(
     surface,
@@ -5127,8 +5138,12 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   ) {
     return null;
   }
-  // No rock or stunted tree grows up through Wickharbor's boardwalk planks.
+  // No rock or stunted tree grows up through Wickharbor's boardwalk planks,
+  // nor New Eastbrook's quay and piers.
   if (galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
+    return null;
+  }
+  if (eastbrookDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
     return null;
   }
   if (!reachDeckClear(x, z, 1)) return null;

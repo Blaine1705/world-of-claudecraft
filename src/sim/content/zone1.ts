@@ -1767,6 +1767,17 @@ export const ZONE1_PROPS: ZonePropsDef = {
     canopyVariant: stall.canopyVariant,
   })),
   mines: [{ x: -38, z: 138, rot: 0.8 }],
+  // The harbor fleet, moored on the piers' open water only (berths verified
+  // against the deck rectangles in sim/eastbrook_harbor.ts: each hull's
+  // collider stays a full radius plus half-width clear of every walkway, the
+  // Wickharbor rule, so nobody wedges between hull and rail).
+  decorProps: [
+    { key: 'seaBoatSailA', x: -110, z: -40, rot: -1.7, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'seaBoatSailA', x: -108, z: -68, rot: 1.5, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'seaBoatFishing', x: -122, z: -54, rot: -1.6, scale: 5, r: 3.5, h: 6, float: 0.45 },
+    { key: 'seaBuoy', x: -124, z: -48, rot: 0.4, scale: 3, float: 0.15 },
+    { key: 'seaBuoyFlag', x: -120, z: -62, rot: -0.8, scale: 3, float: 0.15 },
+  ],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
   tents: [
     { x: 62, z: -61, rot: 0.4, scale: 1 },

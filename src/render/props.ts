@@ -262,6 +262,10 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // ship memorial on the Wickharbor dock plaza, the golden horse for the
   // stable yard
   shipMonument: { url: '/models/props/ship_monument.glb', kit: 'kgale' },
+  seaBoatSailA: { url: '/models/biome/sea_boat_sail_a.glb', kit: 'pirate' },
+  seaBoatFishing: { url: '/models/biome/sea_boat_fishing.glb', kit: 'pirate' },
+  seaBuoy: { url: '/models/biome/sea_buoy.glb', kit: 'pirate' },
+  seaBuoyFlag: { url: '/models/biome/sea_buoy_flag.glb', kit: 'pirate' },
   goldenHorseStatue: { url: '/models/props/golden_horse_statue.glb', kit: 'kgale' },
   // a placeable oak (the foliage kit's biggest crown) for authored shade
   // spots like the Garden Gate lawns; decor entries set scale, r is trunk

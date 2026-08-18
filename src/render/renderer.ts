@@ -235,6 +235,7 @@ import {
   MIN_DYNAMIC_RENDER_SCALE,
 } from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
+import { buildEastbrookHarbor } from './eastbrook_harbor';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
 import {
@@ -2539,6 +2540,12 @@ export class Renderer {
     setRenderCategory(this.eastbrookTownView.group, 'props');
     this.scene.add(this.eastbrookTownView.group);
     freezeStaticSubtreeMatrices(this.eastbrookTownView.group);
+    // the harbor waterfront: quay boardwalk + piers from the same deck
+    // rectangles groundHeight walks (render/eastbrook_harbor.ts)
+    const harborGroup = buildEastbrookHarbor(this.sim.cfg.seed);
+    setRenderCategory(harborGroup, 'props');
+    this.scene.add(harborGroup);
+    freezeStaticSubtreeMatrices(harborGroup);
     bd('eastbrook-town');
 
     // Fenbridge's replacement town is a separate built-in-only subtree. Its
