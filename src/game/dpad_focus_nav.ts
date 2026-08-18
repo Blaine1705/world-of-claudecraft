@@ -169,12 +169,31 @@ export function clearPadFocus(): void {
  * auto-focusing the whole page on any state change would yank focus around the
  * HUD instead of landing inside the thing that just opened.
  */
+let lastRoot: HTMLElement | null = null;
+
 export function focusFirstInWindow(): boolean {
+  lastRoot = null; // force the next sync to treat this as a fresh surface
+  return syncWindowFocus();
+}
+
+/**
+ * Keep focus inside whatever surface is on top. Moves focus when the top-most
+ * window CHANGES (a dialogue opening the quest window over itself: there is no
+ * open/close edge to catch, the pad is already in a window) or when the focused
+ * control has gone (the surface rebuilt its contents under us). Otherwise it
+ * leaves the player's selection exactly where they put it.
+ */
+export function syncWindowFocus(): boolean {
   if (typeof document === 'undefined') return false;
   const root = activeRoot();
+  const rootChanged = root !== lastRoot;
+  lastRoot = root;
   if (!root) return false;
   const els = focusables(root);
   if (els.length === 0) return false;
+  const active = document.activeElement as HTMLElement | null;
+  const focusLost = !active || !els.includes(active);
+  if (!rootChanged && !focusLost) return false;
   els[0].focus();
   markPadFocus(els[0]);
   return true;

@@ -4,6 +4,7 @@ import {
   focusFirstInWindow,
   moveDpadFocus,
   pressDpadFocus,
+  syncWindowFocus,
 } from '../src/game/dpad_focus_nav';
 
 // A fake DOM modelling only what dpad_focus_nav touches: the two selector shapes
@@ -306,6 +307,58 @@ describe('focusFirstInWindow', () => {
     allEls = [dialog, el('DIV', 10, 10)];
     install();
     expect(focusFirstInWindow()).toBe(false);
+  });
+});
+
+describe('syncWindowFocus', () => {
+  function windowWith(x: number, ...labels: string[]) {
+    const dlg = el('DIV', x, 0, { role: 'dialog' });
+    dlg.rect = { left: x, top: 0, right: x + 300, bottom: 300 };
+    const buttons = labels.map((_, i) => el('BUTTON', x + 10, 10 + i * 50));
+    return { dlg, buttons };
+  }
+
+  it('follows focus into a window opened OVER the one the pad is already in', () => {
+    // Talking to an NPC and accepting a quest opens the quest window on top of
+    // the dialogue. There is no open/close edge to catch, so without this the
+    // selection stays behind in the dialogue and the player has to walk it over.
+    const first = windowWith(0, 'a', 'b');
+    allEls = [first.dlg, ...first.buttons];
+    install();
+    focusFirstInWindow();
+    expect(active).toBe(first.buttons[0]);
+
+    // the quest window mounts after it in document order, so it is on top
+    const second = windowWith(400, 'x', 'y');
+    allEls = [...allEls, second.dlg, ...second.buttons];
+    install();
+    expect(syncWindowFocus()).toBe(true);
+    expect(active).toBe(second.buttons[0]);
+  });
+
+  it('leaves the selection alone while the same window stays on top', () => {
+    const w = windowWith(0, 'a', 'b');
+    allEls = [w.dlg, ...w.buttons];
+    install();
+    focusFirstInWindow();
+    moveDpadFocus('down');
+    expect(active).toBe(w.buttons[1]);
+    // a re-check must not yank the player back to the first control
+    expect(syncWindowFocus()).toBe(false);
+    expect(active).toBe(w.buttons[1]);
+  });
+
+  it('recovers when the focused control is rebuilt away under the pad', () => {
+    const w = windowWith(0, 'a', 'b');
+    allEls = [w.dlg, ...w.buttons];
+    install();
+    focusFirstInWindow();
+    // the window swaps its contents; the focused node is gone
+    const rebuilt = el('BUTTON', 10, 10);
+    allEls = [w.dlg, rebuilt];
+    install();
+    expect(syncWindowFocus()).toBe(true);
+    expect(active).toBe(rebuilt);
   });
 });
 

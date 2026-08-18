@@ -15,7 +15,13 @@ import {
   nextCrossHotbarTriggerState,
 } from './cross_hotbar';
 import type { CrossHotbarBindings } from './cross_hotbar_bindings';
-import { clearPadFocus, focusFirstInWindow, moveDpadFocus, pressDpadFocus } from './dpad_focus_nav';
+import {
+  clearPadFocus,
+  focusFirstInWindow,
+  moveDpadFocus,
+  pressDpadFocus,
+  syncWindowFocus,
+} from './dpad_focus_nav';
 import type { GamepadBindings } from './gamepad_bindings';
 import {
   AXIS,
@@ -85,6 +91,11 @@ export class GamepadManager {
   // Edge-detects a window opening and closing, so focus lands inside it exactly
   // once and the pointer leaves with it.
   private prevPointerMode = false;
+  // A press can open a window over the one the pad is already in, and that has no
+  // open/close edge to catch. Re-check the top surface on the poll AFTER any
+  // press rather than every frame: activeRoot() reads layout, which is not
+  // something to do 60 times a second for a check that only matters after input.
+  private resyncFocus = false;
   private crossHotbar = false;
   private crossHotbarExpand = true;
   private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
@@ -268,6 +279,11 @@ export class GamepadManager {
     // over a surface that is no longer there.
     if (!pointerMode && this.prevPointerMode) this.exitNavMode();
     this.prevPointerMode = pointerMode;
+
+    if (pointerMode && this.resyncFocus) {
+      this.resyncFocus = false;
+      syncWindowFocus();
+    }
 
     if (pointerMode) {
       // A modal surface owns the pad: clear any lingering stick movement (a
@@ -474,6 +490,9 @@ export class GamepadManager {
     let acted = false;
     for (const idx of risingEdges(this.prevPressed, cur)) {
       acted = true;
+      // Whatever this press does may swap the surface under us (accepting a quest
+      // opens its window over the dialogue), so look again next poll.
+      this.resyncFocus = true;
       this.cb.onInputEdge();
       const dir = DPAD_NAV_DIRECTIONS[idx];
       if (dir !== undefined) {
