@@ -453,6 +453,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/preview_open_gate_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
+  'src/render/live_program_watch_core.ts',
   'src/render/reveal_gate_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',

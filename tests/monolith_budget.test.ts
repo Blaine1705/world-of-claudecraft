@@ -110,7 +110,11 @@ const MONOLITHS: MonolithRow[] = [
     // imports went, and moving the budget's frame boundary into the sync
     // prologue traded a five-line rationale in the governor for the one that
     // now sits beside the queue's own noteFrame (net -3).
-    ceiling: 13557,
+    // Lowered again by the live-program telemetry, which paid for its arm by
+    // extracting the renderer's info.programs readouts into
+    // src/render/live_program_watch.ts; the per-draw bracket lives in
+    // frame_present.ts, where the draw is (net -5).
+    ceiling: 13552,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

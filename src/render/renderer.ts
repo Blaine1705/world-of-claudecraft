@@ -348,6 +348,7 @@ import {
   type PrewarmPacingHandle,
 } from './link_rate_budget';
 import { runLinkedProgramTouchLane } from './linked_program_touch_lane';
+import { armLiveProgramWatch, programCounts } from './live_program_watch';
 import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
@@ -4475,6 +4476,7 @@ export class Renderer {
   markGpuHitchReveal(): void {
     this.gpuHitchCompileLifecycle?.markReveal();
     markPrewarmPacingReveal(this.gpuHitchPacing, this.lastPrewarmStats);
+    armLiveProgramWatch(this.webgl);
   }
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
@@ -5364,13 +5366,6 @@ export class Renderer {
     return group;
   }
 
-  private prewarmCounts(): { programs: number; textures: number } {
-    return {
-      programs: this.webgl.info.programs?.length ?? 0,
-      textures: this.webgl.info.memory.textures,
-    };
-  }
-
   private prewarmTexture(texture: THREE.Texture | null | undefined): void {
     if (!texture) return;
     this.webgl.initTexture(texture);
@@ -5789,7 +5784,7 @@ export class Renderer {
       PREWARM_COMPILE_AWAIT_RESERVE_MS,
     );
     const manifestEntries: RendererPrewarmManifestEntryStats[] = [];
-    const startCounts = this.prewarmCounts();
+    const startCounts = programCounts(this.webgl);
     const createdViewTypes: string[] = [];
     const p = this.sim.player;
     const activeZone = zoneAt(p.pos.x, p.pos.z);
@@ -6172,7 +6167,7 @@ export class Renderer {
       // reads this.lastPrewarmStats after a resume (#2571 review).
       target: RendererPrewarmManifestEntryStats[] = manifestEntries,
     ): Promise<void> => {
-      const before = this.prewarmCounts();
+      const before = programCounts(this.webgl);
       const entryStarted = performance.now();
       if (
         prewarmEntryShouldDefer(
@@ -6221,7 +6216,7 @@ export class Renderer {
       // its counts, never 'completed'.
       const progress = entry.progress?.() ?? null;
       if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
-      const after = this.prewarmCounts();
+      const after = programCounts(this.webgl);
       const entryEnded = performance.now();
       target.push({
         id: entry.id,
@@ -7204,7 +7199,7 @@ export class Renderer {
         // (CONSTRAINED_PREWARM_RESUME): those hand over their explicit small
         // units, which run after entry instead of never.
         if (!prewarmEntryRuns(entry.id, policy)) {
-          const counts = this.prewarmCounts();
+          const counts = programCounts(this.webgl);
           const skipUnits = prewarmEntryResumesAfterSkip(entry.id, policy)
             ? (entry.resumeUnits?.() ?? [])
             : [];
@@ -7414,7 +7409,7 @@ export class Renderer {
     }
 
     const elapsed = performance.now() - started;
-    const finalCounts = this.prewarmCounts();
+    const finalCounts = programCounts(this.webgl);
     const stats: RendererPrewarmStats = {
       elapsedMs: roundMs(elapsed),
       maxMs: roundMs(maxMs),

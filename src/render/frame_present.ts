@@ -5,11 +5,21 @@
 // Everything else in sync (view lifecycle, mixers, uTime, the viewport poll)
 // keeps running while a frame is skipped, so a hidden window has no create
 // burst or shader-link stall waiting for it when it comes back.
+//
+// The draw is also where a program ESCAPE is visible: a variant no prewarm
+// covered links synchronously inside this render call, so the live-program
+// watch brackets exactly it (absorb before, record after) and nothing else.
+
+import {
+  absorbLivePrograms,
+  type ProgramListHost,
+  recordNewLivePrograms,
+} from './live_program_watch';
 
 export interface FramePresentHost {
   vfx: { prepareDraw(camera: unknown): void };
   post: { updateScreenFx(dt: number): void; render(): void } | null;
-  webgl: { render(scene: unknown, camera: unknown): void };
+  webgl: { render(scene: unknown, camera: unknown): void } & ProgramListHost;
   scene: unknown;
   camera: unknown;
 }
@@ -28,11 +38,13 @@ export function presentFrame(host: FramePresentHost, dt: number, present: boolea
     return false;
   }
   host.vfx.prepareDraw(host.camera);
+  absorbLivePrograms(host.webgl);
   if (host.post) {
     // screen-fx pass state (ripple re-projection, flash decay) advances
     // with the camera finalized for this frame
     host.post.updateScreenFx(dt);
     host.post.render();
   } else host.webgl.render(host.scene, host.camera);
+  recordNewLivePrograms(host.webgl);
   return true;
 }

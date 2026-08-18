@@ -175,6 +175,7 @@ function baseSnapshot(): PerfSnapshot {
             'attach-watchdog': 0,
             'gate-timeout': 0,
             'submit-stop': 0,
+            'live-program': 0,
           },
           events: [],
           reveal: { keysHeld: 0, rootsHeld: 0, rootsPiecewise: 0, rootsAtWatchdog: 0 },

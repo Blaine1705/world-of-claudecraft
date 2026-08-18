@@ -2,7 +2,10 @@
 // only a console line: the reveal-gate watchdog, the gated scene-attach
 // watchdog, and the compile gate's diagnostic timeout. Each of those is a
 // bounded fail-soft path that hides a slow or stuck driver link, so the only
-// evidence a capture could carry was a warning nobody parses.
+// evidence a capture could carry was a warning nobody parses. The newest kind
+// is not an escape at all: `live-program` names a shader program the driver
+// minted INSIDE a live frame after the reveal (live_program_watch.ts), which is
+// the one thing the prep machinery could not otherwise see.
 // The reveal gate also reports its SOFT deadline here, which escapes nothing
 // and exists only to leave that evidence, plus lifetime counters of where the
 // roots of a held key became visible.
@@ -21,7 +24,8 @@ export type GpuPrepEventKind =
   | 'reveal-soft-deadline'
   | 'attach-watchdog'
   | 'gate-timeout'
-  | 'submit-stop';
+  | 'submit-stop'
+  | 'live-program';
 
 export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'reveal-watchdog',
@@ -29,6 +33,7 @@ export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'attach-watchdog',
   'gate-timeout',
   'submit-stop',
+  'live-program',
 ];
 
 /** Newest events are kept; older ones fall out of the ring and only survive in
@@ -120,6 +125,7 @@ const counts: Record<GpuPrepEventKind, number> = {
   'attach-watchdog': 0,
   'gate-timeout': 0,
   'submit-stop': 0,
+  'live-program': 0,
 };
 
 const reveal: GpuPrepRevealCounters = {
