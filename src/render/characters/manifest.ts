@@ -492,13 +492,27 @@ const ENEMY7: ClipMap = {
   death: 'Death',
 };
 
+// The authored ogre body (the _Mob_Updates artist drop, combined by
+// tmp/ogre_build.mjs): a rigged Tripo donor whose drop authors every slot,
+// Run included (retimed in the build, see the gait numbers on mob_ogre
+// below). Its own constant rather than ENEMY7 because the clip names
+// differ (Hit, not the 2023 pack's HitRecieve pair).
+const OGRE: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
 // The kobold family's own attack (scripts/build_kobold_anims.mjs, issue
-// #2889): ENEMY7's Attack is shared by reference with mob_ogre (a giant
-// twice its height, on giant.glb), so a kobold currently swings the exact
-// same single double-claw chop. This clip is baked off goblin.glb's own
-// donor poses (Attack's own beats re-timed into a two-part combo, plus
-// Jump, a clip goblin.glb ships that ENEMY7 never wires), so only
-// mob_kobold gets it; mob_ogre stays on the shared constant untouched.
+// #2889): ENEMY7's Attack was shared by reference with mob_ogre back when
+// the ogre rendered on giant.glb (it has its own authored body and OGRE
+// ClipMap now), so a kobold then swung the exact same single double-claw
+// chop. This clip is baked off goblin.glb's own donor poses (Attack's own
+// beats re-timed into a two-part combo, plus Jump, a clip goblin.glb ships
+// that ENEMY7 never wires), so only mob_kobold gets it.
 const KOBOLD_ENEMY7: ClipMap = {
   ...ENEMY7,
   attack: ['Kobold_Pounce'],
@@ -2053,13 +2067,26 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.12,
   },
+  // The authored ogre body (the _Mob_Updates artist drop, combined by
+  // tmp/ogre_build.mjs), replacing the 2023-pack giant.glb stick rig the
+  // whole family rendered as. Gait refs measured (tmp/ogre_gait_measure.mjs)
+  // at the dominant template scale 1.3 (thornpeak_ogre / ogre_crusher /
+  // rift_stone_ogre; the kobold_digger dominant-population precedent): Walk
+  // natural 2.79 yd/s, and the authored Run cycle measured 4.83, a 1.45x
+  // ask against the family's 7.0 chase, so the build retimes it 1.21x in
+  // place (a 0.60s heavy sprint cadence), natural 5.84, and the chase runs
+  // at ~1.2x with clamp headroom instead of at the 1.6 edge.
   mob_ogre: {
-    url: `${CREATURES}/giant.glb`,
-    animUrls: [`${CREATURES}/giant_hit_variety_anims.glb`],
+    url: `${CREATURES}/ogre.glb`,
     height: 2.8,
-    clips: ENEMY7,
+    clips: OGRE,
+    walkRef: 2.79,
+    runRef: 5.84,
+    // Light wash, the kobold_digger reason: the drop ships an authored brown
+    // hide, and the old 0.2 (sized to keep the giant's flat atlas readable)
+    // would only muddy it. Entity tint still separates the family's mobs.
     tint: 'entity',
-    tintStrength: 0.2, // skin washes pink fast
+    tintStrength: 0.12,
   },
   // Five Wildheart troll silhouettes use the same complete biped vocabulary,
   // but preserve their woven cloth, bone paint, feathers, and jungle palette.
