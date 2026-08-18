@@ -969,7 +969,12 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         marketDb.suspendListingIfSafe(realm, scene.listingId, BASE_MS),
         marketDb.finalizeDeliveredSettlement(finalizeArgs(realm, scene)),
       ]);
-      expect(['settlement_live', 'contended']).toContain(suspend);
+      // Three legal serializations for the suspend arm: it reads the live
+      // settlement first (settlement_live), it collides mid-flight
+      // (contended), or finalize commits WHOLE before suspend takes its
+      // locks, so the guard correctly refuses over the now-closed listing
+      // (not_active). The invariants below hold in all three.
+      expect(['settlement_live', 'contended', 'not_active']).toContain(suspend);
       expect(['finalized', 'contended']).toContain(finalize);
       // Converge: a plain retry finishes the sale exactly once.
       if (finalize !== 'finalized') {
