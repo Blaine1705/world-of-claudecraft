@@ -15,7 +15,7 @@ import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
-import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
+import { MECH_CHROMAS, mechChromaSkinIndex } from '../src/sim/content/skins';
 import { SPORT_ROLES, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
@@ -189,7 +189,6 @@ import {
   openPlaySession,
   pool,
   releaseCharacterLease,
-  revokeAccountMechChroma,
   saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
   saveCharacterState,
@@ -3658,30 +3657,20 @@ export class GameServer {
       .catch((err) => console.error('failed to grant account weapon skins:', err));
   }
 
+  /** Take a mech chroma off the acting character's own current appearance. The
+   *  account-wide unlock (accountCosmetics.mechChromaIds) is permanent, exactly
+   *  like an owned Season 1 Armory weapon skin: this never revokes it, so any
+   *  character on the account (online or not, now or later) can still take the
+   *  look off, and can freely put it back on via change_skin with no item
+   *  involved. Only the acting character's OWN display changes; every other
+   *  character's independently chosen look is left alone. */
   private unequipAccountMechChroma(session: ClientSession, chromaId: string): void {
     const skin = mechChromaSkinIndex(chromaId);
-    const itemId = mechChromaItemId(chromaId);
-    if (skin < 0 || !itemId || !session.accountCosmetics.mechChromaIds.includes(chromaId)) return;
-    const nextCosmetics = {
-      ...session.accountCosmetics,
-      mechChromaIds: session.accountCosmetics.mechChromaIds.filter((id) => id !== chromaId),
-    };
-    this.replaceLiveAccountCosmetics(session.accountId, nextCosmetics);
-    for (const live of this.clients.values()) {
-      if (live.accountId !== session.accountId) continue;
-      const e = this.sim.entities.get(live.pid);
-      if (e?.skinCatalog === 'mech' && e.skin === skin) {
-        this.sim.setPlayerSkin(live.pid, 0, 'class');
-      }
+    if (skin < 0 || !session.accountCosmetics.mechChromaIds.includes(chromaId)) return;
+    const e = this.sim.entities.get(session.pid);
+    if (e?.skinCatalog === 'mech' && e.skin === skin) {
+      this.sim.setPlayerSkin(session.pid, 0, 'class');
     }
-    // movement: the sim-side twin of Sim.unequipMechChroma. Unequipping a mech
-    // chroma re-grants the item equipping it consumed, so this relocates a copy
-    // the account already owns. Both arms carry the flag or the offline Sim and
-    // this server would answer the obtain tally differently for one action.
-    this.sim.addItem(itemId, 1, session.pid, { movement: true });
-    void revokeAccountMechChroma(session.accountId, chromaId)
-      .then((cosmetics) => this.replaceLiveAccountCosmetics(session.accountId, cosmetics))
-      .catch((err) => console.error('failed to remove account mech chroma:', err));
   }
 
   /** Apply (skinId set) or detach (skinId null + wtype) a Season 1 Armory weapon

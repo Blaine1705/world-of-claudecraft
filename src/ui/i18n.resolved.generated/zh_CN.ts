@@ -9997,7 +9997,7 @@ export const zh_CN: EnTranslations = {
       },
       "fear": {
         "name": "惊惧",
-        "description": "使敌人陷入恐惧并畏缩，最多持续 8 秒。任何伤害都会打破效果。"
+        "description": "使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",
@@ -10243,7 +10243,7 @@ export const zh_CN: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "骸骨印记",
-        "description": "为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。"
+        "description": "为敌人标记15秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。"
       },
       "unholy_command": {
         "name": "邪秽号令",
@@ -10342,8 +10342,8 @@ export const zh_CN: EnTranslations = {
         "description": "进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）"
       },
       "feral_charge": {
-        "name": "野性冲锋",
-        "description": "冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）"
+        "name": "原始涌动",
+        "description": "释放一股原始涌动。狼形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）"
       },
       "swiftmend": {
         "name": "迅捷治愈",
@@ -10599,7 +10599,7 @@ export const zh_CN: EnTranslations = {
       },
       "evocation": {
         "name": "以太之井",
-        "description": "快速恢复法力。（法师天赋）"
+        "description": "引导6秒：每秒恢复100点法力并获得8点法术强度，效果在引导期间叠加并持续15秒。（法师天赋）"
       },
       "flurry_of_knives": {
         "name": "刀刃乱舞",
@@ -10627,11 +10627,11 @@ export const zh_CN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐惧嚎叫",
-        "description": "使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）"
+        "description": "使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧效果。（术士天赋）"
       },
       "ice_block": {
         "name": "寒冰棺",
-        "description": "将你封入寒冰之中，吸收大量伤害，持续 8 秒。（法师天赋）"
+        "description": "将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）"
       },
       "inner_focus": {
         "name": "静心",

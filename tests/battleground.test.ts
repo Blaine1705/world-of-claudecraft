@@ -71,6 +71,7 @@ import { addThreat } from '../src/sim/threat';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { UNSTUCK_COUNTDOWN_SECONDS } from '../src/sim/unstuck';
 import { groundHeight } from '../src/sim/world';
+import type { IWorld } from '../src/world_api';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The staged 5v5 arms (graveyard no-auto-release, the 720s cap, the fairness
@@ -1222,6 +1223,39 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     );
     expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
     expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
+  it('Esc-menu Unstuck recovers a wall-trapped fighter with latched movement input', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    expect(pid).toBe(sim.playerId);
+    const e = forceIntoBgWallTrap(sim, match, pid);
+    const meta = must(sim.meta(pid), 'player meta');
+    meta.moveInput.forward = true;
+
+    const menuWorld: Pick<IWorld, 'unstuck'> = sim;
+    menuWorld.unstuck();
+
+    expect(meta.pendingUnstuck).not.toBeNull();
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'started',
+        pid,
+      }),
+    );
+
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
+
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(e.dead).toBe(false);
+    expect(e.ghost).toBe(false);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
+    expect(meta.pendingUnstuck).toBeNull();
+    expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
   });
 
   it('combat still cancels a battleground wall-trap Unstuck countdown', () => {

@@ -144,14 +144,18 @@ describe('Warlock Soulwell', () => {
     expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(3);
   });
 
-  it('does not let the owner rotate an active well into a newly formed group', () => {
+  it('rejects members of a new party formed after the well was summoned', () => {
     const { sim, owner, ownerId, allyId, strangerId } = world();
     const well = summon(sim, owner);
+    const summonedPartyId = sim.partyOf(ownerId)?.id;
 
-    sim.partyLeave(allyId);
+    sim.partyLeave(ownerId);
     sim.partyInvite(strangerId, ownerId);
     sim.partyAccept(strangerId);
 
+    expect(sim.partyOf(ownerId)?.id).not.toBe(summonedPartyId);
+    expect(sim.pickUpObject(well.id, allyId)).toBe(true);
+    expect(sim.countItem(SOUL_STONE_ITEM_ID, allyId)).toBe(3);
     expect(sim.pickUpObject(well.id, strangerId)).toBe(true);
     expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(0);
   });

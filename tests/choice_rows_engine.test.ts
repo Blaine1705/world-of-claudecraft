@@ -91,14 +91,17 @@ describe('choice row engine', () => {
     expect(mods.grants.some((g) => g.ability === granted)).toBe(true);
   });
 
-  it('every grant-bearing option is named after its granted ability (i18n free)', () => {
+  it('every grant-bearing option name stays anchored to its granted ability (i18n free)', () => {
     for (const cls of CLASSES) {
       for (const row of CHOICE_ROWS[cls].rows) {
         for (const o of row.options) {
           const g = o.effect.grant?.ability;
           if (!g) continue;
           expect(ABILITIES[g], `${o.id} grants unknown ability ${g}`).toBeTruthy();
-          expect(o.name, `${o.id} name must match ${g}'s display name`).toBe(ABILITIES[g].name);
+          expect(
+            [ABILITIES[g].name, `Improved ${ABILITIES[g].name}`].includes(o.name),
+            `${o.id} name must match or improve ${g}'s display name`,
+          ).toBe(true);
         }
       }
     }

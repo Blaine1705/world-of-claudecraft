@@ -145,7 +145,12 @@ describe('appearance skin selection', () => {
     expect((p as { weaponSkinId?: string | null }).weaponSkinId).toBeNull();
   });
 
-  it('sends the online mech chroma unequip command and mirrors the returned item immediately', () => {
+  it('sends the online mech chroma unequip command and keeps the account-wide unlock permanent', () => {
+    // Regression: the local mirror used to strip the chroma out of
+    // accountCosmetics.mechChromaIds and mint an item back, so a second
+    // character showing the same look (never touched by this call) could
+    // never take it off, or put it back on, again. The unlock must stay
+    // account-wide and permanent, like a purchased Season 1 Armory skin.
     const sent: unknown[] = [];
     const client: ClientWorld = Object.create(ClientWorld.prototype);
     Object.assign(client, {
@@ -160,9 +165,11 @@ describe('appearance skin selection', () => {
 
     client.unequipMechChroma('amber_crimson');
 
-    expect(client.accountCosmetics.mechChromaIds).toEqual([]);
+    // The unlock is never revoked locally: it stays available to reselect.
+    expect(client.accountCosmetics.mechChromaIds).toEqual(['amber_crimson']);
     expect(client.player.skinCatalog).toBe('class');
-    expect(client.inventory).toEqual([{ itemId: 'amber_crimson_armor_plate', count: 1 }]);
+    // No item is minted: the look was never itemized.
+    expect(client.inventory).toEqual([]);
     expect(sent).toEqual([{ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }]);
   });
 

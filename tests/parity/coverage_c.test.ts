@@ -116,9 +116,18 @@ describe('coverage: each scenario fires its subsystem', () => {
     ).toBe(true);
     // paladin consecration: a ground AoE was pushed (on-cast pulse path).
     expect((rec.sim as any).groundAoEs.length).toBeGreaterThanOrEqual(1);
-    // warlock fear: the incapacitate aura landed on the warlock's mob (fear-angle draw).
-    const warlockMob = ents.find((e) => e.id === rec.notes.warlockMobId);
-    expect(warlockMob?.auras?.some((a: Ev) => a.kind === 'incapacitate')).toBe(true);
+    // warlock fear: the fear-flavored incapacitate arm emitted its impact.
+    // The sampled end state can miss a short Harrow aura, but this event fires
+    // after the effect-dispatch arm rolls the fear heading and applies the aura.
+    expect(
+      ev.some(
+        (e) =>
+          e.type === 'spellfx' &&
+          e.ability === 'fear' &&
+          e.fx === 'fearImpact' &&
+          e.targetId === rec.notes.warlockMobId,
+      ),
+    ).toBe(true);
     // warlock summon_imp: a pet now belongs to the warlock (summonDemon -> summonPet).
     expect(ents.some((e) => e.ownerId === rec.notes.warlockId)).toBe(true);
     // druid form switch: the LAST form (cat) is active and bear was stripped.
