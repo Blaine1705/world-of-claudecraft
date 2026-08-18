@@ -18,6 +18,7 @@ import {
   stepEnvironmentBlend,
 } from './environment_transition_core';
 import { GFX, type GfxSettings } from './gfx';
+import { type HdrPixelData, resampleHdrRgba } from './hdr_resample';
 import type { SkyResidencyRegion } from './sky_residency_core';
 import { skyTexture } from './textures';
 
@@ -394,6 +395,17 @@ const hdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
 // a 2k source quadruples the CubeUV working-target size and blur cost, which
 // the zone streaming lane would otherwise pay inside live frames.
 const envHdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
+// The env PMREM source width, and the ONE cubeUV height a session prefilters
+// at. PMREMGenerator sizes its target off the SOURCE (_fromTexture calls
+// _setSize(image.width / 4) for an equirect) and envMapCubeUVHeight is a
+// program-cache-key input three re-reads with no material.needsUpdate, so a
+// biome prefiltered from the full-size dome HDR relinks every lit material in
+// the scene the moment the camera crosses into it.
+const ENV_HDRI_WIDTH = 512;
+// Dome HDRs resampled down to ENV_HDRI_WIDTH for biomes whose env arm has not
+// landed yet or was evicted. Memoized per biome so the renderer's PMREM cache
+// (keyed on source identity) still builds one prefilter per biome.
+const envFallbackStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
 const backdropStore: Partial<Record<SkyKey, THREE.Texture>> = {};
 const skyAssetTasks = new Map<string, Promise<void>>();
 // Fetches that have not settled yet. skyAssetTasks alone cannot answer this
@@ -590,6 +602,11 @@ export function releaseSkyBiomeAssets(biomes: readonly SkyKey[]): SkyKey[] {
   // make the next ensure resolve instantly against empty stores.
   for (const biome of dropping) skyAssetTasks.delete(skyAssetTaskKey(biome));
   for (const biome of dropping) {
+    const fallback = envFallbackStore[biome];
+    delete envFallbackStore[biome];
+    // Its pixels are this module's own copy, so it is released with the biome
+    // whether or not the dome HDR's url is still claimed elsewhere.
+    if (fallback && fallback !== hdriStore[biome]) fallback.dispose();
     releaseHdrSlot(hdriStore, BIOME_HDRI, biome, dropping);
     releaseHdrSlot(envHdriStore, BIOME_HDRI_1K, biome, dropping, { maxWidth: 512 });
     const backdrop = backdropStore[biome];
@@ -655,12 +672,47 @@ export function hasBackdropAssets(biomes: readonly SkyKey[] = ['vale', 'marsh', 
 
 // Decoded-asset residency for one biome, read directly off BOTH stores.
 // envTexture cannot probe env residency: it falls back to the dome HDR when
-// the env store misses, so a dome-only biome would read non-null there and a
-// caller would PMREM the full-size dome (4x the CubeUV working-target size
-// and blur cost, see envHdriStore above) and cache that wrong prefilter for
-// the session. ensureSkyBiomeAssets starts the dome and env fetches together
-// on every profile that fetches at all, but they settle independently, so
+// the env store misses, so a dome-only biome reads non-null there and a caller
+// would cache a prefilter built from the dome copy for the session (correctly
+// sized since envFallbackTexture resamples it, but still not the shipped env
+// source). ensureSkyBiomeAssets starts the dome and env fetches together on
+// every profile that fetches at all, but they settle independently, so
 // residency is both stores non-null.
+/**
+ * The env PMREM source for a biome whose 512-wide env arm is missing: the dome
+ * HDR resampled to ENV_HDRI_WIDTH, never the full-size dome itself. Null when
+ * the dome has no decoded pixels to resample, which skips that biome's
+ * prefilter (the previous biome's IBL keeps lighting the scene) rather than
+ * caching a differently sized one for the session.
+ */
+function envFallbackTexture(biome: SkyKey): THREE.DataTexture | null {
+  const dome = hdriStore[biome];
+  if (!dome) return null;
+  const image = dome.image as { data?: HdrPixelData; width?: number; height?: number } | undefined;
+  const width = image?.width ?? 0;
+  if (width <= ENV_HDRI_WIDTH) return dome;
+  const cached = envFallbackStore[biome];
+  if (cached) return cached;
+  if (!image?.data || !image.height) return null;
+  const resized = resampleHdrRgba(image.data, width, image.height, ENV_HDRI_WIDTH);
+  const texture = new THREE.DataTexture(
+    resized.data as Uint16Array<ArrayBuffer>,
+    resized.width,
+    resized.height,
+  );
+  texture.type = dome.type;
+  texture.colorSpace = dome.colorSpace;
+  texture.mapping = dome.mapping;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = dome.wrapT;
+  texture.minFilter = dome.minFilter;
+  texture.magFilter = dome.magFilter;
+  texture.generateMipmaps = dome.generateMipmaps;
+  texture.needsUpdate = true;
+  envFallbackStore[biome] = texture;
+  return texture;
+}
+
 function skyBiomeAssetsResident(biome: SkyKey): boolean {
   return Boolean(hdriStore[biome]) && Boolean(envHdriStore[biome]);
 }
@@ -1163,7 +1215,7 @@ export function buildSky(
       uniforms.uTime.value = time;
     },
     envTexture(biome: SkyKey): THREE.DataTexture | null {
-      return envHdriStore[biome] ?? hdriStore[biome] ?? null;
+      return envHdriStore[biome] ?? envFallbackTexture(biome) ?? null;
     },
     domeTexture(biome: SkyKey): THREE.Texture | null {
       return hdriStore[biome] ?? null;
