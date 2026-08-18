@@ -227,6 +227,12 @@ export const hudChromeStrings = {
     woc: {
       tabGold: 'Gold',
       tabWoc: '$WOC',
+      // The currency switch's own accessible name (a group of two toggles),
+      // never one toggle's label for the pair; and why the $WOC toggle is
+      // off on the gold face (true for every cause the model refuses on).
+      modesLabel: 'Payment currency',
+      tabWocHint:
+        'Paying in $WOC is available when your side of the table is empty and no gold is offered.',
       priceLabel: 'Price in USD',
       pricePlaceholder: '0.00',
       equivalent: 'About {tokens} $WOC at the current rate',
@@ -240,6 +246,8 @@ export const hudChromeStrings = {
       netLineBuyer: 'The seller receives {net}',
       sendOffer: 'Offer $WOC',
       offerSent: 'Offer sent. It expires in 10 minutes unless {name} accepts.',
+      // The real expiry from the wire, when the server sends one.
+      offerSentUntil: 'Offer sent. It expires at {time} unless {name} accepts.',
       incomingAccept: '{name} offers {price} for your items.',
       // Role-neutral: it renders on the buyer's compose face and on BOTH
       // review faces.
@@ -253,18 +261,29 @@ export const hudChromeStrings = {
       // These say so, rather than leaving a disabled button unexplained.
       hintClearYourItems: 'Remove your own items: a $WOC offer buys what they are selling.',
       hintAwaitTheirItems: 'Waiting for them to offer something that can be sold for $WOC.',
-      hintOneItem: 'A $WOC deal covers exactly one item. Leave only the one being sold.',
+      // Role-neutral: the same key reads on the buyer's compose face (about
+      // the seller's table) and the seller's accept face.
+      hintOneItem:
+        'A $WOC deal covers exactly one item. Only the item being sold can be on the table.',
       hintEnterPrice: 'Enter a price in USD.',
       hintAcceptNeedsItem: 'Add the item you are selling before accepting.',
-      hintAcceptLocked: 'That item is locked. Unlock it in your bags before selling it.',
+      // The staged copy is a snapshot: after unlocking in the bags the item
+      // has to be re-staged for the trade to see the change, so the hint names
+      // that step (the R10 dead end).
+      hintAcceptLocked:
+        'That item is locked. Unlock it in your bags, then remove it from the trade and add it again.',
       hintGoldOffered: 'Remove your gold offer first: a trade is gold or $WOC, not both.',
-      ineligibleNote: '{count} staged item(s) cannot be sold for $WOC.',
+      // The count rides the plurals base wocTradeIneligible; this sentence
+      // says WHY (the exchange lock predicate's arms).
+      ineligibleReason:
+        'Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.',
       incomingTitle: '$WOC offer from {name}',
       incomingBody: '{name} offers to sell you {item} for {price}.',
       // The formatter already spells the currency in every locale (US$,
       // USD, $US), so the key adds no code of its own.
       moneyUsd: '{usd}',
-      moneyTokens: '(~ {tokens} $WOC)',
+      // One template for both figures, so a locale orders and spaces them.
+      moneyLine: '{usd} (~ {tokens} $WOC)',
       waitingOther: 'Offer accepted. Waiting for the other player to accept.',
       payNow: 'Pay {usd}',
       awaitingPayment: 'Waiting for payment confirmation...',
@@ -468,6 +487,12 @@ export const hudChromeStrings = {
     showAmounts: 'Show all Claudium amounts',
     hideAmounts: 'Hide extra Claudium amounts',
     skuRow: '{usd} for {claudium} Claudium',
+    // The pack price in the chosen crypto rail: the amount is a localized
+    // number and the ticker is a template token, never a glued suffix (the
+    // usd_text.ts rule for the USD arm, applied to the token arms).
+    priceSol: '{amount} SOL',
+    priceUsdc: '{amount} USDC',
+    priceWoc: '{amount} WOC',
     buyButton: 'Buy',
     buyUnavailable: 'Purchasing is unavailable right now.',
     storeTitle: 'Cosmetic Store',
@@ -660,6 +685,8 @@ export const hudChromeStrings = {
     jump: 'Jump',
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
+    // The Exchange launcher's own short label (it borrowed the Browse tab's).
+    wocMarket: 'Exchange',
     deeds: 'Deeds',
     mounts: 'Mounts',
     professions: 'Professions',
@@ -2236,6 +2263,12 @@ export const hudChromeStrings = {
       few: 'Choose from {count} items',
       many: 'Choose from {count} items',
       other: 'Choose from {count} items',
+    },
+    wocTradeIneligible: {
+      one: '{count} staged item cannot be sold for $WOC.',
+      few: '{count} staged items cannot be sold for $WOC.',
+      many: '{count} staged items cannot be sold for $WOC.',
+      other: '{count} staged items cannot be sold for $WOC.',
     },
     finderPartySize: {
       one: '{count} player',
@@ -5191,16 +5224,27 @@ export const hudChromeStrings = {
     tabBrowse: 'Browse',
     tabSell: 'Sell',
     tabActivity: 'Activity',
+    // The tab strip's own accessible name (the store's 'WOC Store sections'
+    // precedent), never the window title twice.
+    tabsLabel: '$WOC Exchange sections',
     loading: 'Loading the Exchange...',
     loadFailed: 'The Exchange could not be reached. Try again shortly.',
     disabledRealm: 'The $WOC Exchange is not available on this realm.',
+    // Names no cause (an operator pause and an unhealthy price print both
+    // land here) and every action the pause refuses (guardEnabledHealthy
+    // gates listing, bidding, offers and the payment quote); a payment
+    // already sent is not health-gated and still settles.
     pausedBanner:
-      'Trading is paused while $WOC pricing recovers. Auctions keep counting down; new bids and payments wait until pricing is healthy, and a payment already sent still settles.',
+      'Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.',
     walletBanner: 'Link and verify a wallet to bid, buy, or sell on the Exchange.',
-    rateNote:
-      'Current rate: about {tokens} $WOC per USD, from the latest venue price print ({time}).',
-    estimateNote:
-      'About {tokens} $WOC at the current rate. The final amount is fixed only when payment is requested.',
+    rateNote: 'Rate: about {tokens} $WOC per USD as of {time}.',
+    // Under the paused banner the print is the last KNOWN rate, dated, never a
+    // live one.
+    rateNotePaused: 'Last known rate: about {tokens} $WOC per USD as of {time}.',
+    // Anchored to the amount it converts (the current bid, else the starting
+    // bid: the same rule the server priced); the fixed-at-payment rule lives
+    // in the bid form's own warning.
+    estimateNote: 'About {tokens} $WOC for {usd} at the current rate.',
     browseEmpty: 'No listings right now. Check back soon.',
     browseError: 'Listings could not be loaded.',
     colItem: 'Item',
@@ -5212,6 +5256,16 @@ export const hudChromeStrings = {
     reserveNotMet: 'Reserve not met',
     yourListing: 'Your listing',
     buyNowLockedBadge: 'Purchase in progress',
+    // The badges' explainers (the shared tooltip box, hover, focus and touch):
+    // a bidder's only encounter with a hidden reserve, and what a locked or
+    // own listing means for them.
+    reserveMetTip: 'The seller set a hidden minimum price, and the current bid meets it.',
+    reserveNotMetTip:
+      'The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.',
+    yourListingTip:
+      'You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.',
+    buyNowLockedTip:
+      'Another buyer holds this listing while they pay. If they do not pay in time, it reopens.',
     pagePrev: 'Previous page',
     pageNext: 'Next page',
     pageNumber: 'Page {current}',
@@ -5229,34 +5283,53 @@ export const hudChromeStrings = {
     detailMinNext: 'Minimum next bid: {usd}',
     detailBuyNow: 'Buy now: {usd}',
     detailSales: 'Recent sales',
-    detailSaleRow: '{usd} from {seller} to {buyer}',
+    detailSaleRow: '{time}: {seller} sold to {buyer} for {usd}',
     detailNoSales: 'No recorded sales for this item yet.',
+    // The history is its own round trip: while it is on its way the pane says
+    // so, never 'no recorded sales'.
+    detailSalesLoading: 'Loading recent sales...',
     bidLabel: 'Your bid (USD)',
     bidPlaceholder: 'Enter a USD amount',
     bidButton: 'Place bid',
     bidAria: 'Place a bid on {item}',
+    // The row activator opens the listing (a buy-now-only listing takes no
+    // bids, and neither does your own), so its name says that.
+    rowOpenAria: 'View the listing for {item}',
     buyNowButton: 'Buy now for {usd}',
     buyNowAria: 'Buy {item} now for {usd}',
     cancelButton: 'Cancel listing',
     cancelAria: 'Cancel your listing of {item}',
+    // The bond schedule for THIS listing: both figures are server-computed
+    // and ride the listing view (the bond for the minimum next bid; a higher
+    // bid holds more), on top of the bid, and every way it comes back. The
+    // forfeit and strike rule is stated once, in bidBindingNote.
     bidBondNote:
-      'Placing a bid holds a refundable bond of {usd}, paid in $WOC. It is returned if you are outbid (unless a second-chance offer makes you the buyer) and forfeited only if you win and do not pay.',
+      'Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.',
     // The pre-bid commitment disclosures (draft Terms 10.4/10.5), shown
     // BEFORE the first bond charge: a bid binds once its bond is signed.
     bidBindingNote:
       'A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.',
+    // The anti-snipe rule with its real figures (2 minutes, capped at 30
+    // past the listed end; pinned against the server constants), and what a
+    // bond that confirms after the close is: not counted, refunded.
     bidCloseNote:
-      'A bid whose bond confirms in the closing minutes can extend the auction by a few minutes. After it closes, a late payment cannot reopen it and is refunded.',
+      'A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.',
     // Bidder-facing second-chance disclosure, shown when the seller opted in:
     // the cascade is automatic (the bond is re-held and a settlement opens),
     // not an offer the bidder accepts.
     offerNextNote:
-      'If the winner does not pay, you may become the buyer at your own bid: your bond is held again and payment is due within the settlement window. Not paying then forfeits the bond and earns a strike.',
+      'If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.',
     // Buy now claims the listing; walking away has a cost of its own.
+    // The real figures (a 270 second hold, a 30 minute per-listing cooldown,
+    // three unpaid Buy Nows per rolling hour; pinned against the server
+    // constants), in plain words.
     buyNowNote:
-      'Buy now holds this listing for you for a short time. Walking away without paying blocks this listing for you for a while, and repeated walk-aways pause Buy Now for you altogether.',
+      'Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.',
     variableTokenWarning:
       'You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.',
+    // On the quote faces the amount IS fixed until the quote expires: the note
+    // says that instead of warning that the number on screen may still move.
+    quoteFixedNote: 'This quote fixes the $WOC amount until it expires. A new quote may differ.',
     settlementDeadlineNote: 'If you win, payment is due within {duration} of the auction closing.',
     // The claim_cooldown refusal's parametric variant: rendered by the
     // api_error matcher when the server names the remaining time (it lives
@@ -5266,12 +5339,14 @@ export const hudChromeStrings = {
     // Named after the document it links (10.3: presented, or clearly linked,
     // at the moment of acceptance), not a settlement-mechanics nickname.
     termsLabel: 'I accept the Marketplace terms.',
-    termsLink: 'View the Marketplace terms',
+    termsLink: 'View the Marketplace terms (opens in a new tab)',
     quoteTitle: 'Confirm payment',
     quoteTotal: 'Total: {tokens} $WOC',
     quoteSeller: 'Seller receives: {tokens} $WOC',
-    quoteBurn: 'Burned: {tokens} $WOC',
-    quoteTreasury: 'Treasury: {tokens} $WOC',
+    // The two fee legs name what each share is: the buyer never reads the
+    // seller's fee note.
+    quoteBurn: 'Burned (removed from supply): {tokens} $WOC',
+    quoteTreasury: 'To the game treasury: {tokens} $WOC',
     quoteExpires: 'Quote expires in {duration}',
     // The static-time twin for cold surfaces with no countdown driver (the
     // trade arm's review panel).
@@ -5281,7 +5356,14 @@ export const hudChromeStrings = {
     quoteRefresh: 'New quote',
     quoteCancel: 'Not now',
     quoteBondFor: 'Refundable bid bond: {usd}',
+    // The bond face names its listing's item when the painter knows it (a
+    // retry after a declined wallet still says which auction it is for).
+    quoteBondForItem: 'Refundable bid bond for {item}: {usd}',
     quoteSettlementFor: 'Settlement for {item}: {usd}',
+    // The claim's own payment deadline on the settlement quote face (the trade
+    // arm's quote face shows its twin); a public Buy Now that lapses earns a
+    // cooldown, not a strike, so this line names no strike.
+    paymentDueAt: 'Payment is due by {time}.',
     signing: 'Waiting for your wallet...',
     signFailed: 'Your wallet did not complete the payment. Check the wallet and try again.',
     // The step-up (listing / directed acceptance) authorization is a message
@@ -5305,12 +5387,15 @@ export const hudChromeStrings = {
     listingCancelPending:
       'Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.',
     sellTitle: 'Create a listing',
+    // Names no floor: the quality floor and the two collectible categories are
+    // realm policy (/status), and the sell filter applies whatever it says.
     sellEmpty:
-      'No eligible items in your bags. The Exchange takes non-soulbound equipment of epic quality or better.',
-    sellSelectAria: 'Select {item} to list',
+      "No eligible items in your bags. The Exchange takes unbound equipment at or above the realm's quality floor, and on some realms mounts and mech chroma plates.",
+    // A copy the player locked themselves is filtered out of the picker; the
+    // note says so instead of leaving it silently missing.
+    sellLockedHidden: 'Locked items are not listed here. Unlock them in your bags to sell them.',
     sellSearchPlaceholder: 'Type to filter your bags',
     sellClear: 'Clear {item} and choose another',
-    sellClearTitle: 'Clear selection',
     sellChoose: 'Item to list',
     sellNoMatches: 'No items match that search',
     sellBuyNowAboveStart: 'The buy-now price must be higher than the starting bid.',
@@ -5320,27 +5405,48 @@ export const hudChromeStrings = {
     sellFormatAuctionBuyNow: 'Auction with buy now',
     sellStart: 'Starting bid (USD)',
     sellReserve: 'Reserve (USD, optional)',
-    sellReserveNote: 'Hidden from bidders; only met or not met is shown.',
+    sellReserveNote:
+      'Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.',
     sellBuyNowNote: 'Required. A buy-now listing sells at this price with no bidding.',
     sellBuyNowAuctionNote:
       'Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.',
     sellBuyNowPrice: 'Buy-now price (USD)',
     sellDuration: 'Duration',
-    sellDurationHours: '{hours} hours',
-    sellOfferNext: 'If the winner does not pay, offer the item to the next bidder.',
+    sellOfferNext:
+      'If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.',
     sellSubmit: 'List item',
     sellSubmitAria: 'List {item} on the Exchange',
+    // The fee schedule is service configuration and is not on the wire, so
+    // the note names no percentage: the resolved fee for the price being
+    // typed renders beside it from the server's estimate (an auction's fee
+    // follows the final price).
     sellFeeNote:
-      'Completed sales pay a fee of about 10 percent: 3 percent burned and 7 percent to the treasury, each rounded up, and you receive the exact remainder (about 90 percent). Proceeds arrive at your linked wallet in the settlement transaction.',
+      'A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.',
     activityListings: 'My listings',
     activityBids: 'My bids',
     activitySettlements: 'My settlements',
     activityEmpty: 'Nothing yet. Bids, listings, and settlements appear here.',
+    // A section with nothing in it says so instead of a heading over air.
+    activityNoListings: 'You have no listings.',
+    activityNoBids: 'You have no bids.',
+    activityNoSettlements: 'You have no settlements.',
     activityPayNow: 'Pay now',
     activityPayNowAria: 'Pay for settlement {id} now',
+    // The item-named twin, used when the wire carries the item (H13 put it on
+    // the row); the id form stays for an older server.
+    activityPayNowItemAria: 'Pay {usd} for {item} now',
     activityDeadline: 'Payment due in {duration}',
+    // The exact deadline (the countdown's tooltip), the detailEndsAt shape.
+    dueAt: 'Due {utc} UTC ({local} local)',
     activityStrikes: 'Marketplace strikes: {count}',
-    activitySuspended: 'Bidding suspended for {duration} after unpaid settlements.',
+    // A strike suspends listing, buying, offers and the step-up too (every
+    // guardSuspended arm), not only bidding.
+    activitySuspended:
+      'Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.',
+    // What a strike is and the ladder it climbs (pinned against the server's
+    // suspension table).
+    strikesTip:
+      'A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.',
     bidStatusPending: 'Awaiting bond',
     bidStatusActive: 'High bidder',
     bidStatusOutbid: 'Outbid',
@@ -5350,6 +5456,7 @@ export const hudChromeStrings = {
     bidStatusCancelled: 'Cancelled',
     bidBondPay: 'Pay bond',
     bidBondPayAria: 'Pay the bond for your bid on listing {id}',
+    bidBondPayItemAria: 'Pay the {bond} bond for your bid on {item}',
     settlementOffered: 'Payment due',
     settlementConfirming: 'Confirming',
     settlementConfirmedDelivering: 'Payment confirmed, delivering',

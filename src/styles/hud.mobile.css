@@ -3074,6 +3074,7 @@
     grid-template-rows: auto auto 1fr;
   }
   body.mobile-touch #woc-market-window .wm-detail {
+    position: static;
     max-height: none;
   }
   /* The touch-target floor for the controls the desktop sheet sizes by padding
@@ -3089,6 +3090,13 @@
     height: auto;
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
+    /* A money sheet under a landscape notch: the close button and the pager
+       sit inside the corner bands unless the pins clear the safe-area insets
+       (the #bags rule's shape). A re-pinned left re-declares transform. */
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    transform: none;
   }
   /* 16px and no-wrap follow .opt-tab: at 13px in a verbose locale the three
      labels wrapped inside their own tabs, and flex:1 alone cannot grow the
@@ -3105,6 +3113,19 @@
        the strip a vertical scroller too and clipped the taller 16px labels. */
     overflow-x: auto;
     overflow-y: hidden;
+  }
+  /* The scrolling strip clips an outside ring: draw the tab's focus ring inside. */
+  body.mobile-touch #woc-market-window button.wm-tab:focus-visible {
+    outline-offset: -2px;
+  }
+  /* Every money-entry control at the touch floor, border-box so a padded
+     text input and a UA border-box select land at the same 40px (the pinned
+     bid-field rule below stays as it is). */
+  body.mobile-touch #woc-market-window input[type="text"],
+  body.mobile-touch #woc-market-window input[type="number"],
+  body.mobile-touch #woc-market-window select {
+    min-height: 40px;
+    box-sizing: border-box;
   }
   body.mobile-touch #woc-market-window .wm-sort select {
     min-height: 40px;
@@ -3131,14 +3152,33 @@
      UI-scale floor of 0.85 would render below 10px on a small screen. */
   body.mobile-touch #woc-market-window label.wm-terms,
   body.mobile-touch #woc-market-window .wm-terms-link,
+  body.mobile-touch #woc-market-window label.wm-offer-next,
   body.mobile-touch #trade-window .trade-woc-terms,
   body.mobile-touch #trade-window .trade-woc-terms-link {
     font-size: 16px;
+  }
+  /* The rest of the arm's money and legal lines join the phone floor: the fee
+     and net figures, the strike and variable-price warnings and the
+     disabled-affordance hint were 11px beside a 16px consent caption. */
+  body.mobile-touch #trade-window .trade-woc-warn,
+  body.mobile-touch #trade-window .trade-woc-note,
+  body.mobile-touch #trade-window .trade-woc-hint,
+  body.mobile-touch #trade-window .trade-woc-block,
+  body.mobile-touch #trade-window .trade-woc-price-label,
+  body.mobile-touch #trade-window .trade-woc-equiv,
+  body.mobile-touch #trade-window .trade-woc-fee,
+  body.mobile-touch #trade-window .trade-woc-net,
+  body.mobile-touch #trade-window .trade-woc-leg,
+  body.mobile-touch #trade-window .trade-woc-waiting,
+  body.mobile-touch #trade-window .trade-woc-done,
+  body.mobile-touch #trade-window .trade-hint {
+    font-size: 14px;
   }
   /* The bid amount field is a money-surface tap target too (the buttons
      beside it are floored at 40px by the shared rule; the input was 37px). */
   body.mobile-touch #woc-market-window .wm-bid-form input[data-field="bid-usd"] {
     min-height: 40px;
+    box-sizing: border-box;
   }
   /* The combobox parts the desktop sheet sizes by padding alone. The options are
      the tap targets here, and the clear button inherits the shared .x-btn floor. */
@@ -3149,7 +3189,7 @@
     min-height: 44px;
   }
   body.mobile-touch #woc-market-window .wm-combo-list {
-    max-height: 40vh;
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) * 0.4);
   }
   body.mobile-touch #woc-market-window label.wm-terms input,
   body.mobile-touch #woc-market-window label.wm-offer-next input,
@@ -3534,13 +3574,108 @@
     height: min(560px, calc(var(--app-vh) / var(--ui-scale, 1) - 20px));
   }
   body.mobile-touch #trade-window {
-    top: 10px;
+    /* A money sheet under a landscape notch: the pins clear the safe-area
+       insets (the #bags shape) so the close button, the arm's Pay and the
+       Accept row never sit in a corner band; the raw-vw clamp is dropped
+       because it under-fills the pinned sheet below uiScale 1 (the #bags
+       comment). A re-pinned left re-declares transform. */
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    max-width: none;
     transform: none;
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow-y: auto;
   }
-  body.mobile-touch #trade-window .trade-cols {
+  /* In-game mobile is landscape only, so the two offer columns stay side by
+     side (a 900px sheet has room for both) and the empty wells shrink: the
+     stacked column spent the scarce axis on two 120px boxes and pushed the arm
+     and the Accept row a screen below the fold. */
+  body.mobile-touch #trade-window .trade-items {
+    min-height: 84px;
+  }
+  /* The window's Accept / Cancel row sticks to the sheet's bottom edge, so the
+     commit control is reachable however long the arm's face runs. The sheet
+     scrolls behind it, so it also reserves its own height as scroll padding:
+     without that, a control scrolled to the bottom (the consent row, Send,
+     Sign) came to rest UNDERNEATH the sticky row and stopped being the
+     top-most element at its own centre, which is exactly untappable. The
+     mobile capture rig asserts that top-most fact per control. */
+  body.mobile-touch #trade-window {
+    scroll-padding-bottom: 72px;
+  }
+  body.mobile-touch #trade-window .trade-actions {
+    position: sticky;
+    bottom: 0;
+    padding: var(--spacing-sm) 0;
+    margin-top: var(--spacing-xs);
+    background: var(--panel-base);
+  }
+  /* The last arm line clears the sticky row when the face is scrolled to its
+     end, so nothing rests under it at rest either. */
+  body.mobile-touch #trade-window .trade-woc-arm {
+    padding-bottom: var(--spacing-lg);
+  }
+  /* The $WOC price field lives in the arm, not in .trade-money, so the coin
+     floor below never reached it: the same 40px / 16px / border-box, wide
+     enough for a four-figure price at the 16px touch font. */
+  body.mobile-touch #trade-window .trade-woc-price {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+    max-width: 140px;
+  }
+  /* The ways out do not span the sheet: only the commitment button does, so
+     a full-width destructive Cancel sale never reads as the primary action
+     above the window's own Cancel. */
+  body.mobile-touch #trade-window .trade-woc-arm > .btn.trade-woc-quiet {
+    align-self: flex-start;
+  }
+  body.mobile-touch #trade-window .trade-woc-arm > .btn.trade-woc-primary {
+    align-self: stretch;
+  }
+  /* The trade opens the bags beside it, and on the sheet layout the bags
+     (z 95, the modal sheet) covered the trade window entirely, arm included.
+     Keyed on the open marker the Hud stamps on every visible window (no new
+     wiring): while BOTH are open they split the sheet like the vendor and
+     bank docks (trade left, bags right), and a bags close returns the trade
+     sheet to full width on its own. */
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+  #trade-window,
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+    #bags {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    max-height: none;
+    height: auto;
+    transform: none;
+    box-sizing: border-box;
+    z-index: 95 !important;
+  }
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+    #trade-window {
+    left: max(10px, env(safe-area-inset-left));
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    overflow-y: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+    #trade-window
+    .trade-cols {
     flex-direction: column;
+  }
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+    #bags {
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    right: max(10px, env(safe-area-inset-right));
+    overflow: hidden;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
   }
   /* Issue 1577 round 2 (9): the bags window used to reserve 72px at the bottom to
      keep clear of the player frame below it. The player frame is fine to cover
@@ -3674,6 +3809,14 @@
     min-height: 40px;
     font-size: 16px;
     box-sizing: border-box;
+  }
+  /* Three 16px digits did not fit the desktop 52px coin box: a five-digit gold
+     value scrolled inside it. */
+  body.mobile-touch .trade-money input.coininput {
+    width: 72px;
+  }
+  body.mobile-touch .trade-coins {
+    flex-wrap: wrap;
   }
   body.mobile-touch .soc-x,
   body.mobile-touch .soc-name.soc-link {

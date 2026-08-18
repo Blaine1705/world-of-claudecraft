@@ -5,7 +5,7 @@
 // offer, acceptance, escrow, payment through the wallet bridge, and the
 // exactly-once completion report. Pure decisions live in woc_trade_offer_view.ts
 // (this module keeps the effects); the arm's model/markup helpers stay in
-// src/ui/trade_woc_panel.ts and src/ui/trade_woc_view.ts.
+// src/ui/trade_woc_arm_painter.ts and src/ui/trade_woc_view.ts.
 //
 // Per src/ui/hud/CLAUDE.md this module never imports Hud: every host capability
 // (the IWorld, the staged gold offer Hud shares with the bags window, log lines,
@@ -19,10 +19,11 @@ import { ITEMS } from '../../../sim/data';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { userFacingApiError } from '../../api_error_i18n';
+import { bagQualityKey } from '../../bags_view';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
-import { formatDateTime, formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
+import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
 import { knownItemDef } from '../../known_item';
 import { termsUrlFor } from '../../terms_link';
@@ -35,7 +36,7 @@ import {
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
-} from '../../trade_woc_panel';
+} from '../../trade_woc_arm_painter';
 import {
   inventoryIndexOfStaged,
   type WocPendingOffer,
@@ -49,8 +50,10 @@ import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { usdText } from '../../usd_text';
 import { verifiedWocBalance } from '../../wallet_balance';
 import { walletBridgeErrorText } from '../../wallet_bridge_reason_text';
+import { WOC_LOG_BAD, WOC_LOG_GOOD, WOC_LOG_NOTE } from '../../woc_log_tones';
 import { wocPaymentPendingText } from '../../woc_market_reason_text';
 import type { WocMarketHooks } from '../../woc_market_window';
+import { wocTokensText } from '../../woc_tokens_text';
 import {
   adoptedWocOffer,
   selectStandingWocOffer,
@@ -430,7 +433,7 @@ export class WocTradeController {
           item: item ? itemDisplayName(item) : (row.itemId ?? ''),
         },
       ),
-      '#7fdc4f',
+      WOC_LOG_GOOD,
     );
     // Both sides: the seller was paid and the buyer spent, so neither footer is
     // still correct.
@@ -476,7 +479,7 @@ export class WocTradeController {
       reason === 'unpaid' && row.role === 'buyer'
         ? WOC_TRADE_CLOSED_UNPAID_BUYER
         : WOC_TRADE_CLOSED_KEYS[reason];
-    this.log(t(key), '#ff6b6b');
+    this.log(t(key), WOC_LOG_BAD);
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
     this.wocTradeQuote = null;
@@ -505,7 +508,7 @@ export class WocTradeController {
             : null;
     if (key === null) return;
     this.wocTradeFinished.add(offerId);
-    this.log(t(key), '#ffd100');
+    this.log(t(key), WOC_LOG_NOTE);
   }
 
   /**
@@ -561,7 +564,7 @@ export class WocTradeController {
           t('hudChrome.trade.woc.offerStandsUntil', {
             time: formatDateTime(row.expiresAtMs, { timeStyle: 'short' }),
           }),
-          '#ffd100',
+          WOC_LOG_NOTE,
         );
       } else if (phase === 'awaiting_payment') {
         // A signature still out with the wallet is a payment in progress,
@@ -575,7 +578,7 @@ export class WocTradeController {
                 : 'hudChrome.trade.woc.dealAwaitsPayment'
               : 'hudChrome.trade.woc.closeSellerHold',
           ),
-          '#ffd100',
+          WOC_LOG_NOTE,
         );
       } else if (phase === 'paying') {
         // Under review, the parked sentence; otherwise the payment is still
@@ -591,7 +594,7 @@ export class WocTradeController {
                 ? 'hudChrome.trade.woc.statusReviewSeller'
                 : 'hudChrome.trade.woc.closePaymentContinuesSeller',
           ),
-          '#ffd100',
+          WOC_LOG_NOTE,
         );
       }
     });
@@ -625,7 +628,7 @@ export class WocTradeController {
     if (offer.role === 'seller') {
       const model = wocTradeModelFrom(this.wocTradeDeps(this.sim.tradeInfo?.otherName ?? ''));
       if (!model.canAccept) {
-        if (model.acceptHint !== null) this.log(t(model.acceptHint), '#ff6b6b');
+        if (model.acceptHint !== null) this.log(t(model.acceptHint), WOC_LOG_BAD);
         return;
       }
     }
@@ -636,7 +639,7 @@ export class WocTradeController {
     if (offer.role === 'seller' && !first) {
       // Unreachable behind canAccept (the single accepted slot is tradable),
       // kept as the extraction belt: refusing beats escrowing the wrong item.
-      this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), '#ff6b6b');
+      this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), WOC_LOG_BAD);
       return;
     }
     // The extraction keys on an INVENTORY index. Sending the staged position
@@ -647,7 +650,7 @@ export class WocTradeController {
       const index = inventoryIndexOfStaged(this.sim.inventory, first);
       if (index < 0) {
         // Not found is not index 0: refusing here beats escrowing the wrong item.
-        this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), '#ff6b6b');
+        this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), WOC_LOG_BAD);
         return;
       }
       itemFields = {
@@ -671,7 +674,7 @@ export class WocTradeController {
           offerId: offer.id,
         });
         if (!issued.ok) {
-          this.log(userFacingApiError({ code: issued.code, params: issued.params }), '#ff6b6b');
+          this.log(userFacingApiError({ code: issued.code, params: issued.params }), WOC_LOG_BAD);
           return;
         }
         let signature: string;
@@ -680,7 +683,7 @@ export class WocTradeController {
           // explicit permission only; an absent flag still goes to the wallet.
           signature = `devsig:${issued.challenge.nonce}`;
         } else {
-          this.log(t('hudChrome.wocMarket.signing'), '#ffd100');
+          this.log(t('hudChrome.wocMarket.signing'), WOC_LOG_NOTE);
           try {
             signature = await hooks.signMessageBase58(issued.challenge.message);
           } catch (err) {
@@ -688,7 +691,7 @@ export class WocTradeController {
             // (a decline, a timeout, a missing wallet), never the bridge's or
             // a wallet extension's raw English.
             console.warn('[wallet bridge] step-up signature failed', err);
-            this.log(walletBridgeErrorText(err, 'sign'), '#ff6b6b');
+            this.log(walletBridgeErrorText(err, 'sign'), WOC_LOG_BAD);
             return;
           }
         }
@@ -700,19 +703,19 @@ export class WocTradeController {
         ...stepUpFields,
       });
       if (!res.ok) {
-        this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
+        this.log(userFacingApiError({ code: res.code, params: res.params }), WOC_LOG_BAD);
         return;
       }
       if (res.listing === null) {
         // Agreed; the other side has not yet. Nothing has moved.
-        this.log(t('hudChrome.trade.woc.waitingOther'), '#ffd100');
+        this.log(t('hudChrome.trade.woc.waitingOther'), WOC_LOG_NOTE);
         this.lastTradeSig = '';
         return;
       }
       // The window STAYS OPEN and the offer stays in it: escrow is done, and
       // the buyer's payment is the next thing that happens here. Closing at
       // this point is what previously left the deal with nowhere to finish.
-      this.log(t('hudChrome.trade.woc.accepted'), '#7fdc4f');
+      this.log(t('hudChrome.trade.woc.accepted'), WOC_LOG_GOOD);
       this.wocTradeOffer = {
         ...offer,
         phase: 'awaiting_payment',
@@ -778,7 +781,7 @@ export class WocTradeController {
         const movedOn = this.wocTradeOffer?.id !== offer.id;
         if (!bought.ok) {
           if (!movedOn) {
-            this.log(userFacingApiError({ code: bought.code, params: bought.params }), '#ff6b6b');
+            this.log(userFacingApiError({ code: bought.code, params: bought.params }), WOC_LOG_BAD);
           }
           return;
         }
@@ -809,7 +812,7 @@ export class WocTradeController {
                 ? { code: 'woc_market.quote_unavailable' }
                 : { code: quoted.code, params: quoted.params },
             ),
-            '#ff6b6b',
+            WOC_LOG_BAD,
           );
           return;
         }
@@ -842,10 +845,10 @@ export class WocTradeController {
         this.log(
           t('hudChrome.trade.woc.quoteStaged', {
             usd: usdText(held.usdCents),
-            tokens: formatNumber(this.wocTradeQuote.totalTokens, { maximumFractionDigits: 4 }),
+            tokens: wocTokensText(this.wocTradeQuote.totalTokens),
             time: formatDateTime(this.wocTradeQuote.expiresAtMs, { timeStyle: 'short' }),
           }),
-          '#ffd100',
+          WOC_LOG_NOTE,
         );
       }
       this.lastTradeSig = '';
@@ -882,7 +885,7 @@ export class WocTradeController {
     if (staged.expiresAtMs !== null && Date.now() > staged.expiresAtMs) {
       this.wocTradeQuote = null;
       this.lastTradeSig = '';
-      this.log(userFacingApiError({ code: 'woc_market.quote_expired' }), '#ff6b6b');
+      this.log(userFacingApiError({ code: 'woc_market.quote_expired' }), WOC_LOG_BAD);
       return;
     }
     this.wocTradePaying = true;
@@ -906,14 +909,14 @@ export class WocTradeController {
         // absent flag still goes through the wallet.
         signature = `devsig:${staged.reference ?? ''}`;
       } else {
-        this.log(t('hudChrome.trade.woc.paying'), '#ffd100');
+        this.log(t('hudChrome.trade.woc.paying'), WOC_LOG_NOTE);
         try {
           signature = await hooks.signAndSendTransactionBase64(staged.transactionBase64);
         } catch (err) {
           // Dev channel keeps the raw error; the player line is classified,
           // never rendered from err.message (the wallet-bridge i18n medium).
           console.warn('[wallet bridge] payment signature failed', err);
-          this.log(walletBridgeErrorText(err, 'payment'), '#ff6b6b');
+          this.log(walletBridgeErrorText(err, 'payment'), WOC_LOG_BAD);
           // Back to the payable face: the decline spent the staged quote,
           // not the deal.
           if (this.wocTradeOffer?.id === offer.id) {
@@ -924,7 +927,7 @@ export class WocTradeController {
       }
       const done = await hooks.client.confirmSettlement(held.id, signature);
       if (!done.ok) {
-        this.log(userFacingApiError({ code: done.code, params: done.params }), '#ff6b6b');
+        this.log(userFacingApiError({ code: done.code, params: done.params }), WOC_LOG_BAD);
         return;
       }
       // The Exchange window's ladder, refined: two surfaces describing the
@@ -938,13 +941,13 @@ export class WocTradeController {
       // never reaches here (the outcome arm refuses it), so the settled line
       // cannot fire for lost money.
       if (done.state === 'review') {
-        this.log(t('hudChrome.wocMarket.settlementReview'), '#ffd100');
+        this.log(t('hudChrome.wocMarket.settlementReview'), WOC_LOG_NOTE);
       } else if (done.state === 'confirming') {
-        this.log(wocPaymentPendingText(done.reason), '#ffd100');
+        this.log(wocPaymentPendingText(done.reason), WOC_LOG_NOTE);
       } else if (done.state === 'confirmed' || done.state === 'delivering') {
-        this.log(t('hudChrome.trade.woc.paymentConfirmed'), '#7fdc4f');
+        this.log(t('hudChrome.trade.woc.paymentConfirmed'), WOC_LOG_GOOD);
       } else {
-        this.log(t('hudChrome.trade.woc.settled'), '#7fdc4f');
+        this.log(t('hudChrome.trade.woc.settled'), WOC_LOG_GOOD);
       }
       // The paying face's status sentence keys on the settlement state (a
       // confirmed payment is not "confirming on the network"), so carry the
@@ -982,7 +985,7 @@ export class WocTradeController {
               ? 'hudChrome.trade.woc.youDeclined'
               : 'hudChrome.trade.woc.youWithdrew',
           ),
-          '#ffd100',
+          WOC_LOG_NOTE,
         );
         if (this.wocTradeOffer?.id === offer.id) {
           this.wocTradeOffer = null;
@@ -995,9 +998,9 @@ export class WocTradeController {
         // The other side resolved it first (or the escrow-failed transient
         // moved it): the trade arm's own sentence, not the shared code's
         // bid-bond copy. The poll reports the verdict itself.
-        this.log(t('hudChrome.trade.woc.offerNotPending'), '#ffd100');
+        this.log(t('hudChrome.trade.woc.offerNotPending'), WOC_LOG_NOTE);
       } else {
-        this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
+        this.log(userFacingApiError({ code: res.code, params: res.params }), WOC_LOG_BAD);
       }
     } finally {
       this.wocTradeResolving = false;
@@ -1037,16 +1040,16 @@ export class WocTradeController {
     try {
       const res = await hooks.client.cancelListing(offer.listingId);
       if (!res.ok) {
-        this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
+        this.log(userFacingApiError({ code: res.code, params: res.params }), WOC_LOG_BAD);
         return;
       }
       if (res.cancelPending === true) {
-        this.log(t('hudChrome.wocMarket.listingCancelPending'), '#ffd100');
+        this.log(t('hudChrome.wocMarket.listingCancelPending'), WOC_LOG_NOTE);
         if (this.wocTradeOffer?.id === offer.id) this.wocTradeCancelPendingFor = offer.id;
         return;
       }
       this.wocTradeFinished.add(offer.id);
-      this.log(t('hudChrome.wocMarket.listingCancelled'), '#ffd100');
+      this.log(t('hudChrome.wocMarket.listingCancelled'), WOC_LOG_NOTE);
       if (this.wocTradeOffer?.id === offer.id) {
         this.wocTradeOffer = null;
         this.wocTradeSplit = null;
@@ -1126,7 +1129,17 @@ export class WocTradeController {
       // The window STAYS OPEN. The offer now sits in it for both players to
       // read, and the seller accepts from there; closing it here left both
       // sides staring at nothing, with no way to agree.
-      this.log(t('hudChrome.trade.woc.offerSent', { name: otherName }), '#7fdc4f');
+      // The real expiry when the wire carries one; the untimed twin otherwise
+      // (an older server), never a hard-coded figure.
+      this.log(
+        typeof res.offer.expiresAtMs === 'number'
+          ? t('hudChrome.trade.woc.offerSentUntil', {
+              name: otherName,
+              time: formatDateTime(res.offer.expiresAtMs, { timeStyle: 'short' }),
+            })
+          : t('hudChrome.trade.woc.offerSent', { name: otherName }),
+        WOC_LOG_GOOD,
+      );
       this.wocTradeOffer = {
         id: res.offer.id,
         usdCents: res.offer.usdCents,
@@ -1141,12 +1154,27 @@ export class WocTradeController {
       };
       this.lastTradeSig = '';
     } else {
-      this.log(userFacingApiError({ code: res.code, params: res.params }), '#ff6b6b');
+      this.log(userFacingApiError({ code: res.code, params: res.params }), WOC_LOG_BAD);
     }
   }
 
+  /** The trade window root, resolved ONCE per controller. updateTradeWindow
+   *  runs on a medium band while a trade is open, and it re-queried the
+   *  document every tick (a faithful-move artifact of the extraction); the
+   *  element is created by the HTML entry and never replaced, so the ref is
+   *  stable for the session. Lazily resolved because the controller is built
+   *  before the shell's windows are wired. */
+  private tradeWindowEl: HTMLElement | null = null;
+
+  private tradeWindow(): HTMLElement {
+    if (this.tradeWindowEl === null || !this.tradeWindowEl.isConnected) {
+      this.tradeWindowEl = $('#trade-window');
+    }
+    return this.tradeWindowEl;
+  }
+
   updateTradeWindow(): void {
-    const el = $('#trade-window');
+    const el = this.tradeWindow();
     const info = this.sim.tradeInfo;
     if (!info) {
       if (this.tradeWasOpen) {
@@ -1331,7 +1359,9 @@ export class WocTradeController {
         // missing def (the shipped failure shape threw here and froze the offer
         // display behind the already-set repaint signature).
         const { item, label } = buildTradeItemRow(s, ITEMS);
-        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span>${esc(label)}</span>`;
+        // The name in its quality colour (the bag, bank and mail rows' family),
+        // so the staged epic reads as one at a glance.
+        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span class="q-${item ? bagQualityKey(item) : 'common'}">${esc(label)}</span>`;
         return mine
           ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
           : `<div class="trade-item">${inner}</div>`;
@@ -1409,7 +1439,12 @@ export class WocTradeController {
       cancelBtn.className = 'btn';
       cancelBtn.textContent = t('hud.trade.cancel');
       cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
-      el.append(acceptBtn, cancelBtn);
+      // The two window actions in one row (the sheet pins it to the bottom
+      // on touch, so the commit control never sits below the fold).
+      const actions = document.createElement('div');
+      actions.className = 'trade-actions';
+      actions.append(acceptBtn, cancelBtn);
+      el.append(actions);
       el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
       wireWocTradeArm(el, this.wocTradeDeps(info.otherName));
       refreshWocTradeArm(el, wocTradeModelFrom(this.wocTradeDeps(info.otherName)));
@@ -1463,7 +1498,7 @@ export class WocTradeController {
         input?.addEventListener('change', syncTradeMoney);
       });
     } catch (err) {
-      console.error('[hud] trade window render failed', err);
+      console.error('[woc trade] trade window render failed', err);
     } finally {
       this.lastTradeSig = sig;
     }

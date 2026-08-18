@@ -475,14 +475,22 @@ export class ClaudiumWindow {
   }
 
   private buyPriceLabel(row: ClaudiumView['buyRows'][number]): string {
+    // Ticker through the catalog, never a glued suffix: the number is
+    // locale-formatted and the unit rides its own template token.
     if (this.selectedRail === 'sol') {
-      return `${this.formatBaseUnits(row.solAmountBase, 9, 4)} SOL`;
+      return t('hudChrome.claudium.priceSol', {
+        amount: this.formatBaseUnits(row.solAmountBase, 9, 4),
+      });
     }
     if (this.selectedRail === 'usdc') {
-      return `${this.formatBaseUnits(row.usdcAmountBase, USDC_DECIMALS, 2)} USDC`;
+      return t('hudChrome.claudium.priceUsdc', {
+        amount: this.formatBaseUnits(row.usdcAmountBase, USDC_DECIMALS, 2),
+      });
     }
     if (this.selectedRail === 'woc') {
-      return `${this.formatBaseUnits(row.wocAmountBase, WOC_DECIMALS, 2)} WOC`;
+      return t('hudChrome.claudium.priceWoc', {
+        amount: this.formatBaseUnits(row.wocAmountBase, WOC_DECIMALS, 2),
+      });
     }
     return this.usdLabel(row.usd);
   }

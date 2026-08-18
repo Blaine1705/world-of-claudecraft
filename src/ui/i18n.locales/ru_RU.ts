@@ -463,6 +463,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.storeTitle': 'Магазин косметики',
   'hudChrome.claudium.storeEmpty': 'Сейчас косметические предметы недоступны.',
   'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.priceWoc': '{amount} WOC',
+  'hudChrome.claudium.priceUsdc': '{amount} USDC',
+  'hudChrome.claudium.priceSol': '{amount} SOL',
   'hudChrome.claudium.spendButton': 'Обменять',
   'hudChrome.claudium.kindCosmetic': 'Косметика',
   'hudChrome.claudium.kindItem': 'Предмет',
@@ -5773,6 +5776,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.jump': 'Прыжок',
   'hudChrome.mobile.leaderboard': 'Рейтинг',
   'hudChrome.mobile.dailyRewards': 'Магазин',
+  'hudChrome.mobile.wocMarket': 'Биржа',
   'hudChrome.mobile.deeds': 'Деяния',
   'hudChrome.mobile.nameplates': 'Имена',
   'hudChrome.mobile.targetCycle': 'Сменить цель',
@@ -8840,8 +8844,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваш лот продан, и покупатель полностью рассчитался. Выручка за вычетом биржевого сбора отправлена на ваш привязанный кошелёк прямо в расчётной транзакции; биржа никогда не держала ваши деньги.\n\nЗапись о сделке хранится в биржевой книге.\n\n- Биржевой маклер',
   'apiError.woc_market.invalid_input': 'Недопустимый ввод.',
   'apiError.woc_market.disabled': 'Биржа $WOC недоступна в этом мире.',
-  'apiError.woc_market.paused':
-    'Торги на бирже приостановлены до восстановления цен. Отсчёт аукционов продолжается.',
+  'apiError.woc_market.paused': 'Торги на бирже приостановлены. Отсчёт аукционов продолжается.',
   'apiError.woc_market.wallet_required':
     'Перед торговлей на бирже привяжите и подтвердите кошелёк.',
   'apiError.woc_market.recipient_wallet_required': 'Этот игрок должен подключить кошелёк, прежде чем сможет принимать платежи в $WOC.',
@@ -8853,7 +8856,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.totp_invalid':
     'Этот код двухфакторной аутентификации не подтвердился. Попробуйте ещё раз.',
   'apiError.woc_market.suspended':
-    'Ваши ставки на бирже приостановлены из-за неоплаченных расчётов.',
+    'Ваш доступ к бирже приостановлен из-за неоплаченных сделок: нельзя делать ставки, покупать, выставлять лоты и торговать за $WOC.',
   'apiError.woc_market.character_invalid':
     'Войдите в игру персонажем, от имени которого выставляете лот, и попробуйте снова.',
   'apiError.woc_market.not_found': 'Эта запись биржи больше не существует.',
@@ -8924,12 +8927,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loadFailed': 'Не удалось связаться с биржей. Попробуйте чуть позже.',
   'hudChrome.wocMarket.disabledRealm': 'Биржа $WOC недоступна в этом мире.',
   'hudChrome.wocMarket.pausedBanner':
-    'Торги приостановлены до восстановления цены $WOC. Отсчёт аукционов продолжается; новые ставки и платежи ждут восстановления цены, а уже отправленный платёж всё равно будет проведён.',
+    'Торги приостановлены. Отсчёт аукционов продолжается; новые лоты, ставки, предложения и платежи ждут возобновления торгов, а уже отправленный платёж всё равно будет проведён.',
   'hudChrome.wocMarket.walletBanner':
     'Привяжите и подтвердите кошелёк, чтобы делать ставки, покупать и продавать на бирже.',
-  'hudChrome.wocMarket.rateNote': 'Текущий курс: около {tokens} $WOC за доллар США, по последней цене сделки на внешнем рынке $WOC ({time}).',
-  'hudChrome.wocMarket.estimateNote':
-    'Около {tokens} $WOC по текущему курсу. Точная сумма фиксируется только при запросе оплаты.',
+  'hudChrome.wocMarket.rateNote': 'Курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
+  'hudChrome.wocMarket.estimateNote': '{usd} по текущему курсу составляет около {tokens} $WOC.',
   'hudChrome.wocMarket.browseEmpty': 'Лотов пока нет. Загляните позже.',
   'hudChrome.wocMarket.browseError': 'Не удалось загрузить список лотов.',
   'hudChrome.wocMarket.colItem': 'Предмет',
@@ -8958,7 +8960,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.detailMinNext': 'Минимальная следующая ставка: {usd}',
   'hudChrome.wocMarket.detailBuyNow': 'Выкуп: {usd}',
   'hudChrome.wocMarket.detailSales': 'Недавние продажи',
-  'hudChrome.wocMarket.detailSaleRow': '{usd}: от {seller} к {buyer}',
+  'hudChrome.wocMarket.detailSaleRow': '{time}: {seller} продал(а) {buyer} за {usd}',
   'hudChrome.wocMarket.detailNoSales': 'Для этого предмета пока нет записей о продажах.',
   'hudChrome.wocMarket.bidLabel': 'Ваша ставка (USD)',
   'hudChrome.wocMarket.bidPlaceholder': 'Введите сумму в USD',
@@ -8968,18 +8970,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.buyNowAria': 'Купить {item} сейчас за {usd}',
   'hudChrome.wocMarket.cancelButton': 'Отменить лот',
   'hudChrome.wocMarket.cancelAria': 'Отменить ваш лот {item}',
-  'hudChrome.wocMarket.bidBondNote': 'Ставка удерживает возвращаемый залог {usd}, оплачиваемый в $WOC. Он возвращается, если вас перебили (кроме случая, когда повторное предложение делает покупателем вас), и удерживается лишь если вы выиграли и не заплатили.',
+  'hudChrome.wocMarket.bidBondNote':
+    'Ставка удерживает возвращаемый залог в $WOC сверх самой ставки: {bond} при ставке {bid}, а при более высокой ставке больше. Он возвращается, если вас перебили или вы не выиграли, а если выиграли, то после вашей оплаты; при повторном предложении он удерживается снова.',
   'hudChrome.wocMarket.variableTokenWarning':
     'Вы обязуетесь оплатить сумму в USD токенами $WOC. Точное количество токенов фиксируется свежей котировкой при запросе оплаты и может отличаться от оценки.',
   'hudChrome.wocMarket.claimCooldownRetry':
     'Вы недавно отказались от быстрой покупки. Повторите попытку через {duration}.',
-  'hudChrome.wocMarket.termsLink': 'Открыть условия Торговой площадки',
+  'hudChrome.wocMarket.termsLink': 'Открыть условия Торговой площадки (в новой вкладке)',
   'hudChrome.wocMarket.quoteExpiresAt': 'Котировка истекает в {time}.',
   'hudChrome.wocMarket.bidBindingNote':
     'Ставка становится обязательной, как только вы подписываете транзакцию залога: отозвать её нельзя, а если вы выиграете и не оплатите покупку, залог будет удержан, и на счёт запишут нарушение правил Торговой площадки.',
-  'hudChrome.wocMarket.bidCloseNote': 'Ставка, залог которой подтверждается в последние минуты, может продлить аукцион на несколько минут. После завершения аукциона запоздавший платёж не открывает его заново, а возвращается.',
-  'hudChrome.wocMarket.offerNextNote': 'Если победитель не оплатит покупку, покупателем по вашей собственной ставке можете стать вы: залог удержат снова, а оплатить нужно в течение окна расчёта. Неоплата тогда лишит вас залога и запишет нарушение.',
-  'hudChrome.wocMarket.buyNowNote': '«Купить сейчас» ненадолго закрепляет этот лот за вами. Если уйти, не оплатив, этот лот будет на время недоступен вам, а повторные уходы приостановят для вас «Купить сейчас» вовсе.',
+  'hudChrome.wocMarket.bidCloseNote':
+    'Ставка, залог которой подтверждается в последние 2 минуты, продлевает аукцион до 2 минут после этой ставки, но не более чем на 30 минут после объявленного завершения. Залог, подтверждённый после завершения аукциона, не засчитывается и возвращается.',
+  'hudChrome.wocMarket.offerNextNote':
+    'Если победитель не оплатит покупку, покупателем по вашей собственной ставке можете стать вы: залог удержат снова (или запросят повторно, если он уже был возвращён), а оплатить нужно в течение {duration}.',
+  'hudChrome.wocMarket.buyNowNote':
+    '«Купить сейчас» закрепляет этот лот за вами примерно на четыре с половиной минуты, пока вы платите. Если не оплатить вовремя, повторить попытку с этим лотом можно будет только через 30 минут, а три неоплаченных «Купить сейчас» за час приостанавливают для вас «Купить сейчас», пока самому раннему из них не исполнится час.',
   'hudChrome.walletBridge.cancelled': 'Запрос к кошельку отменён. Ничего не отправлено.',
   'hudChrome.walletBridge.timeout':
     'Кошелёк не ответил вовремя. Откройте кошелёк и повторите попытку.',
@@ -9010,8 +9016,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteTitle': 'Подтверждение оплаты',
   'hudChrome.wocMarket.quoteTotal': 'Итого: {tokens} $WOC',
   'hudChrome.wocMarket.quoteSeller': 'Продавец получает: {tokens} $WOC',
-  'hudChrome.wocMarket.quoteBurn': 'Сжигается: {tokens} $WOC',
-  'hudChrome.wocMarket.quoteTreasury': 'Казна: {tokens} $WOC',
+  'hudChrome.wocMarket.quoteBurn': 'Сжигается (изымается из обращения): {tokens} $WOC',
+  'hudChrome.wocMarket.quoteTreasury': 'В казну игры: {tokens} $WOC',
   'hudChrome.wocMarket.quoteExpires': 'Котировка истечёт через {duration}',
   'hudChrome.wocMarket.quoteExpired': 'Котировка истекла. Запросите новую.',
   'hudChrome.wocMarket.quoteSign': 'Подписать и оплатить',
@@ -9039,16 +9045,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Отмена ожидает: покупатель удерживает окно покупки. Если он не заплатит, лот закроется, а предмет вернётся почтой Вороньей службы.',
   'hudChrome.wocMarket.sellTitle': 'Создание лота',
   'hudChrome.wocMarket.sellEmpty':
-    'В сумках нет подходящих предметов. Биржа принимает только неприсоединённую экипировку эпического качества и выше.',
-  'hudChrome.wocMarket.sellSelectAria': 'Выбрать {item} для выставления',
+    'В сумках нет подходящих предметов. Биржа принимает неприсоединённую экипировку не ниже порога качества этого мира, а на некоторых мирах ещё средства передвижения и пластины окраски мехов.',
   'hudChrome.wocMarket.sellFormat': 'Формат',
   'hudChrome.wocMarket.sellFormatAuction': 'Аукцион',
   'hudChrome.plurals.wocMarketSellChoose.one': 'Выберите из {count} предмета',
   'hudChrome.plurals.wocMarketSellChoose.few': 'Выберите из {count} предметов',
   'hudChrome.plurals.wocMarketSellChoose.many': 'Выберите из {count} предметов',
   'hudChrome.plurals.wocMarketSellChoose.other': 'Выберите из {count} предметов',
+  'hudChrome.plurals.wocTradeIneligible.other':
+    '{count} выставленных предметов нельзя продать за $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.many':
+    '{count} выставленных предметов нельзя продать за $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.few':
+    '{count} выставленных предмета нельзя продать за $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.one':
+    '{count} выставленный предмет нельзя продать за $WOC.',
   'hudChrome.wocMarket.sellClear': 'Убрать {item} и выбрать другой',
-  'hudChrome.wocMarket.sellClearTitle': 'Снять выбор',
   'hudChrome.wocMarket.sellSearchPlaceholder': 'Введите текст для фильтра сумок',
   'hudChrome.wocMarket.sellChoose': 'Предмет для продажи',
   'hudChrome.wocMarket.sellNoMatches': 'Нет предметов по этому запросу',
@@ -9061,16 +9073,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellBuyNowNote': 'Обязательно. Такой лот продаётся по этой цене без торгов.',
   'hudChrome.wocMarket.sellBuyNowAuctionNote': 'Необязательно. Цена, заплатив которую покупатель завершит аукцион досрочно; она должна быть выше стартовой и резервной.',
   'hudChrome.wocMarket.sellReserveNote':
-    'Скрыта от участников; показывается только достигнута она или нет.',
+    'Необязательно, не ниже стартовой ставки. Участники видят только, достигнут он или нет; если высшая ставка на момент завершения окажется ниже, предмет вернётся к вам непроданным, а все залоги будут возвращены.',
   'hudChrome.wocMarket.sellBuyNowPrice': 'Цена выкупа (USD)',
   'hudChrome.wocMarket.sellDuration': 'Длительность',
-  'hudChrome.wocMarket.sellDurationHours': '{hours} ч.',
   'hudChrome.wocMarket.sellOfferNext':
-    'Если победитель не заплатит, предложить предмет следующему участнику.',
+    'Если победитель не заплатит, продать предмет следующему по величине участнику, чья ставка достигает резерва, по его ставке, а не завершать торги без продажи.',
   'hudChrome.wocMarket.sellSubmit': 'Выставить предмет',
   'hudChrome.wocMarket.sellSubmitAria': 'Выставить {item} на биржу',
   'hudChrome.wocMarket.sellFeeNote':
-    'Завершённые продажи облагаются сбором около 10%: 3% сжигается и 7% уходит в казну, каждая часть округляется вверх, а вы получаете точный остаток (около 90%). Выручка приходит на ваш привязанный кошелёк прямо в расчётной транзакции.',
+    'При завершённой продаже из цены удерживается сбор биржи: часть сжигается, часть уходит в казну, а остаток приходит на ваш привязанный кошелёк в расчётной транзакции. Сбор для введённой вами цены показан здесь; на аукционе он рассчитывается от итоговой цены.',
   'hudChrome.wocMarket.activityListings': 'Мои лоты',
   'hudChrome.wocMarket.activityBids': 'Мои ставки',
   'hudChrome.wocMarket.activitySettlements': 'Мои расчёты',
@@ -9080,7 +9091,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.activityDeadline': 'Оплата в течение {duration}',
   'hudChrome.wocMarket.activityStrikes': 'Штрафы на бирже: {count}',
   'hudChrome.wocMarket.activitySuspended':
-    'Ставки приостановлены на {duration} из-за неоплаченных расчётов.',
+    'Доступ к бирже приостановлен на {duration} из-за неоплаченных сделок: до тех пор нельзя делать ставки, покупать, выставлять лоты и торговать за $WOC.',
   'hudChrome.wocMarket.bidStatusPending': 'Ожидает залога',
   'hudChrome.wocMarket.bidStatusActive': 'Лидирующая ставка',
   'hudChrome.wocMarket.bidStatusOutbid': 'Перебита',
@@ -9113,6 +9124,33 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': 'Отменён',
   'hudChrome.wocMarket.listingStatusSuspended': 'Приостановлен',
   'hudChrome.wocMarket.listingStatusUnsold': 'Не продан',
+  'hudChrome.wocMarket.bidBondPayItemAria': 'Оплатить залог {bond} за ставку на {item}',
+  'hudChrome.wocMarket.strikesTip':
+    'Штраф начисляется каждый раз, когда вы не оплачиваете сделку, на которую согласились. После первого каждый следующий штраф отстраняет вас от биржи на всё больший срок: 3 дня, затем 14, затем 90, затем год.',
+  'hudChrome.wocMarket.dueAt': 'Срок: {utc} UTC ({local} по местному времени)',
+  'hudChrome.wocMarket.activityPayNowItemAria': 'Оплатить {usd} за {item} сейчас',
+  'hudChrome.wocMarket.activityNoSettlements': 'У вас нет расчётов.',
+  'hudChrome.wocMarket.activityNoBids': 'У вас нет ставок.',
+  'hudChrome.wocMarket.activityNoListings': 'У вас нет лотов.',
+  'hudChrome.wocMarket.sellLockedHidden':
+    'Заблокированные предметы здесь не показываются. Чтобы продать их, снимите блокировку в сумке.',
+  'hudChrome.wocMarket.paymentDueAt': 'Оплата должна поступить до {time}.',
+  'hudChrome.wocMarket.quoteBondForItem': 'Возвращаемый залог за ставку на {item}: {usd}',
+  'hudChrome.wocMarket.quoteFixedNote':
+    'Эта котировка фиксирует сумму в $WOC до своего истечения. Новая котировка может отличаться.',
+  'hudChrome.wocMarket.rowOpenAria': 'Открыть лот: {item}',
+  'hudChrome.wocMarket.detailSalesLoading': 'Загружаем недавние продажи...',
+  'hudChrome.wocMarket.buyNowLockedTip':
+    'Другой покупатель удерживает этот лот, пока платит. Если он не оплатит вовремя, лот откроется снова.',
+  'hudChrome.wocMarket.yourListingTip':
+    'Это ваш лот. Делать ставки на свой лот нельзя; пока на него нет ставок, его можно отменить здесь или во вкладке «Активность».',
+  'hudChrome.wocMarket.reserveNotMetTip':
+    'Продавец установил скрытую минимальную цену. Если высшая ставка на момент завершения окажется ниже неё, предмет не будет продан, а все залоги вернутся.',
+  'hudChrome.wocMarket.reserveMetTip':
+    'Продавец установил скрытую минимальную цену, и текущая ставка её достигает.',
+  'hudChrome.wocMarket.rateNotePaused':
+    'Последний известный курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
+  'hudChrome.wocMarket.tabsLabel': 'Разделы биржи $WOC',
   'hudChrome.calendar.title': 'Календарь событий',
   'hudChrome.calendar.close': 'Закрыть календарь',
   'hudChrome.calendar.keybindLabel': 'Календарь событий',
@@ -13531,18 +13569,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.hintClearYourItems': 'Уберите свои предметы: предложение $WOC покупает то, что продают вам.',
   'hudChrome.trade.woc.hintAwaitTheirItems': 'Ждём, когда они выставят что-то, что можно продать за $WOC.',
   'hudChrome.trade.woc.hintOneItem':
-    'Сделка за $WOC охватывает ровно один предмет. Оставьте только тот, который продаётся.',
+    'Сделка за $WOC охватывает ровно один предмет. На столе может быть только продаваемый предмет.',
   'hudChrome.trade.woc.sendOffer': 'Предложить $WOC',
   'hudChrome.trade.woc.incomingAccept': '{name} предлагает {price} за ваши предметы.',
-  'hudChrome.trade.woc.hintAcceptLocked': 'Этот предмет заблокирован. Снимите блокировку в сумке, прежде чем продавать его.',
+  'hudChrome.trade.woc.hintAcceptLocked':
+    'Этот предмет заблокирован. Снимите блокировку в сумке, затем уберите его из сделки и добавьте снова.',
   'hudChrome.trade.woc.hintAcceptNeedsItem': 'Прежде чем принять, добавьте предмет, который продаёте.',
   'hudChrome.trade.woc.hintEnterPrice': 'Укажите цену в долларах.',
   'hudChrome.trade.woc.hintGoldOffered': 'Сначала уберите предложение золота: обмен идёт либо за золото, либо за $WOC.',
-  'hudChrome.trade.woc.ineligibleNote': 'Предметов, которые нельзя продать за $WOC: {count}.',
   'hudChrome.trade.woc.incomingTitle': 'Предложение $WOC от {name}',
   'hudChrome.trade.woc.incomingBody': '{name} предлагает продать вам {item} за {price}.',
   'hudChrome.trade.woc.moneyUsd': '{usd}',
-  'hudChrome.trade.woc.moneyTokens': '(~ {tokens} $WOC)',
   'hudChrome.trade.woc.waitingOther': 'Предложение принято. Ждём согласия второго игрока.',
   'hudChrome.trade.woc.payNow': 'Оплатить {usd}',
   'hudChrome.trade.woc.awaitingPayment': 'Ожидаем подтверждения оплаты…',
@@ -13586,6 +13623,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.statusConfirmedBuyer': 'Оплата подтверждена. Доставка завершается...',
   'hudChrome.trade.woc.statusConfirmedSeller': 'Оплата подтверждена. Сделка завершается...',
   'hudChrome.trade.woc.hintBelowMin': 'Минимальная цена на бирже: {usd}.',
+  'hudChrome.trade.woc.pricePlaceholder': '0.00',
+  'hudChrome.trade.woc.tabWoc': '$WOC',
+  'hudChrome.trade.woc.tabGold': 'Золото',
+  'hudChrome.trade.woc.offerSentUntil':
+    'Предложение отправлено. Оно истечёт в {time}, если {name} не примет его.',
+  'hudChrome.trade.woc.moneyLine': '{usd} (~ {tokens} $WOC)',
+  'hudChrome.trade.woc.ineligibleReason':
+    'Персональные, квестовые и заблокированные предметы, а также предметы вне категорий биржи нельзя продать за $WOC.',
+  'hudChrome.trade.woc.tabWocHint':
+    'Оплата в $WOC доступна, когда ваша сторона стола пуста и золото не предложено.',
+  'hudChrome.trade.woc.modesLabel': 'Валюта оплаты',
   'hudChrome.trade.woc.paidSeller': 'Вы получили платёж {price} за ваш предмет {item}.',
   'hudChrome.trade.woc.paidBuyer': 'Вы отправили платёж {price} за {item}.',
   'hudChrome.bags.lockItem': 'Заблокировать предмет',

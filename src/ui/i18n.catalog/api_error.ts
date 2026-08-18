@@ -224,7 +224,7 @@ export const apiErrorStrings = {
   woc_market: {
     invalid_input: 'Invalid input.',
     disabled: 'The $WOC Exchange is not available on this realm.',
-    paused: 'Exchange trading is paused while pricing recovers. Auctions keep counting down.',
+    paused: 'Exchange trading is paused. Auctions keep counting down.',
     wallet_required: 'Link and verify a wallet before trading on the Exchange.',
     recipient_wallet_required:
       'That player must connect a wallet before they can accept $WOC payments.',
@@ -237,7 +237,8 @@ export const apiErrorStrings = {
     totp_required:
       'This amount requires two-factor authentication. Enable it in account settings, then enter your code.',
     totp_invalid: 'That two-factor code did not verify. Try again.',
-    suspended: 'Your Exchange bidding is suspended after unpaid settlements.',
+    suspended:
+      'Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.',
     character_invalid: 'Play the character you are listing from, and try again.',
     not_found: 'That Exchange entry no longer exists.',
     not_yours: 'That Exchange entry no longer exists.',

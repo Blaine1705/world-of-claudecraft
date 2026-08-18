@@ -1,8 +1,12 @@
 // The trade window's $WOC arm: the thin DOM consumer over trade_woc_view.ts.
 //
-// A COLD painter (src/ui/CLAUDE.md). It repaints only when the trade window
-// itself repaints, holds no per-frame path, arms no driver of its own, and
-// makes no forced-reflow layout read.
+// A COLD painter (src/ui/CLAUDE.md), named as one so the painter gate
+// (tests/hud_perf_budget.test.ts, the `*_painter.ts` sweep) counts its raw
+// writes: it repaints only when the trade window itself repaints, holds no
+// per-frame path, arms no driver of its own, and makes no forced-reflow layout
+// read. Its few in-place writes (the derived lines, the over-balance class, the
+// Send button's disabled flag) are event-driven and elided by value compare;
+// the gate's allowance row pins their exact count.
 //
 // The price field deliberately does NOT ride the window's repaint signature.
 // The window rebuilds its whole subtree when that signature changes, so putting
@@ -20,7 +24,7 @@ import type { InvSlot, ItemDef } from '../sim/types';
 import { durationText } from './duration_text';
 import { esc } from './esc';
 import { restoreFirstEnabled } from './focus_restore';
-import { formatDateTime, formatNumber, t } from './i18n';
+import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import {
   buildWocTradeModel,
   type WocPendingOffer,
@@ -30,6 +34,7 @@ import {
   type WocTradeSplit,
 } from './trade_woc_view';
 import { usdText } from './usd_text';
+import { wocTokensText } from './woc_tokens_text';
 
 export interface WocTradePanelDeps {
   staged: readonly InvSlot[];
@@ -106,19 +111,20 @@ const usd = usdText;
 /**
  * The standing offer as it reads in the trade window's Money row.
  *
- * "$1.00 USD (~ 7,812.5 $WOC)": the currency the two players agreed in, with
- * the server-quoted token figure beside it. The tilde is doing real work, since
- * the token amount is a preview and the exact number is set by a fresh quote at
- * payment time. Empty string when there is no offer, so the caller can fall
- * back to gold without a branch on null.
+ * "$1.00 (~ 7,812.5 $WOC)": the currency the two players agreed in, with the
+ * server-quoted token figure beside it, both figures in ONE catalog template so
+ * a locale orders and spaces them (never a code-side join). The tilde is doing
+ * real work, since the token amount is a preview and the exact number is set
+ * by a fresh quote at payment time. Empty string when there is no offer, so
+ * the caller can fall back to gold without a branch on null.
  */
 export function wocTradeMoneyText(offer: WocPendingOffer | null): string {
   if (offer === null) return '';
-  const price = t('hudChrome.trade.woc.moneyUsd', { usd: usd(offer.usdCents) });
-  if (offer.tokens === null) return price;
-  return `${price} ${t('hudChrome.trade.woc.moneyTokens', {
-    tokens: formatNumber(offer.tokens, { maximumFractionDigits: 4 }),
-  })}`;
+  if (offer.tokens === null) return t('hudChrome.trade.woc.moneyUsd', { usd: usd(offer.usdCents) });
+  return t('hudChrome.trade.woc.moneyLine', {
+    usd: usd(offer.usdCents),
+    tokens: wocTokensText(offer.tokens),
+  });
 }
 
 export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
@@ -165,13 +171,15 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   // href resolves per shell (src/ui/terms_link.ts, the host passes it in):
   // same-origin on the site, the canonical page from the desktop and native
   // shells.
+  // Caption and link share one wrapping row at one size, so they read as one
+  // sentence instead of the link dropping to its own line under the box.
   const termsRow = model.showTerms
-    ? `<label class="trade-woc-terms"><input type="checkbox" data-woc-terms data-focus-key="trade-woc-terms"${
+    ? `<div class="trade-woc-consent"><label class="trade-woc-terms"><input type="checkbox" data-woc-terms data-focus-key="trade-woc-terms"${
         model.termsChecked ? ' checked' : ''
       } /> ${esc(t('hudChrome.wocMarket.termsLabel'))}</label>
       <a class="trade-woc-terms-link" href="${esc(model.termsHref)}" target="_blank" rel="noopener noreferrer">${esc(
         t('hudChrome.wocMarket.termsLink'),
-      )}</a>`
+      )}</a></div>`
     : '';
   // The fee block beside a standing deal: the seller commits by accepting,
   // so the fee and THEIR net sit on the review face before that click; the
@@ -184,15 +192,30 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   const bindingNote = model.showBindingNote
     ? `<p class="trade-woc-warn" data-woc-binding></p>`
     : '';
+  // The currency switch: a labelled GROUP of two pressed-state toggles (the
+  // dungeon finder's ruling: a tablist without the roving-tabindex half reads
+  // worse than a group with aria-pressed), named for what it switches, never
+  // for one of its two options. Both stay ordinary Tab stops; the pressed one
+  // is told apart by aria-pressed AND the underline (shape, not colour alone).
+  // The disabled $WOC toggle on the gold face carries the reason as a hint.
   const modeTabs = `
-    <div class="trade-woc-modes" role="tablist" aria-label="${esc(t('hudChrome.trade.woc.tabWoc'))}">
-      <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'gold' ? ' active' : ''}" aria-selected="${model.mode === 'gold'}" data-woc-mode="gold" data-focus-key="trade-woc-tab-gold"${model.wocDealStanding ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabGold'))}</button>
-      <button type="button" role="tab" class="btn trade-woc-mode${model.mode === 'woc' ? ' active' : ''}" aria-selected="${model.mode === 'woc'}" data-woc-mode="woc" data-focus-key="trade-woc-tab-woc"${model.wocDisabled ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabWoc'))}</button>
+    <div class="trade-woc-modes" role="group" aria-label="${esc(t('hudChrome.trade.woc.modesLabel'))}">
+      <button type="button" class="btn trade-woc-mode" aria-pressed="${model.mode === 'gold'}" data-woc-mode="gold" data-focus-key="trade-woc-tab-gold"${model.wocDealStanding ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabGold'))}</button>
+      <button type="button" class="btn trade-woc-mode" aria-pressed="${model.mode === 'woc'}" data-woc-mode="woc" data-focus-key="trade-woc-tab-woc"${model.wocDisabled ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabWoc'))}</button>
     </div>`;
+  const wocOffHint =
+    model.mode === 'gold' && model.wocDisabled && !model.wocDealStanding && model.blockKey === null
+      ? `<p class="trade-woc-note">${esc(t('hudChrome.trade.woc.tabWocHint'))}</p>`
+      : '';
 
   if (model.blockKey !== null) {
     // The arm stays present while blocked so the reason has somewhere to live.
-    return `<div class="trade-woc-arm">${modeTabs}<p class="trade-woc-block">${esc(t(model.blockKey))}</p></div>`;
+    // The partner check is a WAIT (the one block a poll answers), so it wears
+    // the shared ring and is announced like the arm's other waits.
+    const waiting = model.blockKey === 'hudChrome.trade.woc.blockPartnerUnknown';
+    return `<div class="trade-woc-arm">${modeTabs}<p class="trade-woc-block"${waiting ? ' role="status"' : ''}>${
+      waiting ? '<span class="woc-spinner" aria-hidden="true"></span>' : ''
+    }${esc(t(model.blockKey))}</p></div>`;
   }
   if (model.pendingOffer !== null) {
     const o = model.pendingOffer;
@@ -241,7 +264,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
       // from click to wallet was the H13 informed-commitment gap.
       if (model.quoteReview !== null && o.role === 'buyer') {
         const q = model.quoteReview;
-        const tokens = (value: number) => formatNumber(value, { maximumFractionDigits: 4 });
+        const tokens = wocTokensText;
         const leg = (
           key:
             | 'hudChrome.wocMarket.quoteTotal'
@@ -249,7 +272,10 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
             | 'hudChrome.wocMarket.quoteBurn'
             | 'hudChrome.wocMarket.quoteTreasury',
           value: number | null,
-        ) => (value == null ? '' : `<p>${esc(t(key, { tokens: tokens(value) }))}</p>`);
+        ) =>
+          value == null
+            ? ''
+            : `<p class="trade-woc-leg${key === 'hudChrome.wocMarket.quoteTotal' ? ' trade-woc-leg-total' : ''}">${esc(t(key, { tokens: tokens(value) }))}</p>`;
         // The Exchange's quote panel shows the same four legs for the same
         // server answer; two surfaces of one economy disclose the same amounts.
         const legs =
@@ -282,19 +308,23 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
               )}</p>`;
         // No consent row here: the claim that staged this quote was the
         // terms-gated send, so acceptance is durable by the time it renders.
+        // On this face the amount IS fixed until the quote expires: the note
+        // says that. Sign is the one commitment button; Not now is the way out.
         return `<div class="trade-woc-arm">${modeTabs}
-          <p role="status">${esc(t('hudChrome.wocMarket.quoteTitle'))}</p>
-          <p>${esc(t('hudChrome.trade.woc.payNow', { usd: usd(q.usdCents) }))}</p>
+          <p class="trade-woc-quote-title" role="status">${esc(t('hudChrome.wocMarket.quoteTitle'))}</p>
+          <p class="trade-woc-leg">${esc(t('hudChrome.trade.woc.payNow', { usd: usd(q.usdCents) }))}</p>
           ${legs}
           ${quoteExpiry}
           ${dueLine}
-          <p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>
-          <button type="button" class="btn trade-woc-pay" data-woc-sign data-focus-key="trade-woc-sign"${
+          <p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.quoteFixedNote'))}</p>
+          <div class="trade-woc-actions">
+          <button type="button" class="btn trade-woc-pay trade-woc-primary" data-woc-sign data-focus-key="trade-woc-sign"${
             model.quoteExpired ? ' disabled' : ''
           }>${esc(t('hudChrome.wocMarket.quoteSign'))}</button>
-          <button type="button" class="btn trade-woc-cancel" data-woc-quote-cancel data-focus-key="trade-woc-quote-cancel">${esc(
+          <button type="button" class="btn trade-woc-cancel trade-woc-quiet" data-woc-quote-cancel data-focus-key="trade-woc-quote-cancel">${esc(
             t('hudChrome.wocMarket.quoteCancel'),
           )}</button>
+          </div>
           <p class="trade-woc-hint" data-woc-hint role="status"></p>
         </div>`;
       }
@@ -310,17 +340,17 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
             )}</p>`;
       const body =
         model.canPay && o.role === 'buyer'
-          ? `${dueOrNote}${termsRow}<button type="button" class="btn trade-woc-pay" data-woc-pay data-focus-key="trade-woc-pay"${
+          ? `${dueOrNote}${termsRow}<button type="button" class="btn trade-woc-pay trade-woc-primary" data-woc-pay data-focus-key="trade-woc-pay"${
               model.busy ? ' disabled' : ''
             }>${
-              model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
+              model.busy ? '<span class="woc-spinner" aria-hidden="true"></span>' : ''
             }${esc(t('hudChrome.trade.woc.payNow', { usd: usd(o.usdCents) }))}</button>`
           : `<p class="trade-woc-waiting" role="status">${
-              model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
+              model.busy ? '<span class="woc-spinner" aria-hidden="true"></span>' : ''
             }${esc(t(model.statusKey ?? 'hudChrome.trade.woc.awaitingPayment'))}</p>`;
       const cancelSale =
         o.role === 'seller' && o.phase === 'awaiting_payment' && !model.cancelPending
-          ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel-sale data-focus-key="trade-woc-cancel-sale"${busyResolve}>${esc(
+          ? `<button type="button" class="btn trade-woc-cancel trade-woc-quiet" data-woc-cancel-sale data-focus-key="trade-woc-cancel-sale"${busyResolve}>${esc(
               t('hudChrome.trade.woc.cancelSale'),
             )}</button>`
           : '';
@@ -339,8 +369,8 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     // disables the control.
     const action =
       o.role === 'buyer'
-        ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel data-focus-key="trade-woc-withdraw"${busyResolve}>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
-        : `<button type="button" class="btn trade-woc-cancel" data-woc-decline data-focus-key="trade-woc-decline"${busyResolve}>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
+        ? `<button type="button" class="btn trade-woc-cancel trade-woc-quiet" data-woc-cancel data-focus-key="trade-woc-withdraw"${busyResolve}>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
+        : `<button type="button" class="btn trade-woc-cancel trade-woc-quiet" data-woc-decline data-focus-key="trade-woc-decline"${busyResolve}>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
     // The offer is not open-ended, so say when it lapses; static text on
     // purpose (a per-second countdown would rebuild the subtree for no
     // decision the player can take differently).
@@ -361,7 +391,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
       <p class="trade-woc-hint" data-woc-hint role="status"></p>
     </div>`;
   }
-  if (model.mode !== 'woc') return `<div class="trade-woc-arm">${modeTabs}</div>`;
+  if (model.mode !== 'woc') return `<div class="trade-woc-arm">${modeTabs}${wocOffHint}</div>`;
 
   const priceValue = usdCents === null ? '' : (usdCents / 100).toFixed(2);
   return `<div class="trade-woc-arm">${modeTabs}
@@ -373,7 +403,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.variableWarning'))}</p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
     ${termsRow}
-    <button type="button" class="btn trade-woc-send" data-woc-send data-focus-key="trade-woc-send">${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
+    <button type="button" class="btn trade-woc-send trade-woc-primary" data-woc-send data-focus-key="trade-woc-send">${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
     <p class="trade-woc-hint" data-woc-hint role="status"></p>
   </div>`;
 }
@@ -396,7 +426,7 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
     model.tokens === null
       ? ''
       : t('hudChrome.trade.woc.equivalent', {
-          tokens: formatNumber(model.tokens, { maximumFractionDigits: 4 }),
+          tokens: wocTokensText(model.tokens),
         }),
   );
   // The figure itself carries the problem, not just the hint below it: the
@@ -436,13 +466,15 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
             duration: durationText(model.holdSeconds),
           }),
   );
+  // The count through the plurals base (a Slavic locale has three forms for
+  // it), then WHY: the exchange lock predicate's arms in one sentence.
   setText(
     '[data-woc-ineligible]',
     model.ineligible.length === 0
       ? ''
-      : t('hudChrome.trade.woc.ineligibleNote', {
+      : `${tPlural('hudChrome.plurals.wocTradeIneligible', model.ineligible.length, {
           count: formatNumber(model.ineligible.length, { maximumFractionDigits: 0 }),
-        }),
+        })} ${t('hudChrome.trade.woc.ineligibleReason')}`,
   );
   // A disabled affordance always says why: the hint rides beside it and
   // clears the moment the action becomes available. The model picks the
