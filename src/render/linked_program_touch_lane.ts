@@ -16,6 +16,7 @@
 // was before.
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
+import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_readiness';
 import {
   collectLinkedPrograms,
   type MaterialPropertiesLike,
@@ -48,23 +49,38 @@ export function linkedProgramTouchPriority(gatePriority: number): number {
  *  of preview pieces into one frame. */
 export const PREVIEW_LINKED_PROGRAM_TOUCH_LABEL = 'touch-preview:program';
 
+export interface LinkedProgramTouchLaneOptions {
+  /** A caller on a SECOND context passes its own label so the budget prices it
+   *  apart from the world tail; see the preview label above. */
+  label?: string;
+  /** Whether the compile this tail follows actually SETTLED over `target`.
+   *  True (the default) records the target's current programs as linked before
+   *  the walk, which is the only thing that ever proves a program ready here.
+   *  A caller whose gate timed out or failed passes false: it warms whatever an
+   *  earlier settle already proved and claims nothing new. */
+  settled?: boolean;
+}
+
 /**
  * Run one queue unit per linked program under `target`, in order, and resolve
  * with how many were touched. The programs are collected ONCE up front: the
  * walk is cheap, and re-walking between pieces would re-touch what earlier
  * pieces already warmed. `gatePriority` is the GATE's priority; the pieces
  * ride at `linkedProgramTouchPriority(gatePriority)`.
+ *
+ * Readiness comes from the settle, never from the driver: see
+ * linked_program_readiness.ts for the 5.6 s live freeze one `isReady()` cost.
  */
 export async function runLinkedProgramTouchLane(
   queue: LinkedProgramTouchQueue,
   properties: MaterialPropertiesLike,
   target: THREE.Object3D,
   gatePriority: number,
-  // A caller on a SECOND context passes its own label so the budget prices it
-  // apart from the world tail; see the preview label above.
-  label: string = LINKED_PROGRAM_TOUCH_LABEL,
+  options: LinkedProgramTouchLaneOptions = {},
 ): Promise<number> {
-  const programs = collectLinkedPrograms(properties, target);
+  const { label = LINKED_PROGRAM_TOUCH_LABEL, settled = true } = options;
+  if (settled) markProgramsReadyUnder(properties, target);
+  const programs = collectLinkedPrograms(properties, target, isProgramKnownReady);
   const priority = linkedProgramTouchPriority(gatePriority);
   for (const program of programs) {
     await queue.run(() => touchLinkedProgram(program), priority, label);

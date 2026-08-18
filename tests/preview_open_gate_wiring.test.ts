@@ -57,21 +57,29 @@ function harness(opts: { programs?: number; textures?: number } = {}): Harness {
     resolveCompile = resolve;
   });
 
+  // One material per program, each carrying the variant its settled compile
+  // resolved to. That record is the touch lane's whole notion of readiness: it
+  // never asks three, whose cached false costs a synchronous driver query
+  // (src/render/linked_program_readiness.ts).
   const programCount = opts.programs ?? 3;
-  const programs = new Map<
-    string,
-    { isReady: () => boolean; getUniforms: () => void; getAttributes: () => void }
-  >();
+  const materials: object[] = [];
+  const linked = new Map<object, unknown>();
   for (let i = 0; i < programCount; i++) {
-    programs.set(`k${i}`, {
-      isReady: () => true,
+    const variant = {
+      isReady: () => {
+        throw new Error('the preview tail must never query the driver for readiness');
+      },
       getUniforms: () => order.push(`touch-uniforms:${i}`),
       getAttributes: () => order.push(`touch-attributes:${i}`),
-    });
+    };
+    const material = { name: `body${i}` };
+    materials.push(material);
+    linked.set(material, { programs: new Map([[`k${i}`, variant]]), currentProgram: variant });
   }
-  const material = { name: 'body' };
   const characterGroup = {
-    traverse: (cb: (o: unknown) => void) => cb({ isMesh: true, material }),
+    traverse: (cb: (o: unknown) => void) => {
+      for (const material of materials) cb({ isMesh: true, material });
+    },
   };
 
   const textures = Array.from({ length: opts.textures ?? 2 }, (_, i) => ({
@@ -98,7 +106,7 @@ function harness(opts: { programs?: number; textures?: number } = {}): Harness {
     },
     getPixelRatio: () => 1,
     setPixelRatio: () => {},
-    properties: { get: () => ({ programs }) },
+    properties: { get: (material: object) => linked.get(material) },
   };
 
   const preview = Object.create(CharacterPreview.prototype) as CharacterPreview;
@@ -401,6 +409,20 @@ describe('the second live draw site is gated too', () => {
     expect(body.indexOf('this.gateAllowsDraw()')).toBeLessThan(
       body.indexOf('this.renderer.render(this.scene, this.camera)'),
     );
+  });
+
+  // Both preview tails follow a compileAsync this class AWAITED to completion,
+  // which is the only thing that proves its programs linked; the lane's
+  // readiness record is fed from exactly that (linked_program_readiness.ts).
+  it('both touch tails declare their compile settled, and neither names the driver', () => {
+    const src = withoutLineComments(readFileSync('src/render/characters/preview.ts', 'utf8'));
+    const calls = src.split('runLinkedProgramTouchLane(').slice(1);
+    expect(calls).toHaveLength(2);
+    for (const call of calls) {
+      const args = call.slice(0, call.indexOf(');'));
+      expect(args).toContain('{ label: PREVIEW_LINKED_PROGRAM_TOUCH_LABEL, settled: true }');
+    }
+    expect(src).not.toContain('isReady(');
   });
 
   // The HUD is the only arm site, and it is inside a monolith the ratchet

@@ -74,8 +74,13 @@ describe('reveal gate wiring (source pins)', () => {
     // measured by it instead of being its own budgeted piece. Both ride the
     // SAME priority the link did, so an imminent key's tail cannot fall behind
     // the lane its link overtook.
-    const uploadAt = anchor(host, '.then(() => deps.upload(target, priority))');
-    const touchAt = anchor(host, '.then(() => deps.touch(target, priority))');
+    const uploadAt = anchor(
+      host,
+      '.then((gate) => deps.upload(target, priority).then(() => gate))',
+    );
+    // The tail also carries the GATE's own result: what a settle proved is the
+    // only readiness the walk has (src/render/linked_program_readiness.ts).
+    const touchAt = anchor(host, '.then((gate) => deps.touch(target, priority, gate))');
     expect(colourAt).toBeLessThan(uploadAt);
     expect(uploadAt).toBeLessThan(touchAt);
     // The soft deadline is the budget's learned cost times the key's roots,
@@ -97,7 +102,7 @@ describe('reveal gate wiring (source pins)', () => {
       'upload: (target, priority) => this.uploadGateTexturesGated(target, priority),',
     );
     expect(wiring).toContain(
-      'touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),',
+      'touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),',
     );
     // The soft deadline reads the LEARNED cost of a reveal compile, under the
     // same kind the host labels its units with.

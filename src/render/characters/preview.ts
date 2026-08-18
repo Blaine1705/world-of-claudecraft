@@ -476,7 +476,9 @@ export class CharacterPreview {
           this.renderer.properties,
           this.characterGroup,
           GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
-          PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
+          // settled: the compileAsync above was awaited to completion, which is
+          // what proves this context's programs linked.
+          { label: PREVIEW_LINKED_PROGRAM_TOUCH_LABEL, settled: true },
         );
       }
     } catch (err) {
@@ -615,7 +617,9 @@ export class CharacterPreview {
       this.renderer.properties,
       this.characterGroup,
       GPU_WORK_PRIORITY.BACKGROUND,
-      PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
+      // settled: reached only with a compiledSig, i.e. after the awaited
+      // compileAsync above resolved for this signature.
+      { label: PREVIEW_LINKED_PROGRAM_TOUCH_LABEL, settled: true },
     );
     // A rebuild in between released those programs (forgetLinked): what this
     // pass warmed is no longer what is mounted, so it records nothing.

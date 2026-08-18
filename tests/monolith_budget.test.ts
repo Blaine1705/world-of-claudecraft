@@ -123,6 +123,10 @@ const MONOLITHS: MonolithRow[] = [
     // canvas_data_url.ts (net -26); the post-effect prewarm lane was then
     // removed after the bench (its entry never ran inside the boot budget and
     // resumed live), keeping the extraction (net -24).
+    // The touch tail's readiness threading (the gate result down to
+    // src/render/linked_program_readiness.ts) paid for itself in place: the
+    // single-use compilePriorityFor wrapper folded into the one gate that
+    // called it, the core it delegated to being its whole body (net 0).
     ceiling: 13501,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },

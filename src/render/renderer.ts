@@ -183,6 +183,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
+import type { CompileGateResult } from './compile_gate';
 import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
 import { compilePriorityForTarget } from './compile_priority_core';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
@@ -2550,7 +2551,7 @@ export class Renderer {
         compileColor: (target) => this.compilePrewarmColorPrograms(target, false),
         compileShadow: (target) => this.compileShadowPrograms(target),
         upload: (target, priority) => this.uploadGateTexturesGated(target, priority),
-        touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),
+        touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),
         predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),
       });
       this.propsRevealGate = createRevealGate(revealHost, (key) => this.propsView.revealRoots(key));
@@ -8746,12 +8747,8 @@ export class Renderer {
   // save a cheap boolean-flag walk). Given the traversal that actually matters is
   // already correctly scoped, and a real batch would cost more than it saves,
   // this stays one call per target.
-  private compilePriorityFor(target: THREE.Object3D): number {
-    return compilePriorityForTarget(target, this.sim.player.targetId);
-  }
-
   private compileGate(target: THREE.Object3D): Promise<unknown> {
-    const priority = this.compilePriorityFor(target);
+    const priority = compilePriorityForTarget(target, this.sim.player.targetId);
     // Compile the same variant pair the boot prewarm proved out, never a bare
     // compileAsync at the ambient render target: three keys a program on the
     // bound target's output colour space (WebGLPrograms getParameters), so on
@@ -8776,8 +8773,8 @@ export class Renderer {
     // on a slot only that unit can free. The gate still settles after them, so
     // a gated reveal is no earlier than it was before.
     return linked
-      .then(() => this.uploadGateTexturesGated(target, priority))
-      .then(() => this.touchLinkedProgramsGated(target, priority));
+      .then((gate) => this.uploadGateTexturesGated(target, priority).then(() => gate))
+      .then((gate) => this.touchLinkedProgramsGated(target, priority, gate));
   }
 
   /** The gate's upload step: one budgeted queue unit per cold texture under
@@ -8791,14 +8788,17 @@ export class Renderer {
   }
 
   /** The gate's tail: every linked program under `target`, one budgeted queue
-   *  unit at a time (src/render/linked_program_touch_lane.ts). */
-  private touchLinkedProgramsGated(target: THREE.Object3D, priority: number): Promise<number> {
-    return runLinkedProgramTouchLane(
-      this.backgroundGpuWork,
-      this.webgl.properties,
-      target,
-      priority,
-    );
+   *  unit at a time (src/render/linked_program_touch_lane.ts). Readiness comes
+   *  from THIS gate's settle, never from a driver query in the walk. */
+  private touchLinkedProgramsGated(
+    target: THREE.Object3D,
+    priority: number,
+    gate: CompileGateResult,
+  ): Promise<number> {
+    const { properties } = this.webgl;
+    return runLinkedProgramTouchLane(this.backgroundGpuWork, properties, target, priority, {
+      settled: !gate.failed && !gate.timedOut,
+    });
   }
 
   private recoverRejectedCompileGate(

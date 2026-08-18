@@ -22,6 +22,7 @@
 
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
+import type { CompileGateResult } from './compile_gate';
 import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
 
 /** The gpu-prep label prefix, and therefore the budget's cost KIND, of every
@@ -30,18 +31,22 @@ import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
 export const REVEAL_GATE_PREP_KIND = 'reveal-gate';
 
 export interface RevealCompileHostDeps {
-  /** Run one root's link as a gated queue unit. */
+  /** Run one root's link as a gated queue unit. Its result says whether the
+   *  link SETTLED, which is what the touch tail's readiness rests on. */
   gate(
     work: () => Promise<unknown>,
     options: { priority: number; label: string },
-  ): Promise<unknown>;
+  ): Promise<CompileGateResult>;
   compileColor(target: THREE.Object3D): Promise<unknown>;
   compileShadow(target: THREE.Object3D): Promise<unknown>;
   /** Every cold texture under the root, one budgeted queue unit each. Between
    *  the link and the touch: the touch's driver round trip flushes behind
    *  everything already queued, so uploads paid after it are measured by it. */
   upload(target: THREE.Object3D, priority: number): Promise<unknown>;
-  touch(target: THREE.Object3D, priority: number): Promise<unknown>;
+  /** The touch tail. It carries the gate's own result: a timed-out or failed
+   *  link proved nothing, so its tail may warm only what an earlier settle
+   *  already proved ready (linked_program_readiness.ts). */
+  touch(target: THREE.Object3D, priority: number, gate: CompileGateResult): Promise<unknown>;
   /** The frame budget's learned cost of ONE reveal compile, which becomes the
    *  key's soft deadline once multiplied by its root count. What it learns is
    *  the compileAsync PROLOGUE (1 to 3 ms), not the driver's link wall time,
@@ -61,8 +66,8 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
         { priority, label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}` },
       );
       return linked
-        .then(() => deps.upload(target, priority))
-        .then(() => deps.touch(target, priority));
+        .then((gate) => deps.upload(target, priority).then(() => gate))
+        .then((gate) => deps.touch(target, priority, gate));
     },
     expectedMs(_key: string, rootCount: number): number {
       return revealSoftDeadlineMs(deps.predictRevealMs(), rootCount);

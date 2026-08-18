@@ -150,7 +150,11 @@ describe('Renderer live shader compile rejection recovery', () => {
     const renderer = harness();
     const order: string[] = [];
     renderer.sim = { player: { targetId: null } };
-    renderer.liveCompileGates = { run: (fn: () => Promise<unknown>) => fn() };
+    // The queue resolves the gate RESULT, which is what tells the tail whether
+    // anything was proved linked.
+    renderer.liveCompileGates = {
+      run: (fn: () => Promise<unknown>) => fn().then(() => ({ failed: false, timedOut: false })),
+    };
     renderer.compilePrewarmColorPrograms = vi.fn(
       (_root: THREE.Object3D, includeOffscreenVariant: boolean) => {
         order.push(`color:${includeOffscreenVariant}`);
@@ -170,7 +174,9 @@ describe('Renderer live shader compile rejection recovery', () => {
     await renderer.compileGate(target);
 
     expect(order).toEqual(['color:false', 'shadow']);
-    expect(properties.get).toHaveBeenCalledTimes(1);
+    // Twice for the one material: the settle's marking walk, then the collect
+    // walk. Neither of them asks the driver anything.
+    expect(properties.get).toHaveBeenCalledTimes(2);
     expect(renderer.compilePrewarmColorPrograms).toHaveBeenCalledWith(target, false);
     expect(renderer.compileShadowPrograms).toHaveBeenCalledWith(target);
   });
@@ -188,7 +194,10 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(target, false)');
     expect(gateMethod).toContain('this.compileShadowPrograms(target)');
     expect(gateMethod).toContain('this.uploadGateTexturesGated(target, priority)');
-    expect(gateMethod).toContain('this.touchLinkedProgramsGated(target, priority)');
+    // The tail carries the GATE's result: a timed-out or failed link proved
+    // nothing, and readiness in the walk comes from a settle, never from a
+    // synchronous COMPLETION_STATUS query (linked_program_readiness.ts).
+    expect(gateMethod).toContain('this.touchLinkedProgramsGated(target, priority, gate)');
     expect(gateMethod).not.toContain('this.webgl.compileAsync');
   });
 
@@ -311,7 +320,11 @@ describe('the compile gate touch tail, per program', () => {
     const order: string[] = [];
     const queued: { label?: string; priority?: number }[] = [];
     renderer.sim = { player: { targetId: null } };
-    renderer.liveCompileGates = { run: (fn: () => Promise<unknown>) => fn() };
+    // The queue resolves the gate RESULT, which is what tells the tail whether
+    // anything was proved linked.
+    renderer.liveCompileGates = {
+      run: (fn: () => Promise<unknown>) => fn().then(() => ({ failed: false, timedOut: false })),
+    };
     renderer.compilePrewarmColorPrograms = () => {
       order.push('color');
       return Promise.resolve();
@@ -328,20 +341,28 @@ describe('the compile gate touch tail, per program', () => {
         return Promise.resolve();
       },
     };
-    const material = new THREE.MeshStandardMaterial();
-    const linked = new Map(
-      Array.from({ length: programs }, (_unused, index) => [
-        `variant${index}`,
-        { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() },
-      ]),
-    );
-    renderer.webgl = {
-      properties: {
-        get: (queried: unknown) => ({ programs: queried === material ? linked : undefined }),
-      },
-    };
+    // One material per program, each with the variant a settled compile
+    // resolved to: that record, not a driver query, is what the walk reads
+    // (src/render/linked_program_readiness.ts). The stubs throw from isReady so
+    // the 5.6 s production freeze cannot come back through this path.
+    const linked = new Map<unknown, { programs: Map<string, unknown>; currentProgram: unknown }>();
     const target = new THREE.Group();
-    target.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
+    for (let index = 0; index < programs; index++) {
+      const material = new THREE.MeshStandardMaterial();
+      const variant = {
+        isReady: () => {
+          throw new Error('the touch tail must never query the driver for readiness');
+        },
+        getUniforms: vi.fn(),
+        getAttributes: vi.fn(),
+      };
+      linked.set(material, {
+        programs: new Map([[`variant${index}`, variant]]),
+        currentProgram: variant,
+      });
+      target.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
+    }
+    renderer.webgl = { properties: { get: (queried: unknown) => linked.get(queried) } };
     renderer.touchTarget = target;
     renderer.queued = queued;
     renderer.order = order;
@@ -388,7 +409,7 @@ describe('the compile gate touch tail, per program', () => {
       'utf8',
     );
     expect(source).toContain(
-      'touch: (target, priority) => this.touchLinkedProgramsGated(target, priority),',
+      'touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),',
     );
     // The same host also pays the cold textures, between the link and the tail.
     expect(source).toContain(
@@ -396,15 +417,18 @@ describe('the compile gate touch tail, per program', () => {
     );
     // Both ride the key's own priority, the imminent one included, so an
     // arrival's tail cannot fall behind the lane its link overtook.
-    expect(host).toContain('.then(() => deps.upload(target, priority))');
+    expect(host).toContain('.then((gate) => deps.upload(target, priority).then(() => gate))');
     // Streamed decor paid the uniform-table round trip on its reveal DRAW
     // (40 to 390 ms on the Intel iGPU) because the reveal host's chain ended at
     // the shadow arm: it now pays the same tail the live gates do.
-    expect(host).toContain('.then(() => deps.touch(target, priority))');
+    expect(host).toContain('.then((gate) => deps.touch(target, priority, gate))');
     // The one-shot burst is gone from the renderer entirely: it cannot be paced,
     // and a call left behind would silently reinstate the whole cost in one frame.
     expect(source).not.toContain('touchLinkedPrograms(');
     expect(source).toContain('runLinkedProgramTouchLane(');
+    // And the tail's own readiness rides the gate result, honestly: a gate
+    // that timed out or failed marks nothing new.
+    expect(source).toContain('settled: !gate.failed && !gate.timedOut,');
   });
 
   it('opens both GPU-preparation frame clocks in the same unconditional sync prologue', () => {

@@ -7,16 +7,19 @@
 
 import { describe, expect, it } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import type { CompileGateResult } from '../src/render/compile_gate';
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from '../src/render/reveal_compile_host';
 import { REVEAL_GATE_WATCHDOG_MS, REVEAL_SOFT_DEADLINE_MIN_MS } from '../src/render/reveal_gate';
 
+const SETTLED: CompileGateResult = { failed: false, timedOut: false };
+
 /** Records every arm the host drives, in order, with the priority it used. */
-function recordingDeps(predictRevealMs = 0) {
-  const calls: { arm: string; priority: number; label?: string }[] = [];
+function recordingDeps(predictRevealMs = 0, result: CompileGateResult = SETTLED) {
+  const calls: { arm: string; priority: number; label?: string; gate?: CompileGateResult }[] = [];
   const deps = {
     gate(work: () => Promise<unknown>, options: { priority: number; label: string }) {
       calls.push({ arm: 'gate', priority: options.priority, label: options.label });
-      return work();
+      return work().then(() => result);
     },
     compileColor(_target: object) {
       calls.push({ arm: 'color', priority: Number.NaN });
@@ -30,8 +33,8 @@ function recordingDeps(predictRevealMs = 0) {
       calls.push({ arm: 'upload', priority });
       return Promise.resolve();
     },
-    touch(_target: object, priority: number) {
-      calls.push({ arm: 'touch', priority });
+    touch(_target: object, priority: number, gate: CompileGateResult) {
+      calls.push({ arm: 'touch', priority, gate });
       return Promise.resolve();
     },
     predictRevealMs: () => predictRevealMs,
@@ -83,6 +86,21 @@ describe('reveal compile host priority', () => {
       const { calls, host } = recordingDeps();
       await host.compile(root, imminent);
       expect(calls.map((call) => call.arm)).toEqual(['gate', 'color', 'shadow', 'upload', 'touch']);
+    }
+  });
+
+  it('hands the tail the gate own result, so a timed-out link proves nothing ready', async () => {
+    // The tail's readiness comes from the settle and nothing else: on a gate
+    // that timed out the driver is still linking, and marking there would let
+    // the walk touch a program whose first use blocks on that very link.
+    for (const result of [
+      SETTLED,
+      { failed: false, timedOut: true },
+      { failed: true, timedOut: false },
+    ]) {
+      const { calls, host } = recordingDeps(0, result);
+      await host.compile(root, false);
+      expect(calls.find((call) => call.arm === 'touch')?.gate).toBe(result);
     }
   });
 

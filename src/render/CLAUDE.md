@@ -226,7 +226,13 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   piecewise under its soft deadline whatever that flag says. The touch tail runs as one budgeted queue
   unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates AND on the
   reveal host, which previously ended at the shadow arm and left streamed decor
-  paying the uniform-table round trip on its reveal draw. A settled gate links
+  paying the uniform-table round trip on its reveal draw. Its readiness comes
+  from the SETTLE and never from a driver query: a settled gate records its
+  target's current programs in `linked_program_readiness.ts` and the walk reads
+  that record, because three latches `programReady` false after one missed poll,
+  so `isReady()` on a program that has been linked and drawing for a minute
+  re-issues COMPLETION_STATUS synchronously (5558 ms on the main thread in the
+  2026-08-18 production capture, with eighteen reveal units parked behind it). A settled gate links
   programs but uploads NOTHING (three's `compileAsync` never reaches
   `WebGLTextures`), so the same gates also run an upload lane: one budgeted
   queue unit per non-resident texture under the root (`texture_prep_lane.ts`,

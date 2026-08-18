@@ -11,9 +11,11 @@
 // testable with a stub property map (tests/linked_program_touch.test.ts).
 import type * as THREE from 'three';
 
-/** The slice of a three WebGLProgram this touch needs. */
+/** The slice of a three WebGLProgram this touch needs. Deliberately WITHOUT
+ *  `isReady`: asking three costs a synchronous driver query whenever its
+ *  cached answer is a latched false (see linked_program_readiness.ts), and
+ *  this walk runs outside any budgeted unit. */
 export interface LinkedProgramLike {
-  isReady(): boolean;
   getUniforms(): unknown;
   getAttributes(): unknown;
 }
@@ -30,11 +32,16 @@ interface MaterialProgramsLike {
 }
 
 /**
- * Every LINKED program under `target`, deduped. Every variant of the material,
- * not `currentProgram`: a tinted clone can be shared between a skinned rig and
- * its rigid far mesh, and that slot names whichever variant drew last. A
- * variant still linking is skipped: its first use would block on the link,
- * which is exactly what the gate exists to avoid.
+ * Every KNOWN-LINKED program under `target`, deduped. Every variant of the
+ * material, not `currentProgram`: a tinted clone can be shared between a
+ * skinned rig and its rigid far mesh, and that slot names whichever variant
+ * drew last. A variant still linking is skipped: its first use would block on
+ * the link, which is exactly what the gate exists to avoid.
+ *
+ * `isKnownReady` is the caller's OWN record of what a settled compile proved
+ * (linked_program_readiness.ts). The walk never asks three: `isReady()` on a
+ * program whose readiness three cached false re-issues a COMPLETION_STATUS
+ * query, and one of those blocked a live main thread 5.6 s in production.
  *
  * Split from the touch itself so the walk (cheap, one pass) and the touching
  * (the expensive part, one driver round trip per program) can be scheduled
@@ -43,6 +50,7 @@ interface MaterialProgramsLike {
 export function collectLinkedPrograms(
   properties: MaterialPropertiesLike,
   target: THREE.Object3D,
+  isKnownReady: (program: LinkedProgramLike) => boolean,
 ): LinkedProgramLike[] {
   const ready: LinkedProgramLike[] = [];
   const seen = new Set<LinkedProgramLike>();
@@ -55,7 +63,7 @@ export function collectLinkedPrograms(
       const programs = (properties.get(material) as MaterialProgramsLike).programs;
       if (!programs) continue;
       for (const program of programs.values()) {
-        if (seen.has(program) || !program.isReady()) continue;
+        if (seen.has(program) || !isKnownReady(program)) continue;
         seen.add(program);
         ready.push(program);
       }
@@ -81,8 +89,9 @@ export function touchLinkedProgram(program: LinkedProgramLike): void {
 export function touchLinkedPrograms(
   properties: MaterialPropertiesLike,
   target: THREE.Object3D,
+  isKnownReady: (program: LinkedProgramLike) => boolean,
 ): number {
-  const programs = collectLinkedPrograms(properties, target);
+  const programs = collectLinkedPrograms(properties, target, isKnownReady);
   for (const program of programs) touchLinkedProgram(program);
   return programs.length;
 }

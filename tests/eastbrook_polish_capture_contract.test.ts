@@ -189,8 +189,11 @@ interface AttributionTargetFixture {
 // signature fields and manifest ids in prewarm_policy.ts, the arrival and
 // coverage wiring): both fingerprinted inputs moved, so the composite follows
 // their bytes. No capture was retaken.
+// Re-minted for the touch tail's readiness fix (the walk no longer asks the
+// driver): renderer.ts moved, the seals follow the swept evidence bytes. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '0c2bb76e95be6b476d7bae0f3ccc8afe35b1aa4ad6ea7a7deebb23906676886b';
+  'abc51db08675303164026d9033bf04a760eb5cbd5a430b00466e0e2a6b140c68';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

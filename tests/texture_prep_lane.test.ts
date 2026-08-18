@@ -210,10 +210,12 @@ describe('runTexturePrepLane', () => {
   it('settles a gate in the order link, upload:*, touch:*', async () => {
     const { queue, order, host } = harness();
     const material = { map: texture('atlas') };
-    const programs = new Map([
-      ['variant0', { isReady: () => true, getUniforms: () => {}, getAttributes: () => {} }],
-    ]);
-    const records = new Map<object, unknown>([[material, { programs }]]);
+    // currentProgram is what the settled compile resolved to, and the only
+    // thing that proves a program linked to the touch lane: it never asks the
+    // driver (src/render/linked_program_readiness.ts).
+    const variant = { getUniforms: () => {}, getAttributes: () => {} };
+    const programs = new Map([['variant0', variant]]);
+    const records = new Map<object, unknown>([[material, { programs, currentProgram: variant }]]);
     // One root both lanes read: the texture walk reaches `material.map`, the
     // program walk reaches the same material's linked variants.
     const root = anyRoot([]);
@@ -295,8 +297,12 @@ describe('the gates that run the lane (source pins)', () => {
     expect(end).toBeGreaterThan(start);
     const gate = source.slice(start, end);
     const linkAt = gate.indexOf('const linked = this.liveCompileGates.run(');
-    const uploadAt = gate.indexOf('.then(() => this.uploadGateTexturesGated(target, priority))');
-    const touchAt = gate.indexOf('.then(() => this.touchLinkedProgramsGated(target, priority))');
+    const uploadAt = gate.indexOf(
+      '.then((gate) => this.uploadGateTexturesGated(target, priority).then(() => gate))',
+    );
+    const touchAt = gate.indexOf(
+      '.then((gate) => this.touchLinkedProgramsGated(target, priority, gate))',
+    );
     expect(linkAt).toBeGreaterThan(-1);
     expect(uploadAt).toBeGreaterThan(linkAt);
     expect(touchAt).toBeGreaterThan(uploadAt);
@@ -311,8 +317,10 @@ describe('the gates that run the lane (source pins)', () => {
     // so an imminent key's tail cannot fall behind the lane its link overtook.
     const host = read('../src/render/reveal_compile_host.ts');
     const gateAt = host.indexOf('const linked = deps.gate(');
-    const uploadAt = host.indexOf('.then(() => deps.upload(target, priority))');
-    const touchAt = host.indexOf('.then(() => deps.touch(target, priority))');
+    const uploadAt = host.indexOf(
+      '.then((gate) => deps.upload(target, priority).then(() => gate))',
+    );
+    const touchAt = host.indexOf('.then((gate) => deps.touch(target, priority, gate))');
     expect(gateAt).toBeGreaterThan(-1);
     expect(uploadAt).toBeGreaterThan(gateAt);
     expect(touchAt).toBeGreaterThan(uploadAt);

@@ -11,6 +11,7 @@ import {
   LINKED_PROGRAM_TOUCH_LABEL,
   type LinkedProgramTouchQueue,
   linkedProgramTouchPriority,
+  PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
   runLinkedProgramTouchLane,
 } from '../src/render/linked_program_touch_lane';
 
@@ -38,37 +39,78 @@ function stubQueue(): LinkedProgramTouchQueue & {
   };
 }
 
-function program(ready: boolean): LinkedProgramLike & { uniforms: ReturnType<typeof vi.fn> } {
+// The lane's readiness comes from the SETTLE it is the tail of, never from
+// three: a program whose readiness three cached false re-issues a
+// COMPLETION_STATUS query on every isReady(), and one of those blocked a live
+// main thread 5.6 s in production. Every stub here throws from isReady so a
+// single driver question fails the suite outright.
+function program(): LinkedProgramLike & {
+  isReady: () => never;
+  uniforms: ReturnType<typeof vi.fn>;
+} {
   const uniforms = vi.fn();
-  return { isReady: () => ready, getUniforms: uniforms, getAttributes: vi.fn(), uniforms };
+  return {
+    isReady: () => {
+      throw new Error('the touch lane must never query the driver for readiness');
+    },
+    getUniforms: uniforms,
+    getAttributes: vi.fn(),
+    uniforms,
+  };
 }
 
-function targetWith(programs: Map<string, LinkedProgramLike>): {
+/** One material under the target: every linked variant three keeps for it, and
+ *  the variant a settled compile resolved to (three's `currentProgram`). */
+interface MaterialSpec {
+  programs: Map<string, LinkedProgramLike>;
+  current?: LinkedProgramLike;
+}
+
+function targetWith(...materials: MaterialSpec[]): {
   properties: MaterialPropertiesLike;
   target: THREE.Object3D;
 } {
-  const material = new THREE.MeshStandardMaterial({ name: 'body' });
+  const records = new Map<THREE.Material, MaterialSpec>();
   const target = new THREE.Group();
-  target.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
+  for (const spec of materials) {
+    const material = new THREE.MeshStandardMaterial({ name: `body${records.size}` });
+    records.set(material, spec);
+    target.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
+  }
   return {
-    properties: { get: (queried) => ({ programs: queried === material ? programs : undefined }) },
+    properties: {
+      get: (queried) => {
+        const spec = records.get(queried as THREE.Material);
+        return { programs: spec?.programs, currentProgram: spec?.current };
+      },
+    },
     target,
   };
 }
 
+/** The ordinary case: one material, one settled variant. */
+const settledMaterial = (variant: LinkedProgramLike, key = 'skinned'): MaterialSpec => ({
+  programs: new Map([[key, variant]]),
+  current: variant,
+});
+
 describe('runLinkedProgramTouchLane', () => {
   it('issues one labelled unit per ready program, at the tail-piece priority, one at a time', async () => {
-    const first = program(true);
-    const second = program(true);
-    const linking = program(false);
+    const first = program();
+    const second = program();
+    const linking = program();
     const { properties, target } = targetWith(
-      new Map([
-        ['skinned', first],
-        ['far', second],
-        // still linking: touching it would block on the link, which is the
-        // stall the gate exists to move off the frame
-        ['pending', linking],
-      ]),
+      {
+        // still linking: it is no material's settled variant, so nothing ever
+        // proved it ready, and touching it would block on the link, which is
+        // the stall the gate exists to move off the frame
+        programs: new Map([
+          ['skinned', first],
+          ['pending', linking],
+        ]),
+        current: first,
+      },
+      settledMaterial(second, 'far'),
     );
     const queue = stubQueue();
 
@@ -90,8 +132,8 @@ describe('runLinkedProgramTouchLane', () => {
   });
 
   it('collects once up front, so a piece admitted later never re-touches an earlier one', async () => {
-    const touched = program(true);
-    const { properties, target } = targetWith(new Map([['skinned', touched]]));
+    const touched = program();
+    const { properties, target } = targetWith(settledMaterial(touched));
     const walks: unknown[] = [];
     const counting: MaterialPropertiesLike = {
       get: (material) => {
@@ -102,13 +144,15 @@ describe('runLinkedProgramTouchLane', () => {
 
     await runLinkedProgramTouchLane(stubQueue(), counting, target, 20);
 
-    expect(walks).toHaveLength(1);
+    // One material, read twice: the settle's marking walk, then the collect
+    // walk. Neither repeats per piece.
+    expect(walks).toHaveLength(2);
     expect(touched.uniforms).toHaveBeenCalledTimes(1);
   });
 
   it('queues nothing for a target with no linked programs', async () => {
     const queue = stubQueue();
-    const { properties, target } = targetWith(new Map());
+    const { properties, target } = targetWith({ programs: new Map() });
 
     await expect(runLinkedProgramTouchLane(queue, properties, target, 20)).resolves.toBe(0);
 
@@ -117,10 +161,8 @@ describe('runLinkedProgramTouchLane', () => {
 
   it('stops the lane when a piece rejects, rather than warming past a dead context', async () => {
     const { properties, target } = targetWith(
-      new Map([
-        ['a', program(true)],
-        ['b', program(true)],
-      ]),
+      settledMaterial(program(), 'a'),
+      settledMaterial(program(), 'b'),
     );
     const failing: LinkedProgramTouchQueue = {
       run: () => Promise.reject(new Error('queue shut down')),
@@ -129,6 +171,62 @@ describe('runLinkedProgramTouchLane', () => {
     await expect(runLinkedProgramTouchLane(failing, properties, target, 20)).rejects.toThrow(
       'queue shut down',
     );
+  });
+
+  it('marks the target as linked on a SETTLED gate, then warms what it marked', async () => {
+    const linked = program();
+    const { properties, target } = targetWith(settledMaterial(linked));
+    const queue = stubQueue();
+
+    // settled defaults to true: the tail of a compile that resolved.
+    await expect(runLinkedProgramTouchLane(queue, properties, target, 20)).resolves.toBe(1);
+
+    expect(linked.uniforms).toHaveBeenCalledTimes(1);
+  });
+
+  it('marks NOTHING when the gate did not settle, and warms only what an earlier settle proved', async () => {
+    // A timed-out gate's compile is still running on the driver: it proved
+    // nothing, and claiming it did is how a program nobody linked would be
+    // touched (which blocks on the link, the stall the gate exists to avoid).
+    const unproven = program();
+    const first = targetWith(settledMaterial(unproven));
+    const timedOut = stubQueue();
+
+    await expect(
+      runLinkedProgramTouchLane(timedOut, first.properties, first.target, 20, { settled: false }),
+    ).resolves.toBe(0);
+    expect(timedOut.units).toEqual([]);
+    expect(unproven.uniforms).not.toHaveBeenCalled();
+
+    // Once a settle over the same target has proved it, a later unsettled tail
+    // may warm it: the record is what changed, not the gate.
+    await runLinkedProgramTouchLane(stubQueue(), first.properties, first.target, 20);
+    const later = stubQueue();
+
+    await expect(
+      runLinkedProgramTouchLane(later, first.properties, first.target, 20, { settled: false }),
+    ).resolves.toBe(1);
+    expect(later.units).toHaveLength(1);
+    expect(unproven.uniforms).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the caller label option, so a second context is priced on its own kind', async () => {
+    const preview = program();
+    const { properties, target } = targetWith(settledMaterial(preview));
+    const queue = stubQueue();
+
+    await runLinkedProgramTouchLane(queue, properties, target, GPU_WORK_PRIORITY.ACTIONABLE_VIEW, {
+      label: PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
+    });
+
+    expect(queue.units).toEqual([
+      {
+        priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+        label: PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
+      },
+    ]);
+    // The label option alone does not change the settle default: the piece ran.
+    expect(preview.uniforms).toHaveBeenCalledTimes(1);
   });
 
   it('keeps an actionable gate pieces at the actionable floor and drops every other gate to TAIL_PIECE', async () => {
@@ -145,8 +243,8 @@ describe('runLinkedProgramTouchLane', () => {
     // the cosmetic warmers.
     expect(GPU_WORK_PRIORITY.TAIL_PIECE).toBeLessThan(GPU_WORK_PRIORITY.BOOT_DEBT);
     expect(GPU_WORK_PRIORITY.TAIL_PIECE).toBeGreaterThan(GPU_WORK_PRIORITY.BACKGROUND);
-    const actionable = program(true);
-    const { properties, target } = targetWith(new Map([['skinned', actionable]]));
+    const actionable = program();
+    const { properties, target } = targetWith(settledMaterial(actionable));
     const queue = stubQueue();
     await runLinkedProgramTouchLane(queue, properties, target, GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
     expect(queue.units).toEqual([
