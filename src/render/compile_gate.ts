@@ -142,13 +142,15 @@ export class CompileGateQueue {
    * of the root), each its own queue unit labelled `${label}:${index}`, so
    * the queue paces the driver's per-program work between them and its
    * released-tail cap bounds how many of the gate's links pile on the driver
-   * at once. The gate keeps ONE deadline: `timeoutMs` counted from the moment
-   * its first piece starts, over every piece, so the same constant that
-   * bounded the whole root still bounds the whole gate (a timeout records
-   * once, under the gate label). The result aggregates the pieces (any
-   * failure fails it, the shared deadline times it out) and resolves only
-   * when every piece settled, so readiness marking and the reveal happen
-   * exactly as for a whole-root gate. Serial on the local fallback.
+   * at once. The deadline is PER PIECE: each piece arms `timeoutMs` when its
+   * own work starts and disarms it when it settles, so the constant keeps
+   * the meaning it had for a whole root (the driver latency of one unit) and
+   * the queue's pacing between pieces never burns it. The gate times out
+   * when any piece does (recorded once per gate, under the gate label, by
+   * the first piece to fire). The result aggregates the pieces (any failure
+   * fails it) and resolves only when every piece settled, so readiness
+   * marking and the reveal happen exactly as for a whole-root gate. Serial
+   * on the local fallback.
    */
   runPieces(
     pieces: Array<() => Promise<unknown>>,
@@ -157,26 +159,32 @@ export class CompileGateQueue {
   ): Promise<CompileGateResult> {
     if (pieces.length === 0) return Promise.resolve({ failed: false, timedOut: false });
     const scheduler = options.scheduler ?? defaultScheduler;
-    let guard: number | null = null;
-    let settledPieces = 0;
     let timedOut = false;
-    const armDeadline = (): void => {
-      if (guard !== null) return;
-      guard = scheduler.setTimeout(() => {
-        if (settledPieces === pieces.length) return;
-        timedOut = true;
-        reportGateTimeout(timeoutMs, options);
-      }, timeoutMs);
-    };
-    const disarmDeadline = (): void => {
-      if (guard !== null) scheduler.clearTimeout(guard);
+    // The queue rejected the gate (shutdown): live timers are cleared and a
+    // piece released after that arms none, so a closed gate records nothing.
+    let closed = false;
+    const armed = new Set<number>();
+    const disarmAll = (): void => {
+      closed = true;
+      for (const guard of armed) scheduler.clearTimeout(guard);
+      armed.clear();
     };
     const settled = pieces.map((piece, index) =>
       this.submit(
         () => {
-          armDeadline();
+          if (closed) return settleCompilePiece(piece);
+          let pieceSettled = false;
+          const guard = scheduler.setTimeout(() => {
+            armed.delete(guard);
+            if (pieceSettled) return;
+            const first = !timedOut;
+            timedOut = true;
+            if (first) reportGateTimeout(timeoutMs, options);
+          }, timeoutMs);
+          armed.add(guard);
           return settleCompilePiece(piece).then((failed) => {
-            settledPieces++;
+            pieceSettled = true;
+            if (armed.delete(guard)) scheduler.clearTimeout(guard);
             return failed;
           });
         },
@@ -186,12 +194,9 @@ export class CompileGateQueue {
       ),
     );
     return Promise.all(settled).then(
-      (failures) => {
-        disarmDeadline();
-        return { failed: failures.some(Boolean), timedOut };
-      },
+      (failures) => ({ failed: failures.some(Boolean), timedOut }),
       (error) => {
-        disarmDeadline();
+        disarmAll();
         throw error;
       },
     );

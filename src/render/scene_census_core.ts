@@ -262,7 +262,9 @@ export function censusTableLines(report: SceneCensusReport): string[] {
 // ---------------------------------------------------------------------------
 // Hitch tracker: per-frame correlation of long frames with program/texture
 // growth and view creation. Fed by the renderer only while the ?perf overlay
-// is up (zero cost otherwise); all timestamps come from the caller.
+// is up (zero cost otherwise); all timestamps come from the caller, and the
+// sample is ALIGNED with the span its dt measures by hitch_frame_align_core
+// (the renderer feeds the aligner's output, never a raw end-of-callback read).
 // ---------------------------------------------------------------------------
 
 export type HitchCause =
@@ -274,18 +276,25 @@ export type HitchCause =
   | 'off-frame'
   | 'other';
 
+/** One frame's sample: every field describes the span `frameMs` measures
+ *  (the previous callback plus the gap before this one, hitch_frame_align_core),
+ *  so a cause inside a callback is filed on the frame that paid it. */
 export interface HitchFrameSample {
   atMs: number;
   frameMs: number;
   submitMs: number;
+  /** Program count at the END of the span; the tracker's delta against the
+   *  previous sample is the span's own growth. */
   programs: number;
   textures: number;
   createdViews: number;
-  /** Main-thread zone streaming build ms the build ledger accumulated since
-   *  the previous frame (build_ledger_core zoneMs): includes the feature
-   *  builders that ran in idle callbacks between the two frame callbacks. */
+  /** Main-thread zone streaming build ms the build ledger accumulated over
+   *  the span (build_ledger_core zoneMs): the callback's feature builders
+   *  plus those that ran in idle callbacks in the gap. */
   zoneBuildMs: number;
-  /** The renderer frame callback's own total ms this frame. */
+  /** Main-thread entity view build ms over the span (build_ledger_core viewMs). */
+  viewBuildMs: number;
+  /** The renderer frame callback's own total ms in the span. */
   rendererMs: number;
   /** Used JS heap in MB at the sample (heap_sample.ts); 0 where unknown. */
   heapMb: number;
@@ -299,14 +308,15 @@ export interface HitchEvent {
   textureDelta: number;
   createdViews: number;
   zoneBuildMs: number;
+  viewBuildMs: number;
   rendererMs: number;
   /** MB the heap shrank since the previous sample (0 when it grew or is unknown). */
   heapDropMb: number;
   cause: HitchCause;
 }
 
-/** The renderer's reused per-frame scratch, so the sample path allocates
- *  nothing while the overlay is up. */
+/** The aligner's reused per-frame scratch (hitch_frame_align_core), so the
+ *  sample path allocates nothing while the overlay is up. */
 export function emptyHitchFrameSample(): HitchFrameSample {
   return {
     atMs: 0,
@@ -316,6 +326,7 @@ export function emptyHitchFrameSample(): HitchFrameSample {
     textures: 0,
     createdViews: 0,
     zoneBuildMs: 0,
+    viewBuildMs: 0,
     rendererMs: 0,
     heapMb: 0,
   };
@@ -363,14 +374,19 @@ function hitchCause(
   textureDelta: number,
   createdViews: number,
   zoneBuildMs: number,
+  viewBuildMs: number,
   heapDropMb: number,
   rendererMs: number,
   frameMs: number,
 ): HitchCause {
   if (programDelta > 0) return 'shader-compile';
   if (textureDelta > 0) return 'texture-upload';
-  if (zoneBuildMs > 0) return 'zone-build';
-  if (createdViews > 0) return 'view-create';
+  // Both ledgers name main-thread construction; the one that spent more
+  // owns the frame (a 0.3 ms zone step beside 50 ms of view builds is the
+  // views' hitch). A created view with no ledger spend still files here.
+  if (zoneBuildMs > 0 || viewBuildMs > 0 || createdViews > 0) {
+    return zoneBuildMs >= viewBuildMs && zoneBuildMs > 0 ? 'zone-build' : 'view-create';
+  }
   // The heap shrank during the frame: a collection ran in it. The event
   // carries the size so an analysis can weigh a coincidental drop.
   if (heapDropMb >= HITCH_GC_DROP_MIN_MB) return 'gc';
@@ -378,7 +394,7 @@ function hitchCause(
   return 'other';
 }
 
-const emptyByCause = (): Record<HitchCause, number> => ({
+export const emptyByCause = (): Record<HitchCause, number> => ({
   'shader-compile': 0,
   'texture-upload': 0,
   'zone-build': 0,
@@ -432,6 +448,7 @@ export function createHitchTracker(
         textureDelta,
         createdViews: sample.createdViews,
         zoneBuildMs: Math.round(sample.zoneBuildMs * 100) / 100,
+        viewBuildMs: Math.round(sample.viewBuildMs * 100) / 100,
         rendererMs: Math.round(sample.rendererMs * 100) / 100,
         heapDropMb,
         cause: hitchCause(
@@ -439,6 +456,7 @@ export function createHitchTracker(
           textureDelta,
           sample.createdViews,
           sample.zoneBuildMs,
+          sample.viewBuildMs,
           heapDropMb,
           sample.rendererMs,
           sample.frameMs,

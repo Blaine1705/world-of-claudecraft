@@ -6,7 +6,7 @@
 // both cases the link comes before the upload, which comes before the touch.
 // The link itself is cut into one gate piece per material group of the root
 // (compile_gate_pieces.ts), each running the colour arm then the shadow arm
-// on its own nodes, all under the one gate.
+// on the group's representative node, all under the one gate.
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -115,11 +115,11 @@ describe('reveal compile host priority', () => {
     }
   });
 
-  it('cuts the link into one gate piece per material group, colour then shadow per node', async () => {
+  it('cuts the link into one gate piece per material group, colour then shadow per representative', async () => {
     // A town kit root: two batches share one material, a third wears another,
-    // and the bare group carries none. Two pieces, every node compiled in
-    // place (the arms get the NODE, never the root), the shared-material
-    // batches inside the same piece.
+    // and the bare group carries none. Two pieces, one representative node
+    // compiled in place per piece (the arms get the NODE, never the root), the
+    // second shared-material batch a cache hit that is not compiled.
     const kit = new THREE.Group();
     kit.name = 'eastbrookTownKit';
     const shared = new THREE.MeshStandardMaterial();
@@ -134,15 +134,14 @@ describe('reveal compile host priority', () => {
       pieces: 2,
       label: 'reveal-gate:eastbrookTownKit',
     });
-    expect(calls.slice(1, 7).map((call) => `${call.arm}:${call.node?.uuid}`)).toEqual([
+    expect(calls.slice(1, 5).map((call) => `${call.arm}:${call.node?.uuid}`)).toEqual([
       `color:${first.uuid}`,
       `shadow:${first.uuid}`,
-      `color:${third.uuid}`,
-      `shadow:${third.uuid}`,
       `color:${second.uuid}`,
       `shadow:${second.uuid}`,
     ]);
-    expect(calls.slice(7).map((call) => call.arm)).toEqual(['upload', 'touch']);
+    expect(calls.some((call) => call.node === third)).toBe(false);
+    expect(calls.slice(5).map((call) => call.arm)).toEqual(['upload', 'touch']);
   });
 
   it('hands the tail the gate own result, so a timed-out link proves nothing ready', async () => {
@@ -173,10 +172,39 @@ describe('reveal compile host priority', () => {
 });
 
 describe('reveal compile host soft deadline', () => {
-  it('reports the learned cost times the root count, floored and clamped', () => {
+  /** A root of `groups` material groups: `groups` pieces. */
+  function rootOfGroups(groups: number): THREE.Group {
+    const group = new THREE.Group();
+    for (let index = 0; index < groups; index++) group.add(oneMaterialRoot(`batch${index}`));
+    return group;
+  }
+
+  it('reports the learned per-piece cost times the PIECE count of the roots, floored and clamped', () => {
+    // The budget learns one reveal-gate unit, and a unit is a piece (one per
+    // material group), so a ten-group kit costs ten units however many roots
+    // it is split across; the root count is not the multiplier.
     const { host } = recordingDeps(400);
-    expect(host.expectedMs?.('town', 1)).toBe(REVEAL_SOFT_DEADLINE_MIN_MS);
-    expect(host.expectedMs?.('town', 10)).toBe(4_000);
-    expect(host.expectedMs?.('town', 1_000)).toBe(REVEAL_GATE_WATCHDOG_MS);
+    expect(host.expectedMs?.('town', 1, [root])).toBe(REVEAL_SOFT_DEADLINE_MIN_MS);
+    expect(host.expectedMs?.('town', 1, [rootOfGroups(10)])).toBe(4_000);
+    expect(host.expectedMs?.('town', 2, [rootOfGroups(4), rootOfGroups(6)])).toBe(4_000);
+    // ten roots of one piece each: the same ten units
+    const batches = Array.from({ length: 10 }, (_, index) => oneMaterialRoot(`b${index}`));
+    expect(host.expectedMs?.('town', 10, batches)).toBe(4_000);
+    expect(host.expectedMs?.('town', 1, [rootOfGroups(1_000)])).toBe(REVEAL_GATE_WATCHDOG_MS);
+  });
+
+  it('prices a compiled root by the pieces its compile SUBMITTED, without walking it again', async () => {
+    const { host } = recordingDeps(400);
+    const kit = rootOfGroups(10);
+    await host.compile(kit, false);
+    // a carrier added after the submit is not what the gate is linking
+    kit.add(oneMaterialRoot('late'));
+    expect(host.expectedMs?.('town', 1, [kit])).toBe(4_000);
+  });
+
+  it('a root without any carrier submits no piece and adds nothing to the deadline', () => {
+    const { host } = recordingDeps(400);
+    expect(host.expectedMs?.('town', 2, [new THREE.Group(), rootOfGroups(5)])).toBe(2_000);
+    expect(host.expectedMs?.('town', 1, [new THREE.Group()])).toBe(REVEAL_SOFT_DEADLINE_MIN_MS);
   });
 });

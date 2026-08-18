@@ -1321,7 +1321,8 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(compileGateStart).toBeGreaterThan(-1);
     expect(compileGateEnd).toBeGreaterThan(compileGateStart);
     // One gate, one queue unit per material group of the target: the split
-    // is compile_gate_pieces.ts, the deadline stays the one constant.
+    // is compile_gate_pieces.ts, and each piece arms the one constant for its
+    // own work.
     expect(compileGate).toContain('this.liveCompileGates.runPieces(');
     expect(compileGate).toContain('linkPieceWork(target, color, shadow)');
     expect(compileGate).toContain('VIEW_COMPILE_GATE_MAX_MS');

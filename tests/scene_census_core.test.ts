@@ -296,6 +296,7 @@ describe('createHitchTracker', () => {
     textures: 50,
     createdViews: 0,
     zoneBuildMs: 0,
+    viewBuildMs: 0,
     rendererMs: 250,
     heapMb: 0,
   };
@@ -378,6 +379,38 @@ describe('createHitchTracker', () => {
     });
     expect(view?.cause).toBe('view-create');
     expect(tracker.summary().byCause['zone-build']).toBe(1);
+  });
+
+  it('weighs the two construction ledgers: the heavier one owns the frame', () => {
+    const tracker = createHitchTracker();
+    tracker.frame({ ...base, frameMs: 10 });
+    // A 0.3 ms zone step beside 50 ms of view builds is the views' hitch,
+    // whatever the created count says.
+    const views = tracker.frame({ ...base, frameMs: 60, zoneBuildMs: 0.3, viewBuildMs: 50 });
+    expect(views?.cause).toBe('view-create');
+    expect(views?.viewBuildMs).toBe(50);
+    expect(views?.zoneBuildMs).toBe(0.3);
+    // View spend alone, no created count (a mount or a form built on an
+    // existing view): still the views' hitch.
+    expect(tracker.frame({ ...base, frameMs: 60, viewBuildMs: 12 })?.cause).toBe('view-create');
+    // A created view with no ledger spend at all still files view-create.
+    expect(tracker.frame({ ...base, frameMs: 60, createdViews: 1 })?.cause).toBe('view-create');
+    // The zone side wins at or above the view side.
+    expect(
+      tracker.frame({ ...base, frameMs: 60, zoneBuildMs: 30, viewBuildMs: 30, createdViews: 2 })
+        ?.cause,
+    ).toBe('zone-build');
+    expect(tracker.frame({ ...base, frameMs: 60, zoneBuildMs: 31, viewBuildMs: 30 })?.cause).toBe(
+      'zone-build',
+    );
+    // Resource growth still outranks both ledgers.
+    expect(
+      tracker.frame({ ...base, frameMs: 60, zoneBuildMs: 1, viewBuildMs: 50, textures: 51 })?.cause,
+    ).toBe('texture-upload');
+    const s = tracker.summary();
+    expect(s.byCause['view-create']).toBe(3);
+    expect(s.byCause['zone-build']).toBe(2);
+    expect(s.byCause['texture-upload']).toBe(1);
   });
 
   it('files a stall the frame callback did not own under off-frame', () => {

@@ -189,7 +189,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(renderer.compileShadowPrograms).toHaveBeenCalledWith(mesh);
   });
 
-  it('submits one gate piece per material group of the target, and every carrier of the group', async () => {
+  it('submits one gate piece per material group of the target, one representative compile each', async () => {
     const renderer = harness();
     renderer.sim = { player: { targetId: null } };
     const submitted: Array<{ pieces: number; label?: string }> = [];
@@ -226,8 +226,9 @@ describe('Renderer live shader compile rejection recovery', () => {
     await renderer.compileGate(target);
 
     expect(submitted).toEqual([{ pieces: 3, label: 'live-gate:Group' }]);
-    // every carrier compiles, grouped: the shared-skin parts inside one piece
-    expect(compiled).toEqual([torso, legs, eyes, hair]);
+    // one compile per group: legs shares torso's programs (same material,
+    // same static variant), so only the group's first carrier is compiled
+    expect(compiled).toEqual([torso, eyes, hair]);
   });
 
   it('never compiles a live gate at the ambient render target (colour-space cache-key trap)', () => {

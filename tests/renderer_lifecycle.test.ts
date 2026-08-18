@@ -56,7 +56,6 @@ describe('Renderer lifecycle wiring', () => {
     renderer.questObjectHidden = makeQuestObjectGate({});
     renderer.viewCreateRetry = { canAttempt };
     renderer.createView = createView;
-    renderer.sampleCreatedViewType = () => {};
 
     const hiddenFrames = Array.from({ length: 3 }, () => renderer.createRequiredViews(player, []));
     expect(hiddenFrames).toEqual([0, 0, 0]);

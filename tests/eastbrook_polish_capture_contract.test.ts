@@ -209,8 +209,11 @@ interface AttributionTargetFixture {
 // Re-minted for the compile gate's piece cut (one queue unit per material
 // group of the target): renderer.ts moved, the seals follow the swept evidence
 // bytes. No capture was retaken.
+// Re-minted for the hitch sample alignment (the top-of-sync reading and the
+// aligned end-of-sync sample): renderer.ts moved, the seals follow the swept
+// evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '021ebb0e2bf401f9a92ddbc7492927c320f27fdb376e4a2aa9636e630ad9f601';
+  '099632e165aec851c5c35813288da0893f5f5dc0bd0b39f1515c590da4055bce';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -3,9 +3,10 @@
 // materials, halo, far bake, mixer) wraps each step in `timeBuildSpan` and the
 // renderer routes the spans into its ledger (`setBuildSpanSink`). Host module:
 // it reads the clock, so it is not a pure core; nothing here decides anything.
-// Kinds prefixed `view-part:` file under the ledger's `other` lane
-// (build_ledger_core.buildLedgerLane), so a sub-span never double counts in
-// the frame's view spend that its enclosing `view:<class>` build already owns.
+// Kinds prefixed `view-part:` file under the ledger's `part` lane
+// (build_ledger_core.buildLedgerLane): kept per kind, out of the frame spend,
+// the worst frame and the slowest ring, so a sub-span never double counts the
+// milliseconds its enclosing `view:<class>` build already owns.
 
 export type BuildSpanSink = (kind: string, ms: number, atMs: number) => void;
 

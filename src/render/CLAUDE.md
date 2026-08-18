@@ -333,7 +333,8 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   those units past `maxDeferFrames` and admitted the entire debt lane as
   `starvation` on the first live frame after the drop.
   Two deadlines beside it, and only one of them reveals: a SOFT deadline per key, from
-  the budget's learned reveal cost times the root count clamped into
+  the budget's learned reveal cost (one gate PIECE, since a reveal compile is one
+  queue unit per material group) times the piece count of the key's roots clamped into
   [`REVEAL_SOFT_DEADLINE_MIN_MS`, `REVEAL_GATE_WATCHDOG_MS`], records a
   `reveal-soft-deadline` gpu-prep event with the key's ready/total roots and
   changes nothing. That learned cost is the compileAsync PROLOGUE (1 to 3 ms),
@@ -438,11 +439,15 @@ GPU work signs. Each rule names its seam and its guard.
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),
   and, if it holds a representation back, names its stand-in in
   `ENTITY_GATE_STAND_INS` plus a case in `tests/entity_gate_stand_in.test.ts`. A
-  compile gate submits one unit per material group of its root
-  (`CompileGateQueue.runPieces` over `linkPieceWork`, `compile_gate_pieces.ts`),
-  never a whole root in one unit: the queue paces between units, and a driver
-  that compiles shader source at submission charged every program of a root to
-  the one unit. No
+  compile gate submits one unit per material group and variant of its root
+  (the material tuple plus what three's program cache key reads off the node:
+  skinning, instancing, morph targets, the geometry attributes), one
+  representative compile per group (`CompileGateQueue.runPieces` over
+  `linkPieceWork`, `compile_gate_pieces.ts`), never a whole root in one unit:
+  the queue paces between units, and a driver that compiles shader source at
+  submission charged every program of a root to the one unit. Each piece arms
+  the gate timeout for its OWN work (the driver latency of one unit), so queue
+  pacing between pieces never counts against it. No
   wall-clock constant calibrated on one machine inside a gate: the arrival lesson
   is that a hold ends on evidence (its own compile settling), on the
   `REVEAL_GATE_WATCHDOG_MS` watchdog, or on a reach floor, never on a tuned timer.
@@ -471,7 +476,10 @@ GPU work signs. Each rule names its seam and its guard.
   same picture is `perfStats().buildLedger` (`build_ledger_core.ts`: main-thread ms
   per view build class and per zone feature builder, the worst frame, the slowest
   builds) and `perfStats().zoneStreaming` (the last prepare's stage wall-times);
-  the hitch tracker's `zone-build` and `off-frame` causes read from them.
+  the hitch tracker's `zone-build`, `view-create` and `off-frame` causes read from
+  them, on a sample ALIGNED with the span its dt measures (`hitch_frame_align_core.ts`:
+  the previous callback plus the gap before this one), so a cause inside a callback
+  is filed on the frame that paid it.
   External capture: `node scripts/gpu_hitch_capture.mjs`. Dispatch
   `render-performance-reviewer` on any diff that lands a producer under these rules.
 

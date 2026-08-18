@@ -152,6 +152,39 @@ describe('the compose step defers the face decals when allowed and the look is n
     expect(decalsOf(root)).toHaveLength(2);
   });
 
+  it('does nothing on a root without the head node: no decal, no deferral flag, ready or not', () => {
+    const look = lookWith({ hair: 'buzz', beard: 'stubble', blush: 'rose', eyeshadow: 'none' });
+    const headless = new THREE.Group();
+    const other = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial());
+    other.name = 'M_Torso';
+    headless.add(other);
+    expect(() => attachFaceDecals(headless, DEF, look, { deferDecals: true })).not.toThrow();
+    expect(decalsOf(headless)).toEqual([]);
+    expect(headless.userData.deferredDecals).toBeUndefined();
+    expect(() => attachFaceDecals(headless, DEF, look)).not.toThrow();
+    expect(decalsOf(headless)).toEqual([]);
+    expect(headless.children).toEqual([other]);
+    // and the late half has nothing to attach either
+    expect(attachDeferredFaceDecals(headless, look)).toEqual([]);
+  });
+
+  it('the late half returns empty and clears the flag when the head left between build and attach', () => {
+    const look = lookWith({ hair: 'buzz', beard: 'stubble', blush: 'rose', eyeshadow: 'none' });
+    const { root, head } = composedRoot();
+    attachFaceDecals(root, DEF, look, { deferDecals: true });
+    expect(root.userData.deferredDecals).toBe(true);
+    root.remove(head);
+    expect(attachDeferredFaceDecals(root, look)).toEqual([]);
+    expect(decalsOf(root)).toEqual([]);
+    // the deferral is consumed, not left armed: the flag is cleared before
+    // the head lookup, so a later call finds nothing to do even if the head
+    // came back
+    expect(root.userData.deferredDecals).toBeUndefined();
+    root.add(head);
+    expect(attachDeferredFaceDecals(root, look)).toEqual([]);
+    expect(decalsOf(root)).toEqual([]);
+  });
+
   it('recolorMesh is the sweep step: skin and hair tinted, anything else passed through', () => {
     const look = lookWith({ hairHue: 12, hairSat: 0.6, hairLight: 0.3 });
     const skinSource = new THREE.MeshStandardMaterial({ name: 'mod_skin' });

@@ -2,7 +2,8 @@
 // queue, so a body whose styles the session has never seen does not build its
 // maps inside the frame the entity enters range.
 //
-// The measurement behind it (tmp/h-bench-results-1.md, batch 2): 94 percent
+// The measurement behind it (headless crowd-arrival bench, iGPU and RTX 3090
+// alike, then a production capture): 94 percent
 // of a composed view build is the two procedural decal maps (the 1024^2 stubble
 // map at 60 to 100 ms, the 512^2 makeup map at 20 ms) plus their head cuts,
 // every one of them a pure function of the STYLE selection and cached per
@@ -56,8 +57,8 @@ import {
  *  small enough that the per-frame budget decides how many units fit a frame,
  *  so no number here is tuned to a machine. The criterion that set it: a unit
  *  must fit inside a frame's spare budget on the weakest target, and the
- *  earlier sixteenth of the stubble map (64 rows) did not in the browser
- *  (tmp/h-plan.md, section 7). */
+ *  earlier sixteenth of the stubble map (64 rows) cost 18 to 22 ms per unit
+ *  in the browser on the iGPU bench, more than a whole frame there. */
 export const LOOK_BAND_ROWS = 8;
 
 /** How many band units a map of `size` rows is painted in. */
@@ -103,7 +104,10 @@ async function runTextureBands(
   paintRows: (out: Uint8Array<ArrayBuffer>, rowStart: number, rowEnd: number) => void,
   publish: (data: Uint8Array<ArrayBuffer>) => void,
 ): Promise<void> {
-  const data = new Uint8Array(new ArrayBuffer(size * size * 4));
+  // The map's buffer (4 MB for the stubble map) is allocated inside the FIRST
+  // band's unit, never in the frame that decided to defer: that frame is the
+  // one the deferral exists to spare.
+  let data: Uint8Array<ArrayBuffer> | null = null;
   const bands = lookTextureBands(size);
   for (let band = 0; band < bands; band++) {
     const last = band === bands - 1;
@@ -111,6 +115,7 @@ async function runTextureBands(
     // once, so a map in progress holds one slot in the queue, not a hundred.
     await queue.run(
       () => {
+        data ??= new Uint8Array(new ArrayBuffer(size * size * 4));
         paintRows(data, band * LOOK_BAND_ROWS, Math.min(size, (band + 1) * LOOK_BAND_ROWS));
         bandsRun++;
         if (last) publish(data);

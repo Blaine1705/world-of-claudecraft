@@ -84,7 +84,8 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   (blush/eyeshadow on the same decal machinery; lipstick is deliberately a
   material tint on the mouth PART instead), `look_pieces.ts` (a composed
   look's decal maps and cuts as deduped PIECES of the GPU work queue, painted
-  a row band per unit; a live candidate whose pieces are not resident builds
+  a row band per unit, the map's buffer allocated inside the first band's
+  unit and never in the deciding frame; a live candidate whose pieces are not resident builds
   its body at once WITHOUT the face decals, the stand-in, and
   `CharacterVisual.attachDeferredDecals` adds them through the compile gate
   once they land; never deferred under a cover or for the target: the producer

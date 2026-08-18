@@ -150,11 +150,15 @@ describe('row-sliced decal maps', () => {
     { blush: 'rose', eyeshadow: 'plum' },
     { blush: 'none', eyeshadow: 'teal' },
     { blush: 'peach', eyeshadow: 'none' },
+    { blush: 'none', eyeshadow: 'none' },
   ] as const)('makeup bands concatenate to the byte-identical full map (%o)', (sel) => {
     const whole = makeupTextureData(sel, SIZE);
     const banded = bandsOf((out, a, b) => makeupTextureRows(sel, out, a, b, SIZE), SIZE);
+    expect(banded.length).toBe(whole.length);
     expect(Buffer.from(banded).equals(Buffer.from(whole))).toBe(true);
-    expect(whole.some((v, i) => i % 4 === 3 && v > 0)).toBe(true);
+    // painted for the selections that wear something, and only for those
+    const wearsAny = sel.blush !== 'none' || sel.eyeshadow !== 'none';
+    expect(whole.some((v, i) => i % 4 === 3 && v > 0)).toBe(wearsAny);
   });
 
   it('the shipped sizes split evenly into the structural bands (a fraction of the map, not a count)', () => {
@@ -290,6 +294,32 @@ describe('composed look pieces on the GPU work queue', () => {
     expect(Buffer.from(published).equals(Buffer.from(decalTextureData(sel)))).toBe(true);
     // the kind the budget learns is the texture family
     expect(gpuPrepKindOfLabel(q.runs[0].label)).toBe(STUBBLE_BAND_LABEL);
+  });
+
+  it('allocates the map buffer inside the first band unit, never in the deciding frame', async () => {
+    // The deferral exists to spare the frame the entity enters range; a 4 MB
+    // allocation in that frame is the very cost it defers.
+    // a selection no other case publishes, so its map is not resident yet
+    const look = lookWith({ hair: 'bald', beard: 'scruff' });
+    expect(hasDecalTexture(stubbleDecals(look.app, look.worn))).toBe(false);
+    const bytes = DECAL_TEX_SIZE * DECAL_TEX_SIZE * 4;
+    const RealArrayBuffer = globalThis.ArrayBuffer;
+    const allocated: number[] = [];
+    globalThis.ArrayBuffer = class extends RealArrayBuffer {
+      constructor(length: number) {
+        super(length);
+        allocated.push(length);
+      }
+    } as unknown as ArrayBufferConstructor;
+    try {
+      const q = fakeQueue('manual');
+      expect(composedLookPiecesFor(DEF, look, null, q.queue, 30).ready).toBe(false);
+      expect(allocated).not.toContain(bytes);
+      expect(q.step()).toBe(true);
+      expect(allocated).toContain(bytes);
+    } finally {
+      globalThis.ArrayBuffer = RealArrayBuffer;
+    }
   });
 
   it('a makeup map is its own band family, and a look wearing both maps needs both', async () => {

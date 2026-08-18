@@ -470,6 +470,7 @@ describe('diagnosePerfSnapshot', () => {
           textureDelta: 0,
           createdViews: 1,
           zoneBuildMs: 0,
+          viewBuildMs: 0,
           rendererMs: 30,
           heapDropMb: 0,
           cause: 'view-create',

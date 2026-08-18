@@ -67,10 +67,10 @@ describe('reveal gate wiring (source pins)', () => {
     expect(host).toContain('label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`');
     // The link is cut into one queue unit per material group of the root
     // (compile_gate_pieces.ts), each running the colour arm then the shadow
-    // arm on that group's nodes, under the one gate deadline.
+    // arm on that group's representative node, each under its own deadline.
     const colourAt = anchor(
       host,
-      'deps.gate(linkPieceWork(target, deps.compileColor, deps.compileShadow), {',
+      'const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow);',
     );
     // Uploads sit BETWEEN the link and the touch: the touch's driver round trip
     // flushes behind everything already queued, so an upload paid after it is
@@ -86,9 +86,13 @@ describe('reveal gate wiring (source pins)', () => {
     const touchAt = anchor(host, '.then((gate) => deps.touch(target, priority, gate))');
     expect(colourAt).toBeLessThan(uploadAt);
     expect(uploadAt).toBeLessThan(touchAt);
-    // The soft deadline is the budget's learned cost times the key's roots,
-    // and it is the host's answer, not a second policy in the renderer.
-    expect(host).toContain('return revealSoftDeadlineMs(deps.predictRevealMs(), rootCount);');
+    // The soft deadline is the budget's learned per-unit cost times the PIECES
+    // the key's roots submit (the budget learns a piece, not a root), and it is
+    // the host's answer, not a second policy in the renderer.
+    expect(host).toContain(
+      'pieces += submittedPieces.get(root) ?? linkPiecesOf(root as THREE.Object3D).length;',
+    );
+    expect(host).toContain('return revealSoftDeadlineMs(deps.predictRevealMs(), pieces);');
   });
 
   it('the renderer wires all four gates behind async-compile support', () => {

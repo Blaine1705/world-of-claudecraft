@@ -26,6 +26,12 @@ type FindingFamily =
   | 'snapshot'
   | 'generic';
 
+/** True when a finding id renders a title of its own rather than the generic
+ *  fallback: the completeness pin every new finding id must satisfy. */
+export function perfFindingHasTitle(id: string): boolean {
+  return Object.hasOwn(TITLE_KEYS, id);
+}
+
 const TITLE_KEYS: Readonly<Record<string, TranslationKey>> = {
   'system-hardware-acceleration': `${PREFIX}.titles.hardwareAcceleration`,
   'system-integrated-gpu': `${PREFIX}.titles.integratedGpu`,

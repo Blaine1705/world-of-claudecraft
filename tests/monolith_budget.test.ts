@@ -148,7 +148,11 @@ const MONOLITHS: MonolithRow[] = [
     // material group of the target, compile_gate_pieces.ts): the enumeration
     // and the per-piece work live in that module, and the gate's rationale
     // comment was rewritten to the design that ships (net -10).
-    ceiling: 13472,
+    // Lowered again by the hitch sample alignment (hitch_frame_align_core.ts:
+    // the start-of-sync reading and the aligned end-of-sync sample), which
+    // paid for its wiring by extracting the perfStats last-frame deep copy
+    // into src/render/renderer_frame_stats_snapshot.ts (net -21).
+    ceiling: 13451,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

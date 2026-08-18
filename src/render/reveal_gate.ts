@@ -68,9 +68,9 @@ export interface RevealCompileHost {
    *  setTimeout/clearTimeout. */
   schedule?: (onTimeout: () => void, ms: number) => () => void;
   /** How long this key's compiles are expected to take, from the host's
-   *  learned cost model. Absent (or at/above the watchdog) arms no soft
-   *  deadline, which is the historical behaviour. */
-  expectedMs?: (key: string, rootCount: number) => number;
+   *  learned cost model, given the roots just submitted. Absent (or at/above
+   *  the watchdog) arms no soft deadline, which is the historical behaviour. */
+  expectedMs?: (key: string, rootCount: number, roots: readonly object[]) => number;
 }
 
 export interface RevealGate extends RevealGateCore {
@@ -93,14 +93,15 @@ const defaultSchedule = (onTimeout: () => void, ms: number): (() => void) => {
 const noCancel = (): void => undefined;
 
 /**
- * The soft deadline for a key whose roots each cost about `perRootMs` to
- * link, clamped into [REVEAL_SOFT_DEADLINE_MIN_MS, REVEAL_GATE_WATCHDOG_MS].
+ * The soft deadline for a key whose link is `unitCount` queue units (gate
+ * pieces, one per material group of its roots) of about `perUnitMs` each,
+ * clamped into [REVEAL_SOFT_DEADLINE_MIN_MS, REVEAL_GATE_WATCHDOG_MS].
  * An unlearned or nonsense cost falls back to the floor rather than to no
  * deadline at all: a budget with no samples is exactly when a report helps.
  */
-export function revealSoftDeadlineMs(perRootMs: number, rootCount: number): number {
-  const roots = Number.isFinite(rootCount) && rootCount > 1 ? Math.floor(rootCount) : 1;
-  const predicted = Number.isFinite(perRootMs) && perRootMs > 0 ? perRootMs * roots : 0;
+export function revealSoftDeadlineMs(perUnitMs: number, unitCount: number): number {
+  const roots = Number.isFinite(unitCount) && unitCount > 1 ? Math.floor(unitCount) : 1;
+  const predicted = Number.isFinite(perUnitMs) && perUnitMs > 0 ? perUnitMs * roots : 0;
   if (predicted <= REVEAL_SOFT_DEADLINE_MIN_MS) return REVEAL_SOFT_DEADLINE_MIN_MS;
   return predicted < REVEAL_GATE_WATCHDOG_MS ? predicted : REVEAL_GATE_WATCHDOG_MS;
 }
@@ -157,7 +158,7 @@ export function createRevealGate(
       let softMs = 0;
       if (host.expectedMs) {
         try {
-          softMs = host.expectedMs(key, rootCount);
+          softMs = host.expectedMs(key, rootCount, roots);
         } catch (error) {
           console.error('Reveal gate expected-cost lookup failed', key, error);
         }

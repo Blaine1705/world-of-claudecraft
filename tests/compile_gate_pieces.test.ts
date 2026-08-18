@@ -1,7 +1,9 @@
 // The three-side binding of the piece cut (src/render/compile_gate_pieces.ts):
 // which nodes of a gated root form a piece (exactly the material carriers
 // three's compile() prepares: mesh, points, line, sprite), keyed on the material
-// tuple's identity, and the per-piece work the gate queue runs.
+// tuple's identity plus the program variant three's cache key reads off the
+// object and its geometry, and the per-piece work the gate queue runs: one
+// representative compile per piece.
 
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
@@ -53,6 +55,76 @@ describe('linkPiecesOf', () => {
     expect(linkPiecesOf(root)).toEqual([[points], [line], [sprite]]);
   });
 
+  it('splits one material across program variants: skinned, instanced and static are three pieces', () => {
+    // three keys a program on object.isSkinnedMesh and object.isInstancedMesh
+    // (WebGLPrograms.getParameters), so the same material on a static mesh, a
+    // skinned mesh and an instanced mesh links three programs.
+    const shared = new THREE.MeshStandardMaterial();
+    const statue = mesh(shared, 'statue');
+    const torso = new THREE.SkinnedMesh(new THREE.BufferGeometry(), shared);
+    torso.name = 'torso';
+    const legs = new THREE.SkinnedMesh(new THREE.BufferGeometry(), shared);
+    legs.name = 'legs';
+    const crowd = new THREE.InstancedMesh(new THREE.BufferGeometry(), shared, 4);
+    crowd.name = 'crowd';
+    const bust = mesh(shared, 'bust');
+    const root = new THREE.Group();
+    root.add(statue, torso, crowd, legs, bust);
+    expect(linkPiecesOf(root)).toEqual([[statue, bust], [torso, legs], [crowd]]);
+  });
+
+  it('splits one material across geometry variants three reads: morph targets, an instance colour, attributes', () => {
+    const shared = new THREE.MeshStandardMaterial();
+    const plain = mesh(shared, 'plain');
+    const morphed = mesh(shared, 'morphed');
+    morphed.geometry.morphAttributes.position = [new THREE.BufferAttribute(new Float32Array(3), 3)];
+    const morphedToo = mesh(shared, 'morphedToo');
+    morphedToo.geometry.morphAttributes.position = [
+      new THREE.BufferAttribute(new Float32Array(3), 3),
+    ];
+    const lit = mesh(shared, 'lit');
+    lit.geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(3), 3));
+    const tinted = new THREE.InstancedMesh(new THREE.BufferGeometry(), shared, 2);
+    tinted.name = 'tinted';
+    tinted.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(6), 3);
+    const untinted = new THREE.InstancedMesh(new THREE.BufferGeometry(), shared, 2);
+    untinted.name = 'untinted';
+    const root = new THREE.Group();
+    root.add(plain, morphed, lit, tinted, morphedToo, untinted);
+    expect(linkPiecesOf(root)).toEqual([
+      [plain],
+      [morphed, morphedToo],
+      [lit],
+      [tinted],
+      [untinted],
+    ]);
+  });
+
+  it('splits a caster from a non-caster of the same material: the shadow arm compiles casters only', () => {
+    // The host's shadow arm links a depth program for a castShadow node and
+    // nothing for the others, so a caster riding a non-caster's piece would
+    // link its depth program synchronously at the first shadow pass.
+    const shared = new THREE.MeshStandardMaterial();
+    const decal = mesh(shared, 'decal');
+    const wall = mesh(shared, 'wall');
+    wall.castShadow = true;
+    const fence = mesh(shared, 'fence');
+    fence.castShadow = true;
+    const root = new THREE.Group();
+    root.add(decal, wall, fence);
+    expect(linkPiecesOf(root)).toEqual([[decal], [wall, fence]]);
+  });
+
+  it('ignores receiveShadow: three feeds it as a uniform, not a program key input', () => {
+    const shared = new THREE.MeshStandardMaterial();
+    const lit = mesh(shared, 'lit');
+    const shaded = mesh(shared, 'shaded');
+    shaded.receiveShadow = true;
+    const root = new THREE.Group();
+    root.add(lit, shaded);
+    expect(linkPiecesOf(root)).toEqual([[lit, shaded]]);
+  });
+
   it('gives a lone mesh root one piece of itself, and a carrier-less root none', () => {
     const lone = mesh(new THREE.MeshStandardMaterial(), 'batch');
     expect(linkPiecesOf(lone)).toEqual([[lone]]);
@@ -61,7 +133,9 @@ describe('linkPiecesOf', () => {
 });
 
 describe('linkPieceWork', () => {
-  it('runs the colour arm then the shadow arm on each node of the piece, in order, nothing reparented', async () => {
+  it('runs ONE colour arm then ONE shadow arm per piece, on its representative, nothing reparented', async () => {
+    // legs shares torso's key (same material, both static): a cache hit that
+    // would only repeat the whole-scene light walk, so it is not compiled.
     const skin = new THREE.MeshStandardMaterial();
     const torso = mesh(skin, 'torso');
     const legs = mesh(skin, 'legs');
@@ -80,10 +154,31 @@ describe('linkPieceWork', () => {
     const work = linkPieceWork(root, color, shadow);
     expect(work).toHaveLength(2);
     await work[0]();
-    expect(arms).toEqual(['color:torso', 'shadow:torso', 'color:legs', 'shadow:legs']);
+    expect(arms).toEqual(['color:torso', 'shadow:torso']);
     await work[1]();
-    expect(arms.slice(4)).toEqual(['color:eyes', 'shadow:eyes']);
+    expect(arms.slice(2)).toEqual(['color:eyes', 'shadow:eyes']);
+    expect(color).toHaveBeenCalledTimes(2);
+    expect(shadow).toHaveBeenCalledTimes(2);
+    expect(color).not.toHaveBeenCalledWith(legs);
     for (const node of [torso, legs, eyes]) expect(node.parent).toBe(root);
+  });
+
+  it('compiles a skinned node of the same material as its own piece: a different program', async () => {
+    const skin = new THREE.MeshStandardMaterial();
+    const statue = mesh(skin, 'statue');
+    const torso = new THREE.SkinnedMesh(new THREE.BufferGeometry(), skin);
+    torso.name = 'torso';
+    const root = new THREE.Group();
+    root.add(statue, torso);
+    const compiled: string[] = [];
+    const arm = (node: THREE.Object3D) => {
+      compiled.push(node.name);
+      return Promise.resolve();
+    };
+    const work = linkPieceWork(root, arm, arm);
+    expect(work).toHaveLength(2);
+    for (const piece of work) await piece();
+    expect(compiled).toEqual(['statue', 'statue', 'torso', 'torso']);
   });
 
   it('starts the first colour arm synchronously inside the work call, so the queue books its prologue', () => {

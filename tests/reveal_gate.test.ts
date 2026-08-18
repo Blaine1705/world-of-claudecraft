@@ -385,6 +385,20 @@ describe('reveal gate soft deadline', () => {
     expect(state.armedMs).toEqual([REVEAL_GATE_WATCHDOG_MS, 2000]);
   });
 
+  it('hands the host the key, the root count and the roots themselves for its cost lookup', () => {
+    // The host prices a key by what its roots SUBMIT (one unit per material
+    // group), so it needs the roots, not just how many there are.
+    const roots = [{ name: 'a' }, { name: 'b' }];
+    const { schedule } = fakeSchedule();
+    const expectedMs = vi.fn(() => 2000);
+    const gate = createRevealGate(
+      { compile: () => new Promise(() => undefined), schedule, expectedMs },
+      () => roots,
+    );
+    gate.allow('town');
+    expect(expectedMs).toHaveBeenCalledWith('town', 2, roots);
+  });
+
   it('records the soft deadline with the key and its ready/total counts, and reveals nothing', async () => {
     let clock = 0;
     setGpuPrepClockForTest(() => clock);

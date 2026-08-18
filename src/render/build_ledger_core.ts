@@ -16,17 +16,23 @@
 // - `zone-wall:<step>`: a zone prepare stage that WRAPS awaited sliced work
 //   (sky, terrain, water). Wall time, not main-thread time, so it is kept per
 //   kind for the streaming picture and never enters the frame spend, the
-//   worst frame, or the slowest ring, all of which name main-thread work.
+//   worst frame, or the slowest ring, all of which name main-thread work;
+// - `view-part:<step>`: a step NESTED inside one `view:<class>` build
+//   (build_spans.ts: assemble, materials, halo, far bake, mixer). Its ms is
+//   already inside the enclosing build's, so like the wall lane it is kept
+//   per kind and never enters the frame spend, the worst frame, or the
+//   slowest ring, none of which may count one millisecond twice.
 //
 // Pure core contract: no three import, no DOM, no clocks (timestamps come
 // from the caller), no randomness. Registered in RENDER_PURE_CORES
 // (tests/architecture.test.ts).
 
-export type BuildLedgerLane = 'view' | 'zone' | 'wall' | 'other';
+export type BuildLedgerLane = 'view' | 'zone' | 'wall' | 'part' | 'other';
 
 export const BUILD_LEDGER_VIEW_PREFIX = 'view:';
 export const BUILD_LEDGER_ZONE_PREFIX = 'zone:';
 export const BUILD_LEDGER_WALL_PREFIX = 'zone-wall:';
+export const BUILD_LEDGER_PART_PREFIX = 'view-part:';
 
 /** Smoothing weight of the per-kind moving average. Structural: it says how
  *  much of the newest build the average trusts, and is not tuned to any
@@ -85,6 +91,7 @@ export interface BuildLedger {
 
 export function buildLedgerLane(kind: string): BuildLedgerLane {
   if (kind.startsWith(BUILD_LEDGER_WALL_PREFIX)) return 'wall';
+  if (kind.startsWith(BUILD_LEDGER_PART_PREFIX)) return 'part';
   if (kind.startsWith(BUILD_LEDGER_VIEW_PREFIX)) return 'view';
   if (kind.startsWith(BUILD_LEDGER_ZONE_PREFIX)) return 'zone';
   return 'other';
@@ -136,7 +143,7 @@ export function createBuildLedger(opts: { slowestLimit?: number } = {}): BuildLe
       if (ms > stats.maxMs) stats.maxMs = ms;
       stats.totalMs += ms;
       const lane = buildLedgerLane(kind);
-      if (lane === 'wall') return;
+      if (lane === 'wall' || lane === 'part') return;
       if (frame.count === 0) frameFirstAtMs = atMs;
       frame.count++;
       frame.totalMs += ms;

@@ -344,6 +344,7 @@ import {
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
+import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -532,6 +533,7 @@ import {
   RenderDiagnostics,
 } from './render_diagnostics';
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
+import { snapshotRendererFrameStats } from './renderer_frame_stats_snapshot';
 import {
   beginRendererFrameTelemetry,
   emptyFoliagePerfStats,
@@ -557,7 +559,6 @@ import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
   captureSceneCensus,
   createHitchTracker,
-  emptyHitchFrameSample,
   type HitchSummary,
   type SceneCensusChild,
   type SceneCensusHost,
@@ -1378,11 +1379,12 @@ export class Renderer {
     previousFocusZ: Number.NaN,
   };
   // Hitch correlation (scene_census_core): fed per frame only while the ?perf
-  // overlay has it enabled, so the fleet pays nothing for it. The sample is a
-  // reused scratch object so the per-frame path stays allocation-free.
+  // overlay has it enabled, so the fleet pays nothing for it. The aligner
+  // (hitch_frame_align_core) turns the top-of-sync and end-of-sync readings
+  // into the sample for the span dt measures, on one reused scratch object.
   private readonly hitchTracker = createHitchTracker();
   private hitchLogEnabled = false;
-  private readonly hitchFrameScratch = emptyHitchFrameSample();
+  private readonly hitchAligner = createHitchFrameAligner();
   private readonly buildLedger = createBuildLedger(); // write-only, read via perfStats()
   // The census burst inflates the following frame's dt; skip that one sample
   // so the tracker never charges the census to the scene.
@@ -1961,7 +1963,7 @@ export class Renderer {
     // ?prep=legacy: admit every unit as before, while the ledger keeps learning
     // so a capture from the legacy arm still carries the costs to compare.
     if (gpuPrepMode() === 'legacy') this.gpuPrepBudget.setLegacy(true);
-    setBuildSpanSink(this.buildLedger.record); // view-part:* spans: 'other' lane, never view spend
+    setBuildSpanSink(this.buildLedger.record); // view-part:* spans: 'part' lane, out of the frame spend
     // biome-ignore format: Keep the established constructor body stable inside the failure guard.
     try {
     // Dev-channel build-phase telemetry (English, console.info, Release-silent):
@@ -1985,14 +1987,13 @@ export class Renderer {
       }
       bdLast = now;
     };
-    // The scene root sits at identity forever, but with the default
-    // matrixAutoUpdate the root recomposes each frame, which flags
-    // matrixWorldNeedsUpdate and FORCE-cascades a matrixWorld multiply through
-    // the graph (three updateMatrixWorld; r185's force still bypasses the
-    // dirty check for every auto-update descendant), defeating both the
-    // static-subtree freeze and the hidden-rig gate below. Freeze the root:
-    // children with auto-update still recompose themselves normally.
-    this.scene.updateMatrix(); this.scene.matrixAutoUpdate = false;
+    // The scene root sits at identity forever; with matrixAutoUpdate on it
+    // recomposes each frame and three's updateMatrixWorld force-cascades the
+    // multiply through every auto-update descendant (r185 still bypasses the
+    // dirty check), defeating the static-subtree freeze and the hidden-rig
+    // gate below. Frozen root: auto-update children still recompose normally.
+    this.scene.updateMatrix();
+    this.scene.matrixAutoUpdate = false;
     this.ambientPointSources = buildWorldAmbientSources(this.sim.cfg.seed);
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
     // composer's MSAA HalfFloat target, low is meant to run without AA, and
@@ -4354,7 +4355,7 @@ export class Renderer {
       nightAmount: Math.round(this.dnGlobalNight * 100) / 100,
       phaseMs: this.rendererPhaseStats(),
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
-      lastFrame: this.snapshotLastFrameStats(),
+      lastFrame: snapshotRendererFrameStats(this.lastFrameStats),
       prewarm: this.lastPrewarmStats,
       gpuQueue: this.backgroundGpuWork.stats(),
       gpuPrep: { budget: this.gpuPrepBudget.snapshot(), events: gpuPrepEventsSnapshot() },
@@ -4373,7 +4374,10 @@ export class Renderer {
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
   setHitchLogEnabled(enabled: boolean): void {
-    if (this.hitchLogEnabled && !enabled) this.hitchTracker.reset();
+    if (this.hitchLogEnabled && !enabled) {
+      this.hitchTracker.reset();
+      this.hitchAligner.reset();
+    }
     this.hitchLogEnabled = enabled;
   }
 
@@ -4494,42 +4498,6 @@ export class Renderer {
       nameplates: summarizeMs(this.phaseSamples.nameplates.toArray()),
       submit: summarizeMs(this.phaseSamples.submit.toArray()),
       total: summarizeMs(this.phaseSamples.total.toArray()),
-    };
-  }
-
-  private snapshotLastFrameStats(): RendererFrameStats {
-    const frame = this.lastFrameStats;
-    const foliage = frame.foliage;
-    const qualityChange = frame.lastQualityChange;
-    return {
-      phaseMs: { ...frame.phaseMs },
-      worldPhaseMs: { ...frame.worldPhaseMs },
-      foliage: {
-        ...foliage,
-        modelBucketsByLod: { ...foliage.modelBucketsByLod },
-        modelVisibleByLod: { ...foliage.modelVisibleByLod },
-        modelDrawsByLod: { ...foliage.modelDrawsByLod },
-        modelVisibleDrawsByLod: { ...foliage.modelVisibleDrawsByLod },
-        modelTrianglesByLod: { ...foliage.modelTrianglesByLod },
-        modelVisibleTrianglesByLod: { ...foliage.modelVisibleTrianglesByLod },
-      },
-      renderDiagnostics: frame.renderDiagnostics,
-      cameraPosition: { ...frame.cameraPosition },
-      playerPosition: { ...frame.playerPosition },
-      biome: frame.biome,
-      lastQualityChange: qualityChange
-        ? {
-            ...qualityChange,
-            previousLevels: { ...qualityChange.previousLevels },
-            levels: { ...qualityChange.levels },
-          }
-        : null,
-      createdViews: frame.createdViews,
-      createdViewTypes: [...frame.createdViewTypes],
-      removedViews: frame.removedViews,
-      candidateViews: frame.candidateViews,
-      activeViews: frame.activeViews,
-      visibleViews: frame.visibleViews,
     };
   }
 
@@ -8700,14 +8668,16 @@ export class Renderer {
   // scene's exact lights + environment. The same priority arbiter owns live
   // views and background uploads, so their WebGL work never overlaps.
   //
-  // One queue unit per MATERIAL GROUP of the target, never the whole target in
-  // one unit (compile_gate_pieces.ts). Checked against the pinned three.js
-  // WebGLRenderer.compile() source, not assumed: `compile(scene, camera,
-  // targetScene)` gathers LIGHTS from `targetScene` (here `this.scene`, for a
-  // correct NUM_POINT_LIGHTS/... variant) but prepares materials only under
-  // `scene` (here the one node handed to it), so a per-node compileAsync yields
-  // exactly that node's programs under the same cache keys as compiling the
-  // root, and only the cheap isLight walk over `this.scene` repeats per call.
+  // One queue unit per MATERIAL GROUP (tuple plus program variant) of the
+  // target, one representative node compiled per group, never the whole
+  // target in one unit (compile_gate_pieces.ts). Checked against the pinned
+  // three.js WebGLRenderer.compile() source, not assumed: `compile(scene,
+  // camera, targetScene)` gathers LIGHTS from `targetScene` (here `this.scene`,
+  // for a correct NUM_POINT_LIGHTS/... variant) but prepares materials only
+  // under `scene` (here the one node handed to it), so a per-node compileAsync
+  // yields exactly that node's programs under the same cache keys as compiling
+  // the root; the group's other nodes are cache hits, and only the cheap
+  // isLight walk over `this.scene` would repeat for them.
   // Drivers that compile shader source synchronously at submission (Mesa on
   // the iGPU) charged every never-seen program of a root to its one unit (a
   // crowd of composed players arriving in a live frame: 500 to 711 ms on the
@@ -10372,6 +10342,19 @@ export class Renderer {
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
+    // The hitch sample's start reading, before any view creation, then a new
+    // ledger frame: what the ledger holds here is the previous callback plus
+    // the gap before this one, the span this callback's dt measures.
+    if (this.hitchLogEnabled) {
+      const spend = this.buildLedger.frameSpend();
+      this.hitchAligner.atStart(
+        this.webgl.info.programs?.length ?? 0,
+        this.webgl.info.memory.textures,
+        spend.zoneMs,
+        spend.viewMs,
+      );
+    }
+    this.buildLedger.beginFrame();
     // Feed the background lane the live frame clock (see its header).
     this.backgroundGpuWork.noteFrame(totalStart);
     // The pacing budget opens its frame on the SAME boundary, unconditionally:
@@ -12534,23 +12517,18 @@ export class Renderer {
     frameStats.activeViews = this.views.size;
     frameStats.visibleViews = visibleViews;
     noteArrivalIfTeleported(p.pos.x, p.pos.z, this.viewCandidates.length);
-    if (this.hitchLogEnabled && this.hitchSkipNextFrame) {
-      this.hitchSkipNextFrame = false;
-    } else if (this.hitchLogEnabled) {
-      const sample = this.hitchFrameScratch;
-      sample.atMs = afterSubmit;
-      sample.frameMs = Math.min(250, Math.max(0, dt * 1000));
-      sample.submitMs = framePhaseMs.submit;
-      sample.programs = this.webgl.info.programs?.length ?? 0;
-      sample.textures = this.webgl.info.memory.textures;
-      sample.createdViews = createdViews;
-      // Zone spend since the previous frame: this callback plus the idle work between.
-      sample.zoneBuildMs = this.buildLedger.frameSpend().zoneMs;
-      sample.rendererMs = framePhaseMs.total;
-      sample.heapMb = usedJsHeapMb();
-      this.hitchTracker.frame(sample);
+    if (this.hitchLogEnabled) {
+      const sample = this.hitchAligner.atEnd(
+        afterSubmit,
+        Math.min(250, Math.max(0, dt * 1000)),
+        framePhaseMs.submit,
+        createdViews,
+        framePhaseMs.total,
+        usedJsHeapMb(),
+      );
+      if (this.hitchSkipNextFrame) this.hitchSkipNextFrame = false;
+      else if (sample) this.hitchTracker.frame(sample);
     }
-    this.buildLedger.beginFrame();
     this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000));
   }
 
@@ -12803,6 +12781,7 @@ export class Renderer {
 
   /** Release host-owned workers, overlay canvases, and document listeners. */
   dispose(): void {
+    setBuildSpanSink(null);
     this.cancelTerrainStreaming();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();

@@ -23,7 +23,7 @@
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import type { CompileGateResult } from './compile_gate';
-import { linkPieceWork } from './compile_gate_pieces';
+import { linkPiecesOf, linkPieceWork } from './compile_gate_pieces';
 import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
 
 /** The gpu-prep label prefix, and therefore the budget's cost KIND, of every
@@ -33,9 +33,9 @@ export const REVEAL_GATE_PREP_KIND = 'reveal-gate';
 
 export interface RevealCompileHostDeps {
   /** Run one root's link as a gate of queue units, one per material group
-   *  of the root (compile_gate_pieces.ts), under one deadline. Its result
-   *  says whether the whole link SETTLED, which is what the touch tail's
-   *  readiness rests on. */
+   *  of the root (compile_gate_pieces.ts), each under its own deadline. Its
+   *  result says whether the whole link SETTLED, which is what the touch
+   *  tail's readiness rests on. */
   gate(
     pieces: Array<() => Promise<unknown>>,
     options: { priority: number; label: string },
@@ -50,21 +50,29 @@ export interface RevealCompileHostDeps {
    *  link proved nothing, so its tail may warm only what an earlier settle
    *  already proved ready (linked_program_readiness.ts). */
   touch(target: THREE.Object3D, priority: number, gate: CompileGateResult): Promise<unknown>;
-  /** The frame budget's learned cost of ONE reveal compile, which becomes the
-   *  key's soft deadline once multiplied by its root count. What it learns is
-   *  the compileAsync PROLOGUE (1 to 3 ms), not the driver's link wall time,
-   *  so the deadline sits at its REVEAL_SOFT_DEADLINE_MIN_MS floor in
-   *  practice; a learned wall time is future work. Harmless either way: the
-   *  soft deadline is telemetry and never reveals anything. */
+  /** The frame budget's learned cost of ONE reveal compile unit (a piece,
+   *  since the gate submits one unit per material group), which becomes the
+   *  key's soft deadline once multiplied by the number of pieces its roots
+   *  submit. What it learns is the compileAsync PROLOGUE (1 to 3 ms), not the
+   *  driver's link wall time, so the deadline sits at its
+   *  REVEAL_SOFT_DEADLINE_MIN_MS floor in practice; a learned wall time is
+   *  future work. Harmless either way: the soft deadline is telemetry and
+   *  never reveals anything. */
   predictRevealMs(): number;
 }
 
 export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealCompileHost {
+  // How many pieces each root's compile submitted, so the key's expected
+  // cost reads what was submitted instead of walking the roots a second time
+  // in the deciding frame.
+  const submittedPieces = new WeakMap<object, number>();
   return {
     compile(root: object, imminent: boolean): Promise<unknown> {
       const target = root as THREE.Object3D;
       const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;
-      const linked = deps.gate(linkPieceWork(target, deps.compileColor, deps.compileShadow), {
+      const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow);
+      submittedPieces.set(target, pieces.length);
+      const linked = deps.gate(pieces, {
         priority,
         label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`,
       });
@@ -72,8 +80,15 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
         .then((gate) => deps.upload(target, priority).then(() => gate))
         .then((gate) => deps.touch(target, priority, gate));
     },
-    expectedMs(_key: string, rootCount: number): number {
-      return revealSoftDeadlineMs(deps.predictRevealMs(), rootCount);
+    expectedMs(_key: string, _rootCount: number, roots: readonly object[]): number {
+      // The budget learns per PIECE (one queue unit per material group), so
+      // the key's expected cost is the piece count of its roots, not the root
+      // count: a town kit root is many pieces, a batch root one.
+      let pieces = 0;
+      for (const root of roots) {
+        pieces += submittedPieces.get(root) ?? linkPiecesOf(root as THREE.Object3D).length;
+      }
+      return revealSoftDeadlineMs(deps.predictRevealMs(), pieces);
     },
   };
 }

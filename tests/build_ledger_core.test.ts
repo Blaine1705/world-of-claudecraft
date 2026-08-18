@@ -11,6 +11,8 @@ describe('buildLedgerLane', () => {
     expect(buildLedgerLane('view:composed')).toBe('view');
     expect(buildLedgerLane('zone:features:buildRealmFlora')).toBe('zone');
     expect(buildLedgerLane('zone-wall:terrain')).toBe('wall');
+    expect(buildLedgerLane('view-part:assemble')).toBe('part');
+    expect(buildLedgerLane('view-part:assemble:parts')).toBe('part');
     expect(buildLedgerLane('mount')).toBe('other');
   });
 });
@@ -62,19 +64,24 @@ describe('createBuildLedger', () => {
     expect(snap.slowest.map((s) => s.kind)).toEqual(['view:rig']);
   });
 
-  it('files a view-part sub-span under other: in kinds, out of the frame view spend', () => {
+  it('keeps a view-part sub-span per kind, out of the frame spend, worst frame and slowest ring', () => {
+    // The sub-spans are NESTED in the outer build: their ms is already inside
+    // its 60, so the frame counts the outer build only, once.
     const ledger = createBuildLedger();
     ledger.record('view:composed', 60, 1);
     ledger.record('view-part:assemble', 40, 2);
     ledger.record('view-part:assemble:parts', 25, 3);
-    expect(buildLedgerLane('view-part:assemble')).toBe('other');
     const spend = ledger.frameSpend();
     expect(spend.viewMs).toBe(60);
     expect(spend.zoneMs).toBe(0);
-    expect(spend.totalMs).toBe(125);
-    const kinds = ledger.snapshot().kinds;
-    expect(kinds['view-part:assemble'].lastMs).toBe(40);
-    expect(kinds['view-part:assemble:parts'].maxMs).toBe(25);
+    expect(spend.totalMs).toBe(60);
+    expect(spend.count).toBe(1);
+    ledger.beginFrame();
+    const snap = ledger.snapshot();
+    expect(snap.kinds['view-part:assemble'].lastMs).toBe(40);
+    expect(snap.kinds['view-part:assemble:parts'].maxMs).toBe(25);
+    expect(snap.worstFrame).toEqual({ ms: 60, count: 1, atMs: 1 });
+    expect(snap.slowest.map((s) => s.kind)).toEqual(['view:composed']);
   });
 
   it('remembers the worst frame with its build count and first timestamp', () => {

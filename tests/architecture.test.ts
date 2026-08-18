@@ -450,6 +450,7 @@ const RENDER_PURE_CORES = [
   'src/render/affliction_familiar_core.ts',
   'src/render/arrival_event_core.ts',
   'src/render/build_ledger_core.ts',
+  'src/render/hitch_frame_align_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
