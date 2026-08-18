@@ -93,6 +93,7 @@ describe('Warlock Soulwell', () => {
     expect(first).toHaveLength(1);
     expect(first[0].soulwell).toEqual({
       ownerId,
+      partyId: 1,
       eligiblePlayerIds: [ownerId, allyId],
       wardAbsorbPctMax: 0,
       wardedPlayerIds: [],

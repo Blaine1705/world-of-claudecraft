@@ -6,7 +6,7 @@
 // its derived npc_modular_<id> VisualDef, every def resolvable).
 
 import { describe, expect, it } from 'vitest';
-import { VISUALS } from '../src/render/characters/manifest';
+import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { ARMOR_SETS, ARMOR_SLOTS, normalizeAppearance } from '../src/render/characters/modular';
 import {
   aldricKeepsHisRig,
@@ -49,6 +49,14 @@ describe('npc looks roster', () => {
     ]) {
       expect(npcLookFor(id), id).not.toBeNull();
     }
+  });
+
+  it('keeps mob-kind Sexton Marrow on the mob visual while NPC-kind composes', () => {
+    const npcLook = npcLookFor('sexton_marrow', 'npc');
+    expect(npcLook).not.toBeNull();
+    expect(npcLookFor('sexton_marrow')).toBe(npcLook);
+    expect(npcLookFor('sexton_marrow', 'mob')).toBeNull();
+    expect(visualKeyFor({ kind: 'mob', templateId: 'sexton_marrow' } as never)).toBe('skel_mage');
   });
 
   // Aldric's hub ids are covered by the dedicated null test above; asserting

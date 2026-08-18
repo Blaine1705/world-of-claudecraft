@@ -1453,6 +1453,10 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
     advanceDelveModule(ctx, run);
     return true;
   }
+  if (state.kind === 'drowned_reliquary' && !state.looted && delveHasLiveMobs(ctx, run)) {
+    ctx.error(r.meta.entityId, 'Clear the remaining enemies first.');
+    return false;
+  }
   const riteOutcome = interactDrownedLitanyRite(ctx, run, objectId, r.meta.entityId);
   if (riteOutcome.handled) return riteOutcome.succeeded;
   if (state.kind === 'locked_chest') {

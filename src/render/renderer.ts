@@ -1790,15 +1790,15 @@ export class Renderer {
   // One shared lane for background work that touches WebGL. Idle callbacks from
   // independent zone/sky/archetype tasks can otherwise all start in one frame.
   private backgroundGpuWork = createBackgroundGpuQueue();
-  // Serial tail for spirit-puppet construction: several models resolve at once
-  // when a class is first sighted, so the builds queue behind one another and
-  // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
-  // Warms the local player's own body spirit (ghost) shader variants ahead of
-  // death, so the ungated self view never links them inline on a spirit release
-  // (the measured ~2.2 s death stall). See self_spirit_prewarm.ts + warmSelfSpirit.
   private selfSpirit = new SelfSpiritPrewarmer({
-    warm: () => this.warmSelfSpirit(),
+    warm: () =>
+      this.backgroundGpuWork.run(
+        () => this.warmSelfSpirit(),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        'self-spirit',
+        { releaseTail: true },
+      ),
     idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
   });
   // Static terrain/water/features just beyond the current zone are built in a
@@ -5686,10 +5686,10 @@ export class Renderer {
   // prologue, then restores the opaque originals BEFORE awaiting the linker
   // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
   // and the clones the flip reuses stay cached on the visual.
-  private async warmSelfSpirit(): Promise<void> {
-    if (!this.asyncCompileSupported || this.sim.player.ghost) return;
+  private async warmSelfSpirit(): Promise<boolean> {
+    if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
     const visual = this.views.get(this.sim.player.id)?.visual;
-    if (!visual) return;
+    if (!visual) return false;
     const previousTarget = this.webgl.getRenderTarget();
     // Composer tiers link the ghost variant against their offscreen colour space.
     if (this.post) this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
@@ -5703,8 +5703,8 @@ export class Renderer {
       visual.setGhost(false);
     }
     await compilePromise;
+    return true;
   }
-
   // A tiny throwaway target for background child uploads, so a prewarm root
   // that is briefly visible during its bounded call is never presented on
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.

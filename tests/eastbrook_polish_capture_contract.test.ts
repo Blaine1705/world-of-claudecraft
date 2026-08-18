@@ -211,8 +211,11 @@ interface AttributionTargetFixture {
 // Re-minted for the approved PR #3425 merge into the v0.39 wrapper: the
 // resolved renderer bytes combine the delve tracker extraction with later
 // wrapper fixes. No capture was retaken.
+// Re-minted after syncing current release/v0.39.0 into the v0.39 wrapper: the
+// resolved renderer bytes retain the queued self-spirit prewarm and delve
+// rebuild repair. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'b03aa42c8eb0d92f0500089860977f0301d502e28779c8fbe9de7f4c5eb8b181';
+  '2772a342485f6158c9c05d7b2915e2535388775df9722d7a06fe68a4b412c5e4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
