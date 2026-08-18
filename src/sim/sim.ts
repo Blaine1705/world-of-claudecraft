@@ -320,6 +320,7 @@ import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from '
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { findNearbyAllies } from './mob/nearby_allies';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
+import { questGateBlocksAggro } from './mob/quest_gated_aggro';
 import {
   createMobScanCounters,
   type MobScanCounters,
@@ -7427,6 +7428,11 @@ export class Sim {
   // Taunt/Growl, classic semantics: never misses, lifts the caster's threat to
   // the top of the table, and forces the mob onto the caster for 3 seconds.
   private applyTaunt(p: Entity, mob: Entity): void {
+    // The one shared taunt entry (single-target, area, hunter/warlock pet growl,
+    // necromancy undead): a quest-gated mob must stay untouchable in this direction
+    // too, or an area taunt swept over a hidden Broodmother egg would still seed
+    // threat/forcedTargetId and force it into combat with a non-quester.
+    if (questGateBlocksAggro(this.players, mob, p)) return;
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
@@ -7828,7 +7834,7 @@ export class Sim {
     return mobCombatProfileFn(mob);
   }
 
-  aggroMob(mob: Entity, target: Entity, social: boolean): void {
+  aggroMob(mob: Entity, target: Entity, social: boolean): boolean {
     if (
       mob.dead ||
       mob.aiState === 'evade' ||
@@ -7836,7 +7842,10 @@ export class Sim {
       mob.aiState === 'attack' ||
       mob.aiState === 'flee'
     )
-      return;
+      return false;
+    // A quest-gated destructible (e.g. a Broodmother egg) never autonomously pulls a
+    // player its own damage gate would refuse: see mob/quest_gated_aggro.ts.
+    if (questGateBlocksAggro(this.players, mob, target)) return false;
     mob.aiState = 'chase';
     mob.aggroTargetId = target.id;
     mob.inCombat = true;
@@ -7888,6 +7897,7 @@ export class Sim {
         }
       });
     }
+    return true;
   }
 
   private updateMob(mob: Entity): void {
