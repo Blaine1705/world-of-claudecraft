@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
@@ -65,7 +66,7 @@ const STONE_DETAIL_CONSUMERS: Record<string, 'material-slot' | 'uniform'> = {
 
 describe('stoneDetailNormal consumers', () => {
   const root = new URL('../src/render/', import.meta.url);
-  const files = tsFilesUnder(root.pathname);
+  const files = tsFilesUnder(fileURLToPath(root));
 
   it('scans the whole render tree', () => {
     // Vacuity floor: the walk is recursive over a deep root, so a real count

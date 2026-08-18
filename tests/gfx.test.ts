@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DEVICE_MEMORY_GB_KEY, ENTRY_TIGHT_MODE_KEY } from '../src/device_memory_hint';
@@ -1300,7 +1301,7 @@ describe('surfaceMat dedupe key', () => {
     // Every caller in the tree, not the two that once did it: the write is
     // legal on a material a caller owns and a live relink on a shared one, and
     // nothing tells the two apart at the call site.
-    const callers = tsFilesUnder(new URL('../src/render/', import.meta.url).pathname)
+    const callers = tsFilesUnder(fileURLToPath(new URL('../src/render/', import.meta.url)))
       .map(({ file, full }) => ({ file, source: readFileSync(full, 'utf8') }))
       .filter(({ source }) => source.includes('surfaceMat('));
 

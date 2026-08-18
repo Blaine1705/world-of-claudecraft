@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -80,7 +81,7 @@ describe('a landed composed portrait reaches its consumers', () => {
   });
 
   it('enumerates the consumers: a new composed subject fails until it is pinned', () => {
-    const found = tsFilesUnder(new URL('../src/', import.meta.url).pathname)
+    const found = tsFilesUnder(fileURLToPath(new URL('../src/', import.meta.url)))
       .filter((f) =>
         asksForAComposedPortrait(codeWithoutLineComments(readFileSync(f.full, 'utf8'))),
       )
