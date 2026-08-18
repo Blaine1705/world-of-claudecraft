@@ -474,10 +474,13 @@ export class GamepadManager {
       // item drag, a spot on the map), so nothing is lost.
       const dir = DPAD_NAV_DIRECTIONS[idx];
       if (dir !== undefined) {
-        // Fall back to nudging the free cursor when the open surface has nothing
-        // focusable to step between: the d-pad used to move the cursor, and a
-        // window the focus order cannot reach must not lose that.
-        if (!moveDpadFocus(dir)) this.nudgeCursor(dir);
+        // Snap the cursor onto whatever took focus: focus alone is invisible on a
+        // pad, so without this the screen does not move and the press appears to
+        // do nothing. Falls back to nudging the cursor when the open surface has
+        // nothing focusable to step between.
+        const focused = moveDpadFocus(dir);
+        if (focused) this.moveCursorTo(focused.x, focused.y);
+        else this.nudgeCursor(dir);
         continue;
       }
       // A presses the focused control, falling back to the cursor when the d-pad
@@ -487,6 +490,16 @@ export class GamepadManager {
       } else if (idx === GP.B || idx === GP.START) this.cb.onAction('escape');
     }
     return acted;
+  }
+
+  // Park the cursor at a point (the centre of a newly focused control).
+  private moveCursorTo(x: number, y: number): void {
+    this.cursorX = x;
+    this.cursorY = y;
+    if (this.cursorEl) {
+      this.cursorEl.style.left = `${x}px`;
+      this.cursorEl.style.top = `${y}px`;
+    }
   }
 
   // One d-pad step of the free cursor, for a surface with no focusable controls.

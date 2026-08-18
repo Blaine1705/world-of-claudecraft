@@ -38,20 +38,33 @@ function toRect(el: HTMLElement): NavRect {
   return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
 }
 
+/** Where the virtual cursor should sit after a focus move: the centre of the
+ *  control that now has focus. */
+export interface DpadFocusResult {
+  x: number;
+  y: number;
+}
+
 /**
- * Move focus one step in `dir`. Answers whether focus actually moved, so the
- * caller can fall back to the free cursor when a window has nothing to navigate.
+ * Move focus one step in `dir`, answering the new focus centre so the caller can
+ * SNAP the virtual cursor onto it. Focus alone is invisible on a pad: the player
+ * is watching the cursor, so the two must travel together (and it keeps a press
+ * at the cursor and a press on the focused control the same act).
+ *
+ * Answers null when nothing moved, so the caller can fall back to the free cursor.
  */
-export function moveDpadFocus(dir: NavDirection): boolean {
+export function moveDpadFocus(dir: NavDirection): DpadFocusResult | null {
   const root = activeRoot() ?? document;
   const els = focusables(root);
-  if (els.length === 0) return false;
+  if (els.length === 0) return null;
   const active = document.activeElement as HTMLElement | null;
   const current = active ? els.indexOf(active) : -1;
   const next = nextFocusIndex(els.map(toRect), current, dir);
-  if (next < 0 || next === current) return false;
-  els[next].focus();
-  return true;
+  if (next < 0 || next === current) return null;
+  const el = els[next];
+  el.focus();
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
 
 /** Press whatever the d-pad has focused. Answers false when nothing is focused,
