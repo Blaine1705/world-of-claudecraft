@@ -46,6 +46,8 @@ import {
   WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BOND_POLL_PARK_SECONDS,
+  WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS,
+  WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS,
   WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
@@ -8500,5 +8502,38 @@ describe('review-round closures (the shared strike gate and the cooldown params)
     expect((await claim2()).ok, 'cap: one second before, still refused').toBe(false);
     h2.setNow(capAtMs);
     expect((await claim2()).ok, 'cap: at the announced moment, admitted').toBe(true);
+  });
+
+  it('both arms refusing with the per-listing cooldown LATER: the reclaim moment wins, in the fake too', async () => {
+    // The other direction of the max-combining rule (the cap-later case is
+    // pinned above): a fresh abandon on THIS listing 5 minutes ago under the
+    // 30-minute re-claim cooldown, plus older abandons on other listings that
+    // fill the hourly cap with a boundary 45 minutes old (draining in 15). A
+    // "cap wins when present" combiner would announce a moment this listing
+    // still refuses; the fake must agree with the Pg twin.
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const reclaimSeedMs = BASE_MS - 5 * 60_000;
+    await h.db.recordBuyNowAbandon(REALM, listing.id, BUYER_A, reclaimSeedMs);
+    for (let i = 0; i < WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR - 1; i++) {
+      h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+      const other = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+      await h.db.recordBuyNowAbandon(REALM, other.id, BUYER_A, BASE_MS - 45 * 60_000 - i * 1000);
+    }
+    const out = await h.service.buyNow({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      acceptTerms: true,
+    });
+    const retryAtMs = reclaimSeedMs + WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
+    expect(retryAtMs, 'the fixture premise: reclaim outlasts the cap drain').toBeGreaterThan(
+      BASE_MS - 45 * 60_000 + WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000,
+    );
+    expect(out).toEqual({
+      ok: false,
+      reason: 'claim_cooldown',
+      params: { retryAfterSeconds: Math.ceil((retryAtMs - h.now()) / 1000) },
+    });
   });
 });

@@ -1528,7 +1528,19 @@ describe('honest deal endings (H13): closed is not settled', () => {
       openTrade(r);
       await flushAsync();
       expect(r.host.logs, resolution).toContain(t(key));
-      expect(r.host.logs.join('\n'), resolution).not.toContain('received a payment');
+      // Never the ROLE-CORRECT paid line: the buyer's is "sent a payment",
+      // the seller's "received a payment" (a negative pin of the other role's
+      // phrase would pass for free).
+      const paidKey =
+        role === 'buyer' ? 'hudChrome.trade.woc.paidBuyer' : 'hudChrome.trade.woc.paidSeller';
+      const paidPhrase = role === 'buyer' ? 'sent a payment' : 'received a payment';
+      expect(t(paidKey, { price: 'p', item: 'i' }), "the phrase is this role's line").toContain(
+        paidPhrase,
+      );
+      expect(r.host.logs.join('\n'), resolution).not.toContain(paidPhrase);
+      // Every closed arm leaves the session OPEN (a dead deal is not a
+      // completed one), the same as the cancelled arm above.
+      expect(r.host.closed, resolution).toBe(0);
       vi.useRealTimers();
     }
   });
@@ -2440,6 +2452,47 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
     expect(c.wocTradeSettlement?.id, 'the held settlement survives for the re-quote').toBe(5);
     expect(r.host.logs.join('\n')).not.toContain('User rejected the request.');
     expect(r.host.logs).toContain(t('hudChrome.walletBridge.cancelled'));
+  });
+
+  it('an UNKNOWN wallet failure while signing renders the PAYMENT-flavored generic, never the sign one', async () => {
+    // The classifier's flavor only shows through on an unknown message: the
+    // controller's sign sink must ask for the payment flavor ("did not complete
+    // the payment"), not the confirmation-signing copy the step-up arm uses.
+    const h = fakeHooks();
+    h.state.buyNowImpl = () =>
+      Promise.resolve({ ...settled(), quote: { ...settled().quote, signatureRequired: true } });
+    h.state.signAndSendImpl = () => Promise.reject(new Error('provider had a bad day'));
+    const { r, c } = await escrowedBuyer(h);
+    await c.payWocTradeOffer();
+    await c.signWocTradeQuote();
+    const joined = r.host.logs.join('\n');
+    expect(r.host.logs.at(-1)).toBe(t('hudChrome.wocMarket.signFailed'));
+    expect(joined).not.toContain(t('hudChrome.wocMarket.signFailedConfirm'));
+    expect(joined).not.toContain('provider had a bad day');
+  });
+
+  it('the Pay claim in flight is in the repaint signature: the pressed button repaints disabled at once', async () => {
+    // Mirror of the seller's Accept-in-flight pin: the buyer's Pay flag is the
+    // ONLY thing that changes between the press and the quote landing, so it
+    // must invalidate the signature or the pressed button keeps reading
+    // pressable through both claim round trips.
+    const h = fakeHooks();
+    const { r, c } = await escrowedBuyer(h);
+    (c as unknown as { wocTradeOfferPolledAtMs: number }).wocTradeOfferPolledAtMs =
+      Date.now() + 1_000_000;
+    r.controller.updateTradeWindow();
+    const before = document.querySelector<HTMLButtonElement>('#trade-window [data-woc-pay]');
+    expect(before, 'the payable face renders Pay').not.toBeNull();
+    expect(before?.disabled).toBe(false);
+    c.wocTradePaying = true;
+    r.controller.updateTradeWindow();
+    const during = document.querySelector<HTMLButtonElement>('#trade-window [data-woc-pay]');
+    expect(during, 'the flag flip repainted the face').not.toBeNull();
+    expect(during?.disabled, 'the pressed Pay reads disabled').toBe(true);
+    c.wocTradePaying = false;
+    r.controller.updateTradeWindow();
+    const after = document.querySelector<HTMLButtonElement>('#trade-window [data-woc-pay]');
+    expect(after?.disabled, 'and pressable again once the round trip ends').toBe(false);
   });
 
   it('a quote failure AFTER the claim keeps the settlement: the next Pay re-quotes without a second buyNow', async () => {

@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { setLanguage } from '../src/ui/i18n';
 import { usdDollarsText, usdText } from '../src/ui/usd_text';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 afterEach(() => {
@@ -63,10 +64,10 @@ describe('the grep-proof: zero hardcoded currency spellings in src/ui, src/game,
     // (wocUsdText, the Claudium pack labels, the daily-rewards prize lines):
     // a literal "$" glued to a localized number. Catalog English (translatable
     // copy) does not match these shapes. Swept over src/ui, src/game, and
-    // src/net on COMMENT-STRIPPED source, so a money surface moving
+    // src/net on COMMENT-STRIPPED source (the shared single-pass stripper: a
+    // block-first strip treats a bare slash-star inside a line comment as an
+    // opener and hides real code from the sweep), so a money surface moving
     // directories or a commented example cannot skew it.
-    const stripComments = (src: string): string =>
-      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
     const offenders: string[] = [];
     for (const dir of ['src/ui', 'src/game', 'src/net']) {
       for (const file of tsFilesUnder(dir)) {

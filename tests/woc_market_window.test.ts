@@ -1492,6 +1492,15 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     // (resolveNotice), so a language switch never strands the toast.
     expect(sign).toContain("kind: 'bondPending', reason: out.reason ?? null");
     expect(sign).toContain("kind: 'pending', reason: out.reason ?? null");
+    // The wallet failure on THIS leg renders the CLASSIFIED payment-flavored
+    // line, never err.message raw (the wallet-bridge i18n medium; the sign
+    // flavor belongs to the step-up arm in submitListing, pinned above).
+    expect(sign).toContain("kind: 'bridge'");
+    expect(sign).toContain('walletBridgeReason(err)');
+    expect(sign).toContain("flavor: 'payment'");
+    expect(sign).not.toContain("flavor: 'sign'");
+    expect(sign).not.toContain('err.message');
+    expect(sign).toContain('console.warn');
     // And the RESOLVE side keeps the two mappers apart: the bond kind renders
     // through the bond voice, never the purchase-money copy (a swapped mapper
     // survived the store-side pin alone).

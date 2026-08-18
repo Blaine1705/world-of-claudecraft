@@ -99,10 +99,12 @@ describeDb('woc market settlement guards against real Postgres', () => {
       buyNowCents?: number | null;
       offerNext?: boolean;
       reserveCents?: number | null;
+      itemId?: string;
     } = {},
   ): Promise<number> {
     seq++;
     const endsAtMs = over.endsAtMs ?? BASE_MS + 60 * MINUTE_MS;
+    const itemId = over.itemId ?? 'crown_of_embers';
     const res = await pool.query(
       `INSERT INTO woc_market_listings (
          realm, seller_account, seller_character, seller_name, seller_wallet,
@@ -118,8 +120,8 @@ describeDb('woc market settlement guards against real Postgres', () => {
         9000 + seq,
         `Seller${seq}`,
         `wallet-seller-${seq}`,
-        JSON.stringify({ itemId: 'crown_of_embers', count: 1 }),
-        'crown_of_embers',
+        JSON.stringify({ itemId, count: 1 }),
+        itemId,
         over.reserveCents ?? null,
         over.buyNowCents === undefined ? 1000 : over.buyNowCents,
         over.offerNext ?? false,
@@ -1457,11 +1459,18 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const realm = `settlements-itemized-${Date.now()}`;
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const listingId = await seedListing(realm, seller);
-      await seedSettlement(realm, listingId, buyer);
+      // TWO listings with DIFFERENT items, both settled by the same buyer: the
+      // pin reaches the CORRELATION itself (a single-listing seed passes an
+      // uncorrelated lookup that names every row after the first listing).
+      const crown = await seedListing(realm, seller);
+      const plate = await seedListing(realm, seller, { itemId: 'deathlord_warplate' });
+      await seedSettlement(realm, crown, buyer);
+      await seedSettlement(realm, plate, buyer);
       const rows = await marketDb.settlementsByAccount(realm, buyer, 10);
-      expect(rows).toHaveLength(1);
-      expect(rows[0].itemId, 'the correlated listing lookup').toBe('crown_of_embers');
+      expect(rows).toHaveLength(2);
+      const named = new Map(rows.map((r) => [r.listingId, r.itemId]));
+      expect(named.get(crown), 'the correlated listing lookup, row 1').toBe('crown_of_embers');
+      expect(named.get(plate), 'the correlated listing lookup, row 2').toBe('deathlord_warplate');
     });
   });
 });

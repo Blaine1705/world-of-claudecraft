@@ -13,12 +13,11 @@ import {
   walletBridgeErrorText,
   walletBridgeReason,
 } from '../src/ui/wallet_bridge_reason_text';
-
 // Comment-stripped before any pin reads a source, or a commented-out throw
-// site keeps a mapping "alive" (the comment-gameable trap; the URL-guarded
-// line strip the sibling market-window pins use).
-const stripCommentsForPin = (src: string): string =>
-  src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+// site keeps a mapping "alive" (the comment-gameable trap); the shared
+// single-pass stripper, so a bare slash-star inside a line comment cannot
+// swallow the real throw sites below it.
+import { stripComments } from './helpers/strip_comments';
 
 describe('classification', () => {
   it('classifies the two cancel NAMES structurally, whatever the message says', () => {
@@ -132,10 +131,10 @@ describe('the drift pin: every mapped literal exists verbatim in a bridge source
     'src/net/desktop_wallet_handoff.ts',
   ];
   // main.ts owns two more of the hand-off's throw strings; it joins RAW (the
-  // naive block-comment strip swallows its glob strings, the judged
-  // main.ts-pin posture), which only makes the presence check more lenient.
+  // judged main.ts-pin posture: its glob strings carry comment markers no
+  // stripper tokenizes), which only makes the presence check more lenient.
   const corpus = [
-    ...sources.map((p) => stripCommentsForPin(readFileSync(p, 'utf8'))),
+    ...sources.map((p) => stripComments(readFileSync(p, 'utf8'))),
     readFileSync('src/main.ts', 'utf8'),
   ].join('\n');
 

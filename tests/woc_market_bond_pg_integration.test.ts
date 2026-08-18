@@ -200,10 +200,12 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       lockAccount?: number | null;
       lockExpiresAtMs?: number | null;
       cancelRequestedAtMs?: number | null;
+      itemId?: string;
     } = {},
   ): Promise<number> {
     seq++;
     const endsAtMs = over.endsAtMs ?? BASE_MS + 60 * MINUTE_MS;
+    const itemId = over.itemId ?? 'crown_of_embers';
     const res = await pool.query(
       `INSERT INTO woc_market_listings (
          realm, seller_account, seller_character, seller_name, seller_wallet,
@@ -223,8 +225,8 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         9000 + seq,
         `Seller${seq}`,
         `wallet-seller-${seq}`,
-        JSON.stringify({ itemId: 'crown_of_embers', count: 1 }),
-        'crown_of_embers',
+        JSON.stringify({ itemId, count: 1 }),
+        itemId,
         over.buyNowCents === undefined ? 1000 : over.buyNowCents,
         over.status ?? 'active',
         endsAtMs,
@@ -1482,6 +1484,37 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       expect(booked.rowCount, 'the fourth abandon was recorded').toBe(1);
     });
 
+    it('when THIS listing re-claim cooldown outlasts the cap drain, the reclaim moment wins', async () => {
+      // The other direction of the max-combining rule: the case above has the
+      // cap drain later; here the per-listing cooldown is the later moment
+      // (a fresh abandon on this listing 5 minutes ago under a 30-minute
+      // cooldown, while the cap-th newest in-window abandon is 45 minutes old
+      // and drains in 15). A "cap wins when present" combiner would send the
+      // player back 10 minutes before this listing admits them.
+      const realm = `reclaim-later-${++seq}`;
+      const seller = await seedAccount();
+      const abuser = await seedAccount();
+      const cap = rulesMod.WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR;
+      const windowMs = rulesMod.WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000;
+      const cooldownMs = rulesMod.WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
+      const capBoundaryMs = BASE_MS - 45 * MINUTE_MS;
+      const reclaimSeedMs = BASE_MS - 5 * MINUTE_MS;
+      // The fixture's premise, stated so a tunable change fails loudly here
+      // rather than silently flipping which arm is later.
+      expect(reclaimSeedMs + cooldownMs).toBeGreaterThan(capBoundaryMs + windowMs);
+      const listingId = await seedListing(realm, seller);
+      await marketDb.recordBuyNowAbandon(realm, listingId, abuser, reclaimSeedMs);
+      // Older abandons on OTHER listings fill the cap: with the fresh one they
+      // number cap, and the cap-th newest is the 45-minute-old boundary.
+      for (let i = 0; i < cap - 1; i++) {
+        const other = await seedListing(realm, seller);
+        await marketDb.recordBuyNowAbandon(realm, other, abuser, capBoundaryMs - i * 1000);
+      }
+      expect(
+        await marketDb.claimBuyNowLock(realm, listingId, abuser, BASE_MS, BASE_MS + 270_000),
+      ).toEqual({ refusal: 'claim_cooldown', retryAtMs: reclaimSeedMs + cooldownMs });
+    });
+
     it('a directed buyer is exempt from the public-loop cooldowns', async () => {
       const realm = `directed-${++seq}`;
       const seller = await seedAccount();
@@ -1690,11 +1723,19 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       const realm = `bids-itemized-${++seq}`;
       const seller = await seedAccount();
       const bidder = await seedAccount();
-      const listingId = await seedListing(realm, seller);
-      await seedBid(realm, listingId, bidder, { status: 'active' });
+      // TWO listings with DIFFERENT items, both bid on by the same account:
+      // the pin reaches the CORRELATION itself. A single-listing seed passes
+      // an uncorrelated lookup (any listing's item, the first by id) that
+      // would name every row after the same item.
+      const crown = await seedListing(realm, seller);
+      const plate = await seedListing(realm, seller, { itemId: 'deathlord_warplate' });
+      await seedBid(realm, crown, bidder, { status: 'active', placedAtMs: BASE_MS - 2_000 });
+      await seedBid(realm, plate, bidder, { status: 'active', placedAtMs: BASE_MS - 1_000 });
       const rows = await marketDb.bidsByAccount(realm, bidder, 10);
-      expect(rows).toHaveLength(1);
-      expect(rows[0].itemId, 'the correlated listing lookup').toBe('crown_of_embers');
+      expect(rows).toHaveLength(2);
+      const named = new Map(rows.map((r) => [r.listingId, r.itemId]));
+      expect(named.get(crown), 'the correlated listing lookup, row 1').toBe('crown_of_embers');
+      expect(named.get(plate), 'the correlated listing lookup, row 2').toBe('deathlord_warplate');
       // The pruned-listing '' arm is UNREACHABLE against real referential
       // integrity (bids CASCADE with their listing), so the guard is
       // defensive; the wire's empty-to-null collapse is pinned separately.

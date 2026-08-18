@@ -425,7 +425,13 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
 
   it('says when the offer lapses, and stays silent when the wire did not say', () => {
     const withExpiry = paint(deps({ pendingOffer: { ...offer, expiresAtMs: 1_800_000_000_000 } }));
-    expect(withExpiry.querySelector('.trade-woc-note')?.textContent ?? '').not.toBe('');
+    // The exact line, not merely "something": a swapped-in unrelated note
+    // (the notInstant warn, say) must not satisfy the deadline promise.
+    expect(withExpiry.querySelector('.trade-woc-note')?.textContent).toBe(
+      t('hudChrome.trade.woc.offerExpiresAt', {
+        time: formatDateTime(1_800_000_000_000, { timeStyle: 'short' }),
+      }),
+    );
     const without = paint(deps({ pendingOffer: offer }));
     // No fabricated deadline: absent means say nothing (the notInstant warn
     // still renders, so scope the check to the expiry note class).
@@ -728,6 +734,30 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     expect(VIEW, 'which skips retired ids').toContain('!finished.has(o.id)');
   });
 
+  it('the repaint signature projects the quote structurally and carries the in-flight flags', () => {
+    // The seam round's anti-property: the sig rides the quote's FIGURES, never
+    // the transaction blob (serializing it every medium-band pass buys no
+    // repaint), and the Pay / resolve / cancel-pending flags are render state
+    // (a pressed button that keeps reading pressable is the elision bug).
+    const sig = CONTROLLER.slice(
+      CONTROLLER.indexOf('const sig = JSON.stringify(['),
+      CONTROLLER.indexOf('if (sig === this.lastTradeSig) return;'),
+    );
+    expect(sig.length).toBeGreaterThan(0);
+    expect(sig).toContain('this.wocTradeQuote.totalTokens');
+    expect(sig).toContain('this.wocTradeQuote.expiresAtMs');
+    expect(sig).not.toContain('transactionBase64');
+    expect(sig).toContain('this.wocTradeSettlement.deadlineAtMs');
+    for (const flag of [
+      'this.wocTradePaying',
+      'this.wocTradeResolving',
+      'this.wocTradeCancelPendingFor',
+      'this.wocTradeAccepting',
+    ]) {
+      expect(sig, flag).toContain(flag);
+    }
+  });
+
   it('resolves the outcome even when the OTHER side closed the window first', () => {
     // The race that shipped: finishWocTrade ends the trade for both players, and
     // the offer poll runs only while a trade is open. Whichever side noticed
@@ -954,6 +984,10 @@ describe('the consent row and the quote review (R9 + informed commitment)', () =
     expect(box).not.toBeNull();
     const link = root.querySelector<HTMLAnchorElement>('.trade-woc-terms-link');
     expect(link?.getAttribute('href')).toBe('/terms');
+    // Off-site in a new tab with no opener: the game keeps running (the
+    // deal is live), and the terms page never gets a handle on the game.
+    expect(link?.getAttribute('target')).toBe('_blank');
+    expect(link?.getAttribute('rel')).toBe('noopener noreferrer');
     box?.click();
     box?.dispatchEvent(new Event('change'));
     expect(d.onTermsChange).toHaveBeenCalledWith(true);
@@ -990,12 +1024,42 @@ describe('the consent row and the quote review (R9 + informed commitment)', () =
     expect(root.querySelector('[data-woc-pay]'), 'Pay yields to the review').toBeNull();
     const text = root.textContent ?? '';
     expect(text).toContain('812.5');
+    // The quote's own expiry, in the shared Exchange wording, and the title
+    // announced (role=status) so a screen reader hears the face swap.
+    expect(text).toContain(
+      t('hudChrome.wocMarket.quoteExpiresAt', {
+        time: formatDateTime(1_800_000_000_000, { timeStyle: 'short' }),
+      }),
+    );
+    expect(
+      [...root.querySelectorAll<HTMLElement>('p[role="status"]')].map((p) => p.textContent),
+    ).toContain(t('hudChrome.wocMarket.quoteTitle'));
     const sign = root.querySelector<HTMLElement>('[data-woc-sign]');
     expect(sign?.textContent).toBe(t('hudChrome.wocMarket.quoteSign'));
     sign?.click();
     expect(d.onSignQuote).toHaveBeenCalled();
     root.querySelector<HTMLElement>('[data-woc-quote-cancel]')?.click();
     expect(d.onQuoteCancel).toHaveBeenCalled();
+  });
+
+  it('a quote with no expiry on the wire says nothing about lapsing (no fabricated deadline)', () => {
+    const root = paint(
+      deps({
+        pendingOffer: payable,
+        quote: {
+          sellerTokens: null,
+          burnTokens: null,
+          treasuryTokens: null,
+          totalTokens: 812.5,
+          usdCents: 100,
+          expiresAtMs: null,
+        },
+      }),
+    );
+    expect(root.querySelector('[data-woc-sign]'), 'the review still renders').not.toBeNull();
+    const prefix = t('hudChrome.wocMarket.quoteExpiresAt', { time: 'X' }).split('X')[0].trim();
+    expect(prefix.length).toBeGreaterThan(0);
+    expect(root.textContent ?? '').not.toContain(prefix);
   });
 
   it('the review never renders on the seller side: the quote is the buyer money', () => {
