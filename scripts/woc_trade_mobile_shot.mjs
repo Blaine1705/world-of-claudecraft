@@ -10,21 +10,41 @@
 // screenshot per face at the lowest graphics preset.
 //
 // Dev-only, not wired into any npm script or CI gate (the DOM units in
-// tests/trade_woc_panel.test.ts pin the markup; this is the pixel-geometry arm
+// tests/trade_woc_arm_painter.test.ts pin the markup; this is the pixel-geometry arm
 // they cannot see). Landscape phone by default (in-game mobile is landscape
 // only); DESKTOP=1 renders the desktop window instead. Needs `npm run dev`.
 //
 //   node scripts/woc_trade_mobile_shot.mjs
 //   GAME_URL=http://localhost:5188 OUT=tmp/woc-trade node scripts/woc_trade_mobile_shot.mjs
+//   STRESS=1       stubs the extremes instead of the pristine deal: a 16-letter
+//                  partner, the longest sellable item name, the maximum price and
+//                  a seven-figure token quote (files carry a -stress suffix).
+//   SHOT_LANG=ru_RU boots the client in that locale (the wordiest fills) and
+//                  suffixes every capture with the locale.
+//   SHOT_PREFIX=before names the files before-* instead of after-*.
+//   BAGS_OVER=1    leaves the bags window where the trade opens it (the sheet
+//                  split) instead of hiding it before measuring.
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
 
-const URL = process.env.GAME_URL ?? 'http://localhost:5173';
+const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const OUT = process.env.OUT ?? 'docs/screenshots/woc-market';
 const MOBILE = process.env.DESKTOP !== '1';
+const STRESS = process.env.STRESS === '1';
+const SHOT_LANG = process.env.SHOT_LANG ?? '';
+const SHOT_PREFIX = process.env.SHOT_PREFIX ?? 'after';
+const BAGS_OVER = process.env.BAGS_OVER === '1';
+const URL = SHOT_LANG ? `${GAME_URL}/?lang=${encodeURIComponent(SHOT_LANG)}` : GAME_URL;
+const SUFFIX = `${STRESS ? '-stress' : ''}${SHOT_LANG ? `-${SHOT_LANG}` : ''}`;
+// The stubbed deal: pristine by default, the extremes under STRESS (the name
+// cap, the longest sellable name, the maximum price, a seven-figure quote).
+const PARTNER = STRESS ? 'Bartholomewsmith' : 'Aldric';
+const ITEM = STRESS ? 'voidsong_dirk' : 'deathlord_warplate';
+const USD_CENTS = STRESS ? 100000 : 1500;
+const TOKENS = STRESS ? 7812500.25 : 1234.5;
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fails = [];
@@ -80,58 +100,70 @@ console.log('mobile-touch active:', touchOn);
 if (MOBILE) check(touchOn, 'body.mobile-touch is active in the landscape phone viewport');
 
 // Stub the online-only pieces the arm needs, then drive the REAL controller.
-const staged = await page.evaluate(() => {
-  const hud = window.__game.hud;
-  const sim = window.__game.sim;
-  const ITEM = 'deathlord_warplate';
-  const TI = {
-    otherPid: 999,
-    otherName: 'Aldric',
-    myOffer: { items: [], copper: 0 },
-    theirOffer: { items: [{ itemId: ITEM, count: 1 }], copper: 0 },
-    myAccepted: false,
-    theirAccepted: false,
-  };
-  Object.defineProperty(sim, 'tradeInfo', { configurable: true, get: () => TI });
-  const hooks = {
-    client: {
-      status: async () => ({ ok: false }),
-      me: async () => ({ ok: false }),
-      offers: async () => ({ ok: false }),
-      tradePartner: async () => ({ name: 'Aldric', walletVerified: true }),
-    },
-    characterId: () => 1,
-    walletLinked: () => true,
-    signAndSendTransactionBase64: async () => 'sig',
-    signMessageBase58: async () => 'sig',
-  };
-  const ctl = hud.wocTrade;
-  Object.defineProperty(ctl, 'wocMarketHooks', { configurable: true, get: () => hooks });
-  ctl.updateTradeWindow(); // first open: resets the arm state
-  ctl.wocTradePartnerFor = 'Aldric';
-  ctl.wocTradePartner = { name: 'Aldric', walletVerified: true };
-  ctl.wocTradePartnerResolved = true;
-  ctl.wocTradeTermsAccepted = false;
-  ctl.wocTradeMinPriceCents = 100;
-  ctl.wocTradeDirectedHoldSeconds = 600;
-  ctl.wocTradeMode = 'woc';
-  ctl.wocTradeUsdCents = 1500;
-  ctl.wocTradeTokens = 1234.5;
-  ctl.wocTradeSplit = { sellerCents: 1350, burnCents: 75, treasuryCents: 75 };
-  ctl.lastTradeSig = '';
-  ctl.updateTradeWindow();
-  // The trade open also shows the bags window, which on the mobile sheet layout
-  // stacks OVER the trade window; hide it so the probe measures what a player
-  // who closed bags sees, and so elementFromPoint below judges tappability.
-  const bags = document.querySelector('#bags');
-  if (bags instanceof HTMLElement) bags.style.display = 'none';
-  return {
-    open: document.querySelector('#trade-window')?.style.display === 'block',
-    arm: !!document.querySelector('#trade-window .trade-woc-arm'),
-    terms: !!document.querySelector('#trade-window .trade-woc-terms'),
-    link: document.querySelector('#trade-window .trade-woc-terms-link')?.getAttribute('href'),
-  };
-});
+const staged = await page.evaluate(
+  (PARTNER, ITEM, USD_CENTS, TOKENS, BAGS_OVER) => {
+    const hud = window.__game.hud;
+    const sim = window.__game.sim;
+    const TI = {
+      otherPid: 999,
+      otherName: PARTNER,
+      myOffer: { items: [], copper: 0 },
+      theirOffer: { items: [{ itemId: ITEM, count: 1 }], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    };
+    Object.defineProperty(sim, 'tradeInfo', { configurable: true, get: () => TI });
+    const hooks = {
+      client: {
+        status: async () => ({ ok: false }),
+        me: async () => ({ ok: false }),
+        offers: async () => ({ ok: false }),
+        tradePartner: async () => ({ name: PARTNER, walletVerified: true }),
+      },
+      characterId: () => 1,
+      walletLinked: () => true,
+      signAndSendTransactionBase64: async () => 'sig',
+      signMessageBase58: async () => 'sig',
+    };
+    const ctl = hud.wocTrade;
+    Object.defineProperty(ctl, 'wocMarketHooks', { configurable: true, get: () => hooks });
+    ctl.updateTradeWindow(); // first open: resets the arm state
+    ctl.wocTradePartnerFor = PARTNER;
+    ctl.wocTradePartner = { name: PARTNER, walletVerified: true };
+    ctl.wocTradePartnerResolved = true;
+    ctl.wocTradeTermsAccepted = false;
+    ctl.wocTradeMinPriceCents = 100;
+    ctl.wocTradeDirectedHoldSeconds = 600;
+    ctl.wocTradeMode = 'woc';
+    ctl.wocTradeUsdCents = USD_CENTS;
+    ctl.wocTradeTokens = TOKENS;
+    ctl.wocTradeSplit = {
+      sellerCents: Math.floor(USD_CENTS * 0.9),
+      burnCents: Math.ceil(USD_CENTS * 0.03),
+      treasuryCents: Math.ceil(USD_CENTS * 0.07),
+    };
+    ctl.lastTradeSig = '';
+    ctl.updateTradeWindow();
+    // The trade open also shows the bags window. On the touch sheet the two now
+    // split the screen (trade left, bags right); BAGS_OVER keeps that real first
+    // state for the capture and the tappability probe, otherwise the bags are
+    // hidden so the probe measures the trade sheet at full width.
+    const bags = document.querySelector('#bags');
+    if (bags instanceof HTMLElement && !BAGS_OVER) bags.style.display = 'none';
+    return {
+      open: document.querySelector('#trade-window')?.style.display === 'block',
+      arm: !!document.querySelector('#trade-window .trade-woc-arm'),
+      terms: !!document.querySelector('#trade-window .trade-woc-terms'),
+      link: document.querySelector('#trade-window .trade-woc-terms-link')?.getAttribute('href'),
+      bagsOpen: bags instanceof HTMLElement && bags.style.display !== 'none',
+    };
+  },
+  PARTNER,
+  ITEM,
+  USD_CENTS,
+  TOKENS,
+  BAGS_OVER,
+);
 console.log('compose face:', JSON.stringify(staged));
 check(staged.open && staged.arm, 'trade window open with the $WOC arm');
 check(staged.terms, 'consent row renders on the buyer compose face');
@@ -202,6 +234,8 @@ async function measure(label) {
       check(r.h >= 40, `${label}: terms link tap height ${r.h} >= 40 (display ${r.display})`);
     if (c.tag === 'input' && String(c.cls) === '' && c.key === 'trade-woc-terms')
       check(r.w >= 24 && r.h >= 24, `${label}: consent checkbox ${r.w}x${r.h} >= 24`);
+    if (c.tag === 'input' && String(c.cls).includes('trade-woc-price'))
+      check(r.h >= 40, `${label}: price field height ${r.h} >= 40`);
     if (r) check(r.onScreen, `${label}: "${c.text || c.tag}" fully on screen after scrollIntoView`);
     if (r)
       check(
@@ -214,13 +248,63 @@ async function measure(label) {
 
 async function shoot(name) {
   await sleep(300);
-  const file = `${OUT}/after-${MOBILE ? 'mobile' : 'desktop'}-trade-${name}.png`;
+  const file = `${OUT}/${SHOT_PREFIX}-${MOBILE ? 'mobile' : 'desktop'}-trade-${name}${SUFFIX}.png`;
   await page.screenshot({ path: file });
   console.log(`wrote ${file}`);
 }
 
+// The window's Accept / Cancel row and the two coin inputs are outside the arm:
+// swept here so the whole sheet's floors are measured, not the arm's alone.
+async function measureWindowChrome(label) {
+  if (!MOBILE) return;
+  const m = await page.evaluate(() => {
+    const win = document.querySelector('#trade-window');
+    const rows = [];
+    for (const el of win?.querySelectorAll('.trade-actions button, .trade-money input, .x-btn') ??
+      []) {
+      // A hidden control has no tap target to floor: the coin row is hidden
+      // while a $WOC deal stands, and Accept is hidden once the goods are
+      // escrowed. Measuring those as zero-height would report the face's own
+      // correct state as a floor failure.
+      if (el.hidden || el.closest('[hidden]') || el.offsetParent === null) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      rows.push({
+        what: el.className || el.tagName.toLowerCase(),
+        text: (el.textContent || el.value || '').trim().slice(0, 20),
+        h: Math.round(r.height),
+        w: Math.round(r.width),
+      });
+    }
+    return rows;
+  });
+  for (const c of m) {
+    check(c.h >= 40, `${label}: window chrome "${c.text || c.what}" height ${c.h} >= 40`);
+  }
+}
+
 await measure('compose (consent row + Send)');
-await shoot('compose-consent');
+await measureWindowChrome('compose');
+if (BAGS_OVER) {
+  // The real first state a player meets: both sheets open, split, and every
+  // arm control still the top-most element at its centre (never under bags).
+  const split = await page.evaluate(() => {
+    const t = document.querySelector('#trade-window')?.getBoundingClientRect();
+    const b = document.querySelector('#bags')?.getBoundingClientRect();
+    if (!t || !b) return null;
+    const overlap = Math.max(0, Math.min(t.right, b.right) - Math.max(t.left, b.left));
+    return {
+      tradeW: Math.round(t.width),
+      bagsW: Math.round(b.width),
+      overlap: Math.round(overlap),
+    };
+  });
+  console.log('   split:', JSON.stringify(split));
+  check(split !== null && split.overlap <= 1, 'the trade sheet and the bags sheet do not overlap');
+  await shoot('compose-with-bags');
+} else {
+  await shoot('compose-consent');
+}
 
 // Buyer pay face: offer accepted by both, goods in escrow, no quote yet.
 async function setOffer(offer, quote, extra = {}) {
@@ -242,8 +326,8 @@ async function setOffer(offer, quote, extra = {}) {
 const now = Date.now();
 const base = {
   id: 1,
-  usdCents: 1500,
-  tokens: 1234.5,
+  usdCents: USD_CENTS,
+  tokens: TOKENS,
   listingId: 7,
   buyerAccepted: true,
   sellerAccepted: true,
@@ -252,17 +336,18 @@ const base = {
 };
 await setOffer({ ...base, role: 'buyer', phase: 'awaiting_payment' }, null);
 await measure('buyer pay face (consent row + Pay)');
+await measureWindowChrome('buyer pay face');
 await shoot('buyer-pay-consent');
 
 await setOffer(
   { ...base, role: 'buyer', phase: 'awaiting_payment' },
   {
     offerId: 1,
-    totalTokens: 1234.5,
-    sellerTokens: 1111.05,
-    burnTokens: 86.415,
-    treasuryTokens: 37.035,
-    usdCents: 1500,
+    totalTokens: TOKENS,
+    sellerTokens: TOKENS * 0.9,
+    burnTokens: TOKENS * 0.07,
+    treasuryTokens: TOKENS * 0.03,
+    usdCents: USD_CENTS,
     expiresAtMs: now + 120000,
     reference: 'ref',
     transactionBase64: 'dHg=',

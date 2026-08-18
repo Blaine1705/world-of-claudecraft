@@ -16,6 +16,15 @@
 //
 // Usage: GAME_URL=http://localhost:5173 SERVER_URL=http://localhost:8787 \
 //        SHOTS_DIR=docs/screenshots/woc-market node scripts/woc_market_shot.mjs
+//   STRESS=1      also seeds the stress content (a 16-letter seller name, the
+//                 longest sellable names incl. a mount, the maximum price, and
+//                 two more sellers at the per-seller listing cap so Browse
+//                 fills a page) and shoots the stress captures; the buyer's own
+//                 account gets three listings so Activity has rows.
+//   SHOT_LANG=ru_RU  boots the client in that locale (the wordiest fills) and
+//                 suffixes every capture with the locale; run it AFTER a
+//                 STRESS=1 pass so the listings it browses already exist.
+//   SHOT_PREFIX=before  names the files before-* instead of after-*.
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import { ed25519 } from '@noble/curves/ed25519';
@@ -30,6 +39,60 @@ const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = SERVER_URL.replace(/^http/, 'ws');
 const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/woc-market';
+const STRESS = process.env.STRESS === '1';
+// The server's chat token bucket (server/game.ts CHAT_RATE_BURST /
+// CHAT_RATE_REFILL_PER_SECOND / CHAT_COOLDOWN_SECONDS): a dev command is a
+// chat message, so the seeder paces itself to it rather than losing gifts.
+const CHAT_BURST = 4;
+const CHAT_REFILL_MS = 3200;
+const CHAT_COOLDOWN_MS = 21000;
+// The listing endpoint's own throttle (server/ratelimit.ts
+// WOC_MARKET_LIST_MAX_PER_MINUTE = 10, a sliding minute fused across the
+// per-IP and per-account buckets): every seeded seller shares 127.0.0.1, so
+// the IP half is what a multi-seller seed exhausts. Pace the creates at the
+// sustained rate and honour a 429's own retry hint. The step-up mint is a
+// separate, looser bucket (20/min) and needs no pacing of its own.
+const LIST_MIN_INTERVAL_MS = 6500;
+let lastListingAtMs = 0;
+async function paceListingCall() {
+  const waitMs = lastListingAtMs + LIST_MIN_INTERVAL_MS - Date.now();
+  if (waitMs > 0) await sleep(waitMs);
+  lastListingAtMs = Date.now();
+}
+const SHOT_LANG = process.env.SHOT_LANG ?? '';
+const SHOT_PREFIX = process.env.SHOT_PREFIX ?? 'after';
+// SEED=0 with BUYER=<username> reuses listings and a buyer this rig already
+// seeded (a rerun, or the before-state pass over the same database), so an
+// iteration costs a browser flow rather than five minutes of paced seeding.
+const SEED = process.env.SEED !== '0';
+const REUSE_BUYER = process.env.BUYER ?? '';
+// The page URL: the locale rides the boot query (the client's own language
+// switch), so every capture of a locale pass reads in that locale.
+const PAGE_URL = SHOT_LANG ? `${GAME_URL}/?lang=${encodeURIComponent(SHOT_LANG)}` : GAME_URL;
+const shotName = (base) => `${SHOT_PREFIX}-${base}${SHOT_LANG ? `-${SHOT_LANG}` : ''}.png`;
+// The stress fixtures: the longest sellable equipment name and the longest
+// mount name (mounts trade at any rarity on the default policy), listed at the
+// MAXIMUM price so $1,000.00 lands in the table, the detail pane and the hints.
+const LONG_ITEM = 'voidsong_dirk';
+const LONG_MOUNT = 'reins_shadowjump_toad';
+const MAX_PRICE_CENTS = 100000;
+// Sellable epics for the page-filling sellers (each seller may hold twelve
+// active listings; a fresh character's sixteen bag slots already carry its
+// starter kit, so no seeded seller receives more than eight gifts).
+const FILLER_ITEMS = [
+  'kingsbane_last_oath',
+  'deathless_heartwood',
+  'blackwater_vanguard_chest',
+  'scepter_of_the_deathless_court',
+  'vestments_of_the_waking_grove',
+  'morthens_cryptforged_hauberk',
+  'necromancers_soulspire_mantle',
+  'architects_cornerstone',
+  'medallion_of_endless_profit',
+  'maul_of_the_scourged_wilds',
+  'deathless_warguard_legmail',
+  'wildheart_hexwood_staff',
+];
 // TWO listings, because a listing is an auction XOR a buy-now now that the
 // combined format is no longer creatable: one of each is what makes the detail
 // pane's bid form and its Buy now button both reachable in a capture.
@@ -108,17 +171,16 @@ async function registerAccount(prefix) {
   return { username, token: reg.body.token };
 }
 
-// The seller: registers, links a wallet, joins over the raw wire, receives the
-// epic via /dev give, then lists it on the Exchange through the real REST flow.
-async function seedSellerListing() {
-  const { username, token } = await registerAccount('wocsell');
-  const { secret } = await linkThrowawayWallet(token);
-  const char = await api(
-    '/api/characters',
-    { name: `Aurelia${nameSuffix}`, class: 'warrior' },
-    token,
-  );
-  if (char.status !== 200) throw new Error(`seller character failed: ${char.status}`);
+// A seller: registers (or reuses the given account), links a wallet, joins
+// over the raw wire, receives the items via /dev give, then lists them on the
+// Exchange through the real REST flow. `shapes` are the listing params per
+// item; the returned account carries the character so a browser can log in
+// as it afterwards (the buyer's own listings for the Activity tab).
+async function seedListings({ prefix, charName, shapes, account = null }) {
+  const { username, token } = account ?? (await registerAccount(prefix));
+  const { secret } = account?.wallet ?? (await linkThrowawayWallet(token));
+  const char = await api('/api/characters', { name: charName, class: 'warrior' }, token);
+  if (char.status !== 200) throw new Error(`${prefix} character failed: ${char.status}`);
   const characterId = char.body.id;
 
   const ws = new WebSocket(`${WS_BASE}/ws`);
@@ -139,55 +201,142 @@ async function seedSellerListing() {
     });
     ws.on('error', reject);
   });
-  // The epics arrive by dev cheat (ALLOW_DEV_COMMANDS server), then the REAL
-  // listing flow escrows them out of the live bags.
-  for (const item of [EPIC_ITEM, BUY_NOW_ITEM]) {
-    ws.send(JSON.stringify({ t: 'cmd', cmd: 'chat', text: `/dev give ${item}` }));
-    await sleep(800);
-  }
-  await sleep(1200);
-  // An AUCTION carries a reserve and no buy-now price, and a BUY-NOW carries the
-  // price and no reserve: the rules refuse any other pairing, so these are the
-  // only two shapes a new listing can take.
-  const shapes = [
-    { itemId: EPIC_ITEM, format: 'auction', reserveCents: 10000, buyNowCents: null },
-    { itemId: BUY_NOW_ITEM, format: 'buy_now', reserveCents: null, buyNowCents: 25000 },
-  ];
-  for (
-    let i = 0;
-    i < 40 &&
-    !(inv && [EPIC_ITEM, BUY_NOW_ITEM].every((id) => inv.some((s) => s && s.itemId === id)));
-    i++
-  ) {
-    await sleep(300);
-  }
-  if (!inv) throw new Error('never saw self.inv on the wire');
+  // ONE item at a time: give it, wait for the delta-guarded self.inv to show
+  // it, list it, then wait for the escrow delta to take it back out. A fresh
+  // character's sixteen backpack slots are mostly starter kit, so front-loading
+  // every gift silently overflowed the bags and the listing loop then failed on
+  // an item that had never landed. Listing frees the slot again, so this shape
+  // seeds any number of listings per seller within the active-listing cap.
+  const waitForItem = async (itemId, tries) => {
+    for (let i = 0; i < tries; i++) {
+      const index = (inv ?? []).findIndex((s) => s && s.itemId === itemId);
+      if (index >= 0) return index;
+      await sleep(300);
+    }
+    return -1;
+  };
+  // A dev command rides the CHAT channel, which is token bucketed on the
+  // server (burst 5, then one per 3 seconds, and three refusals in a row buy a
+  // 20 second cooldown). A seeding loop that ignores it silently loses gifts
+  // after the fifth item, which then reads as "never reached the bags". Spend
+  // the burst, then pace; a miss waits out the cooldown and retries once.
+  let gifts = 0;
+  const giveAndWait = async (itemId) => {
+    if (gifts >= CHAT_BURST) await sleep(CHAT_REFILL_MS);
+    gifts++;
+    ws.send(JSON.stringify({ t: 'cmd', cmd: 'chat', text: `/dev give ${itemId}` }));
+    const found = await waitForItem(itemId, 20);
+    if (found >= 0) return found;
+    // Assume the bucket refused it: wait the cooldown out and try once more.
+    await sleep(CHAT_COOLDOWN_MS);
+    ws.send(JSON.stringify({ t: 'cmd', cmd: 'chat', text: `/dev give ${itemId}` }));
+    return waitForItem(itemId, 40);
+  };
   const listed = [];
   for (const shape of shapes) {
-    const index = inv.findIndex((s) => s && s.itemId === shape.itemId);
-    if (index < 0) throw new Error(`${shape.itemId} not in bags`);
+    const index = await giveAndWait(shape.itemId);
+    if (index < 0) {
+      throw new Error(
+        `${shape.itemId} never reached the bags (${(inv ?? []).length} slots used); is ALLOW_DEV_COMMANDS=1 set?`,
+      );
+    }
     const params = { startCents: 2500, durationHours: 24, offerNext: true, ...shape };
-    const stepUp = await stepUpFor(token, secret, params);
-    const out = await api(
-      '/api/woc-market/listings',
-      { characterId, itemIndex: index, ...params, stepUp },
-      token,
-    );
+    const create = async () => {
+      await paceListingCall();
+      // The step-up nonce is single-use and short-lived, so it is minted INSIDE
+      // the paced window, never before the wait.
+      const stepUp = await stepUpFor(token, secret, params);
+      return api(
+        '/api/woc-market/listings',
+        { characterId, itemIndex: index, ...params, stepUp },
+        token,
+      );
+    };
+    let out = await create();
+    if (out.status === 429) {
+      const retryMs = Math.min(90, Number(out.body?.retryAfterSeconds ?? 60)) * 1000 + 1500;
+      console.log(`listing ${shape.itemId} throttled; waiting ${Math.round(retryMs / 1000)}s`);
+      await sleep(retryMs);
+      out = await create();
+    }
     if (out.status === 200) {
-      listed.push(shape.format);
+      listed.push(shape.itemId);
       // Let the post-escrow inventory delta land before the next index read.
-      await sleep(1500);
+      for (let i = 0; i < 20 && (inv ?? []).some((s) => s && s.itemId === shape.itemId); i++) {
+        await sleep(200);
+      }
     } else {
-      console.log(`listing ${shape.format} refused: ${out.status} ${JSON.stringify(out.body)}`);
+      console.log(`listing ${shape.itemId} refused: ${out.status} ${JSON.stringify(out.body)}`);
     }
   }
   ws.close();
   if (listed.length < shapes.length) {
     throw new Error(
-      `seller listed only [${listed.join(', ')}]; is WOC_MARKET_ENABLED=1 set on the server?`,
+      `${prefix} listed only ${listed.length}/${shapes.length}; is WOC_MARKET_ENABLED=1 set on the server?`,
     );
   }
-  console.log(`seller ${username} listed ${listed.join(' + ')}`);
+  console.log(
+    `${prefix} ${username} listed ${listed.length} (${listed.slice(0, 3).join(', ')}...)`,
+  );
+  return { username, token, characterId, charName };
+}
+
+// The base pair: an AUCTION carries a reserve and no buy-now price, and a
+// BUY-NOW carries the price and no reserve: the rules refuse any other pairing,
+// so these are the only two shapes a new listing can take.
+async function seedSellerListing() {
+  await seedListings({
+    prefix: 'wocsell',
+    charName: `Aurelia${nameSuffix}`,
+    shapes: [
+      { itemId: EPIC_ITEM, format: 'auction', reserveCents: 10000, buyNowCents: null },
+      { itemId: BUY_NOW_ITEM, format: 'buy_now', reserveCents: null, buyNowCents: 25000 },
+    ],
+  });
+}
+
+// The stress content: a 16-letter seller (the name cap) listing the longest
+// names at the maximum price, plus two page-filling sellers at the cap.
+async function seedStressListings() {
+  const auction = (itemId, startCents = 2500) => ({
+    itemId,
+    format: 'auction',
+    reserveCents: null,
+    buyNowCents: null,
+    startCents,
+  });
+  await seedListings({
+    prefix: 'wocmax',
+    // Twelve letters plus the four-letter run suffix: exactly the 16 cap.
+    charName: `Bartholomewa${nameSuffix}`,
+    shapes: [
+      {
+        itemId: LONG_MOUNT,
+        format: 'buy_now',
+        reserveCents: null,
+        buyNowCents: MAX_PRICE_CENTS,
+        startCents: 99975,
+      },
+      {
+        itemId: LONG_ITEM,
+        format: 'auction',
+        reserveCents: 100000,
+        buyNowCents: null,
+        startCents: 99975,
+      },
+      ...FILLER_ITEMS.slice(0, 6).map((id) => auction(id)),
+    ],
+  });
+  await seedListings({
+    prefix: 'wocfill',
+    charName: `Corvina${nameSuffix}`,
+    shapes: FILLER_ITEMS.slice(0, 8).map((id, i) => auction(id, 2500 + i * 725)),
+  });
+  await seedListings({
+    prefix: 'wocfilb',
+    charName: `Dorian${nameSuffix}`,
+    shapes: FILLER_ITEMS.slice(4, 12).map((id, i) => auction(id, 3100 + i * 640)),
+  });
 }
 
 // The exemplar flow from scripts/social_landscape_online_shot.mjs, verbatim
@@ -195,13 +344,32 @@ async function seedSellerListing() {
 // the realm picker, charcreate, Enter World, the mobile preflight.
 async function enterWorldInBrowser(
   page,
-  { username, charName, cls, mobile = false, register = false },
+  { username, charName, cls, mobile = false, register = false, existingChar = false },
 ) {
   await suppressGpuNotice(page);
+  // A takeover asks through a NATIVE window.confirm (src/main.ts
+  // takeOverAndEnter), which puppeteer suppresses unless a dialog handler
+  // answers it: without this the press silently did nothing and the flow hung
+  // on the character panel. Registered once per page, before any click.
+  if (!page.__wocDialogHandler) {
+    page.__wocDialogHandler = true;
+    page.on('dialog', (dialog) => {
+      void dialog.accept().catch(() => {});
+    });
+  }
+  // The capture rule: the LOWEST graphics preset, seeded before the document
+  // loads (the renderer reads woc_settings.graphicsPreset at startup, so a
+  // staging-time write lands too late; graphicsDefaultApplied rides along or
+  // main.ts's first-run probe persists its own tier over the seed). Window
+  // shots are evidence about the DOM, never render fidelity, and tier 1 is
+  // what SwiftShader should be asked to pay for on a shared box.
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
   let lastErr;
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
-      await page.goto(GAME_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.goto(PAGE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
       lastErr = undefined;
       break;
     } catch (e) {
@@ -243,58 +411,118 @@ async function enterWorldInBrowser(
     if (!filled) await sleep(400);
   }
   if (!filled) throw new Error('login form never stabilized');
-  await page.waitForSelector('#realm-list .realm-row', { timeout: 15000 });
-  await page.evaluate(() => {
-    const row = document.querySelector('#realm-list .realm-row');
-    if (row instanceof HTMLElement) row.click();
-  });
-  await page.waitForFunction(
-    () =>
-      !document.querySelector('#charcreate-panel')?.hasAttribute('hidden') ||
-      !document.querySelector('#charselect-panel')?.hasAttribute('hidden'),
-    { timeout: 15000, polling: 200 },
-  );
+  await page.waitForSelector('#realm-list .realm-row', { timeout: 20000 });
+  // The realm press occasionally lands before the row is wired (the realm list
+  // paints from one fetch and wires from another), and the flow then waited out
+  // its timeout at a panel that never opened: press until a panel answers.
+  let onPanel = false;
+  for (let attempt = 0; attempt < 4 && !onPanel; attempt++) {
+    await page.evaluate(() => {
+      const row = document.querySelector('#realm-list .realm-row');
+      if (row instanceof HTMLElement) row.click();
+    });
+    onPanel = await page
+      .waitForFunction(
+        () =>
+          !document.querySelector('#charcreate-panel')?.hasAttribute('hidden') ||
+          !document.querySelector('#charselect-panel')?.hasAttribute('hidden'),
+        { timeout: 8000, polling: 200 },
+      )
+      .then(() => true)
+      .catch(() => false);
+    if (!onPanel) console.log('realm press did not open a panel; retrying');
+  }
+  if (!onPanel) throw new Error('realm selection never opened a character panel');
   const onCreatePanel = await page.evaluate(
     () => !document.querySelector('#charcreate-panel')?.hasAttribute('hidden'),
   );
-  if (!onCreatePanel) {
-    await page.evaluate(() => document.querySelector('#btn-new-character')?.click());
-    await page.waitForFunction(
-      () => !document.querySelector('#charcreate-panel')?.hasAttribute('hidden'),
-      { timeout: 10000, polling: 200 },
+  // An account seeded over the wire already has its character (the buyer's
+  // own listings): pick it from the select panel instead of creating one.
+  if (!existingChar) {
+    if (!onCreatePanel) {
+      await page.evaluate(() => document.querySelector('#btn-new-character')?.click());
+      await page.waitForFunction(
+        () => !document.querySelector('#charcreate-panel')?.hasAttribute('hidden'),
+        { timeout: 10000, polling: 200 },
+      );
+    }
+    await page.evaluate(
+      (name, wantedClass) => {
+        document.querySelector('#new-char-name').value = name;
+        document
+          .querySelector(`#charcreate-panel .mini-class[data-class="${wantedClass}"]`)
+          ?.click();
+        document.querySelector('#btn-create-char').click();
+      },
+      charName,
+      cls,
     );
   }
-  await page.evaluate(
-    (name, wantedClass) => {
-      document.querySelector('#new-char-name').value = name;
-      document.querySelector(`#charcreate-panel .mini-class[data-class="${wantedClass}"]`)?.click();
-      document.querySelector('#btn-create-char').click();
-    },
-    charName,
-    cls,
-  );
   await page.waitForFunction(
     () => !document.querySelector('#charselect-panel')?.hasAttribute('hidden'),
     { timeout: 10000, polling: 200 },
   );
-  await sleep(700);
-  await page.evaluate((name) => {
-    const rows = [...document.querySelectorAll('#char-list .char-row')];
-    const row =
-      rows.find((r) => r.querySelector('.char-name')?.textContent?.trim() === name) ?? rows[0];
-    row?.querySelector('.enter-world-btn')?.click();
-  }, charName);
-  if (mobile) {
-    await page
-      .waitForSelector('#mobile-preflight-continue', { visible: true, timeout: 8000 })
-      .catch(() => {});
-    await page.evaluate(() => document.querySelector('#mobile-preflight-continue')?.click());
-  }
+  // WAIT for the list, do not sleep at it: an account whose character was
+  // seeded over the wire (the buyer's own listings) lands on a select panel
+  // that populates from a REST read, and a fixed sleep clicked an empty list
+  // and hung at the panel with no error to show.
+  await page.waitForSelector('#char-list .char-row', { timeout: 20000 });
+  const enterWorld = async () => {
+    await page.evaluate((name) => {
+      const rows = [...document.querySelectorAll('#char-list .char-row')];
+      const row =
+        rows.find((r) => r.querySelector('.char-name')?.textContent?.trim() === name) ?? rows[0];
+      row?.click();
+      // A character the seeding socket still holds a lease on offers TAKE OVER
+      // instead of Enter World (the row says "Already in world"), and the
+      // shared button relabels itself the same way: press whichever is there.
+      const enter = row?.querySelector('.enter-world-btn');
+      const takeover =
+        row?.querySelector('.take-over-btn') ??
+        document.querySelector('#charselect-panel .take-over-btn');
+      if (takeover instanceof HTMLElement) takeover.click();
+      else if (enter instanceof HTMLElement) enter.click();
+      else document.querySelector('#btn-enter-world')?.click();
+    }, charName);
+    await sleep(500);
+    if (mobile) {
+      await page
+        .waitForSelector('#mobile-preflight-continue', { visible: true, timeout: 8000 })
+        .catch(() => {});
+      await page.evaluate(() => document.querySelector('#mobile-preflight-continue')?.click());
+    }
+  };
+  await enterWorld();
   try {
-    await page.waitForFunction(() => window.__game?.world?.entities?.size >= 1, {
-      timeout: 60000,
-      polling: 500,
-    });
+    // Two more presses if the first is swallowed (a lease the seeding socket
+    // has not released yet answers, and the panel stays put with no error).
+    // NEVER re-press once the client is in: a second Take Over takes over this
+    // session's OWN character, and the server then kicks the client that had
+    // just entered (the flow died later at an undefined window.__game). So the
+    // re-press is gated on __game still being absent, and a client that has
+    // booted is given a longer window to finish streaming entities.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const entered = await page
+        .waitForFunction(() => window.__game?.world?.entities?.size >= 1, {
+          timeout: 30000,
+          polling: 500,
+        })
+        .then(() => true)
+        .catch(() => false);
+      if (entered) break;
+      const booted = await page.evaluate(() => typeof window.__game !== 'undefined');
+      if (booted) {
+        console.log('client is in; waiting for the entity stream');
+        await page.waitForFunction(() => window.__game?.world?.entities?.size >= 1, {
+          timeout: 60000,
+          polling: 500,
+        });
+        break;
+      }
+      if (attempt === 2) throw new Error('never entered the world after three attempts');
+      console.log('enter-world press did not take; retrying');
+      await enterWorld();
+    }
   } catch (err) {
     // Dump the stuck page state so a rerun can be diagnosed from the artifact.
     await page.screenshot({ path: `${OUT}/debug-stuck.png` });
@@ -367,6 +595,14 @@ async function shoot(page, file, clip) {
     // on /play, so hiding it is the honest framing of the window itself.
     const cta = document.getElementById('discord-cta-banner');
     if (cta !== null) cta.hidden = true;
+    // The software-rendering notice is a top-right toast that sat across the
+    // window header and the minimap in the first stress captures; it is a
+    // headless-environment artifact, so dismiss it rather than frame it.
+    for (const btn of document.querySelectorAll('#gpu-notice button, .gpu-notice button')) {
+      if (btn instanceof HTMLElement) btn.click();
+    }
+    const notice = document.querySelector('#gpu-notice, .gpu-notice');
+    if (notice instanceof HTMLElement) notice.hidden = true;
     return confirm !== null;
   });
   if (dismissed) await sleep(500);
@@ -374,8 +610,36 @@ async function shoot(page, file, clip) {
   console.log(`wrote ${OUT}/${file}`);
 }
 
+async function clickTab(page, tab) {
+  await page.evaluate((id) => {
+    const el = document.querySelector(`#woc-market-window .wm-tab[data-tab="${id}"]`);
+    if (el instanceof HTMLElement) el.click();
+  }, tab);
+  await sleep(600);
+}
+
+async function clickRowContaining(page, needle) {
+  const ok = await page.evaluate((n) => {
+    const row = [...document.querySelectorAll('#woc-market-window .wm-row')].find((r) =>
+      (r.textContent || '').includes(n),
+    );
+    if (row instanceof HTMLElement) {
+      row.click();
+      return true;
+    }
+    return false;
+  }, needle);
+  await sleep(1500);
+  return ok;
+}
+
 async function main() {
-  await seedSellerListing();
+  if (SEED) {
+    await seedSellerListing();
+    if (STRESS) await seedStressListings();
+  } else {
+    console.log('SEED=0: reusing the listings already in the database');
+  }
 
   const browser = await puppeteer.launch({
     executablePath: BROWSER_PATH,
@@ -385,32 +649,103 @@ async function main() {
 
   // Buyer main: the account exists (and has its wallet linked) BEFORE the
   // browser signs in, so refreshWalletLinkStatus sees the link at login and
-  // the window renders its wallet-live state.
-  const buyer = await registerAccount('wocbuy');
-  await linkThrowawayWallet(buyer.token);
+  // the window renders its wallet-live state. Under STRESS the buyer's own
+  // character is seeded over the wire with three listings first, so the
+  // Activity tab has rows of its own to show (and the picker later fills from
+  // a bag of many epics).
+  // A reused buyer logs in with the password every seeded account shares; its
+  // character already exists and already holds listings.
+  const buyer = REUSE_BUYER
+    ? { username: REUSE_BUYER, token: null }
+    : await registerAccount('wocbuy');
+  const buyerWallet = REUSE_BUYER ? null : await linkThrowawayWallet(buyer.token);
+  const buyerChar = REUSE_BUYER ? '' : `Bramble${nameSuffix}`;
+  if (SEED && STRESS && !REUSE_BUYER) {
+    await seedListings({
+      prefix: 'wocbuy',
+      charName: buyerChar,
+      account: { ...buyer, wallet: buyerWallet },
+      shapes: FILLER_ITEMS.slice(0, 3).map((id, i) => ({
+        itemId: id,
+        format: 'auction',
+        reserveCents: null,
+        buyNowCents: null,
+        startCents: 4000 + i * 1000,
+      })),
+    });
+  }
   const page = await browser.newPage();
   await page.setViewport({ width: 1600, height: 1000 });
   await enterWorldInBrowser(page, {
     username: buyer.username,
-    charName: `Bramble${nameSuffix}`,
+    charName: buyerChar,
     cls: 'rogue',
+    existingChar: STRESS || REUSE_BUYER !== '',
   });
-  // An epic in the buyer's own bags gives the Sell tab a real row.
-  await page.evaluate((item) => window.__game.world.chat(`/dev give ${item}`), EPIC_ITEM);
-  await sleep(1200);
   await openExchange(page);
+  // ZERO STATES first, before any bag gift: the Sell tab with nothing eligible
+  // and, without stress seeding, the Activity tab with nothing at all.
+  await clickTab(page, 'sell');
+  await shoot(page, shotName('desktop-sell-empty'));
+  await clickTab(page, 'activity');
+  await shoot(page, shotName(STRESS ? 'desktop-activity-own-listings' : 'desktop-activity-empty'));
+  await clickTab(page, 'browse');
+  // Epics in the buyer's own bags give the Sell tab real rows (many, under
+  // stress, so the picker list scrolls).
+  // Paced to the same chat bucket as the seeder above (the client's own chat
+  // call is the same channel); the first few ride the burst.
+  const gifts = STRESS ? [EPIC_ITEM, ...FILLER_ITEMS.slice(3, 9), LONG_ITEM] : [EPIC_ITEM];
+  for (const [i, item] of gifts.entries()) {
+    await page.evaluate((id) => window.__game.world.chat(`/dev give ${id}`), item);
+    await sleep(i >= CHAT_BURST - 1 ? CHAT_REFILL_MS : 500);
+  }
+  await sleep(1200);
   await page.evaluate(() => {
     const row = document.querySelector('#woc-market-window .wm-row');
     if (row instanceof HTMLElement) row.click();
   });
   await sleep(1500);
-  await shoot(page, 'after-desktop-browse.png');
+  await shoot(page, shotName('desktop-browse'));
+  if (STRESS) {
+    // Sort NEWEST for the stress pair: the default "ending soonest" order puts
+    // whatever this database already held on page 1, and the stress rows are
+    // what these captures are about.
+    await page.evaluate(() => {
+      const sel = document.querySelector('#woc-market-window [data-field="sort"]');
+      if (sel instanceof HTMLSelectElement) {
+        sel.value = 'newest';
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    await sleep(1500);
+    // The maximum price on the longest mount name (the buy-now pane), then the
+    // longest equipment name at a maximum starting bid (the bid form).
+    await clickRowContaining(page, '$1,000.00');
+    await shoot(page, shotName('desktop-browse-stress-max-price'));
+    await clickRowContaining(page, 'Voidsong');
+    await shoot(page, shotName('desktop-browse-stress-long-name'));
+    // The last page of a full browse: page-next until it disables.
+    for (let i = 0; i < 4; i++) {
+      const more = await page.evaluate(() => {
+        const next = document.querySelector('#woc-market-window [data-action="page-next"]');
+        if (next instanceof HTMLButtonElement && !next.disabled) {
+          next.click();
+          return true;
+        }
+        return false;
+      });
+      if (!more) break;
+      await sleep(1200);
+    }
+    await shoot(page, shotName('desktop-browse-stress-last-page'));
+    await page.evaluate(() => {
+      const prev = document.querySelector('#woc-market-window [data-action="page-prev"]');
+      if (prev instanceof HTMLButtonElement && !prev.disabled) prev.click();
+    });
+    await sleep(1200);
+  }
 
-  await page.evaluate(() => {
-    const tab = document.querySelector('#woc-market-window .wm-tab[data-tab="sell"]');
-    if (tab instanceof HTMLElement) tab.click();
-  });
-  await sleep(600);
+  await clickTab(page, 'sell');
   // The picker is a combobox now, not a grid of .wm-sell-item buttons. Focus
   // ALONE opens the full list (the delegated focusin arm), and an option commits
   // on MOUSEDOWN rather than click, because the options are non-focusable divs
@@ -419,14 +754,23 @@ async function main() {
     document.querySelector('#woc-market-window .wm-combo-input')?.focus();
   });
   await sleep(700);
-  await shoot(page, 'after-desktop-sell.png');
+  await shoot(page, shotName('desktop-sell'));
   await page.evaluate(() => {
     document
       .querySelector('#woc-market-window .wm-combo-item')
       ?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
   });
   await sleep(700);
-  await shoot(page, 'after-desktop-sell-selected.png');
+  // A typed price lands the resolved fee lines under the form.
+  await page.evaluate(() => {
+    const start = document.querySelector('#woc-market-window [data-field="sell-start"]');
+    if (start instanceof HTMLInputElement) {
+      start.value = '125';
+      start.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+  await sleep(1200);
+  await shoot(page, shotName('desktop-sell-selected'));
   await page.close();
 
   // Mobile landscape (in-game mobile is landscape-only on the web client).
@@ -466,7 +810,7 @@ async function main() {
   await sleep(1500);
   await openExchange(mobile);
   // No clip: the viewport IS the frame now that puppeteer owns the metrics.
-  await shoot(mobile, 'after-mobile-browse.png', null);
+  await shoot(mobile, shotName('mobile-browse'), null);
 
   // The money-surface floors, in a REAL phone viewport: open each listing
   // shape's detail pane and measure what the DOM units cannot (rendered tap
@@ -537,6 +881,42 @@ async function main() {
       check(m.termsLabel.onScreen && m.termsLink?.onScreen, `${label}: consent row on screen`);
     }
   };
+  // Every control on the sheet at the touch floor: a window-wide sweep of the
+  // buttons, links, inputs, selects and consent labels the CSS claims to
+  // floor (40px, checkbox 24px, inputs at the 16px anti-zoom font), plus the
+  // coarse-pointer fact the floors depend on.
+  const sweepFloors = async (label) => {
+    const m = await mobile.evaluate(() => {
+      const win = document.querySelector('#woc-market-window');
+      const rows = [];
+      for (const el of win?.querySelectorAll(
+        'button, a, input, select, label.wm-terms, label.wm-offer-next',
+      ) ?? []) {
+        if (el.closest('[hidden]')) continue;
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) continue;
+        const cs = getComputedStyle(el);
+        rows.push({
+          tag: el.tagName.toLowerCase(),
+          type: el.getAttribute('type') ?? '',
+          key: el.getAttribute('data-focus-key') ?? el.getAttribute('data-action') ?? el.className,
+          w: Math.round(r.width),
+          h: Math.round(r.height),
+          font: Number.parseFloat(cs.fontSize),
+        });
+      }
+      return { coarse: matchMedia('(pointer: coarse)').matches, rows };
+    });
+    console.log(`   ${label}: pointer coarse ${m.coarse}, ${m.rows.length} controls`);
+    for (const c of m.rows) {
+      const isBox = c.tag === 'input' && c.type === 'checkbox';
+      const floor = isBox ? 24 : 40;
+      check(c.h >= floor, `${label}: ${c.tag} [${c.key}] height ${c.h} >= ${floor}`);
+      if ((c.tag === 'input' && !isBox) || c.tag === 'select')
+        check(c.font >= 16, `${label}: ${c.tag} [${c.key}] font ${c.font} >= 16`);
+    }
+  };
+  await sweepFloors('mobile browse');
   // The BUY-NOW pane (no bid form): the consent row plus the walk-away note.
   check(await openRow('$250'), 'buy-now listing row opened');
   const bn = await measureDetail();
@@ -545,7 +925,8 @@ async function main() {
   const noteIdx = bn.order.findIndex((o) => o.startsWith('note:Buy now holds'));
   const buyIdx = bn.order.findIndex((o) => o.startsWith('buy-now:'));
   check(noteIdx >= 0 && noteIdx < buyIdx, 'buy-now: the walk-away note precedes the button');
-  await shoot(mobile, 'after-mobile-buy-now-consent.png', null);
+  await shoot(mobile, shotName('mobile-buy-now-consent'), null);
+  await sweepFloors('mobile buy-now detail');
   // The AUCTION pane: the bid form with the disclosures BEFORE Place bid.
   check(await openRow('No bids yet'), 'auction listing row opened');
   const au = await measureDetail();
@@ -555,7 +936,27 @@ async function main() {
   check(bindIdx >= 0 && bindIdx < bidIdx, 'auction: the binding disclosure precedes Place bid');
   check(au.placeBid && au.placeBid.h >= 40, `auction: Place bid height ${au.placeBid?.h} >= 40`);
   check(au.bidUsd && au.bidUsd.h >= 40, `auction: bid field height ${au.bidUsd?.h} >= 40`);
-  await shoot(mobile, 'after-mobile-auction-disclosures.png', null);
+  await shoot(mobile, shotName('mobile-auction-disclosures'), null);
+  await sweepFloors('mobile auction detail');
+  // The Sell tab: the combobox open, then a chosen item's form (its money
+  // inputs and selects at the floor).
+  await clickTab(mobile, 'sell');
+  await mobile.evaluate((id) => window.__game.world.chat(`/dev give ${id}`), EPIC_ITEM);
+  await sleep(1500);
+  await mobile.evaluate(() => {
+    document.querySelector('#woc-market-window .wm-combo-input')?.focus();
+  });
+  await sleep(700);
+  await shoot(mobile, shotName('mobile-sell'), null);
+  await sweepFloors('mobile sell picker');
+  await mobile.evaluate(() => {
+    document
+      .querySelector('#woc-market-window .wm-combo-item')
+      ?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+  });
+  await sleep(700);
+  await shoot(mobile, shotName('mobile-sell-selected'), null);
+  await sweepFloors('mobile sell form');
   await mobile.close();
 
   await browser.close();

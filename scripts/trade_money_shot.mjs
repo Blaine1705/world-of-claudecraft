@@ -2,18 +2,21 @@
 // "Your offer" money was a single raw-copper number box; now it is three
 // gold/silver/copper fields matching the World Market sell form, so a player
 // no longer has to hand-convert (e.g. 5g 32s 45c instead of typing 53245).
-// Boots the offline game headless at max graphics, stubs an open trade so the
+// Boots the offline game headless at the LOWEST graphics preset (the capture
+// rule: window shots are evidence about the DOM, never render fidelity, and
+// the low tier is what SwiftShader should pay for), stubs an open trade so the
 // REAL woc_trade controller (hud.wocTrade, src/ui/hud/woc_trade/) renders
-// updateTradeWindow(), and captures tmp/trade_money.png.
+// updateTradeWindow(), and captures tmp/trade_money.png (SHOT= overrides).
 // Run with `npm run dev` already up.
 
 import fs from 'node:fs';
+import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
-const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '/?gfx=ultra';
+const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const OUT = process.env.SHOT ?? 'tmp/trade_money.png';
-fs.mkdirSync('tmp', { recursive: true });
+fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fails = [];
 const check = (cond, msg) => {
@@ -33,6 +36,12 @@ const browser = await puppeteer.launch({
   defaultViewport: { width: 1600, height: 1000, deviceScaleFactor: 2 },
 });
 const page = await browser.newPage();
+// Seeded BEFORE the document loads: the renderer reads the preset at startup,
+// and graphicsDefaultApplied keeps main.ts's first-run probe from persisting
+// its own tier over the seed.
+await page.evaluateOnNewDocument(
+  `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+);
 page.on('pageerror', (e) => fails.push('PAGEERROR: ' + e.message));
 page.on('console', (m) => {
   if (m.type() === 'error') console.log('CONSOLE-ERR:', m.text());
@@ -51,12 +60,12 @@ await page.evaluate(() => {
   document.querySelector('#offline-select .mini-class[data-class="warrior"]').click();
   document.querySelector('#btn-start-offline').click();
 });
-// ?gfx=ultra under software rendering boots slowly (~30-40s); poll generously.
+// Software rendering boots slowly even at the low tier; poll generously.
 await page.waitForFunction(() => window.__game?.sim?.entities?.size > 5, {
   timeout: 60000,
   polling: 300,
 });
-await sleep(2500); // let max-gfx scene settle
+await sleep(2500); // let the scene settle
 
 // Stub an open trade and stage a money amount, then drive the real HUD render.
 const res = await page.evaluate(() => {
