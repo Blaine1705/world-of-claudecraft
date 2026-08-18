@@ -551,9 +551,11 @@ export class PartyMachine {
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
     this.partyByPid.delete(pid);
-    // Paladin auras are tied to the party relationship. Keep the caster's own
-    // aura intact, but remove paladin auras from the remaining members.
+    // Paladin auras are tied to the party relationship. Keep each caster's own
+    // aura intact, but remove persistent paladin auras across the broken party edge.
+    const departing = this.ctx.resolve(pid)?.e;
     for (const mPid of party.members) {
+      if (departing) this.ctx.clearAurasFromSource(departing, mPid, isPersistentPaladinAura);
       const member = this.ctx.resolve(mPid)?.e;
       if (member) this.ctx.clearAurasFromSource(member, pid, isPersistentPaladinAura);
     }

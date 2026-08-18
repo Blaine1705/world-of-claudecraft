@@ -53,6 +53,22 @@ describe('parties', () => {
     return { sim, a, b };
   }
 
+  function makePaladinAuraDuo(persistentAura: 'devotion_ward' | 'retribution_aura'): {
+    sim: Sim;
+    paladin: number;
+    member: number;
+  } {
+    const sim = makeWorld();
+    const paladin = sim.addPlayer('paladin', 'Paladin');
+    const member = sim.addPlayer('warrior', 'Member');
+    sim.setPlayerLevel(16, paladin);
+    sim.partyInvite(member, paladin);
+    sim.partyAccept(member);
+    sim.castAbility(persistentAura, paladin);
+    expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+    return { sim, paladin, member };
+  }
+
   // Direct corpse construction (mirroring tests/loot_roll.test.ts's `deadCorpse`)
   // so the kill-time eligible set (`lootRecipientIds`) is controlled deterministically,
   // independent of live positions at loot time. Shared by the round-robin and
@@ -103,6 +119,28 @@ describe('parties', () => {
 
       expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
       expect(sim.entities.get(member)?.auras.find((a) => a.id === 'dawn_devotion')).toBeDefined();
+    }
+  });
+
+  it('removes persistent paladin auras from a non-paladin who leaves', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const { sim, member } = makePaladinAuraDuo(persistentAura);
+
+      sim.partyLeave(member);
+
+      expect(sim.partyOf(member)).toBe(null);
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+    }
+  });
+
+  it('removes persistent paladin auras from a non-paladin who is kicked', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const { sim, paladin, member } = makePaladinAuraDuo(persistentAura);
+
+      sim.partyKick(member, paladin);
+
+      expect(sim.partyOf(member)).toBe(null);
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
     }
   });
 
