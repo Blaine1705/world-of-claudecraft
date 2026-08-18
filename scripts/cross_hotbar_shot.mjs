@@ -1,16 +1,7 @@
-// Screenshots for the controller cross hotbar: the HUD with no trigger held
-// (the before state, which is also what every keyboard player keeps seeing), the
-// bar open on the left trigger, the same bar swapped to its second set by the
-// opposite-trigger tap, and the Controller options panel carrying the new rows.
-//
-// A real pad cannot be driven from puppeteer, so the page's own
-// navigator.getGamepads is replaced with one that reports a standard Xbox pad
-// whose trigger state this script owns. Everything downstream is the real code
-// path: GamepadManager polls it, the pure reducer resolves the hold, and the
-// overlay paints from the action bar's own state.
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const OUT = process.env.SHOT_DIR ?? 'docs/screenshots/cross-hotbar';
@@ -31,20 +22,13 @@ page.on('console', (m) => {
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
-await page.click('#btn-offline');
-await wait(200);
-await page.type('#char-name', 'Padtest');
-await page.click('#offline-select .mini-class[data-class="warrior"]');
-await page.click('#btn-start-offline');
-await wait(4000);
-
-// Fill the first cross-hotbar set so the shot shows a realistic bar rather than
-// a level-one warrior's three abilities: the overlay mirrors action-bar slots,
-// so seeding the bar seeds the bar.
-await page.evaluate(() => {
-  document.querySelector('#tutorial-skip')?.click();
-});
+// domcontentloaded, not networkidle0: the client streams audio and model assets
+// long after the world is playable, so idle never arrives within a sane timeout.
+await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
+// The shared entry flow also clears the intro cinematic, the tutorial overlay and
+// the camera prompt, none of which may appear in a captured screenshot.
+const booted = await enterOfflineGame(page, { charName: 'Padtest', settleMs: 4000 });
+console.log('world booted:', booted);
 
 // Replace the pad. Trigger state lives on window.__pad and the page polls it.
 await page.evaluate(() => {

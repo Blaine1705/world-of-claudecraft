@@ -2,10 +2,10 @@
 // through the injected PainterHostWriters, so a frame that changes nothing costs
 // no DOM mutation.
 //
-// The eight cells are painted by the SHARED ActionBarPainter, not by a second copy
-// of the icon/cooldown/usability rules: the overlay re-presents cells the desktop
-// action bar has already ticked this frame. It builds a small adapter state whose
-// eight entries are REFERENCES into that state's slot array (no per-frame copy, no
+// The sixteen cells are painted by the SHARED ActionBarPainter, not by a second
+// copy of the icon/cooldown/usability rules: the overlay re-presents cells the
+// desktop action bar has already ticked this frame. It builds a small adapter state
+// whose entries are REFERENCES into that state's slot array (no per-frame copy, no
 // allocation), so a cross-hotbar cell can never disagree with the action-bar button
 // it mirrors.
 
@@ -18,23 +18,23 @@ import { CROSS_HOTBAR_CELLS, type CrossHotbarOverlayState } from './cross_hotbar
 
 const DISPLAY_SHOWN = '';
 const DISPLAY_HIDDEN = 'none';
-const LAYER_ATTR = 'data-xhb-layer';
 const CLASS_EXPANDED = 'xhb-expanded';
-const CLASS_ACTIVE = 'xhb-active';
-// No trigger held: the attribute still needs a defined value, since the elided
-// writer compares strings rather than removing the attribute.
-const LAYER_NONE = 'none';
+// Marks the half a held trigger has armed. Both halves stay visible either way:
+// the bar shows the whole set, and this only says which one a press will fire.
+const CLASS_HALF_ARMED = 'xhb-armed';
 
-/** The overlay's root plus the eight cells, in CROSS_HOTBAR_CELLS order. */
+/** The overlay's root, its two halves, and the sixteen cells in cell order. */
 export interface CrossHotbarPaintDescriptor {
   root: HTMLElement;
+  leftHalf: HTMLElement;
+  rightHalf: HTMLElement;
   bar: ActionBarPaintDescriptor;
 }
 
 export class CrossHotbarPainter {
   private readonly barPainter: ActionBarPainter;
-  // Reused every frame: the eight entries are reassigned to point at the desktop
-  // state's slots, so painting allocates nothing.
+  // Reused every frame: the entries are reassigned to point at the desktop state's
+  // slots, so painting allocates nothing.
   private readonly adapter: ActionBarState;
   // Stands in for a cell whose layout entry names no real action-bar slot.
   private readonly blank: ActionBarSlotState = makeSlotState();
@@ -51,16 +51,23 @@ export class CrossHotbarPainter {
   /**
    * Paint one frame. `bar` is the desktop action bar's state for THIS frame; the
    * overlay reads its cells straight out of it. A hidden overlay stops after the
-   * display write, so a player who never touches a trigger pays one elided write
-   * per frame and nothing else.
+   * display write, so a player with no pad pays one elided write per frame.
    */
   paint(state: CrossHotbarOverlayState, bar: ActionBarState): void {
     this.writers.setDisplay(this.descriptor.root, state.visible ? DISPLAY_SHOWN : DISPLAY_HIDDEN);
     if (!state.visible) return;
 
-    this.writers.setAttr(this.descriptor.root, LAYER_ATTR, state.layer ?? LAYER_NONE);
     this.writers.toggleClass(this.descriptor.root, CLASS_EXPANDED, state.expanded);
-    this.writers.toggleClass(this.descriptor.root, CLASS_ACTIVE, state.active);
+    this.writers.toggleClass(
+      this.descriptor.leftHalf,
+      CLASS_HALF_ARMED,
+      state.activeLayer === 'left',
+    );
+    this.writers.toggleClass(
+      this.descriptor.rightHalf,
+      CLASS_HALF_ARMED,
+      state.activeLayer === 'right',
+    );
 
     for (let i = 0; i < this.adapter.slots.length; i++) {
       const slot = state.cellSlots[i];

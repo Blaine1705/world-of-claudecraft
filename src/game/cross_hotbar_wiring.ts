@@ -6,6 +6,7 @@
 // shape of a feature.
 
 import {
+  CROSS_HOTBAR_DPAD_GLYPHS,
   CROSS_HOTBAR_EXPANDED_SET,
   CROSS_HOTBAR_LAYER_BUTTONS,
   CROSS_HOTBAR_PRIMARY_SET,
@@ -15,11 +16,10 @@ import { CrossHotbarBindings } from './cross_hotbar_bindings';
 import { type GamepadKind, gamepadButtonLabel } from './gamepad_map';
 
 export interface CrossHotbarHoldInfo {
-  layer: CrossHotbarLayer;
+  /** The armed half, or null for the resting bar (which still shows). */
+  layer: CrossHotbarLayer | null;
   slots: readonly number[];
   expanded: boolean;
-  /** False for the resting bar, true once a trigger is actually down. */
-  active: boolean;
   /** The hardware glyph under each cell, for the connected pad's brand. */
   buttons: readonly string[];
 }
@@ -78,13 +78,12 @@ export function crossHotbarHold(
   layer: CrossHotbarLayer | null,
   set: number,
   kind: GamepadKind,
-): CrossHotbarHoldInfo | null {
-  if (layer === null) return null;
+): CrossHotbarHoldInfo {
   return {
     layer,
-    slots: bindings.layerSlots(set, layer),
+    // The WHOLE set: the bar shows both halves and only ARMS one.
+    slots: bindings.setSlots(set),
     expanded: set === CROSS_HOTBAR_EXPANDED_SET,
-    active: true,
     buttons: crossHotbarButtonLabels(kind),
   };
 }
@@ -96,18 +95,18 @@ export function crossHotbarResting(
   bindings: CrossHotbarBindings,
   kind: GamepadKind,
 ): CrossHotbarHoldInfo {
-  return {
-    layer: 'left',
-    slots: bindings.layerSlots(CROSS_HOTBAR_PRIMARY_SET, 'left'),
-    expanded: false,
-    active: false,
-    buttons: crossHotbarButtonLabels(kind),
-  };
+  return crossHotbarHold(bindings, null, CROSS_HOTBAR_PRIMARY_SET, kind);
 }
 
-/** The eight hardware glyphs under the cells, for the connected pad's brand. */
+/** The sixteen hardware glyphs under the cells (the left half's eight then the
+ *  right half's, the same buttons twice because the trigger is what separates
+ *  them). The d-pad four collapse to bare arrows: the cell already sits in the
+ *  position it names, so the full "D-pad up" only crowds a 44px cell. */
 export function crossHotbarButtonLabels(kind: GamepadKind): string[] {
-  return CROSS_HOTBAR_LAYER_BUTTONS.map((button) => gamepadButtonLabel(button, kind));
+  const half = CROSS_HOTBAR_LAYER_BUTTONS.map(
+    (button) => CROSS_HOTBAR_DPAD_GLYPHS[button] ?? gamepadButtonLabel(button, kind),
+  );
+  return [...half, ...half];
 }
 
 // Pad mode is the cross hotbar being both enabled AND reachable. A player with no
@@ -142,11 +141,7 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
     bindings,
     syncPadMode,
     onHold: (layer, set, kind) =>
-      host().setCrossHotbar(
-        layer === null
-          ? crossHotbarResting(bindings, kind)
-          : crossHotbarHold(bindings, layer, set, kind),
-      ),
+      host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind)),
     applySetting: (pad, store, key, value) => {
       if (key === 'gamepadCrossHotbar') {
         enabled = store.set(key, !!value);

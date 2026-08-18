@@ -37,6 +37,17 @@ export const CROSS_HOTBAR_LAYER_BUTTONS: readonly number[] = [
   GP.A,
 ];
 
+// Compact glyphs for the on-screen bar. The options panel wants the full hardware
+// name ("D-pad up"), but under a 44px cell that is noise: the cell already SITS in
+// the diamond position it names, so the arrow alone reads faster and cannot crowd
+// its neighbours. Face buttons keep their silk-screen letter, which is already short.
+export const CROSS_HOTBAR_DPAD_GLYPHS: Record<number, string> = {
+  [GP.DPAD_UP]: '\u2191',
+  [GP.DPAD_LEFT]: '\u2190',
+  [GP.DPAD_RIGHT]: '\u2192',
+  [GP.DPAD_DOWN]: '\u2193',
+};
+
 export const CROSS_HOTBAR_SLOTS_PER_LAYER = CROSS_HOTBAR_LAYER_BUTTONS.length;
 export const CROSS_HOTBAR_SLOTS_PER_SET = CROSS_HOTBAR_SLOTS_PER_LAYER * 2;
 

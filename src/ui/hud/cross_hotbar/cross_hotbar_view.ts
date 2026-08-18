@@ -1,7 +1,11 @@
-// Pure, DOM-free model for the cross-hotbar overlay: the eight cells one held
-// trigger lights, and which action-bar slot each one currently shows. The overlay
-// draws two diamonds of four (the d-pad and the face buttons) whose CONTENTS swap
-// with the held trigger, rather than showing all sixteen of a set at once.
+// Pure, DOM-free model for the cross-hotbar overlay.
+//
+// The bar shows a WHOLE SET at once: sixteen cells in two halves, the left
+// trigger's eight and the right trigger's eight, each half a d-pad diamond plus a
+// face diamond. Holding a trigger does not swap the contents, it HIGHLIGHTS that
+// half, so a player reads both halves at rest and sees which one is armed. (An
+// eight-cell design that swapped contents per trigger hides half the set, which
+// makes the resting bar a poor replacement for the action-bar rows.)
 //
 // Deliberately self-contained: it names no gamepad button, because a registered UI
 // pure core stays host-agnostic (it may not reach into src/game). The CELL ORDER
@@ -13,88 +17,79 @@
 // overlay reuses the desktop action bar's already-ticked ActionBarState, so a
 // cross-hotbar cell and its action-bar button can never disagree.
 
-/** Which trigger is held. Structurally the game core's CrossHotbarLayer. */
+/** Which trigger a half belongs to. Structurally the game core's CrossHotbarLayer. */
 export type CrossHotbarOverlayLayer = 'left' | 'right';
 
 export type CrossHotbarCluster = 'dpad' | 'face';
 export type CrossHotbarPoint = 'top' | 'left' | 'right' | 'bottom';
 
-/** One overlay cell: where it sits in its diamond. */
+/** One overlay cell: which half it belongs to and where it sits in its diamond. */
 export interface CrossHotbarCell {
-  /** 0 to 7, the overlay's own display order. */
+  /** 0 to 15, matching the set position the game core resolves a press to. */
   index: number;
+  layer: CrossHotbarOverlayLayer;
   cluster: CrossHotbarCluster;
   point: CrossHotbarPoint;
 }
 
-// Each diamond is read top, left, right, bottom.
+// Each diamond is read top, left, right, bottom; each half is d-pad then face.
 const POINTS: readonly CrossHotbarPoint[] = ['top', 'left', 'right', 'bottom'];
 const CLUSTERS: readonly CrossHotbarCluster[] = ['dpad', 'face'];
+const LAYERS: readonly CrossHotbarOverlayLayer[] = ['left', 'right'];
 
-/** The eight cells, in display order: the d-pad diamond then the face diamond. */
-export const CROSS_HOTBAR_CELLS: readonly CrossHotbarCell[] = CLUSTERS.flatMap(
-  (cluster, clusterIndex) =>
-    POINTS.map((point, pointIndex) => ({
-      index: clusterIndex * POINTS.length + pointIndex,
+export const CROSS_HOTBAR_CELLS: readonly CrossHotbarCell[] = LAYERS.flatMap((layer, l) =>
+  CLUSTERS.flatMap((cluster, c) =>
+    POINTS.map((point, p) => ({
+      index: l * CLUSTERS.length * POINTS.length + c * POINTS.length + p,
+      layer,
       cluster,
       point,
     })),
+  ),
 );
 
 export const CROSS_HOTBAR_CELL_COUNT = CROSS_HOTBAR_CELLS.length;
 
 export interface CrossHotbarOverlayState {
   visible: boolean;
-  /** True only while a trigger is actually held. The bar stays on screen in pad
-   *  mode with no trigger down (that is the whole point of replacing the desktop
-   *  bar with it), so "shown" and "armed" are different questions. */
-  active: boolean;
-  layer: CrossHotbarOverlayLayer | null;
+  /** The half a held trigger has armed, or null for the resting bar. */
+  activeLayer: CrossHotbarOverlayLayer | null;
   /** Whether the second (double) set is showing, for the overlay's set marker. */
   expanded: boolean;
-  /** Action-bar slot per cell, always eight entries; -1 where the layout has none. */
+  /** Action-bar slot per cell, always sixteen entries; -1 where the layout has none. */
   cellSlots: readonly number[];
 }
 
 export const HIDDEN_CROSS_HOTBAR: CrossHotbarOverlayState = {
   visible: false,
-  active: false,
-  layer: null,
+  activeLayer: null,
   expanded: false,
   cellSlots: CROSS_HOTBAR_CELLS.map(() => -1),
 };
 
-/** What the HUD is handed when a trigger goes down: which trigger, the eight
- *  action-bar slots it reaches, and whether the double set is showing. */
+/** What the HUD is handed: the whole set, plus which half (if any) is armed. */
 export interface CrossHotbarHold {
-  layer: CrossHotbarOverlayLayer;
+  /** The armed half, or null for the resting bar (still shown). */
+  layer: CrossHotbarOverlayLayer | null;
+  /** The SIXTEEN action-bar slots of the active set, in cell order. */
   slots: readonly number[];
   expanded: boolean;
-  /** False for the resting bar a pad player always sees, true once a trigger is
-   *  actually down. */
-  active: boolean;
   /** The hardware glyph under each cell, in CROSS_HOTBAR_CELLS order. */
   buttons: readonly string[];
 }
 
 /**
- * Build the overlay state for a held trigger. `layerSlots` is the eight action-bar
- * slots that trigger reaches (game/cross_hotbar resolves it from the persisted
- * layout); a null layer means no trigger is held, which hides the bar. A short or
- * missing slot list still yields eight cells, so the painter never indexes past its
- * own elements.
+ * Build the overlay state. A null hold hides the bar outright (no pad, or the
+ * cross hotbar switched off); any hold shows all sixteen cells, arming at most one
+ * half. A short or missing slot list still yields sixteen cells, so the painter
+ * never indexes past its own elements.
  */
-export function crossHotbarOverlayState(
-  layer: CrossHotbarOverlayLayer | null,
-  layerSlots: readonly number[],
-  expanded = false,
-  active = true,
-): CrossHotbarOverlayState {
-  if (layer === null) return HIDDEN_CROSS_HOTBAR;
+export function crossHotbarOverlayState(hold: CrossHotbarHold | null): CrossHotbarOverlayState {
+  if (hold === null) return HIDDEN_CROSS_HOTBAR;
   const cellSlots: number[] = [];
   for (let i = 0; i < CROSS_HOTBAR_CELL_COUNT; i++) {
-    const slot = layerSlots[i];
+    const slot = hold.slots[i];
     cellSlots.push(typeof slot === 'number' && slot >= 0 ? slot : -1);
   }
-  return { visible: true, active, layer, expanded, cellSlots };
+  return { visible: true, activeLayer: hold.layer, expanded: hold.expanded, cellSlots };
 }

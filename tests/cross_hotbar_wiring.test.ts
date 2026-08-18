@@ -62,9 +62,30 @@ function fakeHost() {
 describe('crossHotbarButtonLabels', () => {
   it('names every cell for the connected pad brand', () => {
     const xbox = crossHotbarButtonLabels('xbox');
-    expect(xbox).toHaveLength(CROSS_HOTBAR_LAYER_BUTTONS.length);
+    expect(xbox).toHaveLength(CROSS_HOTBAR_LAYER_BUTTONS.length * 2);
     // d-pad diamond then the face diamond, top/left/right/bottom each.
-    expect(xbox.slice(4)).toEqual(['Y', 'X', 'B', 'A']);
+    expect(xbox.slice(4, 8)).toEqual(['Y', 'X', 'B', 'A']);
+  });
+
+  it('names all sixteen cells: the same eight buttons on each half', () => {
+    const labels = crossHotbarButtonLabels('xbox');
+    expect(labels).toHaveLength(16);
+    expect(labels.slice(0, 8)).toEqual(labels.slice(8));
+  });
+
+  it('collapses the d-pad four to bare arrows so a 44px cell is not crowded', () => {
+    // The options panel wants the full "D-pad up"; the on-screen cell already SITS
+    // in the position it names, so the arrow alone is what belongs under it.
+    expect(crossHotbarButtonLabels('xbox').slice(0, 4)).toEqual([
+      '\u2191',
+      '\u2190',
+      '\u2192',
+      '\u2193',
+    ]);
+    // Brand-independent: the d-pad is identical on every pad.
+    expect(crossHotbarButtonLabels('playstation').slice(0, 4)).toEqual(
+      crossHotbarButtonLabels('nintendo').slice(0, 4),
+    );
   });
 
   it('follows the brand rather than the position, so a Nintendo pad reads its own', () => {
@@ -77,27 +98,30 @@ describe('crossHotbarButtonLabels', () => {
 });
 
 describe('crossHotbarResting', () => {
-  it('is the primary set left eight, shown but not armed', () => {
+  it('shows the whole primary set with neither half armed', () => {
     const resting = crossHotbarResting(new CrossHotbarBindings(), 'xbox');
-    expect(resting.layer).toBe('left');
-    expect(resting.active).toBe(false);
+    expect(resting.layer).toBeNull();
     expect(resting.expanded).toBe(false);
-    expect(resting.slots).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+    // All SIXTEEN, not just one trigger's eight.
+    expect(resting.slots).toEqual(Array.from({ length: 16 }, (_, i) => i));
     expect(resting.buttons).toEqual(crossHotbarButtonLabels('xbox'));
   });
 });
 
 describe('crossHotbarHold', () => {
-  it('is armed and carries the brand glyphs', () => {
+  it('arms a half but still carries the whole set', () => {
     const hold = crossHotbarHold(new CrossHotbarBindings(), 'right', 1, 'playstation');
-    expect(hold?.active).toBe(true);
-    expect(hold?.expanded).toBe(true);
-    expect(hold?.slots).toEqual([24, 25, 26, 27, 28, 29, 30, 31]);
-    expect(hold?.buttons?.[7]).toBe('Cross');
+    expect(hold.layer).toBe('right');
+    expect(hold.expanded).toBe(true);
+    // The expanded set is action-bar slots 16..31, both halves.
+    expect(hold.slots).toEqual(Array.from({ length: 16 }, (_, i) => i + 16));
+    expect(hold.buttons[7]).toBe('Cross');
   });
 
-  it('is null once no trigger is held', () => {
-    expect(crossHotbarHold(new CrossHotbarBindings(), null, 0, 'xbox')).toBeNull();
+  it('still shows the bar when no trigger is held, just unarmed', () => {
+    const hold = crossHotbarHold(new CrossHotbarBindings(), null, 0, 'xbox');
+    expect(hold.layer).toBeNull();
+    expect(hold.slots).toHaveLength(16);
   });
 });
 
@@ -115,9 +139,7 @@ describe('pad mode', () => {
     expect(bodyClasses.has(PAD_MODE_CLASS)).toBe(true);
     // A pad: the bar rests on screen so hiding the desktop rows leaves the player
     // with a hotbar rather than nothing.
-    expect(host.setCrossHotbar).toHaveBeenLastCalledWith(
-      expect.objectContaining({ active: false, layer: 'left' }),
-    );
+    expect(host.setCrossHotbar).toHaveBeenLastCalledWith(expect.objectContaining({ layer: null }));
   });
 
   it('gives the pad up again when it disconnects', () => {
@@ -163,12 +185,11 @@ describe('onHold', () => {
     const wiring = createCrossHotbar(() => host);
     wiring.onHold('left', 0, 'xbox');
     expect(host.setCrossHotbar).toHaveBeenLastCalledWith(
-      expect.objectContaining({ active: true, layer: 'left' }),
+      expect.objectContaining({ layer: 'left' }),
     );
     wiring.onHold(null, 0, 'xbox');
-    // Releasing must NOT close the bar: in pad mode it is the only hotbar.
-    expect(host.setCrossHotbar).toHaveBeenLastCalledWith(
-      expect.objectContaining({ active: false, layer: 'left' }),
-    );
+    // Releasing must NOT close the bar: in pad mode it is the only hotbar. It just
+    // stops arming a half.
+    expect(host.setCrossHotbar).toHaveBeenLastCalledWith(expect.objectContaining({ layer: null }));
   });
 });

@@ -1,7 +1,7 @@
-// DOM adapter for the cross-hotbar overlay: mints the two diamonds and their eight
-// cells inside the static #cross-hotbar root, holds the current overlay state, and
-// drives the painter each frame. Cold by contract: no layout reads, no driver of
-// its own (the HUD's frame loop calls paint).
+// DOM adapter for the cross-hotbar overlay: mints the two halves, their four
+// diamonds and sixteen cells inside the static #cross-hotbar root, holds the
+// current overlay state, and drives the painter each frame. Cold by contract: no
+// layout reads, no driver of its own (the HUD's frame loop calls paint).
 //
 // The root is aria-hidden by design. The cells MIRROR action-bar buttons that
 // already carry their own accessible names, so exposing them again would announce
@@ -11,24 +11,27 @@ import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarSlotElements } from '../action_bar/action_bar_painter';
 import type { ActionBarState } from '../action_bar/action_bar_view';
 import { CrossHotbarPainter } from './cross_hotbar_painter';
-import type { CrossHotbarHold } from './cross_hotbar_view';
 import {
   CROSS_HOTBAR_CELLS,
+  type CrossHotbarCell,
+  type CrossHotbarHold,
   type CrossHotbarOverlayState,
   crossHotbarOverlayState,
   HIDDEN_CROSS_HOTBAR,
 } from './cross_hotbar_view';
 
 const ROOT_ID = 'cross-hotbar';
+const HALF_CLASS = 'xhb-half';
 const CLUSTER_CLASS = 'xhb-diamond';
 const CELL_CLASS = 'xhb-slot';
 const CELL_POSITION_ATTR = 'data-xhb-point';
 const CELL_INDEX_ATTR = 'data-xhb-index';
+const HALF_LAYER_ATTR = 'data-xhb-half';
 const GLYPH_CLASS = 'xhb-glyph';
 
 /** Mint one cell's inner spans, matching the action bar's element contract so the
  *  shared ActionBarPainter can write it unchanged. */
-function buildCell(cell: (typeof CROSS_HOTBAR_CELLS)[number]): ActionBarSlotElements {
+function buildCell(cell: CrossHotbarCell): ActionBarSlotElements {
   const btn = document.createElement('div');
   btn.className = `action-btn ${CELL_CLASS}`;
   btn.setAttribute(CELL_POSITION_ATTR, cell.point);
@@ -60,24 +63,40 @@ export class CrossHotbarController {
     iconBg: (k: string) => string,
   ) {
     const cells: ActionBarSlotElements[] = [];
-    for (const cluster of ['dpad', 'face'] as const) {
-      const wrap = document.createElement('div');
-      wrap.className = `${CLUSTER_CLASS} ${CLUSTER_CLASS}-${cluster}`;
-      for (const cell of CROSS_HOTBAR_CELLS) {
-        if (cell.cluster !== cluster) continue;
-        const els = buildCell(cell);
-        const glyph = document.createElement('span');
-        glyph.className = GLYPH_CLASS;
-        els.btn.appendChild(glyph);
-        this.glyphs[cell.index] = glyph;
-        wrap.appendChild(els.btn);
-        cells[cell.index] = els;
+    const halfEls = new Map<string, HTMLElement>();
+    for (const cell of CROSS_HOTBAR_CELLS) {
+      let half = halfEls.get(cell.layer);
+      if (!half) {
+        half = document.createElement('div');
+        half.className = `${HALF_CLASS} ${HALF_CLASS}-${cell.layer}`;
+        half.setAttribute(HALF_LAYER_ATTR, cell.layer);
+        halfEls.set(cell.layer, half);
+        root.appendChild(half);
       }
-      root.appendChild(wrap);
+      const clusterKey = `${cell.layer}:${cell.cluster}`;
+      let cluster = halfEls.get(clusterKey);
+      if (!cluster) {
+        cluster = document.createElement('div');
+        cluster.className = `${CLUSTER_CLASS} ${CLUSTER_CLASS}-${cell.cluster}`;
+        halfEls.set(clusterKey, cluster);
+        half.appendChild(cluster);
+      }
+      const els = buildCell(cell);
+      const glyph = document.createElement('span');
+      glyph.className = GLYPH_CLASS;
+      els.btn.appendChild(glyph);
+      this.glyphs[cell.index] = glyph;
+      cluster.appendChild(els.btn);
+      cells[cell.index] = els;
     }
     this.painter = new CrossHotbarPainter(
       writers,
-      { root, bar: { container: root, slots: cells } },
+      {
+        root,
+        leftHalf: halfEls.get('left') ?? root,
+        rightHalf: halfEls.get('right') ?? root,
+        bar: { container: root, slots: cells },
+      },
       iconBg,
     );
   }
@@ -92,18 +111,12 @@ export class CrossHotbarController {
     return root ? new CrossHotbarController(root, writers, iconBg) : undefined;
   }
 
-  /** Open the overlay on a held trigger, or close it when `layer` is null. */
-  /** Open, rest, or close the bar. The glyphs are written here rather than per
-   *  frame (they only move when the pad's brand does) and into their OWN element,
-   *  because the shared ActionBarPainter owns `.keybind` and would overwrite a
-   *  glyph parked there with the keyboard keycap. */
+  /** Show the bar (arming at most one half), or hide it with null. The glyphs are
+   *  written here rather than per frame (they only move when the pad's brand does)
+   *  and into their OWN element, because the shared ActionBarPainter owns
+   *  `.keybind` and would overwrite a glyph parked there with the keyboard keycap. */
   setHold(hold: CrossHotbarHold | null): void {
-    this.state = crossHotbarOverlayState(
-      hold?.layer ?? null,
-      hold?.slots ?? [],
-      hold?.expanded ?? false,
-      hold?.active ?? true,
-    );
+    this.state = crossHotbarOverlayState(hold);
     const labels = hold?.buttons;
     if (!labels) return;
     for (let i = 0; i < this.glyphs.length; i++) {

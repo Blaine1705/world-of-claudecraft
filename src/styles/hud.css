@@ -9204,48 +9204,107 @@ body.reduce-motion .breath-bar.breath-bar-drowning {
 }
 
 /* ---------- controller cross hotbar ----------
-   The pad's held-trigger bar: two diamonds of four, sitting directly above the
-   action bar. Cells carry .action-btn as well, so every icon, cooldown sweep,
-   recharge veil and state class the action bar already styles applies unchanged;
-   only the diamond geometry and the hold treatment live here. The overlay is
-   pointer-events-free: it is a readout for a controller, never a click target. */
+   The pad's held-trigger bar: a whole set at once, sixteen cells in two halves
+   (the left trigger's eight and the right trigger's eight), each half a d-pad
+   diamond plus a face diamond. Holding a trigger ARMS a half rather than swapping
+   the contents, so both halves stay readable. Cells carry .action-btn as well, so
+   every icon, cooldown sweep, recharge veil and state class the action bar already
+   styles applies unchanged; only the geometry and the arm treatment live here.
+   The overlay is pointer-events-free: a readout for a controller, never a target. */
 .xhb {
-  --xhb-cell: 44px;
+  --xhb-cell: 40px;
   /* Fixed, not in the HUD column's flow: the bar comes and goes with the pad, and
-     anything in flow here shoves the player frame and XP bar up and down as it
-     does. Out of flow it can never move another element. */
+     anything in flow here shoves the player frame and XP bar as it does. Out of
+     flow it can never move another element. Its BOTTOM sits where the action-bar
+     rows sit, so the pad bar takes over that band rather than floating elsewhere. */
   position: fixed;
   left: 50%;
-  bottom: var(--xhb-bottom, 96px);
+  bottom: var(--xhb-bottom, 18px);
   transform: translateX(-50%);
   z-index: 6;
   display: flex;
-  gap: 26px;
+  gap: 18px;
   align-items: center;
   justify-content: center;
-  padding: 8px 14px;
+  padding: 6px 12px;
   width: max-content;
   max-width: 100%;
   pointer-events: none;
   background: var(--panel-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
-  /* Resting: on screen so a pad player always sees their actions, dimmed so it
-     never competes with the world until a trigger arms it. */
-  opacity: 0.72;
+}
+/* One trigger's eight: its d-pad diamond and its face diamond, side by side.
+   Dimmed until that trigger arms it, so the armed half reads at a glance. */
+.xhb-half {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  opacity: 0.5;
   transition: opacity 120ms ease;
 }
-.xhb.xhb-active {
+.xhb-half.xhb-armed {
   opacity: 1;
+  background: rgba(255, 209, 0, 0.08);
 }
-body.reduce-motion .xhb {
+/* The two halves read as one bar but must not run together. */
+.xhb-half-right {
+  border-left: 1px solid var(--border);
+}
+body.reduce-motion .xhb-half {
   transition: none;
 }
-/* Pad mode: the cross hotbar IS the hotbar, so the desktop rows stand down
-   rather than duplicating it under a bar the player has stopped reading. */
+.xhb-diamond {
+  display: grid;
+  grid-template-columns: repeat(3, var(--xhb-cell));
+  grid-template-rows: repeat(3, var(--xhb-cell));
+  gap: 2px;
+}
+.xhb-slot {
+  width: var(--xhb-cell);
+  height: var(--xhb-cell);
+  position: relative;
+}
+.xhb-slot[data-xhb-point="top"] {
+  grid-area: 1 / 2;
+}
+.xhb-slot[data-xhb-point="left"] {
+  grid-area: 2 / 1;
+}
+.xhb-slot[data-xhb-point="right"] {
+  grid-area: 2 / 3;
+}
+.xhb-slot[data-xhb-point="bottom"] {
+  grid-area: 3 / 2;
+}
+/* The double set: the same bar showing the second sixteen, marked by the accent
+   frame so a player never has to guess which set a press will cast from. */
+.xhb.xhb-expanded {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
+}
+/* Pad mode: the cross hotbar IS the hotbar, so the desktop rows stand down rather
+   than duplicating it under a bar the player has stopped reading.
+   VISIBILITY, never display: the rows sit in the bottom HUD column, so collapsing
+   their boxes drags the player frame and stance bar down the screen the moment a
+   pad connects. Keeping the box hides the ink and holds the layout still. */
 body.xhb-mode #actionbar,
 body.xhb-mode #actionbar2,
 body.xhb-mode #actionbar3 {
+  visibility: hidden;
+}
+/* The bar is taller than the rows it replaces, so lift the rest of the bottom
+   column clear of it. A transform, not a margin: it moves no other element's box
+   and so cannot reflow anything. */
+body.xhb-mode #player-frame,
+body.xhb-mode #stancebar {
+  transform: translateY(calc(-1 * var(--xhb-lift, 118px)));
+}
+/* The pad has no cursor, so the keycap column the action bar shows would be noise
+   here: the button under each cell is the d-pad or face button it sits on. */
+.xhb-slot .keybind {
   display: none;
 }
 /* The hardware glyph under each cell, so the mapping reads itself without a trip
@@ -9254,7 +9313,7 @@ body.xhb-mode #actionbar3 {
 .xhb-glyph {
   position: absolute;
   left: 50%;
-  bottom: -13px;
+  bottom: -12px;
   transform: translateX(-50%);
   font-family: var(--ui-font);
   font-size: 10px;
