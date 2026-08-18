@@ -117,7 +117,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again when the watch moved onto the injected present host: the
     // host's placeholder fields went with it (net -1 with the zero-env
     // prefilter size comment).
-    ceiling: 13551,
+    // Lowered again by the production-named coverage fixes, which paid their
+    // wiring by moving the empty phase-ms fixtures into
+    // renderer_frame_telemetry_core.ts and canvasDataUrlAsync into
+    // canvas_data_url.ts (net -26).
+    ceiling: 13525,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
