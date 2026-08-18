@@ -764,6 +764,10 @@ describe('GamepadManager cross hotbar', () => {
     const onAction = vi.fn();
     const onCrossHotbar = vi.fn();
     const onCrossHotbarCast = vi.fn();
+    const onCrossHotbarEdit = vi.fn();
+    // Which cell the bar reports as focused, driven per case; null is "focus is
+    // somewhere else", which arranging must ignore.
+    let focusedCell: number | null = null;
     const triggerGamepadJump = vi.fn();
     const input = {
       applyGamepadLook: vi.fn(),
@@ -782,6 +786,8 @@ describe('GamepadManager cross hotbar', () => {
       isPointerMode: () => pointerMode,
       onCrossHotbar,
       onCrossHotbarCast,
+      onCrossHotbarEdit,
+      focusedCrossHotbarCell: () => focusedCell,
     } satisfies GamepadCallbacks);
     const xhb = new CrossHotbarBindings();
     // Seed a known bar so a cell's action is predictable: cell N holds ability aN.
@@ -800,7 +806,11 @@ describe('GamepadManager cross hotbar', () => {
       onAction,
       onCrossHotbarCast,
       onCrossHotbar,
+      onCrossHotbarEdit,
       triggerGamepadJump,
+      focus: (cell: number | null) => {
+        focusedCell = cell;
+      },
       press: (...buttons: number[]) => {
         pad = gamepadWithPressed(...buttons);
         manager.poll(1 / 60);
@@ -1092,5 +1102,70 @@ describe('GamepadManager cross hotbar', () => {
     h.press(GP.LT);
     h.manager.stop();
     expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
+  });
+  describe('cross hotbar arrange mode', () => {
+    const enterEdit = (h: ReturnType<typeof setupCrossHotbar>) => {
+      h.press(GP.LB);
+      h.press(GP.LB, GP.Y);
+      h.press();
+    };
+
+    it('opens and closes on the bumper plus top face button', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(true, null);
+      enterEdit(h);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null);
+    });
+
+    it('moves an action onto another cell', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(0);
+      h.press(GP.A);
+      h.press();
+      h.focus(3);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[3]).toEqual({ type: 'ability', id: 'a0' });
+      // A move is a SWAP: what was on the target went where the action came from.
+      expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a3' });
+    });
+
+    it('casts nothing while arranging', () => {
+      // The whole point of a mode: a press that would fire the ability being moved
+      // has to stay silent.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(0);
+      h.press(GP.LT);
+      h.press(GP.LT, GP.DPAD_UP);
+      expect(h.onCrossHotbarCast).not.toHaveBeenCalled();
+    });
+
+    it('clears the focused cell with cancel', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(2);
+      h.press(GP.B);
+      expect(h.xhb.setActions(0)[2]).toBeNull();
+    });
+
+    it('leaves the bar alone when nothing on it is focused', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(null);
+      h.press(GP.A);
+      h.press();
+      h.press(GP.B);
+      expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a0' });
+    });
+
+    it('does nothing at all when the player never entered the mode', () => {
+      const h = setupCrossHotbar(true);
+      h.focus(2);
+      h.press(GP.B);
+      expect(h.xhb.setActions(0)[2]).toEqual({ type: 'ability', id: 'a2' });
+    });
   });
 });

@@ -2327,7 +2327,7 @@ async function startGame(
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
-    onCrossHotbar: (layer, set) => crossHotbar.onHold(layer, set, gamepad.getKind()),
+    ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
   gamepad.setCrossHotbarBindings(crossHotbar.bindings);
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)

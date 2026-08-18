@@ -19097,11 +19097,8 @@ export class Hud {
     this.optionsWindow.onPerfOverlayMoved(x, y);
   }
 
-  /** Called by main.ts when a pad connects/disconnects: re-label the Controller
-   *  panel with the newly detected brand's glyphs if that panel is open. */
   /** What an untouched cross hotbar is filled from: this character's action bar,
-   *  plus its stance-style abilities, which are known but unbound and so would be
-   *  unreachable on a pad. */
+   *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
   crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
     return {
       bar: this.hotbarActions.map((a) => (a ? { type: a.type, id: a.id } : null)),
@@ -19111,11 +19108,18 @@ export class Hud {
     };
   }
 
+  /** The bar's own arrange surface, whole rather than proxied method by method. */
+  crossHotbarEdit(): CrossHotbarController | null {
+    return this.crossHotbar ?? null;
+  }
+
   /** Open or close the controller cross hotbar (the pad's held-trigger bar). */
   setCrossHotbar(hold: CrossHotbarHold | null): void {
     this.crossHotbar?.setHold(hold);
   }
 
+  /** Called by main.ts when a pad connects/disconnects: re-label the Controller
+   *  panel with the newly detected brand's glyphs if that panel is open. */
   refreshControllerLabels(): void {
     this.optionsWindow.refreshControllerLabels();
   }

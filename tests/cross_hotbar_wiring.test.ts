@@ -56,6 +56,7 @@ function fakeHost(bar: CrossHotbarHoldInfo['slots'] = [], extras: string[] = [])
   return {
     setCrossHotbar: vi.fn<(hold: CrossHotbarHoldInfo | null) => void>(),
     refreshControllerLabels: vi.fn(),
+    crossHotbarEdit: () => null,
     crossHotbarSeed: () => ({ bar, extras }),
   };
 }

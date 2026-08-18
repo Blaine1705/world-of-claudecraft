@@ -17,6 +17,13 @@ import {
 } from './cross_hotbar';
 import type { CrossHotbarBindings } from './cross_hotbar_bindings';
 import {
+  type CrossHotbarEditState,
+  clearCell,
+  confirmCell,
+  IDLE_EDIT_STATE,
+  toggleEdit,
+} from './cross_hotbar_edit';
+import {
   clearPadFocus,
   focusFirstInWindow,
   moveDpadFocus,
@@ -73,6 +80,12 @@ export interface GamepadCallbacks {
   // an ability or item id rather than an action-bar slot: IWorld.castAbility is
   // deliberately id-based so the client never depends on slot semantics.
   onCrossHotbarCast?(action: { type: 'ability' | 'item'; id: string }): void;
+  // Edit mode opened, closed, or picked something up. `carriedFrom` is the cell an
+  // action was lifted off, for the gap the bar draws where it used to be.
+  onCrossHotbarEdit?(active: boolean, carriedFrom: number | null): void;
+  // Which cell the bar has focused, so a press can act on it. Answered by the HUD
+  // because focus lives in the DOM.
+  focusedCrossHotbarCell?(): number | null;
 }
 
 // Which way each d-pad button steps focus while a window is open.
@@ -107,6 +120,10 @@ export class GamepadManager {
   // stepping onto a control beats steering a pointer at it, so this is the escape
   // hatch for what the focus order cannot reach, not the everyday path.
   private mouseMode = false;
+  // Arranging the bar on the bar itself. While it is on, confirm and cancel act on
+  // the focused CELL rather than casting, so a player cannot fire an ability by
+  // trying to move it.
+  private edit: CrossHotbarEditState = IDLE_EDIT_STATE;
   private crossHotbar = false;
   private crossHotbarExpand = true;
   private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
@@ -289,6 +306,25 @@ export class GamepadManager {
     const chordRise =
       (cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.R3]) ||
       (cur[GP.R3] && !this.prevPressed[GP.R3] && cur[GP.LB]);
+    // Arrange mode, the same shape of chord: LB plus the top face button. On the
+    // bar rather than in a menu, because a pad player is looking at the bar.
+    const editChord =
+      (cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.Y]) ||
+      (cur[GP.Y] && !this.prevPressed[GP.Y] && cur[GP.LB]);
+    if (editChord && this.crossHotbar) {
+      const toggled = toggleEdit(this.edit);
+      this.edit = toggled.state;
+      if (toggled.restore) {
+        this.crossHotbarBindings?.bind(
+          toggled.restore.cell.set,
+          toggled.restore.cell.position,
+          toggled.restore.action,
+        );
+      }
+      this.cb.onCrossHotbarEdit?.(this.edit.active, null);
+      this.notifyCrossHotbar();
+    }
+
     if (chordRise) {
       this.mouseMode = !this.mouseMode;
       if (this.mouseMode) clearPadFocus();
@@ -425,6 +461,35 @@ export class GamepadManager {
     );
   }
 
+  /** Confirm and cancel arrange the focused cell while editing. Answers whether the
+   *  press was consumed, so anything else still reaches its ordinary binding. */
+  private editPress(buttonIndex: number): boolean {
+    const store = this.crossHotbarBindings;
+    if (!store) return false;
+    const action = this.bindings.actionFor(buttonIndex);
+    const isConfirm = action === GAMEPAD_CONFIRM;
+    const isCancel = buttonIndex === GP.B;
+    if (!isConfirm && !isCancel) return false;
+    const index = this.cb.focusedCrossHotbarCell?.() ?? null;
+    if (index === null) return false;
+    // The focused index addresses the ACTIVE set: the bar shows one set at a time.
+    const cell = { set: crossHotbarActiveSet(this.triggerState), position: index };
+    if (isConfirm) {
+      const r = confirmCell(this.edit, cell, (c) => store.setActions(c.set)[c.position] ?? null);
+      this.edit = r.state;
+      if (r.swap)
+        store.swap(r.swap.from.set, r.swap.from.position, r.swap.to.set, r.swap.to.position);
+    } else {
+      const r = clearCell(this.edit, cell);
+      this.edit = r.state;
+      if (r.restore) store.bind(r.restore.cell.set, r.restore.cell.position, r.restore.action);
+      if (r.clear) store.bind(r.clear.set, r.clear.position, null);
+    }
+    this.cb.onCrossHotbarEdit?.(this.edit.active, this.edit.from?.position ?? null);
+    this.notifyCrossHotbar();
+    return true;
+  }
+
   // Whether a bare press of this button would fall through without doing
   // anything: either the cross hotbar has claimed it (and swallows it with no
   // trigger held) or it simply carries no binding. Only such a press may be
@@ -438,10 +503,14 @@ export class GamepadManager {
   }
 
   private dispatch(buttonIndex: number): void {
+    if (this.edit.active && this.editPress(buttonIndex)) return;
     if (this.crossHotbar) {
       // The triggers are the modifier while the cross hotbar is on: they never
       // fire their own flat binding, the way a Shift key does not type.
       if (buttonIndex === GP.LT || buttonIndex === GP.RT) return;
+      // Arranging is not playing: nothing on the bar fires while a cell is being
+      // moved, or the player casts the very thing they are trying to relocate.
+      if (this.edit.active && isCrossHotbarButton(buttonIndex)) return;
       const action = this.crossHotbarActionFor(buttonIndex);
       if (action !== null) {
         this.cb.onCrossHotbarCast?.(action);

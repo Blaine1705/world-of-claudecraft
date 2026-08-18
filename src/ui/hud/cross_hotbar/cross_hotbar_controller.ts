@@ -41,6 +41,8 @@ const CELL_POSITION_ATTR = 'data-xhb-point';
 const CELL_INDEX_ATTR = 'data-xhb-index';
 const HALF_LAYER_ATTR = 'data-xhb-half';
 const GLYPH_CLASS = 'xhb-glyph';
+const EDIT_CLASS = 'xhb-editing';
+const CARRIED_CLASS = 'xhb-carried';
 // Painted at nothing while hidden: the painter returns after its display write.
 const EMPTY_BAR_STATE = { slots: [], manySpells: false };
 const TRIGGER_CLASS = 'xhb-trigger';
@@ -118,9 +120,15 @@ export class CrossHotbarController {
   private readonly painter: CrossHotbarPainter;
   private readonly view: ActionBarView;
   private readonly glyphs: HTMLElement[] = [];
+  private readonly cellEls: HTMLElement[] = [];
+  private readonly root: HTMLElement;
   private readonly triggerLabels = new Map<string, HTMLElement>();
   private readonly hint: HTMLElement;
   private state: CrossHotbarOverlayState = HIDDEN_CROSS_HOTBAR;
+  // The hint the bar shows when it is not being arranged, kept so leaving edit
+  // mode puts it back without waiting for the next hold to repaint it.
+  private restingHint = '';
+  private editing = false;
 
   private constructor(
     root: HTMLElement,
@@ -128,6 +136,7 @@ export class CrossHotbarController {
     iconBg: (k: string) => string,
     resolve: CrossHotbarResolvers,
   ) {
+    this.root = root;
     const cells: ActionBarSlotElements[] = [];
     const halfEls = new Map<string, HTMLElement>();
     for (const cell of CROSS_HOTBAR_CELLS) {
@@ -156,6 +165,7 @@ export class CrossHotbarController {
       glyph.className = GLYPH_CLASS;
       els.btn.appendChild(glyph);
       this.glyphs[cell.index] = glyph;
+      this.cellEls[cell.index] = els.btn;
       cluster.appendChild(els.btn);
       cells[cell.index] = els;
     }
@@ -239,7 +249,33 @@ export class CrossHotbarController {
       if (el.textContent !== next) el.textContent = next;
     }
     // Advertises the route to the expanded bank: hold one trigger, tap the other.
-    if (this.hint.textContent !== bothTriggers) this.hint.textContent = bothTriggers;
+    this.restingHint = bothTriggers;
+    if (!this.editing && this.hint.textContent !== bothTriggers) {
+      this.hint.textContent = bothTriggers;
+    }
+  }
+
+  /** Which cell the pad has focused, or null when focus is elsewhere. Read off the
+   *  cell's own index attribute so the DOM stays the single source of truth for
+   *  what is selected. */
+  focusedCell(): number | null {
+    const active = document.activeElement as HTMLElement | null;
+    const raw = active?.getAttribute?.(CELL_INDEX_ATTR);
+    if (raw === null || raw === undefined) return null;
+    const index = Number(raw);
+    return Number.isInteger(index) ? index : null;
+  }
+
+  /** Pin the bar open for arranging and mark the cell being carried, so the player
+   *  can see what they picked up and that the bar is now editable. */
+  setEditing(active: boolean, carriedFrom: number | null): void {
+    this.editing = active;
+    this.root.classList.toggle(EDIT_CLASS, active);
+    const hint = active ? t('hudChrome.controller.crossHotbarEditHint') : this.restingHint;
+    if (this.hint.textContent !== hint) this.hint.textContent = hint;
+    for (let i = 0; i < this.cellEls.length; i++) {
+      this.cellEls[i].classList.toggle(CARRIED_CLASS, active && i === carriedFrom);
+    }
   }
 
   /** Tick this bar's own slot states from the frame's world snapshot, then paint.

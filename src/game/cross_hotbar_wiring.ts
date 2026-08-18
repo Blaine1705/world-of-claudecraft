@@ -36,6 +36,15 @@ export interface CrossHotbarOverlayHost {
    *  abilities a pad needs that the bar does not carry (a stance is known at
    *  level one yet unbound, so a pad player could never otherwise reach it). */
   crossHotbarSeed(): { bar: readonly CrossHotbarAction[]; extras: readonly string[] };
+  /** The bar's arrange surface, or null before the overlay exists. */
+  crossHotbarEdit(): CrossHotbarEditSurface | null;
+}
+
+/** What arranging needs off the live bar: which cell is focused, and a place to
+ *  show what is being carried. */
+export interface CrossHotbarEditSurface {
+  focusedCell(): number | null;
+  setEditing(active: boolean, carriedFrom: number | null): void;
 }
 
 /** The live pad, for the connection-driven half of pad mode. */
@@ -76,6 +85,12 @@ export interface CrossHotbarWiring {
     value: number | boolean,
   ): boolean;
   hooks: CrossHotbarPanelHooks;
+  /** The pad callbacks, in the shape GamepadCallbacks declares them. */
+  padCallbacks(kind: () => GamepadKind): {
+    onCrossHotbar(layer: CrossHotbarLayer | null, set: number): void;
+    onCrossHotbarEdit(active: boolean, carriedFrom: number | null): void;
+    focusedCrossHotbarCell(): number | null;
+  };
   /** Re-evaluate pad mode after a connect, disconnect, or settings change. */
   syncPadMode(pad: CrossHotbarPadState): void;
 }
@@ -160,6 +175,13 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
     syncPadMode,
     onHold: (layer, set, kind) =>
       host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind)),
+    padCallbacks: (kind) => ({
+      onCrossHotbar: (layer, set) =>
+        host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind())),
+      onCrossHotbarEdit: (active, carriedFrom) =>
+        host().crossHotbarEdit()?.setEditing(active, carriedFrom),
+      focusedCrossHotbarCell: () => host().crossHotbarEdit()?.focusedCell() ?? null,
+    }),
     applySetting: (pad, store, key, value) => {
       if (key === 'gamepadCrossHotbar') {
         enabled = store.set(key, !!value);

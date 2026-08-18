@@ -1530,6 +1530,10 @@ export const hudChromeStrings = {
     crossHotbarOverlay: 'Cross hotbar',
     crossHotbarOwnsButtons:
       'The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.',
+    crossHotbarEditHint:
+      'Arranging: confirm lifts an action and drops it on the next cell, cancel clears one.',
+    crossHotbarEditHelp:
+      'Hold the left bumper and press the top face button to arrange the bar with the controller.',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in

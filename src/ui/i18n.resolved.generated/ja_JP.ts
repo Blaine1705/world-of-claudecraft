@@ -1463,7 +1463,9 @@ export const ja_JP: EnTranslations = {
       "crossHotbarSlot": "アクションバー {slot}",
       "crossHotbarPosition": "{trigger} + {button}",
       "crossHotbarOverlay": "クロスホットバー",
-      "crossHotbarOwnsButtons": "クロスホットバーが有効な間、トリガーと方向キーはクロスホットバーが使用します。ここではなく下の項目で設定してください。"
+      "crossHotbarOwnsButtons": "クロスホットバーが有効な間、トリガーと方向キーはクロスホットバーが使用します。ここではなく下の項目で設定してください。",
+      "crossHotbarEditHint": "配置変更中：決定でアクションを持ち上げ次のマスに置き、キャンセルでマスを空にします。",
+      "crossHotbarEditHelp": "左バンパーを押しながら上の面ボタンを押すと、コントローラーでバーを配置変更できます。"
     },
     "perf": {
       "title": "パフォーマンスオーバーレイ",

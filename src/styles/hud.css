@@ -9462,3 +9462,21 @@ body.pad-nav * {
   background: url("/ui/cursors/arrow.png") no-repeat center / contain;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
 }
+
+/* Edit mode: the bar is pinned open and arrangeable, so it says so rather than
+   looking like an ordinary resting bar the player's presses are bouncing off. */
+.xhb.xhb-editing {
+  opacity: 1;
+  border-color: var(--gold);
+  box-shadow: 0 0 14px rgba(255, 209, 0, 0.4);
+}
+.xhb.xhb-editing .xhb-half {
+  opacity: 1;
+}
+/* The cell an action was lifted from: it reads as a gap the carried thing came
+   out of, so the player can see where "put it back" would land. */
+.xhb-slot.xhb-carried {
+  opacity: 0.35;
+  outline: 2px dashed var(--gold);
+  outline-offset: 2px;
+}

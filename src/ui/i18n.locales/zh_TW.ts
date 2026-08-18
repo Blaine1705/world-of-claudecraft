@@ -26,6 +26,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.zoomIn': '放大',
   'hudChrome.controller.zoomOut': '縮小',
   'hudChrome.controller.confirmAction': '確認 / 選擇',
+  'hudChrome.controller.crossHotbarEditHint': '整理中：確認鍵拿起一個技能並放到下一個格子，取消鍵清空格子。',
+  'hudChrome.controller.crossHotbarEditHelp': '按住左肩鍵並按上方面鍵，即可用手把整理十字熱鍵列。',
   'hudChrome.controller.crossHotbarOwnsButtons': '十字熱鍵欄啟用時，扳機鍵和方向鍵歸它所有，請在下方設定，而非此處。',
   'hudChrome.controller.crossHotbar': '十字熱鍵欄',
   'hudChrome.controller.crossHotbarEnable': '啟用十字熱鍵欄',

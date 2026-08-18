@@ -1888,11 +1888,6 @@ export class OptionsWindow {
   // physical pair a player presses (both halves are hardware glyphs, so the pair
   // is assembled from a t() template rather than concatenated).
   private renderCrossHotbarRows(body: HTMLElement, hooks: OptionsHooks): void {
-    const _kind = hooks.gamepad.kind();
-    const _slotOptions = Array.from({ length: ACTION_BAR_SLOTS }, (_, slot) => ({
-      value: String(slot),
-      label: this.actionDisplayName(`slot${slot}`, String(slot + 1)),
-    }));
     const head = document.createElement('div');
     head.className = 'kb-cat';
     head.textContent = t('hudChrome.controller.crossHotbar');
@@ -1905,7 +1900,13 @@ export class OptionsWindow {
 
     // The per-cell assignment rows are gone: they addressed action-bar SLOTS, which
     // the bar no longer stores, and thirty-two dropdowns was a miserable way to
-    // arrange a bar you are looking at. Arranging happens on the bar itself now.
+    // arrange a bar you are looking at. Arranging happens on the bar itself now,
+    // so this says how to get there.
+    const editHelp = document.createElement('div');
+    editHelp.className = 'set-note';
+    editHelp.textContent = t('hudChrome.controller.crossHotbarEditHelp');
+    body.appendChild(editHelp);
+
     const resetLayout = document.createElement('button');
     resetLayout.type = 'button';
     resetLayout.className = 'btn';
