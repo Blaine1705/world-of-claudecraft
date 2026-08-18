@@ -734,7 +734,12 @@ describe('GamepadManager cross hotbar', () => {
       // Cursor mode builds the virtual pointer element on entry.
       createElement: () => ({ className: '', style: {}, setAttribute: vi.fn() }),
       body: { appendChild: vi.fn() },
+      // UI navigation queries these; an empty HUD means every move falls back to
+      // nudging the cursor, which is the behaviour these cases care about.
+      querySelectorAll: () => [],
+      activeElement: null,
     });
+    vi.stubGlobal('getComputedStyle', () => ({ visibility: 'visible', display: 'block' }));
     vi.stubGlobal('window', {
       innerWidth: 1920,
       innerHeight: 1080,
@@ -845,6 +850,33 @@ describe('GamepadManager cross hotbar', () => {
     h.press(GP.LT, GP.LB);
     // LB is neither a diamond button nor a trigger, so its default slot2 stands.
     expect(h.onAction).toHaveBeenCalledWith('slot2');
+  });
+
+  it('opens UI navigation from the world on a bare d-pad press', () => {
+    // Pointer mode is otherwise gated on a HUD window already being open, which
+    // left a pad with no way in: the d-pad claims nothing in the world, so it
+    // read as completely dead. This is the entry point.
+    const h = setupCrossHotbar(true);
+    h.press(GP.DPAD_UP);
+    expect((h.manager as unknown as { navEngaged: boolean }).navEngaged).toBe(true);
+  });
+
+  it('does not open UI navigation while a trigger is held (that is the hotbar)', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.DPAD_UP);
+    expect((h.manager as unknown as { navEngaged: boolean }).navEngaged).toBe(false);
+  });
+
+  it('backs out of UI navigation on B without closing anything else', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.DPAD_UP);
+    expect((h.manager as unknown as { navEngaged: boolean }).navEngaged).toBe(true);
+    h.press();
+    h.press(GP.B);
+    expect((h.manager as unknown as { navEngaged: boolean }).navEngaged).toBe(false);
+    // B exited navigation rather than firing the host's escape.
+    expect(h.onAction).not.toHaveBeenCalledWith('escape');
   });
 
   it('never casts an action-bar slot from a bare diamond press', () => {

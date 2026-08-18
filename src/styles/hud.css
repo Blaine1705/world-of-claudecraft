@@ -9397,3 +9397,15 @@ body.xhb-mode #stancebar {
 .xhb-slot .keybind {
   display: none;
 }
+
+/* The d-pad's UI-navigation highlight. An explicit class, not :focus-visible:
+   focus set programmatically does not satisfy the browser's keyboard-like
+   heuristic, so a pad player would see no ring and read the navigation as
+   broken. Drawn from tokens and steady (never transitioned off), matching the
+   focus-ring contract in src/ui/CLAUDE.md. */
+.pad-focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 10px rgba(255, 209, 0, 0.45);
+  border-radius: 4px;
+}

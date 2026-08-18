@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { moveDpadFocus, pressDpadFocus } from '../src/game/dpad_focus_nav';
+import { clearPadFocus, moveDpadFocus, pressDpadFocus } from '../src/game/dpad_focus_nav';
 
 // A fake DOM modelling only what dpad_focus_nav touches: the two selector shapes
 // it queries, visibility, boxes, focus and click. The shared tests/helpers/fake_dom
@@ -13,6 +13,8 @@ interface FakeEl {
   visible: boolean;
   disabled: boolean;
   clicks: number;
+  classes: Set<string>;
+  classList: { add(c: string): void; remove(c: string): void };
   focus(): void;
   click(): void;
   getBoundingClientRect(): {
@@ -43,6 +45,17 @@ function el(
     visible: opts.visible ?? true,
     disabled: opts.disabled ?? false,
     clicks: 0,
+    classes: new Set<string>(),
+    get classList() {
+      return {
+        add: (c: string) => {
+          node.classes.add(c);
+        },
+        remove: (c: string) => {
+          node.classes.delete(c);
+        },
+      };
+    },
     focus() {
       active = node;
     },
@@ -121,6 +134,34 @@ describe('moveDpadFocus', () => {
     const moved = moveDpadFocus('down');
     expect(active).toBe(b);
     expect(moved).toEqual({ x: 20, y: 60 });
+  });
+
+  it('marks the focused control so a pad player can SEE it', () => {
+    // Programmatic focus() does not satisfy the browser's :focus-visible
+    // heuristic, so without an explicit class there is no ring at all and the
+    // navigation reads as broken.
+    const a = el('BUTTON', 0, 0);
+    const b = el('BUTTON', 0, 50);
+    allEls = [a, b];
+    install();
+    a.focus();
+    moveDpadFocus('down');
+    expect(b.classes.has('pad-focus')).toBe(true);
+    // and the mark follows focus rather than accumulating
+    moveDpadFocus('up');
+    expect(b.classes.has('pad-focus')).toBe(false);
+    expect(a.classes.has('pad-focus')).toBe(true);
+  });
+
+  it('drops the mark when navigation ends', () => {
+    const a = el('BUTTON', 0, 0);
+    const b = el('BUTTON', 0, 50);
+    allEls = [a, b];
+    install();
+    a.focus();
+    moveDpadFocus('down');
+    clearPadFocus();
+    expect(b.classes.has('pad-focus')).toBe(false);
   });
 
   it('answers null when nothing lies that way, so the caller nudges the cursor', () => {

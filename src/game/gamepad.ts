@@ -15,7 +15,7 @@ import {
   nextCrossHotbarTriggerState,
 } from './cross_hotbar';
 import type { CrossHotbarBindings } from './cross_hotbar_bindings';
-import { moveDpadFocus, pressDpadFocus } from './dpad_focus_nav';
+import { clearPadFocus, moveDpadFocus, pressDpadFocus } from './dpad_focus_nav';
 import type { GamepadBindings } from './gamepad_bindings';
 import {
   AXIS,
@@ -81,6 +81,10 @@ export class GamepadManager {
   private invertY = false;
   private vibration = 1;
   private lastHealth: number | null = null;
+  // The player has opened UI navigation from the world with the d-pad. Pointer
+  // mode is otherwise gated on a HUD window being open, which leaves a pad with
+  // no way IN: the d-pad claims nothing in the world, so it read as dead.
+  private navEngaged = false;
   private crossHotbar = false;
   private crossHotbarExpand = true;
   private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
@@ -135,7 +139,7 @@ export class GamepadManager {
     this.input.clearGamepadMove();
     this.input.setGamepadLookActive(false);
     this.releaseCrossHotbar();
-    this.hideCursor();
+    this.exitNavMode();
   }
 
   setDeadzone(v: number): void {
@@ -261,7 +265,21 @@ export class GamepadManager {
 
     this.checkRumble();
 
-    if (this.cb.isPointerMode()) {
+    // A bare d-pad press that would otherwise do NOTHING opens UI navigation, so
+    // the pad can reach the HUD without a keyboard. Read the triggers from THIS
+    // poll rather than the reducer, which still holds last poll's value here: a
+    // trigger and a button pressed together must reach the cross hotbar, not this.
+    const triggerHeld = (cur[GP.LT] ?? false) || (cur[GP.RT] ?? false);
+    if (!this.cb.isPointerMode() && !this.navEngaged && !triggerHeld) {
+      for (const idx of risingEdges(this.prevPressed, cur)) {
+        if (DPAD_NAV_DIRECTIONS[idx] !== undefined && this.pressWouldDoNothing(idx)) {
+          this.navEngaged = true;
+          break;
+        }
+      }
+    }
+
+    if (this.cb.isPointerMode() || this.navEngaged) {
       // UI-navigation cursor mode: stick drives a software pointer. Clear any
       // lingering stick movement (a non-modal window like bags doesn't freeze
       // movement on its own) and skip camera/ability dispatch.
@@ -343,6 +361,15 @@ export class GamepadManager {
       layer,
       buttonIndex,
     );
+  }
+
+  // Whether a bare press of this button would fall through without doing
+  // anything: either the cross hotbar has claimed it (and swallows it with no
+  // trigger held) or it simply carries no binding. Only such a press may be
+  // repurposed for UI navigation; one that still fires a real action keeps it.
+  private pressWouldDoNothing(buttonIndex: number): boolean {
+    if (this.crossHotbar && isCrossHotbarButton(buttonIndex)) return true;
+    return this.bindings.actionFor(buttonIndex) === GAMEPAD_NONE;
   }
 
   private dispatch(buttonIndex: number): void {
@@ -487,9 +514,21 @@ export class GamepadManager {
       // has not focused anything the navigation owns.
       if (idx === GP.A) {
         if (!pressDpadFocus()) this.clickAtCursor();
-      } else if (idx === GP.B || idx === GP.START) this.cb.onAction('escape');
+      } else if (idx === GP.B || idx === GP.START) {
+        // B backs out of UI navigation the pad opened itself; otherwise it is the
+        // host's escape (closing the window that put us in pointer mode).
+        if (this.navEngaged && !this.cb.isPointerMode()) this.exitNavMode();
+        else this.cb.onAction('escape');
+      }
     }
     return acted;
+  }
+
+  // Leave the d-pad's UI navigation and give the world back.
+  private exitNavMode(): void {
+    this.navEngaged = false;
+    clearPadFocus();
+    this.hideCursor();
   }
 
   // Park the cursor at a point (the centre of a newly focused control).

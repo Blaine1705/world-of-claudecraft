@@ -63,8 +63,29 @@ export function moveDpadFocus(dir: NavDirection): DpadFocusResult | null {
   if (next < 0 || next === current) return null;
   const el = els[next];
   el.focus();
+  markPadFocus(el);
   const r = el.getBoundingClientRect();
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
+
+// Programmatic focus() does NOT satisfy the browser's :focus-visible heuristic,
+// which only fires for input it judges keyboard-like. A pad player therefore sees
+// no ring at all, which is indistinguishable from the navigation being broken. So
+// the highlight is an explicit class rather than a pseudo-class we do not control.
+const PAD_FOCUS_CLASS = 'pad-focus';
+let marked: HTMLElement | null = null;
+
+function markPadFocus(el: HTMLElement): void {
+  if (marked === el) return;
+  marked?.classList.remove(PAD_FOCUS_CLASS);
+  el.classList.add(PAD_FOCUS_CLASS);
+  marked = el;
+}
+
+/** Drop the highlight when the pad leaves UI navigation. */
+export function clearPadFocus(): void {
+  marked?.classList.remove(PAD_FOCUS_CLASS);
+  marked = null;
 }
 
 /** Press whatever the d-pad has focused. Answers false when nothing is focused,
