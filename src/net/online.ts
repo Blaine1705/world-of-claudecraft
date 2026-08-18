@@ -3344,6 +3344,10 @@ export class ClientWorld implements IWorld {
       e.resource = s.res;
       e.maxResource = s.mres;
       e.resourceType = s.rtype;
+      // Parked mana while shapeshifted (server/game.ts self snapshot). Absent
+      // means zero, decoded unconditionally so leaving the form clears it
+      // rather than stranding the last parked pool on the mirror.
+      e.savedMana = typeof s.sm === 'number' ? s.sm : 0;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
       // corpse position while a ghost (null once resurrected). Delta-guarded: kept

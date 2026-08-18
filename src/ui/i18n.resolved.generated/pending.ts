@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "es_ES": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "fr_FR": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "fr_CA": [
+    "guide.classPage.formsAutoUnshift"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "de_DE": [
+    "guide.classPage.formsAutoUnshift"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.classPage.formsAutoUnshift"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "nl_NL": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "pl_PL": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "id_ID": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "tr_TR": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "sv_SE": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "vi_VN": [
+    "guide.classPage.formsAutoUnshift"
+  ],
+  "da_DK": [
+    "guide.classPage.formsAutoUnshift"
+  ]
 };
