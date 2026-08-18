@@ -40,6 +40,7 @@ import {
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
+import { CROSS_HOTBAR_ATTACK_ID } from './game/cross_hotbar';
 import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
@@ -3501,12 +3502,18 @@ async function startGame(
    */
   function padAutoTarget(action: { type: 'ability' | 'item'; id: string }): void {
     if (action.type !== 'ability') return;
+    // Attack is not in ABILITIES (it is the fixed slot-0 toggle, not a spell), so
+    // it would otherwise be the ONE press that skips this, and it is the press a
+    // new player reaches for first. It plainly needs a hostile target: without one
+    // the sim answers "Invalid attack target."
+    const ability =
+      action.id === CROSS_HOTBAR_ATTACK_ID ? { requiresTarget: true } : ABILITIES[action.id];
     const current = world.player.targetId ?? null;
     const targeted = current !== null ? world.entities.get(current) : undefined;
     const activePvpOpponents = activePvpOpponentIds(world);
     const attackable = (e: Parameters<typeof isAttackableEntity>[0]) =>
       isAttackableEntity(e, world.playerId, activePvpOpponents);
-    if (!shouldAutoTarget(ABILITIES[action.id], !!targeted && attackable(targeted))) return;
+    if (!shouldAutoTarget(ability, !!targeted && attackable(targeted))) return;
     const picked = nearestAutoTarget(world.entities.values(), world.player.pos, (e) =>
       attackable(e as Parameters<typeof isAttackableEntity>[0]),
     );

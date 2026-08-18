@@ -2192,6 +2192,14 @@ describe('client HTML shell', () => {
       "t('questUi.errors.escortAway'),\n        t('errors.nothingInteract'),",
     );
     expect(mainTs).not.toContain('online === null');
+    // Attack is the fixed slot-0 toggle, not a spell, so ABILITIES has no record
+    // for it and it would be the ONE press that skipped auto-targeting: the very
+    // press a new controller player reaches for first, on a wolf they have not
+    // targeted. The descriptor is substituted here rather than in the pure core,
+    // which never learns about pseudo-actions.
+    expect(mainTs).toContain(
+      'action.id === CROSS_HOTBAR_ATTACK_ID ? { requiresTarget: true } : ABILITIES[action.id]',
+    );
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
       'isClickMoveButton &&\n        shouldApproachPickedEntity(\n          world.player,\n          e,\n          didInteractImmediately,\n          true,\n          localPartyMemberIds(world.partyInfo),\n        )',
