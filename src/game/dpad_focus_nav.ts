@@ -75,19 +75,79 @@ export function moveDpadFocus(dir: NavDirection): DpadFocusResult | null {
 // no ring at all, which is indistinguishable from the navigation being broken. So
 // the highlight is an explicit class rather than a pseudo-class we do not control.
 const PAD_FOCUS_CLASS = 'pad-focus';
+const CURSOR_ID = 'pad-cursor';
 let marked: HTMLElement | null = null;
+let cursorEl: HTMLElement | null = null;
 
-function markPadFocus(el: HTMLElement): void {
-  if (marked === el) return;
-  marked?.classList.remove(PAD_FOCUS_CLASS);
-  el.classList.add(PAD_FOCUS_CLASS);
-  marked = el;
+// The pointer graphic that rides the selection. A console MMO still SHOWS a
+// cursor under gamepad control (FFXIV anchors one to the selected element); what
+// it does not do is make you steer it. So this is drawn by us, snapped to focus,
+// and never free-moving. It is not the OS pointer, which a page cannot move.
+function ensureCursor(): HTMLElement | null {
+  if (cursorEl) return cursorEl;
+  if (typeof document === 'undefined') return null;
+  const el = document.createElement('div');
+  el.id = CURSOR_ID;
+  el.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(el);
+  cursorEl = el;
+  return el;
 }
 
-/** Drop the highlight when the pad leaves UI navigation. */
+// While the pad is driving the UI, the OS pointer is dead weight sitting wherever
+// it was last left, so it is hidden. ANY real pointer movement brings it straight
+// back (a mouse, or the Deck's trackpad, which emulates one) and stands the pad
+// pointer down: whichever device the player just used is the one that shows.
+const PAD_NAV_CLASS = 'pad-nav';
+let padNavActive = false;
+let pointerWatchAttached = false;
+
+function watchForRealPointer(): void {
+  if (pointerWatchAttached || typeof window === 'undefined') return;
+  pointerWatchAttached = true;
+  window.addEventListener(
+    'mousemove',
+    () => {
+      if (padNavActive) setPadCursorMode(false);
+    },
+    { passive: true },
+  );
+}
+
+function setPadCursorMode(on: boolean): void {
+  if (padNavActive === on) return;
+  padNavActive = on;
+  try {
+    document.body.classList.toggle(PAD_NAV_CLASS, on);
+  } catch {
+    /* no DOM */
+  }
+  if (!on && cursorEl) cursorEl.style.display = 'none';
+}
+
+function markPadFocus(el: HTMLElement): void {
+  if (marked !== el) {
+    marked?.classList.remove(PAD_FOCUS_CLASS);
+    el.classList.add(PAD_FOCUS_CLASS);
+    marked = el;
+  }
+  // Anchor the pointer to the selection's top-left corner, the way FFXIV parks
+  // it: on the element, not centred over it, so it never hides the label.
+  const cursor = ensureCursor();
+  if (!cursor) return;
+  watchForRealPointer();
+  setPadCursorMode(true);
+  const r = el.getBoundingClientRect();
+  cursor.style.left = `${r.left}px`;
+  cursor.style.top = `${r.top}px`;
+  cursor.style.display = 'block';
+}
+
+/** Drop the highlight and park the pointer when the pad leaves UI navigation. */
 export function clearPadFocus(): void {
   marked?.classList?.remove(PAD_FOCUS_CLASS);
   marked = null;
+  setPadCursorMode(false);
 }
 
 /** Press whatever the d-pad has focused. Answers false when nothing is focused,

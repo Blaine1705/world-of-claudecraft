@@ -9409,3 +9409,33 @@ body.xhb-mode #stancebar {
   box-shadow: 0 0 10px rgba(255, 209, 0, 0.45);
   border-radius: 4px;
 }
+
+/* The pad's pointer: a mouse-cursor graphic anchored to whatever the d-pad has
+   selected. A console MMO still SHOWS a cursor under gamepad control, it just
+   never makes you steer it, so this snaps to the selection and never free-moves.
+   It is drawn by us because a page cannot move the OS pointer. */
+#pad-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 20px;
+  margin: -2px 0 0 -3px;
+  display: none;
+  pointer-events: none;
+  z-index: 100000;
+  background: #fff;
+  border: 1px solid #000;
+  /* A classic arrow pointer, drawn rather than shipped as an asset. */
+  clip-path: polygon(0 0, 0 78%, 26% 60%, 44% 100%, 68% 88%, 50% 50%, 100% 44%);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
+}
+
+/* Pad navigation hides the OS pointer, which would otherwise sit abandoned
+   wherever it was last left. Any real mouse or trackpad movement clears this
+   class immediately (gamepad/dpad_focus_nav.ts), so a keyboard-and-mouse player
+   never loses their cursor. */
+body.pad-nav,
+body.pad-nav * {
+  cursor: none !important;
+}

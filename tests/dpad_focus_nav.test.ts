@@ -29,6 +29,7 @@ interface FakeEl {
 }
 
 let active: FakeEl | null = null;
+let padCursorClasses = new Set<string>();
 let allEls: FakeEl[] = [];
 
 function el(
@@ -96,13 +97,29 @@ function within(container: FakeEl | null, node: FakeEl): boolean {
 function install(): void {
   const queryAll = (root: FakeEl | null, selector: string): FakeEl[] =>
     allEls.filter((n) => matches(n, selector) && within(root, n));
+  const bodyClasses = new Set<string>();
   const docLike = {
     querySelectorAll: (selector: string) => queryAll(null, selector),
     get activeElement() {
       return active;
     },
-    body: { tagName: 'BODY' },
+    body: {
+      tagName: 'BODY',
+      classList: {
+        toggle: (c: string, on: boolean) => {
+          if (on) bodyClasses.add(c);
+          else bodyClasses.delete(c);
+        },
+      },
+      appendChild: () => {},
+    },
+    createElement: () => ({
+      id: '',
+      style: {} as Record<string, string>,
+      setAttribute: () => {},
+    }),
   };
+  padCursorClasses = bodyClasses;
   vi.stubGlobal('document', docLike);
   vi.stubGlobal('getComputedStyle', (n: FakeEl) => ({
     visibility: n.visible ? 'visible' : 'hidden',
@@ -118,6 +135,10 @@ function install(): void {
 beforeEach(() => {
   active = null;
   allEls = [];
+  padCursorClasses = new Set<string>();
+  // The module keeps the highlight, the pointer and the hidden-cursor flag at
+  // module scope (one pad, one HUD), so reset them or state leaks between cases.
+  clearPadFocus();
 });
 afterEach(() => vi.unstubAllGlobals());
 
@@ -151,6 +172,19 @@ describe('moveDpadFocus', () => {
     moveDpadFocus('up');
     expect(b.classes.has('pad-focus')).toBe(false);
     expect(a.classes.has('pad-focus')).toBe(true);
+  });
+
+  it('hides the OS pointer while navigating and restores it on the way out', () => {
+    // The OS pointer would otherwise sit abandoned wherever it was last left.
+    const a = el('BUTTON', 0, 0);
+    const b = el('BUTTON', 0, 50);
+    allEls = [a, b];
+    install();
+    a.focus();
+    moveDpadFocus('down');
+    expect(padCursorClasses.has('pad-nav')).toBe(true);
+    clearPadFocus();
+    expect(padCursorClasses.has('pad-nav')).toBe(false);
   });
 
   it('drops the mark when navigation ends', () => {
