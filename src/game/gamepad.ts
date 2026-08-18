@@ -21,6 +21,7 @@ import {
   clearCell,
   confirmCell,
   IDLE_EDIT_STATE,
+  pickUpAction,
   toggleEdit,
 } from './cross_hotbar_edit';
 import {
@@ -49,6 +50,7 @@ import {
   TRIGGER_THRESHOLD,
 } from './gamepad_map';
 import type { Input } from './input';
+import { focusedPadAction } from './pad_focus_action';
 import { clickPadMouse, hidePadMouse, updatePadMouse } from './pad_mouse_cursor';
 
 export interface GamepadCallbacks {
@@ -321,8 +323,7 @@ export class GamepadManager {
           toggled.restore.action,
         );
       }
-      this.cb.onCrossHotbarEdit?.(this.edit.active, null);
-      this.notifyCrossHotbar();
+      this.announceEdit();
     }
 
     if (chordRise) {
@@ -470,6 +471,24 @@ export class GamepadManager {
     const isConfirm = action === GAMEPAD_CONFIRM;
     const isCancel = buttonIndex === GP.B;
     if (!isConfirm && !isCancel) return false;
+    // Picking an ability up out of the spellbook is how something NEW reaches the
+    // bar; only when empty-handed, so a carry in progress is never overwritten.
+    if (isConfirm && this.edit.carried === null) {
+      const picked = pickUpAction(this.edit, focusedPadAction());
+      if (picked !== this.edit) {
+        this.edit = picked;
+        this.announceEdit();
+        return true;
+      }
+    }
+    // Cancelling a carry needs no cell: putting it down is the whole act.
+    if (!isConfirm && this.edit.carried !== null) {
+      const r = clearCell(this.edit, { set: 0, position: 0 });
+      this.edit = r.state;
+      if (r.restore) store.bind(r.restore.cell.set, r.restore.cell.position, r.restore.action);
+      this.announceEdit();
+      return true;
+    }
     const index = this.cb.focusedCrossHotbarCell?.() ?? null;
     if (index === null) return false;
     // The focused index addresses the ACTIVE set: the bar shows one set at a time.
@@ -479,15 +498,21 @@ export class GamepadManager {
       this.edit = r.state;
       if (r.swap)
         store.swap(r.swap.from.set, r.swap.from.position, r.swap.to.set, r.swap.to.position);
+      if (r.place) store.bind(r.place.cell.set, r.place.cell.position, r.place.action);
     } else {
       const r = clearCell(this.edit, cell);
       this.edit = r.state;
-      if (r.restore) store.bind(r.restore.cell.set, r.restore.cell.position, r.restore.action);
       if (r.clear) store.bind(r.clear.set, r.clear.position, null);
     }
+    this.announceEdit();
+    return true;
+  }
+
+  // Push the arrange state out: what the bar draws (the gap under a carried
+  // action) and the freshly written cells.
+  private announceEdit(): void {
     this.cb.onCrossHotbarEdit?.(this.edit.active, this.edit.from?.position ?? null);
     this.notifyCrossHotbar();
-    return true;
   }
 
   // Whether a bare press of this button would fall through without doing

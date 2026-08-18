@@ -20,7 +20,9 @@ export interface CrossHotbarEditState {
   active: boolean;
   /** The action lifted off a cell and travelling with the cursor, if any. */
   carried: CrossHotbarAction;
-  /** Where it was lifted from, so a drop can put the displaced action back. */
+  /** Where it was lifted from, so a drop can put the displaced action back. Null
+   *  when it came from OUTSIDE the bar (the spellbook), which is a plain place
+   *  rather than a swap: there is nothing behind it to exchange with. */
   from: CrossHotbarCellRef | null;
 }
 
@@ -51,6 +53,16 @@ export function toggleEdit(state: CrossHotbarEditState): {
   return { state: IDLE_EDIT_STATE, restore };
 }
 
+/** Pick up an action that is not on the bar (a spellbook entry). It carries with
+ *  no origin, so dropping it writes rather than swaps. */
+export function pickUpAction(
+  state: CrossHotbarEditState,
+  action: CrossHotbarAction,
+): CrossHotbarEditState {
+  if (!state.active || action === null || state.carried !== null) return state;
+  return { ...state, carried: action, from: null };
+}
+
 /** What pressing confirm on a cell does: lift its action, or drop the carried one.
  *
  * A drop SWAPS, so dropping onto an occupied cell exchanges the two rather than
@@ -64,21 +76,25 @@ export function confirmCell(
 ): {
   state: CrossHotbarEditState;
   swap: { from: CrossHotbarCellRef; to: CrossHotbarCellRef } | null;
+  place: { cell: CrossHotbarCellRef; action: CrossHotbarAction } | null;
 } {
-  if (!state.active || !isValidCell(cell)) return { state, swap: null };
+  const nothing = { state, swap: null, place: null };
+  if (!state.active || !isValidCell(cell)) return nothing;
   if (state.carried === null) {
     const action = actionAt(cell);
     // Lifting nothing is not a carry: it would leave the cursor "holding" an empty
     // cell, and the next press would silently blank whatever it landed on.
-    if (action === null) return { state, swap: null };
-    return { state: { ...state, carried: action, from: cell }, swap: null };
+    if (action === null) return nothing;
+    return { state: { ...state, carried: action, from: cell }, swap: null, place: null };
   }
+  const dropped = { ...state, carried: null, from: null };
   const from = state.from;
-  if (from === null) return { state: { ...state, carried: null, from: null }, swap: null };
-  return {
-    state: { ...state, carried: null, from: null },
-    swap: { from, to: cell },
-  };
+  // Carried in from off the bar: write it, overwriting whatever was there. There
+  // is no origin cell to send the displaced action back to.
+  if (from === null) {
+    return { state: dropped, swap: null, place: { cell, action: state.carried } };
+  }
+  return { state: dropped, swap: { from, to: cell }, place: null };
 }
 
 /** Clearing a cell. While carrying, this cancels the carry instead: the player is
@@ -92,12 +108,11 @@ export function clearCell(
   clear: CrossHotbarCellRef | null;
 } {
   if (!state.active) return { state, restore: null, clear: null };
-  if (state.carried !== null && state.from !== null) {
-    return {
-      state: { ...state, carried: null, from: null },
-      restore: { cell: state.from, action: state.carried },
-      clear: null,
-    };
+  if (state.carried !== null) {
+    // Nothing to restore for something carried in from off the bar: it was never
+    // taken out of a cell, so cancelling just puts it down.
+    const restore = state.from !== null ? { cell: state.from, action: state.carried } : null;
+    return { state: { ...state, carried: null, from: null }, restore, clear: null };
   }
   if (!isValidCell(cell)) return { state, restore: null, clear: null };
   return { state, restore: null, clear: cell };

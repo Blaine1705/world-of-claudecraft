@@ -1531,7 +1531,7 @@ export const hudChromeStrings = {
     crossHotbarOwnsButtons:
       'The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.',
     crossHotbarEditHint:
-      'Arranging: confirm lifts an action and drops it on the next cell, cancel clears one.',
+      'Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.',
     crossHotbarEditHelp:
       'Hold the left bumper and press the top face button to arrange the bar with the controller.',
   },

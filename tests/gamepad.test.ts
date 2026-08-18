@@ -811,6 +811,25 @@ describe('GamepadManager cross hotbar', () => {
       focus: (cell: number | null) => {
         focusedCell = cell;
       },
+      // Put a spellbook row under focus. Draggable because that is the flag the
+      // spellbook sets once isAbilityActionBarEligible has passed.
+      focusSpell: (abilityId: string | null) => {
+        if (abilityId === null) {
+          Reflect.deleteProperty(globalThis, 'document');
+          return;
+        }
+        Object.defineProperty(globalThis, 'document', {
+          configurable: true,
+          value: {
+            activeElement: {
+              draggable: true,
+              getAttribute: (name: string) => (name === 'data-ability-id' ? abilityId : null),
+            },
+            // The focus stepper runs on the same press; it finds nothing to move to.
+            querySelectorAll: () => [],
+          },
+        });
+      },
       press: (...buttons: number[]) => {
         pad = gamepadWithPressed(...buttons);
         manager.poll(1 / 60);
@@ -1104,6 +1123,12 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
   });
   describe('cross hotbar arrange mode', () => {
+    // focusSpell installs a document global; drop it so a later case in this file
+    // sees the plain-Node environment the rest of the suite assumes.
+    afterEach(() => {
+      Reflect.deleteProperty(globalThis, 'document');
+    });
+
     const enterEdit = (h: ReturnType<typeof setupCrossHotbar>) => {
       h.press(GP.LB);
       h.press(GP.LB, GP.Y);
@@ -1159,6 +1184,30 @@ describe('GamepadManager cross hotbar', () => {
       h.press();
       h.press(GP.B);
       expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a0' });
+    });
+
+    it('picks an ability out of the spellbook and drops it on a cell', () => {
+      // The other half of arranging: slot-to-slot moves what is already there,
+      // this is how something NEW reaches the bar.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focusSpell('mortal_strike');
+      h.press(GP.A);
+      h.press();
+      h.focusSpell(null);
+      h.focus(5);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[5]).toEqual({ type: 'ability', id: 'mortal_strike' });
+    });
+
+    it('leaves a spellbook row alone outside arrange mode', () => {
+      const h = setupCrossHotbar(true);
+      h.focusSpell('mortal_strike');
+      h.focus(5);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[5]).toEqual({ type: 'ability', id: 'a5' });
     });
 
     it('does nothing at all when the player never entered the mode', () => {

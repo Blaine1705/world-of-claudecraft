@@ -1464,7 +1464,7 @@ export const ko_KR: EnTranslations = {
       "crossHotbarPosition": "{trigger} + {button}",
       "crossHotbarOverlay": "크로스 핫바",
       "crossHotbarOwnsButtons": "크로스 핫바가 켜져 있는 동안에는 트리거와 방향키를 크로스 핫바가 사용합니다. 여기가 아니라 아래에서 설정하세요.",
-      "crossHotbarEditHint": "정렬 중: 확인으로 액션을 집어 다음 칸에 놓고, 취소로 칸을 비웁니다.",
+      "crossHotbarEditHint": "정렬 중: 확인으로 칸이나 마법서에서 액션을 집어 칸에 놓고, 취소로 칸을 비웁니다.",
       "crossHotbarEditHelp": "왼쪽 범퍼를 누른 채 위쪽 페이스 버튼을 누르면 컨트롤러로 바를 정렬할 수 있습니다."
     },
     "perf": {

@@ -6,6 +6,7 @@ import {
   confirmCell,
   IDLE_EDIT_STATE,
   isValidCell,
+  pickUpAction,
   toggleEdit,
 } from '../src/game/cross_hotbar_edit';
 
@@ -124,5 +125,42 @@ describe('clearCell', () => {
 
   it('ignores a cell that does not exist', () => {
     expect(clearCell(editing, cell(0, 99)).clear).toBeNull();
+  });
+});
+
+describe('pickUpAction', () => {
+  it('carries an action that came from off the bar', () => {
+    const s = pickUpAction(editing, ability('new'));
+    expect(s.carried).toEqual(ability('new'));
+    // No origin cell: it was never on the bar, so a drop writes rather than swaps.
+    expect(s.from).toBeNull();
+  });
+
+  it('refuses to overwrite a carry already in progress', () => {
+    const carrying = { active: true, carried: ability('a'), from: cell(0, 0) };
+    expect(pickUpAction(carrying, ability('new'))).toBe(carrying);
+  });
+
+  it('does nothing while not editing, or with nothing to pick up', () => {
+    expect(pickUpAction(IDLE_EDIT_STATE, ability('new'))).toBe(IDLE_EDIT_STATE);
+    expect(pickUpAction(editing, null)).toBe(editing);
+  });
+
+  it('places onto a cell instead of swapping with it', () => {
+    // A swap would send whatever was on the cell back to an origin that does not
+    // exist, which is how an action would silently vanish.
+    const carrying = pickUpAction(editing, ability('new'));
+    const dropped = confirmCell(carrying, cell(0, 1), actionAt);
+    expect(dropped.place).toEqual({ cell: cell(0, 1), action: ability('new') });
+    expect(dropped.swap).toBeNull();
+    expect(dropped.state.carried).toBeNull();
+  });
+
+  it('is put down, not put back, when cancelled', () => {
+    const carrying = pickUpAction(editing, ability('new'));
+    const r = clearCell(carrying, cell(0, 4));
+    expect(r.restore).toBeNull();
+    expect(r.clear).toBeNull();
+    expect(r.state.carried).toBeNull();
   });
 });
