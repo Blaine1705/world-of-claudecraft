@@ -187,28 +187,15 @@ describe('reveal gate wiring (source pins)', () => {
     expect(propsSource).toContain(
       'cullableBounds(obj, propCullKey(cullables.length), box, sphere)',
     );
-    // The hideables (buildings, tents, campfires) are the third namespace on
-    // the same gate: keyed from their slot at registration, resolved to the
-    // one group, and consulted through the band gate (armed at world entry,
-    // never under the curtain), never a bare `visible = true` on first sight.
-    expect(propsSource).toContain('new Map(hideables.map((hideable) => [hideable.key, hideable]))');
-    expect(propsSource).toContain('key: propHideableKey(hideables.length),');
-    expect(propsSource).toContain(
-      'propHideableConsultImminent(centerDistSq, h.cull, fogFar, h, bandRevealGate)',
-    );
-    expect(propsSource).toContain(
-      'const reveal = propHideableReveal(centerDistSq, h.cull, fogFar, h, bandRevealGate);',
-    );
-    expect(propsSource).toContain('const hideablePass = newPropCullPass();');
-    // The ONLY visible=true write on a hideable group is inside showHideable,
-    // reached after the consult (a second writer would be a bare reveal).
-    expect(propsSource.match(/h\.group\.visible = true;/g) ?? []).toHaveLength(1);
-    const showAt = anchor(propsSource, 'function showHideable(');
-    expect(anchor(propsSource, 'h.group.visible = true;')).toBeGreaterThan(showAt);
+    // The hideables (buildings, tents, campfires) deliberately do NOT ride a
+    // first-sight gate (props.ts explains: 116 keys at once starved the
+    // reveal pipeline on the iGPU ride); their unique-material case is the
+    // far cell's `:near` hold, which resolves through the same far-cell map.
+    expect(propsSource).not.toContain('propHideable');
     const rootsAt = anchor(propsSource, 'revealRoots(key: string): readonly THREE.Object3D[] {');
     const roots = propsSource.slice(rootsAt, rootsAt + 200);
     expect(roots).toContain(
-      'return propRevealRoots<THREE.Object3D>(farCellsByKey, cullablesByKey, hideablesByKey, key);',
+      'return propRevealRoots<THREE.Object3D>(farCellsByKey, cullablesByKey, key);',
     );
     // Every band goes through the ONE gated cull entry: no raw `.obj.visible =`
     // write anywhere in props.ts (the pre-change loop had exactly one). The

@@ -295,11 +295,16 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   static batch plus every building group and flipping all of them on the frame
   the slowest link settles IS the burst the gate exists to prevent. A root
   once shown is never hidden again (`numPointLights` is in three's program
-  cache key, so a hide and re-show links fresh programs). The props bands, the
-  props hideables (each camera-ghost building, tent or campfire group, on the
-  band gate under `hideable:<slot>` keys, `prop_cull_core.ts` `propHideable*`)
-  and the foliage buckets are one root per key, and a far cell's bake meshes
-  swap as one representation, so those consults stay all-or-nothing.
+  cache key, so a hide and re-show links fresh programs). The props bands and
+  the foliage buckets are one root per key, and a far cell's bake meshes swap
+  as one representation (its first near flip back after a proven bake holds
+  ON the bake under `<key>:near`, `prop_cell_core.ts` `propCellNearKey`, until
+  the members' own programs link), so those consults stay all-or-nothing. The
+  props HIDEABLES (each camera-ghost building, tent or campfire group) carry
+  NO first-sight gate of their own, by measurement: gating them put 116 keys
+  into the reveal pipeline at once on the Eastbrook ride and the iGPU could
+  not settle them inside the watchdog, so they hid 10 s and drew cold anyway;
+  the near-flip hold is what covers a building's unique kit materials.
   The two consults that used to SKIP the gate (a prop band already inside half
   the fog, a camera already inside a town's cull radius: the teleport-arrival
   shape) are IMMINENT HOLDS now, because the premise that such an arrival rides
@@ -322,8 +327,8 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   frame with two or more of them). `gpu_prep_events.ts` counts the marked keys
   as `imminentHolds`.
   TWO REACH FLOORS, and they are the only reveals that may draw a root
-  unlinked: colliders are never invisible at arm's length. Bands and hideables
-  keep `PROP_CULL_REVEAL_REACH` (40 yd, instant, gate or not). Towns get
+  unlinked: colliders are never invisible at arm's length. Bands keep
+  `PROP_CULL_REVEAL_REACH` (40 yd, instant, gate or not). Towns get
   `TOWN_REVEAL_REACH_YD` (12 yd, applied in the piecewise pass on the first held
   frame, budget-free, counted as `rootsReach`), and it is DELIBERATELY the
   smaller one: a town kit's programs are shared across its buildings, so
