@@ -5820,6 +5820,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Consumir',
   'entities.abilities.drain_life.description': 'Consome a vitalidade do alvo, causando {damage} de dano das Sombras a cada segundo e transferindo 70% disso como vida. Aflição transfere tudo em vez disso. Quando canalizado em vosso Evil Eye principal, consome todos os Fios do Destino no início, e cada Fio gera 1 de Condenação extra por pulso.',
   'entities.abilities.fear.name': 'Atormentar',
+  'entities.abilities.fear.description':
+    'Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito.',
   'entities.abilities.searing_pain.name': 'Cauterizar',
   'entities.abilities.searing_pain.description':
     'Queima o inimigo com fogo agonizante, causando {damage} de dano de Fogo. Lançamento rápido.',
@@ -8897,6 +8899,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Pressione F para subir',
   'sim.delve.objectiveClearRoom': 'Limpe a sala.',
   'sim.delve.objectiveDefeatBoss': 'Derrote o chefe.',
+  'sim.delve.enemiesRemain': 'Elimine primeiro os inimigos restantes.',
   'sim.rift.allUnstable': 'Todas as fendas estão instáveis no momento. Tente novamente em breve.',
   'sim.rift.alreadyCleared': 'Esta fenda já foi concluída por {names}.',
   'sim.rift.deadEntry': 'Você não pode entrar em uma fenda enquanto estiver morto.',
@@ -11153,6 +11156,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': 'Arremessa um martelo sagrado causando {damage} de dano e gera 1 de Devoção. Utilizável abaixo de 20% de vida, ou durante Ascensão Divina ou Ira Vingadora. Ira da Alvorada concede uma conjuração adicional contra qualquer alvo que ignora seu tempo de recarga em curso e causa 20% mais dano. Ascensão aumenta seu dano em 30%.',
   'entities.abilities.healing_stream.description':
     'Restaura 120 de vida de um alvo aliado ao longo de 12 s. (talento de Xamã)',
+  'entities.abilities.howl_of_terror.description':
+    'Amedronta os inimigos próximos por até 5 s. Dano acumulado equivalente a 8% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)',
   'entities.abilities.ice_block.description':
     'Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns já ativos e impede a aplicação de novos efeitos de controle comuns. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)',
   'entities.abilities.inner_focus.description': 'Torna vossa próxima magia de sacerdote gratuita e ininterrompível. Dura 60 s.',
@@ -12866,6 +12871,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.needle_of_fate.description':
     'Perfura o inimigo causando {damage} de dano das Sombras e gera 5 de Condenação se ele carregar seu Evil Eye. Cada acerto no seu Evil Eye primário adiciona um Fio do Destino por 12 s, até 3. Se não houver Evil Eye, a Needle of Fate primeiro marca seu alvo.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Marca um inimigo por 15 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 jardas e cria 1 Fragmento de Alma.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'O Maledictor possui seu Evil Eye primário por 15 s e gera 35 de Condenação. Needle of Fate é conjurada em 1 s e gera 2 de Condenação extra, Consumir pode ser canalizado em movimento, e Sentence causa 25% mais dano e libera um eco retardado por 60% de dano, diminuindo para 30% entre os níveis 17 e 20.',

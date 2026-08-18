@@ -457,6 +457,42 @@ describe('GameServer sessions', () => {
     expect(server.sim.entities.get(first.pid)?.skinCatalog).toBe('mech');
   });
 
+  it('reconciles a saved worn mech chroma when the account cosmetics row is stale', async () => {
+    grantAccountMechChroma.mockClear();
+    const seedServer = new GameServer();
+    const seedPid = seedServer.sim.addPlayer('mage', 'Stuckmech');
+    seedServer.sim.setPlayerSkin(seedPid, 0, 'mech');
+    const state = seedServer.sim.serializeCharacter(seedPid);
+    if (!state) throw new Error('missing saved state');
+
+    const server = new GameServer();
+    const session = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Stuckmech', 'mage', state, false, {
+        accountCosmetics: {
+          completedQuestIds: [],
+          mechChromaIds: [],
+          weaponSkinIds: [],
+          weaponSkinLoadout: {},
+        },
+      }),
+    );
+
+    expect(session.accountCosmetics.mechChromaIds).toContain('amber_crimson');
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(grantAccountMechChroma).toHaveBeenCalledWith(11, 'amber_crimson');
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }),
+    );
+    expect(server.sim.entities.get(session.pid)?.skinCatalog).toBe('class');
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }),
+    );
+    expect(server.sim.entities.get(session.pid)?.skinCatalog).toBe('mech');
+  });
+
   it('keeps the character-id session index coherent across join, duplicate join, leave, and rejoin', async () => {
     const server = new GameServer();
     const first = expectJoined(server.join(fakeWs(), 11, 101, 'Indexa', 'warrior', null));

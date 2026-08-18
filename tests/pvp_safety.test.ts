@@ -284,13 +284,13 @@ describe('PvP control abilities in active duels', () => {
     expect(b.auras.some((aura) => aura.id === 'fear_incap')).toBe(true);
   });
 
-  it('diminishes repeated duel Fears by duration to full, half, quarter, eighth and resets after 60s', () => {
+  it('diminishes repeated duel Fears from their authored duration and resets after 60s', () => {
     const { sim, aPid, b } = startDuel('warlock', 'warrior', 20);
 
     const castFear = () => {
       // A resisted Fear applies nothing and does NOT advance diminishing returns
       // (the spell-hit roll precedes the DR bookkeeping in applyAbility), so retry
-      // until it lands. This keeps the scaled DR sequence stable regardless of where
+      // until it lands. This keeps the multiplier sequence stable regardless of where
       // the shared world RNG stream happens to sit (new content shifts it).
       let dur = 0;
       for (let attempt = 0; attempt < 50 && dur === 0; attempt++) {

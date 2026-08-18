@@ -11967,7 +11967,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '멀리 있는 적을 성스러운 사슬로 즉시 결박합니다. 적은 자신에게서 3미터 거리까지 초당 18미터의 속도로 끌려오며, 도착하면 4초 동안 이동 속도가 50% 감소합니다. 승천 중에는 주변의 두 번째 적도 결박합니다.',
   'entities.abilities.oath_chain.name': '맹세의 사슬',
   'entities.abilities.ossuary_mark.description':
-    '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
+    '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
   'entities.abilities.ossuary_mark.name': '납골 표식',
   'entities.abilities.overbloom.description':
     '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',

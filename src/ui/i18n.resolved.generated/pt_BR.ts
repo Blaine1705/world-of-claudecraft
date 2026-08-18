@@ -7187,7 +7187,7 @@ export const pt_BR: EnTranslations = {
       "shopMarksRequired": "Você precisa de {marks} Selos de Incursão para comprar {name}.",
       "shopSealPremiumOnly": "Este selo só cede à mão de um mestre: apenas a aposta Superior pode abri-lo.",
       "passageSealed": "A passagem está selada.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Elimine primeiro os inimigos restantes.",
       "moveCloserPassage": "Aproxime-se da passagem.",
       "moveCloserChest": "Aproxime-se do baú.",
       "moveCloserReliquary": "Aproxime-se do relicário.",
@@ -9997,7 +9997,7 @@ export const pt_BR: EnTranslations = {
       },
       "fear": {
         "name": "Atormentar",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito."
       },
       "searing_pain": {
         "name": "Cauterizar",
@@ -10243,7 +10243,7 @@ export const pt_BR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Marca um inimigo por 15 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 jardas e cria 1 Fragmento de Alma."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const pt_BR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Uivo de Terror",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Amedronta os inimigos próximos por até 5 s. Dano acumulado equivalente a 8% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)"
       },
       "ice_block": {
         "name": "Caixão Frio",

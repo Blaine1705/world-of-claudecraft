@@ -7187,7 +7187,7 @@ export const tr_TR: EnTranslations = {
       "shopMarksRequired": "{name} satın almak için {marks} Delve Nişanına ihtiyacın var.",
       "shopSealPremiumOnly": "Bu mühür yalnızca bir ustanın eline boyun eğer. Onu yalnızca Premium bedel açabilir.",
       "passageSealed": "Geçit mühürlü.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Önce kalan düşmanları temizle.",
       "moveCloserPassage": "Geçide yaklaş.",
       "moveCloserChest": "Sandığa yaklaş.",
       "moveCloserReliquary": "Emanetliğe yaklaş.",
@@ -9997,7 +9997,7 @@ export const tr_TR: EnTranslations = {
       },
       "fear": {
         "name": "Dehşet",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar."
       },
       "searing_pain": {
         "name": "Dağlama",
@@ -10243,7 +10243,7 @@ export const tr_TR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Kemik Damgası",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
       },
       "unholy_command": {
         "name": "Kutsuz Emir",
@@ -10627,7 +10627,7 @@ export const tr_TR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Dehşet Uluması",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)"
       },
       "ice_block": {
         "name": "Soğuk Tabut",

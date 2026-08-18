@@ -3180,7 +3180,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': '対象の生命力を貪り、毎秒{damage}の影ダメージを与え、その70%を体力としてあなたへ移します。苦痛はその全てを移します。主たる邪眼へ詠唱を維持すると、開始時に運命の糸をすべて消費し、糸1本ごとに刻みあたり追加で断罪が1得られます。',
   'entities.abilities.fear.name': '責め苦',
   'entities.abilities.fear.description':
-    '敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する累積ダメージを受けると効果が切れます。',
+    '敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。',
   'entities.abilities.searing_pain.name': '灼熱',
   'entities.abilities.searing_pain.description':
     '苦痛の炎で敵を焼き、{damage} の火炎ダメージを与えます。詠唱が速い呪文です。',
@@ -9817,7 +9817,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）',
   'entities.abilities.howl_of_terror.description':
-    '周囲の敵を最大5秒間恐怖状態にする。対象の最大体力の8%に相当する累積ダメージを受けると恐怖が解除される。（ウォーロックのタレント）',
+    '周囲の敵を最大5秒間恐怖状態にする。対象の最大体力の8%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）',
   'entities.abilities.ice_block.description':
     '8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。すでにかかっている通常の有害な効果を取り除き、新たな通常の行動阻害効果の付与を防ぎます。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）',
   'entities.abilities.inner_focus.description': '次のプリーストの呪文を無償かつ中断されないものにします。60秒続きます。',

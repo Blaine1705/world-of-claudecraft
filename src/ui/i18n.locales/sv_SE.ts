@@ -4206,6 +4206,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.name': 'Utdrivningens rit',
   'entities.abilities.expose_armor.name': 'Rustningsbräsch',
   'entities.abilities.faerie_fire.name': 'Häxljus',
+  'entities.abilities.fear.description':
+    'Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten.',
   'entities.abilities.fear.name': 'Plåga',
   'entities.abilities.ferocious_bite.name': 'Blodsbett',
   'entities.abilities.fire_blast.description': 'Spränger fienden för {damage} eldskada. Omedelbar.',
@@ -8585,6 +8587,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Okänd fördjupningsnivå.',
   'sim.delve.wayOutNotOpen': 'Vägen ut är inte öppen ännu.',
   'sim.delve.whileTrading': 'Du kan inte gå in i en fördjupning medan du handlar.',
+  'sim.delve.enemiesRemain': 'Besegra de återstående fienderna först.',
   'sim.lockpick.alreadyInProgress': 'Någon arbetar redan med låset.',
   'sim.lockpick.cannotPickThat': 'Du kan inte dyrka upp det.',
   'sim.lockpick.chooseAnte': 'Välj 1, 2 eller 3 dyrkar.',
@@ -10896,6 +10899,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': 'Slungar en helig hammare för {damage} skada och alstrar 1 Hängivenhet. Kan användas under 20% hälsa, eller under Gudomlig upphöjelse eller Hämnande vrede. Gryningens vrede ger en extra kastning mot vilket mål som helst som bortser från dess pågående nedkylning och vållar 20% mer skada. Upphöjelse ökar dess skada med 30%.',
   'entities.abilities.healing_stream.description':
     'Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)',
+  'entities.abilities.howl_of_terror.description':
+    'Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)',
   'entities.abilities.ice_block.description':
     'Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)',
   'entities.abilities.inner_focus.description': 'Gör er nästa prästbesvärjelse gratis och omöjlig att avbryta. Varar 60 sek.',
@@ -12725,6 +12730,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.needle_of_fate.description':
     'Genomborrar fienden för {damage} skuggskada och genererar 5 Fördömelse om den bär ditt Evil Eye. Varje träff på ditt primära Evil Eye lägger till en Ödestråd i 12 sek, upp till 3. Om inget Evil Eye finns märker Needle först sitt mål.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledictorn tar över ditt primära Evil Eye i 15 sek och genererar 35 Fördömelse. Needle of Fate kastas på 1 sek och genererar 2 extra Fördömelse, Förtär kan kanaliseras i rörelse, och Sentence gör 25% mer skada och släpper ett fördröjt eko för 60% skada, avtagande till 30% mellan nivåerna 17 och 20.',

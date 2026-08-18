@@ -7187,7 +7187,7 @@ export const da_DK: EnTranslations = {
       "shopMarksRequired": "Du skal bruge {marks} Delve-mærker for at købe {name}.",
       "shopSealPremiumOnly": "Dette segl giver kun efter for en mesters hånd. Kun Premium-indsatsen kan åbne det.",
       "passageSealed": "Passagen er forseglet.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Besejr først de resterende fjender.",
       "moveCloserPassage": "Gå tættere på passagen.",
       "moveCloserChest": "Gå tættere på kisten.",
       "moveCloserReliquary": "Gå tættere på relikvariet.",
@@ -9997,7 +9997,7 @@ export const da_DK: EnTranslations = {
       },
       "fear": {
         "name": "Hjemsøg",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten."
       },
       "searing_pain": {
         "name": "Svid",
@@ -10243,7 +10243,7 @@ export const da_DK: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Mærker en fjende i 15 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 yards og skaber 1 Sjælesplint."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const da_DK: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Rædselshyl",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)"
       },
       "ice_block": {
         "name": "Kold kiste",

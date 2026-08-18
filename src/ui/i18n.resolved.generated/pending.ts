@@ -10,9 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -27,13 +24,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "es_ES": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -48,13 +41,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "fr_FR": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -69,13 +58,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "fr_CA": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -90,14 +75,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -112,13 +93,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "de_DE": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -133,8 +110,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "zh_CN": [
     "hudChrome.dawnholdMap.title",
@@ -153,9 +129,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "pt_BR": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -170,17 +143,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "ru_RU": [
     "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "cs_CZ": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -195,13 +164,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "nl_NL": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -216,13 +181,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "pl_PL": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -237,13 +198,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "id_ID": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -258,13 +215,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "tr_TR": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -279,13 +232,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "sv_SE": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -300,13 +249,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "vi_VN": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -321,13 +266,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ],
   "da_DK": [
-    "entities.abilities.fear.description",
-    "entities.abilities.howl_of_terror.description",
-    "entities.abilities.ossuary_mark.description",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -342,7 +283,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title",
-    "sim.delve.enemiesRemain"
+    "hudChrome.lastkeepMap.title"
   ]
 };

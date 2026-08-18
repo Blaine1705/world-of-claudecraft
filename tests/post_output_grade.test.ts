@@ -41,27 +41,6 @@ describe('fused output and grade shader', () => {
     expect(shader).toContain('vec2 inputUv = min(vUv * uInputUvRect.xy, uInputUvRect.zw);');
   });
 
-  it('rewrites NaN to zero on both composer-target reads before the tonemap', () => {
-    // A single NaN fragment in the HalfFloat beauty target is smeared frame-wide
-    // by the bloom blur and tonemaps to black on the composer tiers, while the
-    // UNSIGNED_BYTE direct-to-canvas tiers clamp it away. Some drivers (ANGLE's
-    // OpenGL backend with NVIDIA on Linux) emit those NaNs from the IBL/PBR path,
-    // so OutputGradePass must scrub NaN out of BOTH the beauty read and the
-    // (already blur-spread) bloom read. Losing either scrub brings the black back.
-    const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
-    expect(shader).toContain('(v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0');
-    const helperAt = shader.indexOf('vec3 sanitizeFinite(vec3 v) {');
-    const beautyScrubAt = shader.indexOf('outputColor.rgb = sanitizeFinite(outputColor.rgb);');
-    const diffuseSampleAt = shader.indexOf('vec4 outputColor = texture(tDiffuse, inputUv);');
-    const bloomScrubAt = shader.indexOf('sanitizeFinite(bloom.rgb * bloom.a)');
-    const toneMapAt = shader.indexOf('outputColor.rgb = ACESFilmicToneMapping(outputColor.rgb);');
-    expect(helperAt).toBeGreaterThan(-1);
-    expect(beautyScrubAt).toBeGreaterThan(diffuseSampleAt);
-    expect(bloomScrubAt).toBeGreaterThan(-1);
-    expect(toneMapAt).toBeGreaterThan(beautyScrubAt);
-    expect(toneMapAt).toBeGreaterThan(bloomScrubAt);
-  });
-
   it('runs the FXAA arm on the display-referred image, between the transfer and the grade', () => {
     const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
     // The whole reason the FXAA arm is a define on THIS pass: it reuses the
@@ -110,6 +89,27 @@ describe('fused output and grade shader', () => {
     );
     expect(fxaaBody).not.toContain('displayColor(');
     expect(fxaaBody.match(/fxaaTap\(inputUv,/g)).toHaveLength(8);
+  });
+
+  it('rewrites NaN to zero on both composer-target reads before the tonemap', () => {
+    // A single NaN fragment in the HalfFloat beauty target is smeared frame-wide
+    // by the bloom blur and tonemaps to black on the composer tiers, while the
+    // UNSIGNED_BYTE direct-to-canvas tiers clamp it away. Some drivers (ANGLE's
+    // OpenGL backend with NVIDIA on Linux) emit those NaNs from the IBL/PBR path,
+    // so OutputGradePass must scrub NaN out of BOTH the beauty read and the
+    // (already blur-spread) bloom read. Losing either scrub brings the black back.
+    const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
+    expect(shader).toContain('(v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0');
+    const helperAt = shader.indexOf('vec3 sanitizeFinite(vec3 v) {');
+    const beautyScrubAt = shader.indexOf('outputColor.rgb = sanitizeFinite(outputColor.rgb);');
+    const diffuseSampleAt = shader.indexOf('vec4 outputColor = texture(tDiffuse, inputUv);');
+    const bloomScrubAt = shader.indexOf('sanitizeFinite(bloom.rgb * bloom.a)');
+    const toneMapAt = shader.indexOf('outputColor.rgb = ACESFilmicToneMapping(outputColor.rgb);');
+    expect(helperAt).toBeGreaterThan(-1);
+    expect(beautyScrubAt).toBeGreaterThan(diffuseSampleAt);
+    expect(bloomScrubAt).toBeGreaterThan(-1);
+    expect(toneMapAt).toBeGreaterThan(beautyScrubAt);
+    expect(toneMapAt).toBeGreaterThan(bloomScrubAt);
   });
 
   it('only calls tonemapping functions the installed three chunk defines', () => {

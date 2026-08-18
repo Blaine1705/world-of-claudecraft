@@ -4293,6 +4293,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.name': 'Nghi Lễ Trục Xuất',
   'entities.abilities.expose_armor.name': 'Xuyên Phá Giáp',
   'entities.abilities.faerie_fire.name': 'Ánh Ma Trơi',
+  'entities.abilities.fear.description':
+    'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng.',
   'entities.abilities.fear.name': 'Giày Vò',
   'entities.abilities.ferocious_bite.name': 'Cắn Xé Máu',
   'entities.abilities.fire_blast.description':
@@ -9308,6 +9310,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Cấp bậc hầm thám hiểm không xác định.',
   'sim.delve.wayOutNotOpen': 'Lối ra vẫn chưa mở.',
   'sim.delve.whileTrading': 'Bạn không thể vào hầm thám hiểm khi đang giao dịch.',
+  'sim.delve.enemiesRemain': 'Hãy đánh bại những kẻ địch còn lại trước.',
   'sim.lockpick.alreadyInProgress': 'Đã có người đang cạy ổ khóa.',
   'sim.lockpick.cannotPickThat': 'Bạn không thể cạy thứ đó.',
   'sim.lockpick.chooseAnte': 'Chọn 1, 2 hoặc 3 cây cạy.',
@@ -10803,6 +10806,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': 'Phóng một chiếc búa thần thánh gây {damage} sát thương và tạo ra 1 Sùng Tín. Dùng được khi mục tiêu dưới 20% máu, hoặc trong lúc Thăng Thiên Thần Thánh hay Cuồng Nộ Báo Thù. Cuồng Nộ Bình Minh ban thêm một lần niệm lên bất cứ mục tiêu nào, bỏ qua thời gian hồi đang chạy và gây thêm 20% sát thương. Thăng Thiên tăng sát thương của nó thêm 30%.',
   'entities.abilities.healing_stream.description':
     'Hồi 120 máu cho một mục tiêu đồng minh trong 12 giây. (thiên phú Shaman)',
+  'entities.abilities.howl_of_terror.description':
+    'Khiến kẻ địch ở gần sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)',
   'entities.abilities.ice_block.description':
     'Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)',
   'entities.abilities.inner_focus.description': 'Khiến phép tu sĩ kế tiếp của bạn miễn phí và không thể bị ngắt. Kéo dài 60 giây.',
@@ -12595,6 +12600,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance': 'Giữ nó tiếp tục cháy: Nguyệt Chủng kéo dài thêm 6 giây.',
   'entities.abilities.needle_of_fate.description': 'Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra 5 Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước.',
   'entities.abilities.needle_of_fate.name': 'Kim Định Mệnh',
+  'entities.abilities.ossuary_mark.description': 'Đánh dấu một kẻ địch trong 15 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn.',
   'entities.abilities.ossuary_mark.name': 'Dấu Ấn Cốt Táng',
   'entities.abilities.possess_evil_eye.description': 'Kẻ Nguyền Rủa chiếm hữu Ác Nhãn chính của bạn trong 15 giây và tạo ra 35 Kết Án. Kim Định Mệnh thi triển trong 1 giây và tạo thêm 2 Kết Án, Nuốt Chửng có thể được dẫn phép khi đang di chuyển, và Phán Quyết gây thêm 25% sát thương và giải phóng một tiếng vọng trễ với 60% sát thương, giảm dần xuống 30% qua các cấp 17-20.',
   'entities.abilities.possess_evil_eye.name': 'Chiếm Hữu Ác Nhãn',

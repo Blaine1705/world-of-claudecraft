@@ -4367,6 +4367,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.name': 'Ritus Pengusiran',
   'entities.abilities.expose_armor.name': 'Tembus Zirah',
   'entities.abilities.faerie_fire.name': 'Cahaya Sihir',
+  'entities.abilities.fear.description':
+    'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya.',
   'entities.abilities.fear.name': 'Cekaman',
   'entities.abilities.ferocious_bite.name': 'Gigitan Berdarah',
   'entities.abilities.fire_blast.description':
@@ -9412,6 +9414,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Tingkat delve tak dikenal.',
   'sim.delve.wayOutNotOpen': 'Jalan keluar belum terbuka.',
   'sim.delve.whileTrading': 'Kamu tidak dapat memasuki delve saat berdagang.',
+  'sim.delve.enemiesRemain': 'Kalahkan musuh yang tersisa terlebih dahulu.',
   'sim.lockpick.alreadyInProgress': 'Seseorang sudah sedang membobol kunci.',
   'sim.lockpick.cannotPickThat': 'Kamu tidak dapat membobol itu.',
   'sim.lockpick.chooseAnte': 'Pilih 1, 2, atau 3 cungkil.',
@@ -10978,7 +10981,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan peluang menghindarmu sebesar 50 poin persentase selama 10 detik. (talenta Hunter)',
   'entities.abilities.earthbind.description': 'Mengakarkan musuh dalam 4 m dari titik sasaran selama 2 dtk, lalu memperlambat mereka 40% selama 6 dtk. (Talenta shaman)',
   'entities.abilities.evocation.description':
-    'Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 Kekuatan Mantra. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)',
+    'Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 spell power. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)',
   'entities.abilities.frenzied_regeneration.description':
     'Memulihkan 40% nyawa maksimummu selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)',
   'entities.abilities.frost_trap.description':
@@ -10986,8 +10989,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': 'Melontarkan palu suci sebesar {damage} kerusakan dan menghasilkan 1 Pengabdian. Bisa dipakai di bawah 20% nyawa, atau selama Kenaikan Ilahi maupun Murka Pembalas. Murka Fajar memberi satu rapalan tambahan terhadap sasaran mana pun yang mengabaikan waktu jedanya yang sedang berjalan dan memberi 20% kerusakan lebih besar. Kenaikan meningkatkan kerusakannya sebesar 30%.',
   'entities.abilities.healing_stream.description':
     'Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)',
+  'entities.abilities.howl_of_terror.description':
+    'Membuat musuh di dekatnya ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)',
   'entities.abilities.ice_block.description':
-    'Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terpana atau berubah wujud. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)',
+    'Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)',
   'entities.abilities.inner_focus.description': 'Membuat mantra pendeta berikutnya gratis dan tak bisa diinterupsi. Bertahan 60 dtk.',
   'entities.abilities.innervate.description':
     'Getah hidup mengalir dalam dirimu selama 10 detik dan memulihkan 20 sumber dayamu saat ini dalam gelombang: mana, amarah, atau energi. Berganti wujud tidak memutusnya. Tidur, pingsan, atau stasis menghentikan aliran getah. (talenta Druid)',
@@ -12848,6 +12853,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.needle_of_fate.description':
     'Menusuk musuh sebesar {damage} kerusakan Bayangan dan menghasilkan 5 Kecaman jika musuh itu menyandang Evil Eye-mu. Setiap pukulan pada Evil Eye utamamu menambah 1 Benang Takdir selama 12 detik, hingga 3. Jika tidak ada Evil Eye, Needle terlebih dahulu menandai targetnya.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    'Menandai musuh selama 15 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 yard dan menciptakan 1 Serpihan Jiwa.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledictor merasuki Evil Eye utamamu selama 15 detik dan menghasilkan 35 Kecaman. Needle of Fate dirapal dalam 1 detik dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, dan Sentence memberikan 25% kerusakan lebih besar dan melepaskan gema tertunda sebesar 60% kerusakan, menurun menjadi 30% sepanjang level 17-20.',

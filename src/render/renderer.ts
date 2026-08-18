@@ -356,7 +356,11 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
-import { mountPrewarmKeys, stageMountPrewarmVisual } from './mount_prewarm';
+import {
+  mountPrewarmKeys,
+  stageMountPrewarmVisual,
+  stageResidentMountPrewarmVisual,
+} from './mount_prewarm';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -1786,11 +1790,7 @@ export class Renderer {
   // One shared lane for background work that touches WebGL. Idle callbacks from
   // independent zone/sky/archetype tasks can otherwise all start in one frame.
   private backgroundGpuWork = createBackgroundGpuQueue();
-  // Serial tail for spirit-puppet construction: several models resolve at once
-  // when a class is first sighted, so the builds queue behind one another and
-  // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
-  // Schedules the local player's own ghost variants at idle, then queues the compile.
   private selfSpirit = new SelfSpiritPrewarmer({
     warm: () =>
       this.backgroundGpuWork.run(
@@ -5678,9 +5678,14 @@ export class Renderer {
     await compilePromise;
   }
 
-  // Link the local player's body-spirit variants off-thread so a later spirit
-  // release reuses cached programs instead of linking inline on the self view.
-  // Apply ghost materials to real skinned meshes, then restore opaque originals.
+  // Link the local player's own body spirit (ghost) transparent variants
+  // off-thread so a later spirit release reuses cached programs instead of
+  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
+  // Applies the ghost materials to the REAL skinned meshes (so the variant
+  // matches the flip's skinning/morph), runs compileAsync's synchronous
+  // prologue, then restores the opaque originals BEFORE awaiting the linker
+  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
+  // and the clones the flip reuses stay cached on the visual.
   private async warmSelfSpirit(): Promise<boolean> {
     if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
     const visual = this.views.get(this.sim.player.id)?.visual;
@@ -5700,7 +5705,6 @@ export class Renderer {
     await compilePromise;
     return true;
   }
-
   // A tiny throwaway target for background child uploads, so a prewarm root
   // that is briefly visible during its bounded call is never presented on
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
@@ -6022,7 +6026,9 @@ export class Renderer {
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
     let mountPrewarmGroup: THREE.Group | null = null;
-    const mountPrewarmWarmedKeys = new Set<string>();
+    const mountPrewarmPlannedKeys = mountPrewarmKeys();
+    const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
+    let mountPrewarmWarmed = 0;
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
     let surfaceDetailTexturesWarmed = 0;
@@ -6084,6 +6090,8 @@ export class Renderer {
       /** Explicit small units that may resume after world entry. The absence of
        * this hook is intentional: a whole manifest entry is never rerun live. */
       resumeUnits?: () => readonly PrewarmResumeUnit[];
+      /** Optional remainder for a started entry that reports partial progress. */
+      resumePartialUnits?: () => readonly PrewarmResumeUnit[];
       run: () => void | Promise<void>;
       /** Read after run(): how much of the planned work actually happened. A
        * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
@@ -6096,21 +6104,6 @@ export class Renderer {
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
     const resumeLedger = createPrewarmResumeLedger();
-
-    const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>
-      mountPrewarmKeys()
-        .filter((key) => !mountPrewarmWarmedKeys.has(key))
-        .map((key) => ({
-          id: `mount:${key}`,
-          run: async () => {
-            const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
-            if (!staged) return;
-            mountPrewarmGroup = staged.group;
-            await this.compilePrewarmColorPrograms(staged.visual.root, false);
-            await this.compileShadowPrograms(staged.visual.root);
-            mountPrewarmWarmedKeys.add(key);
-          },
-        }));
 
     // One shared dedupe store across EVERY compile collection in this entry
     // pass (early submission, the compile entry's tail, the live-scene
@@ -6411,6 +6404,10 @@ export class Renderer {
       // its counts, never 'completed'.
       const progress = entry.progress?.() ?? null;
       if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
+      if (status === 'partial') {
+        const partialUnits = entry.resumePartialUnits?.() ?? [];
+        if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });
+      }
       const after = this.prewarmCounts();
       const entryEnded = performance.now();
       target.push({
@@ -6528,6 +6525,20 @@ export class Renderer {
     };
 
     const settleMinPasses = this.lowGfx ? 8 : 10;
+
+    const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>
+      [...mountPrewarmPendingKeys].map((key) => ({
+        id: `mount:${key}`,
+        run: async () => {
+          const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+          if (!staged) return;
+          mountPrewarmGroup = staged.group;
+          await this.compilePrewarmColorPrograms(staged.visual.root, false);
+          await this.compileShadowPrograms(staged.visual.root);
+          mountPrewarmPendingKeys.delete(key);
+          mountPrewarmWarmed++;
+        },
+      }));
 
     const textureResumeUnits = (
       idPrefix: string,
@@ -7058,48 +7069,44 @@ export class Renderer {
         },
       },
       {
-        // Rideable mounts: worn by whoever is riding one, so first sighting
-        // links programs like vfx.weapon-skins. Mount GLBs are lazyPreload
-        // (characters/assets.ts), and stalled fetches drop only that mount.
+        // Rideable mounts: worn by whoever is riding one, so the FIRST
+        // sighting of any given mount links its programs the moment it
+        // appears, exactly like vfx.weapon-skins above. The runtime fallback
+        // (gateSwapFlagOnCompile at the mount-swap site, see updateEntity) is
+        // a no-op without KHR_parallel_shader_compile, so on that hardware
+        // this entry is the only mitigation there ever was (#2571). Mount
+        // GLBs are lazyPreload (characters/assets.ts): a fetch failure or a
+        // timed-out one (mount_prewarm.ts's MOUNT_PREWARM_FETCH_TIMEOUT_MS)
+        // drops only that one mount, never the whole entry.
         //
-        // The immediate path only stages within the entry budget; unwarmed
-        // mounts become the same per-mount resume units used after a whole
-        // entry deferral. Those resumed units self-compile both color and
-        // shadow programs because programs.compile has already run.
+        // The loading-cover path stages only already-resident mount assets,
+        // then the shared programs.compile entry links both program halves
+        // for that staged group. Missing keys hand off to one explicit
+        // background resume unit per mount, where each lazy fetch has its own
+        // timeout and then self-compiles because programs.compile has already
+        // finished. progress() reports only keys actually staged or resumed,
+        // so a deadline-limited pass reports 'partial', never a false
+        // 'completed' (the failure mode resolvePrewarmEntryStatus documents).
         id: 'vfx.mount-programs',
         category: 'vfx',
         priority: 63,
         required: false,
         resumeUnits: mountPrewarmResumeUnits,
-        // Immediate path only STAGES each mount (never compiles inline): the
-        // group it builds is picked up by stagedCompileGroupsNow() below, so
-        // the shared 'programs.compile' entry links both program halves for
-        // it exactly like every other staged prewarm group, matching
-        // vfx.weapon-skins/props.ghost-fade-variants beside it. Only the
-        // deferred resumeUnits path above self-compiles: by the time it
-        // runs, 'programs.compile' has already finished.
+        resumePartialUnits: mountPrewarmResumeUnits,
         run: async () => {
-          const mountDeadline = policy.finishFullManifestBeforeReveal ? hardDeadline : deadline;
-          for (const key of mountPrewarmKeys()) {
-            const remainingMs = mountDeadline - performance.now();
-            if (remainingMs <= 0) break;
-            const staged = await stageMountPrewarmVisual(
-              this.scene,
-              mountPrewarmGroup,
-              key,
-              remainingMs,
-            );
+          for (const key of mountPrewarmPlannedKeys) {
+            if (performance.now() >= buildDeadline) break;
+            const staged = stageResidentMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
             if (!staged) continue;
             mountPrewarmGroup = staged.group;
-            mountPrewarmWarmedKeys.add(key);
+            mountPrewarmPendingKeys.delete(key);
+            mountPrewarmWarmed++;
           }
-          const units = mountPrewarmResumeUnits();
-          if (units.length > 0) droppedEntries.push({ id: 'vfx.mount-programs', units });
         },
         progress: () => ({
-          done: mountPrewarmWarmedKeys.size,
-          planned: mountPrewarmKeys().length,
-          trimmed: mountPrewarmWarmedKeys.size < mountPrewarmKeys().length,
+          done: mountPrewarmWarmed,
+          planned: mountPrewarmPlannedKeys.length,
+          trimmed: mountPrewarmPendingKeys.size > 0,
         }),
         detail: () => `mounts=${mountPrewarmGroup?.children.length ?? 0}`,
       },
@@ -11232,8 +11239,14 @@ export class Renderer {
       if (!v.visual) continue;
       // Warm the local player's own spirit variants once per distinct look, so
       // a death spirit-release never links them inline on the ungated self view.
-      if (e.id === this.sim.player.id && this.asyncCompileSupported && !this.sim.player.ghost) {
-        this.selfSpirit.observe(v.visual, e.skin, e.mainhandItemId, e.offhandItemId);
+      if (e.id === this.sim.player.id) {
+        this.selfSpirit.observe(
+          v.visual,
+          e.skin,
+          e.mainhandItemId,
+          e.offhandItemId,
+          e.weaponSkinId,
+        );
       }
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 

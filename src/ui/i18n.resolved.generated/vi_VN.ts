@@ -7187,7 +7187,7 @@ export const vi_VN: EnTranslations = {
       "shopMarksRequired": "Bạn cần {marks} Dấu Ấn Thám Hiểm để mua {name}.",
       "shopSealPremiumOnly": "Dấu niêm này chỉ chịu khuất phục trước bàn tay bậc thầy. Chỉ có mức cược Cao Cấp mới mở được nó.",
       "passageSealed": "Lối đi đã bị niêm phong.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Hãy đánh bại những kẻ địch còn lại trước.",
       "moveCloserPassage": "Hãy lại gần lối đi hơn.",
       "moveCloserChest": "Hãy lại gần chiếc rương hơn.",
       "moveCloserReliquary": "Hãy lại gần hộp thánh tích hơn.",
@@ -9997,7 +9997,7 @@ export const vi_VN: EnTranslations = {
       },
       "fear": {
         "name": "Giày Vò",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng."
       },
       "searing_pain": {
         "name": "Nung Đốt",
@@ -10243,7 +10243,7 @@ export const vi_VN: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Dấu Ấn Cốt Táng",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Đánh dấu một kẻ địch trong 15 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
       },
       "unholy_command": {
         "name": "Mệnh Lệnh Tà Ác",
@@ -10627,7 +10627,7 @@ export const vi_VN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Tiếng Hú Kinh Hoàng",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)"
       },
       "ice_block": {
         "name": "Quan Tài Lạnh",

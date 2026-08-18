@@ -25,7 +25,7 @@ import { setRenderCategory } from './renderer_diagnostics';
  * keeps running in the background (still memoized for a later successful
  * pass); this just stops THIS pass waiting on it, same as a genuine failure.
  */
-export const MOUNT_PREWARM_FETCH_TIMEOUT_MS = 8000;
+const MOUNT_PREWARM_FETCH_TIMEOUT_MS = 8000;
 
 function raceTimeout<T>(promise: Promise<T>, ms: number): Promise<T | 'timeout'> {
   return new Promise((resolve) => {
@@ -52,6 +52,16 @@ export function mountPrewarmKeys(): MountKey[] {
   return Object.keys(MOUNT_VISUAL_SPECS) as MountKey[];
 }
 
+function createReadyMountPrewarmVisual(key: MountKey): CharacterVisual | null {
+  const { visualKey } = MOUNT_VISUAL_SPECS[key];
+  if (!mountAssetsReady(visualKey)) return null;
+  const visual = createMountVisual(visualKey);
+  visual.root.name = `prewarm-mount:${key}`;
+  visual.root.position.set(0, -1000, 0); // off-screen; compile ignores position
+  setRenderCategory(visual.root, 'prewarm');
+  return visual;
+}
+
 /**
  * Build one hidden, off-screen rig for a mount, resolving its lazy GLB first
  * if it has not been fetched yet (bounded by MOUNT_PREWARM_FETCH_TIMEOUT_MS).
@@ -60,24 +70,15 @@ export function mountPrewarmKeys(): MountKey[] {
  * idle pass retries it, exactly like every other lazy character asset miss
  * in this renderer (never a synchronous throw on the render path).
  */
-export async function buildMountPrewarmVisual(
-  key: MountKey,
-  fetchTimeoutMs = MOUNT_PREWARM_FETCH_TIMEOUT_MS,
-): Promise<CharacterVisual | null> {
+export async function buildMountPrewarmVisual(key: MountKey): Promise<CharacterVisual | null> {
   const { visualKey } = MOUNT_VISUAL_SPECS[key];
   if (!mountAssetsReady(visualKey)) {
-    if (fetchTimeoutMs <= 0) return null;
     await raceTimeout(
       preloadMountAssets(visualKey).catch(() => undefined),
-      Math.min(MOUNT_PREWARM_FETCH_TIMEOUT_MS, fetchTimeoutMs),
+      MOUNT_PREWARM_FETCH_TIMEOUT_MS,
     );
   }
-  if (!mountAssetsReady(visualKey)) return null;
-  const visual = createMountVisual(visualKey);
-  visual.root.name = `prewarm-mount:${key}`;
-  visual.root.position.set(0, -1000, 0); // off-screen; compile ignores position
-  setRenderCategory(visual.root, 'prewarm');
-  return visual;
+  return createReadyMountPrewarmVisual(key);
 }
 
 export interface MountPrewarmStageResult {
@@ -104,9 +105,16 @@ export async function stageMountPrewarmVisual(
   scene: THREE.Scene,
   group: THREE.Group | null,
   key: MountKey,
-  fetchTimeoutMs = MOUNT_PREWARM_FETCH_TIMEOUT_MS,
 ): Promise<MountPrewarmStageResult | null> {
-  const visual = await buildMountPrewarmVisual(key, fetchTimeoutMs);
+  const visual = await buildMountPrewarmVisual(key);
+  return stageReadyMountPrewarmVisual(scene, group, visual);
+}
+
+function stageReadyMountPrewarmVisual(
+  scene: THREE.Scene,
+  group: THREE.Group | null,
+  visual: CharacterVisual | null,
+): MountPrewarmStageResult | null {
   if (!visual) return null;
   let targetGroup = group;
   if (!targetGroup) {
@@ -115,4 +123,17 @@ export async function stageMountPrewarmVisual(
   }
   targetGroup.add(visual.root);
   return { group: targetGroup, visual };
+}
+
+/**
+ * Stages only already-resident mount assets. This is the world-entry path:
+ * slow lazy GLB fetches stay out of the loading-cover budget and are retried
+ * by the explicit background resume units.
+ */
+export function stageResidentMountPrewarmVisual(
+  scene: THREE.Scene,
+  group: THREE.Group | null,
+  key: MountKey,
+): MountPrewarmStageResult | null {
+  return stageReadyMountPrewarmVisual(scene, group, createReadyMountPrewarmVisual(key));
 }

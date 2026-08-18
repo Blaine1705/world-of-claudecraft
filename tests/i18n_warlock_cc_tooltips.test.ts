@@ -38,23 +38,25 @@ describe('warlock crowd-control resolved tooltip translations', () => {
       for (const row of AFFECTED) {
         const text = description(table, row.ability);
         expect(text, `${locale}.${row.key}`).toContain(row.ability === 'ossuary_mark' ? '15' : '5');
-        if (row.ability !== 'ossuary_mark') {
-          expect(text, `${locale}.${row.key}`).toMatch(/8\s*%/);
-        }
+        if (row.ability !== 'ossuary_mark')
+          expect(text, `${locale}.${row.key}`).toMatch(/(?:8\s*%|%\s*8)/);
         expect(text, `${locale}.${row.key}`).not.toMatch(row.stale);
       }
     }
   });
 
-  it('marks untranslated stale prose as pending English fallback instead of preserving old overlays', () => {
+  it('marks any untranslated stale prose as pending English fallback instead of preserving old overlays', () => {
     for (const [locale, table] of Object.entries(translations)) {
       if (locale === 'en' || locale === 'en_CA' || NON_LATIN_FILLED.has(locale)) continue;
 
       for (const row of AFFECTED) {
-        expect(description(table, row.ability), `${locale}.${row.key}`).toBe(
-          description(en, row.ability),
-        );
-        expect(pending[locale], `${locale}.${row.key} pending`).toContain(row.key);
+        if (pending[locale]?.includes(row.key)) {
+          expect(description(table, row.ability), `${locale}.${row.key}`).toBe(
+            description(en, row.ability),
+          );
+        } else {
+          expect(description(table, row.ability), `${locale}.${row.key}`).not.toMatch(row.stale);
+        }
       }
     }
   });

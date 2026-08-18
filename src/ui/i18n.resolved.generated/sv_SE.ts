@@ -7187,7 +7187,7 @@ export const sv_SE: EnTranslations = {
       "shopMarksRequired": "Du behöver {marks} Fördjupningsmärken för att köpa {name}.",
       "shopSealPremiumOnly": "Detta sigill ger vika endast för en mästares hand. Endast Premium-insatsen kan öppna det.",
       "passageSealed": "Passagen är förseglad.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Besegra de återstående fienderna först.",
       "moveCloserPassage": "Gå närmare passagen.",
       "moveCloserChest": "Gå närmare kistan.",
       "moveCloserReliquary": "Gå närmare relikvariet.",
@@ -9997,7 +9997,7 @@ export const sv_SE: EnTranslations = {
       },
       "fear": {
         "name": "Plåga",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten."
       },
       "searing_pain": {
         "name": "Sveda",
@@ -10243,7 +10243,7 @@ export const sv_SE: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const sv_SE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Skräckyl",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)"
       },
       "ice_block": {
         "name": "Kall kista",

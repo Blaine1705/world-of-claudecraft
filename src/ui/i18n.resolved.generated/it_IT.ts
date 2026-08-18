@@ -7187,7 +7187,7 @@ export const it_IT: EnTranslations = {
       "shopMarksRequired": "Ti servono {marks} Sigilli d'Incursione per comprare {name}.",
       "shopSealPremiumOnly": "Questo sigillo cede solo alla mano di un maestro: solo la puntata Pregiata può aprirlo.",
       "passageSealed": "Il passaggio è sigillato.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Elimina prima i nemici rimasti.",
       "moveCloserPassage": "Avvicinati al passaggio.",
       "moveCloserChest": "Avvicinati allo scrigno.",
       "moveCloserReliquary": "Avvicinati al reliquiario.",
@@ -9997,7 +9997,7 @@ export const it_IT: EnTranslations = {
       },
       "fear": {
         "name": "Tormento",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto."
       },
       "searing_pain": {
         "name": "Bruciatura",
@@ -10243,7 +10243,7 @@ export const it_IT: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Marchia un nemico per 15 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const it_IT: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Ululato del Terrore",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Terrorizza i nemici vicini per un massimo di 5 sec. I danni pari in totale all'8% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)"
       },
       "ice_block": {
         "name": "Bara Fredda",

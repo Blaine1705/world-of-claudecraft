@@ -7187,7 +7187,7 @@ export const de_DE: EnTranslations = {
       "shopMarksRequired": "Du benötigst {marks} Tiefgang-Marken, um {name} zu kaufen.",
       "shopSealPremiumOnly": "Dieses Siegel weicht nur der Hand eines Meisters: Nur der Erlesene Einsatz kann es öffnen.",
       "passageSealed": "Der Durchgang ist versiegelt.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Erledige zuerst die verbleibenden Gegner.",
       "moveCloserPassage": "Geh näher an den Durchgang heran.",
       "moveCloserChest": "Geh näher an die Truhe heran.",
       "moveCloserReliquary": "Geh näher an das Reliquiar heran.",
@@ -9997,7 +9997,7 @@ export const de_DE: EnTranslations = {
       },
       "fear": {
         "name": "Heimsuchung",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit des Ziels bricht den Effekt."
       },
       "searing_pain": {
         "name": "Versengen",
@@ -10243,7 +10243,7 @@ export const de_DE: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Markiert einen Gegner 15 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 Metern und erschafft 1 Seelenfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const de_DE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Schreckensheulen",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Versetzt Gegner in der Nähe bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)"
       },
       "ice_block": {
         "name": "Kalter Sarg",

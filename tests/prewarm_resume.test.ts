@@ -432,6 +432,10 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(source).toContain('const resume = orderPrewarmResumeEntries(droppedEntries);');
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
+    expect(source).toContain('const partialUnits = entry.resumePartialUnits?.() ?? [];');
+    expect(source).toContain(
+      'if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });',
+    );
     expect(resumeSlice).toContain('deferPoolPublication =');
     expect(source).toContain(
       'cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication })',
@@ -541,17 +545,22 @@ describe('resumeDroppedPrewarmEntries', () => {
   // without KHR_parallel_shader_compile, so the first sighting of any mount
   // could freeze a live frame with no mitigation at all on that hardware.
   //
-  // The structural checks pin the renderer wiring, while the behavior test
-  // below catches the scene-parenting regression that source matches missed:
-  // an entry that reparented every staged rig straight out of its own group
-  // into the live scene, leaked them there forever, and warmed zero mounts on
-  // the desktop path while still reporting 'completed'.
-  it('warms every mount program as one resumable unit per catalog key', () => {
+  // This source pin is paired with the behavior test below: a previous
+  // source-only version could not catch the scene reparent bug, but it still
+  // pins the merge-critical contract: loading-cover staging is resident-only
+  // while missing keys resume as bounded per-mount units that self-compile
+  // both color and shadow programs.
+  it('stages resident mounts inline and resumes missing keys one unit at a time', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const helperStart = source.indexOf('const mountPrewarmResumeUnits = ');
+    const helperEnd = source.indexOf('\n\n    const textureResumeUnits =', helperStart);
     const start = source.indexOf("id: 'vfx.mount-programs'");
     const end = source.indexOf("id: 'sky.nearby-biomes'", start);
+    const helperBlock = source.slice(helperStart, helperEnd);
     const entryBlock = source.slice(start, end);
 
+    expect(helperStart).toBeGreaterThan(-1);
+    expect(helperEnd).toBeGreaterThan(helperStart);
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     expect(entryBlock).toContain("category: 'vfx'");
@@ -559,28 +568,28 @@ describe('resumeDroppedPrewarmEntries', () => {
     // Derived from the real catalog, never a hand-maintained list: this is
     // exactly the property that kept vfx.weapon-skins from drifting the way
     // mounts did, and mount_prewarm.test.ts pins the derivation itself.
-    expect(entryBlock).toContain('mountPrewarmKeys()');
-    expect(source).toContain('id: `mount:$' + '{key}`');
-    expect(source).toContain('const mountPrewarmWarmedKeys = new Set<string>();');
-    expect(source).toContain('.filter((key) => !mountPrewarmWarmedKeys.has(key))');
-    expect(entryBlock).toContain('const remainingMs = mountDeadline - performance.now();');
-    expect(entryBlock).toContain('if (remainingMs <= 0) break;');
-    expect(entryBlock.replace(/\s+/g, '')).toContain(
-      'stageMountPrewarmVisual(this.scene,mountPrewarmGroup,key,remainingMs,)',
+    expect(source).toContain('const mountPrewarmPlannedKeys = mountPrewarmKeys();');
+    expect(source).toContain('const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);');
+    expect(source).toContain('const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>');
+    expect(helperBlock).toContain(`id: \`mount:\${key}\``);
+    expect(helperBlock).toContain('stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key)');
+    expect(helperBlock).toContain('mountPrewarmPendingKeys.delete(key)');
+    expect(entryBlock).toContain(
+      'stageResidentMountPrewarmVisual(this.scene, mountPrewarmGroup, key)',
     );
-    expect(entryBlock).toContain('const units = mountPrewarmResumeUnits();');
-    expect(source).toContain(
-      "if (units.length > 0) droppedEntries.push({ id: 'vfx.mount-programs', units });",
-    );
+    expect(entryBlock).toContain('if (performance.now() >= buildDeadline) break;');
+    expect(entryBlock).toContain('resumeUnits: mountPrewarmResumeUnits');
+    expect(entryBlock).toContain('resumePartialUnits: mountPrewarmResumeUnits');
     // Both program halves: three's shadow depth material uses a different
     // cache key (RGBADepthPacking) than the color pass, so linking only the
     // color program still left the first shadow draw to link synchronously.
-    expect(source).toContain('compilePrewarmColorPrograms(staged.visual.root, false)');
-    expect(source).toContain('compileShadowPrograms(staged.visual.root)');
+    expect(helperBlock).toContain('compilePrewarmColorPrograms(staged.visual.root, false)');
+    expect(helperBlock).toContain('compileShadowPrograms(staged.visual.root)');
     // An honest progress(): a run cut short by the deadline must report
     // 'partial', never a false 'completed' (resolvePrewarmEntryStatus's
     // documented failure mode).
     expect(entryBlock).toContain('progress: () => ({');
+    expect(entryBlock).toContain('trimmed: mountPrewarmPendingKeys.size > 0');
 
     // The staged group is torn out of the scene by both cleanup paths and
     // hidden between resumed entries, exactly like every other prewarm group.

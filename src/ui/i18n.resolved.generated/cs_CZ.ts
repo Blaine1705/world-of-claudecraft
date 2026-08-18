@@ -7187,7 +7187,7 @@ export const cs_CZ: EnTranslations = {
       "shopMarksRequired": "K nákupu {name} potřebuješ {marks} známek výprav.",
       "shopSealPremiumOnly": "Tato pečeť povolí jen mistrovské ruce. Otevře ji pouze prémiová sázka.",
       "passageSealed": "Průchod je zapečetěný.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Nejprve poraz zbývající nepřátele.",
       "moveCloserPassage": "Přibliž se k průchodu.",
       "moveCloserChest": "Přibliž se k truhle.",
       "moveCloserReliquary": "Přibliž se k relikviáři.",
@@ -9997,7 +9997,7 @@ export const cs_CZ: EnTranslations = {
       },
       "fear": {
         "name": "Děs",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší."
       },
       "searing_pain": {
         "name": "Sežehnutí",
@@ -10243,7 +10243,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Na 15 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10627,7 +10627,7 @@ export const cs_CZ: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Děsivé zavytí",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Vyděsí blízké nepřátele až na 5 s. Poškození v součtu 8 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)"
       },
       "ice_block": {
         "name": "Ledová rakev",

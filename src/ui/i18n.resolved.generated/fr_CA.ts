@@ -7187,7 +7187,7 @@ export const fr_CA: EnTranslations = {
       "shopMarksRequired": "Il vous faut {marks} Marques de plongée pour acheter {name}.",
       "shopSealPremiumOnly": "Ce sceau ne cède qu'à la main d'un maître : seule la mise Supérieure peut l'ouvrir.",
       "passageSealed": "Le passage est scellé.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Réglez d'abord le sort des ennemis restants.",
       "moveCloserPassage": "Rapprochez-vous du passage.",
       "moveCloserChest": "Rapprochez-vous du coffre.",
       "moveCloserReliquary": "Rapprochez-vous du reliquaire.",
@@ -9997,7 +9997,7 @@ export const fr_CA: EnTranslations = {
       },
       "fear": {
         "name": "Tourment",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet."
       },
       "searing_pain": {
         "name": "Cautérisation",
@@ -10243,7 +10243,7 @@ export const fr_CA: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Marque de l'ossuaire",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Marque un ennemi pendant 15 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 mètres et crée 1 Fragment d'âme."
       },
       "unholy_command": {
         "name": "Commandement impie",
@@ -10627,11 +10627,11 @@ export const fr_CA: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Hurlement d’effroi",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)"
       },
       "ice_block": {
         "name": "Cercueil froid",
-        "description": "Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. (Mage)"
+        "description": "Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)"
       },
       "inner_focus": {
         "name": "Esprit apaisé",
@@ -10792,11 +10792,11 @@ export const fr_CA: EnTranslations = {
       },
       "veilstrike": {
         "name": "Frappe du voile",
-        "description": "Consomme la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)"
+        "description": "Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)"
       },
       "venomrend": {
         "name": "Déchirure venimeuse",
-        "description": "Consomme le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)"
+        "description": "Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)"
       },
       "typhoon": {
         "name": "Typhon",

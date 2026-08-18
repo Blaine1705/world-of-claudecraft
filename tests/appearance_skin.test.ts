@@ -47,7 +47,7 @@ describe('appearance skin selection', () => {
       playerId: 7,
       entities: new Map([[7, { id: 7, skin: 0 }]]),
     });
-    (globalThis as any).WebSocket = { OPEN: 1 };
+    Object.assign(globalThis, { WebSocket: { OPEN: 1 } });
 
     client.changeSkin(2);
 
@@ -143,6 +143,45 @@ describe('appearance skin selection', () => {
     expect((p as { skinCatalog?: string }).skinCatalog).toBe('class');
     // The class rig cannot render a sword skin, so it must not stay resolved.
     expect((p as { weaponSkinId?: string | null }).weaponSkinId).toBeNull();
+  });
+
+  it('reconciles a saved worn mech chroma into offline account cosmetics', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', playerName: 'Stuckmech' });
+    sim.setPlayerSkin(sim.playerId, 0, 'mech');
+    const state = sim.serializeCharacter(sim.playerId);
+    if (!state) throw new Error('missing saved state');
+
+    const restored = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = restored.addPlayer('warrior', 'Stuckmech', { state });
+
+    expect(restored.accountCosmetics.mechChromaIds).toContain('amber_crimson');
+    expect(restored.unequipMechChroma('amber_crimson', pid)).toBe(true);
+    expect(restored.entities.get(pid)?.skinCatalog).toBe('class');
+  });
+
+  it('optimistically unequips the current worn mech chroma even when account cosmetics are stale', async () => {
+    const sent: unknown[] = [];
+    const { bareClient } = await import('./helpers/bare_client');
+    const client = bareClient(7, { playerClass: 'warrior' });
+    Object.assign(client, {
+      connected: true,
+      ws: { readyState: 1, send: (raw: string) => sent.push(JSON.parse(raw)) },
+      accountCosmetics: { completedQuestIds: [], mechChromaIds: [] },
+    });
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    const p = client.entities.get(7) ?? { id: 7 };
+    Object.assign(p, {
+      id: 7,
+      templateId: 'warrior',
+      skin: 0,
+      skinCatalog: 'mech',
+    });
+    client.entities.set(7, p as never);
+
+    client.unequipMechChroma('amber_crimson');
+
+    expect((p as { skinCatalog?: string }).skinCatalog).toBe('class');
+    expect(sent).toEqual([{ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }]);
   });
 
   it('sends the online mech chroma unequip command and keeps the account-wide unlock permanent', () => {

@@ -89,7 +89,17 @@ async function checkBasisuTool() {
   }
 }
 
-async function convertJob(job, { dir, dryRun }) {
+function basisuFailureReason(stdout, stderr, fallback) {
+  return (stderr.trim() || stdout.trim()).split('\n').slice(-1)[0] || fallback;
+}
+
+function makeTempOutputPath(dstPath) {
+  const dstDir = path.dirname(dstPath);
+  const stagingDir = fs.mkdtempSync(path.join(dstDir, `.${path.basename(dstPath)}-`));
+  return { stagingDir, tmpPath: path.join(stagingDir, path.basename(dstPath)) };
+}
+
+export async function convertJob(job, { dir, dryRun, runBasisuCommand = runBasisu }) {
   const { srcPath, dstPath } = skyKtx2Paths(job, dir);
   if (!fs.existsSync(srcPath)) {
     return { job, status: 'failed', reason: `missing source ${job.source}`, before: 0, after: 0 };
@@ -97,12 +107,18 @@ async function convertJob(job, { dir, dryRun }) {
   const before = fs.statSync(srcPath).size;
   if (dryRun) return { job, status: 'would-convert', before, after: before };
 
-  const { code, stdout, stderr } = await runBasisu(
-    buildBasisuHdrArgs({ srcPath, dstPath, resample: job.resample }),
-  );
-  if (code !== 0 || !fs.existsSync(dstPath)) {
-    const reason = (stderr.trim() || stdout.trim()).split('\n').slice(-1)[0];
-    return { job, status: 'failed', reason, before, after: before };
+  const { stagingDir, tmpPath } = makeTempOutputPath(dstPath);
+  try {
+    const { code, stdout, stderr } = await runBasisuCommand(
+      buildBasisuHdrArgs({ srcPath, dstPath: tmpPath, resample: job.resample }),
+    );
+    if (code !== 0 || !fs.existsSync(tmpPath)) {
+      const reason = basisuFailureReason(stdout, stderr, `encoder did not write ${job.target}`);
+      return { job, status: 'failed', reason, before, after: before };
+    }
+    fs.renameSync(tmpPath, dstPath);
+  } finally {
+    fs.rmSync(stagingDir, { recursive: true, force: true });
   }
   return { job, status: 'converted', before, after: fs.statSync(dstPath).size };
 }

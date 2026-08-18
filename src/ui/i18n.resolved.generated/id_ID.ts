@@ -7187,7 +7187,7 @@ export const id_ID: EnTranslations = {
       "shopMarksRequired": "Kamu butuh {marks} Tanda Delve untuk membeli {name}.",
       "shopSealPremiumOnly": "Segel ini hanya tunduk pada tangan sang ahli. Hanya taruhan Premium yang dapat membukanya.",
       "passageSealed": "Lorong itu tersegel.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Kalahkan musuh yang tersisa terlebih dahulu.",
       "moveCloserPassage": "Mendekatlah ke lorong.",
       "moveCloserChest": "Mendekatlah ke peti.",
       "moveCloserReliquary": "Mendekatlah ke relikuari.",
@@ -9997,7 +9997,7 @@ export const id_ID: EnTranslations = {
       },
       "fear": {
         "name": "Cekaman",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya."
       },
       "searing_pain": {
         "name": "Bakar",
@@ -10243,7 +10243,7 @@ export const id_ID: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Menandai musuh selama 15 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 yard dan menciptakan 1 Serpihan Jiwa."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10599,7 +10599,7 @@ export const id_ID: EnTranslations = {
       },
       "evocation": {
         "name": "Sumur Eter",
-        "description": "Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 Kekuatan Mantra. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)"
+        "description": "Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 spell power. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)"
       },
       "flurry_of_knives": {
         "name": "Rentetan Pisau",
@@ -10627,11 +10627,11 @@ export const id_ID: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Lolongan Ngeri",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Membuat musuh di dekatnya ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)"
       },
       "ice_block": {
         "name": "Peti Es",
-        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terpana atau berubah wujud. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
+        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
       },
       "inner_focus": {
         "name": "Pikiran Hening",

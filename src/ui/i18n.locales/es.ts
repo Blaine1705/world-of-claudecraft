@@ -5926,6 +5926,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Consumir',
   'entities.abilities.drain_life.description': 'Consume la vitalidad del objetivo, infligiendo {damage} de daño de Sombra cada segundo y transfiriéndote un 70% como salud. Aflicción transfiere en cambio la totalidad. Cuando se canaliza sobre tu Mal de ojo principal, consume todos los Hilos del destino al comenzar, y cada Hilo genera 1 de Condena adicional por pulso.',
   'entities.abilities.fear.name': 'Espanto',
+  'entities.abilities.fear.description':
+    'Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto.',
   'entities.abilities.searing_pain.name': 'Abrasar',
   'entities.abilities.searing_pain.description':
     'Abrasa al enemigo con fuego agonizante por {damage} de daño de Fuego. Lanzamiento rápido.',
@@ -9082,6 +9084,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Pulsa F para trepar',
   'sim.delve.objectiveClearRoom': 'Despeja la sala.',
   'sim.delve.objectiveDefeatBoss': 'Derrota al jefe.',
+  'sim.delve.enemiesRemain': 'Elimina primero a los enemigos restantes.',
   'sim.rift.allUnstable':
     'Todas las brechas están inestables en este momento. Vuelve a intentarlo pronto.',
   'sim.rift.alreadyCleared': 'Esta brecha ya ha sido despejada por {names}.',
@@ -11433,6 +11436,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': 'Lanza un martillo sagrado por {damage} de daño y genera 1 de Devoción. Se puede usar por debajo del 20% de salud, o durante Ascensión Divina o Ira Vengadora. Ira del Alba concede un lanzamiento adicional contra cualquier objetivo que ignora su tiempo de reutilización actual e inflige un 20% más de daño. Ascensión aumenta su daño un 30%.',
   'entities.abilities.healing_stream.description':
     'Restaura 120 de salud a un objetivo aliado durante 12 s. (talento de Chamán)',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a los enemigos cercanos hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)',
   'entities.abilities.ice_block.description':
     'Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño. Elimina los efectos perjudiciales comunes ya activos e impide que se apliquen nuevos efectos de control comunes. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)',
   'entities.abilities.inner_focus.description': 'Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s.',
@@ -13070,6 +13075,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.description':
     'Quema al enemigo con fuego lunar, infligiendo {damage} de daño Arcano más daño con el tiempo.',
   'entities.abilities.moonfire.specNote_balance': 'Mantenlo ardiendo: Semilla Lunar lo extiende 6 s.',
+  'entities.abilities.ossuary_mark.description':
+    'Marca a un enemigo durante 15 s y almacena un 20% del daño infligido por ti y tus no-muertos. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Marca del Osario',
   'entities.abilities.rake.description':
     'Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de lobo.',

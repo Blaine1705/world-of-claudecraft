@@ -33,10 +33,17 @@ type WarmedLook = {
   skin: number;
   mainhand: string | null;
   offhand: string | null;
+  weaponSkin: string | null;
 };
 
 export class SelfSpiritPrewarmer {
-  private warmed: WarmedLook = { visual: null, skin: -1, mainhand: null, offhand: null };
+  private warmed: WarmedLook = {
+    visual: null,
+    skin: -1,
+    mainhand: null,
+    offhand: null,
+    weaponSkin: null,
+  };
   private inFlight = false;
   private active: WarmedLook | null = null;
   private pending: WarmedLook | null = null;
@@ -46,8 +53,14 @@ export class SelfSpiritPrewarmer {
   /** Call once per frame for the local player once its visual exists. A change
    *  in the visual instance (a recompose) or in the skin/weapon ids re-arms the
    *  warm; an identical call is a no-op. */
-  observe(visual: object, skin: number, mainhand: string | null, offhand: string | null): void {
-    const look = { visual, skin, mainhand, offhand };
+  observe(
+    visual: object,
+    skin: number,
+    mainhand: string | null,
+    offhand: string | null,
+    weaponSkin: string | null,
+  ): void {
+    const look = { visual, skin, mainhand, offhand, weaponSkin };
     if (sameLook(look, this.warmed)) return;
     if (this.active && sameLook(look, this.active)) return;
     if (this.pending && sameLook(look, this.pending)) return;
@@ -93,6 +106,7 @@ function sameLook(a: WarmedLook, b: WarmedLook): boolean {
     a.visual === b.visual &&
     a.skin === b.skin &&
     a.mainhand === b.mainhand &&
-    a.offhand === b.offhand
+    a.offhand === b.offhand &&
+    a.weaponSkin === b.weaponSkin
   );
 }

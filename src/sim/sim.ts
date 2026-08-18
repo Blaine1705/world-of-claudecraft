@@ -270,7 +270,7 @@ import {
   sanitizeItemInstancePayloadOnLoad,
   warnDroppedInstanceKeys,
 } from './item_instance_load';
-import { canStackInstancePayloads } from './item_instance_merge';
+import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
@@ -306,6 +306,7 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
 import {
   mobCombatProfile as mobCombatProfileFn,
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
@@ -3067,6 +3068,11 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    this.accountCosmetics = accountCosmeticsWithWornMechChroma(
+      this.accountCosmetics,
+      meta.skinCatalog,
+      meta.skin,
+    );
     if (this.primaryId === -1) this.primaryId = player.id;
 
     if (savedState) {
@@ -3164,10 +3170,9 @@ export class Sim {
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
       // bank arm below): a counted instanced slot loads capped at what
-      // identical-payload merges or an in-place whole-stack lock could
-      // legitimately have built, and a charge-bearing payload stays
-      // one-per-slot, so a hand-edited count can never launder into
-      // independent copies via a later deposit or trade.
+      // identical-payload merges could legitimately have built, and a
+      // charge-bearing payload stays one-per-slot, so a hand-edited count can
+      // never launder into independent copies via a later deposit or trade.
       meta.inventory = s.inventory.map((raw) => {
         const slot = cloneInvSlot(raw);
         slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
@@ -3237,10 +3242,9 @@ export class Sim {
       // merges past the stack cap are legitimate here (recordVendorBuyback
       // merges an entire multi-unit sale into one row, and buyBackItem
       // re-splits on the way out). The one arm that must clamp is charges: a
-      // charge-bearing payload shares mutable state across the counted row,
-      // and a hand-edited count would mint independent charge-bearing copies
-      // through the grant's fresh-slot clone. A player lock alone is not a
-      // charge payload, so it does not make a saved counted row lossy.
+      // charge-bearing payload can never merge, so a legitimate charge row is
+      // always count 1, and a hand-edited count would mint independent
+      // charge-bearing copies through the grant's fresh-slot clone.
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((raw) => {
         const slot = cloneInvSlot(raw);
         // Rift rebuild FIRST, the same order as the bags arm above (the
@@ -3263,7 +3267,7 @@ export class Sim {
           if (payload) slot.instance = payload;
           else delete slot.instance;
         }
-        if (slot.instance?.charges !== undefined) slot.count = 1;
+        if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
         return slot;
       });
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
@@ -4658,7 +4662,6 @@ export class Sim {
     if (!r) return false;
     const skin = mechChromaSkinIndex(chromaId);
     if (skin < 0) return false;
-    if (!this.accountCosmetics.mechChromaIds.includes(chromaId)) return false;
     const { meta } = r;
     if (meta.skinCatalog !== 'mech' || meta.skin !== skin) return false;
     this.setPlayerSkin(meta.entityId, 0, 'class');

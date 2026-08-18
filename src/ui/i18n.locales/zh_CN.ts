@@ -9391,7 +9391,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
   'entities.abilities.howl_of_terror.description':
-    '使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧效果。（术士天赋）',
+    '使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧。（术士天赋）',
   'entities.abilities.ice_block.description':
     '将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
   'entities.abilities.inner_focus.description': '使你的下一个牧师法术免费且无法被打断。持续 60 秒。',

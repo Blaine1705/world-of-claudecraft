@@ -7187,7 +7187,7 @@ export const es: EnTranslations = {
       "shopMarksRequired": "Necesitas {marks} Marcas de Expedición para comprar {name}.",
       "shopSealPremiumOnly": "Este sello solo cede a la mano de un maestro: solo la apuesta Selecta puede abrirlo.",
       "passageSealed": "El pasaje está sellado.",
-      "enemiesRemain": "Clear the remaining enemies first.",
+      "enemiesRemain": "Elimina primero a los enemigos restantes.",
       "moveCloserPassage": "Acércate al pasaje.",
       "moveCloserChest": "Acércate al cofre.",
       "moveCloserReliquary": "Acércate al relicario.",
@@ -9997,7 +9997,7 @@ export const es: EnTranslations = {
       },
       "fear": {
         "name": "Espanto",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
+        "description": "Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto."
       },
       "searing_pain": {
         "name": "Abrasar",
@@ -10243,7 +10243,7 @@ export const es: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Marca del Osario",
-        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Marca a un enemigo durante 15 s y almacena un 20% del daño infligido por ti y tus no-muertos. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 fragmento de alma."
       },
       "unholy_command": {
         "name": "Mandato profano",
@@ -10627,7 +10627,7 @@ export const es: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Aullido Pavoroso",
-        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
+        "description": "Aterroriza a los enemigos cercanos hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)"
       },
       "ice_block": {
         "name": "Ataúd Helado",

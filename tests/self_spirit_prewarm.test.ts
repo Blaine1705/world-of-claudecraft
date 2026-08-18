@@ -24,9 +24,9 @@ describe('SelfSpiritPrewarmer', () => {
       },
       idle: async () => {},
     });
-    p.observe(visualA, 0, 'sword', null);
-    p.observe(visualA, 0, 'sword', null);
-    p.observe(visualA, 0, 'sword', null);
+    p.observe(visualA, 0, 'sword', null, null);
+    p.observe(visualA, 0, 'sword', null, null);
+    p.observe(visualA, 0, 'sword', null, null);
     await new Promise((r) => setTimeout(r, 0));
     expect(warms).toBe(1);
   });
@@ -40,9 +40,9 @@ describe('SelfSpiritPrewarmer', () => {
       },
       idle: async () => {},
     });
-    p.observe(visualA, 0, 'sword', null);
+    p.observe(visualA, 0, 'sword', null, null);
     await new Promise((r) => setTimeout(r, 0));
-    p.observe(visualB, 0, 'sword', null); // rebuilt -> new instance
+    p.observe(visualB, 0, 'sword', null, null); // rebuilt -> new instance
     await new Promise((r) => setTimeout(r, 0));
     expect(looks.length).toBe(2);
   });
@@ -56,13 +56,29 @@ describe('SelfSpiritPrewarmer', () => {
       },
       idle: async () => {},
     });
-    p.observe(visualA, 0, 'sword', null);
+    p.observe(visualA, 0, 'sword', null, null);
     await new Promise((r) => setTimeout(r, 0));
-    p.observe(visualA, 1, 'sword', null); // skin swap
+    p.observe(visualA, 1, 'sword', null, null); // skin swap
     await new Promise((r) => setTimeout(r, 0));
-    p.observe(visualA, 1, 'axe', 'shield'); // weapon swap
+    p.observe(visualA, 1, 'axe', 'shield', null); // weapon swap
     await new Promise((r) => setTimeout(r, 0));
     expect(warms).toBe(3);
+  });
+
+  it('re-warms when a weapon cosmetic changes without a held-item swap', async () => {
+    let warms = 0;
+    const p = new SelfSpiritPrewarmer({
+      warm: async () => {
+        warms++;
+        return true;
+      },
+      idle: async () => {},
+    });
+    p.observe(visualA, 0, 'sword', null, null);
+    await new Promise((r) => setTimeout(r, 0));
+    p.observe(visualA, 0, 'sword', null, 'cinderbrand_sword');
+    await new Promise((r) => setTimeout(r, 0));
+    expect(warms).toBe(2);
   });
 
   it('never overlaps two warms and coalesces a burst during one in-flight warm', async () => {
@@ -78,14 +94,14 @@ describe('SelfSpiritPrewarmer', () => {
       },
       idle: async () => {},
     });
-    p.observe(visualA, 0, 'sword', null); // starts warm #1 (in flight)
+    p.observe(visualA, 0, 'sword', null, null); // starts warm #1 (in flight)
     await new Promise((r) => setTimeout(r, 0));
     expect(started).toBe(1);
     // Three look changes while the first warm is still running: must NOT start a
     // second warm yet, and must collapse to exactly ONE follow-up warm.
-    p.observe(visualA, 1, 'sword', null);
-    p.observe(visualA, 2, 'sword', null);
-    p.observe(visualB, 2, 'sword', null);
+    p.observe(visualA, 1, 'sword', null, null);
+    p.observe(visualA, 2, 'sword', null, null);
+    p.observe(visualB, 2, 'sword', null, null);
     await new Promise((r) => setTimeout(r, 0));
     expect(started).toBe(1); // still only the in-flight one
     gate.resolve();
@@ -111,11 +127,11 @@ describe('SelfSpiritPrewarmer', () => {
       },
       idle: async () => {},
     });
-    p.observe(visualA, 0, 'sword', null); // throws
+    p.observe(visualA, 0, 'sword', null, null); // throws
     await new Promise((r) => setTimeout(r, 0));
     await new Promise((r) => setTimeout(r, 0));
     expect(warms).toBe(1);
-    p.observe(visualB, 0, 'sword', null); // lane not wedged
+    p.observe(visualB, 0, 'sword', null, null); // lane not wedged
     await new Promise((r) => setTimeout(r, 0));
     expect(warms).toBe(2);
   });
@@ -130,16 +146,16 @@ describe('SelfSpiritPrewarmer', () => {
       },
       idle: async () => {},
     });
-    p.observe(visualA, 0, 'sword', null);
+    p.observe(visualA, 0, 'sword', null, null);
     await new Promise((r) => setTimeout(r, 0));
     expect(warms).toBe(1);
 
     playerGhost = false;
-    p.observe(visualA, 0, 'sword', null);
+    p.observe(visualA, 0, 'sword', null, null);
     await new Promise((r) => setTimeout(r, 0));
     expect(warms).toBe(2);
 
-    p.observe(visualA, 0, 'sword', null);
+    p.observe(visualA, 0, 'sword', null, null);
     await new Promise((r) => setTimeout(r, 0));
     expect(warms).toBe(2);
   });

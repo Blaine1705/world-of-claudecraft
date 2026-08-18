@@ -36,6 +36,8 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // The Soul Stone heal fraction is SOUL_STONE_HEAL_PCT_MAX (src/sim/soulwell.ts),
   // an engine constant, not an effects-array value.
   soulwell: [25],
+  // Pact Deepened's magic reduction lives in the talent stat resolver.
+  demon_skin: [5],
   // Flash of Light's Devotion comes from the Paladin generation table, not its heal effect.
   flash_of_light: [1],
   // Lay on Hands Devotion comes from the Paladin generation table, not its heal effect.

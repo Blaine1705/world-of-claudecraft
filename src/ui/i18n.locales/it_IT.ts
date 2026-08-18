@@ -5869,6 +5869,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Divorare',
   'entities.abilities.drain_life.description': "Consuma la vitalità del bersaglio, infliggendo {damage} danni da Ombra ogni secondo e trasferendovene il 70% come salute. Afflizione ne trasferisce invece la totalità. Quando è incanalato sul vostro Evil Eye primario, consuma all'inizio tutti i Filamenti del Fato, e ogni Filamento genera 1 Condanna in più per impulso.",
   'entities.abilities.fear.name': 'Tormento',
+  'entities.abilities.fear.description':
+    "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto.",
   'entities.abilities.searing_pain.name': 'Bruciatura',
   'entities.abilities.searing_pain.description':
     'Brucia il nemico con fuoco agonizzante per {damage} danni da Fuoco. Lancio rapido.',
@@ -9020,6 +9022,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Premi F per risalire',
   'sim.delve.objectiveClearRoom': 'Ripulisci la stanza.',
   'sim.delve.objectiveDefeatBoss': 'Sconfiggi il boss.',
+  'sim.delve.enemiesRemain': 'Elimina prima i nemici rimasti.',
   'sim.rift.allUnstable': 'Tutti gli squarci sono instabili in questo momento. Riprova a breve.',
   'sim.rift.alreadyCleared': 'Questo squarcio è già stato completato da {names}.',
   'sim.rift.deadEntry': 'Non puoi entrare in uno squarcio mentre sei morto.',
@@ -11324,6 +11327,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description': "Scaglia un martello sacro per {damage} danni e genera 1 Devozione. Utilizzabile sotto il 20% di salute, oppure durante Ascensione Divina o Ira Vendicatrice. Ira dell'Alba concede un lancio aggiuntivo contro qualsiasi bersaglio che ignora il tempo di recupero in corso e infligge il 20% di danno in più. Ascensione ne aumenta il danno del 30%.",
   'entities.abilities.healing_stream.description':
     'Ripristina 120 salute a un bersaglio alleato in 12 sec. (talento dello Sciamano)',
+  'entities.abilities.howl_of_terror.description':
+    "Terrorizza i nemici vicini per un massimo di 5 sec. I danni pari in totale all'8% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)",
   'entities.abilities.ice_block.description':
     'Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni già attivi e impedisce l’applicazione di nuovi effetti di controllo comuni. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)',
   'entities.abilities.inner_focus.description': 'Rende il vostro prossimo incantesimo da sacerdote gratuito e non interrompibile. Dura 60 sec.',
@@ -12930,6 +12935,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.needle_of_fate.description':
     'Trafigge il nemico per {damage} danni da Ombra e genera 5 Condanna se porta il tuo Evil Eye. Ogni colpo sul tuo Evil Eye primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Evil Eye, Needle of Fate marchia per prima il suo bersaglio.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
+  'entities.abilities.ossuary_mark.description':
+    "Marchia un nemico per 15 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima.",
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Il Maledictor possiede il tuo Evil Eye primario per 15 sec e genera 35 Condanna. Needle of Fate si lancia in 1 sec e genera 2 Condanna extra, Divorare può essere incanalato in movimento, e Sentence infligge il 25% di danni in più e rilascia un\'eco ritardata per il 60% dei danni, che scende al 30% tra i livelli 17 e 20.',
