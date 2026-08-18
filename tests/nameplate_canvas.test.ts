@@ -94,6 +94,7 @@ interface CartoucheSurfaceAccess {
     outer: { x: number; y: number; w: number; h: number };
     clasp: { x: number; y: number; w: number; h: number };
     extraLift: number;
+    motifCount: number;
     nameRowTop: number;
     nameBaseline: number;
     titleBaseline: number;
@@ -594,9 +595,11 @@ describe('nameplate canvas surface', () => {
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
 
-    // Five strokes: dark contour, frame, inner hairline, shared brackets, clasp.
-    expect(traces[0].stroke).toHaveBeenCalledTimes(5);
+    // Six strokes: dark contour, frame, inner hairline, shared brackets, clasp,
+    // motif. A missing motif would drop this back to five.
+    expect(traces[0].stroke).toHaveBeenCalledTimes(6);
     expect(traces[0].fill).toHaveBeenCalledTimes(2);
+    expect(cartoucheOf(surface).motifCount).toBeGreaterThan(0);
     expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
     expect(traces[0].strokeStyles).toEqual(
       expect.arrayContaining([accent?.frame, accent?.edge, accent?.glow]),
@@ -776,8 +779,9 @@ describe('nameplate canvas surface', () => {
     expect(rasterizedText).toContain('Gate Keeper');
     expect(rasterizedText).toContain('Gilded One');
     expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
-    expect(traces[0].stroke).toHaveBeenCalledTimes(5);
+    expect(traces[0].stroke).toHaveBeenCalledTimes(6);
     const plaque = cartoucheOf(surface);
+    expect(plaque.motifCount).toBeGreaterThan(0);
     const title = drawSpy.mock.calls.find((call) => call[1] === 'Gate Keeper');
     expect(title?.[2]).toBe(plaque.titleCenterX);
     expect(title?.[3]).toBe(plaque.titleBaseline);
@@ -917,7 +921,8 @@ describe('nameplate canvas surface', () => {
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     expect(traces[0].fillStyles).toContain(NAMEPLATE_CARTOUCHE_WELL_FILL);
-    expect(traces[0].stroke).toHaveBeenCalledTimes(5);
+    expect(traces[0].stroke).toHaveBeenCalledTimes(6);
+    expect(cartoucheOf(surface).motifCount).toBeGreaterThan(0);
   });
 
   it('E14: stealth opacity applies to the plaque as well as the text', () => {

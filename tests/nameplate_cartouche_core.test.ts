@@ -108,6 +108,8 @@ describe('nameplateCartoucheInto allocation and purity', () => {
     const inner = out.inner;
     const clasp = out.clasp;
     const brackets = out.brackets;
+    const motif = out.motif;
+    const m0 = out.motif[0];
     const tl = out.brackets[0];
     const tr = out.brackets[1];
     const br = out.brackets[2];
@@ -119,6 +121,8 @@ describe('nameplateCartoucheInto allocation and purity', () => {
     expect(out.inner).toBe(inner);
     expect(out.clasp).toBe(clasp);
     expect(out.brackets).toBe(brackets);
+    expect(out.motif).toBe(motif);
+    expect(out.motif[0]).toBe(m0);
     expect(out.brackets[0]).toBe(tl);
     expect(out.brackets[1]).toBe(tr);
     expect(out.brackets[2]).toBe(br);
@@ -300,6 +304,8 @@ describe('E15 unknown / empty / title-deed slug: no plaque', () => {
     expect(out.well.h).toBe(0);
     expect(out.outer.w).toBe(0);
     expect(out.clasp.w).toBe(0);
+    expect(out.motifKind).toBe('');
+    expect(out.motifCount).toBe(0);
     expect(out.brackets[0].endX).toBe(0);
     expect(out.brackets[1].endX).toBe(0);
     expect(out.brackets[2].endX).toBe(0);
@@ -427,5 +433,53 @@ describe('E25 / E26 identity is tier-invariant in the core', () => {
     ]) {
       expect(source.includes(token), `core must not read ${token}`).toBe(false);
     }
+  });
+});
+
+describe('E32 motif distinctness: four slugs, four side-primitive sets', () => {
+  const KIND: Record<string, string> = {
+    curators_gilt: 'catalogue',
+    reliquary_gilt: 'vault',
+    deepward: 'ward',
+    prestige_laurels: 'laurel',
+  };
+
+  function fingerprint(slug: string): string {
+    const out = layout({ slug, nameRowWidth: 70, nameRowHeight: 16, titleWidth: 0 });
+    const parts: string[] = [];
+    for (let i = 0; i < out.motifCount; i++) {
+      const p = out.motif[i];
+      parts.push(`${p.x1},${p.y1},${p.x2},${p.y2}`);
+    }
+    return parts.join('|');
+  }
+
+  it('dispatches four different motif kinds and four different line sets', () => {
+    const prints: string[] = [];
+    for (const slug of BORDER_ACCENT_SLUGS) {
+      const out = layout({ slug });
+      expect(out.motifKind, slug).toBe(KIND[slug]);
+      expect(borderAccent(slug)?.motif, slug).toBe(KIND[slug]);
+      expect(out.motifCount, slug).toBeGreaterThan(0);
+      expect(out.motifCount, slug).toBeLessThanOrEqual(16);
+      prints.push(fingerprint(slug));
+    }
+    expect(new Set(prints).size).toBe(BORDER_ACCENT_SLUGS.length);
+    expect(new Set(BORDER_ACCENT_SLUGS.map((slug) => KIND[slug])).size).toBe(4);
+  });
+
+  it('would fail if two slugs emitted the same side-primitive set', () => {
+    expect(fingerprint('curators_gilt')).not.toBe(fingerprint('reliquary_gilt'));
+    expect(fingerprint('curators_gilt')).not.toBe(fingerprint('deepward'));
+    expect(fingerprint('curators_gilt')).not.toBe(fingerprint('prestige_laurels'));
+    expect(fingerprint('reliquary_gilt')).not.toBe(fingerprint('deepward'));
+    expect(fingerprint('reliquary_gilt')).not.toBe(fingerprint('prestige_laurels'));
+    expect(fingerprint('deepward')).not.toBe(fingerprint('prestige_laurels'));
+  });
+
+  it('clears the motif when the slug is empty', () => {
+    const out = layout({ slug: '' });
+    expect(out.motifKind).toBe('');
+    expect(out.motifCount).toBe(0);
   });
 });

@@ -23,6 +23,10 @@
 
 import { DEEDS } from '../sim/content/deeds';
 
+/** Per-slug side-motif discriminant. Shared hardware (well, brackets, clasp)
+ *  stays the same; only these four shape sets change with the worn slug. */
+export type BorderMotifKind = 'catalogue' | 'vault' | 'ward' | 'laurel';
+
 /** The colors one border slug paints with. Consumed as canvas stroke colors by
  *  the nameplate and as CSS custom properties by the portrait ring, so both
  *  surfaces of one identity always agree:
@@ -30,38 +34,95 @@ import { DEEDS } from '../sim/content/deeds';
  *  - `edge`: the dark contour under/inside the frame line that keeps it legible
  *    against a bright sky or a pale portrait.
  *  - `glow`: the light highlight tint (an inner hairline on the canvas, the
- *    outer bloom on the ring). */
+ *    outer bloom on the ring).
+ *  - `motif`: which side-primitive set the cartouche core dispatches. */
 export interface BorderAccent {
   readonly frame: string;
   readonly edge: string;
   readonly glow: string;
+  readonly motif: BorderMotifKind;
 }
 
-// THE palette table: the single source of truth for every border slug's colors.
-// Literal color strings, not CSS vars, because the canvas cannot read a custom
-// property cheaply per plate per frame; the portrait ring receives these same
-// literals through the painter instead of duplicating them in hud.css. Four
-// deliberately distinct reads at nameplate distance: laurel green, deep teal,
-// pale ivory gilt, and rich gold. Every value here is unique repo-wide ON
-// PURPOSE, and reliquary_gilt's pair carries a MECHANICAL nudge for it: the
-// classic elite/quest gold (#f2c84b, plus #ffdf8a) already lives on the
-// scanned accent path, so reusing those exact bytes would force the
-// exact-once scan in tests/deed_border_accent.test.ts to carry a collision
-// allowlist, and an allowlist is where a real duplicated accent could hide.
-// The step is deliberately imperceptible: it buys the clean scan, NOT a
-// visible separation from elite chrome (at this distance the two golds read
-// the same, which is fine, since the border is identity and the elite frame
-// is not something a player reads off a portrait ring).
+// CSS-facing chassis numbers. The cartouche core re-exports them under the
+// NAMEPLATE_CARTOUCHE_* names Phase 1 locked, and the inspect / ring painters
+// write them as custom properties so hud.css and shell.css never restate the
+// hex or the pad/radius px. UI cannot import render, so the literals live here.
+export const CARTOUCHE_CHROME_PAD_X = 9;
+export const CARTOUCHE_CHROME_PAD_Y = 5;
+export const CARTOUCHE_CHROME_RADIUS = 6;
+export const CARTOUCHE_CHROME_WELL_ALPHA = 0.4;
+export const CARTOUCHE_CHROME_WELL_FILL = '#14110c';
+export const CARTOUCHE_CHROME_CLASP_WIDTH = 10;
+export const CARTOUCHE_CHROME_CLASP_HEIGHT = 5;
+export const CARTOUCHE_PAD_X_PROP = '--cartouche-pad-x';
+export const CARTOUCHE_PAD_Y_PROP = '--cartouche-pad-y';
+export const CARTOUCHE_RADIUS_PROP = '--cartouche-radius';
+export const CARTOUCHE_WELL_ALPHA_PROP = '--cartouche-well-alpha';
+export const CARTOUCHE_WELL_FILL_PROP = '--cartouche-well-fill';
+export const CARTOUCHE_CLASP_WIDTH_PROP = '--cartouche-clasp-width';
+export const CARTOUCHE_CLASP_HEIGHT_PROP = '--cartouche-clasp-height';
+
+/** Style fragment the inspect header and any other cold surface writes next
+ *  to the three accent properties. Values come from the named exports above,
+ *  never from a restated hex or magic px in CSS. */
+export function cartoucheChromeStyle(): string {
+  return (
+    `${CARTOUCHE_PAD_X_PROP}:${CARTOUCHE_CHROME_PAD_X}px;` +
+    `${CARTOUCHE_PAD_Y_PROP}:${CARTOUCHE_CHROME_PAD_Y}px;` +
+    `${CARTOUCHE_RADIUS_PROP}:${CARTOUCHE_CHROME_RADIUS}px;` +
+    `${CARTOUCHE_WELL_ALPHA_PROP}:${CARTOUCHE_CHROME_WELL_ALPHA};` +
+    `${CARTOUCHE_WELL_FILL_PROP}:${CARTOUCHE_CHROME_WELL_FILL};` +
+    `${CARTOUCHE_CLASP_WIDTH_PROP}:${CARTOUCHE_CHROME_CLASP_WIDTH}px;` +
+    `${CARTOUCHE_CLASP_HEIGHT_PROP}:${CARTOUCHE_CHROME_CLASP_HEIGHT}px`
+  );
+}
+
+// THE palette table: the single source of truth for every border slug's colors
+// and motif kind. Literal color strings, not CSS vars, because the canvas
+// cannot read a custom property cheaply per plate per frame; the portrait
+// ring receives these same literals through the painter instead of
+// duplicating them in hud.css. Four deliberately distinct reads at nameplate
+// distance: laurel green, deep teal, Catalogue antique brass, and Eternal
+// Spoils gold. Every value here is unique repo-wide ON PURPOSE, and
+// reliquary_gilt's pair carries a MECHANICAL nudge for it: the classic
+// elite/quest gold (#f2c84b, plus #ffdf8a) already lives on the scanned
+// accent path, so reusing those exact bytes would force the exact-once scan
+// in tests/deed_border_accent.test.ts to carry a collision allowlist, and an
+// allowlist is where a real duplicated accent could hide.
+// Catalogue brass sits near #c9b17a / ink #2a2214 / cream #f3ead0 and must
+// not collide with reliquary_gilt #f4ca43, elite/quest #f2c84b, or any other
+// scanned hex (the cream glow is one step off #f3ead0, which already lives
+// on the components sheet).
 // Each record is Object.frozen, not merely `Readonly` (which is compile-time
 // only): borderAccent hands the SAME record straight to a canvas strokeStyle and
 // to CSS custom properties on both surfaces, so a stray runtime write to one
 // field would silently repaint every plate and ring of that slug. Freezing makes
 // such a write throw in strict mode instead.
 const BORDER_ACCENTS: Readonly<Record<string, BorderAccent>> = Object.freeze({
-  curators_gilt: Object.freeze({ frame: '#e3d9ae', edge: '#5b5030', glow: '#f6efd2' }),
-  deepward: Object.freeze({ frame: '#4fb3c8', edge: '#123a4a', glow: '#8fe3f2' }),
-  prestige_laurels: Object.freeze({ frame: '#8fbf6a', edge: '#2f4a1e', glow: '#c6e79a' }),
-  reliquary_gilt: Object.freeze({ frame: '#f4ca43', edge: '#6b4a12', glow: '#ffe28f' }),
+  curators_gilt: Object.freeze({
+    frame: '#c9b17a',
+    edge: '#2a2214',
+    glow: '#f3ebcf',
+    motif: 'catalogue',
+  }),
+  deepward: Object.freeze({
+    frame: '#4fb3c8',
+    edge: '#123a4a',
+    glow: '#8fe3f2',
+    motif: 'ward',
+  }),
+  prestige_laurels: Object.freeze({
+    frame: '#8fbf6a',
+    edge: '#2f4a1e',
+    glow: '#c6e79a',
+    motif: 'laurel',
+  }),
+  reliquary_gilt: Object.freeze({
+    frame: '#f4ca43',
+    edge: '#6b4a12',
+    glow: '#ffe28f',
+    motif: 'vault',
+  }),
 });
 
 /** Every slug the palette table covers, sorted. Derived from the table so the

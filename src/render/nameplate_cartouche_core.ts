@@ -1,21 +1,34 @@
 // Book of Deeds nameplate cartouche geometry. DOM/Three/i18n-free so a Vitest
 // drives it directly. The canvas is a thin consumer: this module owns pad,
-// well, hardware, content origins, and the extraLift both y-walks apply.
+// well, hardware, content origins, extraLift, and the per-slug side motifs.
 
-export const NAMEPLATE_CARTOUCHE_PAD_X = 9;
-export const NAMEPLATE_CARTOUCHE_PAD_Y = 5;
-export const NAMEPLATE_CARTOUCHE_RADIUS = 6;
-export const NAMEPLATE_CARTOUCHE_WELL_ALPHA = 0.4;
-export const NAMEPLATE_CARTOUCHE_WELL_FILL = '#14110c';
+import {
+  type BorderMotifKind,
+  borderAccent,
+  CARTOUCHE_CHROME_CLASP_HEIGHT,
+  CARTOUCHE_CHROME_CLASP_WIDTH,
+  CARTOUCHE_CHROME_PAD_X,
+  CARTOUCHE_CHROME_PAD_Y,
+  CARTOUCHE_CHROME_RADIUS,
+  CARTOUCHE_CHROME_WELL_ALPHA,
+  CARTOUCHE_CHROME_WELL_FILL,
+} from '../ui/deed_border_view';
+
+export const NAMEPLATE_CARTOUCHE_PAD_X = CARTOUCHE_CHROME_PAD_X;
+export const NAMEPLATE_CARTOUCHE_PAD_Y = CARTOUCHE_CHROME_PAD_Y;
+export const NAMEPLATE_CARTOUCHE_RADIUS = CARTOUCHE_CHROME_RADIUS;
+export const NAMEPLATE_CARTOUCHE_WELL_ALPHA = CARTOUCHE_CHROME_WELL_ALPHA;
+export const NAMEPLATE_CARTOUCHE_WELL_FILL = CARTOUCHE_CHROME_WELL_FILL;
 export const NAMEPLATE_CARTOUCHE_TITLE_STEP = 11;
 export const NAMEPLATE_CARTOUCHE_TITLE_BASELINE = 9;
 export const NAMEPLATE_CARTOUCHE_NAME_BASELINE_FROM_CENTER = 5;
 export const NAMEPLATE_CARTOUCHE_BRACKET_ARM = 6;
 export const NAMEPLATE_CARTOUCHE_BRACKET_INSET = 1;
-export const NAMEPLATE_CARTOUCHE_CLASP_WIDTH = 10;
-export const NAMEPLATE_CARTOUCHE_CLASP_HEIGHT = 5;
+export const NAMEPLATE_CARTOUCHE_CLASP_WIDTH = CARTOUCHE_CHROME_CLASP_WIDTH;
+export const NAMEPLATE_CARTOUCHE_CLASP_HEIGHT = CARTOUCHE_CHROME_CLASP_HEIGHT;
 export const NAMEPLATE_CARTOUCHE_CLASP_OVERLAP = 1;
 export const NAMEPLATE_CARTOUCHE_INNER_INSET = 2.5;
+export const NAMEPLATE_CARTOUCHE_MOTIF_CAP = 16;
 export const NAMEPLATE_CARTOUCHE_EXTRA_LIFT =
   NAMEPLATE_CARTOUCHE_PAD_Y * 2 +
   (NAMEPLATE_CARTOUCHE_CLASP_HEIGHT - NAMEPLATE_CARTOUCHE_CLASP_OVERLAP);
@@ -41,6 +54,17 @@ export interface CartoucheClasp {
   h: number;
 }
 
+export type CartoucheMotifKind = BorderMotifKind | '';
+
+/** One preallocated line segment. Motif sets are line lists only so the
+ *  canvas can stroke them without a second layout pass. */
+export interface CartoucheMotifPrim {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
 export interface NameplateCartoucheInput {
   screenX: number;
   nameRowBottomY: number;
@@ -60,6 +84,9 @@ export interface NameplateCartouche {
   innerRadius: number;
   brackets: [CartoucheBracket, CartoucheBracket, CartoucheBracket, CartoucheBracket];
   clasp: CartoucheClasp;
+  motifKind: CartoucheMotifKind;
+  motifCount: number;
+  motif: CartoucheMotifPrim[];
   nameRowLeft: number;
   nameRowTop: number;
   nameBaseline: number;
@@ -73,6 +100,10 @@ function makeRect(): CartoucheRect {
 
 function makeBracket(): CartoucheBracket {
   return { cornerX: 0, cornerY: 0, endX: 0, endY: 0 };
+}
+
+function makeMotifPrim(): CartoucheMotifPrim {
+  return { x1: 0, y1: 0, x2: 0, y2: 0 };
 }
 
 function writeRect(rect: CartoucheRect, x: number, y: number, w: number, h: number): void {
@@ -111,6 +142,8 @@ function zeroPlaque(out: NameplateCartouche): void {
   out.clasp.y = 0;
   out.clasp.w = 0;
   out.clasp.h = 0;
+  out.motifKind = '';
+  out.motifCount = 0;
 }
 
 function writeOrigins(out: NameplateCartouche, input: NameplateCartoucheInput): void {
@@ -135,6 +168,9 @@ export function createNameplateCartouche(): NameplateCartouche {
     innerRadius: 0,
     brackets: [makeBracket(), makeBracket(), makeBracket(), makeBracket()],
     clasp: { x: 0, y: 0, w: 0, h: 0 },
+    motifKind: '',
+    motifCount: 0,
+    motif: Array.from({ length: NAMEPLATE_CARTOUCHE_MOTIF_CAP }, makeMotifPrim),
     nameRowLeft: 0,
     nameRowTop: 0,
     nameBaseline: 0,
@@ -194,5 +230,82 @@ export function nameplateCartoucheInto(
   out.clasp.h = NAMEPLATE_CARTOUCHE_CLASP_HEIGHT;
   out.clasp.x = outerX + (outerW - NAMEPLATE_CARTOUCHE_CLASP_WIDTH) / 2;
   out.clasp.y = outerY - (NAMEPLATE_CARTOUCHE_CLASP_HEIGHT - NAMEPLATE_CARTOUCHE_CLASP_OVERLAP);
+  writeMotif(out, input.slug);
   return out;
+}
+
+function addMotifLine(
+  out: NameplateCartouche,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): void {
+  if (out.motifCount >= out.motif.length) return;
+  const prim = out.motif[out.motifCount];
+  prim.x1 = x1;
+  prim.y1 = y1;
+  prim.x2 = x2;
+  prim.y2 = y2;
+  out.motifCount += 1;
+}
+
+function writeCatalogueMotif(out: NameplateCartouche): void {
+  // Book ticks: three short horizontal page-lines on each side.
+  const midY = out.outer.y + out.outer.h / 2;
+  const left = out.outer.x + 3;
+  const right = out.outer.x + out.outer.w - 3;
+  for (const dy of [-3, 0, 3]) {
+    addMotifLine(out, left, midY + dy, left + 4, midY + dy);
+    addMotifLine(out, right - 4, midY + dy, right, midY + dy);
+  }
+}
+
+function writeVaultMotif(out: NameplateCartouche): void {
+  // Vault knot: a diamond plus a horizontal bar on each side.
+  const midY = out.outer.y + out.outer.h / 2;
+  const writeKnot = (cx: number): void => {
+    addMotifLine(out, cx, midY - 3, cx + 3, midY);
+    addMotifLine(out, cx + 3, midY, cx, midY + 3);
+    addMotifLine(out, cx, midY + 3, cx - 3, midY);
+    addMotifLine(out, cx - 3, midY, cx, midY - 3);
+    addMotifLine(out, cx - 3, midY, cx + 3, midY);
+  };
+  writeKnot(out.outer.x + 5);
+  writeKnot(out.outer.x + out.outer.w - 5);
+}
+
+function writeWardMotif(out: NameplateCartouche): void {
+  // Ward key: vertical stem, triangular bow, inward-facing bit.
+  const midY = out.outer.y + out.outer.h / 2;
+  const writeKey = (cx: number, bitDir: number): void => {
+    addMotifLine(out, cx, midY - 5, cx, midY + 4);
+    addMotifLine(out, cx, midY - 5, cx - 2.5, midY - 2);
+    addMotifLine(out, cx, midY - 5, cx + 2.5, midY - 2);
+    addMotifLine(out, cx, midY + 4, cx + 3 * bitDir, midY + 4);
+  };
+  writeKey(out.outer.x + 5, 1);
+  writeKey(out.outer.x + out.outer.w - 5, -1);
+}
+
+function writeLaurelMotif(out: NameplateCartouche): void {
+  // Laurel sprigs: three diagonal ticks fanning from an inner point.
+  const midY = out.outer.y + out.outer.h / 2;
+  const writeSprig = (cx: number, dir: number): void => {
+    addMotifLine(out, cx, midY, cx + 3 * dir, midY - 4);
+    addMotifLine(out, cx, midY, cx + 4 * dir, midY);
+    addMotifLine(out, cx, midY, cx + 3 * dir, midY + 4);
+  };
+  writeSprig(out.outer.x + 6, -1);
+  writeSprig(out.outer.x + out.outer.w - 6, 1);
+}
+
+function writeMotif(out: NameplateCartouche, slug: string): void {
+  const kind = borderAccent(slug)?.motif ?? '';
+  out.motifKind = kind;
+  out.motifCount = 0;
+  if (kind === 'catalogue') writeCatalogueMotif(out);
+  else if (kind === 'vault') writeVaultMotif(out);
+  else if (kind === 'ward') writeWardMotif(out);
+  else if (kind === 'laurel') writeLaurelMotif(out);
 }

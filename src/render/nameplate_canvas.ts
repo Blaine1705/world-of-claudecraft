@@ -613,9 +613,10 @@ export class NameplateCanvasSurface {
   }
 
   // The Book of Deeds cartouche: midnight well, three-layer metal edge, shared
-  // L-brackets and top clasp. Shapes only, so it creates no text sprite and no
-  // cache entry. Geometry comes from the caller-owned cartouche record. Drawn
-  // BEFORE the row content so the name and title sit on top of the well.
+  // L-brackets, top clasp, and the per-slug side motif the core already laid
+  // out. Shapes only, so it creates no text sprite and no cache entry.
+  // Geometry comes from the caller-owned cartouche record. Drawn BEFORE the
+  // row content so the name and title sit on top of the well.
   // Cosmetic identity only: it encodes no health, range, rank, or threat, so
   // collapsing all four slugs onto one system-color pair under forced colors
   // hides nothing a player acts on (unlike the quest marker tones, which earn a
@@ -690,6 +691,17 @@ export class NameplateCanvasSurface {
     ctx.lineWidth = CARTOUCHE_HARDWARE_WIDTH;
     ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
     ctx.stroke();
+    if (cartouche.motifCount > 0) {
+      ctx.beginPath();
+      for (let i = 0; i < cartouche.motifCount; i++) {
+        const prim = cartouche.motif[i];
+        ctx.moveTo(prim.x1, prim.y1);
+        ctx.lineTo(prim.x2, prim.y2);
+      }
+      ctx.lineWidth = CARTOUCHE_HARDWARE_WIDTH;
+      ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
+      ctx.stroke();
+    }
   }
 
   private drawHealth(state: NameplateCanvasState, centerX: number, y: number): void {
