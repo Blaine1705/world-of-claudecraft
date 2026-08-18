@@ -386,6 +386,12 @@ const DEFAULT_SLOWEST_LIMIT = 20;
 // it. Those records settle; a wedge is the record that never does.
 const DEFAULT_STALL_MS = 4000;
 const DEFAULT_STALL_LIMIT = 8;
+// Frames a waiting tail-free piece may see pass with no tail-free unit starting
+// before the drain owes it a hearing ahead of the priority order (the piece
+// slot in the header). One in four bounds a starving gate's settle without
+// letting the pieces of a busy arrival take every frame from the link
+// submissions that start the driver's async work.
+export const PIECE_SLOT_STARVED_FRAMES = 4;
 // Concurrent released tails, i.e. driver links settling while the queue keeps
 // draining. 2 keeps a second gate flowing past one slow link while holding the
 // snapshot-burst bound: with the running unit's own prologue, at most 3 units'
@@ -461,9 +467,11 @@ export function createBackgroundGpuQueue(opts?: {
   let admissionParks = 0;
   let selectionPass = 0;
   let admissionNotify: (() => void) | null = null;
-  // The per-frame piece slot (see the header): whether a tail-free unit ran in
-  // the frame under way, and whether the frame that just ended left one owed.
-  let tailFreeRanThisFrame = false;
+  // The piece slot (see the header): how many frames in a row ended with a
+  // tail-free piece waiting (the lowest one never starting), and whether that
+  // streak reached the bound that owes the piece a hearing before the
+  // priority order.
+  let tailFreeStarvedFrames = 0;
   let pieceSlotOwed = false;
   // True while the drain loop is parked waiting for a cap slot. Read at enqueue
   // so a unit arriving mid-park is attributed the wait it really had.
@@ -688,6 +696,18 @@ export function createBackgroundGpuQueue(opts?: {
     return found;
   };
 
+  /** The priority of the lowest-priority tail-free candidate still pending
+   *  once `started` left the queue (Infinity when none): the bar a starting
+   *  unit must be at or under to count as the starving piece itself. */
+  const lowestPendingTailFreePriority = (started: PendingGpuWork<unknown>): number => {
+    let lowest = Number.POSITIVE_INFINITY;
+    for (const candidate of pending) {
+      if (candidate === started || candidate.releaseTail) continue;
+      if (candidate.priority < lowest) lowest = candidate.priority;
+    }
+    return lowest;
+  };
+
   /**
    * Index of the unit to start next: highest priority, FIFO within a priority,
    * and with an armed admission the first such candidate it admits. Returns -1
@@ -814,8 +834,12 @@ export function createBackgroundGpuQueue(opts?: {
         continue;
       }
       const [next] = pending.splice(selectedIndex, 1);
-      if (!next.releaseTail) {
-        tailFreeRanThisFrame = true;
+      // The starving piece is the LOWEST tail-free candidate: only its own
+      // start (or a start at or below its priority) settles the streak. A
+      // higher tail-free unit starting (a debt batch) is the storm, not the
+      // piece running.
+      if (!next.releaseTail && next.priority <= lowestPendingTailFreePriority(next)) {
+        tailFreeStarvedFrames = 0;
         pieceSlotOwed = false;
       }
       const startedAt = now();
@@ -929,10 +953,17 @@ export function createBackgroundGpuQueue(opts?: {
         // bound counts in, and the new frame re-opens the budget: wake the loop
         // so it reconsiders everything it parked on.
         for (const entry of pending) if (entry.refusedAdmission) entry.deferredFrames++;
-        // The frame that just ended owes a piece when one waited through it
-        // without any tail-free unit running (see the header's piece slot).
-        pieceSlotOwed = !tailFreeRanThisFrame && lowestTailFree() >= 0;
-        tailFreeRanThisFrame = false;
+        // A piece that waited through the frame with no tail-free unit running
+        // ages the starvation streak; the slot is owed once the streak reaches
+        // PIECE_SLOT_STARVED_FRAMES, not every frame: on the iGPU a touch piece
+        // costs 15 to 45 ms, and offering one ahead of the priority order every
+        // frame took the crowd arrival's frames away from the props bands' own
+        // compile submissions (measured: the town twins raced their first draw
+        // again). Every fourth frame keeps a starving gate settling while the
+        // storm keeps three frames in four for its submissions.
+        if (lowestTailFree() >= 0) tailFreeStarvedFrames++;
+        else tailFreeStarvedFrames = 0;
+        pieceSlotOwed = tailFreeStarvedFrames >= PIECE_SLOT_STARVED_FRAMES;
         wakeAdmission();
       }
       const previous = lastFrameAt;

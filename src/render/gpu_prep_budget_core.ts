@@ -328,11 +328,16 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
       // The slot is per frame, NOT per unspent frame: gating it on a frame
       // that had spent nothing let any actionable unit that ran first close
       // it for every visible and approaching piece behind it, which on a busy
-      // frame is all of them.
+      // frame is all of them. It does need SOME headroom left, though: a frame
+      // already exhausted by an earlier piece must not take a second oversized
+      // one, or the cheap link submissions behind it lose the whole frame
+      // (measured on the iGPU crowd: the props bands' compiles slipped and
+      // their first draw raced).
       if (
         (input.cls === 'visible' || input.cls === 'approaching') &&
         !progressUsedThisFrame &&
         ledgerOf(input.kind) !== undefined &&
+        headroom() > 0 &&
         predictedMs > headroom()
       ) {
         progressUsedThisFrame = true;

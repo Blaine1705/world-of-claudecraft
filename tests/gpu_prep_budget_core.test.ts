@@ -184,8 +184,17 @@ describe('gpu prep admission rules, in order', () => {
     expect(budget.admit({ kind: 'live-gate:Group', cls: 'actionable', deferredFrames: 0 })).toEqual(
       { admit: true, reason: 'actionable-floor', predictedMs: 8 },
     );
-    // Same kind, same zero headroom: the visible class gets the frame's one
-    // progress slot, and the next piece behind it is refused.
+    // Same kind, same ZERO headroom: the visible class is refused too, since
+    // the progress slot needs some headroom left (an exhausted frame takes no
+    // oversized piece); with a little headroom left it takes the slot once.
+    expect(budget.admit({ kind: 'live-gate:Group', cls: 'visible', deferredFrames: 0 })).toEqual({
+      admit: false,
+      reason: 'no-headroom',
+      predictedMs: 8,
+      headroomMs: 0,
+    });
+    budget.noteFrame(40);
+    budget.spend(1);
     expect(budget.admit({ kind: 'live-gate:Group', cls: 'visible', deferredFrames: 0 })).toEqual({
       admit: true,
       reason: 'progress',
@@ -195,7 +204,7 @@ describe('gpu prep admission rules, in order', () => {
       admit: false,
       reason: 'no-headroom',
       predictedMs: 8,
-      headroomMs: 0,
+      headroomMs: 1,
     });
   });
 
@@ -473,6 +482,16 @@ describe('gpu prep budget: progress and class-specific starvation', () => {
     const cosmetic = budgetAt(40);
     cosmetic.record('touch:0', 15);
     expect(cosmetic.admit({ kind: 'touch:1', cls: 'cosmetic', deferredFrames: 0 })).toMatchObject({
+      admit: false,
+      reason: 'no-headroom',
+    });
+    // ...but never on a frame an earlier piece already exhausted: the cheap
+    // link submissions behind it would lose the whole frame.
+    const exhausted = budgetAt(40);
+    exhausted.record('touch:0', 15);
+    exhausted.spend(2); // headroom floor 2 -> 0 left
+    expect(exhausted.headroomMs()).toBe(0);
+    expect(exhausted.admit({ kind: 'touch:1', cls: 'visible', deferredFrames: 0 })).toMatchObject({
       admit: false,
       reason: 'no-headroom',
     });

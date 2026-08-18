@@ -5,6 +5,7 @@ import {
   GPU_WORK_PRIORITY,
   type GpuWorkAdmission,
   type GpuWorkAdmissionCandidate,
+  PIECE_SLOT_STARVED_FRAMES,
 } from '../src/render/background_gpu_queue';
 import { withHiddenPrewarmGroups } from '../src/render/prewarm_pass';
 
@@ -1751,16 +1752,26 @@ describe('createBackgroundGpuQueue admission', () => {
     await settle();
     expect(ran).toEqual(['debt:0']);
 
-    // Frame 1 ended with the piece pending and no tail-free unit started in
-    // it: the next selection owes the piece its slot, ahead of the drain.
+    // Frames 1..3 end with the piece pending and no tail-free unit started in
+    // them: the streak reaches PIECE_SLOT_STARVED_FRAMES and the next selection
+    // owes the piece its slot, ahead of the drain. One frame short of it the
+    // drain still wins (the storm keeps three frames in four).
     queue.noteFrame(32);
+    queue.noteFrame(48);
     releases[0]();
+    await settle();
+    expect(ran).toEqual(['debt:0', 'debt:1']);
+    const third = debt(2);
+    queue.noteFrame(64);
+    queue.noteFrame(80);
+    releases[1]();
     await piece;
 
-    expect(ran).toEqual(['debt:0', 'piece', 'debt:1']);
+    expect(ran).toEqual(['debt:0', 'debt:1', 'piece', 'debt:2']);
+    expect(PIECE_SLOT_STARVED_FRAMES).toBe(4);
     expect(queue.stats().admission.parks).toBe(0);
-    releases[1]();
-    await Promise.all([first, second]);
+    releases[2]();
+    await Promise.all([first, second, third]);
   });
 
   it('leaves selection alone in a frame that already started a tail-free unit', async () => {
