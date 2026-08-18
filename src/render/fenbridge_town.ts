@@ -36,6 +36,7 @@ import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
   newTownPiecewiseReveal,
+  orderTownRootsNearestFirst,
   townPiecewiseRevealInto,
   townRootVisible,
   townStaticReveal,
@@ -1324,6 +1325,12 @@ function buildFromTemplates(
 
   let revealGate: RevealGateCore | null = null;
   let staticRevealed = false;
+  // The gate asks for the roots the moment the consult fires the request, so
+  // these are the CAMERA's coordinates of that very frame: an arrival submits
+  // the buildings it landed among before the far side of the town.
+  let lastCamX = 0;
+  let lastCamZ = 0;
+  const orderedRevealRoots: THREE.Object3D[] = [];
   return {
     group,
     setCaptureOverlay,
@@ -1331,7 +1338,14 @@ function buildFromTemplates(
       revealGate = gate;
     },
     staticRevealRoots(): readonly THREE.Object3D[] {
-      return staticRevealRoots;
+      return orderTownRootsNearestFirst(
+        staticRevealRoots,
+        staticPiecewise.x,
+        staticPiecewise.z,
+        lastCamX,
+        lastCamZ,
+        orderedRevealRoots,
+      );
     },
     update(
       camX: number,
@@ -1344,6 +1358,8 @@ function buildFromTemplates(
       dt: number,
       reducedMotion = false,
     ): void {
+      lastCamX = camX;
+      lastCamZ = camZ;
       const hubDx = camX - FENBRIDGE_LAYOUT.hub.center.x;
       const hubDz = camZ - FENBRIDGE_LAYOUT.hub.center.z;
       const reveal = townStaticReveal(

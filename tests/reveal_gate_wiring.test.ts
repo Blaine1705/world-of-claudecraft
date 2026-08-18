@@ -31,22 +31,28 @@ describe('reveal gate wiring (source pins)', () => {
 
   it('the shared reveal compile host links, arms shadows, then runs the touch tail', () => {
     // The host moved out of the renderer constructor, so the pins move with
-    // it: what must not drift is the lane it rides (below the live entity
-    // gates), the label its cost model is keyed on, and the order of the
-    // three arms, since a touch tail before the link warms nothing.
+    // it: what must not drift is the lane it rides (the imminent one above the
+    // rest of the reveals, the ordinary one below the live entity gates), the
+    // label its cost model is keyed on, and the order of the three arms, since
+    // a touch tail before the link warms nothing. The priorities themselves are
+    // tested for real in tests/reveal_compile_host.test.ts.
     const host = read('../src/render/reveal_compile_host.ts');
     expect(host).toContain("export const REVEAL_GATE_PREP_KIND = 'reveal-gate';");
-    expect(host).toContain('priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,');
-    expect(host).toContain('label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`,');
+    expect(host).toContain(
+      'const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;',
+    );
+    expect(host).toContain('label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`');
     const colourAt = anchor(
       host,
       'deps.compileColor(target).then(() => deps.compileShadow(target))',
     );
     // Uploads sit BETWEEN the link and the touch: the touch's driver round trip
     // flushes behind everything already queued, so an upload paid after it is
-    // measured by it instead of being its own budgeted piece.
-    const uploadAt = anchor(host, '.then(() => deps.upload(target, GPU_WORK_PRIORITY');
-    const touchAt = anchor(host, '.then(() => deps.touch(target, GPU_WORK_PRIORITY');
+    // measured by it instead of being its own budgeted piece. Both ride the
+    // SAME priority the link did, so an imminent key's tail cannot fall behind
+    // the lane its link overtook.
+    const uploadAt = anchor(host, '.then(() => deps.upload(target, priority))');
+    const touchAt = anchor(host, '.then(() => deps.touch(target, priority))');
     expect(colourAt).toBeLessThan(uploadAt);
     expect(uploadAt).toBeLessThan(touchAt);
     // The soft deadline is the budget's learned cost times the key's roots,
@@ -119,9 +125,16 @@ describe('reveal gate wiring (source pins)', () => {
     expect(propsSource).toContain(
       'updatePropCell(cell, camX, camZ, fogFar, undefined, revealGate);',
     );
+    // The bands go through the LIST pass, not the per-band entry: that is what
+    // consults a frame's imminent bands nearest to the camera first, and its
+    // scratch is built once per view rather than per frame.
     expect(propsSource).toContain(
-      'updatePropCullable(cullables[i], camX, camZ, fogFar, fogFarSq, bandRevealGate);',
+      'updatePropCullables(cullables, camX, camZ, fogFar, fogFarSq, bandRevealGate, cullPass);',
     );
+    expect(propsSource).toContain('const cullPass = newPropCullPass();');
+    // No clock anywhere in the reveal path: the cores hold none and there is
+    // no bound left for one to feed.
+    expect(propsSource).not.toContain('gpuPrepNow');
     expect(propsSource).toContain('setBandRevealGate(gate: RevealGateCore | null): void {');
     // The reveal key IS the map key: if these diverge, revealRoots returns
     // [] for every consult and the gate degrades to an immediate reveal that
@@ -223,7 +236,17 @@ describe('reveal gate wiring (source pins)', () => {
       );
       expect(source).toContain('buildingGroups.push(built.group);');
       expect(source).toContain('staticRevealRoots(): readonly THREE.Object3D[] {');
-      expect(source).toContain('return staticRevealRoots;');
+      // The gate asks for the roots inside the consult that fires the request,
+      // so the view hands them over NEAREST FIRST at that frame's camera: an
+      // arrival links the buildings it landed among before the far side.
+      expect(source).toContain('return orderTownRootsNearestFirst(');
+      expect(source).toContain('staticPiecewise.x,');
+      expect(source).toContain('orderedRevealRoots,');
+      const camAt = anchor(source, 'lastCamX = camX;');
+      expect(camAt).toBeLessThan(policyAt);
+      // No clock anywhere in the reveal path: the cores hold none and there is
+      // no bound left for one to feed.
+      expect(source).not.toContain('gpuPrepNow');
       const anchorsAt = anchor(source, 'const rootX: number[] = staticCullTargets.map(');
       expect(anchorsAt).toBeGreaterThan(
         anchor(source, 'const staticRevealRoots: THREE.Object3D[] ='),

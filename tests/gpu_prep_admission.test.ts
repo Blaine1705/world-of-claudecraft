@@ -2,10 +2,15 @@
 // (src/render/gpu_prep_admission.ts). Its whole job is translation, so these
 // cases pin the translation: label to cost KIND, priority to admission CLASS,
 // and a spend that both learns the piece's cost and charges the frame.
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { resetArrivalCoverForTest, setArrivalCover } from '../src/render/arrival_cover';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
 import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
+
+afterEach(() => {
+  resetArrivalCoverForTest();
+});
 
 describe('createGpuPrepAdmission', () => {
   it('admits an actionable-priority candidate whatever the frame costs', () => {
@@ -144,5 +149,87 @@ describe('createGpuPrepAdmission', () => {
     const snapshot = budget.snapshot();
     expect(snapshot.decisions.legacy).toBe(1);
     expect(snapshot.kinds).toEqual([{ kind: 'touch', emaMs: 3, samples: 1 }]);
+  });
+  it('under the arrival curtain admits the arrival lanes and refuses the debt ones', () => {
+    // The frame behind a loading screen is not a frame to protect, but it is
+    // not a frame to give away either: free admission for everything is what
+    // starved the arrival, because the boot-debt and background lanes drained
+    // at full speed ahead of the very keys the camera landed among (measured
+    // at an online entry: after a full second of hold, 0 of 1 roots ready on
+    // every band key and 0 of 12 on the town).
+    const budget = createGpuPrepBudget({ targetFrameMs: 16.7, minSliceMs: 1 });
+    const admission = createGpuPrepAdmission(budget);
+    budget.noteFrame(120);
+    budget.record('touch', 40);
+    budget.record('reveal-gate', 40);
+    const debt = {
+      label: 'reveal-gate:tavern',
+      priority: GPU_WORK_PRIORITY.BOOT_DEBT,
+      deferredFrames: 0,
+    };
+    const imminentPiece = {
+      label: 'touch:program',
+      priority: GPU_WORK_PRIORITY.TAIL_PIECE,
+      deferredFrames: 0,
+    };
+    const imminentLink = {
+      label: 'reveal-gate:tavern',
+      priority: GPU_WORK_PRIORITY.LIVE_VIEW,
+      deferredFrames: 0,
+    };
+
+    setArrivalCover(true);
+    // An imminent key's LINK and its tail PIECES both get through, which is
+    // the whole point: a held key settles on its pieces, not on its link.
+    expect(admission.admit(imminentLink)).toBe(true);
+    expect(admission.admit(imminentPiece)).toBe(true);
+    // The debt and background lanes wait for the lift.
+    expect(admission.admit(debt)).toBe(false);
+    expect(
+      admission.admit({
+        label: 'touch:program',
+        priority: GPU_WORK_PRIORITY.BACKGROUND,
+        deferredFrames: 0,
+      }),
+    ).toBe(false);
+    const covered = budget.snapshot();
+    expect(covered.decisions.cover).toBe(2);
+    expect(covered.decisions['cover-not-arrival']).toBe(2);
+    // The frame budget was not consulted at all, so its per-frame slots are
+    // still there for the frames that do need them.
+    expect(covered.decisions['first-sample']).toBe(0);
+    expect(covered.decisions['no-headroom']).toBe(0);
+
+    // Learning still happens under the cover, in the spend.
+    admission.spend(3, 'touch:program');
+    expect(budget.snapshot().kinds).toContainEqual({ kind: 'touch', emaMs: 28.9, samples: 2 });
+
+    // Off the cover, the ordinary frame budget is back in charge.
+    setArrivalCover(false);
+    expect(
+      admission.admit({
+        label: 'touch:program',
+        priority: GPU_WORK_PRIORITY.BACKGROUND,
+        deferredFrames: 0,
+      }),
+    ).toBe(false);
+    expect(budget.snapshot().decisions['no-headroom']).toBe(1);
+  });
+
+  it('the cover never overrules the legacy kill switch', () => {
+    const budget = createGpuPrepBudget({ targetFrameMs: 16.7 });
+    const admission = createGpuPrepAdmission(budget);
+    budget.noteFrame(120);
+    budget.setLegacy(true);
+    setArrivalCover(true);
+    expect(
+      admission.admit({
+        label: 'touch:program',
+        priority: GPU_WORK_PRIORITY.BOOT_DEBT,
+        deferredFrames: 0,
+      }),
+    ).toBe(true);
+    expect(budget.snapshot().decisions.legacy).toBe(1);
+    expect(budget.snapshot().decisions['cover-not-arrival']).toBe(0);
   });
 });

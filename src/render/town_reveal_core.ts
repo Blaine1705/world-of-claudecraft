@@ -1,11 +1,16 @@
 // Town static-cull first-reveal policy (hitch-hunt P3a), shared by the
 // Eastbrook and Fenbridge views. The static batches' FIRST fog-cull reveal
 // waits for a reveal gate so a walking approach never links the town's
-// programs inside a live frame; but a camera already among the buildings
-// (login, hearth, teleport: arrivals that ride the loading cover, whose zone
-// prepare compiles the scene) must NEVER be held, because the sim colliders
-// would block movement against invisible walls. Once revealed, the gate is
-// never consulted again.
+// programs inside a live frame. A camera already among the buildings (login,
+// hearth, teleport) is held too: that arrival used to reveal at once on the
+// premise that the cover's zone prepare had compiled the scene, and on a host
+// whose boot manifest drops the town that premise is false, so the whole town
+// kit linked inside the live frames right after the jump. Its consult is
+// IMMINENT instead: the hold stands, and the gate submits the town's compiles
+// at the imminent priority, its roots ordered nearest to the camera first
+// (orderTownRootsNearestFirst), so what the player is standing in links first.
+// Nothing here reveals on a clock. Once revealed, the gate is never consulted
+// again.
 //
 // A town key is the widest one in the game: every static batch plus every
 // building group, dozens of independent subtrees behind one hold. Waiting for
@@ -20,17 +25,26 @@
 // avoided. The key-level answer is unchanged, and it still wins: warm reveals
 // everything, fog-hidden hides everything.
 //
+// TOWN_REVEAL_REACH_YD is the town's fairness floor, and it is DELIBERATELY
+// small where the props bands get 40 yards. A town kit's programs are SHARED
+// across its buildings, so revealing one still-unlinked building links the
+// whole kit cold, inside that live frame: exactly the cost this policy exists
+// to avoid. The reach is therefore the smallest radius at which a collider is
+// genuinely at arm's length, not a comfort radius for "the town looks empty".
+//
 // Pure core contract: no three import, no DOM, no clocks, no randomness.
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts); tested by
 // tests/town_reveal_core.test.ts.
 
 export interface TownRevealGate {
-  allow(key: string): boolean;
+  allow(key: string, imminent?: boolean): boolean;
   /** Per-root readiness (reveal_gate_core). A gate without it keeps the
-   *  historical all-or-nothing hold. */
+   *  historical all-or-nothing hold, minus the reach floor. */
   rootReady?(key: string, root: object): boolean;
-  /** Telemetry hook: this root revealed before its key warmed. */
+  /** Telemetry hook: this root revealed because its own compile landed. */
   noteRootRevealed?(key: string): void;
+  /** Telemetry hook: this root revealed on the reach floor, linked or not. */
+  noteRootRevealedAtReach?(key: string): void;
 }
 
 /**
@@ -51,9 +65,11 @@ export function townStaticReveal(
 ): TownStaticReveal {
   if (!fogVisible) return 'hidden';
   if (alreadyRevealed) return 'revealed';
+  if (gate === null) return 'revealed';
+  // A camera inside the cull radius is the IMMINENT consult: the player is
+  // standing in this town, so its compiles go to the front of the reveal lane.
   const insideTown = camDistSqToCenter <= cullRadius * cullRadius;
-  if (insideTown || gate === null || gate.allow(key)) return 'revealed';
-  return 'held';
+  return gate.allow(key, insideTown) ? 'revealed' : 'held';
 }
 
 /**
@@ -62,6 +78,18 @@ export function townStaticReveal(
  * several settle together, which is exactly the burst worth spreading.
  */
 export const TOWN_PIECEWISE_REVEALS_PER_FRAME = 2;
+
+/**
+ * The town's reach floor, in yards from the camera to a root's anchor: a
+ * building this close shows on the first held frame, linked or not, because
+ * its colliders are at arm's length and the player would otherwise walk into
+ * nothing. Small (see the header): a town kit's programs are shared across
+ * buildings, so every reach reveal risks linking the whole kit cold in a live
+ * frame. It is the fairness floor, not a comfort radius, so it covers only
+ * what the player can physically touch; everything farther waits for its own
+ * compile, however long that takes.
+ */
+export const TOWN_REVEAL_REACH_YD = 12;
 
 /** The town's per-root reveal state, built once beside its roots list. */
 export interface TownPiecewiseReveal {
@@ -97,9 +125,43 @@ export function newTownPiecewiseReveal(
 }
 
 /**
- * Flip the nearest ready roots of a held key, up to the per-frame budget.
- * Returns how many flipped. Allocation-free: the selection is a bounded
- * k-smallest scan over the caller-owned arrays, never a sort of a fresh list.
+ * The roots of a town key, nearest to the camera first, refilled into a
+ * caller-owned array. The town view hands this to the gate at REQUEST time so
+ * an imminent arrival submits its compiles in the order the player will see
+ * them; it runs once per key, not per frame, so the index sort it needs costs
+ * nothing on the frame path. Equal distances keep their declaration order
+ * (the sort is stable), so the result is deterministic.
+ */
+export function orderTownRootsNearestFirst<T>(
+  roots: readonly T[],
+  x: Float32Array,
+  z: Float32Array,
+  camX: number,
+  camZ: number,
+  out: T[],
+): readonly T[] {
+  const distSq = (index: number): number => {
+    const dx = (x[index] ?? 0) - camX;
+    const dz = (z[index] ?? 0) - camZ;
+    return dx * dx + dz * dz;
+  };
+  const order: number[] = [];
+  for (let index = 0; index < roots.length; index++) order.push(index);
+  order.sort((a, b) => distSq(a) - distSq(b));
+  out.length = 0;
+  for (let n = 0; n < order.length; n++) out.push(roots[order[n]]);
+  return out;
+}
+
+/**
+ * Flip the held key's roots that may come in this frame, and return how many
+ * flipped. Two passes, in this order:
+ * - the REACH floor: every unrevealed root within TOWN_REVEAL_REACH_YD shows
+ *   at once, readiness and per-frame budget both irrelevant, because a
+ *   collider at arm's length may not be invisible;
+ * - the READY roots, nearest first, at most TOWN_PIECEWISE_REVEALS_PER_FRAME.
+ * Allocation-free: the ready selection is a bounded k-smallest scan over the
+ * caller-owned arrays, never a sort of a fresh list.
  */
 export function townPiecewiseRevealInto(
   state: TownPiecewiseReveal,
@@ -109,10 +171,21 @@ export function townPiecewiseRevealInto(
   gate: TownRevealGate | null | undefined,
 ): number {
   if (reveal !== 'held') return 0;
-  if (!gate || typeof gate.rootReady !== 'function') return 0;
   const { key, roots, revealed } = state;
   let flipped = 0;
-  while (flipped < TOWN_PIECEWISE_REVEALS_PER_FRAME) {
+  const reachSq = TOWN_REVEAL_REACH_YD * TOWN_REVEAL_REACH_YD;
+  for (let index = 0; index < roots.length; index++) {
+    if (revealed[index] === 1) continue;
+    const dx = state.x[index] - camX;
+    const dz = state.z[index] - camZ;
+    if (dx * dx + dz * dz > reachSq) continue;
+    revealed[index] = 1;
+    flipped++;
+    gate?.noteRootRevealedAtReach?.(key);
+  }
+  if (!gate || typeof gate.rootReady !== 'function') return flipped;
+  let ready = 0;
+  while (ready < TOWN_PIECEWISE_REVEALS_PER_FRAME) {
     let best = -1;
     let bestDistSq = Number.POSITIVE_INFINITY;
     for (let index = 0; index < roots.length; index++) {
@@ -127,6 +200,7 @@ export function townPiecewiseRevealInto(
     }
     if (best < 0) break;
     revealed[best] = 1;
+    ready++;
     flipped++;
     gate.noteRootRevealed?.(key);
   }

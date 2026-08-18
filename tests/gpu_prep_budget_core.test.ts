@@ -6,6 +6,7 @@ import {
   DEFAULT_GPU_PREP_BUDGET_CONFIG,
   type GpuPrepBudgetConfig,
   gpuPrepClassForPriority,
+  gpuPrepCoverAdmits,
   gpuPrepKindOfLabel,
 } from '../src/render/gpu_prep_budget_core';
 import { LINKED_PROGRAM_TOUCH_LABEL } from '../src/render/linked_program_touch_lane';
@@ -64,6 +65,32 @@ describe('gpu prep class mapping', () => {
     expect(gpuPrepClassForPriority(GPU_WORK_PRIORITY.ACTIONABLE_VIEW + 100)).toBe('actionable');
     expect(gpuPrepClassForPriority(-5)).toBe('cosmetic');
     expect(gpuPrepClassForPriority(Number.NaN)).toBe('cosmetic');
+  });
+});
+
+describe('gpu prep cover rule', () => {
+  it('admits the arrival lanes and refuses the debt and background ones', () => {
+    // What an arrival curtain's frames are for: the keys the camera landed
+    // among, their links and the tail pieces those keys settle on. The lanes
+    // that pay old debt or warm what nobody is looking at wait for the lift.
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.ACTIONABLE_VIEW)).toBe(true);
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.LIVE_VIEW)).toBe(true);
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.VISIBLE_PREWARM)).toBe(true);
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.TAIL_PIECE)).toBe(true);
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.BOOT_DEBT)).toBe(false);
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.BACKGROUND)).toBe(false);
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.BOOT_RESUME)).toBe(false);
+  });
+
+  it('draws the line right below VISIBLE_PREWARM, tail pieces excepted', () => {
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.VISIBLE_PREWARM - 1)).toBe(false);
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.TAIL_PIECE + 1)).toBe(false);
+    expect(gpuPrepCoverAdmits(GPU_WORK_PRIORITY.TAIL_PIECE - 1)).toBe(false);
+  });
+
+  it('admits a candidate with no usable priority, the cover historical answer', () => {
+    expect(gpuPrepCoverAdmits(undefined)).toBe(true);
+    expect(gpuPrepCoverAdmits(Number.NaN)).toBe(true);
   });
 });
 
@@ -440,6 +467,20 @@ describe('gpu prep snapshot', () => {
     budget.admit({ kind: 'dear:1', cls: 'visible', deferredFrames: 5 });
     budget.notePressure(true);
     budget.admit({ kind: 'cheap:1', cls: 'cosmetic', deferredFrames: 0 });
+    budget.admit({
+      kind: 'cheap:1',
+      cls: 'cosmetic',
+      deferredFrames: 0,
+      cover: true,
+      priority: GPU_WORK_PRIORITY.BOOT_DEBT,
+    });
+    budget.admit({
+      kind: 'cheap:1',
+      cls: 'approaching',
+      deferredFrames: 0,
+      cover: true,
+      priority: GPU_WORK_PRIORITY.TAIL_PIECE,
+    });
     budget.setLegacy(true);
     budget.admit({ kind: 'cheap:1', cls: 'cosmetic', deferredFrames: 0 });
     budget.spend(0.5);
@@ -452,9 +493,11 @@ describe('gpu prep snapshot', () => {
       starvation: 1,
       legacy: 1,
       'first-sample': 1,
+      cover: 1,
       'no-headroom': 0,
       'unknown-cap': 1,
       pressure: 1,
+      'cover-not-arrival': 1,
     });
     expect(snapshot.kinds).toEqual([
       { kind: 'dear', emaMs: 12, samples: 1 },

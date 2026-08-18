@@ -26,11 +26,23 @@
 // watchdog. That distinction is the whole point: revealing early is exactly
 // the stall the gate exists to prevent, and what a capture was missing was
 // not another escape but the evidence that a key was slow.
+//
+// There is NO wall-clock reveal bound: a held root shows when its own compile
+// lands and otherwise stays hidden, so this module owns exactly one clock, the
+// watchdog's. What an IMMINENT consult buys instead is queue position: the
+// request carries the flag down to the compile host, which submits that key's
+// link, upload and touch pieces at the imminent priority so the decor the
+// camera stands in is what the driver links first. Every gate joins the
+// arrival-cover registry on creation, so a teleport's loading screen can wait
+// on exactly those holds before it lifts.
 
+import { registerRevealGateForArrival } from './arrival_cover';
 import {
   gpuPrepNow,
+  noteRevealImminentHold,
   noteRevealKeyHeld,
   noteRevealRootPiecewise,
+  noteRevealRootReach,
   noteRevealRootsAtWatchdog,
   recordGpuPrepEvent,
 } from './gpu_prep_events';
@@ -48,8 +60,10 @@ export const REVEAL_GATE_WATCHDOG_MS = 10_000;
 export const REVEAL_SOFT_DEADLINE_MIN_MS = 1_000;
 
 export interface RevealCompileHost {
-  /** Compile one root's programs; resolves (or rejects) when settled. */
-  compile(root: object): Promise<unknown>;
+  /** Compile one root's programs; resolves (or rejects) when settled.
+   *  `imminent` is the consult's answer to "is the camera already among this
+   *  key's objects", and the host turns it into queue priority. */
+  compile(root: object, imminent: boolean): Promise<unknown>;
   /** Injectable watchdog scheduler; returns a cancel function. Defaults to
    *  setTimeout/clearTimeout. */
   schedule?: (onTimeout: () => void, ms: number) => () => void;
@@ -60,10 +74,15 @@ export interface RevealCompileHost {
 }
 
 export interface RevealGate extends RevealGateCore {
-  /** A consumer revealed one root before its key warmed. Telemetry only: the
-   *  gate never decides anything from it, so a consumer that does not report
-   *  loses a counter, never a reveal. */
+  /** A consumer revealed one root before its key warmed, because that root's
+   *  own compile landed. Telemetry only: the gate never decides anything from
+   *  it, so a consumer that does not report loses a counter, never a reveal. */
   noteRootRevealed(key: string): void;
+  /** A consumer revealed one root before its key warmed because the root sits
+   *  inside its reach floor (colliders at arm's length), linked or not. Kept
+   *  apart from the piecewise count: these are the fairness reveals, the ones
+   *  that may still draw cold. */
+  noteRootRevealedAtReach(key: string): void;
 }
 
 const defaultSchedule = (onTimeout: () => void, ms: number): (() => void) => {
@@ -87,7 +106,7 @@ export function revealSoftDeadlineMs(perRootMs: number, rootCount: number): numb
 }
 
 /** Module-owned scratch for the readiness reads, which only ever happen
- *  synchronously inside one escape callback. */
+ *  synchronously inside one escape or deadline callback. */
 const readiness: RevealGateReadiness = { ready: 0, total: 0 };
 
 export function createRevealGate(
@@ -95,77 +114,85 @@ export function createRevealGate(
   rootsFor: (key: string) => readonly object[],
 ): RevealGate {
   const schedule = host.schedule ?? defaultSchedule;
-  const gate: RevealGateCore = createRevealGateCore((key) => {
-    const requestedAtMs = gpuPrepNow();
-    let roots: readonly object[] = [];
-    try {
-      roots = rootsFor(key);
-    } catch (error) {
-      console.error('Reveal gate roots lookup failed', key, error);
-    }
-    gate.noteRoots(key, roots);
-    const rootCount = gate.readiness(key, readiness).total;
-    noteRevealKeyHeld(rootCount);
-    const compiles = roots.map((root) => {
-      const settleRoot = (): void => gate.settleRoot(key, root);
+  const gate: RevealGateCore = createRevealGateCore(
+    (key, imminent) => {
+      const requestedAtMs = gpuPrepNow();
+      let roots: readonly object[] = [];
       try {
-        return Promise.resolve(host.compile(root)).then(settleRoot, settleRoot);
+        roots = rootsFor(key);
       } catch (error) {
-        console.error('Reveal gate compile request failed', key, error);
-        settleRoot();
-        return undefined;
+        console.error('Reveal gate roots lookup failed', key, error);
       }
-    });
-    let settled = false;
-    let cancelSoftDeadline: () => void = noCancel;
-    const cancelWatchdog = schedule(() => {
-      if (settled) return;
-      settled = true;
-      cancelSoftDeadline();
-      console.warn(`Reveal gate watchdog revealed ${key} before its compiles settled`);
-      const { ready, total } = gate.readiness(key, readiness);
-      recordGpuPrepEvent({
-        kind: 'reveal-watchdog',
-        key,
-        ageMs: gpuPrepNow() - requestedAtMs,
-        readyRoots: ready,
-        totalRoots: total,
+      gate.noteRoots(key, roots);
+      const rootCount = gate.readiness(key, readiness).total;
+      noteRevealKeyHeld(rootCount);
+      const compiles = roots.map((root) => {
+        const settleRoot = (): void => gate.settleRoot(key, root);
+        try {
+          return Promise.resolve(host.compile(root, imminent)).then(settleRoot, settleRoot);
+        } catch (error) {
+          console.error('Reveal gate compile request failed', key, error);
+          settleRoot();
+          return undefined;
+        }
       });
-      noteRevealRootsAtWatchdog(total - ready);
-      gate.settle(key);
-    }, REVEAL_GATE_WATCHDOG_MS);
-    let softMs = 0;
-    if (host.expectedMs) {
-      try {
-        softMs = host.expectedMs(key, rootCount);
-      } catch (error) {
-        console.error('Reveal gate expected-cost lookup failed', key, error);
-      }
-    }
-    if (Number.isFinite(softMs) && softMs > 0 && softMs < REVEAL_GATE_WATCHDOG_MS) {
-      cancelSoftDeadline = schedule(() => {
-        if (settled || gate.state(key) === 'warm') return;
+      let settled = false;
+      let cancelSoftDeadline: () => void = noCancel;
+      const cancelWatchdog = schedule(() => {
+        if (settled) return;
+        settled = true;
+        cancelSoftDeadline();
+        console.warn(`Reveal gate watchdog revealed ${key} before its compiles settled`);
         const { ready, total } = gate.readiness(key, readiness);
         recordGpuPrepEvent({
-          kind: 'reveal-soft-deadline',
+          kind: 'reveal-watchdog',
           key,
           ageMs: gpuPrepNow() - requestedAtMs,
           readyRoots: ready,
           totalRoots: total,
         });
-      }, softMs);
-    }
-    void Promise.all(compiles).then(() => {
-      cancelWatchdog();
-      cancelSoftDeadline();
-      if (settled) return;
-      settled = true;
-      gate.settle(key);
-    });
-  });
-  return Object.assign(gate, {
+        noteRevealRootsAtWatchdog(total - ready);
+        gate.settle(key);
+      }, REVEAL_GATE_WATCHDOG_MS);
+      let softMs = 0;
+      if (host.expectedMs) {
+        try {
+          softMs = host.expectedMs(key, rootCount);
+        } catch (error) {
+          console.error('Reveal gate expected-cost lookup failed', key, error);
+        }
+      }
+      if (Number.isFinite(softMs) && softMs > 0 && softMs < REVEAL_GATE_WATCHDOG_MS) {
+        cancelSoftDeadline = schedule(() => {
+          if (settled || gate.state(key) === 'warm') return;
+          const { ready, total } = gate.readiness(key, readiness);
+          recordGpuPrepEvent({
+            kind: 'reveal-soft-deadline',
+            key,
+            ageMs: gpuPrepNow() - requestedAtMs,
+            readyRoots: ready,
+            totalRoots: total,
+          });
+        }, softMs);
+      }
+      void Promise.all(compiles).then(() => {
+        cancelWatchdog();
+        cancelSoftDeadline();
+        if (settled) return;
+        settled = true;
+        gate.settle(key);
+      });
+    },
+    { onImminentHold: noteRevealImminentHold },
+  );
+  const revealGate = Object.assign(gate, {
     noteRootRevealed(_key: string): void {
       noteRevealRootPiecewise();
     },
+    noteRootRevealedAtReach(_key: string): void {
+      noteRevealRootReach();
+    },
   });
+  registerRevealGateForArrival(revealGate);
+  return revealGate;
 }

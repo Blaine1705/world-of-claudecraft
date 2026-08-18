@@ -2597,10 +2597,10 @@ export class Renderer {
     // (a far cell's near twin, or hidden for a fog band or a town's first
     // approach) until its programs are linked off-thread. Without async compile the
     // gate itself would be the synchronous stall, so the views stay ungated
-    // there and keep their historical immediate reveal. Reveal compiles ride
-    // BELOW the live entity gates (VISIBLE_PREWARM, not LIVE_VIEW): a
-    // teleport can queue dozens of far cells at once, and cosmetic scenery
-    // must never delay an actionable mob or player reveal.
+    // there and keep their historical immediate reveal. Ordinary reveal
+    // compiles ride BELOW the live entity gates (VISIBLE_PREWARM): a teleport
+    // can queue dozens of far cells at once, and cosmetic scenery must never
+    // delay an actionable mob or player reveal. An IMMINENT key rides higher.
     // A key's soft deadline comes from the budget's learned reveal cost: past
     // it the gate reports how much of the key linked and keeps waiting, so
     // only the hard watchdog ever reveals an unlinked root (reveal_gate.ts).

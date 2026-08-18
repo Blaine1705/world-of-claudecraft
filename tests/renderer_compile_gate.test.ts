@@ -394,11 +394,13 @@ describe('the compile gate touch tail, per program', () => {
     expect(source).toContain(
       'upload: (target, priority) => this.uploadGateTexturesGated(target, priority),',
     );
-    expect(host).toContain('.then(() => deps.upload(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))');
+    // Both ride the key's own priority, the imminent one included, so an
+    // arrival's tail cannot fall behind the lane its link overtook.
+    expect(host).toContain('.then(() => deps.upload(target, priority))');
     // Streamed decor paid the uniform-table round trip on its reveal DRAW
     // (40 to 390 ms on the Intel iGPU) because the reveal host's chain ended at
     // the shadow arm: it now pays the same tail the live gates do.
-    expect(host).toContain('.then(() => deps.touch(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))');
+    expect(host).toContain('.then(() => deps.touch(target, priority))');
     // The one-shot burst is gone from the renderer entirely: it cannot be paced,
     // and a call left behind would silently reinstate the whole cost in one frame.
     expect(source).not.toContain('touchLinkedPrograms(');

@@ -4,9 +4,16 @@
 // reveal lane's policy is nameable and testable on its own; the renderer keeps
 // only the bindings below.
 //
-// Reveal compiles ride BELOW the live entity gates (VISIBLE_PREWARM, not
-// LIVE_VIEW): a teleport can queue dozens of far cells at once, and cosmetic
-// scenery must never delay an actionable mob or player reveal.
+// Ordinary reveal compiles ride BELOW the live entity gates (VISIBLE_PREWARM,
+// not LIVE_VIEW): a teleport can queue dozens of far cells at once, and
+// cosmetic scenery must never delay an actionable mob or player reveal.
+//
+// An IMMINENT key is the exception, and only about ORDER. It is the decor the
+// camera already stands among at an arrival, which nothing else in the scene
+// can stand in for and which stays hidden until its own compile lands, so its
+// link, upload and touch pieces ride at LIVE_VIEW: still under the actionable
+// gates (mobs and players keep their floor), still above every other reveal
+// and every background warmer. It buys queue position, never an early draw.
 //
 // The tail matters as much as the link. Streamed decor used to pay the
 // uniform-table round trip on its reveal DRAW (40 to 390 ms on the Intel
@@ -46,18 +53,16 @@ export interface RevealCompileHostDeps {
 
 export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealCompileHost {
   return {
-    compile(root: object): Promise<unknown> {
+    compile(root: object, imminent: boolean): Promise<unknown> {
       const target = root as THREE.Object3D;
+      const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;
       const linked = deps.gate(
         () => deps.compileColor(target).then(() => deps.compileShadow(target)),
-        {
-          priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-          label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`,
-        },
+        { priority, label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}` },
       );
       return linked
-        .then(() => deps.upload(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))
-        .then(() => deps.touch(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM));
+        .then(() => deps.upload(target, priority))
+        .then(() => deps.touch(target, priority));
     },
     expectedMs(_key: string, rootCount: number): number {
       return revealSoftDeadlineMs(deps.predictRevealMs(), rootCount);

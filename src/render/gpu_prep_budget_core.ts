@@ -52,6 +52,25 @@ export function gpuPrepClassForPriority(priority: number): GpuPrepClass {
   return 'cosmetic';
 }
 
+/**
+ * Whether an ARRIVAL CURTAIN admits this candidate. The cover has no live
+ * frame to protect, so it used to admit everything, and that is what starved
+ * the arrival: measured at an online entry, a full second of free admission
+ * drained the boot-debt resume lane at full speed and not one piece of an
+ * imminent reveal key ever ran (0 of 1 ready on every band, 0 of 12 on the
+ * town). Under a cover the frames belong to what the camera LANDED AMONG, so
+ * the debt and background lanes wait: BOOT_RESUME, BACKGROUND and BOOT_DEBT
+ * are refused, and everything from TAIL_PIECE up is admitted (a gate's tail
+ * pieces are what a held key needs to settle, so refusing them would defeat
+ * the whole arrangement). A candidate with no usable priority is admitted,
+ * which is the cover's historical answer.
+ */
+export function gpuPrepCoverAdmits(priority: number | undefined): boolean {
+  if (typeof priority !== 'number' || !Number.isFinite(priority)) return true;
+  if (priority === GPU_WORK_PRIORITY.TAIL_PIECE) return true;
+  return priority >= GPU_WORK_PRIORITY.VISIBLE_PREWARM;
+}
+
 /** Longest kind key retained. A label is caller-supplied, so the ledger's key
  *  space is bounded here rather than trusted. */
 const MAX_KIND_LENGTH = 48;
@@ -125,6 +144,12 @@ export interface GpuPrepAdmitInput {
   cls: GpuPrepClass;
   /** Frames this candidate has already been refused, counted by the caller. */
   deferredFrames: number;
+  /** An arrival curtain covers the world: the cover rule below decides, and
+   *  the frame budget is not consulted at all. */
+  cover?: boolean;
+  /** The candidate's queue priority. Read only by the cover rule
+   *  (gpuPrepCoverAdmits); the ordinary path decides on `cls`. */
+  priority?: number;
 }
 
 export type GpuPrepAdmitReason =
@@ -134,19 +159,28 @@ export type GpuPrepAdmitReason =
   | 'starvation'
   | 'legacy'
   | 'first-sample'
+  | 'cover'
   | 'no-headroom'
   | 'unknown-cap'
-  | 'pressure';
+  | 'pressure'
+  | 'cover-not-arrival';
 
 export type GpuPrepAdmitDecision =
   | {
       admit: true;
-      reason: 'actionable-floor' | 'fits' | 'progress' | 'starvation' | 'legacy' | 'first-sample';
+      reason:
+        | 'actionable-floor'
+        | 'fits'
+        | 'progress'
+        | 'starvation'
+        | 'legacy'
+        | 'first-sample'
+        | 'cover';
       predictedMs: number;
     }
   | {
       admit: false;
-      reason: 'no-headroom' | 'unknown-cap' | 'pressure';
+      reason: 'no-headroom' | 'unknown-cap' | 'pressure' | 'cover-not-arrival';
       predictedMs: number;
       headroomMs: number;
     };
@@ -235,9 +269,11 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
     starvation: 0,
     legacy: 0,
     'first-sample': 0,
+    cover: 0,
     'no-headroom': 0,
     'unknown-cap': 0,
     pressure: 0,
+    'cover-not-arrival': 0,
   };
   // Before a single frame is measured, assume the frame is already spending its
   // whole target: preparation then starts from the minSliceMs floor and grows
@@ -258,14 +294,21 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
   const ledgerOf = (kind: string): KindLedger | undefined => kinds.get(gpuPrepKindOfLabel(kind));
   const predict = (kind: string): number => ledgerOf(kind)?.emaMs ?? cfg.unknownCostMs;
   const admitted = (
-    reason: 'actionable-floor' | 'fits' | 'progress' | 'starvation' | 'legacy' | 'first-sample',
+    reason:
+      | 'actionable-floor'
+      | 'fits'
+      | 'progress'
+      | 'starvation'
+      | 'legacy'
+      | 'first-sample'
+      | 'cover',
     predictedMs: number,
   ): GpuPrepAdmitDecision => {
     decisions[reason]++;
     return { admit: true, reason, predictedMs };
   };
   const deferred = (
-    reason: 'no-headroom' | 'unknown-cap' | 'pressure',
+    reason: 'no-headroom' | 'unknown-cap' | 'pressure' | 'cover-not-arrival',
     predictedMs: number,
   ): GpuPrepAdmitDecision => {
     decisions[reason]++;
@@ -312,6 +355,15 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
     admit(input: GpuPrepAdmitInput): GpuPrepAdmitDecision {
       const predictedMs = predict(input.kind);
       if (legacy) return admitted('legacy', predictedMs);
+      // The cover answers BEFORE the frame budget and instead of it: there is
+      // no live frame to protect behind a loading screen, only an order to
+      // impose. Nothing below is consulted, so the frame's first-sample and
+      // progress slots stay unspent for the frames that do need them.
+      if (input.cover === true) {
+        return gpuPrepCoverAdmits(input.priority)
+          ? admitted('cover', predictedMs)
+          : deferred('cover-not-arrival', predictedMs);
+      }
       if (input.cls === 'actionable') return admitted('actionable-floor', predictedMs);
       const deferredFrames = Number.isFinite(input.deferredFrames) ? input.deferredFrames : 0;
       const starvationBound =

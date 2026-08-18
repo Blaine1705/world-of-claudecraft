@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { arrivalHeldImminentKeys, resetArrivalCoverForTest } from '../src/render/arrival_cover';
 import {
   gpuPrepEventsSnapshot,
   resetGpuPrepEventsForTest,
@@ -65,6 +66,7 @@ beforeEach(() => {
 afterEach(() => {
   setGpuPrepClockForTest(null);
   resetGpuPrepEventsForTest();
+  resetArrivalCoverForTest();
   vi.useRealTimers();
   vi.restoreAllMocks();
 });
@@ -490,5 +492,94 @@ describe('reveal gate soft deadline', () => {
       expect(snapshot.reveal.rootsAtWatchdog).toBe(3);
       expect(gate.allow('fenbridge-town-static')).toBe(true);
     });
+  });
+});
+
+describe('reveal gate imminent holds', () => {
+  /** A gate whose compiles never settle, so a hold can only end on a settle
+   *  the test drives. */
+  function stuckGate(roots: readonly object[]) {
+    const { state, schedule } = fakeSchedule();
+    const compiled: { root: object; imminent: boolean }[] = [];
+    const gate = createRevealGate(
+      {
+        compile: (root, imminent) => {
+          compiled.push({ root, imminent });
+          return new Promise<void>(() => undefined);
+        },
+        schedule,
+      },
+      () => roots,
+    );
+    return { gate, state, compiled };
+  }
+
+  it('counts a hold and submits every root as imminent when the consult says so', () => {
+    const roots = [{}, {}];
+    const { gate, compiled } = stuckGate(roots);
+    expect(gate.allow('eastbrook-town-static', true)).toBe(false);
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.reveal.imminentHolds).toBe(1);
+    // The hold is a normal key hold too: the compiles were submitted.
+    expect(snapshot.reveal.keysHeld).toBe(1);
+    expect(snapshot.reveal.rootsHeld).toBe(2);
+    expect(compiled).toEqual(roots.map((root) => ({ root, imminent: true })));
+    // Nothing is recorded in the ring: imminence is a counter, not an escape.
+    expect(snapshot.total).toBe(0);
+  });
+
+  it('submits an ordinary consult without the flag and counts no imminent hold', () => {
+    const roots = [{}];
+    const { gate, compiled } = stuckGate(roots);
+    expect(gate.allow('cull:12')).toBe(false);
+    expect(compiled).toEqual([{ root: roots[0], imminent: false }]);
+    expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(0);
+  });
+
+  it('holds an imminent key until its compiles settle, with no bound anywhere', () => {
+    const { gate, state } = stuckGate([{}]);
+    gate.allow('town', true);
+    // The ONLY timer the request arms is the hard watchdog (the host offers no
+    // expected cost here, so no soft deadline either).
+    expect(state.armedMs).toEqual([REVEAL_GATE_WATCHDOG_MS]);
+    for (let frame = 0; frame < 500; frame++) {
+      expect(gate.allow('town', true)).toBe(false);
+    }
+    expect(gpuPrepEventsSnapshot().total).toBe(0);
+    expect(gate.state('town')).toBe('compiling');
+  });
+
+  it('reports a reach reveal apart from a piecewise one', () => {
+    const { gate } = stuckGate([{}]);
+    gate.allow('town', true);
+    gate.noteRootRevealed('town');
+    gate.noteRootRevealedAtReach('town');
+    gate.noteRootRevealedAtReach('town');
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.reveal.rootsPiecewise).toBe(1);
+    expect(snapshot.reveal.rootsReach).toBe(2);
+  });
+
+  it('joins the arrival-cover registry on creation, so a curtain can wait on it', async () => {
+    const { schedule } = fakeSchedule();
+    const gate = createRevealGate({ compile: () => new Promise(() => undefined), schedule }, () => [
+      {},
+    ]);
+    expect(gate.allow('town', true)).toBe(false);
+    expect(arrivalHeldImminentKeys()).toBe(1);
+    // Only the settle clears it: the cover has nothing that shortens a hold.
+    gate.settle('town');
+    expect(arrivalHeldImminentKeys()).toBe(0);
+    await flushMicrotasks();
+  });
+
+  it('a key that settles inside the curtain leaves nothing held', async () => {
+    const { schedule } = fakeSchedule();
+    const gate = createRevealGate({ compile: () => Promise.resolve(), schedule }, () => [{}]);
+    gate.allow('town', true);
+    await flushMicrotasks();
+    expect(gate.allow('town', true)).toBe(true);
+    expect(arrivalHeldImminentKeys()).toBe(0);
+    expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(1);
   });
 });

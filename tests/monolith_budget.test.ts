@@ -127,9 +127,10 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    // Lowered after the character-select roster's composed-chip repaint moved
-    // into src/ui/charselect_composed_refresh.ts (net -13).
-    ceiling: 11470,
+    // Lowered after the blocking arrival's promise chain moved into
+    // src/game/arrival_warmup.ts (net -16), and again when the world-entry
+    // settle cover joined it (net -6).
+    ceiling: 11448,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -307,14 +307,12 @@ describe('the gates that run the lane (source pins)', () => {
   });
 
   it('the reveal compile host calls deps.upload between deps.gate and deps.touch', () => {
+    // Upload and touch ride the SAME priority the link did (imminent or not),
+    // so an imminent key's tail cannot fall behind the lane its link overtook.
     const host = read('../src/render/reveal_compile_host.ts');
     const gateAt = host.indexOf('const linked = deps.gate(');
-    const uploadAt = host.indexOf(
-      '.then(() => deps.upload(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))',
-    );
-    const touchAt = host.indexOf(
-      '.then(() => deps.touch(target, GPU_WORK_PRIORITY.VISIBLE_PREWARM))',
-    );
+    const uploadAt = host.indexOf('.then(() => deps.upload(target, priority))');
+    const touchAt = host.indexOf('.then(() => deps.touch(target, priority))');
     expect(gateAt).toBeGreaterThan(-1);
     expect(uploadAt).toBeGreaterThan(gateAt);
     expect(touchAt).toBeGreaterThan(uploadAt);

@@ -36,6 +36,7 @@ import {
   newFenbridgeBuildingVisibilityPlan,
 } from '../src/render/fenbridge_town_visibility_core';
 import { GFX, gfxInternalsForTest } from '../src/render/gfx';
+import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
@@ -118,6 +119,7 @@ async function loadRuntimeGlb(assetUrl: string): Promise<THREE.Group> {
 afterEach(() => {
   setGfx(ORIGINAL_GFX);
   setActiveWorldContent(null);
+  setGpuPrepClockForTest(null);
 });
 
 const ROTATED_BUILDING: FenbridgeBuildingVisibilityTarget = {
@@ -734,18 +736,66 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(firstGroup.visible).toBe(true);
   });
 
-  it('never holds the buildings when the camera is already inside the town', () => {
+  it('holds the buildings as an IMMINENT key when the camera is already inside', () => {
+    // The arrival shape: it used to reveal on the spot without consulting,
+    // which linked the whole town kit in the live frames after the jump on a
+    // host whose boot manifest never carried it. It consults now, holds, and
+    // what standing inside buys is that the compiles go out first.
     setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
     const view = fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
-    const requested: string[] = [];
-    view.setRevealGate(createRevealGateCore((key) => requested.push(key)));
+    const requested: { key: string; imminent: boolean }[] = [];
+    view.setRevealGate(createRevealGateCore((key, imminent) => requested.push({ key, imminent })));
+    const far = FENBRIDGE_LAYOUT.buildings[FENBRIDGE_LAYOUT.buildings.length - 1];
+    const farGroup = view.group.getObjectByName(`fenbridgeBuilding:${far.id}`);
+    if (!farGroup) throw new Error('renderer fixture lost the last building');
+    const hub = FENBRIDGE_LAYOUT.hub.center;
+    view.update(hub.x, 2, hub.z, hub.x, 2, hub.z + 5, 200, 0.05);
+    expect(requested).toEqual([{ key: 'fenbridge-town-static', imminent: true }]);
+    expect(farGroup.visible).toBe(false);
+    // No clock is threaded anywhere: the hold outlasts any number of frames.
+    for (let frame = 0; frame < 200; frame++) {
+      view.update(hub.x, 2, hub.z, hub.x, 2, hub.z + 5, 200, 0.05);
+    }
+    expect(farGroup.visible).toBe(false);
+    expect(requested).toHaveLength(1);
+  });
+
+  it("shows a building at arm's length on the first held frame, linked or not", () => {
+    // The reach floor: the sim colliders of a building the camera is standing
+    // in must not sit under something invisible, whatever the driver is doing.
+    setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
+    const view = fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    view.setRevealGate(createRevealGateCore(() => undefined));
     const building = FENBRIDGE_LAYOUT.buildings[0];
     const group = view.group.getObjectByName(`fenbridgeBuilding:${building.id}`);
     if (!group) throw new Error('renderer fixture lost the first building');
-    const hub = FENBRIDGE_LAYOUT.hub.center;
-    view.update(hub.x + 4, 2, hub.z + 4, hub.x, 2, hub.z, 200, 0.05);
-    expect(requested).toEqual([]);
+    const { x, z } = group.position;
+    view.update(x, 2, z, x, 2, z + 5, 200, 0.05);
     expect(group.visible).toBe(true);
+    // The town key itself never warmed: this is the floor, not a reveal.
+    const micro = view.group.getObjectByName('fenbridgeTownMicroOpaqueBatch');
+    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    expect(micro.visible).toBe(false);
+  });
+
+  it('hands the gate its roots nearest to the camera first', () => {
+    // The compiles are submitted in the order the roots come back, so an
+    // arrival links what it landed among before the far side of the town.
+    setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
+    const view = fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    let submitted: readonly THREE.Object3D[] = [];
+    view.setRevealGate(
+      createRevealGateCore(() => {
+        submitted = [...view.staticRevealRoots()];
+      }),
+    );
+    const last = FENBRIDGE_LAYOUT.buildings[FENBRIDGE_LAYOUT.buildings.length - 1];
+    const lastGroup = view.group.getObjectByName(`fenbridgeBuilding:${last.id}`);
+    if (!lastGroup) throw new Error('renderer fixture lost the last building');
+    const { x, z } = lastGroup.position;
+    view.update(x, 2, z, x, 2, z + 5, 200, 0.05);
+    expect(submitted).toHaveLength(view.staticRevealRoots().length);
+    expect(submitted[0]).toBe(lastGroup);
   });
 
   it('fades one intersected building independently and never mutates static batches', () => {

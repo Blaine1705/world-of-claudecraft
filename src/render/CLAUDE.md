@@ -269,7 +269,48 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   cache key, so a hide and re-show links fresh programs). The props bands and
   the foliage buckets are one root per key, and a far cell's bake meshes swap
   as one representation, so those consults stay all-or-nothing.
-  Two deadlines, and only one of them reveals: a SOFT deadline per key, from
+  The two consults that used to SKIP the gate (a prop band already inside half
+  the fog, a camera already inside a town's cull radius: the teleport-arrival
+  shape) are IMMINENT HOLDS now, because the premise that such an arrival rides
+  a cover whose zone prepare compiled the scene is false wherever the boot
+  manifest dropped that content, and revealing on the jump frame linked the
+  whole town kit in live frames. They consult and hold like any other reveal;
+  what imminence buys is ORDER, never an early draw. There is NO wall-clock
+  reveal bound anywhere: the cores take no clock, a held root shows when its own
+  compile lands, and the only other ends of a hold are the
+  `REVEAL_GATE_WATCHDOG_MS` watchdog and the two reach floors below.
+  IMMINENT KEYS GO FIRST, AND NEAREST FIRST. The consult carries the flag into
+  the gate's request (`reveal_gate_core.ts` `allow(key, imminent)`), which
+  carries it into `reveal_compile_host.ts`: that key's link, upload and touch
+  pieces ride at `LIVE_VIEW` instead of `VISIBLE_PREWARM`, still under the
+  actionable gates. Within a key the roots are submitted nearest to the camera
+  first (`town_reveal_core.ts` `orderTownRootsNearestFirst`, called by each town
+  view at request time off that frame's camera), and across keys a frame's
+  escaping bands are consulted in distance order (`prop_cull_core.ts`
+  `updatePropCullables` over a reused `PropCullPass`; the sort runs only on a
+  frame with two or more of them). `gpu_prep_events.ts` counts the marked keys
+  as `imminentHolds`.
+  TWO REACH FLOORS, and they are the only reveals that may draw a root
+  unlinked: colliders are never invisible at arm's length. Bands keep
+  `PROP_CULL_REVEAL_REACH` (40 yd, instant, gate or not). Towns get
+  `TOWN_REVEAL_REACH_YD` (12 yd, applied in the piecewise pass on the first held
+  frame, budget-free, counted as `rootsReach`), and it is DELIBERATELY the
+  smaller one: a town kit's programs are shared across its buildings, so
+  revealing one unlinked building links the whole kit cold in that live frame.
+  It is the fairness floor, not a comfort radius.
+  The ARRIVAL COVER (`arrival_cover.ts`, raised by `src/game/arrival_warmup.ts`
+  for the whole blocking teleport chain, and at world entry) does two things and
+  neither of them reveals anything. It makes the curtain WAIT on the gates
+  (`awaitArrivalReveals`, at most `ARRIVAL_REVEAL_SETTLE_MAX_MS`, zero online)
+  so an arrival lifts with its decor linked the way boot does, and it switches
+  `gpu_prep_admission.ts` onto the cover rule (`gpu_prep_budget_core.ts`
+  `gpuPrepCoverAdmits`): under a curtain there is no frame to protect, so
+  everything from `TAIL_PIECE` up is admitted on the `cover` reason, and
+  `BOOT_DEBT` / `BACKGROUND` / `BOOT_RESUME` are refused on
+  `cover-not-arrival`. Admitting those too is what starved the arrival
+  (measured: after a second of hold, 0 of 1 roots ready per band key and 0 of 12
+  on the town, because the debt lane drained ahead of them).
+  Two deadlines beside it, and only one of them reveals: a SOFT deadline per key, from
   the budget's learned reveal cost times the root count clamped into
   [`REVEAL_SOFT_DEADLINE_MIN_MS`, `REVEAL_GATE_WATCHDOG_MS`], records a
   `reveal-soft-deadline` gpu-prep event with the key's ready/total roots and
@@ -279,8 +320,8 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   way; the `REVEAL_GATE_WATCHDOG_MS` hard watchdog still reveals ungated and now
   carries the same counts, plus the `reveal` aggregate in
   `gpu_prep_events.ts` (keys held, roots held, roots revealed piecewise, roots
-  still compiling at a watchdog), so a capture can attribute a first-draw
-  stall to the roots that never linked in time.
+  revealed on a reach floor, roots still compiling at a watchdog), so a capture
+  can attribute a first-draw stall to the roots that never linked in time.
 - **Every gate names its stand-in: NEVER LEAVE AN ENTITY WITH NO REPRESENTATION.**
   A gate hides a still-linking object so its reveal draw cannot stall the frame;
   the link is not cancellable and the gate timeout is diagnostic only, so the

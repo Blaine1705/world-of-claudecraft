@@ -3,8 +3,10 @@ import {
   GPU_PREP_EVENT_RING_SIZE,
   gpuPrepEventsSnapshot,
   gpuPrepNow,
+  noteRevealImminentHold,
   noteRevealKeyHeld,
   noteRevealRootPiecewise,
+  noteRevealRootReach,
   noteRevealRootsAtWatchdog,
   recordGpuPrepEvent,
   resetGpuPrepEventsForTest,
@@ -40,7 +42,9 @@ describe('gpu preparation event ring', () => {
       keysHeld: 0,
       rootsHeld: 0,
       rootsPiecewise: 0,
+      rootsReach: 0,
       rootsAtWatchdog: 0,
+      imminentHolds: 0,
     });
   });
 
@@ -100,6 +104,24 @@ describe('gpu preparation event ring', () => {
     // Strictly increasing ages prove the wrap did not shuffle the order.
     const ages = snapshot.events.map((event) => event.ageMs);
     expect(ages).toEqual([...ages].sort((a, b) => a - b));
+  });
+
+  it('holds a whole arrival session, so the rarer kinds survive the soft deadlines', () => {
+    // The measured shape the size answers: an arrival records ~89
+    // reveal-soft-deadline events, and at 64 every rarer kind behind them was
+    // dropped, which is exactly the population a capture needs to read.
+    expect(GPU_PREP_EVENT_RING_SIZE).toBe(160);
+    for (let i = 0; i < 89; i++) {
+      recordGpuPrepEvent({ kind: 'reveal-soft-deadline', key: `soft-${i}`, ageMs: 1 });
+    }
+    for (let i = 0; i < 29; i++) {
+      recordGpuPrepEvent({ kind: 'live-program', key: `program-${i}`, ageMs: 1_000 });
+    }
+    const programs = gpuPrepEventsSnapshot().events.filter(
+      (event) => event.kind === 'live-program',
+    );
+    expect(programs).toHaveLength(29);
+    expect(gpuPrepEventsSnapshot().dropped).toBe(0);
   });
 
   it('allocates no new slot once the ring is full', () => {
@@ -210,19 +232,25 @@ describe('gpu preparation reveal counters', () => {
     noteRevealKeyHeld(1);
     noteRevealRootPiecewise();
     noteRevealRootPiecewise();
+    noteRevealRootReach();
     noteRevealRootsAtWatchdog(3);
     const snapshot = gpuPrepEventsSnapshot();
     expect(snapshot.reveal).toEqual({
       keysHeld: 2,
       rootsHeld: 42,
       rootsPiecewise: 2,
+      rootsReach: 1,
       rootsAtWatchdog: 3,
+      imminentHolds: 0,
     });
-    // Roots revealed when their key warmed are the remainder, so the three
-    // populations partition the held roots without a fourth counter.
+    // Roots revealed when their key warmed are the remainder, so the four
+    // populations partition the held roots without a fifth counter.
     const atWarm =
-      snapshot.reveal.rootsHeld - snapshot.reveal.rootsPiecewise - snapshot.reveal.rootsAtWatchdog;
-    expect(atWarm).toBe(37);
+      snapshot.reveal.rootsHeld -
+      snapshot.reveal.rootsPiecewise -
+      snapshot.reveal.rootsReach -
+      snapshot.reveal.rootsAtWatchdog;
+    expect(atWarm).toBe(36);
   });
 
   it('the reveal counters are a module-owned object the snapshot reuses', () => {
@@ -254,16 +282,36 @@ describe('gpu preparation reveal counters', () => {
     expect(snapshot.reveal.rootsAtWatchdog).toBe(0);
   });
 
+  it('counts the imminent holds and the reach reveals apart from the piecewise ones', () => {
+    // An arrival among streamed decor marks its keys imminent, and the reach
+    // floor is the only reveal that may still draw a root unlinked, so a
+    // capture has to be able to tell those two populations apart.
+    noteRevealImminentHold();
+    noteRevealImminentHold();
+    noteRevealRootReach();
+    noteRevealRootPiecewise();
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.reveal.imminentHolds).toBe(2);
+    expect(snapshot.reveal.rootsReach).toBe(1);
+    expect(snapshot.reveal.rootsPiecewise).toBe(1);
+    // None of them is an event: they are lifetime counters only.
+    expect(snapshot.total).toBe(0);
+  });
+
   it('reset clears the reveal counters too', () => {
     noteRevealKeyHeld(5);
     noteRevealRootPiecewise();
     noteRevealRootsAtWatchdog(2);
+    noteRevealRootReach();
+    noteRevealImminentHold();
     resetGpuPrepEventsForTest();
     expect(gpuPrepEventsSnapshot().reveal).toEqual({
       keysHeld: 0,
       rootsHeld: 0,
       rootsPiecewise: 0,
+      rootsReach: 0,
       rootsAtWatchdog: 0,
+      imminentHolds: 0,
     });
   });
 });

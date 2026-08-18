@@ -180,3 +180,99 @@ describe('reveal gate core per-root readiness', () => {
     expect(gate.state('town')).toBe('warm');
   });
 });
+
+describe('reveal gate core imminent holds', () => {
+  /** A gate recording every request with the imminence it carried, and every
+   *  imminent-hold report. */
+  function imminentGate() {
+    const requested: { key: string; imminent: boolean }[] = [];
+    const holds: string[] = [];
+    const gate = createRevealGateCore((key, imminent) => requested.push({ key, imminent }), {
+      onImminentHold: (key) => holds.push(key),
+    });
+    return { gate, requested, holds };
+  }
+
+  it('carries the imminent flag into the request and reports the hold once', () => {
+    const { gate, requested, holds } = imminentGate();
+    expect(gate.allow('town', true)).toBe(false);
+    expect(requested).toEqual([{ key: 'town', imminent: true }]);
+    expect(holds).toEqual(['town']);
+    // Every later consult holds without re-requesting and without re-reporting.
+    expect(gate.allow('town', true)).toBe(false);
+    expect(gate.allow('town', true)).toBe(false);
+    expect(requested).toHaveLength(1);
+    expect(holds).toEqual(['town']);
+  });
+
+  it('an ordinary consult requests without the flag and reports no hold', () => {
+    const { gate, requested, holds } = imminentGate();
+    expect(gate.allow('cull:3')).toBe(false);
+    expect(gate.allow('cull:4', false)).toBe(false);
+    expect(requested).toEqual([
+      { key: 'cull:3', imminent: false },
+      { key: 'cull:4', imminent: false },
+    ]);
+    expect(holds).toEqual([]);
+  });
+
+  it('holds an imminent key forever while its compiles are in flight', () => {
+    // The whole point of dropping the bound: no clock passes here at all, and
+    // there is no clock to pass, so a hold can only end on a settle.
+    const { gate } = imminentGate();
+    expect(gate.allow('town', true)).toBe(false);
+    for (let consult = 0; consult < 1_000; consult++) {
+      expect(gate.allow('town', true)).toBe(false);
+    }
+    expect(gate.state('town')).toBe('compiling');
+    expect(gate.heldImminentKeys()).toBe(1);
+    gate.settle('town');
+    expect(gate.allow('town', true)).toBe(true);
+    expect(gate.heldImminentKeys()).toBe(0);
+  });
+
+  it('a root of an imminent key is ready only once its own compile lands', () => {
+    const { gate } = imminentGate();
+    const linked = {};
+    const cold = {};
+    gate.allow('town', true);
+    gate.noteRoots('town', [linked, cold]);
+    expect(gate.rootReady('town', linked)).toBe(false);
+    gate.settleRoot('town', linked);
+    expect(gate.rootReady('town', linked)).toBe(true);
+    expect(gate.rootReady('town', cold)).toBe(false);
+  });
+
+  it('a later imminent consult marks a key the first consult requested ordinarily', () => {
+    // The request already went out at the ordinary priority and is not
+    // re-submitted, but the key is what the camera stands in now, so the
+    // arrival cover has to count it as held.
+    const { gate, requested, holds } = imminentGate();
+    gate.allow('cull:9');
+    expect(gate.heldImminentKeys()).toBe(0);
+    gate.allow('cull:9', true);
+    expect(requested).toEqual([{ key: 'cull:9', imminent: false }]);
+    expect(holds).toEqual(['cull:9']);
+    expect(gate.heldImminentKeys()).toBe(1);
+  });
+
+  it('counts held imminent keys per key, and drops them as they warm', () => {
+    const { gate } = imminentGate();
+    gate.allow('a', true);
+    gate.allow('b', true);
+    gate.allow('c');
+    expect(gate.heldImminentKeys()).toBe(2);
+    gate.settle('a');
+    expect(gate.heldImminentKeys()).toBe(1);
+    gate.settle('b');
+    expect(gate.heldImminentKeys()).toBe(0);
+  });
+
+  it('a warm key is never marked imminent and never reports a hold', () => {
+    const { gate, holds } = imminentGate();
+    gate.settle('town');
+    expect(gate.allow('town', true)).toBe(true);
+    expect(holds).toEqual([]);
+    expect(gate.heldImminentKeys()).toBe(0);
+  });
+});

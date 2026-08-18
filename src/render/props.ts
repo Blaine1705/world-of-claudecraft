@@ -49,11 +49,12 @@ import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occl
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
+  newPropCullPass,
   type PropCullBounds,
   type PropCullRevealState,
   propCullKey,
   propRevealRoots,
-  updatePropCullable,
+  updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
@@ -2319,6 +2320,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
   const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
+  const cullPass = newPropCullPass();
   let revealGate: RevealGateCore | null = null;
   let bandRevealGate: RevealGateCore | null = null;
 
@@ -2349,10 +2351,11 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     ): void {
       const fogFarSq = fogFar * fogFar;
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
-      // approach holds until the gate has linked its programs.
-      for (let i = 0; i < cullables.length; i++) {
-        updatePropCullable(cullables[i], camX, camZ, fogFar, fogFarSq, bandRevealGate);
-      }
+      // approach holds until the gate has linked its programs, and an arrival
+      // among the bands holds too, with its compiles submitted at the imminent
+      // priority and, on a frame where several bands escape at once, nearest
+      // to the camera first.
+      updatePropCullables(cullables, camX, camZ, fogFar, fogFarSq, bandRevealGate, cullPass);
       // Far-cell swap first (prop_cell_core): distant cells draw their merged
       // bake and suppress the members' individual baked meshes; near cells
       // (where the ghost fade can fire) draw the individuals while the bake

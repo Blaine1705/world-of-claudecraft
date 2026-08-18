@@ -5,11 +5,11 @@ import './styles/index.css';
 import { captureFirstTouch, registerAttributionPayload } from './attribution';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
-import { afterActiveAnimationMs } from './game/active_animation_timer';
 import {
   syncAppViewport as syncAppViewportShared,
   syncSettledAppViewport,
 } from './game/app_viewport';
+import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_warmup';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import {
@@ -160,11 +160,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import {
-  loadingCurtainFadeMs,
-  resolveUiEffectsProfile,
-  worldEntryGpuSettleCoverMs,
-} from './game/ui_effects_profile';
+import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
@@ -3843,47 +3839,31 @@ async function startGame(
     // view at MIN_OUTDOOR_FOG_FAR long after the screen lifts.
     const resumeInput = gameInputReady;
     gameInputReady = false;
-    showLoadingScreen(t('loading.world'));
-    zoneWarmup = nextPaint()
-      .then(() =>
-        renderer.prepareZoneAt(zoneX, zoneZ, (done, total) =>
-          setLoadingProgressRange(done, total, 0, 55),
-        ),
-      )
-      .then(() =>
-        renderer.prepareZonesAround(
-          zoneX,
-          zoneZ,
-          riftExit ? RIFT_EXIT_STREAM_RADIUS : ARRIVAL_NEIGHBOR_STREAM_RADIUS,
-          (done, total) => setLoadingProgressRange(done, total, 55, 94),
-        ),
-      )
-      // An arrival with no overworld neighbourhood at all (a dungeon or rift
-      // interior, 99k yards off the strip) reports no progress above, so fill
-      // the band explicitly rather than letting the bar sit at 55.
-      .then(() => setLoadingProgressRange(1, 1, 55, 94))
-      .then(async () => {
-        setLoadingPercent(96, t('loading.enteringWorld'));
-        try {
-          await renderer.prewarmZoneAt(zoneX, zoneZ);
-        } catch (err) {
-          console.warn('Zone shader prewarm failed', err);
-        }
-      })
-      .then(() => setLoadingPercent(100, t('loading.enteringWorld')))
-      .then(nextPaint)
-      .then(() => {
-        hideLoadingScreen();
+    zoneWarmup = runBlockingArrivalWarmup({
+      renderer,
+      ui: {
+        showLoadingScreen,
+        setLoadingProgressRange,
+        setLoadingPercent,
+        hideLoadingScreen,
+        nextPaint,
+        fatalOverlay,
+      },
+      t,
+      technicalErrorMessage,
+      zoneX,
+      zoneZ,
+      online: online !== null,
+      neighborRadiusYd: riftExit ? RIFT_EXIT_STREAM_RADIUS : ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+      onRevealed: () => {
         gameInputReady = resumeInput;
         last = performance.now();
         acc = 0;
-      })
-      .catch((err) => {
-        fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
-      })
-      .finally(() => {
+      },
+      onSettled: () => {
         zoneWarmup = null;
-      });
+      },
+    });
   };
 
   // Camera follow state: keyboard turning advances facing in 20Hz sim steps,
@@ -5133,14 +5113,12 @@ async function startGame(
           }
         }, loadingCurtainFadeDelayMs());
       };
-      afterActiveAnimationMs(
-        worldEntryGpuSettleCoverMs({
-          adaptiveBudget: GFX.autoGovernor,
-          constrainedMemory: GFX.constrainedMemory,
-          online: online !== null,
-        }),
+      settleWorldEntryCover({
+        adaptiveBudget: GFX.autoGovernor,
+        constrainedMemory: GFX.constrainedMemory,
+        online: online !== null,
         revealWorld,
-      );
+      });
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).

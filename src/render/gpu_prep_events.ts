@@ -36,9 +36,20 @@ export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'live-program',
 ];
 
-/** Newest events are kept; older ones fall out of the ring and only survive in
- *  the lifetime counts. */
-export const GPU_PREP_EVENT_RING_SIZE = 64;
+/**
+ * Newest events are kept; older ones fall out of the ring and only survive in
+ * the lifetime counts.
+ *
+ * Sized from a measured capture rather than a guess. At 64 an arrival session
+ * recorded 127 to 137 events, of which 89 were `reveal-soft-deadline`, and
+ * they filled the ring before any other kind could reach it: the rarer kinds
+ * were all dropped, so the ones that say what an arrival actually did were
+ * unreadable. The fix is the ring, not a per-kind reservation: a reserved slot
+ * would keep exactly one of a population of dozens, whereas the whole point is
+ * the DISTRIBUTION of ages and ready/total counts across them. 160 covers that
+ * session with headroom and still bounds a stuck lane's memory.
+ */
+export const GPU_PREP_EVENT_RING_SIZE = 160;
 
 export interface GpuPrepEvent {
   kind: GpuPrepEventKind;
@@ -72,20 +83,28 @@ export interface GpuPrepEventInput {
 
 /**
  * Lifetime totals of the reveal-gate holds, so a capture can say where the
- * roots of a held key actually became visible. The three populations
- * partition `rootsHeld`: piecewise (revealed as their own compile landed),
- * at the watchdog (still compiling when the hard escape fired), and the
- * remainder, which revealed when their key warmed.
+ * roots of a held key actually became visible. The four populations partition
+ * `rootsHeld`: piecewise (revealed as their own compile landed), at the reach
+ * floor (shown unlinked because their colliders were at arm's length), at the
+ * watchdog (still compiling when the hard escape fired), and the remainder,
+ * which revealed when their key warmed.
  */
 export interface GpuPrepRevealCounters {
   /** Keys that entered a hold (their compile request fired). */
   keysHeld: number;
   /** Roots behind those keys. */
   rootsHeld: number;
-  /** Roots a consumer revealed before its key warmed. */
+  /** Roots a consumer revealed before its key warmed, on their own compile. */
   rootsPiecewise: number;
+  /** Roots a consumer revealed before its key warmed because they sat inside
+   *  its reach floor: the only reveals that may still draw unlinked. */
+  rootsReach: number;
   /** Roots still compiling when a hard watchdog revealed their key. */
   rootsAtWatchdog: number;
+  /** Keys an IMMINENT consult marked (an arrival standing among streamed
+   *  decor), whose compiles were therefore submitted at the imminent
+   *  priority. They hold like any other key: this is not an escape count. */
+  imminentHolds: number;
 }
 
 export interface GpuPrepEventsSnapshot {
@@ -132,7 +151,9 @@ const reveal: GpuPrepRevealCounters = {
   keysHeld: 0,
   rootsHeld: 0,
   rootsPiecewise: 0,
+  rootsReach: 0,
   rootsAtWatchdog: 0,
+  imminentHolds: 0,
 };
 
 /** A non-negative finite count, so a caller's bad arithmetic cannot poison a
@@ -151,14 +172,26 @@ export function noteRevealKeyHeld(rootCount: number): void {
   reveal.rootsHeld += countOf(rootCount);
 }
 
-/** One root revealed before its key warmed (the piecewise policy). */
+/** One root revealed before its key warmed, on its own compile (the
+ *  piecewise policy). */
 export function noteRevealRootPiecewise(): void {
   reveal.rootsPiecewise++;
+}
+
+/** One root revealed before its key warmed because it sat inside its reach
+ *  floor, linked or not. */
+export function noteRevealRootReach(): void {
+  reveal.rootsReach++;
 }
 
 /** A hard watchdog revealed a key with this many roots still compiling. */
 export function noteRevealRootsAtWatchdog(count: number): void {
   reveal.rootsAtWatchdog += countOf(count);
+}
+
+/** An imminent consult marked a key (reveal_gate_core). */
+export function noteRevealImminentHold(): void {
+  reveal.imminentHolds++;
 }
 
 export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
@@ -225,5 +258,7 @@ export function resetGpuPrepEventsForTest(): void {
   reveal.keysHeld = 0;
   reveal.rootsHeld = 0;
   reveal.rootsPiecewise = 0;
+  reveal.rootsReach = 0;
   reveal.rootsAtWatchdog = 0;
+  reveal.imminentHolds = 0;
 }
