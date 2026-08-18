@@ -8030,6 +8030,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.continentMap.toggleAria'
   | 'hudChrome.controller.buttons'
   | 'hudChrome.controller.cameraSpeed'
+  | 'hudChrome.controller.confirmAction'
   | 'hudChrome.controller.crossHotbar'
   | 'hudChrome.controller.crossHotbarEnable'
   | 'hudChrome.controller.crossHotbarExpand'

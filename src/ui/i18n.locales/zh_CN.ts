@@ -25,6 +25,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': '放大',
   'hudChrome.controller.zoomOut': '缩小',
+  'hudChrome.controller.confirmAction': '确认 / 选择',
   'hudChrome.controller.crossHotbar': '十字热键栏',
   'hudChrome.controller.crossHotbarEnable': '启用十字热键栏',
   'hudChrome.controller.crossHotbarExpand': '双十字热键栏',

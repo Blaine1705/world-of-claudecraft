@@ -25,6 +25,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': 'ズームイン',
   'hudChrome.controller.zoomOut': 'ズームアウト',
+  'hudChrome.controller.confirmAction': '決定 / 選択',
   'hudChrome.controller.crossHotbar': 'クロスホットバー',
   'hudChrome.controller.crossHotbarEnable': 'クロスホットバーを有効化',
   'hudChrome.controller.crossHotbarExpand': 'ダブルクロスホットバー',

@@ -1447,6 +1447,7 @@ export const tr_TR: EnTranslations = {
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",
       "menuAction": "Oyun Menüsü",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Yakınlaştır",
       "zoomOut": "Uzaklaştır",
       "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın.",

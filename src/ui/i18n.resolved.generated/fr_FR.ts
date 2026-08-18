@@ -1447,6 +1447,7 @@ export const fr_FR: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Zoom avant",
       "zoomOut": "Zoom arrière",
       "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran.",

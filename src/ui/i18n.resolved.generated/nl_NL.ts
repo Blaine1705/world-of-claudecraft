@@ -1447,6 +1447,7 @@ export const nl_NL: EnTranslations = {
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",
       "menuAction": "Spelmenu",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Inzoomen",
       "zoomOut": "Uitzoomen",
       "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken.",

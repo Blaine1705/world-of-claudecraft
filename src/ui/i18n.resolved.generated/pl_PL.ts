@@ -1447,6 +1447,7 @@ export const pl_PL: EnTranslations = {
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",
       "menuAction": "Menu gry",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Przybliż",
       "zoomOut": "Oddal",
       "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego.",

@@ -33,6 +33,7 @@ import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
+  GAMEPAD_CONFIRM,
   GAMEPAD_NONE,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
@@ -1804,6 +1805,7 @@ export class OptionsWindow {
     const opts: { value: string; label: string }[] = [
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
+      { value: GAMEPAD_CONFIRM, label: t('hudChrome.controller.confirmAction') },
       { value: GAMEPAD_ZOOM_IN, label: t('hudChrome.controller.zoomIn') },
       { value: GAMEPAD_ZOOM_OUT, label: t('hudChrome.controller.zoomOut') },
     ];

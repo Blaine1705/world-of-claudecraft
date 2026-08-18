@@ -1447,6 +1447,7 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Zoom ind",
       "zoomOut": "Zoom ud",
       "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren.",

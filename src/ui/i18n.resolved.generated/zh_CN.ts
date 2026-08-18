@@ -1447,6 +1447,7 @@ export const zh_CN: EnTranslations = {
       "buttons": "按键布局",
       "resetButtons": "重置按键布局",
       "menuAction": "游戏菜单",
+      "confirmAction": "确认 / 选择",
       "zoomIn": "放大",
       "zoomOut": "缩小",
       "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。",

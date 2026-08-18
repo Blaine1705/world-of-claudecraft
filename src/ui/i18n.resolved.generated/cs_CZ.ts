@@ -1447,6 +1447,7 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Přiblížit",
       "zoomOut": "Oddálit",
       "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce.",

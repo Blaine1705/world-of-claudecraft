@@ -25,6 +25,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': '확대',
   'hudChrome.controller.zoomOut': '축소',
+  'hudChrome.controller.confirmAction': '확인 / 선택',
   'hudChrome.controller.crossHotbar': '크로스 핫바',
   'hudChrome.controller.crossHotbarEnable': '크로스 핫바 사용',
   'hudChrome.controller.crossHotbarExpand': '더블 크로스 핫바',

@@ -25,6 +25,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': 'Приблизить',
   'hudChrome.controller.zoomOut': 'Отдалить',
+  'hudChrome.controller.confirmAction': 'Подтвердить / выбрать',
   'hudChrome.controller.crossHotbar': 'Крестовая панель',
   'hudChrome.controller.crossHotbarEnable': 'Включить крестовую панель',
   'hudChrome.controller.crossHotbarExpand': 'Двойная крестовая панель',

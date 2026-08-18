@@ -565,7 +565,15 @@ describe('GamepadManager: onActivity', () => {
     const hadWindow = 'window' in globalThis;
     Object.defineProperty(globalThis, 'document', {
       configurable: true,
-      value: { createElement: makeEl, body: makeEl(), hasFocus: () => focused },
+      value: {
+        createElement: makeEl,
+        body: makeEl(),
+        hasFocus: () => focused,
+        // UI navigation queries these; an empty HUD is the right shape here (the
+        // cases care about the activity signal, not about what gets focused).
+        querySelectorAll: () => [],
+        activeElement: null,
+      },
     });
     Object.defineProperty(globalThis, 'window', {
       configurable: true,
@@ -614,17 +622,19 @@ describe('GamepadManager: onActivity', () => {
     }
   });
 
-  it('fires on UI cursor movement alone while a window is open (pointer mode)', () => {
-    // Pointer mode returns before the movement/look arms, so it needs its own
-    // signal: a player navigating the bags with the stick is still present.
+  it('fires on a UI navigation step while a window is open', () => {
+    // UI navigation returns before the movement/look arms, so it needs its own
+    // signal: a player stepping through the bags with the d-pad is still present.
+    // The STICK no longer counts here: it drives no cursor since the software
+    // pointer was removed (navigation is focus-driven), so only a real d-pad or
+    // button edge is activity.
     const restore = installDocumentStub(true);
     try {
-      stubPad(padWith([], stickAxes(AXIS.LEFT_X, 1)));
+      stubPad(padWith([GP.DPAD_DOWN]));
       const { manager, onActivity } = rig(true);
       manager.poll(1 / 60);
       expect(onActivity).toHaveBeenCalledTimes(1);
-      // and a still stick in the same mode is silent, so the arm is the cursor
-      // MOVING, not merely being drawn
+      // A still pad in the same mode is silent.
       stubPad(padWith());
       const idle = rig(true);
       idle.manager.poll(1 / 60);
@@ -634,15 +644,15 @@ describe('GamepadManager: onActivity', () => {
     }
   });
 
-  it('fires on vertical cursor movement alone (both cursor dimensions count)', () => {
-    // The horizontal case above cannot see a dropped `my` arm in the cursor's
-    // moved-this-frame predicate; this one isolates it.
+  it('does not count a deflected stick as activity while navigating the UI', () => {
+    // The software cursor is gone, so a stick push in UI navigation genuinely
+    // does nothing and must not report the player as present.
     const restore = installDocumentStub(true);
     try {
-      stubPad(padWith([], stickAxes(AXIS.LEFT_Y, 1)));
+      stubPad(padWith([], stickAxes(AXIS.LEFT_X, 1)));
       const { manager, onActivity } = rig(true);
       manager.poll(1 / 60);
-      expect(onActivity).toHaveBeenCalledTimes(1);
+      expect(onActivity).not.toHaveBeenCalled();
     } finally {
       restore();
     }
@@ -914,7 +924,7 @@ describe('GamepadManager cross hotbar', () => {
     h.press(GP.LT, GP.DPAD_UP);
     expect(h.onAction).toHaveBeenCalledWith('slot5');
     h.press();
-    h.press(GP.A);
+    h.press(GP.Y); // jump lives on the top face button now (Triangle on PS)
     expect(h.triggerGamepadJump).toHaveBeenCalled();
     expect(h.onCrossHotbar).not.toHaveBeenCalled();
   });

@@ -1447,6 +1447,7 @@ export const es: EnTranslations = {
       "buttons": "Distribución de botones",
       "resetButtons": "Restablecer distribución de botones",
       "menuAction": "Menú del juego",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Acercar",
       "zoomOut": "Alejar",
       "help": "El stick izquierdo mueve, el derecho controla la cámara. Abre una ventana para usar el puntero en pantalla.",

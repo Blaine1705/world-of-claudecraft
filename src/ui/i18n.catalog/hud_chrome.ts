@@ -1508,6 +1508,7 @@ export const hudChromeStrings = {
     buttons: 'Button Layout',
     resetButtons: 'Reset Button Layout',
     menuAction: 'Game Menu',
+    confirmAction: 'Confirm / Select',
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',
     help: 'Left stick moves, right stick looks. Open a window to use the on-screen pointer.',

@@ -1447,6 +1447,7 @@ export const sv_SE: EnTranslations = {
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",
       "menuAction": "Spelmeny",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Zooma in",
       "zoomOut": "Zooma ut",
       "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren.",

@@ -1447,6 +1447,7 @@ export const de_DE: EnTranslations = {
       "buttons": "Tastenbelegung",
       "resetButtons": "Tastenbelegung zurücksetzen",
       "menuAction": "Spielmenü",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Einzoomen",
       "zoomOut": "Auszoomen",
       "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden.",

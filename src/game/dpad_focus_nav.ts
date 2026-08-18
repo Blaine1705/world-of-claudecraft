@@ -54,6 +54,8 @@ export interface DpadFocusResult {
  * Answers null when nothing moved, so the caller can fall back to the free cursor.
  */
 export function moveDpadFocus(dir: NavDirection): DpadFocusResult | null {
+  // No DOM (headless env server, unit tests): nothing to navigate.
+  if (typeof document === 'undefined') return null;
   const root = activeRoot() ?? document;
   const els = focusables(root);
   if (els.length === 0) return null;
@@ -84,13 +86,14 @@ function markPadFocus(el: HTMLElement): void {
 
 /** Drop the highlight when the pad leaves UI navigation. */
 export function clearPadFocus(): void {
-  marked?.classList.remove(PAD_FOCUS_CLASS);
+  marked?.classList?.remove(PAD_FOCUS_CLASS);
   marked = null;
 }
 
 /** Press whatever the d-pad has focused. Answers false when nothing is focused,
  *  so the caller can fall back to clicking at the free cursor instead. */
 export function pressDpadFocus(): boolean {
+  if (typeof document === 'undefined') return false;
   const active = document.activeElement as HTMLElement | null;
   if (!active || active === document.body) return false;
   const root = activeRoot() ?? document;

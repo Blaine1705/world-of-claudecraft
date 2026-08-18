@@ -201,6 +201,10 @@ export function gamepadButtonLabel(button: number, kind: GamepadKind): string {
 // 'jump' and 'autorun' are real Keybinds ids and handled by Input directly.
 export type GamepadActionId = string;
 export const GAMEPAD_NONE = 'none';
+// Press the focused UI control: the pad's left-mouse-button equivalent. Handled
+// in GamepadManager.dispatch() against the focus navigation, so it never reaches
+// the host's keybind path (there is no keyboard action for "click").
+export const GAMEPAD_CONFIRM = 'confirm';
 export const GAMEPAD_ZOOM_IN = 'zoomIn';
 export const GAMEPAD_ZOOM_OUT = 'zoomOut';
 // Matches the step Input's mouse-wheel handler applies per notch (input.ts), so
@@ -211,19 +215,20 @@ export const GAMEPAD_ZOOM_STEP = 1.4;
 // looks, face/shoulder/d-pad reach the first nine action-bar slots plus the
 // staple verbs (jump, interact, target, menu). Fully remappable afterwards.
 export const DEFAULT_GAMEPAD_BINDINGS: Record<number, GamepadActionId> = {
-  [GP.A]: 'jump',
+  // Face buttons follow the console-MMO convention: bottom confirms, right
+  // cancels/interacts, left targets, top jumps.
+  [GP.A]: GAMEPAD_CONFIRM,
   [GP.B]: 'interact',
-  [GP.Y]: 'target',
+  [GP.X]: 'target',
+  [GP.Y]: 'jump',
   [GP.RB]: 'slot1',
   [GP.LB]: 'slot2',
   // LT/RT are deliberately UNBOUND: they are the cross hotbar's two modifiers, and
   // a modifier that also fires an ability reads as a random cast every time the
   // player reaches for the bar. They stay free for a player who switches the cross
   // hotbar off and wants them back.
-  // The d-pad and X carry no bare action: they are cross-hotbar cells, and the
-  // whole set is one trigger away. FFXIV reserves the same buttons for system
-  // verbs (jump, cancel, confirm, sub-command) rather than abilities. They stay
-  // free for the targeting/menu pass.
+  // The d-pad carries no bare action: it is four cross-hotbar cells, and a bare
+  // press opens UI navigation instead.
   [GP.BACK]: 'map',
   [GP.START]: 'escape',
   [GP.L3]: 'autorun',

@@ -2,7 +2,7 @@
 // All the deterministic math lives in the pure core (gamepad_map.ts); this file
 // owns the side effects: polling navigator.getGamepads() each frame, driving the
 // Input instance (movement / camera / jump), dispatching edge-button actions via
-// the host's onAction callback, the virtual-cursor UI-navigation mode, and
+// the host's onAction callback, the focus-driven UI-navigation mode, and
 // haptic rumble. Modeled structurally on MobileControls.
 
 import type { NavDirection } from '../ui/dpad_nav_core';
@@ -20,6 +20,7 @@ import type { GamepadBindings } from './gamepad_bindings';
 import {
   AXIS,
   detectGamepadKind,
+  GAMEPAD_CONFIRM,
   GAMEPAD_NONE,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
@@ -42,7 +43,7 @@ export interface GamepadCallbacks {
   // here against Input directly and never reach this.
   onAction(id: string): void;
   // True while any interactive HUD window is open, switching the pad into the
-  // virtual-cursor UI-navigation mode (movement/camera/abilities are suspended).
+  // focus-driven UI-navigation mode (movement/camera/abilities are suspended).
   isPointerMode(): boolean;
   // Current local-player health, for rumble-on-damage. Optional.
   getPlayerHealth?(): number;
@@ -50,7 +51,7 @@ export interface GamepadCallbacks {
   // glyphs shown in the Controller options panel) may have changed. Optional.
   onConnectionChange?(): void;
   // The player actually moved something this frame (a button edge, either
-  // stick, or the UI cursor), at most once per poll. The desktop shell uses it
+  // stick, or a UI navigation step), at most once per poll. The desktop shell uses it
   // to keep the OS from sleeping the display during a pad-only session, which
   // the OS cannot see: pad input never reaches the window as an event. A held
   // still pad, a connection, and an unfocused window are all silent. Optional.
@@ -60,9 +61,6 @@ export interface GamepadCallbacks {
   // never per poll. Optional.
   onCrossHotbar?(layer: CrossHotbarLayer | null, set: number): void;
 }
-
-const CURSOR_SPEED = 900; // px/sec at full stick deflection in UI cursor mode
-const CURSOR_DPAD_STEP = 48; // px per d-pad press when there is nothing to focus
 
 // Which way each d-pad button steps focus while a window is open.
 const DPAD_NAV_DIRECTIONS: Record<number, NavDirection> = {
@@ -88,10 +86,6 @@ export class GamepadManager {
   private crossHotbar = false;
   private crossHotbarExpand = true;
   private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
-  private cursorEl: HTMLDivElement | null = null;
-  private cursorX = 0;
-  private cursorY = 0;
-  private cursorInit = false;
   private boundConnect = (e: GamepadEvent) => this.onConnect(e);
   private boundDisconnect = (e: GamepadEvent) => this.onDisconnect(e);
 
@@ -216,7 +210,6 @@ export class GamepadManager {
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
       this.releaseCrossHotbar();
-      this.hideCursor();
       this.cb.onConnectionChange?.();
     }
   }
@@ -258,7 +251,6 @@ export class GamepadManager {
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
       this.releaseCrossHotbar();
-      this.hideCursor();
       this.prevPressed = cur;
       return;
     }
@@ -280,17 +272,18 @@ export class GamepadManager {
     }
 
     if (this.cb.isPointerMode() || this.navEngaged) {
-      // UI-navigation cursor mode: stick drives a software pointer. Clear any
+      // UI navigation: the pad is driving the HUD, not the world. Clear any
       // lingering stick movement (a non-modal window like bags doesn't freeze
       // movement on its own) and skip camera/ability dispatch.
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
       this.releaseCrossHotbar();
-      if (this.updateCursor(pad, cur, dt)) this.cb.onActivity?.();
+      if (this.updateNavigation(cur)) this.cb.onActivity?.();
       this.prevPressed = cur;
       return;
     }
-    this.hideCursor();
+    // Back in the world: the pad is no longer driving the HUD.
+    if (this.navEngaged) this.exitNavMode();
 
     // The cross hotbar's trigger state advances BEFORE this poll's edges are
     // dispatched, so a trigger and a face button pressed in the same poll cast
@@ -368,8 +361,11 @@ export class GamepadManager {
   // trigger held) or it simply carries no binding. Only such a press may be
   // repurposed for UI navigation; one that still fires a real action keeps it.
   private pressWouldDoNothing(buttonIndex: number): boolean {
-    if (this.crossHotbar && isCrossHotbarButton(buttonIndex)) return true;
-    return this.bindings.actionFor(buttonIndex) === GAMEPAD_NONE;
+    const action = this.bindings.actionFor(buttonIndex);
+    if (action === GAMEPAD_NONE) return true;
+    // Mirrors dispatch(): with the cross hotbar on, a claimed button's SLOT
+    // binding is swallowed, but its system verb (target, interact) still fires.
+    return this.crossHotbar && isCrossHotbarButton(buttonIndex) && action.startsWith('slot');
   }
 
   private dispatch(buttonIndex: number): void {
@@ -399,6 +395,10 @@ export class GamepadManager {
     }
     const action = this.bindings.actionFor(buttonIndex);
     if (action === GAMEPAD_NONE) return;
+    if (action === GAMEPAD_CONFIRM) {
+      pressDpadFocus();
+      return;
+    }
     if (action === 'jump') {
       this.input.triggerGamepadJump();
       return;
@@ -455,68 +455,32 @@ export class GamepadManager {
     }
   }
 
-  // --- UI-navigation virtual cursor ---------------------------------------
-  private ensureCursor(): HTMLDivElement {
-    if (!this.cursorEl) {
-      const el = document.createElement('div');
-      el.className = 'gamepad-cursor';
-      el.setAttribute('aria-hidden', 'true');
-      document.body.appendChild(el);
-      this.cursorEl = el;
-    }
-    return this.cursorEl;
-  }
-
-  /** Drives the virtual pointer; answers whether the player moved it or pressed
-   *  something this frame, which is the pointer-mode half of onActivity. */
-  private updateCursor(pad: Gamepad, cur: boolean[], dt: number): boolean {
-    const el = this.ensureCursor();
-    if (!this.cursorInit) {
-      this.cursorX = window.innerWidth / 2;
-      this.cursorY = window.innerHeight / 2;
-      this.cursorInit = true;
-    }
-    el.style.display = 'block';
-    // Left stick (or d-pad) moves the pointer.
-    let mx = pad.axes[AXIS.LEFT_X] ?? 0;
-    let my = pad.axes[AXIS.LEFT_Y] ?? 0;
-    if (Math.hypot(mx, my) < this.deadzone) {
-      mx = 0;
-      my = 0;
-    }
-    this.cursorX = Math.min(window.innerWidth, Math.max(0, this.cursorX + mx * CURSOR_SPEED * dt));
-    this.cursorY = Math.min(window.innerHeight, Math.max(0, this.cursorY + my * CURSOR_SPEED * dt));
-    el.style.left = `${this.cursorX}px`;
-    el.style.top = `${this.cursorY}px`;
-
-    // The post-deadzone stick (and the d-pad overrides above) are the cursor's
-    // own movement verdict, so activity here costs one comparison.
-    let acted = mx !== 0 || my !== 0;
+  // --- UI navigation (focus-driven; no software cursor) --------------------
+  /**
+   * UI navigation, the pad's answer to a mouse. There is deliberately NO software
+   * cursor: a page cannot move the OS pointer, and a fake one has to be steered
+   * pixel by pixel to reach a button. Console MMOs navigate by FOCUS instead, so
+   * the d-pad steps between the open surface's controls, the focused one is
+   * highlighted, and confirm presses it. The player's real mouse is untouched and
+   * keeps working alongside this.
+   *
+   * Answers whether the player did anything this frame (the activity signal).
+   */
+  private updateNavigation(cur: boolean[]): boolean {
+    let acted = false;
     for (const idx of risingEdges(this.prevPressed, cur)) {
       acted = true;
       this.cb.onInputEdge();
-      // The d-pad steps between the open window's controls rather than nudging the
-      // cursor a few pixels: a cursor has to be steered to a button, focus lands on
-      // it. The stick keeps the free cursor for what focus order cannot reach (an
-      // item drag, a spot on the map), so nothing is lost.
       const dir = DPAD_NAV_DIRECTIONS[idx];
       if (dir !== undefined) {
-        // Snap the cursor onto whatever took focus: focus alone is invisible on a
-        // pad, so without this the screen does not move and the press appears to
-        // do nothing. Falls back to nudging the cursor when the open surface has
-        // nothing focusable to step between.
-        const focused = moveDpadFocus(dir);
-        if (focused) this.moveCursorTo(focused.x, focused.y);
-        else this.nudgeCursor(dir);
+        moveDpadFocus(dir);
         continue;
       }
-      // A presses the focused control, falling back to the cursor when the d-pad
-      // has not focused anything the navigation owns.
-      if (idx === GP.A) {
-        if (!pressDpadFocus()) this.clickAtCursor();
+      if (this.bindings.actionFor(idx) === GAMEPAD_CONFIRM) {
+        pressDpadFocus();
       } else if (idx === GP.B || idx === GP.START) {
-        // B backs out of UI navigation the pad opened itself; otherwise it is the
-        // host's escape (closing the window that put us in pointer mode).
+        // B backs out of navigation the pad opened itself; otherwise it is the
+        // host's escape (closing the window that put us here).
         if (this.navEngaged && !this.cb.isPointerMode()) this.exitNavMode();
         else this.cb.onAction('escape');
       }
@@ -528,46 +492,5 @@ export class GamepadManager {
   private exitNavMode(): void {
     this.navEngaged = false;
     clearPadFocus();
-    this.hideCursor();
-  }
-
-  // Park the cursor at a point (the centre of a newly focused control).
-  private moveCursorTo(x: number, y: number): void {
-    this.cursorX = x;
-    this.cursorY = y;
-    if (this.cursorEl) {
-      this.cursorEl.style.left = `${x}px`;
-      this.cursorEl.style.top = `${y}px`;
-    }
-  }
-
-  // One d-pad step of the free cursor, for a surface with no focusable controls.
-  private nudgeCursor(dir: NavDirection): void {
-    const step = CURSOR_DPAD_STEP;
-    if (dir === 'left') this.cursorX = Math.max(0, this.cursorX - step);
-    else if (dir === 'right') this.cursorX = Math.min(window.innerWidth, this.cursorX + step);
-    else if (dir === 'up') this.cursorY = Math.max(0, this.cursorY - step);
-    else this.cursorY = Math.min(window.innerHeight, this.cursorY + step);
-    if (this.cursorEl) {
-      this.cursorEl.style.left = `${this.cursorX}px`;
-      this.cursorEl.style.top = `${this.cursorY}px`;
-    }
-  }
-
-  // Synthesizes mousedown/mouseup/click at the cursor, reusing every existing DOM
-  // click handler (use/equip/sell/trade/feed). Native HTML5 drag-to-rearrange the
-  // action bar is the one interaction this cannot reach; clicks cover the rest.
-  private clickAtCursor(): void {
-    const target = document.elementFromPoint(this.cursorX, this.cursorY) as HTMLElement | null;
-    if (!target) return;
-    const opts = { bubbles: true, cancelable: true, clientX: this.cursorX, clientY: this.cursorY };
-    target.dispatchEvent(new MouseEvent('mousedown', opts));
-    target.dispatchEvent(new MouseEvent('mouseup', opts));
-    target.click();
-  }
-
-  private hideCursor(): void {
-    if (this.cursorEl) this.cursorEl.style.display = 'none';
-    this.cursorInit = false;
   }
 }

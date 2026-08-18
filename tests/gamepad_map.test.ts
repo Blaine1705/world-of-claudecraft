@@ -137,7 +137,10 @@ describe('risingEdges', () => {
 
 describe('default layout', () => {
   it('binds every console-MMO button to a known action and stays within the bindable set', () => {
-    expect(DEFAULT_GAMEPAD_BINDINGS[GP.A]).toBe('jump');
+    // Console-MMO face layout: bottom confirms, top jumps.
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.A]).toBe('confirm');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.Y]).toBe('jump');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.X]).toBe('target');
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.START]).toBe('escape');
     for (const idx of Object.keys(DEFAULT_GAMEPAD_BINDINGS).map(Number)) {
       expect(BINDABLE_BUTTONS).toContain(idx);
@@ -151,15 +154,7 @@ describe('default layout', () => {
     // The triggers are the cross hotbar's modifiers. A modifier that also fires an
     // ability reads as a random cast every time the player reaches for the bar, so
     // they ship unbound and stay free for anyone who turns the cross hotbar off.
-    const unbound: number[] = [
-      GP.LT,
-      GP.RT,
-      GP.X,
-      GP.DPAD_UP,
-      GP.DPAD_DOWN,
-      GP.DPAD_LEFT,
-      GP.DPAD_RIGHT,
-    ];
+    const unbound: number[] = [GP.LT, GP.RT, GP.DPAD_UP, GP.DPAD_DOWN, GP.DPAD_LEFT, GP.DPAD_RIGHT];
     expect(bound).toEqual(BINDABLE_BUTTONS.filter((b) => !unbound.includes(b)));
     for (const b of unbound) expect(DEFAULT_GAMEPAD_BINDINGS[b]).toBeUndefined();
   });

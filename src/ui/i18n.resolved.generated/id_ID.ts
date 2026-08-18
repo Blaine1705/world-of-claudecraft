@@ -1447,6 +1447,7 @@ export const id_ID: EnTranslations = {
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
       "menuAction": "Menu Game",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Perbesar",
       "zoomOut": "Perkecil",
       "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar.",

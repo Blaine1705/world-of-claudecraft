@@ -1447,6 +1447,7 @@ export const vi_VN: EnTranslations = {
       "buttons": "Bố Cục Nút",
       "resetButtons": "Đặt Lại Bố Cục Nút",
       "menuAction": "Menu Trò Chơi",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Phóng To",
       "zoomOut": "Thu Nhỏ",
       "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình.",
