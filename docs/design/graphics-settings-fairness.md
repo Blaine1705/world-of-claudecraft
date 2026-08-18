@@ -76,6 +76,16 @@ COSMETIC (may be tiered down on lower presets):
   low-tier target-frame body throttle (about 10 Hz, target swap bypasses), a redraw-smoothness
   shed this list already sanctions for the portrait.
 
+- Edge anti-aliasing, and WHICH edge anti-aliasing a tier gets. High and above run the SMAA
+  tail; medium (and any mix that resolves to the grade-only chain) runs the FXAA arm fused
+  into `OutputGradePass`; low and the memory-constrained WebKit rungs run none, because they
+  have no grade pass to fuse into. All three arms filter the display-space image AFTER
+  everything a player reads has been drawn into it, and none of them removes, hides, delays,
+  or repositions anything: an aliased silhouette and an anti-aliased one carry the same
+  information at the same time. Which arm a session gets is a pure function of the STATIC
+  device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
+  governor, so it cannot vary between two players standing in the same spot.
+
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
 
