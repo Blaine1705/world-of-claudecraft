@@ -41,6 +41,7 @@ import {
 } from '../../trade_woc_arm_painter';
 import {
   inventoryIndexOfStaged,
+  usableStampMs,
   type WocPendingOffer,
   type WocTradePartner,
   type WocTradeQuoteReview,
@@ -567,12 +568,7 @@ export class WocTradeController {
       // Same finite test as the send path above, and the same `> 0`: a truthy
       // check passes NaN, and a finite check alone would turn an epoch-0 stamp
       // (absence written as a number) into a 1970 deadline.
-      if (
-        row.status === 'pending' &&
-        row.role === 'buyer' &&
-        Number.isFinite(row.expiresAtMs) &&
-        row.expiresAtMs > 0
-      ) {
+      if (row.status === 'pending' && row.role === 'buyer' && usableStampMs(row.expiresAtMs)) {
         this.log(
           t('hudChrome.trade.woc.offerStandsUntil', {
             time: formatDateTime(row.expiresAtMs, { timeStyle: 'short' }),
@@ -843,7 +839,7 @@ export class WocTradeController {
         // two agree today, and the settlement is the authority if they ever
         // do not.
         usdCents: held.usdCents,
-        expiresAtMs: quote.expiresAtMs ?? null,
+        expiresAtMs: usableStampMs(quote.expiresAtMs),
         reference: quote.reference ?? null,
         transactionBase64: quote.transactionBase64,
         ...(quote.signatureRequired === undefined
@@ -1153,7 +1149,7 @@ export class WocTradeController {
       // `> 0` keeps the old truthy behaviour for an epoch-0 stamp, which is
       // absence expressed as a number, not a 1970 deadline.
       this.log(
-        Number.isFinite(res.offer.expiresAtMs) && res.offer.expiresAtMs > 0
+        usableStampMs(res.offer.expiresAtMs) !== null
           ? t('hudChrome.trade.woc.offerSentUntil', {
               name: otherName,
               time: formatDateTime(res.offer.expiresAtMs, { timeStyle: 'short' }),
@@ -1170,7 +1166,7 @@ export class WocTradeController {
         listingId: null,
         buyerAccepted: false,
         sellerAccepted: false,
-        expiresAtMs: res.offer.expiresAtMs ?? null,
+        expiresAtMs: usableStampMs(res.offer.expiresAtMs),
         settlementState: null,
       };
       this.lastTradeSig = '';

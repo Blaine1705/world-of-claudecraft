@@ -23,11 +23,14 @@ export const WOC_TOKEN_FRACTION_DIGITS = 2;
 export const WOC_TOKEN_SMALL_FRACTION_DIGITS = 9;
 
 export function wocTokensText(tokens: number): string {
-  // A NON-ZERO amount must never render as "0": at two digits a fee leg under
-  // half a hundredth of a token (a burn leg once $WOC is worth enough) rounds
-  // flat, and a player reading a quote's legs would see a zero the server never
-  // sent. Below that threshold the figure keeps enough digits to stay true; at
-  // and above it, every surface shares the one two-digit spelling.
+  // No amount the WIRE can carry may render as "0": at two digits a fee leg
+  // under half a hundredth of a token (a burn leg once $WOC is worth enough)
+  // rounds flat, and a player reading a quote's legs would see a zero the
+  // server never sent. Below that threshold the figure keeps the token's own
+  // nine base decimals, so even one base unit prints as itself; at and above
+  // it, every surface shares the one two-digit spelling. Below a base unit
+  // (5e-10 and under) it does round to zero, which is honest: there is no such
+  // amount on this chain, and the alternative is a column of noise.
   const small = tokens !== 0 && Math.abs(tokens) < 0.5 * 10 ** -WOC_TOKEN_FRACTION_DIGITS;
   return formatNumber(tokens, {
     maximumFractionDigits: small ? WOC_TOKEN_SMALL_FRACTION_DIGITS : WOC_TOKEN_FRACTION_DIGITS,

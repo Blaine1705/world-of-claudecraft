@@ -3103,12 +3103,16 @@
        as well would stretch every short sheet to the full screen (a two-line
        trade painting a 400px panel), so it is deliberately not set here. The
        SPLIT rule below pins both edges, because a side-by-side dock is meant
-       to be full height. */
+       to be full height. With no bottom pin this cap is the ONLY thing holding
+       the sheet on screen, so --app-vh is read WITH a fallback: that token is
+       set by JS, and an unset one makes the whole declaration invalid at
+       computed-value time, leaving max-height at its initial `none` and the
+       sheet uncapped with its commit row below the fold. */
     left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
     right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
     top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
     max-height: calc(
-      var(--app-vh) /
+      var(--app-vh, 100dvh) /
       var(--ui-scale, 1) -
       (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
       (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))
@@ -3453,7 +3457,8 @@
      single column on mobile; a shorter clamp (like the vendor window's own,
      see the comment on #vendor-window below) would leave the flex:1 listing
      body (#market-body) zero height, so it collapsed and could not be scrolled.
-     Give the window the full available height (like #trade-window) so the listing
+     Give the window the full available height (like #bags, which pins both
+     edges; #trade-window no longer does) so the listing
      body keeps a usable, touch-scrollable height under the header.
      The search box living in `.mkt-controls` (a sibling above #market-body, not
      inside it) added a fourth stacked chrome row: tabs + controls + body. With
@@ -3527,7 +3532,7 @@
   }
   /* Phase 5: the tall list windows (mailbox, calendar) are flex columns with an
      inner scroll body (#mailbox-body, .cal-day-pane) and overflow:hidden on the
-     shell. Edge-pinned they take the full available height (the #trade-window
+     shell. Edge-pinned they take the full available height (the #bags
      template) so the inner body keeps a usable, touch-scrollable height under the
      header instead of the sheet's overflow-y:auto fighting the inner flex scroll.
      #market-window used to follow this same inner-scroll shape, but PR #2107
@@ -3607,14 +3612,18 @@
        as well would stretch every short sheet to the full screen (a two-line
        trade painting a 400px panel), so it is deliberately not set here. The
        SPLIT rule below pins both edges, because a side-by-side dock is meant
-       to be full height. */
+       to be full height. With no bottom pin this cap is the ONLY thing holding
+       the sheet on screen, so --app-vh is read WITH a fallback: that token is
+       set by JS, and an unset one makes the whole declaration invalid at
+       computed-value time, leaving max-height at its initial `none` and the
+       sheet uncapped with its commit row below the fold. */
     left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
     right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
     top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
     max-width: none;
     transform: none;
     max-height: calc(
-      var(--app-vh) /
+      var(--app-vh, 100dvh) /
       var(--ui-scale, 1) -
       (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
       (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))

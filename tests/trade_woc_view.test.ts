@@ -16,6 +16,7 @@ import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
   buildWocTradeModel,
   inventoryIndexOfStaged,
+  usableStampMs,
   wocTradableSlot,
 } from '../src/ui/trade_woc_view';
 
@@ -733,5 +734,22 @@ describe('the confirmed-awaiting-delivery status sentences', () => {
       },
     });
     expect(seller.quoteReview).toBeNull();
+  });
+});
+
+describe('usableStampMs: the one test for a wire timestamp worth printing', () => {
+  it('keeps a real stamp and refuses every shape Intl would throw or misread on', () => {
+    // NaN and Infinity make formatDateTime raise a RangeError (which would take
+    // the arm's whole face down, not just the line); 0 and a negative stamp are
+    // absence written as a number, and printing them means a 1970 deadline on a
+    // money surface.
+    expect(usableStampMs(1_800_000_000_000)).toBe(1_800_000_000_000);
+    expect(usableStampMs(1)).toBe(1);
+    for (const bad of [null, undefined, Number.NaN, 0, -1, Number.POSITIVE_INFINITY]) {
+      expect(
+        usableStampMs(bad as number | null | undefined),
+        `${String(bad)} is unusable`,
+      ).toBeNull();
+    }
   });
 });

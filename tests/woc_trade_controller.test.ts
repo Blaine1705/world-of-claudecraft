@@ -423,7 +423,10 @@ describe('an unusable offer expiry falls back to the untimed line', () => {
     // server-side NaN as null); NaN is the value a date projection yields and
     // the one a typeof test lets through; 0 is absence written as a number,
     // which a bare finite check would print as a 1970 deadline.
-    for (const value of [null, undefined, Number.NaN, 0]) {
+    // Infinity and a negative stamp are what make this decisive against a plain
+    // truthy guard: every falsy value alone would pass one. Infinity formats to
+    // a RangeError, a negative stamp to a pre-1970 deadline.
+    for (const value of [null, undefined, Number.NaN, 0, Number.POSITIVE_INFINITY, -86_400_000]) {
       const { logs } = await send(value);
       expect(logs.at(-1), `expiry ${String(value)} must read as untimed`).toBe(UNTIMED);
     }
@@ -1826,6 +1829,34 @@ describe('informed waiting: expiry, close-time honesty, fresh money lines', () =
     );
     expect(line, 'the still-stands line').toBeTruthy();
     vi.useRealTimers();
+  });
+
+  it('says nothing about an expiry the row cannot express', async () => {
+    // The OTHER expiry read (the offer row's "stands until" line), which had no
+    // arm of its own: an epoch-0 stamp is absence written as a number and NaN
+    // is what a date projection yields, and formatDateTime throws on the second
+    // rather than printing anything. Both must take the silent branch.
+    for (const value of [0, Number.NaN, Number.POSITIVE_INFINITY, -1]) {
+      vi.useFakeTimers();
+      vi.setSystemTime(1_000_000);
+      const h = fakeHooks();
+      h.state.offersResult = {
+        ok: true,
+        offers: [offerRow({ expiresAtMs: value as number })],
+      };
+      const r = rig(h.hooks);
+      openTrade(r);
+      await flushAsync();
+      r.host.tradeInfo = null;
+      r.controller.updateTradeWindow();
+      await flushAsync();
+      const stem = t('hudChrome.trade.woc.offerStandsUntil', { time: '' }).slice(0, 12);
+      expect(
+        r.host.logs.find((l) => l.startsWith(stem)),
+        `expiry ${String(value)} must not produce a stands-until line`,
+      ).toBeUndefined();
+      vi.useRealTimers();
+    }
   });
 
   it('a price edit blanks the derived money lines IMMEDIATELY, not after the debounce', async () => {

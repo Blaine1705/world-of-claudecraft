@@ -1133,7 +1133,9 @@ describe('the consent checkboxes reach the target floor on DESKTOP too', () => {
     const at = css.indexOf(selector);
     expect(at, `${selector} exists`).toBeGreaterThan(-1);
     const block = css.slice(at, css.indexOf('\n  }', at));
-    return new RegExp(`${prop}:([^;]+);`).exec(block)?.[1]?.trim() ?? '';
+    // Anchored: "width" is a substring of min-width and max-width, so an
+    // unanchored match would happily read a neighbouring declaration.
+    return new RegExp(`(?:^|[\\s;{])${prop}:([^;]+);`).exec(block)?.[1]?.trim() ?? '';
   };
 
   it('floors the Exchange consent and offer-next boxes at 24px', () => {

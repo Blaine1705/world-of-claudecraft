@@ -418,6 +418,21 @@ const SEND_HINT_KEYS: Record<WocSendHint, TranslationKey> = {
  * only: the quality floor is policy the server owns and may retune, and a
  * client copy of it would drift.
  */
+/**
+ * A wire timestamp this client is willing to PRINT, or null.
+ *
+ * Every expiry on the $WOC arm comes from a server column projected through a
+ * Date parse, and the shapes that projection can produce are exactly the ones
+ * Intl refuses: NaN and Infinity make `formatDateTime` throw a RangeError
+ * (taking the whole line, and its painter, down), while 0 and a negative stamp
+ * are absence written as a number and would print a 1970 deadline. One test,
+ * one place, so the send path, the offer row and the quote face cannot drift
+ * apart on what counts as usable.
+ */
+export function usableStampMs(value: number | null | undefined): number | null {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null;
+}
+
 export function wocTradableSlot(slot: InvSlot, items: Readonly<Record<string, ItemDef>>): boolean {
   const def = items[slot.itemId];
   if (!def) return false;

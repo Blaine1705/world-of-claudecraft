@@ -27,6 +27,7 @@ import { restoreFirstEnabled } from './focus_restore';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import {
   buildWocTradeModel,
+  usableStampMs,
   type WocPendingOffer,
   type WocTradeModel,
   type WocTradePartner,
@@ -288,11 +289,11 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
         // control), instead of a dead button under a past time.
         const quoteExpiry = model.quoteExpired
           ? `<p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.quoteExpiredTrade'))}</p>`
-          : q.expiresAtMs === null
+          : usableStampMs(q.expiresAtMs) === null
             ? ''
             : `<p class="trade-woc-note">${esc(
                 t('hudChrome.wocMarket.quoteExpiresAt', {
-                  time: formatDateTime(q.expiresAtMs, { timeStyle: 'short' }),
+                  time: formatDateTime(q.expiresAtMs as number, { timeStyle: 'short' }),
                 }),
               )}</p>`;
         // The claim's OWN payment deadline (shorter than the directed hold the
@@ -374,12 +375,15 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     // The offer is not open-ended, so say when it lapses; static text on
     // purpose (a per-second countdown would rebuild the subtree for no
     // decision the player can take differently).
+    // The same one test every other stamp read takes: a null check alone lets
+    // NaN through to Intl, which throws rather than printing, and the throw
+    // lands inside this painter and takes the whole arm's face down.
     const expiry =
-      o.expiresAtMs == null
+      usableStampMs(o.expiresAtMs) === null
         ? ''
         : `<p class="trade-woc-note">${esc(
             t('hudChrome.trade.woc.offerExpiresAt', {
-              time: formatDateTime(o.expiresAtMs, { timeStyle: 'short' }),
+              time: formatDateTime(o.expiresAtMs as number, { timeStyle: 'short' }),
             }),
           )}</p>`;
     return `<div class="trade-woc-arm">${modeTabs}

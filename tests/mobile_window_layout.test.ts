@@ -225,8 +225,14 @@ describe('mobile window layout CSS', () => {
     // explains the value, and prose satisfies a substring check on its own.
     const reserve = /scroll-padding-bottom:([^;]+);/.exec(block)?.[1] ?? '';
     expect(reserve, 'the bottom reserve is declared').not.toBe('');
-    expect(reserve, "it mirrors the window's inset-aware padding-bottom").toContain(
-      'max(var(--window-pad), calc(18px + env(safe-area-inset-bottom)))',
+    // Tied to the GENERIC rule's own declaration, not to a second copy of the
+    // literal: pinning each separately lets the generic padding be retuned, its
+    // own pin updated, and the reserve silently under-cover by the difference.
+    const generic = blockContaining('padding-bottom: max(', 'body.mobile-touch .window {');
+    const padding = /padding-bottom:([^;]+);/.exec(generic)?.[1]?.trim() ?? '';
+    expect(padding, 'the generic mobile window declares an inset-aware padding').not.toBe('');
+    expect(reserve.replace(/\s+/g, ' '), 'the reserve carries that exact expression').toContain(
+      padding.replace(/\s+/g, ' '),
     );
     expect(reserve).toContain('40px');
     const top = /scroll-padding-top:([^;]+);/.exec(block)?.[1] ?? '';
@@ -248,11 +254,25 @@ describe('mobile window layout CSS', () => {
       expect(block, `${id} pins its top inset`).toContain(
         'top: calc(max(10px, env(safe-area-inset-top))',
       );
-      expect(block, `${id} must not pin its bottom edge`).not.toMatch(/\n\s*bottom: /);
       expect(block, `${id} subtracts both insets from its cap`).toContain(
         'max(10px, env(safe-area-inset-bottom))',
       );
+      // EVERY block that names the sheet, not only the one above: a re-added
+      // pin would most naturally land in the rule this sheet SHARES with
+      // #social-window, which sets exactly that for itself.
+      for (const other of mobileCss.split('\n  }')) {
+        if (!other.includes(`${id} {`) && !other.includes(`${id},`)) continue;
+        if (other.includes(':has(#trade-window')) continue; // the split dock, below
+        expect(other, `no block may pin ${id}'s bottom edge`).not.toMatch(/\n\s*bottom: (?!auto)/);
+      }
     }
+    // ...and the split dock KEEPS both pins, because a side-by-side sheet is
+    // meant to be full height. That is the other half of the same decision.
+    const split = mobileCss
+      .split('\n  }')
+      .find((b) => b.includes(':has(#trade-window') && b.includes('position: fixed'));
+    expect(split, 'the side-by-side split rule exists').toBeDefined();
+    expect(split ?? '', 'the split dock pins both edges').toMatch(/\n\s*bottom: calc\(max\(10px/);
   });
 
   it('floors the vendor purchase-quantity controls at 40px under a coarse pointer (phase 21)', () => {
