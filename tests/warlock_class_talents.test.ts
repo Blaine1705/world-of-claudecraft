@@ -193,6 +193,19 @@ describe('warlock class talent tree', () => {
     expect(player.cooldowns.get('hex_of_violence')).toBeCloseTo(8.5);
   });
 
+  it('reduces Possess the Evil Eye and Hour of Judgment while casting', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_chaos_bolt' }, 'affliction');
+    addTarget(sim);
+    player.cooldowns.set('possess_evil_eye', 10);
+    player.cooldowns.set('hour_of_judgment', 10);
+
+    sim.castAbility('needle_of_fate');
+    tick(sim, 20);
+
+    expect(player.cooldowns.get('possess_evil_eye')).toBeCloseTo(8.5);
+    expect(player.cooldowns.get('hour_of_judgment')).toBeCloseTo(8.5);
+  });
+
   it('includes specialization signatures in Unbroken Ritual', () => {
     expect(ABILITIES.conflagrate.specs).toEqual(['destruction']);
     expect(ABILITIES.metamorphosis.specs).toEqual(['demonology']);

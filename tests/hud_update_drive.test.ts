@@ -416,11 +416,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'hides the combo row for non-energy classes, through the elided writer',
   },
   {
-    call: 'this.doomMeter.paint',
+    call: 'this.updateWarlockDoomMeter',
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'write-elided Warlock Doom meter driven by its own view core',
+    why: 'write-elided Warlock Doom meter driven from the player-owned Fate Thread aura',
   },
   {
     call: 'this.procOverlayPainter.paintNecromancyCharges',
