@@ -1239,10 +1239,10 @@ describe('the $WOC token firewall over src/sim', () => {
   });
 
   it('is non-vacuous: the scan sees the sim tree and its own pattern bites', () => {
-    // Near the real count (475 today) per the tests/CLAUDE.md floor rule: a
+    // Near the real count (492 today) per the tests/CLAUDE.md floor rule: a
     // walk that quietly lost most of the tree must fail here, because with
     // sim.ts off the allowlist the corpus IS the firewall.
-    expect(simFiles.length).toBeGreaterThan(460);
+    expect(simFiles.length).toBeGreaterThan(480);
     // Every allowlisted file still exists, still trips the pattern (a stale
     // entry is a whole-file blind spot), and still has the read-only
     // projection shape spelled out at PROJECTION_RULES above.

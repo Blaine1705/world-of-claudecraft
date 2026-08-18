@@ -140,9 +140,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned again to the exact merged size after the v0.39.0 sync merge
     // (release-side growth only; the branch's own delegates are unchanged).
     // Re-pinned 12508 -> 12527 at the third v0.39.0 sync merge (release tip
-    // b650d9d7d2): release-side growth only again (practice dummies, the
-    // delve finale gate); the branch's delegates are unchanged and the merged
-    // file stays under the release's own 12660 row. Exact merged count.
+    // b650d9d7d2): release-side growth only again (the practice dummies'
+    // vitals, the quest-gated aggro/taunt gate, the worn mech-chroma
+    // reconcile, the clearAurasFromSource predicate); the branch's delegates
+    // are unchanged and the merged file stays under the release's own 12660
+    // row. Exact merged count.
     file: 'src/sim/sim.ts',
     ceiling: 12527,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
@@ -165,8 +167,12 @@ const MONOLITHS: MonolithRow[] = [
     // escrow-persist host seam (enqueueCharacterWrite,
     // serializeCharacterForPersist, escrowSessionLost, the guild-book flush
     // pair). Zero headroom on purpose, the standing posture here.
+    // Re-pinned 10818 -> 10807 at the third v0.39.0 sync merge (release tip
+    // b650d9d7d2): the release moved the mech-chroma reconcile out to
+    // server/mech_chroma_reconcile.ts, so the merged file landed SMALLER and
+    // the ratchet follows it down (exact merged count, zero headroom).
     file: 'server/game.ts',
-    ceiling: 10818,
+    ceiling: 10807,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
