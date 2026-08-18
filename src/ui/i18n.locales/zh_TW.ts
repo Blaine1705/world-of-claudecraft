@@ -7081,6 +7081,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'sim.delve.moveCloserStairs': '再靠近階梯一些。',
   'sim.delve.notInDelve': '你並不在秘探之中。',
   'sim.delve.nothingHappens': '沒有任何事發生。',
+  'sim.delve.enemiesRemain': '先清除剩餘的敵人。',
   'sim.delve.passageSealed': '通道被封住了。',
   'sim.delve.raiseDead': '{name} 開始施放喚醒亡者。',
   'sim.delve.runFailed': '{name} 旅程失敗。',

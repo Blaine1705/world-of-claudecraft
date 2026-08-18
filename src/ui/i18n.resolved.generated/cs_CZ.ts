@@ -7187,6 +7187,7 @@ export const cs_CZ: EnTranslations = {
       "shopMarksRequired": "K nákupu {name} potřebuješ {marks} známek výprav.",
       "shopSealPremiumOnly": "Tato pečeť povolí jen mistrovské ruce. Otevře ji pouze prémiová sázka.",
       "passageSealed": "Průchod je zapečetěný.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Přibliž se k průchodu.",
       "moveCloserChest": "Přibliž se k truhle.",
       "moveCloserReliquary": "Přibliž se k relikviáři.",

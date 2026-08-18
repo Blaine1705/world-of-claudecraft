@@ -7187,6 +7187,7 @@ export const fr_FR: EnTranslations = {
       "shopMarksRequired": "Il vous faut {marks} Marques de plongée pour acheter {name}.",
       "shopSealPremiumOnly": "Ce sceau ne cède qu'à la main d'un maître : seule la mise Supérieure peut l'ouvrir.",
       "passageSealed": "Le passage est scellé.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Rapprochez-vous du passage.",
       "moveCloserChest": "Rapprochez-vous du coffre.",
       "moveCloserReliquary": "Rapprochez-vous du reliquaire.",

@@ -7187,6 +7187,7 @@ export const it_IT: EnTranslations = {
       "shopMarksRequired": "Ti servono {marks} Sigilli d'Incursione per comprare {name}.",
       "shopSealPremiumOnly": "Questo sigillo cede solo alla mano di un maestro: solo la puntata Pregiata può aprirlo.",
       "passageSealed": "Il passaggio è sigillato.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Avvicinati al passaggio.",
       "moveCloserChest": "Avvicinati allo scrigno.",
       "moveCloserReliquary": "Avvicinati al reliquiario.",
