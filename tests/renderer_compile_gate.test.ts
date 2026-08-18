@@ -151,9 +151,13 @@ describe('Renderer live shader compile rejection recovery', () => {
     const order: string[] = [];
     renderer.sim = { player: { targetId: null } };
     // The queue resolves the gate RESULT, which is what tells the tail whether
-    // anything was proved linked.
+    // anything was proved linked. The gate hands it one piece per material
+    // group of the target (here one), each the colour arm then the shadow arm.
     renderer.liveCompileGates = {
-      run: (fn: () => Promise<unknown>) => fn().then(() => ({ failed: false, timedOut: false })),
+      runPieces: (pieces: Array<() => Promise<unknown>>) =>
+        pieces
+          .reduce<Promise<unknown>>((chain, piece) => chain.then(piece), Promise.resolve())
+          .then(() => ({ failed: false, timedOut: false })),
     };
     renderer.compilePrewarmColorPrograms = vi.fn(
       (_root: THREE.Object3D, includeOffscreenVariant: boolean) => {
@@ -169,7 +173,8 @@ describe('Renderer live shader compile rejection recovery', () => {
     const properties = { get: vi.fn(() => ({})) };
     renderer.webgl = { properties };
     const target = new THREE.Group();
-    target.add(new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial()));
+    const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+    target.add(mesh);
 
     await renderer.compileGate(target);
 
@@ -177,8 +182,52 @@ describe('Renderer live shader compile rejection recovery', () => {
     // Twice for the one material: the settle's marking walk, then the collect
     // walk. Neither of them asks the driver anything.
     expect(properties.get).toHaveBeenCalledTimes(2);
-    expect(renderer.compilePrewarmColorPrograms).toHaveBeenCalledWith(target, false);
-    expect(renderer.compileShadowPrograms).toHaveBeenCalledWith(target);
+    // The arms compile the material carrier itself, in place, never the root:
+    // three prepares materials only under the node it is handed, so this is
+    // exactly the mesh's programs, and one queue unit per material group.
+    expect(renderer.compilePrewarmColorPrograms).toHaveBeenCalledWith(mesh, false);
+    expect(renderer.compileShadowPrograms).toHaveBeenCalledWith(mesh);
+  });
+
+  it('submits one gate piece per material group of the target, and every carrier of the group', async () => {
+    const renderer = harness();
+    renderer.sim = { player: { targetId: null } };
+    const submitted: Array<{ pieces: number; label?: string }> = [];
+    renderer.liveCompileGates = {
+      runPieces: (
+        pieces: Array<() => Promise<unknown>>,
+        _timeoutMs: number,
+        options: { label?: string },
+      ) => {
+        submitted.push({ pieces: pieces.length, label: options.label });
+        return pieces
+          .reduce<Promise<unknown>>((chain, piece) => chain.then(piece), Promise.resolve())
+          .then(() => ({ failed: false, timedOut: false }));
+      },
+    };
+    const compiled: THREE.Object3D[] = [];
+    renderer.compilePrewarmColorPrograms = (node: THREE.Object3D) => {
+      compiled.push(node);
+      return Promise.resolve();
+    };
+    renderer.compileShadowPrograms = () => Promise.resolve();
+    renderer.webgl = { properties: { get: () => ({}) } };
+    // A composed body: two skinned parts share the tinted skin material, the
+    // eyes wear their own, the hair another. Three groups, four carriers.
+    const target = new THREE.Group();
+    target.name = 'Group';
+    const skin = new THREE.MeshStandardMaterial();
+    const torso = new THREE.Mesh(new THREE.BufferGeometry(), skin);
+    const eyes = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+    const legs = new THREE.Mesh(new THREE.BufferGeometry(), skin);
+    const hair = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
+    target.add(torso, eyes, legs, hair);
+
+    await renderer.compileGate(target);
+
+    expect(submitted).toEqual([{ pieces: 3, label: 'live-gate:Group' }]);
+    // every carrier compiles, grouped: the shared-skin parts inside one piece
+    expect(compiled).toEqual([torso, legs, eyes, hair]);
   });
 
   it('never compiles a live gate at the ambient render target (colour-space cache-key trap)', () => {
@@ -190,9 +239,14 @@ describe('Renderer live shader compile rejection recovery', () => {
     const gateMethod = source.slice(gateStart, gateEnd);
     // Three keys a program on the bound target's output colour space, so a bare
     // compileAsync here links the canvas variant while composer tiers draw the
-    // linear one: route through the same variant pair the boot prewarm uses.
-    expect(gateMethod).toContain('this.compilePrewarmColorPrograms(target, false)');
-    expect(gateMethod).toContain('this.compileShadowPrograms(target)');
+    // linear one: route through the same variant pair the boot prewarm uses,
+    // per material-group piece of the target (compile_gate_pieces.ts), never
+    // the whole target in one queue unit.
+    expect(gateMethod).toContain('this.compilePrewarmColorPrograms(node, false)');
+    expect(gateMethod).toContain('this.compileShadowPrograms(node)');
+    expect(gateMethod).toContain('this.liveCompileGates.runPieces(');
+    expect(gateMethod).toContain('linkPieceWork(target, color, shadow),');
+    expect(gateMethod).not.toContain('this.liveCompileGates.run(');
     expect(gateMethod).toContain('this.uploadGateTexturesGated(target, priority)');
     // The tail carries the GATE's result: a timed-out or failed link proved
     // nothing, and readiness in the walk comes from a settle, never from a
@@ -321,9 +375,13 @@ describe('the compile gate touch tail, per program', () => {
     const queued: { label?: string; priority?: number }[] = [];
     renderer.sim = { player: { targetId: null } };
     // The queue resolves the gate RESULT, which is what tells the tail whether
-    // anything was proved linked.
+    // anything was proved linked. One piece per material (each mesh below
+    // wears its own), run serially here like the local fallback.
     renderer.liveCompileGates = {
-      run: (fn: () => Promise<unknown>) => fn().then(() => ({ failed: false, timedOut: false })),
+      runPieces: (pieces: Array<() => Promise<unknown>>) =>
+        pieces
+          .reduce<Promise<unknown>>((chain, piece) => chain.then(piece), Promise.resolve())
+          .then(() => ({ failed: false, timedOut: false })),
     };
     renderer.compilePrewarmColorPrograms = () => {
       order.push('color');
@@ -378,7 +436,17 @@ describe('the compile gate touch tail, per program', () => {
 
     await renderer.compileGate(renderer.touchTarget as THREE.Object3D);
 
-    expect(renderer.order).toEqual(['color', 'shadow', 'unit:1', 'unit:2', 'unit:3']);
+    expect(renderer.order).toEqual([
+      'color',
+      'shadow',
+      'color',
+      'shadow',
+      'color',
+      'shadow',
+      'unit:1',
+      'unit:2',
+      'unit:3',
+    ]);
     // A LIVE_VIEW gate's pieces ride at TAIL_PIECE, below every link submission.
     expect(renderer.queued).toEqual([
       { label: 'touch:program', priority: GPU_WORK_PRIORITY.TAIL_PIECE },

@@ -144,7 +144,11 @@ const MONOLITHS: MonolithRow[] = [
     // builds the body without its face decals and attaches them on the
     // pieces' arrival), which paid for its wiring by moving the mobile
     // opening render scale into dynamic_resolution_core.ts (net -1).
-    ceiling: 13482,
+    // Lowered again by the compile gate's piece cut (one queue unit per
+    // material group of the target, compile_gate_pieces.ts): the enumeration
+    // and the per-piece work live in that module, and the gate's rationale
+    // comment was rewritten to the design that ships (net -10).
+    ceiling: 13472,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

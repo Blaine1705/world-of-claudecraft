@@ -10,6 +10,7 @@
 
 import type { GpuWorkRunOptions } from './background_gpu_queue';
 import { recordGpuPrepEvent } from './gpu_prep_events';
+import { linkPieceLabel } from './link_piece_core';
 
 export interface CompileGateScheduler {
   setTimeout: (cb: () => void, ms: number) => number;
@@ -58,6 +59,31 @@ const defaultScheduler: CompileGateScheduler = {
  * decisions never read it back, which is what keeps this module deterministic
  * (its ageMs is the deadline that elapsed, not a clock reading).
  */
+function reportGateTimeout(timeoutMs: number, options: CompileGateOptions): void {
+  if (options.recordTimeoutEvent !== false) {
+    recordGpuPrepEvent({
+      kind: 'gate-timeout',
+      key: options.label ?? 'compile-gate',
+      ageMs: timeoutMs,
+    });
+  }
+  options.onTimeout?.();
+}
+
+/** A piece's settle, fail-soft like the whole gate's: a rejection or a
+ *  synchronous throw leaves no compile active, so it only marks the piece
+ *  failed. */
+function settleCompilePiece(piece: () => Promise<unknown>): Promise<boolean> {
+  try {
+    return piece().then(
+      () => false,
+      () => true,
+    );
+  } catch {
+    return Promise.resolve(true);
+  }
+}
+
 export function awaitCompileGate(
   compile: () => Promise<unknown>,
   timeoutMs: number,
@@ -70,14 +96,7 @@ export function awaitCompileGate(
     const guard = scheduler.setTimeout(() => {
       if (settled) return;
       timedOut = true;
-      if (options.recordTimeoutEvent !== false) {
-        recordGpuPrepEvent({
-          kind: 'gate-timeout',
-          key: options.label ?? 'compile-gate',
-          ageMs: timeoutMs,
-        });
-      }
-      options.onTimeout?.();
+      reportGateTimeout(timeoutMs, options);
     }, timeoutMs);
     const finish = (failed: boolean): void => {
       if (settled) return;
@@ -115,7 +134,70 @@ export class CompileGateQueue {
     timeoutMs: number,
     options: CompileGateOptions = {},
   ): Promise<CompileGateResult> {
-    const work = () => awaitCompileGate(compile, timeoutMs, options);
+    return this.submit(() => awaitCompileGate(compile, timeoutMs, options), options);
+  }
+
+  /**
+   * One gate cut into pieces (compile_gate_pieces.ts: one per material group
+   * of the root), each its own queue unit labelled `${label}:${index}`, so
+   * the queue paces the driver's per-program work between them and its
+   * released-tail cap bounds how many of the gate's links pile on the driver
+   * at once. The gate keeps ONE deadline: `timeoutMs` counted from the moment
+   * its first piece starts, over every piece, so the same constant that
+   * bounded the whole root still bounds the whole gate (a timeout records
+   * once, under the gate label). The result aggregates the pieces (any
+   * failure fails it, the shared deadline times it out) and resolves only
+   * when every piece settled, so readiness marking and the reveal happen
+   * exactly as for a whole-root gate. Serial on the local fallback.
+   */
+  runPieces(
+    pieces: Array<() => Promise<unknown>>,
+    timeoutMs: number,
+    options: CompileGateOptions = {},
+  ): Promise<CompileGateResult> {
+    if (pieces.length === 0) return Promise.resolve({ failed: false, timedOut: false });
+    const scheduler = options.scheduler ?? defaultScheduler;
+    let guard: number | null = null;
+    let settledPieces = 0;
+    let timedOut = false;
+    const armDeadline = (): void => {
+      if (guard !== null) return;
+      guard = scheduler.setTimeout(() => {
+        if (settledPieces === pieces.length) return;
+        timedOut = true;
+        reportGateTimeout(timeoutMs, options);
+      }, timeoutMs);
+    };
+    const disarmDeadline = (): void => {
+      if (guard !== null) scheduler.clearTimeout(guard);
+    };
+    const settled = pieces.map((piece, index) =>
+      this.submit(
+        () => {
+          armDeadline();
+          return settleCompilePiece(piece).then((failed) => {
+            settledPieces++;
+            return failed;
+          });
+        },
+        options.label === undefined
+          ? options
+          : { ...options, label: linkPieceLabel(options.label, index) },
+      ),
+    );
+    return Promise.all(settled).then(
+      (failures) => {
+        disarmDeadline();
+        return { failed: failures.some(Boolean), timedOut };
+      },
+      (error) => {
+        disarmDeadline();
+        throw error;
+      },
+    );
+  }
+
+  private submit<T>(work: () => Promise<T>, options: CompileGateOptions): Promise<T> {
     if (this.sharedQueue) {
       return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true });
     }

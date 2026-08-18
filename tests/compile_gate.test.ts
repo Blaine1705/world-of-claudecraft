@@ -298,6 +298,208 @@ describe('CompileGateQueue', () => {
   });
 });
 
+describe('CompileGateQueue.runPieces', () => {
+  // The gate cut into one queue unit per material group (compile_gate_pieces.ts):
+  // the aggregate result, the ONE deadline over every piece, the per-piece
+  // labels, and the serial local fallback.
+  const settledResult = { failed: false, timedOut: false };
+
+  function recordingSharedQueue() {
+    const units: Array<{ priority?: number; label?: string; releaseTail?: boolean }> = [];
+    const sharedQueue = {
+      run: <T>(
+        work: () => T | Promise<T>,
+        priority?: number,
+        label?: string,
+        options?: { releaseTail?: boolean },
+      ): Promise<T> => {
+        units.push({ priority, label, releaseTail: options?.releaseTail });
+        return Promise.resolve().then(work);
+      },
+    };
+    return { units, sharedQueue };
+  }
+
+  it('aggregates settled pieces into one settled gate, one labelled unit per piece, in order', async () => {
+    const { units, sharedQueue } = recordingSharedQueue();
+    const queue = new CompileGateQueue(sharedQueue);
+    const ran: number[] = [];
+    const piece = (index: number) => () => {
+      ran.push(index);
+      return Promise.resolve();
+    };
+    const gate = queue.runPieces([piece(0), piece(1), piece(2)], 1500, {
+      priority: 40,
+      label: 'live-gate:Group',
+    });
+    await expect(gate).resolves.toEqual(settledResult);
+    expect(ran).toEqual([0, 1, 2]);
+    // The kind stays the label head (the budget's per-kind estimate is
+    // unchanged); the piece index lands after the root name. Every piece
+    // rides the gate's priority and releases its tail like a whole gate.
+    expect(units).toEqual([
+      { priority: 40, label: 'live-gate:Group:0', releaseTail: true },
+      { priority: 40, label: 'live-gate:Group:1', releaseTail: true },
+      { priority: 40, label: 'live-gate:Group:2', releaseTail: true },
+    ]);
+  });
+
+  it('fails the gate when any piece rejects or throws, still settling every other piece', async () => {
+    const { sharedQueue } = recordingSharedQueue();
+    const queue = new CompileGateQueue(sharedQueue);
+    const others = vi.fn(() => Promise.resolve());
+    const rejected = queue.runPieces(
+      [others, () => Promise.reject(new Error('link failed')), others],
+      1500,
+    );
+    await expect(rejected).resolves.toEqual({ failed: true, timedOut: false });
+    expect(others).toHaveBeenCalledTimes(2);
+    const thrown = queue.runPieces(
+      [
+        () => {
+          throw new Error('extension unavailable');
+        },
+      ],
+      1500,
+    );
+    await expect(thrown).resolves.toEqual({ failed: true, timedOut: false });
+  });
+
+  it('keeps ONE deadline over every piece: armed once at the first start, cleared once all settle', async () => {
+    const scheduler = fakeScheduler();
+    const setTimeoutSpy = vi.spyOn(scheduler, 'setTimeout');
+    const { sharedQueue } = recordingSharedQueue();
+    const queue = new CompileGateQueue(sharedQueue);
+    const resolvers: Array<() => void> = [];
+    const pending = () => new Promise<void>((resolve) => resolvers.push(resolve));
+    const gate = queue.runPieces([pending, pending, pending], 1500, {
+      scheduler,
+      label: 'live-gate:Group',
+    });
+    for (let index = 0; index < 4; index++) await Promise.resolve();
+    expect(resolvers).toHaveLength(3);
+    // no fresh full timeout per piece: the constant bounds the whole gate
+    expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+    expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1500);
+    resolvers[0]();
+    resolvers[1]();
+    await Promise.resolve();
+    // the last piece is still linking when the deadline lands
+    scheduler.fire();
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.counts['gate-timeout']).toBe(1);
+    // recorded once, under the GATE label, with the deadline that elapsed
+    expect(snapshot.events[0]).toMatchObject({
+      kind: 'gate-timeout',
+      key: 'live-gate:Group',
+      ageMs: 1500,
+    });
+    // fail-soft, as for a whole gate: nothing is released early, the gate
+    // still resolves only on the last piece's real settle
+    let done = false;
+    void gate.then(() => {
+      done = true;
+    });
+    await Promise.resolve();
+    expect(done).toBe(false);
+    resolvers[2]();
+    await expect(gate).resolves.toEqual({ failed: false, timedOut: true });
+    expect(scheduler.cleared).toContain(scheduler.pendingId ?? -1);
+  });
+
+  it('records no timeout for a gate whose pieces all settle inside the deadline', async () => {
+    const scheduler = fakeScheduler();
+    const { sharedQueue } = recordingSharedQueue();
+    const queue = new CompileGateQueue(sharedQueue);
+    await queue.runPieces([() => Promise.resolve(), () => Promise.resolve()], 1500, {
+      scheduler,
+      label: 'fast',
+    });
+    expect(gpuPrepEventsSnapshot().total).toBe(0);
+    // firing the already-cleared guard is inert
+    scheduler.fire();
+    expect(gpuPrepEventsSnapshot().total).toBe(0);
+  });
+
+  it('a gate with no pieces (a root without a material carrier) settles at once', async () => {
+    const { units, sharedQueue } = recordingSharedQueue();
+    const queue = new CompileGateQueue(sharedQueue);
+    await expect(queue.runPieces([], 1500, { label: 'empty' })).resolves.toEqual(settledResult);
+    expect(units).toEqual([]);
+  });
+
+  it('runs the pieces strictly serially, in order, on the local fallback', async () => {
+    const queue = new CompileGateQueue();
+    let active = 0;
+    let maxActive = 0;
+    const order: string[] = [];
+    const resolvers: Array<() => void> = [];
+    const piece = (name: string) => () =>
+      new Promise<void>((resolve) => {
+        active += 1;
+        maxActive = Math.max(maxActive, active);
+        order.push(name);
+        resolvers.push(() => {
+          active -= 1;
+          resolve();
+        });
+      });
+    const gate = queue.runPieces([piece('a'), piece('b')], 1500);
+    const next = queue.run(piece('c'), 1500);
+    for (let index = 0; index < 4; index++) await Promise.resolve();
+    expect(order).toEqual(['a']);
+    resolvers.shift()?.();
+    for (let index = 0; index < 4; index++) await Promise.resolve();
+    expect(order).toEqual(['a', 'b']);
+    resolvers.shift()?.();
+    await expect(gate).resolves.toEqual(settledResult);
+    for (let index = 0; index < 4; index++) await Promise.resolve();
+    // a whole gate queued behind the pieces waits for the last of them
+    expect(order).toEqual(['a', 'b', 'c']);
+    resolvers.shift()?.();
+    await next;
+    expect(maxActive).toBe(1);
+  });
+
+  it('overlaps a gate pieces up to the real shared queue cap and holds the rest', async () => {
+    // Composition over the REAL queue: two pieces start their compile
+    // prologues while neither link has settled, the third waits on the
+    // released-tail cap. That cap, now per piece, is what bounds how many of
+    // one root's links pile on the driver at once.
+    const queue = new CompileGateQueue(createBackgroundGpuQueue());
+    const noopScheduler = { setTimeout: () => 0, clearTimeout: () => {} };
+    const started: number[] = [];
+    const piece = (index: number) => () => {
+      started.push(index);
+      return new Promise<void>(() => {});
+    };
+    void queue.runPieces([piece(0), piece(1), piece(2)], 1500, {
+      label: 'live-gate:Group',
+      scheduler: noopScheduler,
+    });
+    for (let index = 0; index < 12; index++) await Promise.resolve();
+    expect(started).toEqual([0, 1]);
+  });
+
+  it('propagates a queue rejection (shutdown) and disarms the deadline', async () => {
+    const scheduler = fakeScheduler();
+    const shutdown = new Error('queue shut down');
+    const sharedQueue = {
+      run: <T>(work: () => T | Promise<T>): Promise<T> =>
+        Promise.resolve()
+          .then(work)
+          .then(() => {
+            throw shutdown;
+          }),
+    };
+    const queue = new CompileGateQueue(sharedQueue);
+    await expect(
+      queue.runPieces([() => Promise.resolve()], 1500, { scheduler, label: 'gone' }),
+    ).rejects.toBe(shutdown);
+    expect(scheduler.cleared).toContain(scheduler.pendingId ?? -1);
+  });
+});
+
 describe('SerialGateLane', () => {
   // A promise chain settles over a few microtasks; a macrotask hop is the
   // robust "everything queued has run" boundary.

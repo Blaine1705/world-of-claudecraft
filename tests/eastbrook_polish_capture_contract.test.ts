@@ -206,8 +206,11 @@ interface AttributionTargetFixture {
 // Re-minted for the deferred-decal stand-in (the live candidate path builds
 // the body without its face decals): renderer.ts moved, the seals follow the
 // swept evidence bytes. No capture was retaken.
+// Re-minted for the compile gate's piece cut (one queue unit per material
+// group of the target): renderer.ts moved, the seals follow the swept evidence
+// bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '0cf5191a00abdc4230919c759dac29ad6e7c54fa5b6f2dcb7b4ddd69cb7befc4';
+  '021ebb0e2bf401f9a92ddbc7492927c320f27fdb376e4a2aa9636e630ad9f601';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

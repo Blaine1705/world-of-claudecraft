@@ -65,9 +65,12 @@ describe('reveal gate wiring (source pins)', () => {
       'const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;',
     );
     expect(host).toContain('label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`');
+    // The link is cut into one queue unit per material group of the root
+    // (compile_gate_pieces.ts), each running the colour arm then the shadow
+    // arm on that group's nodes, under the one gate deadline.
     const colourAt = anchor(
       host,
-      'deps.compileColor(target).then(() => deps.compileShadow(target))',
+      'deps.gate(linkPieceWork(target, deps.compileColor, deps.compileShadow), {',
     );
     // Uploads sit BETWEEN the link and the touch: the touch's driver round trip
     // flushes behind everything already queued, so an upload paid after it is

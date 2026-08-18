@@ -4,7 +4,11 @@
 // LIVE_VIEW so the driver links it ahead of the rest of the reveal lane, an
 // ordinary reveal stays at VISIBLE_PREWARM under the live entity gates, and in
 // both cases the link comes before the upload, which comes before the touch.
+// The link itself is cut into one gate piece per material group of the root
+// (compile_gate_pieces.ts), each running the colour arm then the shadow arm
+// on its own nodes, all under the one gate.
 
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import type { CompileGateResult } from '../src/render/compile_gate';
@@ -15,18 +19,33 @@ const SETTLED: CompileGateResult = { failed: false, timedOut: false };
 
 /** Records every arm the host drives, in order, with the priority it used. */
 function recordingDeps(predictRevealMs = 0, result: CompileGateResult = SETTLED) {
-  const calls: { arm: string; priority: number; label?: string; gate?: CompileGateResult }[] = [];
+  const calls: {
+    arm: string;
+    priority: number;
+    label?: string;
+    gate?: CompileGateResult;
+    node?: THREE.Object3D;
+    pieces?: number;
+  }[] = [];
   const deps = {
-    gate(work: () => Promise<unknown>, options: { priority: number; label: string }) {
-      calls.push({ arm: 'gate', priority: options.priority, label: options.label });
-      return work().then(() => result);
+    gate(pieces: Array<() => Promise<unknown>>, options: { priority: number; label: string }) {
+      calls.push({
+        arm: 'gate',
+        priority: options.priority,
+        label: options.label,
+        pieces: pieces.length,
+      });
+      // serial, like the local fallback: the pieces' arms land in order
+      return pieces
+        .reduce<Promise<unknown>>((chain, piece) => chain.then(piece), Promise.resolve())
+        .then(() => result);
     },
-    compileColor(_target: object) {
-      calls.push({ arm: 'color', priority: Number.NaN });
+    compileColor(node: THREE.Object3D) {
+      calls.push({ arm: 'color', priority: Number.NaN, node });
       return Promise.resolve();
     },
-    compileShadow(_target: object) {
-      calls.push({ arm: 'shadow', priority: Number.NaN });
+    compileShadow(node: THREE.Object3D) {
+      calls.push({ arm: 'shadow', priority: Number.NaN, node });
       return Promise.resolve();
     },
     upload(_target: object, priority: number) {
@@ -42,7 +61,14 @@ function recordingDeps(predictRevealMs = 0, result: CompileGateResult = SETTLED)
   return { calls, host: createRevealCompileHost(deps) };
 }
 
-const root = { name: 'eastbrookTownMicroOpaqueBatch', type: 'Mesh' };
+/** A one-material root: one piece, one colour arm, one shadow arm. */
+function oneMaterialRoot(name = 'eastbrookTownMicroOpaqueBatch'): THREE.Mesh {
+  const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
+  mesh.name = name;
+  return mesh;
+}
+
+const root = oneMaterialRoot();
 
 describe('reveal compile host priority', () => {
   it('submits an IMMINENT key at LIVE_VIEW, link, upload and touch alike', async () => {
@@ -89,6 +115,36 @@ describe('reveal compile host priority', () => {
     }
   });
 
+  it('cuts the link into one gate piece per material group, colour then shadow per node', async () => {
+    // A town kit root: two batches share one material, a third wears another,
+    // and the bare group carries none. Two pieces, every node compiled in
+    // place (the arms get the NODE, never the root), the shared-material
+    // batches inside the same piece.
+    const kit = new THREE.Group();
+    kit.name = 'eastbrookTownKit';
+    const shared = new THREE.MeshStandardMaterial();
+    const first = new THREE.Mesh(new THREE.BufferGeometry(), shared);
+    const second = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
+    const third = new THREE.Mesh(new THREE.BufferGeometry(), shared);
+    kit.add(first, second, third);
+    const { calls, host } = recordingDeps();
+    await host.compile(kit, false);
+    expect(calls[0]).toMatchObject({
+      arm: 'gate',
+      pieces: 2,
+      label: 'reveal-gate:eastbrookTownKit',
+    });
+    expect(calls.slice(1, 7).map((call) => `${call.arm}:${call.node?.uuid}`)).toEqual([
+      `color:${first.uuid}`,
+      `shadow:${first.uuid}`,
+      `color:${third.uuid}`,
+      `shadow:${third.uuid}`,
+      `color:${second.uuid}`,
+      `shadow:${second.uuid}`,
+    ]);
+    expect(calls.slice(7).map((call) => call.arm)).toEqual(['upload', 'touch']);
+  });
+
   it('hands the tail the gate own result, so a timed-out link proves nothing ready', async () => {
     // The tail's readiness comes from the settle and nothing else: on a gate
     // that timed out the driver is still linking, and marking there would let
@@ -109,7 +165,9 @@ describe('reveal compile host priority', () => {
     await host.compile(root, true);
     expect(calls[0].label).toBe(`${REVEAL_GATE_PREP_KIND}:${root.name}`);
     const { calls: unnamed, host: other } = recordingDeps();
-    await other.compile({ name: '', type: 'Group' }, false);
+    const group = new THREE.Group();
+    group.add(oneMaterialRoot(''));
+    await other.compile(group, false);
     expect(unnamed[0].label).toBe(`${REVEAL_GATE_PREP_KIND}:Group`);
   });
 });

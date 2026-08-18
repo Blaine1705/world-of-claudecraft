@@ -23,6 +23,7 @@
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import type { CompileGateResult } from './compile_gate';
+import { linkPieceWork } from './compile_gate_pieces';
 import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
 
 /** The gpu-prep label prefix, and therefore the budget's cost KIND, of every
@@ -31,10 +32,12 @@ import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
 export const REVEAL_GATE_PREP_KIND = 'reveal-gate';
 
 export interface RevealCompileHostDeps {
-  /** Run one root's link as a gated queue unit. Its result says whether the
-   *  link SETTLED, which is what the touch tail's readiness rests on. */
+  /** Run one root's link as a gate of queue units, one per material group
+   *  of the root (compile_gate_pieces.ts), under one deadline. Its result
+   *  says whether the whole link SETTLED, which is what the touch tail's
+   *  readiness rests on. */
   gate(
-    work: () => Promise<unknown>,
+    pieces: Array<() => Promise<unknown>>,
     options: { priority: number; label: string },
   ): Promise<CompileGateResult>;
   compileColor(target: THREE.Object3D): Promise<unknown>;
@@ -61,10 +64,10 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
     compile(root: object, imminent: boolean): Promise<unknown> {
       const target = root as THREE.Object3D;
       const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;
-      const linked = deps.gate(
-        () => deps.compileColor(target).then(() => deps.compileShadow(target)),
-        { priority, label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}` },
-      );
+      const linked = deps.gate(linkPieceWork(target, deps.compileColor, deps.compileShadow), {
+        priority,
+        label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`,
+      });
       return linked
         .then((gate) => deps.upload(target, priority).then(() => gate))
         .then((gate) => deps.touch(target, priority, gate));

@@ -437,7 +437,12 @@ GPU work signs. Each rule names its seam and its guard.
   `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),
   and, if it holds a representation back, names its stand-in in
-  `ENTITY_GATE_STAND_INS` plus a case in `tests/entity_gate_stand_in.test.ts`. No
+  `ENTITY_GATE_STAND_INS` plus a case in `tests/entity_gate_stand_in.test.ts`. A
+  compile gate submits one unit per material group of its root
+  (`CompileGateQueue.runPieces` over `linkPieceWork`, `compile_gate_pieces.ts`),
+  never a whole root in one unit: the queue paces between units, and a driver
+  that compiles shader source at submission charged every program of a root to
+  the one unit. No
   wall-clock constant calibrated on one machine inside a gate: the arrival lesson
   is that a hold ends on evidence (its own compile settling), on the
   `REVEAL_GATE_WATCHDOG_MS` watchdog, or on a reach floor, never on a tuned timer.

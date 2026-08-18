@@ -1320,7 +1320,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     const compileGate = renderer.slice(compileGateStart, compileGateEnd);
     expect(compileGateStart).toBeGreaterThan(-1);
     expect(compileGateEnd).toBeGreaterThan(compileGateStart);
-    expect(compileGate).toContain('this.liveCompileGates.run(');
+    // One gate, one queue unit per material group of the target: the split
+    // is compile_gate_pieces.ts, the deadline stays the one constant.
+    expect(compileGate).toContain('this.liveCompileGates.runPieces(');
+    expect(compileGate).toContain('linkPieceWork(target, color, shadow)');
     expect(compileGate).toContain('VIEW_COMPILE_GATE_MAX_MS');
     expect(compileGate).not.toContain('onTimeout');
     // The target-ancestry walk lives in compile_priority_core.ts (its own

@@ -786,10 +786,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the deferred-decal stand-in (the live candidate path builds
 // the body without its face decals): renderer.ts moved, the seals follow the
 // swept evidence bytes. No capture was retaken.
+// Re-minted for the compile gate's piece cut (one queue unit per material
+// group of the target): renderer.ts moved, the seals follow the swept evidence
+// bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '96c029ccf57c81d1f5676e46bdce1c15a7f4cdfa4caa9d743f77b37764c7805e';
+  '87fd495131bc63f24e21610e25d38bb4ffc1d55cd79102f2f085b3a88720bff8';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '0cf5191a00abdc4230919c759dac29ad6e7c54fa5b6f2dcb7b4ddd69cb7befc4';
+  '021ebb0e2bf401f9a92ddbc7492927c320f27fdb376e4a2aa9636e630ad9f601';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1808,10 +1811,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // composite first, then this seal. No capture was retaken.
     // Re-minted for the deferred-decal stand-in (renderer.ts): same order, the
     // composite first, then this seal. No capture was retaken.
+    // Re-minted for the compile gate's piece cut (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('2292879a6f7ca89bd3e11e20873a80aad652d1b0b56cfaaf5430a1d180f9f1fa');
+    ).toBe('18bc0578d452531130e3e5865e0beff4c6776f0c84a5c89ef19809f04467a1ca');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
