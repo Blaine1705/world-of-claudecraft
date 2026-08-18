@@ -12,17 +12,23 @@
 //
 // THE HEURISTICS, and they are deliberately two:
 //   A. The BUNDLE idiom, over the whole of src/render: a module-scope
-//      `let <name>: <Local>Materials | null = null`, whose type is a local
-//      interface rather than a `THREE.*` class. That is the shape all four
-//      share, and it separates a bundle of one visual's materials from the
-//      `THREE.Material | null` singletons the zone and minigame scenery keeps
-//      (mailbox, the Vale Cup kit, the Wildheart basin), which are built when
-//      their zone builds, not on a cast.
-//   B. ANY module-scope lazy material cache (a `| null` single, or a Map whose
-//      values are THREE materials) inside the ABILITY-VISUAL corpus:
-//      `*_visual.ts`, `*_fx.ts`, `*_vfx.ts`, `*_markers.ts`, and everything
-//      under `ability_vfx/`. B is the wider net: it catches a new spell visual
-//      that caches one material, or a Map keyed by school or colour.
+//      `let <name>: <Type> | null = null` (or `| undefined = undefined`,
+//      wrapped over as many lines as the formatter chose) whose type HOLDS a
+//      THREE material without BEING one. The type may be an inline object
+//      type, a Map, an array, or a local interface or alias declared in the
+//      same file, which is then resolved and read: keying on a `Materials`
+//      name suffix would have missed the first bundle called anything else.
+//      What it deliberately does not match is a type written as nothing but a
+//      THREE class (`let glow: THREE.Material | null = null`), the singleton
+//      idiom the zone and minigame scenery keeps (mailbox, the Vale Cup kit,
+//      the Wildheart basin), which is built when its zone builds, not on a
+//      cast.
+//   B. ANY module-scope lazy material cache (a `| null`/`| undefined` single,
+//      or a Map whose values are THREE materials) inside the ABILITY-VISUAL
+//      corpus: `*_visual.ts`, `*_fx.ts`, `*_vfx.ts`, `*_markers.ts`, and
+//      everything under `ability_vfx/`. B is the wider net inside the corpus:
+//      it catches a new spell visual that caches one bare THREE material, or a
+//      Map keyed by school or colour.
 //
 // A hit is registered in ABILITY_MATERIAL_SOURCES or listed in EXCLUDED below
 // with its reason, and the excluded ones stay visible here rather than being
@@ -43,6 +49,7 @@ import {
   abilityMaterialPrewarmMaterials,
   buildAbilityMaterialPrewarmGroup,
 } from '../src/render/ability_material_prewarm';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
@@ -55,6 +62,16 @@ const EXCLUDED: Record<string, string> = {
     'and colour and are reachable only inside the battleground scene, which builds on entry. ' +
     'src/render/CLAUDE.md: a program only ONE encounter can reach warms at that interior attach, ' +
     'never in the boot manifest.',
+  'cliff_scree.ts':
+    'World scenery, not a cast: bakeRocks() fills the cache while buildCliffScree assembles the ' +
+    'scatter the Renderer constructor adds straight to the scene (renderer.ts), so the boot scene ' +
+    'compile unit reaches the InstancedMeshes wearing it. A boot twin here would link a program ' +
+    'the scene already carries.',
+  'frost_ice_fields.ts':
+    'Zone scenery, not a cast: prepareFrostIceParts() fills the cache while buildFrostIceFields ' +
+    'assembles the Frostveil spire group, which frost_sky.ts adds to the zone scene, so the zone ' +
+    'prepare and the boot scene sweep reach every mesh wearing it. Same ruling as the mailbox and ' +
+    'the Vale Cup kit: built when its zone builds.',
 };
 
 /** Files whose module ABILITY_MATERIAL_SOURCES stages, by basename. */
@@ -65,12 +82,51 @@ const REGISTERED_MODULES = [
   'fireball_travel_visual.ts',
 ];
 
-const BUNDLE_CACHE = /^let\s+\w+:\s+(?!THREE\.)\w*Materials\s+\|\s+null\s+=\s+null;$/m;
-const SINGLE_CACHE = /^let\s+\w+:\s+[\w.]*Material\w*\s+\|\s+null\s+=\s+null;$/m;
+/** A module-scope lazy cache, however the formatter wrapped it. The type
+ *  capture refuses `;` and `=`, so a match can never run past its own
+ *  statement into a later declaration's `| null = null`. */
+const LAZY_CACHE =
+  /^let\s+\w+\s*:\s*([^;=]*?)\s*\|\s*(?:null|undefined)\s*=\s*(?:null|undefined);$/gm;
+/** A type written as NOTHING BUT a THREE class: the scenery singleton idiom,
+ *  out of heuristic A's scope by ruling (see the header). */
+const BARE_THREE_CLASS = /^THREE\.\w+(?:<[^>]*>)?$/;
+const THREE_MATERIAL = /THREE\.\w*Material\w*/;
+const SINGLE_CACHE =
+  /^let\s+\w+\s*:\s*[\w.]*Material\w*\s*\|\s*(?:null|undefined)\s*=\s*(?:null|undefined);$/m;
 const MATERIAL_MAP_CACHE = /^const\s+\w+\s*=\s*new Map<[^>]*THREE\.\w*Material[^>]*>\(\);$/m;
 
 const inAbilityCorpus = (file: string): boolean =>
   /(_visual|_fx|_vfx|_markers)\.ts$/.test(file) || file.startsWith('ability_vfx/');
+
+/** The body of an `interface X {...}` / `type X = {...}` declared in the same
+ *  file, so a cache typed by a local name is judged on what it really holds. */
+function localTypeBody(text: string, name: string): string | null {
+  const declaration = new RegExp(`(?:interface|type)\\s+${name}\\b[^{;=]*[={]([\\s\\S]*?)\\n\\}`);
+  return text.match(declaration)?.[1] ?? null;
+}
+
+/** Does this declared type HOLD a THREE material without BEING one? */
+function holdsMaterial(text: string, type: string): boolean {
+  // A wrapped union opens with its own leading pipe: `let kit:\n  | Kit\n  | null`.
+  const bare = type
+    .replace(/^\|\s*/, '')
+    .replace(/^readonly\s+/, '')
+    .replace(/\[\]$/, '')
+    .trim();
+  if (BARE_THREE_CLASS.test(bare)) return false;
+  // An inline object type, a Map, or an array of them says so in the type text.
+  if (THREE_MATERIAL.test(bare)) return true;
+  const local = /^[A-Z]\w*$/.test(bare) ? localTypeBody(text, bare) : null;
+  return local !== null && THREE_MATERIAL.test(local);
+}
+
+/** Every heuristic-A hit in one source, as the matched declarations. The
+ *  fixture cases below drive this SAME function the sweep does. */
+function lazyMaterialCaches(text: string): string[] {
+  return [...text.matchAll(LAZY_CACHE)]
+    .filter((match) => holdsMaterial(text, match[1]))
+    .map((match) => match[0]);
+}
 
 interface Hit {
   file: string;
@@ -81,7 +137,7 @@ function sweep(): Hit[] {
   const hits: Hit[] = [];
   for (const source of tsFilesUnder(RENDER_ROOT)) {
     const text = readFileSync(source.full, 'utf8');
-    if (BUNDLE_CACHE.test(text)) {
+    if (lazyMaterialCaches(text).length > 0) {
       hits.push({ file: source.file, idiom: 'bundle' });
       continue;
     }
@@ -107,25 +163,60 @@ describe('the lazy-material sweep', () => {
 
   it('matches the idioms it claims to, on fixtures', () => {
     // Positive controls for each pattern, so a zero below is never vacuous.
-    expect(BUNDLE_CACHE.test('let materials: FrostRootMaterials | null = null;')).toBe(true);
+    const bundle = 'interface FrostRootMaterials {\n  glow: THREE.MeshBasicMaterial;\n}\n';
+    expect(lazyMaterialCaches(`${bundle}let materials: FrostRootMaterials | null = null;`)).toEqual(
+      ['let materials: FrostRootMaterials | null = null;'],
+    );
+    // The four widenings this file's sweep grew, each with its own fixture: a
+    // type whose NAME says nothing about materials, `| undefined`, a
+    // declaration wrapped over several lines, and an inline object type.
+    const named = 'interface HourglassKit {\n  sand: THREE.ShaderMaterial;\n}\n';
+    expect(lazyMaterialCaches(`${named}let kit: HourglassKit | null = null;`)).toHaveLength(1);
+    expect(
+      lazyMaterialCaches(`${named}let kit: HourglassKit | undefined = undefined;`),
+    ).toHaveLength(1);
+    expect(lazyMaterialCaches(`${named}let kit:\n  | HourglassKit\n  | null = null;`)).toHaveLength(
+      1,
+    );
+    expect(
+      lazyMaterialCaches('let kit: { ring: THREE.MeshBasicMaterial } | null = null;'),
+    ).toHaveLength(1);
+    expect(
+      lazyMaterialCaches('let bySchool: Map<number, THREE.ShaderMaterial> | null = null;'),
+    ).toHaveLength(1);
     expect(SINGLE_CACHE.test('let glow: THREE.MeshBasicMaterial | null = null;')).toBe(true);
+    expect(SINGLE_CACHE.test('let glow: THREE.MeshBasicMaterial | undefined = undefined;')).toBe(
+      true,
+    );
     expect(
       MATERIAL_MAP_CACHE.test('const mats = new Map<number, THREE.MeshBasicMaterial>();'),
     ).toBe(true);
-    // The bundle pattern refuses the scenery singletons on purpose: they are
-    // built when their zone builds, not on a cast.
-    expect(BUNDLE_CACHE.test('let sharedGlowMaterial: THREE.Material | null = null;')).toBe(false);
+    // Heuristic A refuses the scenery singletons on purpose: they are built
+    // when their zone builds, not on a cast.
+    expect(lazyMaterialCaches('let sharedGlowMaterial: THREE.Material | null = null;')).toEqual([]);
+    // A lazy cache that holds no material at all is not this sweep's business.
+    expect(lazyMaterialCaches('let assetsPromise: Promise<void> | null = null;')).toEqual([]);
+    expect(lazyMaterialCaches('let gltf: GLTF | null = null;')).toEqual([]);
     // An eagerly built module constant is not a lazy cache.
     expect(SINGLE_CACHE.test('const GOLD = new THREE.MeshStandardMaterial();')).toBe(false);
+    expect(lazyMaterialCaches('const GOLD = new THREE.MeshStandardMaterial();')).toEqual([]);
+    // A declaration can never swallow the one after it: two statements, and
+    // the first is not a material cache.
+    expect(
+      lazyMaterialCaches(
+        `let draws: readonly Draw[] = [];\n${named}let kit: HourglassKit | null = null;`,
+      ),
+    ).toEqual(['let kit: HourglassKit | null = null;']);
   });
 
   it('finds every registered factory, and enough of them to be a real sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor: the four bundles plus the excluded battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(5);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(4);
+    // Vacuity floor, kept just under the real count: the four registered
+    // bundles, the two excluded scenery bakes, and the battleground caches.
+    expect(hits.length).toBeGreaterThanOrEqual(7);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(6);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {
@@ -194,7 +285,10 @@ describe('the staged group', () => {
 });
 
 describe('the manifest wiring (source pins)', () => {
-  const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+  // Comment-STRIPPED: a commented-out slot must not keep these pins green.
+  const renderer = codeWithoutLineComments(
+    readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+  );
 
   it('rides the ability-primitives entry, on both arms', () => {
     const start = renderer.indexOf("        id: 'vfx.ability-primitives',");

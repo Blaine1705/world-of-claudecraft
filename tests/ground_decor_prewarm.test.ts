@@ -18,7 +18,8 @@
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { foliageGrassInternalsForTest } from '../src/render/foliage';
 import {
   type GrassCapCollapseBand,
   grassCapCollapseBand,
@@ -32,11 +33,15 @@ import {
   groundDecorPrewarmKey,
   registerGroundDecorPrewarmDraw,
 } from '../src/render/ground_decor_prewarm';
-import { nightAccentGlowMaterial } from '../src/render/night_accents';
+import { buildNightAccents, nightAccentGlowMaterial } from '../src/render/night_accents';
 import { materialProgramSignature } from '../src/render/prewarm_policy';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
+/** Sources are read comment-STRIPPED: every pin below names a line of code that
+ *  is explained in prose right beside itself, so a raw read would stay green
+ *  over a commented-out registration. */
 const sourceOf = (path: string): string =>
-  readFileSync(new URL(`../src/render/${path}`, import.meta.url), 'utf8');
+  codeWithoutLineComments(readFileSync(new URL(`../src/render/${path}`, import.meta.url), 'utf8'));
 
 /**
  * Every blade-carpet radius the tier table can hand `grassCapCollapseBand`,
@@ -87,6 +92,67 @@ function cardGeometry(withCapAttribute: boolean): THREE.BufferGeometry {
 
 beforeEach(() => {
   clearGroundDecorPrewarmDraws();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+/** The procedural grass/firefly sheets are drawn on a 2D canvas, which a plain
+ *  Node run has none of (same stub shape as tests/ability_vfx_prewarm.test.ts).
+ *  `getContext` answers only for '2d': gfx.ts probes for a WebGL context and
+ *  must keep getting none. */
+function installCanvasStub(): void {
+  const noop = (): void => {};
+  const gradient = { addColorStop: noop };
+  const named: Record<string, unknown> = {
+    createLinearGradient: () => gradient,
+    createRadialGradient: () => gradient,
+    createPattern: () => null,
+    createImageData: (w: number, h: number) => ({ data: new Uint8ClampedArray(w * h * 4) }),
+    getImageData: (_x: number, _y: number, w: number, h: number) => ({
+      data: new Uint8ClampedArray(w * h * 4),
+    }),
+    measureText: () => ({ width: 0 }),
+  };
+  const context = new Proxy({} as Record<string | symbol, unknown>, {
+    get: (state, prop) => named[prop as string] ?? (prop in state ? state[prop] : noop),
+  });
+  vi.stubGlobal('document', {
+    createElement: () => ({
+      width: 0,
+      height: 0,
+      getContext: (kind: string) => (kind === '2d' ? context : null),
+    }),
+  });
+}
+
+describe('the real pools publish themselves (the twins=0 floor)', () => {
+  // Every other case here registers its own draws, so all of them would still
+  // pass over a manifest the LIVE builders never fill: a boot with zero twins
+  // is exactly the defect this module exists to prevent. This one runs the
+  // real ring build and the real night-accent build and reads the registry
+  // back.
+  it('registers the grass card and the night-accent glow at build time', () => {
+    installCanvasStub();
+    buildNightAccents(7);
+    let frameMs = 0;
+    foliageGrassInternalsForTest.buildGrassRing(new THREE.Group(), 42, () => (frameMs += 1));
+
+    const draws = groundDecorPrewarmDraws();
+    expect(draws.length).toBeGreaterThanOrEqual(2);
+    const signatures = draws.map((draw) => materialProgramSignature(draw.material));
+    // The grass card's key is composed through grassCardProgramCacheKey, so a
+    // cap arm is the proof the LIVE material (not a lookalike) was published.
+    expect(signatures.filter((signature) => signature.includes('cap:')).length).toBeGreaterThan(0);
+    expect(
+      signatures.filter((signature) => signature.startsWith('MeshBasicMaterial|')).length,
+    ).toBeGreaterThan(0);
+    // Every published draw becomes a twin: a registry that fills but builds
+    // nothing warms nothing.
+    expect(buildGroundDecorPrewarmTwins()).toHaveLength(draws.length);
+    for (const draw of draws) expect(draw.instanceColor).toBe(true);
+  });
 });
 
 describe('the grass-card cap arms', () => {
@@ -231,6 +297,14 @@ describe('the prewarm manifest wiring (source pins)', () => {
     // Both arms of the entry mint the group: the entry run AND the resume
     // units a deadline drop falls back to.
     expect(entry.match(/buildFoliageMaterialPrewarmGroup\(\)/g)?.length).toBe(2);
-    expect(renderer).not.toContain("id: 'ground-decor");
+    // The twins ride that entry and never mint a lane of their own. A bare
+    // `not.toContain` over a needle nothing ever writes is vacuous, so the
+    // needle is proven against a manifest id that IS there, and the scan is
+    // proven to be over a source full of manifest ids.
+    const laneId = "id: 'ground-decor";
+    expect(`        ${laneId}.twins',`).toContain(laneId);
+    expect(renderer.match(/^\s+id: '[\w.:-]+',$/gm)?.length ?? 0).toBeGreaterThan(10);
+    expect(renderer.match(/id: 'foliage\.materials',/g)).toHaveLength(1);
+    expect(renderer).not.toContain(laneId);
   });
 });

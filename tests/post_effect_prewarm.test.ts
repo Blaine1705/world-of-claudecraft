@@ -14,7 +14,7 @@
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   buildPostEffectPrewarmRoot,
   createPostEffectPrewarmLane,
@@ -24,6 +24,29 @@ import {
   postEffectPassMaterials,
   postEffectScreenMaterials,
 } from '../src/render/post_effect_prewarm';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
+
+// The REAL chain below is built through post.ts, whose pass set is decided by
+// the graphics tier; the tier is pinned here so the case is about the
+// enumeration and not about whatever tier a Node run guesses (same stub shape
+// as tests/post_pipeline.test.ts).
+const gfxSettings = vi.hoisted(() => ({
+  ao: true,
+  aoFullRes: true,
+  bloom: true,
+  composer: true,
+  msaaSamples: 0,
+  smaa: true,
+}));
+
+vi.mock('../src/render/gfx', () => ({
+  GFX: gfxSettings,
+  sharedUniforms: { uTime: { value: 0 } },
+}));
+
+vi.mock('../src/render/render_dev_flags', () => ({
+  renderLayerDisabled: () => false,
+}));
 
 const mat = (name: string): THREE.Material => {
   const material = new THREE.ShaderMaterial();
@@ -207,8 +230,91 @@ describe('the prewarm lane', () => {
   });
 });
 
+describe('the REAL composer chain', () => {
+  // Every case above drives hand-built pass shapes, so all of them would stay
+  // green if a live pass moved its material one level deeper or behind a
+  // prototype getter and the enumeration collapsed to nothing. This builds the
+  // chain post.ts really ships and counts what comes back.
+  function rendererStub(): THREE.WebGLRenderer {
+    return {
+      capabilities: { isWebGL2: true },
+      getDrawingBufferSize: (out: THREE.Vector2) => out.set(1280, 720),
+      getPixelRatio: () => 1,
+    } as unknown as THREE.WebGLRenderer;
+  }
+
+  async function livePipeline(): Promise<PostEffectComposerLike> {
+    // SMAAPass builds its lookup textures from Image objects.
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    return buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    ) as unknown as PostEffectComposerLike;
+  }
+
+  beforeEach(() => {
+    gfxSettings.ao = true;
+    gfxSettings.aoFullRes = true;
+    gfxSettings.bloom = true;
+    gfxSettings.smaa = true;
+    gfxSettings.msaaSamples = 0;
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('enumerates every full-screen program the live chain draws', async () => {
+    const post = await livePipeline();
+    const chain = postEffectChainMaterials(post);
+    // The measured defect was sixteen never-compiled full-screen programs. The
+    // pinned chain (N8AO, bloom, grade, screen fx, SMAA) enumerates 17 today,
+    // so the floor sits just under it: a floor of a handful would let the
+    // collapse of a whole pass hide.
+    expect(chain.length).toBeGreaterThanOrEqual(14);
+    expect(new Set(chain).size).toBe(chain.length);
+    for (const material of chain) expect(material.isMaterial).toBe(true);
+    // Every pass in this chain owns quad materials (the scene pass is N8AO,
+    // which draws its own): a pass the walk finds nothing on is a pass whose
+    // programs would link in the settle frame.
+    const silent = post.composer.passes
+      .filter((pass) => postEffectPassMaterials(pass).length === 0)
+      .map((pass) => pass.constructor.name);
+    expect(silent).toEqual([]);
+    expect(post.composer.passes.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('takes the live tail pass for the screen variant', async () => {
+    const post = await livePipeline();
+    const screen = postEffectScreenMaterials(post);
+    const chain = postEffectChainMaterials(post);
+    expect(screen.length).toBeGreaterThan(0);
+    for (const material of screen) expect(chain).toContain(material);
+    expect(postEffectPassMaterials(post.composer.passes.at(-1) as PostEffectPassLike)).toEqual(
+      screen,
+    );
+  });
+
+  it('warms a real program count, not just zero, through the lane', async () => {
+    const post = await livePipeline();
+    const { lane, calls, drawn } = fakeHost(post);
+    await lane.run();
+    expect(calls).toHaveLength(2);
+    expect(drawn(calls[0]).length).toBeGreaterThanOrEqual(14);
+    expect(lane.detail()).not.toBe('programs=0');
+  });
+});
+
 describe('the manifest entry (source pins)', () => {
-  const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+  // Comment-STRIPPED: the manifest entry is annotated line by line, so a raw
+  // read would let a commented-out lane keep every pin below green.
+  const renderer = codeWithoutLineComments(
+    readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+  );
 
   it('runs BEFORE world.initial-frame, which is what draws the chain', () => {
     const entry = renderer.indexOf("id: 'post.effect-programs',");

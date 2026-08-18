@@ -11,6 +11,7 @@ import {
   runBlockingArrivalWarmup,
   settleWorldEntryCover,
 } from '../src/game/arrival_warmup';
+import { WORLD_ENTRY_GPU_SETTLE_COVER_MS } from '../src/game/ui_effects_profile';
 import { arrivalCoverActive, resetArrivalCoverForTest } from '../src/render/arrival_cover';
 
 interface Rig {
@@ -219,14 +220,17 @@ describe('runBlockingArrivalWarmup', () => {
 describe('settleWorldEntryCover', () => {
   afterEach(() => resetArrivalCoverForTest());
 
-  function entryRig(online: boolean) {
+  function entryRig(
+    online: boolean,
+    tier: { adaptiveBudget?: boolean; constrainedMemory?: boolean } = {},
+  ) {
     const calls: string[] = [];
     const waited: number[] = [];
     let settleMs = -1;
     let flush: (() => void) | null = null;
     settleWorldEntryCover({
-      adaptiveBudget: true,
-      constrainedMemory: false,
+      adaptiveBudget: tier.adaptiveBudget ?? true,
+      constrainedMemory: tier.constrainedMemory ?? false,
       online,
       revealWorld: () => calls.push('revealWorld'),
       afterActiveAnimationMs: (ms, callback) => {
@@ -261,6 +265,28 @@ describe('settleWorldEntryCover', () => {
     await Promise.resolve();
     expect(r.calls).toEqual(['cover:on', 'awaitReveals', 'revealWorld', 'cover:off']);
     expect(r.waited).toEqual([0]);
+  });
+
+  it('passes the settle the graphics tier asks for, not a constant', async () => {
+    // The cover exists to hide the GPU settling behind a still frame, and only
+    // a host that adapts its budget and is not memory-constrained gets one.
+    // Without a case per input, the offline case above passes on any positive
+    // number and this whole dimension is untested.
+    expect(entryRig(false, { adaptiveBudget: true, constrainedMemory: false }).settleMs()).toBe(
+      WORLD_ENTRY_GPU_SETTLE_COVER_MS,
+    );
+    expect(WORLD_ENTRY_GPU_SETTLE_COVER_MS).toBeGreaterThan(0);
+    // A fixed budget has nothing to settle into, and a constrained device pays
+    // the wait without the benefit: both go straight through.
+    expect(entryRig(false, { adaptiveBudget: false, constrainedMemory: false }).settleMs()).toBe(0);
+    expect(entryRig(false, { adaptiveBudget: true, constrainedMemory: true }).settleMs()).toBe(0);
+    expect(entryRig(false, { adaptiveBudget: false, constrainedMemory: true }).settleMs()).toBe(0);
+    // Online outranks the tier on every arm: a live character never waits.
+    for (const adaptiveBudget of [true, false]) {
+      for (const constrainedMemory of [true, false]) {
+        expect(entryRig(true, { adaptiveBudget, constrainedMemory }).settleMs()).toBe(0);
+      }
+    }
   });
 
   it('drops the cover even when revealWorld throws, and reports the throw', async () => {

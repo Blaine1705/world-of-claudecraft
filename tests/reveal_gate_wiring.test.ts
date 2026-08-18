@@ -26,6 +26,29 @@ function anchor(source: string, needle: string): number {
   return index;
 }
 
+/** Every clock a reveal path could reach for. `gpuPrepNow` is the repo's own
+ *  wrapper; the two raw globals are what a hand-rolled bound would use. */
+const CLOCK_TOKENS = ['gpuPrepNow', 'performance.now()', 'Date.now()'] as const;
+
+/**
+ * No clock anywhere in a reveal path: the cores hold none and there is no
+ * bound left for one to feed.
+ *
+ * A never-present token is a vacuous assertion on its own (a typo'd needle, or
+ * a `read()` that silently returned nothing, passes it), so the same needles
+ * are proven against a POSITIVE CONTROL first: gpu_prep_events.ts is the
+ * sibling that legitimately carries all three (it IS the clock), and it is read
+ * through the same `read`.
+ */
+function expectNoClock(source: string, label: string): void {
+  const control = read('../src/render/gpu_prep_events.ts');
+  expect(source.length, `${label} read back empty`).toBeGreaterThan(1_000);
+  for (const token of CLOCK_TOKENS) {
+    expect(control, `${token} is no longer a live token anywhere`).toContain(token);
+    expect(source, `${label} reaches for ${token}`).not.toContain(token);
+  }
+}
+
 describe('reveal gate wiring (source pins)', () => {
   const rendererSource = read('../src/render/renderer.ts');
 
@@ -132,9 +155,7 @@ describe('reveal gate wiring (source pins)', () => {
       'updatePropCullables(cullables, camX, camZ, fogFar, fogFarSq, bandRevealGate, cullPass);',
     );
     expect(propsSource).toContain('const cullPass = newPropCullPass();');
-    // No clock anywhere in the reveal path: the cores hold none and there is
-    // no bound left for one to feed.
-    expect(propsSource).not.toContain('gpuPrepNow');
+    expectNoClock(propsSource, 'props.ts');
     expect(propsSource).toContain('setBandRevealGate(gate: RevealGateCore | null): void {');
     // The reveal key IS the map key: if these diverge, revealRoots returns
     // [] for every consult and the gate degrades to an immediate reveal that
@@ -244,9 +265,7 @@ describe('reveal gate wiring (source pins)', () => {
       expect(source).toContain('orderedRevealRoots,');
       const camAt = anchor(source, 'lastCamX = camX;');
       expect(camAt).toBeLessThan(policyAt);
-      // No clock anywhere in the reveal path: the cores hold none and there is
-      // no bound left for one to feed.
-      expect(source).not.toContain('gpuPrepNow');
+      expectNoClock(source, path);
       const anchorsAt = anchor(source, 'const rootX: number[] = staticCullTargets.map(');
       expect(anchorsAt).toBeGreaterThan(
         anchor(source, 'const staticRevealRoots: THREE.Object3D[] ='),

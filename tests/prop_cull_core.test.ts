@@ -325,6 +325,32 @@ describe('prop cull frame pass ordering', () => {
     expect(requested).toEqual(['cull:walk-a', 'cull:walk-b', 'cull:arrival']);
   });
 
+  it('reveals an imminent band through the list pass once its compile settles', () => {
+    // The list pass is what production runs; every other case above that
+    // reaches `visible === true` goes through the single-band entry, so a pass
+    // that consulted correctly and then never applied the reveal would keep
+    // them all green while the arrival stayed invisible.
+    const requested: string[] = [];
+    const gate = createRevealGateCore((key) => requested.push(key));
+    const bands = arrivalBands();
+    const pass = newPropCullPass();
+    updatePropCullables(bands, 0, 0, 400, 400 * 400, gate, pass);
+    expect(requested).toEqual(['cull:near', 'cull:mid', 'cull:far']);
+    for (const band of bands) expect(band.obj.visible).toBe(false);
+
+    // One settle at a time: only the settled band turns visible.
+    gate.settle('cull:mid');
+    updatePropCullables(bands, 0, 0, 400, 400 * 400, gate, pass);
+    expect(bands.map((band) => band.obj.visible)).toEqual([false, true, false]);
+    expect(bands[1].revealed).toBe(true);
+
+    for (const key of ['cull:near', 'cull:far']) gate.settle(key);
+    updatePropCullables(bands, 0, 0, 400, 400 * 400, gate, pass);
+    for (const band of bands) expect(band.obj.visible).toBe(true);
+    // No second consult for a band that already revealed.
+    expect(requested).toEqual(['cull:near', 'cull:mid', 'cull:far']);
+  });
+
   it('reuses one caller-owned scratch across frames', () => {
     const gate = createRevealGateCore(() => undefined);
     const bands = arrivalBands();

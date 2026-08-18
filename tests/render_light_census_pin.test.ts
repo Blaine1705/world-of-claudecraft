@@ -30,6 +30,13 @@ import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_a
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const RENDER_ROOT = fileURLToPath(new URL('../src/render', import.meta.url));
+/** The other two trees that can reach the world scene graph. Neither owns a
+ *  light today; the scan is here so the first one fails loudly instead of
+ *  landing in a tree this census never looked at. */
+const OUTSIDE_ROOTS: readonly { label: string; root: string; files: number }[] = [
+  { label: 'src/game', root: fileURLToPath(new URL('../src/game', import.meta.url)), files: 100 },
+  { label: 'src/ui', root: fileURLToPath(new URL('../src/ui', import.meta.url)), files: 500 },
+];
 
 /** The census-keyed light classes. `new THREE.X(` and the bare `new X(` a named
  *  import would produce are both matched: banning one spelling bans one
@@ -41,15 +48,30 @@ const CENSUS_LIGHTS = [
   'RectAreaLight',
 ] as const;
 type CensusLight = (typeof CENSUS_LIGHTS)[number];
+/** What a file can do to the census: construct one of the four classes, or
+ *  CLONE a light, which `Object3D.clone()` copies class and all. */
+type CensusProducer = CensusLight | 'clone';
 
 const CENSUS_LIGHT_PATTERN = new RegExp(
   `new\\s+(?:THREE\\.)?(${CENSUS_LIGHTS.join('|')})\\s*\\(`,
   'g',
 );
 
+/**
+ * A clone is the spelling `new` misses entirely: `sunLight.clone()` hands back
+ * a second DirectionalLight, and adding it relinks every lit material exactly
+ * as a `new` would. Matched on the receiver's NAME, since a source scan has no
+ * types: any identifier ending in `Light`, plus the world rig's two fields by
+ * their literal names. `this.sun` and `this.hemi` are spelled out rather than a
+ * bare `sun`, because src/render's `sun` locals are Vector3 directions
+ * (sky.ts, gfx.ts) that clone all the time and a name-only rule cannot tell
+ * those apart.
+ */
+const LIGHT_CLONE_PATTERN = /(?:\w*Light|this\.sun|this\.hemi)\s*\.clone\s*\(/g;
+
 interface CensusEntry {
-  /** The classes this file is allowed to construct. */
-  readonly kinds: readonly CensusLight[];
+  /** The classes this file is allowed to construct (`clone` for a light copy). */
+  readonly kinds: readonly CensusProducer[];
   /** One line: why a light here cannot relink the world scene after boot. */
   readonly reason: string;
 }
@@ -90,15 +112,17 @@ const ALLOWED: Readonly<Record<string, CensusEntry>> = {
   },
 };
 
-function censusHits(source: string): CensusLight[] {
-  const kinds = new Set<CensusLight>();
+function censusHits(source: string): CensusProducer[] {
+  const kinds = new Set<CensusProducer>();
   for (const match of source.matchAll(CENSUS_LIGHT_PATTERN)) kinds.add(match[1] as CensusLight);
+  if (LIGHT_CLONE_PATTERN.test(source)) kinds.add('clone');
+  LIGHT_CLONE_PATTERN.lastIndex = 0;
   return [...kinds].sort();
 }
 
-function scanRenderTree(): { files: number; hits: Map<string, CensusLight[]> } {
-  const files = tsFilesUnder(RENDER_ROOT);
-  const hits = new Map<string, CensusLight[]>();
+function scanTree(root: string): { files: number; hits: Map<string, CensusProducer[]> } {
+  const files = tsFilesUnder(root);
+  const hits = new Map<string, CensusProducer[]>();
   for (const { file, full } of files) {
     // Full-line comments are stripped first: the relink hazard is explained in
     // prose right beside the code all over this tree (point_light_budget.ts,
@@ -110,7 +134,24 @@ function scanRenderTree(): { files: number; hits: Map<string, CensusLight[]> } {
   return { files: files.length, hits };
 }
 
+const scanRenderTree = (): { files: number; hits: Map<string, CensusProducer[]> } =>
+  scanTree(RENDER_ROOT);
+
 describe('the src/render light census', () => {
+  it('knows exactly these files, and no more', () => {
+    // The allowlist IS the ruling, so its shape is pinned rather than left to
+    // whatever a future row adds: a new row is a decision someone made on
+    // purpose, and it fails here first.
+    expect(Object.keys(ALLOWED).sort()).toEqual([
+      'armory_preview.ts',
+      'characters/portrait.ts',
+      'characters/preview.ts',
+      'foliage_impostor.ts',
+      'renderer.ts',
+      'wildheart_props.ts',
+    ]);
+  });
+
   it('scans the whole tree through the shared walker, and the corpus is not empty', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
     const { files, hits } = scanRenderTree();
@@ -165,6 +206,21 @@ describe('the src/render light census', () => {
     expect(ALLOWED['wildheart_props.ts'].reason).toContain('backlog');
   });
 
+  it('constructs no census-keyed light outside src/render at all', () => {
+    // The HUD, the input layer and the game-loop glue own no scene lights: a
+    // light minted there would relink the world census from a tree this pin
+    // never used to look at. The zero is not vacuous, because the matcher is
+    // proven on fixtures below and each tree carries a file-count floor.
+    for (const { label, root, files } of OUTSIDE_ROOTS) {
+      const scan = scanTree(root);
+      expect(scan.files, `${label} walk narrowed`).toBeGreaterThan(files);
+      expect(
+        [...scan.hits.keys()].sort(),
+        `${label} constructs or clones a census-keyed light. Each of those counts is a three program-cache-key input, so it relinks every lit material in view. Give it a prewarm home or a gate (src/render/CLAUDE.md) and dispatch render-performance-reviewer; do NOT allowlist it silently.`,
+      ).toEqual([]);
+    }
+  });
+
   it('detects every spelling a producer could use (positive control)', () => {
     const namespaced = 'const sun = new THREE.DirectionalLight(0xffffff, 1);';
     const namedImport = 'const hemi = new HemisphereLight(0xffffff, 0x444444, 1);';
@@ -178,6 +234,16 @@ describe('the src/render light census', () => {
     ]);
     // A point light is out of scope here: it has a pad budget of its own.
     expect(censusHits('const p = new THREE.PointLight(0xffffff, 5, 10, 2);')).toEqual([]);
+    // A CLONE is a producer too, whatever the receiver is called.
+    expect(censusHits('const extra = sunLight.clone();')).toEqual(['clone']);
+    expect(censusHits('const extra = this.sun.clone( true );')).toEqual(['clone']);
+    expect(censusHits('rig.add(this.hemi.clone());')).toEqual(['clone']);
+    // ... but a direction vector called `sun` is not a light, and src/render
+    // clones those constantly.
+    expect(censusHits('const dir = sunDir.clone().normalize();')).toEqual([]);
+    expect(censusHits('const c = material.color.clone();')).toEqual([]);
+    // Both spellings at once come back as both producers, sorted.
+    expect(censusHits('new THREE.SpotLight(1); keyLight.clone();')).toEqual(['SpotLight', 'clone']);
     // ... and prose about the hazard is not a producer.
     expect(censusHits(codeWithoutLineComments('// never new THREE.DirectionalLight here'))).toEqual(
       [],

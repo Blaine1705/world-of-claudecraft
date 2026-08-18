@@ -365,7 +365,10 @@ describe('reveal gate soft deadline', () => {
 
   it('derives the deadline from the learned per-root cost, clamped to its bounds', () => {
     // Below the floor a slow frame alone would fire it; above the watchdog it
-    // would say nothing the watchdog does not already say.
+    // would say nothing the watchdog does not already say. The floor is pinned
+    // to its literal, so the clamp cases below cannot be self-comparisons that
+    // stay green whatever it is moved to.
+    expect(REVEAL_SOFT_DEADLINE_MIN_MS).toBe(1_000);
     expect(revealSoftDeadlineMs(50, 40)).toBe(2000);
     expect(revealSoftDeadlineMs(1, 1)).toBe(REVEAL_SOFT_DEADLINE_MIN_MS);
     expect(revealSoftDeadlineMs(1000, 40)).toBe(REVEAL_GATE_WATCHDOG_MS);

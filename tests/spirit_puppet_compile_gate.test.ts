@@ -18,8 +18,10 @@ vi.mock('../src/render/assets/loader', () => ({
 }));
 
 // warmForClass resolves its models from the authored spec table; the shaman's
-// Ghost Wolf is the stable single-model case.
+// Ghost Wolf is the stable single-model case. BEAR is the second entry of
+// SPIRIT_URLS, used where the queue needs more than one puppet in it.
 const WOLF = 'wolf';
+const BEAR = 'bear';
 
 /**
  * A resolved GLB carrying a real rig: the puppet material is SKINNED (the
@@ -354,6 +356,44 @@ describe('every material the puppet can draw goes through the gate', () => {
     expect(puppet.compiled).toBe(true);
     expect(pool.spawn({ ...SPAWN })).toBe(true);
     expect(pool.activeCount()).toBe(1);
+  });
+
+  it('warms a refused NON-tail puppet first, ahead of the rest of the queue', async () => {
+    // The queue is drained from the tail, so a refused cast on the puppet that
+    // is NOT at the tail only reaches the gate on the next pump if warmNext
+    // really moved it. With two puppets queued, a pump that gates the OTHER one
+    // is the whole defect: the cast that was just refused would stay refused
+    // for as many casts as there are puppets ahead of it.
+    const { pool, probe } = makePool();
+    const roots: THREE.Object3D[] = [];
+    pool.setCompileGate((root) => {
+      roots.push(root);
+      return new Promise(() => {});
+    });
+    // A spawn of an unloaded model warms it; two of them queue two puppets in
+    // load order, so the wolf is the non-tail one.
+    expect(pool.spawn({ ...SPAWN, model: WOLF })).toBe(false);
+    expect(pool.spawn({ ...SPAWN, model: BEAR })).toBe(false);
+    await vi.waitFor(() => expect(probe.puppets.size).toBe(2));
+    const wolf = probe.puppets.get(WOLF);
+    const bear = probe.puppets.get(BEAR);
+    expect(wolf).toBeDefined();
+    expect(bear).toBeDefined();
+    if (!wolf || !bear) return;
+
+    // The refused cast: still no spirit on stage, and nothing gated yet.
+    expect(pool.spawn({ ...SPAWN, model: WOLF })).toBe(false);
+    expect(pool.activeCount()).toBe(0);
+    expect(roots).toHaveLength(0);
+
+    pool.update(1 / 60);
+    expect(roots).toEqual([wolf.root]);
+    expect(wolf.root.parent).toBe(probe.compileGroup);
+    // One puppet at a time: the bear is still queued, untouched and unwarmed.
+    expect(bear.root.parent).not.toBe(probe.compileGroup);
+    expect(bear.compiled).toBe(false);
+    expect(probe.compileGroup.children).toHaveLength(1);
+    expect(probe.compileGroup.visible).toBe(false);
   });
 
   it('requeues an in-use puppet instead of dropping it off the warm-up queue', async () => {
