@@ -7187,6 +7187,7 @@ export const ko_KR: EnTranslations = {
       "shopMarksRequired": "{name}을(를) 구매하려면 탐굴 증표 {marks}개가 필요합니다.",
       "shopSealPremiumOnly": "이 봉인은 대가의 손에만 응합니다. 최상급 베팅만이 열 수 있습니다.",
       "passageSealed": "통로가 봉인되어 있습니다.",
+      "enemiesRemain": "남은 적을 먼저 처치하세요.",
       "moveCloserPassage": "통로에 더 가까이 다가가세요.",
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
       "moveCloserReliquary": "성물함에 더 가까이 다가가세요.",

@@ -10768,6 +10768,7 @@ export type TranslationKeyFlat =
   | 'sim.delve.duringArena'
   | 'sim.delve.duringDuel'
   | 'sim.delve.eggSacBurst'
+  | 'sim.delve.enemiesRemain'
   | 'sim.delve.graveFalters'
   | 'sim.delve.graveSilent'
   | 'sim.delve.instancesBusy'

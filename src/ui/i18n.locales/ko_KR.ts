@@ -7360,6 +7360,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.moveCloserStairs': '계단에 더 가까이 다가가세요.',
   'sim.delve.notInDelve': '탐굴 중이 아닙니다.',
   'sim.delve.nothingHappens': '아무 일도 일어나지 않습니다.',
+  'sim.delve.enemiesRemain': '남은 적을 먼저 처치하세요.',
   'sim.delve.passageSealed': '통로가 봉인되어 있습니다.',
   'sim.delve.raiseDead': '{name}이(가) 죽음의 부활을 시전하기 시작합니다.',
   'sim.delve.runFailed': '{name} 진행에 실패했습니다.',

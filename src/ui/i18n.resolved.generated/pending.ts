@@ -24,7 +24,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "es_ES": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -41,7 +42,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "fr_FR": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -58,7 +60,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "fr_CA": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -75,7 +78,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "en_CA": [],
   "it_IT": [
@@ -93,7 +97,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "de_DE": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -110,7 +115,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "zh_CN": [
     "hudChrome.dawnholdMap.title",
@@ -143,7 +149,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "ru_RU": [
     "hudChrome.dawnholdMap.title",
@@ -164,7 +171,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "nl_NL": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -181,7 +189,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "pl_PL": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -198,7 +207,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "id_ID": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -215,7 +225,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "tr_TR": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -232,7 +243,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "sv_SE": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -249,7 +261,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "vi_VN": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -266,7 +279,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ],
   "da_DK": [
     "entities.dungeons.dawnhold_castle.enterText",
@@ -283,6 +297,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
-    "hudChrome.lastkeepMap.title"
+    "hudChrome.lastkeepMap.title",
+    "sim.delve.enemiesRemain"
   ]
 };

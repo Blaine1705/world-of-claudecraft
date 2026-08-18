@@ -7187,6 +7187,7 @@ export const en_XA: EnTranslations = {
       "shopMarksRequired": "[Ýóú ñééð {marks} Ðéļʋé Ɱáŕķš ţó ƀúý {name}.]",
       "shopSealPremiumOnly": "[Ţĥíš šéáļ ýíéļðš óñļý ţó á ɱášţéŕ'š ĥáñð. Óñļý ţĥé Þŕéɱíúɱ áñţé çáñ óþéñ íţ.]",
       "passageSealed": "[Ţĥé þáššáĝé íš šéáļéð.]",
+      "enemiesRemain": "[Çļéáŕ ţĥé ŕéɱáíñíñĝ éñéɱíéš ƒíŕšţ.]",
       "moveCloserPassage": "[Ɱóʋé çļóšéŕ ţó ţĥé þáššáĝé.]",
       "moveCloserChest": "[Ɱóʋé çļóšéŕ ţó ţĥé çĥéšţ.]",
       "moveCloserReliquary": "[Ɱóʋé çļóšéŕ ţó ţĥé ŕéļíɋúáŕý.]",

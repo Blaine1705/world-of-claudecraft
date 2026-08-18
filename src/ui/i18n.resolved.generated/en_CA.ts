@@ -7187,6 +7187,7 @@ export const en_CA: EnTranslations = {
       "shopMarksRequired": "You need {marks} Delve Marks to buy {name}.",
       "shopSealPremiumOnly": "This seal yields only to a master's hand. Only the Premium ante can open it.",
       "passageSealed": "The passage is sealed.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Move closer to the passage.",
       "moveCloserChest": "Move closer to the chest.",
       "moveCloserReliquary": "Move closer to the reliquary.",
