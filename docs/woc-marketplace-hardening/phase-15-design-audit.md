@@ -458,6 +458,36 @@ exist plus `color-mix()` over them (the `hud.css` precedent).
       for one system stays: "Marketplace terms" names the actual document, and
       the new strike tooltip defines the term where the count renders.
 
+## K. The capture set (deliverable 5)
+
+All of it lives in ONE directory, `docs/screenshots/woc-market/`: 57 `after-`
+shots and 22 `before-` shots, every one taken at the LOWEST graphics preset
+(the rigs seed `graphicsPreset 1` before the document loads, pinned by
+`tests/woc_market_copy_figures.test.ts`), desktop at 1600x900 and phone in the
+landscape-only 900x420 the game actually runs in. The sixteen captures that
+predated the step-up are gone, and with them the last shots of the retired 2FA
+face: nothing in either window renders a TOTP field any more
+(`tests/woc_market_window.test.ts` pins that the painter never mentions one).
+
+What the pairs are for, reading `before-` against `after-` of the same name:
+
+- `mobile-trade-compose-with-bags`: the blocking mobile defect. BEFORE, the
+  bags sheet covers the trade window completely (the rig measures
+  `tradeW 880, bagsW 880, overlap 880`, and every arm control answers the hit
+  test as `div#bags`); AFTER, they split the sheet, `overlap 0`, every control
+  top-most at its own centre.
+- `mobile-browse`, `mobile-sell`, `mobile-sell-selected`, `mobile-buy-now-consent`,
+  `mobile-auction-disclosures`: the touch floors. The before run fails six of
+  them (37px and 39px money inputs, a 26px price field); the after run passes
+  152 checks with none.
+- `desktop-browse` and its three `-stress` twins (the longest sellable name, the
+  maximum price, the last page): the table's alignment, the sticky detail pane
+  and the pager at the extremes.
+- `desktop-sell-empty` / `desktop-activity-empty`: the zero states.
+- the `-ru_RU` twins: the wordiest fills, on every face that carries copy.
+- the `-stress` trade faces: a 16-character partner name (the cap), a
+  7,812,500.25 token figure and a $1,000 price through every settlement face.
+
 ## J. Test pins, seams and hygiene
 
 - [x] APPLIED. `WocMarketWindow` had NO behavioral rig (every claim was source
