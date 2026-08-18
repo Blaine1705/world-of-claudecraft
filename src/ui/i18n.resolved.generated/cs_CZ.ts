@@ -2265,6 +2265,7 @@ export const cs_CZ: EnTranslations = {
       "mail": "Kroužková zbroj"
     },
     "auraEffect": {
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Způsobuje {value} {school} poškození každých {interval} s",
       "hot": "Obnovuje {value} zdraví každých {interval} s",
       "mendingCurrent": "Ukládá {value} léčení, uvolňovaného v čase nebo spotřebovaného Kaskádovou látkou",
@@ -13359,6 +13360,12 @@ export const cs_CZ: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, metla Thornpeaku"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Přízrak pohřební knihy"
       },
@@ -16870,6 +16877,16 @@ export const cs_CZ: EnTranslations = {
         "name": "Raidová aréna Nythraxis",
         "enterText": "Procházíš zapečetěnými královskými dveřmi.",
         "leaveText": "Vracíš se do chladného vzduchu Thornpeaku."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Kotlina Divokého srdce",

@@ -99,6 +99,9 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       ? { key: `${KEY}.mendingCurrentPercent`, nums: { pct: round(a.poolPct) } }
       : { key: `${KEY}.mendingCurrent`, nums: { value: round(a.value) } };
   }
+  if (a.id === 'ignivar_shared_pyre') {
+    return { key: `${KEY}.sharedPyre`, nums: { players: 4 } };
+  }
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
     return { key: `${KEY}.temporalHourglass`, nums: {} };
   }

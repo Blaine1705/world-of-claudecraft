@@ -2265,6 +2265,7 @@ export const pt_BR: EnTranslations = {
       "mail": "Malha"
     },
     "auraEffect": {
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Causa {value} de dano de {school} a cada {interval} s",
       "hot": "Restaura {value} de vida a cada {interval} s",
       "mendingCurrent": "Armazena {value} de cura, liberada com o tempo ou consumida por Remendo em Cascata",
@@ -13359,6 +13360,12 @@ export const pt_BR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagelo de Thornpeak"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Espectro do Registro"
       },
@@ -16870,6 +16877,16 @@ export const pt_BR: EnTranslations = {
         "name": "Arena de raide de Nythraxis",
         "enterText": "Você atravessa a porta real selada.",
         "leaveText": "Você retorna ao ar frio de Thornpeak."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "A Bacia de Wildheart",

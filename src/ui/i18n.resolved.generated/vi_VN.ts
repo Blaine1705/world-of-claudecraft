@@ -2265,6 +2265,7 @@ export const vi_VN: EnTranslations = {
       "mail": "Giáp lưới"
     },
     "auraEffect": {
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Gây {value} sát thương {school} mỗi {interval} giây",
       "hot": "Hồi {value} máu mỗi {interval} giây",
       "mendingCurrent": "Tích {value} hồi máu, giải phóng dần theo thời gian hoặc bị Vá Tầng Tầng tiêu thụ",
@@ -13359,6 +13360,12 @@ export const vi_VN: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tai Họa Đỉnh Gai"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Oan Hồn Sổ Sách"
       },
@@ -16870,6 +16877,16 @@ export const vi_VN: EnTranslations = {
         "name": "Đấu Trường Raid Nythraxis",
         "enterText": "Bạn đi qua cánh cửa hoàng gia niêm phong.",
         "leaveText": "Bạn trở lại không khí lạnh giá của Đỉnh Gai."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Lòng Chảo Trái Tim Hoang Dã",

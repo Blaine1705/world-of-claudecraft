@@ -14,6 +14,7 @@ import {
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
 import { cheaterTagLabel } from '../ui/cheater_tag';
 import { deedBorderSlug } from '../ui/deed_border_view';
+import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { deedTitleText } from '../ui/deed_i18n';
 import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
@@ -284,7 +285,7 @@ export class NameplatePainter {
           ? t('abilityUi.cast.gathering')
           : ABILITIES[cast.label]
             ? tEntity({ kind: 'ability', id: cast.label, field: 'name' })
-            : cast.label;
+            : abilityDisplayNameFromSource(cast.label);
     } else if (!cast.visible) {
       state.castSource = '';
       state.castLabel = '';

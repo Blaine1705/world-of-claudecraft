@@ -2265,6 +2265,7 @@ export const zh_CN: EnTranslations = {
       "mail": "锁甲"
     },
     "auraEffect": {
+      "sharedPyre": "圈内至少需要 {players} 名玩家",
       "dot": "每 {interval} 秒造成 {value} 点{school}伤害",
       "hot": "每 {interval} 秒恢复 {value} 点生命值",
       "mendingCurrent": "储存 {value} 点治疗量，随时间释放或由湍流愈合消耗",
@@ -13359,6 +13360,12 @@ export const zh_CN: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荆峰之灾"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "伊格尼瓦，末焰使者"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "终焉之心"
+      },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
       },
@@ -16870,6 +16877,16 @@ export const zh_CN: EnTranslations = {
         "name": "尼思拉克西斯团队竞技场",
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
+      },
+      "ignivar_raid_arena": {
+        "name": "最后泉源熔炉",
+        "enterText": "热浪在熔炉封印的水源上方翻涌。",
+        "leaveText": "你离开熔炉，终于再次畅快呼吸。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",

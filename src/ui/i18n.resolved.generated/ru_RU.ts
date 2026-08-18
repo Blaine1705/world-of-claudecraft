@@ -2265,6 +2265,7 @@ export const ru_RU: EnTranslations = {
       "mail": "Кольчуга"
     },
     "auraEffect": {
+      "sharedPyre": "В круге должно находиться не менее {players} игроков",
       "dot": "Наносит {value} единиц урона ({school}) каждые {interval} сек",
       "hot": "Восстанавливает {value} здоровья каждые {interval} сек",
       "mendingCurrent": "Накапливает {value} исцеления, которое высвобождается со временем или расходуется Каскадным исцелением",
@@ -13359,6 +13360,12 @@ export const ru_RU: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Нитраксис, Бич Торнпика"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Игнивар, Вестник Последнего Пламени"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Сердце Конца"
+      },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"
       },
@@ -16870,6 +16877,16 @@ export const ru_RU: EnTranslations = {
         "name": "Рейдовая арена Нитраксиса",
         "enterText": "Вы проходите через запечатанную королевскую дверь.",
         "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
+      },
+      "ignivar_raid_arena": {
+        "name": "Горнило Последнего Источника",
+        "enterText": "Жар дрожит над запечатанными водами Горнила.",
+        "leaveText": "Вы покидаете Горнило и снова дышите свободно."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Котловина Дикого Сердца",

@@ -17,7 +17,13 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
+import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { createGroundObject, createMob } from '../entity';
+import {
+  IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
+  ignivarLinkedRaidRoom,
+} from '../ignivar_raid_ids';
 import {
   COMBAT_EXIT_MEMORY_SECONDS,
   type CombatExitThreatEntry,
@@ -34,6 +40,7 @@ import { dropThreat } from '../threat';
 import {
   dist2d,
   type Entity,
+  IGNIVAR_BOSS_ID,
   INSTANCE_EMPTY_TIMEOUT,
   NYTHRAXIS_BOSS_ID,
   NYTHRAXIS_ROOM_RADIUS,
@@ -48,8 +55,17 @@ import {
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
-const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
-const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
+const RAID_ALLOWED_DUNGEON_IDS = new Set([
+  'nythraxis_crypt',
+  'nythraxis_boss_arena',
+  IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
+]);
+const RAID_REQUIRED_DUNGEON_IDS = new Set([
+  'nythraxis_boss_arena',
+  IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
+]);
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
@@ -298,13 +314,77 @@ export function enterDungeon(
     }
   }
   const key = instanceKeyFor(ctx, r.meta.entityId);
-  const difficulty = claimDifficultyForDungeon(dungeonId, ctx.dungeonDifficulty(r.meta.entityId));
+  const ignivarSourceClaim =
+    dungeonId === IGNIVAR_SECOND_WING_ID
+      ? ctx.instances.find(
+          (candidate) =>
+            candidate.dungeonId === IGNIVAR_RAID_ARENA_ID &&
+            candidate.partyKey === key &&
+            instanceClaimContains(candidate, r.e.pos),
+        )
+      : undefined;
+  const defeatedIgnivar = ignivarSourceClaim?.mobIds.some((mobId) => {
+    const mob = ctx.entities.get(mobId);
+    return mob?.templateId === IGNIVAR_BOSS_ID && mob.dead;
+  });
+  if (dungeonId === IGNIVAR_SECOND_WING_ID && !bypass && !defeatedIgnivar) {
+    ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
+    return false;
+  }
+  const difficulty =
+    ignivarSourceClaim?.difficulty ??
+    claimDifficultyForDungeon(dungeonId, ctx.dungeonDifficulty(r.meta.entityId));
   // An existing claim for this group ALWAYS wins, whatever the current selection:
   // the claimed difficulty is fixed for the instance's life, so a mid-run
   // selection flip (or a ghost corpse-running back after one) rejoins the
   // group's live instance instead of stranding the player in a fresh parallel
   // claim. The selected difficulty applies only when claiming a new instance.
   let inst = ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === key);
+  let devReplacementSlot: InstanceSlot | undefined;
+  let devReplacementEnteredBy: number[] = [];
+  // A dev teleport names an exact difficulty and is also the only supported way
+  // to iterate on raid encounters without waiting for the normal empty-instance
+  // lifecycle. Replace a mismatched dev claim so the confirmation message cannot
+  // say Heroic while silently returning the tester to a live Normal room.
+  if (bypass && dungeonId === 'ignivar_raid_arena' && inst && inst.difficulty !== difficulty) {
+    const devOnlyParty =
+      (!party || party.leader === r.meta.entityId) &&
+      (!party ||
+        party.members.every(
+          (memberId) =>
+            memberId === r.meta.entityId || ctx.players.get(memberId)?.isDevBot === true,
+        ));
+    const devOnlyParticipants = [...inst.enteredBy].every(
+      (memberId) => memberId === r.meta.entityId || ctx.players.get(memberId)?.isDevBot === true,
+    );
+    const hasBoundCorpse = [...ctx.players.values()].some(
+      (meta) => ctx.entities.get(meta.entityId)?.corpseInstanceId === inst?.exitId,
+    );
+    if (!devOnlyParty || !devOnlyParticipants || r.e.ghost || hasBoundCorpse) {
+      ctx.error(r.meta.entityId, 'This live raid claim cannot be replaced safely.');
+      return false;
+    }
+    if (difficulty === 'heroic' && isRaidLocked(ctx, r.meta, heroicLockoutId(dungeonId))) {
+      ctx.error(r.meta.entityId, `You are locked to Heroic ${dungeon.name}.`);
+      return false;
+    }
+    devReplacementSlot = inst;
+    devReplacementEnteredBy = [...inst.enteredBy].filter(
+      (memberId) => memberId !== r.meta.entityId && ctx.players.get(memberId)?.isDevBot === true,
+    );
+    const oldIgnivarIds = inst.mobIds.filter(
+      (mobId) => ctx.entities.get(mobId)?.templateId === IGNIVAR_BOSS_ID,
+    );
+    for (const meta of ctx.players.values()) {
+      const player = ctx.entities.get(meta.entityId);
+      if (player?.kind !== 'player') continue;
+      for (const oldIgnivarId of oldIgnivarIds) {
+        clearIgnivarEncounterAuras(player, oldIgnivarId);
+      }
+    }
+    freeInstance(ctx, inst);
+    inst = undefined;
+  }
   const corpseRunClaim = defeatedNythraxisCorpseRunClaim(ctx, key, r.e);
   const returningForLoot = inst !== undefined && corpseRunClaim === inst;
   // Nythraxis keeps its at-the-door lockout, scoped to the difficulty actually
@@ -381,7 +461,9 @@ export function enterDungeon(
       ctx.error(r.meta.entityId, `You are locked to Heroic ${dungeon.name}.`);
       return false;
     }
-    inst = ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === null);
+    inst =
+      devReplacementSlot ??
+      ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === null);
     if (!inst) {
       ctx.error(r.meta.entityId, `All instances of ${dungeon.name} are busy. Try again soon.`);
       return false;
@@ -422,6 +504,7 @@ export function enterDungeon(
   // Session participation record for this run: awardHeroicMarks pays the mail
   // arm only to locked players who actually walked through the door.
   inst.enteredBy.add(r.meta.entityId);
+  for (const devBotId of devReplacementEnteredBy) inst.enteredBy.add(devBotId);
   // Stepping inside removes you from any arena queue: a match must never form for
   // a player standing in an instance and teleport them back inside fully restored
   // (issue #1600). No-op if they were not queued; notifies any 2v2 teammate.
@@ -578,6 +661,7 @@ export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: n
   if (!dungeon) return null;
   const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
   if (inst) scrubInstanceThreat(ctx, inst, p.id);
+  if (dungeon.id === 'ignivar_raid_arena') clearIgnivarEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
   return { x: dungeon.doorPos.x + drop.x, z: dungeon.doorPos.z + drop.z };
@@ -697,7 +781,7 @@ function claimInstance(
       obj.templateId = objDef.templateId;
       obj.dungeonId = objDef.dungeonId ?? null;
       obj.objectItemId = null;
-      obj.lootable = true;
+      obj.lootable = objDef.lootable ?? true;
     }
     ctx.addEntity(obj);
     inst.objectIds.push(obj.id);
@@ -994,6 +1078,22 @@ export function updateInstances(ctx: SimContext): void {
       if (e && instanceClaimContains(inst, e.pos)) {
         occupied = true;
         break;
+      }
+    }
+    const linkedDungeonId = ignivarLinkedRaidRoom(inst.dungeonId);
+    if (!occupied && linkedDungeonId) {
+      const linked = ctx.instances.find(
+        (candidate) =>
+          candidate.dungeonId === linkedDungeonId && candidate.partyKey === inst.partyKey,
+      );
+      if (linked) {
+        for (const meta of ctx.players.values()) {
+          const entity = ctx.entities.get(meta.entityId);
+          if (entity && instanceClaimContains(linked, entity.pos)) {
+            occupied = true;
+            break;
+          }
+        }
       }
     }
     if (occupied) {

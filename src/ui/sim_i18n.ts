@@ -13,6 +13,7 @@
 // matcher — so a new unhandled sim string cannot ship silently.
 import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
+import type { EntityKind, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
   formatNumber,
@@ -172,6 +173,7 @@ const baseEnTable = {
   'error.alreadyInParty': 'You are already in a party.',
   'error.notPartyLeader': 'You are not the party leader.',
   'error.raidMarkersParty': 'You must be in a party to use raid markers.',
+  'error.liveRaidClaimUnsafe': 'This live raid claim cannot be replaced safely.',
   'error.nameSellQty': 'Name how many you wish to sell.',
   'error.talentsInCombat': 'You cannot change talents in combat.',
   'error.talentsArena': 'You cannot change talents during an arena match.',
@@ -445,6 +447,24 @@ const baseEnTable = {
   'aura.temporalExhaustion': 'Temporal Exhaustion',
   // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
   'aura.cauterizeFatigue': 'Cauterize Fatigue',
+  'aura.ignivarBrandOfThePyre': 'Brand of the Pyre',
+  'aura.ignivarMoltenArmor': 'Molten Armor',
+  'aura.ignivarLastInferno': 'Last Inferno',
+  'aura.ignivarSharedPyre': 'Shared Pyre',
+  'aura.ignivarForgeChains': 'Chains of the Forge',
+  'mechanic.ignivarSearingTorrent': 'Searing Torrent',
+  'mechanic.ignivarForgeStrike': 'Forge Strike',
+  'mechanic.ignivarCleansingBacklash': 'Cleansing Backlash',
+  'mechanic.ignivarApocalypse': 'Apocalypse',
+  'mechanic.ignivarRainOfCinders': 'Rain of Cinders',
+  'mechanic.ignivarFallingCinders': 'Falling Cinders',
+  'mechanic.ignivarRevolvingInferno': 'Revolving Inferno',
+  'mechanic.ignivarForgeWave': 'Forge Wave',
+  'mechanic.ignivarJudgmentOfTheForge': 'Judgment of the Forge',
+  'dialogue.ignivarHeartAwakens': 'The Heart of the End awakens. Let the world burn!',
+  'dialogue.ignivarLastFlame': 'The last flame consumes all!',
+  'dialogue.ignivarSkyBurns': 'The sky itself will burn!',
+  'dialogue.ignivarSharePyre': 'Four must share the pyre, or all will burn!',
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',
@@ -8355,6 +8375,48 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
   ...PET_NEW,
 };
 
+const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>>> =
+  {
+    es: {
+      'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
+      'aura.ignivarMoltenArmor': 'Armadura Fundida',
+      'aura.ignivarLastInferno': 'Último Infierno',
+      'aura.ignivarSharedPyre': 'Pira compartida',
+      'mechanic.ignivarSearingTorrent': 'Torrente abrasador',
+      'mechanic.ignivarForgeStrike': 'Golpe de Fundición',
+      'mechanic.ignivarCleansingBacklash': 'Represalia purificadora',
+      'mechanic.ignivarApocalypse': 'Apocalipsis',
+      'mechanic.ignivarRainOfCinders': 'Lluvia de brasas',
+      'mechanic.ignivarFallingCinders': 'Caída de brasas',
+      'mechanic.ignivarRevolvingInferno': 'Infierno giratorio',
+      'mechanic.ignivarForgeWave': 'Onda de la Forja',
+      'mechanic.ignivarJudgmentOfTheForge': 'Juicio de la Forja',
+      'dialogue.ignivarHeartAwakens': 'El Corazón del Fin despierta. ¡Que arda el mundo!',
+      'dialogue.ignivarLastFlame': '¡La última llama lo consume todo!',
+      'dialogue.ignivarSkyBurns': '¡Hasta el propio cielo arderá!',
+      'dialogue.ignivarSharePyre': '¡Cuatro deben compartir la pira o todos arderéis!',
+    },
+    es_ES: {
+      'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
+      'aura.ignivarMoltenArmor': 'Armadura Fundida',
+      'aura.ignivarLastInferno': 'Último Infierno',
+      'aura.ignivarSharedPyre': 'Pira compartida',
+      'mechanic.ignivarSearingTorrent': 'Torrente abrasador',
+      'mechanic.ignivarForgeStrike': 'Golpe de Fundición',
+      'mechanic.ignivarCleansingBacklash': 'Represalia purificadora',
+      'mechanic.ignivarApocalypse': 'Apocalipsis',
+      'mechanic.ignivarRainOfCinders': 'Lluvia de brasas',
+      'mechanic.ignivarFallingCinders': 'Caída de brasas',
+      'mechanic.ignivarRevolvingInferno': 'Infierno giratorio',
+      'mechanic.ignivarForgeWave': 'Onda de la Forja',
+      'mechanic.ignivarJudgmentOfTheForge': 'Juicio de la Forja',
+      'dialogue.ignivarHeartAwakens': 'El Corazón del Fin despierta. ¡Que arda el mundo!',
+      'dialogue.ignivarLastFlame': '¡La última llama lo consume todo!',
+      'dialogue.ignivarSkyBurns': '¡Hasta el propio cielo arderá!',
+      'dialogue.ignivarSharePyre': '¡Cuatro deben compartir la pira o todos arderéis!',
+    },
+  };
+
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
@@ -8363,6 +8425,7 @@ export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Ob
       ...BASE_DICT[lang],
       ...PET_DICT[lang],
       'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
+      ...IGNIVAR_DICT[lang],
     },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
@@ -8473,6 +8536,20 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
   'Temporal Exhaustion': 'aura.temporalExhaustion',
   'Cauterize Fatigue': 'aura.cauterizeFatigue',
+  'Brand of the Pyre': 'aura.ignivarBrandOfThePyre',
+  'Molten Armor': 'aura.ignivarMoltenArmor',
+  'Last Inferno': 'aura.ignivarLastInferno',
+  'Shared Pyre': 'aura.ignivarSharedPyre',
+  'Chains of the Forge': 'aura.ignivarForgeChains',
+  'Searing Torrent': 'mechanic.ignivarSearingTorrent',
+  'Forge Strike': 'mechanic.ignivarForgeStrike',
+  'Cleansing Backlash': 'mechanic.ignivarCleansingBacklash',
+  Apocalypse: 'mechanic.ignivarApocalypse',
+  'Rain of Cinders': 'mechanic.ignivarRainOfCinders',
+  'Falling Cinders': 'mechanic.ignivarFallingCinders',
+  'Revolving Inferno': 'mechanic.ignivarRevolvingInferno',
+  'Forge Wave': 'mechanic.ignivarForgeWave',
+  'Judgment of the Forge': 'mechanic.ignivarJudgmentOfTheForge',
   // Thornhollow Fields battleground auras (src/sim/social/battleground.ts): spawn
   // protection, the carrier-fatigue vulnerability, the carried-flag buff, and the
   // sprint-rune haste.
@@ -12050,4 +12127,27 @@ export function localizeSimText(text: string): string | null {
     if (m) return rule.build(m);
   }
   return null;
+}
+
+export function localizeAuthoredYellText(
+  text: string,
+  speakerKind?: EntityKind,
+  classId?: PlayerClass,
+): string {
+  if (speakerKind === 'player' || classId !== undefined) return text;
+  return localizeSimText(text) ?? text;
+}
+
+export function localizeAuthoredYellSpeakerName(
+  name: string,
+  speakerKind?: EntityKind,
+  templateId?: string,
+  classId?: PlayerClass,
+): string {
+  if (speakerKind === 'player' || classId !== undefined) return name;
+  if (templateId && (speakerKind === 'mob' || speakerKind === 'npc')) {
+    return tEntity({ kind: speakerKind, id: templateId, field: 'name' });
+  }
+  const mob = Object.values(MOBS).find((entry) => entry.name === name);
+  return mob ? tEntity({ kind: 'mob', id: mob.id, field: 'name' }) : name;
 }

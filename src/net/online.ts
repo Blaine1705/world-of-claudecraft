@@ -97,6 +97,7 @@ import {
   type AccountCosmetics,
   type ActiveConsecration,
   type ActiveFrostRing,
+  type ActiveIgnivarMeteorWarning,
   type ActiveTemporalHourglass,
   type ArenaInfo,
   type BankInfo,
@@ -1931,6 +1932,7 @@ export class ClientWorld implements IWorld {
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
+  activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   activeConsecrations: ActiveConsecration[] = [];
   private counterfangWindowDeadlineMs = 0;
@@ -2876,6 +2878,36 @@ export class ClientWorld implements IWorld {
               innerRadius: ring.i as number,
               duration: ring.dur as number,
               remaining: Math.min(ring.rem as number, ring.dur as number),
+            },
+          ];
+        })
+      : [];
+    this.activeIgnivarMeteors = Array.isArray(snap.ignivarMeteors)
+      ? snap.ignivarMeteors.flatMap((value: unknown): ActiveIgnivarMeteorWarning[] => {
+          if (!value || typeof value !== 'object') return [];
+          const meteor = value as Record<string, unknown>;
+          if (
+            typeof meteor.id !== 'string' ||
+            ![meteor.x, meteor.z, meteor.r, meteor.dur, meteor.rem, meteor.lead].every(
+              (entry) => typeof entry === 'number' && Number.isFinite(entry),
+            ) ||
+            (meteor.r as number) <= 0 ||
+            (meteor.dur as number) <= 0 ||
+            (meteor.rem as number) <= 0 ||
+            (meteor.lead as number) < 0 ||
+            (meteor.lead as number) >= (meteor.dur as number)
+          ) {
+            return [];
+          }
+          return [
+            {
+              id: meteor.id,
+              x: meteor.x as number,
+              z: meteor.z as number,
+              radius: meteor.r as number,
+              duration: meteor.dur as number,
+              remaining: Math.min(meteor.rem as number, meteor.dur as number),
+              warningLead: meteor.lead as number,
             },
           ];
         })

@@ -2265,6 +2265,7 @@ export const nl_NL: EnTranslations = {
       "mail": "Maliën"
     },
     "auraEffect": {
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Brengt elke {interval} s {value} {school}schade toe",
       "hot": "Herstelt elke {interval} s {value} gezondheid",
       "mendingCurrent": "Slaat {value} genezing op, na verloop van tijd vrijgegeven of verbruikt door Cascadeherstel",
@@ -13359,6 +13360,12 @@ export const nl_NL: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Gesel van Doorntop"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Grootboek-Schim"
       },
@@ -16870,6 +16877,16 @@ export const nl_NL: EnTranslations = {
         "name": "Nythraxis Raid-Arena",
         "enterText": "Je gaat door de verzegelde koninklijke deur.",
         "leaveText": "Je keert terug naar de koude lucht van Doorntop."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Het Wildhartbekken",

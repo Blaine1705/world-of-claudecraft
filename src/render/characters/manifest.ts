@@ -6,7 +6,13 @@ import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
-import { ALL_CLASSES, type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
+import {
+  ALL_CLASSES,
+  type Entity,
+  IGNIVAR_BOSS_ID,
+  isMechWearer,
+  type PlayerClass,
+} from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 
@@ -91,6 +97,10 @@ export interface VisualDef {
   hover?: number;
   /** yaw applied so the model faces +Z (facing-0 convention) */
   yaw?: number;
+  /** Optional texture-aware ambient lift for exceptionally dark authored bodies. */
+  selfIllumination?: number;
+  /** Optional per-visual multiplier for scene environment reflections. */
+  envMapIntensity?: number;
   /** KayKit chars ship every accessory visible: non-skinned mesh nodes to KEEP.
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
@@ -168,8 +178,15 @@ const KAYKIT_EMOTES: Partial<Record<OverheadEmoteId, EmoteClipSpec>> = {
   salute: { clips: ['Spellcast_Raise', 'Block'], timeScale: 1.18 },
   cry: { clips: ['Hit_A', 'Sit_Floor_Down'], timeScale: 0.65 },
   bow: { clips: ['Sit_Floor_Down', 'Spellcast_Raise'], timeScale: 1.35 },
-  clap: { clips: ['1H_Melee_Attack_Slice_Diagonal', 'Cheer'], timeScale: 1.55, repeats: 2 },
-  roar: { clips: ['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop', 'Cheer'], timeScale: 0.9 },
+  clap: {
+    clips: ['1H_Melee_Attack_Slice_Diagonal', 'Cheer'],
+    timeScale: 1.55,
+    repeats: 2,
+  },
+  roar: {
+    clips: ['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop', 'Cheer'],
+    timeScale: 0.9,
+  },
   kneel: { clips: ['Sit_Floor_Down'], timeScale: 0.85 },
 };
 
@@ -666,6 +683,22 @@ const WATER_ELEMENTAL: ClipMap = {
   attack: ['Cast'],
   hit: ['Hit'],
   death: 'Death',
+};
+
+// Ignivar uses the same KayKit Rig_Medium skeleton as player characters, but
+// its three boss clips deliberately avoid the stock two-hand spellcasting
+// gestures: ForgeCast stays restrained, ForgeSlam moves the complete rig through
+// one rigid lunge, and ForgeIdle holds the asymmetric arms without hand waving.
+// ForgeHit remains planted because stock Hit_A deforms this custom boss skin.
+const IGNIVAR: ClipMap = {
+  idle: 'ForgeIdle',
+  walk: 'Walking_A',
+  run: 'Running_A',
+  attack: ['ForgeSlam'],
+  hit: ['ForgeHit'],
+  death: 'Death_A',
+  cast: 'ForgeCast',
+  flourish: 'Cheer',
 };
 
 const SPIDER: ClipMap = {
@@ -1462,7 +1495,11 @@ export const VISUALS: Record<string, VisualDef> = {
     show: [],
     attach: [
       { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+      {
+        url: `${WEAPONS}/spellbook_open.glb`,
+        bone: 'handslot.l',
+        gripRef: 'Spellbook_open',
+      },
     ],
     weaponSlots: [0], // mainhand (wand) swaps; spellbook offhand stays
     // Faint violet lift only, to tell this apart from the mage/priest models
@@ -2140,6 +2177,20 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
+  mob_ignivar: {
+    url: `${CREATURES}/ignivar_herald.glb`,
+    height: 2.65,
+    // The local manual rig is authored directly onto KayKit's +Z-facing bind.
+    yaw: 0,
+    // Preserve the furnace read in the dark coliseum without restoring the
+    // glossy HIFI treatment that clashed with the game's faceted materials.
+    selfIllumination: 0.2,
+    envMapIntensity: 1.6,
+    clips: IGNIVAR,
+    walkRef: 1.6,
+    runRef: 3.2,
+    attackTimeScale: 1,
+  },
   mob_water_elemental: {
     url: `${CREATURES}/water_elemental.glb`,
     height: 2.65,
@@ -2787,7 +2838,11 @@ export const VISUALS: Record<string, VisualDef> = {
     show: ['Mage_Hat'],
     attach: [
       { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+      {
+        url: `${WEAPONS}/spellbook_open.glb`,
+        bone: 'handslot.l',
+        gripRef: 'Spellbook_open',
+      },
     ],
     tint: 'entity',
     tintStrength: 0.55,
@@ -2880,6 +2935,7 @@ export function modularVisualKey(cls: PlayerClass): string {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  [IGNIVAR_BOSS_ID]: 'mob_ignivar',
   wildheart_stalker: 'mob_wildheart_stalker',
   wildheart_ravager: 'mob_wildheart_ravager',
   wildheart_hexcaller: 'mob_wildheart_hexcaller',

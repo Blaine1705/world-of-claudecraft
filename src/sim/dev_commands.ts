@@ -5,6 +5,7 @@ import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
+import { setupIgnivarDevRaid } from './ignivar_dev_raid';
 import { enterDungeon } from './instances/dungeons';
 import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
@@ -484,8 +485,9 @@ export function handleDevChat(
     }
     const difficulty = dungeonMatch[2]?.toLowerCase() === 'heroic' ? 'heroic' : 'normal';
     ctx.setDungeonDifficulty(difficulty, pid);
-    enterDungeon(ctx, dungeonId, pid, true);
-    emitDevLog(ctx, pid, `[dev] Entering ${dungeonId} (${difficulty}).`);
+    if (enterDungeon(ctx, dungeonId, pid, true)) {
+      emitDevLog(ctx, pid, `[dev] Entering ${dungeonId} (${difficulty}).`);
+    }
     return null;
   }
 
@@ -665,10 +667,44 @@ export function handleDevChat(
     if (entity) {
       entity.devGod = !entity.devGod;
       if (entity.devGod) {
+        entity.profilerInvulnerable = false;
         entity.hp = entity.maxHp;
         entity.resource = entity.maxResource;
       }
       emitDevLog(ctx, pid, `[dev] God mode ${entity.devGod ? 'ON' : 'OFF'}.`);
+    }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+immortal|devimmortal)\s*$/i.test(raw)) {
+    const entity = ctx.entities.get(pid);
+    if (entity) {
+      entity.profilerInvulnerable = !entity.profilerInvulnerable;
+      if (entity.profilerInvulnerable) {
+        entity.devGod = false;
+        entity.hp = entity.maxHp;
+        entity.resource = entity.maxResource;
+      }
+      emitDevLog(
+        ctx,
+        pid,
+        entity.profilerInvulnerable
+          ? '[dev] Immortal mode ON (normal outgoing damage).'
+          : '[dev] Immortal mode OFF.',
+      );
+    }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+ignivarraid|devignivarraid)\s*$/i.test(raw)) {
+    const result = setupIgnivarDevRaid(ctx, pid);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Ignivar raid ${result.reused ? 'reset' : 'ready'}: ${result.allies} stationary, invulnerable allies in spread soak pods. They stay outside Brand range; join the marked pod as the fourth Shared Pyre soaker. On Heroic, Chains of the Forge links all 10 players into five proximity pairs; stay within 10 yards of your partner, and never cross another pair's chain because it severs and kills the intruder.`,
+      );
     }
     return null;
   }
@@ -749,7 +785,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev immortal, /dev ignivarraid, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

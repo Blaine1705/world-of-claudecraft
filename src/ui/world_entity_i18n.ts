@@ -87,6 +87,8 @@ const MOB_IDS = [
   'nythraxis_heroic_priest_add',
   'nythraxis_heroic_rogue_add',
   'nythraxis_scourge_of_thornpeak',
+  'ignivar_herald_of_the_last_flame',
+  'ignivar_heart_of_the_end',
   // Collapsed Reliquary delve mobs
   'reliquary_ledger_wraith',
   'reliquary_funeral_ringer',
@@ -569,6 +571,8 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
+  'ignivar_raid_arena',
+  'ignivar_inner_crucible',
   'wildheart_basin',
   'the_last_keep',
   'dawnhold_castle',

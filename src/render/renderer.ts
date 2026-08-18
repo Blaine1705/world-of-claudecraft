@@ -39,9 +39,22 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
+import {
+  IGNIVAR_FORGE_WAVE_CAST_ID,
+  IGNIVAR_FRONTAL_CAST_ID,
+  IGNIVAR_JUDGMENT_CAST_ID,
+  IGNIVAR_ROTATING_RAYS_CAST_ID,
+  IGNIVAR_SKYFIRE_CAST_ID,
+} from '../sim/encounters/ignivar';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
-import { ALL_CLASSES, type Entity, isMechWearer, type SimEvent } from '../sim/types';
+import {
+  ALL_CLASSES,
+  type Entity,
+  IGNIVAR_BOSS_ID,
+  isMechWearer,
+  type SimEvent,
+} from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
@@ -330,6 +343,25 @@ import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
+import { applyIgnivarArenaFog } from './ignivar_arena_atmosphere';
+import {
+  buildIgnivarWaterConduit,
+  isIgnivarWaterConduitTemplate,
+  isStableIgnivarWaterConduitTransition,
+  syncIgnivarWaterConduitVisibility,
+} from './ignivar_conduit';
+import {
+  disposeIgnivarEncounterVisuals,
+  hasVisibleIgnivarEncounterTelegraph,
+  syncIgnivarEncounterVisuals,
+  syncIgnivarPlayerChainVisual,
+} from './ignivar_encounter';
+import {
+  ignivarEncounterBypassesCharacterCulling,
+  ignivarEncounterViewVisibleDuringCompile,
+} from './ignivar_encounter_core';
+import { attachIgnivarModelVfx } from './ignivar_model_vfx';
+import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
@@ -2922,7 +2954,7 @@ export class Renderer {
       (x, z) => groundHeight(x, z, this.sim.cfg.seed),
       (x, z, meteor) => {
         if (
-          meteor.ability &&
+          meteor?.ability &&
           this.abilityVfx.handleSpellfxAt({
             x,
             z,
@@ -5089,6 +5121,7 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
+    this.mageGroundFx.syncMeteorWarnings(this.sim.activeIgnivarMeteors);
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // The meteor fx registers and releases budget lights AFTER the pass (a
@@ -8011,12 +8044,16 @@ export class Renderer {
           }
           break;
         }
+        if (ev.fx === 'meteorImpact' && ev.persistentId) {
+          this.mageGroundFx.impactMeteor(ev.persistentId, ev.x, ev.z);
+          break;
+        }
         // The Frozen Orb flight, animated locally from its three moments:
         // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
         // the server's real coordinates when the orb latches onto an enemy.
         // The pulse novas below stay the area telegraph, so no actionable
         // information rides on this mesh.
-        if (ev.fx === 'meteorFall') {
+        if (ev.fx === 'meteorFall' || ev.fx === 'ambientMeteorFall') {
           this.mageGroundFx.spawnMeteor({
             x: ev.x,
             z: ev.z,
@@ -8024,6 +8061,9 @@ export class Renderer {
             duration: ev.duration ?? 2,
             sourceId: ev.sourceId,
             ability: ev.ability,
+            showTelegraph: ev.fx !== 'ambientMeteorFall',
+            warningLead: ev.warningLead,
+            persistentId: ev.persistentId,
           });
           break;
         }
@@ -8540,7 +8580,13 @@ export class Renderer {
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
     // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
     // bodies (handled in the next branch).
-    if (
+    const raidGatePlan =
+      e.kind === 'object' ? ignivarRaidGatePlan(e.templateId, e.dungeonId) : null;
+    if (raidGatePlan) {
+      body = buildIgnivarRaidGate(raidGatePlan.open);
+      height = raidGatePlan.height;
+      objectMesh = body;
+    } else if (
       e.kind === 'object' &&
       (e.templateId === 'dungeon_door' ||
         e.templateId === 'dungeon_exit' ||
@@ -8607,6 +8653,11 @@ export class Renderer {
                 ? 2.2
                 : 2.4;
       objectMesh = body;
+    } else if (e.kind === 'object' && isIgnivarWaterConduitTemplate(e.templateId)) {
+      const built = buildIgnivarWaterConduit(e.templateId);
+      body = built.group;
+      height = built.height;
+      objectMesh = built.group;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
@@ -8769,6 +8820,7 @@ export class Renderer {
       // entity scale is applied to the whole group below, so it can update live
       // (Fiesta size buffs) and also scale lazily-built form visuals for free.
       group.add(visual.root);
+      if (e.templateId === IGNIVAR_BOSS_ID) attachIgnivarModelVfx(visual.root);
       height = visual.height;
     }
 
@@ -8923,7 +8975,14 @@ export class Renderer {
     // the compilePending flag (only the non-self loop does), so gating it would
     // strand the player invisible. Other entities un-hide via that loop.
     if (view && e.id !== this.sim.player.id) {
-      view.compileReady = this.gateViewOnCompile(view, group);
+      // Ignivar's floor telegraphs are actionable during a cold/late-join load.
+      // Compile the complete view against the live light state, but gate only the
+      // cosmetic rig so the entity anchor remains visible for those overlays.
+      view.compileReady = this.gateViewOnCompile(
+        view,
+        group,
+        e.templateId === IGNIVAR_BOSS_ID && view.visual ? view.visual.root : group,
+      );
     }
     // Warm an already-mounted entity's engine clips at view creation too: the
     // mountKey-edge preload below only fires on a CHANGE, but a remote rider
@@ -9014,12 +9073,18 @@ export class Renderer {
   // prewarm cannot anticipate (e.g. the env-map-lit material that links only when
   // you walk into a biome) never hitch in-world. The prewarm stays a pure
   // optimization: already-compiled spawn content resolves instantly, no pop-in.
-  private gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null {
+  private gateViewOnCompile(
+    view: EntityView,
+    group: THREE.Group,
+    visibilityTarget: THREE.Object3D = group,
+  ): Promise<void> | null {
     if (!this.asyncCompileSupported) return null;
     const generation = this.lifecycleGeneration;
-    const priorVisibility = group.visible;
+    const priorVisibility = visibilityTarget.visible;
+    const gatesOnlyCharacterRig = visibilityTarget !== group;
     view.compilePending = true;
-    group.visible = false;
+    if (gatesOnlyCharacterRig) view.visualCompilePending = true;
+    visibilityTarget.visible = false;
     // The canvas nameplate (name, target marker, health, and cast bar) keeps
     // painting while the 3D group is gated, so actionable information has an
     // immediate placeholder without first-drawing a still-linking shader.
@@ -9027,12 +9092,15 @@ export class Renderer {
       () => {
         if (!this.shutdownStarted && generation === this.lifecycleGeneration) {
           view.compilePending = false;
+          if (gatesOnlyCharacterRig) view.visualCompilePending = false;
+          visibilityTarget.visible = priorVisibility;
         }
       },
       (error) => {
         this.recoverRejectedCompileGate(error, generation, () => {
           view.compilePending = false;
-          group.visible = priorVisibility;
+          if (gatesOnlyCharacterRig) view.visualCompilePending = false;
+          visibilityTarget.visible = priorVisibility;
         });
       },
     );
@@ -9894,6 +9962,7 @@ export class Renderer {
     encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null);
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
+    const inIgnivar = interior === 'ignivar' || interior === 'ignivar_depths';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
     // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
@@ -9911,23 +9980,25 @@ export class Renderer {
               ? 'temple'
               : inNythraxis
                 ? 'nythraxis'
-                : inWildheartField
-                  ? 'wildheartField'
-                  : inLastKeep
-                    ? 'lastkeep'
-                    : inDawnhold
-                      ? 'dawnhold'
-                      : inside
-                        ? 'dungeon'
-                        : camY <
-                            waterLevelAt(
-                              this.camera.position.x,
-                              this.camera.position.z,
-                              this.sim.cfg.seed,
-                            ) -
-                              0.05
-                          ? 'underwater'
-                          : 'outdoor';
+                : inIgnivar
+                  ? 'ignivar'
+                  : inWildheartField
+                    ? 'wildheartField'
+                    : inLastKeep
+                      ? 'lastkeep'
+                      : inDawnhold
+                        ? 'dawnhold'
+                        : inside
+                          ? 'dungeon'
+                          : camY <
+                              waterLevelAt(
+                                this.camera.position.x,
+                                this.camera.position.z,
+                                this.sim.cfg.seed,
+                              ) -
+                                0.05
+                            ? 'underwater'
+                            : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -9971,6 +10042,11 @@ export class Renderer {
         fog.color.setHex(0x020106);
         fog.near = 20;
         fog.far = 80;
+      } else if (desired === 'ignivar') {
+        // A warm, smoky forge grade with enough depth to read the complete
+        // 66-yard octagon. The atmosphere module owns these literals so its
+        // floor accents and the room lighting cannot drift into two palettes.
+        applyIgnivarArenaFog(fog);
       } else if (desired === 'wildheartField') {
         // Sunlit humid depth keeps the full caldera readable while the rear
         // shrine and limestone shell settle into a warm green atmospheric veil.
@@ -10422,6 +10498,7 @@ export class Renderer {
     this.healGlowAt.delete(id);
     const v = this.views.get(id);
     if (!v) return;
+    disposeIgnivarEncounterVisuals(v.group);
     // A pending weapon-skin application must never land on a dropped (or
     // pooled and reused) view.
     this.weaponSkinApplies.cancel(id);
@@ -10846,7 +10923,7 @@ export class Renderer {
         // the view is torn down anyway); while hidden, show only within 80yd.
         // hidden until its shaders finish linking off-thread (async-compile gate);
         // the object branch below may still re-hide loot
-        v.group.visible = !v.compilePending;
+        v.group.visible = ignivarEncounterViewVisibleDuringCompile(e.templateId, v.compilePending);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The
@@ -10914,6 +10991,16 @@ export class Renderer {
       const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
       v.group.position.set(x, y, z);
       let facing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * facingAlpha(ea);
+      if (
+        e.templateId === IGNIVAR_BOSS_ID &&
+        (e.castingAbility === IGNIVAR_FRONTAL_CAST_ID ||
+          e.castingAbility === IGNIVAR_FORGE_WAVE_CAST_ID ||
+          e.castingAbility === IGNIVAR_JUDGMENT_CAST_ID ||
+          e.castingAbility === IGNIVAR_ROTATING_RAYS_CAST_ID ||
+          e.castingAbility === IGNIVAR_SKYFIRE_CAST_ID)
+      ) {
+        facing = e.facing;
+      }
       if (id === p.id && renderFacingOverride !== null) {
         // Follow the camera-driven heading, easing in the one-time engage gap
         // (up to 180deg when engaging after an orbit) under the rate limiter
@@ -10945,18 +11032,25 @@ export class Renderer {
         // strand the object invisible through the whole 80-96yd hysteresis band
         // if the viewer retreats before the rebuild lands.
         if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
-          this.removeView(id);
-          this.createView(e);
-          continue;
+          if (isStableIgnivarWaterConduitTransition(v.builtTemplateId, e.templateId)) {
+            v.builtTemplateId = e.templateId;
+          } else {
+            this.removeView(id);
+            this.createView(e);
+            continue;
+          }
         }
         const isPortalObject = isPersistentPortalObject(e);
-        const vis = syncDelveInteractableVisibility(
-          v.group,
-          e.templateId,
-          e.lootable,
-          v.compilePending,
-          !isPortalObject || d2 <= this.entityViewCreateRangeSq,
-        );
+        const withinRange = !isPortalObject || d2 <= this.entityViewCreateRangeSq;
+        const vis = isIgnivarWaterConduitTemplate(e.templateId)
+          ? syncIgnivarWaterConduitVisibility(v.group, e.templateId, v.compilePending, withinRange)
+          : syncDelveInteractableVisibility(
+              v.group,
+              e.templateId,
+              e.lootable,
+              v.compilePending,
+              withinRange,
+            );
         if (v.sparkle && vis) {
           // sub-pixel beyond ~45u but still a full transparent draw each
           // (d2 is this entity's player distance, computed once above)
@@ -11061,24 +11155,55 @@ export class Renderer {
         dt,
         this.reducedMotion(),
       );
-      if (!v.visual) continue;
+      syncIgnivarPlayerChainVisual(v.group, e, this.views, dt, this.sim.entities);
+      if (!v.visual) {
+        if (e.kind === 'player' && ignivarEncounterBypassesCharacterCulling(e)) {
+          syncIgnivarEncounterVisuals(
+            v.group,
+            e,
+            dt,
+            this.vfx,
+            undefined,
+            false,
+            undefined,
+            this.sim.entities,
+          );
+        }
+        continue;
+      }
       const veilboundState = characterVeilboundState(e);
       const paladinAegisActive = e.castingAbility === 'aegis_first_dawn' && e.channeling && !e.dead;
       // Decide visibility from the real world position before presentation work.
       // Audio and state derivation below remain active even for hidden actors.
-      let charOnScreen = true;
+      let characterBodyOnScreen = true;
       if (this.cullCharacters && id !== p.id) {
         this.cullSphere.center.set(x, y + v.height * 0.5 * v.liveScale, z);
         const characterRadius = (v.height * 0.7 + 1.5) * v.liveScale;
         this.cullSphere.radius = paladinAegisActive
           ? Math.max(characterRadius, PALADIN_AEGIS_DOME_RADIUS + 1)
           : characterRadius;
-        charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
+        characterBodyOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
+      const charOnScreen = characterBodyOnScreen || ignivarEncounterBypassesCharacterCulling(e);
       const runCharacterPresentation = shouldRunCharacterPresentationWork(
         charOnScreen,
         actionablePose,
       );
+      if (
+        runCharacterPresentation ||
+        (e.templateId === IGNIVAR_BOSS_ID && hasVisibleIgnivarEncounterTelegraph(v.group))
+      ) {
+        syncIgnivarEncounterVisuals(
+          v.group,
+          e,
+          dt,
+          this.vfx,
+          v.visual.root,
+          characterBodyOnScreen,
+          undefined,
+          this.sim.entities,
+        );
+      }
 
       let iceBlockActivated = false;
       if (runCharacterPresentation) {
@@ -12386,6 +12511,7 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
+    this.mageGroundFx.syncMeteorWarnings(this.sim.activeIgnivarMeteors);
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // Same post-fx budget recovery as the prewarm frame path: a landing or

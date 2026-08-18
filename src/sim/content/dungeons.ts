@@ -1,6 +1,8 @@
 // Dungeon content: mob templates that only spawn inside instances, spawn
 // lists, and the DungeonDef registry merged by sim/data.ts.
 
+import { IGNIVAR_CONDUITS, IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../ignivar_arena';
+import { IGNIVAR_GATE_LOCKED_TEMPLATE, IGNIVAR_SECOND_WING_ID } from '../ignivar_raid_ids';
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
 
@@ -21,6 +23,53 @@ export const DUNGEON_KEEPSAKE_ITEMS: Record<string, ItemDef> = {
 };
 
 export const DUNGEON_MOBS: Record<string, MobTemplate> = {
+  // Ignivar's dedicated visual is dispatched by render/characters/manifest.ts.
+  // Encounter behavior lives in encounters/ignivar.ts, not on generic template hooks.
+  ignivar_herald_of_the_last_flame: {
+    id: 'ignivar_herald_of_the_last_flame',
+    name: 'Ignivar, Herald of the Last Flame',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    boss: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 70000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 48,
+    dmgPerLevel: 10,
+    attackSpeed: 2.6,
+    armorPerLevel: 42,
+    moveSpeed: 7,
+    aggroRadius: 30,
+    loot: [],
+    scale: 3.4,
+    color: 0xd64316,
+    enrage: { belowHpPct: 0.25, dmgMult: 1.35 },
+  },
+  // Stationary priority target for Ignivar's Normal intermission.
+  ignivar_heart_of_the_end: {
+    id: 'ignivar_heart_of_the_end',
+    name: 'Heart of the End',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 7000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2.6,
+    armorPerLevel: 12,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 2.25,
+    color: 0xff6a1a,
+  },
   // ---- The Hollow Crypt (5-player elite instance) ----
   crypt_shambler: {
     id: 'crypt_shambler',
@@ -819,6 +868,10 @@ const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 },
 ];
 
+const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 },
+];
+
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   hollow_crypt: {
     id: 'hollow_crypt',
@@ -1005,5 +1058,56 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     suggestedPlayers: 10,
     enterText: 'You pass through the sealed royal door.',
     leaveText: 'You return to the cold air of Thornpeak.',
+  },
+  ignivar_raid_arena: {
+    id: 'ignivar_raid_arena',
+    name: 'Crucible of the Last Spring',
+    index: 10,
+    // Development-only entrance until the raid's progression hook is authored.
+    doorPos: { x: 0, z: 0 },
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -27 },
+    exitOffset: { x: 0, z: -30 },
+    spawns: IGNIVAR_RAID_SPAWN_LIST,
+    objects: [
+      ...IGNIVAR_CONDUITS.map((conduit) => ({
+        itemId: '',
+        name: `${conduit.id} Water Conduit`,
+        x: conduit.x,
+        z: conduit.z,
+        templateId: IGNIVAR_WATER_CONDUIT_TEMPLATES.ready,
+        lootable: false,
+      })),
+      {
+        itemId: '',
+        name: 'Sealed Inner Crucible Gate',
+        x: 0,
+        z: 31.5,
+        templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_SECOND_WING_ID,
+        lootable: false,
+      },
+    ],
+    interior: 'ignivar',
+    suggestedPlayers: 10,
+    enterText: 'Heat shimmers above the sealed waters of the Crucible.',
+    leaveText: 'You step away from the Crucible and breathe freely again.',
+  },
+  ignivar_inner_crucible: {
+    id: 'ignivar_inner_crucible',
+    name: 'The Inner Crucible',
+    index: 11,
+    // Internal raid wing reached only through the gate behind Ignivar.
+    doorPos: { x: 0, z: 0 },
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -34 },
+    exitOffset: { x: 0, z: -38 },
+    spawns: [],
+    interior: 'ignivar_depths',
+    suggestedPlayers: 10,
+    enterText: 'The opened gate leads deeper into the Crucible.',
+    leaveText: 'You leave the silent depths of the Crucible.',
   },
 };

@@ -261,6 +261,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated creature model + animations (training_dummy) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated creature model + animations (gravewing) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated character form + animations (lich_form) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
+| Generated animated raid boss model (ignivar_herald) | World of ClaudeCraft | Owner-approved OpenAI concept, Tripo image-to-model task `faec579d-0f72-4dbb-a11a-8c7578bb1699`, then local KayKit `Rig_Medium` skinning, restrained boss clips, VFX sockets, and deterministic finalization in `scripts/assets/ignivar_herald` | Project asset | With the project only |
 | Generated prop model (engineering_workbench) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (alchemy_cauldron) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (cooking_spit) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |

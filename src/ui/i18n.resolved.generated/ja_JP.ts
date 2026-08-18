@@ -2265,6 +2265,7 @@ export const ja_JP: EnTranslations = {
       "mail": "鎖"
     },
     "auraEffect": {
+      "sharedPyre": "サークル内に少なくとも{players}人のプレイヤーが必要",
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
       "mendingCurrent": "{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する",
@@ -13359,6 +13360,12 @@ export const ja_JP: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "イグニヴァル、最後の炎の先触れ"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "終焉の心臓"
+      },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
       },
@@ -16870,6 +16877,16 @@ export const ja_JP: EnTranslations = {
         "name": "ナイスラクシスのレイドアリーナ",
         "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
+      },
+      "ignivar_raid_arena": {
+        "name": "最後の泉のるつぼ",
+        "enterText": "るつぼの封じられた水面に熱気が揺らめいています。",
+        "leaveText": "るつぼを離れ、再び自由に息をつきます。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",

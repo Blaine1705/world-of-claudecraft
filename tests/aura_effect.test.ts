@@ -9,6 +9,13 @@ import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
 describe('auraEffectDescriptor', () => {
+  it('explains that Ignivar Shared Pyre splits damage inside its circle', () => {
+    expect(desc({ id: 'ignivar_shared_pyre', kind: 'vulnerability', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.sharedPyre',
+      nums: { players: 4 },
+    });
+  });
+
   it('describes the cancelable protective Hourglass aura', () => {
     expect(desc({ id: 'temporal_hourglass', kind: 'stasis', value: 1.5 })).toEqual({
       key: 'hudChrome.auraEffect.temporalHourglass',

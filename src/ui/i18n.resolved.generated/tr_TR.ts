@@ -2265,6 +2265,7 @@ export const tr_TR: EnTranslations = {
       "mail": "Zincir"
     },
     "auraEffect": {
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Her {interval} sn {value} {school} hasarı verir",
       "hot": "Her {interval} sn {value} sağlık yeniler",
       "mendingCurrent": "{value} iyileştirme biriktirir; zamanla salınır veya Şelale Onarımı tarafından tüketilir",
@@ -13359,6 +13360,12 @@ export const tr_TR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Dikenzirve Belası"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Defter Hayaleti"
       },
@@ -16870,6 +16877,16 @@ export const tr_TR: EnTranslations = {
         "name": "Nythraxis Akın Arenası",
         "enterText": "Mühürlü kraliyet kapısından geçersin.",
         "leaveText": "Dikenzirve'nin soğuk havasına geri dönersin."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Yaban Yürek Çukuru",

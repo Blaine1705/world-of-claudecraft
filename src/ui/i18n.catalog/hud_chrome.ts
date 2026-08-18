@@ -2631,6 +2631,8 @@ export const hudChromeStrings = {
   // localized damage-school name (see schools below). Keys are produced by the pure
   // aura_effect.ts descriptor; render via t('hudChrome.auraEffect.<key>', values).
   auraEffect: {
+    sharedPyre:
+      'Splits its damage between players inside the circle; {players} players recommended',
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
     mendingCurrent: 'Stores {value} healing, released over time or consumed by Cascading Mend',

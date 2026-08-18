@@ -2265,6 +2265,7 @@ export const fr_FR: EnTranslations = {
       "mail": "Mailles"
     },
     "auraEffect": {
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Inflige {value} points de dégâts de {school} toutes les {interval} s",
       "hot": "Rend {value} points de vie toutes les {interval} s",
       "mendingCurrent": "Stocke {value} de soins, libérés avec le temps ou consommés par Reprise en cascade",
@@ -13359,6 +13360,12 @@ export const fr_FR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Fléau de Thornpeak"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Spectre du registre"
       },
@@ -16870,6 +16877,16 @@ export const fr_FR: EnTranslations = {
         "name": "Arène de raid de Nythraxis",
         "enterText": "Vous franchissez la porte royale scellée.",
         "leaveText": "Vous retrouvez l'air froid de Thornpeak."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Le Bassin du Cœur Sauvage",

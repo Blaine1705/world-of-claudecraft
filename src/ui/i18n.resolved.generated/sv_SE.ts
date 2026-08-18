@@ -2265,6 +2265,7 @@ export const sv_SE: EnTranslations = {
       "mail": "Ringbrynja"
     },
     "auraEffect": {
+      "sharedPyre": "Splits its damage between players inside the circle; {players} players recommended",
       "dot": "Gör {value} {school}-skada var {interval}:e s",
       "hot": "Återställer {value} hälsa var {interval}:e s",
       "mendingCurrent": "Lagrar {value} läkning, frisläppt över tid eller förbrukad av Kaskadlagning",
@@ -13359,6 +13360,12 @@ export const sv_SE: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Törntoppens gissel"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
       "reliquary_ledger_wraith": {
         "name": "Liggarvålnad"
       },
@@ -16870,6 +16877,16 @@ export const sv_SE: EnTranslations = {
         "name": "Nythraxis raidarena",
         "enterText": "Du passerar genom den förseglade kungliga dörren.",
         "leaveText": "Du återvänder till Törntopps kalla luft."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Vildhjärtats bassäng",
