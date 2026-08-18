@@ -1015,6 +1015,17 @@ describe('delve reward chest + surface exit flow', () => {
     return { boss, events };
   }
 
+  function spawnBossAdd(
+    sim: ReturnType<typeof makeSim>,
+    run: ReturnType<typeof enterFinale>,
+    pos: { x: number; y: number; z: number },
+  ) {
+    const add = createMob((sim as any).nextId++, MOBS.reliquary_ledger_wraith, 9, { ...pos });
+    (sim as any).addEntity(add);
+    run.mobIds.push(add.id);
+    return add;
+  }
+
   // Drive the lockpicking minigame to a flawless solve. Returns the chest id.
   function pickLockFlawless(
     sim: ReturnType<typeof makeSim>,
@@ -1132,11 +1143,7 @@ describe('delve reward chest + surface exit flow', () => {
     sim.player.pos = { ...chestEnt.pos };
     sim.player.prevPos = { ...chestEnt.pos };
 
-    const add = createMob((sim as any).nextId++, MOBS.reliquary_ledger_wraith, 9, {
-      ...chestEnt.pos,
-    });
-    (sim as any).addEntity(add);
-    run.mobIds.push(add.id);
+    const add = spawnBossAdd(sim, run, chestEnt.pos);
 
     expect(sim.delveInteract(chestId)).toBe(false);
     const events = sim.tick();
@@ -1154,6 +1161,77 @@ describe('delve reward chest + surface exit flow', () => {
     expect(sim.delveInteract(chestId)).toBe(true);
     const offer = sim.tick().find((e) => e.type === 'lockpickOffer');
     expect(offer).toBeDefined();
+  });
+
+  it('direct lockpick engage cannot bypass a live boss-summoned add', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+    spawnBossAdd(sim, run, chestEnt.pos);
+
+    sim.lockpickEngage(chestId, 1);
+    const events = sim.tick();
+
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+    expect(events.some((e) => e.type === 'lockpickSession')).toBe(false);
+    expect(run.lockpick).toBeNull();
+    expect(run.completed).toBe(false);
+    expect(run.surfaceExitId).toBeNull();
+    expect(run.objectState[chestId].looted).not.toBe(true);
+    expect(run.objectState[chestId].open).not.toBe(true);
+  });
+
+  it('direct lockpick success cannot grant or open the exit if an add becomes live mid-session', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+
+    sim.lockpickEngage(chestId, 1);
+    expect(run.lockpick?.state).toBe('IN_PROGRESS');
+    sim.drainEvents();
+    const add = spawnBossAdd(sim, run, chestEnt.pos);
+
+    let guard = 0;
+    while (run.lockpick && run.lockpick.state === 'IN_PROGRESS' && guard++ < 12) {
+      const actions = solveLockActions(run.lockpick.pages[run.lockpick.pageIndex])!;
+      for (const a of actions) sim.lockpickAction(a);
+    }
+    const events = sim.drainEvents();
+
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+    expect(
+      events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'abandoned'),
+    ).toBeDefined();
+    expect(events.some((e) => e.type === 'delveChestLoot')).toBe(false);
+    expect(run.lockpick).toBeNull();
+    expect(run.completed).toBe(false);
+    expect(run.surfaceExitId).toBeNull();
+    expect(run.objectState[chestId].looted).not.toBe(true);
+    expect(run.objectState[chestId].attemptAvailable).toBe(true);
+
+    add.dead = true;
+    pickLockFlawless(sim, run, 1);
+    expect(run.completed).toBe(true);
+    expect(run.surfaceExitId).not.toBeNull();
+    expect(run.objectState[chestId].looted).toBe(true);
   });
 
   it('flawless solve grants marks (premium tier), completes the run, and spawns the surface exit', () => {
