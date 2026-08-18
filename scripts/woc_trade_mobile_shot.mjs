@@ -278,6 +278,14 @@ async function shoot(name) {
   // Same capture hygiene as the market rig: the perf-doctor nudge is pressed
   // away right before the shot, or it lands in the frame's corner.
   await dismissPerfNudge(page);
+  // Frame the face from its TOP. The measurement pass just before this scrolls
+  // each control into view one by one, so whatever it touched last decided the
+  // scroll offset, and the shots came out mid-face with the mode tabs sliced by
+  // the header. Evidence should open where a player opens it.
+  await page.evaluate(() => {
+    const win = document.querySelector('#trade-window');
+    if (win) win.scrollTop = 0;
+  });
   await sleep(300);
   const file = `${OUT}/${SHOT_PREFIX}-${MOBILE ? 'mobile' : 'desktop'}-trade-${name}${SUFFIX}.png`;
   await page.screenshot({ path: file });

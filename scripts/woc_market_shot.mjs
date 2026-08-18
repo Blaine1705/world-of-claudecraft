@@ -680,6 +680,16 @@ async function shoot(page, file, clip) {
   // swiftshader box is one: pressed away the way a player would, right before
   // the shot, or it sits in the frame's corner over the window.
   await dismissPerfNudge(page);
+  // Frame the sheet from the TOP of whatever scrolls in it: the floor sweep
+  // scrolls each control into view one at a time, so the last one it touched
+  // decided the offset and the shots came out mid-face.
+  await page.evaluate(() => {
+    const win = document.querySelector('#woc-market-window');
+    if (win) win.scrollTop = 0;
+    for (const pane of win?.querySelectorAll('.wm-body, .wm-browse, .wm-detail') ?? []) {
+      pane.scrollTop = 0;
+    }
+  });
   // The camera-choice prompt mounts a beat after world entry and would
   // overlay the window; dismiss it (and any lingering tutorial chip) at the
   // last moment before every capture.
