@@ -295,7 +295,12 @@ export class WocMarketClient {
       if (!res.ok) {
         const body =
           data && typeof data === 'object' ? (data as Record<string, unknown>) : undefined;
-        const code = typeof body?.code === 'string' ? (body.code as string) : undefined;
+        // A REAL code is a non-empty string (the same test apiErrorFromBody
+        // in src/net/online.ts applies): an empty code is a codeless body.
+        const code =
+          typeof body?.code === 'string' && body.code.length > 0
+            ? (body.code as string)
+            : undefined;
         // The whole parsed body rides as params (the ApiError convention:
         // code params are top-level extension members of the problem
         // envelope), and ONLY beside a real code, matching apiErrorFromBody

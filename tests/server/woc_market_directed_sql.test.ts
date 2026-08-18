@@ -105,6 +105,19 @@ describe('the schema carries the directed column additively', () => {
     expect(WOC_MARKET_SCHEMA).toContain('woc_market_directed_offers_listing');
     expect(WOC_MARKET_SCHEMA).toContain('woc_market_offers_accepted_unstamped');
     expect(WOC_MARKET_SCHEMA).toContain('woc_market_offers_pair_pending');
+    // The poll read's two account indexes, with their exact columns (a
+    // same-name index with a different prefix puts the seq scan back while a
+    // name pin stays green), and the retired pending-only pair they replace.
+    const schema = WOC_MARKET_SCHEMA.replace(/--[^\n]*/g, ' ').replace(/\s+/g, ' ');
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_all ON woc_market_directed_offers(realm, buyer_account, created_at DESC);',
+    );
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_offers_seller_all ON woc_market_directed_offers(realm, seller_account, created_at DESC);',
+    );
+    expect(schema).toContain('DROP INDEX IF EXISTS woc_market_offers_buyer_pending;');
+    expect(schema).toContain('DROP INDEX IF EXISTS woc_market_offers_seller_pending;');
+    expect(schema).not.toContain('CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_pending');
   });
 
   it('creates the pair-pending index with its exact columns and partial predicate', async () => {
@@ -547,7 +560,7 @@ describe('a finished sale stops being a live offer', () => {
     // Otherwise a completed deal stays in both trade windows forever, showing
     // "Paid" and blocking the same two players from starting a fresh one.
     const { pool, sql } = recordingPool();
-    await new PgWocMarketDb(pool).directedOffersForAccount(REALM, 7);
+    await new PgWocMarketDb(pool).directedOffersForAccount(REALM, 7, 1_800_000_000_000);
     const [text] = sql();
     expect(text).toContain("l.status <> 'closed'");
     // And an offer with no listing yet (still under review) must survive it.
@@ -573,13 +586,30 @@ describe('a finished sale stops being a live offer', () => {
     expect(SETTLED_OFFER_GRACE_MS).toBeGreaterThan(10_000);
   });
 
+  it('keeps a JUST-resolved offer readable too, as an arm of the status predicate', async () => {
+    // The verdict read (the honest-endings fix): the side that did NOT
+    // decline / withdraw learns the outcome off the lingering row. Its only
+    // other guard is the db-gated pg suite, so the always-run floor pins the
+    // arm's SHAPE here: an OR inside the status disjunction, on the same $3
+    // bound the listing arm rides. Whitespace-collapsed because the
+    // statement is reflowed with comments between the arms.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).directedOffersForAccount(REALM, 7, 1_800_000_000_000);
+    const text = sql()[0]
+      .replace(/--[^\n]*/g, ' ')
+      .replace(/\s+/g, ' ');
+    expect(text).toContain("o.status IN ('pending', 'accepted') OR o.updated_at > $3");
+    // A stable order under same-clock ties: the fake mirrors the id tiebreak.
+    expect(text).toContain('ORDER BY o.created_at DESC, o.id DESC LIMIT 50');
+  });
+
   it('joins the LATEST settlement, so a payment in flight is visible', async () => {
     // Without this the seller cannot distinguish a buyer signing in their wallet
     // from a buyer who walked away: both look like "waiting for payment" until
     // the item disappears. ORDER BY id DESC because a buyer may retry, and only
     // the newest attempt describes what is happening now.
     const { pool, sql } = recordingPool();
-    await new PgWocMarketDb(pool).directedOffersForAccount(REALM, 7);
+    await new PgWocMarketDb(pool).directedOffersForAccount(REALM, 7, 1_800_000_000_000);
     const [text] = sql();
     expect(text).toContain('s.state AS settlement_state');
     expect(text).toContain('woc_market_settlements');

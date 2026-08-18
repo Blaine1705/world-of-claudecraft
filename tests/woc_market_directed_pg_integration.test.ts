@@ -1426,11 +1426,66 @@ describeDb('woc market directed rail against real Postgres', () => {
       // poll seq-scans a table that grows per offer. Existence-pinned so a
       // schema edit cannot silently put the seq scan back.
       const res = await pool.query(
-        `SELECT indexname FROM pg_indexes WHERE tablename = 'woc_market_directed_offers'`,
+        `SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'woc_market_directed_offers'`,
       );
       const names = res.rows.map((r) => String(r.indexname));
       expect(names).toContain('woc_market_offers_buyer_all');
       expect(names).toContain('woc_market_offers_seller_all');
+      // The COLUMNS, not just the names: a same-name index with a different
+      // prefix (no realm, no created_at) survives the name pin and puts the
+      // seq scan back.
+      const def = (name: string) =>
+        String(res.rows.find((r) => String(r.indexname) === name)?.indexdef ?? '');
+      expect(def('woc_market_offers_buyer_all')).toContain(
+        '(realm, buyer_account, created_at DESC)',
+      );
+      expect(def('woc_market_offers_seller_all')).toContain(
+        '(realm, seller_account, created_at DESC)',
+      );
+      // The retired pending-only pair is gone from a freshly applied schema.
+      expect(names).not.toContain('woc_market_offers_buyer_pending');
+      expect(names).not.toContain('woc_market_offers_seller_pending');
+    });
+
+    it('the poll read PLANS on those indexes (no seq scan of the offers table)', async () => {
+      // A plan pin, because existence alone cannot fail when a later predicate
+      // edit (another OR arm, a function wrapper on realm/account) makes the
+      // read unable to use them. On the small disposable database the planner
+      // would pick a seq scan on cost alone, so it is disallowed for the
+      // session: with USABLE indexes the plan then goes through them (a
+      // BitmapOr over the two, or plain index scans); with none it still
+      // seq-scans, at a huge cost, which is what the assertion catches.
+      const marketDbMod = await import('../server/woc_market_db');
+      const realm = `plan-${Date.now()}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      await seedOffer(realm, seller, buyer, { status: 'pending' });
+      // Capture the exact statement the read runs, then EXPLAIN it verbatim.
+      const captured: { text: string; values: unknown[] }[] = [];
+      const recorder = {
+        query: (text: string, values: unknown[]) => {
+          captured.push({ text, values });
+          return pool.query(text, values);
+        },
+      } as unknown as Pool;
+      await new marketDbMod.PgWocMarketDb(recorder).directedOffersForAccount(
+        realm,
+        buyer,
+        Date.now(),
+      );
+      expect(captured).toHaveLength(1);
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        await client.query('SET LOCAL enable_seqscan = off');
+        const plan = await client.query(`EXPLAIN ${captured[0].text}`, captured[0].values);
+        const lines = plan.rows.map((r) => String(r['QUERY PLAN'])).join('\n');
+        expect(lines).not.toMatch(/Seq Scan on woc_market_directed_offers/);
+        expect(lines).toMatch(/woc_market_offers_(buyer|seller)_all/);
+        await client.query('ROLLBACK');
+      } finally {
+        client.release();
+      }
     });
   });
 });

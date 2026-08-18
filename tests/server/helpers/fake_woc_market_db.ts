@@ -510,14 +510,20 @@ export class FakeWocMarketDb implements WocMarketDb {
     return this.stepUpChallenges.size;
   }
 
-  async directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]> {
+  async directedOffersForAccount(
+    realm: string,
+    account: number,
+    nowMs: number = this.now(),
+  ): Promise<WocDirectedOfferRow[]> {
     // Full Pg fidelity (the read used to return 'pending' rows only, which
-    // hid the whole payment-phase machinery from every fake-driven test):
+    // hid the whole payment machinery from every fake-driven test):
     // pending AND accepted rows; a just-RESOLVED row (declined / withdrawn /
     // expired) for the grace window, so the non-resolving side can read the
     // verdict; the closed-listing grace clause; and the listing/settlement
-    // join fields the arm derives its phase from.
-    const graceCutoffMs = this.now() - SETTLED_OFFER_GRACE_MS;
+    // join fields the arm derives its wocOfferPhase from. nowMs is the
+    // service clock the seam passes (defaulted to the injected clock for the
+    // direct callers in the fake's own suite), like the Pg read.
+    const graceCutoffMs = nowMs - SETTLED_OFFER_GRACE_MS;
     return (
       [...this.offers.values()]
         .filter(
@@ -535,9 +541,10 @@ export class FakeWocMarketDb implements WocMarketDb {
           if (!l || l.status !== 'closed') return true;
           return (this.listingTouchMs.get(o.listingId) ?? 0) > graceCutoffMs;
         })
-        // Mirror the Pg read's ORDER BY o.created_at DESC LIMIT 50 (id breaks
-        // same-clock ties deterministically), so an ordering or truncation
-        // assumption cannot pass here and fail against Postgres.
+        // Mirror the Pg read's ORDER BY o.created_at DESC, o.id DESC LIMIT 50
+        // (the id tiebreak is in the SQL too, so same-clock ties order the
+        // same way here and there), so an ordering or truncation assumption
+        // cannot pass here and fail against Postgres.
         .sort((a, b) => b.createdAtMs - a.createdAtMs || b.id - a.id)
         .slice(0, 50)
         .map((o) => {

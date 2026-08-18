@@ -1112,6 +1112,70 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       expect(typeof ok).not.toBe('string');
     });
 
+    it('the announced retry moment is the FIRST admissible one, on both arms', async () => {
+      // The honesty contract behind retryAfterSeconds: a claim at EXACTLY
+      // retryAtMs succeeds. Both probes compare strictly (lock_expires > the
+      // window cutoff), which is what puts the boundary on the admissible
+      // side; a >= would keep refusing at the announced moment (a '1 second'
+      // answer once more), and the pins above retry well past it, so only
+      // this case can see it. One second before, still refused.
+      const realm = `cooldown-boundary-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      await marketDb.recordBuyNowAbandon(realm, listingId, buyer, BASE_MS - 1_000);
+      const refused = await marketDb.claimBuyNowLock(
+        realm,
+        listingId,
+        buyer,
+        BASE_MS,
+        BASE_MS + 270_000,
+      );
+      if (typeof refused === 'string' || !('retryAtMs' in refused)) {
+        throw new Error(`expected a cooldown refusal, got ${JSON.stringify(refused)}`);
+      }
+      const at = refused.retryAtMs;
+      expect(
+        await marketDb.claimBuyNowLock(realm, listingId, buyer, at - 1_000, at + 269_000),
+      ).toMatchObject({ refusal: 'claim_cooldown' });
+      const atBoundary = await marketDb.claimBuyNowLock(realm, listingId, buyer, at, at + 270_000);
+      expect(typeof atBoundary, 'the per-listing arm admits the claim at retryAtMs').not.toBe(
+        'string',
+      );
+      expect(atBoundary).not.toMatchObject({ refusal: 'claim_cooldown' });
+      // The cap arm: three abandons on other listings, then a fresh listing
+      // claimed at exactly the moment the cap-th newest leaves the window.
+      const griefer = await seedAccount();
+      for (let i = 0; i < 3; i++) {
+        const other = await seedListing(realm, seller);
+        await marketDb.recordBuyNowAbandon(realm, other, griefer, BASE_MS - (i + 1) * MINUTE_MS);
+      }
+      const fresh = await seedListing(realm, seller);
+      const capped = await marketDb.claimBuyNowLock(
+        realm,
+        fresh,
+        griefer,
+        BASE_MS,
+        BASE_MS + 270_000,
+      );
+      if (typeof capped === 'string' || !('retryAtMs' in capped)) {
+        throw new Error(`expected a cap refusal, got ${JSON.stringify(capped)}`);
+      }
+      const capAt = capped.retryAtMs;
+      expect(
+        await marketDb.claimBuyNowLock(realm, fresh, griefer, capAt - 1_000, capAt + 269_000),
+      ).toMatchObject({ refusal: 'claim_cooldown' });
+      const capBoundary = await marketDb.claimBuyNowLock(
+        realm,
+        fresh,
+        griefer,
+        capAt,
+        capAt + 270_000,
+      );
+      expect(typeof capBoundary, 'the cap arm admits the claim at retryAtMs').not.toBe('string');
+      expect(capBoundary).not.toMatchObject({ refusal: 'claim_cooldown' });
+    });
+
     it('the account-wide cap allows the claim BELOW three abandons and refuses AT three', async () => {
       const realm = `cap-${++seq}`;
       const seller = await seedAccount();

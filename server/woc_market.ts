@@ -343,8 +343,15 @@ export interface WocMarketDb {
   ): Promise<WocStepUpChallengeRow | null>;
   /** Delete expired challenges; every issue runs this first (bounded growth). */
   pruneStepUpChallenges(realm: string, nowMs: number): Promise<number>;
-  /** Pending offers this account may act on, both directions. */
-  directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]>;
+  /** The offers this account may act on or must still observe, both
+   *  directions: pending and accepted rows, plus just-resolved rows and
+   *  closed listings inside the grace window measured from nowMs (the
+   *  service clock, so a travelled test clock drives Pg and fake alike). */
+  directedOffersForAccount(
+    realm: string,
+    account: number,
+    nowMs: number,
+  ): Promise<WocDirectedOfferRow[]>;
   /**
    * Move a PENDING offer to a terminal status, atomically.
    *
@@ -2239,10 +2246,10 @@ export class WocMarketService {
     };
   }
 
-  /** Pending offers this account may act on, both directions. */
+  /** The offers this account may act on or must still observe, both directions. */
   async directedOffers(account: number): Promise<WocDirectedOfferRow[]> {
     if (!this.cfg.enabled) return [];
-    return this.deps.db.directedOffersForAccount(this.cfg.realm, account);
+    return this.deps.db.directedOffersForAccount(this.cfg.realm, account, this.now());
   }
 
   async cancelListing(

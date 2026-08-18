@@ -296,5 +296,13 @@ describe('the params channel carries CODE PARAMS, not just the code echo', () =>
       ok: false,
       code: WOC_MARKET_UNAVAILABLE,
     });
+    // An EMPTY code is codeless too (apiErrorFromBody's length > 0 test); a
+    // bare typeof check would hand '' to the matcher, which reads it as no
+    // code and falls to prose over a params object.
+    stubFetch(() => ({ status: 500, body: { code: '', detail: 'wreckage' } }));
+    await expect(client().cancelListing(41)).resolves.toEqual({
+      ok: false,
+      code: WOC_MARKET_UNAVAILABLE,
+    });
   });
 });

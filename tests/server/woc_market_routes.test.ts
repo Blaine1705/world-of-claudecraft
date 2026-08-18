@@ -621,6 +621,35 @@ describe('the refusal-to-wire mapping', () => {
     });
   });
 
+  it('the admin listings-by-seller handler refuses a bad account with the registered code', async () => {
+    // The sibling of the two arms above: an unparsable ?account= used to write
+    // inline English ('invalid account') straight into the admin envelope,
+    // the one arm the code conversion missed. Same registry, same surface.
+    const drive = async (account: string) => {
+      service({ adminListingsBySeller: async () => [] });
+      const ctx = fakeCtx({
+        method: 'GET',
+        url: `/admin/api/woc-market/listings?account=${account}`,
+        query: { account },
+      });
+      return handlerFor('GET', '/admin/api/woc-market/listings')(ctx);
+    };
+    await expect(drive('abc')).rejects.toMatchObject({
+      status: 400,
+      code: 'woc_market.invalid_input',
+    });
+    await expect(drive('0')).rejects.toMatchObject({ status: 400 });
+    // A valid id reaches the service and answers the envelope.
+    const ctx = fakeCtx({
+      method: 'GET',
+      url: '/admin/api/woc-market/listings?account=41',
+      query: { account: '41' },
+    });
+    service({ adminListingsBySeller: async () => [] });
+    await handlerFor('GET', '/admin/api/woc-market/listings')(ctx);
+    expect(sent(ctx).status).toBe(200);
+  });
+
   it('the admin sale-excluded handler throws the registered sale_conflict code', async () => {
     const drive = async (reason: 'sale_conflict' | 'not_found') => {
       service({ adminSetSaleExcluded: async () => ({ ok: false, reason }) });

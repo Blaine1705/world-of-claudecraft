@@ -622,23 +622,29 @@ CREATE TABLE IF NOT EXISTS woc_market_directed_offers (
   expires_at TIMESTAMPTZ NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
--- The buyer's inbox and the seller's outbox: both page the pending set only.
-CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_pending
-  ON woc_market_directed_offers(realm, buyer_account, created_at DESC)
-  WHERE status = 'pending';
-CREATE INDEX IF NOT EXISTS woc_market_offers_seller_pending
-  ON woc_market_directed_offers(realm, seller_account, created_at DESC)
-  WHERE status = 'pending';
 -- The trade arm's poll read (directedOffersForAccount, every 2s per open
--- trade) admits resolved rows inside the grace window, so its predicate
--- (status IN pending,accepted OR updated_at grace) can NEVER use the
--- pending-only partials above: without these two the whole read is a seq
--- scan of a table that grows per offer. A BitmapOr over the pair turns it
--- into per-account probes (measured: 2398 buffers to 206 on 200k rows).
+-- trade) never implied the retired pending-only partials' predicate: it
+-- admits accepted rows (the payment leg) and, since the verdict grace arm,
+-- just-resolved rows too, so without these two the whole read is a seq scan
+-- of a table that grows per offer. A BitmapOr over the pair turns it into
+-- per-account probes (measured: 2398 buffers to 206 on 200k rows). The
+-- discriminator (status / updated_at) stays a heap filter, so the cost is
+-- linear in the account's RETAINED offer history (WOC_MARKET_OFFERS_RETENTION_
+-- DAYS is the control), not in its live offers: measure the per-account
+-- discard before enable. Two full indexes cost roughly a third more WAL per
+-- offer transition (status sits in partial predicates, so no HOT update).
+-- Boot DDL, not concurrent_indexes.ts: pre-enable the table is empty.
 CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_all
   ON woc_market_directed_offers(realm, buyer_account, created_at DESC);
 CREATE INDEX IF NOT EXISTS woc_market_offers_seller_all
   ON woc_market_directed_offers(realm, seller_account, created_at DESC);
+-- The pending-only inbox/outbox partials are retired: no statement can use a
+-- status = 'pending' partial any more (the poll read above admits accepted
+-- and just-resolved rows, the pair-pending unique index below serves the
+-- reopen probes, woc_market_offers_due the expiry sweep), so they were pure
+-- write amplification on every offer insert and transition.
+DROP INDEX IF EXISTS woc_market_offers_buyer_pending;
+DROP INDEX IF EXISTS woc_market_offers_seller_pending;
 -- The expiry sweep's due-claim seek.
 CREATE INDEX IF NOT EXISTS woc_market_offers_due
   ON woc_market_directed_offers(realm, expires_at)
@@ -839,13 +845,17 @@ const OFFER_COLS =
   'buyer_accepted, seller_accepted';
 
 /**
- * How long a SETTLED offer stays readable after its listing closes.
+ * How long a FINISHED offer state stays readable to the trade poll: a settled
+ * sale after its listing closes, a closed-not-sold listing (cancelled /
+ * suspended / unpaid), and a resolved offer (declined / withdrawn / expired)
+ * for the side that did not resolve it.
  *
- * The completion moment has to survive long enough for both clients to observe
- * it on their own poll (2s) and act on it: show the outcome, then close. Sized
- * with a wide margin over that, because the cost of being generous is only that
- * a finished deal lingers in a read, while the cost of being tight is a sale
- * that silently disappears, which is the bug this exists to fix.
+ * The outcome moment has to survive long enough for both clients to observe
+ * it on their own poll (2s) and act on it: show the outcome, then close or
+ * return to the form. Sized with a wide margin over that, because the cost of
+ * being generous is only that a finished deal lingers in a read, while the
+ * cost of being tight is an outcome that silently disappears (the sale case
+ * shipped that way and the window simply emptied).
  *
  * It does NOT gate starting a fresh trade: each client retires an offer id once
  * it has shown the outcome, so the window's length is invisible to players.
@@ -1632,12 +1642,16 @@ export class PgWocMarketDb implements WocMarketDb {
   async directedOffersForAccount(
     realm: string,
     account: number,
-    nowMs: number = Date.now(),
+    nowMs: number,
   ): Promise<WocDirectedOfferRow[]> {
     // 'accepted' rides along with 'pending' because the deal is not over when it
     // is agreed: the buyer still has to pay, and BOTH windows need to show that
-    // phase. The listing's own status comes with it so the seller can tell
+    // step. The listing's own status comes with it so the seller can tell
     // "waiting for payment" from "paid", without a second round trip.
+    // nowMs is the SERVICE clock (passed through the seam, never defaulted to
+    // Date.now() here): the two grace bounds below compare it with DB-stamped
+    // updated_at, and a test clock must drive the read the way it drives the
+    // fake, or the two implementations disagree under a travelled clock.
     const cols = OFFER_COLS.split(', ')
       .map((c) => `o.${c}`)
       .join(', ');
@@ -1682,7 +1696,7 @@ export class PgWocMarketDb implements WocMarketDb {
             OR l.status <> 'closed'
             OR l.updated_at > $3
           )
-        ORDER BY o.created_at DESC LIMIT 50`,
+        ORDER BY o.created_at DESC, o.id DESC LIMIT 50`,
       [realm, account, new Date(nowMs - SETTLED_OFFER_GRACE_MS)],
     );
     return res.rows.map(toOffer);
@@ -2651,37 +2665,46 @@ export class PgWocMarketDb implements WocMarketDb {
     // the in-tx re-check stays.
     // Answers WHEN a retry can first succeed (retryAtMs), or null when not
     // refused, so the refusal can name a remaining time. Both arms are
-    // probed even when the first refuses: the honest retry moment is the
-    // LATER of the two (a 5-minute per-listing answer while the hourly cap
-    // still holds for 40 would send the player back too early), and the
-    // second probe only runs on the refusal path, which the rate limiter
-    // already bounds.
+    // probed in ONE round trip (two scalar subqueries; the in-transaction
+    // re-check runs under the listing row lock, so a second trip there is
+    // lock time for nothing): the honest retry moment is the LATER of the
+    // two (a 5-minute per-listing answer while the hourly cap still holds
+    // for 40 would send the player back too early). Same index cost as the
+    // old short-circuiting pair: the per-listing arm is a max() over the
+    // qualifying range of the unique index prefix (listing_id, account,
+    // lock_expires) and the cap arm a bounded scan of the account index
+    // ordered by lock_expires, both O(cap) rows by the hourly cap itself.
     const cooldownRefused = async (q: Pick<Pool, 'query'>): Promise<number | null> => {
       // Per-listing re-claim cooldown: the NEWEST in-window abandon of this
-      // listing sets the clock. max() over the unique index prefix
-      // (listing_id, account, lock_expires) is an index-tail read.
-      const cooled = await q.query(
-        `SELECT max(lock_expires) AS latest FROM woc_market_buy_now_abandons
-          WHERE listing_id = $1 AND account = $2
-            AND lock_expires > to_timestamp($3 / 1000.0)`,
-        [id, account, nowMs - WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000],
+      // listing sets the clock. Account-wide hourly cap: a row exists at
+      // OFFSET cap-1 exactly when the in-window count reaches the cap (the
+      // old saturating count's predicate); that cap-th-newest row leaving
+      // the window is the first moment the count can drop below the cap.
+      // Both comparisons are strict, which is what makes the announced
+      // moment the FIRST admissible one (pinned at the boundary).
+      const probes = await q.query(
+        `SELECT
+           (SELECT max(lock_expires) FROM woc_market_buy_now_abandons
+             WHERE listing_id = $1 AND account = $2
+               AND lock_expires > to_timestamp($3 / 1000.0)) AS latest,
+           (SELECT lock_expires FROM woc_market_buy_now_abandons
+             WHERE account = $2 AND realm = $4
+               AND lock_expires > to_timestamp($5 / 1000.0)
+             ORDER BY lock_expires DESC
+             OFFSET $6 LIMIT 1) AS cap_at`,
+        [
+          id,
+          account,
+          nowMs - WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000,
+          realm,
+          nowMs - WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000,
+          WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR - 1,
+        ],
       );
-      const latest: Date | null = cooled.rows[0]?.latest ?? null;
+      const latest: Date | null = probes.rows[0]?.latest ?? null;
       const reclaimAtMs =
         latest === null ? null : ms(latest) + WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
-      // Account-wide hourly cap. A row exists at OFFSET cap-1 exactly when
-      // the in-window count reaches the cap (the old saturating count's
-      // predicate, same O(cap) index walk); that cap-th-newest row leaving
-      // the window is the first moment the count can drop below the cap.
-      const capped = await q.query(
-        `SELECT lock_expires AS at FROM woc_market_buy_now_abandons
-          WHERE account = $1 AND realm = $2
-            AND lock_expires > to_timestamp($3 / 1000.0)
-          ORDER BY lock_expires DESC
-          OFFSET ${WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR - 1} LIMIT 1`,
-        [account, realm, nowMs - WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000],
-      );
-      const capBoundary: Date | null = capped.rows[0]?.at ?? null;
+      const capBoundary: Date | null = probes.rows[0]?.cap_at ?? null;
       const capDrainsAtMs =
         capBoundary === null
           ? null
@@ -3429,11 +3452,16 @@ export class PgWocMarketDb implements WocMarketDb {
     // Item-named for the Activity surface. A correlated PK lookup, not a JOIN:
     // the shared BID_COLS list is unqualified and both tables carry id/realm/
     // status, so a join would make it ambiguous; the subquery is one index hit
-    // per row, bounded by the LIMIT. Empty string when the listing row is gone
-    // (retention), which the client's unknown-item arm already renders.
+    // per row, bounded by the LIMIT (measured plan-identical to a JOIN). The
+    // correlation is table-qualified: an unqualified listing_id would rebind
+    // to the INNER table the day woc_market_listings gains a column of that
+    // name and the statement would start erroring. The '' arm below is a
+    // type-level default only: bids CASCADE with their listing, so a
+    // surviving row always resolves its item.
     const res = await this.pool.query(
       `SELECT ${BID_COLS},
-              (SELECT l.item_id FROM woc_market_listings l WHERE l.id = listing_id)
+              (SELECT l.item_id FROM woc_market_listings l
+                WHERE l.id = woc_market_bids.listing_id)
                 AS activity_item_id
          FROM woc_market_bids
         WHERE realm = $1 AND account = $2
@@ -3624,10 +3652,12 @@ export class PgWocMarketDb implements WocMarketDb {
     account: number,
     limit: number,
   ): Promise<WocActivitySettlementRow[]> {
-    // Item-named like bidsByAccount above (same correlated-lookup rationale).
+    // Item-named like bidsByAccount above (same correlated-lookup rationale,
+    // same table-qualified correlation, same CASCADE note on the '' arm).
     const res = await this.pool.query(
       `SELECT ${SETTLEMENT_COLS},
-              (SELECT l.item_id FROM woc_market_listings l WHERE l.id = listing_id)
+              (SELECT l.item_id FROM woc_market_listings l
+                WHERE l.id = woc_market_settlements.listing_id)
                 AS activity_item_id
          FROM woc_market_settlements
         WHERE realm = $1 AND buyer_account = $2

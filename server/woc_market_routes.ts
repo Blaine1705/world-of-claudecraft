@@ -786,10 +786,10 @@ async function historyHandler(ctx: Ctx): Promise<void> {
 async function adminListingsHandler(ctx: Ctx): Promise<void> {
   const raw = ctx.query.account;
   const account = Number(typeof raw === 'string' ? raw : '');
-  if (!Number.isInteger(account) || account < 1) {
-    json(ctx.res, 400, { success: false, data: null, error: 'invalid account' });
-    return;
-  }
+  // Registered code, never inline English (the sibling admin arms below):
+  // withErrors serializes it into the admin envelope's error field.
+  if (!Number.isInteger(account) || account < 1)
+    throw new HttpError(400, 'woc_market.invalid_input');
   const listings = await useService().adminListingsBySeller(account);
   json(ctx.res, 200, {
     success: true,
