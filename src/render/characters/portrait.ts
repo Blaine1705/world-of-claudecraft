@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
+import { gpuPrepNow } from '../gpu_prep_events';
 import { shaderDebugRequested } from '../shader_debug_flag';
 import {
   collectPrewarmTextures,
@@ -193,13 +194,34 @@ function requestLiveCapture(
   skin: number,
   framing: PortraitFraming,
 ): void {
-  liveCaptures.request(key, async () => {
+  liveCaptures.request(key, gpuPrepNow(), async () => {
     await prewarmVisualPortrait(visualKey, skin, framing);
     // A capture that linked nothing (encode failure, graphics rebuild) commits
-    // nothing: leave the consumers on their crest rather than repaint them.
-    if (!cache.has(key)) return;
+    // nothing: leave the consumers on their crest rather than repaint them,
+    // and report the miss so the lane backs this key off. Without that, a key
+    // that can never cache is re-kicked by the next frame's ask and loops its
+    // whole capture forever.
+    if (!cache.has(key)) return false;
     for (const cb of updateListeners) cb(visualKey, skin);
+    return true;
   });
+}
+
+/**
+ * The cached headshot for a (visual, skin, framing), or null. A PEEK: unlike
+ * the getters above it never kicks a capture on a miss, because its caller is
+ * the preview's cold-open stand-in (src/ui/preview_stand_in.ts), which resolves
+ * it at the exact moment the sheet's own context is linking. Starting a
+ * second-context capture there would put a 43 to 201 ms build, upload and
+ * encode on the frame that carries the click, which is the block the gate
+ * exists to remove.
+ */
+export function cachedPortraitDataUrl(
+  visualKey: string,
+  skin = 0,
+  framing: PortraitFraming = 'headshot',
+): string | null {
+  return cache.get(`${visualKey}:${skin}:${framing}`) ?? null;
 }
 
 /** Tight-memory iOS hosts defer the boot skin-atlas sweep (assets.ts), so a

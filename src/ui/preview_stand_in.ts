@@ -4,10 +4,11 @@
 // Every gate in this repo names its stand-in: a gate hides a still-linking
 // object so its reveal draw cannot stall the frame, and that is fair only
 // while something else still tells the player what is there. The paperdoll's
-// stand-in is the class CREST, the same ladder the portrait chips already
-// climb when a 3D portrait is not ready yet: honest (the player's own class,
-// not a fake body), free (a cached icon data URL), and NO new string, so this
-// adds no i18n surface at all. The container it paints into already carries
+// stand-in is a CACHED headshot of the character, else the class CREST: the
+// same ladder the portrait chips already climb when a 3D portrait is not ready
+// yet, honest (the player's own class, not a fake body), free (an already
+// cached data URL either way), and NO new string, so this adds no i18n
+// surface at all. The container it paints into already carries
 // t('hudChrome.character.modelPreview') as its aria-label; the layer only adds
 // aria-busy while the warm runs, and its image is decorative.
 //
@@ -16,34 +17,45 @@
 //
 // Cold path only: one element per open, never touched per frame, so it is
 // outside the HUD's per-frame write-elision budget by construction.
+//
+// Every mount of the shared turntable (Hud.mountSharedPreview) arms through
+// armPreviewOpen below, so the sheet, the skin picker and Inspect all hold
+// their first draw behind this layer while that context links, uploads and
+// touches what was just mounted.
 
+import { cachedPortraitDataUrl } from '../render/characters/portrait';
 import type { LinkedProgramTouchQueue } from '../render/linked_program_touch_lane';
 import type { PlayerClass } from '../sim/types';
 import { crestUrl } from './portrait_chip';
 
 /** What CharacterPreview.armOpen drives. Both halves are idempotent. */
-export interface PreviewStandIn {
+interface PreviewStandIn {
   show(): void;
   hide(): void;
 }
 
 export const PREVIEW_STAND_IN_CLASS = 'preview-stand-in';
 
-export interface PreviewStandInOpts {
-  /** Whose crest to draw. */
+interface PreviewStandInOpts {
+  /** Whose crest to draw, and whose cached headshot to prefer. */
   cls: PlayerClass;
-  /** A cached portrait of this exact character, when the caller already holds
-   *  one: truer than the crest, and the common case for Inspect once the
-   *  post-entry lane has warmed the class headshots. Never resolve one here on
-   *  a cache MISS: the synchronous portrait path costs 43 to 201 ms, which is
-   *  the very block the gate exists to remove. */
-  portraitUrl?: string | null;
+  /** Which body skin the mount is showing, so the peeked headshot is this
+   *  character's rather than another chroma's. */
+  skin?: number;
 }
 
 /**
  * Build the stand-in layer for `container` (`#char-model-preview` or
  * `#inspect-model-preview`). Nothing is created until `show()`, so an open
  * that skips the gate (already linked) costs one object and no DOM.
+ *
+ * The image is a cached headshot of this exact (class, skin) when the portrait
+ * cache already holds one (truer than the crest, and the common case once the
+ * post-entry lane has warmed the class headshots), else the class crest. The
+ * lookup is a PEEK that never kicks a capture: this runs at the moment the
+ * sheet's own context is linking, and a second-context capture there would put
+ * its 43 to 201 ms build, upload and encode on the very frame the gate exists
+ * to keep clear.
  */
 export function createPreviewStandIn(
   container: HTMLElement,
@@ -57,7 +69,9 @@ export function createPreviewStandIn(
       el.className = PREVIEW_STAND_IN_CLASS;
       el.setAttribute('aria-hidden', 'true');
       const img = document.createElement('img');
-      img.src = opts.portraitUrl || crestUrl(opts.cls);
+      img.src =
+        cachedPortraitDataUrl(`player_${opts.cls}`, opts.skin ?? 0, 'headshot') ??
+        crestUrl(opts.cls);
       img.alt = '';
       img.draggable = false;
       el.appendChild(img);
@@ -75,7 +89,7 @@ export function createPreviewStandIn(
 
 /** The slice of CharacterPreview this arming needs (structural, so the arm is
  *  testable without a WebGL context). */
-export interface PreviewOpenGateHost {
+interface PreviewOpenGateHost {
   setTouchQueue(queue: LinkedProgramTouchQueue | null): void;
   armOpen(standIn: PreviewStandIn | null): void;
 }

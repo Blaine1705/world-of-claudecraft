@@ -128,11 +128,6 @@ export class CharacterPreview {
   // empty canvas. It also carries the linked signature prewarm() shares.
   private openGate: PreviewOpenGate = createPreviewOpenGate();
   private standIn: PreviewOpenStandIn | null = null;
-  // The container a revealed frame is still standing in. A gear change rebuilds
-  // the body without resizing, so that RETAINED frame is the truest stand-in
-  // available and the crest layer would only dim it; a mount into a different
-  // container (Inspect, a reopened sheet) has no such frame and gets the crest.
-  private revealedContainer: HTMLElement | null = null;
   // The WORLD renderer's background GPU queue, injected by the HUD. Right on a
   // foreign context because the queue arbitrates MAIN-THREAD time, not
   // programs: a getUniforms/getAttributes round trip blocks the same thread
@@ -410,6 +405,8 @@ export class CharacterPreview {
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
       if (this.gateAllowsDraw()) this.renderer.render(this.scene, this.camera);
+    } else {
+      this.standDownOpenGate();
     }
   }
 
@@ -443,10 +440,12 @@ export class CharacterPreview {
     const sig = this.currentVisualSig;
     if (!this.openGate.arm(sig, gpuPrepNow())) return;
     this.hideStandIn();
-    if (this.revealedContainer !== this.container) {
-      this.standIn = standIn;
-      standIn?.show();
-    }
+    // Always, even for a rebuild in the SAME container: setContainer and the
+    // resize observer both run syncSize first, and setSize reassigns
+    // canvas.width, which CLEARS the drawing buffer. There is no retained
+    // frame left to stand in for the armed window, only a black panel.
+    this.standIn = standIn;
+    standIn?.show();
     const token = this.openGate.beginWarm();
     if (token === null) return;
     void this.prepareOpen(token, sig);
@@ -510,12 +509,23 @@ export class CharacterPreview {
     this.hideStandIn();
     if (!this.renderActive) return;
     this.renderer.render(this.scene, this.camera);
-    this.revealedContainer = this.container;
   }
 
   private hideStandIn(): void {
     this.standIn?.hide();
     this.standIn = null;
+  }
+
+  /** The preview stopped drawing: its window closed, or its container was
+   *  unmounted. Both draw sites are unreachable now, so the bounded escape can
+   *  never fire and an armed gate would strand the stand-in layer and its
+   *  aria-busy on a hidden container until the next mount. Drop the hold with
+   *  it; the next mount arms again, and a warm still in flight records nothing
+   *  because cancel() supersedes its arm. */
+  private standDownOpenGate(): void {
+    if (!this.openGate.isArmed() && !this.standIn) return;
+    this.openGate.cancel();
+    this.hideStandIn();
   }
 
   /** Compile and upload the current preview while a loading screen is visible.
@@ -529,6 +539,9 @@ export class CharacterPreview {
     const previousAspect = this.camera.aspect;
     const previousSkin = this.currentSkin;
     const wasActive = this.renderActive;
+    // What this pass linked, if anything: its touch tail runs after the
+    // warmup buffer is handed back (see below).
+    let compiledSig: string | null = null;
     this.renderActive = false;
     this.prewarming = true;
     this.pendingActive = null;
@@ -545,7 +558,7 @@ export class CharacterPreview {
       const warmSig = this.currentVisualSig;
       if (!this.openGate.isLinked(warmSig)) {
         await this.renderer.compileAsync(this.scene, this.camera);
-        this.openGate.noteLinked(warmSig);
+        compiledSig = warmSig;
       }
       // A chroma swap rebinds body textures. Upload every class variant now so
       // clicking a skin swatch cannot turn the preview's next rAF into a first-
@@ -584,6 +597,30 @@ export class CharacterPreview {
       this.renderActive = requestedActive ?? wasActive;
       if (requestedActive !== null) this.syncSize();
       this.timer.reset();
+    }
+    // The tail, OUTSIDE the warmup window: it only walks programs that are
+    // already linked, and holding the live preview inactive across a paced
+    // per-program lane would keep the panel dark if the player opened the
+    // sheet mid-warm.
+    //
+    // The signature counts as linked only once that tail has run, because the
+    // skip it grants makes a later open bypass armOpen entirely, tail
+    // included, and an open with no tail pays the first-use uniform-table
+    // query per program (15 to 17 ms each on the Intel iGPU) inside the frame
+    // that carries the click. With no queue injected there is no tail here, so
+    // nothing is recorded and the open gate still touches.
+    if (compiledSig === null || !this.touchQueue || this.destroyed) return;
+    await runLinkedProgramTouchLane(
+      this.touchQueue,
+      this.renderer.properties,
+      this.characterGroup,
+      GPU_WORK_PRIORITY.BACKGROUND,
+      PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
+    );
+    // A rebuild in between released those programs (forgetLinked): what this
+    // pass warmed is no longer what is mounted, so it records nothing.
+    if (!this.destroyed && this.currentVisualSig === compiledSig) {
+      this.openGate.noteLinked(compiledSig);
     }
   }
 
@@ -674,6 +711,7 @@ export class CharacterPreview {
       // Re-anchor the timer while hidden so reopening cannot produce a large
       // animation step.
       this.timer.reset();
+      this.standDownOpenGate();
       return;
     }
 

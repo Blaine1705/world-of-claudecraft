@@ -28,7 +28,7 @@
  *  stuck driver shows the player a character instead of an empty panel. */
 export const PREVIEW_OPEN_GATE_ESCAPE_MS = 1500;
 
-export interface PreviewOpenGateOptions {
+interface PreviewOpenGateOptions {
   escapeMs?: number;
 }
 

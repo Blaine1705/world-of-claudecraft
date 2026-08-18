@@ -101,13 +101,13 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   const source = src ? ` src="${src}"` : '';
   const crestId = `class_${cls}`;
   const fallbackAttrs = crestImageFallbackAttributes(crestId, 96);
-  // A chip with no embedded portrait carries the crest fallback, INCLUDING the
-  // deferSource one: it ships with no src at all, so without this a hydration
-  // that never lands (or lands with the portrait still capturing) leaves a
-  // permanently empty box. The attributes cost no data URL in the markup;
-  // hydrateCrestImageFallbacks paints the crest after mount and
-  // hydratePortraits clears it when the real headshot arrives.
-  const portraitFallbackAttrs = portrait && !deferSource ? '' : ` ${fallbackAttrs}`;
+  // A deferSource chip deliberately carries NO crest fallback: it ships with no
+  // src at all, and hydrateCrestImageFallbacks fires its error path immediately
+  // for a src-less image (complete, naturalWidth 0), painting a procedural crest
+  // data URL into every chip. That per-chip cost is exactly what deferSource
+  // exists to avoid in dense grids; those chips upgrade through
+  // hydratePortraits instead.
+  const portraitFallbackAttrs = !portrait && !deferSource ? ` ${fallbackAttrs}` : '';
   const pending = portrait && !deferSource ? '' : ' data-portrait-pending="1"';
   const fallbackCls = portrait && !deferSource ? '' : ' is-fallback';
   // A composed chip built before assets were ready holds the crest, and

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // The live getters must never block the calling frame: on a cache miss they
 // answer null and kick the ASYNC capture (the prewarm twin), then fire the
@@ -94,8 +94,15 @@ import {
   onPortraitUpdate,
   playerPortraitDataUrl,
   portraitsReady,
+  resetPortraitRendererForGraphicsRebuild,
   visualPortraitDataUrl,
 } from '../src/render/characters/portrait';
+import { PORTRAIT_CAPTURE_RETRY_BASE_MS } from '../src/render/characters/portrait_capture_lane_core';
+import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
+
+// The retry backoff is measured against the render-wide gpu-prep clock, so the
+// cases below step time instead of racing a real one.
+const clock = { now: 100_000 };
 
 const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
@@ -109,8 +116,11 @@ async function settleCapture(tag: string, ok = true): Promise<void> {
   entry.cb(ok ? new Blob(['png'], { type: 'image/png' }) : null);
 }
 
+afterAll(() => setGpuPrepClockForTest(null));
+
 describe('live portrait capture', () => {
   beforeEach(async () => {
+    setGpuPrepClockForTest(() => clock.now);
     await vi.waitFor(() => expect(portraitsReady()).toBe(true));
     // Each case settles what it started, so a leftover here would mean one
     // case could settle another's capture: fail loudly instead.
@@ -166,22 +176,49 @@ describe('live portrait capture', () => {
     });
   });
 
-  it('caches nothing and notifies nobody on a failed encode, and the next ask retries', async () => {
+  it('caches nothing, notifies nobody, and BACKS OFF a key whose capture failed', async () => {
     const updated = vi.fn();
     onPortraitUpdate(updated);
     expect(playerPortraitDataUrl('druid')).toBeNull();
 
     await settleCapture('player_druid:0', false);
-    // The in-flight entry clearing IS the sync point: the next ask captures again.
-    await vi.waitFor(() => {
-      expect(playerPortraitDataUrl('druid')).toBeNull();
-      expect(rig.builds).toEqual(['player_druid', 'player_druid']);
-    });
+    // Wait for the lane to retire the key, then keep asking: every consumer
+    // asks once per frame while it draws its crest, and without a cooldown
+    // each of those asks re-kicks the whole 43 to 201 ms capture.
+    await flush();
+    for (let i = 0; i < 5; i++) expect(playerPortraitDataUrl('druid')).toBeNull();
+    clock.now += PORTRAIT_CAPTURE_RETRY_BASE_MS - 1;
+    expect(playerPortraitDataUrl('druid')).toBeNull();
+    await flush();
+    expect(rig.builds).toEqual(['player_druid']);
+    expect(rig.encodes).toEqual([]);
     expect(updated).not.toHaveBeenCalled();
+
+    // Past the cooldown, exactly one retry, which lands.
+    clock.now += 1;
+    expect(playerPortraitDataUrl('druid')).toBeNull();
+    await vi.waitFor(() => expect(rig.builds).toEqual(['player_druid', 'player_druid']));
 
     await settleCapture('player_druid:0');
     await vi.waitFor(() => expect(updated).toHaveBeenCalledWith('player_druid', 0));
     expect(playerPortraitDataUrl('druid')).toBe(ASYNC_URL);
+  });
+
+  it('a graphics rebuild clears the backoff, so the next ask captures at once', async () => {
+    expect(playerPortraitDataUrl('priest')).toBeNull();
+    await settleCapture('player_priest:0', false);
+    await flush();
+    expect(playerPortraitDataUrl('priest')).toBeNull();
+    await flush();
+    expect(rig.builds).toEqual(['player_priest']);
+
+    // The rebuild swapped the rig: a key that failed against the old one gets
+    // a fresh attempt against the new one, with no cooldown left to wait out.
+    resetPortraitRendererForGraphicsRebuild();
+    expect(playerPortraitDataUrl('priest')).toBeNull();
+    await vi.waitFor(() => expect(rig.builds).toEqual(['player_priest', 'player_priest']));
+    await settleCapture('player_priest:0');
+    await vi.waitFor(() => expect(playerPortraitDataUrl('priest')).toBe(ASYNC_URL));
   });
 
   it('leaves the composed path on its synchronous capture', async () => {

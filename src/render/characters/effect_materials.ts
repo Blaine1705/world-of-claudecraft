@@ -31,26 +31,26 @@ import { cloneMaterialWithHooks } from '../material_clone_hooks';
 export type GhostStyle = 'spirit' | 'stealth';
 
 /** Every overlay that flips `transparent` on a rig material. */
-export type CharacterEffectStyle = GhostStyle | 'shadowform' | 'moonkin';
+type CharacterEffectStyle = GhostStyle | 'shadowform' | 'moonkin';
 
-export const GHOST_OPACITY = 0.34;
+const GHOST_OPACITY = 0.34;
 // Stealth (Duskveil/Smokestep) reads as a faded-but-solid silhouette, a touch
 // denser than the spirit run's 0.34 (owner: stealth was "too transparent").
-export const STEALTH_OPACITY = 0.45;
-export const SHADOWFORM_OPACITY = 0.9;
-export const SHADOWFORM_TINT = new THREE.Color(0x5a2a8f);
-export const SHADOWFORM_EMISSIVE_HEX = 0x2a0a4a;
-export const SHADOWFORM_EMISSIVE_INTENSITY = 0.4;
+const STEALTH_OPACITY = 0.45;
+const SHADOWFORM_OPACITY = 0.9;
+const SHADOWFORM_TINT = new THREE.Color(0x5a2a8f);
+const SHADOWFORM_EMISSIVE_HEX = 0x2a0a4a;
+const SHADOWFORM_EMISSIVE_INTENSITY = 0.4;
 // Moonkin Form: a brighter, more luminous violet than the ghost run (owner's brief: a
 // purplish tint like ghost form but a bit brighter).
-export const MOONKIN_OPACITY = 0.72;
-export const MOONKIN_TINT = new THREE.Color(0x9d6bff);
-export const MOONKIN_EMISSIVE_HEX = 0x6a3fd0;
-export const MOONKIN_EMISSIVE_INTENSITY = 0.55;
+const MOONKIN_OPACITY = 0.72;
+const MOONKIN_TINT = new THREE.Color(0x9d6bff);
+const MOONKIN_EMISSIVE_HEX = 0x6a3fd0;
+const MOONKIN_EMISSIVE_INTENSITY = 0.55;
 
-/** userData marker every clone this module mints carries, so the prewarm twin
- *  and its guard test can tell a factory-built variant from a hand-rolled one. */
-export const CHARACTER_EFFECT_MARKER = 'wocCharacterEffect';
+/** userData marker every clone this module mints carries, so a factory-built
+ *  variant is distinguishable from a hand-rolled one. */
+const CHARACTER_EFFECT_MARKER = 'wocCharacterEffect';
 
 type TintableMaterial = THREE.Material & {
   color?: THREE.Color;

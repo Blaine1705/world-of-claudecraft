@@ -9,7 +9,10 @@ import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import { CharacterPreview } from '../src/render/characters/preview';
-import { createPreviewOpenGate } from '../src/render/characters/preview_open_gate_core';
+import {
+  createPreviewOpenGate,
+  type PreviewOpenGate,
+} from '../src/render/characters/preview_open_gate_core';
 import {
   gpuPrepEventsSnapshot,
   resetGpuPrepEventsForTest,
@@ -231,20 +234,46 @@ describe('CharacterPreview cold-open gate', () => {
     expect(drawSite(h)).toBe(true);
   });
 
-  it('a re-arm in the SAME container keeps the retained frame instead of the crest', async () => {
+  it('a re-arm in the SAME container shows the stand-in too (the resize cleared the buffer)', async () => {
     const h = harness();
     h.preview.armOpen(h.standIn);
     h.resolveCompile();
     await settle();
     expect(h.order).toContain('render');
 
-    // A gear change rebuilds the body in place: nothing resized, so the frame
-    // already on the canvas is the truest stand-in there is.
+    // A gear change rebuilds the body in place, but the mount still runs
+    // setContainer/syncSize first, and setSize reassigns canvas.width, which
+    // CLEARS the drawing buffer: there is no retained frame to stand in, only
+    // a black panel for the whole armed window.
     h.state.currentVisualSig = '["player_warrior","sword_b",null,null,null]';
     const second = { show: vi.fn(), hide: vi.fn() };
     h.preview.armOpen(second);
     expect(drawSite(h)).toBe(false);
-    expect(second.show).not.toHaveBeenCalled();
+    expect(second.show).toHaveBeenCalledTimes(1);
+  });
+
+  it('a sheet closed while armed drops the hold and the stand-in with it', async () => {
+    const h = harness();
+    h.preview.armOpen(h.standIn);
+    expect(h.order).toContain('stand-in:show');
+
+    // The window closed: the container has no box, so neither draw site is
+    // reachable and the bounded escape can never fire. Nothing may be left
+    // behind on the hidden container.
+    const container = h.state.container as { clientWidth: number; clientHeight: number };
+    container.clientWidth = 0;
+    container.clientHeight = 0;
+    h.preview.syncSize();
+
+    expect(h.order).toContain('stand-in:hide');
+    expect((h.state.openGate as PreviewOpenGate).isArmed()).toBe(false);
+
+    // The warm still in flight was superseded: it records nothing and reveals
+    // nothing into the closed panel.
+    h.resolveCompile();
+    await settle();
+    expect(h.order).not.toContain('render');
+    expect(h.preview.linkedVisualSig).toBeNull();
   });
 
   it('still gates when no background prewarm ever ran (the tightMemory arm)', () => {
@@ -313,6 +342,43 @@ describe('CharacterPreview cold-open gate', () => {
     h.preview.armOpen(h.standIn);
     expect(drawSite(h)).toBe(true);
   });
+
+  it('prewarm records the signature only once its OWN touch tail has run', async () => {
+    vi.stubGlobal('window', { setTimeout: (fn: () => void) => setTimeout(fn, 0) });
+    const h = harness({ programs: 3 });
+    h.resolveCompile();
+    await h.preview.prewarm([0]);
+
+    // The skip an open takes from this signature covers the tail as well, so
+    // the warm has to have paid it: otherwise the open bypasses armOpen
+    // entirely and the first-use uniform-table queries land on the click.
+    expect(h.touched).toHaveLength(3);
+    expect(h.order.indexOf('touch-uniforms:0')).toBeGreaterThan(h.order.indexOf('compile'));
+    expect(h.preview.linkedVisualSig).toBe(SIG);
+  });
+
+  it('prewarm with NO queue records nothing, so the open gate still touches', async () => {
+    vi.stubGlobal('window', { setTimeout: (fn: () => void) => setTimeout(fn, 0) });
+    const h = harness({ programs: 2 });
+    h.state.touchQueue = null;
+    h.resolveCompile();
+    await h.preview.prewarm([0]);
+
+    expect(h.touched).toEqual([]);
+    expect(h.preview.linkedVisualSig).toBeNull();
+
+    // ...so the open still arms, and its own tail runs there.
+    h.state.touchQueue = {
+      run: async <T>(work: () => T | Promise<T>, priority: number, label: string): Promise<T> => {
+        h.touched.push({ priority, label });
+        return work();
+      },
+    };
+    h.preview.armOpen(h.standIn);
+    expect(drawSite(h)).toBe(false);
+    await settle();
+    expect(h.touched).toHaveLength(2);
+  });
 });
 
 const withoutLineComments = (source: string): string =>
@@ -344,7 +410,7 @@ describe('the second live draw site is gated too', () => {
     const mount = hud.slice(hud.indexOf('private mountSharedPreview('));
     const body = withoutLineComments(mount.slice(0, mount.indexOf('\n  }')));
     expect(body).toContain(
-      'armPreviewOpen(this.charPreview, container, { cls: opts.cls }, this.renderer)',
+      'armPreviewOpen(this.charPreview, container, { cls: opts.cls, skin: opts.skin }, this.renderer)',
     );
   });
 });
