@@ -16,6 +16,7 @@ import {
   TEXTURE_PREP_LABEL,
   type TexturePrepQueue,
   texturePieceLabel,
+  texturePieceSizeClass,
   texturePrepPriority,
 } from '../src/render/texture_prep_lane';
 
@@ -199,8 +200,8 @@ describe('runTexturePrepLane', () => {
 
     expect(count).toBe(1);
     expect(units).toEqual([
-      { label: 'upload:texture:bones:1024x256u', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
-      { label: 'upload:texture:bones:1024x256u', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
+      { label: 'upload-mid:texture:bones:1024x256u', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
+      { label: 'upload-mid:texture:bones:1024x256u', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
     ]);
     expect(order.filter((entry) => entry === 'upload:bones')).toHaveLength(2);
   });
@@ -252,10 +253,30 @@ describe('texturePieceLabel', () => {
     const anonymous = { name: '', uuid: 'abcdef12-3456', image: null };
     // biome-ignore lint/suspicious/noExplicitAny: structural stubs against three's Texture.
     const label = (t: unknown): string => texturePieceLabel(TEXTURE_PREP_LABEL, t as any);
-    expect(label(named)).toBe('upload:texture:skin_atlas:2048x1024u');
-    expect(label(compressed)).toBe('upload:texture:skin_atlas:2048x1024c');
+    expect(label(named)).toBe('upload-big:texture:skin_atlas:2048x1024u');
+    expect(label(compressed)).toBe('upload-big:texture:skin_atlas:2048x1024c');
     expect(label(anonymous)).toBe('upload:texture:abcdef12:unsizedu');
-    expect(label(named).split(':')[0]).toBe('upload');
+    expect(label(named).split(':')[0]).toBe('upload-big');
+  });
+
+  it.each([
+    ['128x128', 128, 128, ''],
+    ['511x512', 511, 512, ''],
+    ['512x512', 512, 512, '-mid'],
+    ['1024x256 (bone table, 512x512 texels)', 1024, 256, '-mid'],
+    ['1023x1024', 1023, 1024, '-mid'],
+    ['1024x1024', 1024, 1024, '-big'],
+    ['4096x4096', 4096, 4096, '-big'],
+  ])('sizes %s into its own cost class', (_name, width, height, expected) => {
+    // biome-ignore lint/suspicious/noExplicitAny: structural stub against three's Texture.
+    expect(texturePieceSizeClass({ image: { width, height } } as any)).toBe(expected);
+    const label = texturePieceLabel(TEXTURE_PREP_LABEL, {
+      name: 't',
+      uuid: 'x',
+      image: { width, height },
+      // biome-ignore lint/suspicious/noExplicitAny: same reason.
+    } as any);
+    expect(label.startsWith(`upload${expected}:texture:t:`)).toBe(true);
   });
 });
 

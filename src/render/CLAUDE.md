@@ -231,7 +231,9 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   `WebGLTextures`), so the same gates also run an upload lane: one budgeted
   queue unit per non-resident texture under the root (`texture_prep_lane.ts`,
   enumeration and the residency predicate in the pure `texture_prep_core.ts`,
-  label kind `upload:texture`, `upload-preview:texture` on a second context).
+  label kind `upload:texture`, `upload-preview:texture` on a second context, with
+  the size class appended to the kind, `upload-mid` from 512x512 texels and
+  `upload-big` from 1024x1024, so a large upload is priced by its own class).
   **The order inside a gate is LINK, then UPLOADS, then the TOUCH tail, then
   settle**, because the touch's driver round trip flushes behind everything
   already queued, so uploads paid after it are simply measured by it. The lane

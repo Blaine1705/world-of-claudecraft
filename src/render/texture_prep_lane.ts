@@ -38,9 +38,10 @@ export interface TexturePrepQueue {
   run<T>(work: () => T | Promise<T>, priority?: number, label?: string): Promise<T>;
 }
 
-/** The label every world upload piece carries. Its KIND (the part before the
- *  colon) is what the budget learns a cost for, so all pieces share one
- *  estimate, priced apart from `touch:program` and `texture-chunk-upload`. */
+/** The base label of every world upload piece. Its KIND (the part before the
+ *  colon, with the size class of texturePieceSizeClass appended) is what the
+ *  budget learns a cost for, priced apart from `touch:program` and
+ *  `texture-chunk-upload`. */
 export const TEXTURE_PREP_LABEL = 'upload:texture';
 
 /** The second contexts' own kind (paperdoll, portrait): a preview upload runs
@@ -70,17 +71,38 @@ export interface TexturePrepOptions {
 }
 
 /**
- * What one piece is called in the queue's slowest / longest-wait lists: the
- * kind, then the texture's name (or its short uuid when unnamed), its
- * dimensions and a `c` for a compressed (KTX2) source. The kind is all the
- * budget reads; the rest is what lets a 900 ms piece be named from a blob.
+ * The size class a piece is priced under. Upload cost is bimodal by size, not
+ * a single distribution: a resident-adjacent 128x128 costs a millisecond and a
+ * 1024x1024 with its mip chain (or a compressed 1024x1024 whose transcode lands
+ * here) costs hundreds, so one learned EMA under-prices the large pieces and
+ * the admission lets them into frames with no headroom for them. Three classes
+ * keep the ledger honest per class: `upload` under 512x512, `upload-mid` from
+ * 512x512 up to 1024x1024, `upload-big` from 1024x1024 up, each its own KIND.
  */
-export function texturePieceLabel(kind: string, texture: THREE.Texture): string {
+export function texturePieceSizeClass(texture: THREE.Texture): '' | '-mid' | '-big' {
+  const image = texture.image as { width?: number; height?: number } | null | undefined;
+  const texels = (image?.width ?? 0) * (image?.height ?? 0);
+  if (texels >= 1024 * 1024) return '-big';
+  if (texels >= 512 * 512) return '-mid';
+  return '';
+}
+
+/**
+ * What one piece is called in the queue: the base label's kind with the size
+ * class appended (`upload-big:texture`), then the texture's name (or its
+ * short uuid when unnamed), its dimensions and a `c` for a compressed (KTX2)
+ * source. The kind is all the budget reads; the rest is what lets a 900 ms
+ * piece be named from a blob.
+ */
+export function texturePieceLabel(baseLabel: string, texture: THREE.Texture): string {
+  const colon = baseLabel.indexOf(':');
+  const head = colon >= 0 ? baseLabel.slice(0, colon) : baseLabel;
+  const rest = colon >= 0 ? baseLabel.slice(colon) : '';
   const image = texture.image as { width?: number; height?: number } | null | undefined;
   const size = image?.width && image?.height ? `${image.width}x${image.height}` : 'unsized';
   const name = texture.name || texture.uuid.slice(0, 8);
   const compressed = (texture as THREE.CompressedTexture).isCompressedTexture ? 'c' : 'u';
-  return `${kind}:${name}:${size}${compressed}`;
+  return `${head}${texturePieceSizeClass(texture)}${rest}:${name}:${size}${compressed}`;
 }
 
 /**
