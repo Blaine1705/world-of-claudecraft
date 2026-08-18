@@ -16,6 +16,15 @@ let cursorEl: HTMLElement | null = null;
 let x = 0;
 let y = 0;
 let placed = false;
+// What the pointer is currently over, so entering and leaving can be announced.
+let hovered: Element | null = null;
+
+// Marks the element under the virtual pointer. CSS :hover is driven by the REAL
+// pointer and cannot be triggered synthetically at all, so any rule that should
+// also light up under the pad has to opt in through this class. Synthetic events
+// below cover the JS half (tooltips, popovers, anything on mouseenter); this
+// covers the CSS half.
+const HOVER_CLASS = 'pad-hover';
 
 function ensureCursor(): HTMLElement | null {
   if (cursorEl) return cursorEl;
@@ -26,6 +35,52 @@ function ensureCursor(): HTMLElement | null {
   document.body.appendChild(el);
   cursorEl = el;
   return el;
+}
+
+function elementUnderPointer(): Element | null {
+  if (typeof document === 'undefined' || typeof document.elementFromPoint !== 'function') {
+    return null;
+  }
+  // The pointer must not be what it finds under itself.
+  const shown = cursorEl?.style.display;
+  if (cursorEl) cursorEl.style.display = 'none';
+  const found = document.elementFromPoint(x, y);
+  if (cursorEl && shown !== undefined) cursorEl.style.display = shown;
+  return found;
+}
+
+function mouseInit(extra: Record<string, unknown> = {}): MouseEventInit {
+  return { bubbles: true, cancelable: true, clientX: x, clientY: y, ...extra };
+}
+
+/**
+ * Tell the page the pointer moved. Without this the virtual mouse could only
+ * CLICK: hover highlights, tooltips and popovers all hang off move and enter
+ * events, so the pad could press things it could never see the state of.
+ *
+ * enter/leave are dispatched non-bubbling on the element itself (that is their
+ * contract) while over/out bubble, so both direct and delegated handlers fire.
+ */
+function announceHover(): void {
+  const next = elementUnderPointer();
+  if (next === hovered) {
+    next?.dispatchEvent(new MouseEvent('mousemove', mouseInit()));
+    return;
+  }
+  if (hovered) {
+    hovered.classList?.remove(HOVER_CLASS);
+    hovered.dispatchEvent(new MouseEvent('mouseout', mouseInit({ relatedTarget: next })));
+    hovered.dispatchEvent(
+      new MouseEvent('mouseleave', mouseInit({ bubbles: false, relatedTarget: next })),
+    );
+  }
+  hovered = next;
+  if (next) {
+    next.classList?.add(HOVER_CLASS);
+    next.dispatchEvent(new MouseEvent('mouseover', mouseInit({ relatedTarget: null })));
+    next.dispatchEvent(new MouseEvent('mouseenter', mouseInit({ bubbles: false })));
+    next.dispatchEvent(new MouseEvent('mousemove', mouseInit()));
+  }
 }
 
 /** Screen position of the virtual pointer, for a caller that needs to aim. */
@@ -53,12 +108,20 @@ export function updatePadMouse(dx: number, dy: number, dt: number): boolean {
   y = Math.min(window.innerHeight, Math.max(0, y + dy * PAD_MOUSE_SPEED * dt));
   el.style.left = `${x}px`;
   el.style.top = `${y}px`;
+  announceHover();
   return true;
 }
 
-/** Put the pointer away when mouse mode ends. */
+/** Put the pointer away when mouse mode ends, and leave whatever it was over so
+ *  no tooltip or highlight is stranded open behind it. */
 export function hidePadMouse(): void {
   if (cursorEl) cursorEl.style.display = 'none';
+  if (hovered) {
+    hovered.classList?.remove(HOVER_CLASS);
+    hovered.dispatchEvent(new MouseEvent('mouseout', mouseInit({ relatedTarget: null })));
+    hovered.dispatchEvent(new MouseEvent('mouseleave', mouseInit({ bubbles: false })));
+    hovered = null;
+  }
 }
 
 /**
@@ -70,10 +133,7 @@ export function clickPadMouse(button: 0 | 2): void {
   // elementFromPoint is browser-only and absent from partial DOMs (headless env
   // server, unit stubs), where there is nothing under the pointer anyway.
   if (typeof document === 'undefined' || typeof document.elementFromPoint !== 'function') return;
-  // The pointer must not be the element the click lands on.
-  hidePadMouse();
-  const target = document.elementFromPoint(x, y) as HTMLElement | null;
-  if (cursorEl) cursorEl.style.display = 'block';
+  const target = elementUnderPointer() as HTMLElement | null;
   if (!target) return;
   const init = { bubbles: true, cancelable: true, clientX: x, clientY: y, button };
   target.dispatchEvent(new MouseEvent('mousedown', init));
