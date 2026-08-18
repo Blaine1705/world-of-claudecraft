@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { clearPadFocus, moveDpadFocus, pressDpadFocus } from '../src/game/dpad_focus_nav';
+import {
+  clearPadFocus,
+  focusFirstInWindow,
+  moveDpadFocus,
+  pressDpadFocus,
+} from '../src/game/dpad_focus_nav';
 
 // A fake DOM modelling only what dpad_focus_nav touches: the two selector shapes
 // it queries, visibility, boxes, focus and click. The shared tests/helpers/fake_dom
@@ -249,6 +254,39 @@ describe('moveDpadFocus', () => {
     a.focus();
     moveDpadFocus('down');
     expect(active).toBe(reachable);
+  });
+});
+
+describe('focusFirstInWindow', () => {
+  it('lands on the first control of the open window', () => {
+    const dialog = el('DIV', 0, 0, { role: 'dialog' });
+    dialog.rect = { left: 0, top: 0, right: 300, bottom: 300 };
+    const first = el('BUTTON', 10, 10);
+    const second = el('BUTTON', 10, 60);
+    allEls = [dialog, first, second];
+    install();
+
+    expect(focusFirstInWindow()).toBe(true);
+    expect(active).toBe(first);
+    // and it is highlighted, so the pad player can see where they landed
+    expect(first.classes.has('pad-focus')).toBe(true);
+  });
+
+  it('refuses when no window is open, rather than grabbing the whole page', () => {
+    // Auto-focusing the document on any state change would yank focus around the
+    // HUD instead of landing inside the thing that opened.
+    allEls = [el('BUTTON', 0, 0)];
+    install();
+    expect(focusFirstInWindow()).toBe(false);
+    expect(active).toBeNull();
+  });
+
+  it('refuses on a window with nothing focusable', () => {
+    const dialog = el('DIV', 0, 0, { role: 'dialog' });
+    dialog.rect = { left: 0, top: 0, right: 300, bottom: 300 };
+    allEls = [dialog, el('DIV', 10, 10)];
+    install();
+    expect(focusFirstInWindow()).toBe(false);
   });
 });
 

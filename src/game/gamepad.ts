@@ -15,7 +15,7 @@ import {
   nextCrossHotbarTriggerState,
 } from './cross_hotbar';
 import type { CrossHotbarBindings } from './cross_hotbar_bindings';
-import { clearPadFocus, moveDpadFocus, pressDpadFocus } from './dpad_focus_nav';
+import { clearPadFocus, focusFirstInWindow, moveDpadFocus, pressDpadFocus } from './dpad_focus_nav';
 import type { GamepadBindings } from './gamepad_bindings';
 import {
   AXIS,
@@ -83,6 +83,8 @@ export class GamepadManager {
   // mode is otherwise gated on a HUD window being open, which leaves a pad with
   // no way IN: the d-pad claims nothing in the world, so it read as dead.
   private navEngaged = false;
+  // Edge-detects a window opening, so focus lands inside it exactly once.
+  private prevPointerMode = false;
   private crossHotbar = false;
   private crossHotbarExpand = true;
   private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
@@ -257,12 +259,19 @@ export class GamepadManager {
 
     this.checkRumble();
 
+    // A window just opened while a pad is driving: put focus on its first control
+    // so the player is already inside it. This runs only from the pad's own poll
+    // with a live pad, so a keyboard-and-mouse session never reaches it.
+    const pointerMode = this.cb.isPointerMode();
+    if (pointerMode && !this.prevPointerMode) focusFirstInWindow();
+    this.prevPointerMode = pointerMode;
+
     // A bare d-pad press that would otherwise do NOTHING opens UI navigation, so
     // the pad can reach the HUD without a keyboard. Read the triggers from THIS
     // poll rather than the reducer, which still holds last poll's value here: a
     // trigger and a button pressed together must reach the cross hotbar, not this.
     const triggerHeld = (cur[GP.LT] ?? false) || (cur[GP.RT] ?? false);
-    if (!this.cb.isPointerMode() && !this.navEngaged && !triggerHeld) {
+    if (!pointerMode && !this.navEngaged && !triggerHeld) {
       for (const idx of risingEdges(this.prevPressed, cur)) {
         if (DPAD_NAV_DIRECTIONS[idx] !== undefined && this.pressWouldDoNothing(idx)) {
           this.navEngaged = true;
@@ -271,7 +280,7 @@ export class GamepadManager {
       }
     }
 
-    if (this.cb.isPointerMode() || this.navEngaged) {
+    if (pointerMode || this.navEngaged) {
       // UI navigation: the pad is driving the HUD, not the world. Clear any
       // lingering stick movement (a non-modal window like bags doesn't freeze
       // movement on its own) and skip camera/ability dispatch.

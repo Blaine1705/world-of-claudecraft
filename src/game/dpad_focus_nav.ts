@@ -150,6 +150,26 @@ export function clearPadFocus(): void {
   setPadCursorMode(false);
 }
 
+/**
+ * Land focus on the first control of a newly opened window, so a pad player does
+ * not have to press a direction just to get in. Answers false when no window is
+ * open or it holds nothing focusable, which leaves the pointer alone.
+ *
+ * Deliberately requires a real window rather than falling back to the document:
+ * auto-focusing the whole page on any state change would yank focus around the
+ * HUD instead of landing inside the thing that just opened.
+ */
+export function focusFirstInWindow(): boolean {
+  if (typeof document === 'undefined') return false;
+  const root = activeRoot();
+  if (!root) return false;
+  const els = focusables(root);
+  if (els.length === 0) return false;
+  els[0].focus();
+  markPadFocus(els[0]);
+  return true;
+}
+
 /** Press whatever the d-pad has focused. Answers false when nothing is focused,
  *  so the caller can fall back to clicking at the free cursor instead. */
 export function pressDpadFocus(): boolean {

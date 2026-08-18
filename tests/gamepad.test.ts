@@ -948,6 +948,47 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onCrossHotbar).toHaveBeenCalledTimes(1);
   });
 
+  it('auto-focuses a window the moment it opens, once', () => {
+    // A pad player should already be inside the window, not have to press a
+    // direction to get in. Edge-detected: it must not re-grab focus every poll.
+    const h = setupCrossHotbar(true);
+    const focused: string[] = [];
+    const btn = {
+      focus: () => focused.push('focus'),
+      classList: { add: () => {}, remove: () => {} },
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+        width: 10,
+        height: 10,
+      }),
+      hasAttribute: () => false,
+    };
+    const dialog = {
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 99,
+        bottom: 99,
+        width: 99,
+        height: 99,
+      }),
+      querySelectorAll: () => [btn],
+    };
+    const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+    (globalThis as unknown as { document: Record<string, unknown> }).document = {
+      ...baseDoc,
+      querySelectorAll: (sel: string) => (sel.includes('dialog') ? [dialog] : [btn]),
+      activeElement: null,
+    };
+    h.setPointerMode(true);
+    h.press();
+    h.press();
+    expect(focused).toEqual(['focus']);
+  });
+
   it('closes the hotbar when a HUD window takes the pad into cursor mode', () => {
     const h = setupCrossHotbar(true);
     h.press(GP.LT);
