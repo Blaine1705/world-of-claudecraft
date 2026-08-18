@@ -214,8 +214,11 @@ interface AttributionTargetFixture {
 // Re-minted after syncing current release/v0.39.0 into the v0.39 wrapper: the
 // resolved renderer bytes retain the queued self-spirit prewarm and delve
 // rebuild repair. No capture was retaken.
+// Re-minted for the Deeprock Boss stuck-corpse fix: entity_view_policy_core.ts
+// gained the decayed-corpse admission check, so the entityViewPolicy leaf
+// moves and the composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '2772a342485f6158c9c05d7b2915e2535388775df9722d7a06fe68a4b412c5e4';
+  'd0be54bc6fe0024f1095afd206d6a89f404945a4e80340009c7cacc413c7bb35';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
