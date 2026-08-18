@@ -19077,7 +19077,7 @@ export class Hud {
    *  panel with the newly detected brand's glyphs if that panel is open. */
   /** Open or close the controller cross hotbar (the pad's held-trigger bar). */
   setCrossHotbar(hold: CrossHotbarHold | null): void {
-    this.crossHotbar?.setHold(hold?.layer ?? null, hold?.slots ?? [], hold?.expanded ?? false);
+    this.crossHotbar?.setHold(hold);
   }
 
   refreshControllerLabels(): void {

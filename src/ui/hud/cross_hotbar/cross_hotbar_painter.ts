@@ -20,6 +20,7 @@ const DISPLAY_SHOWN = '';
 const DISPLAY_HIDDEN = 'none';
 const LAYER_ATTR = 'data-xhb-layer';
 const CLASS_EXPANDED = 'xhb-expanded';
+const CLASS_ACTIVE = 'xhb-active';
 // No trigger held: the attribute still needs a defined value, since the elided
 // writer compares strings rather than removing the attribute.
 const LAYER_NONE = 'none';
@@ -59,6 +60,7 @@ export class CrossHotbarPainter {
 
     this.writers.setAttr(this.descriptor.root, LAYER_ATTR, state.layer ?? LAYER_NONE);
     this.writers.toggleClass(this.descriptor.root, CLASS_EXPANDED, state.expanded);
+    this.writers.toggleClass(this.descriptor.root, CLASS_ACTIVE, state.active);
 
     for (let i = 0; i < this.adapter.slots.length; i++) {
       const slot = state.cellSlots[i];

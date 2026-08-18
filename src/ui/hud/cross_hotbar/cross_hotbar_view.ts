@@ -45,6 +45,10 @@ export const CROSS_HOTBAR_CELL_COUNT = CROSS_HOTBAR_CELLS.length;
 
 export interface CrossHotbarOverlayState {
   visible: boolean;
+  /** True only while a trigger is actually held. The bar stays on screen in pad
+   *  mode with no trigger down (that is the whole point of replacing the desktop
+   *  bar with it), so "shown" and "armed" are different questions. */
+  active: boolean;
   layer: CrossHotbarOverlayLayer | null;
   /** Whether the second (double) set is showing, for the overlay's set marker. */
   expanded: boolean;
@@ -54,6 +58,7 @@ export interface CrossHotbarOverlayState {
 
 export const HIDDEN_CROSS_HOTBAR: CrossHotbarOverlayState = {
   visible: false,
+  active: false,
   layer: null,
   expanded: false,
   cellSlots: CROSS_HOTBAR_CELLS.map(() => -1),
@@ -65,6 +70,11 @@ export interface CrossHotbarHold {
   layer: CrossHotbarOverlayLayer;
   slots: readonly number[];
   expanded: boolean;
+  /** False for the resting bar a pad player always sees, true once a trigger is
+   *  actually down. */
+  active: boolean;
+  /** The hardware glyph under each cell, in CROSS_HOTBAR_CELLS order. */
+  buttons: readonly string[];
 }
 
 /**
@@ -78,6 +88,7 @@ export function crossHotbarOverlayState(
   layer: CrossHotbarOverlayLayer | null,
   layerSlots: readonly number[],
   expanded = false,
+  active = true,
 ): CrossHotbarOverlayState {
   if (layer === null) return HIDDEN_CROSS_HOTBAR;
   const cellSlots: number[] = [];
@@ -85,5 +96,5 @@ export function crossHotbarOverlayState(
     const slot = layerSlots[i];
     cellSlots.push(typeof slot === 'number' && slot >= 0 ? slot : -1);
   }
-  return { visible: true, layer, expanded, cellSlots };
+  return { visible: true, active, layer, expanded, cellSlots };
 }

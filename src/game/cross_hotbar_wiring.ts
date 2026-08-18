@@ -5,22 +5,39 @@
 // a firewall, not a home (src/game/CLAUDE.md): the client carries calls, not the
 // shape of a feature.
 
-import { CROSS_HOTBAR_EXPANDED_SET, type CrossHotbarLayer } from './cross_hotbar';
+import {
+  CROSS_HOTBAR_EXPANDED_SET,
+  CROSS_HOTBAR_LAYER_BUTTONS,
+  CROSS_HOTBAR_PRIMARY_SET,
+  type CrossHotbarLayer,
+} from './cross_hotbar';
 import { CrossHotbarBindings } from './cross_hotbar_bindings';
+import { type GamepadKind, gamepadButtonLabel } from './gamepad_map';
 
 export interface CrossHotbarHoldInfo {
   layer: CrossHotbarLayer;
   slots: readonly number[];
   expanded: boolean;
+  /** False for the resting bar, true once a trigger is actually down. */
+  active: boolean;
+  /** The hardware glyph under each cell, for the connected pad's brand. */
+  buttons: readonly string[];
 }
 
 /** The HUD surface the overlay is driven through. */
 export interface CrossHotbarOverlayHost {
   setCrossHotbar(hold: CrossHotbarHoldInfo | null): void;
+  refreshControllerLabels(): void;
+}
+
+/** The live pad, for the connection-driven half of pad mode. */
+export interface CrossHotbarPadState {
+  isConnected(): boolean;
+  getKind(): GamepadKind;
 }
 
 /** The live pad the settings arm pushes to. */
-export interface CrossHotbarPad {
+export interface CrossHotbarPad extends CrossHotbarPadState {
   setCrossHotbar(on: boolean): void;
   setCrossHotbarExpand(on: boolean): void;
 }
@@ -41,7 +58,7 @@ export interface CrossHotbarWiring {
   /** Passed to the GamepadManager so a held trigger resolves against this layout. */
   bindings: CrossHotbarBindings;
   /** The pad's onCrossHotbar callback: opens, swaps, and closes the overlay. */
-  onHold(layer: CrossHotbarLayer | null, set: number): void;
+  onHold(layer: CrossHotbarLayer | null, set: number, kind: GamepadKind): void;
   /** The two cross-hotbar settings. Answers whether the key was one of them, so
    *  the caller's settings chain can return on a match. */
   applySetting(
@@ -51,6 +68,8 @@ export interface CrossHotbarWiring {
     value: number | boolean,
   ): boolean;
   hooks: CrossHotbarPanelHooks;
+  /** Re-evaluate pad mode after a connect, disconnect, or settings change. */
+  syncPadMode(pad: CrossHotbarPadState): void;
 }
 
 /** The overlay payload for a held trigger, or null once none is held. */
@@ -58,13 +77,50 @@ export function crossHotbarHold(
   bindings: CrossHotbarBindings,
   layer: CrossHotbarLayer | null,
   set: number,
+  kind: GamepadKind,
 ): CrossHotbarHoldInfo | null {
   if (layer === null) return null;
   return {
     layer,
     slots: bindings.layerSlots(set, layer),
     expanded: set === CROSS_HOTBAR_EXPANDED_SET,
+    active: true,
+    buttons: crossHotbarButtonLabels(kind),
   };
+}
+
+/** The bar a pad player sees with no trigger down: the first set's left eight,
+ *  shown but not armed. Keeping it on screen is what lets the desktop rows stand
+ *  down without leaving the player with no hotbar at all. */
+export function crossHotbarResting(
+  bindings: CrossHotbarBindings,
+  kind: GamepadKind,
+): CrossHotbarHoldInfo {
+  return {
+    layer: 'left',
+    slots: bindings.layerSlots(CROSS_HOTBAR_PRIMARY_SET, 'left'),
+    expanded: false,
+    active: false,
+    buttons: crossHotbarButtonLabels(kind),
+  };
+}
+
+/** The eight hardware glyphs under the cells, for the connected pad's brand. */
+export function crossHotbarButtonLabels(kind: GamepadKind): string[] {
+  return CROSS_HOTBAR_LAYER_BUTTONS.map((button) => gamepadButtonLabel(button, kind));
+}
+
+// Pad mode is the cross hotbar being both enabled AND reachable. A player with no
+// pad keeps the desktop rows even though the setting defaults on, which is the
+// whole reason this is not just the setting.
+const PAD_MODE_CLASS = 'xhb-mode';
+
+function applyPadModeClass(on: boolean): void {
+  try {
+    document.body.classList.toggle(PAD_MODE_CLASS, on);
+  } catch {
+    /* no DOM (headless/tests) */
+  }
 }
 
 /**
@@ -74,12 +130,28 @@ export function crossHotbarHold(
  */
 export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotbarWiring {
   const bindings = new CrossHotbarBindings();
+  let enabled = true;
+  const syncPadMode = (pad: CrossHotbarPadState): void => {
+    const on = enabled && pad.isConnected();
+    applyPadModeClass(on);
+    const ui = host();
+    ui.refreshControllerLabels();
+    ui.setCrossHotbar(on ? crossHotbarResting(bindings, pad.getKind()) : null);
+  };
   return {
     bindings,
-    onHold: (layer, set) => host().setCrossHotbar(crossHotbarHold(bindings, layer, set)),
+    syncPadMode,
+    onHold: (layer, set, kind) =>
+      host().setCrossHotbar(
+        layer === null
+          ? crossHotbarResting(bindings, kind)
+          : crossHotbarHold(bindings, layer, set, kind),
+      ),
     applySetting: (pad, store, key, value) => {
       if (key === 'gamepadCrossHotbar') {
-        pad.setCrossHotbar(store.set(key, !!value));
+        enabled = store.set(key, !!value);
+        pad.setCrossHotbar(enabled);
+        syncPadMode(pad);
         return true;
       }
       if (key === 'gamepadCrossHotbarExpand') {

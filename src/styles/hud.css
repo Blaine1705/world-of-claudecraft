@@ -574,7 +574,7 @@
     top: auto;
     left: auto;
     width: 612px;
-    margin: 0 auto 6px;
+    margin: 0 auto 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9211,11 +9211,18 @@ body.reduce-motion .breath-bar.breath-bar-drowning {
    pointer-events-free: it is a readout for a controller, never a click target. */
 .xhb {
   --xhb-cell: 44px;
+  /* Fixed, not in the HUD column's flow: the bar comes and goes with the pad, and
+     anything in flow here shoves the player frame and XP bar up and down as it
+     does. Out of flow it can never move another element. */
+  position: fixed;
+  left: 50%;
+  bottom: var(--xhb-bottom, 96px);
+  transform: translateX(-50%);
+  z-index: 6;
   display: flex;
   gap: 26px;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 6px;
   padding: 8px 14px;
   width: max-content;
   max-width: 100%;
@@ -9223,6 +9230,38 @@ body.reduce-motion .breath-bar.breath-bar-drowning {
   background: var(--panel-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
+  /* Resting: on screen so a pad player always sees their actions, dimmed so it
+     never competes with the world until a trigger arms it. */
+  opacity: 0.72;
+  transition: opacity 120ms ease;
+}
+.xhb.xhb-active {
+  opacity: 1;
+}
+body.reduce-motion .xhb {
+  transition: none;
+}
+/* Pad mode: the cross hotbar IS the hotbar, so the desktop rows stand down
+   rather than duplicating it under a bar the player has stopped reading. */
+body.xhb-mode #actionbar,
+body.xhb-mode #actionbar2,
+body.xhb-mode #actionbar3 {
+  display: none;
+}
+/* The hardware glyph under each cell, so the mapping reads itself without a trip
+   to the options panel. Its own element: the shared action-bar painter owns
+   `.keybind` and would overwrite a glyph parked there with the keyboard keycap. */
+.xhb-glyph {
+  position: absolute;
+  left: 50%;
+  bottom: -13px;
+  transform: translateX(-50%);
+  font-family: var(--ui-font);
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--gold-dim);
+  text-shadow: 0 1px 2px #000;
 }
 .xhb-diamond {
   display: grid;

@@ -11,7 +11,7 @@ import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarSlotElements } from '../action_bar/action_bar_painter';
 import type { ActionBarState } from '../action_bar/action_bar_view';
 import { CrossHotbarPainter } from './cross_hotbar_painter';
-import type { CrossHotbarOverlayLayer } from './cross_hotbar_view';
+import type { CrossHotbarHold } from './cross_hotbar_view';
 import {
   CROSS_HOTBAR_CELLS,
   type CrossHotbarOverlayState,
@@ -24,6 +24,7 @@ const CLUSTER_CLASS = 'xhb-diamond';
 const CELL_CLASS = 'xhb-slot';
 const CELL_POSITION_ATTR = 'data-xhb-point';
 const CELL_INDEX_ATTR = 'data-xhb-index';
+const GLYPH_CLASS = 'xhb-glyph';
 
 /** Mint one cell's inner spans, matching the action bar's element contract so the
  *  shared ActionBarPainter can write it unchanged. */
@@ -50,6 +51,7 @@ function buildCell(cell: (typeof CROSS_HOTBAR_CELLS)[number]): ActionBarSlotElem
 
 export class CrossHotbarController {
   private readonly painter: CrossHotbarPainter;
+  private readonly glyphs: HTMLElement[] = [];
   private state: CrossHotbarOverlayState = HIDDEN_CROSS_HOTBAR;
 
   private constructor(
@@ -64,6 +66,10 @@ export class CrossHotbarController {
       for (const cell of CROSS_HOTBAR_CELLS) {
         if (cell.cluster !== cluster) continue;
         const els = buildCell(cell);
+        const glyph = document.createElement('span');
+        glyph.className = GLYPH_CLASS;
+        els.btn.appendChild(glyph);
+        this.glyphs[cell.index] = glyph;
         wrap.appendChild(els.btn);
         cells[cell.index] = els;
       }
@@ -87,12 +93,23 @@ export class CrossHotbarController {
   }
 
   /** Open the overlay on a held trigger, or close it when `layer` is null. */
-  setHold(
-    layer: CrossHotbarOverlayLayer | null,
-    layerSlots: readonly number[],
-    expanded: boolean,
-  ): void {
-    this.state = crossHotbarOverlayState(layer, layerSlots, expanded);
+  /** Open, rest, or close the bar. The glyphs are written here rather than per
+   *  frame (they only move when the pad's brand does) and into their OWN element,
+   *  because the shared ActionBarPainter owns `.keybind` and would overwrite a
+   *  glyph parked there with the keyboard keycap. */
+  setHold(hold: CrossHotbarHold | null): void {
+    this.state = crossHotbarOverlayState(
+      hold?.layer ?? null,
+      hold?.slots ?? [],
+      hold?.expanded ?? false,
+      hold?.active ?? true,
+    );
+    const labels = hold?.buttons;
+    if (!labels) return;
+    for (let i = 0; i < this.glyphs.length; i++) {
+      const next = labels[i] ?? '';
+      if (this.glyphs[i].textContent !== next) this.glyphs[i].textContent = next;
+    }
   }
 
   /** Paint from the frame's already-ticked action-bar state. */

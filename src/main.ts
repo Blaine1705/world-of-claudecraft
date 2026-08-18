@@ -2324,9 +2324,9 @@ async function startGame(
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
-    onConnectionChange: () => hud.refreshControllerLabels(),
+    onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
-    onCrossHotbar: crossHotbar.onHold,
+    onCrossHotbar: (layer, set) => crossHotbar.onHold(layer, set, gamepad.getKind()),
   });
   gamepad.setCrossHotbarBindings(crossHotbar.bindings);
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
