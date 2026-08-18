@@ -326,6 +326,8 @@ const UI_PURE_CORES = [
   'src/ui/market_armor_badge.ts',
   'src/ui/market_buy_confirm_core.ts',
   'src/ui/usd_text.ts',
+  'src/ui/woc_tokens_text.ts',
+  'src/ui/woc_log_tones.ts',
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/terms_link.ts',
   'src/ui/duration_text.ts',
@@ -617,6 +619,8 @@ const BARE_NAMED = [
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
   'src/ui/usd_text.ts',
+  'src/ui/woc_tokens_text.ts',
+  'src/ui/woc_log_tones.ts',
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/terms_link.ts',
   'src/ui/duration_text.ts',
@@ -1733,7 +1737,9 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/unit_portrait.ts',
   'src/ui/usd_text.ts',
   'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/woc_log_tones.ts',
   'src/ui/woc_market_reason_text.ts',
+  'src/ui/woc_tokens_text.ts',
   'src/ui/xp_bar.ts',
 ];
 

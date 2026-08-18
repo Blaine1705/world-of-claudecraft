@@ -21,7 +21,7 @@ import {
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
-} from '../src/ui/trade_woc_panel';
+} from '../src/ui/trade_woc_arm_painter';
 import type { WocTradeQuoteReview } from '../src/ui/trade_woc_view';
 import { usdText } from '../src/ui/usd_text';
 
@@ -598,7 +598,7 @@ describe('the payment phase, in the window rather than elsewhere', () => {
       // Announced, because a chain confirmation is exactly the change a screen
       // reader user cannot otherwise perceive.
       expect(line?.getAttribute('role'), role).toBe('status');
-      expect(root.querySelector('.trade-woc-spinner'), role).not.toBeNull();
+      expect(root.querySelector('.woc-spinner'), role).not.toBeNull();
       expect(root.querySelector('[data-woc-pay]'), role).toBeNull();
     }
     // And the two sides do NOT read the same, which is the point of the split.
@@ -620,7 +620,7 @@ describe('the payment phase, in the window rather than elsewhere', () => {
     expect(seller.busy).toBe(false);
     expect(seller.statusKey).not.toBeNull();
     const root = paint(deps({ pendingOffer: { ...paying, role: 'seller' } }));
-    expect(root.querySelector('.trade-woc-spinner')).toBeNull();
+    expect(root.querySelector('.woc-spinner')).toBeNull();
   });
 });
 
@@ -1104,11 +1104,11 @@ describe('the QA round faces: pressed Pay, expired Sign, keyed controls', () => 
     const busy = paint(deps({ pendingOffer: escrowed, paying: true }));
     const btn = busy.querySelector<HTMLButtonElement>('[data-woc-pay]');
     expect(btn?.disabled).toBe(true);
-    expect(btn?.querySelector('.trade-woc-spinner')).not.toBeNull();
+    expect(btn?.querySelector('.woc-spinner')).not.toBeNull();
     const idle = paint(deps({ pendingOffer: escrowed }));
     const idleBtn = idle.querySelector<HTMLButtonElement>('[data-woc-pay]');
     expect(idleBtn?.disabled).toBe(false);
-    expect(idleBtn?.querySelector('.trade-woc-spinner')).toBeNull();
+    expect(idleBtn?.querySelector('.woc-spinner')).toBeNull();
   });
 
   it('the claim in flight makes the model busy; an idle wait does not', () => {
@@ -1370,7 +1370,7 @@ describe('the QA session faces: fee block, commitment note, quote legs, focus la
           : 'hudChrome.trade.woc.statusReviewSeller',
       );
       expect(model.busy).toBe(false);
-      expect(paint(d).querySelector('.trade-woc-spinner')).toBeNull();
+      expect(paint(d).querySelector('.woc-spinner')).toBeNull();
     }
     // Confirming still spins, and a delivered answer reads as decided money.
     const confirming = wocTradeModelFrom(

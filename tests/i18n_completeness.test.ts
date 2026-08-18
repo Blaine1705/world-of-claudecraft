@@ -440,6 +440,7 @@ describe('i18n CLDR pluralization', () => {
       'reliquaryToGo',
       'secondsRemaining',
       'wocMarketSellChoose',
+      'wocTradeIneligible',
     ]);
     for (const base of bases) {
       for (const cat of ['one', 'few', 'many', 'other']) {

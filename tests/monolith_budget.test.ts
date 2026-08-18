@@ -67,7 +67,10 @@ const MONOLITHS: MonolithRow[] = [
     // absorbed the login prewarm trim's flags, so the merged file landed
     // SMALLER than either side (release row 19387). Exact merged count, zero
     // headroom: the next line added fails.
-    ceiling: 19069,
+    // Lowered 19069 -> 19043 after the bag $WOC balance chip moved out to
+    // src/ui/woc_balance_chip.ts (the ratchet's own rule: an extraction lowers
+    // the ceiling, never raises it). Exact count, zero headroom.
+    ceiling: 19043,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

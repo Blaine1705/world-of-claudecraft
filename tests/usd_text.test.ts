@@ -47,15 +47,19 @@ describe('formatting', () => {
   });
 });
 
-describe('the grep-proof: zero hardcoded currency spellings in src/ui, src/game, src/net', () => {
+describe('the grep-proof: zero hardcoded currency or ticker spellings in src/ui, src/game, src/net', () => {
   // The shapes the sweep hunts. Each is a literal currency glued to a
   // localized number, which Intl exists to spell: a template `$${...}`, a
   // quoted "$" concatenated on either side (any spacing), and a currency
   // code appended after an interpolation.
+  // The last shape covers the token tickers too: a ` SOL` / ` USDC` / ` WOC` /
+  // ` $WOC` glued after an interpolation is the same defect with a unit Intl
+  // cannot spell (the Claudium pack labels used to), so the unit rides a
+  // catalog template token instead.
   const SHAPES: readonly RegExp[] = [
     /`[^`]*\$\$\{/,
     /['"]\$['"]\s*\+|\+\s*['"]\$['"]/,
-    /\$\{[^}]*\}\s*USD`/,
+    /\$\{[^}]*\}\s*(?:USD|USDC|SOL|WOC|\$WOC)`/,
   ];
   const offends = (src: string): boolean => SHAPES.some((re) => re.test(src));
 
@@ -84,7 +88,12 @@ describe('the grep-proof: zero hardcoded currency spellings in src/ui, src/game,
     expect(offends('const x = "$"+amount;')).toBe(true);
     expect(offends("const x = amount + '$';")).toBe(true);
     expect(offends('const x = `${amount} USD`;')).toBe(true);
+    expect(offends('const x = `${amount} SOL`;')).toBe(true);
+    expect(offends('const x = `${amount} USDC`;')).toBe(true);
+    expect(offends('const x = `${amount} WOC`;')).toBe(true);
+    expect(offends('const x = `${tokens} $WOC`;')).toBe(true);
     expect(offends('const x = `${amount}`;')).toBe(false);
+    expect(offends("t('hudChrome.claudium.priceSol', { amount })")).toBe(false);
     expect(offends('const x = usdText(cents);')).toBe(false);
     expect(offends("t('hudChrome.trade.woc.moneyUsd', { usd })")).toBe(false);
   });

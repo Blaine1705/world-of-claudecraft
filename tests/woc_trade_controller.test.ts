@@ -725,7 +725,11 @@ describe('the escrow-failed retry face', () => {
       phase: 'awaiting_payment',
     };
     r.controller.updateTradeWindow();
-    const buttons = document.querySelectorAll<HTMLButtonElement>('#trade-window > button.btn');
+    // The two window actions live in their own row (the sheet pins it on
+    // touch); still exactly two, Accept first.
+    const buttons = document.querySelectorAll<HTMLButtonElement>(
+      '#trade-window > .trade-actions > button.btn',
+    );
     expect(buttons.length).toBe(2);
     expect(buttons[0]?.hidden).toBe(true);
     expect(buttons[0]?.disabled).toBe(true);

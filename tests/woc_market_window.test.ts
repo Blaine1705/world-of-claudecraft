@@ -2,10 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { stripComments } from './helpers/strip_comments';
 
-// The $WOC Exchange window painter is a cold DOM module; driving its live DOM
-// belongs to the opt-in browser suite. This is the no-DOM source-scan
-// equivalent (the tests/market_window.test.ts pattern): each pin below names
-// WHY it exists, because a source regex proves discipline, not behavior.
+// The $WOC Exchange window painter is a cold DOM module. Its BEHAVIOR is
+// driven live in tests/woc_market_window_rig.test.ts (the happy-dom rig over
+// the real window: the fetch set, the row select, the busyGen close guard,
+// the poll gate, the form draft and focus carry, the combobox). This file is
+// the no-DOM source-scan twin (the tests/market_window.test.ts pattern): the
+// contracts a regex CAN hold (no magic values, no layout reads, no driver,
+// i18n and escaping discipline, CSS specificity order, class coverage). Each
+// pin below names WHY it exists, because a source regex proves discipline,
+// not behavior; a behavior claim belongs on the rig.
 const painter = readFileSync(new URL('../src/ui/woc_market_window.ts', import.meta.url), 'utf8');
 
 // Slice a method body between two source anchors so an assertion about
@@ -165,7 +170,11 @@ describe('woc_market_window: focus management and dialog chrome', () => {
   });
 
   it('close() returns focus to the captured opener', () => {
-    const close = painter.slice(painter.indexOf('close(): void {'));
+    // Bounded to close()'s own body (the next member), so a restore call
+    // anywhere later in the file cannot satisfy this pin. The live rig
+    // (tests/woc_market_window_rig.test.ts) proves the ORIGINAL opener is the
+    // one handed back.
+    const close = between('close(): void {', 'private async reload(): Promise<void> {');
     expect(close).toContain('this.deps.restoreFocus(this.opener)');
   });
 
@@ -175,9 +184,9 @@ describe('woc_market_window: focus management and dialog chrome', () => {
     // guard so the window is usable again AND bumps busyGen: without the bump,
     // resetting busy would break the invariant that `busy` means "a mutation is
     // in flight" (pollFromServer gates on it) and an abandoned run's finally
-    // would clear a newer run's guard. FOLLOW-UP (phase 15, window UX honesty):
-    // a live-DOM behavioral rig for WocMarketWindow, which has no instantiation
-    // harness today, to prove the abandoned run bails rather than pin structure.
+    // would clear a newer run's guard. The live rig proves the behavior (the
+    // abandoned run sends nothing, and a run resolving late under a newer one
+    // leaves that run's guard alone); this pin holds only the structure.
     const close = betweenCode('close(): void {', 'reload(): Promise<void> {');
     expect(close).toContain('this.busy = false');
     expect(close).toContain('this.busyLabel = null');
@@ -408,10 +417,13 @@ describe('woc_market_window: every class it emits is actually styled', () => {
       // And never as the bare class, which is the losing form.
       expect(css.includes(`#woc-market-window .${cls} {`), `bare .${cls} rule loses`).toBe(false);
     }
-    // Order still has to hold: the generic rule must come FIRST.
-    expect(css.indexOf('#woc-market-window button:not(.x-btn) {')).toBeLessThan(
-      css.indexOf('#woc-market-window button.wm-tab-selected'),
-    );
+    // Order still has to hold: the generic rule must come FIRST. Both anchors
+    // are asserted present first (a lost anchor is -1, and -1 < N would pass).
+    const generic = css.indexOf('#woc-market-window button:not(.x-btn) {');
+    const selectedTab = css.indexOf('#woc-market-window button.wm-tab-selected');
+    expect(generic).toBeGreaterThanOrEqual(0);
+    expect(selectedTab).toBeGreaterThanOrEqual(0);
+    expect(generic).toBeLessThan(selectedTab);
   });
 
   it('harvests the classes that exist ONLY inside an interpolated attribute', () => {
@@ -603,7 +615,11 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
   it('shows an ICON next to every option name', () => {
     const sell = between('private sellHtml(', 'private activityHtml(');
     expect(sell).toContain('wm-combo-icon');
-    expect(sell).toContain("iconDataUrl('item', r.itemId, 28)");
+    // The default master size (the shared icon path): curated art returns the
+    // 128px WebP whatever the size, and the procedural fallback composes at the
+    // shared master so it stays crisp on a 2x display and rides the warm cache.
+    expect(sell).toContain("iconDataUrl('item', r.itemId)");
+    expect(sell).not.toContain("iconDataUrl('item', r.itemId, 28)");
   });
 
   it('renders the selected item INSIDE the control, hoverable, with a clear button', () => {
@@ -967,12 +983,22 @@ describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () =>
       'private async submitListing(): Promise<void> {',
       'private async payBond(',
     );
-    // The busy ladder: signing while the popup is open, then the listing send
-    // (a plain REST create, NOT an on-chain confirm, so its own honest label).
-    const iSigning = submit.indexOf("withBusy('hudChrome.wocMarket.signing'");
+    // The busy ladder, in order: the challenge mint is a plain REST round trip
+    // ("Confirming"), the wallet sentence appears only at the handoff that
+    // actually opens a wallet (so the dev economy's devsig arm never claims
+    // one), and the create is its own honest label (a REST create, NOT an
+    // on-chain confirm).
+    const iConfirming = submit.indexOf("withBusy('hudChrome.wocMarket.confirming'");
+    const iSigning = submit.indexOf("busyLabel = 'hudChrome.wocMarket.signing'");
     const iListing = submit.indexOf("busyLabel = 'hudChrome.wocMarket.listing'");
-    expect(iSigning).toBeGreaterThanOrEqual(0);
+    expect(iConfirming).toBeGreaterThanOrEqual(0);
+    expect(iSigning).toBeGreaterThan(iConfirming);
     expect(iListing).toBeGreaterThan(iSigning);
+    // The wallet label is set INSIDE the real-signature arm, never in the
+    // devsig arm above it.
+    const iDevsig = submit.indexOf('devsig:${issued.challenge.nonce}');
+    expect(iDevsig).toBeGreaterThanOrEqual(0);
+    expect(iSigning).toBeGreaterThan(iDevsig);
     // A wallet failure renders the CLASSIFIED sign-flavored line, never
     // err.message raw (the wallet-bridge i18n medium); the raw error logs on
     // the dev channel, and a challenge refusal rides fail().
@@ -1109,15 +1135,19 @@ describe('woc_market_window: the two ways to take a listing are separate actions
     expect(rule, 'no buy-now rule in components.css').not.toEqual('');
     expect(rule).toContain('width: 100%');
     expect(rule).toContain('display: block');
-    expect(rule).toMatch(/margin-top:\s*\d+px/);
+    // Air above it, on a spacing token or a literal (a token move must not
+    // read as the air disappearing).
+    expect(rule).toMatch(/margin-top:\s*(?:\d+px|var\(--spacing-[a-z]+\))/);
   });
 
   it('keeps buy-now AFTER the window-wide button rule, so the width is not erased', () => {
     // The same specificity trap the tab rules hit: an attribute selector is
     // (1,1,1) and so is `button:not(.x-btn)`, so source order is what decides.
-    expect(css.indexOf('#woc-market-window button:not(.x-btn) {')).toBeLessThan(
-      css.indexOf('#woc-market-window .wm-detail button[data-action="buy-now"]'),
-    );
+    const generic = css.indexOf('#woc-market-window button:not(.x-btn) {');
+    const buyNow = css.indexOf('#woc-market-window .wm-detail button[data-action="buy-now"]');
+    expect(generic).toBeGreaterThanOrEqual(0);
+    expect(buyNow).toBeGreaterThanOrEqual(0);
+    expect(generic).toBeLessThan(buyNow);
   });
 });
 
@@ -1236,7 +1266,9 @@ describe('woc_market_window: a price the wallet cannot cover', () => {
 
   it('clears the buy-now quote when the selected listing changes', () => {
     // A stale figure from the previous listing would gate this one.
-    const select = between('this.selectedId = id;', 'private usd(');
+    // Bounded to selectListing's own body: a reset that moved into render()
+    // would still contain the token but is not what this pin claims.
+    const select = between('private async selectListing(', 'refreshIfChanged(): void {');
     expect(select).toContain('this.buyNowTokens = null');
   });
 });
@@ -1593,8 +1625,12 @@ describe('woc_market_window: informed commitment before the first charge (H13/R9
     // seller's second-chance disclosure when opted in.
     expect(bidForm).toContain('hudChrome.wocMarket.bidBindingNote');
     expect(bidForm).toContain('hudChrome.wocMarket.bidCloseNote');
+    // The second-chance disclosure renders only when the seller opted in, and
+    // resolves the settlement window it names (the payment deadline the cascade
+    // gives the promoted bidder).
+    expect(bidForm).toContain('d.offerNext\n        ? `<p class="wm-note">${esc(');
     expect(bidForm).toContain(
-      "d.offerNext ? `<p class=\"wm-note\">${esc(t('hudChrome.wocMarket.offerNextNote'))}</p>` : ''",
+      "t('hudChrome.wocMarket.offerNextNote', {\n              duration: this.countdown(model.settlementWindowSeconds),",
     );
     // BEFORE the button, where the player still decides.
     expect(bidForm.indexOf('bidBindingNote')).toBeLessThan(bidForm.indexOf('place-bid'));
