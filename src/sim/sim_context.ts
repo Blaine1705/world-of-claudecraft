@@ -441,7 +441,11 @@ export interface SimContextCallbacks {
   // hasPendingSocialInvite are core; the five fiesta* hooks are A3-owned), plus the
   // arena bodies EXPOSED for the Fiesta slice (A3): readyArenaFighter / resetForArena
   // / isArenaTeamWiped / arenaIsDown / arenaAllPids (arenaTeamOf already above).
-  clearAurasFromSource(target: Entity, sourceId: number): void;
+  clearAurasFromSource(
+    target: Entity,
+    sourceId: number,
+    shouldClear?: (aura: Aura) => boolean,
+  ): void;
   entityInDungeon(e: Entity, dungeonId: string): boolean;
   hasPendingSocialInvite(targetPid: number): boolean;
   createFiestaState(): FiestaState;

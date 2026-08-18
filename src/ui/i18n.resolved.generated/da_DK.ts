@@ -7187,6 +7187,7 @@ export const da_DK: EnTranslations = {
       "shopMarksRequired": "Du skal bruge {marks} Delve-mærker for at købe {name}.",
       "shopSealPremiumOnly": "Dette segl giver kun efter for en mesters hånd. Kun Premium-indsatsen kan åbne det.",
       "passageSealed": "Passagen er forseglet.",
+      "enemiesRemain": "Besejr først de resterende fjender.",
       "moveCloserPassage": "Gå tættere på passagen.",
       "moveCloserChest": "Gå tættere på kisten.",
       "moveCloserReliquary": "Gå tættere på relikvariet.",
@@ -9996,7 +9997,7 @@ export const da_DK: EnTranslations = {
       },
       "fear": {
         "name": "Hjemsøg",
-        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 8 sek. Enhver skade bryder effekten."
+        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten."
       },
       "searing_pain": {
         "name": "Svid",
@@ -10242,7 +10243,7 @@ export const da_DK: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Mærker en fjende i 12 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 m og skaber 1 Sjælesplint."
+        "description": "Mærker en fjende i 15 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 yards og skaber 1 Sjælesplint."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10341,8 +10342,8 @@ export const da_DK: EnTranslations = {
         "description": "Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)"
       },
       "feral_charge": {
-        "name": "Vild ladning",
-        "description": "Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)"
+        "name": "Urkraftsbølge",
+        "description": "Udløs en urkraftsbølge. I Ulveform øges jeres energiregenerering med 100% i 10 sek. I Bruin-form får I øjeblikkeligt 50 raseri. (Vildskabssignatur)"
       },
       "swiftmend": {
         "name": "Hurtig heling",
@@ -10598,7 +10599,7 @@ export const da_DK: EnTranslations = {
       },
       "evocation": {
         "name": "Æterbrønd",
-        "description": "Restaura mana rápidamente. (magikertalent)"
+        "description": "Kanaliser i 6 sek.: Hvert sekund genopretter I 100 mana og opbygger 8 besværgelseskraft. Bonussen stables under kanaliseringen og varer 15 sek. (magikertalent)"
       },
       "flurry_of_knives": {
         "name": "Knivbyge",
@@ -10626,11 +10627,11 @@ export const da_DK: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Rædselshyl",
-        "description": "Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)"
+        "description": "Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)"
       },
       "ice_block": {
         "name": "Kold kiste",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)"
+        "description": "Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)"
       },
       "inner_focus": {
         "name": "Stillet sind",
@@ -10722,7 +10723,7 @@ export const da_DK: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Ræsende sind",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)"
+        "description": "Gør jeres næste besværgelse med kastetid øjeblikkelig. Varer 60 sek. (magikertalent)"
       },
       "psychic_scream": {
         "name": "Psykisk skrig",

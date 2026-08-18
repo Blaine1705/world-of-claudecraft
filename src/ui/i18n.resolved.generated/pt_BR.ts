@@ -7187,6 +7187,7 @@ export const pt_BR: EnTranslations = {
       "shopMarksRequired": "Você precisa de {marks} Selos de Incursão para comprar {name}.",
       "shopSealPremiumOnly": "Este selo só cede à mão de um mestre: apenas a aposta Superior pode abri-lo.",
       "passageSealed": "A passagem está selada.",
+      "enemiesRemain": "Elimine primeiro os inimigos restantes.",
       "moveCloserPassage": "Aproxime-se da passagem.",
       "moveCloserChest": "Aproxime-se do baú.",
       "moveCloserReliquary": "Aproxime-se do relicário.",
@@ -9996,7 +9997,7 @@ export const pt_BR: EnTranslations = {
       },
       "fear": {
         "name": "Atormentar",
-        "description": "Aterroriza o inimigo, deixando-o acuado por até 8 s. Qualquer dano quebra o efeito."
+        "description": "Aterroriza o inimigo, deixando-o acuado por até 5 s. Dano acumulado equivalente a 8% da vida máxima do alvo quebra o efeito."
       },
       "searing_pain": {
         "name": "Cauterizar",
@@ -10242,7 +10243,7 @@ export const pt_BR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marca um inimigo por 12 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 m e cria 1 Fragmento de Alma."
+        "description": "Marca um inimigo por 15 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 jardas e cria 1 Fragmento de Alma."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10341,8 +10342,8 @@ export const pt_BR: EnTranslations = {
         "description": "Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)"
       },
       "feral_charge": {
-        "name": "Investida Feral",
-        "description": "Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)"
+        "name": "Surto Primevo",
+        "description": "Libera um surto primevo. Na Forma de Lobo, a regeneração de energia aumenta em 100% por 10 s. Na Forma de Bruin, gera instantaneamente 50 de raiva. (assinatura Feral)"
       },
       "swiftmend": {
         "name": "Recuperação Rápida",
@@ -10598,7 +10599,7 @@ export const pt_BR: EnTranslations = {
       },
       "evocation": {
         "name": "Poço Etéreo",
-        "description": "Restaura mana rápidamente. (talento de mago)"
+        "description": "Canaliza por 6 s: a cada segundo, restaura 100 de mana e acumula 8 de poder mágico. O bônus acumula durante a canalização e dura 15 s. (talento de mago)"
       },
       "flurry_of_knives": {
         "name": "Rajada de Facas",
@@ -10626,11 +10627,11 @@ export const pt_BR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Uivo de Terror",
-        "description": "Amedronta os inimigos próximos por até 3 s. O dano pode interromper o efeito. (talento de Bruxo)"
+        "description": "Amedronta os inimigos próximos por até 5 s. Dano acumulado equivalente a 8% da vida máxima de um alvo quebra seu medo. (talento de Bruxo)"
       },
       "ice_block": {
         "name": "Caixão Frio",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)"
+        "description": "Envolve você em gelo sólido por 8 s, tornando-o imune a todo dano. Remove efeitos nocivos comuns já ativos e impede a aplicação de novos efeitos de controle comuns. Pode ser usado enquanto estiver atordoado ou transformado. Você não pode agir enquanto estiver envolto. Conjure novamente para cancelar. (mago)"
       },
       "inner_focus": {
         "name": "Mente Serena",
@@ -10722,7 +10723,7 @@ export const pt_BR: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Mente Acelerada",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento de mago)"
+        "description": "Faz com que seu próximo feitiço com tempo de lançamento seja instantâneo. Dura 60 s. (talento de mago)"
       },
       "psychic_scream": {
         "name": "Grito Psíquico",
