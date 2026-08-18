@@ -5,10 +5,10 @@ Resume here. Do not re-litigate locked decisions; they live in
 
 ## Resume point
 
-Phase 1 is complete on `feature/deed-border-cartouche` in worktree
+Phase 2 is complete on `feature/deed-border-cartouche` in worktree
 `/Users/fernando/Documents/wocc-deed-border-cartouche`. Next action: run
-Phase 2 from `phase-02-qa-chassis.md` in that worktree. Do not start
-Phase 3.
+Phase 3 from `phase-03-identity.md` in that worktree. Do not start
+Phase 3 unless the operator asks.
 
 ## Blocker
 
@@ -17,10 +17,9 @@ None.
 ## Next action
 
 1. Work in `/Users/fernando/Documents/wocc-deed-border-cartouche`.
-2. Execute Phase 2 (`phase-02-qa-chassis.md`): coverage audit of E1-E26,
-   graphics-tier fairness, before/after screenshots, reviewers,
-   `node scripts/gate_select.mjs`.
-3. Do not start Phase 3 until Phase 2 is green.
+2. Execute Phase 3 (`phase-03-identity.md`): motifs, Catalogue brass
+   retune, picker swatches, inspect header, portrait-ring clasp.
+3. Do not start Phase 4 until Phase 3 tests for E27-E36 exist and are green.
 
 ## Locked decisions (cheat sheet)
 
@@ -42,13 +41,20 @@ None.
 - Pad is 9 x and 5 y. Radius 6. Well alpha 0.4. Well fill `#14110c`.
 - `OVERLAP_THRESHOLD_Y_PX` is 32 and `STACK_OFFSET_PX` is 34 (old 18/20 plus extraLift).
 
+## Closed in Phase 2
+
+- E1-E26 each name a decisive test. E36 is the no-IWorld pin.
+- Fairness scan includes the core. `--fx-shadow` is forbidden on the TS path.
+- Screenshots under `docs/screenshots/deed-border-cartouche/phase-01/`.
+- `node scripts/gate_select.mjs` passed (12 steps).
+
 ## Surfaces in play
 
 - `src/ui/deed_border_view.ts`
-- `src/render/nameplate_cartouche_core.ts` (new)
+- `src/render/nameplate_cartouche_core.ts`
 - `src/render/nameplate_canvas.ts`
 - `src/render/nameplate_painter.ts`
-- `src/render/nameplate_declutter.ts` (Y constants now include extraLift)
+- `src/render/nameplate_declutter.ts` (Y constants include extraLift)
 - `src/styles/hud.css` (Phase 3 ring)
 - `src/styles/shell.css` (Phase 3 inspect)
 - `src/ui/deeds_window.ts` + `src/styles/components.css` (Phase 3 picker)
