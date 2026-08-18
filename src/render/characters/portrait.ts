@@ -572,8 +572,9 @@ export function onPortraitsReady(cb: () => void): void {
  * A COMPOSED capture is addressed by its cache `key` (third argument), because
  * no (visualKey, skin) pair names one; the skin it reports is
  * {@link COMPOSED_PORTRAIT_SKIN}, an index no catalog holds. Listeners that
- * take the first two arguments only stay valid and never see a composed
- * update as one of theirs. */
+ * take the first two arguments still RECEIVE a composed update and cannot
+ * recognize it as theirs, so any listener that acts on (visualKey, skin) must
+ * reject that skin itself (start_skin_picker_portraits.ts does). */
 export function onPortraitUpdate(
   cb: (visualKey: string, skin: number, key?: string) => void,
 ): void {

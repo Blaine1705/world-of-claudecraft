@@ -370,6 +370,7 @@ import {
   maybeShowFirstRunCameraPrompt,
 } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
+import { resetComposedRows, trackComposedRow } from './ui/charselect_composed_refresh';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -6706,6 +6707,7 @@ async function refreshCharacters(): Promise<void> {
     if (chars.some((c) => c.skinCatalog === 'mech')) void preloadMechAssets();
     if (api.realm) $('#charselect-realm').textContent = api.realm;
     listEl.innerHTML = '';
+    resetComposedRows();
     // Boot resume: a WebView reload during play sent us here with a persisted
     // active-play marker. If that character still exists on the marker's realm,
     // re-enter the world directly instead of showing char-select (a linkdead
@@ -6764,22 +6766,24 @@ async function refreshCharacters(): Promise<void> {
           look: charselectLook(c),
           catalog: c.skinCatalog ?? 'class',
         });
-      // A composed chip cannot hydrate from data attributes, so a row built
-      // before the portrait renderer is ready re-renders its own chip once the
-      // assets land (the crest placeholder shows until then).
-      if (charselectLook(c) && !portraitsReady()) {
-        onPortraitsReady(() => {
-          const chip = row.querySelector('.portrait-chip[data-portrait-composed]');
-          if (!chip?.isConnected) return;
-          chip.outerHTML = chipHtml();
-          // The module-scope onPortraitsReady listener in portrait_chip.ts
-          // (which arms crest-image fallbacks document-wide) is registered
-          // at import time, before this per-row callback, so it already ran
-          // by the time the swap above lands new elements in the DOM. Re-arm
-          // this row's fresh badge/portrait img explicitly, or a blocked or
-          // missing crest asset on it never falls back.
-          hydratePortraits(row);
-        });
+      // A composed chip cannot hydrate from data attributes, so the row
+      // re-renders its own chip: once the assets land, and again once the
+      // composed capture behind it lands (the crest shows until then).
+      const rebuildChip = () => {
+        const chip = row.querySelector('.portrait-chip[data-portrait-composed]');
+        if (!chip?.isConnected) return;
+        chip.outerHTML = chipHtml();
+        // The module-scope onPortraitsReady listener in portrait_chip.ts
+        // (which arms crest-image fallbacks document-wide) is registered
+        // at import time, before this per-row callback, so it already ran
+        // by the time the swap above lands new elements in the DOM. Re-arm
+        // this row's fresh badge/portrait img explicitly, or a blocked or
+        // missing crest asset on it never falls back.
+        hydratePortraits(row);
+      };
+      if (charselectLook(c)) {
+        trackComposedRow(row, rebuildChip);
+        if (!portraitsReady()) onPortraitsReady(rebuildChip);
       }
       row.innerHTML = `${chipHtml()}
         <div class="char-id">
