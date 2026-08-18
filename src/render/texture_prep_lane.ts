@@ -70,6 +70,20 @@ export interface TexturePrepOptions {
 }
 
 /**
+ * What one piece is called in the queue's slowest / longest-wait lists: the
+ * kind, then the texture's name (or its short uuid when unnamed), its
+ * dimensions and a `c` for a compressed (KTX2) source. The kind is all the
+ * budget reads; the rest is what lets a 900 ms piece be named from a blob.
+ */
+export function texturePieceLabel(kind: string, texture: THREE.Texture): string {
+  const image = texture.image as { width?: number; height?: number } | null | undefined;
+  const size = image?.width && image?.height ? `${image.width}x${image.height}` : 'unsized';
+  const name = texture.name || texture.uuid.slice(0, 8);
+  const compressed = (texture as THREE.CompressedTexture).isCompressedTexture ? 'c' : 'u';
+  return `${kind}:${name}:${size}${compressed}`;
+}
+
+/**
  * Upload every non-resident texture under `root`, one queue unit at a time, in
  * order, and resolve with how many textures were handed to the host. The
  * textures are collected ONCE up front: re-walking between pieces would
@@ -94,9 +108,10 @@ export async function runTexturePrepLane(
     root,
     inFlight ? (texture): boolean => inFlight.has(texture as THREE.Texture) : undefined,
   ) as THREE.Texture[];
-  const label = options.label ?? TEXTURE_PREP_LABEL;
+  const kind = options.label ?? TEXTURE_PREP_LABEL;
   const priority = texturePrepPriority(gatePriority);
   for (const texture of textures) {
+    const label = texturePieceLabel(kind, texture);
     if ((texture as THREE.DataTexture).isDataTexture) {
       await uploadDataTextureInChunks(host, texture, {
         uploadChunk: (chunk) => queue.run(() => host.initTexture(chunk), priority, label),

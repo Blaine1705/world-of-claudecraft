@@ -15,6 +15,7 @@ import {
   runTexturePrepLane,
   TEXTURE_PREP_LABEL,
   type TexturePrepQueue,
+  texturePieceLabel,
   texturePrepPriority,
 } from '../src/render/texture_prep_lane';
 
@@ -104,16 +105,16 @@ describe('runTexturePrepLane', () => {
 
     expect(count).toBe(2);
     expect(order).toEqual([
-      'start:upload:texture',
+      'start:upload:texture:cold:unsizedu',
       'upload:cold',
-      'end:upload:texture',
-      'start:upload:texture',
+      'end:upload:texture:cold:unsizedu',
+      'start:upload:texture:alsoCold:unsizedu',
       'upload:alsoCold',
-      'end:upload:texture',
+      'end:upload:texture:alsoCold:unsizedu',
     ]);
     expect(units).toEqual([
-      { label: TEXTURE_PREP_LABEL, priority: GPU_WORK_PRIORITY.TAIL_PIECE },
-      { label: TEXTURE_PREP_LABEL, priority: GPU_WORK_PRIORITY.TAIL_PIECE },
+      { label: 'upload:texture:cold:unsizedu', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
+      { label: 'upload:texture:alsoCold:unsizedu', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
     ]);
   });
 
@@ -147,7 +148,10 @@ describe('runTexturePrepLane', () => {
     );
 
     expect(units).toEqual([
-      { label: PREVIEW_TEXTURE_PREP_LABEL, priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW },
+      {
+        label: `${PREVIEW_TEXTURE_PREP_LABEL}:portrait:unsizedu`,
+        priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      },
     ]);
   });
 
@@ -195,8 +199,8 @@ describe('runTexturePrepLane', () => {
 
     expect(count).toBe(1);
     expect(units).toEqual([
-      { label: TEXTURE_PREP_LABEL, priority: GPU_WORK_PRIORITY.TAIL_PIECE },
-      { label: TEXTURE_PREP_LABEL, priority: GPU_WORK_PRIORITY.TAIL_PIECE },
+      { label: 'upload:texture:bones:1024x256u', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
+      { label: 'upload:texture:bones:1024x256u', priority: GPU_WORK_PRIORITY.TAIL_PIECE },
     ]);
     expect(order.filter((entry) => entry === 'upload:bones')).toHaveLength(2);
   });
@@ -230,10 +234,28 @@ describe('runTexturePrepLane', () => {
 
     expect(order.filter((entry) => !entry.startsWith('end:'))).toEqual([
       'link',
-      'start:upload:texture',
+      'start:upload:texture:atlas:unsizedu',
       'upload:atlas',
       'start:touch:program',
     ]);
+  });
+});
+
+describe('texturePieceLabel', () => {
+  it('keeps the budget kind first and names the texture, its size and its source class', () => {
+    const named = {
+      name: 'skin_atlas',
+      uuid: 'abcdef12-3456',
+      image: { width: 2048, height: 1024 },
+    };
+    const compressed = { ...named, isCompressedTexture: true };
+    const anonymous = { name: '', uuid: 'abcdef12-3456', image: null };
+    // biome-ignore lint/suspicious/noExplicitAny: structural stubs against three's Texture.
+    const label = (t: unknown): string => texturePieceLabel(TEXTURE_PREP_LABEL, t as any);
+    expect(label(named)).toBe('upload:texture:skin_atlas:2048x1024u');
+    expect(label(compressed)).toBe('upload:texture:skin_atlas:2048x1024c');
+    expect(label(anonymous)).toBe('upload:texture:abcdef12:unsizedu');
+    expect(label(named).split(':')[0]).toBe('upload');
   });
 });
 
