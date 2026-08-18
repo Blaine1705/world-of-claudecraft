@@ -134,7 +134,17 @@ interface MeteorFx {
   elapsed: number;
   landed: boolean;
   spawn: MeteorFallSpawn;
+  contributorOwnsGroundDetail: boolean;
   ignivarFireAoe: GroundFireAoeHandle | null;
+}
+
+function advanceGroundFireAoe(aoe: GroundFireAoeHandle, seconds: number): void {
+  let remaining = Math.max(0, seconds);
+  while (remaining > 0) {
+    const step = Math.min(remaining, 0.05);
+    aoe.update(step);
+    remaining -= step;
+  }
 }
 
 interface RuneFx {
@@ -381,6 +391,13 @@ export class MageGroundFx {
 
     const warning = this.buildMeteorTelegraph(opts, geometry.flame, initialElapsed / duration);
     warning.group.visible = opts.showTelegraph !== false;
+    const contributorOwnsGroundDetail = opts.persistentId !== undefined;
+    if (contributorOwnsGroundDetail) {
+      warning.group.getObjectByName('mage-meteor-telegraph-footprint')!.visible = false;
+      warning.group.getObjectByName('mage-meteor-telegraph-veins')!.visible = false;
+      warning.group.getObjectByName('mage-meteor-telegraph-flames')!.visible = false;
+      warning.beaconEmbers.visible = false;
+    }
     root.add(warning.group);
     const ignivarFireAoe = opts.persistentId
       ? createGroundFireAoe({
@@ -391,7 +408,9 @@ export class MageGroundFx {
       : null;
     if (ignivarFireAoe) {
       ignivarFireAoe.group.position.set(opts.x, gy, opts.z);
+      ignivarFireAoe.group.visible = opts.showTelegraph !== false;
       ignivarFireAoe.heatup();
+      advanceGroundFireAoe(ignivarFireAoe, initialElapsed);
       this.scene.add(ignivarFireAoe.group);
     }
     this.scene.add(root);
@@ -430,6 +449,7 @@ export class MageGroundFx {
       elapsed: initialElapsed,
       landed: false,
       spawn: { ...opts },
+      contributorOwnsGroundDetail,
       ignivarFireAoe,
     });
   }
@@ -445,10 +465,14 @@ export class MageGroundFx {
         existing.snapshotManaged = true;
         existing.duration = Math.max(0.05, warning.duration);
         existing.warningLead = Math.min(existing.duration - 0.01, Math.max(0, warning.warningLead));
-        existing.elapsed = Math.max(
+        const authoritativeElapsed = Math.max(
           existing.elapsed,
           existing.duration - Math.min(existing.duration, warning.remaining),
         );
+        if (existing.ignivarFireAoe) {
+          advanceGroundFireAoe(existing.ignivarFireAoe, authoritativeElapsed - existing.elapsed);
+        }
+        existing.elapsed = authoritativeElapsed;
         continue;
       }
       this.spawnMeteor({
@@ -1259,9 +1283,11 @@ export class MageGroundFx {
         if (scorchElapsed < METEOR_SCORCH_LINGER) {
           const fade = 1 - scorchElapsed / METEOR_SCORCH_LINGER;
           const firePulse = 0.84 + Math.sin(scorchElapsed * 11) * 0.16;
-          m.footprintMat.opacity = 0.14 * fade;
+          if (!m.contributorOwnsGroundDetail) m.footprintMat.opacity = 0.14 * fade;
           m.countdownMat.opacity = 0.58 * fade * firePulse;
-          m.veinMat.opacity = 0.56 * fade * (0.88 + Math.sin(scorchElapsed * 8 + 0.7) * 0.12);
+          if (!m.contributorOwnsGroundDetail) {
+            m.veinMat.opacity = 0.56 * fade * (0.88 + Math.sin(scorchElapsed * 8 + 0.7) * 0.12);
+          }
           if (scorchElapsed > METEOR_SCORCH_LINGER - 1) m.ignivarFireAoe?.stop();
           continue;
         }
@@ -1290,13 +1316,15 @@ export class MageGroundFx {
       m.trail.rotation.y -= dt * 0.45;
 
       const warningPulse = 0.88 + Math.sin(m.elapsed * (5 + t * 7)) * 0.12;
-      m.footprintMat.opacity = (0.18 + t * 0.07) * (0.96 + Math.sin(m.elapsed * 4) * 0.04);
       m.boundaryMat.opacity = (0.58 + t * 0.25) * warningPulse;
       m.countdownMat.opacity = (0.34 + t * 0.5) * warningPulse;
-      m.veinMat.opacity = (0.34 + t * 0.46) * warningPulse;
-      m.flameMat.opacity = (0.22 + t * 0.16) * warningPulse;
-      m.beaconEmberMat.opacity = (0.14 + t * 0.14) * warningPulse;
-      m.beaconEmbers.rotation.y += dt * (0.2 + t * 0.35);
+      if (!m.contributorOwnsGroundDetail) {
+        m.footprintMat.opacity = (0.18 + t * 0.07) * (0.96 + Math.sin(m.elapsed * 4) * 0.04);
+        m.veinMat.opacity = (0.34 + t * 0.46) * warningPulse;
+        m.flameMat.opacity = (0.22 + t * 0.16) * warningPulse;
+        m.beaconEmberMat.opacity = (0.14 + t * 0.14) * warningPulse;
+        m.beaconEmbers.rotation.y += dt * (0.2 + t * 0.35);
+      }
       // Terrain-draping the two moving rims costs 144 height samples. Five raid
       // warnings used to repeat that work and upload five buffers every render
       // frame; 20 Hz stays visually continuous while bounding the CPU/GPU churn.
@@ -1306,16 +1334,18 @@ export class MageGroundFx {
         this.writeMeteorCountdownRing(m.countdownPositions, m.x, m.z, m.radius, t);
         m.countdownRing.geometry.attributes.position.needsUpdate = true;
       }
-      for (let flameIndex = 0; flameIndex < m.flameBases.length; flameIndex++) {
-        const base = m.flameBases[flameIndex];
-        const flicker = 0.58 + Math.sin(m.elapsed * 9 + base.phase) * 0.13 + t * 0.22;
-        m.flameDummy.position.set(base.x, base.y + Math.max(0, flicker - 0.56) * 0.14, base.z);
-        m.flameDummy.rotation.set(0, -base.phase * 0.22 + m.elapsed * 0.35, 0);
-        m.flameDummy.scale.set(0.66 + t * 0.16, flicker, 0.66 + t * 0.16);
-        m.flameDummy.updateMatrix();
-        m.flames.setMatrixAt(flameIndex, m.flameDummy.matrix);
+      if (!m.contributorOwnsGroundDetail) {
+        for (let flameIndex = 0; flameIndex < m.flameBases.length; flameIndex++) {
+          const base = m.flameBases[flameIndex];
+          const flicker = 0.58 + Math.sin(m.elapsed * 9 + base.phase) * 0.13 + t * 0.22;
+          m.flameDummy.position.set(base.x, base.y + Math.max(0, flicker - 0.56) * 0.14, base.z);
+          m.flameDummy.rotation.set(0, -base.phase * 0.22 + m.elapsed * 0.35, 0);
+          m.flameDummy.scale.set(0.66 + t * 0.16, flicker, 0.66 + t * 0.16);
+          m.flameDummy.updateMatrix();
+          m.flames.setMatrixAt(flameIndex, m.flameDummy.matrix);
+        }
+        m.flames.instanceMatrix.needsUpdate = true;
       }
-      m.flames.instanceMatrix.needsUpdate = true;
     }
     for (let i = this.runes.length - 1; i >= 0; i--) {
       const r = this.runes[i];

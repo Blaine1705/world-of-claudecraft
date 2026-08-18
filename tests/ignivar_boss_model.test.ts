@@ -151,6 +151,33 @@ describe('Ignivar boss model', () => {
     expect(model.getObjectByName('ignivar__pulse_shell')).toBeDefined();
     expect(model.getObjectByName('ignivar__shockwave')).toBeDefined();
 
+    const plume = model.getObjectByName('vfx_core__plume') as THREE.Points<
+      THREE.BufferGeometry,
+      THREE.ShaderMaterial
+    >;
+    const smoke = model.getObjectByName('vfx_core__smoke') as THREE.Mesh<
+      THREE.BufferGeometry,
+      THREE.ShaderMaterial
+    >;
+    const shimmer = model.getObjectByName('vfx_core__shimmer') as THREE.Mesh<
+      THREE.BufferGeometry,
+      THREE.ShaderMaterial
+    >;
+    for (const material of [plume.material, smoke.material, shimmer.material]) {
+      expect(material.vertexShader).toContain('float mscale = length(modelMatrix[1].xyz);');
+    }
+    expect(plume.material.vertexShader).toContain('gl_PointSize = aSize * mscale * grow');
+    expect(plume.material.vertexShader).toMatch(
+      /\(pow\(life, 1\.3\) \* uReach \* 2\.0\s*\+\s*sin\([^;]+\) \* mscale;/s,
+    );
+    expect(smoke.material.vertexShader).toContain('float width = (0.018 + t * 0.085) * mscale;');
+    expect(smoke.material.vertexShader).toContain(
+      'world.y += pow(t, 1.15) * uReach * 2.6 * mscale;',
+    );
+    expect(shimmer.material.vertexShader).toContain(
+      'float s = 0.55 * (0.8 + 0.4 * uIntensity) * mscale;',
+    );
+
     syncIgnivarModelVfx(model, 1 / 60, undefined, {
       dead: false,
       castingAbility: 'Forge Wave',
@@ -177,6 +204,13 @@ describe('Ignivar boss model', () => {
     aoe.heatup();
     aoe.update(1 / 60);
     expect(aoe.phase()).toBe('heatup');
+    const disc = aoe.group.getObjectByName('ground_fire_aoe__disc') as THREE.Mesh<
+      THREE.CircleGeometry,
+      THREE.ShaderMaterial
+    >;
+    expect(disc.material.fragmentShader).toMatch(
+      /1\.0\s*-\s*smoothstep\(\s*uHeat \* 1\.15 - 0\.35,\s*uHeat \* 1\.15,\s*r \+ \(n - 0\.5\) \* 0\.2\s*\)/s,
+    );
     aoe.erupt();
     aoe.update(1 / 60);
     expect(aoe.phase()).toBe('fire');

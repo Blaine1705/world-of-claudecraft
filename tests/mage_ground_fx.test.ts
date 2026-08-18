@@ -33,6 +33,7 @@ describe('Mage meteor visual', () => {
     const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
     expect(root.getObjectByName('mage-meteor-body')?.visible).toBe(true);
     expect(root.getObjectByName('mage-meteor-telegraph')?.visible).toBe(false);
+    expect(scene.getObjectByName('ground_fire_aoe')).toBeUndefined();
   });
 
   it('shows the danger circle before revealing a delayed falling meteor', () => {
@@ -93,6 +94,106 @@ describe('Mage meteor visual', () => {
     expect(root.getObjectByName('mage-meteor-body')?.visible).toBe(true);
     fx.update(1.74);
     expect(landed).toHaveBeenCalledOnce();
+  });
+
+  it('lets the contributor fire disc own Ignivar ground detail without hiding countdown', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+
+    fx.syncMeteorWarnings([
+      {
+        id: '77:912:0',
+        x: 4,
+        z: 7,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 2,
+        warningLead: 0.75,
+      },
+    ]);
+
+    const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    const contributorAoe = scene.getObjectByName('ground_fire_aoe') as THREE.Group;
+    const contributorDisc = contributorAoe.getObjectByName('ground_fire_aoe__disc') as THREE.Mesh<
+      THREE.CircleGeometry,
+      THREE.ShaderMaterial
+    >;
+    expect(contributorAoe.visible).toBe(true);
+    expect(contributorDisc.material.uniforms.uHeat.value).toBeCloseTo(1 - 0.89 ** 10, 6);
+    expect(root.getObjectByName('mage-meteor-telegraph-footprint')?.visible).toBe(false);
+    expect(root.getObjectByName('mage-meteor-telegraph-veins')?.visible).toBe(false);
+    expect(root.getObjectByName('mage-meteor-telegraph-flames')?.visible).toBe(false);
+    expect(root.getObjectByName('mage-meteor-telegraph-beacon-embers')?.visible).toBe(false);
+    expect(root.getObjectByName('mage-meteor-telegraph-boundary')?.visible).toBe(true);
+    expect(root.getObjectByName('mage-meteor-telegraph-countdown-ring')?.visible).toBe(true);
+
+    const boundary = root.getObjectByName('mage-meteor-telegraph-boundary') as THREE.LineLoop<
+      THREE.BufferGeometry,
+      THREE.LineBasicMaterial
+    >;
+    const countdown = root.getObjectByName('mage-meteor-telegraph-countdown-ring') as THREE.Mesh<
+      THREE.BufferGeometry,
+      THREE.MeshBasicMaterial
+    >;
+    const countdownPositions = countdown.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const countdownXBefore = countdownPositions.getX(0);
+    const boundaryOpacityBefore = boundary.material.opacity;
+    const countdownOpacityBefore = countdown.material.opacity;
+    fx.update(METEOR_COUNTDOWN_GEOMETRY_UPDATE_SECONDS);
+    expect(countdownPositions.getX(0)).not.toBe(countdownXBefore);
+    expect(boundary.material.opacity).not.toBe(boundaryOpacityBefore);
+    expect(countdown.material.opacity).not.toBe(countdownOpacityBefore);
+    for (const name of [
+      'mage-meteor-telegraph-footprint',
+      'mage-meteor-telegraph-veins',
+      'mage-meteor-telegraph-flames',
+      'mage-meteor-telegraph-beacon-embers',
+    ]) {
+      expect(root.getObjectByName(name)?.visible).toBe(false);
+    }
+
+    fx.syncMeteorWarnings([
+      {
+        id: '77:912:0',
+        x: 4,
+        z: 7,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 1,
+        warningLead: 0.75,
+      },
+    ]);
+    expect(contributorDisc.material.uniforms.uHeat.value).toBeCloseTo(1 - 0.89 ** 30, 6);
+
+    const genericScene = new THREE.Scene();
+    const genericFx = new MageGroundFx(genericScene, () => 0, vi.fn());
+    genericFx.spawnMeteor({ x: 4, z: 7, radius: 2.4, duration: 2.5 });
+    const genericRoot = genericScene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    expect(genericScene.getObjectByName('ground_fire_aoe')).toBeUndefined();
+    for (const name of [
+      'mage-meteor-telegraph-footprint',
+      'mage-meteor-telegraph-veins',
+      'mage-meteor-telegraph-flames',
+      'mage-meteor-telegraph-beacon-embers',
+    ]) {
+      expect(genericRoot.getObjectByName(name)?.visible).toBe(true);
+    }
+  });
+
+  it('hides the contributor fire disc with an explicitly hidden warning', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+
+    fx.spawnMeteor({
+      x: 4,
+      z: 7,
+      radius: 2.4,
+      duration: 2.5,
+      persistentId: '77:912:0',
+      showTelegraph: false,
+    });
+
+    expect(scene.getObjectByName('ground_fire_aoe')?.visible).toBe(false);
   });
 
   it('deduplicates the live meteor event against its snapshot warning', () => {

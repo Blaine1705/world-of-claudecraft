@@ -115,13 +115,14 @@ void main() {
   // pow 1.3 bends the stream up EARLY and hard -- the column reads near
   // vertical a hand-span off the vent.
   vec4 world = modelMatrix * vec4(pos, 1.0);
-  world.y += pow(life, 1.3) * uReach * 2.0;
-           + sin(uTime * 7.0 + aSeed * 53.0) * 0.02 * life;
+  float mscale = length(modelMatrix[1].xyz);
+  world.y += (pow(life, 1.3) * uReach * 2.0
+           + sin(uTime * 7.0 + aSeed * 53.0) * 0.02 * life) * mscale;
 
   vec4 mv = viewMatrix * world;
   // grow out of the vent, then burn away
   float grow = smoothstep(0.0, 0.15, life) * (1.0 - smoothstep(0.55, 1.0, life));
-  gl_PointSize = aSize * grow * (1.0 + uIntensity * 0.5) * (260.0 / -mv.z);
+  gl_PointSize = aSize * mscale * grow * (1.0 + uIntensity * 0.5) * (260.0 / -mv.z);
   gl_Position = projectionMatrix * mv;
 }
 `;
@@ -183,9 +184,10 @@ void main() {
   float wave = sin(t * 7.0 - uTime * 2.6 + aSeed * 37.0) * (0.03 + t * 0.12);
   vec3 pos = vec3(cos(ang) * r + wave, dist, sin(ang) * r);
   vec4 world = modelMatrix * vec4(pos, 1.0);
-  world.y += pow(t, 1.15) * uReach * 2.6;
+  float mscale = length(modelMatrix[1].xyz);
+  world.y += pow(t, 1.15) * uReach * 2.6 * mscale;
   vec3 camRight = normalize(vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]));
-  float width = 0.018 + t * 0.085;
+  float width = (0.018 + t * 0.085) * mscale;
   world.xyz += camRight * aSide * width;
   gl_Position = projectionMatrix * viewMatrix * world;
 }
@@ -283,7 +285,8 @@ void main() {
   vec3 c = vec3(modelMatrix[3]);
   vec3 right = normalize(vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]));
   vec3 up    = normalize(vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]));
-  float s = 0.55 * (0.8 + 0.4 * uIntensity);
+  float mscale = length(modelMatrix[1].xyz);
+  float s = 0.55 * (0.8 + 0.4 * uIntensity) * mscale;
   vec3 world = c + right * position.x * s + up * (position.y * s + s * 0.55);
   gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
 }
@@ -534,7 +537,11 @@ void main() {
   float glowCrack = 1.0 - smoothstep(0.0, 0.30, edge);    // heat bleeding up the plate walls
   float subCrack = (1.0 - smoothstep(0.0, 0.045, edge2)) * 0.5; // finer secondary cracking
   // cracks reveal centre-out as the heat builds
-  float reveal = smoothstep(uHeat * 1.15, uHeat * 1.15 - 0.35, r + (n - 0.5) * 0.2);
+  float reveal = 1.0 - smoothstep(
+    uHeat * 1.15 - 0.35,
+    uHeat * 1.15,
+    r + (n - 0.5) * 0.2
+  );
   float pulse = 0.75 + 0.25 * sin(uTime * 5.0 + r * 6.0);
   float ring = smoothstep(0.90, 0.955, r) * (1.0 - smoothstep(0.975, 1.0, r));
   float churn = vnoise(vP * 3.0 + vec2(uTime * 0.35, -uTime * 0.22));
