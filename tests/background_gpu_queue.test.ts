@@ -5,7 +5,6 @@ import {
   GPU_WORK_PRIORITY,
   type GpuWorkAdmission,
   type GpuWorkAdmissionCandidate,
-  PIECE_SLOT_STARVED_FRAMES,
 } from '../src/render/background_gpu_queue';
 import { withHiddenPrewarmGroups } from '../src/render/prewarm_pass';
 
@@ -1710,17 +1709,10 @@ describe('createBackgroundGpuQueue admission', () => {
     expect(stats.slowest.every((unit) => unit.deferredFrames === 0)).toBe(true);
   });
 
-  it('owes a starving tail-free piece a slot, whatever the priority storm', async () => {
-    // The starvation strict priority cannot escape on its own: while higher
-    // units keep arriving AND being admitted, a piece is never OFFERED, so its
-    // deferral counter never runs, the budget's starvation bound cannot fire,
-    // and the gate whose touch pieces ride at TAIL_PIECE never settles.
-    //
-    // The storm is a BOOT-DEBT drain: those batches keep their tail HELD, so
-    // each occupies the loop for its whole link, spanning several frames, and
-    // they are tail-free units themselves. That is why the slot is keyed on the
-    // LOWEST-priority tail-free candidate: the highest one would be the storm's
-    // own next batch, and the piece would still never run.
+  it('keeps strict priority order: a tail-free piece behind a storm runs in the storm gap', async () => {
+    // No per-frame piece slot (see the queue header: the iGPU crowd bench
+    // rejected it). A TAIL_PIECE touch behind a boot-debt drain runs as soon
+    // as the drain leaves a gap, and not before.
     const gate = probe(() => true);
     const queue = createBackgroundGpuQueue({ admission: gate.admission });
     const ran: string[] = [];
@@ -1735,81 +1727,28 @@ describe('createBackgroundGpuQueue admission', () => {
         `zone-prepare:${index}`,
       );
     queue.noteFrame(0);
-
     const piece = queue.run(
       () => void ran.push('piece'),
       GPU_WORK_PRIORITY.TAIL_PIECE,
       'touch:program',
     );
     const first = debt(0);
-    await settle();
-    expect(ran).toEqual(['debt:0']);
-
-    // Frame 0 ended: it STARTED a tail-free unit, so nothing is owed yet, and
-    // the drain lands its next batch while the first one is still linking.
-    queue.noteFrame(16);
     const second = debt(1);
     await settle();
     expect(ran).toEqual(['debt:0']);
-
-    // Frames 1..3 end with the piece pending and no tail-free unit started in
-    // them: the streak reaches PIECE_SLOT_STARVED_FRAMES and the next selection
-    // owes the piece its slot, ahead of the drain. One frame short of it the
-    // drain still wins (the storm keeps three frames in four).
+    queue.noteFrame(16);
     queue.noteFrame(32);
     queue.noteFrame(48);
+    queue.noteFrame(64);
     releases[0]();
     await settle();
+    // The pending debt batch outranks the piece: strict priority.
     expect(ran).toEqual(['debt:0', 'debt:1']);
-    const third = debt(2);
-    queue.noteFrame(64);
-    queue.noteFrame(80);
     releases[1]();
     await piece;
-
-    expect(ran).toEqual(['debt:0', 'debt:1', 'piece', 'debt:2']);
-    expect(PIECE_SLOT_STARVED_FRAMES).toBe(4);
-    expect(queue.stats().admission.parks).toBe(0);
-    releases[2]();
-    await Promise.all([first, second, third]);
-  });
-
-  it('leaves selection alone in a frame that already started a tail-free unit', async () => {
-    const gate = probe(() => true);
-    const queue = createBackgroundGpuQueue({ admission: gate.admission });
-    const ran: string[] = [];
-    let releaseDebt!: () => void;
-    queue.noteFrame(0);
-
-    const debt = queue.run(
-      () => {
-        ran.push('debt');
-        return new Promise<void>((resolve) => {
-          releaseDebt = resolve;
-        });
-      },
-      GPU_WORK_PRIORITY.BOOT_DEBT,
-      'zone-prepare:eastbrook',
-    );
-    const piece = queue.run(
-      () => void ran.push('piece'),
-      GPU_WORK_PRIORITY.TAIL_PIECE,
-      'touch:program',
-    );
-    await settle();
-    // The debt batch started inside frame 0, so frame 1 owes no slot and the
-    // higher-priority arrival keeps its place ahead of the piece.
-    queue.noteFrame(16);
-    const reveal = queue.run(
-      () => void ran.push('reveal-gate:a'),
-      GPU_WORK_PRIORITY.LIVE_VIEW,
-      'reveal-gate:a',
-      { releaseTail: true },
-    );
-    releaseDebt();
-    await Promise.all([piece, debt, reveal]);
-
-    expect(ran).toEqual(['debt', 'reveal-gate:a', 'piece']);
+    // The gap after the drain is where the piece runs.
+    expect(ran).toEqual(['debt:0', 'debt:1', 'piece']);
+    await Promise.all([first, second]);
   });
 
   it('counts a cap park with a refused piece as an admission park, not a tail-cap one', async () => {

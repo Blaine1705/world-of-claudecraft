@@ -81,18 +81,15 @@
 // budget with no frames to protect would park under the curtain with nothing
 // able to wake it. There is no live frame to protect before the first one.
 //
-// The PIECE SLOT is the one exception to strict priority order, and it is what
-// keeps the admission's own starvation bound reachable. Under a storm of
-// higher-priority units that keep arriving AND being admitted (a boot-debt
-// drain, a teleport reveal storm) a tail-free piece further down is never even
-// OFFERED to the admission, so its deferral counter never runs, the starvation
-// rule never fires, and a gate whose touch pieces ride at TAIL_PIECE never
-// settles: its entity sits on its stand-in for as long as the storm lasts. So
-// a frame that ends with pieces pending and no piece run owes one: the next
-// selection offers the LOWEST-priority tail-free candidate first, still
-// through the admission (the storm that starves a piece is itself tail-free
-// when it is a boot-debt drain, so the highest one would be the storm again). At least one piece per frame whenever pieces wait;
-// strict priority still orders everything else.
+// Strict priority order stays strict; there is no per-frame "piece slot". One
+// was tried (a starving tail-free piece offered ahead of the order every frame,
+// then every fourth frame) and the iGPU crowd bench rejected it both ways: it
+// forced touch pieces into the driver's link storm, where a single
+// ACTIVE_UNIFORMS query waited 0.5 to 1.9 s, and it took frames from the props
+// bands' own compile submissions. A tail-free piece behind a storm is not
+// starved outright: the boot-debt drain spaces its batches with idle slots and
+// a reveal storm has gaps between arrivals, and the piece is admitted in the
+// first such gap; its wait is bounded by the storm, which is the honest bound.
 import { createGpuQueueWindow, type GpuQueueWindowStats } from './gpu_queue_window_core';
 
 export const GPU_WORK_PRIORITY = {
@@ -386,12 +383,6 @@ const DEFAULT_SLOWEST_LIMIT = 20;
 // it. Those records settle; a wedge is the record that never does.
 const DEFAULT_STALL_MS = 4000;
 const DEFAULT_STALL_LIMIT = 8;
-// Frames a waiting tail-free piece may see pass with no tail-free unit starting
-// before the drain owes it a hearing ahead of the priority order (the piece
-// slot in the header). One in four bounds a starving gate's settle without
-// letting the pieces of a busy arrival take every frame from the link
-// submissions that start the driver's async work.
-export const PIECE_SLOT_STARVED_FRAMES = 4;
 // Concurrent released tails, i.e. driver links settling while the queue keeps
 // draining. 2 keeps a second gate flowing past one slow link while holding the
 // snapshot-burst bound: with the running unit's own prologue, at most 3 units'
@@ -467,12 +458,6 @@ export function createBackgroundGpuQueue(opts?: {
   let admissionParks = 0;
   let selectionPass = 0;
   let admissionNotify: (() => void) | null = null;
-  // The piece slot (see the header): how many frames in a row ended with a
-  // tail-free piece waiting (the lowest one never starting), and whether that
-  // streak reached the bound that owes the piece a hearing before the
-  // priority order.
-  let tailFreeStarvedFrames = 0;
-  let pieceSlotOwed = false;
   // True while the drain loop is parked waiting for a cap slot. Read at enqueue
   // so a unit arriving mid-park is attributed the wait it really had.
   let parkedOnTailCap = false;
@@ -675,10 +660,9 @@ export function createBackgroundGpuQueue(opts?: {
     a.priority > b.priority || (a.priority === b.priority && a.order < b.order);
 
   /** Index of the LOWEST-priority pending unit that holds no tail, FIFO among
-   *  equals, or -1. Lowest, because the slot exists for the candidate strict
-   *  priority starves: the storm that starves a touch piece is itself made of
-   *  tail-free units (a boot-debt drain holds its tails), so offering the
-   *  highest-priority one would re-offer the storm its own next unit. */
+   *  equals, or -1: the cap-park attribution asks whether any such candidate
+   *  is pending (a full cap with a tail-free candidate is a budget park, not a
+   *  cap park). */
   const lowestTailFree = (): number => {
     let found = -1;
     for (let index = 0; index < pending.length; index++) {
@@ -694,18 +678,6 @@ export function createBackgroundGpuQueue(opts?: {
       }
     }
     return found;
-  };
-
-  /** The priority of the lowest-priority tail-free candidate still pending
-   *  once `started` left the queue (Infinity when none): the bar a starting
-   *  unit must be at or under to count as the starving piece itself. */
-  const lowestPendingTailFreePriority = (started: PendingGpuWork<unknown>): number => {
-    let lowest = Number.POSITIVE_INFINITY;
-    for (const candidate of pending) {
-      if (candidate === started || candidate.releaseTail) continue;
-      if (candidate.priority < lowest) lowest = candidate.priority;
-    }
-    return lowest;
   };
 
   /**
@@ -728,27 +700,6 @@ export function createBackgroundGpuQueue(opts?: {
       return selectedIndex;
     }
     selectionPass++;
-    if (pieceSlotOwed) {
-      // Offered FIRST, still through the admission: the slot buys the piece a
-      // hearing, never an exemption from the budget. A refusal at least starts
-      // its deferral counter, which is what the starvation bound counts in.
-      const pieceIndex = lowestTailFree();
-      if (pieceIndex >= 0) {
-        const piece = pending[pieceIndex];
-        if (
-          admission.admit({
-            label: piece.label,
-            priority: piece.priority,
-            deferredFrames: piece.deferredFrames,
-          })
-        ) {
-          return pieceIndex;
-        }
-        piece.refusedPass = selectionPass;
-        piece.refusedAdmission = true;
-        admissionDeferred++;
-      }
-    }
     for (;;) {
       let selectedIndex = -1;
       for (let index = 0; index < pending.length; index++) {
@@ -834,14 +785,6 @@ export function createBackgroundGpuQueue(opts?: {
         continue;
       }
       const [next] = pending.splice(selectedIndex, 1);
-      // The starving piece is the LOWEST tail-free candidate: only its own
-      // start (or a start at or below its priority) settles the streak. A
-      // higher tail-free unit starting (a debt batch) is the storm, not the
-      // piece running.
-      if (!next.releaseTail && next.priority <= lowestPendingTailFreePriority(next)) {
-        tailFreeStarvedFrames = 0;
-        pieceSlotOwed = false;
-      }
       const startedAt = now();
       const unit: RunningGpuWork = {
         entry: next,
@@ -953,17 +896,6 @@ export function createBackgroundGpuQueue(opts?: {
         // bound counts in, and the new frame re-opens the budget: wake the loop
         // so it reconsiders everything it parked on.
         for (const entry of pending) if (entry.refusedAdmission) entry.deferredFrames++;
-        // A piece that waited through the frame with no tail-free unit running
-        // ages the starvation streak; the slot is owed once the streak reaches
-        // PIECE_SLOT_STARVED_FRAMES, not every frame: on the iGPU a touch piece
-        // costs 15 to 45 ms, and offering one ahead of the priority order every
-        // frame took the crowd arrival's frames away from the props bands' own
-        // compile submissions (measured: the town twins raced their first draw
-        // again). Every fourth frame keeps a starving gate settling while the
-        // storm keeps three frames in four for its submissions.
-        if (lowestTailFree() >= 0) tailFreeStarvedFrames++;
-        else tailFreeStarvedFrames = 0;
-        pieceSlotOwed = tailFreeStarvedFrames >= PIECE_SLOT_STARVED_FRAMES;
         wakeAdmission();
       }
       const previous = lastFrameAt;
