@@ -1273,17 +1273,23 @@ function buildFromTemplates(
   // whole town so it anchors at the hub centre, a building at its own
   // footprint. hideTargets is built in the buildingGroups loop, so the two
   // stay index-aligned by construction.
+  // Only the buildings are FOOTPRINT-anchored, so only they can take the reach
+  // floor: a batch's centre anchor is an ordering hint, never an arm's-length
+  // distance (a camera at the hub would flip every batch at once).
   const rootX: number[] = staticCullTargets.map(() => FENBRIDGE_LAYOUT.hub.center.x);
   const rootZ: number[] = staticCullTargets.map(() => FENBRIDGE_LAYOUT.hub.center.z);
+  const rootFootprint: boolean[] = staticCullTargets.map(() => false);
   for (const target of hideTargets) {
     rootX.push(target.x);
     rootZ.push(target.z);
+    rootFootprint.push(true);
   }
   const staticPiecewise = newTownPiecewiseReveal(
     STATIC_REVEAL_KEY,
     staticRevealRoots,
     rootX,
     rootZ,
+    rootFootprint,
   );
   const visibilityPlan = newFenbridgeBuildingVisibilityPlan();
   const setCaptureOverlay = (visible: boolean): void => {

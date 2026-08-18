@@ -248,6 +248,14 @@ describe('reveal gate wiring (source pins)', () => {
       // nobody holds.
       expect(source).toContain(`const STATIC_REVEAL_KEY = '${key}';`);
       expect(source).toContain('newTownPiecewiseReveal(');
+      // Only the buildings are FOOTPRINT-anchored. Every static batch anchors
+      // at the town centre, so without the flag list a camera standing there
+      // takes the reach floor on all of them in one unlinked frame.
+      expect(source).toContain(
+        'const rootFootprint: boolean[] = staticCullTargets.map(() => false);',
+      );
+      expect(source).toContain('rootFootprint.push(true);');
+      expect(source).toContain('rootFootprint,\n  );');
       // The roots provider hands the gate the batch set the cull flips PLUS
       // every building group: a building outside the roots links its
       // unshared materials cold on its own first fog reveal. The piecewise

@@ -25,8 +25,9 @@
 // avoided. The key-level answer is unchanged, and it still wins: warm reveals
 // everything, fog-hidden hides everything.
 //
-// TOWN_REVEAL_REACH_YD is the town's fairness floor, and it is DELIBERATELY
-// small where the props bands get 40 yards. A town kit's programs are SHARED
+// TOWN_REVEAL_REACH_YD is the town's fairness floor, it applies only to
+// FOOTPRINT-anchored roots (a building), and it is DELIBERATELY small where
+// the props bands get 40 yards. A town kit's programs are SHARED
 // across its buildings, so revealing one still-unlinked building links the
 // whole kit cold, inside that live frame: exactly the cost this policy exists
 // to avoid. The reach is therefore the smallest radius at which a collider is
@@ -100,15 +101,26 @@ export interface TownPiecewiseReveal {
   z: Float32Array;
   /** 1 once the root at that slot has been shown; never cleared. */
   revealed: Uint8Array;
+  /** 1 where the anchor is the root's OWN footprint, so a camera distance to
+   *  it is a real arm's-length reading and the reach floor may take it. 0 for
+   *  a town-spanning static batch, whose anchor is the town centre. */
+  footprint: Uint8Array;
 }
 
 /** Roots past the end of `x`/`z` anchor at the town centre, which is the
- *  honest answer for a batch that spans the whole town. */
+ *  honest answer for a batch that spans the whole town.
+ *
+ *  `footprintAnchored` says which of those anchors is a footprint (defaulting
+ *  to yes, per slot). It is a separate flag rather than a sentinel anchor
+ *  because the centre IS the right anchor for the nearest-first ORDER of a
+ *  town-spanning batch; what it is not is a distance the reach floor may read
+ *  as arm's length. */
 export function newTownPiecewiseReveal(
   key: string,
   roots: readonly object[],
   x: readonly number[],
   z: readonly number[],
+  footprintAnchored?: readonly boolean[],
 ): TownPiecewiseReveal {
   const state: TownPiecewiseReveal = {
     key,
@@ -116,10 +128,12 @@ export function newTownPiecewiseReveal(
     x: new Float32Array(roots.length),
     z: new Float32Array(roots.length),
     revealed: new Uint8Array(roots.length),
+    footprint: new Uint8Array(roots.length),
   };
   for (let index = 0; index < roots.length; index++) {
     state.x[index] = x[index] ?? 0;
     state.z[index] = z[index] ?? 0;
+    state.footprint[index] = (footprintAnchored?.[index] ?? true) ? 1 : 0;
   }
   return state;
 }
@@ -156,9 +170,13 @@ export function orderTownRootsNearestFirst<T>(
 /**
  * Flip the held key's roots that may come in this frame, and return how many
  * flipped. Two passes, in this order:
- * - the REACH floor: every unrevealed root within TOWN_REVEAL_REACH_YD shows
- *   at once, readiness and per-frame budget both irrelevant, because a
- *   collider at arm's length may not be invisible;
+ * - the REACH floor: every unrevealed FOOTPRINT-anchored root within
+ *   TOWN_REVEAL_REACH_YD shows at once, readiness and per-frame budget both
+ *   irrelevant, because a collider at arm's length may not be invisible. A
+ *   town-spanning static batch is excluded: reach is a collider argument and
+ *   a batch has no arm's-length position, so a camera standing on the town
+ *   centre would otherwise flip every micro and wall batch in one unlinked
+ *   frame, which is the burst this whole policy exists to prevent;
  * - the READY roots, nearest first, at most TOWN_PIECEWISE_REVEALS_PER_FRAME.
  * Allocation-free: the ready selection is a bounded k-smallest scan over the
  * caller-owned arrays, never a sort of a fresh list.
@@ -176,6 +194,7 @@ export function townPiecewiseRevealInto(
   const reachSq = TOWN_REVEAL_REACH_YD * TOWN_REVEAL_REACH_YD;
   for (let index = 0; index < roots.length; index++) {
     if (revealed[index] === 1) continue;
+    if (state.footprint[index] === 0) continue;
     const dx = state.x[index] - camX;
     const dz = state.z[index] - camZ;
     if (dx * dx + dz * dz > reachSq) continue;

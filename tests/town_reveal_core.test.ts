@@ -329,6 +329,57 @@ describe('town reveal reach floor', () => {
     // town floor covers only what the player can physically touch.
     expect(TOWN_REVEAL_REACH_YD).toBe(12);
   });
+
+  it('never takes a town-spanning batch, whose anchor is the town centre', () => {
+    // The arrival shape the towns really produce: every static batch anchors
+    // at the centre, so a camera standing there is "at arm's length" of all of
+    // them at once. That is the whole-kit unlinked burst the policy exists to
+    // prevent, and only the building with a real footprint may take the floor.
+    const townRoots = [
+      { id: 'micro-batch' },
+      { id: 'wall-batch' },
+      { id: 'building-here' },
+      { id: 'building-far' },
+    ];
+    const state = newTownPiecewiseReveal(
+      'town',
+      townRoots,
+      [0, 0, 3, 400],
+      [0, 0, 0, 0],
+      [false, false, true, true],
+    );
+    const { gate, reached } = reachGate();
+    expect(townPiecewiseRevealInto(state, 'held', 0, 0, gate)).toBe(1);
+    expect(townRootVisible('held', state, 2)).toBe(true);
+    expect(townRootVisible('held', state, 0)).toBe(false);
+    expect(townRootVisible('held', state, 1)).toBe(false);
+    expect(townRootVisible('held', state, 3)).toBe(false);
+    expect(reached).toEqual(['town']);
+    // The batches are not merely deferred a frame: they wait for their own
+    // compile however long the camera stands on their anchor.
+    expect(townPiecewiseRevealInto(state, 'held', 0, 0, gate)).toBe(0);
+    expect(townRootVisible('held', state, 0)).toBe(false);
+  });
+
+  it('keeps the centre anchor for the ORDER a batch is submitted in', () => {
+    // Excluding a batch from the reach must not cost it its anchor: the
+    // nearest-first submission still reads x/z, so a camera at the centre
+    // still asks for the batches before the far building.
+    const townRoots = [{ id: 'micro-batch' }, { id: 'building-far' }];
+    const state = newTownPiecewiseReveal('town', townRoots, [0, 400], [0, 0], [false, true]);
+    const out: { id: string }[] = [];
+    expect(orderTownRootsNearestFirst(townRoots, state.x, state.z, 0, 0, out)).toEqual(townRoots);
+    expect(state.footprint[0]).toBe(0);
+    expect(state.footprint[1]).toBe(1);
+  });
+
+  it('defaults an unflagged root to footprint-anchored, so the floor still holds', () => {
+    // Every caller that has a real anchor per root omits the flag list.
+    const state = newTownPiecewiseReveal('town', [{ id: 'near' }], [100], [0]);
+    expect(state.footprint[0]).toBe(1);
+    const { gate } = reachGate();
+    expect(townPiecewiseRevealInto(state, 'held', 100, 0, gate)).toBe(1);
+  });
 });
 
 describe('town reveal root submission order', () => {
