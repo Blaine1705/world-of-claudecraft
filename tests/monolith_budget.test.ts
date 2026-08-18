@@ -140,7 +140,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the gc hitch cause, whose heap read (heap_sample.ts)
     // paid for its import and sample line by folding the key-light follow
     // beside it onto its single statement (net -1).
-    ceiling: 13483,
+    // Lowered again by the deferred-decal stand-in (the live candidate path
+    // builds the body without its face decals and attaches them on the
+    // pieces' arrival), which paid for its wiring by moving the mobile
+    // opening render scale into dynamic_resolution_core.ts (net -1).
+    ceiling: 13482,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

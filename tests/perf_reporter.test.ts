@@ -401,7 +401,7 @@ function snapshot(): PerfSnapshot {
         },
       },
       buildLedger: { kinds: {}, worstFrame: { ms: 0, count: 0, atMs: 0 }, slowest: [] },
-      lookPieces: { pending: 0, completedPieces: 0, bandsRun: 0, holds: 0 },
+      lookPieces: { pending: 0, completedPieces: 0, bandsRun: 0, deferred: 0, attached: 0 },
       zoneStreaming: { prepared: 1, pending: 0, last: null },
       autoGovernor: true,
       budget: {

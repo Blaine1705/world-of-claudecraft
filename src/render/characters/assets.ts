@@ -27,6 +27,7 @@ import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
+import { composedLookReady } from './look_pieces';
 import { buildMakeupDecal } from './makeup';
 import {
   type AttachDef,
@@ -1278,6 +1279,19 @@ function recolored(
   return mat;
 }
 
+/** The head a look's decals ride, inside a composed clone (or null when the
+ *  part set has no such node). */
+function headOf(root: THREE.Object3D, look: ModularLook): THREE.SkinnedMesh | null {
+  const name = headNodeName(look.app.gender);
+  let head: THREE.SkinnedMesh | null = null;
+  root.traverse((o) => {
+    if (!head && (o as THREE.SkinnedMesh).isSkinnedMesh && o.name === name) {
+      head = o as THREE.SkinnedMesh;
+    }
+  });
+  return head;
+}
+
 /**
  * Add the stubble/buzz decal, if the look wears one.
  *
@@ -1287,24 +1301,17 @@ function recolored(
  * the recolour sweep below, which is what paints it the hair colour, and before
  * `applyMorphs`, which drives it off the head's own morph dictionary.
  */
-function attachStubbleDecal(root: THREE.Object3D, look: ModularLook): void {
+function attachStubbleDecal(head: THREE.SkinnedMesh, look: ModularLook): THREE.SkinnedMesh | null {
   const sel = stubbleDecals(look.app, look.worn);
-  if (!sel.scalp && !sel.beard) return;
-  const name = headNodeName(look.app.gender);
-  let head: THREE.SkinnedMesh | null = null;
-  root.traverse((o) => {
-    if (!head && (o as THREE.SkinnedMesh).isSkinnedMesh && o.name === name) {
-      head = o as THREE.SkinnedMesh;
-    }
-  });
-  if (!head) return;
+  if (!sel.scalp && !sel.beard) return null;
   const decal = buildStubbleDecal(head, sel);
   // Sibling, not child: the head is skinned, so a child would inherit its
   // (bind-pose) transform on top of the skinning it already does.
   if (decal) {
     markFaceDecal(decal);
-    (head as THREE.SkinnedMesh).parent?.add(decal);
+    head.parent?.add(decal);
   }
+  return decal;
 }
 
 /**
@@ -1317,22 +1324,72 @@ function attachStubbleDecal(root: THREE.Object3D, look: ModularLook): void {
  * sweep (see `recolored`), because the mouth is a part standing proud of the
  * skin and a decal on the head at the lip band renders behind it.
  */
-function attachMakeupDecal(root: THREE.Object3D, look: ModularLook): void {
+function attachMakeupDecal(head: THREE.SkinnedMesh, look: ModularLook): THREE.SkinnedMesh | null {
   const sel = makeupSelection(look.app, look.worn);
-  if (!wearsFaceDecal(sel)) return;
-  const name = headNodeName(look.app.gender);
-  let head: THREE.SkinnedMesh | null = null;
-  root.traverse((o) => {
-    if (!head && (o as THREE.SkinnedMesh).isSkinnedMesh && o.name === name) {
-      head = o as THREE.SkinnedMesh;
-    }
-  });
-  if (!head) return;
+  if (!wearsFaceDecal(sel)) return null;
   const decal = buildMakeupDecal(head, sel);
   if (decal) {
     markFaceDecal(decal);
-    (head as THREE.SkinnedMesh).parent?.add(decal);
+    head.parent?.add(decal);
   }
+  return decal;
+}
+
+/** Options of a composed build. */
+export interface AssembleOptions {
+  /** Leave the face decals off when the look's pieces (its decal maps and
+   *  cuts, look_pieces.ts) are not resident, flagging the root
+   *  (`userData.deferredDecals`) for a late attachDeferredFaceDecals; the
+   *  body still builds whole and at once. Off, or with the pieces resident,
+   *  the decals attach here as always. */
+  deferDecals?: boolean;
+}
+
+/** The compose's decal step: both decals attached, or deferred (see
+ *  AssembleOptions.deferDecals) when allowed and the look is not ready. */
+export function attachFaceDecals(
+  root: THREE.Object3D,
+  def: VisualDef,
+  look: ModularLook,
+  opts?: AssembleOptions,
+): void {
+  const head = headOf(root, look);
+  if (!head) return;
+  if (opts?.deferDecals && !composedLookReady(def, look, head)) {
+    root.userData.deferredDecals = true;
+    return;
+  }
+  attachStubbleDecal(head, look);
+  attachMakeupDecal(head, look);
+}
+
+/**
+ * The late half of a deferred compose: the same two decals attachFaceDecals
+ * would have added, given exactly what the synchronous compose gives every
+ * mesh after attach (the recolour sweep's hair tint on the stubble material,
+ * the look's morph influences), the flag cleared. Returns the decal meshes so
+ * the visual can finish what ITS constructor does per mesh (tint, snapshot,
+ * caster flags) and reveal them through the compile gate. Empty when the root
+ * carries no deferral or the head is gone.
+ */
+export function attachDeferredFaceDecals(
+  root: THREE.Object3D,
+  look: ModularLook,
+): THREE.SkinnedMesh[] {
+  if (!root.userData.deferredDecals) return [];
+  delete root.userData.deferredDecals;
+  const head = headOf(root, look);
+  if (!head) return [];
+  const decals: THREE.SkinnedMesh[] = [];
+  for (const decal of [attachStubbleDecal(head, look), attachMakeupDecal(head, look)]) {
+    if (!decal) continue;
+    recolorMesh(decal, look);
+    // applyMorphs writes each mesh's influences by name from the look alone,
+    // so running it over the decal is the same write the compose sweep does
+    applyMorphs(decal, look);
+    decals.push(decal);
+  }
+  return decals;
 }
 
 /**
@@ -1352,14 +1409,29 @@ export function modularHeadFor(def: VisualDef, look: ModularLook): THREE.Skinned
   } catch {
     return null;
   }
-  const name = headNodeName(look.app.gender);
-  let head: THREE.SkinnedMesh | null = null;
-  root.traverse((o) => {
-    if (!head && (o as THREE.SkinnedMesh).isSkinnedMesh && o.name === name) {
-      head = o as THREE.SkinnedMesh;
-    }
-  });
-  return head;
+  return headOf(root, look);
+}
+
+/** The recolour sweep's per-mesh step: the look's skin, hair, eye, lash,
+ *  lipstick, jewellery and outfit tints onto every material of one mesh (see
+ *  `recolored`), plus the body-mesh flag the legacy skin-atlas swap gates on. */
+export function recolorMesh(mesh: THREE.Mesh, look: ModularLook): void {
+  const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+  // Only PLATE is a "body mesh" here: that flag gates the legacy per-class
+  // skin-atlas swap (SKINS/skinTexture), which must never repaint the
+  // colour-picked skin and hair.
+  if (mats.some((m) => m && isArmorMaterial(m.name))) mesh.userData.bodyMesh = true;
+  // The mouth part is the one place `mod_skin` must not be the skin tone,
+  // that primitive is the lips. GLTFLoader suffixes a multi-primitive mesh
+  // (`M_Mouth_neutral_1`), so match on the node's stem rather than equality.
+  const onMouth = mesh.name.includes('_Mouth_');
+  // GLTFLoader suffixes multi-primitive meshes, so match the stem
+  const onJewel = mesh.name.startsWith('E2_');
+  // ...and a hair band is the E2_ subset that must ignore the earring slot
+  const onBand = mesh.name.startsWith('E2_band_');
+  mesh.material = Array.isArray(mesh.material)
+    ? mesh.material.map((m) => recolored(m, look, onMouth, onJewel, onBand))
+    : recolored(mesh.material, look, onMouth, onJewel, onBand);
 }
 
 /** Compose a modular character: pick parts, recolour skin/hair, attach weapons. */
@@ -1368,36 +1440,18 @@ export function assembleModular(
   look: ModularLook,
   weaponItemId?: string | null,
   offhandItemId?: string | null,
+  opts?: AssembleOptions,
 ): THREE.Object3D {
   const names = modularPartNames(look.app, look.worn);
   // Nested inside the visual's `view-part:assemble` span; the variant step is
   // the cache miss (whole-GLB clone + part merge) or a map hit.
   const variant = timeBuildSpan('view-part:assemble:variant', () => modularVariant(def.url, names));
   const root = timeBuildSpan('view-part:assemble:parts', () => cloneSkinned(variant.root));
-  timeBuildSpan('view-part:assemble:decals', () => {
-    attachStubbleDecal(root, look);
-    attachMakeupDecal(root, look);
-  });
+  timeBuildSpan('view-part:assemble:decals', () => attachFaceDecals(root, def, look, opts));
   const recolorStarted = performance.now();
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh) return;
-    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-    // Only PLATE is a "body mesh" here: that flag gates the legacy per-class
-    // skin-atlas swap (SKINS/skinTexture), which must never repaint the
-    // colour-picked skin and hair.
-    if (mats.some((m) => m && isArmorMaterial(m.name))) mesh.userData.bodyMesh = true;
-    // The mouth part is the one place `mod_skin` must not be the skin tone,
-    // that primitive is the lips. GLTFLoader suffixes a multi-primitive mesh
-    // (`M_Mouth_neutral_1`), so match on the node's stem rather than equality.
-    const onMouth = mesh.name.includes('_Mouth_');
-    // GLTFLoader suffixes multi-primitive meshes, so match the stem
-    const onJewel = mesh.name.startsWith('E2_');
-    // ...and a hair band is the E2_ subset that must ignore the earring slot
-    const onBand = mesh.name.startsWith('E2_band_');
-    mesh.material = Array.isArray(mesh.material)
-      ? mesh.material.map((m) => recolored(m, look, onMouth, onJewel, onBand))
-      : recolored(mesh.material, look, onMouth, onJewel, onBand);
+    if (mesh.isMesh) recolorMesh(mesh, look);
   });
   recordBuildSpan('view-part:assemble:recolor', performance.now() - recolorStarted, recolorStarted);
   timeBuildSpan('view-part:assemble:morphs', () => applyMorphs(root, look));
@@ -1493,9 +1547,10 @@ export function assembleModel(
   weaponItemId?: string | null,
   offhandItemId?: string | null,
   look?: ModularLook | null,
+  opts?: AssembleOptions,
 ): THREE.Object3D {
   if (def.modular) {
-    return assembleModular(def, look ?? DEFAULT_LOOK, weaponItemId, offhandItemId);
+    return assembleModular(def, look ?? DEFAULT_LOOK, weaponItemId, offhandItemId, opts);
   }
   const root = cloneSkinned(optimizedScene(def.url));
   // tag the character's own meshes (body + accessories share one texture atlas)

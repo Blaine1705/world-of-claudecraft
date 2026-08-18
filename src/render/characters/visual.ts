@@ -35,9 +35,11 @@ import {
   shouldPlayLanding,
 } from './anim_state';
 import {
+  type AssembleOptions,
   applyMaterials,
   applyModularSliderMorphs,
   assembleModel,
+  attachDeferredFaceDecals,
   ensureSkinTexture,
   farSourceMaterials,
   modularFarBake,
@@ -64,6 +66,7 @@ import {
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
+import { noteLookAttached } from './look_pieces';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
 import type { ModularAppearance, ModularLook } from './modular';
@@ -420,6 +423,59 @@ export class CharacterVisual {
     this.look = { ...this.look, app };
     applyModularSliderMorphs(this.model, app);
   }
+
+  /** Attach the face decals a deferred build left off (AssembleOptions
+   *  .deferDecals, once the look's pieces are resident): the same decals the
+   *  synchronous compose adds, given everything the constructor's sweeps give
+   *  a mesh (the tier tint and its lease, the effect-swap snapshot and the
+   *  effect the body wears now, the caster flags), born hidden and revealed
+   *  through the compile gate so their first draw never links inside a live
+   *  frame (immediately without a gate: previews, tests). False when there is
+   *  nothing to attach: disposed, no deferral on the model, or a fixed rig. */
+  attachDeferredDecals(): boolean {
+    if (this.disposed || !this.look || !this.model.userData.deferredDecals) return false;
+    const decals = attachDeferredFaceDecals(this.model, this.look);
+    for (const decal of decals) {
+      applyMaterials(
+        decal,
+        this.def,
+        this.entityColor,
+        skinTexture(this.key, this.skinIndex),
+        skinEmissiveTexture(this.key, this.skinIndex),
+        this.tintedRigClaims,
+      );
+      this.originalMaterials.set(decal, decal.material);
+      decal.material = this.effectMaterial(decal.material);
+      decal.castShadow = this.shadowOn;
+      decal.receiveShadow = false;
+      decal.frustumCulled = false;
+      this.casters.push(decal);
+      this.revealDecalOnCompile(decal);
+    }
+    if (decals.length > 0) noteLookAttached();
+    return true;
+  }
+
+  private revealDecalOnCompile(decal: THREE.Mesh): void {
+    const gate = this.farBakeGate;
+    if (!gate) return;
+    decal.visible = false;
+    try {
+      gate(decal, () => {
+        // A visual disposed, or its decal detached, while the link was in
+        // flight: the settle belongs to a mesh this visual no longer draws.
+        if (this.disposed || decal.parent === null) return;
+        decal.visible = true;
+      });
+    } catch (err) {
+      // A gate that rejects outright (a lane shut down under a graphics
+      // rebuild) reveals now: a decal linking on its first draw beats one that
+      // never shows, and the swap must not throw out of the attach.
+      decal.visible = true;
+      console.warn('[decals] compile gate refused a face decal, revealed ungated:', err);
+    }
+  }
+
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
   // The skin's authored tuning row (the rig's 1.0 look) plus the shed
@@ -647,6 +703,7 @@ export class CharacterVisual {
     weaponOverride: WeaponLayoutOverride | null = null,
     offhandItemId: string | null = null,
     look: ModularLook | null = null,
+    opts?: AssembleOptions,
   ) {
     const prep = prepareVisual(key);
     // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
@@ -679,7 +736,7 @@ export class CharacterVisual {
     // downstream can read a look the geometry never used.
     this.look = prep.def.modular ? look : null;
     this.model = timeBuildSpan('view-part:assemble', () =>
-      assembleModel(this.def, weaponItemId, offhandItemId, look),
+      assembleModel(this.def, weaponItemId, offhandItemId, look, opts),
     );
     // Release-on-throw for everything below: the retry gate re-runs this whole
     // constructor when a streamed asset lands late (a designed path, not an

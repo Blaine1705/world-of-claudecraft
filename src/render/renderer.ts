@@ -136,12 +136,12 @@ import {
 import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
+  type AssembleOptions,
   type CharacterVisual,
-  composedLookOf,
+  composedLookPiecesOf,
   createCharacterVisual,
   createMountVisual,
   type FarBakeGate,
-  holdComposedLookView,
   lookPiecesStats,
   modularLookFor,
   setWeaponVfxViewportHeight,
@@ -241,6 +241,7 @@ import {
   dynamicResolutionAllocationScale,
   dynamicResolutionGovernorRange,
   dynamicResolutionRect,
+  initialEffectiveRenderScale,
   MIN_DYNAMIC_RENDER_SCALE,
 } from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
@@ -4195,7 +4196,11 @@ export class Renderer {
   /** Resolution multiplier on top of the device pixel ratio (0.5..1). */
   setRenderScale(scale: number): void {
     this.renderScale = Math.min(1, Math.max(0.5, scale));
-    this.effectiveRenderScale = this.initialEffectiveRenderScale(this.renderScale);
+    this.effectiveRenderScale = initialEffectiveRenderScale(
+      this.renderScale,
+      this.isMobileRuntime(),
+      urlForcedTier(),
+    );
     this.frameMsEma = 16.7;
     this.adaptiveGrace = 1.0;
     this.adaptiveCooldown = 0.5;
@@ -4213,18 +4218,6 @@ export class Renderer {
 
   private isMobileRuntime(): boolean {
     return document.body.classList.contains('mobile-touch');
-  }
-
-  private initialEffectiveRenderScale(scale: number): number {
-    const forcedTier = urlForcedTier();
-    if (
-      this.isMobileRuntime() &&
-      forcedTier !== 'high' &&
-      forcedTier !== 'ultra' &&
-      forcedTier !== 'insane'
-    )
-      return Math.min(scale, 0.85);
-    return scale;
   }
 
   private renderBudgetMinScale(): number {
@@ -4735,7 +4728,7 @@ export class Renderer {
     limit: number,
     createdViewTypes: string[],
     deadlineMs = Infinity,
-    holdUnreadyLooks = false,
+    deferLooks = false,
   ): { created: number; trimmed: boolean } {
     const max = Math.max(0, Math.floor(limit));
     let created = 0;
@@ -4759,39 +4752,45 @@ export class Renderer {
       // a recent failed build (assets unavailable) sits out its cooldown so it
       // cannot burn a budget slot every frame
       if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) continue;
-      // a held look takes no slot: the loop moves on to the next candidate
-      if (holdUnreadyLooks && this.holdComposedLook(e)) continue;
-      this.createView(e);
+      if (deferLooks) this.createViewDeferringLook(e);
+      else this.createView(e);
       sampleCreatedViewType(createdViewTypes, e);
       created++;
     }
     return { created, trimmed };
   }
 
-  /** The live-frame hold (characters/look_pieces.ts): a candidate whose
-   *  composed look is not resident waits, its pieces enqueued, instead of
-   *  painting its decal maps inside this frame. The local target builds now
+  /** The live-frame build (characters/look_pieces.ts): a candidate whose
+   *  composed look is not resident builds now WITHOUT its face decals (the
+   *  body is the stand-in), its pieces enqueued, and the decals attach through
+   *  the compile gate once they land. The local target builds whole now
    *  (actionable), and a covered frame keeps the synchronous build. */
-  private holdComposedLook(e: Entity): boolean {
-    if (e.id === this.sim.player.targetId || arrivalCoverActive()) return false;
-    const composed = composedLookOf(e);
-    if (!composed) return false;
-    return holdComposedLookView(
-      composed.def,
-      composed.look,
-      this.backgroundGpuWork,
-      GPU_WORK_PRIORITY.LIVE_VIEW,
-    );
+  private createViewDeferringLook(e: Entity): void {
+    const pieces =
+      e.id === this.sim.player.targetId || arrivalCoverActive()
+        ? null
+        : composedLookPiecesOf(e, this.backgroundGpuWork, GPU_WORK_PRIORITY.LIVE_VIEW);
+    if (!pieces || pieces.ready) {
+      this.createView(e);
+      return;
+    }
+    this.createView(e, { deferDecals: true });
+    const visual = this.views.get(e.id)?.visual;
+    if (!visual) return;
+    pieces.attachWhenReady(`${e.id}`, () => {
+      if (this.views.get(e.id)?.visual === visual) visual.attachDeferredDecals();
+    });
   }
 
   private createCharacterVisualWithRetry(
     e: Entity,
     slot: string,
     formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
+    opts?: AssembleOptions,
   ): CharacterVisual | null {
     const now = performance.now();
     if (!this.viewCreateRetry.canAttempt(e.id, slot, now)) return null;
-    const visual = createCharacterVisual(e, formKey);
+    const visual = createCharacterVisual(e, formKey, opts);
     if (visual) {
       this.viewCreateRetry.markSucceeded(e.id, slot);
       visual.setFarBakeGate(this.farBakeGate);
@@ -8275,16 +8274,16 @@ export class Renderer {
     return group;
   }
 
-  private createView(e: Entity): void {
+  private createView(e: Entity, opts?: AssembleOptions): void {
     const started = performance.now();
-    this.buildView(e);
+    this.buildView(e, opts);
     const view = this.views.get(e.id);
     if (!view) return;
     const kind = viewBuildClass(e, this.sim.player.id, view.visual);
     this.buildLedger.record(`view:${kind}`, performance.now() - started, started);
   }
 
-  private buildView(e: Entity): void {
+  private buildView(e: Entity, opts?: AssembleOptions): void {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
     let visual: CharacterVisual | null = null;
@@ -8518,7 +8517,7 @@ export class Renderer {
         // "asset-upload" travel hitch. Before, only the few prewarm-seeded copies were
         // ever recycled, so every mob past that count churned. Key is per-template, so
         // the pool stays bounded by the peak simultaneous count.
-        visual = this.createCharacterVisualWithRetry(e, 'view');
+        visual = this.createCharacterVisualWithRetry(e, 'view', undefined, opts);
         // assets unavailable: skip, the entity stays a view candidate but sits
         // out the retry cooldown so it cannot starve the per-frame budget
         if (!visual) {

@@ -190,6 +190,28 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(farMeshShown(true, true, false)).toBe(true); // settled: mesh takes over
   });
 
+  it('deferred face decals: the body drew from its first frame, the paint alone arrives late', () => {
+    // The decals of a body built with them deferred are gated through the far
+    // bake gate (visual.ts revealDecalOnCompile hides ONLY the decal meshes);
+    // the body is the stand-in, so no plate is forced and the entity has a
+    // click target and silhouette the whole time.
+    const row = ENTITY_GATE_STAND_INS.find(
+      (r) =>
+        r.callSite ===
+        'this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled)',
+    );
+    expect(row?.hides).toContain('attachDeferredDecals');
+    expect(row?.standIn).toContain('the same body');
+    const visual = sourceOf('src/render/characters/visual.ts');
+    const reveal = visual.slice(
+      visual.indexOf('private revealDecalOnCompile('),
+      visual.indexOf('\n  }', visual.indexOf('private revealDecalOnCompile(')),
+    );
+    expect(reveal).toContain('decal.visible = false;');
+    expect(reveal).not.toContain('root.visible');
+    expect(anyCharacterRigDrawing(slots({ visual: rig(true) }))).toBe(true);
+  });
+
   it('mount and weapon gates: the character keeps drawing throughout', () => {
     // Both hide only an accessory node, never the body, so the rider/wearer is
     // the stand-in and no plate is forced.

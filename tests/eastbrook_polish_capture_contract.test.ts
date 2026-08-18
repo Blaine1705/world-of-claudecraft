@@ -203,8 +203,11 @@ interface AttributionTargetFixture {
 // Re-minted for the gc hitch cause (the heap read on the hitch sample):
 // renderer.ts moved, the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for the deferred-decal stand-in (the live candidate path builds
+// the body without its face decals): renderer.ts moved, the seals follow the
+// swept evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '69a58203a0d533ec28cb1d0255b571eb6f30a220db498860d792aea79a1079c4';
+  '0cf5191a00abdc4230919c759dac29ad6e7c54fa5b6f2dcb7b4ddd69cb7befc4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

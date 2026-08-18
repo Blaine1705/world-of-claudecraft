@@ -444,13 +444,21 @@ GPU work signs. Each rule names its seam and its guard.
 - **CPU construction pieces ride the same queue and budget.** Main-thread work a
   view build would otherwise pay inside its frame (a composed look's procedural
   decal maps and head cuts, measured at 94 percent of a composed build) is cut into
-  pieces the budget can price (a map as a chain of row bands, one queue unit each,
-  a cut as one unit), deduped by style key, and enqueued at the view's priority;
-  the renderer HOLDS the live candidate until its pieces are resident (no view, no
-  partial body) and builds it off warm caches on a later pass. Under a cover and
-  for the local target the build stays synchronous. Seam:
-  `characters/look_pieces.ts` (`holdComposedLookView`, `perfStats().lookPieces`),
-  guarded by `tests/look_pieces.test.ts` and `tests/renderer_look_pieces_hold.test.ts`.
+  pieces the budget can price (a map as a chain of row bands, `LOOK_BAND_ROWS` rows
+  per unit, a structural fraction of the map so the budget decides how many units
+  fit a frame; a cut as one unit), deduped by style key, and enqueued at the view's
+  priority. The live candidate whose pieces are not resident builds its body NOW
+  without its face decals (the body IS the stand-in: nameplate, click target and
+  silhouette on the frame it enters range, never an invisible player, per the
+  fairness rule) and the decals attach later, one budgeted queue unit per body
+  (`LookPieces.attachWhenReady`, so a crowd sharing a look never attaches in one
+  burst), through the visual's compile gate (`CharacterVisual.attachDeferredDecals`,
+  hidden until their programs link).
+  Under a cover and for the local target the build stays synchronous, decals
+  included. Seam: `characters/look_pieces.ts` (`composedLookPiecesFor`,
+  `perfStats().lookPieces`) and `AssembleOptions.deferDecals`, guarded by
+  `tests/look_pieces.test.ts`, `tests/deferred_face_decals.test.ts` and
+  `tests/renderer_look_pieces_hold.test.ts`.
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, plus the `arrival` mark

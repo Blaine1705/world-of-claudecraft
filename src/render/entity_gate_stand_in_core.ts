@@ -141,9 +141,9 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     file: 'src/render/renderer.ts',
     callSite: 'this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled)',
     hides:
-      'the freshly baked far mesh and its shadow proxy; the SAME injected gate also stages the transparent effect clones (visual.ts stageEffectSwap), which hide nothing at all',
+      'the freshly baked far mesh and its shadow proxy; the SAME injected gate also stages the transparent effect clones (visual.ts stageEffectSwap), which hide nothing at all, and reveals the face decals of a body built with them deferred (visual.ts attachDeferredDecals), which hide only themselves',
     standIn:
-      'the articulated rig, held by farMeshShown (characters/far_lod_reveal_core.ts); for the effect-clone use, the body itself, still drawing its current opaque materials until the swap commits',
+      'the articulated rig, held by farMeshShown (characters/far_lod_reveal_core.ts); for the effect-clone use, the body itself, still drawing its current opaque materials until the swap commits; for the deferred decals, the same body, drawn whole from the frame it entered range with only its stubble and makeup paint arriving late',
   },
   {
     gate: 'gateSwapFlagOnCompile',

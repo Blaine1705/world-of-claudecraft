@@ -4,23 +4,19 @@
 // texture painting inside the frame (src/render/characters/look_pieces.ts).
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-let fakeHead: THREE.SkinnedMesh | null = null;
-vi.mock('../src/render/characters/assets', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('../src/render/characters/assets')>()),
-  modularHeadFor: () => fakeHead,
-}));
-
 import {
+  composedLookPiecesFor,
   composedLookReady,
+  DECAL_ATTACH_LABEL,
   DECAL_GEOMETRY_LABEL,
   enqueueComposedLookPieces,
-  holdComposedLookView,
-  LOOK_TEXTURE_BANDS,
+  LOOK_BAND_ROWS,
   type LookPieceQueue,
   lookPiecesStats,
+  lookTextureBands,
   MAKEUP_BAND_LABEL,
-  noteLookHold,
+  noteLookAttached,
+  noteLookDeferred,
   resetLookPiecesForTest,
   STUBBLE_BAND_LABEL,
 } from '../src/render/characters/look_pieces';
@@ -127,10 +123,9 @@ const flush = async (): Promise<void> => {
 
 const bandsOf = (fn: (out: Uint8Array, a: number, b: number) => void, size: number) => {
   const out = new Uint8Array(size * size * 4);
-  const rows = size / LOOK_TEXTURE_BANDS;
   // painted out of order on purpose: a band depends on its own rows only
-  for (let band = LOOK_TEXTURE_BANDS - 1; band >= 0; band--) {
-    fn(out, band * rows, (band + 1) * rows);
+  for (let band = lookTextureBands(size) - 1; band >= 0; band--) {
+    fn(out, band * LOOK_BAND_ROWS, (band + 1) * LOOK_BAND_ROWS);
   }
   return out;
 };
@@ -162,10 +157,18 @@ describe('row-sliced decal maps', () => {
     expect(whole.some((v, i) => i % 4 === 3 && v > 0)).toBe(true);
   });
 
-  it('the shipped sizes split evenly into the structural bands', () => {
-    expect(LOOK_TEXTURE_BANDS).toBe(16);
-    expect(DECAL_TEX_SIZE % LOOK_TEXTURE_BANDS).toBe(0);
-    expect(MAKEUP_TEX_SIZE % LOOK_TEXTURE_BANDS).toBe(0);
+  it('the shipped sizes split evenly into the structural bands (a fraction of the map, not a count)', () => {
+    expect(LOOK_BAND_ROWS).toBe(8);
+    expect(DECAL_TEX_SIZE % LOOK_BAND_ROWS).toBe(0);
+    expect(MAKEUP_TEX_SIZE % LOOK_BAND_ROWS).toBe(0);
+    // the unit count follows the map: the larger stubble map is more units,
+    // never a bigger unit
+    expect(lookTextureBands(DECAL_TEX_SIZE)).toBe(128);
+    expect(lookTextureBands(MAKEUP_TEX_SIZE)).toBe(64);
+    expect(lookTextureBands(DECAL_TEX_SIZE) * LOOK_BAND_ROWS).toBe(DECAL_TEX_SIZE);
+    // a size that does not divide gets a short last band, never a dropped row
+    expect(lookTextureBands(1020)).toBe(128);
+    expect(lookTextureBands(1)).toBe(1);
   });
 
   it('residency flips when a map is published from data, and the getter then serves it', () => {
@@ -210,7 +213,6 @@ describe('row-sliced decal maps', () => {
 describe('composed look pieces on the GPU work queue', () => {
   beforeEach(() => {
     resetLookPiecesForTest();
-    fakeHead = null;
   });
   afterEach(() => {
     vi.restoreAllMocks();
@@ -219,45 +221,69 @@ describe('composed look pieces on the GPU work queue', () => {
   it('a look with no decal at all is ready at once and enqueues nothing', () => {
     const look = lookWith({ hair: 'bald', beard: 'none' });
     const q = fakeQueue();
-    expect(composedLookReady(DEF, look)).toBe(true);
-    expect(holdComposedLookView(DEF, look, q.queue, 30)).toBe(false);
+    expect(composedLookReady(DEF, look, null)).toBe(true);
+    const pieces = composedLookPiecesFor(DEF, look, null, q.queue, 30);
+    expect(pieces.ready).toBe(true);
     expect(q.runs).toEqual([]);
-    expect(lookPiecesStats()).toEqual({ pending: 0, completedPieces: 0, bandsRun: 0, holds: 0 });
+    expect(lookPiecesStats()).toEqual({
+      pending: 0,
+      completedPieces: 0,
+      bandsRun: 0,
+      deferred: 0,
+      attached: 0,
+    });
   });
 
-  it('a stubble map is a chain of 16 band units, one in the queue at a time, then resident', async () => {
+  it('a stubble map is a chain of band units, one in the queue at a time, then resident', async () => {
     const look = lookWith({ hair: 'buzz', beard: 'stubble' });
     const sel = stubbleDecals(look.app, look.worn);
     expect(sel).toEqual({ scalp: 'buzz', beard: 'stubble' });
     expect(hasDecalTexture(sel)).toBe(false);
+    const bands = lookTextureBands(DECAL_TEX_SIZE);
     const q = fakeQueue('manual');
-    expect(holdComposedLookView(DEF, look, q.queue, 30)).toBe(true);
-    expect(lookPiecesStats()).toMatchObject({ pending: 1, holds: 1 });
+    const first = composedLookPiecesFor(DEF, look, null, q.queue, 30);
+    expect(first.ready).toBe(false);
+    expect(lookPiecesStats()).toMatchObject({ pending: 1, deferred: 1 });
     // never all at once: the first band alone sits in the queue
     expect(q.runs.map((r) => r.label)).toEqual([`${STUBBLE_BAND_LABEL}:${decalKey(sel)}:0`]);
     expect(q.runs[0].priority).toBe(30);
-    // a second hold for the same look (another entity of the crowd) dedupes
-    expect(holdComposedLookView(DEF, look, q.queue, 30)).toBe(true);
+    // a second deferral for the same look (another entity of the crowd)
+    // dedupes the piece and waits on the SAME in-flight chain
+    const second = composedLookPiecesFor(DEF, look, null, q.queue, 30);
+    expect(second.ready).toBe(false);
     expect(q.runs).toHaveLength(1);
-    expect(lookPiecesStats().holds).toBe(2);
-    for (let band = 0; band < LOOK_TEXTURE_BANDS; band++) {
+    expect(lookPiecesStats().deferred).toBe(2);
+    let firstReady = false;
+    let secondReady = false;
+    void first.whenReady.then(() => {
+      firstReady = true;
+    });
+    void second.whenReady.then(() => {
+      secondReady = true;
+    });
+    for (let band = 0; band < bands; band++) {
       expect(q.step()).toBe(true);
-      await flush();
-      if (band < LOOK_TEXTURE_BANDS - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      if (band < bands - 1) {
         expect(q.runs).toHaveLength(band + 2);
         expect(q.runs[band + 1].label).toBe(`${STUBBLE_BAND_LABEL}:${decalKey(sel)}:${band + 1}`);
         expect(hasDecalTexture(sel)).toBe(false);
+        expect(firstReady).toBe(false);
       }
     }
-    expect(q.runs).toHaveLength(LOOK_TEXTURE_BANDS);
+    await flush();
+    expect(q.runs).toHaveLength(bands);
     expect(hasDecalTexture(sel)).toBe(true);
-    expect(composedLookReady(DEF, look)).toBe(true);
-    expect(holdComposedLookView(DEF, look, q.queue, 30)).toBe(false);
+    expect(firstReady).toBe(true);
+    expect(secondReady).toBe(true);
+    expect(composedLookReady(DEF, look, null)).toBe(true);
+    expect(composedLookPiecesFor(DEF, look, null, q.queue, 30).ready).toBe(true);
     expect(lookPiecesStats()).toEqual({
       pending: 0,
       completedPieces: 1,
-      bandsRun: LOOK_TEXTURE_BANDS,
-      holds: 2,
+      bandsRun: bands,
+      deferred: 2,
+      attached: 0,
     });
     // the published map is the banded paint, byte-identical to the whole
     const published = decalTexture(sel).image.data as Uint8Array;
@@ -269,65 +295,104 @@ describe('composed look pieces on the GPU work queue', () => {
   it('a makeup map is its own band family, and a look wearing both maps needs both', async () => {
     const look = lookWith({ hair: 'crew', beard: 'none', blush: 'rose', eyeshadow: 'teal' });
     const q = fakeQueue();
-    enqueueComposedLookPieces(DEF, look, q.queue, 30);
+    enqueueComposedLookPieces(DEF, look, null, q.queue, 30);
     await flush();
     const kinds = new Set(q.runs.map((r) => gpuPrepKindOfLabel(r.label)));
     expect(kinds).toEqual(new Set([STUBBLE_BAND_LABEL, MAKEUP_BAND_LABEL]));
     expect(q.runs.filter((r) => r.label.startsWith(MAKEUP_BAND_LABEL))).toHaveLength(
-      LOOK_TEXTURE_BANDS,
+      lookTextureBands(MAKEUP_TEX_SIZE),
     );
     expect(hasMakeupTexture(makeupSelection(look.app, look.worn))).toBe(true);
-    expect(composedLookReady(DEF, look)).toBe(true);
+    expect(composedLookReady(DEF, look, null)).toBe(true);
     expect(lookPiecesStats()).toMatchObject({ pending: 0, completedPieces: 2 });
   });
 
+  it('whenReady waits on every piece of THIS look, including one another look started', async () => {
+    // look A starts the stubble map; look B needs that same map plus its own
+    // makeup map, so B settles only once BOTH chains are done
+    const a = lookWith({ hair: 'buzz', beard: 'scruff', blush: 'none', eyeshadow: 'none' });
+    const b = lookWith({ hair: 'buzz', beard: 'scruff', blush: 'peach', eyeshadow: 'plum' });
+    const q = fakeQueue('manual');
+    const piecesA = composedLookPiecesFor(DEF, a, null, q.queue, 30);
+    const piecesB = composedLookPiecesFor(DEF, b, null, q.queue, 30);
+    expect(piecesA.ready).toBe(false);
+    expect(piecesB.ready).toBe(false);
+    // the shared stubble chain is in flight once; B added only its makeup chain
+    expect(q.runs.map((r) => gpuPrepKindOfLabel(r.label))).toEqual([
+      STUBBLE_BAND_LABEL,
+      MAKEUP_BAND_LABEL,
+    ]);
+    let aReady = false;
+    let bReady = false;
+    void piecesA.whenReady.then(() => {
+      aReady = true;
+    });
+    void piecesB.whenReady.then(() => {
+      bReady = true;
+    });
+    // run every parked unit to completion (each step re-parks the next band)
+    while (q.step()) await new Promise((resolve) => setTimeout(resolve, 0));
+    await flush();
+    expect(hasDecalTexture(stubbleDecals(a.app, a.worn))).toBe(true);
+    expect(hasMakeupTexture(makeupSelection(b.app, b.worn))).toBe(true);
+    expect(aReady).toBe(true);
+    expect(bReady).toBe(true);
+    expect(lookPiecesStats()).toMatchObject({ pending: 0, completedPieces: 2, deferred: 2 });
+  });
+
   it('with the head resolved, the cuts are one unit each and run once', async () => {
-    fakeHead = sphereHead();
+    const head = sphereHead();
     const look = lookWith({ hair: 'crew', beard: 'none', blush: 'rose', eyeshadow: 'none' });
     const sel = stubbleDecals(look.app, look.worn);
     const q = fakeQueue();
-    expect(composedLookReady(DEF, look)).toBe(false);
-    enqueueComposedLookPieces(DEF, look, q.queue, 30);
-    enqueueComposedLookPieces(DEF, look, q.queue, 30);
+    expect(composedLookReady(DEF, look, head)).toBe(false);
+    enqueueComposedLookPieces(DEF, look, head, q.queue, 30);
+    enqueueComposedLookPieces(DEF, look, head, q.queue, 30);
     await flush();
     const geometryUnits = q.runs.filter(
       (r) => gpuPrepKindOfLabel(r.label) === DECAL_GEOMETRY_LABEL,
     );
     expect(geometryUnits.map((r) => r.label).sort()).toEqual([
-      `${DECAL_GEOMETRY_LABEL}:makeup-geometry:${fakeHead.geometry.uuid}`,
-      `${DECAL_GEOMETRY_LABEL}:stubble-geometry:${fakeHead.geometry.uuid}|${decalKey(sel)}`,
+      `${DECAL_GEOMETRY_LABEL}:makeup-geometry:${head.geometry.uuid}`,
+      `${DECAL_GEOMETRY_LABEL}:stubble-geometry:${head.geometry.uuid}|${decalKey(sel)}`,
     ]);
-    expect(hasDecalGeometry(fakeHead.geometry, sel)).toBe(true);
-    expect(hasMakeupGeometry(fakeHead.geometry)).toBe(true);
-    expect(composedLookReady(DEF, look)).toBe(true);
+    expect(hasDecalGeometry(head.geometry, sel)).toBe(true);
+    expect(hasMakeupGeometry(head.geometry)).toBe(true);
+    expect(composedLookReady(DEF, look, head)).toBe(true);
     // a second look on the same head with the same styles shares every piece
-    expect(composedLookReady(DEF, lookWith({ ...look.app, skinHue: 200 }))).toBe(true);
+    expect(composedLookReady(DEF, lookWith({ ...look.app, skinHue: 200 }), head)).toBe(true);
     // ...and a differently cut style needs only its own cut and map
     q.runs.length = 0;
-    enqueueComposedLookPieces(DEF, lookWith({ hair: 'buzz', beard: 'none' }), q.queue, 30);
+    enqueueComposedLookPieces(DEF, lookWith({ hair: 'buzz', beard: 'none' }), head, q.queue, 30);
     await flush();
     const kinds = q.runs.map((r) => gpuPrepKindOfLabel(r.label));
-    expect(kinds.filter((k) => k === STUBBLE_BAND_LABEL)).toHaveLength(LOOK_TEXTURE_BANDS);
+    const bands = lookTextureBands(DECAL_TEX_SIZE);
+    expect(kinds.filter((k) => k === STUBBLE_BAND_LABEL)).toHaveLength(bands);
     expect(kinds.filter((k) => k === DECAL_GEOMETRY_LABEL)).toHaveLength(1);
-    expect(kinds).toHaveLength(LOOK_TEXTURE_BANDS + 1);
+    expect(kinds).toHaveLength(bands + 1);
+    // without a head there is nothing to cut and nothing to wait on
+    expect(composedLookReady(DEF, look, null)).toBe(true);
   });
 
-  it('a failing band drops the key so a later enqueue retries, warning once', async () => {
+  it('a failing band drops the key so a later enqueue retries, warning once, and settles the wait', async () => {
     const look = lookWith({ hair: 'crew', beard: 'scruff' });
     const sel = stubbleDecals(look.app, look.worn);
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const failing = fakeQueue('manual');
-    enqueueComposedLookPieces(DEF, look, failing.queue, 30);
+    const pieces = composedLookPiecesFor(DEF, look, null, failing.queue, 30);
     expect(lookPiecesStats().pending).toBe(1);
     const unit = failing.parked.shift();
     unit?.reject(new Error('queue shut down'));
+    // never a rejection for the waiter: it settles, and the attach paints
+    // what is missing synchronously (fail-soft)
+    await expect(pieces.whenReady).resolves.toBeUndefined();
     await flush();
     expect(lookPiecesStats().pending).toBe(0);
     expect(hasDecalTexture(sel)).toBe(false);
     expect(warn).toHaveBeenCalledTimes(1);
     // retried on the next enqueue, from band 0
     const q = fakeQueue();
-    enqueueComposedLookPieces(DEF, look, q.queue, 30);
+    enqueueComposedLookPieces(DEF, look, null, q.queue, 30);
     await flush();
     expect(q.runs[0].label).toBe(`${STUBBLE_BAND_LABEL}:${decalKey(sel)}:0`);
     expect(hasDecalTexture(sel)).toBe(true);
@@ -335,21 +400,79 @@ describe('composed look pieces on the GPU work queue', () => {
     resetLookPiecesForTest();
     warn.mockClear();
     const again = fakeQueue('manual');
-    enqueueComposedLookPieces(DEF, lookWith({ hair: 'crew', beard: 'stubble' }), again.queue, 30);
+    const retry = lookWith({ hair: 'crew', beard: 'stubble' });
+    enqueueComposedLookPieces(DEF, retry, null, again.queue, 30);
     again.parked.shift()?.reject(new Error('one'));
     await flush();
-    enqueueComposedLookPieces(DEF, lookWith({ hair: 'crew', beard: 'stubble' }), again.queue, 30);
+    enqueueComposedLookPieces(DEF, retry, null, again.queue, 30);
     again.parked.shift()?.reject(new Error('two'));
     await flush();
     expect(warn).toHaveBeenCalledTimes(1);
   });
 
+  it('attachWhenReady runs the attach as one budgeted unit per body once the pieces land, never in the settle turn', async () => {
+    // three peers of the crowd wearing one never-seen look: one shared piece
+    // chain, three attach units, each admitted by the queue on its own slot
+    const look = lookWith({ hair: 'bald', beard: 'stubble', blush: 'none', eyeshadow: 'none' });
+    const q = fakeQueue('manual');
+    const peers = [1, 2, 3].map(() => composedLookPiecesFor(DEF, look, null, q.queue, 30));
+    const attached: number[] = [];
+    peers.forEach((pieces, i) => {
+      expect(pieces.ready).toBe(false);
+      pieces.attachWhenReady(`peer-${i}`, () => attached.push(i));
+    });
+    // land every band (each step re-parks the next band of the one chain)
+    let steps = 0;
+    while (q.parked.length > 0 && !q.runs.some((r) => r.label.startsWith(DECAL_ATTACH_LABEL))) {
+      q.step();
+      steps++;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+    expect(steps).toBe(lookTextureBands(DECAL_TEX_SIZE));
+    await flush();
+    // the pieces are resident, yet nothing attached: the three attaches sit
+    // in the queue as units of their own, labelled per body at the priority
+    expect(hasDecalTexture(stubbleDecals(look.app, look.worn))).toBe(true);
+    expect(attached).toEqual([]);
+    const units = q.runs.filter((r) => gpuPrepKindOfLabel(r.label) === DECAL_ATTACH_LABEL);
+    expect(units.map((r) => r.label)).toEqual([
+      `${DECAL_ATTACH_LABEL}:peer-0`,
+      `${DECAL_ATTACH_LABEL}:peer-1`,
+      `${DECAL_ATTACH_LABEL}:peer-2`,
+    ]);
+    expect(units.every((r) => r.priority === 30)).toBe(true);
+    // one admitted slot, one body
+    expect(q.step()).toBe(true);
+    await flush();
+    expect(attached).toEqual([0]);
+    while (q.step()) await flush();
+    expect(attached).toEqual([0, 1, 2]);
+    // a unit the queue refuses is dropped, never an unhandled rejection
+    const shut = composedLookPiecesFor(DEF, look, null, q.queue, 30);
+    expect(shut.ready).toBe(true);
+    let ran = false;
+    shut.attachWhenReady('late', () => {
+      ran = true;
+    });
+    await flush();
+    q.parked.shift()?.reject(new Error('queue shut down'));
+    await flush();
+    expect(ran).toBe(false);
+  });
+
   it('a fixed rig def has no pieces', () => {
     const q = fakeQueue();
-    expect(composedLookReady(VISUALS.player_warrior, lookWith({ hair: 'buzz' }))).toBe(true);
-    enqueueComposedLookPieces(VISUALS.player_warrior, lookWith({ hair: 'buzz' }), q.queue, 30);
+    expect(composedLookReady(VISUALS.player_warrior, lookWith({ hair: 'buzz' }), null)).toBe(true);
+    enqueueComposedLookPieces(
+      VISUALS.player_warrior,
+      lookWith({ hair: 'buzz' }),
+      null,
+      q.queue,
+      30,
+    );
     expect(q.runs).toEqual([]);
-    noteLookHold();
-    expect(lookPiecesStats().holds).toBe(1);
+    noteLookDeferred();
+    noteLookAttached();
+    expect(lookPiecesStats()).toMatchObject({ deferred: 1, attached: 1 });
   });
 });

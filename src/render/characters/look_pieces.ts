@@ -10,13 +10,18 @@
 // the split is by piece, not by entity: each map is painted a band of rows at
 // a time as its own queue unit (the same admission every other piece rides,
 // gpu_prep_budget_core, learning the cost per label kind), a cut is one unit,
-// pieces are deduped by key across the crowd, and the renderer HOLDS an entity
-// whose pieces are not all resident (no view yet, exactly its state while a
-// candidate waits its turn; never a partial body). Once resident, the next
-// candidate pass builds the view off warm caches. Under a cover and for the
-// local target the renderer never consults this seam: those builds stay
-// synchronous.
-import { modularHeadFor } from './assets';
+// pieces are deduped by key across the crowd, and an entity whose pieces are
+// not all resident builds its body at once WITHOUT its face decals (the body
+// is the stand-in: nameplate, click target and silhouette on the frame it
+// enters range, never an invisible player) and attaches the decals through the
+// compile gate once its pieces land (CharacterVisual.attachDeferredDecals).
+// Under a cover and for the local target the renderer never consults this
+// seam: those builds stay synchronous, decals included.
+//
+// No import from assets.ts here, on purpose: assets.ts asks this module
+// whether a look is ready (its deferral decision), so the head a cut needs is
+// a PARAMETER (assets resolves it from the cached variant, modularHeadFor).
+import type * as THREE from 'three';
 import {
   ensureMakeupGeometry,
   hasMakeupGeometry,
@@ -45,11 +50,20 @@ import {
   hasDecalTexture,
 } from './stubble';
 
-/** How many row bands a decal map is painted in: one queue unit computes
- *  1/16 of the map's rows. STRUCTURAL, not a timing: it fixes the size of a
- *  unit (a few ms for the stubble map), and the per-frame budget decides how
- *  many such units a frame admits, so no number here is tuned to a machine. */
-export const LOOK_TEXTURE_BANDS = 16;
+/** Rows of a decal map one queue unit paints: a STRUCTURAL fraction of the
+ *  texture (bands = size / LOOK_BAND_ROWS: 128 units for the 1024 stubble map,
+ *  64 for the 512 makeup map), never a timing. It fixes the size of a unit
+ *  small enough that the per-frame budget decides how many units fit a frame,
+ *  so no number here is tuned to a machine. The criterion that set it: a unit
+ *  must fit inside a frame's spare budget on the weakest target, and the
+ *  earlier sixteenth of the stubble map (64 rows) did not in the browser
+ *  (tmp/h-plan.md, section 7). */
+export const LOOK_BAND_ROWS = 8;
+
+/** How many band units a map of `size` rows is painted in. */
+export function lookTextureBands(size: number): number {
+  return Math.ceil(size / LOOK_BAND_ROWS);
+}
 
 /** The slice of the background GPU queue a piece rides (synchronous CPU work
  *  is a valid unit there). */
@@ -63,17 +77,22 @@ export interface LookPieceQueue {
 export const STUBBLE_BAND_LABEL = 'decal-stubble';
 export const MAKEUP_BAND_LABEL = 'decal-makeup';
 export const DECAL_GEOMETRY_LABEL = 'decal-geometry';
+/** The late attach of a deferred body's decals, one unit per body. */
+export const DECAL_ATTACH_LABEL = 'decal-attach';
 
 interface LookPiece {
   key: string;
   start(queue: LookPieceQueue, priority: number): Promise<void>;
 }
 
-const inFlight = new Set<string>();
+/** In-flight pieces by key, each a promise that settles once the piece is
+ *  resident or dropped, so a look can wait on a piece another look started. */
+const inFlight = new Map<string, Promise<void>>();
 const warned = new Set<string>();
 let completedPieces = 0;
 let bandsRun = 0;
-let holds = 0;
+let deferred = 0;
+let attached = 0;
 
 async function runTextureBands(
   queue: LookPieceQueue,
@@ -85,14 +104,14 @@ async function runTextureBands(
   publish: (data: Uint8Array<ArrayBuffer>) => void,
 ): Promise<void> {
   const data = new Uint8Array(new ArrayBuffer(size * size * 4));
-  const rowsPerBand = size / LOOK_TEXTURE_BANDS;
-  for (let band = 0; band < LOOK_TEXTURE_BANDS; band++) {
-    const last = band === LOOK_TEXTURE_BANDS - 1;
+  const bands = lookTextureBands(size);
+  for (let band = 0; band < bands; band++) {
+    const last = band === bands - 1;
     // The next band is enqueued from this unit's completion, never all at
-    // once, so a map in progress holds one slot in the queue, not sixteen.
+    // once, so a map in progress holds one slot in the queue, not a hundred.
     await queue.run(
       () => {
-        paintRows(data, band * rowsPerBand, (band + 1) * rowsPerBand);
+        paintRows(data, band * LOOK_BAND_ROWS, Math.min(size, (band + 1) * LOOK_BAND_ROWS));
         bandsRun++;
         if (last) publish(data);
       },
@@ -143,11 +162,16 @@ function geometryPiece(key: string, ensure: () => void): LookPiece {
   };
 }
 
-/** Every piece the look needs that is not resident yet. The head comes from
- *  the cached part-set variant; when the part library has not landed there is
+/** Every piece the look needs that is not resident yet. `head` is the mesh
+ *  the decals ride (assets.modularHeadFor, or the clone's own head inside a
+ *  compose); null when the part library has not landed, in which case there is
  *  no head to cut and the cuts are not this seam's to wait on (the fail-soft
  *  build reports the miss). */
-function missingPieces(def: VisualDef, look: ModularLook): LookPiece[] {
+function missingPieces(
+  def: VisualDef,
+  look: ModularLook,
+  head: THREE.SkinnedMesh | null,
+): LookPiece[] {
   if (!def.modular) return [];
   const stubble = stubbleDecals(look.app, look.worn);
   const wantsStubble = stubble.scalp !== null || stubble.beard !== null;
@@ -157,7 +181,6 @@ function missingPieces(def: VisualDef, look: ModularLook): LookPiece[] {
   const missing: LookPiece[] = [];
   if (wantsStubble && !hasDecalTexture(stubble)) missing.push(stubbleTexturePiece(stubble));
   if (wantsMakeup && !hasMakeupTexture(makeup)) missing.push(makeupTexturePiece(makeup));
-  const head = modularHeadFor(def, look);
   if (!head) return missing;
   const headGeometry = head.geometry;
   if (wantsStubble && !hasDecalGeometry(headGeometry, stubble)) {
@@ -175,62 +198,116 @@ function missingPieces(def: VisualDef, look: ModularLook): LookPiece[] {
   return missing;
 }
 
-function startPieces(pieces: LookPiece[], queue: LookPieceQueue, priority: number): void {
-  for (const piece of pieces) {
-    if (inFlight.has(piece.key)) continue;
-    inFlight.add(piece.key);
-    piece.start(queue, priority).then(
-      () => {
-        inFlight.delete(piece.key);
-        completedPieces++;
-      },
-      (err: unknown) => {
-        // Dropped so a later enqueue retries it; the report is once per key
-        // (a queue shut down by a graphics rebuild rejects every unit at once).
-        inFlight.delete(piece.key);
-        if (warned.has(piece.key)) return;
-        warned.add(piece.key);
-        console.warn(`[look-pieces] ${piece.key} failed, will retry on demand:`, err);
-      },
-    );
-  }
+/** Start a piece unless it is already in flight; either way the promise that
+ *  settles once it is resident or dropped. Never rejects: a failed piece is
+ *  dropped so a later enqueue retries it, reported once per key (a queue shut
+ *  down by a graphics rebuild rejects every unit at once), and whoever waited
+ *  on it paints what is missing synchronously on attach (fail-soft). */
+function startPiece(piece: LookPiece, queue: LookPieceQueue, priority: number): Promise<void> {
+  const running = inFlight.get(piece.key);
+  if (running) return running;
+  const settled = piece.start(queue, priority).then(
+    () => {
+      inFlight.delete(piece.key);
+      completedPieces++;
+    },
+    (err: unknown) => {
+      inFlight.delete(piece.key);
+      if (warned.has(piece.key)) return;
+      warned.add(piece.key);
+      console.warn(`[look-pieces] ${piece.key} failed, will retry on demand:`, err);
+    },
+  );
+  inFlight.set(piece.key, settled);
+  return settled;
 }
 
 /** True when every piece the look needs is resident, so a view build off it
  *  is the ~1 ms cache-hit build. */
-export function composedLookReady(def: VisualDef, look: ModularLook): boolean {
-  return missingPieces(def, look).length === 0;
+export function composedLookReady(
+  def: VisualDef,
+  look: ModularLook,
+  head: THREE.SkinnedMesh | null,
+): boolean {
+  return missingPieces(def, look, head).length === 0;
 }
 
 /** Enqueue every missing piece of the look not already in flight. */
 export function enqueueComposedLookPieces(
   def: VisualDef,
   look: ModularLook,
+  head: THREE.SkinnedMesh | null,
   queue: LookPieceQueue,
   priority: number,
 ): void {
-  startPieces(missingPieces(def, look), queue, priority);
+  for (const piece of missingPieces(def, look, head)) startPiece(piece, queue, priority);
 }
 
-/** The renderer's one call on the live candidate path: false when the look is
- *  ready (build now), true when the entity is to be HELD this pass, with its
- *  missing pieces enqueued (deduped) and the hold counted. */
-export function holdComposedLookView(
-  def: VisualDef,
-  look: ModularLook,
+export interface LookPieces {
+  /** Every piece resident: build the view whole, now. */
+  ready: boolean;
+  /** Settles once every piece of THIS look is resident (pieces another look
+   *  started included); already settled when `ready`. Never rejects. */
+  whenReady: Promise<void>;
+  /** Once resident, run `attach` as ONE unit of the same queue at the same
+   *  priority (label `decal-attach:<label>`), so a crowd sharing one look
+   *  attaches one body per admitted slot instead of every body inside the
+   *  microtask that settled the last band. A unit the queue refuses (shut
+   *  down by a graphics rebuild) is dropped: the views are rebuilt with it. */
+  attachWhenReady(label: string, attach: () => void): void;
+}
+
+function lookPieces(
+  whenReady: Promise<void>,
   queue: LookPieceQueue,
   priority: number,
-): boolean {
-  const missing = missingPieces(def, look);
-  if (missing.length === 0) return false;
-  startPieces(missing, queue, priority);
-  noteLookHold();
-  return true;
+  ready: boolean,
+): LookPieces {
+  return {
+    ready,
+    whenReady,
+    attachWhenReady: (label, attach) => {
+      void whenReady
+        .then(() => queue.run(attach, priority, `${DECAL_ATTACH_LABEL}:${label}`))
+        .catch(() => undefined);
+    },
+  };
 }
 
-/** Count a view hold decided by the renderer. */
-export function noteLookHold(): void {
-  holds++;
+/** The renderer's one call on the live candidate path: the look's readiness,
+ *  with its missing pieces enqueued (deduped) and the deferral counted when it
+ *  is not ready. The caller builds the body without its decals and attaches
+ *  them on `whenReady`. */
+export function composedLookPiecesFor(
+  def: VisualDef,
+  look: ModularLook,
+  head: THREE.SkinnedMesh | null,
+  queue: LookPieceQueue,
+  priority: number,
+): LookPieces {
+  const missing = missingPieces(def, look, head);
+  if (missing.length === 0) return lookPieces(Promise.resolve(), queue, priority, true);
+  const waits = missing.map((piece) => startPiece(piece, queue, priority));
+  noteLookDeferred();
+  return lookPieces(
+    Promise.all(waits).then(() => undefined),
+    queue,
+    priority,
+    false,
+  );
+}
+
+/** Count a view the renderer built with its decals deferred (counted at the
+ *  decision, so a build that then fails still counts; `attached` counts the
+ *  bodies whose decals landed, and a peer that left range first is the
+ *  normal gap between the two). */
+export function noteLookDeferred(): void {
+  deferred++;
+}
+
+/** Count a late decal attach (CharacterVisual.attachDeferredDecals). */
+export function noteLookAttached(): void {
+  attached++;
 }
 
 export interface LookPiecesStats {
@@ -239,12 +316,14 @@ export interface LookPiecesStats {
   completedPieces: number;
   /** Texture band units that ran. */
   bandsRun: number;
-  /** View builds the renderer held for missing pieces. */
-  holds: number;
+  /** Views built without their face decals, the pieces not yet resident. */
+  deferred: number;
+  /** Late decal attaches done once the pieces landed. */
+  attached: number;
 }
 
 export function lookPiecesStats(): LookPiecesStats {
-  return { pending: inFlight.size, completedPieces, bandsRun, holds };
+  return { pending: inFlight.size, completedPieces, bandsRun, deferred, attached };
 }
 
 export function resetLookPiecesForTest(): void {
@@ -252,5 +331,6 @@ export function resetLookPiecesForTest(): void {
   warned.clear();
   completedPieces = 0;
   bandsRun = 0;
-  holds = 0;
+  deferred = 0;
+  attached = 0;
 }

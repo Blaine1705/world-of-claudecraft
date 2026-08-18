@@ -243,7 +243,7 @@ describe('renderer integration (source pins)', () => {
     // a pool miss falls through to a fresh build from the SAME entity the
     // evicted visual was built from: eviction is invisible on screen
     const missWindow = renderer.slice(acquireIdx, acquireIdx + 1200);
-    expect(missWindow).toContain("this.createCharacterVisualWithRetry(e, 'view')");
+    expect(missWindow).toContain("this.createCharacterVisualWithRetry(e, 'view', undefined, opts)");
   });
 });
 
