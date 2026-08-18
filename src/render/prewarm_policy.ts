@@ -413,6 +413,9 @@ export function prewarmProgramContentKeys(
   return materialIds.map((id) => `${token}:${id}`);
 }
 
+/** three's NormalBlending, as a literal because this module stays Three-free. */
+const NORMAL_BLENDING = 1;
+
 /** The material half of a program-content key. A program SIGNATURE, not the
  * material uuid: distinct GLB materials by the hundred share the same linked
  * program (same type, same shader hooks, same map-presence defines), and an
@@ -422,8 +425,11 @@ export function prewarmProgramContentKeys(
  * inputs three keys program defines on that the mesh-shape token does not
  * already carry: material type, hook identity (customProgramCacheKey, whose
  * three default is onBeforeCompile source), custom vertex/fragment source,
- * defines, the texture-channel presence bits, blending/alpha-test, vertex
- * colors, flat shading, fog opt-out and side. An imperfect signature is
+ * defines, the texture-channel presence bits, three's own `opaque` bit
+ * (transparent + blending + alphaToCoverage, which an earlier version of this
+ * comment claimed while the code carried transparency alone), alphaHash,
+ * dithering, premultipliedAlpha, alpha-test, vertex colors, flat shading, fog
+ * opt-out and side. An imperfect signature is
  * fail-soft: world.initial-frame's own
  * guaranteed submit (its start is bounded ahead of the hard deadline by
  * prewarmCompileAwaitDeadline) links any residue behind the loading cover
@@ -448,6 +454,11 @@ export function materialProgramSignature(material: {
   specularMap?: unknown;
   gradientMap?: unknown;
   transparent?: boolean;
+  blending?: number;
+  alphaToCoverage?: boolean;
+  alphaHash?: boolean;
+  dithering?: boolean;
+  premultipliedAlpha?: boolean;
   alphaTest?: number;
   vertexColors?: boolean;
   flatShading?: boolean;
@@ -481,6 +492,19 @@ export function materialProgramSignature(material: {
     bit(material.specularMap),
     bit(material.gradientMap),
     bit(material.transparent),
+    // three's `opaque` bit verbatim (WebGLPrograms.getParameters): an
+    // additive-blended opaque material and a normal-blended one are two
+    // programs, and folding transparency alone collapsed them onto one
+    // stand-in that never linked the second.
+    bit(
+      material.transparent !== true &&
+        (material.blending ?? NORMAL_BLENDING) === NORMAL_BLENDING &&
+        material.alphaToCoverage !== true,
+    ),
+    bit(material.alphaToCoverage),
+    bit(material.alphaHash),
+    bit(material.dithering),
+    bit(material.premultipliedAlpha),
     bit((material.alphaTest ?? 0) > 0),
     bit(material.vertexColors),
     bit(material.flatShading),

@@ -729,6 +729,33 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     );
   });
 
+  it('splits every input of the opaque bit three keys on, and the flags beside it', () => {
+    // three's key carries `opaque` (transparent === false && blending ===
+    // NormalBlending && alphaToCoverage === false) plus alphaHash, dithering
+    // and premultipliedAlpha. Each is its own class of variant the compile
+    // lane would otherwise skip and the first live draw would link.
+    const stone = { type: 'MeshStandardMaterial', map: {}, transparent: false };
+    const base = materialProgramSignature(stone);
+    // AdditiveBlending: opaque with a non-normal blend mode is a second program.
+    expect(materialProgramSignature({ ...stone, blending: 2 })).not.toBe(base);
+    expect(materialProgramSignature({ ...stone, alphaToCoverage: true })).not.toBe(base);
+    expect(materialProgramSignature({ ...stone, alphaHash: true })).not.toBe(base);
+    expect(materialProgramSignature({ ...stone, dithering: true })).not.toBe(base);
+    expect(materialProgramSignature({ ...stone, premultipliedAlpha: true })).not.toBe(base);
+    // NormalBlending spelled out is the default, so it must not split.
+    expect(materialProgramSignature({ ...stone, blending: 1 })).toBe(base);
+    // ... and each of the four is independent of the others.
+    const signatures = new Set([
+      base,
+      materialProgramSignature({ ...stone, blending: 2 }),
+      materialProgramSignature({ ...stone, alphaToCoverage: true }),
+      materialProgramSignature({ ...stone, alphaHash: true }),
+      materialProgramSignature({ ...stone, dithering: true }),
+      materialProgramSignature({ ...stone, premultipliedAlpha: true }),
+    ]);
+    expect(signatures.size).toBe(6);
+  });
+
   it('wires the compile dedupe and the widened shadow arm to the measured residue', () => {
     // Line comments stripped: a commented-out call site must not keep a
     // positive pin green.
