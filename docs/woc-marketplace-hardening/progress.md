@@ -100,8 +100,10 @@ twin, comment and fill truth-ups. Registry, JUDGED and DEFERRED lists: the
 14 QA ROUND bullet in state.md.
 
 Gate: node scripts/gate_select.mjs (TEST_DATABASE_URL on the command line
-only) (result recorded below once the run on the committed tree finishes). Pushed per R4 (no open PR on this branch;
-pre-push floor green).
+only) PASS at 12395705bb, all 12 steps green: full-suite fallback, 2891 test
+files / 41133 tests with 8 workers, browser 19 files / 129, freshness +
+malware + biome + tsc + every build; tree clean after. Pushed per R4 (no open
+PR on this branch; pre-push floor green).
 
 ## 14 implement round (UX honesty on the money surface)
 

@@ -1289,8 +1289,14 @@ Still open (a phase that hits one asks at session start):
     forfeit ruling); the fail-then-'pay again' copy on quote_expired /
     transaction_failed presumes no tokens moved (a service-contract question
     for 21's devnet run).
-    GATE: run after this docs commit on the fully committed tree; the result
-    line is appended below by the closing docs commit.
+    GATE: node scripts/gate_select.mjs PASS on the committed tree at
+    12395705bb (TEST_DATABASE_URL on the command line only), all 12 steps
+    green: full-suite fallback (292 changed paths incl. vite.config.ts and
+    the fake db helper), 2891 test files / 41133 tests (2 expected fail, 26
+    skipped) with 8 workers, browser suite 19 files / 129, i18n + manifest
+    freshness, malware scan, ci:changed, tsc + every build; tree clean after.
+    Pushed per R4 right after (this closing line is the only commit past the
+    gated tip).
 - 13 listing-step-up (2026-08-16/17, GAME repo, session start 19e4cd87ce =
   the 12 QA docs tip, release sync a no-op at 0 behind origin/release/v0.39.0
   tip d2d1a8ad5c; ~16 code and doc commits to tip 813e2a51e0, LOCAL not pushed
