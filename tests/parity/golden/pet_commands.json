@@ -1844,7 +1844,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "1398f36a",
+      "state": "70040445",
       "events": "b0fefd8f",
       "rng": {
         "draws": 0,
@@ -2160,12 +2160,12 @@
           "dodgeChance": 0.05,
           "fallStartY": -0.218583,
           "fiveSecondRule": 99,
-          "hp": 64,
+          "hp": 90,
           "id": 975,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 162,
+          "maxHp": 227,
           "moveSpeed": 5.2,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2184,12 +2184,12 @@
             "z": -1
           },
           "stats": {
-            "armor": 88
+            "armor": 132
           },
           "templateId": "emberkin",
           "weapon": {
-            "max": 21,
-            "min": 14,
+            "max": 25,
+            "min": 16,
             "speed": 2
           }
         }
@@ -2199,8 +2199,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 976,
-      "state": "802b995f",
-      "events": "1cb376ef",
+      "state": "1e07f21f",
+      "events": "edc83589",
       "rng": {
         "draws": 151,
         "digest": "1e93d795"
@@ -2210,8 +2210,8 @@
       "tick": 80,
       "time": 4,
       "nextId": 976,
-      "state": "6c296a7b",
-      "events": "d0f34bb2",
+      "state": "23387c32",
+      "events": "1139fef4",
       "rng": {
         "draws": 286,
         "digest": "a616493f"
@@ -2221,7 +2221,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 976,
-      "state": "6c296a7b",
+      "state": "23387c32",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -2556,12 +2556,12 @@
           "dodgeChance": 0.05,
           "fallStartY": -0.218583,
           "fiveSecondRule": 99,
-          "hp": 93,
+          "hp": 133,
           "id": 975,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 162,
+          "maxHp": 227,
           "moveSpeed": 5.2,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2580,12 +2580,12 @@
             "z": -1
           },
           "stats": {
-            "armor": 88
+            "armor": 132
           },
           "templateId": "emberkin",
           "weapon": {
-            "max": 21,
-            "min": 14,
+            "max": 25,
+            "min": 16,
             "speed": 2
           }
         }
