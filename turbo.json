@@ -78,6 +78,7 @@
     "SHOT_MOBILE",
     "SHOT_OUT",
     "SHOT_PREFIX",
+    "SHOT_SLUG",
     "SHOT_SUFFIX",
     "SHOT_TAGS",
     "SHOT_TEMPLATE",
