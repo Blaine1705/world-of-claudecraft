@@ -234,6 +234,8 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     // A beast, not a brute: it renders on the yeti body and was only in the ogre
     // family from the era when that family's fallback was a generic giant. Beast
     // is tameable, but this one is elite, which the tame gate refuses anyway.
+    // The den also stops tending a night brazier with the move (ogre is a
+    // FIRE_BUILDING_FAMILIES member, beast is not), which reads right for a yeti.
     family: 'beast',
     hpBase: 120,
     hpPerLevel: 30,
