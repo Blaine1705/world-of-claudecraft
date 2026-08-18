@@ -863,6 +863,41 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onAction).toHaveBeenCalledWith('slot2');
   });
 
+  it('toggles the virtual mouse on LB + right-stick-click, either order', () => {
+    // FFXIV's own chord. Order-independent so a player cannot half-press it.
+    const h = setupCrossHotbar(true);
+    const mode = () => (h.manager as unknown as { mouseMode: boolean }).mouseMode;
+    h.press(GP.LB);
+    h.press(GP.LB, GP.R3);
+    expect(mode()).toBe(true);
+    h.press();
+    // and back off, pressed the other way round
+    h.press(GP.R3);
+    h.press(GP.R3, GP.LB);
+    expect(mode()).toBe(false);
+  });
+
+  it('gives the triggers to the pointer in mouse mode, not the cross hotbar', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LB);
+    h.press(GP.LB, GP.R3); // mouse mode on
+    h.press();
+    h.press(GP.LT);
+    // LT is a click now, so the cross hotbar must never report an armed half.
+    const armed = h.onCrossHotbar.mock.calls.filter((c: unknown[]) => c[0] !== null);
+    expect(armed).toEqual([]);
+  });
+
+  it('stops driving the world while the pointer owns the pad', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LB);
+    h.press(GP.LB, GP.R3);
+    (h.input.setGamepadMove as ReturnType<typeof vi.fn>).mockClear();
+    h.press();
+    expect(h.input.clearGamepadMove).toHaveBeenCalled();
+    expect(h.input.setGamepadMove).not.toHaveBeenCalled();
+  });
+
   it('navigates the HUD WITHOUT taking the world away', () => {
     // The d-pad steps through menus while the character keeps playing: movement
     // and the camera must still be driven on the very same poll. An earlier

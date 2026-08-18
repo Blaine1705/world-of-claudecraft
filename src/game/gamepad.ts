@@ -25,6 +25,7 @@ import {
 import type { GamepadBindings } from './gamepad_bindings';
 import {
   AXIS,
+  applyRadialDeadzone,
   detectGamepadKind,
   GAMEPAD_CONFIRM,
   GAMEPAD_NONE,
@@ -40,6 +41,7 @@ import {
   TRIGGER_THRESHOLD,
 } from './gamepad_map';
 import type { Input } from './input';
+import { clickPadMouse, hidePadMouse, updatePadMouse } from './pad_mouse_cursor';
 
 export interface GamepadCallbacks {
   // Record one physical button rising edge for the HUD's APM readout.
@@ -96,6 +98,10 @@ export class GamepadManager {
   // press rather than every frame: activeRoot() reads layout, which is not
   // something to do 60 times a second for a check that only matters after input.
   private resyncFocus = false;
+  // The opt-in virtual mouse (FFXIV's LB + right-stick-click). Off by default:
+  // stepping onto a control beats steering a pointer at it, so this is the escape
+  // hatch for what the focus order cannot reach, not the everyday path.
+  private mouseMode = false;
   private crossHotbar = false;
   private crossHotbarExpand = true;
   private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
@@ -147,6 +153,8 @@ export class GamepadManager {
     this.input.setGamepadLookActive(false);
     this.releaseCrossHotbar();
     this.exitNavMode();
+    this.mouseMode = false;
+    hidePadMouse();
   }
 
   setDeadzone(v: number): void {
@@ -269,6 +277,42 @@ export class GamepadManager {
     }
 
     this.checkRumble();
+
+    // FFXIV's toggle for the virtual mouse: LB + right-stick-click. Checked as a
+    // CHORD (either button rising while the other is held) so the order the two
+    // are pressed in does not matter.
+    const chordRise =
+      (cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.R3]) ||
+      (cur[GP.R3] && !this.prevPressed[GP.R3] && cur[GP.LB]);
+    if (chordRise) {
+      this.mouseMode = !this.mouseMode;
+      if (this.mouseMode) clearPadFocus();
+      else hidePadMouse();
+    }
+
+    if (this.mouseMode) {
+      // The pointer owns the pad: the right stick drives it and the triggers
+      // click, so neither the camera nor the cross hotbar may also read them.
+      this.input.clearGamepadMove();
+      this.input.setGamepadLookActive(false);
+      this.releaseCrossHotbar();
+      const mv = applyRadialDeadzone(
+        pad.axes[AXIS.RIGHT_X] ?? 0,
+        pad.axes[AXIS.RIGHT_Y] ?? 0,
+        this.deadzone,
+      );
+      let acted = updatePadMouse(mv.x, mv.y, dt);
+      for (const idx of risingEdges(this.prevPressed, cur)) {
+        acted = true;
+        this.cb.onInputEdge();
+        if (idx === GP.LT) clickPadMouse(0);
+        else if (idx === GP.RT) clickPadMouse(2);
+        else if (idx === GP.B || idx === GP.START) this.cb.onAction('escape');
+      }
+      if (acted) this.cb.onActivity?.();
+      this.prevPressed = cur;
+      return;
+    }
 
     // A window just opened while a pad is driving: put focus on its first control
     // so the player is already inside it. This runs only from the pad's own poll

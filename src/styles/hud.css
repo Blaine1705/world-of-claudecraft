@@ -9446,3 +9446,19 @@ body.pad-nav * {
 .xhb.xhb-expanded .xhb-half:not(.xhb-armed) {
   display: none;
 }
+
+/* The opt-in virtual mouse pointer. Same ornate arrow as everything else, so the
+   pad's two pointers and the mouse's are one cursor; only how it MOVES differs. */
+#pad-mouse-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  margin: -2px 0 0 -7px;
+  display: none;
+  pointer-events: none;
+  z-index: 100001;
+  background: url("/ui/cursors/arrow.png") no-repeat center / contain;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
+}
