@@ -72,7 +72,7 @@ describe('rallyFleeingAllies', () => {
 
     sim.startAutoAttack();
 
-    expect(sim.player.autoAttack).toBe(true);
+    expect(sim.player.autoAttack).toBe(false);
     expect(sim.player.inCombat).toBe(false);
     expect(egg.inCombat).toBe(false);
     expect(egg.aiState).toBe('idle');

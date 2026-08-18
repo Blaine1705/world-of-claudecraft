@@ -168,7 +168,10 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     t.ownerId === null &&
     t.aiState !== 'evade'
   ) {
-    if (questGateBlocksAggro(ctx.players, t, p)) return;
+    if (questGateBlocksAggro(ctx.players, t, p)) {
+      p.autoAttack = false;
+      return;
+    }
     if (t.aiState === 'idle' && !ctx.aggroMob(t, p, true)) {
       p.autoAttack = false;
       return;
