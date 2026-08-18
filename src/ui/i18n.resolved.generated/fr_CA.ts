@@ -1568,7 +1568,7 @@ export const fr_CA: EnTranslations = {
           "render": "rendu   soumission {submit} ms | monde {world} ms | entités {entities} ms",
           "scene": "scène   {calls} appels | {triangles} tris | {views} vues",
           "hitches": "saccades {hitches} | shaders {shaders} | transferts {uploads} | vues {views}",
-          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "en attente"
         },
@@ -1622,6 +1622,7 @@ export const fr_CA: EnTranslations = {
             "textureUpload": "Les transferts de textures causent des saccades en jeu",
             "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "La création de vues d'entités cause des saccades",
+            "gcHitch": "Garbage collections are running inside long frames",
             "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Des images longues non attribuées subsistent",
             "assetStartup": "Le démarrage du jeu est retardé par le chargement des ressources",

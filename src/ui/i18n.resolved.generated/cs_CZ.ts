@@ -1568,7 +1568,7 @@ export const cs_CZ: EnTranslations = {
           "render": "render  odeslání {submit} ms | svět {world} ms | entity {entities} ms",
           "scene": "scéna   {calls} volání | {triangles} troj. | {views} zobr.",
           "hitches": "záseky {hitches} | shadery {shaders} | nahrávky {uploads} | zobrazení {views}",
-          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "čeká se"
         },
@@ -1622,6 +1622,7 @@ export const cs_CZ: EnTranslations = {
             "textureUpload": "Nahrávání textur způsobuje záseky ve hře",
             "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Vytváření zobrazení entit způsobuje záseky",
+            "gcHitch": "Garbage collections are running inside long frames",
             "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Zůstávají nepřiřazené dlouhé snímky",
             "assetStartup": "Spuštění hry zpožďuje práce s assety",

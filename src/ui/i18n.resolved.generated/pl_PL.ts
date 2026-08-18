@@ -1568,7 +1568,7 @@ export const pl_PL: EnTranslations = {
           "render": "render: przesył {submit} ms | świat {world} ms | jednostki {entities} ms",
           "scene": "scena: {calls} wywołań | {triangles} trójkątów | {views} widoków",
           "hitches": "zacięcia: {hitches} | shadery: {shaders} | przesłania: {uploads} | widoki: {views}",
-          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU: {renderer}",
           "waitingValue": "oczekiwanie"
         },
@@ -1622,6 +1622,7 @@ export const pl_PL: EnTranslations = {
             "textureUpload": "Przesyłanie tekstur powoduje zacięcia rozgrywki",
             "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Tworzenie widoków jednostek powoduje zacięcia",
+            "gcHitch": "Garbage collections are running inside long frames",
             "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Pozostają niezidentyfikowane długie klatki",
             "assetStartup": "Uruchamianie gry jest opóźniane przez pracę nad zasobami",

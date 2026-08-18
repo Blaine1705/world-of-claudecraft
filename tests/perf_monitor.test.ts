@@ -367,6 +367,7 @@ describe('perf monitor scene census wiring', () => {
           'texture-upload': 0,
           'zone-build': 0,
           'view-create': 0,
+          gc: 0,
           'off-frame': 0,
           other: 1,
         },

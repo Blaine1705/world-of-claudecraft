@@ -22,6 +22,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -39,6 +40,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -56,6 +58,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -73,6 +76,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -91,6 +95,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -108,6 +113,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -141,6 +147,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -162,6 +169,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -179,6 +187,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -196,6 +205,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -213,6 +223,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -230,6 +241,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -247,6 +259,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -264,6 +277,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
@@ -281,6 +295,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.story.tower",
     "hudChrome.lastkeepMap.story.undercroft",
     "hudChrome.lastkeepMap.title",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"

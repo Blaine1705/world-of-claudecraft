@@ -1568,7 +1568,7 @@ export const zh_TW: EnTranslations = {
           "render": "算繪  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 實體 {entities} 毫秒",
           "scene": "場景   {calls} 次呼叫 | {triangles} 個三角形 | {views} 個視圖",
           "hitches": "卡頓 {hitches} | 著色器 {shaders} | 上傳 {uploads} | 視圖 {views}",
-          "hitchesBuild": "區域建置 {zoneBuilds} | 影格外 {offFrame}",
+          "hitchesBuild": "區域建置 {zoneBuilds} | 影格外 {offFrame} | 垃圾回收 {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "等待中"
         },
@@ -1622,6 +1622,7 @@ export const zh_TW: EnTranslations = {
             "textureUpload": "紋理上傳造成遊戲卡頓",
             "zoneBuild": "區域串流建置造成卡頓",
             "viewCreate": "實體視圖建立造成卡頓",
+            "gcHitch": "垃圾回收正在長影格內執行",
             "offFrameHitch": "長影格來自渲染回呼之外的工作",
             "otherHitch": "仍有未歸因的長影格",
             "assetStartup": "資源處理延遲了遊戲啟動",

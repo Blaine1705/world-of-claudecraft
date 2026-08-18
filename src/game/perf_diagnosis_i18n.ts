@@ -48,6 +48,7 @@ const TITLE_KEYS: Readonly<Record<string, TranslationKey>> = {
   'hitch-texture-upload': `${PREFIX}.titles.textureUpload`,
   'hitch-zone-build': `${PREFIX}.titles.zoneBuild`,
   'hitch-view-create': `${PREFIX}.titles.viewCreate`,
+  'hitch-gc': `${PREFIX}.titles.gcHitch`,
   'hitch-off-frame': `${PREFIX}.titles.offFrameHitch`,
   'hitch-other': `${PREFIX}.titles.otherHitch`,
   'asset-startup': `${PREFIX}.titles.assetStartup`,

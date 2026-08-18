@@ -9212,6 +9212,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss'
   | 'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu'
   | 'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics'
+  | 'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch'
   | 'hudChrome.perf.diagnostics.diagnosis.titles.generic'
   | 'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit'
   | 'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration'

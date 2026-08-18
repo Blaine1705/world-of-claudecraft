@@ -780,10 +780,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the composed-look pieces hold (live candidate path wiring):
 // renderer.ts moved, the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for the gc hitch cause (the heap read on the hitch sample):
+// renderer.ts moved, the seals follow the swept evidence bytes. No capture was
+// retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'f3d5d0fbcfebaaa0ad80c10084ecbc2739643413b259283763378cdc584cf409';
+  '5c50dba2d1e055962668e1791ea2a0c2a9bbee8fd6545a7fc4e1681184f778c1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '2d7ffe57bcf869f63660e553292ceb3cda5e35442a0eb2a96a595f74df057569';
+  '69a58203a0d533ec28cb1d0255b571eb6f30a220db498860d792aea79a1079c4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1798,10 +1801,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // composite first, then this seal. No capture was retaken.
     // Re-minted for the composed-look pieces hold (renderer.ts): same order,
     // the composite first, then this seal. No capture was retaken.
+    // Re-minted for the gc hitch cause (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('2bfabc9a52a217d7f0524ba6c467e65731e40b231c5a7eca0a2418ca03b1961b');
+    ).toBe('c43041269e955d78f46c647391d92076b40411e55c396eafd7f351d61cd3051b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

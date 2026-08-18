@@ -137,7 +137,10 @@ const MONOLITHS: MonolithRow[] = [
     // the zero foliage readout into renderer_frame_telemetry_core.ts beside
     // the other zero fixtures and the created-view type sampler into
     // view_candidate_pool_core.ts (net -16).
-    ceiling: 13484,
+    // Lowered again by the gc hitch cause, whose heap read (heap_sample.ts)
+    // paid for its import and sample line by folding the key-light follow
+    // beside it onto its single statement (net -1).
+    ceiling: 13483,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

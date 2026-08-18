@@ -340,6 +340,7 @@ describe('PerfDiagnosticsPanel', () => {
         'texture-upload': 0,
         'zone-build': 4,
         'view-create': 0,
+        gc: 3,
         'off-frame': 2,
         other: 0,
       },
@@ -360,7 +361,7 @@ describe('PerfDiagnosticsPanel', () => {
 
     const text = document.body.textContent ?? '';
     expect(text).toContain('hitches 7 | shaders 1 | uploads 0 | views 0');
-    expect(text).toContain('zone builds 4 | off-frame 2');
+    expect(text).toContain('zone builds 4 | off-frame 2 | gc 3');
   });
 
   it('fully collapses and expands the diagnostic body', () => {

@@ -1568,7 +1568,7 @@ export const ja_JP: EnTranslations = {
           "render": "描画  送信 {submit} ミリ秒 | ワールド {world} ミリ秒 | エンティティ {entities} ミリ秒",
           "scene": "シーン   {calls} 呼び出し | {triangles} 三角形 | {views} ビュー",
           "hitches": "カクつき {hitches} | シェーダー {shaders} | アップロード {uploads} | ビュー {views}",
-          "hitchesBuild": "ゾーン構築 {zoneBuilds} | フレーム外 {offFrame}",
+          "hitchesBuild": "ゾーン構築 {zoneBuilds} | フレーム外 {offFrame} | GC {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "待機中"
         },
@@ -1622,6 +1622,7 @@ export const ja_JP: EnTranslations = {
             "textureUpload": "テクスチャのアップロードでカクつきが発生しています",
             "zoneBuild": "ゾーンのストリーミング構築でカクつきが発生しています",
             "viewCreate": "エンティティ表示の作成でカクつきが発生しています",
+            "gcHitch": "長いフレーム内でガベージコレクションが実行されています",
             "offFrameHitch": "長いフレームはレンダーコールバック外の処理に起因しています",
             "otherHitch": "原因不明の長いフレームが残っています",
             "assetStartup": "アセット処理でゲーム開始が遅れています",

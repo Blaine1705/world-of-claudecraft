@@ -470,6 +470,7 @@ export class PerfDiagnosticsPanel {
       t('hudChrome.perf.diagnostics.metrics.hitchesBuild', {
         zoneBuilds: formatNumber(hitches?.byCause['zone-build'] ?? 0, INTEGER_NUMBER_FORMAT),
         offFrame: formatNumber(hitches?.byCause['off-frame'] ?? 0, INTEGER_NUMBER_FORMAT),
+        gc: formatNumber(hitches?.byCause.gc ?? 0, INTEGER_NUMBER_FORMAT),
       }),
       t('hudChrome.perf.diagnostics.metrics.gpu', {
         renderer:

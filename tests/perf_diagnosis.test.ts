@@ -304,6 +304,7 @@ describe('diagnosePerfSnapshot', () => {
         'texture-upload': 1,
         'zone-build': 0,
         'view-create': 2,
+        gc: 0,
         'off-frame': 0,
         other: 0,
       },
@@ -331,6 +332,7 @@ describe('diagnosePerfSnapshot', () => {
         'texture-upload': 0,
         'zone-build': 0,
         'view-create': 0,
+        gc: 0,
         'off-frame': 0,
         other: 80,
       },
@@ -359,6 +361,7 @@ describe('diagnosePerfSnapshot', () => {
         'texture-upload': 0,
         'zone-build': 3,
         'view-create': 0,
+        gc: 0,
         'off-frame': 0,
         other: 0,
       },
@@ -378,6 +381,40 @@ describe('diagnosePerfSnapshot', () => {
     expect(finding?.title).toBe('Zone streaming builds are causing hitches');
   });
 
+  it('treats gc hitches like unattributed ones: medium confidence, only while the recent window is slow', () => {
+    const snapshot = baseSnapshot();
+    snapshot.hitches = {
+      frames: 600,
+      hitches: 4,
+      byCause: {
+        'shader-compile': 0,
+        'texture-upload': 0,
+        'zone-build': 0,
+        'view-create': 0,
+        gc: 4,
+        'off-frame': 0,
+        other: 0,
+      },
+      programGrowthFrames: 0,
+      programsAdded: 0,
+      recent: [],
+    };
+    // Scavenges coincide with long frames on every capture: a healthy window
+    // files nothing.
+    expect(diagnosePerfSnapshot(snapshot).findings.some((item) => item.id === 'hitch-gc')).toBe(
+      false,
+    );
+    makeSlow(snapshot);
+    const finding = diagnosePerfSnapshot(snapshot).findings.find((item) => item.id === 'hitch-gc');
+    expect(finding?.severity).toBe('critical');
+    expect(finding?.confidence).toBe('medium');
+    expect(finding?.title).toBe('Garbage collections are running inside long frames');
+    expect(finding?.sourceFiles).toEqual([
+      'src/render/renderer.ts',
+      'src/render/characters/visual.ts',
+    ]);
+  });
+
   it('treats off-frame hitches like unattributed ones: only while the recent window is slow', () => {
     const snapshot = baseSnapshot();
     snapshot.hitches = {
@@ -388,6 +425,7 @@ describe('diagnosePerfSnapshot', () => {
         'texture-upload': 0,
         'zone-build': 0,
         'view-create': 0,
+        gc: 0,
         'off-frame': 5,
         other: 0,
       },
@@ -417,6 +455,7 @@ describe('diagnosePerfSnapshot', () => {
         'texture-upload': 0,
         'zone-build': 0,
         'view-create': 1,
+        gc: 0,
         'off-frame': 0,
         other: 0,
       },
@@ -432,6 +471,7 @@ describe('diagnosePerfSnapshot', () => {
           createdViews: 1,
           zoneBuildMs: 0,
           rendererMs: 30,
+          heapDropMb: 0,
           cause: 'view-create',
         },
       ],
@@ -578,6 +618,7 @@ describe('diagnosePerfSnapshot', () => {
         'texture-upload': 0,
         'zone-build': 0,
         'view-create': 0,
+        gc: 0,
         'off-frame': 0,
         other: 0,
       },

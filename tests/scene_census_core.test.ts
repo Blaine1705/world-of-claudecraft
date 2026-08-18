@@ -10,12 +10,14 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { GC_DROP_MIN_MB } from '../src/game/heap_sawtooth';
 import type { DrawStatsCounters } from '../src/render/draw_stats_core';
 import {
   captureSceneCensus,
   censusCount,
   censusTableLines,
   createHitchTracker,
+  HITCH_GC_DROP_MIN_MB,
   type SceneCensusHost,
   type SceneCensusMeta,
 } from '../src/render/scene_census_core';
@@ -285,6 +287,8 @@ describe('censusTableLines', () => {
 describe('createHitchTracker', () => {
   // rendererMs is the whole frame by default: the callback owns the stall,
   // so the resource rules decide; the off-frame cases lower it explicitly.
+  // heapMb is unknown (0) by default, as on every non-Chrome browser; the gc
+  // cases feed a real reading.
   const base = {
     atMs: 1000,
     submitMs: 5,
@@ -293,6 +297,7 @@ describe('createHitchTracker', () => {
     createdViews: 0,
     zoneBuildMs: 0,
     rendererMs: 250,
+    heapMb: 0,
   };
 
   it('records nothing for fast frames but still counts program growth', () => {
@@ -394,12 +399,81 @@ describe('createHitchTracker', () => {
     expect(tracker.summary().byCause.other).toBe(1);
   });
 
+  it('mirrors the heap sawtooth quantization floor (render cannot import game/)', () => {
+    expect(HITCH_GC_DROP_MIN_MB).toBe(GC_DROP_MIN_MB);
+    expect(HITCH_GC_DROP_MIN_MB).toBe(2);
+  });
+
+  it('files a long frame in which the heap shrank under gc, carrying the drop size', () => {
+    const tracker = createHitchTracker();
+    tracker.frame({ ...base, frameMs: 10, heapMb: 200 });
+    const gc = tracker.frame({ ...base, frameMs: 60, heapMb: 158.766 });
+    expect(gc?.cause).toBe('gc');
+    expect(gc?.heapDropMb).toBe(41.2);
+    // Growth is allocation, not a collection: the drop stays at zero and the
+    // frame falls through to the callback-share rule.
+    const grow = tracker.frame({ ...base, frameMs: 60, heapMb: 190 });
+    expect(grow?.cause).toBe('other');
+    expect(grow?.heapDropMb).toBe(0);
+    // A dip under the quantization floor is noise, not a collection: the event
+    // still carries it, but it does not decide the cause.
+    const noise = tracker.frame({ ...base, frameMs: 60, heapMb: 190 - HITCH_GC_DROP_MIN_MB + 0.1 });
+    expect(noise?.cause).toBe('other');
+    expect(noise?.heapDropMb).toBe(1.9);
+    // Exactly the floor files: the floor is inclusive.
+    const atFloor = tracker.frame({ ...base, frameMs: 60, heapMb: 188.1 - HITCH_GC_DROP_MIN_MB });
+    expect(atFloor?.cause).toBe('gc');
+    expect(atFloor?.heapDropMb).toBe(2);
+    expect(tracker.summary().byCause.gc).toBe(2);
+    expect(tracker.summary().byCause.other).toBe(2);
+  });
+
+  it('ranks gc below every named resource and above off-frame', () => {
+    const tracker = createHitchTracker();
+    tracker.frame({ ...base, frameMs: 10, heapMb: 200 });
+    const view = tracker.frame({ ...base, frameMs: 100, heapMb: 150, createdViews: 1 });
+    expect(view?.cause).toBe('view-create');
+    expect(view?.heapDropMb).toBe(50);
+    const zone = tracker.frame({ ...base, frameMs: 100, heapMb: 100, zoneBuildMs: 5 });
+    expect(zone?.cause).toBe('zone-build');
+    // The callback owned 20 of 100 ms, but the heap shrank: the collection is
+    // the named suspect, not the anonymous off-frame bucket.
+    const gc = tracker.frame({ ...base, frameMs: 100, heapMb: 60, rendererMs: 20 });
+    expect(gc?.cause).toBe('gc');
+    const off = tracker.frame({ ...base, frameMs: 100, heapMb: 70, rendererMs: 20 });
+    expect(off?.cause).toBe('off-frame');
+    expect(off?.heapDropMb).toBe(0);
+    // A sub-floor dip does not rescue the frame from off-frame either.
+    const dip = tracker.frame({ ...base, frameMs: 100, heapMb: 69, rendererMs: 20 });
+    expect(dip?.cause).toBe('off-frame');
+    expect(dip?.heapDropMb).toBe(1);
+  });
+
+  it('never files gc from an unknown heap, and an unknown sample leaves the baseline alone', () => {
+    const tracker = createHitchTracker();
+    // No reading at all (non-Chrome): long frames never become gc.
+    tracker.frame({ ...base, frameMs: 10 });
+    expect(tracker.frame({ ...base, frameMs: 60 })?.cause).toBe('other');
+    // A known baseline, then a 0 sample: no drop, and the baseline survives it,
+    // so the next real reading still measures against 200.
+    tracker.frame({ ...base, frameMs: 10, heapMb: 200 });
+    const unknown = tracker.frame({ ...base, frameMs: 60, heapMb: 0 });
+    expect(unknown?.cause).toBe('other');
+    expect(unknown?.heapDropMb).toBe(0);
+    const next = tracker.frame({ ...base, frameMs: 60, heapMb: 150 });
+    expect(next?.cause).toBe('gc');
+    expect(next?.heapDropMb).toBe(50);
+    expect(tracker.summary().byCause.gc).toBe(1);
+  });
+
   it('treats the first frame as baseline: no deltas even on a long frame', () => {
     const tracker = createHitchTracker();
-    const first = tracker.frame({ ...base, frameMs: 100, programs: 300 });
+    const first = tracker.frame({ ...base, frameMs: 100, programs: 300, heapMb: 200 });
     expect(first?.cause).toBe('other');
     expect(first?.programDelta).toBe(0);
+    expect(first?.heapDropMb).toBe(0);
     expect(tracker.summary().programsAdded).toBe(0);
+    expect(tracker.summary().byCause.gc).toBe(0);
   });
 
   it('caps the recent ring and resets cleanly', () => {
@@ -422,9 +496,15 @@ describe('createHitchTracker', () => {
       'texture-upload': 0,
       'zone-build': 0,
       'view-create': 0,
+      gc: 0,
       'off-frame': 0,
       other: 0,
     });
+    // The heap baseline resets with the counters: the first reading after a
+    // reset is a baseline again, never a drop against the old run.
+    tracker.frame({ ...base, frameMs: 10, heapMb: 200 });
+    tracker.reset();
+    expect(tracker.frame({ ...base, frameMs: 60, heapMb: 100 })?.cause).toBe('other');
   });
 });
 

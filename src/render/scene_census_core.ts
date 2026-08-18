@@ -270,6 +270,7 @@ export type HitchCause =
   | 'texture-upload'
   | 'zone-build'
   | 'view-create'
+  | 'gc'
   | 'off-frame'
   | 'other';
 
@@ -286,6 +287,8 @@ export interface HitchFrameSample {
   zoneBuildMs: number;
   /** The renderer frame callback's own total ms this frame. */
   rendererMs: number;
+  /** Used JS heap in MB at the sample (heap_sample.ts); 0 where unknown. */
+  heapMb: number;
 }
 
 export interface HitchEvent {
@@ -297,6 +300,8 @@ export interface HitchEvent {
   createdViews: number;
   zoneBuildMs: number;
   rendererMs: number;
+  /** MB the heap shrank since the previous sample (0 when it grew or is unknown). */
+  heapDropMb: number;
   cause: HitchCause;
 }
 
@@ -312,6 +317,7 @@ export function emptyHitchFrameSample(): HitchFrameSample {
     createdViews: 0,
     zoneBuildMs: 0,
     rendererMs: 0,
+    heapMb: 0,
   };
 }
 
@@ -345,11 +351,19 @@ const HITCH_RECENT_LIMIT = 20;
  *  callback than inside it. */
 export const HITCH_OFF_FRAME_SHARE = 0.5;
 
+/** The heap drop below which a shrink does not decide the cause. Mirrors
+ *  GC_DROP_MIN_MB in src/game/heap_sawtooth.ts (render must not import game/;
+ *  tests/scene_census_core.test.ts pins the two equal): Chrome quantizes
+ *  usedJSHeapSize on non-isolated pages, so smaller dips are quantization
+ *  noise, not a collection. The event still carries the smaller drop. */
+export const HITCH_GC_DROP_MIN_MB = 2;
+
 function hitchCause(
   programDelta: number,
   textureDelta: number,
   createdViews: number,
   zoneBuildMs: number,
+  heapDropMb: number,
   rendererMs: number,
   frameMs: number,
 ): HitchCause {
@@ -357,6 +371,9 @@ function hitchCause(
   if (textureDelta > 0) return 'texture-upload';
   if (zoneBuildMs > 0) return 'zone-build';
   if (createdViews > 0) return 'view-create';
+  // The heap shrank during the frame: a collection ran in it. The event
+  // carries the size so an analysis can weigh a coincidental drop.
+  if (heapDropMb >= HITCH_GC_DROP_MIN_MB) return 'gc';
   if (rendererMs < frameMs * HITCH_OFF_FRAME_SHARE) return 'off-frame';
   return 'other';
 }
@@ -366,6 +383,7 @@ const emptyByCause = (): Record<HitchCause, number> => ({
   'texture-upload': 0,
   'zone-build': 0,
   'view-create': 0,
+  gc: 0,
   'off-frame': 0,
   other: 0,
 });
@@ -384,6 +402,7 @@ export function createHitchTracker(
   // the per-frame path stays allocation-free outside actual hitch events.
   let lastPrograms = -1;
   let lastTextures = -1;
+  let lastHeapMb = 0;
   let recent: HitchEvent[] = [];
   return {
     frame(sample: HitchFrameSample): HitchEvent | null {
@@ -393,6 +412,13 @@ export function createHitchTracker(
       const textureDelta = lastTextures >= 0 ? sample.textures - lastTextures : 0;
       lastPrograms = sample.programs;
       lastTextures = sample.textures;
+      // An unknown heap (0) neither drops nor moves the baseline, so a browser
+      // without performance.memory never files a gc hitch.
+      const heapDropMb =
+        sample.heapMb > 0 && lastHeapMb > 0
+          ? Math.round(Math.max(0, lastHeapMb - sample.heapMb) * 10) / 10
+          : 0;
+      if (sample.heapMb > 0) lastHeapMb = sample.heapMb;
       if (programDelta > 0) {
         programGrowthFrames++;
         programsAdded += programDelta;
@@ -407,11 +433,13 @@ export function createHitchTracker(
         createdViews: sample.createdViews,
         zoneBuildMs: Math.round(sample.zoneBuildMs * 100) / 100,
         rendererMs: Math.round(sample.rendererMs * 100) / 100,
+        heapDropMb,
         cause: hitchCause(
           programDelta,
           textureDelta,
           sample.createdViews,
           sample.zoneBuildMs,
+          heapDropMb,
           sample.rendererMs,
           sample.frameMs,
         ),
@@ -440,6 +468,7 @@ export function createHitchTracker(
       programsAdded = 0;
       lastPrograms = -1;
       lastTextures = -1;
+      lastHeapMb = 0;
       recent = [];
     },
   };

@@ -1568,7 +1568,7 @@ export const es_ES: EnTranslations = {
           "render": "render  envío {submit} ms | mundo {world} ms | entidades {entities} ms",
           "scene": "escena  {calls} llamadas | {triangles} tris | {views} vistas",
           "hitches": "tirones {hitches} | shaders {shaders} | cargas {uploads} | vistas {views}",
-          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "esperando"
         },
@@ -1622,6 +1622,7 @@ export const es_ES: EnTranslations = {
             "textureUpload": "Las cargas de texturas están causando tirones de juego",
             "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "La creación de vistas de entidades está causando tirones",
+            "gcHitch": "Garbage collections are running inside long frames",
             "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Quedan fotogramas largos sin atribuir",
             "assetStartup": "El trabajo de recursos retrasa el inicio del juego",

@@ -341,6 +341,7 @@ import {
 } from './ground_object_pool';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
+import { usedJsHeapMb } from './heap_sample';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -12424,10 +12425,7 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambience', worldStart);
     // shadow frustum follows the player
     const pv = this.views.get(p.id);
-    if (pv) {
-      const pp = pv.group.position;
-      this.updateKeyLight(pp);
-    }
+    if (pv) this.updateKeyLight(pv.group.position);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'shadows', worldStart);
     // sky dome + sun disc ride along with the camera. The battleground is
     // OPEN-AIR: dome, sun, and weather render over the band exactly like the
@@ -12560,6 +12558,7 @@ export class Renderer {
       // Zone spend since the previous frame: this callback plus the idle work between.
       sample.zoneBuildMs = this.buildLedger.frameSpend().zoneMs;
       sample.rendererMs = framePhaseMs.total;
+      sample.heapMb = usedJsHeapMb();
       this.hitchTracker.frame(sample);
     }
     this.buildLedger.beginFrame();

@@ -460,6 +460,12 @@ export function diagnosePerfSnapshot(
         files: ['src/render/renderer.ts', 'src/render/view_create_retry.ts'],
       },
       {
+        key: 'gc' as const,
+        title: 'Garbage collections are running inside long frames',
+        fix: 'Repeated collections inside long frames point at per-frame allocation: look at what the render loop and the character visual builds allocate per frame (heapDropMb on the recent hitch events sizes each collection).',
+        files: ['src/render/renderer.ts', 'src/render/characters/visual.ts'],
+      },
+      {
         key: 'off-frame' as const,
         title: 'Long frames come from work outside the render callback',
         fix: 'Rerun locally with ?perfTrace=1 and inspect devTrace.longTasks for the task that ran between two frame callbacks (garbage collection, snapshot apply, a background task).',
@@ -473,9 +479,10 @@ export function diagnosePerfSnapshot(
       },
     ];
     for (const rule of hitchRules) {
-      // The renderer could not name a resource for these two, so they only
-      // count while the recent window is actually slow.
-      const unattributed = rule.key === 'other' || rule.key === 'off-frame';
+      // The renderer could not name a resource for these, so they only count
+      // while the recent window is actually slow (a collection coinciding
+      // with a long frame is a lead, not a named resource).
+      const unattributed = rule.key === 'other' || rule.key === 'off-frame' || rule.key === 'gc';
       if (unattributed && !slowFrames) continue;
       const count = hitches.byCause[rule.key];
       if (count <= 0) continue;
@@ -503,7 +510,9 @@ export function diagnosePerfSnapshot(
             ? 'Some sampled frames exceeded the renderer hitch threshold without a matching program, texture, zone build, or view-count change.'
             : rule.key === 'off-frame'
               ? 'Some sampled frames exceeded the renderer hitch threshold while the render callback itself used less than half of the frame.'
-              : 'The renderer recorded a frame over the hitch threshold at the same time this resource count changed.',
+              : rule.key === 'gc'
+                ? 'The JS heap shrank during a frame over the hitch threshold: a garbage collection ran inside it.'
+                : 'The renderer recorded a frame over the hitch threshold at the same time this resource count changed.',
         evidence: [
           `${count} of ${hitches.hitches} recorded hitches were attributed to ${rule.key}.`,
           ...(rule.key === 'shader-compile'

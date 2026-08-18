@@ -1568,7 +1568,7 @@ export const da_DK: EnTranslations = {
           "render": "render  indsendelse {submit} ms | verden {world} ms | enheder {entities} ms",
           "scene": "scene   {calls} kald | {triangles} tri | {views} visninger",
           "hitches": "hak {hitches} | shaders {shaders} | uploads {uploads} | visninger {views}",
-          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "venter"
         },
@@ -1622,6 +1622,7 @@ export const da_DK: EnTranslations = {
             "textureUpload": "Teksturupload forårsager hak i spillet",
             "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Oprettelse af enhedsvisninger forårsager hak",
+            "gcHitch": "Garbage collections are running inside long frames",
             "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Der er stadig uforklarede lange billeder",
             "assetStartup": "Spillets opstart forsinkes af assetarbejde",

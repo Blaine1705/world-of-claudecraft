@@ -200,8 +200,11 @@ interface AttributionTargetFixture {
 // Re-minted for the composed-look pieces hold (live candidate path wiring):
 // renderer.ts moved, the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for the gc hitch cause (the heap read on the hitch sample):
+// renderer.ts moved, the seals follow the swept evidence bytes. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '2d7ffe57bcf869f63660e553292ceb3cda5e35442a0eb2a96a595f74df057569';
+  '69a58203a0d533ec28cb1d0255b571eb6f30a220db498860d792aea79a1079c4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
