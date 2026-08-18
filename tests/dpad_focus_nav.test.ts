@@ -440,3 +440,23 @@ describe('restorePadFocus', () => {
     expect(restorePadFocus()).toBe(false);
   });
 });
+
+describe('clearPadFocus', () => {
+  it('blurs as well as unmarks, so a later confirm acts on nothing', () => {
+    // Hiding the cursor alone left the element focused, and confirm then opened
+    // whatever it had been resting on: the selection looked gone and was not.
+    const btn = el('BUTTON', 10, 10);
+    let blurred = false;
+    (btn as unknown as { blur: () => void }).blur = () => {
+      blurred = true;
+    };
+    allEls = [btn];
+    install();
+    moveDpadFocus('down');
+    expect(btn.classes.has('pad-focus')).toBe(true);
+
+    clearPadFocus();
+    expect(btn.classes.has('pad-focus')).toBe(false);
+    expect(blurred).toBe(true);
+  });
+});

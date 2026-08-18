@@ -44,6 +44,19 @@ const HALF_LAYER_ATTR = 'data-xhb-half';
 const GLYPH_CLASS = 'xhb-glyph';
 const EDIT_CLASS = 'xhb-editing';
 const CARRIED_CLASS = 'xhb-carried';
+// Marks the spellbook row whose action is in hand. The bar shows a gap for an
+// action lifted off a CELL; one picked out of the book leaves no gap, so without
+// this a pick-up from the spellbook had no visible effect at all.
+const SPELL_CARRIED_CLASS = 'spell-carried';
+
+function markCarriedSpellbookRow(abilityId: string | null): void {
+  for (const el of document.querySelectorAll<HTMLElement>(`.${SPELL_CARRIED_CLASS}`)) {
+    el.classList.remove(SPELL_CARRIED_CLASS);
+  }
+  if (!abilityId) return;
+  const row = document.querySelector<HTMLElement>(`.spell-row[data-ability-id="${abilityId}"]`);
+  row?.classList.add(SPELL_CARRIED_CLASS);
+}
 // Painted at nothing while hidden: the painter returns after its display write.
 const EMPTY_BAR_STATE = { slots: [], manySpells: false };
 const TRIGGER_CLASS = 'xhb-trigger';
@@ -135,7 +148,7 @@ export class CrossHotbarController {
     root: HTMLElement,
     writers: PainterHostWriters,
     iconBg: (k: string) => string,
-    resolve: CrossHotbarResolvers,
+    private readonly resolve: CrossHotbarResolvers,
   ) {
     this.root = root;
     const cells: ActionBarSlotElements[] = [];
@@ -267,6 +280,12 @@ export class CrossHotbarController {
     }
   }
 
+  /** The player-facing name of a carried action, for the carrying line. */
+  private actionName(id: string): string {
+    const ability = this.resolve.abilityById(id);
+    return ability ? this.resolve.abilityName(ability.def) : id;
+  }
+
   /** Which cell the pad has focused, or null when focus is elsewhere. Read off the
    *  cell's own index attribute so the DOM stays the single source of truth for
    *  what is selected. */
@@ -280,11 +299,18 @@ export class CrossHotbarController {
 
   /** Pin the bar open for arranging and mark the cell being carried, so the player
    *  can see what they picked up and that the bar is now editable. */
-  setEditing(active: boolean, carriedFrom: number | null): void {
+  setEditing(active: boolean, carriedFrom: number | null, carried: string | null = null): void {
     this.editing = active;
     this.root.classList.toggle(EDIT_CLASS, active);
-    const hint = active ? t('hudChrome.controller.crossHotbarEditHint') : this.restingHint;
+    // Carrying is the state with no other tell when the action came from the
+    // spellbook: it left no gap on the bar, so the line has to say what is in hand.
+    const hint = !active
+      ? this.restingHint
+      : carried
+        ? t('hudChrome.controller.crossHotbarCarrying', { action: this.actionName(carried) })
+        : t('hudChrome.controller.crossHotbarEditHint');
     if (this.hint.textContent !== hint) this.hint.textContent = hint;
+    markCarriedSpellbookRow(carried);
     for (let i = 0; i < this.cellEls.length; i++) {
       this.cellEls[i].classList.toggle(CARRIED_CLASS, active && i === carriedFrom);
     }

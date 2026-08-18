@@ -106,6 +106,9 @@ export function crossHotbarOverlayState(hold: CrossHotbarHold | null): CrossHotb
 /** The rebind surface the options panel and any edit mode both consume. Declared
  *  here so the HUD's hooks interface can extend it rather than restate it. */
 export interface CrossHotbarPanelHooks {
+  /** Offer a cell to any newly learned ability, so levelling into a spell puts it
+   *  in reach instead of leaving a pad player to find the arrange chord first. */
+  syncCrossHotbarKnown(abilityIds: readonly string[]): void;
   crossHotbarSets(): readonly (readonly CrossHotbarOverlayAction[])[];
   bindCrossHotbar(set: number, position: number, action: CrossHotbarOverlayAction): void;
   resetCrossHotbar(): void;

@@ -397,6 +397,7 @@ import {
   HOTBAR_ACTION_MIME,
   type HotbarAction,
   handleMobileAttackTap,
+  isAbilityActionBarEligible,
   loadoutKnownAbilityIds,
   parseHotbarAction,
   placeAbilityOnSlot,
@@ -6691,6 +6692,16 @@ export class Hud {
 
   private syncSlotMap(): void {
     this.actionBarController.syncKnownAbilities();
+    // The pad's bar gets the same offer, filtered by the same two rules the action
+    // bar auto-places by: no passives, and no stances (those are seeded already).
+    this.optionsHooks?.gamepad.syncCrossHotbarKnown(
+      this.sim.known
+        .filter(
+          (k) =>
+            isAbilityActionBarEligible(k.def) && !isStanceBarAbilityGroup(k.def.exclusiveGroup),
+        )
+        .map((k) => k.def.id),
+    );
     this.mobileActionPage = this.currentMobileActionPage();
   }
 

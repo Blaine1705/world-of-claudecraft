@@ -19,6 +19,7 @@ import {
   crossHotbarSetActions,
   defaultCrossHotbarLayout,
   isCrossHotbarSeeded,
+  placeInFirstFreeCell,
   sanitizeCrossHotbarLayout,
   seedCrossHotbarLayout,
 } from './cross_hotbar';
@@ -28,21 +29,58 @@ const STORE_KEY = 'woc_gamepad_xhb';
 
 export class CrossHotbarBindings {
   private layout: CrossHotbarAction[][] = defaultCrossHotbarLayout();
+  // Every ability this bar has already offered a cell. Kept so a newly learned
+  // spell lands once and an ability the player then REMOVES stays removed, rather
+  // than reappearing on the next sync.
+  private seen = new Set<string>();
 
   constructor() {
     this.load();
   }
 
   private load(): void {
-    this.layout = sanitizeCrossHotbarLayout(parseStoredJson(STORE_KEY));
+    const stored = parseStoredJson(STORE_KEY);
+    // The bare array is the original shape; read it so an existing layout survives.
+    const raw = Array.isArray(stored) ? { layout: stored, seen: [] } : stored;
+    const bag = (raw ?? {}) as { layout?: unknown; seen?: unknown };
+    this.layout = sanitizeCrossHotbarLayout(bag.layout);
+    this.seen = new Set(
+      Array.isArray(bag.seen) ? bag.seen.filter((id): id is string => typeof id === 'string') : [],
+    );
   }
 
   private save(): void {
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(this.layout));
+      localStorage.setItem(
+        STORE_KEY,
+        JSON.stringify({ layout: this.layout, seen: [...this.seen] }),
+      );
     } catch {
       /* storage unavailable */
     }
+  }
+
+  /**
+   * Offer a cell to every ability the bar has not seen before, so levelling into a
+   * new spell puts it in reach instead of leaving a pad player to discover the
+   * arrange chord first. Ids are pre-filtered by the caller against the SAME rules
+   * the action bar auto-places by.
+   *
+   * Marks an id seen whether or not a cell was free, so a full bar does not quietly
+   * queue placements that surface later when the player frees a slot.
+   */
+  syncKnown(abilityIds: readonly string[]): boolean {
+    if (!this.isSeeded()) return false;
+    let changed = false;
+    for (const id of abilityIds) {
+      if (this.seen.has(id)) continue;
+      this.seen.add(id);
+      changed = true;
+      const next = placeInFirstFreeCell(this.layout, { type: 'ability', id });
+      if (next) this.layout = next;
+    }
+    if (changed) this.save();
+    return changed;
   }
 
   /** The whole layout, for the overlay and the options panel. */
@@ -61,6 +99,13 @@ export class CrossHotbarBindings {
    * never reach it). Does nothing once the bar holds anything, so a player's own
    * arrangement is never overwritten.
    */
+  /** Record what the bar already holds as seen, so seeding does not re-offer it. */
+  private markSeededSeen(): void {
+    for (const cells of this.layout) {
+      for (const cell of cells) if (cell?.type === 'ability') this.seen.add(cell.id);
+    }
+  }
+
   seedOnce(barActions: readonly CrossHotbarAction[], extras: readonly string[] = []): boolean {
     if (this.isSeeded()) return false;
     // Wait for the ACTION BAR specifically, not for any content at all. A pad is
@@ -70,6 +115,7 @@ export class CrossHotbarBindings {
     if (!barActions.some((action) => action !== null)) return false;
     this.layout = seedCrossHotbarLayout(barActions, extras);
     if (!this.isSeeded()) return false;
+    this.markSeededSeen();
     this.save();
     return true;
   }

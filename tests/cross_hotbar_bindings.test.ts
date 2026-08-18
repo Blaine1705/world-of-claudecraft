@@ -199,3 +199,55 @@ describe('seeding waits for the action bar', () => {
     expect(flat).toContainEqual({ type: 'ability', id: 'battle_stance' });
   });
 });
+
+describe('syncKnown offers a cell to a newly learned ability', () => {
+  const seed = (xhb: CrossHotbarBindings) => {
+    const bar: ({ type: 'ability'; id: string } | null)[] = Array.from({ length: 32 }, () => null);
+    bar[0] = { type: 'ability', id: 'heroic_strike' };
+    xhb.seedOnce(bar, []);
+  };
+
+  it('places a spell the bar has never seen', () => {
+    // A new player levels, learns something, and would otherwise never see it on
+    // the pad: the bar seeds once and nothing put a new spell on it after that.
+    const xhb = new CrossHotbarBindings();
+    xhb.reset();
+    seed(xhb);
+    expect(xhb.syncKnown(['heroic_strike', 'rend'])).toBe(true);
+    expect(xhb.all().flat()).toContainEqual({ type: 'ability', id: 'rend' });
+  });
+
+  it('leaves an ability the player REMOVED off the bar', () => {
+    // The whole reason for tracking what has been seen: re-offering a cell to
+    // something deliberately cleared would fight the player every level.
+    const xhb = new CrossHotbarBindings();
+    xhb.reset();
+    seed(xhb);
+    xhb.syncKnown(['rend']);
+    const at = xhb.all()[0].findIndex((a) => a?.id === 'rend');
+    xhb.bind(0, at, null);
+    expect(xhb.syncKnown(['rend'])).toBe(false);
+    expect(xhb.all().flat()).not.toContainEqual({ type: 'ability', id: 'rend' });
+  });
+
+  it('does not re-offer what the seed already placed', () => {
+    const xhb = new CrossHotbarBindings();
+    xhb.reset();
+    seed(xhb);
+    expect(xhb.syncKnown(['heroic_strike'])).toBe(false);
+    expect(
+      xhb
+        .all()
+        .flat()
+        .filter((a) => a?.id === 'heroic_strike'),
+    ).toHaveLength(1);
+  });
+
+  it('does nothing before the bar is seeded', () => {
+    // Placing into an unseeded bar would beat the seed to the cells and leave the
+    // player's action-bar order scattered.
+    const xhb = new CrossHotbarBindings();
+    xhb.reset();
+    expect(xhb.syncKnown(['rend'])).toBe(false);
+  });
+});

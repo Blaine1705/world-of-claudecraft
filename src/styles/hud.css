@@ -9517,3 +9517,11 @@ body.pad-nav * {
   outline: 2px dashed var(--gold);
   outline-offset: 2px;
 }
+
+/* The spellbook row whose action the pad is carrying. An action lifted off a CELL
+   leaves a visible gap on the bar; one picked out of the book leaves none, so this
+   is the only sign the pick-up worked. */
+.spell-row.spell-carried {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
+}

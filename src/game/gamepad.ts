@@ -85,8 +85,10 @@ export interface GamepadCallbacks {
   // deliberately id-based so the client never depends on slot semantics.
   onCrossHotbarCast?(action: { type: 'ability' | 'item'; id: string }): void;
   // Edit mode opened, closed, or picked something up. `carriedFrom` is the cell an
-  // action was lifted off, for the gap the bar draws where it used to be.
-  onCrossHotbarEdit?(active: boolean, carriedFrom: number | null): void;
+  // action was lifted off, for the gap the bar draws where it used to be; `carried`
+  // is what is in hand, which is the only feedback a pick-up FROM the spellbook has
+  // (it comes off no cell, so there is no gap to see).
+  onCrossHotbarEdit?(active: boolean, carriedFrom: number | null, carried: string | null): void;
   // Which cell the bar has focused, so a press can act on it. Answered by the HUD
   // because focus lives in the DOM.
   focusedCrossHotbarCell?(): number | null;
@@ -574,7 +576,11 @@ export class GamepadManager {
   // Push the arrange state out: what the bar draws (the gap under a carried
   // action) and the freshly written cells.
   private announceEdit(): void {
-    this.cb.onCrossHotbarEdit?.(this.edit.active, this.edit.from?.position ?? null);
+    this.cb.onCrossHotbarEdit?.(
+      this.edit.active,
+      this.edit.from?.position ?? null,
+      this.edit.carried?.id ?? null,
+    );
     this.notifyCrossHotbar();
   }
 

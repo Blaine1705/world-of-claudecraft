@@ -20,6 +20,26 @@ import { GP } from './gamepad_map';
  */
 export const CROSS_HOTBAR_ATTACK_ID = 'attack';
 
+/**
+ * Put an action on the first free cell, reading the sets in order. Answers null
+ * when the bar is full, so the caller can leave the layout untouched rather than
+ * evicting something the player put there.
+ */
+export function placeInFirstFreeCell(
+  layout: CrossHotbarLayout,
+  action: CrossHotbarAction,
+): CrossHotbarAction[][] | null {
+  if (action === null) return null;
+  for (let set = 0; set < layout.length; set++) {
+    const position = layout[set].indexOf(null);
+    if (position < 0) continue;
+    const next = layout.map((cells) => [...cells]);
+    next[set][position] = action;
+    return next;
+  }
+  return null;
+}
+
 /** The chord that opens arrange mode. One definition, so the pad that reads it and
  *  the hint that names it can never drift apart. */
 export const CROSS_HOTBAR_ARRANGE_CHORD = { bumper: GP.LB, button: GP.Y } as const;

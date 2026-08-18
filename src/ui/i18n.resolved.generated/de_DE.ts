@@ -1465,6 +1465,7 @@ export const de_DE: EnTranslations = {
       "crossHotbarOverlay": "Cross hotbar",
       "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
       "crossHotbarArrangeChord": "{bumper} + {button} to arrange",
+      "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
       "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
       "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
     },

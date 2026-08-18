@@ -1196,9 +1196,10 @@ describe('GamepadManager cross hotbar', () => {
     it('opens and closes on the bumper plus top face button', () => {
       const h = setupCrossHotbar(true);
       enterEdit(h);
-      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(true, null);
+      // The third argument is what is in hand, which is nothing on the way in.
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(true, null, null);
       enterEdit(h);
-      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
     });
 
     it('moves an action onto another cell', () => {

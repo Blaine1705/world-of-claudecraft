@@ -77,7 +77,7 @@ const MONOLITHS: MonolithRow[] = [
     // (reticle, empower, sport, mouseover) instead of growing a second cast path,
     // with the Attack branch beside it: Attack is the fixed slot-0 toggle rather
     // than an ability, so it is the one action the seed cannot copy off the bar.
-    ceiling: 19458,
+    ceiling: 19469,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

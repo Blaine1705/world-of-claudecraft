@@ -8036,6 +8036,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.controller.confirmAction'
   | 'hudChrome.controller.crossHotbar'
   | 'hudChrome.controller.crossHotbarArrangeChord'
+  | 'hudChrome.controller.crossHotbarCarrying'
   | 'hudChrome.controller.crossHotbarEditHelp'
   | 'hudChrome.controller.crossHotbarEditHint'
   | 'hudChrome.controller.crossHotbarEnable'

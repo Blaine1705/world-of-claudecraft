@@ -187,9 +187,18 @@ export function restorePadFocus(): boolean {
   return true;
 }
 
-/** Drop the highlight and park the pointer when the pad leaves UI navigation. */
+/**
+ * Drop the highlight and park the pointer when the pad leaves UI navigation.
+ *
+ * BLURS as well as unmarks. Hiding the cursor alone left the element still
+ * focused, so a confirm pressed afterwards opened whatever the cursor had been
+ * sitting on: the selection looked gone and was not.
+ */
 export function clearPadFocus(): void {
-  marked?.classList?.remove(PAD_FOCUS_CLASS);
+  if (marked) {
+    marked.classList?.remove(PAD_FOCUS_CLASS);
+    marked.blur?.();
+  }
   marked = null;
   setPadCursorMode(false);
 }

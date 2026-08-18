@@ -29,6 +29,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.zoomOut': 'ズームアウト',
   'hudChrome.controller.confirmAction': '決定 / 選択',
   'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button} で配置変更',
+  'hudChrome.controller.crossHotbarCarrying': '{action}を持っています。マスで決定を押すと置き、キャンセルで戻します。',
   'hudChrome.controller.crossHotbarEditHint': '配置変更中：決定でマスまたはスペルブックからアクションを持ち上げてマスに置き、キャンセルでマスを空にします。',
   'hudChrome.controller.crossHotbarEditHelp': '左バンパーを押しながら上の面ボタンを押すと、コントローラーでバーを配置変更できます。',
   'hudChrome.controller.crossHotbarOwnsButtons': 'クロスホットバーが有効な間、トリガーと方向キーはクロスホットバーが使用します。ここではなく下の項目で設定してください。',

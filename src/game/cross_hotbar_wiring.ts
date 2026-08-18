@@ -48,7 +48,7 @@ export interface CrossHotbarOverlayHost {
  *  show what is being carried. */
 export interface CrossHotbarEditSurface {
   focusedCell(): number | null;
-  setEditing(active: boolean, carriedFrom: number | null): void;
+  setEditing(active: boolean, carriedFrom: number | null, carried: string | null): void;
 }
 
 /** The live pad, for the connection-driven half of pad mode. */
@@ -75,6 +75,9 @@ export interface CrossHotbarSettingsStore {
 
 /** The rebind surface the Controller options panel consumes. */
 export interface CrossHotbarPanelHooks {
+  /** Offer a cell to any newly learned ability. Called where the action bar does
+   *  its own auto-place, so both bars react to a level-up on the same beat. */
+  syncCrossHotbarKnown(abilityIds: readonly string[]): void;
   crossHotbarSets(): readonly (readonly CrossHotbarAction[])[];
   bindCrossHotbar(set: number, position: number, action: CrossHotbarAction): void;
   resetCrossHotbar(): void;
@@ -97,7 +100,7 @@ export interface CrossHotbarWiring {
   /** The pad callbacks, in the shape GamepadCallbacks declares them. */
   padCallbacks(kind: () => GamepadKind): {
     onCrossHotbar(layer: CrossHotbarLayer | null, set: number): void;
-    onCrossHotbarEdit(active: boolean, carriedFrom: number | null): void;
+    onCrossHotbarEdit(active: boolean, carriedFrom: number | null, carried: string | null): void;
     focusedCrossHotbarCell(): number | null;
   };
   /** Hand the layout to the pad. Separate from construction because the pad is
@@ -195,8 +198,8 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
     padCallbacks: (kind) => ({
       onCrossHotbar: (layer, set) =>
         host().setCrossHotbar(crossHotbarHold(bindings, layer, set, kind())),
-      onCrossHotbarEdit: (active, carriedFrom) =>
-        host().crossHotbarEdit()?.setEditing(active, carriedFrom),
+      onCrossHotbarEdit: (active, carriedFrom, carried) =>
+        host().crossHotbarEdit()?.setEditing(active, carriedFrom, carried),
       focusedCrossHotbarCell: () => host().crossHotbarEdit()?.focusedCell() ?? null,
     }),
     applySetting: (pad, store, key, value) => {
@@ -213,6 +216,7 @@ export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotb
       return false;
     },
     hooks: {
+      syncCrossHotbarKnown: (abilityIds) => bindings.syncKnown(abilityIds),
       crossHotbarSets: () => bindings.all(),
       bindCrossHotbar: (set, position, action) => bindings.bind(set, position, action),
       resetCrossHotbar: () => bindings.reset(),
