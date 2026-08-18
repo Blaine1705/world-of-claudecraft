@@ -138,6 +138,7 @@ import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
+import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
@@ -2212,6 +2213,20 @@ async function startGame(
       case 'targetFriendly':
         world.targetNearestFriendly();
         break;
+      // Selecting the people you talk to. The sim's friendly cycle answers heal
+      // eligibility and so skips every quest giver, which left a pad player with
+      // no way to pick one; targetEntity is the seam that already exists for it.
+      case 'targetNpcNext':
+      case 'targetNpcPrev': {
+        const next = nextNpcTarget(
+          world.entities.values(),
+          world.player.pos,
+          world.player.targetId ?? null,
+          id === 'targetNpcNext' ? 1 : -1,
+        );
+        if (next !== null) world.targetEntity(next);
+        break;
+      }
       case 'targetFriendlyNext':
         world.friendlyTabTarget();
         break;

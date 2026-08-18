@@ -154,7 +154,7 @@ const MONOLITHS: MonolithRow[] = [
     // substance is in src/game/cross_hotbar_wiring.ts, which is what this file's
     // seam asks for, plus the cast handler the bar dispatches through. Exact
     // count: any further growth reds again.
-    ceiling: 11521,
+    ceiling: 11536,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -114,14 +114,17 @@ const DPAD_NAV_DIRECTIONS: Record<number, NavDirection> = {
 // highlight on screen.
 const FOCUS_RETURN_FRAMES = 12;
 
-// What the bare d-pad cycles in the world. Left/right walk the target list and
-// up/down the friendly one, matching the console-MMO split. There is no reverse
-// friendly cycle to bind, so down takes the nearest instead of stepping back.
+// What the bare d-pad cycles in the world: left/right the hostile list, up/down
+// the NPCs standing around you, matching the console-MMO split between "what am I
+// fighting" and "who am I talking to".
 const DPAD_TARGET_ACTIONS: Record<number, string | undefined> = {
   [GP.DPAD_LEFT]: 'targetPrev',
   [GP.DPAD_RIGHT]: 'target',
-  [GP.DPAD_UP]: 'targetFriendlyNext',
-  [GP.DPAD_DOWN]: 'targetFriendly',
+  // Up and down walk the NPCs rather than the sim's friendly list: an ordinary
+  // quest giver is not "friendly" by that rule (it answers heal eligibility), so
+  // cycling it could never reach the people a player most needs to select.
+  [GP.DPAD_UP]: 'targetNpcPrev',
+  [GP.DPAD_DOWN]: 'targetNpcNext',
 };
 
 export class GamepadManager {
