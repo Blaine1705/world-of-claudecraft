@@ -4,6 +4,9 @@ import {
   declutterNameplatesInPlace,
   type NameplateAnchor,
   type NameplateDeclutterMetrics,
+  OVERLAP_THRESHOLD_X_PX,
+  OVERLAP_THRESHOLD_Y_PX,
+  STACK_OFFSET_PX,
 } from '../src/render/nameplate_declutter';
 
 /**
@@ -12,9 +15,9 @@ import {
  * silently stack differently in a crowd than they do in the unit tests.
  */
 function declutterReference(anchors: NameplateAnchor[]): NameplateAnchor[] {
-  const OVERLAP_X = 80;
-  const OVERLAP_Y = 18;
-  const STACK = 20;
+  const OVERLAP_X = OVERLAP_THRESHOLD_X_PX;
+  const OVERLAP_Y = OVERLAP_THRESHOLD_Y_PX;
+  const STACK = STACK_OFFSET_PX;
   const out = anchors.map((a) => ({ ...a }));
   const byId = new Map(out.map((a) => [a.id, a]));
   const visited = new Set<number>();
@@ -82,7 +85,7 @@ describe('nameplate declutter', () => {
     const b = out.find((n) => n.id === 2);
     expect(a).toBeDefined();
     expect(b).toBeDefined();
-    expect(Math.abs((a?.sy ?? 0) - (b?.sy ?? 0))).toBeGreaterThanOrEqual(18);
+    expect(Math.abs((a?.sy ?? 0) - (b?.sy ?? 0))).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
     // horizontal position is untouched, only vertical stacking separates plates
     expect(a?.sx).toBe(200);
     expect(b?.sx).toBe(202);
@@ -99,7 +102,7 @@ describe('nameplate declutter', () => {
     const out = declutterNameplates(anchors);
     const a = out.find((n) => n.id === 1);
     const b = out.find((n) => n.id === 2);
-    expect(Math.abs((a?.sy ?? 0) - (b?.sy ?? 0))).toBeGreaterThanOrEqual(18);
+    expect(Math.abs((a?.sy ?? 0) - (b?.sy ?? 0))).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
   });
 
   it('stacks a cluster of 3+ overlapping anchors without unbounded growth', () => {
@@ -110,8 +113,8 @@ describe('nameplate declutter', () => {
     ];
     const out = declutterNameplates(anchors);
     const ys = out.map((n) => n.sy).sort((x, y) => x - y);
-    expect(ys[1] - ys[0]).toBeGreaterThanOrEqual(18);
-    expect(ys[2] - ys[1]).toBeGreaterThanOrEqual(18);
+    expect(ys[1] - ys[0]).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
+    expect(ys[2] - ys[1]).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
     expect(ys[2] - ys[0]).toBeLessThan(200);
   });
 
@@ -126,7 +129,11 @@ describe('nameplate declutter', () => {
     ];
 
     const out = declutterNameplates(anchors);
-    expect(out.map((anchor) => anchor.sy)).toEqual([80, 100, 120]);
+    expect(out.map((anchor) => anchor.sy)).toEqual([
+      100 - STACK_OFFSET_PX,
+      100,
+      100 + STACK_OFFSET_PX,
+    ]);
   });
 
   it('orders a cluster stably by id regardless of input order', () => {
@@ -163,7 +170,7 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     const out = declutterNameplatesInPlace(anchors);
     expect(out).toBe(anchors);
     expect(out[0]).toBe(first); // element objects reused, not reallocated
-    expect(Math.abs(out[0].sy - out[1].sy)).toBeGreaterThanOrEqual(18);
+    expect(Math.abs(out[0].sy - out[1].sy)).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
   });
 
   it('matches the O(N^2) reference on dense random crowds', () => {
@@ -220,16 +227,26 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     const actual = declutterNameplatesInPlace(anchors.map((a) => ({ ...a })));
     expect(actual[0].sy).toBeCloseTo(expected[0].sy, 9);
     expect(actual[1].sy).toBeCloseTo(expected[1].sy, 9);
-    expect(Math.abs(actual[0].sy - actual[1].sy)).toBeGreaterThanOrEqual(18);
+    expect(Math.abs(actual[0].sy - actual[1].sy)).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
   });
 
   it.each([
     ['inclusive horizontal threshold', { sx: 0, sy: 0 }, { sx: 80, sy: 0 }, true],
     ['outside horizontal threshold', { sx: 0, sy: 0 }, { sx: 80.0001, sy: 0 }, false],
-    ['inclusive vertical threshold', { sx: 0, sy: 0 }, { sx: 0, sy: 18 }, true],
-    ['outside vertical threshold', { sx: 0, sy: 0 }, { sx: 0, sy: 18.0001 }, false],
-    ['inclusive diagonal threshold', { sx: 0, sy: 0 }, { sx: 80, sy: 18 }, true],
-    ['inclusive opposite diagonal', { sx: 0, sy: 18 }, { sx: 80, sy: 0 }, true],
+    ['inclusive vertical threshold', { sx: 0, sy: 0 }, { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX }, true],
+    [
+      'outside vertical threshold',
+      { sx: 0, sy: 0 },
+      { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX + 0.0001 },
+      false,
+    ],
+    [
+      'inclusive diagonal threshold',
+      { sx: 0, sy: 0 },
+      { sx: 80, sy: OVERLAP_THRESHOLD_Y_PX },
+      true,
+    ],
+    ['inclusive opposite diagonal', { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX }, { sx: 80, sy: 0 }, true],
     ['negative to positive cell boundary', { sx: -40, sy: 0 }, { sx: 40, sy: 0 }, true],
   ])('pins the %s', (_label, a, b, collides) => {
     const anchors: NameplateAnchor[] = [
@@ -253,7 +270,7 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     const expected = declutterReference(anchors);
     const actual = declutterNameplatesInPlace(anchors.map((a) => ({ ...a })));
     for (let i = 0; i < anchors.length; i++) expect(actual[i].sy).toBeCloseTo(expected[i].sy, 6);
-    expect(Math.abs(actual[0].sy - actual[1].sy)).toBeGreaterThanOrEqual(18);
+    expect(Math.abs(actual[0].sy - actual[1].sy)).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
     expect(actual[2].sy).toBe(-3e6); // untouched
     expect(actual[3].sy).toBe(500); // untouched
   });
@@ -277,8 +294,8 @@ describe('nameplate declutter: spatial-hash hot path', () => {
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
-    expect(anchors[1].sy - anchors[0].sy).toBe(20);
-    expect(anchors[anchors.length - 1].sy - anchors[anchors.length - 2].sy).toBe(20);
+    expect(anchors[1].sy - anchors[0].sy).toBe(STACK_OFFSET_PX);
+    expect(anchors[anchors.length - 1].sy - anchors[anchors.length - 2].sy).toBe(STACK_OFFSET_PX);
     expect(metrics.candidateChecks).toBeLessThan(anchors.length * 8);
   });
 
@@ -291,8 +308,8 @@ describe('nameplate declutter: spatial-hash hot path', () => {
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
-    expect(anchors[1].sy - anchors[0].sy).toBe(20);
-    expect(anchors[anchors.length - 1].sy - anchors[anchors.length - 2].sy).toBe(20);
+    expect(anchors[1].sy - anchors[0].sy).toBe(STACK_OFFSET_PX);
+    expect(anchors[anchors.length - 1].sy - anchors[anchors.length - 2].sy).toBe(STACK_OFFSET_PX);
     expect(metrics.candidateChecks).toBe(anchors.length);
   });
 
@@ -308,8 +325,18 @@ describe('nameplate declutter: spatial-hash hot path', () => {
   });
 
   it.each([
-    ['left cell below right', { sx: 79, sy: 0 }, { sx: 0, sy: 17 }, { sx: 158, sy: 34 }],
-    ['left cell above right', { sx: 79, sy: 35 }, { sx: 0, sy: 18 }, { sx: 158, sy: 0 }],
+    [
+      'left cell below right',
+      { sx: 79, sy: 0 },
+      { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX - 1 },
+      { sx: 158, sy: (OVERLAP_THRESHOLD_Y_PX - 1) * 2 },
+    ],
+    [
+      'left cell above right',
+      { sx: 79, sy: (OVERLAP_THRESHOLD_Y_PX - 1) * 2 + 1 },
+      { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX },
+      { sx: 158, sy: 0 },
+    ],
   ])(
     'rejects dense diagonal neighbour buckets without a false merge when the %s',
     (_label, leftXBound, leftYBound, right) => {
@@ -323,10 +350,10 @@ describe('nameplate declutter: spatial-hash hot path', () => {
 
       const leftBaseSy = (leftXBound.sy + leftYBound.sy) / 2;
       const componentMid = (4_000 - 1) / 2;
-      expect(anchors[0].sy).toBe(leftBaseSy - componentMid * 20);
-      expect(anchors[3_999].sy).toBe(leftBaseSy + componentMid * 20);
-      expect(anchors[4_000].sy).toBe(right.sy - componentMid * 20);
-      expect(anchors[7_999].sy).toBe(right.sy + componentMid * 20);
+      expect(anchors[0].sy).toBe(leftBaseSy - componentMid * STACK_OFFSET_PX);
+      expect(anchors[3_999].sy).toBe(leftBaseSy + componentMid * STACK_OFFSET_PX);
+      expect(anchors[4_000].sy).toBe(right.sy - componentMid * STACK_OFFSET_PX);
+      expect(anchors[7_999].sy).toBe(right.sy + componentMid * STACK_OFFSET_PX);
       expect(metrics.candidateChecks).toBeLessThan(anchors.length * 2);
     },
   );
@@ -398,13 +425,13 @@ describe('nameplate declutter: spatial-hash hot path', () => {
   it.each([
     [
       'left cell below right',
-      { id: 1, sx: 70, sy: 144115188075856000 },
-      { id: 2, sx: 100, sy: 144115188075856030 },
+      { id: 1, sx: 70, sy: 2 ** 57 + 128 },
+      { id: 2, sx: 100, sy: 2 ** 57 + 256 },
     ],
     [
       'left cell above right',
-      { id: 1, sx: 70, sy: 144115188075856030 },
-      { id: 2, sx: 100, sy: 144115188075856000 },
+      { id: 1, sx: 70, sy: 2 ** 57 + 256 },
+      { id: 2, sx: 100, sy: 2 ** 57 + 128 },
     ],
   ])('does not round a far y gap down for a diagonal with the %s', (_label, a, b) => {
     const anchors: NameplateAnchor[] = [a, b];
@@ -423,7 +450,7 @@ describe('nameplate declutter: spatial-hash hot path', () => {
 
     declutterNameplatesInPlace(anchors);
 
-    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBeGreaterThanOrEqual(18);
+    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
   });
 
   it('ignores every non-finite projection while finite anchors still stack', () => {
@@ -446,7 +473,7 @@ describe('nameplate declutter: spatial-hash hot path', () => {
       expect(Object.is(anchors[i].sx, invalidBefore[i].sx)).toBe(true);
       expect(Object.is(anchors[i].sy, invalidBefore[i].sy)).toBe(true);
     }
-    expect(Math.abs(anchors[6].sy - anchors[7].sy)).toBeGreaterThanOrEqual(18);
+    expect(Math.abs(anchors[6].sy - anchors[7].sy)).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
     // Resolved finite candidates are consumed from the bucket instead of rescanned.
     expect(metrics.candidateChecks).toBe(2);
   });
@@ -500,6 +527,6 @@ describe('nameplate declutter: spatial-hash hot path', () => {
       { id: 2, sx: 104, sy: 101 },
     ];
     expect(() => declutterNameplatesInPlace(anchors, 99)).not.toThrow();
-    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBeGreaterThanOrEqual(18);
+    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
   });
 });

@@ -9,6 +9,8 @@
 // each anchor's collision cluster through a reusable spatial hash rather than
 // rescanning all anchors, which made the pass quadratic in a crowd.
 
+import { NAMEPLATE_CARTOUCHE_EXTRA_LIFT } from './nameplate_cartouche_core';
+
 export interface NameplateAnchor {
   id: number;
   sx: number;
@@ -26,13 +28,14 @@ export interface NameplateDeclutterMetrics {
 // labels render much wider than the anchor point itself (name + level + hp
 // bar), so this approximates half of a typical label's on-screen width rather
 // than the anchor point spacing.
-const OVERLAP_THRESHOLD_X_PX = 80;
-// Vertical anchors this close are considered the "same row" (labels are a
-// single text line anchored at their bottom, so the tolerance is much
-// tighter than the horizontal one).
-const OVERLAP_THRESHOLD_Y_PX = 18;
-// Vertical gap applied between stacked members of a cluster.
-const STACK_OFFSET_PX = 20;
+export const OVERLAP_THRESHOLD_X_PX = 80;
+// Vertical anchors this close are considered the "same row". A worn cartouche
+// adds NAMEPLATE_CARTOUCHE_EXTRA_LIFT above the name, so the old 18px same-row
+// window would miss two bordered name-only plates that now overlap.
+export const OVERLAP_THRESHOLD_Y_PX = 18 + NAMEPLATE_CARTOUCHE_EXTRA_LIFT;
+// Vertical gap applied between stacked members of a cluster. 20px no longer
+// clears a 16px name row plus the cartouche extra lift.
+export const STACK_OFFSET_PX = 20 + NAMEPLATE_CARTOUCHE_EXTRA_LIFT;
 
 // Cell size equals the collision thresholds, so two colliding anchors are never
 // more than one cell apart on either axis and a 3x3 neighbourhood is exhaustive.
