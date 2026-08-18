@@ -1584,6 +1584,63 @@ describe('createBackgroundGpuQueue admission', () => {
     expect(queue.stats().slowest[0].deferredFrames).toBe(1);
   });
 
+  it('does not age a refusal the policy says is not a wait for headroom', async () => {
+    // The arrival-cover shape: the policy refuses this unit on a rule that has
+    // nothing to do with the frame's headroom, so the frames it spends under
+    // the curtain must not accumulate deferrals. Ageing them made every one of
+    // these units starvation-admissible on the first live frame after the
+    // cover dropped, which is the whole debt lane into one live frame.
+    let ages = false;
+    const seenAgeChecks: GpuWorkAdmissionCandidate[] = [];
+    const gate = probe(() => false);
+    gate.admission.agesDeferral = (candidate) => {
+      seenAgeChecks.push({ ...candidate });
+      return ages;
+    };
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    queue.noteFrame(0);
+    void queue.run(() => undefined, GPU_WORK_PRIORITY.BOOT_DEBT, 'zone-prepare:boot');
+    await settle();
+
+    for (const at of [16, 32, 48]) {
+      queue.noteFrame(at);
+      await settle();
+    }
+    // Every re-consult still sees a candidate that has waited zero frames, so
+    // no starvation rule can fire on it.
+    expect(gate.seen.length).toBeGreaterThanOrEqual(4);
+    expect(gate.seen.every((candidate) => candidate.deferredFrames === 0)).toBe(true);
+    // The policy really was asked, with the candidate it refused.
+    expect(seenAgeChecks.length).toBeGreaterThanOrEqual(3);
+    expect(seenAgeChecks[0].label).toBe('zone-prepare:boot');
+    expect(seenAgeChecks[0].priority).toBe(GPU_WORK_PRIORITY.BOOT_DEBT);
+
+    // ...and the moment the policy allows it again the ordinary ageing resumes
+    // from where it stopped, so nothing is lost, only not accrued under cover.
+    ages = true;
+    gate.seen.length = 0;
+    for (const at of [64, 80]) {
+      queue.noteFrame(at);
+      await settle();
+    }
+    expect(gate.seen.map((candidate) => candidate.deferredFrames)).toEqual([1, 2]);
+  });
+
+  it('ages a refusal by default, with no agesDeferral installed', async () => {
+    // The vacuity arm of the case above: the same drive over the plain probe
+    // (which declares no agesDeferral) must still count every frame.
+    const gate = probe(() => false);
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    queue.noteFrame(0);
+    void queue.run(() => undefined, GPU_WORK_PRIORITY.BOOT_DEBT, 'zone-prepare:boot');
+    await settle();
+    for (const at of [16, 32, 48]) {
+      queue.noteFrame(at);
+      await settle();
+    }
+    expect(gate.seen.map((candidate) => candidate.deferredFrames)).toEqual([0, 1, 2, 3]);
+  });
+
   it('runs an admissible lower-priority unit while a costly higher-priority one is deferred', async () => {
     // Intended, and the inversion the budget core bounds: the deferred unit
     // ages one frame per noteFrame and its starvation rule admits it regardless

@@ -216,6 +216,34 @@ describe('createGpuPrepAdmission', () => {
     expect(budget.snapshot().decisions['no-headroom']).toBe(1);
   });
 
+  it('stops the deferral clock for exactly the lanes the cover refuses', () => {
+    // A `cover-not-arrival` refusal is not a wait for headroom, so it must not
+    // age: ticking deferredFrames through a whole curtain left every
+    // BOOT_DEBT / BACKGROUND / BOOT_RESUME unit past maxDeferFrames, and the
+    // first live frame after the drop admitted the entire debt lane on
+    // `starvation`.
+    const budget = createGpuPrepBudget({ targetFrameMs: 16.7 });
+    const admission = createGpuPrepAdmission(budget);
+    const ages = (priority: number): boolean =>
+      admission.agesDeferral?.({ label: 'touch:program', priority, deferredFrames: 0 }) ?? true;
+
+    setArrivalCover(true);
+    expect(ages(GPU_WORK_PRIORITY.BOOT_DEBT)).toBe(false);
+    expect(ages(GPU_WORK_PRIORITY.BACKGROUND)).toBe(false);
+    expect(ages(GPU_WORK_PRIORITY.BOOT_RESUME)).toBe(false);
+    // The lanes the cover ADMITS never reach the ageing question refused, but
+    // if the frame budget refuses one of them it is an ordinary wait.
+    expect(ages(GPU_WORK_PRIORITY.TAIL_PIECE)).toBe(true);
+    expect(ages(GPU_WORK_PRIORITY.LIVE_VIEW)).toBe(true);
+    expect(ages(GPU_WORK_PRIORITY.VISIBLE_PREWARM)).toBe(true);
+    expect(ages(GPU_WORK_PRIORITY.ACTIONABLE_VIEW)).toBe(true);
+
+    // Cover off, every lane ages again: the pause belongs to the curtain, not
+    // to the priority.
+    setArrivalCover(false);
+    for (const priority of Object.values(GPU_WORK_PRIORITY)) expect(ages(priority)).toBe(true);
+  });
+
   it('the cover never overrules the legacy kill switch', () => {
     const budget = createGpuPrepBudget({ targetFrameMs: 16.7 });
     const admission = createGpuPrepAdmission(budget);

@@ -10,6 +10,7 @@ import type { GpuWorkAdmission } from './background_gpu_queue';
 import {
   type GpuPrepBudget,
   gpuPrepClassForPriority,
+  gpuPrepCoverAdmits,
   gpuPrepKindOfLabel,
 } from './gpu_prep_budget_core';
 
@@ -33,6 +34,18 @@ export function createGpuPrepAdmission(budget: GpuPrepBudget): GpuWorkAdmission 
         cover: arrivalCoverActive(),
         priority: candidate.priority,
       }).admit;
+    },
+    agesDeferral(candidate): boolean {
+      // A `cover-not-arrival` refusal is not a wait for headroom: the unit is
+      // refused because the curtain's budget belongs to the arrival, and it
+      // will be reconsidered on its own terms the moment the cover drops.
+      // Ageing it meanwhile ticked deferredFrames through the whole curtain,
+      // so at the drop every BOOT_DEBT / BACKGROUND / BOOT_RESUME unit was
+      // already past maxDeferFrames and admitted as `starvation` on the first
+      // live frame: the entire debt lane, unpaced, into the frame the player
+      // just got back.
+      if (!arrivalCoverActive()) return true;
+      return gpuPrepCoverAdmits(candidate.priority);
     },
     spend(syncMs, label): void {
       // Record BEFORE spending: both are per-piece bookkeeping, but only the

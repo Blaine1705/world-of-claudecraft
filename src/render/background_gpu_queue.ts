@@ -73,7 +73,12 @@
 // higher-priority one waits. That inversion is deliberate and bounded: the
 // refused candidate ages one deferral per noteFrame and the policy's starvation
 // rule admits it regardless once it has waited long enough, so pacing delays a
-// piece, never drops it. When every candidate is refused the loop PARKS until
+// piece, never drops it. The policy may decline that ageing per candidate
+// (agesDeferral), for the one refusal that is not a wait for headroom: under
+// the arrival cover, boot debt is refused because it is not this arrival's
+// work, and ageing it through the whole curtain would make every one of those
+// units starvation-admissible on the first live frame after the drop.
+// When every candidate is refused the loop PARKS until
 // the next frame or the next arrival, and it is ARMED BY THE FRAME CLOCK: until
 // the host feeds its first noteFrame the admission is not consulted at all.
 // Boot is why. World entry pushes dozens of units through before
@@ -131,6 +136,15 @@ export interface GpuWorkAdmissionCandidate {
 /** The per-frame budget seam (see the header's admission paragraph). */
 export interface GpuWorkAdmission {
   admit(candidate: GpuWorkAdmissionCandidate): boolean;
+  /** Whether a refused candidate's deferral should AGE this frame. Absent, or
+   *  true, means it does, which is the ordinary pacing case: a unit refused
+   *  for lack of headroom is waiting for headroom, and the starvation bound
+   *  measures that wait. A policy that refuses a candidate on a rule which has
+   *  nothing to do with waiting (the arrival cover, which refuses boot debt
+   *  because it is not this arrival's work) answers false, so the unit does
+   *  not spend the curtain accumulating deferrals it never earned and then
+   *  admit as `starvation` on the first live frame after the drop. */
+  agesDeferral?(candidate: GpuWorkAdmissionCandidate): boolean;
   /** The main-thread cost the admitted unit's synchronous prologue really had,
    *  reported the moment it returns so a second admission in the same frame
    *  prices the smaller headroom it actually has. Called for the released-tail
@@ -894,8 +908,23 @@ export function createBackgroundGpuQueue(opts?: {
       if (admission) {
         // A refused candidate ages in FRAMES, which is the unit the starvation
         // bound counts in, and the new frame re-opens the budget: wake the loop
-        // so it reconsiders everything it parked on.
-        for (const entry of pending) if (entry.refusedAdmission) entry.deferredFrames++;
+        // so it reconsiders everything it parked on. The policy may decline
+        // the ageing for a candidate whose refusal is not a wait for headroom
+        // (GpuWorkAdmission.agesDeferral).
+        for (const entry of pending) {
+          if (!entry.refusedAdmission) continue;
+          if (
+            admission.agesDeferral !== undefined &&
+            !admission.agesDeferral({
+              label: entry.label,
+              priority: entry.priority,
+              deferredFrames: entry.deferredFrames,
+            })
+          ) {
+            continue;
+          }
+          entry.deferredFrames++;
+        }
         wakeAdmission();
       }
       const previous = lastFrameAt;
