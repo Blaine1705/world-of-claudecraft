@@ -76,6 +76,13 @@ export function moveDpadFocus(dir: NavDirection): DpadFocusResult | null {
 // the highlight is an explicit class rather than a pseudo-class we do not control.
 const PAD_FOCUS_CLASS = 'pad-focus';
 const CURSOR_ID = 'pad-cursor';
+// The shipped arrow's hotspot, matching CURSOR_HAND in cursors.ts: the tip sits
+// 7px right and 2px down from the image's own top-left corner.
+const CURSOR_HOTSPOT_X = 7;
+const CURSOR_HOTSPOT_Y = 2;
+// How far inside the corner the tip sits, so it reads as pointing AT the control
+// rather than balanced on its edge.
+const CURSOR_INSET = 6;
 let marked: HTMLElement | null = null;
 let cursorEl: HTMLElement | null = null;
 
@@ -131,15 +138,18 @@ function markPadFocus(el: HTMLElement): void {
     el.classList.add(PAD_FOCUS_CLASS);
     marked = el;
   }
-  // Anchor the pointer to the selection's top-left corner, the way FFXIV parks
-  // it: on the element, not centred over it, so it never hides the label.
   const cursor = ensureCursor();
   if (!cursor) return;
   watchForRealPointer();
   setPadCursorMode(true);
+  // Park the arrow's TIP just inside the selection's bottom-right corner. The
+  // art points up and left (hotspot 7,2 in cursors.ts), so sitting at the
+  // bottom-right aims it back INTO the element; at the top-left it would point
+  // away into empty space. Offsetting by the hotspot puts the tip, not the
+  // image's corner, where we mean it.
   const r = el.getBoundingClientRect();
-  cursor.style.left = `${r.left}px`;
-  cursor.style.top = `${r.top}px`;
+  cursor.style.left = `${r.right - CURSOR_HOTSPOT_X - CURSOR_INSET}px`;
+  cursor.style.top = `${r.bottom - CURSOR_HOTSPOT_Y - CURSOR_INSET}px`;
   cursor.style.display = 'block';
 }
 

@@ -9418,16 +9418,14 @@ body.xhb-mode #stancebar {
   position: fixed;
   left: 0;
   top: 0;
-  width: 14px;
-  height: 20px;
-  margin: -2px 0 0 -3px;
+  width: 28px;
+  height: 28px;
   display: none;
   pointer-events: none;
   z-index: 100000;
-  background: #fff;
-  border: 1px solid #000;
-  /* A classic arrow pointer, drawn rather than shipped as an asset. */
-  clip-path: polygon(0 0, 0 78%, 26% 60%, 44% 100%, 68% 88%, 50% 50%, 100% 44%);
+  /* The SAME ornate arrow the mouse uses (--cursor-arrow / CURSOR_HAND), so the
+     pad's pointer and the mouse's are one cursor rather than two designs. */
+  background: url("/ui/cursors/arrow.png") no-repeat center / contain;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
 }
 

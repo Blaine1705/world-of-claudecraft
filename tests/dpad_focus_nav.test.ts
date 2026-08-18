@@ -35,6 +35,7 @@ interface FakeEl {
 
 let active: FakeEl | null = null;
 let padCursorClasses = new Set<string>();
+let padCursorStyle: Record<string, string> = {};
 let allEls: FakeEl[] = [];
 
 function el(
@@ -118,11 +119,11 @@ function install(): void {
       },
       appendChild: () => {},
     },
-    createElement: () => ({
-      id: '',
-      style: {} as Record<string, string>,
-      setAttribute: () => {},
-    }),
+    createElement: () => {
+      const node = { id: '', style: {} as Record<string, string>, setAttribute: () => {} };
+      padCursorStyle = node.style;
+      return node;
+    },
   };
   padCursorClasses = bodyClasses;
   vi.stubGlobal('document', docLike);
@@ -141,6 +142,8 @@ beforeEach(() => {
   active = null;
   allEls = [];
   padCursorClasses = new Set<string>();
+  // padCursorStyle is deliberately NOT reset: the module mints its pointer once
+  // and caches it, so the live style object is the one to keep watching.
   // The module keeps the highlight, the pointer and the hidden-cursor flag at
   // module scope (one pad, one HUD), so reset them or state leaks between cases.
   clearPadFocus();
@@ -177,6 +180,22 @@ describe('moveDpadFocus', () => {
     moveDpadFocus('up');
     expect(b.classes.has('pad-focus')).toBe(false);
     expect(a.classes.has('pad-focus')).toBe(true);
+  });
+
+  it('parks the arrow tip inside the selection bottom-right corner', () => {
+    // The shipped art points up and left, so the bottom-right aims it back INTO
+    // the control; the offsets put the TIP there, not the image's own corner.
+    const a = el('BUTTON', 0, 0);
+    const b = el('BUTTON', 0, 50); // right 40, bottom 70
+    allEls = [a, b];
+    install();
+    a.focus();
+    moveDpadFocus('down');
+    const style = padCursorStyle as Record<string, string>;
+    // right(40) - hotspotX(7) - inset(6) = 27 ; bottom(70) - hotspotY(2) - inset(6) = 62
+    expect(style.left).toBe('27px');
+    expect(style.top).toBe('62px');
+    expect(style.display).toBe('block');
   });
 
   it('hides the OS pointer while navigating and restores it on the way out', () => {
