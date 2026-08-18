@@ -46,6 +46,54 @@ function skinnedGltf(): { scene: THREE.Object3D; animations: THREE.AnimationClip
   return { scene: root, animations: [] };
 }
 
+/**
+ * The same rig plus the two mesh kinds a creature GLB also ships: a plain Mesh
+ * and an InstancedMesh. All three end up wearing the ONE shared ghost material,
+ * and three keys `instancing` and `skinning` into the program cache, so each
+ * kind is its own program. The production escape (2026-08-18, 93.9 s) was
+ * exactly these two: one plain and two instanced MeshBasicMaterial programs,
+ * 59.5 ms, linked inside a live frame.
+ */
+function mixedGltf(): { scene: THREE.Object3D; animations: THREE.AnimationClip[] } {
+  const { scene, animations } = skinnedGltf();
+  const plain = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial());
+  plain.name = 'horns';
+  scene.add(plain);
+  const instanced = new THREE.InstancedMesh(
+    new THREE.BoxGeometry(0.2, 0.2, 0.2),
+    new THREE.MeshStandardMaterial(),
+    4,
+  );
+  instanced.name = 'quills';
+  scene.add(instanced);
+  return { scene, animations };
+}
+
+/** Every drawable mesh under a root, the set a program is linked per. */
+function drawableMeshes(root: THREE.Object3D): THREE.Mesh[] {
+  const meshes: THREE.Mesh[] = [];
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh) meshes.push(mesh);
+  });
+  return meshes;
+}
+
+const SPAWN = {
+  model: WOLF,
+  path: 'rise',
+  atKind: 'caster',
+  x: 0,
+  y: 0,
+  z: 0,
+  dirX: 1,
+  dirZ: 0,
+  scale: 1,
+  dur: 1.5,
+  colorHex: 0xffffff,
+  dim: 1,
+} as const;
+
 interface PuppetProbe {
   puppets: Map<string, { root: THREE.Object3D; mat: THREE.Material; compiled: boolean }>;
   compileGroup: THREE.Group;
@@ -240,5 +288,95 @@ describe('the renderer host wiring', () => {
     const fx = readFileSync(new URL('../src/render/ability_vfx/fx.ts', import.meta.url), 'utf8');
     expect(fx).toContain('setSpiritCompileGate(gate: SpiritCompileGate | null): void {');
     expect(fx).toContain('this.spirits.setCompileGate(gate);');
+  });
+});
+
+describe('every material the puppet can draw goes through the gate', () => {
+  beforeEach(() => {
+    loadGltf.mockResolvedValue(mixedGltf());
+  });
+
+  it('hands the gate the plain and instanced arms, not just the skinned one', async () => {
+    const { pool, probe } = makePool();
+    const roots: THREE.Object3D[] = [];
+    pool.setCompileGate((root) => {
+      roots.push(root);
+      return new Promise(() => {});
+    });
+    await warmOnePuppet(pool, probe);
+    pool.update(1 / 60);
+
+    const puppet = probe.puppets.get(WOLF);
+    expect(puppet).toBeDefined();
+    if (!puppet) return;
+    expect(roots).toHaveLength(1);
+
+    const drawn = drawableMeshes(puppet.root);
+    const gated = drawableMeshes(roots[0]);
+    // The gate root IS the draw root, so no mesh kind can be left behind.
+    expect(gated).toEqual(drawn);
+    // Vacuity floor: all three kinds are present, each wearing the shared
+    // ghost material the first spawn draws with.
+    expect(drawn.length).toBe(3);
+    expect(drawn.filter((mesh) => (mesh as THREE.SkinnedMesh).isSkinnedMesh)).toHaveLength(1);
+    expect(drawn.filter((mesh) => (mesh as THREE.InstancedMesh).isInstancedMesh)).toHaveLength(1);
+    expect(drawn.every((mesh) => mesh.material === puppet.mat)).toBe(true);
+  });
+
+  it('refuses to show a puppet whose gate has not settled, and warms it next', async () => {
+    const { pool, probe } = makePool();
+    let settle: (() => void) | null = null;
+    pool.setCompileGate(
+      () =>
+        new Promise<void>((resolve) => {
+          settle = resolve;
+        }),
+    );
+    await warmOnePuppet(pool, probe);
+    const puppet = probe.puppets.get(WOLF);
+    expect(puppet).toBeDefined();
+    if (!puppet) return;
+
+    // Cast before the warm-up frame: the spirit layer is skipped rather than
+    // drawn cold, and nothing is put on stage.
+    expect(pool.spawn({ ...SPAWN })).toBe(false);
+    expect(pool.activeCount()).toBe(0);
+    expect(puppet.compiled).toBe(false);
+
+    pool.update(1 / 60);
+    expect(settle).not.toBeNull();
+    (settle as unknown as () => void)();
+    await Promise.resolve();
+    await Promise.resolve();
+    pool.update(1 / 60);
+
+    // Gated: the same cast now shows.
+    expect(puppet.compiled).toBe(true);
+    expect(pool.spawn({ ...SPAWN })).toBe(true);
+    expect(pool.activeCount()).toBe(1);
+  });
+
+  it('requeues an in-use puppet instead of dropping it off the warm-up queue', async () => {
+    // The no-gate host spawns immediately, so a puppet can be on stage when
+    // the queue reaches it. Dropping it there left every program it mounts to
+    // link on its next draw.
+    const { pool, probe } = makePool();
+    await warmOnePuppet(pool, probe);
+    expect(pool.spawn({ ...SPAWN })).toBe(true);
+
+    const roots: THREE.Object3D[] = [];
+    pool.setCompileGate((root) => {
+      roots.push(root);
+      return Promise.resolve();
+    });
+    pool.update(1 / 60);
+    expect(roots).toHaveLength(0);
+
+    // Released, and the queue still holds it: the next frame gates it.
+    for (let frame = 0; frame < 40; frame++) pool.update(0.1);
+    expect(pool.activeCount()).toBe(0);
+    pool.update(1 / 60);
+    expect(roots).toHaveLength(1);
+    expect(roots[0]).toBe(probe.puppets.get(WOLF)?.root);
   });
 });

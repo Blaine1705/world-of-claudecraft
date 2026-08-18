@@ -433,6 +433,21 @@ export class SpiritApparitions {
       return false;
     }
     if (puppet.inUse) return false;
+    // The gate's whole contract: a puppet is SHOWN only once EVERY material it
+    // mounts has been linked off-thread. A rig's plain and instanced meshes
+    // wear the same shared ghost material as its skinned ones, and each of
+    // those mesh kinds is its own program, so drawing an ungated puppet links
+    // them inside a combat frame (production 2026-08-18: three programs, 59.5
+    // ms, the run's only live escape). The spirit is ONE layer of a ceremony
+    // that plays without it (the caller still draws its ring, burst and light
+    // pulse), so a refused spawn is the same silent miss a model still in
+    // flight already takes, and the puppet goes to the front of the warm-up
+    // queue so the next cast has it. Hosts without a gate keep the historical
+    // one-frame visible compile pass and spawn immediately.
+    if (this.compileGate && !puppet.compiled) {
+      this.warmNext(puppet);
+      return false;
+    }
     let slot: SpiritSlot | null = null;
     for (const s of this.slots) {
       if (!s.active) {
@@ -558,7 +573,15 @@ export class SpiritApparitions {
     if (this.gateSettled && this.gateSettled === this.compiling) this.finishCompile();
     if (this.compiling) return;
     const next = this.compileQueue.pop();
-    if (!next || next.compiled || next.inUse) return;
+    if (!next || next.compiled) return;
+    if (next.inUse) {
+      // On stage without having been gated (a gate installed mid-session, or a
+      // release that has not run yet): requeue it, never drop it. A dropped
+      // puppet leaves the queue for good and every program it mounts links on
+      // its next draw, which is exactly what the gate exists to prevent.
+      this.compileQueue.unshift(next);
+      return;
+    }
     next.mat.opacity = 0;
     this.compileGroup.add(next.root);
     this.compiling = next;
@@ -573,6 +596,14 @@ export class SpiritApparitions {
     } catch {
       settle();
     }
+  }
+
+  /** Warm this puppet before the rest of the backlog (pop() takes the tail). */
+  private warmNext(puppet: SpiritPuppet): void {
+    const at = this.compileQueue.indexOf(puppet);
+    if (at < 0) return;
+    this.compileQueue.splice(at, 1);
+    this.compileQueue.push(puppet);
   }
 
   private finishCompile(): void {
