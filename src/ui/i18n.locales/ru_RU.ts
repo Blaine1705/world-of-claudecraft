@@ -7473,6 +7473,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.delve.moveCloserStairs': 'Подойдите ближе к лестнице.',
   'sim.delve.notInDelve': 'Вы не находитесь в вылазке.',
   'sim.delve.nothingHappens': 'Ничего не происходит.',
+  'sim.delve.enemiesRemain': 'Сначала расправьтесь с оставшимися врагами.',
   'sim.delve.passageSealed': 'Проход запечатан.',
   'sim.delve.raiseDead': '{name} начинает Поднятие мёртвых.',
   'sim.delve.runFailed': 'Вылазка {name} провалена.',
