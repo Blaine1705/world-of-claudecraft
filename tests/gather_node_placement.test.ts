@@ -1248,10 +1248,11 @@ describe('gather node placement: every node sits on ground a player can work', (
     const clearanceAt = (x: number, z: number) =>
       Math.hypot(x - grix.center.x, z - grix.center.z) - reach - REACH;
     // The shipped-then-moved spots, carried through the 2026-08 headland
-    // translation (-60,-24) so they keep their original offsets from Grix:
-    // both inside the scaled reach.
-    expect(clearanceAt(-159, -80)).toBeLessThan(0);
-    expect(clearanceAt(-136, -103)).toBeLessThan(0);
+    // translation (-60,-24) and then the phase 0b move to the Mirefen road
+    // (+110,+230) so they keep their original offsets from Grix: both inside
+    // the scaled reach.
+    expect(clearanceAt(-49, 150)).toBeLessThan(0);
+    expect(clearanceAt(-26, 127)).toBeLessThan(0);
     // Their replacements clear it with real margin.
     const five = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_5');
     const six = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_6');
@@ -1259,7 +1260,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     expect(six && clearanceAt(six.pos.x, six.pos.z)).toBeGreaterThan(0);
   });
 
-  it('the road band holds exactly the four deliberately-exempt nodes', () => {
+  it('the road band holds exactly the two deliberately-exempt nodes', () => {
     // The trailing comment at the bottom of this file explains why road clearance
     // is NOT an arm: generateDecorations screens world props at 5 yards from a
     // road, and four shipped nodes sit inside that, two of them the Copper Dig ore
@@ -1270,6 +1271,10 @@ describe('gather node placement: every node sits on ground a player can work', (
     // clearance rule; it is the record of who is exempt from one.
     // wood_mirefen_t2 left this set when R11 moved it off the road surface: it
     // was the one member whose exemption recorded a defect, not a decision.
+    // ore_eastbrook_1 and ore_eastbrook_3 left it with phase 0b of the New
+    // Eastbrook program: the relocated veins stand clear of the extended
+    // north road, so their old beside-the-mine-road exemption retired with
+    // the old road spur.
     const inBand = GATHER_NODES.filter(
       (n) =>
         (TUNED_ZONE_IDS as readonly string[]).includes(n.zoneId) &&
@@ -1277,12 +1282,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     )
       .map((n) => n.id)
       .sort();
-    expect(inBand).toEqual([
-      'herb_thornpeak_2',
-      'ore_eastbrook_1',
-      'ore_eastbrook_3',
-      'ore_mirefen_2',
-    ]);
+    expect(inBand).toEqual(['herb_thornpeak_2', 'ore_mirefen_2']);
   });
 
   it('the expansion-zone road band holds exactly the eight recorded exemptions', () => {

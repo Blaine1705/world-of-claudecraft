@@ -158,9 +158,25 @@ describe('generated chunk geometry is stable', () => {
     // x -63..41, z -148..-74 (the flatten rect plus its 8yd apron), the town
     // core reads byte-identical, and the largest move is 13.90 where the
     // stand tiers stood. An intended, looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('09e45c7a643439c1bbedd54066ae1ea6');
+    // Re-minted for phase 0b of the New Eastbrook program (the harbor-town
+    // plat, docs/design/eastbrook-revamp/master-plan.md): the southern basin
+    // coastline moves seaward on two new land lobes plus the town-plat level
+    // stamps, the interim dig headland reverts to open sea, and the whole
+    // Copper Dig cluster (level stamp, camp flattens, ore veins, road leg)
+    // re-lands northeast past the wolf runs. Localization checked on a 1yd
+    // lattice over x -220..70, z -220..220 at the production seed against a
+    // HEAD worktree: 50,002 of 128,331 points move, every one inside two
+    // disjoint windows: 35,688 in x -213..65, z -210..-14 (the basin plat and
+    // the reverted headland; the largest move anywhere is 15.21 where the new
+    // basin lobe lifts old seabed into shore at (-72,-153)) and 14,314 in
+    // x -104..40, z 81..207 (the new dig grade; largest move 8.85 where the
+    // level stamp cuts the rise at (-34,165)), the old town core near (0,-3)
+    // reads byte-identical, and nothing between the windows moves. Both
+    // digests move because the reverted headland straddles the rect edge at
+    // x = -180. An intended, looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('342a52345373e1e9035a249e3da88fcb');
     // The gap super-chunks take the same re-mint.
-    expect(digestOf(gapFill)).toBe('4df7ccbb3d29fffbec733ce0e95e31f9');
+    expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
 
     terrain.cancelStreaming();
   });

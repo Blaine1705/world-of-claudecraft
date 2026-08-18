@@ -57,7 +57,7 @@ describe('the continent derives the right border set', () => {
     // stadium (the New Eastbrook program demolition).
     expect(terrainRegionCandidateCountsAt(2, -2)).toEqual({
       appliers: 8,
-      camps: 16,
+      camps: 17,
       hubs: 1,
     });
   });

@@ -11,6 +11,7 @@ import {
 } from './castle_layout';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
+import { VALE_BAYS, VALE_LAND_LOBES } from './content/vale_coast';
 import {
   bgOriginAt,
   CAMPS,
@@ -1580,29 +1581,6 @@ function applyGaleCoast(x: number, z: number, h: number): number {
 // applier returns it untouched and every seed-pinned fixture keeps its exact
 // ground. Only the far edges (low landness) become shore and water.
 // ---------------------------------------------------------------------------
-const VALE_LAND_LOBES = [
-  { x: 0, z: 30, r: 128 }, // the heartland: the town, the roads, the fields
-  { x: 0, z: 155, r: 100 }, // the north reach to the Mirefen border
-  { x: -95, z: 170, r: 52 }, // ...its northwest fill (the border stays land)
-  { x: 95, z: 170, r: 52 }, // ...and northeast fill
-  { x: -168, z: 172, r: 42 }, // the northwest border corner
-  { x: 168, z: 172, r: 42 }, // the northeast border corner
-  { x: -100, z: 85, r: 70 }, // the western downs and Mirror Lake's shore
-  { x: -95, z: -55, r: 70 }, // the southwest pastures (Grix's tunnel)
-  { x: -138, z: -95, r: 58 }, // the dig headland: holds the relocated Copper Dig (New Eastbrook program)
-  { x: 45, z: -85, r: 84 }, // the south fields (the bandit camp)
-  { x: 108, z: -52, r: 60 }, // the southwest rise (mogger's hollow)
-  { x: 100, z: 70, r: 62 }, // the west meadows
-  { x: 60, z: 138, r: 55 }, // Brightwood Glade's north wood
-  { x: 150, z: -46, r: 44 }, // the west point: the causeway's mainland root
-] as const;
-const VALE_BAYS = [
-  { x: -192, z: 25, r: 60 }, // the west bay
-  { x: 30, z: -196, r: 66 }, // the south bay
-  { x: 196, z: 104, r: 56 }, // the east bay, north of the causeway
-  { x: -142, z: -152, r: 48 }, // the southwest cove
-  { x: 178, z: -128, r: 42 }, // the south cove, east of the point
-] as const;
 
 const VALE_LAND_FIELD = boundedBlobs(VALE_LAND_LOBES);
 const VALE_BAY_FIELD = boundedBlobs(VALE_BAYS);

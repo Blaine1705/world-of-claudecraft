@@ -23,24 +23,24 @@ describe('zone1 quest text direction (issue #2680)', () => {
     return camp?.center as { x: number; z: number };
   }
 
-  it('places the Copper Dig southeast of town (negative x, negative z)', () => {
+  it('places the Copper Dig northeast of town (negative x, positive z)', () => {
     const dig = poi('copper_dig');
     expect(dig.x).toBeLessThan(0); // -x is east
-    expect(dig.z).toBeLessThan(0); // south
+    expect(dig.z).toBeGreaterThan(0); // north
   });
 
   it("names the Copper Dig's real direction in Foreman Odell's quest text", () => {
     const quest = ZONE1_QUESTS.q_prof_intro;
     expect(quest, 'q_prof_intro should be registered').toBeTruthy();
-    expect(quest.text).toContain('Copper Dig, southeast of town');
-    expect(quest.text).not.toContain('Copper Dig, southwest of town');
+    expect(quest.text).toContain('Copper Dig, northeast of town');
+    expect(quest.text).not.toContain('Copper Dig, northwest of town');
     // Pin the RENDERED English too: the quest log reads the resolved i18n
     // table, not the content record directly, so a catalog override that
     // drifts from src/sim/content/zone1.ts would slip past a content-only
     // assertion (issue #2680 review, finding 1).
     const resolved = en.entities.quests.q_prof_intro.text;
-    expect(resolved).toContain('Copper Dig, southeast of town');
-    expect(resolved).not.toContain('Copper Dig, southwest of town');
+    expect(resolved).toContain('Copper Dig, northeast of town');
+    expect(resolved).not.toContain('Copper Dig, northwest of town');
   });
 
   it('places the Bandit Camp southwest of town (positive x, negative z)', () => {

@@ -231,6 +231,7 @@ import {
   COPPER_DIG_TERRAIN_EDITS,
   GRAVEYARD_POS,
   LAKE,
+  TOWN_PLAT_TERRAIN_EDITS,
   TOWN_RADIUS,
   ZONE1_CAMPS,
   ZONE1_CHAPEL_CAMPS,
@@ -471,7 +472,7 @@ export const CAMPS: CampDef[] = [
   ...ZONE3_CAMPS,
   ...TEMPLE_CAMPS,
   ...ZONE1_CHAPEL_CAMPS,
-  { mobId: 'grix_the_tunnelking', center: { x: -155, z: -102 }, radius: 4, count: 1 },
+  { mobId: 'grix_the_tunnelking', center: { x: -45, z: 128 }, radius: 4, count: 1 },
   // Veiled Hollow camps stay LAST for the same draw-order reason; the two
   // northern realms append after it in registration order.
   ...REALM_CAMPS,
@@ -717,7 +718,7 @@ export const BUILTIN_WORLD: WorldContent = {
   // invisible collision walls: the moderation cage plus the Last Keep's
   // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
   blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
-  terrainEdits: [...JAIL_TERRAIN_EDITS, ...COPPER_DIG_TERRAIN_EDITS],
+  terrainEdits: [...JAIL_TERRAIN_EDITS, ...COPPER_DIG_TERRAIN_EDITS, ...TOWN_PLAT_TERRAIN_EDITS],
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;

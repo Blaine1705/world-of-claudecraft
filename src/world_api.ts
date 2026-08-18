@@ -123,7 +123,11 @@ export type {
 // 7 = the New Eastbrook program's Copper Dig relocation to the dig headland
 // (new coast lobe, dig terrain stamp, moved camps/props/veins and colliders;
 // docs/design/eastbrook-revamp/master-plan.md).
-export const ONLINE_WORLD_LAYOUT_VERSION = 7 as const;
+// 8 = phase 0b of the same program: the dig headland reverts to open sea (the
+// ferry lane), the Copper Dig cluster moves northeast past Mirror Lake onto
+// the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
+// land where the Sowfield stood.
+export const ONLINE_WORLD_LAYOUT_VERSION = 8 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

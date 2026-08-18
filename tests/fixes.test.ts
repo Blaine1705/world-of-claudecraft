@@ -333,8 +333,8 @@ describe('terrain wall standoff', () => {
     expect(isBlocked(SEED, deeprockFar.x, deeprockFar.z, PLAYER_BODY_RADIUS)).toBe(false); // far past the 5yd mound radius
     // zone1 mine (-148, -92, rot 0.8), on the dig headland since the New
     // Eastbrook relocation (the mound offset math is unchanged):
-    expect(isBlocked(SEED, -150.44, -94.37, PLAYER_BODY_RADIUS)).toBe(true); // mound center
-    const zone1Far = mineMoundFar(-148, -92, 0.8);
+    expect(isBlocked(SEED, -40.44, 135.63, PLAYER_BODY_RADIUS)).toBe(true); // mound center
+    const zone1Far = mineMoundFar(-38, 138, 0.8);
     expect(isBlocked(SEED, zone1Far.x, zone1Far.z, PLAYER_BODY_RADIUS)).toBe(false); // far past the 5yd mound radius
   });
 

@@ -44,7 +44,7 @@ const WORD_CLAIM: Readonly<Record<string, { claims: readonly Component[]; domina
   west: { claims: ['west'], dominant: true },
   western: { claims: ['west'], dominant: true },
   eastern: { claims: ['east'], dominant: true },
-  southeast: { claims: ['south', 'east'], dominant: false },
+  northeast: { claims: ['north', 'east'], dominant: false },
   southwest: { claims: ['south', 'west'], dominant: false },
 };
 
@@ -100,12 +100,13 @@ const VALE = 'eastbrook_vale';
 const PEAKS = 'thornpeak_heights';
 
 const ROWS: readonly CompassRow[] = [
-  // "There are ore veins in the rocks around the Copper Dig, southeast of
-  // town": anchored on town, as the sentence says, and pointed at the POI it
-  // names (src/sim/content/zone1.ts, ZONE1_ZONE.pois copper_dig).
+  // "There are ore veins in the rocks around the Copper Dig, northeast of
+  // town past the wolf runs": anchored on town, as the sentence says, and
+  // pointed at the POI it names (src/sim/content/zone1.ts, ZONE1_ZONE.pois
+  // copper_dig; moved northeast in phase 0b of the New Eastbrook program).
   {
     id: 'q_prof_intro',
-    word: 'southeast',
+    word: 'northeast',
     from: hub(VALE),
     to: poi(VALE, 'copper_dig'),
     target: 'the copper_dig POI',
@@ -276,7 +277,7 @@ describe('quest direction words match the world (the compass-truth guard)', () =
     expect(words.has('west') || words.has('western')).toBe(true);
     expect(words.has('eastern')).toBe(true);
     expect(words.has('southwest')).toBe(true);
-    expect(words.has('southeast')).toBe(true);
+    expect(words.has('northeast')).toBe(true);
     const dxs = ROWS.map((r) => r.to.x - r.from.x);
     expect(dxs.some((dx) => dx > 0)).toBe(true);
     expect(dxs.some((dx) => dx < 0)).toBe(true);

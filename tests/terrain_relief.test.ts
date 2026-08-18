@@ -60,7 +60,12 @@ describe('the calm field keeps graded features on their exact classic terrain', 
   // to full float precision; a drift here means a road, camp pad, or graded
   // bench no longer stands on the terrain it was built against.
   const goldens: [string, number, number, number][] = [
-    ['vale road', 0, 160, -3.3480606337549164],
+    // The road pin moved from (0,160) with phase 0b of the New Eastbrook
+    // program: the Copper Dig's level stamp (r 64 from (-32,144)) and the
+    // relocated kobold camp's flatten skirt now re-grade the road there on
+    // purpose; (0,80) is the same road, calm exactly 0, clear of every
+    // authored layer.
+    ['vale road', 0, 80, -1.4539035084008747],
     ['peaks road', -98, 727, 10.139872348652359],
     ['marsh road', 20, 470, -1.769678368869094],
     ['frost road', -73, 1696, 13.619770689175878],
