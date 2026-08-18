@@ -437,7 +437,7 @@ export const guideStrings = {
     advancedBody:
       'You do not have to pick Advanced to see the detail dials. The Graphics panel always shows them, in two cards: World Detail holds Terrain Detail, Foliage Density, Surface Detail, View Distance, Water Quality, and Character Detail, and Lighting & Effects holds Effects & Lighting, Shadow Quality, Ambient Occlusion, Bloom, Anti-Aliasing, Dynamic Lights, and Particle Effects. Under a fixed preset each dial shows roughly where that preset sits.',
     advancedMixes:
-      'Two favorite mixes: keep Shadow Quality high and set Effects & Lighting to Low for a crisp, glow-free look that runs light, or do the reverse to keep the bloom and soften the shadows. One thing to know before you mix: Ambient Occlusion, Bloom, and Anti-Aliasing ride the same chain as Effects & Lighting, so with that dial on Low they have nothing to run on.',
+      'Two favorite mixes: keep Shadow Quality high and set Effects & Lighting to Low for a crisp, glow-free look that runs light, or do the reverse to keep the bloom and soften the shadows. One thing to know before you mix: Ambient Occlusion and Bloom ride the same chain as Effects & Lighting, so with that dial on Low they have nothing to run on. Anti-Aliasing survives that mix, on a cheaper edge filter built into the final image pass.',
     tableHeading: 'Every graphics option, explained',
     colSetting: 'Setting',
     colDoes: 'What it does',
@@ -2809,10 +2809,10 @@ export const guideStrings = {
     ench: {
       disenchantHeading: 'Disenchanting',
       disenchantNote:
-        'Disenchanting takes any weapon or armor piece of common quality or better and consumes one copy, taking a plain copy before an enchanted one; when only enchanted copies remain, one of those is destroyed, enchant and all. Common and uncommon pieces mill down into a rolled handful of Chime Dust, a little richer for rarer and higher-level pieces; from rare up the yield changes shape, exactly one Chime Essence from a rare piece or one Chime Shard from an epic or legendary one, plus a typed secondary keyed to what the piece was made of.',
+        'Disenchanting takes any weapon, armor, or held off-hand piece (an orb, quiver, or the like) of common quality or better and consumes one copy, taking a plain copy before an enchanted one; when only enchanted copies remain, one of those is destroyed, enchant and all. Common and uncommon pieces mill down into a rolled handful of Chime Dust, a little richer for rarer and higher-level pieces; from rare up the yield changes shape, exactly one Chime Essence from a rare piece or one Chime Shard from an epic or legendary one, plus a typed secondary keyed to what the piece was made of.',
       typedHeading: 'Typed secondaries',
       typedNote:
-        'The typed secondaries follow the material: cloth armor yields Resonant Thread, leather Resonant Hide, mail Resonant Links, melee weapons Resonant Steel, and staves, wands, bows, and crossbows Resonant Timber. A rare piece gives exactly {rare}; an epic or legendary piece gives {epicMin} or {epicMax}. Rings and necklaces have no armor class, so they yield only the primary material.\n\nMind the fine print: the Resonant secondaries bind on trade, so each can change hands exactly once, straight from the breaker to the enchanter who will burn it. Dust, Essence, and Shards carry no such string and move like any other trade good.',
+        'The typed secondaries follow the material: cloth armor yields Resonant Thread, leather Resonant Hide, mail Resonant Links, melee weapons Resonant Steel, and staves, wands, bows, and crossbows Resonant Timber. A rare piece gives exactly {rare}; an epic or legendary piece gives {epicMin} or {epicMax}. Rings, necklaces, and held off-hands have no armor class or weapon family, so they yield only the primary material.\n\nMind the fine print: the Resonant secondaries bind on trade, so each can change hands exactly once, straight from the breaker to the enchanter who will burn it. Dust, Essence, and Shards carry no such string and move like any other trade good.',
       colSource: 'Broken from',
       meleeWeapons: 'Melee weapons',
       timberWeapons: 'Staves, wands, bows, and crossbows',
@@ -2830,7 +2830,7 @@ export const guideStrings = {
       },
       salvageHeading: 'Salvage',
       salvageNote:
-        'Salvage is the everyman cousin of disenchanting: the same weapons and armor, no skill required and none gained, returning plain crafting scrap by quality instead of anything arcane. Anyone can do it, enchanter or not. When you hold a piece worth breaking, the choice is simple: from rare up, disenchanting is strictly the better deal, while at common the two yields vendor for about the same, so break toward whichever material you actually need.',
+        'Salvage is the everyman cousin of disenchanting: the same weapons, armor, and held off-hands, no skill required and none gained, returning plain crafting scrap by quality instead of anything arcane. Anyone can do it, enchanter or not. When you hold a piece worth breaking, the choice is simple: from rare up, disenchanting is strictly the better deal, while at common the two yields vendor for about the same, so break toward whichever material you actually need.',
       bonusFmt: '+{value} {stat}',
       // #2825 correction, as a NEW key: enchant_offhand_stamina ships, so the
       // retired enchantsNote's "every armor slot except the off hand" now

@@ -14,6 +14,12 @@ export interface HudPreviewPrewarmDeps<Pose> {
   cardPoses: readonly Pose[];
   /** Forwarded verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
   includeCharFamily: boolean;
+  /** Forwarded verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
+  warmCharSkins: boolean;
+  /** Forwarded verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
+  includeCardPoses: boolean;
+  /** Forwarded verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
+  portraitFramings: readonly ('headshot' | 'body')[];
   renderCharShell: () => void;
   prewarmCharSkin: (skin: number) => void | Promise<void>;
   prewarmCardPose: (pose: Pose) => void | Promise<void>;
@@ -29,6 +35,9 @@ export function buildHudPreviewPrewarmUnits<Pose>(
     skinCount,
     cardPoses: deps.cardPoses,
     includeCharFamily: deps.includeCharFamily,
+    warmCharSkins: deps.warmCharSkins,
+    includeCardPoses: deps.includeCardPoses,
+    portraitFramings: deps.portraitFramings,
     renderCharShell: deps.renderCharShell,
     prewarmCharSkin: deps.prewarmCharSkin,
     prewarmCardPose: deps.prewarmCardPose,

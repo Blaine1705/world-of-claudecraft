@@ -7494,6 +7494,7 @@ export const sv_SE: EnTranslations = {
       "shopMarksRequired": "Du behöver {marks} Fördjupningsmärken för att köpa {name}.",
       "shopSealPremiumOnly": "Detta sigill ger vika endast för en mästares hand. Endast Premium-insatsen kan öppna det.",
       "passageSealed": "Passagen är förseglad.",
+      "enemiesRemain": "Besegra de återstående fienderna först.",
       "moveCloserPassage": "Gå närmare passagen.",
       "moveCloserChest": "Gå närmare kistan.",
       "moveCloserReliquary": "Gå närmare relikvariet.",
@@ -10303,7 +10304,7 @@ export const sv_SE: EnTranslations = {
       },
       "fear": {
         "name": "Plåga",
-        "description": "Slår skräck i fienden och får den att huka sig i upp till 8 sek. All skada bryter effekten."
+        "description": "Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten."
       },
       "searing_pain": {
         "name": "Sveda",
@@ -10549,7 +10550,7 @@ export const sv_SE: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Märker en fiende i 12 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 meter och skapar 1 Själfragment."
+        "description": "Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10648,8 +10649,8 @@ export const sv_SE: EnTranslations = {
         "description": "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)"
       },
       "feral_charge": {
-        "name": "Vild rusning",
-        "description": "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)"
+        "name": "Urvåg",
+        "description": "Släpp lös en urvåg. I Vargform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)"
       },
       "swiftmend": {
         "name": "Snabb läkning",
@@ -10905,7 +10906,7 @@ export const sv_SE: EnTranslations = {
       },
       "evocation": {
         "name": "Eterbrunn",
-        "description": "Restaura mana rápidamente. (magikertalang)"
+        "description": "Kanalisera i 6 sek.: varje sekund återställer ni 100 mana och bygger upp 8 besvärjelsekraft. Bonusen staplas under kanaliseringen och varar i 15 sek. (magikertalang)"
       },
       "flurry_of_knives": {
         "name": "Knivstorm",
@@ -10933,11 +10934,11 @@ export const sv_SE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Skräckyl",
-        "description": "Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)"
+        "description": "Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)"
       },
       "ice_block": {
         "name": "Kall kista",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)"
+        "description": "Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)"
       },
       "inner_focus": {
         "name": "Stillat sinne",
@@ -11029,7 +11030,7 @@ export const sv_SE: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Rusande sinne",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)"
+        "description": "Gör er nästa besvärjelse med kasttid omedelbar. Varar i 60 sek. (magikertalang)"
       },
       "psychic_scream": {
         "name": "Psykiskt skrik",
@@ -13548,6 +13549,15 @@ export const sv_SE: EnTranslations = {
       },
       "training_dummy": {
         "name": "Träningsdocka"
+      },
+      "friendly_player_dummy": {
+        "name": "Friendly Player Dummy"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal Boss Dummy"
+      },
+      "heroic_boss_dummy": {
+        "name": "Heroic Boss Dummy"
       },
       "ridge_stalker": {
         "name": "Åssmygare"

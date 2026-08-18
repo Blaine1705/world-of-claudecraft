@@ -7494,6 +7494,7 @@ export const zh_TW: EnTranslations = {
       "shopMarksRequired": "購買 {name} 需要 {marks} 枚秘探印記。",
       "shopSealPremiumOnly": "此封印只向大師之手屈服，唯有上等投入方能開啟。",
       "passageSealed": "通道被封住了。",
+      "enemiesRemain": "先清除剩餘的敵人。",
       "moveCloserPassage": "再靠近通道一些。",
       "moveCloserChest": "再靠近寶箱一些。",
       "moveCloserReliquary": "再靠近聖物匣一些。",
@@ -10303,7 +10304,7 @@ export const zh_TW: EnTranslations = {
       },
       "fear": {
         "name": "折魂",
-        "description": "使敵人陷入恐懼並畏縮，最多持續 8 秒。任何傷害都會打破效果。"
+        "description": "使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",
@@ -10549,7 +10550,7 @@ export const zh_TW: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "骸骨印記",
-        "description": "為敵人標記12秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。"
+        "description": "為敵人標記15秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。"
       },
       "unholy_command": {
         "name": "邪穢號令",
@@ -10648,8 +10649,8 @@ export const zh_TW: EnTranslations = {
         "description": "進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）"
       },
       "feral_charge": {
-        "name": "野性衝鋒",
-        "description": "衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）"
+        "name": "原始湧動",
+        "description": "釋放一股原始湧動。狼形態下，能量恢復速度提高100%，持續10秒。巨熊形態下，立即產生50點怒氣。（野性專精招牌）"
       },
       "swiftmend": {
         "name": "迅癒",
@@ -10905,7 +10906,7 @@ export const zh_TW: EnTranslations = {
       },
       "evocation": {
         "name": "乙太之井",
-        "description": "快速恢復法力。（法師天賦）"
+        "description": "引導6秒：每秒恢復100點法力並獲得8點法術強度，效果在引導期間疊加並持續15秒。（法師天賦）"
       },
       "flurry_of_knives": {
         "name": "刀刃亂舞",
@@ -10933,11 +10934,11 @@ export const zh_TW: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐懼嚎叫",
-        "description": "使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）"
+        "description": "使附近的敵人恐懼，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破其恐懼。（術士天賦）"
       },
       "ice_block": {
         "name": "寒冰棺",
-        "description": "將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）"
+        "description": "將你封入堅冰8秒，使你免疫所有傷害。移除已存在的一般有害效果，並阻止新的一般控制效果施加於你。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）"
       },
       "inner_focus": {
         "name": "靜心",
@@ -13548,6 +13549,15 @@ export const zh_TW: EnTranslations = {
       },
       "training_dummy": {
         "name": "訓練假人"
+      },
+      "friendly_player_dummy": {
+        "name": "友方玩家假人"
+      },
+      "normal_boss_dummy": {
+        "name": "普通首領假人"
+      },
+      "heroic_boss_dummy": {
+        "name": "英雄首領假人"
       },
       "ridge_stalker": {
         "name": "山脊潛獵者"

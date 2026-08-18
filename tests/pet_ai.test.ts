@@ -321,6 +321,43 @@ describe('pet proximity pull: a pet drags idle wild mobs like its owner', () => 
     expect(mob.aggroTargetId).toBe(pet.id);
     expect(mob.aiState).not.toBe('idle');
   });
+
+  it('does not pull a quest-gated mob for a non-questing owner, but does once questing', () => {
+    // Same proximity pull (pullNearbyMobs -> ctx.aggroMob(m, pet, true)), stamped with
+    // a quest-gated template (the Broodmother egg): the pet-driven pull path shares
+    // aggroMob with the player idle scan, so it must share the quest gate too.
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const egg = wildHostile(sim, [pet.id]);
+    egg.templateId = 'spider_egg';
+    egg.level = 10;
+    pet.level = 1;
+    egg.aiState = 'idle';
+    egg.aggroTargetId = null;
+    egg.inCombat = false;
+    // Owner kept close (unlike the sibling test above): two updatePet calls run here,
+    // and an owner left "implausibly far" triggers petFollow's teleport-to-owner
+    // recovery on the first call, yanking the pet away before the second assertion.
+    place(owner, 100, 100);
+    place(pet, 100, 100);
+    place(egg, 103, 100);
+    sim.rebucket(pet);
+    sim.rebucket(egg);
+    sim.rebucket(owner);
+
+    updatePet(sim.ctx, pet);
+    expect(egg.aggroTargetId).toBeNull();
+    expect(egg.aiState).toBe('idle');
+
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    updatePet(sim.ctx, pet);
+    expect(egg.aggroTargetId).toBe(pet.id);
+    expect(egg.aiState).not.toBe('idle');
+  });
 });
 
 // petPickTarget now iterates the spatial grid within PET_ASSIST_RANGE instead of the

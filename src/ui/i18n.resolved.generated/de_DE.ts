@@ -7494,6 +7494,7 @@ export const de_DE: EnTranslations = {
       "shopMarksRequired": "Du benötigst {marks} Tiefgang-Marken, um {name} zu kaufen.",
       "shopSealPremiumOnly": "Dieses Siegel weicht nur der Hand eines Meisters: Nur der Erlesene Einsatz kann es öffnen.",
       "passageSealed": "Der Durchgang ist versiegelt.",
+      "enemiesRemain": "Erledige zuerst die verbleibenden Gegner.",
       "moveCloserPassage": "Geh näher an den Durchgang heran.",
       "moveCloserChest": "Geh näher an die Truhe heran.",
       "moveCloserReliquary": "Geh näher an das Reliquiar heran.",
@@ -10303,7 +10304,7 @@ export const de_DE: EnTranslations = {
       },
       "fear": {
         "name": "Heimsuchung",
-        "description": "Versetzt den Gegner in Schrecken und lässt ihn bis zu 8 Sek. lang kauern. Jeder Schaden bricht den Effekt."
+        "description": "Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit des Ziels bricht den Effekt."
       },
       "searing_pain": {
         "name": "Versengen",
@@ -10549,7 +10550,7 @@ export const de_DE: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Markiert einen Gegner 12 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 m und erschafft 1 Seelenfragment."
+        "description": "Markiert einen Gegner 15 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 Metern und erschafft 1 Seelenfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10648,8 +10649,8 @@ export const de_DE: EnTranslations = {
         "description": "Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)"
       },
       "feral_charge": {
-        "name": "Wilde Attacke",
-        "description": "Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)"
+        "name": "Urwoge",
+        "description": "Entfesselt eine Urwoge. In Wolfsgestalt wird Eure Energieregeneration 10 Sek. lang um 100% erhöht. In Bruin-Gestalt erhaltet Ihr sofort 50 Wut. (Wildheits-Signatur)"
       },
       "swiftmend": {
         "name": "Rasche Heilung",
@@ -10905,7 +10906,7 @@ export const de_DE: EnTranslations = {
       },
       "evocation": {
         "name": "Ätherbrunnen",
-        "description": "Restaura Mana rápidamente. (Magier-Talent)"
+        "description": "Kanalisiert 6 Sek. lang: Jede Sekunde werden 100 Mana wiederhergestellt und 8 Zaubermacht aufgebaut. Der Bonus ist während des Kanalisierens stapelbar und hält 15 Sek. lang an. (Magier-Talent)"
       },
       "flurry_of_knives": {
         "name": "Messerhagel",
@@ -10933,11 +10934,11 @@ export const de_DE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Schreckensheulen",
-        "description": "Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Hexenmeistertalent)"
+        "description": "Versetzt Gegner in der Nähe bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)"
       },
       "ice_block": {
         "name": "Kalter Sarg",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 Sek.. (Magier-Talent)"
+        "description": "Schließt Euch 8 Sek. lang in festes Eis ein und macht Euch gegen jeglichen Schaden immun. Entfernt bestehende gewöhnliche schädliche Effekte und verhindert neue gewöhnliche Kontroll-Effekte. Kann während Betäubung oder Verwandlung eingesetzt werden. Ihr könnt währenddessen nicht handeln. Erneut wirken, um den Effekt abzubrechen. (Magier)"
       },
       "inner_focus": {
         "name": "Stiller Geist",
@@ -11029,7 +11030,7 @@ export const de_DE: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Rasender Geist",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 Sek.. (Magier-Talent)"
+        "description": "Macht Euren nächsten Zauber mit Zauberzeit zu einem Spontanzauber. Hält 60 Sek. lang an. (Magier-Talent)"
       },
       "psychic_scream": {
         "name": "Schreckensschrei",
@@ -13548,6 +13549,15 @@ export const de_DE: EnTranslations = {
       },
       "training_dummy": {
         "name": "Trainingspuppe"
+      },
+      "friendly_player_dummy": {
+        "name": "Friendly Player Dummy"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal Boss Dummy"
+      },
+      "heroic_boss_dummy": {
+        "name": "Heroic Boss Dummy"
       },
       "ridge_stalker": {
         "name": "Gratpirscher"

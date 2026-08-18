@@ -61,7 +61,13 @@ const MONOLITHS: MonolithRow[] = [
     // (its row went to 19488 there), and the merged file here lands at exactly
     // 19170. Re-derived from the merged tree, not taken from either side,
     // keeping the zero-headroom posture: the next line added fails.
-    ceiling: 19170,
+    // Re-pinned 19170 -> 19069 at the third v0.39.0 sync merge (release tip
+    // b650d9d7d2): the release extracted abilityEffectText into
+    // ability_description.ts and this branch's preview_prewarm_wiring.ts
+    // absorbed the login prewarm trim's flags, so the merged file landed
+    // SMALLER than either side (release row 19387). Exact merged count, zero
+    // headroom: the next line added fails.
+    ceiling: 19069,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -82,10 +88,46 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
+    // Lowered again after extracting the delve interior build-cache scheduling
+    // (the position-keyed rebuild/retire decision plus the async build loop)
+    // into src/render/delve_interior_tracker.ts.
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging the delve tracker and prewarm work plus the release-owned
+    // weapon-skin identity repair leaves renderer.ts at the exact count below;
+    // any further growth reds again.
+    // Raised +38 for the vfx.mount-programs manifest entry (#2571: mounts had
+    // ZERO prewarm coverage, so the first sighting of any mount could freeze a
+    // live frame, worse on hardware without KHR_parallel_shader_compile where
+    // the runtime fallback gate is a no-op). The rig-building logic itself was
+    // extracted to src/render/mount_prewarm.ts; this was the coordinator's
+    // unavoidable thin-wiring cost (the manifest entry, its group bookkeeping,
+    // and cleanup/hide registration).
+    // Raised a further +34 (13792 -> 13826) in review response: the group-
+    // staging/scene-bookkeeping logic that first cut left inline here (and
+    // that inline copy is what hid the bug, an `Object3D.add` reparent that
+    // silently detached every staged rig from its group) moved into
+    // mount_prewarm.ts's stageMountPrewarmVisual too, but run() also grew
+    // real synchronous-desktop-path work plus an honest progress() (the
+    // entry's run() was previously a no-op that still reported 'completed'),
+    // and resumeUnits now links the shadow-depth program half it was missing.
+    // What remains is the manifest entry itself, the shared
+    // mountPrewarmGroup/mountPrewarmWarmed variables, and cleanup/hide
+    // registration: exactly the seam this ratchet exists to bound, not grow
+    // unchecked.
+    // Merging PR #3447 onto the corrected PR #3446 v0.39 wrapper leaves the
+    // renderer below this bound; any further growth reds again.
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
+    // keeps the delve tracker and mount prewarm extractions while preserving
+    // the wrapper's later renderer wiring, so the ceiling is the exact
+    // resolved count.
+    // PR #3468 changes the shadow-depth prewarm material contract, but this
+    // wrapper's combined renderer remains at the same resolved count.
+    ceiling: 13744,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -97,16 +139,23 @@ const MONOLITHS: MonolithRow[] = [
     // service placements in the sim; still under the release's own 12660.
     // Re-pinned again to the exact merged size after the v0.39.0 sync merge
     // (release-side growth only; the branch's own delegates are unchanged).
+    // Re-pinned 12508 -> 12527 at the third v0.39.0 sync merge (release tip
+    // b650d9d7d2): release-side growth only again (practice dummies, the
+    // delve finale gate); the branch's delegates are unchanged and the merged
+    // file stays under the release's own 12660 row. Exact merged count.
     file: 'src/sim/sim.ts',
-    ceiling: 12508,
+    ceiling: 12527,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
     // Lowered to the exact size after the Claudium checkout error ladder
     // moved into src/ui/wallet_bridge_reason_text.ts (the ratchet only works
     // if it tightens with every real extraction).
+    // Re-pinned 11486 -> 11493 at the third v0.39.0 sync merge (release tip
+    // b650d9d7d2): release-side growth only (its own row went to 11490); the
+    // branch's main.ts lines are unchanged. Exact merged count, zero headroom.
     file: 'src/main.ts',
-    ceiling: 11486,
+    ceiling: 11493,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -142,7 +191,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4150,
+    ceiling: 4147,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

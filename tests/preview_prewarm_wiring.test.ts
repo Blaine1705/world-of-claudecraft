@@ -20,12 +20,28 @@ type Calls = {
   poses: string[];
 };
 
-function makeDeps(includeCharFamily: boolean, playerClass: 'warrior' | 'paladin' = 'warrior') {
+type PlanFlags = {
+  warmCharSkins?: boolean;
+  includeCardPoses?: boolean;
+  portraitFramings?: readonly ('headshot' | 'body')[];
+};
+
+// The wiring suite exercises the FULL plan by default (both framings, skins and
+// poses on) so the routing pins stay decisive; the login-trim flags are pinned
+// separately below as pure pass-throughs.
+function makeDeps(
+  includeCharFamily: boolean,
+  playerClass: 'warrior' | 'paladin' = 'warrior',
+  flags: PlanFlags = {},
+) {
   const calls: Calls = { shell: 0, skins: [], poses: [] };
   const units = buildHudPreviewPrewarmUnits<string>({
     playerClass,
     cardPoses: ['poseA', 'poseB'],
     includeCharFamily,
+    warmCharSkins: flags.warmCharSkins ?? true,
+    includeCardPoses: flags.includeCardPoses ?? true,
+    portraitFramings: flags.portraitFramings ?? ['headshot', 'body'],
     renderCharShell: () => {
       calls.shell++;
     },
@@ -88,6 +104,25 @@ describe('buildHudPreviewPrewarmUnits', () => {
     expect(calls.skins).toEqual(
       Array.from({ length: skinCount('player_paladin') }, (_, index) => index),
     );
+  });
+
+  it('forwards the login-trim flags verbatim (skins, poses, framings)', () => {
+    const { calls, units } = makeDeps(true, 'warrior', {
+      warmCharSkins: false,
+      includeCardPoses: false,
+      portraitFramings: ['headshot'],
+    });
+    for (const u of units) u.run();
+    // The shell still builds (includeCharFamily), but no skin or pose unit rides
+    // it, and only the headshot framing reaches the portrait prewarm.
+    expect(calls.shell).toBe(1);
+    expect(calls.skins).toEqual([]);
+    expect(calls.poses).toEqual([]);
+    const framings = new Set(vi.mocked(prewarmPlayerPortrait).mock.calls.map((c) => c[2]));
+    expect([...framings]).toEqual(['headshot']);
+    let expected = 0;
+    for (const cls of ALL_CLASSES) expected += skinCount(`player_${cls}`);
+    expect(vi.mocked(prewarmPlayerPortrait).mock.calls.length).toBe(expected);
   });
 
   it('excludes the char-family units when includeCharFamily is false', () => {
