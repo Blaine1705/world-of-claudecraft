@@ -24,6 +24,7 @@ import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
 import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
+import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
 import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
 
@@ -1409,7 +1410,9 @@ export class AbilityVfx {
         }
       }
     }
-    if (glowStrength > 0) fx.bodyGlow(e.id, glowColor, glowStrength, glowSlow);
+    if (glowStrength > 0 && ignivarAllowsBodyGlow(e.templateId, e.castingAbility)) {
+      fx.bodyGlow(e.id, glowColor, glowStrength, glowSlow);
+    }
     this.latchHeldState(held, e);
   }
 

@@ -70,6 +70,14 @@ export function ignivarEncounterViewVisibleDuringCompile(
   return templateId === IGNIVAR_BOSS_ID || !compilePending;
 }
 
+/** Ignivar's authored rig and flames stay readable without a generic body tint while casting. */
+export function ignivarAllowsBodyGlow(
+  templateId: string | undefined,
+  castingAbility: string | null,
+): boolean {
+  return templateId !== IGNIVAR_BOSS_ID || castingAbility === null;
+}
+
 function cuePulse(progress: number, start: number, end: number): number {
   if (progress <= start || progress >= end) return 0;
   const phase = (progress - start) / (end - start);

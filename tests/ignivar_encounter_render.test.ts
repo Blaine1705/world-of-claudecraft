@@ -69,6 +69,7 @@ import {
   IGNIVAR_FORGE_WAVE_CAST_ID,
   IGNIVAR_FRONTAL_CAST_ID,
   IGNIVAR_JUDGMENT_CAST_ID,
+  IGNIVAR_LAST_INFERNO_AURA_ID,
   IGNIVAR_ROTATING_RAYS_ACTIVE_SECONDS,
   IGNIVAR_ROTATING_RAYS_CAST_ID,
   IGNIVAR_SKYFIRE_CAST_ID,
@@ -290,13 +291,14 @@ describe('Ignivar encounter renderer', () => {
     expect(abilityVfxFullSpecFor(IGNIVAR_SKYFIRE_CAST_ID)?.linger).toBeUndefined();
   });
 
-  it('drives the frontal vortex and body glow from the live cast state', () => {
+  it('keeps every cast windup without tinting Ignivar or changing other casters', () => {
     const windup = vi.fn().mockReturnValue(true);
     const bodyGlow = vi.fn();
     const fx = {
       setDelegates: vi.fn(),
       windup,
       bodyGlow,
+      orbit: vi.fn().mockReturnValue(false),
     } as unknown as AbilityVfxFx;
     const painter = new AbilityVfx(
       {
@@ -318,17 +320,51 @@ describe('Ignivar encounter renderer', () => {
       () => 1,
     );
 
+    for (const [index, castingAbility] of [
+      IGNIVAR_FRONTAL_CAST_ID,
+      IGNIVAR_SKYFIRE_CAST_ID,
+      IGNIVAR_FORGE_WAVE_CAST_ID,
+      IGNIVAR_JUDGMENT_CAST_ID,
+    ].entries()) {
+      painter.syncEntity({
+        id: 77 + index,
+        templateId: IGNIVAR_BOSS_ID,
+        castingAbility,
+        castRemaining: 1.5,
+        castTotal: 3,
+        auras: index === 0 ? [{ id: IGNIVAR_LAST_INFERNO_AURA_ID }] : [],
+        kind: 'mob',
+      });
+    }
+
+    expect(windup).toHaveBeenNthCalledWith(1, 77, 0xff4a12, 0.5, 'vortex', false);
+    expect(windup).toHaveBeenCalledTimes(4);
+    expect(bodyGlow).not.toHaveBeenCalled();
+
     painter.syncEntity({
-      id: 77,
-      castingAbility: IGNIVAR_FRONTAL_CAST_ID,
+      id: 81,
+      templateId: 'other_boss',
+      castingAbility: 'fireball',
       castRemaining: 1.5,
       castTotal: 3,
       auras: [],
       kind: 'mob',
     });
 
-    expect(windup).toHaveBeenCalledWith(77, 0xff4a12, 0.5, 'vortex', false);
-    expect(bodyGlow).toHaveBeenCalledWith(77, 0xff7a24, 1.92, false);
+    expect(bodyGlow).toHaveBeenCalledTimes(1);
+
+    painter.syncEntity({
+      id: 82,
+      templateId: IGNIVAR_BOSS_ID,
+      castingAbility: null,
+      castRemaining: 0,
+      castTotal: 0,
+      auras: [{ id: IGNIVAR_LAST_INFERNO_AURA_ID }],
+      kind: 'mob',
+    });
+
+    expect(bodyGlow).toHaveBeenCalledTimes(2);
+    expect(bodyGlow).toHaveBeenLastCalledWith(82, expect.any(Number), expect.any(Number), false);
   });
 
   it('authors Forge Wave as a powerful fire release without closing its safe gaps', () => {
