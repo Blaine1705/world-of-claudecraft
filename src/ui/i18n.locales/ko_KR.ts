@@ -8689,7 +8689,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '해당 플레이어가 $WOC 결제를 받으려면 먼저 지갑을 연결해야 합니다.',
   'apiError.woc_market.self_offer': '자신에게 $WOC 제안을 보낼 수 없습니다.',
   'apiError.woc_market.offer_expired': '해당 $WOC 제안이 만료되었습니다. 새로 요청하세요.',
-  'apiError.woc_market.terms_required': '계속하려면 거래소 정산 약관에 동의하세요.',
+  'apiError.woc_market.terms_required': '계속하려면 마켓 약관에 동의하세요.',
   'apiError.woc_market.totp_required':
     '이 금액에는 2단계 인증이 필요합니다. 계정 설정에서 활성화한 뒤 코드를 입력하세요.',
   'apiError.woc_market.totp_invalid': '2단계 인증 코드를 확인할 수 없습니다. 다시 시도하세요.',
@@ -8709,7 +8709,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지갑의 $WOC가 이 입찰과 보증금을 감당하기에 부족합니다.',
   'apiError.woc_market.quote_unavailable':
     '지금은 가격 견적을 발급할 수 없습니다. 잠시 후 다시 시도하세요.',
-  'apiError.woc_market.quote_expired': '해당 견적이 만료되었습니다. 새 견적을 요청하세요.',
+  'apiError.woc_market.quote_expired': '해당 견적이 만료되었습니다. 새 견적을 요청하세요. 새 견적이 제공되지 않으면 해당 결제 기간이 이미 종료된 것입니다.',
   'apiError.woc_market.not_pending': '해당 입찰은 더 이상 보증금을 기다리는 상태가 아닙니다.',
   'apiError.woc_market.confirm_failed':
     '트랜잭션을 확인할 수 없습니다. 새 견적을 받아 다시 시도하세요.',
@@ -8719,7 +8719,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.item_locked':
     '해당 아이템은 잠겨 있습니다. 판매하기 전에 가방에서 잠금을 해제하세요.',
   'apiError.woc_market.item_mismatch':
-    '구매자가 동의한 아이템과 일치하지 않습니다. 거래를 새로 시작하세요.',
+    '구매자가 동의한 바로 그 아이템이 아니거나 상태가 변경되었습니다(잠금도 포함됩니다). 거래를 새로 시작하세요.',
   'apiError.woc_market.offer_pending':
     '이 플레이어와 진행 중인 거래가 이미 있습니다. 먼저 해결하세요.',
   'apiError.woc_market.bond_window_closed':
@@ -8762,10 +8762,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loadFailed': '거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.wocMarket.disabledRealm': '이 서버에서는 $WOC 거래소를 이용할 수 없습니다.',
   'hudChrome.wocMarket.pausedBanner':
-    '$WOC 가격이 복구될 때까지 거래가 일시 중지됩니다. 경매 카운트다운은 계속되며, 가격이 정상화될 때까지 어떤 판매도 성사되지 않습니다.',
+    '$WOC 가격이 복구될 때까지 거래가 일시 중지됩니다. 경매 카운트다운은 계속됩니다. 새 입찰과 결제는 가격이 정상화될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.',
   'hudChrome.wocMarket.walletBanner':
     '지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.',
-  'hudChrome.wocMarket.rateNote': '현재 환율: 1 USD당 약 {tokens} $WOC ({time} 기준).',
+  'hudChrome.wocMarket.rateNote': '현재 환율: 1 USD당 약 {tokens} $WOC (거래소 최신 체결 가격, {time} 기준).',
   'hudChrome.wocMarket.estimateNote':
     '현재 환율로 약 {tokens} $WOC. 최종 수량은 결제를 요청할 때 확정됩니다.',
   'hudChrome.wocMarket.browseEmpty': '지금은 등록된 물품이 없습니다. 나중에 다시 확인하세요.',
@@ -8838,7 +8838,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementFailConfirmingOverdue': '이 결제는 확인이 너무 오래 걸려 검토 중입니다.',
   'hudChrome.wocMarket.settlementDeadlineNote':
     '낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.',
-  'hudChrome.wocMarket.termsLabel': '가변 토큰 정산 약관에 동의합니다.',
+  'hudChrome.wocMarket.termsLabel': '마켓 약관에 동의합니다.',
   'hudChrome.wocMarket.quoteTitle': '결제 확인',
   'hudChrome.wocMarket.quoteTotal': '합계: {tokens} $WOC',
   'hudChrome.wocMarket.quoteSeller': '판매자 수령액: {tokens} $WOC',
@@ -8901,7 +8901,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellSubmit': '아이템 등록',
   'hudChrome.wocMarket.sellSubmitAria': '{item}을(를) 거래소에 등록',
   'hudChrome.wocMarket.sellFeeNote':
-    '판매 완료 시 10% 수수료가 부과됩니다. 90%는 판매자에게, 3%는 소각, 7%는 트레저리로 갑니다. 대금은 정산 트랜잭션으로 연동된 지갑에 바로 도착합니다.',
+    '판매 완료 시 약 10% 수수료가 부과됩니다. 3%는 소각, 7%는 트레저리로 가며, 각각 올림으로 계산되고 판매자는 그 나머지 정확한 금액(약 90%)을 받습니다. 대금은 정산 트랜잭션으로 연동된 지갑에 바로 도착합니다.',
   'hudChrome.wocMarket.activityListings': '내 등록',
   'hudChrome.wocMarket.activityBids': '내 입찰',
   'hudChrome.wocMarket.activitySettlements': '내 정산',

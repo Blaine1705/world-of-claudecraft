@@ -453,6 +453,10 @@ export default defineConfig({
       // the prod reverse-proxy route (nginx /wiki -> :8080). Needs the container
       // up: `docker compose up -d mediawiki mediawiki-db`.
       '/wiki': { target: 'http://127.0.0.1:8080', changeOrigin: true },
+      // The Marketplace consent links (trade arm + Exchange) point at /terms,
+      // served by the game server: proxy it so the compliance affordance is
+      // exercisable in the normal dev loop instead of 404ing on :5173.
+      '/terms': { target: apiProxyTarget, changeOrigin: true },
     },
   },
   build: {

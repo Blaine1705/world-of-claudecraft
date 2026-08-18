@@ -628,6 +628,10 @@ same file), and each module's header carries its own contract.
   trade arm's consent row (`trade_woc_panel.ts`) each name the Marketplace terms,
   link them (`/terms`), and send the player's REAL choice; the R9 hard-coded
   `acceptTerms: true` posture is closed (`docs/woc-marketplace-hardening/state.md`).
+  CAVEAT the code cannot show: the deployed `public/terms.html` does not yet carry
+  its Marketplace section (the draft lives at the repo root), so the link points at
+  a page missing the terms being accepted until the pre-enable Terms publication
+  lands (owned by the packet's close-out audit; the market ships config-off).
 - **woc_store_view.ts** (+ **char_skin_window.ts**, **armory_inspect.ts**,
   **armory_labels.ts**, **store_promo_card.ts**, **preview_prewarm_core.ts**): the WOC Store
   and Season 1 Armory. The pure projection reads the skin catalog

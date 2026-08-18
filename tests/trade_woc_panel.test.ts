@@ -10,10 +10,12 @@
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
+import { captureFocusKey } from '../src/ui/focus_restore';
 import { wocOfferPhase } from '../src/ui/hud/woc_trade/woc_trade_offer_view';
 import { t } from '../src/ui/i18n';
 import {
   refreshWocTradeArm,
+  restoreWocTradeFocus,
   type WocTradePanelDeps,
   wireWocTradeArm,
   wocTradeArmHtml,
@@ -1064,5 +1066,100 @@ describe('the consent row and the quote review (R9 + informed commitment)', () =
       }),
     );
     expect(root.querySelector('[data-woc-sign]')).toBeNull();
+  });
+});
+
+describe('the QA round faces: pressed Pay, expired Sign, keyed controls', () => {
+  const escrowed = {
+    id: 7,
+    usdCents: 100,
+    tokens: 7812.5,
+    role: 'buyer' as const,
+    phase: 'awaiting_payment' as const,
+    listingId: 41,
+    buyerAccepted: true,
+    sellerAccepted: true,
+  };
+  const quote: { totalTokens: number | null; usdCents: number; expiresAtMs: number | null } = {
+    totalTokens: 5000,
+    usdCents: 100,
+    expiresAtMs: 1_000,
+  };
+
+  it('disables the pressed Pay button and spins while the claim round trips', () => {
+    const busy = paint(deps({ pendingOffer: escrowed, paying: true }));
+    const btn = busy.querySelector<HTMLButtonElement>('[data-woc-pay]');
+    expect(btn?.disabled).toBe(true);
+    expect(btn?.querySelector('.trade-woc-spinner')).not.toBeNull();
+    const idle = paint(deps({ pendingOffer: escrowed }));
+    const idleBtn = idle.querySelector<HTMLButtonElement>('[data-woc-pay]');
+    expect(idleBtn?.disabled).toBe(false);
+    expect(idleBtn?.querySelector('.trade-woc-spinner')).toBeNull();
+  });
+
+  it('the claim in flight makes the model busy; an idle wait does not', () => {
+    expect(wocTradeModelFrom(deps({ pendingOffer: escrowed, paying: true })).busy).toBe(true);
+    expect(wocTradeModelFrom(deps({ pendingOffer: escrowed })).busy).toBe(false);
+  });
+
+  it('quoteExpired needs a real lapse: an absent clock or expiry never fires it', () => {
+    const at = (nowMs?: number, q = quote) =>
+      wocTradeModelFrom(deps({ pendingOffer: escrowed, quote: q, nowMs })).quoteExpired;
+    expect(at(2_000)).toBe(true);
+    expect(at(500)).toBe(false);
+    expect(at(undefined)).toBe(false);
+    expect(at(2_000, { ...quote, expiresAtMs: null })).toBe(false);
+  });
+
+  it('renders Sign disabled once the staged quote lapsed at paint time', () => {
+    const lapsed = paint(deps({ pendingOffer: escrowed, quote, nowMs: 2_000 }));
+    expect(lapsed.querySelector<HTMLButtonElement>('[data-woc-sign]')?.disabled).toBe(true);
+    const live = paint(deps({ pendingOffer: escrowed, quote, nowMs: 500 }));
+    expect(live.querySelector<HTMLButtonElement>('[data-woc-sign]')?.disabled).toBe(false);
+  });
+
+  it('keys every actionable control so a rebuild cannot drop focus to body', () => {
+    const has = (root: HTMLElement, sel: string): void => {
+      expect(root.querySelector(sel), sel).not.toBeNull();
+    };
+    const compose = paint(deps({ termsAccepted: false }));
+    has(compose, '[data-woc-send][data-focus-key="trade-woc-send"]');
+    has(compose, '[data-woc-terms][data-focus-key="trade-woc-terms"]');
+    const pay = paint(deps({ pendingOffer: escrowed }));
+    has(pay, '[data-woc-pay][data-focus-key="trade-woc-pay"]');
+    const seller = paint(deps({ pendingOffer: { ...escrowed, role: 'seller' as const } }));
+    has(seller, '[data-woc-cancel-sale][data-focus-key="trade-woc-cancel-sale"]');
+    const reviewBuyer = paint(
+      deps({ pendingOffer: { ...escrowed, phase: 'review' as const, listingId: null } }),
+    );
+    has(reviewBuyer, '[data-woc-cancel][data-focus-key="trade-woc-withdraw"]');
+    const reviewSeller = paint(
+      deps({
+        pendingOffer: {
+          ...escrowed,
+          phase: 'review' as const,
+          listingId: null,
+          role: 'seller' as const,
+        },
+      }),
+    );
+    has(reviewSeller, '[data-woc-decline][data-focus-key="trade-woc-decline"]');
+    const quoteFace = paint(
+      deps({ pendingOffer: escrowed, quote: { ...quote, expiresAtMs: null } }),
+    );
+    has(quoteFace, '[data-woc-sign][data-focus-key="trade-woc-sign"]');
+    has(quoteFace, '[data-woc-quote-cancel][data-focus-key="trade-woc-quote-cancel"]');
+  });
+
+  it('carries the consent checkbox focus across a rebuild', () => {
+    const d = deps({ termsAccepted: false, pendingOffer: escrowed });
+    const root = paint(d);
+    document.body.appendChild(root);
+    root.querySelector<HTMLInputElement>('[data-woc-terms]')?.focus();
+    const key = captureFocusKey(root);
+    expect(key).toBe('trade-woc-terms');
+    root.innerHTML = wocTradeArmHtml(wocTradeModelFrom(d), d.usdCents);
+    restoreWocTradeFocus(root, key);
+    expect(document.activeElement?.hasAttribute('data-woc-terms')).toBe(true);
   });
 });

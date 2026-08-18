@@ -965,7 +965,7 @@ export class WocMarketWindow {
       ? ''
       : `<label class="wm-terms"><input type="checkbox" data-field="accept-terms" data-focus-key="wm-terms" ${this.acceptTerms ? 'checked' : ''} /> ${esc(
           t('hudChrome.wocMarket.termsLabel'),
-        )}</label> <a class="wm-terms-link" href="/terms" target="_blank" rel="noopener">${esc(
+        )}</label> <a class="wm-terms-link" href="/terms" target="_blank" rel="noopener noreferrer">${esc(
           t('hudChrome.wocMarket.termsLink'),
         )}</a>`;
     return termsRow;

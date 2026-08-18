@@ -8717,7 +8717,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.self_offer': '自分自身に $WOC のオファーを送ることはできません。',
   'apiError.woc_market.offer_expired':
     'その $WOC オファーは期限切れです。新しいものを依頼してください。',
-  'apiError.woc_market.terms_required': '続行するには取引所の決済条件に同意してください。',
+  'apiError.woc_market.terms_required': '続行するにはマーケット利用規約に同意してください。',
   'apiError.woc_market.totp_required':
     'この金額には二要素認証が必要です。アカウント設定で有効にしてからコードを入力してください。',
   'apiError.woc_market.totp_invalid':
@@ -8739,7 +8739,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.quote_unavailable':
     '現在、価格見積もりを発行できません。しばらくしてからもう一度お試しください。',
   'apiError.woc_market.quote_expired':
-    'その見積もりは期限切れです。新しい見積もりを取得してください。',
+    'その見積もりは期限切れです。新しい見積もりを取得してください。取得できない場合、その支払い期間はすでに終了しています。',
   'apiError.woc_market.not_pending': 'その入札はもう保証金を待っている状態ではありません。',
   'apiError.woc_market.confirm_failed':
     'トランザクションを確認できませんでした。新しい見積もりを取得して、もう一度お試しください。',
@@ -8749,7 +8749,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.item_locked':
     'そのアイテムはロックされています。売る前にバッグでロックを解除してください。',
   'apiError.woc_market.item_mismatch':
-    '買い手が同意したアイテムと一致しません。改めて取引をやり直してください。',
+    '買い手が同意したその現物と一致しないか、状態が変化しています（ロックも含まれます）。改めて取引をやり直してください。',
   'apiError.woc_market.offer_pending':
     'このプレイヤーとの取引がすでに進行中です。先にそちらを解決してください。',
   'apiError.woc_market.bond_window_closed':
@@ -8795,10 +8795,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '取引所に接続できませんでした。しばらくしてからもう一度お試しください。',
   'hudChrome.wocMarket.disabledRealm': 'このレルムでは $WOC 取引所を利用できません。',
   'hudChrome.wocMarket.pausedBanner':
-    '$WOC の価格情報が回復するまで取引は一時停止中です。オークションのカウントダウンは続行され、価格が健全に戻るまで決済は行われません。',
+    '$WOC の価格情報が回復するまで取引は一時停止中です。オークションのカウントダウンは続行されます。新しい入札と支払いは価格が健全に戻るまで待機になりますが、すでに送信された支払いはそのまま決済されます。',
   'hudChrome.wocMarket.walletBanner':
     'ウォレットを連携して認証すると、取引所で入札、購入、出品ができます。',
-  'hudChrome.wocMarket.rateNote': '現在のレート: 1 USD あたり約 {tokens} $WOC（{time} 時点）。',
+  'hudChrome.wocMarket.rateNote': '現在のレート: 1 USD あたり約 {tokens} $WOC（取引所の最新の約定価格、{time} 時点）。',
   'hudChrome.wocMarket.estimateNote':
     '現在のレートで約 {tokens} $WOC。最終的な数量は支払いを要求した時点で確定します。',
   'hudChrome.wocMarket.browseEmpty': '現在出品はありません。また後で確認してください。',
@@ -8870,7 +8870,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementFailConfirmingOverdue': 'この支払いは確認に時間がかかりすぎたため、審査中です。',
   'hudChrome.wocMarket.settlementDeadlineNote':
     '落札した場合、オークション終了後 {duration} 以内に支払う必要があります。',
-  'hudChrome.wocMarket.termsLabel': '変動トークン決済の条件に同意します。',
+  'hudChrome.wocMarket.termsLabel': 'マーケット利用規約に同意します。',
   'hudChrome.wocMarket.quoteTitle': '支払いの確認',
   'hudChrome.wocMarket.quoteTotal': '合計: {tokens} $WOC',
   'hudChrome.wocMarket.quoteSeller': '出品者の受取额: {tokens} $WOC',
@@ -8935,7 +8935,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellSubmit': '出品する',
   'hudChrome.wocMarket.sellSubmitAria': '{item} を取引所に出品する',
   'hudChrome.wocMarket.sellFeeNote':
-    '売買成立時に 10% の手数料がかかります。90% はあなたへ、3% はバーン、7% はトレジャリーへ。売上は決済トランザクションで直接あなたの連携ウォレットに届きます。',
+    '売買成立時に約 10% の手数料がかかります。3% はバーン、7% はトレジャリーへ、いずれも切り上げで差し引かれ、あなたはその残額（約 90%）を正確に受け取ります。売上は決済トランザクションで直接あなたの連携ウォレットに届きます。',
   'hudChrome.wocMarket.activityListings': '自分の出品',
   'hudChrome.wocMarket.activityBids': '自分の入札',
   'hudChrome.wocMarket.activitySettlements': '自分の決済',

@@ -60,6 +60,11 @@ export interface WocTradePanelDeps {
   termsChecked?: boolean;
   /** The staged settlement quote awaiting the buyer's explicit sign-off. */
   quote?: { totalTokens: number | null; usdCents: number; expiresAtMs: number | null } | null;
+  /** True while the Pay claim (buyNow + quote) is in flight, so the pressed
+   *  button goes disabled immediately rather than two round trips later. */
+  paying?: boolean;
+  /** Paint-time clock, for the staged quote's expiry face only. */
+  nowMs?: number;
   pendingOffer: WocPendingOffer | null;
   onModeChange(mode: 'gold' | 'woc'): void;
   onPriceInput(usdCents: number | null): void;
@@ -126,6 +131,8 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     termsAccepted: deps.termsAccepted,
     termsChecked: deps.termsChecked,
     quote: deps.quote,
+    paying: deps.paying,
+    nowMs: deps.nowMs,
     pendingOffer: deps.pendingOffer,
     goldOffered: deps.goldCopper > 0 || deps.partnerGoldCopper > 0,
     walletTokens: deps.walletTokens,
@@ -143,10 +150,10 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   // (R9). Rendered only where the model says a terms-gated send is on
   // screen; checked state is controller-held so it survives rebuilds.
   const termsRow = model.showTerms
-    ? `<label class="trade-woc-terms"><input type="checkbox" data-woc-terms${
+    ? `<label class="trade-woc-terms"><input type="checkbox" data-woc-terms data-focus-key="trade-woc-terms"${
         model.termsChecked ? ' checked' : ''
       } /> ${esc(t('hudChrome.trade.woc.termsLabel'))}</label>
-      <a class="trade-woc-terms-link" href="/terms" target="_blank" rel="noopener">${esc(
+      <a class="trade-woc-terms-link" href="/terms" target="_blank" rel="noopener noreferrer">${esc(
         t('hudChrome.wocMarket.termsLink'),
       )}</a>`
     : '';
@@ -215,16 +222,16 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
                 }),
               )}</p>`;
         return `<div class="trade-woc-arm">${modeTabs}
-          <p>${esc(t('hudChrome.wocMarket.quoteTitle'))}</p>
+          <p role="status">${esc(t('hudChrome.wocMarket.quoteTitle'))}</p>
           <p>${esc(t('hudChrome.trade.woc.payNow', { usd: usd(q.usdCents) }))}</p>
           ${total}
           ${quoteExpiry}
           <p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>
           ${termsRow}
-          <button type="button" class="btn trade-woc-pay" data-woc-sign>${esc(
-            t('hudChrome.wocMarket.quoteSign'),
-          )}</button>
-          <button type="button" class="btn trade-woc-cancel" data-woc-quote-cancel>${esc(
+          <button type="button" class="btn trade-woc-pay" data-woc-sign data-focus-key="trade-woc-sign"${
+            model.quoteExpired ? ' disabled' : ''
+          }>${esc(t('hudChrome.wocMarket.quoteSign'))}</button>
+          <button type="button" class="btn trade-woc-cancel" data-woc-quote-cancel data-focus-key="trade-woc-quote-cancel">${esc(
             t('hudChrome.wocMarket.quoteCancel'),
           )}</button>
           <p class="trade-woc-hint" data-woc-hint role="status"></p>
@@ -232,15 +239,17 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
       }
       const body =
         model.canPay && o.role === 'buyer'
-          ? `${termsRow}<button type="button" class="btn trade-woc-pay" data-woc-pay>${esc(
-              t('hudChrome.trade.woc.payNow', { usd: usd(o.usdCents) }),
-            )}</button>`
+          ? `${termsRow}<button type="button" class="btn trade-woc-pay" data-woc-pay data-focus-key="trade-woc-pay"${
+              model.busy ? ' disabled' : ''
+            }>${
+              model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
+            }${esc(t('hudChrome.trade.woc.payNow', { usd: usd(o.usdCents) }))}</button>`
           : `<p class="trade-woc-waiting" role="status">${
               model.busy ? '<span class="trade-woc-spinner" aria-hidden="true"></span>' : ''
             }${esc(t(model.statusKey ?? 'hudChrome.trade.woc.awaitingPayment'))}</p>`;
       const cancelSale =
         o.role === 'seller' && o.phase === 'awaiting_payment'
-          ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel-sale>${esc(
+          ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel-sale data-focus-key="trade-woc-cancel-sale">${esc(
               t('hudChrome.trade.woc.cancelSale'),
             )}</button>`
           : '';
@@ -257,8 +266,8 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     // wiring, now live).
     const action =
       o.role === 'buyer'
-        ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
-        : `<button type="button" class="btn trade-woc-cancel" data-woc-decline>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
+        ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel data-focus-key="trade-woc-withdraw">${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
+        : `<button type="button" class="btn trade-woc-cancel" data-woc-decline data-focus-key="trade-woc-decline">${esc(t('hudChrome.trade.woc.decline'))}</button>`;
     // The offer is not open-ended, so say when it lapses; static text on
     // purpose (a per-second countdown would rebuild the subtree for no
     // decision the player can take differently).
@@ -290,7 +299,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.variableWarning'))}</p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
     ${termsRow}
-    <button type="button" class="btn trade-woc-send" data-woc-send>${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
+    <button type="button" class="btn trade-woc-send" data-woc-send data-focus-key="trade-woc-send">${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
     <p class="trade-woc-hint" data-woc-hint role="status"></p>
   </div>`;
 }

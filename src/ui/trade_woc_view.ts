@@ -180,6 +180,12 @@ export interface WocTradeInput {
    * from click to wallet with nothing showing the token total or expiry.
    */
   quote?: { totalTokens: number | null; usdCents: number; expiresAtMs: number | null } | null;
+  /** True while the Pay claim (buyNow + quote) round trips: the pressed Pay
+   *  button must go disabled immediately, not when the quote lands. */
+  paying?: boolean;
+  /** Paint-time clock for the staged quote's expiry face. Absent means the
+   *  face never shows expired (the sign handler still guards the click). */
+  nowMs?: number;
   /**
    * The VERIFIED wallet's $WOC balance, or null when it is not known.
    *
@@ -266,6 +272,11 @@ export interface WocTradeModel {
     usdCents: number;
     expiresAtMs: number | null;
   } | null;
+  /** True once the staged quote's deadline passed at paint time: Sign renders
+   *  disabled. The click handler re-checks the clock either way (a face
+   *  painted before the lapse keeps its enabled button until a repaint), so
+   *  this is the honest face, not the guard. */
+  quoteExpired: boolean;
   /** Whether "Send offer" may be pressed. */
   canSend: boolean;
   /** The i18n key explaining why it may not, or null when it may. */
@@ -537,6 +548,10 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
       (input.pendingOffer.phase === 'awaiting_payment' || input.pendingOffer.phase === 'paying')
         ? input.quote
         : null,
+    quoteExpired:
+      input.quote?.expiresAtMs != null &&
+      input.nowMs != null &&
+      input.nowMs > input.quote.expiresAtMs,
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
@@ -557,7 +572,9 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
           : (STATUS_KEYS[`${input.pendingOffer.phase}:${input.pendingOffer.role}`] ?? null),
     // Only the payment itself spins. Waiting on the other player to press a
     // button is not progress and must not look like it, or every wait reads as
-    // "something is happening" and the player never knows when to act.
-    busy: input.pendingOffer?.phase === 'paying',
+    // "something is happening" and the player never knows when to act. The
+    // claim round trips (buyNow + quote) count as the payment: the pressed
+    // Pay button must stop looking pressable immediately, not two RTTs later.
+    busy: input.pendingOffer?.phase === 'paying' || input.paying === true,
   };
 }

@@ -64,6 +64,13 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
  *  is invisible while two players are talking. */
 const WOC_TRADE_OFFER_POLL_MS = 2000;
 
+/** The honest line for each way a deal can die without a sale. */
+const WOC_TRADE_CLOSED_KEYS: Record<WocOfferClosedReason, TranslationKey> = {
+  cancelled: 'hudChrome.trade.woc.closedCancelled',
+  suspended: 'hudChrome.trade.woc.closedSuspended',
+  unpaid: 'hudChrome.trade.woc.closedUnpaid',
+};
+
 /** The host capabilities the controller borrows from Hud, per the domain
  *  contract (narrow closures, never the Hud class). */
 export interface WocTradeControllerDeps {
@@ -220,6 +227,15 @@ export class WocTradeController {
       termsAccepted: this.wocTradeTermsAccepted,
       termsChecked: this.wocTradeTermsChecked,
       quote: this.wocTradeQuote,
+      // The claim round trips (buyNow + quote) in flight: the Pay button
+      // must stop looking pressable the moment it is pressed, not when the
+      // quote lands two RTTs later.
+      paying: this.wocTradePaying,
+      // Paint-time clock for the staged quote's expiry face. Deliberately
+      // NOT in the repaint signature: the face goes disabled on the next
+      // repaint after lapse, and the sign handler re-checks at the click,
+      // which is the load-bearing guard.
+      nowMs: Date.now(),
       onModeChange: (mode) => {
         this.wocTradeMode = mode;
         this.lastTradeSig = '';
@@ -379,12 +395,7 @@ export class WocTradeController {
     if (this.wocTradeFinished.has(row.id)) return;
     this.wocTradeFinished.add(row.id);
     const reason = wocOfferClosedReason(row) ?? 'unpaid';
-    const CLOSED_KEYS: Record<WocOfferClosedReason, TranslationKey> = {
-      cancelled: 'hudChrome.trade.woc.closedCancelled',
-      suspended: 'hudChrome.trade.woc.closedSuspended',
-      unpaid: 'hudChrome.trade.woc.closedUnpaid',
-    };
-    this.log(t(CLOSED_KEYS[reason]), '#ff6b6b');
+    this.log(t(WOC_TRADE_CLOSED_KEYS[reason]), '#ff6b6b');
     this.wocTradeOffer = null;
     this.wocTradeSplit = null;
     this.wocTradeQuote = null;
@@ -669,6 +680,16 @@ export class WocTradeController {
     const staged = this.wocTradeQuote;
     const settlementId = this.wocTradeSettlementId;
     if (!hooks || !offer || staged === null || settlementId === null || this.wocTradePaying) {
+      return;
+    }
+    // A lapsed quote must never reach the wallet: signing it buys a refusal
+    // at best, and the wallet prompt would be the first the buyer hears of
+    // the lapse. Spend the stale quote here and send them back to Pay, which
+    // re-quotes against the settlement they already hold (no second buyNow).
+    if (staged.expiresAtMs !== null && Date.now() > staged.expiresAtMs) {
+      this.wocTradeQuote = null;
+      this.lastTradeSig = '';
+      this.log(userFacingApiError({ code: 'woc_market.quote_expired' }), '#ff6b6b');
       return;
     }
     this.wocTradePaying = true;
@@ -976,9 +997,20 @@ export class WocTradeController {
       this.wocTradeOffer,
       // The staged quote review and the consent row's visibility are both
       // structural render state; the CHECKBOX state is deliberately absent
-      // (toggling must not rebuild the subtree under the click).
-      this.wocTradeQuote,
+      // (toggling must not rebuild the subtree under the click). The quote
+      // rides as a STRUCTURAL PROJECTION: transactionBase64 and reference
+      // render nowhere, and serializing a whole transaction blob on every
+      // medium-band pass buys no repaint the projected fields do not.
+      this.wocTradeQuote === null
+        ? null
+        : [
+            this.wocTradeQuote.totalTokens,
+            this.wocTradeQuote.usdCents,
+            this.wocTradeQuote.expiresAtMs,
+          ],
       this.wocTradeTermsAccepted,
+      // The Pay claim in flight disables the button, so it is render state.
+      this.wocTradePaying,
       // The seller's step-up round trip changes the Accept button (Waiting +
       // disabled), so it must invalidate the signature or the pending face is
       // elided and the button reads Accept through the whole wallet handoff.

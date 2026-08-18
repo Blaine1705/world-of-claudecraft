@@ -2044,3 +2044,81 @@ describe('review-round closures: the arms the first audit found unpinned', () =>
     expect(c.wocTradeOffer?.settlementState, 'the answer rides the held offer').toBe('confirmed');
   });
 });
+
+describe('a lapsed staged quote never reaches the wallet', () => {
+  it('sign refuses it at the click, spends it, and says why', async () => {
+    const h = fakeHooks();
+    let confirms = 0;
+    h.state.confirmSettlementImpl = () => {
+      confirms += 1;
+      return Promise.resolve({ ok: true, state: 'settled' });
+    };
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      wocTradeQuote: unknown;
+      wocTradeSettlementId: number | null;
+      signWocTradeQuote(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    c.wocTradeSettlementId = 5;
+    c.wocTradeQuote = {
+      totalTokens: 5,
+      usdCents: 100,
+      expiresAtMs: Date.now() - 1_000,
+      reference: 'dev_woc_1',
+      transactionBase64: 'dHg=',
+    };
+    await c.signWocTradeQuote();
+    expect(c.wocTradeQuote, 'the stale quote is spent, not signed').toBeNull();
+    expect(h.state.calls.signAndSends, 'the wallet never opens').toEqual([]);
+    expect(confirms, 'no confirm rides a refused sign').toBe(0);
+    expect(r.host.logs).toContain(t('apiError.woc_market.quote_expired'));
+    // The held deal is untouched: Pay re-quotes against the same settlement.
+    expect(c.wocTradeOffer?.phase).toBe('awaiting_payment');
+    expect(c.wocTradeSettlementId).toBe(5);
+  });
+
+  it('a live quote still signs (the guard reads the clock, not the field)', async () => {
+    const h = fakeHooks();
+    h.state.buyNowImpl = () => Promise.resolve({ ok: true, settlement: { id: 5 }, quote: null });
+    h.state.settlementQuoteImpl = () =>
+      Promise.resolve({
+        ok: true,
+        quote: {
+          reference: 'dev_woc_1',
+          transactionBase64: 'dHg=',
+          signatureRequired: false,
+          amount: null,
+          seller: null,
+          burn: null,
+          treasury: null,
+          bondCents: null,
+          expiresAtMs: Date.now() + 60_000,
+        },
+      });
+    h.state.confirmSettlementImpl = () => Promise.resolve({ ok: true, state: 'settled' });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as {
+      wocTradeOffer: WocPendingOffer | null;
+      payWocTradeOffer(): Promise<void>;
+      signWocTradeQuote(): Promise<void>;
+    };
+    c.wocTradeOffer = heldOffer({
+      role: 'buyer',
+      phase: 'awaiting_payment',
+      listingId: 41,
+      buyerAccepted: true,
+      sellerAccepted: true,
+    });
+    await c.payWocTradeOffer();
+    await c.signWocTradeQuote();
+    expect(r.host.logs).toContain(t('hudChrome.trade.woc.settled'));
+  });
+});

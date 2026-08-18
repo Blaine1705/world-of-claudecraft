@@ -3105,9 +3105,20 @@
     min-height: 40px;
   }
   /* A checkbox cannot be 40px without looking broken, so the LABEL is the tap
-     target (clicking it toggles the box) and the label is what gets the floor. */
+     target (clicking it toggles the box) and the label is what gets the floor.
+     The trade arm's consent row is the same control on the other money
+     surface, so it gets the same floor; the terms links beside both are the
+     smallest money-surface tap targets and get an inline-flex floor of their
+     own (a bare inline anchor cannot honour min-height). */
   body.mobile-touch #woc-market-window label.wm-terms,
-  body.mobile-touch #woc-market-window label.wm-offer-next {
+  body.mobile-touch #woc-market-window label.wm-offer-next,
+  body.mobile-touch #trade-window .trade-woc-terms {
+    min-height: 40px;
+  }
+  body.mobile-touch #woc-market-window .wm-terms-link,
+  body.mobile-touch #trade-window .trade-woc-terms-link {
+    display: inline-flex;
+    align-items: center;
     min-height: 40px;
   }
   /* The combobox parts the desktop sheet sizes by padding alone. The options are
@@ -3122,7 +3133,8 @@
     max-height: 40vh;
   }
   body.mobile-touch #woc-market-window label.wm-terms input,
-  body.mobile-touch #woc-market-window label.wm-offer-next input {
+  body.mobile-touch #woc-market-window label.wm-offer-next input,
+  body.mobile-touch #trade-window .trade-woc-terms input {
     width: 24px;
     height: 24px;
   }

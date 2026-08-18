@@ -8843,7 +8843,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.recipient_wallet_required': 'Этот игрок должен подключить кошелёк, прежде чем сможет принимать платежи в $WOC.',
   'apiError.woc_market.self_offer': 'Нельзя отправить предложение $WOC самому себе.',
   'apiError.woc_market.offer_expired': 'Это предложение $WOC истекло. Запросите новое.',
-  'apiError.woc_market.terms_required': 'Чтобы продолжить, примите условия расчётов биржи.',
+  'apiError.woc_market.terms_required': 'Чтобы продолжить, примите условия Торговой площадки.',
   'apiError.woc_market.totp_required':
     'Для этой суммы требуется двухфакторная аутентификация. Включите её в настройках аккаунта и введите код.',
   'apiError.woc_market.totp_invalid':
@@ -8866,7 +8866,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'В вашем кошельке недостаточно $WOC для этой ставки и её залога.',
   'apiError.woc_market.quote_unavailable':
     'Сейчас не удалось получить котировку. Попробуйте чуть позже.',
-  'apiError.woc_market.quote_expired': 'Эта котировка истекла. Запросите новую.',
+  'apiError.woc_market.quote_expired': 'Эта котировка истекла. Запросите новую; если новая не предлагается, это окно уже закрылось.',
   'apiError.woc_market.not_pending': 'Эта ставка больше не ожидает залога.',
   'apiError.woc_market.confirm_failed':
     'Не удалось подтвердить транзакцию. Запросите новую котировку и повторите попытку.',
@@ -8876,7 +8876,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.item_locked':
     'Этот предмет заблокирован. Снимите блокировку в сумке, прежде чем продавать его.',
   'apiError.woc_market.item_mismatch':
-    'Это не тот предмет, на который согласился покупатель. Начните новую сделку.',
+    'Это не тот самый экземпляр, на который согласился покупатель, либо его состояние изменилось (блокировка тоже считается). Начните новую сделку.',
   'apiError.woc_market.offer_pending':
     'У вас уже есть незавершённая сделка с этим игроком. Сначала завершите её.',
   'apiError.woc_market.bond_window_closed':
@@ -8920,11 +8920,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loadFailed': 'Не удалось связаться с биржей. Попробуйте чуть позже.',
   'hudChrome.wocMarket.disabledRealm': 'Биржа $WOC недоступна в этом мире.',
   'hudChrome.wocMarket.pausedBanner':
-    'Торги приостановлены до восстановления цены $WOC. Отсчёт аукционов продолжается; ни одна сделка не совершится, пока цены не станут надёжными.',
+    'Торги приостановлены до восстановления цены $WOC. Отсчёт аукционов продолжается; новые ставки и платежи ждут восстановления цены, а уже отправленный платёж всё равно будет проведён.',
   'hudChrome.wocMarket.walletBanner':
     'Привяжите и подтвердите кошелёк, чтобы делать ставки, покупать и продавать на бирже.',
   'hudChrome.wocMarket.rateNote':
-    'Текущий курс: около {tokens} $WOC за доллар США, по состоянию на {time}.',
+    'Текущий курс: около {tokens} $WOC за доллар США, по последней цене сделки на бирже ({time}).',
   'hudChrome.wocMarket.estimateNote':
     'Около {tokens} $WOC по текущему курсу. Точная сумма фиксируется только при запросе оплаты.',
   'hudChrome.wocMarket.browseEmpty': 'Лотов пока нет. Загляните позже.',
@@ -9006,7 +9006,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Этот платёж подтверждался слишком долго и находится на проверке.',
   'hudChrome.wocMarket.settlementDeadlineNote':
     'Если вы выиграете, оплата должна поступить в течение {duration} после закрытия аукциона.',
-  'hudChrome.wocMarket.termsLabel': 'Я принимаю условия расчёта с плавающим количеством токенов.',
+  'hudChrome.wocMarket.termsLabel': 'Я принимаю условия Торговой площадки.',
   'hudChrome.wocMarket.quoteTitle': 'Подтверждение оплаты',
   'hudChrome.wocMarket.quoteTotal': 'Итого: {tokens} $WOC',
   'hudChrome.wocMarket.quoteSeller': 'Продавец получает: {tokens} $WOC',
@@ -9069,7 +9069,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellSubmit': 'Выставить предмет',
   'hudChrome.wocMarket.sellSubmitAria': 'Выставить {item} на биржу',
   'hudChrome.wocMarket.sellFeeNote':
-    'Завершённые продажи облагаются сбором 10%: 90% вам, 3% сжигается, 7% в казну. Выручка приходит на ваш привязанный кошелёк прямо в расчётной транзакции.',
+    'Завершённые продажи облагаются сбором около 10%: 3% сжигается и 7% уходит в казну, каждая часть округляется вверх, а вы получаете точный остаток (около 90%). Выручка приходит на ваш привязанный кошелёк прямо в расчётной транзакции.',
   'hudChrome.wocMarket.activityListings': 'Мои лоты',
   'hudChrome.wocMarket.activityBids': 'Мои ставки',
   'hudChrome.wocMarket.activitySettlements': 'Мои расчёты',
