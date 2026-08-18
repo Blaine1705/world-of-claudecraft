@@ -300,6 +300,13 @@ export class GamepadManager {
       return;
     }
 
+    // A pad is usually connected before the character's action bar has loaded, so
+    // the first seed attempt has nothing to copy. Re-ask until it takes; the check
+    // is an in-memory scan of the layout and stops the moment the bar is seeded.
+    if (this.crossHotbar && this.crossHotbarBindings?.isSeeded() === false) {
+      this.cb.onConnectionChange?.();
+    }
+
     this.checkRumble();
 
     // FFXIV's toggle for the virtual mouse: LB + right-stick-click. Checked as a

@@ -9292,14 +9292,17 @@ body.reduce-motion .xhb-half {
    pad connects. Keeping the box hides the ink and holds the layout still. */
 body.xhb-mode #actionbar,
 body.xhb-mode #actionbar2,
-body.xhb-mode #actionbar3 {
+body.xhb-mode #actionbar3,
+/* The stance bar goes with them: the stance is seeded onto the cross hotbar for
+   exactly this reason, so leaving its own bar up duplicates a button the player
+   now presses somewhere else. */
+body.xhb-mode #stancebar {
   visibility: hidden;
 }
 /* The bar is taller than the rows it replaces, so lift the rest of the bottom
    column clear of it. A transform, not a margin: it moves no other element's box
    and so cannot reflow anything. */
-body.xhb-mode #player-frame,
-body.xhb-mode #stancebar {
+body.xhb-mode #player-frame {
   transform: translateY(calc(-1 * var(--xhb-lift, 118px)));
 }
 /* The pad has no cursor, so the keycap column the action bar shows would be noise

@@ -171,3 +171,31 @@ describe('CrossHotbarBindings', () => {
     expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(ability('x'));
   });
 });
+
+describe('seeding waits for the action bar', () => {
+  it('does not latch on the extras alone', () => {
+    // A pad is usually connected before the character's bar has loaded, and the
+    // stance is ready first. Latching then produced a bar holding a stance and
+    // nothing else, which is what a Steam Deck player actually saw.
+    const xhb = new CrossHotbarBindings();
+    xhb.reset();
+    expect(
+      xhb.seedOnce(
+        Array.from({ length: 32 }, () => null),
+        ['battle_stance'],
+      ),
+    ).toBe(false);
+    expect(xhb.isSeeded()).toBe(false);
+  });
+
+  it('latches once the bar has something on it, extras included', () => {
+    const xhb = new CrossHotbarBindings();
+    xhb.reset();
+    const bar = Array.from({ length: 32 }, () => null as CrossHotbarAction);
+    bar[0] = { type: 'ability', id: 'heroic_strike' };
+    expect(xhb.seedOnce(bar, ['battle_stance'])).toBe(true);
+    const flat = xhb.all().flat();
+    expect(flat).toContainEqual({ type: 'ability', id: 'heroic_strike' });
+    expect(flat).toContainEqual({ type: 'ability', id: 'battle_stance' });
+  });
+});

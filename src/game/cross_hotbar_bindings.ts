@@ -63,8 +63,13 @@ export class CrossHotbarBindings {
    */
   seedOnce(barActions: readonly CrossHotbarAction[], extras: readonly string[] = []): boolean {
     if (this.isSeeded()) return false;
+    // Wait for the ACTION BAR specifically, not for any content at all. A pad is
+    // usually connected before the character's bar loads, and the extras (the
+    // stance) are ready first: latching then would seed a bar holding nothing but
+    // a stance and never fill in the player's actual actions.
+    if (!barActions.some((action) => action !== null)) return false;
     this.layout = seedCrossHotbarLayout(barActions, extras);
-    if (!this.isSeeded()) return false; // nothing to seed from yet; try again later
+    if (!this.isSeeded()) return false;
     this.save();
     return true;
   }
