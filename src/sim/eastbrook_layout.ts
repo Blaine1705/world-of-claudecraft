@@ -530,7 +530,7 @@ export const REMOVED_EASTBROOK_PLACEMENTS = deepFreeze({
   ],
 } as const);
 
-const CIVIC_CENTER = { x: 0, z: 2 } as const;
+const CIVIC_CENTER = { x: -14, z: -102 } as const;
 // Keep the feature visually central while leaving the default spawn's east-side
 // lane through the square clear for player and pet bodies. The old exact-center
 // placement made x=2 a tangent for the player and an overlap for larger movers.
@@ -594,65 +594,62 @@ const BUILDINGS = [
     'eastbrook_bank',
     '/models/props/eastbrook_bank.glb',
     'house',
-    { x: 18, z: 10.5 },
+    { x: 12, z: -94 },
     7,
     7.8,
     5.5,
-    Math.atan2(-18, -8.5),
+    -2.356194490192345,
   ),
   makeBuilding(
     'eastbrook_smithy',
     '/models/props/eastbrook_smithy.glb',
     'house',
-    { x: 4.8, z: 19.7 },
+    { x: -2, z: -122 },
     7,
     7.5,
     5.5,
-    -2.876775,
+    -2.0344439357957027,
   ),
   makeBuilding(
     'eastbrook_inn',
     '/models/props/eastbrook_inn.glb',
     'inn',
-    { x: -12.5, z: 16.5 },
+    { x: -38, z: -88 },
     7.5,
     8.5,
     6,
-    Math.atan2(12.5, -14.5),
+    -2.5535900500422257,
     0.8,
   ),
   makeBuilding(
     'eastbrook_chapel',
     '/models/props/eastbrook_chapel.glb',
     'chapel',
-    { x: -21, z: -2.3 },
+    { x: 2, z: -78 },
     5.5,
     7,
     6,
-    1.368826,
+    0.7853981633974483,
   ),
   makeBuilding(
     'eastbrook_weaving_workshop',
     '/models/props/eastbrook_weaving_workshop.glb',
     'house',
-    { x: -7.2, z: -21 },
+    { x: -28, z: -122 },
     5.5,
     5.8,
     4.5,
-    0.30338,
+    2.5535900500422257,
   ),
   makeBuilding(
     'eastbrook_toolworks',
     '/models/props/eastbrook_toolworks.glb',
     'house',
-    // Keep the long-established (2,-21) deterministic combat/open-field seam
-    // and the southeast gate road clear while still moving the workshop
-    // outward from its rebuild-v1 lot.
-    { x: 6.2, z: -18 },
+    { x: -16, z: -128 },
     5.5,
     5.8,
     4.5,
-    -0.3006056700423954,
+    0.5880026035475675,
   ),
 ] as const;
 
@@ -693,7 +690,7 @@ const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_north',
     '/models/dungeon/bench.glb',
-    { x: 0, z: 4.9 },
+    { x: -14, z: -99.1 },
     1.8,
     0.6,
     Math.PI,
@@ -701,7 +698,7 @@ const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_south',
     '/models/dungeon/bench.glb',
-    { x: 0, z: -0.9 },
+    { x: -14, z: -104.9 },
     1.8,
     0.6,
     0,
@@ -709,7 +706,7 @@ const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_west',
     '/models/dungeon/bench.glb',
-    { x: -2.9, z: 2 },
+    { x: -11.1, z: -102 },
     1.8,
     0.6,
     Math.PI / 2,
@@ -717,8 +714,8 @@ const BENCHES = [
 ];
 
 const MARKET_STALL_SPECS = [
-  ['eastbrook_market_stall_world_market', 'gold', { x: -5.5, z: 9.5 }, 2.508844],
-  ['eastbrook_market_stall_provisions', 'green', { x: -9, z: 0.5 }, 1.405648],
+  ['eastbrook_market_stall_world_market', 'gold', { x: -17.5, z: -99 }, 2.279422598922567],
+  ['eastbrook_market_stall_provisions', 'green', { x: -17.5, z: -105 }, 0.8621700546672264],
 ] as const;
 const MARKET_STALLS = MARKET_STALL_SPECS.map(([id, canopyVariant, position, rotation]) => {
   const base = makeObbPlacement(
@@ -800,32 +797,11 @@ function wallPoint(x: number, z: number): Point2 {
   return { x: x * scale, z: z * scale };
 }
 
-const WALL_GATES = [
-  makeCircularWallGate(WALL_CONFIG, 'eastbrook_gate_east', 'east', wallPoint(28.506, 7.593), 5),
-  makeCircularWallGate(
-    WALL_CONFIG,
-    'eastbrook_gate_northeast',
-    'northeast',
-    wallPoint(20.348, 21.359),
-    5,
-  ),
-  makeCircularWallGate(WALL_CONFIG, 'eastbrook_gate_north', 'north', wallPoint(-7.469, 28.539), 5),
-  makeCircularWallGate(
-    WALL_CONFIG,
-    'eastbrook_gate_northwest',
-    'northwest',
-    wallPoint(-23.95, 17.224),
-    5,
-  ),
-  makeCircularWallGate(
-    WALL_CONFIG,
-    'eastbrook_gate_southwest',
-    'southwest',
-    wallPoint(-21.495, -20.204),
-    5,
-  ),
-  makeCircularWallGate(WALL_CONFIG, 'eastbrook_gate_bandit', 'bandit', wallPoint(20.86, -20.86), 5),
-] as const;
+// The harbor town has NO ring wall (site-plan.md section 2: a town grown
+// along streets, open to its quay and beach). Gates and segments are empty
+// on purpose; the machinery stays so the API and its consumers (renderer
+// instancing, wall-pillar colliders, wallSegmentMirrored) hold their shape.
+const WALL_GATES: ReturnType<typeof makeCircularWallGate>[] = [];
 
 const WALL_SEGMENTS = generateCircularWallSegments(WALL_CONFIG, WALL_GATES);
 
@@ -853,84 +829,79 @@ function gateCrossing(id: string): Point2 {
 const ROADS = [
   {
     id: 'north',
-    existingRoadPoint: { x: 0, z: 8 },
-    gateId: 'eastbrook_gate_north',
+    existingRoadPoint: { x: 2, z: -70 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: 0, z: 6.75 },
-      { x: 0, z: 8 },
-      gateCrossing('eastbrook_gate_north'),
-      { x: -7.469, z: 28.539 },
+      { x: 10, z: -94.5 },
+      { x: 8, z: -86 },
+      { x: 4, z: -76 },
+      { x: 2, z: -70 },
+      { x: -2, z: -56 },
     ],
   },
   {
     id: 'east',
-    existingRoadPoint: { x: 8, z: 2 },
-    gateId: 'eastbrook_gate_east',
+    existingRoadPoint: { x: -44, z: -98 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: 4.75, z: 2 },
-      { x: 8, z: 2 },
-      { x: 15, z: 3.5 },
-      { x: 23, z: 4.5 },
-      gateCrossing('eastbrook_gate_east'),
-      { x: 28.506, z: 7.593 },
+      { x: -12.5, z: -102 },
+      { x: -26, z: -100 },
+      { x: -44, z: -98 },
+      { x: -56, z: -88 },
+      { x: -62, z: -76 },
+      { x: -70, z: -68 },
+      { x: -80, z: -66 },
+      { x: -88, z: -60 },
+      { x: -92, z: -56 },
     ],
   },
   {
     id: 'bandit',
-    existingRoadPoint: { x: 6, z: -6 },
-    gateId: 'eastbrook_gate_bandit',
+    existingRoadPoint: { x: -6, z: -124 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      pointAtYaw(CIVIC_CENTER, Math.atan2(6, -8), 4.75),
-      { x: 6, z: -6 },
-      { x: 8, z: -12 },
-      gateCrossing('eastbrook_gate_bandit'),
-      { x: 20.86, z: -20.86 },
+      { x: -12, z: -104 },
+      { x: -10, z: -112 },
+      { x: -6, z: -124 },
+      { x: -16, z: -126 },
+      { x: -26, z: -125 },
     ],
   },
   {
     id: 'northwest',
-    existingRoadPoint: { x: -8, z: 6 },
-    gateId: 'eastbrook_gate_northwest',
+    existingRoadPoint: { x: -10, z: -132 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      pointAtYaw(CIVIC_CENTER, Math.atan2(-8, 4), 4.75),
-      { x: -8, z: 6 },
-      { x: -15, z: 8 },
-      { x: -21, z: 11 },
-      gateCrossing('eastbrook_gate_northwest'),
-      { x: -23.95, z: 17.224 },
+      { x: -14, z: -104.5 },
+      { x: -12, z: -118 },
+      { x: -10, z: -132 },
+      { x: -10, z: -142 },
     ],
   },
   {
     id: 'southwest',
-    existingRoadPoint: { x: -6, z: -6 },
-    gateId: 'eastbrook_gate_southwest',
+    existingRoadPoint: { x: 0, z: -99 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      pointAtYaw(CIVIC_CENTER, Math.atan2(-6, -8), 4.75),
-      { x: -6, z: -6 },
-      { x: -10, z: -8 },
-      { x: -20, z: -9 },
-      { x: -22, z: -12 },
-      { x: -17.851916681798443, z: -16.779722011586674 },
-      gateCrossing('eastbrook_gate_southwest'),
-      { x: -21.495, z: -20.204 },
+      { x: 8, z: -96 },
+      { x: 0, z: -99 },
+      { x: -11, z: -101 },
     ],
   },
   {
     id: 'northeast',
-    existingRoadPoint: { x: 6, z: 8 },
-    gateId: 'eastbrook_gate_northeast',
+    existingRoadPoint: { x: -92, z: -54 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      pointAtYaw(CIVIC_CENTER, Math.atan2(6, 6), 4.75),
-      { x: 6, z: 8 },
-      { x: 12, z: 14 },
-      gateCrossing('eastbrook_gate_northeast'),
-      { x: 20.348, z: 21.359 },
+      { x: -92, z: -46 },
+      { x: -92, z: -54 },
+      { x: -92, z: -62 },
     ],
   },
 ] as const;
@@ -995,40 +966,40 @@ const TRADER_POSITION = localToWorld(
 );
 // Lin is a quest herbalist, not a merchant. Keep her already-clear civic-green
 // position without inventing a replacement stall or blocking the smithy sightline.
-const APOTHECARY_POSITION = { x: 2.8431593444121797, z: 9.717148252611294 } as const;
+const APOTHECARY_POSITION = { x: -12, z: -97.5 } as const;
 const SMITH_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, -2, 0);
 const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 2, 0);
 const COOK_POSITION = localToWorld(KITCHENS_STATION.position, INN.rotation, 1.75, 0);
 const WEAVER_POSITION = localToWorld(LOOM_STATION.position, WEAVING_HOUSE.rotation, 2, 0);
 const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS.rotation, 2, 0);
-const SAUL_POSITION = { x: 0, z: -14.5 } as const;
-const FURY_POSITION = { x: -22.5, z: -7.5 } as const;
+const SAUL_POSITION = { x: 7, z: -92.5 } as const;
+const FURY_POSITION = { x: -2, z: -74 } as const;
 
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
   makeNpc(
     'marshal_redbrook',
-    { x: 4.5, z: 5.5 },
-    facingToward({ x: 4.5, z: 5.5 }, CIVIC_CENTER),
-    'eastbrook_civic_well_beacon',
+    { x: 10, z: -97.5 },
+    0.0,
+    'eastbrook_noticeboard',
   ),
   makeNpc('trader_wilkes', TRADER_POSITION, MARKET_STALLS[1].rotation, MARKET_STALLS[1].id),
-  makeNpc('apothecary_lin', APOTHECARY_POSITION, -2.788602, 'eastbrook_gate_northeast'),
+  makeNpc('apothecary_lin', APOTHECARY_POSITION, -2.723368324010564, 'eastbrook_civic_well_beacon'),
   makeNpc('brother_aldric', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
   makeNpc('smith_haldren', SMITH_POSITION, SMITHY.rotation, FORGE_STATION.id),
   makeNpc(
     'fisherman_brandt',
-    { x: -22, z: 4 },
-    facingToward({ x: -22, z: 4 }, CIVIC_CENTER),
-    'eastbrook_gate_northwest',
+    { x: -95, z: -50 },
+    -1.5707963267948966,
+    'eastbrook_quay',
   ),
-  makeNpc('foreman_odell', { x: -8, z: -9.5 }, 0.607802, 'eastbrook_gate_southwest'),
+  makeNpc('foreman_odell', { x: -84, z: -63 }, 0.6747409422235526, 'eastbrook_quay'),
   makeNpc('bursar_fernando', BANK.frontStandingPoint, BANK.rotation, BANK.id),
   makeNpc(
     'card_master',
-    { x: 10.5, z: 1 },
-    facingToward({ x: 10.5, z: 1 }, CIVIC_CENTER),
-    PRESERVED_ARMOURY.id,
+    { x: -34, z: -92 },
+    -0.7853981633974483,
+    'eastbrook_inn',
   ),
   makeNpc('chronicler_saul', SAUL_POSITION, TOOLWORKS.rotation, 'mailbox_eastbrook'),
   makeNpc('forgemistress_darva', DARVA_POSITION, SMITHY.rotation, FORGE_STATION.id),
@@ -1062,7 +1033,7 @@ for (let column = 0; column < 9; column++) {
 // Keep both its body and standing point outside F-range of every service NPC:
 // proximity interaction prioritizes lootable objects before NPCs, so a closer
 // placement could otherwise steal the player's service interaction.
-const NOTICEBOARD_POSITION = { x: 10, z: -8 } as const;
+const NOTICEBOARD_POSITION = { x: 8, z: -93 } as const;
 const NOTICEBOARD_ROTATION = facingToward(NOTICEBOARD_POSITION, CIVIC_CENTER);
 const NOTICEBOARD_WIDTH = 2.4;
 const NOTICEBOARD_DEPTH = 0.6;
@@ -1076,14 +1047,14 @@ const NOTICEBOARD_FRONT_STANDING_POINT = localToWorld(
 const SERVICES = {
   playerStart: {
     id: 'eastbrook_player_start',
-    position: { x: 2, z: -2 },
+    position: { x: -94, z: -58 },
     bodyRadius: 0.5,
   },
   mailbox: {
     id: 'mailbox_eastbrook',
     templateId: 'mailbox',
     assetId: '/models/props/mailbox_pillar.glb',
-    position: { x: 0, z: -7.5 },
+    position: { x: -10, z: -98 },
     bodyRadius: 0.8,
     interactionRadius: 7,
     // The pillar is a solid collider (the noticeboard pattern), so walkers
@@ -1113,17 +1084,17 @@ const SERVICES = {
   },
   graveyard: {
     id: 'gy_eastbrook',
-    position: { x: -14, z: -14 },
-    legacyReleasePoint: { x: -12, z: -14 },
+    position: { x: -2, z: -70 },
+    legacyReleasePoint: { x: 0, z: -70 },
     healerTemplateId: 'spirit_healer',
     healerFacing: Math.PI,
     headstones: [
-      { id: 'gy_eastbrook_headstone_0', position: { x: -14, z: -14 } },
-      { id: 'gy_eastbrook_headstone_1', position: { x: -11.8, z: -14 } },
-      { id: 'gy_eastbrook_headstone_2', position: { x: -9.6, z: -14 } },
-      { id: 'gy_eastbrook_headstone_3', position: { x: -14, z: -11.4 } },
-      { id: 'gy_eastbrook_headstone_4', position: { x: -11.8, z: -11.4 } },
-      { id: 'gy_eastbrook_headstone_5', position: { x: -9.6, z: -11.4 } },
+      { id: 'gy_eastbrook_headstone_0', position: { x: -2, z: -70 } },
+      { id: 'gy_eastbrook_headstone_1', position: { x: 0.2, z: -70 } },
+      { id: 'gy_eastbrook_headstone_2', position: { x: 2.4, z: -70 } },
+      { id: 'gy_eastbrook_headstone_3', position: { x: -2, z: -67.4 } },
+      { id: 'gy_eastbrook_headstone_4', position: { x: 0.2, z: -67.4 } },
+      { id: 'gy_eastbrook_headstone_5', position: { x: 2.4, z: -67.4 } },
     ],
   },
   rest: { id: 'eastbrook_inn_rest', buildingId: 'eastbrook_inn' },
@@ -1134,9 +1105,9 @@ const SERVICES = {
       id: 'eastbrook_player_start_to_square',
       bodyRadius: 0.8,
       points: [
-        { x: 2, z: -2 },
-        { x: 2, z: 0 },
-        { x: 2, z: 2 },
+        { x: -94, z: -58 },
+        { x: -92, z: -56 },
+        { x: -90, z: -57 },
       ],
     },
     {

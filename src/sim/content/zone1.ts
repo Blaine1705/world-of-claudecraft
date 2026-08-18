@@ -89,12 +89,12 @@ export const ZONE1_ZONE: ZoneDef = {
   zMax: 180,
   levelRange: [1, 7],
   biome: 'vale',
-  hub: { x: 0, z: 0, radius: TOWN_RADIUS, name: 'Eastbrook' },
+  hub: { x: -14, z: -100, radius: TOWN_RADIUS, name: 'Eastbrook' },
   graveyard: GRAVEYARD_POS,
   lakes: [LAKE],
   pois: [
-    { x: 0, z: -3, label: 'Eastbrook', id: 'eastbrook' },
-    { x: -2, z: 70, label: 'Wolf Run', id: 'wolf_run' },
+    { x: -14, z: -102, label: 'Eastbrook', id: 'eastbrook' },
+    { x: 2, z: -4, label: 'Wolf Run', id: 'wolf_run' },
     { x: 65, z: 0, label: 'Boar Meadow', id: 'boar_meadow' },
     { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
     { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
@@ -1596,8 +1596,8 @@ export const ZONE1_CAMPS: CampDef[] = [
   // produced a run of mirrored quest directions; verify any direction claim
   // against that note, never against raw signs.
   // Wolves: north woods
-  { mobId: 'forest_wolf', center: { x: -27, z: 71 }, radius: 28.5, count: 6 },
-  { mobId: 'forest_wolf', center: { x: 24, z: 70 }, radius: 26, count: 5 },
+  { mobId: 'forest_wolf', center: { x: -10, z: 6 }, radius: 28.5, count: 6 },
+  { mobId: 'forest_wolf', center: { x: 10, z: 44 }, radius: 26, count: 5 },
   // Nudged north to stay ahead of the widened wolf runs (q_greyjaw sends the
   // player to "the deep woods north of the wolf runs").
   { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
@@ -1692,24 +1692,30 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
 export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [
     ...EASTBROOK_LAYOUT.roads[0].points,
+    { x: -4, z: -30 },
+    { x: 2, z: -4 },
     { x: -8, z: 30 },
     { x: -15, z: 55 },
     { x: -2, z: 78 },
     { x: -16, z: 104 },
     { x: -26, z: 124 },
     { x: -32, z: 140 },
-  ], // north to wolves, then on past Mirror Lake to the Copper Dig and the Mirefen road
-  [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // west to boars
-  [...EASTBROOK_LAYOUT.roads[2].points, { x: 30, z: -30 }, { x: 50, z: -50 }, { x: 65, z: -65 }], // southwest to bandits
-  [...EASTBROOK_LAYOUT.roads[3].points, { x: -35, z: 25 }, { x: -58, z: 48 }, { x: -66, z: 58 }], // northeast to lake
+  ], // north over the chapel green, through the Wolf Run on the old town ground, on past Mirror Lake to the Copper Dig and the Mirefen road
+  [...EASTBROOK_LAYOUT.roads[1].points], // the main street: market square east to the harbor quay
   [
-    ...EASTBROOK_LAYOUT.roads[4].points,
-    { x: -30, z: -28 },
-    { x: -55, z: -45 },
-    { x: -70, z: -55 },
+    ...EASTBROOK_LAYOUT.roads[2].points,
+    { x: -14, z: -138 },
+    { x: 10, z: -140 },
+    { x: 30, z: -30 },
+    { x: 50, z: -50 },
+    { x: 65, z: -65 },
+  ], // crafts lane, then the coast track southwest to the bandit camp
+  [...EASTBROOK_LAYOUT.roads[3].points], // the beach promenade
+  [...EASTBROOK_LAYOUT.roads[4].points], // civic link across the squares
+  [
+    ...EASTBROOK_LAYOUT.roads[5].points,
     { x: -96, z: -66 },
-  ], // southeast across the flank (the freed dig ground; the dockside phase re-lays it)
-  [...EASTBROOK_LAYOUT.roads[5].points, { x: 35, z: 35 }, { x: 60, z: 60 }, { x: 78, z: 74 }], // northwest to ruins
+  ], // the quay walk, joining the flank track (the freed dig ground)
 ];
 
 // ---------------------------------------------------------------------------
