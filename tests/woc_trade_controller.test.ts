@@ -381,28 +381,64 @@ describe('the open transition', () => {
 });
 
 describe('an unusable offer expiry falls back to the untimed line', () => {
-  it('treats NaN as no expiry, because NaN passes a typeof number test', () => {
-    // The server projects this column through a Date parse: a missing or
-    // unparseable value comes across as NaN, and NaN IS a number. The guard
-    // that asked typeof therefore rendered "Invalid Date" into a money line.
-    expect(Number.isFinite(Number.NaN)).toBe(false);
-    expect(typeof Number.NaN).toBe('number');
-    const timed = t('hudChrome.trade.woc.offerSentUntil', { name: 'Aldan', time: '9:28 PM' });
-    const untimed = t('hudChrome.trade.woc.offerSent', { name: 'Aldan' });
-    expect(timed).not.toBe(untimed);
-    // Both expiry reads take the finite test. Comments are stripped first, or
-    // the prose above each read would satisfy the scan on its own.
-    const src = readFileSync('src/ui/hud/woc_trade/woc_trade_controller.ts', 'utf8')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/(^|[^:])\/\/.*$/gm, '$1');
-    expect(src).toContain('Number.isFinite(res.offer.expiresAtMs)');
-    expect(src).toContain('Number.isFinite(row.expiresAtMs)');
-    expect(src, 'the typeof form passes NaN').not.toContain(
-      "typeof res.offer.expiresAtMs === 'number'",
+  // Driven through the real send path, not asserted about language constants:
+  // each unusable stamp must take the UNTIMED branch, and the usable one must
+  // take the timed branch, with nothing thrown on the way (formatDateTime
+  // raises RangeError on NaN, so a wrong guard here takes the line down rather
+  // than printing something odd).
+  const send = async (expiresAtMs: unknown): Promise<{ logs: string[] }> => {
+    const h = fakeHooks();
+    h.state.createOfferImpl = () =>
+      Promise.resolve({ ok: true, offer: { id: 11, usdCents: 250, expiresAtMs } });
+    const r = rig(h.hooks);
+    r.host.tradeInfo = {
+      otherPid: 2,
+      otherName: 'Borin',
+      myOffer: { items: [], copper: 0 },
+      theirOffer: { items: [{ itemId: 'worn_sword', count: 1 }], copper: 0 },
+      myAccepted: false,
+      theirAccepted: false,
+    } as unknown as typeof r.host.tradeInfo;
+    const c = r.controller as unknown as {
+      wocTradeMode: 'gold' | 'woc';
+      wocTradeUsdCents: number | null;
+      wocTradePartner: { name: string; walletVerified: boolean } | null;
+      wocTradePartnerResolved: boolean;
+      wocTradeTermsChecked: boolean;
+      sendWocTradeOffer(otherName: string): Promise<void>;
+    };
+    c.wocTradeMode = 'woc';
+    c.wocTradeUsdCents = 250;
+    c.wocTradePartner = { name: 'Borin', walletVerified: true };
+    c.wocTradePartnerResolved = true;
+    c.wocTradeTermsChecked = true;
+    await c.sendWocTradeOffer('Borin');
+    return { logs: r.host.logs };
+  };
+
+  const UNTIMED = t('hudChrome.trade.woc.offerSent', { name: 'Borin' });
+
+  it('takes the untimed line for null, undefined, NaN and an epoch-0 stamp', async () => {
+    // null is what the wire really delivers for a missing stamp (JSON writes a
+    // server-side NaN as null); NaN is the value a date projection yields and
+    // the one a typeof test lets through; 0 is absence written as a number,
+    // which a bare finite check would print as a 1970 deadline.
+    for (const value of [null, undefined, Number.NaN, 0]) {
+      const { logs } = await send(value);
+      expect(logs.at(-1), `expiry ${String(value)} must read as untimed`).toBe(UNTIMED);
+    }
+  });
+
+  it('takes the timed line for a real stamp', async () => {
+    const at = Date.UTC(2026, 7, 19, 2, 28);
+    const { logs } = await send(at);
+    expect(logs.at(-1)).toBe(
+      t('hudChrome.trade.woc.offerSentUntil', {
+        name: 'Borin',
+        time: formatDateTime(at, { timeStyle: 'short' }),
+      }),
     );
-    expect(src, 'a truthy check passes NaN').not.toContain(
-      "row.role === 'buyer' && row.expiresAtMs",
-    );
+    expect(logs.at(-1)).not.toBe(UNTIMED);
   });
 });
 

@@ -61,6 +61,11 @@ describe('a small but real amount never prints as zero', () => {
     expect(wocTokensText(0.004)).not.toBe('0');
     expect(wocTokensText(0.004)).toContain('0.004');
     expect(wocTokensText(0.000012)).toContain('0.000012');
+    // Down to one base unit at the token's nine decimals: six digits left
+    // everything under 5e-7 rounding to a flat zero, the same defect one order
+    // further down.
+    expect(wocTokensText(4.9e-7)).not.toBe('0');
+    expect(wocTokensText(1e-9)).toContain('0.000000001');
     expect(wocTokensText(-0.004)).toContain('0.004');
     // A true zero is still a plain zero, and anything at or above the threshold
     // keeps the one shared two-digit spelling.

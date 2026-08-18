@@ -325,6 +325,32 @@ async function measureWindowChrome(label) {
       reserve: Number.isFinite(reserve) ? Math.round(reserve) : null,
     };
   });
+  // ...and again with a REAL home-indicator inset forced on, because headless
+  // Chromium reports every safe-area inset as zero, which is precisely the
+  // configuration where a reserve built on the flat --window-pad token looks
+  // correct. The override reproduces what the generic mobile window rule
+  // resolves to on a landscape phone (18px + a 21px indicator).
+  const inset = await page.evaluate(() => {
+    const win = document.querySelector('#trade-window');
+    if (!win) return null;
+    const previous = win.style.paddingBottom;
+    win.style.paddingBottom = 'max(12px, calc(18px + 21px))';
+    const actions = win.querySelector('.trade-actions');
+    const w = win.getBoundingClientRect();
+    const r = actions?.getBoundingClientRect() ?? null;
+    const band = r ? Math.round(w.bottom - r.top) : null;
+    win.style.paddingBottom = previous;
+    return band;
+  });
+  // The authored reserve, resolved with the same inset the override applies:
+  // the computed style cannot report it, because the inset really is zero here.
+  const reserveWithInset = m.reserve === null ? null : m.reserve + 39 - 12;
+  if (inset !== null && reserveWithInset !== null) {
+    check(
+      reserveWithInset >= inset,
+      `${label}: scroll reserve ${reserveWithInset} >= the band under a 21px home indicator ${inset}`,
+    );
+  }
   // The reserve must cover the band, or the CSS is quietly lying about it.
   if (m.band !== null && m.reserve !== null) {
     check(

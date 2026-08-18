@@ -87,8 +87,13 @@ describe('marketplace copy names the live rule figures', () => {
         const at = src.indexOf(`'${key}':`);
         expect(at, `${locale} carries a fill for ${key}`).toBeGreaterThan(-1);
         // The value runs to the next quoted key at this indent, which is where
-        // the overlay's flat rows end.
-        const value = src.slice(at, src.indexOf("\n  '", at + 1));
+        // the overlay's flat rows end. The end has to be FOUND: for the last
+        // row in a file, indexOf returns -1 and slice(at, -1) would hand back
+        // the rest of the file, so a figure anywhere later would satisfy the
+        // check and the pin would be quietly vacuous.
+        const end = src.indexOf("\n  '", at + 1);
+        expect(end, `${locale} ${key} is followed by another row`).toBeGreaterThan(at);
+        const value = src.slice(at, end);
         for (const figure of figures) {
           expect(value, `${locale} ${key} still spells ${figure}`).toContain(figure);
         }

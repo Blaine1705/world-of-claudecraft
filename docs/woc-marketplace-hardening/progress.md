@@ -3003,6 +3003,10 @@ docs and capture commits.
   window this pass neither owns nor captured. It is on the exact ratchet in
   `tests/css_token_resolution.test.ts` with that reason, and the retune owes a
   Dungeon Finder before/after (desktop and 900x420) when it lands.
+- **A follow-up, not a ceiling.** `src/ui/woc_market_window.ts` enters the
+  monolith ratchet at 2623 lines with zero headroom, which stops the growth but
+  legitimizes the size: the pure-core half of the recipe (a `woc_market_view.ts`
+  the window renders from) was never built. Worth its own extraction pass.
 - **A theme pass.** The typed price and the block reason read `--gold` and
   `--gold-dim`, the RAW accent pair, while the rest of the arm reads the
   contrast-repaired `--color-accent`. Both are a clear improvement on the hex
@@ -3052,6 +3056,37 @@ fix round applied, each with its own pin:
   namespace expects; the balance chip joined the architecture registries beside
   its two siblings; the log tones' literals are a documented sanctioned home
   with a test pinning the single source.
+
+A THIRD review, fresh over the fix round itself, found two defects the fixes
+had introduced and two claims that overstated what they fixed. All four settled:
+
+- The derived scroll reserve mirrored a flat `--window-pad`, but the window's
+  real bottom padding is the inset-aware `max(--window-pad, 18px + inset)`: on a
+  landscape phone with a home indicator the reserve came up 15px short and put
+  the control back under the commit row. Headless capture reports zero insets,
+  so no rig run could have seen it; the calc now mirrors the source rule, a pin
+  reads the DECLARATION (prose in the block cannot satisfy it), and the rig
+  forces a real inset for one measurement so the case is exercised at all.
+- Pinning the sheets' BOTTOM edge stretched them to full height (a two-line
+  trade painting a 400px panel), which the fix never claimed and did not need:
+  the inset-aware height cap alone fixes the off-screen case. The pin is gone
+  from both money sheets, kept only on the side-by-side split where full height
+  is the point, and pinned so it cannot come back unnoticed.
+- The offer-expiry story was wrong in the direction that matters: JSON writes a
+  server-side NaN as null, so the old guard already took the untimed branch, and
+  had NaN arrived, `formatDateTime` THROWS rather than printing "Invalid Date".
+  The guard stays as honest hardening, now with `> 0` so an epoch-0 stamp still
+  reads as absence rather than a 1970 deadline, and the tautological test is
+  replaced by one that drives the real send path for null, undefined, NaN and 0.
+- The small-amount token floor still printed "0" below 5e-7, one order down from
+  the defect it fixed. It now falls back to the token's own nine decimals, with
+  the one-base-unit case pinned.
+
+Also from that round: the quality colour goes through the shared
+`itemNameColor` family module (which owns the fallback token, gives a quest item
+the bag's quest gold, and reads the map with `Object.hasOwn` so a hostile wire
+quality cannot interpolate a prototype key), and the overlay-figure pin guards
+its slice end so it cannot go vacuous on the last row of a file.
 
 Judged, no change, with the reasoning:
 

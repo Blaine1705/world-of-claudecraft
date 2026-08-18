@@ -6,6 +6,20 @@ const mobileCss = readFileSync(
   'utf8',
 ).replace(/\r\n/g, '\n');
 
+/** The declaration block (selector to closing brace) that carries `needle`,
+ *  optionally the one whose selector line is `selector`. Anchoring on a
+ *  declaration rather than on a line offset keeps these pins readable when the
+ *  surrounding comments move, which they do every time the reasoning is
+ *  written down. */
+function blockContaining(needle: string, selector?: string): string {
+  const blocks = mobileCss.split('\n  }');
+  const hit = blocks.find(
+    (b) => b.includes(needle) && (selector === undefined || b.includes(selector)),
+  );
+  expect(hit, `a block carrying ${needle}${selector ? ` under ${selector}` : ''}`).toBeDefined();
+  return hit ?? '';
+}
+
 describe('mobile window layout CSS', () => {
   it('clamps generic mobile windows to the app viewport and reserves bottom padding', () => {
     const start = mobileCss.indexOf('body.mobile-touch .window {');
@@ -197,6 +211,48 @@ describe('mobile window layout CSS', () => {
     expect(mobileCss).toMatch(
       /body\.mobile-touch #woc-market-window \.wm-bid-form input\[data-field="bid-usd"\] \{\s*min-height: 40px;/,
     );
+  });
+
+  it('reserves the sticky commit row and the sticky header on the trade sheet', () => {
+    // Both reserves are load-bearing and both were wrong once. The BOTTOM one
+    // must mirror the window's own inset-aware padding-bottom (the generic rule
+    // pinned above): built on the flat --window-pad token it came up 15px short
+    // on a phone with a home indicator, and a headless capture cannot see that
+    // because it reports zero insets. The TOP one clears the sticky
+    // .window > .panel-title, which paints over the sheet scrolling beneath it.
+    const block = blockContaining('scroll-padding-bottom:');
+    // The DECLARATION, not the block: the block also carries the prose that
+    // explains the value, and prose satisfies a substring check on its own.
+    const reserve = /scroll-padding-bottom:([^;]+);/.exec(block)?.[1] ?? '';
+    expect(reserve, 'the bottom reserve is declared').not.toBe('');
+    expect(reserve, "it mirrors the window's inset-aware padding-bottom").toContain(
+      'max(var(--window-pad), calc(18px + env(safe-area-inset-bottom)))',
+    );
+    expect(reserve).toContain('40px');
+    const top = /scroll-padding-top:([^;]+);/.exec(block)?.[1] ?? '';
+    expect(top, 'the top reserve clears the sticky header').toMatch(
+      /calc\(48px \+ var\(--spacing-sm\)\)/,
+    );
+  });
+
+  it('does not pin the money sheets to both edges (a short sheet must not stretch)', () => {
+    // A fixed element with height:auto and BOTH top and bottom set fills the
+    // screen: a two-line trade painted a 400px panel with its commit row at the
+    // bottom of an empty sheet. The inset-aware max-height is what keeps the
+    // sheet on screen; the bottom pin belongs only to the side-by-side split.
+    for (const id of ['#trade-window', '#woc-market-window']) {
+      const block = blockContaining(
+        'top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
+        `body.mobile-touch ${id} {`,
+      );
+      expect(block, `${id} pins its top inset`).toContain(
+        'top: calc(max(10px, env(safe-area-inset-top))',
+      );
+      expect(block, `${id} must not pin its bottom edge`).not.toMatch(/\n\s*bottom: /);
+      expect(block, `${id} subtracts both insets from its cap`).toContain(
+        'max(10px, env(safe-area-inset-bottom))',
+      );
+    }
   });
 
   it('floors the vendor purchase-quantity controls at 40px under a coarse pointer (phase 21)', () => {

@@ -25,7 +25,7 @@ import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
 import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
-import { QUALITY_COLOR } from '../../icons';
+import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
 
 import { termsUrlFor } from '../../terms_link';
@@ -564,8 +564,15 @@ export class WocTradeController {
       // seller needs no line (their next move, accept or decline, reopens a
       // trade anyway, and the offer lapses on its own); every other live
       // state carries money or an escrowed copy and says so.
-      // Same finite test as the send path above: a truthy check passes NaN.
-      if (row.status === 'pending' && row.role === 'buyer' && Number.isFinite(row.expiresAtMs)) {
+      // Same finite test as the send path above, and the same `> 0`: a truthy
+      // check passes NaN, and a finite check alone would turn an epoch-0 stamp
+      // (absence written as a number) into a 1970 deadline.
+      if (
+        row.status === 'pending' &&
+        row.role === 'buyer' &&
+        Number.isFinite(row.expiresAtMs) &&
+        row.expiresAtMs > 0
+      ) {
         this.log(
           t('hudChrome.trade.woc.offerStandsUntil', {
             time: formatDateTime(row.expiresAtMs, { timeStyle: 'short' }),
@@ -1136,12 +1143,17 @@ export class WocTradeController {
       // read, and the seller accepts from there; closing it here left both
       // sides staring at nothing, with no way to agree.
       // The real expiry when the wire carries a usable one; the untimed twin
-      // otherwise, never a hard-coded figure. Number.isFinite, not a typeof
-      // test: the server projects this column through a Date parse that yields
-      // NaN for a missing or unparseable value, and NaN IS a number, so the
-      // typeof form let a "Invalid Date" through to a money line.
+      // otherwise, never a hard-coded figure. Defensive rather than a live bug
+      // fix: the server projects this column through a Date parse that CAN
+      // yield NaN, but JSON.stringify writes NaN as null, so what reaches the
+      // client is null and the old truthy test already took the untimed branch.
+      // The finite form is what the value deserves anyway, because if NaN ever
+      // did arrive, formatDateTime THROWS on it (RangeError) rather than
+      // printing anything, and the throw would take the whole line down. The
+      // `> 0` keeps the old truthy behaviour for an epoch-0 stamp, which is
+      // absence expressed as a number, not a 1970 deadline.
       this.log(
-        Number.isFinite(res.offer.expiresAtMs)
+        Number.isFinite(res.offer.expiresAtMs) && res.offer.expiresAtMs > 0
           ? t('hudChrome.trade.woc.offerSentUntil', {
               name: otherName,
               time: formatDateTime(res.offer.expiresAtMs, { timeStyle: 'short' }),
@@ -1368,14 +1380,17 @@ export class WocTradeController {
         // missing def (the shipped failure shape threw here and froze the offer
         // display behind the already-set repaint signature).
         const { item, label } = buildTradeItemRow(s, ITEMS);
-        // The name in its quality colour, the way every sibling row family
-        // writes it: an inline colour off QUALITY_COLOR (bags_window,
-        // bank_window, the Exchange's own rows). NOT the .q-<rung> class, which
-        // is the icon FRAME family: it carries border-color plus an epic and
-        // legendary glow and never a text colour, so on a bare span it painted
-        // a stray halo and left the name the inherited grey.
+        // The name in its quality colour, through the shared family module
+        // rather than a hand-rolled lookup: itemNameColor owns the fallback
+        // token, gives a quest-purpose item the bag and tooltip's quest gold,
+        // and reads the map with Object.hasOwn so a wire quality colliding with
+        // an Object.prototype key cannot interpolate a function source into a
+        // style attribute. NOT the .q-<rung> class, which is the icon FRAME
+        // family: it carries border-color plus an epic and legendary glow and
+        // never a text colour, so on a bare span it painted a stray halo and
+        // left the name the inherited grey.
         const qColor = item
-          ? (QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR)
+          ? itemNameColor({ kind: item.kind, quality: bagQualityKey(item) })
           : QUALITY_DEFAULT_COLOR;
         const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
         return mine

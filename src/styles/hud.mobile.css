@@ -3095,15 +3095,18 @@
        scale, because these pins are authored
        INSIDE #ui's zoom: a raw 44px notch renders at 37px on the 0.85 floor and
        leaves the corner controls inside the band the pin exists to clear (the
-       #social-window shape, which documents the same reasoning). The BOTTOM
-       edge is pinned too, and the height cap subtracts both insets rather than
-       a flat 20px: with a top inset above 10px the sheet's bottom edge fell
-       BELOW the viewport, and a fixed sheet cannot be scrolled back, so a
-       sticky commit row pinned to that edge went out of reach entirely. */
+       #social-window shape, which documents the same reasoning). The height cap
+       subtracts BOTH insets rather than a flat 20px: with a top inset above
+       10px the sheet's bottom edge fell BELOW the viewport, and a fixed sheet
+       cannot be scrolled back, so the sticky commit row pinned to that edge
+       went out of reach entirely. The cap alone fixes that; pinning `bottom`
+       as well would stretch every short sheet to the full screen (a two-line
+       trade painting a 400px panel), so it is deliberately not set here. The
+       SPLIT rule below pins both edges, because a side-by-side dock is meant
+       to be full height. */
     left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
     right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
     top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
-    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
     max-height: calc(
       var(--app-vh) /
       var(--ui-scale, 1) -
@@ -3596,15 +3599,18 @@
     /* Every inset is divided by the UI scale, because these pins are authored
        INSIDE #ui's zoom: a raw 44px notch renders at 37px on the 0.85 floor and
        leaves the corner controls inside the band the pin exists to clear (the
-       #social-window shape, which documents the same reasoning). The BOTTOM
-       edge is pinned too, and the height cap subtracts both insets rather than
-       a flat 20px: with a top inset above 10px the sheet's bottom edge fell
-       BELOW the viewport, and a fixed sheet cannot be scrolled back, so a
-       sticky commit row pinned to that edge went out of reach entirely. */
+       #social-window shape, which documents the same reasoning). The height cap
+       subtracts BOTH insets rather than a flat 20px: with a top inset above
+       10px the sheet's bottom edge fell BELOW the viewport, and a fixed sheet
+       cannot be scrolled back, so the sticky commit row pinned to that edge
+       went out of reach entirely. The cap alone fixes that; pinning `bottom`
+       as well would stretch every short sheet to the full screen (a two-line
+       trade painting a 400px panel), so it is deliberately not set here. The
+       SPLIT rule below pins both edges, because a side-by-side dock is meant
+       to be full height. */
     left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
     right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
     top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
-    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
     max-width: none;
     transform: none;
     max-height: calc(
@@ -3637,16 +3643,21 @@
        a row whose band is 72px) parked the price label under the row again,
        which is exactly what the rig's top-most check caught. Row: a 40px button
        floor between two --spacing-sm bands, plus its --spacing-xs top margin,
-       plus --window-pad below it, plus one more --spacing-sm so the control
-       clears the row rather than touching it. The rig measures the real band
-       and asserts this reserve covers it, so the arithmetic here can never
-       drift silently again. */
+       plus the window's REAL bottom padding below it, plus one more
+       --spacing-sm so the control clears the row rather than touching it. That
+       padding is the inset-aware max() the generic mobile window rule sets
+       (the `padding-bottom` beside its own max-height above), NOT a flat
+       --window-pad: on a landscape phone with a 21px home indicator it
+       resolves to 39px, so a reserve built on the flat token came up 15px
+       short and put the control back under the row. Headless capture reports
+       zero insets, which is exactly why this has to mirror the source rule
+       rather than trust a measurement taken without one. */
     scroll-padding-bottom: calc(
       40px +
       2 *
       var(--spacing-sm) +
       var(--spacing-xs) +
-      var(--window-pad) +
+      max(var(--window-pad), calc(18px + env(safe-area-inset-bottom))) +
       var(--spacing-sm)
     );
     /* The same fact at the TOP edge, and the one the bottom fix did not cover:

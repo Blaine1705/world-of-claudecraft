@@ -1122,6 +1122,34 @@ describe('woc_market_window: a fixed-price listing can satisfy the guards buyNow
   });
 });
 
+describe('the consent checkboxes reach the target floor on DESKTOP too', () => {
+  // The mobile sheet floors both at 24px (pinned in
+  // tests/mobile_window_layout.test.ts). Desktop shipped the Exchange's box at
+  // the 13px UA default and the trade arm's at 18px, under the 24px absolute
+  // minimum in src/ui/CLAUDE.md, on the one control the server will not take
+  // money without. The DECLARATION is read, not the whole block: prose about a
+  // value satisfies a substring check on its own.
+  const decl = (css: string, selector: string, prop: string): string => {
+    const at = css.indexOf(selector);
+    expect(at, `${selector} exists`).toBeGreaterThan(-1);
+    const block = css.slice(at, css.indexOf('\n  }', at));
+    return new RegExp(`${prop}:([^;]+);`).exec(block)?.[1]?.trim() ?? '';
+  };
+
+  it('floors the Exchange consent and offer-next boxes at 24px', () => {
+    const css = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+    const sel = '#woc-market-window label.wm-terms input[type="checkbox"]';
+    expect(decl(css, sel, 'width')).toBe('24px');
+    expect(decl(css, sel, 'height')).toBe('24px');
+  });
+
+  it('floors the trade arm consent box at 24px', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    expect(decl(css, '.trade-woc-terms input {', 'width')).toBe('24px');
+    expect(decl(css, '.trade-woc-terms input {', 'height')).toBe('24px');
+  });
+});
+
 describe('woc_market_window: the two ways to take a listing are separate actions', () => {
   const css = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 

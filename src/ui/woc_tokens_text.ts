@@ -16,9 +16,11 @@ import { formatNumber } from './i18n';
  *  fee leg at the token's real magnitude, never a nine-decimal base figure. */
 export const WOC_TOKEN_FRACTION_DIGITS = 2;
 
-/** Digits a figure too small to show at the standard precision falls back to,
- *  so a real amount never prints as a flat zero. */
-export const WOC_TOKEN_SMALL_FRACTION_DIGITS = 6;
+/** Digits a figure too small to show at the standard precision falls back to:
+ *  the token's own base precision, so even one base unit prints as itself
+ *  rather than as a flat zero. Six digits left everything under 5e-7 rounding
+ *  to "0", which is the same defect one order down. */
+export const WOC_TOKEN_SMALL_FRACTION_DIGITS = 9;
 
 export function wocTokensText(tokens: number): string {
   // A NON-ZERO amount must never render as "0": at two digits a fee leg under
