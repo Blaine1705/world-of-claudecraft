@@ -893,12 +893,25 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onCrossHotbarCast).not.toHaveBeenCalledWith({ type: 'ability', id: 'a16' });
   });
 
-  it('leaves buttons the cross hotbar does not claim on their flat binding', () => {
+  it('fires no action-bar slot from any button while the bar is on', () => {
+    // Not just the diamond: the bumpers carried slot1 and slot2, so reaching for
+    // one as a modifier cast a spell on the way in. With the bar on it owns every
+    // ability, and the whole set is one trigger away.
     const h = setupCrossHotbar(true);
-    h.press(GP.LT);
-    h.press(GP.LT, GP.LB);
-    // LB is neither a diamond button nor a trigger, so its default slot2 stands.
-    expect(h.onAction).toHaveBeenCalledWith('slot2');
+    h.press(GP.LB);
+    h.press();
+    h.press(GP.RB);
+    expect(h.onAction).not.toHaveBeenCalledWith('slot2');
+    expect(h.onAction).not.toHaveBeenCalledWith('slot1');
+  });
+
+  it('keeps a non-slot binding on a button the bar does not claim', () => {
+    // The rule is about action-bar slots specifically: a system verb still fires,
+    // or turning the bar on would silently disarm half the pad.
+    const h = setupCrossHotbar(true);
+    h.bindings.bind(GP.LB, 'map');
+    h.press(GP.LB);
+    expect(h.onAction).toHaveBeenCalledWith('map');
   });
 
   it('toggles the virtual mouse on LB + right-stick-click, either order', () => {

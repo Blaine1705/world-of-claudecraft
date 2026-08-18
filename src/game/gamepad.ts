@@ -551,9 +551,9 @@ export class GamepadManager {
   private pressWouldDoNothing(buttonIndex: number): boolean {
     const action = this.bindings.actionFor(buttonIndex);
     if (action === GAMEPAD_NONE) return true;
-    // Mirrors dispatch(): with the cross hotbar on, a claimed button's SLOT
-    // binding is swallowed, but its system verb (target, interact) still fires.
-    return this.crossHotbar && isCrossHotbarButton(buttonIndex) && action.startsWith('slot');
+    // Mirrors dispatch(): with the cross hotbar on, a SLOT binding is swallowed on
+    // every button, but its system verb (target, interact) still fires.
+    return this.crossHotbar && action.startsWith('slot');
   }
 
   private dispatch(buttonIndex: number): void {
@@ -574,16 +574,14 @@ export class GamepadManager {
       // swallowed: falling through to the flat binding would cast the wrong
       // thing at the exact moment the player is reading the cross hotbar.
       if (this.triggerState.hold !== null && isCrossHotbarButton(buttonIndex)) return;
-      // No trigger held: the diamond buttons keep their SYSTEM verbs (jump,
-      // interact, target) but never their action-bar slot. A button that casts an
-      // ability bare AND a different one under a trigger is the "random cast"
-      // problem, and the whole set is already a trigger away. Checked at dispatch
-      // rather than only in the defaults so a remap cannot reintroduce it.
-      if (
-        isCrossHotbarButton(buttonIndex) &&
-        this.bindings.actionFor(buttonIndex).startsWith('slot')
-      )
-        return;
+      // No trigger held: buttons keep their SYSTEM verbs (jump, interact, target)
+      // but NO button fires an action-bar slot. A button that casts an ability bare
+      // AND a different one under a trigger is the "random cast" problem, and the
+      // whole set is already a trigger away. It covers every button, not just the
+      // diamond: the bumpers were still casting bar slots 1 and 2, so reaching for
+      // a bumper as a modifier cast a spell on the way. Checked at dispatch rather
+      // than only in the defaults so a remap cannot reintroduce it.
+      if (this.bindings.actionFor(buttonIndex).startsWith('slot')) return;
     }
     const action = this.bindings.actionFor(buttonIndex);
     if (action === GAMEPAD_NONE) return;
