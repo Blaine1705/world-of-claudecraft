@@ -70,6 +70,32 @@ describe('marketplace copy names the live rule figures', () => {
     expect(market.activitySuspended).toContain('$WOC trades');
   });
 
+  it('the five non-Latin fills carry the same figures as the English source', () => {
+    // The header's claim, made real: reading only hudChromeStrings would let a
+    // rule retune reword the English and leave a stale figure standing in every
+    // fill, which is the one place a player of that locale would read it. The
+    // digits survive translation (they are digits in all five), so each fill is
+    // checked for the numbers its English twin spells.
+    const FILLS: Array<[string, readonly string[]]> = [
+      ['hudChrome.wocMarket.bidCloseNote', ['2', '30']],
+      ['hudChrome.wocMarket.buyNowNote', ['30']],
+      ['hudChrome.wocMarket.strikesTip', ['3', '14', '90']],
+    ];
+    for (const locale of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU']) {
+      const src = readFileSync(`src/ui/i18n.locales/${locale}.ts`, 'utf8');
+      for (const [key, figures] of FILLS) {
+        const at = src.indexOf(`'${key}':`);
+        expect(at, `${locale} carries a fill for ${key}`).toBeGreaterThan(-1);
+        // The value runs to the next quoted key at this indent, which is where
+        // the overlay's flat rows end.
+        const value = src.slice(at, src.indexOf("\n  '", at + 1));
+        for (const figure of figures) {
+          expect(value, `${locale} ${key} still spells ${figure}`).toContain(figure);
+        }
+      }
+    }
+  });
+
   it('the capture rigs seed the LOWEST graphics preset before the document loads', () => {
     // The standing capture rule: window shots are evidence about the DOM, and
     // tier 1 is what SwiftShader should pay for on a shared box. graphicsPreset 1

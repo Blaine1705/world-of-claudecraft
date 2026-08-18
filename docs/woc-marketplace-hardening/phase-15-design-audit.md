@@ -342,6 +342,20 @@ exist plus `color-mix()` over them (the `hud.css` precedent).
       (Accept / Cancel row, coin inputs, close), the coarse-pointer fact the
       floors depend on, and a `BAGS_OVER=1` arm that captures and asserts the
       split state instead of hiding the bags to measure.
+- [x] APPLIED, from the seam review. Both money sheets pin their BOTTOM edge and
+      divide every safe-area inset by the UI scale (the `#social-window` shape).
+      The old form paired a raw inset with a flat 20px height cap, so a top
+      inset above 10px pushed the sheet's bottom edge BELOW the viewport, and a
+      fixed sheet cannot be scrolled back: the newly sticky commit row, pinned
+      to exactly that edge, went out of reach. The raw insets also shrank with
+      the zoom, clearing only 37px of a 44px notch at the 0.85 scale floor.
+- [x] APPLIED. The sticky row's scroll reserve is derived from the tokens the
+      row is built from (a 40px button floor between two `--spacing-sm` bands
+      plus a `--spacing-xs` gap) rather than a 72px literal that silently stops
+      covering the row when either moves.
+- [x] APPLIED. Both consent checkboxes reach the 24px floor on DESKTOP too: the
+      trade arm's was 18px and the Exchange's was still the 13px UA default, on
+      the one control the server will not take money without.
 - [x] JUDGED, no change. Insetting the SHARED sheet base for all 24 windows is
       the systemic fix and a maintainer call; this pass insets the two money
       sheets it owns. The store's dead portrait media query stays (out of scope,

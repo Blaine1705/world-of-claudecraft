@@ -488,7 +488,24 @@ async function enterWorldInBrowser(
       .catch(() => false);
     if (!onPanel) console.log('realm press did not open a panel; retrying');
   }
-  if (!onPanel) throw new Error('realm selection never opened a character panel');
+  if (!onPanel) {
+    // Name what the page actually shows: a bare throw here cost a rerun every
+    // time, and every stall so far has been one of these fields.
+    const state = await page.evaluate(() => ({
+      realmRows: document.querySelectorAll('#realm-list .realm-row').length,
+      firstRealm: document.querySelector('#realm-list .realm-row')?.textContent?.trim() ?? '',
+      realmDisabled: document.querySelector('#realm-list .realm-row')?.hasAttribute('disabled'),
+      realmErr: document.querySelector('#realm-error')?.textContent ?? '',
+      login: document.querySelector('#login-panel')?.hasAttribute('hidden'),
+      loginErr: document.querySelector('#login-error')?.textContent ?? '',
+      charcreate: document.querySelector('#charcreate-panel')?.hasAttribute('hidden'),
+      charselect: document.querySelector('#charselect-panel')?.hasAttribute('hidden'),
+      game: typeof window.__game,
+    }));
+    console.error('realm press never opened a panel:', JSON.stringify(state));
+    await page.screenshot({ path: `${OUT}/debug-realm.png` });
+    throw new Error('realm selection never opened a character panel');
+  }
   const onCreatePanel = await page.evaluate(
     () => !document.querySelector('#charcreate-panel')?.hasAttribute('hidden'),
   );

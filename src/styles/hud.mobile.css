@@ -3630,7 +3630,11 @@
      top-most element at its own centre, which is exactly untappable. The
      mobile capture rig asserts that top-most fact per control. */
   body.mobile-touch #trade-window {
-    scroll-padding-bottom: 72px;
+    /* Derived, not guessed: the row is a 40px button floor between two
+       --spacing-sm bands, plus a --spacing-xs gap so the control clears it
+       rather than touching it. A literal here would silently stop covering the
+       row the moment the spacing tokens or the button floor move. */
+    scroll-padding-bottom: calc(40px + 2 * var(--spacing-sm) + var(--spacing-xs));
     /* The same fact at the TOP edge, and the one the bottom fix did not cover:
        .window > .panel-title is sticky (layout.css) and paints over the sheet
        scrolling beneath it, so a control the browser scrolls to the top of the

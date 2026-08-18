@@ -2996,11 +2996,80 @@ docs and capture commits.
 - **A catalog-wide decision.** Title case on buttons (DESIGN.md 5.4): this
   catalog is mixed, so a marketplace-only sweep would create a new
   inconsistency and stale every locale row it touched.
+- **The DESIGN.md chrome retune, WITH evidence.** `--panel-border` (DESIGN.md
+  4.3) stays UNDECLARED. Its 13 consumers are all in the Dungeon Finder section,
+  so declaring the alias is not a token cleanup: it switches on 13 borders that
+  have never painted and grows those content-sized chips by about 2px, in a
+  window this pass neither owns nor captured. It is on the exact ratchet in
+  `tests/css_token_resolution.test.ts` with that reason, and the retune owes a
+  Dungeon Finder before/after (desktop and 900x420) when it lands.
+- **A theme pass.** The typed price and the block reason read `--gold` and
+  `--gold-dim`, the RAW accent pair, while the rest of the arm reads the
+  contrast-repaired `--color-accent`. Both are a clear improvement on the hex
+  literals they replaced; choosing between the pairs belongs with a contrast
+  sweep over every preset, not a marketplace section.
+- **Structural, whole-HUD.** Every mobile touch floor is authored inside `#ui`'s
+  zoom, so at the 0.85 UI-scale floor a 40px control renders at 34px. The money
+  sheets' own INSETS are now divided by the scale; doing the same to the floors
+  is a house-wide change with its own capture set.
 - **Recorded, no change.** The three native `<select>` controls stay native (the
   themed `.ui-dd` swap is wiring); the Exchange stays a fitted 960x700 rather
   than the large-window target; the store's dead portrait media query stays;
   insetting the SHARED mobile sheet base for all 24 windows is a maintainer
   call, so this pass insets only the two money sheets it owns.
+
+### 15 review round (two independent frontend seam passes, every finding settled)
+
+Two `frontend-seam-reviewer` passes ran over the committed range with MOBILE in
+scope, plus an i18n fill audit. Neither returned a BLOCKING finding. What the
+fix round applied, each with its own pin:
+
+- The staged item's name carried `.q-<rung>`, which is the icon FRAME family
+  (border plus an epic and legendary glow, never a text colour): an epic read
+  grey behind a stray halo, a rare showed nothing. It now takes the inline
+  `QUALITY_COLOR` every sibling row family uses; the pin reds on the old markup.
+- Two rendered sentences were joined in code with a hard `' '`, which decides a
+  locale's spacing (CJK sets none) and forbids reordering: the ineligible count
+  and its reason, and the seller's fee and net. Each owns its line now, the
+  shape the arm already used for the fee and net pair.
+- A fee resolved for one price field survived the format swap that rebuilds the
+  form under it. It is dropped and re-asked; the pin fails if the re-ask goes.
+- A token amount too small for two fraction digits printed a flat `0`: a real
+  fee leg reading as nothing. Under half a hundredth it now keeps six digits.
+- Both offer-expiry reads used a `typeof === 'number'` or truthy test, neither
+  of which rejects NaN, and NaN is exactly what the server's date projection
+  yields for a missing value. Both take `Number.isFinite` now.
+- Mobile: both money sheets pin their BOTTOM edge and divide every safe-area
+  inset by the UI scale. With a top inset above 10px the old cap put the sheet's
+  bottom edge (and the sticky commit row pinned to it) below the viewport, out
+  of reach on a fixed sheet. The `scroll-padding-bottom` literal is derived from
+  the tokens the row is built from.
+- Desktop consent checkboxes reached the 24px floor (the trade arm's was 18px,
+  the Exchange's the 13px UA default) on the one control the server will not
+  take money without.
+- The Exchange window took a zero-headroom line ceiling now that it is the
+  largest unpinned UI module; the arm painter got the no-magic source scan its
+  namespace expects; the balance chip joined the architecture registries beside
+  its two siblings; the log tones' literals are a documented sanctioned home
+  with a test pinning the single source.
+
+Judged, no change, with the reasoning:
+
+- The per-keystroke sell-fee estimate is the window's OWN established idiom (the
+  bid preview above it does the same, RTT-coalesced with at most one in flight,
+  no timer, because the window's contract forbids self-scheduling). Recorded for
+  the service owner rather than changed late in a presentation pass.
+- The buyer's pre-signature note now says the quote fixes the amount until it
+  expires. Verified against the wire rather than taken on faith: a settlement
+  carries `quoteReference` plus `quoteExpiresAtMs` and is refused outright when
+  either is absent (`server/woc_market.ts`, `quote_unavailable`).
+- The arm painter stays in the perf gate's audited bucket with an EXACT write
+  allowance rather than moving back to the unscanned cold bucket or routing five
+  event-driven writes through the facet. The allowance is stricter than its
+  previous classification: a third `textContent` site now fails the gate.
+- The currency switch stays a pressed-toggle group rather than the tab-strip
+  family: there are no tabpanels, and the previous `role="tablist"` with no
+  roving tabindex was the defect. Reuse the family if a third mode lands.
 
 ### 15 items closed from earlier phases' deferral lists
 
