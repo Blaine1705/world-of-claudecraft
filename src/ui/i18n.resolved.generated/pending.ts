@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -27,9 +28,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "es_ES": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -47,9 +52,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "fr_FR": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -67,9 +76,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "fr_CA": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -87,10 +100,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -108,9 +125,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "de_DE": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -128,7 +149,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "zh_CN": [
     "hudChrome.controller.crossHotbarPosition",
@@ -147,6 +171,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet"
   ],
   "pt_BR": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -164,13 +189,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "ru_RU": [
     "hudChrome.controller.crossHotbarPosition",
     "hudChrome.controller.crossHotbarSet"
   ],
   "cs_CZ": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -188,9 +217,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "nl_NL": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -208,9 +241,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "pl_PL": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -228,9 +265,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "id_ID": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -248,9 +289,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "tr_TR": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -268,9 +313,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "sv_SE": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -288,9 +337,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "vi_VN": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -308,9 +361,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ],
   "da_DK": [
+    "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
     "hudChrome.controller.crossHotbarArrangeChord",
@@ -328,6 +385,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarSet",
     "hudChrome.controller.crossHotbarSetExpanded",
     "hudChrome.controller.crossHotbarSetPrimary",
-    "hudChrome.controller.crossHotbarSlot"
+    "hudChrome.controller.crossHotbarSlot",
+    "hudChrome.controller.cycleHudAction",
+    "hudChrome.controller.cycleSetAction",
+    "hudChrome.controller.subcommandsAction"
   ]
 };

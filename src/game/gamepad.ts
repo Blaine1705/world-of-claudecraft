@@ -14,6 +14,7 @@ import {
   INITIAL_CROSS_HOTBAR_TRIGGER_STATE,
   isCrossHotbarButton,
   nextCrossHotbarTriggerState,
+  toggleCrossHotbarStandingSet,
 } from './cross_hotbar';
 import type { CrossHotbarBindings } from './cross_hotbar_bindings';
 import {
@@ -27,6 +28,7 @@ import {
 import {
   clearPadFocus,
   focusFirstInWindow,
+  hasPadFocus,
   moveDpadFocus,
   pressDpadFocus,
   restorePadFocus,
@@ -38,7 +40,9 @@ import {
   AXIS,
   applyRadialDeadzone,
   detectGamepadKind,
+  GAMEPAD_CANCEL,
   GAMEPAD_CONFIRM,
+  GAMEPAD_CYCLE_SET,
   GAMEPAD_NONE,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
@@ -109,6 +113,16 @@ const DPAD_NAV_DIRECTIONS: Record<number, NavDirection> = {
 // after the close, short enough that a genuine exit does not leave a stale
 // highlight on screen.
 const FOCUS_RETURN_FRAMES = 12;
+
+// What the bare d-pad cycles in the world. Left/right walk the target list and
+// up/down the friendly one, matching the console-MMO split. There is no reverse
+// friendly cycle to bind, so down takes the nearest instead of stepping back.
+const DPAD_TARGET_ACTIONS: Record<number, string | undefined> = {
+  [GP.DPAD_LEFT]: 'targetPrev',
+  [GP.DPAD_RIGHT]: 'target',
+  [GP.DPAD_UP]: 'targetFriendlyNext',
+  [GP.DPAD_DOWN]: 'targetFriendly',
+};
 
 export class GamepadManager {
   private index: number | null = null;
@@ -231,6 +245,13 @@ export class GamepadManager {
       return;
     }
     this.triggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
+    this.notifyCrossHotbar();
+  }
+
+  /** Swap the standing set. Holding a trigger is not required: this is the switch
+   *  a player leaves flipped, not the mid-hold reach the opposite trigger gives. */
+  private toggleCrossHotbarSet(): void {
+    this.triggerState = toggleCrossHotbarStandingSet(this.triggerState);
     this.notifyCrossHotbar();
   }
 
@@ -478,8 +499,18 @@ export class GamepadManager {
       // a press that would otherwise do nothing is taken, so nothing is stolen.
       const dir = DPAD_NAV_DIRECTIONS[idx];
       if (dir !== undefined && this.triggerState.hold === null && this.pressWouldDoNothing(idx)) {
-        moveDpadFocus(dir);
-        continue;
+        // Inside the HUD (the player stepped in with the cycle button, or is
+        // arranging the bar), the arrows walk the interface. Otherwise they cycle
+        // targets, which is what a console MMO gives its d-pad in the world.
+        if (this.edit.active || hasPadFocus()) {
+          moveDpadFocus(dir);
+          continue;
+        }
+        const targetAction = DPAD_TARGET_ACTIONS[idx];
+        if (targetAction) {
+          this.cb.onAction(targetAction);
+          continue;
+        }
       }
       this.dispatch(idx);
     }
@@ -632,8 +663,17 @@ export class GamepadManager {
     }
     const action = this.bindings.actionFor(buttonIndex);
     if (action === GAMEPAD_NONE) return;
+    if (action === GAMEPAD_CYCLE_SET) {
+      // Only while the bar is on: with it off there are no sets to swap between,
+      // and a button that silently does nothing is worse than one left free.
+      if (this.crossHotbar) this.toggleCrossHotbarSet();
+      return;
+    }
     if (action === GAMEPAD_CONFIRM) {
-      pressDpadFocus();
+      // Confirm FIRST, interact second. With a control focused the press belongs
+      // to the interface; with none it is the world's, which is what makes one
+      // button both "confirm" and "talk to this NPC" the way FFXIV has it.
+      if (!pressDpadFocus()) this.cb.onAction('interact');
       return;
     }
     if (action === 'jump') {

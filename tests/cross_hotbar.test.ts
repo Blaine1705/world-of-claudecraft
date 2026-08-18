@@ -19,6 +19,7 @@ import {
   nextCrossHotbarTriggerState,
   sanitizeCrossHotbarLayout,
   seedCrossHotbarLayout,
+  toggleCrossHotbarStandingSet,
 } from '../src/game/cross_hotbar';
 import { GP } from '../src/game/gamepad_map';
 
@@ -335,5 +336,43 @@ describe('sanitizeCrossHotbarLayout', () => {
   it('drops extra sets a longer stored value carries', () => {
     const stored = [...defaultCrossHotbarLayout(), Array(16).fill(null)];
     expect(sanitizeCrossHotbarLayout(stored)).toHaveLength(CROSS_HOTBAR_SET_COUNT);
+  });
+});
+
+describe('the standing set and the mid-hold reach compose', () => {
+  const held = (over: Partial<CrossHotbarTriggerState> = {}) => ({
+    ...INITIAL_CROSS_HOTBAR_TRIGGER_STATE,
+    ...over,
+  });
+
+  it('survives a hold ending, unlike the reach', () => {
+    // The whole difference between the two: a switch is standing, a reach lasts
+    // only as long as the trigger does.
+    const switched = toggleCrossHotbarStandingSet(INITIAL_CROSS_HOTBAR_TRIGGER_STATE);
+    const afterHold = nextCrossHotbarTriggerState(
+      { ...switched, hold: 'left', ltDown: true },
+      false,
+      false,
+      true,
+    );
+    expect(afterHold.standing).toBe(true);
+    expect(afterHold.hold).toBeNull();
+    expect(crossHotbarActiveSet(afterHold)).toBe(CROSS_HOTBAR_EXPANDED_SET);
+  });
+
+  it('reads as the OTHER set whichever one is standing', () => {
+    // XOR, not either flag alone: tapping the opposite trigger has to mean "the
+    // other set" even when the player already switched to the second one.
+    expect(crossHotbarActiveSet(held())).toBe(CROSS_HOTBAR_PRIMARY_SET);
+    expect(crossHotbarActiveSet(held({ standing: true }))).toBe(CROSS_HOTBAR_EXPANDED_SET);
+    expect(crossHotbarActiveSet(held({ expanded: true }))).toBe(CROSS_HOTBAR_EXPANDED_SET);
+    expect(crossHotbarActiveSet(held({ expanded: true, standing: true }))).toBe(
+      CROSS_HOTBAR_PRIMARY_SET,
+    );
+  });
+
+  it('toggles back', () => {
+    const on = toggleCrossHotbarStandingSet(INITIAL_CROSS_HOTBAR_TRIGGER_STATE);
+    expect(toggleCrossHotbarStandingSet(on).standing).toBe(false);
   });
 });

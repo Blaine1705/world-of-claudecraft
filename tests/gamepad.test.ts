@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { CROSS_HOTBAR_EXPANDED_SET, CROSS_HOTBAR_PRIMARY_SET } from '../src/game/cross_hotbar';
 import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
 import { type GamepadCallbacks, GamepadManager } from '../src/game/gamepad';
 import { GamepadBindings } from '../src/game/gamepad_bindings';
@@ -984,14 +985,48 @@ describe('GamepadManager cross hotbar', () => {
     // the random-cast problem; the whole set is a trigger away, so bare presses of
     // a cross-hotbar button never reach a slot.
     h.press(GP.DPAD_UP);
-    expect(h.onAction).not.toHaveBeenCalled();
+    // A bare d-pad press cycles targets now, so assert on the SLOT specifically
+    // rather than on silence: the rule is about abilities, not about the button
+    // being inert.
+    for (const call of h.onAction.mock.calls) {
+      expect(String(call[0]).startsWith('slot')).toBe(false);
+    }
   });
 
   it('keeps the SYSTEM verbs on the diamond buttons when no trigger is held', () => {
     const h = setupCrossHotbar(true);
-    // B is 'interact' by default, which is not a slot, so a bare press still works.
+    // B is 'cancel' by default, which is not a slot, so a bare press still works.
     h.press(GP.B);
+    expect(h.onAction).toHaveBeenCalledWith('cancel');
+  });
+
+  it('swaps the standing set on the right bumper', () => {
+    // The bar has two sets and, before this, the only way to the second was
+    // tapping the opposite trigger mid-hold. The bumper is the standing switch.
+    const h = setupCrossHotbar(true);
+    h.press(GP.RB);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, CROSS_HOTBAR_EXPANDED_SET);
+    h.press();
+    h.press(GP.RB);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, CROSS_HOTBAR_PRIMARY_SET);
+  });
+
+  it('interacts on confirm when no interface control is focused', () => {
+    // The console-MMO reading of the bottom button: confirm what is focused, and
+    // with nothing focused talk to (or loot) what is targeted. Pressing "back" to
+    // start a conversation is the thing every console player gets wrong once.
+    const h = setupCrossHotbar(true);
+    h.press(GP.A);
     expect(h.onAction).toHaveBeenCalledWith('interact');
+  });
+
+  it('cycles targets on the bare d-pad, and only outside the HUD', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.DPAD_RIGHT);
+    h.press();
+    h.press(GP.DPAD_LEFT);
+    expect(h.onAction).toHaveBeenCalledWith('target');
+    expect(h.onAction).toHaveBeenCalledWith('targetPrev');
   });
 
   it('suppresses a slot a player REMAPPED onto a diamond button too', () => {

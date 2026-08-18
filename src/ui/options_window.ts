@@ -26,8 +26,12 @@ import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
+  GAMEPAD_CANCEL,
   GAMEPAD_CONFIRM,
+  GAMEPAD_CYCLE_HUD,
+  GAMEPAD_CYCLE_SET,
   GAMEPAD_NONE,
+  GAMEPAD_SUBCOMMANDS,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
   gamepadButtonLabel,
@@ -1799,6 +1803,10 @@ export class OptionsWindow {
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
       { value: GAMEPAD_CONFIRM, label: t('hudChrome.controller.confirmAction') },
+      { value: GAMEPAD_CANCEL, label: t('hudChrome.controller.cancelAction') },
+      { value: GAMEPAD_SUBCOMMANDS, label: t('hudChrome.controller.subcommandsAction') },
+      { value: GAMEPAD_CYCLE_HUD, label: t('hudChrome.controller.cycleHudAction') },
+      { value: GAMEPAD_CYCLE_SET, label: t('hudChrome.controller.cycleSetAction') },
       { value: GAMEPAD_ZOOM_IN, label: t('hudChrome.controller.zoomIn') },
       { value: GAMEPAD_ZOOM_OUT, label: t('hudChrome.controller.zoomOut') },
     ];

@@ -205,6 +205,20 @@ export const GAMEPAD_NONE = 'none';
 // in GamepadManager.dispatch() against the focus navigation, so it never reaches
 // the host's keybind path (there is no keyboard action for "click").
 export const GAMEPAD_CONFIRM = 'confirm';
+// Cancel, the way a console MMO means it: back out of the top window, and with
+// none open let the target go. Distinct from `escape`, which opens the game menu
+// once there is nothing left to close.
+export const GAMEPAD_CANCEL = 'cancel';
+// Open the target's subcommands (the context menu a mouse gets by right-clicking),
+// falling back to the map when nothing is targeted. One button, as FFXIV has it.
+export const GAMEPAD_SUBCOMMANDS = 'subcommands';
+// Step the pad's selection through the HUD's own components. This is the job the
+// bare d-pad used to do, moved to its own button so the d-pad can cycle targets.
+export const GAMEPAD_CYCLE_HUD = 'cycleHud';
+// Swap the cross hotbar between its sets without holding anything, the way a
+// console MMO spends its right bumper. The trigger-tap route stays: this is the
+// standing switch, that one is the mid-hold reach.
+export const GAMEPAD_CYCLE_SET = 'cycleHotbarSet';
 export const GAMEPAD_ZOOM_IN = 'zoomIn';
 export const GAMEPAD_ZOOM_OUT = 'zoomOut';
 // Matches the step Input's mouse-wheel handler applies per notch (input.ts), so
@@ -215,13 +229,18 @@ export const GAMEPAD_ZOOM_STEP = 1.4;
 // looks, face/shoulder/d-pad reach the first nine action-bar slots plus the
 // staple verbs (jump, interact, target, menu). Fully remappable afterwards.
 export const DEFAULT_GAMEPAD_BINDINGS: Record<number, GamepadActionId> = {
-  // Face buttons follow the console-MMO convention: bottom confirms, right
-  // cancels/interacts, left targets, top jumps.
+  // Face buttons follow the console-MMO convention as FFXIV spells it: bottom
+  // confirms AND interacts (talk, loot), right is purely cancel, left opens the
+  // target's subcommands or the map, top jumps. Interacting is deliberately NOT on
+  // the right button: cancel and interact are different verbs, and pressing "back"
+  // to talk to someone is the thing every console player gets wrong once.
   [GP.A]: GAMEPAD_CONFIRM,
-  [GP.B]: 'interact',
-  [GP.X]: 'target',
+  [GP.B]: GAMEPAD_CANCEL,
+  [GP.X]: GAMEPAD_SUBCOMMANDS,
   [GP.Y]: 'jump',
-  [GP.RB]: 'slot1',
+  // The bumpers no longer carry ability slots (the bar owns every ability now), so
+  // the right one takes the set switch it has on a console pad.
+  [GP.RB]: GAMEPAD_CYCLE_SET,
   [GP.LB]: 'slot2',
   // LT/RT are deliberately UNBOUND: they are the cross hotbar's two modifiers, and
   // a modifier that also fires an ability reads as a random cast every time the
@@ -229,7 +248,8 @@ export const DEFAULT_GAMEPAD_BINDINGS: Record<number, GamepadActionId> = {
   // hotbar off and wants them back.
   // The d-pad carries no bare action: it is four cross-hotbar cells, and a bare
   // press opens UI navigation instead.
-  [GP.BACK]: 'map',
+  // The map moved to X with the subcommands, which frees this for the HUD walk.
+  [GP.BACK]: GAMEPAD_CYCLE_HUD,
   [GP.START]: 'escape',
   [GP.L3]: 'autorun',
   [GP.R3]: 'targetFriendly',

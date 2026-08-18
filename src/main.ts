@@ -54,6 +54,7 @@ import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
+import { cycleHudFocus } from './game/dpad_focus_nav';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -73,6 +74,7 @@ import {
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
+import { GAMEPAD_CANCEL, GAMEPAD_CYCLE_HUD, GAMEPAD_SUBCOMMANDS } from './game/gamepad_map';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
@@ -138,6 +140,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { padReelItemId } from './game/pad_reel';
+import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
@@ -2175,6 +2178,18 @@ async function startGame(
   const crossHotbar = createCrossHotbar(() => hud);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
+    // Cancel backs out one step at a time: the top window, then the target. Only
+    // once there is nothing left to leave does the game menu come up, which is
+    // what keeps this distinct from the menu button rather than a second copy.
+    if (id === GAMEPAD_CANCEL) {
+      if (dismissCameraPrompt() || hud.cancelGroundAim() || hud.closeAll()) return;
+      world.targetEntity(null);
+      return;
+    }
+    if (id === GAMEPAD_CYCLE_HUD) {
+      cycleHudFocus();
+      return;
+    }
     if (id === 'escape') {
       if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
@@ -2230,6 +2245,14 @@ async function startGame(
       case 'map':
         hud.toggleMap();
         break;
+      // The target's subcommands, or the map when there is no target: one button
+      // for "what can I do with this", the way a console MMO spends its left face
+      // button. The menu itself is the one the mouse opens by right-clicking, so
+      // there is no second menu to keep in step with it.
+      case GAMEPAD_SUBCOMMANDS: {
+        if (!openTargetSubcommands()) hud.toggleMap();
+        break;
+      }
       case 'nameplates':
         renderer.showNameplates = !renderer.showNameplates;
         break;

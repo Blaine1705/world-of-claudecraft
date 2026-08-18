@@ -191,8 +191,13 @@ export function crossHotbarSetActions(
 export interface CrossHotbarTriggerState {
   /** The trigger being held, or null when the cross hotbar is dormant. */
   hold: CrossHotbarLayer | null;
-  /** Whether the opposite-trigger tap has swapped this hold to the second set. */
+  /** Whether the opposite-trigger tap has swapped THIS HOLD to the other set. It
+   *  lasts as long as the hold does, which is what makes it a reach rather than a
+   *  switch. */
   expanded: boolean;
+  /** Which set the bar sits on with nothing held. Survives holds, so it is the
+   *  standing choice the set-switch button flips. */
+  standing: boolean;
   ltDown: boolean;
   rtDown: boolean;
 }
@@ -200,6 +205,7 @@ export interface CrossHotbarTriggerState {
 export const INITIAL_CROSS_HOTBAR_TRIGGER_STATE: CrossHotbarTriggerState = {
   hold: null,
   expanded: false,
+  standing: false,
   ltDown: false,
   rtDown: false,
 };
@@ -233,12 +239,26 @@ export function nextCrossHotbarTriggerState(
     if (down(opposite) && !oppositeWasDown) expanded = !expanded;
   }
 
-  return { hold, expanded, ltDown, rtDown };
+  // `standing` is deliberately untouched: releasing a trigger must not undo the
+  // set the player switched to, or the switch would last exactly one hold.
+  return { hold, expanded, standing: prev.standing, ltDown, rtDown };
 }
 
-/** The set a trigger state reads from. */
+/** Flip the standing set. The mid-hold reach is left alone: it is relative to
+ *  whatever is standing, which is what makes the two compose. */
+export function toggleCrossHotbarStandingSet(
+  state: CrossHotbarTriggerState,
+): CrossHotbarTriggerState {
+  return { ...state, standing: !state.standing };
+}
+
+/**
+ * The set a trigger state reads from: the standing choice, swapped while a hold
+ * has reached across. Read as XOR rather than either flag alone, so tapping the
+ * opposite trigger always means "the other set" no matter which one is standing.
+ */
 export function crossHotbarActiveSet(state: CrossHotbarTriggerState): number {
-  return state.expanded ? CROSS_HOTBAR_EXPANDED_SET : CROSS_HOTBAR_PRIMARY_SET;
+  return state.expanded !== state.standing ? CROSS_HOTBAR_EXPANDED_SET : CROSS_HOTBAR_PRIMARY_SET;
 }
 
 /**

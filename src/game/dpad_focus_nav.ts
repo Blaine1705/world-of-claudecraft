@@ -25,6 +25,29 @@ function isVisible(el: HTMLElement): boolean {
 // the player in whichever one they are standing in.
 let spanWindows = false;
 
+/** Whether the pad is holding a HUD selection right now. The d-pad reads this to
+ *  decide between walking the interface and cycling targets: once the player is
+ *  IN the HUD the arrows belong to it, and cancelling hands them back. */
+export function hasPadFocus(): boolean {
+  return marked !== null;
+}
+
+/**
+ * Step the selection to the next HUD control, wrapping at the end. This is the
+ * "cycle HUD components" button a console MMO gives its interface, and it is the
+ * way IN now that the bare d-pad cycles targets instead.
+ */
+export function cycleHudFocus(): boolean {
+  if (typeof document === 'undefined') return false;
+  const els = focusables(activeRoot() ?? document);
+  if (els.length === 0) return false;
+  const at = marked ? els.indexOf(marked) : -1;
+  const next = els[(at + 1) % els.length];
+  next.focus();
+  markPadFocus(next);
+  return true;
+}
+
 /** Whether the d-pad currently walks the whole document rather than one window. */
 export function setPadNavSpansWindows(on: boolean): void {
   spanWindows = on;

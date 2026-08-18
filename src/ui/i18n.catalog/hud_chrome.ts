@@ -1530,6 +1530,10 @@ export const hudChromeStrings = {
     crossHotbarOverlay: 'Cross hotbar',
     crossHotbarOwnsButtons:
       'The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.',
+    cancelAction: 'Cancel / Back',
+    subcommandsAction: 'Subcommands / Map',
+    cycleHudAction: 'Cycle Interface',
+    cycleSetAction: 'Change Hotbar Set',
     crossHotbarArrangeChord: '{bumper} + {button} to arrange',
     crossHotbarCarrying: 'Carrying {action}: confirm on a cell to place it, cancel to put it back.',
     crossHotbarEditHint:

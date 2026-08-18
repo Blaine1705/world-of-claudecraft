@@ -140,7 +140,12 @@ describe('default layout', () => {
     // Console-MMO face layout: bottom confirms, top jumps.
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.A]).toBe('confirm');
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.Y]).toBe('jump');
-    expect(DEFAULT_GAMEPAD_BINDINGS[GP.X]).toBe('target');
+    // The left face button opens the target's subcommands (falling back to the
+    // map). Targeting does not need a button of its own: confirm selects, and the
+    // bare d-pad cycles.
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.X]).toBe('subcommands');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.B]).toBe('cancel');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.BACK]).toBe('cycleHud');
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.START]).toBe('escape');
     for (const idx of Object.keys(DEFAULT_GAMEPAD_BINDINGS).map(Number)) {
       expect(BINDABLE_BUTTONS).toContain(idx);
@@ -161,16 +166,14 @@ describe('default layout', () => {
 
   it('covers its action-bar slots exactly once (catches a dropped or duplicated slotN)', () => {
     const values = Object.values(DEFAULT_GAMEPAD_BINDINGS);
-    // Only the two bumpers still carry a bare slot. Every cross-hotbar button (the
-    // d-pad and the face four) is reserved for system verbs and its sixteen
-    // trigger-held slots, and the triggers themselves are the modifiers, so the
-    // flat layout deliberately no longer reaches slot0 or slot3..slot8.
-    for (const slot of [1, 2]) {
-      // Exactly once: count 0 = a dropped slot, count >= 2 = a duplicated slot
-      // (additive or displacing). The default layout binds each slot to one button.
-      expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(1);
-    }
-    for (const slot of [0, 3, 4, 5, 6, 7, 8]) {
+    // Only the LEFT bumper still carries a bare slot; the right one took the set
+    // switch a console pad puts there. Every cross-hotbar button (the d-pad and
+    // the face four) is reserved for system verbs and its sixteen trigger-held
+    // slots, and the triggers themselves are the modifiers, so the flat layout
+    // deliberately reaches no other slot.
+    // Exactly once: count 0 = a dropped slot, count >= 2 = a duplicated slot.
+    expect(values.filter((v) => v === 'slot2').length, 'slot2').toBe(1);
+    for (const slot of [0, 1, 3, 4, 5, 6, 7, 8]) {
       expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(0);
     }
   });
