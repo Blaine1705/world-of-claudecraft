@@ -197,8 +197,11 @@ interface AttributionTargetFixture {
 // moved, the seals follow the swept evidence bytes. No capture was retaken.
 // Re-minted for the build-span sink wiring (view-part sub-spans): renderer.ts
 // moved, the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the composed-look pieces hold (live candidate path wiring):
+// renderer.ts moved, the seals follow the swept evidence bytes. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '997134cbdd9544c6cefedf74bf65ef3f0152a174d067eeac2ef4531d6260c98a';
+  '2d7ffe57bcf869f63660e553292ceb3cda5e35442a0eb2a96a595f74df057569';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

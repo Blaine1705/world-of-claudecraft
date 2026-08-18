@@ -1,3 +1,5 @@
+import type { FoliagePerfStats } from './foliage';
+
 export interface RendererFramePhaseMs {
   setup: number;
   entities: number;
@@ -96,4 +98,38 @@ export function beginRendererFrameTelemetry(
   worldPhaseMs.sky = 0;
   worldPhaseMs.sunSprites = 0;
   worldPhaseMs.godRays = 0;
+}
+
+/** The zero foliage readout, for a renderer whose foliage system has not
+ *  reported yet. Beside the other zero fixtures for the same reason. */
+export function emptyFoliagePerfStats(): FoliagePerfStats {
+  return {
+    modelQuality: 1,
+    modelBuckets: 0,
+    modelVisibleBuckets: 0,
+    modelBucketsByLod: {},
+    modelVisibleByLod: {},
+    modelDraws: 0,
+    modelVisibleDraws: 0,
+    modelDrawsByLod: {},
+    modelVisibleDrawsByLod: {},
+    modelTriangles: 0,
+    modelVisibleTriangles: 0,
+    modelTrianglesByLod: {},
+    modelVisibleTrianglesByLod: {},
+    grassEnabled: false,
+    grassQuality: 0,
+    grassActiveRadius: 0,
+    grassChunks: 0,
+    grassReadyChunks: 0,
+    grassVisibleChunks: 0,
+    grassQueuedChunks: 0,
+    grassTufts: 0,
+    grassVisibleTufts: 0,
+    grassBuiltChunks: 0,
+    grassDisposedChunks: 0,
+    grassLastBuildMs: 0,
+    grassBuildMs: 0,
+    grassCacheLimit: 0,
+  };
 }

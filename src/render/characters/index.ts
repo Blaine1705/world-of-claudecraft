@@ -4,10 +4,22 @@
 // the Renderer constructs views.
 import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { logAssetMissOnce } from './asset_miss_log';
-import { mechHeldWeaponOverride, modularVisualKey, VISUALS, visualKeyFor } from './manifest';
+import {
+  mechHeldWeaponOverride,
+  modularVisualKey,
+  VISUALS,
+  type VisualDef,
+  visualKeyFor,
+} from './manifest';
 import { MODULAR_WARRIOR_KEY, type ModularLook } from './modular';
 import { CharacterVisual } from './visual';
 
+export {
+  holdComposedLookView,
+  type LookPiecesStats,
+  lookPiecesStats,
+  noteLookHold,
+} from './look_pieces';
 export { CharacterPreview } from './preview';
 export type { PreviewAppearance } from './preview_appearance';
 export type { PreviewFramingName } from './preview_framing';
@@ -45,6 +57,18 @@ export function modularLookFor(e: Entity): ModularLook | null {
 export function modularKeyFor(e: Entity): string {
   const key = modularVisualKey(e.templateId as PlayerClass);
   return VISUALS[key] ? key : MODULAR_WARRIOR_KEY;
+}
+
+/** The composed body an entity's BASE visual will build from, resolved the
+ *  same way createCharacterVisual resolves it (a mech wearer never composes;
+ *  forms are separate lazy slots over this base), or null when the entity
+ *  keeps a fixed rig. The renderer asks this before a live view build so it
+ *  can hold a look whose pieces are not resident (look_pieces.ts). */
+export function composedLookOf(e: Entity): { def: VisualDef; look: ModularLook } | null {
+  if (isMechWearer(e)) return null;
+  const look = modularLookProvider?.(e) ?? null;
+  if (!look) return null;
+  return { def: VISUALS[modularKeyFor(e)], look };
 }
 
 /** Build a rideable mount's visual: no skin, no held weapon, authored colours

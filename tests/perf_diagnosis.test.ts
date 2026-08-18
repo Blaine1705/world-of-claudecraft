@@ -193,6 +193,7 @@ function baseSnapshot(): PerfSnapshot {
         },
       },
       buildLedger: { kinds: {}, worstFrame: { ms: 0, count: 0, atMs: 0 }, slowest: [] },
+      lookPieces: { pending: 0, completedPieces: 0, bandsRun: 0, holds: 0 },
       zoneStreaming: { prepared: 1, pending: 0, last: null },
     },
     hud: { hotDomWrites: 10, hotDomSkippedWrites: 90, hotDomSkipRate: 0.9 },

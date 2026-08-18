@@ -132,7 +132,12 @@ const MONOLITHS: MonolithRow[] = [
     // hitch sample's two new fields) by moving the zone prepare report and its
     // stat shapes into src/render/zone_prepare_stats.ts and the hitch scratch
     // factory into scene_census_core.ts (net -1).
-    ceiling: 13500,
+    // Lowered again by the composed-look pieces hold (the live candidate path
+    // consults characters/look_pieces.ts), which paid for its wiring by moving
+    // the zero foliage readout into renderer_frame_telemetry_core.ts beside
+    // the other zero fixtures and the created-view type sampler into
+    // view_candidate_pool_core.ts (net -16).
+    ceiling: 13484,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

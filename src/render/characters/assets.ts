@@ -1335,6 +1335,33 @@ function attachMakeupDecal(root: THREE.Object3D, look: ModularLook): void {
   }
 }
 
+/**
+ * The head mesh a look's decals ride, from the CACHED part-set variant, or null
+ * when the part library has not landed (the fail-soft build path reports that
+ * miss itself). Reading the variant is what any compose of this look does
+ * first, so a miss here (about 3 ms once per part set) is the compose's own
+ * cost paid early, not extra work; every later read is a map hit plus a walk.
+ * The head is an unmerged, morph-carrying part, so its geometry is the parsed
+ * scene's own buffer, shared by every variant of the same GLB and stable to
+ * key a decal cut on (stubble.ts / makeup.ts cache per head geometry uuid).
+ */
+export function modularHeadFor(def: VisualDef, look: ModularLook): THREE.SkinnedMesh | null {
+  let root: THREE.Object3D;
+  try {
+    root = modularVariant(def.url, modularPartNames(look.app, look.worn)).root;
+  } catch {
+    return null;
+  }
+  const name = headNodeName(look.app.gender);
+  let head: THREE.SkinnedMesh | null = null;
+  root.traverse((o) => {
+    if (!head && (o as THREE.SkinnedMesh).isSkinnedMesh && o.name === name) {
+      head = o as THREE.SkinnedMesh;
+    }
+  });
+  return head;
+}
+
 /** Compose a modular character: pick parts, recolour skin/hair, attach weapons. */
 export function assembleModular(
   def: VisualDef,

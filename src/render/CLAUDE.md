@@ -441,6 +441,16 @@ GPU work signs. Each rule names its seam and its guard.
   wall-clock constant calibrated on one machine inside a gate: the arrival lesson
   is that a hold ends on evidence (its own compile settling), on the
   `REVEAL_GATE_WATCHDOG_MS` watchdog, or on a reach floor, never on a tuned timer.
+- **CPU construction pieces ride the same queue and budget.** Main-thread work a
+  view build would otherwise pay inside its frame (a composed look's procedural
+  decal maps and head cuts, measured at 94 percent of a composed build) is cut into
+  pieces the budget can price (a map as a chain of row bands, one queue unit each,
+  a cut as one unit), deduped by style key, and enqueued at the view's priority;
+  the renderer HOLDS the live candidate until its pieces are resident (no view, no
+  partial body) and builds it off warm caches on a later pass. Under a cover and
+  for the local target the build stays synchronous. Seam:
+  `characters/look_pieces.ts` (`holdComposedLookView`, `perfStats().lookPieces`),
+  guarded by `tests/look_pieces.test.ts` and `tests/renderer_look_pieces_hold.test.ts`.
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, plus the `arrival` mark

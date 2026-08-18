@@ -62,7 +62,7 @@ import { AfflictionFamiliar } from './affliction_familiar';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
-import { noteArrivalIfTeleported } from './arrival_cover';
+import { arrivalCoverActive, noteArrivalIfTeleported } from './arrival_cover';
 import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
@@ -137,9 +137,12 @@ import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
   type CharacterVisual,
+  composedLookOf,
   createCharacterVisual,
   createMountVisual,
   type FarBakeGate,
+  holdComposedLookView,
+  lookPiecesStats,
   modularLookFor,
   setWeaponVfxViewportHeight,
 } from './characters';
@@ -528,6 +531,7 @@ import {
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
 import {
   beginRendererFrameTelemetry,
+  emptyFoliagePerfStats,
   emptyFramePhaseMs,
   emptyWorldPhaseMs,
   type RendererFramePhaseMs,
@@ -634,6 +638,7 @@ import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
 import {
   finishViewCandidates,
+  sampleCreatedViewType,
   type ViewCandidate,
   writeViewCandidate,
 } from './view_candidate_pool_core';
@@ -784,7 +789,6 @@ const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
 // submit. The retained iPhone probe measured that burst at 1.17s. Remaining views
 // stream in through the post-entry one-per-frame budget instead.
 const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;
-const VIEW_CREATED_TYPE_SAMPLE_LIMIT = 24;
 const PERSISTENT_PORTAL_VIEW_PREWARM_LIMIT = 16;
 // rigs further than this stop casting articulated shadows (~7 draws each) and
 // hand off to a single-draw static-pose shadow proxy (the merged far-LOD mesh
@@ -1168,38 +1172,6 @@ function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
   root.traverse((o) => {
     if ((o as THREE.Mesh).isMesh && (o as THREE.Mesh).castShadow) into.push(o);
   });
-}
-
-function emptyFoliagePerfStats(): FoliagePerfStats {
-  return {
-    modelQuality: 1,
-    modelBuckets: 0,
-    modelVisibleBuckets: 0,
-    modelBucketsByLod: {},
-    modelVisibleByLod: {},
-    modelDraws: 0,
-    modelVisibleDraws: 0,
-    modelDrawsByLod: {},
-    modelVisibleDrawsByLod: {},
-    modelTriangles: 0,
-    modelVisibleTriangles: 0,
-    modelTrianglesByLod: {},
-    modelVisibleTrianglesByLod: {},
-    grassEnabled: false,
-    grassQuality: 0,
-    grassActiveRadius: 0,
-    grassChunks: 0,
-    grassReadyChunks: 0,
-    grassVisibleChunks: 0,
-    grassQueuedChunks: 0,
-    grassTufts: 0,
-    grassVisibleTufts: 0,
-    grassBuiltChunks: 0,
-    grassDisposedChunks: 0,
-    grassLastBuildMs: 0,
-    grassBuildMs: 0,
-    grassCacheLimit: 0,
-  };
 }
 
 function sleep(ms: number): Promise<void> {
@@ -4391,6 +4363,7 @@ export class Renderer {
       gpuQueue: this.backgroundGpuWork.stats(),
       gpuPrep: { budget: this.gpuPrepBudget.snapshot(), events: gpuPrepEventsSnapshot() },
       buildLedger: this.buildLedger.snapshot(),
+      lookPieces: lookPiecesStats(),
       zoneStreaming: this.zoneStreamingStats(),
     };
   }
@@ -4675,15 +4648,6 @@ export class Renderer {
     finishViewCandidates(this.viewCandidates, count);
   }
 
-  private createdViewType(e: Entity): string {
-    const id = e.templateId || e.kind;
-    return `${e.kind}:${id}`.slice(0, 64);
-  }
-
-  private sampleCreatedViewType(into: string[], e: Entity): void {
-    if (into.length < VIEW_CREATED_TYPE_SAMPLE_LIMIT) into.push(this.createdViewType(e));
-  }
-
   private createRequiredView(id: number | null, createdViewTypes: string[]): number {
     if (id === null) return 0;
     const e = this.sim.entities.get(id);
@@ -4691,7 +4655,7 @@ export class Renderer {
     if (!entityViewIsAdmitted(e, this.sim.questLog, this.questObjectHidden)) return 0;
     if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) return 0;
     this.createView(e);
-    this.sampleCreatedViewType(createdViewTypes, e);
+    sampleCreatedViewType(createdViewTypes, e);
     return 1;
   }
 
@@ -4719,7 +4683,7 @@ export class Renderer {
         this.createView(entity);
         view = this.views.get(entity.id);
         if (view) {
-          this.sampleCreatedViewType(createdViewTypes, entity);
+          sampleCreatedViewType(createdViewTypes, entity);
           created++;
         }
       }
@@ -4760,7 +4724,7 @@ export class Renderer {
       }
       if (!isPersistentPortalObject(e) || this.views.has(e.id)) continue;
       this.createView(e);
-      this.sampleCreatedViewType(createdViewTypes, e);
+      sampleCreatedViewType(createdViewTypes, e);
       created++;
     }
     return { created, trimmed };
@@ -4770,6 +4734,7 @@ export class Renderer {
     limit: number,
     createdViewTypes: string[],
     deadlineMs = Infinity,
+    holdUnreadyLooks = false,
   ): { created: number; trimmed: boolean } {
     const max = Math.max(0, Math.floor(limit));
     let created = 0;
@@ -4793,11 +4758,29 @@ export class Renderer {
       // a recent failed build (assets unavailable) sits out its cooldown so it
       // cannot burn a budget slot every frame
       if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) continue;
+      // a held look takes no slot: the loop moves on to the next candidate
+      if (holdUnreadyLooks && this.holdComposedLook(e)) continue;
       this.createView(e);
-      this.sampleCreatedViewType(createdViewTypes, e);
+      sampleCreatedViewType(createdViewTypes, e);
       created++;
     }
     return { created, trimmed };
+  }
+
+  /** The live-frame hold (characters/look_pieces.ts): a candidate whose
+   *  composed look is not resident waits, its pieces enqueued, instead of
+   *  painting its decal maps inside this frame. The local target builds now
+   *  (actionable), and a covered frame keeps the synchronous build. */
+  private holdComposedLook(e: Entity): boolean {
+    if (e.id === this.sim.player.targetId || arrivalCoverActive()) return false;
+    const composed = composedLookOf(e);
+    if (!composed) return false;
+    return holdComposedLookView(
+      composed.def,
+      composed.look,
+      this.backgroundGpuWork,
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+    );
   }
 
   private createCharacterVisualWithRetry(
@@ -10477,6 +10460,7 @@ export class Renderer {
       this.runtimeViewCreateBudget(dt),
       createdViewTypes,
       Infinity,
+      true,
     ).created;
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
