@@ -121,6 +121,8 @@ const MONOLITHS: MonolithRow[] = [
     // keeps the delve tracker and mount prewarm extractions while preserving
     // the wrapper's later renderer wiring, so the ceiling is the exact
     // resolved count.
+    // PR #3468 changes the shadow-depth prewarm material contract, but this
+    // wrapper's combined renderer remains at the same resolved count.
     ceiling: 13744,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
