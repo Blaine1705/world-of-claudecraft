@@ -115,7 +115,12 @@ import {
   type GrassCapCollapseBand,
   grassCapCollapseBand,
   grassCapCollapseShaderPatch,
+  grassCardProgramCacheKey,
 } from './grass_cap_collapse_core';
+import {
+  buildGroundDecorPrewarmTwins,
+  registerGroundDecorPrewarmDraw,
+} from './ground_decor_prewarm';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import {
@@ -1185,7 +1190,7 @@ interface SpeciesSpec {
 //   - castShadow: ultra renders a shadow pass, so the depth/shadow program variant
 //     must compile too.
 // Caller adds the group to the scene before the compile pass and removes it after.
-// (Grass compiles at spawn via the player-centred ring, so it is not duplicated.)
+// (Grass, flowers and the night glow caps ride the ground-decor twins below.)
 export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'foliage-material-prewarm';
@@ -1261,6 +1266,9 @@ export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
   // buildFoliage has baked the atlas (renderer builds the world before the
   // prewarm pass runs) and on the arms without sprites.
   for (const mesh of impostorPrewarmMeshes()) group.add(mesh);
+  // The lazily-built ground-decor pools (grass cards, flowers, night-accent
+  // glow caps): published at build time, linked here.
+  for (const twin of buildGroundDecorPrewarmTwins()) group.add(twin);
   return group;
 }
 
@@ -2564,8 +2572,8 @@ function applyGrassShader(
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
     sh.fragmentShader = patchGrassFragmentShader(sh.fragmentShader);
   };
-  const capProgramKey = capBand ? `${capBand.start.toFixed(3)}-${capBand.end.toFixed(3)}` : 'none';
-  mat.customProgramCacheKey = () => `grass-card|cap:${capProgramKey}|${baseProgramKey}`;
+  const cacheKey = grassCardProgramCacheKey(capBand, baseProgramKey);
+  mat.customProgramCacheKey = () => cacheKey;
 }
 
 /** The overworld jungle grass tint (GRASS_TINT.jungle), for interiors that
@@ -2792,6 +2800,9 @@ function buildGrassRing(
         }),
   );
   applyGrassShader(mat, uniforms, capCollapseBand);
+  // Chunk meshes are built per frame as you walk, so no boot compile root ever
+  // sees this material (ground_decor_prewarm.ts).
+  registerGroundDecorPrewarmDraw({ geometry: geo, material: mat, instanceColor: true });
 
   // ground-cover flowers: a sparse companion set in the same chunks, sharing
   // the sway/fade shader so they move and thin exactly like the grass.
@@ -2883,6 +2894,7 @@ function buildGrassRing(
           : new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.35 }),
       );
       applyGrassShader(fmMat, uniforms, null);
+      registerGroundDecorPrewarmDraw({ geometry: flowerGeo, material: fmMat, instanceColor: true });
       flowerMatCache.set(key, fmMat);
     }
     return fmMat;
