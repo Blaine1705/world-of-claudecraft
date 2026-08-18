@@ -763,7 +763,40 @@ export async function capture(args) {
     } else {
       await enterOnlineGearedGame(page, { ...args, url: requestedUrl.toString() }, captureId);
     }
-    await runTimedWindow(page, args, sleep, () => Date.now(), roster ?? null);
+    // Names for the live-program events: while the timed window runs, poll the
+    // renderer's local render diagnostics (loopback dev builds with
+    // ?perfTrace=1) for the materials and objects seen for the first time,
+    // stamped on the probe clock, so a program minted live can be lined up
+    // with the object that brought it. Bounded; empty when the diagnostics are
+    // off.
+    const renderNames = [];
+    const namesPoll = setInterval(() => {
+      page
+        .evaluate(() => {
+          const stats = window.__game?.renderer?.perfStats?.();
+          const diag = stats?.renderDiagnostics;
+          if (!diag?.enabled) return null;
+          const newMaterials = diag.newMaterials ?? [];
+          const firstVisibleObjects = diag.firstVisibleObjects ?? [];
+          if (newMaterials.length === 0 && firstVisibleObjects.length === 0) return null;
+          return { atMs: performance.now(), newMaterials, firstVisibleObjects };
+        })
+        .then((row) => {
+          if (!row || renderNames.length >= 400) return;
+          const last = renderNames[renderNames.length - 1];
+          const same =
+            last &&
+            JSON.stringify(last.newMaterials) === JSON.stringify(row.newMaterials) &&
+            JSON.stringify(last.firstVisibleObjects) === JSON.stringify(row.firstVisibleObjects);
+          if (!same) renderNames.push(row);
+        })
+        .catch(() => {});
+    }, 250);
+    try {
+      await runTimedWindow(page, args, sleep, () => Date.now(), roster ?? null);
+    } finally {
+      clearInterval(namesPoll);
+    }
     const snapshot = await page.evaluate(() => window.__wocGpuHitchProbe?.stop('duration'));
     if (!snapshot) throw new Error('GPU hitch probe was not installed');
     const browserVersion = await browser.version();
@@ -776,6 +809,7 @@ export async function capture(args) {
       provenance,
     });
     raw.diagnostics.pageErrors = pageErrors;
+    raw.diagnostics.renderNames = renderNames;
     if (pageErrors.length > 0) raw.capture.complete = false;
     const expectedBuildId = git(['rev-parse', '--short=12', 'HEAD']);
     const expectedSourceBuildId = sourceBuildId();
