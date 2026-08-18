@@ -117,7 +117,9 @@ export function interactSoulwell(ctx: SimContext, object: Entity, actorId: numbe
   const state = object.soulwell;
   const ownerParty = ctx.partyOf(state.ownerId);
   const isCurrentGroupMember =
-    state.partyId !== null && ownerParty?.id === state.partyId && ownerParty.members.includes(actorId);
+    state.partyId !== null &&
+    ownerParty?.id === state.partyId &&
+    ownerParty.members.includes(actorId);
   if (!state.eligiblePlayerIds.includes(actorId) && !isCurrentGroupMember) {
     ctx.error(actorId, 'That ally is not in your group.');
     return true;

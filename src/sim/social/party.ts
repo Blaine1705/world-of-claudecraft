@@ -561,7 +561,8 @@ export class PartyMachine {
     const leaver = this.ctx.resolve(pid)?.e;
     if (leaver) {
       for (const sourcePid of oldMembers) {
-        if (sourcePid !== pid) this.ctx.clearAurasFromSource(leaver, sourcePid, isPersistentPaladinAura);
+        if (sourcePid !== pid)
+          this.ctx.clearAurasFromSource(leaver, sourcePid, isPersistentPaladinAura);
       }
     }
     // Drop the leaver from any in-flight ready check so the remaining members can
