@@ -8949,6 +8949,14 @@ export class GameServer {
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
     });
+    // Parked mana: a druid in Bruin or Wolf Form runs the live bar on rage or
+    // energy with the real pool set aside in savedMana (entity.ts
+    // recalcPlayerStats). The action bar needs it to answer affordability for an
+    // auto-unshifting cast (combat/form_auto_unshift.ts), which is billed
+    // against the parked pool and not against the form bar. Self-only, because
+    // no other client has a use for it, and omitted at rest (the omit-when-
+    // default wire convention) so an unshifted player pays nothing for it.
+    if (p.resourceType !== 'mana' && p.savedMana > 0) self.sm = Math.round(p.savedMana);
     const json = JSON.stringify(self);
     selfLap?.('self.base');
     // heavy, rarely-changing fields ride along only when their serialized

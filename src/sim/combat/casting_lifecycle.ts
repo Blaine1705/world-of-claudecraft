@@ -132,6 +132,11 @@ import {
   iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
+import {
+  applyAutoUnshift,
+  isFormToggleAbility as isFormToggle,
+  willAutoUnshift,
+} from './form_auto_unshift';
 import { isActionLockingFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   applyBrainFreezeOverride,
@@ -214,10 +219,6 @@ export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'mortal_strike',
   'shield_slam',
 ]);
-
-function isFormToggle(ability: AbilityDef): boolean {
-  return ability.effects.some((e) => e.type === 'selfBuff' && isFormAuraKind(e.kind));
-}
 
 // Forms, stances and stealth are toggles: re-casting cancels the aura, and
 // cancelling is never gated by cost or cooldown (the cooldown gates re-entry).
@@ -1003,6 +1004,16 @@ export function castAbility(
     ctx.error(p.id, afflictionError);
     return;
   }
+  // Auto-unshift (see combat/form_auto_unshift.ts): a healing or damaging spell
+  // pressed in Bruin/Wolf/Fleet Form drops the form and casts. Decided HERE and
+  // applied at the form gate below, because the two questions this answers sit
+  // on either side of it: the cast is billed against the PARKED mana (the live
+  // bar is rage or energy while shifted), and refusing it for cost must leave
+  // the druid still wearing the form rather than stripping it for nothing.
+  const autoUnshift = willAutoUnshift(p.auras, ability);
+  // Fleet Form never swapped the bar, so its pool is already the live one; only
+  // the bar-swapping forms (bear rage, cat energy) park mana in savedMana.
+  const castingPool = autoUnshift && p.resourceType !== 'mana' ? p.savedMana : p.resource;
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
@@ -1028,7 +1039,7 @@ export function castAbility(
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
   if (
-    p.resource < payableCost &&
+    castingPool < payableCost &&
     (!canCastFree || stormcastArmedForAbility) &&
     !freeBySolarReprisal &&
     !togglingOff &&
@@ -1036,13 +1047,18 @@ export function castAbility(
   ) {
     ctx.error(
       p.id,
-      p.resourceType === 'rage'
-        ? 'Not enough rage!'
-        : p.resourceType === 'energy'
-          ? 'Not enough energy!'
-          : p.resourceType === 'focus'
-            ? 'Not enough Focus!'
-            : 'Not enough mana!',
+      // An auto-unshifting cast was weighed against the parked mana, so it is
+      // mana it is short of, never the rage or energy bar it never touches.
+      // Every other arm is the ladder this always had.
+      autoUnshift
+        ? 'Not enough mana!'
+        : p.resourceType === 'rage'
+          ? 'Not enough rage!'
+          : p.resourceType === 'energy'
+            ? 'Not enough energy!'
+            : p.resourceType === 'focus'
+              ? 'Not enough Focus!'
+              : 'Not enough mana!',
     );
     return;
   }
@@ -1118,8 +1134,13 @@ export function castAbility(
       return;
     }
   } else if (form && !isFormToggle(ability) && !ability.usableInForm) {
-    ctx.error(p.id, "You can't do that while shapeshifted.");
-    return;
+    // Auto-unshift consumes no cost and no GCD (leaving a form has always been
+    // free here), so an instant such as Lunar Tempest fires on the same press.
+    // Shifting back IN stays a normal ability and still bills both.
+    if (!applyAutoUnshift(ctx, p, meta, ability)) {
+      ctx.error(p.id, "You can't do that while shapeshifted.");
+      return;
+    }
   }
   if (
     ability.requiresStealth &&
