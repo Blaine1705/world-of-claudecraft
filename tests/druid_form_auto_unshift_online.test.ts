@@ -77,11 +77,26 @@ describe('druid auto-unshift, online', () => {
 
     broadcast(server);
     const shifted = lastSnap(fc.sent);
-    expect(shifted.self.sm).toBe(Math.round(parked));
+    expect(shifted.self.sm).toBe(Math.floor(parked));
 
     const client = bareClient(session.pid, { playerClass: 'druid' });
     (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(shifted);
-    expect(client.player.savedMana).toBe(Math.round(parked));
+    expect(client.player.savedMana).toBe(Math.floor(parked));
+  });
+
+  it('floors the parked pool so the bar never lights a slot the server refuses', () => {
+    // The mirrored pool must never read HIGHER than the real one: the bar
+    // refuses at "pool < cost" and costs are whole numbers, so flooring makes
+    // the client's test exactly the server's. Rounding a 24.6 pool up to 25
+    // would paint a 25-cost heal live and then have the cast refused.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const { session, druid } = joinDruid(server, fc);
+    enterBearForm(server, session, druid);
+    druid.savedMana = 24.6;
+
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.sm).toBe(24);
   });
 
   it('omits the parked pool at rest and clears a stale mirror on unshift', () => {

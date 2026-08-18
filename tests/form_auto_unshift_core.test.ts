@@ -12,6 +12,7 @@ import {
   isFormToggleAbility,
   isHealingOrDamagingAbility,
   willAutoUnshift,
+  wireParkedMana,
 } from '../src/sim/combat/form_auto_unshift';
 import { ABILITIES } from '../src/sim/data';
 import type { AuraKind } from '../src/sim/types';
@@ -132,5 +133,27 @@ describe('isHealingOrDamagingAbility', () => {
     expect(isHealingOrDamagingAbility(ABILITIES.wrath)).toBe(true); // damage
     expect(isHealingOrDamagingAbility(ABILITIES.healing_touch)).toBe(true); // healing
     expect(isHealingOrDamagingAbility(ABILITIES.mark_of_the_wild)).toBe(false); // neither
+  });
+});
+
+describe('wireParkedMana', () => {
+  it('never reports more mana than the caster actually has parked', () => {
+    // The whole point of the field: the bar must not light a slot the server
+    // will refuse. Rounding would, at every fractional pool just under a cost.
+    for (const parked of [0, 0.9, 24.6, 25, 25.4, 25.5, 999.99]) {
+      expect(wireParkedMana(parked)).toBeLessThanOrEqual(parked);
+      expect(Number.isInteger(wireParkedMana(parked))).toBe(true);
+    }
+    expect(wireParkedMana(24.6)).toBe(24); // Math.round would say 25
+    expect(wireParkedMana(25.5)).toBe(25); // ...and 26
+  });
+
+  it('agrees with the server test exactly at a cost boundary', () => {
+    // A 25-cost heal against a 24.6 pool: the sim gate compares the raw pool and
+    // refuses, so the mirrored pool has to refuse too.
+    const cost = ABILITIES.healing_touch.cost;
+    expect(Number.isInteger(cost)).toBe(true);
+    expect(wireParkedMana(cost - 0.4) < cost).toBe(cost - 0.4 < cost);
+    expect(wireParkedMana(cost + 0.4) < cost).toBe(cost + 0.4 < cost);
   });
 });

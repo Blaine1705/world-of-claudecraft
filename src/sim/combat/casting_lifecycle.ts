@@ -1134,10 +1134,11 @@ export function castAbility(
       return;
     }
   } else if (form && !isFormToggle(ability) && !ability.usableInForm) {
-    // Auto-unshift consumes no cost and no GCD (leaving a form has always been
-    // free here), so an instant such as Lunar Tempest fires on the same press.
-    // Shifting back IN stays a normal ability and still bills both.
-    if (!applyAutoUnshift(ctx, p, meta, ability)) {
+    // Only the DECISION is made here, so the ladder below continues for a cast
+    // that will auto-unshift. The form itself is not touched until the cast
+    // commits (see applyAutoUnshift further down): every refusal between here
+    // and there would otherwise strip the form for a cast that never happened.
+    if (!autoUnshift) {
       ctx.error(p.id, "You can't do that while shapeshifted.");
       return;
     }
@@ -1503,6 +1504,22 @@ export function castAbility(
   if (ability.id !== 'ghost_wolf' && p.auras.some((a) => a.id === 'ghost_wolf')) {
     ctx.breakGhostWolf(p);
   }
+  // Auto-unshift (combat/form_auto_unshift.ts), applied HERE rather than at the
+  // form gate above, and for the same reason the affordability check was hoisted
+  // ABOVE that gate: a druid must never lose a form to a press that goes on to be
+  // refused. Everything that can still say no (target, range, line of sight,
+  // min-range, party membership) has now cleared, so this is the first point at
+  // which the cast is certain. It sits with its siblings deliberately: standing
+  // up, sheathing, breaking Ghost Wolf and dismounting are the same kind of "the
+  // cast is happening, so this state goes" change, and Ghost Wolf is the shaman's
+  // travel form, the exact analogue one line up.
+  //
+  // Still free and still off the GCD (leaving a form has always been free here),
+  // and it precedes all three commit branches below (channel, cast-time, instant)
+  // as well as every billing site, so an instant such as Lunar Tempest fires on
+  // the same press and pays from the restored mana pool. Shifting back IN stays a
+  // normal ability and bills both.
+  if (autoUnshift) applyAutoUnshift(ctx, p, meta, ability);
   // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
   if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.mountCastKey !== '') {

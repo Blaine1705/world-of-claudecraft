@@ -86,6 +86,21 @@ export function willAutoUnshift(auras: readonly Pick<Aura, 'kind'>[], def: Abili
   return isHealingOrDamagingAbility(def);
 }
 
+/** The parked pool as the SELF snapshot should carry it (server/game.ts, the
+ *  sparse `sm` key), so the action bar can price an auto-unshifting cast
+ *  against the mana that will actually pay for it.
+ *
+ *  Floors, and the floor is the contract, not a formatting choice. The bar
+ *  refuses a slot when its pool is under the cost, and every payable cost is a
+ *  whole number, so flooring makes the client's "floor(pool) < cost" exactly
+ *  equivalent to the server's own "pool < cost". Rounding is off by one in the
+ *  player's disfavour at a fractional pool (24.6 parked against a 25 cost
+ *  rounds up to 25, lighting a slot the server then refuses), which is the one
+ *  thing this field exists to prevent. */
+export function wireParkedMana(savedMana: number): number {
+  return Math.floor(savedMana);
+}
+
 /** Drop every druid form the caster wears so the pending cast can proceed.
  *  Mirrors the toggle-off path in effect_dispatch (splice, fade event, stat
  *  recalc), which is what returns the parked mana pool to the live bar.
@@ -103,6 +118,15 @@ export function applyAutoUnshift(
     p.auras.splice(i, 1);
     ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
   }
+  // Stalk is Wolf Form's stealth (requiresForm: 'cat'), so it goes out with the
+  // form. Pressing the form button by hand already ends it, though only as a
+  // side effect: casting an ability breaks stealth when its effects resolve.
+  // An auto-unshift casts no form button, so without this the druid would keep
+  // Stalk through the whole spell and only lose it at the cast's own commit,
+  // which on a 2.5s Wildmend is 2.5 seconds of hidden casting the manual route
+  // never grants. Routed through the single breakStealth funnel so the fade
+  // event and the rogue Duskveil bookkeeping behave as they do everywhere else.
+  ctx.breakStealth(p);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   return true;
 }
