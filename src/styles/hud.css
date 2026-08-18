@@ -9437,3 +9437,12 @@ body.pad-nav,
 body.pad-nav * {
   cursor: none !important;
 }
+
+/* The expanded bank (both triggers) is a THIRD set of eight, not a second page
+   of sixteen: only the half those triggers reach exists, so the other half is
+   dropped rather than drawn as an unreachable twin. Without this the bank looks
+   identical to an ordinary trigger page and reads as the bar having swapped
+   pages, which is not what happened. */
+.xhb.xhb-expanded .xhb-half:not(.xhb-armed) {
+  display: none;
+}

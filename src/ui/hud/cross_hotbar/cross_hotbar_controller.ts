@@ -3,9 +3,10 @@
 // current overlay state, and drives the painter each frame. Cold by contract: no
 // layout reads, no driver of its own (the HUD's frame loop calls paint).
 //
-// The root is aria-hidden by design. The cells MIRROR action-bar buttons that
-// already carry their own accessible names, so exposing them again would announce
-// every ability twice; the overlay is a controller-only affordance.
+// The cells are focusable and therefore NOT inside an aria-hidden root: focusable
+// content hidden from assistive tech is a violation, and the pad has to be able to
+// select a cell. Each cell carries the shared action-bar painter's own aria-label,
+// so what is announced is the ability on it.
 
 import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarSlotElements } from '../action_bar/action_bar_painter';
@@ -38,6 +39,10 @@ function buildCell(cell: CrossHotbarCell): ActionBarSlotElements {
   btn.className = `action-btn ${CELL_CLASS}`;
   btn.setAttribute(CELL_POSITION_ATTR, cell.point);
   btn.setAttribute(CELL_INDEX_ATTR, String(cell.index));
+  // Focusable so the d-pad's UI navigation can actually reach the bar: without a
+  // tabindex the cells are invisible to the focus query and a player could look
+  // at the cross hotbar but never select a cell on it.
+  btn.setAttribute('tabindex', '0');
   const label = document.createElement('span');
   label.className = 'icon-label';
   const countEl = document.createElement('span');
@@ -134,13 +139,21 @@ export class CrossHotbarController {
       const next = labels[i] ?? '';
       if (this.glyphs[i].textContent !== next) this.glyphs[i].textContent = next;
     }
+    const bothTriggers = `${hold.triggers.left} + ${hold.triggers.right}`;
     for (const [layer, el] of this.triggerLabels) {
-      const next = layer === 'left' ? hold.triggers.left : hold.triggers.right;
+      // In the expanded bank the reachable half is opened by BOTH triggers, so it
+      // says so: labelling it with one trigger made the bank read as that
+      // trigger's ordinary page rather than the extra one.
+      const next =
+        hold.expanded && layer === hold.layer
+          ? bothTriggers
+          : layer === 'left'
+            ? hold.triggers.left
+            : hold.triggers.right;
       if (el.textContent !== next) el.textContent = next;
     }
-    // Advertises the route to the second set: hold one trigger, tap the other.
-    const hintText = `${hold.triggers.left} + ${hold.triggers.right}`;
-    if (this.hint.textContent !== hintText) this.hint.textContent = hintText;
+    // Advertises the route to the expanded bank: hold one trigger, tap the other.
+    if (this.hint.textContent !== bothTriggers) this.hint.textContent = bothTriggers;
   }
 
   /** Paint from the frame's already-ticked action-bar state. */
