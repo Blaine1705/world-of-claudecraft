@@ -13,20 +13,9 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
   borderAccent,
-  CARTOUCHE_CHROME_CLASP_HEIGHT,
-  CARTOUCHE_CHROME_CLASP_WIDTH,
-  CARTOUCHE_CHROME_PAD_X,
-  CARTOUCHE_CHROME_PAD_Y,
-  CARTOUCHE_CHROME_RADIUS,
-  CARTOUCHE_CHROME_WELL_ALPHA,
-  CARTOUCHE_CHROME_WELL_FILL,
-  CARTOUCHE_CLASP_HEIGHT_PROP,
-  CARTOUCHE_CLASP_WIDTH_PROP,
-  CARTOUCHE_PAD_X_PROP,
-  CARTOUCHE_PAD_Y_PROP,
-  CARTOUCHE_RADIUS_PROP,
-  CARTOUCHE_WELL_ALPHA_PROP,
-  CARTOUCHE_WELL_FILL_PROP,
+  DEED_HERALDRY_MOTIF_ATTR,
+  DEED_HERALDRY_WELL_FILL,
+  DEED_HERALDRY_WELL_PROP,
 } from '../src/ui/deed_border_view';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { makeWriterFacet } from '../src/ui/painter_host';
@@ -391,13 +380,21 @@ describe('UnitFramePainter: the title-decoration spans (Book of Deeds)', () => {
 
 describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
   const PORTRAIT_BORDER = { tag: 'portraitBorder' } as unknown as HTMLElement;
+  const NAME_HEADER = { tag: 'nameHeader' } as unknown as HTMLElement;
+  const SEAL_MOTIF = { tag: 'sealMotif' } as unknown as HTMLElement;
+  const HEADER_PATTERN = { tag: 'headerPattern' } as unknown as HTMLElement;
   const BORDERED_ELEMENTS: UnitFrameElements = {
     ...FULL_ELEMENTS,
     portraitBorder: PORTRAIT_BORDER,
+    heraldry: {
+      nameHeader: NAME_HEADER,
+      sealMotif: SEAL_MOTIF,
+      headerPattern: HEADER_PATTERN,
+    },
   };
   const ACCENT = borderAccent('reliquary_gilt');
 
-  it('writes the slug attribute and the palette custom properties through the writers', () => {
+  it('E47: writes one slug, palette, seal, and quiet header motif through elided writers', () => {
     const calls = paint(playerDescriptor({ borderSlug: 'reliquary_gilt' }), BORDERED_ELEMENTS, {
       shownDisplay: 'flex',
     });
@@ -419,36 +416,48 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
       args: [PORTRAIT_BORDER, PORTRAIT_BORDER_GLOW_PROP, ACCENT?.glow],
     });
     expect(calls).toContainEqual({
-      m: 'setStyleProp',
-      args: [PORTRAIT_BORDER, CARTOUCHE_PAD_X_PROP, `${CARTOUCHE_CHROME_PAD_X}px`],
+      m: 'setAttr',
+      args: [PORTRAIT_BORDER, DEED_HERALDRY_MOTIF_ATTR, ACCENT?.motif],
     });
     expect(calls).toContainEqual({
       m: 'setStyleProp',
-      args: [PORTRAIT_BORDER, CARTOUCHE_PAD_Y_PROP, `${CARTOUCHE_CHROME_PAD_Y}px`],
+      args: [PORTRAIT_BORDER, DEED_HERALDRY_WELL_PROP, DEED_HERALDRY_WELL_FILL],
     });
-    expect(calls).toContainEqual({
-      m: 'setStyleProp',
-      args: [PORTRAIT_BORDER, CARTOUCHE_RADIUS_PROP, `${CARTOUCHE_CHROME_RADIUS}px`],
-    });
-    expect(calls).toContainEqual({
-      m: 'setStyleProp',
-      args: [PORTRAIT_BORDER, CARTOUCHE_WELL_ALPHA_PROP, String(CARTOUCHE_CHROME_WELL_ALPHA)],
-    });
-    expect(calls).toContainEqual({
-      m: 'setStyleProp',
-      args: [PORTRAIT_BORDER, CARTOUCHE_WELL_FILL_PROP, CARTOUCHE_CHROME_WELL_FILL],
-    });
-    expect(calls).toContainEqual({
-      m: 'setStyleProp',
-      args: [PORTRAIT_BORDER, CARTOUCHE_CLASP_WIDTH_PROP, `${CARTOUCHE_CHROME_CLASP_WIDTH}px`],
-    });
-    expect(calls).toContainEqual({
-      m: 'setStyleProp',
-      args: [PORTRAIT_BORDER, CARTOUCHE_CLASP_HEIGHT_PROP, `${CARTOUCHE_CHROME_CLASP_HEIGHT}px`],
-    });
+    for (const host of [NAME_HEADER]) {
+      expect(calls).toContainEqual({
+        m: 'setAttr',
+        args: [host, PORTRAIT_BORDER_ATTR, 'reliquary_gilt'],
+      });
+      expect(calls).toContainEqual({
+        m: 'setAttr',
+        args: [host, DEED_HERALDRY_MOTIF_ATTR, ACCENT?.motif],
+      });
+      expect(calls).toContainEqual({
+        m: 'setStyleProp',
+        args: [host, PORTRAIT_BORDER_FRAME_PROP, ACCENT?.frame],
+      });
+      expect(calls).toContainEqual({
+        m: 'setStyleProp',
+        args: [host, PORTRAIT_BORDER_EDGE_PROP, ACCENT?.edge],
+      });
+      expect(calls).toContainEqual({
+        m: 'setStyleProp',
+        args: [host, PORTRAIT_BORDER_GLOW_PROP, ACCENT?.glow],
+      });
+      expect(calls).toContainEqual({
+        m: 'setStyleProp',
+        args: [host, DEED_HERALDRY_WELL_PROP, DEED_HERALDRY_WELL_FILL],
+      });
+    }
+    for (const motif of [SEAL_MOTIF, HEADER_PATTERN]) {
+      expect(calls).toContainEqual({
+        m: 'setAttr',
+        args: [motif, 'd', ACCENT?.motifPath],
+      });
+    }
   });
 
-  it('clears all four slots for a borderless unit (a cleared border removes the ring)', () => {
+  it('E47: clears every reveal slot for a borderless player', () => {
     // '' is also what a stale id and a title-reward deed resolve to at the call
     // site, so this one arm covers every no-accent case the view can carry.
     const calls = paint(playerDescriptor({ borderSlug: '' }), BORDERED_ELEMENTS, {
@@ -458,33 +467,40 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
       m: 'setAttr',
       args: [PORTRAIT_BORDER, PORTRAIT_BORDER_ATTR, ''],
     });
-    for (const prop of [
-      PORTRAIT_BORDER_FRAME_PROP,
-      PORTRAIT_BORDER_EDGE_PROP,
-      PORTRAIT_BORDER_GLOW_PROP,
-      CARTOUCHE_PAD_X_PROP,
-      CARTOUCHE_PAD_Y_PROP,
-      CARTOUCHE_RADIUS_PROP,
-      CARTOUCHE_WELL_ALPHA_PROP,
-      CARTOUCHE_WELL_FILL_PROP,
-      CARTOUCHE_CLASP_WIDTH_PROP,
-      CARTOUCHE_CLASP_HEIGHT_PROP,
-    ]) {
-      expect(calls).toContainEqual({ m: 'setStyleProp', args: [PORTRAIT_BORDER, prop, ''] });
+    for (const host of [PORTRAIT_BORDER, NAME_HEADER]) {
+      for (const prop of [
+        PORTRAIT_BORDER_FRAME_PROP,
+        PORTRAIT_BORDER_EDGE_PROP,
+        PORTRAIT_BORDER_GLOW_PROP,
+        DEED_HERALDRY_WELL_PROP,
+      ]) {
+        expect(calls).toContainEqual({ m: 'setStyleProp', args: [host, prop, ''] });
+      }
+      expect(calls).toContainEqual({
+        m: 'setAttr',
+        args: [host, DEED_HERALDRY_MOTIF_ATTR, ''],
+      });
     }
+    expect(calls).toContainEqual({ m: 'setAttr', args: [NAME_HEADER, PORTRAIT_BORDER_ATTR, ''] });
+    expect(calls).toContainEqual({ m: 'setAttr', args: [SEAL_MOTIF, 'd', ''] });
+    expect(calls).toContainEqual({ m: 'setAttr', args: [HEADER_PATTERN, 'd', ''] });
   });
 
-  it('renders an unknown slug as borderless: the palette gates the attribute (content drift)', () => {
+  it('renders an unknown slug as borderless: the palette gates every host (content drift)', () => {
     // A slug with no palette (a drifted id the table cannot color) writes '' into
     // the gate attribute AND the three props, so the CSS :not([data-border=""])
     // gate stays closed and no transparent ::after box paints. This matches the
     // nameplate, which early-returns to nothing for the same case, so both
     // surfaces of one identity render a drifted id identically.
     const calls = paint(playerDescriptor({ borderSlug: 'slug_with_no_palette' }), BORDERED_ELEMENTS)
-      .filter((c) => c.args[0] === PORTRAIT_BORDER)
+      .filter((c) =>
+        [PORTRAIT_BORDER, NAME_HEADER, SEAL_MOTIF, HEADER_PATTERN].includes(
+          c.args[0] as HTMLElement,
+        ),
+      )
       .map((c) => c.args[2]);
     expect(calls.every((value) => value === '')).toBe(true);
-    expect(calls.length).toBeGreaterThanOrEqual(4);
+    expect(calls.length).toBeGreaterThanOrEqual(12);
   });
 
   it('elides every border write on a repeat paint (the facet caches, no local field)', () => {
@@ -528,6 +544,11 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
       hpFill: stub(),
       hpText: stub(),
       portraitBorder: host,
+      heraldry: {
+        nameHeader: stub(),
+        sealMotif: stub(),
+        headerPattern: stub(),
+      },
     };
     const painter = new UnitFramePainter(facet, elements, { shownDisplay: 'flex' });
     const view = unitFrameView(playerDescriptor({ borderSlug: 'deepward' }));
@@ -549,11 +570,14 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
     expect(writes).toBeGreaterThan(firstWrites);
   });
 
-  it('an instance without the border host pays zero border writes', () => {
+  it('E48: an instance without the two optional heraldry hosts pays zero identity writes', () => {
     const calls = paint(playerDescriptor({ borderSlug: 'deepward' }), FULL_ELEMENTS, {
       shownDisplay: 'flex',
     });
     expect(calls.some((c) => c.args[0] === PORTRAIT_BORDER)).toBe(false);
+    expect(calls.some((c) => c.args[0] === NAME_HEADER)).toBe(false);
+    expect(calls.some((c) => c.args[0] === SEAL_MOTIF)).toBe(false);
+    expect(calls.some((c) => c.args[0] === HEADER_PATTERN)).toBe(false);
     expect(calls.some((c) => c.m === 'setAttr' || c.m === 'setStyleProp')).toBe(false);
   });
 

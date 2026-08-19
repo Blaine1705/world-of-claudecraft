@@ -167,6 +167,11 @@ const MONOLITHS: MonolithRow[] = [
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
+    file: 'src/render/nameplate_canvas.ts',
+    ceiling: 852,
+    seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
+  },
+  {
     file: 'src/sim/colliders.ts',
     ceiling: 2660,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',

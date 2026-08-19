@@ -23,9 +23,97 @@
 
 import { DEEDS } from '../sim/content/deeds';
 
-/** Per-slug side-motif discriminant. Shared hardware (well, brackets, clasp)
- *  stays the same; only these four shape sets change with the worn slug. */
+/** Per-slug seal-face discriminant shared by every Deed Heraldry surface. */
 export type BorderMotifKind = 'catalogue' | 'vault' | 'ward' | 'laurel';
+
+/** One line in normalized seal space. Renderers transform these static
+ *  coordinates into their own seal bounds without creating a second motif
+ *  catalogue or allocating transformed arrays. */
+export interface BorderMotifPrimitive {
+  readonly x1: number;
+  readonly y1: number;
+  readonly x2: number;
+  readonly y2: number;
+}
+
+// The four existing identities from the original cartouche, normalized around
+// the center of the forged seal: Catalogue page lines, the Vault diamond knot,
+// the Ward key, and mirrored Laurel sprigs. The arrays and every line record are
+// frozen because every heraldry surface receives these exact shared objects.
+const BORDER_MOTIF_PRIMITIVES: Readonly<Record<BorderMotifKind, readonly BorderMotifPrimitive[]>> =
+  Object.freeze({
+    catalogue: Object.freeze([
+      Object.freeze({ x1: -0.8, y1: -0.6, x2: 0.8, y2: -0.6 }),
+      Object.freeze({ x1: -0.8, y1: 0, x2: 0.8, y2: 0 }),
+      Object.freeze({ x1: -0.8, y1: 0.6, x2: 0.8, y2: 0.6 }),
+    ]),
+    vault: Object.freeze([
+      Object.freeze({ x1: 0, y1: -0.85, x2: 0.85, y2: 0 }),
+      Object.freeze({ x1: 0.85, y1: 0, x2: 0, y2: 0.85 }),
+      Object.freeze({ x1: 0, y1: 0.85, x2: -0.85, y2: 0 }),
+      Object.freeze({ x1: -0.85, y1: 0, x2: 0, y2: -0.85 }),
+      Object.freeze({ x1: -0.85, y1: 0, x2: 0.85, y2: 0 }),
+    ]),
+    ward: Object.freeze([
+      Object.freeze({ x1: 0, y1: -0.9, x2: 0, y2: 0.6 }),
+      Object.freeze({ x1: 0, y1: -0.9, x2: -0.45, y2: -0.4 }),
+      Object.freeze({ x1: 0, y1: -0.9, x2: 0.45, y2: -0.4 }),
+      Object.freeze({ x1: 0, y1: 0.6, x2: 0.75, y2: 0.6 }),
+    ]),
+    laurel: Object.freeze([
+      Object.freeze({ x1: -0.1, y1: 0, x2: -0.75, y2: -0.75 }),
+      Object.freeze({ x1: -0.1, y1: 0, x2: -0.9, y2: 0 }),
+      Object.freeze({ x1: -0.1, y1: 0, x2: -0.75, y2: 0.75 }),
+      Object.freeze({ x1: 0.1, y1: 0, x2: 0.75, y2: -0.75 }),
+      Object.freeze({ x1: 0.1, y1: 0, x2: 0.9, y2: 0 }),
+      Object.freeze({ x1: 0.1, y1: 0, x2: 0.75, y2: 0.75 }),
+    ]),
+  });
+
+/** Return the stored normalized lines for one existing motif identity. */
+export function borderMotifPrimitives(kind: BorderMotifKind): readonly BorderMotifPrimitive[] {
+  return BORDER_MOTIF_PRIMITIVES[kind];
+}
+
+// DOM surfaces consume the same normalized line sets as the world canvas, expressed
+// as one cached SVG path per motif. The cache is populated while the frozen accent
+// table below is built, so the per-frame unit painter only reads stored strings.
+// No coordinate is copied: every M/L pair is derived from BORDER_MOTIF_PRIMITIVES.
+const BORDER_MOTIF_PATH_CACHE = new Map<BorderMotifKind, string>();
+const BORDER_MOTIF_VIEWBOX_CENTER = 12;
+const BORDER_MOTIF_VIEWBOX_SCALE = 7;
+
+function motifSvgCoordinate(value: number): number {
+  return Number((BORDER_MOTIF_VIEWBOX_CENTER + value * BORDER_MOTIF_VIEWBOX_SCALE).toFixed(2));
+}
+
+/** Stable SVG path generated from the canonical normalized primitive set. */
+export function borderMotifPath(kind: BorderMotifKind): string {
+  const cached = BORDER_MOTIF_PATH_CACHE.get(kind);
+  if (cached !== undefined) return cached;
+  let path = '';
+  const primitives = borderMotifPrimitives(kind);
+  for (let i = 0; i < primitives.length; i++) {
+    const line = primitives[i];
+    path +=
+      `M${motifSvgCoordinate(line.x1)} ${motifSvgCoordinate(line.y1)}` +
+      `L${motifSvgCoordinate(line.x2)} ${motifSvgCoordinate(line.y2)}`;
+  }
+  BORDER_MOTIF_PATH_CACHE.set(kind, path);
+  return path;
+}
+
+export type DeedHeraldryMotifSvgClass = 'deed-heraldry-seal-art' | 'deed-heraldry-pattern';
+
+/** Code-native motif art for cold DOM surfaces. The hot unit-frame path uses a
+ *  pre-existing SVG path node and writes this same cached `d` through its elided
+ *  attribute writer. */
+export function deedHeraldryMotifSvg(
+  kind: BorderMotifKind,
+  className: DeedHeraldryMotifSvgClass,
+): string {
+  return `<svg class="${className}" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="${borderMotifPath(kind)}"></path></svg>`;
+}
 
 /** The colors one border slug paints with. Consumed as canvas stroke colors by
  *  the nameplate and as CSS custom properties by the portrait ring, so both
@@ -35,45 +123,35 @@ export type BorderMotifKind = 'catalogue' | 'vault' | 'ward' | 'laurel';
  *    against a bright sky or a pale portrait.
  *  - `glow`: the light highlight tint (an inner hairline on the canvas, the
  *    outer bloom on the ring).
- *  - `motif`: which side-primitive set the cartouche core dispatches. */
+ *  - `motif`: which normalized forged-seal primitive set the surface draws.
+ *  - `motifPath`: the module-initialized SVG expression of that SAME primitive
+ *    set, for DOM surfaces that cannot draw the canvas lines directly. */
 export interface BorderAccent {
   readonly frame: string;
   readonly edge: string;
   readonly glow: string;
   readonly motif: BorderMotifKind;
+  readonly motifPath: string;
 }
 
-// CSS-facing chassis numbers. The cartouche core re-exports them under the
-// NAMEPLATE_CARTOUCHE_* names Phase 1 locked, and the inspect / ring painters
-// write them as custom properties so hud.css and shell.css never restate the
-// hex or the pad/radius px. UI cannot import render, so the literals live here.
-export const CARTOUCHE_CHROME_PAD_X = 9;
-export const CARTOUCHE_CHROME_PAD_Y = 5;
-export const CARTOUCHE_CHROME_RADIUS = 6;
-export const CARTOUCHE_CHROME_WELL_ALPHA = 0.4;
-export const CARTOUCHE_CHROME_WELL_FILL = '#14110c';
-export const CARTOUCHE_CHROME_CLASP_WIDTH = 10;
-export const CARTOUCHE_CHROME_CLASP_HEIGHT = 5;
-export const CARTOUCHE_PAD_X_PROP = '--cartouche-pad-x';
-export const CARTOUCHE_PAD_Y_PROP = '--cartouche-pad-y';
-export const CARTOUCHE_RADIUS_PROP = '--cartouche-radius';
-export const CARTOUCHE_WELL_ALPHA_PROP = '--cartouche-well-alpha';
-export const CARTOUCHE_WELL_FILL_PROP = '--cartouche-well-fill';
-export const CARTOUCHE_CLASP_WIDTH_PROP = '--cartouche-clasp-width';
-export const CARTOUCHE_CLASP_HEIGHT_PROP = '--cartouche-clasp-height';
+// One CSS-token convention for every DOM surface. The world canvas imports the
+// same well-fill value below; only its measured alpha differs at world distance.
+export const DEED_HERALDRY_ATTR = 'data-border';
+export const DEED_HERALDRY_MOTIF_ATTR = 'data-motif';
+export const DEED_HERALDRY_FRAME_PROP = '--border-accent-frame';
+export const DEED_HERALDRY_EDGE_PROP = '--border-accent-edge';
+export const DEED_HERALDRY_GLOW_PROP = '--border-accent-glow';
+export const DEED_HERALDRY_WELL_PROP = '--deed-heraldry-well';
+export const DEED_HERALDRY_WELL_FILL = '#14110c';
 
-/** Style fragment the inspect header and any other cold surface writes next
- *  to the three accent properties. Values come from the named exports above,
- *  never from a restated hex or magic px in CSS. */
-export function cartoucheChromeStyle(): string {
+/** Canonical style fragment for cold surfaces. Callers HTML-escape the returned
+ *  fragment as one attribute value. */
+export function deedHeraldryStyle(accent: Pick<BorderAccent, 'frame' | 'edge' | 'glow'>): string {
   return (
-    `${CARTOUCHE_PAD_X_PROP}:${CARTOUCHE_CHROME_PAD_X}px;` +
-    `${CARTOUCHE_PAD_Y_PROP}:${CARTOUCHE_CHROME_PAD_Y}px;` +
-    `${CARTOUCHE_RADIUS_PROP}:${CARTOUCHE_CHROME_RADIUS}px;` +
-    `${CARTOUCHE_WELL_ALPHA_PROP}:${CARTOUCHE_CHROME_WELL_ALPHA};` +
-    `${CARTOUCHE_WELL_FILL_PROP}:${CARTOUCHE_CHROME_WELL_FILL};` +
-    `${CARTOUCHE_CLASP_WIDTH_PROP}:${CARTOUCHE_CHROME_CLASP_WIDTH}px;` +
-    `${CARTOUCHE_CLASP_HEIGHT_PROP}:${CARTOUCHE_CHROME_CLASP_HEIGHT}px`
+    `${DEED_HERALDRY_FRAME_PROP}:${accent.frame};` +
+    `${DEED_HERALDRY_EDGE_PROP}:${accent.edge};` +
+    `${DEED_HERALDRY_GLOW_PROP}:${accent.glow};` +
+    `${DEED_HERALDRY_WELL_PROP}:${DEED_HERALDRY_WELL_FILL};`
   );
 }
 
@@ -104,24 +182,28 @@ const BORDER_ACCENTS: Readonly<Record<string, BorderAccent>> = Object.freeze({
     edge: '#2a2214',
     glow: '#f3ebcf',
     motif: 'catalogue',
+    motifPath: borderMotifPath('catalogue'),
   }),
   deepward: Object.freeze({
     frame: '#4fb3c8',
     edge: '#123a4a',
     glow: '#8fe3f2',
     motif: 'ward',
+    motifPath: borderMotifPath('ward'),
   }),
   prestige_laurels: Object.freeze({
     frame: '#8fbf6a',
     edge: '#2f4a1e',
     glow: '#c6e79a',
     motif: 'laurel',
+    motifPath: borderMotifPath('laurel'),
   }),
   reliquary_gilt: Object.freeze({
     frame: '#f4ca43',
     edge: '#6b4a12',
     glow: '#ffe28f',
     motif: 'vault',
+    motifPath: borderMotifPath('vault'),
   }),
 });
 
@@ -143,6 +225,16 @@ export function deedBorderSlug(deedId: string | null | undefined): string {
   const def = Object.hasOwn(DEEDS, deedId) ? DEEDS[deedId] : undefined;
   const reward = def?.reward;
   return reward?.kind === 'border' ? reward.slug : '';
+}
+
+/** Resolve target-frame heraldry only for a player entity. The identity wire
+ *  already omits `border` on other kinds, but this explicit gate keeps a stale or
+ *  malformed NPC/mob/object view from inheriting player reward chrome. */
+export function deedTargetBorderSlug(
+  entityKind: string,
+  deedId: string | null | undefined,
+): string {
+  return entityKind === 'player' ? deedBorderSlug(deedId) : '';
 }
 
 /**

@@ -18,16 +18,17 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { charSheetRefreshSig } from '../src/ui/char_sheet_sig_core';
 import {
   BORDER_ACCENT_SLUGS,
+  type BorderMotifKind,
   borderAccent,
-  CARTOUCHE_CHROME_PAD_X,
-  CARTOUCHE_CHROME_PAD_Y,
-  CARTOUCHE_CHROME_RADIUS,
-  CARTOUCHE_CHROME_WELL_ALPHA,
-  CARTOUCHE_CHROME_WELL_FILL,
-  cartoucheChromeStyle,
+  borderMotifPath,
+  borderMotifPrimitives,
+  DEED_HERALDRY_ATTR,
+  DEED_HERALDRY_WELL_FILL,
   deedBorderSlug,
+  deedHeraldryMotifSvg,
+  deedTargetBorderSlug,
 } from '../src/ui/deed_border_view';
-import { PRESET_ORDER, THEME_PRESETS, themeCssVars } from '../src/ui/theme';
+import { contrastRatio, mixHex, PRESET_ORDER, THEME_PRESETS, themeCssVars } from '../src/ui/theme';
 import {
   PORTRAIT_BORDER_ATTR,
   PORTRAIT_BORDER_EDGE_PROP,
@@ -55,7 +56,7 @@ const RING_RULE = HUD_CSS.match(
 const ACCENT_PATH = [
   'src/ui/deed_border_view.ts',
   'src/render/nameplate_canvas.ts',
-  'src/render/nameplate_cartouche_core.ts',
+  'src/render/nameplate_heraldry_core.ts',
   'src/render/nameplate_painter.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_frame_painter.ts',
@@ -64,6 +65,7 @@ const ACCENT_PATH = [
   // painter resolved values, so BOTH files join the single-source scan.
   'src/ui/inspect_view.ts',
   'src/ui/inspect_window.ts',
+  'src/ui/deeds_window.ts',
 ];
 
 describe('deedBorderSlug: deed id -> border slug', () => {
@@ -92,6 +94,13 @@ describe('deedBorderSlug: deed id -> border slug', () => {
     expect(deedBorderSlug('prog_veteran')).toBe('');
     expect(DEEDS.prog_first_steps?.reward).toBeUndefined();
     expect(deedBorderSlug('prog_first_steps')).toBe('');
+  });
+
+  it('E48: only a player target may resolve a target-frame heraldry slug', () => {
+    expect(deedTargetBorderSlug('player', 'dgn_deepward')).toBe('deepward');
+    for (const kind of ['mob', 'npc', 'object', 'pet']) {
+      expect(deedTargetBorderSlug(kind, 'dgn_deepward'), kind).toBe('');
+    }
   });
 });
 
@@ -155,6 +164,85 @@ describe('borderAccent: slug -> palette', () => {
   });
 });
 
+describe('E40: four normalized seal identities have one static primitive owner', () => {
+  const kinds: readonly BorderMotifKind[] = ['catalogue', 'vault', 'ward', 'laurel'];
+  const fingerprint = (kind: BorderMotifKind): string =>
+    borderMotifPrimitives(kind)
+      .map((prim) => `${prim.x1},${prim.y1},${prim.x2},${prim.y2}`)
+      .join('|');
+
+  it('returns one deeply frozen primitive set with stable identities for each kind', () => {
+    for (const kind of kinds) {
+      const primitives = borderMotifPrimitives(kind);
+      expect(primitives.length, `${kind} must have a readable seal silhouette`).toBeGreaterThan(0);
+      expect(Object.isFrozen(primitives), `${kind} primitive array must be frozen`).toBe(true);
+      expect(borderMotifPrimitives(kind), `${kind} must reuse its static primitive array`).toBe(
+        primitives,
+      );
+      for (let i = 0; i < primitives.length; i++) {
+        const primitive = primitives[i];
+        expect(Object.isFrozen(primitive), `${kind}[${i}] must be frozen`).toBe(true);
+        expect(borderMotifPrimitives(kind)[i], `${kind}[${i}] identity must stay stable`).toBe(
+          primitive,
+        );
+        for (const coordinate of [primitive.x1, primitive.y1, primitive.x2, primitive.y2]) {
+          expect(Number.isFinite(coordinate), `${kind}[${i}] coordinate must be finite`).toBe(true);
+          expect(
+            coordinate,
+            `${kind}[${i}] must stay in normalized seal space`,
+          ).toBeGreaterThanOrEqual(-1);
+          expect(
+            coordinate,
+            `${kind}[${i}] must stay in normalized seal space`,
+          ).toBeLessThanOrEqual(1);
+        }
+      }
+    }
+  });
+
+  it('gives all four kinds distinct nonempty coordinate fingerprints without using color', () => {
+    const fingerprints = kinds.map(fingerprint);
+    for (const value of fingerprints) expect(value).not.toBe('');
+    expect(new Set(fingerprints).size).toBe(kinds.length);
+
+    const paletteKinds = BORDER_ACCENT_SLUGS.map((slug) => borderAccent(slug)?.motif).sort();
+    expect(paletteKinds).toEqual([...kinds].sort());
+  });
+});
+
+describe('E55: every DOM seal derives from the canonical normalized primitives', () => {
+  const kinds: readonly BorderMotifKind[] = ['catalogue', 'vault', 'ward', 'laurel'];
+
+  it('prebuilds one stable SVG path per motif without a second coordinate table', () => {
+    for (const kind of kinds) {
+      const path = borderMotifPath(kind);
+      expect(path).toMatch(/^M/);
+      expect(path).toContain('L');
+      expect(borderMotifPath(kind)).toBe(path);
+      const svg = deedHeraldryMotifSvg(kind, 'deed-heraldry-seal-art');
+      expect(svg).toContain('class="deed-heraldry-seal-art"');
+      expect(svg).toContain(`d="${path}"`);
+      expect(svg).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    }
+    const source = read('src/ui/deed_border_view.ts');
+    const primitiveTable = source.slice(
+      source.indexOf('const BORDER_MOTIF_PRIMITIVES'),
+      source.indexOf('export function borderMotifPrimitives'),
+    );
+    expect(primitiveTable.match(/x1:/g)).toHaveLength(
+      kinds.flatMap((kind) => borderMotifPrimitives(kind)).length,
+    );
+    expect(source).not.toContain('M12');
+  });
+
+  it('stores the derived path on the same frozen per-slug record as palette and motif', () => {
+    for (const slug of BORDER_ACCENT_SLUGS) {
+      const accent = borderAccent(slug);
+      expect(accent?.motifPath).toBe(borderMotifPath(accent?.motif as BorderMotifKind));
+    }
+  });
+});
+
 describe('the portrait ring consumes the palette table, and holds no colors of its own', () => {
   const rule = RING_RULE;
 
@@ -205,14 +293,14 @@ describe('the portrait ring consumes the palette table, and holds no colors of i
     );
   });
 
-  it('pins the forced-palette mapping the nameplate cartouche already had', () => {
+  it('pins the forced-palette mapping the world Deed Heraldry already had', () => {
     // Recorded at Phase 19 QA and closed in Phase 20. The three accent custom
     // properties are never missing (paintPortraitBorder writes them together
     // with the data-border slug the rule gates on), so the `transparent`
     // fallbacks cannot engage; what forced-colors does is replace the computed
     // colors with the system palette. The arm is worth pinning for the CHOICE of
-    // replacement, three things: the same system pair the cartouche
-    // (nameplate_canvas.ts drawBorderAccent) already restated, the outline
+    // replacement, three things: the same system pair the world heraldry
+    // (nameplate_canvas.ts drawDeedHeraldry) already restated, the outline
     // remapped so the edge contour does not flatten onto the frame line, and the
     // decorative bloom dropped explicitly. The two surfaces must agree on WHICH
     // system colors, or one identity reads two ways under high contrast.
@@ -220,10 +308,10 @@ describe('the portrait ring consumes the palette table, and holds no colors of i
       /@media \(forced-colors: active\) \{\s*\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::after \{([^}]*)\}/,
     )?.[1];
     expect(forced, 'the portrait ring has no forced-colors arm in hud.css').toBeTruthy();
-    // The frame line is the one that must stay visible; the edge contour drops
-    // to the background color, exactly as the canvas does.
+    // Both CSS contours stay visible in the system foreground color. The world
+    // canvas keeps its own Canvas edge because it paints a filled ribbon well.
     expect(forced).toContain('border-color: CanvasText;');
-    expect(forced).toContain('outline-color: Canvas;');
+    expect(forced).toContain('outline-color: CanvasText;');
     // The bloom is stripped by forced-colors anyway; dropping it explicitly
     // keeps the rule honest rather than leaving a dead declaration that reads
     // load-bearing.
@@ -232,31 +320,37 @@ describe('the portrait ring consumes the palette table, and holds no colors of i
     // The canvas half of the family, read from its own source so the two cannot
     // drift: same two system colors, same roles.
     const canvas = read('src/render/nameplate_canvas.ts');
-    const cartouche = canvas.slice(canvas.indexOf('private drawBorderAccent('));
-    const body = cartouche.slice(0, cartouche.indexOf('private drawHealth('));
+    const drawStart = canvas.indexOf('private drawDeedHeraldry(');
+    const healthStart = canvas.indexOf('private drawHealth(', drawStart);
+    expect(drawStart, 'drawDeedHeraldry definition missing').toBeGreaterThan(-1);
+    expect(
+      healthStart,
+      'drawDeedHeraldry source window has no drawHealth boundary',
+    ).toBeGreaterThan(drawStart);
+    const body = canvas.slice(drawStart, healthStart);
     expect(body).toContain("forcedColors ? 'CanvasText' : accent.frame");
     expect(body).toContain("forcedColors ? 'Canvas' : accent.edge");
-    expect(body).toContain("forcedColors ? 'Canvas' : NAMEPLATE_CARTOUCHE_WELL_FILL");
+    expect(body).toContain("forcedColors ? 'Canvas' : NAMEPLATE_HERALDRY_WELL_FILL");
     expect(body).toContain("forcedColors ? 'Canvas' : accent.glow");
   });
 
-  it('gives the inspect header accent the same forced-colors arm', () => {
+  it('gives the inspect banner accent the same forced-colors arm', () => {
     // The third surface of the identity joins the family in the same change,
     // rather than inheriting the gap the ring just closed.
     const shell = read('src/styles/shell.css');
     const forced = shell.match(
-      /@media \(forced-colors: active\) \{\s*\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /@media \(forced-colors: active\) \{\s*\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
     expect(forced, 'the inspect header accent has no forced-colors arm').toBeTruthy();
     expect(forced).toContain('border-color: CanvasText;');
-    expect(forced).toContain('outline-color: Canvas;');
+    expect(forced).toContain('outline-color: CanvasText;');
     expect(forced).toContain('box-shadow: none;');
   });
 
-  it('the inspect header rule gates on a NON-EMPTY slug and holds no color', () => {
+  it('the inspect banner rule gates on a NON-EMPTY slug and holds no color', () => {
     const shell = read('src/styles/shell.css');
     const rule = shell.match(
-      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
     expect(rule, 'the inspect header accent rule is missing from shell.css').toBeTruthy();
     // Every color arrives through the painter's custom properties, and the
@@ -276,22 +370,12 @@ describe('the portrait ring consumes the palette table, and holds no colors of i
     expect(tiered[0]).toContain('box-shadow');
   });
 
-  it('the inspect painter writes the ring attribute and property NAMES verbatim', () => {
-    // The card spells the four literals inline (it must not import a per-frame
-    // painter for four strings), so this is what keeps them equal to the
-    // constants the stylesheet family is written against.
+  it('the inspect painter uses the one canonical attribute and style builder', () => {
     const painter = read('src/ui/inspect_window.ts');
-    expect(painter).toContain(`${PORTRAIT_BORDER_ATTR}="\${esc(border.slug)}"`);
-    for (const prop of [
-      PORTRAIT_BORDER_FRAME_PROP,
-      PORTRAIT_BORDER_EDGE_PROP,
-      PORTRAIT_BORDER_GLOW_PROP,
-    ]) {
-      // The esc() wrapper is pinned with the name: the style attribute is the
-      // one place a future palette source could inject through, so dropping the
-      // escape must red this test, not just reordering the property names.
-      expect(painter, `the inspect card must write ${prop}`).toContain(`${prop}:\${esc(border.`);
-    }
+    expect(PORTRAIT_BORDER_ATTR).toBe(DEED_HERALDRY_ATTR);
+    expect(painter).toMatch(/\$\{DEED_HERALDRY_ATTR\}="\$\{esc\(border\.slug\)\}"/);
+    expect(painter).toMatch(/\$\{DEED_HERALDRY_MOTIF_ATTR\}="\$\{border\.motif\}"/);
+    expect(painter).toContain('esc(deedHeraldryStyle(border))');
   });
 
   it('duplicates no slug and no palette color into CSS (one source of truth)', () => {
@@ -386,8 +470,12 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     'render_budget',
     'RenderBudgetGovernor',
     '--fx-shadow',
+    'GFX',
     'gfxTier',
+    'fxTier',
+    'graphicsPreset',
     'data-fx-level',
+    '.animate(',
   ];
 
   it('reads no effects profile, tier knob, or FPS governor anywhere on the path', () => {
@@ -396,6 +484,39 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       for (const token of PROFILE_TOKENS) {
         expect(source.includes(token), `${rel} must not read ${token}`).toBe(false);
       }
+    }
+  });
+
+  it('E46: the world seal and ribbon source has no raster, shed, filter, or motion path', () => {
+    const core = read('src/render/nameplate_heraldry_core.ts');
+    const canvas = read('src/render/nameplate_canvas.ts');
+    const drawStart = canvas.indexOf('private drawDeedHeraldry(');
+    const healthStart = canvas.indexOf('private drawHealth(', drawStart);
+    expect(drawStart, 'drawDeedHeraldry definition missing').toBeGreaterThan(-1);
+    expect(
+      healthStart,
+      'drawDeedHeraldry source window has no drawHealth boundary',
+    ).toBeGreaterThan(drawStart);
+    const source = `${core}\n${canvas.slice(drawStart, healthStart)}`;
+    const forbidden: ReadonlyArray<readonly [string, RegExp]> = [
+      ['sprite', /\bsprite\b/i],
+      ['raster image', /\b(?:raster|drawImage)\b/i],
+      [
+        'gradient',
+        /\b(?:gradient|createLinearGradient|createRadialGradient|createConicGradient)\b/i,
+      ],
+      ['filter', /\bfilter\b/i],
+      [
+        'tier or governor',
+        /\b(?:gfx|gfxTier|fxTier|graphicsPreset|tier|ui_effects_profile|ui_tier_knobs|render_budget|RenderBudgetGovernor)\b/i,
+      ],
+      [
+        'animation',
+        /\b(?:animate|animation|requestAnimationFrame|setInterval|setTimeout|transition|keyframes)\b/i,
+      ],
+    ];
+    for (const [label, pattern] of forbidden) {
+      expect(source, `world Deed Heraldry must not add a ${label} path`).not.toMatch(pattern);
     }
   });
 
@@ -468,7 +589,7 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     }
   });
 
-  it('E27: canvas metal is static; inspect and picker metal still read on parchment', () => {
+  it('E56: canvas and social-surface metal stay independent of every theme', () => {
     expect(PRESET_ORDER).toEqual(['classic', 'midnight', 'parchment', 'highContrast']);
     expect(THEME_PRESETS.parchment.panel).toBe('#ece0c4');
     const themeSource = read('src/ui/theme.ts');
@@ -477,18 +598,19 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     expect(themeSource).not.toContain('--border-accent-glow');
     const vars = Object.keys(themeCssVars(THEME_PRESETS.parchment));
     expect(vars.some((name) => name.startsWith('--border-accent-'))).toBe(false);
-    expect(vars.some((name) => name.startsWith('--cartouche-'))).toBe(false);
+    expect(vars.some((name) => name.startsWith('--deed-heraldry-'))).toBe(false);
     const canvas = read('src/render/nameplate_canvas.ts');
     expect(canvas).not.toContain('themeCssVars');
     expect(canvas).not.toContain('THEME_PRESETS');
     expect(canvas).not.toContain('parchment');
     const inspectRule = read('src/styles/shell.css').match(
-      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
-    expect(inspectRule, 'inspect header rule missing').toBeTruthy();
+    expect(inspectRule, 'inspect banner rule missing').toBeTruthy();
     expect(inspectRule).toContain('var(--border-accent-frame');
     expect(inspectRule).toContain('var(--border-accent-edge');
     expect(inspectRule).toContain('var(--border-accent-glow');
+    expect(inspectRule).toContain('var(--deed-heraldry-well');
     expect(inspectRule).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
     const swatch = read('src/styles/components.css').match(
       /\n {2}\.deed-border-swatch \{([^}]*)\}/,
@@ -497,83 +619,156 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     expect(swatch).toContain('var(--border-accent-frame');
     expect(swatch).toContain('var(--border-accent-edge');
     expect(swatch).toContain('var(--border-accent-glow');
+    expect(swatch).toContain('var(--deed-heraldry-well');
     expect(swatch).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    const components = read('src/styles/components.css');
+    const heraldryStart = components.indexOf('.deed-heraldry-seal {');
+    const forcedComponents = components.slice(
+      components.indexOf('@media (forced-colors: active) {', heraldryStart),
+      components.indexOf('body.mobile-touch .deed-heraldry-preview {', heraldryStart),
+    );
+    expect(forcedComponents, 'picker and preview forced-colors arm missing').toBeTruthy();
+    expect(forcedComponents).toContain('.deed-heraldry-seal');
+    expect(forcedComponents).toContain('.deed-border-swatch');
+    expect(forcedComponents).toContain('.deed-heraldry-preview[data-border]:not([data-border=""])');
+    expect(forcedComponents).toContain('border-color: CanvasText;');
+    expect(forcedComponents).toContain('outline-color: CanvasText;');
+    expect(forcedComponents).toContain('stroke: CanvasText;');
+    expect(forcedComponents).toContain('box-shadow: none;');
+    const forcedHudStart = HUD_CSS.indexOf(
+      '@media (forced-colors: active) {',
+      HUD_CSS.indexOf('> .deed-heraldry-seal'),
+    );
+    const forcedHud = HUD_CSS.slice(
+      forcedHudStart,
+      HUD_CSS.indexOf('.level-chip {', forcedHudStart),
+    );
+    expect(forcedHud, 'unit-frame forced-colors arm missing').toBeTruthy();
+    expect(forcedHud).toContain('> .deed-heraldry-seal');
+    expect(forcedHud).toContain('.uf-name-header[data-border]');
+    expect(forcedHud).toContain('.deed-heraldry-pattern');
   });
 
-  it('E30: inspect header is a CSS cartouche (well + edge + clasp) with forced-colors', () => {
+  it('E56: Parchment keeps all copy on fixed dark heraldry surfaces AA-readable', () => {
+    const components = read('src/styles/components.css');
     const shell = read('src/styles/shell.css');
-    const rule = shell.match(
-      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+    const option = components.match(/\n {2}\.deed-title-option \{([^}]*)\}/)?.[1];
+    const optionHover = components.match(/\n {2}\.deed-title-option:hover \{([^}]*)\}/)?.[1];
+    const preview = components.match(
+      /\n {2}\.deed-heraldry-preview\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
-    const clasp = shell.match(
-      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    const previewRibbon = components.match(/\n {2}\.deed-heraldry-preview-ribbon \{([^}]*)\}/)?.[1];
+    const previewName = components.match(/\n {2}\.deed-heraldry-preview-name \{([^}]*)\}/)?.[1];
+    const previewDeedStart = components.lastIndexOf('\n  .deed-heraldry-preview-deed {');
+    const previewDeed = components.slice(
+      previewDeedStart,
+      components.indexOf('}', previewDeedStart),
+    );
+    const inspectTitle = shell.match(
+      /\n {2}\.inspect-heraldry-banner \.inspect-title \{([^}]*)\}/,
     )?.[1];
-    expect(rule).toContain('var(--cartouche-well-fill)');
-    expect(rule).toContain('var(--cartouche-radius)');
-    expect(rule).toContain('var(--cartouche-pad-x)');
-    expect(rule).toContain('var(--cartouche-pad-y)');
-    expect(rule).toContain('var(--border-accent-frame');
-    expect(rule).toContain('var(--border-accent-edge');
-    expect(clasp, 'inspect clasp missing').toBeTruthy();
-    expect(clasp).toContain('left: 50%;');
-    expect(clasp).toContain('var(--cartouche-clasp-width)');
-    expect(clasp).toContain('var(--cartouche-clasp-height)');
-    expect(clasp).toContain('var(--border-accent-frame');
-    expect(clasp).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
-    const chrome = cartoucheChromeStyle();
-    expect(CARTOUCHE_CHROME_PAD_X).toBe(9);
-    expect(CARTOUCHE_CHROME_PAD_Y).toBe(5);
-    expect(CARTOUCHE_CHROME_RADIUS).toBe(6);
-    expect(CARTOUCHE_CHROME_WELL_FILL).toBe('#14110c');
-    expect(CARTOUCHE_CHROME_WELL_ALPHA).toBe(0.4);
-    expect(chrome).toContain('--cartouche-pad-x:9px;');
-    expect(chrome).toContain('--cartouche-pad-y:5px;');
-    expect(chrome).toContain('--cartouche-radius:6px;');
-    expect(chrome).toContain('--cartouche-well-fill:#14110c;');
-    expect(chrome).toContain('--cartouche-well-alpha:0.4;');
-    expect(chrome).toContain('--cartouche-clasp-width:10px;');
-    expect(chrome).toContain('--cartouche-clasp-height:5px');
-    const painter = read('src/ui/inspect_window.ts');
-    expect(painter).toContain('cartoucheChromeStyle()');
-    const forcedClasp = shell.match(
-      /@media \(forced-colors: active\) \{[\s\S]*?\.inspect-name\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    const inspectBanner = shell.match(
+      /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
-    expect(forcedClasp, 'inspect clasp forced-colors arm missing').toBeTruthy();
-    expect(forcedClasp).toContain('border-color: CanvasText;');
-    expect(forcedClasp).toContain('background-color: Canvas;');
-    expect(forcedClasp).toContain('box-shadow: none;');
+    const inspectDeed = shell.match(/\n {2}\.inspect-heraldry-deed \{([^}]*)\}/)?.[1];
+    expect(option).toContain('color: var(--color-text-overlay);');
+    expect(optionHover).toContain('color: var(--color-deed-banner-text);');
+    expect(previewRibbon).toContain('color: var(--color-text-overlay);');
+    expect(previewName).toContain('color: var(--color-text-overlay);');
+    expect(previewDeed).toContain('color: var(--color-text-overlay);');
+    expect(inspectTitle).toContain('color: var(--color-text-overlay);');
+    expect(inspectDeed).toContain('color: var(--color-text-overlay);');
+    expect(option).toContain('background: linear-gradient(160deg, #17130c, #0c0a07);');
+    expect(preview).toContain('var(--deed-heraldry-well, transparent) 74%');
+    expect(inspectBanner).toContain('var(--deed-heraldry-well, transparent) 82%');
+
+    const vars = themeCssVars(THEME_PRESETS.parchment);
+    const overlayText = vars['--color-text-overlay'];
+    const panel = vars['--panel-base'];
+    const well = DEED_HERALDRY_WELL_FILL;
+    const optionBackgrounds = ['#17130c', '#0c0a07'];
+    const translucentHeraldryBackgrounds = [mixHex(well, panel, 0.18), mixHex(well, panel, 0.26)];
+    for (const background of [well, ...optionBackgrounds, ...translucentHeraldryBackgrounds]) {
+      expect(
+        contrastRatio(overlayText, background),
+        `Parchment overlay text on ${background}`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+
+    const tokens = read('src/styles/tokens.css');
+    const hoverText = tokens.match(/--color-deed-banner-text:\s*(#[0-9a-fA-F]{6});/)?.[1];
+    expect(hoverText, 'fixed dark-surface hover token missing').toBeTruthy();
+    for (const background of optionBackgrounds) {
+      expect(
+        contrastRatio(String(hoverText), background),
+        `Parchment option hover on ${background}`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
-  it('E31: portrait ring stays a circle; clasp sits at 12 o clock under the level chip', () => {
+  it('E49/E50: portraits stay circular, gameplay overlays win, and the hollow clasp is gone', () => {
     expect(RING_RULE, 'the portrait ring rule is missing from hud.css').toBeTruthy();
     expect(RING_RULE).toContain('border-radius: 50%;');
     expect(RING_RULE).toContain('z-index: 2;');
     const clasp = HUD_CSS.match(
       /\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
     )?.[1];
-    expect(clasp, 'portrait clasp rule missing').toBeTruthy();
-    expect(clasp).toContain('left: 30px;');
-    expect(clasp).toContain('top: -6px;');
-    expect(clasp).toContain('transform: translate(-50%, -50%);');
-    expect(clasp).toContain('border-radius: 2px;');
-    expect(clasp).toContain('z-index: 2;');
-    expect(clasp).toContain('var(--cartouche-clasp-width)');
-    expect(clasp).toContain('var(--border-accent-frame');
-    expect(clasp).not.toContain('border-radius: 50%');
-    expect(clasp).not.toContain('--fx-shadow');
+    expect(clasp, 'the 12 o clock checkbox clasp must be removed').toBeUndefined();
+    const seal = HUD_CSS.match(
+      /\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\) > \.deed-heraldry-seal \{([^}]*)\}/,
+    )?.[1];
+    expect(seal, 'portrait/name joint seal rule missing').toBeTruthy();
+    expect(seal).toContain('display: grid;');
+    expect(seal).toContain('z-index: 3;');
+    const targetSeal = HUD_CSS.match(
+      /#target-frame > \.portrait-wrap\[data-border\]:not\(\[data-border=""\]\) > \.deed-heraldry-seal \{([^}]*)\}/,
+    )?.[1];
+    expect(targetSeal, 'target portrait seal mirror rule missing').toBeTruthy();
+    expect(targetSeal).toContain('left: -7px;');
+    expect(targetSeal).toContain('right: auto;');
     expect(HUD_CSS, 'the level chip must sit above the ring').toMatch(
       /\n {2}\.level-chip \{[^}]*z-index: 3;/,
     );
     expect(HUD_CSS, 'the combat flash must sit above the ring').toMatch(
       /\n {2}\.combat-flash \{[^}]*z-index: 4;/,
     );
+    // The existing boss dragon-emblem pseudo-element is gameplay rank chrome,
+    // not the removed heraldry clasp, and remains target-only.
     expect(HUD_CSS).toContain('#target-frame.boss > .portrait-wrap::before {');
-    const forcedClasp = HUD_CSS.match(
-      /@media \(forced-colors: active\) \{\s*\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::after \{[^}]*\}\s*\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
-    )?.[1];
-    expect(forcedClasp, 'portrait clasp forced-colors arm missing').toBeTruthy();
-    expect(forcedClasp).toContain('border-color: CanvasText;');
-    expect(forcedClasp).toContain('background-color: Canvas;');
+    expect(HUD_CSS).not.toContain('--cartouche-clasp');
+  });
+
+  it('E47/E48: only player and target documents expose the joint seal and header pattern hosts', () => {
+    for (const rel of ['index.html', 'play.html']) {
+      const html = read(rel);
+      for (const prefix of ['pf', 'tf']) {
+        expect(html).toContain(`id="${prefix}-name-header"`);
+        expect(html).toContain(`id="${prefix}-heraldry-seal-motif"`);
+        expect(html).toContain(`id="${prefix}-heraldry-pattern-motif"`);
+        const portraitStart = html.indexOf(`id="${prefix}-portrait-wrap"`);
+        const barsStart = html.indexOf('<div class="uf-bars">', portraitStart);
+        const headerStart = html.indexOf(`id="${prefix}-name-header"`, barsStart);
+        const firstBarStart = html.indexOf('<div class="bar', headerStart);
+        expect(html.slice(portraitStart, barsStart)).toContain(
+          `id="${prefix}-heraldry-seal-motif"`,
+        );
+        expect(html.slice(headerStart, firstBarStart)).toContain(
+          `id="${prefix}-heraldry-pattern-motif"`,
+        );
+        expect(html.slice(headerStart, firstBarStart)).toContain(`id="${prefix}-name"`);
+      }
+      for (const prefix of ['petf', 'totf']) {
+        expect(html).not.toContain(`${prefix}-heraldry`);
+      }
+      expect(html.match(/class="deed-heraldry-seal"/g)).toHaveLength(2);
+      expect(html.match(/class="deed-heraldry-pattern"/g)).toHaveLength(2);
+    }
+    const hud = read('src/ui/hud.ts');
+    expect(hud).toContain('targetFrame.borderSlug = deedTargetBorderSlug(');
+    expect(hud.match(/heraldry:\s*\{/g)).toHaveLength(2);
+    expect(hud.slice(hud.indexOf('private readonly totFramePainter'))).not.toContain(
+      'totf-heraldry',
+    );
   });
 
   it('E33: Catalogue brass does not collide with Eternal Spoils gold or elite gold', () => {
@@ -593,30 +788,110 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     }
   });
 
-  it('E34: cartouche identity adds no motion', () => {
+  it('E57: social heraldry adds no continuous motion', () => {
     const inspectRule = read('src/styles/shell.css').match(
-      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
-    const inspectClasp = read('src/styles/shell.css').match(
-      /\n {2}\.inspect-name\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    const header = HUD_CSS.match(
+      /\n {2}\.uf-name-header\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
-    const swatch = read('src/styles/components.css').match(
-      /\n {2}\.deed-border-swatch \{([^}]*)\}/,
-    )?.[1];
-    const clasp = HUD_CSS.match(
-      /\.portrait-wrap\[data-border\]:not\(\[data-border=""\]\)::before \{([^}]*)\}/,
+    const components = read('src/styles/components.css');
+    const swatch = components.match(/\n {2}\.deed-border-swatch \{([^}]*)\}/)?.[1];
+    const preview = components.match(
+      /\n {2}\.deed-heraldry-preview\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
     for (const [name, body] of [
       ['inspect', inspectRule],
-      ['inspect clasp', inspectClasp],
+      ['unit header', header],
       ['picker swatch', swatch],
-      ['ring clasp', clasp],
+      ['picker preview', preview],
     ] as const) {
       expect(body, `${name} rule missing`).toBeTruthy();
       expect(body, `${name} must not animate`).not.toMatch(/animation|@keyframes|transition/);
     }
-    const core = read('src/render/nameplate_cartouche_core.ts');
+    for (const rel of ['src/styles/components.css', 'src/styles/hud.css', 'src/styles/shell.css']) {
+      for (const rule of read(rel).matchAll(
+        /\.(?:deed-heraldry|deed-border|uf-name-header)[^{]*\{([^}]*)\}/g,
+      )) {
+        expect(rule[1], `${rel} shared heraldry rule must not animate`).not.toMatch(
+          /animation|@keyframes|transition/,
+        );
+      }
+    }
+    const core = read('src/render/nameplate_heraldry_core.ts');
     expect(core).not.toMatch(/requestAnimationFrame|setInterval|@keyframes/);
+    expect(read('src/ui/deeds_window.ts')).not.toMatch(
+      /requestAnimationFrame|setInterval|@keyframes/,
+    );
+  });
+
+  it('E52/E53/E57: mobile stacks previews without hiding identity, and tiers scale bloom only', () => {
+    const mobile = read('src/styles/hud.mobile.css');
+    expect(mobile).not.toMatch(
+      /(?:deed-heraldry|uf-name-header|portrait-wrap\[data-border)[^}]*display:\s*none/,
+    );
+    const components = read('src/styles/components.css');
+    const mobilePreview = components.match(
+      /body\.mobile-touch \.deed-heraldry-preview \{([^}]*)\}/,
+    )?.[1];
+    expect(mobilePreview, 'mobile preview stack rule missing').toBeTruthy();
+    expect(mobilePreview).toContain('grid-template-columns: 1fr;');
+
+    for (const rel of [
+      'src/styles/hud.css',
+      'src/styles/hud.mobile.css',
+      'src/styles/components.css',
+      'src/styles/shell.css',
+      'src/styles/tokens.css',
+    ]) {
+      const css = read(rel);
+      for (const selector of css.match(/[^{};]*data-fx-level[^{}]*\{/g) ?? []) {
+        expect(
+          /deed-heraldry|uf-name-header|portrait-wrap\[data-border|deed-border-swatch/.test(
+            selector,
+          ),
+          `a data-fx-level selector must not target social identity: ${selector.trim()}`,
+        ).toBe(false);
+      }
+    }
+
+    for (const [name, body] of [
+      ['shared seal', components.match(/\n {2}\.deed-heraldry-seal \{([^}]*)\}/)?.[1]],
+      [
+        'portrait ring',
+        String(RING_RULE).slice(
+          String(RING_RULE).indexOf('{') + 1,
+          String(RING_RULE).lastIndexOf('}'),
+        ),
+      ],
+      [
+        'unit header',
+        HUD_CSS.match(
+          /\n {2}\.uf-name-header\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+        )?.[1],
+      ],
+      [
+        'inspect banner',
+        read('src/styles/shell.css').match(
+          /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+        )?.[1],
+      ],
+      ['picker swatch', components.match(/\n {2}\.deed-border-swatch \{([^}]*)\}/)?.[1]],
+      [
+        'picker preview',
+        components.match(
+          /\n {2}\.deed-heraldry-preview\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+        )?.[1],
+      ],
+    ] as const) {
+      expect(body, `${name} rule missing`).toBeTruthy();
+      expect(body?.match(/var\(--fx-shadow/g) ?? []).toHaveLength(1);
+      expect(body).toMatch(/box-shadow:[^;]*var\(--fx-shadow/s);
+      for (const declaration of body?.split(';') ?? []) {
+        if (!declaration.includes('var(--fx-shadow')) continue;
+        expect(declaration.trim().startsWith('box-shadow:')).toBe(true);
+      }
+    }
   });
 
   it('E35: changing activeBorder busts the character sheet refresh signature', () => {
@@ -637,14 +912,22 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     expect(read('src/ui/char_sheet_sig_core.ts')).toContain('parts.activeBorder');
   });
 
-  it('E36: worn slug still arrives on entity.border with no world_api change', () => {
+  it('E58: worn slug still rides activeBorder/entity.border with one explicit picker command', () => {
     expect(deedBorderSlug('prog_prestige_10')).toBe('prestige_laurels');
     expect(deedBorderSlug('col_discovery_250')).toBe('curators_gilt');
     const painter = read('src/render/nameplate_painter.ts');
     expect(painter).toContain('state.border = deedBorderSlug(entity.border);');
     const view = read('src/ui/deed_border_view.ts');
     expect(view).not.toContain('world_api');
-    expect(read('src/render/nameplate_cartouche_core.ts')).not.toContain('world_api');
+    expect(read('src/render/nameplate_heraldry_core.ts')).not.toContain('world_api');
+    const picker = read('src/ui/deeds_window.ts');
+    expect(picker.match(/\.setActiveBorder\(/g)).toHaveLength(1);
+    const click = picker.slice(
+      picker.indexOf("for (const btn of el.querySelectorAll<HTMLElement>('[data-border-pick]'))"),
+    );
+    expect(click.slice(0, click.indexOf('\n    }'))).toContain(
+      "this.deps.world().setActiveBorder(id === '' ? null : id);",
+    );
   });
 
   it('resolves borderSlug at the hud.ts call sites without a tier read', () => {
@@ -655,7 +938,7 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     // wrapping if) is caught without whole-file false positives.
     const hud = read('src/ui/hud.ts').split('\n');
     const sites = hud.reduce<number[]>((acc, line, i) => {
-      if (line.includes('borderSlug = deedBorderSlug')) acc.push(i);
+      if (line.includes('Frame.borderSlug = deed')) acc.push(i);
       return acc;
     }, []);
     expect(sites.length, 'expected both borderSlug assignments (self + target)').toBe(2);

@@ -518,7 +518,7 @@ const RENDER_PURE_CORES = [
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
-  'src/render/nameplate_cartouche_core.ts',
+  'src/render/nameplate_heraldry_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',

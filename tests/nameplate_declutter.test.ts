@@ -75,15 +75,37 @@ describe('nameplate declutter', () => {
     expect(declutterNameplates(anchors)).toEqual(anchors);
   });
 
-  it('E24: two plates 25px apart vertically now collide (the old 18px window would miss them)', () => {
+  it('E45: two heraldry plates 25px apart vertically clear at the accepted 28px pitch', () => {
     const anchors: NameplateAnchor[] = [
       { id: 1, sx: 200, sy: 100 },
       { id: 2, sx: 200, sy: 125 },
     ];
     const out = declutterNameplates(anchors);
-    expect(OVERLAP_THRESHOLD_Y_PX).toBe(32);
-    expect(STACK_OFFSET_PX).toBe(34);
-    expect(Math.abs((out[0]?.sy ?? 0) - (out[1]?.sy ?? 0))).toBe(34);
+    expect(OVERLAP_THRESHOLD_Y_PX).toBe(26);
+    expect(STACK_OFFSET_PX).toBe(28);
+    expect(Math.abs((out[0]?.sy ?? 0) - (out[1]?.sy ?? 0))).toBe(28);
+  });
+
+  it('E45: the left-mounted 18px seal keeps colliding through its 3px ribbon overlap', () => {
+    // The seal projects 15px beyond the old ribbon-only reach: the right
+    // plate's seal still overlaps the left plate when their anchors are 95px
+    // apart, so the declutter pass must not leave them on the same row.
+    const ribbonOnlyThreshold = 80;
+    const sealSize = 18;
+    const sealRibbonOverlap = 3;
+    const anchors: NameplateAnchor[] = [
+      { id: 1, sx: 200, sy: 100 },
+      {
+        id: 2,
+        sx: 200 + ribbonOnlyThreshold + sealSize - sealRibbonOverlap,
+        sy: 100,
+      },
+    ];
+
+    const out = declutterNameplates(anchors);
+
+    expect(OVERLAP_THRESHOLD_X_PX).toBe(95);
+    expect(Math.abs((out[0]?.sy ?? 0) - (out[1]?.sy ?? 0))).toBe(28);
   });
 
   it('separates two anchors that project to nearly the same spot', () => {
@@ -131,7 +153,7 @@ describe('nameplate declutter', () => {
 
   it('stacks a transitive chain where the endpoints do not directly overlap', () => {
     // A overlaps B (70px apart) and B overlaps C (70px apart), but A and C
-    // are 140px apart, beyond OVERLAP_THRESHOLD_X_PX (80px). All three still
+    // are 140px apart, beyond OVERLAP_THRESHOLD_X_PX (95px). All three still
     // belong to the same collision component and must be stacked together.
     const anchors: NameplateAnchor[] = [
       { id: 1, sx: 0, sy: 100 },
@@ -242,8 +264,18 @@ describe('nameplate declutter: spatial-hash hot path', () => {
   });
 
   it.each([
-    ['inclusive horizontal threshold', { sx: 0, sy: 0 }, { sx: 80, sy: 0 }, true],
-    ['outside horizontal threshold', { sx: 0, sy: 0 }, { sx: 80.0001, sy: 0 }, false],
+    [
+      'inclusive horizontal threshold',
+      { sx: 0, sy: 0 },
+      { sx: OVERLAP_THRESHOLD_X_PX, sy: 0 },
+      true,
+    ],
+    [
+      'outside horizontal threshold',
+      { sx: 0, sy: 0 },
+      { sx: OVERLAP_THRESHOLD_X_PX + 0.0001, sy: 0 },
+      false,
+    ],
     ['inclusive vertical threshold', { sx: 0, sy: 0 }, { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX }, true],
     [
       'outside vertical threshold',
@@ -254,11 +286,21 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     [
       'inclusive diagonal threshold',
       { sx: 0, sy: 0 },
-      { sx: 80, sy: OVERLAP_THRESHOLD_Y_PX },
+      { sx: OVERLAP_THRESHOLD_X_PX, sy: OVERLAP_THRESHOLD_Y_PX },
       true,
     ],
-    ['inclusive opposite diagonal', { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX }, { sx: 80, sy: 0 }, true],
-    ['negative to positive cell boundary', { sx: -40, sy: 0 }, { sx: 40, sy: 0 }, true],
+    [
+      'inclusive opposite diagonal',
+      { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX },
+      { sx: OVERLAP_THRESHOLD_X_PX, sy: 0 },
+      true,
+    ],
+    [
+      'negative to positive cell boundary',
+      { sx: -OVERLAP_THRESHOLD_X_PX / 2, sy: 0 },
+      { sx: OVERLAP_THRESHOLD_X_PX / 2, sy: 0 },
+      true,
+    ],
   ])('pins the %s', (_label, a, b, collides) => {
     const anchors: NameplateAnchor[] = [
       { id: 1, ...a },
@@ -327,7 +369,9 @@ describe('nameplate declutter: spatial-hash hot path', () => {
   it('does not repeatedly scan a dense non-overlapping neighbour bucket', () => {
     const anchors: NameplateAnchor[] = [];
     for (let i = 0; i < 4_000; i++) anchors.push({ id: i, sx: 0, sy: 100 });
-    for (let i = 0; i < 4_000; i++) anchors.push({ id: 4_000 + i, sx: 159, sy: 100 });
+    for (let i = 0; i < 4_000; i++) {
+      anchors.push({ id: 4_000 + i, sx: OVERLAP_THRESHOLD_X_PX * 2 - 1, sy: 100 });
+    }
     const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
@@ -338,15 +382,21 @@ describe('nameplate declutter: spatial-hash hot path', () => {
   it.each([
     [
       'left cell below right',
-      { sx: 79, sy: 0 },
+      { sx: OVERLAP_THRESHOLD_X_PX - 1, sy: 0 },
       { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX - 1 },
-      { sx: 158, sy: (OVERLAP_THRESHOLD_Y_PX - 1) * 2 },
+      {
+        sx: (OVERLAP_THRESHOLD_X_PX - 1) * 2,
+        sy: (OVERLAP_THRESHOLD_Y_PX - 1) * 2,
+      },
     ],
     [
       'left cell above right',
-      { sx: 79, sy: (OVERLAP_THRESHOLD_Y_PX - 1) * 2 + 1 },
+      {
+        sx: OVERLAP_THRESHOLD_X_PX - 1,
+        sy: (OVERLAP_THRESHOLD_Y_PX - 1) * 2 + 1,
+      },
       { sx: 0, sy: OVERLAP_THRESHOLD_Y_PX },
-      { sx: 158, sy: 0 },
+      { sx: (OVERLAP_THRESHOLD_X_PX - 1) * 2, sy: 0 },
     ],
   ])(
     'rejects dense diagonal neighbour buckets without a false merge when the %s',
@@ -390,7 +440,7 @@ describe('nameplate declutter: spatial-hash hot path', () => {
   });
 
   it('does not self-collide when adjacent far cell coordinates round together', () => {
-    const farX = 80 * (Number.MAX_SAFE_INTEGER + 1);
+    const farX = OVERLAP_THRESHOLD_X_PX * (Number.MAX_SAFE_INTEGER + 1);
     const anchors: NameplateAnchor[] = [
       { id: 1, sx: farX, sy: 100 },
       { id: 2, sx: -farX, sy: 500 },

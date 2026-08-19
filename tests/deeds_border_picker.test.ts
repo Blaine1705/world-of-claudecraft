@@ -255,9 +255,19 @@ describe('Book of Deeds border picker', () => {
     const style = swatch?.getAttribute('style') ?? '';
     expect(style).not.toContain('--border-accent-frame');
     expect(style).not.toContain('#');
+    expect(none?.querySelector('.deed-heraldry-seal')).toBeNull();
+    expect(none?.querySelector('.deed-border-material')).toBeNull();
+    const components = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+    const forcedEmpty = components.match(
+      /@media \(forced-colors: active\) \{[\s\S]*?\.deed-border-swatch-empty \{([^}]*)\}/,
+    )?.[1];
+    expect(forcedEmpty, 'forced colors must keep the None swatch empty').toBeTruthy();
+    expect(forcedEmpty).toContain('background: none;');
+    expect(forcedEmpty).toContain('border: 0;');
+    expect(forcedEmpty).toContain('outline: 0;');
   });
 
-  it('E29: earned options show the live 3-color swatch; active and 40x40 stay', () => {
+  it('E53: earned options show the canonical seal and material; active and 40x40 stay', () => {
     const state = baseState({ activeBorder: DEEPWARD });
     state.deedsEarned.set(PRESTIGE, '2026-08-01');
     state.deedsEarned.set(DEEPWARD, '2026-08-02');
@@ -270,10 +280,18 @@ describe('Book of Deeds border picker', () => {
       const slug = deedBorderSlug(id);
       const accent = borderAccent(slug);
       expect(accent).not.toBeNull();
+      expect(swatch?.getAttribute('data-border')).toBe(slug);
+      expect(swatch?.getAttribute('data-motif')).toBe(accent?.motif);
       const style = swatch?.getAttribute('style') ?? '';
       expect(style).toContain(`--border-accent-frame:${accent?.frame}`);
       expect(style).toContain(`--border-accent-edge:${accent?.edge}`);
       expect(style).toContain(`--border-accent-glow:${accent?.glow}`);
+      expect(style).toContain('--deed-heraldry-well:#14110c');
+      expect(swatch?.querySelector('.deed-heraldry-seal')).not.toBeNull();
+      expect(swatch?.querySelector('.deed-border-material')).not.toBeNull();
+      const paths = swatch?.querySelectorAll<SVGPathElement>('path') ?? [];
+      expect(paths.length).toBeGreaterThanOrEqual(2);
+      for (const path of paths) expect(path.getAttribute('d')).toBe(accent?.motifPath);
       if (id === DEEPWARD) {
         expect(accent?.frame).toBe('#4fb3c8');
         expect(style).toContain('--border-accent-frame:#4fb3c8');
@@ -291,6 +309,61 @@ describe('Book of Deeds border picker', () => {
       /body\.mobile-touch \.deed-title-option \{\s*min-width: 40px;\s*min-height: 40px;/,
     );
     expect(components).toMatch(/\.deed-title-option\.active \{/);
+  });
+
+  it('E54: hover and focus swap the live preview without equipping', () => {
+    const state = baseState({ activeBorder: DEEPWARD });
+    state.deedsEarned.set(PRESTIGE, '2026-08-01');
+    state.deedsEarned.set(DEEPWARD, '2026-08-02');
+    const { el, setActiveBorder } = makeWindow(state);
+    const preview = () => el.querySelector<HTMLElement>('.deed-heraldry-preview');
+    expect(preview()?.getAttribute('data-preview-deed')).toBe(DEEPWARD);
+    expect(preview()?.getAttribute('data-border')).toBe(deedBorderSlug(DEEPWARD));
+    const expectPreviewFamily = (id: string): void => {
+      const root = preview();
+      const accent = borderAccent(deedBorderSlug(id));
+      expect(root?.querySelector('.deed-heraldry-preview-world')).not.toBeNull();
+      expect(root?.querySelector('.deed-heraldry-preview-interaction')).not.toBeNull();
+      expect(root?.querySelector('.deed-heraldry-preview-ribbon')?.textContent).toBe('Hero');
+      expect(root?.querySelector('.deed-heraldry-preview-name')?.textContent).toBe('Hero');
+      expect(root?.querySelector('.deed-heraldry-preview-deed')?.textContent).toBe(deedName(id));
+      const paths = root?.querySelectorAll<SVGPathElement>('path') ?? [];
+      expect(paths.length).toBeGreaterThanOrEqual(3);
+      for (const path of paths) expect(path.getAttribute('d')).toBe(accent?.motifPath);
+    };
+    expectPreviewFamily(DEEPWARD);
+
+    const prestige = el.querySelector<HTMLElement>(`[data-border-pick="${PRESTIGE}"]`);
+    prestige?.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(preview()?.getAttribute('data-preview-deed')).toBe(PRESTIGE);
+    expect(preview()?.getAttribute('data-border')).toBe(deedBorderSlug(PRESTIGE));
+    expectPreviewFamily(PRESTIGE);
+    expect(setActiveBorder).not.toHaveBeenCalled();
+    expect(state.activeBorder).toBe(DEEPWARD);
+
+    prestige?.focus();
+    prestige?.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(preview()?.getAttribute('data-preview-deed')).toBe(PRESTIGE);
+    expect(setActiveBorder).not.toHaveBeenCalled();
+
+    prestige?.blur();
+    expect(preview()?.getAttribute('data-preview-deed')).toBe(DEEPWARD);
+    expect(setActiveBorder).not.toHaveBeenCalled();
+    expect(state.activeBorder).toBe(DEEPWARD);
+  });
+
+  it('E54: previewing None is genuinely empty and still does not unequip', () => {
+    const state = baseState({ activeBorder: DEEPWARD });
+    state.deedsEarned.set(DEEPWARD, '2026-08-02');
+    const { el, setActiveBorder } = makeWindow(state);
+    const none = el.querySelector<HTMLElement>('[data-border-pick=""]');
+    none?.dispatchEvent(new MouseEvent('mouseenter'));
+    const preview = el.querySelector<HTMLElement>('.deed-heraldry-preview');
+    expect(preview?.getAttribute('data-preview-deed')).toBe('');
+    expect(preview?.getAttribute('data-border')).toBe('');
+    expect(preview?.children).toHaveLength(0);
+    expect(setActiveBorder).not.toHaveBeenCalled();
+    expect(state.activeBorder).toBe(DEEPWARD);
   });
 });
 
@@ -318,6 +391,17 @@ describe('picker and note CSS reach (grouped selectors, not just classes)', () =
     // The head is an h3 now: without this the UA sheet renders it bold and
     // larger than the shelf label should be.
     expect(rule).toContain('font-weight: 400;');
+  });
+
+  it('stacks preview labels and the touch layout without relying on viewport width', () => {
+    const labels = components.match(
+      /\.deed-heraldry-preview-name,\s*\n?\s*\.deed-heraldry-preview-deed \{([^}]*)\}/,
+    )?.[1];
+    expect(labels, 'preview label rule missing').toBeTruthy();
+    expect(labels).toContain('display: block;');
+    const touch = components.match(/body\.mobile-touch \.deed-heraldry-preview \{([^}]*)\}/)?.[1];
+    expect(touch, 'landscape touch preview stack rule missing').toBeTruthy();
+    expect(touch).toContain('grid-template-columns: 1fr;');
   });
 
   it('styles the WORN border badge through its full compound selector', () => {

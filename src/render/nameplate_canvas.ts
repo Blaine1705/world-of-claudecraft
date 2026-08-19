@@ -1,14 +1,14 @@
-import { borderAccent } from '../ui/deed_border_view';
+import { borderAccent, borderMotifPrimitives } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 import {
-  createNameplateCartouche,
-  NAMEPLATE_CARTOUCHE_EXTRA_LIFT,
-  NAMEPLATE_CARTOUCHE_TITLE_STEP,
-  NAMEPLATE_CARTOUCHE_WELL_ALPHA,
-  NAMEPLATE_CARTOUCHE_WELL_FILL,
-  type NameplateCartoucheInput,
-  nameplateCartoucheInto,
-} from './nameplate_cartouche_core';
+  createNameplateHeraldry,
+  NAMEPLATE_HERALDRY_EXTRA_LIFT,
+  NAMEPLATE_HERALDRY_TITLE_STEP,
+  NAMEPLATE_HERALDRY_WELL_ALPHA,
+  NAMEPLATE_HERALDRY_WELL_FILL,
+  type NameplateHeraldryInput,
+  nameplateHeraldryInto,
+} from './nameplate_heraldry_core';
 import { drawNameplateLootIcon } from './nameplate_loot_icon';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
@@ -197,14 +197,12 @@ const EMOTE_STYLE: TextSpriteStyle = {
   lineWidth: 1,
 };
 
-// Cartouche stroke widths. Geometry (pad, well, hardware, extraLift) lives on
-// nameplate_cartouche_core.ts; these are the canvas pen sizes for the three-layer
-// metal edge and the shared hardware.
-const CARTOUCHE_EDGE_WIDTH = 3;
-const CARTOUCHE_FRAME_WIDTH = 1.5;
-const CARTOUCHE_INNER_WIDTH = 1;
-const CARTOUCHE_HARDWARE_WIDTH = 1.5;
-const CARTOUCHE_CLASP_RADIUS = 2;
+// Pen sizes for the world-scale forged seal and its quiet ribbon. All geometry
+// and layout measurements live in the pure heraldry core.
+const HERALDRY_EDGE_WIDTH = 2;
+const HERALDRY_FRAME_WIDTH = 1;
+const HERALDRY_MOTIF_WIDTH = 1.25;
+const HERALDRY_RIVET_RADIUS = 1;
 
 interface CachedImage {
   image: HTMLImageElement;
@@ -323,13 +321,12 @@ export class NameplateCanvasSurface {
   private readonly emoteStyle: TextSpriteStyle = { ...EMOTE_STYLE };
   private width = 0;
   private height = 0;
-  private readonly cartouche = createNameplateCartouche();
-  private readonly cartoucheInput: NameplateCartoucheInput = {
+  private readonly heraldry = createNameplateHeraldry();
+  private readonly heraldryInput: NameplateHeraldryInput = {
     screenX: 0,
     nameRowBottomY: 0,
     nameRowWidth: 0,
     nameRowHeight: 0,
-    titleWidth: 0,
     slug: '',
   };
 
@@ -414,8 +411,8 @@ export class NameplateCanvasSurface {
         this.configureTextStyle(guildStyle, GUILD_STYLE.fill),
       );
     }
-    if (state.title) y -= NAMEPLATE_CARTOUCHE_TITLE_STEP;
-    y -= this.cartoucheLift(state);
+    if (state.title) y -= NAMEPLATE_HERALDRY_TITLE_STEP;
+    y -= this.heraldryLift(state);
 
     const rowHeight = this.drawNameRow(state, screenX, y);
     y -= rowHeight;
@@ -486,8 +483,8 @@ export class NameplateCanvasSurface {
     if (state.castVisible) y -= 10;
     if (state.hpVisible) y -= 7;
     if (state.guild) y -= state.currentTarget ? 14 : 12;
-    if (state.title) y -= NAMEPLATE_CARTOUCHE_TITLE_STEP;
-    y -= this.cartoucheLift(state);
+    if (state.title) y -= NAMEPLATE_HERALDRY_TITLE_STEP;
+    y -= this.heraldryLift(state);
     y -= this.nameRowHeight(state);
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.comboPips > 0) y -= 9;
@@ -529,8 +526,8 @@ export class NameplateCanvasSurface {
     this.text.clear();
   };
 
-  private cartoucheLift(state: NameplateCanvasState): number {
-    return state.border && borderAccent(state.border) ? NAMEPLATE_CARTOUCHE_EXTRA_LIFT : 0;
+  private heraldryLift(state: NameplateCanvasState): number {
+    return state.border && borderAccent(state.border) ? NAMEPLATE_HERALDRY_EXTRA_LIFT : 0;
   }
 
   private nameRowHeight(state: NameplateCanvasState): number {
@@ -557,19 +554,17 @@ export class NameplateCanvasSurface {
     let badgeWidth = 0;
     for (const badge of state.badges) badgeWidth += badge.size + 3;
     const rowWidth = badgeWidth + cheaterWidth + aiWidth + levelWidth + nameWidth;
-    const titleWidth = state.title ? this.text.measureAdvance(state.title, titleStyle) : 0;
-    const input = this.cartoucheInput;
+    const input = this.heraldryInput;
     input.screenX = screenX;
     input.nameRowBottomY = bottomY;
     input.nameRowWidth = rowWidth;
     input.nameRowHeight = rowHeight;
-    input.titleWidth = titleWidth;
-    input.slug = borderAccent(state.border) ? state.border : '';
-    const cartouche = nameplateCartoucheInto(this.cartouche, input);
-    if (cartouche.active) this.drawBorderAccent(state.border, state.opacity);
-    let x = cartouche.nameRowLeft;
-    const topY = cartouche.nameRowTop;
-    const nameBaseline = cartouche.nameBaseline;
+    input.slug = state.border;
+    const heraldry = nameplateHeraldryInto(this.heraldry, input);
+    if (heraldry.active) this.drawDeedHeraldry(state.border, state.opacity);
+    let x = heraldry.nameRowLeft;
+    const topY = heraldry.nameRowTop;
+    const nameBaseline = heraldry.nameBaseline;
     for (const badge of state.badges) {
       this.drawBadge(badge, x, topY + (rowHeight - badge.size) / 2);
       x += badge.size + 3;
@@ -604,104 +599,99 @@ export class NameplateCanvasSurface {
       this.text.draw(
         this.ctx,
         state.title,
-        cartouche.titleCenterX,
-        cartouche.titleBaseline,
+        heraldry.titleCenterX,
+        heraldry.titleBaseline,
         titleStyle,
       );
     }
     return rowHeight;
   }
 
-  // The Book of Deeds cartouche: midnight well, three-layer metal edge, shared
-  // L-brackets, top clasp, and the per-slug side motif the core already laid
-  // out. Shapes only, so it creates no text sprite and no cache entry.
-  // Geometry comes from the caller-owned cartouche record. Drawn BEFORE the
-  // row content so the name and title sit on top of the well.
-  // Cosmetic identity only: it encodes no health, range, rank, or threat, so
-  // collapsing all four slugs onto one system-color pair under forced colors
-  // hides nothing a player acts on (unlike the quest marker tones, which earn a
-  // redundant non-color cue).
-  private drawBorderAccent(slug: string, plateAlpha: number): void {
+  // One world-scale deed seal joined to the name-only ribbon. Geometry is
+  // caller-owned, motif lines are frozen shared data, and every mark is a
+  // Canvas2D shape drawn before readable content.
+  private drawDeedHeraldry(slug: string, plateAlpha: number): void {
     const accent = borderAccent(slug);
-    const cartouche = this.cartouche;
-    if (!accent || !cartouche.active) return;
+    const heraldry = this.heraldry;
+    const kind = heraldry.motifKind;
+    if (!accent || !heraldry.active || !kind) return;
     const ctx = this.ctx;
     const forcedColors = this.forcedColorsActive();
     roundedRect(
       ctx,
-      cartouche.well.x,
-      cartouche.well.y,
-      cartouche.well.w,
-      cartouche.well.h,
-      cartouche.radius,
+      heraldry.ribbon.x,
+      heraldry.ribbon.y,
+      heraldry.ribbon.w,
+      heraldry.ribbon.h,
+      heraldry.ribbonRadius,
     );
     if (forcedColors) {
       ctx.fillStyle = 'Canvas';
       ctx.fill();
     } else {
-      ctx.globalAlpha = plateAlpha * NAMEPLATE_CARTOUCHE_WELL_ALPHA;
-      ctx.fillStyle = NAMEPLATE_CARTOUCHE_WELL_FILL;
+      ctx.globalAlpha = plateAlpha * NAMEPLATE_HERALDRY_WELL_ALPHA;
+      ctx.fillStyle = NAMEPLATE_HERALDRY_WELL_FILL;
       ctx.fill();
       ctx.globalAlpha = plateAlpha;
     }
-    roundedRect(
-      ctx,
-      cartouche.outer.x,
-      cartouche.outer.y,
-      cartouche.outer.w,
-      cartouche.outer.h,
-      cartouche.radius,
-    );
-    ctx.lineWidth = CARTOUCHE_EDGE_WIDTH;
+    ctx.lineWidth = HERALDRY_EDGE_WIDTH;
     ctx.strokeStyle = forcedColors ? 'Canvas' : accent.edge;
     ctx.stroke();
-    ctx.lineWidth = CARTOUCHE_FRAME_WIDTH;
+    ctx.lineWidth = HERALDRY_FRAME_WIDTH;
     ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
     ctx.stroke();
-    roundedRect(
-      ctx,
-      cartouche.inner.x,
-      cartouche.inner.y,
-      cartouche.inner.w,
-      cartouche.inner.h,
-      cartouche.innerRadius,
-    );
-    ctx.lineWidth = CARTOUCHE_INNER_WIDTH;
+
+    ctx.beginPath();
+    ctx.rect(heraldry.joint.x, heraldry.joint.y, heraldry.joint.w, heraldry.joint.h);
+    ctx.fillStyle = forcedColors ? 'Canvas' : accent.edge;
+    ctx.fill();
+    ctx.lineWidth = HERALDRY_FRAME_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
+    ctx.stroke();
+
+    const sealCenterX = heraldry.seal.x + heraldry.seal.size / 2;
+    const sealCenterY = heraldry.seal.y + heraldry.seal.size / 2;
+    ctx.beginPath();
+    ctx.arc(sealCenterX, sealCenterY, heraldry.seal.size / 2, 0, Math.PI * 2);
+    ctx.fillStyle = forcedColors ? 'Canvas' : accent.edge;
+    ctx.fill();
+    ctx.lineWidth = HERALDRY_EDGE_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(sealCenterX, sealCenterY, heraldry.seal.size / 2 - 3, 0, Math.PI * 2);
+    ctx.fillStyle = forcedColors ? 'Canvas' : NAMEPLATE_HERALDRY_WELL_FILL;
+    ctx.fill();
+    ctx.lineWidth = HERALDRY_FRAME_WIDTH;
     ctx.strokeStyle = forcedColors ? 'Canvas' : accent.glow;
     ctx.stroke();
+
+    const motif = borderMotifPrimitives(kind);
     ctx.beginPath();
-    for (const bracket of cartouche.brackets) {
-      ctx.moveTo(bracket.endX, bracket.cornerY);
-      ctx.lineTo(bracket.cornerX, bracket.cornerY);
-      ctx.lineTo(bracket.cornerX, bracket.endY);
+    for (let i = 0; i < motif.length; i++) {
+      const line = motif[i];
+      ctx.moveTo(
+        heraldry.motifCenterX + line.x1 * heraldry.motifScale,
+        heraldry.motifCenterY + line.y1 * heraldry.motifScale,
+      );
+      ctx.lineTo(
+        heraldry.motifCenterX + line.x2 * heraldry.motifScale,
+        heraldry.motifCenterY + line.y2 * heraldry.motifScale,
+      );
     }
-    ctx.lineWidth = CARTOUCHE_HARDWARE_WIDTH;
+    ctx.lineWidth = HERALDRY_MOTIF_WIDTH;
     ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
     ctx.stroke();
-    roundedRect(
-      ctx,
-      cartouche.clasp.x,
-      cartouche.clasp.y,
-      cartouche.clasp.w,
-      cartouche.clasp.h,
-      CARTOUCHE_CLASP_RADIUS,
-    );
-    ctx.fillStyle = forcedColors ? 'Canvas' : NAMEPLATE_CARTOUCHE_WELL_FILL;
+
+    ctx.beginPath();
+    ctx.arc(heraldry.rivets[0].x, heraldry.rivets[0].y, HERALDRY_RIVET_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = forcedColors ? 'CanvasText' : accent.frame;
     ctx.fill();
-    ctx.lineWidth = CARTOUCHE_HARDWARE_WIDTH;
-    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
-    ctx.stroke();
-    if (cartouche.motifCount > 0) {
-      ctx.beginPath();
-      for (let i = 0; i < cartouche.motifCount; i++) {
-        const prim = cartouche.motif[i];
-        ctx.moveTo(prim.x1, prim.y1);
-        ctx.lineTo(prim.x2, prim.y2);
-      }
-      ctx.lineWidth = CARTOUCHE_HARDWARE_WIDTH;
-      ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
-      ctx.stroke();
-    }
+    ctx.beginPath();
+    ctx.arc(heraldry.rivets[1].x, heraldry.rivets[1].y, HERALDRY_RIVET_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = forcedColors ? 'CanvasText' : accent.frame;
+    ctx.fill();
   }
 
   private drawHealth(state: NameplateCanvasState, centerX: number, y: number): void {

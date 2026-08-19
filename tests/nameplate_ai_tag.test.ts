@@ -323,11 +323,45 @@ describe('batched canvas nameplate state', () => {
     expect(state.guildLabel).toBe('');
   });
 
-  it('resolves the border slug per entity and clears it for every borderless case', () => {
+  it('E42: empty, stale, removed, and title-reward ids clear the world heraldry slug', () => {
     // The slug is resolved on the SAME tier-cadenced resolveContent pass as the
     // title, so a border change repaints exactly like a title change. Every arm
     // here is a way a stale slug could survive onto the wrong plate.
     const bordered = entity({ id: 2, border: 'col_reliquary_rank_5' });
+    const { painter } = harness([bordered]);
+
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
+
+    // Empty and null selections: the reset must blank the slug the plate
+    // already holds instead of leaking a previous seal and ribbon.
+    bordered.border = '';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+    bordered.border = 'col_reliquary_rank_5';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
+    bordered.border = null;
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+
+    // A TITLE-reward deed is not heraldry, and an id the catalog no longer has
+    // (a save that outlived its content record) resolves to no world token.
+    bordered.border = 'prog_veteran';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+    bordered.border = 'deed_that_no_longer_exists';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+  });
+
+  it('E43: heraldry stays player-only while target, reaction, dead, and stealth state survive', () => {
+    let hostile = false;
+    const bordered = entity({
+      id: 2,
+      border: 'col_reliquary_rank_5',
+      auras: [{ kind: 'stealth' } as Entity['auras'][number]],
+    });
     const mob = entity({
       id: 3,
       kind: 'mob',
@@ -347,34 +381,47 @@ describe('batched canvas nameplate state', () => {
       templateId: 'marshal_redbrook',
       border: 'col_reliquary_rank_5',
     });
-    const { painter } = harness([bordered, mob, object, npc]);
+    const { painter } = harness([bordered, mob, object, npc], {
+      me: { targetId: bordered.id },
+      isHostilePlayer: () => hostile,
+    });
 
     painter.update(true);
-    expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
-    // A mob, an NPC, and a world object never carry one, so the accent is player identity.
-    expect(stateOf(painter, 3).border).toBe('');
-    expect(stateOf(painter, 4).border).toBe('');
-    expect(stateOf(painter, 5).border).toBe('');
+    const state = stateOf(painter, bordered.id);
+    expect(state).toMatchObject({
+      border: 'reliquary_gilt',
+      currentTarget: true,
+      hostile: false,
+      deadEnemy: false,
+      hpVisible: true,
+      opacity: 0.55,
+      nameColor: '#7fb8ff',
+    });
+    // A mob, NPC, and world object cannot inherit a valid player deed id.
+    expect(stateOf(painter, mob.id).border).toBe('');
+    expect(stateOf(painter, object.id).border).toBe('');
+    expect(stateOf(painter, npc.id).border).toBe('');
 
-    // Cleared selection: the reset must blank the slug the plate already holds.
-    bordered.border = null;
+    hostile = true;
+    bordered.dead = true;
     painter.update(true);
-    expect(stateOf(painter, 2).border).toBe('');
-
-    // A TITLE-reward deed is not a border, and an id the catalog no longer has
-    // (a save that outlived its content record) resolves to no accent either.
-    bordered.border = 'prog_veteran';
-    painter.update(true);
-    expect(stateOf(painter, 2).border).toBe('');
-    bordered.border = 'deed_that_no_longer_exists';
-    painter.update(true);
-    expect(stateOf(painter, 2).border).toBe('');
+    expect(state).toMatchObject({
+      border: 'reliquary_gilt',
+      currentTarget: true,
+      hostile: true,
+      deadEnemy: true,
+      hpVisible: false,
+      opacity: 0.55,
+      // Reaction is carried separately. The canvas applies hostile/dead name
+      // color without overwriting the player's independent role/friendly color.
+      nameColor: '#7fb8ff',
+    });
   });
 
-  it('E18: a hidden self plate with an emote never keeps a worn slug', () => {
+  it('E43: a hidden self plate with an emote never keeps worn heraldry', () => {
     // Own-nameplate off still shows the self emote bubble, so resolveContent
     // runs. suppressSelf must return after the reset blanks the slug, or the
-    // bubble path would leak a cartouche onto a hidden identity plate.
+    // bubble path would leak a seal and ribbon onto a hidden identity plate.
     const { painter } = harness([], {
       includeSelf: true,
       showOwnNameplate: () => false,

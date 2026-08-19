@@ -142,7 +142,9 @@ describe('hud wiring', () => {
     // which drive the painter with a descriptor the call site builds here: drop
     // either line and the picker changes nothing on screen with every test green.
     expect(hud).toContain('playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);');
-    expect(hud).toContain('targetFrame.borderSlug = deedBorderSlug(target.border ?? null);');
+    expect(hud).toContain(
+      'targetFrame.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);',
+    );
     // The painter can only write the ring on a frame it was handed.
     expect(hud).toContain("private pfPortraitWrapEl = $('#pf-portrait-wrap');");
     expect(hud).toContain("private targetPortraitWrapEl = $('#tf-portrait-wrap');");
@@ -695,11 +697,14 @@ describe('touch long-press peek', () => {
     // Association, not just count: the guard is the FIRST statement of each
     // action handler specifically, never merely present somewhere in the file.
     for (const selector of ['data-watch', 'data-title', 'data-border-pick']) {
-      expect(painter).toMatch(
-        new RegExp(
-          `\\('\\[${selector}\\]'\\)\\)\\s*\\{\\s*btn\\.addEventListener\\('click', \\(\\) => \\{\\s*` +
-            `if \\(this\\.deps\\.consumePeek\\(\\)\\)`,
-        ),
+      const loopStart = painter.indexOf(`el.querySelectorAll<HTMLElement>('[${selector}]')`);
+      expect(loopStart).toBeGreaterThan(-1);
+      const nextLoop = painter.indexOf('\n    for (const btn of ', loopStart + 1);
+      const loopEnd =
+        nextLoop === -1 ? painter.indexOf('\n  }\n\n  private fmt', loopStart) : nextLoop;
+      expect(loopEnd).toBeGreaterThan(loopStart);
+      expect(painter.slice(loopStart, loopEnd)).toMatch(
+        /btn\.addEventListener\('click', \(\) => \{\s*if \(this\.deps\.consumePeek\(\)\)/,
       );
     }
     expect(hud).toMatch(
