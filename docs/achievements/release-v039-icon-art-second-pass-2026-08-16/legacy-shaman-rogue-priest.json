@@ -1,9 +1,4 @@
 {
-  "shippingDecision": {
-    "status": "reverted-from-shipping",
-    "date": "2026-08-19",
-    "reason": "Spell icon freeze: live class ability icons carry piloting muscle memory (bar scanning in PvE and PvP), so they are frozen at their pre-v0.39 art. The paintings recorded here passed art review and stay archived for any future deliberate, player-facing refresh event. See docs/design/spell-icon-freeze.md and tests/spell_icon_freeze.test.ts."
-  },
   "schemaVersion": 1,
   "batch": {
     "id": "release-v039-icon-art-second-pass-legacy-shaman-rogue-priest-2026-08-16",
