@@ -59,7 +59,7 @@ describe('Eastbrook town grass exclusion', () => {
     const byId = new Map(exclusions.map((exclusion) => [exclusion.id, exclusion]));
     const expectedObbDimensions = {
       eastbrook_grand_armoury: [6.5, 4.5],
-      eastbrook_bank: [3.5, 2.75],
+      eastbrook_bank: [3.75, 3],
       eastbrook_smithy: [3.5, 2.75],
       eastbrook_inn: [3.75, 3],
       eastbrook_chapel: [2.75, 3],

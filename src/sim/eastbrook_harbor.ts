@@ -21,12 +21,13 @@ const DECKS_Z2 = -38;
 
 export const EASTBROOK_HARBOR_DECKS: GaleDeckDef[] = [
   // the quay boardwalk, laid along the pad's east lip; every pier roots on it
-  { x: -97.5, z: -54, rot: 0, hl: 11, hw: 1.5, ax: -94, az: -54 },
+  { x: -97.5, z: -54, rot: 0, hl: 14, hw: 1.5, ax: -94, az: -54 },
   // the ferry berth: the long middle pier, reaching the cove's deep water
   { x: -107, z: -54, rot: -Math.PI / 2, hl: 10, hw: 2.2, ax: -94, az: -54 },
-  // the two working piers, north and south, with open water between
-  { x: -105, z: -46, rot: -Math.PI / 2, hl: 7, hw: 1.6, ax: -94, az: -46 },
-  { x: -105, z: -62, rot: -Math.PI / 2, hl: 7, hw: 1.6, ax: -94, az: -62 },
+  // the two working piers fanned wide, the Wickharbor pattern: each keeps
+  // open water and breathing room on both sides (owner refinement)
+  { x: -104.5, z: -42.6, rot: -Math.PI / 2 + 0.12, hl: 7, hw: 1.6, ax: -94, az: -43 },
+  { x: -104.5, z: -65.4, rot: -Math.PI / 2 - 0.12, hl: 7, hw: 1.6, ax: -94, az: -65 },
 ];
 
 /**

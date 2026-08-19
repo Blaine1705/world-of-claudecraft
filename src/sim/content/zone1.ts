@@ -70,6 +70,14 @@ export const EASTBROOK_QUAY_TERRAIN_EDITS: HeightStamp[] = [
   { x: -92, z: -62, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
 ];
 
+// Sandy shoreline around the harbor cove's rims near the town (owner
+// refinement): narrow aprons pulled into the shore band so the splat reads
+// sand where the town meets the water, north and south of the quay.
+export const HARBOR_SAND_TERRAIN_EDITS: HeightStamp[] = [
+  { x: -99, z: -37, radius: 9, delta: -3.4, falloff: 'smooth', mode: 'level' },
+  { x: -100, z: -71, radius: 9, delta: -3.4, falloff: 'smooth', mode: 'level' },
+];
+
 export const SOWFIELD_BEACH_TERRAIN_EDITS: HeightStamp[] = [
   { x: -64, z: -154, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
   { x: -52, z: -156, radius: 29, delta: -4.0, falloff: 'smooth', mode: 'level' },
@@ -1774,11 +1782,29 @@ export const ZONE1_PROPS: ZonePropsDef = {
   // collider stays a full radius plus half-width clear of every walkway, the
   // Wickharbor rule, so nobody wedges between hull and rail).
   decorProps: [
-    { key: 'seaBoatSailA', x: -110, z: -40, rot: -1.7, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'seaBoatSailA', x: -108, z: -68, rot: 1.5, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'seaBoatFishing', x: -122, z: -54, rot: -1.6, scale: 5, r: 3.5, h: 6, float: 0.45 },
-    { key: 'seaBuoy', x: -124, z: -48, rot: 0.4, scale: 3, float: 0.15 },
-    { key: 'seaBuoyFlag', x: -120, z: -62, rot: -0.8, scale: 3, float: 0.15 },
+    // The harbor fleet on the Wickharbor pattern (owner refinement): the same
+    // hulls Galecrest moors, on the piers' open sides only. Berths verified
+    // against the fanned deck rectangles in sim/eastbrook_harbor.ts: each
+    // hull's collider stays a full radius plus half-width clear of every
+    // walkway, so nobody wedges between hull and rail.
+    { key: 'hexShipBlue', x: -108, z: -35.5, rot: -1.75, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: -109, z: -72.5, rot: 1.55, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: -123, z: -54, rot: -1.6, scale: 6, r: 4, h: 9, float: 0.55 },
+    // dinghies riding the water in the pier gaps, Wickharbor-style
+    { key: 'hexBoat', x: -103, z: -48.5, rot: 0.7, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: -102, z: -60, rot: -1.9, scale: 6, float: 0.1 },
+    // the small watch tower on the quay's north shoulder, eyes on the fairway
+    { key: 'hexWatchtower', x: -89, z: -41, rot: -2.3, scale: 6.5, r: 2.4, h: 12 },
+    // tidy quay dressing: the anchor by the tower, cargo clustered at the
+    // boardwalk roots rather than scattered
+    { key: 'hexAnchor', x: -87.5, z: -44.5, rot: -0.9, scale: 6 },
+    { key: 'hexCrateBig', x: -95.5, z: -44, rot: 0.3, scale: 5, r: 1.2, h: 2 },
+    { key: 'hexCrateOpen', x: -95.5, z: -46.2, rot: -0.5, scale: 5, r: 1.1, h: 1.6 },
+    { key: 'hexSack', x: -95.8, z: -62, rot: 1.1, scale: 5 },
+    { key: 'hexBarrel', x: -95.4, z: -64, rot: 0, scale: 5, r: 1, h: 1.8 },
+    // fairway buoys marking the channel to the ferry berth
+    { key: 'seaBuoy', x: -126, z: -46, rot: 0.4, scale: 3, float: 0.15 },
+    { key: 'seaBuoyFlag', x: -124, z: -62, rot: -0.8, scale: 3, float: 0.15 },
   ],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
   tents: [

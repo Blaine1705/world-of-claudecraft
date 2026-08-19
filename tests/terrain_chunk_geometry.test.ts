@@ -188,7 +188,8 @@ describe('generated chunk geometry is stable', () => {
     // under the climb gate; the digest above is minted against this final
     // Streets re-threaded for the lane-clearance proofs in the same change
     // One more mint: the herb-node moves are terrain inputs too (node ground
-    // pads), the digest follows the final node set. // (roads are height appliers); this digest is the final street set. // stamp set. // An intended, looked-at world change, not drift.
+    // Minted once more for the owner refinements: the fanned piers, the
+    // harbor sand aprons, and the quay dressing move the shore heights. // pads), the digest follows the final node set. // (roads are height appliers); this digest is the final street set. // stamp set. // An intended, looked-at world change, not drift.
     // Re-minted 2026-08 for the harbor move (the New Eastbrook program,
     // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): layout v3
     // lands Eastbrook on the harbor quay, with wave A carving the cove and
@@ -206,7 +207,7 @@ describe('generated chunk geometry is stable', () => {
     // recomputed byte-identical on the live tree; both digests were
     // computed twice and are deterministic. An intended, looked-at world
     // change, not drift.
-    expect(digestOf(inRect)).toBe('4708ee04e7c1484edfe640fb613bbc4f');
+    expect(digestOf(inRect)).toBe('702411a7ebf95c55d1d8b230b16a449c');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
 

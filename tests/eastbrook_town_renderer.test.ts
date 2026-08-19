@@ -584,13 +584,14 @@ describe('Eastbrook repeated placement triangle budget', () => {
     expect(budget.maximumFoundationTriangles).toBe(EASTBROOK_LAYOUT.buildings.length * 12);
     // Re-minted 2026-08: the 26 retired wall instances took 5,356 triangles
     // with them in the harbor move (d19aa33f76,
-    // docs/design/eastbrook-revamp/site-plan.md).
-    expect(budget.assetTriangles).toBe(23_474);
+    // docs/design/eastbrook-revamp/site-plan.md), then the owner's Galecrest
+    // building mix swapped five shells for the lighter hexb kit models.
+    expect(budget.assetTriangles).toBe(21_270);
     expect(budget.maximumFoundationTriangles).toBe(72);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(23_546);
+    expect(budget.maximumRuntimeTriangles).toBe(21_342);
     expect(
       budget.maximumRuntimeTriangles,
       JSON.stringify({

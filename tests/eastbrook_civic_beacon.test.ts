@@ -335,7 +335,7 @@ describe('Eastbrook civic beacon shader animation', () => {
   // triangles) left the layout with the Eastbrook harbor move (d19aa33f76,
   // docs/design/eastbrook-revamp/site-plan.md): 23,474 asset triangles plus
   // the 72-triangle foundation allowance.
-  it('preserves the committed 23,546 runtime triangle budget without another draw', async () => {
+  it('preserves the committed 21,342 runtime triangle budget without another draw', async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -355,7 +355,7 @@ describe('Eastbrook civic beacon shader animation', () => {
       triangleCountByAsset[assetUrl] = triangles;
     }
     expect(eastbrookTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      maximumRuntimeTriangles: 23_546,
+      maximumRuntimeTriangles: 21_342,
       withinHardCeiling: true,
       meetsTarget: true,
     });
