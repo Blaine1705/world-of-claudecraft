@@ -108,7 +108,15 @@ describe('marketplace copy names the live rule figures', () => {
         expect(end, `${locale} ${key} is followed by another row`).toBeGreaterThan(at);
         const value = src.slice(at, end);
         for (const figure of figures) {
-          expect(value, `${locale} ${key} still spells ${figure}`).toContain(figure);
+          // Digit-boundary containment, not substring: after a 2-to-3 retune
+          // a stale fill's '30' must not satisfy '3'. ASCII digits in these
+          // figure-bearing fills are the established contract of all five
+          // locales (CJK game UI convention); a fill moving to native number
+          // words would need this check revisited deliberately.
+          expect(
+            new RegExp(`(?<![0-9])${figure}(?![0-9])`).test(value),
+            `${locale} ${key} still spells ${figure}`,
+          ).toBe(true);
         }
       }
     }

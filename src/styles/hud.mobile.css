@@ -3210,9 +3210,11 @@
     min-height: 44px;
   }
   body.mobile-touch #woc-market-window .wm-combo-list {
-    /* The 100dvh fallback matters: an unset --app-vh would make the whole
-       declaration invalid at computed-value time, and max-height would land on
-       its initial none rather than the desktop cap this rule overrode. */
+    /* The 100dvh fallback is defence in depth, parity with the money sheets:
+       tokens.css seeds --app-vh on :root, so the unset case needs a failed
+       stylesheet load, but if it ever fires the declaration would otherwise
+       go invalid at computed-value time and max-height would land on its
+       initial none rather than the desktop cap this rule overrode. */
     max-height: calc(var(--app-vh, 100dvh) / var(--ui-scale, 1) * 0.4);
   }
   body.mobile-touch #woc-market-window label.wm-terms input,

@@ -67,7 +67,11 @@ describe('the grep-proof: zero hardcoded currency or ticker spellings in src/ui,
     /`[^`]*\$\$\{/,
     /['"]\$['"]\s*\+|\+\s*['"]\$['"]/,
     new RegExp(`\\$\\{[^}]*\\}\\s*${TICKER}(?![A-Za-z])`),
-    new RegExp(`\`[^\`]*[^A-Za-z\`]${TICKER}\\s+\\$\\{`),
+    // Prefix glue: the ticker may open the template (the optional group) and
+    // may touch the interpolation with no space at all (\\s*), or the most
+    // direct forms of the defect pass while only the mid-template one is
+    // caught.
+    new RegExp(`\`(?:[^\`]*[^A-Za-z\`])?${TICKER}\\s*\\$\\{`),
   ];
   const offends = (src: string): boolean => SHAPES.some((re) => re.test(src));
 
@@ -105,6 +109,8 @@ describe('the grep-proof: zero hardcoded currency or ticker spellings in src/ui,
     expect(offends('const x = `${amount} SOL each`;')).toBe(true);
     expect(offends('const x = `pay ${amount} USD now`;')).toBe(true);
     expect(offends('const x = `about WOC ${amount}`;')).toBe(true);
+    expect(offends('const x = `WOC ${amount}`;')).toBe(true);
+    expect(offends('const x = `pay WOC${amount}`;')).toBe(true);
     // Ticker-shaped identifiers and longer tickers stay clean: the lookahead
     // rejects a letter after the ticker, and USDC matches as itself.
     expect(offends('const x = `${amount} USDT`;')).toBe(false);

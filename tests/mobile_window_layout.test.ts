@@ -293,7 +293,12 @@ describe('mobile window layout CSS', () => {
     expect(mobileCss).toContain(
       ':has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])',
     );
-    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    // Comment-stripped like the CSS read above: a commented-out stamp left by
+    // a refactor must not keep this green.
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
+      /\/\*[\s\S]*?\*\/|(?<!:)\/\/[^\n]*/g,
+      '',
+    );
     expect(hud, 'the HUD stamps the marker the selector reads').toContain(
       "dataset.windowOpen = '1'",
     );

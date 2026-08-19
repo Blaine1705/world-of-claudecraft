@@ -205,6 +205,41 @@ describe('extractCopy requires the seller live in this realm process', () => {
     );
   });
 
+  it('restores a DISTINCT payload object: the bag slot never aliases the extracted copy', () => {
+    // restoreInto clones like grantCopies does: the caller may still hold the
+    // extracted slot (createListing stringifies it into the listing row), and
+    // a bag slot aliasing that object would let one side's mutation reach the
+    // other. Reverting the clone makes the two references identical and reds
+    // the not.toBe below.
+    const { host } = makeHost({ serializeCharacterForPersist: () => null });
+    const pid = liveSession(host);
+    host.sim.addItemInstance('rusty_hatchet', { signer: 'Provenance' }, pid, 1, { silent: true });
+    const meta = host.sim.players.get(pid);
+    if (!meta) throw new Error('no live player meta');
+    const index = meta.inventory.findIndex((s) => s.itemId === 'rusty_hatchet');
+    expect(index).toBeGreaterThanOrEqual(0);
+    // Capture the exact slot object the undo arm hands to restoreInto.
+    const realExtract = host.sim.extractTradableCopy.bind(host.sim);
+    let extracted: InvSlot | undefined;
+    host.sim.extractTradableCopy = (p, ref) => {
+      const out = realExtract(p, ref);
+      if (out.ok) extracted = out.extracted;
+      return out;
+    };
+    const custody = createWocMarketCustody(host);
+    expect(custody.extractCopy(7, 2, { index, itemId: 'rusty_hatchet' })).toEqual({
+      ok: false,
+      reason: 'offline',
+    });
+    expect(extracted?.instance, 'the extraction carried the payload').toBeDefined();
+    const slot = meta.inventory.find((s) => s.itemId === 'rusty_hatchet' && s.instance);
+    expect(slot?.instance, 'the restored copy keeps its payload').toBeDefined();
+    expect(slot?.instance).toEqual(extracted?.instance);
+    expect(slot?.instance, 'the restored payload is a clone of the extracted one').not.toBe(
+      extracted?.instance,
+    );
+  });
+
   it('refuses not_yours when the live character belongs to another account', () => {
     // The account check happens BEFORE any bag mutation: a mismatched pair must
     // never reach extractTradableCopy.

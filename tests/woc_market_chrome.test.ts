@@ -53,7 +53,11 @@ describe('woc_market_chrome: the exact end time', () => {
   it('spells the UTC reading literally and fills both template slots', () => {
     setLanguage('en');
     const text = wocEndsAtText(ENDS_MS);
-    expect(text).toContain('Jan 15, 2026, 11:30 PM');
+    // \s before PM, not a literal space: CLDR 44+ spells it with U+202F and
+    // older lines with U+0020, and this pin is about the instant, not the
+    // separator byte.
+    expect(text).toContain('Jan 15, 2026');
+    expect(text).toMatch(/11:30\sPM/);
     expect(text).toContain('UTC');
     // The whole line equals the template with BOTH slots filled: an empty or
     // unfilled {local} slot cannot reproduce this string.
