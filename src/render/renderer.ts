@@ -347,6 +347,7 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
+import { initialFrameArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import {
   applyInteriorLightRig,
@@ -6023,6 +6024,7 @@ export class Renderer {
     // first when it runs, and the post-manifest hand-off pushes any leftover
     // to the resume lane (never dropped, hitch-hunt P1).
     const deferredSubmitUnits: PrewarmResumeUnit[] = [];
+    let initialFrameDeferred: LinkDebt | null = null;
     const LATE_COMPILE_GROUPS = new Set(['weapon-vfx']);
     const RECOLLECT_COMPILE_GROUPS = new Set(['scene']);
     // deadlineMs: the early entry stops at the GPU submit guard; the compile
@@ -6971,19 +6973,17 @@ export class Renderer {
         category: 'world',
         priority: 70,
         required: true,
-        // Never sacrificed to the soft deadline: this is the one submit that
-        // exercises the real live draw path, and dropping it (measured when
-        // the exempt compile above consumed the whole budget) makes the
-        // initial scene link its programs at first LIVE draw, 102-318 ms
-        // stalls in front of the player. The compile entry awaits every
-        // submitted unit before this one runs, so this frame draws with its
-        // programs already linked, and the hard deadline remains the
-        // unconditional backstop that can cancel even this entry.
+        // Never sacrificed to the soft deadline (the live draw path's one
+        // submit); the hard deadline stays the backstop. The pass draws only
+        // when the compile lane left no link debt, else it defers (initial_frame_core.ts).
         deadlineExempt: true,
         run: () => {
+          initialFrameDeferred = initialFrameDeferral(compileLifecycle.records);
+          if (initialFrameDeferred) return;
           this.renderPrewarmPass(1 / 60);
           renderPasses++;
         },
+        ...initialFrameArms(() => initialFrameDeferred),
       },
       {
         id: 'programs.compile',
