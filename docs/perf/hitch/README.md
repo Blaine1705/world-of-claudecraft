@@ -245,6 +245,17 @@ arrived). The guard test pins the r185 form. Any future three upgrade must again
 re-verify upstream `compileAsync` behavior and deliberately retain, replace, or remove
 the patch and its installed-source guard test.
 
+The same patch file carries one hunk outside `compileAsync`, in `WebGLPrograms`, pinned
+by the same guard test: released program retention. Upstream destroys a shader program
+the moment its last material releases it, so a material disposed and re-minted under the
+same cache key (a streamed prop cell unloading and reloading, one player of a class
+leaving and another arriving) links the same program again, cold, on the main thread; a
+production capture showed most of the worst live link stalls carrying a byte-identical
+cache key to a program that had existed. Released programs now stay linked in a bounded
+FIFO (a count, `RETAINED_PROGRAM_LIMIT`, never a timer) and `acquireProgram` hands one
+back as if it had never left; `renderer.info.retainedPrograms` exposes the list for
+monitoring next to `info.programs` (which keeps counting them: they are live GL programs).
+
 ## Freeze rule
 
 After engineering signoff, `scripts/perf_hitch.mjs`, its files under `scripts/lib/`,

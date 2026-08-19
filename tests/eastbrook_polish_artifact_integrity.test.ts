@@ -798,10 +798,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the resume lane ordering (program debt before upload debt):
 // prewarm_policy.ts moved, the seals follow the swept evidence bytes. No
 // capture was retaken.
+// Re-minted for the three patch-hash bump in pnpm-lock.yaml: the lockfile is a
+// hashed leaf of the town fingerprint, so the seals follow the swept evidence
+// bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '102cdd9d97306a149960e3047b777124b803435bb14b12f5ce38bc169ecc08f7';
+  'e5d323c6f25cc9ce07ec5127cb93c6461d3cc74fb69e1e1e6173ddd2e401c784';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'd4dd19c141c56aba8a6e13dcfe4d91d91b539011d7d5379e9d751382e36f1ae9';
+  '5fa873f18458abc0f32fbd43b5e8beb92f635fad4ac52100e5adcd53db6705e8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1829,10 +1832,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // capture was retaken.
     // Re-minted for the resume lane ordering (prewarm_policy.ts): same order,
     // the composite first, then this seal. No capture was retaken.
+    // Re-minted for the three patch-hash bump (pnpm-lock.yaml): same order, the
+    // composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('809708e01fc06c5406b2c98d68574f48574bf2bd18fbe3706c31e511b6ad994c');
+    ).toBe('8d237439d9937ef266eb67bcc0e0e6922b095286e0c9e7490afda910310d86c9');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

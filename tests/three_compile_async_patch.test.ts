@@ -175,6 +175,67 @@ describe('three compileAsync disposal race patch', () => {
   });
 });
 
+describe('three released program retention patch', () => {
+  // Fourth patch hunk (WebGLPrograms): upstream destroys a program the moment
+  // its last material releases it, so a material disposed and re-minted under
+  // the same cache key (a streamed prop cell unloading and reloading, one
+  // player of a class leaving and another arriving) links the same program
+  // again, cold, on the main thread; production 2026-08-19 showed 13 of the 18
+  // worst live link stalls with a byte-identical cache key to a program that
+  // had existed. Released programs stay linked in a bounded FIFO and
+  // acquireProgram hands one back as if it had never left.
+  const source = readFileSync(
+    new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    'utf8',
+  );
+
+  it('keeps the retention applied: a released program is parked, not destroyed', () => {
+    expect(
+      source.includes('const RETAINED_PROGRAM_LIMIT = 64;'),
+      'the retention bound is missing; re-run pnpm install',
+    ).toBe(true);
+    // The release arm parks and evicts the OLDEST past the bound (a count,
+    // never a timer); the destroy body is the upstream one, moved.
+    expect(
+      source.includes(
+        'if ( -- program.usedTimes === 0 ) {\n\n\t\t\tretainedPrograms.push( program );\n\n\t\t\tif ( retainedPrograms.length > RETAINED_PROGRAM_LIMIT ) destroyProgram( retainedPrograms.shift() );',
+      ),
+      'the release arm no longer parks the program under the bound; re-run pnpm install',
+    ).toBe(true);
+    // The acquire arm un-parks: without the splice a re-acquired program
+    // would still sit in the FIFO and be destroyed under a live material at
+    // eviction, which is worse than the upstream behavior.
+    expect(
+      source.includes(
+        'if ( program.usedTimes === 0 ) {\n\n\t\t\t\tconst r = retainedPrograms.indexOf( program );\n\t\t\t\tif ( r !== - 1 ) retainedPrograms.splice( r, 1 );',
+      ),
+      'the acquire arm no longer un-parks a retained program; re-run pnpm install',
+    ).toBe(true);
+    // The upstream immediate-destroy spelling must be GONE from the release
+    // arm. Positive control: the unpatched three.cjs still carries it once.
+    const immediate = 'if ( -- program.usedTimes === 0 ) {\n\n\t\t\t// Remove from unordered set';
+    expect(
+      source.includes(immediate),
+      'the upstream immediate destroy is back beside the retention; re-run pnpm install',
+    ).toBe(false);
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    expect(
+      unpatchedSibling.split(immediate).length - 1,
+      'the three.cjs control no longer matches the immediate-destroy needle; the GONE pin may be vacuous',
+    ).toBe(1);
+  });
+
+  it('exposes the retained list for monitoring beside info.programs', () => {
+    expect(
+      source.includes('info.retainedPrograms = programCache.retainedPrograms;'),
+      'renderer.info.retainedPrograms is missing; re-run pnpm install',
+    ).toBe(true);
+  });
+});
+
 describe('three degenerate normal guard patch', () => {
   // The one SHADER hunk of the same patch file, pinned here beside the
   // compileAsync hunks because they share one .patch and one scope note: the
