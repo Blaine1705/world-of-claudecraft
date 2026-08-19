@@ -198,7 +198,7 @@ interface AttributionTargetFixture {
 // keeps its pre-move framing (frozen in the artifact-integrity suite) and
 // only the swept provenance bytes follow the merged inputs.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '43193ffc2696541d508f8272dde357f7423a5a7307fba21796eb85bd2876be1c';
+  '467a0c351e62dbb8ae8b4d500204e0bb5e5f06c17366e5aebbd3f6a5ca79f543';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -61,6 +61,22 @@ function sourceAsset(withEmissive: boolean): THREE.Group {
       )
     : new THREE.BoxGeometry(2, 3, 4);
   if (!shell) throw new Error('failed to merge the kit fixture shell');
+  if (withEmissive) {
+    // The shipped kit GLBs decode their meshopt streams into INTERLEAVED
+    // position attributes (stride 4 with a pad lane). Model that layout in
+    // the kit fixture so the pane detector's adapter is exercised against
+    // the real runtime shape: reading the shared array as tight per-vertex
+    // triples silently found zero windows on every real model (round 4).
+    const tight = shell.getAttribute('position');
+    const interleavedArray = new Float32Array(tight.count * 4);
+    for (let vertex = 0; vertex < tight.count; vertex++) {
+      interleavedArray[vertex * 4] = tight.getX(vertex);
+      interleavedArray[vertex * 4 + 1] = tight.getY(vertex);
+      interleavedArray[vertex * 4 + 2] = tight.getZ(vertex);
+    }
+    const buffer = new THREE.InterleavedBuffer(interleavedArray, 4);
+    shell.setAttribute('position', new THREE.InterleavedBufferAttribute(buffer, 3, 0));
+  }
   source.add(new THREE.Mesh(shell, opaque));
   if (withEmissive) {
     const emissive = new THREE.MeshStandardMaterial({

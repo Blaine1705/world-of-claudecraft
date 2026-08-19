@@ -366,6 +366,32 @@ function kitMaterial(source: THREE.Material): THREE.Material {
 // GLB's single mesh. Filled lazily by the first buildKitBuilding for an URL.
 const kitWindowPaneCache = new Map<string, KitWindowPane[]>();
 
+// The shipped kit GLBs decode their meshopt streams into INTERLEAVED
+// attributes (stride 4 with one pad lane), so the raw shared array is never
+// a tight per-vertex scan target. This copies the position lanes into a
+// tight typed array of the SAME element class, preserving the exact raw
+// (quantized) values the detector's exact-position vertex merge relies on.
+// A plain tight BufferAttribute passes its array through untouched.
+function tightRawPositions(
+  attribute: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+): ArrayLike<number> {
+  if (attribute instanceof THREE.InterleavedBufferAttribute) {
+    const data = attribute.data;
+    const src = data.array as unknown as ArrayLike<number> & {
+      constructor: new (length: number) => number[];
+    };
+    const out = new src.constructor(attribute.count * 3);
+    for (let vertex = 0; vertex < attribute.count; vertex++) {
+      const base = vertex * data.stride + attribute.offset;
+      out[vertex * 3] = src[base];
+      out[vertex * 3 + 1] = src[base + 1];
+      out[vertex * 3 + 2] = src[base + 2];
+    }
+    return out;
+  }
+  return attribute.array as ArrayLike<number>;
+}
+
 function kitPanesForAsset(url: string, source: THREE.Object3D): KitWindowPane[] {
   const cached = kitWindowPaneCache.get(url);
   if (cached) return cached;
@@ -376,12 +402,10 @@ function kitPanesForAsset(url: string, source: THREE.Object3D): KitWindowPane[] 
   // The closure assignment defeats narrowing: name the found mesh explicitly.
   const first = firstMesh as THREE.Mesh | null;
   const position = first?.geometry.getAttribute('position');
-  // The shipped kit GLBs decode their meshopt streams to plain attributes;
-  // an interleaved position attribute has no raw per-vertex array to scan.
   const panes =
-    position instanceof THREE.BufferAttribute && first
+    position && first
       ? kitWindowPanes(
-          position.array as ArrayLike<number>,
+          tightRawPositions(position),
           position.count,
           (first.geometry.index?.array as ArrayLike<number> | undefined) ?? null,
         )
@@ -393,9 +417,13 @@ function kitPanesForAsset(url: string, source: THREE.Object3D): KitWindowPane[] 
 // KHR_mesh_quantization: a normalized attribute renders as value / range on
 // the GPU, so pane quads authored in the raw attribute units the detector
 // scanned need the same factor to land in the mesh node's local space.
-function normalizedAttributeScale(attribute: THREE.BufferAttribute): number {
+// Interleaved attributes read their element class off the shared buffer.
+function normalizedAttributeScale(
+  attribute: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+): number {
   if (!attribute.normalized) return 1;
-  const array = attribute.array;
+  const array =
+    attribute instanceof THREE.InterleavedBufferAttribute ? attribute.data.array : attribute.array;
   if (array instanceof Int8Array) return 1 / 127;
   if (array instanceof Uint8Array) return 1 / 255;
   if (array instanceof Int16Array) return 1 / 32767;
@@ -414,7 +442,7 @@ function kitWindowPaneGeometry(
   panes: readonly KitWindowPane[],
 ): THREE.BufferGeometry | null {
   const position = mesh.geometry.getAttribute('position');
-  if (panes.length === 0 || !(position instanceof THREE.BufferAttribute)) return null;
+  if (panes.length === 0 || !position) return null;
   const parts: THREE.BufferGeometry[] = [];
   for (const pane of panes) {
     const quad = new THREE.PlaneGeometry(pane.width, pane.height);
