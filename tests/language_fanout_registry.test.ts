@@ -224,6 +224,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the race id, the phase and the whole second remaining, so the time-left line never moves with the locale',
   },
   {
+    file: 'bootcamp.ts',
+    memos: ['lastCounts'],
+    answer: 'this.bootcamp.relocalize',
+    why: 'the gauntlet flag tally that keys the ferryman guide reactions; the locale never moves a flag count, and relocalize() repaints the card and clears the interact bubble memo so every localized string re-renders',
+  },
+  {
     file: 'arena_window.ts',
     memos: ['lastSig'],
     answer: 'this.arenaWindow.relocalize',

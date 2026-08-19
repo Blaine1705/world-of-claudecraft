@@ -299,12 +299,9 @@ export class BootcampOverlay {
     syncGlow('#quest-log .ql-item', (el) => el.dataset.quest === questId);
     syncGlow(
       '#vendor-window .vendor-item',
-      (el) => vendorItem !== null && el.dataset.focusKey === `buy:${vendorItem}`,
+      (el) => vendorItem !== null && el.dataset.coachItem === vendorItem,
     );
-    syncGlow(
-      '#bags .bag-item',
-      (el) => bagItem !== null && (el.dataset.focusKey?.startsWith(bagItem) ?? false),
-    );
+    syncGlow('#bags .bag-item', (el) => bagItem !== null && el.dataset.coachItem === bagItem);
   }
 
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange
@@ -312,6 +309,10 @@ export class BootcampOverlay {
   relocalize(_world: IWorld, keybinds: Keybinds): void {
     if (!this.engaged || this.renderKey === null) return;
     this.renderPanel(keybinds);
+    // The interact bubble's content memo digests no locale, so a language
+    // switch would leave the verb in the old tongue until the target moved;
+    // clearing it makes the next frame repaint the localized verb.
+    this.promptContentKey = '';
   }
 
   // ---- internals --------------------------------------------------------
