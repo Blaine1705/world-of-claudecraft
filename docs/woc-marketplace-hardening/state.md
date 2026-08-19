@@ -3718,6 +3718,12 @@ Still open (a phase that hits one asks at session start):
     woc_market_settlements_state_created (the new boot drops it), so its
     readout sample sorts the delivering set unindexed: diagnostic-only and
     transient, but expect that read to be slower until the fleet converges.
+    Same class, reverse direction for the retention round's supersede: an
+    old-binary boot RE-CREATES woc_market_settlements_listing (its schema
+    still carries the CREATE with no DROP) and the next new-binary boot
+    drops it again, each flip a synchronous build/drop under ACCESS
+    EXCLUSIVE on woc_market_settlements; free pre-enable (empty table),
+    so avoid mixed-fleet boot ping-pong after enable.
     onSweepError logs raw pg errors
     (detail/where can echo character names and item JSON; fine today, but
     revisit before any account or wallet column joins those rows). The

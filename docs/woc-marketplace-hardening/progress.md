@@ -3688,7 +3688,9 @@ live work; deliverable 3's FK-cascade columns touched by MARKETPLACE
 deletes were ALL already covered (06/14), and the four uncovered FK
 columns are accounts-cascade only, DECIDED not indexed: the only hard
 accounts DELETE in the tree is the federated-provision race loser
-(deleteUnusedFederatedProvision), which by construction deletes fresh
+(deleteUnusedFederatedProvision, server/federated_auth_db.ts; the QA
+round corrected this entry's original server/db.ts cite), which by
+construction deletes fresh
 unused accounts that cannot own market rows, and user-facing removal is
 a soft delete that fires no cascade, so four permanent write-amplifying
 indexes on the hottest tables would serve a scan that cannot fire (the
@@ -3740,7 +3742,7 @@ THE VALUES REGISTRY the 17 QA re-judges:
   tests prove both bid paths answer the typed contended 409 with
   elapsed in [1500, 10000) ms against the 15s session ceiling. 55P03
   fires now count (wocMarketLockWaitTimeoutCount, incremented in the
-  isLockContention classifier, single-count audited across all 13 call
+  isLockContention classifier, single-count audited across all 12 call
   sites) beside idleTxKills on the stuck readout; the counters are
   proven to partition the codes in unit AND real-pg tests.
 - priorWinners: nextCascadeBidder(listingId, minCents) derives the
