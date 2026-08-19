@@ -956,17 +956,17 @@ export const da_DK: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Kælderhvælvingen",
+        "state": "Repræsentationsetagen",
+        "residence": "Boligetagen",
+        "tower": "Vagttårnet"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Haveetagen",
+        "solar": "Solgemakket"
       }
     },
     "compass": {
@@ -4770,6 +4770,7 @@ export const da_DK: EnTranslations = {
       "mageEleJet": "Vandstråle sidder på kæledyrsbjælken som sin egen knap: klik på den for at fastlåse en kølig stråle på én fjende, eller højreklik på den (langt tryk på mobil) for at lade elementaren affyre den automatisk, når den er klar.",
       "formsHeading": "Formskifte",
       "formsNote": "En druide kæmper ved at skifte form. De fleste druideevner hører til én form, så den form, du er i, afgør, hvad du kan kaste, og at skifte koster lidt mana. Du kan skifte form både i og uden for kamp, så tit du vil.",
+      "formsAutoUnshift": "Et heal eller en skadetrylleformular kastet i skikkelse trækker dig selv ud af den. At forlade en skikkelse på den måde er gratis og bruger ikke den globale nedkøling, så en øjeblikkelig trylleformular affyres i samme sekund, du trykker. At skifte tilbage er en almindelig evne og koster stadig mana og din globale nedkøling.",
       "formsMoonwing": "En Månelund-druide får endnu en form, Månekinform, den kasterform en Månelund-druide kæmper i. Det er den ene dyreform, der beholder dine besværgelser, og din tryllestav virker kun i den eller i din normale kasterform.",
       "formLine": {
         "form_bear": "Tank-formen: en tyk hud, raseri i stedet for mana, og ekstra trussel, så fjenderne bliver ved med at svinge efter dig.",
@@ -7187,6 +7188,7 @@ export const da_DK: EnTranslations = {
       "shopMarksRequired": "Du skal bruge {marks} Delve-mærker for at købe {name}.",
       "shopSealPremiumOnly": "Dette segl giver kun efter for en mesters hånd. Kun Premium-indsatsen kan åbne det.",
       "passageSealed": "Passagen er forseglet.",
+      "enemiesRemain": "Besejr først de resterende fjender.",
       "moveCloserPassage": "Gå tættere på passagen.",
       "moveCloserChest": "Gå tættere på kisten.",
       "moveCloserReliquary": "Gå tættere på relikvariet.",
@@ -9996,7 +9998,7 @@ export const da_DK: EnTranslations = {
       },
       "fear": {
         "name": "Hjemsøg",
-        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 8 sek. Enhver skade bryder effekten."
+        "description": "Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten."
       },
       "searing_pain": {
         "name": "Svid",
@@ -10074,7 +10076,7 @@ export const da_DK: EnTranslations = {
       "ferocious_bite": {
         "name": "Blodbid",
         "description": "Afsluttende manøvre, der giver {damage}. Kun i Ulveform.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst: et bid for 70 plus 43 pr. combopoint, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner 30 energi."
+        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et kraftigere slag, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner energi."
       },
       "swipe": {
         "name": "Fejende Kløer",
@@ -10137,7 +10139,7 @@ export const da_DK: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Ulveblod",
-        "description": "Øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform."
+        "description": "Frembringer {rage} energi og øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform."
       },
       "rip": {
         "name": "Blodrevne",
@@ -10242,7 +10244,7 @@ export const da_DK: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Mærker en fjende i 12 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 m og skaber 1 Sjælesplint."
+        "description": "Mærker en fjende i 15 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 yards og skaber 1 Sjælesplint."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10341,8 +10343,8 @@ export const da_DK: EnTranslations = {
         "description": "Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)"
       },
       "feral_charge": {
-        "name": "Vild ladning",
-        "description": "Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)"
+        "name": "Urkraftsbølge",
+        "description": "Udløs en urkraftsbølge. I Ulveform øges jeres energiregenerering med 100% i 10 sek. I Bruin-form får I øjeblikkeligt 50 raseri. (Vildskabssignatur)"
       },
       "swiftmend": {
         "name": "Hurtig heling",
@@ -10358,7 +10360,7 @@ export const da_DK: EnTranslations = {
       },
       "redharvest": {
         "name": "Rød Høst",
-        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner 30 energi. Virker uden kombopoint."
+        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint."
       },
       "marrowbreak": {
         "name": "Marvbrækker",
@@ -10598,7 +10600,7 @@ export const da_DK: EnTranslations = {
       },
       "evocation": {
         "name": "Æterbrønd",
-        "description": "Restaura mana rápidamente. (magikertalent)"
+        "description": "Kanaliser i 6 sek.: Hvert sekund genopretter I 100 mana og opbygger 8 besværgelseskraft. Bonussen stables under kanaliseringen og varer 15 sek. (magikertalent)"
       },
       "flurry_of_knives": {
         "name": "Knivbyge",
@@ -10606,7 +10608,7 @@ export const da_DK: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Vild heling",
-        "description": "Genopretter 180 helbred over 10 sek. Kun i Bjørneform. (druidentalent)"
+        "description": "Genopretter 40% af dit maksimale helbred over 10 sek. Kun i Bjørneform. (druidentalent)"
       },
       "frost_trap": {
         "name": "Rimfælde",
@@ -10626,11 +10628,11 @@ export const da_DK: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Rædselshyl",
-        "description": "Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)"
+        "description": "Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)"
       },
       "ice_block": {
         "name": "Kold kiste",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)"
+        "description": "Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)"
       },
       "inner_focus": {
         "name": "Stillet sind",
@@ -10722,7 +10724,7 @@ export const da_DK: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Ræsende sind",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)"
+        "description": "Gør jeres næste besværgelse med kastetid øjeblikkelig. Varer 60 sek. (magikertalent)"
       },
       "psychic_scream": {
         "name": "Psykisk skrig",
@@ -10839,7 +10841,7 @@ export const da_DK: EnTranslations = {
       },
       "prowl": {
         "name": "Snig",
-        "description": "Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 50 % langsommere. Kan ikke bruges i kamp."
+        "description": "Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 5 % langsommere. Kan ikke bruges i kamp."
       },
       "rake": {
         "name": "Flæns",
@@ -12395,7 +12397,7 @@ export const da_DK: EnTranslations = {
         "name": "Uberørt Klo"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Buket fra Dawnholds have"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
@@ -13241,6 +13243,15 @@ export const da_DK: EnTranslations = {
       },
       "training_dummy": {
         "name": "Træningsdukke"
+      },
+      "friendly_player_dummy": {
+        "name": "Venlig spillerdukke"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal bossdukke"
+      },
+      "heroic_boss_dummy": {
+        "name": "Heroisk bossdukke"
       },
       "ridge_stalker": {
         "name": "Bjergkamssniger"
@@ -16882,9 +16893,9 @@ export const da_DK: EnTranslations = {
         "leaveText": "Du trækker borgdøren i og træder tilbage ud i Dragelandets vind."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Dawnhold Slot",
+        "enterText": "Du træder ind i Dawnhold Slots varme, blomsterduftende sale.",
+        "leaveText": "Du smutter ud igen på havens solbeskinnede græsplæne."
       },
       "drowned_temple": {
         "name": "Det Druknede Tempel",
