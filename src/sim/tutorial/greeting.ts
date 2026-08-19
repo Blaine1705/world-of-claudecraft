@@ -17,7 +17,7 @@
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/
 // game/net imports, no Math.random/Date.now, host-agnostic.
 
-import { PROVING_SHORE_ARRIVAL } from '../content/proving_shore';
+import { isOnProvingShore, PROVING_SHORE_ARRIVAL } from '../content/proving_shore';
 import { DUNGEON_X_THRESHOLD } from '../data';
 import { displacePlayer } from '../displacement';
 import { emitIslandArrival } from '../interactions/ferry_bell';
@@ -39,6 +39,16 @@ export function maybeEmitTutorialGreeting(meta: PlayerMeta, ctx: SimContext): bo
   if (meta.tutorialGreetingSent) return false;
   meta.tutorialGreetingSent = true;
   if (!isFreshCharacter(meta)) return false;
+  // A newborn who is ALREADY ashore (the server rolls fresh characters at
+  // PROVING_SHORE_ARRIVAL) skips Bryn's ferry offer, which would read as
+  // nonsense mid-island, and gets Odo's arrival welcome instead. Fresh
+  // characters standing anywhere else (the offline Sim's town spawn, legacy
+  // saves) keep the opt-in greeting.
+  const p = ctx.entities.get(meta.entityId);
+  if (p && isOnProvingShore(p.pos.x, p.pos.z)) {
+    emitIslandArrival(ctx, p, meta);
+    return true;
+  }
   ctx.emit({
     type: 'tutorialGreeting',
     pid: meta.entityId,

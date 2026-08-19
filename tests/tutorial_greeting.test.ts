@@ -20,6 +20,9 @@ function greetCtx(sim: Sim) {
   const raw = {
     tickCount: 0,
     players: sim.players,
+    // The island-standing arm reads the fresh character's position (an
+    // auto-entered newborn skips Bryn's offer for Odo's arrival).
+    entities: sim.entities,
     emit: (e: SimEvent) => emitted.push(e),
   };
   return { ctx: raw as unknown as SimContext, emitted, raw };
@@ -34,6 +37,25 @@ describe('tutorial greeting one-shot', () => {
     expect(first.emitted).toEqual([
       { type: 'tutorialGreeting', pid: sim.playerId, firstCharacter: true },
     ]);
+    expect(meta.tutorialGreetingSent).toBe(true);
+
+    const second = greetCtx(sim);
+    expect(maybeEmitTutorialGreeting(meta, second.ctx)).toBe(false);
+    expect(second.emitted).toEqual([]);
+  });
+
+  it('greets a fresh character ALREADY ashore with the island arrival, not the ferry offer', () => {
+    // The server rolls newborn rows at PROVING_SHORE_ARRIVAL (auto-entered
+    // tutorial), so the first greeting a new player sees is Odo's welcome.
+    const sim = makeSim();
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = PROVING_SHORE_ARRIVAL.x;
+    p.pos.z = PROVING_SHORE_ARRIVAL.z;
+    const meta = sim.players.get(sim.playerId)!;
+    const first = greetCtx(sim);
+    expect(maybeEmitTutorialGreeting(meta, first.ctx)).toBe(true);
+    expect(first.emitted).toHaveLength(1);
+    expect(first.emitted[0]).toMatchObject({ type: 'ferryIslandArrival', pid: sim.playerId });
     expect(meta.tutorialGreetingSent).toBe(true);
 
     const second = greetCtx(sim);
