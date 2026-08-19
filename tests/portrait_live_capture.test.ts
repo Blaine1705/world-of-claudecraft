@@ -63,7 +63,11 @@ vi.mock('../src/render/assets/preload', () => ({
 vi.mock('../src/render/characters/assets', () => ({
   ensureSkinTexture: () => null,
 }));
-vi.mock('../src/render/characters/modular', () => ({
+// Partial on purpose: characters/manifest.ts now pulls npc_looks, which reads
+// NEUTRAL_FACE from this module at load time, so the real exports stay and only
+// the signature this test keys its cache on is faked.
+vi.mock('../src/render/characters/modular', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/render/characters/modular')>()),
   modularSignature: (app: { sig?: string }) => app?.sig ?? 'sig',
 }));
 vi.mock('../src/render/texture_prewarm', () => ({
