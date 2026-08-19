@@ -410,15 +410,6 @@ const SEND_HINT_KEYS: Record<WocSendHint, TranslationKey> = {
 };
 
 /**
- * Whether one staged slot may be sold for $WOC.
- *
- * Shares `exchangeHardLock` / `exchangeItemCategory` with the server's
- * eligibility policy and the sim's escrow extraction, so the window cannot
- * offer something the server would refuse. It is deliberately the CATEGORY test
- * only: the quality floor is policy the server owns and may retune, and a
- * client copy of it would drift.
- */
-/**
  * A wire timestamp this client is willing to PRINT, or null.
  *
  * Every expiry on the $WOC arm comes from a server column projected through a
@@ -433,6 +424,15 @@ export function usableStampMs(value: number | null | undefined): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null;
 }
 
+/**
+ * Whether one staged slot may be sold for $WOC.
+ *
+ * Shares `exchangeHardLock` / `exchangeItemCategory` with the server's
+ * eligibility policy and the sim's escrow extraction, so the window cannot
+ * offer something the server would refuse. It is deliberately the CATEGORY test
+ * only: the quality floor is policy the server owns and may retune, and a
+ * client copy of it would drift.
+ */
 export function wocTradableSlot(slot: InvSlot, items: Readonly<Record<string, ItemDef>>): boolean {
   const def = items[slot.itemId];
   if (!def) return false;

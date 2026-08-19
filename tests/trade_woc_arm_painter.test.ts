@@ -16,7 +16,7 @@ import { formatDateTime, t } from '../src/ui/i18n';
 import {
   refreshWocTradeArm,
   restoreWocTradeFocus,
-  type WocTradePanelDeps,
+  type WocTradeArmDeps,
   wireWocTradeArm,
   wocTradeArmHtml,
   wocTradeModelFrom,
@@ -46,7 +46,7 @@ const CONTROLLER = stripComments(
 );
 const VIEW = stripComments(readFileSync('src/ui/hud/woc_trade/woc_trade_offer_view.ts', 'utf8'));
 
-function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
+function deps(over: Partial<WocTradeArmDeps> = {}): WocTradeArmDeps {
   return {
     staged: [],
     theirStaged: [slot(EPIC.id)],
@@ -81,7 +81,7 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
 }
 
 /** Paint the arm into a detached root, exactly as the trade window does. */
-function paint(d: WocTradePanelDeps): HTMLElement {
+function paint(d: WocTradeArmDeps): HTMLElement {
   const root = document.createElement('div');
   root.innerHTML = wocTradeArmHtml(wocTradeModelFrom(d), d.usdCents);
   wireWocTradeArm(root, d);

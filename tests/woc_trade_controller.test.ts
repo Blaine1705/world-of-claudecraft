@@ -8,7 +8,6 @@
 // (the unstage click mutates it in place), setStaged must replace it on the
 // open and close transitions, and the completion report fires exactly once.
 
-import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WocOfferView } from '../src/net/woc_market_sdk';
 import { ITEMS } from '../src/sim/data';

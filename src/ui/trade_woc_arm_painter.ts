@@ -37,7 +37,7 @@ import {
 import { usdText } from './usd_text';
 import { wocTokensText } from './woc_tokens_text';
 
-export interface WocTradePanelDeps {
+export interface WocTradeArmDeps {
   staged: readonly InvSlot[];
   /** The sim's cleaned own-side offer when a session mirrors one; the accept
    *  arm judges over THIS table (the one the player sees rendered), never the
@@ -128,7 +128,7 @@ export function wocTradeMoneyText(offer: WocPendingOffer | null): string {
   });
 }
 
-export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
+export function wocTradeModelFrom(deps: WocTradeArmDeps): WocTradeModel {
   return buildWocTradeModel({
     marketEnabled: deps.marketEnabled,
     selfWalletVerified: deps.selfWalletVerified,
@@ -549,7 +549,7 @@ export function restoreWocTradeFocus(root: ParentNode, focusKey: string | null):
 }
 
 /** Attach the arm's listeners to a freshly painted root. */
-export function wireWocTradeArm(root: ParentNode, deps: WocTradePanelDeps): void {
+export function wireWocTradeArm(root: ParentNode, deps: WocTradeArmDeps): void {
   root.querySelectorAll<HTMLElement>('[data-woc-mode]').forEach((btn) => {
     btn.addEventListener('click', () => {
       deps.onModeChange(btn.dataset.wocMode === 'woc' ? 'woc' : 'gold');

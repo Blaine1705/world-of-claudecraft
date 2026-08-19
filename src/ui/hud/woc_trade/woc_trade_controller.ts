@@ -33,7 +33,7 @@ import { buildTradeItemRow, tradeRowTooltipTarget } from '../../trade_view';
 import {
   refreshWocTradeArm,
   restoreWocTradeFocus,
-  type WocTradePanelDeps,
+  type WocTradeArmDeps,
   wireWocTradeArm,
   wocTradeArmHtml,
   wocTradeModelFrom,
@@ -247,7 +247,7 @@ export class WocTradeController {
   }
 
   /** The arm's deps for the CURRENT trade. Rebuilt per paint; holds no state. */
-  private wocTradeDeps(otherName: string): WocTradePanelDeps {
+  private wocTradeDeps(otherName: string): WocTradeArmDeps {
     return {
       staged: this.stagedTrade.items,
       // The accept arm's table: the same authoritative-first read the accept

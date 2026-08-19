@@ -3163,4 +3163,5 @@ instead of on every medium-band tick; the log-tone triple is named once
 sell picker says why a locked copy is missing; the wallet busy label appears
 only at the handoff that actually opens a wallet (never during the challenge
 mint, never in the dev economy's devsig arm); and the stale TOTP-bearing
-captures are replaced by the fresh set below.
+captures are replaced by the fresh set indexed per pair in section K of
+`phase-15-design-audit.md`.

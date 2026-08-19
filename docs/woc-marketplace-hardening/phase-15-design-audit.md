@@ -63,9 +63,16 @@ exist plus `color-mix()` over them (the `hud.css` precedent).
 - [x] APPLIED. The listbox shadow's raw `#000000a6` and fixed blur now ride
       `var(--color-art-shadow)` and `var(--fx-shadow)`, so the low tier sheds
       it like every other decorative shadow.
-- [x] APPLIED. `--panel-border` was consumed by `components.css` and declared
-      nowhere: defined in `tokens.css` as the border knob's alias (DESIGN.md
-      4.3's latent-token fix), so those three rules stop resolving to nothing.
+- [ ] DEFERRED (the DESIGN.md chrome retune, WITH evidence). `--panel-border`
+      is consumed and declared nowhere, but its 13 consumers are all Dungeon
+      Finder borders, so declaring the alias is not a token cleanup: it
+      switches on borders that have never painted and grows those chips by
+      about 2px, in a window this pass neither owns nor captured. It stays
+      UNDECLARED on the exact ratchet in `tests/css_token_resolution.test.ts`
+      (which pins the non-declaration), and the retune owes a Dungeon Finder
+      before/after (desktop and 900x420) when it lands. An early draft of this
+      row declared the alias; the seam review reversed it, and progress.md's
+      deferral list is the record this row now matches.
 - [x] JUDGED, no change. The accent knob's own retune (`#ffd100` to `#d8a645`),
       `--color-accent-hover`, `--color-text-secondary` / `--color-text-faint`,
       `--panel-fill-strong` and the `--color-ink-*` ramp are DESIGN.md

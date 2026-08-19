@@ -40,6 +40,10 @@ const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = SERVER_URL.replace(/^http/, 'ws');
 const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/woc-market';
+// Failure-path debug dumps go OUTSIDE the committed capture directory: a
+// stalled run must never leave a debug-*.png where a bulk git add of the
+// capture set would sweep it in.
+const DEBUG_OUT = process.env.DEBUG_DIR ?? 'tmp';
 const STRESS = process.env.STRESS === '1';
 // The server's chat token bucket (server/game.ts CHAT_RATE_BURST /
 // CHAT_RATE_REFILL_PER_SECOND / CHAT_COOLDOWN_SECONDS): a dev command is a
@@ -100,6 +104,7 @@ const FILLER_ITEMS = [
 const EPIC_ITEM = 'deathlord_warplate';
 const BUY_NOW_ITEM = 'wyrmshadow_harness';
 fs.mkdirSync(OUT, { recursive: true });
+fs.mkdirSync(DEBUG_OUT, { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // One assertion ledger for the whole run (the desktop stress arm asserts its
@@ -503,7 +508,7 @@ async function enterWorldInBrowser(
       game: typeof window.__game,
     }));
     console.error('realm press never opened a panel:', JSON.stringify(state));
-    await page.screenshot({ path: `${OUT}/debug-realm.png` });
+    await page.screenshot({ path: `${DEBUG_OUT}/debug-realm.png` });
     throw new Error('realm selection never opened a character panel');
   }
   const onCreatePanel = await page.evaluate(
@@ -552,7 +557,7 @@ async function enterWorldInBrowser(
         rows: document.querySelectorAll('#char-list .char-row').length,
       }));
       console.error('character panel never opened:', JSON.stringify(state));
-      await page.screenshot({ path: `${OUT}/debug-charselect.png` });
+      await page.screenshot({ path: `${DEBUG_OUT}/debug-charselect.png` });
       throw err;
     });
   // WAIT for the list, do not sleep at it: an account whose character was
@@ -618,7 +623,7 @@ async function enterWorldInBrowser(
     }
   } catch (err) {
     // Dump the stuck page state so a rerun can be diagnosed from the artifact.
-    await page.screenshot({ path: `${OUT}/debug-stuck.png` });
+    await page.screenshot({ path: `${DEBUG_OUT}/debug-stuck.png` });
     const state = await page.evaluate(() => ({
       login: document.querySelector('#login-panel')?.hasAttribute('hidden'),
       realm: document.querySelector('#realm-list') !== null,
@@ -675,21 +680,26 @@ async function openExchange(page) {
   console.log('exchange state:', JSON.stringify(state));
 }
 
-async function shoot(page, file, clip) {
+async function shoot(page, file, clip, frameSel) {
   // The perf-doctor nudge fires mid-session on any slow machine, and a headless
   // swiftshader box is one: pressed away the way a player would, right before
   // the shot, or it sits in the frame's corner over the window.
   await dismissPerfNudge(page);
   // Frame the sheet from the TOP of whatever scrolls in it: the floor sweep
   // scrolls each control into view one at a time, so the last one it touched
-  // decided the offset and the shots came out mid-face.
-  await page.evaluate(() => {
+  // decided the offset and the shots came out mid-face. A capture whose FACE
+  // lives below the window top (the one-column sheet paints the detail pane
+  // under the table) passes frameSel instead, and the frame starts there:
+  // scrollIntoView honours the window's own scroll-padding-top, so the sticky
+  // header never covers the face's first row.
+  await page.evaluate((sel) => {
     const win = document.querySelector('#woc-market-window');
     if (win) win.scrollTop = 0;
     for (const pane of win?.querySelectorAll('.wm-body, .wm-browse, .wm-detail') ?? []) {
       pane.scrollTop = 0;
     }
-  });
+    if (sel) document.querySelector(sel)?.scrollIntoView({ block: 'start' });
+  }, frameSel ?? null);
   // The camera-choice prompt mounts a beat after world entry and would
   // overlay the window; dismiss it (and any lingering tutorial chip) at the
   // last moment before every capture.
@@ -1067,7 +1077,7 @@ async function main() {
         bn.order.findIndex((o) => o.startsWith('note:Buy now holds')) < buyIdx,
       'buy-now: the walk-away note precedes the button',
     );
-  await shoot(mobile, shotName('mobile-buy-now-consent'), null);
+  await shoot(mobile, shotName('mobile-buy-now-consent'), null, '#woc-market-window .wm-detail');
   await sweepFloors('mobile buy-now detail');
   // The AUCTION pane: the bid form with the disclosures BEFORE Place bid.
   check(
@@ -1090,7 +1100,15 @@ async function main() {
     );
   check(au.placeBid && au.placeBid.h >= 40, `auction: Place bid height ${au.placeBid?.h} >= 40`);
   check(au.bidUsd && au.bidUsd.h >= 40, `auction: bid field height ${au.bidUsd?.h} >= 40`);
-  await shoot(mobile, shotName('mobile-auction-disclosures'), null);
+  await shoot(
+    mobile,
+    shotName('mobile-auction-disclosures'),
+    null,
+    // The face this capture is NAMED for is the pre-bid disclosure block, and
+    // the auction pane is tall enough that the detail's top pushes it out of a
+    // 420px frame: frame from the disclosures themselves.
+    '#woc-market-window .wm-disclosures',
+  );
   await sweepFloors('mobile auction detail');
   // The Sell tab: the combobox open, then a chosen item's form (its money
   // inputs and selects at the floor).

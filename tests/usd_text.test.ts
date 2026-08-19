@@ -56,10 +56,18 @@ describe('the grep-proof: zero hardcoded currency or ticker spellings in src/ui,
   // ` $WOC` glued after an interpolation is the same defect with a unit Intl
   // cannot spell (the Claudium pack labels used to), so the unit rides a
   // catalog template token instead.
+  // Longest ticker first, and a letter lookahead after it: USD before USDC
+  // would stop the match one letter short and the lookahead would then reject
+  // USDC entirely, while the lookahead alone is what keeps USDT or SOLID from
+  // matching as USD or SOL. The ticker may sit after the interpolation at any
+  // position in the template (not only right before the closing backtick), or
+  // glued in front of one.
+  const TICKER = '(?:USDC|USD|SOL|\\$?WOC)';
   const SHAPES: readonly RegExp[] = [
     /`[^`]*\$\$\{/,
     /['"]\$['"]\s*\+|\+\s*['"]\$['"]/,
-    /\$\{[^}]*\}\s*(?:USD|USDC|SOL|WOC|\$WOC)`/,
+    new RegExp(`\\$\\{[^}]*\\}\\s*${TICKER}(?![A-Za-z])`),
+    new RegExp(`\`[^\`]*[^A-Za-z\`]${TICKER}\\s+\\$\\{`),
   ];
   const offends = (src: string): boolean => SHAPES.some((re) => re.test(src));
 
@@ -92,6 +100,16 @@ describe('the grep-proof: zero hardcoded currency or ticker spellings in src/ui,
     expect(offends('const x = `${amount} USDC`;')).toBe(true);
     expect(offends('const x = `${amount} WOC`;')).toBe(true);
     expect(offends('const x = `${tokens} $WOC`;')).toBe(true);
+    // The mid-template and prefix glues: the same defect away from the
+    // template's end, and the unit in front of the number.
+    expect(offends('const x = `${amount} SOL each`;')).toBe(true);
+    expect(offends('const x = `pay ${amount} USD now`;')).toBe(true);
+    expect(offends('const x = `about WOC ${amount}`;')).toBe(true);
+    // Ticker-shaped identifiers and longer tickers stay clean: the lookahead
+    // rejects a letter after the ticker, and USDC matches as itself.
+    expect(offends('const x = `${amount} USDT`;')).toBe(false);
+    expect(offends('const x = `${amount} SOLID plan`;')).toBe(false);
+    expect(offends('const x = `${amountUSD}`;')).toBe(false);
     expect(offends('const x = `${amount}`;')).toBe(false);
     expect(offends("t('hudChrome.claudium.priceSol', { amount })")).toBe(false);
     expect(offends('const x = usdText(cents);')).toBe(false);

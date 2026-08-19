@@ -3210,7 +3210,10 @@
     min-height: 44px;
   }
   body.mobile-touch #woc-market-window .wm-combo-list {
-    max-height: calc(var(--app-vh) / var(--ui-scale, 1) * 0.4);
+    /* The 100dvh fallback matters: an unset --app-vh would make the whole
+       declaration invalid at computed-value time, and max-height would land on
+       its initial none rather than the desktop cap this rule overrode. */
+    max-height: calc(var(--app-vh, 100dvh) / var(--ui-scale, 1) * 0.4);
   }
   body.mobile-touch #woc-market-window label.wm-terms input,
   body.mobile-touch #woc-market-window label.wm-offer-next input,
