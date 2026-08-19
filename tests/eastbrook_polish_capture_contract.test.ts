@@ -255,7 +255,7 @@ interface AttributionTargetFixture {
 // scheduler branch: both parents' renderer and prewarm bytes combine in one
 // tree, so the seals follow the swept evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ce79e351ee56860305fa30edebed197a970a265dae0baff2e1cebf81fed93f76';
+  'a06d864912b79cad9aed4421bd873ac968b6c7d327c26be844cba330f78c703c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

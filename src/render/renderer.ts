@@ -5773,7 +5773,7 @@ export class Renderer {
       buildAbilityMaterialPrewarmGroup,
     );
     let mountPrewarmGroup: THREE.Group | null = null;
-    const mountPrewarmPlannedKeys = mountPrewarmKeys();
+    const mountPrewarmPlannedKeys = mountPrewarmKeys(this.sim.ownedMounts());
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
     let mountPrewarmWarmed = 0;
     let surfaceDetailTexturesWarmed = 0;
