@@ -757,8 +757,12 @@ export const WOC_MARKET_CONFIRM_MAX_PER_MINUTE = 60;
 // one every 2 seconds (30/min), and a player actively browsing adds a
 // detail+history pair per row tap. One worst-case player sits near 90/min;
 // 240 keeps TWO players behind one NAT (the fused per-IP bucket is shared)
-// under the window with margin, while the caches behind these routes bound
-// what an allowed flood can buy to in-memory work.
+// under the window with margin. Three or more worst-case players behind one
+// NAT exceed the shared IP arm and 429 each other's polls (silent staleness,
+// retried next beat); accepted at this scale, re-judged pre-enable. The
+// caches behind five of the six routes bound what an allowed flood buys to
+// in-memory work; the offers poll stays an uncached, index-tuned per-account
+// read whose cost control is the retention window.
 export const WOC_MARKET_READ_MAX_PER_MINUTE = 240;
 
 // Step-up challenge issuance (B6/R1): its OWN bucket, sized at double the

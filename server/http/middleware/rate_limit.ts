@@ -82,7 +82,9 @@ export type RateLimitKeyClass = 'ip' | 'ip+account';
  * WOC_MARKET_READ_POLICY (the marketplace's polled GET surface): paying two
  * pg writes per ALLOWED poll would have out-costed the very reads its caches
  * remove, and the tier-1 sliding window still meters the flood per process.
- * Every other policy is 'global' (the derivation guard test pins the table).
+ * Every other policy is 'global'; the derivation guard test pins the full
+ * table, this one opt-out included, so a silently-added second 'none' fails
+ * there.
  */
 export type RateLimitTier2 = 'global' | 'none';
 

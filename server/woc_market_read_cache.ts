@@ -22,8 +22,10 @@
 // fresh this data is (the 5s sweep beat, the window's 3s awaiting-chain
 // poll), so the cache never makes a player's view meaningfully staler than
 // the server's own convergence. Player-visible immediacy is preserved by
-// BUSTS, not tiny TTLs: every successful market mutation on the routes layer
-// busts the listings surface and the actor's activity readout, and the two
+// BUSTS, not tiny TTLs: every market mutation on the routes layer busts the
+// actor's activity readout (refusals included: a refused call can still have
+// committed durable state, terms acceptance and recorded signatures above
+// all), successful mutations bust the listings surface too, and the three
 // moderation arms bust what they change (suspend -> listings; sale exclusion
 // -> that item's history; strike clearing -> that account's readout). Sweep
 // transitions deliberately ride the TTL.
@@ -41,7 +43,12 @@
 //   realm because each process constructs its own instance.
 // - A null listing row is cached like any other answer (a probed missing id
 //   stays 404-cheap); every in-process listing-creating path busts, so a
-//   fresh listing is never hidden behind its own pre-warmed negative.
+//   fresh listing is never hidden behind its own pre-warmed negative. The
+//   detail keys ARE caller-minted (any positive id), unlike the fenced
+//   browse and history keys: accepted asymmetry, because a probe walk's
+//   evictions convert other viewers' hits into PRIMARY-KEY point reads
+//   (listingById), not the OFFSET-walk or external-service costs the other
+//   fences exist for, and the read limiter bounds the walk.
 // - Every refresh thunk for a given key MUST be equivalent (the key encodes
 //   every input the thunk varies on). The service call sites hold this by
 //   construction: browse keys encode the whole query tuple, sales is gated
@@ -56,10 +63,19 @@ import type { WocBrowseQuery } from './woc_market';
  *  page or a hot listing rides one read per TTL window), so the TTL matching
  *  the 3s awaiting-chain poll is fine: one player's own cadence missing the
  *  window does not matter when N players share the entry. With filtered
- *  queries bypassing, the legitimate browse key space is small (sorts x
- *  qualities x formats x live pages), so 128 holds the hot set. */
+ *  queries AND deep pages bypassing, the cacheable browse key space is small
+ *  (sorts x qualities x formats x the shallow pages), so 128 holds the hot
+ *  set. */
 export const WOC_MARKET_BROWSE_CACHE_TTL_MS = 3_000;
 export const WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES = 128;
+/** Only the SHALLOW pages are cached (page <= this). The page number is
+ *  caller-chosen up to the route's 400-page clamp, so without the fence one
+ *  reader inside the 240/min budget could mint enough distinct page keys to
+ *  churn the whole LRU, and every resulting miss is the expensive
+ *  OFFSET-walk read the page clamp exists to bound. The cross-player win
+ *  lives entirely in the first pages; a deep page is a per-user lookup whose
+ *  bound is the limiter (the itemIds-filter bypass, same reasoning). */
+export const WOC_MARKET_BROWSE_CACHE_MAX_PAGE = 2;
 export const WOC_MARKET_DETAIL_CACHE_TTL_MS = 3_000;
 export const WOC_MARKET_DETAIL_CACHE_MAX_ENTRIES = 256;
 export const WOC_MARKET_HISTORY_CACHE_TTL_MS = 10_000;
@@ -71,6 +87,12 @@ export const WOC_MARKET_HISTORY_CACHE_MAX_ENTRIES = 256;
  *  would trade payment-state visibility for hit rate on a surface whose
  *  real fix was sequencing the fan-out. */
 export const WOC_MARKET_ME_CACHE_TTL_MS = 2_000;
+/** Caps are ENTRY counts, not bytes, and this surface holds the heavy value:
+ *  a readout carries up to 12 listing rows (full item payloads) plus 50 bids
+ *  and 50 settlements, so 512 warm accounts is on the order of 10 to 20 MB
+ *  resident on the box that also runs the realm sim. Entries are only minted
+ *  by real polls and the LRU evicts idle accounts; whoever raises a cap here
+ *  is buying memory, not just hit rate. */
 export const WOC_MARKET_ME_CACHE_MAX_ENTRIES = 512;
 
 /** The canonical browse cache key. Field-by-field, never JSON.stringify of
@@ -256,10 +278,16 @@ export class WocMarketReadCache {
 
   /** The listings surface changed (a listing created, cancelled, bid on,
    *  bought, suspended, or a directed deal escrowed one): browse pages and
-   *  listing rows both restate it, so both drop. Coarse ON PURPOSE: at the
-   *  mutation limiter's ceiling this is a handful of re-reads per minute,
-   *  and a finer map would be a second copy of which mutation touches which
-   *  page. */
+   *  listing rows both restate it, so both drop. Coarse ON PURPOSE: a finer
+   *  map would be a second copy of which mutation touches which page.
+   *  Honest arithmetic: the mutation limiters are PER ACCOUNT, so a busy
+   *  realm's combined bust rate can pass one per TTL at peak, and the cache
+   *  then degrades toward one shared read per mutation window, NOT toward
+   *  per-request reads: single-flight still collapses every concurrent
+   *  reader between busts, which is the load-bearing win. The per-surface
+   *  counters on the internal stuck readout are how that degradation is
+   *  measured rather than guessed (the pre-enable audit checks them at a
+   *  realistic mutation rate). */
   bustListings(): void {
     this.browsePages.bustAll();
     this.listingRows.bustAll();
@@ -269,13 +297,11 @@ export class WocMarketReadCache {
     this.meByAccount.bust(account);
   }
 
-  bustHistory(itemId: string): void {
-    this.salesByItem.bust(itemId);
-  }
-
-  /** The sale-exclusion moderation arm knows only the sale id, not the item,
-   *  so it drops the whole history map (rare, and enforcement must not wait
-   *  out a TTL: the cached-read moderation-bust rule). */
+  /** The whole history map drops: the sale-exclusion moderation arm knows
+   *  only the sale id, not the item (rare, and enforcement must not wait out
+   *  a TTL: the cached-read moderation-bust rule), and the eager-delivery
+   *  confirm path busts here too rather than carry a per-item variant no
+   *  production caller needed. */
   bustHistoryAll(): void {
     this.salesByItem.bustAll();
   }

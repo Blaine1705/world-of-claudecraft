@@ -607,6 +607,9 @@ same file), and each module's header carries its own contract.
 - **woc_market_window.ts** over the pure **woc_market_view.ts** core: the $WOC Exchange
   (config-off behind `WOC_MARKET_ENABLED`; `docs/prd/woc/marketplace.md`). Everything
   economic is a passthrough of server numbers; the terms-acceptance checkbox lives here.
+  **woc_market_chrome.ts** is the emit-only markup seam the window composes (browse
+  strip, sales list, sell-empty caption, bond disclosure notes); it spells its focus
+  keys through `FOCUS_KEY_ATTR` from `focus_restore.ts`.
   Custody moves run the wallet STEP-UP first (B6/R1): the submit mints a challenge,
   hands the SERVER-built message to `hooks.signMessageBase58` (same lazy bridge as the
   payment signer), and sends the proof with the request; the trade window's $WOC arm

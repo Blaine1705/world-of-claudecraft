@@ -726,19 +726,25 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
       directedBuyerAccount: null,
     },
   });
+  // The actor's readout drops on EVERY outcome, refusals included: a refused
+  // call can still have committed durable state the readout serves (recorded
+  // terms acceptance, a recorded signature, an inserted-then-expired
+  // settlement), so busting only the ok arm left /me pre-mutation for a TTL.
+  // The rule holds for every mutating handler below; the listings surface
+  // still busts only on success (a refusal changed no shared listing).
+  readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   // A new listing changes the browse surface for everyone and the seller's
   // own activity readout; the cached copies must not outlive the mutation.
   readCache()?.bustListings();
-  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, { listing: listingView(out.listing, ctxAccountId(ctx)) });
 }
 
 async function cancelListingHandler(ctx: Ctx): Promise<void> {
   const out = await useService().cancelListing(ctxAccountId(ctx), idParam(ctx));
+  readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   readCache()?.bustListings();
-  readCache()?.bustMe(ctxAccountId(ctx));
   // cancelPending: the cancel was ACCEPTED as intent on a locked listing (no
   // new claims or bids; it closes when the current window ends unpaid).
   json(ctx.res, 200, out.cancelPending === true ? { ok: true, cancelPending: true } : { ok: true });
@@ -753,24 +759,28 @@ async function placeBidHandler(ctx: Ctx): Promise<void> {
     amountCents: intField(body.amountCents, 1, WOC_MARKET_MAX_PRICE_CENTS),
     acceptTerms: body.acceptTerms === true,
   });
+  // Before the refusal throw: placeBid can record first-time terms
+  // acceptance and then refuse a later guard.
+  readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   readCache()?.bustListings();
-  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, { bid: bidView(out.bid), bond: quoteView(out.bond) });
 }
 
 async function bondQuoteHandler(ctx: Ctx): Promise<void> {
   const out = await useService().refreshBondQuote(ctxAccountId(ctx), idParam(ctx));
-  if (!out.ok) throwRefusal(out);
+  // Before the refusal throw: a bond_amount_drift refusal ADOPTS the
+  // service's figure onto the bid row.
   readCache()?.bustMe(ctxAccountId(ctx));
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { bond: quoteView(out.bond) });
 }
 
 async function abandonBidHandler(ctx: Ctx): Promise<void> {
   const out = await useService().abandonBid(ctxAccountId(ctx), idParam(ctx));
+  readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   readCache()?.bustListings();
-  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, { abandoned: true });
 }
 
@@ -781,11 +791,13 @@ async function confirmBondHandler(ctx: Ctx): Promise<void> {
     idParam(ctx),
     signatureField(body.signature),
   );
+  // Before the refusal throw: confirmBond records the submitted signature
+  // in the ledger even when the chain's verdict then refuses.
+  readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   // Activation (or a recorded payment) moves the listing's current bid and
   // the bidder's own rows.
   readCache()?.bustListings();
-  readCache()?.bustMe(ctxAccountId(ctx));
   // `pending` is the honest third answer: paid, but the chain has not decided.
   // Collapsing it into standing:false would read as "outbid" to the client.
   // The screened reason says WHICH pending: the ledger saw the payment
@@ -805,9 +817,11 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
     listingId: idParam(ctx),
     acceptTerms: body.acceptTerms === true,
   });
+  // Before the refusal throw: buyNow can insert a settlement and then
+  // expire it on quote_unavailable, and can record first-time terms.
+  readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   readCache()?.bustListings();
-  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, {
     settlement: settlementView(out.settlement),
     quote: quoteView(out.quote),
@@ -816,8 +830,8 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
 
 async function settlementQuoteHandler(ctx: Ctx): Promise<void> {
   const out = await useService().settlementQuote(ctxAccountId(ctx), idParam(ctx));
-  if (!out.ok) throwRefusal(out);
   readCache()?.bustMe(ctxAccountId(ctx));
+  if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { quote: quoteView(out.quote) });
 }
 
@@ -828,9 +842,16 @@ async function confirmSettlementHandler(ctx: Ctx): Promise<void> {
     idParam(ctx),
     signatureField(body.signature),
   );
+  // Before the refusal throw: confirmSettlement records the signature and
+  // can transition the row to 'failed' before refusing confirm_failed.
+  readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   readCache()?.bustListings();
-  readCache()?.bustMe(ctxAccountId(ctx));
+  // A 'confirmed' answer means the EAGER delivery ran to the sale insert on
+  // this request, so the item's recorded history changed under a route
+  // mutation (the header's bust bucket, not the sweep's TTL bucket); the arm
+  // only knows the settlement id, so the whole map drops, like moderation.
+  if (out.state === 'confirmed') readCache()?.bustHistoryAll();
   // Same contract as the bond leg: a confirming state names its screened
   // pending verdict; every decided state answers null.
   json(ctx.res, 200, { state: out.state, reason: screenWirePendingReason(out.reason ?? null) });
@@ -1040,6 +1061,12 @@ async function createOfferHandler(ctx: Ctx): Promise<void> {
     },
     acceptTerms: body.acceptTerms === true,
   });
+  // Offers themselves are uncached, but createDirectedOffer runs guardTerms,
+  // which can record FIRST-TIME terms acceptance the cached /me readout
+  // serves (and it records on refused calls too, so this precedes the
+  // throw): without the bust the client re-shows the consent checkbox for a
+  // TTL after the player already consented.
+  readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   json(ctx.res, 200, { offer: offerView(out.offer, ctxAccountId(ctx)) });
 }
@@ -1066,13 +1093,13 @@ async function acceptOfferHandler(ctx: Ctx): Promise<void> {
     // side sends none and the service demands none of them.
     optionalStepUp(body.stepUp),
   );
+  readCache()?.bustMe(viewer);
   if (!out.ok) throwRefusal(out);
   // Acceptance can escrow a listing (the directed rail's consummation), and
   // once one exists BOTH parties' activity readouts change (the seller's
   // listings row, the buyer's coming settlement), so both bust; before the
   // deal consummates only the acting side's view moved.
   readCache()?.bustListings();
-  readCache()?.bustMe(viewer);
   if (out.listing !== null) {
     readCache()?.bustMe(out.listing.sellerAccount);
     if (out.listing.directedBuyerAccount !== null) {

@@ -25,6 +25,7 @@ import { throwProvedRollback } from './pg_rollback_proof';
 import { logSafe, WocWireDriftWarner } from './woc_market_drift_warn';
 import { pruneWocLocalLedgers, wocBackedOffIds } from './woc_market_local_ledgers';
 import type { WocMarketReadCache } from './woc_market_read_cache';
+import { WOC_MARKET_BROWSE_CACHE_MAX_PAGE } from './woc_market_read_cache';
 import {
   adoptableBondCents,
   antiSnipeExtendedEndMs,
@@ -58,18 +59,18 @@ import {
   type WocListingParams,
   type WocSettlementState,
 } from './woc_market_rules';
-import {
-  buildStepUpMessage,
-  type NewWocStepUpChallenge,
-  newStepUpNonce,
-  stepUpBindingDigest,
-  verifyStepUpProof,
-  WOC_MARKET_STEPUP_TTL_MS,
-  type WocStepUpBinding,
-  type WocStepUpChallengeRow,
-  type WocStepUpProof,
-  type WocStepUpRefusal,
+import type {
+  NewWocStepUpChallenge,
+  WocStepUpBinding,
+  WocStepUpChallengeRow,
+  WocStepUpProof,
+  WocStepUpRefusal,
 } from './woc_market_stepup';
+import {
+  issueStepUpChallengeFlow,
+  stepUpProofRefusal,
+  type WocStepUpFlowCtx,
+} from './woc_market_stepup_flow';
 
 // ---------------------------------------------------------------------------
 // Row shapes (persisted by woc_market_db.ts)
@@ -625,7 +626,10 @@ export interface WocMarketDb {
           | 'cancel_pending'
           | 'own_listing'
           | 'bid_too_low'
-          | 'already_pending';
+          | 'already_pending'
+          // The bounded-wait refusal (the idle kill, or any future lock
+          // bound): typed so a bid under contention answers 409, never 500.
+          | 'contended';
       }
   >;
   /** Anti-snipe at bond progress: extend the auction end for a bid whose
@@ -926,6 +930,12 @@ export interface WocMarketEconomy {
   ): Promise<{ settled: boolean; pending: boolean; reason: string | null }>;
   refundBond(reference: string): Promise<{ done: boolean; reason: string | null }>;
   forfeitBond(reference: string): Promise<{ done: boolean; reason: string | null }>;
+  /** Ops introspection for the price cache (proxy only; the dev economy has
+   *  no cache): ages of the held success and failure memos, so a stale-served
+   *  or blanked price is a NUMBER on the internal stuck readout rather than
+   *  invisible (the cached_read stale-serve warn's spirit; this cache logs
+   *  nothing itself). */
+  priceCacheAges?(): { successAgeMs: number | null; failureAgeMs: number | null };
 }
 
 export type WocCustodyExtract =
@@ -1216,7 +1226,15 @@ const SWEEP_BATCH = 25;
  *  rather than camp the lock for the whole batch. Rows left behind stay
  *  durably due and the next pass resumes; worst hold is about this budget
  *  plus one RPC timeout, comfortably under the watchdog's 60s alarm. */
-const BOND_PAYOUT_BUDGET_MS = 30_000;
+export const BOND_PAYOUT_BUDGET_MS = 30_000;
+
+/** Wall-clock bound on the activity readout's six SEQUENTIAL reads: each is
+ *  its own implicit pool checkout with its own 5s connect deadline, so under
+ *  a saturated pool the sequencing turned one 5s worst case into six back to
+ *  back (30s of held socket per poll). One checkout timeout plus slack: the
+ *  between-reads check fails the readout fast and the client's poll retries
+ *  on its next beat. */
+export const WOC_MARKET_ME_READOUT_DEADLINE_MS = 6_000;
 
 /** Per-arm counts for one sweep pass, so a wedged marketplace is visible: a
  *  silent idle pass and a permanently starved backlog look identical without
@@ -1402,13 +1420,15 @@ export class WocMarketService {
     // Viewer-identical per query tuple (the SQL excludes directed listings and
     // carries nothing viewer-scoped), so the page is shared through the read
     // cache; listingView's `mine` is computed per request over the shared rows.
-    // Item-filtered searches BYPASS the cache on purpose: the filter list is
-    // caller-chosen key entropy (screened, but still an open combination
-    // space), and caching it would let one account's distinct filters evict
-    // the hot unfiltered pages every player shares. A filtered search is a
-    // per-user lookup; the limiter is its bound.
+    // Item-filtered searches AND deep pages BYPASS the cache on purpose: both
+    // are caller-chosen key entropy (screened, but still an open combination
+    // space; the page number alone spans the 400-page clamp), and caching
+    // them would let one account's distinct keys evict the hot shallow pages
+    // every player shares while each eviction re-buys an OFFSET-walk read.
+    // A filtered search or a deep page is a per-user lookup; the limiter is
+    // its bound.
     const refresh = () => this.deps.db.browseListings(this.cfg.realm, q);
-    return this.deps.readCache && q.itemIds === null
+    return this.deps.readCache && q.itemIds === null && q.page <= WOC_MARKET_BROWSE_CACHE_MAX_PAGE
       ? this.deps.readCache.browse(q, refresh)
       : refresh();
   }
@@ -1480,11 +1500,26 @@ export class WocMarketService {
     wallet: string | null;
   }> {
     const realm = this.cfg.realm;
+    const startedAtMs = this.now();
+    // Checked BETWEEN reads, the bond walk's shape: a read in flight
+    // finishes, and a readout past the deadline fails fast instead of
+    // walking every remaining checkout's own 5s wait (rationale at the
+    // constant). Under the fixed test clocks elapsed is zero.
+    const deadline = (): void => {
+      if (this.now() - startedAtMs > WOC_MARKET_ME_READOUT_DEADLINE_MS) {
+        throw new Error('woc market activity readout deadline exceeded');
+      }
+    };
     const listings = await this.deps.db.listingsBySeller(realm, account);
+    deadline();
     const bids = await this.deps.db.bidsByAccount(realm, account, 50);
+    deadline();
     const settlements = await this.deps.db.settlementsByAccount(realm, account, 50);
+    deadline();
     const strikes = await this.deps.db.strikeInfo(account);
+    deadline();
     const termsAcceptedAtMs = await this.deps.db.termsAcceptedAt(account);
+    deadline();
     const wallet = await this.deps.verifiedWallet(account);
     return { listings, bids, settlements, strikes, termsAcceptedAtMs, wallet };
   }
@@ -1571,31 +1606,24 @@ export class WocMarketService {
    * linked wallet the caller just re-read, the same canonical record the
    * payment path trusts.
    */
+  /** The extracted step-up flow's slice of this service, built per call. */
+  private stepUpCtx(): WocStepUpFlowCtx {
+    return {
+      db: this.deps.db,
+      realm: this.cfg.realm,
+      devSig: this.deps.stepUpDevSig,
+      now: () => this.now(),
+    };
+  }
+
   private async guardStepUp(
     account: number,
     wallet: string,
     proof: WocStepUpProof | undefined,
     binding: WocStepUpBinding,
   ): Promise<Refused | null> {
-    if (!proof) return refuse('stepup_required');
-    // Shape screens before the store sees attacker-controlled strings: a
-    // decided refusal, no query. The nonce shape is the issuer's own hex form;
-    // the signature cap comfortably holds a base58 ed25519 signature and the
-    // dev form.
-    if (!/^[0-9a-f]{32}$/.test(proof.nonce) || proof.signature.length > 256) {
-      return refuse('stepup_challenge_invalid');
-    }
-    const row = await this.deps.db.consumeStepUpChallenge(this.cfg.realm, proof.nonce, account);
-    const verdict = verifyStepUpProof({
-      row,
-      proof,
-      expectedDigest: stepUpBindingDigest(binding),
-      accountId: account,
-      currentWallet: wallet,
-      nowMs: this.now(),
-      devSig: this.deps.stepUpDevSig,
-    });
-    return verdict.ok ? null : refuse(verdict.reason);
+    const reason = await stepUpProofRefusal(this.stepUpCtx(), account, wallet, proof, binding);
+    return reason === null ? null : refuse(reason);
   }
 
   /**
@@ -1625,58 +1653,8 @@ export class WocMarketService {
     if (gate) return gate;
     const wallet = await this.deps.verifiedWallet(account);
     if (!wallet) return refuse('wallet_required');
-    let binding: WocStepUpBinding;
-    if (request.operation === 'accept_directed_offer') {
-      const offer = await this.deps.db.directedOfferById(this.cfg.realm, request.offerId);
-      // Only the SELLER's acceptance needs a proof, so only the seller can
-      // mint one; not_found for everyone else, the directed convention.
-      if (!offer || offer.sellerAccount !== account) return refuse('not_found');
-      if (offer.status !== 'pending') return refuse('not_pending');
-      if (offer.expiresAtMs <= this.now()) return refuse('offer_expired');
-      // A legacy pre-pin offer with no item names nothing to sign for, and its
-      // acceptance would refuse item_mismatch on the null pin anyway; refuse
-      // rather than mint a blank "Item: " authorization.
-      if (!offer.itemId) return refuse('not_found');
-      binding = {
-        operation: 'accept_directed_offer',
-        offerId: request.offerId,
-        itemId: offer.itemId,
-        usdCents: offer.usdCents,
-      };
-    } else {
-      // The item must be real BEFORE the wallet is asked to sign for it: a
-      // free-text id (a newline forging a line in the popup, or a nonexistent
-      // id createListing would refuse) never mints a challenge.
-      if (!Object.hasOwn(ITEMS, request.itemId)) return refuse('unknown_item');
-      binding = request;
-    }
-    // Issue-time prune: what bounds the table (plus the rate limiter).
-    await this.deps.db.pruneStepUpChallenges(this.cfg.realm, this.now());
-    const nonce = newStepUpNonce();
-    const expiresAtMs = this.now() + WOC_MARKET_STEPUP_TTL_MS;
-    const message = buildStepUpMessage({
-      binding,
-      accountId: account,
-      wallet,
-      realm: this.cfg.realm,
-      nonce,
-      expiresAtIso: new Date(expiresAtMs).toISOString(),
-    });
-    const row: NewWocStepUpChallenge = {
-      nonce,
-      realm: this.cfg.realm,
-      accountId: account,
-      wallet,
-      operation: binding.operation,
-      bindingDigest: stepUpBindingDigest(binding),
-      message,
-      expiresAtMs,
-    };
-    await this.deps.db.createStepUpChallenge(row);
-    return {
-      ok: true,
-      challenge: { nonce, message, expiresAtMs, signatureRequired: !this.deps.stepUpDevSig },
-    };
+    const out = await issueStepUpChallengeFlow(this.stepUpCtx(), account, wallet, request);
+    return out.ok ? out : refuse(out.reason);
   }
 
   // -------------------------------------------------------------------------
@@ -3126,12 +3104,19 @@ export class WocMarketService {
    * Segment contract:
    * - `locked: true` segments are the database arms; the shell holds the
    *   advisory lock (and its one pool client) only for that segment's
-   *   bounded batches, releasing both between segments.
+   *   bounded batches, releasing both between segments. One honest
+   *   exception: the expiry arms' strike gate consults the CACHED price
+   *   (strikeDefaultingBuyer), bounded by the price cache's policy (about
+   *   one blocking probe per 3s failure-memo window under an outage, never
+   *   per row); the segment's remaining worst case is lock-wait arithmetic
+   *   under the watchdog's 60s alarm, measured at scale by the pg rigs.
    * - `locked: false` segments (the confirm polls) make read-only CHAIN
    *   calls and run with NO client checked out between their statements and
    *   NO advisory lock held. Safe under a concurrent peer (the deploy-overlap
-   *   window) because every write they make is a single-winner CAS over the
-   *   row's own state: transitionSettlement's state guard, holdBondAndActivate
+   *   window) because every STATE write they make is a single-winner CAS over
+   *   the row's own state (the park-rotation timestamp touch,
+   *   touchBidPollRow, is unguarded on purpose: idempotent bookkeeping a
+   *   racing peer merely repeats): transitionSettlement's state guard, holdBondAndActivate
    *   (an ordered FOR UPDATE re-read), the guarded lapse, and the anti-snipe
    *   extension (extendAuctionForBondProgress re-reads the listing under FOR
    *   UPDATE and recomputes against the base cap, so a racing peer moves the
@@ -3144,6 +3129,10 @@ export class WocMarketService {
    * - Progress persists BETWEEN segments by construction: every arm commits
    *   its row transitions per row, so an aborted pass (lost lock, shutdown)
    *   resumes from durable state on the next pass.
+   * - The pass shares ONE nowMs captured at plan build (the one-block
+   *   pass's semantic); a long chain-polls segment ages it conservatively
+   *   (fewer expiries, wider park windows), and processDueBonds re-reads
+   *   the clock for its own budget.
    *
    * Arm ORDER is the load-bearing part and is unchanged from the one-block
    * pass this replaces; the ordering comments ride the arms below.
@@ -3160,6 +3149,9 @@ export class WocMarketService {
     // clobber a pass mid-flight nor inherit a finished pass's verdict (a
     // shared field raced both ways).
     const scope: WocDeliveryScope = { contended: false, parked: 0 };
+    // The bond walk's budget-break flag, pass-scoped like the delivery
+    // scope: a sub-batch break must still reach the saturated list.
+    const budgetBroke = { bonds: false };
     const nowMs = this.now();
     const stats: WocSweepPassStats = {
       lapsedBids: 0,
@@ -3275,7 +3267,7 @@ export class WocMarketService {
           // under the watchdog's 60s alarm; the remainder stays durably due
           // and the next pass resumes. The hour-scale camp H11 flags lives
           // in the confirm polls, which stay unlocked.
-          await runArm('bonds', () => this.processDueBonds());
+          await runArm('bonds', () => this.processDueBonds(budgetBroke));
         },
       },
     ];
@@ -3297,6 +3289,10 @@ export class WocMarketService {
         const saturated = Object.entries(stats)
           .filter(([, n]) => n >= SWEEP_BATCH)
           .map(([arm]) => arm);
+        // A budget-broken bond walk did not drain BY DEFINITION, even when
+        // the fetched count sits under a full batch (10 due, 3 walked): the
+        // flag keeps the degraded case in the saturation signal.
+        if (budgetBroke.bonds && !saturated.includes('bonds')) saturated.push('bonds');
         this.deps.onSweepPass?.(stats, saturated, this.now() - nowMs);
         return stats;
       },
@@ -3304,8 +3300,13 @@ export class WocMarketService {
   }
 
   /** The whole pass in one call: the segment plan run back to back with no
-   *  locking (the shell owns locks; tests and the eager pokes come through
-   *  here). Behavior and stats are byte-identical to the segmented run. */
+   *  locking (the shell owns locks; only tests call this today, no
+   *  production caller exists). Arm order and stats match the one-block
+   *  pass this replaced exactly, INCLUDING its one divergence from the
+   *  shell: a segment throw here skips finish(), as the old pass skipped
+   *  onSweepPass, while the shell's finally always reports. The only throw
+   *  path out of a segment is a throwing onSweepError dep, which production
+   *  does not wire. */
   async sweepPass(): Promise<WocSweepPassStats | null> {
     const plan = this.sweepSegments();
     if (!plan) return null;
@@ -3967,8 +3968,6 @@ export class WocMarketService {
     return this.runDeliveryBatch('reconciled', stuck, nowMs, scope);
   }
 
-  /** The ids a batch read should skip: parked rows still inside their
-   *  backoff window. Process-local by design, like the park ledgers. */
   /** Drive an older binary's delivered-but-unclosed residue FORWARD: custody
    *  completed ('delivered') but the separately-committed close tail never
    *  ran, leaving a listing nothing else may touch (cancel, suspend, reclaim
@@ -4444,7 +4443,7 @@ export class WocMarketService {
     return advanced;
   }
 
-  private async processDueBonds(): Promise<number> {
+  private async processDueBonds(budgetBroke?: { bonds: boolean }): Promise<number> {
     const startedAtMs = this.now();
     const due = await this.deps.db.bondsDue(this.cfg.realm, SWEEP_BATCH);
     let walked = 0;
@@ -4453,7 +4452,12 @@ export class WocMarketService {
       // finishes (its verdict writes), and the remainder stays due for the
       // next pass. Under the fixed test clocks elapsed is zero, so suites
       // exercise the full batch unless they advance time on purpose.
-      if (this.now() - startedAtMs > BOND_PAYOUT_BUDGET_MS) break;
+      if (this.now() - startedAtMs > BOND_PAYOUT_BUDGET_MS) {
+        // The break itself is reported: a SUB-batch break reads as a drained
+        // pass by count alone (the saturation filter fires at a full batch).
+        if (budgetBroke) budgetBroke.bonds = true;
+        break;
+      }
       walked++;
       try {
         if (bid.bondReference === null) {
@@ -4476,12 +4480,8 @@ export class WocMarketService {
         this.sweepError('bonds', err);
       }
     }
-    // On a BUDGET BREAK report the rows FETCHED, not walked: the undrained
-    // remainder is a real money backlog, and reporting only the walked count
-    // would silence the saturation signal in exactly the degraded case the
-    // budget exists for (the watchdog cannot cover it either, since the
-    // budget is deliberately under its alarm). A fully walked batch reports
-    // the walk as before.
-    return walked < due.length ? due.length : walked;
+    // Rows FETCHED (== walked except on a budget break, where the undrained
+    // remainder must keep counting; the break rides the flag into saturated).
+    return due.length;
   }
 }
