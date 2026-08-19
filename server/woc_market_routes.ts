@@ -456,10 +456,13 @@ function settlementView(row: WocSettlementRow & { itemId?: string }): Record<str
 }
 
 function saleView(row: WocSaleRow): Record<string, unknown> {
+  // No `item` payload: the row's full InvSlot (instance rolls included) was
+  // the heaviest field on the history wire and NO client consumer ever read
+  // it (the history read is keyed by the item the caller already knows).
+  // Trimmed with the hot-read caching; the db row keeps it for operators.
   return {
     id: row.id,
     itemId: row.itemId,
-    item: row.item,
     priceCents: row.priceCents,
     sellerName: row.sellerName,
     buyerName: row.buyerName,

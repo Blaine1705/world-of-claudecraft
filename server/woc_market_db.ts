@@ -2050,6 +2050,13 @@ export class PgWocMarketDb implements WocMarketDb {
         // Fail fast on contention (the escrowInsertListing rationale; the rare
         // 55P03 or 40P01 surfaces as the typed 'contended' refusal below).
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // The connection-camping bound (the 04-round guards' rule, retrofitted
+        // here with the hot-path work): a client idle IN this transaction past
+        // the bound is killed as 25P03, which withTx maps to the typed
+        // 'contended' like every sibling guard.
+        await client.query(
+          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+        );
         // Lock order is bids THEN listing, matching activateBid (which locks its
         // bid row before the listing row): the reverse order deadlocks against a
         // concurrent bond activation. Bids inserted after this pass block on the
@@ -2195,6 +2202,13 @@ export class PgWocMarketDb implements WocMarketDb {
     try {
       return await this.withTx(async (client) => {
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // The connection-camping bound (the 04-round guards' rule, retrofitted
+        // here with the hot-path work): a client idle IN this transaction past
+        // the bound is killed as 25P03, which withTx maps to the typed
+        // 'contended' like every sibling guard.
+        await client.query(
+          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+        );
         const row = await client.query(
           `SELECT status FROM woc_market_listings WHERE id = $1 FOR UPDATE`,
           [id],
@@ -2403,6 +2417,13 @@ export class PgWocMarketDb implements WocMarketDb {
       // A 55P03 here surfaces as the transient-throw arm and retries.
       await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
       await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+      // The connection-camping bound (the 04-round guards' rule, retrofitted
+      // here with the hot-path work): a client idle IN this transaction past
+      // the bound is killed as 25P03, which withTx maps to the typed
+      // 'contended' like every sibling guard.
+      await client.query(
+        `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+      );
       const saved = await saveCharacterStateOnClient(
         client,
         save.characterId,
@@ -3053,6 +3074,11 @@ export class PgWocMarketDb implements WocMarketDb {
       }
   > {
     return this.withTx(async (client) => {
+      // The connection-camping bound (the 04-round guards' rule, retrofitted
+      // here with the hot-path work); 25P03 maps to the typed 'contended'.
+      await client.query(
+        `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+      );
       // LOCK ORDER carve-out: no EXISTING bid row lock is ever taken here
       // (the INSERT below mints a fresh row), so listing-first is
       // deadlock-free; a crossing finalize re-locks the open set AFTER its
@@ -3352,6 +3378,11 @@ export class PgWocMarketDb implements WocMarketDb {
     nowMs: number,
   ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending'> {
     return this.withTx(async (client) => {
+      // The connection-camping bound (the 04-round guards' rule, retrofitted
+      // here with the hot-path work); 25P03 maps to the typed 'contended'.
+      await client.query(
+        `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+      );
       // Lock the whole open bid set for the listing in id order BEFORE the
       // listing row (the file-wide order; suspendListingIfSafe scans the same
       // way). The old shape locked only its own bid here and acquired the
@@ -3566,6 +3597,13 @@ export class PgWocMarketDb implements WocMarketDb {
         // (the escrowInsertListing rationale); a 55P03 or 40P01 surfaces as
         // the typed 'contended' refusal.
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // The connection-camping bound (the 04-round guards' rule, retrofitted
+        // here with the hot-path work): a client idle IN this transaction past
+        // the bound is killed as 25P03, which withTx maps to the typed
+        // 'contended' like every sibling guard.
+        await client.query(
+          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+        );
         // The winner stamp comes FIRST so the lock order is bid then listing,
         // the same order activateBid and suspendListingIfSafe use; the
         // reverse order deadlocks against a concurrent bond activation. A
@@ -3920,6 +3958,13 @@ export class PgWocMarketDb implements WocMarketDb {
     try {
       return await this.withTx(async (client) => {
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // The connection-camping bound (the 04-round guards' rule, retrofitted
+        // here with the hot-path work): a client idle IN this transaction past
+        // the bound is killed as 25P03, which withTx maps to the typed
+        // 'contended' like every sibling guard.
+        await client.query(
+          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+        );
         // The whole tail holds the listing plus open-bid locks, so its total
         // hold must be bounded by more than the per-statement pool default:
         // the same explicit allowance the escrow and delivered-save guards

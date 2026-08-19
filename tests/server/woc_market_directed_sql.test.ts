@@ -10,6 +10,7 @@
 // one named account and must never enter a public result set), so it is pinned to a
 // literal rather than a shape.
 
+import { readFileSync } from 'node:fs';
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -1048,6 +1049,23 @@ const FINALIZE_ARGS = {
   },
 } as const;
 
+describe('every guard transaction bounds its idle holds', () => {
+  it('carries the idle-in-transaction bound at EVERY withTx site (completeness, comment-stripped)', () => {
+    // The retrofit rule: a guard transaction that can sit idle between
+    // statements camps a shared-pool client, so every one carries the 25P03
+    // bound. Counted against the withTx sites so a NEW guard transaction
+    // cannot ship without it (the count moves in the same change, on
+    // purpose).
+    const src = readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/[^\n]*/g, '');
+    const txSites = src.match(/this\.withTx\(/g) ?? [];
+    const idleBounds = src.match(/SET LOCAL idle_in_transaction_session_timeout/g) ?? [];
+    expect(txSites.length).toBe(12);
+    expect(idleBounds.length).toBe(txSites.length);
+  });
+});
+
 describe('the delivery close tail is ONE transaction, in SQL', () => {
   it('runs the whole tail between one BEGIN and one COMMIT, waits bounded', async () => {
     const { pool, sql } = recordingTxPool();
@@ -1058,10 +1076,13 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
     expect(seq[0]).toBe('BEGIN');
     expect(seq.at(-1)).toBe('COMMIT');
     expect(seq[1]).toContain('SET LOCAL lock_timeout');
+    // The connection-camping bound rides every guard transaction now (the
+    // idle-in-transaction retrofit).
+    expect(seq[2]).toContain('SET LOCAL idle_in_transaction_session_timeout');
     // The whole tail holds the listing plus bid locks, so it carries the
     // heavy statement allowance too (the pool default would abort a slow
     // money-path commit mid-flight).
-    expect(seq[2]).toContain('SET LOCAL statement_timeout');
+    expect(seq[3]).toContain('SET LOCAL statement_timeout');
     // Every write the old code committed separately now sits inside the one
     // transaction: the CAS, the sale, the close, the dispose, the bond flips.
     const inside = seq.slice(1, -1).join('\n');

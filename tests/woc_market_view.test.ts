@@ -454,7 +454,6 @@ describe('detail resolution', () => {
   const sale: WocSaleView = {
     id: 5,
     itemId: epicEquipId,
-    item: { itemId: epicEquipId, count: 1 },
     priceCents: 4000,
     sellerName: 'Old Seller',
     buyerName: 'Old Buyer',

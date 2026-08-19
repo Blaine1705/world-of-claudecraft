@@ -395,7 +395,9 @@ describe('market wire views expose exactly their pinned key sets', () => {
 
   it('saleView', async () => {
     expect(Object.keys(await historySaleView()).sort()).toEqual(
-      ['atMs', 'buyerName', 'id', 'item', 'itemId', 'priceCents', 'sellerName'].sort(),
+      // No `item`: the full InvSlot was dead wire weight (no client reader);
+      // itemId is the identity the history caller already keys by.
+      ['atMs', 'buyerName', 'id', 'itemId', 'priceCents', 'sellerName'].sort(),
     );
   });
 

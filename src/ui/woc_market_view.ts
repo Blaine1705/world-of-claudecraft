@@ -130,7 +130,6 @@ export interface WocSettlementView {
 export interface WocSaleView {
   id: number;
   itemId: string;
-  item: InvSlot;
   priceCents: number;
   sellerName: string;
   buyerName: string;
