@@ -4087,6 +4087,124 @@ DASHBOARD repo, worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13,
 branch integration/woc-market-trading, FRESH session, own origin/master
 sync first.
 
+## 18 QA round (verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
+
+DASHBOARD repo, worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13,
+branch integration/woc-market-trading. Session start e82303e (the 18 implement
+tip AND the PR #13 remote branch tip); origin/master sync a NO-OP. Game branch
+feature/woc-marketplace verified 0 behind the newest release (origin/release/v0.40.0
+e56707a675), so the game-side push is the 1-ahead docs commit only. Audited the
+implement diff c001d4a..e82303e (ten commits). Validation held by hand (no
+reviewer roster or gate in the dashboard repo): npm test, npm run check, npm run
+build.
+
+SIX fresh coverage lanes (security, correctness, test-decisiveness, decimals
+direction, dead-code/docs, React render safety) over the whole range. ONE
+blocking finding, real and headline: the game proxy's host-pinning bypass. The
+allowlist stripped a leading slash for its check but the upstream URL was built
+from the RAW params.path, so a request written /api/game//internal/... (Astro
+captures params.path with a leading slash) made new URL('//internal/...', base)
+protocol-relative and would send DASHBOARD_INTERNAL_SECRET to host 'internal'
+(proven in node: host resolves to 'internal'). Fixed by mirroring the sibling
+payout proxy's canonicalProxyPath (new canonicalGamePath: full decode, refuse a
+residual percent, strip leading slashes, collapse traversal, re-check the
+normalized output for a re-introduced percent) and building the URL from that
+normalized value; the allowlist is exact-match so only the two literal safe
+strings can reach the URL builder. Mutation-proven: reverting the call fails the
+new host-integrity test. The four named probes all verified sound by hand before
+the lanes: the proxy bypass hunt found the gated catch-all as the ONLY reach to
+GAME_SERVICE_URL / the secret in src (list views go through /api/game/); roles
+resolve server-side from the httpOnly sameSite=strict session cookie (nothing
+client-forgeable); decimals cover both directions (withdraw submit uses the same
+source, the trading panel submits no amounts); the forfeit confirmation binds to
+the specific reference tail with a decisive stale-consent cross-bond test; the
+actor-id-survives-rename test is decisive.
+
+The rest of the ~45 lane findings were applied or judged with the file open.
+Headline applied fixes: object-valued render leaves are now screened in
+market_summary_load (a JSON object where a scalar belongs threw "Objects are not
+valid as a React child" and, with no error boundary above the panel, unmounted
+the whole tab, exactly the blast radius e82303e claimed to close); OPERATOR_LOCALE
+extracted to one module and routed through the market view core, the shared USD
+formatter and the list views, pinned by value AND a source scan; the headline
+rate and sample-window figures extracted out of inline JSX into the tested view
+core; bpsToPercent junk-checks; USDC_MINT_DECIMALS and SOL_DECIMALS added so the
+bare-argument decimal sites the scan cannot see share one source (the scan gained
+inverse/leading-zero exponent arms, a wider file filter, a fixed negative control,
+and documented escapes); the .wm-over-balance section-error class renamed to the
+honest .wm-error-line; legsReconcile's docstring corrected to the sanity check it
+performs; the big-number probe rewritten to diverge provably at a representable
+value; the release-form keep-on-failure decision extracted to a helper. Sixteen
+new-pin mutants all bit.
+
+FIX ROUND RE-REVIEWED FRESH (three lanes over e82303e..HEAD, the unreviewed fix
+code): five real defects found and fixed in a second wave. (1) releaseSubmitOutcome
+was decorative (called only with a literal true; failure bypassed it); the panel
+now routes BOTH outcomes through it at one join point. (2) The leaf screen missed
+leaves the view core COERCES rather than renders raw (pause.reason/actor into a
+template, price.reason into a computed property key, attention counts into a `>`
+comparison, leg strings into legsReconcile's regex test) which a JSON object with
+no callable toString throws inside during render; all now screened, plus a
+defense-in-depth typeof guard in legsReconcile. (3) describePriceReason(missing)
+said "Price is healthy." beside the "Halted" label; it now reads "No price reason
+reported." and the healthy detail is hardcoded on its own branch. (4)
+sampleWindowLabel rendered junk as "0 over 0m", counterfeiting the real
+insufficient-samples halt state; now "-". (5) TreasuryBuyAndBurnPanel still had
+two bare SOL 9s contradicting the new SOL_DECIMALS comment; routed through the
+constant. The round-2 pins all bit (R9 legsReconcile defense-in-depth needed a
+direct unit test since the loader screen made it unreachable otherwise).
+
+JUDGED no-change (binding unless a later session overrules; do NOT re-raise):
+- Halt/Resume control unavailable during an overview outage: the implement round's
+  deliberate decision (a blind pause toggle without the current state is its own
+  hazard), re-confirmed. A state-independent halt needs a service surface.
+- 404/405 decided before the auth 403 (path-probing oracle): matches the sibling
+  proxies; the middleware 401s an anonymous caller before the handler in
+  production, and the two-path allowlist ships in the client bundle. No leak.
+- auditActorDisplay mis-parsing a legacy value shaped like the composite: usernames
+  are charset-constrained (no spaces or parens), so no current row can match, and
+  the fallback is fail-safe.
+- The recycled-username test decisive only jointly with the exact-format pin, and
+  the submit-direction claims: verified sound.
+- formatUsd swap and canonicalGamePath widening (percent-encoded allowlisted paths
+  now proxy) are deliberate, safe behavior changes; note them in the PR body.
+
+DEFERRED to 19 (dashboard tooling: CI, tests, investigation UX, the component
+harness), with owners:
+- The component-render harness for the JSX wiring pins (tes-2 from the implement
+  round, plus the validateReleaseSubmit-before-POST money guard, the
+  auditActorDisplay+title pattern, the loader-ref wiring): 19 owns the harness.
+- The MarketListViews stale-response-wins race and shared busy flag (apply the
+  createSummaryLoader supersession pattern to the list views), and the
+  quotes/list loading affordance on a filter change (the mixed-epoch window).
+- The ambient-locale money helpers still on the host default (ClaudiumPurchasesPanel
+  baseUnits/whole/token, TreasuryBuyAndBurnPanel formatBaseUnits, App.tsx formatSol,
+  DiscountsPanel): the existing 19 ambient-locale item, now itemized.
+- The wocDecimals runtime reconciliation guard/banner (the divergence window is
+  documented in woc_mint.ts; 19/22 own the guard and asking the service to report
+  wocDecimals on the market payloads).
+- WOC withdraw submitted before the wallets payload lands (converts at the fallback
+  constant, skips the balance check; benign while the constant tracks the live mint,
+  the tested fix needs the harness).
+- Submit error/notice persisting across subtab switches; the tablist ARIA
+  completion; the status-pill warn/error styling; release reference uppercase-hex
+  leniency.
+
+CLAUDE.md: the token-figures convention now names all three exponent constants and
+the bare-argument rule; the view-core rule scoped to new and changed code; the
+audit-actor cross-repo bound noted as service-owned. Verified against the code.
+
+Commits (dashboard repo, session range e82303e..HEAD, EIGHT): 70c3e12 proxy
+host-pinning, 2859622 render-leaf screening, 596de8b formatter hardening + locale
+single-source, 5492f59 USDC/SOL constants, 3a4dca8 release-form + panel wiring +
+class rename + docs, 132a3f9 (round 2) coerced-leaf screening + halted status
+line, 2e8344a (round 2) outcome routing + proxy percent recheck + treasury
+decimals + locale scan, ae6e46c CLAUDE.md token constants. Validation on the final
+tree: npm test 183 pass 0 fail (baseline 164), npm run check 0 errors (the one
+pre-existing App.tsx React.FormEvent hint untouched), npm run build complete.
+Range c001d4a..HEAD swept: zero em/en dashes, zero emojis, no "phase" in commit
+text. Pushed per R4 to origin/feature/woc-market-trading-controls (PR #13).
+
 ## 18 implement round (dashboard guardrails)
 
 DASHBOARD repo, worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13,

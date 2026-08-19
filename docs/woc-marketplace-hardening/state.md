@@ -5,6 +5,35 @@ actually reads.
 
 ## Where we are
 
+- 18 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied or
+  judged with the file open, PUSHED per R4). DASHBOARD repo; session start e82303e
+  (the implement tip AND the PR #13 remote tip); origin/master sync a NO-OP; game
+  branch verified 0 behind origin/release/v0.40.0 e56707a675 so the game push is
+  the 1-ahead docs commit only. Six fresh coverage lanes over c001d4a..e82303e:
+  ONE blocking (the game proxy host-pinning bypass, a leading-slash params.path
+  made new URL('//internal/...', base) protocol-relative and would send the
+  dashboard secret to host 'internal'; fixed by mirroring the payout proxy's
+  canonicalGamePath and building the URL from the normalized value, mutation-proven).
+  The four named probes verified sound by hand (proxy bypass hunt clean, roles are
+  server-session-keyed, decimals cover both directions, forfeit binds to the
+  reference tail, actor-id survives rename). ~45 findings applied or judged;
+  headline fixes: object-valued render leaves screened in market_summary_load (a
+  malformed 200 could unmount the tab), OPERATOR_LOCALE extracted to one module and
+  pinned by value plus a source scan, the rate/sample-window figures extracted to
+  the tested view core, USDC_MINT_DECIMALS/SOL_DECIMALS added for the bare-argument
+  decimal sites, the .wm-over-balance class renamed to .wm-error-line, the
+  big-number probe rewritten decisive. Sixteen new-pin mutants bit. FIX ROUND
+  RE-REVIEWED FRESH (three lanes over the unreviewed fix code): five real defects
+  found and fixed in a second wave (releaseSubmitOutcome was decorative; the leaf
+  screen missed leaves the view core COERCES not renders; describePriceReason said
+  "healthy" on the halted line; sampleWindowLabel counterfeited "0 samples"; two
+  bare SOL 9s remained), all round-2 pins bit. Eight fix commits (e82303e..ae6e46c);
+  final tree npm test 183/0, check 0 errors, build complete; pushed to
+  origin/feature/woc-market-trading-controls (PR #13). The 18 QA round section in
+  progress.md is the registry the next sessions consume (JUDGED and DEFERRED lists
+  binding; 19 owns the component-render harness, the MarketListViews stale-wins
+  race and loading affordance, the ambient-locale money helpers, and the wocDecimals
+  reconciliation guard).
 - 18 IMPLEMENT COMPLETE (2026-08-19, DASHBOARD repo, LOCAL per R4: nothing
   pushed in either repo; the 18 QA session pushes on PASS to
   origin/feature/woc-market-trading-controls, updating PR #13). Session
@@ -132,10 +161,15 @@ actually reads.
   life); the account-keyed bust design must handle revokeCompanionToken's
   prefix-keyed delete; recon detail in the 17 implement entry of
   progress.md.
-- Next file to run: `docs/woc-marketplace-hardening/phase-18-qa.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-19-dashboard-tooling.md`
   (DASHBOARD repo, worktree `/Users/fernando/Documents/woc-rewards-dashboard-pr13`,
-  branch `integration/woc-market-trading`, FRESH session, own
-  origin/master sync first; it diffs from c001d4a and pushes on PASS).
+  branch `integration/woc-market-trading`, FRESH session, own origin/master sync
+  first). 19 owns the deferrals the 18 QA registry named: the component-render
+  test harness (so JSX wiring and the money-guard call get pinned), the
+  MarketListViews stale-response-wins race + shared busy flag + a loading affordance
+  on filter change, the ambient-locale money helpers, and the wocDecimals runtime
+  reconciliation guard (plus asking the service to report wocDecimals on the market
+  payloads, shared with 22).
 - 16 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied or
   judged with the file open, PUSHED per R4). Release sync a NO-OP (0 behind
   origin/release/v0.40.0 e56707a675). Eight workflow lanes + three typed
