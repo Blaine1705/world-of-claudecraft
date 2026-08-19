@@ -143,13 +143,17 @@ export function orderRootsByDistanceSq<T>(
 }
 
 /** Structural shape of a compile root's placement (a three mesh satisfies it
- *  without this module importing three). */
+ *  without this module importing three). An InstancedMesh also exposes its
+ *  instance matrices (count x 16 floats, local to the mesh). */
 export interface CompileRootPlacement {
   matrixWorld: { elements: ArrayLike<number> };
   boundingSphere?: { center: { x: number; y: number; z: number } } | null;
   geometry?: {
     boundingSphere?: { center: { x: number; y: number; z: number } } | null;
   } | null;
+  isInstancedMesh?: boolean;
+  count?: number;
+  instanceMatrix?: { array: ArrayLike<number> } | null;
 }
 
 /**
@@ -162,6 +166,18 @@ export interface CompileRootPlacement {
  * instance-aware sphere on the object, so that bound takes precedence over
  * the primitive-local geometry sphere. The translation is the fallback for
  * spheres not yet computed.
+ *
+ * A world-spanning InstancedMesh (every alchemy cauldron of the world in one
+ * mesh) has its aggregate centre far from ANY instance, so the centre alone
+ * sorted it last and the resume lane reached it after the instance next to
+ * the player had already drawn cold (bench batches 17 to 19: the station
+ * cauldron, 0.4 to 0.7 s never-compiled in the first two seconds after the
+ * curtain, every run). For an InstancedMesh with several instances the proxy
+ * is therefore the NEAREST instance translation and nothing else (the
+ * aggregate centre is wrong in both directions: far from every instance, or
+ * near the camera with no instance there); a single-instance mesh keeps the
+ * sphere, which is what keeps the identity-instance bakes honest (their
+ * instance sits at the origin and the geometry carries the placement).
  */
 export function compileRootDistanceSq(
   root: CompileRootPlacement,
@@ -178,7 +194,23 @@ export function compileRootDistanceSq(
   }
   const dx = x - camX;
   const dz = z - camZ;
-  return dx * dx + dz * dz;
+  let best = dx * dx + dz * dz;
+  const instances = root.isInstancedMesh === true ? root.instanceMatrix?.array : undefined;
+  const count = root.count ?? 0;
+  if (instances && count > 1 && instances.length >= count * 16) {
+    best = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < count; i++) {
+      const base = i * 16;
+      const lx = instances[base + 12];
+      const ly = instances[base + 13];
+      const lz = instances[base + 14];
+      const ix = world[0] * lx + world[4] * ly + world[8] * lz + world[12] - camX;
+      const iz = world[2] * lx + world[6] * ly + world[10] * lz + world[14] - camZ;
+      const d = ix * ix + iz * iz;
+      if (d < best) best = d;
+    }
+  }
+  return best;
 }
 
 export interface PrewarmCompileUnitOptions<T> {

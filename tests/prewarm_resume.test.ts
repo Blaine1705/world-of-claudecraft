@@ -969,6 +969,35 @@ describe('compileRootDistanceSq: the honest position of a compile root', () => {
     expect(compileRootDistanceSq(root, 0, 0)).toBe(500 * 500);
   });
 
+  it('reads the NEAREST instance of a world-spanning InstancedMesh, never only its far centre', () => {
+    // Every cauldron of the world in one mesh: the aggregate centre sits far
+    // from the instance next to the player, and centre-only ordering put the
+    // mesh last (the station cauldron drew cold right after the curtain,
+    // bench batches 17 to 19).
+    const geometry = new THREE.BoxGeometry(2, 2, 2);
+    const root = new THREE.InstancedMesh(geometry, new THREE.MeshBasicMaterial(), 3);
+    root.setMatrixAt(0, new THREE.Matrix4().makeTranslation(-900, 0, 0));
+    root.setMatrixAt(1, new THREE.Matrix4().makeTranslation(12, 0, 5));
+    root.setMatrixAt(2, new THREE.Matrix4().makeTranslation(900, 0, 0));
+    root.computeBoundingSphere();
+    root.updateMatrixWorld(true);
+    // The aggregate centre sits near the origin with no instance there; the
+    // nearest instance is what counts.
+    expect(Math.abs(root.boundingSphere?.center.x ?? 999)).toBeLessThan(1);
+    expect(compileRootDistanceSq(root, 0, 0)).toBe(12 * 12 + 5 * 5);
+    expect(compileRootDistanceSq(root, 890, 0)).toBe(10 * 10);
+    // The mesh's own world matrix applies to the instances too.
+    root.position.set(100, 0, 0);
+    root.updateMatrixWorld(true);
+    expect(compileRootDistanceSq(root, 100, 0)).toBe(12 * 12 + 5 * 5);
+    // A single identity instance (a world-baked bake) keeps the sphere reading.
+    const bake = new THREE.InstancedMesh(geometry, new THREE.MeshBasicMaterial(), 1);
+    bake.setMatrixAt(0, new THREE.Matrix4());
+    bake.boundingSphere = new THREE.Sphere(new THREE.Vector3(300, 0, 40), 10);
+    bake.updateMatrixWorld(true);
+    expect(compileRootDistanceSq(bake, 0, 0)).toBe(300 * 300 + 40 * 40);
+  });
+
   it('falls back to the matrix translation without a computed sphere', () => {
     const translated = [...identity];
     translated[12] = 30;
