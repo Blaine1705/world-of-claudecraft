@@ -185,7 +185,10 @@ interface AttributionTargetFixture {
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '15e0226d4f781b86d3a58fd7625fb506b5cc00d286e03a59cfa8dff916f24dbf';
+  // Re-minted for the Proving Shore guidance pass: the island beacon memo
+  // and sparkle arm left renderer.ts for island_guidance.ts, so the
+  // first-order composite follows renderer.ts. No capture was retaken.
+  '2f8070ae106b1fab7dfb841fe30cf70390d2cd8e0337f18c713d1ca97a129976';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
