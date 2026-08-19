@@ -119,7 +119,12 @@ CREATE INDEX IF NOT EXISTS woc_market_listings_live_price
 -- DESC within equal prices); the sort direction needs its own index. Stated
 -- trade: every bid activation updates current_bid_cents and now maintains
 -- two expression indexes instead of one (already non-HOT because of the ASC
--- twin), the price of removing a per-page sort from a player-facing sort.
+-- twin), the price of removing a per-page sort from a player-facing sort;
+-- measured on the full 16-index table: about +8% on a single-row bid-price
+-- update and roughly +290 WAL bytes per updated row. The win is the SHALLOW
+-- pages (the ones players read and the cache serves): past a few hundred
+-- rows of OFFSET the planner abandons the ordered walk and sorts the live
+-- set anyway, which is fine, deep pages are uncached and rare by design.
 CREATE INDEX IF NOT EXISTS woc_market_listings_live_price_desc
   ON woc_market_listings(realm, COALESCE(current_bid_cents, start_cents) DESC, id)
   WHERE status <> 'closed';
@@ -1148,8 +1153,10 @@ function isLockContention(err: unknown): boolean {
   // (an event-loop stall on the shared box) and the server terminated the
   // session rather than let it hold the row lock unbounded. Plain
   // contention to the caller: retry immediately.
-  // Counting 55P03 here is sound because every contention path routes its
-  // error through exactly one tail that calls this classifier once.
+  // Counting 55P03 here is sound because every guard routes its error
+  // through exactly one tail that calls this classifier once: eleven map it
+  // to their typed 'contended', and the delivered-save tail classifies only
+  // to count, then rethrows to commitGrant's transient arm.
   if (code === '55P03') lockWaitTimeouts++;
   return code === '55P03' || code === '40P01' || code === '25P03';
 }
@@ -2538,6 +2545,16 @@ export class PgWocMarketDb implements WocMarketDb {
       );
       if ((booked.rowCount ?? 0) === 0) throw new TxAbort('claim_missing' as const);
       return 'booked' as const;
+    }).catch((err): never => {
+      // Count a 55P03 like every sibling guard (the classifier owns the
+      // counter), WITHOUT changing the routing: this guard deliberately has
+      // no typed 'contended' mapping, because commitGrant's transient-throw
+      // arm wants the raw error as its park-or-retry evidence. Skipping the
+      // classifier here left the most contended lock in the market (the
+      // characters row the game loop's autosave fights over) invisible to
+      // the lockWaitTimeouts tuning signal.
+      isLockContention(err);
+      throw err;
     });
   }
 
@@ -3484,6 +3501,10 @@ export class PgWocMarketDb implements WocMarketDb {
       // unbounded wait here camps the bond poll's client for that whole
       // window. 55P03 rides the same contended tail as the 40P01 the lock
       // ordering already anticipates: the poll simply retries next pass.
+      // Per STATEMENT, not per transaction: this guard takes its locks in
+      // two statements (the open-bid set, then the listing), so the worst
+      // hold is about twice the bound plus work, under the 15s session
+      // ceiling; insertPendingBid is single-wait.
       await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
       // The connection-camping bound (the 04-round guards' rule, retrofitted
       // here with the hot-path work); 25P03 maps to the typed 'contended'.
@@ -4483,9 +4504,23 @@ export async function pruneClosedWocListingsBatch(
  *  vacuously, so malformed legacy refs prune on the window alone; wrapping
  *  them in IS-NULL disjuncts blocked the pull-up and hashed the ENTIRE
  *  settlements id set per batch), the ctid outer keeps the DELETE a Tid Scan
- *  instead of a table-sized semi-join (a row moved by a concurrent update
- *  fails the re-check and simply prunes next batch), and the {1,18} digit
- *  bound keeps the ::bigint cast from ever overflowing on a hostile ref. */
+ *  instead of a table-sized semi-join (measured 6.8x; a row moved by a
+ *  concurrent update fails the re-check, the short batch reads as caught-up
+ *  to the sweep shell, and the row prunes on a later night's run, the safe
+ *  direction), and the {1,18} digit bound keeps the ::bigint cast from ever
+ *  overflowing on a hostile ref. Cost shape per NIGHT, stated like the
+ *  step-up sibling states its O(table): the guard-blocked prefix (aged rows
+ *  whose referent survives) sorts oldest so EVERY batch of a run re-walks it
+ *  before reaching deletable rows, costing O(blocked x batches) index visits
+ *  plus two pk probes per blocked row on top of O(deleted); healthy systems
+ *  keep that prefix near empty (a blocked claim is a stuck deal the monitor
+ *  reports), and a pathological prefix that outgrows the 15s pool
+ *  statement_timeout aborts this table's prune for the night (logged by the
+ *  sweep, retried next night; the growth direction, never the ledger's). No
+ *  explicit lock_timeout on purpose, like every sibling prune: the DELETE
+ *  locks only claims rows no live flow writes (booked rows are terminal, and
+ *  any claim a delivery could still touch has a live referent the guard
+ *  excludes), so the 15s ceiling is the honest bound. */
 export async function pruneBookedWocCustodyClaimsBatch(
   pool: Pool,
   retentionDays: number,
@@ -4562,7 +4597,10 @@ export const WOC_STEPUP_PRUNE_SLACK_DAYS = 1;
  *  O(table)-per-batch shape is ACCEPTED, stated like the abandons sibling:
  *  measured 4.5 ms per batch at 23k rows (two passes of the table), and the
  *  5-minute TTL, the issue-time reaper, and the rate limiter keep the table
- *  orders of magnitude smaller than that in practice. */
+ *  orders of magnitude smaller than that in practice. No explicit
+ *  lock_timeout, like every sibling prune: the only writer that can hold one
+ *  of these rows is the issue-time reaper deleting the same expired garbage
+ *  (whoever wins did the work), bounded by the 15s session ceiling. */
 export async function pruneExpiredWocStepUpChallengesBatch(
   pool: Pool,
   batchSize: number,
