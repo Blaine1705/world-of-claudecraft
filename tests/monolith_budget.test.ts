@@ -165,8 +165,12 @@ const MONOLITHS: MonolithRow[] = [
     // reconcile, the clearAurasFromSource predicate); the branch's delegates
     // are unchanged and the merged file stays under the release's own 12660
     // row. Exact merged count.
+    // Re-pinned 12527 -> 12531 at the fourth v0.39.0 sync merge (release tip
+    // ea9377db8e): release-side growth only (the druid auto-unshift strip at
+    // cast commit and the aggro/taunt boolean gates); the branch's delegates
+    // are unchanged. Exact merged count, still under the release's own 12660.
     file: 'src/sim/sim.ts',
-    ceiling: 12527,
+    ceiling: 12531,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -191,8 +195,12 @@ const MONOLITHS: MonolithRow[] = [
     // b650d9d7d2): the release moved the mech-chroma reconcile out to
     // server/mech_chroma_reconcile.ts, so the merged file landed SMALLER and
     // the ratchet follows it down (exact merged count, zero headroom).
+    // Re-pinned 10807 -> 10813 at the fourth v0.39.0 sync merge (release tip
+    // ea9377db8e): release-side growth only (the druid parked-mana sm field
+    // in the self-snapshot build plus its wireParkedMana import); the
+    // branch's own surface is unchanged (exact merged count, zero headroom).
     file: 'server/game.ts',
-    ceiling: 10807,
+    ceiling: 10813,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
