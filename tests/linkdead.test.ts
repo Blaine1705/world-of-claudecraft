@@ -223,6 +223,48 @@ describe('linkdead grace lifecycle', () => {
     expect(server.clients.size).toBe(1);
   });
 
+  it('adopts an explicit mutedUntil/reason/strikes supplied on resume', () => {
+    // resumeSession trusts meta.mutedUntil/reason/chatStrikes as-is: the race
+    // that could make that snapshot stale (an admin /mute or the chat
+    // filter's own optimistic mute landing on this exact still-linkdead
+    // session while ws_auth.ts's account read is in flight) is fenced
+    // upstream, before this value is ever computed (server/chat_mod_live.ts,
+    // exercised end to end in tests/server/ws_auth.test.ts). This pins the
+    // wiring half: an explicit fresh mute must actually reach the session.
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Muted', 'warrior', null));
+    dropSocket(server, session, ws);
+    expect(session.chatMutedUntil).toBeNull();
+
+    const ws2 = fakeWs();
+    const mutedUntil = new Date(Date.now() + 5 * 60_000).toISOString();
+    const resumed = expectJoined(
+      server.join(ws2, 11, 101, 'Muted', 'warrior', null, false, {
+        mutedUntil,
+        reason: 'spam',
+        chatStrikes: 2,
+      }),
+    );
+
+    expect(resumed.chatMutedUntil).toBe(new Date(mutedUntil).getTime());
+    expect(resumed.chatMuteReason).toBe('spam');
+    expect(resumed.chatStrikes).toBe(2);
+  });
+
+  it('resumes unmuted when nothing was ever muted and the resume meta carries no mute', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'NeverMuted', 'warrior', null));
+    dropSocket(server, session, ws);
+    expect(session.chatMutedUntil).toBeNull();
+
+    const ws2 = fakeWs();
+    const resumed = expectJoined(server.join(ws2, 11, 101, 'NeverMuted', 'warrior', null));
+
+    expect(resumed.chatMutedUntil).toBeNull();
+  });
+
   it('ignores a late close event from the pre-resume socket', () => {
     const server = new GameServer();
     const ws = fakeWs();

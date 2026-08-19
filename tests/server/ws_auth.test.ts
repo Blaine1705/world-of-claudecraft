@@ -11,6 +11,7 @@ import type * as http from 'node:http';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WebSocket, WebSocketServer } from 'ws';
+import { ChatModerationLiveState } from '../../server/chat_mod_live';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
 import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
@@ -77,6 +78,7 @@ function setup() {
   const ws = new FakeWs();
   const session = { pid: 1, tag: 'fake-session' };
   const generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
+  const chatModerationLiveState = new ChatModerationLiveState();
   const game = {
     isIpBlocked: vi.fn((_ip: string) => false),
     countIpSessions: vi.fn((_ip: string) => 0),
@@ -89,6 +91,9 @@ function setup() {
     socketClosed: vi.fn(() => true),
     beginGeneralChatRateLimitHydration: vi.fn((accountId: number) =>
       generalChatRateLimitLiveState.beginHydration(accountId),
+    ),
+    beginChatModerationHydration: vi.fn((accountId: number) =>
+      chatModerationLiveState.beginHydration(accountId),
     ),
   };
   const deps: WsAuthDeps = {
@@ -134,7 +139,7 @@ function setup() {
     maxPlayersPerRealm: 0,
   };
   const req = {} as http.IncomingMessage;
-  return { ws, game, session, deps, req, generalChatRateLimitLiveState };
+  return { ws, game, session, deps, req, generalChatRateLimitLiveState, chatModerationLiveState };
 }
 
 function joinedMeta(game: ReturnType<typeof setup>['game']): Record<string, unknown> {
@@ -1039,6 +1044,59 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
       await authenticating;
 
       expect(joinedMeta(current.game).generalChatRateLimit).toEqual(committed);
+    },
+  );
+
+  it.each([
+    {
+      label: 'mute',
+      hydrated: null,
+      committed: { mutedUntil: '2099-01-01T00:00:00.000Z', reason: 'spam', strikes: 0 },
+    },
+    {
+      label: 'unmute',
+      hydrated: '2099-01-01T00:00:00.000Z',
+      committed: { mutedUntil: null, reason: '', strikes: 0 },
+    },
+  ])(
+    // Reproduces the resume race server/chat_mod_live.ts exists to close: a
+    // mute or unmute pushed onto this account WHILE the auth query snapshot
+    // below is still in flight must win over that now-stale snapshot,
+    // whichever direction it moved.
+    'uses a committed chat-moderation $label that arrives during auth hydration',
+    async ({ hydrated, committed }) => {
+      const current = setup();
+      let resolveCharacter!: (character: CharacterRow | null) => void;
+      current.deps.moderationStatusForAccount = vi.fn(async () =>
+        modStatus({ chatMutedUntil: hydrated }),
+      );
+      current.deps.getCharacter = vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise<CharacterRow | null>((resolve) => {
+              resolveCharacter = resolve;
+            }),
+        )
+        .mockResolvedValue(baseChar());
+      const authenticating = createWsAuth(current.deps).authenticateWebSocket(
+        asWs(current.ws),
+        authRaw(),
+        current.req,
+      );
+      await vi.waitFor(() =>
+        expect(current.deps.moderationStatusForAccount).toHaveBeenCalledOnce(),
+      );
+
+      current.chatModerationLiveState.changed(1, committed);
+      resolveCharacter(baseChar());
+      await authenticating;
+
+      expect(joinedMeta(current.game)).toMatchObject({
+        mutedUntil: committed.mutedUntil,
+        reason: committed.reason,
+        chatStrikes: committed.strikes,
+      });
     },
   );
 

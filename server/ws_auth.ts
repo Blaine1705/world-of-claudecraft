@@ -289,6 +289,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // notification received during later handshake awaits overrides this query's
     // stale value at the synchronous game.join boundary, with no second DB read.
     const generalChatRateLimitHydration = game.beginGeneralChatRateLimitHydration(accountId);
+    // Same capture-before-the-read contract as above, for the sibling
+    // mute/reason/strikes snapshot: see chat_mod_live.ts for why this fence
+    // exists (a live push landing on this same still-linkdead session during
+    // the reads below must never be discarded by the stale snapshot they'd
+    // otherwise resolve to).
+    const chatModerationHydration = game.beginChatModerationHydration(accountId);
     try {
       const status = await moderationStatusForAccount(accountId);
       if (status.locked) {
@@ -305,6 +311,11 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         return;
       }
       const chatMute = await chatMuteStatusForAccount(accountId);
+      const resolvedModeration = chatModerationHydration.resolve({
+        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
+        reason: chatMute.reason,
+        strikes: status.chatStrikes,
+      });
       // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
       // is handled inside game.join(); this guard blocks egregious bot farms before
       // they consume a session slot.
@@ -329,9 +340,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
-        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
-        reason: chatMute.reason,
-        chatStrikes: status.chatStrikes,
+        mutedUntil: resolvedModeration.mutedUntil,
+        reason: resolvedModeration.reason,
+        chatStrikes: resolvedModeration.strikes,
         accountCosmetics,
         isAdmin,
         adminPermissions,
@@ -572,6 +583,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
     } finally {
       generalChatRateLimitHydration.release();
+      chatModerationHydration.release();
     }
   }
 

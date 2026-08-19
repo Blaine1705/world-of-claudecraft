@@ -163,6 +163,11 @@ import {
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
 import {
+  type ChatModerationHydration,
+  ChatModerationLiveState,
+  pushChatModerationChange,
+} from './chat_mod_live';
+import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
   persistCheaterMark,
   refreshCheaterMark,
@@ -1886,6 +1891,7 @@ export class GameServer {
   private readonly moderation: ModerationService<ClientSession>;
   private readonly generalChatQuota: GeneralChatQuotaCoordinator;
   private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
+  private readonly chatModerationLiveState = new ChatModerationLiveState();
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -3244,6 +3250,10 @@ export class GameServer {
   /** Fence an auth-query policy snapshot against later LISTEN notifications. */
   beginGeneralChatRateLimitHydration(accountId: number): GeneralChatRateLimitHydration {
     return this.generalChatRateLimitLiveState.beginHydration(accountId);
+  }
+
+  beginChatModerationHydration(accountId: number): ChatModerationHydration {
+    return this.chatModerationLiveState.beginHydration(accountId);
   }
 
   generalChatQuotaInFlight(): number {
@@ -6298,6 +6308,7 @@ export class GameServer {
       if (session.accountId !== accountId) continue;
       session.chatMutedUntil = until.getTime();
       session.chatMuteReason = reason.trim();
+      pushChatModerationChange(this.chatModerationLiveState, session);
       this.send(session, {
         t: 'events',
         list: [{ type: 'error', text: this.chatMuteMessage(session) }],
@@ -6368,6 +6379,7 @@ export class GameServer {
       if (session.accountId === accountId) {
         session.chatMutedUntil = null;
         session.chatMuteReason = '';
+        pushChatModerationChange(this.chatModerationLiveState, session);
       }
     }
   }
@@ -6375,7 +6387,9 @@ export class GameServer {
   /** Reflect an admin "reset strikes" on any live sessions. */
   resetChatStrikesLive(accountId: number): void {
     for (const session of this.clients.values()) {
-      if (session.accountId === accountId) session.chatStrikes = 0;
+      if (session.accountId !== accountId) continue;
+      session.chatStrikes = 0;
+      pushChatModerationChange(this.chatModerationLiveState, session);
     }
   }
 
@@ -10661,6 +10675,7 @@ export class GameServer {
         session.chatMutedUntil = applied.chatMutedUntil
           ? new Date(applied.chatMutedUntil).getTime()
           : session.chatMutedUntil;
+        pushChatModerationChange(this.chatModerationLiveState, session);
       })
       .catch((err) => console.error('applyChatStrike failed:', err));
     void recordChatViolation({

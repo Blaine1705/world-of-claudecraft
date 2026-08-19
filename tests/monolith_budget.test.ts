@@ -138,7 +138,14 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'server/game.ts',
-    ceiling: 10900,
+    // Raised from 10900 for fix/chat-mute-resume-race: the account
+    // chat-moderation hydration fence (server/chat_mod_live.ts, a new
+    // sibling module) needed five call-site wire-ins (muteAccountChat,
+    // liftChatMuteLive, resetChatStrikesLive, enforceChatPolicy, and the
+    // begin-hydration accessor) that touch this file's private mutable
+    // session/client state directly, so they cannot move out further. Small
+    // margin over the file's real size per the ratchet policy.
+    ceiling: 10915,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
