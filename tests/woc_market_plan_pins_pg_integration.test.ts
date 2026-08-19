@@ -215,7 +215,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     expect(plan).not.toMatch(/Seq Scan on woc_market_directed_offers/);
     expect(plan).not.toMatch(/Seq Scan on woc_market_settlements/);
     expect(plan).toContain('woc_market_settlements_listing_latest');
-  }, 60_000);
+  }, 20_000);
 
   it('every browse sort is an ordered index walk: price_desc now has its own direction', async () => {
     const realm = 'plans-browse';
@@ -258,7 +258,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
       // mismatch this index exists to close has come back.
       expect(plan, `${sort} must not plan a sort`).not.toMatch(/Sort/);
     }
-  }, 60_000);
+  }, 20_000);
 
   it('the five stuck-readout classes are index-reachable end to end', async () => {
     take();
@@ -274,7 +274,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     expect(joined, 'delivering + review age').toContain('woc_market_settlements_state_updated');
     expect(joined, 'undisposed listings').toContain('woc_market_listings_undisposed');
     expect(joined, 'stuck bonds').toContain('woc_market_bids_bond_confirming');
-  }, 60_000);
+  }, 20_000);
 
   it('the redrive page walks live ids and probes settlements through the composite', async () => {
     // The distribution this partial index exists for: a long dead prefix in
@@ -363,7 +363,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     // realm) is often the cheapest of the three. Which one wins is a
     // cost-model choice; the regression class is the seq scan.
     expect(residuePlan).toMatch(/woc_market_settlements_(listing_latest|open2|state_updated)/);
-  }, 60_000);
+  }, 20_000);
 
   it('both rotation-order batch reads ride their COALESCE partials without a sort', async () => {
     take();
@@ -379,7 +379,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     expect(returnsPlan).not.toMatch(/Seq Scan on woc_market_listings/);
     expect(returnsPlan).toContain('woc_market_listings_undisposed_rotation');
     expect(returnsPlan).not.toMatch(/Sort/);
-  }, 60_000);
+  }, 20_000);
 
   it('the sold-residue dispose seeks its partial and proves the sale through the once index', async () => {
     take();
@@ -390,7 +390,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     expect(plan).toContain('woc_market_listings_sold_undisposed');
     expect(plan).not.toMatch(/Seq Scan on woc_market_sales/);
     expect(plan).toContain('woc_market_sales_listing_once');
-  }, 60_000);
+  }, 20_000);
 
   it('the offer expiry and converge probes ride their partials', async () => {
     const realm = 'plans-probes';
@@ -420,7 +420,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     const convergePlan = await planOf(converge.text, converge.values);
     expect(convergePlan).not.toMatch(/Seq Scan on woc_market_directed_offers/);
     expect(convergePlan).toContain('woc_market_offers_accepted_unstamped');
-  }, 60_000);
+  }, 20_000);
 
   it('the buy-now cooldown ledger probes are index probes on the abandons table', async () => {
     const realm = 'plans-cooldown';
@@ -437,7 +437,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
       expect(plan).not.toMatch(/Seq Scan on woc_market_buy_now_abandons/);
       expect(plan).toMatch(/woc_market_buy_now_abandons_(once|account)/);
     }
-  }, 60_000);
+  }, 20_000);
 
   it('the cascade pick derives prior winners store-side and stays on the bids index', async () => {
     const realm = 'plans-cascade';
@@ -477,7 +477,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     const plan = await planOf(pick.text, pick.values);
     expect(plan).not.toMatch(/Seq Scan on woc_market_bids/);
     expect(plan).toContain('woc_market_bids_listing');
-  }, 60_000);
+  }, 20_000);
 
   it('the booked-claims prune plans anti-join referent seeks behind its cursor, never table scans', async () => {
     // The pin the db review demanded after measuring the first cut: the
@@ -517,5 +517,5 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     // scans and so dodge every seq-scan assert): a pull-up-blocked probe
     // plans as a SubPlan, the anti-join never does.
     expect(plan).not.toMatch(/SubPlan/);
-  }, 60_000);
+  }, 20_000);
 });
