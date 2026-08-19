@@ -917,6 +917,15 @@ export class OptionsWindow {
     return body;
   }
 
+  // Restore exactly these keys, re-apply them to their subsystem, then redraw.
+  // Shared so a view whose scope also covers a bespoke row can widen the key list
+  // without restating what Reset to Defaults means.
+  private resetSettingScope(hooks: OptionsHooks, keys: readonly (keyof GameSettings)[]): void {
+    hooks.settings.reset(keys);
+    for (const k of keys) hooks.onSettingChange(k, hooks.settings.get(k));
+    this.render();
+  }
+
   // `controls` is the sub-view's own declarative control list (as built for
   // this render pass): Reset to Defaults scopes to exactly the setting keys
   // that view renders (issue 2341), rather than wiping the whole GameSettings
@@ -941,10 +950,7 @@ export class OptionsWindow {
         resetAction(hooks, keys);
         return;
       }
-      hooks.settings.reset(keys);
-      // re-apply only this view's settings to their subsystem, then redraw
-      for (const k of keys) hooks.onSettingChange(k, hooks.settings.get(k));
-      this.render();
+      this.resetSettingScope(hooks, keys);
     });
     const back = document.createElement('button');
     back.className = 'btn';
@@ -1888,7 +1894,12 @@ export class OptionsWindow {
       body.appendChild(reset);
       this.renderCrossHotbarRows(body, hooks);
     }
-    this.settingsViewFooter(controls);
+    // The display picker stays out of buildControllerControls (it is a dropdown and
+    // it reads beside the bar's own rows, not up in the toggle block), so its key is
+    // named here or Reset to Defaults would walk past the one row it cannot see.
+    this.settingsViewFooter(controls, (hooks, keys) =>
+      this.resetSettingScope(hooks, [...keys, 'gamepadCrossHotbarDisplay']),
+    );
   }
 
   // Which action-bar slot each cross-hotbar position casts. One row per position,

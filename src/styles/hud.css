@@ -9454,40 +9454,6 @@ body.xhb-mode #castbar {
     -1px 0 2px #000,
     0 -1px 2px #000;
 }
-.xhb-diamond {
-  display: grid;
-  grid-template-columns: repeat(3, var(--xhb-cell));
-  grid-template-rows: repeat(3, var(--xhb-cell));
-  gap: 2px;
-}
-.xhb-slot {
-  width: var(--xhb-cell);
-  height: var(--xhb-cell);
-  position: relative;
-}
-.xhb-slot[data-xhb-point="top"] {
-  grid-area: 1 / 2;
-}
-.xhb-slot[data-xhb-point="left"] {
-  grid-area: 2 / 1;
-}
-.xhb-slot[data-xhb-point="right"] {
-  grid-area: 2 / 3;
-}
-.xhb-slot[data-xhb-point="bottom"] {
-  grid-area: 3 / 2;
-}
-/* The double set: the same bar showing the second sixteen, marked by the accent
-   frame so a player never has to guess which set a press will cast from. */
-.xhb.xhb-expanded {
-  border-color: var(--gold);
-  box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
-}
-/* The pad has no cursor, so the keycap column the action bar shows would be noise
-   here: the button under each cell is the d-pad or face button it sits on. */
-.xhb-slot .keybind {
-  display: none;
-}
 
 /* The d-pad's UI-navigation highlight. An explicit class, not :focus-visible:
    focus set programmatically does not satisfy the browser's keyboard-like
@@ -9523,9 +9489,12 @@ body.xhb-mode #castbar {
 /* Pad navigation hides the OS pointer, which would otherwise sit abandoned
    wherever it was last left. Any real mouse or trackpad movement clears this
    class immediately (gamepad/dpad_focus_nav.ts), so a keyboard-and-mouse player
-   never loses their cursor. */
-body.pad-nav,
-body.pad-nav * {
+   never loses their cursor.
+   Gated on game-active, the in-world gate: a universal !important reaches the
+   start screen and character select too, where the pad drives nothing and the
+   player still needs a pointer to get into the world. */
+body.pad-nav.game-active,
+body.pad-nav.game-active * {
   cursor: none !important;
 }
 
