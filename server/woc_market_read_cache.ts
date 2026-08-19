@@ -52,12 +52,24 @@ import type { KeyedCachedReadStats } from './cached_read';
 import { KeyedCachedRead } from './cached_read';
 import type { WocBrowseQuery } from './woc_market';
 
+/** Browse and detail: the win is CROSS-PLAYER sharing (every viewer of a
+ *  page or a hot listing rides one read per TTL window), so the TTL matching
+ *  the 3s awaiting-chain poll is fine: one player's own cadence missing the
+ *  window does not matter when N players share the entry. With filtered
+ *  queries bypassing, the legitimate browse key space is small (sorts x
+ *  qualities x formats x live pages), so 128 holds the hot set. */
 export const WOC_MARKET_BROWSE_CACHE_TTL_MS = 3_000;
 export const WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES = 128;
 export const WOC_MARKET_DETAIL_CACHE_TTL_MS = 3_000;
 export const WOC_MARKET_DETAIL_CACHE_MAX_ENTRIES = 256;
 export const WOC_MARKET_HISTORY_CACHE_TTL_MS = 10_000;
 export const WOC_MARKET_HISTORY_CACHE_MAX_ENTRIES = 256;
+/** The activity readout is per account, so there is no cross-player win and
+ *  the TTL is DELIBERATELY at the poll cadence, not above it: its job is to
+ *  collapse bursts (open() racing the poll, a second window), while every
+ *  poll beat still reads the player's live payment state; a longer TTL
+ *  would trade payment-state visibility for hit rate on a surface whose
+ *  real fix was sequencing the fan-out. */
 export const WOC_MARKET_ME_CACHE_TTL_MS = 2_000;
 export const WOC_MARKET_ME_CACHE_MAX_ENTRIES = 512;
 
