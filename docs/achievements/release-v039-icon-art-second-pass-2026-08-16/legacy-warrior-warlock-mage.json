@@ -1,4 +1,9 @@
 {
+  "shippingDecision": {
+    "status": "reverted-from-shipping",
+    "date": "2026-08-19",
+    "reason": "Spell icon freeze: live class ability icons carry piloting muscle memory (bar scanning in PvE and PvP), so they are frozen at their pre-v0.39 art. The paintings recorded here passed art review and stay archived for any future deliberate, player-facing refresh event. See docs/design/spell-icon-freeze.md and tests/spell_icon_freeze.test.ts."
+  },
   "schemaVersion": 1,
   "batch": "release-v039-second-pass-legacy-warrior-warlock-mage-2026-08-16",
   "generatedAt": "2026-08-16",
@@ -82,7 +87,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -151,7 +161,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -220,7 +235,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -289,7 +309,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -358,7 +383,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -427,7 +457,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -496,7 +531,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -565,7 +605,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -634,7 +679,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -707,7 +757,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -776,7 +831,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -845,7 +905,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -914,7 +979,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -983,7 +1053,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -1052,7 +1127,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -1121,7 +1201,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -1190,7 +1275,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -1263,7 +1353,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -1332,7 +1427,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -1401,7 +1501,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
@@ -1474,7 +1579,12 @@
           "semantic": "accepted",
           "crop": "accepted",
           "style": "accepted",
-          "sizesPx": [128, 48, 32, 16],
+          "sizesPx": [
+            128,
+            48,
+            32,
+            16
+          ],
           "grayscale": "accepted",
           "circularCrop": "accepted"
         }
