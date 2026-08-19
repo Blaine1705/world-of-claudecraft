@@ -76,6 +76,11 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
  *  is invisible while two players are talking. */
 const WOC_TRADE_OFFER_POLL_MS = 2000;
 
+/** Backoff before a FAILED trade-partner lookup retries (the lookup rides
+ *  the 30/min quote bucket, so a refused call must not be re-sent on the
+ *  next paint). */
+const WOC_TRADE_PARTNER_RETRY_MS = 5000;
+
 /** The honest line for each way a deal can die without a sale. */
 const WOC_TRADE_CLOSED_KEYS: Record<WocOfferClosedReason, TranslationKey> = {
   cancelled: 'hudChrome.trade.woc.closedCancelled',
@@ -169,6 +174,11 @@ export class WocTradeController {
   private wocTradePartnerResolved = false;
   /** The name the partner lookup was issued for, so it runs once per trade. */
   private wocTradePartnerFor = '';
+  /** Earliest wall-clock moment a FAILED partner lookup may retry: a 429 or
+   *  an outage is not a verdict, so the arm stays unresolved (no false
+   *  "recipient has no wallet") and the lookup re-issues after this pause
+   *  instead of hammering the bucket that just refused it. */
+  private wocTradePartnerRetryAtMs = 0;
   private wocTradeEstimateTimer: number | null = null;
   /** Guards a late estimate from overwriting a newer one (last write wins). */
   private wocTradeEstimateSeq = 0;
@@ -1201,6 +1211,7 @@ export class WocTradeController {
         this.wocTradePartner = null;
         this.wocTradePartnerResolved = false;
         this.wocTradePartnerFor = '';
+        this.wocTradePartnerRetryAtMs = 0;
         // Before clearing it: a deal that was still live when the window shut
         // may have settled, and this side may not have seen it yet. Clears
         // wocTradeOffer itself, so the assignment it replaces is not repeated.
@@ -1265,12 +1276,24 @@ export class WocTradeController {
     // The standing offer is polled every pass (self-throttled by wall clock),
     // because either side may create or resolve one at any moment.
     this.pollWocTradeOffer(info.otherName, Date.now());
-    if (this.wocMarketHooks !== null && this.wocTradePartnerFor !== info.otherName) {
+    if (
+      this.wocMarketHooks !== null &&
+      this.wocTradePartnerFor !== info.otherName &&
+      Date.now() >= this.wocTradePartnerRetryAtMs
+    ) {
       this.wocTradePartnerFor = info.otherName;
       const name = info.otherName;
-      void this.wocMarketHooks.client.tradePartner(name).then((partner) => {
+      void this.wocMarketHooks.client.tradePartner(name).then((out) => {
         if (this.wocTradePartnerFor !== name) return; // the trade moved on
-        this.wocTradePartner = partner;
+        if (!out.ok) {
+          // A failed lookup (rate limit, outage) resolves NOTHING: leave the
+          // arm unresolved rather than render a false "recipient has no
+          // wallet" for the whole trade, and retry after a pause.
+          this.wocTradePartnerFor = '';
+          this.wocTradePartnerRetryAtMs = Date.now() + WOC_TRADE_PARTNER_RETRY_MS;
+          return;
+        }
+        this.wocTradePartner = out.partner;
         this.wocTradePartnerResolved = true;
         this.lastTradeSig = ''; // one repaint, to show the arm or its reason
       });

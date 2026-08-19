@@ -389,14 +389,22 @@ export class WocMarketClient {
     return out.ok ? out.data : null;
   }
 
-  /** Can this character be paid in $WOC? Null when there is no such character
-   *  on the realm, which the window treats the same as "cannot be paid". */
-  async tradePartner(characterName: string): Promise<WocTradePartnerView | null> {
+  /** Can this character be paid in $WOC? A definitive no-such-character
+   *  answer (the server's 404) resolves ok with a null partner, which the
+   *  window treats as "cannot be paid". Every OTHER failure (the read
+   *  limiter's 429, an outage) answers ok: false: that is a FAILED LOOKUP,
+   *  not a verdict, and rendering it as "recipient has no wallet" asserted
+   *  something the client never learned. */
+  async tradePartner(
+    characterName: string,
+  ): Promise<{ ok: true; partner: WocTradePartnerView | null } | { ok: false }> {
     const out = await this.request<{ partner: WocTradePartnerView }>(
       'GET',
       `/api/woc-market/trade-partner?name=${encodeURIComponent(characterName)}`,
     );
-    return out.ok ? out.data.partner : null;
+    if (out.ok) return { ok: true, partner: out.data.partner };
+    if (out.code === 'woc_market.not_found') return { ok: true, partner: null };
+    return { ok: false };
   }
 
   async offers(): Promise<{ ok: true; offers: WocOfferView[] } | WocMarketFail> {

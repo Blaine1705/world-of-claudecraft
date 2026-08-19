@@ -13,7 +13,7 @@
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
-import { itemQualityLabel } from './item_kind_label';
+import { ITEM_QUALITY_LABEL_KEYS, itemQualityLabel } from './item_kind_label';
 import { svgIcon } from './ui_icons';
 
 /** The browse faces' control row: the sort control LEADS the row (the 15 QA
@@ -74,11 +74,12 @@ export function wocEndsAtText(endsAtMs: number): string {
   });
 }
 
-/** The known quality vocabulary, for resolving the /status floor word to its
- *  localized name; an unrecognized future policy word renders verbatim
- *  rather than mislabeling (the server validated it, the client just cannot
- *  name it yet). */
-const QUALITY_WORDS = new Set(['poor', 'common', 'uncommon', 'rare', 'epic', 'legendary']);
+/** The known quality vocabulary, DERIVED from the exhaustive label record so
+ *  a new quality flows here in the same change that names it; the /status
+ *  floor word resolves to its localized name, and an unrecognized future
+ *  policy word renders verbatim rather than mislabeling (the server
+ *  validated it, the client just cannot name it yet). */
+const QUALITY_WORDS = new Set<string>(Object.keys(ITEM_QUALITY_LABEL_KEYS));
 
 /**
  * The empty Sell tab, with the realm's OWN policy resolved into the copy:
