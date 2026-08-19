@@ -1,5 +1,10 @@
 # Phase 4 starter: QA, identity and family
 
+Historical prompt: Phase 4 completed technically on 2026-08-18. The subsequent
+art review superseded its cartouche target and opened Phases 5-8. Do not use
+this file as the current resume point and do not open the PR from its old exit.
+Resume from `phase-05-heraldry-nameplate.md` via `state.md`.
+
 Model: grok-4.6. Reasoning: xhigh. Final contribution QA. Do not invent
 new motifs. Fix confirmed gaps only.
 
@@ -35,4 +40,5 @@ New design. Push or PR unless asked.
 ## Exit
 
 READY / READY WITH NOTES / NOT READY. Record commands and outcomes.
-If READY, the operator may open the PR from this worktree.
+This historical phase was READY WITH NOTES technically. It no longer authorizes
+opening the PR; Phase 8 owns the active shipping exit.

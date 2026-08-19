@@ -1,177 +1,180 @@
-# Deed-border cartouche: implementation plan
+# Deed Heraldry: implementation plan
 
-Turn the Book of Deeds wearable border from a stroked outline into a small
-forged name plaque (a cartouche). Cosmetic identity only. No power, no
-actionable information, no new image assets.
+Turn the Book of Deeds wearable border into a two-scale MMORPG identity reward:
+a compact forged seal and quiet name ribbon in the world, then a richer
+heraldic reveal on the player/target frame, inspect card, and picker. Cosmetic
+identity only. No power and no actionable information.
+
+The filename remains `deed-border-cartouche/implementation-plan.md` because it
+is the continuity packet for the existing branch. The Phase 1-4 cartouche is
+implemented and QA-green, but the post-Phase 4 art review rejected it as the
+shipping visual direction: it reads as UI outline, not a reward worth wearing.
+Phases 5-8 are the active completion plan and supersede the old visual target.
 
 Companion documents: `docs/design/deeds.md` (reward definition),
 `docs/design/reliquary.md` (Eternal Spoils / `reliquary_gilt`),
 `docs/design/graphics-settings-fairness.md` (identity vs bloom),
 `DESIGN.md` sections 1, 3, 4, 7.13, and 13 (crafted fantasy, gold is
-structural, nameplates, contracts), `docs/qa-gate.md`.
+structural, nameplates, contracts), `docs/qa-gate.md`, and the approved
+`art-direction.md` in this packet.
 
 This packet does not change who earns a border, how it is stored
 (`PlayerMeta.activeBorder` is still a deed id), or the wear command
 (`deed_set_border`). It changes how a worn slug is drawn.
 
-## Why four phases
+## Why eight phases
 
-The current accent is a 3-stroke rounded rect around the name row only
-(`drawBorderAccent` in `src/render/nameplate_canvas.ts`). Making it feel like
-a reward is a layout rewrite plus a family restyle. Those two build slices
-each need a dedicated QA gate before the next slice starts:
+Phases 1-4 are completed implementation history. They established the saved
+state, pure geometry seam, palette table, fairness pins, and screenshot
+coverage, but their visual result is not accepted for shipping.
 
-1. **Chassis.** Layout, well, shared hardware, every edge case, on today's
-   palettes.
-2. **QA: chassis.** Coverage audit, graphics-tier fairness, screenshots,
-   reviewers, selective gate. Stop if anything is missing.
-3. **Identity and family.** Motifs, Catalogue brass, picker, inspect, ring.
-4. **QA: identity and family.** Same rigor on the new surfaces, then the
-   contribution is ready.
+1. **Cartouche chassis.** Complete, retained as history.
+2. **QA: chassis.** Complete, retained as history.
+3. **Cartouche identity and family.** Complete, retained as history.
+4. **QA: cartouche identity.** Complete technically; visual review reopened
+   the feature.
+5. **World Deed Heraldry.** Replace the outline cartouche with the seal and
+   quiet name ribbon. Reconcile layout and tests deliberately.
+6. **QA: world heraldry.** Judge nameplate distance first, then geometry,
+   fairness, allocation, declutter, and screenshot evidence.
+7. **Social reveal family.** Build the player/target header, refined circular
+   portrait treatment, inspect banner, and meaningful picker preview.
+8. **QA: heraldry family.** Prove beauty, identity, accessibility, theme and
+   tier fairness, performance, and the complete social experience.
 
-A motif pass on a still-crooked box will look like another UI bug. A
-family restyle without a coverage audit will miss no-title, no-badge, or
-low-tier shedding. QA is a phase, not a paragraph at the end of a build
-phase.
-
-One PR is allowed if each QA phase is green before the next build phase
-starts on the same branch. Two PRs (chassis, then identity) are cleaner
-for review.
+Each new build slice has a dedicated QA phase. Phase 5 must not start the
+social surfaces, and Phase 7 must not begin until the world token is accepted.
+The contribution is not ready for a PR until Phase 8 is green.
 
 ## Current behavior (ownership)
 
 | Surface | What it does today |
 |---|---|
-| `src/ui/deed_border_view.ts` | Slug -> `{ frame, edge, glow }`. Four slugs: `curators_gilt` (ivory), `reliquary_gilt` (rich gold), `deepward` (teal), `prestige_laurels` (green). |
-| `src/render/nameplate_canvas.ts` `drawBorderAccent` | Dark contour + frame + inner hairline. Pad 5px x, 3px top, 0 bottom. Flush with the name-row floor. Title sits on the next line, outside the box. |
+| `src/ui/deed_border_view.ts` | Slug -> `{ frame, edge, glow, motif }`. Four reward slugs map to catalogue antique brass, vault gold, ward teal, and laurel green. |
+| `src/render/nameplate_canvas.ts` `drawBorderAccent` | Phase 4 cartouche: midnight well, multi-line perimeter, brackets, clasp, and tiny side motif around name + title. Technically correct, visually too outline-led. |
 | `src/render/nameplate_painter.ts` | Resolves `entity.border` through `deedBorderSlug` on the same cadence as `title`. Players only. |
-| `src/styles/hud.css` `.portrait-wrap[data-border]` | Circular 2px ring + outline + `--fx-shadow` bloom. |
-| `src/styles/shell.css` `.inspect-name[data-border]` | CSS rounded rect, same three custom properties. |
-| `src/ui/deeds_window.ts` Titles and Borders shelf | Text buttons, no preview swatch. |
-| `scripts/pr_shot_targets.mjs` `nameplate-border` | Offline shot of rank-5 Curator border + portrait ring. `when` is incomplete (misses `nameplate_canvas`). |
+| `src/styles/hud.css` `.portrait-wrap[data-border]` | Circular ring plus a small 12-o'clock clasp. The clasp can read as a checkbox; no heraldic target-name header exists. |
+| `src/styles/shell.css` `.inspect-name[data-border]` | Enlarged CSS cartouche around the name only. It does not create a ceremonial inspect reveal. |
+| `src/ui/deeds_window.ts` Titles and Borders shelf | Earned options show three anonymous color stripes; there is no live surface preview. |
+| `scripts/pr_shot_targets.mjs` | Working recipes for nameplate, picker, and inspect; they need heraldry labels, dependencies, and Phase 5/7 evidence variants. |
 
-Pinned today: shapes only (no per-slug sprite), "adds no vertical space" so
-the emote walk stays exact (`tests/nameplate_canvas.test.ts`), unique hex
-literals (`tests/deed_border_accent.test.ts`), forced-colors collapse to
-`Canvas` / `CanvasText`, identity is tier-invariant and only bloom sheds.
+Pinned today: shapes only (no per-slug sprite), shared `extraLift` 14 on both
+y-walks, declutter 32 / 34, unique hex literals
+(`tests/deed_border_accent.test.ts`), forced-colors collapse to `Canvas` /
+`CanvasText`, identity is tier-invariant, and only bloom sheds. Phase 5 may
+replace the geometry literals through the explicit E37-E46 supersession path.
 
 ## Desired behavior
 
-A worn border draws a **cartouche**: a thin midnight well, the existing
-three-layer metal edge, shared corner brackets, a top-center clasp, and
-(Phase 3) a per-slug side motif. It wraps the **name row and the title**
-as one plaque. Health, guild, cast bar, markers, combo pips, and raid
-marks stay outside.
+A worn reward draws **Deed Heraldry**. At world distance, a forged 16-18px
+seal sits immediately left of the name on a shallow midnight ribbon. The seal
+contains the existing catalogue, vault, ward, or laurel motif at a scale where
+its silhouette reads. The ribbon owns the name row only. It has a quiet material
+grain and at most a fine structural metal edge. It never becomes a full rounded
+rectangle around name + title.
 
-Gold stays structural: a fine antique edge, never a thick yellow bar, never
-a large gold fill (`DESIGN.md` 1.4 and 3). The well is ink, not gold.
+On interaction, the same seal, metal, and motif-derived pattern expand into a
+richer name header on the player and target frames and a ceremonial inspect
+banner. The Book of Deeds picker shows the seal, a material sample, and live
+surface previews instead of anonymous stripes.
 
-The borderless plate is unchanged, including the "no panel background on
-standard friendly plates" rule in `DESIGN.md` 7.13. A worn border is a
-special identity state, not a new default plate.
+Gold stays structural: a fine antique edge, never a thick yellow bar and never
+a large fill (`DESIGN.md` 1.4 and 3). The world remains the hero. Health,
+resource, guild, cast, markers, combo, raid marks, level, combat state, and
+other gameplay semantics stay outside the cosmetic treatment.
 
-## Locked decisions
+The borderless plate and frames are unchanged. A worn reward is a special
+identity state, not a restyle of every player or every HUD component.
 
-1. **Chassis, QA, identity, QA.** Do not start Phase 3 until Phase 2 is
-   green. Do not call the feature done until Phase 4 is green.
-2. **Wrap name + title.** One plaque. When there is no title, the plaque
-   hugs the name row only (still symmetrically padded). Guild stays outside,
-   between the health bar and the cartouche.
-3. **Shapes only.** No PNG/SVG frame per slug. The nameplate sprite-budget
-   pin stays: flipping slugs must not mint a text or image sprite.
-4. **Shared ink well.** One midnight fill (about 0.4 alpha) for every slug.
-   Metal color is what distinguishes them at distance. Do not per-slug the
-   well.
-5. **Shared hardware, per-slug motif.** Four corner L-brackets and one
-   top clasp are the chassis. Side motifs (book ticks, vault knot, ward
-   key, laurel sprigs) land in Phase 3 and dispatch on slug.
-6. **Catalogue color retune is Phase 3.** `curators_gilt` stays ivory until
-   the chassis is screenshot-true, then moves to warmer antique brass
-   (near `#c9b17a` / ink edge `#2a2214` / cream glow `#f3ead0`). Do not
-   steal `reliquary_gilt`'s `#f4ca43`. The other two palettes stay.
-7. **Optical centering.** Badge stack and name are one centered group
-   (already true). Title stays centered on the plate center (`screenX`),
-   including when badges make the name row left-heavy. Name-row text
-   (name, AI, cheater) is vertically centered with the badges, not
-   baseline-pinned to the row floor. Symmetric pad, about 8-10px x and
-   4-5px y.
-8. **Cartouche width is `max(nameRowWidth, titleWidth) + padX * 2`.** A
-   title wider than the name row must widen the plaque, not clip or wrap.
-9. **Documented extra lift, not "zero height".** Replace the current "adds
-   no vertical space" pin with a named extra lift from the geometry module
-   that `drawBase` and `drawEmote` both consume. Clasp and pad are part of
-   that lift.
-10. **Identity on every graphics tier.** The plaque, edge, well, hardware,
-    and (Phase 3) motif render at low. Only bloom / clasp glint may ride
-    `--fx-shadow`. Forced-colors still collapse every slug to the same
-    `Canvas` / `CanvasText` pair. The cartouche core must not take a tier,
-    governor, or effects-profile argument.
-11. **Module-first.** New geometry and path primitives land in a sibling
-    module, not as another block on `nameplate_canvas.ts`. Palettes and
-    motif kind stay on `deed_border_view.ts` so CSS surfaces never import
-    render. Shared numbers (pad, radius, well alpha, extraLift) are named
-    exports the canvas and the tests both import. Do not duplicate them.
-12. **Tests are written in the build phase, audited in the QA phase.**
-    Phase 1 and Phase 3 land decisive Vitest coverage for every matrix row
-    they touch. Phase 2 and Phase 4 refuse "it looks fine" as evidence.
-13. **Screenshots are QA deliverables.** Before/after, desktop and mobile
-    where the surface is not canvas-identical, committed under
-    `docs/screenshots/deed-border-cartouche/`. Use the existing
-    `nameplate-border` target in `scripts/pr_shot_targets.mjs` (extend its
-    `when` and recipes). Seed the lowest graphics preset unless the shot's
-    purpose is a tier comparison (`.claude/skills/pr-screenshots/SKILL.md`).
-14. **No new player-facing copy** unless the picker grows a visible
-    structure that needs a label. If a label is added, it is a `t()` key
-    in the matching `src/ui/i18n.catalog/` module, English only.
-15. **No sim, server, wire, or IWorld change is expected.** The slug
-    already travels. If a phase thinks it needs one, stop and surface it.
+## Locked decisions for Phases 5-8
+
+1. **The art direction is approved.** `art-direction.md` and its concept image
+   define the hierarchy and reward feel. Do not regress to a perimeter outline.
+2. **Two scales, one identity.** Compact seal + ribbon in the world; richer
+   player/target and inspect reveal on interaction.
+3. **Four slugs only.** `curators_gilt`, `reliquary_gilt`, `deepward`, and
+   `prestige_laurels`. No new deed, reward, slug, or motif.
+4. **Seal first.** The existing catalogue, vault, ward, or laurel motif becomes
+   the readable face of a forged medallion. It must not remain tiny side noise.
+5. **Name ribbon only.** The ribbon owns the name row. The chosen title returns
+   to its secondary text line outside. Guild and all gameplay rows stay outside.
+6. **No full outline.** Remove the cartouche perimeter, corner brackets, and
+   central nameplate clasp from the world token. Fine metal may edge or join the
+   ribbon, but it cannot box the whole nameplate.
+7. **Shared material, distinct identity.** Keep a common midnight well and
+   forged construction. Distinguish slugs through existing color, seal
+   silhouette, and a quiet pattern derived from the same motif.
+8. **Catalogue stays antique brass.** Keep `#c9b17a` / `#2a2214` / `#f3ebcf`.
+   It must not collide with Eternal Spoils `#f4ca43` or elite/quest `#f2c84b`.
+9. **Player and target are social reveals, not HUD reskins.** Keep portraits
+   circular. Put the seal at the portrait/name joint and pattern the name header
+   only. Do not recolor or wrap bars.
+10. **Inspect is the ceremonial canvas.** It shows the same seal/material plus
+    the real player name, equipped title when present, and localized deed name.
+11. **Picker teaches the reward.** Reuse `.deed-title-option`; earned options
+    show the actual seal and material. None is empty. Selection drives a live
+    world and interaction preview. The mobile floor remains 40x40.
+12. **Borderless stays clean.** No seal, ribbon, header pattern, special ring,
+    inspect banner, or fake picker material leaks into the empty state.
+13. **Identity on every tier.** Seal, ribbon, pattern, and structural edge render
+    at low. Only bloom may shed. Prefer no motion at any tier.
+14. **Hot path stays allocation-free.** Shapes only for the world token. No
+    generated bitmap, per-slug frame sprite, canvas gradient allocation, DOM
+    read, filter, or animation in the per-frame path.
+15. **Module-first.** Replace the old geometry behind a pure sibling core. Keep
+    the canvas thin and under its monolith ceiling. Static motif primitives have
+    one owner and are reused by cold surfaces rather than redrawn four ways.
+16. **Old geometry numbers are not new visual locks.** `#14110c` near 0.4 alpha
+    remains the material starting point. Phase 5 may remeasure pad, seal size,
+    radius, and `extraLift`; it must name and decisively pin the accepted values.
+17. **Tests change honestly.** E1-E36 remain historical coverage. When new
+    behavior intentionally invalidates an old literal, replace it and record the
+    supersession; never weaken it just to make the new design pass.
+18. **Screenshots are QA deliverables.** Phase 6 owns `phase-05/`; Phase 8 owns
+    `phase-07/`. Normal nameplate distance is the first acceptance view.
+19. **Player-facing copy is localized.** If "Deed Heraldry" or preview labels
+    ship, add proper `t()` keys and satisfy the current M16/i18n contract.
+20. **No sim, server, wire, or IWorld change.** The deed id already travels. If
+    a phase thinks it needs one, stop and surface it.
 
 ## Architecture (componentize first)
 
 ```
-deed_border_view.ts            slug -> palette + motif kind (UI_PURE_CORE)
-nameplate_cartouche_core.ts    layout + path primitives (RENDER_PURE_CORES)
-nameplate_canvas.ts            thin consumer: fill, stroke, place content
-hud.css / shell.css            ring + inspect, same custom properties
-deeds_window.ts                picker swatches (Phase 3)
-pr_shot_targets.mjs            nameplate-border (+ picker/inspect variants)
+deed_border_view.ts           slug -> palette + motif + static seal identity
+nameplate_heraldry_core.ts    seal/ribbon layout and caller-owned geometry
+nameplate_canvas.ts           thin hot-path consumer
+unit_frame_painter.ts         elided slug/palette/motif writes
+hud.ts + hud.css              player/target name-header reveal
+inspect_view/window + shell   ceremonial inspect banner
+deeds_window + components     seal options + event-driven live preview
+pr_shot_targets.mjs           world, target, inspect, picker evidence
 ```
 
-`src/render/nameplate_cartouche_core.ts` is DOM/Three/i18n-free. Register
-it in `RENDER_PURE_CORES` (`tests/architecture.test.ts`). It takes
-measured widths/heights and a slug, and fills a caller-owned result:
+Phase 5 replaces `nameplate_cartouche_core.ts` with
+`nameplate_heraldry_core.ts`; do not leave two active geometry systems. The new
+core is DOM/Three/i18n-free, registered in `RENDER_PURE_CORES`, and fills a
+caller-owned result containing:
 
-- outer `x, y, w, h`
-- well rect
-- edge / frame / inner hairline
-- corner brackets, clasp
-- content origins: name-row left/top, name baseline, title baseline
-- `extraLift` (the y-walk delta both drawers must apply)
-- Phase 3: motif primitives
+- name-row content origins and secondary title baseline
+- shallow ribbon bounds/path and its fine structural edge
+- forged seal bounds and the transform for normalized motif primitives
+- any tiny joint/rivet primitives approved by the screenshots
+- measured `extraLift` consumed by both base and emote y-walks
 
-Allocation rule: the core fills a caller-owned record. The nameplate
-hot path allocates nothing per plate per frame. Pin this with
-`tests/util/alloc_probe.ts` or an equivalent reference-stability check.
+The allocation rule remains: the world hot path creates nothing per plate per
+frame. Static motif primitives have one owner. If Phase 7 needs inline SVG on a
+cold DOM surface, derive it from those static primitives in a pure UI helper;
+do not duplicate four hand-authored symbols in CSS, HTML, and canvas.
 
-`BorderAccent` may gain a `motif` discriminant in Phase 3
-(`catalogue` / `vault` / `ward` / `laurel`). Colors stay unique
-repo-wide literals. A `well` fill is a named constant on the cartouche
-module, not a fourth hex on every slug.
+`src/ui/` already imports into the nameplate canvas (`deed_border_view`,
+`text_sprite_cache`). Keep that direction. `deed_border_view` must not import
+render. Do not grow `nameplate_canvas.ts` past its monolith ceiling.
 
-`src/ui/` already imports into the nameplate canvas
-(`deed_border_view`, `text_sprite_cache`). Keep that direction. Do not
-have `deed_border_view` import render.
+The player/target, inspect, and picker surfaces consume the same palette and
+motif discriminant through custom properties and `data-*` attributes. CSS owns
+cold-surface material and pattern. It never owns a second per-slug palette.
 
-Do not grow `nameplate_canvas.ts` past its monolith ceiling
-(`tests/monolith_budget.test.ts`). The extraction is mandatory.
-
-CSS family (Phase 3): inspect and the portrait clasp consume the same
-`--border-accent-frame|edge|glow` custom properties the ring already
-uses. Shared pad/radius numbers that CSS needs should be CSS variables
-written by the painter from the same named exports, not restated hex or
-magic px in `hud.css` / `shell.css`.
-
-## Edge-case matrix
+## Historical edge-case matrix (Phases 1-4)
 
 Every row is a Vitest with a decisive assertion (a wrong layout, a
 missing primitive, or a leaked palette hex must fail the test). Visual
@@ -218,13 +221,52 @@ confirmation is extra, never a substitute. Combinations marked
 | E35 | Char sheet refresh | `activeBorder` still busts the sheet sig (`char_sheet_sig_core.ts`). No visual regression required beyond that. | 3 |
 | E36 | ClientWorld / online | No IWorld change. Worn slug still arrives on the entity. If a phase touches `world_api` or the wire, stop. | 2 / 4 |
 
-Declutter: `nameplate_declutter.ts` uses a fixed 18px Y overlap and 20px
-stack. Phase 1 must measure `extraLift` and bump those constants if two
-bordered player plates can now overlap. Pin the new numbers (E24).
+E1-E36 explain and pin the implemented cartouche. They remain history, not the
+acceptance target for Phases 5-8. Phase 5 may replace assertions that directly
+require title-inside, perimeter brackets, the central clasp, old motif
+placement, or old geometry literals. It must preserve or replace the behavioral
+invariants those tests protected: centering, badge clearance, y-walk agreement,
+declutter, no sprites, forced colors, borderless behavior, and no wire drift.
+
+## Active edge-case matrix (Phases 5-8)
+
+Every row needs a decisive automated assertion and the visual rows also need
+named screenshot evidence. Phase 6 maps E37-E46. Phase 8 maps E47-E58.
+
+| Id | Case | Required read | Phase |
+|---|---|---|---|
+| E37 | World silhouette | Worn state emits one forged seal plus a shallow name ribbon; no full perimeter, four corner brackets, or central clasp primitive survives. | 5 |
+| E38 | Name + secondary title | Ribbon owns the name row only. Title is centered on its secondary line outside the ribbon. | 5 |
+| E39 | Name-row variants | Long/Unicode name, AFK/role prefix, AI/Cheater chip, and 15/24px badges neither collide with the seal nor move the name group off `screenX`. | 5 |
+| E40 | Four seal identities | Catalogue, vault, ward, and laurel use four distinct normalized primitive sets that remain distinguishable without color. | 5 |
+| E41 | Gameplay slots | Guild, HP, cast, combo, raid mark, quest marker, and emote keep their existing order and clearance. The reward never paints around them. | 5 |
+| E42 | Borderless / stale | Empty, unknown, removed, or title-reward ids emit no seal/ribbon and use the unchanged secondary-title path. | 5 |
+| E43 | Reaction and state | Friendly/hostile name color, current-target size, dead state, stealth opacity, and self-hide behavior survive the new geometry. | 5 |
+| E44 | Scale and y-walk | CSS-pixel geometry does not double-scale with DPR/uiScale. `drawBase` and `drawEmote` consume the same newly measured `extraLift`. | 5 |
+| E45 | Declutter | Two nearby heraldry plates clear each other using newly measured and literal-pinned Y threshold/stack values. | 5 |
+| E46 | Hot-path and fairness | No per-frame allocation, raster/sprite, gradient, filter, tier input, or governor input. Seal/ribbon survive low; forced colors use system colors. | 5 / 6 |
+| E47 | Player-frame reveal | A worn player gets the same seal and restrained name-header material; borderless player frame remains unchanged. | 7 |
+| E48 | Target-frame reveal | A bordered player target gets the same seal at the portrait/name joint and pattern on the name header only. Mobs/NPCs and target-of-target do not inherit it. | 7 |
+| E49 | Unit-frame semantics | Portrait stays circular. Level, elite, combat flash, title, sanction, HP, resource, absorb, cast, and debuffs keep hierarchy, color, and z-order. | 7 |
+| E50 | Portrait hardware | The hollow 12-o'clock checkbox clasp is gone or transformed into clearly integrated hardware; no square replaces the circle. | 7 |
+| E51 | Inspect banner | In-range bordered inspect shows seal, restrained pattern, real name, equipped title when present, and localized granting-deed name. Borderless and remote cards stay clean. | 7 |
+| E52 | Inspect constraints | The banner does not dominate the paperdoll, standing, flair badges, or equipment and remains readable on desktop/mobile. | 7 |
+| E53 | Picker options | Earned options show canonical seal + material + existing deed name. None is empty. Shared focus/active semantics and 40x40 touch floor survive. | 7 |
+| E54 | Picker live preview | Selection updates representative world and interaction previews from the live palette/motif without equipping until the existing action fires. | 7 |
+| E55 | Family single source | One slug resolves to the same palette and motif on world, player, target, inspect, and picker; no second per-slug color table or hand-copied symbol set exists. | 7 |
+| E56 | Themes and contrast | Classic, midnight, parchment, highContrast, and forced colors keep the name readable, the seal identifiable, and selection visible. | 7 / 8 |
+| E57 | Tier and motion | Full identity exists at low and high. Only bloom may differ. No continuous animation; reduced motion has nothing essential to remove. | 7 / 8 |
+| E58 | Persistence and wire | Equip/unequip, slug swap, character-sheet refresh, reconnect, and online mirror still use `activeBorder`; no sim/server/wire/IWorld change. | 7 / 8 |
+
+Phase 5 must remeasure `extraLift` and the declutter constants from the new
+world geometry. The old 14 / 32 / 34 literals remain history until replaced by
+the accepted Phase 5 numbers. Both y-walks and every decisive test move in the
+same change.
 
 ## Standing QA contract (every phase)
 
-Build phases write the tests. QA phases prove the tests are real.
+Build phases write the tests. QA phases prove the tests are real. For the active
+program, Phase 5 owns E37-E46 and Phase 7 owns E47-E58.
 
 A test is decisive when a wrong implementation fails it. Forbidden:
 constant-self-comparison, asserting a function equals itself, pinning
@@ -234,13 +276,11 @@ title gap, well alpha) are pinned to literals.
 
 Graphics-tier contract, pinned, not implied:
 
-- Identity primitives (well, three-layer edge, hardware, Phase 3 motif)
-  have no `gfx` / `governor` / `ui_effects_profile` / `data-fx-level`
-  input. Extend the existing path scan in
-  `tests/deed_border_accent.test.ts`.
-- The only tier-scaled quantity is bloom / clasp glint via `--fx-shadow`
-  (already 0 at low). Phase 3 must not add a second shed path that can
-  hide the plaque.
+- Seal, ribbon, pattern, fine edge, and integrated hardware have no `gfx` /
+  governor / effects-profile input. Extend the existing path scan in
+  `tests/deed_border_accent.test.ts` to every new module.
+- The only tier-scaled quantity is bloom via `--fx-shadow` (already 0 at low).
+  Phases 5 and 7 must not add another shed path that hides identity.
 - QA screenshots seed `graphicsPreset: 1` unless the shot is a deliberate
   low-vs-high comparison.
 
@@ -258,11 +298,11 @@ Reviewers (read-only, fresh, not the implementer):
 
 | Reviewer | When |
 |---|---|
-| `qa-checklist` | Every QA phase. |
-| `test-coverage-auditor` | Every QA phase. Map each matrix id in play to a named test. |
-| `frontend-seam-reviewer` | Every QA phase (render / UI / CSS). |
-| `architecture-reviewer` | Only if `src/sim/` was touched (it should not be). |
-| `cross-platform-sync` | Only if `world_api`, wire, or `ClientWorld` was touched (it should not be). |
+| `$woc-qa` / `docs/qa-gate.md` | Every QA phase; parent runs deterministic commands once. |
+| `woc_test_coverage` | Every QA phase. Map each active matrix id to a named decisive test and audit intentionally retired pins. |
+| `woc_frontend` | Every QA phase. Judge normal-distance craft, family, responsive layout, themes, forced colors, and fairness. |
+| `woc_sim_architecture` | Only if `src/sim/` was touched unexpectedly; stop before proceeding. |
+| `woc_cross_platform` | Only if `world_api`, wire, or `ClientWorld` was touched unexpectedly; stop before proceeding. |
 
 A QA phase is red if any matrix id in play has no decisive test, if the
 selective gate is red, if screenshots are missing, or if a reviewer
@@ -412,10 +452,12 @@ Starter prompt: `phase-03-identity.md`.
 
 ## Phase 4: QA, identity and family
 
-**Outcome.** The full vision is proven: chassis still holds, identity is
-distinct, family surfaces agree, every graphics tier shows the plaque,
-screenshots cover the new surfaces, reviewers are clean, selective gate
-is green. The contribution may be called ready.
+**Historical outcome.** The cartouche chassis held, every automated gate was
+green, and the Phase 3 album covered the surfaces. The subsequent visual review
+found that the result still read as a generic outline: color was visible before
+identity, motifs disappeared at play distance, the inspect treatment was a
+larger slab, the ring clasp resembled a checkbox, and picker stripes did not
+communicate reward. That review opened Phases 5-8.
 
 **In scope.**
 
@@ -444,11 +486,194 @@ is green. The contribution may be called ready.
 
 **Out of scope.** New motifs, extra slugs, drive-by HUD restyles.
 
-**Exit (feature ready).** Coverage map complete. Gate green. Screenshots
-committed and referenced. Reviewers READY or READY WITH NOTES that do
-not block. `progress.md` marks Phases 1-4 complete.
+**Historical exit.** Coverage map complete. Gate green. Screenshots committed
+and referenced. `progress.md` marks Phases 1-4 complete, but the feature is not
+ready to ship until Phase 8 closes.
 
 Starter prompt: `phase-04-qa-identity.md`.
+
+## Phase 5: world Deed Heraldry
+
+**Outcome.** The world-space reward is no longer a perimeter cartouche. It is a
+compact forged seal attached to a quiet name ribbon, recognizable at normal
+nameplate distance. The title returns to the secondary line. E37-E46 have
+decisive tests, and every intentionally retired E1-E36 pin has a documented
+replacement.
+
+**In scope.**
+
+- Add `src/render/nameplate_heraldry_core.ts` and
+  `tests/nameplate_heraldry_core.test.ts`; register the core in
+  `RENDER_PURE_CORES`.
+- Move the normalized catalogue/vault/ward/laurel seal primitives to one static,
+  allocation-free owner reachable by the renderer without reversing the
+  UI-to-render dependency.
+- Rewire `nameplate_canvas.ts` to draw the shallow well, fine edge, seal, and
+  approved minimal joint/rivets. Remove the world perimeter, four corner
+  brackets, central clasp, and tiny side-motif treatment.
+- Keep the name-row badge group optically centered on `screenX`. Place the seal
+  relative to the ribbon without letting it re-center the text incorrectly.
+- Restore the title to the secondary text line and keep guild/actionable slots
+  outside. Cover absent title and title wider than name without widening the
+  ribbon to the title.
+- Remeasure and export accepted seal/ribbon dimensions, alpha, and `extraLift`.
+  Update both y-walks and declutter constants from those values.
+- Replace `nameplate_cartouche_core.ts` and its test once migration is complete;
+  do not leave two active geometry paths.
+- Update the canvas/fairness/source-scan tests and record the E1-E36
+  supersession map in `progress.md`.
+- Update the `nameplate-border` shot recipe dependencies/label for heraldry so
+  Phase 6 captures the real diff.
+
+**Out of scope.** Player/target DOM header, inspect banner, picker redesign,
+new copy, new slugs/motifs, generated runtime image assets, animation, and Phase
+6 screenshot commitment.
+
+**Validation (implementer, before handing to QA).**
+
+```text
+npx tsc --noEmit
+npx vitest run tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts tests/nameplate_ai_tag.test.ts tests/nameplate_declutter.test.ts tests/deed_border_accent.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts
+npx @biomejs/biome check --write <changed files>
+```
+
+**Exit into Phase 6.** E37-E46 exist and pass. Old geometry tests were replaced,
+not weakened. There is one active core, no sprite/allocation/tier regression,
+and no Phase 7 surface work in the tree. `progress.md` and `state.md` point to
+Phase 6.
+
+Starter prompt: `phase-05-heraldry-nameplate.md`.
+
+## Phase 6: QA, world heraldry
+
+**Outcome.** Independent QA proves the seal reads at play distance, the name
+still wins the hierarchy, all four identities differ without relying only on
+color, and the new geometry is fair and cheap. This phase may reject technically
+correct work for weak reward feel.
+
+**In scope (read-only first, then fix-forward only for confirmed gaps).**
+
+- Audit the E1-E36 supersession map and map E37-E46 to named decisive tests.
+- Run the Phase 5 list, selective gate, and required QA workflow.
+- Dispatch `woc_test_coverage` and `woc_frontend` on the real diff vs
+  `origin/release/v0.39.0`.
+- Capture live-game evidence under
+  `docs/screenshots/deed-border-cartouche/phase-05/`:
+  - all four slugs at normal town/nameplate distance, low preset
+  - tight crop of all four seals only after the distance shots pass
+  - Catalogue vs Eternal Spoils side by side
+  - current-target-sized world plate
+  - long Unicode name and all-badge stress case
+  - title and no-title
+  - borderless control
+  - low vs high (identity same, bloom only)
+  - two nearby bordered players after declutter
+- Manual grayscale check on the four seal crops; color cannot be the only cue.
+- Verify forced colors through a real browser setting when available, otherwise
+  use the decisive unit pin and record the limitation.
+
+Generated concepts never count as QA proof. If a visual blocker requires a new
+direction mockup, use `$imagegen`, ground it in the live screenshot, save it
+under `direction/`, record its prompt, and keep it separate from captured proof.
+
+**Exit into Phase 7.** Tests and gate are green, reviewers have no blocking
+finding, and the normal-distance album earns a visual verdict of SHIP or SHIP
+WITH NOTES. "Readable when zoomed" is not enough. `state.md` points to Phase 7.
+
+Starter prompt: `phase-06-qa-heraldry-nameplate.md`.
+
+## Phase 7: social reveal family
+
+**Outcome.** The player and target HUD reveal the worn heraldry without
+reskinning gameplay bars; inspect provides the ceremonial reward moment; the
+Book of Deeds picker shows meaningful seal/material options and live previews.
+E47-E58 have decisive tests.
+
+**In scope.**
+
+- Extend the shared border view with the motif/custom-property data cold
+  surfaces need. Keep one slug-to-palette/motif table.
+- Add a player/target name-header host through the existing unit-frame painter
+  seam. Put the seal at the portrait/name joint and a quiet motif-derived pattern
+  behind the name header only.
+- Keep both portraits circular. Refine the ring to a fine family edge and remove
+  the current hollow top clasp when the joint seal becomes the hardware focus.
+- Preserve target name ellipsis, title spans, Cheater tag, reaction color, and
+  every bar/state z-order. Player and target only; party, pet, target-of-target,
+  NPC, mob, and object frames do not inherit the reward.
+- Extend inspect models with the existing localized granting-deed name. Build a
+  compact banner around name/title/deed label with the same seal/material and a
+  pattern derived from the existing motif.
+- Replace picker stripes with the canonical seal, material sample, and existing
+  deed name. None stays empty. Reuse `.deed-title-option`.
+- Add event-driven live preview for representative world and interaction forms.
+  Previewing a row must not equip it; only the existing picker action mutates
+  `activeBorder`.
+- Add only the necessary localized labels, satisfying M16 and a11y. Prefer the
+  existing deed name/title keys over new copy.
+- Update `docs/design/deeds.md`, `docs/design/reliquary.md`, and
+  `docs/design/graphics-settings-fairness.md` from cartouche terminology to the
+  implemented Deed Heraldry contract.
+- Update shot recipes for player/target, inspect, picker, theme, and mobile
+  variants. Phase 8 owns the committed album.
+
+**Out of scope.** New deed content, new motifs, changing reward eligibility,
+full unit-frame skinning, bar recolors, 3D capes/mounts, sparkle, continuous
+motion, sim/server/wire changes, and Phase 8 screenshot commitment.
+
+**Validation (implementer, before handing to QA).**
+
+```text
+npx tsc --noEmit
+npx vitest run tests/deed_border_accent.test.ts tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts tests/deeds_border_picker.test.ts tests/inspect_window.test.ts tests/inspect_view.test.ts tests/unit_frame_painter.test.ts tests/unit_frame.test.ts tests/localization_fixes.test.ts tests/i18n_completeness.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts
+npx @biomejs/biome check --write <changed files>
+```
+
+**Exit into Phase 8.** E47-E58 exist and pass. One family mapping drives every
+surface. Mobile/focus/forced-colors contracts are pinned. No gameplay bar or
+wire path changed. `progress.md` and `state.md` point to Phase 8.
+
+Starter prompt: `phase-07-social-reveal.md`.
+
+## Phase 8: QA, full Deed Heraldry family
+
+**Outcome.** The hard-earned reward is beautiful, coherent, legible, fair, and
+performant across every surface and supported presentation mode. The player can
+enable it confidently from the picker and is rewarded both by passive world
+recognition and by the richer social reveal.
+
+**In scope (read-only first, then fix-forward only for confirmed gaps).**
+
+- Audit the complete E37-E58 map plus every retained E1-E36 invariant.
+- Run both active-phase test lists, the required QA workflow, and
+  `node scripts/gate_select.mjs`.
+- Dispatch `woc_test_coverage` and `woc_frontend`; add another specialist only
+  if the finished diff actually touches its domain.
+- Capture the final live-game family album under
+  `docs/screenshots/deed-border-cartouche/phase-07/`:
+  - all four world seals at normal distance and in tight crops
+  - Catalogue vs Eternal Spoils
+  - low vs high
+  - player and target frames with the same active heraldry
+  - target frame with long localized title and Cheater tag
+  - inspect desktop, mobile, and parchment
+  - picker desktop, mobile, parchment, focus-visible, active, and None
+  - picker live preview for all four choices
+  - borderless world/player/target/inspect/picker controls
+- Wear each reward through the real Book of Deeds flow, click a bordered player,
+  inspect them, swap slugs, unequip, reconnect, and verify the owner/player-frame
+  view as well as the observer view.
+- Judge the world at nameplate distance first. Then inspect close craft, family,
+  motif legibility, parchment survival, and cheap-yellow/chrome regressions.
+- Record exact commands, screenshots, reviewer findings, fixes, and remaining
+  risks in `progress.md` and `state.md`.
+
+**Exit (feature ready).** E37-E58 coverage is complete, the selective gate is
+green, reviewers are READY or READY WITH NOTES without a blocking craft issue,
+the final album proves the approved art direction, and no unsupported system
+changed. Only then may the operator open a PR.
+
+Starter prompt: `phase-08-qa-heraldry-family.md`.
 
 ## Risks
 
@@ -467,13 +692,31 @@ Starter prompt: `phase-04-qa-identity.md`.
   build phase cannot close itself.
 - Identity accidentally shed on low. Mitigation: core takes no tier
   argument; fairness scan; low-preset screenshot.
+- The seal becomes a larger generic badge. Mitigation: keep it attached to the
+  name ribbon, use the deed motif as its face, and accept at normal distance.
+- The ribbon becomes the same cartouche with fewer strokes. Mitigation: E37
+  forbids a full perimeter and Phase 6 reviews distance before crops.
+- Target treatment expands into a full HUD skin. Mitigation: only the name
+  header and portrait joint receive heraldry; bars and state semantics are
+  explicitly pinned by E49.
+- Cold surfaces drift from the world seal. Mitigation: one palette/motif owner,
+  canonical static primitives, E55, and a side-by-side family album.
+- Picker preview mutates the equipped reward or becomes per-frame work.
+  Mitigation: selection preview is event-driven and equip remains on the
+  existing action path, pinned by E54.
+- A generated concept is mistaken for shippable UI or QA proof. Mitigation: the
+  concept is reference-only; runtime remains code-native and screenshots come
+  from the booted client.
 
 ## Worktree and branch
 
-```
-git worktree add ../wocc-deed-border-cartouche -b feature/deed-border-cartouche origin/release/v0.39.0
-cd ../wocc-deed-border-cartouche
-pnpm install --frozen-lockfile
+The worktree and branch already exist:
+
+```text
+cd /Users/fernando/Documents/wocc-deed-border-cartouche
+git status --short --branch
 ```
 
-Do not implement on `release/v0.39.0` itself. Do not base on `main`.
+Work only there on `feature/deed-border-cartouche`, diff vs
+`origin/release/v0.39.0`. Do not recreate the branch, implement on the release
+checkout, or base on `main`.

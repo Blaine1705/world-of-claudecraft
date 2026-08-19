@@ -1,19 +1,52 @@
-# Deed-border cartouche: progress
+# Deed Heraldry: progress
 
 | Phase | Status | Notes |
 |---|---|---|
 | 1. Cartouche chassis | complete | Core + canvas rewire landed. extraLift is 14. Declutter Y is 32 / 34. |
 | 2. QA: chassis | complete | Coverage map audited. Vacuous Object.keys pins replaced. E5/E7/E18/E22/E24 now have decisive assertions. Screenshots committed. Reviewers verified. `node scripts/gate_select.mjs` PASS (12 steps). |
 | 3. Identity and family | complete | Motifs, Catalogue brass, picker swatches, inspect cartouche, ring clasp, E27-E36 tests. |
-| 4. QA: identity and family | complete | Coverage map audited. Family screenshots under `phase-03/`. Reviewers READY WITH NOTES. `node scripts/gate_select.mjs` PASS (12 steps). |
+| 4. QA: cartouche identity | complete, visually superseded | Coverage map audited. Family screenshots under `phase-03/`. Reviewers READY WITH NOTES. `node scripts/gate_select.mjs` PASS (12 steps). Post-QA art review found the result too outline-led and reopened the feature. |
+| 5. World Deed Heraldry | complete | One 18px forged seal + quiet name ribbon, secondary title line, one pure core, E37-E46 tests. No social-surface work. |
+| 6. QA: world heraldry | complete: SHIP | Normal-distance and grayscale craft review passed. Live `phase-05/` album complete. E1-E46 audited, confirmed test gaps fixed forward, both reviewers READY, full 12-step gate green. |
+| 7. Social reveal family | complete | Player/target name header, refined circle, inspect banner, picker seals + event previews. E47-E58 are mapped below. |
+| 8. QA: full heraldry family | complete: READY WITH NOTES / SHIP WITH NOTES | E1-E58 audited. Final family album accepted. Focused suites, full selective gate, coverage, frontend, and gate-integrity reviews are green. |
 
-Phase 4 closed 2026-08-18 on `feature/deed-border-cartouche`. The operator may open the PR.
+Phase 4 closed technically on 2026-08-18. The same-day visual review returned
+NEEDS ANOTHER PASS: the perimeter read as UI chrome, motifs vanished at normal
+distance, inspect was a larger outline, the ring clasp resembled a checkbox,
+and picker stripes did not communicate earned identity. The operator approved
+the Deed Heraldry pivot in `art-direction.md`. Do not open the PR until Phase 8.
+
+Phase 5 completed the world implementation on 2026-08-18. The old outline
+cartouche core and test were intentionally replaced by one caller-owned heraldry
+core. Phase 6, not Phase 5, owned live screenshot and normal-distance craft
+acceptance; that audit is now recorded below.
+
+Phase 6 completed on 2026-08-18 with a **SHIP** verdict. The live world token
+passes at normal town distance before crop inspection, all four motifs remain
+distinct in grayscale, and confirmed reviewer gaps were closed with test-only
+fix-forward work.
+
+Phase 7 completed implementation on 2026-08-18. The accepted seal, material,
+and motif mapping now drives the player frame, valid player targets, inspect
+banner, picker options, and event-driven world and interaction previews.
+
+Phase 8 completed on 2026-08-18. The full Deed Heraldry family passed technical,
+coverage, craft, responsive, accessibility, theme, tier-fairness, and live-flow
+review. Final verdicts are **READY WITH NOTES** and **SHIP WITH NOTES**. The
+notes are branch synchronization with the advanced release base and unrelated
+headless mobile asset warnings; neither changes the accepted heraldry behavior.
 
 ## Coverage map (filled by QA phases)
 
-Every E1-E26 row names the assertion that would fail on a wrong pad, a missing well, a title left outside, a 24px Discord portrait kissing the floor, a leaked palette hex under forced-colors, or a y-walk desync. Load-bearing numbers are literals. E27-E36 now name Phase 3 tests. E36 is still the no-IWorld pin.
+This table is a frozen Phase 4 history record, not current coverage. It
+deliberately names cartouche tests and literals that Phase 5 retired. The
+complete disposition ledger below is the current E1-E36 acceptance record and
+maps every old pin to its retained invariant or E37-E46 replacement. Phase 8
+re-audited all 36 dispositions against the release-base diff. E36 remains the
+no-IWorld pin.
 
-| Id | Test file / name | Status |
+| Id | Historical test file / name | Phase 4 status only |
 |---|---|---|
 | E1 | `tests/nameplate_cartouche_core.test.ts` "hugs the name row with 9px x and 5px y pad and centers the name group" (`outer.w` 88, `outer.h` 26, `nameRowLeft` 285) | audited |
 | E2 | `tests/nameplate_cartouche_core.test.ts` "keeps the title baseline 9px below the name row" (baseline 209 inside well); `tests/nameplate_canvas.test.ts` "E2: a worn border draws the title with the name, inside the well" (`text.draw` Y is `titleBaseline`, inside well) | audited |
@@ -50,7 +83,396 @@ Every E1-E26 row names the assertion that would fail on a wrong pad, a missing w
 | E33 | `tests/deed_border_accent.test.ts` "E33: Catalogue brass does not collide with Eternal Spoils gold or elite gold" (`#c9b17a` / `#2a2214` / `#f3ebcf` vs `#f4ca43` and `#f2c84b`); single-source color scan still green | audited |
 | E34 | `tests/deed_border_accent.test.ts` "E34: cartouche identity adds no motion" (inspect, clasp, swatch, ring clasp have no animation/transition) | audited |
 | E35 | `tests/deed_border_accent.test.ts` "E35: changing activeBorder busts the character sheet refresh signature" (`charSheetRefreshSig` moves on wear and on slug swap) | audited |
-| E36 | `tests/deed_border_accent.test.ts` "E36: worn slug still arrives on entity.border with no world_api change"; `tests/nameplate_ai_tag.test.ts` `prog_prestige_10` -> `prestige_laurels`. `git diff --name-only origin/release/v0.39.0` still has no `src/world_api*`, `src/net/`, `server/`, or `src/sim/` files. | audited |
+| E36 | `tests/deed_border_accent.test.ts` "E36: worn slug still arrives on entity.border with no world_api change"; `tests/nameplate_ai_tag.test.ts` `prog_prestige_10` -> `prestige_laurels`. The merge-base-to-worktree feature diff has no `src/world_api*`, `src/net/`, `server/`, or `src/sim/` files; the direct two-tree diff only exposes newer release-base work absent from this branch. | audited |
+
+## Active coverage map (filled by Phases 5-8)
+
+Build phases replace `unmapped` with named decisive tests. QA phases audit each
+mapping and refuse a constant-self-comparison, source-presence-only assertion,
+or a screenshot standing in for behavior coverage.
+
+| Id | Owner | Test file / name | Status |
+|---|---|---|---|
+| E37 | Phase 5 | `tests/nameplate_heraldry_core.test.ts` "E37 world silhouette: one seal attached to one shallow name ribbon"; `tests/nameplate_canvas.test.ts` "E37/E40: pins the exact ribbon and $border seal path grammar for $name" across both row widths and all four slugs, plus the retired-perimeter assertion | audited |
+| E38 | Phase 5 | `tests/nameplate_heraldry_core.test.ts` "E38 name and secondary title geometry"; `tests/nameplate_canvas.test.ts` "E38: the ribbon owns the name row and the equipped title stays outside" | audited |
+| E39 | Phase 5 | `tests/nameplate_heraldry_core.test.ts` "E39 measured name-row variants stay centered and clear the seal"; `tests/nameplate_canvas.test.ts` "E39: Unicode, chips, and 15/24px badges stay centered and clear the seal" | audited |
+| E40 | Phase 5 / 6 | Core four-identity suite; deed-accent static-owner suite; forced-color geometry fingerprints; exact Canvas path grammar for every slug; source pin requires exactly one canonical `borderMotifPrimitives(kind)` read and direct loop consumption | audited |
+| E41 | Phase 5 | `tests/nameplate_canvas.test.ts` "E41: keeps guild below the health bar and outside the name ribbon" and "E41: pins every pair in the cast, HP, guild, quest, combo, raid, and emote y-walk" | audited |
+| E42 | Phase 5 | Core inactive-state suite; canvas no-paint/title tests; `tests/nameplate_ai_tag.test.ts` "E42: empty, stale, removed, and title-reward ids clear the world heraldry slug" | audited |
+| E43 | Phase 5 | Canvas death/stealth/reaction tests plus "E43: pairs ordinary 12px/16px/18px sizing against target 14px/18px/20px"; `tests/nameplate_ai_tag.test.ts` player-only and hidden-self tests | audited |
+| E44 | Phase 5 | Core caller-owned/CSS-pixel suite; canvas shared-lift and DPR 1/2 tests | audited |
+| E45 | Phase 5 | `tests/nameplate_declutter.test.ts` "E45: two heraldry plates 25px apart vertically clear at the accepted 28px pitch" and 95px left-seal boundary test | audited |
+| E46 | Phase 5 / 6 | Runtime reference-stability probe; fail-closed TypeScript-AST call-graph scans for the core and canvas painter; planted allocation/helper escapes; flat sprite count; forced colors; expanded tier/GFX/preset/motion guards; architecture registry; monolith ratchet | audited |
+| E47 | Phase 7 | `tests/unit_frame_painter.test.ts` "E47: writes one slug, palette, seal, and quiet header motif through elided writers" and "E47: clears every reveal slot for a borderless player"; `tests/deed_border_accent.test.ts` "E47/E48: only player and target documents expose the joint seal and header pattern hosts" | audited |
+| E48 | Phase 7 | `tests/deed_border_accent.test.ts` "E48: only a player target may resolve a target-frame heraldry slug" and the player/target-only document-host test; `tests/unit_frame_painter.test.ts` "E48: an instance without the two optional heraldry hosts pays zero identity writes" | audited |
+| E49 | Phase 7 | `tests/deed_border_accent.test.ts` "E49/E50: portraits stay circular, gameplay overlays win, and the hollow clasp is gone"; existing `tests/unit_frame.test.ts` full descriptor/title pass-through and `tests/unit_frame_painter.test.ts` elided HP/resource/absorb/title suites remain green | audited |
+| E50 | Phase 7 | `tests/deed_border_accent.test.ts` "E49/E50: portraits stay circular, gameplay overlays win, and the hollow clasp is gone" pins no heraldry `::before`, circular ring, joint seal, and level/combat overlay order | audited |
+| E51 | Phase 7 | `tests/inspect_view.test.ts` "E51: resolves a worn deed to its slug, motif, palette, and localized granting name"; `tests/inspect_window.test.ts` E51 canonical-style and rendered real-name/title/deed banner tests | audited |
+| E52 | Phase 7 | `tests/inspect_window.test.ts` "E52: keeps the ceremonial banner compact beside the paperdoll stage"; `tests/deed_border_accent.test.ts` "E52/E53/E57: mobile stacks previews without hiding identity, and tiers scale bloom only" | audited |
+| E53 | Phase 7 | `tests/deeds_border_picker.test.ts` E28 empty None plus "E53: earned options show the canonical seal and material; active and 40x40 stay"; mobile stack/tier test in `tests/deed_border_accent.test.ts` | audited |
+| E54 | Phase 7 | `tests/deeds_border_picker.test.ts` "E54: hover and focus swap the live preview without equipping" and "E54: previewing None is genuinely empty and still does not unequip" | audited |
+| E55 | Phase 7 | `tests/deed_border_accent.test.ts` "E55: every DOM seal derives from the canonical normalized primitives" suite, exact four path fingerprints, stable prebuilt paths, and one palette-owner scan | audited |
+| E56 | Phase 7 / 8 | `tests/deed_border_accent.test.ts` "E56: canvas and social-surface metal stay independent of every theme" plus forced-color arms for unit, inspect, picker, and previews; live classic, parchment, and forced-color evidence is in `phase-07/` | audited |
+| E57 | Phase 7 / 8 | `tests/deed_border_accent.test.ts` "E57: social heraldry adds no continuous motion" and the mobile/tier test, plus ring, seal, header, inspect, picker bloom-only and no-tier-selector pins; paired low/high evidence is in `phase-07/` | audited |
+| E58 | Phase 7 / 8 | `tests/deed_border_accent.test.ts` "E58: worn slug still rides activeBorder/entity.border with one explicit picker command", existing character-sheet signature pin, and diff guard for sim/server/wire/IWorld paths; `live-qa-evidence.json` records reconnect restoration | audited |
+
+## E1-E36 Phase 5 supersession ledger
+
+This ledger is exhaustive. "Retained" means Phase 5 kept the behavior and its
+test. "Superseded" means the old visual literal or cartouche-specific assertion
+was intentionally removed and a named E37-E46 assertion now owns the invariant.
+E29-E31 remain live only because Phase 7, not Phase 5, owns those social visuals.
+
+| Id | Phase 4 pin disposition in Phase 5 |
+|---|---|
+| E1 | **Superseded by E37/E39.** Full plaque pad 9/5, radius 6, outer 88x26, and lift 14 became ribbon pad 7/1, radius 2, an 18px seal, and lift 8. Name content remains centered on `screenX`. |
+| E2 | **Superseded by E38.** Title-inside-well geometry became the centered secondary line outside the ribbon. |
+| E3 | **Superseded by E38.** Title width no longer widens world geometry; `NameplateHeraldryInput` has no `titleWidth`. |
+| E4 | **Superseded by E39.** The 24px badge row no longer proves a 34px plaque or 5px floor; it proves a 26px ribbon with 1px vertical pad. |
+| E5 | **Superseded by E39.** The 15px badge no longer proves old outer height 26 or 6px floor clearance; it stays centered in the 16px row and clear of the seal. |
+| E6 | **Superseded by E39.** Top-left L-bracket arm clearance became an exact 4px gap between the seal edge and readable content. |
+| E7 | **Superseded by E39.** AI and Cheater share the name baseline inside the ribbon, not the old well. |
+| E8 | **Superseded by E39.** Old outer width 238 and 9px edge pad became measured content width plus 7px ribbon pad with the content midpoint still on `screenX`. |
+| E9 | **Visual anchor superseded; ordering retained.** The ribbon fill, rather than the old well, must paint before the dev outline and readable name. |
+| E10 | **Superseded by E43.** The current-target pin now proves an 18px row, 20px ribbon, and 14px name font instead of old outer height 28. |
+| E11 | **Bounds superseded; ordering retained by E41.** Guild text stays below HP and outside the ribbon. |
+| E12 | **Clasp-specific pin superseded by E41.** Cast/HP/quest/combo/raid/emote remain outside the token; steps 10/7/26/9/31/47 remain exact. |
+| E13 | **Superseded by E43.** A dead wearer keeps the seal/ribbon token without relying on a six-stroke plaque count. |
+| E14 | **Superseded by E43.** Stealth keeps 0.55 plate opacity; the ribbon product changed from `0.55 * 0.4` to `0.55 * 0.48`. |
+| E15 | **Superseded by E42.** Empty/unknown state zeros ribbon, seal, joint, rivets, and motif transform rather than outer/brackets/clasp fields. |
+| E16 | **Superseded by E46.** Forced colors map the new seal/ribbon to `Canvas`/`CanvasText`, with four geometry fingerprints retained without palette color. |
+| E17 | **Superseded by E44.** `extraLift` changed from 14 to 8; CSS-pixel and DPR-independent behavior remains. |
+| E18 | **Retained under E43.** Hidden self plus emote clears the worn slug and leaks no world identity. |
+| E19 | **Old plaque wording/strokes superseded; reaction invariant retained by E43.** Hostile name stays red while slug metal is unchanged; friendly color also remains. |
+| E20 | **Retained under E42/E43.** Mobs, NPCs, and objects never receive player heraldry. |
+| E21 | **Old well/hardware fields superseded by E42.** Borderless paints no seal/ribbon and keeps the ordinary secondary-title path. |
+| E22 | **Superseded by E44.** Base/emote shift changed from 14px and clasp clearance to one exact 8px lift with seal/ribbon clearance. |
+| E23 | **Superseded by E46.** Exact six-stroke cartouche became code-native seal/ribbon shapes, four expected seal/rivet arcs, static motifs, and flat sprite count across slug flips. |
+| E24 | **Superseded by E45.** X/Y/stack measurements are now 95/26/28 instead of 80/32/34. |
+| E25 | **Visual description superseded; fairness retained by E46.** Seal, ribbon, motif, and structural edge have no profile, tier, or governor input. |
+| E26 | **World visual description superseded; fairness retained by E46.** Identity remains complete at every preset; only the pre-existing social bloom may scale. |
+| E27 | **Retained.** World material remains theme-independent; social parchment checks are unchanged. |
+| E28 | **Retained.** Picker None remains empty. |
+| E29 | **Not changed in Phase 5; deferred to Phase 7.** The current three-color picker swatch, active/focus semantics, and 40x40 touch floor remain enforced. |
+| E30 | **Not changed in Phase 5; deferred to Phase 7.** Inspect keeps its current 9/5/6/0.4 cartouche chrome and forced-color behavior. |
+| E31 | **Not changed in Phase 5; deferred to Phase 7.** Circular ring, old clasp, level chip, and combat-flash ordering remain enforced. |
+| E32 | **Superseded by E40.** Tiny cartouche-coordinate side motifs became four deeply frozen, normalized, grayscale-distinct seal-face primitive sets. |
+| E33 | **Retained.** Catalogue brass remains `#c9b17a`/`#2a2214`/`#f3ebcf`, distinct from Eternal Spoils and elite gold. |
+| E34 | **Core path superseded; motion invariant retained by E46.** The world source is now `nameplate_heraldry_core.ts`; no animation or clock input was added. |
+| E35 | **Retained.** `activeBorder` still invalidates the character-sheet refresh signature. |
+| E36 | **Retained.** The deed slug still reaches `entity.border`; Phase 5 changes no sim, server, persistence, wire, or IWorld surface. |
+
+## Art-direction pivot
+
+- Approved reference:
+  `docs/screenshots/deed-border-cartouche/direction/deed-heraldry-concept.png`.
+- World recognition token: readable forged seal plus shallow midnight ribbon
+  behind the name row only. Title returns outside.
+- Interaction reveal: same seal/material on player and target name headers;
+  circular portrait remains; gameplay bars remain standard.
+- Inspect is the ceremonial reveal. Picker shows the actual seal/material and a
+  live preview instead of stripes.
+- Four slugs/motifs only. Catalogue brass remains distinct. Borderless stays
+  clean. Identity exists on every tier. Runtime remains code-native and
+  allocation-free on the world path.
+
+## Phase 5 notes
+
+- Tests were written first. The first full Phase 5 run was red as intended: 15
+  failing assertions plus 2 import-failed suites because the new core/API did
+  not exist, the old core still existed, and declutter still reported 80/32/34.
+- World geometry is now owned only by
+  `src/render/nameplate_heraldry_core.ts`. Normal 70x16 input at `(320, 200)`
+  yields ribbon `{ x:278, y:183, w:84, h:18 }`, seal
+  `{ x:263, y:183, size:18 }`, exact 3px seal/ribbon overlap, a 4px seal/content
+  gap, title center 320, and title baseline 209 outside the ribbon.
+- Accepted literals: ribbon pad 7/1, radius 2, well `#14110c` at 0.48, seal 18,
+  overlap 3, extra lift 8, title step/baseline 11/9, and name baseline offset 5.
+  Declutter is X/Y/stack 95/26/28.
+- Catalogue, vault, ward, and laurel normalized primitives have one deeply
+  frozen owner in `deed_border_view.ts`. The hot writer transforms them directly
+  and creates no sprite, raster, gradient, filter, transformed array, closure,
+  tier branch, or governor branch.
+- `nameplate_canvas.ts` is 842 lines under its new 852-line ratchet. The old
+  `nameplate_cartouche_core.ts` and paired test are deleted. Phase 7's
+  `CARTOUCHE_CHROME_*` 9/5/6/0.4 values remain unchanged.
+- Focused Phase 5 suite: 7 files, 196/196 tests passed. `npx tsc --noEmit`
+  passed. `npm run ci:changed` passed with 12 pre-existing warnings; the scoped
+  13-file Biome check passed with 5 pre-existing environment-variable warnings.
+- The first clean full gate exposed one test-harness assumption: the screenshot
+  reference scan tried to read the intentionally deleted, still-unstaged old
+  core reported by `git ls-files`. The scan now excludes paths absent from the
+  worktree while retaining its 6,000-file vacuity floor; its focused suite is
+  25/25. The final `npm run gate` passed all 12 steps with 8 Vitest workers.
+- `node scripts/gate_select.mjs` passed all 12 steps with 8 Vitest workers. Its
+  selected Vitest portion passed 883 files / 15,980 tests, with 8 files / 80
+  tests skipped.
+- Fresh `woc_test_coverage` and `woc_frontend` reviews were READY with no
+  actionable Phase 5 findings. At that handoff, Phase 6 still owned
+  normal-distance hierarchy, four-motif grayscale distinction, and crowded
+  live-image evidence; those checks are now closed below.
+- No sim, server, persistence, wire, or IWorld file changed. No runtime image,
+  slug, deed, title, lore, motif kind, or player-facing string was added.
+
+## Phase 6 notes: SHIP
+
+- Independent QA ran on 2026-08-18 in the requested worktree and branch,
+  against `origin/release/v0.39.0`. `git status --short --branch` was the first
+  command. The complete Phase 5 diff, every changed test, all E37-E46 mappings,
+  the exhaustive E1-E36 supersession ledger, and the Phase 1/3 screenshot
+  albums were reviewed. No sim, server, persistence, wire, or IWorld path is in
+  the Phase 5 diff.
+- Live capture used the booted client on `127.0.0.1:5187` with
+  `npm run dev -- --host 127.0.0.1 --port 5187`, then temporary ignored harnesses
+  `node tmp/phase6_distance_capture.mjs` and
+  `node tmp/phase6_stress_capture.mjs`. The harnesses were removed after capture.
+  Earned deed ids were seeded, then each reward was equipped through
+  `sim.setActiveBorder`, the real Book of Deeds eligibility/equip validator; no
+  arbitrary world-border slug was injected. The normal-distance read was judged
+  and passed before any close crop was accepted.
+- Normal-distance low-tier evidence:
+  `docs/screenshots/deed-border-cartouche/phase-05/normal-curators_gilt-town-low.png`,
+  `normal-reliquary_gilt-town-low.png`, `normal-deepward-town-low.png`,
+  `normal-prestige_laurels-town-low.png`, and
+  `normal-all-four-town-low.png`. Catalogue-vs-Eternal-Spoils evidence is
+  `normal-catalogue-beside-eternal-spoils-low.png`.
+- Only after that gate passed, the four seal crops were accepted:
+  `docs/screenshots/deed-border-cartouche/phase-05/seal-crop-curators_gilt.png`,
+  `seal-crop-reliquary_gilt.png`, `seal-crop-deepward.png`, and
+  `seal-crop-prestige_laurels.png`. The deterministic grayscale comparison is
+  `grayscale-four-seals.png` in Catalogue / Vault / Ward / Laurel order.
+- Stress and control evidence in the same folder:
+  `current-target-sized-nameplate-low.png`, `title-and-guild-low.png`,
+  `no-title-low.png`, `long-unicode-name-low.png`,
+  `all-badges-title-guild-bars-emote-low.png`, `borderless-control-low.png`,
+  `two-nearby-bordered-after-declutter-low.png`,
+  `graphics-comparison-low.png`, `graphics-comparison-high.png`,
+  `graphics-comparison-low-vs-high.png`, and `forced-colors-active.png`.
+  Forced colors was an actual Chrome DevTools `forced-colors: active` emulation
+  (`matchMedia('(forced-colors: active)').matches === true`), not a mocked unit
+  state.
+- Craft verdict: the name reads first, the 18px seal second, and metal third.
+  Catalogue page bars, Vault diamond/bar, Ward key, and Laurel fan remain
+  distinct without color. The 7/1 ribbon stays quiet and shallow. Title, guild,
+  HP/cast bars, markers, badges, and emotes remain outside and retain their
+  existing layout. Borderless is clean; the 95/26/28 declutter literals keep two
+  nearby bordered players clear. Low and high preserve the same identity, and
+  the result reads as earned heraldry in a crowded town. No image generation was
+  used for QA evidence.
+- Fresh read-only `woc_frontend` review initially found one evidence-only blocker:
+  the mail banner covered the high-tier `TIERPARITY` plate. The high leg and
+  combined comparison were recaptured after dismissing the banner. Re-review
+  returned **READY** and found the implementation/craft surface green, including
+  forced colors, borderless, hierarchy, crowding, and the allocation/sprite/tier
+  seams.
+- Fresh read-only `woc_test_coverage` review initially returned NOT READY on two
+  confirmed Phase 5 test gaps: bounded source-token lists could miss
+  `Object.values` / `Object.entries` / `JSON.parse` / `.concat` or a newly called
+  allocating helper, and the tests did not fully pin one canonical motif owner
+  across all four exact Canvas grammars. Phase 6 fixed forward in tests only:
+  `tests/helpers/hot_path_allocations.ts` now uses the TypeScript AST to walk
+  reachable functions/methods, reject allocation syntax/APIs, and fail unknown
+  bare, `this`, or property helper calls outside a narrow safe Canvas/Math/Object
+  allowlist. Planted escape cases prove the scanner. Core and painter call graphs,
+  exactly one `borderMotifPrimitives(kind)` lookup, direct primitive consumption,
+  all four exact path grammars, and `GFX` / `gfxTier` / `fxTier` /
+  `graphicsPreset` / `.animate()` fairness spellings are pinned. Re-review
+  returned **READY** with high confidence and no remaining blocking coverage gap.
+- Exact post-fix checks:
+  - `npx tsc --noEmit`: PASS. Its first run after adding the helper caught one
+    optional-body narrowing error in the test helper; an explicit body guard was
+    added and the final run passed.
+  - `npx vitest run tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts tests/deed_border_accent.test.ts`
+    passed 3 files and 95/95 tests.
+  - `npx vitest run tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts tests/nameplate_ai_tag.test.ts tests/nameplate_declutter.test.ts tests/deed_border_accent.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts`
+    passed 7 files and 203/203 tests.
+  - `npx @biomejs/biome check --write scripts/pr_shot_targets.mjs src/render/nameplate_canvas.ts src/render/nameplate_declutter.ts src/render/nameplate_heraldry_core.ts src/styles/hud.css src/ui/deed_border_view.ts tests/helpers/hot_path_allocations.ts tests/architecture.test.ts tests/ci_workflow.test.ts tests/deed_border_accent.test.ts tests/monolith_budget.test.ts tests/nameplate_ai_tag.test.ts tests/nameplate_canvas.test.ts tests/nameplate_declutter.test.ts tests/nameplate_heraldry_core.test.ts`
+    passed over 15 files, no fixes, five pre-existing screenshot-script env-var
+    warnings.
+  - `npm run i18n:gen`: PASS; UI/admin generated catalogs rewrote 0/26 files and
+    pending remained 0.
+  - `npx vitest run tests/architecture.test.ts tests/localization_fixes.test.ts tests/monolith_budget.test.ts tests/ci_workflow.test.ts`
+    passed 4 files and 124 tests, with 3 expected skips.
+  - `npm run ci:changed`: PASS over 20 selected files, no fixes, 12 pre-existing
+    warnings.
+  - `npm run gate`: PASS, all 12 steps green with 8 Vitest workers before the
+    test-only reviewer fix-forward.
+  - Initial `node scripts/gate_select.mjs`: PASS, all 12 steps; selected Vitest
+    passed 883 files / 15,980 tests with 8 files / 80 tests skipped, plus 20
+    browser files / 131 tests.
+  - Final `node scripts/gate_select.mjs` after the fix-forward: PASS, all 12
+    steps. The new unclassified helper correctly forced conservative full-suite
+    mode: 2,853 files passed / 12 skipped; 39,534 tests passed / 2 expected fail /
+    115 skipped; browser 20 files / 131 tests. Type/build/artifact steps passed;
+    malware gate passed 6,275 files / 373 prior flags / 0 high.
+  - `git diff --check`: PASS before and after QA changes.
+- Remaining non-blocking risk: the allocation guard is fail-closed static AST
+  analysis plus runtime reference-stability probing, not a heap profiler. Live
+  screenshots use headless SwiftShader and seeded offline players rather than a
+  production network crowd, though they exercise the real booted client,
+  renderer, validator, declutter, preset, and forced-color paths. The optional
+  world debug payload did not echo the active graphics preset, so the tier proof
+  combines the seeded low/high setting, paired unobstructed live renders, and
+  decisive no-tier-branch tests rather than a screenshot telemetry label.
+- Final Phase 6 verdict: **SHIP**. Phase 7 may be started in a new session only;
+  it was not implemented or begun here.
+
+## Phase 7 notes
+
+- Tests were written first for each surface. The initial focused runs failed on
+  missing unit-frame reveal hosts and writes, absent inspect banner data, the
+  old picker stripe structure, missing previews, and the retired clasp rules.
+  Implementation followed those failures rather than weakening the assertions.
+- `src/ui/deed_border_view.ts` remains the one family owner. It now derives one
+  cached SVG path per existing normalized motif, stores that path with the
+  palette record, and exports one attribute/style-token convention for every
+  DOM surface. No second color, coordinate, slug, or silhouette table landed.
+- The existing `UnitFramePainter` gained optional heraldry hosts. Player and
+  target instances write the slug, motif path, well, and palette through the
+  existing elided writers. Other instances omit the hosts and pay zero identity
+  writes. `deedTargetBorderSlug` fails closed for every non-player target.
+- `index.html` and `play.html` now give only player and target frames a joint
+  seal plus name-header pattern host. The portrait remains circular, the hollow
+  top clasp is removed, and the existing level and combat overlays remain above
+  the structural ring. The name, title, sanction, reaction color, bars, absorb,
+  cast, and debuff paths were not changed.
+- Inspect resolves the real localized granting-deed name in
+  `inspect_view.ts`. The painter renders a compact name/title/deed banner from
+  the same seal, material, and motif. Borderless and remote cards keep their
+  prior plain presentation.
+- Earned Book options now show the canonical seal and a patterned material
+  sample. None remains empty. Hover and focus repaint representative world and
+  interaction previews only on those events. The sole
+  `setActiveBorder` call remains inside the existing click action.
+- `docs/design/deeds.md`, `docs/design/reliquary.md`, and
+  `docs/design/graphics-settings-fairness.md` now describe the implemented
+  family. `scripts/pr_shot_targets.mjs` has Phase 8 recipes for unit frames,
+  inspect, picker preview, mobile, parchment, and low/high comparison. No Phase
+  8 screenshot was captured or committed.
+- Exact Phase 7 checks:
+  - `npx tsc --noEmit` passed.
+  - `npx vitest run tests/deed_border_accent.test.ts tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts tests/deeds_border_picker.test.ts tests/inspect_window.test.ts tests/inspect_view.test.ts tests/unit_frame_painter.test.ts tests/unit_frame.test.ts tests/localization_fixes.test.ts tests/i18n_completeness.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts`
+    passed 12 files, 340 tests, with 3 expected skips.
+  - `npx vitest run tests/nameplate_ai_tag.test.ts tests/nameplate_declutter.test.ts tests/cheater_tag.test.ts tests/hud_update_drive.test.ts tests/deeds_view.test.ts tests/pr_shot_targets.test.ts`
+    passed 6 files and 171 tests.
+  - `npx @biomejs/biome check --write index.html play.html scripts/pr_shot_targets.mjs src/render/nameplate_canvas.ts src/render/nameplate_declutter.ts src/render/nameplate_heraldry_core.ts src/styles/components.css src/styles/hud.css src/styles/shell.css src/ui/deed_border_view.ts src/ui/deeds_window.ts src/ui/hud.ts src/ui/inspect_view.ts src/ui/inspect_window.ts src/ui/unit_frame_painter.ts tests/helpers/hot_path_allocations.ts tests/architecture.test.ts tests/ci_workflow.test.ts tests/deed_border_accent.test.ts tests/deeds_border_picker.test.ts tests/inspect_view.test.ts tests/inspect_window.test.ts tests/monolith_budget.test.ts tests/nameplate_ai_tag.test.ts tests/nameplate_canvas.test.ts tests/nameplate_declutter.test.ts tests/nameplate_dev_glow.test.ts tests/nameplate_heraldry_core.test.ts tests/unit_frame_painter.test.ts`
+    passed over 29 files with no fixes on the final run and 8 pre-existing
+    warnings.
+  - `npm run ci:changed` passed over 20 selected files with 8 pre-existing
+    warnings.
+  - `git diff --check` passed. The release-base diff contains no `src/sim/`,
+    `server/`, `src/net/`, `src/world_api.ts`, or `src/world_api/` path.
+- Remaining risk belongs to Phase 8: the new social surfaces have not received
+  live normal-distance family review, real-browser focus/hover inspection,
+  final mobile/parchment/forced-colors captures, or the low/high bloom
+  comparison. No selective gate or specialist QA review was run here because
+  those are explicitly Phase 8 work.
+
+## Phase 8 notes: READY WITH NOTES / SHIP WITH NOTES
+
+- QA ran on 2026-08-18 in the requested worktree and branch against
+  `origin/release/v0.39.0`. `git status --short --branch` was the first command.
+  The complete working-tree diff, Phase 1, Phase 3, and accepted Phase 5 albums,
+  both active coverage maps, and every E1-E58 disposition were reviewed before
+  visual judgment.
+- The normal-distance world gate passed before close craft. Evidence starts
+  with `phase-07/12-all-four-world-normal-low.png`, followed by
+  `13-all-four-world-tight-low.png`. Name remains first, seal second, and metal
+  third. Catalogue, Vault, Ward, and Laurel stay distinct without relying on
+  color. The world token remains the accepted Phase 5 seal and quiet ribbon.
+- The final album is
+  `docs/screenshots/deed-border-cartouche/phase-07/`. Its canonical surface
+  frames are 01 through 11. Frames 12 through 13 cover world distance and
+  close craft. Frames 14 through 17 are corrected real Book equip flows for all
+  four rewards. Frames 18 through 21 are no-equip focus previews. Frames 22
+  through 29 cover peer inspect, reconnect, borderless controls, forced colors,
+  and the long German title plus Cheater target.
+- Real-flow evidence is recorded in `phase-07/live-qa-evidence.json`. All four
+  earned options were clicked through the Book of Deeds, each became active,
+  and each drove its matching preview. The same session separately proved
+  focus preview without equip, None unequip, owner and observer restoration
+  after character serialization/re-entry, a bordered peer inspect, forced
+  colors, and a localized long-title sanction line.
+- Low/high evidence is `02-deed-heraldry-unit-frames-desktop-low.png` and
+  `03-deed-heraldry-unit-frames-desktop-high.png`. The capture recipe now marks
+  the preset as explicit, asserts preset 1/3, `data-fx-level` low/high, and
+  `--fx-shadow` 0/1, freezes both desktop scenes through the real dev-only
+  `/daynight day` input path, and removes any stray options overlay. Tests pin
+  that structural identity never reads the tier; only `box-shadow` bloom reads
+  `--fx-shadow`.
+- Parchment evidence is `08-deed-border-picker-parchment.png` and
+  `11-inspect-border-cartouche-parchment.png`. Confirmed low-contrast copy was
+  fixed to use the dark-surface overlay token. The E56 test binds every tested
+  background to the production well constant and actual CSS gradient/mix
+  values, then enforces 4.5 contrast for option, preview name/deed, inspect
+  title, and granting-deed copy. Inspect frames 09 through 11 now also exercise
+  the existing long Armorcrafting title.
+- Forced colors is real Chromium emulation:
+  `matchMedia('(forced-colors: active)').matches` was true and frame 27 records
+  player, target, and picker slugs as `deepward`. None remains empty. Identity
+  edges use `CanvasText`; no gameplay data is hidden.
+- Focused commands and outcomes:
+  - `npx vitest run tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts tests/nameplate_ai_tag.test.ts tests/nameplate_declutter.test.ts tests/deed_border_accent.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts`
+    passed 7 files and 207 tests.
+  - `npx vitest run tests/deed_border_accent.test.ts tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts tests/deeds_border_picker.test.ts tests/inspect_window.test.ts tests/inspect_view.test.ts tests/unit_frame_painter.test.ts tests/unit_frame.test.ts tests/localization_fixes.test.ts tests/i18n_completeness.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts`
+    passed 12 files and 341 tests, with 3 expected skips.
+  - `npx vitest run tests/mobile_window_coverage.test.ts tests/mobile_window_layout.test.ts tests/mobile_window_transform.test.ts tests/i18n_completeness.test.ts tests/localization_fixes.test.ts tests/styles_extraction.test.ts tests/css_value_validity.test.ts tests/focus_visible_guard.test.ts tests/theme.test.ts tests/ui_effects_profile.test.ts tests/ui_effects_wiring.test.ts`
+    passed 11 files and 216 tests, with 1 expected skip.
+  - The final fix-forward run,
+    `npx vitest run tests/deed_border_accent.test.ts tests/deeds_border_picker.test.ts tests/inspect_window.test.ts tests/pr_shot_targets.test.ts tests/ci_workflow.test.ts`,
+    passed 5 files and 145 tests.
+  - `npx vitest run tests/deed_border_accent.test.ts tests/pr_shot_targets.test.ts`
+    passed 2 files and 74 tests after the final source-linked E56 pin.
+  - `npx tsc --noEmit` and `git diff --check` passed.
+  - `GATE_SELECT_BASE=origin/release/v0.39.0 node scripts/gate_select.mjs`
+    passed all 12 selected steps on the final tree.
+  - Changed-file Biome checks passed with the same eight pre-existing warnings:
+    five screenshot-script environment warnings and three template-placeholder
+    test warnings.
+- Canonical capture command:
+  `GAME_URL=http://127.0.0.1:5173 DIFF_FILE=/tmp/phase8-heraldry.diff SHOTS_DIR=docs/screenshots/deed-border-cartouche/phase-07 NAV_TIMEOUT_MS=180000 ENTRY_SELECTOR_TIMEOUT_MS=180000 node scripts/pr_screenshots.mjs`.
+  Targeted ignored harnesses recaptured the high/mobile tier frames, corrected
+  all four Book equip frames, and refreshed the final picker/inspect
+  Parchment views. Those temporary harnesses were removed after capture.
+- Confirmed review findings and fixes:
+  - Coverage review found missing host nesting, target mirror, all-four motif,
+    inspect cleanliness/motif/compactness, motion/bloom, and screenshot-recipe
+    pins. Each was fixed forward in the owning test.
+  - Frontend review found preview-label collision, wide touch stacking,
+    forced-color edge loss, leaked theme state, Parchment dark-surface copy,
+    and an undecidable tier pair. CSS, recipe seeds/assertions, and live frames
+    were corrected without changing the approved design.
+  - Gate-integrity review found that the screenshot-reference guard could
+    silently omit missing paths, then that its first fix would fail a real
+    sparse checkout. The final guard builds non-screenshot corpus candidates
+    first, derives legitimate local unstaged deletions from Git, rejects every
+    other absence, and retains the vacuity floor and cone set equality.
+- Final fresh specialist results:
+  - `woc_test_coverage`: **READY**. E1-E36 and E37-E58 are complete; no
+    actionable coverage finding remains.
+  - `woc_frontend`: **READY WITH NOTES / SHIP WITH NOTES**. No actionable
+    craft, accessibility, responsive, hierarchy, fairness, or architecture
+    defect remains.
+  - `gate-integrity-reviewer`: **READY**. Both sparse-corpus findings are
+    resolved and the workflow pin is 25/25.
+- Architecture stayed in scope. The merge-base-to-worktree feature diff has no
+  `src/sim/`, `server/`, `src/net/`, `src/world_api.ts`, or `src/world_api/`
+  path. A direct two-tree diff exposes newer release-base changes absent from
+  this branch; those are not Deed Heraldry changes. No deed, slug, motif,
+  silhouette, lore, reward, gameplay power, generated runtime art, player copy,
+  persistence, wire, net, or IWorld behavior was added.
+- Remaining notes:
+  - The branch is 12 commits ahead and 9 behind the now-advanced release base.
+    Integrate the current release branch and rerun the gate before merge.
+  - Three mobile captures logged 18 skipped unrelated NPC assets. None overlaps
+    a reviewed player, target, picker, or inspect surface. The album manifest
+    records them explicitly.
+  - Browser axe, a dedicated mobile E2E pass, and ARM3 wall-clock profiling were
+    not separately rerun. The canonical browser suite, architecture/performance
+    pins, headless mobile captures, and deterministic hot-path guards passed.
+- Final Phase 8 verdict: **READY WITH NOTES** technically and **SHIP WITH
+  NOTES** visually. Both permit shipping, so Phase 8 is complete. No commit,
+  stage, push, or PR action was performed.
 
 ## Phase 3 notes
 
