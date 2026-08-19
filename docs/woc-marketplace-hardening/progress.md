@@ -35,7 +35,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 14 QA | phase-14-qa | game | DONE (QA PASS) | 8c0370585c | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open; release/v0.39.0 re-synced (merge 8c0370585c, tip f42a67f341, trivial); nine workflow audit lanes + six typed reviewers (frontend-seam MOBILE, cross-platform, database-performance, migration-safety, security; test-coverage silent, covered by two mutation batteries: 43 mutants 36 bit + 50 mutants 44 bit, every survivor a real pin gap closed) + the session's own mobile E2E arm (two dev-only rigs measuring the money faces in a landscape phone viewport, six captures) + the Capacitor /terms check (dead on iOS + packaged desktop, rebooted Android; fixed with the wiki_link resolver idiom); fix commits e68227b6bb, d1e3eb2199, ea08ac4711, and 6f67a96057 after a fresh four-lane re-review of the fix round; gate GREEN (see the 14 QA round section); pushed per R4 |
 | 15 | ui-polish | game | DONE (impl) | 01faddadf8 | release/v0.39.0 re-synced FIRST (merge 3a98604c83, release tip b650d9d7d2, 150 commits, NON-trivial: four conflicts, release-merge-audit run and its findings applied, see the section below); the DESIGN.md conformance audit written first (docs/woc-marketplace-hardening/phase-15-design-audit.md: seven read-only lanes, 215 findings, every row APPLIED, DEFERRED with an owner, or JUDGED with a reason) and then worked top to bottom; presentation only, zero view-core diffs; five commits (a4fcac14d8 + 01faddadf8 from the merge audit, then 92da32bbb1 style, e6c054232d test, be35080962 scripts, plus the docs and capture commits below); highest-value catches: var(--accent) was declared NOWHERE so seven marketplace declarations shipped resolving to inherit/currentColor, the mobile bags sheet covered the whole trade window on touch (the arm unreachable), neither money sheet cleared the safe-area insets, the trade arm's spinner was an inline box that never spun inside the pressed Pay button, the browse table re-flowed every column on each per-second countdown rebuild, the toast strip shifted the control under the pointer, the sell form's money inputs and the arm's price field missed the touch floor, the seller never saw a resolved fee (the note named a percentage the SERVICE owns), the bond note resolved the wrong bid's bond, the paused and suspended lines named a cause they cannot know and actions they do not cover, and the Exchange window had no behavioral test at all; new guards: the css var() resolution ratchet (the --accent class cannot recur), the copy-to-constants pins, the shared token spelling, the widened ticker grep-proof, and tests/woc_market_window_rig.test.ts (the first live rig for WocMarketWindow, 21 cases); LOCAL, not pushed per R4 (15-qa pushes on PASS) |
 | 15 QA | phase-15-qa | game | DONE | 4cb60d0d3c | PASS-WITH-FOLLOWUPS, Fernando's sign-off BEAUTIFUL WITH NOTES, notes shipped, PUSHED per R4 (see the 15 QA round section) |
-| 16 | hot-path-scale | game | DONE (impl) | 94d53a243a | H11 closed: five GETs metered + cached, /me sequenced to one client, price cache single-flight with a short failure memo and bounded SWR, sweep locks per segment with the overrun watchdog; the owed 12/13/14/15 clusters shipped or decided (see the 16 implement section); LOCAL, not pushed per R4 (16-qa pushes on PASS) |
+| 16 | hot-path-scale | game | DONE incl QA | 94d53a243a | H11 closed: six GETs metered, four read surfaces cached with busts on every outcome, /me sequenced with a deadline, price cache single-flight with a short failure memo and bounded SWR, sweep locks per segment with the budgeted bond walk and the overrun watchdog; QA verdict PASS-WITH-FOLLOWUPS (the 16 QA round section is the registry 17 consumes), PUSHED per R4 |
 | 16 QA | phase-16-qa | game | NOT STARTED | | |
 | 17 | db-retention-indexes | game | NOT STARTED | | |
 | 17 QA | phase-17-qa | game | NOT STARTED | | |
@@ -3467,3 +3467,200 @@ committed server core passed (exit 0) and the final gate runs after the
 docs commit. NEXT = docs/woc-marketplace-hardening/phase-16-qa.md, GAME
 repo, worktree wocc-marketplace, FRESH session, newest origin/release/**
 sync first; it diffs 4cb60d0d3c..HEAD and pushes on PASS.
+
+## 16 QA round (2026-08-19, verdict PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open, PUSHED per R4)
+
+Release sync first: a NO-OP (the branch already contained
+origin/release/v0.40.0's tip e56707a675, the implement session's own sync;
+0 behind, no merge commit, no audit owed). The audited range is
+4cb60d0d3c..60fc62f3fe (nine commits); the session's own fixes extend it to
+the pushed tip.
+
+Audit shape: eight workflow lanes over the phase probes (bust completeness,
+cache-key scoping and freeze, limiter-vs-cadence, sweep re-entrancy,
+pool-hold counting, price-cache state machine, client cluster and i18n,
+values-registry and docs) plus the three typed reviewers via plain Agent
+(server-hot-path, database-performance, test-coverage) and the session's
+own verification arm; then a FRESH two-lens review of the fix round, a
+sixteen-mutant battery (all BIT), a five-mutant residue battery from that
+review (all BIT after its fixes), and qa-checklist last. Roughly 85
+findings total, zero blocking in the lanes; every one applied or judged.
+
+The session's own verification: tsc; six pg suites 249/249 zero skips and
+later the full affected battery 29 files / ~1,240 tests green WITH
+TEST_DATABASE_URL; ci:changed clean; both capture rigs run against a live
+dev stack at the lowest preset (trade window 128 checks ALL PASSED,
+Exchange rig with STRESS seeding 154 checks all passed, closing the
+scrollIntoView real-viewport item the implement session flagged); the
+16-row bust table checked against the code (no mutating route missing);
+the six-GET limiter mounts, the fused ip+account window, the five i18n
+fills per new key, sellEmpty's retirement, and the commit hygiene all
+re-verified by hand.
+
+The focus_restore discrepancy, CONFIRMED STATICALLY: at the session-start
+tip 4cb60d0d3c, src/ui/woc_market_chrome.ts emitted data-focus-key at three
+sites with no focus_restore import while the namespace sweep in
+tests/focus_restore.test.ts demanded the import, so the sweep was red by
+construction there. The 15 QA's recorded full-suite green cannot have run
+that state of both files; the usual suspects are the vitest transform cache
+after the sign-off-round edits and shard selection (the 15 gate's shards
+recorded 41,446 tests, so a stale-transform false green is the likelier).
+No action beyond this record: 60fc62f3fe fixed it the honest way and the
+suite is green on the real coupling.
+
+The database-performance reviewer returned BLOCK with four P1s; each was
+judged with the file open and two were real code defects, fixed:
+
+- P1-1 CONFIRMED: the idle-bound retrofit made 25P03 the first contention
+  code insertPendingBid can produce, and its refusal union had no
+  'contended' member and no catch, so an idle kill was a NEW raw 500 on a
+  player's bid (the site's comment claimed a mapping that did not exist).
+  Fixed with the activateBid-shaped tail catch and the typed 409; the
+  residue round added its red-provable test.
+- P1-2 CONFIRMED: the 2s guard idle bound had been retrofitted onto the two
+  save-bearing transactions (escrowInsertListing,
+  saveDeliveredCharacterBooked) whose character sanitize+serialize runs
+  BETWEEN statements, where Postgres reads CPU work as idle-in-transaction;
+  a GC pause or heavy tick there false-fires the kill and costs a delivery
+  grant for the pass, against the delivered-save's own wait-out-slowness
+  allowance. Fixed with SAVE_IDLE_TX_TIMEOUT_MS 10s at exactly those two
+  sites (rationale at the constant), pinned by count, by tier distribution,
+  AND by identity in the save-and-book SQL sequence.
+- P1-3 PARTIALLY APPLIED: the destroy-on-25P03 is forced (the server
+  terminated the session; the socket is dead) and skipping the bound during
+  a stall storm would reopen exactly the camping H11 closes, so the
+  cooldown proposal was REJECTED; the observability half shipped: a
+  process-lifetime idleTxKills counter rides GET /internal/woc-market/stuck
+  beside the new priceCache memo ages (the hot-path lane's own ask), both
+  source-pinned and behavior-tested.
+- P1-4 REJECTED as a practical starvation: the lost-lock break only stands
+  the LOSER down, and the segment winner always continues through its own
+  delivery and bond-payout tail; a persistent anti-phase requires the
+  winner to be mid-lock at the loser's every 5s retry, which chain-poll
+  duration variance destroys, and the blast is bounded by the deploy
+  overlap with every arm resuming from durable rows. The two-shell
+  observation is recorded for 21's devnet run.
+
+Other applied fixes out of the round (commits 1819f8917d, 2303baf2cc,
+9f3d53003d, 48fe30cc58, e3bd74c52a): the browse cache now fences DEEP PAGES
+(WOC_MARKET_BROWSE_CACHE_MAX_PAGE 2; the page number spans the 400-page
+clamp, so one reader inside the budget could churn the whole LRU and every
+miss re-buys the OFFSET walk); every mutating handler busts the ACTOR'S
+readout on refusals too (the bust lane's catch: guardTerms records consent
+and confirm legs record signatures BEFORE a later guard refuses, so the ok-
+arm-only bust left /me pre-mutation for a TTL; createOffer gained its bust
+for the same reason and the eager-delivery confirm now drops the history
+map on its 'confirmed' answer); the caller-less bustHistory was removed;
+myActivity gained a between-reads deadline (WOC_MARKET_ME_READOUT_DEADLINE_MS
+6s: sequencing had turned one 5s checkout worst case into six back to back,
+30s of held socket per poll under saturation); the bond walk's budget break
+now joins the SATURATED list (a sub-batch break read as a drained pass by
+count alone) and processDueBonds returns the always-equal due.length with
+the dead conditional gone; the sweep shell destroys a client whose unlock
+answers FALSE; the lock statements are exported constants the shell, the
+text pin, and the pg exclusion proof all share; the proxy's shared
+estimates are frozen like the read-cache values and peek() hands out
+copies; the trade window's partner lookup is TRI-STATE (the 30/min-bucket
+move had made a 429 render as a false 'recipient has no wallet' for the
+whole trade: the server's 404 is now the only null-partner verdict, any
+other failure leaves the arm unresolved with a 5s re-armed backoff and a
+sequence guard so a stale failure cannot drop a newer lookup's answer); the
+sell caption's QUALITY_WORDS derives from the exported exhaustive label
+record; and the fix round's growth paid the monolith ratchet by extracting
+the step-up flow to server/woc_market_stepup_flow.ts (the ratchet row's own
+named candidate; move-audited faithful, direct tests, row exactly 4487
+zero headroom, delivery arms are the next candidate).
+
+Test hardening beyond the mutants (the coverage lanes' demands, all
+landed): the 30s bond budget pinned by value and bounded from BELOW; the
+acceptOffer table row de-aliased onto a third account with the null-listing
+and step-up rows added; the post-stop runOnce pinned at the guard; the
+tier-1-only opt-out proven against a recording tier-2 store with a positive
+control AND added to the derivation-guard table; the drift-warn same-sets
+claim made behavioral in both directions; the real-Postgres advisory-lock
+exclusion and the lapse and anti-snipe single-winner races; refusal rows
+for ALL eleven busting handlers (the count tripwire is order-blind); the
+limiter floor derived from the typed surface field with the admin carve-out
+pinned exactly; all five readout-deadline checks proven load-bearing; the
+itemIdField charset screen and canonicalization tested at both routes; the
+six new keys' five fills placeholder-pinned at PR tier; exact price-cache
+boundary and thrown-refresh containment arms; the 25P03 warn-line and
+counter test; connect()-aware pool gauges counting all six reads; the
+watchdog interval clamp; and direct tests for the extracted step-up flow.
+
+The fresh fix-round review: the correctness lens returned ZERO blocking and
+zero should-fix (its move-audit of the extraction found no drift; its nine
+nits/notes were applied where actionable: the lookup sequence guard, the
+handler-comment scope, the CLAUDE.md citation) and the coverage lens's two
+blockers plus six should-fixes were all applied and then proven by its own
+five predicted-survive mutants biting.
+
+JUDGED no change this round (do not re-raise): the 2s /me TTL below the
+poll cadence (burst collapse is its documented job; raising it would delay
+the chain-decided payment transitions the awaiting poll exists to catch);
+coarse bustListings under realm-wide mutation rates (single-flight still
+collapses concurrent readers between busts; honest arithmetic now at the
+method, counters on the readout, 22 checks them at a real mutation rate);
+the detail cache's caller-minted ids (evictions cost PRIMARY-KEY point
+reads, not the OFFSET or external-service costs the other fences exist
+for; asymmetry rationale now in the header); the offers GET staying
+uncached (bounded by concurrent trades and retention; the ratelimit.ts
+comment no longer over-claims it); the detail estimate arm on the read
+bucket (worst-case distinct usdCents per TTL window sits far under the 256
+LRU behind the limiter); the sweep's three-checkout overhead and the
+locked-segment price probe (bounded by the price cache policy, comment now
+honest); the 25P03 warn being unthrottled (bounded by pool size); the
+sliding-window copy cost at 240; the NAT-triple 429 cliff (recorded at the
+constant, 22 re-judges; the sizing holds two worst-case players with
+margin); stop() waiting out a degraded chain-polls segment (supervisor
+kill is the deploy backstop, watchdog stays loud; 22 runbook); the
+pre-existing pollConfirmingSettlements head-of-line shape (bounded by the
+6h review park); the shared-limiter-map eviction judging by the current
+call's limit (pre-existing class, recorded); thrown service errors
+skipping the actor bust (one tier rarer than the refusal class this round
+closed, 2s-bounded); the dev economy's unfrozen estimates (double-gated
+off in production); the /me deadline surfacing as a 500 (saturation IS an
+incident); the copy-figures indexOf idiom and the last-row parse noise
+(fails loud, matches the sibling); the timing side-channel on warm
+directed rows (bounded by negative caching and the limiter; the body
+contract is intact); and the realm-less cache keys (the one-process
+premise is recorded at the policy and the header).
+
+qa-checklist ran LAST and returned READY (0 blocking, 0 should-fix),
+verifying the extraction move line by line, the CLAUDE.md claims symbol by
+symbol, and the copy floor; its three performance observations join 22's
+pre-enable audit: the eager confirm's bustHistoryAll degrades the history
+surface toward one shared read per completed sale on a busy realm (the
+handler cannot know the item id today; single-flight still collapses
+readers), the /me deadline's EFFECTIVE worst case is the 6s bound plus one
+in-flight read (about 11s under full saturation, the number an operator
+should hold), and the trade-partner retry is uncapped at 12/min against
+the quote bucket for the life of an open trade window (an escalating
+backoff is the refinement if quote-bucket pressure shows).
+
+DEFERRED with owners (new this round): the per-request auth-guard reads
+(requireAccount's two uncached queries per request now dominate every
+metered marketplace GET's cost; the highest-leverage remaining server win)
+join the escrow WRITE-path cluster in the rider decision at the 17 session
+start; the expiry segment's measured full-batch ceiling rides 20/21 with
+the existing at-scale items; the two-sweep-shell anti-phase observation
+rides 21; the sweep stop() drain semantics, the strike probe's widened
+30s SWR window, the offers-cache option, the NAT-triple sizing, and the
+cache-counter check at a real mutation rate all ride 22's pre-enable
+audit; the pg-suites-in-CI question stays the standing posture (20/22).
+
+Registry corrections landed in state.md: the woc_market.ts ratchet row is
+4487 (not the 4500 the mid-session bullet recorded), the budget-break stat
+reports rows FETCHED with the break riding the saturated list (the bullet
+described the superseded design), and the implement roster is nine commits
+(the five it listed plus 6113964df0, 61868970db, 7ebb5491ce, 60fc62f3fe).
+
+Gate: node scripts/gate_select.mjs on the committed tree at 181570b2bd
+with TEST_DATABASE_URL only: PASS, all 12 steps green, full-suite fallback
+(2,924 files passed + the env-gated perf-budget skip, 41,606 tests + 2
+expected fails + the 26 known default skips), browser suite 20/131, tsc,
+all builds, malware scan; the five woc pg suites additionally proven
+zero-skip in this session's own runs (249/249 and the 29-file battery).
+NEXT = docs/woc-marketplace-hardening/phase-17-db-retention-indexes.md,
+GAME repo, worktree wocc-marketplace, FRESH session, newest
+origin/release/** sync first.

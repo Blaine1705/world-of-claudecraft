@@ -5,16 +5,46 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-16-qa.md` (GAME
-  repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session,
-  newest origin/release/** sync first; it diffs 4cb60d0d3c..HEAD, the whole
-  16 implement range incl. the trivial v0.40.0 sync merge ee6780bd76, and
-  pushes on PASS per R4).
+- Next file to run: `docs/woc-marketplace-hardening/phase-17-db-retention-indexes.md`
+  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH
+  session, newest origin/release/** sync first). The 17 SESSION START also
+  DECIDES the deferred rider scope: the escrow WRITE-path cluster PLUS the
+  new per-request auth-guard-read cluster (requireAccount's two uncached
+  queries per request dominate every metered marketplace GET; the
+  discord_status_cache shape with moderation busts is the sketched fix).
+- 16 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied or
+  judged with the file open, PUSHED per R4). Release sync a NO-OP (0 behind
+  origin/release/v0.40.0 e56707a675). Eight workflow lanes + three typed
+  reviewers + a fresh two-lens fix-round review + 21 mutants ALL BIT +
+  qa-checklist; ~85 findings, zero lane blockers; the db-perf BLOCK's four
+  P1s judged with files open (two real: the unmapped 25P03 on the bid path,
+  the 2s idle bound over the save-serialize window). Five fix commits
+  1819f8917d / 2303baf2cc / 9f3d53003d / 48fe30cc58 / e3bd74c52a. REGISTRY
+  DELTAS on top of the 16 implement bullet: browse cache fences DEEP PAGES
+  (WOC_MARKET_BROWSE_CACHE_MAX_PAGE 2); EVERY mutating handler busts the
+  actor readout on refusals too, createOffer busts (guardTerms records),
+  the eager confirm's 'confirmed' answer drops the history map, bustHistory
+  (caller-less) removed; myActivity carries a between-reads deadline
+  (WOC_MARKET_ME_READOUT_DEADLINE_MS 6s); the bond budget break joins the
+  SATURATED list and the arm returns due.length; the two save-bearing
+  guards carry SAVE_IDLE_TX_TIMEOUT_MS 10s (the other ten keep 2s);
+  idleTxKills + priceCache memo ages ride /internal/woc-market/stuck; the
+  sweep destroys a client whose unlock answers false and the lock SQL is
+  the exported WOC_MARKET_SWEEP_LOCK_SQL/UNLOCK_SQL pair every judge
+  shares; proxy estimates are frozen; tradePartner is TRI-STATE in the sdk
+  (404 = the only null-partner verdict) with a 5s re-armed backoff and a
+  sequence guard in the trade controller; QUALITY_WORDS derives from the
+  exported ITEM_QUALITY_LABEL_KEYS; the step-up flow lives in
+  server/woc_market_stepup_flow.ts (ratchet row exactly 4487, zero
+  headroom, delivery arms next candidate). The 16 QA round section in
+  progress.md is the registry 17 consumes (JUDGED and DEFERRED lists
+  binding; the focus_restore/15-QA discrepancy is recorded there).
 - 16 IMPLEMENT COMPLETE (2026-08-19, LOCAL not pushed per R4; session start
   4cb60d0d3c, release sync ee6780bd76 TRIVIAL: origin/release/v0.40.0 was
   minted upstream, tip e56707a675, icons + CI workflows only, no audit
-  owed). H11 closed; five code commits ab09d6e931 / 01130fb79b / 3d6e7ee99a
-  / 1b9bdcdb36 / 94d53a243a plus the docs commit. THE VALUES REGISTRY the
+  owed). H11 closed; NINE commits (ab09d6e931 / 01130fb79b / 3d6e7ee99a /
+  1b9bdcdb36 / 94d53a243a / 6113964df0 / 61868970db / 7ebb5491ce /
+  60fc62f3fe, roster corrected by the 16 QA). THE VALUES REGISTRY the
   16 QA re-judges: read limiter woc_market_read 240/min shared across six
   GETs (status, browse, detail, me, history, offers), ip+account, TIER-1
   ONLY (tier2 'none' is load-bearing: 'global' costs two rate_limits
@@ -37,14 +67,16 @@ actually reads.
   sellEmptyFloor, sellCollectibles{Both,Mounts,Chromas}) each with five
   non-Latin fills; sellEmpty RETIRED (its five fills removed; the release
   fill list loses that row). Monolith: server/woc_market.ts ENTERS the
-  ratchet at 4500 (drift-warn extracted to woc_market_drift_warn.ts, both
+  ratchet at 4487 (corrected by the 16 QA; the ledger extraction re-pinned
+  the mid-session 4500) (drift-warn extracted to woc_market_drift_warn.ts, both
   wire screens + the warner judge through the exported
   WOC_MARKET_WIRE_PENDING_SET/FAIL_SET); woc_market_window.ts DOWN
   2618 -> 2614 (sales list + sell caption to chrome). saleView.item is OFF
   the wire (dead weight, no client reader). All twelve withTx guards carry
   the idle bound; the shared withTx arm logs 25P03 kills distinctly; the
-  LOCKED bond-payout walk is budgeted (BOND_PAYOUT_BUDGET_MS 30s, rows
-  walked not fetched). DECIDED: the 50-row
+  LOCKED bond-payout walk is budgeted (BOND_PAYOUT_BUDGET_MS 30s; the arm
+  reports rows FETCHED and a budget break joins the saturated list,
+  corrected by the 16 QA). DECIDED: the 50-row
   offers-inbox cap STANDS, no pagination (cost/benefit in the 16 progress
   entry; 22 re-checks against the abuse ledger). RE-DEFERRED with owners:
   the escrow WRITE-path cluster to a dedicated rider before 22 (decided at
