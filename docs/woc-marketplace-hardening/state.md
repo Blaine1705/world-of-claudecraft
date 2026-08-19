@@ -5,6 +5,41 @@ actually reads.
 
 ## Where we are
 
+- 17 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied
+  or judged with the file open, PUSHED per R4). Release sync a NO-OP (0
+  behind origin/release/v0.40.0 e56707a675, the newest release branch).
+  Nine audit lanes (db-perf, migration-safety, test-coverage as plain
+  Agents; six workflow lanes incl. the four phase probes) + a FRESH
+  fix-round reviewer + qa-checklist LAST; ZERO blocking findings against
+  the implement round; the never-sweep verdict is SOUND (three lanes plus
+  the session's own read: unbooked structurally unreachable, live
+  referents shield at any age incl. review-state disputes, re-drive after
+  prune impossible by construction, no livelock); the accounts-FK
+  not-indexed decision UPHELD and converted into a pg catalog
+  completeness floor (exactly the four allowlisted columns; partial and
+  INVALID indexes do not count as coverage); five mutations run, five
+  bit. Fix commits 30b3097e6a / 727f71c88c / fafe5e5afe / ebe9b24662
+  plus docs 5419d66455: the delivered-save guard's 55P03
+  count-and-rethrow tail (the twelfth guard joins lockWaitTimeouts,
+  routing unchanged), the plan suite's realistic fixture moved to
+  beforeAll (-t filtered runs fixed) with a NATURAL-cost prune probe and
+  behavioral cascade/claimed_at arms, the FK completeness floor, the
+  custody-ref prefix containment scan (positive control, exact-path
+  allowlist), and the TRUE retention-default contract in server/CLAUDE.md
+  (every retention window has a positive code default: unset prunes at
+  the documented value, 0 is the explicit keep-forever, untrimmed reads
+  make whitespace fail safe). REGISTRY DELTAS on the 17 implement entry:
+  deleteUnusedFederatedProvision lives in server/federated_auth_db.ts;
+  the classifier has 12 call sites; the phase-22 ops caveats gain the
+  REVERSE mixed-fleet index flip (an old-binary boot re-creates
+  woc_market_settlements_listing under ACCESS EXCLUSIVE). The 17 QA
+  round section in progress.md is the registry the next sessions consume
+  (JUDGED and DEFERRED lists binding; the escrow WRITE-path rider gains
+  the plain-statement-writer bound class, headlined by the contended-arm
+  clearBuyNowLock cleanup; 22's runbook gains the 365d memoRef-trace
+  bound and the sweep-budget arithmetic). Gate PASS twice: 5419d66455
+  and the final code tree ebe9b24662, all 12 steps, selective; the wrap
+  commit on top is docs-only.
 - 17 IMPLEMENT COMPLETE (2026-08-19, LOCAL not pushed per R4; release sync
   a NO-OP, 0 behind origin/release/v0.40.0 e56707a675; session start
   4799b24dc2). All four deliverables landed with their stale premises
@@ -67,10 +102,10 @@ actually reads.
   life); the account-keyed bust design must handle revokeCompanionToken's
   prefix-keyed delete; recon detail in the 17 implement entry of
   progress.md.
-- Next file to run: `docs/woc-marketplace-hardening/phase-17-qa.md`
-  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH
-  session, newest origin/release/** sync first) once the 17 implement
-  session below completes.
+- Next file to run: `docs/woc-marketplace-hardening/phase-18-dashboard-guardrails.md`
+  (DASHBOARD repo, worktree `/Users/fernando/Documents/woc-rewards-dashboard-pr13`,
+  branch `integration/woc-market-trading`, FRESH session, own
+  origin/master sync first).
 - 16 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied or
   judged with the file open, PUSHED per R4). Release sync a NO-OP (0 behind
   origin/release/v0.40.0 e56707a675). Eight workflow lanes + three typed
