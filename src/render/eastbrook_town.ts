@@ -44,14 +44,25 @@ import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 const ROOT_NAME = 'eastbrookTownRebuild';
 const FOUNDATION_OVERLAP = 0.03;
 const FOUNDATION_COLOR = 0x46505e;
+// Warm interior light for the kit buildings (owner refinement round 3): the
+// hexb GLBs carry no emissive materials (their windows are palette texels in
+// the KTX2 atlas), so each kit building gets amber pane boxes on its front
+// wall riding the same vertex-color emissive ladder as the shape buildings'
+// authored windows.
+const KIT_WINDOW_AMBER = 0xffb45a;
 const TOWN_CULL_RADIUS =
   EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
 
+// Deduped: since round 3 the layout re-uses kit shells across buildings
+// (three hexb_home_a lots, two hexb_home_b), and this list is a set of
+// URLs to load, never a per-building roster.
 const NEW_ASSET_URLS = Object.freeze([
-  ...EASTBROOK_LAYOUT.buildings.map((building) => building.assetId),
-  EASTBROOK_LAYOUT.civic.wellBeacon.assetId,
-  EASTBROOK_LAYOUT.market.stalls[0].assetId,
-  EASTBROOK_LAYOUT.wall.assetId,
+  ...new Set([
+    ...EASTBROOK_LAYOUT.buildings.map((building) => building.assetId),
+    EASTBROOK_LAYOUT.civic.wellBeacon.assetId,
+    EASTBROOK_LAYOUT.market.stalls[0].assetId,
+    EASTBROOK_LAYOUT.wall.assetId,
+  ]),
 ]);
 const SUPPORT_ASSET_URLS = Object.freeze([
   EASTBROOK_LAYOUT.civic.benches[0].assetId,
@@ -346,6 +357,45 @@ function kitMaterial(source: THREE.Material): THREE.Material {
   return lambert;
 }
 
+// The lit-window panes for one kit building: a merged set of amber boxes on
+// the front wall, deep enough to stay flush against walls the roof eaves
+// inset from the scaled bounding box. Tall buildings (the townhall and the
+// tavern) get a second upper row. Parented BESIDE the raw clone so the kit
+// traverse never flips their shadow flags: panes cast no shadows, the
+// shape-building emissive contract.
+function kitWindowPaneGeometry(dimensions: {
+  width: number;
+  height: number;
+  depth: number;
+}): THREE.BufferGeometry | null {
+  const { width, height, depth } = dimensions;
+  const paneWidth = Math.min(0.9, width * 0.11);
+  const paneHeight = paneWidth * 1.35;
+  const paneDepth = 0.8;
+  const rows = height >= 11 ? [0.26, 0.52] : [0.32];
+  const parts: THREE.BufferGeometry[] = [];
+  for (const row of rows) {
+    for (const side of [-1, 1]) {
+      const pane = new THREE.BoxGeometry(paneWidth, paneHeight, paneDepth).toNonIndexed();
+      pane.deleteAttribute('uv');
+      pane.translate(side * width * 0.22, height * row, depth / 2 - paneDepth / 2 + 0.05);
+      parts.push(pane);
+    }
+  }
+  const merged = mergeParts(parts, 'kit window panes');
+  if (!merged) return null;
+  const count = merged.getAttribute('position').count;
+  const tint = new THREE.Color(KIT_WINDOW_AMBER);
+  const colors = new Float32Array(count * 3);
+  for (let index = 0; index < count; index++) {
+    colors[index * 3] = tint.r;
+    colors[index * 3 + 1] = tint.g;
+    colors[index * 3 + 2] = tint.b;
+  }
+  merged.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return merged;
+}
+
 // A kit building: the raw GLB scene cloned with its own materials, scaled to
 // the layout's native dimensions and seated like every template building; the
 // roof-hide contract is identical so camera ghosting keeps working.
@@ -409,6 +459,17 @@ function buildKitBuilding(
     skirt.receiveShadow = true;
     group.add(skirt);
     mats.push(skirtMaterial);
+  }
+  const paneGeometry = kitWindowPaneGeometry(dimensions);
+  if (paneGeometry) {
+    const paneMaterial = townMaterial(true, undefined, true);
+    paneMaterial.name = `eastbrookTownKitPanes:${building.id}`;
+    const panes = new THREE.Mesh(paneGeometry, paneMaterial);
+    panes.name = `eastbrookBuildingEmissive:${building.id}`;
+    panes.castShadow = false;
+    panes.receiveShadow = false;
+    group.add(panes);
+    mats.push(paneMaterial);
   }
 
   return {

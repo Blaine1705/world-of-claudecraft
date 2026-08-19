@@ -360,13 +360,14 @@ describe('Eastbrook authored gameplay data integration', () => {
   });
 
   // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
-  // docs/design/eastbrook-revamp/site-plan.md): the wall and its gates are
-  // retired by design, so every road carries gateId null and there is no
-  // gate crossing to contain. The exterior tie-in tails re-tied with the
-  // zone1 re-tie; three roads now end at their authored last point (no
-  // exterior extension).
+  // docs/design/eastbrook-revamp/site-plan.md), then for owner refinement
+  // round 3: the wall and its gates are retired by design, so every road
+  // carries gateId null and there is no gate crossing to contain. Round 3
+  // added the inn lane (appended last, the by-index spread rule), trimmed
+  // the beach promenade to the pulled-in strand, and re-tied the coast
+  // track to hug the new waterline.
   it('keeps every preserved exterior road on its authored prefix with no gate crossing', () => {
-    expect(ZONE1_ROADS).toHaveLength(6);
+    expect(ZONE1_ROADS).toHaveLength(7);
     for (let index = 0; index < EASTBROOK_LAYOUT.roads.length; index++) {
       const authored = EASTBROOK_LAYOUT.roads[index];
       expect(ZONE1_ROADS[index].slice(0, authored.points.length)).toEqual(authored.points);
@@ -376,9 +377,10 @@ describe('Eastbrook authored gameplay data integration', () => {
       { x: -32, z: 140 },
       { x: -92, z: -56 },
       { x: 65, z: -65 },
-      { x: -10, z: -142 },
+      { x: -9.2, z: -134 },
       { x: -9, z: -100.4 },
       { x: -96, z: -66 },
+      { x: -44, z: -98 },
     ]);
   });
 
@@ -777,7 +779,8 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   // Re-anchored 2026-08-18 for the harbor move (commit d19aa33f76,
   // docs/design/eastbrook-revamp/site-plan.md): the square anchor moved to
   // the new market square and the six retired gate destinations left the
-  // list with the wall (36 became 30).
+  // list with the wall (36 became 30). Round 3 promoted the trio of decor
+  // homes into layout buildings, adding their entrances (33).
   it('pathfinds bidirectionally from the square to every service, NPC, station, and entrance', () => {
     // Middle of the new market square: inside the civic ring, clear of the
     // well beacon and the benches, and directly connected to the east-road
@@ -805,7 +808,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         (building) => ({ id: `${building.id}:entrance`, point: building.frontStandingPoint }),
       ),
     ];
-    expect(destinations).toHaveLength(30);
+    expect(destinations).toHaveLength(33);
     const moverProfiles = [
       { id: 'player', bodyRadius: PLAYER_BODY_RADIUS },
       // Pet locomotion deliberately shares PLAYER_BODY_RADIUS; keep this

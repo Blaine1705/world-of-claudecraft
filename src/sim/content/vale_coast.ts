@@ -12,8 +12,8 @@ export const VALE_LAND_LOBES = [
   { x: 168, z: 172, r: 42 }, // the northeast border corner
   { x: -100, z: 85, r: 70 }, // the western downs and Mirror Lake's shore
   { x: -95, z: -55, r: 70 }, // the southwest pastures (Grix's tunnel)
-  { x: -18, z: -112, r: 68 }, // the harbor basin: New Eastbrook's reserved plat (south half; trimmed so the sea meets the town, owner refinement)
-  { x: -52, z: -100, r: 60 }, // the harbor basin's east reach (closes the old lagoon)
+  { x: -18, z: -106, r: 59 }, // the harbor basin: New Eastbrook's reserved plat (south half; trimmed twice so the sea meets the town, owner refinements)
+  { x: -52, z: -96, r: 53 }, // the harbor basin's east reach (closes the old lagoon)
   { x: 45, z: -85, r: 84 }, // the south fields (the bandit camp)
   { x: 108, z: -52, r: 60 }, // the southwest rise (mogger's hollow)
   { x: 100, z: 70, r: 62 }, // the west meadows
@@ -26,5 +26,6 @@ export const VALE_BAYS = [
   { x: 30, z: -196, r: 66 }, // the south bay
   { x: 196, z: 104, r: 56 }, // the east bay, north of the causeway
   { x: -142, z: -152, r: 48 }, // the southwest cove
+  { x: -42, z: -180, r: 60 }, // the town-front shallows: pulls the strand up to New Eastbrook's doorstep (owner refinement round 3)
   { x: 178, z: -128, r: 42 }, // the south cove, east of the point
 ] as const;

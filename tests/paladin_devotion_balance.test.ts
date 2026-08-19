@@ -23,11 +23,14 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // the v0.39 Eastbrook harbor move (d19aa33f76,
 // docs/design/eastbrook-revamp/site-plan.md), whose world content forks the
 // shared stream again: holy 41.25 to 42.45; protection and retribution
+// unmoved. Re-pinned for owner refinement round 3 (the coastline pulled to
+// the town, re-threaded streets, three promoted home lots), which forks the
+// shared stream once more: retribution 55.75 to 52.45; holy and protection
 // unmoved. The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 42.45,
   protection: 38.65,
-  retribution: 55.75,
+  retribution: 52.45,
 };
 
 function addDummy(sim: Sim): Entity {

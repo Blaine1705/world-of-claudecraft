@@ -78,19 +78,55 @@ export const HARBOR_SAND_TERRAIN_EDITS: HeightStamp[] = [
   { x: -100, z: -71, radius: 9, delta: -3.4, falloff: 'smooth', mode: 'level' },
 ];
 
+// Round 3 (owner): the sea now starts a dozen yards below the town's south
+// lots, so the strand is a NARROW apron riding the new lobe line, not a wide
+// shelf. Each stamp centers ~8yd north of the local open-sea line with a
+// radius that dies before the nearest building pad (the tight middle stretch
+// runs small radii on purpose: the toolworks lot is 4-9yd from the line
+// there, and the natural field slope already reads as beach).
 export const SOWFIELD_BEACH_TERRAIN_EDITS: HeightStamp[] = [
-  { x: -58, z: -152, radius: 14, delta: -3.2, falloff: 'smooth', mode: 'level' },
-  { x: -64, z: -144, radius: 22, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -52, z: -146, radius: 23, delta: -4.0, falloff: 'smooth', mode: 'level' },
-  { x: -40, z: -148, radius: 23, delta: -4.0, falloff: 'smooth', mode: 'level' },
-  { x: -28, z: -150, radius: 24, delta: -4.0, falloff: 'smooth', mode: 'level' },
-  { x: -16, z: -146, radius: 20, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -4, z: -144, radius: 20, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: 8, z: -141, radius: 24, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: 20, z: -138, radius: 22, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: 32, z: -136, radius: 22, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: 44, z: -133, radius: 20, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -66, z: -139, radius: 13, delta: -3.6, falloff: 'smooth', mode: 'level' },
+  { x: -54, z: -138, radius: 14, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -42, z: -136, radius: 14, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -30, z: -135, radius: 13, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -23, z: -136, radius: 10, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -8, z: -131, radius: 7, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 4, z: -130, radius: 9, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 16, z: -132, radius: 11, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 28, z: -136, radius: 12, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 40, z: -137, radius: 13, delta: -3.9, falloff: 'smooth', mode: 'level' },
 ];
+
+// The seabed apron: the wide plat stamps above still reach past the coast
+// and would hold a dry shelf inside cells the (un-stamped) field already
+// calls open sea. This row rides ~5yd SOUTH of the field's sea line and
+// takes the stamped ground below the waterline there, so the water you see
+// starts where the sea actually is. Applied after the beach row (order is
+// application order); every center sits in open-sea cells, so no dry land
+// is ever pulled wet (the stamps-never-create-water rule is about the field,
+// which this row does not touch).
+export const SOWFIELD_SEABED_TERRAIN_EDITS: HeightStamp[] = [
+  { x: -66, z: -152, radius: 13, delta: -5.2, falloff: 'smooth', mode: 'level' },
+  { x: -54, z: -150, radius: 13, delta: -5.2, falloff: 'smooth', mode: 'level' },
+  { x: -42, z: -148, radius: 13, delta: -5.2, falloff: 'smooth', mode: 'level' },
+  { x: -30, z: -148, radius: 13, delta: -5.2, falloff: 'smooth', mode: 'level' },
+  { x: -20, z: -146, radius: 13, delta: -5.2, falloff: 'smooth', mode: 'level' },
+  { x: -10, z: -142, radius: 12, delta: -5.2, falloff: 'smooth', mode: 'level' },
+  { x: 0, z: -137, radius: 11, delta: -5.2, falloff: 'smooth', mode: 'level' },
+  { x: 10, z: -140, radius: 12, delta: -5.2, falloff: 'smooth', mode: 'level' },
+  { x: 20, z: -146, radius: 13, delta: -5.2, falloff: 'smooth', mode: 'level' },
+];
+// Flower drifts beside the lamplit town streets (owner refinement round 3).
+// The renderer's grass ring treats these circles as guaranteed bloom cells
+// (the REALM_FLOWER_MEADOWS mechanism); placement inside them still skips
+// water, steep ground, and roads, so the drifts read as blooming verges.
+export const ZONE1_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
+  { x: -22, z: -100, r: 7 }, // the civic green, west of the square
+  { x: -4, z: -73, r: 8 }, // the chapel rise, blooms among the headstones
+  { x: -36, z: -103, r: 6 }, // the main-street verge by the market home
+  { x: -6, z: -116, r: 6 }, // the beach promenade's east verge
+];
+
 // Basin carved into the heightfield. Pushed to the far northeast so its
 // shoreline meets the fishing dock and the murloc camp instead of drowning them.
 export const LAKE = { x: -92, z: 88, radius: 30 };
@@ -1718,8 +1754,8 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [
     ...EASTBROOK_LAYOUT.roads[2].points,
     { x: -24, z: -132 },
-    { x: -14, z: -138 },
-    { x: 10, z: -140 },
+    { x: -12, z: -135 },
+    { x: 12, z: -131 },
     { x: 30, z: -30 },
     { x: 50, z: -50 },
     { x: 65, z: -65 },
@@ -1727,6 +1763,7 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [...EASTBROOK_LAYOUT.roads[3].points], // the beach promenade
   [...EASTBROOK_LAYOUT.roads[4].points], // civic link across the squares
   [...EASTBROOK_LAYOUT.roads[5].points, { x: -96, z: -66 }], // the quay walk, joining the flank track (the freed dig ground)
+  [...EASTBROOK_LAYOUT.roads[6].points], // the inn lane down to the main street
 ];
 
 // ---------------------------------------------------------------------------
@@ -1803,11 +1840,23 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { key: 'hexCrateOpen', x: -95.5, z: -46.2, rot: -0.5, scale: 5, r: 1.1, h: 1.6 },
     { key: 'hexSack', x: -95.8, z: -62, rot: 1.1, scale: 5 },
     { key: 'hexBarrel', x: -95.4, z: -64, rot: 0, scale: 5, r: 1, h: 1.8 },
-    // a few more homes so the town reads lived-in (owner refinement):
-    // one on the main street, one by the civic square, one on the chapel rise
-    { key: 'hexbHomeA', x: -33, z: -111, rot: 0.35, scale: 7, r: 4.5, h: 8 },
-    { key: 'hexbHomeB', x: 22, z: -106, rot: -0.9, scale: 7, r: 4.5, h: 9 },
-    { key: 'hexbHomeA', x: -8, z: -82, rot: 1.9, scale: 7, r: 4.5, h: 8 },
+    // The three extra homes moved into EASTBROOK_LAYOUT.buildings (round 3):
+    // as first-class houses they get lots, skirts, and lit windows there.
+    // Flower plantings along the lamplit streets (owner refinement round 3):
+    // walk-through dressing (no r/h), every cluster a hand-checked 2.2yd plus
+    // off its street's centerline so nothing sits on the track.
+    { key: 'flowerGlow', x: -17.5, z: -94.5, rot: 0.4, scale: 1.7 },
+    { key: 'shrubFlowering', x: -19, z: -95.5, rot: 1.8, scale: 1.0 },
+    { key: 'flowerGlow', x: -18.5, z: -108.5, rot: -0.7, scale: 1.6 },
+    { key: 'flowerGlow', x: 9.4, z: -84.2, rot: 2.1, scale: 1.6 },
+    { key: 'shrubFlowering', x: 8.6, z: -82.6, rot: -1.2, scale: 0.95 },
+    { key: 'flowerGlow', x: 2.6, z: -71.2, rot: 0.9, scale: 1.7 },
+    { key: 'shrubFlowering', x: -30, z: -96.4, rot: 0.2, scale: 1.05 },
+    { key: 'flowerGlow', x: -34, z: -103.6, rot: -2.4, scale: 1.7 },
+    { key: 'flowerGlow', x: -52, z: -84.4, rot: 1.3, scale: 1.6 },
+    { key: 'flowerGlow', x: -14.6, z: -113, rot: -0.3, scale: 1.6 },
+    { key: 'shrubFlowering', x: -7.2, z: -124, rot: 2.7, scale: 0.95 },
+    { key: 'flowerGlow', x: -35.2, z: -94.6, rot: 1.1, scale: 1.5 },
     // fairway buoys marking the channel to the ferry berth
     { key: 'seaBuoy', x: -126, z: -46, rot: 0.4, scale: 3, float: 0.15 },
     { key: 'seaBuoyFlag', x: -124, z: -62, rot: -0.8, scale: 3, float: 0.15 },

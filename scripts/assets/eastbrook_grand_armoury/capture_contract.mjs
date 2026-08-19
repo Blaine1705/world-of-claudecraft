@@ -403,11 +403,11 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
   }),
   'smithy-and-forge': Object.freeze({
     camera: Object.freeze({ x: -9.5, y: 7, z: -126 }),
-    target: Object.freeze({ x: -5.801315561749643, y: 3, z: -123.90065778087482 }),
+    target: Object.freeze({ x: -6.293250516799596, y: 3, z: -124.1466252583998 }),
   }),
   'inn-and-kitchens': Object.freeze({
     camera: Object.freeze({ x: -43, y: 8, z: -94 }),
-    target: Object.freeze({ x: -40.10786074565587, y: 3, z: -91.1617911184838 }),
+    target: Object.freeze({ x: -42.82589170715949, y: 3, z: -90.73189846640925 }),
   }),
   'chapel-and-weaving': Object.freeze({
     camera: Object.freeze({ x: 26, y: 12, z: -100 }),
@@ -415,7 +415,7 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
   }),
   'toolworks-service-perimeter': Object.freeze({
     camera: Object.freeze({ x: -11, y: 7, z: -120 }),
-    target: Object.freeze({ x: -13.919874264155391, y: 5, z: -124.87981139623308 }),
+    target: Object.freeze({ x: -13.614789156231515, y: 5, z: -124.42218373434727 }),
   }),
   'stall-world-market': Object.freeze({
     camera: Object.freeze({ x: -13, y: 6, z: -96.5 }),

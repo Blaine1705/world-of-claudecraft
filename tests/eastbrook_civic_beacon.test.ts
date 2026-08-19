@@ -258,9 +258,9 @@ describe('Eastbrook civic beacon shader animation', () => {
     // the 4 wall color draws and 2 wall shadow draws; then the KTX2
     // kit-building path (buildKitBuilding in src/render/eastbrook_town.ts,
     // same site plan) put five raw-clone kit buildings in whose every mesh
-    // casts shadows, so the two-mesh fixtures keep colorDraws at 14 while
-    // shadowDraws rises to 12.
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 12 });
+    // casts shadows, so under round 3 (nine buildings, lit kit windows) the
+    // two-mesh fixtures give colorDraws 28 and shadowDraws 18.
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 28, shadowDraws: 18 });
 
     view.update(0, 5, 0, 0, 0, 0, 100, 1, true);
     const shader = compileMaterial(micro.material as THREE.Material);
@@ -336,9 +336,10 @@ describe('Eastbrook civic beacon shader animation', () => {
     // Re-pinned 2026-08 with the harbor move's wall retirement (d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md) and the KTX2 kit-building
     // path (buildKitBuilding in src/render/eastbrook_town.ts): the kit
-    // clones cast shadows from every mesh, so shadowDraws is 12 while
-    // colorDraws stays 14 under the two-mesh fixtures.
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 12 });
+    // clones cast shadows from every mesh, so under round 3 the two-mesh
+    // fixtures give shadowDraws 18 and colorDraws 28 (the window panes never
+    // cast).
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 28, shadowDraws: 18 });
   });
 
   it('does not instantiate the animation or any town geometry for a custom world', () => {
@@ -356,7 +357,7 @@ describe('Eastbrook civic beacon shader animation', () => {
   // triangles) left the layout with the Eastbrook harbor move (d19aa33f76,
   // docs/design/eastbrook-revamp/site-plan.md): 23,474 asset triangles plus
   // the 72-triangle foundation allowance.
-  it('preserves the committed 21,342 runtime triangle budget without another draw', async () => {
+  it('preserves the committed 24,793 runtime triangle budget without another draw', async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -376,7 +377,7 @@ describe('Eastbrook civic beacon shader animation', () => {
       triangleCountByAsset[assetUrl] = triangles;
     }
     expect(eastbrookTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      maximumRuntimeTriangles: 21_342,
+      maximumRuntimeTriangles: 24_793,
       withinHardCeiling: true,
       meetsTarget: true,
     });

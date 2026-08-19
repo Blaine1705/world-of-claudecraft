@@ -1,10 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { DRAKELANDS_FLOWER_MEADOWS } from '../sim/content/drakelands';
-import { GALECREST_FLOWER_MEADOWS } from '../sim/content/galecrest';
 import { STABLE_PADDOCK } from '../sim/content/mounts';
-import { REALM_FLOWER_MEADOWS } from '../sim/content/realm';
 import {
   BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
@@ -29,6 +26,7 @@ import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachBiomeHaze } from './biome_haze_field';
 import { applyCanopyDetail } from './canopy_detail';
+import { flowerMeadowsInChunk } from './flower_meadows_core';
 import {
   applyInstanceCollapse,
   type CollapseRole,
@@ -2883,6 +2881,19 @@ function buildGrassRing(
     // below), so its chunks carry a near-garden flower buffer
     // the Drakelands' authored firebloom fields bloom on near-bare ground
     // (ember grass density is 0), so their chunks need a field-sized buffer
+    // authored flower meadows overlapping this chunk (flower_meadows_core
+    // owns the biome registry); resolved before the buffer so a meadow chunk
+    // gets a field-sized cap even in a sparse biome (the vale's 0.14 would
+    // clip the drifts)
+    const chunkMinX = chunk.cx * GRASS_CHUNK_SIZE;
+    const chunkMinZ = chunk.cz * GRASS_CHUNK_SIZE;
+    const meadowsInChunk = flowerMeadowsInChunk(
+      chunkBiome,
+      chunkMinX,
+      chunkMinX + GRASS_CHUNK_SIZE,
+      chunkMinZ,
+      chunkMinZ + GRASS_CHUNK_SIZE,
+    );
     const flowerCap = Math.max(
       8,
       Math.floor(
@@ -2891,7 +2902,7 @@ function buildGrassRing(
             ? 1.2
             : chunkBiome === 'fen'
               ? 0.8
-              : fieldChunk || stableBandChunk || chunkBiome === 'ember'
+              : fieldChunk || stableBandChunk || chunkBiome === 'ember' || meadowsInChunk.length > 0
                 ? 0.45
                 : 0.14),
       ),
@@ -2914,23 +2925,6 @@ function buildGrassRing(
     const i1 = Math.ceil(maxX / step) + 1;
     const j0 = Math.floor(minZ / step) - 1;
     const j1 = Math.ceil(maxZ / step) + 1;
-    // authored flower meadows overlapping this chunk (the dusk realm's
-    // meadow bowls, the Galecrest's house gardens + tarn shore rings, and
-    // the Drakelands' firebloom fields around Wyrmwatch)
-    const meadowSource =
-      chunkBiome === 'dusk'
-        ? REALM_FLOWER_MEADOWS
-        : chunkBiome === 'gale'
-          ? GALECREST_FLOWER_MEADOWS
-          : chunkBiome === 'ember'
-            ? DRAKELANDS_FLOWER_MEADOWS
-            : null;
-    const meadowsInChunk = meadowSource
-      ? meadowSource.filter(
-          (mw) =>
-            mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
-        )
-      : [];
     yield; // setup (buffer allocation + chunk classification) is one sub-unit
 
     for (let i = i0; i <= i1 && n < chunkCap; i++) {
@@ -3008,7 +3002,7 @@ function buildGrassRing(
         if (FLOWERLESS_BIOMES.has(tuftBiome)) continue;
         // roughly one tuft in nine sprouts a flower cluster beside it; in
         // the field realms, coarse field cells bloom into dense drifts, and
-        // the authored meadow circles (REALM_FLOWER_MEADOWS) always bloom
+        // the authored meadow circles (flower_meadows_core) always bloom
         const fieldCell = fieldChunk ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
         const inMeadow = meadowsInChunk.some((mw) => {
           const mdx = x - mw.x;

@@ -208,7 +208,21 @@ describe('generated chunk geometry is stable', () => {
     // recomputed byte-identical on the live tree; both digests were
     // computed twice and are deterministic. An intended, looked-at world
     // change, not drift.
-    expect(digestOf(inRect)).toBe('0720a162981b316ba05f337d208b76a3');
+    // Re-minted for owner refinement round 3 (the coastline pulled to the
+    // town's doorstep): the basin lobes trim again, the town-front shallows
+    // bay carves the strand up to z -132..-147 across the frontage, the
+    // beach stamps re-lay as a narrow apron riding that line, and the new
+    // seabed apron row takes the stamped shelf below the waterline exactly
+    // where the un-stamped field already reads open sea (visible waterline
+    // within 1.5yd of the field line at every probed transect). Roads moved
+    // with it (promenade trimmed to the strand, coast track re-tied, the
+    // inn lane added, the wider main street). Evidence: 1yd lattice over
+    // x -75..45, z -170..-100 on the live tree: 5,126 dry and 3,465 wet
+    // cells, heights within [-7.70, 2.41], zero non-finite, and the worst
+    // dry-to-dry step is 1.172 at (-75,-140) (the pasture-coast blend),
+    // under the 1.5 climb gate; every town building pad probed level with
+    // its round-2 grade. An intended, looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('3b8a62584e3c80b2f79c9d6f8da874dd');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 

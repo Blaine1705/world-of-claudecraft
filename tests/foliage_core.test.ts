@@ -27,8 +27,11 @@ describe('Eastbrook town grass exclusion', () => {
     // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see fenbridge_layout).
     // Re-pinned 2026-08: the harbor-move layout v3 retired the ring wall
     // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), dropping the
-    // 26 wall-chord OBB exclusions (61 obb + 26 circle remain).
-    expect(exclusions).toHaveLength(87);
+    // 26 wall-chord OBB exclusions. Re-pinned again for round 3: the grown
+    // lots and the inn lane left the count alone, but the three promoted
+    // homes (eastbrook_home_market, eastbrook_home_east, eastbrook_home_rise)
+    // each add a footprint OBB and an apron circle (64 obb + 29 circle).
+    expect(exclusions).toHaveLength(93);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
@@ -57,14 +60,20 @@ describe('Eastbrook town grass exclusion', () => {
   it('pins the literal exclusion dimensions for the complete replacement layout', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
     const byId = new Map(exclusions.map((exclusion) => [exclusion.id, exclusion]));
+    // Re-pinned 2026-08 round 3: every kit building grew so its door reads
+    // at player height (the chapel is a bespoke asset and stays as shipped),
+    // and the three promoted homes carry first-class lots of their own now.
     const expectedObbDimensions = {
       eastbrook_grand_armoury: [6.5, 4.5],
-      eastbrook_bank: [3.75, 3],
-      eastbrook_smithy: [3.5, 2.75],
-      eastbrook_inn: [3.75, 3],
+      eastbrook_bank: [4.3, 3.45],
+      eastbrook_smithy: [4.2, 3.3],
+      eastbrook_inn: [4.3, 3.45],
       eastbrook_chapel: [2.75, 3],
-      eastbrook_weaving_workshop: [2.75, 2.25],
-      eastbrook_toolworks: [2.75, 2.25],
+      eastbrook_weaving_workshop: [3.45, 2.8],
+      eastbrook_toolworks: [3.45, 2.8],
+      eastbrook_home_market: [3.45, 2.8],
+      eastbrook_home_east: [3.45, 2.8],
+      eastbrook_home_rise: [3.45, 2.8],
     } as const;
     for (const [id, [halfWidth, halfDepth]] of Object.entries(expectedObbDimensions)) {
       expect(byId.get(id)).toMatchObject({ kind: 'obb', halfWidth, halfDepth });
@@ -106,9 +115,10 @@ describe('Eastbrook town grass exclusion', () => {
     const fenceDimensions = dimensionsFor(EASTBROOK_LAYOUT.fences.map((fence) => fence.id));
     // Re-pinned 2026-08: the smithy fences moved with the smithy in the
     // harbor move (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md),
-    // so the derived half widths carry different float noise.
+    // then re-derived again in round 3 when the yard widened around the
+    // grown smithy lot, so the half widths carry fresh float noise.
     expect(fenceDimensions.map(([halfWidth]) => halfWidth)).toEqual([
-      0.8499999999999975, 4.200000000000004, 0.8499999999999975,
+      0.9000000000000008, 4.7000000000000055, 0.9000000000000008,
     ]);
     expect(fenceDimensions.map(([, halfDepth]) => halfDepth)).toEqual([0.14, 0.14, 0.14]);
 

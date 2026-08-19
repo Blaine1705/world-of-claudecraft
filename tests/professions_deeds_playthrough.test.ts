@@ -260,7 +260,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits at index 18 in the shared
+  // 90s budget: the re-hunted koi session sits at index 9 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
   // REAL world ticks (19 bite-and-reel sessions plus bounded combat waits),
@@ -308,8 +308,12 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Re-hunted 2026-08 for the Eastbrook harbor move (layout v3, d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md): the relocated town, camps,
     // harbor decks, and retuned terrain shift the world-gen draws and every
-    // shared-stream index downstream; the koi now lands on session index 18.
-    expect(koiSession).toBe(18);
+    // shared-stream index downstream. Re-hunted again 2026-08 for the round 3
+    // town refinement (re-threaded roads, three decor props promoted to layout
+    // buildings, retuned terrain stamps): roads, props, and terrain are
+    // world-gen inputs, so the same shared-stream shift applies; the koi now
+    // lands on session index 9.
+    expect(koiSession).toBe(9);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -343,20 +347,23 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Re-hunted again 2026-08 for the Eastbrook harbor move (layout v3,
     // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the relocated
     // town, camps, harbor decks, and retuned terrain shift the world-gen
-    // draws, the same cause as the dig-headland re-record.
+    // draws, the same cause as the dig-headland re-record. Re-hunted once more
+    // 2026-08 for the round 3 town refinement (re-threaded roads, three decor
+    // props promoted to layout buildings, retuned terrain stamps), the same
+    // cause again.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 78 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 29 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 154,
+        hitAt: 21,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 37,
+        hitAt: 102,
       },
     ];
     for (const hunt of hunts) {
@@ -416,11 +423,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded with the
     // craft-cast system: the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 0 (re-hunted 2026-08 for the Eastbrook
+    // specimen lands on attempt index 4 (re-hunted 2026-08 for the Eastbrook
     // harbor move, layout v3, d19aa33f76,
-    // docs/design/eastbrook-revamp/site-plan.md, same cause as the beat 12 to
-    // 14 hunts).
-    expect(hitAt).toBe(0);
+    // docs/design/eastbrook-revamp/site-plan.md, then again 2026-08 for the
+    // round 3 town refinement, same cause as the beat 12 to 14 hunts).
+    expect(hitAt).toBe(4);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

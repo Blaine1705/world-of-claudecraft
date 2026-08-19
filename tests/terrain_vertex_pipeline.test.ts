@@ -51,10 +51,13 @@ describe('terrain vertex pipeline', () => {
     // spans the vacated old town ground and the rotated Wolf Run camps,
     // whose re-grades flip diagonal splits. Re-minted once more when the
     // street re-threads and camp spacing fixes rode the same change (roads
-    // are height appliers). Computed twice in separate processes on the
-    // live tree, identical both times.
+    // are height appliers). Re-minted for owner refinement round 3: the
+    // coastline pulled to the town's doorstep (trimmed lobes, the seabed
+    // apron row, re-laid beach stamps) and the re-threaded streets flip
+    // splits again. Computed twice in separate processes on the live tree,
+    // identical both times.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      '2dc5a1066281463530255cb18b8594fb7592e2604ad34caca24406866fa0176d',
+      '3c7b8ca40e949740ade8f769a8ce21df114c8910b6af88b3972a41f31b882f74',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

@@ -377,9 +377,11 @@ describe('authoritative Eastbrook replacement plan', () => {
 
   it('literally pins every new building and derives each front from local +Z', () => {
     // Re-pinned 2026-08 for the harbor move (d19aa33f76,
-    // docs/design/eastbrook-revamp/site-plan.md): layout v3 re-lots all six
-    // replacement buildings across the harbor districts; native dimensions
-    // and corner radii are unchanged.
+    // docs/design/eastbrook-revamp/site-plan.md), then again for owner
+    // refinement round 3: every kit lot grew so its door reads at player
+    // height, and the trio of homes that were zone1 decor props are
+    // first-class houses now (nine buildings; the chapel keeps its authored
+    // proportions).
     expect(
       EASTBROOK_LAYOUT.buildings.map((building) => ({
         id: building.id,
@@ -395,46 +397,58 @@ describe('authoritative Eastbrook replacement plan', () => {
         id: 'eastbrook_bank',
         assetId: '/models/biome/hexb_townhall.glb',
         kind: 'house',
-        position: { x: 12, z: -94 },
+        position: {
+          x: 12,
+          z: -94,
+        },
         nativeDimensions: {
-          width: 7.5,
-          height: 11,
-          depth: 6,
+          width: 8.6,
+          height: 12.7,
+          depth: 6.9,
         },
         rotation: -2.356194490192345,
-        maxCornerRadius: 4.802343178074636,
+        maxCornerRadius: 5.512939324897382,
       },
       {
         id: 'eastbrook_smithy',
         assetId: '/models/biome/hexb_workshop.glb',
         kind: 'house',
-        position: { x: -2, z: -122 },
+        position: {
+          x: -2,
+          z: -122,
+        },
         nativeDimensions: {
-          width: 7,
-          height: 8,
-          depth: 5.5,
+          width: 8.4,
+          height: 9.6,
+          depth: 6.6,
         },
         rotation: -2.0344439357957027,
-        maxCornerRadius: 4.451123453691213,
+        maxCornerRadius: 5.341348144429457,
       },
       {
         id: 'eastbrook_inn',
         assetId: '/models/biome/hexb_tavern.glb',
         kind: 'inn',
-        position: { x: -38, z: -88 },
+        position: {
+          x: -38,
+          z: -88,
+        },
         nativeDimensions: {
-          width: 7.5,
-          height: 10,
-          depth: 6,
+          width: 8.6,
+          height: 11.5,
+          depth: 6.9,
         },
         rotation: -2.5535900500422257,
-        maxCornerRadius: 4.802343178074636,
+        maxCornerRadius: 5.512939324897382,
       },
       {
         id: 'eastbrook_chapel',
         assetId: '/models/props/eastbrook_chapel.glb',
         kind: 'chapel',
-        position: { x: 2, z: -78 },
+        position: {
+          x: 2,
+          z: -78,
+        },
         nativeDimensions: {
           width: 5.5,
           height: 7,
@@ -447,27 +461,81 @@ describe('authoritative Eastbrook replacement plan', () => {
         id: 'eastbrook_weaving_workshop',
         assetId: '/models/biome/hexb_home_a.glb',
         kind: 'house',
-        position: { x: -28, z: -122 },
+        position: {
+          x: -28,
+          z: -122,
+        },
         nativeDimensions: {
-          width: 5.5,
-          height: 7.5,
-          depth: 4.5,
+          width: 6.9,
+          height: 9.4,
+          depth: 5.6,
         },
         rotation: 2.5535900500422257,
-        maxCornerRadius: 3.5531676008879742,
+        maxCornerRadius: 4.443253312607778,
       },
       {
         id: 'eastbrook_toolworks',
         assetId: '/models/biome/hexb_home_b.glb',
         kind: 'house',
-        position: { x: -16, z: -128 },
+        position: {
+          x: -16,
+          z: -128,
+        },
         nativeDimensions: {
-          width: 5.5,
-          height: 8.5,
-          depth: 4.5,
+          width: 6.9,
+          height: 10.6,
+          depth: 5.6,
         },
         rotation: 0.5880026035475675,
-        maxCornerRadius: 3.5531676008879742,
+        maxCornerRadius: 4.443253312607778,
+      },
+      {
+        id: 'eastbrook_home_market',
+        assetId: '/models/biome/hexb_home_a.glb',
+        kind: 'house',
+        position: {
+          x: -33,
+          z: -111,
+        },
+        nativeDimensions: {
+          width: 6.9,
+          height: 9.4,
+          depth: 5.6,
+        },
+        rotation: 0.2,
+        maxCornerRadius: 4.443253312607778,
+      },
+      {
+        id: 'eastbrook_home_east',
+        assetId: '/models/biome/hexb_home_b.glb',
+        kind: 'house',
+        position: {
+          x: 22,
+          z: -106,
+        },
+        nativeDimensions: {
+          width: 6.9,
+          height: 10.6,
+          depth: 5.6,
+        },
+        rotation: -1.46,
+        maxCornerRadius: 4.443253312607778,
+      },
+      {
+        id: 'eastbrook_home_rise',
+        assetId: '/models/biome/hexb_home_a.glb',
+        kind: 'house',
+        position: {
+          x: -8,
+          z: -82,
+        },
+        nativeDimensions: {
+          width: 6.9,
+          height: 9.4,
+          depth: 5.6,
+        },
+        rotation: 1.17,
+        maxCornerRadius: 4.443253312607778,
       },
     ]);
 
@@ -641,24 +709,42 @@ describe('authoritative Eastbrook replacement plan', () => {
       {
         id: 'eastbrook_fence_smithy_west',
         district: 'smithy_yard',
-        start: { x: 4.395154415649398, z: -123.83357574154984 },
-        end: { x: 2.8746281909495415, z: -124.59383885389975 },
+        start: {
+          x: 5.155417527999327,
+          z: -124.0124611797498,
+        },
+        end: {
+          x: 3.5454485841994785,
+          z: -124.81744565164973,
+        },
         width: 0.28,
         height: 0.9,
       },
       {
         id: 'eastbrook_fence_smithy_outer',
         district: 'smithy_yard',
-        start: { x: 4.529318494299386, z: -123.43108350559987 },
-        end: { x: 0.7727242920997393, z: -115.91789510120057 },
+        start: {
+          x: 5.289581606649314,
+          z: -123.60996894379986,
+        },
+        end: {
+          x: 1.0857738089497104,
+          z: -115.20235334840064,
+        },
         width: 0.28,
         height: 0.9,
       },
       {
         id: 'eastbrook_fence_smithy_east',
         district: 'smithy_yard',
-        start: { x: 0.37023205614977694, z: -115.78373102255058 },
-        end: { x: -1.1502941685500798, z: -116.5439941349005 },
+        start: {
+          x: 0.6832815729997472,
+          z: -115.06818926975066,
+        },
+        end: {
+          x: -0.9266873708001011,
+          z: -115.87317374165059,
+        },
         width: 0.28,
         height: 0.9,
       },
@@ -728,11 +814,13 @@ describe('wall and road geometry', () => {
     expect(clearances[0].clearance).toBeGreaterThan(PLAYER_RADIUS);
   });
 
-  it('pins six three-yard harbor streets through the existing road points', () => {
+  it('pins the harbor streets through the existing road points', () => {
     // Re-pinned 2026-08 for the harbor move (d19aa33f76,
-    // docs/design/eastbrook-revamp/site-plan.md): layout v3 replaced the six
-    // gate lanes with six harbor streets; the town is open, so every gateId
-    // is null while halfWidth stays 1.5.
+    // docs/design/eastbrook-revamp/site-plan.md), then for owner refinement
+    // round 3: the town is open so every gateId is null; the main street to
+    // the quay runs a wider halfWidth 2 spine, the side lanes stay 1.5, and
+    // the inn lane joins the inn square to that spine (appended last: zone1
+    // spreads these entries by index).
     expect(
       EASTBROOK_LAYOUT.roads.map((road) => ({
         id: road.id,
@@ -744,79 +832,207 @@ describe('wall and road geometry', () => {
     ).toEqual([
       {
         id: 'north',
-        existingRoadPoint: { x: 6, z: -72 },
+        existingRoadPoint: {
+          x: 6,
+          z: -72,
+        },
         gateId: null,
         halfWidth: 1.5,
         points: [
-          { x: 14, z: -89 },
-          { x: 12, z: -85 },
-          { x: 10, z: -80 },
-          { x: 6, z: -72 },
-          { x: 0, z: -58 },
+          {
+            x: 14.6,
+            z: -88.6,
+          },
+          {
+            x: 12,
+            z: -85,
+          },
+          {
+            x: 10,
+            z: -80,
+          },
+          {
+            x: 6,
+            z: -72,
+          },
+          {
+            x: 0,
+            z: -58,
+          },
         ],
       },
       {
         id: 'east',
-        existingRoadPoint: { x: -44, z: -98 },
+        existingRoadPoint: {
+          x: -44,
+          z: -98,
+        },
         gateId: null,
-        halfWidth: 1.5,
+        halfWidth: 2,
         points: [
-          { x: -20, z: -102 },
-          { x: -26, z: -101 },
-          { x: -44, z: -98 },
-          { x: -56, z: -88 },
-          { x: -62, z: -76 },
-          { x: -70, z: -68 },
-          { x: -80, z: -66 },
-          { x: -88, z: -60 },
-          { x: -92, z: -56 },
+          {
+            x: -20,
+            z: -102,
+          },
+          {
+            x: -26,
+            z: -101,
+          },
+          {
+            x: -44,
+            z: -98,
+          },
+          {
+            x: -56,
+            z: -88,
+          },
+          {
+            x: -62,
+            z: -76,
+          },
+          {
+            x: -70,
+            z: -68,
+          },
+          {
+            x: -80,
+            z: -66,
+          },
+          {
+            x: -88,
+            z: -60,
+          },
+          {
+            x: -92,
+            z: -56,
+          },
         ],
       },
       {
         id: 'bandit',
-        existingRoadPoint: { x: -10, z: -112 },
+        existingRoadPoint: {
+          x: -10,
+          z: -112,
+        },
         gateId: null,
         halfWidth: 1.5,
         points: [
-          { x: -11, z: -105.5 },
-          { x: -10, z: -112 },
-          { x: -9, z: -119 },
-          { x: -12, z: -123 },
-          { x: -22, z: -120.5 },
+          {
+            x: -11,
+            z: -105.5,
+          },
+          {
+            x: -10,
+            z: -112,
+          },
+          {
+            x: -9,
+            z: -119,
+          },
+          {
+            x: -12,
+            z: -123,
+          },
+          {
+            x: -22,
+            z: -120.5,
+          },
         ],
       },
       {
         id: 'northwest',
-        existingRoadPoint: { x: -10, z: -132 },
+        existingRoadPoint: {
+          x: -9.2,
+          z: -132,
+        },
         gateId: null,
         halfWidth: 1.5,
         points: [
-          { x: -12, z: -107.5 },
-          { x: -11.5, z: -118 },
-          { x: -10, z: -132 },
-          { x: -10, z: -142 },
+          {
+            x: -12,
+            z: -107.5,
+          },
+          {
+            x: -10.8,
+            z: -118,
+          },
+          {
+            x: -9.2,
+            z: -132,
+          },
+          {
+            x: -9.2,
+            z: -134,
+          },
         ],
       },
       {
         id: 'southwest',
-        existingRoadPoint: { x: 0, z: -99 },
+        existingRoadPoint: {
+          x: 0,
+          z: -99,
+        },
         gateId: null,
         halfWidth: 1.5,
         points: [
-          { x: 7.6, z: -96.4 },
-          { x: 0, z: -99 },
-          { x: -9, z: -100.4 },
+          {
+            x: 7,
+            z: -97.4,
+          },
+          {
+            x: 0,
+            z: -99,
+          },
+          {
+            x: -9,
+            z: -100.4,
+          },
         ],
       },
       {
         id: 'northeast',
-        existingRoadPoint: { x: -92, z: -54 },
+        existingRoadPoint: {
+          x: -92,
+          z: -54,
+        },
         gateId: null,
         halfWidth: 1.5,
         points: [
-          { x: -92, z: -46 },
-          { x: -92, z: -54 },
-          { x: -92, z: -62 },
+          {
+            x: -92,
+            z: -46,
+          },
+          {
+            x: -92,
+            z: -54,
+          },
+          {
+            x: -92,
+            z: -62,
+          },
+        ],
+      },
+      {
+        id: 'inn_lane',
+        existingRoadPoint: {
+          x: -44,
+          z: -98,
+        },
+        gateId: null,
+        halfWidth: 1.5,
+        points: [
+          {
+            x: -40.8,
+            z: -92.2,
+          },
+          {
+            x: -42,
+            z: -95,
+          },
+          {
+            x: -44,
+            z: -98,
+          },
         ],
       },
     ]);
@@ -948,28 +1164,40 @@ describe('layout clearance and service anchors', () => {
         id: 'station_eastbrook_forge',
         type: 'forge',
         masterNpcId: 'forgemistress_darva',
-        position: { x: -5.801315561749643, z: -123.90065778087482 },
+        position: {
+          x: -6.293250516799596,
+          z: -124.1466252583998,
+        },
         interactionRadius: 20,
       },
       {
         id: 'station_eastbrook_kitchens',
         type: 'kitchens',
         masterNpcId: 'cook_marlow',
-        position: { x: -42.576276618858145, z: -90.35747583395722 },
+        position: {
+          x: -42.82589170715949,
+          z: -90.73189846640925,
+        },
         interactionRadius: 20,
       },
       {
         id: 'station_eastbrook_loom',
         type: 'loom',
         masterNpcId: 'weaver_ottilie',
-        position: { x: -25.91987426415539, z: -125.12018860376692 },
+        position: {
+          x: -25.614789156231517,
+          z: -125.57781626565273,
+        },
         interactionRadius: 20,
       },
       {
         id: 'station_eastbrook_toolworks',
         type: 'toolworks',
         masterNpcId: 'tinker_gizzel',
-        position: { x: -13.919874264155391, z: -124.87981139623308 },
+        position: {
+          x: -13.614789156231515,
+          z: -124.42218373434727,
+        },
         interactionRadius: 20,
       },
     ]);
@@ -990,7 +1218,7 @@ describe('layout clearance and service anchors', () => {
         2.4805494847391065,
         'eastbrook_market_stall_world_market',
       ],
-      ['marshal_redbrook', 10, -97.5, 0, 'eastbrook_noticeboard'],
+      ['marshal_redbrook', 9.6, -98.6, 0, 'eastbrook_noticeboard'],
       [
         'trader_wilkes',
         -16.333512834321652,
@@ -1008,8 +1236,8 @@ describe('layout clearance and service anchors', () => {
       ],
       [
         'smith_haldren',
-        -4.906888370749727,
-        -125.68951216287465,
+        -5.39882332579968,
+        -125.93547964039962,
         -2.0344439357957027,
         'station_eastbrook_forge',
       ],
@@ -1017,8 +1245,8 @@ describe('layout clearance and service anchors', () => {
       ['foreman_odell', -84, -63, 0.6747409422235526, 'eastbrook_quay'],
       [
         'bursar_fernando',
-        8.818019484660535,
-        -97.18198051533946,
+        8.49982143312659,
+        -97.50017856687342,
         -2.356194490192345,
         'eastbrook_bank',
       ],
@@ -1026,29 +1254,29 @@ describe('layout clearance and service anchors', () => {
       ['chronicler_saul', 10.2, -87.5, 0.5880026035475675, 'mailbox_eastbrook'],
       [
         'forgemistress_darva',
-        -6.919349550499538,
-        -121.66458980337504,
+        -7.4112845055494905,
+        -121.91055728090001,
         -2.0344439357957027,
         'station_eastbrook_forge',
       ],
       [
         'cook_marlow',
-        -44.03236463394937,
-        -89.38675049056307,
+        -44.28197972225072,
+        -89.7611731230151,
         -2.5535900500422257,
         'station_eastbrook_kitchens',
       ],
       [
         'weaver_ottilie',
-        -27.583974852831076,
-        -126.22958899621737,
+        -27.278889744907204,
+        -126.68721665810318,
         2.5535900500422257,
         'station_eastbrook_loom',
       ],
       [
         'tinker_gizzel',
-        -12.255773675479704,
-        -125.98921178868353,
+        -11.950688567555828,
+        -125.53158412679772,
         0.5880026035475675,
         'station_eastbrook_toolworks',
       ],

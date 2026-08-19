@@ -198,7 +198,7 @@ interface AttributionTargetFixture {
 // keeps its pre-move framing (frozen in the artifact-integrity suite) and
 // only the swept provenance bytes follow the merged inputs.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'eba666983fc014cf49ab21531acc827a913252f6653d48f589deac1e3dc16cc6';
+  '70c5503a78e2111bd502aeea00a596d2bd81cbad5fb7b707751a82ff265556e9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -587,11 +587,11 @@ describe('Eastbrook polish capture contract', () => {
       },
       'smithy-and-forge': {
         camera: { x: -9.5, y: 7, z: -126 },
-        target: { x: -5.801315561749643, y: 3, z: -123.90065778087482 },
+        target: { x: -6.293250516799596, y: 3, z: -124.1466252583998 },
       },
       'inn-and-kitchens': {
         camera: { x: -43, y: 8, z: -94 },
-        target: { x: -40.10786074565587, y: 3, z: -91.1617911184838 },
+        target: { x: -42.82589170715949, y: 3, z: -90.73189846640925 },
       },
       'chapel-and-weaving': {
         camera: { x: 26, y: 12, z: -100 },
@@ -599,7 +599,7 @@ describe('Eastbrook polish capture contract', () => {
       },
       'toolworks-service-perimeter': {
         camera: { x: -11, y: 7, z: -120 },
-        target: { x: -13.919874264155391, y: 5, z: -124.87981139623308 },
+        target: { x: -13.614789156231515, y: 5, z: -124.42218373434727 },
       },
       'stall-world-market': {
         camera: { x: -13, y: 6, z: -96.5 },
@@ -708,7 +708,7 @@ describe('Eastbrook polish capture contract', () => {
     expect(toolworks).toMatchObject({
       position: { x: -16, z: -128 },
       rotation: 0.5880026035475675,
-      frontStandingPoint: { x: -13.919874264155391, z: -124.87981139623308 },
+      frontStandingPoint: { x: -13.614789156231515, z: -124.42218373434727 },
     });
     expect(toolworksStation?.position).toEqual(toolworks?.frontStandingPoint);
     expect(

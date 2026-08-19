@@ -589,15 +589,21 @@ const PRESERVED_ARMOURY = {
   frontStandingPoint: { x: 12, z: -5.5 },
 } as const;
 
+// Round 3 (owner): every kit building grew so its door reads at player
+// height (uniform per-building factors, aspect kept: homes 1.25x, the
+// workshop 1.2x, the tall civic pair 1.15x). The chapel is a bespoke asset
+// with authored proportions and stays as shipped. The extra trio of homes
+// that used to be zone1 decor props are first-class houses now, with lots,
+// foundation skirts, and the same warm lit panes as the rest of the town.
 const BUILDINGS = [
   makeBuilding(
     'eastbrook_bank',
     '/models/biome/hexb_townhall.glb',
     'house',
     { x: 12, z: -94 },
-    7.5,
-    11,
-    6,
+    8.6,
+    12.7,
+    6.9,
     -2.356194490192345,
   ),
   makeBuilding(
@@ -605,9 +611,9 @@ const BUILDINGS = [
     '/models/biome/hexb_workshop.glb',
     'house',
     { x: -2, z: -122 },
-    7,
-    8,
-    5.5,
+    8.4,
+    9.6,
+    6.6,
     -2.0344439357957027,
   ),
   makeBuilding(
@@ -615,9 +621,9 @@ const BUILDINGS = [
     '/models/biome/hexb_tavern.glb',
     'inn',
     { x: -38, z: -88 },
-    7.5,
-    10,
-    6,
+    8.6,
+    11.5,
+    6.9,
     -2.5535900500422257,
     0.8,
   ),
@@ -636,9 +642,9 @@ const BUILDINGS = [
     '/models/biome/hexb_home_a.glb',
     'house',
     { x: -28, z: -122 },
-    5.5,
-    7.5,
-    4.5,
+    6.9,
+    9.4,
+    5.6,
     2.5535900500422257,
   ),
   makeBuilding(
@@ -646,10 +652,40 @@ const BUILDINGS = [
     '/models/biome/hexb_home_b.glb',
     'house',
     { x: -16, z: -128 },
-    5.5,
-    8.5,
-    4.5,
+    6.9,
+    10.6,
+    5.6,
     0.5880026035475675,
+  ),
+  makeBuilding(
+    'eastbrook_home_market',
+    '/models/biome/hexb_home_a.glb',
+    'house',
+    { x: -33, z: -111 },
+    6.9,
+    9.4,
+    5.6,
+    0.2,
+  ),
+  makeBuilding(
+    'eastbrook_home_east',
+    '/models/biome/hexb_home_b.glb',
+    'house',
+    { x: 22, z: -106 },
+    6.9,
+    10.6,
+    5.6,
+    -1.46,
+  ),
+  makeBuilding(
+    'eastbrook_home_rise',
+    '/models/biome/hexb_home_a.glb',
+    'house',
+    { x: -8, z: -82 },
+    6.9,
+    9.4,
+    5.6,
+    1.17,
   ),
 ] as const;
 
@@ -756,28 +792,30 @@ function makeFence(
 }
 
 const SMITHY = buildingById('eastbrook_smithy');
+// Yard locals track the grown smithy footprint (halfWidth 4.2, halfDepth
+// 3.3): posts stay a clear step outside the walls so no fence end embeds.
 const FENCES = [
   makeFence(
     'eastbrook_fence_smithy_west',
     'smithy_yard',
-    localToWorld(SMITHY.position, SMITHY.rotation, -4.5, -4.9),
-    localToWorld(SMITHY.position, SMITHY.rotation, -4.5, -3.2),
+    localToWorld(SMITHY.position, SMITHY.rotation, -5.0, -5.5),
+    localToWorld(SMITHY.position, SMITHY.rotation, -5.0, -3.7),
     0.28,
     0.9,
   ),
   makeFence(
     'eastbrook_fence_smithy_outer',
     'smithy_yard',
-    localToWorld(SMITHY.position, SMITHY.rotation, -4.2, -5.2),
-    localToWorld(SMITHY.position, SMITHY.rotation, 4.2, -5.2),
+    localToWorld(SMITHY.position, SMITHY.rotation, -4.7, -5.8),
+    localToWorld(SMITHY.position, SMITHY.rotation, 4.7, -5.8),
     0.28,
     0.9,
   ),
   makeFence(
     'eastbrook_fence_smithy_east',
     'smithy_yard',
-    localToWorld(SMITHY.position, SMITHY.rotation, 4.5, -4.9),
-    localToWorld(SMITHY.position, SMITHY.rotation, 4.5, -3.2),
+    localToWorld(SMITHY.position, SMITHY.rotation, 5.0, -5.5),
+    localToWorld(SMITHY.position, SMITHY.rotation, 5.0, -3.7),
     0.28,
     0.9,
   ),
@@ -833,7 +871,7 @@ const ROADS = [
     gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: 14, z: -89 },
+      { x: 14.6, z: -88.6 },
       { x: 12, z: -85 },
       { x: 10, z: -80 },
       { x: 6, z: -72 },
@@ -844,7 +882,10 @@ const ROADS = [
     id: 'east',
     existingRoadPoint: { x: -44, z: -98 },
     gateId: null,
-    halfWidth: 1.5,
+    // The main street: a touch wider than the side lanes so the walk from
+    // the square to the quay reads as the town's spine (owner refinement
+    // round 3, tidier pathways).
+    halfWidth: 2,
     points: [
       { x: -20, z: -102 },
       { x: -26, z: -101 },
@@ -872,14 +913,16 @@ const ROADS = [
   },
   {
     id: 'northwest',
-    existingRoadPoint: { x: -10, z: -132 },
+    existingRoadPoint: { x: -9.2, z: -132 },
     gateId: null,
     halfWidth: 1.5,
+    // Shifted a step east of the grown toolworks lot (round 3) and trimmed
+    // to end on the new strand, short of the pulled-in waterline.
     points: [
       { x: -12, z: -107.5 },
-      { x: -11.5, z: -118 },
-      { x: -10, z: -132 },
-      { x: -10, z: -142 },
+      { x: -10.8, z: -118 },
+      { x: -9.2, z: -132 },
+      { x: -9.2, z: -134 },
     ],
   },
   {
@@ -888,7 +931,7 @@ const ROADS = [
     gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: 7.6, z: -96.4 },
+      { x: 7, z: -97.4 },
       { x: 0, z: -99 },
       { x: -9, z: -100.4 },
     ],
@@ -902,6 +945,21 @@ const ROADS = [
       { x: -92, z: -46 },
       { x: -92, z: -54 },
       { x: -92, z: -62 },
+    ],
+  },
+  // A short lane from the inn's door down to the main street, so the inn
+  // square joins the town's spine instead of floating beside it (owner
+  // refinement round 3). APPENDED last: zone1's ZONE1_ROADS spreads these
+  // entries by index, so new roads never land mid-array.
+  {
+    id: 'inn_lane',
+    existingRoadPoint: { x: -44, z: -98 },
+    gateId: null,
+    halfWidth: 1.5,
+    points: [
+      { x: -40.8, z: -92.2 },
+      { x: -42, z: -95 },
+      { x: -44, z: -98 },
     ],
   },
 ] as const;
@@ -977,7 +1035,7 @@ const FURY_POSITION = { x: -2, z: -74 } as const;
 
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
-  makeNpc('marshal_redbrook', { x: 10, z: -97.5 }, 0.0, 'eastbrook_noticeboard'),
+  makeNpc('marshal_redbrook', { x: 9.6, z: -98.6 }, 0.0, 'eastbrook_noticeboard'),
   makeNpc('trader_wilkes', TRADER_POSITION, MARKET_STALLS[1].rotation, MARKET_STALLS[1].id),
   makeNpc('apothecary_lin', APOTHECARY_POSITION, -2.723368324010564, 'eastbrook_civic_well_beacon'),
   makeNpc('brother_aldric', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
