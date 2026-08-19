@@ -154,9 +154,10 @@ Three seams keep it flat; use them, never re-invent them.
 
 - **Every table that grows without bound gets a retention story in the same change.**
   The nightly sweep (`retention_sweep.ts`, registered after listen in `main.ts`) runs
-  batched prunes under a per-run budget; windows are env keys in `.env.example` (most
-  read unset as keep forever, deliberately fail-safe; the marketplace windows default
-  ON, values at their `.env.example` rows, with `0` the explicit keep-forever). A new
+  batched prunes under a per-run budget; windows are env keys in `.env.example`, each
+  with a POSITIVE code default, so an unset key prunes at the value its `.env.example`
+  row states; `0` is the explicit keep-forever, and the reads are deliberately
+  untrimmed so a whitespace value numbers to 0, the safe side for a delete. A new
   per-event, per-session, or per-day table
   either registers a prune primitive in its `*_db.ts` or carries an explicit
   keep-forever comment at the DDL. Fold before deleting when readers need lifetime

@@ -692,6 +692,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
               SELECT 1 FROM pg_index i
                WHERE i.indrelid = c.conrelid
                  AND i.indpred IS NULL
+                 AND i.indisvalid
                  AND i.indkey[0] = c.conkey[1])
           ORDER BY 1, 2`,
       );

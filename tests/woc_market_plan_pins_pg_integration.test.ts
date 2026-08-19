@@ -458,12 +458,14 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     }
     // Judged with the plans open: BOTH cooldown arms are account-scoped
     // probes (account = X AND lock_expires > T, listing_id a residual
-    // filter), so both legitimately ride the account-leading _account index;
-    // _once serves the recorder's listing-scoped statements, pinned
-    // elsewhere. The decisive extra here is that the account-leading path is
-    // PRESENT: a shape drift that pushed the cap arm off account-first
-    // (walking _once and filtering) would drop this name from every plan
-    // while still matching the per-probe alternation.
+    // filter) and today both ride the account-leading _account index; _once
+    // mainly serves the recorder's listing-scoped statements. Honest pin
+    // strength: the two arms share ONE statement, so this cannot see which
+    // arm uses which index, and EITHER abandons index is a legitimate cost
+    // pick over a table the 3-per-account-hour cap and 30-day window keep
+    // tiny; the banned class is the seq scan, asserted per probe above.
+    // This line adds only that the account-leading path stays present in
+    // the statement's plan.
     expect(plans.join('\n')).toContain('woc_market_buy_now_abandons_account');
   }, 20_000);
 
