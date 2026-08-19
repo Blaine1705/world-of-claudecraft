@@ -1966,19 +1966,23 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     z0: number,
     size: number,
     spacing: number,
+    urgent = false,
   ): Promise<boolean> => {
     const active = zoneBuildPool();
     if (!active) return false;
-    const arrays = await active.buildChunk({
-      x0,
-      z0,
-      size,
-      spacing,
-      seed,
-      withSplat: !lowGfx,
-      skirtSpan,
-      lowShade,
-    });
+    const arrays = await active.buildChunk(
+      {
+        x0,
+        z0,
+        size,
+        spacing,
+        seed,
+        withSplat: !lowGfx,
+        skirtSpan,
+        lowShade,
+      },
+      { urgent },
+    );
     if (!arrays) return false;
     if (cancelled) return true; // discarded view: drop the result, do not attach
     attachChunk(finishChunkGeometry(arrays), x0, z0, size, spacing);
@@ -2203,21 +2207,35 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         // here exactly as before, and THAT arm keeps the periodic yield: it is
         // the only one that can eat a frame.
         let sinceYield = 0;
+        // The first error is rethrown after the lane so a failed cell keeps the
+        // pre-pipeline semantics: the zone is NOT marked loaded and the gating
+        // caller's own catch (the arrival chain's fatal overlay) sees it,
+        // instead of a silent permanent hole under the fog clamp.
+        let firstError: unknown;
         await runBoundedLane(
           cells,
           zoneBuildPool()?.size ?? 1,
           async ([cx, cz]) => {
             const job = claimCell(zone.id, cx, cz);
-            if (job && !(await addChunkInWorker(job.x0, job.z0, job.size, job.spacing))) {
+            if (job && !(await addChunkInWorker(job.x0, job.z0, job.size, job.spacing, true))) {
               if (cancelled) return;
               addChunk(job.x0, job.z0, job.size, job.spacing);
-              if (++sinceYield % cellsPerSlice === 0) await yieldSlice();
             }
             if (cancelled) return;
             onProgress?.(++done, total);
+            // Counted per CELL, not per fallback build: the pre-pipeline loop
+            // yielded every four cells whatever their state, and a re-ensure
+            // over an already-claimed zone must not walk every cell yieldless.
+            if (++sinceYield % cellsPerSlice === 0) await yieldSlice();
           },
-          { shouldStop: () => cancelled },
+          {
+            shouldStop: () => cancelled || firstError !== undefined,
+            onError: (error) => {
+              firstError ??= error;
+            },
+          },
         );
+        if (firstError !== undefined) throw firstError;
         if (cancelled) return;
       }
       loadedZones.add(zone.id);

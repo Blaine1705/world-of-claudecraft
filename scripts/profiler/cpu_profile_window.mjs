@@ -77,7 +77,7 @@ export function aggregate(profile, rows) {
     if (!node) continue;
     add(self, frameKey(node.callFrame), row.weightMs);
     const name = node.callFrame?.functionName ?? '';
-    if (name in special) special[name] += row.weightMs;
+    if (Object.hasOwn(special, name)) special[name] += row.weightMs;
     const chain = [];
     for (let id = row.nodeId; id !== undefined; id = parents.get(id)) {
       const current = nodes.get(id);

@@ -11,7 +11,7 @@
 // CSP), and every caller keeps its existing main-thread path for exactly that
 // case. Off-thread generation is a latency optimisation, never a requirement:
 // the results are identical either way, which
-// tests/terrain_chunk_geometry.test.ts and tests/zone_build_worker.test.ts pin.
+// tests/terrain_chunk_geometry.test.ts and tests/terrain_chunk_worker.test.ts pin.
 //
 // Sizing: this work is pure arithmetic, so it scales with cores, but the main
 // thread still has to upload the results, and starving it helps nobody. Hence
@@ -31,13 +31,21 @@ const MAX_WORKERS = 3;
 
 export interface ZoneBuildPool {
   /** Resolves with the chunk's arrays, or null if the worker failed and the
-   *  caller should build it on the main thread instead. */
-  buildChunk(job: Omit<TerrainChunkRequest, 'id' | 'kind'>): Promise<ChunkGeometryArrays | null>;
+   *  caller should build it on the main thread instead. `urgent` puts the job
+   *  ahead of queued background work: a gating caller (a blocking arrival's
+   *  loading screen) must not wait behind idle neighbour prepares. */
+  buildChunk(
+    job: Omit<TerrainChunkRequest, 'id' | 'kind'>,
+    opts?: { urgent?: boolean },
+  ): Promise<ChunkGeometryArrays | null>;
   /** Resolves with the sheet's shore attributes, or null if the worker failed
    *  and the caller should bake them on the main thread instead. The coordinate
    *  arrays are TRANSFERRED, so the caller must hand over arrays it built for
    *  this job and not read them afterwards. */
-  fillWater(job: Omit<WaterFillRequest, 'id' | 'kind'>): Promise<WaterFillArrays | null>;
+  fillWater(
+    job: Omit<WaterFillRequest, 'id' | 'kind'>,
+    opts?: { urgent?: boolean },
+  ): Promise<WaterFillArrays | null>;
   /** How many jobs can be in flight before a submission starts queueing. */
   readonly size: number;
   dispose(): void;
@@ -46,6 +54,10 @@ export interface ZoneBuildPool {
 interface PoolWorker {
   worker: Worker;
   busy: boolean;
+  /** The one job this worker is running, so a worker-level error (which has no
+   *  job id of its own) fails only that job, never the other workers' pending
+   *  ones. */
+  currentId: number | null;
 }
 
 function spawn(): Worker | null {
@@ -67,10 +79,10 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
       : 2;
   // Leave the main thread a core: it still uploads every result.
   const target = Math.max(1, Math.min(MAX_WORKERS, hardware - 1));
-  const workers: PoolWorker[] = [{ worker: first, busy: false }];
+  const workers: PoolWorker[] = [{ worker: first, busy: false, currentId: null }];
   for (let i = 1; i < target; i++) {
     const worker = spawn();
-    if (worker) workers.push({ worker, busy: false });
+    if (worker) workers.push({ worker, busy: false, currentId: null });
   }
 
   const pending = new Map<number, (response: ZoneBuildResponse) => void>();
@@ -83,22 +95,27 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
       const resolve = pending.get(event.data.id);
       pending.delete(event.data.id);
       entry.busy = false;
+      entry.currentId = null;
       resolve?.(event.data);
       waiting.shift()?.();
     };
     entry.worker.onerror = () => {
-      // A worker-level error has no job id, so fail every job it could have
-      // been running rather than leaking the promises.
+      // A worker-level error carries no job id, so fail THIS worker's one
+      // in-flight job (tracked on the entry); the other workers' pending jobs
+      // are healthy and must not be force-failed onto the main-thread path.
+      const id = entry.currentId;
       entry.busy = false;
-      for (const [id, resolve] of [...pending]) {
+      entry.currentId = null;
+      if (id !== null) {
+        const resolve = pending.get(id);
         pending.delete(id);
-        resolve({ id, ok: false, error: 'zone build worker error' });
+        resolve?.({ id, ok: false, error: 'zone build worker error' });
       }
       waiting.shift()?.();
     };
   }
 
-  const claim = async (): Promise<PoolWorker | null> => {
+  const claim = async (urgent: boolean): Promise<PoolWorker | null> => {
     for (;;) {
       if (disposed) return null;
       const free = workers.find((entry) => !entry.busy);
@@ -106,27 +123,46 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
         free.busy = true;
         return free;
       }
-      await new Promise<void>((resolve) => waiting.push(resolve));
+      await new Promise<void>((resolve) => {
+        // Urgent claimants (a gating arrival) go to the FRONT: the pool is
+        // otherwise FIFO, and a teleport's chunks queueing behind three idle
+        // neighbour water fills would extend the loading screen by exactly
+        // the seconds this pool exists to remove.
+        if (urgent) waiting.unshift(resolve);
+        else waiting.push(resolve);
+      });
     }
   };
 
   const submit = async (
     job: Omit<TerrainChunkRequest, 'id'> | Omit<WaterFillRequest, 'id'>,
     transfer?: Transferable[],
+    urgent = false,
   ): Promise<ZoneBuildResponse | null> => {
-    const entry = await claim();
+    const entry = await claim(urgent);
     if (!entry) return null;
     const id = nextId++;
+    entry.currentId = id;
     return await new Promise<ZoneBuildResponse>((resolve) => {
       pending.set(id, resolve);
-      entry.worker.postMessage({ ...job, id } as ZoneBuildRequest, transfer ?? []);
+      try {
+        entry.worker.postMessage({ ...job, id } as ZoneBuildRequest, transfer ?? []);
+      } catch (error) {
+        // A throwing post (a detached transferable, a clone failure) must not
+        // retire the worker: it never received the job.
+        pending.delete(id);
+        entry.busy = false;
+        entry.currentId = null;
+        waiting.shift()?.();
+        resolve({ id, ok: false, error: String(error) });
+      }
     });
   };
 
   return {
     size: workers.length,
-    async buildChunk(job): Promise<ChunkGeometryArrays | null> {
-      const response = await submit({ ...job, kind: 'chunk' });
+    async buildChunk(job, opts): Promise<ChunkGeometryArrays | null> {
+      const response = await submit({ ...job, kind: 'chunk' }, undefined, opts?.urgent === true);
       if (!response?.ok || response.kind !== 'chunk') return null;
       return {
         positions: response.positions,
@@ -138,8 +174,12 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
         indices: response.indices,
       };
     },
-    async fillWater(job): Promise<WaterFillArrays | null> {
-      const response = await submit({ ...job, kind: 'water-fill' }, [job.x.buffer, job.z.buffer]);
+    async fillWater(job, opts): Promise<WaterFillArrays | null> {
+      const response = await submit(
+        { ...job, kind: 'water-fill' },
+        [job.x.buffer, job.z.buffer],
+        opts?.urgent === true,
+      );
       if (!response?.ok || response.kind !== 'water-fill') return null;
       return { shoreDepth: response.shoreDepth, shoreSlope: response.shoreSlope };
     },
@@ -167,7 +207,9 @@ export function zoneBuildPool(): ZoneBuildPool | null {
   // worker samples its own copy of the content, which is always the built-in
   // world, so it would bake the wrong ground and shorelines. Fall back to the
   // main-thread paths while one is active (the spawned pool is kept for the
-  // return to the built-in world).
+  // return to the built-in world). Acquisition-time only: a swap landing after
+  // a job was posted still bakes the built-in world, so the editor must swap
+  // BEFORE it builds, which its play-test entry does.
   if (!isBuiltinWorldActive()) return null;
   if (shared === undefined) shared = createZoneBuildPool();
   return shared;
@@ -177,6 +219,9 @@ export function zoneBuildPool(): ZoneBuildPool | null {
  *  teardown or a graphics rebuild) and forgets it, so the next zone build
  *  spawns a fresh one instead of finding a permanently disposed pool. */
 export function disposeZoneBuildPool(): void {
+  // Also forgets a remembered null: a dispose happens on a renderer teardown
+  // or graphics rebuild, so a workerless host retries the spawn once per
+  // rebuild, never per zone (the memo above covers the per-zone case).
   shared?.dispose();
   shared = undefined;
 }

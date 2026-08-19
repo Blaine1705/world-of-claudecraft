@@ -972,6 +972,7 @@ async function fillShoreOffThread(
   shoreDepth: Float32Array,
   shoreSlope: Float32Array,
   seed: number,
+  urgent: boolean,
 ): Promise<boolean> {
   const pool = zoneBuildPool();
   if (!pool) return false;
@@ -981,7 +982,7 @@ async function fillShoreOffThread(
     x[i] = pos.getX(i);
     z[i] = pos.getZ(i);
   }
-  const filled = await pool.fillWater({ x, z, seed });
+  const filled = await pool.fillWater({ x, z, seed }, { urgent });
   if (!filled) return false;
   shoreDepth.set(filled.shoreDepth);
   shoreSlope.set(filled.shoreSlope);
@@ -1387,7 +1388,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // 1.7 s), and it is pure arithmetic, so it belongs on the shared zone-build
     // workers. The row slicing below stays for the fallback, which is what runs
     // wherever module workers are unavailable or the job failed.
-    if (!(await fillShoreOffThread(pos, shoreDepth, shoreSlope, seed))) {
+    if (!(await fillShoreOffThread(pos, shoreDepth, shoreSlope, seed, !idlePace))) {
       if (idlePace) {
         await runIdleQueue(WATER_VERTEX_ROWS, fillRow, {
           batchSize: WATER_ROWS_PER_IDLE_SLICE,

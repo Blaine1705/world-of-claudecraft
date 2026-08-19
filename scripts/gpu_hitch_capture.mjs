@@ -579,14 +579,23 @@ export async function startCpuProfile(page) {
 export async function stopCpuProfile(profiler, page, outPath) {
   if (!profiler) return null;
   try {
-    const pageNowAtStopMs = await page.evaluate(() => performance.now());
+    // Bracket the stop with two page-clock reads: profile.endTime lands
+    // between them, so the midpoint bounds the anchor skew to half the CDP
+    // round trip instead of the whole of it.
+    const pageNowBeforeStopMs = await page.evaluate(() => performance.now());
     const { profile } = await profiler.session.send('Profiler.stop');
+    const pageNowAfterStopMs = await page.evaluate(() => performance.now());
+    const pageNowAtStopMs = (pageNowBeforeStopMs + pageNowAfterStopMs) / 2;
+    if (!Array.isArray(profile.samples) || profile.samples.length === 0) {
+      console.error('CPU profile is empty (the profiler did not survive to the stop)');
+    }
     await profiler.session.detach().catch(() => {});
     const output = path.resolve(ROOT, outPath);
     fs.mkdirSync(path.dirname(output), { recursive: true });
     const payload = {
       ...profile,
       wocPageNowAtStopMs: pageNowAtStopMs,
+      wocPageNowStopSpreadMs: pageNowAfterStopMs - pageNowBeforeStopMs,
       wocProfileEndTimeUs: profile.endTime,
     };
     fs.writeFileSync(output, `${JSON.stringify(payload)}\n`);
