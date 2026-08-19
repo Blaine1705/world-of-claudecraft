@@ -470,6 +470,7 @@ import {
 import { buildComposer, type PostPipeline } from './post';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
+  compileRootLabel,
   createPrewarmCompileLifecycle,
   type PrewarmCompileLifecycle,
   type RendererPrewarmCategory,
@@ -5811,7 +5812,10 @@ export class Renderer {
     let compileUnitsPlanned = 0;
     let compileUnitsDone = 0;
     let compileUnitsDropped = 0;
-    const compileLifecycle = createPrewarmCompileLifecycle(() => performance.now());
+    const compileLifecycle = createPrewarmCompileLifecycle(
+      () => performance.now(),
+      compileRootLabel,
+    );
     this.gpuHitchCompileLifecycle = compileLifecycle;
     let vfxPrewarmBursts = 0;
     let compileMode: RendererPrewarmStats['compileMode'] = 'none';
@@ -7292,10 +7296,7 @@ export class Renderer {
           // `resume`): pool publication still waits for the same settlement.
           await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));
           return resumeDroppedPrewarmEntries(resume, {
-            idleSlot: () =>
-              idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
-                maxTimeoutDeferrals: 2,
-              }),
+            idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }),
             runUnit: (unit, entry) => {
               // Link/upload debt runs at BOOT_DEBT so the cosmetic BACKGROUND
               // warmers (the preview lane) cannot starve it (hitch-hunt P1:
@@ -7303,10 +7304,9 @@ export class Renderer {
               // BATCH (no pieces) keeps its tail HELD: released, its 16 to 32
               // links piled into the driver at once (sub-1-fps for a minute
               // with a dropped manifest). A debt ROOT piece releases its tail:
-              // ONE link, bounded by the released-tail cap, whereas a held
-              // root blocked the queue head for its whole link wait behind
-              // the driver's queue (batch 18: one root 4.0 s on the iGPU,
-              // the reveal lane starved past its watchdog).
+              // ONE link under the released-tail cap, whereas a held root
+              // blocked the queue head for its whole link wait behind the
+              // driver's queue (batch 18: 4.0 s on the iGPU, reveals starved).
               const debt = prewarmResumeIsDebt(entry.id);
               resumeLedger.noteStart(entry.id);
               const priority = debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME;
@@ -7317,8 +7317,8 @@ export class Renderer {
                   }),
                 );
               }
-              // Cosmetic resume keeps the released tail: held, each 16-root
-              // unit blocked live compile gates for seconds (travel hitches).
+              // Cosmetic resume keeps the released tail (held, a 16-root unit
+              // blocked live compile gates for seconds: travel hitches).
               return this.backgroundGpuWork.run(unit.run, priority, unit.id, {
                 releaseTail: !debt,
               });
