@@ -23,8 +23,10 @@
 // the lesson. Reads world state, writes none, and runs identically against
 // the offline Sim and the online ClientWorld.
 
-import { currentInputHintMode, type InputHintMode } from '../game/input_hint_mode';
+import { currentInputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
+import { voice } from '../game/voice';
+import { coachTrailPlan, distanceToTrail } from '../render/coach_trail_core';
 import type { Renderer } from '../render/renderer';
 import { BOOTCAMP_COURSE_CHECKPOINTS, isOnProvingShore } from '../sim/content/proving_shore';
 import { GAUNTLET_QUEST_ID } from '../sim/tutorial/gauntlet_run';
@@ -35,7 +37,6 @@ import {
   type BootcampParam,
   type BootcampStep,
   bellCardPlan,
-  bootcampArrowTarget,
   bootcampBodyPlan,
   bootcampKeycaps,
   bootcampTitleKey,
@@ -50,9 +51,18 @@ import {
 } from './bootcamp_view';
 import {
   type CoachPromptPlan,
+  coachGlowBagItemId,
+  coachGlowQuestId,
+  coachGlowVendorItemId,
   coachPromptChip,
   coachPromptInRange,
   coachPromptPlan,
+  GUIDE_VOICE_LINES,
+  type GuideVoiceLineName,
+  VEER_GRACE_MS,
+  VEER_NUDGE_COOLDOWN_MS,
+  VEER_NUDGES_PER_STATION,
+  VEER_OFF_YD,
 } from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
@@ -65,7 +75,6 @@ export class BootcampOverlay {
   private engaged = false;
   private step: BootcampStep | null = null;
   private renderKey: string | null = null;
-  private lastMode: InputHintMode = 'keyboard';
   private lastCounts = 0;
   // The camera lesson's client-side tally: accumulated view-yaw travel.
   private cameraTravel = 0;
@@ -81,17 +90,7 @@ export class BootcampOverlay {
   private bodyEl!: HTMLElement;
   private keysEl!: HTMLElement;
   private progressEl!: HTMLElement;
-  private arrow: HTMLElement | null = null;
   private lastFocus: CoachFocus | null = null;
-  private lastKeybinds: Keybinds | null = null;
-  // Per-frame arrow painting state (the write-elision ledger, the memoized
-  // terrain sample, and the resize-listener-cached viewport; see updateArrow).
-  private arrowPainted = { visible: false, sx: Number.NaN, sy: Number.NaN, rot: Number.NaN };
-  private arrowGroundKey = '';
-  private arrowGroundY = 0;
-  private arrowVw = 0;
-  private arrowVh = 0;
-  private onArrowResize: (() => void) | null = null;
   // The floating interact bubble (coach_prompt_view.ts): shown only while
   // standing in interact reach of the coach's current target, so the one
   // button that matters appears where the player is already looking.
@@ -128,7 +127,6 @@ export class BootcampOverlay {
     }
 
     this.lastFocus = focus;
-    this.lastKeybinds = keybinds;
     const isGauntlet = focus?.questId === GAUNTLET_QUEST_ID;
     this.lastCounts = isGauntlet ? questCounts(world) : 0;
 
@@ -168,12 +166,145 @@ export class BootcampOverlay {
 
     if (this.renderKey !== nextRenderKey) {
       this.renderKey = nextRenderKey;
-      this.lastMode = mode;
       this.renderPanel(keybinds);
     }
 
-    this.updateArrow(renderer);
     this.updatePrompt(world, renderer, keybinds);
+    this.applyUiGlow();
+    this.updateGuideVoice(world, focus);
+  }
+
+  // ---- Ferryman Odo's guiding voice --------------------------------------
+  // One-shot reactions to the player's FIRST actions (first flag, the run
+  // hand-in, each station handed back), a veer-off-the-trail nudge, and the
+  // graduation send-off. The clip is optional garnish (voice.play on an
+  // unrendered key is a silent no-op); the caption under the coach card is
+  // the always-on half. Session-scoped one-shot latches: a reload re-greets,
+  // which reads as warmth, not a bug.
+  private guidePrevStation: string | null = null;
+  private guidePrevCounts = -1;
+  private guideSpoken = new Set<GuideVoiceLineName>();
+  private guideStationParity = false;
+  private guideVeerCheckedAt = 0;
+  private guideOffPathSince: number | null = null;
+  private guideLastNudgeAt = 0;
+  private guideNudges = 0;
+  private captionEl: HTMLElement | null = null;
+  private captionTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private updateGuideVoice(world: IWorld, focus: CoachFocus | null): void {
+    if (!this.engaged) return;
+    const stationKey = this.bellPhase ? 'bell' : focus ? `${focus.questId}:${focus.state}` : 'none';
+    if (stationKey !== this.guidePrevStation) {
+      const prev = this.guidePrevStation;
+      if (stationKey === 'bell') {
+        this.speak('graduate');
+      } else if (prev === null && focus?.state === 'available') {
+        this.speak('arrival');
+      } else if (prev?.endsWith(':ready') && focus && !prev.startsWith(`${focus.questId}:`)) {
+        // A hand-in just landed: alternate the two encouragement lines.
+        this.speak(this.guideStationParity ? 'stationDoneB' : 'stationDoneA', true);
+        this.guideStationParity = !this.guideStationParity;
+      }
+      this.guidePrevStation = stationKey;
+      this.guideNudges = 0;
+      this.guideOffPathSince = null;
+    }
+    if (focus?.questId === GAUNTLET_QUEST_ID) {
+      if (this.guidePrevCounts === 0 && this.lastCounts === 1) this.speak('firstFlag');
+      if (this.guidePrevCounts >= 0 && this.guidePrevCounts < BOOTCAMP_COURSE_CHECKPOINTS.length) {
+        if (this.lastCounts >= BOOTCAMP_COURSE_CHECKPOINTS.length) this.speak('runDone');
+      }
+      this.guidePrevCounts = this.lastCounts;
+    } else {
+      this.guidePrevCounts = -1;
+    }
+    this.updateVeerNudge(world);
+  }
+
+  private updateVeerNudge(world: IWorld): void {
+    const now = performance.now();
+    if (now - this.guideVeerCheckedAt < 1000) return;
+    this.guideVeerCheckedAt = now;
+    const p = world.player;
+    if (!p) return;
+    const plan = coachTrailPlan(world, this.lastCounts);
+    if (!plan) {
+      this.guideOffPathSince = null;
+      return;
+    }
+    const d = distanceToTrail(plan.points, p.pos.x, p.pos.z);
+    if (d <= VEER_OFF_YD) {
+      this.guideOffPathSince = null;
+      return;
+    }
+    if (this.guideOffPathSince === null) {
+      this.guideOffPathSince = now;
+      return;
+    }
+    if (now - this.guideOffPathSince < VEER_GRACE_MS) return;
+    if (this.guideNudges >= VEER_NUDGES_PER_STATION) return;
+    if (now - this.guideLastNudgeAt < VEER_NUDGE_COOLDOWN_MS) return;
+    this.guideLastNudgeAt = now;
+    this.guideNudges += 1;
+    this.guideOffPathSince = null;
+    this.speak('veerOff', true);
+  }
+
+  private speak(name: GuideVoiceLineName, repeatable = false): void {
+    if (!repeatable) {
+      if (this.guideSpoken.has(name)) return;
+      this.guideSpoken.add(name);
+    }
+    const line = GUIDE_VOICE_LINES[name];
+    // Never talk over a dialog greeting or another guide line mid-play; the
+    // caption still lands, so the guidance is never lost with the audio.
+    if (!voice.isPlaying()) voice.play(line.clip);
+    this.showCaption(t(line.caption));
+  }
+
+  private showCaption(text: string): void {
+    this.ensureDom();
+    if (!this.root) return;
+    if (!this.captionEl) {
+      const el = document.createElement('div');
+      el.className = 'tut-voice';
+      this.root.appendChild(el);
+      this.captionEl = el;
+    }
+    const odo = tEntity({ kind: 'npc', id: 'ferryman_odo', field: 'name' });
+    this.captionEl.textContent = `${odo}: "${text}"`;
+    this.captionEl.style.display = '';
+    if (this.captionTimer) clearTimeout(this.captionTimer);
+    this.captionTimer = setTimeout(() => {
+      if (this.captionEl) this.captionEl.style.display = 'none';
+    }, 8000);
+  }
+
+  // Toggle the press-this-next glow (.qd-coach) on whichever window controls
+  // match the current station: the tracker title, the quest-log row, the
+  // vendor's pouch row, the bagged pouch stack. Windows rebuild their DOM
+  // freely, so the class is re-synced on a short cadence rather than hooked
+  // into every painter; the toggles are same-state no-ops between changes.
+  private glowTick = 0;
+
+  private applyUiGlow(): void {
+    this.glowTick = (this.glowTick + 1) % 10;
+    if (this.glowTick !== 0) return;
+    const focus = this.lastFocus;
+    const questId = coachGlowQuestId(focus);
+    const vendorItem = coachGlowVendorItemId(focus);
+    const bagItem = coachGlowBagItemId(focus);
+    syncGlow('#quest-tracker .qt-title', (el) => el.dataset.quest === questId);
+    syncGlow('#quest-log .ql-item', (el) => el.dataset.quest === questId);
+    syncGlow(
+      '#vendor-window .vendor-item',
+      (el) => vendorItem !== null && el.dataset.focusKey === `buy:${vendorItem}`,
+    );
+    syncGlow(
+      '#bags .bag-item',
+      (el) => bagItem !== null && (el.dataset.focusKey?.startsWith(bagItem) ?? false),
+    );
   }
 
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange
@@ -229,27 +360,26 @@ export class BootcampOverlay {
     // The quest dialog shifts down below the card while this class is up.
     document.body.classList.add('bc-coach-up');
 
-    const arrow = document.createElement('div');
-    arrow.className = 'tut-arrow';
-    arrow.setAttribute('aria-hidden', 'true');
-    arrow.textContent = '➤'; // the tut-arrow family's marker glyph
-    ui.appendChild(arrow);
-    this.arrow = arrow;
+    // No guidance arrow here (the Eastbrook coachmark keeps its own): the
+    // island guides with the golden ground trail, the target NPC's aura, and
+    // the objective beam (render/island_guidance.ts), which playtests read
+    // far better than a screen-space pointer.
 
-    // The interact bubble: a keycap chip plus a one-word verb, world-anchored
-    // over the target. aria-hidden: the coach card body already carries the
-    // same instruction for screen readers.
+    // The prompt bubble: keycap chip(s) plus a one-word verb. World-anchored
+    // over interact targets; screen-anchored low-center for the movement
+    // lessons (the W ask). aria-hidden: the coach card body already carries
+    // the same instruction for screen readers.
     const prompt = document.createElement('div');
     prompt.className = 'tut-prompt';
     prompt.setAttribute('aria-hidden', 'true');
-    const chip = document.createElement('span');
-    chip.className = 'tut-keycap';
+    const chips = document.createElement('span');
+    chips.className = 'tut-prompt-chips';
     const verb = document.createElement('span');
     verb.className = 'tut-prompt-verb';
-    prompt.append(chip, verb);
+    prompt.append(chips, verb);
     ui.appendChild(prompt);
     this.prompt = prompt;
-    this.promptChipEl = chip;
+    this.promptChipEl = chips;
     this.promptVerbEl = verb;
   }
 
@@ -276,7 +406,6 @@ export class BootcampOverlay {
   /** The Gauntlet's own lesson-ladder card (the rail's head quest). */
   private renderLadderPanel(keybinds: Keybinds): void {
     const mode = currentInputHintMode();
-    this.lastMode = mode;
 
     const unbound = t('hud.options.unbound');
     const labels = {
@@ -310,7 +439,6 @@ export class BootcampOverlay {
     const focus = this.lastFocus;
     if (!focus) return;
     const mode = currentInputHintMode();
-    this.lastMode = mode;
 
     const labels = this.coachLabels(keybinds);
     const plan = coachCardPlan(focus, mode);
@@ -333,7 +461,6 @@ export class BootcampOverlay {
   /** The closing card: the rail is done, ring the bell home. */
   private renderBellPanel(keybinds: Keybinds): void {
     const mode = currentInputHintMode();
-    this.lastMode = mode;
     const labels = this.coachLabels(keybinds);
     const plan = bellCardPlan(mode);
     const params: Record<string, string> = {};
@@ -358,92 +485,51 @@ export class BootcampOverlay {
     this.keysEl.style.display = this.keysEl.childElementCount > 0 ? '' : 'none';
   }
 
-  // Points the shared course arrow at the current lesson's target. Runs every
-  // HUD frame, so it follows the per-frame painter contracts by hand (this is
-  // a bare-named overlay, not a *_painter on the PainterHost seam): the
-  // terrain sample is memoized per target, the viewport is a cached value a
-  // resize listener refreshes (never a layout-forcing innerWidth read at the
-  // tail of Hud.update), and every style write is elided against the last
-  // painted value, so a still camera writes nothing.
-  private updateArrow(renderer: Renderer): void {
-    if (!this.arrow) return;
-    const target = this.bellPhase
-      ? bellCardPlan(this.lastMode).arrow
-      : this.step !== null
-        ? bootcampArrowTarget(this.step, this.lastCounts)
-        : this.lastFocus
-          ? coachCardPlan(this.lastFocus, this.lastMode).arrow
-          : null;
-    if (!target) {
-      this.hideArrow();
-      return;
-    }
-
-    // Targets are authored on dry ground; the max() is defensive for edited
-    // worlds so the marker never aims under the sea. Static per lesson, so
-    // one sample per target, not one per frame.
-    const groundKey = `${target.x},${target.z}`;
-    if (this.arrowGroundKey !== groundKey) {
-      this.arrowGroundKey = groundKey;
-      this.arrowGroundY = Math.max(groundHeight(target.x, target.z, WORLD_SEED), WATER_LEVEL) + 2.2;
-    }
-    if (!this.onArrowResize) {
-      const read = (): void => {
-        this.arrowVw = window.innerWidth;
-        this.arrowVh = window.innerHeight;
-      };
-      read();
-      this.onArrowResize = read;
-      window.addEventListener('resize', read);
-    }
-    const v = renderer.worldToScreen(target.x, this.arrowGroundY, target.z);
-    const margin = 56;
-    const w = this.arrowVw;
-    const h = this.arrowVh;
-    let sx = v.x;
-    let sy = v.y;
-    if (v.behind) {
-      sx = w - v.x;
-      sy = h - v.y;
-    }
-    const angle = Math.atan2(sy - h / 2, sx - w / 2);
-    // Half-pixel quantization: enough resolution for a smooth glide, coarse
-    // enough that float jitter from a still camera elides to zero writes.
-    sx = Math.round(Math.max(margin, Math.min(w - margin, sx)) * 2) / 2;
-    sy = Math.round(Math.max(margin, Math.min(h - margin, sy)) * 2) / 2;
-    const rot = Math.round(angle * 200) / 200;
-
-    const last = this.arrowPainted;
-    if (!last.visible) {
-      this.arrow.style.display = 'block';
-      last.visible = true;
-    }
-    if (last.sx !== sx) {
-      this.arrow.style.left = `${sx}px`;
-      last.sx = sx;
-    }
-    if (last.sy !== sy) {
-      this.arrow.style.top = `${sy}px`;
-      last.sy = sy;
-    }
-    if (last.rot !== rot) {
-      this.arrow.style.transform = `translate(-50%, -50%) rotate(${rot}rad)`;
-      last.rot = rot;
-    }
-  }
-
-  private hideArrow(): void {
-    if (!this.arrow || !this.arrowPainted.visible) return;
-    this.arrow.style.display = 'none';
-    this.arrowPainted.visible = false;
-  }
-
-  // The interact bubble's per-frame drive: same painter discipline as
-  // updateArrow (memoized ground sample, cached viewport, elided writes).
-  // Hidden out of interact reach, so appearing IS the signal to press.
+  // The interact bubble's per-frame drive: the per-frame painter contracts
+  // by hand (memoized ground sample, elided writes; this is a bare-named
+  // overlay, not a *_painter on the PainterHost seam). Hidden out of
+  // interact reach, so appearing IS the signal to press.
   private updatePrompt(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
     if (!this.prompt || !this.promptChipEl || !this.promptVerbEl) return;
     const p = world.player;
+    const mode = currentInputHintMode();
+
+    // The movement lessons carry a screen-anchored bubble (there is no world
+    // point to stand it on: the lesson is the player's own hands), so the W
+    // ask is as loud as the interact F. Keyboard only, the keycap rule.
+    if (
+      mode === 'keyboard' &&
+      (this.step === 'forward' || this.step === 'turnwalk' || this.step === 'strafe')
+    ) {
+      const unbound = t('hud.options.unbound');
+      const caps = bootcampKeycaps(this.step, mode, {
+        forwardKey: keybinds.primaryLabel('forward') || unbound,
+        turnKey: keybinds.primaryLabel('turnRight') || unbound,
+        strafeKey: keybinds.primaryLabel('strafeLeft') || unbound,
+        interactKey: keybinds.primaryLabel('interact') || unbound,
+      });
+      const contentKey = `move:${this.step}:${caps.join(',')}`;
+      if (this.promptContentKey !== contentKey) {
+        this.promptContentKey = contentKey;
+        this.paintPromptChips(caps);
+        this.promptVerbEl.textContent = t('hudChrome.bootcamp.promptHold');
+      }
+      this.prompt.classList.add('tut-prompt-center');
+      if (!this.promptPainted.visible) {
+        this.prompt.style.display = 'flex';
+        this.promptPainted.visible = true;
+      }
+      // The centered variant is CSS-positioned; clear any stale inline offsets.
+      if (!Number.isNaN(this.promptPainted.sx)) {
+        this.prompt.style.left = '';
+        this.prompt.style.top = '';
+        this.promptPainted.sx = Number.NaN;
+        this.promptPainted.sy = Number.NaN;
+      }
+      return;
+    }
+    this.prompt.classList.remove('tut-prompt-center');
+
     const plan: CoachPromptPlan | null = p
       ? coachPromptPlan({
           bellPhase: this.bellPhase,
@@ -458,13 +544,11 @@ export class BootcampOverlay {
       return;
     }
 
-    const mode = currentInputHintMode();
     const { chip } = coachPromptChip(mode, keybinds.primaryLabel('interact'));
     const contentKey = `${plan.verbKey}:${chip ?? ''}:${mode}`;
     if (this.promptContentKey !== contentKey) {
       this.promptContentKey = contentKey;
-      this.promptChipEl.textContent = chip ?? '';
-      this.promptChipEl.style.display = chip ? '' : 'none';
+      this.paintPromptChips(chip ? [chip] : []);
       this.promptVerbEl.textContent = t(plan.verbKey);
     }
 
@@ -496,6 +580,18 @@ export class BootcampOverlay {
     }
   }
 
+  private paintPromptChips(caps: readonly string[]): void {
+    if (!this.promptChipEl) return;
+    this.promptChipEl.replaceChildren();
+    for (const cap of caps) {
+      const chip = document.createElement('span');
+      chip.className = 'tut-keycap';
+      chip.textContent = cap;
+      this.promptChipEl.appendChild(chip);
+    }
+    this.promptChipEl.style.display = caps.length > 0 ? '' : 'none';
+  }
+
   private hidePrompt(): void {
     if (!this.prompt || !this.promptPainted.visible) return;
     this.prompt.style.display = 'none';
@@ -509,22 +605,26 @@ export class BootcampOverlay {
     this.renderKey = null;
     this.bellPhase = false;
     this.root?.remove();
-    this.arrow?.remove();
     this.prompt?.remove();
     this.root = null;
-    this.arrow = null;
     this.prompt = null;
     this.promptChipEl = null;
     this.promptVerbEl = null;
     this.promptContentKey = '';
     this.promptPainted = { visible: false, sx: Number.NaN, sy: Number.NaN };
     this.promptGroundKey = '';
-    if (this.onArrowResize) {
-      window.removeEventListener('resize', this.onArrowResize);
-      this.onArrowResize = null;
+    // Leaving the island: no control is the next press any more.
+    for (const scope of ['#quest-tracker', '#quest-log', '#vendor-window', '#bags']) {
+      for (const el of document.querySelectorAll<HTMLElement>(`${scope} .qd-coach`)) {
+        el.classList.remove('qd-coach');
+      }
     }
-    this.arrowPainted = { visible: false, sx: Number.NaN, sy: Number.NaN, rot: Number.NaN };
-    this.arrowGroundKey = '';
+    if (this.captionTimer) clearTimeout(this.captionTimer);
+    this.captionTimer = null;
+    this.captionEl = null;
+    this.guidePrevStation = null;
+    this.guidePrevCounts = -1;
+    this.guideOffPathSince = null;
     document.body.classList.remove('bc-coach-up');
   }
 }
@@ -542,6 +642,13 @@ function railQuestState(world: IWorld, questId: string): CoachState | null {
   if (state === 'available') return 'available';
   if (state === 'ready') return 'ready';
   return null;
+}
+
+/** Class-toggle sweep for the press-this-next glow (same-state no-ops). */
+function syncGlow(selector: string, want: (el: HTMLElement) => boolean): void {
+  for (const el of document.querySelectorAll<HTMLElement>(selector)) {
+    el.classList.toggle('qd-coach', want(el));
+  }
 }
 
 /** Shortest signed angular distance, for the camera lesson's travel tally. */

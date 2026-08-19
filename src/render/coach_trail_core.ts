@@ -163,6 +163,33 @@ export function coachTrailPlan(
   return null;
 }
 
+/** Planar distance from (x, z) to the trail polyline: the min over its
+ *  segments (point-to-segment, not point-to-vertex, so walking BETWEEN two
+ *  far-apart waypoints still counts as on the path). The ferryman's
+ *  veer-off nudge keys on this. */
+export function distanceToTrail(
+  points: readonly { x: number; z: number }[],
+  x: number,
+  z: number,
+): number {
+  if (points.length === 0) return Number.POSITIVE_INFINITY;
+  let best = Math.hypot(points[0].x - x, points[0].z - z);
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1];
+    const b = points[i];
+    const abx = b.x - a.x;
+    const abz = b.z - a.z;
+    const lenSq = abx * abx + abz * abz;
+    const t =
+      lenSq === 0 ? 0 : Math.max(0, Math.min(1, ((x - a.x) * abx + (z - a.z) * abz) / lenSq));
+    const px = a.x + abx * t;
+    const pz = a.z + abz * t;
+    const d = Math.hypot(px - x, pz - z);
+    if (d < best) best = d;
+  }
+  return best;
+}
+
 /** The ONE island NPC who is the rail's current pressing target (the giver
  *  on the way in, the turn-in once the task is done): the golden-glow NPC.
  *  Null while a task is mid-flight (the glow would point at nothing useful)
@@ -180,8 +207,40 @@ export interface CoachGuides {
   plan: CoachTrailPlan | null;
   glowNpcId: string | null;
   /** The glow NPC's authored stand (island NPCs are stationary), the target
-   *  ring's world anchor. */
+   *  ring's and aura's world anchor. */
   glowNpcPos: { x: number; z: number } | null;
+  /** A NON-character objective's world anchor: the current gauntlet flag,
+   *  the signpost, the ferry bell. Carries the vertical light beam. */
+  beamAt: { x: number; z: number } | null;
+  /** True on the crate haul: the beam follows the nearest LIVE crate, which
+   *  only the consumer can resolve (it needs the entity roster). */
+  beamAtNearestCrate: boolean;
+}
+
+/** The non-character objective the vertical beam should stand over, or null
+ *  when the station's target is an NPC (they get the aura instead). */
+function beamTarget(
+  world: CoachGuideReader,
+  gauntletCounts: number,
+): { at: { x: number; z: number } | null; nearestCrate: boolean } {
+  const focus = railFocus(world);
+  if (!focus) {
+    const last = PROVING_SHORE_QUEST_ORDER[PROVING_SHORE_QUEST_ORDER.length - 1];
+    if (world.questState(last) === 'done') return { at: bellPoint(), nearestCrate: false };
+    return { at: null, nearestCrate: false };
+  }
+  if (focus.state !== 'active') return { at: null, nearestCrate: false };
+  if (focus.questId === PROVING_SHORE_QUEST_ORDER[0]) {
+    // Mid-lanes: the beam stands on the CURRENT flag. Once every flag is
+    // tagged the target is Overseer Pell, an NPC: aura, not beam.
+    if (gauntletCounts < BOOTCAMP_COURSE_CHECKPOINTS.length) {
+      return { at: BOOTCAMP_COURSE_CHECKPOINTS[gauntletCounts] ?? null, nearestCrate: false };
+    }
+    return { at: null, nearestCrate: false };
+  }
+  if (focus.questId === 'q_ps_the_wreck_line') return { at: null, nearestCrate: true };
+  if (focus.questId === 'q_ps_the_signpost') return { at: SIGNPOST_SPOT, nearestCrate: false };
+  return { at: null, nearestCrate: false };
 }
 
 /** One per-frame read for the renderer: the trail plan plus the golden
@@ -190,9 +249,12 @@ export interface CoachGuides {
 export function coachGuides(world: CoachGuideReader): CoachGuides {
   const gauntletCounts = world.questLog.get(PROVING_SHORE_QUEST_ORDER[0])?.counts?.[0] ?? 0;
   const glowNpcId = coachTargetNpcId(world);
+  const beam = beamTarget(world, gauntletCounts);
   return {
     plan: coachTrailPlan(world, gauntletCounts),
     glowNpcId,
     glowNpcPos: glowNpcId ? PROVING_SHORE_NPCS[glowNpcId].pos : null,
+    beamAt: beam.at,
+    beamAtNearestCrate: beam.nearestCrate,
   };
 }

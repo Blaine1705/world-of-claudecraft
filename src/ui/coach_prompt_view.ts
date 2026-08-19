@@ -161,6 +161,74 @@ export function coachPromptInRange(
   return planar(plan.x, plan.z, playerPos.x, playerPos.z) <= plan.range;
 }
 
+// ---------------------------------------------------------------------------
+// The press-this-next UI glow (styles/components.css .qd-coach): which
+// control outside the dialog pulses for the current station. Applied by the
+// bootcamp overlay's glow applicator; the quest dialog gates its own rows.
+// ---------------------------------------------------------------------------
+
+/** The rail quest whose tracker title and quest-log row pulse. */
+export function coachGlowQuestId(focus: CoachFocus | null): string | null {
+  return focus?.questId ?? null;
+}
+
+/** The vendor stock row that pulses (the pouch purchase lesson). */
+export function coachGlowVendorItemId(focus: CoachFocus | null): string | null {
+  return focus?.questId === 'q_ps_pouch_and_purse' && focus.state === 'active'
+    ? 'linen_pouch'
+    : null;
+}
+
+/** The bag stack that pulses (the pouch buckle-on lesson). */
+export function coachGlowBagItemId(focus: CoachFocus | null): string | null {
+  return focus?.questId === 'q_ps_pouch_and_purse' && focus.state === 'ready'
+    ? 'linen_pouch'
+    : null;
+}
+
+// ---------------------------------------------------------------------------
+// Ferryman Odo's guiding voice: the clip key (rendered by the ElevenLabs
+// pipeline from scripts/voices/extra_lines.mjs, whose guide__odo__* texts
+// mirror these captions in English) plus the LOCALIZED caption row the coach
+// card shows while the line plays. tests/coach_prompt_view.test.ts holds the
+// clip keys and the extra_lines entries together.
+// ---------------------------------------------------------------------------
+
+export type GuideVoiceLineName =
+  | 'arrival'
+  | 'firstFlag'
+  | 'runDone'
+  | 'stationDoneA'
+  | 'stationDoneB'
+  | 'veerOff'
+  | 'graduate';
+
+export const GUIDE_VOICE_LINES: Readonly<
+  Record<GuideVoiceLineName, { clip: string; caption: TranslationKey }>
+> = {
+  arrival: { clip: 'guide__odo__arrival', caption: 'hudChrome.bootcamp.voiceArrival' },
+  firstFlag: { clip: 'guide__odo__first_flag', caption: 'hudChrome.bootcamp.voiceFirstFlag' },
+  runDone: { clip: 'guide__odo__run_done', caption: 'hudChrome.bootcamp.voiceRunDone' },
+  stationDoneA: {
+    clip: 'guide__odo__station_done_a',
+    caption: 'hudChrome.bootcamp.voiceStationDoneA',
+  },
+  stationDoneB: {
+    clip: 'guide__odo__station_done_b',
+    caption: 'hudChrome.bootcamp.voiceStationDoneB',
+  },
+  veerOff: { clip: 'guide__odo__veer_off', caption: 'hudChrome.bootcamp.voiceVeerOff' },
+  graduate: { clip: 'guide__odo__graduate', caption: 'hudChrome.bootcamp.voiceGraduate' },
+};
+
+/** How far from the golden trail counts as veering off (the trail legs are
+ *  straight chords of winding roads, so this carries real slack), and how
+ *  long the player must stay out before Odo says anything. */
+export const VEER_OFF_YD = 30;
+export const VEER_GRACE_MS = 5000;
+export const VEER_NUDGE_COOLDOWN_MS = 45000;
+export const VEER_NUDGES_PER_STATION = 2;
+
 /** The chip text beside the verb: the live interact bind on keyboard, the
  *  fixed pad interact button, a localized "Tap" on touch (chips are keycap
  *  GLYPHS, so the pad's fixed B mapping (gamepad_map.ts) is literal, not

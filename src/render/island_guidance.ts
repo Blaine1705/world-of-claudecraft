@@ -22,7 +22,14 @@ const EMPTY_BEACON_IDS: ReadonlySet<string> = new Set();
 /** The world facets this coordinator reads each frame. */
 export interface GuideWorld extends CoachGuideReader {
   player: { pos: { x: number; z: number } } | null | undefined;
+  entities: ReadonlyMap<
+    number,
+    { kind: string; objectItemId?: string | null; dead?: boolean; pos: { x: number; z: number } }
+  >;
 }
+
+/** The crate haul's live ground objects (entity.ts createGroundObject). */
+const CRATE_OBJECT_ITEM_ID = 'ps_castaway_crate';
 
 interface SparkleVfx {
   castSparkle(entityId: number, school: string, dt: number, color?: number): void;
@@ -67,10 +74,32 @@ export class IslandGuidance {
     vfx.castSparkle(e.id, 'holy', dt * (gold ? 3.0 : 2.0), gold ? GOLD_FIZZ : undefined);
   }
 
-  /** Drive the trail ribbon and the target ring; call once per render frame
-   *  (actionable guidance, identical on every graphics tier). */
+  /** Drive the trail ribbon, the target aura/ring, and the objective beam;
+   *  call once per render frame (actionable guidance, identical on every
+   *  graphics tier). */
   update(world: GuideWorld, time: number, dt: number): void {
     this.frame(world, time);
-    this.trail.update(this.guides?.plan ?? null, this.guides?.glowNpcPos ?? null, time, dt);
+    const g = this.guides;
+    let beamAt = g?.beamAt ?? null;
+    if (!beamAt && g?.beamAtNearestCrate) beamAt = nearestLiveCrate(world);
+    this.trail.update(g?.plan ?? null, g?.glowNpcPos ?? null, beamAt, time, dt);
   }
+}
+
+/** The nearest live castaway crate to the player, the crate haul's beam
+ *  anchor (crates despawn between respawns, so this follows the roster). */
+function nearestLiveCrate(world: GuideWorld): { x: number; z: number } | null {
+  const p = world.player;
+  if (!p) return null;
+  let best: { x: number; z: number } | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const e of world.entities.values()) {
+    if (e.kind !== 'object' || e.objectItemId !== CRATE_OBJECT_ITEM_ID || e.dead) continue;
+    const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+    if (d < bestD) {
+      bestD = d;
+      best = e.pos;
+    }
+  }
+  return best;
 }

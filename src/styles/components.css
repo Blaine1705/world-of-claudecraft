@@ -803,12 +803,13 @@
     outline: 3px solid var(--color-border-focus);
     outline-offset: 2px;
   }
-  /* The Proving Shore's press-this-next glow (quest_dialog_controller.ts adds
-     qd-coach on the island): a breathing golden border on the quest rows and
-     the Accept/Complete button, so a brand-new player never hunts for the
-     next click. Island-only by the class, shared by both element families. */
-  .qd-list-item.qd-coach,
-  .btn.qd-coach {
+  /* The Proving Shore's press-this-next glow: a breathing golden border on
+     whichever control is the step's next click, so a brand-new player never
+     hunts for it. Island-only by the class; applied by the quest dialog
+     controller (its rows and Accept/Complete) and by the bootcamp overlay's
+     glow applicator (tracker titles, quest-log rows, the vendor buy row,
+     the bag stack), all sharing this one rule. */
+  .qd-coach {
     border: 1px solid var(--gold);
     box-shadow:
       0 0 10px #ffc86066,
@@ -829,8 +830,7 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .qd-list-item.qd-coach,
-    .btn.qd-coach {
+    .qd-coach {
       animation: none;
     }
   }

@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.voiceGraduate': '鐘はおまえさんのために鳴った。海の向こうでイーストブルックが待っておる。もう大丈夫だ。',
+  'hudChrome.bootcamp.voiceVeerOff': '待ちなさい、そっちは違う。金色の道は後ろだよ。',
+  'hudChrome.bootcamp.voiceStationDoneB': 'だいぶ様になってきたな、間違いない。',
+  'hudChrome.bootcamp.voiceStationDoneA': 'よくやった。次へ進みなさい、道はもう照らしてある。',
+  'hudChrome.bootcamp.voiceRunDone': '見事な走りだった。褒美は監督官ペルが持っておる。受け取りに行きなさい。',
+  'hudChrome.bootcamp.voiceFirstFlag': '旗をひとつ越えたな。その調子で足を止めるな、残りはふたつだ。',
+  'hudChrome.bootcamp.voiceArrival': '無事の上陸だ。足元の金色の道が見えるか？わしよりよほど道を知っておる。あれをたどりなさい。',
   'guide.classPage.formName.form_cat': 'ウルフフォーム',
   'guide.gear.slotOffhand': 'オフハンド',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -13096,17 +13103,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。インタラクトボタンを押して走りを納め、最初の報酬を受け取ろう。',
   'hudChrome.bootcamp.coachNextTitle': '次は{npc}',
   'hudChrome.bootcamp.coachNextBody':
-    '矢印をたどって{npc}のところへ。名前が見えるところまで歩み寄り、{interactKey}を押すか、左クリックして次の仕事を受けよう。',
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、{interactKey}を押すか、左クリックして次の仕事を受けよう。',
   'hudChrome.bootcamp.coachNextBodyTouch':
-    '矢印をたどって{npc}のところへ。名前が見えるところまで歩み寄り、相手をタップするか、使用ボタンをタップして次の仕事を受けよう。',
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、相手をタップするか、使用ボタンをタップして次の仕事を受けよう。',
   'hudChrome.bootcamp.coachNextBodyPad':
-    '矢印をたどって{npc}のところへ。名前が見えるところまで歩み寄り、インタラクトボタンを押して次の仕事を受けよう。',
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、インタラクトボタンを押して次の仕事を受けよう。',
   'hudChrome.bootcamp.coachTaskBody':
-    '矢印をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら{mapKey}で地図が開ける。',
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら{mapKey}で地図が開ける。',
   'hudChrome.bootcamp.coachTaskBodyTouch':
-    '矢印をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
   'hudChrome.bootcamp.coachTaskBodyPad':
-    '矢印をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
   'hudChrome.bootcamp.coachReadyTitle': '任務完了',
   'hudChrome.bootcamp.coachReadyBody':
     '{npc}のもとへ行き、{interactKey}を押すか、左クリックして納め、報酬を受け取ろう。',

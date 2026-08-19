@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.voiceGraduate': '자네를 위해 종이 울렸네. 바다 건너 이스트브룩이 기다리고 있고, 자네는 준비가 되었네.',
+  'hudChrome.bootcamp.voiceVeerOff': '잠깐, 친구. 그쪽이 아닐세. 황금 길은 뒤에 있네.',
+  'hudChrome.bootcamp.voiceStationDoneB': '제법 손에 익어 가는군, 틀림없네.',
+  'hudChrome.bootcamp.voiceStationDoneA': '잘했네. 다음으로 가게, 길은 이미 밝혀 두었으니.',
+  'hudChrome.bootcamp.voiceRunDone': '깔끔한 질주였네. 보상은 감독관 펠이 갖고 있으니 가서 받게.',
+  'hudChrome.bootcamp.voiceFirstFlag': '깃발 하나를 지났군. 다리를 멈추지 말게, 이제 둘 남았네.',
+  'hudChrome.bootcamp.voiceArrival': '무사히 뭍에 올랐군. 발밑의 황금 길이 보이나? 나보다 길을 잘 아니 그대로 따라가게.',
   'guide.classPage.formName.form_cat': '늑대 변신',
   'guide.gear.slotOffhand': '보조장비',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -13105,17 +13112,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 상호작용 버튼을 눌러 완주를 보고하고 첫 보상을 받으세요.',
   'hudChrome.bootcamp.coachNextTitle': '다음: {npc}',
   'hudChrome.bootcamp.coachNextBody':
-    '화살표를 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 다음 임무를 받으세요.',
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 다음 임무를 받으세요.',
   'hudChrome.bootcamp.coachNextBodyTouch':
-    '화살표를 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상대를 탭하거나 사용 버튼을 탭해 다음 임무를 받으세요.',
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상대를 탭하거나 사용 버튼을 탭해 다음 임무를 받으세요.',
   'hudChrome.bootcamp.coachNextBodyPad':
-    '화살표를 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 다음 임무를 받으세요.',
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 다음 임무를 받으세요.',
   'hudChrome.bootcamp.coachTaskBody':
-    '화살표를 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 {mapKey}로 지도를 열 수 있습니다.',
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 {mapKey}로 지도를 열 수 있습니다.',
   'hudChrome.bootcamp.coachTaskBodyTouch':
-    '화살표를 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
   'hudChrome.bootcamp.coachTaskBodyPad':
-    '화살표를 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
   'hudChrome.bootcamp.coachReadyTitle': '임무 완료',
   'hudChrome.bootcamp.coachReadyBody':
     '{npc}에게 가서 {interactKey}를 누르거나 왼쪽 클릭해 임무를 보고하고 보상을 받으세요.',

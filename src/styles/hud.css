@@ -479,6 +479,15 @@
     font-weight: 600;
     color: var(--gold-dim);
   }
+  /* Ferryman Odo's caption row (bootcamp.ts showCaption): the on-screen half
+     of a guide voice line, shown under the card body for a few seconds. */
+  .tut-voice {
+    margin-top: 8px;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--gold-dim);
+  }
   /* The bootcamp card's on-screen keycap chips (bootcamp.ts): the physical
      keys the current lesson asks for, drawn as caps under the body copy. */
   .tut-keys {
@@ -634,8 +643,26 @@
     font-size: 13px;
     padding: 4px 7px 3px;
   }
+  .tut-prompt-chips {
+    display: flex;
+    gap: 4px;
+  }
   .tut-prompt-verb {
     text-shadow: 0 1px 2px #000;
+  }
+  /* The movement lessons' screen-anchored variant: no world target to stand
+     on, so the bubble sits low-center above the action bar where the hands
+     already look. Overrides the world-anchored transform. */
+  .tut-prompt.tut-prompt-center {
+    left: 50%;
+    top: auto;
+    bottom: 26%;
+    transform: translateX(-50%);
+    font-size: 15px;
+  }
+  .tut-prompt.tut-prompt-center .tut-keycap {
+    font-size: 16px;
+    padding: 6px 10px 5px;
   }
   @keyframes tut-in {
     from {

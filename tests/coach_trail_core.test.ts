@@ -10,6 +10,7 @@ import {
   coachGuides,
   coachTargetNpcId,
   coachTrailPlan,
+  distanceToTrail,
 } from '../src/render/coach_trail_core';
 import {
   BOOTCAMP_COURSE_CHECKPOINTS,
@@ -97,6 +98,30 @@ describe('coachTrailPlan: the route per station', () => {
   });
 });
 
+describe('distanceToTrail: point-to-segment over the route', () => {
+  const L = [
+    { x: 0, z: 0 },
+    { x: 10, z: 0 },
+    { x: 10, z: 10 },
+  ];
+
+  it('measures to the segment body, not just the vertices', () => {
+    // Midway along the first leg, 3 to the side: the nearest VERTEX is 5.83
+    // away, but the path itself is 3 away.
+    expect(distanceToTrail(L, 5, 3)).toBeCloseTo(3, 5);
+  });
+
+  it('clamps to the segment ends past the route', () => {
+    expect(distanceToTrail(L, -4, 0)).toBeCloseTo(4, 5);
+    expect(distanceToTrail(L, 10, 14)).toBeCloseTo(4, 5);
+  });
+
+  it('is zero on the path and infinite with no path', () => {
+    expect(distanceToTrail(L, 10, 5)).toBeCloseTo(0, 5);
+    expect(distanceToTrail([], 0, 0)).toBe(Number.POSITIVE_INFINITY);
+  });
+});
+
 describe('coachTargetNpcId: the golden press-me NPC', () => {
   it('is the giver on offer, the turn-in when ready, nobody mid-task', () => {
     expect(coachTargetNpcId(reader({ q_ps_strike_true: 'available' }))).toBe(
@@ -106,6 +131,32 @@ describe('coachTargetNpcId: the golden press-me NPC', () => {
       PROVING_SHORE_QUESTS.q_ps_strike_true.turnInNpcId,
     );
     expect(coachTargetNpcId(reader({ q_ps_strike_true: 'active' }))).toBeNull();
+  });
+});
+
+describe('coachGuides: the objective beam', () => {
+  it('stands the beam on the CURRENT gauntlet flag mid-lanes', () => {
+    const guides = coachGuides(reader({ [GAUNTLET]: 'active' }, { [GAUNTLET]: 1 }));
+    expect(guides.beamAt).toEqual(BOOTCAMP_COURSE_CHECKPOINTS[1]);
+    expect(guides.beamAtNearestCrate).toBe(false);
+  });
+
+  it('hands the crate haul to the consumer (nearest live crate)', () => {
+    const guides = coachGuides(reader({ q_ps_the_wreck_line: 'active' }));
+    expect(guides.beamAt).toBeNull();
+    expect(guides.beamAtNearestCrate).toBe(true);
+  });
+
+  it('stands the beam on the signpost reading spot', () => {
+    const guides = coachGuides(reader({ q_ps_the_signpost: 'active' }));
+    expect(guides.beamAt).toEqual({ x: -312, z: 42.5 });
+  });
+
+  it('gives NPC stations the aura, never a beam', () => {
+    const guides = coachGuides(reader({ q_ps_strike_true: 'available' }));
+    expect(guides.beamAt).toBeNull();
+    expect(guides.beamAtNearestCrate).toBe(false);
+    expect(guides.glowNpcId).not.toBeNull();
   });
 });
 

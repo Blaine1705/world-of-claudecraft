@@ -5,6 +5,9 @@
 // chip resolution per input family.
 
 import { describe, expect, it } from 'vitest';
+// The generation-side line list (plain mjs data): the clip keys the UI plays
+// must each have a text entry the ElevenLabs pipeline renders.
+import { EXTRA_LINES } from '../scripts/voices/extra_lines.mjs';
 import { PROVING_SHORE_NPCS, PROVING_SHORE_QUESTS } from '../src/sim/content/proving_shore';
 import { INTERACT_RANGE } from '../src/sim/types';
 import { BELL_STEP_TARGET } from '../src/ui/bootcamp_view';
@@ -13,10 +16,12 @@ import {
   coachPromptChip,
   coachPromptInRange,
   coachPromptPlan,
+  GUIDE_VOICE_LINES,
   nearestCrate,
   PROMPT_NPC_RANGE,
   PROMPT_OBJECT_RANGE,
 } from '../src/ui/coach_prompt_view';
+import { en } from '../src/ui/i18n.catalog';
 
 const AT_ORIGIN = { x: 0, z: 0 };
 
@@ -122,6 +127,32 @@ describe('nearestCrate: the haul scan', () => {
       pos: { x: 1, z: 0 },
     };
     expect(nearestCrate([bell], AT_ORIGIN)).toBeNull();
+  });
+});
+
+describe('GUIDE_VOICE_LINES: the clip keys, the pipeline lines, the captions', () => {
+  it('renders every UI clip key from an extra_lines entry on the ferryman', () => {
+    const byKey = new Map(EXTRA_LINES.map((l: { key: string }) => [l.key, l]));
+    for (const line of Object.values(GUIDE_VOICE_LINES)) {
+      const entry = byKey.get(line.clip) as { voiceNpc: string; text: string } | undefined;
+      expect(
+        entry,
+        `${line.clip} must be declared in scripts/voices/extra_lines.mjs`,
+      ).toBeDefined();
+      // The designed voice Odo's own dialog aliases to (coverage requires a
+      // designed voice, not an alias); promote to ferryman_odo's own voice
+      // when one is designed, and move this pin with it.
+      expect(entry!.voiceNpc).toBe('ferrymaster_caddow');
+    }
+  });
+
+  it('speaks the SAME English the caption row shows (reword them together)', () => {
+    const byKey = new Map(EXTRA_LINES.map((l: { key: string; text: string }) => [l.key, l.text]));
+    const captions = en.hudChrome.bootcamp as Record<string, string>;
+    for (const line of Object.values(GUIDE_VOICE_LINES)) {
+      const captionKey = line.caption.replace('hudChrome.bootcamp.', '');
+      expect(byKey.get(line.clip)).toBe(captions[captionKey]);
+    }
   });
 });
 

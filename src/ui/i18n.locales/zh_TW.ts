@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.voiceGraduate': '鐘為你敲響了。海那頭的東溪正等著你，你也準備好了。',
+  'hudChrome.bootcamp.voiceVeerOff': '慢著，朋友，走反了。金色路徑在你身後呢。',
+  'hudChrome.bootcamp.voiceStationDoneB': '你越來越上手了，錯不了。',
+  'hudChrome.bootcamp.voiceStationDoneA': '幹得好。往下一處去吧，路已經為你點亮了。',
+  'hudChrome.bootcamp.voiceRunDone': '跑得乾淨俐落。獎賞在監工佩爾那裡，去領吧。',
+  'hudChrome.bootcamp.voiceFirstFlag': '過了一面旗了。腿別停，還剩兩面。',
+  'hudChrome.bootcamp.voiceArrival': '平安上岸啦，朋友。看見腳下這條金色路徑了嗎？它比我還認得路，跟著走就是。',
   'guide.classPage.formName.form_cat': '狼形態',
   'guide.gear.slotOffhand': '副手',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -12872,17 +12879,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '腿上的功夫就這些了。監工佩爾就站在紅旗旁邊：按下互動鍵，交上你的成績，領取你的第一份報酬。',
   'hudChrome.bootcamp.coachNextTitle': '下一位：{npc}',
   'hudChrome.bootcamp.coachNextBody':
-    '跟著箭頭去找{npc}。走到跟前直到名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊對方，接下你的下一件差事。',
+    '沿著金色路徑去找{npc}。走到跟前直到名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊對方，接下你的下一件差事。',
   'hudChrome.bootcamp.coachNextBodyTouch':
-    '跟著箭頭去找{npc}。走到跟前直到名字顯示出來，然後點按對方，或點按使用按鈕，接下你的下一件差事。',
+    '沿著金色路徑去找{npc}。走到跟前直到名字顯示出來，然後點按對方，或點按使用按鈕，接下你的下一件差事。',
   'hudChrome.bootcamp.coachNextBodyPad':
-    '跟著箭頭去找{npc}。走到跟前直到名字顯示出來，然後按下互動鍵，接下你的下一件差事。',
+    '沿著金色路徑去找{npc}。走到跟前直到名字顯示出來，然後按下互動鍵，接下你的下一件差事。',
   'hudChrome.bootcamp.coachTaskBody':
-    '跟著箭頭去完成差事。右側的追蹤欄隨時記著進度，迷了路就按 {mapKey} 打開地圖。',
+    '沿著金色路徑去完成差事。右側的追蹤欄隨時記著進度，迷了路就按 {mapKey} 打開地圖。',
   'hudChrome.bootcamp.coachTaskBodyTouch':
-    '跟著箭頭去完成差事。右側的追蹤欄隨時記著進度，迷了路就點按地圖按鈕看路。',
+    '沿著金色路徑去完成差事。右側的追蹤欄隨時記著進度，迷了路就點按地圖按鈕看路。',
   'hudChrome.bootcamp.coachTaskBodyPad':
-    '跟著箭頭去完成差事。右側的追蹤欄隨時記著進度，迷了路就按下地圖按鈕看路。',
+    '沿著金色路徑去完成差事。右側的追蹤欄隨時記著進度，迷了路就按下地圖按鈕看路。',
   'hudChrome.bootcamp.coachReadyTitle': '差事辦妥',
   'hudChrome.bootcamp.coachReadyBody':
     '前往{npc}身邊，按 {interactKey}，或用滑鼠左鍵點擊對方，交上差事，領取報酬。',

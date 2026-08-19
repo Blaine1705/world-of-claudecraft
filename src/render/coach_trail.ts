@@ -26,6 +26,15 @@ const GOLD = 0xffc860;
 const RING_INNER = 0.95;
 const RING_OUTER = 1.35;
 const RING_LIFT = 0.12;
+// The target NPC's body aura: a soft radial billboard behind the model, the
+// "glowing character" read (playtest: an arrow over the head looked wrong).
+const AURA_WIDTH = 3.0;
+const AURA_HEIGHT = 3.6;
+const AURA_LIFT = 1.15;
+// The non-character objective's vertical light column, sized to read across
+// the whole shore ("a beam, say 25 yards").
+const BEAM_HEIGHT = 25;
+const BEAM_RADIUS = 0.55;
 
 /** The race_line chevron strip, narrower: one arrow per repeat, pointing +u. */
 function chevronTexture(): THREE.Texture {
@@ -50,6 +59,41 @@ function chevronTexture(): THREE.Texture {
   return tex;
 }
 
+/** A soft radial glow disc, drawn once (the aura sprite's face). */
+function radialGlowTexture(): THREE.Texture {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+  const g = ctx.createRadialGradient(size / 2, size / 2, 8, size / 2, size / 2, size / 2);
+  g.addColorStop(0, 'rgba(255,255,255,0.9)');
+  g.addColorStop(0.45, 'rgba(255,255,255,0.35)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, size, size);
+  return new THREE.CanvasTexture(canvas);
+}
+
+/** A vertical alpha falloff strip for the beam (bright at the ground, gone
+ *  at the top). */
+function beamFadeTexture(): THREE.Texture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+  const g = ctx.createLinearGradient(0, 64, 0, 0);
+  g.addColorStop(0, 'rgba(255,255,255,0.85)');
+  g.addColorStop(0.35, 'rgba(255,255,255,0.4)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 1, 64);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  return tex;
+}
+
 export class CoachTrail {
   private ribbon: THREE.Mesh | null = null;
   private mat: THREE.MeshBasicMaterial | null = null;
@@ -58,6 +102,11 @@ export class CoachTrail {
   private ring: THREE.Mesh | null = null;
   private ringMat: THREE.MeshBasicMaterial | null = null;
   private ringKey = '';
+  private aura: THREE.Sprite | null = null;
+  private auraMat: THREE.SpriteMaterial | null = null;
+  private beam: THREE.Mesh | null = null;
+  private beamMat: THREE.MeshBasicMaterial | null = null;
+  private beamKey = '';
 
   constructor(
     private readonly scene: THREE.Object3D,
@@ -165,11 +214,57 @@ export class CoachTrail {
     this.scene.add(this.ring);
   }
 
-  /** Per-frame drive: `plan`/`ringAt` are null off the island or when the
-   *  station has no route/target. `time` is the renderer's shared clock. */
+  private ensureAura(): void {
+    if (this.aura) return;
+    this.auraMat = new THREE.SpriteMaterial({
+      map: radialGlowTexture(),
+      color: new THREE.Color(GOLD).multiplyScalar(1.6),
+      transparent: true,
+      opacity: 0.55,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    this.aura = new THREE.Sprite(this.auraMat);
+    this.aura.renderOrder = 3;
+    this.aura.userData.renderCategory = 'ui3d';
+    this.aura.visible = false;
+    this.scene.add(this.aura);
+  }
+
+  private ensureBeam(): void {
+    if (this.beam) return;
+    const geo = new THREE.CylinderGeometry(
+      BEAM_RADIUS,
+      BEAM_RADIUS * 1.5,
+      BEAM_HEIGHT,
+      14,
+      1,
+      true,
+    );
+    this.beamMat = new THREE.MeshBasicMaterial({
+      map: beamFadeTexture(),
+      color: new THREE.Color(GOLD).multiplyScalar(1.8),
+      transparent: true,
+      opacity: 0.65,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    this.beam = new THREE.Mesh(geo, this.beamMat);
+    this.beam.renderOrder = 3;
+    this.beam.userData.renderCategory = 'ui3d';
+    this.beam.visible = false;
+    this.scene.add(this.beam);
+  }
+
+  /** Per-frame drive: every anchor is null off the island or when the
+   *  station has no such target. `ringAt` doubles as the NPC aura anchor;
+   *  `beamAt` is the non-character objective's light column. `time` is the
+   *  renderer's shared clock. */
   update(
     plan: CoachTrailPlan | null,
     ringAt: { x: number; z: number } | null,
+    beamAt: { x: number; z: number } | null,
     time: number,
     dt: number,
   ): void {
@@ -183,20 +278,50 @@ export class CoachTrail {
         this.mat.opacity = 0.65 + 0.2 * Math.sin(time * 2.4);
       }
     }
+    this.updateRingAndAura(ringAt, time);
+    this.updateBeam(beamAt, time);
+  }
+
+  private updateRingAndAura(ringAt: { x: number; z: number } | null, time: number): void {
     if (!ringAt) {
       if (this.ring) this.ring.visible = false;
+      if (this.aura) this.aura.visible = false;
       return;
     }
     this.ensureRing();
-    if (!this.ring || !this.ringMat) return;
+    this.ensureAura();
+    if (!this.ring || !this.ringMat || !this.aura || !this.auraMat) return;
     this.ring.visible = true;
+    this.aura.visible = true;
     const key = `${ringAt.x},${ringAt.z}`;
     if (this.ringKey !== key) {
       this.ringKey = key;
-      this.ring.position.set(ringAt.x, this.groundAt(ringAt.x, ringAt.z) + RING_LIFT, ringAt.z);
+      const ground = this.groundAt(ringAt.x, ringAt.z);
+      this.ring.position.set(ringAt.x, ground + RING_LIFT, ringAt.z);
+      this.aura.position.set(ringAt.x, ground + AURA_LIFT, ringAt.z);
     }
     const pulse = 1 + 0.1 * Math.sin(time * 3.4);
     this.ring.scale.setScalar(pulse);
     this.ringMat.opacity = 0.4 + 0.25 * (0.5 + 0.5 * Math.sin(time * 3.4));
+    const breathe = 1 + 0.07 * Math.sin(time * 2.2);
+    this.aura.scale.set(AURA_WIDTH * breathe, AURA_HEIGHT * breathe, 1);
+    this.auraMat.opacity = 0.45 + 0.2 * (0.5 + 0.5 * Math.sin(time * 2.2));
+  }
+
+  private updateBeam(beamAt: { x: number; z: number } | null, time: number): void {
+    if (!beamAt) {
+      if (this.beam) this.beam.visible = false;
+      return;
+    }
+    this.ensureBeam();
+    if (!this.beam || !this.beamMat) return;
+    this.beam.visible = true;
+    const key = `${beamAt.x},${beamAt.z}`;
+    if (this.beamKey !== key) {
+      this.beamKey = key;
+      const ground = this.groundAt(beamAt.x, beamAt.z);
+      this.beam.position.set(beamAt.x, ground + BEAM_HEIGHT / 2, beamAt.z);
+    }
+    this.beamMat.opacity = 0.5 + 0.2 * Math.sin(time * 2.8);
   }
 }

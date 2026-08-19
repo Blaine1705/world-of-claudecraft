@@ -701,17 +701,17 @@ export const hudChromeStrings = {
     // non-Latin overlays carry real fills.
     coachNextTitle: 'Next: {npc}',
     coachNextBody:
-      'Follow the arrow to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.',
+      'Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.',
     coachNextBodyTouch:
-      'Follow the arrow to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.',
+      'Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.',
     coachNextBodyPad:
-      'Follow the arrow to {npc}. Walk up until the name shows, then press your interact button to take your next task.',
+      'Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.',
     coachTaskBody:
-      'Follow the arrow to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.',
+      'Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.',
     coachTaskBodyTouch:
-      'Follow the arrow to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.',
+      'Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.',
     coachTaskBodyPad:
-      'Follow the arrow to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.',
+      'Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.',
     coachReadyTitle: 'Task complete',
     // "Head to", never "Return to": on the rail every hand-in NPC is the NEXT
     // station, someone the player has not met yet, so "return" reads as a
@@ -763,6 +763,20 @@ export const hudChromeStrings = {
     promptPickUp: 'Pick up',
     promptRead: 'Read',
     promptRing: 'Ring',
+    promptHold: 'Hold',
+    // Ferryman Odo's guiding voice: the CAPTION rows the coach card shows
+    // while the (English) VO clip plays. Each row mirrors one
+    // scripts/voices/extra_lines.mjs guide__odo__* line; reword the two
+    // together. WORDY by M16, so the five non-Latin overlays carry fills.
+    voiceArrival:
+      'Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.',
+    voiceFirstFlag: 'That is one flag down. Keep those legs moving, only two to go.',
+    voiceRunDone: 'A clean run, that. Overseer Pell holds your reward, go claim it.',
+    voiceStationDoneA: 'Fine work. On to the next, the path is already lit for you.',
+    voiceStationDoneB: 'You are getting the hang of this, no mistake.',
+    voiceVeerOff: 'Hold up, friend, that is the wrong way. The golden path is behind you.',
+    voiceGraduate:
+      'The bell is rung for you. Eastbrook waits across the water, and you are ready for it.',
     // The closing card once Ferryman Odo has the last hand-in: ring home.
     bellTitle: 'Ring the bell',
     bellBody:
