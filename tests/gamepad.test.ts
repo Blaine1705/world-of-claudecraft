@@ -755,6 +755,9 @@ describe('GamepadManager cross hotbar', () => {
   // inherit whatever an earlier suite left on globalThis.
   afterEach(() => vi.unstubAllGlobals());
 
+  // The per-character storage namespace, matching the other cross-hotbar suites.
+  const CROSS_HOTBAR_SCOPE = 'char:test';
+
   function setupCrossHotbar(enabled: boolean) {
     let windowFocused = true;
     vi.stubGlobal('document', {
@@ -768,12 +771,15 @@ describe('GamepadManager cross hotbar', () => {
       activeElement: null,
     });
     vi.stubGlobal('getComputedStyle', () => ({ visibility: 'visible', display: 'block' }));
-    vi.stubGlobal('window', {
+    // Kept by reference so a case can deliver a real pad event through whatever
+    // start() registered, instead of reaching for the private handler.
+    const windowStub = {
       innerWidth: 1920,
       innerHeight: 1080,
-      addEventListener: vi.fn(),
+      addEventListener: vi.fn<(type: string, handler: unknown) => void>(),
       removeEventListener: vi.fn(),
-    });
+    };
+    vi.stubGlobal('window', windowStub);
     let pad = gamepadWithPressed();
     Object.defineProperty(globalThis, 'navigator', {
       configurable: true,
@@ -811,7 +817,7 @@ describe('GamepadManager cross hotbar', () => {
       onOpenSpellbook,
       focusedCrossHotbarCell: () => focusedCell,
     } satisfies GamepadCallbacks);
-    const xhb = new CrossHotbarBindings();
+    const xhb = new CrossHotbarBindings(CROSS_HOTBAR_SCOPE);
     // Seed a known bar so a cell's action is predictable: cell N holds ability aN.
     // Reset first: seedOnce is a no-op on an already-seeded bar, and this Node has
     // a real localStorage, so a layout persisted by an earlier case would survive.
@@ -874,6 +880,16 @@ describe('GamepadManager cross hotbar', () => {
       },
       setPointerMode: (on: boolean) => {
         pointerMode = on;
+      },
+      // Unplug a pad the way the browser reports it: through the listener start()
+      // put on window, so a case cannot pass against a handler nothing wires up.
+      // Throws if start() was never called, which is the honest failure.
+      disconnectPad: (padIndex: number) => {
+        const registered = windowStub.addEventListener.mock.calls.find(
+          ([type]) => type === 'gamepaddisconnected',
+        );
+        const handler = registered?.[1] as (e: { gamepad: { index: number } }) => void;
+        handler({ gamepad: { index: padIndex } });
       },
     };
   }
@@ -1511,6 +1527,32 @@ describe('GamepadManager cross hotbar', () => {
       h.manager.stop();
       expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
       expect(setPadNavSpansWindows).toHaveBeenLastCalledWith(false);
+    });
+
+    it('leaves arrange mode when the active pad is unplugged', () => {
+      // The fourth way out, and the only one no human action follows: a pad that
+      // dies mid-arrange leaves the HUD drawing a mode nothing can now exit, and
+      // the action in hand nowhere at all.
+      const h = setupCrossHotbar(true);
+      h.manager.start();
+      enterEdit(h);
+      h.focus(0);
+      h.press(GP.A);
+      h.press();
+      h.disconnectPad(0);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+      // What was in hand went back on the cell it came off.
+      expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a0' });
+    });
+
+    it('stays in arrange mode when a different pad is unplugged', () => {
+      // Only the ACTIVE pad's loss ends the mode: a second controller leaving
+      // must not cancel the arrange the player is still in the middle of.
+      const h = setupCrossHotbar(true);
+      h.manager.start();
+      enterEdit(h);
+      h.disconnectPad(1);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(true, null, null);
     });
 
     it('leaves arrange mode when the window loses focus', () => {

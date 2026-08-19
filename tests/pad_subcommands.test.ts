@@ -99,6 +99,16 @@ describe('pad subcommands frame choice', () => {
     expect(player.events.map((e) => e.type)).toEqual(['contextmenu']);
   });
 
+  it('never opens a party row, so the list stays the target and player frames', () => {
+    // A party row binds its own context menu, but a pad reaches a party member by
+    // TARGETING them, and it has no way to say which row it means: an unclaimed
+    // press must fall through to the caller's fallback instead.
+    const row = frame();
+    frames['#party-row-1'] = row;
+    expect(openTargetSubcommands()).toBe(false);
+    expect(row.events).toHaveLength(0);
+  });
+
   it('answers false when no frame is up at all', () => {
     // The caller falls back to the map on false, so a press is never dead.
     expect(openTargetSubcommands()).toBe(false);

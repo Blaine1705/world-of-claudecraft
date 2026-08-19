@@ -9,6 +9,9 @@
 // Attack seat and 1..ACTION_BAR_ABILITY_SLOTS are the configurable slots, so a
 // loop bounded by the array length silently skips the LAST one. That is the
 // off-by-one this file pins, together with the three fallback arms.
+//
+// The second block pins the other half of the same seam: which ids Hud.syncSlotMap
+// hands the pad as newly learnable actions.
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -37,9 +40,12 @@ vi.mock('../src/ui/icons', () => ({
 }));
 
 import { CROSS_HOTBAR_ATTACK_ID } from '../src/game/cross_hotbar';
+import { ABILITIES } from '../src/sim/data';
+import type { AbilityDef } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
 import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
 import { tSim } from '../src/ui/sim_i18n';
+import { isStanceBarAbilityGroup } from '../src/ui/stance_bar_view';
 
 type Action = { type: 'ability' | 'item'; id: string } | null;
 
@@ -216,5 +222,53 @@ describe('Hud.castCrossHotbarAction fallback for an action off the desktop bar',
 
     expect(hud.sim.useItem).not.toHaveBeenCalled();
     expect(hud.showError).not.toHaveBeenCalled();
+  });
+});
+
+// Hud.syncSlotMap, the mid-session "you learned something new" hand-off to the pad.
+// Stances are the interesting id: pad mode hides the desktop stance bar, so a stance
+// learned after the cross hotbar was seeded reaches a controller player ONLY through
+// this offer. The list is filtered by action-bar eligibility alone, and a stance-group
+// filter creeping back here would silently strand Guarded Stance on a pad again.
+describe('Hud.syncSlotMap known-ability offer to the pad', () => {
+  interface SyncHarness {
+    actionBarController: { syncKnownAbilities: ReturnType<typeof vi.fn> };
+    optionsHooks: { gamepad: { syncCrossHotbarKnown: ReturnType<typeof vi.fn> } };
+    sim: { known: { def: AbilityDef }[] };
+    currentMobileActionPage: ReturnType<typeof vi.fn>;
+    syncSlotMap(): void;
+  }
+
+  /** A Hud with the real syncSlotMap over the two collaborators it reads: the
+   *  player's known list and the gamepad options hook it offers ids to. */
+  function makeSyncHud(knownIds: readonly string[]): SyncHarness {
+    const hud = Object.create(Hud.prototype) as unknown as SyncHarness;
+    hud.actionBarController = { syncKnownAbilities: vi.fn() };
+    hud.optionsHooks = { gamepad: { syncCrossHotbarKnown: vi.fn() } };
+    // Real content records: what makes an id a stance is the shipped
+    // exclusiveGroup, not a shape the test gets to invent for itself.
+    hud.sim = { known: knownIds.map((id) => ({ def: ABILITIES[id] })) };
+    hud.currentMobileActionPage = vi.fn(() => 0);
+    return hud;
+  }
+
+  function offeredIds(hud: SyncHarness): string[] {
+    hud.syncSlotMap();
+    const [ids] = hud.optionsHooks.gamepad.syncCrossHotbarKnown.mock.calls[0] as [string[]];
+    return ids;
+  }
+
+  it('offers a stance the pad has no other way to reach', () => {
+    expect(isStanceBarAbilityGroup(ABILITIES.defensive_stance.exclusiveGroup)).toBe(true);
+    const hud = makeSyncHud(['mortal_strike', 'defensive_stance']);
+
+    expect(offeredIds(hud)).toContain('defensive_stance');
+  });
+
+  it('withholds a passive, which no bar seat can cast', () => {
+    expect(ABILITIES.measured_fury.passive).toBe(true);
+    const hud = makeSyncHud(['mortal_strike', 'measured_fury']);
+
+    expect(offeredIds(hud)).toEqual(['mortal_strike']);
   });
 });

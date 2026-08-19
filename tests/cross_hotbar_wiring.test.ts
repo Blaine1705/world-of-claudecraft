@@ -10,6 +10,8 @@ import {
 } from '../src/game/cross_hotbar_wiring';
 
 const PAD_MODE_CLASS = 'xhb-mode';
+// Both seams take the character scope, so every case here names one.
+const SCOPE = 'char:test';
 
 // minimal localStorage + body stubs (the test env is plain node, no DOM)
 function installGlobals(): Set<string> {
@@ -104,7 +106,7 @@ describe('crossHotbarButtonLabels', () => {
 
 describe('crossHotbarResting', () => {
   it('shows the whole primary set with neither half armed', () => {
-    const resting = crossHotbarResting(new CrossHotbarBindings(), 'xbox');
+    const resting = crossHotbarResting(new CrossHotbarBindings(SCOPE), 'xbox');
     expect(resting.layer).toBeNull();
     expect(resting.expanded).toBe(false);
     // All SIXTEEN cells, empty until the bar is seeded.
@@ -115,11 +117,11 @@ describe('crossHotbarResting', () => {
   });
 
   it('names the triggers for the connected brand', () => {
-    expect(crossHotbarResting(new CrossHotbarBindings(), 'playstation').triggers).toEqual({
+    expect(crossHotbarResting(new CrossHotbarBindings(SCOPE), 'playstation').triggers).toEqual({
       left: 'L2',
       right: 'R2',
     });
-    expect(crossHotbarResting(new CrossHotbarBindings(), 'nintendo').triggers).toEqual({
+    expect(crossHotbarResting(new CrossHotbarBindings(SCOPE), 'nintendo').triggers).toEqual({
       left: 'ZL',
       right: 'ZR',
     });
@@ -128,7 +130,7 @@ describe('crossHotbarResting', () => {
 
 describe('crossHotbarHold', () => {
   it('arms a half but still carries the whole set', () => {
-    const hold = crossHotbarHold(new CrossHotbarBindings(), 'right', 1, 'playstation');
+    const hold = crossHotbarHold(new CrossHotbarBindings(SCOPE), 'right', 1, 'playstation');
     expect(hold.layer).toBe('right');
     expect(hold.expanded).toBe(true);
     expect(hold.slots).toHaveLength(16);
@@ -136,7 +138,7 @@ describe('crossHotbarHold', () => {
   });
 
   it('still shows the bar when no trigger is held, just unarmed', () => {
-    const hold = crossHotbarHold(new CrossHotbarBindings(), null, 0, 'xbox');
+    const hold = crossHotbarHold(new CrossHotbarBindings(SCOPE), null, 0, 'xbox');
     expect(hold.layer).toBeNull();
     expect(hold.slots).toHaveLength(16);
   });
@@ -145,7 +147,7 @@ describe('crossHotbarHold', () => {
 describe('pad mode', () => {
   it('takes over the hotbar only when the cross hotbar is on AND a pad is present', () => {
     const host = fakeHost();
-    const wiring = createCrossHotbar(() => host);
+    const wiring = createCrossHotbar(() => host, SCOPE);
 
     wiring.syncPadMode(fakePad(false));
     expect(bodyClasses.has(PAD_MODE_CLASS)).toBe(false);
@@ -161,7 +163,7 @@ describe('pad mode', () => {
 
   it('gives the pad up again when it disconnects', () => {
     const host = fakeHost();
-    const wiring = createCrossHotbar(() => host);
+    const wiring = createCrossHotbar(() => host, SCOPE);
     wiring.syncPadMode(fakePad(true));
     wiring.syncPadMode(fakePad(false));
     expect(bodyClasses.has(PAD_MODE_CLASS)).toBe(false);
@@ -170,13 +172,13 @@ describe('pad mode', () => {
 
   it('re-labels the pad on every sync, so a brand swap reaches the glyphs', () => {
     const host = fakeHost();
-    createCrossHotbar(() => host).syncPadMode(fakePad(true, 'xbox'));
+    createCrossHotbar(() => host, SCOPE).syncPadMode(fakePad(true, 'xbox'));
     expect(host.refreshControllerLabels).toHaveBeenCalled();
   });
 
   it('hands the hotbar back the moment the setting is switched off', () => {
     const host = fakeHost();
-    const wiring = createCrossHotbar(() => host);
+    const wiring = createCrossHotbar(() => host, SCOPE);
     const pad = fakePad(true);
     wiring.syncPadMode(pad);
     expect(bodyClasses.has(PAD_MODE_CLASS)).toBe(true);
@@ -191,7 +193,7 @@ describe('pad mode', () => {
 
   it('seeds the bar from the action bar the first time a pad appears', () => {
     const host = fakeHost([{ type: 'ability', id: 'heroic_strike' }], ['battle_stance']);
-    const wiring = createCrossHotbar(() => host);
+    const wiring = createCrossHotbar(() => host, SCOPE);
     wiring.bindings.reset();
     wiring.syncPadMode(fakePad(true));
     const slots = wiring.bindings.setActions(0);
@@ -202,7 +204,7 @@ describe('pad mode', () => {
 
   it('does not re-seed over a bar the player has arranged', () => {
     const host = fakeHost([{ type: 'ability', id: 'heroic_strike' }], []);
-    const wiring = createCrossHotbar(() => host);
+    const wiring = createCrossHotbar(() => host, SCOPE);
     wiring.bindings.reset();
     wiring.syncPadMode(fakePad(true));
     wiring.bindings.bind(0, 0, { type: 'ability', id: 'mine' });
@@ -212,7 +214,7 @@ describe('pad mode', () => {
   });
 
   it('leaves an unrelated setting alone', () => {
-    const wiring = createCrossHotbar(() => fakeHost());
+    const wiring = createCrossHotbar(() => fakeHost(), SCOPE);
     const store = { set: (_k: string, v: never) => v };
     expect(wiring.applySetting(fakePad(true), store, 'gamepadInvertY', true)).toBe(false);
   });
@@ -221,7 +223,7 @@ describe('pad mode', () => {
 describe('onHold', () => {
   it('rests rather than hiding when the trigger is released', () => {
     const host = fakeHost();
-    const wiring = createCrossHotbar(() => host);
+    const wiring = createCrossHotbar(() => host, SCOPE);
     wiring.onHold('left', 0, 'xbox');
     expect(host.setCrossHotbar).toHaveBeenLastCalledWith(
       expect.objectContaining({ layer: 'left' }),
@@ -237,7 +239,7 @@ describe('the display preset', () => {
   it('puts exactly one preset class on the body', () => {
     // Each preset is a coherent look, so they are mutually exclusive: leaving two
     // on would blend two designs and neither would be the one the player picked.
-    const wiring = createCrossHotbar(() => fakeHost());
+    const wiring = createCrossHotbar(() => fakeHost(), SCOPE);
     const pad = fakePad(true);
     const store = { set: (_k: string, v: never) => v };
 
@@ -254,7 +256,7 @@ describe('the display preset', () => {
   it('falls back to full for a value that names no preset', () => {
     // The value is persisted, so it is untrusted: a hand-edited or older setting
     // must land on a real look rather than stripping every class.
-    const wiring = createCrossHotbar(() => fakeHost());
+    const wiring = createCrossHotbar(() => fakeHost(), SCOPE);
     const pad = fakePad(true);
     const store = { set: (_k: string, v: never) => v };
     wiring.applySetting(pad, store, 'gamepadCrossHotbarDisplay', 99);

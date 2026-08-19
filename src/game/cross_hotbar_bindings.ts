@@ -51,7 +51,9 @@ export class CrossHotbarBindings {
   private seen = new Set<string>();
   private readonly storeKey: string;
 
-  constructor(scope = '') {
+  // Required rather than defaulted: an omitted scope lands every character back on
+  // the one shared key, which is the bug the namespacing exists to prevent.
+  constructor(scope: string) {
     this.storeKey = scope ? `${KEY_PREFIX}:${scope}` : KEY_PREFIX;
     this.load();
   }
@@ -101,8 +103,8 @@ export class CrossHotbarBindings {
   /**
    * Offer a cell to every ability the bar has not seen before, so levelling into a
    * new spell puts it in reach instead of leaving a pad player to discover the
-   * arrange chord first. Ids are pre-filtered by the caller against the SAME rules
-   * the action bar auto-places by.
+   * arrange chord first. Ids are pre-filtered by the caller on the PAD's rules, not
+   * the action bar's: pad mode hides the stance bar, so stances ride along here.
    *
    * Marks an id seen whether or not a cell was free, so a full bar does not quietly
    * queue placements that surface later when the player frees a slot.

@@ -9,6 +9,12 @@ import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
 import { GP } from '../src/game/gamepad_map';
 
 const STORE_KEY = 'woc_gamepad_xhb';
+// The constructor takes the character scope, so every case names one.
+const SCOPE = 'char:test';
+const SCOPED_KEY = `${STORE_KEY}:${SCOPE}`;
+// The one deliberate empty scope: it is what the pre-namespace key was written
+// under, and these cases are about a player arriving with that value.
+const LEGACY_SCOPE = '';
 
 // minimal localStorage stub (the test env is plain node, no DOM)
 function installStorage(): void {
@@ -32,20 +38,20 @@ describe('CrossHotbarBindings', () => {
   const bar = (n: number) => Array.from({ length: n }, (_, i) => ability(`a${i}`));
 
   it('starts empty and unseeded', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     expect(b.all()).toEqual(defaultCrossHotbarLayout());
     expect(b.isSeeded()).toBe(false);
   });
 
   it('seeds once from the action bar and persists it', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     expect(b.seedOnce(bar(4))).toBe(true);
     expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(ability('a0'));
-    expect(new CrossHotbarBindings().isSeeded()).toBe(true);
+    expect(new CrossHotbarBindings(SCOPE).isSeeded()).toBe(true);
   });
 
   it('never re-seeds over a bar the player has arranged', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(4));
     b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('rearranged'));
     expect(b.seedOnce(bar(4))).toBe(false);
@@ -57,13 +63,13 @@ describe('CrossHotbarBindings', () => {
   it('stays unseeded when there is nothing yet to seed FROM', () => {
     // A bar of empty slots must not count as seeded, or the real seed would be
     // skipped forever once the player has abilities.
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     expect(b.seedOnce([null, null])).toBe(false);
     expect(b.isSeeded()).toBe(false);
   });
 
   it('carries class extras onto the bar', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce([ability('heroic_strike'), null], ['battle_stance']);
     expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_LEFT)).toEqual(
       ability('battle_stance'),
@@ -71,22 +77,22 @@ describe('CrossHotbarBindings', () => {
   });
 
   it('resolves a trigger-plus-button press to the action on that cell', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(32));
     expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(ability('a0'));
     expect(b.actionFor(CROSS_HOTBAR_EXPANDED_SET, 'right', GP.A)).toEqual(ability('a31'));
   });
 
   it('persists a rebind and reloads it', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('shield_block'));
     expect(
-      new CrossHotbarBindings().actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP),
+      new CrossHotbarBindings(SCOPE).actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP),
     ).toEqual(ability('shield_block'));
   });
 
   it('rebinds by the physical trigger-plus-button pair', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(32));
     b.bindButton(CROSS_HOTBAR_PRIMARY_SET, 'right', GP.B, ability('x'));
     expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'right', GP.B)).toEqual(ability('x'));
@@ -95,20 +101,20 @@ describe('CrossHotbarBindings', () => {
   });
 
   it('clears a cell when bound to nothing', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(4));
     b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, null);
     expect(b.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toBeNull();
   });
 
   it('ignores a rebind of a button the cross hotbar does not claim', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.bindButton(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.LB, ability('x'));
     expect(b.isSeeded()).toBe(false);
   });
 
   it('ignores an out-of-range set or position', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.bind(9, 0, ability('x'));
     b.bind(CROSS_HOTBAR_PRIMARY_SET, -1, ability('x'));
     b.bind(CROSS_HOTBAR_PRIMARY_SET, CROSS_HOTBAR_SLOTS_PER_SET, ability('x'));
@@ -116,7 +122,7 @@ describe('CrossHotbarBindings', () => {
   });
 
   it('swaps two cells, which is what an edit-mode drag does', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(4));
     b.swap(CROSS_HOTBAR_PRIMARY_SET, 0, CROSS_HOTBAR_PRIMARY_SET, 1);
     expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET)[0]).toEqual(ability('a1'));
@@ -124,7 +130,7 @@ describe('CrossHotbarBindings', () => {
   });
 
   it('swaps across sets too', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(32));
     b.swap(CROSS_HOTBAR_PRIMARY_SET, 0, CROSS_HOTBAR_EXPANDED_SET, 0);
     expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET)[0]).toEqual(ability('a16'));
@@ -132,7 +138,7 @@ describe('CrossHotbarBindings', () => {
   });
 
   it('leaves the bar alone when a swap names a cell that does not exist', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(4));
     const before = JSON.stringify(b.all());
     b.swap(CROSS_HOTBAR_PRIMARY_SET, 0, 9, 0);
@@ -142,7 +148,7 @@ describe('CrossHotbarBindings', () => {
   // bind/swap replace the rows they touch instead of editing them, so a snapshot
   // the overlay took last frame is still the layout it was taken from.
   it('never rewrites a layout snapshot a caller is already holding', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(32));
     const snapshot = b.all();
     const primaryBefore = snapshot[CROSS_HOTBAR_PRIMARY_SET][0];
@@ -161,7 +167,7 @@ describe('CrossHotbarBindings', () => {
   });
 
   it('allows two cells to hold the same action', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('x'));
     b.bind(CROSS_HOTBAR_PRIMARY_SET, 1, ability('x'));
     expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET).slice(0, 2)).toEqual([
@@ -171,20 +177,20 @@ describe('CrossHotbarBindings', () => {
   });
 
   it('resets back to empty so the next seed refills it', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     b.seedOnce(bar(4));
     b.reset();
     expect(b.isSeeded()).toBe(false);
-    expect(new CrossHotbarBindings().isSeeded()).toBe(false);
+    expect(new CrossHotbarBindings(SCOPE).isSeeded()).toBe(false);
   });
 
   it('falls back to empty when the stored value is corrupt', () => {
-    localStorage.setItem(STORE_KEY, '{not json');
-    expect(new CrossHotbarBindings().all()).toEqual(defaultCrossHotbarLayout());
+    localStorage.setItem(SCOPED_KEY, '{not json');
+    expect(new CrossHotbarBindings(SCOPE).all()).toEqual(defaultCrossHotbarLayout());
   });
 
   it('survives storage being unavailable', () => {
-    const b = new CrossHotbarBindings();
+    const b = new CrossHotbarBindings(SCOPE);
     vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
       throw new Error('quota');
     });
@@ -198,7 +204,7 @@ describe('seeding waits for the action bar', () => {
     // A pad is usually connected before the character's bar has loaded, and the
     // stance is ready first. Latching then produced a bar holding a stance and
     // nothing else, which is what a Steam Deck player actually saw.
-    const xhb = new CrossHotbarBindings();
+    const xhb = new CrossHotbarBindings(SCOPE);
     xhb.reset();
     expect(
       xhb.seedOnce(
@@ -210,7 +216,7 @@ describe('seeding waits for the action bar', () => {
   });
 
   it('latches once the bar has something on it, extras included', () => {
-    const xhb = new CrossHotbarBindings();
+    const xhb = new CrossHotbarBindings(SCOPE);
     xhb.reset();
     const bar: ({ type: 'ability'; id: string } | null)[] = Array.from({ length: 32 }, () => null);
     bar[0] = { type: 'ability', id: 'heroic_strike' };
@@ -231,7 +237,7 @@ describe('syncKnown offers a cell to a newly learned ability', () => {
   it('places a spell the bar has never seen', () => {
     // A new player levels, learns something, and would otherwise never see it on
     // the pad: the bar seeds once and nothing put a new spell on it after that.
-    const xhb = new CrossHotbarBindings();
+    const xhb = new CrossHotbarBindings(SCOPE);
     xhb.reset();
     seed(xhb);
     expect(xhb.syncKnown(['heroic_strike', 'rend'])).toBe(true);
@@ -241,7 +247,7 @@ describe('syncKnown offers a cell to a newly learned ability', () => {
   it('leaves an ability the player REMOVED off the bar', () => {
     // The whole reason for tracking what has been seen: re-offering a cell to
     // something deliberately cleared would fight the player every level.
-    const xhb = new CrossHotbarBindings();
+    const xhb = new CrossHotbarBindings(SCOPE);
     xhb.reset();
     seed(xhb);
     xhb.syncKnown(['rend']);
@@ -252,7 +258,7 @@ describe('syncKnown offers a cell to a newly learned ability', () => {
   });
 
   it('does not re-offer what the seed already placed', () => {
-    const xhb = new CrossHotbarBindings();
+    const xhb = new CrossHotbarBindings(SCOPE);
     xhb.reset();
     seed(xhb);
     expect(xhb.syncKnown(['heroic_strike'])).toBe(false);
@@ -267,7 +273,7 @@ describe('syncKnown offers a cell to a newly learned ability', () => {
   it('does nothing before the bar is seeded', () => {
     // Placing into an unseeded bar would beat the seed to the cells and leave the
     // player's action-bar order scattered.
-    const xhb = new CrossHotbarBindings();
+    const xhb = new CrossHotbarBindings(SCOPE);
     xhb.reset();
     expect(xhb.syncKnown(['rend'])).toBe(false);
   });
@@ -320,7 +326,7 @@ describe('the pre-namespace layout migrates to one character', () => {
   const ability = (id: string) => ({ type: 'ability' as const, id });
   const bar = (n: number) => Array.from({ length: n }, (_, i) => ability(`a${i}`));
 
-  const installLegacyLayout = () => new CrossHotbarBindings().seedOnce(bar(4));
+  const installLegacyLayout = () => new CrossHotbarBindings(LEGACY_SCOPE).seedOnce(bar(4));
 
   it('adopts the legacy layout as the first character profile', () => {
     installLegacyLayout();
@@ -353,7 +359,7 @@ describe('the pre-namespace layout migrates to one character', () => {
   });
 
   it('does not adopt an empty legacy layout', () => {
-    new CrossHotbarBindings().bind(CROSS_HOTBAR_PRIMARY_SET, 0, null);
+    new CrossHotbarBindings(LEGACY_SCOPE).bind(CROSS_HOTBAR_PRIMARY_SET, 0, null);
     expect(new CrossHotbarBindings('char:alice').isSeeded()).toBe(false);
     expect(new CrossHotbarBindings('char:bob').isSeeded()).toBe(false);
   });

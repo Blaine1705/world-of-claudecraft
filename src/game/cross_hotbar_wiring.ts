@@ -266,11 +266,12 @@ function applyPadModeClass(on: boolean): void {
  * call keeps the wiring independent of that order instead of pinning it.
  *
  * `scope` is the character the layout is stored under, the same string `Keybinds`
- * takes, so two characters on one machine never share a pad layout.
+ * takes, so two characters on one machine never share a pad layout. It is required
+ * rather than defaulted, or an unscoped caller shares one key across characters.
  */
 export function createCrossHotbar(
   host: () => CrossHotbarOverlayHost,
-  scope = '',
+  scope: string,
 ): CrossHotbarWiring {
   const bindings = new CrossHotbarBindings(scope);
   let enabled = true;
