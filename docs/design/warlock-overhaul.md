@@ -134,10 +134,11 @@ event, and receive a 35% Sentence echo. The shared resource remains capped at 10
 
 ### Localization handoff
 
-The existing key `entities.abilities.sentence.description` was reworded to explain all four
-Condemnation thresholds. Its non-English overlays still contain the older generic wording and
-must be refreshed in the next maintainer locale pass because the pending-key worklist does not
-detect changes to an existing English value.
+The existing keys `entities.abilities.sentence.description` and
+`entities.abilities.fear.description` were reworded to explain all four Condemnation thresholds
+and restore Harrow's 8 second duration, respectively. Their non-English overlays still contain
+the older wording and must be refreshed in the next maintainer locale pass because the pending-key
+worklist does not detect changes to an existing English value.
 
 ### Strengths
 
