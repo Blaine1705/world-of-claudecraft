@@ -235,10 +235,15 @@ describe('mobile window layout CSS', () => {
       padding.replace(/\s+/g, ' '),
     );
     expect(reserve).toContain('40px');
+    // The TOP reserve is tied to the header's own declared floor the same way,
+    // rather than repeating the number and hoping: move the floor and this
+    // reds instead of the reserve going stale 800 lines away.
+    const header = blockContaining('min-height:', 'body.mobile-touch .window > .panel-title {');
+    const headerFloor = /min-height:\s*([0-9]+px);/.exec(header)?.[1] ?? '';
+    expect(headerFloor, 'the mobile header declares a height floor').toMatch(/^\d+px$/);
     const top = /scroll-padding-top:([^;]+);/.exec(block)?.[1] ?? '';
-    expect(top, 'the top reserve clears the sticky header').toMatch(
-      /calc\(48px \+ var\(--spacing-sm\)\)/,
-    );
+    expect(top, 'the top reserve is built from that floor').toContain(headerFloor);
+    expect(top, 'and clears it rather than just meeting it').toContain('var(--spacing-sm)');
   });
 
   it('does not pin the money sheets to both edges (a short sheet must not stretch)', () => {

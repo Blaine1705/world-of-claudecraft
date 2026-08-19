@@ -3652,15 +3652,25 @@
        a row whose band is 72px) parked the price label under the row again,
        which is exactly what the rig's top-most check caught. Row: a 40px button
        floor between two --spacing-sm bands, plus its --spacing-xs top margin,
-       plus the window's REAL bottom padding below it, plus one more
-       --spacing-sm so the control clears the row rather than touching it. That
-       padding is the inset-aware max() the generic mobile window rule sets
-       (the `padding-bottom` beside its own max-height above), NOT a flat
+       plus the window's REAL bottom padding below it, plus slack. That padding
+       is the inset-aware max() the generic mobile window rule sets (the
+       `padding-bottom` beside its own max-height above), NOT a flat
        --window-pad: on a landscape phone with a 21px home indicator it
-       resolves to 39px, so a reserve built on the flat token came up 15px
-       short and put the control back under the row. Headless capture reports
-       zero insets, which is exactly why this has to mirror the source rule
-       rather than trust a measurement taken without one. */
+       resolves to 39px, so a reserve built on the flat token came up short and
+       put the control back under the row. Headless capture reports zero
+       insets, which is why this mirrors the source rule instead of trusting a
+       measurement taken without one.
+       Read the terms honestly. The 40px is the button FLOOR, not the row's
+       height: a locale whose commit label wraps grows the row past the slack,
+       and no arithmetic here can see that. The --spacing-xs is the row's top
+       margin, which sits ABOVE it and so lands as slack rather than as part of
+       the covered band. The two guards cover each other's blind spot and
+       neither is sufficient alone: this calc is the only thing that can see an
+       inset, and the rig's `reserve >= measured band` assertion (run per face
+       and per locale, the Russian pass being the wordiest) is the only thing
+       that can see a row that grew. The rig also measures from the border box
+       while scroll-padding resolves against the padding box, so its band reads
+       2px conservative, which is the safe direction. */
     scroll-padding-bottom: calc(
       40px +
       2 *
@@ -3669,7 +3679,13 @@
       max(var(--window-pad), calc(18px + env(safe-area-inset-bottom))) +
       var(--spacing-sm)
     );
-    /* The same fact at the TOP edge, and the one the bottom fix did not cover:
+    /* The same fact at the TOP edge, and the one the bottom fix did not cover.
+       48px is the header's own declared floor (the mobile .panel-title rule
+       above), tied to it by tests/mobile_window_layout.test.ts rather than
+       copied and hoped for. Note the whole family of scroll-padding only
+       steers scroll-INTO-view (focus, scrollIntoView): a player who drags a
+       field under the sticky header by hand still can. Focus is the trigger
+       this fixes.
        .window > .panel-title is sticky (layout.css) and paints over the sheet
        scrolling beneath it, so a control the browser scrolls to the top of the
        scrollport (focusing a money field does exactly that) came to rest

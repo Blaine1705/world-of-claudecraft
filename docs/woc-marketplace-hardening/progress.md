@@ -3007,6 +3007,23 @@ docs and capture commits.
   monolith ratchet at 2623 lines with zero headroom, which stops the growth but
   legitimizes the size: the pure-core half of the recipe (a `woc_market_view.ts`
   the window renders from) was never built. Worth its own extraction pass.
+- **A mobile-chrome sweep.** `scroll-padding-top` is declared for `#trade-window`
+  alone, but the cause is shared: the block that grants `overflow-y: auto` on the
+  window element itself covers fifteen windows, and any of them whose header is
+  the sticky `.panel-title` inside that scrollport has the same hazard (several
+  are immune because they scroll an inner pane with the header outside it, which
+  is why the Exchange needed no equivalent). The durable form is one rule over
+  the self-scrolling set, plus a `--mobile-header-h` token both the floor and the
+  reserve read. Out of scope here, and it wants its own captures.
+- **Recorded, not closed.** `scroll-padding` steers scroll-INTO-view only
+  (focus, `scrollIntoView`). A player who drags a money field under the sticky
+  header by hand still can; focus is the trigger this pass fixes.
+- **Recorded, guarded by the rig.** The reserve's `40px` term is the button
+  FLOOR, not the row's height: a locale whose commit label wraps grows the row
+  past the slack, and no arithmetic in the sheet can see that. What can see it is
+  the rig's `reserve >= measured band` assertion, which runs per face and per
+  locale (the Russian pass being the wordiest). The two guards cover each other:
+  only the CSS can see an inset, only the rig can see a grown row.
 - **A theme pass.** The typed price and the block reason read `--gold` and
   `--gold-dim`, the RAW accent pair, while the rest of the arm reads the
   contrast-repaired `--color-accent`. Both are a clear improvement on the hex
@@ -3016,6 +3033,12 @@ docs and capture commits.
   zoom, so at the 0.85 UI-scale floor a 40px control renders at 34px. The money
   sheets' own INSETS are now divided by the scale; doing the same to the floors
   is a house-wide change with its own capture set.
+- **For Fernando's sign-off, not a defect.** The capture set is 79 files and
+  about 46 MB. `docs/` is NOT part of the built site (only `public/` deploys
+  verbatim), so this is repo weight only, and the directory already carried
+  roughly 900 MB before this pass. Trimming the `-stress` and `-ru_RU` variants
+  would halve it; keeping them is what makes the extremes and the wordiest
+  locale reviewable. The 15 QA session owns that call.
 - **Recorded, no change.** The three native `<select>` controls stay native (the
   themed `.ui-dd` swap is wiring); the Exchange stays a fitted 960x700 rather
   than the large-window target; the store's dead portrait media query stays;
