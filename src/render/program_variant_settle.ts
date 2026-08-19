@@ -59,10 +59,13 @@ export interface ProgramVariantSettleResult {
  * Poll every not-yet-proved program of `materials` until all answer ready or
  * `deadline` fires; each program that answers ready is recorded at once
  * (markProgramReady), so a deadline that ends the poll still leaves the ready
- * ones proved and the touch tail warms them. The first pass runs
- * synchronously (the piece's compile just resolved, so its programs are the
- * likeliest to be ready right now); every later pass rides the scheduler at
- * three's cadence.
+ * ones proved and the touch tail warms them. Every pass, the FIRST included,
+ * rides the scheduler: the first used to run synchronously on the compile
+ * piece's own resolution stack, which put its COMPLETION_STATUS queries
+ * inside the queue's released tail where no unit's syncMs books them (review
+ * of the scheduler PR); one zero-delay hop costs the settle nothing (the
+ * piece's programs stay the likeliest to be ready) and takes the query class
+ * off the compile stack.
  */
 export function settleProgramVariants(
   properties: MaterialPropertiesLike,
@@ -100,7 +103,14 @@ export function settleProgramVariants(
         reject(error);
       }
     };
-    pass();
+    // Nothing pending needs no poll and keeps the historic no-timer shape
+    // (callers settle trivially for materials three never prepared). Any real
+    // poll is deferred: the query pass never runs on the caller's stack.
+    if (pending.length === 0) {
+      resolve({ settled: true, ready, pending: 0 });
+      return;
+    }
+    scheduler.setTimeout(pass, 0);
   });
 }
 

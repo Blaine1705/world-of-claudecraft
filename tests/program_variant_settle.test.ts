@@ -162,7 +162,10 @@ describe('settleProgramVariants', () => {
     void settleProgramVariants(properties, [material], live, scheduler).then((settled) => {
       result = settled;
     });
-    // The first pass ran synchronously: the ready variant is proved at once.
+    // The first pass rides the scheduler too (a zero-delay hop off the
+    // compile piece's resolution stack), so nothing is polled before it fires.
+    expect(rigid.polls).toBe(0);
+    scheduler.advance(0);
     expect(rigid.polls).toBe(1);
     expect(skinned.polls).toBe(1);
     expect(isProgramKnownReady(rigid)).toBe(true);
@@ -180,6 +183,7 @@ describe('settleProgramVariants', () => {
     expect(isProgramKnownReady(skinned)).toBe(true);
     expect(result).toEqual({ settled: true, ready: 2, pending: 0 });
     expect(scheduler.armed).toEqual([
+      0,
       PROGRAM_VARIANT_POLL_INTERVAL_MS,
       PROGRAM_VARIANT_POLL_INTERVAL_MS,
     ]);
@@ -248,7 +252,8 @@ describe('settleProgramVariants', () => {
     scheduler.advance(PROGRAM_VARIANT_POLL_INTERVAL_MS);
     await expect(settled).resolves.toEqual({ settled: false, ready: 1, pending: 1 });
     expect(never.polls).toBe(5);
-    expect(scheduler.armed).toHaveLength(4);
+    // The leading zero-delay first pass now rides the scheduler too.
+    expect(scheduler.armed).toHaveLength(5);
     expect(isProgramKnownReady(rigid)).toBe(true);
     expect(isProgramKnownReady(never)).toBe(false);
     rigid.seal();
@@ -284,10 +289,12 @@ describe('settleProgramVariants', () => {
       ]),
     );
     const scheduler = manualScheduler();
-    await expect(
-      settleProgramVariants(properties, [material], { fired: true }, scheduler),
-    ).resolves.toEqual({ settled: false, ready: 1, pending: 1 });
-    expect(scheduler.armed).toEqual([]);
+    const settled = settleProgramVariants(properties, [material], { fired: true }, scheduler);
+    // The one pass rides the zero-delay hop; nothing is asked on the caller's stack.
+    expect(scheduler.armed).toEqual([0]);
+    scheduler.advance(0);
+    await expect(settled).resolves.toEqual({ settled: false, ready: 1, pending: 1 });
+    expect(scheduler.armed).toEqual([0]);
     expect(isProgramKnownReady(ready)).toBe(true);
     expect(isProgramKnownReady(linking)).toBe(false);
   });
@@ -299,7 +306,9 @@ describe('settleProgramVariants', () => {
       new Map([[material, { programs: new Map<string, SettleProgramLike>([['only', proved]]) }]]),
     );
     const scheduler = manualScheduler();
-    await expect(settleProgramVariants(properties, [material], live, scheduler)).resolves.toEqual({
+    const firstSettle = settleProgramVariants(properties, [material], live, scheduler);
+    scheduler.advance(0);
+    await expect(firstSettle).resolves.toEqual({
       settled: true,
       ready: 1,
       pending: 0,
@@ -312,7 +321,8 @@ describe('settleProgramVariants', () => {
       ready: 0,
       pending: 0,
     });
-    expect(scheduler.armed).toEqual([]);
+    // The only timer ever armed was the first settle's zero-delay hop.
+    expect(scheduler.armed).toEqual([0]);
   });
 
   it('rejects when a poll throws, on the first pass or a later one, instead of hanging the piece', async () => {
@@ -326,9 +336,9 @@ describe('settleProgramVariants', () => {
       new Map([[material, { programs: new Map<string, SettleProgramLike>([['boom', boom]]) }]]),
     );
     const scheduler = manualScheduler();
-    await expect(settleProgramVariants(properties, [material], live, scheduler)).rejects.toThrow(
-      'asked outside',
-    );
+    const firstPass = settleProgramVariants(properties, [material], live, scheduler);
+    scheduler.advance(0);
+    await expect(firstPass).rejects.toThrow('asked outside');
     const late = program('late', Number.POSITIVE_INFINITY);
     const later = propertiesFor(
       new Map([[material, { programs: new Map<string, SettleProgramLike>([['late', late]]) }]]),
@@ -360,15 +370,18 @@ describe('settleProgramVariants', () => {
     const scheduler = manualScheduler();
     scheduler.passCostMs = 30;
     const settled = settleProgramVariants(properties, [material], live, scheduler);
-    // expensive passes double the interval from the floor: 20, 40, 80
-    expect(scheduler.armed).toEqual([20]);
+    // The zero-delay first pass, then expensive passes double the interval
+    // from the floor: 20, 40, 80
+    expect(scheduler.armed).toEqual([0]);
+    scheduler.advance(0);
+    expect(scheduler.armed).toEqual([0, 20]);
     scheduler.advance(20);
     scheduler.advance(40);
-    expect(scheduler.armed).toEqual([20, 40, 80]);
+    expect(scheduler.armed).toEqual([0, 20, 40, 80]);
     scheduler.passCostMs = 0;
     scheduler.advance(80);
     // a cheap pass resets to the floor
-    expect(scheduler.armed).toEqual([20, 40, 80, PROGRAM_VARIANT_POLL_INTERVAL_MS]);
+    expect(scheduler.armed).toEqual([0, 20, 40, 80, PROGRAM_VARIANT_POLL_INTERVAL_MS]);
     scheduler.advance(PROGRAM_VARIANT_POLL_INTERVAL_MS);
     await expect(settled).resolves.toEqual({ settled: true, ready: 1, pending: 0 });
     expect(slow.polls).toBe(5);
@@ -453,8 +466,11 @@ describe('the settle inside a pieced gate (runPieces + linkPieceWork)', () => {
       result = gate;
     });
     await flush();
-    // the piece's deadline (1500) then the settle's first reschedule (10)
-    expect(scheduler.armed).toEqual([1500, PROGRAM_VARIANT_POLL_INTERVAL_MS]);
+    // the piece's deadline (1500) then the settle's zero-delay first pass
+    expect(scheduler.armed).toEqual([1500, 0]);
+    expect(result).toBeNull();
+    scheduler.advance(0);
+    await flush();
     expect(result).toBeNull();
     scheduler.advance(PROGRAM_VARIANT_POLL_INTERVAL_MS);
     await flush();
