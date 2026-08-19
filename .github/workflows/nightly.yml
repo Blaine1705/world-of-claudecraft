@@ -248,7 +248,17 @@ jobs:
           key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
 
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        # Same split as ci.yml's browser-gate step: the browser install fails
+        # hard, the package-manager OS-dep half is bounded and best-effort
+        # because the runner image already ships Chromium's system libraries
+        # and a stalled mirror was killing whole runs (2026-08-19 queue
+        # rejections). A genuinely missing library still fails at browser
+        # launch below.
+        run: |
+          npx playwright install chromium
+          timeout -k 15 120 npx playwright install-deps chromium \
+            || timeout -k 15 60 npx playwright install-deps chromium \
+            || echo "install-deps unavailable (last exit $?); relying on the runner image's browser libraries"
 
       - name: Run browser regressions
         run: npm run test:browser

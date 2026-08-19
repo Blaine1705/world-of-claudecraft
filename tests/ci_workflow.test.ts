@@ -18,6 +18,7 @@ import {
   I18N_ARTIFACTS,
   MANIFEST_ARTIFACTS,
 } from '../scripts/lib/gate_steps.mjs';
+import { PLAYWRIGHT_INSTALL_BLOCK } from './helpers/playwright_install_block';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { stripComments } from './helpers/strip_comments';
 
@@ -428,7 +429,18 @@ describe('CI workflow parity', () => {
 
   it('runs the opt-in Chromium browser regressions in their own CI job', () => {
     const browserGate = jobSource('browser-gate');
-    expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
+    // The install is split: the browser download fails hard, while the
+    // package-manager half (playwright install-deps) is bounded and
+    // best-effort by ruling (2026-08-19: three merge-queue rejections died
+    // at zero mirror throughput with the browser cache-hit). The runner
+    // image already ships Chromium's system libraries, and a genuinely
+    // missing one fails at browser launch. Pinned as the WHOLE block scalar
+    // so a step comment cannot satisfy it, the hard-fail line cannot grow a
+    // fallback, and the retry count and bounds cannot drift silently: the
+    // two tries total 3 minutes, sized so a double stall stays inside the
+    // job's 10-minute bound and its auto-rerunnable setup class.
+    expect(browserGate).toContain(PLAYWRIGHT_INSTALL_BLOCK);
+    expect(browserGate).not.toContain('--with-deps');
     expect(browserGate).toContain('run: npm run test:browser');
     const browser = gateSteps.find((s) => s.name === 'browser regressions');
     expect(browser?.cmd).toBe('npm');
@@ -467,9 +479,9 @@ describe('CI workflow parity', () => {
     );
     expect(browserGate).toContain("require('playwright/package.json').version");
     expect(browserGate.indexOf('Cache Playwright Chromium browsers')).toBeLessThan(
-      browserGate.indexOf('run: npx playwright install --with-deps chromium'),
+      browserGate.indexOf('npx playwright install chromium'),
     );
-    expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
+    expect(browserGate).toContain('npx playwright install chromium');
     // No restore-keys: the key is already exact-version-scoped, so a prefix
     // fallback could only ever restore a PRIOR Playwright version's binaries
     // alongside the new install. actions/cache never evicts an old entry, so

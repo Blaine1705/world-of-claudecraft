@@ -407,7 +407,27 @@ jobs:
           key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
 
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        # The old single-step form folded a package-manager run (playwright
+        # install-deps) into the browser install, and in practice that half
+        # was the step's only failure mode: three consecutive merge-queue
+        # rejections on 2026-08-19 died at zero mirror throughput with the
+        # browser itself cache-hit. The halves are split so the browser
+        # install keeps its hard failure while the OS-dep half gets two
+        # bounded tries (120s then 60s, -k so a TERM-ignoring hang cannot
+        # defeat the bound; 3 minutes worst case keeps a double stall well
+        # inside this job's 10-minute bound and its auto-rerunnable setup
+        # class) and then defers to the runner image, which ships Chromium's
+        # system libraries. A genuinely missing shared library still fails
+        # loudly at browser launch in the next step; the residual risk the
+        # fallback accepts is environment drift the launch cannot see (fonts,
+        # which the a11y geometry assertions depend on), judged acceptable
+        # against queue rejections because the runner image pins its own
+        # font set.
+        run: |
+          npx playwright install chromium
+          timeout -k 15 120 npx playwright install-deps chromium \
+            || timeout -k 15 60 npx playwright install-deps chromium \
+            || echo "install-deps unavailable (last exit $?); relying on the runner image's browser libraries"
 
       - name: Run browser regressions
         run: npm run test:browser
