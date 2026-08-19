@@ -2,7 +2,7 @@
 // PR screenshot for fix/chat-mute-resume-race: an admin's chat mute against a
 // REAL server serving the REAL POST /admin/api/moderation/accounts/:id/chat-mute
 // route, showing the "muted until" state a resuming session must never lose
-// (server/chat_mute_resume.ts).
+// (server/chat_mod_live.ts).
 //
 // Dev-only, not wired into any npm script or CI gate. Needs:
 //   - the dev Postgres up (npm run db:up)

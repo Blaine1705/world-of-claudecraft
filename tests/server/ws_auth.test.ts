@@ -1051,21 +1051,25 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
     {
       label: 'mute',
       hydrated: null,
-      committed: { mutedUntil: '2099-01-01T00:00:00.000Z', reason: 'spam', strikes: 0 },
+      committed: { mutedUntil: '2099-01-01T00:00:00.000Z', reason: 'spam', strikes: 4 },
     },
     {
       label: 'unmute',
       hydrated: '2099-01-01T00:00:00.000Z',
-      committed: { mutedUntil: null, reason: '', strikes: 0 },
+      committed: { mutedUntil: null, reason: 'lifted', strikes: 1 },
     },
   ])(
-    // Reproduces the resume race server/chat_mod_live.ts exists to close: a
-    // mute or unmute pushed onto this account WHILE the auth query snapshot
-    // below is still in flight must win over that now-stale snapshot,
-    // whichever direction it moved.
-    'uses a committed chat-moderation $label that arrives during auth hydration',
+    // Reproduces the RESUME race server/chat_mod_live.ts exists to close (the
+    // reported bug: a linkdead session's reconnect): a mute or unmute pushed
+    // onto this account WHILE the auth query snapshot below is still in
+    // flight must win over that now-stale snapshot, whichever direction it
+    // moved. strikes/reason differ from every default in this file so a
+    // regression that silently fell back to the fresh snapshot's own values
+    // cannot pass by coincidence.
+    'uses a committed chat-moderation $label that arrives during auth hydration on resume',
     async ({ hydrated, committed }) => {
       const current = setup();
+      current.game.hasSessionForCharacter.mockReturnValue(true);
       let resolveCharacter!: (character: CharacterRow | null) => void;
       current.deps.moderationStatusForAccount = vi.fn(async () =>
         modStatus({ chatMutedUntil: hydrated }),
@@ -1088,7 +1092,8 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
         expect(current.deps.moderationStatusForAccount).toHaveBeenCalledOnce(),
       );
 
-      current.chatModerationLiveState.changed(1, committed);
+      current.chatModerationLiveState.muteChanged(1, committed);
+      current.chatModerationLiveState.strikesChanged(1, committed.strikes);
       resolveCharacter(baseChar());
       await authenticating;
 
@@ -1099,6 +1104,47 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
       });
     },
   );
+
+  it('still catches a push landing after chatMuteStatusForAccount but before the synchronous join boundary', async () => {
+    // The fence must resolve AT the game.join call, not right after its own
+    // DB reads: loadAccountCosmetics (and, on other arms, adminRolesForAccount
+    // / bankBonusForAccount / the lease acquire / the character reload) all
+    // still run between those reads and the actual join, and a push landing
+    // in that later window must not be lost either.
+    const current = setup();
+    current.game.hasSessionForCharacter.mockReturnValue(true);
+    type Cosmetics = Awaited<ReturnType<typeof current.deps.loadAccountCosmetics>>;
+    let resolveCosmetics!: (cosmetics: Cosmetics) => void;
+    current.deps.loadAccountCosmetics = vi.fn(
+      () =>
+        new Promise<Cosmetics>((resolve) => {
+          resolveCosmetics = resolve;
+        }),
+    );
+    const authenticating = createWsAuth(current.deps).authenticateWebSocket(
+      asWs(current.ws),
+      authRaw(),
+      current.req,
+    );
+    await vi.waitFor(() => expect(current.deps.loadAccountCosmetics).toHaveBeenCalledOnce());
+
+    const committed = { mutedUntil: '2099-01-01T00:00:00.000Z', reason: 'late push', strikes: 3 };
+    current.chatModerationLiveState.muteChanged(1, committed);
+    current.chatModerationLiveState.strikesChanged(1, committed.strikes);
+    resolveCosmetics({
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+    });
+    await authenticating;
+
+    expect(joinedMeta(current.game)).toMatchObject({
+      mutedUntil: committed.mutedUntil,
+      reason: committed.reason,
+      chatStrikes: committed.strikes,
+    });
+  });
 
   it('falls back to the chat-level mute when the account has no mute', async () => {
     const { ws, game, deps, req } = setup();

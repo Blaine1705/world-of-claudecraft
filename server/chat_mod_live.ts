@@ -14,8 +14,8 @@ export interface ChatModerationHydration {
   release(): void;
 }
 
-// A session-shaped source for pushChatModerationChange: whatever currently
-// holds the three live fields (ClientSession satisfies this structurally).
+// A session-shaped source for the push helpers below: whatever currently
+// holds the live fields (ClientSession satisfies this structurally).
 export interface ChatModerationSource {
   accountId: number;
   chatMutedUntil: number | null;
@@ -23,27 +23,50 @@ export interface ChatModerationSource {
   chatStrikes: number;
 }
 
+function isoMutedUntil(chatMutedUntil: number | null): string | null {
+  // Number.isFinite, not a bare null check: every current producer of
+  // session.chatMutedUntil is either null-guarded (muteAccountChat) or
+  // DB-derived, but toISOString() throws RangeError on NaN, and a throw
+  // escaping mid-loop here (liftChatMuteLive/resetChatStrikesLive iterate
+  // several sessions) would leave some of an account's sessions pushed and
+  // others not.
+  return chatMutedUntil !== null && Number.isFinite(chatMutedUntil)
+    ? new Date(chatMutedUntil).toISOString()
+    : null;
+}
+
 /**
- * Records a session's current mute/reason/strikes as its account's latest
- * live chat-moderation push, so a reconnect hydration in flight right now
- * (GameServer.beginChatModerationHydration) resolves to this write instead
- * of the stale DB snapshot it started reading before this landed.
+ * Records a session's current mute+reason as its account's latest live push.
+ * Deliberately separate from pushStrikesChange: a session's chat_strikes can
+ * be stale for an unrelated reason (e.g. a cross-realm change this process
+ * never saw), and folding it into the same push would let a strikes-only
+ * write resurrect that stale mute state during a hydration window it has no
+ * fresher information about. See ChatModerationLiveState below.
  */
-export function pushChatModerationChange(
+export function pushMuteChange(
   liveState: ChatModerationLiveState,
   session: ChatModerationSource,
 ): void {
-  liveState.changed(session.accountId, {
-    mutedUntil:
-      session.chatMutedUntil !== null ? new Date(session.chatMutedUntil).toISOString() : null,
+  liveState.muteChanged(session.accountId, {
+    mutedUntil: isoMutedUntil(session.chatMutedUntil),
     reason: session.chatMuteReason,
-    strikes: session.chatStrikes,
   });
 }
 
-interface LiveModerationVersion {
-  generation: number;
-  state: ChatModerationState;
+/** The strikes-only counterpart to pushMuteChange; see its header. */
+export function pushStrikesChange(
+  liveState: ChatModerationLiveState,
+  session: ChatModerationSource,
+): void {
+  liveState.strikesChanged(session.accountId, session.chatStrikes);
+}
+
+interface LiveModerationEntry {
+  muteGeneration: number;
+  mutedUntil: string | null;
+  reason: string;
+  strikesGeneration: number;
+  strikes: number;
 }
 
 // Bounded like the sibling cache below; an in-progress hydration stays pinned
@@ -62,7 +85,14 @@ const CHAT_MODERATION_CACHE_MAX_ACCOUNTS = 4_096;
  * the SAME still-linkdead session before that snapshot resolves, silently
  * un-enforcing (or under-escalating) a live sanction on resume.
  *
- * A handshake that captures no concurrent push trusts its own DB read
+ * The mute/reason pair and strikes are fenced with INDEPENDENT generations
+ * (not one combined generation), and resolve() merges them field by field.
+ * A single combined generation would let a push that only confirms one of
+ * the two (say, a strikes reset) also resurrect the OTHER one from the
+ * session's own possibly-stale mirror -- exactly the cross-realm-divergence
+ * failure this fence exists to prevent, just moved to a different field.
+ *
+ * A field with no concurrent push trusts the fresh DB read for THAT field
  * completely: that is what keeps a mute/unmute/reset issued through a
  * DIFFERENT realm process self-healing on the next resume (accounts.chat_
  * muted_until and chat_strikes are account-wide, but a live push here only
@@ -70,18 +100,27 @@ const CHAT_MODERATION_CACHE_MAX_ACCOUNTS = 4_096;
  * over a fresh read from a handshake this process never pushed to).
  */
 export class ChatModerationLiveState {
-  readonly #latest = new Map<number, LiveModerationVersion>();
+  readonly #latest = new Map<number, LiveModerationEntry>();
   readonly #pins = new Map<number, number>();
   #generation = 0;
 
   beginHydration(accountId: number): ChatModerationHydration {
-    const capturedGeneration = this.#latest.get(accountId)?.generation ?? 0;
+    const entry = this.#latest.get(accountId);
+    const capturedMuteGeneration = entry?.muteGeneration ?? 0;
+    const capturedStrikesGeneration = entry?.strikesGeneration ?? 0;
     this.#pins.set(accountId, (this.#pins.get(accountId) ?? 0) + 1);
     let released = false;
     return {
       resolve: (hydrated) => {
         const latest = this.#latest.get(accountId);
-        return latest && latest.generation !== capturedGeneration ? latest.state : hydrated;
+        const useMute = latest !== undefined && latest.muteGeneration !== capturedMuteGeneration;
+        const useStrikes =
+          latest !== undefined && latest.strikesGeneration !== capturedStrikesGeneration;
+        return {
+          mutedUntil: useMute ? latest.mutedUntil : hydrated.mutedUntil,
+          reason: useMute ? latest.reason : hydrated.reason,
+          strikes: useStrikes ? latest.strikes : hydrated.strikes,
+        };
       },
       release: () => {
         if (released) return;
@@ -94,10 +133,31 @@ export class ChatModerationLiveState {
     };
   }
 
-  changed(accountId: number, state: ChatModerationState): void {
+  muteChanged(accountId: number, mute: { mutedUntil: string | null; reason: string }): void {
     this.#generation++;
+    const prev = this.#latest.get(accountId);
     this.#latest.delete(accountId);
-    this.#latest.set(accountId, { generation: this.#generation, state });
+    this.#latest.set(accountId, {
+      muteGeneration: this.#generation,
+      mutedUntil: mute.mutedUntil,
+      reason: mute.reason,
+      strikesGeneration: prev?.strikesGeneration ?? 0,
+      strikes: prev?.strikes ?? 0,
+    });
+    this.#trim();
+  }
+
+  strikesChanged(accountId: number, strikes: number): void {
+    this.#generation++;
+    const prev = this.#latest.get(accountId);
+    this.#latest.delete(accountId);
+    this.#latest.set(accountId, {
+      muteGeneration: prev?.muteGeneration ?? 0,
+      mutedUntil: prev?.mutedUntil ?? null,
+      reason: prev?.reason ?? '',
+      strikesGeneration: this.#generation,
+      strikes,
+    });
     this.#trim();
   }
 

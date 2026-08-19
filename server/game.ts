@@ -165,7 +165,8 @@ import { ChatLogger } from './chat_log';
 import {
   type ChatModerationHydration,
   ChatModerationLiveState,
-  pushChatModerationChange,
+  pushMuteChange,
+  pushStrikesChange,
 } from './chat_mod_live';
 import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
@@ -6308,7 +6309,7 @@ export class GameServer {
       if (session.accountId !== accountId) continue;
       session.chatMutedUntil = until.getTime();
       session.chatMuteReason = reason.trim();
-      pushChatModerationChange(this.chatModerationLiveState, session);
+      pushMuteChange(this.chatModerationLiveState, session);
       this.send(session, {
         t: 'events',
         list: [{ type: 'error', text: this.chatMuteMessage(session) }],
@@ -6379,7 +6380,7 @@ export class GameServer {
       if (session.accountId === accountId) {
         session.chatMutedUntil = null;
         session.chatMuteReason = '';
-        pushChatModerationChange(this.chatModerationLiveState, session);
+        pushMuteChange(this.chatModerationLiveState, session);
       }
     }
   }
@@ -6389,7 +6390,7 @@ export class GameServer {
     for (const session of this.clients.values()) {
       if (session.accountId !== accountId) continue;
       session.chatStrikes = 0;
-      pushChatModerationChange(this.chatModerationLiveState, session);
+      pushStrikesChange(this.chatModerationLiveState, session);
     }
   }
 
@@ -10672,10 +10673,11 @@ export class GameServer {
     void applyChatStrike(session.accountId, outcome.muteSeconds)
       .then((applied) => {
         session.chatStrikes = applied.strikes;
-        session.chatMutedUntil = applied.chatMutedUntil
-          ? new Date(applied.chatMutedUntil).getTime()
-          : session.chatMutedUntil;
-        pushChatModerationChange(this.chatModerationLiveState, session);
+        pushStrikesChange(this.chatModerationLiveState, session);
+        if (applied.chatMutedUntil) {
+          session.chatMutedUntil = new Date(applied.chatMutedUntil).getTime();
+          pushMuteChange(this.chatModerationLiveState, session);
+        }
       })
       .catch((err) => console.error('applyChatStrike failed:', err));
     void recordChatViolation({

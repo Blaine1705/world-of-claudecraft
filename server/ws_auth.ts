@@ -311,11 +311,17 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         return;
       }
       const chatMute = await chatMuteStatusForAccount(accountId);
-      const resolvedModeration = chatModerationHydration.resolve({
+      // Resolved at each game.join call below, not here: like
+      // generalChatRateLimitHydration, resolving early would leave every
+      // await between here and the synchronous join boundary (adminRolesForAccount,
+      // loadAccountCosmetics, and on the fresh arm bankBonusForAccount, the lease
+      // acquire, and the character reload) unfenced against a live push landing
+      // in that window.
+      const freshModeration = {
         mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
         reason: chatMute.reason,
         strikes: status.chatStrikes,
-      });
+      };
       // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
       // is handled inside game.join(); this guard blocks egregious bot farms before
       // they consume a session slot.
@@ -340,9 +346,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
-        mutedUntil: resolvedModeration.mutedUntil,
-        reason: resolvedModeration.reason,
-        chatStrikes: resolvedModeration.strikes,
         accountCosmetics,
         isAdmin,
         adminPermissions,
@@ -385,6 +388,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // resumes and keeps its nonce; a live duplicate is rejected) and never
           // re-stamp the row with a fresh acquire that a doomed handshake could
           // leave mismatched.
+          const moderation = chatModerationHydration.resolve(freshModeration);
           result = game.join(
             ws,
             accountId,
@@ -395,6 +399,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             character.is_gm,
             {
               ...joinMeta,
+              mutedUntil: moderation.mutedUntil,
+              reason: moderation.reason,
+              chatStrikes: moderation.strikes,
               generalChatRateLimit: generalChatRateLimitHydration.resolve(
                 status.generalChatRateLimit ?? null,
               ),
@@ -482,6 +489,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               leaseNonce = undefined;
               throw err;
             }
+            const moderation = chatModerationHydration.resolve(freshModeration);
             result = game.join(
               ws,
               accountId,
@@ -494,6 +502,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 ...joinMeta,
                 leaseNonce,
                 bankBonus,
+                mutedUntil: moderation.mutedUntil,
+                reason: moderation.reason,
+                chatStrikes: moderation.strikes,
                 generalChatRateLimit: generalChatRateLimitHydration.resolve(
                   status.generalChatRateLimit ?? null,
                 ),
