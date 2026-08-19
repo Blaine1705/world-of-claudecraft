@@ -41,6 +41,7 @@ const describeDb = ADMIN_URL ? describe : describe.skip;
 describeDb('woc market plan-class pins against real Postgres', () => {
   let admin: Pool;
   let pool: Pool;
+  let db: typeof import('../server/db');
   let marketDbMod: typeof import('../server/woc_market_db');
   let marketDb: PgWocMarketDb;
   let captured: { text: string; values: unknown[] }[] = [];
@@ -57,7 +58,7 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     );
     await admin.query(`DROP DATABASE IF EXISTS ${VERIFY_DB}`);
     await admin.query(`CREATE DATABASE ${VERIFY_DB}`);
-    const db = await import('../server/db');
+    db = await import('../server/db');
     marketDbMod = await import('../server/woc_market_db');
     // The REAL boot path, so every index under test is the one production gets.
     await db.ensureSchema();
@@ -84,6 +85,9 @@ describeDb('woc market plan-class pins against real Postgres', () => {
   }, 120_000);
 
   afterAll(async () => {
+    // The boot path's module pool too, like every sibling pg suite: a leaked
+    // pool can hang the worker at teardown.
+    await db?.pool?.end().catch(() => {});
     await pool?.end();
     await admin?.end();
   });
@@ -340,6 +344,12 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     // (tests/server/woc_market_directed_sql.test.ts).
     expect(idsPlan).not.toMatch(/Seq Scan on woc_market_listings/);
     expect(idsPlan).toMatch(/Index Scan|Bitmap Index Scan/);
+    // The falsifiable half: at NATURAL costs over this ANALYZEd two-realm
+    // distribution the seq-scan assert is a real planner outcome the fixture
+    // could produce, so a predicate change that pushed the read outside every
+    // index would fail here rather than being masked by the seqscan penalty.
+    const idsNatural = await planOf(idsPage.text, idsPage.values, 'natural');
+    expect(idsNatural).not.toMatch(/Seq Scan on woc_market_listings/);
     // The second statement only fires when the page found live listings; the
     // two seeded rows above guarantee it, so the probe half is really pinned.
     expect(residue, 'the settlements probe must have run').toBeDefined();
@@ -467,5 +477,40 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     const plan = await planOf(pick.text, pick.values);
     expect(plan).not.toMatch(/Seq Scan on woc_market_bids/);
     expect(plan).toContain('woc_market_bids_listing');
+  }, 60_000);
+
+  it('the booked-claims prune plans anti-join referent seeks behind its cursor, never table scans', async () => {
+    // The pin the db review demanded after measuring the first cut: the
+    // IS-NULL-wrapped probes compiled to hashed SubPlans that SEQ SCANNED the
+    // whole settlements table per batch, so the shipped bare-NOT-EXISTS +
+    // ctid shape is held here as a plan class: the booked partial drives the
+    // candidate set, both referent probes stay ON THE PRIMARY KEYS (the
+    // planner may hash an index-only scan or seek per row by cost; both are
+    // index paths, and the banned class is the table scan), and the outer
+    // DELETE is a Tid Scan instead of a table-sized semi-join. A Sort of one
+    // batch's bounded candidate set is a legitimate cost choice and is not
+    // asserted against.
+    await pool.query(
+      `INSERT INTO woc_market_custody_claims (custody_ref, realm, booked_at)
+       VALUES ('woc_settlement:88880001', 'plans-claims', now() - interval '400 days'),
+              ('woc_listing_return:88880002', 'plans-claims', now() - interval '400 days')`,
+    );
+    // The free function takes its pool directly, so it needs its own local
+    // recorder (the suite's wrapped pool only backs the class methods).
+    const rec: { text: string; values: unknown[] }[] = [];
+    const recPool = {
+      query: (t: string, v?: unknown[]) => {
+        rec.push({ text: t, values: v ?? [] });
+        return pool.query(t, v as never[]);
+      },
+    } as unknown as Pool;
+    await marketDbMod.pruneBookedWocCustodyClaimsBatch(recPool, 365, 100);
+    const [prune] = rec;
+    const plan = await planOf(prune.text, prune.values);
+    expect(plan).not.toMatch(/Seq Scan on woc_market_/);
+    expect(plan).toContain('woc_market_custody_claims_booked');
+    expect(plan).toContain('woc_market_settlements_pkey');
+    expect(plan).toContain('woc_market_listings_pkey');
+    expect(plan).toMatch(/Tid Scan/);
   }, 60_000);
 });

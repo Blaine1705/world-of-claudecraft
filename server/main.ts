@@ -385,7 +385,9 @@ import {
   pruneExpiredWocStepUpChallengesBatch,
   pruneResolvedWocOffersBatch,
   pruneWocBuyNowAbandonsBatch,
+  wocCustodyClaimsRetentionWarning,
   wocMarketIdleTxKillCount,
+  wocMarketLockWaitTimeoutCount,
 } from './woc_market_db';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
@@ -2877,6 +2879,9 @@ configureInternalWocMarketStuckRead(async () => ({
   // Guard transactions the idle bound killed (25P03), each destroying its
   // pooled client: the retrofit's false-fire rate as a counter.
   idleTxKills: wocMarketIdleTxKillCount(),
+  // Guard statements the 2s lock-wait bound refused (55P03): the tuning
+  // signal for ESCROW_LOCK_TIMEOUT_MS, since players feel these as 409s.
+  lockWaitTimeouts: wocMarketLockWaitTimeoutCount(),
   // The shared pg pool's live occupancy (the pool-wait observability the
   // pre-enable review asked for): waiting > 0 sustained means requests are
   // queueing for clients, the brownout precursor the read caches exist to
@@ -3637,6 +3642,8 @@ export async function startServer(): Promise<http.Server> {
         // a referent guard: a claim whose settlement or listing row still
         // exists is never pruned, whatever its age. Unbooked rows are the
         // operator queue and are structurally out of this prune's reach.
+        // The window relation the guard depends on is checked at boot below
+        // (the warn beside retentionSweep.start()).
         name: 'woc_market_custody_claims',
         pruneBatch: (n) =>
           pruneBookedWocCustodyClaimsBatch(pool, config.wocMarketCustodyClaimsRetentionDays, n),
@@ -3672,6 +3679,15 @@ export async function startServer(): Promise<http.Server> {
         : undefined,
   });
   retentionSweep.start();
+  {
+    // A misconfigured custody-claims window silently disarms the exactly-once
+    // ledger's retention story; make it one loud boot line instead.
+    const claimsRetentionWarn = wocCustodyClaimsRetentionWarning(
+      config.wocMarketCustodyClaimsRetentionDays,
+      config.wocMarketListingsRetentionDays,
+    );
+    if (claimsRetentionWarn !== null) console.warn(claimsRetentionWarn);
+  }
 
   // The $WOC Exchange sweep: auction closes, settlement expiry and cascades,
   // delivery/return reconciliation, bond refunds. Per-realm advisory-locked,

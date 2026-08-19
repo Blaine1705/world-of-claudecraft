@@ -1171,6 +1171,9 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // evictions must be a number an operator can watch, not log volume).
     expect(code).toContain('priceCache: wocMarketEconomy.priceCacheAges?.() ?? null');
     expect(code).toContain('idleTxKills: wocMarketIdleTxKillCount()');
+    // The 55P03 twin: every guard now carries the lock-wait bound, so its
+    // fire rate is the tuning signal for ESCROW_LOCK_TIMEOUT_MS.
+    expect(code).toContain('lockWaitTimeouts: wocMarketLockWaitTimeoutCount()');
     // The pg pool gauge (the pre-enable review's pool-wait observability):
     // sustained waiting > 0 is the brownout precursor, and this readout is
     // where an operator already looks.

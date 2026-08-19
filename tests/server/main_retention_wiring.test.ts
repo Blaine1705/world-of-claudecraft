@@ -187,6 +187,14 @@ describe('retention sweep wiring in server/main.ts', () => {
     // Deliberately knobless: expired step-up nonces are garbage, not history,
     // so the drain takes no retention-days argument to misthread.
     expect(MAIN).toContain('pruneExpiredWocStepUpChallengesBatch(pool, n)');
+    // The custody-claims window relation check must actually be WIRED (the
+    // helper is unit-tested in the market SQL floor; this catches dead code),
+    // with both knobs threaded in the documented order (whitespace-collapsed
+    // so a formatter reflow cannot red it).
+    const flat = MAIN.replace(/\s+/g, ' ');
+    expect(flat).toContain(
+      'wocCustodyClaimsRetentionWarning( config.wocMarketCustodyClaimsRetentionDays, config.wocMarketListingsRetentionDays, )',
+    );
     expect(MAIN).toContain(
       'pruneClosedWocListingsBatch(pool, config.wocMarketListingsRetentionDays, n)',
     );

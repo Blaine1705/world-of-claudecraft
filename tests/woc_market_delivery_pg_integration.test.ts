@@ -1231,6 +1231,11 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       const liveSettlementRef = await book(rulesMod.settlementCustodyRef(liveSettlement.id));
       const returnListing = await seedListing(realm, seller);
       const liveReturnRef = await book(rulesMod.listingReturnCustodyRef(returnListing));
+      // The sold-notice arm of the listing regex, per dimension: its
+      // candidate row is shielded by the SAME live listing class, so
+      // narrowing the regex to return-only would wrongly prune this one.
+      const soldListing = await seedListing(realm, seller);
+      const liveSoldRef = await book(rulesMod.listingSoldNoticeCustodyRef(soldListing));
       // SURVIVOR by age: booked yesterday, referents long gone.
       const fresh = await book(rulesMod.settlementCustodyRef(99_999_904));
       // SURVIVORS unconditionally: the unbooked operator queue in all three
@@ -1252,7 +1257,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
           WHERE realm = $1 AND custody_ref <> $2`,
         [realm, fresh],
       );
-      // The premise that makes the counts below EXACT: this test's six aged
+      // The premise that makes the counts below EXACT: this test's seven aged
       // booked rows are the only booked rows in the whole disposable database
       // older than the window (every other fixture books at now()). Asserted
       // so a future aged fixture fails loudly here instead of drifting the
@@ -1261,9 +1266,14 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         `SELECT count(*)::int AS n FROM woc_market_custody_claims
           WHERE booked_at IS NOT NULL AND booked_at < now() - interval '365 days'`,
       );
-      expect(aged.rows[0].n, 'only this test ages booked rows past the window').toBe(6);
+      expect(aged.rows[0].n, 'only this test ages booked rows past the window').toBe(7);
+      // Staged batches pin the cursor walk AND idempotence: the batch bound
+      // is honored, a re-run continues where the last left off, and a drained
+      // table answers zero instead of re-deleting.
+      expect(await marketDbMod.pruneBookedWocCustodyClaimsBatch(pool, 365, 2)).toBe(2);
+      expect(await marketDbMod.pruneBookedWocCustodyClaimsBatch(pool, 365, 2)).toBe(2);
       const pruned = await marketDbMod.pruneBookedWocCustodyClaimsBatch(pool, 365, 100);
-      expect(pruned, 'dead-referent aged rows only').toBe(4);
+      expect(pruned, 'the staged batches already drained the prunable set').toBe(0);
       const left = await pool.query(
         `SELECT custody_ref FROM woc_market_custody_claims WHERE realm = $1 ORDER BY custody_ref`,
         [realm],
@@ -1274,6 +1284,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       }
       expect(refs, 'live settlement row shields its claim').toContain(liveSettlementRef);
       expect(refs, 'live listing row shields its claim').toContain(liveReturnRef);
+      expect(refs, 'live listing shields its sold notice too').toContain(liveSoldRef);
       expect(refs, 'inside the window: kept').toContain(fresh);
       expect(refs, 'unbooked bare: never pruned').toContain(bare);
       expect(refs, 'unbooked grant-intent: never pruned').toContain(granted);

@@ -328,6 +328,14 @@ describe('loadConfig', () => {
         dflt: 365,
       },
     ] as const;
+    // The outlive invariant between the two defaults, asserted rather than
+    // narrated: a default retune that lets the claims window sag to (or
+    // under) the listings window quietly re-arms the delivery duplication
+    // for unparseable legacy refs, whose ONLY protection is the window.
+    const defaults = loadConfig(MIN_ENV);
+    expect(defaults.wocMarketCustodyClaimsRetentionDays).toBeGreaterThan(
+      defaults.wocMarketListingsRetentionDays,
+    );
     for (const { key, field, dflt } of cases) {
       // A set value overrides the default.
       expect(loadConfig({ ...MIN_ENV, [key]: '7' })[field]).toBe(7);

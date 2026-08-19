@@ -290,4 +290,39 @@ describeDb('woc market step-up challenges against real Postgres', () => {
       }),
     ).rejects.toThrow();
   });
+
+  it('the nightly drain deletes only nonces a full slack day past expiry, in real SQL', async () => {
+    // The retention registration's behavioral arm: the DB-free pin holds the
+    // statement text, this proves the interval cast and the LIMIT actually
+    // execute against Postgres. The drain judges against now(), so these
+    // rows date off the real wall clock, unlike the BASE_MS fixtures.
+    const marketDbMod = await import('../server/woc_market_db');
+    const account = await seedAccount();
+    const realNowMs = Date.now();
+    const longDead = challenge(account, { expiresAtMs: realNowMs - 2 * 86_400_000 });
+    const justExpired = challenge(account, { expiresAtMs: realNowMs - 3_600_000 });
+    const live = challenge(account, { expiresAtMs: realNowMs + 3_600_000 });
+    await marketDb.createStepUpChallenge(longDead);
+    await marketDb.createStepUpChallenge(justExpired);
+    await marketDb.createStepUpChallenge(live);
+    // The exactness premise, asserted like the retention siblings: only this
+    // test seeds rows behind the real-clock drain cutoff (BASE_MS fixtures
+    // sit far in the future).
+    const reachable = await pool.query(
+      `SELECT count(*)::int AS n FROM woc_market_stepup_challenges
+        WHERE expires_at < now() - interval '1 day'`,
+    );
+    expect(reachable.rows[0].n, 'only this test seeds a drainable row').toBe(1);
+    expect(await marketDbMod.pruneExpiredWocStepUpChallengesBatch(pool, 100)).toBe(1);
+    const left = await pool.query(
+      `SELECT nonce FROM woc_market_stepup_challenges WHERE nonce = ANY($1::text[])`,
+      [[longDead.nonce, justExpired.nonce, live.nonce]],
+    );
+    const nonces = left.rows.map((r) => String(r.nonce));
+    expect(nonces, 'a day past expiry: drained').not.toContain(longDead.nonce);
+    expect(nonces, 'inside the slack day: kept for the expiry verdict').toContain(
+      justExpired.nonce,
+    );
+    expect(nonces, 'live: kept').toContain(live.nonce);
+  }, 20_000);
 });

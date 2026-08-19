@@ -1063,6 +1063,9 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         await holder.query(`SELECT 1 FROM woc_market_listings WHERE id = $1 FOR UPDATE`, [
           listingId,
         ]);
+        const counters = await import('../server/woc_market_db');
+        const idleBefore = counters.wocMarketIdleTxKillCount();
+        const lockBefore = counters.wocMarketLockWaitTimeoutCount();
         const startedAt = Date.now();
         const out = await marketDb.insertPendingBid({
           realm,
@@ -1084,6 +1087,11 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         // that bounded this wait before the lock_timeout existed.
         expect(elapsedMs).toBeGreaterThanOrEqual(1_500);
         expect(elapsedMs).toBeLessThan(10_000);
+        // The 55P03 lands on ITS counter and stays OFF the idle-kill one: a
+        // real lock-timeout fire against real Postgres, so a future fold of
+        // 55P03 into the 25P03 arm poisons a pinned metric here.
+        expect(counters.wocMarketLockWaitTimeoutCount()).toBe(lockBefore + 1);
+        expect(counters.wocMarketIdleTxKillCount()).toBe(idleBefore);
       } finally {
         await holder.query('ROLLBACK').catch(() => {});
         holder.release();
@@ -1102,6 +1110,8 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         await holder.query(`SELECT 1 FROM woc_market_listings WHERE id = $1 FOR UPDATE`, [
           listingId,
         ]);
+        const counters = await import('../server/woc_market_db');
+        const idleBefore = counters.wocMarketIdleTxKillCount();
         const startedAt = Date.now();
         const out = await marketDb.activateBid(bidId, BASE_MS);
         const elapsedMs = Date.now() - startedAt;
@@ -1111,6 +1121,9 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         expect(out).toBe('contended');
         expect(elapsedMs).toBeGreaterThanOrEqual(1_500);
         expect(elapsedMs).toBeLessThan(10_000);
+        expect(counters.wocMarketIdleTxKillCount(), 'a lock wait is not an idle kill').toBe(
+          idleBefore,
+        );
       } finally {
         await holder.query('ROLLBACK').catch(() => {});
         holder.release();

@@ -1112,9 +1112,11 @@ describe('every guard transaction bounds its idle holds', () => {
       // The lock-wait bound reached the last two holdouts (insertPendingBid,
       // activateBid) with the retention round, so the floor ratchets: every
       // guard transaction now bounds BOTH how long it waits for a row lock
-      // and how long it may idle while holding one.
+      // and how long it may idle while holding one. The FULL literal per
+      // slice, so a doubled site cannot mask a sibling on a different
+      // constant while the total stays right.
       expect(
-        slice.slice(0, 1600).includes('SET LOCAL lock_timeout'),
+        slice.slice(0, 1600).includes('SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}'),
         `withTx site ${i + 1} carries the lock-wait bound near its head`,
       ).toBe(true);
     }
@@ -1409,6 +1411,10 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     await pruneBookedWocCustodyClaimsBatch(pool, 365, 100);
     const [text] = sql();
     expect(text).toContain('DELETE FROM woc_market_custody_claims');
+    // The ctid outer keeps the DELETE a Tid Scan instead of a table-sized
+    // semi-join (measured 6.8x; a concurrently moved row fails the re-check
+    // and prunes next batch, the safe direction for a prune).
+    expect(text).toContain('WHERE ctid IN');
     // The unbooked operator queue is structurally out of reach: the predicate
     // is the prune-cursor partial's own (woc_market_custody_claims_booked).
     expect(text).toContain('booked_at IS NOT NULL');
@@ -1419,12 +1425,14 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     expect(text).not.toContain('claimed_at');
     // The referent belt: a claim whose settlement or listing row still exists
     // is unreachable whatever its age, so a stuck deal keeps its exactly-once
-    // evidence. Both probes are primary-key seeks off the parsed ref, and the
-    // regex guards keep the ::bigint cast off malformed legacy refs (which
-    // prune on the window alone).
-    expect(text).toContain("c.custody_ref ~ '^woc_settlement:[0-9]+$'");
-    expect(text).toContain("c.custody_ref ~ '^woc_listing_(return|sold):[0-9]+$'");
-    expect(text).toContain('NOT EXISTS');
+    // evidence. The probes are BARE NOT EXISTS (a NULL parsed id passes them
+    // vacuously; wrapping them in IS-NULL disjuncts blocked the anti-join
+    // pull-up and hashed the whole settlements id set per batch, the measured
+    // regression the plan-pins suite now guards), and the {1,18} digit bound
+    // keeps the ::bigint cast off any hostile over-long ref.
+    expect(text).toContain("c.custody_ref ~ '^woc_settlement:[0-9]{1,18}$'");
+    expect(text).toContain("c.custody_ref ~ '^woc_listing_(return|sold):[0-9]{1,18}$'");
+    expect(text).not.toContain('IS NULL OR');
     expect(text).toContain('SELECT 1 FROM woc_market_settlements s WHERE s.id = ref.settlement_id');
     expect(text).toContain('SELECT 1 FROM woc_market_listings l WHERE l.id = ref.listing_id');
     // booked_at IS indexed for this predicate (the partial cursor above), so
@@ -1438,6 +1446,72 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     expect(await pruneBookedWocCustodyClaimsBatch(quiet.pool, -5, 100)).toBe(0);
     expect(await pruneBookedWocCustodyClaimsBatch(quiet.pool, Number.NaN, 100)).toBe(0);
     expect(quiet.sql()).toHaveLength(0);
+  });
+
+  it('every exported custody-ref mint shape matches a prune referent regex (no fourth rail slips to window-only)', async () => {
+    // The regexes duplicate the mint functions as SQL literals; this pin is
+    // what makes that duplication safe. A NEW *CustodyRef export whose output
+    // matches neither regex would silently get window-only retention, losing
+    // the referent protection that stands between the prune and the re-drive
+    // duplication, so it must fail HERE first.
+    const rules = await import('../../server/woc_market_rules');
+    const { pool, sql } = recordingPool();
+    const { pruneBookedWocCustodyClaimsBatch } = await import('../../server/woc_market_db');
+    await pruneBookedWocCustodyClaimsBatch(pool, 365, 100);
+    const [text] = sql();
+    const regexes = [...text.matchAll(/~ '(\^[^']+\$)'/g)].map((m) => new RegExp(m[1]));
+    expect(regexes.length).toBe(2);
+    const minters = Object.entries(rules).filter(
+      (entry): entry is [string, (id: number) => string] =>
+        entry[0].endsWith('CustodyRef') && typeof entry[1] === 'function',
+    );
+    // All three known shapes, plus any future export the filter discovers.
+    expect(minters.map(([name]) => name).sort()).toEqual(
+      expect.arrayContaining([
+        'listingReturnCustodyRef',
+        'listingSoldNoticeCustodyRef',
+        'settlementCustodyRef',
+      ]),
+    );
+    for (const [name, mint] of minters) {
+      const ref = mint(123456789);
+      expect(
+        regexes.some((re) => re.test(ref)),
+        `${name} output ${ref} must match a prune referent regex`,
+      ).toBe(true);
+    }
+  });
+
+  it('the custody retention misconfiguration warning fires on both hazard arms and stays quiet when sound', async () => {
+    const { wocCustodyClaimsRetentionWarning } = await import('../../server/woc_market_db');
+    // Sound configuration (the defaults): silent.
+    expect(wocCustodyClaimsRetentionWarning(365, 180)).toBeNull();
+    // Claims retention off: nothing to warn about (keep-forever is safe).
+    expect(wocCustodyClaimsRetentionWarning(0, 180)).toBeNull();
+    // Listings keep-forever makes the referent guard block everything: the
+    // registered prune is silently inert, which deserves a boot line.
+    expect(wocCustodyClaimsRetentionWarning(365, 0)).toContain('grow without bound');
+    // A window at or below the listings window abandons the outlive
+    // invariant that protects unparseable legacy refs.
+    expect(wocCustodyClaimsRetentionWarning(180, 180)).toContain('must stay ABOVE');
+    expect(wocCustodyClaimsRetentionWarning(30, 180)).toContain('must stay ABOVE');
+    expect(wocCustodyClaimsRetentionWarning(181, 180)).toBeNull();
+  });
+
+  it('the cascade pick derives prior winners per ACCOUNT in the shipped SQL (no exclusion array)', async () => {
+    // The always-running twin of the pg plan case: the fake mirrors this
+    // derivation, so without this pin a revert of the correlated subquery
+    // would pass the whole merge gate on the fake's re-implementation.
+    const { pool, sql, params } = recordingPool();
+    await new PgWocMarketDb(pool).nextCascadeBidder(41, 500);
+    const [text] = sql();
+    expect(text).toContain("candidate.status = 'outbid'");
+    expect(text).toContain('w.listing_id = $1');
+    expect(text).toContain('w.account = candidate.account');
+    expect(text).toContain("w.status IN ('won', 'defaulted')");
+    expect(text).toContain('NOT EXISTS');
+    expect(text).not.toContain('= ANY($3');
+    expect(params()[0]).toEqual([41, 500]);
   });
 
   it('the step-up drain deletes only long-expired nonces with NO ORDER BY (the unindexed-cutoff rule)', async () => {
@@ -1474,7 +1548,12 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     for (const method of ['async insertPendingBid', 'async activateBidTx']) {
       const start = src.indexOf(method);
       expect(start, method).toBeGreaterThan(-1);
-      const head = src.slice(start, src.indexOf('FOR UPDATE', start));
+      // Guard the slice bound: with no FOR UPDATE after the method, indexOf
+      // answers -1 and the slice silently widens to the whole file, turning
+      // this into a vacuous somewhere-in-the-file pin.
+      const bound = src.indexOf('FOR UPDATE', start);
+      expect(bound, `${method} still takes a row lock`).toBeGreaterThan(start);
+      const head = src.slice(start, bound);
       expect(head, `${method} bounds its lock wait before the first row lock`).toContain(
         'SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}',
       );
@@ -1861,15 +1940,23 @@ describe('the escrow listing transaction, in SQL', () => {
           }
           return undefined;
         });
+      const { wocMarketLockWaitTimeoutCount } = await import('../../server/woc_market_db');
+      const lockBefore = wocMarketLockWaitTimeoutCount();
       await new PgWocMarketDb(rig('25P03').pool).escrowInsertListing(SAVE, LISTING);
       const killLines = spy.mock.calls.filter((c) => String(c[0]).includes('25P03'));
       expect(killLines).toHaveLength(1);
       expect(String(killLines[0]?.[0])).toContain('idle-killed');
       expect(wocMarketIdleTxKillCount()).toBe(before + 1);
+      // The two counters partition the contention codes: an idle kill never
+      // moves the lock-wait counter.
+      expect(wocMarketLockWaitTimeoutCount()).toBe(lockBefore);
       spy.mockClear();
       await new PgWocMarketDb(rig('55P03').pool).escrowInsertListing(SAVE, LISTING);
       expect(spy.mock.calls.filter((c) => String(c[0]).includes('25P03'))).toHaveLength(0);
       expect(wocMarketIdleTxKillCount()).toBe(before + 1);
+      // And a lock-wait refusal counts on ITS side only: the operator's
+      // tuning signal for ESCROW_LOCK_TIMEOUT_MS on the internal readout.
+      expect(wocMarketLockWaitTimeoutCount()).toBe(lockBefore + 1);
     } finally {
       spy.mockRestore();
     }

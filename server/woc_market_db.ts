@@ -116,7 +116,10 @@ CREATE INDEX IF NOT EXISTS woc_market_listings_live_price
   WHERE status <> 'closed';
 -- price_desc keeps the ASC id tiebreak (page stability shared with price_asc),
 -- so a backward scan of the ASC index cannot serve it (that would yield id
--- DESC within equal prices); the sort direction needs its own index.
+-- DESC within equal prices); the sort direction needs its own index. Stated
+-- trade: every bid activation updates current_bid_cents and now maintains
+-- two expression indexes instead of one (already non-HOT because of the ASC
+-- twin), the price of removing a per-page sort from a player-facing sort.
 CREATE INDEX IF NOT EXISTS woc_market_listings_live_price_desc
   ON woc_market_listings(realm, COALESCE(current_bid_cents, start_cents) DESC, id)
   WHERE status <> 'closed';
@@ -1128,12 +1131,26 @@ export function wocMarketIdleTxKillCount(): number {
   return idleTxKills;
 }
 
+/** Process-lifetime count of guard statements the lock-wait bound refused
+ *  (55P03). Every withTx guard now carries the 2s lock_timeout, so this is
+ *  the tuning signal the idle counter is for 25P03: a rate spike here is
+ *  lock contention players feel as 409s, a number on the internal stuck
+ *  readout instead of support tickets. */
+let lockWaitTimeouts = 0;
+
+export function wocMarketLockWaitTimeoutCount(): number {
+  return lockWaitTimeouts;
+}
+
 function isLockContention(err: unknown): boolean {
   const code = (err as { code?: string }).code;
   // 25P03: the guard transaction sat idle past its in-transaction timeout
   // (an event-loop stall on the shared box) and the server terminated the
   // session rather than let it hold the row lock unbounded. Plain
   // contention to the caller: retry immediately.
+  // Counting 55P03 here is sound because every contention path routes its
+  // error through exactly one tail that calls this classifier once.
+  if (code === '55P03') lockWaitTimeouts++;
   return code === '55P03' || code === '40P01' || code === '25P03';
 }
 
@@ -3620,16 +3637,20 @@ export class PgWocMarketDb implements WocMarketDb {
     // bid on this listing ever reached 'won' or 'defaulted' had its chance.
     // The NOT EXISTS (over NOT IN, the work_mem rule) replaces the cascade
     // arm's full bid-list fetch, which materialized the listing's whole bid
-    // history per overdue settlement just to derive this set.
+    // history per overdue settlement just to derive this set. The OUTER
+    // alias is load-bearing: with a bare outer table, dropping the inner
+    // alias would silently turn the correlation into a self-reference that
+    // matches every row.
     const res = await this.pool.query(
-      `SELECT ${BID_COLS} FROM woc_market_bids
-        WHERE listing_id = $1 AND status = 'outbid' AND amount_cents >= $2
+      `SELECT ${BID_COLS} FROM woc_market_bids candidate
+        WHERE candidate.listing_id = $1 AND candidate.status = 'outbid'
+          AND candidate.amount_cents >= $2
           AND NOT EXISTS (
             SELECT 1 FROM woc_market_bids w
              WHERE w.listing_id = $1
-               AND w.account = woc_market_bids.account
+               AND w.account = candidate.account
                AND w.status IN ('won', 'defaulted'))
-        ORDER BY amount_cents DESC, placed_at ASC, id ASC
+        ORDER BY candidate.amount_cents DESC, candidate.placed_at ASC, candidate.id ASC
         LIMIT 1`,
       [listingId, minCents],
     );
@@ -4452,11 +4473,18 @@ export async function pruneClosedWocListingsBatch(
  *  the exactly-once evidence, so a row is pruned only when the referent its
  *  custody ref names (the settlement for woc_settlement:<id>, the listing
  *  for woc_listing_return:<id> and woc_listing_sold:<id>; the mint functions
- *  live in woc_market_rules.ts) is ALSO gone, which makes a re-drive of that
- *  ref impossible by construction; a stuck deal older than the window keeps
- *  its claim for as long as its rows survive. Both probes are primary-key
- *  seeks (the regex-guarded CASE keeps the cast off malformed legacy refs,
- *  which prune on the window alone). */
+ *  live in woc_market_rules.ts, and a test pins every exported mint shape to
+ *  these regexes) is ALSO gone, which makes a re-drive of that ref
+ *  impossible by construction; a stuck deal older than the window keeps its
+ *  claim for as long as its rows survive. Plan shape (measured, and pinned
+ *  in the plan-pins pg suite): the bare NOT EXISTS probes plan as anti-joins
+ *  with primary-key seeks per candidate row (a NULL parsed id passes them
+ *  vacuously, so malformed legacy refs prune on the window alone; wrapping
+ *  them in IS-NULL disjuncts blocked the pull-up and hashed the ENTIRE
+ *  settlements id set per batch), the ctid outer keeps the DELETE a Tid Scan
+ *  instead of a table-sized semi-join (a row moved by a concurrent update
+ *  fails the re-check and simply prunes next batch), and the {1,18} digit
+ *  bound keeps the ::bigint cast from ever overflowing on a hostile ref. */
 export async function pruneBookedWocCustodyClaimsBatch(
   pool: Pool,
   retentionDays: number,
@@ -4466,25 +4494,54 @@ export async function pruneBookedWocCustodyClaimsBatch(
   const days = Math.max(1, Math.floor(retentionDays));
   const res = await pool.query(
     `DELETE FROM woc_market_custody_claims
-      WHERE custody_ref IN (
-        SELECT c.custody_ref
+      WHERE ctid IN (
+        SELECT c.ctid
           FROM woc_market_custody_claims c,
                LATERAL (SELECT
-                 CASE WHEN c.custody_ref ~ '^woc_settlement:[0-9]+$'
+                 CASE WHEN c.custody_ref ~ '^woc_settlement:[0-9]{1,18}$'
                       THEN split_part(c.custody_ref, ':', 2)::bigint END AS settlement_id,
-                 CASE WHEN c.custody_ref ~ '^woc_listing_(return|sold):[0-9]+$'
+                 CASE WHEN c.custody_ref ~ '^woc_listing_(return|sold):[0-9]{1,18}$'
                       THEN split_part(c.custody_ref, ':', 2)::bigint END AS listing_id) ref
          WHERE c.booked_at IS NOT NULL
            AND c.booked_at < now() - ($1 || ' days')::interval
-           AND (ref.settlement_id IS NULL OR NOT EXISTS (
-                  SELECT 1 FROM woc_market_settlements s WHERE s.id = ref.settlement_id))
-           AND (ref.listing_id IS NULL OR NOT EXISTS (
-                  SELECT 1 FROM woc_market_listings l WHERE l.id = ref.listing_id))
+           AND NOT EXISTS (
+                 SELECT 1 FROM woc_market_settlements s WHERE s.id = ref.settlement_id)
+           AND NOT EXISTS (
+                 SELECT 1 FROM woc_market_listings l WHERE l.id = ref.listing_id)
          ORDER BY c.booked_at
          LIMIT $2)`,
     [String(days), Math.max(1, Math.floor(batchSize))],
   );
   return res.rowCount ?? 0;
+}
+
+/** The operator warning for a custody-claims retention misconfiguration; a
+ *  pure predicate so main.ts stays a thin caller and a unit test can drive
+ *  both arms. The referent guard makes the window belt-and-braces for every
+ *  ref the mint functions produce, but the window is the SOLE protection for
+ *  unparseable legacy refs, and with the listings window at keep-forever the
+ *  guard blocks every deletion, so the registration is silently inert. */
+export function wocCustodyClaimsRetentionWarning(
+  custodyClaimsDays: number,
+  listingsDays: number,
+): string | null {
+  if (!Number.isFinite(custodyClaimsDays) || custodyClaimsDays <= 0) return null;
+  if (!Number.isFinite(listingsDays) || listingsDays <= 0) {
+    return (
+      '[woc_market] WOC_MARKET_LISTINGS_RETENTION_DAYS is keep-forever, so every ' +
+      'custody claim referent survives and the booked-claims prune never deletes; ' +
+      'woc_market_custody_claims will grow without bound despite its registration'
+    );
+  }
+  if (custodyClaimsDays <= listingsDays) {
+    return (
+      `[woc_market] WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS (${custodyClaimsDays}) ` +
+      `must stay ABOVE WOC_MARKET_LISTINGS_RETENTION_DAYS (${listingsDays}): a booked ` +
+      'claim is the exactly-once delivery evidence and has to outlive the rows that ' +
+      'could re-drive its ref; unparseable legacy refs have only the window'
+    );
+  }
+  return null;
 }
 
 /** How long an EXPIRED step-up challenge lingers before the nightly drain
@@ -4499,7 +4556,11 @@ export const WOC_STEPUP_PRUNE_SLACK_DAYS = 1;
  *  batch exists so a realm that stops issuing challenges still drains. No
  *  ORDER BY: expires_at leads only behind realm
  *  (woc_market_stepup_challenges_realm_expiry), so a global oldest-first
- *  would plan a full sort per batch for rows that are all equally dead. */
+ *  would plan a full sort per batch for rows that are all equally dead. The
+ *  O(table)-per-batch shape is ACCEPTED, stated like the abandons sibling:
+ *  measured 4.5 ms per batch at 23k rows (two passes of the table), and the
+ *  5-minute TTL, the issue-time reaper, and the rate limiter keep the table
+ *  orders of magnitude smaller than that in practice. */
 export async function pruneExpiredWocStepUpChallengesBatch(
   pool: Pool,
   batchSize: number,

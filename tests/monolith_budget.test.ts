@@ -237,10 +237,12 @@ const MONOLITHS: MonolithRow[] = [
     // the file past the first snapshot, and the local-ledger arithmetic
     // (woc_market_local_ledgers.ts) moved out to pay for it; the qa
     // session's fix round then paid its own growth with the step-up flow
-    // (woc_market_stepup_flow.ts). The figure is the extracted count, zero
-    // headroom; the delivery arms are the next standing candidate.
+    // (woc_market_stepup_flow.ts). The retention round then folded the
+    // cascade arm's prior-winner fetch into the store and re-pinned at the
+    // shrunken count. The figure is the current count, zero headroom; the
+    // delivery arms are the next standing candidate.
     file: 'server/woc_market.ts',
-    ceiling: 4487,
+    ceiling: 4484,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
