@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { audio } from '../src/game/audio';
 import { deedName } from '../src/ui/deed_i18n';
 import { Hud } from '../src/ui/hud';
+import { bindChromeButtonKeyGuard } from '../src/ui/pointer_blur';
 
 // This file runs under jsdom (for the keyboard-guard behavioral test below),
 // where import.meta.url is an http URL that readFileSync rejects; resolve the
@@ -884,29 +885,30 @@ describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
     expect(start).toBeGreaterThan(0);
     const guardArray = hud.slice(start, hud.indexOf(']', start));
     expect(guardArray).toContain("'#deeds-window'");
-    // The shared guard body the behavioral test below faithfully copies: it
-    // stopPropagation's Enter/Space only when a BUTTON has focus and NEVER
-    // preventDefault's (native activation survives). Scope the preventDefault
-    // absence to the guard region so an unrelated hud handler cannot mask a drift.
+    // The shared guard body now lives in src/ui/pointer_blur.ts
+    // (bindChromeButtonKeyGuard), which the behavioral test below drives
+    // directly: it stopPropagation's Enter/Space only when a BUTTON has focus
+    // and NEVER preventDefault's (native activation survives). Pin that hud.ts
+    // still binds it (plus the pointer-only blur) over every guarded panel.
     const guardRegion = hud.slice(start, hud.indexOf("$('#mm-map')", start));
-    expect(guardRegion).toContain("(e.target as HTMLElement).tagName !== 'BUTTON'");
-    expect(guardRegion).toContain('e.stopPropagation()');
-    expect(guardRegion).not.toContain('preventDefault');
+    expect(guardRegion).toContain('bindChromeButtonKeyGuard(panel)');
+    expect(guardRegion).toContain('bindPointerBlur(panel)');
+    const guardSrc = stripLineComments(read('../src/ui/pointer_blur.ts'));
+    const guardBody = guardSrc.slice(guardSrc.indexOf('function bindChromeButtonKeyGuard'));
+    expect(guardBody).toContain("tagName !== 'BUTTON'");
+    expect(guardBody).toContain('ke.stopPropagation()');
+    expect(guardBody).not.toContain('preventDefault');
   });
 
   it('stops Enter/Space from the game binds on a focused Book button, preserving native activation', () => {
-    // Drives the exact hud.ts guard body over a Book button. The source pin above
-    // keeps hud.ts wiring #deeds-window into the array and keeps this copy honest;
-    // deeds_window_focus.test.ts covers that the real Book renders buttons here.
+    // Drives the REAL shared guard (the one hud.ts binds on each guarded panel
+    // root; it survives the painter's innerHTML rebuilds because it lives on
+    // the root). deeds_window_focus.test.ts covers that the real Book renders
+    // buttons here.
     document.body.innerHTML = '<div id="deeds-window"><button data-close></button></div>';
     const root = document.getElementById('deeds-window') as HTMLElement;
     const btn = root.querySelector('button') as HTMLButtonElement;
-    // The listener hud.ts installs on each guarded panel root (survives the
-    // painter's innerHTML rebuilds because it lives on the root).
-    root.addEventListener('keydown', (e) => {
-      if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
-      if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') e.stopPropagation();
-    });
+    bindChromeButtonKeyGuard(root);
     const windowSpy = vi.fn();
     window.addEventListener('keydown', windowSpy);
     btn.focus();

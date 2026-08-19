@@ -1,6 +1,7 @@
 import { CTX_MENU_PICKER_CLASS } from '../../bag_item_action_menu';
 import { esc } from '../../esc';
 import { type TranslationKey, t } from '../../i18n';
+import { blurIfPointerClick } from '../../pointer_blur';
 import { rovingTarget } from '../../roving_index';
 import { tryEncodeItemLink, tryEncodeQuestLink } from '../quest/quest_link';
 import {
@@ -255,7 +256,14 @@ export class ChatWindowController {
       button.dataset.tab = id;
       button.setAttribute('role', 'tab');
       button.textContent = label;
-      button.addEventListener('click', () => this.selectTab(id, true));
+      // Selecting a tab restyles in place (no strip rebuild), so a mouse click
+      // would leave the tab focused and the next unshielded Space would natively
+      // re-click it. Pointer-only blur; keyboard selection (onTabKeyDown) keeps
+      // its roving focus.
+      button.addEventListener('click', (event) => {
+        this.selectTab(id, true);
+        blurIfPointerClick(event, button);
+      });
       button.addEventListener('keydown', (event) => this.onTabKeyDown(id, order, event));
       return button;
     };
@@ -319,14 +327,19 @@ export class ChatWindowController {
     add.textContent = '+';
     add.setAttribute('aria-label', t('hud.core.chatChannels.add'));
     add.title = t('hud.core.chatChannels.add');
-    add.addEventListener('click', () => {
+    add.addEventListener('click', (event) => {
       const menu = this.deps.contextMenu.element;
       if (menu.style.display === 'block' && this.deps.contextMenu.opener() === add) {
         this.deps.contextMenu.close();
+        blurIfPointerClick(event, add);
         return;
       }
       const rect = add.getBoundingClientRect();
       this.openChannelMenu(rect.left, rect.bottom, add);
+      // The "+" keeps document focus after a mouse click (the ctx menu items are
+      // not focused on pointer open), so blur it or the next unshielded Space
+      // re-toggles the channel menu. Keyboard activation keeps focus.
+      blurIfPointerClick(event, add);
     });
     // Dragging a tab onto "+" moves it to the end of the strip.
     add.addEventListener('dragover', (event) => {

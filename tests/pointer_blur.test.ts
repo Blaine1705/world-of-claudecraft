@@ -1,0 +1,185 @@
+// pointer_blur.ts: pointer-only blur for HUD chrome buttons plus the shared
+// Enter/Space chrome-button key guard. Plain-Node suite over hand-rolled fakes
+// modeling only the contract under test (the tests/CLAUDE.md DOM rule): the
+// discriminator is UIEvent.detail (pointer clicks carry detail > 0, keyboard
+// and programmatic activations carry detail === 0), the delegated form must
+// bind in the CAPTURE phase (the blur must land before the clicked button's
+// own handler records it as a focus-restore opener), and the key guard must
+// stop propagation WITHOUT preventing the default, or it would kill the very
+// keyboard activation it exists to protect.
+
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
+import {
+  bindChromeButtonKeyGuard,
+  bindPointerBlur,
+  blurIfPointerClick,
+} from '../src/ui/pointer_blur';
+
+class FakeButton {
+  blurred = 0;
+  tagName = 'BUTTON';
+  constructor(private readonly selectorMatches: string[]) {}
+  closest(selector: string): FakeButton | null {
+    return this.selectorMatches.includes(selector) ? this : null;
+  }
+  blur(): void {
+    this.blurred++;
+  }
+}
+
+interface BoundListener {
+  type: string;
+  listener: (e: Event) => void;
+  capture: boolean;
+}
+
+class FakeContainer {
+  listeners: BoundListener[] = [];
+  addEventListener(
+    type: string,
+    listener: (e: Event) => void,
+    options?: boolean | { capture?: boolean },
+  ): void {
+    const capture = typeof options === 'boolean' ? options : (options?.capture ?? false);
+    this.listeners.push({ type, listener, capture });
+  }
+  dispatch(type: string, e: unknown): void {
+    for (const l of this.listeners) if (l.type === type) l.listener(e as Event);
+  }
+}
+
+describe('blurIfPointerClick', () => {
+  it('blurs on a pointer-driven click (detail > 0)', () => {
+    const btn = new FakeButton([]);
+    blurIfPointerClick({ detail: 1, target: btn }, btn);
+    expect(btn.blurred).toBe(1);
+  });
+
+  it('leaves keyboard/programmatic activation focused (detail === 0)', () => {
+    const btn = new FakeButton([]);
+    blurIfPointerClick({ detail: 0, target: btn }, btn);
+    expect(btn.blurred).toBe(0);
+  });
+
+  it('tolerates a missing element', () => {
+    expect(() => blurIfPointerClick({ detail: 1, target: null }, null)).not.toThrow();
+  });
+});
+
+describe('bindPointerBlur (delegated)', () => {
+  it('binds a capture-phase click listener, so the blur precedes the target handler', () => {
+    const container = new FakeContainer();
+    bindPointerBlur(container, 'button');
+    expect(container.listeners).toHaveLength(1);
+    expect(container.listeners[0].type).toBe('click');
+    expect(container.listeners[0].capture).toBe(true);
+  });
+
+  it('blurs the selector match for a pointer click and skips keyboard clicks', () => {
+    const container = new FakeContainer();
+    bindPointerBlur(container, 'button');
+    const btn = new FakeButton(['button']);
+    container.dispatch('click', { detail: 1, target: btn });
+    expect(btn.blurred).toBe(1);
+    container.dispatch('click', { detail: 0, target: btn });
+    expect(btn.blurred).toBe(1);
+  });
+
+  it('ignores clicks whose target matches nothing', () => {
+    const container = new FakeContainer();
+    bindPointerBlur(container, '.micro-btn');
+    const notAButton = new FakeButton([]);
+    expect(() => container.dispatch('click', { detail: 1, target: notAButton })).not.toThrow();
+    expect(notAButton.blurred).toBe(0);
+  });
+});
+
+describe('bindChromeButtonKeyGuard', () => {
+  function keyEvent(over: Partial<Record<'key' | 'code', string>> & { tagName?: string }): {
+    key: string;
+    code: string;
+    target: { tagName: string };
+    stopped: number;
+    prevented: number;
+    stopPropagation(): void;
+    preventDefault(): void;
+  } {
+    return {
+      key: over.key ?? '',
+      code: over.code ?? '',
+      target: { tagName: over.tagName ?? 'BUTTON' },
+      stopped: 0,
+      prevented: 0,
+      stopPropagation() {
+        this.stopped++;
+      },
+      preventDefault() {
+        this.prevented++;
+      },
+    };
+  }
+
+  it('stops propagation of Enter and Space on a focused button, keeping the default', () => {
+    const container = new FakeContainer();
+    bindChromeButtonKeyGuard(container);
+    for (const over of [{ key: 'Enter' }, { key: ' ' }, { code: 'Space' }]) {
+      const e = keyEvent(over);
+      container.dispatch('keydown', e);
+      expect(e.stopped, JSON.stringify(over)).toBe(1);
+      // preventDefault would suppress the native activation this guard protects.
+      expect(e.prevented, JSON.stringify(over)).toBe(0);
+    }
+  });
+
+  it('lets every other key, and non-button targets, bubble to the game keybinds', () => {
+    const container = new FakeContainer();
+    bindChromeButtonKeyGuard(container);
+    const escapeKey = keyEvent({ key: 'Escape' });
+    container.dispatch('keydown', escapeKey);
+    expect(escapeKey.stopped).toBe(0);
+    const spaceOnDiv = keyEvent({ code: 'Space', tagName: 'DIV' });
+    container.dispatch('keydown', spaceOnDiv);
+    expect(spaceOnDiv.stopped).toBe(0);
+  });
+});
+
+describe('hud.ts wiring pins (the surfaces the Space-reopens-last-menu fix covers)', () => {
+  // Source pins in the bank/deeds guard-array style: the browser E2E
+  // (tests/browser/stale_focus_space.browser.test.ts) drives the real helpers
+  // over a FIXTURE rail, so without these pins hud.ts could silently drop the
+  // real wiring while every behavioral suite stays green.
+  const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
+
+  it('keeps the micromenu side rail in the shared panel guard array', () => {
+    const start = hud.indexOf("'#delve-board',");
+    expect(start).toBeGreaterThan(0);
+    const guardArray = hud.slice(start, hud.indexOf(']', start));
+    // The rail is the surface the bug was reported on: every #mm-* toggle and
+    // the daily rewards launcher live under it.
+    expect(guardArray).toContain("'#side-buttons'");
+  });
+
+  it('binds both halves of the contract (key guard + pointer blur) over the guard array', () => {
+    const start = hud.indexOf("'#delve-board',");
+    const loop = hud.slice(start, hud.indexOf('}', hud.indexOf(']', start)));
+    expect(loop).toContain('bindChromeButtonKeyGuard(panel)');
+    expect(loop).toContain('bindPointerBlur(panel)');
+  });
+
+  it('keeps the pointer-only blur on the tracker headers (their rebuilds re-focus themselves)', () => {
+    expect(hud).toContain("bindPointerBlur($('#quest-tracker'), '.qt-header, .qt-title')");
+    expect(hud).toContain("bindPointerBlur($('#deed-tracker'), '.dt-header')");
+    expect(hud).toContain("bindPointerBlur($('#reliquary-tracker'), '.dt-header')");
+  });
+
+  it('marks the two non-dialog modal surfaces as dialog roots for the blocked-Space guard', () => {
+    // The emote editor and the (pinnable) emote wheel are isModalOpen()
+    // surfaces built as bare divs; the input layer's blocked-state guard
+    // (src/game/stale_chrome_focus.ts) spares only buttons inside a dialog
+    // root, so dropping either mark would eat their keyboard Space activation.
+    expect(hud).toContain("markDialogRoot(el, { label: t('hudChrome.emoteEditor.title') })");
+    expect(hud).toContain("markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') })");
+  });
+});
