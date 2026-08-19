@@ -1343,6 +1343,12 @@ export interface AssembleOptions {
    *  body still builds whole and at once. Off, or with the pieces resident,
    *  the decals attach here as always. */
   deferDecals?: boolean;
+  /** Build with no face decals at all and no deferral flag: for a compose
+   *  whose product never carries them. The composed far bake is the one such
+   *  caller (composedFarMeshes drops every face decal from the flatten), and
+   *  the maps it would otherwise mint are the two procedural textures a
+   *  peer's first sight of an unseen style already pays in pieces. */
+  skipDecals?: boolean;
 }
 
 /** The compose's decal step: both decals attached, or deferred (see
@@ -1353,6 +1359,7 @@ export function attachFaceDecals(
   look: ModularLook,
   opts?: AssembleOptions,
 ): void {
+  if (opts?.skipDecals) return;
   const head = headOf(root, look);
   if (!head) return;
   if (opts?.deferDecals && !composedLookReady(def, look, head)) {
@@ -2334,7 +2341,10 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
   // Pose a throwaway composed clone mid-idle and bake it, exactly as
   // prepareVisual does for a fixed rig. The clone is released immediately: it
   // exists only to be flattened, and holding a ref would pin the part set.
-  const temp = assembleModular(def, look);
+  // No face decals: the flatten drops them (composedFarMeshes), and building
+  // them here cost a whole synchronous decal-map mint per unseen style on the
+  // per-frame far crossing (production 2026-08-19: 186 ms in one frame).
+  const temp = assembleModular(def, look, null, null, { skipDecals: true });
   const idle = prep.clips.get(def.clips.idle);
   if (idle) {
     const mixer = new THREE.AnimationMixer(temp);

@@ -47,6 +47,9 @@ export interface BuildLedgerKindStats {
   lastMs: number;
   emaMs: number;
   maxMs: number;
+  /** When the `maxMs` sample was recorded, so a kind the frame lanes do not
+   *  rank (a wall span, a nested part) still names the frame of its worst. */
+  maxAtMs: number;
   totalMs: number;
 }
 
@@ -134,13 +137,16 @@ export function createBuildLedger(opts: { slowestLimit?: number } = {}): BuildLe
       if (!(ms >= 0) || !Number.isFinite(ms)) return;
       let stats = kinds.get(kind);
       if (!stats) {
-        stats = { count: 0, lastMs: 0, emaMs: ms, maxMs: 0, totalMs: 0 };
+        stats = { count: 0, lastMs: 0, emaMs: ms, maxMs: 0, maxAtMs: 0, totalMs: 0 };
         kinds.set(kind, stats);
       }
       stats.count++;
       stats.lastMs = ms;
       stats.emaMs += (ms - stats.emaMs) * BUILD_LEDGER_EMA_ALPHA;
-      if (ms > stats.maxMs) stats.maxMs = ms;
+      if (ms > stats.maxMs) {
+        stats.maxMs = ms;
+        stats.maxAtMs = atMs;
+      }
       stats.totalMs += ms;
       const lane = buildLedgerLane(kind);
       if (lane === 'wall' || lane === 'part') return;
@@ -173,6 +179,7 @@ export function createBuildLedger(opts: { slowestLimit?: number } = {}): BuildLe
           lastMs: roundTenth(s.lastMs),
           emaMs: roundTenth(s.emaMs),
           maxMs: roundTenth(s.maxMs),
+          maxAtMs: Math.round(s.maxAtMs),
           totalMs: roundTenth(s.totalMs),
         };
       }

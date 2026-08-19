@@ -253,6 +253,17 @@ describe('far-LOD wiring (source pins)', () => {
     expect(fixed).toContain('bakeStaticPose(norm, farBakeMeshes(temp))');
   });
 
+  it('composes its throwaway with skipDecals: the flatten drops face decals, so none is minted', () => {
+    // Without the option the bake built both decal maps synchronously on the
+    // per-frame far crossing (production 2026-08-19: a 186 ms frame) and then
+    // threw them away with the temp.
+    const composed = fnBody('src/render/characters/assets.ts', 'export function modularFarBake(');
+    expect(composed).toContain('assembleModular(def, look, null, null, { skipDecals: true })');
+    const attach = fnBody('src/render/characters/assets.ts', 'export function attachFaceDecals(');
+    expect(attach.indexOf('if (opts?.skipDecals) return;')).toBeGreaterThan(-1);
+    expect(attach.indexOf('if (opts?.skipDecals) return;')).toBeLessThan(attach.indexOf('headOf('));
+  });
+
   it('peeks before spending the budget, and goes pending when refused', () => {
     // A part set someone already baked must never compete for the frame slot:
     // a crowd sharing a haircut would otherwise drain one character per window

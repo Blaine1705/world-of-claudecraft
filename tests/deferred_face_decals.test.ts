@@ -108,6 +108,26 @@ describe('the compose step defers the face decals when allowed and the look is n
     expect(root.userData.deferredDecals).toBeUndefined();
   });
 
+  it('builds no decal and sets no flag with skipDecals, ready or not, and counts no deferral', () => {
+    // The composed far bake's arm: its flatten drops every face decal, so the
+    // compose it bakes must not mint the two decal maps (a whole synchronous
+    // build per unseen style, on the per-frame far crossing) nor leave a
+    // deferral behind for a late attach nobody will run.
+    const before = lookPiecesStats().deferred;
+    const look = lookWith({ hair: 'buzz', beard: 'stubble', blush: 'rose', eyeshadow: 'none' });
+    const cold = composedRoot();
+    attachFaceDecals(cold.root, DEF, look, { skipDecals: true, deferDecals: true });
+    expect(decalsOf(cold.root)).toEqual([]);
+    expect(cold.root.userData.deferredDecals).toBeUndefined();
+    expect(attachDeferredFaceDecals(cold.root, look)).toEqual([]);
+    const warm = composedRoot();
+    publishPieces(look, warm.head);
+    attachFaceDecals(warm.root, DEF, look, { skipDecals: true });
+    expect(decalsOf(warm.root)).toEqual([]);
+    expect(warm.root.userData.deferredDecals).toBeUndefined();
+    expect(lookPiecesStats().deferred).toBe(before);
+  });
+
   it('attaches at once with the option when every piece is resident (the ~1 ms cache-hit build)', () => {
     const look = lookWith({ hair: 'crew', beard: 'scruff', blush: 'peach', eyeshadow: 'plum' });
     const { root, head } = composedRoot();

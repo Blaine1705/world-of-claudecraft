@@ -26,6 +26,7 @@ describe('createBuildLedger', () => {
     expect(rig.count).toBe(2);
     expect(rig.lastMs).toBe(12.1);
     expect(rig.maxMs).toBe(12.1);
+    expect(rig.maxAtMs).toBe(110);
     expect(rig.totalMs).toBe(16.1);
     // First sample seeds the average; the second moves it by the alpha.
     const ema = 4.04 + (12.06 - 4.04) * BUILD_LEDGER_EMA_ALPHA;
@@ -80,6 +81,10 @@ describe('createBuildLedger', () => {
     const snap = ledger.snapshot();
     expect(snap.kinds['view-part:assemble'].lastMs).toBe(40);
     expect(snap.kinds['view-part:assemble:parts'].maxMs).toBe(25);
+    // A part lane kind is out of the frame lanes, but its worst sample still
+    // says WHEN: that is the only frame anchor a nested span keeps.
+    ledger.record('view-part:assemble:parts', 24, 4);
+    expect(ledger.snapshot().kinds['view-part:assemble:parts'].maxAtMs).toBe(3);
     expect(snap.worstFrame).toEqual({ ms: 60, count: 1, atMs: 1 });
     expect(snap.slowest.map((s) => s.kind)).toEqual(['view:composed']);
   });
