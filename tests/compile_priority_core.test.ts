@@ -32,4 +32,38 @@ describe('compilePriorityForTarget', () => {
     expect(compilePriorityForTarget(node(), null)).toBe(GPU_WORK_PRIORITY.LIVE_VIEW);
     expect(compilePriorityForTarget(node(7), null)).toBe(GPU_WORK_PRIORITY.LIVE_VIEW);
   });
+
+  it('gives a CASTING entity the actionable floor even when it is not targeted', () => {
+    // A mob casting at a player who has not targeted it is still something that
+    // player reacts to, so its programs cannot ride the background lane and
+    // land after the cast bar has drained.
+    const casting = (id: number) => id === 8;
+    expect(compilePriorityForTarget(node(8), 7, casting)).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+    // ... including a payload hung under the casting entity, same walk.
+    const payload = node(undefined, node(undefined, node(8)));
+    expect(compilePriorityForTarget(payload, 7, casting)).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+    // ... and with no player target at all.
+    expect(compilePriorityForTarget(node(8), null, casting)).toBe(
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+    );
+  });
+
+  it('leaves a non-casting, non-targeted entity on LIVE_VIEW', () => {
+    const casting = (id: number) => id === 8;
+    expect(compilePriorityForTarget(node(9), 7, casting)).toBe(GPU_WORK_PRIORITY.LIVE_VIEW);
+    // An untagged node is never asked about: the predicate only sees real ids.
+    const asked: unknown[] = [];
+    expect(
+      compilePriorityForTarget(node(undefined, node(9)), 7, (id) => {
+        asked.push(id);
+        return false;
+      }),
+    ).toBe(GPU_WORK_PRIORITY.LIVE_VIEW);
+    expect(asked).toEqual([9]);
+  });
+
+  it('keeps the old behavior for a caller that passes no cast predicate', () => {
+    expect(compilePriorityForTarget(node(8), 7)).toBe(GPU_WORK_PRIORITY.LIVE_VIEW);
+    expect(compilePriorityForTarget(node(7), 7)).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+  });
 });

@@ -8788,19 +8788,19 @@ export class Renderer {
   // target, one representative node compiled per group, never the whole
   // target in one unit (compile_gate_pieces.ts). Checked against the pinned
   // three.js WebGLRenderer.compile() source, not assumed: `compile(scene,
-  // camera, targetScene)` gathers LIGHTS from `targetScene` (here `this.scene`,
-  // for a correct NUM_POINT_LIGHTS/... variant) but prepares materials only
-  // under `scene` (here the one node handed to it), so a per-node compileAsync
-  // yields exactly that node's programs under the same cache keys as compiling
-  // the root; the group's other nodes are cache hits, and only the cheap
-  // isLight walk over `this.scene` would repeat for them.
+  // camera, targetScene)` gathers LIGHTS from targetScene (this.scene, for a
+  // correct NUM_POINT_LIGHTS variant) but prepares materials only under the
+  // one node handed to it, so a per-node compileAsync yields exactly that
+  // node's programs under the root's cache keys; the group's other nodes are
+  // cache hits, only the cheap isLight walk over this.scene repeats.
   // Drivers that compile shader source synchronously at submission (Mesa on
   // the iGPU) charged every never-seen program of a root to its one unit (a
   // crowd of composed players arriving in a live frame: 500 to 711 ms on the
   // first `live-gate` unit); the queue paces between units, never inside one,
   // and its released-tail cap now bounds the gate's links on the driver too.
   private compileGate(target: THREE.Object3D): Promise<unknown> {
-    const priority = compilePriorityForTarget(target, this.sim.player.targetId);
+    const isCasting = (id: number): boolean => Boolean(this.sim.entities.get(id)?.castingAbility);
+    const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
     // Compile the same variant pair the boot prewarm proved out, never a bare
     // compileAsync at the ambient render target: three keys a program on the
     // bound target's output colour space (WebGLPrograms getParameters), so on

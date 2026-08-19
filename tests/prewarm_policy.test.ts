@@ -1341,7 +1341,7 @@ describe('mandatory interaction-landmark prewarm', () => {
     // The target-ancestry walk lives in compile_priority_core.ts (its own
     // Vitest); the renderer stays a thin caller.
     expect(renderer).toContain(
-      'const priority = compilePriorityForTarget(target, this.sim.player.targetId);',
+      'const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);',
     );
     expect(renderer).toContain(
       'private readonly liveCompileGates = new CompileGateQueue(this.backgroundGpuWork)',
