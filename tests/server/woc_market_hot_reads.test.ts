@@ -603,6 +603,124 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
       cold: ['me7'],
       refuses: true,
     },
+    // Every remaining mutating handler gets its refusal row too: the source
+    // comment claims the actor-bust-on-refusal rule for ALL of them, and the
+    // 25-call tripwire is order-blind, so only these rows pin the
+    // bust-BEFORE-throw ordering per handler.
+    {
+      name: 'a REFUSED createListing still busts the seller readout, nothing shared',
+      method: 'POST',
+      path: '/api/woc-market/listings',
+      ctx: () =>
+        post('/api/woc-market/listings', {
+          body: {
+            characterId: 1,
+            itemIndex: 0,
+            itemId: 'sunblade',
+            format: 'auction',
+            startCents: 5000,
+            durationHours: 24,
+          },
+        }),
+      service: { createListing: async () => ({ ok: false, reason: 'unknown_item' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED cancelListing still busts the seller readout, nothing shared',
+      method: 'POST',
+      path: '/api/woc-market/listings/:id/cancel',
+      ctx: () => post('/api/woc-market/listings/4/cancel', { params: { id: '4' } }),
+      service: { cancelListing: async () => ({ ok: false, reason: 'not_found' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED bondQuote still busts the bidder readout (drift adoption commits)',
+      method: 'POST',
+      path: '/api/woc-market/bids/:id/bond-quote',
+      ctx: () => post('/api/woc-market/bids/9/bond-quote', { params: { id: '9' } }),
+      service: { refreshBondQuote: async () => ({ ok: false, reason: 'not_found' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED abandonBid still busts the bidder readout, nothing shared',
+      method: 'POST',
+      path: '/api/woc-market/bids/:id/abandon',
+      ctx: () => post('/api/woc-market/bids/9/abandon', { params: { id: '9' } }),
+      service: { abandonBid: async () => ({ ok: false, reason: 'not_found' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED confirmBond still busts the bidder readout (signature recorded first)',
+      method: 'POST',
+      path: '/api/woc-market/bids/:id/bond',
+      ctx: () =>
+        post('/api/woc-market/bids/9/bond', {
+          params: { id: '9' },
+          body: { signature: 'devsig:abc' },
+        }),
+      service: { confirmBond: async () => ({ ok: false, reason: 'confirm_failed' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED buyNow still busts the buyer readout (settlement can insert then expire)',
+      method: 'POST',
+      path: '/api/woc-market/listings/:id/buy-now',
+      ctx: () =>
+        post('/api/woc-market/listings/4/buy-now', {
+          params: { id: '4' },
+          body: { characterId: 1, acceptTerms: true },
+        }),
+      service: { buyNow: async () => ({ ok: false, reason: 'quote_unavailable' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED settlementQuote still busts the buyer readout, nothing shared',
+      method: 'POST',
+      path: '/api/woc-market/settlements/:id/quote',
+      ctx: () => post('/api/woc-market/settlements/21/quote', { params: { id: '21' } }),
+      service: { settlementQuote: async () => ({ ok: false, reason: 'not_found' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED acceptOffer still busts the acting side only',
+      method: 'POST',
+      path: '/api/woc-market/offers/:id/accept',
+      ctx: () =>
+        post('/api/woc-market/offers/5/accept', {
+          params: { id: '5' },
+          body: { characterId: 1 },
+        }),
+      service: { acceptDirectedOffer: async () => ({ ok: false, reason: 'not_found' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a confirmSettlement still CONFIRMING busts listings and buyer, never history',
+      method: 'POST',
+      path: '/api/woc-market/settlements/:id/confirm',
+      ctx: () =>
+        post('/api/woc-market/settlements/21/confirm', {
+          params: { id: '21' },
+          body: { signature: 'sig123' },
+        }),
+      // The history drop is gated on the DECIDED 'confirmed' answer (the
+      // eager delivery's sale insert); an undecided confirm changed no sale.
+      service: {
+        confirmSettlement: async () => ({
+          ok: true,
+          state: 'confirming',
+          reason: 'not_yet_visible',
+        }),
+      },
+      cold: ['listings', 'me7'],
+    },
     {
       name: 'declineOffer busts nothing',
       method: 'POST',
@@ -1092,14 +1210,21 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
       warner.notePending('never_a_verdict');
       warner.noteFail('never_a_verdict');
       expect(spy).toHaveBeenCalledTimes(2);
-      // A fail word is NOT a pending word: cross-vocabulary leakage would
-      // let one screen's additions silently mute the other channel.
+      // Cross-vocabulary leakage in EITHER direction would let one screen's
+      // additions silently mute the other channel: a fail-only word is not a
+      // pending word, and a pending-only word is not a fail word.
       const failOnly = WOC_MARKET_WIRE_FAIL_REASONS.filter(
         (w) => !(WOC_MARKET_WIRE_PENDING_REASONS as readonly string[]).includes(w),
       );
       expect(failOnly.length).toBeGreaterThan(0);
       warner.notePending(failOnly[0]);
       expect(spy).toHaveBeenCalledTimes(3);
+      const pendingOnly = WOC_MARKET_WIRE_PENDING_REASONS.filter(
+        (w) => !(WOC_MARKET_WIRE_FAIL_REASONS as readonly string[]).includes(w),
+      );
+      expect(pendingOnly.length).toBeGreaterThan(0);
+      warner.noteFail(pendingOnly[0]);
+      expect(spy).toHaveBeenCalledTimes(4);
     } finally {
       spy.mockRestore();
     }
@@ -1199,20 +1324,51 @@ describe('the activity readout deadline', () => {
     });
   }
 
-  it('a saturated pool fails the readout FAST instead of walking six checkout deadlines', async () => {
-    // Each read models a 5s pool-checkout wait: the sequencing turned one 5s
-    // worst case into 30s of held socket, so the between-reads deadline must
-    // cut the walk after the read that crosses it.
+  it.each([
+    // perReadMs chosen so the crossing lands after a DIFFERENT read each
+    // time: every one of the five between-read checks is load-bearing on its
+    // own, so deleting any single deadline() call must fail one row here.
+    [5_000, 'bidsByAccount', 'settlementsByAccount'],
+    [2_100, 'settlementsByAccount', 'strikeInfo'],
+    [1_600, 'strikeInfo', 'termsAcceptedAt'],
+  ] as const)(
+    'at %dms per read the walk stops right after %s (the next read never runs)',
+    async (perReadMs, lastCalled, firstUncalled) => {
+      const clockRef = { ms: BASE_MS };
+      const db = slowActivityDb(clockRef, perReadMs);
+      await expect(serviceOn(clockRef, db).myActivity(7)).rejects.toThrow(
+        /activity readout deadline/,
+      );
+      expect(db[lastCalled]).toHaveBeenCalledTimes(1);
+      expect(db[firstUncalled]).not.toHaveBeenCalled();
+    },
+  );
+
+  it('the FIFTH check cuts before the wallet read (the last arm is live too)', async () => {
     const clockRef = { ms: BASE_MS };
-    const db = slowActivityDb(clockRef, 5_000);
-    await expect(serviceOn(clockRef, db).myActivity(7)).rejects.toThrow(
-      /activity readout deadline/,
-    );
-    // The first read crossed nothing (5s < 6s); the second crossed the
-    // deadline check, so reads three onward never ran.
-    expect(db.listingsBySeller).toHaveBeenCalledTimes(1);
-    expect(db.bidsByAccount).toHaveBeenCalledTimes(1);
-    expect(db.settlementsByAccount).not.toHaveBeenCalled();
+    const db = slowActivityDb(clockRef, 1_250);
+    const verifiedWallet = vi.fn(async () => null);
+    const service = new RealWocMarketService({
+      db: db as unknown as WocMarketDb,
+      economy: createDevWocMarketEconomy(() => clockRef.ms),
+      custody: {} as unknown as WocMarketDeps['custody'],
+      verifiedWallet,
+      balanceTokens: async () => null,
+      stepUpDevSig: true,
+      config: {
+        enabled: true,
+        realm: REALM,
+        policy: WOC_MARKET_RESTRICTED_POLICY,
+        confirmingReviewMs: 6 * 3600 * 1000,
+      },
+      now: () => clockRef.ms,
+    });
+    // Five reads at 1250ms cross at 6250: the readout must REJECT (a deleted
+    // fifth check would let the instant wallet read complete it) and the
+    // wallet dep is never consulted.
+    await expect(service.myActivity(7)).rejects.toThrow(/activity readout deadline/);
+    expect(db.termsAcceptedAt).toHaveBeenCalledTimes(1);
+    expect(verifiedWallet).not.toHaveBeenCalled();
   });
 
   it('a healthy readout completes all six reads untouched by the deadline', async () => {
@@ -1229,12 +1385,13 @@ describe('the activity readout deadline', () => {
 });
 
 describe('the limiter mount floor', () => {
-  it('EVERY marketplace API GET carries some rate-limit policy (derived, not enumerated)', () => {
+  it('EVERY player-surface GET carries some rate-limit policy (derived, not enumerated)', () => {
     // The by-identity table above pins WHICH bucket each known GET rides;
     // this derived sweep is the floor that catches a NEW client-triggerable
     // GET shipped with no limiter at all (an unmetered read is sustainable
-    // at whatever rate a client cares to send).
-    const gets = routes.filter((r) => r.method === 'GET' && r.path.startsWith('/api/woc-market/'));
+    // at whatever rate a client cares to send). Filtered on the TYPED
+    // surface field, never a path prefix a new route could dodge.
+    const gets = routes.filter((r) => r.method === 'GET' && r.surface === 'api');
     expect(gets.length).toBeGreaterThanOrEqual(7);
     for (const route of gets) {
       const tagged = (route.middleware ?? []).some(
@@ -1242,6 +1399,11 @@ describe('the limiter mount floor', () => {
       );
       expect(tagged, `${route.path} carries a rate-limit policy`).toBe(true);
     }
+    // The admin surface is the ONE deliberate carve-out: operator-only
+    // behind the admin auth, not client-triggerable, so it carries no
+    // player limiter. Pinned so the carve-out stays exactly this wide.
+    const adminGets = routes.filter((r) => r.method === 'GET' && r.surface === 'admin');
+    expect(adminGets.map((r) => r.path)).toEqual(['/admin/api/woc-market/listings']);
   });
 
   it('two ACCOUNTS behind one IP share the fused per-IP read window (the NAT sizing premise)', async () => {

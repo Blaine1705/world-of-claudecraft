@@ -730,8 +730,10 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
   // call can still have committed durable state the readout serves (recorded
   // terms acceptance, a recorded signature, an inserted-then-expired
   // settlement), so busting only the ok arm left /me pre-mutation for a TTL.
-  // The rule holds for every mutating handler below; the listings surface
-  // still busts only on success (a refusal changed no shared listing).
+  // The rule holds for every handler below that busts the actor's readout at
+  // all (decline/withdraw mutate only the uncached offers surface and the
+  // admin arms bust what they change); the listings surface still busts only
+  // on success (a refusal changed no shared listing).
   readCache()?.bustMe(ctxAccountId(ctx));
   if (!out.ok) throwRefusal(out);
   // A new listing changes the browse surface for everyone and the seller's

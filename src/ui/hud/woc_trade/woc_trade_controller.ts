@@ -179,6 +179,11 @@ export class WocTradeController {
    *  "recipient has no wallet") and the lookup re-issues after this pause
    *  instead of hammering the bucket that just refused it. */
   private wocTradePartnerRetryAtMs = 0;
+  /** Monotonic lookup id: only the NEWEST lookup's answer may land. The name
+   *  guard alone let a STALE failure (a lookup from a closed trade settling
+   *  late) clear the key and arm the backoff under a newer in-flight lookup
+   *  for the same partner, dropping that lookup's good answer. */
+  private wocTradePartnerSeq = 0;
   private wocTradeEstimateTimer: number | null = null;
   /** Guards a late estimate from overwriting a newer one (last write wins). */
   private wocTradeEstimateSeq = 0;
@@ -1283,8 +1288,11 @@ export class WocTradeController {
     ) {
       this.wocTradePartnerFor = info.otherName;
       const name = info.otherName;
+      const seq = ++this.wocTradePartnerSeq;
       void this.wocMarketHooks.client.tradePartner(name).then((out) => {
-        if (this.wocTradePartnerFor !== name) return; // the trade moved on
+        // Only the newest lookup's answer lands: the seq guard also stops a
+        // STALE failure from arming the backoff under a fresh lookup.
+        if (seq !== this.wocTradePartnerSeq || this.wocTradePartnerFor !== name) return;
         if (!out.ok) {
           // A failed lookup (rate limit, outage) resolves NOTHING: leave the
           // arm unresolved rather than render a false "recipient has no

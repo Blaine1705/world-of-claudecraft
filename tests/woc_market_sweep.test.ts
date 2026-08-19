@@ -23,7 +23,9 @@ import { RETENTION_SWEEP_ADVISORY_LOCK_KEY } from '../server/retention_sweep';
 import {
   createWocMarketSweep,
   WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
+  WOC_MARKET_SWEEP_LOCK_SQL,
   WOC_MARKET_SWEEP_POLL_MS,
+  WOC_MARKET_SWEEP_UNLOCK_SQL,
   type WocMarketSweepLockClient,
   type WocMarketSweepPassPlan,
   type WocMarketSweepSegment,
@@ -107,11 +109,17 @@ describe('one guarded pass over the segment plan', () => {
     });
     await sweep.runOnce();
     expect(run).toHaveBeenCalledTimes(1);
-    expect(client.queries[0].sql).toContain('pg_try_advisory_lock');
+    // The EXACT statements, by the exported single source: the pg exclusion
+    // proof executes these same strings, so a shape drift (dropping
+    // hashtext, rewrapping the realm) cannot pass one judge and fail only in
+    // production.
+    expect(client.queries[0].sql).toBe(WOC_MARKET_SWEEP_LOCK_SQL);
+    expect(WOC_MARKET_SWEEP_LOCK_SQL).toBe('SELECT pg_try_advisory_lock($1, hashtext($2)) AS ok');
     // Both lock statements carry the key AND the realm, so two realms never
     // serialize against each other.
     expect(client.queries[0].params).toEqual([WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY, REALM]);
-    expect(client.queries[1].sql).toContain('pg_advisory_unlock');
+    expect(client.queries[1].sql).toBe(WOC_MARKET_SWEEP_UNLOCK_SQL);
+    expect(WOC_MARKET_SWEEP_UNLOCK_SQL).toBe('SELECT pg_advisory_unlock($1, hashtext($2)) AS ok');
     expect(client.queries[1].params).toEqual([WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY, REALM]);
     // Healthy pass: the client goes back to the pool, never destroyed.
     expect(client.releases).toEqual([undefined]);

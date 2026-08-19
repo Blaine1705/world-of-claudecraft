@@ -1606,15 +1606,17 @@ describeDb('woc market settlement guards against real Postgres', () => {
 
     it('the realm advisory lock EXCLUDES a second session against real Postgres', async () => {
       // The shell suite proves the sweep honors a false try-lock answer over
-      // a fake; THIS proves the SQL itself excludes: the exact statement the
-      // shell issues, the exact key constant, two live sessions.
+      // a fake; THIS proves the SQL itself excludes, executing the EXPORTED
+      // statement strings the shell issues (one source of truth: a
+      // hashtext-shape drift cannot pass the text pin while this proof runs
+      // a different statement), with the exact key constant, two sessions.
       const sweepMod = await import('../server/woc_market_sweep');
       const realm = 'guard-h11-advisory';
       const a = await pool.connect();
       const b = await pool.connect();
       try {
         const lock = (client: typeof a | typeof b) =>
-          client.query('SELECT pg_try_advisory_lock($1, hashtext($2)) AS ok', [
+          client.query(sweepMod.WOC_MARKET_SWEEP_LOCK_SQL, [
             sweepMod.WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
             realm,
           ]);
@@ -1625,14 +1627,14 @@ describeDb('woc market settlement guards against real Postgres', () => {
         expect(second.rows[0]?.ok).toBe(false);
         // ...and wins as soon as the holder releases (per-segment release is
         // what hands the realm's sweep between peers).
-        const unlocked = await a.query('SELECT pg_advisory_unlock($1, hashtext($2)) AS ok', [
+        const unlocked = await a.query(sweepMod.WOC_MARKET_SWEEP_UNLOCK_SQL, [
           sweepMod.WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
           realm,
         ]);
         expect(unlocked.rows[0]?.ok).toBe(true);
         const third = await lock(b);
         expect(third.rows[0]?.ok).toBe(true);
-        await b.query('SELECT pg_advisory_unlock($1, hashtext($2))', [
+        await b.query(sweepMod.WOC_MARKET_SWEEP_UNLOCK_SQL, [
           sweepMod.WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
           realm,
         ]);

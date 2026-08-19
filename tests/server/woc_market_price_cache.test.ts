@@ -260,4 +260,17 @@ describe('containment arms', () => {
     // instead of sharing the dead rejection forever.
     expect((await r.cache.read()).tag).toBe('recovered');
   });
+
+  it('peek() hands out COPIES: mutating the readout cannot corrupt the state machine', async () => {
+    const r = rig(async () => ok('first'));
+    await r.cache.read();
+    const seen = r.cache.peek();
+    expect(seen.success).not.toBeNull();
+    if (seen.success) seen.success.at = -1;
+    // A second peek reads the LIVE memo, untouched by the caller's write,
+    // and the cache still serves the in-TTL hit off the real timestamp.
+    expect(r.cache.peek().success?.at).not.toBe(-1);
+    expect((await r.cache.read()).tag).toBe('first');
+    expect(r.calls()).toBe(1);
+  });
 });

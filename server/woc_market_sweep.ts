@@ -48,6 +48,13 @@
 // drives is a bounded no-op when nothing is due.
 
 export const WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY = 0x57_4f_43_03; // "WOC\x03"
+
+/** The lock statements as ONE source of truth: the shell issues these and
+ *  the pg exclusion proof executes the SAME strings, so the hashtext(realm)
+ *  shape cannot drift between the judge that pins the text and the judge
+ *  that proves the exclusion. Params: [key, realm]. */
+export const WOC_MARKET_SWEEP_LOCK_SQL = 'SELECT pg_try_advisory_lock($1, hashtext($2)) AS ok';
+export const WOC_MARKET_SWEEP_UNLOCK_SQL = 'SELECT pg_advisory_unlock($1, hashtext($2)) AS ok';
 export const WOC_MARKET_SWEEP_POLL_MS = 5_000;
 
 export interface WocMarketSweepLockClient {
@@ -115,7 +122,7 @@ export function createWocMarketSweep(deps: WocMarketSweepDeps): WocMarketSweep {
     try {
       let acquired = false;
       try {
-        const res = await client.query('SELECT pg_try_advisory_lock($1, hashtext($2)) AS ok', [
+        const res = await client.query(WOC_MARKET_SWEEP_LOCK_SQL, [
           WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
           deps.realm,
         ]);
@@ -129,7 +136,7 @@ export function createWocMarketSweep(deps: WocMarketSweepDeps): WocMarketSweep {
         await run();
       } finally {
         try {
-          const unlocked = await client.query('SELECT pg_advisory_unlock($1, hashtext($2)) AS ok', [
+          const unlocked = await client.query(WOC_MARKET_SWEEP_UNLOCK_SQL, [
             WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
             deps.realm,
           ]);

@@ -18,6 +18,7 @@ import {
   SETTLED_OFFER_GRACE_MS,
   TxNeverStarted,
   WOC_MARKET_OFFERS_PAIR_PENDING_INDEX,
+  wocMarketIdleTxKillCount,
 } from '../../server/woc_market_db';
 import type { CharacterState } from '../../src/sim/sim';
 
@@ -1575,6 +1576,11 @@ describe('the atomic save-and-book, in SQL', () => {
     const seq = sql();
     expect(seq[0]).toBe('BEGIN');
     expect(seq.at(-1)).toBe('COMMIT');
+    // The WIDER save-tier idle bound BY IDENTITY, not just the site count:
+    // this transaction serializes the character blob between statements, so
+    // a swap back to the 2s guard bound (with the two-and-ten counts kept
+    // intact by promoting some other guard) must fail here.
+    expect(seq.some((t) => t.includes('idle_in_transaction_session_timeout = 10000'))).toBe(true);
     const character = seq.findIndex((t) => t.includes('UPDATE characters'));
     const booking = seq.findIndex((t) => t.includes('UPDATE woc_market_custody_claims'));
     expect(character).toBeGreaterThan(0);
@@ -1716,6 +1722,73 @@ describe('the escrow listing transaction, in SQL', () => {
     });
     const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
     expect(out).toEqual({ ok: false, reason: 'contended' });
+  });
+
+  it('the 25P03 kill warns its DISTINCT line and counts; a 55P03 lock wait does neither', async () => {
+    // The retrofit's false-fire rate must be observable: folded silently
+    // into 'contended' an idle kill was indistinguishable from an ordinary
+    // lock wait, so the arm owns one warn line and the counter the internal
+    // readout serves. The 55P03 negative proves the line is the KILL's, not
+    // every contention refusal's.
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const before = wocMarketIdleTxKillCount();
+      const rig = (code: string) =>
+        recordingTxPool((text) => {
+          if (text.includes('FOR UPDATE')) {
+            throw Object.assign(new Error('boom'), { code });
+          }
+          return undefined;
+        });
+      await new PgWocMarketDb(rig('25P03').pool).escrowInsertListing(SAVE, LISTING);
+      const killLines = spy.mock.calls.filter((c) => String(c[0]).includes('25P03'));
+      expect(killLines).toHaveLength(1);
+      expect(String(killLines[0]?.[0])).toContain('idle-killed');
+      expect(wocMarketIdleTxKillCount()).toBe(before + 1);
+      spy.mockClear();
+      await new PgWocMarketDb(rig('55P03').pool).escrowInsertListing(SAVE, LISTING);
+      expect(spy.mock.calls.filter((c) => String(c[0]).includes('25P03'))).toHaveLength(0);
+      expect(wocMarketIdleTxKillCount()).toBe(before + 1);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("insertPendingBid maps a contention code to the typed 'contended' (never a raw 500 on a bid)", async () => {
+    // The idle-bound retrofit made 25P03 the FIRST contention code this
+    // transaction can produce, and its refusal union had no contended member:
+    // without the tail catch the player's bid answered internal.error.
+    const bidArgs = {
+      realm: 'Claudemoon',
+      listingId: 9,
+      account: 7,
+      characterId: 21,
+      characterName: 'Bidder',
+      wallet: 'wallet-7',
+      amountCents: 5000,
+      bondCents: 250,
+      nowMs: 1_000_000,
+      minNext: () => 100,
+    };
+    const { pool } = recordingTxPool((text) => {
+      if (text.includes('FOR UPDATE')) {
+        throw Object.assign(new Error('idle kill'), { code: '25P03' });
+      }
+      return undefined;
+    });
+    expect(await new PgWocMarketDb(pool).insertPendingBid(bidArgs)).toEqual({
+      ok: false,
+      reason: 'contended',
+    });
+    // A non-contention failure still surfaces: the catch maps ONLY the
+    // contention codes, never a real bug.
+    const { pool: buggy } = recordingTxPool((text) => {
+      if (text.includes('FOR UPDATE')) throw new Error('some real bug');
+      return undefined;
+    });
+    await expect(new PgWocMarketDb(buggy).insertPendingBid(bidArgs)).rejects.toThrow(
+      'some real bug',
+    );
   });
 
   it("maps a CODELESS BEGIN failure to 'contended': nothing could have committed", async () => {

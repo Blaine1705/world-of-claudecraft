@@ -438,6 +438,15 @@ describe('the price and estimate caches at the proxy (H11)', () => {
     expect(afterSuccess?.successAgeMs).toBeGreaterThanOrEqual(0);
     expect(afterSuccess?.failureAgeMs).toBeNull();
   });
+
+  it('priceCacheAges() reports the FAILURE memo age too (the brownout number)', async () => {
+    respond = () => ({ status: 502, body: {} });
+    const economy = createWocMarketEconomyProxy();
+    await economy.price();
+    const ages = economy.priceCacheAges?.();
+    expect(ages?.failureAgeMs).toBeGreaterThanOrEqual(0);
+    expect(ages?.successAgeMs).toBeNull();
+  });
 });
 
 describe('the estimate fee split is accepted only when it reconciles', () => {

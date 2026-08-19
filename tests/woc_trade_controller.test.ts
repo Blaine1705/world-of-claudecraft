@@ -2942,19 +2942,34 @@ describe('the partner lookup is a verdict only when it ANSWERED', () => {
     expect(c.wocTradePartnerResolved).toBe(false);
     expect(c.wocTradePartner).toBeNull();
     // Repaints inside the backoff window re-issue NOTHING (the lookup rides
-    // the 30/min quote bucket, so hammering a refusing bucket digs deeper).
+    // the 30/min quote bucket, so hammering a refusing bucket digs deeper);
+    // one millisecond before the boundary is still inside.
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    vi.setSystemTime(1_000_000 + 4_999);
     r.controller.updateTradeWindow();
     await flushAsync();
     expect(lookups).toBe(1);
-    // Past the pause the lookup retries, and a now-healthy answer resolves.
-    h.state.tradePartnerImpl = () => {
-      lookups++;
-      return Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
-    };
+    // At exactly the pause the lookup retries; a second failure RE-ARMS the
+    // backoff (an unarmed retry would re-fire on every later paint, which is
+    // exactly the hammering the pause exists to stop).
     vi.setSystemTime(1_000_000 + 5_000);
     r.controller.updateTradeWindow();
     await flushAsync();
     expect(lookups).toBe(2);
+    vi.setSystemTime(1_000_000 + 5_000 + 4_999);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(lookups).toBe(2);
+    // Past the SECOND window a now-healthy answer resolves.
+    h.state.tradePartnerImpl = () => {
+      lookups++;
+      return Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
+    };
+    vi.setSystemTime(1_000_000 + 5_000 + 5_000);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(lookups).toBe(3);
     expect(c.wocTradePartnerResolved).toBe(true);
     expect(c.wocTradePartner).toEqual({ name: 'Bree', walletVerified: true });
     vi.useRealTimers();
