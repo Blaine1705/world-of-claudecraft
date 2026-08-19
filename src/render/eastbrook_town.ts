@@ -114,6 +114,9 @@ interface TownAssetTemplate {
   opaque: THREE.BufferGeometry | null;
   emissive: THREE.BufferGeometry | null;
   size: THREE.Vector3;
+  /** Kit buildings only: the raw GLB scene, rendered with its own materials
+   *  (KTX2 palette textures the atlas bake cannot read on the CPU). */
+  raw?: THREE.Object3D;
 }
 
 interface RoofHideTarget extends EastbrookRoofVisibilityTarget {
@@ -202,46 +205,6 @@ function materialIsEmissive(material: THREE.Material): boolean {
   );
 }
 
-// The kit buildings (the Galecrest hexb mix) carry their color in a small
-// palette texture rather than material.color; sample it at each vertex UV so
-// the baked vertex colors match the model's real palette (flat-shaded kit
-// islands, so a point sample is exact). Cached per texture image.
-const paletteSamplers = new WeakMap<object, (u: number, v: number) => [number, number, number]>();
-
-function paletteSampler(
-  material: THREE.Material,
-): ((u: number, v: number) => [number, number, number]) | null {
-  const source = material as THREE.Material & { map?: THREE.Texture | null };
-  const image = source.map?.image as
-    | (CanvasImageSource & { width: number; height: number })
-    | undefined;
-  if (!image || !image.width || !image.height) return null;
-  if (typeof document === 'undefined') return null; // node test env: no canvas
-  const cached = paletteSamplers.get(image);
-  if (cached) return cached;
-  const canvas = document.createElement('canvas');
-  canvas.width = image.width;
-  canvas.height = image.height;
-  const context = canvas.getContext('2d');
-  if (!context) return null;
-  context.drawImage(image, 0, 0);
-  const data = context.getImageData(0, 0, image.width, image.height).data;
-  const sampler = (u: number, v: number): [number, number, number] => {
-    const px = Math.min(
-      image.width - 1,
-      Math.max(0, Math.floor((u % 1 < 0 ? (u % 1) + 1 : u % 1) * image.width)),
-    );
-    const py = Math.min(
-      image.height - 1,
-      Math.max(0, Math.floor((1 - (v % 1 < 0 ? (v % 1) + 1 : v % 1)) * image.height)),
-    );
-    const at = (py * image.width + px) * 4;
-    return [data[at] / 255, data[at + 1] / 255, data[at + 2] / 255];
-  };
-  paletteSamplers.set(image, sampler);
-  return sampler;
-}
-
 function geometryFromMesh(
   mesh: THREE.Mesh,
   material: THREE.Material,
@@ -257,16 +220,11 @@ function geometryFromMesh(
   if (normal) geometry.setAttribute('normal', toFloatAttr(normal, 3));
   const sourceColor = source.getAttribute('color');
   const tint = materialColor(material, url);
-  const uv = source.getAttribute('uv');
-  const sample = uv ? paletteSampler(material) : null;
   const colors = new Float32Array(position.count * 3);
   for (let index = 0; index < position.count; index++) {
-    const texel: [number, number, number] = sample
-      ? sample(uv!.getX(index), uv!.getY(index))
-      : [1, 1, 1];
-    colors[index * 3] = (sourceColor?.getX(index) ?? 1) * tint.r * texel[0];
-    colors[index * 3 + 1] = (sourceColor?.getY(index) ?? 1) * tint.g * texel[1];
-    colors[index * 3 + 2] = (sourceColor?.getZ(index) ?? 1) * tint.b * texel[2];
+    colors[index * 3] = (sourceColor?.getX(index) ?? 1) * tint.r;
+    colors[index * 3 + 1] = (sourceColor?.getY(index) ?? 1) * tint.g;
+    colors[index * 3 + 2] = (sourceColor?.getZ(index) ?? 1) * tint.b;
   }
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   if (source.index) geometry.setIndex(source.index.clone());
@@ -341,6 +299,19 @@ function prepareTemplates(
     if (cache.has(url)) continue;
     const source = sources.get(url);
     if (!source) throw new Error(`Eastbrook town asset was not preloaded: ${url}`);
+    // Kit buildings (the Galecrest hexb mix) render with their OWN GLB
+    // materials: their color lives in KTX2 palette textures the GPU samples,
+    // which the atlas vertex-color pipeline cannot bake (a compressed image
+    // is not CPU-readable; sampling it crashed the renderer). The raw scene
+    // rides the template cache for buildKitBuilding, and its GLB cache entry
+    // is never released (the clones share its textures).
+    if (isKitBuildingAsset(url)) {
+      const box = new THREE.Box3().setFromObject(source);
+      const kitSize = new THREE.Vector3();
+      box.getSize(kitSize);
+      cache.set(url, { opaque: null, emissive: null, size: kitSize, raw: source });
+      continue;
+    }
     cache.set(url, extractTemplate(source, url));
     if (release) {
       loadedSources.delete(url);
@@ -348,6 +319,115 @@ function prepareTemplates(
     }
   }
   return cache;
+}
+
+function isKitBuildingAsset(url: string): boolean {
+  return url.startsWith('/models/biome/');
+}
+
+// Kit materials keep their GLB textures; on the Lambert tiers they downgrade
+// like every town material (the Low-tier contract the surface-atlas suite
+// audits), carrying map, color, and emissive across.
+function kitMaterial(source: THREE.Material): THREE.Material {
+  if (GFX.standardMaterials) return cloneMaterialWithHooks(source);
+  const from = source as THREE.Material & {
+    map?: THREE.Texture | null;
+    color?: THREE.Color;
+    emissive?: THREE.Color;
+    emissiveMap?: THREE.Texture | null;
+  };
+  const lambert = new THREE.MeshLambertMaterial({
+    map: from.map ?? null,
+    color: from.color?.clone() ?? new THREE.Color(0xffffff),
+  });
+  if (from.emissive) lambert.emissive = from.emissive.clone();
+  if (from.emissiveMap) lambert.emissiveMap = from.emissiveMap;
+  lambert.name = source.name;
+  return lambert;
+}
+
+// A kit building: the raw GLB scene cloned with its own materials, scaled to
+// the layout's native dimensions and seated like every template building; the
+// roof-hide contract is identical so camera ghosting keeps working.
+function buildKitBuilding(
+  building: (typeof EASTBROOK_LAYOUT.buildings)[number],
+  source: THREE.Object3D,
+  groundAt: GroundAt,
+): { group: THREE.Group; hideTarget: RoofHideTarget } {
+  const dimensions = building.nativeDimensions;
+  const terrain = buildingTerrain(building, groundAt);
+  const foundationDepth = Math.max(0, terrain.entranceY - terrain.minimumY);
+
+  const clone = source.clone(true);
+  const box = new THREE.Box3().setFromObject(clone);
+  const size = new THREE.Vector3();
+  box.getSize(size);
+  const scaleX = dimensions.width / Math.max(size.x, 1e-4);
+  const scaleY = dimensions.height / Math.max(size.y, 1e-4);
+  const scaleZ = dimensions.depth / Math.max(size.z, 1e-4);
+  const mats: THREE.Material[] = [];
+  clone.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    child.castShadow = true;
+    child.receiveShadow = true;
+    const list = Array.isArray(child.material) ? child.material : [child.material];
+    const cloned = list.map((m) => kitMaterial(m));
+    child.material = Array.isArray(child.material) ? cloned : cloned[0];
+    mats.push(...cloned);
+  });
+  const wrap = new THREE.Group();
+  wrap.add(clone);
+  // center the model on its footprint and rest its base at y 0 of the wrap
+  clone.position.set(-(box.min.x + size.x / 2), -box.min.y, -(box.min.z + size.z / 2));
+  wrap.scale.set(scaleX, scaleY, scaleZ);
+
+  const group = new THREE.Group();
+  group.name = `eastbrookBuilding:${building.id}`;
+  group.userData.eastbrookBuildingId = building.id;
+  group.userData.assetId = building.assetId;
+  group.userData.assetUrl = building.assetId;
+  group.userData.position = building.position;
+  group.userData.rotation = building.rotation;
+  group.userData.target = building.nativeDimensions;
+  group.userData.front = building.frontStandingPoint;
+  group.userData.foundationDepth = foundationDepth;
+  group.position.set(building.position.x, terrain.entranceY, building.position.z);
+  group.rotation.y = building.rotation;
+  group.add(wrap);
+  if (foundationDepth > 1e-4) {
+    const height = foundationDepth + FOUNDATION_OVERLAP;
+    const skirtGeometry = coloredBox(
+      dimensions.width,
+      height,
+      dimensions.depth,
+      (FOUNDATION_OVERLAP - foundationDepth) / 2,
+    );
+    const skirtMaterial = townMaterial(false, undefined, true);
+    skirtMaterial.name = `eastbrookTownKitSkirt:${building.id}`;
+    const skirt = new THREE.Mesh(skirtGeometry, skirtMaterial);
+    skirt.castShadow = false;
+    skirt.receiveShadow = true;
+    group.add(skirt);
+    mats.push(skirtMaterial);
+  }
+
+  return {
+    group,
+    hideTarget: {
+      group,
+      mats: mats.map(occluderFadeMat),
+      hidden: false,
+      alpha: 1,
+      x: building.position.x,
+      z: building.position.z,
+      halfWidth: dimensions.width / 2,
+      halfDepth: dimensions.depth / 2,
+      cosine: Math.cos(building.rotation),
+      sine: Math.sin(building.rotation),
+      topY: terrain.entranceY + dimensions.height,
+      cullRadius: building.maxCornerRadius,
+    },
+  };
 }
 
 function materialOptions(emissive: boolean, atlas = eastbrookSurfaceAtlasTexture()) {
@@ -948,6 +1028,13 @@ function buildFromTemplates(
 
   const roofHideTargets: RoofHideTarget[] = [];
   for (const building of EASTBROOK_LAYOUT.buildings) {
+    const kitTemplate = templates.get(building.assetId);
+    if (kitTemplate?.raw) {
+      const built = buildKitBuilding(building, kitTemplate.raw, groundAt);
+      group.add(built.group);
+      roofHideTargets.push(built.hideTarget);
+      continue;
+    }
     const template = templates.get(building.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${building.assetId}`);
     const built = buildBuilding(building, template, groundAt, atlas);

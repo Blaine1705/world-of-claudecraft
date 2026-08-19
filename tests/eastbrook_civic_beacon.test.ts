@@ -229,20 +229,38 @@ describe('Eastbrook civic beacon shader animation', () => {
     expect(mask.count).toBe(micro.geometry.getAttribute('position').count);
     expect(selectedCount).toBe(civicTemplateVertexCount);
     expect(bytes.length - selectedCount).toBeGreaterThan(0);
+    // Re-staged 2026-08 for the KTX2 kit-building path (buildKitBuilding in
+    // src/render/eastbrook_town.ts,
+    // docs/design/eastbrook-revamp/site-plan.md): the five hexb kit buildings
+    // render raw GLB clones with no eastbrookBuildingEmissive mesh, so the
+    // material-independence pin runs against the chapel, the one building
+    // still on the template pipeline, and additionally checks no kit clone
+    // material was reused for the micro batch.
+    const chapel = EASTBROOK_LAYOUT.buildings.find(
+      (building) => !building.assetId.startsWith('/models/biome/'),
+    );
+    if (!chapel) throw new Error('missing template-pipeline chapel building');
     const buildingMaterial = (
-      view.group.getObjectByName(
-        `eastbrookBuildingEmissive:${EASTBROOK_LAYOUT.buildings[0].id}`,
-      ) as THREE.Mesh
+      view.group.getObjectByName(`eastbrookBuildingEmissive:${chapel.id}`) as THREE.Mesh
     ).material;
     expect(micro.material).not.toBe(buildingMaterial);
+    view.group.traverse((child) => {
+      if (!(child instanceof THREE.Mesh) || child === micro) return;
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      expect(materials.includes(micro.material as THREE.Material)).toBe(false);
+    });
     expect((micro.material as THREE.Material).userData.eastbrookCivicBeacon).toEqual({
       maskAttribute: EASTBROOK_CIVIC_MASK_ATTRIBUTE,
       programCacheKey: 'eastbrook-civic-beacon-v1',
     });
     // Draw stats re-pinned 2026-08: harbor-move layout v3 retired the ring
     // wall (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), removing
-    // the 4 wall color draws and 2 wall shadow draws.
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 7 });
+    // the 4 wall color draws and 2 wall shadow draws; then the KTX2
+    // kit-building path (buildKitBuilding in src/render/eastbrook_town.ts,
+    // same site plan) put five raw-clone kit buildings in whose every mesh
+    // casts shadows, so the two-mesh fixtures keep colorDraws at 14 while
+    // shadowDraws rises to 12.
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 12 });
 
     view.update(0, 5, 0, 0, 0, 0, 100, 1, true);
     const shader = compileMaterial(micro.material as THREE.Material);
@@ -316,8 +334,11 @@ describe('Eastbrook civic beacon shader animation', () => {
     });
     expect(decoratedMeshes).toEqual(['eastbrookTownMicroEmissiveBatch']);
     // Re-pinned 2026-08 with the harbor move's wall retirement (d19aa33f76,
-    // docs/design/eastbrook-revamp/site-plan.md).
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 7 });
+    // docs/design/eastbrook-revamp/site-plan.md) and the KTX2 kit-building
+    // path (buildKitBuilding in src/render/eastbrook_town.ts): the kit
+    // clones cast shadows from every mesh, so shadowDraws is 12 while
+    // colorDraws stays 14 under the two-mesh fixtures.
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 14, shadowDraws: 12 });
   });
 
   it('does not instantiate the animation or any town geometry for a custom world', () => {
