@@ -1084,15 +1084,18 @@ const FINALIZE_ARGS = {
 } as const;
 
 describe('every guard transaction bounds its idle holds', () => {
-  it('carries the idle-in-transaction bound at EVERY withTx site (completeness, comment-stripped)', () => {
+  it('carries the idle-in-transaction bound at EVERY withTx site (completeness, comment-stripped)', async () => {
     // The retrofit rule: a guard transaction that can sit idle between
     // statements camps a shared-pool client, so every one carries the 25P03
     // bound. Counted against the withTx sites so a NEW guard transaction
     // cannot ship without it (the count moves in the same change, on
-    // purpose).
-    const src = readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/\/\/[^\n]*/g, '');
+    // purpose). The SHARED stripper, not local regexes: the block-before-line
+    // order this floor first used is exactly the form strip_comments.ts
+    // documents as silently exempting whole spans.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
     // The call may carry an explicit generic (this.withTx<T>(...): the
     // insertPendingBid contended-tail shape), so match both forms.
     const txSites = src.match(/this\.withTx(<[^>\n]+>)?\(/g) ?? [];
@@ -1412,8 +1415,9 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     const [text] = sql();
     expect(text).toContain('DELETE FROM woc_market_custody_claims');
     // The ctid outer keeps the DELETE a Tid Scan instead of a table-sized
-    // semi-join (measured 6.8x; a concurrently moved row fails the re-check
-    // and prunes next batch, the safe direction for a prune).
+    // semi-join (measured 6.8x; a concurrently moved row fails the re-check,
+    // reads as caught-up for the night, and prunes on a later run, the safe
+    // direction for a prune).
     expect(text).toContain('WHERE ctid IN');
     // The unbooked operator queue is structurally out of reach: the predicate
     // is the prune-cursor partial's own (woc_market_custody_claims_booked).
@@ -1483,6 +1487,32 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
         `${name} output ${ref} must match a prune referent regex`,
       ).toBe(true);
     }
+  });
+
+  it('custody-ref prefix literals live ONLY in the rules minters and the prune regexes', async () => {
+    // The minter-correspondence pin above sees only *CustodyRef-suffixed
+    // exports of woc_market_rules.ts, so an inline template ref at a call
+    // site would bypass it and silently fall to window-only retention.
+    // Containment closes that arm: the known ref families' prefixes may
+    // appear in exactly two files, the minters (where the suffix pin
+    // patrols) and the prune's referent regexes. A NEW prefix family stays
+    // a naming-contract obligation (stated at the prune docstring); no
+    // static scan can enumerate the unknown.
+    const { readdirSync } = await import('node:fs');
+    const { stripComments } = await import('../helpers/strip_comments');
+    const dir = new URL('../../server/', import.meta.url);
+    const offenders: string[] = [];
+    // Recursive on purpose: server/ has subdirectories (http/, epic/, ...),
+    // and a shallow walk is the known scan-guard trap.
+    for (const entry of readdirSync(dir, { recursive: true })) {
+      const rel = String(entry);
+      if (!rel.endsWith('.ts')) continue;
+      const base = rel.split('/').at(-1);
+      if (base === 'woc_market_rules.ts' || base === 'woc_market_db.ts') continue;
+      const text = stripComments(readFileSync(new URL(rel, dir), 'utf8'));
+      if (/woc_(settlement|listing_[a-z_]+):/.test(text)) offenders.push(rel);
+    }
+    expect(offenders).toEqual([]);
   });
 
   it('the custody retention misconfiguration warning fires on both hazard arms and stays quiet when sound', async () => {
@@ -1923,8 +1953,17 @@ describe('the escrow listing transaction, in SQL', () => {
       }
       return undefined;
     });
+    const counters = await import('../../server/woc_market_db');
+    const idleBefore = counters.wocMarketIdleTxKillCount();
+    const lockBefore = counters.wocMarketLockWaitTimeoutCount();
     const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
     expect(out).toEqual({ ok: false, reason: 'contended' });
+    // The counters partition the codes EXACTLY: 55P03 moves only the
+    // lock-wait counter, 25P03 only the idle-kill one, and 40P01 moves
+    // NEITHER, so a widened increment condition in the classifier (counting
+    // the whole contention set) fails on this row.
+    expect(counters.wocMarketLockWaitTimeoutCount()).toBe(lockBefore + (code === '55P03' ? 1 : 0));
+    expect(counters.wocMarketIdleTxKillCount()).toBe(idleBefore + (code === '25P03' ? 1 : 0));
   });
 
   it('the 25P03 kill warns its DISTINCT line and counts; a 55P03 lock wait does neither', async () => {
@@ -1963,6 +2002,32 @@ describe('the escrow listing transaction, in SQL', () => {
     } finally {
       spy.mockRestore();
     }
+  });
+
+  it('the delivered-save guard counts a 55P03 on the lock-wait counter and rethrows it raw', async () => {
+    // The one guard with no typed 'contended' mapping: commitGrant's
+    // transient-throw arm wants the raw error as its park-or-retry evidence.
+    // But the characters row it waits on is the most contended lock in the
+    // market (the game loop's autosave fights it), so skipping the
+    // classifier left those fires invisible to the lockWaitTimeouts tuning
+    // signal. Count-and-rethrow: the raw error still reaches the transient
+    // arm untouched.
+    const { pool } = recordingTxPool((text) => {
+      if (text.includes('UPDATE characters')) {
+        throw Object.assign(new Error('canceling statement due to lock timeout'), {
+          code: '55P03',
+        });
+      }
+      return undefined;
+    });
+    const counters = await import('../../server/woc_market_db');
+    const idleBefore = counters.wocMarketIdleTxKillCount();
+    const lockBefore = counters.wocMarketLockWaitTimeoutCount();
+    await expect(
+      new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'woc_settlement:9'),
+    ).rejects.toMatchObject({ code: '55P03' });
+    expect(counters.wocMarketLockWaitTimeoutCount()).toBe(lockBefore + 1);
+    expect(counters.wocMarketIdleTxKillCount()).toBe(idleBefore);
   });
 
   it("insertPendingBid maps a contention code to the typed 'contended' (never a raw 500 on a bid)", async () => {

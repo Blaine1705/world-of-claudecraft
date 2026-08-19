@@ -82,6 +82,58 @@ describeDb('woc market plan-class pins against real Postgres', () => {
       `INSERT INTO accounts (id, username, password_hash)
        SELECT g, 'plan-fixture-' || g, 'x' FROM generate_series(10000, 10199) g`,
     );
+    // The realistic-row-count fixture lives HERE, not in the poll-read case:
+    // several pins (the poll preference proof, the prune's referent probes)
+    // depend on these table sizes and their ANALYZEd statistics, and in-test
+    // seeding made every -t filtered or reordered run plan against
+    // near-empty tables (reproduced: the prune's pkey anti-join flipped to a
+    // hash over the composite, an index path the pin refuses by name).
+    // 5,000 offers across 100 accounts: the scale where the retired partial
+    // indexes left the old shape planning a seq scan per 2s poll. Mixed
+    // statuses so the candidate set is realistic. Beneath them, 1,000
+    // listings each carrying three TERMINAL settlement attempts ('failed' and
+    // 'expired' sit outside the one-open-settlement partial, so bulk rows
+    // cannot trip it), with a fifth of the offers stamped onto a listing:
+    // that is the shape the LATERAL latest-settlement probe pays for per
+    // offer row, so the planner's choices are made on real statistics.
+    await pool.query(
+      `INSERT INTO woc_market_listings (
+         realm, seller_account, seller_character, seller_name, seller_wallet,
+         item, item_id, quality, format, start_cents, buy_now_cents,
+         offer_next, status, item_disposed, ends_at, base_ends_at)
+       SELECT 'plans-offers', 10001, 9000 + g, 'LS' || g, 'w-ls-' || g,
+              '{"itemId":"crown_of_embers","count":1}'::jsonb, 'crown_of_embers',
+              'epic', 'buy_now', 500, 1000, false, 'settling', false,
+              now() + interval '1 hour', now() + interval '1 hour'
+         FROM generate_series(1, 1000) g`,
+    );
+    const bounds = await pool.query(
+      `SELECT min(id)::bigint AS lo FROM woc_market_listings WHERE realm = 'plans-offers'`,
+    );
+    const lo = Number(bounds.rows[0].lo);
+    await pool.query(
+      `INSERT INTO woc_market_settlements (
+         listing_id, realm, bid_id, attempt, buyer_account, buyer_character,
+         buyer_name, buyer_wallet, amount_cents, state, deadline_at)
+       SELECT $1 + (g % 1000), 'plans-offers', NULL, g, 10002, 7000, 'PB', 'w-pb', 1000,
+              CASE WHEN g % 2 = 0 THEN 'failed' ELSE 'expired' END, now()
+         FROM generate_series(1, 3000) g`,
+      [lo],
+    );
+    await pool.query(
+      `INSERT INTO woc_market_directed_offers (
+         realm, seller_account, seller_character, seller_name, buyer_account,
+         buyer_name, usd_cents, status, listing_id, expires_at, updated_at)
+       SELECT 'plans-offers', 10000 + (g % 100), 9000 + g, 'S' || g, 10000 + ((g - 1) / 100),
+              'B' || g, 1000, CASE WHEN g % 10 = 0 THEN 'pending' ELSE 'declined' END,
+              CASE WHEN g % 5 = 0 THEN $1 + (g % 1000) END,
+              now() + interval '10 minutes', now() - interval '1 minute'
+         FROM generate_series(1, 5000) g`,
+      [lo],
+    );
+    await pool.query('ANALYZE woc_market_directed_offers');
+    await pool.query('ANALYZE woc_market_settlements');
+    await pool.query('ANALYZE woc_market_listings');
   }, 120_000);
 
   afterAll(async () => {
@@ -149,55 +201,9 @@ describeDb('woc market plan-class pins against real Postgres', () => {
   }
 
   it('the poll read prefers the account indexes at realistic row counts, and its LATERAL probe seeks the settlements composite', async () => {
+    // Fixture: the beforeAll's realistic seed (5,000 offers / 1,000 listings
+    // / 3,000 terminal settlements in 'plans-offers', ANALYZEd).
     const realm = 'plans-offers';
-    // 5,000 offers across 100 accounts: the scale where the retired partial
-    // indexes left the old shape planning a seq scan per 2s poll. Mixed
-    // statuses so the candidate set is realistic. Beneath them, 1,000
-    // listings each carrying three TERMINAL settlement attempts ('failed' and
-    // 'expired' sit outside the one-open-settlement partial, so bulk rows
-    // cannot trip it), with a fifth of the offers stamped onto a listing:
-    // that is the shape the LATERAL latest-settlement probe pays for per
-    // offer row, so the planner's choice below is made on real statistics.
-    await pool.query(
-      `INSERT INTO woc_market_listings (
-         realm, seller_account, seller_character, seller_name, seller_wallet,
-         item, item_id, quality, format, start_cents, buy_now_cents,
-         offer_next, status, item_disposed, ends_at, base_ends_at)
-       SELECT $1, 10001, 9000 + g, 'LS' || g, 'w-ls-' || g,
-              '{"itemId":"crown_of_embers","count":1}'::jsonb, 'crown_of_embers',
-              'epic', 'buy_now', 500, 1000, false, 'settling', false,
-              now() + interval '1 hour', now() + interval '1 hour'
-         FROM generate_series(1, 1000) g`,
-      [realm],
-    );
-    const bounds = await pool.query(
-      `SELECT min(id)::bigint AS lo FROM woc_market_listings WHERE realm = $1`,
-      [realm],
-    );
-    const lo = Number(bounds.rows[0].lo);
-    await pool.query(
-      `INSERT INTO woc_market_settlements (
-         listing_id, realm, bid_id, attempt, buyer_account, buyer_character,
-         buyer_name, buyer_wallet, amount_cents, state, deadline_at)
-       SELECT $2 + (g % 1000), $1, NULL, g, 10002, 7000, 'PB', 'w-pb', 1000,
-              CASE WHEN g % 2 = 0 THEN 'failed' ELSE 'expired' END, now()
-         FROM generate_series(1, 3000) g`,
-      [realm, lo],
-    );
-    await pool.query(
-      `INSERT INTO woc_market_directed_offers (
-         realm, seller_account, seller_character, seller_name, buyer_account,
-         buyer_name, usd_cents, status, listing_id, expires_at, updated_at)
-       SELECT $1, 10000 + (g % 100), 9000 + g, 'S' || g, 10000 + ((g - 1) / 100),
-              'B' || g, 1000, CASE WHEN g % 10 = 0 THEN 'pending' ELSE 'declined' END,
-              CASE WHEN g % 5 = 0 THEN $2 + (g % 1000) END,
-              now() + interval '10 minutes', now() - interval '1 minute'
-         FROM generate_series(1, 5000) g`,
-      [realm, lo],
-    );
-    await pool.query('ANALYZE woc_market_directed_offers');
-    await pool.query('ANALYZE woc_market_settlements');
-    await pool.query('ANALYZE woc_market_listings');
     await marketDb.directedOffersForAccount(realm, 10_042, Date.now());
     const [poll] = take();
     expect(poll.text).toContain('FROM woc_market_directed_offers o');
@@ -205,7 +211,12 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     // per-account probes over walking the realm, and the LATERAL probe seeks
     // (listing_id, id DESC) instead of sorting settlement attempts per row
     // (the terminal attempts sit outside the one-open partial, so no other
-    // index can serve the latest-attempt read).
+    // index can serve the latest-attempt read). Scope stated honestly: the
+    // preference holds AT THIS SEEDED DISTRIBUTION (uniform, 50 offers per
+    // account); an account owning a large fraction of the realm's offers
+    // legitimately seq-scans at natural cost, which is the planner being
+    // right, not the shape regressing (that account's read is linear in its
+    // own retained history either way, the retention window's bound).
     const natural = await planOf(poll.text, poll.values, 'natural');
     expect(natural).not.toMatch(/Seq Scan on woc_market_directed_offers/);
     expect(natural).toMatch(/woc_market_offers_(buyer|seller)_all/);
@@ -253,7 +264,9 @@ describeDb('woc market plan-class pins against real Postgres', () => {
       const [browse] = take();
       const plan = await planOf(browse.text, browse.values);
       expect(plan, sort).not.toMatch(/Seq Scan on woc_market_listings/);
-      expect(plan, sort).toContain(index);
+      // Boundary-anchored: live_price is a NAME PREFIX of live_price_desc,
+      // so a bare toContain on the ASC arm would accept the DESC index.
+      expect(plan, sort).toMatch(new RegExp(`${index}(?![_a-z])`));
       // The index SERVES THE ORDER: no sort node may appear, or the direction
       // mismatch this index exists to close has come back.
       expect(plan, `${sort} must not plan a sort`).not.toMatch(/Sort/);
@@ -268,7 +281,9 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     const plans: string[] = [];
     for (const s of statements) plans.push(await planOf(s.text, s.values));
     const joined = plans.join('\n');
-    // No class may scan a marketplace table; each class's own index appears.
+    // No class may scan a marketplace table; the four distinct backing
+    // indexes appear by name (the five classes share four indexes:
+    // delivering and review both age on woc_market_settlements_state_updated).
     expect(joined).not.toMatch(/Seq Scan on woc_market_/);
     expect(joined, 'unbooked claims').toContain('woc_market_custody_claims_unbooked');
     expect(joined, 'delivering + review age').toContain('woc_market_settlements_state_updated');
@@ -432,11 +447,22 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     // The advisory pre-pass runs its one-round-trip cooldown probes on the
     // shared pool; a shape change that moved or dropped them must fail here.
     expect(abandonProbes.length).toBeGreaterThanOrEqual(1);
+    const plans: string[] = [];
     for (const probe of abandonProbes) {
       const plan = await planOf(probe.text, probe.values);
       expect(plan).not.toMatch(/Seq Scan on woc_market_buy_now_abandons/);
       expect(plan).toMatch(/woc_market_buy_now_abandons_(once|account)/);
+      plans.push(plan);
     }
+    // Judged with the plans open: BOTH cooldown arms are account-scoped
+    // probes (account = X AND lock_expires > T, listing_id a residual
+    // filter), so both legitimately ride the account-leading _account index;
+    // _once serves the recorder's listing-scoped statements, pinned
+    // elsewhere. The decisive extra here is that the account-leading path is
+    // PRESENT: a shape drift that pushed the cap arm off account-first
+    // (walking _once and filtering) would drop this name from every plan
+    // while still matching the per-probe alternation.
+    expect(plans.join('\n')).toContain('woc_market_buy_now_abandons_account');
   }, 20_000);
 
   it('the cascade pick derives prior winners store-side and stays on the bids index', async () => {
@@ -470,6 +496,23 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     await bid(10_010, 900, 'outbid');
     await bid(10_010, 950, 'defaulted');
     const runnerUp = await bid(10_011, 800, 'outbid');
+    // And per LISTING, not per account globally: the runner-up WON a
+    // different listing, which must not disqualify them here. Dropping the
+    // inner listing_id qual (the lost-correlation regression) still plans a
+    // clean anti-join every plan assert accepts, so this behavioral arm is
+    // what makes the per-listing scope decisive in-suite.
+    const otherListing = await seedListing(realm);
+    const otherBid = async (account: number): Promise<void> => {
+      seq++;
+      await pool.query(
+        `INSERT INTO woc_market_bids (
+           listing_id, realm, account, character_id, character_name, wallet,
+           amount_cents, status, bond_cents, bond_state, placed_at
+         ) VALUES ($1, $2, $3, $4, $5, $6, 600, 'won', 70, 'held', now())`,
+        [otherListing, realm, account, 8000 + seq, `PlanBidder${seq}`, `wallet-pb-${seq}`],
+      );
+    };
+    await otherBid(10_011);
     take();
     const picked = await marketDb.nextCascadeBidder(listingId, 0);
     const [pick] = take();
@@ -495,6 +538,16 @@ describeDb('woc market plan-class pins against real Postgres', () => {
        VALUES ('woc_settlement:88880001', 'plans-claims', now() - interval '400 days'),
               ('woc_listing_return:88880002', 'plans-claims', now() - interval '400 days')`,
     );
+    // Ballast so the NATURAL-cost probe below faces a real choice: enough
+    // aged booked rows that a planner tempted to hash a referent table would
+    // show it in the plan (the regression class), with statistics current.
+    await pool.query(
+      `INSERT INTO woc_market_custody_claims (custody_ref, realm, booked_at)
+       SELECT 'woc_settlement:' || (88881000 + g), 'plans-claims',
+              now() - interval '400 days'
+         FROM generate_series(1, 1500) g`,
+    );
+    await pool.query('ANALYZE woc_market_custody_claims');
     // The free function takes its pool directly, so it needs its own local
     // recorder (the suite's wrapped pool only backs the class methods).
     const rec: { text: string; values: unknown[] }[] = [];
@@ -517,5 +570,15 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     // scans and so dodge every seq-scan assert): a pull-up-blocked probe
     // plans as a SubPlan, the anti-join never does.
     expect(plan).not.toMatch(/SubPlan/);
+    // And at NATURAL cost over the ANALYZEd ballast, so a cost-model flip
+    // back into hashing a referent table (the measured first-cut regression,
+    // whichever node it hides behind) cannot pass on the seqscan-off crutch
+    // alone. The claims-side access method is deliberately free here: at a
+    // small candidate set a seq scan of the claims table itself is a
+    // legitimate natural pick and not the regression class.
+    const natural = await planOf(prune.text, prune.values, 'natural');
+    expect(natural).not.toMatch(/SubPlan/);
+    expect(natural).not.toMatch(/Seq Scan on woc_market_settlements/);
+    expect(natural).not.toMatch(/Seq Scan on woc_market_listings/);
   }, 20_000);
 });

@@ -1250,12 +1250,18 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       expect(await marketDb.markCustodyMailIntent(mailed)).toBe(true);
       // Age everything this test owns except the fresh row; the aging is
       // ref-scoped so the suite's other fixtures stay out of the window.
+      // deadReturn deliberately keeps its RECENT claimed_at: a prune that
+      // drifted to ageing on claimed_at would then stop pruning it, so the
+      // booked_at-vs-claimed_at choice is caught behaviorally here, not
+      // only by the SQL text pin.
       await pool.query(
         `UPDATE woc_market_custody_claims
             SET booked_at = booked_at - interval '400 days',
-                claimed_at = claimed_at - interval '400 days'
+                claimed_at = CASE WHEN custody_ref <> $3
+                                  THEN claimed_at - interval '400 days'
+                                  ELSE claimed_at END
           WHERE realm = $1 AND custody_ref <> $2`,
-        [realm, fresh],
+        [realm, fresh, deadReturn],
       );
       // The premise that makes the counts below EXACT: this test's seven aged
       // booked rows are the only booked rows in the whole disposable database

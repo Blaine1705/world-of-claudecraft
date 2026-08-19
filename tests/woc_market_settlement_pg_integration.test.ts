@@ -666,6 +666,43 @@ describeDb('woc market settlement guards against real Postgres', () => {
       expect(second).not.toContain('woc_market_settlements_listing');
     }, 20_000);
 
+    it('every marketplace FK first column is index-covered, minus the judged accounts carve-out', async () => {
+      // The retention round's criterion is an "every" claim (an index for
+      // every FK-cascade column marketplace deletes touch), so it gets a
+      // completeness floor, not a name list: a future woc_market_* child
+      // table whose FK ships uncovered must fail HERE, not as a production
+      // cascade's per-row sequential scan. Partial indexes do not count as
+      // coverage (a cascade scan's bare col = $1 predicate cannot imply an
+      // index predicate). The four allowlisted accounts-cascade columns are
+      // the JUDGED exceptions: the only hard accounts DELETE in production
+      // is the federated-provision race loser
+      // (server/federated_auth_db.ts), whose predicate (no password, no
+      // tokens, no links) cannot own market rows, player-facing removal is
+      // a soft delete that fires no cascade, and four permanent
+      // write-amplifying indexes on the two hottest tables would serve
+      // scans that cannot fire. Growing this list is a judgment, not a
+      // formality: every addition needs the same cannot-fire argument.
+      const uncovered = await pool.query(
+        `SELECT c.conrelid::regclass::text AS tbl, a.attname AS col
+           FROM pg_constraint c
+           JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+          WHERE c.contype = 'f'
+            AND c.conrelid::regclass::text LIKE 'woc_market%'
+            AND NOT EXISTS (
+              SELECT 1 FROM pg_index i
+               WHERE i.indrelid = c.conrelid
+                 AND i.indpred IS NULL
+                 AND i.indkey[0] = c.conkey[1])
+          ORDER BY 1, 2`,
+      );
+      expect(uncovered.rows.map((r) => `${r.tbl}.${r.col}`)).toEqual([
+        'woc_market_directed_offers.buyer_account',
+        'woc_market_directed_offers.seller_account',
+        'woc_market_listings.directed_buyer_account',
+        'woc_market_listings.seller_account',
+      ]);
+    }, 20_000);
+
     it('the boot repair demotes a legacy delivered-plus-open pair instead of failing the boot', async () => {
       const realm = 'guard-repair-settlements';
       const seller = await seedAccount();
