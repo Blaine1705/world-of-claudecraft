@@ -74,7 +74,10 @@ const EXCLUDED: Record<string, string> = {
     'the Vale Cup kit: built when its zone builds.',
 };
 
-/** Files whose module ABILITY_MATERIAL_SOURCES stages, by basename. */
+/** Files whose module ABILITY_MATERIAL_SOURCES stages, by basename. Held here
+ *  as its own list so the sweep below reads a NAME, not the factory it is
+ *  auditing, and pinned equal to the sources' own `module` fields: a row added
+ *  here to silence a hit, with no factory behind it, fails that pin. */
 const REGISTERED_MODULES = [
   'frost_nova_root_visual.ts',
   'ice_block_visual.ts',
@@ -207,6 +210,19 @@ describe('the lazy-material sweep', () => {
         `let draws: readonly Draw[] = [];\n${named}let kit: HourglassKit | null = null;`,
       ),
     ).toEqual(['let kit: HourglassKit | null = null;']);
+  });
+
+  it('registers exactly the modules the prewarm really stages', () => {
+    // The list above is a test-local name set; without this pin a module could
+    // be added to it (silencing its hit) while no factory drains its cache, and
+    // the sweep would go green on a visual that still links at first cast.
+    expect([...REGISTERED_MODULES].sort()).toEqual(
+      ABILITY_MATERIAL_SOURCES.map((source) => source.module).sort(),
+    );
+    // ... and one factory per module, so two sources cannot cover for a third.
+    expect(new Set(ABILITY_MATERIAL_SOURCES.map((source) => source.module)).size).toBe(
+      ABILITY_MATERIAL_SOURCES.length,
+    );
   });
 
   it('finds every registered factory, and enough of them to be a real sweep', () => {

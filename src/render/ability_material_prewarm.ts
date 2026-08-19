@@ -37,6 +37,11 @@ const REFERENCE_CHARACTER_HEIGHT = 1.8;
  *  hidden stand-in drawing it the way a live cast does. */
 export interface AbilityMaterialSource {
   id: string;
+  /** The basename of the module whose lazy cache this source drains. Declared
+   *  here rather than left to the sweep's own list, so a new source module can
+   *  never be registered in the sweep without a factory behind it
+   *  (tests/ability_material_prewarm_sweep.test.ts pins the two sets equal). */
+  module: string;
   /** Every material the module's lazy cache can hand a live cast. */
   materials(): readonly THREE.Material[];
   /** A hidden instance of the live visual, meshes and all. */
@@ -49,16 +54,19 @@ export interface AbilityMaterialSource {
 export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
   {
     id: 'frost-nova-root',
+    module: 'frost_nova_root_visual.ts',
     materials: () => Object.values(frostRootMaterials()),
     build: () => new FrostNovaRootVisual(REFERENCE_CHARACTER_HEIGHT).group,
   },
   {
     id: 'ice-block',
+    module: 'ice_block_visual.ts',
     materials: () => Object.values(iceMaterials()),
     build: () => new IceBlockVisual(REFERENCE_CHARACTER_HEIGHT).group,
   },
   {
     id: 'temporal-hourglass',
+    module: 'temporal_hourglass_visual.ts',
     materials: () => Object.values(temporalHourglassMaterials()),
     // One stand-in per MODE: the hourglass mounts the protective energy
     // material at build and swaps the hostile one in on update(), so a single
@@ -76,6 +84,7 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
   },
   {
     id: 'fireball-travel',
+    module: 'fireball_travel_visual.ts',
     materials: () => Object.values(fireballMaterials()),
     build: () => new FireballTravelVisual().group,
   },
