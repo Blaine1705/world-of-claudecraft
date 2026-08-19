@@ -12,7 +12,11 @@ import {
   settleWorldEntryCover,
 } from '../src/game/arrival_warmup';
 import { WORLD_ENTRY_GPU_SETTLE_COVER_MS } from '../src/game/ui_effects_profile';
-import { arrivalCoverActive, resetArrivalCoverForTest } from '../src/render/arrival_cover';
+import {
+  arrivalCoverActive,
+  resetArrivalCoverForTest,
+  setArrivalCover,
+} from '../src/render/arrival_cover';
 
 interface Rig {
   calls: string[];
@@ -208,6 +212,76 @@ describe('runBlockingArrivalWarmup', () => {
     await runBlockingArrivalWarmup(r.deps);
 
     expect(r.calls).toContain('prepareZonesAround:120,-40,999');
+  });
+
+  it('releases the hold and drops the cover when the RAISE itself throws', () => {
+    // The raise runs before the promise chain exists, so a synchronous throw
+    // there has no `finally` behind it: it must undo itself on the spot or the
+    // world draw stays held and the curtain stays up for the rest of the
+    // session.
+    const held: boolean[] = [];
+    const r = rig({
+      setCover: undefined,
+      holdWorldDraw: (value) => {
+        held.push(value);
+        if (value) throw new Error('hold exploded');
+      },
+    });
+    expect(() => runBlockingArrivalWarmup(r.deps)).toThrow('hold exploded');
+    expect(held).toEqual([true, false]);
+    expect(arrivalCoverActive()).toBe(false);
+  });
+
+  it("leaves another owner's cover alone when the raise throws before its own", () => {
+    // Only what this chain actually raised is undone: a blind drop would
+    // decrement the world-entry owner's depth and strip ITS cover.
+    setArrivalCover(true);
+    const r = rig({
+      setCover: undefined,
+      ui: {
+        ...rig().deps.ui,
+        showLoadingScreen: () => {
+          throw new Error('screen exploded');
+        },
+      },
+    });
+    expect(() => runBlockingArrivalWarmup(r.deps)).toThrow('screen exploded');
+    expect(arrivalCoverActive()).toBe(true);
+  });
+
+  it('keeps the real cover up until BOTH overlapping owners have dropped it', async () => {
+    // A teleport-sized reposition landing inside the world-entry settle window
+    // puts the two owners on the same curtain. Whichever finishes first must
+    // not un-refuse the boot-debt and background admission lanes mid-arrival.
+    const entryCalls: string[] = [];
+    let flushEntry = (): void => {};
+    settleWorldEntryCover({
+      adaptiveBudget: false,
+      constrainedMemory: false,
+      online: true,
+      revealWorld: () => entryCalls.push('revealWorld'),
+      afterActiveAnimationMs: (_ms, callback) => {
+        flushEntry = callback;
+      },
+      awaitReveals: async () => undefined,
+    });
+    expect(arrivalCoverActive()).toBe(true);
+
+    let releaseArrival = (): void => {};
+    const arrivalWait = new Promise<void>((resolve) => {
+      releaseArrival = resolve;
+    });
+    const r = rig({ setCover: undefined, awaitReveals: () => arrivalWait });
+    const chain = runBlockingArrivalWarmup(r.deps);
+
+    flushEntry();
+    for (let i = 0; i < 8; i++) await Promise.resolve();
+    expect(entryCalls).toEqual(['revealWorld']);
+    expect(arrivalCoverActive()).toBe(true);
+
+    releaseArrival();
+    await chain;
+    expect(arrivalCoverActive()).toBe(false);
   });
 
   it('pins the settle budget to three seconds', () => {

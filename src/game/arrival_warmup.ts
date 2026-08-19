@@ -94,14 +94,17 @@ export interface BlockingArrivalWarmupDeps {
   neighborRadiusYd: number;
   /** The screen has lifted: restore input and reset the frame clock. */
   onRevealed: () => void;
-  /** The chain is over, however it ended. */
-  onSettled?: () => void;
+  /** The chain is over, however it ended. Required: it carries main.ts's
+   *  reentrancy guard (it clears the in-flight warmup), and a chain that
+   *  forgot it would wedge every later arrival. */
+  onSettled: () => void;
   /** Hold (true) or release (false) the world draw while the screen is up:
    *  held from the landing frame, released once the reveals have settled so
    *  the paint before the lift already shows the destination (see
    *  presentation_gate.ts, worldDrawHeld). Released again when the chain ends,
-   *  however it ended, so a failed arrival never leaves the world undrawn. */
-  holdWorldDraw?: (held: boolean) => void;
+   *  however it ended, so a failed arrival never leaves the world undrawn.
+   *  Required: it is the only release of the hold. */
+  holdWorldDraw: (held: boolean) => void;
   /** Injected by tests; defaults to the real arrival cover. */
   setCover?: (active: boolean) => void;
   awaitReveals?: (maxMs: number) => Promise<void>;
@@ -115,9 +118,32 @@ export function runBlockingArrivalWarmup(deps: BlockingArrivalWarmupDeps): Promi
   const { renderer, ui, t, zoneX, zoneZ } = deps;
   const setCover = deps.setCover ?? setCoverDefault;
   const awaitReveals = deps.awaitReveals ?? awaitRevealsDefault;
-  ui.showLoadingScreen(t('loading.world'));
-  setCover(true);
-  deps.holdWorldDraw?.(true);
+  // The raise sits in its own try: a synchronous throw out of it (a broken
+  // loading screen, a broken cover) happens before the promise chain exists,
+  // so nothing downstream would ever release the hold or drop the curtain.
+  // Undo exactly what went up, then let the caller see the failure.
+  let raised = false;
+  let held = false;
+  try {
+    ui.showLoadingScreen(t('loading.world'));
+    setCover(true);
+    raised = true;
+    // Marked BEFORE the call: a hold that threw halfway is still a hold that
+    // may be up, and only what was raised is undone (a blind drop would
+    // decrement the world-entry owner's cover depth instead of this chain's).
+    held = true;
+    deps.holdWorldDraw(true);
+  } catch (err) {
+    if (held) {
+      try {
+        deps.holdWorldDraw(false);
+      } catch (releaseErr) {
+        console.warn('Arrival world-draw release failed', releaseErr);
+      }
+    }
+    if (raised) setCover(false);
+    throw err;
+  }
   return (
     ui
       .nextPaint()
@@ -144,7 +170,7 @@ export function runBlockingArrivalWarmup(deps: BlockingArrivalWarmupDeps): Promi
         }
         await awaitReveals(arrivalRevealSettleMaxMs(deps.online));
         renderer.markGpuHitchReveal();
-        deps.holdWorldDraw?.(false);
+        deps.holdWorldDraw(false);
       })
       .then(() => ui.setLoadingPercent(100, t('loading.enteringWorld')))
       .then(() => ui.nextPaint())
@@ -159,9 +185,9 @@ export function runBlockingArrivalWarmup(deps: BlockingArrivalWarmupDeps): Promi
         // Never leave the cover raised: it holds the GPU-prep admission on the
         // arrival rule, and a stuck flag would keep the boot-debt and
         // background lanes refused for the rest of the session.
-        deps.holdWorldDraw?.(false);
+        deps.holdWorldDraw(false);
         setCover(false);
-        deps.onSettled?.();
+        deps.onSettled();
       })
   );
 }

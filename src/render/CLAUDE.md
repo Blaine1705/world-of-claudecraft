@@ -361,7 +361,13 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   false for it (`background_gpu_queue.ts` consults the hook in `noteFrame`),
   because ticking `deferredFrames` through a whole curtain left every one of
   those units past `maxDeferFrames` and admitted the entire debt lane as
-  `starvation` on the first live frame after the drop.
+  `starvation` on the first live frame after the drop. The cover is DEPTH-counted
+  (`setArrivalCover(true|false)` increments and decrements, floored at zero): the
+  blocking arrival and the world-entry settle are independent owners that can
+  overlap, and the curtain stands until the last of them drops it. Beside the
+  cover, the blocking arrival also HOLDS THE WORLD DRAW for the same span
+  (`src/game/presentation_gate.ts` `worldDrawHeld`); see `src/game/CLAUDE.md`,
+  the `arrival_warmup.ts` row.
   Two deadlines beside it, and only one of them reveals: a SOFT deadline per key, from
   the budget's learned reveal cost (one gate PIECE, since a reveal compile is one
   queue unit per material group) times the piece count of the key's roots clamped into

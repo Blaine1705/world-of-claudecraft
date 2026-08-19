@@ -97,12 +97,25 @@ describe('arrival cover flag', () => {
     expect(arrivalCoverActive()).toBe(false);
   });
 
-  it('is idempotent, so a redundant raise or drop changes nothing', () => {
-    // The warmup's finally always runs, including on a path that never raised
-    // the curtain.
+  it('counts depth, so an overlapping owner cannot cut the other one short', () => {
+    // The blocking arrival and the world-entry settle raise the same curtain
+    // and can overlap (a teleport-sized reposition landing inside the entry
+    // settle window). The cover must stand until the LAST of them drops it.
+    setArrivalCover(true);
+    setArrivalCover(true);
+    expect(arrivalCoverActive()).toBe(true);
+    setArrivalCover(false);
+    expect(arrivalCoverActive()).toBe(true);
     setArrivalCover(false);
     expect(arrivalCoverActive()).toBe(false);
-    setArrivalCover(true);
+  });
+
+  it('floors the depth at zero, so a redundant drop cannot bank a negative', () => {
+    // The warmup's finally always runs, including on a path that never raised
+    // the curtain: an unmatched drop must not make the NEXT raise a no-op.
+    setArrivalCover(false);
+    setArrivalCover(false);
+    expect(arrivalCoverActive()).toBe(false);
     setArrivalCover(true);
     expect(arrivalCoverActive()).toBe(true);
     setArrivalCover(false);

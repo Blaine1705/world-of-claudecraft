@@ -1,11 +1,11 @@
-// The ARRIVAL CURTAIN: the one flag saying a blocking loading screen currently
+// The ARRIVAL CURTAIN: the one signal saying a blocking loading screen currently
 // covers the world while a teleport arrival (hearth, dungeon exit, rift exit,
 // any jump into a zone that is not ready) prepares and prewarms its
 // destination. Boot has always compiled the scene it lands in under such a
 // cover; a mid-session arrival did not, so the streamed decor the camera lands
 // among linked its programs in live frames instead.
 //
-// Two consumers read the flag, and both change only PACING, never what the
+// Two consumers read it, and both change only PACING, never what the
 // player can see or act on:
 // - the arrival chain itself, which WAITS on this registry before it lifts the
 //   screen (awaitArrivalReveals): while the curtain is up a hold costs the
@@ -46,7 +46,12 @@ export interface ArrivalRevealWaitOptions {
   pollMs?: number;
 }
 
-let coverActive = false;
+// The curtain is a DEPTH, not a flag: two independent owners raise it (the
+// blocking arrival chain and the world-entry settle), and a teleport-sized
+// displacement landing inside the entry settle window makes them overlap. A
+// bare boolean let whichever dropped first clear the other's cover and
+// un-refuse the boot-debt and background admission lanes mid-arrival.
+let coverDepth = 0;
 const gates = new Set<WeakRef<ArrivalRevealGate>>();
 // Module-level like the flag: a graphics rebuild mints a fresh renderer, and
 // the player's last position is not something a rebuild should forget.
@@ -70,7 +75,7 @@ export function registerRevealGateForArrival(gate: ArrivalRevealGate): void {
 }
 
 export function arrivalCoverActive(): boolean {
-  return coverActive;
+  return coverDepth > 0;
 }
 
 /** Imminent keys still held across every registered gate. */
@@ -80,9 +85,16 @@ export function arrivalHeldImminentKeys(): number {
   return held;
 }
 
-/** Raise or drop the curtain. */
+/**
+ * Raise (`true`) or drop (`false`) the curtain, counted: a raise increments
+ * the depth and a drop decrements it, floored at zero so a drop that never
+ * had a matching raise (a chain whose `finally` runs on a path that never
+ * raised) cannot push it negative. The curtain stays up until the LAST owner
+ * drops it, so overlapping owners never cut each other's cover short.
+ */
 export function setArrivalCover(active: boolean): void {
-  coverActive = active;
+  if (active) coverDepth++;
+  else if (coverDepth > 0) coverDepth--;
 }
 
 /**
@@ -139,7 +151,7 @@ export function awaitArrivalReveals(
 export function noteArrivalEvent(missingViews: number): void {
   recordGpuPrepEvent({
     kind: 'arrival',
-    key: coverActive ? 'cover' : 'no-cover',
+    key: arrivalCoverActive() ? 'cover' : 'no-cover',
     ageMs: 0,
     units: missingViews,
     totalRoots: arrivalHeldImminentKeys(),
@@ -153,7 +165,7 @@ export function noteArrivalIfTeleported(x: number, z: number, missingViews: numb
 }
 
 export function resetArrivalCoverForTest(): void {
-  coverActive = false;
+  coverDepth = 0;
   gates.clear();
   arrivalDetector = createArrivalDetector();
 }

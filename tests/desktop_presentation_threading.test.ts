@@ -120,6 +120,13 @@ describe('the presentation gate threading in main.ts frame()', () => {
     expect(flat(stripLineComments(warmupCalls[0]))).toContain(
       'holdWorldDraw: gateInput.holdWorldDraw,',
     );
+    // And the hold is a BOOLEAN, so the in-flight-warmup early-out is the one
+    // thing keeping a second arrival from racing the first one's release: it
+    // would hold the draw again and let the first chain's end free it under a
+    // still-covered arrival. Scoped to the declaration, like the pins below.
+    expect(flat(stripLineComments(declarationText('maybeWarmCurrentZone')))).toContain(
+      'if (zoneWarmup) return;',
+    );
   });
 
   it('drives the HUD non-paint head on hidden frames at BOTH call sites', () => {
