@@ -283,6 +283,16 @@ describe('mobile window layout CSS', () => {
     expect(split ?? '', 'the split dock pins both edges').toMatch(/\n\s*bottom: calc\(max\(10px/);
   });
 
+  it('gives the phone Exchange rows their rhythm, first row included', () => {
+    // The 15 sign-off note: taller cells than the desktop 6px, and the first
+    // row clears the header hairline with its own top padding instead of
+    // starting flush against it.
+    const rows = blockContaining('padding-top: 12px;', '#woc-market-window .wm-table td');
+    expect(rows).toContain('padding-bottom: 12px;');
+    const first = blockContaining('padding-top: 16px;', 'tbody tr:first-child td');
+    expect(first).toContain('#woc-market-window');
+  });
+
   it('the split dock marker is the one the HUD actually stamps', () => {
     // The split rule keys on [data-window-open="1"] on BOTH #trade-window and
     // #bags, and the stamp lives in hud.ts as dataset.windowOpen. Renaming

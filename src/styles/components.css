@@ -16297,8 +16297,11 @@
      plus a 240 to 320px detail column, deliberately under the large-window
      target. The mobile sheet re-pins it in hud.mobile.css. */
   #woc-market-window {
-    width: min(80vw, 960px);
-    height: min(84vh, 700px);
+    /* The desktop Exchange claims its real estate (Fernando's 15 QA sign-off
+       note): a large window rather than the old fitted 960x700, which also
+       gives every column the room to sit left-aligned with its header. */
+    width: min(92vw, 1440px);
+    height: min(92vh, 920px);
     display: none;
     flex-direction: column;
     overflow: hidden;
@@ -16453,6 +16456,9 @@
     align-items: center;
     gap: var(--spacing-sm);
     flex-wrap: wrap;
+    /* The control row breathes (the 15 QA sign-off note): top and bottom
+       padding on the whole row, with the sort control leading it. */
+    padding: var(--spacing-sm) 0;
   }
   #woc-market-window .wm-pager .ui-icon {
     width: 20px;
@@ -16560,13 +16566,11 @@
   #woc-market-window .wm-table th:nth-child(5) {
     width: 12%;
   }
-  #woc-market-window .wm-table td:nth-child(2) {
+  /* Every cell sits left-aligned under its left-aligned header (the 15 QA
+     sign-off note), and a long value WRAPS to a second line rather than
+     squeezing or clipping: no nowrap, no right-aligned number columns. */
+  #woc-market-window .wm-table td {
     overflow-wrap: anywhere;
-  }
-  #woc-market-window .wm-table th:nth-child(n + 3),
-  #woc-market-window .wm-table td:nth-child(n + 3) {
-    text-align: right;
-    white-space: nowrap;
   }
   /* A row is one control (the activator button carries the keyboard reach), so
      it answers the pointer like one: the house cursor and a fill step on hover,

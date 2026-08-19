@@ -49,6 +49,7 @@ import {
 } from './wallet_bridge_reason_text';
 import { overWalletBalance } from './woc_affordable_core';
 import {
+  wocBrowseStripHtml,
   wocEndsAtText,
   wocErrorStatusHtml,
   wocLoadingStatusHtml,
@@ -816,25 +817,9 @@ export class WocMarketWindow {
   /** The shared waiting ring (the trade arm's spinner, one primitive). */
   private browseHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
     const b = model.browse;
-    // The pager renders on EVERY browse face: an empty page past the first
-    // (the last listing on it closed between the has-more probe and the
-    // click) and a failed reach both leave the player a way back and a live
-    // sort control, instead of a dead end with no control at all.
-    const pager =
-      `<div class="wm-pager">` +
-      // Keyed like every other control, so a keyboard player paging through
-      // the listings keeps their place across the rebuild each page triggers
-      // (the restore ladder below falls from next to prev on the last page).
-      `<button type="button" data-action="page-prev" data-focus-key="wm-page-prev" ${b.page <= 0 ? 'disabled' : ''} aria-label="${esc(t('hudChrome.wocMarket.pagePrev'))}">${svgIcon('prev')}</button>` +
-      `<span>${esc(t('hudChrome.wocMarket.pageNumber', { current: formatNumber(b.page + 1) }))}</span>` +
-      `<button type="button" data-action="page-next" data-focus-key="wm-page-next" ${b.hasMore ? '' : 'disabled'} aria-label="${esc(t('hudChrome.wocMarket.pageNext'))}">${svgIcon('next')}</button>` +
-      `<label class="wm-sort">${esc(t('hudChrome.wocMarket.sortLabel'))}` +
-      `<select data-field="sort" data-focus-key="wm-sort">` +
-      `<option value="ending" ${this.sort === 'ending' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sortEnding'))}</option>` +
-      `<option value="newest" ${this.sort === 'newest' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sortNewest'))}</option>` +
-      `<option value="price_asc" ${this.sort === 'price_asc' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sortPriceAsc'))}</option>` +
-      `<option value="price_desc" ${this.sort === 'price_desc' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sortPriceDesc'))}</option>` +
-      `</select></label></div>`;
+    // The control row is a chrome builder (sort leading, then the pager,
+    // keyed so a keyboard player keeps their place across the rebuild).
+    const pager = wocBrowseStripHtml({ page: b.page, hasMore: b.hasMore, sort: this.sort });
     if (b.failed) {
       return `<div class="wm-browse">${pager}${wocErrorStatusHtml(t('hudChrome.wocMarket.browseError'))}</div>`;
     }
@@ -848,6 +833,18 @@ export class WocMarketWindow {
     }
     const rows = b.rows
       .map((r) => {
+        // A USD figure's token equivalence rides its tooltip (the detail
+        // pane's own estimateNote spelling), when a live rate is on hand.
+        const usdTip = (cents: number, slot: string): string =>
+          model.tokensPerUsd === null
+            ? ''
+            : this.tip(
+                `${slot}:${r.id}`,
+                t('hudChrome.wocMarket.estimateNote', {
+                  tokens: this.tokens((cents / 100) * model.tokensPerUsd),
+                  usd: this.usd(cents),
+                }),
+              );
         const badge =
           r.reserveBadge === null
             ? ''
@@ -891,8 +888,8 @@ export class WocMarketWindow {
           `data-focus-key="wm-row-${r.id}" aria-label="${esc(t('hudChrome.wocMarket.rowOpenAria', { item: this.itemName(r.itemId) }))}">` +
           `${this.itemCellHtml(r.itemId, r.quality, `browse:${r.id}`, r.instance)}</button>${mine}${locked}</td>` +
           `<td>${esc(r.sellerName)}</td>` +
-          `<td>${currentCell}${badge}</td>` +
-          `<td>${r.buyNowCents === null ? '' : esc(this.usd(r.buyNowCents))}</td>` +
+          `<td><span${r.currentCents === null ? '' : usdTip(r.currentCents, 'bidequiv')}>${currentCell}</span>${badge}</td>` +
+          `<td>${r.buyNowCents === null ? '' : `<span${usdTip(r.buyNowCents, 'buyequiv')}>${esc(this.usd(r.buyNowCents))}</span>`}</td>` +
           // The countdown is one truncated unit; the exact end time (UTC and
           // local, the detail pane's spelling) rides its tooltip.
           `<td${this.tip(`ends:${r.id}`, wocEndsAtText(r.endsAtMs))}>${esc(this.countdown(r.remainingMs / 1000))}</td></tr>`

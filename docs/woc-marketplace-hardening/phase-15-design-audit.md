@@ -470,8 +470,10 @@ exist plus `color-mix()` over them (the `hud.css` precedent).
 All of it lives in ONE directory, `docs/screenshots/woc-market/`: 57 `after-`
 shots and 22 `before-` shots, every one taken at the LOWEST graphics preset
 (the rigs seed `graphicsPreset 1` before the document loads, pinned by
-`tests/woc_market_copy_figures.test.ts`), desktop at 1600x900 and phone in the
-landscape-only 900x420 the game actually runs in. The sixteen captures that
+`tests/woc_market_copy_figures.test.ts`), desktop at 1600x1000 and phone in
+the landscape-only logical viewports the game actually runs in (the Exchange
+rig at 915x412, the trade rig at 900x420, both at device scale 2, so the
+files are 1830x824 and 1800x840). The sixteen captures that
 predated the step-up are gone, and with them the last shots of the retired 2FA
 face: nothing in either window renders a TOTP field any more
 (`tests/woc_market_window.test.ts` pins that the painter never mentions one).

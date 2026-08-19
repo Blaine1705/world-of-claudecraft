@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { formatDateTime, setLanguage, t } from '../src/ui/i18n';
 import {
+  wocBrowseStripHtml,
   wocEndsAtText,
   wocErrorStatusHtml,
   wocLoadingStatusHtml,
@@ -41,6 +42,37 @@ describe('woc_market_chrome: the status builders', () => {
     // The hostile text lands entity-encoded, never as live markup.
     expect(html).toContain('failed &lt;b&gt;&quot;badly&quot;&lt;/b&gt; &amp; loudly');
     expect(html).not.toContain('<b>"badly"</b>');
+  });
+});
+
+describe('woc_market_chrome: the browse control row', () => {
+  it('the sort control LEADS the row, and every hook the window owns survives', () => {
+    const html = wocBrowseStripHtml({ page: 1, hasMore: true, sort: 'newest' });
+    // Sort at the very far left (the 15 QA sign-off note): its label opens
+    // the row, before either pager button.
+    expect(html.indexOf('wm-sort')).toBeLessThan(html.indexOf('page-prev'));
+    // The focus keys and data hooks the restore ladder and the click handler
+    // resolve, byte for byte.
+    for (const hook of [
+      'data-field="sort"',
+      'data-focus-key="wm-sort"',
+      'data-action="page-prev"',
+      'data-focus-key="wm-page-prev"',
+      'data-action="page-next"',
+      'data-focus-key="wm-page-next"',
+    ]) {
+      expect(html).toContain(hook);
+    }
+    expect(html).toContain('value="newest" selected');
+  });
+
+  it('disables exactly the pager arm the page position rules out', () => {
+    const first = wocBrowseStripHtml({ page: 0, hasMore: true, sort: 'ending' });
+    expect(/page-prev[^>]*disabled/.test(first)).toBe(true);
+    expect(/page-next[^>]*disabled/.test(first)).toBe(false);
+    const last = wocBrowseStripHtml({ page: 3, hasMore: false, sort: 'ending' });
+    expect(/page-prev[^>]*disabled/.test(last)).toBe(false);
+    expect(/page-next[^>]*disabled/.test(last)).toBe(true);
   });
 });
 

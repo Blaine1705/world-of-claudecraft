@@ -3077,6 +3077,16 @@
     position: static;
     max-height: none;
   }
+  /* Row rhythm on the phone sheet (the 15 QA sign-off note): taller cells
+     than the desktop 6px, and the FIRST row clears the header hairline with
+     its own top padding instead of starting flush against it. */
+  body.mobile-touch #woc-market-window .wm-table td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  body.mobile-touch #woc-market-window .wm-table tbody tr:first-child td {
+    padding-top: 16px;
+  }
   /* The touch-target floor for the controls the desktop sheet sizes by padding
      alone. The tab strip came out about 30px tall (7px padding on a 13px line),
      under the 40x40 floor in src/ui/CLAUDE.md; the pager, form and row-open

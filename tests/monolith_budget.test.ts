@@ -49,8 +49,11 @@ const MONOLITHS: MonolithRow[] = [
     // chrome (spinner, loading line, error line, the exact end time a countdown
     // cell carries) moved to src/ui/woc_market_chrome.ts, which is the seam
     // named below. The ratchet only works if it tightens after an extraction.
+    // Down 2621 -> 2618 when the browse control row followed the chrome out
+    // (the 15 sign-off round: sort leads the row), paying for the price
+    // cells' token-equivalence tooltips with room to spare.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2621,
+    ceiling: 2618,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
