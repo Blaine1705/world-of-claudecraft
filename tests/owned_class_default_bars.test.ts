@@ -421,14 +421,17 @@ describe('owned class level 20 default action bars', () => {
       const actions = buildDefaultFormBar(expected, ACTION_BAR_ABILITY_SLOTS);
       // Controller reachability is the CROSS HOTBAR's now, not a flat slotN button
       // binding: a pad reaches abilities by holding a trigger, and the bar is seeded
-      // from this same default loadout. Sixteen cells in the first set, so the reach
-      // is wider than the eight face buttons it replaced, and the check is against
-      // the real seeding function rather than a restatement of it.
-      const seeded = new Set(
-        seedCrossHotbarLayout(actions, [])
-          .flat()
-          .filter((cell) => cell !== null)
-          .map((cell) => `${cell.type}:${cell.id}`),
+      // from this same default loadout. Pinned as the exact per-set slices, in order:
+      // an empty-extras seed copies the bar, so merely asserting the bar's actions are
+      // somewhere in the layout cannot fail for any class content, while this catches a
+      // reordered seed, a narrower set, and a kit whose later actions stop landing on
+      // the second set (the only two sets a pad can reach).
+      const layout = seedCrossHotbarLayout(actions, []);
+      expect(layout[0], `${key} cross hotbar first set`).toEqual(
+        actions.slice(0, CROSS_HOTBAR_SLOTS_PER_SET),
+      );
+      expect(layout[1], `${key} cross hotbar second set`).toEqual(
+        actions.slice(CROSS_HOTBAR_SLOTS_PER_SET, CROSS_HOTBAR_SLOTS_PER_SET * 2),
       );
       for (let index = 0; index < actions.length; index++) {
         if (!actions[index]) continue;
@@ -437,12 +440,6 @@ describe('owned class level 20 default action bars', () => {
         expect(desktopRow, `${key} desktop slot ${sourceSlot}`).toBeLessThanOrEqual(3);
         if (index < 11) {
           expect(desktopRow, `${key} visible desktop slot ${sourceSlot}`).toBe(1);
-        }
-        const action = actions[index];
-        if (index < CROSS_HOTBAR_SLOTS_PER_SET && action) {
-          expect(seeded, `${key} cross hotbar slot ${sourceSlot}`).toContain(
-            `${action.type}:${action.id}`,
-          );
         }
         const page = Math.floor(index / MOBILE_ACTIONS_PER_PAGE);
         const button = index % MOBILE_ACTIONS_PER_PAGE;

@@ -139,16 +139,21 @@ export function tryNearbyInteraction(
         bestObjectDistance = distance;
       }
     }
-    const preferred =
-      preferNpcId !== undefined && preferNpcId !== null && entity.id === preferNpcId;
-    if (entity.kind === 'npc' && (preferred || distance < bestNpcDistance)) {
+    // The promotion jumps the nearest-wins order, so it carries a strict reach check
+    // of its own; the scan keeps the reach its sentinel has always given it.
+    const promoted =
+      preferNpcId !== undefined &&
+      preferNpcId !== null &&
+      entity.id === preferNpcId &&
+      distance <= INTERACT_RANGE;
+    if (entity.kind === 'npc' && (promoted || distance < bestNpcDistance)) {
       const isGhostHealer = entity.templateId === 'spirit_healer' && player.ghost;
       const isLivingNpc = entity.templateId !== 'spirit_healer' && !player.dead;
-      if ((isGhostHealer || isLivingNpc) && distance <= INTERACT_RANGE) {
+      if (isGhostHealer || isLivingNpc) {
         bestNpc = entity.id;
         // Out of reach of anything else, so a nearer npc later in the sweep cannot
         // take the pick back off the one the player actually selected.
-        bestNpcDistance = preferred ? -1 : distance;
+        bestNpcDistance = promoted ? -1 : distance;
       }
     }
   }

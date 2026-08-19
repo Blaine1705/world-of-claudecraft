@@ -675,7 +675,7 @@ import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import { localizeSimAuraName, localizeSimText, tSim } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import {
   advanceSkillLevelObservation,
@@ -6692,15 +6692,12 @@ export class Hud {
 
   private syncSlotMap(): void {
     this.actionBarController.syncKnownAbilities();
-    // The pad's bar gets the same offer, filtered by the same two rules the action
-    // bar auto-places by: no passives, and no stances (those are seeded already).
+    // The pad's bar gets the same offer minus passives, and stances ride along
+    // because pad mode hides the stance bar: a stance learned after the seed
+    // (Defensive Stance, the druid forms) is otherwise unreachable without the
+    // arrange chord. Seeded ids are already marked seen, so this never re-offers.
     this.optionsHooks?.gamepad.syncCrossHotbarKnown(
-      this.sim.known
-        .filter(
-          (k) =>
-            isAbilityActionBarEligible(k.def) && !isStanceBarAbilityGroup(k.def.exclusiveGroup),
-        )
-        .map((k) => k.def.id),
+      this.sim.known.filter((k) => isAbilityActionBarEligible(k.def)).map((k) => k.def.id),
     );
     this.mobileActionPage = this.currentMobileActionPage();
   }
@@ -7022,8 +7019,8 @@ export class Hud {
    * auto-attack QoL) rather than a second cast path that would drift from it.
    *
    * The bar is seeded from the action bar, so the lookup almost always hits. An
-   * action arranged onto the pad and nowhere else falls back to a plain cast,
-   * which is the one case without a reticle.
+   * action arranged onto the pad and nowhere else falls back to a plain cast (the
+   * one case without a reticle) or, for an item, to the shared item-use seam.
    */
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
@@ -7036,12 +7033,29 @@ export class Hud {
     // 0 is not reachable there, so delegating by array index fired auto-attack
     // instead of the ability the player pressed.
     let slot = -1;
-    for (let i = 0; i < this.hotbarActions.length && slot < 0; i++) {
+    // barSlot 0 is that Attack seat and 1..length are the configurable slots, so
+    // the last one is length itself, not length - 1.
+    for (let i = 0; i <= this.hotbarActions.length && slot < 0; i++) {
       const onBar = this.actionForSlot(i);
       if (onBar?.type === action.type && onBar.id === action.id) slot = i;
     }
-    if (slot >= 0) this.castSlot(slot);
-    else if (action.type === 'ability') this.sim.castAbility(action.id);
+    if (slot >= 0) {
+      this.castSlot(slot);
+      return;
+    }
+    // The sim owns the refusal for an ability the player no longer knows.
+    if (action.type === 'ability') {
+      this.sim.castAbility(action.id);
+      return;
+    }
+    if (this.tradeOpen) return;
+    if (this.isHotbarItemId(action.id)) {
+      this.useHotbarItem(action.id);
+      return;
+    }
+    // A cell left holding an item this client cannot use is a stale binding, so
+    // refuse it out loud rather than eating the press.
+    this.showError(tSim('error.noItem'));
   }
 
   castSlot(barSlot: number): void {
@@ -7136,13 +7150,17 @@ export class Hud {
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
-      // Gathering tools route through the interact-style handler first
-      // (#2343); everything else (and fishing implements) keeps the plain
-      // useItem command.
-      if (!this.tryGatherToolUse(action.id)) this.sim.useItem(action.id);
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      this.useHotbarItem(action.id);
       this.flashActionSlot(barSlot);
     }
+  }
+
+  // The one item-use path a bar press takes, keyboard or pad: gathering tools
+  // route through the interact-style handler first (#2343); everything else
+  // (and fishing implements) keeps the plain useItem command.
+  private useHotbarItem(itemId: string): void {
+    if (!this.tryGatherToolUse(itemId)) this.sim.useItem(itemId);
+    if ($('#bags').style.display !== 'none') this.renderBags();
   }
 
   private mobileActionSourceSlotCount(): number {

@@ -3,10 +3,11 @@
 // current overlay state, and drives the painter each frame. Cold by contract: no
 // layout reads, no driver of its own (the HUD's frame loop calls paint).
 //
-// The cells are focusable and therefore NOT inside an aria-hidden root: focusable
+// The cells are real buttons and therefore NOT inside an aria-hidden root: focusable
 // content hidden from assistive tech is a violation, and the pad has to be able to
-// select a cell. Each cell carries the shared action-bar painter's own aria-label,
-// so what is announced is the ability on it.
+// select a cell while arranging. Each cell carries the shared action-bar painter's
+// own aria-label and aria-disabled, which is why the button role has to be real:
+// ARIA drops both on a generic role, leaving the announced name behind.
 
 import { CROSS_HOTBAR_ATTACK_ID } from '../../../game/cross_hotbar';
 import { resolveActionReplacement } from '../../../sim/combat/action_replacement';
@@ -42,6 +43,12 @@ const CELL_POSITION_ATTR = 'data-xhb-point';
 const CELL_INDEX_ATTR = 'data-xhb-index';
 const HALF_LAYER_ATTR = 'data-xhb-half';
 const GLYPH_CLASS = 'xhb-glyph';
+const TABINDEX_ATTR = 'tabindex';
+// A resting cell is cast by its hardware chord and the overlay takes no pointer,
+// so it is a readout: reachable only while arranging, which is the one act that
+// picks a cell rather than firing it.
+const CELL_TAB_STOP = '0';
+const CELL_NOT_TAB_STOP = '-1';
 const EDIT_CLASS = 'xhb-editing';
 const CARRIED_CLASS = 'xhb-carried';
 // Marks the spellbook row whose action is in hand. The bar shows a gap for an
@@ -65,14 +72,15 @@ const HINT_CLASS = 'xhb-hint';
 /** Mint one cell's inner spans, matching the action bar's element contract so the
  *  shared ActionBarPainter can write it unchanged. */
 function buildCell(cell: CrossHotbarCell): ActionBarSlotElements {
-  const btn = document.createElement('div');
+  // The same element the desktop action bar mints for a slot, so one stylesheet
+  // and one painter serve both, and the painter's aria-label lands on a role that
+  // is allowed to carry it.
+  const btn = document.createElement('button');
+  btn.type = 'button';
   btn.className = `action-btn ${CELL_CLASS}`;
   btn.setAttribute(CELL_POSITION_ATTR, cell.point);
   btn.setAttribute(CELL_INDEX_ATTR, String(cell.index));
-  // Focusable so the d-pad's UI navigation can actually reach the bar: without a
-  // tabindex the cells are invisible to the focus query and a player could look
-  // at the cross hotbar but never select a cell on it.
-  btn.setAttribute('tabindex', '0');
+  btn.setAttribute(TABINDEX_ATTR, CELL_NOT_TAB_STOP);
   const label = document.createElement('span');
   label.className = 'icon-label';
   const countEl = document.createElement('span');
@@ -146,7 +154,7 @@ export class CrossHotbarController {
 
   private constructor(
     root: HTMLElement,
-    writers: PainterHostWriters,
+    private readonly writers: PainterHostWriters,
     iconBg: (k: string) => string,
     private readonly resolve: CrossHotbarResolvers,
   ) {
@@ -252,10 +260,12 @@ export class CrossHotbarController {
     if (!hold) return;
     const labels = hold.buttons;
     for (let i = 0; i < this.glyphs.length; i++) {
-      const next = labels[i] ?? '';
-      if (this.glyphs[i].textContent !== next) this.glyphs[i].textContent = next;
+      this.writers.setText(this.glyphs[i], labels[i] ?? '');
     }
-    const bothTriggers = `${hold.triggers.left} + ${hold.triggers.right}`;
+    const bothTriggers = t('hudChrome.controller.crossHotbarPosition', {
+      trigger: hold.triggers.left,
+      button: hold.triggers.right,
+    });
     for (const [layer, el] of this.triggerLabels) {
       // In the expanded bank the reachable half is opened by BOTH triggers, so it
       // says so: labelling it with one trigger made the bank read as that
@@ -266,7 +276,7 @@ export class CrossHotbarController {
           : layer === 'left'
             ? hold.triggers.left
             : hold.triggers.right;
-      if (el.textContent !== next) el.textContent = next;
+      this.writers.setText(el, next);
     }
     // Advertises the route to the expanded bank: hold one trigger, tap the other.
     // The resting bar carries the way INTO arrange mode; a chord nothing names is
@@ -279,9 +289,7 @@ export class CrossHotbarController {
             button: hold.arrange.button,
           })
         : bothTriggers;
-    if (!this.editing && this.hint.textContent !== this.restingHint) {
-      this.hint.textContent = this.restingHint;
-    }
+    if (!this.editing) this.writers.setText(this.hint, this.restingHint);
   }
 
   /** The player-facing name of a carried action, for the carrying line. */
@@ -301,8 +309,9 @@ export class CrossHotbarController {
     return Number.isInteger(index) ? index : null;
   }
 
-  /** Pin the bar open for arranging and mark the cell being carried, so the player
-   *  can see what they picked up and that the bar is now editable. */
+  /** Pin the bar open for arranging, mark the cell being carried, and open the
+   *  cells to focus for as long as the mode lasts, so the player can see what they
+   *  picked up and reach the cell they want to put it on. */
   setEditing(active: boolean, carriedFrom: number | null, carried: string | null = null): void {
     this.editing = active;
     this.root.classList.toggle(EDIT_CLASS, active);
@@ -313,10 +322,15 @@ export class CrossHotbarController {
       : carried
         ? t('hudChrome.controller.crossHotbarCarrying', { action: this.actionName(carried) })
         : t('hudChrome.controller.crossHotbarEditHint');
-    if (this.hint.textContent !== hint) this.hint.textContent = hint;
+    this.writers.setText(this.hint, hint);
     markCarriedSpellbookRow(carried);
     for (let i = 0; i < this.cellEls.length; i++) {
       this.cellEls[i].classList.toggle(CARRIED_CLASS, active && i === carriedFrom);
+      this.writers.setAttr(
+        this.cellEls[i],
+        TABINDEX_ATTR,
+        active ? CELL_TAB_STOP : CELL_NOT_TAB_STOP,
+      );
     }
   }
 
