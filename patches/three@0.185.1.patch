@@ -1,5 +1,5 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index ad13abf7d128bee607a7672646ca543327e258d3..3033059283d2a59b93d6653688ec613e3b1b9b9d 100644
+index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9e6e3a1f7 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
 @@ -438,7 +438,7 @@ var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\t#ifndef USE_INSTANCING
@@ -188,15 +188,14 @@ index ad13abf7d128bee607a7672646ca543327e258d3..3033059283d2a59b93d6653688ec613e
  					}
  
 -					// if some materials are still not ready, wait a bit and check again
--
--					setTimeout( checkMaterialsReady, 10 );
 +					// if some materials are still not ready, wait a bit and check again.
 +					// The reset keys on CHEAP QUERIES ONLY, deliberately not on progress:
 +					// with ~30 ms queries a poller that finds one ready material per pass
 +					// would reset to 10 ms every time and still own ~75 percent of the
 +					// main thread while draining. Expensive queries back off whether or
 +					// not they progressed; readiness latency is bounded by the cap.
-+
+ 
+-					setTimeout( checkMaterialsReady, 10 );
 +					const passMs = performance.now() - passStart;
 +					pollIntervalMs =
 +						passMs < POLL_PASS_BUDGET_MS
@@ -206,3 +205,16 @@ index ad13abf7d128bee607a7672646ca543327e258d3..3033059283d2a59b93d6653688ec613e
  
  				}
  
+@@ -17876,7 +17975,11 @@ class WebGLRenderer {
+ 
+ 				} else if ( object.isMesh || object.isLine || object.isPoints ) {
+ 
+-					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
++					// World of ClaudeCraft: a count 0 InstancedMesh draws nothing, yet the render
++					// list still reaches setProgram, which LINKS its program for zero pixels.
++					const drawsNothing = object.isInstancedMesh === true && object.count === 0;
++
++					if ( drawsNothing === false && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
+ 
+ 						const geometry = objects.update( object );
+ 						const material = object.material;

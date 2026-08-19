@@ -330,6 +330,84 @@ describe('three degenerate normal guard patch', () => {
   });
 });
 
+describe('three empty instanced draw skip patch', () => {
+  // Fifth patch hunk (WebGLRenderer.projectObject): an InstancedMesh whose
+  // count is 0 draws nothing, yet upstream still pushes it into the render
+  // list, and renderBufferDirect reaches setProgram (acquiring and, when cold,
+  // LINKING the material's program) before renderInstances returns on
+  // primcount 0. Measured in this repo: the props far bakes sit at count 0 in
+  // near mode (shadow-only casters, restored to count 1 by the app's
+  // onBeforeShadow hook) and paid 2.3 s of cold color-program links for zero
+  // pixels in the first seconds after the loading curtain on an Intel iGPU
+  // (bench batch 17). The SHADOW pass is unaffected by design: WebGLShadowMap
+  // traverses the scene itself rather than the render list, and onBeforeShadow
+  // has restored count 1 by the time it draws. Known limit: a count 0
+  // InstancedMesh no longer receives onBeforeRender or onAfterRender from the
+  // color pass.
+  const source = readFileSync(
+    new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    'utf8',
+  );
+  const stock =
+    '\n\t\t\t\t\tif ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {';
+
+  it('keeps the count 0 skip applied inside projectObject', () => {
+    expect(
+      source.includes(
+        'const drawsNothing = object.isInstancedMesh === true && object.count === 0;',
+      ),
+      'the empty-instanced skip is not applied; re-run pnpm install',
+    ).toBe(true);
+    // The flag alone proves nothing: the assertion is that it GATES the push,
+    // as the first condition of the mesh branch's frustum test, so a count 0
+    // instanced mesh never reaches the render list even while on screen.
+    expect(
+      source.includes(
+        'if ( drawsNothing === false && ( ! object.frustumCulled || ' +
+          '_frustum.intersectsObject( object ) ) ) {',
+      ),
+      'the count 0 flag no longer gates the render-list push; re-run pnpm install',
+    ).toBe(true);
+  });
+
+  it('leaves no ungated mesh-branch frustum test behind', () => {
+    // The patch REPLACES the mesh-branch test, it does not add a second one:
+    // the ungated spelling must be gone, or a build still pushes count 0
+    // instanced meshes. Positive control: the deliberately unpatched sibling
+    // bundle carries the spelling exactly once and carries no skip of its own,
+    // so the GONE pin is proven matchable rather than vacuously absent.
+    expect(
+      source.includes(stock),
+      'the ungated mesh-branch frustum test is back; the count 0 skip no longer replaces it',
+    ).toBe(false);
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    expect(
+      unpatchedSibling.split(stock).length - 1,
+      'the unpatched three.cjs control no longer matches the ungated needle; the GONE pin may be vacuous',
+    ).toBe(1);
+    expect(
+      unpatchedSibling.includes('object.isInstancedMesh === true && object.count === 0'),
+      'the unpatched three.cjs control already carries the skip; the pins above prove nothing',
+    ).toBe(false);
+  });
+
+  it('records the hunk in the checked-in patch file', () => {
+    // node_modules is reinstalled from patches/three@0.185.1.patch, so the
+    // shipped artifact carries the hunk too, as an ADDED line rather than
+    // anywhere in its context.
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
+    expect(
+      patch.includes(
+        '+\t\t\t\t\tconst drawsNothing = object.isInstancedMesh === true && object.count === 0;',
+      ),
+      'the empty-instanced skip is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+  });
+});
+
 // The scan half of the scope note above, so the note is enforced rather than
 // trusted: the day a module consumes build/three.cjs (via a bare CommonJS
 // require), names any unpatched bundle (three.module.min.js and the r185

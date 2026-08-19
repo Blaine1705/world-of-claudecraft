@@ -2732,8 +2732,11 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
       geo.computeBoundingBox();
       geo.computeBoundingSphere();
       // Single-instance so the count gate below can skip the color pass
-      // per frame without touching visibility (three's instanced draw path
-      // is a free no-op at count 0).
+      // per frame without touching visibility. Free ONLY because the repo's
+      // three patch keeps a count 0 InstancedMesh out of the render list:
+      // upstream still reached setProgram and linked the bake's colour
+      // program for zero pixels (2.3 s of cold links right after the curtain
+      // on the iGPU, bench batch 17; patches/three@0.185.1.patch).
       const mesh = new THREE.InstancedMesh(geo, bucket.material, 1);
       mesh.name = `far-bake:${cellKey}`;
       mesh.setMatrixAt(0, new THREE.Matrix4());

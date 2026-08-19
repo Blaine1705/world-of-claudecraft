@@ -266,6 +266,19 @@ counts parked programs too, so it no longer falls when content unloads and a uni
 re-acquires a parked program reports zero links (the link-exact cross-check is the capture
 kit's `linkProgram` intercept).
 
+The same file carries one more hunk outside `compileAsync`, in
+`WebGLRenderer.projectObject`, pinned by the same guard test: an `InstancedMesh` whose
+`count` is 0 is not pushed into the render list. There is nothing to draw, but upstream
+still reaches `renderBufferDirect`, which calls `setProgram` (acquiring and, when cold,
+linking the material's program) before `renderInstances` returns on `primcount === 0`.
+The props far bakes spend near mode at count 0 (shadow-only casters, restored to count 1
+by their `onBeforeShadow` hook) and paid 2.3 s of cold color-pass program links for zero
+pixels in the first seconds after the loading curtain on an Intel iGPU. The shadow pass
+is unaffected by design: `WebGLShadowMap` traverses the scene itself rather than the
+render list, and `onBeforeShadow` has restored count 1 by the time it draws. Known limit,
+by construction: a count 0 `InstancedMesh` no longer receives `onBeforeRender` or
+`onAfterRender` from the color pass.
+
 ## Freeze rule
 
 After engineering signoff, `scripts/perf_hitch.mjs`, its files under `scripts/lib/`,

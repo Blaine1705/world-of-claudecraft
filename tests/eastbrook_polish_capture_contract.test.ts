@@ -254,8 +254,12 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of upstream/main into the GPU-preparation
 // scheduler branch: both parents' renderer and prewarm bytes combine in one
 // tree, so the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the second three patch-hash bump in pnpm-lock.yaml (the count 0
+// instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
+// fingerprint, so the seals follow the swept evidence bytes. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '526059ee582e2792f56f924991ad20bafbd59faeec6c58fd60b33c33037202a9';
+  'e31093df2c44e1ecefc02a96763f263dbda0619136feb519441431ccf1883a5f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
