@@ -36,10 +36,10 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 15 | ui-polish | game | DONE (impl) | 01faddadf8 | release/v0.39.0 re-synced FIRST (merge 3a98604c83, release tip b650d9d7d2, 150 commits, NON-trivial: four conflicts, release-merge-audit run and its findings applied, see the section below); the DESIGN.md conformance audit written first (docs/woc-marketplace-hardening/phase-15-design-audit.md: seven read-only lanes, 215 findings, every row APPLIED, DEFERRED with an owner, or JUDGED with a reason) and then worked top to bottom; presentation only, zero view-core diffs; five commits (a4fcac14d8 + 01faddadf8 from the merge audit, then 92da32bbb1 style, e6c054232d test, be35080962 scripts, plus the docs and capture commits below); highest-value catches: var(--accent) was declared NOWHERE so seven marketplace declarations shipped resolving to inherit/currentColor, the mobile bags sheet covered the whole trade window on touch (the arm unreachable), neither money sheet cleared the safe-area insets, the trade arm's spinner was an inline box that never spun inside the pressed Pay button, the browse table re-flowed every column on each per-second countdown rebuild, the toast strip shifted the control under the pointer, the sell form's money inputs and the arm's price field missed the touch floor, the seller never saw a resolved fee (the note named a percentage the SERVICE owns), the bond note resolved the wrong bid's bond, the paused and suspended lines named a cause they cannot know and actions they do not cover, and the Exchange window had no behavioral test at all; new guards: the css var() resolution ratchet (the --accent class cannot recur), the copy-to-constants pins, the shared token spelling, the widened ticker grep-proof, and tests/woc_market_window_rig.test.ts (the first live rig for WocMarketWindow, 21 cases); LOCAL, not pushed per R4 (15-qa pushes on PASS) |
 | 15 QA | phase-15-qa | game | DONE | 4cb60d0d3c | PASS-WITH-FOLLOWUPS, Fernando's sign-off BEAUTIFUL WITH NOTES, notes shipped, PUSHED per R4 (see the 15 QA round section) |
 | 16 | hot-path-scale | game | DONE incl QA | 94d53a243a | H11 closed: six GETs metered, four read surfaces cached with busts on every outcome, /me sequenced with a deadline, price cache single-flight with a short failure memo and bounded SWR, sweep locks per segment with the budgeted bond walk and the overrun watchdog; QA verdict PASS-WITH-FOLLOWUPS (the 16 QA round section is the registry 17 consumes), PUSHED per R4 |
-| 16 QA | phase-16-qa | game | NOT STARTED | | |
-| 17 | db-retention-indexes | game | NOT STARTED | | |
-| 17 QA | phase-17-qa | game | NOT STARTED | | |
-| 18 | dashboard-guardrails | dashboard | NOT STARTED | | |
+| 16 QA | phase-16-qa | game | DONE (QA PASS) | e3bd74c52a | PASS-WITH-FOLLOWUPS, five fix commits, pushed per R4; the 16 QA round section below is the registry (this table row was trued up late by the 18 session; the section was always current) |
+| 17 | db-retention-indexes | game | DONE | 0d1c5729a1 | all four deliverables landed, gate PASS; the 17 implement round section below is the registry (row trued up late by the 18 session) |
+| 17 QA | phase-17-qa | game | DONE (QA PASS) | e3ab5f6f21 | PASS-WITH-FOLLOWUPS, never-sweep verdict SOUND, pushed per R4 (origin tip e3ab5f6f21); the 17 QA round section below is the registry (row trued up late by the 18 session) |
+| 18 | dashboard-guardrails | dashboard | DONE (impl) | c001d4a | DASHBOARD repo; H1 role gate, 6-decimal mint source, WMB_-only release, reference-tail forfeit confirmation, destination reset, immutable-id audit actor, independent summary reads; session start c001d4a (= PR #13 tip), origin/master sync NO-OP; three coverage lenses (0 blocking) + TWO fresh fix-round reviewers (both READY), every finding applied or judged; final tip e82303e, npm test 164 / check 0 / build 0; LOCAL, not pushed per R4 (18 QA pushes on PASS); the 18 implement round section below is the registry |
 | 18 QA | phase-18-qa | dashboard | NOT STARTED | | |
 | 19 | dashboard-tooling | dashboard | NOT STARTED | | |
 | 19 QA | phase-19-qa | dashboard | NOT STARTED | | |
@@ -4086,3 +4086,234 @@ NEXT = docs/woc-marketplace-hardening/phase-18-dashboard-guardrails.md,
 DASHBOARD repo, worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13,
 branch integration/woc-market-trading, FRESH session, own origin/master
 sync first.
+
+## 18 implement round (dashboard guardrails)
+
+DASHBOARD repo, worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13,
+branch integration/woc-market-trading. Session start c001d4a, which equals
+BOTH the recorded PR #13 tip and origin/feature/woc-market-trading-controls,
+so the 2026-08-11 review premises were written against exactly this tree;
+the origin/master sync was a NO-OP (3654e92 already an ancestor). Baseline
+validated green before any change: npm test 131, npm run check exit 0,
+npm run build exit 0. LOCAL per R4: NOTHING pushed in either repo; the 18
+QA session pushes on PASS.
+
+PREMISES RE-VERIFIED FIRST (all four finding clusters still live at
+c001d4a; review.md line numbers are stale because 80e8988 split the
+Trading React into MarketTradingPanel/MarketListViews plus view-cores,
+but every defect survived the split):
+- H1: the game proxy checked only locals.user, with a comment claiming
+  there was nothing to narrow; the page-level tab gate
+  (canManageMarketSettlement) never covered a direct /api/game request.
+  Payload precision for the record: the two game reads carry seller and
+  buyer names, item ids, prices, statuses and tx signatures, NOT raw
+  wallet addresses (review.md's "wallet addresses" wording belongs to the
+  service overview, which was already internal-gated); the internal-only
+  classification stands on the trading-history content.
+- H2: WOC_DECIMALS = 9 in market_trading_view.ts vs the live mint's 6;
+  the Claudium panel already preferred service-reported wocDecimals with
+  literal 6 fallbacks; TreasuryBuyAndBurnPanel's 1_000_000_000n sites are
+  SOL lamports (9 is correct there; allowlisted in the sweep).
+- Release regex accepted WM[BS]_; forfeit fired on one unconfirmed click;
+  releaseTo survived a successful forfeit; the economy proxy sent the
+  bare username as x-woc-economy-admin-actor (the service records it
+  verbatim, 200-code-point intake bound); load() was one Promise.all
+  whose failure nulled overview, and the overview-null early return
+  unmounted the whole panel INCLUDING the subtab bar, killing the
+  game-backed views with it.
+
+DELIVERABLES, each closed with tests that fail on the old behavior (red
+runs observed before each fix):
+1. H1 role gate: canReadGameMarketData in src/auth/policy.ts (internal
+   tier); the game proxy refuses before any secret use or upstream call.
+   Tests: external 403 on EVERY allowed path (matrix iterates
+   allowedGamePaths() so it self-extends) with the upstream counter
+   pinned to zero; internal (non-owner) 200 on every path with the
+   counter pinned to the path count; signed-out 403; policy pins. Bypass
+   hunt: the only GAME_SERVICE_URL / dashboard-secret reach in src/ is
+   the gated proxy.
+2. H2 decimals: src/components/woc_mint.ts exports WOC_MINT_DECIMALS = 6,
+   the one declaration; market_trading_view.ts consumes it (WOC_DECIMALS
+   deleted); the four ClaudiumPurchasesPanel fallbacks unified to the
+   constant, which also covers the SUBMIT direction (decimalToBaseUnits
+   on the withdraw path shares the source; the trading panel itself
+   never submits an amount). Tests: rendered-figure proofs (9000000000
+   base = 9,000 $WOC), the 6-pin, and a source scan over src/ with an
+   exact-path SOL allowlist, per-arm positive AND negative pattern
+   probes, a file-count floor, and an allowlisted-file liveness control.
+3. Operation safety: WMB_-only regex whose error names the WMS_ mistake;
+   market_release_form.ts (pure reducer + validateReleaseSubmit): a
+   forfeit requires typing the last 8 characters of the SPECIFIC
+   reference (forfeitConfirmTarget; the 18 QA file's binding probe,
+   adopted at implement time), submit-succeeded resets the whole form
+   destination included, set-to AND set-reference clear the typed
+   consent, failure keeps the form for retry; the economy proxy sends
+   auditActor(user) = "id (username)" (src/auth/audit_actor.ts), id
+   first, and panels render the username half via auditActorDisplay with
+   the full composite on hover. Tests: WMS refusal, generic-word
+   refusal, the stale-consent cross-reference case (tail of bond A
+   refused when the field holds bond B), destination reset against the
+   exact stale-treasury hazard, recycled-username distinguishability,
+   rename-survival of the id key, intake-bound fit, proxy header pins on
+   the composite, display extraction incl. legacy bare-username rows.
+4. Overview resilience: market_summary_load.ts (Promise.allSettled, one
+   error slot per read, data nulled on that read's failure, malformed
+   200 payloads routed to the section error); the panel renders the
+   subtab bar unconditionally, each summary section renders data or its
+   own error, the release control works without the overview, and a
+   monotonic load sequence stops a stale in-flight read from
+   overwriting a newer filter's state. Tests: per-read failure matrix
+   with sibling DATA survival pinned, all-fail never throws, non-Error
+   reasons readable, statusFilter encoded, malformed-payload arm.
+
+REVIEW ROUND: three read-only coverage lenses (security, correctness,
+test-decisiveness) as one workflow over c001d4a..c075f78: ZERO blocking;
+6 should-fix, 7 nits, 9 notes; every finding applied or judged with the
+file open. APPLIED (commits bfab70d code, b4c4f71 docs): the CLAUDE.md
+allowlist overclaim scoped (the payout proxy is a prefix rule with a
+deny-list external policy, now named as the known exception); the
+set-reference consent clear (premise superseded by the tail binding but
+applied for a uniform consent model); the scan pattern widened to the
+literal family (grouped/bare 10^9 AND 10^6, 1e9/1E9/1e+9/1e6,
+10**literal, 10n**BigInt(literal), Math.pow(10, literal)) with per-arm
+probes and separator-safe paths; README trued (external role does NOT
+include discounts, Trading tab entry added, GAME_SERVICE_URL +
+DASHBOARD_INTERNAL_SECRET documented); env save/restore in the proxy
+tests plus the internal-arm upstream counter; operator number formatting
+pinned to en-US (OPERATOR_LOCALE) in the market view core and the
+panel's inline call, making the exact-string decimal pins locale-stable
+(chosen over softening the tests: operator copy is consistent English);
+the stale-filter load race fixed with the monotonic loadSeq ref; stale
+success notices cleared at submit start; auditActorDisplay for the
+audit cell and pause banner; .wm-over-balance gained a real style rule
+with the loading/error class split; the exactness comment reworded
+(nearest representable, not exact, past 2^53); the 64-char username
+premise corrected to the real 32 bound; sibling-data asserts added
+(cross-contamination mutant killed); Array.isArray guards on fulfilled
+payloads with their test.
+
+JUDGED this round (binding unless 18 QA overrules):
+- tes-2 (should-fix): "subtab bar survives an early return" has no
+  failing test. DEFERRED to 19 with reasoning: tests cannot import .tsx
+  under --experimental-strip-types (no JSX transform), so a decisive pin
+  needs a component-render harness (a build step or dev dependency),
+  which is 19's scope (CI + tests); a source-text pin on JSX topology
+  would be brittle and gameable. The state layer IS pinned (loader
+  isolation); the JSX topology was hand-verified and lens-verified.
+- 404/405 decided before the role check + the GAME_SERVICE_URL localhost
+  default: kept; matches the sibling proxies, the middleware 401s
+  anonymous callers before the handler in production, and the allowlist
+  is source-public.
+- Error-replaces-data on a transient refresh failure: conforming and
+  deliberate (anti-mixed-epoch; the module comment carries the
+  rationale). If operators complain, the fix is an explicit
+  stale-as-of presentation, never silent retention.
+- Halt control unavailable during an overview outage: a decision, not an
+  accident (a blind pause toggle without knowing the current state is
+  its own hazard; a state-independent halt needs a service surface).
+- claudium_format.formatUsd and the Claudium panels keep ambient-locale
+  formatting: pre-existing class outside this diff's surface; recorded
+  for 19.
+
+VERIFIED cross-repo (files open, read-only):
+- The service fails closed on a WMS_ reference at release: admin
+  forceRelease resolves the reference through the BOND store
+  (refundBond/forfeitBond), a non-bond ref refuses, and the ATTEMPT is
+  audited either way. The dashboard ceremony is fat-finger protection,
+  not the gate.
+- The service's actor intake bounds at 200 code points; usernames are
+  constrained to ^[a-z0-9][a-z0-9._-]{2,31}$ so the composite cannot
+  carry CR/LF or parens (non-spoofable shape); worst real composite is
+  about 71 code points.
+
+LEDGER ITEMS with owners:
+- 19: payout proxy allowlist upgrade (prefix + deny-list is the known
+  exception; bring it to the game/economy allowlist shape) and the
+  component-render test harness (tes-2). Payout mutations besides
+  void/restore forward no actor identity; extend id-first forwarding
+  when the payout service grows audit rows. Ambient-locale formatUsd
+  class.
+- 19/22: ask the economy service to report wocDecimals on the market
+  admin payloads and prefer it in the Trading tab (constant-only until
+  then, divergence window documented in woc_mint.ts).
+
+FRESH FIX-ROUND REVIEWS (two agent rounds, then a documented self-review
+of the final small round):
+- Round-1 fixes (c075f78/bfab70d/b4c4f71) got a FRESH reviewer: READY,
+  0 blocking, 4 should-fix, 4 nits, 6 notes; ALL applied in c88084f:
+  the loader now survives a literal-null 200 body (optional-chained
+  value access; the old shape rejected the WHOLE load as an unhandled
+  rejection and froze the tab); the overview arm gained the same
+  malformed-200 screen the row arms had; the supersession guard moved
+  OUT of the untestable panel into the tested createSummaryLoader
+  factory (deterministic race test: gates installed synchronously,
+  superseded call resolves null); formatUsd pinned to en-US (its pins
+  were already en-shaped, now locale-stable); the Discounts and
+  Claudium audit tables render the composite actor's human half with
+  the id on hover (collateral of the proxy change on THEIR rows); the
+  action-error line outranks hints (.wm-over-balance) and top-level
+  trading hints got a muted scoped rule; the scan pattern gained
+  [d_] digit-run boundaries (21_000_000_000 no longer submatches) with
+  new negative probes and a sorted, order-insensitive allowlist
+  compare; README denial list gained buy-and-burn + dismissal
+  management and the Summary-subtab env note; CLAUDE.md's typed-
+  confirmation sentence scoped to the forfeit direction. Verified-sound
+  notes from that round: the forfeit binding has no bypass, the display
+  parser cannot misparse real usernames (charset-constrained), env
+  hygiene complete.
+- Round-2 fixes (c88084f) got a SECOND fresh reviewer: READY, 0
+  blocking, 2 should-fix, 2 nits; ALL applied in e82303e: the shape
+  screen pins price.tokensPerUsd as null-or-number (a MISSING key
+  slipped the panel's null-equality guard and threw in render) and
+  screens venue elements (null or usdPerToken-less venues crashed the
+  venue table); row arrays screened per element (a null row = that
+  section's malformed error); the loader ref is lazy-initialized
+  (useMemo could legally remint the supersession counter); submit
+  handlers refresh through a latest-load ref (a filter change mid-POST
+  is no longer rolled back by the old closure; the reviewer traced this
+  as pre-existing, fixed anyway); the treasury recovery message renders
+  the actor's human half; the CSS comment states the selector's real
+  reach.
+- Round-3 fixes (e82303e) were SELF-REVIEWED with files open (narrow,
+  decisive-by-construction tests; verified no valid service payload can
+  be refused by the screen since every screened member is required by
+  the MarketOverview interface, the ref lazy-init is the sanctioned
+  React pattern, and the cleaned dep arrays hold). The 18 QA session
+  re-reviews the full range fresh regardless.
+
+JUDGED from the fresh rounds (binding unless 18 QA overrules):
+- Mixed-grouping scale spellings (1_000000000) escape the tightened
+  digit-run boundaries: accepted heuristic cost of exempting large
+  literals; the pattern is declaredly literal-spelling coverage and the
+  named-constant arm was always out of grep's reach.
+- README's "automatic-payout changes" wording covering the
+  daily-rewards toggle: pre-existing prose, untouched.
+- App.tsx's duplicate ambient-locale USD formatter and the discount
+  percent formatters: folded into 19's ambient-locale item.
+
+CLAUDE.md: the dashboard repo had NONE; created top-level (pure
+view-cores under thin panels, proxy-owned authorization with the payout
+exception named, immutable-id attribution, the single mint exponent,
+independent section failure, constant-time compares with password.ts as
+the pattern, the test bar). Every claim verified against the code after
+the review round's truth-up.
+
+Commits (dashboard repo, session range c001d4a..e82303e, TEN):
+5258a10 role gate, c0b391b decimals + release safety cores, 8807819
+audit attribution, 2dbad3c independent summary reads + panel rewire,
+2d63027 CLAUDE.md, c075f78 reference-bound forfeit confirmation,
+bfab70d review fix round, b4c4f71 docs truth-ups, c88084f second fix
+round from the fresh reviewer, e82303e render-path leaf screening from
+the second fresh reviewer.
+
+Validation on the final tree e82303e: npm test 164 pass, 0 fail
+(baseline was 131); npm run check exit 0 (astro check 0 errors + tsc;
+one PRE-EXISTING hint, the deprecated React.FormEvent in App.tsx,
+untouched); npm run build exit 0. Diff swept after every round: zero
+em/en dashes, zero emojis, no "phase" in commit text.
+
+NEXT = docs/woc-marketplace-hardening/phase-18-qa.md, DASHBOARD repo,
+worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13, branch
+integration/woc-market-trading, FRESH session, own origin/master sync
+first; it diffs c001d4a..e82303e and pushes on PASS to
+origin/feature/woc-market-trading-controls (updates PR #13).

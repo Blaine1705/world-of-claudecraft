@@ -5,6 +5,36 @@ actually reads.
 
 ## Where we are
 
+- 18 IMPLEMENT COMPLETE (2026-08-19, DASHBOARD repo, LOCAL per R4: nothing
+  pushed in either repo; the 18 QA session pushes on PASS to
+  origin/feature/woc-market-trading-controls, updating PR #13). Session
+  start c001d4a (= the PR #13 tip AND the remote branch tip, so the
+  2026-08-11 premises were re-verified against exactly the reviewed tree;
+  origin/master sync a NO-OP). All four deliverables closed with
+  red-first tests: H1 (canReadGameMarketData gates the game proxy before
+  secret use, external-role matrix over every proxied path with a
+  zero-upstream pin), H2 (WOC_MINT_DECIMALS = 6 in woc_mint.ts, the one
+  source; Claudium fallbacks unified; scan guard with per-arm probes and
+  a SOL lamports allowlist), operation safety (WMB_-only release,
+  forfeit confirmation typed as the SPECIFIC reference's last 8 chars,
+  the 18 QA binding probe adopted early; whole-form reset on success;
+  auditActor "id (username)" composite with auditActorDisplay rendering
+  the human half), and overview resilience (market_summary_load
+  allSettled per-read isolation, subtabs unconditional, monotonic load
+  sequence, malformed-200 guards). Review: three coverage lenses, ZERO
+  blocking, ~22 findings all applied or judged, then TWO fresh fix-round
+  reviewers (both READY; their findings, incl. the literal-null 200
+  body, the tokensPerUsd/venue-element render-path leaves, and the
+  tested createSummaryLoader supersession factory, all applied); en-US
+  operator number formatting (OPERATOR_LOCALE, formatUsd included)
+  chosen over locale-dependent pins. Dashboard repo gained its first
+  CLAUDE.md; README trued (external role, Trading tab, env vars).
+  Validation final tree e82303e (session range c001d4a..e82303e, ten
+  commits): npm test 164/164, check 0, build 0. The 18 implement round
+  section in progress.md is the registry the 18 QA consumes (JUDGED and
+  LEDGER-ITEM lists binding; 19 owns the payout-proxy allowlist upgrade,
+  the component-render harness, payout actor forwarding, and the
+  ambient-locale class now scoped to App.tsx/discount formatters).
 - 17 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied
   or judged with the file open, PUSHED per R4). Release sync a NO-OP (0
   behind origin/release/v0.40.0 e56707a675, the newest release branch).
@@ -102,10 +132,10 @@ actually reads.
   life); the account-keyed bust design must handle revokeCompanionToken's
   prefix-keyed delete; recon detail in the 17 implement entry of
   progress.md.
-- Next file to run: `docs/woc-marketplace-hardening/phase-18-dashboard-guardrails.md`
+- Next file to run: `docs/woc-marketplace-hardening/phase-18-qa.md`
   (DASHBOARD repo, worktree `/Users/fernando/Documents/woc-rewards-dashboard-pr13`,
   branch `integration/woc-market-trading`, FRESH session, own
-  origin/master sync first).
+  origin/master sync first; it diffs from c001d4a and pushes on PASS).
 - 16 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied or
   judged with the file open, PUSHED per R4). Release sync a NO-OP (0 behind
   origin/release/v0.40.0 e56707a675). Eight workflow lanes + three typed
