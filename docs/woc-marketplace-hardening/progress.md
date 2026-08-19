@@ -3846,7 +3846,12 @@ the NaN batchSize pass-through is the pre-existing house shape).
 Commits: 3a3c13ce27 (feat: retention, indexes, lock bounds, cascade
 fold, pool gauge), e2eceb2438 (test: retention/deadline/plan-class
 coverage), 0fb0359113 (fix: the review round), 32cecb3de4 (test: the
-fresh-review fixes), plus the docs commits.
+fresh-review fixes), 7f3b1ab05a (docs + the qa should-fix),
+168b50966a (test: the duration-ratchet fit; the first gate run's ONE
+red was the new plan suite declaring 720s of summed 60s allowances
+against the 300s default for two-second cases; the 20s house standard
+fits under the ratchet, which counts only allowances above 20s), plus
+the wrap commit.
 LOCAL per R4: nothing pushed; the 17 QA session pushes on PASS.
 
 Validation: tsc clean; ci:changed exit 0; the full DB-free market and
@@ -3856,9 +3861,13 @@ ALL SIX pg suites green against dev Postgres with TEST_DATABASE_URL
 zero skips proven by count); qa-checklist additionally re-ran tsc,
 biome, the malware scan, and every pg suite itself and EXPLAINed the
 prune independently. The gate (node scripts/gate_select.mjs with
-TEST_DATABASE_URL only, committed tree) runs at session close; its
-result is recorded in the wrap commit line below.
-Gate: [recorded in the wrap commit]
+TEST_DATABASE_URL only, committed tree) then ran twice at session
+close: the first run FAILED on exactly the suite-duration ratchet
+(fixed in 168b50966a, above), and the rerun on the final tree PASSED:
+all 12 steps green, full-suite fallback (2,925 files passed + the
+env-gated skip, 41,627 tests + 2 expected fails + 26 known default
+skips), browser suite 20 files / 131 tests, tsc, all builds, malware
+scan.
 
 NEXT = docs/woc-marketplace-hardening/phase-17-qa.md, GAME repo,
 worktree wocc-marketplace, FRESH session, newest origin/release/** sync
