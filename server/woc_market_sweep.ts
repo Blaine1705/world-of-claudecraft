@@ -16,10 +16,12 @@
 // - an UNLOCKED segment (the read-only confirm polls) holds NO client and NO
 //   advisory lock ACROSS its chain round trips; the individual guarded
 //   writes it lands still check out their own clients for their own bounded
-//   transactions, and every one is a single-winner CAS transition (see
-//   sweepSegments' contract), so a concurrent peer costs duplicate confirm
-//   round trips for the deploy-overlap window (an accepted, bounded cost),
-//   never duplicate effects; money-moving chain arms stay locked;
+//   transactions, and every STATE write is a single-winner CAS transition
+//   (see sweepSegments' contract; the park-rotation timestamp touches are
+//   idempotent bookkeeping a racing peer merely repeats), so a concurrent
+//   peer costs duplicate confirm round trips for the deploy-overlap window
+//   (an accepted, bounded cost), never duplicate effects; money-moving
+//   chain arms stay locked;
 // - a LOST try-lock aborts the rest of the pass (the peer holding the lock
 //   IS this realm's sweep, exactly the old whole-pass semantic, now judged
 //   at each locked segment);
@@ -33,6 +35,13 @@
 // "WOC\x01" (0x57_4f_43_01), retention_sweep.ts holds "WOC\x02"
 // (0x57_4f_43_02); this key is "WOC\x03" in the int4 space of the two-arg
 // lock family, so the three can never collide.
+//
+// Pool floor: a locked segment holds ONE client for the lock while each arm
+// checks out its own for its guarded transactions, so the segmented shape
+// needs at least two pool clients; at DB_POOL_MAX_CLIENTS=1 every locked
+// segment self-starves (each arm's checkout waits out its 5s deadline and
+// refuses TxNeverStarted, scored 0 by per-arm isolation) while the process
+// otherwise looks healthy apart from the sweep-error log.
 //
 // Unlike the nightly retention sweep this polls every few seconds: auction
 // ends and settlement windows are minute-scale deadlines, and every arm it
@@ -120,10 +129,15 @@ export function createWocMarketSweep(deps: WocMarketSweepDeps): WocMarketSweep {
         await run();
       } finally {
         try {
-          await client.query('SELECT pg_advisory_unlock($1, hashtext($2))', [
+          const unlocked = await client.query('SELECT pg_advisory_unlock($1, hashtext($2)) AS ok', [
             WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
             deps.realm,
           ]);
+          // A false answer means this session did not hold the lock it just
+          // ran under: the session's lock state is not what this code
+          // believes, so the client is destroyed like the thrown arm (the
+          // conservative reading of the poisoned-lock rule).
+          if (unlocked.rows[0]?.ok !== true) destroyClient = true;
         } catch {
           destroyClient = true;
         }

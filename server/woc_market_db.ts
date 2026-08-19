@@ -799,6 +799,18 @@ export const ESCROW_LOCK_TIMEOUT_MS = 2_000;
  *  older guards rides the hot-path work. */
 export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
 
+/** The idle bound for the TWO save-bearing transactions (escrowInsertListing,
+ *  saveDeliveredCharacterBooked): both run saveCharacterStateOnClient inside
+ *  the transaction, whose sanitize + serialize of a production-sized
+ *  character blob is CPU work Postgres observes as idle-in-transaction, and
+ *  a GC pause or heavy tick on the shared four-core box lands in exactly
+ *  that window. At the 2s guard bound a false fire loses the delivery grant
+ *  for the pass (or refuses a legitimate escrow), which contradicts the
+ *  delivered-save's own wait-out-slowness allowance; 10s keeps the camping
+ *  bounded while making a stall-driven false fire implausible (a 10s
+ *  event-loop stall has bigger problems than this transaction). */
+export const SAVE_IDLE_TX_TIMEOUT_MS = 10_000;
+
 /** Per-statement allowance for the escrow listing transaction, WORKLOAD
  *  scoped (exported for the tunables-ladder pin). It sits between the lock
  *  wait ceiling and the session default: the transaction now runs inside the
@@ -1061,6 +1073,34 @@ export class TxNeverStarted extends Error {
  *  'contended' retry refusal; without the mapping they 500 as internal.error,
  *  which contradicts the lock_timeout rationale comments and logs contention
  *  as a server fault. */
+/** insertPendingBid's answer, named so the contended tail-catch and the
+ *  withTx generic share one contextual type (an inline union loses the
+ *  narrowing once .catch joins the chain). */
+type InsertPendingBidResult =
+  | { ok: true; bid: WocBidRow }
+  | {
+      ok: false;
+      reason:
+        | 'not_found'
+        | 'not_active'
+        | 'cancel_pending'
+        | 'own_listing'
+        | 'bid_too_low'
+        | 'already_pending'
+        | 'contended';
+    };
+
+/** Process-lifetime count of guard transactions the idle bound killed
+ *  (25P03). Each kill also destroys its pooled client, so a stall storm
+ *  evicts several of the ten at once; this counter makes the retrofit's
+ *  false-fire rate a NUMBER on the internal stuck readout instead of log
+ *  volume an operator has to grep for. */
+let idleTxKills = 0;
+
+export function wocMarketIdleTxKillCount(): number {
+  return idleTxKills;
+}
+
 function isLockContention(err: unknown): boolean {
   const code = (err as { code?: string }).code;
   // 25P03: the guard transaction sat idle past its in-transaction timeout
@@ -1160,6 +1200,7 @@ export class PgWocMarketDb implements WocMarketDb {
       // indistinguishable from ordinary lock waits; the distinct line is what
       // makes the retrofit's false-fire rate observable in production.
       if (code(chosen) === '25P03') {
+        idleTxKills++;
         console.warn('[woc_market] guard transaction idle-killed (25P03); pooled client destroyed');
       }
       // A failure with NO SQLSTATE means no server verdict reached us, so the
@@ -1216,8 +1257,12 @@ export class PgWocMarketDb implements WocMarketDb {
         // milliseconds is an incident to surface, not contention to retry).
         await client.query(`SET LOCAL statement_timeout = ${ESCROW_STATEMENT_TIMEOUT_MS}`);
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // The WIDER save-site idle bound, not the 2s guard bound: the
+        // character serialize below runs between statements, where Postgres
+        // sees this session as idle-in-transaction (rationale at the
+        // constant).
         await client.query(
-          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+          `SET LOCAL idle_in_transaction_session_timeout = ${SAVE_IDLE_TX_TIMEOUT_MS}`,
         );
         // Lock ORDER is accounts-then-characters, matching every established
         // capped-insert path (db.ts createCharacterCapped, maps_db, user_assets_db),
@@ -2426,12 +2471,13 @@ export class PgWocMarketDb implements WocMarketDb {
       // A 55P03 here surfaces as the transient-throw arm and retries.
       await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
       await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
-      // The connection-camping bound (the 04-round guards' rule, retrofitted
-      // here with the hot-path work): a client idle IN this transaction past
-      // the bound is killed as 25P03, which withTx maps to the typed
-      // 'contended' like every sibling guard.
+      // The WIDER save-site idle bound, not the 2s guard bound: the character
+      // serialize below is CPU work Postgres observes as idle-in-transaction,
+      // and a 2s false fire here loses the grant for the pass, which the
+      // heavy statement allowance above exists to avoid (rationale at the
+      // constant). 25P03 still maps to the typed 'contended'.
       await client.query(
-        `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+        `SET LOCAL idle_in_transaction_session_timeout = ${SAVE_IDLE_TX_TIMEOUT_MS}`,
       );
       const saved = await saveCharacterStateOnClient(
         client,
@@ -3069,22 +3115,13 @@ export class PgWocMarketDb implements WocMarketDb {
     bondCents: number;
     nowMs: number;
     minNext: (row: WocListingRow) => number;
-  }): Promise<
-    | { ok: true; bid: WocBidRow }
-    | {
-        ok: false;
-        reason:
-          | 'not_found'
-          | 'not_active'
-          | 'cancel_pending'
-          | 'own_listing'
-          | 'bid_too_low'
-          | 'already_pending';
-      }
-  > {
-    return this.withTx(async (client) => {
+  }): Promise<InsertPendingBidResult> {
+    return this.withTx<InsertPendingBidResult>(async (client) => {
       // The connection-camping bound (the 04-round guards' rule, retrofitted
-      // here with the hot-path work); 25P03 maps to the typed 'contended'.
+      // here with the hot-path work); the catch on the tail maps 25P03 to
+      // the typed 'contended' (the activateBid shape): without it the idle
+      // kill was a NEW raw 500 on a player's bid, since this site sets no
+      // lock_timeout and 25P03 is the first contention code it can produce.
       await client.query(
         `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
       );
@@ -3160,6 +3197,12 @@ export class PgWocMarketDb implements WocMarketDb {
       // signature is recorded), which keeps the in-flight-confirmation
       // protection while pricing the grief at a real broadcast payment.
       return { ok: true as const, bid: toBid(inserted.rows[0]) };
+    }).catch((err): InsertPendingBidResult => {
+      // The idle kill (25P03) and any future contention code answer the
+      // typed refusal instead of a raw 500 on the player's bid; the
+      // activateBid wrapper is the shape precedent.
+      if (isLockContention(err)) return { ok: false, reason: 'contended' };
+      throw err;
     });
   }
 

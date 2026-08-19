@@ -46,8 +46,8 @@ import {
 const SERVICE_TIMEOUT_MS = 5000;
 const CONFIRM_TIMEOUT_MS = 60_000;
 /** Estimates and price reads are cached briefly: browse/bid-form traffic must
- *  never turn into a per-request service call storm. The price ride the
- *  purposed cache (woc_market_price_cache.ts: single-flight, short failure
+ *  never turn into a per-request service call storm. The price rides the
+ *  purpose-built cache (woc_market_price_cache.ts: single-flight, short failure
  *  memo, bounded stale-while-revalidate); estimates ride the shared keyed
  *  cache (single-flight per amount, LRU bound). An UNAVAILABLE estimate is
  *  deliberately cached for the full TTL like a success: it is the typed
@@ -195,6 +195,16 @@ function leg(value: WireLeg | null | undefined): { base: string; tokens: number 
  * they will receive, and a split that does not reconcile is not a rounding
  * disagreement, it is a different sale. Fail closed and the UI omits the line.
  */
+/** The shared estimate is handed to every caller inside a TTL window, so it
+ *  is frozen like the read-cache values (freezeShared's rationale): an
+ *  in-place edit by one consumer would corrupt every sharer, and a frozen
+ *  write throws in its author's own tests instead. */
+function freezeEstimate(value: WocEstimate): WocEstimate {
+  if (value.amount !== null) Object.freeze(value.amount);
+  if (value.split !== null) Object.freeze(value.split);
+  return Object.freeze(value);
+}
+
 function estimateSplit(value: WireEstimate['split'], usdCents: number): WocEstimateSplit | null {
   if (!value) return null;
   const { sellerCents, burnCents, treasuryCents } = value;
@@ -267,15 +277,17 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
         path: 'estimate',
         body: { usdCents },
       });
-      return wire && wire.ok === true
-        ? {
-            available: true,
-            usdCents,
-            amount: leg(wire.amount),
-            asOfMs: wire.asOfMs ?? null,
-            split: estimateSplit(wire.split, usdCents),
-          }
-        : { available: false, usdCents, amount: null, asOfMs: null, split: null };
+      return freezeEstimate(
+        wire && wire.ok === true
+          ? {
+              available: true,
+              usdCents,
+              amount: leg(wire.amount),
+              asOfMs: wire.asOfMs ?? null,
+              split: estimateSplit(wire.split, usdCents),
+            }
+          : { available: false, usdCents, amount: null, asOfMs: null, split: null },
+      );
     },
     { ttlMs: ESTIMATE_CACHE_TTL_MS, maxEntries: ESTIMATE_CACHE_MAX_ENTRIES },
   );
@@ -283,6 +295,15 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
   return {
     price(): Promise<WocPriceInfo> {
       return priceCache.read();
+    },
+
+    priceCacheAges(): { successAgeMs: number | null; failureAgeMs: number | null } {
+      const at = Date.now();
+      const { success, failure } = priceCache.peek();
+      return {
+        successAgeMs: success === null ? null : at - success.at,
+        failureAgeMs: failure === null ? null : at - failure.at,
+      };
     },
 
     estimate(usdCents: number): Promise<WocEstimate> {

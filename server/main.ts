@@ -383,6 +383,7 @@ import {
   pruneClosedWocListingsBatch,
   pruneResolvedWocOffersBatch,
   pruneWocBuyNowAbandonsBatch,
+  wocMarketIdleTxKillCount,
 } from './woc_market_db';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
@@ -2867,6 +2868,13 @@ configureInternalWocMarketStuckRead(async () => ({
   // surface): eviction thrash or a bust storm is a DB-load incident in the
   // making, and this readout is where an operator already looks.
   readCaches: wocMarketReadCache.stats(),
+  // The price cache's memo ages (null on the dev economy, which has no
+  // cache): a stale-served or blanked price during a brownout is a NUMBER
+  // here, not an invisible state the module never logs.
+  priceCache: wocMarketEconomy.priceCacheAges?.() ?? null,
+  // Guard transactions the idle bound killed (25P03), each destroying its
+  // pooled client: the retrofit's false-fire rate as a counter.
+  idleTxKills: wocMarketIdleTxKillCount(),
 }));
 
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need

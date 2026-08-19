@@ -123,16 +123,24 @@ export function createWocPriceCache<T>(
       // probe; otherwise this read pays (or joins) the refresh.
       if (failure !== null && at - failure.at < failureTtlMs) return failure.value;
       const value = await refreshShared();
-      // A failed refresh with a success that is STILL inside the stale-serve
-      // bound serves the success (stale-on-error): reachable when this reader
-      // joined a flight that was started by an older stale-serve read.
+      // Stale-on-error BELT, unreachable under the current interleavings: a
+      // cold-path reader implies no in-bound success existed at read time,
+      // single-flight admits no rival install, and the failure handler above
+      // clears any out-of-bound success before a joined reader resumes. Kept
+      // because it is the correct answer if a future edit ever lets a fresh
+      // success land while a failure flight is still settling.
       if (opts.isFailure(value) && success !== null && now() - success.at < staleServeMaxMs) {
         return success.value;
       }
       return value;
     },
     peek() {
-      return { success, failure };
+      // Shallow copies: introspection must never hand out the live memo
+      // records (a caller writing .at would corrupt the state machine).
+      return {
+        success: success === null ? null : { ...success },
+        failure: failure === null ? null : { ...failure },
+      };
     },
   };
 }
