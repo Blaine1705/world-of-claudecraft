@@ -47,6 +47,12 @@ export interface WocMarketStatus {
   allowMounts: boolean;
   allowMechChromas: boolean;
   settlementWindowSeconds: number;
+  bond?: {
+    rateBps: number;
+    minCents: number;
+    maxCents: number;
+    pendingTtlSeconds: number;
+  };
 }
 
 export interface WocListingView {
@@ -275,7 +281,21 @@ export type WocMarketViewModel =
         /** Copies the picker hides that UNLOCKING would bring back, so the
          *  caption about locked items is only shown when it is true. */
         lockedOut: number;
+        /** The policy figures the sell-empty caption resolves (the same
+         *  values the pre-filter above already applied), so the copy names
+         *  THIS realm's floor and categories instead of a generic sentence. */
+        qualityFloor: string;
+        allowMounts: boolean;
+        allowMechChromas: boolean;
       };
+      /** The bond schedule and payment window off /status, or null on an
+       *  older server (the disclosures then keep their figure-free copy). */
+      bondSchedule: {
+        rateBps: number;
+        minCents: number;
+        maxCents: number;
+        pendingTtlSeconds: number;
+      } | null;
       activity: WocActivityModel | null;
     };
 
@@ -462,7 +482,11 @@ export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewMode
         mounts: status.allowMounts,
         mechChromas: status.allowMechChromas,
       }).length,
+      qualityFloor: status.qualityFloor,
+      allowMounts: status.allowMounts,
+      allowMechChromas: status.allowMechChromas,
     },
+    bondSchedule: status.bond ?? null,
     activity,
   };
 }

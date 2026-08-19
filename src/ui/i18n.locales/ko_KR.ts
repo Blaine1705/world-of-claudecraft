@@ -8816,6 +8816,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.cancelAria': '{item} 등록 취소',
   'hudChrome.wocMarket.bidBondNote':
     '입찰하면 입찰가와 별도로 환불 가능한 보증금을 $WOC로 예치합니다. {bid} 입찰에 {bond}이며, 입찰가가 높을수록 더 많습니다. 상회 입찰이 나오거나 낙찰되지 못하면 반환되고, 낙찰 후 결제를 마치면 반환됩니다. 차순위 제안 시에는 다시 예치됩니다.',
+  'hudChrome.wocMarket.bidBondSchedule': '보증금은 입찰가의 {rate}%이며, 최소 {min}, 최대 {max}입니다.',
+  'hudChrome.wocMarket.bidBondPayWindow': '입찰 후 {duration} 이내에 보증금을 지불하지 않으면 입찰이 무효화됩니다.',
   'hudChrome.wocMarket.variableTokenWarning':
     '당신은 USD 가치를 $WOC로 지불하기로 약정합니다. 정확한 토큰 수량은 결제 요청 시의 새 견적으로 확정되며 추정치와 다를 수 있습니다.',
   'hudChrome.wocMarket.claimCooldownRetry':
@@ -8881,8 +8883,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingCancelPending':
     '취소 대기 중: 한 구매자가 구매 창구를 쥐고 있습니다. 그가 결제하지 않으면 등록이 닫히고 아이템은 레이븐포스트 우편으로 돌아옵니다.',
   'hudChrome.wocMarket.sellTitle': '등록 만들기',
-  'hudChrome.wocMarket.sellEmpty':
-    '가방에 등록 가능한 아이템이 없습니다. 거래소는 귀속되지 않고 서버의 품질 기준 이상인 장비를 취급하며, 일부 서버에서는 탈것과 메크 크로마 플레이트도 취급합니다.',
+  'hudChrome.wocMarket.sellEmptyFloor':
+    '가방에 등록 가능한 아이템이 없습니다. 이 서버는 {floor} 품질 이상의 귀속되지 않은 장비를 취급합니다.',
+  'hudChrome.wocMarket.sellCollectiblesBoth': '탈것과 메크 크로마 플레이트도 등록할 수 있습니다.',
+  'hudChrome.wocMarket.sellCollectiblesMounts': '탈것도 등록할 수 있습니다.',
+  'hudChrome.wocMarket.sellCollectiblesChromas': '메크 크로마 플레이트도 등록할 수 있습니다.',
   'hudChrome.wocMarket.sellFormat': '형식',
   'hudChrome.wocMarket.sellFormatAuction': '경매',
   'hudChrome.plurals.wocMarketSellChoose.few': '{count}개 중에서 선택',

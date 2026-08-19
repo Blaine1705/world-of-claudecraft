@@ -5305,6 +5305,13 @@ export const hudChromeStrings = {
     // forfeit and strike rule is stated once, in bidBindingNote.
     bidBondNote:
       'Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.',
+    // The GENERAL bond schedule for an arbitrary typed bid, resolved from the
+    // figures /status ships (the copy-figures rule: named figures come off
+    // the wire, never hard-coded prose). Rendered only when the server sent
+    // them; an older server keeps the figure-free bidBondNote alone.
+    bidBondSchedule: 'The bond is {rate} percent of your bid, at least {min} and at most {max}.',
+    // The bond payment window off /status: an unpaid bond lapses the bid.
+    bidBondPayWindow: 'Pay the bond within {duration} of placing your bid, or the bid lapses.',
     // The pre-bid commitment disclosures (draft Terms 10.4/10.5), shown
     // BEFORE the first bond charge: a bid binds once its bond is signed.
     bidBindingNote:
@@ -5387,10 +5394,19 @@ export const hudChromeStrings = {
     listingCancelPending:
       'Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.',
     sellTitle: 'Create a listing',
-    // Names no floor: the quality floor and the two collectible categories are
-    // realm policy (/status), and the sell filter applies whatever it says.
-    sellEmpty:
-      "No eligible items in your bags. The Exchange takes unbound equipment at or above the realm's quality floor, and on some realms mounts and mech chroma plates.",
+    // The RESOLVED sell-empty caption: {floor} is this realm's live quality
+    // floor off /status (localized through itemQualityLabel), and the
+    // collectible sentence below it is chosen from the realm's own category
+    // switches, so the copy names what THIS realm takes instead of a generic
+    // "some realms" sentence (the copy-figures rule). Replaces the retired
+    // figure-free sellEmpty; the ready model always has the figures.
+    sellEmptyFloor:
+      'No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.',
+    // The collectible-category sentence, one key per switch combination so no
+    // locale ever composes a list in code; omitted when both are off.
+    sellCollectiblesBoth: 'Mounts and mech chroma plates can also be listed.',
+    sellCollectiblesMounts: 'Mounts can also be listed.',
+    sellCollectiblesChromas: 'Mech chroma plates can also be listed.',
     // A copy the player locked themselves is filtered out of the picker; the
     // note says so instead of leaving it silently missing.
     sellLockedHidden: 'Locked items are not listed here. Unlock them in your bags to sell them.',

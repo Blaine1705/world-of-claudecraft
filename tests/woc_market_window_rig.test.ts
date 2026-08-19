@@ -941,3 +941,117 @@ describe('WocMarketWindow live rig: Activity cancel', () => {
     expect(r.root.textContent).toContain(t('hudChrome.wocMarket.listingCancelled'));
   });
 });
+
+describe('WocMarketWindow live rig: resolved disclosure figures and the select scroll', () => {
+  it('a row tap commands the detail pane into view (the one-column sheet cure)', async () => {
+    // happy-dom ships Element.scrollIntoView but lays nothing out, so the pin
+    // is the COMMAND and its target, not pixels (the jump-window suites' spy
+    // shape).
+    const seen: { className: string; arg: unknown }[] = [];
+    const spy = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(function (
+      this: Element,
+      arg?: unknown,
+    ) {
+      seen.push({ className: (this as HTMLElement).className, arg });
+    });
+    try {
+      const r = rig();
+      r.win.open();
+      await flush();
+      seen.length = 0;
+      q<HTMLButtonElement>(r.root, '.wm-row-open').click();
+      await flush();
+      const detailScrolls = seen.filter((s) => s.className.includes('wm-detail'));
+      expect(detailScrolls.length).toBeGreaterThanOrEqual(1);
+      // block nearest: a no-op on the desktop's sticky pane, the scroll cure
+      // on the stacked phone sheet.
+      expect(detailScrolls[0]?.arg).toEqual({ block: 'nearest' });
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('a background poll re-render never re-commands the scroll', async () => {
+    const seen: string[] = [];
+    const spy = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(function (
+      this: Element,
+    ) {
+      seen.push((this as HTMLElement).className);
+    });
+    try {
+      const r = rig();
+      r.win.open();
+      await flush();
+      q<HTMLButtonElement>(r.root, '.wm-row-open').click();
+      await flush();
+      seen.length = 0;
+      vi.spyOn(Date, 'now').mockReturnValue(NOW + 120_000);
+      r.win.refreshIfChanged();
+      await flush();
+      expect(seen.filter((c) => c.includes('wm-detail'))).toEqual([]);
+    } finally {
+      vi.restoreAllMocks();
+      spy.mockRestore();
+    }
+  });
+
+  it('the bid form resolves the bond schedule and pay window from the status figures', async () => {
+    const r = rig();
+    r.fake.answers.status = async () =>
+      status({ bond: { rateBps: 500, minCents: 100, maxCents: 5000, pendingTtlSeconds: 300 } });
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-row-open').click();
+    await flush();
+    const disclosures = q(r.root, '.wm-bid-form .wm-disclosures').textContent ?? '';
+    // The resolved schedule: rate off the wire (5 percent), both clamps as
+    // money, and the payment window as a duration. Figures, not prose.
+    expect(disclosures).toContain('5 percent of your bid');
+    expect(disclosures).toContain('$1.00');
+    expect(disclosures).toContain('$50.00');
+    expect(disclosures).toContain('Pay the bond within');
+  });
+
+  it('an older server without the figures keeps the figure-free disclosures', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-row-open').click();
+    await flush();
+    const disclosures = q(r.root, '.wm-bid-form .wm-disclosures').textContent ?? '';
+    expect(disclosures).not.toContain('percent of your bid');
+    expect(disclosures).not.toContain('Pay the bond within');
+    // The listing-specific note still stands either way.
+    expect(disclosures).toContain(
+      t('hudChrome.wocMarket.bidBondNote', { bond: '$2.50', bid: '$25.00' }),
+    );
+  });
+
+  it('the empty sell tab names the realm floor and its collectible categories', async () => {
+    const r = rig({ inventory: [] });
+    r.fake.answers.status = async () => status({ allowMounts: true, allowMechChromas: false });
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    await flush();
+    const caption = q(r.root, '.wm-sell .wm-status').textContent ?? '';
+    // The live floor, localized, in the sentence; and exactly the switched-on
+    // collectible sentence, never the other two.
+    expect(caption).toContain(t('hudChrome.wocMarket.sellEmptyFloor', { floor: 'Epic' }));
+    expect(caption).toContain(t('hudChrome.wocMarket.sellCollectiblesMounts'));
+    expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesBoth'));
+    expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesChromas'));
+  });
+
+  it('with both collectible switches off the caption names only the floor', async () => {
+    const r = rig({ inventory: [] });
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    await flush();
+    const caption = q(r.root, '.wm-sell .wm-status').textContent ?? '';
+    expect(caption).toContain(t('hudChrome.wocMarket.sellEmptyFloor', { floor: 'Epic' }));
+    expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesMounts'));
+    expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesChromas'));
+  });
+});

@@ -12,6 +12,7 @@
 
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t } from './i18n';
+import { itemQualityLabel } from './item_kind_label';
 import { svgIcon } from './ui_icons';
 
 /** The browse faces' control row: the sort control LEADS the row (the 15 QA
@@ -70,4 +71,103 @@ export function wocEndsAtText(endsAtMs: number): string {
     utc: formatDateTime(endsAtMs, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }),
     local: formatDateTime(endsAtMs, { dateStyle: 'medium', timeStyle: 'short' }),
   });
+}
+
+/** The known quality vocabulary, for resolving the /status floor word to its
+ *  localized name; an unrecognized future policy word renders verbatim
+ *  rather than mislabeling (the server validated it, the client just cannot
+ *  name it yet). */
+const QUALITY_WORDS = new Set(['poor', 'common', 'uncommon', 'rare', 'epic', 'legendary']);
+
+/**
+ * The empty Sell tab, with the realm's OWN policy resolved into the copy:
+ * the live quality floor (localized through the shared quality-label family)
+ * and a collectible sentence chosen from the realm's category switches, one
+ * key per combination so no locale composes a list in code. The old caption
+ * said "the realm's quality floor" and "on some realms" while the figures
+ * sat one field away on /status; named figures come off the wire.
+ */
+export function wocSellEmptyHtml(
+  policy: { qualityFloor: string; allowMounts: boolean; allowMechChromas: boolean },
+  lockedNoteHtml: string,
+): string {
+  const floor = QUALITY_WORDS.has(policy.qualityFloor)
+    ? itemQualityLabel(policy.qualityFloor as Parameters<typeof itemQualityLabel>[0])
+    : policy.qualityFloor;
+  const collectibles =
+    policy.allowMounts && policy.allowMechChromas
+      ? t('hudChrome.wocMarket.sellCollectiblesBoth')
+      : policy.allowMounts
+        ? t('hudChrome.wocMarket.sellCollectiblesMounts')
+        : policy.allowMechChromas
+          ? t('hudChrome.wocMarket.sellCollectiblesChromas')
+          : null;
+  return (
+    `<div class="wm-sell"><div class="wm-status" role="status">` +
+    `<p>${esc(t('hudChrome.wocMarket.sellEmptyFloor', { floor }))}</p>` +
+    (collectibles === null ? '' : `<p>${esc(collectibles)}</p>`) +
+    `</div>${lockedNoteHtml}</div>`
+  );
+}
+
+/**
+ * The general bond disclosures resolved from the /status figures: the
+ * schedule for an arbitrary typed bid and the payment window whose lapse
+ * kills the bid. Rendered only when the server sent the figures (the caller
+ * gates on them), so an older server keeps the figure-free listing-specific
+ * note alone.
+ */
+export function wocBondScheduleNotesHtml(args: {
+  rateBps: number;
+  minCents: number;
+  maxCents: number;
+  /** The pre-localized payment window (the window's countdown formatter). */
+  payWindowText: string;
+  /** The window's own money formatter, so both surfaces spell USD one way. */
+  usd(cents: number): string;
+}): string {
+  return (
+    `<p class="wm-note">${esc(
+      t('hudChrome.wocMarket.bidBondSchedule', {
+        rate: formatNumber(args.rateBps / 100),
+        min: args.usd(args.minCents),
+        max: args.usd(args.maxCents),
+      }),
+    )}</p>` +
+    `<p class="wm-note">${esc(
+      t('hudChrome.wocMarket.bidBondPayWindow', { duration: args.payWindowText }),
+    )}</p>`
+  );
+}
+
+/**
+ * The detail pane's recent-sales list. Null sales means the history round
+ * trip is still out: 'still loading', never 'no recorded sales', which
+ * would assert what the client does not know.
+ */
+export function wocSalesHistoryHtml(
+  sales:
+    | readonly { atMs: number; priceCents: number; sellerName: string; buyerName: string }[]
+    | null,
+  usd: (cents: number) => string,
+): string {
+  if (sales === null) {
+    return `<p class="wm-sales-empty">${esc(t('hudChrome.wocMarket.detailSalesLoading'))}</p>`;
+  }
+  if (sales.length === 0) {
+    return `<p class="wm-sales-empty">${esc(t('hudChrome.wocMarket.detailNoSales'))}</p>`;
+  }
+  return `<ul class="wm-sales">${sales
+    .map(
+      (s) =>
+        `<li>${esc(
+          t('hudChrome.wocMarket.detailSaleRow', {
+            time: formatDateTime(s.atMs, { dateStyle: 'medium' }),
+            usd: usd(s.priceCents),
+            seller: s.sellerName,
+            buyer: s.buyerName,
+          }),
+        )}</li>`,
+    )
+    .join('')}</ul>`;
 }

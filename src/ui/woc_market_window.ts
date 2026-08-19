@@ -49,10 +49,13 @@ import {
 } from './wallet_bridge_reason_text';
 import { overWalletBalance } from './woc_affordable_core';
 import {
+  wocBondScheduleNotesHtml,
   wocBrowseStripHtml,
   wocEndsAtText,
   wocErrorStatusHtml,
   wocLoadingStatusHtml,
+  wocSalesHistoryHtml,
+  wocSellEmptyHtml,
   wocSpinnerHtml,
 } from './woc_market_chrome';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
@@ -393,6 +396,11 @@ export class WocMarketWindow {
     this.bidEstimateWanted = null;
     this.buyNowTokens = null;
     this.render();
+    // The one-column phone sheet stacks the detail pane below the table, so a
+    // row tap on a full page painted the bid form off screen. A scroll
+    // COMMAND, not a forced-reflow read (the paintSellActive precedent);
+    // block nearest is a no-op on the desktop's sticky, already-visible pane.
+    this.deps.root().querySelector('.wm-detail')?.scrollIntoView({ block: 'nearest' });
     const seq = this.renderSeq;
     const detail = await hooks.client.detail(id);
     if (seq !== this.renderSeq) return;
@@ -926,26 +934,7 @@ export class WocMarketWindow {
           }),
         )}</p>`
       : `<p class="wm-estimate"></p>`;
-    // The history is a separate round trip: null is 'still loading', never
-    // 'no recorded sales', which would assert what the client does not know.
-    const sales =
-      this.sales === null
-        ? `<p class="wm-sales-empty">${esc(t('hudChrome.wocMarket.detailSalesLoading'))}</p>`
-        : d.sales.length === 0
-          ? `<p class="wm-sales-empty">${esc(t('hudChrome.wocMarket.detailNoSales'))}</p>`
-          : `<ul class="wm-sales">${d.sales
-              .map(
-                (s) =>
-                  `<li>${esc(
-                    t('hudChrome.wocMarket.detailSaleRow', {
-                      time: formatDateTime(s.atMs, { dateStyle: 'medium' }),
-                      usd: this.usd(s.priceCents),
-                      seller: s.sellerName,
-                      buyer: s.buyerName,
-                    }),
-                  )}</li>`,
-              )
-              .join('')}</ul>`;
+    const sales = wocSalesHistoryHtml(this.sales === null ? null : d.sales, (c) => this.usd(c));
     const bidForm = this.bidFormHtml(model, d.row.id, name);
     // EXACT here, unlike the bid: buy-now carries no bond, so the server compares
     // this same price and nothing else.
@@ -1068,6 +1057,13 @@ export class WocMarketWindow {
           bid: this.usd(d.row.minNextBidCents),
         }),
       )}</p>` +
+      (model.bondSchedule === null
+        ? ''
+        : wocBondScheduleNotesHtml({
+            ...model.bondSchedule,
+            payWindowText: this.countdown(model.bondSchedule.pendingTtlSeconds),
+            usd: (c) => this.usd(c),
+          })) +
       `<p class="wm-note">${esc(t('hudChrome.wocMarket.bidBindingNote'))}</p>` +
       `<p class="wm-note">${esc(t('hudChrome.wocMarket.bidCloseNote'))}</p>` +
       (d.offerNext
@@ -1131,7 +1127,7 @@ export class WocMarketWindow {
         ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellLockedHidden'))}</p>`
         : '';
     if (model.sell.rows.length === 0) {
-      return `<div class="wm-sell"><div class="wm-status" role="status">${esc(t('hudChrome.wocMarket.sellEmpty'))}</div>${lockedNote}</div>`;
+      return wocSellEmptyHtml(model.sell, lockedNote);
     }
     // A searchable dropdown, not a grid of buttons: a full bag is 70+ tradable
     // items and the flat list pushed the form off the screen. An empty query

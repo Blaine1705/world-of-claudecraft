@@ -52,8 +52,11 @@ const MONOLITHS: MonolithRow[] = [
     // Down 2621 -> 2618 when the browse control row followed the chrome out
     // (the 15 sign-off round: sort leads the row), paying for the price
     // cells' token-equivalence tooltips with room to spare.
+    // Down 2618 -> 2614 when the recent-sales list and the empty-sell caption
+    // followed (wocSalesHistoryHtml / wocSellEmptyHtml), paying for the
+    // resolved bond disclosures and the select-scroll command.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2618,
+    ceiling: 2614,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {

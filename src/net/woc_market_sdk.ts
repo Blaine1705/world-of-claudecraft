@@ -45,6 +45,17 @@ export interface WocMarketStatus {
   /** The directed (p2p) payment hold in seconds: the buyer's commitment note
    *  names it. Absent from an older server (the note then names no figure). */
   directedHoldSeconds?: number;
+  /** The bid-bond schedule and bond payment window, so disclosure copy
+   *  resolves live figures (the server's own mirror of the service rule; the
+   *  service-computed figure still arrives on every quote). Absent from an
+   *  older server AND from the fail-closed stub: the copy then falls back to
+   *  its figure-free sentences rather than asserting numbers it cannot know. */
+  bond?: {
+    rateBps: number;
+    minCents: number;
+    maxCents: number;
+    pendingTtlSeconds: number;
+  };
 }
 
 export interface WocListingView {

@@ -8849,6 +8849,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.cancelAria': '{item} の出品を取り下げる',
   'hudChrome.wocMarket.bidBondNote':
     '入札すると、入札額とは別に返還可能な保証金を $WOC で預けます。{bid} の入札で {bond}、入札額が高いほど多くなります。上回られた場合や落札できなかった場合、または落札して支払いを済ませた後に返還されます。次点への譲渡では再び預けられます。',
+  'hudChrome.wocMarket.bidBondSchedule': '保証金は入札額の{rate}%で、最低{min}、最高{max}です。',
+  'hudChrome.wocMarket.bidBondPayWindow': '入札から{duration}以内に保証金を支払わないと、入札は失効します。',
   'hudChrome.wocMarket.variableTokenWarning':
     'あなたは USD 建ての金額を $WOC で支払うことを約束します。正確なトークン数は支払い要求時の新しい見積もりで確定し、概算と異なる場合があります。',
   'hudChrome.wocMarket.claimCooldownRetry':
@@ -8915,8 +8917,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingCancelPending':
     '取り下げ待ち: 購入枠を確保している買い手がいます。支払いがなければ出品は閉じられ、アイテムはレイヴンポスト便で戻ります。',
   'hudChrome.wocMarket.sellTitle': '出品を作成',
-  'hudChrome.wocMarket.sellEmpty':
-    'バッグに出品できるアイテムがありません。取引所は、未バインドでレルムの品質下限以上の装備を扱います。レルムによっては、マウントとメカクロマプレートも扱います。',
+  'hudChrome.wocMarket.sellEmptyFloor':
+    'バッグに出品できるアイテムがありません。このレルムでは、{floor}品質以上の未バインド装備を取り扱います。',
+  'hudChrome.wocMarket.sellCollectiblesBoth': 'マウントとメカクロマプレートも出品できます。',
+  'hudChrome.wocMarket.sellCollectiblesMounts': 'マウントも出品できます。',
+  'hudChrome.wocMarket.sellCollectiblesChromas': 'メカクロマプレートも出品できます。',
   'hudChrome.wocMarket.sellFormat': '形式',
   'hudChrome.wocMarket.sellFormatAuction': 'オークション',
   'hudChrome.plurals.wocMarketSellChoose.few': '{count} 件から選択',

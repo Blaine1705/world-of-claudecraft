@@ -8442,6 +8442,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.cancelAria': '取消你的 {item} 掛單',
   'hudChrome.wocMarket.bidBondNote':
     '出價時會在出價之外凍結一筆可退還的 $WOC 保證金：出價 {bid} 時為 {bond}，出價越高保證金越多。被超越或未得標時退還；若得標，則在你付款後退還；二次機會轉讓會再次凍結它。',
+  'hudChrome.wocMarket.bidBondSchedule': '保證金為出價的{rate}%，最低{min}，最高{max}。',
+  'hudChrome.wocMarket.bidBondPayWindow': '請在出價後{duration}內支付保證金，否則出價將失效。',
   'hudChrome.wocMarket.variableTokenWarning':
     '你承諾以 $WOC 支付一筆美元價值。具體代幣數量由請求付款時的最新報價確定，可能與估算不同。',
   'hudChrome.wocMarket.claimCooldownRetry': '你最近放棄過一次直購。請在{duration}後再試。',
@@ -8500,7 +8502,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingCancelPending':
     '取消待定：一位買家正持有購買視窗。若其未付款，掛單將關閉，物品經烏鴉郵局退回。',
   'hudChrome.wocMarket.sellTitle': '建立掛單',
-  'hudChrome.wocMarket.sellEmpty': '背包中沒有符合條件的物品。交易所接受未綁定且達到本服品質門檻的裝備，部分伺服器還接受坐騎和機甲塗裝板。',
+  'hudChrome.wocMarket.sellEmptyFloor': '背包中沒有符合條件的物品。本伺服器交易所接受{floor}品質及以上的未綁定裝備。',
+  'hudChrome.wocMarket.sellCollectiblesBoth': '坐騎和機甲塗裝板也可以上架。',
+  'hudChrome.wocMarket.sellCollectiblesMounts': '坐騎也可以上架。',
+  'hudChrome.wocMarket.sellCollectiblesChromas': '機甲塗裝板也可以上架。',
   'hudChrome.wocMarket.sellFormat': '形式',
   'hudChrome.wocMarket.sellFormatAuction': '拍賣',
   'hudChrome.plurals.wocMarketSellChoose.few': '從 {count} 件物品中選擇',

@@ -111,7 +111,9 @@ describe('woc_market_chrome: the exact end time', () => {
       'utf8',
     ).replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '');
     const calls = src.match(/formatDateTime\([^)]*\)/g) ?? [];
-    expect(calls.length, 'both readings come from the shared formatter').toBe(2);
+    // Three: the two endsAt readings plus the sales-history row date (the
+    // detail pane's recent-sales builder moved here with the hot-path work).
+    expect(calls.length, 'every reading comes from the shared formatter').toBe(3);
     expect(calls.filter((c) => c.includes("timeZone: 'UTC'")).length).toBe(1);
     expect(src).toMatch(/utc:\s*formatDateTime\([^)]*timeZone: 'UTC'/);
   });

@@ -119,6 +119,22 @@ describe('status()', () => {
     await expect(client().status()).resolves.toEqual({ ok: true, ...statusBody });
   });
 
+  it('passes the bond schedule through and OMITS it from the fail-closed stub', async () => {
+    const withBond = {
+      ...statusBody,
+      bond: { rateBps: 500, minCents: 100, maxCents: 5000, pendingTtlSeconds: 300 },
+    };
+    stubFetch(() => ({ status: 200, body: withBond }));
+    await expect(client().status()).resolves.toEqual({ ok: true, ...withBond });
+    // The stub must NOT invent figures: absent means the disclosure copy
+    // falls back to its figure-free sentences instead of asserting numbers
+    // an unreachable server never confirmed.
+    stubFetch(() => 'throw');
+    const failed = await client().status();
+    expect(failed.ok).toBe(false);
+    expect('bond' in failed).toBe(false);
+  });
+
   it('resolves the typed disabled fallback on a network throw', async () => {
     stubFetch(() => 'throw');
     await expect(client().status()).resolves.toEqual({

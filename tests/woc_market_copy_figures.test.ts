@@ -2,9 +2,12 @@
 // anti-snipe window, the Buy Now hold and its cooldowns, the strike ladder)
 // are pinned to the constants they describe: a rule retune must reword the
 // English (and its five non-Latin fills) in the same change, or this reds.
-// The figures are not on the /status wire (recorded as a follow-up), which
-// is exactly why the source pin exists: the copy is the client's only
-// statement of them.
+// Those figures are not on the /status wire, which is exactly why the source
+// pin exists: the copy is the client's only statement of them. The BOND
+// schedule and payment window are the exception: /status now ships them and
+// the copy resolves placeholders instead of prose figures, so their pins
+// below guard the WIRE mirror (a silent retune must red here too, because
+// the deploy-coupled service mirrors the same rule).
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
@@ -12,6 +15,10 @@ import {
   WOC_MARKET_ANTI_SNIPE_CAP_SECONDS,
   WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS,
   WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS,
+  WOC_MARKET_BOND_MAX_CENTS,
+  WOC_MARKET_BOND_MIN_CENTS,
+  WOC_MARKET_BOND_PENDING_TTL_SECONDS,
+  WOC_MARKET_BOND_RATE_BPS,
   WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS,
   WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
@@ -52,6 +59,27 @@ describe('marketplace copy names the live rule figures', () => {
     expect(strikeSuspensionMs(5)).toBe(365 * DAY_MS);
     expect(market.strikesTip).toContain('After the first');
     expect(market.strikesTip).toContain('3 days, then 14, then 90, then a year');
+  });
+
+  it('the bond schedule and payment window ride /status as these exact figures', () => {
+    // 5 percent, $1 to $50, a 5-minute payment window: the mirror the wire
+    // ships and the resolved copy renders. The deploy coupling keeps the
+    // service's own schedule in lockstep (DEPLOY.md), so a retune here is a
+    // cross-repo change, never a silent constant edit.
+    expect(WOC_MARKET_BOND_RATE_BPS).toBe(500);
+    expect(WOC_MARKET_BOND_MIN_CENTS).toBe(100);
+    expect(WOC_MARKET_BOND_MAX_CENTS).toBe(5000);
+    expect(WOC_MARKET_BOND_PENDING_TTL_SECONDS).toBe(300);
+    // The copy carries PLACEHOLDERS, never digits: the figures land at render
+    // time from /status, so the English can never contradict a future wire.
+    expect(market.bidBondSchedule).toContain('{rate}');
+    expect(market.bidBondSchedule).toContain('{min}');
+    expect(market.bidBondSchedule).toContain('{max}');
+    expect(market.bidBondSchedule).not.toMatch(/\d/);
+    expect(market.bidBondPayWindow).toContain('{duration}');
+    expect(market.bidBondPayWindow).not.toMatch(/\d/);
+    // The resolved sell caption resolves the floor the same way.
+    expect(market.sellEmptyFloor).toContain('{floor}');
   });
 
   it('the fee note names no percentage (the schedule is service configuration, off the wire)', () => {

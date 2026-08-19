@@ -768,3 +768,26 @@ describe('wocMarketViewSig: the Activity listings digest', () => {
     expect(withBid(null)).not.toBe(withBid(500));
   });
 });
+
+describe('resolved policy figures on the model', () => {
+  it('passes the bond schedule through, and null when the server did not send one', () => {
+    const schedule = { rateBps: 500, minCents: 100, maxCents: 5000, pendingTtlSeconds: 300 };
+    expect(ready(makeInput({ status: makeStatus({ bond: schedule }) })).bondSchedule).toEqual(
+      schedule,
+    );
+    // An older server: the disclosures must render figure-free, so absence is
+    // an explicit null the painter can branch on, never an undefined slip.
+    expect(ready(makeInput()).bondSchedule).toBeNull();
+  });
+
+  it('hands the sell caption the same policy figures the pre-filter applied', () => {
+    const model = ready(
+      makeInput({
+        status: makeStatus({ qualityFloor: 'rare', allowMounts: true, allowMechChromas: false }),
+      }),
+    );
+    expect(model.sell.qualityFloor).toBe('rare');
+    expect(model.sell.allowMounts).toBe(true);
+    expect(model.sell.allowMechChromas).toBe(false);
+  });
+});

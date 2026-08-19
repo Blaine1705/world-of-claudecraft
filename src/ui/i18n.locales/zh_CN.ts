@@ -8442,6 +8442,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.cancelAria': '取消你的 {item} 挂单',
   'hudChrome.wocMarket.bidBondNote':
     '出价时会在出价之外冻结一笔可退还的 $WOC 保证金：出价 {bid} 时为 {bond}，出价越高保证金越多。被超越或未中标时退还；若中标，则在你付款后退还；二次机会转让会再次冻结它。',
+  'hudChrome.wocMarket.bidBondSchedule': '保证金为出价的{rate}%，最低{min}，最高{max}。',
+  'hudChrome.wocMarket.bidBondPayWindow': '请在出价后{duration}内支付保证金，否则出价将失效。',
   'hudChrome.wocMarket.variableTokenWarning':
     '你承诺以 $WOC 支付一笔美元价值。具体代币数量由请求付款时的最新报价确定，可能与估算不同。',
   'hudChrome.wocMarket.claimCooldownRetry': '你最近放弃过一次直购。请在{duration}后再试。',
@@ -8500,7 +8502,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingCancelPending':
     '取消待定：一位买家正持有购买窗口。若其未付款，挂单将关闭，物品经乌鸦邮局退回。',
   'hudChrome.wocMarket.sellTitle': '创建挂单',
-  'hudChrome.wocMarket.sellEmpty': '背包中没有符合条件的物品。交易所接受未绑定且达到本服品质门槛的装备，部分服务器还接受坐骑和机甲涂装板。',
+  'hudChrome.wocMarket.sellEmptyFloor': '背包中没有符合条件的物品。本服交易所接受{floor}品质及以上的未绑定装备。',
+  'hudChrome.wocMarket.sellCollectiblesBoth': '坐骑和机甲涂装板也可以上架。',
+  'hudChrome.wocMarket.sellCollectiblesMounts': '坐骑也可以上架。',
+  'hudChrome.wocMarket.sellCollectiblesChromas': '机甲涂装板也可以上架。',
   'hudChrome.wocMarket.sellFormat': '形式',
   'hudChrome.wocMarket.sellFormatAuction': '拍卖',
   'hudChrome.plurals.wocMarketSellChoose.few': '从 {count} 件物品中选择',

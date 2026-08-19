@@ -8974,6 +8974,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.cancelAria': 'Отменить ваш лот {item}',
   'hudChrome.wocMarket.bidBondNote':
     'Ставка удерживает возвращаемый залог в $WOC сверх самой ставки: {bond} при ставке {bid}, а при более высокой ставке больше. Он возвращается, если вас перебили или вы не выиграли, а если выиграли, то после вашей оплаты; при повторном предложении он удерживается снова.',
+  'hudChrome.wocMarket.bidBondSchedule': 'Залог составляет {rate}% от ставки: не менее {min} и не более {max}.',
+  'hudChrome.wocMarket.bidBondPayWindow': 'Оплатите залог в течение {duration} после ставки, иначе ставка будет аннулирована.',
   'hudChrome.wocMarket.variableTokenWarning':
     'Вы обязуетесь оплатить сумму в USD токенами $WOC. Точное количество токенов фиксируется свежей котировкой при запросе оплаты и может отличаться от оценки.',
   'hudChrome.wocMarket.claimCooldownRetry':
@@ -9046,8 +9048,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingCancelPending':
     'Отмена ожидает: покупатель удерживает окно покупки. Если он не заплатит, лот закроется, а предмет вернётся почтой Вороньей службы.',
   'hudChrome.wocMarket.sellTitle': 'Создание лота',
-  'hudChrome.wocMarket.sellEmpty':
-    'В сумках нет подходящих предметов. Биржа принимает неприсоединённую экипировку не ниже порога качества этого мира, а на некоторых мирах ещё средства передвижения и пластины окраски мехов.',
+  'hudChrome.wocMarket.sellEmptyFloor':
+    'В сумках нет подходящих предметов. Этот мир принимает неприсоединённую экипировку качества {floor} и выше.',
+  'hudChrome.wocMarket.sellCollectiblesBoth':
+    'Также можно выставлять средства передвижения и пластины окраски мехов.',
+  'hudChrome.wocMarket.sellCollectiblesMounts': 'Также можно выставлять средства передвижения.',
+  'hudChrome.wocMarket.sellCollectiblesChromas': 'Также можно выставлять пластины окраски мехов.',
   'hudChrome.wocMarket.sellFormat': 'Формат',
   'hudChrome.wocMarket.sellFormatAuction': 'Аукцион',
   'hudChrome.plurals.wocMarketSellChoose.one': 'Выберите из {count} предмета',
