@@ -450,6 +450,7 @@ const RENDER_PURE_CORES = [
   'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
   'src/render/arrival_event_core.ts',
+  'src/render/build_lane_core.ts',
   'src/render/build_ledger_core.ts',
   'src/render/hitch_frame_align_core.ts',
   'src/render/initial_frame_core.ts',

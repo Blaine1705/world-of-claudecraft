@@ -37,6 +37,21 @@ function cellsOwnedBy(zoneId: string, chunkSize: number): [number, number][] {
   return owned;
 }
 
+/** A build-route-independent identity for a zone's chunks: where each mesh
+ *  sits and how dense it is. Two routes to the same world produce the same set,
+ *  whatever order the chunks arrived in. */
+function chunkFingerprints(group: THREE.Object3D): string[] {
+  return group.children
+    .map((child) => {
+      const geo = (child as THREE.Mesh).geometry as THREE.BufferGeometry;
+      geo.computeBoundingBox();
+      const box = geo.boundingBox;
+      const pos = geo.attributes.position;
+      return `${box?.min.x.toFixed(3)},${box?.min.z.toFixed(3)},${pos.count}`;
+    })
+    .sort();
+}
+
 function mockEmptyAssetLoads(): void {
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => new Promise(() => {})),
@@ -77,6 +92,11 @@ describe('progressive terrain build', () => {
   });
   afterEach(() => {
     vi.useRealTimers();
+    // The pooled-build test below stubs the worker pool; vi.resetModules()
+    // drops the module cache but NOT the mock registry, so without this the
+    // stub would leak into every later test in this file (it made an idle
+    // build finish at fast pace and quietly broke the escalation pins).
+    vi.doUnmock('../src/render/zone_build_pool');
   });
 
   it('builds nothing until a zone is ensured, then only that zone streams in', async () => {
@@ -251,6 +271,69 @@ describe('progressive terrain build', () => {
     expect(idle.isZoneLoaded(zone.id)).toBe(true);
     fast.cancelStreaming();
     idle.cancelStreaming();
+  });
+
+  // The GATING arm pipelines through the shared worker pool: it used to build
+  // every cell synchronously on the main thread (measured ~0.8 s per zone under
+  // a teleport's loading screen), while the pool sat idle behind the idle arm.
+  // The pins: every cell really goes off-thread, no more jobs are in flight than
+  // the pool has workers, and the zone that lands is the same one the
+  // main-thread arm builds.
+  it('a fast-paced build pipelines through the worker pool and lands the same zone', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+    const zone = zoneAt(0, 0);
+
+    const plain = buildTerrain(20061);
+    const plainTask = plain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await plainTask;
+    const expected = chunkFingerprints(plain.group);
+    plain.cancelStreaming();
+
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const stats = { calls: 0, inFlight: 0, peak: 0 };
+    const POOL_SIZE = 3;
+    vi.doMock('../src/render/zone_build_pool', async () => {
+      const { buildChunkArrays } = await import('../src/render/zone_build_worker');
+      return {
+        zoneBuildPool: () => ({
+          size: POOL_SIZE,
+          async buildChunk(job: Record<string, unknown>) {
+            stats.calls++;
+            stats.inFlight++;
+            stats.peak = Math.max(stats.peak, stats.inFlight);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            stats.inFlight--;
+            return buildChunkArrays({ ...job, kind: 'chunk', id: stats.calls } as never);
+          },
+          async fillWater() {
+            return null;
+          },
+          dispose() {},
+        }),
+        disposeZoneBuildPool: () => {},
+      };
+    });
+    const pooled = (await import('../src/render/terrain')).buildTerrain(20061);
+    const progress: number[] = [];
+    const pooledTask = pooled.ensureZone(zone, (done) => progress.push(done));
+    await vi.runAllTimersAsync();
+    await pooledTask;
+
+    const built = chunkFingerprints(pooled.group);
+    expect(built).toEqual(expected);
+    // Every chunk came from the pool: not one fell back to the main thread.
+    expect(stats.calls).toBe(pooled.group.children.length);
+    expect(stats.peak).toBe(POOL_SIZE);
+    // Progress still ticks once per cell (and per normal-bake slice), in order.
+    expect(progress.length).toBeGreaterThan(pooled.group.children.length);
+    expect(progress).toEqual(progress.slice().sort((a, b) => a - b));
+    expect(pooled.isZoneLoaded(zone.id)).toBe(true);
+    pooled.cancelStreaming();
   });
 
   // Escalation: an in-flight idle build switches to fast pacing mid-zone. In

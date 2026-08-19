@@ -28,6 +28,9 @@ describe('progressive water build', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.restoreAllMocks();
+    // vi.resetModules() drops the module cache but NOT the mock registry, so
+    // the pool stub below has to be lifted or it leaks into later tests.
+    vi.doUnmock('../src/render/zone_build_pool');
   });
 
   it('coalesces an idle zone build and stages its mesh hidden for renderer prewarm', async () => {
@@ -53,6 +56,68 @@ describe('progressive water build', () => {
     expect(mesh.visible).toBe(false);
     expect(water.group.children).toContain(mesh);
     expect(await water.ensureZone(zone, { pace: 'idle' })).toEqual([]);
+  });
+
+  // The shore-attribute bake (32k vertices of shoreDepthAt + shoreSlopeAt) is
+  // the single biggest term in a zone's water prepare, and it now rides the
+  // shared zone-build workers on BOTH paces. The pins: the sheet really is
+  // baked off-thread when a pool exists, and the attributes it lands are the
+  // ones the main-thread bake produces.
+  it('bakes the shore attributes on the worker pool and matches the main-thread bake', async () => {
+    vi.resetModules();
+    mockWaterShaderAssets();
+    const { buildWater } = await import('../src/render/water');
+    const { zoneAt } = await import('../src/sim/data');
+    await Promise.resolve();
+    const zone = zoneAt(0, 0);
+
+    const plain = buildWater(20061);
+    const plainTask = plain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    const [plainMesh] = await plainTask;
+    const expectedDepth = Array.from(
+      (plainMesh.geometry.attributes.aShoreDepth as THREE.BufferAttribute).array,
+    );
+    const expectedSlope = Array.from(
+      (plainMesh.geometry.attributes.aShoreSlope as THREE.BufferAttribute).array,
+    );
+    expect(new Set(expectedDepth).size).toBeGreaterThan(1);
+
+    vi.resetModules();
+    mockWaterShaderAssets();
+    const fills: number[] = [];
+    vi.doMock('../src/render/zone_build_pool', async () => {
+      const { buildWaterFillArrays } = await import('../src/render/zone_build_worker');
+      return {
+        zoneBuildPool: () => ({
+          size: 3,
+          async buildChunk() {
+            return null;
+          },
+          async fillWater(job: { x: Float32Array; z: Float32Array; seed: number }) {
+            fills.push(job.x.length);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            return buildWaterFillArrays({ ...job, kind: 'water-fill', id: fills.length });
+          },
+          dispose() {},
+        }),
+        disposeZoneBuildPool: () => {},
+      };
+    });
+    const pooled = (await import('../src/render/water')).buildWater(20061);
+    await Promise.resolve();
+    const pooledTask = pooled.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    const [pooledMesh] = await pooledTask;
+
+    expect(fills.length).toBeGreaterThan(0);
+    expect(fills[0]).toBe(expectedDepth.length);
+    expect(
+      Array.from((pooledMesh.geometry.attributes.aShoreDepth as THREE.BufferAttribute).array),
+    ).toEqual(expectedDepth);
+    expect(
+      Array.from((pooledMesh.geometry.attributes.aShoreSlope as THREE.BufferAttribute).array),
+    ).toEqual(expectedSlope);
   });
 
   it('unloadZone releases a streamed zone sheet (and its underside twin) and a later ensureZone rebuilds it', async () => {
