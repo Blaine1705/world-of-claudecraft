@@ -246,7 +246,8 @@ const DEFAULT_WOC_MARKET_ABANDONS_RETENTION_DAYS = 30;
 // deal provenance); half a year matches the listings window so a deal's offer
 // and listing rows age out together.
 const DEFAULT_WOC_MARKET_OFFERS_RETENTION_DAYS = 180;
-// DOUBLE the listings window on purpose, never matched to it: a booked claim
+// A full year, comfortably above the listings window on purpose and never
+// matched to it: a booked claim
 // is the exactly-once delivery evidence, and it must provably outlive the
 // settlement and listing rows (180-day window, aged on updated_at) that could
 // still reach bookCustodyOnce with the same custody ref. booked_at is stamped

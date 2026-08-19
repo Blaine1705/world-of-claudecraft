@@ -5,13 +5,72 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-17-db-retention-indexes.md`
+- 17 IMPLEMENT COMPLETE (2026-08-19, LOCAL not pushed per R4; release sync
+  a NO-OP, 0 behind origin/release/v0.40.0 e56707a675; session start
+  4799b24dc2). All four deliverables landed with their stale premises
+  re-verified first: custody-claims retention (pruneBookedWocCustodyClaimsBatch,
+  WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS 365, booked-only aged on
+  booked_at behind the new woc_market_custody_claims_booked partial, a
+  parsed-ref referent guard so a live settlement/listing row shields its
+  claim at any age, ctid outer, boot warning wocCustodyClaimsRetentionWarning
+  on the window relation) plus the knobless step-up drain
+  (WOC_STEPUP_PRUNE_SLACK_DAYS 1), both registered before the listings
+  tail; indexes woc_market_listings_live_price_desc and
+  woc_market_settlements_listing_latest (supersedes _listing by
+  create-before-drop); lock_timeout completed at insertPendingBid and
+  activateBidTx (ALL twelve withTx guards now carry both bounds,
+  ratcheted; held-lock pg proofs within [1.5s, 10s)); the priorWinners
+  fold (nextCascadeBidder derives won/defaulted per account in SQL, the
+  cascade arm's unbounded bid-list fetch is gone); the consolidated
+  EXPLAIN list as the new tests/woc_market_plan_pins_pg_integration.test.ts
+  incl the realistic-count poll-read preference proof; the pgPool gauge
+  {total, idle, waiting} plus the 55P03 lockWaitTimeouts counter on
+  GET /internal/woc-market/stuck; the accounts-cascade FK columns
+  DECIDED not indexed (rationale in the 17 progress entry, QA re-judges);
+  the boot-repair quals EXPLAINed one-off and recorded (discharged);
+  monolith ratchet re-pinned DOWN at woc_market.ts 4484. Three typed
+  reviewers plus a fresh fix-round reviewer plus qa-checklist (READY);
+  roughly 55 findings, every one applied or judged; the headline was the
+  measured hashed-SubPlan regression in the first prune cut, fixed and
+  plan-pinned with a no-SubPlan assert. The 17 implement entry in
+  progress.md is the registry the 17 QA consumes (JUDGED lists binding;
+  values registry inside).
+- 17 SESSION START DECISION (2026-08-19), the deferred perf rider scope,
+  settled with reasons: NEITHER cluster lands in 17. (1) The escrow
+  WRITE-path cluster (05/06 QA db-perf P2s, 12 sub-items per the 16 QA
+  registry) goes to its OWN dedicated rider before 22, confirming the 16
+  proposal: it is write-path work with its own pg review surface (the
+  roughly 15-site FOR NO KEY UPDATE narrowing pass, the commitGrant FIFO
+  hard-sequenced after the honest occupancy bound), it needs
+  privacy-security in its reviewer set, and folding it into 17 would double
+  the review surface of both diffs. (2) The per-request auth-guard-read
+  cluster ALSO goes to a dedicated rider before 22, SEPARATE from the
+  escrow rider: it is security-sensitive caching, not retention/index work
+  (a token cache extends a revoked token's life by up to its TTL, including
+  the ADMIN bearer, since require_admin resolves through the same
+  db.accountAndScopeForToken; a moderation cache delays cross-process bans
+  by the TTL; moderationStatusForAccount computes locked/suspendedUntil
+  with Date.now at read time, so the ROW, not the computed result, must be
+  cached), with roughly 20 bust sites across 6+ files and its own reviewer
+  set (privacy-security + server-hot-path). It is NOT an enable blocker:
+  both guard reads are indexed point reads (auth_tokens token probe,
+  accounts id PK + one LEFT JOIN) already behind the 240/min read limiter;
+  the win is efficiency, not safety, so deferring past 17 costs nothing at
+  enable time. Sequencing: both riders land AFTER 19 and BEFORE 21 where
+  feasible so 21's devnet contention run measures the shipped shapes;
+  escrow rider first (its items carry internal ordering), auth-guard rider
+  second; each as its own implement+QA pair. Design constraints recorded
+  for the auth rider: consider scoping the cache to the marketplace
+  guardDbBundle seam (woc_market_routes.ts) so the admin surface stays
+  uncached; cache raw rows and re-check expires_at at read time (the SQL
+  bakes expires_at > now() into the probe, so a result cache extends token
+  life); the account-keyed bust design must handle revokeCompanionToken's
+  prefix-keyed delete; recon detail in the 17 implement entry of
+  progress.md.
+- Next file to run: `docs/woc-marketplace-hardening/phase-17-qa.md`
   (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH
-  session, newest origin/release/** sync first). The 17 SESSION START also
-  DECIDES the deferred rider scope: the escrow WRITE-path cluster PLUS the
-  new per-request auth-guard-read cluster (requireAccount's two uncached
-  queries per request dominate every metered marketplace GET; the
-  discord_status_cache shape with moderation busts is the sketched fix).
+  session, newest origin/release/** sync first) once the 17 implement
+  session below completes.
 - 16 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied or
   judged with the file open, PUSHED per R4). Release sync a NO-OP (0 behind
   origin/release/v0.40.0 e56707a675). Eight workflow lanes + three typed

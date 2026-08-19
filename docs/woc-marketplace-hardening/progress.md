@@ -3664,3 +3664,202 @@ zero-skip in this session's own runs (249/249 and the 29-file battery).
 NEXT = docs/woc-marketplace-hardening/phase-17-db-retention-indexes.md,
 GAME repo, worktree wocc-marketplace, FRESH session, newest
 origin/release/** sync first.
+
+## 17 implement round (database retention, indexes, and deadlines)
+
+Release sync a NO-OP: the branch already sat AT origin/release/v0.40.0's
+tip e56707a675 (0 behind, no merge commit, no audit owed); session start
+tip 4799b24dc2, tree clean. The SESSION START DECISION on the deferred
+perf rider scope is recorded in state.md: NEITHER cluster lands in 17;
+the escrow WRITE-path cluster and the per-request auth-guard-read
+cluster each go to their OWN dedicated rider before 22 (escrow first,
+auth-guard second, both ideally after 19 and before 21 so the devnet
+contention run measures the shipped shapes), with the reasons and the
+auth rider's design constraints in the state.md entry.
+
+Premise re-verification first (the findings context was dated 2026-08-11
+and partially stale): deliverable 1's query-shape fix was SUPERSEDED by
+the 14 round (the non-partial _buyer_all/_seller_all indexes and a
+one-row EXPLAIN pin already shipped), leaving the realistic-row-count
+proof, the settlements LATERAL index, the consolidated EXPLAIN list, and
+the priorWinners bound; deliverable 2's offers half shipped with 06 (all
+four terminal statuses swept, verified), leaving custody claims as the
+live work; deliverable 3's FK-cascade columns touched by MARKETPLACE
+deletes were ALL already covered (06/14), and the four uncovered FK
+columns are accounts-cascade only, DECIDED not indexed: the only hard
+accounts DELETE in the tree is the federated-provision race loser
+(deleteUnusedFederatedProvision), which by construction deletes fresh
+unused accounts that cannot own market rows, and user-facing removal is
+a soft delete that fires no cascade, so four permanent write-amplifying
+indexes on the hottest tables would serve a scan that cannot fire (the
+QA session re-judges); deliverable 4's buy-now half already carried the
+full posture, leaving insertPendingBid and activateBid.
+
+THE VALUES REGISTRY the 17 QA re-judges:
+- Custody-claims retention: pruneBookedWocCustodyClaimsBatch, BOOKED
+  rows only, aged on booked_at behind the new partial cursor
+  woc_market_custody_claims_booked (booked_at) WHERE booked_at IS NOT
+  NULL; window WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS default 365, a
+  full year comfortably above the listings window BY DESIGN (booked_at
+  is stamped at or before the listing's closing updated_at, so an equal
+  window could prune the claim first); a parsed-ref referent guard (bare NOT EXISTS
+  primary-key probes off regex-guarded CASE parses of the three mint
+  shapes woc_settlement:/woc_listing_return:/woc_listing_sold:, digit
+  bound {1,18}) means a claim whose settlement or listing row survives
+  NEVER prunes whatever its age; malformed legacy refs prune on the
+  window alone (fail-open, judged: the pre-enable deploy note requires
+  the table empty-or-booked, and the minter-regex pin makes a fourth
+  unparsed shape impossible to ship silently). The ctid outer keeps the
+  DELETE a Tid Scan (a concurrently moved row misses and prunes next
+  batch, the safe direction). Unbooked rows in every attribution state
+  are structurally out of reach and the never-delete operator rule
+  stands. Registration sits BEFORE the woc_market_listings tail entry.
+  A BOOT WARNING (wocCustodyClaimsRetentionWarning, unit-tested pure
+  helper) fires when the custody window sits at or below the listings
+  window or when listings retention is keep-forever (which silently
+  disarms this prune; also documented at the .env.example row).
+- Step-up drain: pruneExpiredWocStepUpChallengesBatch, knobless BY
+  DESIGN (expired nonces are garbage, not history; prune-on-issue stays
+  the primary reaper; this entry only drains realms that stopped
+  issuing), WOC_STEPUP_PRUNE_SLACK_DAYS = 1 day past expiry, no ORDER
+  BY (unindexed global cutoff, the abandons rule), O(table) per batch
+  ACCEPTED and stated at the docstring with the measured figure.
+- Indexes: woc_market_listings_live_price_desc (realm, COALESCE(
+  current_bid_cents, start_cents) DESC, id) partial on the live set (the
+  ASC id tiebreak shared with price_asc is exactly why a backward scan
+  of the ASC index cannot serve it; the +1-index-per-bid write cost is a
+  stated trade); woc_market_settlements_listing_latest (listing_id, id
+  DESC) serving both the FK cascade and the offers reads' LATERAL
+  latest-settlement probe, superseding woc_market_settlements_listing
+  via create-before-drop idempotent DDL (upgrade path proven by
+  recreate-then-reapply in the settlement pg suite).
+- Deadlines: insertPendingBid and activateBidTx gained SET LOCAL
+  lock_timeout = ESCROW_LOCK_TIMEOUT_MS (2000), completing the set: ALL
+  TWELVE withTx guards now carry BOTH bounds, ratcheted by the
+  completeness floor (per-site full-literal + count). Held-lock pg
+  tests prove both bid paths answer the typed contended 409 with
+  elapsed in [1500, 10000) ms against the 15s session ceiling. 55P03
+  fires now count (wocMarketLockWaitTimeoutCount, incremented in the
+  isLockContention classifier, single-count audited across all 13 call
+  sites) beside idleTxKills on the stuck readout; the counters are
+  proven to partition the codes in unit AND real-pg tests.
+- priorWinners: nextCascadeBidder(listingId, minCents) derives the
+  won/defaulted exclusion per ACCOUNT in SQL (NOT EXISTS, outer table
+  aliased so the correlation cannot silently self-reference); the
+  cascade arm no longer fetches bidsForListing, removing the unbounded
+  per-overdue-settlement read AND the unbounded array; the fake mirrors
+  the derivation and an always-running SQL-floor pin holds the shipped
+  text (the coverage lane's blocker: without it the merge gate only
+  exercised the fake).
+- Observability: GET /internal/woc-market/stuck gains the pgPool
+  occupancy gauge {total, idle, waiting} (the 16-deferred pg pool gauge
+  itself; sustained waiting > 0 is the brownout precursor) and the
+  lockWaitTimeouts counter.
+- The monolith ratchet RE-PINS server/woc_market.ts at 4484 (the
+  cascade fold shrank the coordinator; headroom is never left to
+  re-consume). woc_market_db.ts (no ceiling) carries the prunes beside
+  its retention siblings.
+
+The consolidated EXPLAIN list landed as the NEW pg suite
+tests/woc_market_plan_pins_pg_integration.test.ts (recording-pool
+capture of the SHIPPED statements, EXPLAIN under SET LOCAL
+enable_seqscan = off in rolled-back transactions, plan CLASS asserts
+anchored to the queries): the poll read at REALISTIC row counts (5,000
+offers, 1,000 listings, 3,000 terminal settlement attempts, ANALYZEd;
+natural-cost preference proof for the account indexes AND the LATERAL
+composite, the acceptance criterion), all four browse sorts as ordered
+sortless index walks, the five stuck-readout classes, the redrive page
+(one JUDGED relaxed pin, rationale in place: under LIMIT the uniform-
+distribution assumption lets a filtered pkey walk tie the live partial
+at any fixture scale, so the decisive asserts are the natural-cost
+no-seq-scan plus the DB-free literal index pin), the two rotation-order
+reads, the sold-residue dispose, the buy-now cooldown ledger probes,
+the offer expiry and converge probes, the cascade pick, and the
+booked-claims prune itself. The two 02-round boot-repair quals were
+EXPLAINed one-off against the grown rig rather than pinned (their
+origin was measure-before-enable): both short-circuit behind an
+InitPlan one-time filter on the index-validity probe on every healthy
+boot, the settlements body when armed is bounded by the OPEN set via
+open2, and the sales body's seq scan fires at most once per legacy
+upgrade under the boot lock, exactly the DDL comments' claims; recorded
+here, item discharged.
+
+Review rounds: database-performance-reviewer, migration-safety, and
+test-coverage-auditor ran as plain Agents over the committed diff;
+roughly 45 findings, EVERY one applied or judged with the file open.
+The headline (both db lanes, independently measured): the first cut's
+IS-NULL-wrapped referent probes compiled to hashed SubPlans that seq-
+scanned the whole settlements table per batch, contradicting the
+docstring; fixed with the row-set-identical bare NOT EXISTS (anti-join
+primary-key paths) plus the ctid outer, and the prune now carries its
+own plan pin so the class cannot regress silently. Also applied: the
+minter-regex correspondence pin (a fourth custody-ref shape cannot
+silently fall to window-only retention), the boot warning + relation
+assert + .env.example coupling note, the 55P03 counter with partition
+proofs, the digit-bound regexes, the cascade outer alias, the live
+sold-notice referent arm (the one referent-guard alternation arm the
+matrix missed), staged-batch idempotence, the real-SQL drain test, the
+natural-mode redrive assert, the plan suite's module-pool leak, the
+FOR-UPDATE slice-bound guard, and the per-slice full-literal lock pin.
+JUDGED no change (do not re-raise): the sticky-prefix gauge (a claim
+blocked by a live referent for 365+ days means a deal the monitor has
+been screaming about for a year; post-enable measurement, 22); the pool
+gauge staying instantaneous and single-pool (the high-water refinement
+and the multi-pool readout ride the rider/22 observability work); the
+stuck-readout plan case's empty-table joined-plan shape (the seqscan-
+off recipe is decisive on usability by design; per-class index names
+are distinct); the residue probe's three-way alternation (all three are
+legitimate O(small) paths, commented in place); the natural-cost
+preference proof's planner-version sensitivity (accepted, header
+discipline); the interval-overflow family on huge retention-days
+values (pre-existing across every sibling prune); the boot DROP INDEX
+ACCESS EXCLUSIVE hold (pre-enable-empty, exact precedent on the same
+table); the dump/restore sequence-reuse exotic (item-loss direction,
+visible, recorded); and the 409-visibility change on contended bids
+(intended: typed, counted, and retryable beats camping a pool client).
+A FRESH reviewer then audited the fix-round commit itself (the
+standing rule); its findings and dispositions close the round (see the
+fix commits).
+
+The fix-round reviewer (fresh, empirical) found no blockers and two
+should-fixes, both applied in 32cecb3de4: the new prune plan pin passed
+verbatim on the REVERTED shape (its hashed SubPlans feed off index-only
+scans, dodging every seq-scan assert), closed with a no-SubPlan assert;
+and the step-up drain test's whole-database exactness premise would
+have gone red around September 2027 when the real clock passes the
+BASE_MS-anchored sibling fixtures, closed by scoping to per-nonce
+asserts. Its nits landed too (the activateBid arm's 55P03 counter
+assert, the warn-consumption pin, the honest keep-forever copy, the
+minter-suffix naming contract stated at the docstring); judged from
+that round: the side-effecting is* classifier (single-count argument
+verified at all call sites and covered by the partition tests) and the
+{1,18} reclassification of 19-digit ids (unreachable for bigserial, and
+it closes the poison-row 22003 hazard the unbounded regex carried).
+qa-checklist ran LAST and returned READY (0 blocking, 1 should-fix:
+the claims-prune ordering comment overstated the plan on small
+fixtures, softened, with the load-bearing classes held by the plan
+pin's no-SubPlan/no-seq-scan asserts; its notes are recorded: the
+elapsed-band flake exposure is accepted at 5x headroom, the 365-vs-360
+DOUBLE prose was corrected to "a full year, comfortably above", and
+the NaN batchSize pass-through is the pre-existing house shape).
+
+Commits: 3a3c13ce27 (feat: retention, indexes, lock bounds, cascade
+fold, pool gauge), e2eceb2438 (test: retention/deadline/plan-class
+coverage), 0fb0359113 (fix: the review round), 32cecb3de4 (test: the
+fresh-review fixes), plus the docs commits.
+LOCAL per R4: nothing pushed; the 17 QA session pushes on PASS.
+
+Validation: tsc clean; ci:changed exit 0; the full DB-free market and
+guard batteries green (roughly 900 tests across the touched suites);
+ALL SIX pg suites green against dev Postgres with TEST_DATABASE_URL
+(plan-pins 10/10, delivery+stepup+bond 85, settlement+directed 76,
+zero skips proven by count); qa-checklist additionally re-ran tsc,
+biome, the malware scan, and every pg suite itself and EXPLAINed the
+prune independently. The gate (node scripts/gate_select.mjs with
+TEST_DATABASE_URL only, committed tree) runs at session close; its
+result is recorded in the wrap commit line below.
+Gate: [recorded in the wrap commit]
+
+NEXT = docs/woc-marketplace-hardening/phase-17-qa.md, GAME repo,
+worktree wocc-marketplace, FRESH session, newest origin/release/** sync
+first; it diffs 4799b24dc2..HEAD and pushes on PASS.

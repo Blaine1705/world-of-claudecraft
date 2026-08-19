@@ -1436,7 +1436,10 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     expect(text).toContain('SELECT 1 FROM woc_market_settlements s WHERE s.id = ref.settlement_id');
     expect(text).toContain('SELECT 1 FROM woc_market_listings l WHERE l.id = ref.listing_id');
     // booked_at IS indexed for this predicate (the partial cursor above), so
-    // oldest-first is a bounded index walk, not a sort.
+    // the index can supply the ordering when the planner takes the ordered
+    // path; on small fixtures a bitmap-plus-sort of one batch's bounded
+    // candidate set is a legitimate cost pick (the plan-pins suite holds the
+    // load-bearing classes: no table scans and no SubPlan).
     expect(text).toContain('ORDER BY c.booked_at');
     expect(text).toContain('LIMIT $2');
     expect(params()[0]).toEqual(['365', 100]);
