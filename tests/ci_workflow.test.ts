@@ -422,7 +422,12 @@ describe('CI workflow parity', () => {
     // gate.mjs and gate_select.mjs share one copy; the pin follows it there and
     // additionally holds gate.mjs to still invoking it, which is what actually
     // makes the resolution reachable.
-    expect(workflow).not.toContain('apt-get');
+    // The blanket apt-get ban became a count pin when browser-gate's font
+    // fallback earned the workflow's ONE sanctioned apt use (the two lines of
+    // the Install Chromium block, pinned whole above): FFmpeg stays banned by
+    // name, and any third apt-get line is new creep this count refuses.
+    expect(workflow).not.toMatch(/apt-get[^\n]*ffmpeg/i);
+    expect(workflow.match(/apt-get/g) ?? []).toHaveLength(2);
     expect(preflightCode).toContain("from '../sfx/ffmpeg_paths.mjs'");
     expect(gateCode).toContain('runGatePreflights');
   });
@@ -434,11 +439,13 @@ describe('CI workflow parity', () => {
     // best-effort by ruling (2026-08-19: three merge-queue rejections died
     // at zero mirror throughput with the browser cache-hit). The runner
     // image already ships Chromium's system libraries, and a genuinely
-    // missing one fails at browser launch. Pinned as the WHOLE block scalar
-    // so a step comment cannot satisfy it, the hard-fail line cannot grow a
-    // fallback, and the retry count and bounds cannot drift silently: the
-    // two tries total 3 minutes, sized so a double stall stays inside the
-    // job's 10-minute bound and its auto-rerunnable setup class.
+    // missing one fails at browser launch, and the fonts install-deps alone
+    // provided are verified by capability with a mirror-swapped targeted
+    // fallback. Pinned as the WHOLE block scalar so a step comment cannot
+    // satisfy it, the hard-fail line cannot grow a fallback, and the bounds
+    // cannot drift silently: the degraded path totals about 3.7 minutes,
+    // sized to stay inside the job's 10-minute bound and its
+    // auto-rerunnable setup class.
     expect(browserGate).toContain(PLAYWRIGHT_INSTALL_BLOCK);
     expect(browserGate).not.toContain('--with-deps');
     expect(browserGate).toContain('run: npm run test:browser');
