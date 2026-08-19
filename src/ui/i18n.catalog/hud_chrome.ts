@@ -764,6 +764,7 @@ export const hudChromeStrings = {
     promptRead: 'Read',
     promptRing: 'Ring',
     promptHold: 'Hold',
+    promptAttack: 'Attack',
     // Ferryman Odo's guiding voice: the CAPTION rows the coach card shows
     // while the (English) VO clip plays. Each row mirrors one
     // scripts/voices/extra_lines.mjs guide__odo__* line; reword the two

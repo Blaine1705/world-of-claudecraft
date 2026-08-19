@@ -7934,6 +7934,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bootcamp.forwardBodyPad'
   | 'hudChrome.bootcamp.forwardBodyTouch'
   | 'hudChrome.bootcamp.forwardTitle'
+  | 'hudChrome.bootcamp.promptAttack'
   | 'hudChrome.bootcamp.promptHold'
   | 'hudChrome.bootcamp.promptPickUp'
   | 'hudChrome.bootcamp.promptRead'

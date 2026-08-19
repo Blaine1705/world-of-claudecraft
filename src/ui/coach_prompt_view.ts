@@ -41,17 +41,25 @@ export interface CoachPromptPlan {
   lift: number;
   /** Interact reach for this target kind (the show gate). */
   range: number;
-  /** The verb under the keycap: Talk, Turn in, Pick up, Read, Ring. */
+  /** The verb under the keycap: Talk, Turn in, Pick up, Read, Ring, Attack. */
   verbKey: TranslationKey;
+  /** 'kill' bubbles chip the target and attack binds instead of interact. */
+  kind: 'interact' | 'kill';
 }
 
-/** The minimal entity shape the crate scan reads (IWorld.entities values). */
+/** The minimal entity shape the crate and mob scans read
+ *  (IWorld.entities values). */
 export interface CoachPromptEntity {
   kind: string;
+  templateId?: string;
   objectItemId?: string | null;
   dead?: boolean;
   pos: { x: number; z: number };
 }
+
+/** How close to the lesson's mobs the Attack bubble shows: wide enough to
+ *  catch the approach, tight enough to point at THIS camp. */
+export const KILL_PROMPT_RANGE = 12;
 
 const NPC_LIFT = 2.5;
 const OBJECT_LIFT = 1.6;
@@ -59,8 +67,40 @@ const OBJECT_LIFT = 1.6;
 function npcPlan(npcId: string, verbKey: TranslationKey): CoachPromptPlan | null {
   const npc = PROVING_SHORE_NPCS[npcId];
   if (!npc) return null;
-  return { x: npc.pos.x, z: npc.pos.z, lift: NPC_LIFT, range: PROMPT_NPC_RANGE, verbKey };
+  return {
+    x: npc.pos.x,
+    z: npc.pos.z,
+    lift: NPC_LIFT,
+    range: PROMPT_NPC_RANGE,
+    verbKey,
+    kind: 'interact',
+  };
 }
+
+/** The nearest LIVE mob of the lesson's template, the Attack bubble's anchor. */
+export function nearestMob(
+  entities: Iterable<CoachPromptEntity>,
+  templateId: string,
+  playerPos: { x: number; z: number },
+): CoachPromptEntity | null {
+  let best: CoachPromptEntity | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const e of entities) {
+    if (e.kind !== 'mob' || e.templateId !== templateId || e.dead) continue;
+    const d = planar(e.pos.x, e.pos.z, playerPos.x, playerPos.z);
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
+  }
+  return best;
+}
+
+/** The two kill lessons' quarry (the Attack bubble's scan target). */
+const KILL_LESSON_TEMPLATE: Readonly<Record<string, string>> = {
+  q_ps_strike_true: 'training_effigy',
+  q_ps_shell_and_claw: 'shore_scuttler',
+};
 
 /** The nearest live castaway crate to the player, or null between respawns. */
 export function nearestCrate(
@@ -104,6 +144,7 @@ export function coachPromptPlan(args: {
       lift: OBJECT_LIFT,
       range: PROMPT_OBJECT_RANGE,
       verbKey: 'hudChrome.bootcamp.promptRing',
+      kind: 'interact',
     };
   }
   if (args.step !== null) {
@@ -122,7 +163,22 @@ export function coachPromptPlan(args: {
   if (focus.state === 'ready') {
     return npcPlan(quest.turnInNpcId, 'hudChrome.bootcamp.promptTurnIn');
   }
-  // Active tasks: only the interact-press lessons get a bubble.
+  // Active tasks: interact-press lessons bubble their target; the kill
+  // lessons bubble the nearest live quarry with the target and attack chips
+  // (the playtest ask: Strike True's instruction comes up like the others).
+  const quarry = KILL_LESSON_TEMPLATE[focus.questId];
+  if (quarry) {
+    const mob = nearestMob(args.entities, quarry, args.playerPos);
+    if (!mob) return null;
+    return {
+      x: mob.pos.x,
+      z: mob.pos.z,
+      lift: NPC_LIFT,
+      range: KILL_PROMPT_RANGE,
+      verbKey: 'hudChrome.bootcamp.promptAttack',
+      kind: 'kill',
+    };
+  }
   if (focus.questId === 'q_ps_the_wreck_line') {
     const crate = nearestCrate(args.entities, args.playerPos);
     if (!crate) return null;
@@ -132,6 +188,7 @@ export function coachPromptPlan(args: {
       lift: OBJECT_LIFT,
       range: PROMPT_OBJECT_RANGE,
       verbKey: 'hudChrome.bootcamp.promptPickUp',
+      kind: 'interact',
     };
   }
   if (focus.questId === 'q_ps_the_signpost') {
@@ -141,6 +198,7 @@ export function coachPromptPlan(args: {
       lift: OBJECT_LIFT,
       range: PROMPT_NPC_RANGE,
       verbKey: 'hudChrome.bootcamp.promptRead',
+      kind: 'interact',
     };
   }
   if (focus.questId === 'q_ps_pouch_and_purse') {

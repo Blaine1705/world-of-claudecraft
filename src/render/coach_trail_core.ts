@@ -215,7 +215,17 @@ export interface CoachGuides {
   /** True on the crate haul: the beam follows the nearest LIVE crate, which
    *  only the consumer can resolve (it needs the entity roster). */
   beamAtNearestCrate: boolean;
+  /** The kill lessons' quarry ground: a wide pulsing ring around the whole
+   *  camp (the effigy yard, the scuttler strand), so "go fight THERE" reads
+   *  from across the shore. */
+  areaRing: { x: number; z: number; radius: number } | null;
 }
+
+/** The two kill camps' authored centers and how wide their rings draw. */
+const KILL_AREA_RINGS: Readonly<Record<string, { x: number; z: number; radius: number }>> = {
+  q_ps_strike_true: { ...STRIKE_YARD, radius: 9 },
+  q_ps_shell_and_claw: { ...SCUTTLER_STRAND, radius: 11 },
+};
 
 /** The non-character objective the vertical beam should stand over, or null
  *  when the station's target is an NPC (they get the aura instead). */
@@ -250,11 +260,14 @@ export function coachGuides(world: CoachGuideReader): CoachGuides {
   const gauntletCounts = world.questLog.get(PROVING_SHORE_QUEST_ORDER[0])?.counts?.[0] ?? 0;
   const glowNpcId = coachTargetNpcId(world);
   const beam = beamTarget(world, gauntletCounts);
+  const focus = railFocus(world);
+  const areaRing = focus?.state === 'active' ? (KILL_AREA_RINGS[focus.questId] ?? null) : null;
   return {
     plan: coachTrailPlan(world, gauntletCounts),
     glowNpcId,
     glowNpcPos: glowNpcId ? PROVING_SHORE_NPCS[glowNpcId].pos : null,
     beamAt: beam.at,
     beamAtNearestCrate: beam.nearestCrate,
+    areaRing,
   };
 }

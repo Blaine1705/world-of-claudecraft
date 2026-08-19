@@ -301,7 +301,17 @@ export class BootcampOverlay {
       '#vendor-window .vendor-item',
       (el) => vendorItem !== null && el.dataset.coachItem === vendorItem,
     );
-    syncGlow('#bags .bag-item', (el) => bagItem !== null && el.dataset.coachItem === bagItem);
+    // The buckle-on step is a sell trap while the stall is open (a bag click
+    // SELLS with a vendor up): with the shop open the glow moves to the
+    // shop's close button, and only once it is closed does the bagged pouch
+    // itself pulse.
+    const vendorEl = document.querySelector<HTMLElement>('#vendor-window');
+    const vendorOpen = vendorEl !== null && vendorEl.style.display === 'block';
+    syncGlow('#vendor-window [data-close]', () => bagItem !== null && vendorOpen);
+    syncGlow(
+      '#bags .bag-item',
+      (el) => bagItem !== null && !vendorOpen && el.dataset.coachItem === bagItem,
+    );
   }
 
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange
@@ -545,11 +555,22 @@ export class BootcampOverlay {
       return;
     }
 
-    const { chip } = coachPromptChip(mode, keybinds.primaryLabel('interact'));
-    const contentKey = `${plan.verbKey}:${chip ?? ''}:${mode}`;
+    // Kill lessons chip the target and attack binds (Tab, 1); everything
+    // else chips the interact bind per input family.
+    let chips: readonly string[];
+    if (plan.kind === 'kill') {
+      chips =
+        mode === 'keyboard'
+          ? [keybinds.primaryLabel('target'), keybinds.primaryLabel('slot0')].filter(Boolean)
+          : [];
+    } else {
+      const { chip } = coachPromptChip(mode, keybinds.primaryLabel('interact'));
+      chips = chip ? [chip] : [];
+    }
+    const contentKey = `${plan.verbKey}:${chips.join(',')}:${mode}`;
     if (this.promptContentKey !== contentKey) {
       this.promptContentKey = contentKey;
-      this.paintPromptChips(chip ? [chip] : []);
+      this.paintPromptChips(chips);
       this.promptVerbEl.textContent = t(plan.verbKey);
     }
 

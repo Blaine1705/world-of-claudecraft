@@ -810,23 +810,32 @@
      glow applicator (tracker titles, quest-log rows, the vendor buy row,
      the bag stack), all sharing this one rule. */
   .qd-coach {
-    border: 1px solid var(--gold);
+    border: 2px solid var(--gold);
+    border-radius: 6px;
     box-shadow:
-      0 0 10px #ffc86066,
-      inset 0 0 6px #ffc86022;
-    animation: qd-coach-pulse 1200ms ease-in-out infinite;
+      0 0 14px #ffc860aa,
+      inset 0 0 8px #ffc86033;
+    animation: qd-coach-pulse 900ms ease-in-out infinite;
   }
+  /* Playtest verdict: the first cut was too subtle to notice mid-flow. The
+     swing is deliberately loud (dim gold to near-white-hot, wide bloom, a
+     background wash) because on the island THIS control is the lesson. */
   @keyframes qd-coach-pulse {
     0%,
     100% {
+      border-color: var(--gold);
+      background-color: #ffc86014;
       box-shadow:
-        0 0 6px #ffc86044,
-        inset 0 0 4px #ffc86018;
+        0 0 8px #ffc86077,
+        inset 0 0 6px #ffc86022;
     }
     50% {
+      border-color: #ffe9b0;
+      background-color: #ffc8602e;
       box-shadow:
-        0 0 14px #ffc86088,
-        inset 0 0 8px #ffc86030;
+        0 0 26px #ffc860ee,
+        0 0 6px #fff3d088,
+        inset 0 0 12px #ffc86055;
     }
   }
   @media (prefers-reduced-motion: reduce) {

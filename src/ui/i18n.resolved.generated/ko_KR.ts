@@ -953,6 +953,7 @@ export const ko_KR: EnTranslations = {
       "promptRead": "Read",
       "promptRing": "Ring",
       "promptHold": "Hold",
+      "promptAttack": "Attack",
       "voiceArrival": "무사히 뭍에 올랐군. 발밑의 황금 길이 보이나? 나보다 길을 잘 아니 그대로 따라가게.",
       "voiceFirstFlag": "깃발 하나를 지났군. 다리를 멈추지 말게, 이제 둘 남았네.",
       "voiceRunDone": "깔끔한 질주였네. 보상은 감독관 펠이 갖고 있으니 가서 받게.",

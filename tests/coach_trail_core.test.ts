@@ -158,6 +158,15 @@ describe('coachGuides: the objective beam', () => {
     expect(guides.beamAtNearestCrate).toBe(false);
     expect(guides.glowNpcId).not.toBeNull();
   });
+
+  it('rings the whole kill camp while its lesson is live, and only then', () => {
+    const strike = coachGuides(reader({ q_ps_strike_true: 'active' }));
+    expect(strike.areaRing).toEqual({ x: -336, z: -14, radius: 9 });
+    const shell = coachGuides(reader({ q_ps_shell_and_claw: 'active' }));
+    expect(shell.areaRing).toEqual({ x: -380, z: -42, radius: 11 });
+    expect(coachGuides(reader({ q_ps_strike_true: 'ready' })).areaRing).toBeNull();
+    expect(coachGuides(reader({ q_ps_the_wreck_line: 'active' })).areaRing).toBeNull();
+  });
 });
 
 describe('coachGuides: the one per-frame read', () => {

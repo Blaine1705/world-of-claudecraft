@@ -953,6 +953,7 @@ export const ja_JP: EnTranslations = {
       "promptRead": "Read",
       "promptRing": "Ring",
       "promptHold": "Hold",
+      "promptAttack": "Attack",
       "voiceArrival": "無事の上陸だ。足元の金色の道が見えるか？わしよりよほど道を知っておる。あれをたどりなさい。",
       "voiceFirstFlag": "旗をひとつ越えたな。その調子で足を止めるな、残りはふたつだ。",
       "voiceRunDone": "見事な走りだった。褒美は監督官ペルが持っておる。受け取りに行きなさい。",

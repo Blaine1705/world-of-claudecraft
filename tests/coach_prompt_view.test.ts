@@ -63,7 +63,20 @@ describe('coachPromptPlan: which target carries the bubble', () => {
     expect(p!.verbKey).toBe('hudChrome.bootcamp.promptTurnIn');
   });
 
-  it('carries no bubble for the kill lessons', () => {
+  it('bubbles the nearest live quarry with Attack for the kill lessons', () => {
+    const near = { kind: 'mob', templateId: 'training_effigy', pos: { x: 4, z: 0 } };
+    const far = { kind: 'mob', templateId: 'training_effigy', pos: { x: 30, z: 0 } };
+    const felled = { kind: 'mob', templateId: 'training_effigy', dead: true, pos: { x: 1, z: 0 } };
+    const p = plan({
+      focus: { questId: 'q_ps_strike_true', state: 'active' },
+      entities: [far, felled, near],
+    });
+    expect(p!.x).toBe(4);
+    expect(p!.kind).toBe('kill');
+    expect(p!.verbKey).toBe('hudChrome.bootcamp.promptAttack');
+  });
+
+  it('stays quiet for a kill lesson with no live quarry in the roster', () => {
     expect(plan({ focus: { questId: 'q_ps_strike_true', state: 'active' } })).toBeNull();
     expect(plan({ focus: { questId: 'q_ps_shell_and_claw', state: 'active' } })).toBeNull();
   });
@@ -111,6 +124,7 @@ describe('coachPromptInRange: the show gate mirrors the interact reach', () => {
     lift: 2,
     range: INTERACT_RANGE + 2,
     verbKey: 'hudChrome.bootcamp.promptTalk',
+    kind: 'interact',
   } as const;
 
   it('shows at the reach boundary and hides one step past it', () => {

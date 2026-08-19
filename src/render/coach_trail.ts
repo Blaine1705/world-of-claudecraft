@@ -107,6 +107,9 @@ export class CoachTrail {
   private beam: THREE.Mesh | null = null;
   private beamMat: THREE.MeshBasicMaterial | null = null;
   private beamKey = '';
+  private areaRing: THREE.Mesh | null = null;
+  private areaRingMat: THREE.MeshBasicMaterial | null = null;
+  private areaRingKey = '';
 
   constructor(
     private readonly scene: THREE.Object3D,
@@ -257,14 +260,70 @@ export class CoachTrail {
     this.scene.add(this.beam);
   }
 
+  /** The kill camps' wide draped ring: an annulus ribbon whose every vertex
+   *  sits on the sampled terrain, rebuilt only when the camp changes. */
+  private buildAreaRing(key: string, at: { x: number; z: number; radius: number }): void {
+    this.disposeAreaRing();
+    const SEGMENTS = 72;
+    const HALF_WIDTH = 0.5;
+    const LIFT = 0.16;
+    const positions = new Float32Array((SEGMENTS + 1) * 2 * 3);
+    const index: number[] = [];
+    for (let i = 0; i <= SEGMENTS; i++) {
+      const a = (i / SEGMENTS) * Math.PI * 2;
+      const cos = Math.cos(a);
+      const sin = Math.sin(a);
+      const ix = at.x + cos * (at.radius - HALF_WIDTH);
+      const iz = at.z + sin * (at.radius - HALF_WIDTH);
+      const ox = at.x + cos * (at.radius + HALF_WIDTH);
+      const oz = at.z + sin * (at.radius + HALF_WIDTH);
+      const vi = i * 2;
+      positions.set([ix, this.groundAt(ix, iz) + LIFT, iz], vi * 3);
+      positions.set([ox, this.groundAt(ox, oz) + LIFT, oz], (vi + 1) * 3);
+      if (i > 0) {
+        const p = vi - 2;
+        const q = vi - 1;
+        index.push(p, q, vi, q, vi + 1, vi);
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setIndex(index);
+    this.areaRingMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(GOLD).multiplyScalar(1.8),
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    this.areaRing = new THREE.Mesh(geo, this.areaRingMat);
+    this.areaRing.renderOrder = 3;
+    this.areaRing.userData.renderCategory = 'ui3d';
+    this.scene.add(this.areaRing);
+    this.areaRingKey = key;
+  }
+
+  private disposeAreaRing(): void {
+    if (this.areaRing) {
+      this.scene.remove(this.areaRing);
+      this.areaRing.geometry.dispose();
+      this.areaRing = null;
+    }
+    this.areaRingMat?.dispose();
+    this.areaRingMat = null;
+    this.areaRingKey = '';
+  }
+
   /** Per-frame drive: every anchor is null off the island or when the
    *  station has no such target. `ringAt` doubles as the NPC aura anchor;
-   *  `beamAt` is the non-character objective's light column. `time` is the
-   *  renderer's shared clock. */
+   *  `beamAt` is the non-character objective's light column; `areaRing`
+   *  circles a kill camp. `time` is the renderer's shared clock. */
   update(
     plan: CoachTrailPlan | null,
     ringAt: { x: number; z: number } | null,
     beamAt: { x: number; z: number } | null,
+    areaRing: { x: number; z: number; radius: number } | null,
     time: number,
     dt: number,
   ): void {
@@ -280,6 +339,17 @@ export class CoachTrail {
     }
     this.updateRingAndAura(ringAt, time);
     this.updateBeam(beamAt, time);
+    if (!areaRing) {
+      if (this.areaRing) this.areaRing.visible = false;
+    } else {
+      const key = `${areaRing.x},${areaRing.z},${areaRing.radius}`;
+      if (this.areaRingKey !== key) this.buildAreaRing(key, areaRing);
+      if (this.areaRing && this.areaRingMat) {
+        this.areaRing.visible = true;
+        // A LOUD pulse (the playtest ask): the whole camp boundary breathes.
+        this.areaRingMat.opacity = 0.35 + 0.4 * (0.5 + 0.5 * Math.sin(time * 3.0));
+      }
+    }
   }
 
   private updateRingAndAura(ringAt: { x: number; z: number } | null, time: number): void {

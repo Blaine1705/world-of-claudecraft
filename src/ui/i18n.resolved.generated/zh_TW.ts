@@ -953,6 +953,7 @@ export const zh_TW: EnTranslations = {
       "promptRead": "Read",
       "promptRing": "Ring",
       "promptHold": "Hold",
+      "promptAttack": "Attack",
       "voiceArrival": "平安上岸啦，朋友。看見腳下這條金色路徑了嗎？它比我還認得路，跟著走就是。",
       "voiceFirstFlag": "過了一面旗了。腿別停，還剩兩面。",
       "voiceRunDone": "跑得乾淨俐落。獎賞在監工佩爾那裡，去領吧。",

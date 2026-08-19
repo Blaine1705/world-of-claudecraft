@@ -82,7 +82,14 @@ export class IslandGuidance {
     const g = this.guides;
     let beamAt = g?.beamAt ?? null;
     if (!beamAt && g?.beamAtNearestCrate) beamAt = nearestLiveCrate(world);
-    this.trail.update(g?.plan ?? null, g?.glowNpcPos ?? null, beamAt, time, dt);
+    this.trail.update(
+      g?.plan ?? null,
+      g?.glowNpcPos ?? null,
+      beamAt,
+      g?.areaRing ?? null,
+      time,
+      dt,
+    );
   }
 }
 

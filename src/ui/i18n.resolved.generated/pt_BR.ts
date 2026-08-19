@@ -953,6 +953,7 @@ export const pt_BR: EnTranslations = {
       "promptRead": "Read",
       "promptRing": "Ring",
       "promptHold": "Hold",
+      "promptAttack": "Attack",
       "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
       "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
       "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
