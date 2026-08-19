@@ -574,6 +574,37 @@ describe('WocMarketWindow live rig: the sell combobox', () => {
   });
 });
 
+describe('WocMarketWindow live rig: the sell form draft', () => {
+  it('carries the typed sell prices and the focus across the fee rebuild', async () => {
+    // The fee round trip calls render(), so the SELL fields are the ones that
+    // rebuild under the seller's hands now. The generic form-draft carry keys
+    // on data-field and covers them, which is exactly the sort of thing that
+    // stays true until someone renames a field.
+    const r = rig();
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    const input = q<HTMLInputElement>(r.root, '.wm-combo-input');
+    input.focus();
+    input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    q(r.root, '.wm-combo-item').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    const start = q<HTMLInputElement>(r.root, '[data-field="sell-start"]');
+    start.value = '42.25';
+    start.focus();
+    const buyNow = q<HTMLInputElement>(r.root, '[data-field="sell-buy-now"]');
+    buyNow.value = '99';
+    // The fee lands and rebuilds the form under both fields.
+    start.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    const startAfter = q<HTMLInputElement>(r.root, '[data-field="sell-start"]');
+    const buyNowAfter = q<HTMLInputElement>(r.root, '[data-field="sell-buy-now"]');
+    expect(startAfter, 'the form really was rebuilt').not.toBe(start);
+    expect(startAfter.value).toBe('42.25');
+    expect(buyNowAfter.value).toBe('99');
+    expect(document.activeElement, 'the seller keeps their place').toBe(startAfter);
+  });
+});
+
 describe('WocMarketWindow live rig: the seller fee figure', () => {
   it('re-derives the fee when the format changes, instead of leaving the old one up', async () => {
     // The fee is resolved by the SERVER for the price typed, and the format
@@ -596,7 +627,13 @@ describe('WocMarketWindow live rig: the seller fee figure', () => {
     format.dispatchEvent(new Event('change', { bubbles: true }));
     const price = q<HTMLInputElement>(r.root, '[data-field="sell-buy-now"]');
     price.value = '100';
+    // Typing alone must NOT ask the server: the estimate shares a per-minute
+    // bucket with the bond quote, the settlement quote and the refresh, so a
+    // seller trying prices could spend what the payment path needs.
     price.dispatchEvent(new Event('input', { bubbles: true }));
+    await flush();
+    expect(r.fake.calls.filter((c) => c.startsWith('estimate:')).length).toBe(0);
+    price.dispatchEvent(new Event('change', { bubbles: true }));
     await flush();
     expect(r.root.querySelectorAll('.wm-sell-fee').length).toBe(2);
     const before = r.fake.calls.filter((c) => c.startsWith('estimate:')).length;
@@ -622,12 +659,12 @@ describe('WocMarketWindow live rig: the seller fee figure', () => {
     q(r.root, '.wm-combo-item').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     const price = q<HTMLInputElement>(r.root, '[data-field="sell-start"]');
     price.value = '25';
-    price.dispatchEvent(new Event('input', { bubbles: true }));
+    price.dispatchEvent(new Event('change', { bubbles: true }));
     await flush();
     expect(r.root.querySelectorAll('.wm-sell-fee').length).toBe(2);
     const cleared = q<HTMLInputElement>(r.root, '[data-field="sell-start"]');
     cleared.value = '';
-    cleared.dispatchEvent(new Event('input', { bubbles: true }));
+    cleared.dispatchEvent(new Event('change', { bubbles: true }));
     await flush();
     expect(r.root.querySelectorAll('.wm-sell-fee').length).toBe(0);
   });

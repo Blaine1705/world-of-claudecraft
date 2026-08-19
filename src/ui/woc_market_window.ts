@@ -22,7 +22,6 @@ import type {
   WocSaleView,
 } from '../net/woc_market_sdk';
 import { ITEMS } from '../sim/data';
-import { isItemLocked } from '../sim/item_lock_flag';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { userFacingApiError } from './api_error_i18n';
@@ -48,6 +47,12 @@ import {
   walletBridgeReasonText,
 } from './wallet_bridge_reason_text';
 import { overWalletBalance } from './woc_affordable_core';
+import {
+  wocEndsAtText,
+  wocErrorStatusHtml,
+  wocLoadingStatusHtml,
+  wocSpinnerHtml,
+} from './woc_market_chrome';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
 import {
   wocBondPendingText,
@@ -706,15 +711,6 @@ export class WocMarketWindow {
     return ` data-tip-key="${esc(key)}"`;
   }
 
-  /** The exact end time of a listing, UTC and local, the way the detail pane
-   *  spells it (the countdown cells carry it as their tooltip). */
-  private endsAtText(endsAtMs: number): string {
-    return t('hudChrome.wocMarket.detailEndsAt', {
-      utc: formatDateTime(endsAtMs, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }),
-      local: formatDateTime(endsAtMs, { dateStyle: 'medium', timeStyle: 'short' }),
-    });
-  }
-
   private html(model: WocMarketViewModel): string {
     // Same lifetime as the DOM it describes (see the fields' comments).
     this.tooltipTargets.clear();
@@ -734,10 +730,10 @@ export class WocMarketWindow {
     if (model.kind === 'unavailable') return header;
     if (model.kind === 'loading') {
       // The shared ring, so a slow first load reads as waiting, never a stall.
-      return `${header}<div class="wm-status wm-status-loading" role="status">${this.spinnerHtml()}<span>${esc(t('hudChrome.wocMarket.loading'))}</span></div>`;
+      return `${header}<div class="wm-status wm-status-loading" role="status">${wocSpinnerHtml()}<span>${esc(t('hudChrome.wocMarket.loading'))}</span></div>`;
     }
     if (model.kind === 'error') {
-      return `${header}${this.errorStatusHtml(t('hudChrome.wocMarket.loadFailed'))}`;
+      return `${header}${wocErrorStatusHtml(t('hudChrome.wocMarket.loadFailed'))}`;
     }
     if (model.kind === 'disabled') {
       return `${header}<div class="wm-status" role="status">${esc(t('hudChrome.wocMarket.disabledRealm'))}</div>`;
@@ -801,7 +797,7 @@ export class WocMarketWindow {
     // The busy line moves (the shared ring): a signed transaction awaiting the
     // chain used to be indistinguishable from a wedged panel.
     const busy = this.busy
-      ? `<div class="wm-busy" role="status">${this.spinnerHtml()}<span>${esc(t(this.busyLabel ?? 'hudChrome.wocMarket.confirming'))}</span></div>`
+      ? `<div class="wm-busy" role="status">${wocSpinnerHtml()}<span>${esc(t(this.busyLabel ?? 'hudChrome.wocMarket.confirming'))}</span></div>`
       : '';
     const foot = `<div class="wm-foot">${rate}${notice}${busy}</div>`;
 
@@ -818,15 +814,6 @@ export class WocMarketWindow {
   }
 
   /** The shared waiting ring (the trade arm's spinner, one primitive). */
-  private spinnerHtml(): string {
-    return `<span class="woc-spinner" aria-hidden="true"></span>`;
-  }
-
-  /** A failed reach reads as an error: the glyph, the error voice, announced. */
-  private errorStatusHtml(text: string): string {
-    return `<div class="wm-status wm-status-error" role="status">${svgIcon('alert')}<span>${esc(text)}</span></div>`;
-  }
-
   private browseHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
     const b = model.browse;
     // The pager renders on EVERY browse face: an empty page past the first
@@ -849,13 +836,13 @@ export class WocMarketWindow {
       `<option value="price_desc" ${this.sort === 'price_desc' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sortPriceDesc'))}</option>` +
       `</select></label></div>`;
     if (b.failed) {
-      return `<div class="wm-browse">${pager}${this.errorStatusHtml(t('hudChrome.wocMarket.browseError'))}</div>`;
+      return `<div class="wm-browse">${pager}${wocErrorStatusHtml(t('hudChrome.wocMarket.browseError'))}</div>`;
     }
     if (b.rows.length === 0) {
       // Loading with nothing to show yet paints the ring, never a header-only
       // table; empty paints the empty line. Both under the live pager.
       const status = b.loading
-        ? `<div class="wm-status wm-status-loading" role="status">${this.spinnerHtml()}<span>${esc(t('hudChrome.wocMarket.loading'))}</span></div>`
+        ? wocLoadingStatusHtml()
         : `<div class="wm-status" role="status">${esc(t('hudChrome.wocMarket.browseEmpty'))}</div>`;
       return `<div class="wm-browse">${pager}${status}</div>`;
     }
@@ -908,7 +895,7 @@ export class WocMarketWindow {
           `<td>${r.buyNowCents === null ? '' : esc(this.usd(r.buyNowCents))}</td>` +
           // The countdown is one truncated unit; the exact end time (UTC and
           // local, the detail pane's spelling) rides its tooltip.
-          `<td${this.tip(`ends:${r.id}`, this.endsAtText(r.endsAtMs))}>${esc(this.countdown(r.remainingMs / 1000))}</td></tr>`
+          `<td${this.tip(`ends:${r.id}`, wocEndsAtText(r.endsAtMs))}>${esc(this.countdown(r.remainingMs / 1000))}</td></tr>`
         );
       })
       .join('');
@@ -1023,7 +1010,7 @@ export class WocMarketWindow {
       `<div class="wm-detail"><h3>${esc(t('hudChrome.wocMarket.detailTitle'))}</h3>` +
       `<div class="wm-detail-item">${this.itemCellHtml(d.row.itemId, d.row.quality, `detail:${d.row.id}`, d.row.instance)}</div>` +
       `<p>${esc(t('hudChrome.wocMarket.detailSeller', { name: d.row.sellerName }))}</p>` +
-      `<p>${esc(this.endsAtText(d.row.endsAtMs))}</p>` +
+      `<p>${esc(wocEndsAtText(d.row.endsAtMs))}</p>` +
       priceLine +
       estimate +
       bidForm +
@@ -1136,16 +1123,16 @@ export class WocMarketWindow {
   }
 
   private sellHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
-    // The picker hides a copy the player locked themselves (the exchange lock
-    // predicate the view core mirrors); the note says so instead of leaving
-    // the copy silently missing. Decided from the live bags: a slot the
-    // painter can name (a known def) that the lock alone refuses.
-    const lockedHidden = this.deps
-      .world()
-      .inventory.some((slot) => ITEMS[slot.itemId] !== undefined && isItemLocked(slot.instance));
-    const lockedNote = lockedHidden
-      ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellLockedHidden'))}</p>`
-      : '';
+    // The picker hides a copy the player locked themselves, and the note says
+    // so instead of leaving it silently missing. The count comes from the view
+    // core's own filter, run with the lock arm inverted, so the caption appears
+    // only for a copy UNLOCKING would actually bring back: asking the bags
+    // "is anything locked" claimed it about a locked stack of cloth, which the
+    // picker would never have offered either way.
+    const lockedNote =
+      model.sell.lockedOut > 0
+        ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellLockedHidden'))}</p>`
+        : '';
     if (model.sell.rows.length === 0) {
       return `<div class="wm-sell"><div class="wm-status" role="status">${esc(t('hudChrome.wocMarket.sellEmpty'))}</div>${lockedNote}</div>`;
     }
@@ -1403,7 +1390,7 @@ export class WocMarketWindow {
         // intent from a plainly active listing, or a directed sale minted by
         // a trade offer from a public auction.
         const cancelBadge = l.cancelPending
-          ? `<span class="wm-inline-busy">${this.spinnerHtml()}${esc(t('hudChrome.wocMarket.activityCancelPending'))}</span>`
+          ? `<span class="wm-inline-busy">${wocSpinnerHtml()}${esc(t('hudChrome.wocMarket.activityCancelPending'))}</span>`
           : '';
         const directedBadge = l.directed
           ? `<span class="wm-mine">${esc(t('hudChrome.wocMarket.activityDirected'))}</span>`
@@ -1443,7 +1430,7 @@ export class WocMarketWindow {
               ? // The SHORT key, shared with the busy banner: a permanent
                 // inline label on every affected row must stay terse (the
                 // first-accepted toast names WHICH pending it is instead).
-                `<span class="wm-inline-busy" role="status">${this.spinnerHtml()}${esc(t('hudChrome.wocMarket.confirming'))}</span>`
+                `<span class="wm-inline-busy" role="status">${wocSpinnerHtml()}${esc(t('hudChrome.wocMarket.confirming'))}</span>`
               : `<button type="button" data-action="pay-bond" data-bid="${b.id}" ${this.busy ? 'disabled' : ''} ` +
                 // The accessible name names the item when the wire carries it
                 // (H13 put the item on the row), the listing id otherwise.
@@ -1694,10 +1681,14 @@ export class WocMarketWindow {
       this.onBidPriceInput();
       return;
     }
-    if (field === 'sell-start' || field === 'sell-buy-now') {
-      this.onSellPriceInput();
-      return;
-    }
+    // Deliberately NOT the sell price fields: their fee estimate rides the same
+    // per-minute bucket as the bond quote, the settlement quote and the refresh
+    // (WOC_MARKET_QUOTE_POLICY), so a seller trying prices could spend the
+    // allowance the PAYMENT path needs and meet a refusal at the worst moment.
+    // The seller's figure is asked for once the value settles (the change
+    // event, on blur or Enter) rather than per keystroke; the bidder's live
+    // preview keeps its own cadence because a bidder watches it while typing.
+    if (field === 'sell-start' || field === 'sell-buy-now') return;
     if (field !== 'sell-search') return;
     this.sellSearch = (target as HTMLInputElement).value;
     this.sellOpen = true;
@@ -2018,6 +2009,13 @@ export class WocMarketWindow {
         this.render();
         this.onSellPriceInput();
       }
+      return;
+    }
+    // The seller's fee is asked for HERE, on change (blur or Enter), not on the
+    // input event: see onInput. One request per settled price instead of one
+    // per keystroke, on a bucket the payment path shares.
+    if (field === 'sell-start' || field === 'sell-buy-now') {
+      this.onSellPriceInput();
       return;
     }
     if (field === 'sell-duration') {

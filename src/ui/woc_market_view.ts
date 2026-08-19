@@ -269,7 +269,13 @@ export type WocMarketViewModel =
         failed: boolean;
         detail: WocDetailModel | null;
       };
-      sell: { rows: WocSellRowModel[]; maxActiveListings: number };
+      sell: {
+        rows: WocSellRowModel[];
+        maxActiveListings: number;
+        /** Copies the picker hides that UNLOCKING would bring back, so the
+         *  caption about locked items is only shown when it is true. */
+        lockedOut: number;
+      };
       activity: WocActivityModel | null;
     };
 
@@ -298,12 +304,40 @@ export function sellableRows(
   qualityFloor: string,
   categories: { mounts: boolean; mechChromas: boolean },
 ): WocSellRowModel[] {
+  return rowsPassing(inventory, qualityFloor, categories, (lock) => lock === null);
+}
+
+/**
+ * The copies the picker hides that the SELLER can unhide: everything the filter
+ * above would have taken, refused by the player's OWN item lock and nothing
+ * stronger (`exchangeHardLock` reports 'locked' only as its last arm).
+ *
+ * This exists so the sell tab's "locked items are not listed here" caption is
+ * true when it is shown. Asking only "is any known item in the bags locked"
+ * claimed it about a locked stack of cloth, which the picker would never have
+ * offered lock or no lock, and which no amount of unlocking would bring back.
+ */
+export function lockedOutRows(
+  inventory: readonly InvSlot[],
+  qualityFloor: string,
+  categories: { mounts: boolean; mechChromas: boolean },
+): WocSellRowModel[] {
+  return rowsPassing(inventory, qualityFloor, categories, (lock) => lock === 'locked');
+}
+
+/** The one filter body both readings share, so they cannot drift apart. */
+function rowsPassing(
+  inventory: readonly InvSlot[],
+  qualityFloor: string,
+  categories: { mounts: boolean; mechChromas: boolean },
+  acceptLock: (lock: ReturnType<typeof exchangeHardLock>) => boolean,
+): WocSellRowModel[] {
   const floor = QUALITY_RANK[qualityFloor] ?? QUALITY_RANK.epic;
   const rows: WocSellRowModel[] = [];
   inventory.forEach((slot, index) => {
     const def = ITEMS[slot.itemId];
     if (!def) return;
-    if (exchangeHardLock(def, slot.instance) !== null) return;
+    if (!acceptLock(exchangeHardLock(def, slot.instance))) return;
     const category = exchangeItemCategory(def);
     if (category === 'other') return;
     if (category === 'mount' && !categories.mounts) return;
@@ -424,6 +458,10 @@ export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewMode
         mechChromas: status.allowMechChromas,
       }),
       maxActiveListings: status.maxActiveListings,
+      lockedOut: lockedOutRows(input.inventory, status.qualityFloor, {
+        mounts: status.allowMounts,
+        mechChromas: status.allowMechChromas,
+      }).length,
     },
     activity,
   };

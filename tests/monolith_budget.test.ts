@@ -45,8 +45,12 @@ const MONOLITHS: MonolithRow[] = [
     // next line added here fails, and the fix is a sibling module behind the
     // window's own seam (a pure view-core plus this thin consumer, the
     // unit_portrait recipe), never a raise.
+    // Re-pinned DOWN from 2623 in the same change that set it: the status
+    // chrome (spinner, loading line, error line, the exact end time a countdown
+    // cell carries) moved to src/ui/woc_market_chrome.ts, which is the seam
+    // named below. The ratchet only works if it tightens after an extraction.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2623,
+    ceiling: 2621,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {

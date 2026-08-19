@@ -6,6 +6,7 @@ import {
   buildWocMarketView,
   canCancelListing,
   countdownSigBucket,
+  lockedOutRows,
   sellableRows,
   type WocActivityView,
   type WocBidView,
@@ -257,6 +258,44 @@ describe('paused derivation', () => {
 });
 
 const BOTH_ON = { mounts: true, mechChromas: true } as const;
+
+describe('lockedOutRows: only what UNLOCKING would bring back', () => {
+  // The caption "locked items are not listed here" is only true for a copy the
+  // player's own lock refuses and nothing stronger. Asking the bags "is
+  // anything locked" said it about copies the picker would never have offered.
+  it('reports a locked copy of otherwise eligible equipment', () => {
+    const inventory: InvSlot[] = [{ itemId: epicEquipId, count: 1, instance: { locked: true } }];
+    expect(sellableRows(inventory, 'epic', BOTH_ON)).toEqual([]);
+    expect(lockedOutRows(inventory, 'epic', BOTH_ON)).toEqual([
+      { index: 0, itemId: epicEquipId, quality: 'epic', instance: { locked: true } },
+    ]);
+  });
+
+  it.each([
+    ['a def with no equip slot', noSlotId],
+    ['a soulbound def', soulboundId],
+    ['a quest-kind def', questKindId],
+    ['rare equipment under the epic floor', rareEquipId],
+  ])('says nothing about a locked %s, which unlocking would not bring back', (_l, itemId) => {
+    const inventory: InvSlot[] = [{ itemId, count: 1, instance: { locked: true } }];
+    expect(sellableRows(inventory, 'epic', BOTH_ON)).toEqual([]);
+    expect(lockedOutRows(inventory, 'epic', BOTH_ON)).toEqual([]);
+  });
+
+  it('says nothing about an eligible copy that is NOT locked', () => {
+    const inventory: InvSlot[] = [{ itemId: epicEquipId, count: 1 }];
+    expect(sellableRows(inventory, 'epic', BOTH_ON)).toHaveLength(1);
+    expect(lockedOutRows(inventory, 'epic', BOTH_ON)).toEqual([]);
+  });
+
+  it('respects the same quality floor as the picker it mirrors', () => {
+    // A locked epic is reported at the epic floor and goes quiet at legendary,
+    // which is the picker's own rule seen from the other side.
+    const inventory: InvSlot[] = [{ itemId: epicEquipId, count: 1, instance: { locked: true } }];
+    expect(lockedOutRows(inventory, 'epic', BOTH_ON)).toHaveLength(1);
+    expect(lockedOutRows(inventory, 'legendary', BOTH_ON)).toEqual([]);
+  });
+});
 
 describe('sellableRows: the sell-tab pre-filter over real ITEMS', () => {
   it('passes eligible epic equipment and preserves its inventory index', () => {
