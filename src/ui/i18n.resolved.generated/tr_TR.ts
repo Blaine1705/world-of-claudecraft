@@ -953,6 +953,22 @@ export const tr_TR: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Mahzen",
+        "state": "Tören Katı",
+        "residence": "Yaşam Katı",
+        "tower": "Gözetleme Kulesi"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Bahçe Katı",
+        "solar": "Güneş Odası"
+      }
+    },
     "compass": {
       "N": "K",
       "NE": "KD",
@@ -4754,6 +4770,7 @@ export const tr_TR: EnTranslations = {
       "mageEleJet": "Su Jeti, evcil çubuğunda kendi düğmesiyle durur: bir düşmana dondurucu bir ışın kilitlemek için tıkla, ya da elementalin onu hazır olduğunda kendiliğinden ateşlemesine izin vermek için sağ tıkla (mobilde dokunup basılı tut).",
       "formsHeading": "Şekil Değiştirme",
       "formsNote": "Bir druid, şekil değiştirerek dövüşür. Çoğu druid yeteneği tek bir şekle aittir, bu yüzden içinde bulunduğun form neyi büyüleyebileceğine karar verir, ve şekil değiştirmek biraz mana harcar. İstediğin kadar sık, dövüş içinde ya da dışında şekil değiştirebilirsin.",
+      "formsAutoUnshift": "Formdayken yapılan bir iyileştirme ya da hasar büyüsü seni formdan kendiliğinden çıkarır. Formu bu yolla bırakmak bedavadır ve genel bekleme süreni harcamaz, yani anlık bir büyü tuşa bastığın anda çıkar. Forma geri dönmek sıradan bir yetenektir ve yine mana ile genel bekleme süreni tüketir.",
       "formsMoonwing": "Bir Denge druidi bir şekil daha kazanır: Aykuşu Formu, bu uzmanlığın dövüştüğü büyücü şeklidir. Büyülerini koruyan tek hayvan şeklidir ve değneğin yalnızca bu şekilde ya da normal büyücü şeklinde çalışır.",
       "formLine": {
         "form_bear": "Tank şekli: ağır bir post, mana yerine öfke ve düşmanların sana vurmaya devam etmesini sağlayan ekstra tehdit.",
@@ -7171,6 +7188,7 @@ export const tr_TR: EnTranslations = {
       "shopMarksRequired": "{name} satın almak için {marks} Delve Nişanına ihtiyacın var.",
       "shopSealPremiumOnly": "Bu mühür yalnızca bir ustanın eline boyun eğer. Onu yalnızca Premium bedel açabilir.",
       "passageSealed": "Geçit mühürlü.",
+      "enemiesRemain": "Önce kalan düşmanları temizle.",
       "moveCloserPassage": "Geçide yaklaş.",
       "moveCloserChest": "Sandığa yaklaş.",
       "moveCloserReliquary": "Emanetliğe yaklaş.",
@@ -9980,7 +9998,7 @@ export const tr_TR: EnTranslations = {
       },
       "fear": {
         "name": "Dehşet",
-        "description": "Düşmanın yüreğine korku salar ve onu 8 saniyeye kadar sinmiş bırakır. Herhangi bir hasar etkiyi bozar."
+        "description": "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar."
       },
       "searing_pain": {
         "name": "Dağlama",
@@ -10058,7 +10076,7 @@ export const tr_TR: EnTranslations = {
       "ferocious_bite": {
         "name": "Kanlı Isırık",
         "description": "{damage} veren bitirici hamle. Yalnızca Kurt Formu.",
-        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: kombo puanı başına 70 artı 43 hasar veren, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vuran ve 30 enerji geri kazandıran bir ısırık."
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak daha güçlü bir ısırık gerçekleştirir, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vurur ve enerji geri kazandırır."
       },
       "swipe": {
         "name": "Süpüren Pençeler",
@@ -10121,7 +10139,7 @@ export const tr_TR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Kurt Kanı",
-        "description": "Saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
+        "description": "Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
       },
       "rip": {
         "name": "Kanlı Yarık",
@@ -10226,7 +10244,7 @@ export const tr_TR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Kemik Damgası",
-        "description": "Bir düşmanı 12 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
+        "description": "Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
       },
       "unholy_command": {
         "name": "Kutsuz Emir",
@@ -10325,8 +10343,8 @@ export const tr_TR: EnTranslations = {
         "description": "Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)"
       },
       "feral_charge": {
-        "name": "Yabani Hücum",
-        "description": "Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)"
+        "name": "İlkel Dalga",
+        "description": "İlkel bir dalga salar. Kurt Formunda Enerji yenilenmesi 10 sn boyunca %100 artar. Bruin Formunda anında 50 Öfke üretir. (Yabanilik imzası)"
       },
       "swiftmend": {
         "name": "Hızlı İyileştirme",
@@ -10342,7 +10360,7 @@ export const tr_TR: EnTranslations = {
       },
       "redharvest": {
         "name": "Kızıl Hasat",
-        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve 30 enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
+        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
       },
       "marrowbreak": {
         "name": "İlik Kıran",
@@ -10582,7 +10600,7 @@ export const tr_TR: EnTranslations = {
       },
       "evocation": {
         "name": "Eter Kuyusu",
-        "description": "Restaura manayı rápidamente. (büyücü yeteneği)"
+        "description": "6 sn kanalize eder: her saniye 100 mana yeniler ve 8 Büyü Gücü biriktirir. Bonus kanalize ederken birikir ve 15 sn sürer. (büyücü yeteneği)"
       },
       "flurry_of_knives": {
         "name": "Bıçak Sağanağı",
@@ -10590,7 +10608,7 @@ export const tr_TR: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Yaban Onarımı",
-        "description": "10 sn. boyunca 180 sağlık yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)"
+        "description": "10 sn. boyunca azami sağlığının %40 kadarını yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)"
       },
       "frost_trap": {
         "name": "Kırağı Tuzağı",
@@ -10610,11 +10628,11 @@ export const tr_TR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Dehşet Uluması",
-        "description": "Yakındaki düşmanları 3 sn. kadar korkutur. Hasar etkiyi bozabilir. (Karabüyücü yeteneği)"
+        "description": "Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)"
       },
       "ice_block": {
         "name": "Soğuk Tabut",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sn. (büyücü yeteneği)"
+        "description": "Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Mevcut sıradan zararlı etkileri kaldırır ve yeni sıradan kontrol etkilerinin uygulanmasını engeller. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)"
       },
       "inner_focus": {
         "name": "Dingin Zihin",
@@ -10706,7 +10724,7 @@ export const tr_TR: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Atılgan Zihin",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sn. (büyücü yeteneği)"
+        "description": "Büyü yapma süresi olan bir sonraki büyünü anında kullanılır hâle getirir. 60 sn sürer. (büyücü yeteneği)"
       },
       "psychic_scream": {
         "name": "Psişik Çığlık",
@@ -10823,7 +10841,7 @@ export const tr_TR: EnTranslations = {
       },
       "prowl": {
         "name": "Sinsi Sokulma",
-        "description": "Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
+        "description": "Kurt Formundayken gizliliğe geçer ve 5% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
       },
       "rake": {
         "name": "Deri Yüzme",
@@ -12378,6 +12396,9 @@ export const tr_TR: EnTranslations = {
       "pristine_claw": {
         "name": "Kusursuz Pençe"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Bahçesi Çiçek Demeti"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -13222,6 +13243,15 @@ export const tr_TR: EnTranslations = {
       },
       "training_dummy": {
         "name": "Antrenman Kuklası"
+      },
+      "friendly_player_dummy": {
+        "name": "Dost Oyuncu Kuklası"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal Boss Kuklası"
+      },
+      "heroic_boss_dummy": {
+        "name": "Kahramanca Boss Kuklası"
       },
       "ridge_stalker": {
         "name": "Sırt Sinsisi"
@@ -16861,6 +16891,11 @@ export const tr_TR: EnTranslations = {
         "name": "Son Kale",
         "enterText": "Son Kale'nin soğuk, sessiz koridorlarına adım atıyorsun.",
         "leaveText": "Kale kapısını arkandan kapatıp Ejder Topraklarının rüzgarına geri dönüyorsun."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Şatosu",
+        "enterText": "Dawnhold Şatosu'nun sıcak, çiçek kokulu salonlarına adım atıyorsun.",
+        "leaveText": "Güneşli bahçe çimenliğine geri süzülüyorsun."
       },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",

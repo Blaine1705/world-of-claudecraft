@@ -953,6 +953,22 @@ export const es_ES: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Los sótanos",
+        "state": "La planta noble",
+        "residence": "La residencia",
+        "tower": "La atalaya"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "La planta del jardín",
+        "solar": "La solana"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -4754,6 +4770,7 @@ export const es_ES: EnTranslations = {
       "mageEleJet": "Chorro de Agua ocupa su propio botón en la barra de mascota: haz clic para fijar un rayo helado sobre un enemigo, o haz clic derecho (mantén pulsado en móvil) para dejar que el elemental lo dispare por su cuenta en cuanto esté listo.",
       "formsHeading": "Cambio de forma",
       "formsNote": "Un druida lucha cambiando de forma. La mayoría de las habilidades de druida pertenecen a una forma concreta, así que la forma en la que estás decide lo que puedes lanzar, y cambiar de forma cuesta un poco de maná. Puedes cambiar de forma dentro o fuera de combate, tantas veces como quieras.",
+      "formsAutoUnshift": "Una sanación o un hechizo de daño lanzado en forma te saca de ella por ti. Salir de una forma así es gratis y no gasta tu tiempo de reutilización global, de modo que un hechizo instantáneo sale en el momento en que lo pulsas. Volver a la forma es una habilidad normal y sigue costando maná y tu tiempo de reutilización global.",
       "formsMoonwing": "Un druida de Equilibrio gana una forma más, la Forma de lechúcico lunar, la forma de conjurador en la que lucha un druida de Equilibrio. Es la única forma animal que conserva tus hechizos, y tu varita solo funciona en ella o en tu forma de conjurador normal.",
       "formLine": {
         "form_bear": "La forma de tanque: una piel gruesa, ira en lugar de maná, y amenaza extra para que los enemigos sigan golpeándote a ti.",
@@ -7171,6 +7188,7 @@ export const es_ES: EnTranslations = {
       "shopMarksRequired": "Necesitas {marks} Marcas de Expedición para comprar {name}.",
       "shopSealPremiumOnly": "Este sello solo cede a la mano de un maestro: solo la apuesta Selecta puede abrirlo.",
       "passageSealed": "El pasaje está sellado.",
+      "enemiesRemain": "Acaba primero con los enemigos restantes.",
       "moveCloserPassage": "Acércate más al pasaje.",
       "moveCloserChest": "Acércate más al cofre.",
       "moveCloserReliquary": "Acércate al relicario.",
@@ -9980,7 +9998,7 @@ export const es_ES: EnTranslations = {
       },
       "fear": {
         "name": "Espanto",
-        "description": "Siembra terror en el enemigo y lo deja encogido durante hasta 8 s. Cualquier daño rompe el efecto."
+        "description": "Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto."
       },
       "searing_pain": {
         "name": "Abrasar",
@@ -10058,7 +10076,7 @@ export const es_ES: EnTranslations = {
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
         "description": "Movimiento de remate que inflige {damage}. Solo en Forma de lobo.",
-        "specNote_feral": "Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja: un mordisco de 70 más 43 por punto de combo que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura 30 de energía."
+        "specNote_feral": "Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía."
       },
       "swipe": {
         "name": "Zarpas Barredoras",
@@ -10121,7 +10139,7 @@ export const es_ES: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangre de Lobo",
-        "description": "Aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo."
+        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo."
       },
       "rip": {
         "name": "Grieta Sangrienta",
@@ -10226,7 +10244,7 @@ export const es_ES: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marca a un enemigo durante 12 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 m y crea 1 Fragmento de alma."
+        "description": "Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 Fragmento de alma."
       },
       "unholy_command": {
         "name": "Mandato profano",
@@ -10325,8 +10343,8 @@ export const es_ES: EnTranslations = {
         "description": "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)"
       },
       "feral_charge": {
-        "name": "Carga feral",
-        "description": "Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)"
+        "name": "Oleada primigenia",
+        "description": "Desata una oleada primigenia. En Forma de lobo, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)"
       },
       "swiftmend": {
         "name": "Alivio presto",
@@ -10342,7 +10360,7 @@ export const es_ES: EnTranslations = {
       },
       "redharvest": {
         "name": "Cosecha Roja",
-        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura 30 de energía. Funciona sin puntos de combo."
+        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura {rage} de energía. Funciona sin puntos de combo."
       },
       "marrowbreak": {
         "name": "Quiebramédula",
@@ -10582,7 +10600,7 @@ export const es_ES: EnTranslations = {
       },
       "evocation": {
         "name": "Pozo de Éter",
-        "description": "Canaliza durante 6 s: cada segundo restaura 40 de maná y acumula 8 de poder con hechizos mientras canalizas. (talento de mago)"
+        "description": "Canaliza durante 6 s: cada segundo restaura 100 de maná y acumula 8 de poder con hechizos. La bonificación se acumula mientras canalizas y dura 15 s. (talento de mago)"
       },
       "flurry_of_knives": {
         "name": "Ráfaga de cuchillos",
@@ -10590,7 +10608,7 @@ export const es_ES: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Remiendo Salvaje",
-        "description": "Restaura 180 de salud durante 10 s. Solo en Forma de Oso. (talento de Druida)"
+        "description": "Restaura un 40% de tu salud máxima durante 10 s. Solo en Forma de Oso. (talento de Druida)"
       },
       "frost_trap": {
         "name": "Trampa de Cencellada",
@@ -10610,11 +10628,11 @@ export const es_ES: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Aullido Pavoroso",
-        "description": "Aterroriza a los enemigos cercanos hasta 3 s. El daño puede romper el efecto. (talento de Brujo)"
+        "description": "Aterroriza a los enemigos cercanos hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)"
       },
       "ice_block": {
         "name": "Ataúd Helado",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)"
+        "description": "Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño. Elimina los efectos perjudiciales comunes ya activos e impide que se apliquen nuevos efectos de control comunes. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)"
       },
       "inner_focus": {
         "name": "Mente Serena",
@@ -10823,7 +10841,7 @@ export const es_ES: EnTranslations = {
       },
       "prowl": {
         "name": "Acechar",
-        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate."
+        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 5% más lento. No puede usarse en combate."
       },
       "rake": {
         "name": "Desollar",
@@ -12378,6 +12396,9 @@ export const es_ES: EnTranslations = {
       "pristine_claw": {
         "name": "Garra Prístina"
       },
+      "dawnhold_posy": {
+        "name": "Ramillete del jardín de Dawnhold"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
       },
@@ -13222,6 +13243,15 @@ export const es_ES: EnTranslations = {
       },
       "training_dummy": {
         "name": "Muñeco de entrenamiento"
+      },
+      "friendly_player_dummy": {
+        "name": "Muñeco de jugador aliado"
+      },
+      "normal_boss_dummy": {
+        "name": "Muñeco de jefe normal"
+      },
+      "heroic_boss_dummy": {
+        "name": "Muñeco de jefe heroico"
       },
       "ridge_stalker": {
         "name": "Acechador de la cresta"
@@ -16861,6 +16891,11 @@ export const es_ES: EnTranslations = {
         "name": "La Última Fortaleza",
         "enterText": "Entras en los fríos y silenciosos salones del Last Keep.",
         "leaveText": "Cierras tras de ti la puerta de la fortaleza y vuelves al viento de los Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Castillo Dawnhold",
+        "enterText": "Entras en los cálidos salones del Castillo Dawnhold, perfumados de flores.",
+        "leaveText": "Vuelves a salir al soleado césped del jardín."
       },
       "drowned_temple": {
         "name": "El Templo Ahogado",

@@ -1015,6 +1015,17 @@ describe('delve reward chest + surface exit flow', () => {
     return { boss, events };
   }
 
+  function spawnBossAdd(
+    sim: ReturnType<typeof makeSim>,
+    run: ReturnType<typeof enterFinale>,
+    pos: { x: number; y: number; z: number },
+  ) {
+    const add = createMob((sim as any).nextId++, MOBS.reliquary_ledger_wraith, 9, { ...pos });
+    (sim as any).addEntity(add);
+    run.mobIds.push(add.id);
+    return add;
+  }
+
   // Drive the lockpicking minigame to a flawless solve. Returns the chest id.
   function pickLockFlawless(
     sim: ReturnType<typeof makeSim>,
@@ -1116,6 +1127,111 @@ describe('delve reward chest + surface exit flow', () => {
     );
     expect(run.completed).toBe(false);
     expect(run.lockpick).toBeNull();
+  });
+
+  // Regression: Deacon Varric's Raise Dead can still have a bonewalker up when the
+  // boss himself dies. The chest (and the surface exit it unlocks) must wait for
+  // that add the same way the mid-run module exit waits for trash, not hand the
+  // party their reward while a fight is still live.
+  it('refuses the locked chest while a boss-summoned add is still alive', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+
+    const add = spawnBossAdd(sim, run, chestEnt.pos);
+
+    expect(sim.delveInteract(chestId)).toBe(false);
+    const events = sim.tick();
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+    expect(events.some((e) => e.type === 'lockpickOffer')).toBe(false);
+    expect(run.objectState[chestId].open).toBe(false);
+    expect(run.lockpick).toBeNull();
+
+    // Once the add is dead, the same interaction succeeds.
+    add.dead = true;
+    expect(sim.delveInteract(chestId)).toBe(true);
+    const offer = sim.tick().find((e) => e.type === 'lockpickOffer');
+    expect(offer).toBeDefined();
+  });
+
+  it('direct lockpick engage cannot bypass a live boss-summoned add', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+    spawnBossAdd(sim, run, chestEnt.pos);
+
+    sim.lockpickEngage(chestId, 1);
+    const events = sim.tick();
+
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+    expect(events.some((e) => e.type === 'lockpickSession')).toBe(false);
+    expect(run.lockpick).toBeNull();
+    expect(run.completed).toBe(false);
+    expect(run.surfaceExitId).toBeNull();
+    expect(run.objectState[chestId].looted).not.toBe(true);
+    expect(run.objectState[chestId].open).not.toBe(true);
+  });
+
+  it('direct lockpick success cannot grant or open the exit if an add becomes live mid-session', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const run = enterFinale(sim);
+    killBoss(sim, run);
+    const chestId = run.rewardChestId!;
+    const chestEnt = sim.entities.get(chestId)!;
+    sim.player.pos = { ...chestEnt.pos };
+    sim.player.prevPos = { ...chestEnt.pos };
+
+    sim.lockpickEngage(chestId, 1);
+    expect(run.lockpick?.state).toBe('IN_PROGRESS');
+    sim.drainEvents();
+    const add = spawnBossAdd(sim, run, chestEnt.pos);
+
+    let guard = 0;
+    while (run.lockpick && run.lockpick.state === 'IN_PROGRESS' && guard++ < 12) {
+      const actions = solveLockActions(run.lockpick.pages[run.lockpick.pageIndex])!;
+      for (const a of actions) sim.lockpickAction(a);
+    }
+    const events = sim.drainEvents();
+
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+    expect(
+      events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'abandoned'),
+    ).toBeDefined();
+    expect(events.some((e) => e.type === 'delveChestLoot')).toBe(false);
+    expect(run.lockpick).toBeNull();
+    expect(run.completed).toBe(false);
+    expect(run.surfaceExitId).toBeNull();
+    expect(run.objectState[chestId].looted).not.toBe(true);
+    expect(run.objectState[chestId].attemptAvailable).toBe(true);
+
+    add.dead = true;
+    pickLockFlawless(sim, run, 1);
+    expect(run.completed).toBe(true);
+    expect(run.surfaceExitId).not.toBeNull();
+    expect(run.objectState[chestId].looted).toBe(true);
   });
 
   it('flawless solve grants marks (premium tier), completes the run, and spawns the surface exit', () => {
@@ -3703,6 +3819,37 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     expect(run.drownedLitanyRite?.awaitingChoice).toBe(true);
     expect(run.drownedLitanyRite?.sequence.length).toBe(0);
     expect(run.drownedLitanyRite?.sequencePlaying).toBe(false);
+  });
+
+  // Regression: Sister Nhalia's own summoned cantors/choir thralls can still be
+  // up when she dies. The rite (and the surface exit it eventually unlocks) must
+  // wait for them, not let the party start it while a fight is still live.
+  it('refuses the rite difficulty commit while a boss-summoned add is still alive', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    const reliquary = sim.entities.get(run.drownedLitanyRite!.reliquaryId)!;
+    sim.player.pos = { ...reliquary.pos };
+    sim.player.prevPos = { ...reliquary.pos };
+
+    const add = createMob((sim as any).nextId++, MOBS.drowned_cantor, 15, { ...reliquary.pos });
+    (sim as any).addEntity(add);
+    run.mobIds.push(add.id);
+
+    (sim as Sim).delveRiteChoose('hard');
+    expect(run.drownedLitanyRite?.awaitingChoice).toBe(true); // still waiting
+    expect(run.drownedLitanyRite?.sequence.length).toBe(0);
+    expect(sim.drainEvents()).toContainEqual({
+      type: 'error',
+      text: 'Clear the remaining enemies first.',
+      pid: sim.playerId,
+    });
+
+    // Once the add is dead, the same commit succeeds.
+    add.dead = true;
+    (sim as Sim).delveRiteChoose('hard');
+    expect(run.drownedLitanyRite?.awaitingChoice).toBe(false);
+    expect(run.drownedLitanyRite?.sequence.length).toBe(6);
   });
 
   it('surfaces the rite phase on delveRun for the HUD guidance', () => {
