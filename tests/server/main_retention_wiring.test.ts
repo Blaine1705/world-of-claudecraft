@@ -53,6 +53,8 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneFtueEventsBatch(',
       'pruneWocBuyNowAbandonsBatch(',
       'pruneResolvedWocOffersBatch(',
+      'pruneBookedWocCustodyClaimsBatch(',
+      'pruneExpiredWocStepUpChallengesBatch(',
       'pruneClosedWocListingsBatch(',
     ]) {
       expect(preListen).not.toContain(call);
@@ -112,10 +114,14 @@ describe('retention sweep wiring in server/main.ts', () => {
       // per event; each registers its bounded prune with the sweep.
       'pruneLevelUpEventsBatch(',
       'pruneFtueEventsBatch(',
-      // The $WOC Exchange retention trio; exactly-once is what catches the
+      // The $WOC Exchange retention set; exactly-once is what catches the
       // splice-duplication hazard the listings entry's own comment records.
+      // Custody claims prune BOOKED rows only (unbooked rows are the operator
+      // queue) and the step-up drain exists for realms that stopped issuing.
       'pruneWocBuyNowAbandonsBatch(',
       'pruneResolvedWocOffersBatch(',
+      'pruneBookedWocCustodyClaimsBatch(',
+      'pruneExpiredWocStepUpChallengesBatch(',
       'pruneClosedWocListingsBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
@@ -176,6 +182,12 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneResolvedWocOffersBatch(pool, config.wocMarketOffersRetentionDays, n)',
     );
     expect(MAIN).toContain(
+      'pruneBookedWocCustodyClaimsBatch(pool, config.wocMarketCustodyClaimsRetentionDays, n)',
+    );
+    // Deliberately knobless: expired step-up nonces are garbage, not history,
+    // so the drain takes no retention-days argument to misthread.
+    expect(MAIN).toContain('pruneExpiredWocStepUpChallengesBatch(pool, n)');
+    expect(MAIN).toContain(
       'pruneClosedWocListingsBatch(pool, config.wocMarketListingsRetentionDays, n)',
     );
   });
@@ -213,6 +225,8 @@ describe('retention sweep wiring in server/main.ts', () => {
       'ftue_events',
       'woc_market_buy_now_abandons',
       'woc_market_directed_offers',
+      'woc_market_custody_claims',
+      'woc_market_stepup_challenges',
       'woc_market_listings',
     ]);
     expect(new Set(names).size).toBe(names.length);

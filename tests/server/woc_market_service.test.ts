@@ -6718,10 +6718,18 @@ describe('the insert refusal arms at the service seam', () => {
     const late = await place(BUYER_B, CHAR_B, 'Brint', 5000);
     const lateTwin = await place(BUYER_C, CHAR_C, 'Corvo', 5000);
     // Equal amounts: the EARLIEST placement wins the cascade pick.
-    expect((await h.db.nextCascadeBidder(listing.id, 0, []))?.id).toBe(early);
-    // Equal amount AND time: the lowest id wins (a total, deterministic order).
-    expect((await h.db.nextCascadeBidder(listing.id, 0, [BUYER_A]))?.id).toBe(late);
+    expect((await h.db.nextCascadeBidder(listing.id, 0))?.id).toBe(early);
+    // A defaulted prior winner leaves the pool; equal amount AND time on the
+    // remaining pair, so the lowest id wins (a total, deterministic order).
+    await h.db.markBidStatus(early, 'defaulted');
+    expect((await h.db.nextCascadeBidder(listing.id, 0))?.id).toBe(late);
     expect(lateTwin).toBeGreaterThan(late);
+    // The exclusion is by ACCOUNT, not by row: BUYER_B's candidate row stays
+    // an eligible 'outbid', but a SIBLING defaulted bid from the same account
+    // disqualifies it, so the pick falls through to BUYER_C.
+    const rebid = await place(BUYER_B, CHAR_B, 'Brint', 4000);
+    await h.db.markBidStatus(rebid, 'defaulted');
+    expect((await h.db.nextCascadeBidder(listing.id, 0))?.id).toBe(lateTwin);
   });
 });
 

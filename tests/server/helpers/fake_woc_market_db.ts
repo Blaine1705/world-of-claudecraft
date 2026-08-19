@@ -1624,20 +1624,26 @@ export class FakeWocMarketDb implements WocMarketDb {
       .map((b) => this.bidOut(b));
   }
 
-  async nextCascadeBidder(
-    listingId: number,
-    minCents: number,
-    excludedAccounts: readonly number[],
-  ): Promise<WocBidRow | null> {
+  async nextCascadeBidder(listingId: number, minCents: number): Promise<WocBidRow | null> {
     // Selection only, like the Pg SELECT: the 'won' stamp rides the
-    // settlement insert (insertSettlement winnerBidId).
+    // settlement insert (insertSettlement winnerBidId). Prior winners are
+    // derived here exactly like the real NOT EXISTS: an account with ANY
+    // 'won' or 'defaulted' bid on the listing is excluded, even when its
+    // candidate row is an eligible 'outbid'.
+    const priorWinners = new Set(
+      [...this.bids.values()]
+        .filter(
+          (b) => b.listingId === listingId && (b.status === 'won' || b.status === 'defaulted'),
+        )
+        .map((b) => b.account),
+    );
     const next = [...this.bids.values()]
       .filter(
         (bid) =>
           bid.listingId === listingId &&
           bid.status === 'outbid' &&
           bid.amountCents >= minCents &&
-          !excludedAccounts.includes(bid.account),
+          !priorWinners.has(bid.account),
       )
       .sort(
         (a, b) => b.amountCents - a.amountCents || a.placedAtMs - b.placedAtMs || a.id - b.id,

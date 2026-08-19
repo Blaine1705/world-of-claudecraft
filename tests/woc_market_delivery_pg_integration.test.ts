@@ -1196,6 +1196,116 @@ describeDb('woc market delivery finalization against real Postgres', () => {
   });
 
   // -------------------------------------------------------------------------
+  // Booked-claims retention over real rows. The never-sweep set is the
+  // dangerous part: an over-eager prune here deletes the exactly-once
+  // evidence and silently re-arms the delivery duplication (B2), so every
+  // surviving class is asserted per dimension.
+  // -------------------------------------------------------------------------
+
+  describe('booked-claims retention, in real SQL', () => {
+    it('prunes aged booked claims with dead referents; live referents, fresh rows, and the whole unbooked queue survive', async () => {
+      const realm = 'delivery-claims-prune';
+      const marketDbMod = await import('../server/woc_market_db');
+      const book = async (ref: string): Promise<string> => {
+        expect(await marketDb.claimCustodyRef(realm, ref)).toBe(true);
+        await marketDb.markCustodyRefBooked(ref);
+        return ref;
+      };
+      // PRUNABLE: aged booked claims whose referent rows never existed (one
+      // per mint shape), plus one aged booked LEGACY ref no mint function
+      // produces (it prunes on the window alone; the referent belt cannot
+      // vouch for a ref it cannot parse).
+      const deadSettlement = await book(rulesMod.settlementCustodyRef(99_999_901));
+      const deadReturn = await book(rulesMod.listingReturnCustodyRef(99_999_902));
+      const deadSold = await book(rulesMod.listingSoldNoticeCustodyRef(99_999_903));
+      const legacy = await book('legacy-opaque-ref');
+      // SURVIVORS by referent: aged booked claims whose settlement or listing
+      // row STILL EXISTS (a stuck deal past the window keeps its evidence).
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const buyerCharacter = await seedCharacter(realm, buyer);
+      const liveListingId = await seedListing(realm, seller);
+      const liveSettlement = await seedSettlement(liveListingId, buyer, buyerCharacter, {
+        state: 'delivered',
+      });
+      const liveSettlementRef = await book(rulesMod.settlementCustodyRef(liveSettlement.id));
+      const returnListing = await seedListing(realm, seller);
+      const liveReturnRef = await book(rulesMod.listingReturnCustodyRef(returnListing));
+      // SURVIVOR by age: booked yesterday, referents long gone.
+      const fresh = await book(rulesMod.settlementCustodyRef(99_999_904));
+      // SURVIVORS unconditionally: the unbooked operator queue in all three
+      // attribution states, aged far past any window, referents dead.
+      const bare = rulesMod.settlementCustodyRef(99_999_905);
+      expect(await marketDb.claimCustodyRef(realm, bare)).toBe(true);
+      const granted = rulesMod.settlementCustodyRef(99_999_906);
+      expect(await marketDb.claimCustodyRef(realm, granted)).toBe(true);
+      expect(await marketDb.markCustodyGrantIntent(granted, buyerCharacter)).toBe(true);
+      const mailed = rulesMod.settlementCustodyRef(99_999_907);
+      expect(await marketDb.claimCustodyRef(realm, mailed)).toBe(true);
+      expect(await marketDb.markCustodyMailIntent(mailed)).toBe(true);
+      // Age everything this test owns except the fresh row; the aging is
+      // ref-scoped so the suite's other fixtures stay out of the window.
+      await pool.query(
+        `UPDATE woc_market_custody_claims
+            SET booked_at = booked_at - interval '400 days',
+                claimed_at = claimed_at - interval '400 days'
+          WHERE realm = $1 AND custody_ref <> $2`,
+        [realm, fresh],
+      );
+      // The premise that makes the counts below EXACT: this test's six aged
+      // booked rows are the only booked rows in the whole disposable database
+      // older than the window (every other fixture books at now()). Asserted
+      // so a future aged fixture fails loudly here instead of drifting the
+      // prune count.
+      const aged = await pool.query(
+        `SELECT count(*)::int AS n FROM woc_market_custody_claims
+          WHERE booked_at IS NOT NULL AND booked_at < now() - interval '365 days'`,
+      );
+      expect(aged.rows[0].n, 'only this test ages booked rows past the window').toBe(6);
+      const pruned = await marketDbMod.pruneBookedWocCustodyClaimsBatch(pool, 365, 100);
+      expect(pruned, 'dead-referent aged rows only').toBe(4);
+      const left = await pool.query(
+        `SELECT custody_ref FROM woc_market_custody_claims WHERE realm = $1 ORDER BY custody_ref`,
+        [realm],
+      );
+      const refs = left.rows.map((r) => String(r.custody_ref));
+      for (const gone of [deadSettlement, deadReturn, deadSold, legacy]) {
+        expect(refs, 'aged, booked, referent gone: pruned').not.toContain(gone);
+      }
+      expect(refs, 'live settlement row shields its claim').toContain(liveSettlementRef);
+      expect(refs, 'live listing row shields its claim').toContain(liveReturnRef);
+      expect(refs, 'inside the window: kept').toContain(fresh);
+      expect(refs, 'unbooked bare: never pruned').toContain(bare);
+      expect(refs, 'unbooked grant-intent: never pruned').toContain(granted);
+      expect(refs, 'unbooked mail-intent: never pruned').toContain(mailed);
+      // The monitor keeps seeing what it must: the three parked rows still
+      // age into the operator readout after the prune ran.
+      const readout = await marketDb.stuckCustodyReadout(realm, Date.now() - 600_000, 10, 1000, 0);
+      expect(readout.unbookedClaims.count).toBe(3);
+      // Keep-forever: an unset window (0) deletes nothing even with aged rows
+      // still on the table.
+      expect(await marketDbMod.pruneBookedWocCustodyClaimsBatch(pool, 0, 100)).toBe(0);
+    }, 20_000);
+
+    it('the booked-claims cursor index is partial on booked rows and survives a schema re-apply', async () => {
+      const marketDbMod = await import('../server/woc_market_db');
+      const def = async (): Promise<string | undefined> => {
+        const res = await pool.query(
+          `SELECT indexdef FROM pg_indexes WHERE indexname = 'woc_market_custody_claims_booked'`,
+        );
+        return res.rows[0]?.indexdef as string | undefined;
+      };
+      const first = await def();
+      expect(first).toContain('(booked_at)');
+      expect(first).toContain('booked_at IS NOT NULL');
+      // The double boot: re-applying the whole schema is a no-op, and the
+      // index definition is byte-stable across it.
+      await pool.query(marketDbMod.WOC_MARKET_SCHEMA);
+      expect(await def()).toBe(first);
+    }, 20_000);
+  });
+
+  // -------------------------------------------------------------------------
   // Park rotation: a parked row cycles to the back of its batch WITHOUT
   // refreshing the age the readout watches. Rotating the age column instead
   // (the shape this pins against) hid every permanently parked row from the

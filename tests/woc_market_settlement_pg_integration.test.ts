@@ -630,8 +630,19 @@ describeDb('woc market settlement guards against real Postgres', () => {
       ]) {
         expect(indexdef, state).toContain(`'${state}'`);
       }
+      // The FK/LATERAL composite: it must order id DESC behind listing_id (the
+      // latest-settlement probe's seek) and the superseded single-column FK
+      // index must be gone. pg_indexes rows are exact names, so no prefix
+      // hazard between _listing and _listing_latest here.
+      expect(first).toContain('woc_market_settlements_listing_latest');
+      expect(first).not.toContain('woc_market_settlements_listing');
+      const latest = await pool.query(
+        `SELECT indexdef FROM pg_indexes WHERE indexname = 'woc_market_settlements_listing_latest'`,
+      );
+      expect(latest.rows[0].indexdef).toContain('(listing_id, id DESC)');
       // A database created before either swap still carries a stale index; a
       // re-boot must drop BOTH generations. Recreate them, re-apply, re-check.
+      // The single-column FK index gets the same upgrade-path proof.
       await pool.query(
         `CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_live
            ON woc_market_settlements(listing_id)
@@ -642,11 +653,17 @@ describeDb('woc market settlement guards against real Postgres', () => {
            ON woc_market_settlements(listing_id)
            WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered')`,
       );
+      await pool.query(
+        `CREATE INDEX IF NOT EXISTS woc_market_settlements_listing
+           ON woc_market_settlements(listing_id)`,
+      );
       await pool.query(schemaSql);
       const second = await names();
       expect(second).toContain('woc_market_settlements_open2');
       expect(second).not.toContain('woc_market_settlements_open');
       expect(second).not.toContain('woc_market_settlements_live');
+      expect(second).toContain('woc_market_settlements_listing_latest');
+      expect(second).not.toContain('woc_market_settlements_listing');
     }, 20_000);
 
     it('the boot repair demotes a legacy delivered-plus-open pair instead of failing the boot', async () => {

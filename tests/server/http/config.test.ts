@@ -320,6 +320,13 @@ describe('loadConfig', () => {
         field: 'wocMarketOffersRetentionDays',
         dflt: 180,
       },
+      {
+        // DOUBLE the listings window on purpose (the config.ts rationale): a
+        // booked claim must outlive the rows that could re-drive its ref.
+        key: 'WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS',
+        field: 'wocMarketCustodyClaimsRetentionDays',
+        dflt: 365,
+      },
     ] as const;
     for (const { key, field, dflt } of cases) {
       // A set value overrides the default.

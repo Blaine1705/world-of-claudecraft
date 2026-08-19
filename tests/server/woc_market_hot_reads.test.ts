@@ -1171,6 +1171,12 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // evictions must be a number an operator can watch, not log volume).
     expect(code).toContain('priceCache: wocMarketEconomy.priceCacheAges?.() ?? null');
     expect(code).toContain('idleTxKills: wocMarketIdleTxKillCount()');
+    // The pg pool gauge (the pre-enable review's pool-wait observability):
+    // sustained waiting > 0 is the brownout precursor, and this readout is
+    // where an operator already looks.
+    expect(code).toContain(
+      'pgPool: { total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount }',
+    );
   });
 
   it('the sweep shell gets the segment plan and the watchdog, and shutdown stops the watchdog', () => {

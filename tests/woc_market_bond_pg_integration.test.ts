@@ -1045,6 +1045,80 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
   });
 
   // -------------------------------------------------------------------------
+  // Bounded lock waits on the bid paths: a held listing row answers the typed
+  // 'contended' refusal within the ESCROW_LOCK_TIMEOUT_MS deadline instead of
+  // camping a pooled client for the 15s session statement_timeout (the two
+  // sites were the last withTx guards with no lock_timeout of their own).
+  // -------------------------------------------------------------------------
+
+  describe('bounded lock waits on the bid paths', () => {
+    it('a bid against a held listing row gets the retryable refusal within the deadline', async () => {
+      const realm = `lockwait-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const holder = await pool.connect();
+      try {
+        await holder.query('BEGIN');
+        await holder.query(`SELECT 1 FROM woc_market_listings WHERE id = $1 FOR UPDATE`, [
+          listingId,
+        ]);
+        const startedAt = Date.now();
+        const out = await marketDb.insertPendingBid({
+          realm,
+          listingId,
+          account: buyer,
+          characterId: 8000 + seq,
+          characterName: `Bidder${seq}`,
+          wallet: `wallet-lockwait-${seq}`,
+          amountCents: 700,
+          bondCents: 70,
+          nowMs: BASE_MS,
+          minNext: () => 0,
+        });
+        const elapsedMs = Date.now() - startedAt;
+        expect(out).toEqual({ ok: false, reason: 'contended' });
+        // The refusal must come from the 2s lock_timeout actually WAITING and
+        // firing: near the bound from below (not an instant refusal on some
+        // other arm) and decisively under the 15s session statement_timeout
+        // that bounded this wait before the lock_timeout existed.
+        expect(elapsedMs).toBeGreaterThanOrEqual(1_500);
+        expect(elapsedMs).toBeLessThan(10_000);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+    }, 20_000);
+
+    it('bond-poll activation against a held listing row answers contended within the deadline', async () => {
+      const realm = `lockwait-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const bidId = await seedBid(realm, listingId, buyer, { status: 'pending_bond' });
+      const holder = await pool.connect();
+      try {
+        await holder.query('BEGIN');
+        await holder.query(`SELECT 1 FROM woc_market_listings WHERE id = $1 FOR UPDATE`, [
+          listingId,
+        ]);
+        const startedAt = Date.now();
+        const out = await marketDb.activateBid(bidId, BASE_MS);
+        const elapsedMs = Date.now() - startedAt;
+        // The poll simply retries next pass; the deadline is what keeps the
+        // sweep's pooled client out of a crossing finalize's 60s heavy
+        // allowance.
+        expect(out).toBe('contended');
+        expect(elapsedMs).toBeGreaterThanOrEqual(1_500);
+        expect(elapsedMs).toBeLessThan(10_000);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+    }, 20_000);
+  });
+
+  // -------------------------------------------------------------------------
   // The abandon-loop defenses (both ruling arms)
   // -------------------------------------------------------------------------
 

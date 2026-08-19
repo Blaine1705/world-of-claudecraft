@@ -965,6 +965,39 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
         'ON woc_market_listings(realm, id) ' +
         "WHERE status = 'closed' AND item_disposed = false AND resolution = 'sold'",
     );
+    // The booked-claims retention cursor: partial on the prune's own
+    // predicate, so the nightly batch walks oldest-first without a sort and
+    // the unbooked operator queue stays outside the index entirely.
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_custody_claims_booked ' +
+        'ON woc_market_custody_claims(booked_at) WHERE booked_at IS NOT NULL',
+    );
+    // price_desc browse sort: its own DESC-expression index (the columns are
+    // pinned in full because live_price is a NAME PREFIX of this one, so a
+    // name-only pin could not tell them apart). The ASC id tiebreak is shared
+    // with price_asc for page stability, which is exactly why a backward scan
+    // of the ASC index cannot serve this sort.
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_listings_live_price_desc ' +
+        'ON woc_market_listings(realm, COALESCE(current_bid_cents, start_cents) DESC, id) ' +
+        "WHERE status <> 'closed'",
+    );
+    // The offers reads' LATERAL latest-settlement probe (listing_id = ...
+    // ORDER BY id DESC LIMIT 1) seeks its composite; it supersedes the
+    // single-column FK index, which is dropped, not left to rot. The
+    // trailing 'ON'/';' anchors matter: _listing is a NAME PREFIX of
+    // _listing_latest.
+    expect(schema).toContain(
+      'CREATE INDEX IF NOT EXISTS woc_market_settlements_listing_latest ' +
+        'ON woc_market_settlements(listing_id, id DESC)',
+    );
+    expect(schema).not.toContain('CREATE INDEX IF NOT EXISTS woc_market_settlements_listing ON');
+    expect(schema).toContain('DROP INDEX IF EXISTS woc_market_settlements_listing;');
+    // Create-before-drop: a boot must never leave the FK column uncovered,
+    // even transiently, on a box replaying the schema mid-upgrade.
+    expect(
+      schema.indexOf('CREATE INDEX IF NOT EXISTS woc_market_settlements_listing_latest'),
+    ).toBeLessThan(schema.indexOf('DROP INDEX IF EXISTS woc_market_settlements_listing;'));
   });
 
   it('makes custody_ref the claims table PRIMARY KEY, which is what makes a claim unique', async () => {
@@ -1076,7 +1109,17 @@ describe('every guard transaction bounds its idle holds', () => {
         slice.slice(0, 1600).includes('SET LOCAL idle_in_transaction_session_timeout'),
         `withTx site ${i + 1} carries the idle bound near its head`,
       ).toBe(true);
+      // The lock-wait bound reached the last two holdouts (insertPendingBid,
+      // activateBid) with the retention round, so the floor ratchets: every
+      // guard transaction now bounds BOTH how long it waits for a row lock
+      // and how long it may idle while holding one.
+      expect(
+        slice.slice(0, 1600).includes('SET LOCAL lock_timeout'),
+        `withTx site ${i + 1} carries the lock-wait bound near its head`,
+      ).toBe(true);
     }
+    const lockBounds = src.match(/SET LOCAL lock_timeout = \$\{ESCROW_LOCK_TIMEOUT_MS\}/g) ?? [];
+    expect(lockBounds.length).toBe(txSites.length);
     // The bound is TWO-TIER: exactly the two save-bearing transactions
     // (escrowInsertListing, saveDeliveredCharacterBooked) carry the wider
     // save bound, because they serialize a character blob between
@@ -1358,6 +1401,84 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     const quiet = recordingPool();
     expect(await pruneClosedWocListingsBatch(quiet.pool, 0, 500)).toBe(0);
     expect(quiet.sql()).toHaveLength(0);
+  });
+
+  it('the booked-claims prune touches only booked rows, guards its referents, and honors keep-forever', async () => {
+    const { pool, sql, params } = recordingPool();
+    const { pruneBookedWocCustodyClaimsBatch } = await import('../../server/woc_market_db');
+    await pruneBookedWocCustodyClaimsBatch(pool, 365, 100);
+    const [text] = sql();
+    expect(text).toContain('DELETE FROM woc_market_custody_claims');
+    // The unbooked operator queue is structurally out of reach: the predicate
+    // is the prune-cursor partial's own (woc_market_custody_claims_booked).
+    expect(text).toContain('booked_at IS NOT NULL');
+    expect(text).not.toContain('booked_at IS NULL');
+    // Age on booked_at, never claimed_at (a re-stamped claim age would let an
+    // old parked row slip in) and never a referent column (there is no FK).
+    expect(text).toContain("booked_at < now() - ($1 || ' days')::interval");
+    expect(text).not.toContain('claimed_at');
+    // The referent belt: a claim whose settlement or listing row still exists
+    // is unreachable whatever its age, so a stuck deal keeps its exactly-once
+    // evidence. Both probes are primary-key seeks off the parsed ref, and the
+    // regex guards keep the ::bigint cast off malformed legacy refs (which
+    // prune on the window alone).
+    expect(text).toContain("c.custody_ref ~ '^woc_settlement:[0-9]+$'");
+    expect(text).toContain("c.custody_ref ~ '^woc_listing_(return|sold):[0-9]+$'");
+    expect(text).toContain('NOT EXISTS');
+    expect(text).toContain('SELECT 1 FROM woc_market_settlements s WHERE s.id = ref.settlement_id');
+    expect(text).toContain('SELECT 1 FROM woc_market_listings l WHERE l.id = ref.listing_id');
+    // booked_at IS indexed for this predicate (the partial cursor above), so
+    // oldest-first is a bounded index walk, not a sort.
+    expect(text).toContain('ORDER BY c.booked_at');
+    expect(text).toContain('LIMIT $2');
+    expect(params()[0]).toEqual(['365', 100]);
+    // The keep-forever arm: zero, negative, and NaN windows must not delete.
+    const quiet = recordingPool();
+    expect(await pruneBookedWocCustodyClaimsBatch(quiet.pool, 0, 100)).toBe(0);
+    expect(await pruneBookedWocCustodyClaimsBatch(quiet.pool, -5, 100)).toBe(0);
+    expect(await pruneBookedWocCustodyClaimsBatch(quiet.pool, Number.NaN, 100)).toBe(0);
+    expect(quiet.sql()).toHaveLength(0);
+  });
+
+  it('the step-up drain deletes only long-expired nonces with NO ORDER BY (the unindexed-cutoff rule)', async () => {
+    const { pool, sql, params } = recordingPool();
+    const { pruneExpiredWocStepUpChallengesBatch, WOC_STEPUP_PRUNE_SLACK_DAYS } = await import(
+      '../../server/woc_market_db'
+    );
+    await pruneExpiredWocStepUpChallengesBatch(pool, 500);
+    const [text] = sql();
+    expect(text).toContain('DELETE FROM woc_market_stepup_challenges');
+    // A day past expires_at: prune-on-issue is the primary reaper, this drain
+    // only clears realms that stopped issuing, and the slack keeps any
+    // in-flight verify safe.
+    expect(text).toContain("expires_at < now() - ($1 || ' days')::interval");
+    expect(text).toContain('LIMIT $2');
+    // expires_at leads only behind realm (the composite seek index), so a
+    // global oldest-first would plan a full sort per batch; the rows are all
+    // equally dead, so order carries nothing.
+    expect(text).not.toContain('ORDER BY');
+    expect(WOC_STEPUP_PRUNE_SLACK_DAYS).toBe(1);
+    expect(params()[0]).toEqual([String(WOC_STEPUP_PRUNE_SLACK_DAYS), 500]);
+  });
+
+  it('the bid paths carry the lock-wait bound ahead of their first row lock', async () => {
+    // insertPendingBid and activateBid were the two withTx sites with no
+    // lock_timeout (their comments recorded the retrofit debt): a bid blocked
+    // behind a held listing row camped a pooled client for the 15s session
+    // statement_timeout. Both now bound the wait at ESCROW_LOCK_TIMEOUT_MS,
+    // and the pre-existing contended tails answer the 55P03 as the typed 409.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
+    for (const method of ['async insertPendingBid', 'async activateBidTx']) {
+      const start = src.indexOf(method);
+      expect(start, method).toBeGreaterThan(-1);
+      const head = src.slice(start, src.indexOf('FOR UPDATE', start));
+      expect(head, `${method} bounds its lock wait before the first row lock`).toContain(
+        'SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}',
+      );
+    }
   });
 
   it('a refused claim opens NO transaction: the advisory refusal is lock-free', async () => {
