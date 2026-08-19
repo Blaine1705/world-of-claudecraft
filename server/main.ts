@@ -380,7 +380,9 @@ import { WocMarketService } from './woc_market';
 import { createWocMarketCustody } from './woc_market_custody';
 import {
   PgWocMarketDb,
+  pruneBookedWocCustodyClaimsBatch,
   pruneClosedWocListingsBatch,
+  pruneExpiredWocStepUpChallengesBatch,
   pruneResolvedWocOffersBatch,
   pruneWocBuyNowAbandonsBatch,
   wocMarketIdleTxKillCount,
@@ -2875,6 +2877,11 @@ configureInternalWocMarketStuckRead(async () => ({
   // Guard transactions the idle bound killed (25P03), each destroying its
   // pooled client: the retrofit's false-fire rate as a counter.
   idleTxKills: wocMarketIdleTxKillCount(),
+  // The shared pg pool's live occupancy (the pool-wait observability the
+  // pre-enable review asked for): waiting > 0 sustained means requests are
+  // queueing for clients, the brownout precursor the read caches exist to
+  // head off.
+  pgPool: { total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount },
 }));
 
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
@@ -3624,6 +3631,22 @@ export async function startServer(): Promise<http.Server> {
         name: 'woc_market_directed_offers',
         pruneBatch: (n) =>
           pruneResolvedWocOffersBatch(pool, config.wocMarketOffersRetentionDays, n),
+      },
+      {
+        // BOOKED custody claims (delivery provenance), aged on booked_at with
+        // a referent guard: a claim whose settlement or listing row still
+        // exists is never pruned, whatever its age. Unbooked rows are the
+        // operator queue and are structurally out of this prune's reach.
+        name: 'woc_market_custody_claims',
+        pruneBatch: (n) =>
+          pruneBookedWocCustodyClaimsBatch(pool, config.wocMarketCustodyClaimsRetentionDays, n),
+      },
+      {
+        // Expired step-up challenges: prune-on-issue is the primary reaper,
+        // so this entry only drains realms that stopped issuing (the slack
+        // constant is the window; deliberately no env knob).
+        name: 'woc_market_stepup_challenges',
+        pruneBatch: (n) => pruneExpiredWocStepUpChallengesBatch(pool, n),
       },
       {
         // Closed, fully-disposed $WOC Exchange listings (bids + settlements

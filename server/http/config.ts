@@ -165,6 +165,12 @@ export interface Config {
   // withdrawn, expired) is kept. Pending offers never prune (they expire
   // through the sweep first); 0 keeps resolved rows forever.
   readonly wocMarketOffersRetentionDays: number;
+  // How many days a BOOKED custody-claim row (delivery provenance) is kept.
+  // Unbooked rows are the operator queue and never prune regardless of this
+  // knob; 0 keeps booked rows forever. Must stay comfortably above the
+  // listings window: a booked claim is the exactly-once evidence and has to
+  // outlive every settlement/listing row that could re-drive its delivery.
+  readonly wocMarketCustodyClaimsRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -240,6 +246,14 @@ const DEFAULT_WOC_MARKET_ABANDONS_RETENTION_DAYS = 30;
 // deal provenance); half a year matches the listings window so a deal's offer
 // and listing rows age out together.
 const DEFAULT_WOC_MARKET_OFFERS_RETENTION_DAYS = 180;
+// DOUBLE the listings window on purpose, never matched to it: a booked claim
+// is the exactly-once delivery evidence, and it must provably outlive the
+// settlement and listing rows (180-day window, aged on updated_at) that could
+// still reach bookCustodyOnce with the same custody ref. booked_at is stamped
+// at delivery, at or before the listing's closing updated_at, so an equal
+// window could prune the claim FIRST and re-arm the duplication the ledger
+// exists to prevent.
+const DEFAULT_WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS = 365;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -474,6 +488,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     wocMarketOffersRetentionDays: numberOr(
       env.WOC_MARKET_OFFERS_RETENTION_DAYS,
       DEFAULT_WOC_MARKET_OFFERS_RETENTION_DAYS,
+    ),
+    wocMarketCustodyClaimsRetentionDays: numberOr(
+      env.WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS,
+      DEFAULT_WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS,
     ),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:

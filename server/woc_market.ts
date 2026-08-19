@@ -691,13 +691,11 @@ export interface WocMarketDb {
   bidsByAccount(realm: string, account: number, limit: number): Promise<WocActivityBidRow[]>;
   bidsForListing(listingId: number): Promise<WocBidRow[]>;
   /** Cascade pick: the highest 'outbid' bid meeting `minCents` whose account
-   *  is not among `excludedAccounts`. Selection only; the 'won' stamp rides
-   *  the settlement insert (insertSettlement winnerBidId). */
-  nextCascadeBidder(
-    listingId: number,
-    minCents: number,
-    excludedAccounts: readonly number[],
-  ): Promise<WocBidRow | null>;
+   *  has NO 'won' or 'defaulted' bid on the listing (prior winners had their
+   *  chance; the exclusion is derived store-side, bounded per candidate).
+   *  Selection only; the 'won' stamp rides the settlement insert
+   *  (insertSettlement winnerBidId). */
+  nextCascadeBidder(listingId: number, minCents: number): Promise<WocBidRow | null>;
   /** With `from`, a compare-and-set (no-op when the bid left those states). */
   markBidStatus(bidId: number, status: WocBidStatus, from?: WocBidStatus[]): Promise<void>;
   /** Atomic loser demote: outbid + queue the held bond for refund in one
@@ -3796,15 +3794,14 @@ export class WocMarketService {
       }
       return;
     }
-    // Cascade to the next eligible bidder when the seller opted in.
+    // Cascade to the next eligible bidder when the seller opted in. Prior
+    // winners are excluded inside the pick itself (a bounded store-side
+    // derivation; this arm used to materialize the listing's whole bid
+    // history per overdue settlement to build that set).
     if (listing.offerNext) {
-      const priorWinners = (await this.deps.db.bidsForListing(listing.id))
-        .filter((b) => b.status === 'won' || b.status === 'defaulted')
-        .map((b) => b.account);
       const next = await this.deps.db.nextCascadeBidder(
         listing.id,
         listing.reserveCents ?? listing.startCents,
-        priorWinners,
       );
       if (next) {
         // The promoted bidder's bond was released when they were outbid, so

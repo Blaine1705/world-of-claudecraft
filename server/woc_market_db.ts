@@ -114,6 +114,12 @@ CREATE INDEX IF NOT EXISTS woc_market_listings_live_created
 CREATE INDEX IF NOT EXISTS woc_market_listings_live_price
   ON woc_market_listings(realm, COALESCE(current_bid_cents, start_cents), id)
   WHERE status <> 'closed';
+-- price_desc keeps the ASC id tiebreak (page stability shared with price_asc),
+-- so a backward scan of the ASC index cannot serve it (that would yield id
+-- DESC within equal prices); the sort direction needs its own index.
+CREATE INDEX IF NOT EXISTS woc_market_listings_live_price_desc
+  ON woc_market_listings(realm, COALESCE(current_bid_cents, start_cents) DESC, id)
+  WHERE status <> 'closed';
 -- The item-id search filter.
 CREATE INDEX IF NOT EXISTS woc_market_listings_live_item
   ON woc_market_listings(realm, item_id)
@@ -445,9 +451,15 @@ CREATE INDEX IF NOT EXISTS woc_market_settlements_buyer
 -- Postgres does not auto-index the referencing side of an FK. Without these,
 -- every listing the retention prune deletes runs one sequential scan of the
 -- settlements table per row (ON DELETE CASCADE), and every cascaded bid
--- delete runs another (ON DELETE SET NULL on bid_id).
-CREATE INDEX IF NOT EXISTS woc_market_settlements_listing
-  ON woc_market_settlements(listing_id);
+-- delete runs another (ON DELETE SET NULL on bid_id). The listing_id index
+-- carries id DESC as its second key so the offers reads' LATERAL
+-- latest-settlement probe (WHERE listing_id = ... ORDER BY id DESC LIMIT 1)
+-- is a one-tuple index seek instead of a per-offer-row sort; it supersedes
+-- the single-column woc_market_settlements_listing (IF NOT EXISTS matches on
+-- NAME only, so the reshape needs a new name and an idempotent DROP).
+CREATE INDEX IF NOT EXISTS woc_market_settlements_listing_latest
+  ON woc_market_settlements(listing_id, id DESC);
+DROP INDEX IF EXISTS woc_market_settlements_listing;
 CREATE INDEX IF NOT EXISTS woc_market_settlements_bid
   ON woc_market_settlements(bid_id);
 
@@ -552,11 +564,18 @@ CREATE TABLE IF NOT EXISTS woc_market_custody_claims (
 -- it parks, never mails. Legacy NULLs mean UNKNOWN, not "no attempt"; the
 -- pre-enable deploy note is that woc_market_custody_claims must be empty (or
 -- fully booked) before the first boot of this schema.
--- Retention: KEEP FOREVER for now, deliberately. Unbooked rows are the
--- operator's queue and are NEVER pruned; booked rows are delivery provenance
--- and stay until the dedicated market retention work registers their prune
--- beside the listing prune (a booked row is one short line per completed
--- delivery or return, so the growth rate is the sale rate).
+-- Retention: BOOKED rows only, aged on booked_at (never on a referent: the
+-- listings prune leaves booked claim rows behind, there is no FK), on the
+-- WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS window via
+-- pruneBookedWocCustodyClaimsBatch below (registered with the nightly
+-- retention sweep in main.ts). Unbooked rows are the operator's queue and
+-- are NEVER pruned, at any age. The window must stay comfortably ABOVE the
+-- listings window: a booked claim is the exactly-once evidence, and pruning
+-- it while any settlement or listing row could still reach bookCustodyOnce
+-- with the same ref would let a redrive mint a FRESH claim that skips the
+-- parcel-in-book check (the duplication this ledger exists to prevent).
+-- Growth rate is the sale rate (one short row per completed delivery or
+-- return), so a year of provenance stays small.
 -- INT to match every other character-id column. IF NOT EXISTS makes this a
 -- no-op on a database that already ran an earlier BIGINT build of this ALTER
 -- (dev databases only; the market never shipped): the width difference is
@@ -569,6 +588,11 @@ ALTER TABLE woc_market_custody_claims
 CREATE INDEX IF NOT EXISTS woc_market_custody_claims_unbooked
   ON woc_market_custody_claims(realm, claimed_at)
   WHERE booked_at IS NULL;
+-- Retention prune cursor (booked rows, oldest first). Boot DDL, not
+-- concurrent_indexes.ts: pre-enable the table is empty.
+CREATE INDEX IF NOT EXISTS woc_market_custody_claims_booked
+  ON woc_market_custody_claims(booked_at)
+  WHERE booked_at IS NOT NULL;
 
 -- Account-scoped (deliberately realm-free): defaults follow the account.
 CREATE TABLE IF NOT EXISTS woc_market_strikes (
@@ -743,8 +767,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS ${WOC_MARKET_OFFERS_PAIR_PENDING_INDEX}
 -- wallet_link_challenges rule); consuming DELETES the row, so a signature can
 -- never authorize twice, and the binding digest pins the operation plus every
 -- money figure the wallet showed (server/woc_market_stepup.ts). Growth is
--- bounded: every issue prunes the expired set first, and the rate limiter
--- bounds the live set per account.
+-- bounded: every issue prunes the expired set first, the rate limiter bounds
+-- the live set per account, and the nightly retention sweep drains realms
+-- that stopped issuing (pruneExpiredWocStepUpChallengesBatch below).
 CREATE TABLE IF NOT EXISTS woc_market_stepup_challenges (
   nonce TEXT PRIMARY KEY,
   realm TEXT NOT NULL,
@@ -795,8 +820,10 @@ export const ESCROW_LOCK_TIMEOUT_MS = 2_000;
  *  original 500ms was four times tighter with no measurement behind it, and
  *  a false fire terminates the session AND discards its pool client, so on
  *  a shared four-core box under load the tighter bound was the riskier
- *  one). Applied to the guards this change introduced; retrofitting the
- *  older guards rides the hot-path work. */
+ *  one). The hot-path retrofit put this bound on every withTx site, and the
+ *  retention round finished the lock_timeout half: every guard that takes a
+ *  row lock now carries BOTH bounds (the completeness floor in
+ *  tests/server/woc_market_directed_sql.test.ts counts them). */
 export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
 
 /** The idle bound for the TWO save-bearing transactions (escrowInsertListing,
@@ -3117,11 +3144,16 @@ export class PgWocMarketDb implements WocMarketDb {
     minNext: (row: WocListingRow) => number;
   }): Promise<InsertPendingBidResult> {
     return this.withTx<InsertPendingBidResult>(async (client) => {
+      // The lock-wait bound: a bid blocked behind a held listing row (a
+      // crossing finalize, cancel, or buy-now claim) answers the typed
+      // 'contended' 409 within ESCROW_LOCK_TIMEOUT_MS instead of camping a
+      // pooled client for the 15s session statement_timeout. SET LOCAL, so
+      // the bound dies with this transaction and never leaks to the pool.
+      await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
       // The connection-camping bound (the 04-round guards' rule, retrofitted
-      // here with the hot-path work); the catch on the tail maps 25P03 to
-      // the typed 'contended' (the activateBid shape): without it the idle
-      // kill was a NEW raw 500 on a player's bid, since this site sets no
-      // lock_timeout and 25P03 is the first contention code it can produce.
+      // here with the hot-path work); the catch on the tail maps 55P03 and
+      // 25P03 alike to the typed 'contended' (the activateBid shape):
+      // without it the idle kill was a NEW raw 500 on a player's bid.
       await client.query(
         `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
       );
@@ -3430,6 +3462,12 @@ export class PgWocMarketDb implements WocMarketDb {
     nowMs: number,
   ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending'> {
     return this.withTx(async (client) => {
+      // The lock-wait bound: a crossing finalize can hold the listing (and
+      // re-lock bids) under the 60s heavy statement allowance, so an
+      // unbounded wait here camps the bond poll's client for that whole
+      // window. 55P03 rides the same contended tail as the 40P01 the lock
+      // ordering already anticipates: the poll simply retries next pass.
+      await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
       // The connection-camping bound (the 04-round guards' rule, retrofitted
       // here with the hot-path work); 25P03 maps to the typed 'contended'.
       await client.query(
@@ -3569,11 +3607,7 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows.map(toBid);
   }
 
-  async nextCascadeBidder(
-    listingId: number,
-    minCents: number,
-    excludedAccounts: readonly number[],
-  ): Promise<WocBidRow | null> {
+  async nextCascadeBidder(listingId: number, minCents: number): Promise<WocBidRow | null> {
     // Selection only: the 'won' stamp rides the settlement insert
     // (insertSettlement winnerBidId), so a crash between pick and insert
     // leaves nothing to unwind and the next pass simply re-picks. Lock-free
@@ -3582,13 +3616,22 @@ export class PgWocMarketDb implements WocMarketDb {
     // the whole pass, so a peer's unlocked arms may interleave); the
     // one-open-settlement index and the winner-bid CAS are the arbiters
     // whenever two pickers ever race.
+    // Prior winners are excluded HERE, per candidate row: an account whose
+    // bid on this listing ever reached 'won' or 'defaulted' had its chance.
+    // The NOT EXISTS (over NOT IN, the work_mem rule) replaces the cascade
+    // arm's full bid-list fetch, which materialized the listing's whole bid
+    // history per overdue settlement just to derive this set.
     const res = await this.pool.query(
       `SELECT ${BID_COLS} FROM woc_market_bids
         WHERE listing_id = $1 AND status = 'outbid' AND amount_cents >= $2
-          AND NOT (account = ANY($3::int[]))
+          AND NOT EXISTS (
+            SELECT 1 FROM woc_market_bids w
+             WHERE w.listing_id = $1
+               AND w.account = woc_market_bids.account
+               AND w.status IN ('won', 'defaulted'))
         ORDER BY amount_cents DESC, placed_at ASC, id ASC
         LIMIT 1`,
-      [listingId, minCents, excludedAccounts],
+      [listingId, minCents],
     );
     return res.rows[0] ? toBid(res.rows[0]) : null;
   }
@@ -4398,6 +4441,76 @@ export async function pruneClosedWocListingsBatch(
          ORDER BY updated_at
          LIMIT $2)`,
     [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
+/** BOOKED custody claims (delivery provenance) past the retention window,
+ *  aged on booked_at, oldest first behind woc_market_custody_claims_booked.
+ *  Unbooked rows are the operator's queue and are structurally out of reach
+ *  (booked_at IS NOT NULL). Belt and braces beyond the window: a claim is
+ *  the exactly-once evidence, so a row is pruned only when the referent its
+ *  custody ref names (the settlement for woc_settlement:<id>, the listing
+ *  for woc_listing_return:<id> and woc_listing_sold:<id>; the mint functions
+ *  live in woc_market_rules.ts) is ALSO gone, which makes a re-drive of that
+ *  ref impossible by construction; a stuck deal older than the window keeps
+ *  its claim for as long as its rows survive. Both probes are primary-key
+ *  seeks (the regex-guarded CASE keeps the cast off malformed legacy refs,
+ *  which prune on the window alone). */
+export async function pruneBookedWocCustodyClaimsBatch(
+  pool: Pool,
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM woc_market_custody_claims
+      WHERE custody_ref IN (
+        SELECT c.custody_ref
+          FROM woc_market_custody_claims c,
+               LATERAL (SELECT
+                 CASE WHEN c.custody_ref ~ '^woc_settlement:[0-9]+$'
+                      THEN split_part(c.custody_ref, ':', 2)::bigint END AS settlement_id,
+                 CASE WHEN c.custody_ref ~ '^woc_listing_(return|sold):[0-9]+$'
+                      THEN split_part(c.custody_ref, ':', 2)::bigint END AS listing_id) ref
+         WHERE c.booked_at IS NOT NULL
+           AND c.booked_at < now() - ($1 || ' days')::interval
+           AND (ref.settlement_id IS NULL OR NOT EXISTS (
+                  SELECT 1 FROM woc_market_settlements s WHERE s.id = ref.settlement_id))
+           AND (ref.listing_id IS NULL OR NOT EXISTS (
+                  SELECT 1 FROM woc_market_listings l WHERE l.id = ref.listing_id))
+         ORDER BY c.booked_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
+/** How long an EXPIRED step-up challenge lingers before the nightly drain
+ *  removes it. Not an env knob on purpose: an expired nonce is garbage by
+ *  construction (the 5-minute TTL is the policy; prune-on-issue is the
+ *  primary reaper), so this registration only drains realms that stopped
+ *  issuing challenges, and a day of slack keeps any in-flight verify safe. */
+export const WOC_STEPUP_PRUNE_SLACK_DAYS = 1;
+
+/** Expired step-up challenges a day past their TTL. The primary reaper is
+ *  prune-on-issue (pruneStepUpChallenges, per realm at challenge mint); this
+ *  batch exists so a realm that stops issuing challenges still drains. No
+ *  ORDER BY: expires_at leads only behind realm
+ *  (woc_market_stepup_challenges_realm_expiry), so a global oldest-first
+ *  would plan a full sort per batch for rows that are all equally dead. */
+export async function pruneExpiredWocStepUpChallengesBatch(
+  pool: Pool,
+  batchSize: number,
+): Promise<number> {
+  const res = await pool.query(
+    `DELETE FROM woc_market_stepup_challenges
+      WHERE nonce IN (
+        SELECT nonce FROM woc_market_stepup_challenges
+         WHERE expires_at < now() - ($1 || ' days')::interval
+         LIMIT $2)`,
+    [String(WOC_STEPUP_PRUNE_SLACK_DAYS), Math.max(1, Math.floor(batchSize))],
   );
   return res.rowCount ?? 0;
 }
