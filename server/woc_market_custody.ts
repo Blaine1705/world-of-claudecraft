@@ -14,7 +14,7 @@ import {
 } from '../src/sim/content/letters';
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { CharacterState, Sim } from '../src/sim/sim';
-import type { InvSlot } from '../src/sim/types';
+import { cloneItemInstancePayload, type InvSlot } from '../src/sim/types';
 import { gameMetricsCounters } from './http/game_signals';
 import type { WocCustodyExtract, WocCustodyGrant, WocMarketCustody } from './woc_market';
 
@@ -366,14 +366,23 @@ export function createWocMarketCustody(
  *  losing the only copy; the extractCopy undo arm has room by construction).
  *  movement: true, like every relocation grant that shares the add hubs
  *  (grantCopies, the mail return rail): the copy was already held, so the
- *  Reliquary obtain tally must not count it again. */
+ *  Reliquary obtain tally must not count it again. The payload is CLONED,
+ *  also like grantCopies: the caller may still hold the extracted slot (the
+ *  listing row stringifies it later), and a bag slot aliasing that object
+ *  would let one side's mutation reach the other. */
 function restoreInto(host: WocCustodyGameHost, pid: number, slot: InvSlot): void {
   if (slot.instance) {
-    host.sim.addItemInstance(slot.itemId, slot.instance, pid, slot.count, {
-      silent: true,
-      movement: true,
-      ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
-    });
+    host.sim.addItemInstance(
+      slot.itemId,
+      cloneItemInstancePayload(slot.instance),
+      pid,
+      slot.count,
+      {
+        silent: true,
+        movement: true,
+        ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
+      },
+    );
   } else {
     host.sim.addItem(slot.itemId, slot.count, pid, {
       silent: true,

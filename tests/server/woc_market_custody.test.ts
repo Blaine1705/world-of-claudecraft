@@ -166,9 +166,14 @@ describe('extractCopy requires the seller live in this realm process', () => {
   it('restores as a RELOCATION: the Reliquary obtain tally does not move across the round trip', () => {
     // The undo arm hands back a copy the seller already held. Every sibling
     // relocation grant (grantCopies in item_instance_transfer.ts, the mail
-    // return rail) passes movement: true so noteRelicObtain stays silent; a
+    // return rail) passes movement: true so noteRelicObtain stays silent.
+    // The REACHABLE door is createListing's refusal arms in woc_market.ts,
+    // which call restoreCopy on a LIVE seller after a successful extract: a
     // restore that counted would let a seller inflate a catalogued relic's
-    // obtain tally by listing into a torn-down session and retrying. The
+    // obtain tally by listing into a refusal and retrying. This harness
+    // drives the same shared restoreInto through the extractCopy undo arm
+    // (fake-only on a real server, where extract and persist share one
+    // synchronous frame, but the cheapest way to reach the helper). The
     // fixture is a catalogued relic (a Reliquary page item) that clears the
     // exchange lock predicate, so the counter is decisive: it moves on any
     // grant that forgets the flag.
