@@ -95,6 +95,11 @@ const usage = `GPU hitch capture
                          __EGL_VENDOR_LIBRARY_FILENAMES=.../10_nvidia.json for
                          the discrete card). Recorded in the browser flags.
   --out FILE             JSON output (default tmp/gpu-hitch_<stamp>.json)
+  --cpu-profile FILE     also record a 1 kHz main-thread sampling CPU profile from
+                         the entry to the end of the timed window, to FILE
+                         (.cpuprofile). Off by default.
+                         Read it with scripts/profiler/cpu_profile_window.mjs,
+                         whose window bounds are the probe's page-clock ms.
   --group-id TOKEN       A/B campaign identifier (requires leg/repetition/order)
   --leg TOKEN            leg label inside the A/B campaign
   --repetition N         one-based repetition number
@@ -198,6 +203,7 @@ export function parseArgs(argv) {
     crowdArriveMs: null,
     angle: null,
     out: null,
+    cpuProfile: null,
     groupId: null,
     leg: null,
     repetition: null,
@@ -236,6 +242,7 @@ export function parseArgs(argv) {
     else if (option === '--crowd-arrive') args.crowdArriveMs = delayMs(next(), '--crowd-arrive');
     else if (option === '--angle') args.angle = campaignToken(next(), '--angle');
     else if (option === '--out') args.out = next();
+    else if (option === '--cpu-profile') args.cpuProfile = next();
     else if (option === '--group-id') args.groupId = campaignToken(next(), '--group-id');
     else if (option === '--leg') args.leg = campaignToken(next(), '--leg');
     else if (option === '--repetition') args.repetition = integer(next(), '--repetition');
@@ -549,6 +556,48 @@ function fireCrowdArrival(args, roster, firedAtMs, firedAtEpochMs) {
   args.crowdArrive = record;
 }
 
+/** Opt-in main-thread sampling profiler from the page's entry to the end of
+ *  the timed window (the entry teleport and its arrival cover are inside). The
+ *  capture's provenance matters more than the profile, so any CDP failure is
+ *  reported and swallowed instead of ending the run. The page clock is read
+ *  right before the stop (the page navigates after the start, which resets
+ *  performance.now) so the analyzer can align profiler time with the probe's
+ *  timestamps. */
+export async function startCpuProfile(page) {
+  try {
+    const session = await page.createCDPSession();
+    await session.send('Profiler.enable');
+    await session.send('Profiler.setSamplingInterval', { interval: 1000 });
+    await session.send('Profiler.start');
+    return { session };
+  } catch (error) {
+    console.error(`CPU profile could not start: ${error?.message ?? error}`);
+    return null;
+  }
+}
+
+export async function stopCpuProfile(profiler, page, outPath) {
+  if (!profiler) return null;
+  try {
+    const pageNowAtStopMs = await page.evaluate(() => performance.now());
+    const { profile } = await profiler.session.send('Profiler.stop');
+    await profiler.session.detach().catch(() => {});
+    const output = path.resolve(ROOT, outPath);
+    fs.mkdirSync(path.dirname(output), { recursive: true });
+    const payload = {
+      ...profile,
+      wocPageNowAtStopMs: pageNowAtStopMs,
+      wocProfileEndTimeUs: profile.endTime,
+    };
+    fs.writeFileSync(output, `${JSON.stringify(payload)}\n`);
+    console.log(`CPU profile written to ${output}`);
+    return { path: output, pageNowAtStopMs, endTimeUs: profile.endTime };
+  } catch (error) {
+    console.error(`CPU profile could not be written: ${error?.message ?? error}`);
+    return null;
+  }
+}
+
 /** The timed window. With hops, delays count from the observer's ARRIVAL
  *  reveal (the online entry teleports the observer and that destination
  *  streams under a cover for a variable time), never from the window opening,
@@ -722,6 +771,7 @@ export async function capture(args) {
   let browser;
   let page;
   let roster;
+  let cpuProfileRecord = null;
   try {
     if (args.mode === 'online-geared') {
       roster = await prepareOnlineGearedRoster({ args, runId: captureId });
@@ -778,6 +828,7 @@ export async function capture(args) {
         // an older Chromium without the entry type leaves the list empty
       }
     });
+    const cpuProfiler = args.cpuProfile ? await startCpuProfile(page) : null;
     if (args.mode === 'offline') {
       await page.goto(requestedUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 60_000 });
       await enterOfflineGame(page, {
@@ -826,6 +877,7 @@ export async function capture(args) {
       await runTimedWindow(page, args, sleep, () => Date.now(), roster ?? null);
     } finally {
       clearInterval(namesPoll);
+      cpuProfileRecord = await stopCpuProfile(cpuProfiler, page, args.cpuProfile);
     }
     const snapshot = await page.evaluate(() => window.__wocGpuHitchProbe?.stop('duration'));
     if (!snapshot) throw new Error('GPU hitch probe was not installed');
@@ -839,6 +891,7 @@ export async function capture(args) {
       provenance,
     });
     raw.diagnostics.pageErrors = pageErrors;
+    if (cpuProfileRecord) raw.diagnostics.cpuProfile = cpuProfileRecord;
     raw.diagnostics.renderNames = renderNames;
     raw.diagnostics.longTasks = await page
       .evaluate(() => globalThis.__wocLongTasks ?? [])
