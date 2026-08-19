@@ -3144,6 +3144,9 @@ Judged, no change, with the reasoning:
   the busy label sequences confirming into signing only at the real wallet
   handoff, and the token spelling in the trade log went from four digits to the
   two every other $WOC surface uses.
+  (The fitted-960x700 judgment two rows below was SUPERSEDED in the 15 QA
+  round: Fernando's sign-off asked for the large window, and the QA round
+  shipped it at min(92vw, 1440px) by min(92vh, 920px).)
 - The buyer's pre-signature note now says the quote fixes the amount until it
   expires. Verified against the wire rather than taken on faith: a settlement
   carries `quoteReference` plus `quoteExpiresAtMs` and is refused outright when
@@ -3168,3 +3171,95 @@ only at the handoff that actually opens a wallet (never during the challenge
 mint, never in the dev economy's devsig arm); and the stale TOTP-bearing
 captures are replaced by the fresh set indexed per pair in section K of
 `phase-15-design-audit.md`.
+
+## 15 QA round (2026-08-19, verdict PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open, PUSHED per R4)
+
+Release sync first: merge e32f7d8945 of origin/release/v0.39.0 tip ea9377db8e
+(136 commits, the druid auto-unshift and the OSSBrain v0.39 train), sole
+conflict the generated i18n pending.ts, resolved by regeneration. The
+release-merge-audit skill ran on it (nine workflow lanes): every overlap
+proven a byte-identical union of both parents, the escrow-restore movement
+fix intact with its test, routes, injected helpers and db mocks all clean.
+Its one blocking repair: the release growth re-pinned on the monolith ratchet
+(sim.ts 12531, server/game.ts 10813, commit 5c67a708cd). Two of its notes
+stand as facts for the release fill: 331 marketplace keys pending across the
+15 Latin locales (correct at PR tier), and hudChrome.dailyRewards.usd now
+reads '{amount}' in the five non-Latin overlays versus '{amount} USD' in the
+Latin ones, to reconcile at the fill.
+
+The desk probes the phase file insists on, run by hand: all 79 captures
+eyeballed (the finding below), the raw-formatting grep (one pre-existing
+toFixed at trade_woc_arm_painter.ts:400, JUDGED correct: it feeds a
+type=number input's machine-format value attribute, not a render sink), the
+fairness diff (clean: nothing tier-gated, the :empty collapse and owl-spacing
+swap shed no actionable read), the behavior freeze (view-core suites
+unchanged in assertions, the one selector edit tracks the .trade-actions row
+move), and the --panel-border deferral verified on its ratchet with a
+decisive non-declaration pin (AGREED, not flipped).
+
+The eyeball's own catch: eleven committed captures were defective, from a
+pre-guard rig run and a framing gap (two desktop stress afters under a
+session-takeover modal, six under the GPU toast, the ru sell-empty behind the
+camera picker, and the four mobile detail captures framed at the window top
+so neither consent nor the bond disclosures they are named for was in frame).
+The rig gained a per-shot frame selector and its failure-path debug dumps
+moved outside the committed directory; all eleven were re-taken on the fixed
+rig (commit 2f31d1f0c5) and re-verified.
+
+Five audit lanes ran over the range (correctness, cleanup, test-coverage,
+frontend-seam, scoped security), plus a FRESH review of the fix round and the
+repo qa-checklist last. Roughly 25 findings; every one applied or judged, the
+fix rounds in commits fd3564d82d, b194e576c5, 38c3ed70d1, 5239f1ef28,
+5e23abe557. Highest-value: the mobile layout suite's pins were
+comment-gameable (the whole file now reads comment-stripped source, and its
+reserve and floor pins were the ONLY in-gate coverage of those facts); the
+five-fill figure check compared against digits hard-coded in the test rather
+than derived from the English, so a rule retune would have passed over five
+stale fills (now derived, on digit boundaries); the escrow-restore clone from
+the security lane got its non-aliasing regression pin, proven decisive by
+mutation; the balance chip's escaping test asserted nothing (now injects a
+hostile quote); woc_market_chrome.ts got the direct test its extraction owed;
+the Exchange's two name-colour sites joined the itemNameColor family
+(Object.hasOwn over a raw map index); and the glued-ticker sweep learned the
+template-start and space-less prefix shapes. Judged, no change: the
+qa-checklist's ASCII-digit contract question on the five fills is now written
+into the test as the deliberate convention of all five locales; the
+forced-inset rig arm stays deleted (it assumed what it should test; the
+record now says so instead of claiming it runs); the split-dock stamp
+tie stays generic to all windows (the design), with a comment-stripped
+cross-file pin closing the one-sided rename. DEFERRED with an owner, new: the
+Exchange's role=status regions are destroyed and recreated per wholesale
+render, so several screen readers will not announce them; the durable fix is
+element identity across renders, which belongs to the woc_market_view
+pure-core extraction pass the registry already owes (the trade arm, which
+keeps its regions, is the exemplar).
+
+Fernando's sign-off came back BEAUTIFUL WITH NOTES, and the notes shipped as
+the sign-off round (commit 9bdb94c81e): the desktop Exchange claims its real
+estate at min(92vw, 1440px) by min(92vh, 920px) (superseding the fitted
+960x700 judgment), every cell sits left-aligned under its header with long
+values wrapping to a second line, the sort control leads the padded control
+row (extracted to woc_market_chrome.ts as a pure builder, so the window
+SHRANK to 2618 and the ratchet followed it down while paying for the new
+tooltips), both price cells carry the token equivalence at the live rate as
+tooltips, and the phone rows take 12px cells with the first row clearing the
+header hairline at 16px. Every Exchange face was re-captured at the new
+geometry (commit 57774f4674, four passes, 608 rig checks green); the taller
+sell face now shows the fee sentence and commit button that used to sit
+below the fold. The capture-set size call the registry left to this session:
+KEEP the stress and ru_RU variants; they carried real review weight in this
+very round.
+
+Verification on the final tree: the full gate step list run stage by stage
+(the artifacts and both freshness gates, the malware scan, biome on changed
+files, the FULL vitest suite in four shards, 41,446 tests and zero failures,
+the real-browser suite 20 files / 131 tests, tsc, every build including the
+client bundle), then the sign-off delta re-proven (the related closure, 36
+files / 565 tests, browser suite and builds again). The mobile rig arms ran
+live on the merged tree: 608 Exchange checks plus the trade rig's en, ru and
+BAGS_OVER arms (128/129/128, the reserve >= measured band assertion held in
+both locales). Still open for a real device: the safe-area insets no
+headless run can see. Housekeeping: backup-pre-reword-15 is verified
+content-free (its tree matches rewritten commit 2dfd1b99de; git cherry all
+equivalent) but the delete stayed permission-blocked, so it remains for a
+manual git branch -D.

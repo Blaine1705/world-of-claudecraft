@@ -5,10 +5,36 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-15-qa.md` (GAME repo,
-  worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session, newest
-  origin/release/** sync first; its PASS requires Fernando's sign-off on the
-  screenshot set, and it is the session that PUSHES per R4).
+- Next file to run: `docs/woc-marketplace-hardening/phase-16-hot-path-scale.md`
+  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH
+  session, newest origin/release/** sync first).
+- 15 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, PUSHED per R4). Release
+  sync: merge e32f7d8945 of origin/release/v0.39.0 tip ea9377db8e (136
+  commits, one generated-i18n conflict, regenerated), release-merge-audit
+  clean apart from the monolith re-pin it owed (sim.ts 12531, game.ts 10813,
+  commit 5c67a708cd). The QA eyeball found and re-took ELEVEN defective
+  captures (takeover modal, GPU toast, camera picker, four misframed mobile
+  detail faces; rig framing fixed, debug dumps out of the committed dir).
+  Five audit lanes plus a fresh fix-round review plus qa-checklist: ~25
+  findings, all applied or judged (comment-stripped mobile pins, derived
+  five-fill figures on digit boundaries, the escrow-restore clone with a
+  mutation-proven non-aliasing pin, the hostile-quote escape test, the
+  chrome module's direct test, itemNameColor at both Exchange sites, wider
+  ticker-glue shapes). Fernando signed off BEAUTIFUL WITH NOTES; the notes
+  shipped (9bdb94c81e): the large window (min(92vw,1440px) x
+  min(92vh,920px), superseding the fitted-960x700 judgment), left-aligned
+  wrapping columns, the sort-led padded control row (extracted to
+  woc_market_chrome.ts, window DOWN to 2618), token-equivalence tooltips on
+  the price cells, phone row rhythm (12px cells, 16px first row); every
+  Exchange face re-captured at the new geometry (57774f4674, 608 rig checks).
+  Gate on the final tree: full step list stage by stage, four full vitest
+  shards (41,446 tests, zero failures), browser suite 131, tsc, all builds,
+  malware scan, then the sign-off delta re-proven (565 related tests). NEW
+  deferral with owner: the Exchange's recreated role=status regions go to
+  the woc_market_view pure-core extraction pass. Real-notch inset check
+  still owed on a device. backup-pre-reword-15 delete stayed
+  permission-blocked (verified content-free; manual git branch -D). The 15
+  QA round entry in progress.md is the registry the next session consumes.
 - 15 IMPLEMENT COMPLETE (2026-08-18, LOCAL not pushed per R4). Release sync
   first: merge 3a98604c83 of origin/release/v0.39.0 tip b650d9d7d2, 150
   commits, NON-trivial (four conflicts), so the `release-merge-audit` skill ran
