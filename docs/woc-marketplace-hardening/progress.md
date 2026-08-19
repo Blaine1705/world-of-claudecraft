@@ -3446,6 +3446,20 @@ premise are recorded at the policy for the 16 QA and 22 to re-judge; the
 mobile scroll lands with rig pins and the real-viewport check joins the
 16 QA session's E2E list.
 
+The final gate's first run then surfaced an INHERITED red this session's
+targeted batteries never selected: tests/focus_restore.test.ts's
+namespace sweep demands that any src/ui module touching data-focus-key
+import the one reader, and woc_market_chrome.ts has EMITTED the attribute
+since the 15 sign-off round moved the browse strip there, with no import.
+Verified red at the session-start tip 4cb60d0d3c itself (checked out and
+run), so it predates this phase; how the 15 QA's recorded full-suite
+green coexists with that is a discrepancy the 16 QA session should note
+(the vitest-transform-cache and shard-selection traps are the usual
+suspects). Fixed the honest way rather than carried: focus_restore.ts now
+exports FOCUS_KEY_ATTR as the namespace's single source and the chrome
+builder spells its three focus keys through it, so the sweep passes
+because the coupling is real, not because a literal moved.
+
 Validation: tsc; the affected battery (~1,900 tests across the marketplace
 and http suites) green; all five pg suites 153/153 zero skips WITH
 TEST_DATABASE_URL; ci:changed clean; an early full gate run on the

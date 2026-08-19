@@ -11,6 +11,7 @@
 // (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { esc } from './esc';
+import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
 import { itemQualityLabel } from './item_kind_label';
 import { svgIcon } from './ui_icons';
@@ -26,15 +27,15 @@ export function wocBrowseStripHtml(opts: { page: number; hasMore: boolean; sort:
   return (
     `<div class="wm-pager">` +
     `<label class="wm-sort">${esc(t('hudChrome.wocMarket.sortLabel'))}` +
-    `<select data-field="sort" data-focus-key="wm-sort">` +
+    `<select data-field="sort" ${FOCUS_KEY_ATTR}="wm-sort">` +
     option('ending', t('hudChrome.wocMarket.sortEnding')) +
     option('newest', t('hudChrome.wocMarket.sortNewest')) +
     option('price_asc', t('hudChrome.wocMarket.sortPriceAsc')) +
     option('price_desc', t('hudChrome.wocMarket.sortPriceDesc')) +
     `</select></label>` +
-    `<button type="button" data-action="page-prev" data-focus-key="wm-page-prev" ${opts.page <= 0 ? 'disabled' : ''} aria-label="${esc(t('hudChrome.wocMarket.pagePrev'))}">${svgIcon('prev')}</button>` +
+    `<button type="button" data-action="page-prev" ${FOCUS_KEY_ATTR}="wm-page-prev" ${opts.page <= 0 ? 'disabled' : ''} aria-label="${esc(t('hudChrome.wocMarket.pagePrev'))}">${svgIcon('prev')}</button>` +
     `<span>${esc(t('hudChrome.wocMarket.pageNumber', { current: formatNumber(opts.page + 1) }))}</span>` +
-    `<button type="button" data-action="page-next" data-focus-key="wm-page-next" ${opts.hasMore ? '' : 'disabled'} aria-label="${esc(t('hudChrome.wocMarket.pageNext'))}">${svgIcon('next')}</button>` +
+    `<button type="button" data-action="page-next" ${FOCUS_KEY_ATTR}="wm-page-next" ${opts.hasMore ? '' : 'disabled'} aria-label="${esc(t('hudChrome.wocMarket.pageNext'))}">${svgIcon('next')}</button>` +
     `</div>`
   );
 }
