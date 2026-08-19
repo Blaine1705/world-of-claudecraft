@@ -198,7 +198,7 @@ interface AttributionTargetFixture {
 // keeps its pre-move framing (frozen in the artifact-integrity suite) and
 // only the swept provenance bytes follow the merged inputs.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c3e28ada39d02842d5a284309aa1a162d9318d4b71e01691034c4f0d6f7fa809';
+  '44861e6306d38aafd150fb40b7e58610ae07d7764957436955e8e1ae22e1fe94';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -897,7 +897,7 @@ describe('Eastbrook polish capture contract', () => {
       },
       'west-wall-quartermaster': {
         subject: 'fury',
-        camera: { x: -7, y: 6, z: -81 },
+        camera: { x: -6, y: 6, z: -76 },
         target: { x: -2, y: 2.5, z: -74 },
       },
     };

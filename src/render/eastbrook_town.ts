@@ -202,6 +202,46 @@ function materialIsEmissive(material: THREE.Material): boolean {
   );
 }
 
+// The kit buildings (the Galecrest hexb mix) carry their color in a small
+// palette texture rather than material.color; sample it at each vertex UV so
+// the baked vertex colors match the model's real palette (flat-shaded kit
+// islands, so a point sample is exact). Cached per texture image.
+const paletteSamplers = new WeakMap<object, (u: number, v: number) => [number, number, number]>();
+
+function paletteSampler(
+  material: THREE.Material,
+): ((u: number, v: number) => [number, number, number]) | null {
+  const source = material as THREE.Material & { map?: THREE.Texture | null };
+  const image = source.map?.image as
+    | (CanvasImageSource & { width: number; height: number })
+    | undefined;
+  if (!image || !image.width || !image.height) return null;
+  if (typeof document === 'undefined') return null; // node test env: no canvas
+  const cached = paletteSamplers.get(image);
+  if (cached) return cached;
+  const canvas = document.createElement('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const context = canvas.getContext('2d');
+  if (!context) return null;
+  context.drawImage(image, 0, 0);
+  const data = context.getImageData(0, 0, image.width, image.height).data;
+  const sampler = (u: number, v: number): [number, number, number] => {
+    const px = Math.min(
+      image.width - 1,
+      Math.max(0, Math.floor((u % 1 < 0 ? (u % 1) + 1 : u % 1) * image.width)),
+    );
+    const py = Math.min(
+      image.height - 1,
+      Math.max(0, Math.floor((1 - (v % 1 < 0 ? (v % 1) + 1 : v % 1)) * image.height)),
+    );
+    const at = (py * image.width + px) * 4;
+    return [data[at] / 255, data[at + 1] / 255, data[at + 2] / 255];
+  };
+  paletteSamplers.set(image, sampler);
+  return sampler;
+}
+
 function geometryFromMesh(
   mesh: THREE.Mesh,
   material: THREE.Material,
@@ -217,11 +257,16 @@ function geometryFromMesh(
   if (normal) geometry.setAttribute('normal', toFloatAttr(normal, 3));
   const sourceColor = source.getAttribute('color');
   const tint = materialColor(material, url);
+  const uv = source.getAttribute('uv');
+  const sample = uv ? paletteSampler(material) : null;
   const colors = new Float32Array(position.count * 3);
   for (let index = 0; index < position.count; index++) {
-    colors[index * 3] = (sourceColor?.getX(index) ?? 1) * tint.r;
-    colors[index * 3 + 1] = (sourceColor?.getY(index) ?? 1) * tint.g;
-    colors[index * 3 + 2] = (sourceColor?.getZ(index) ?? 1) * tint.b;
+    const texel: [number, number, number] = sample
+      ? sample(uv!.getX(index), uv!.getY(index))
+      : [1, 1, 1];
+    colors[index * 3] = (sourceColor?.getX(index) ?? 1) * tint.r * texel[0];
+    colors[index * 3 + 1] = (sourceColor?.getY(index) ?? 1) * tint.g * texel[1];
+    colors[index * 3 + 2] = (sourceColor?.getZ(index) ?? 1) * tint.b * texel[2];
   }
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   if (source.index) geometry.setIndex(source.index.clone());

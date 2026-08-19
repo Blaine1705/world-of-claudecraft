@@ -297,6 +297,17 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     cTmp.lerp(sandC, shore);
     lerpSplat(w, 3, shore);
   }
+  // New Eastbrook's strand (owner refinement): the vale's beach band reads as
+  // full sand well above the wet lip, so the shore is unambiguous sand rather
+  // than the base cover showing through. Fades out by ~2.2yd above the
+  // waterline, under the quay pad's working grade.
+  if (biome === 'vale') {
+    const strand = clamp01((wl + 2.5 - h) / 1.3);
+    if (strand > 0) {
+      cTmp.lerp(sandC, Math.min(1, strand));
+      lerpSplat(w, 3, Math.min(1, strand));
+    }
+  }
   // packed dirt at each hub settlement (same feather as the splat weight —
   // a constant lerp stamped a clean-edged brown disc on the grass)
   for (const zn of ZONES) {

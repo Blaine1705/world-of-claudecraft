@@ -380,7 +380,7 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   Object.freeze({
     name: 'west-wall-quartermaster',
     subject: 'fury',
-    camera: Object.freeze({ x: -7, y: 6, z: -81 }),
+    camera: Object.freeze({ x: -6, y: 6, z: -76 }),
     target: Object.freeze({ x: -2, y: 2.5, z: -74 }),
   }),
 ]);

@@ -985,7 +985,7 @@ const NPCS = [
   makeNpc('fisherman_brandt', { x: -95, z: -50 }, -1.5707963267948966, 'eastbrook_quay'),
   makeNpc('foreman_odell', { x: -84, z: -63 }, 0.6747409422235526, 'eastbrook_quay'),
   makeNpc('bursar_fernando', BANK.frontStandingPoint, BANK.rotation, BANK.id),
-  makeNpc('card_master', { x: -34, z: -92 }, -0.7853981633974483, 'eastbrook_inn'),
+  makeNpc('card_master', { x: -34, z: -92 }, -2.677945044588987, 'eastbrook_inn'),
   makeNpc('chronicler_saul', SAUL_POSITION, TOOLWORKS.rotation, 'mailbox_eastbrook'),
   makeNpc('forgemistress_darva', DARVA_POSITION, SMITHY.rotation, FORGE_STATION.id),
   makeNpc('cook_marlow', COOK_POSITION, INN.rotation, KITCHENS_STATION.id),

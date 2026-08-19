@@ -1022,7 +1022,7 @@ describe('layout clearance and service anchors', () => {
         -2.356194490192345,
         'eastbrook_bank',
       ],
-      ['card_master', -34, -92, -0.7853981633974483, 'eastbrook_inn'],
+      ['card_master', -34, -92, -2.677945044588987, 'eastbrook_inn'],
       ['chronicler_saul', 10.2, -87.5, 0.5880026035475675, 'mailbox_eastbrook'],
       [
         'forgemistress_darva',

@@ -79,16 +79,17 @@ export const HARBOR_SAND_TERRAIN_EDITS: HeightStamp[] = [
 ];
 
 export const SOWFIELD_BEACH_TERRAIN_EDITS: HeightStamp[] = [
-  { x: -64, z: -154, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -52, z: -156, radius: 29, delta: -4.0, falloff: 'smooth', mode: 'level' },
-  { x: -40, z: -158, radius: 29, delta: -4.0, falloff: 'smooth', mode: 'level' },
-  { x: -28, z: -160, radius: 30, delta: -4.0, falloff: 'smooth', mode: 'level' },
-  { x: -16, z: -156, radius: 26, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: -4, z: -154, radius: 26, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: 8, z: -151, radius: 30, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: 20, z: -148, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: 32, z: -146, radius: 28, delta: -3.9, falloff: 'smooth', mode: 'level' },
-  { x: 44, z: -143, radius: 26, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -58, z: -152, radius: 14, delta: -3.2, falloff: 'smooth', mode: 'level' },
+  { x: -64, z: -144, radius: 22, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -52, z: -146, radius: 23, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -40, z: -148, radius: 23, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -28, z: -150, radius: 24, delta: -4.0, falloff: 'smooth', mode: 'level' },
+  { x: -16, z: -146, radius: 20, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: -4, z: -144, radius: 20, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 8, z: -141, radius: 24, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 20, z: -138, radius: 22, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 32, z: -136, radius: 22, delta: -3.9, falloff: 'smooth', mode: 'level' },
+  { x: 44, z: -133, radius: 20, delta: -3.9, falloff: 'smooth', mode: 'level' },
 ];
 // Basin carved into the heightfield. Pushed to the far northeast so its
 // shoreline meets the fishing dock and the murloc camp instead of drowning them.
@@ -1802,6 +1803,11 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { key: 'hexCrateOpen', x: -95.5, z: -46.2, rot: -0.5, scale: 5, r: 1.1, h: 1.6 },
     { key: 'hexSack', x: -95.8, z: -62, rot: 1.1, scale: 5 },
     { key: 'hexBarrel', x: -95.4, z: -64, rot: 0, scale: 5, r: 1, h: 1.8 },
+    // a few more homes so the town reads lived-in (owner refinement):
+    // one on the main street, one by the civic square, one on the chapel rise
+    { key: 'hexbHomeA', x: -33, z: -111, rot: 0.35, scale: 7, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 22, z: -106, rot: -0.9, scale: 7, r: 4.5, h: 9 },
+    { key: 'hexbHomeA', x: -8, z: -82, rot: 1.9, scale: 7, r: 4.5, h: 8 },
     // fairway buoys marking the channel to the ferry berth
     { key: 'seaBuoy', x: -126, z: -46, rot: 0.4, scale: 3, float: 0.15 },
     { key: 'seaBuoyFlag', x: -124, z: -62, rot: -0.8, scale: 3, float: 0.15 },
