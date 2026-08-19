@@ -1071,7 +1071,12 @@ describe('createBackgroundGpuQueue', () => {
     // link queue, and it is what settles the gates whose tails hold the cap.
     // Parking it behind two slow crowd links kept every reveal gate compiling
     // past its soft deadline on the iGPU crowd bench.
-    const queue = createBackgroundGpuQueue({ tailLimit: 2 });
+    // An injected clock, as in the wait-stat tests above: recordWait drops a
+    // wait that rounds to 0 ms, and on a fast enough machine the third gate's
+    // real wait across promise hops IS under the rounding floor, so the
+    // longestWaits assertion below would flake without it.
+    let clock = 0;
+    const queue = createBackgroundGpuQueue({ tailLimit: 2, now: () => clock });
     const events: string[] = [];
     const links: Array<() => void> = [];
     const gate = (name: string) =>
@@ -1102,7 +1107,9 @@ describe('createBackgroundGpuQueue', () => {
     expect(events).toEqual(['first:prologue', 'second:prologue', 'touch']);
     expect(queue.stats().pending).toBe(1);
     expect(queue.stats().waitingTails.map((tail) => tail.label)).toEqual(['first', 'second']);
-    // Bound kept: at most tailLimit tails plus the one running unit.
+    // Bound kept: at most tailLimit tails plus the one running unit. The clock
+    // advances while the third gate is parked, so its recorded wait is real.
+    clock += 25;
     links[0]();
     await flush();
     expect(events).toEqual(['first:prologue', 'second:prologue', 'touch', 'third:prologue']);
