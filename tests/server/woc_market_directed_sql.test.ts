@@ -1499,19 +1499,27 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     // a naming-contract obligation (stated at the prune docstring); no
     // static scan can enumerate the unknown.
     const { readdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
     const { stripComments } = await import('../helpers/strip_comments');
-    const dir = new URL('../../server/', import.meta.url);
+    const dir = fileURLToPath(new URL('../../server/', import.meta.url));
     const offenders: string[] = [];
+    let scanned = 0;
     // Recursive on purpose: server/ has subdirectories (http/, epic/, ...),
-    // and a shallow walk is the known scan-guard trap.
+    // and a shallow walk is the known scan-guard trap. Platform sep, not
+    // '/': the recursive listing joins with the native separator.
     for (const entry of readdirSync(dir, { recursive: true })) {
       const rel = String(entry);
       if (!rel.endsWith('.ts')) continue;
-      const base = rel.split('/').at(-1);
-      if (base === 'woc_market_rules.ts' || base === 'woc_market_db.ts') continue;
-      const text = stripComments(readFileSync(new URL(rel, dir), 'utf8'));
+      // Exact root-relative paths, not basenames: a nested copy named like
+      // an allowlisted file must NOT inherit its exemption.
+      if (rel === 'woc_market_rules.ts' || rel === 'woc_market_db.ts') continue;
+      scanned++;
+      const text = stripComments(readFileSync(join(dir, rel), 'utf8'));
       if (/woc_(settlement|listing_[a-z_]+):/.test(text)) offenders.push(rel);
     }
+    // Positive control: a mis-rooted or empty walk must not pass vacuously.
+    expect(scanned).toBeGreaterThan(100);
     expect(offenders).toEqual([]);
   });
 

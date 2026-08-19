@@ -216,7 +216,9 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     // account); an account owning a large fraction of the realm's offers
     // legitimately seq-scans at natural cost, which is the planner being
     // right, not the shape regressing (that account's read is linear in its
-    // own retained history either way, the retention window's bound).
+    // own retained history either way, the retention window's bound). The
+    // seeded spread: 100 seller accounts at 50 rows, 50 buyer accounts at
+    // 100, so the polled account holds about 150 of the 5,000.
     const natural = await planOf(poll.text, poll.values, 'natural');
     expect(natural).not.toMatch(/Seq Scan on woc_market_directed_offers/);
     expect(natural).toMatch(/woc_market_offers_(buyer|seller)_all/);

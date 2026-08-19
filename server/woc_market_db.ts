@@ -1154,9 +1154,10 @@ function isLockContention(err: unknown): boolean {
   // session rather than let it hold the row lock unbounded. Plain
   // contention to the caller: retry immediately.
   // Counting 55P03 here is sound because every guard routes its error
-  // through exactly one tail that calls this classifier once: eleven map it
-  // to their typed 'contended', and the delivered-save tail classifies only
-  // to count, then rethrows to commitGrant's transient arm.
+  // through exactly one tail that calls this classifier once: most map it
+  // to their typed 'contended', the no-winner close probe answers false
+  // (park the listing), and the delivered-save tail classifies only to
+  // count, then rethrows to commitGrant's transient arm.
   if (code === '55P03') lockWaitTimeouts++;
   return code === '55P03' || code === '40P01' || code === '25P03';
 }
@@ -2809,10 +2810,11 @@ export class PgWocMarketDb implements WocMarketDb {
     // lock time for nothing): the honest retry moment is the LATER of the
     // two (a 5-minute per-listing answer while the hourly cap still holds
     // for 40 would send the player back too early). Same index cost as the
-    // old short-circuiting pair: the per-listing arm is a max() over the
-    // qualifying range of the unique index prefix (listing_id, account,
-    // lock_expires) and the cap arm a bounded scan of the account index
-    // ordered by lock_expires, both O(cap) rows by the hourly cap itself.
+    // old short-circuiting pair, and EXPLAINed (the plan-pins suite): the
+    // planner serves BOTH arms account-first off the abandons account index
+    // (listing_id and realm are residual filters over that account's few
+    // in-window rows), both O(cap) rows by the hourly cap itself; the _once
+    // unique index's job is the recorder's integrity, not these reads.
     const cooldownRefused = async (q: Pick<Pool, 'query'>): Promise<number | null> => {
       // Per-listing re-claim cooldown: the NEWEST in-window abandon of this
       // listing sets the clock. Account-wide hourly cap: a row exists at
@@ -3502,9 +3504,10 @@ export class PgWocMarketDb implements WocMarketDb {
       // window. 55P03 rides the same contended tail as the 40P01 the lock
       // ordering already anticipates: the poll simply retries next pass.
       // Per STATEMENT, not per transaction: this guard takes its locks in
-      // two statements (the open-bid set, then the listing), so the worst
-      // hold is about twice the bound plus work, under the 15s session
-      // ceiling; insertPendingBid is single-wait.
+      // two statements (the open-bid set, then the listing; a third when the
+      // own-bid re-read races into a row a crossing holder just locked), so
+      // the worst hold is a few times the bound plus work, under the 15s
+      // session ceiling; insertPendingBid is single-wait.
       await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
       // The connection-camping bound (the 04-round guards' rule, retrofitted
       // here with the hot-path work); 25P03 maps to the typed 'contended'.
@@ -4598,8 +4601,10 @@ export const WOC_STEPUP_PRUNE_SLACK_DAYS = 1;
  *  measured 4.5 ms per batch at 23k rows (two passes of the table), and the
  *  5-minute TTL, the issue-time reaper, and the rate limiter keep the table
  *  orders of magnitude smaller than that in practice. No explicit
- *  lock_timeout, like every sibling prune: the only writer that can hold one
- *  of these rows is the issue-time reaper deleting the same expired garbage
+ *  lock_timeout, like every sibling prune: the writers that can hold one of
+ *  these rows are the issue-time reaper and a straggler
+ *  consumeStepUpChallenge retrying a long-expired nonce (its DELETE
+ *  carries no expiry qual by design), each removing the same garbage
  *  (whoever wins did the work), bounded by the 15s session ceiling. */
 export async function pruneExpiredWocStepUpChallengesBatch(
   pool: Pool,
