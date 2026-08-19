@@ -195,6 +195,8 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(flat).toContain(
       'wocCustodyClaimsRetentionWarning( config.wocMarketCustodyClaimsRetentionDays, config.wocMarketListingsRetentionDays, )',
     );
+    // And the answer must reach an operator, not be computed and dropped.
+    expect(flat).toContain('if (claimsRetentionWarn !== null) console.warn(claimsRetentionWarn)');
     expect(MAIN).toContain(
       'pruneClosedWocListingsBatch(pool, config.wocMarketListingsRetentionDays, n)',
     );

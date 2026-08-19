@@ -4473,8 +4473,9 @@ export async function pruneClosedWocListingsBatch(
  *  the exactly-once evidence, so a row is pruned only when the referent its
  *  custody ref names (the settlement for woc_settlement:<id>, the listing
  *  for woc_listing_return:<id> and woc_listing_sold:<id>; the mint functions
- *  live in woc_market_rules.ts, and a test pins every exported mint shape to
- *  these regexes) is ALSO gone, which makes a re-drive of that ref
+ *  live in woc_market_rules.ts, and a test pins every *CustodyRef-suffixed
+ *  export there to these regexes, which makes that SUFFIX the naming
+ *  contract for any future mint) is ALSO gone, which makes a re-drive of that ref
  *  impossible by construction; a stuck deal older than the window keeps its
  *  claim for as long as its rows survive. Plan shape (measured, and pinned
  *  in the plan-pins pg suite): the bare NOT EXISTS probes plan as anti-joins
@@ -4529,8 +4530,9 @@ export function wocCustodyClaimsRetentionWarning(
   if (!Number.isFinite(listingsDays) || listingsDays <= 0) {
     return (
       '[woc_market] WOC_MARKET_LISTINGS_RETENTION_DAYS is keep-forever, so every ' +
-      'custody claim referent survives and the booked-claims prune never deletes; ' +
-      'woc_market_custody_claims will grow without bound despite its registration'
+      'parseable custody claim referent survives and the booked-claims prune can ' +
+      'delete only window-aged legacy refs; woc_market_custody_claims will grow ' +
+      'without bound despite its registration'
     );
   }
   if (custodyClaimsDays <= listingsDays) {

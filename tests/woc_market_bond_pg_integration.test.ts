@@ -1112,6 +1112,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         ]);
         const counters = await import('../server/woc_market_db');
         const idleBefore = counters.wocMarketIdleTxKillCount();
+        const lockBefore = counters.wocMarketLockWaitTimeoutCount();
         const startedAt = Date.now();
         const out = await marketDb.activateBid(bidId, BASE_MS);
         const elapsedMs = Date.now() - startedAt;
@@ -1121,6 +1122,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         expect(out).toBe('contended');
         expect(elapsedMs).toBeGreaterThanOrEqual(1_500);
         expect(elapsedMs).toBeLessThan(10_000);
+        expect(counters.wocMarketLockWaitTimeoutCount()).toBe(lockBefore + 1);
         expect(counters.wocMarketIdleTxKillCount(), 'a lock wait is not an idle kill').toBe(
           idleBefore,
         );

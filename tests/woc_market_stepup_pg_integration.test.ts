@@ -305,15 +305,14 @@ describeDb('woc market step-up challenges against real Postgres', () => {
     await marketDb.createStepUpChallenge(longDead);
     await marketDb.createStepUpChallenge(justExpired);
     await marketDb.createStepUpChallenge(live);
-    // The exactness premise, asserted like the retention siblings: only this
-    // test seeds rows behind the real-clock drain cutoff (BASE_MS fixtures
-    // sit far in the future).
-    const reachable = await pool.query(
-      `SELECT count(*)::int AS n FROM woc_market_stepup_challenges
-        WHERE expires_at < now() - interval '1 day'`,
-    );
-    expect(reachable.rows[0].n, 'only this test seeds a drainable row').toBe(1);
-    expect(await marketDbMod.pruneExpiredWocStepUpChallengesBatch(pool, 100)).toBe(1);
+    // Deliberately NO whole-database exactness premise: the sibling fixtures
+    // anchor at BASE_MS, which the real clock eventually passes, and a
+    // whole-table count would schedule a suite breakage for that day (the
+    // fresh review's catch). The per-nonce asserts below are the decisive
+    // arms; the return only proves the drain deleted at least our row.
+    expect(
+      await marketDbMod.pruneExpiredWocStepUpChallengesBatch(pool, 100),
+    ).toBeGreaterThanOrEqual(1);
     const left = await pool.query(
       `SELECT nonce FROM woc_market_stepup_challenges WHERE nonce = ANY($1::text[])`,
       [[longDead.nonce, justExpired.nonce, live.nonce]],

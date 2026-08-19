@@ -512,5 +512,10 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     expect(plan).toContain('woc_market_settlements_pkey');
     expect(plan).toContain('woc_market_listings_pkey');
     expect(plan).toMatch(/Tid Scan/);
+    // The decisive line (the fresh review proved the rest passes on the
+    // reverted shape too, whose hashed SubPlans feed off full INDEX-ONLY
+    // scans and so dodge every seq-scan assert): a pull-up-blocked probe
+    // plans as a SubPlan, the anti-join never does.
+    expect(plan).not.toMatch(/SubPlan/);
   }, 60_000);
 });
