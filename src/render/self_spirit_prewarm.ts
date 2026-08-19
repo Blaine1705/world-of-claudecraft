@@ -18,8 +18,8 @@
 
 export interface SelfSpiritPrewarmDeps {
   /** Link the local player's spirit variants off-thread. Re-reads the current
-   *  self visual itself; resolves when the link settles (or fails soft). */
-  warm: () => Promise<void>;
+   *  self visual itself; resolves true only when a compile actually ran. */
+  warm: () => Promise<boolean>;
   /** Await an idle slot before the warm, so it never lands on a live frame. */
   idle: () => Promise<void>;
 }
@@ -45,7 +45,8 @@ export class SelfSpiritPrewarmer {
     weaponSkin: null,
   };
   private inFlight = false;
-  private pending = false;
+  private active: WarmedLook | null = null;
+  private pending: WarmedLook | null = null;
 
   constructor(private readonly deps: SelfSpiritPrewarmDeps) {}
 
@@ -59,42 +60,53 @@ export class SelfSpiritPrewarmer {
     offhand: string | null,
     weaponSkin: string | null,
   ): void {
-    const w = this.warmed;
-    if (
-      visual === w.visual &&
-      skin === w.skin &&
-      mainhand === w.mainhand &&
-      offhand === w.offhand &&
-      weaponSkin === w.weaponSkin
-    ) {
-      return;
-    }
-    this.warmed = { visual, skin, mainhand, offhand, weaponSkin };
+    const look = { visual, skin, mainhand, offhand, weaponSkin };
+    if (sameLook(look, this.warmed)) return;
+    if (this.active && sameLook(look, this.active)) return;
+    if (this.pending && sameLook(look, this.pending)) return;
+    this.pending = look;
     this.schedule();
   }
 
   private schedule(): void {
-    if (this.inFlight) {
-      this.pending = true;
-      return;
-    }
+    if (this.inFlight || !this.pending) return;
     this.inFlight = true;
     void this.run();
   }
 
   private async run(): Promise<void> {
     try {
-      await this.deps.idle();
-      await this.deps.warm();
+      while (this.pending) {
+        const idleLook = this.pending;
+        this.pending = null;
+        await this.deps.idle();
+        const look = this.pending ?? idleLook;
+        this.pending = null;
+        this.active = look;
+        const warmed = await this.deps.warm();
+        this.active = null;
+        if (warmed) {
+          this.warmed = look;
+          if (this.pending && sameLook(this.pending, this.warmed)) this.pending = null;
+        }
+      }
     } catch {
       // Soft-fail: a context loss or shutdown race must never wedge the lane.
       // Whatever stays cold still links on the spirit flip, same as before.
     } finally {
+      this.active = null;
       this.inFlight = false;
-      if (this.pending) {
-        this.pending = false;
-        this.schedule();
-      }
+      this.schedule();
     }
   }
+}
+
+function sameLook(a: WarmedLook, b: WarmedLook): boolean {
+  return (
+    a.visual === b.visual &&
+    a.skin === b.skin &&
+    a.mainhand === b.mainhand &&
+    a.offhand === b.offhand &&
+    a.weaponSkin === b.weaponSkin
+  );
 }

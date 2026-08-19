@@ -1486,7 +1486,7 @@ const classAbilityNamesEn = {
       [
         'demon_skin',
         'Fiendhide',
-        'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active.',
+        'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
       ],
       [
         'immolate',

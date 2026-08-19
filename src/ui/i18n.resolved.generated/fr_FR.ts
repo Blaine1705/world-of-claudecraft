@@ -1040,19 +1040,19 @@ export const fr_FR: EnTranslations = {
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "lastkeepMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep} : {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "La salle basse",
+        "state": "L'étage d'apparat",
+        "residence": "Le logis",
+        "tower": "La tour de guet"
       }
     },
     "dawnholdMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep} : {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Le rez-de-jardin",
+        "solar": "La chambre du soleil"
       }
     },
     "compass": {
@@ -5106,6 +5106,7 @@ export const fr_FR: EnTranslations = {
       "mageEleJet": "Jet d'eau se trouve sur la barre du familier comme un bouton à part entière : cliquez dessus pour verrouiller un rayon glacial sur un ennemi, ou faites un clic droit (appui long sur tactile) pour laisser l'élémentaire le déclencher de lui-même dès qu'il est prêt.",
       "formsHeading": "Changement de forme",
       "formsNote": "Un druide combat en changeant de forme. La plupart des capacités de druide appartiennent à une forme précise, si bien que la forme que vous portez détermine ce que vous pouvez lancer, et changer de forme coûte un peu de mana. Vous pouvez changer de forme en combat ou hors combat, aussi souvent que vous le souhaitez.",
+      "formsAutoUnshift": "Un soin ou un sort de dégâts lancé sous forme vous en fait sortir tout seul. Quitter une forme ainsi est gratuit et ne consomme pas votre temps de recharge global, un sort instantané part donc à l'instant où vous appuyez. Reprendre la forme est une capacité ordinaire, qui coûte toujours du mana et votre temps de recharge global.",
       "formsMoonwing": "Un druide Équilibre gagne une forme supplémentaire, la Forme de sélénien, la forme de lanceur de sorts dans laquelle il combat. C'est la seule forme animale qui conserve vos sorts, et votre baguette ne fonctionne que dans cette forme ou dans votre forme de lanceur de sorts normale.",
       "formLine": {
         "form_bear": "La forme de tank : une peau épaisse, de la rage à la place du mana, et davantage de menace pour que les ennemis continuent de vous frapper.",
@@ -12732,7 +12733,7 @@ export const fr_FR: EnTranslations = {
         "name": "Griffe immaculée"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bouquet du jardin de Dawnhold"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"
@@ -13580,13 +13581,13 @@ export const fr_FR: EnTranslations = {
         "name": "Mannequin d'entraînement"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Mannequin de joueur allié"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Mannequin de boss normal"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Mannequin de boss héroïque"
       },
       "ridge_stalker": {
         "name": "Traqueur de crête"
@@ -17228,9 +17229,9 @@ export const fr_FR: EnTranslations = {
         "leaveText": "Vous refermez la porte du donjon et retrouvez le vent des Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Château Dawnhold",
+        "enterText": "Vous pénétrez dans les salles chaudes et parfumées de fleurs du Château Dawnhold.",
+        "leaveText": "Vous ressortez sur la pelouse ensoleillée du jardin."
       },
       "drowned_temple": {
         "name": "Le Temple noyé",

@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Et heal eller en skadetrylleformular kastet i skikkelse trækker dig selv ud af den. At forlade en skikkelse på den måde er gratis og bruger ikke den globale nedkøling, så en øjeblikkelig trylleformular affyres i samme sekund, du trykker. At skifte tilbage er en almindelig evne og koster stadig mana og din globale nedkøling.',
+  'entities.mobs.heroic_boss_dummy.name': 'Heroisk bossdukke',
+  'entities.mobs.normal_boss_dummy.name': 'Normal bossdukke',
+  'entities.mobs.friendly_player_dummy.name': 'Venlig spillerdukke',
+  'entities.items.dawnhold_posy.name': 'Buket fra Dawnholds have',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Du smutter ud igen på havens solbeskinnede græsplæne.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Du træder ind i Dawnhold Slots varme, blomsterduftende sale.',
+  'entities.dungeons.dawnhold_castle.name': 'Dawnhold Slot',
+  'hudChrome.lastkeepMap.story.tower': 'Vagttårnet',
+  'hudChrome.lastkeepMap.story.residence': 'Boligetagen',
+  'hudChrome.lastkeepMap.story.state': 'Repræsentationsetagen',
+  'hudChrome.lastkeepMap.story.undercroft': 'Kælderhvælvingen',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Solgemakket',
+  'hudChrome.dawnholdMap.story.ground': 'Haveetagen',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Slagmark.',
   'guide.social.chanBattlegroundBody': 'Tal med alle stridende i din slagmark, begge sider. Kun mens en kamp er i gang.',
   'hud.chat.templates.battleground': '[Slagmark] {name}: {message}',

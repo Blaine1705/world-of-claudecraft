@@ -1042,17 +1042,17 @@ export const sv_SE: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Källarvalven",
+        "state": "Paradvåningen",
+        "residence": "Bostadsvåningen",
+        "tower": "Vakttornet"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Trädgårdsvåningen",
+        "solar": "Solkammaren"
       }
     },
     "compass": {
@@ -5106,6 +5106,7 @@ export const sv_SE: EnTranslations = {
       "mageEleJet": "Vattenstråle har en egen knapp på djurraden: klicka på den för att låsa en kylande stråle på en fiende, eller högerklicka på den (håll intryckt på mobil) för att låta elementaren avfyra den på egen hand så snart den är redo.",
       "formsHeading": "Formskiftning",
       "formsNote": "En druid slåss genom att byta form. De flesta av druidens förmågor hör till en enda form, så formen du befinner dig i avgör vad du kan kasta, och att skifta kostar lite mana. Du kan skifta in eller ut ur strid, så ofta du vill.",
+      "formsAutoUnshift": "En läkning eller en skadetrollformel som kastas i skepnad tar dig ur den åt dig. Att lämna en skepnad på det sättet är gratis och förbrukar inte den globala nedkylningen, så en omedelbar trollformel går av i samma stund du trycker. Att skifta tillbaka är en vanlig förmåga och kostar fortfarande mana och din globala nedkylning.",
       "formsMoonwing": "En Månlund-druid får en form till, Månugglaform, besvärjarformen en Balans-druid strider i. Det är den enda djurformen som behåller dina besvärjelser, och din trollstav fungerar bara i den eller i din vanliga besvärjarform.",
       "formLine": {
         "form_bear": "Tankformen: en tjock hud, Raseri i stället för mana, och extra hot så att fiender fortsätter slå på dig.",
@@ -12732,7 +12733,7 @@ export const sv_SE: EnTranslations = {
         "name": "Orörd klo"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bukett från Dawnholds trädgård"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
@@ -13580,13 +13581,13 @@ export const sv_SE: EnTranslations = {
         "name": "Träningsdocka"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Vänlig spelardocka"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Normal bossdocka"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Heroisk bossdocka"
       },
       "ridge_stalker": {
         "name": "Åssmygare"
@@ -17228,9 +17229,9 @@ export const sv_SE: EnTranslations = {
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Dawnholds slott",
+        "enterText": "Du kliver in i de varma, blomsterdoftande salarna i Dawnholds slott.",
+        "leaveText": "Du kliver ut igen på trädgårdens solbelysta gräsmatta."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",

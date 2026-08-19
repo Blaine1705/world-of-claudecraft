@@ -13,6 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Una sanación o un hechizo de daño lanzado en forma te saca de ella por ti. Salir de una forma así es gratis y no gasta tu tiempo de reutilización global, de modo que un hechizo instantáneo sale en el momento en que lo pulsas. Volver a la forma es una habilidad normal y sigue costando maná y tu tiempo de reutilización global.',
+  'entities.mobs.heroic_boss_dummy.name': 'Muñeco de jefe heroico',
+  'entities.mobs.normal_boss_dummy.name': 'Muñeco de jefe normal',
+  'entities.mobs.friendly_player_dummy.name': 'Muñeco de jugador aliado',
+  'entities.items.dawnhold_posy.name': 'Ramillete del jardín de Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Vuelves a salir al soleado césped del jardín.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Entras en los cálidos salones del Castillo Dawnhold, perfumados de flores.',
+  'entities.dungeons.dawnhold_castle.name': 'Castillo Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'La atalaya',
+  'hudChrome.lastkeepMap.story.residence': 'La residencia',
+  'hudChrome.lastkeepMap.story.state': 'La planta noble',
+  'hudChrome.lastkeepMap.story.undercroft': 'Los sótanos',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'La solana',
+  'hudChrome.dawnholdMap.story.ground': 'La planta del jardín',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Campo de batalla.',
   'guide.social.chanBattlegroundBody': 'Habla con todos los combatientes de tu campo de batalla, de ambos bandos. Solo mientras hay una partida en curso.',
   'hud.chat.templates.battleground': '[Campo de batalla] {name}: {message}',

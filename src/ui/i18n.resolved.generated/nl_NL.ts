@@ -1042,17 +1042,17 @@ export const nl_NL: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "De keldergewelven",
+        "state": "De staatsieverdieping",
+        "residence": "De woonverdieping",
+        "tower": "De wachttoren"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "De tuinverdieping",
+        "solar": "De zonnekamer"
       }
     },
     "compass": {
@@ -5106,6 +5106,7 @@ export const nl_NL: EnTranslations = {
       "mageEleJet": "Waterstraal staat als eigen knop op de huisdierbalk: klik erop om een vertragende straal op één vijand vast te zetten, of klik met rechts (op mobiel aanraken en vasthouden) om de elementaal hem zelf te laten afvuren zodra hij klaar is.",
       "formsHeading": "Gedaanteverwisseling",
       "formsNote": "Een druïde vecht door van gedaante te veranderen. De meeste druïdenvaardigheden horen bij één gedaante, dus de vorm waarin je verkeert bepaalt wat je kunt gebruiken, en van gedaante wisselen kost een beetje mana. Je kunt in of buiten gevecht van gedaante wisselen, zo vaak je wilt.",
+      "formsAutoUnshift": "Een heling of een schadespreuk die je in gedaante uitspreekt, haalt je er vanzelf uit. Een gedaante zo verlaten is gratis en verbruikt je globale afkoeltijd niet, dus een instantspreuk gaat af op het moment dat je drukt. Terugschakelen is een gewone vaardigheid en kost nog steeds mana en je globale afkoeltijd.",
       "formsMoonwing": "Een Balans-druïde krijgt er nog één gedaante bij: de Maanuilvorm, de spreukgedaante waarin hij vecht. Het is de enige diergedaante die je spreuken behoudt, en je toverstaf werkt alleen in deze vorm of in je normale spreukgedaante.",
       "formLine": {
         "form_bear": "De tankgedaante: een zware huid, Woede in plaats van mana, en extra dreiging zodat vijanden jou blijven aanvallen.",
@@ -12732,7 +12733,7 @@ export const nl_NL: EnTranslations = {
         "name": "Ongerepte Klauw"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Boeketje uit de tuin van Dawnhold"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -13580,13 +13581,13 @@ export const nl_NL: EnTranslations = {
         "name": "Oefenpop"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Bevriende spelerpop"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Normale bosspop"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Heroïsche bosspop"
       },
       "ridge_stalker": {
         "name": "Bergkam-Sluiper"
@@ -17228,9 +17229,9 @@ export const nl_NL: EnTranslations = {
         "leaveText": "Je trekt de burchtdeur dicht en stapt terug de wind van de Drakenlanden in."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Kasteel Dawnhold",
+        "enterText": "Je stapt de warme, naar bloemen geurende zalen van Kasteel Dawnhold binnen.",
+        "leaveText": "Je glipt weer naar buiten, het zonnige gazon van de tuin op."
       },
       "drowned_temple": {
         "name": "De Verdronken Tempel",

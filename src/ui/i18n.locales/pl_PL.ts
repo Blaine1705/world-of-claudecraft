@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Leczenie lub zaklęcie zadające obrażenia rzucone w formie samo cię z niej wyprowadza. Opuszczenie formy w ten sposób jest darmowe i nie zużywa globalnego czasu odnowienia, więc błyskawiczne zaklęcie odpala się w chwili naciśnięcia. Powrót do formy to zwykła zdolność i nadal kosztuje manę oraz globalny czas odnowienia.',
+  'entities.mobs.heroic_boss_dummy.name': 'Manekin heroicznego bossa',
+  'entities.mobs.normal_boss_dummy.name': 'Manekin normalnego bossa',
+  'entities.mobs.friendly_player_dummy.name': 'Manekin przyjaznego gracza',
+  'entities.items.dawnhold_posy.name': 'Bukiecik z ogrodu zamku Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Zamek Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Wieża strażnicza',
+  'hudChrome.lastkeepMap.story.residence': 'Piętro mieszkalne',
+  'hudChrome.lastkeepMap.story.state': 'Piętro reprezentacyjne',
+  'hudChrome.lastkeepMap.story.undercroft': 'Podziemia',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Komnata słoneczna',
+  'hudChrome.dawnholdMap.story.ground': 'Parter ogrodowy',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Pole bitwy.',
   'guide.social.chanBattlegroundBody': 'Rozmawiaj z każdym walczącym na polu bitwy, po obu stronach. Tylko podczas trwania meczu.',
   'hud.chat.templates.battleground': '[Pole bitwy] {name}: {message}',

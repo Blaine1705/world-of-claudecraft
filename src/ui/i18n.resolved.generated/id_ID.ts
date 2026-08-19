@@ -1042,17 +1042,17 @@ export const id_ID: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Ruang Bawah Tanah",
+        "state": "Lantai Kebesaran",
+        "residence": "Lantai Hunian",
+        "tower": "Menara Pengawas"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Lantai Taman",
+        "solar": "Ruang Matahari"
       }
     },
     "compass": {
@@ -5106,6 +5106,7 @@ export const id_ID: EnTranslations = {
       "mageEleJet": "Pancaran Air menempati bilah peliharaan sebagai tombolnya sendiri: klik untuk mengunci seberkas sinar pembeku pada satu musuh, atau klik kanan (tekan dan tahan di perangkat seluler) agar elemental itu menembakkannya sendiri kapan pun sudah siap.",
       "formsHeading": "Perubahan Wujud",
       "formsNote": "Seorang druid bertarung dengan berganti wujud. Sebagian besar kemampuan druid terikat pada satu wujud tertentu, jadi wujud yang sedang kamu tempati menentukan apa yang bisa kamu rapalkan, dan berganti wujud menghabiskan sedikit mana. Kamu bisa berubah wujud masuk atau keluar dari pertempuran, sesering yang kamu mau.",
+      "formsAutoUnshift": "Penyembuhan atau sihir serangan yang dirapal saat berwujud akan mengeluarkanmu dari wujud itu secara otomatis. Keluar dari wujud dengan cara ini gratis dan tidak memakai jeda global, jadi sihir instan langsung meluncur begitu kau menekannya. Kembali ke wujud adalah kemampuan biasa dan tetap memakan mana serta jeda global.",
       "formsMoonwing": "Druid Keseimbangan mendapat satu wujud lagi, Wujud Burung Bulan, wujud perapal yang menjadi cara bertarung druid Keseimbangan. Inilah satu-satunya wujud hewan yang tetap mempertahankan mantramu, dan tongkat sihirmu hanya berfungsi dalam wujud ini atau dalam wujud perapal normalmu.",
       "formLine": {
         "form_bear": "Wujud tank: kulit tebal, Amarah alih-alih mana, dan ancaman ekstra agar musuh terus menyerangmu.",
@@ -12732,7 +12733,7 @@ export const id_ID: EnTranslations = {
         "name": "Cakar Murni"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Buket Taman Dawnhold"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
@@ -13580,13 +13581,13 @@ export const id_ID: EnTranslations = {
         "name": "Boneka Latihan"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Boneka Pemain Sekutu"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Boneka Bos Normal"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Boneka Bos Heroik"
       },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"
@@ -17228,9 +17229,9 @@ export const id_ID: EnTranslations = {
         "leaveText": "Kau menutup pintu benteng itu dan melangkah kembali ke angin Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Kastil Dawnhold",
+        "enterText": "Kau melangkah masuk ke aula Kastil Dawnhold yang hangat dan harum bunga.",
+        "leaveText": "Kau menyelinap keluar lagi ke halaman rumput taman yang bermandikan cahaya matahari."
       },
       "drowned_temple": {
         "name": "Kuil Tenggelam",

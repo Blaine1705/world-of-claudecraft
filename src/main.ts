@@ -1498,7 +1498,7 @@ async function startGame(
     setModularLookProvider((e) =>
       e.kind === 'player'
         ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
-        : npcLookFor(e.templateId),
+        : npcLookFor(e.templateId, e.kind),
     );
     // No helmet re-assert here on purpose. The preference is per CHARACTER
     // now: set from the creator's toggle at creation, changed by the paperdoll

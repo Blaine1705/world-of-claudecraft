@@ -13,6 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': "Un soin ou un sort de dégâts lancé sous forme vous en fait sortir tout seul. Quitter une forme ainsi est gratuit et ne consomme pas votre temps de recharge global, un sort instantané part donc à l'instant où vous appuyez. Reprendre la forme est une capacité ordinaire, qui coûte toujours du mana et votre temps de recharge global.",
+  'entities.mobs.heroic_boss_dummy.name': 'Mannequin de boss héroïque',
+  'entities.mobs.normal_boss_dummy.name': 'Mannequin de boss normal',
+  'entities.mobs.friendly_player_dummy.name': 'Mannequin de joueur allié',
+  'entities.items.dawnhold_posy.name': 'Bouquet du jardin de Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Vous ressortez sur la pelouse ensoleillée du jardin.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Vous pénétrez dans les salles chaudes et parfumées de fleurs du Château Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Château Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'La tour de guet',
+  'hudChrome.lastkeepMap.story.residence': 'Le logis',
+  'hudChrome.lastkeepMap.story.state': "L'étage d'apparat",
+  'hudChrome.lastkeepMap.story.undercroft': 'La salle basse',
+  'hudChrome.lastkeepMap.title': '{keep} : {story}',
+  'hudChrome.dawnholdMap.story.solar': 'La chambre du soleil',
+  'hudChrome.dawnholdMap.story.ground': 'Le rez-de-jardin',
+  'hudChrome.dawnholdMap.title': '{keep} : {story}',
   'guide.social.chanBattleground': 'Champs de Thornhollow.',
   'guide.social.chanBattlegroundBody': "Parlez à chaque combattant de votre champ de bataille, des deux côtés. Uniquement pendant qu'un match est en cours.",
   'hud.chat.templates.battleground': '[Champs de Thornhollow] {name} : {message}',

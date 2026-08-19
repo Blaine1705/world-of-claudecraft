@@ -11,6 +11,7 @@ import {
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { isStunned } from '../src/sim/combat/cc';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
+import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
@@ -8867,6 +8868,11 @@ export class GameServer {
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
     });
+    // Parked mana (a druid form runs the live bar on rage or energy and sets the
+    // real pool aside): self-only, and omitted at rest per the omit-when-default
+    // wire convention, so the action bar can price an auto-unshifting cast.
+    // wireParkedMana owns the flooring contract and the reason for it.
+    if (p.resourceType !== 'mana' && p.savedMana > 0) self.sm = wireParkedMana(p.savedMana);
     const json = JSON.stringify(self);
     selfLap?.('self.base');
     // heavy, rarely-changing fields ride along only when their serialized

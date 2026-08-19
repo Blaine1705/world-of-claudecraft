@@ -178,6 +178,36 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
   });
 
+  it('petPickTarget aggressive mode skips quest-gated mobs for a non-questing owner', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'aggressive';
+    pet.level = 10;
+    const egg = wildHostile(sim, [pet.id]);
+    egg.templateId = 'spider_egg';
+    egg.level = 10;
+    egg.aggroTargetId = null;
+    egg.inCombat = false;
+    isolate(sim, [pid, pet.id, egg.id]);
+    place(owner, 0, 0);
+    place(pet, 1, 0);
+    place(egg, 9, 0); // inside PET_AGGRESSIVE_RANGE, outside the 4yd proximity-pull floor
+    owner.targetId = null;
+    owner.autoAttack = false;
+    const meta = expectDefined(sim.meta(pid));
+    meta.lastActiveTick = sim.tickCount;
+    syncGrid(sim);
+
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+
+    meta.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(egg.id);
+  });
+
   it('petRangedAttack hurls a fire-school bolt that deals AP-scaled damage', () => {
     const { sim, pid } = world();
     const pet = adopt(sim, pid);
@@ -274,6 +304,56 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     updatePet(sim.ctx, pet);
     expect(pet.castingAbility).toBe('water_jet');
     expect(pet.channeling).toBe(true);
+  });
+
+  it('does not auto-cast Water Jet at a quest-gated mob for a non-questing owner', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const egg = wildHostile(sim, [pet.id]);
+    pet.templateId = 'water_elemental';
+    pet.petMode = 'aggressive';
+    pet.petAutoWaterJet = true;
+    pet.petTauntTimer = 0;
+    pet.aggroTargetId = egg.id; // stale target safety: updatePet must clear it, not cast
+    pet.inCombat = true;
+    pet.level = 10;
+    egg.templateId = 'spider_egg';
+    egg.level = 10;
+    egg.aggroTargetId = null;
+    egg.inCombat = false;
+    isolate(sim, [pid, pet.id, egg.id]);
+    place(owner, 0, 0);
+    place(pet, 1, 0);
+    place(egg, 9, 0);
+    const meta = expectDefined(sim.meta(pid));
+    meta.lastActiveTick = sim.tickCount;
+    syncGrid(sim);
+    sim.drainEvents();
+
+    updatePet(sim.ctx, pet);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.castingAbility).not.toBe('water_jet');
+    expect(pet.channeling).toBe(false);
+    expect(egg.auras.some((a) => a.id === 'water_jet' || a.id === 'water_jet_slow')).toBe(false);
+    expect(
+      sim.drainEvents().some((event) => event.type === 'spellfx' && event.sourceId === pet.id),
+    ).toBe(false);
+
+    meta.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    pet.petTauntTimer = 0;
+    syncGrid(sim);
+    updatePet(sim.ctx, pet);
+
+    expect(pet.aggroTargetId).toBe(egg.id);
+    expect(pet.castingAbility).toBe('water_jet');
+    expect(pet.channeling).toBe(true);
+    expect(egg.auras.some((a) => a.id === 'water_jet' && a.sourceId === pet.id)).toBe(true);
   });
 
   it('setPetAutoWaterJet toggles the flag on a jet-bearing pet', () => {

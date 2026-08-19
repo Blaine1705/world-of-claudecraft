@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.lastkeepMap.title': '{keep}：{story}',
+  'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': 'ウルフフォーム',
   'guide.gear.slotOffhand': 'オフハンド',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -12548,6 +12550,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'フリートフォーム',
   'guide.classPage.formsHeading': '変身',
   'guide.classPage.formsMoonwing': '均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。',
+  'guide.classPage.formsAutoUnshift':
+    '変身中に回復や攻撃の呪文を唱えると、姿はひとりでに解けます。こうして姿を解くのはマナもかからず、グローバルクールダウンも使いません。ですから即時発動の呪文は押した瞬間に飛びます。もう一度変身するのは普通のアビリティなので、マナもグローバルクールダウンもかかります。',
   'guide.classPage.formsNote': 'ドルイドは姿を変えて戦います。ドルイドのアビリティはほとんどがいずれか一つの姿に属しているので、今どの姿でいるかが何を使えるかを決めます。変身にはわずかなマナがかかります。戦闘中でも戦闘外でも、好きなだけ変身し、また解くことができます。',
   'guide.classPage.mageEleHeading': 'ウォーターエレメンタル',
   'guide.classPage.mageEleJet': 'ウォータージェットはペットバーに独立したボタンとして並びます。クリックすれば凍てつく光線を敵一体に固定し、右クリック（モバイルでは長押し）すれば、準備が整うたびにエレメンタルが自分の判断で放つようになります。',

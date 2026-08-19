@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.lastkeepMap.title': '{keep}：{story}',
+  'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': '狼形態',
   'guide.gear.slotOffhand': '副手',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -12002,6 +12004,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formsHeading': '變形',
   'guide.classPage.formsMoonwing':
     '平衡專精的德魯伊會多獲得一種形態：梟獸形態，那是平衡德魯伊作戰時所處的施法形態。它是唯一保留你法術的動物形態，而你的魔杖也只有在它或你平常的施法形態下才能使用。',
+  'guide.classPage.formsAutoUnshift':
+    '變身時施放治療或傷害法術會自動為你解除變身。以這種方式離開形態不消耗法力，也不占用全域冷卻，因此瞬發法術會在你按下的那一刻釋放。重新變身是普通技能，依然消耗法力並占用全域冷卻。',
   'guide.classPage.formsNote':
     '德魯伊靠變換形態作戰。大多數德魯伊技能都隸屬於某一種形態，因此你身處的形態決定了你能施放什麼，而變形本身會消耗少許法力。無論是否在戰鬥中，你都可以隨心所欲地變來變去。',
   'guide.classPage.mageEleHeading': '水元素',

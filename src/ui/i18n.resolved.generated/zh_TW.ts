@@ -1040,7 +1040,7 @@ export const zh_TW: EnTranslations = {
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "lastkeepMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "undercroft": "地下穹室",
         "state": "正殿層",
@@ -1049,7 +1049,7 @@ export const zh_TW: EnTranslations = {
       }
     },
     "dawnholdMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "ground": "庭園層",
         "solar": "日光廳"
@@ -5106,6 +5106,7 @@ export const zh_TW: EnTranslations = {
       "mageEleJet": "水流噴射在寵物動作列上自成一個按鈕：點擊它可將一道冰寒光束鎖定在單一敵人身上，或是按右鍵（在手機上長按），讓水元素在冷卻結束後自行施放。",
       "formsHeading": "變形",
       "formsNote": "德魯伊靠變換形態作戰。大多數德魯伊技能都隸屬於某一種形態，因此你身處的形態決定了你能施放什麼，而變形本身會消耗少許法力。無論是否在戰鬥中，你都可以隨心所欲地變來變去。",
+      "formsAutoUnshift": "變身時施放治療或傷害法術會自動為你解除變身。以這種方式離開形態不消耗法力，也不占用全域冷卻，因此瞬發法術會在你按下的那一刻釋放。重新變身是普通技能，依然消耗法力並占用全域冷卻。",
       "formsMoonwing": "平衡專精的德魯伊會多獲得一種形態：梟獸形態，那是平衡德魯伊作戰時所處的施法形態。它是唯一保留你法術的動物形態，而你的魔杖也只有在它或你平常的施法形態下才能使用。",
       "formLine": {
         "form_bear": "坦克型態：厚實的皮毛、以怒氣取代法力，還有額外威脅值，好讓敵人繼續朝你揮拳。",

@@ -1042,17 +1042,17 @@ export const it_IT: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "I sotterranei",
+        "state": "Il piano nobile",
+        "residence": "La residenza",
+        "tower": "La torre di guardia"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Il piano del giardino",
+        "solar": "La sala del sole"
       }
     },
     "compass": {
@@ -5106,6 +5106,7 @@ export const it_IT: EnTranslations = {
       "mageEleJet": "Getto d'Acqua compare sulla barra del famiglio come pulsante a sé stante: cliccalo per bloccare un raggio gelido su un nemico, oppure fai clic destro su di esso (tocca e tieni premuto su mobile) per lasciare che l'elementale lo lanci da solo ogni volta che è pronto.",
       "formsHeading": "Trasformazioni",
       "formsNote": "Un druido combatte cambiando forma. La maggior parte delle abilità del druido appartiene a una forma specifica, quindi la forma in cui ti trovi decide cosa puoi lanciare, e trasformarti costa un po' di mana. Puoi trasformarti dentro o fuori dal combattimento, tutte le volte che vuoi.",
+      "formsAutoUnshift": "Una cura o un incantesimo di danno lanciato in forma ti fa uscire da solo. Lasciare una forma in questo modo è gratuito e non consuma il recupero globale, quindi un incantesimo istantaneo parte nel momento in cui lo premi. Rientrare in forma è un'abilità normale e costa comunque mana e il tuo recupero globale.",
       "formsMoonwing": "Un druido di Equilibrio ottiene una forma in più, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. È l'unica forma animale che conserva i tuoi incantesimi, e la tua bacchetta funziona solo con essa o con la tua normale forma da incantatore.",
       "formLine": {
         "form_bear": "La forma da tank: una pelle spessa, rabbia al posto del mana, e minaccia extra così i nemici continuano ad attaccarti.",
@@ -12732,7 +12733,7 @@ export const it_IT: EnTranslations = {
         "name": "Artiglio Immacolato"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Mazzolino del giardino di Dawnhold"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
@@ -13580,13 +13581,13 @@ export const it_IT: EnTranslations = {
         "name": "Manichino d'allenamento"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Manichino di giocatore alleato"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Manichino di boss normale"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Manichino di boss eroico"
       },
       "ridge_stalker": {
         "name": "Braccatore della cresta"
@@ -17228,9 +17229,9 @@ export const it_IT: EnTranslations = {
         "leaveText": "Chiudi il portone della rocca e torni nel vento delle Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Castello Dawnhold",
+        "enterText": "Metti piede nelle sale calde e profumate di fiori del Castello Dawnhold.",
+        "leaveText": "Esci di nuovo sul prato soleggiato del giardino."
       },
       "drowned_temple": {
         "name": "Il Tempio Annegato",

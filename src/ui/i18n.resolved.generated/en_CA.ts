@@ -5106,6 +5106,7 @@ export const en_CA: EnTranslations = {
       "mageEleJet": "Water Jet sits on the pet bar as a button of its own: click it to lock a chilling beam onto one enemy, or right-click it (touch and hold on mobile) to let the elemental fire it on its own whenever it is ready.",
       "formsHeading": "Shapeshifting",
       "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
+      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
       "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
       "formLine": {
         "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
@@ -10249,7 +10250,7 @@ export const en_CA: EnTranslations = {
       },
       "demon_skin": {
         "name": "Fiendhide",
-        "description": "Demonic skin increases your armor by {buff} for 30 min. Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active."
+        "description": "Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active."
       },
       "immolate": {
         "name": "Burning Pact",

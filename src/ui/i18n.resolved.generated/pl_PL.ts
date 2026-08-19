@@ -1042,17 +1042,17 @@ export const pl_PL: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Podziemia",
+        "state": "Piętro reprezentacyjne",
+        "residence": "Piętro mieszkalne",
+        "tower": "Wieża strażnicza"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Parter ogrodowy",
+        "solar": "Komnata słoneczna"
       }
     },
     "compass": {
@@ -5106,6 +5106,7 @@ export const pl_PL: EnTranslations = {
       "mageEleJet": "Strumień wody zajmuje własny przycisk na pasku zwierzęcia: kliknij go, aby zablokować spowalniającą wiązkę na jednym wrogu, albo kliknij go prawym przyciskiem (przytrzymaj dotyk na urządzeniu mobilnym), aby pozwolić żywiołakowi rzucać go samodzielnie, gdy tylko będzie gotowy.",
       "formsHeading": "Zmiana kształtu",
       "formsNote": "Druid walczy, zmieniając kształt. Większość zdolności druida należy do jednej postaci, więc to, w jakiej formie się znajdujesz, decyduje, co możesz rzucić, a przemiana kosztuje odrobinę many. Możesz przemieniać się w walce i poza nią, tak często, jak chcesz.",
+      "formsAutoUnshift": "Leczenie lub zaklęcie zadające obrażenia rzucone w formie samo cię z niej wyprowadza. Opuszczenie formy w ten sposób jest darmowe i nie zużywa globalnego czasu odnowienia, więc błyskawiczne zaklęcie odpala się w chwili naciśnięcia. Powrót do formy to zwykła zdolność i nadal kosztuje manę oraz globalny czas odnowienia.",
       "formsMoonwing": "Druid o specjalizacji Równowaga zyskuje jeszcze jedną postać, Postać księżycowej sowy, formę rzucającego, w jakiej walczy. To jedyna zwierzęca postać, która zachowuje twoje zaklęcia, a różdżka działa tylko w niej albo w twojej zwykłej postaci rzucającego.",
       "formLine": {
         "form_bear": "Postać do tankowania: gruba skóra, wściekłość zamiast many i dodatkowe zagrożenie, dzięki któremu wrogowie wciąż atakują ciebie.",
@@ -12732,7 +12733,7 @@ export const pl_PL: EnTranslations = {
         "name": "Nieskazitelny Pazur"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bukiecik z ogrodu zamku Dawnhold"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
@@ -13580,13 +13581,13 @@ export const pl_PL: EnTranslations = {
         "name": "Manekin treningowy"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Manekin przyjaznego gracza"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Manekin normalnego bossa"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Manekin heroicznego bossa"
       },
       "ridge_stalker": {
         "name": "Grzbietowy Tropiciel"
@@ -17228,9 +17229,9 @@ export const pl_PL: EnTranslations = {
         "leaveText": "Zamykasz za sobą bramę twierdzy i wracasz w wiatr Smoczych Ziem."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Zamek Dawnhold",
+        "enterText": "Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.",
+        "leaveText": "Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik."
       },
       "drowned_temple": {
         "name": "Zatopiona Świątynia",

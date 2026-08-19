@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Een heling of een schadespreuk die je in gedaante uitspreekt, haalt je er vanzelf uit. Een gedaante zo verlaten is gratis en verbruikt je globale afkoeltijd niet, dus een instantspreuk gaat af op het moment dat je drukt. Terugschakelen is een gewone vaardigheid en kost nog steeds mana en je globale afkoeltijd.',
+  'entities.mobs.heroic_boss_dummy.name': 'Heroïsche bosspop',
+  'entities.mobs.normal_boss_dummy.name': 'Normale bosspop',
+  'entities.mobs.friendly_player_dummy.name': 'Bevriende spelerpop',
+  'entities.items.dawnhold_posy.name': 'Boeketje uit de tuin van Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Je glipt weer naar buiten, het zonnige gazon van de tuin op.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Je stapt de warme, naar bloemen geurende zalen van Kasteel Dawnhold binnen.',
+  'entities.dungeons.dawnhold_castle.name': 'Kasteel Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'De wachttoren',
+  'hudChrome.lastkeepMap.story.residence': 'De woonverdieping',
+  'hudChrome.lastkeepMap.story.state': 'De staatsieverdieping',
+  'hudChrome.lastkeepMap.story.undercroft': 'De keldergewelven',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'De zonnekamer',
+  'hudChrome.dawnholdMap.story.ground': 'De tuinverdieping',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Slagveld.',
   'guide.social.chanBattlegroundBody': 'Praat met elke strijder op je slagveld, aan beide kanten. Alleen terwijl er een wedstrijd bezig is.',
   'hud.chat.templates.battleground': '[Slagveld] {name}: {message}',

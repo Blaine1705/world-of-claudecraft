@@ -10,6 +10,10 @@ import type { Entity } from '../src/sim/types';
 
 const makeSim = () => new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
 
+type CombatHarness = {
+  enterCombat(a: Entity, b: Entity): boolean;
+};
+
 function wildMobs(sim: Sim): Entity[] {
   return [...sim.entities.values()].filter(
     (e) => e.kind === 'mob' && !e.dead && e.ownerId === null,
@@ -28,6 +32,66 @@ function placeAlly(ally: Entity, near: Entity, dx: number, templateId = 'graveca
 }
 
 describe('rallyFleeingAllies', () => {
+  it('blocks quest-gated enterCombat before combat state changes for a non-quester', () => {
+    const sim = makeSim();
+    const [egg] = wildMobs(sim);
+    placeAlly(egg, sim.player, 2, 'spider_egg');
+    sim.player.combatTimer = 4;
+    egg.combatTimer = 6;
+    const harness = sim as unknown as CombatHarness;
+
+    harness.enterCombat(sim.player, egg);
+
+    expect(sim.player.inCombat).toBe(false);
+    expect(sim.player.combatTimer).toBe(4);
+    expect(egg.inCombat).toBe(false);
+    expect(egg.combatTimer).toBe(6);
+    expect(egg.aiState).toBe('idle');
+    expect(egg.aggroTargetId).toBeNull();
+    expect(egg.threat.has(sim.playerId)).toBe(false);
+
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    harness.enterCombat(sim.player, egg);
+
+    expect(sim.player.inCombat).toBe(true);
+    expect(egg.inCombat).toBe(true);
+    expect(egg.aiState).toBe('chase');
+    expect(egg.aggroTargetId).toBe(sim.playerId);
+    expect(egg.threat.has(sim.playerId)).toBe(true);
+  });
+
+  it('does not seed melee auto-attack threat against a quest-gated mob for a non-quester', () => {
+    const sim = makeSim();
+    const [egg] = wildMobs(sim);
+    placeAlly(egg, sim.player, 2, 'spider_egg');
+    sim.player.targetId = egg.id;
+
+    sim.startAutoAttack();
+
+    expect(sim.player.autoAttack).toBe(false);
+    expect(sim.player.inCombat).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(egg.aiState).toBe('idle');
+    expect(egg.aggroTargetId).toBeNull();
+    expect(egg.threat.has(sim.playerId)).toBe(false);
+
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    sim.startAutoAttack();
+
+    expect(sim.player.inCombat).toBe(true);
+    expect(egg.inCombat).toBe(true);
+    expect(egg.aiState).toBe('chase');
+    expect(egg.threat.has(sim.playerId)).toBe(true);
+  });
+
   it('pulls an idle same-family ally inside the help radius and returns the count', () => {
     const sim = makeSim();
     const [fleer, ally] = wildMobs(sim);

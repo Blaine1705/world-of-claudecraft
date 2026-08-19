@@ -1042,17 +1042,17 @@ export const es_ES: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Los sótanos",
+        "state": "La planta noble",
+        "residence": "La residencia",
+        "tower": "La atalaya"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "La planta del jardín",
+        "solar": "La solana"
       }
     },
     "compass": {
@@ -5106,6 +5106,7 @@ export const es_ES: EnTranslations = {
       "mageEleJet": "Chorro de Agua ocupa su propio botón en la barra de mascota: haz clic para fijar un rayo helado sobre un enemigo, o haz clic derecho (mantén pulsado en móvil) para dejar que el elemental lo dispare por su cuenta en cuanto esté listo.",
       "formsHeading": "Cambio de forma",
       "formsNote": "Un druida lucha cambiando de forma. La mayoría de las habilidades de druida pertenecen a una forma concreta, así que la forma en la que estás decide lo que puedes lanzar, y cambiar de forma cuesta un poco de maná. Puedes cambiar de forma dentro o fuera de combate, tantas veces como quieras.",
+      "formsAutoUnshift": "Una sanación o un hechizo de daño lanzado en forma te saca de ella por ti. Salir de una forma así es gratis y no gasta tu tiempo de reutilización global, de modo que un hechizo instantáneo sale en el momento en que lo pulsas. Volver a la forma es una habilidad normal y sigue costando maná y tu tiempo de reutilización global.",
       "formsMoonwing": "Un druida de Equilibrio gana una forma más, la Forma de lechúcico lunar, la forma de conjurador en la que lucha un druida de Equilibrio. Es la única forma animal que conserva tus hechizos, y tu varita solo funciona en ella o en tu forma de conjurador normal.",
       "formLine": {
         "form_bear": "La forma de tanque: una piel gruesa, ira en lugar de maná, y amenaza extra para que los enemigos sigan golpeándote a ti.",
@@ -12732,7 +12733,7 @@ export const es_ES: EnTranslations = {
         "name": "Garra Prístina"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Ramillete del jardín de Dawnhold"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
@@ -13580,13 +13581,13 @@ export const es_ES: EnTranslations = {
         "name": "Muñeco de entrenamiento"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Muñeco de jugador aliado"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Muñeco de jefe normal"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Muñeco de jefe heroico"
       },
       "ridge_stalker": {
         "name": "Acechador de la cresta"
@@ -17228,9 +17229,9 @@ export const es_ES: EnTranslations = {
         "leaveText": "Cierras tras de ti la puerta de la fortaleza y vuelves al viento de los Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Castillo Dawnhold",
+        "enterText": "Entras en los cálidos salones del Castillo Dawnhold, perfumados de flores.",
+        "leaveText": "Vuelves a salir al soleado césped del jardín."
       },
       "drowned_temple": {
         "name": "El Templo Ahogado",

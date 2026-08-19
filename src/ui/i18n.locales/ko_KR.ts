@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.classPage.formName.form_cat': '늑대 변신',
   'guide.gear.slotOffhand': '보조장비',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -12534,6 +12536,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': '쾌속 형태',
   'guide.classPage.formsHeading': '변신',
   'guide.classPage.formsMoonwing': '조화 전문화 드루이드는 형태를 하나 더 얻습니다. 조화 드루이드가 싸울 때 쓰는 시전자 형태인 달빛야수 변신입니다. 주문을 그대로 쓸 수 있는 유일한 동물 형태이며, 마법봉은 이 형태나 평범한 시전자 모습에서만 쓸 수 있습니다.',
+  'guide.classPage.formsAutoUnshift':
+    '변신한 채로 치유 주문이나 공격 주문을 시전하면 형태가 알아서 풀립니다. 이렇게 형태를 벗는 데에는 마나가 들지 않고 공용 재사용 대기시간도 쓰지 않으므로, 즉시 시전 주문은 누른 그 순간에 나갑니다. 다시 변신하는 것은 평범한 능력이라 여전히 마나와 공용 재사용 대기시간이 듭니다.',
   'guide.classPage.formsNote': '드루이드는 형태를 바꾸며 싸웁니다. 드루이드의 능력은 대부분 특정 형태에 속하므로, 지금 어떤 형태인지가 무엇을 쓸 수 있는지를 결정하며, 변신에는 약간의 마나가 듭니다. 전투 중이든 아니든 원하는 만큼 자주 변신할 수 있습니다.',
   'guide.classPage.mageEleHeading': '물의 정령',
   'guide.classPage.mageEleJet': '물 분사는 소환수 바에 자기 버튼으로 따로 자리합니다. 클릭하면 적 하나에게 얼어붙는 물줄기를 집중시키고, 우클릭하면(모바일에서는 길게 누르면) 준비될 때마다 정령이 알아서 쏘게 합니다.',

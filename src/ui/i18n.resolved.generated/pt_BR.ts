@@ -1042,17 +1042,17 @@ export const pt_BR: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Os porões",
+        "state": "O andar nobre",
+        "residence": "A residência",
+        "tower": "A torre de vigia"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "O andar do jardim",
+        "solar": "A sala do sol"
       }
     },
     "compass": {
@@ -5106,6 +5106,7 @@ export const pt_BR: EnTranslations = {
       "mageEleJet": "Jato de Água fica na barra do mascote como um botão só seu: clique nele para travar um fluxo gélido em um inimigo, ou clique com o botão direito nele (toque e segure no touch) para deixar o elemental lançá-lo sozinho sempre que estiver pronto.",
       "formsHeading": "Mudança de Forma",
       "formsNote": "Um druida luta mudando de forma. A maioria das habilidades de druida pertence a uma forma específica, então a forma em que você está decide o que pode conjurar, e mudar de forma custa um pouco de mana. Você pode mudar de forma dentro ou fora de combate, quantas vezes quiser.",
+      "formsAutoUnshift": "Uma cura ou um feitiço de dano conjurado em forma tira você dela sozinho. Sair de uma forma assim é de graça e não gasta sua recarga global, então um feitiço instantâneo dispara no momento em que você aperta. Voltar para a forma é uma habilidade comum e ainda custa mana e sua recarga global.",
       "formsMoonwing": "Um druida Equilíbrio ganha mais uma forma, a Forma de Luniscante, a forma de conjurador em que um druida Equilíbrio luta. É a única forma animal que mantém suas magias, e sua varinha só funciona nela ou na sua forma normal de conjurador.",
       "formLine": {
         "form_bear": "A forma de tanque: uma pele grossa, raiva em vez de mana, e ameaça extra para que os inimigos continuem batendo em você.",
@@ -12732,7 +12733,7 @@ export const pt_BR: EnTranslations = {
         "name": "Garra Imaculada"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Ramalhete do jardim de Dawnhold"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
@@ -13580,13 +13581,13 @@ export const pt_BR: EnTranslations = {
         "name": "Boneco de Treino"
       },
       "friendly_player_dummy": {
-        "name": "Friendly Player Dummy"
+        "name": "Boneco de Jogador Aliado"
       },
       "normal_boss_dummy": {
-        "name": "Normal Boss Dummy"
+        "name": "Boneco de Chefe Normal"
       },
       "heroic_boss_dummy": {
-        "name": "Heroic Boss Dummy"
+        "name": "Boneco de Chefe Heroico"
       },
       "ridge_stalker": {
         "name": "Rastreador da crista"
@@ -17228,9 +17229,9 @@ export const pt_BR: EnTranslations = {
         "leaveText": "Você fecha o portão do reduto e volta para o vento das Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Castelo Dawnhold",
+        "enterText": "Você entra nos salões quentes e perfumados de flores do Castelo Dawnhold.",
+        "leaveText": "Você volta a sair para o gramado ensolarado do jardim."
       },
       "drowned_temple": {
         "name": "O Templo Afogado",
