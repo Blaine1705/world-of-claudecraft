@@ -5,6 +5,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { describe, expect, it } from 'vitest';
 import {
   createEastbrookCivicBeaconState,
@@ -64,7 +65,23 @@ function compileMaterial(
 
 function sourceAsset(withEmissive: boolean): THREE.Group {
   const source = new THREE.Group();
-  source.add(new THREE.Mesh(new THREE.BoxGeometry(2, 3, 4), new THREE.MeshStandardMaterial()));
+  // Round 4: kit fixtures carry a window-assembly component INSIDE the first
+  // mesh's geometry (a thin box at mid-height on the +z face, merged into
+  // the shell the way the single-mesh hexb GLBs model their frames), so the
+  // pane detector (kit_window_panes_core.ts) finds exactly one window per
+  // kit building. The opaque merge keeps the extra triangles off the
+  // TownEmissive mesh, so the civic mask counts below stay authored.
+  const shell = withEmissive
+    ? mergeGeometries(
+        [
+          new THREE.BoxGeometry(2, 3, 4),
+          new THREE.BoxGeometry(0.4, 0.6, 0.08).translate(0.6, 0.9, 1.96),
+        ],
+        false,
+      )
+    : new THREE.BoxGeometry(2, 3, 4);
+  if (!shell) throw new Error('failed to merge the kit fixture shell');
+  source.add(new THREE.Mesh(shell, new THREE.MeshStandardMaterial()));
   if (withEmissive) {
     const emissive = new THREE.MeshStandardMaterial({ emissive: 0xffffff });
     emissive.name = 'TownEmissive';
@@ -258,8 +275,9 @@ describe('Eastbrook civic beacon shader animation', () => {
     // the 4 wall color draws and 2 wall shadow draws; then the KTX2
     // kit-building path (buildKitBuilding in src/render/eastbrook_town.ts,
     // same site plan) put five raw-clone kit buildings in whose every mesh
-    // casts shadows, so under round 3 (nine buildings, lit kit windows) the
-    // two-mesh fixtures give colorDraws 28 and shadowDraws 18.
+    // casts shadows, so under round 4 (nine buildings, kit windows derived
+    // from the fixtures' window-assembly components) the two-mesh fixtures
+    // give colorDraws 28 and shadowDraws 18.
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 28, shadowDraws: 18 });
 
     view.update(0, 5, 0, 0, 0, 0, 100, 1, true);
@@ -336,9 +354,9 @@ describe('Eastbrook civic beacon shader animation', () => {
     // Re-pinned 2026-08 with the harbor move's wall retirement (d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md) and the KTX2 kit-building
     // path (buildKitBuilding in src/render/eastbrook_town.ts): the kit
-    // clones cast shadows from every mesh, so under round 3 the two-mesh
-    // fixtures give shadowDraws 18 and colorDraws 28 (the window panes never
-    // cast).
+    // clones cast shadows from every mesh, so under round 4 the two-mesh
+    // fixtures give shadowDraws 18 and colorDraws 28 (the window panes,
+    // derived from the fixtures' window-assembly components, never cast).
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 28, shadowDraws: 18 });
   });
 

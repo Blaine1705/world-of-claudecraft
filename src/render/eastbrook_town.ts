@@ -34,6 +34,7 @@ import {
 } from './eastbrook_town_visibility_core';
 import { indexExactVertexTuples } from './exact_index_geometry';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { type KitWindowPane, kitWindowPanes } from './kit_window_panes_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
@@ -44,11 +45,13 @@ import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 const ROOT_NAME = 'eastbrookTownRebuild';
 const FOUNDATION_OVERLAP = 0.03;
 const FOUNDATION_COLOR = 0x46505e;
-// Warm interior light for the kit buildings (owner refinement round 3): the
+// Warm interior light for the kit buildings (owner refinement round 4): the
 // hexb GLBs carry no emissive materials (their windows are palette texels in
-// the KTX2 atlas), so each kit building gets amber pane boxes on its front
-// wall riding the same vertex-color emissive ladder as the shape buildings'
-// authored windows.
+// the KTX2 atlas), so each kit building gets one amber pane quad per window
+// assembly detected in the model's own geometry (kit_window_panes_core.ts),
+// riding the same vertex-color emissive ladder as the shape buildings'
+// authored windows. Panes derived from the real window frames sit exactly in
+// the models' openings; the earlier bounding-box guesses floated off walls.
 const KIT_WINDOW_AMBER = 0xffb45a;
 const TOWN_CULL_RADIUS =
   EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
@@ -111,6 +114,7 @@ export function prepareEastbrookTownProfileAssets(): Promise<void> {
 
 export function resetEastbrookTownProfileCaches(): void {
   preparedTemplates.clear();
+  kitWindowPaneCache.clear();
 }
 
 if (typeof window !== 'undefined') {
@@ -357,30 +361,68 @@ function kitMaterial(source: THREE.Material): THREE.Material {
   return lambert;
 }
 
-// The lit-window panes for one kit building: a merged set of amber boxes on
-// the front wall, deep enough to stay flush against walls the roof eaves
-// inset from the scaled bounding box. Tall buildings (the townhall and the
-// tavern) get a second upper row. Parented BESIDE the raw clone so the kit
-// traverse never flips their shadow flags: panes cast no shadows, the
-// shape-building emissive contract.
-function kitWindowPaneGeometry(dimensions: {
-  width: number;
-  height: number;
-  depth: number;
-}): THREE.BufferGeometry | null {
-  const { width, height, depth } = dimensions;
-  const paneWidth = Math.min(0.9, width * 0.11);
-  const paneHeight = paneWidth * 1.35;
-  const paneDepth = 0.8;
-  const rows = height >= 11 ? [0.26, 0.52] : [0.32];
+// Window panes per kit asset URL, derived once from the model's own window
+// assemblies (kit_window_panes_core.ts) in the raw attribute units of the
+// GLB's single mesh. Filled lazily by the first buildKitBuilding for an URL.
+const kitWindowPaneCache = new Map<string, KitWindowPane[]>();
+
+function kitPanesForAsset(url: string, source: THREE.Object3D): KitWindowPane[] {
+  const cached = kitWindowPaneCache.get(url);
+  if (cached) return cached;
+  let firstMesh: THREE.Mesh | null = null;
+  source.traverse((child) => {
+    if (firstMesh === null && child instanceof THREE.Mesh) firstMesh = child;
+  });
+  // The closure assignment defeats narrowing: name the found mesh explicitly.
+  const first = firstMesh as THREE.Mesh | null;
+  const position = first?.geometry.getAttribute('position');
+  // The shipped kit GLBs decode their meshopt streams to plain attributes;
+  // an interleaved position attribute has no raw per-vertex array to scan.
+  const panes =
+    position instanceof THREE.BufferAttribute && first
+      ? kitWindowPanes(
+          position.array as ArrayLike<number>,
+          position.count,
+          (first.geometry.index?.array as ArrayLike<number> | undefined) ?? null,
+        )
+      : [];
+  kitWindowPaneCache.set(url, panes);
+  return panes;
+}
+
+// KHR_mesh_quantization: a normalized attribute renders as value / range on
+// the GPU, so pane quads authored in the raw attribute units the detector
+// scanned need the same factor to land in the mesh node's local space.
+function normalizedAttributeScale(attribute: THREE.BufferAttribute): number {
+  if (!attribute.normalized) return 1;
+  const array = attribute.array;
+  if (array instanceof Int8Array) return 1 / 127;
+  if (array instanceof Uint8Array) return 1 / 255;
+  if (array instanceof Int16Array) return 1 / 32767;
+  if (array instanceof Uint16Array) return 1 / 65535;
+  return 1;
+}
+
+// The merged lit-window quads for one kit building, in raw model space: one
+// PlaneGeometry per detected window assembly, across the assembly's thin
+// horizontal axis, dequantized and moved by the mesh node's model-root
+// transform (the caller settles matrixWorld while the clone is parentless at
+// the origin). A uniform amber vertex color rides the same vertex-color
+// emissive ladder as the shape buildings' authored windows.
+function kitWindowPaneGeometry(
+  mesh: THREE.Mesh,
+  panes: readonly KitWindowPane[],
+): THREE.BufferGeometry | null {
+  const position = mesh.geometry.getAttribute('position');
+  if (panes.length === 0 || !(position instanceof THREE.BufferAttribute)) return null;
   const parts: THREE.BufferGeometry[] = [];
-  for (const row of rows) {
-    for (const side of [-1, 1]) {
-      const pane = new THREE.BoxGeometry(paneWidth, paneHeight, paneDepth).toNonIndexed();
-      pane.deleteAttribute('uv');
-      pane.translate(side * width * 0.22, height * row, depth / 2 - paneDepth / 2 + 0.05);
-      parts.push(pane);
-    }
+  for (const pane of panes) {
+    const quad = new THREE.PlaneGeometry(pane.width, pane.height);
+    if (pane.thinX) quad.rotateY(Math.PI / 2);
+    quad.translate(pane.cx, pane.cy, pane.cz);
+    const part = quad.toNonIndexed();
+    part.deleteAttribute('uv');
+    parts.push(part);
   }
   const merged = mergeParts(parts, 'kit window panes');
   if (!merged) return null;
@@ -393,6 +435,9 @@ function kitWindowPaneGeometry(dimensions: {
     colors[index * 3 + 2] = tint.b;
   }
   merged.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const scale = normalizedAttributeScale(position);
+  merged.scale(scale, scale, scale);
+  merged.applyMatrix4(mesh.matrixWorld);
   return merged;
 }
 
@@ -409,6 +454,10 @@ function buildKitBuilding(
   const foundationDepth = Math.max(0, terrain.entranceY - terrain.minimumY);
 
   const clone = source.clone(true);
+  // World matrices settle while the clone is parentless at the origin: the
+  // window-pane bake below reads the mesh node's matrixWorld as its
+  // transform relative to the model root.
+  clone.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(clone);
   const size = new THREE.Vector3();
   box.getSize(size);
@@ -416,8 +465,10 @@ function buildKitBuilding(
   const scaleY = dimensions.height / Math.max(size.y, 1e-4);
   const scaleZ = dimensions.depth / Math.max(size.z, 1e-4);
   const mats: THREE.Material[] = [];
+  let firstKitMesh: THREE.Mesh | null = null;
   clone.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
+    if (firstKitMesh === null) firstKitMesh = child;
     child.castShadow = true;
     child.receiveShadow = true;
     const list = Array.isArray(child.material) ? child.material : [child.material];
@@ -430,6 +481,29 @@ function buildKitBuilding(
   // center the model on its footprint and rest its base at y 0 of the wrap
   clone.position.set(-(box.min.x + size.x / 2), -box.min.y, -(box.min.z + size.z / 2));
   wrap.scale.set(scaleX, scaleY, scaleZ);
+  // Lit window panes (owner refinement round 4): quads derived from the
+  // model's own window assemblies (kit_window_panes_core.ts), baked into raw
+  // model space, added AFTER the shadow traverse and AS A SIBLING of the
+  // clone inside the wrap, so the panes keep castShadow false, inherit the
+  // wrap's scale-to-dimensions transform, and share the clone's centering
+  // offset. matrixWorld still holds the parentless-origin update from above:
+  // repositioning the clone does not recompute it.
+  const paneGeometry = firstKitMesh
+    ? kitWindowPaneGeometry(firstKitMesh, kitPanesForAsset(building.assetId, source))
+    : null;
+  if (paneGeometry) {
+    const paneMaterial = townMaterial(true, undefined, true);
+    paneMaterial.name = `eastbrookTownKitPanes:${building.id}`;
+    // A pane sits mid-opening and must read from both approaches.
+    paneMaterial.side = THREE.DoubleSide;
+    const panes = new THREE.Mesh(paneGeometry, paneMaterial);
+    panes.name = `eastbrookBuildingEmissive:${building.id}`;
+    panes.castShadow = false;
+    panes.receiveShadow = false;
+    panes.position.copy(clone.position);
+    wrap.add(panes);
+    mats.push(paneMaterial);
+  }
 
   const group = new THREE.Group();
   group.name = `eastbrookBuilding:${building.id}`;
@@ -459,17 +533,6 @@ function buildKitBuilding(
     skirt.receiveShadow = true;
     group.add(skirt);
     mats.push(skirtMaterial);
-  }
-  const paneGeometry = kitWindowPaneGeometry(dimensions);
-  if (paneGeometry) {
-    const paneMaterial = townMaterial(true, undefined, true);
-    paneMaterial.name = `eastbrookTownKitPanes:${building.id}`;
-    const panes = new THREE.Mesh(paneGeometry, paneMaterial);
-    panes.name = `eastbrookBuildingEmissive:${building.id}`;
-    panes.castShadow = false;
-    panes.receiveShadow = false;
-    group.add(panes);
-    mats.push(paneMaterial);
   }
 
   return {

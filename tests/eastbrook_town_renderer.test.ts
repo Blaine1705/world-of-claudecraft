@@ -4,6 +4,7 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   EASTBROOK_TOWN_ASSET_INSTANCE_COUNTS,
@@ -43,7 +44,24 @@ function sourceAsset(withEmissive: boolean): THREE.Group {
   const source = new THREE.Group();
   const opaque = new THREE.MeshStandardMaterial({ color: 0x789abc });
   opaque.name = 'TownOpaque';
-  source.add(new THREE.Mesh(new THREE.BoxGeometry(2, 3, 4), opaque));
+  // Round 4: kit fixtures carry a window-assembly component INSIDE the first
+  // mesh's geometry (a thin box at mid-height on the +z face, merged into the
+  // shell the way the single-mesh hexb GLBs model their frames), so the pane
+  // detector (kit_window_panes_core.ts, read from the source's first Mesh in
+  // buildKitBuilding) finds exactly one window per kit building. The
+  // template-path fixtures share the shape; their extra 12 triangles ride the
+  // opaque merge and stay inside the shell's bounding box.
+  const shell = withEmissive
+    ? mergeGeometries(
+        [
+          new THREE.BoxGeometry(2, 3, 4),
+          new THREE.BoxGeometry(0.4, 0.6, 0.08).translate(0.6, 0.9, 1.96),
+        ],
+        false,
+      )
+    : new THREE.BoxGeometry(2, 3, 4);
+  if (!shell) throw new Error('failed to merge the kit fixture shell');
+  source.add(new THREE.Mesh(shell, opaque));
   if (withEmissive) {
     const emissive = new THREE.MeshStandardMaterial({
       color: 0xffb45a,
@@ -168,12 +186,16 @@ describe('Eastbrook town renderer', () => {
         // Re-staged 2026-08 for the KTX2 kit-building path (buildKitBuilding
         // in src/render/eastbrook_town.ts,
         // docs/design/eastbrook-revamp/site-plan.md), then for owner
-        // refinement round 3: a kit group carries no merged
+        // refinement round 4: a kit group carries no merged
         // eastbrookBuildingOpaque mesh; it holds a wrap group of raw GLB
         // scene clones scaled to nativeDimensions (every cloned mesh casting
         // shadows) PLUS one merged amber window-pane mesh under the
-        // shape-path emissive name, parented beside the wrap so it never
-        // casts shadows. Flat ground grows no foundation skirt.
+        // shape-path emissive name. The panes are derived from the model's
+        // own window assemblies (kit_window_panes_core.ts) and parented
+        // inside the wrap AS A SIBLING of the clone, after the shadow
+        // traverse, so they never cast shadows, inherit the wrap's
+        // scale-to-dimensions transform, and share the clone's centering
+        // offset. Flat ground grows no foundation skirt.
         expect(group?.getObjectByName(`eastbrookBuildingOpaque:${building.id}`)).toBeUndefined();
         const panes = group?.getObjectByName(`eastbrookBuildingEmissive:${building.id}`);
         expect(panes, `${building.id} window panes`).toBeInstanceOf(THREE.Mesh);
@@ -183,12 +205,32 @@ describe('Eastbrook town renderer', () => {
         expect((panes.material as THREE.Material).name).toBe(
           `eastbrookTownKitPanes:${building.id}`,
         );
+        // A pane sits mid-opening and must read from both approaches.
+        expect((panes.material as THREE.Material).side, `${building.id} pane sidedness`).toBe(
+          THREE.DoubleSide,
+        );
         const wrap = group?.children.find(
           (child): child is THREE.Group => child instanceof THREE.Group,
         );
         expect(wrap, building.id).toBeInstanceOf(THREE.Group);
         if (!wrap) throw new Error(`missing kit wrap group for ${building.id}`);
-        const kitMeshes = meshesOf(wrap);
+        // Sibling-of-the-clone contract: the pane mesh rides the wrap (so it
+        // scales with the model) beside the clone, sharing its centering
+        // offset, and its single quad sits exactly on the fixture's window
+        // assembly (center 0.6, 0.9, 1.96 in raw model space).
+        expect(panes.parent, `${building.id} pane parent`).toBe(wrap);
+        const clone = wrap.children.find((child) => child !== panes);
+        if (!clone) throw new Error(`missing kit clone for ${building.id}`);
+        expect(panes.position.toArray(), `${building.id} pane offset`).toEqual(
+          clone.position.toArray(),
+        );
+        expect(panes.geometry.getAttribute('position').count, `${building.id} pane quad`).toBe(6);
+        panes.geometry.computeBoundingBox();
+        const paneCenter = panes.geometry.boundingBox?.getCenter(new THREE.Vector3());
+        expect(paneCenter?.x, building.id).toBeCloseTo(0.6, 6);
+        expect(paneCenter?.y, building.id).toBeCloseTo(0.9, 6);
+        expect(paneCenter?.z, building.id).toBeCloseTo(1.96, 6);
+        const kitMeshes = meshesOf(wrap).filter((mesh) => mesh !== panes);
         expect(kitMeshes.length, building.id).toBeGreaterThan(0);
         expect(
           kitMeshes.every((mesh) => mesh.castShadow),
@@ -250,11 +292,12 @@ describe('Eastbrook town renderer', () => {
     ]);
     expect(view.group.userData.microPlacementIds).not.toContain('eastbrook_market_stall_artisans');
     // Draw stats re-pinned 2026-08 for the KTX2 kit-building path, then for
-    // owner refinement round 3 (nine buildings, lit kit windows): the eight
-    // kit instances' raw clones cast shadows from EVERY cloned mesh, so the
-    // two-mesh fixtures give 16 kit shadow draws plus the chapel opaque and
-    // the micro opaque batch (18); colorDraws is 28 (16 kit clone materials
-    // + 8 merged window-pane meshes, which never cast + the chapel
+    // owner refinement round 4 (nine buildings, kit windows derived from the
+    // models' own window assemblies): the eight kit instances' raw clones
+    // cast shadows from EVERY cloned mesh, so the two-mesh fixtures give 16
+    // kit shadow draws plus the chapel opaque and the micro opaque batch
+    // (18); colorDraws is 28 (16 kit clone materials + 8 window-pane meshes,
+    // one detected assembly per kit fixture, which never cast + the chapel
     // opaque+emissive pair + the 2 micro batches).
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({
       colorDraws: 28,
@@ -311,7 +354,7 @@ describe('Eastbrook town renderer', () => {
         // with a dedicated 12-triangle foundation skirt mesh (the same box
         // the template path merges into its opaque batch); flat ground grows
         // no skirt at all.
-        // The window-pane mesh is a sibling Mesh child too (round 3), so the
+        // The window-pane mesh lives inside the wrap group (round 4), so the
         // skirt is found by its material name, never by "first Mesh child".
         const skirt = group.children.find(
           (child): child is THREE.Mesh =>
@@ -423,10 +466,11 @@ describe('Eastbrook town renderer', () => {
     // Re-pinned 2026-08 for the harbor move's wall retirement (d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md), the KTX2 kit-building path
     // (buildKitBuilding in src/render/eastbrook_town.ts), and owner
-    // refinement round 3 (nine buildings, lit kit windows): 28 meshes are
-    // the 8 kit instances' 16 raw GLB clones, their 8 merged window-pane
-    // meshes, the chapel opaque+emissive pair, and the 2 micro batches; the
-    // 4 wall InstancedMeshes no longer exist.
+    // refinement round 4 (nine buildings, kit windows derived from the
+    // models' own assemblies): 28 meshes are the 8 kit instances' 16 raw GLB
+    // clones, their 8 window-pane meshes (one detected assembly per kit
+    // fixture), the chapel opaque+emissive pair, and the 2 micro batches;
+    // the 4 wall InstancedMeshes no longer exist.
     expect(meshes).toHaveLength(28);
     const kitBuildings = EASTBROOK_LAYOUT.buildings.filter((building) =>
       isKitBuildingAsset(building.assetId),
