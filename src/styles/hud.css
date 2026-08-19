@@ -428,7 +428,11 @@
     max-width: 420px;
     box-sizing: border-box;
     pointer-events: auto;
-    background: var(--panel-bg);
+    /* Pinned literals, deliberately NOT var(--panel-bg): the coach card must
+       read as the SAME box for every player, scene, and UI theme (playtests
+       flagged the themeable token rendering it dark in one shot and grey in
+       the next), and near-opaque so the backdrop cannot restyle it. */
+    background: linear-gradient(170deg, #15151ffa 0%, #0b0b12fa 60%, #08080dfa 100%);
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow:
@@ -599,6 +603,40 @@
     will-change: transform;
     animation: tut-pulse 1100ms ease-in-out infinite;
   }
+  /* The island coach's floating interact bubble (bootcamp.ts updatePrompt):
+     a keycap chip plus a one-word verb over the current target, visible only
+     inside interact reach. Sibling of .tut-arrow: absolute in #ui, painter
+     positioned, never interactive. */
+  .tut-prompt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    transform: translate(-50%, -100%);
+    pointer-events: none;
+    background: linear-gradient(170deg, #15151ff2 0%, #0b0b12f2 100%);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    box-shadow:
+      0 0 12px #ffc86055,
+      0 4px 14px #000a;
+    padding: 6px 10px;
+    color: #e8e2d0;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 21;
+    animation: tut-pulse 1100ms ease-in-out infinite;
+  }
+  .tut-prompt .tut-keycap {
+    font-size: 13px;
+    padding: 4px 7px 3px;
+  }
+  .tut-prompt-verb {
+    text-shadow: 0 1px 2px #000;
+  }
   @keyframes tut-in {
     from {
       transform: translateX(-50%) translateY(-14px);
@@ -623,6 +661,9 @@
       animation: none;
     }
     .tut-arrow {
+      animation: none;
+    }
+    .tut-prompt {
       animation: none;
     }
   }

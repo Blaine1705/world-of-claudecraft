@@ -12879,10 +12879,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '跟着箭头去完成差事。右侧的追踪栏随时记着进度，迷了路就按下地图按钮看路。',
   'hudChrome.bootcamp.coachReadyTitle': '差事办妥',
   'hudChrome.bootcamp.coachReadyBody':
-    '回到{npc}身边，按 {interactKey}，或者用鼠标左键点击对方，交上差事，领取报酬。',
-  'hudChrome.bootcamp.coachReadyBodyTouch': '回到{npc}身边，点按对方，交上差事，领取报酬。',
+    '前往{npc}身边，按 {interactKey}，或者用鼠标左键点击对方，交上差事，领取报酬。',
+  'hudChrome.bootcamp.coachReadyBodyTouch': '前往{npc}身边，点按对方，交上差事，领取报酬。',
   'hudChrome.bootcamp.coachReadyBodyPad':
-    '回到{npc}身边，按下互动键，交上差事，领取报酬。',
+    '前往{npc}身边，按下互动键，交上差事，领取报酬。',
   'hudChrome.bootcamp.taskStrikeTrueBody':
     '走到一个草人跟前，按 {targetKey}，或者用鼠标左键点击它，把它设为目标。然后按 {attackKey}，或者点击动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
   'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
@@ -12907,11 +12907,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.taskPouchBodyPad':
     '对着{npc}按下互动键打开货摊，然后选中亚麻小袋买下它。',
   'hudChrome.bootcamp.readyPouchBody':
-    '小袋已买下。按 {bagsKey} 打开背包，用鼠标左键点击亚麻小袋，把它系进一个空着的袋扣。然后回到{npc}身边，按 {interactKey}，把小袋亮给对方看。',
+    '小袋已买下。按 {bagsKey} 打开背包，用鼠标左键点击亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按 {interactKey}，把小袋亮给对方看。',
   'hudChrome.bootcamp.readyPouchBodyTouch':
-    '小袋已买下。打开背包，点按亚麻小袋，把它系进一个空着的袋扣。然后回到{npc}身边，点按对方，把小袋亮给对方看。',
+    '小袋已买下。打开背包，点按亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，点按对方，把小袋亮给对方看。',
   'hudChrome.bootcamp.readyPouchBodyPad':
-    '小袋已买下。打开背包，选中亚麻小袋，把它系进一个空着的袋扣。然后回到{npc}身边，按下互动键，把小袋亮给对方看。',
+    '小袋已买下。打开背包，选中亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按下互动键，把小袋亮给对方看。',
   'hudChrome.bootcamp.bellTitle': '敲响渡船铃',
   'hudChrome.bootcamp.bellBody':
     '你的航程已经挣到了。走到码头旁的渡船铃跟前，按 {interactKey}，或者用鼠标左键点击它，扬帆前往东溪镇。',

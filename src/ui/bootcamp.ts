@@ -48,6 +48,12 @@ import {
   coachKeycaps,
   computeBootcampStep,
 } from './bootcamp_view';
+import {
+  type CoachPromptPlan,
+  coachPromptChip,
+  coachPromptInRange,
+  coachPromptPlan,
+} from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 
@@ -86,6 +92,16 @@ export class BootcampOverlay {
   private arrowVw = 0;
   private arrowVh = 0;
   private onArrowResize: (() => void) | null = null;
+  // The floating interact bubble (coach_prompt_view.ts): shown only while
+  // standing in interact reach of the coach's current target, so the one
+  // button that matters appears where the player is already looking.
+  private prompt: HTMLElement | null = null;
+  private promptChipEl: HTMLElement | null = null;
+  private promptVerbEl: HTMLElement | null = null;
+  private promptContentKey = '';
+  private promptPainted = { visible: false, sx: Number.NaN, sy: Number.NaN };
+  private promptGroundKey = '';
+  private promptGroundY = 0;
 
   // Called every HUD frame. Cheap no-op while no rail quest is moving.
   update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
@@ -157,6 +173,7 @@ export class BootcampOverlay {
     }
 
     this.updateArrow(renderer);
+    this.updatePrompt(world, renderer, keybinds);
   }
 
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange
@@ -218,6 +235,22 @@ export class BootcampOverlay {
     arrow.textContent = '➤'; // the tut-arrow family's marker glyph
     ui.appendChild(arrow);
     this.arrow = arrow;
+
+    // The interact bubble: a keycap chip plus a one-word verb, world-anchored
+    // over the target. aria-hidden: the coach card body already carries the
+    // same instruction for screen readers.
+    const prompt = document.createElement('div');
+    prompt.className = 'tut-prompt';
+    prompt.setAttribute('aria-hidden', 'true');
+    const chip = document.createElement('span');
+    chip.className = 'tut-keycap';
+    const verb = document.createElement('span');
+    verb.className = 'tut-prompt-verb';
+    prompt.append(chip, verb);
+    ui.appendChild(prompt);
+    this.prompt = prompt;
+    this.promptChipEl = chip;
+    this.promptVerbEl = verb;
   }
 
   private renderPanel(keybinds: Keybinds): void {
@@ -405,6 +438,70 @@ export class BootcampOverlay {
     this.arrowPainted.visible = false;
   }
 
+  // The interact bubble's per-frame drive: same painter discipline as
+  // updateArrow (memoized ground sample, cached viewport, elided writes).
+  // Hidden out of interact reach, so appearing IS the signal to press.
+  private updatePrompt(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
+    if (!this.prompt || !this.promptChipEl || !this.promptVerbEl) return;
+    const p = world.player;
+    const plan: CoachPromptPlan | null = p
+      ? coachPromptPlan({
+          bellPhase: this.bellPhase,
+          step: this.step,
+          focus: this.lastFocus,
+          entities: world.entities.values(),
+          playerPos: p.pos,
+        })
+      : null;
+    if (!plan || !p || !coachPromptInRange(plan, p.pos)) {
+      this.hidePrompt();
+      return;
+    }
+
+    const mode = currentInputHintMode();
+    const { chip } = coachPromptChip(mode, keybinds.primaryLabel('interact'));
+    const contentKey = `${plan.verbKey}:${chip ?? ''}:${mode}`;
+    if (this.promptContentKey !== contentKey) {
+      this.promptContentKey = contentKey;
+      this.promptChipEl.textContent = chip ?? '';
+      this.promptChipEl.style.display = chip ? '' : 'none';
+      this.promptVerbEl.textContent = t(plan.verbKey);
+    }
+
+    const groundKey = `${plan.x},${plan.z}`;
+    if (this.promptGroundKey !== groundKey) {
+      this.promptGroundKey = groundKey;
+      this.promptGroundY =
+        Math.max(groundHeight(plan.x, plan.z, WORLD_SEED), WATER_LEVEL) + plan.lift;
+    }
+    const v = renderer.worldToScreen(plan.x, this.promptGroundY, plan.z);
+    if (v.behind) {
+      this.hidePrompt();
+      return;
+    }
+    const sx = Math.round(v.x * 2) / 2;
+    const sy = Math.round(v.y * 2) / 2;
+    const last = this.promptPainted;
+    if (!last.visible) {
+      this.prompt.style.display = 'flex';
+      last.visible = true;
+    }
+    if (last.sx !== sx) {
+      this.prompt.style.left = `${sx}px`;
+      last.sx = sx;
+    }
+    if (last.sy !== sy) {
+      this.prompt.style.top = `${sy}px`;
+      last.sy = sy;
+    }
+  }
+
+  private hidePrompt(): void {
+    if (!this.prompt || !this.promptPainted.visible) return;
+    this.prompt.style.display = 'none';
+    this.promptPainted.visible = false;
+  }
+
   /** Fold the card away for now; the quest log decides any re-engage. */
   private disengage(): void {
     this.engaged = false;
@@ -413,8 +510,15 @@ export class BootcampOverlay {
     this.bellPhase = false;
     this.root?.remove();
     this.arrow?.remove();
+    this.prompt?.remove();
     this.root = null;
     this.arrow = null;
+    this.prompt = null;
+    this.promptChipEl = null;
+    this.promptVerbEl = null;
+    this.promptContentKey = '';
+    this.promptPainted = { visible: false, sx: Number.NaN, sy: Number.NaN };
+    this.promptGroundKey = '';
     if (this.onArrowResize) {
       window.removeEventListener('resize', this.onArrowResize);
       this.onArrowResize = null;

@@ -93,8 +93,11 @@ const MONOLITHS: MonolithRow[] = [
     // decor_torch_fx.ts) and the renderer carries their hookup, the beacon's
     // per-frame memo, and the entity-loop sparkle arm. Re-pinned
     // 13716 -> 13729 by the review fixes: the beacon memo gains its island
-    // rectangle gate and the shared off-island empty set. Exact count.
-    ceiling: 13729,
+    // rectangle gate and the shared off-island empty set. LOWERED
+    // 13729 -> 13712 by the noob-friendliness pass: the beacon memo, the
+    // sparkle arm, and the new golden-trail hookup all moved out into
+    // island_guidance.ts, leaving two one-line call sites. Exact count.
+    ceiling: 13712,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

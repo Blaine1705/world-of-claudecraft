@@ -13109,11 +13109,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '矢印をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
   'hudChrome.bootcamp.coachReadyTitle': '任務完了',
   'hudChrome.bootcamp.coachReadyBody':
-    '{npc}のもとへ戻り、{interactKey}を押すか、左クリックして納め、報酬を受け取ろう。',
+    '{npc}のもとへ行き、{interactKey}を押すか、左クリックして納め、報酬を受け取ろう。',
   'hudChrome.bootcamp.coachReadyBodyTouch':
-    '{npc}のもとへ戻り、相手をタップして納め、報酬を受け取ろう。',
+    '{npc}のもとへ行き、相手をタップして納め、報酬を受け取ろう。',
   'hudChrome.bootcamp.coachReadyBodyPad':
-    '{npc}のもとへ戻り、インタラクトボタンを押して納め、報酬を受け取ろう。',
+    '{npc}のもとへ行き、インタラクトボタンを押して納め、報酬を受け取ろう。',
   'hudChrome.bootcamp.taskStrikeTrueBody':
     '藁のかかしに歩み寄り、{targetKey}を押すか、左クリックしてターゲットにしよう。次に{attackKey}を押すか、アクションバーの最初のボタンをクリックして打ち込もう。一体が崩れるまで打ち続けること。',
   'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
@@ -13139,11 +13139,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.taskPouchBodyPad':
     '{npc}に向かってインタラクトボタンを押して露店を開き、亜麻のポーチを選んで買おう。',
   'hudChrome.bootcamp.readyPouchBody':
-    'ポーチは買えた。{bagsKey}を押してバッグを開き、亜麻のポーチを左クリックして空いた鞄留めに締めよう。それから{npc}のもとへ戻り、{interactKey}を押して見せに行こう。',
+    'ポーチは買えた。{bagsKey}を押してバッグを開き、亜麻のポーチを左クリックして空いた鞄留めに締めよう。それから{npc}のもとへ行き、{interactKey}を押して見せよう。',
   'hudChrome.bootcamp.readyPouchBodyTouch':
-    'ポーチは買えた。バッグを開き、亜麻のポーチをタップして空いた鞄留めに締めよう。それから{npc}のもとへ戻り、相手をタップして見せに行こう。',
+    'ポーチは買えた。バッグを開き、亜麻のポーチをタップして空いた鞄留めに締めよう。それから{npc}のもとへ行き、相手をタップして見せよう。',
   'hudChrome.bootcamp.readyPouchBodyPad':
-    'ポーチは買えた。バッグを開き、亜麻のポーチを選んで空いた鞄留めに締めよう。それから{npc}のもとへ戻り、インタラクトボタンを押して見せに行こう。',
+    'ポーチは買えた。バッグを開き、亜麻のポーチを選んで空いた鞄留めに締めよう。それから{npc}のもとへ行き、インタラクトボタンを押して見せよう。',
   'hudChrome.bootcamp.bellTitle': '鐘を鳴らす',
   'hudChrome.bootcamp.bellBody':
     '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、{interactKey}を押すか、左クリックして、イーストブルックへ出航しよう。',

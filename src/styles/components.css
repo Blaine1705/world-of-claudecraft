@@ -803,6 +803,37 @@
     outline: 3px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  /* The Proving Shore's press-this-next glow (quest_dialog_controller.ts adds
+     qd-coach on the island): a breathing golden border on the quest rows and
+     the Accept/Complete button, so a brand-new player never hunts for the
+     next click. Island-only by the class, shared by both element families. */
+  .qd-list-item.qd-coach,
+  .btn.qd-coach {
+    border: 1px solid var(--gold);
+    box-shadow:
+      0 0 10px #ffc86066,
+      inset 0 0 6px #ffc86022;
+    animation: qd-coach-pulse 1200ms ease-in-out infinite;
+  }
+  @keyframes qd-coach-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 6px #ffc86044,
+        inset 0 0 4px #ffc86018;
+    }
+    50% {
+      box-shadow:
+        0 0 14px #ffc86088,
+        inset 0 0 8px #ffc86030;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qd-list-item.qd-coach,
+    .btn.qd-coach {
+      animation: none;
+    }
+  }
   .btn {
     background: linear-gradient(#8a3326, #5a1d12 55%, #471409);
     color: #ffd9a0;

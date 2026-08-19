@@ -13118,11 +13118,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '화살표를 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
   'hudChrome.bootcamp.coachReadyTitle': '임무 완료',
   'hudChrome.bootcamp.coachReadyBody':
-    '{npc}에게 돌아가 {interactKey}를 누르거나 왼쪽 클릭해 임무를 보고하고 보상을 받으세요.',
+    '{npc}에게 가서 {interactKey}를 누르거나 왼쪽 클릭해 임무를 보고하고 보상을 받으세요.',
   'hudChrome.bootcamp.coachReadyBodyTouch':
-    '{npc}에게 돌아가 상대를 탭해 임무를 보고하고 보상을 받으세요.',
+    '{npc}에게 가서 상대를 탭해 임무를 보고하고 보상을 받으세요.',
   'hudChrome.bootcamp.coachReadyBodyPad':
-    '{npc}에게 돌아가 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요.',
+    '{npc}에게 가서 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요.',
   'hudChrome.bootcamp.taskStrikeTrueBody':
     '짚 허수아비에게 다가가 {targetKey}를 누르거나 왼쪽 클릭해 대상으로 잡으세요. 그런 다음 {attackKey}를 누르거나 행동 단축바의 첫 번째 버튼을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요.',
   'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
@@ -13148,11 +13148,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.taskPouchBodyPad':
     '{npc}에게 상호작용 버튼을 눌러 좌판을 열고, 아마천 주머니를 골라 구입하세요.',
   'hudChrome.bootcamp.readyPouchBody':
-    '주머니를 샀습니다. {bagsKey}를 눌러 가방을 열고 아마천 주머니를 왼쪽 클릭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 {interactKey}를 눌러 보여 주세요.',
+    '주머니를 샀습니다. {bagsKey}를 눌러 가방을 열고 아마천 주머니를 왼쪽 클릭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 {interactKey}를 눌러 보여 주세요.',
   'hudChrome.bootcamp.readyPouchBodyTouch':
-    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 탭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 상대를 탭해 보여 주세요.',
+    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 탭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 상대를 탭해 보여 주세요.',
   'hudChrome.bootcamp.readyPouchBodyPad':
-    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 골라 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 돌아가 상호작용 버튼을 눌러 보여 주세요.',
+    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 골라 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 상호작용 버튼을 눌러 보여 주세요.',
   'hudChrome.bootcamp.bellTitle': '종 울리기',
   'hudChrome.bootcamp.bellBody':
     '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 {interactKey}를 누르거나 왼쪽 클릭해 이스트브룩으로 출항하세요.',

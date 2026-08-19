@@ -713,11 +713,14 @@ export const hudChromeStrings = {
     coachTaskBodyPad:
       'Follow the arrow to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.',
     coachReadyTitle: 'Task complete',
+    // "Head to", never "Return to": on the rail every hand-in NPC is the NEXT
+    // station, someone the player has not met yet, so "return" reads as a
+    // place they have already been and sends new players backward.
     coachReadyBody:
-      'Return to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.',
-    coachReadyBodyTouch: 'Return to {npc} and tap them to hand it in and take your reward.',
+      'Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.',
+    coachReadyBodyTouch: 'Head to {npc} and tap them to hand it in and take your reward.',
     coachReadyBodyPad:
-      'Return to {npc} and press your interact button to hand it in and take your reward.',
+      'Head to {npc} and press your interact button to hand it in and take your reward.',
     // Per-quest mechanic lessons replacing the generic task/ready bodies
     // (bootcamp_view.ts COACH_ACTIVE_OVERRIDES / COACH_READY_OVERRIDES):
     // targeting and the swing for Strike True, the pickup press for the
@@ -747,11 +750,19 @@ export const hudChromeStrings = {
     taskPouchBodyPad:
       'Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.',
     readyPouchBody:
-      'Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press {interactKey} to show it off.',
+      'Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.',
     readyPouchBodyTouch:
-      'Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and tap them to show it off.',
+      'Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.',
     readyPouchBodyPad:
-      'Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then return to {npc} and press your interact button to show it off.',
+      'Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.',
+    // The floating interact bubble over the coach's current target
+    // (bootcamp.ts + coach_prompt_view.ts): one keycap chip plus one short
+    // verb, readable without reading the card. Deliberately terse.
+    promptTalk: 'Talk',
+    promptTurnIn: 'Turn in',
+    promptPickUp: 'Pick up',
+    promptRead: 'Read',
+    promptRing: 'Ring',
     // The closing card once Ferryman Odo has the last hand-in: ring home.
     bellTitle: 'Ring the bell',
     bellBody:

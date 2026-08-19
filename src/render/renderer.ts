@@ -6,7 +6,6 @@ import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
 } from '../sim/combat/priest/presentation';
-import { isOnProvingShore } from '../sim/content/proving_shore';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -336,6 +335,7 @@ import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './imp
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
+import { IslandGuidance } from './island_guidance';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -492,11 +492,6 @@ import {
 import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
-import { beaconNpcIds } from './quest_beacon_core';
-
-// The off-island beacon answer, shared so the per-frame memo never allocates
-// away from the shore.
-const EMPTY_BEACON_IDS: ReadonlySet<string> = new Set();
 
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
@@ -1665,9 +1660,8 @@ export class Renderer {
   private emberPools: EmberPoolsView | null = null;
   private campBraziers: CampBraziersView | null = null;
   private decorTorchFx: DecorTorchFxView | null = null;
-  // Per-frame memo for the island rail's go-here-next NPC beacons.
-  private islandBeaconIds: ReadonlySet<string> = new Set();
-  private islandBeaconTime = -1;
+  // The island rail's guidance coordinator (beacon fizz + golden trail).
+  private islandGuidance!: IslandGuidance;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
   // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
@@ -3191,6 +3185,8 @@ export class Renderer {
     this.raceLine = new RaceLine(this.scene, this.groundSample);
     // Riding-lesson start platform: the glowing square behind the start arch.
     this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
+    // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
+    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -11063,24 +11059,9 @@ export class Renderer {
         continue;
       }
       if (e.kind === 'npc') {
-        // The tutorial island's go-here-next beacon: a gentle holy fizz over
-        // the rail NPC that currently offers or awaits the chain's quest
-        // (quest_beacon_core.ts), so a brand-new player can see their next
-        // stop across the shore. Memoized once per frame AND gated on the
-        // island rectangle: off the shore the rail's seven questState reads
-        // (each an options-object plus attunement-copy allocation online)
-        // would otherwise run every frame for every player in the world.
-        if (this.islandBeaconTime !== this.time) {
-          this.islandBeaconTime = this.time;
-          const player = this.sim.player;
-          this.islandBeaconIds =
-            player && isOnProvingShore(player.pos.x, player.pos.z)
-              ? beaconNpcIds(this.sim)
-              : EMPTY_BEACON_IDS;
-        }
-        if (this.islandBeaconIds.has(e.templateId)) {
-          this.vfx.castSparkle(e.id, 'holy', dt * 2.0);
-        }
+        // The island rail's go-here-next fizz (island_guidance.ts): gentle
+        // holy sparkle over beacon NPCs, gold over the current target.
+        this.islandGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
       }
       if (e.templateId === VALE_CUP_BALL_TEMPLATE) {
         // bespoke ball motion (roll + contact shadow + dust); no rig to animate
@@ -12417,6 +12398,8 @@ export class Renderer {
     this.vfx.update(dt);
     // Racing line (cosmetic; reads the self race view only).
     this.raceLine.update(this.sim.mountRaceView(), this.time, dt);
+    // Island guidance trail (actionable on every tier; island-gated inside).
+    this.islandGuidance.update(this.sim, this.time, dt);
     // Start platform: visible while the riding quest is active and no race is live.
     this.mountBeacon.update(
       this.sim.questState('q_riding_lessons') === 'active' && !this.sim.mountRaceView(),
