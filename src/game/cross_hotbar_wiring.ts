@@ -264,9 +264,15 @@ function applyPadModeClass(on: boolean): void {
  * Build the whole cross-hotbar wiring. The host arrives as a THUNK because the
  * pad is constructed before the HUD in the client's boot order; resolving it per
  * call keeps the wiring independent of that order instead of pinning it.
+ *
+ * `scope` is the character the layout is stored under, the same string `Keybinds`
+ * takes, so two characters on one machine never share a pad layout.
  */
-export function createCrossHotbar(host: () => CrossHotbarOverlayHost): CrossHotbarWiring {
-  const bindings = new CrossHotbarBindings();
+export function createCrossHotbar(
+  host: () => CrossHotbarOverlayHost,
+  scope = '',
+): CrossHotbarWiring {
+  const bindings = new CrossHotbarBindings(scope);
   let enabled = true;
   const syncPadMode = (pad: CrossHotbarPadState): void => {
     const on = enabled && pad.isConnected();

@@ -87,6 +87,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const padTargetPickTs = readFileSync(
+  new URL('../src/game/pad_target_pick.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -2197,9 +2201,22 @@ describe('client HTML shell', () => {
     // press a new controller player reaches for first, on a wolf they have not
     // targeted. The descriptor is substituted here rather than in the pure core,
     // which never learns about pseudo-actions.
-    expect(mainTs).toContain(
-      'action.id === CROSS_HOTBAR_ATTACK_ID ? { requiresTarget: true } : ABILITIES[action.id]',
+    expect(padTargetPickTs).toMatch(
+      /action\.id === CROSS_HOTBAR_ATTACK_ID\s*\?\s*\{ requiresTarget: true \}\s*:\s*resolvedAbility\(world, action\.id\)/,
     );
+    // Every other press is judged on the definition the button would actually cast:
+    // a cell stores the learned BASE id, which an aura transform can move away from.
+    expect(padTargetPickTs).toContain('resolveActionReplacement(known, world.player).def');
+    expect(mainTs).toContain('const padTargetPick = createPadTargetPick({ world, interactKey });');
+    // Pad mode is a body class only syncPadMode writes, and gamepad.stop() releases
+    // the pad without an onConnectionChange, so the Controller settings arm has to
+    // re-read it: otherwise turning the setting off leaves the desktop rows hidden
+    // behind a cross hotbar no longer driven by anything.
+    expect(mainTs).toMatch(
+      /else gamepad\.stop\(\);[\s\S]{0,400}?crossHotbar\.syncPadMode\(gamepad\);/,
+    );
+    // The pad layout is per character, like the keybinds it is scoped alongside.
+    expect(mainTs).toContain('createCrossHotbar(() => hud, keybindScope)');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
       'isClickMoveButton &&\n        shouldApproachPickedEntity(\n          world.player,\n          e,\n          didInteractImmediately,\n          true,\n          localPartyMemberIds(world.partyInfo),\n        )',

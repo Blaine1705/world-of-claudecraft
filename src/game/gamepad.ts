@@ -14,6 +14,7 @@ import {
   INITIAL_CROSS_HOTBAR_TRIGGER_STATE,
   isCrossHotbarButton,
   nextCrossHotbarTriggerState,
+  releaseCrossHotbarHold,
   toggleCrossHotbarStandingSet,
 } from './cross_hotbar';
 import type { CrossHotbarBindings } from './cross_hotbar_bindings';
@@ -110,10 +111,18 @@ const DPAD_NAV_DIRECTIONS: Record<number, NavDirection> = {
 };
 
 // How long to wait for a closing window to hand focus back before the pad drops
-// its selection. A handful of frames: long enough for a return dispatched a tick
-// after the close, short enough that a genuine exit does not leave a stale
-// highlight on screen.
-const FOCUS_RETURN_FRAMES = 12;
+// its selection. Counted in SECONDS off the frame delta, not in frames: the same
+// grace has to be long enough for a return dispatched a tick after the close and
+// short enough not to strand a stale highlight, at 30 fps and at 144 Hz alike.
+const FOCUS_RETURN_SECONDS = 0.2;
+
+// How often to re-ask for the one-time cross-hotbar seed while the bar is still
+// empty, and how long to keep asking. Each ask rebuilds the Controller options
+// panel, so a per-poll retry left its own dropdowns unclickable; and a bar that
+// legitimately has nothing to copy (a fresh character whose action bar is empty)
+// would otherwise ask for the whole session.
+const SEED_RETRY_INTERVAL_SECONDS = 1;
+const SEED_RETRY_WINDOW_SECONDS = 30;
 
 // What the bare d-pad cycles in the world: left/right the hostile list, up/down
 // the NPCs standing around you, matching the console-MMO split between "what am I
@@ -156,11 +165,13 @@ export class GamepadManager {
   // the focused CELL rather than casting, so a player cannot fire an ability by
   // trying to move it.
   private edit: CrossHotbarEditState = IDLE_EDIT_STATE;
-  // Frames left to wait for a closing window's focus return before giving up on it.
-  private restoreFocusFrames = 0;
+  // Seconds left to wait for a closing window's focus return before giving up on it.
+  private restoreFocusSeconds = 0;
   private crossHotbar = false;
   private crossHotbarExpand = true;
   private triggerState: CrossHotbarTriggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
+  private seedRetrySeconds = 0;
+  private seedRetryAsks = 0;
   private boundConnect = (e: GamepadEvent) => this.onConnect(e);
   private boundDisconnect = (e: GamepadEvent) => this.onDisconnect(e);
 
@@ -207,6 +218,7 @@ export class GamepadManager {
     this.prevPressed.fill(false);
     this.input.clearGamepadMove();
     this.input.setGamepadLookActive(false);
+    this.releaseCrossHotbarEdit();
     this.releaseCrossHotbar();
     this.exitNavMode();
     this.mouseMode = false;
@@ -230,33 +242,64 @@ export class GamepadManager {
   setCrossHotbar(on: boolean): void {
     if (this.crossHotbar === on) return;
     this.crossHotbar = on;
+    this.releaseCrossHotbarEdit();
     this.releaseCrossHotbar();
   }
   /** Whether tapping the opposite trigger swaps to the second set. */
   setCrossHotbarExpand(on: boolean): void {
     this.crossHotbarExpand = on;
-    if (!on && this.triggerState.expanded) {
-      this.triggerState = { ...this.triggerState, expanded: false };
-      this.notifyCrossHotbar();
-    }
+    if (!on) this.setTriggerState({ ...this.triggerState, expanded: false });
   }
 
   // Drop any held trigger and tell the overlay to hide. Shared by every path
   // that stops feeding the pad: disable, blur, disconnect, pointer mode, stop().
+  // The standing set is NOT a hold, so it survives: this runs every poll while a
+  // window is open, and resetting it there would make opening bags cancel the set
+  // the player switched to.
   private releaseCrossHotbar(): void {
-    if (this.triggerState.hold === null && !this.triggerState.expanded) {
-      this.triggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
-      return;
+    this.setTriggerState(releaseCrossHotbarHold(this.triggerState));
+  }
+
+  // The one place the trigger state is written, so the overlay can never be left
+  // drawing a layer or a set the pad has already moved off.
+  private setTriggerState(next: CrossHotbarTriggerState): void {
+    const prev = this.triggerState;
+    this.triggerState = next;
+    if (prev.hold !== next.hold || crossHotbarActiveSet(prev) !== crossHotbarActiveSet(next)) {
+      this.notifyCrossHotbar();
     }
-    this.triggerState = INITIAL_CROSS_HOTBAR_TRIGGER_STATE;
-    this.notifyCrossHotbar();
   }
 
   /** Swap the standing set. Holding a trigger is not required: this is the switch
    *  a player leaves flipped, not the mid-hold reach the opposite trigger gives. */
   private toggleCrossHotbarSet(): void {
-    this.triggerState = toggleCrossHotbarStandingSet(this.triggerState);
-    this.notifyCrossHotbar();
+    this.setTriggerState(toggleCrossHotbarStandingSet(this.triggerState));
+  }
+
+  // Enter or leave arrange mode. Leaving puts anything in hand back on the cell it
+  // came off, so no way out of the mode can lose an action.
+  private toggleCrossHotbarEdit(): void {
+    const toggled = toggleEdit(this.edit);
+    this.edit = toggled.state;
+    // Carrying an action means moving between the spellbook and the bar, so the
+    // d-pad walks the whole screen rather than the window it started in.
+    setPadNavSpansWindows(this.edit.active);
+    if (toggled.restore) {
+      this.crossHotbarBindings?.bind(
+        toggled.restore.cell.set,
+        toggled.restore.cell.position,
+        toggled.restore.action,
+      );
+    }
+    this.announceEdit();
+  }
+
+  // Leave arrange mode from a path that is not the chord. The chord is gated on
+  // the bar being enabled, so a player who switches it off (or unplugs, or blurs)
+  // mid-arrange would otherwise sit in a mode with no way out of it.
+  private releaseCrossHotbarEdit(): void {
+    if (!this.edit.active) return;
+    this.toggleCrossHotbarEdit();
   }
 
   private notifyCrossHotbar(): void {
@@ -277,6 +320,7 @@ export class GamepadManager {
   private acquire(pad: Gamepad): void {
     this.index = pad.index;
     this.kind = detectGamepadKind(pad.id);
+    this.resetSeedRetry();
   }
 
   private onConnect(e: GamepadEvent): void {
@@ -293,6 +337,7 @@ export class GamepadManager {
       this.prevPressed.fill(false);
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
+      this.releaseCrossHotbarEdit();
       this.releaseCrossHotbar();
       this.cb.onConnectionChange?.();
     }
@@ -334,17 +379,13 @@ export class GamepadManager {
     if (!this.windowFocused()) {
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
+      this.releaseCrossHotbarEdit();
       this.releaseCrossHotbar();
       this.prevPressed = cur;
       return;
     }
 
-    // A pad is usually connected before the character's action bar has loaded, so
-    // the first seed attempt has nothing to copy. Re-ask until it takes; the check
-    // is an in-memory scan of the layout and stops the moment the bar is seeded.
-    if (this.crossHotbar && this.crossHotbarBindings?.isSeeded() === false) {
-      this.cb.onConnectionChange?.();
-    }
+    this.retryCrossHotbarSeed(dt);
 
     this.checkRumble();
 
@@ -365,19 +406,7 @@ export class GamepadManager {
       (cur[GP.Y] && !this.prevPressed[GP.Y] && cur[GP.LB]);
     if (editChord && this.crossHotbar) {
       chordButton = cur[GP.Y] && !this.prevPressed[GP.Y] ? GP.Y : GP.LB;
-      const toggled = toggleEdit(this.edit);
-      this.edit = toggled.state;
-      // Carrying an action means moving between the spellbook and the bar, so the
-      // d-pad walks the whole screen rather than the window it started in.
-      setPadNavSpansWindows(this.edit.active);
-      if (toggled.restore) {
-        this.crossHotbarBindings?.bind(
-          toggled.restore.cell.set,
-          toggled.restore.cell.position,
-          toggled.restore.action,
-        );
-      }
-      this.announceEdit();
+      this.toggleCrossHotbarEdit();
     }
 
     if (chordRise) {
@@ -422,10 +451,13 @@ export class GamepadManager {
     // or drop the highlight and the pointer when there is nothing to go back to,
     // rather than leaving them over a surface that is no longer there.
     if (!pointerMode && this.prevPointerMode) this.exitNavMode();
-    else if (this.restoreFocusFrames > 0) {
-      this.restoreFocusFrames--;
-      if (restorePadFocus()) this.restoreFocusFrames = 0;
-      else if (this.restoreFocusFrames === 0) clearPadFocus();
+    else if (this.restoreFocusSeconds > 0) {
+      this.restoreFocusSeconds -= dt;
+      if (restorePadFocus()) this.restoreFocusSeconds = 0;
+      else if (this.restoreFocusSeconds <= 0) {
+        this.restoreFocusSeconds = 0;
+        clearPadFocus();
+      }
     }
     this.prevPointerMode = pointerMode;
 
@@ -536,16 +568,35 @@ export class GamepadManager {
       this.releaseCrossHotbar();
       return;
     }
-    const prev = this.triggerState;
-    this.triggerState = nextCrossHotbarTriggerState(
-      prev,
-      cur[GP.LT] ?? false,
-      cur[GP.RT] ?? false,
-      this.crossHotbarExpand,
+    this.setTriggerState(
+      nextCrossHotbarTriggerState(
+        this.triggerState,
+        cur[GP.LT] ?? false,
+        cur[GP.RT] ?? false,
+        this.crossHotbarExpand,
+      ),
     );
-    if (this.triggerState.hold !== prev.hold || this.triggerState.expanded !== prev.expanded) {
-      this.notifyCrossHotbar();
+  }
+
+  // A pad is usually connected before the character's action bar has loaded, so the
+  // first seed attempt has nothing to copy. Re-ask on a timer rather than per poll:
+  // every ask rebuilds the Controller options panel, and a bar that stays empty
+  // would sustain that forever.
+  private retryCrossHotbarSeed(dt: number): void {
+    if (!this.crossHotbar || this.crossHotbarBindings?.isSeeded() !== false) {
+      this.resetSeedRetry();
+      return;
     }
+    this.seedRetrySeconds += dt;
+    const due = (this.seedRetryAsks + 1) * SEED_RETRY_INTERVAL_SECONDS;
+    if (due > SEED_RETRY_WINDOW_SECONDS || this.seedRetrySeconds < due) return;
+    this.seedRetryAsks++;
+    this.cb.onConnectionChange?.();
+  }
+
+  private resetSeedRetry(): void {
+    this.seedRetrySeconds = 0;
+    this.seedRetryAsks = 0;
   }
 
   /** The action a button press casts through the cross hotbar right now, or null
@@ -671,6 +722,12 @@ export class GamepadManager {
     }
     const action = this.bindings.actionFor(buttonIndex);
     if (action === GAMEPAD_NONE) return;
+    if (action === GAMEPAD_CANCEL && hasPadFocus()) {
+      // Cancel backs out one step at a time, and the HUD selection is the innermost
+      // step: hand the d-pad back to the world before the host clears the target.
+      clearPadFocus();
+      return;
+    }
     if (action === GAMEPAD_CYCLE_SET) {
       // Only while the bar is on: with it off there are no sets to swap between,
       // and a button that silently does nothing is worse than one left free.
@@ -782,6 +839,6 @@ export class GamepadManager {
   // before the thing to return to appeared.
   private exitNavMode(): void {
     if (restorePadFocus()) return;
-    this.restoreFocusFrames = FOCUS_RETURN_FRAMES;
+    this.restoreFocusSeconds = FOCUS_RETURN_SECONDS;
   }
 }

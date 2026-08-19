@@ -11,7 +11,6 @@ import {
   syncSettledAppViewport,
 } from './game/app_viewport';
 import { audio } from './game/audio';
-import { nearestAutoTarget, shouldAutoTarget } from './game/auto_target';
 import { AutoLoot } from './game/autoloot';
 import {
   BROWSER_BODY_CLASSES,
@@ -40,7 +39,6 @@ import {
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
-import { CROSS_HOTBAR_ATTACK_ID } from './game/cross_hotbar';
 import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
@@ -140,10 +138,11 @@ import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
-import { nearbyNpcs, nextNpcTarget } from './game/npc_cycle';
+import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
+import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
@@ -339,7 +338,6 @@ import {
   ALL_CLASSES,
   DT,
   dist2d,
-  INTERACT_RANGE,
   MELEE_RANGE,
   PLAYER_INTEREST_DROP_RADIUS,
   type PlayerClass,
@@ -2182,7 +2180,7 @@ async function startGame(
     });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
-  const crossHotbar = createCrossHotbar(() => hud);
+  const crossHotbar = createCrossHotbar(() => hud, keybindScope);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
     // Cancel backs out one step at a time: the top window, then the target. Only
@@ -2248,7 +2246,7 @@ async function startGame(
           world.useItem(reelRod);
           break;
         }
-        padInteract();
+        padTargetPick.interact();
         break;
       }
       case 'bags':
@@ -2378,7 +2376,7 @@ async function startGame(
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
     onCrossHotbarCast: (action) => {
-      padAutoTarget(action);
+      padTargetPick.autoTarget(action);
       hud.castCrossHotbarAction(action);
     },
     onOpenSpellbook: () => hud.openSpellbook(),
@@ -2673,6 +2671,10 @@ async function startGame(
       const v = settings.set('gamepadEnabled', !!value);
       if (v) gamepad.start();
       else gamepad.stop();
+      // stop() releases the pad without an onConnectionChange, so pad mode has to
+      // be re-read here or the player who just turned the controller off is left
+      // with the desktop rows hidden behind a dead cross hotbar.
+      crossHotbar.syncPadMode(gamepad);
       return;
     }
     if (key === 'gamepadInvertY') {
@@ -3475,50 +3477,9 @@ async function startGame(
     );
   }
 
-  /**
-   * The pad's talk press. Selects before it talks, so the target frame shows who
-   * is being addressed and a press never answers a different npc from the one the
-   * player stepped onto with the d-pad. Everything else about interacting (loot,
-   * doors, nodes, fishing) is unchanged: this only decides WHICH npc.
-   */
-  function padInteract(): void {
-    const targeted = world.player.targetId ?? null;
-    const current = targeted !== null ? world.entities.get(targeted) : undefined;
-    const inReach = (e: { pos: { x: number; y: number; z: number } }) =>
-      dist2d(world.player.pos, e.pos) <= INTERACT_RANGE;
-    const prefer =
-      current?.kind === 'npc' && inReach(current)
-        ? targeted
-        : (nearbyNpcs(world.entities.values(), world.player.pos, INTERACT_RANGE)[0]?.id ?? null);
-    if (prefer !== null && prefer !== targeted) world.targetEntity(prefer);
-    interactKey(prefer);
-  }
-
-  /**
-   * Choose an enemy for a pad press that needs one and has none. A mouse player
-   * targets by clicking what they can see; a pad player has no such gesture, so
-   * without this a new player who sees a wolf and presses the attack they know
-   * gets an error instead of a fight.
-   */
-  function padAutoTarget(action: { type: 'ability' | 'item'; id: string }): void {
-    if (action.type !== 'ability') return;
-    // Attack is not in ABILITIES (it is the fixed slot-0 toggle, not a spell), so
-    // it would otherwise be the ONE press that skips this, and it is the press a
-    // new player reaches for first. It plainly needs a hostile target: without one
-    // the sim answers "Invalid attack target."
-    const ability =
-      action.id === CROSS_HOTBAR_ATTACK_ID ? { requiresTarget: true } : ABILITIES[action.id];
-    const current = world.player.targetId ?? null;
-    const targeted = current !== null ? world.entities.get(current) : undefined;
-    const activePvpOpponents = activePvpOpponentIds(world);
-    const attackable = (e: Parameters<typeof isAttackableEntity>[0]) =>
-      isAttackableEntity(e, world.playerId, activePvpOpponents);
-    if (!shouldAutoTarget(ability, !!targeted && attackable(targeted))) return;
-    const picked = nearestAutoTarget(world.entities.values(), world.player.pos, (e) =>
-      attackable(e as Parameters<typeof isAttackableEntity>[0]),
-    );
-    if (picked !== null) world.targetEntity(picked);
-  }
+  // The pad's own selection rules (which npc a talk press addresses, which enemy
+  // a cast picks) live in src/game/pad_target_pick.ts; this carries the calls.
+  const padTargetPick = createPadTargetPick({ world, interactKey });
 
   function attackNearest(): void {
     const p = world.player;

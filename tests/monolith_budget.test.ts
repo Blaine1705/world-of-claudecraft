@@ -77,7 +77,11 @@ const MONOLITHS: MonolithRow[] = [
     // (reticle, empower, sport, mouseover) instead of growing a second cast path,
     // with the Attack branch beside it: Attack is the fixed slot-0 toggle rather
     // than an ability, so it is the one action the seed cannot copy off the bar.
-    ceiling: 19472,
+    // Raised for the cross-hotbar cast-fallback fix: the fallback grows an item
+    // arm and a spoken refusal beside the ability one, and the shared item-use
+    // seam castSlot and the pad now both call. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 19490,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -147,14 +151,11 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    // Re-pinned to the merged count: this branch and the moved v0.39 base each
-    // added their own wiring to a file both had sitting exactly on the old pin.
-    // The cross hotbar's share is two imports and the composition calls that
-    // create it, hand it the pad, and route its settings; everything with
-    // substance is in src/game/cross_hotbar_wiring.ts, which is what this file's
-    // seam asks for, plus the cast handler the bar dispatches through. Exact
-    // count: any further growth reds again.
-    ceiling: 11591,
+    // Lowered by the pad-selection extraction: the pad's own targeting rules
+    // (which npc a talk press addresses, which enemy a cast picks) moved to
+    // src/game/pad_target_pick.ts, which is what this file's seam asks for, and
+    // main.ts keeps only the call. Exact count: any further growth reds again.
+    ceiling: 11552,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

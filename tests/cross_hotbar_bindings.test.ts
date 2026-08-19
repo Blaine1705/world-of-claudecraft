@@ -139,6 +139,27 @@ describe('CrossHotbarBindings', () => {
     expect(JSON.stringify(b.all())).toBe(before);
   });
 
+  // bind/swap replace the rows they touch instead of editing them, so a snapshot
+  // the overlay took last frame is still the layout it was taken from.
+  it('never rewrites a layout snapshot a caller is already holding', () => {
+    const b = new CrossHotbarBindings();
+    b.seedOnce(bar(32));
+    const snapshot = b.all();
+    const primaryBefore = snapshot[CROSS_HOTBAR_PRIMARY_SET][0];
+    const expandedBefore = snapshot[CROSS_HOTBAR_EXPANDED_SET][0];
+
+    b.bind(CROSS_HOTBAR_PRIMARY_SET, 1, ability('bound'));
+    b.swap(CROSS_HOTBAR_PRIMARY_SET, 0, CROSS_HOTBAR_EXPANDED_SET, 0);
+
+    expect(snapshot[CROSS_HOTBAR_PRIMARY_SET][0]).toEqual(primaryBefore);
+    expect(snapshot[CROSS_HOTBAR_EXPANDED_SET][0]).toEqual(expandedBefore);
+    expect(snapshot[CROSS_HOTBAR_PRIMARY_SET][1]).toEqual(ability('a1'));
+    // The live layout still took both writes.
+    expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET)[1]).toEqual(ability('bound'));
+    expect(b.setActions(CROSS_HOTBAR_PRIMARY_SET)[0]).toEqual(expandedBefore);
+    expect(b.setActions(CROSS_HOTBAR_EXPANDED_SET)[0]).toEqual(primaryBefore);
+  });
+
   it('allows two cells to hold the same action', () => {
     const b = new CrossHotbarBindings();
     b.bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('x'));
@@ -249,5 +270,129 @@ describe('syncKnown offers a cell to a newly learned ability', () => {
     const xhb = new CrossHotbarBindings();
     xhb.reset();
     expect(xhb.syncKnown(['rend'])).toBe(false);
+  });
+});
+
+describe('the layout is per character', () => {
+  const ability = (id: string) => ({ type: 'ability' as const, id });
+  const bar = (n: number) => Array.from({ length: n }, (_, i) => ability(`a${i}`));
+
+  it('writes under the character-namespaced key, mirroring keybinds', () => {
+    new CrossHotbarBindings('char:alice').seedOnce(bar(4));
+    expect(localStorage.getItem(`${STORE_KEY}:char:alice`)).not.toBeNull();
+    expect(localStorage.getItem(STORE_KEY)).toBeNull();
+  });
+
+  it('namespaces an offline character by class and name', () => {
+    new CrossHotbarBindings('offline:warrior:Aldric').seedOnce(bar(4));
+    expect(localStorage.getItem(`${STORE_KEY}:offline:warrior:Aldric`)).not.toBeNull();
+  });
+
+  it('never hands one character the bar another character seeded', () => {
+    // The bug this pins: a single global key meant the second character opened a
+    // bar of the first one's ability ids, which resolve to nothing for them.
+    const alice = new CrossHotbarBindings('char:alice');
+    alice.seedOnce(bar(4));
+    const bob = new CrossHotbarBindings('char:bob');
+    expect(bob.isSeeded()).toBe(false);
+    expect(bob.all()).toEqual(defaultCrossHotbarLayout());
+    expect(bob.seedOnce([ability('shadow_bolt'), null])).toBe(true);
+    expect(bob.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(
+      ability('shadow_bolt'),
+    );
+    expect(alice.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(ability('a0'));
+  });
+
+  it('still offers a cell to an ability another character has already seen', () => {
+    // The other half of the shared-key bug: `seen` was global too, so a full bar
+    // on one character silenced the new-spell placement on every other one.
+    const alice = new CrossHotbarBindings('char:alice');
+    alice.seedOnce(bar(32));
+    alice.syncKnown(['rend']);
+    const bob = new CrossHotbarBindings('char:bob');
+    bob.seedOnce([ability('heroic_strike'), null]);
+    expect(bob.syncKnown(['rend'])).toBe(true);
+    expect(bob.all().flat()).toContainEqual(ability('rend'));
+  });
+});
+
+describe('the pre-namespace layout migrates to one character', () => {
+  const ability = (id: string) => ({ type: 'ability' as const, id });
+  const bar = (n: number) => Array.from({ length: n }, (_, i) => ability(`a${i}`));
+
+  const installLegacyLayout = () => new CrossHotbarBindings().seedOnce(bar(4));
+
+  it('adopts the legacy layout as the first character profile', () => {
+    installLegacyLayout();
+    const alice = new CrossHotbarBindings('char:alice');
+    expect(alice.actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP)).toEqual(ability('a0'));
+    expect(localStorage.getItem(`${STORE_KEY}:char:alice`)).not.toBeNull();
+    expect(new CrossHotbarBindings('char:alice').isSeeded()).toBe(true);
+  });
+
+  it('reads the original bare-array shape too', () => {
+    const legacy = defaultCrossHotbarLayout();
+    legacy[0][0] = ability('a0');
+    localStorage.setItem(STORE_KEY, JSON.stringify(legacy));
+    expect(
+      new CrossHotbarBindings('char:alice').actionFor(CROSS_HOTBAR_PRIMARY_SET, 'left', GP.DPAD_UP),
+    ).toEqual(ability('a0'));
+  });
+
+  it('hands it to exactly one character, so the rest seed from their own bar', () => {
+    installLegacyLayout();
+    expect(new CrossHotbarBindings('char:alice').isSeeded()).toBe(true);
+    expect(new CrossHotbarBindings('char:bob').isSeeded()).toBe(false);
+  });
+
+  it('leaves the legacy value itself untouched', () => {
+    installLegacyLayout();
+    const before = localStorage.getItem(STORE_KEY);
+    new CrossHotbarBindings('char:alice').bind(CROSS_HOTBAR_PRIMARY_SET, 0, ability('x'));
+    expect(localStorage.getItem(STORE_KEY)).toBe(before);
+  });
+
+  it('does not adopt an empty legacy layout', () => {
+    new CrossHotbarBindings().bind(CROSS_HOTBAR_PRIMARY_SET, 0, null);
+    expect(new CrossHotbarBindings('char:alice').isSeeded()).toBe(false);
+    expect(new CrossHotbarBindings('char:bob').isSeeded()).toBe(false);
+  });
+
+  it('does not re-offer a cell to what the adopted layout already holds', () => {
+    installLegacyLayout();
+    const alice = new CrossHotbarBindings('char:alice');
+    expect(alice.syncKnown(['a0'])).toBe(false);
+    expect(
+      alice
+        .all()
+        .flat()
+        .filter((a) => a?.id === 'a0'),
+    ).toHaveLength(1);
+  });
+});
+
+describe('reset recovers the bar completely', () => {
+  const ability = (id: string) => ({ type: 'ability' as const, id });
+
+  it('forgets what has been offered, so a re-seeded bar takes the abilities back', () => {
+    const b = new CrossHotbarBindings('char:alice');
+    b.seedOnce([ability('heroic_strike'), null]);
+    b.syncKnown(['rend']);
+    b.reset();
+    expect(b.isSeeded()).toBe(false);
+    expect(b.seedOnce([ability('heroic_strike'), null])).toBe(true);
+    expect(b.syncKnown(['rend'])).toBe(true);
+    expect(b.all().flat()).toContainEqual(ability('rend'));
+  });
+
+  it('persists the cleared state, so a reload does not resurrect it', () => {
+    const b = new CrossHotbarBindings('char:alice');
+    b.seedOnce([ability('heroic_strike'), null]);
+    b.syncKnown(['rend']);
+    b.reset();
+    expect(JSON.parse(localStorage.getItem(`${STORE_KEY}:char:alice`)!).seen).toEqual([]);
+    const reloaded = new CrossHotbarBindings('char:alice');
+    reloaded.seedOnce([ability('heroic_strike'), null]);
+    expect(reloaded.syncKnown(['rend'])).toBe(true);
   });
 });

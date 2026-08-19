@@ -259,6 +259,16 @@ export function nextCrossHotbarTriggerState(
   return { hold, expanded, standing: prev.standing, ltDown, rtDown };
 }
 
+/**
+ * Let go of the bar: the hold, the mid-hold reach and the two trigger latches drop
+ * together. `standing` survives for the same reason the reducer above leaves it
+ * alone: it is the set the player chose, not a part of this hold, and a window
+ * opening or the window losing focus must not silently undo it.
+ */
+export function releaseCrossHotbarHold(state: CrossHotbarTriggerState): CrossHotbarTriggerState {
+  return { ...INITIAL_CROSS_HOTBAR_TRIGGER_STATE, standing: state.standing };
+}
+
 /** Flip the standing set. The mid-hold reach is left alone: it is relative to
  *  whatever is standing, which is what makes the two compose. */
 export function toggleCrossHotbarStandingSet(

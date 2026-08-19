@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CROSS_HOTBAR_EXPANDED_SET, CROSS_HOTBAR_PRIMARY_SET } from '../src/game/cross_hotbar';
 import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
+import { clearPadFocus, hasPadFocus, setPadNavSpansWindows } from '../src/game/dpad_focus_nav';
 import { type GamepadCallbacks, GamepadManager } from '../src/game/gamepad';
 import { GamepadBindings } from '../src/game/gamepad_bindings';
 import {
   AXIS,
+  GAMEPAD_CANCEL,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
   GAMEPAD_ZOOM_STEP,
@@ -13,6 +15,20 @@ import {
 } from '../src/game/gamepad_map';
 import { Input, type InputCallbacks } from '../src/game/input';
 import { Keybinds } from '../src/game/keybinds';
+
+// Every export still runs for real; three are wrapped because the module keeps the
+// state behind them private: the whole-screen d-pad switch (leaving it on is exactly
+// what a missing arrange-mode teardown looks like), and the pad's HUD selection,
+// which has no DOM to hold it in this env.
+vi.mock('../src/game/dpad_focus_nav', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/game/dpad_focus_nav')>();
+  return {
+    ...actual,
+    setPadNavSpansWindows: vi.fn(actual.setPadNavSpansWindows),
+    clearPadFocus: vi.fn(actual.clearPadFocus),
+    hasPadFocus: vi.fn(actual.hasPadFocus),
+  };
+});
 
 const originalNavigator = globalThis.navigator;
 
@@ -740,8 +756,9 @@ describe('GamepadManager cross hotbar', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   function setupCrossHotbar(enabled: boolean) {
+    let windowFocused = true;
     vi.stubGlobal('document', {
-      hasFocus: () => true,
+      hasFocus: () => windowFocused,
       // Cursor mode builds the virtual pointer element on entry.
       createElement: () => ({ className: '', style: {}, setAttribute: vi.fn() }),
       body: { appendChild: vi.fn() },
@@ -763,6 +780,7 @@ describe('GamepadManager cross hotbar', () => {
       value: { getGamepads: () => [pad] },
     });
     const onAction = vi.fn();
+    const onConnectionChange = vi.fn();
     const onCrossHotbar = vi.fn();
     const onCrossHotbarCast = vi.fn();
     const onCrossHotbarEdit = vi.fn();
@@ -786,6 +804,7 @@ describe('GamepadManager cross hotbar', () => {
       onAction,
       onInputEdge: vi.fn(),
       isPointerMode: () => pointerMode,
+      onConnectionChange,
       onCrossHotbar,
       onCrossHotbarCast,
       onCrossHotbarEdit,
@@ -807,6 +826,7 @@ describe('GamepadManager cross hotbar', () => {
       xhb,
       input,
       onAction,
+      onConnectionChange,
       onCrossHotbarCast,
       onCrossHotbar,
       onCrossHotbarEdit,
@@ -837,6 +857,14 @@ describe('GamepadManager cross hotbar', () => {
       press: (...buttons: number[]) => {
         pad = gamepadWithPressed(...buttons);
         manager.poll(1 / 60);
+      },
+      // One idle poll of an arbitrary length, for the time-based paths.
+      poll: (dt: number) => {
+        pad = gamepadWithPressed();
+        manager.poll(dt);
+      },
+      setWindowFocused: (on: boolean) => {
+        windowFocused = on;
       },
       // Push the left stick past the deadzone for one poll.
       move: () => {
@@ -1215,6 +1243,73 @@ describe('GamepadManager cross hotbar', () => {
     h.manager.stop();
     expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
   });
+
+  it('keeps the standing set through a release, so opening a window never undoes it', () => {
+    // A release runs on every poll while a window is open. The standing set is the
+    // switch the player leaves flipped, not part of the hold, so it has to survive
+    // one; the bar and the overlay must also still agree afterwards.
+    const h = setupCrossHotbar(true);
+    h.press(GP.RB);
+    h.setPointerMode(true);
+    h.press();
+    h.press();
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, CROSS_HOTBAR_EXPANDED_SET);
+    h.setPointerMode(false);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith('left', CROSS_HOTBAR_EXPANDED_SET);
+    // Cell 0 of the SECOND set, which is where the player left the bar.
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a16' });
+  });
+
+  it('does not re-notify the overlay on the polls after a release', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.setPointerMode(true);
+    h.press(GP.LT);
+    const closed = h.onCrossHotbar.mock.calls.length;
+    h.press(GP.LT);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenCalledTimes(closed);
+  });
+
+  it('retries the one-time seed on a timer, never once per poll', () => {
+    // Each ask rebuilds the Controller options panel, so a per-poll retry made its
+    // own dropdowns unclickable for as long as the bar stayed empty.
+    const h = setupCrossHotbar(true);
+    h.xhb.reset();
+    h.onConnectionChange.mockClear();
+    for (let i = 0; i < 12; i++) h.press();
+    expect(h.onConnectionChange).not.toHaveBeenCalled();
+    h.poll(1);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(1);
+    h.poll(0.5);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(1);
+    h.poll(0.5);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(2);
+  });
+
+  it('stops retrying the moment the bar is seeded', () => {
+    const h = setupCrossHotbar(true);
+    h.xhb.reset();
+    h.onConnectionChange.mockClear();
+    h.poll(1);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(1);
+    h.xhb.seedOnce([{ type: 'ability', id: 'a0' }]);
+    for (let i = 0; i < 5; i++) h.poll(1);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives up on a bar that never fills instead of asking all session', () => {
+    const h = setupCrossHotbar(true);
+    h.xhb.reset();
+    h.onConnectionChange.mockClear();
+    for (let i = 0; i < 60; i++) h.poll(1);
+    const asks = h.onConnectionChange.mock.calls.length;
+    expect(asks).toBeGreaterThan(0);
+    for (let i = 0; i < 60; i++) h.poll(1);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(asks);
+  });
   describe('cross hotbar arrange mode', () => {
     // focusSpell installs a document global; drop it so a later case in this file
     // sees the plain-Node environment the rest of the suite assumes.
@@ -1390,11 +1485,134 @@ describe('GamepadManager cross hotbar', () => {
       expect(h.xhb.setActions(0)[5]).toEqual({ type: 'ability', id: 'a5' });
     });
 
+    it('leaves arrange mode when the bar is switched off mid-arrange', () => {
+      // The chord out of the mode is gated on the bar being ON, so switching it off
+      // while arranging used to take the only exit away with the player inside.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(0);
+      h.press(GP.A);
+      h.press();
+      vi.mocked(setPadNavSpansWindows).mockClear();
+      h.manager.setCrossHotbar(false);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+      expect(setPadNavSpansWindows).toHaveBeenLastCalledWith(false);
+      // Really over: a confirm on another cell no longer moves what was in hand.
+      h.focus(3);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[3]).toEqual({ type: 'ability', id: 'a3' });
+    });
+
+    it('leaves arrange mode when the pad is stopped', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      vi.mocked(setPadNavSpansWindows).mockClear();
+      h.manager.stop();
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+      expect(setPadNavSpansWindows).toHaveBeenLastCalledWith(false);
+    });
+
+    it('leaves arrange mode when the window loses focus', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.setWindowFocused(false);
+      h.press();
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+    });
+
     it('does nothing at all when the player never entered the mode', () => {
       const h = setupCrossHotbar(true);
       h.focus(2);
       h.press(GP.B);
       expect(h.xhb.setActions(0)[2]).toEqual({ type: 'ability', id: 'a2' });
     });
+  });
+});
+
+// The pad's HUD selection is state that a press has to be able to LEAVE. Cancel is
+// that press, and the grace the pad allows a closing window to hand focus back is a
+// wall-clock budget, not a frame count, so it means the same on a 30 fps handheld
+// and a 144 Hz desktop.
+describe('GamepadManager pad focus handover', () => {
+  // Own the DOM globals poll() reads, the same way the cross-hotbar suite does, so
+  // these cases do not inherit an unfocused window from an earlier one.
+  afterEach(() => vi.unstubAllGlobals());
+
+  function setupFocus(pointerMode: () => boolean) {
+    vi.stubGlobal('document', {
+      hasFocus: () => true,
+      querySelectorAll: () => [],
+      activeElement: null,
+    });
+    let pad = gamepadWithPressed();
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const onAction = vi.fn();
+    const input = {
+      applyGamepadLook: vi.fn(),
+      clearGamepadMove: vi.fn(),
+      setGamepadLookActive: vi.fn(),
+      setGamepadMove: vi.fn(),
+      triggerGamepadJump: vi.fn(),
+    } as unknown as Input;
+    const callbacks = {
+      onAction,
+      onInputEdge: vi.fn(),
+      isPointerMode: pointerMode,
+    } satisfies GamepadCallbacks;
+    const manager = new GamepadManager(input, new GamepadBindings(), callbacks);
+    (manager as unknown as { index: number | null }).index = 0;
+    vi.mocked(clearPadFocus).mockClear();
+    return {
+      manager,
+      onAction,
+      press: (...buttons: number[]) => {
+        pad = gamepadWithPressed(...buttons);
+      },
+    };
+  }
+
+  it('spends the focus-return grace in seconds, so one long frame ends it', () => {
+    let pointerMode = true;
+    const h = setupFocus(() => pointerMode);
+    h.manager.poll(1 / 60);
+    pointerMode = false;
+    h.manager.poll(1 / 60); // the closing edge: nothing restored focus, so the wait starts
+    expect(clearPadFocus).not.toHaveBeenCalled();
+    h.manager.poll(0.25);
+    expect(clearPadFocus).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps waiting across the short frames a high refresh rate delivers', () => {
+    let pointerMode = true;
+    const h = setupFocus(() => pointerMode);
+    h.manager.poll(1 / 144);
+    pointerMode = false;
+    h.manager.poll(1 / 144);
+    // Twelve frames at 144 Hz is 83 ms, well inside the grace the old frame count spent.
+    for (let i = 0; i < 12; i++) h.manager.poll(1 / 144);
+    expect(clearPadFocus).not.toHaveBeenCalled();
+    for (let i = 0; i < 20; i++) h.manager.poll(1 / 144);
+    expect(clearPadFocus).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops the pad selection on cancel instead of clearing the target under it', () => {
+    const h = setupFocus(() => false);
+    vi.mocked(hasPadFocus).mockReturnValueOnce(true);
+    h.press(GP.B);
+    h.manager.poll(1 / 60);
+    expect(clearPadFocus).toHaveBeenCalledTimes(1);
+    expect(h.onAction).not.toHaveBeenCalledWith(GAMEPAD_CANCEL);
+  });
+
+  it('passes cancel through to the host once the pad holds no selection', () => {
+    const h = setupFocus(() => false);
+    h.press(GP.B);
+    h.manager.poll(1 / 60);
+    expect(clearPadFocus).not.toHaveBeenCalled();
+    expect(h.onAction).toHaveBeenCalledWith(GAMEPAD_CANCEL);
   });
 });

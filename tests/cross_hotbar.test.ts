@@ -17,6 +17,7 @@ import {
   isCrossHotbarButton,
   isCrossHotbarSeeded,
   nextCrossHotbarTriggerState,
+  releaseCrossHotbarHold,
   sanitizeCrossHotbarLayout,
   seedCrossHotbarLayout,
   toggleCrossHotbarStandingSet,
@@ -374,5 +375,41 @@ describe('the standing set and the mid-hold reach compose', () => {
   it('toggles back', () => {
     const on = toggleCrossHotbarStandingSet(INITIAL_CROSS_HOTBAR_TRIGGER_STATE);
     expect(toggleCrossHotbarStandingSet(on).standing).toBe(false);
+  });
+});
+
+describe('releaseCrossHotbarHold', () => {
+  it('drops the hold, the reach and both trigger latches', () => {
+    const released = releaseCrossHotbarHold({
+      hold: 'right',
+      expanded: true,
+      standing: false,
+      ltDown: true,
+      rtDown: true,
+    });
+    expect(released).toEqual(INITIAL_CROSS_HOTBAR_TRIGGER_STATE);
+  });
+
+  it('keeps the standing set, so letting go is not a way to lose it', () => {
+    // Release runs on every poll while a window is open and again on blur, so a
+    // release that reset the standing set would make opening bags undo the switch.
+    const released = releaseCrossHotbarHold({
+      hold: 'left',
+      expanded: true,
+      standing: true,
+      ltDown: true,
+      rtDown: false,
+    });
+    expect(released.standing).toBe(true);
+    expect(released.hold).toBeNull();
+    expect(released.expanded).toBe(false);
+    expect(crossHotbarActiveSet(released)).toBe(CROSS_HOTBAR_EXPANDED_SET);
+  });
+
+  it('is idempotent, so repeating it over many polls settles', () => {
+    const once = releaseCrossHotbarHold(
+      toggleCrossHotbarStandingSet(INITIAL_CROSS_HOTBAR_TRIGGER_STATE),
+    );
+    expect(releaseCrossHotbarHold(once)).toEqual(once);
   });
 });
