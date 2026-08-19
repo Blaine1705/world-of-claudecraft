@@ -30,13 +30,6 @@ import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_a
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const RENDER_ROOT = fileURLToPath(new URL('../src/render', import.meta.url));
-/** The other two trees that can reach the world scene graph. Neither owns a
- *  light today; the scan is here so the first one fails loudly instead of
- *  landing in a tree this census never looked at. */
-const OUTSIDE_ROOTS: readonly { label: string; root: string; files: number }[] = [
-  { label: 'src/game', root: fileURLToPath(new URL('../src/game', import.meta.url)), files: 100 },
-  { label: 'src/ui', root: fileURLToPath(new URL('../src/ui', import.meta.url)), files: 500 },
-];
 
 /** The census-keyed light classes. `new THREE.X(` and the bare `new X(` a named
  *  import would produce are both matched: banning one spelling bans one
@@ -111,6 +104,43 @@ const ALLOWED: Readonly<Record<string, CensusEntry>> = {
       'THE NAMED EXCEPTION: the Wildheart caldera interior rig adds a hemisphere and a directional light to the world scene when the interior builds, which is why its buildInterior arm is a deliberate ungated scene.add (pinned in tests/renderer_compile_gate.test.ts); pre-linking a scene-wide light census is backlog, not a precedent',
   },
 };
+
+/** The other trees that can reach the world scene graph. src/game and src/ui
+ *  own no light today; the scan is here so the first one fails loudly instead
+ *  of landing in a tree this census never looked at. src/editor DOES compose
+ *  the real Renderer (src/editor/3d/viewport.ts), so it is scanned on the same
+ *  terms as src/render: one allowlist row, one reason. */
+const OUTSIDE_ROOTS: readonly {
+  label: string;
+  root: string;
+  files: number;
+  allowed: Readonly<Record<string, CensusEntry>>;
+}[] = [
+  {
+    label: 'src/game',
+    root: fileURLToPath(new URL('../src/game', import.meta.url)),
+    files: 100,
+    allowed: {},
+  },
+  {
+    label: 'src/ui',
+    root: fileURLToPath(new URL('../src/ui', import.meta.url)),
+    files: 500,
+    allowed: {},
+  },
+  {
+    label: 'src/editor',
+    root: fileURLToPath(new URL('../src/editor', import.meta.url)),
+    files: 30,
+    allowed: {
+      'asset_thumbs.ts': {
+        kinds: ['DirectionalLight'],
+        reason:
+          "the asset-browser thumbnail rig's own secondary GL context: a lazily created offscreen WebGLRenderer with its own scene, built once with the context and never added to the world scene the editor viewport composes",
+      },
+    },
+  },
+];
 
 function censusHits(source: string): CensusProducer[] {
   const kinds = new Set<CensusProducer>();
@@ -206,19 +236,38 @@ describe('the src/render light census', () => {
     expect(ALLOWED['wildheart_props.ts'].reason).toContain('backlog');
   });
 
-  it('constructs no census-keyed light outside src/render at all', () => {
-    // The HUD, the input layer and the game-loop glue own no scene lights: a
-    // light minted there would relink the world census from a tree this pin
+  it('constructs a census-keyed light outside src/render only where allowlisted', () => {
+    // The HUD, the input layer and the game-loop glue own no scene lights, and
+    // the editor owns exactly one, in its own offscreen context: a light minted
+    // anywhere else here would relink the world census from a tree this pin
     // never used to look at. The zero is not vacuous, because the matcher is
     // proven on fixtures below and each tree carries a file-count floor.
-    for (const { label, root, files } of OUTSIDE_ROOTS) {
+    for (const { label, root, files, allowed } of OUTSIDE_ROOTS) {
       const scan = scanTree(root);
       expect(scan.files, `${label} walk narrowed`).toBeGreaterThan(files);
       expect(
-        [...scan.hits.keys()].sort(),
+        [...scan.hits.keys()].filter((file) => allowed[file] === undefined).sort(),
         `${label} constructs or clones a census-keyed light. Each of those counts is a three program-cache-key input, so it relinks every lit material in view. Give it a prewarm home or a gate (src/render/CLAUDE.md) and dispatch render-performance-reviewer; do NOT allowlist it silently.`,
       ).toEqual([]);
+      for (const [file, entry] of Object.entries(allowed)) {
+        expect(
+          scan.hits.get(file),
+          `${label}/${file} no longer constructs a census-keyed light: drop its row`,
+        ).toEqual([...entry.kinds].sort());
+        expect(entry.reason.length, `${label}/${file} needs a real reason`).toBeGreaterThan(40);
+      }
     }
+  });
+
+  it('scans src/editor because it composes the real Renderer', () => {
+    // The editor viewport builds a live Sim and hands it to the game Renderer,
+    // so a light added anywhere in that tree reaches the SAME world scene the
+    // census governs. The one row it carries is an offscreen thumbnail rig.
+    const editor = OUTSIDE_ROOTS.find((entry) => entry.label === 'src/editor');
+    expect(editor).toBeDefined();
+    expect(Object.keys(editor?.allowed ?? {})).toEqual(['asset_thumbs.ts']);
+    const viewport = readFileSync(new URL('../src/editor/3d/viewport.ts', import.meta.url), 'utf8');
+    expect(viewport).toContain("import { Renderer } from '../../render/renderer'");
   });
 
   it('detects every spelling a producer could use (positive control)', () => {
