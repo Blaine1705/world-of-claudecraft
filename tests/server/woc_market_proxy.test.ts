@@ -328,6 +328,74 @@ describe('graceful degradation is the contract', () => {
   });
 });
 
+describe('the price and estimate caches at the proxy (H11)', () => {
+  // The proxy captures its clock at construction, so the fake Date must be
+  // installed BEFORE createWocMarketEconomyProxy (the captured-clock rule).
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const healthyBody = { healthy: true, tokensPerUsd: 100, asOfMs: 1_799_000_400_000 };
+
+  it('a failed refresh does not blank a still-recent healthy price (stale-while-revalidate)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(1_820_000_000_000);
+    respond = () => ({ status: 200, body: healthyBody });
+    const economy = createWocMarketEconomyProxy();
+    const first = await economy.price();
+    expect(first.healthy).toBe(true);
+    // Past the 15s TTL, inside the 30s stale-serve bound, with the service
+    // now DOWN: the read serves the recent healthy value immediately instead
+    // of blanking the market for a full TTL (the H11 finding).
+    vi.setSystemTime(1_820_000_016_000);
+    respond = () => ({ status: 500, body: {} });
+    const during = await economy.price();
+    expect(during.healthy).toBe(true);
+    // Let the background probe settle; the healthy value still stands.
+    await Promise.resolve();
+    await Promise.resolve();
+    const after = await economy.price();
+    expect(after.healthy).toBe(true);
+  });
+
+  it('a cold failure is cached briefly, so recovery is visible in seconds, not a TTL', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(1_820_000_000_000);
+    respond = () => ({ status: 500, body: {} });
+    const economy = createWocMarketEconomyProxy();
+    expect((await economy.price()).available).toBe(false);
+    // 3.1 seconds later the service is back. The old cache stored the failure
+    // for the full 15s TTL, so this exact read used to answer unavailable
+    // (and keep the market paused) for another twelve seconds.
+    vi.setSystemTime(1_820_000_003_100);
+    respond = () => ({ status: 200, body: healthyBody });
+    const recovered = await economy.price();
+    expect(recovered.available).toBe(true);
+    expect(recovered.healthy).toBe(true);
+  });
+
+  it('concurrent cold price reads share ONE service call (single-flight)', async () => {
+    respond = () => ({ status: 200, body: healthyBody });
+    const economy = createWocMarketEconomyProxy();
+    const [a, b, c] = await Promise.all([economy.price(), economy.price(), economy.price()]);
+    expect(seen).toHaveLength(1);
+    expect(a).toBe(b);
+    expect(b).toBe(c);
+  });
+
+  it('concurrent estimates for one amount share ONE service call; a new amount pays its own', async () => {
+    respond = () => ({
+      status: 200,
+      body: { ok: true, amount: { base: '1', tokens: 1 }, asOfMs: 1 },
+    });
+    const economy = createWocMarketEconomyProxy();
+    await Promise.all([economy.estimate(700), economy.estimate(700), economy.estimate(700)]);
+    expect(seen).toHaveLength(1);
+    await economy.estimate(701);
+    expect(seen).toHaveLength(2);
+  });
+});
+
 describe('the estimate fee split is accepted only when it reconciles', () => {
   // This figure is shown to a seller as the money they will receive, so a split
   // that does not add up is not a rounding disagreement, it is a different sale.

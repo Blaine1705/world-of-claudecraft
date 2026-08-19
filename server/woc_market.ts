@@ -22,6 +22,8 @@ import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
+import { logSafe, WocWireDriftWarner } from './woc_market_drift_warn';
+import type { WocMarketReadCache } from './woc_market_read_cache';
 import {
   adoptableBondCents,
   antiSnipeExtendedEndMs,
@@ -48,8 +50,6 @@ import {
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   WOC_MARKET_STRANDED_RECLAIM_SECONDS,
-  WOC_MARKET_WIRE_FAIL_REASONS,
-  WOC_MARKET_WIRE_PENDING_REASONS,
   type WocBidStatus,
   type WocEligibilityPolicy,
   type WocEligibilityRefusal,
@@ -1113,6 +1113,12 @@ export interface WocMarketDeps {
    *  production this is false and every proof is a real ed25519 signature. */
   stepUpDevSig: boolean;
   config: WocMarketConfig;
+  /** The hot-read cache (H11). OPTIONAL: absent, every read is uncached (the
+   *  service-test rigs and the sweep-only constructions), which is also why
+   *  its absence can never widen behavior, only cost. main.ts wires the SAME
+   *  instance here and onto the routes runtime, whose mutation handlers own
+   *  the busts. */
+  readCache?: WocMarketReadCache;
   now?: () => number;
   /** Per-pass observability sink (main.ts logs it). `saturated` names every arm
    *  that came back with a FULL batch, i.e. a backlog that is not draining.
@@ -1281,22 +1287,6 @@ interface WocDeliveryScope {
   parked: number;
 }
 
-/** Log-channel clamp for wire-supplied identifiers: printable ASCII only,
- *  bounded, so a hostile or corrupt value cannot forge log lines or flood
- *  the channel (the same discipline the route layer's signature screen
- *  applies at intake; this belt covers values that predate it). The bound
- *  matches the intake screen's 256 so a real base58 signature (87 to 88
- *  chars) survives whole: the retirement trace is reconciliation evidence,
- *  and a truncated signature defeats an exact-match log search. */
-function logSafe(value: string): string {
-  return value.replace(/[^\x20-\x7e]/g, '?').slice(0, 256);
-}
-
-/** Distinct unrecognized verdict words warned about before the channel goes
- *  quiet: one line per word is a drift signal, an unbounded set fed by wire
- *  text is a leak. */
-const WIRE_DRIFT_WARN_CAP = 100;
-
 export class WocMarketService {
   constructor(private readonly deps: WocMarketDeps) {}
 
@@ -1346,63 +1336,9 @@ export class WocMarketService {
    *  every pass forever; young confirming bonds keep the full poll cadence. */
   private readonly parkedBondPolls = new Map<number, number>();
 
-  /** Verdict words already warned about, one channel per vocabulary (once
-   *  per word per service instance; production runs one instance per realm
-   *  process). Keys are logSafe-clamped and the set is capped, so a
-   *  misbehaving service answering a distinct unbounded word per call cannot
-   *  grow process memory for its lifetime. */
-  private readonly wireDriftWarns = {
-    pending: { words: new Set<string>(), suppressed: false },
-    fail: { words: new Set<string>(), suppressed: false },
-  };
-
-  /**
-   * Dev-channel visibility for service vocabulary drift. The anti-snipe
-   * allowlist fails SILENTLY toward never extending when the service stops
-   * emitting the exact ledger-matched word, and the wire screen collapses an
-   * unknown word to 'other' with no trace: the first sighting of each
-   * unrecognized pending word is worth one line so a service drift is
-   * visible instead of invisible.
-   */
-  private notePendingVerdict(reason: string | null): void {
-    this.noteWireVerdict('pending', WOC_MARKET_WIRE_PENDING_REASONS, reason);
-  }
-
-  /** The fail-side twin. Fail words persist verbatim on the settlement row,
-   *  so operators CAN query the drift after the fact; the warn exists so
-   *  they never have to know to look (the same silent-collapse class the
-   *  pending warn closes: every affected player sees the generic line). */
-  private noteFailVerdict(reason: string | null): void {
-    this.noteWireVerdict('fail', WOC_MARKET_WIRE_FAIL_REASONS, reason);
-  }
-
-  private noteWireVerdict(
-    kind: 'pending' | 'fail',
-    vocabulary: readonly string[],
-    reason: string | null,
-  ): void {
-    if (reason === null) return;
-    if (vocabulary.includes(reason)) return;
-    const chan = this.wireDriftWarns[kind];
-    const word = logSafe(reason);
-    if (chan.words.has(word)) return;
-    if (chan.words.size >= WIRE_DRIFT_WARN_CAP) {
-      if (!chan.suppressed) {
-        chan.suppressed = true;
-        console.warn(`[woc_market] further unrecognized ${kind} verdict words suppressed`);
-      }
-      return;
-    }
-    chan.words.add(word);
-    // Two literals, not one interpolated shape: the pending line predates the
-    // fail channel and is pinned byte-for-byte, and "fail confirm verdict"
-    // reads wrong for a word that arrived on a bond refusal.
-    if (kind === 'pending') {
-      console.warn(`[woc_market] unrecognized pending confirm verdict ${word}`);
-    } else {
-      console.warn(`[woc_market] unrecognized fail verdict ${word}`);
-    }
-  }
+  /** Service vocabulary drift channel (woc_market_drift_warn.ts): judged
+   *  through the same exported Sets the wire screens use. */
+  private readonly driftWarn = new WocWireDriftWarner();
 
   /** Next time the delivered-residue arm may run (minute-scale: it converges
    *  an OLDER binary's crash residue, so every-pass cost bought nothing). */
@@ -1484,7 +1420,11 @@ export class WocMarketService {
 
   async browse(q: WocBrowseQuery): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
     if (!this.cfg.enabled) return { rows: [], hasMore: false };
-    return this.deps.db.browseListings(this.cfg.realm, q);
+    // Viewer-identical per query tuple (the SQL excludes directed listings and
+    // carries nothing viewer-scoped), so the page is shared through the read
+    // cache; listingView's `mine` is computed per request over the shared rows.
+    const refresh = () => this.deps.db.browseListings(this.cfg.realm, q);
+    return this.deps.readCache ? this.deps.readCache.browse(q, refresh) : refresh();
   }
 
   /**
@@ -1502,7 +1442,13 @@ export class WocMarketService {
     viewerAccount: number | null,
   ): Promise<{ listing: WocListingRow; estimate: WocEstimate | null } | null> {
     if (!this.cfg.enabled) return null;
-    const listing = await this.deps.db.listingById(this.cfg.realm, id);
+    // The ROW is shared through the read cache; the directed-sale party gate
+    // below runs per request over it, so a warm cache never widens who sees a
+    // directed listing (the cache-key anti-enumeration rule).
+    const rowRefresh = () => this.deps.db.listingById(this.cfg.realm, id);
+    const listing = await (this.deps.readCache
+      ? this.deps.readCache.listingRow(id, rowRefresh)
+      : rowRefresh());
     if (!listing) return null;
     if (listing.directedBuyerAccount !== null) {
       const isParty =
@@ -1530,21 +1476,42 @@ export class WocMarketService {
     termsAcceptedAtMs: number | null;
     wallet: string | null;
   }> {
+    const refresh = () => this.myActivityUncached(account);
+    return this.deps.readCache ? this.deps.readCache.myActivity(account, refresh) : refresh();
+  }
+
+  /** SEQUENTIAL on purpose, never Promise.all: each db read is its own
+   *  implicit pool checkout, so a six-way fan-out held six of the shared
+   *  pool's ten clients per request (H11). One at a time, one request can
+   *  never hold more than one client; the pool-hold bound is pinned by a
+   *  counting test. */
+  private async myActivityUncached(account: number): Promise<{
+    listings: WocListingRow[];
+    bids: WocActivityBidRow[];
+    settlements: WocActivitySettlementRow[];
+    strikes: WocStrikeRow | null;
+    termsAcceptedAtMs: number | null;
+    wallet: string | null;
+  }> {
     const realm = this.cfg.realm;
-    const [listings, bids, settlements, strikes, termsAcceptedAtMs, wallet] = await Promise.all([
-      this.deps.db.listingsBySeller(realm, account),
-      this.deps.db.bidsByAccount(realm, account, 50),
-      this.deps.db.settlementsByAccount(realm, account, 50),
-      this.deps.db.strikeInfo(account),
-      this.deps.db.termsAcceptedAt(account),
-      this.deps.verifiedWallet(account),
-    ]);
+    const listings = await this.deps.db.listingsBySeller(realm, account);
+    const bids = await this.deps.db.bidsByAccount(realm, account, 50);
+    const settlements = await this.deps.db.settlementsByAccount(realm, account, 50);
+    const strikes = await this.deps.db.strikeInfo(account);
+    const termsAcceptedAtMs = await this.deps.db.termsAcceptedAt(account);
+    const wallet = await this.deps.verifiedWallet(account);
     return { listings, bids, settlements, strikes, termsAcceptedAtMs, wallet };
   }
 
   async salesHistory(itemId: string, limit = 20): Promise<WocSaleRow[]> {
     if (!this.cfg.enabled) return [];
-    return this.deps.db.salesForItem(this.cfg.realm, itemId, limit);
+    const refresh = () => this.deps.db.salesForItem(this.cfg.realm, itemId, limit);
+    // Keyed by item alone: every route caller uses the default limit, and a
+    // non-default limit (none exists today) must bypass rather than poison
+    // the shared key.
+    return this.deps.readCache && limit === 20
+      ? this.deps.readCache.sales(itemId, refresh)
+      : refresh();
   }
 
   // -------------------------------------------------------------------------
@@ -2660,7 +2627,7 @@ export class WocMarketService {
       // not re-anchor on a fresh clock, or it holds the close at now plus
       // the extension continuously to the cap for free.
       if (confirmed.reason === WOC_MARKET_LEDGER_MATCHED_REASON) await extend(anchorMs);
-      this.notePendingVerdict(confirmed.reason);
+      this.driftWarn.notePending(confirmed.reason);
       // The verbatim service word rides the ok-shape for the route layer to
       // screen: the player deserves to know WHICH pending this is.
       return { ok: true, standing: false, pending: true, reason: confirmed.reason };
@@ -2669,7 +2636,7 @@ export class WocMarketService {
     // drops the word and lapseBid records no reason, so unlike a settlement
     // row there is no verbatim column an operator could query after the
     // fact. The sighting line is the only trace.
-    this.noteFailVerdict(confirmed.reason);
+    this.driftWarn.noteFail(confirmed.reason);
     return refuse('confirm_failed');
   }
 
@@ -2725,7 +2692,7 @@ export class WocMarketService {
         const confirmed = await this.deps.economy
           .confirm(bid.bondReference, bid.bondSignature)
           .catch(() => null);
-        if (confirmed?.pending) this.notePendingVerdict(confirmed.reason);
+        if (confirmed?.pending) this.driftWarn.notePending(confirmed.reason);
         if (!confirmed || confirmed.pending) {
           // Undecided. YOUNG bonds (inside the park window, the normal
           // finality span) keep the full poll cadence; a bond the chain
@@ -2777,7 +2744,7 @@ export class WocMarketService {
           // burns one confirm RPC forever, the exact starvation the park
           // mechanism exists to prevent. The refusal word leaves no row
           // behind on this leg, so the drift channel is its only trace.
-          this.noteFailVerdict(confirmed.reason);
+          this.driftWarn.noteFail(confirmed.reason);
           const lapsed = await this.deps.db.lapseBid(bid.id);
           if (!lapsed) {
             this.parkedBondPolls.set(bid.id, nowMs + WocMarketService.PARK_RETRY_MS);
@@ -3087,10 +3054,10 @@ export class WocMarketService {
     // The verbatim service word rides the ok-shape for the route layer to
     // screen (same contract as the bond leg's pending arm).
     if (confirmed.pending) {
-      this.notePendingVerdict(confirmed.reason);
+      this.driftWarn.notePending(confirmed.reason);
       return { ok: true, state: 'confirming', reason: confirmed.reason };
     }
-    this.noteFailVerdict(confirmed.reason);
+    this.driftWarn.noteFail(confirmed.reason);
     await this.deps.db.transitionSettlement(
       settlement.id,
       ['confirming'],
@@ -3160,84 +3127,179 @@ export class WocMarketService {
   // The sweep pass (called by woc_market_sweep.ts on its own clock)
   // -------------------------------------------------------------------------
 
-  async sweepPass(): Promise<WocSweepPassStats | null> {
+  /**
+   * One pass's ordered plan, for the sweep shell to bracket with the
+   * per-realm advisory lock SEGMENT BY SEGMENT instead of camping a pool
+   * client and the lock across the whole pass (H11: the two chain-poll arms
+   * alone can walk 2 x SWEEP_BATCH confirm round trips at the 60s confirm
+   * timeout).
+   *
+   * Segment contract:
+   * - `locked: true` segments are the database arms; the shell holds the
+   *   advisory lock (and its one pool client) only for that segment's
+   *   bounded batches, releasing both between segments.
+   * - `locked: false` segments make CHAIN calls and run with NO pool client
+   *   and NO advisory lock. Safe under a concurrent peer (the deploy-overlap
+   *   window) because every write they make is a single-winner CAS over the
+   *   row's own state (transitionSettlement's state guard, holdBondAndActivate,
+   *   the guarded lapse, setBondState's from-state list) and the service-side
+   *   refund/forfeit/confirm calls are idempotent by reference; a peer racing
+   *   the same row costs at most a duplicate read-only round trip.
+   * - Progress persists BETWEEN segments by construction: every arm commits
+   *   its row transitions per row, so an aborted pass (lost lock, shutdown)
+   *   resumes from durable state on the next pass.
+   *
+   * Arm ORDER is the load-bearing part and is unchanged from the one-block
+   * pass this replaces; the ordering comments ride the arms below.
+   * finish() fires the per-pass reporting exactly once with whatever ran
+   * (unrun arms score 0, which can never read as saturated).
+   */
+  sweepSegments(): {
+    segments: ReadonlyArray<{ name: string; locked: boolean; run(): Promise<void> }>;
+    finish(): WocSweepPassStats;
+  } | null {
+    if (!this.cfg.enabled) return null;
     // Contention and park accounting are SCOPED to this pass: the eager
     // confirm entry mints its own scope, so a request thread can neither
     // clobber a pass mid-flight nor inherit a finished pass's verdict (a
     // shared field raced both ways).
     const scope: WocDeliveryScope = { contended: false, parked: 0 };
-    if (!this.cfg.enabled) return null;
     const nowMs = this.now();
+    const stats: WocSweepPassStats = {
+      lapsedBids: 0,
+      expiredOffers: 0,
+      convergedOffers: 0,
+      reclaimed: 0,
+      closed: 0,
+      reviewed: 0,
+      expired: 0,
+      cancelClosed: 0,
+      polled: 0,
+      polledBonds: 0,
+      delivered: 0,
+      reconciled: 0,
+      redriven: 0,
+      disposed: 0,
+      returned: 0,
+      parked: 0,
+      bonds: 0,
+    };
     // Every arm runs through arm(): one failing arm (or one poisoned row
     // inside an arm's own loop) is reported to onSweepError and the REST of
     // the pass still runs. Without this, a single throw skipped every later
-    // arm of the pass, and the new sale-dedupe index makes a throw here
+    // arm of the pass, and the sale-dedupe index makes a throw here
     // strictly more likely than it used to be.
-    const stats: WocSweepPassStats = {
-      lapsedBids: await this.arm('lapsedBids', () =>
-        this.deps.db.lapsePendingBids(
-          this.cfg.realm,
-          nowMs - WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000,
-          SWEEP_BATCH,
-        ),
-      ),
-      // Directed offers escrow nothing, so an unanswered one costs no custody.
-      // It still has to expire: left pending it stays visible in both players'
-      // trade windows as a deal that can never be accepted, and the retention
-      // prune only reaches resolved rows, so the table would grow forever.
-      expiredOffers: await this.arm('expiredOffers', () =>
-        this.deps.db.expireDueDirectedOffers(this.cfg.realm, nowMs, SWEEP_BATCH),
-      ),
-      // Offer housekeeping's sibling, no ordering dependency on any other
-      // arm: it touches only accepted offers with NO listing, a set the
-      // listing arms never read.
-      convergedOffers: await this.arm('convergedOffers', () => this.convergeUnstampedOffers(nowMs)),
-      reclaimed: await this.arm('reclaimed', () => this.reclaimStrandedListings(nowMs)),
-      // BEFORE the close/expiry arms on purpose: a delivered-but-unclosed
-      // listing must converge to its finished sale before anything else can
-      // misread it as resolvable. Minute-scale (REDRIVE_INTERVAL_MS): the arm
-      // converges an OLDER binary's residue, so an every-pass run bought
-      // nothing but query load; counts rows ADVANCED, not rows examined.
-      redriven: await this.arm('redriven', () => this.redriveDeliveredTails(nowMs, scope)),
-      // The sibling residue class, its own arm so a throw here can never
-      // discard the page walk's count (and vice versa); shares the minute
-      // cadence and honors a contended pass.
-      disposed: await this.arm('disposed', () => this.disposeSoldResidue(nowMs, scope)),
-      closed: await this.arm('closed', () => this.closeDueAuctions(nowMs)),
-      // BEFORE the poll arm (see parkOverdueConfirming) and before
-      // cancelClosed (the abandon-recording order rule).
-      reviewed: await this.arm('reviewed', () => this.parkOverdueConfirming(nowMs)),
-      expired: await this.arm('expired', () => this.expireOverdueSettlements(nowMs)),
-      // AFTER the expiry arm on purpose: the overdue arm is the canonical
-      // abandon recorder and expires the abandoned window's settlement, so a
-      // cancel-pending listing converges in the same pass its window dies.
-      cancelClosed: await this.arm('cancelClosed', () => this.closeCancelPendingListings(nowMs)),
-      polled: await this.arm('polled', () => this.pollConfirmingSettlements()),
-      // BEFORE the lapse arm above would matter: a paid-but-undecided bond is
-      // excluded from lapsing by its signature, and this is what resolves it.
-      polledBonds: await this.arm('polledBonds', () => this.pollConfirmingBonds()),
-      delivered: await this.arm('delivered', () => this.deliverConfirmedSettlements(nowMs, scope)),
-      reconciled: await this.arm('reconciled', () => this.reconcileDelivering(nowMs, scope)),
-      returned: await this.arm('returned', () => this.returnUndisposedItems(nowMs, scope)),
-      // Evaluated AFTER the three arms above (object literals evaluate in
-      // source order), so it sees every park event of this pass. New park
-      // EVENTS only: a row skipped inside its backoff window counts nothing,
-      // so a standing parked set cannot flood this the way counting parked
-      // rows as delivered once flooded the saturation warning.
-      parked: scope.parked,
-      bonds: await this.arm('bonds', () => this.processDueBonds()),
+    const runArm = async (name: keyof WocSweepPassStats, run: () => Promise<number>) => {
+      stats[name] = await this.arm(name, run);
     };
-    // A FULL batch means the arm did not drain: that is the one signal that
-    // separates a healthy idle marketplace from a permanently starved backlog,
-    // so it is reported rather than left to look identical. The delivery arms
-    // count rows ADVANCED; park events ride their own stat so a parked-only
-    // pass still reads as work without turning the saturation warning into a
-    // permanent 5-second flood.
-    const saturated = Object.entries(stats)
-      .filter(([, n]) => n >= SWEEP_BATCH)
-      .map(([arm]) => arm);
-    this.deps.onSweepPass?.(stats, saturated, this.now() - nowMs);
-    return stats;
+    const segments = [
+      {
+        name: 'expiry',
+        locked: true,
+        run: async () => {
+          await runArm('lapsedBids', () =>
+            this.deps.db.lapsePendingBids(
+              this.cfg.realm,
+              nowMs - WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000,
+              SWEEP_BATCH,
+            ),
+          );
+          // Directed offers escrow nothing, so an unanswered one costs no
+          // custody. It still has to expire: left pending it stays visible in
+          // both players' trade windows as a deal that can never be accepted,
+          // and the retention prune only reaches resolved rows, so the table
+          // would grow forever.
+          await runArm('expiredOffers', () =>
+            this.deps.db.expireDueDirectedOffers(this.cfg.realm, nowMs, SWEEP_BATCH),
+          );
+          // Offer housekeeping's sibling, no ordering dependency on any other
+          // arm: it touches only accepted offers with NO listing, a set the
+          // listing arms never read.
+          await runArm('convergedOffers', () => this.convergeUnstampedOffers(nowMs));
+          await runArm('reclaimed', () => this.reclaimStrandedListings(nowMs));
+          // BEFORE the close/expiry arms on purpose: a delivered-but-unclosed
+          // listing must converge to its finished sale before anything else
+          // can misread it as resolvable. Minute-scale (REDRIVE_INTERVAL_MS):
+          // the arm converges an OLDER binary's residue, so an every-pass run
+          // bought nothing but query load; counts rows ADVANCED, not rows
+          // examined.
+          await runArm('redriven', () => this.redriveDeliveredTails(nowMs, scope));
+          // The sibling residue class, its own arm so a throw here can never
+          // discard the page walk's count (and vice versa); shares the minute
+          // cadence and honors a contended pass.
+          await runArm('disposed', () => this.disposeSoldResidue(nowMs, scope));
+          await runArm('closed', () => this.closeDueAuctions(nowMs));
+          // BEFORE the poll arm (see parkOverdueConfirming) and before
+          // cancelClosed (the abandon-recording order rule).
+          await runArm('reviewed', () => this.parkOverdueConfirming(nowMs));
+          await runArm('expired', () => this.expireOverdueSettlements(nowMs));
+          // AFTER the expiry arm on purpose: the overdue arm is the canonical
+          // abandon recorder and expires the abandoned window's settlement, so
+          // a cancel-pending listing converges in the same pass its window
+          // dies.
+          await runArm('cancelClosed', () => this.closeCancelPendingListings(nowMs));
+        },
+      },
+      {
+        name: 'chain-polls',
+        locked: false,
+        run: async () => {
+          await runArm('polled', () => this.pollConfirmingSettlements());
+          // BEFORE the lapse arm above would matter: a paid-but-undecided
+          // bond is excluded from lapsing by its signature, and this is what
+          // resolves it.
+          await runArm('polledBonds', () => this.pollConfirmingBonds());
+        },
+      },
+      {
+        name: 'delivery',
+        locked: true,
+        run: async () => {
+          await runArm('delivered', () => this.deliverConfirmedSettlements(nowMs, scope));
+          await runArm('reconciled', () => this.reconcileDelivering(nowMs, scope));
+          await runArm('returned', () => this.returnUndisposedItems(nowMs, scope));
+        },
+      },
+      {
+        name: 'bond-payouts',
+        locked: false,
+        run: async () => {
+          await runArm('bonds', () => this.processDueBonds());
+        },
+      },
+    ];
+    return {
+      segments,
+      finish: (): WocSweepPassStats => {
+        // Read AFTER the delivery segment, so it sees every park event of
+        // this pass. New park EVENTS only: a row skipped inside its backoff
+        // window counts nothing, so a standing parked set cannot flood this
+        // the way counting parked rows as delivered once flooded the
+        // saturation warning.
+        stats.parked = scope.parked;
+        // A FULL batch means the arm did not drain: that is the one signal
+        // that separates a healthy idle marketplace from a permanently
+        // starved backlog, so it is reported rather than left to look
+        // identical. The delivery arms count rows ADVANCED; park events ride
+        // their own stat so a parked-only pass still reads as work without
+        // turning the saturation warning into a permanent 5-second flood.
+        const saturated = Object.entries(stats)
+          .filter(([, n]) => n >= SWEEP_BATCH)
+          .map(([arm]) => arm);
+        this.deps.onSweepPass?.(stats, saturated, this.now() - nowMs);
+        return stats;
+      },
+    };
+  }
+
+  /** The whole pass in one call: the segment plan run back to back with no
+   *  locking (the shell owns locks; tests and the eager pokes come through
+   *  here). Behavior and stats are byte-identical to the segmented run. */
+  async sweepPass(): Promise<WocSweepPassStats | null> {
+    const plan = this.sweepSegments();
+    if (!plan) return null;
+    for (const segment of plan.segments) await segment.run();
+    return plan.finish();
   }
 
   /** Per-arm error isolation: report the failure and score 0 for this pass;
@@ -3783,12 +3845,12 @@ export class WocMarketService {
         const confirmed = await this.deps.economy
           .confirm(settlement.quoteReference, settlement.txSignature)
           .catch(() => null);
-        if (confirmed?.pending) this.notePendingVerdict(confirmed.reason);
+        if (confirmed?.pending) this.driftWarn.notePending(confirmed.reason);
         if (!confirmed || confirmed.pending) continue;
         if (confirmed.settled) {
           await this.deps.db.transitionSettlement(settlement.id, ['confirming'], 'confirmed');
         } else {
-          this.noteFailVerdict(confirmed.reason);
+          this.driftWarn.noteFail(confirmed.reason);
           await this.deps.db.transitionSettlement(
             settlement.id,
             ['confirming'],

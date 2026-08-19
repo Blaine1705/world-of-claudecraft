@@ -1,5 +1,6 @@
-// The $WOC Exchange sweep shell (server/woc_market_sweep.ts): the timing and
-// locking wrapper around WocMarketService.sweepPass. Modeled on
+// The $WOC Exchange sweep shell (server/woc_market_sweep.ts): the timing,
+// locking, and watchdog wrapper around the segment plan
+// WocMarketService.sweepSegments builds. Modeled on
 // tests/retention_sweep.test.ts, which pins the sibling sweep's identical
 // hazards.
 //
@@ -9,6 +10,13 @@
 // never close, settlement windows never expire, and escrowed items never fly
 // home, all while the process looks healthy. The module claims distinctness in
 // prose; this asserts it.
+//
+// Why the per-segment shape matters (H11): the old shell held ONE pool client
+// and the session advisory lock across the whole pass, which the chain-poll
+// arms can stretch to tens of minutes against a hung economy service. The
+// pins here are the new contract: a locked segment brackets its own
+// checkout/lock/unlock/release, an UNLOCKED (chain) segment runs with no
+// client checked out at all, and a lost try-lock stands the pass down.
 
 import { describe, expect, it, vi } from 'vitest';
 import { RETENTION_SWEEP_ADVISORY_LOCK_KEY } from '../server/retention_sweep';
@@ -17,6 +25,8 @@ import {
   WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
   WOC_MARKET_SWEEP_POLL_MS,
   type WocMarketSweepLockClient,
+  type WocMarketSweepPassPlan,
+  type WocMarketSweepSegment,
 } from '../server/woc_market_sweep';
 
 const REALM = 'Claudemoon';
@@ -52,6 +62,12 @@ function fakeClient(
   };
 }
 
+/** A one-segment plan (the single-locked-segment shape most lock tests need). */
+function planOf(segments: WocMarketSweepSegment[], finish: () => void = () => {}) {
+  const plan: WocMarketSweepPassPlan = { segments, finish };
+  return plan;
+}
+
 describe('the advisory lock key', () => {
   it('is the literal WOC\\x03 key and collides with neither sibling lock', () => {
     // Pinned to the literal, not to itself: the whole point is that these three
@@ -71,18 +87,19 @@ describe('the advisory lock key', () => {
   });
 });
 
-describe('one guarded pass', () => {
-  it('takes the per-realm lock, runs the pass, then unlocks and pools the client', async () => {
+describe('one guarded pass over the segment plan', () => {
+  it('brackets a locked segment with lock and unlock, then pools the client', async () => {
     const client = fakeClient();
-    const pass = vi.fn(async () => {});
+    const run = vi.fn(async () => {});
+    const finish = vi.fn();
     const sweep = createWocMarketSweep({
       realm: REALM,
       connect: async () => client,
-      pass,
+      plan: () => planOf([{ name: 'expiry', locked: true, run }], finish),
       onError: () => {},
     });
     await sweep.runOnce();
-    expect(pass).toHaveBeenCalledTimes(1);
+    expect(run).toHaveBeenCalledTimes(1);
     expect(client.queries[0].sql).toContain('pg_try_advisory_lock');
     // Both lock statements carry the key AND the realm, so two realms never
     // serialize against each other.
@@ -91,42 +108,165 @@ describe('one guarded pass', () => {
     expect(client.queries[1].params).toEqual([WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY, REALM]);
     // Healthy pass: the client goes back to the pool, never destroyed.
     expect(client.releases).toEqual([undefined]);
+    expect(finish).toHaveBeenCalledTimes(1);
   });
 
-  it('skips the pass entirely when a peer holds the realm lock', async () => {
-    const client = fakeClient({ lockOk: false });
-    const pass = vi.fn(async () => {});
+  it('runs an UNLOCKED (chain) segment with no client checked out at all', async () => {
+    let connects = 0;
+    const order: string[] = [];
     const sweep = createWocMarketSweep({
       realm: REALM,
-      connect: async () => client,
-      pass,
+      connect: async () => {
+        connects++;
+        order.push('connect');
+        return fakeClient();
+      },
+      plan: () =>
+        planOf([
+          {
+            name: 'chain-polls',
+            locked: false,
+            run: async () => {
+              order.push('chain');
+            },
+          },
+        ]),
       onError: () => {},
     });
     await sweep.runOnce();
-    expect(pass).not.toHaveBeenCalled();
-    // No unlock: this process never held the lock.
-    expect(client.queries.map((q) => q.sql).join()).not.toContain('pg_advisory_unlock');
-    expect(client.releases).toEqual([undefined]);
+    // The decisive shape: a chain segment costs ZERO pool checkouts, so a
+    // hung economy service can no longer camp a shared-pool client.
+    expect(connects).toBe(0);
+    expect(order).toEqual(['chain']);
   });
 
-  it('still unlocks and releases when the pass throws, and reports the error', async () => {
-    const client = fakeClient();
-    const onError = vi.fn();
-    const boom = new Error('pass exploded');
+  it('releases the locked segment BEFORE the chain segment runs, and re-locks after', async () => {
+    const order: string[] = [];
+    const clients: FakeClient[] = [];
+    const sweep = createWocMarketSweep({
+      realm: REALM,
+      connect: async () => {
+        const c = fakeClient();
+        clients.push(c);
+        const release = c.release.bind(c);
+        c.release = (destroy?: boolean) => {
+          order.push('release');
+          release(destroy);
+        };
+        return c;
+      },
+      plan: () =>
+        planOf([
+          {
+            name: 'expiry',
+            locked: true,
+            run: async () => {
+              order.push('db-1');
+            },
+          },
+          {
+            name: 'chain-polls',
+            locked: false,
+            run: async () => {
+              order.push('chain');
+            },
+          },
+          {
+            name: 'delivery',
+            locked: true,
+            run: async () => {
+              order.push('db-2');
+            },
+          },
+        ]),
+      onError: () => {},
+    });
+    await sweep.runOnce();
+    // The pass never holds a client across the chain segment: the first
+    // locked segment's client is RELEASED before the chain work starts, and
+    // the second locked segment checks out (and releases) its own.
+    expect(order).toEqual(['db-1', 'release', 'chain', 'db-2', 'release']);
+    expect(clients).toHaveLength(2);
+    for (const c of clients) {
+      expect(c.queries.map((q) => q.sql).filter((sql) => sql.includes('advisory'))).toHaveLength(2);
+    }
+  });
+
+  it('stands the whole pass down when a peer holds the realm lock, finish still fires', async () => {
+    const client = fakeClient({ lockOk: false });
+    const db = vi.fn(async () => {});
+    const chain = vi.fn(async () => {});
+    const finish = vi.fn();
     const sweep = createWocMarketSweep({
       realm: REALM,
       connect: async () => client,
-      pass: async () => {
-        throw boom;
+      plan: () =>
+        planOf(
+          [
+            { name: 'expiry', locked: true, run: db },
+            { name: 'chain-polls', locked: false, run: chain },
+          ],
+          finish,
+        ),
+      onError: () => {},
+    });
+    await sweep.runOnce();
+    expect(db).not.toHaveBeenCalled();
+    // The peer holding the lock IS this realm's sweep: the chain arms stand
+    // down with the rest rather than interleaving with it.
+    expect(chain).not.toHaveBeenCalled();
+    // No unlock: this process never held the lock.
+    expect(client.queries.map((q) => q.sql).join()).not.toContain('pg_advisory_unlock');
+    expect(client.releases).toEqual([undefined]);
+    // The pass still reports (zero-scored arms can never read as saturated).
+    expect(finish).toHaveBeenCalledTimes(1);
+  });
+
+  it('a null plan (market disabled) does nothing', async () => {
+    let connects = 0;
+    const sweep = createWocMarketSweep({
+      realm: REALM,
+      connect: async () => {
+        connects++;
+        return fakeClient();
       },
+      plan: () => null,
+      onError: () => {},
+    });
+    await sweep.runOnce();
+    expect(connects).toBe(0);
+  });
+
+  it('still unlocks and releases when a segment throws, reports the error, and finish fires', async () => {
+    const client = fakeClient();
+    const onError = vi.fn();
+    const finish = vi.fn();
+    const boom = new Error('segment exploded');
+    const sweep = createWocMarketSweep({
+      realm: REALM,
+      connect: async () => client,
+      plan: () =>
+        planOf(
+          [
+            {
+              name: 'expiry',
+              locked: true,
+              run: async () => {
+                throw boom;
+              },
+            },
+          ],
+          finish,
+        ),
       onError,
     });
     await sweep.runOnce();
-    // A thrown pass must not leak the lock: the next pass has to be able to
+    // A thrown segment must not leak the lock: the next pass has to be able to
     // take it, or this realm's sweep is dead until the connection dies.
     expect(client.queries[1].sql).toContain('pg_advisory_unlock');
     expect(client.releases).toEqual([undefined]);
     expect(onError).toHaveBeenCalledWith(boom);
+    expect(finish).toHaveBeenCalledTimes(1);
   });
 
   it('DESTROYS the client when the lock query itself fails', async () => {
@@ -135,7 +275,7 @@ describe('one guarded pass', () => {
     const sweep = createWocMarketSweep({
       realm: REALM,
       connect: async () => client,
-      pass: async () => {},
+      plan: () => planOf([{ name: 'expiry', locked: true, run: async () => {} }]),
       onError,
     });
     await sweep.runOnce();
@@ -147,17 +287,47 @@ describe('one guarded pass', () => {
 
   it('DESTROYS the client when the unlock query fails', async () => {
     const client = fakeClient({ unlockThrows: true });
-    const pass = vi.fn(async () => {});
+    const run = vi.fn(async () => {});
     const sweep = createWocMarketSweep({
       realm: REALM,
       connect: async () => client,
-      pass,
+      plan: () => planOf([{ name: 'expiry', locked: true, run }]),
       onError: () => {},
     });
     await sweep.runOnce();
-    expect(pass).toHaveBeenCalledTimes(1);
-    // The pass succeeded but the lock may still be held: same hazard, same fix.
+    expect(run).toHaveBeenCalledTimes(1);
+    // The segment succeeded but the lock may still be held: same hazard, same fix.
     expect(client.releases).toEqual([true]);
+  });
+
+  it('stamps the watchdog: begin, each segment by name, end (end even on a throw)', async () => {
+    const stamps: string[] = [];
+    const watchdog = {
+      begin: () => stamps.push('begin'),
+      segment: (name: string) => stamps.push(`segment:${name}`),
+      end: () => stamps.push('end'),
+    };
+    const sweep = createWocMarketSweep({
+      realm: REALM,
+      connect: async () => fakeClient(),
+      plan: () =>
+        planOf([
+          { name: 'expiry', locked: true, run: async () => {} },
+          {
+            name: 'chain-polls',
+            locked: false,
+            run: async () => {
+              throw new Error('mid-pass');
+            },
+          },
+        ]),
+      onError: () => {},
+      watchdog,
+    });
+    await sweep.runOnce();
+    // end fires from the finally: a thrown pass must never leave the watchdog
+    // reporting a phantom still-running pass forever.
+    expect(stamps).toEqual(['begin', 'segment:expiry', 'segment:chain-polls', 'end']);
   });
 });
 
@@ -167,11 +337,11 @@ describe('re-entrancy and shutdown', () => {
     const gate = new Promise<void>((resolve) => {
       release = resolve;
     });
-    // Counted on CONNECT, not on pass: the guard rejects the second call the
-    // moment the first is in flight, which is before the first has awaited its
-    // way to pass(). Asserting on pass would race the pass's own startup.
+    // Counted on CONNECT, not on the segment body: the guard rejects the
+    // second call the moment the first is in flight, which is before the
+    // first has awaited its way into a segment.
     let connects = 0;
-    const pass = vi.fn(async () => {
+    const run = vi.fn(async () => {
       await gate;
     });
     const sweep = createWocMarketSweep({
@@ -180,7 +350,7 @@ describe('re-entrancy and shutdown', () => {
         connects++;
         return fakeClient();
       },
-      pass,
+      plan: () => planOf([{ name: 'expiry', locked: true, run }]),
       onError: () => {},
     });
     const first = sweep.runOnce();
@@ -190,42 +360,57 @@ describe('re-entrancy and shutdown', () => {
     await first;
     // And the rejected call never queued: no second pass runs on drain.
     expect(connects).toBe(1);
-    expect(pass).toHaveBeenCalledTimes(1);
+    expect(run).toHaveBeenCalledTimes(1);
   });
 
-  it('stop() awaits the in-flight pass and refuses every later one', async () => {
+  it('stop() awaits the in-flight segment and skips the remaining segments', async () => {
     let release!: () => void;
     const gate = new Promise<void>((resolve) => {
       release = resolve;
     });
     let finished = false;
-    const pass = vi.fn(async () => {
-      await gate;
-      finished = true;
-    });
+    const later = vi.fn(async () => {});
+    const finish = vi.fn();
     const sweep = createWocMarketSweep({
       realm: REALM,
       connect: async () => fakeClient(),
-      pass,
+      plan: () =>
+        planOf(
+          [
+            {
+              name: 'expiry',
+              locked: true,
+              run: async () => {
+                await gate;
+                finished = true;
+              },
+            },
+            { name: 'chain-polls', locked: false, run: later },
+          ],
+          finish,
+        ),
       onError: () => {},
     });
     const first = sweep.runOnce();
     const stopping = sweep.stop();
     release();
     await stopping;
-    // stop() must not resolve before the pass it is draining: the pool closes
-    // right after it in main.ts's shutdown.
+    // stop() must not resolve before the segment it is draining: the pool
+    // closes right after it in main.ts's shutdown. But the NEXT segment never
+    // starts: shutdown does not wait out chain round trips it can skip.
     expect(finished).toBe(true);
     await first;
+    expect(later).not.toHaveBeenCalled();
+    expect(finish).toHaveBeenCalledTimes(1);
     await sweep.runOnce();
-    expect(pass).toHaveBeenCalledTimes(1);
+    expect(later).not.toHaveBeenCalled();
   });
 
   it('start() arms an unref-ed timer and stop() clears it', async () => {
     const sweep = createWocMarketSweep({
       realm: REALM,
       connect: async () => fakeClient(),
-      pass: async () => {},
+      plan: () => planOf([]),
       onError: () => {},
       pollMs: 50,
     });

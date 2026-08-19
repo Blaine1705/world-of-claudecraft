@@ -227,6 +227,17 @@ const MONOLITHS: MonolithRow[] = [
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
+    // Entered the ratchet with the hot-path-scale work, alongside the
+    // drift-warn extraction (woc_market_drift_warn.ts) that paid for the
+    // sweep segment plan; the read caches, price cache, and watchdog are
+    // already sibling modules. Zero headroom: the next growth owes the next
+    // extraction (guardStepUp/issueStepUpChallenge and the delivery arms are
+    // the standing candidates).
+    file: 'server/woc_market.ts',
+    ceiling: 4470,
+    seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
+  },
+  {
     file: 'src/render/foliage.ts',
     ceiling: 4147,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',

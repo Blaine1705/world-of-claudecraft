@@ -774,8 +774,18 @@ describe('response wrappers expose exactly their pinned key sets', () => {
         'allowMechChromas',
         'settlementWindowSeconds',
         'directedHoldSeconds',
+        'bond',
       ].sort(),
     );
+    // The bond schedule and payment window, exactly the rules constants: the
+    // client's disclosure copy resolves live figures from these instead of
+    // shipping figure-free sentences, so a silent retune must red here.
+    expect(body.bond).toEqual({
+      rateBps: 500,
+      minCents: 100,
+      maxCents: 5000,
+      pendingTtlSeconds: 300,
+    });
     // The p2p hold rides as the rules constant, a positive number of seconds
     // (the trade arm's commitment note renders it through durationText).
     expect(body.directedHoldSeconds).toBe(WOC_MARKET_DIRECTED_HOLD_SECONDS);

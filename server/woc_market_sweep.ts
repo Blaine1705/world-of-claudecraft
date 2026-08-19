@@ -1,17 +1,35 @@
-// Self-clocked $WOC Exchange sweep: the timing shell around
-// WocMarketService.sweepPass() (auction closes, settlement expiry and
-// cascades, delivery and return reconciliation, bond refunds/forfeits). The
-// pass itself is idempotent and batch-bounded, so this shell only owns the
-// clock, the re-entrancy guard, the per-realm advisory lock, and stop().
+// Self-clocked $WOC Exchange sweep: the timing shell around the segment plan
+// WocMarketService.sweepSegments() builds (auction closes, settlement expiry
+// and cascades, delivery and return reconciliation, bond refunds/forfeits).
+// The arms themselves are idempotent and batch-bounded, so this shell only
+// owns the clock, the re-entrancy guard, the per-realm advisory lock, the
+// duration watchdog stamps, and stop().
 //
-// Locking: realm processes share one database, and a realm may be restarted
-// side by side during a deploy, so each pass takes the two-int session
-// advisory lock (WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY, hashtext(realm)) and a
-// loser simply skips its pass; the peer holding the lock IS this realm's
-// sweep. Distinct-key cross-reference: db.ts boot DDL holds "WOC\x01"
-// (0x57_4f_43_01), retention_sweep.ts holds "WOC\x02" (0x57_4f_43_02); this
-// key is "WOC\x03" in the int4 space of the two-arg lock family, so the three
-// can never collide.
+// Locking (H11): the lock and its pool client are held PER LOCKED SEGMENT,
+// never across the pass. The old shape checked out one client and held the
+// session advisory lock across the whole pass body, which the two chain-poll
+// arms can stretch to 2 x SWEEP_BATCH confirm round trips at the 60s confirm
+// timeout: a hung economy service camped a shared-pool client and the lock
+// for tens of minutes while every peer lost the try-lock. Now:
+// - a `locked` segment (the database arms) brackets its bounded batches with
+//   checkout + try-lock and unlock + release;
+// - an UNLOCKED segment (the chain arms) runs with NO pool client and NO
+//   advisory lock at all; its writes are single-winner CAS transitions (see
+//   sweepSegments' contract), so a concurrent peer costs duplicate reads,
+//   never duplicate effects;
+// - a LOST try-lock aborts the rest of the pass (the peer holding the lock
+//   IS this realm's sweep, exactly the old whole-pass semantic, now judged
+//   at each locked segment);
+// - progress persists between segments in the rows themselves, so an aborted
+//   pass resumes from durable state on the next poll.
+//
+// Locking mechanics: realm processes share one database, and a realm may be
+// restarted side by side during a deploy, so each locked segment takes the
+// two-int session advisory lock (WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
+// hashtext(realm)). Distinct-key cross-reference: db.ts boot DDL holds
+// "WOC\x01" (0x57_4f_43_01), retention_sweep.ts holds "WOC\x02"
+// (0x57_4f_43_02); this key is "WOC\x03" in the int4 space of the two-arg
+// lock family, so the three can never collide.
 //
 // Unlike the nightly retention sweep this polls every few seconds: auction
 // ends and settlement windows are minute-scale deadlines, and every arm it
@@ -25,13 +43,36 @@ export interface WocMarketSweepLockClient {
   release(destroy?: boolean): void;
 }
 
+/** One ordered slice of a pass (WocMarketService.sweepSegments builds them). */
+export interface WocMarketSweepSegment {
+  name: string;
+  /** Bracket this segment with the advisory lock (and its one client). An
+   *  unlocked segment runs with no client checked out at all. */
+  locked: boolean;
+  run(): Promise<void>;
+}
+
+export interface WocMarketSweepPassPlan {
+  segments: ReadonlyArray<WocMarketSweepSegment>;
+  /** Per-pass reporting; the shell calls it exactly once, aborted or not. */
+  finish(): unknown;
+}
+
+/** The watchdog stamps the shell feeds (woc_market_sweep_watchdog.ts). */
+export interface WocMarketSweepWatchdogStamps {
+  begin(): void;
+  segment(name: string): void;
+  end(): void;
+}
+
 export interface WocMarketSweepDeps {
   realm: string;
-  /** One pool checkout per pass, held only for the lock lifetime. */
+  /** One pool checkout per LOCKED SEGMENT, held only for that segment. */
   connect(): Promise<WocMarketSweepLockClient>;
-  /** The whole pass body (WocMarketService.sweepPass). */
-  pass(): Promise<void>;
+  /** Build one pass's ordered plan; null when the market is disabled. */
+  plan(): WocMarketSweepPassPlan | null;
   onError(err: unknown): void;
+  watchdog?: WocMarketSweepWatchdogStamps;
   pollMs?: number;
 }
 
@@ -47,14 +88,16 @@ export function createWocMarketSweep(deps: WocMarketSweepDeps): WocMarketSweep {
   let running: Promise<void> | null = null;
   let stopped = false;
 
-  async function guardedPass(): Promise<void> {
+  /** Run one segment under the advisory lock: checkout, try-lock, run,
+   *  unlock, release. 'lost' means a peer holds the realm's lock. */
+  async function lockedRun(run: () => Promise<void>): Promise<'ran' | 'lost'> {
     const client = await deps.connect();
     // Poisoned-lock hazard (the retention_sweep.ts rationale, verbatim): a
     // client whose lock or unlock query failed may still hold the SESSION
     // advisory lock, and a pooled connection lives for hours. While it sits in
-    // the pool the lock stays taken and every future pass for this realm loses
-    // the try-lock, so the marketplace silently stops closing auctions and
-    // expiring settlements. Both arms destroy the connection instead of
+    // the pool the lock stays taken and every future segment for this realm
+    // loses the try-lock, so the marketplace silently stops closing auctions
+    // and expiring settlements. Both arms destroy the connection instead of
     // pooling it: ending the backend session drops its locks.
     let destroyClient = false;
     try {
@@ -69,9 +112,9 @@ export function createWocMarketSweep(deps: WocMarketSweepDeps): WocMarketSweep {
         destroyClient = true;
         throw err;
       }
-      if (!acquired) return; // a peer is sweeping this realm
+      if (!acquired) return 'lost';
       try {
-        await deps.pass();
+        await run();
       } finally {
         try {
           await client.query('SELECT pg_advisory_unlock($1, hashtext($2))', [
@@ -82,8 +125,36 @@ export function createWocMarketSweep(deps: WocMarketSweepDeps): WocMarketSweep {
           destroyClient = true;
         }
       }
+      return 'ran';
     } finally {
       client.release(destroyClient || undefined);
+    }
+  }
+
+  async function guardedPass(): Promise<void> {
+    const plan = deps.plan();
+    if (!plan) return;
+    deps.watchdog?.begin();
+    try {
+      for (const segment of plan.segments) {
+        // A stop() ends the pass at the next segment boundary: shutdown must
+        // not wait out an unlocked segment's chain round trips.
+        if (stopped) break;
+        deps.watchdog?.segment(segment.name);
+        if (segment.locked) {
+          const outcome = await lockedRun(segment.run);
+          // A peer holding the lock IS this realm's sweep: it will run the
+          // remaining arms itself, so this pass stands down entirely rather
+          // than interleaving.
+          if (outcome === 'lost') break;
+        } else {
+          // Chain calls: no client checked out, no lock held (see header).
+          await segment.run();
+        }
+      }
+    } finally {
+      deps.watchdog?.end();
+      plan.finish();
     }
   }
 

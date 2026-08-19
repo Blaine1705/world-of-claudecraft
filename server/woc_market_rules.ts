@@ -204,17 +204,23 @@ export const WOC_MARKET_WIRE_FAIL_REASONS = [
 /** The stable stand-in for any reason outside the pinned vocabularies. */
 export const WOC_MARKET_WIRE_REASON_OTHER = 'other';
 
-const WIRE_PENDING_SET: ReadonlySet<string> = new Set(WOC_MARKET_WIRE_PENDING_REASONS);
-const WIRE_FAIL_SET: ReadonlySet<string> = new Set(WOC_MARKET_WIRE_FAIL_REASONS);
+/** The two screened vocabularies as Sets, EXPORTED so every judge of
+ *  membership (the wire screens below AND the drift-warn channel in
+ *  woc_market_drift_warn.ts) shares these exact instances: a second
+ *  hand-built set was how the two judges could drift apart. */
+export const WOC_MARKET_WIRE_PENDING_SET: ReadonlySet<string> = new Set(
+  WOC_MARKET_WIRE_PENDING_REASONS,
+);
+export const WOC_MARKET_WIRE_FAIL_SET: ReadonlySet<string> = new Set(WOC_MARKET_WIRE_FAIL_REASONS);
 
 export function screenWirePendingReason(reason: string | null): string | null {
   if (reason === null) return null;
-  return WIRE_PENDING_SET.has(reason) ? reason : WOC_MARKET_WIRE_REASON_OTHER;
+  return WOC_MARKET_WIRE_PENDING_SET.has(reason) ? reason : WOC_MARKET_WIRE_REASON_OTHER;
 }
 
 export function screenWireFailReason(reason: string | null): string | null {
   if (reason === null) return null;
-  return WIRE_FAIL_SET.has(reason) ? reason : WOC_MARKET_WIRE_REASON_OTHER;
+  return WOC_MARKET_WIRE_FAIL_SET.has(reason) ? reason : WOC_MARKET_WIRE_REASON_OTHER;
 }
 
 /**

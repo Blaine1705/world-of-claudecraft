@@ -28,6 +28,7 @@
 // It is wired ONLY when ALLOW_DEV_COMMANDS=1 AND WOC_MARKET_DEV_SERVICE=1
 // (main.ts), the dev-cheat gating precedent; production never sees it.
 
+import { KeyedCachedRead } from './cached_read';
 import type {
   WocEstimate,
   WocEstimateSplit,
@@ -35,6 +36,7 @@ import type {
   WocPriceInfo,
   WocQuoteIntent,
 } from './woc_market';
+import { createWocPriceCache } from './woc_market_price_cache';
 import {
   bondCents,
   WOC_MARKET_CONFIRM_UNAVAILABLE_REASON,
@@ -44,8 +46,13 @@ import {
 const SERVICE_TIMEOUT_MS = 5000;
 const CONFIRM_TIMEOUT_MS = 60_000;
 /** Estimates and price reads are cached briefly: browse/bid-form traffic must
- *  never turn into a per-request service call storm. */
-const PRICE_CACHE_TTL_MS = 15_000;
+ *  never turn into a per-request service call storm. The price ride the
+ *  purposed cache (woc_market_price_cache.ts: single-flight, short failure
+ *  memo, bounded stale-while-revalidate); estimates ride the shared keyed
+ *  cache (single-flight per amount, LRU bound). An UNAVAILABLE estimate is
+ *  deliberately cached for the full TTL like a success: it is the typed
+ *  degradation answer, and re-probing it per read during an outage is the
+ *  storm the cache exists to prevent. */
 const ESTIMATE_CACHE_TTL_MS = 15_000;
 const ESTIMATE_CACHE_MAX_ENTRIES = 256;
 
@@ -234,52 +241,52 @@ function toQuote(wire: WireQuote | null): WocQuoteIntent {
 }
 
 export function createWocMarketEconomyProxy(): WocMarketEconomy {
-  let priceCache: { at: number; value: WocPriceInfo } | null = null;
-  const estimateCache = new Map<number, { at: number; value: WocEstimate }>();
-
-  return {
-    async price(): Promise<WocPriceInfo> {
-      const now = Date.now();
-      if (priceCache && now - priceCache.at < PRICE_CACHE_TTL_MS) return priceCache.value;
+  // available:false means the TRANSPORT failed (env unset, unreachable,
+  // non-2xx, timeout): that is the failure the short memo bounds. A reachable
+  // service answering healthy:false is a SUCCESS (its truthful paused answer)
+  // and caches for the full TTL like any other.
+  const priceCache = createWocPriceCache<WocPriceInfo>(
+    async () => {
       const wire = await callService<WirePrice>({ method: 'GET', path: 'price' });
-      const value: WocPriceInfo = wire
-        ? {
-            available: true,
-            healthy: wire.healthy === true,
-            reason: wire.reason ?? null,
-            tokensPerUsd: wire.tokensPerUsd ?? null,
-            asOfMs: wire.asOfMs ?? null,
-          }
-        : PRICE_UNAVAILABLE;
-      priceCache = { at: now, value };
-      return value;
+      if (!wire) return PRICE_UNAVAILABLE;
+      return {
+        available: true,
+        healthy: wire.healthy === true,
+        reason: wire.reason ?? null,
+        tokensPerUsd: wire.tokensPerUsd ?? null,
+        asOfMs: wire.asOfMs ?? null,
+      };
     },
+    { isFailure: (value) => !value.available },
+  );
 
-    async estimate(usdCents: number): Promise<WocEstimate> {
-      const now = Date.now();
-      const hit = estimateCache.get(usdCents);
-      if (hit && now - hit.at < ESTIMATE_CACHE_TTL_MS) return hit.value;
+  const estimateCache = new KeyedCachedRead<WocEstimate>(
+    async (usdCents) => {
       const wire = await callService<WireEstimate>({
         method: 'POST',
         path: 'estimate',
         body: { usdCents },
       });
-      const value: WocEstimate =
-        wire && wire.ok === true
-          ? {
-              available: true,
-              usdCents,
-              amount: leg(wire.amount),
-              asOfMs: wire.asOfMs ?? null,
-              split: estimateSplit(wire.split, usdCents),
-            }
-          : { available: false, usdCents, amount: null, asOfMs: null, split: null };
-      if (estimateCache.size >= ESTIMATE_CACHE_MAX_ENTRIES) {
-        const oldest = estimateCache.keys().next().value;
-        if (oldest !== undefined) estimateCache.delete(oldest);
-      }
-      estimateCache.set(usdCents, { at: now, value });
-      return value;
+      return wire && wire.ok === true
+        ? {
+            available: true,
+            usdCents,
+            amount: leg(wire.amount),
+            asOfMs: wire.asOfMs ?? null,
+            split: estimateSplit(wire.split, usdCents),
+          }
+        : { available: false, usdCents, amount: null, asOfMs: null, split: null };
+    },
+    { ttlMs: ESTIMATE_CACHE_TTL_MS, maxEntries: ESTIMATE_CACHE_MAX_ENTRIES },
+  );
+
+  return {
+    price(): Promise<WocPriceInfo> {
+      return priceCache.read();
+    },
+
+    estimate(usdCents: number): Promise<WocEstimate> {
+      return estimateCache.read(usdCents);
     },
 
     async bondQuote(args): Promise<WocQuoteIntent> {

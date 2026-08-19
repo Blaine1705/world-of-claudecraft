@@ -51,11 +51,16 @@ import type {
   WocSettlementRow,
   WocStrikeRow,
 } from './woc_market';
+import type { WocMarketReadCache } from './woc_market_read_cache';
 import {
   bondCents,
   minNextBidCents,
   screenWireFailReason,
   screenWirePendingReason,
+  WOC_MARKET_BOND_MAX_CENTS,
+  WOC_MARKET_BOND_MIN_CENTS,
+  WOC_MARKET_BOND_PENDING_TTL_SECONDS,
+  WOC_MARKET_BOND_RATE_BPS,
   WOC_MARKET_DIRECTED_HOLD_SECONDS,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_PRICE_CENTS,
@@ -131,6 +136,12 @@ export function wocMarketConfig(): WocMarketConfig {
 
 export interface WocMarketRuntime {
   service: WocMarketService;
+  /** The hot-read cache the service reads through (H11). The SAME instance
+   *  main.ts hands the service as deps.readCache; the mutation handlers here
+   *  own the busts (a stale-forever cache on a money surface is worse than
+   *  no cache). Absent in rigs that install a bare fake service, in which
+   *  case the service reads uncached and there is nothing to bust. */
+  readCache?: WocMarketReadCache;
 }
 
 let runtime: WocMarketRuntime | null = null;
@@ -148,6 +159,10 @@ function useService(): WocMarketService {
     throw new Error('woc_market runtime is not configured; call configureWocMarketRuntime');
   }
   return runtime.service;
+}
+
+function readCache(): WocMarketReadCache | null {
+  return runtime?.readCache ?? null;
 }
 
 // ---------------------------------------------------------------------------
@@ -522,6 +537,18 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     // The directed (p2p) payment hold, so the trade arm's commitment note can
     // name the deadline whose lapse earns a strike instead of a guessed one.
     directedHoldSeconds: WOC_MARKET_DIRECTED_HOLD_SECONDS,
+    // The bond schedule and the bond payment window, so the client's
+    // disclosure copy resolves live figures instead of shipping figure-free
+    // sentences (the copy-figures follow-up). These are this server's mirror
+    // of the service rule, the same mirror that already prices
+    // minNextBidBondCents on every listing view; the service-computed figure
+    // still arrives on each quote and is the one the player pays.
+    bond: {
+      rateBps: WOC_MARKET_BOND_RATE_BPS,
+      minCents: WOC_MARKET_BOND_MIN_CENTS,
+      maxCents: WOC_MARKET_BOND_MAX_CENTS,
+      pendingTtlSeconds: WOC_MARKET_BOND_PENDING_TTL_SECONDS,
+    },
   });
 }
 
@@ -674,12 +701,18 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
     },
   });
   if (!out.ok) throwRefusal(out);
+  // A new listing changes the browse surface for everyone and the seller's
+  // own activity readout; the cached copies must not outlive the mutation.
+  readCache()?.bustListings();
+  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, { listing: listingView(out.listing, ctxAccountId(ctx)) });
 }
 
 async function cancelListingHandler(ctx: Ctx): Promise<void> {
   const out = await useService().cancelListing(ctxAccountId(ctx), idParam(ctx));
   if (!out.ok) throwRefusal(out);
+  readCache()?.bustListings();
+  readCache()?.bustMe(ctxAccountId(ctx));
   // cancelPending: the cancel was ACCEPTED as intent on a locked listing (no
   // new claims or bids; it closes when the current window ends unpaid).
   json(ctx.res, 200, out.cancelPending === true ? { ok: true, cancelPending: true } : { ok: true });
@@ -695,18 +728,23 @@ async function placeBidHandler(ctx: Ctx): Promise<void> {
     acceptTerms: body.acceptTerms === true,
   });
   if (!out.ok) throwRefusal(out);
+  readCache()?.bustListings();
+  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, { bid: bidView(out.bid), bond: quoteView(out.bond) });
 }
 
 async function bondQuoteHandler(ctx: Ctx): Promise<void> {
   const out = await useService().refreshBondQuote(ctxAccountId(ctx), idParam(ctx));
   if (!out.ok) throwRefusal(out);
+  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, { bond: quoteView(out.bond) });
 }
 
 async function abandonBidHandler(ctx: Ctx): Promise<void> {
   const out = await useService().abandonBid(ctxAccountId(ctx), idParam(ctx));
   if (!out.ok) throwRefusal(out);
+  readCache()?.bustListings();
+  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, { abandoned: true });
 }
 
@@ -718,6 +756,10 @@ async function confirmBondHandler(ctx: Ctx): Promise<void> {
     signatureField(body.signature),
   );
   if (!out.ok) throwRefusal(out);
+  // Activation (or a recorded payment) moves the listing's current bid and
+  // the bidder's own rows.
+  readCache()?.bustListings();
+  readCache()?.bustMe(ctxAccountId(ctx));
   // `pending` is the honest third answer: paid, but the chain has not decided.
   // Collapsing it into standing:false would read as "outbid" to the client.
   // The screened reason says WHICH pending: the ledger saw the payment
@@ -738,6 +780,8 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
     acceptTerms: body.acceptTerms === true,
   });
   if (!out.ok) throwRefusal(out);
+  readCache()?.bustListings();
+  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, {
     settlement: settlementView(out.settlement),
     quote: quoteView(out.quote),
@@ -747,6 +791,7 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
 async function settlementQuoteHandler(ctx: Ctx): Promise<void> {
   const out = await useService().settlementQuote(ctxAccountId(ctx), idParam(ctx));
   if (!out.ok) throwRefusal(out);
+  readCache()?.bustMe(ctxAccountId(ctx));
   json(ctx.res, 200, { quote: quoteView(out.quote) });
 }
 
@@ -758,6 +803,8 @@ async function confirmSettlementHandler(ctx: Ctx): Promise<void> {
     signatureField(body.signature),
   );
   if (!out.ok) throwRefusal(out);
+  readCache()?.bustListings();
+  readCache()?.bustMe(ctxAccountId(ctx));
   // Same contract as the bond leg: a confirming state names its screened
   // pending verdict; every decided state answers null.
   json(ctx.res, 200, { state: out.state, reason: screenWirePendingReason(out.reason ?? null) });
@@ -822,6 +869,8 @@ async function adminSuspendListingHandler(ctx: Ctx): Promise<void> {
     if (out.reason === 'contended') throw new HttpError(409, 'woc_market.contended');
     throw new HttpError(404, 'woc_market.not_found');
   }
+  // Moderation MUST bust, never wait out a TTL (the cached-read rule).
+  readCache()?.bustListings();
   json(ctx.res, 200, { success: true, data: { suspended: true } });
 }
 
@@ -839,11 +888,16 @@ async function adminSaleExcludedHandler(ctx: Ctx): Promise<void> {
     if (out.reason === 'sale_conflict') throw new HttpError(409, 'woc_market.sale_conflict');
     throw new HttpError(404, 'woc_market.not_found');
   }
+  // Moderation bust; the arm knows only the sale id, so the whole history
+  // map drops (rare, and enforcement must not wait out the TTL).
+  readCache()?.bustHistoryAll();
   json(ctx.res, 200, { success: true, data: { excluded: body.excluded } });
 }
 
 async function adminClearStrikesHandler(ctx: Ctx): Promise<void> {
   await useService().adminClearStrikes(adminTargetId(ctx));
+  // Moderation bust: the target's activity readout carries the strike row.
+  readCache()?.bustMe(adminTargetId(ctx));
   json(ctx.res, 200, { success: true, data: { cleared: true } });
 }
 
@@ -986,6 +1040,10 @@ async function acceptOfferHandler(ctx: Ctx): Promise<void> {
     optionalStepUp(body.stepUp),
   );
   if (!out.ok) throwRefusal(out);
+  // Acceptance can escrow a listing (the directed rail's consummation) and
+  // moves both parties' activity readouts.
+  readCache()?.bustListings();
+  readCache()?.bustMe(viewer);
   // A null listing means "agreed, still waiting on the other side": the deal is
   // live but nothing has escrowed, and the client must not treat it as done.
   json(ctx.res, 200, {
@@ -1071,24 +1129,30 @@ export const routes: RouteDef[] = [
     handler: withdrawOfferHandler,
   },
   {
+    // The five hot GETs below all carry the shared read limiter (H11): every
+    // one is a client-triggerable read, and an unmetered read is sustainable
+    // at whatever rate a client cares to send. Their costs are bounded by the
+    // caches behind them (the proxy price cache for status, the read cache
+    // for browse/detail/me/history), so the limiter is the flood ceiling,
+    // not the cost model.
     method: 'GET',
     path: '/api/woc-market/status',
     surface: 'api',
-    middleware: [readAccount],
+    middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     handler: statusHandler,
   },
   {
     method: 'GET',
     path: '/api/woc-market/listings',
     surface: 'api',
-    middleware: [readAccount],
+    middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     handler: browseHandler,
   },
   {
     method: 'GET',
     path: '/api/woc-market/listings/:id',
     surface: 'api',
-    middleware: [readAccount],
+    middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     meta: NO_OWNER,
     handler: listingDetailHandler,
   },
@@ -1103,14 +1167,14 @@ export const routes: RouteDef[] = [
     method: 'GET',
     path: '/api/woc-market/me',
     surface: 'api',
-    middleware: [readAccount],
+    middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     handler: myActivityHandler,
   },
   {
     method: 'GET',
     path: '/api/woc-market/history/:itemId',
     surface: 'api',
-    middleware: [readAccount],
+    middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     meta: NO_OWNER,
     handler: historyHandler,
   },

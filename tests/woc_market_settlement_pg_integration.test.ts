@@ -1473,4 +1473,120 @@ describeDb('woc market settlement guards against real Postgres', () => {
       expect(named.get(plate), 'the correlated listing lookup, row 2').toBe('deathlord_warplate');
     });
   });
+
+  // -------------------------------------------------------------------------
+  // H11 hot-path scale guards: the chain arms' single-winner exclusion (what
+  // replaces the whole-pass advisory lock for the unlocked sweep segments)
+  // and the activity fan-out's one-pool-client bound, both against real
+  // Postgres.
+  // -------------------------------------------------------------------------
+
+  describe('hot-path scale guards', () => {
+    it('two concurrent sweepers cannot double-confirm one settlement (the chain-arm CAS)', async () => {
+      const realm = 'guard-h11-poll-cas';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const settlement = await seedSettlement(realm, listingId, buyer, { state: 'confirming' });
+      // The chain-polls segment runs UNLOCKED now, so the deploy-overlap case
+      // is two processes reaching the same verdict write together. The
+      // from-state CAS is the exclusion: exactly one wins, and the loser's
+      // EvalPlanQual re-check sees the moved row rather than re-applying.
+      const [a, b] = await Promise.all([
+        marketDb.transitionSettlement(settlement.id, ['confirming'], 'confirmed'),
+        marketDb.transitionSettlement(settlement.id, ['confirming'], 'confirmed'),
+      ]);
+      expect([a, b].filter(Boolean)).toHaveLength(1);
+      expect((await settlementRow(settlement.id)).state).toBe('confirmed');
+    });
+
+    it('two concurrent sweepers race a bond payout write to exactly one winner', async () => {
+      const realm = 'guard-h11-bond-cas';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const bidId = await seedBid(realm, listingId, buyer, {
+        status: 'outbid',
+        bondState: 'refund_due',
+        bondReference: 'woc_bond:h11-cas',
+      });
+      const [a, b] = await Promise.all([
+        marketDb.setBondState(bidId, ['refund_due'], 'refunded'),
+        marketDb.setBondState(bidId, ['refund_due'], 'refunded'),
+      ]);
+      expect([a, b].filter(Boolean)).toHaveLength(1);
+    });
+
+    it('the activity readout holds at most ONE pool client at a time (counted at the pool)', async () => {
+      const realm = 'guard-h11-me-pool';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      await seedBid(realm, listingId, buyer, {});
+      await seedSettlement(realm, listingId, buyer, { state: 'offered' });
+      // A dedicated two-client pool plus a gauge over query(): the six-way
+      // Promise.all this replaces held up to six clients per request, so the
+      // decisive assertion is the PEAK, not the outcome (the phase file's
+      // "the test must count held clients, not just pass functionally").
+      const gaugePool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 2 });
+      let inFlight = 0;
+      let peak = 0;
+      const counting = {
+        query: async (...args: unknown[]) => {
+          inFlight++;
+          peak = Math.max(peak, inFlight);
+          try {
+            return await (gaugePool.query as (...a: unknown[]) => Promise<unknown>)(...args);
+          } finally {
+            inFlight--;
+          }
+        },
+        connect: () => gaugePool.connect(),
+      };
+      const marketDbMod = await import('../server/woc_market_db');
+      const countingDb = new marketDbMod.PgWocMarketDb(counting as unknown as Pool);
+      const service = new marketMod.WocMarketService({
+        db: countingDb,
+        economy: proxyMod.createDevWocMarketEconomy(() => BASE_MS),
+        custody: {
+          runSerialized: () => {
+            throw new Error('custody not exercised');
+          },
+          ownsLiveCharacter: () => true,
+          escrowSessionLost: () => {},
+          extractCopy: () => {
+            throw new Error('custody not exercised');
+          },
+          grantCopy: () => {
+            throw new Error('custody not exercised');
+          },
+          snapshotCopy: () => {
+            throw new Error('custody not exercised');
+          },
+          restoreCopy: () => {},
+          persistMailParcel: async () => {},
+          hasParcel: () => false,
+        },
+        verifiedWallet: async () => 'wallet-fixture',
+        balanceTokens: async () => 1_000_000,
+        stepUpDevSig: true,
+        config: {
+          enabled: true,
+          realm,
+          policy: rulesMod.WOC_MARKET_RESTRICTED_POLICY,
+          confirmingReviewMs: 6 * 3600 * 1000,
+        },
+        now: () => BASE_MS,
+      });
+      try {
+        const activity = await service.myActivity(buyer);
+        // The reads really ran (rows came back), one at a time.
+        expect(activity.bids).toHaveLength(1);
+        expect(activity.settlements).toHaveLength(1);
+        expect(peak).toBe(1);
+      } finally {
+        await gaugePool.end().catch(() => {});
+      }
+    });
+  });
 });

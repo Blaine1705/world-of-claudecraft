@@ -386,8 +386,10 @@ import {
 } from './woc_market_db';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
+import { WocMarketReadCache } from './woc_market_read_cache';
 import { configureWocMarketRuntime, wocMarketConfig } from './woc_market_routes';
 import { createWocMarketSweep } from './woc_market_sweep';
+import { createWocMarketSweepWatchdog } from './woc_market_sweep_watchdog';
 import { createWsAuth } from './ws_auth';
 import { bufferHandshakeMessages } from './ws_buffer';
 
@@ -2784,9 +2786,13 @@ const wocMarketEconomy = wocMarketDevService
   ? createDevWocMarketEconomy()
   : createWocMarketEconomyProxy();
 const wocMarketDb = new PgWocMarketDb(pool);
+// The hot-read cache (H11): the service reads through it; the route layer's
+// mutation handlers bust it. ONE instance wired to both, or busts would miss.
+const wocMarketReadCache = new WocMarketReadCache();
 const wocMarketService = new WocMarketService({
   db: wocMarketDb,
   economy: wocMarketEconomy,
+  readCache: wocMarketReadCache,
   // The step-up devsig arm rides the SAME double-gated switch as the dev
   // economy: impossible to reach in production, and one truth for "dev".
   stepUpDevSig: wocMarketDevService,
@@ -2828,10 +2834,16 @@ const wocMarketService = new WocMarketService({
   // default prints the identical line, and wiring a byte-identical copy here
   // meant every format tweak had to land in two places.
 });
-configureWocMarketRuntime({ service: wocMarketService });
+configureWocMarketRuntime({ service: wocMarketService, readCache: wocMarketReadCache });
 // The dashboard's read-only ops views. Injected here so internal.ts never
 // imports the market route module (and admin/account behind it).
 configureInternalWocMarketReads(wocMarketService);
+// The sweep duration watchdog: mid-flight visibility for a camping pass
+// (constructed here so the ops readout below can serve it; the sweep shell
+// stamps it once constructed after listen).
+const wocMarketSweepWatchdog = createWocMarketSweepWatchdog({
+  log: (line) => console.warn(line),
+});
 // The stuck-custody monitor: one cached read serving both the secret-gated
 // ops endpoint and the periodic log line below (started after listen).
 const wocMarketMonitor = createWocMarketMonitor({
@@ -2842,7 +2854,13 @@ const wocMarketMonitor = createWocMarketMonitor({
   // confirming settlements, so the two H15 surfaces share one policy.
   bondStuckAgeMs: wocMarketConfig().confirmingReviewMs,
 });
-configureInternalWocMarketStuckRead(() => wocMarketMonitor.read());
+// The ops surface serves the monitor's cached custody readout PLUS the sweep
+// watchdog's in-process health (a camping pass is visible in the same place
+// as the parked custody it would starve).
+configureInternalWocMarketStuckRead(async () => ({
+  ...(await wocMarketMonitor.read()),
+  sweep: wocMarketSweepWatchdog.readout(),
+}));
 
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
 // but cannot import without a cycle: the live IP-block gate off the GameServer, the
@@ -3623,10 +3641,9 @@ export async function startServer(): Promise<http.Server> {
   const wocMarketSweep = createWocMarketSweep({
     realm: REALM,
     connect: () => pool.connect(),
-    pass: async () => {
-      await wocMarketService.sweepPass();
-    },
+    plan: () => wocMarketService.sweepSegments(),
     onError: (err) => console.error('[woc_market] sweep pass failed:', err),
+    watchdog: wocMarketSweepWatchdog,
   });
   if (wocMarketConfig().enabled) wocMarketSweep.start();
   // The stuck-custody log beat starts even when the marketplace is DISABLED:

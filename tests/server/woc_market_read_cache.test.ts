@@ -1,0 +1,201 @@
+// The marketplace hot-read cache (server/woc_market_read_cache.ts): TTL,
+// single-flight, key isolation, bust semantics, and the shared-value freeze.
+// The clock is injected; no timers or sleeps anywhere.
+
+import { describe, expect, it, vi } from 'vitest';
+import type { WocBrowseQuery } from '../../server/woc_market';
+import {
+  WOC_MARKET_BROWSE_CACHE_TTL_MS,
+  WOC_MARKET_ME_CACHE_TTL_MS,
+  WocMarketReadCache,
+  wocBrowseCacheKey,
+} from '../../server/woc_market_read_cache';
+
+const Q: WocBrowseQuery = {
+  page: 0,
+  pageSize: 25,
+  quality: null,
+  format: null,
+  itemIds: null,
+  sort: 'ending',
+};
+
+function rig() {
+  let clock = 9_000_000;
+  const cache = new WocMarketReadCache({ now: () => clock });
+  return {
+    cache,
+    advance: (ms: number) => {
+      clock += ms;
+    },
+  };
+}
+
+function deferred<T>() {
+  let resolve!: (v: T) => void;
+  const promise = new Promise<T>((r) => {
+    resolve = r;
+  });
+  return { promise, resolve };
+}
+
+describe('the browse cache key', () => {
+  it('is canonical per query tuple and distinguishes every field', () => {
+    const base = wocBrowseCacheKey(Q);
+    expect(wocBrowseCacheKey({ ...Q })).toBe(base);
+    // Each field moves the key on its own: a collision on any one of these
+    // would serve one filter's page under another filter.
+    expect(wocBrowseCacheKey({ ...Q, page: 1 })).not.toBe(base);
+    expect(wocBrowseCacheKey({ ...Q, pageSize: 26 })).not.toBe(base);
+    expect(wocBrowseCacheKey({ ...Q, sort: 'newest' })).not.toBe(base);
+    expect(wocBrowseCacheKey({ ...Q, quality: 'epic' })).not.toBe(base);
+    expect(wocBrowseCacheKey({ ...Q, format: 'auction' })).not.toBe(base);
+    expect(wocBrowseCacheKey({ ...Q, itemIds: ['sunblade'] })).not.toBe(base);
+    // Absent-vs-empty itemIds share one key on purpose (both mean "no
+    // filter" to the SQL); a one-id list does not collide with a two-id one.
+    expect(wocBrowseCacheKey({ ...Q, itemIds: ['a', 'b'] })).not.toBe(
+      wocBrowseCacheKey({ ...Q, itemIds: ['a'] }),
+    );
+  });
+});
+
+describe('read-through behavior', () => {
+  it('serves a browse page from cache inside the TTL and refreshes past it', async () => {
+    const r = rig();
+    const refresh = vi.fn(async () => ({ rows: [{ id: 1 }], hasMore: false }));
+    const first = await r.cache.browse(Q, refresh);
+    r.advance(WOC_MARKET_BROWSE_CACHE_TTL_MS - 1);
+    const second = await r.cache.browse(Q, refresh);
+    expect(refresh).toHaveBeenCalledTimes(1);
+    // The SAME object: shared, which is why it is frozen (below).
+    expect(second).toBe(first);
+    r.advance(2);
+    await r.cache.browse(Q, refresh);
+    expect(refresh).toHaveBeenCalledTimes(2);
+  });
+
+  it('single-flights a concurrent burst into one refresh (the burst proof)', async () => {
+    const r = rig();
+    const gate = deferred<{ rows: unknown[]; hasMore: boolean }>();
+    const refresh = vi.fn(() => gate.promise);
+    const reads = [
+      r.cache.browse(Q, refresh),
+      r.cache.browse(Q, refresh),
+      r.cache.browse(Q, refresh),
+    ];
+    expect(refresh).toHaveBeenCalledTimes(1);
+    gate.resolve({ rows: [], hasMore: false });
+    const values = await Promise.all(reads);
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(values[1]).toBe(values[0]);
+    expect(values[2]).toBe(values[0]);
+  });
+
+  it('keys the activity readout BY ACCOUNT: two accounts never share an entry', async () => {
+    const r = rig();
+    const forA = vi.fn(async () => ({ listings: [], bids: [{ id: 'a' }] }));
+    const forB = vi.fn(async () => ({ listings: [], bids: [{ id: 'b' }] }));
+    const a = await r.cache.myActivity(7, forA);
+    const b = await r.cache.myActivity(8, forB);
+    expect(a).not.toBe(b);
+    expect((a.bids[0] as { id: string }).id).toBe('a');
+    expect((b.bids[0] as { id: string }).id).toBe('b');
+    // And a warm read for A still answers A.
+    expect(await r.cache.myActivity(7, forB)).toBe(a);
+    expect(forB).toHaveBeenCalledTimes(1);
+  });
+
+  it('keys history by item id without cross-item leaks', async () => {
+    const r = rig();
+    const sunblade = await r.cache.sales('sunblade', async () => [{ id: 1 }]);
+    const dawnaxe = await r.cache.sales('dawnaxe', async () => [{ id: 2 }]);
+    expect(sunblade).not.toBe(dawnaxe);
+    expect(await r.cache.sales('sunblade', async () => [{ id: 3 }])).toBe(sunblade);
+  });
+
+  it('freezes the shared value one level deep (result, arrays, rows)', async () => {
+    const r = rig();
+    const page = await r.cache.browse(Q, async () => ({
+      rows: [{ id: 1, status: 'active' }],
+      hasMore: false,
+    }));
+    expect(Object.isFrozen(page)).toBe(true);
+    expect(Object.isFrozen(page.rows)).toBe(true);
+    expect(Object.isFrozen(page.rows[0])).toBe(true);
+    // A consumer's in-place edit throws under strict mode instead of
+    // corrupting every other caller's copy for the rest of the TTL.
+    expect(() => {
+      (page.rows as unknown[]).push({ id: 2 });
+    }).toThrow();
+  });
+});
+
+describe('busts', () => {
+  it('bustListings drops browse pages AND listing rows, immediately', async () => {
+    const r = rig();
+    let generation = 1;
+    const browseRefresh = vi.fn(async () => ({ rows: [{ generation }], hasMore: false }));
+    const rowRefresh = vi.fn(async () => ({ id: 4, generation }));
+    await r.cache.browse(Q, browseRefresh);
+    await r.cache.listingRow(4, rowRefresh);
+    generation = 2;
+    r.cache.bustListings();
+    // No clock advance: the bust alone must expose the mutation (a TTL-only
+    // cache on a money surface is the defect the busts exist to close).
+    const page = await r.cache.browse(Q, browseRefresh);
+    const row = await r.cache.listingRow(4, rowRefresh);
+    expect((page.rows[0] as { generation: number }).generation).toBe(2);
+    expect((row as { generation: number }).generation).toBe(2);
+  });
+
+  it('bustMe drops exactly the named account', async () => {
+    const r = rig();
+    let generation = 1;
+    const refresh = vi.fn(async () => ({ generation }));
+    await r.cache.myActivity(7, refresh);
+    await r.cache.myActivity(8, refresh);
+    generation = 2;
+    r.cache.bustMe(7);
+    expect((await r.cache.myActivity(7, refresh)).generation).toBe(2);
+    // Account 8 keeps its cached readout: the bust is scoped.
+    expect((await r.cache.myActivity(8, refresh)).generation).toBe(1);
+  });
+
+  it('bustHistory drops one item; bustHistoryAll drops the map', async () => {
+    const r = rig();
+    let generation = 1;
+    const refresh = vi.fn(async () => [{ generation }]);
+    await r.cache.sales('sunblade', refresh);
+    await r.cache.sales('dawnaxe', refresh);
+    generation = 2;
+    r.cache.bustHistory('sunblade');
+    expect((await r.cache.sales('sunblade', refresh))[0]?.generation).toBe(2);
+    expect((await r.cache.sales('dawnaxe', refresh))[0]?.generation).toBe(1);
+    generation = 3;
+    r.cache.bustHistoryAll();
+    expect((await r.cache.sales('dawnaxe', refresh))[0]?.generation).toBe(3);
+  });
+});
+
+describe('bounds', () => {
+  it('the activity map evicts its least-recently-read account at the cap', async () => {
+    const r = rig();
+    const refresh = vi.fn(async () => ({}));
+    // Fill past the cap; the earliest accounts fall out (LRU), so the map
+    // can never grow with the realm's whole account space.
+    for (let account = 1; account <= 513; account++) {
+      await r.cache.myActivity(account, refresh);
+    }
+    expect(r.cache.stats().me.entries).toBe(512);
+    expect(r.cache.stats().me.evictions).toBe(1);
+    // Account 1 was evicted: reading it again refreshes.
+    const calls = refresh.mock.calls.length;
+    await r.cache.myActivity(1, refresh);
+    expect(refresh.mock.calls.length).toBe(calls + 1);
+  });
+
+  it('exports the documented TTLs (at or under the cadences that already bound freshness)', () => {
+    expect(WOC_MARKET_BROWSE_CACHE_TTL_MS).toBe(3_000);
+    expect(WOC_MARKET_ME_CACHE_TTL_MS).toBe(2_000);
+  });
+});
