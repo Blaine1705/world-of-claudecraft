@@ -67,6 +67,7 @@ function rig(overrides: Partial<BlockingArrivalWarmupDeps> = {}): Rig {
       calls.push('onSettled');
     },
     setCover: (active) => calls.push(`cover:${active}`),
+    holdWorldDraw: (held) => calls.push(`worldDraw:${held ? 'held' : 'free'}`),
     awaitReveals: async (maxMs) => {
       waited.push(maxMs);
       calls.push('awaitReveals');
@@ -99,6 +100,7 @@ describe('runBlockingArrivalWarmup', () => {
     expect(r.calls).toEqual([
       'showLoadingScreen:loading.world',
       'cover:true',
+      'worldDraw:held',
       'nextPaint',
       'prepareZoneAt:120,-40',
       'progress:1/2:0-55',
@@ -111,10 +113,14 @@ describe('runBlockingArrivalWarmup', () => {
       'prewarmZoneAt:120,-40',
       'awaitReveals',
       'markGpuHitchReveal',
+      // Released before the last paint, so the frame under the lifting screen
+      // already shows the destination; released again when the chain ends.
+      'worldDraw:free',
       'percent:100',
       'nextPaint',
       'hideLoadingScreen',
       'onRevealed',
+      'worldDraw:free',
       'cover:false',
       'onSettled',
     ]);
@@ -175,6 +181,12 @@ describe('runBlockingArrivalWarmup', () => {
     expect(r.calls).not.toContain('hideLoadingScreen');
     expect(r.revealed).toBe(0);
     expect(r.settled).toBe(1);
+    // The world draw was held at the top and is released by the end, so a
+    // failed arrival never leaves the world undrawn behind the fatal overlay.
+    expect(r.calls.indexOf('worldDraw:held')).toBeGreaterThan(-1);
+    expect(r.calls.lastIndexOf('worldDraw:free')).toBeGreaterThan(
+      r.calls.indexOf('worldDraw:held'),
+    );
   });
 
   it('survives a failed prewarm and still reveals', async () => {

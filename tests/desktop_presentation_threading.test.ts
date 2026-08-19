@@ -61,15 +61,25 @@ describe('the presentation gate threading in main.ts frame()', () => {
     );
   });
 
-  it('threads gate.render as the present argument of BOTH renderer.sync call sites', () => {
+  it('threads the gate drawWorld decision as the present argument of BOTH renderer.sync call sites', () => {
     // One arm per site (joint coverage masks a deleted site): the offline and
-    // online branches each carry their own sync call ending in gate.render.
+    // online branches each carry their own sync call ending in drawWorld, a
+    // FRESH gate read taken right before the call (maybeWarmCurrentZone, earlier
+    // in the same frame, may have held the world draw for this very frame: the
+    // landing frame of a blocking arrival must not draw the destination cold).
     // (?!\)) skips the argument-less mention inside a comment; every real call
     // site passes arguments.
     const syncCalls = body.match(/renderer\.sync\((?!\))[^;]*?\);/g) ?? [];
-    const presentThreaded = syncCalls.filter((call) => /,\s*gate\.render,?\s*\)/.test(call));
+    const presentThreaded = syncCalls.filter((call) => /,\s*drawWorld,?\s*\)/.test(call));
     expect(syncCalls).toHaveLength(2);
     expect(presentThreaded).toHaveLength(2);
+    expect(body.match(/const drawWorld = presentationGate\(gateInput\)\.drawWorld;/g)).toHaveLength(
+      2,
+    );
+    // The gate input is the module's factory (its holdWorldDraw is what the
+    // blocking arrival chain receives), never a literal.
+    expect(sourceText).toContain('const gateInput = newPresentationGateInput(DESKTOP_APP);');
+    expect(sourceText).toContain('holdWorldDraw: gateInput.holdWorldDraw,');
   });
 
   it('drives the HUD non-paint head on hidden frames at BOTH call sites', () => {

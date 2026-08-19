@@ -96,6 +96,12 @@ export interface BlockingArrivalWarmupDeps {
   onRevealed: () => void;
   /** The chain is over, however it ended. */
   onSettled?: () => void;
+  /** Hold (true) or release (false) the world draw while the screen is up:
+   *  held from the landing frame, released once the reveals have settled so
+   *  the paint before the lift already shows the destination (see
+   *  presentation_gate.ts, worldDrawHeld). Released again when the chain ends,
+   *  however it ended, so a failed arrival never leaves the world undrawn. */
+  holdWorldDraw?: (held: boolean) => void;
   /** Injected by tests; defaults to the real arrival cover. */
   setCover?: (active: boolean) => void;
   awaitReveals?: (maxMs: number) => Promise<void>;
@@ -111,6 +117,7 @@ export function runBlockingArrivalWarmup(deps: BlockingArrivalWarmupDeps): Promi
   const awaitReveals = deps.awaitReveals ?? awaitRevealsDefault;
   ui.showLoadingScreen(t('loading.world'));
   setCover(true);
+  deps.holdWorldDraw?.(true);
   return (
     ui
       .nextPaint()
@@ -137,6 +144,7 @@ export function runBlockingArrivalWarmup(deps: BlockingArrivalWarmupDeps): Promi
         }
         await awaitReveals(arrivalRevealSettleMaxMs(deps.online));
         renderer.markGpuHitchReveal();
+        deps.holdWorldDraw?.(false);
       })
       .then(() => ui.setLoadingPercent(100, t('loading.enteringWorld')))
       .then(() => ui.nextPaint())
@@ -151,6 +159,7 @@ export function runBlockingArrivalWarmup(deps: BlockingArrivalWarmupDeps): Promi
         // Never leave the cover raised: it holds the GPU-prep admission on the
         // arrival rule, and a stuck flag would keep the boot-debt and
         // background lanes refused for the rest of the session.
+        deps.holdWorldDraw?.(false);
         setCover(false);
         deps.onSettled?.();
       })

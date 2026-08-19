@@ -140,7 +140,7 @@ import { padReelItemId } from './game/pad_reel';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
-import { presentationGate } from './game/presentation_gate';
+import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -3837,17 +3837,16 @@ async function startGame(
         });
       return;
     }
-    // A teleport-sized jump (rift exit, dungeon door, hearthstone) can land
-    // anywhere: keep the classic blocking loading screen instead of dropping
-    // the player into a not-yet-built void. The destination rectangle is only
-    // half of it, so the arrival NEIGHBOURHOOD streams behind the same screen
-    // on every such jump, not just a rift exit: landing near a zone border
-    // with the neighbour unprepared leaves the residency clamp holding the
-    // view at MIN_OUTDOOR_FOG_FAR long after the screen lifts.
+    // A teleport-sized jump (rift exit, dungeon door, hearthstone) can land anywhere:
+    // keep the classic blocking loading screen instead of dropping the player into a
+    // not-yet-built void. The destination rectangle is only half of it, so the arrival
+    // NEIGHBOURHOOD streams behind the same screen on every such jump, not just a rift
+    // exit: a border landing with the neighbour unprepared leaves the fog clamp held.
     const resumeInput = gameInputReady;
     gameInputReady = false;
     zoneWarmup = runBlockingArrivalWarmup({
       renderer,
+      holdWorldDraw: gateInput.holdWorldDraw,
       ui: {
         showLoadingScreen,
         setLoadingProgressRange,
@@ -4247,7 +4246,7 @@ async function startGame(
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
-  const gateInput = { hidden: false, desktopApp: DESKTOP_APP, graphicsRebuildPaused: false };
+  const gateInput = newPresentationGateInput(DESKTOP_APP);
   function frame(now: number): void {
     requestAnimationFrame(frame);
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
@@ -4449,12 +4448,13 @@ async function startGame(
         movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
-      // A hidden frame skips the draw, so timing it would dilute the renderer
-      // bucket with work that never happened.
+      // A hidden frame's draw is not timed (it never ran); the world draw is
+      // re-read here: maybeWarmCurrentZone above may have held it this frame.
       const rendererStart = gate.render ? perf.startTime() : 0;
+      const drawWorld = presentationGate(gateInput).drawWorld;
       traceStart = perf.startTrace();
       try {
-        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, gate.render);
+        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, drawWorld);
       } finally {
         perf.finishTrace(
           'renderer.sync',
@@ -4688,9 +4688,8 @@ async function startGame(
     // and the reticle is only consumed by the skipped draw (phase 4 QA F7).
     if (gate.render) syncGroundAimReticle();
     const onlineViews = renderer.views.size;
-    // A hidden frame skips the draw, so timing it would dilute the renderer
-    // bucket with work that never happened.
     const rendererStart = gate.render ? perf.startTime() : 0;
+    const drawWorld = presentationGate(gateInput).drawWorld;
     traceStart = perf.startTrace();
     try {
       renderer.sync(
@@ -4704,7 +4703,7 @@ async function startGame(
         adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
         selfMotion,
         selfAuthoritativeDiscontinuity,
-        gate.render,
+        drawWorld,
       );
     } finally {
       perf.finishTrace(
