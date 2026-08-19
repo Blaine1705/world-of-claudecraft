@@ -7198,7 +7198,7 @@ export class Renderer {
               const debt = prewarmResumeIsDebt(entry.id);
               resumeLedger.noteStart(entry.id);
               return this.backgroundGpuWork.run(
-                unit.run,
+                unit.runSerial ?? unit.run,
                 debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,
                 unit.id,
                 {

@@ -166,6 +166,39 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compiled).toEqual(['player', 'mob']);
   });
 
+  it('a batch unit also offers runSerial: the same roots one at a time, every root attempted', async () => {
+    // The live resume lane's shape: `run` launches the batch together (the
+    // boot shape), `runSerial` awaits each root before the next, so a root's
+    // second arm never fires as one continuation burst with its batch-mates.
+    const roots = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+    const order: string[] = [];
+    let inFlight = 0;
+    let overlap = 0;
+    const compile = async (root: { id: string }) => {
+      inFlight++;
+      overlap = Math.max(overlap, inFlight);
+      order.push(`start:${root.id}`);
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      order.push(`end:${root.id}`);
+      inFlight--;
+      if (root.id === 'b') throw new Error('b failed');
+    };
+    const [unit] = buildPrewarmCompileUnits([{ id: 'scene', roots }], compile, { batchSize: 3 });
+    expect(unit.id).toBe('scene:0');
+    expect(typeof unit.runSerial).toBe('function');
+
+    await expect(unit.runSerial?.()).rejects.toThrow('b failed');
+    expect(order).toEqual(['start:a', 'end:a', 'start:b', 'end:b', 'start:c', 'end:c']);
+    expect(overlap).toBe(1);
+
+    // and `run` keeps the together shape
+    order.length = 0;
+    overlap = 0;
+    await expect(unit.run()).rejects.toThrow('b failed');
+    expect(overlap).toBe(3);
+    expect(order.slice(0, 3)).toEqual(['start:a', 'start:b', 'start:c']);
+  });
+
   it('skips a root whose every dedupe key was already covered', async () => {
     // Hundreds of material-bearing leaves share programs (surfaceMat dedupes
     // materials): a root contributing no unseen key links nothing new, so it
@@ -449,9 +482,11 @@ describe('resumeDroppedPrewarmEntries', () => {
     // warmers that starved it in production) with its tail HELD so batches
     // settle serially and the driver link queue stays shallow; everything
     // else stays at BOOT_RESUME with the released tail
-    // (prewarmResumeIsDebt, prewarm_policy.ts).
+    // (prewarmResumeIsDebt, prewarm_policy.ts). The lane runs a batch unit's
+    // SERIAL arm (PrewarmResumeUnit.runSerial): the world is live here, and
+    // the together arm's second-arm continuations fired as one 3 s task.
     expect(source).toContain(
-      'return this.backgroundGpuWork.run(\n                unit.run,\n                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,\n                unit.id,',
+      'return this.backgroundGpuWork.run(\n                unit.runSerial ?? unit.run,\n                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,\n                unit.id,',
     );
     expect(source).toContain('releaseTail: !debt,');
     // The old bare `releaseTail: true,` pin drifted: after the debt-class

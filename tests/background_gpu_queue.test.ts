@@ -1389,7 +1389,7 @@ describe('createBackgroundGpuQueue', () => {
     expect(archetypes).toContain('this.backgroundGpuWork.run(');
     expect(texture).toContain('this.backgroundGpuWork.run(');
     expect(initial).toContain(
-      'return this.backgroundGpuWork.run(\n                unit.run,\n                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,\n                unit.id,',
+      'return this.backgroundGpuWork.run(\n                unit.runSerial ?? unit.run,\n                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,\n                unit.id,',
     );
     // Debt batches hold their tail (serial, settled-before-next) so the
     // driver link queue stays shallow; only cosmetic resume releases it.

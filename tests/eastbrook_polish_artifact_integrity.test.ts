@@ -802,9 +802,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // hashed leaf of the town fingerprint, so the seals follow the swept evidence
 // bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e5d323c6f25cc9ce07ec5127cb93c6461d3cc74fb69e1e1e6173ddd2e401c784';
+  '19d458b76603627d43c98bcc926e57f719913cb4cd4d871fae5fa77652aca80e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '5fa873f18458abc0f32fbd43b5e8beb92f635fad4ac52100e5adcd53db6705e8';
+  '7a355a41ed17257706ebe43f7b9e5b1eb2baa26aa50cce7ad052ef84c4176111';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1837,7 +1837,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('8d237439d9937ef266eb67bcc0e0e6922b095286e0c9e7490afda910310d86c9');
+    ).toBe('b0883fda17b90e41a737077c1b52cdb0cfe17de3cef81593ac1e6fbd0e55c4b2');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

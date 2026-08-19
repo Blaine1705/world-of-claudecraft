@@ -748,6 +748,36 @@ export async function capture(args) {
       captureId,
       scenario: scenarioName(args.mode),
     });
+    // Long tasks on the page clock, from document start: the queue's frame
+    // period and the renderer's phase timings cannot tell a main-thread task
+    // that ran BETWEEN frames from a driver stall (bench H13: multi-second
+    // frame periods around the compile-submit batch units with 11 to 22 ms of
+    // sync and no query over 53 ms). Bounded; the attribution is what the
+    // browser gives (script URL or container), never a guess.
+    await page.evaluateOnNewDocument(() => {
+      const rows = [];
+      globalThis.__wocLongTasks = rows;
+      if (typeof PerformanceObserver === 'undefined') return;
+      try {
+        new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (rows.length >= 600) return;
+            const attribution = (entry.attribution ?? []).map((a) => ({
+              name: a.name,
+              containerType: a.containerType,
+              containerSrc: a.containerSrc,
+            }));
+            rows.push({
+              startMs: Math.round(entry.startTime * 10) / 10,
+              durationMs: Math.round(entry.duration * 10) / 10,
+              attribution,
+            });
+          }
+        }).observe({ entryTypes: ['longtask'] });
+      } catch {
+        // an older Chromium without the entry type leaves the list empty
+      }
+    });
     if (args.mode === 'offline') {
       await page.goto(requestedUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 60_000 });
       await enterOfflineGame(page, {
@@ -810,6 +840,9 @@ export async function capture(args) {
     });
     raw.diagnostics.pageErrors = pageErrors;
     raw.diagnostics.renderNames = renderNames;
+    raw.diagnostics.longTasks = await page
+      .evaluate(() => globalThis.__wocLongTasks ?? [])
+      .catch(() => []);
     if (pageErrors.length > 0) raw.capture.complete = false;
     const expectedBuildId = git(['rev-parse', '--short=12', 'HEAD']);
     const expectedSourceBuildId = sourceBuildId();

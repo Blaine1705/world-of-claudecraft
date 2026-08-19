@@ -6,6 +6,17 @@
 export interface PrewarmResumeUnit {
   id: string;
   run: () => void | Promise<void>;
+  /** The same work with its roots compiled ONE AT A TIME, for a lane that runs
+   *  while the world is live. A batch unit's `run` launches its roots together
+   *  (the boot shape: their driver links overlap under the curtain), but every
+   *  root's SECOND arm (the shadow compile after its colour compile settles)
+   *  then runs as a continuation, and the roots' colour links settle in the
+   *  same poll pass, so 16 to 32 shadow prologues fire in one microtask burst:
+   *  one 3 to 3.8 s main-thread task with 11 to 22 ms of sync, measured on the
+   *  Intel iGPU resume lane (bench H14, the `scene:N` / `props:N` /
+   *  `ghost-fade-variants:N` units). Serial, each root's continuation is its
+   *  own task and frames run between them. Absent on a unit with no batch. */
+  runSerial?: () => Promise<void>;
 }
 
 export interface PrewarmResumeEntry {
@@ -231,6 +242,19 @@ export function buildPrewarmCompileUnits<T extends object>(
             (result): result is PromiseRejectedResult => result.status === 'rejected',
           );
           if (failed) throw failed.reason;
+        },
+        runSerial: async () => {
+          // Same contract, one root at a time (see PrewarmResumeUnit.runSerial):
+          // every root still gets its attempt, the first failure is rethrown.
+          let failure: { reason: unknown } | null = null;
+          for (const root of roots) {
+            try {
+              await compile(root);
+            } catch (reason) {
+              failure ??= { reason };
+            }
+          }
+          if (failure) throw failure.reason;
         },
       });
     };
