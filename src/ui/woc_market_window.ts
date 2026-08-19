@@ -662,10 +662,7 @@ export class WocMarketWindow {
     instance?: ItemInstancePayload,
   ): string {
     const icon = iconDataUrl('item', itemId);
-    // Build-time color through the shared itemNameColor family (the vendor/
-    // bags convention): Object.hasOwn inside it keeps a server-sent quality
-    // that collides with a prototype key on the fallback token instead of
-    // interpolating a function source into the style attribute.
+    // itemNameColor family (vendor/bags): hasOwn parks prototype-key qualities on the fallback.
     const color = itemNameColor({ quality });
     // The .q-<rung> frame class: the same charset guard the shared icon helper
     // applies (the quality is server-sent on the wire; an unknown rung takes
@@ -1176,14 +1173,14 @@ export class WocMarketWindow {
                 instance: r.instance,
               });
               const rung = /^[a-z]+$/.test(r.quality) ? r.quality : 'common';
+              const clr = itemNameColor({ quality: r.quality });
               return (
                 `<div class="wm-combo-item${i === active ? ' wm-combo-active' : ''}" ` +
                 `id="${listId}-o${i}" role="option" aria-selected="${i === active ? 'true' : 'false'}" ` +
                 `data-sell-index="${r.index}" data-opt="${i}">` +
                 `<img class="wm-combo-icon item-icon q-${rung}" data-tt-key="opt:${r.index}" src="${iconDataUrl('item', r.itemId)}" alt="" draggable="false" />` +
-                `<span class="wm-combo-name" style="color: ${itemNameColor({
-                  quality: r.quality,
-                })}">${esc(this.itemName(r.itemId))}</span></div>`
+                `<span class="wm-combo-name" style="color: ${clr}">` +
+                `${esc(this.itemName(r.itemId))}</span></div>`
               );
             })
             .join('');
