@@ -187,19 +187,16 @@ describe('busts', () => {
     expect((await r.cache.myActivity(8, refresh)).generation).toBe(1);
   });
 
-  it('bustHistory drops one item; bustHistoryAll drops the map', async () => {
+  it('bustHistoryAll drops the whole map (the arm knows only the sale id)', async () => {
     const r = rig();
     let generation = 1;
     const refresh = vi.fn(async () => [{ generation }]);
     await r.cache.sales('sunblade', refresh);
     await r.cache.sales('dawnaxe', refresh);
     generation = 2;
-    r.cache.bustHistory('sunblade');
-    expect((await r.cache.sales('sunblade', refresh))[0]?.generation).toBe(2);
-    expect((await r.cache.sales('dawnaxe', refresh))[0]?.generation).toBe(1);
-    generation = 3;
     r.cache.bustHistoryAll();
-    expect((await r.cache.sales('dawnaxe', refresh))[0]?.generation).toBe(3);
+    expect((await r.cache.sales('sunblade', refresh))[0]?.generation).toBe(2);
+    expect((await r.cache.sales('dawnaxe', refresh))[0]?.generation).toBe(2);
   });
 });
 

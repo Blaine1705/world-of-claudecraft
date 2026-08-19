@@ -1059,20 +1059,30 @@ describe('every guard transaction bounds its idle holds', () => {
     const src = readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/[^\n]*/g, '');
-    const txSites = src.match(/this\.withTx\(/g) ?? [];
+    // The call may carry an explicit generic (this.withTx<T>(...): the
+    // insertPendingBid contended-tail shape), so match both forms.
+    const txSites = src.match(/this\.withTx(<[^>\n]+>)?\(/g) ?? [];
     const idleBounds = src.match(/SET LOCAL idle_in_transaction_session_timeout/g) ?? [];
     expect(txSites.length).toBe(12);
     expect(idleBounds.length).toBe(txSites.length);
     // DISTRIBUTION, not just the count: a copy-paste retrofit can double one
     // site and skip another with the totals intact. Every withTx callback
     // must carry the bound near its head (the SET LOCALs open each guard).
-    const slices = src.split('this.withTx(').slice(1);
+    const slices = src.split(/this\.withTx(?:<[^>\n]+>)?\(/).slice(1);
+    expect(slices.length).toBe(12);
     for (const [i, slice] of slices.entries()) {
       expect(
         slice.slice(0, 1600).includes('SET LOCAL idle_in_transaction_session_timeout'),
         `withTx site ${i + 1} carries the idle bound near its head`,
       ).toBe(true);
     }
+    // The bound is TWO-TIER: exactly the two save-bearing transactions
+    // (escrowInsertListing, saveDeliveredCharacterBooked) carry the wider
+    // save bound, because they serialize a character blob between
+    // statements; every other guard carries the 2s bound. A site quietly
+    // switching tiers is a policy change, not a tidy-up.
+    expect(src.match(/\$\{SAVE_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(2);
+    expect(src.match(/\$\{GUARD_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(10);
   });
 });
 
@@ -1657,11 +1667,13 @@ describe('the escrow listing transaction, in SQL', () => {
     // The three SET LOCAL bounds with their literals: the workload-scoped
     // statement allowance (the transaction heads a character's save FIFO, so
     // it must never hold it for the 60s heavy allowance), the lock-wait
-    // ceiling, and the idle-in-transaction kill its guard siblings carry.
+    // ceiling, and the WIDER save-site idle bound (the character serialize
+    // runs between statements, where Postgres sees idle-in-transaction; the
+    // 2s guard bound false-fires on an ordinary stall there).
     expect(seq.some((t) => t.includes('SET LOCAL statement_timeout = 4000'))).toBe(true);
     expect(seq.some((t) => t.includes('SET LOCAL lock_timeout = 2000'))).toBe(true);
     expect(
-      seq.some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 2000')),
+      seq.some((t) => t.includes('SET LOCAL idle_in_transaction_session_timeout = 10000')),
     ).toBe(true);
     // Lock ORDER: accounts before characters (the createCharacterCapped
     // order), and the listing INSERT only after the fenced character write.

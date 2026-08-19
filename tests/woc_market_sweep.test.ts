@@ -37,7 +37,12 @@ interface FakeClient extends WocMarketSweepLockClient {
 }
 
 function fakeClient(
-  opts: { lockOk?: boolean; lockThrows?: boolean; unlockThrows?: boolean } = {},
+  opts: {
+    lockOk?: boolean;
+    lockThrows?: boolean;
+    unlockThrows?: boolean;
+    unlockFalse?: boolean;
+  } = {},
 ): FakeClient {
   const queries: { sql: string; params: unknown[] }[] = [];
   const releases: (boolean | undefined)[] = [];
@@ -52,7 +57,9 @@ function fakeClient(
       }
       if (sql.includes('pg_advisory_unlock')) {
         if (opts.unlockThrows) throw new Error('unlock query failed');
-        return { rows: [{}] };
+        // The real call answers its boolean; false means the session did not
+        // hold the lock it just ran under (the destroy arm's trigger).
+        return { rows: [{ ok: opts.unlockFalse !== true }] };
       }
       return { rows: [] };
     },
@@ -197,6 +204,7 @@ describe('one guarded pass over the segment plan', () => {
     const db = vi.fn(async () => {});
     const chain = vi.fn(async () => {});
     const finish = vi.fn();
+    const stamps: string[] = [];
     const sweep = createWocMarketSweep({
       realm: REALM,
       connect: async () => client,
@@ -209,6 +217,11 @@ describe('one guarded pass over the segment plan', () => {
           finish,
         ),
       onError: () => {},
+      watchdog: {
+        begin: () => stamps.push('begin'),
+        segment: (name) => stamps.push(`segment:${name}`),
+        end: () => stamps.push('end'),
+      },
     });
     await sweep.runOnce();
     expect(db).not.toHaveBeenCalled();
@@ -220,6 +233,9 @@ describe('one guarded pass over the segment plan', () => {
     expect(client.releases).toEqual([undefined]);
     // The pass still reports (zero-scored arms can never read as saturated).
     expect(finish).toHaveBeenCalledTimes(1);
+    // The lost-lock abort still closes its watchdog pass: without the end
+    // stamp the readout would show a phantom forever-running pass.
+    expect(stamps).toEqual(['begin', 'segment:expiry', 'end']);
   });
 
   it('a null plan (market disabled) does nothing', async () => {
@@ -297,6 +313,23 @@ describe('one guarded pass over the segment plan', () => {
     await sweep.runOnce();
     expect(run).toHaveBeenCalledTimes(1);
     // The segment succeeded but the lock may still be held: same hazard, same fix.
+    expect(client.releases).toEqual([true]);
+  });
+
+  it('DESTROYS the client when unlock answers FALSE (session lock state unexpected)', async () => {
+    const client = fakeClient({ unlockFalse: true });
+    const run = vi.fn(async () => {});
+    const sweep = createWocMarketSweep({
+      realm: REALM,
+      connect: async () => client,
+      plan: () => planOf([{ name: 'expiry', locked: true, run }]),
+      onError: () => {},
+    });
+    await sweep.runOnce();
+    expect(run).toHaveBeenCalledTimes(1);
+    // A false unlock means this session did not hold the lock it just ran
+    // under: its lock state is not what the shell believes, so the client is
+    // destroyed like the thrown arm rather than pooled.
     expect(client.releases).toEqual([true]);
   });
 
@@ -404,6 +437,11 @@ describe('re-entrancy and shutdown', () => {
     expect(finish).toHaveBeenCalledTimes(1);
     await sweep.runOnce();
     expect(later).not.toHaveBeenCalled();
+    // The post-stop runOnce must refuse at the GUARD, not merely skip
+    // segments inside a fresh pass: a fresh pass would build a new plan and
+    // fire finish() a second time (deleting the stopped arm of runOnce's
+    // guard is exactly the regression this count catches).
+    expect(finish).toHaveBeenCalledTimes(1);
   });
 
   it('start() arms an unref-ed timer and stop() clears it', async () => {

@@ -233,7 +233,7 @@ function fakeHooks(): {
     // Null = the lookup answered "cannot be paid" (the historical default
     // here); the offer-face tests override with a verified partner, since a
     // REAL standing deal always has one (createOffer refuses otherwise).
-    tradePartnerImpl: (): Promise<unknown> => Promise.resolve(null),
+    tradePartnerImpl: (): Promise<unknown> => Promise.resolve({ ok: true, partner: null }),
     cancelListingImpl: (): Promise<unknown> =>
       Promise.resolve({ ok: false, code: 'woc_market.disabled' }),
     lastAcceptBody: null as Record<string, unknown> | null,
@@ -1679,7 +1679,8 @@ describe('seller controls (H13): decline and cancel sale, end to end', () => {
     vi.useFakeTimers();
     vi.setSystemTime(1_000_000);
     const h = fakeHooks();
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     h.state.offersResult = {
       ok: true,
       offers: [offerRow({ role: 'seller', buyerName: 'Bree' })],
@@ -1701,7 +1702,8 @@ describe('seller controls (H13): decline and cancel sale, end to end', () => {
     vi.useFakeTimers();
     vi.setSystemTime(1_000_000);
     const h = fakeHooks();
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     h.state.offersResult = { ok: true, offers: [offerRow()] };
     const r = rig(h.hooks);
     openTrade(r);
@@ -1721,7 +1723,8 @@ describe('seller controls (H13): decline and cancel sale, end to end', () => {
     vi.useFakeTimers();
     vi.setSystemTime(1_000_000);
     const h = fakeHooks();
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     h.state.cancelListingImpl = () => Promise.resolve({ ok: true });
     h.state.offersResult = {
       ok: true,
@@ -1756,7 +1759,8 @@ describe('seller controls (H13): decline and cancel sale, end to end', () => {
     vi.useFakeTimers();
     vi.setSystemTime(1_000_000);
     const h = fakeHooks();
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     h.state.cancelListingImpl = () => Promise.resolve({ ok: true, cancelPending: true });
     h.state.offersResult = {
       ok: true,
@@ -1788,7 +1792,8 @@ describe('seller controls (H13): decline and cancel sale, end to end', () => {
     vi.useFakeTimers();
     vi.setSystemTime(1_000_000);
     const h = fakeHooks();
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     h.state.offersResult = {
       ok: true,
       offers: [
@@ -2077,7 +2082,8 @@ describe('review-round closures: the arms the first audit found unpinned', () =>
     vi.useFakeTimers();
     vi.setSystemTime(1_000_000);
     const h = fakeHooks();
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     h.state.offersResult = { ok: true, offers: [offerRow({ role: 'seller', buyerName: 'Bree' })] };
     const r = rig(h.hooks);
     openTrade(r);
@@ -2310,7 +2316,8 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
   async function escrowedBuyer(h: ReturnType<typeof fakeHooks>) {
     // A REAL standing deal always has a verified partner (createOffer refuses
     // otherwise); the DOM assertions below need the arm past its block face.
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     const r = rig(h.hooks);
     const c = r.controller as unknown as Ctl;
     openTrade(r);
@@ -2655,7 +2662,8 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
       await gate.promise;
       return { ok: false, code: 'woc_market.not_pending' };
     };
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     const r = rig(h.hooks);
     const c = r.controller as unknown as Ctl;
     openTrade(r);
@@ -2677,7 +2685,8 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
   it('a cancel answered CANCEL-PENDING is recorded on the face until the deal moves on', async () => {
     const h = fakeHooks();
     h.state.cancelListingImpl = () => Promise.resolve({ ok: true, cancelPending: true });
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     const r = rig(h.hooks);
     const c = r.controller as unknown as Ctl;
     openTrade(r);
@@ -2831,7 +2840,8 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
     const h = fakeHooks();
     const gate = deferred<unknown>();
     h.state.cancelListingImpl = () => gate.promise;
-    h.state.tradePartnerImpl = () => Promise.resolve({ name: 'Bree', walletVerified: true });
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
     const r = rig(h.hooks);
     const c = r.controller as unknown as Ctl;
     openTrade(r);
@@ -2902,5 +2912,93 @@ describe('the QA session closures: settlement hygiene, the claim is not a paymen
     openTrade(r2);
     await flushAsync();
     expect((r2.controller as unknown as Ctl).wocTradeDirectedHoldSeconds).toBeNull();
+  });
+});
+
+describe('the partner lookup is a verdict only when it ANSWERED', () => {
+  interface PartnerCtl {
+    wocTradePartner: { name: string; walletVerified: boolean } | null;
+    wocTradePartnerResolved: boolean;
+    wocTradePartnerFor: string;
+    wocTradePartnerRetryAtMs: number;
+  }
+
+  it('a FAILED lookup (429, outage) leaves the arm unresolved and retries after the pause', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    let lookups = 0;
+    h.state.tradePartnerImpl = () => {
+      lookups++;
+      return Promise.resolve({ ok: false });
+    };
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as PartnerCtl;
+    openTrade(r);
+    await flushAsync();
+    // NOT resolved: rendering the failure as "recipient has no wallet"
+    // asserted a verdict the client never learned.
+    expect(lookups).toBe(1);
+    expect(c.wocTradePartnerResolved).toBe(false);
+    expect(c.wocTradePartner).toBeNull();
+    // Repaints inside the backoff window re-issue NOTHING (the lookup rides
+    // the 30/min quote bucket, so hammering a refusing bucket digs deeper).
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(lookups).toBe(1);
+    // Past the pause the lookup retries, and a now-healthy answer resolves.
+    h.state.tradePartnerImpl = () => {
+      lookups++;
+      return Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
+    };
+    vi.setSystemTime(1_000_000 + 5_000);
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(lookups).toBe(2);
+    expect(c.wocTradePartnerResolved).toBe(true);
+    expect(c.wocTradePartner).toEqual({ name: 'Bree', walletVerified: true });
+    vi.useRealTimers();
+  });
+
+  it('an ANSWERED no-such-character (ok with null partner) resolves as the honest no-wallet verdict', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    h.state.tradePartnerImpl = () => Promise.resolve({ ok: true, partner: null });
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as PartnerCtl;
+    openTrade(r);
+    await flushAsync();
+    expect(c.wocTradePartnerResolved).toBe(true);
+    expect(c.wocTradePartner).toBeNull();
+    vi.useRealTimers();
+  });
+
+  it('closing the trade clears the retry backoff so the next trade looks up immediately', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const h = fakeHooks();
+    let lookups = 0;
+    h.state.tradePartnerImpl = () => {
+      lookups++;
+      return Promise.resolve({ ok: false });
+    };
+    const r = rig(h.hooks);
+    const c = r.controller as unknown as PartnerCtl;
+    openTrade(r);
+    await flushAsync();
+    expect(lookups).toBe(1);
+    expect(c.wocTradePartnerRetryAtMs).toBeGreaterThan(0);
+    r.host.tradeInfo = null;
+    r.controller.updateTradeWindow();
+    await flushAsync();
+    expect(c.wocTradePartnerRetryAtMs).toBe(0);
+    h.state.tradePartnerImpl = () =>
+      Promise.resolve({ ok: true, partner: { name: 'Bree', walletVerified: true } });
+    openTrade(r);
+    await flushAsync();
+    // A fresh trade is never taxed with the previous trade's backoff.
+    expect(c.wocTradePartnerResolved).toBe(true);
+    vi.useRealTimers();
   });
 });

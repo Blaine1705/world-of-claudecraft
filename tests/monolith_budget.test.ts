@@ -235,10 +235,10 @@ const MONOLITHS: MonolithRow[] = [
     // sweep segment plan; the read caches, price cache, and watchdog are
     // already sibling modules. The qa gate caught the review rounds growing
     // the file past the first snapshot, and the local-ledger arithmetic
-    // (woc_market_local_ledgers.ts) moved out to pay for it: the figure is
-    // the extracted count, zero headroom. The next growth owes the next
-    // extraction (guardStepUp/issueStepUpChallenge and the delivery arms
-    // are the standing candidates).
+    // (woc_market_local_ledgers.ts) moved out to pay for it; the qa
+    // session's fix round then paid its own growth with the step-up flow
+    // (woc_market_stepup_flow.ts). The figure is the extracted count, zero
+    // headroom; the delivery arms are the next standing candidate.
     file: 'server/woc_market.ts',
     ceiling: 4487,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',

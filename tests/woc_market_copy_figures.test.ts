@@ -98,6 +98,35 @@ describe('marketplace copy names the live rule figures', () => {
     expect(market.activitySuspended).toContain('$WOC trades');
   });
 
+  it('the six resolved-figure keys keep all five non-Latin fills with exact placeholder parity', () => {
+    // The digit-derived check below cannot see these keys (their figures
+    // arrive as PLACEHOLDERS, not digits), and the release-tier pending scan
+    // cannot see a DROPPED fill row either until release: this is the
+    // PR-tier pin that each fill exists and spells every token the English
+    // resolves.
+    const KEYS: Array<[string, string]> = [
+      ['hudChrome.wocMarket.bidBondSchedule', market.bidBondSchedule],
+      ['hudChrome.wocMarket.bidBondPayWindow', market.bidBondPayWindow],
+      ['hudChrome.wocMarket.sellEmptyFloor', market.sellEmptyFloor],
+      ['hudChrome.wocMarket.sellCollectiblesBoth', market.sellCollectiblesBoth],
+      ['hudChrome.wocMarket.sellCollectiblesMounts', market.sellCollectiblesMounts],
+      ['hudChrome.wocMarket.sellCollectiblesChromas', market.sellCollectiblesChromas],
+    ];
+    for (const locale of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU']) {
+      const src = readFileSync(`src/ui/i18n.locales/${locale}.ts`, 'utf8');
+      for (const [key, english] of KEYS) {
+        const at = src.indexOf(`'${key}':`);
+        expect(at, `${locale} carries a fill for ${key}`).toBeGreaterThan(-1);
+        const end = src.indexOf("\n  '", at + 1);
+        expect(end, `${locale} ${key} is followed by another row`).toBeGreaterThan(at);
+        const value = src.slice(at, end);
+        for (const token of english.match(/\{[a-zA-Z]+\}/g) ?? []) {
+          expect(value, `${locale} ${key} spells ${token}`).toContain(token);
+        }
+      }
+    }
+  });
+
   it('the five non-Latin fills carry the same figures as the English source', () => {
     // The header's claim, made real: reading only hudChromeStrings would let a
     // rule retune reword the English and leave a stale figure standing in every

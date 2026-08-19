@@ -405,6 +405,39 @@ describe('the price and estimate caches at the proxy (H11)', () => {
     await economy.estimate(701);
     expect(seen).toHaveLength(2);
   });
+
+  it('the shared estimate is FROZEN: an in-place edit by one consumer throws instead of corrupting', async () => {
+    respond = () => ({
+      status: 200,
+      body: {
+        ok: true,
+        amount: { base: '1', tokens: 1 },
+        asOfMs: 1,
+        split: { sellerCents: 630, burnCents: 35, treasuryCents: 35 },
+      },
+    });
+    const economy = createWocMarketEconomyProxy();
+    const estimate = await economy.estimate(700);
+    // The same object serves every caller for a TTL window (pinned above),
+    // so mutation is the corruption vector; freezing turns it into the
+    // mutator's own TypeError (the read-cache freezeShared discipline).
+    expect(Object.isFrozen(estimate)).toBe(true);
+    expect(Object.isFrozen(estimate.amount)).toBe(true);
+    expect(Object.isFrozen(estimate.split)).toBe(true);
+    expect(() => {
+      (estimate as { usdCents: number }).usdCents = 1;
+    }).toThrow(TypeError);
+  });
+
+  it('priceCacheAges() reports the memo ages for the ops readout (null before any answer)', async () => {
+    respond = () => ({ status: 200, body: healthyBody });
+    const economy = createWocMarketEconomyProxy();
+    expect(economy.priceCacheAges?.()).toEqual({ successAgeMs: null, failureAgeMs: null });
+    await economy.price();
+    const afterSuccess = economy.priceCacheAges?.();
+    expect(afterSuccess?.successAgeMs).toBeGreaterThanOrEqual(0);
+    expect(afterSuccess?.failureAgeMs).toBeNull();
+  });
 });
 
 describe('the estimate fee split is accepted only when it reconciles', () => {

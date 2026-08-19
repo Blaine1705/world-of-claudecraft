@@ -17,11 +17,17 @@ import {
   WOC_MARKET_READ_MAX_PER_MINUTE,
 } from '../../server/ratelimit';
 import type { WocMarketDb, WocMarketDeps, WocMarketService } from '../../server/woc_market';
-import { WocMarketService as RealWocMarketService } from '../../server/woc_market';
+import {
+  BOND_PAYOUT_BUDGET_MS,
+  WocMarketService as RealWocMarketService,
+  WOC_MARKET_ME_READOUT_DEADLINE_MS,
+} from '../../server/woc_market';
+import { WocWireDriftWarner } from '../../server/woc_market_drift_warn';
 import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
 import {
   bustWocMarketActivity,
   registerWocMarketReadCacheForBusts,
+  WOC_MARKET_BROWSE_CACHE_MAX_PAGE,
   WocMarketReadCache,
 } from '../../server/woc_market_read_cache';
 import {
@@ -29,7 +35,11 @@ import {
   resetWocMarketRuntimeForTests,
   routes,
 } from '../../server/woc_market_routes';
-import { WOC_MARKET_RESTRICTED_POLICY } from '../../server/woc_market_rules';
+import {
+  WOC_MARKET_RESTRICTED_POLICY,
+  WOC_MARKET_WIRE_FAIL_REASONS,
+  WOC_MARKET_WIRE_PENDING_REASONS,
+} from '../../server/woc_market_rules';
 import { ITEMS } from '../../src/sim/data';
 import { fakeCtx } from './helpers';
 
@@ -127,7 +137,10 @@ describe('service reads through the cache', () => {
   it('collapses a concurrent browse burst into ONE db read', async () => {
     const gate = deferred<{ rows: never[]; hasMore: boolean }>();
     const browseListings = vi.fn(() => gate.promise);
-    const service = makeService({ browseListings }, { readCache: new WocMarketReadCache() });
+    const service = makeService(
+      { browseListings },
+      { readCache: new WocMarketReadCache({ now: () => BASE_MS }) },
+    );
     const reads = [service.browse(BROWSE_Q), service.browse(BROWSE_Q), service.browse(BROWSE_Q)];
     expect(browseListings).toHaveBeenCalledTimes(1);
     gate.resolve({ rows: [], hasMore: false });
@@ -148,7 +161,10 @@ describe('service reads through the cache', () => {
   it('the directed-listing party gate runs per request OVER the warm cache: a stranger still reads null', async () => {
     const directed = listingRow({ directedBuyerAccount: 8 });
     const listingById = vi.fn(async () => directed);
-    const service = makeService({ listingById }, { readCache: new WocMarketReadCache() });
+    const service = makeService(
+      { listingById },
+      { readCache: new WocMarketReadCache({ now: () => BASE_MS }) },
+    );
     // The buyer party warms the cache and sees the listing.
     const forBuyer = await service.listingDetail(4, 8);
     expect(forBuyer?.listing.id).toBe(4);
@@ -166,7 +182,10 @@ describe('service reads through the cache', () => {
   it('sales history is keyed per item and shared across callers (known items only)', async () => {
     const [itemA, itemB] = Object.keys(ITEMS);
     const salesForItem = vi.fn(async (_realm: string, itemId: string) => [{ id: 1, itemId }]);
-    const service = makeService({ salesForItem }, { readCache: new WocMarketReadCache() });
+    const service = makeService(
+      { salesForItem },
+      { readCache: new WocMarketReadCache({ now: () => BASE_MS }) },
+    );
     await service.salesHistory(itemA);
     await service.salesHistory(itemA);
     await service.salesHistory(itemB);
@@ -178,7 +197,10 @@ describe('service reads through the cache', () => {
     const salesForItem = vi.fn(async (_realm: string, _itemId: string, limit: number) =>
       Array.from({ length: Math.min(limit, 3) }, (_, i) => ({ id: i })),
     );
-    const service = makeService({ salesForItem }, { readCache: new WocMarketReadCache() });
+    const service = makeService(
+      { salesForItem },
+      { readCache: new WocMarketReadCache({ now: () => BASE_MS }) },
+    );
     const first = await service.salesHistory(itemA);
     // The odd limit pays its own read...
     await service.salesHistory(itemA, 2);
@@ -191,7 +213,10 @@ describe('service reads through the cache', () => {
 
   it('sales history for an UNKNOWN item id never occupies a cache slot', async () => {
     const salesForItem = vi.fn(async () => []);
-    const service = makeService({ salesForItem }, { readCache: new WocMarketReadCache() });
+    const service = makeService(
+      { salesForItem },
+      { readCache: new WocMarketReadCache({ now: () => BASE_MS }) },
+    );
     await service.salesHistory('zz_not_a_real_item_zz');
     await service.salesHistory('zz_not_a_real_item_zz');
     // Uncached both times: free-text ids must not evict real items' entries.
@@ -200,7 +225,10 @@ describe('service reads through the cache', () => {
 
   it('an item-filtered browse bypasses the cache (filter lists are caller-minted key entropy)', async () => {
     const browseListings = vi.fn(async () => ({ rows: [], hasMore: false }));
-    const service = makeService({ browseListings }, { readCache: new WocMarketReadCache() });
+    const service = makeService(
+      { browseListings },
+      { readCache: new WocMarketReadCache({ now: () => BASE_MS }) },
+    );
     const filtered = { ...BROWSE_Q, itemIds: ['sunblade_of_dawn'] };
     await service.browse(filtered);
     await service.browse(filtered);
@@ -244,10 +272,16 @@ describe('the activity fan-out', () => {
     const service = makeService(counting.db, {
       verifiedWallet: (a) => counting.gauge(a === 7 ? 'wallet-7' : null),
     });
-    await service.myActivity(7);
-    // All six reads ran...
+    const out = await service.myActivity(7);
+    // All six reads ran, each exactly once (a silently dropped read would
+    // keep the peak honest while shrinking the readout; a seventh read
+    // added later must move these counts in the same change)...
     expect(counting.db.listingsBySeller).toHaveBeenCalledTimes(1);
+    expect(counting.db.bidsByAccount).toHaveBeenCalledTimes(1);
+    expect(counting.db.settlementsByAccount).toHaveBeenCalledTimes(1);
+    expect(counting.db.strikeInfo).toHaveBeenCalledTimes(1);
     expect(counting.db.termsAcceptedAt).toHaveBeenCalledTimes(1);
+    expect(out.wallet).toBe('wallet-7');
     // ...and never two at once: the six-way Promise.all drew six of the
     // shared pool's ten clients per request, which is the H11 finding.
     expect(counting.peak()).toBe(1);
@@ -255,7 +289,7 @@ describe('the activity fan-out', () => {
 
   it('caches the readout per account with the account as the key', async () => {
     const counting = countingActivityDb();
-    const cache = new WocMarketReadCache();
+    const cache = new WocMarketReadCache({ now: () => BASE_MS });
     const service = makeService(counting.db, {
       readCache: cache,
       verifiedWallet: (a) => counting.gauge(a === 7 ? 'wallet-7' : null),
@@ -346,7 +380,11 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
     service: Record<string, unknown>;
     /** Which warmed surfaces the handler must drop; everything else must
      *  STAY WARM (a wrong-kind bust swap is the regression this catches). */
-    cold: ReadonlyArray<'listings' | 'me7' | 'me8' | 'history'>;
+    cold: ReadonlyArray<'listings' | 'me7' | 'me8' | 'me9' | 'history'>;
+    /** The handler THROWS (a refused mutation): the actor's readout must
+     *  still drop (a refusal can follow committed state: recorded terms, a
+     *  recorded signature), while the shared surfaces stay warm. */
+    refuses?: true;
   }
 
   const post = (url: string, over: Record<string, unknown> = {}) =>
@@ -450,11 +488,17 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
           params: { id: '21' },
           body: { signature: 'sig123' },
         }),
+      // 'confirmed' means the EAGER delivery inserted the sale on this very
+      // request, so the recorded history changed under a route mutation: the
+      // whole history map drops (the arm knows only the settlement id).
       service: { confirmSettlement: async () => ({ ok: true, state: 'confirmed', reason: null }) },
-      cold: ['listings', 'me7'],
+      cold: ['listings', 'me7', 'history'],
     },
     {
-      name: 'acceptOffer with an escrowed listing busts BOTH parties',
+      // Viewer 7, seller 8, directed buyer 9: THREE distinct accounts, so
+      // each of the two conditional party busts is exercised on its own key
+      // (aliasing the buyer to the viewer once let a wrong-field swap pass).
+      name: 'acceptOffer with an escrowed listing busts the viewer AND both parties',
       method: 'POST',
       path: '/api/woc-market/offers/:id/accept',
       ctx: () =>
@@ -465,13 +509,25 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
       service: {
         acceptDirectedOffer: async () => ({
           ok: true,
-          listing: fullListing({ sellerAccount: 8, directedBuyerAccount: 7 }),
+          listing: fullListing({ sellerAccount: 8, directedBuyerAccount: 9 }),
         }),
       },
-      cold: ['listings', 'me7', 'me8'],
+      cold: ['listings', 'me7', 'me8', 'me9'],
     },
     {
-      name: 'createOffer busts nothing (offers are not cached)',
+      name: 'acceptOffer with NO listing yet busts only the acting side',
+      method: 'POST',
+      path: '/api/woc-market/offers/:id/accept',
+      ctx: () =>
+        post('/api/woc-market/offers/5/accept', {
+          params: { id: '5' },
+          body: { characterId: 1 },
+        }),
+      service: { acceptDirectedOffer: async () => ({ ok: true, listing: null }) },
+      cold: ['listings', 'me7'],
+    },
+    {
+      name: 'createOffer busts the actor readout (guardTerms can record first-time consent)',
       method: 'POST',
       path: '/api/woc-market/offers',
       ctx: () =>
@@ -485,7 +541,67 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
           },
         }),
       service: { createDirectedOffer: async () => ({ ok: true, offer: offerRow }) },
+      cold: ['me7'],
+    },
+    {
+      name: 'stepUpChallenge busts nothing (challenge state is not a cached surface)',
+      method: 'POST',
+      path: '/api/woc-market/step-up/challenge',
+      ctx: () =>
+        post('/api/woc-market/step-up/challenge', {
+          body: { operation: 'accept_directed_offer', offerId: 5 },
+        }),
+      service: {
+        issueStepUpChallenge: async () => ({
+          ok: true,
+          challenge: { challengeId: 3, message: 'm', expiresAtMs: BASE_MS + 60_000 },
+        }),
+      },
       cold: [],
+    },
+    {
+      name: 'a REFUSED placeBid still busts the bidder readout, nothing shared',
+      method: 'POST',
+      path: '/api/woc-market/listings/:id/bids',
+      ctx: () =>
+        post('/api/woc-market/listings/4/bids', {
+          params: { id: '4' },
+          body: { characterId: 1, amountCents: 5000, acceptTerms: true },
+        }),
+      service: { placeBid: async () => ({ ok: false, reason: 'bid_too_low' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED confirmSettlement still busts the buyer readout (failed transition committed)',
+      method: 'POST',
+      path: '/api/woc-market/settlements/:id/confirm',
+      ctx: () =>
+        post('/api/woc-market/settlements/21/confirm', {
+          params: { id: '21' },
+          body: { signature: 'sig123' },
+        }),
+      service: { confirmSettlement: async () => ({ ok: false, reason: 'confirm_failed' }) },
+      cold: ['me7'],
+      refuses: true,
+    },
+    {
+      name: 'a REFUSED createOffer still busts the actor readout (terms recorded before the refusal)',
+      method: 'POST',
+      path: '/api/woc-market/offers',
+      ctx: () =>
+        post('/api/woc-market/offers', {
+          body: {
+            characterId: 1,
+            sellerCharacterName: 'Selara',
+            usdCents: 5000,
+            itemId: 'sunblade',
+            acceptTerms: true,
+          },
+        }),
+      service: { createDirectedOffer: async () => ({ ok: false, reason: 'self_offer' }) },
+      cold: ['me7'],
+      refuses: true,
     },
     {
       name: 'declineOffer busts nothing',
@@ -550,7 +666,7 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
 
   for (const testCase of CASES) {
     it(testCase.name, async () => {
-      const cache = new WocMarketReadCache();
+      const cache = new WocMarketReadCache({ now: () => BASE_MS });
       let generation = 1;
       // Warm every surface at generation 1, then bump: a surface that still
       // answers 1 stayed warm, one that answers 2 was busted. No TTL is in
@@ -560,6 +676,7 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
         row: () => cache.listingRow(4, async () => ({ generation })),
         me7: () => cache.myActivity(7, async () => ({ generation })),
         me8: () => cache.myActivity(8, async () => ({ generation })),
+        me9: () => cache.myActivity(9, async () => ({ generation })),
         history: () => cache.sales('sunblade', async () => ({ generation })),
       } as const;
       for (const warm of Object.values(probes)) await warm();
@@ -567,11 +684,17 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
         service: testCase.service as unknown as WocMarketService,
         readCache: cache,
       });
-      await handlerFor(testCase.method, testCase.path)(testCase.ctx());
+      if (testCase.refuses) {
+        // The refusal must still surface to the pipeline (the bust is a side
+        // effect of the attempt, never a swallow of the refusal).
+        await expect(handlerFor(testCase.method, testCase.path)(testCase.ctx())).rejects.toThrow();
+      } else {
+        await handlerFor(testCase.method, testCase.path)(testCase.ctx());
+      }
       generation = 2;
       const expectGen = async (
         probe: () => Promise<unknown>,
-        surface: 'listings' | 'me7' | 'me8' | 'history',
+        surface: 'listings' | 'me7' | 'me8' | 'me9' | 'history',
       ) => {
         const value = (await probe()) as { generation?: number } & {
           rows?: { generation: number }[];
@@ -585,6 +708,7 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
       await expectGen(probes.row, 'listings');
       await expectGen(probes.me7, 'me7');
       await expectGen(probes.me8, 'me8');
+      await expectGen(probes.me9, 'me9');
       await expectGen(probes.history, 'history');
     });
   }
@@ -595,11 +719,13 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
       'utf8',
     );
     const code = src.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-    // 23 = eight mutations at two busts each, the two quote refreshes at one,
-    // the three moderation arms at one each, and acceptOffer's two extra
-    // party busts. The TABLE above is the behavioral authority (it catches a
+    // 25 = eight mutations at two busts each (the actor bust now precedes
+    // the refusal throw), the two quote refreshes at one, createOffer's
+    // actor bust, the three moderation arms at one each, acceptOffer's two
+    // extra party busts, and confirmSettlement's eager-delivery history
+    // drop. The TABLE above is the behavioral authority (it catches a
     // wrong-kind swap); this count only catches a call deleted wholesale.
-    expect(code.match(/readCache\(\)\?\.bust/g)).toHaveLength(23);
+    expect(code.match(/readCache\(\)\?\.bust/g)).toHaveLength(25);
   });
 
   it('handlers render cleanly over FROZEN cached values, twice in a row', async () => {
@@ -607,10 +733,22 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
     // TypeError on the SECOND request of a TTL window; this drives the two
     // read handlers through a REAL service and REAL cache to prove none
     // mutates today.
-    const cache = new WocMarketReadCache();
+    const knownItem = Object.keys(ITEMS)[0];
+    const cache = new WocMarketReadCache({ now: () => BASE_MS });
     const service = makeService(
       {
         browseListings: async () => ({ rows: [fullListing()], hasMore: false }),
+        listingById: async () => fullListing({ id: 4, itemId: knownItem }),
+        salesForItem: async () => [
+          {
+            id: 6,
+            itemId: knownItem,
+            priceCents: 5000,
+            sellerName: 'Selara',
+            buyerName: 'Aldan',
+            atMs: BASE_MS,
+          },
+        ],
         listingsBySeller: async () => [fullListing()],
         bidsByAccount: async () => [{ ...bidRow, itemId: 'sunblade' }],
         settlementsByAccount: async () => [{ ...settlementRow, itemId: 'sunblade' }],
@@ -620,12 +758,22 @@ describe('route-layer busts (the full handler-to-surface table)', () => {
       { readCache: cache },
     );
     configureWocMarketRuntime({ service, readCache: cache });
-    for (const [method, routePath, url] of [
-      ['GET', '/api/woc-market/listings', '/api/woc-market/listings'],
-      ['GET', '/api/woc-market/me', '/api/woc-market/me'],
+    // All four cached read surfaces render twice over the warm shared value:
+    // detail exercises the estimateView leg and history exercises saleView,
+    // which a listings+me-only loop left unproven against the freeze.
+    for (const [method, routePath, url, params] of [
+      ['GET', '/api/woc-market/listings', '/api/woc-market/listings', {}],
+      ['GET', '/api/woc-market/me', '/api/woc-market/me', {}],
+      ['GET', '/api/woc-market/listings/:id', '/api/woc-market/listings/4', { id: '4' }],
+      [
+        'GET',
+        '/api/woc-market/history/:itemId',
+        `/api/woc-market/history/${knownItem}`,
+        { itemId: knownItem },
+      ],
     ] as const) {
       for (let round = 0; round < 2; round++) {
-        const ctx = fakeCtx({ url, account: { accountId: 7, scope: 'read' } });
+        const ctx = fakeCtx({ url, params, account: { accountId: 7, scope: 'read' } });
         await handlerFor(method, routePath)(ctx);
         const res = ctx.res as unknown as { statusCode: number };
         expect(res.statusCode, `${routePath} round ${round + 1}`).toBe(200);
@@ -713,7 +861,7 @@ describe('the bond-payout budget', () => {
       clock += 31_000;
       return { done: true, reason: null };
     });
-    const passes: Record<string, number>[] = [];
+    const passes: { stats: Record<string, number>; saturated: readonly string[] }[] = [];
     const service = new RealWocMarketService({
       db: { bondsDue, setBondState } as unknown as WocMarketDb,
       economy: {
@@ -730,8 +878,8 @@ describe('the bond-payout budget', () => {
         policy: WOC_MARKET_RESTRICTED_POLICY,
         confirmingReviewMs: 6 * 3600 * 1000,
       },
-      onSweepPass: (stats) => {
-        passes.push(stats as unknown as Record<string, number>);
+      onSweepPass: (stats, saturated) => {
+        passes.push({ stats: stats as unknown as Record<string, number>, saturated });
       },
       onSweepError: () => {},
       now: () => clock,
@@ -749,7 +897,66 @@ describe('the bond-payout budget', () => {
     // A budget break reports the FETCHED count, never the walked one: the
     // two undrained rows are a real money backlog, and a walked-only stat
     // would silence the saturation signal in exactly this degraded case.
-    expect(passes[0]?.bonds).toBe(3);
+    expect(passes[0]?.stats.bonds).toBe(3);
+    // The break itself joins the saturated list: a SUB-batch break (3 due is
+    // far under SWEEP_BATCH) would otherwise read as a drained pass by count
+    // alone, silent exactly when the backlog is small.
+    expect(passes[0]?.saturated).toContain('bonds');
+  });
+
+  it('a healthy service walks the whole batch inside the budget (the lower bound)', async () => {
+    // The degraded case above only bounds the budget from ABOVE (any value
+    // under one RPC's cost passes it); this arm reds if the budget were
+    // quietly dropped toward zero, where a healthy 1s-per-RPC batch would
+    // stop mid-walk and defer real refunds every pass.
+    let clock = BASE_MS;
+    const bondsDue = vi.fn(async () => [
+      { id: 1, bondReference: 'woc_bond:1', bondState: 'refund_due' },
+      { id: 2, bondReference: 'woc_bond:2', bondState: 'refund_due' },
+      { id: 3, bondReference: 'woc_bond:3', bondState: 'refund_due' },
+    ]);
+    const setBondState = vi.fn(async () => true);
+    const refundBond = vi.fn(async () => {
+      clock += 1_000;
+      return { done: true, reason: null };
+    });
+    const passes: { saturated: readonly string[] }[] = [];
+    const service = new RealWocMarketService({
+      db: { bondsDue, setBondState } as unknown as WocMarketDb,
+      economy: {
+        refundBond,
+        forfeitBond: refundBond,
+      } as unknown as WocMarketDeps['economy'],
+      custody: {} as unknown as WocMarketDeps['custody'],
+      verifiedWallet: async () => null,
+      balanceTokens: async () => null,
+      stepUpDevSig: true,
+      config: {
+        enabled: true,
+        realm: REALM,
+        policy: WOC_MARKET_RESTRICTED_POLICY,
+        confirmingReviewMs: 6 * 3600 * 1000,
+      },
+      onSweepPass: (_stats, saturated) => {
+        passes.push({ saturated });
+      },
+      onSweepError: () => {},
+      now: () => clock,
+    });
+    const plan = service.sweepSegments();
+    await plan?.segments.find((seg) => seg.name === 'bond-payouts')?.run();
+    plan?.finish();
+    expect(refundBond).toHaveBeenCalledTimes(3);
+    expect(setBondState).toHaveBeenCalledTimes(3);
+    expect(passes[0]?.saturated).not.toContain('bonds');
+  });
+
+  it('the budget value is the pinned 30 seconds', () => {
+    // The budget is only exercised from above (a slow RPC) and below (a
+    // fast batch); the VALUE itself must not drift silently, because it is
+    // the locked segment's hold ceiling and sits deliberately under the
+    // watchdog's 60s alarm.
+    expect(BOND_PAYOUT_BUDGET_MS).toBe(30_000);
   });
 });
 
@@ -841,6 +1048,11 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     );
     expect(code).toContain('registerWocMarketReadCacheForBusts(wocMarketReadCache)');
     expect(code).toContain('readCaches: wocMarketReadCache.stats()');
+    // The two degraded-state counters ride the same readout: the price
+    // cache's memo ages and the idle-kill count (a stall storm's client
+    // evictions must be a number an operator can watch, not log volume).
+    expect(code).toContain('priceCache: wocMarketEconomy.priceCacheAges?.() ?? null');
+    expect(code).toContain('idleTxKills: wocMarketIdleTxKillCount()');
   });
 
   it('the sweep shell gets the segment plan and the watchdog, and shutdown stops the watchdog', () => {
@@ -865,20 +1077,38 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     expect(unlink).toContain('bustWocMarketActivity(accountId)');
   });
 
-  it('the drift-warn channel judges through the SAME exported sets the wire screens use', () => {
-    const warnSrc = readFileSync(
-      path.join(__dirname, '..', '..', 'server', 'woc_market_drift_warn.ts'),
-      'utf8',
-    );
-    expect(warnSrc).toContain('WOC_MARKET_WIRE_PENDING_SET');
-    expect(warnSrc).toContain('WOC_MARKET_WIRE_FAIL_SET');
-    expect(warnSrc).toContain("from './woc_market_rules'");
+  it('the drift-warn channel recognizes EXACTLY the wire-screen vocabularies (behavioral)', () => {
+    // Behavioral, not a source-text scan (the module's own header names the
+    // Sets, so a toContain pin was satisfiable by a comment): every word the
+    // wire screens recognize warns NOTHING, one off-vocabulary word warns
+    // exactly once, so the two judges provably share one notion of
+    // "recognized" per vocabulary.
+    const warner = new WocWireDriftWarner();
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      for (const word of WOC_MARKET_WIRE_PENDING_REASONS) warner.notePending(word);
+      for (const word of WOC_MARKET_WIRE_FAIL_REASONS) warner.noteFail(word);
+      expect(spy).not.toHaveBeenCalled();
+      warner.notePending('never_a_verdict');
+      warner.noteFail('never_a_verdict');
+      expect(spy).toHaveBeenCalledTimes(2);
+      // A fail word is NOT a pending word: cross-vocabulary leakage would
+      // let one screen's additions silently mute the other channel.
+      const failOnly = WOC_MARKET_WIRE_FAIL_REASONS.filter(
+        (w) => !(WOC_MARKET_WIRE_PENDING_REASONS as readonly string[]).includes(w),
+      );
+      expect(failOnly.length).toBeGreaterThan(0);
+      warner.notePending(failOnly[0]);
+      expect(spy).toHaveBeenCalledTimes(3);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 
 describe('cross-domain wallet busts', () => {
   it('bustWocMarketActivity reaches the registered instance and only the named account', async () => {
-    const cache = new WocMarketReadCache();
+    const cache = new WocMarketReadCache({ now: () => BASE_MS });
     registerWocMarketReadCacheForBusts(cache);
     try {
       let generation = 1;
@@ -898,7 +1128,7 @@ describe('cross-domain wallet busts', () => {
 
 describe('cache bounds under key churn', () => {
   it('the browse refresh registry stays bounded under hundreds of distinct keys', async () => {
-    const cache = new WocMarketReadCache();
+    const cache = new WocMarketReadCache({ now: () => BASE_MS });
     for (let page = 0; page < 300; page++) {
       await cache.browse({ ...BROWSE_Q, page }, async () => ({ rows: [], hasMore: false }));
     }
@@ -908,5 +1138,129 @@ describe('cache bounds under key churn', () => {
     expect(stats.entries).toBe(128);
     expect(stats.refreshRegistry).toBeLessThanOrEqual(257);
     expect(stats.evictions).toBeGreaterThan(0);
+  });
+});
+
+describe('the browse page fence', () => {
+  it('caches shallow pages, bypasses deep ones (page keys are caller-minted entropy)', async () => {
+    const browseListings = vi.fn(async () => ({ rows: [], hasMore: false }));
+    const service = makeService(
+      { browseListings },
+      { readCache: new WocMarketReadCache({ now: () => BASE_MS }) },
+    );
+    // The deepest cacheable page: two reads share one db round trip.
+    const shallow = { ...BROWSE_Q, page: WOC_MARKET_BROWSE_CACHE_MAX_PAGE };
+    await service.browse(shallow);
+    await service.browse(shallow);
+    expect(browseListings).toHaveBeenCalledTimes(1);
+    // One past the fence: every read pays its own OFFSET walk (the limiter
+    // is the bound), and no cache slot is minted for a mintable key.
+    const deep = { ...BROWSE_Q, page: WOC_MARKET_BROWSE_CACHE_MAX_PAGE + 1 };
+    await service.browse(deep);
+    await service.browse(deep);
+    expect(browseListings).toHaveBeenCalledTimes(3);
+  });
+
+  it('the fence value is the pinned 2 (pages 0 to 2 carry the cross-player win)', () => {
+    expect(WOC_MARKET_BROWSE_CACHE_MAX_PAGE).toBe(2);
+  });
+});
+
+describe('the activity readout deadline', () => {
+  function slowActivityDb(clockRef: { ms: number }, perReadMs: number) {
+    const read = async <T>(value: T): Promise<T> => {
+      clockRef.ms += perReadMs;
+      return value;
+    };
+    return {
+      listingsBySeller: vi.fn((_r: string, _a: number) => read([])),
+      bidsByAccount: vi.fn((_r: string, _a: number, _l: number) => read([])),
+      settlementsByAccount: vi.fn((_r: string, _a: number, _l: number) => read([])),
+      strikeInfo: vi.fn((_a: number) => read(null)),
+      termsAcceptedAt: vi.fn((_a: number) => read(null)),
+    };
+  }
+
+  function serviceOn(clockRef: { ms: number }, db: Record<string, unknown>) {
+    return new RealWocMarketService({
+      db: db as unknown as WocMarketDb,
+      economy: createDevWocMarketEconomy(() => clockRef.ms),
+      custody: {} as unknown as WocMarketDeps['custody'],
+      verifiedWallet: async () => null,
+      balanceTokens: async () => null,
+      stepUpDevSig: true,
+      config: {
+        enabled: true,
+        realm: REALM,
+        policy: WOC_MARKET_RESTRICTED_POLICY,
+        confirmingReviewMs: 6 * 3600 * 1000,
+      },
+      now: () => clockRef.ms,
+    });
+  }
+
+  it('a saturated pool fails the readout FAST instead of walking six checkout deadlines', async () => {
+    // Each read models a 5s pool-checkout wait: the sequencing turned one 5s
+    // worst case into 30s of held socket, so the between-reads deadline must
+    // cut the walk after the read that crosses it.
+    const clockRef = { ms: BASE_MS };
+    const db = slowActivityDb(clockRef, 5_000);
+    await expect(serviceOn(clockRef, db).myActivity(7)).rejects.toThrow(
+      /activity readout deadline/,
+    );
+    // The first read crossed nothing (5s < 6s); the second crossed the
+    // deadline check, so reads three onward never ran.
+    expect(db.listingsBySeller).toHaveBeenCalledTimes(1);
+    expect(db.bidsByAccount).toHaveBeenCalledTimes(1);
+    expect(db.settlementsByAccount).not.toHaveBeenCalled();
+  });
+
+  it('a healthy readout completes all six reads untouched by the deadline', async () => {
+    const clockRef = { ms: BASE_MS };
+    const db = slowActivityDb(clockRef, 200);
+    const out = await serviceOn(clockRef, db).myActivity(7);
+    expect(out.listings).toEqual([]);
+    expect(db.termsAcceptedAt).toHaveBeenCalledTimes(1);
+  });
+
+  it('the deadline value is one checkout timeout plus slack', () => {
+    expect(WOC_MARKET_ME_READOUT_DEADLINE_MS).toBe(6_000);
+  });
+});
+
+describe('the limiter mount floor', () => {
+  it('EVERY marketplace API GET carries some rate-limit policy (derived, not enumerated)', () => {
+    // The by-identity table above pins WHICH bucket each known GET rides;
+    // this derived sweep is the floor that catches a NEW client-triggerable
+    // GET shipped with no limiter at all (an unmetered read is sustainable
+    // at whatever rate a client cares to send).
+    const gets = routes.filter((r) => r.method === 'GET' && r.path.startsWith('/api/woc-market/'));
+    expect(gets.length).toBeGreaterThanOrEqual(7);
+    for (const route of gets) {
+      const tagged = (route.middleware ?? []).some(
+        (mw) => typeof (mw as { rateLimitPolicyName?: string }).rateLimitPolicyName === 'string',
+      );
+      expect(tagged, `${route.path} carries a rate-limit policy`).toBe(true);
+    }
+  });
+
+  it('two ACCOUNTS behind one IP share the fused per-IP read window (the NAT sizing premise)', async () => {
+    setRateLimitClock(() => BASE_MS);
+    const middleware = rateLimit(WOC_MARKET_READ_POLICY);
+    // Both ctxs share the fake request's one source address, so the refusal
+    // below can only come from the shared per-IP arm (account 8's own
+    // account window is untouched).
+    const ctxFor = (accountId: number) => fakeCtx({ account: { accountId, scope: 'read' } });
+    // Account 7 spends the whole IP window from one address...
+    for (let i = 0; i < WOC_MARKET_READ_MAX_PER_MINUTE; i++) {
+      await middleware(ctxFor(7), async () => {});
+    }
+    // ...and account 8 on the SAME address is refused: the 240 sizing is
+    // sized for NAT-mates sharing one bucket, so the sharing itself must
+    // hold (an account-only window would double the effective budget).
+    await expect(middleware(ctxFor(8), async () => {})).rejects.toMatchObject({
+      status: 429,
+      code: 'rate_limit.exceeded',
+    });
   });
 });

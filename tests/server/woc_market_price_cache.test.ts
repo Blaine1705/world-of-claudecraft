@@ -167,3 +167,97 @@ describe('woc price cache', () => {
     expect(WOC_PRICE_FAILURE_TTL_MS).toBeLessThan(WOC_PRICE_CACHE_TTL_MS);
   });
 });
+
+describe('exact boundaries (an off-by-one at any comparison site must fail HERE)', () => {
+  it('age EXACTLY ttlMs is stale-serve, not a hit: the old value returns and a refresh kicks', async () => {
+    let answer = ok('first');
+    const r = rig(async () => answer);
+    await r.cache.read();
+    answer = ok('second');
+    r.advance(WOC_PRICE_CACHE_TTL_MS);
+    expect((await r.cache.read()).tag).toBe('first');
+    // The kick ran (calls moved), so the flip from pure-hit to SWR happened
+    // at the boundary itself, not one past it.
+    expect(r.calls()).toBe(2);
+  });
+
+  it('age EXACTLY staleServeMaxMs is unservable: the read blocks on the refresh', async () => {
+    let answer = ok('first');
+    const r = rig(async () => answer);
+    await r.cache.read();
+    answer = ok('second');
+    r.advance(WOC_PRICE_STALE_SERVE_MAX_MS);
+    expect((await r.cache.read()).tag).toBe('second');
+  });
+
+  it('a failure landing with the success EXACTLY at the stale-serve bound clears it', async () => {
+    let answer: Price = ok('first');
+    const r = rig(async () => answer);
+    await r.cache.read();
+    answer = FAIL;
+    r.advance(WOC_PRICE_STALE_SERVE_MAX_MS);
+    expect((await r.cache.read()).available).toBe(false);
+    // The >= at the install site: the out-of-bound success is GONE, so a
+    // later read cannot resurrect a price older than the health ceiling.
+    expect(r.cache.peek().success).toBeNull();
+    expect(r.cache.peek().failure).not.toBeNull();
+  });
+});
+
+describe('containment arms', () => {
+  it('stale-serve readers JOIN a hanging refresh: one probe, never one per read', async () => {
+    let gate: { promise: Promise<Price>; resolve: (v: Price) => void } | null = null;
+    let answer: Price | null = ok('first');
+    const r = rig(() => {
+      if (answer !== null) return Promise.resolve(answer);
+      gate = deferred<Price>();
+      return gate.promise;
+    });
+    await r.cache.read();
+    answer = null; // every later refresh hangs on its gate
+    r.advance(WOC_PRICE_CACHE_TTL_MS + 1);
+    // Three stale-serve reads against the hanging refresh: all serve the old
+    // success immediately and share ONE in-flight probe (a per-read probe
+    // against a hanging service is the storm single-flight exists to stop).
+    expect((await r.cache.read()).tag).toBe('first');
+    expect((await r.cache.read()).tag).toBe('first');
+    expect((await r.cache.read()).tag).toBe('first');
+    expect(r.calls()).toBe(2);
+    (gate as unknown as { resolve: (v: Price) => void }).resolve(ok('second'));
+    await Promise.resolve();
+    expect((await r.cache.read()).tag).toBe('second');
+  });
+
+  it('a THROWN refresh on the stale-serve path is swallowed and the stale success keeps serving', async () => {
+    let boom = false;
+    const r = rig(async () => {
+      if (boom) throw new Error('refresh bug');
+      return ok('first');
+    });
+    await r.cache.read();
+    boom = true;
+    r.advance(WOC_PRICE_CACHE_TTL_MS + 1);
+    // The kick's rejection is caught (an unhandled rejection here fails the
+    // whole suite), the read still answers, and the settled flight clears so
+    // the next read can retry.
+    expect((await r.cache.read()).tag).toBe('first');
+    await Promise.resolve();
+    await Promise.resolve();
+    boom = false;
+    r.advance(1);
+    expect((await r.cache.read()).tag).toBe('first');
+  });
+
+  it('a THROWN refresh on the cold path rejects the read but never wedges the flight slot', async () => {
+    let boom = true;
+    const r = rig(async () => {
+      if (boom) throw new Error('refresh bug');
+      return ok('recovered');
+    });
+    await expect(r.cache.read()).rejects.toThrow('refresh bug');
+    boom = false;
+    // The finally cleared inFlight, so the retry mints a fresh flight
+    // instead of sharing the dead rejection forever.
+    expect((await r.cache.read()).tag).toBe('recovered');
+  });
+});

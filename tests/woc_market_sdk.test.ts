@@ -336,3 +336,31 @@ describe('the params channel carries CODE PARAMS, not just the code echo', () =>
     });
   });
 });
+
+describe('tradePartner(): a verdict only when the server ANSWERED', () => {
+  it('a 200 resolves ok with the partner', async () => {
+    stubFetch(() => ({
+      status: 200,
+      body: { partner: { name: 'Bree', walletVerified: true } },
+    }));
+    await expect(client().tradePartner('Bree')).resolves.toEqual({
+      ok: true,
+      partner: { name: 'Bree', walletVerified: true },
+    });
+  });
+
+  it("the server's 404 (no such character) is the honest null-partner verdict", async () => {
+    stubFetch(() => ({ status: 404, body: { code: 'woc_market.not_found' } }));
+    await expect(client().tradePartner('Nobody')).resolves.toEqual({ ok: true, partner: null });
+  });
+
+  it.each([
+    ['a rate-limit 429', 429, { code: 'rate_limit.exceeded' }],
+    ['a codeless 500', 500, { detail: 'wreckage' }],
+  ])('%s is a FAILED LOOKUP, never a no-wallet verdict', async (_label, status, body) => {
+    stubFetch(() => ({ status, body }));
+    // ok:false and NOTHING else: the caller must not read this as "cannot
+    // be paid" (the false "recipient has no wallet" class).
+    await expect(client().tradePartner('Bree')).resolves.toEqual({ ok: false });
+  });
+});

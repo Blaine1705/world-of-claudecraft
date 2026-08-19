@@ -1526,8 +1526,8 @@ describeDb('woc market settlement guards against real Postgres', () => {
       await seedSettlement(realm, listingId, buyer, { state: 'offered' });
       // A dedicated two-client pool plus a gauge over query(): the six-way
       // Promise.all this replaces held up to six clients per request, so the
-      // decisive assertion is the PEAK, not the outcome (the phase file's
-      // "the test must count held clients, not just pass functionally").
+      // decisive assertion is the PEAK, not the outcome (the pool-hold bound
+      // must be COUNTED, never just passed functionally).
       const gaugePool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 2 });
       let inFlight = 0;
       let peak = 0;
@@ -1541,7 +1541,22 @@ describeDb('woc market settlement guards against real Postgres', () => {
             inFlight--;
           }
         },
-        connect: () => gaugePool.connect(),
+        // Explicit checkouts count too, for their whole hold: a read
+        // refactored onto withTx must not escape the gauge (today every
+        // activity read is a one-shot pool.query, so connect() going
+        // unexercised here is itself part of the pin).
+        connect: async () => {
+          inFlight++;
+          peak = Math.max(peak, inFlight);
+          const client = await gaugePool.connect();
+          const release = client.release.bind(client);
+          client.release = (destroy?: boolean | Error) => {
+            inFlight--;
+            client.release = release;
+            return release(destroy as Error | undefined);
+          };
+          return client;
+        },
       };
       const marketDbMod = await import('../server/woc_market_db');
       const countingDb = new marketDbMod.PgWocMarketDb(counting as unknown as Pool);
@@ -1587,6 +1602,83 @@ describeDb('woc market settlement guards against real Postgres', () => {
       } finally {
         await gaugePool.end().catch(() => {});
       }
+    });
+
+    it('the realm advisory lock EXCLUDES a second session against real Postgres', async () => {
+      // The shell suite proves the sweep honors a false try-lock answer over
+      // a fake; THIS proves the SQL itself excludes: the exact statement the
+      // shell issues, the exact key constant, two live sessions.
+      const sweepMod = await import('../server/woc_market_sweep');
+      const realm = 'guard-h11-advisory';
+      const a = await pool.connect();
+      const b = await pool.connect();
+      try {
+        const lock = (client: typeof a | typeof b) =>
+          client.query('SELECT pg_try_advisory_lock($1, hashtext($2)) AS ok', [
+            sweepMod.WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
+            realm,
+          ]);
+        const first = await lock(a);
+        expect(first.rows[0]?.ok).toBe(true);
+        // The peer loses while the lock is held...
+        const second = await lock(b);
+        expect(second.rows[0]?.ok).toBe(false);
+        // ...and wins as soon as the holder releases (per-segment release is
+        // what hands the realm's sweep between peers).
+        const unlocked = await a.query('SELECT pg_advisory_unlock($1, hashtext($2)) AS ok', [
+          sweepMod.WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
+          realm,
+        ]);
+        expect(unlocked.rows[0]?.ok).toBe(true);
+        const third = await lock(b);
+        expect(third.rows[0]?.ok).toBe(true);
+        await b.query('SELECT pg_advisory_unlock($1, hashtext($2))', [
+          sweepMod.WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
+          realm,
+        ]);
+      } finally {
+        a.release();
+        b.release();
+      }
+    });
+
+    it('two concurrent sweepers race a bid LAPSE to exactly one winner', async () => {
+      const realm = 'guard-h11-lapse-cas';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const bidId = await seedBid(realm, listingId, buyer, {
+        status: 'pending_bond',
+        bondState: 'pending',
+      });
+      // The guarded lapse is one of the unlocked chain-poll segment's
+      // single-winner writes: its status+bond_state qual is the exclusion.
+      const [a, b] = await Promise.all([marketDb.lapseBid(bidId), marketDb.lapseBid(bidId)]);
+      expect([a, b].filter(Boolean)).toHaveLength(1);
+    });
+
+    it('two concurrent anti-snipe extensions converge on ONE absolute close, never a compound', async () => {
+      const realm = 'guard-h11-extend-cas';
+      const seller = await seedAccount();
+      const endsAtMs = BASE_MS + 60 * MINUTE_MS;
+      const target = endsAtMs + 5 * MINUTE_MS;
+      const listingId = await seedListing(realm, seller, { endsAtMs });
+      // The real caller computes an ABSOLUTE target from the anchor and the
+      // base cap and answers null once the row already reaches it, so a
+      // racing peer re-reading under FOR UPDATE skips instead of stacking a
+      // second extension on the first one's output.
+      const extendTo = (row: { endsAtMs: number }) => (row.endsAtMs >= target ? null : target);
+      const [a, b] = await Promise.all([
+        marketDb.extendAuctionForBondProgress(realm, listingId, extendTo),
+        marketDb.extendAuctionForBondProgress(realm, listingId, extendTo),
+      ]);
+      expect([a, b].filter((r) => r === 'extended')).toHaveLength(1);
+      expect([a, b].filter((r) => r === 'skip')).toHaveLength(1);
+      const row = await pool.query(
+        `SELECT (extract(epoch FROM ends_at) * 1000)::bigint AS ends FROM woc_market_listings WHERE id = $1`,
+        [listingId],
+      );
+      expect(Number(row.rows[0].ends)).toBe(target);
     });
   });
 });

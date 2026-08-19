@@ -484,8 +484,12 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     const { DB_STATEMENT_TIMEOUT_MS, DB_HEAVY_STATEMENT_TIMEOUT_MS } = await import(
       '../../server/db'
     );
-    const { ESCROW_STATEMENT_TIMEOUT_MS, ESCROW_LOCK_TIMEOUT_MS, GUARD_IDLE_TX_TIMEOUT_MS } =
-      await import('../../server/woc_market_db');
+    const {
+      ESCROW_STATEMENT_TIMEOUT_MS,
+      ESCROW_LOCK_TIMEOUT_MS,
+      GUARD_IDLE_TX_TIMEOUT_MS,
+      SAVE_IDLE_TX_TIMEOUT_MS,
+    } = await import('../../server/woc_market_db');
     const { ESCROW_QUEUE_WAIT_MS, ESCROW_QUEUE_WARN_MS, ESCROW_QUEUE_WARN_THROTTLE_MS } =
       await import('../../server/woc_market_custody');
     // 4000 since the directed-rail work: FIVE workload statements now share
@@ -497,6 +501,12 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // Equal BY RULING (the idle bound and the lock wait tell one story).
     expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(2_000);
     expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(ESCROW_LOCK_TIMEOUT_MS);
+    // The save-bearing pair's wider idle bound: the character serialize runs
+    // between statements (idle to Postgres), so the 2s guard bound would
+    // false-fire on an ordinary stall and lose the grant for the pass. It
+    // must sit strictly above the guard bound and stay finite.
+    expect(SAVE_IDLE_TX_TIMEOUT_MS).toBe(10_000);
+    expect(SAVE_IDLE_TX_TIMEOUT_MS).toBeGreaterThan(GUARD_IDLE_TX_TIMEOUT_MS);
     // The HTTP-side queue bounds: the wait deadline mirrors the pool's own
     // 5s checkout deadline, and slow waits warn before they refuse.
     expect(ESCROW_QUEUE_WAIT_MS).toBe(5_000);

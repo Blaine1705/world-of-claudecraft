@@ -147,4 +147,18 @@ describe('woc market sweep watchdog', () => {
     // routine brownouts.
     expect(WOC_MARKET_SWEEP_OVERRUN_WARN_MS).toBe(60_000);
   });
+
+  it('the timer period never drops below one second (a tiny warnMs must not spin the loop)', () => {
+    const spy = vi.spyOn(global, 'setInterval');
+    try {
+      const dog = createWocMarketSweepWatchdog({ log: () => {}, warnMs: 400, now: () => 0 });
+      dog.begin();
+      // warnMs / 4 would be 100ms; the floor clamps the shared interval to
+      // 1000 so a mis-set bound can never turn the idle watchdog into load.
+      expect(spy.mock.calls.at(-1)?.[1]).toBe(1_000);
+      dog.stop();
+    } finally {
+      spy.mockRestore();
+    }
+  });
 });

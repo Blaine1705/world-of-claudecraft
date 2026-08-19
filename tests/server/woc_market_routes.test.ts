@@ -875,6 +875,60 @@ describe('browse query decoding', () => {
     expect(seen).toMatchObject({ page: 0, sort: 'ending', quality: null, format: null });
   });
 
+  it.each([
+    ['a space', 'sun blade'],
+    ['a separator byte', 'sun\x1fblade'],
+    ['a quote', "sun'blade"],
+    ['over-length', 'x'.repeat(129)],
+  ])(
+    'refuses an itemIds entry with %s (the closed id charset is the cache-key fence)',
+    async (_label, hostile) => {
+      service({ browse: async () => ({ rows: [], hasMore: false }) });
+      const ctx = readCtx({ query: { itemIds: `sunblade,${hostile}` } });
+      await expect(handlerFor('GET', '/api/woc-market/listings')(ctx)).rejects.toMatchObject({
+        status: 400,
+        code: 'woc_market.invalid_input',
+      });
+    },
+  );
+
+  it('canonicalizes the itemIds filter: sorted, de-duplicated, empty means null', async () => {
+    const seen: (readonly string[] | null)[] = [];
+    service({
+      browse: async (q) => {
+        seen.push(q.itemIds);
+        return { rows: [], hasMore: false };
+      },
+    });
+    // Order and duplicates collapse to ONE canonical list, so equivalent
+    // filters stay equivalent everywhere downstream (the cache-key rule).
+    await handlerFor('GET', '/api/woc-market/listings')(readCtx({ query: { itemIds: 'b,a,b' } }));
+    expect(seen[0]).toEqual(['a', 'b']);
+    // An empty list and an absent param mean the same "no filter".
+    await handlerFor('GET', '/api/woc-market/listings')(readCtx({ query: { itemIds: '' } }));
+    expect(seen[1]).toBeNull();
+  });
+
+  it.each([
+    ['a space', 'sun blade'],
+    ['over-length', 'x'.repeat(129)],
+  ])(
+    'refuses a history item id with %s (the same closed-charset screen)',
+    async (_label, hostile) => {
+      service({ salesHistory: async () => [] });
+      const ctx = readCtx({
+        url: `/api/woc-market/history/${encodeURIComponent(hostile)}`,
+        params: { itemId: hostile },
+      });
+      await expect(handlerFor('GET', '/api/woc-market/history/:itemId')(ctx)).rejects.toMatchObject(
+        {
+          status: 400,
+          code: 'woc_market.invalid_input',
+        },
+      );
+    },
+  );
+
   it('caps the itemIds filter instead of building an unbounded IN list', async () => {
     // Collected into an array rather than a nullable local: assigning inside the
     // callback leaves the narrowed type at `null` for the property read below.
