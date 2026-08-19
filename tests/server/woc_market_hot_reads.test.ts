@@ -746,9 +746,10 @@ describe('the bond-payout budget', () => {
     // whole batch, and rows 2 and 3 stay durably due for the next pass.
     expect(refundBond).toHaveBeenCalledTimes(1);
     expect(setBondState).toHaveBeenCalledTimes(1);
-    // Rows WALKED, not fetched: a budget break must not read as a drained
-    // batch (3 fetched would satisfy nothing here; the stat says 1).
-    expect(passes[0]?.bonds).toBe(1);
+    // A budget break reports the FETCHED count, never the walked one: the
+    // two undrained rows are a real money backlog, and a walked-only stat
+    // would silence the saturation signal in exactly this degraded case.
+    expect(passes[0]?.bonds).toBe(3);
   });
 });
 

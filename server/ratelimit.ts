@@ -749,15 +749,16 @@ export const WOC_MARKET_BID_MAX_PER_MINUTE = 20;
 export const WOC_MARKET_QUOTE_MAX_PER_MINUTE = 30;
 export const WOC_MARKET_CONFIRM_MAX_PER_MINUTE = 60;
 
-// The one shared read bucket now covers ALL seven marketplace GETs (offers,
-// trade-partner, status, browse, detail, activity, history), so it is sized
-// against the real client cadences, not per route: the Exchange's
-// awaiting-chain poll is two reads every 3 seconds (40/min), the trade
-// window's directed-offer poll is one every 2 seconds (30/min), and a player
-// actively browsing adds a detail+history pair per row tap. One worst-case
-// player sits near 90/min; 240 keeps TWO players behind one NAT (the fused
-// per-IP bucket is shared) under the window with margin, while the caches
-// behind these routes bound what an allowed flood can buy to in-memory work.
+// The one shared read bucket covers SIX marketplace GETs (offers, status,
+// browse, detail, activity, history; trade-partner deliberately rides the
+// smaller quote bucket, an enumeration-shaped read), sized against the real
+// client cadences, not per route: the Exchange's awaiting-chain poll is two
+// reads every 3 seconds (40/min), the trade window's directed-offer poll is
+// one every 2 seconds (30/min), and a player actively browsing adds a
+// detail+history pair per row tap. One worst-case player sits near 90/min;
+// 240 keeps TWO players behind one NAT (the fused per-IP bucket is shared)
+// under the window with margin, while the caches behind these routes bound
+// what an allowed flood can buy to in-memory work.
 export const WOC_MARKET_READ_MAX_PER_MINUTE = 240;
 
 // Step-up challenge issuance (B6/R1): its OWN bucket, sized at double the

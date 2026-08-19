@@ -23,6 +23,7 @@ import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
 import { logSafe, WocWireDriftWarner } from './woc_market_drift_warn';
+import { pruneWocLocalLedgers, wocBackedOffIds } from './woc_market_local_ledgers';
 import type { WocMarketReadCache } from './woc_market_read_cache';
 import {
   adoptableBondCents,
@@ -1357,45 +1358,16 @@ export class WocMarketService {
    *  the two residue arms cannot hide each other's failures). */
   private disposeDueAtMs = 0;
 
-  /** Entries in the process-local ledgers older than this are dead weight:
-   *  a pending grant is only usable while its exact session lives, a pending
-   *  mail attempt retries within a pass or two, and a parked delivery's skip
-   *  window is a minute. */
-  private static readonly LOCAL_LEDGER_TTL_MS = 10 * 60_000;
   private static readonly PARK_RETRY_MS = 60_000;
   private static readonly REDRIVE_INTERVAL_MS = 60_000;
   private static readonly REDRIVE_PAGE = 500;
 
   private pruneLocalLedgers(nowMs: number): void {
-    const cutoff = nowMs - WocMarketService.LOCAL_LEDGER_TTL_MS;
-    for (const [ref, entry] of this.pendingGrants) {
-      if (entry.stampMs <= cutoff) this.pendingGrants.delete(ref);
-    }
-    for (const [ref, entry] of this.pendingMail) {
-      if (entry.stampMs <= cutoff) this.pendingMail.delete(ref);
-    }
-    // The park maps store RETRY times, not stamps: prune once the retry
-    // itself has been stale for the ledger horizon.
-    for (const [id, retryAtMs] of this.parkedDeliveries) {
-      if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
-        this.parkedDeliveries.delete(id);
-      }
-    }
-    for (const [id, retryAtMs] of this.parkedCancelIntents) {
-      if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
-        this.parkedCancelIntents.delete(id);
-      }
-    }
-    for (const [id, retryAtMs] of this.parkedBondPolls) {
-      if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
-        this.parkedBondPolls.delete(id);
-      }
-    }
-    for (const [id, retryAtMs] of this.parkedReturns) {
-      if (nowMs - retryAtMs > WocMarketService.LOCAL_LEDGER_TTL_MS) {
-        this.parkedReturns.delete(id);
-      }
-    }
+    pruneWocLocalLedgers(
+      nowMs,
+      [this.pendingGrants, this.pendingMail],
+      [this.parkedDeliveries, this.parkedCancelIntents, this.parkedBondPolls, this.parkedReturns],
+    );
   }
 
   private now(): number {
@@ -2701,7 +2673,7 @@ export class WocMarketService {
     const bonds = await this.deps.db.confirmingBonds(
       this.cfg.realm,
       SWEEP_BATCH,
-      this.backedOffIds(this.parkedBondPolls, nowMs),
+      wocBackedOffIds(this.parkedBondPolls, nowMs),
     );
     for (const bid of bonds) {
       try {
@@ -3655,7 +3627,7 @@ export class WocMarketService {
       this.cfg.realm,
       nowMs,
       SWEEP_BATCH,
-      this.backedOffIds(this.parkedCancelIntents, nowMs),
+      wocBackedOffIds(this.parkedCancelIntents, nowMs),
     );
     let closed = 0;
     for (const listing of pending) {
@@ -3990,21 +3962,13 @@ export class WocMarketService {
     const stuck = await this.deps.db.deliveringSettlements(
       this.cfg.realm,
       SWEEP_BATCH,
-      this.backedOffIds(this.parkedDeliveries, nowMs),
+      wocBackedOffIds(this.parkedDeliveries, nowMs),
     );
     return this.runDeliveryBatch('reconciled', stuck, nowMs, scope);
   }
 
   /** The ids a batch read should skip: parked rows still inside their
    *  backoff window. Process-local by design, like the park ledgers. */
-  private backedOffIds(parked: ReadonlyMap<number, number>, nowMs: number): number[] {
-    const out: number[] = [];
-    for (const [id, retryAtMs] of parked) {
-      if (retryAtMs > nowMs) out.push(id);
-    }
-    return out;
-  }
-
   /** Drive an older binary's delivered-but-unclosed residue FORWARD: custody
    *  completed ('delivered') but the separately-committed close tail never
    *  ran, leaving a listing nothing else may touch (cancel, suspend, reclaim
@@ -4450,7 +4414,7 @@ export class WocMarketService {
     const backlog = await this.deps.db.undisposedClosedListings(
       this.cfg.realm,
       SWEEP_BATCH,
-      this.backedOffIds(this.parkedReturns, nowMs),
+      wocBackedOffIds(this.parkedReturns, nowMs),
     );
     let advanced = 0;
     for (const listing of backlog) {
@@ -4512,8 +4476,12 @@ export class WocMarketService {
         this.sweepError('bonds', err);
       }
     }
-    // Rows WALKED, not fetched: a budget break must not read as a drained
-    // batch to the saturation signal (walked == SWEEP_BATCH still trips it).
-    return walked;
+    // On a BUDGET BREAK report the rows FETCHED, not walked: the undrained
+    // remainder is a real money backlog, and reporting only the walked count
+    // would silence the saturation signal in exactly the degraded case the
+    // budget exists for (the watchdog cannot cover it either, since the
+    // budget is deliberately under its alarm). A fully walked batch reports
+    // the walk as before.
+    return walked < due.length ? due.length : walked;
   }
 }
