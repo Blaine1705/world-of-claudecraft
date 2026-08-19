@@ -352,6 +352,78 @@ describe('diagnosePerfSnapshot', () => {
       diagnosePerfSnapshot(snapshot).findings.some((finding) => finding.id === 'hitch-other'),
     ).toBe(true);
   });
+  it('caps the three unattributed hitch families at one shared score deduction', () => {
+    // gc, off-frame and other were ONE bucket before the tracker learned to
+    // separate them, and one capture can trip all three off the same long
+    // frames. Ungrouped that is three criticals, 105 points, and the score a
+    // player reads collapses to zero on a single diagnostic refinement.
+    const snapshot = baseSnapshot();
+    makeSlow(snapshot);
+    snapshot.hitches = {
+      frames: 600,
+      hitches: 12,
+      byCause: {
+        'shader-compile': 0,
+        'texture-upload': 0,
+        'zone-build': 0,
+        'view-create': 0,
+        gc: 4,
+        'off-frame': 4,
+        other: 4,
+      },
+      programGrowthFrames: 0,
+      programsAdded: 0,
+      recent: [],
+    };
+
+    const diagnosis = diagnosePerfSnapshot(snapshot);
+    const unattributed = ['hitch-gc', 'hitch-off-frame', 'hitch-other'];
+    // All three findings are still FILED: only the arithmetic is grouped.
+    expect(diagnosis.findings.map((finding) => finding.id).sort()).toEqual(
+      [...unattributed].sort(),
+    );
+    for (const id of unattributed) {
+      expect(diagnosis.findings.find((finding) => finding.id === id)?.severity).toBe('critical');
+    }
+    expect(diagnosis.status).toBe('critical');
+    // One critical deduction between them, exactly what the single bucket cost.
+    expect(diagnosis.score).toBe(65);
+
+    // A NAMED family is not in the group, so it still deducts on its own: the
+    // cap is a shared bucket, never a blanket discount on hitch findings.
+    snapshot.hitches.byCause['zone-build'] = 4;
+    snapshot.hitches.hitches = 16;
+    const withNamed = diagnosePerfSnapshot(snapshot);
+    expect(withNamed.findings.some((finding) => finding.id === 'hitch-zone-build')).toBe(true);
+    expect(withNamed.score).toBe(30);
+  });
+
+  it('scores a healthy capture at 100 and a single unattributed family at 65', () => {
+    // The healthy end of the same pin: nothing fires, nothing is deducted.
+    expect(diagnosePerfSnapshot(baseSnapshot()).score).toBe(100);
+
+    const snapshot = baseSnapshot();
+    makeSlow(snapshot);
+    snapshot.hitches = {
+      frames: 600,
+      hitches: 4,
+      byCause: {
+        'shader-compile': 0,
+        'texture-upload': 0,
+        'zone-build': 0,
+        'view-create': 0,
+        gc: 0,
+        'off-frame': 0,
+        other: 4,
+      },
+      programGrowthFrames: 0,
+      programsAdded: 0,
+      recent: [],
+    };
+    // One family alone reaches the cap, so the group's cap changes nothing here.
+    expect(diagnosePerfSnapshot(snapshot).score).toBe(65);
+  });
+
   it('names zone streaming builds with the renderer streaming sources', () => {
     const snapshot = baseSnapshot();
     snapshot.hitches = {
