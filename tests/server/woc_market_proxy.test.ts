@@ -383,6 +383,17 @@ describe('the price and estimate caches at the proxy (H11)', () => {
     expect(b).toBe(c);
   });
 
+  it('an UNAVAILABLE estimate is cached for the full TTL like a success (the documented storm guard)', async () => {
+    respond = () => ({ status: 500, body: {} });
+    const economy = createWocMarketEconomyProxy();
+    expect((await economy.estimate(700)).available).toBe(false);
+    expect((await economy.estimate(700)).available).toBe(false);
+    // ONE call: re-probing per read during an outage is the storm the cache
+    // exists to prevent (deliberately unlike the price read's short memo;
+    // estimates degrade to a missing line, prices pause the market).
+    expect(seen).toHaveLength(1);
+  });
+
   it('concurrent estimates for one amount share ONE service call; a new amount pays its own', async () => {
     respond = () => ({
       status: 200,

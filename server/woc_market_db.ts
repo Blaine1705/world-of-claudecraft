@@ -1153,6 +1153,15 @@ export class PgWocMarketDb implements WocMarketDb {
       const code = (e: unknown): string | undefined =>
         (e as { code?: string } | null | undefined)?.code;
       const chosen = code(err) !== undefined ? err : code(asyncErr) !== undefined ? asyncErr : err;
+      // 25P03 gets its own line: the idle-in-transaction bound KILLED this
+      // session and the finally below destroys the pooled client, so a storm
+      // of these (a long event-loop stall on the shared box) evicts several
+      // of the ten clients at once. Folded silently into 'contended' it was
+      // indistinguishable from ordinary lock waits; the distinct line is what
+      // makes the retrofit's false-fire rate observable in production.
+      if (code(chosen) === '25P03') {
+        console.warn('[woc_market] guard transaction idle-killed (25P03); pooled client destroyed');
+      }
       // A failure with NO SQLSTATE means no server verdict reached us, so the
       // connection's protocol state is unknown: the driver-side query_timeout
       // in particular rejects with a codeless error, cancels nothing
@@ -3525,9 +3534,11 @@ export class PgWocMarketDb implements WocMarketDb {
     // Selection only: the 'won' stamp rides the settlement insert
     // (insertSettlement winnerBidId), so a crash between pick and insert
     // leaves nothing to unwind and the next pass simply re-picks. Lock-free
-    // on the single-sweeper premise (woc_market_sweep.ts holds the per-realm
-    // advisory lock, pinned by tests/woc_market_sweep.test.ts); the one-open-
-    // settlement index is the arbiter if that premise is ever broken.
+    // on the segment-sweeper premise (woc_market_sweep.ts holds the
+    // per-realm advisory lock around the LOCKED segment this runs in, not
+    // the whole pass, so a peer's unlocked arms may interleave); the
+    // one-open-settlement index and the winner-bid CAS are the arbiters
+    // whenever two pickers ever race.
     const res = await this.pool.query(
       `SELECT ${BID_COLS} FROM woc_market_bids
         WHERE listing_id = $1 AND status = 'outbid' AND amount_cents >= $2

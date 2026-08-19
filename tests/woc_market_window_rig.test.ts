@@ -962,7 +962,9 @@ describe('WocMarketWindow live rig: resolved disclosure figures and the select s
       q<HTMLButtonElement>(r.root, '.wm-row-open').click();
       await flush();
       const detailScrolls = seen.filter((s) => s.className.includes('wm-detail'));
-      expect(detailScrolls.length).toBeGreaterThanOrEqual(1);
+      // EXACTLY one: a re-command on every render inside the tap's flush
+      // would fight the player's own scrolling.
+      expect(detailScrolls.length).toBe(1);
       // block nearest: a no-op on the desktop's sticky pane, the scroll cure
       // on the stacked phone sheet.
       expect(detailScrolls[0]?.arg).toEqual({ block: 'nearest' });
@@ -985,9 +987,23 @@ describe('WocMarketWindow live rig: resolved disclosure figures and the select s
       q<HTMLButtonElement>(r.root, '.wm-row-open').click();
       await flush();
       seen.length = 0;
+      // The positive control: the poll's answer CHANGES the table, so the
+      // absence below is a real re-render declining to scroll, never a
+      // short-circuited poll passing vacuously.
+      r.fake.answers.browse = async () => ({
+        ok: true,
+        hasMore: false,
+        page: 0,
+        listings: [listing(1), listing(2)],
+      });
       vi.spyOn(Date, 'now').mockReturnValue(NOW + 120_000);
+      // Two ticks: the poll only MUTATES on the first (it never paints); the
+      // second tick's signature compare is the render path that shows it.
       r.win.refreshIfChanged();
       await flush();
+      r.win.refreshIfChanged();
+      await flush();
+      expect(r.root.querySelectorAll('.wm-row').length).toBe(2);
       expect(seen.filter((c) => c.includes('wm-detail'))).toEqual([]);
     } finally {
       vi.restoreAllMocks();
@@ -1041,6 +1057,32 @@ describe('WocMarketWindow live rig: resolved disclosure figures and the select s
     expect(caption).toContain(t('hudChrome.wocMarket.sellCollectiblesMounts'));
     expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesBoth'));
     expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesChromas'));
+  });
+
+  it('with both switches on the caption takes the combined sentence, never the singles', async () => {
+    const r = rig({ inventory: [] });
+    r.fake.answers.status = async () => status({ allowMounts: true, allowMechChromas: true });
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    await flush();
+    const caption = q(r.root, '.wm-sell .wm-status').textContent ?? '';
+    expect(caption).toContain(t('hudChrome.wocMarket.sellCollectiblesBoth'));
+    expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesMounts'));
+    expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesChromas'));
+  });
+
+  it('with only chroma plates on the caption names exactly them', async () => {
+    const r = rig({ inventory: [] });
+    r.fake.answers.status = async () => status({ allowMounts: false, allowMechChromas: true });
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    await flush();
+    const caption = q(r.root, '.wm-sell .wm-status').textContent ?? '';
+    expect(caption).toContain(t('hudChrome.wocMarket.sellCollectiblesChromas'));
+    expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesBoth'));
+    expect(caption).not.toContain(t('hudChrome.wocMarket.sellCollectiblesMounts'));
   });
 
   it('with both collectible switches off the caption names only the floor', async () => {

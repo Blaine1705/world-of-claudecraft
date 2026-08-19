@@ -5,7 +5,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { WocBrowseQuery } from '../../server/woc_market';
 import {
+  WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES,
   WOC_MARKET_BROWSE_CACHE_TTL_MS,
+  WOC_MARKET_DETAIL_CACHE_MAX_ENTRIES,
+  WOC_MARKET_DETAIL_CACHE_TTL_MS,
+  WOC_MARKET_HISTORY_CACHE_MAX_ENTRIES,
+  WOC_MARKET_HISTORY_CACHE_TTL_MS,
+  WOC_MARKET_ME_CACHE_MAX_ENTRIES,
   WOC_MARKET_ME_CACHE_TTL_MS,
   WocMarketReadCache,
   wocBrowseCacheKey,
@@ -56,6 +62,16 @@ describe('the browse cache key', () => {
     expect(wocBrowseCacheKey({ ...Q, itemIds: ['a', 'b'] })).not.toBe(
       wocBrowseCacheKey({ ...Q, itemIds: ['a'] }),
     );
+    expect(wocBrowseCacheKey({ ...Q, itemIds: [] })).toBe(base);
+  });
+
+  it('the key shape is the pinned literal (separator and component order are load-bearing)', () => {
+    // The \x1f separator and the field order are what keep distinct tuples
+    // distinct; a reordered builder must fail HERE, not in production.
+    expect(wocBrowseCacheKey(Q)).toBe('0\x1f25\x1fending\x1f\x1f\x1f');
+    expect(
+      wocBrowseCacheKey({ ...Q, quality: 'epic', format: 'auction', itemIds: ['a', 'b'] }),
+    ).toBe('0\x1f25\x1fending\x1fepic\x1fauction\x1fa,b');
   });
 });
 
@@ -113,20 +129,30 @@ describe('read-through behavior', () => {
     expect(await r.cache.sales('sunblade', async () => [{ id: 3 }])).toBe(sunblade);
   });
 
-  it('freezes the shared value one level deep (result, arrays, rows)', async () => {
+  it('freezes the shared value: result, arrays, rows, row items, and object values', async () => {
     const r = rig();
     const page = await r.cache.browse(Q, async () => ({
-      rows: [{ id: 1, status: 'active' }],
+      rows: [{ id: 1, status: 'active', item: { itemId: 'sunblade', count: 1 } }],
       hasMore: false,
     }));
     expect(Object.isFrozen(page)).toBe(true);
     expect(Object.isFrozen(page.rows)).toBe(true);
     expect(Object.isFrozen(page.rows[0])).toBe(true);
+    // The row's item payload is the nested object a future consumer could
+    // plausibly redact in place; it freezes too.
+    expect(Object.isFrozen((page.rows[0] as { item: object }).item)).toBe(true);
     // A consumer's in-place edit throws under strict mode instead of
     // corrupting every other caller's copy for the rest of the TTL.
     expect(() => {
       (page.rows as unknown[]).push({ id: 2 });
     }).toThrow();
+    // Non-array object values (the activity readout's strike row) freeze as
+    // well: result.strikes.strikes++ must throw, not corrupt.
+    const readout = await r.cache.myActivity(7, async () => ({
+      listings: [],
+      strikes: { strikes: 1, suspendedUntilMs: null },
+    }));
+    expect(Object.isFrozen(readout.strikes)).toBe(true);
   });
 });
 
@@ -194,8 +220,16 @@ describe('bounds', () => {
     expect(refresh.mock.calls.length).toBe(calls + 1);
   });
 
-  it('exports the documented TTLs (at or under the cadences that already bound freshness)', () => {
+  it('exports the documented TTLs and caps (at or under the cadences that bound freshness)', () => {
     expect(WOC_MARKET_BROWSE_CACHE_TTL_MS).toBe(3_000);
+    expect(WOC_MARKET_DETAIL_CACHE_TTL_MS).toBe(3_000);
+    // The history TTL is the one that gates how long a moderation-adjacent
+    // staleness can last between busts; the caps bound realm memory.
+    expect(WOC_MARKET_HISTORY_CACHE_TTL_MS).toBe(10_000);
     expect(WOC_MARKET_ME_CACHE_TTL_MS).toBe(2_000);
+    expect(WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES).toBe(128);
+    expect(WOC_MARKET_DETAIL_CACHE_MAX_ENTRIES).toBe(256);
+    expect(WOC_MARKET_HISTORY_CACHE_MAX_ENTRIES).toBe(256);
+    expect(WOC_MARKET_ME_CACHE_MAX_ENTRIES).toBe(512);
   });
 });

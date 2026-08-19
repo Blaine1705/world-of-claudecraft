@@ -13,10 +13,13 @@
 // for tens of minutes while every peer lost the try-lock. Now:
 // - a `locked` segment (the database arms) brackets its bounded batches with
 //   checkout + try-lock and unlock + release;
-// - an UNLOCKED segment (the chain arms) runs with NO pool client and NO
-//   advisory lock at all; its writes are single-winner CAS transitions (see
-//   sweepSegments' contract), so a concurrent peer costs duplicate reads,
-//   never duplicate effects;
+// - an UNLOCKED segment (the read-only confirm polls) holds NO client and NO
+//   advisory lock ACROSS its chain round trips; the individual guarded
+//   writes it lands still check out their own clients for their own bounded
+//   transactions, and every one is a single-winner CAS transition (see
+//   sweepSegments' contract), so a concurrent peer costs duplicate confirm
+//   round trips for the deploy-overlap window (an accepted, bounded cost),
+//   never duplicate effects; money-moving chain arms stay locked;
 // - a LOST try-lock aborts the rest of the pass (the peer holding the lock
 //   IS this realm's sweep, exactly the old whole-pass semantic, now judged
 //   at each locked segment);
@@ -137,8 +140,10 @@ export function createWocMarketSweep(deps: WocMarketSweepDeps): WocMarketSweep {
     deps.watchdog?.begin();
     try {
       for (const segment of plan.segments) {
-        // A stop() ends the pass at the next segment boundary: shutdown must
-        // not wait out an unlocked segment's chain round trips.
+        // A stop() ends the pass at the next segment boundary: shutdown
+        // skips every segment not yet started (it still waits out the one
+        // in flight; only the poll cadence, never stop(), can cut a
+        // segment's own chain round trips short).
         if (stopped) break;
         deps.watchdog?.segment(segment.name);
         if (segment.locked) {

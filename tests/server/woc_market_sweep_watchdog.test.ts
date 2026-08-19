@@ -2,7 +2,7 @@
 // mid-flight voice for a camping pass. The clock is injected and tick() is
 // driven directly (the monitor's logTick idiom), so no fake timers anywhere.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   createWocMarketSweepWatchdog,
   WOC_MARKET_SWEEP_OVERRUN_WARN_MS,
@@ -114,6 +114,31 @@ describe('woc market sweep watchdog', () => {
     clock += 2_000;
     expect(() => dog.tick()).not.toThrow();
     expect(dog.readout().overruns).toBe(1);
+  });
+
+  it('arms ONE unref-ed interval at the documented quarter-bound period, and stop() clears it', () => {
+    const spy = vi.spyOn(globalThis, 'setInterval');
+    try {
+      const dog = createWocMarketSweepWatchdog({ log: () => {}, now: () => 0 });
+      dog.begin();
+      dog.begin();
+      // One shared interval across passes; hasRef() false is the pin that
+      // catches a deleted unref (every Node Timeout HAS the method, so a
+      // typeof check would stay green with the call removed) - without it a
+      // live handle holds the process open through every shutdown.
+      expect(spy).toHaveBeenCalledTimes(1);
+      const handle = spy.mock.results[0]?.value as NodeJS.Timeout;
+      expect(handle.hasRef()).toBe(false);
+      expect(spy.mock.calls[0]?.[1]).toBe(15_000);
+      dog.stop();
+      // Idempotent, and a fresh begin() re-arms.
+      dog.stop();
+      dog.begin();
+      expect(spy).toHaveBeenCalledTimes(2);
+      dog.stop();
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it('the default bound is one confirm timeout', () => {

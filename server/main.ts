@@ -386,7 +386,7 @@ import {
 } from './woc_market_db';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
-import { WocMarketReadCache } from './woc_market_read_cache';
+import { registerWocMarketReadCacheForBusts, WocMarketReadCache } from './woc_market_read_cache';
 import { configureWocMarketRuntime, wocMarketConfig } from './woc_market_routes';
 import { createWocMarketSweep } from './woc_market_sweep';
 import { createWocMarketSweepWatchdog } from './woc_market_sweep_watchdog';
@@ -2789,6 +2789,9 @@ const wocMarketDb = new PgWocMarketDb(pool);
 // The hot-read cache (H11): the service reads through it; the route layer's
 // mutation handlers bust it. ONE instance wired to both, or busts would miss.
 const wocMarketReadCache = new WocMarketReadCache();
+// The wallet link/unlink writes in db.ts bust the activity readout through
+// the module-level registration (identity changes never wait out a TTL).
+registerWocMarketReadCacheForBusts(wocMarketReadCache);
 const wocMarketService = new WocMarketService({
   db: wocMarketDb,
   economy: wocMarketEconomy,
@@ -2860,6 +2863,10 @@ const wocMarketMonitor = createWocMarketMonitor({
 configureInternalWocMarketStuckRead(async () => ({
   ...(await wocMarketMonitor.read()),
   sweep: wocMarketSweepWatchdog.readout(),
+  // The hot-read cache counters (reads/refreshes/evictions/busts/entries per
+  // surface): eviction thrash or a bust storm is a DB-load incident in the
+  // making, and this readout is where an operator already looks.
+  readCaches: wocMarketReadCache.stats(),
 }));
 
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
@@ -3667,6 +3674,7 @@ export async function startServer(): Promise<http.Server> {
     // race the pool close below.
     await retentionSweep.stop();
     await wocMarketSweep.stop();
+    wocMarketSweepWatchdog.stop();
     await wocMarketMonitor.stop();
     await generalChatQuotaListener.stop();
     game.stop();

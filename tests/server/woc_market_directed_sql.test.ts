@@ -1063,6 +1063,16 @@ describe('every guard transaction bounds its idle holds', () => {
     const idleBounds = src.match(/SET LOCAL idle_in_transaction_session_timeout/g) ?? [];
     expect(txSites.length).toBe(12);
     expect(idleBounds.length).toBe(txSites.length);
+    // DISTRIBUTION, not just the count: a copy-paste retrofit can double one
+    // site and skip another with the totals intact. Every withTx callback
+    // must carry the bound near its head (the SET LOCALs open each guard).
+    const slices = src.split('this.withTx(').slice(1);
+    for (const [i, slice] of slices.entries()) {
+      expect(
+        slice.slice(0, 1600).includes('SET LOCAL idle_in_transaction_session_timeout'),
+        `withTx site ${i + 1} carries the idle bound near its head`,
+      ).toBe(true);
+    }
   });
 });
 

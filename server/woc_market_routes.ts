@@ -305,6 +305,18 @@ function stringField(value: unknown, maxLen: number): string {
   return value as string;
 }
 
+/** An item id as a FILTER input: the closed machine vocabulary's charset,
+ *  refused otherwise. Tighter than stringField on purpose: these values
+ *  become shared cache-key components and index-filter arms, so free-text
+ *  here is key-entropy an attacker mints for free (the browse cache-thrash
+ *  class), and no real item id needs anything outside this set. */
+const ITEM_ID_SHAPE = /^[A-Za-z0-9_.:-]{1,128}$/;
+function itemIdField(value: unknown): string {
+  const id = stringField(value, 128);
+  if (!ITEM_ID_SHAPE.test(id)) invalid();
+  return id;
+}
+
 /** A submitted transaction signature. Real Solana signatures are base58
  *  (87-88 chars); the shape bound is looser (the dev economy and its tests
  *  post plain tagged strings, and the trade controller's dev-chain arm
@@ -573,15 +585,26 @@ async function browseHandler(ctx: Ctx): Promise<void> {
   if (qualityRaw !== null && !QUALITIES.has(qualityRaw)) invalid();
   if (formatRaw !== null && !LISTING_FORMATS.has(formatRaw)) invalid();
   const itemIdsRaw = one(ctx.query.itemIds);
-  const itemIds =
+  // Shape-screened, sorted, de-duplicated, and normalized to null when empty:
+  // item ids are a closed machine vocabulary, so anything outside the id
+  // charset is a 400, not a novel filter; the canonical order keeps
+  // equivalent filters equivalent everywhere downstream; and an empty list
+  // and an absent param mean the same "no filter" to the SQL, so they must
+  // be ONE value, not a coupling between modules.
+  const screened =
     itemIdsRaw === null
-      ? null
-      : itemIdsRaw
-          .split(',')
-          .map((s) => s.trim())
-          .filter((s) => s !== '')
-          .slice(0, 50)
-          .map((id) => stringField(id, 128));
+      ? []
+      : [
+          ...new Set(
+            itemIdsRaw
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s !== '')
+              .slice(0, 50)
+              .map((id) => itemIdField(id)),
+          ),
+        ].sort();
+  const itemIds = screened.length === 0 ? null : screened;
   // Validated like every other numeric on this surface: an unclamped page
   // became the SQL OFFSET, so 1e400 reached Postgres as Infinity (a 500 on
   // client input) and huge finite values forced a full index walk.
@@ -827,8 +850,9 @@ async function myActivityHandler(ctx: Ctx): Promise<void> {
 }
 
 async function historyHandler(ctx: Ctx): Promise<void> {
-  const itemId = ctx.params.itemId ?? '';
-  if (itemId === '' || itemId.length > 128) invalid();
+  // The same closed-vocabulary screen the browse filter uses: this value is
+  // a shared cache-key component, so free text is minted key entropy.
+  const itemId = itemIdField(ctx.params.itemId ?? '');
   const sales = await useService().salesHistory(itemId);
   json(ctx.res, 200, { sales: sales.map(saleView) });
 }
@@ -1043,10 +1067,18 @@ async function acceptOfferHandler(ctx: Ctx): Promise<void> {
     optionalStepUp(body.stepUp),
   );
   if (!out.ok) throwRefusal(out);
-  // Acceptance can escrow a listing (the directed rail's consummation) and
-  // moves both parties' activity readouts.
+  // Acceptance can escrow a listing (the directed rail's consummation), and
+  // once one exists BOTH parties' activity readouts change (the seller's
+  // listings row, the buyer's coming settlement), so both bust; before the
+  // deal consummates only the acting side's view moved.
   readCache()?.bustListings();
   readCache()?.bustMe(viewer);
+  if (out.listing !== null) {
+    readCache()?.bustMe(out.listing.sellerAccount);
+    if (out.listing.directedBuyerAccount !== null) {
+      readCache()?.bustMe(out.listing.directedBuyerAccount);
+    }
+  }
   // A null listing means "agreed, still waiting on the other side": the deal is
   // live but nothing has escrowed, and the client must not treat it as done.
   json(ctx.res, 200, {
@@ -1092,10 +1124,14 @@ export const routes: RouteDef[] = [
     // offers the arm. The subject is another player BY DESIGN, so there is no
     // owner to load; the name rides a query param rather than a path segment
     // because a character name is not an id and may contain spaces.
+    // The QUOTE bucket, not the read one, ON PURPOSE: this is an
+    // existence-plus-wallet-linkage oracle over free-text names, and the
+    // widened polling budget must not widen how fast an account can harvest
+    // who has linked a wallet. A trade needs one lookup; 30/min is ample.
     method: 'GET',
     path: '/api/woc-market/trade-partner',
     surface: 'api',
-    middleware: [activeAccount, rateLimit(WOC_MARKET_READ_POLICY)],
+    middleware: [activeAccount, rateLimit(WOC_MARKET_QUOTE_POLICY)],
     handler: tradePartnerHandler,
   },
   {

@@ -1423,8 +1423,15 @@ export class WocMarketService {
     // Viewer-identical per query tuple (the SQL excludes directed listings and
     // carries nothing viewer-scoped), so the page is shared through the read
     // cache; listingView's `mine` is computed per request over the shared rows.
+    // Item-filtered searches BYPASS the cache on purpose: the filter list is
+    // caller-chosen key entropy (screened, but still an open combination
+    // space), and caching it would let one account's distinct filters evict
+    // the hot unfiltered pages every player shares. A filtered search is a
+    // per-user lookup; the limiter is its bound.
     const refresh = () => this.deps.db.browseListings(this.cfg.realm, q);
-    return this.deps.readCache ? this.deps.readCache.browse(q, refresh) : refresh();
+    return this.deps.readCache && q.itemIds === null
+      ? this.deps.readCache.browse(q, refresh)
+      : refresh();
   }
 
   /**
@@ -1508,8 +1515,11 @@ export class WocMarketService {
     const refresh = () => this.deps.db.salesForItem(this.cfg.realm, itemId, limit);
     // Keyed by item alone: every route caller uses the default limit, and a
     // non-default limit (none exists today) must bypass rather than poison
-    // the shared key.
-    return this.deps.readCache && limit === 20
+    // the shared key. UNKNOWN item ids also bypass: they answer an empty
+    // list either way, and caching them would let free-text ids (the route
+    // screens the charset, not the vocabulary) evict the real items' warm
+    // history entries.
+    return this.deps.readCache && limit === 20 && Object.hasOwn(ITEMS, itemId)
       ? this.deps.readCache.sales(itemId, refresh)
       : refresh();
   }
@@ -3138,13 +3148,20 @@ export class WocMarketService {
    * - `locked: true` segments are the database arms; the shell holds the
    *   advisory lock (and its one pool client) only for that segment's
    *   bounded batches, releasing both between segments.
-   * - `locked: false` segments make CHAIN calls and run with NO pool client
-   *   and NO advisory lock. Safe under a concurrent peer (the deploy-overlap
+   * - `locked: false` segments (the confirm polls) make read-only CHAIN
+   *   calls and run with NO client checked out between their statements and
+   *   NO advisory lock held. Safe under a concurrent peer (the deploy-overlap
    *   window) because every write they make is a single-winner CAS over the
-   *   row's own state (transitionSettlement's state guard, holdBondAndActivate,
-   *   the guarded lapse, setBondState's from-state list) and the service-side
-   *   refund/forfeit/confirm calls are idempotent by reference; a peer racing
-   *   the same row costs at most a duplicate read-only round trip.
+   *   row's own state: transitionSettlement's state guard, holdBondAndActivate
+   *   (an ordered FOR UPDATE re-read), the guarded lapse, and the anti-snipe
+   *   extension (extendAuctionForBondProgress re-reads the listing under FOR
+   *   UPDATE and recomputes against the base cap, so a racing peer moves the
+   *   close by observation skew, never by a second extension). A peer racing
+   *   the same row costs duplicate confirm round trips for the overlap
+   *   window, never a duplicate effect. The individual guarded writes still
+   *   check out their own clients for their own bounded transactions; what an
+   *   unlocked segment never does is HOLD one across a chain round trip.
+   *   Money-moving chain arms are locked (see bond-payouts below).
    * - Progress persists BETWEEN segments by construction: every arm commits
    *   its row transitions per row, so an aborted pass (lost lock, shutdown)
    *   resumes from durable state on the next pass.
@@ -3262,8 +3279,21 @@ export class WocMarketService {
       },
       {
         name: 'bond-payouts',
-        locked: false,
+        locked: true,
         run: async () => {
+          // LOCKED, unlike the poll segment, because this arm's chain calls
+          // MOVE MONEY (bond refunds and forfeits) and bondsDue is an
+          // unclaimed read: two deploy-overlap peers would both read the same
+          // refund_due row and both fire the refund RPC before either
+          // setBondState CAS lands. The service's release protocol is
+          // idempotent by reference (the claim CAS persists the signed tx
+          // before broadcast, probe-before-resend), so a duplicate request
+          // cannot double-pay, but the lock keeps game-side exclusion
+          // PROVABLE rather than resting on the cross-repo contract alone.
+          // Worst case under a service brownout this holds the lock client
+          // for SWEEP_BATCH refund timeouts (about two minutes), which the
+          // sweep watchdog reports mid-flight; the hour-scale camp H11 flags
+          // lives in the confirm polls, which stay unlocked.
           await runArm('bonds', () => this.processDueBonds());
         },
       },

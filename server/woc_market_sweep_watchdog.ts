@@ -19,6 +19,11 @@
 // Wall clock is correct here (server-only, never sim). The timer callback is
 // exposed as tick() so tests drive it with the injected clock and no fake
 // timers (the monitor's logTick shape).
+//
+// Coverage honesty: the readout answers the SHELL's pass (begin/segment/end
+// are the shell's stamps). A test's or an eager poke's direct
+// service.sweepPass() run never stamps it, so `running: false` means "the
+// shell is idle", not "no sweep work is executing anywhere".
 
 export const WOC_MARKET_SWEEP_OVERRUN_WARN_MS = 60_000;
 
@@ -57,6 +62,8 @@ export interface WocMarketSweepWatchdog {
   /** The timer body; exposed for tests (production's interval calls it). */
   tick(): void;
   readout(): WocMarketSweepWatchdogReadout;
+  /** Clear the shared interval (shutdown symmetry with the monitor/sweep). */
+  stop(): void;
 }
 
 export function createWocMarketSweepWatchdog(
@@ -119,6 +126,12 @@ export function createWocMarketSweepWatchdog(
       currentSegment = null;
     },
     tick,
+    stop(): void {
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    },
     readout(): WocMarketSweepWatchdogReadout {
       return {
         running: startedAtMs !== null,

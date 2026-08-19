@@ -28,10 +28,25 @@
 // -> that item's history; strike clearing -> that account's readout). Sweep
 // transitions deliberately ride the TTL.
 //
-// Values handed out are FROZEN one level deep (result object, its arrays,
-// their rows): read() hands the SAME object to every caller inside a TTL
+// Values handed out are FROZEN defensively (the result object, its arrays,
+// their rows, each row's `item` payload, and non-array object values like the
+// strike row): read() hands the SAME object to every caller inside a TTL
 // window, so an in-place sort or redaction by one consumer would corrupt it
 // for the rest (the monitor's freezeReadout rationale).
+//
+// Scope truths a reader must not over-assume:
+// - Busts are IN-PROCESS. One process serves one realm, which is the
+//   deployment shape; during a deploy overlap a peer process converges on
+//   the short TTLs instead (seconds), and the keys deliberately omit the
+//   realm because each process constructs its own instance.
+// - A null listing row is cached like any other answer (a probed missing id
+//   stays 404-cheap); every in-process listing-creating path busts, so a
+//   fresh listing is never hidden behind its own pre-warmed negative.
+// - Every refresh thunk for a given key MUST be equivalent (the key encodes
+//   every input the thunk varies on). The service call sites hold this by
+//   construction: browse keys encode the whole query tuple, sales is gated
+//   to the one default limit, and the row/activity thunks close over the key
+//   itself.
 
 import type { KeyedCachedReadStats } from './cached_read';
 import { KeyedCachedRead } from './cached_read';
@@ -47,11 +62,13 @@ export const WOC_MARKET_ME_CACHE_TTL_MS = 2_000;
 export const WOC_MARKET_ME_CACHE_MAX_ENTRIES = 512;
 
 /** The canonical browse cache key. Field-by-field, never JSON.stringify of
- *  the object: key equality must not depend on property insertion order, and
- *  itemIds are joined AFTER the route's own bound (50 ids, 128 chars each)
- *  so the key length is bounded by what the route already admits. The \x1f
- *  separator cannot appear in any component (itemIds pass the route's
- *  stringField screen; the rest are enum words and integers). */
+ *  the object: key equality must not depend on property insertion order. The
+ *  \x1f separator cannot appear in any component: the route screens itemIds
+ *  to the closed item-id charset (ITEM_ID_SHAPE, sorted and de-duplicated)
+ *  and the rest are enum words and clamped integers. Belt only today: the
+ *  service consults the cache ONLY for itemIds === null queries, so the
+ *  itemIds component is always empty in a live key; it stays in the builder
+ *  so lifting that gate can never silently merge distinct filters. */
 export function wocBrowseCacheKey(q: WocBrowseQuery): string {
   return [
     String(q.page),
@@ -63,26 +80,34 @@ export function wocBrowseCacheKey(q: WocBrowseQuery): string {
   ].join('\x1f');
 }
 
-/** One level of defensive freezing: the shared result, its arrays, and their
- *  rows. Deliberately not deep (row internals like the item payload are
- *  treated as read-only by every consumer; deep-freezing them would walk
- *  every cached byte per refresh). */
+/** Defensive freezing of the shared value: the result, its arrays, their
+ *  rows, each row's `item` payload (the one nested object handlers could
+ *  plausibly redact in place), and non-array object values (the activity
+ *  readout's strike row). Deliberately not a full deep walk: freezing every
+ *  cached byte per refresh is the cost this stops at, and anything deeper
+ *  than a row's item has no mutating consumer to guard against. */
+function freezeRow(row: unknown): void {
+  if (row === null || typeof row !== 'object') return;
+  const item = (row as { item?: unknown }).item;
+  if (item !== null && typeof item === 'object') Object.freeze(item);
+  Object.freeze(row);
+}
+
 function freezeShared<T>(value: T): T {
   if (value === null || typeof value !== 'object') return value;
   for (const inner of Object.values(value as Record<string, unknown>)) {
     if (Array.isArray(inner)) {
-      for (const row of inner) {
-        if (row !== null && typeof row === 'object') Object.freeze(row);
-      }
+      for (const row of inner) freezeRow(row);
+      Object.freeze(inner);
+    } else if (inner !== null && typeof inner === 'object') {
       Object.freeze(inner);
     }
   }
   if (Array.isArray(value)) {
-    for (const row of value as unknown[]) {
-      if (row !== null && typeof row === 'object') Object.freeze(row);
-    }
+    for (const row of value as unknown[]) freezeRow(row);
   }
-  return Object.freeze(value);
+  freezeRow(value);
+  return value;
 }
 
 /** A keyed cache whose refresh thunk arrives PER CALL (the service passes a
@@ -98,19 +123,28 @@ class ThunkKeyedCache<K extends string | number> {
   constructor(private readonly opts: { ttlMs: number; maxEntries: number; now?: () => number }) {
     this.cache = new KeyedCachedRead<unknown, K>((key) => {
       const refresh = this.refreshers.get(key);
-      if (!refresh) throw new Error(`woc market read cache has no refresh for key ${String(key)}`);
+      // No key in the message: browse and history keys carry caller-supplied
+      // text, and this error can reach the raw stale-serve warn in
+      // cached_read.ts (the log-forging discipline).
+      if (!refresh) throw new Error('woc market read cache has no refresh for this key');
       return refresh().then(freezeShared);
     }, opts);
   }
 
   read<T>(key: K, refresh: () => Promise<T>): Promise<T> {
     this.refreshers.set(key, refresh);
+    const flight = this.cache.read(key) as Promise<T>;
+    // Prune AFTER starting the read, never before: the cache inserts this
+    // key's entry synchronously ahead of its flight, so only now is the
+    // sweep guaranteed not to drop the thunk of the very read it is part of
+    // (pruning first did exactly that once the registry crossed the
+    // threshold, which the churn-bound test reproduces).
     if (this.refreshers.size > this.opts.maxEntries * 2) {
       for (const k of this.refreshers.keys()) {
         if (!this.cache.has(k)) this.refreshers.delete(k);
       }
     }
-    return this.cache.read(key) as Promise<T>;
+    return flight;
   }
 
   bust(key: K): void {
@@ -121,9 +155,30 @@ class ThunkKeyedCache<K extends string | number> {
     this.cache.bustAll();
   }
 
-  stats(): KeyedCachedReadStats {
-    return this.cache.stats();
+  stats(): KeyedCachedReadStats & { refreshRegistry: number } {
+    // refreshRegistry rides along so the registry's 2x-cap bound is
+    // observable (and pinned) rather than claimed.
+    return { ...this.cache.stats(), refreshRegistry: this.refreshers.size };
   }
+}
+
+// ---------------------------------------------------------------------------
+// The one cross-domain bust: a wallet link or unlink changes the activity
+// readout's `wallet` field, and identity changes must not wait out a TTL
+// (the moderation-bust rule's spirit). The write sites live in server/db.ts,
+// which cannot hold the instance, so main.ts registers it here at boot (the
+// discord_status_cache shape, instance-flavored).
+// ---------------------------------------------------------------------------
+
+let registeredForBusts: WocMarketReadCache | null = null;
+
+export function registerWocMarketReadCacheForBusts(cache: WocMarketReadCache | null): void {
+  registeredForBusts = cache;
+}
+
+/** Drop one account's cached activity readout (wallet link/unlink writes). */
+export function bustWocMarketActivity(accountId: number): void {
+  registeredForBusts?.bustMe(accountId);
 }
 
 export interface WocMarketReadCacheOptions {
@@ -217,10 +272,10 @@ export class WocMarketReadCache {
   }
 
   stats(): {
-    browse: KeyedCachedReadStats;
-    detail: KeyedCachedReadStats;
-    history: KeyedCachedReadStats;
-    me: KeyedCachedReadStats;
+    browse: KeyedCachedReadStats & { refreshRegistry: number };
+    detail: KeyedCachedReadStats & { refreshRegistry: number };
+    history: KeyedCachedReadStats & { refreshRegistry: number };
+    me: KeyedCachedReadStats & { refreshRegistry: number };
   } {
     return {
       browse: this.browsePages.stats(),

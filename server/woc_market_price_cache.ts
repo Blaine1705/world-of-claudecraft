@@ -28,6 +28,10 @@
 // The refresh NEVER throws (the proxy's graceful-degradation contract): it
 // resolves an unavailable value instead, and this module distinguishes
 // success from failure with an injected predicate so it stays value-agnostic.
+// Worst-case read latency: a read past staleServeMaxMs (or a cold one)
+// blocks on the single-flight refresh, i.e. up to the proxy's 5s service
+// timeout; every concurrent reader joins that one flight. Inside the bound,
+// reads never block (SWR).
 // Wall clock is correct here (server-only, never sim); tests inject now.
 
 export interface WocPriceCacheOptions<T> {

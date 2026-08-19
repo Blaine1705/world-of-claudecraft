@@ -75,12 +75,14 @@ export type RateLimitKeyClass = 'ip' | 'ip+account';
 
 /**
  * Whether a policy is backed by the pg-global tier-2 store, or tier-1 only.
- * Every current policy is 'global' (the derivation guard test pins that), so no
- * code constructs 'none' today. It is the deliberate per-policy opt-out the
- * two-tier resolver spec calls for: tier-2 costs one pg UPSERT per ALLOWED
- * request (two for 'ip+account'), so a future mounted high-volume policy (e.g.
- * public_read at 60/min per IP) can stay tier-1-only with a one-word policy
- * edit instead of a resolver change.
+ * It is the deliberate per-policy opt-out the two-tier resolver spec calls
+ * for: tier-2 costs one pg UPSERT per ALLOWED request (two for 'ip+account'),
+ * so a mounted high-volume policy stays tier-1-only with a one-word policy
+ * edit instead of a resolver change. The one 'none' policy today is
+ * WOC_MARKET_READ_POLICY (the marketplace's polled GET surface): paying two
+ * pg writes per ALLOWED poll would have out-costed the very reads its caches
+ * remove, and the tier-1 sliding window still meters the flood per process.
+ * Every other policy is 'global' (the derivation guard test pins the table).
  */
 export type RateLimitTier2 = 'global' | 'none';
 
@@ -154,7 +156,7 @@ export function resetTier2ErrorLogThrottle(): void {
  * and never 500s the route or blocks traffic.
  */
 export function rateLimit(policy: RateLimitPolicy): Middleware {
-  return async (ctx: Ctx, next: Next) => {
+  const middleware = async (ctx: Ctx, next: Next) => {
     const t1 = policy.tier1(ctx);
     if (!t1.allowed) {
       // rate_limit_hits_total attack-signal series (source-spec 4.9): count every
@@ -190,6 +192,11 @@ export function rateLimit(policy: RateLimitPolicy): Middleware {
 
     await next();
   };
+  // The policy name rides the returned closure so route tables are
+  // introspectable: a test can assert WHICH policy a route mounts by
+  // identity instead of scanning source text (closures are otherwise
+  // anonymous). Metadata only; dispatch never reads it.
+  return Object.assign(middleware, { rateLimitPolicyName: policy.name });
 }
 
 // An 'ip+account' policy reads the caller's account id via the shared ctxAccountId
@@ -375,13 +382,23 @@ export const WOC_MARKET_CONFIRM_POLICY: RateLimitPolicy = wocMarketMutationPolic
   'confirm',
   WOC_MARKET_CONFIRM_MAX_PER_MINUTE,
 );
-// The reads are metered too: browse and the activity fan-out each cost several
+// The reads are metered too: browse and the activity fan-out each cost
 // database round trips, and /listings/:id can reach the economy service.
-export const WOC_MARKET_READ_POLICY: RateLimitPolicy = wocMarketMutationPolicy(
-  'woc_market_read',
-  'read',
-  WOC_MARKET_READ_MAX_PER_MINUTE,
-);
+// TIER-1 ONLY, the documented high-volume opt-out: this bucket now fronts the
+// POLLED surface (the Exchange's 3s awaiting-chain beat and the trade
+// window's 2s offer poll), and tier-2 'global' would spend two rate_limits
+// UPSERTs per ALLOWED poll, adding pg writes to the exact hot path the read
+// caches exist to relieve (and serializing NAT-mates on one hot row). The
+// in-process sliding window still bounds what any (ip, account) pair can
+// send this realm.
+export const WOC_MARKET_READ_POLICY: RateLimitPolicy = {
+  name: 'woc_market_read',
+  keyClass: 'ip+account',
+  limit: WOC_MARKET_READ_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => wocMarketMutationRateLimited(ctx.req, ctxAccountId(ctx), 'read'),
+  tier2: 'none',
+};
 // Step-up challenge issuance (B6/R1): its own bucket so the challenge-then-
 // create pair never halves the shared list bucket (rationale at the limit
 // constant in server/ratelimit.ts).

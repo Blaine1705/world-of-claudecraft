@@ -14,6 +14,8 @@ import {
   wocEndsAtText,
   wocErrorStatusHtml,
   wocLoadingStatusHtml,
+  wocSalesHistoryHtml,
+  wocSellEmptyHtml,
   wocSpinnerHtml,
 } from '../src/ui/woc_market_chrome';
 
@@ -116,5 +118,38 @@ describe('woc_market_chrome: the exact end time', () => {
     expect(calls.length, 'every reading comes from the shared formatter').toBe(3);
     expect(calls.filter((c) => c.includes("timeZone: 'UTC'")).length).toBe(1);
     expect(src).toMatch(/utc:\s*formatDateTime\([^)]*timeZone: 'UTC'/);
+  });
+});
+
+describe('woc_market_chrome: the sales history list', () => {
+  it('renders the three-way branch: loading for null, empty line, then rows through the formatters', () => {
+    const usd = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+    expect(wocSalesHistoryHtml(null, usd)).toContain(t('hudChrome.wocMarket.detailSalesLoading'));
+    expect(wocSalesHistoryHtml([], usd)).toContain(t('hudChrome.wocMarket.detailNoSales'));
+    const rows = wocSalesHistoryHtml(
+      [{ atMs: 1_820_000_000_000, priceCents: 4000, sellerName: 'Selara', buyerName: 'Aldan' }],
+      usd,
+    );
+    expect(rows).toContain('<ul class="wm-sales">');
+    expect(rows).toContain('$40.00');
+    expect(rows).toContain('Selara');
+    expect(rows).toContain('Aldan');
+  });
+});
+
+describe('woc_market_chrome: the resolved sell caption', () => {
+  it('localizes a known floor and passes an unrecognized future policy word through verbatim', () => {
+    const known = wocSellEmptyHtml(
+      { qualityFloor: 'epic', allowMounts: false, allowMechChromas: false },
+      '',
+    );
+    expect(known).toContain('Epic');
+    // A policy word this client predates renders as itself rather than
+    // mislabeling: the server validated it, the client just cannot name it.
+    const future = wocSellEmptyHtml(
+      { qualityFloor: 'mythic', allowMounts: false, allowMechChromas: false },
+      '',
+    );
+    expect(future).toContain('mythic');
   });
 });

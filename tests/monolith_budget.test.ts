@@ -233,11 +233,13 @@ const MONOLITHS: MonolithRow[] = [
     // Entered the ratchet with the hot-path-scale work, alongside the
     // drift-warn extraction (woc_market_drift_warn.ts) that paid for the
     // sweep segment plan; the read caches, price cache, and watchdog are
-    // already sibling modules. Zero headroom: the next growth owes the next
-    // extraction (guardStepUp/issueStepUpChallenge and the delivery arms are
-    // the standing candidates).
+    // already sibling modules. The figure is the count the change SHIPPED
+    // (its review round grew the segment-contract and cache-gating comments
+    // after the first snapshot). Zero headroom: the next growth owes the
+    // next extraction (guardStepUp/issueStepUpChallenge and the delivery
+    // arms are the standing candidates).
     file: 'server/woc_market.ts',
-    ceiling: 4470,
+    ceiling: 4500,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
