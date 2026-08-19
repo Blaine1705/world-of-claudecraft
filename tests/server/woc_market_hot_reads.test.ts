@@ -699,6 +699,59 @@ describe('the sweep segment plan', () => {
   });
 });
 
+describe('the bond-payout budget', () => {
+  it('a degraded service stops the walk at the wall-clock budget; the rest stays due', async () => {
+    let clock = BASE_MS;
+    const bondsDue = vi.fn(async () => [
+      { id: 1, bondReference: 'woc_bond:1', bondState: 'refund_due' },
+      { id: 2, bondReference: 'woc_bond:2', bondState: 'refund_due' },
+      { id: 3, bondReference: 'woc_bond:3', bondState: 'refund_due' },
+    ]);
+    const setBondState = vi.fn(async () => true);
+    const refundBond = vi.fn(async () => {
+      // Each RPC rides its full timeout under the brownout this models.
+      clock += 31_000;
+      return { done: true, reason: null };
+    });
+    const passes: Record<string, number>[] = [];
+    const service = new RealWocMarketService({
+      db: { bondsDue, setBondState } as unknown as WocMarketDb,
+      economy: {
+        refundBond,
+        forfeitBond: refundBond,
+      } as unknown as WocMarketDeps['economy'],
+      custody: {} as unknown as WocMarketDeps['custody'],
+      verifiedWallet: async () => null,
+      balanceTokens: async () => null,
+      stepUpDevSig: true,
+      config: {
+        enabled: true,
+        realm: REALM,
+        policy: WOC_MARKET_RESTRICTED_POLICY,
+        confirmingReviewMs: 6 * 3600 * 1000,
+      },
+      onSweepPass: (stats) => {
+        passes.push(stats as unknown as Record<string, number>);
+      },
+      onSweepError: () => {},
+      now: () => clock,
+    });
+    const plan = service.sweepSegments();
+    const payouts = plan?.segments.find((seg) => seg.name === 'bond-payouts');
+    expect(payouts?.locked).toBe(true);
+    await payouts?.run();
+    plan?.finish();
+    // One RPC consumed the whole budget, so the walk stopped: the LOCKED
+    // segment's hold is bounded near the budget plus one timeout, never the
+    // whole batch, and rows 2 and 3 stay durably due for the next pass.
+    expect(refundBond).toHaveBeenCalledTimes(1);
+    expect(setBondState).toHaveBeenCalledTimes(1);
+    // Rows WALKED, not fetched: a budget break must not read as a drained
+    // batch (3 fetched would satisfy nothing here; the stat says 1).
+    expect(passes[0]?.bonds).toBe(1);
+  });
+});
+
 describe('the read limiter', () => {
   it('mounts the read policy on the five hot GETs and the offers poll, BY IDENTITY', () => {
     // The rateLimit factory tags its middleware with the policy name, so

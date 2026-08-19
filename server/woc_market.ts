@@ -1209,6 +1209,13 @@ const refuse = (reason: WocMarketRefusal, params?: Record<string, string | numbe
 // Sweep pass budgets: every arm is bounded per pass so one huge backlog can
 // never starve the others; the next pass continues where this one stopped.
 const SWEEP_BATCH = 25;
+/** Wall-clock budget for the LOCKED bond-payout walk: the segment holds the
+ *  advisory lock and its client while refund/forfeit RPCs run, so a degraded
+ *  service (every RPC riding its full timeout) must stop the walk early
+ *  rather than camp the lock for the whole batch. Rows left behind stay
+ *  durably due and the next pass resumes; worst hold is about this budget
+ *  plus one RPC timeout, comfortably under the watchdog's 60s alarm. */
+const BOND_PAYOUT_BUDGET_MS = 30_000;
 
 /** Per-arm counts for one sweep pass, so a wedged marketplace is visible: a
  *  silent idle pass and a permanently starved backlog look identical without
@@ -3290,10 +3297,12 @@ export class WocMarketService {
           // before broadcast, probe-before-resend), so a duplicate request
           // cannot double-pay, but the lock keeps game-side exclusion
           // PROVABLE rather than resting on the cross-repo contract alone.
-          // Worst case under a service brownout this holds the lock client
-          // for SWEEP_BATCH refund timeouts (about two minutes), which the
-          // sweep watchdog reports mid-flight; the hour-scale camp H11 flags
-          // lives in the confirm polls, which stay unlocked.
+          // The hold is BUDGETED: processDueBonds stops its walk at
+          // BOND_PAYOUT_BUDGET_MS, so a degraded service bounds the lock and
+          // client hold at about the budget plus one RPC timeout (~35s),
+          // under the watchdog's 60s alarm; the remainder stays durably due
+          // and the next pass resumes. The hour-scale camp H11 flags lives
+          // in the confirm polls, which stay unlocked.
           await runArm('bonds', () => this.processDueBonds());
         },
       },
@@ -4472,8 +4481,16 @@ export class WocMarketService {
   }
 
   private async processDueBonds(): Promise<number> {
+    const startedAtMs = this.now();
     const due = await this.deps.db.bondsDue(this.cfg.realm, SWEEP_BATCH);
+    let walked = 0;
     for (const bid of due) {
+      // The budget check runs BETWEEN rows, never mid-RPC: a row in flight
+      // finishes (its verdict writes), and the remainder stays due for the
+      // next pass. Under the fixed test clocks elapsed is zero, so suites
+      // exercise the full batch unless they advance time on purpose.
+      if (this.now() - startedAtMs > BOND_PAYOUT_BUDGET_MS) break;
+      walked++;
       try {
         if (bid.bondReference === null) {
           // Nothing was ever transferred; close the loop locally.
@@ -4495,6 +4512,8 @@ export class WocMarketService {
         this.sweepError('bonds', err);
       }
     }
-    return due.length;
+    // Rows WALKED, not fetched: a budget break must not read as a drained
+    // batch to the saturation signal (walked == SWEEP_BATCH still trips it).
+    return walked;
   }
 }

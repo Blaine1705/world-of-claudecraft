@@ -390,7 +390,11 @@ export const WOC_MARKET_CONFIRM_POLICY: RateLimitPolicy = wocMarketMutationPolic
 // UPSERTs per ALLOWED poll, adding pg writes to the exact hot path the read
 // caches exist to relieve (and serializing NAT-mates on one hot row). The
 // in-process sliding window still bounds what any (ip, account) pair can
-// send this realm.
+// send this realm. Tier-1-only is SOUND because one process serves one realm
+// (the deployment shape); a realm ever fronted by multiple concurrent
+// processes must revisit this, since each process would grant a full window.
+// Flood observability is unchanged: the tier-1 429 path feeds the same
+// rate_limit_hits_total attack-signal series either way.
 export const WOC_MARKET_READ_POLICY: RateLimitPolicy = {
   name: 'woc_market_read',
   keyClass: 'ip+account',

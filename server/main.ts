@@ -3675,6 +3675,10 @@ export async function startServer(): Promise<http.Server> {
     await retentionSweep.stop();
     await wocMarketSweep.stop();
     wocMarketSweepWatchdog.stop();
+    // Release the bust registration so a shut-down server never pins its
+    // cache instance (the registry teardown rule; repeated boots in one
+    // process would otherwise chain-leak each boot's whole cache).
+    registerWocMarketReadCacheForBusts(null);
     await wocMarketMonitor.stop();
     await generalChatQuotaListener.stop();
     game.stop();

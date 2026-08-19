@@ -168,8 +168,12 @@ class ThunkKeyedCache<K extends string | number> {
   }
 
   stats(): KeyedCachedReadStats & { refreshRegistry: number } {
-    // refreshRegistry rides along so the registry's 2x-cap bound is
-    // observable (and pinned) rather than claimed.
+    // refreshRegistry rides along so the registry's bound is observable (and
+    // pinned) rather than claimed. The steady-state bound is 2x maxEntries,
+    // NOT maxEntries: orphaned thunks from evicted or failed-mint keys sit
+    // until the next threshold crossing, so a reading above the LRU cap is
+    // normal, not a leak. The prune itself is O(registry) once per
+    // threshold crossing, amortized to O(1) per read at today's caps.
     return { ...this.cache.stats(), refreshRegistry: this.refreshers.size };
   }
 }
@@ -184,6 +188,8 @@ class ThunkKeyedCache<K extends string | number> {
 
 let registeredForBusts: WocMarketReadCache | null = null;
 
+/** LAST registration wins (one live server per process is the shape); pass
+ *  null on shutdown or test teardown so a dead instance is never pinned. */
 export function registerWocMarketReadCacheForBusts(cache: WocMarketReadCache | null): void {
   registeredForBusts = cache;
 }
