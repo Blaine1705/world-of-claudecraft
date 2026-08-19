@@ -311,3 +311,172 @@ describe('zoneBuildPool urgent lane', () => {
     expect(first.posted[1].kind).toBe('chunk');
   });
 });
+
+// A worker can die outright: its module fails to load (a stale hashed URL after
+// a deploy, a blocked CSP, a mobile OOM kill), it fires onerror once, and from
+// then on every postMessage is swallowed in silence. Handing such a worker
+// another job leaves that job's promise unsettled forever, and the gating
+// terrain lane awaits it: the loading screen, the world-draw hold and input
+// stay stuck for the rest of the session. So a failed worker must be retired,
+// and a pool with no live worker left must DECLINE rather than park.
+const CHUNK_JOB = {
+  x0: 0,
+  z0: 0,
+  size: 30,
+  spacing: 1,
+  seed: 1,
+  withSplat: false,
+  skirtSpan: 0,
+  lowShade: false,
+};
+
+/** A minimal ok chunk response for a given job id: buildChunk only copies the
+ *  attribute fields across, so real geometry would prove nothing extra here. */
+function okChunk(id: number): { data: unknown } {
+  return {
+    data: {
+      id,
+      kind: 'chunk',
+      ok: true,
+      positions: new Float32Array(3),
+      normals: new Float32Array(3),
+      colors: new Float32Array(3),
+      uvs: new Float32Array(2),
+      splats: null,
+      extras: null,
+      indices: new Uint32Array(3),
+    },
+  };
+}
+
+function feed(worker: FakeWorker, message: { data: unknown }): void {
+  (worker.onmessage as (event: { data: unknown }) => void)(message);
+}
+
+function fail(worker: FakeWorker): void {
+  (worker.onerror as () => void)();
+}
+
+describe('zoneBuildPool worker failure', () => {
+  useFakeWorkers();
+  beforeEach(() => {
+    // Pin the pool to three workers: the isolation arm needs more than one,
+    // and hardwareConcurrency is whatever the test host happens to have.
+    vi.stubGlobal('navigator', { hardwareConcurrency: 4 });
+  });
+
+  it('retires the failed worker only, and declines once every worker is dead', async () => {
+    const pool = zoneBuildPool();
+    expect(pool).not.toBeNull();
+    if (!pool) return;
+    const workers = FakeWorker.spawned;
+    expect(workers.length).toBe(3);
+
+    const jobs = workers.map(() => pool.buildChunk({ ...CHUNK_JOB }));
+    await Promise.resolve();
+    expect(workers.map((w) => w.posted.length)).toEqual([1, 1, 1]);
+
+    // One worker dies. Only ITS in-flight job fails.
+    const deadId = workers[0].posted[0].id;
+    fail(workers[0]);
+    expect(await jobs[0]).toBeNull();
+
+    // A response arriving from the retired worker must not resurrect it.
+    feed(workers[0], okChunk(deadId));
+
+    // The healthy workers' jobs are untouched and still complete.
+    feed(workers[1], okChunk(workers[1].posted[0].id));
+    expect(await jobs[1]).not.toBeNull();
+
+    // The freed HEALTHY worker takes the next job; the dead one never does.
+    const next = pool.buildChunk({ ...CHUNK_JOB });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(workers.map((w) => w.posted.length)).toEqual([1, 2, 1]);
+
+    // With one worker dead and two busy, this claimant parks.
+    const parked = pool.buildChunk({ ...CHUNK_JOB });
+    await Promise.resolve();
+    expect(workers.map((w) => w.posted.length)).toEqual([1, 2, 1]);
+
+    // The last two die: every outstanding job resolves null, including the
+    // claimant that was already parked (nothing can ever wake it otherwise).
+    fail(workers[1]);
+    fail(workers[2]);
+    expect(await next).toBeNull();
+    expect(await jobs[2]).toBeNull();
+    expect(await parked).toBeNull();
+
+    // And a fresh submission into the all-dead pool declines promptly instead
+    // of hanging, without posting into any corpse.
+    expect(await pool.buildChunk({ ...CHUNK_JOB })).toBeNull();
+    expect(workers.map((w) => w.posted.length)).toEqual([1, 2, 1]);
+  });
+});
+
+describe('zoneBuildPool single-worker recovery', () => {
+  useFakeWorkers();
+  beforeEach(() => {
+    // hardwareConcurrency 2 leaves the main thread a core, so the pool spawns
+    // exactly one worker: that pins "the SAME worker takes the next job".
+    vi.stubGlobal('navigator', { hardwareConcurrency: 2 });
+  });
+
+  it('a throwing postMessage fails just that job and leaves the worker usable', async () => {
+    const pool = zoneBuildPool();
+    expect(pool).not.toBeNull();
+    if (!pool) return;
+    expect(FakeWorker.spawned.length).toBe(1);
+    const worker = FakeWorker.spawned[0];
+    const accept = worker.postMessage.bind(worker);
+    let threw = false;
+    worker.postMessage = (message: unknown): void => {
+      if (!threw) {
+        threw = true;
+        throw new Error('detached transferable');
+      }
+      accept(message);
+    };
+
+    expect(await pool.buildChunk({ ...CHUNK_JOB })).toBeNull();
+    expect(threw).toBe(true);
+    expect(worker.posted).toHaveLength(0);
+
+    // The worker never received that job, so it is healthy: it must not be
+    // left busy, or every later job would park on a worker that is idle.
+    const next = pool.buildChunk({ ...CHUNK_JOB });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(worker.posted).toHaveLength(1);
+    feed(worker, okChunk(worker.posted[0].id));
+    expect(await next).not.toBeNull();
+  });
+
+  it('a stale response does not free a worker that already carries a newer job', async () => {
+    const pool = zoneBuildPool();
+    expect(pool).not.toBeNull();
+    if (!pool) return;
+    const worker = FakeWorker.spawned[0];
+
+    const inFlight = pool.buildChunk({ ...CHUNK_JOB });
+    await Promise.resolve();
+    expect(worker.posted).toHaveLength(1);
+    const liveId = worker.posted[0].id;
+
+    // A reply for a job this worker no longer owns must not clear its busy
+    // flag: the live job is still running, and a second post would race it.
+    feed(worker, okChunk(liveId + 1000));
+    const queued = pool.buildChunk({ ...CHUNK_JOB });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(worker.posted).toHaveLength(1);
+
+    // The worker's own answer frees it, and the queued job goes out then.
+    feed(worker, okChunk(liveId));
+    expect(await inFlight).not.toBeNull();
+    await Promise.resolve();
+    expect(worker.posted).toHaveLength(2);
+    feed(worker, okChunk(worker.posted[1].id));
+    expect(await queued).not.toBeNull();
+  });
+});

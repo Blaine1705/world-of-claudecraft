@@ -58,6 +58,12 @@ interface PoolWorker {
    *  job id of its own) fails only that job, never the other workers' pending
    *  ones. */
   currentId: number | null;
+  /** Retired by a worker-level error. A worker whose module failed to load (a
+   *  stale hashed URL after a deploy, a blocked CSP, a mobile OOM kill) fires
+   *  onerror once and then swallows every later postMessage in silence, so
+   *  handing it another job would leave that job's promise unsettled forever
+   *  and hang the gating arrival that awaits it. */
+  dead: boolean;
 }
 
 function spawn(): Worker | null {
@@ -79,10 +85,10 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
       : 2;
   // Leave the main thread a core: it still uploads every result.
   const target = Math.max(1, Math.min(MAX_WORKERS, hardware - 1));
-  const workers: PoolWorker[] = [{ worker: first, busy: false, currentId: null }];
+  const workers: PoolWorker[] = [{ worker: first, busy: false, currentId: null, dead: false }];
   for (let i = 1; i < target; i++) {
     const worker = spawn();
-    if (worker) workers.push({ worker, busy: false, currentId: null });
+    if (worker) workers.push({ worker, busy: false, currentId: null, dead: false });
   }
 
   const pending = new Map<number, (response: ZoneBuildResponse) => void>();
@@ -90,39 +96,63 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
   let nextId = 1;
   let disposed = false;
 
+  const allDead = (): boolean => workers.every((entry) => entry.dead);
+
+  const retire = (entry: PoolWorker): void => {
+    entry.dead = true;
+    entry.busy = false;
+    entry.currentId = null;
+    // A retired worker frees no capacity, so waking one parked claimant would
+    // only make it re-park. Once the LAST worker goes, though, every parked
+    // claimant has to be woken: their wake can never come from a completion
+    // now, and claim() answers null on the re-check.
+    if (allDead()) {
+      while (waiting.length > 0) waiting.shift()?.();
+    }
+  };
+
   for (const entry of workers) {
     entry.worker.onmessage = (event: MessageEvent<ZoneBuildResponse>) => {
       const resolve = pending.get(event.data.id);
       pending.delete(event.data.id);
-      entry.busy = false;
-      entry.currentId = null;
+      // The response is its own job's answer whatever the worker's state, but
+      // only the job the worker STILL carries frees it: a late reply for a job
+      // already failed by onerror (or never posted, see submit) would otherwise
+      // free a worker that has since taken a newer one, and a reply from a
+      // retired worker would resurrect it.
+      if (!entry.dead && entry.currentId === event.data.id) {
+        entry.busy = false;
+        entry.currentId = null;
+        waiting.shift()?.();
+      }
       resolve?.(event.data);
-      waiting.shift()?.();
     };
     entry.worker.onerror = () => {
       // A worker-level error carries no job id, so fail THIS worker's one
       // in-flight job (tracked on the entry); the other workers' pending jobs
       // are healthy and must not be force-failed onto the main-thread path.
       const id = entry.currentId;
-      entry.busy = false;
-      entry.currentId = null;
+      retire(entry);
       if (id !== null) {
         const resolve = pending.get(id);
         pending.delete(id);
         resolve?.({ id, ok: false, error: 'zone build worker error' });
       }
-      waiting.shift()?.();
     };
   }
 
   const claim = async (urgent: boolean): Promise<PoolWorker | null> => {
     for (;;) {
       if (disposed) return null;
-      const free = workers.find((entry) => !entry.busy);
+      const free = workers.find((entry) => !entry.busy && !entry.dead);
       if (free) {
         free.busy = true;
         return free;
       }
+      // Every worker retired: no completion can ever wake a claimant again, so
+      // decline here and let the caller take its main-thread path instead of
+      // parking on a promise nothing will settle.
+      if (allDead()) return null;
       await new Promise<void>((resolve) => {
         // Urgent claimants (a gating arrival) go to the FRONT: the pool is
         // otherwise FIFO, and a teleport's chunks queueing behind three idle

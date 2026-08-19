@@ -400,6 +400,63 @@ describe('progressive terrain build', () => {
     pooled.cancelStreaming();
   });
 
+  // A pool job that REJECTS (a worker that died mid-zone, not one that merely
+  // declined) must not be swallowed: the gating lane rethrows the first error,
+  // so the zone stays unloaded and the arrival's own catch sees it, instead of
+  // a permanent hole in the ground sitting under an opened fog clamp.
+  it('a rejecting pool job fails the gating build and leaves the zone rebuildable', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const stats = { calls: 0, rejected: 0 };
+    const REJECT_ON_CALL = 5;
+    vi.doMock('../src/render/zone_build_pool', async () => {
+      const { buildChunkArrays } = await import('../src/render/zone_build_worker');
+      return {
+        zoneBuildPool: () => ({
+          size: 3,
+          async buildChunk(job: Record<string, unknown>) {
+            const call = ++stats.calls;
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            if (call === REJECT_ON_CALL) {
+              stats.rejected++;
+              throw new Error('zone build worker died');
+            }
+            return buildChunkArrays({ ...job, kind: 'chunk', id: call } as never);
+          },
+          async fillWater() {
+            return null;
+          },
+          dispose() {},
+        }),
+        disposeZoneBuildPool: () => {},
+      };
+    });
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+    const zone = zoneAt(0, 0);
+
+    const terrain = buildTerrain(20061);
+    const settled = terrain.ensureZone(zone).then(
+      () => 'resolved' as const,
+      (error: unknown) => error,
+    );
+    await vi.runAllTimersAsync();
+    expect(await settled).toBeInstanceOf(Error);
+    expect(stats.rejected).toBe(1);
+    expect(terrain.isZoneLoaded(zone.id)).toBe(false);
+
+    // Not loaded means REBUILDABLE, not merely un-flagged: a second ensureZone
+    // must run the build again (consulting the pool for the cells the failed
+    // lane never reached) rather than early-return on a cached zone.
+    const callsAfterFailure = stats.calls;
+    const second = terrain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await second;
+    expect(stats.calls).toBeGreaterThan(callsAfterFailure);
+    expect(terrain.isZoneLoaded(zone.id)).toBe(true);
+    terrain.cancelStreaming();
+  });
+
   // Escalation: an in-flight idle build switches to fast pacing mid-zone. In
   // Node the idle fallback is a >=200ms cooperative timer while fast yields
   // are setTimeout(0), so MOCK TIME separates the paces decisively: a zone
