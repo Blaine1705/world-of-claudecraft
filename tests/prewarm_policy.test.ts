@@ -84,6 +84,7 @@ const MANIFEST_IDS = [
   'vfx.atlas',
   'vfx.weapon-skins',
   'vfx.ability-primitives',
+  'vfx.mount-programs',
   'sky.nearby-biomes',
   'world.initial-frame',
   'programs.compile',
@@ -266,6 +267,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // per-family criterion in the debt set's doc.
     expect(prewarmResumeIsDebt('props.ghost-fade-variants')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.weapon-skins')).toBe(false);
+    expect(prewarmResumeIsDebt('vfx.mount-programs')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
   });
 
@@ -326,6 +328,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'vfx.atlas',
       'vfx.weapon-skins',
       'vfx.ability-primitives',
+      'vfx.mount-programs',
       'sky.current-zone',
       'render.settle-passes',
       // Converted to prewarm slots (variant_prewarm_slot.ts): a landmark
@@ -1357,6 +1360,28 @@ describe('mandatory interaction-landmark prewarm', () => {
       'return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true })',
     );
     expect(core).toContain('this.tail.then(work)');
+  });
+});
+
+describe('self-spirit prewarm queue wiring', () => {
+  it('preserves the idle delay and runs the compile through the shared GPU queue', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const start = renderer.indexOf('private selfSpirit = new SelfSpiritPrewarmer({');
+    const end = renderer.indexOf('\n  // Static terrain/water/features', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const wiring = renderer.slice(start, end);
+    const idleAt = wiring.indexOf('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
+    const queueAt = wiring.indexOf('this.backgroundGpuWork.run(');
+    expect(idleAt).toBeGreaterThan(-1);
+    expect(queueAt).toBeGreaterThan(-1);
+    expect(wiring).toContain('() => this.warmSelfSpirit()');
+    expect(wiring).toContain('GPU_WORK_PRIORITY.VISIBLE_PREWARM');
+    expect(wiring).toContain("'self-spirit'");
+    expect(wiring).toContain('{ releaseTail: true }');
   });
 });
 

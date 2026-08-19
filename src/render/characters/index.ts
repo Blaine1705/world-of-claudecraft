@@ -14,10 +14,12 @@ import {
   visualKeyFor,
 } from './manifest';
 import { MODULAR_WARRIOR_KEY, type ModularLook } from './modular';
+import { npcModularKeyFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 
 export type { AssembleOptions } from './assets';
 export { type LookPiecesStats, lookPiecesStats } from './look_pieces';
+export { npcLookFor } from './npc_looks';
 export { CharacterPreview } from './preview';
 export type { PreviewAppearance } from './preview_appearance';
 export type { PreviewFramingName } from './preview_framing';
@@ -51,8 +53,12 @@ export function modularLookFor(e: Entity): ModularLook | null {
 
 /** The composed-body visual key for an entity the look provider claimed: the
  *  class's own modular def (its clips, ability mapping and hand layout), with
- *  the warrior's as the fallback for a templateId without one. */
+ *  the warrior's as the fallback for a templateId without one. A claimed
+ *  NON-player (a world NPC or an NPC-bodied quest actor) resolves its authored
+ *  prop-set def instead: the class fallback would hand a villager the
+ *  warrior's default sword and swing set. */
 export function modularKeyFor(e: Entity): string {
+  if (e.kind !== 'player') return npcModularKeyFor(e.templateId);
   const key = modularVisualKey(e.templateId as PlayerClass);
   return VISUALS[key] ? key : MODULAR_WARRIOR_KEY;
 }
