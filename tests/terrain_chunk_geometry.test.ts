@@ -240,7 +240,14 @@ describe('generated chunk geometry is stable', () => {
     // edge. The gap-fill digest therefore HOLDS, recomputed byte-identical
     // on the live tree; both digests were computed twice and are
     // deterministic. An intended, looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('0f52238550e3e8760c7f7f6562de55d9');
+    // Re-minted for owner refinement round 4: the KayKit barracks and watch
+    // tower took the retired armoury's Wolf Run lot as decor props, and decor
+    // props with a collider radius are calm-anchor terrain inputs, so their
+    // pads reshape the old town ground locally (the barracks lot at
+    // (17.5,-5.5) and the tower knoll at (27,-13)). Computed twice in
+    // separate processes, identical both times. An intended, looked-at world
+    // change, not drift.
+    expect(digestOf(inRect)).toBe('13e988449bead7c3de1775d375f31023');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 

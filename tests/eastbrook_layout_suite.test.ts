@@ -348,31 +348,13 @@ describe('removed Eastbrook placement inventory', () => {
 });
 
 describe('authoritative Eastbrook replacement plan', () => {
-  it('is deeply immutable and pins the preserved Armoury without making it an inn', () => {
+  it('is deeply immutable and retires the preserved Armoury from placement', () => {
     expectDeepFrozen(EASTBROOK_LAYOUT);
     expect(EASTBROOK_LAYOUT.id).toBe('eastbrook_civic_layout_v2');
-    expect(EASTBROOK_LAYOUT.preservedBuildings).toEqual([
-      {
-        id: 'eastbrook_grand_armoury',
-        assetId: '/models/props/eastbrook_grand_armoury.glb',
-        landmark: 'eastbrook_grand_armoury',
-        kind: 'house',
-        position: { x: 17.5, z: -5.5 },
-        nativeDimensions: { width: 13, height: 16.35, depth: 9 },
-        aboveGradeHeight: 15,
-        foundationDepth: 1.35,
-        rotation: -Math.PI / 2,
-        footprint: {
-          id: 'eastbrook_grand_armoury',
-          center: { x: 17.5, z: -5.5 },
-          halfWidth: 6.5,
-          halfDepth: 4.5,
-          rotation: -Math.PI / 2,
-        },
-        maxCornerRadius: 7.905694150420948,
-        frontStandingPoint: { x: 12, z: -5.5 },
-      },
-    ]);
+    // Round 4: the Grand Armoury left its Wolf Run lot (the KayKit barracks
+    // garrison stands there now, authored as zone1 decorProps). The list
+    // stays as the API shape every spread/map consumer reads.
+    expect(EASTBROOK_LAYOUT.preservedBuildings).toEqual([]);
   });
 
   it('literally pins every new building and derives each front from local +Z', () => {
@@ -796,9 +778,12 @@ describe('wall and road geometry', () => {
     // Seed 4242, entity 54: this pre-existing target must remain reachable or
     // its arrival-timer draw disappears and forks the shared RNG stream.
     // Re-pinned 2026-08 for the harbor move (d19aa33f76,
-    // docs/design/eastbrook-revamp/site-plan.md): the ring wall is retired
-    // (zero segments), so reachability now holds against the remaining
-    // solids; the nearest is the preserved Armoury, seven yards clear.
+    // docs/design/eastbrook-revamp/site-plan.md), then again in round 4: the
+    // preserved Armoury retired from placement with the barracks swap, so the
+    // nearest remaining LAYOUT solid is the chapel, eighty yards off. The
+    // barracks garrison that took the lot is a zone1 decor collider, not a
+    // layout solid; its own clearance from this target is covered by the
+    // gameplay-integration fixed-seed projection.
     const wanderTarget = { x: 29.4338221478, z: 0.9998592577 };
     expect(EASTBROOK_LAYOUT.wall.segments).toHaveLength(0);
     const clearances = nonWallSolidObbs()
@@ -808,8 +793,8 @@ describe('wall and road geometry', () => {
       }))
       .sort((left, right) => left.clearance - right.clearance);
     expect(clearances[0]).toEqual({
-      id: 'eastbrook_grand_armoury',
-      clearance: 7.433822147800001,
+      id: 'eastbrook_chapel',
+      clearance: 79.73738253357934,
     });
     expect(clearances[0].clearance).toBeGreaterThan(PLAYER_RADIUS);
   });
@@ -1218,7 +1203,7 @@ describe('layout clearance and service anchors', () => {
         2.4805494847391065,
         'eastbrook_market_stall_world_market',
       ],
-      ['marshal_redbrook', 9.6, -98.6, 0, 'eastbrook_noticeboard'],
+      ['marshal_redbrook', 3.6, -95.6, -1.919567330378804, 'eastbrook_noticeboard'],
       [
         'trader_wilkes',
         -16.333512834321652,
@@ -1236,9 +1221,9 @@ describe('layout clearance and service anchors', () => {
       ],
       [
         'smith_haldren',
-        -5.39882332579968,
-        -125.93547964039962,
-        -2.0344439357957027,
+        -7.893250516799595,
+        -125.3466252583998,
+        1.0303768265243132,
         'station_eastbrook_forge',
       ],
       ['fisherman_brandt', -95, -50, -1.5707963267948966, 'eastbrook_quay'],
@@ -1261,9 +1246,9 @@ describe('layout clearance and service anchors', () => {
       ],
       [
         'cook_marlow',
-        -44.28197972225072,
-        -89.7611731230151,
-        -2.5535900500422257,
+        -42.62589170715949,
+        -92.23189846640925,
+        -0.669638945676638,
         'station_eastbrook_kitchens',
       ],
       [
@@ -1336,10 +1321,10 @@ describe('layout clearance and service anchors', () => {
         MAX_MOVER_RADIUS - 1e-8,
       );
     }
-    expect(
-      pointClearance(EASTBROOK_LAYOUT.preservedBuildings[0].frontStandingPoint),
-      'Armoury approach',
-    ).toBeGreaterThanOrEqual(MAX_MOVER_RADIUS);
+    // Round 4: preservedBuildings is empty (the armoury retired from
+    // placement); the barracks-approach route front stays covered by the
+    // routes sweep below, since the approach is still an authored route.
+    expect(EASTBROOK_LAYOUT.preservedBuildings).toHaveLength(0);
     for (const stall of EASTBROOK_LAYOUT.market.stalls) {
       expect(pointClearance(stall.frontStandingPoint), stall.id).toBeGreaterThanOrEqual(
         PLAYER_RADIUS - 1e-8,

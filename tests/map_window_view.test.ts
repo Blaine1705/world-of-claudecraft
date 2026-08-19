@@ -369,20 +369,36 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     );
     expect(mapBuildingMarkerKind({ kind: 'inn' })).toBe('inn');
 
+    // Round 4 retired the armoury from the shipped world (the barracks
+    // garrison holds its lot as a decor prop, which draws no building
+    // marker), so the classification path is proven on a synthetic landmark
+    // lot instead of a shipped placement.
     const world = makeOverworldWorld('sim') as unknown as {
       player: { pos: { x: number; z: number } };
     };
     world.player.pos.x = 17.5;
     world.player.pos.z = -5.5;
-    const detail = buildOverworldMapModel(input(world as unknown as IWorld, MAP_MAX_ZOOM)).detail;
+    const landmarkProps = {
+      ...PROPS,
+      buildings: [
+        {
+          kind: 'house',
+          landmark: 'eastbrook_grand_armoury',
+          x: 17.5,
+          z: -5.5,
+          w: 13,
+          d: 9,
+          rot: -Math.PI / 2,
+        },
+      ],
+    } as ZonePropsDef;
+    const detail = buildOverworldMapModel(
+      input(world as unknown as IWorld, MAP_MAX_ZOOM, NO_DECOR, landmarkProps),
+    ).detail;
     const armouries = detail?.buildings.filter((building) => building.kind === 'armoury');
     expect(armouries).toHaveLength(1);
-    expect(armouries?.[0].points).toEqual([
-      { mx: 322, my: 219.33333333333334 },
-      { mx: 322, my: 340.66666666666663 },
-      { mx: 238, my: 340.66666666666663 },
-      { mx: 238, my: 219.33333333333334 },
-    ]);
+    const shipped = buildOverworldMapModel(input(world as unknown as IWorld, MAP_MAX_ZOOM)).detail;
+    expect(shipped?.buildings.filter((building) => building.kind === 'armoury')).toHaveLength(0);
   });
 
   it('maps every rebuilt Eastbrook building, civic prop, stall, and authored wall segment', () => {

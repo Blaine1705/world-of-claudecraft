@@ -54,10 +54,12 @@ describe('terrain vertex pipeline', () => {
     // are height appliers). Re-minted for owner refinement round 3: the
     // coastline pulled to the town's doorstep (trimmed lobes, the seabed
     // apron row, re-laid beach stamps) and the re-threaded streets flip
-    // splits again. Computed twice in separate processes on the live tree,
+    // splits again. Re-minted for round 4: the barracks garrison's calm-anchor
+    // pads reshape the probe chunk (the old town ground). Computed twice in
+    // separate processes on the live tree,
     // identical both times.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      '3c7b8ca40e949740ade8f769a8ce21df114c8910b6af88b3972a41f31b882f74',
+      'acd1445b9090587eef2cbeb4305fc26321832abfabf651a5b2ba2db619ac4417',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

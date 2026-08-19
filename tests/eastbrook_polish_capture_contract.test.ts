@@ -198,7 +198,7 @@ interface AttributionTargetFixture {
 // keeps its pre-move framing (frozen in the artifact-integrity suite) and
 // only the swept provenance bytes follow the merged inputs.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '70c5503a78e2111bd502aeea00a596d2bd81cbad5fb7b707751a82ff265556e9';
+  '43193ffc2696541d508f8272dde357f7423a5a7307fba21796eb85bd2876be1c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -581,6 +581,10 @@ describe('Eastbrook polish capture contract', () => {
     // re-derived to the v3 lots (targets on the buildings' front standing
     // points, cameras collision-clear on the public faces).
     expect(EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES).toEqual({
+      'armoury-relation': {
+        camera: { x: 34, y: 15, z: 25 },
+        target: { x: 12.5, y: 4, z: -5.5 },
+      },
       'bank-and-chest': {
         camera: { x: 5, y: 7, z: -101 },
         target: { x: 8.994796179957174, y: 3.2, z: -97.00520382004282 },

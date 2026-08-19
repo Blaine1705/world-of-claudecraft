@@ -568,26 +568,25 @@ function makeBuilding(
   };
 }
 
-const PRESERVED_ARMOURY = {
-  id: 'eastbrook_grand_armoury',
-  assetId: '/models/props/eastbrook_grand_armoury.glb',
-  landmark: 'eastbrook_grand_armoury',
-  kind: 'house',
-  position: { x: 17.5, z: -5.5 },
-  nativeDimensions: { width: 13, height: 16.35, depth: 9 },
-  aboveGradeHeight: 15,
-  foundationDepth: 1.35,
-  rotation: -Math.PI / 2,
-  footprint: {
-    id: 'eastbrook_grand_armoury',
-    center: { x: 17.5, z: -5.5 },
-    halfWidth: 6.5,
-    halfDepth: 4.5,
-    rotation: -Math.PI / 2,
-  },
-  maxCornerRadius: Math.hypot(6.5, 4.5),
-  frontStandingPoint: { x: 12, z: -5.5 },
-} as const;
+// Round 4: the preserved Grand Armoury leaves its Wolf Run lot. The KayKit
+// barracks and a watch tower take over the (17.5, -5.5) ground as the Wolf
+// Run garrison (zone1 decorProps rows own those placements); the armoury GLB
+// and its render adapter stay shipped for custom worlds. preservedBuildings
+// keeps its API shape as an empty list so every spread/map consumer holds.
+export interface PreservedBuildingPlacement {
+  id: string;
+  assetId: string;
+  landmark: string;
+  kind: 'house' | 'inn' | 'chapel';
+  position: Point2;
+  nativeDimensions: { width: number; height: number; depth: number };
+  aboveGradeHeight: number;
+  foundationDepth: number;
+  rotation: number;
+  footprint: Obb2;
+  maxCornerRadius: number;
+  frontStandingPoint: Point2;
+}
 
 // Round 3 (owner): every kit building grew so its door reads at player
 // height (uniform per-building factors, aspect kept: homes 1.25x, the
@@ -1025,28 +1024,75 @@ const TRADER_POSITION = localToWorld(
 // Lin is a quest herbalist, not a merchant. Keep her already-clear civic-green
 // position without inventing a replacement stall or blocking the smithy sightline.
 const APOTHECARY_POSITION = { x: -12, z: -97.5 } as const;
-const SMITH_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, -2, 0);
+// Station cluster props sit at station + world-axis offsets (town_props.ts,
+// no rotation), so the smith's and cook's work points derive the same way.
+// Round 4: the smith stands on the yard's open corner, half a stride clear
+// of the crate that his old derived spot nearly touched, facing the anvil.
+const FORGE_ANVIL_POINT = {
+  x: FORGE_STATION.position.x + 1.4,
+  z: FORGE_STATION.position.z + 0.6,
+} as const;
+const SMITH_POSITION = {
+  x: FORGE_STATION.position.x - 1.6,
+  z: FORGE_STATION.position.z - 1.2,
+} as const;
 const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 2.5, 0);
-const COOK_POSITION = localToWorld(KITCHENS_STATION.position, INN.rotation, 1.75, 0);
+// Round 4: the cook works the prep side, a stride clear of the open flame
+// (the kitchens campfire, the town's only open fire, burns at station +
+// (-1.7, +0.9)). The prep offset holds z at -1.5 rather than the drafted
+// -1.4 so the cook also keeps the full anchor clearance (0.85) plus a body
+// radius (0.6) off the station point that service routes end on.
+const KITCHENS_FIRE_POINT = {
+  x: KITCHENS_STATION.position.x - 1.7,
+  z: KITCHENS_STATION.position.z + 0.9,
+} as const;
+const COOK_POSITION = {
+  x: KITCHENS_STATION.position.x + 0.2,
+  z: KITCHENS_STATION.position.z - 1.5,
+} as const;
 const WEAVER_POSITION = localToWorld(LOOM_STATION.position, WEAVING_HOUSE.rotation, 2, 0);
 const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS.rotation, 2, 0);
 const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
 const FURY_POSITION = { x: -2, z: -74 } as const;
 
+// Round 4: the marshal keeps watch beside his notice board, a clear stride
+// from the bursar's queue and outside the board's posting envelope (the
+// board's body and posting point both stay a full interact range away, the
+// board comment's rule). The drafted spot at (9, -92.5) sat INSIDE the
+// bank's rotated lot (the 45-degree townhall footprint owns that corner),
+// so the watch stands on the green south of the board instead: outside the
+// envelope, off the posting lane, facing the civic square he polices.
+const MARSHAL_POSITION = { x: 3.6, z: -95.6 } as const;
+
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
-  makeNpc('marshal_redbrook', { x: 9.6, z: -98.6 }, 0.0, 'eastbrook_noticeboard'),
+  makeNpc(
+    'marshal_redbrook',
+    MARSHAL_POSITION,
+    facingToward(MARSHAL_POSITION, CIVIC_CENTER),
+    'eastbrook_noticeboard',
+  ),
   makeNpc('trader_wilkes', TRADER_POSITION, MARKET_STALLS[1].rotation, MARKET_STALLS[1].id),
   makeNpc('apothecary_lin', APOTHECARY_POSITION, -2.723368324010564, 'eastbrook_civic_well_beacon'),
   makeNpc('brother_aldric', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
-  makeNpc('smith_haldren', SMITH_POSITION, SMITHY.rotation, FORGE_STATION.id),
+  makeNpc(
+    'smith_haldren',
+    SMITH_POSITION,
+    facingToward(SMITH_POSITION, FORGE_ANVIL_POINT),
+    FORGE_STATION.id,
+  ),
   makeNpc('fisherman_brandt', { x: -95, z: -50 }, -1.5707963267948966, 'eastbrook_quay'),
   makeNpc('foreman_odell', { x: -84, z: -63 }, 0.6747409422235526, 'eastbrook_quay'),
   makeNpc('bursar_fernando', BANK.frontStandingPoint, BANK.rotation, BANK.id),
   makeNpc('card_master', { x: -34, z: -92 }, -2.677945044588987, 'eastbrook_inn'),
   makeNpc('chronicler_saul', SAUL_POSITION, TOOLWORKS.rotation, 'mailbox_eastbrook'),
   makeNpc('forgemistress_darva', DARVA_POSITION, SMITHY.rotation, FORGE_STATION.id),
-  makeNpc('cook_marlow', COOK_POSITION, INN.rotation, KITCHENS_STATION.id),
+  makeNpc(
+    'cook_marlow',
+    COOK_POSITION,
+    facingToward(COOK_POSITION, KITCHENS_FIRE_POINT),
+    KITCHENS_STATION.id,
+  ),
   makeNpc('weaver_ottilie', WEAVER_POSITION, WEAVING_HOUSE.rotation, LOOM_STATION.id),
   makeNpc('tinker_gizzel', TINKER_POSITION, TOOLWORKS.rotation, TOOLWORKS_STATION.id),
   makeNpc('fury', FURY_POSITION, facingToward(FURY_POSITION, CIVIC_CENTER), 'eastbrook_chapel'),
@@ -1187,9 +1233,10 @@ const SERVICES = {
     {
       id: 'eastbrook_armoury_approach',
       bodyRadius: 0.8,
-      // The Armoury stayed behind as the preserved landmark on the Wolf
-      // Run's ground: the approach now leaves the north road at the old
-      // town's heart rather than a civic ring that no longer exists.
+      // Round 4: the barracks approach. The Grand Armoury left the Wolf Run
+      // lot and the KayKit barracks garrison stands on its ground, so the
+      // walk still leaves the north road at the old town's heart and ends
+      // at the same lot front. The route id stays for save/route stability.
       points: [
         { x: 2, z: -4 },
         { x: 8, z: -4.5 },
@@ -1213,7 +1260,7 @@ const SERVICES = {
 
 export const EASTBROOK_LAYOUT = deepFreeze({
   id: 'eastbrook_civic_layout_v2',
-  preservedBuildings: [PRESERVED_ARMOURY],
+  preservedBuildings: [] as readonly PreservedBuildingPlacement[],
   buildings: BUILDINGS,
   civic: {
     center: CIVIC_CENTER,

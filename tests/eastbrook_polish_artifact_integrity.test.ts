@@ -713,9 +713,12 @@ const ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS: readonly CaptureViewContract[] =
     }),
   })),
 ];
-// The 13 views the harbor move re-aimed; every other matched view still shares
-// its live framing with the frozen records.
+// The views the harbor move re-aimed (13), plus armoury-relation from owner
+// refinement round 4 (the armoury retired from placement and the matched view
+// aims at the barracks garrison on its lot); every other matched view still
+// shares its live framing with the frozen records.
 const HARBOR_MOVED_VIEW_NAMES: ReadonlySet<string> = new Set([
+  'armoury-relation',
   'bank-and-chest',
   'smithy-and-forge',
   'inn-and-kitchens',
@@ -896,9 +899,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // mints anew and this metadata authority sha follows the swept bytes. No
 // capture was retaken; the records keep their frozen pre-move framing.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '6e7281db54bb8233db9d73c4366055643aca256036d83fcb59fc0cb060ae7a92';
+  '1c86a1bd7ad95ec35d7de74ac60b31c2cd6504e545f671aee1a2db01d5709e8c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '70c5503a78e2111bd502aeea00a596d2bd81cbad5fb7b707751a82ff265556e9';
+  '43193ffc2696541d508f8272dde357f7423a5a7307fba21796eb85bd2876be1c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1943,7 +1946,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('5b8df7f97a92b8e46a5b5e37cb3875523f314c60482dba39284462c948adaa21');
+    ).toBe('72e9fc005421e803e484842d6f260002425db10f65d246116eb7e5ea6171273c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
@@ -2005,7 +2008,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
       name: string;
       viewName: string;
     }>;
-    const views = EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[];
+    // Frozen performance evidence validates against the ACCEPTED frozen
+    // framing, not the live matched views: a later deliberate re-aim (the
+    // round-4 armoury-relation move to the barracks garrison) diverges the
+    // live view while the recorded scenarios keep their capture-time aim.
+    // The declares-stale test above owns the divergence accounting.
+    const views = ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[];
 
     for (const prefix of ['before', 'after'] as const) {
       for (const profile of PROFILES) {

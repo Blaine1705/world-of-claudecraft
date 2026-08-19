@@ -377,13 +377,14 @@ describe('interaction.interact dispatch', () => {
   it('routes a nearby quest NPC to talkToNpc via the ctx callbacks (quest accepted)', () => {
     // Single-player world at the q_wolves giver: interact's quest-entity arm fans
     // into ctx.isQuestInteractionEntity + ctx.talkToNpc, both bound to Sim.
-    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
-    // docs/design/eastbrook-revamp/site-plan.md): marshal_redbrook now stands at
-    // (10, -97.5) by the noticeboard; the same 2yd offset south keeps him the
-    // nearest NPC (2.0yd, vs bursar_fernando 2.69) with no lootable in scan range.
+    // Re-pinned 2026-08 for the harbor move, then for owner refinement round
+    // 4: marshal_redbrook keeps watch at (3.6, -95.6) beside his notice
+    // board; the same 2yd offset south keeps him the nearest NPC (2.0yd, vs
+    // bursar_fernando 4.9) with no lootable in scan range (the board sits
+    // 8.7yd off).
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true }) as AnySim;
     const p = sim.player;
-    place(sim, p, 10, -99.5);
+    place(sim, p, 3.6, -97.6);
     expect(sim.questState('q_wolves')).toBe('available');
     interaction.interact(ctxOf(sim), p.id);
     expect(sim.questState('q_wolves')).toBe('active');

@@ -174,7 +174,10 @@ function placeEntity(sim: Sim, entity: Entity, point: { x: number; z: number }):
 // sized market stalls (w/d/height drive the authored OBB collider), the
 // three smithy-yard fences at their probed endpoints, and no town campfire
 // (the retired [3, -4] row sat inside what is now Wolf Run: exactly the
-// class of collider that forked the wolf projection).
+// class of collider that forked the wolf projection). Round 4 dropped the
+// armoury landmark row: the live town no longer places it, and the barracks
+// garrison that took the lot rides through unchanged as decorProps in BOTH
+// worlds via the ...current spread.
 function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   const townBuildingIds = new Set(
     [...EASTBROOK_LAYOUT.preservedBuildings, ...EASTBROOK_LAYOUT.buildings].map(
@@ -184,15 +187,6 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   return {
     ...current,
     buildings: [
-      {
-        kind: 'inn',
-        landmark: 'eastbrook_grand_armoury',
-        x: 17.5,
-        z: -5.5,
-        w: 13,
-        d: 9,
-        rot: -Math.PI / 2,
-      },
       { kind: 'house', x: 12, z: -94, w: 7, d: 5.5, rot: -2.356194490192345 },
       { kind: 'house', x: -2, z: -122, w: 7, d: 5.5, rot: -2.0344439357957027 },
       { kind: 'inn', x: -38, z: -88, w: 7.5, d: 6, rot: -2.5535900500422257 },
@@ -268,20 +262,14 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
 
 describe('Eastbrook authored gameplay data integration', () => {
   it('replaces only the town prop inventory and preserves every exterior prop row in order', () => {
-    expect(ZONE1_PROPS.buildings.map((building) => building.id)).toEqual([
-      'eastbrook_grand_armoury',
-      ...EASTBROOK_LAYOUT.buildings.map((building) => building.id),
-    ]);
-    expect(ZONE1_PROPS.buildings[0]).toMatchObject({
-      id: 'eastbrook_grand_armoury',
-      kind: 'house',
-      landmark: 'eastbrook_grand_armoury',
-      x: 17.5,
-      z: -5.5,
-      w: 13,
-      d: 9,
-      rot: -Math.PI / 2,
-    });
+    // Round 4: the preserved Grand Armoury row retired with the barracks
+    // swap; the building table is exactly the authored layout lots now, and
+    // the KayKit barracks + watch tower garrison the old lot as decorProps
+    // (pinned in tests/eastbrook_grand_armoury.test.ts).
+    expect(ZONE1_PROPS.buildings.map((building) => building.id)).toEqual(
+      EASTBROOK_LAYOUT.buildings.map((building) => building.id),
+    );
+    expect(ZONE1_PROPS.buildings.some((building) => building.landmark)).toBe(false);
     // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md): the well beacon moved with
     // the civic square to the harbor site.
@@ -780,7 +768,8 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   // docs/design/eastbrook-revamp/site-plan.md): the square anchor moved to
   // the new market square and the six retired gate destinations left the
   // list with the wall (36 became 30). Round 3 promoted the trio of decor
-  // homes into layout buildings, adding their entrances (33).
+  // homes into layout buildings, adding their entrances (33). Round 4
+  // retired the preserved armoury from placement, dropping its entrance (32).
   it('pathfinds bidirectionally from the square to every service, NPC, station, and entrance', () => {
     // Middle of the new market square: inside the civic ring, clear of the
     // well beacon and the benches, and directly connected to the east-road
@@ -808,7 +797,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         (building) => ({ id: `${building.id}:entrance`, point: building.frontStandingPoint }),
       ),
     ];
-    expect(destinations).toHaveLength(33);
+    expect(destinations).toHaveLength(32);
     const moverProfiles = [
       { id: 'player', bodyRadius: PLAYER_BODY_RADIUS },
       // Pet locomotion deliberately shares PLAYER_BODY_RADIUS; keep this
@@ -872,19 +861,19 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
 
   it('makes the new inn the sole Eastbrook rest area and uses rotation-correct local transforms', () => {
     const inn = ZONE1_PROPS.buildings.find((building) => building.id === 'eastbrook_inn');
-    const armoury = ZONE1_PROPS.buildings.find(
-      (building) => building.id === 'eastbrook_grand_armoury',
-    );
-    if (!inn || !armoury) throw new Error('missing Eastbrook rest fixtures');
+    if (!inn) throw new Error('missing Eastbrook rest fixtures');
+    // Round 4: the armoury retired from placement, so no zone1 building row
+    // carries its landmark and the barracks lot front grants no rest.
+    expect(ZONE1_PROPS.buildings.some((building) => building.landmark)).toBe(false);
     const innPlacement = EASTBROOK_LAYOUT.buildings.find(
       (building) => building.id === 'eastbrook_inn',
     );
     if (!innPlacement) throw new Error('missing authored Eastbrook inn');
     const restPoint = innPlacement.frontStandingPoint;
-    const armouryPoint = EASTBROOK_LAYOUT.preservedBuildings[0].frontStandingPoint;
+    const barracksFront = { x: 12, z: -5.5 };
     expect(isBlocked(SEED, restPoint.x, restPoint.z, 0.5)).toBe(false);
     expect(isResting({ inCombat: false, pos: { ...restPoint, y: 0 } } as Entity)).toBe(true);
-    expect(isResting({ inCombat: false, pos: { ...armouryPoint, y: 0 } } as Entity)).toBe(false);
+    expect(isResting({ inCombat: false, pos: { ...barracksFront, y: 0 } } as Entity)).toBe(false);
 
     const arbitrary = { kind: 'inn', x: 37, z: -19, w: 8, d: 3, rot: 0.731 } as const;
     const inside = localToWorld({ x: arbitrary.x, z: arbitrary.z }, arbitrary.rot, 3.9, 1.4);

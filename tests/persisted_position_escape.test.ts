@@ -63,7 +63,7 @@ describe('persisted overworld position escape', () => {
   // is left to trap a save in; the remaining rows still exercise the escape
   // path against the moved buildings and stalls.
   it.each([
-    ['preserved armoury', EASTBROOK_BUILDINGS_BY_ID.eastbrook_grand_armoury.position],
+    ['barracks garrison lot', { x: 17.5, z: -5.5 } as { x: number; z: number }],
     ['new bank', EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position],
     ['market stall', EASTBROOK_LAYOUT.market.stalls[0].position],
   ])('moves a save trapped inside the %s to deterministic clear ground', (_label, position) => {

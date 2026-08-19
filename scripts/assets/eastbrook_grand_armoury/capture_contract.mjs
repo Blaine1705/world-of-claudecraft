@@ -264,6 +264,9 @@ export const EASTBROOK_TOWN_CAPTURE_VIEWS = Object.freeze([
   }),
   Object.freeze({
     name: 'armoury-relation',
+    // HISTORICAL: frozen at the capture-time aim; the committed evidence
+    // records this exact view. The round-4 barracks re-aim rides the matched
+    // override table below, never this row.
     camera: Object.freeze({ x: 34, y: 15, z: 25 }),
     target: Object.freeze({ x: 10, y: 4, z: -2 }),
   }),
@@ -397,6 +400,13 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
 // public-side of BOTH fronts is east of the bank, so that camera is now a
 // wide establishing shot across the civic square.
 export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
+  'armoury-relation': Object.freeze({
+    // Round 4: the armoury retired from placement and the KayKit barracks
+    // garrison holds the lot; the matched view aims just off the barracks
+    // west facade (its rectangle collider owns the lot center).
+    camera: Object.freeze({ x: 34, y: 15, z: 25 }),
+    target: Object.freeze({ x: 12.5, y: 4, z: -5.5 }),
+  }),
   'bank-and-chest': Object.freeze({
     camera: Object.freeze({ x: 5, y: 7, z: -101 }),
     target: Object.freeze({ x: 8.994796179957174, y: 3.2, z: -97.00520382004282 }),

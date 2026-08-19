@@ -2,7 +2,6 @@
 // wolves and boars, the bandit camp, and Brother Aldric's Gravecaller chain
 // leading to the Hollow Crypt.
 
-import { EASTBROOK_GRAND_ARMOURY } from '../building_layout';
 import {
   EASTBROOK_LAYOUT,
   EASTBROOK_NPC_PLACEMENTS_BY_ID,
@@ -1776,14 +1775,8 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
 
 export const ZONE1_PROPS: ZonePropsDef = {
   buildings: [
-    {
-      id: EASTBROOK_LAYOUT.preservedBuildings[0].id,
-      assetId: EASTBROOK_LAYOUT.preservedBuildings[0].assetId,
-      kind: EASTBROOK_LAYOUT.preservedBuildings[0].kind,
-      landmark: EASTBROOK_GRAND_ARMOURY.landmark,
-      ...EASTBROOK_GRAND_ARMOURY.lot,
-      height: EASTBROOK_GRAND_ARMOURY.aboveGradeHeight,
-    },
+    // Round 4: the preserved Grand Armoury row left this table; the KayKit
+    // barracks and its watch tower stand on the lot as decorProps below.
     ...EASTBROOK_LAYOUT.buildings.map((building) => ({
       id: building.id,
       assetId: building.assetId,
@@ -1864,6 +1857,26 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // fairway buoys marking the channel to the ferry berth
     { key: 'seaBuoy', x: -126, z: -46, rot: 0.4, scale: 3, float: 0.15 },
     { key: 'seaBuoyFlag', x: -124, z: -62, rot: -0.8, scale: 3, float: 0.15 },
+    // round 4: the KayKit barracks takes the armoury's lot as the Wolf Run
+    // garrison. r 5.2 stays the clearance radius scatter and keep-outs read
+    // (the dawnhold_layout.ts pattern); hw/hd collide the model's real wall
+    // box instead of that circle (the ZonePropsDef box rule): hw matches the
+    // measured local-x wall half (4.68), hd is trimmed to the lot's authored
+    // half-depth 4.5 so the barracks-approach route front at (12, -5.5)
+    // keeps its route-body (0.8) clearance off the facade.
+    {
+      key: 'hexBarracks',
+      x: 17.5,
+      z: -5.5,
+      rot: -1.5707963267948966,
+      scale: 6.5,
+      r: 5.2,
+      h: 11,
+      hw: 4.7,
+      hd: 4.5,
+    },
+    // eyes over the runs
+    { key: 'hexWatchtower', x: 27, z: -13, rot: 2.2, scale: 6.5, r: 2.4, h: 12 },
   ],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
   tents: [
