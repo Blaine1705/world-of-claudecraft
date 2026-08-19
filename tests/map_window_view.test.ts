@@ -42,6 +42,7 @@ import {
   buildOverworldMapModel,
   gatherNodeMarkerAt,
   MAP_GATHER_NODE_HIT_RADIUS,
+  MAP_LANDMARK_MAX_NUDGE_YD,
   MAP_LANDMARK_PLACEMENT_BY_PROFILE,
   MAP_LANDMARK_SEPARATION,
   MAP_MAX_ZOOM,
@@ -1506,19 +1507,21 @@ describe('zone-map civic services', () => {
     expect(first.npcs.length).toBeGreaterThan(0);
     const landmarks = [...first.services, ...first.stations];
     expect(landmarks).toHaveLength(3);
+    // Every landmark stays within the world-yard nudge cap of its authored
+    // projection (all three sources are collocated at the giver). At the
+    // full-zone scale the 24px separation cannot be honored inside the cap,
+    // so the badges overlap at their true spot instead of drifting: that IS
+    // the contract now (the old unbounded search carried a badge 27 world
+    // yards from the thing it marked).
+    const authored = {
+      mx: ((ZONE_CX + FULL_SPAN / 2 - giver.pos.x) / FULL_SPAN) * CANVAS,
+      my: ((ZONE_CZ + FULL_SPAN / 2 - giver.pos.z) / FULL_SPAN) * CANVAS,
+    };
+    const maxNudgePx = MAP_LANDMARK_MAX_NUDGE_YD * (CANVAS / FULL_SPAN) + 1e-6;
     for (const landmark of landmarks) {
-      for (const npc of first.npcs) {
-        expect(Math.hypot(landmark.mx - npc.mx, landmark.my - npc.my)).toBeGreaterThanOrEqual(
-          MAP_LANDMARK_SEPARATION - 1e-6,
-        );
-      }
-    }
-    for (let i = 0; i < landmarks.length; i++) {
-      for (let j = i + 1; j < landmarks.length; j++) {
-        expect(
-          Math.hypot(landmarks[i].mx - landmarks[j].mx, landmarks[i].my - landmarks[j].my),
-        ).toBeGreaterThanOrEqual(MAP_LANDMARK_SEPARATION - 1e-6);
-      }
+      expect(Math.hypot(landmark.mx - authored.mx, landmark.my - authored.my)).toBeLessThanOrEqual(
+        maxNudgePx,
+      );
     }
   });
 
@@ -1556,29 +1559,50 @@ describe('zone-map civic services', () => {
     expect(Object.isFrozen(MAP_LANDMARK_PLACEMENT_BY_PROFILE)).toBe(true);
     expect(Object.isFrozen(MAP_LANDMARK_PLACEMENT_BY_PROFILE.compact)).toBe(true);
     expect(compact.gatherNodes).toEqual(standard.gatherNodes);
-    expect([...compact.services, ...compact.stations]).not.toEqual([
-      ...standard.services,
-      ...standard.stations,
-    ]);
 
-    const landmarks = [...compact.services, ...compact.stations];
-    for (const landmark of landmarks) {
-      expect(landmark.mx).toBeGreaterThan(0);
-      expect(landmark.mx).toBeLessThan(CANVAS);
-      expect(landmark.my).toBeGreaterThan(0);
-      expect(landmark.my).toBeLessThan(CANVAS);
-      for (const npc of compact.npcs) {
-        expect(Math.hypot(landmark.mx - npc.mx, landmark.my - npc.my)).toBeGreaterThanOrEqual(
-          MAP_LANDMARK_PLACEMENT_BY_PROFILE.compact.separation - 1e-6,
-        );
+    // Both profiles hold the SAME world-yard nudge cap: at the full-zone
+    // scale neither separation (24px or 34px) fits inside it for collocated
+    // landmarks, so both keep the badges at their authored spot; the profile
+    // geometry still matters at closer zooms, where the cap converts to more
+    // pixels than the separation needs.
+    const authored = {
+      mx: ((ZONE_CX + FULL_SPAN / 2 - giver.pos.x) / FULL_SPAN) * CANVAS,
+      my: ((ZONE_CZ + FULL_SPAN / 2 - giver.pos.z) / FULL_SPAN) * CANVAS,
+    };
+    const maxNudgePx = MAP_LANDMARK_MAX_NUDGE_YD * (CANVAS / FULL_SPAN) + 1e-6;
+    for (const landmarks of [
+      [...compact.services, ...compact.stations],
+      [...standard.services, ...standard.stations],
+    ]) {
+      for (const landmark of landmarks) {
+        expect(landmark.mx).toBeGreaterThan(0);
+        expect(landmark.mx).toBeLessThan(CANVAS);
+        expect(landmark.my).toBeGreaterThan(0);
+        expect(landmark.my).toBeLessThan(CANVAS);
+        expect(
+          Math.hypot(landmark.mx - authored.mx, landmark.my - authored.my),
+        ).toBeLessThanOrEqual(maxNudgePx);
       }
     }
-    for (let i = 0; i < landmarks.length; i++) {
-      for (let j = i + 1; j < landmarks.length; j++) {
-        expect(
-          Math.hypot(landmarks[i].mx - landmarks[j].mx, landmarks[i].my - landmarks[j].my),
-        ).toBeGreaterThanOrEqual(MAP_LANDMARK_PLACEMENT_BY_PROFILE.compact.separation - 1e-6);
-      }
+  });
+
+  it('caps every real Eastbrook station badge inside the world-yard nudge bound at zoom 1', () => {
+    // The owner-reported bug: at the full-zone frame the constant-pixel
+    // de-overlap search moved the Toolworks badge 27 world yards south, onto
+    // a player standing on the strand. The cap converts to canvas pixels at
+    // the live scale, so no badge may render further than
+    // MAP_LANDMARK_MAX_NUDGE_YD from its authored projection at ANY zoom.
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
+    const zoneStations = STATIONS.filter((station) => station.zoneId === ZONE.id);
+    expect(model.stations).toHaveLength(zoneStations.length);
+    const maxNudgePx = MAP_LANDMARK_MAX_NUDGE_YD * (CANVAS / FULL_SPAN) + 1e-6;
+    for (const station of zoneStations) {
+      const marker = model.stations.find((candidate) => candidate.stationId === station.id);
+      expect(marker).toBeDefined();
+      if (!marker) continue;
+      const mx = ((ZONE_CX + FULL_SPAN / 2 - station.pos.x) / FULL_SPAN) * CANVAS;
+      const my = ((ZONE_CZ + FULL_SPAN / 2 - station.pos.z) / FULL_SPAN) * CANVAS;
+      expect(Math.hypot(marker.mx - mx, marker.my - my)).toBeLessThanOrEqual(maxNudgePx);
     }
   });
 
@@ -1797,35 +1821,52 @@ describe('zone-map crafting stations', () => {
     expect(marker).toBeDefined();
     if (!marker) return;
     expect(stationMarkerAt(model.stations, marker.mx, marker.my)).toBe(marker);
+    // Under the nudge cap the town's stations cluster at their true spots,
+    // so probe from a point past the hit radius of EVERY station: straight
+    // up from the topmost badge, where the vertical gap alone exceeds it.
+    const topMy = Math.min(...model.stations.map((candidate) => candidate.my));
     expect(
-      stationMarkerAt(model.stations, marker.mx + MAP_STATION_HIT_RADIUS + 0.5, marker.my),
+      stationMarkerAt(model.stations, marker.mx, topMy - MAP_STATION_HIT_RADIUS - 0.5),
     ).toBeNull();
     expect(stationMarkerAt([], marker.mx, marker.my)).toBeNull();
   });
 
-  it('pushes a station badge clear of an overlapping quest glyph', () => {
+  it('pushes a station badge clear of an overlapping quest glyph only within the world-yard cap', () => {
     const world = makeOverworldWorld('sim') as unknown as {
       questState: () => 'available';
     };
     world.questState = () => 'available';
-    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
-    expect(model.stations.length).toBeGreaterThan(0);
-    expect(model.npcs.length).toBeGreaterThan(0);
 
-    for (const station of model.stations) {
+    // Full-zone frame: the cap converts to fewer pixels than the required
+    // separation, so badges hold their authored spot and overlap the glyphs
+    // honestly (bounded drift) instead of walking yards away.
+    const fullZone = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    expect(fullZone.stations.length).toBeGreaterThan(0);
+    expect(fullZone.npcs.length).toBeGreaterThan(0);
+    const maxNudgePx = MAP_LANDMARK_MAX_NUDGE_YD * (CANVAS / FULL_SPAN) + 1e-6;
+    for (const station of zoneStations) {
+      const marker = fullZone.stations.find((candidate) => candidate.stationId === station.id);
+      expect(marker).toBeDefined();
+      if (!marker) continue;
+      const mx = ((ZONE_CX + FULL_SPAN / 2 - station.pos.x) / FULL_SPAN) * CANVAS;
+      const my = ((ZONE_CZ + FULL_SPAN / 2 - station.pos.z) / FULL_SPAN) * CANVAS;
+      expect(Math.hypot(marker.mx - mx, marker.my - my)).toBeLessThanOrEqual(maxNudgePx);
+    }
+
+    // Closer zoom over the town: the same cap now converts to more pixels
+    // than the separation needs, so the classic de-overlap resumes and every
+    // badge clears every quest glyph.
+    const zoomed = buildOverworldMapModel({
+      ...input(world as unknown as IWorld, 4),
+      center: { x: -14, z: -102 },
+    });
+    expect(zoomed.stations.length).toBeGreaterThan(0);
+    expect(zoomed.npcs.length).toBeGreaterThan(0);
+    for (const station of zoomed.stations) {
       const nearest = Math.min(
-        ...model.npcs.map((npc) => Math.hypot(station.mx - npc.mx, station.my - npc.my)),
+        ...zoomed.npcs.map((npc) => Math.hypot(station.mx - npc.mx, station.my - npc.my)),
       );
       expect(nearest).toBeGreaterThanOrEqual(MAP_STATION_NPC_SEPARATION - 1e-6);
-    }
-    for (let i = 0; i < model.stations.length; i++) {
-      for (let j = i + 1; j < model.stations.length; j++) {
-        const a = model.stations[i];
-        const b = model.stations[j];
-        expect(Math.hypot(a.mx - b.mx, a.my - b.my)).toBeGreaterThanOrEqual(
-          MAP_STATION_NPC_SEPARATION - 1e-6,
-        );
-      }
     }
   });
 });
