@@ -516,6 +516,7 @@ import {
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
   resumeDroppedPrewarmEntries,
+  runPrewarmPiecesSerially,
   settlePrewarmBeforePublish,
   trackPrefetch,
   waitForPrefetch,
@@ -7304,24 +7305,23 @@ export class Renderer {
               // debt batch's links pile into the driver concurrently, and
               // with the whole manifest dropped that queue depth made every
               // first draw block for seconds (measured sub-1-fps for a full
-              // minute locally). Serial, settled-before-next batches keep the
-              // link queue shallow; live gates (LIVE_VIEW/ACTIONABLE_VIEW)
-              // preempt between batches, waiting at most one batch's settle.
+              // minute locally). One ROOT per queue unit (unit.pieces) keeps
+              // the link queue shallow and lets live and reveal gates
+              // preempt between roots, waiting at most one root's settle
+              // (prewarm_resume.ts explains the batch-held shape it replaces).
               const debt = prewarmResumeIsDebt(entry.id);
               resumeLedger.noteStart(entry.id);
-              return this.backgroundGpuWork.run(
-                unit.runSerial ?? unit.run,
-                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,
-                unit.id,
-                {
-                  // Cosmetic resume keeps the released tail: without it each
-                  // 16-root unit occupied the whole serial queue for seconds,
-                  // so live compile gates could not START and first-sight
-                  // content hitched for minutes after entry (the captured
-                  // travel-hitch amplifier).
-                  releaseTail: !debt,
-                },
-              );
+              const priority = debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME;
+              // Cosmetic resume keeps the released tail: held, each 16-root
+              // unit occupied the serial queue for seconds and live compile
+              // gates could not START (the captured travel-hitch amplifier).
+              const options = { releaseTail: !debt };
+              if (debt && unit.pieces) {
+                return runPrewarmPiecesSerially(unit.pieces, (piece) =>
+                  this.backgroundGpuWork.run(piece.run, priority, piece.id, options),
+                );
+              }
+              return this.backgroundGpuWork.run(unit.run, priority, unit.id, options);
             },
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {

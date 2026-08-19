@@ -14,6 +14,7 @@ import {
   orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   resumeDroppedPrewarmEntries,
+  runPrewarmPiecesSerially,
   settlePrewarmBeforePublish,
   trackPrefetch,
   waitForPrefetch,
@@ -167,10 +168,12 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compiled).toEqual(['player', 'mob']);
   });
 
-  it('a batch unit also offers runSerial: the same roots one at a time, every root attempted', async () => {
+  it('a batch unit also offers one PIECE per root, each its own unit: the roots one at a time, every root attempted', async () => {
     // The live resume lane's shape: `run` launches the batch together (the
-    // boot shape), `runSerial` awaits each root before the next, so a root's
-    // second arm never fires as one continuation burst with its batch-mates.
+    // boot shape); the pieces run one root each through the caller's queue
+    // (runPrewarmPiecesSerially), so a root's second arm never fires as one
+    // continuation burst with its batch-mates, and the queue re-arbitrates
+    // between roots instead of holding for the whole batch's settle.
     const roots = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
     const order: string[] = [];
     let inFlight = 0;
@@ -186,9 +189,17 @@ describe('resumeDroppedPrewarmEntries', () => {
     };
     const [unit] = buildPrewarmCompileUnits([{ id: 'scene', roots }], compile, { batchSize: 3 });
     expect(unit.id).toBe('scene:0');
-    expect(typeof unit.runSerial).toBe('function');
+    expect(unit.roots).toEqual(roots);
+    expect(unit.pieces?.map((piece) => piece.id)).toEqual(['scene:0:0', 'scene:0:1', 'scene:0:2']);
 
-    await expect(unit.runSerial?.()).rejects.toThrow('b failed');
+    const submitted: string[] = [];
+    await expect(
+      runPrewarmPiecesSerially(unit.pieces ?? [], (piece) => {
+        submitted.push(piece.id);
+        return piece.run();
+      }),
+    ).rejects.toThrow('b failed');
+    expect(submitted).toEqual(['scene:0:0', 'scene:0:1', 'scene:0:2']);
     expect(order).toEqual(['start:a', 'end:a', 'start:b', 'end:b', 'start:c', 'end:c']);
     expect(overlap).toBe(1);
 
@@ -483,13 +494,14 @@ describe('resumeDroppedPrewarmEntries', () => {
     // warmers that starved it in production) with its tail HELD so batches
     // settle serially and the driver link queue stays shallow; everything
     // else stays at BOOT_RESUME with the released tail
-    // (prewarmResumeIsDebt, prewarm_policy.ts). The lane runs a batch unit's
-    // SERIAL arm (PrewarmResumeUnit.runSerial): the world is live here, and
-    // the together arm's second-arm continuations fired as one 3 s task.
+    // (prewarmResumeIsDebt, prewarm_policy.ts). The lane runs a debt unit's
+    // PIECES one root per queue unit (PrewarmResumeUnit.pieces): the world is
+    // live here, the together arm's second-arm continuations fired as one
+    // 3 s task, and a batch-held unit starved the reveal gates behind it.
     expect(source).toContain(
-      'return this.backgroundGpuWork.run(\n                unit.runSerial ?? unit.run,\n                debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,\n                unit.id,',
+      'if (debt && unit.pieces) {\n                return runPrewarmPiecesSerially(unit.pieces, (piece) =>\n                  this.backgroundGpuWork.run(piece.run, priority, piece.id, options),\n                );\n              }',
     );
-    expect(source).toContain('releaseTail: !debt,');
+    expect(source).toContain('const options = { releaseTail: !debt };');
     // The old bare `releaseTail: true,` pin drifted: after the debt-class
     // split the only remaining literal `true` belongs to the preview lane,
     // an unrelated call site. The resume lane's contract is the class-driven

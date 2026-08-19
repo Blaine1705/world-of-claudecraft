@@ -3,20 +3,35 @@
 // no whole-entry callback: requestIdleCallback cannot preempt synchronous work
 // once it starts, including Three r165's compileAsync traversal prologue.
 
+/** One root's share of a batch unit, runnable as its own queue unit. */
+export interface PrewarmResumeUnitPiece {
+  /** `${unit.id}:${index}`: the same kind prefix as the unit, so the budget
+   *  prices it under the unit's family. */
+  id: string;
+  run: () => Promise<void>;
+}
+
 export interface PrewarmResumeUnit {
   id: string;
   run: () => void | Promise<void>;
-  /** The same work with its roots compiled ONE AT A TIME, for a lane that runs
-   *  while the world is live. A batch unit's `run` launches its roots together
-   *  (the boot shape: their driver links overlap under the curtain), but every
-   *  root's SECOND arm (the shadow compile after its colour compile settles)
-   *  then runs as a continuation, and the roots' colour links settle in the
-   *  same poll pass, so 16 to 32 shadow prologues fire in one microtask burst:
-   *  one 3 to 3.8 s main-thread task with 11 to 22 ms of sync, measured on the
-   *  Intel iGPU resume lane (bench H14, the `scene:N` / `props:N` /
-   *  `ghost-fade-variants:N` units). Serial, each root's continuation is its
-   *  own task and frames run between them. Absent on a unit with no batch. */
-  runSerial?: () => Promise<void>;
+  /** The same work cut ONE ROOT PER PIECE, for a lane that runs while the
+   *  world is live. A batch unit's `run` launches its roots together (the
+   *  boot shape: their driver links overlap under the curtain), but live that
+   *  shape cost twice: every root's SECOND arm (the shadow compile after its
+   *  colour compile settles) ran as a continuation, and the roots' colour
+   *  links settled in the same poll pass, so 16 to 32 shadow prologues fired
+   *  in one microtask burst (one 3 to 3.8 s main-thread task, bench H14); and
+   *  the unit held the queue for its WHOLE settle, which serial made 4 to 6 s
+   *  on the Intel iGPU, so the reveal gates of the decor the camera stands in
+   *  waited behind it past their watchdog (bench batch 17: 116 keys, 365
+   *  roots revealed cold). One root per queue unit keeps the held-tail debt
+   *  shape (hitch-hunt P1: one settled link at a time, the driver queue
+   *  shallow) and lets the queue re-arbitrate between roots, so a gate waits
+   *  at most one root's settle. Absent on a unit with no batch. */
+  pieces?: readonly PrewarmResumeUnitPiece[];
+  /** The roots behind the unit, for a consumer that needs to know WHICH
+   *  scene objects a deferred unit left unlinked (the reveal-time hold). */
+  roots?: readonly object[];
 }
 
 export interface PrewarmResumeEntry {
@@ -243,19 +258,13 @@ export function buildPrewarmCompileUnits<T extends object>(
           );
           if (failed) throw failed.reason;
         },
-        runSerial: async () => {
-          // Same contract, one root at a time (see PrewarmResumeUnit.runSerial):
-          // every root still gets its attempt, the first failure is rethrown.
-          let failure: { reason: unknown } | null = null;
-          for (const root of roots) {
-            try {
-              await compile(root);
-            } catch (reason) {
-              failure ??= { reason };
-            }
-          }
-          if (failure) throw failure.reason;
-        },
+        pieces: roots.map((root, index) => ({
+          id: `${id}:${index}`,
+          run: async () => {
+            await compile(root);
+          },
+        })),
+        roots,
       });
     };
     for (const root of group.roots) {
@@ -273,6 +282,26 @@ export function buildPrewarmCompileUnits<T extends object>(
     flush();
   }
   return units;
+}
+
+/**
+ * Run a unit's pieces one after the other through `runPiece` (the caller's
+ * queue submission), every piece attempted, the first failure rethrown at the
+ * end: the contract `run` has for the batch, kept for the per-root shape.
+ */
+export async function runPrewarmPiecesSerially(
+  pieces: readonly PrewarmResumeUnitPiece[],
+  runPiece: (piece: PrewarmResumeUnitPiece) => Promise<unknown>,
+): Promise<void> {
+  let failure: { reason: unknown } | null = null;
+  for (const piece of pieces) {
+    try {
+      await runPiece(piece);
+    } catch (reason) {
+      failure ??= { reason };
+    }
+  }
+  if (failure) throw failure.reason;
 }
 
 /**
