@@ -222,7 +222,25 @@ describe('generated chunk geometry is stable', () => {
     // dry-to-dry step is 1.172 at (-75,-140) (the pasture-coast blend),
     // under the 1.5 climb gate; every town building pad probed level with
     // its round-2 grade. An intended, looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('3b8a62584e3c80b2f79c9d6f8da874dd');
+    // Re-minted for owner refinement round 4 (the Wolf Run reads green
+    // meadow, not strand): terrain_chunk_build.ts now multiplies its shore
+    // and vale-strand paint factors by shoreWaterGate, the same gate the far
+    // vista already applied (far_terrain_core.ts), closing the documented
+    // near/far seam gap. Positions, normals, uvs, and indices are untouched
+    // (the wiring never reads or writes a height); only colors and splat
+    // weights move, and only on dry in-band ground. Probe evidence at the
+    // production seed: the gate answers 0 across the Wolf Run basin at
+    // (0,-16) h -3.05, (16,-8) h -3.05, (24,0) h -2.86, and 1 at the town's
+    // south strand (-14,-136) h -2.72 and the cove rim (-99,-37) h -3.40,
+    // so real beaches keep their shipped sand exactly. Localization on a 1yd
+    // lattice over x -220..70, z -220..220: 15,253 of 128,331 points carry a
+    // nonzero paint factor with gate under 1, every one inside x -83..70,
+    // z -124..206 (the basin and the dry pass toward Mirefen; nothing south
+    // of z -124, so the strand stays sand), all east of the x = -180 rect
+    // edge. The gap-fill digest therefore HOLDS, recomputed byte-identical
+    // on the live tree; both digests were computed twice and are
+    // deterministic. An intended, looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('0f52238550e3e8760c7f7f6562de55d9');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 

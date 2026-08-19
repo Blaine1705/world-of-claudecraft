@@ -476,6 +476,7 @@ const RENDER_PURE_CORES = [
   'src/render/fishing_bobber_core.ts',
   'src/render/flower_meadows_core.ts',
   'src/render/foliage_core.ts',
+  'src/render/foliage_shore_gate_core.ts',
   'src/render/gpu_queue_window_core.ts',
   'src/render/evil_eye_marker_core.ts',
   'src/render/lich_audio_state_core.ts',

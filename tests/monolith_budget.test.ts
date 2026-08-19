@@ -120,7 +120,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 3960,
+    ceiling: 3959,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

@@ -82,6 +82,7 @@ import {
   shadowRowVisible,
   shadowVolumeMoved,
 } from './foliage_shadow_core';
+import { foliageShoreSkip } from './foliage_shore_gate_core';
 import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
@@ -2956,7 +2957,7 @@ function buildGrassRing(
           (0.25 + 1.7 * lushness * lushness);
         if (r > density) continue;
         const h = terrainHeight(x, z, seed);
-        if (h < WATER_LEVEL + 1.6) continue;
+        if (foliageShoreSkip(x, z, h, seed)) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         if (insideGrassHubExclusion(activeContent.zones, x, z)) continue;
@@ -3037,9 +3038,8 @@ function buildGrassRing(
             const fx = x + (hashAt(i + rep, j, 7) - 0.5) * (1.4 + rep * 1.3);
             const fz = z + (hashAt(i, j + rep, 8) - 0.5) * (1.4 + rep * 1.3);
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
-              continue;
-            }
+            if (foliageShoreSkip(fx, fz, fh, seed)) continue;
+            if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
             // a band-edge bloom must not stray into the worked yard
             if (tuftBiome === 'gale' && inStableYard(fx, fz)) continue;
             if (tuftBiome === 'garden' && inDawnholdBailey(fx, fz, 0.5)) continue;
@@ -3076,9 +3076,8 @@ function buildGrassRing(
             const mdz = fz - mw.z;
             if (mdx * mdx + mdz * mdz >= mw.r * mw.r) continue;
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
-              continue;
-            }
+            if (foliageShoreSkip(fx, fz, fh, seed)) continue;
+            if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
             const fs = 0.55 + hashAt(i + rep, j, 17) * 0.5;
             q.setFromAxisAngle(up, hashAt(i, j + rep, 18) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
@@ -3109,7 +3108,7 @@ function buildGrassRing(
             if (tint < 0 && rep < 2) tint = gardenMeadowTintAt(fx, fz);
             if (tint < 0) continue;
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed)) continue;
+            if (foliageShoreSkip(fx, fz, fh, seed) || tooSteep(fx, fz, seed)) continue;
             const fs = 0.6 + hashAt(i + rep, j, 17) * 0.4;
             q.setFromAxisAngle(up, hashAt(i, j, 18 + rep) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));

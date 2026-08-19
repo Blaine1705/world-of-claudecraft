@@ -125,6 +125,10 @@ export const ZONE1_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: -4, z: -73, r: 8 }, // the chapel rise, blooms among the headstones
   { x: -36, z: -103, r: 6 }, // the main-street verge by the market home
   { x: -6, z: -116, r: 6 }, // the beach promenade's east verge
+  // Owner refinement round 4: the Wolf Run reads green meadow, not strand.
+  { x: -6, z: 2, r: 9 },
+  { x: 14, z: -18, r: 8 },
+  { x: 4, z: 14, r: 8 },
 ];
 
 // Basin carved into the heightfield. Pushed to the far northeast so its

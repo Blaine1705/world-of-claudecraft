@@ -20,8 +20,9 @@ describe('flowerMeadowsForBiome', () => {
   });
 
   it("keeps New Eastbrook's street-verge drifts on dry authored circles", () => {
-    // The round-3 verges: positive radii, all near the town's lamplit
-    // streets (the strand runs south of z -130; verges stay north of it).
+    // The round-3 verges plus the round-4 Wolf Run meadows: positive radii,
+    // all on dry vale ground (the strand runs south of z -130; every circle
+    // stays north of it).
     expect(ZONE1_FLOWER_MEADOWS.length).toBeGreaterThanOrEqual(4);
     for (const meadow of ZONE1_FLOWER_MEADOWS) {
       expect(meadow.r).toBeGreaterThan(0);
