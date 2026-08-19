@@ -16,9 +16,11 @@
 // was before.
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
+import { recordGpuPrepEvent } from './gpu_prep_events';
 import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_readiness';
 import {
   collectLinkedPrograms,
+  type LinkedProgramLike,
   type MaterialPropertiesLike,
   touchLinkedProgram,
 } from './linked_program_touch';
@@ -53,12 +55,23 @@ export interface LinkedProgramTouchLaneOptions {
   /** A caller on a SECOND context passes its own label so the budget prices it
    *  apart from the world tail; see the preview label above. */
   label?: string;
-  /** Whether the compile this tail follows actually SETTLED over `target`.
-   *  True (the default) records the target's current programs as linked before
-   *  the walk, which is the only thing that ever proves a program ready here.
-   *  A caller whose gate timed out or failed passes false: it warms whatever an
-   *  earlier settle already proved and claims nothing new. */
+  /** Whether THIS caller proved the target's current programs linked, by
+   *  awaiting a compile over them with no other proof arm (the preview
+   *  context: its own scene, its own materials). True (the default) records
+   *  each material's current program as linked before the walk. A host whose
+   *  link pieces already prove every program one by one (the world gates,
+   *  program_variant_settle) passes FALSE: the tail runs after the upload
+   *  lane, and by then a SHARED material may carry a different program than
+   *  the one its piece proved (another gate's variant still linking, or a
+   *  released program relinked under the same key), which a walk mark would
+   *  bless unproven and the touch would then block on (production
+   *  2026-08-19: twenty touch pieces, 1160 ms, none proven by a poll). */
   settled?: boolean;
+  /** Called with how many distinct programs under `target` the walk SKIPPED
+   *  as unproven (deduplicated across meshes sharing a material), so a host
+   *  can leave the evidence: those are exactly the programs a walk mark would
+   *  have blessed. Called once per lane run, with 0 when nothing was skipped. */
+  onUnproven?: (count: number) => void;
 }
 
 /**
@@ -78,12 +91,53 @@ export async function runLinkedProgramTouchLane(
   gatePriority: number,
   options: LinkedProgramTouchLaneOptions = {},
 ): Promise<number> {
-  const { label = LINKED_PROGRAM_TOUCH_LABEL, settled = true } = options;
+  const { label = LINKED_PROGRAM_TOUCH_LABEL, settled = true, onUnproven } = options;
   if (settled) markProgramsReadyUnder(properties, target);
-  const programs = collectLinkedPrograms(properties, target, isProgramKnownReady);
+  const unproven = new Set<LinkedProgramLike>();
+  const programs = collectLinkedPrograms(properties, target, (program) => {
+    const known = isProgramKnownReady(program);
+    if (!known) unproven.add(program);
+    return known;
+  });
+  onUnproven?.(unproven.size);
   const priority = linkedProgramTouchPriority(gatePriority);
   for (const program of programs) {
     await queue.run(() => touchLinkedProgram(program), priority, label);
   }
   return programs.length;
+}
+
+/** Key suffix of a gate whose link pieces did NOT all settle: unproven
+ *  programs are expected there and must not read as the shared-material
+ *  race the plain key names. */
+export const TOUCH_UNPROVEN_UNSETTLED_SUFFIX = ':unsettled';
+
+/**
+ * The world gates' tail: the lane above with NO walk mark (the pieces' settle
+ * arm, program_variant_settle, is the only proof), and the programs the walk
+ * skips as unproven recorded as one `touch-unproven` event keyed by the gate
+ * target's label (plus the unsettled suffix when the gate's pieces did not
+ * all settle), `units` the count. Those are exactly the programs a walk mark
+ * used to bless and the touch then blocked on: the tail runs after the upload
+ * lane, and by then a SHARED material can carry another gate's variant still
+ * linking or a released program relinked under the same key (production
+ * 2026-08-19: twenty touch pieces, 1160 ms, none proven by a poll). The event
+ * is write-only evidence, like every gpu_prep_events kind.
+ */
+export function runWorldGateTouchLane(
+  queue: LinkedProgramTouchQueue,
+  properties: MaterialPropertiesLike,
+  target: THREE.Object3D,
+  gatePriority: number,
+  gate: { failed: boolean; timedOut: boolean },
+): Promise<number> {
+  const label = target.name || target.type;
+  const key = gate.failed || gate.timedOut ? `${label}${TOUCH_UNPROVEN_UNSETTLED_SUFFIX}` : label;
+  return runLinkedProgramTouchLane(queue, properties, target, gatePriority, {
+    settled: false,
+    onUnproven: (count) => {
+      if (count <= 0) return;
+      recordGpuPrepEvent({ kind: 'touch-unproven', key, ageMs: 0, units: count });
+    },
+  });
 }

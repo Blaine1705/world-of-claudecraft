@@ -6,6 +6,8 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
+import { markProgramReady } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike, MaterialPropertiesLike } from '../src/render/linked_program_touch';
 import {
   LINKED_PROGRAM_TOUCH_LABEL,
@@ -13,6 +15,8 @@ import {
   linkedProgramTouchPriority,
   PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
   runLinkedProgramTouchLane,
+  runWorldGateTouchLane,
+  TOUCH_UNPROVEN_UNSETTLED_SUFFIX,
 } from '../src/render/linked_program_touch_lane';
 
 interface RecordedUnit {
@@ -210,6 +214,35 @@ describe('runLinkedProgramTouchLane', () => {
     expect(unproven.uniforms).toHaveBeenCalledTimes(2);
   });
 
+  it('reports how many distinct programs the walk skipped as unproven, 0 included', async () => {
+    const proven = program();
+    const linking = program();
+    // the same still-linking program under two materials: one program, counted once
+    const { properties, target } = targetWith(
+      settledMaterial(proven, 'a'),
+      { programs: new Map([['skinned', linking]]) },
+      { programs: new Map([['far', linking]]) },
+    );
+    const seen: number[] = [];
+
+    await runLinkedProgramTouchLane(stubQueue(), properties, target, 20, {
+      settled: false,
+      onUnproven: (count) => seen.push(count),
+    });
+    expect(seen).toEqual([2]);
+    expect(linking.uniforms).not.toHaveBeenCalled();
+
+    // Once proved, the same walk reports 0 and warms it.
+    markProgramReady(proven);
+    markProgramReady(linking);
+    await runLinkedProgramTouchLane(stubQueue(), properties, target, 20, {
+      settled: false,
+      onUnproven: (count) => seen.push(count),
+    });
+    expect(seen).toEqual([2, 0]);
+    expect(linking.uniforms).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps the caller label option, so a second context is priced on its own kind', async () => {
     const preview = program();
     const { properties, target } = targetWith(settledMaterial(preview));
@@ -250,5 +283,56 @@ describe('runLinkedProgramTouchLane', () => {
     expect(queue.units).toEqual([
       { priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW, label: LINKED_PROGRAM_TOUCH_LABEL },
     ]);
+  });
+});
+
+describe('runWorldGateTouchLane', () => {
+  it('never marks at the walk: a settled gate warms only what a poll proved, and records the rest', async () => {
+    resetGpuPrepEventsForTest();
+    // The shared-material race the walk mark used to lose: the material's
+    // current program is a variant nobody proved (another gate's link still in
+    // flight, or a released program relinked under the same key).
+    const relinked = program();
+    const { properties, target } = targetWith(settledMaterial(relinked));
+    target.name = 'Group:7';
+    const queue = stubQueue();
+
+    await expect(
+      runWorldGateTouchLane(queue, properties, target, 20, { failed: false, timedOut: false }),
+    ).resolves.toBe(0);
+    expect(queue.units).toEqual([]);
+    expect(relinked.uniforms).not.toHaveBeenCalled();
+    const snapshot = gpuPrepEventsSnapshot();
+    expect(snapshot.counts['touch-unproven']).toBe(1);
+    expect(snapshot.events[0]).toMatchObject({ kind: 'touch-unproven', key: 'Group:7', units: 1 });
+
+    // Proved by a poll (the piece's settle arm), the same tail warms it and
+    // records nothing: zero unproven is not an event.
+    markProgramReady(relinked);
+    await expect(
+      runWorldGateTouchLane(stubQueue(), properties, target, 20, {
+        failed: false,
+        timedOut: false,
+      }),
+    ).resolves.toBe(1);
+    expect(relinked.uniforms).toHaveBeenCalledTimes(1);
+    expect(gpuPrepEventsSnapshot().counts['touch-unproven']).toBe(1);
+  });
+
+  it('keys an unsettled gate apart, where unproven programs are expected', async () => {
+    resetGpuPrepEventsForTest();
+    const { properties, target } = targetWith(settledMaterial(program()));
+    target.name = 'fenbridgeBuilding';
+
+    await runWorldGateTouchLane(stubQueue(), properties, target, 20, {
+      failed: false,
+      timedOut: true,
+    });
+    expect(gpuPrepEventsSnapshot().events[0]).toMatchObject({
+      kind: 'touch-unproven',
+      key: `fenbridgeBuilding${TOUCH_UNPROVEN_UNSETTLED_SUFFIX}`,
+      units: 1,
+    });
+    resetGpuPrepEventsForTest();
   });
 });

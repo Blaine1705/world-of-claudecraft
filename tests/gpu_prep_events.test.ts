@@ -39,6 +39,7 @@ describe('gpu preparation event ring', () => {
       'submit-stop': 0,
       'live-program': 0,
       arrival: 0,
+      'touch-unproven': 0,
     });
     expect(snapshot.reveal).toEqual({
       keysHeld: 0,
@@ -82,6 +83,7 @@ describe('gpu preparation event ring', () => {
       'submit-stop': 0,
       'live-program': 0,
       arrival: 0,
+      'touch-unproven': 0,
     });
     expect(snapshot.events.map((event) => event.key)).toEqual([
       'view:mob',
@@ -160,7 +162,7 @@ describe('gpu preparation event ring', () => {
     expect(snapshot.total).toBe(0);
     expect(snapshot.dropped).toBe(0);
     expect(snapshot.events).toEqual([]);
-    expect(Object.values(snapshot.counts)).toEqual([0, 0, 0, 0, 0, 0, 0]);
+    expect(Object.values(snapshot.counts)).toEqual([0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
   it('serves the injected clock, and the default one is restored on release', () => {

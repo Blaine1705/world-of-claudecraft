@@ -11,7 +11,10 @@
 // roots of a held key became visible. `arrival` is a lifecycle mark, not an
 // escape either: one per teleport-class landing (arrival_event_core), so a
 // capture can line the escapes and the build ledger up against the moment
-// the camera was dropped somewhere new.
+// the camera was dropped somewhere new. `touch-unproven` is evidence too: a
+// world gate's touch tail found programs under its target that no settle had
+// proved (linked_program_touch_lane runWorldGateTouchLane), the
+// ones a walk mark used to bless and block on; `units` carries the count.
 //
 // Write-only telemetry: nothing here feeds a reveal, an admission, or any
 // other decision, so recording an event can never change what the renderer
@@ -29,7 +32,8 @@ export type GpuPrepEventKind =
   | 'gate-timeout'
   | 'submit-stop'
   | 'live-program'
-  | 'arrival';
+  | 'arrival'
+  | 'touch-unproven';
 
 export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'reveal-watchdog',
@@ -39,6 +43,7 @@ export const GPU_PREP_EVENT_KINDS: readonly GpuPrepEventKind[] = [
   'submit-stop',
   'live-program',
   'arrival',
+  'touch-unproven',
 ];
 
 /**
@@ -174,6 +179,7 @@ const counts: Record<GpuPrepEventKind, number> = {
   'submit-stop': 0,
   'live-program': 0,
   arrival: 0,
+  'touch-unproven': 0,
 };
 
 const reveal: GpuPrepRevealCounters = {

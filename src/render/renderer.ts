@@ -366,7 +366,7 @@ import {
   markPrewarmPacingReveal,
   type PrewarmPacingHandle,
 } from './link_rate_budget';
-import { runLinkedProgramTouchLane } from './linked_program_touch_lane';
+import { runWorldGateTouchLane } from './linked_program_touch_lane';
 import * as liveProgramWatch from './live_program_watch';
 import { renderLoadMeasure } from './load_marks';
 import {
@@ -8728,17 +8728,15 @@ export class Renderer {
   }
 
   /** The gate's tail: every linked program under `target`, one budgeted queue
-   *  unit at a time (src/render/linked_program_touch_lane.ts). Readiness comes
-   *  from THIS gate's settle, never from a driver query in the walk. */
+   *  unit at a time. Readiness comes from the pieces' own settle only, never
+   *  from a walk mark here (why, and the evidence it leaves: runWorldGateTouchLane). */
   private touchLinkedProgramsGated(
     target: THREE.Object3D,
     priority: number,
     gate: CompileGateResult,
   ): Promise<number> {
     const { properties } = this.webgl;
-    return runLinkedProgramTouchLane(this.backgroundGpuWork, properties, target, priority, {
-      settled: !gate.failed && !gate.timedOut,
-    });
+    return runWorldGateTouchLane(this.backgroundGpuWork, properties, target, priority, gate);
   }
 
   private recoverRejectedCompileGate(

@@ -179,6 +179,7 @@ function baseSnapshot(): PerfSnapshot {
             'submit-stop': 0,
             'live-program': 0,
             arrival: 0,
+            'touch-unproven': 0,
           },
           events: [],
           reveal: {

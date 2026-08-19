@@ -182,10 +182,11 @@ describe('Renderer live shader compile rejection recovery', () => {
     await renderer.compileGate(target);
 
     expect(order).toEqual(['color:false', 'shadow']);
-    // Three times for the one material: the piece's variant settle (which
-    // finds no program to poll here), the tail's marking walk, then the
-    // collect walk. None of them asks the driver anything.
-    expect(properties.get).toHaveBeenCalledTimes(3);
+    // Twice for the one material: the piece's variant settle (which finds no
+    // program to poll here), then the tail's collect walk. No marking walk:
+    // the settle is the only proof (runWorldGateTouchLane). None of them asks
+    // the driver anything.
+    expect(properties.get).toHaveBeenCalledTimes(2);
     // The arms compile the material carrier itself, in place, never the root:
     // three prepares materials only under the node it is handed, so this is
     // exactly the mesh's programs, and one queue unit per material group.
@@ -515,10 +516,15 @@ describe('the compile gate touch tail, per program', () => {
     // The one-shot burst is gone from the renderer entirely: it cannot be paced,
     // and a call left behind would silently reinstate the whole cost in one frame.
     expect(source).not.toContain('touchLinkedPrograms(');
-    expect(source).toContain('runLinkedProgramTouchLane(');
-    // And the tail's own readiness rides the gate result, honestly: a gate
-    // that timed out or failed marks nothing new.
-    expect(source).toContain('settled: !gate.failed && !gate.timedOut,');
+    // The world tail: no walk mark ever (the pieces' settle is the only
+    // proof), and the unproven programs the walk skips recorded as evidence
+    // (runWorldGateTouchLane); the bare lane with its marking arm stays with
+    // the preview context, whose awaited compileAsync IS its proof.
+    expect(source).toContain(
+      'runWorldGateTouchLane(this.backgroundGpuWork, properties, target, priority, gate)',
+    );
+    expect(source).not.toContain('runLinkedProgramTouchLane(');
+    expect(source).not.toContain('settled: !gate.failed && !gate.timedOut,');
   });
 
   it('opens both GPU-preparation frame clocks in the same unconditional sync prologue', () => {

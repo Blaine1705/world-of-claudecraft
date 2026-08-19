@@ -158,7 +158,10 @@ const MONOLITHS: MonolithRow[] = [
     // FogSceneState it classifies (interior_light_rig.ts isOpenAirFogState),
     // landing with the shadow arm's every-mesh twin swap in the same change
     // (net -3).
-    ceiling: 13448,
+    // Lowered again when the world gates' touch tail moved behind
+    // linked_program_touch_lane.ts runWorldGateTouchLane (no walk mark, the
+    // unproven walk recorded as a touch-unproven event) (net -2).
+    ceiling: 13446,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
