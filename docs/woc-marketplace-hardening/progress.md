@@ -34,8 +34,8 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 13 QA | phase-13-qa | game | DONE (QA PASS) | 220b9b018f | PASS-WITH-FOLLOWUPS, every finding applied or judged; release/v0.39.0 re-synced (merge 220b9b018f, tip f48c7a3a9b, 2 conflicts: i18n pending regenerated + hud.ts ceiling re-derived to 19170; release-merge-audit CLEAN, both usage-limit trap lanes re-run inline); independent mutation battery 21/22 bit, the 1 survivor a REAL safeMessagePiece code+pin gap closed; two code fixes (sanitizer C1/Cf + non-string coerce; window close-reset) + a test-pin batch incl. the devsig-wiring total-bypass pin, all mutation-proven; the fe BLOCKING (R10 lock-hint dead end) reclassified should-fix and deferred to 15 (no custody hole; offer pin always unlocked); gate GREEN (see 13 QA ROUND); pushed per R4 |
 | 14 QA | phase-14-qa | game | DONE (QA PASS) | 8c0370585c | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open; release/v0.39.0 re-synced (merge 8c0370585c, tip f42a67f341, trivial); nine workflow audit lanes + six typed reviewers (frontend-seam MOBILE, cross-platform, database-performance, migration-safety, security; test-coverage silent, covered by two mutation batteries: 43 mutants 36 bit + 50 mutants 44 bit, every survivor a real pin gap closed) + the session's own mobile E2E arm (two dev-only rigs measuring the money faces in a landscape phone viewport, six captures) + the Capacitor /terms check (dead on iOS + packaged desktop, rebooted Android; fixed with the wiki_link resolver idiom); fix commits e68227b6bb, d1e3eb2199, ea08ac4711, and 6f67a96057 after a fresh four-lane re-review of the fix round; gate GREEN (see the 14 QA round section); pushed per R4 |
 | 15 | ui-polish | game | DONE (impl) | 01faddadf8 | release/v0.39.0 re-synced FIRST (merge 3a98604c83, release tip b650d9d7d2, 150 commits, NON-trivial: four conflicts, release-merge-audit run and its findings applied, see the section below); the DESIGN.md conformance audit written first (docs/woc-marketplace-hardening/phase-15-design-audit.md: seven read-only lanes, 215 findings, every row APPLIED, DEFERRED with an owner, or JUDGED with a reason) and then worked top to bottom; presentation only, zero view-core diffs; five commits (a4fcac14d8 + 01faddadf8 from the merge audit, then 92da32bbb1 style, e6c054232d test, be35080962 scripts, plus the docs and capture commits below); highest-value catches: var(--accent) was declared NOWHERE so seven marketplace declarations shipped resolving to inherit/currentColor, the mobile bags sheet covered the whole trade window on touch (the arm unreachable), neither money sheet cleared the safe-area insets, the trade arm's spinner was an inline box that never spun inside the pressed Pay button, the browse table re-flowed every column on each per-second countdown rebuild, the toast strip shifted the control under the pointer, the sell form's money inputs and the arm's price field missed the touch floor, the seller never saw a resolved fee (the note named a percentage the SERVICE owns), the bond note resolved the wrong bid's bond, the paused and suspended lines named a cause they cannot know and actions they do not cover, and the Exchange window had no behavioral test at all; new guards: the css var() resolution ratchet (the --accent class cannot recur), the copy-to-constants pins, the shared token spelling, the widened ticker grep-proof, and tests/woc_market_window_rig.test.ts (the first live rig for WocMarketWindow, 21 cases); LOCAL, not pushed per R4 (15-qa pushes on PASS) |
-| 15 QA | phase-15-qa | game | NOT STARTED | | PASS requires Fernando's screenshot sign-off |
-| 16 | hot-path-scale | game | NOT STARTED | | |
+| 15 QA | phase-15-qa | game | DONE | 4cb60d0d3c | PASS-WITH-FOLLOWUPS, Fernando's sign-off BEAUTIFUL WITH NOTES, notes shipped, PUSHED per R4 (see the 15 QA round section) |
+| 16 | hot-path-scale | game | DONE (impl) | 94d53a243a | H11 closed: five GETs metered + cached, /me sequenced to one client, price cache single-flight with a short failure memo and bounded SWR, sweep locks per segment with the overrun watchdog; the owed 12/13/14/15 clusters shipped or decided (see the 16 implement section); LOCAL, not pushed per R4 (16-qa pushes on PASS) |
 | 16 QA | phase-16-qa | game | NOT STARTED | | |
 | 17 | db-retention-indexes | game | NOT STARTED | | |
 | 17 QA | phase-17-qa | game | NOT STARTED | | |
@@ -3263,3 +3263,193 @@ headless run can see. Housekeeping: backup-pre-reword-15 is verified
 content-free (its tree matches rewritten commit 2dfd1b99de; git cherry all
 equivalent) but the delete stayed permission-blocked, so it remains for a
 manual git branch -D.
+
+## 16 hot-path-scale (2026-08-19, GAME repo, IMPLEMENT session)
+
+Release sync first: origin/release/v0.40.0 had been minted upstream (tip
+e56707a675, seven commits past this branch: the 58-icon revert with its
+byte freeze and two CI browser-deps fixes). Merge ee6780bd76 was TRIVIAL
+(no conflicts, no source or lockfile overlap, only icons, icon tests and
+two workflows), so no release-merge-audit was owed.
+
+The phase closes H11 end to end, five code commits (ab09d6e931 the server
+core, 01130fb79b the client cluster, 3d6e7ee99a the dispositions,
+1b9bdcdb36 the review fix round, 94d53a243a the TTL rationale):
+
+- Deliverable 1: the five unmetered GETs (status, browse, detail, me,
+  history) carry rateLimit(WOC_MARKET_READ_POLICY); the shared read
+  bucket resized 120 to 240 against the measured cadences (the Exchange
+  awaiting-chain poll is browse+me every 3s, the trade window polls
+  offers every 2s), and the policy is TIER-1 ONLY (the review's blocking
+  catch: tier-2 'global' spends two rate_limits UPSERTs per ALLOWED poll,
+  out-costing the reads the caches remove). The db-backed reads go
+  through the new server/woc_market_read_cache.ts (KeyedCachedRead per
+  surface: browse pages 3s/128 on the canonical query tuple, listing rows
+  3s/256, history 10s/256, activity 2s/512; single-flight, LRU, values
+  frozen defensively). Busts ride every mutating handler (the 16-row
+  handler-to-surface table pins each by KIND), the three moderation arms,
+  and, via a registered hook, the wallet link/unlink writes in db.ts.
+  Cache-key entropy is fenced: item ids are shape-screened
+  (ITEM_ID_SHAPE), sorted, de-duplicated, empty normalizes to null;
+  item-FILTERED browse and UNKNOWN-item history bypass the cache
+  entirely. The directed-listing party gate runs per request OVER the
+  warm shared row (the two-viewer probe pins it). GET /trade-partner
+  moved to the smaller QUOTE bucket (an existence-plus-wallet oracle must
+  not inherit the widened polling budget).
+- Deliverable 2: myActivity runs its six reads SEQUENTIALLY (the old
+  Promise.all drew six of the ten shared pool clients per request) behind
+  the per-account cache; the pool-hold bound is COUNTED in both the
+  DB-free gauge and the pg suite (peak == 1 against real Postgres).
+- Deliverable 3: server/woc_market_price_cache.ts replaces the proxy's
+  inline cache: success TTL 15s, failure memo 3s (an outage no longer
+  blanks prices and pauses the market for a full TTL), single-flight,
+  stale-while-revalidate bounded at 30s so renders never hitch while the
+  health gate still converges; a failure never overwrites an in-bound
+  success. Estimates moved onto the keyed cache seam (15s/256,
+  single-flight per usdCents; an unavailable answer stays cached for the
+  full TTL by design, pinned).
+- Deliverable 4: WocMarketService.sweepSegments() splits the pass into
+  locked db segments (expiry, delivery) and segments the shell brackets
+  individually; the read-only confirm polls (chain-polls) run UNLOCKED
+  and hold no client across their chain round trips (their writes are
+  single-winner CAS transitions, proven under concurrency in the pg
+  suite), while the money-moving bond-payouts segment stays LOCKED (the
+  fix round's blocking catch: bondsDue is an unclaimed read, and two
+  deploy-overlap peers must not both fire a refund RPC; the service's
+  reference idempotence stays the second belt). A lost try-lock stands
+  the pass down; stop() cuts at segment boundaries; progress is the rows'
+  own durable transitions. server/woc_market_sweep_watchdog.ts is the
+  mid-flight voice (warn at 60s = one confirm timeout, repeating per
+  bound, one overrun scored per pass) and its readout plus the cache
+  counters ride GET /internal/woc-market/stuck.
+
+Owed clusters, shipped: the 12/13 QA modularity unit
+(server/woc_market_drift_warn.ts extraction judging through the exported
+WOC_MARKET_WIRE_PENDING_SET/FAIL_SET, the same Sets the wire screens use;
+the server/woc_market.ts monolith row lands at 4500 zero headroom and the
+window's came DOWN to 2614 via the wocSalesHistoryHtml/wocSellEmptyHtml
+chrome extractions); the 12 QA saleView.item trim (the full InvSlot per
+sale row had NO client reader; wire pin retuned); the 04 idle-in-
+transaction retrofit (all twelve withTx guards carry GUARD_IDLE with the
+typed 25P03 arm, now with a distinct idle-killed warn line and a
+per-site distribution pin); the 15 copy-figures cluster (/status ships
+the bond schedule mirror {rateBps 500, minCents 100, maxCents 5000} and
+bondPendingTtlSeconds 300; bidBondSchedule + bidBondPayWindow render the
+resolved figures; sellEmptyFloor + three collectible-variant keys replace
+the retired figure-free sellEmpty; six new keys each carry their five
+non-Latin fills; tests/woc_market_copy_figures.test.ts pins the
+constants and the placeholder discipline); and the 15 scrollIntoView-on-
+select cure (block nearest on the detail pane at row tap, exactly once,
+never on a poll re-render, rig-pinned with a positive render control).
+
+Decided (the 16-owed judgments): the 50-row offers-inbox cap STANDS with
+no pagination now: burying a victim's oldest live offer needs 50+
+distinct accounts each holding a live offer at once (the pair-pending
+unique index), re-posted every 600s offer TTL against the 10/min create
+limiter, and the harm is inbox visibility only (offers self-expire and
+escrow nothing); pagination is a wire-plus-trade-window product change,
+and 22 re-checks the call against the abuse ledger pre-enable. The 06
+estimate-amplifier note is CLOSED by the per-usdCents estimate cache plus
+this round's single-flight. The per-actor offer fan-out watch (06/14) is
+re-affirmed unchanged.
+
+Re-deferred with owners and reasons: the escrow WRITE-path cluster (05 QA
+db-perf P2s: realm-global escrow semaphore, contention-class label,
+draining refusal on createListing, FOR NO KEY UPDATE narrowing; the 05/06
+escrow-queue observability: pendingKeys gauge, wocEscrowQueue terminal
+kind, TxNeverStarted-to-contended widening incl. commitGrant's park arm,
+per-listing serialize cost, the saveAll-wave suppression measurement; the
+honest occupancy tail with the guild-flush 60s term; the commitGrant FIFO,
+still sequenced AFTER the occupancy bound; the local-ledger eviction and
+excludeIds growth bounds) goes to a dedicated rider before 22, decided at
+the 17 session start: it is write-path work with its own pg review
+surface, and this phase's spec is the hot READ path plus the sweep. The
+trade-wire diff-cost note (06) rides 22 as measure-and-decide. The p99.9
+inter-statement gap measurement and the advisory-cooldown at-scale proof
+(04) ride 20/21 (they need the at-scale rig; the 2000ms idle bound is now
+at least OBSERVABLE via the distinct 25P03 line). The end-to-end
+contention run rides 21; pool-wait observability is partially served now
+(watchdog + cache counters on the ops readout) with the pg pool gauge
+itself on 17/22. The EXPLAIN list and the priorWinners bound stay 17-led
+(its scope line; this phase added no new SQL shapes). The abandons-FK
+lock-registry note stays recorded for the 22 runbook. SEC-9 (11 QA): the
+game-side half shipped here (estimate single-flight; the 30/min quote
+limiter bounds per-account sample injection); the recording-window remedy
+is SERVICE-side and rides 22's economics judgment.
+
+Review: four lanes via plain Agent (server-hot-path, database-performance,
+privacy-security, test-coverage; the workflow-agentType trap avoided),
+roughly 60 findings, EVERY one applied or judged with the file open. The
+two blockers are described above (tier-2 cost, bond-payout locking). Other
+high-value applied fixes: the browse cache-key comment cited a charset
+screen that did not exist (now real), one account could thrash the
+128-entry browse LRU with minted filter keys (now structurally
+unreachable), acceptOffer left the counterparty's readout stale, the
+watchdog had no stop(), the cascade picker's comment still claimed the
+whole-pass lock, and the coverage lane's demanded registry-bound test
+CAUGHT A REAL BUG (the thunk-registry prune ran before the read minted
+its cache entry, so past the 2x threshold it dropped the current read's
+own thunk; prune moved after the read, reproduced then green). Judged, no
+change (do not re-raise): /status body memoization (the bearer-guard
+reads dominate that route's cost), folding the two SET LOCALs into one
+round trip (pin churn for sub-ms), pairwise /me concurrency (the
+one-client bound is the clearer contract), the aborted-pass zero-stats
+report (the main.ts sink already suppresses idle lines; the shape is now
+pinned), the detail estimate's cold 5s stall (pre-existing, unchanged by
+this diff, bounded by the service timeout), and the deploy-overlap
+duplicate confirm round trips (bounded by the overlap window; a per-pass
+probe would tax every pass forever to shave a deploy-window cost).
+
+A FRESH review of the fix round itself (the standing rule) found one
+blocker and settled it: locking bond-payouts had re-bought a bounded piece
+of the camping (lock + client held for up to a whole batch of RPC
+timeouts), so processDueBonds now stops its walk at a 30s wall-clock
+budget (BOND_PAYOUT_BUDGET_MS): the hold is bounded near the budget plus
+one RPC timeout, under the watchdog's alarm, the remainder stays durably
+due, and the arm's stat counts rows WALKED so a budget break still trips
+the saturation signal honestly (decisive test: one RPC eats the budget,
+rows two and three wait). Its should-fixes landed too: shutdown now
+unregisters the bust hook (the registry teardown rule), the rateLimit
+factory's return type carries the policy-name tag so a future wrapper
+dropping it fails loudly, the read policy records its one-process-per-
+realm deployment assumption (tier-1 429s still feed the attack-signal
+series), and the registry stats comment states the honest 2x bound.
+Judged from that round, no change: the db.ts wallet bust keeps the
+bustDiscordStatus in-write precedent (an event seam waits for a second
+consumer; the writes are autocommit so the bust is post-commit by
+construction); the acceptOffer bust stays keyed on the listing field (it
+IS the escrow signal, pinned); freezing row.item is itself the guard
+against future in-place redaction (a mutation throws in its own tests);
+the 25P03 warn is ONE shared arm in withTx (nothing per-site to
+interpolate).
+
+The repo qa-checklist ran LAST (the canonical order) and its verdict was
+NOT READY on two cheap blockers, both cleared in the closing commit: the
+fix rounds had grown server/woc_market.ts 19 lines past the fresh ratchet
+row (the one thing every diff-reading lane structurally could not see),
+paid by extracting the process-local ledger arithmetic to
+server/woc_market_local_ledgers.ts (pruneWocLocalLedgers +
+wocBackedOffIds, direct tests; the row re-pins at 4487 zero headroom);
+and the ledger files needed committing before a meaningful gate. Its
+should-fixes landed too: the ratelimit.ts sizing comment still counted
+trade-partner in the read bucket (six GETs now, matching the code and
+CLAUDE.md), and its sharpest catch INVERTED my budget-break stat: a
+budget-broken bond walk reporting rows WALKED silenced the saturation
+signal in exactly the degraded case the budget exists for (the watchdog
+deliberately alarms above the budget, so BOTH nets went quiet); the arm
+now reports rows FETCHED on a break so the backlog trips the warning, and
+the test pins it. Judged from that round: the trade-partner move onto the
+shared 30/min quote bucket is a conscious coupling (the lookup is
+one-shot on name entry; a bidding player's quote traffic sits well under
+the budget); the tier-1-only posture and its one-process-per-realm
+premise are recorded at the policy for the 16 QA and 22 to re-judge; the
+mobile scroll lands with rig pins and the real-viewport check joins the
+16 QA session's E2E list.
+
+Validation: tsc; the affected battery (~1,900 tests across the marketplace
+and http suites) green; all five pg suites 153/153 zero skips WITH
+TEST_DATABASE_URL; ci:changed clean; an early full gate run on the
+committed server core passed (exit 0) and the final gate runs after the
+docs commit. NEXT = docs/woc-marketplace-hardening/phase-16-qa.md, GAME
+repo, worktree wocc-marketplace, FRESH session, newest origin/release/**
+sync first; it diffs 4cb60d0d3c..HEAD and pushes on PASS.

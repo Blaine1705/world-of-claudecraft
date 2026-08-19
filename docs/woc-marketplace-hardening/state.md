@@ -5,9 +5,55 @@ actually reads.
 
 ## Where we are
 
-- Next file to run: `docs/woc-marketplace-hardening/phase-16-hot-path-scale.md`
-  (GAME repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH
-  session, newest origin/release/** sync first).
+- Next file to run: `docs/woc-marketplace-hardening/phase-16-qa.md` (GAME
+  repo, worktree `/Users/fernando/Documents/wocc-marketplace`, FRESH session,
+  newest origin/release/** sync first; it diffs 4cb60d0d3c..HEAD, the whole
+  16 implement range incl. the trivial v0.40.0 sync merge ee6780bd76, and
+  pushes on PASS per R4).
+- 16 IMPLEMENT COMPLETE (2026-08-19, LOCAL not pushed per R4; session start
+  4cb60d0d3c, release sync ee6780bd76 TRIVIAL: origin/release/v0.40.0 was
+  minted upstream, tip e56707a675, icons + CI workflows only, no audit
+  owed). H11 closed; five code commits ab09d6e931 / 01130fb79b / 3d6e7ee99a
+  / 1b9bdcdb36 / 94d53a243a plus the docs commit. THE VALUES REGISTRY the
+  16 QA re-judges: read limiter woc_market_read 240/min shared across six
+  GETs (status, browse, detail, me, history, offers), ip+account, TIER-1
+  ONLY (tier2 'none' is load-bearing: 'global' costs two rate_limits
+  UPSERTs per allowed poll); trade-partner deliberately on the 30/min
+  QUOTE bucket (enumeration oracle). Read caches
+  (server/woc_market_read_cache.ts): browse 3s/128 (itemIds===null
+  queries only), listing rows 3s/256, history 10s/256 (known ITEMS ids
+  only), activity 2s/512; busts = every mutating handler (16-row table
+  pin) + moderation arms + wallet link/unlink via
+  registerWocMarketReadCacheForBusts; values frozen defensively. Price
+  cache (server/woc_market_price_cache.ts): success TTL 15s, failure memo
+  3s, SWR bound 30s, single-flight; estimates on KeyedCachedRead 15s/256
+  single-flight per usdCents. Sweep: sweepSegments() = expiry(locked),
+  chain-polls(UNLOCKED, read-only confirms, CAS-proven), delivery(locked),
+  bond-payouts(LOCKED, money RPCs need provable exclusion); watchdog warn
+  60s repeating, readout + cache counters on GET /internal/woc-market/stuck;
+  /me sequenced to ONE pool client (counted in unit + pg). /status now
+  ships bond {rateBps 500, minCents 100, maxCents 5000, pendingTtlSeconds
+  300}; six new i18n keys (bidBondSchedule, bidBondPayWindow,
+  sellEmptyFloor, sellCollectibles{Both,Mounts,Chromas}) each with five
+  non-Latin fills; sellEmpty RETIRED (its five fills removed; the release
+  fill list loses that row). Monolith: server/woc_market.ts ENTERS the
+  ratchet at 4500 (drift-warn extracted to woc_market_drift_warn.ts, both
+  wire screens + the warner judge through the exported
+  WOC_MARKET_WIRE_PENDING_SET/FAIL_SET); woc_market_window.ts DOWN
+  2618 -> 2614 (sales list + sell caption to chrome). saleView.item is OFF
+  the wire (dead weight, no client reader). All twelve withTx guards carry
+  the idle bound; the shared withTx arm logs 25P03 kills distinctly; the
+  LOCKED bond-payout walk is budgeted (BOND_PAYOUT_BUDGET_MS 30s, rows
+  walked not fetched). DECIDED: the 50-row
+  offers-inbox cap STANDS, no pagination (cost/benefit in the 16 progress
+  entry; 22 re-checks against the abuse ledger). RE-DEFERRED with owners:
+  the escrow WRITE-path cluster to a dedicated rider before 22 (decided at
+  the 17 session start); trade-wire diff-cost note 22; p99.9 gap +
+  advisory-cooldown proofs 20/21; contention run 21; EXPLAIN list +
+  priorWinners 17; abandons-FK lock note 22; SEC-9 recording-window remedy
+  22 (service-side; game-side single-flight shipped). The 16 implement
+  entry in progress.md is the registry the 16 QA consumes (JUDGED
+  no-change list inside: do not re-raise).
 - 15 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, PUSHED per R4). Release
   sync: merge e32f7d8945 of origin/release/v0.39.0 tip ea9377db8e (136
   commits, one generated-i18n conflict, regenerated), release-merge-audit
