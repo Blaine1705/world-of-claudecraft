@@ -30,6 +30,36 @@ function frameBody(): string {
   return frame.getText(sourceFile);
 }
 
+/** The source text of the one `const <name> = ...` declaration, so a pin is
+ *  scoped to the declaration itself rather than matched anywhere in the file. */
+function declarationText(name: string): string {
+  let found: ts.VariableDeclaration | undefined;
+  const visit = (node: ts.Node): void => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name) {
+      found = node;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  if (!found) throw new Error(`src/main.ts ${name} was not found`);
+  return found.getText(sourceFile);
+}
+
+/** Every call of `<callee>(...)`, each as its own source slice, so an argument
+ *  pin cannot be satisfied by text that merely sits near the call. */
+function callTexts(callee: string): string[] {
+  const calls: string[] = [];
+  const visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
+      if (node.expression.text === callee) calls.push(node.getText(sourceFile));
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  return calls;
+}
+
 const flat = (text: string) => text.replace(/\s+/g, ' ');
 // Line comments drop before flattening: an inline comment's punctuation would
 // otherwise break call-span matching (frame() has no string containing '//').
@@ -77,9 +107,19 @@ describe('the presentation gate threading in main.ts frame()', () => {
       2,
     );
     // The gate input is the module's factory (its holdWorldDraw is what the
-    // blocking arrival chain receives), never a literal.
-    expect(sourceText).toContain('const gateInput = newPresentationGateInput(DESKTOP_APP);');
-    expect(sourceText).toContain('holdWorldDraw: gateInput.holdWorldDraw,');
+    // blocking arrival chain receives), never a literal: pinned on the
+    // declaration slice, not anywhere in the file.
+    expect(flat(stripLineComments(declarationText('gateInput')))).toBe(
+      'gateInput = newPresentationGateInput(DESKTOP_APP)',
+    );
+    // And the hold is handed to the ARRIVAL WARMUP itself. Scoped to that call
+    // expression: a whole-file match would pass on the property surviving in
+    // some unrelated object literal while the warmup lost it.
+    const warmupCalls = callTexts('runBlockingArrivalWarmup');
+    expect(warmupCalls).toHaveLength(1);
+    expect(flat(stripLineComments(warmupCalls[0]))).toContain(
+      'holdWorldDraw: gateInput.holdWorldDraw,',
+    );
   });
 
   it('drives the HUD non-paint head on hidden frames at BOTH call sites', () => {
@@ -153,26 +193,8 @@ describe('the hidden-shell zone-warm pause (phase 8 GPU lane audit, lane 1)', ()
   // behavior-tested in tests/zone_warm_tracker.test.ts; these pins hold the
   // composition: the latch threaded as the tracker's hidden argument, and
   // the no-answer early-out.
-  function warmBody(): string {
-    let warm: ts.VariableDeclaration | undefined;
-    const visit = (node: ts.Node): void => {
-      if (
-        ts.isVariableDeclaration(node) &&
-        ts.isIdentifier(node.name) &&
-        node.name.text === 'maybeWarmCurrentZone'
-      ) {
-        warm = node;
-        return;
-      }
-      ts.forEachChild(node, visit);
-    };
-    visit(sourceFile);
-    if (!warm) throw new Error('src/main.ts maybeWarmCurrentZone was not found');
-    return warm.getText(sourceFile);
-  }
-
   it('threads the presentation latch into the tracker and bails on a hidden frame', () => {
-    const body = flat(stripLineComments(warmBody()));
+    const body = flat(stripLineComments(declarationText('maybeWarmCurrentZone')));
     expect(body).toContain(
       'const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());',
     );

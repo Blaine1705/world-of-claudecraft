@@ -319,8 +319,8 @@ describe('progressive terrain build', () => {
       };
     });
     const pooled = (await import('../src/render/terrain')).buildTerrain(20061);
-    const progress: number[] = [];
-    const pooledTask = pooled.ensureZone(zone, (done) => progress.push(done));
+    const progress: [number, number][] = [];
+    const pooledTask = pooled.ensureZone(zone, (done, total) => progress.push([done, total]));
     await vi.runAllTimersAsync();
     await pooledTask;
 
@@ -329,9 +329,73 @@ describe('progressive terrain build', () => {
     // Every chunk came from the pool: not one fell back to the main thread.
     expect(stats.calls).toBe(pooled.group.children.length);
     expect(stats.peak).toBe(POOL_SIZE);
-    // Progress still ticks once per cell (and per normal-bake slice), in order.
+    // Progress still ticks once per cell (and per normal-bake slice), and it
+    // RUNS OUT: the loading bar has to reach its own total, so the last call
+    // is the full one and no tick ever overshoots it. (Sortedness alone was
+    // vacuous: an unordered lane still pushes an ascending counter.)
     expect(progress.length).toBeGreaterThan(pooled.group.children.length);
-    expect(progress).toEqual(progress.slice().sort((a, b) => a - b));
+    const total = progress[0][1];
+    expect(total).toBeGreaterThan(0);
+    expect(progress.every(([, reported]) => reported === total)).toBe(true);
+    expect(progress.at(-1)).toEqual([total, total]);
+    expect(Math.max(...progress.map(([done]) => done))).toBe(total);
+    expect(pooled.isZoneLoaded(zone.id)).toBe(true);
+    pooled.cancelStreaming();
+  });
+
+  // The pool is FALLIBLE by contract: a worker can fail a single job and the
+  // caller must build that one cell here instead. The zone that lands must be
+  // indistinguishable from the all-main-thread one, cell for cell, or a zone
+  // would quietly come out different depending on which jobs happened to fail.
+  it('falls back per cell when the pool declines a job, and still lands the same zone', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+    const zone = zoneAt(0, 0);
+
+    const plain = buildTerrain(20061);
+    const plainTask = plain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await plainTask;
+    const expected = chunkFingerprints(plain.group);
+    plain.cancelStreaming();
+
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const stats = { calls: 0, declined: 0 };
+    vi.doMock('../src/render/zone_build_pool', async () => {
+      const { buildChunkArrays } = await import('../src/render/zone_build_worker');
+      return {
+        zoneBuildPool: () => ({
+          size: 3,
+          async buildChunk(job: Record<string, unknown>) {
+            const call = ++stats.calls;
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            if (call % 3 === 0) {
+              stats.declined++;
+              return null;
+            }
+            return buildChunkArrays({ ...job, kind: 'chunk', id: call } as never);
+          },
+          async fillWater() {
+            return null;
+          },
+          dispose() {},
+        }),
+        disposeZoneBuildPool: () => {},
+      };
+    });
+    const pooled = (await import('../src/render/terrain')).buildTerrain(20061);
+    const pooledTask = pooled.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await pooledTask;
+
+    expect(chunkFingerprints(pooled.group)).toEqual(expected);
+    expect(stats.declined).toBeGreaterThan(0);
+    // Still consulted for EVERY claimable cell: a declined job must fall back
+    // for that one cell only, never make the lane give up on the pool.
+    expect(stats.calls).toBe(pooled.group.children.length);
     expect(pooled.isZoneLoaded(zone.id)).toBe(true);
     pooled.cancelStreaming();
   });

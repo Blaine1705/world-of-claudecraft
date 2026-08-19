@@ -85,6 +85,15 @@ describe('presentationGate', () => {
     // The stronger arms still win over the hold.
     expect(presentationGate({ ...held, graphicsRebuildPaused: true }).tick).toBe(false);
     expect(presentationGate({ ...held, hidden: true, desktopApp: true }).render).toBe(false);
+    // A hidden WEB tab is not the desktop hidden arm (rAF is already paused
+    // there, so there is nothing to skip): it falls through to the hold, which
+    // still applies. Hidden alone must not upgrade the decision to all-off.
+    expect(presentationGate({ ...held, hidden: true })).toEqual({
+      render: true,
+      drawWorld: false,
+      paint: true,
+      tick: true,
+    });
     // The hold is a frozen singleton like the others.
     expect(presentationGate({ ...held })).toBe(presentationGate(held));
     expect(Object.isFrozen(presentationGate(held))).toBe(true);

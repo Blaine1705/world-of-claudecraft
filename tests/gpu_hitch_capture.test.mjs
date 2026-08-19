@@ -460,6 +460,11 @@ describe('gpu hitch capture CLI', () => {
     );
   });
 
+  it('takes the CPU profile destination off --cpu-profile, and records none without it', () => {
+    expect(parseArgs(['--cpu-profile', 'tmp/x.cpuprofile']).cpuProfile).toBe('tmp/x.cpuprofile');
+    expect(parseArgs([]).cpuProfile).toBeNull();
+  });
+
   it('defaults to the reference 1600x900 viewport', () => {
     expect(parseArgs([]).viewport).toEqual({ width: 1600, height: 900, deviceScaleFactor: 1 });
   });

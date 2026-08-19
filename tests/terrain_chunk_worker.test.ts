@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   beginChunkGeometry,
   fillChunkIndexRow,
   fillChunkVertexRow,
 } from '../src/render/terrain_chunk_build';
 import { shoreDepthAt, shoreSlopeAt } from '../src/render/water_core';
-import { zoneBuildPool } from '../src/render/zone_build_pool';
+import { disposeZoneBuildPool, zoneBuildPool } from '../src/render/zone_build_pool';
 import {
   buildChunkArrays,
   buildWaterFillArrays,
@@ -167,24 +167,70 @@ describe('off-thread water fill matches the main thread', () => {
   });
 });
 
+// Node has no module Worker, so both describes below stand up a minimal stub:
+// the pool only ever constructs one, assigns onmessage/onerror, posts to it and
+// terminates it, which is exactly this surface. Without the stub every arm
+// would be satisfied by "there is no Worker here" and prove nothing.
+class FakeWorker {
+  static spawned: FakeWorker[] = [];
+  static reset(): void {
+    FakeWorker.spawned = [];
+  }
+  terminated = 0;
+  onmessage: unknown = null;
+  onerror: unknown = null;
+  constructor() {
+    FakeWorker.spawned.push(this);
+  }
+  posted: { id: number; kind: string }[] = [];
+  postMessage(message: unknown): void {
+    this.posted.push(message as { id: number; kind: string });
+  }
+  terminate(): void {
+    this.terminated++;
+  }
+}
+
+function useFakeWorkers(): void {
+  beforeEach(() => {
+    // zoneBuildPool memoizes, and the workerless arm above already cached a
+    // null: without this the stubbed spawn would never be attempted.
+    disposeZoneBuildPool();
+    FakeWorker.reset();
+    vi.stubGlobal('Worker', FakeWorker);
+  });
+  afterEach(() => {
+    disposeZoneBuildPool();
+    setActiveWorldContent(null);
+    vi.unstubAllGlobals();
+  });
+}
+
 describe('zoneBuildPool custom-world guard', () => {
-  it('refuses to hand out the pool while a custom world is active, and recovers after', () => {
+  useFakeWorkers();
+
+  it('hands out the pool on the built-in world, refuses it under a custom one, and recovers', () => {
+    // Positive control first: with workers available the accessor really does
+    // spawn a pool, so the null below can only be the custom-world guard.
     expect(isBuiltinWorldActive()).toBe(true);
+    expect(zoneBuildPool()).not.toBeNull();
+    expect(FakeWorker.spawned.length).toBeGreaterThan(0);
+
+    // A worker samples its own module copy of the content (the built-in
+    // world), so the accessor must force the main-thread fallback here.
     setActiveWorldContent({ zones: [], spawns: [] } as never);
-    try {
-      expect(isBuiltinWorldActive()).toBe(false);
-      // A worker samples its own module copy of the content (the built-in
-      // world), so the accessor must force the main-thread fallback here.
-      expect(zoneBuildPool()).toBeNull();
-    } finally {
-      setActiveWorldContent(null);
-    }
+    expect(isBuiltinWorldActive()).toBe(false);
+    const spawnedBefore = FakeWorker.spawned.length;
+    expect(zoneBuildPool()).toBeNull();
+    // The guard short-circuits: it must not spawn a pool it then withholds.
+    expect(FakeWorker.spawned.length).toBe(spawnedBefore);
+
+    setActiveWorldContent(null);
     expect(isBuiltinWorldActive()).toBe(true);
+    expect(zoneBuildPool()).not.toBeNull();
   });
 
   it('guards the accessor itself, not a call site (source pin)', () => {
-    // Node has no module workers, so the runtime arm above cannot separate
-    // "custom world refused" from "no Worker": pin the guard's placement.
     const source = readFileSync(
       path.resolve(__dirname, '../src/render/zone_build_pool.ts'),
       'utf8',
@@ -194,5 +240,74 @@ describe('zoneBuildPool custom-world guard', () => {
     expect(accessor.indexOf('isBuiltinWorldActive')).toBeLessThan(
       accessor.indexOf('createZoneBuildPool'),
     );
+  });
+});
+
+// The pool is a process-wide singleton every view shares, and cancelStreaming
+// disposes it: if dispose forgot to terminate its workers they would outlive
+// the renderer, and if the accessor kept handing back the disposed pool the
+// next zone build would submit into a dead one.
+describe('zoneBuildPool singleton lifecycle', () => {
+  useFakeWorkers();
+
+  it('memoizes one pool, terminates its workers on dispose, and spawns a fresh one after', () => {
+    const first = zoneBuildPool();
+    expect(first).not.toBeNull();
+    expect(zoneBuildPool()).toBe(first);
+    const beforeDispose = [...FakeWorker.spawned];
+    expect(beforeDispose.length).toBeGreaterThan(0);
+    for (const worker of beforeDispose) expect(worker.terminated).toBe(0);
+
+    disposeZoneBuildPool();
+    for (const worker of beforeDispose) expect(worker.terminated).toBe(1);
+
+    const second = zoneBuildPool();
+    expect(second).not.toBeNull();
+    expect(second).not.toBe(first);
+    expect(FakeWorker.spawned.length).toBeGreaterThan(beforeDispose.length);
+  });
+});
+
+describe('zoneBuildPool urgent lane', () => {
+  useFakeWorkers();
+
+  it('an urgent claimant jumps queued background work once a worker frees up', async () => {
+    const pool = zoneBuildPool();
+    expect(pool).not.toBeNull();
+    if (!pool) return;
+    const workers = FakeWorker.spawned.length;
+    const chunkJob = {
+      x0: 0,
+      z0: 0,
+      size: 30,
+      spacing: 1,
+      seed: 1,
+      withSplat: false,
+      skirtSpan: 0,
+      lowShade: false,
+    };
+    // Saturate every worker with background chunk jobs that never respond.
+    for (let i = 0; i < workers; i++) void pool.buildChunk({ ...chunkJob });
+    await Promise.resolve();
+    const postedBefore = FakeWorker.spawned.reduce((n, w) => n + w.posted.length, 0);
+    expect(postedBefore).toBe(workers);
+    // Queue a background water fill FIRST, then an urgent chunk.
+    void pool.fillWater({ x: new Float32Array(1), z: new Float32Array(1), seed: 1 });
+    void pool.buildChunk({ ...chunkJob }, { urgent: true });
+    await Promise.resolve();
+    // Free one worker: its queued-in-front URGENT claimant must get it, so the
+    // next posted job is the chunk, not the earlier-queued water fill.
+    const first = FakeWorker.spawned[0];
+    const firstId = first.posted[0].id;
+    (first.onmessage as (e: { data: unknown }) => void)({
+      data: { id: firstId, kind: 'chunk', ok: false, error: 'freed for the test' },
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    // The freed worker (and only it) got a new job, and that job is the
+    // URGENT chunk, not the earlier-queued water fill.
+    expect(FakeWorker.spawned.reduce((n, w) => n + w.posted.length, 0)).toBe(workers + 1);
+    expect(first.posted.length).toBe(2);
+    expect(first.posted[1].kind).toBe('chunk');
   });
 });

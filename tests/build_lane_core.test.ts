@@ -92,7 +92,11 @@ describe('bounded build lane', () => {
   });
 
   it('stops submitting once the caller cancels, and still awaits what started', async () => {
+    // Deterministic: with limit 2 the lane submits 0 and 1, then parks on the
+    // race; item 1 cancels while both are in flight, so the check before item
+    // 2 is the first one that sees it. Exactly [0, 1] started, never 2.
     const started: number[] = [];
+    const finished: number[] = [];
     let cancelled = false;
     await runBoundedLane(
       [0, 1, 2, 3, 4, 5],
@@ -101,11 +105,17 @@ describe('bounded build lane', () => {
         started.push(item);
         await Promise.resolve();
         if (item === 1) cancelled = true;
+        // A second await, so a lane that returned at the break instead of
+        // draining what it started would resolve with this still unrun.
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        finished.push(item);
       },
       { shouldStop: () => cancelled },
     );
-    expect(started.length).toBeLessThan(6);
-    expect(started).toEqual(started.slice().sort((a, b) => a - b));
+    expect(started).toEqual([0, 1]);
+    // Cancelling stops SUBMISSION only: every started job is awaited to the
+    // end before the lane resolves.
+    expect(finished.slice().sort((a, b) => a - b)).toEqual([0, 1]);
   });
 
   it('treats a zero or negative limit as one in flight rather than deadlocking', async () => {
