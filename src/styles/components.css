@@ -16672,9 +16672,12 @@
     /* The pane stops at the window's own cap minus the chrome above and below
        it (title, tab strip, strip, foot). --app-vh, not raw vh: the file's
        idiom, and the only one that follows the mobile browser's live viewport.
-       The mobile sheet drops the cap entirely (position: static there), so this
-       is the desktop pane's rule alone. */
-    max-height: calc(min(var(--app-vh) * 0.84, 700px) - 132px);
+       The 100dvh fallback matters: an unset token would make the declaration
+       invalid at computed-value time and the cap would land on its initial
+       none, losing the pane's own scroll. The mobile sheet drops the cap
+       entirely (position: static there), so this is the desktop pane's rule
+       alone. */
+    max-height: calc(min(var(--app-vh, 100dvh) * 0.84, 700px) - 132px);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: var(--window-pad);

@@ -50,11 +50,15 @@ describe('woc_market_window: no magic color values', () => {
     expect(painter).not.toMatch(/\b(?:rgba?|hsla?)\(/);
   });
 
-  it('routes item-name color through the shared QUALITY_COLOR map with a token fallback', () => {
+  it('routes item-name color through the shared itemNameColor family', () => {
     // The one color the painter writes comes from the vendor/bags convention,
-    // never a per-window palette.
-    expect(painter).toContain("import { iconDataUrl, QUALITY_COLOR } from './icons';");
-    expect(painter).toContain("QUALITY_COLOR[quality] ?? 'var(--color-quality-default)'");
+    // never a per-window palette. The family module owns the fallback token
+    // and the Object.hasOwn guard, so a raw QUALITY_COLOR index (whose ??
+    // never fires on a prototype-key quality) must not come back.
+    expect(painter).toContain("import { itemNameColor } from './item_name_color';");
+    expect(painter).toContain('itemNameColor({ quality })');
+    expect(painter).toContain('itemNameColor({');
+    expect(painter).not.toContain('QUALITY_COLOR[');
   });
 
   it('uses no em or en dashes (ASCII separators only)', () => {

@@ -3087,9 +3087,12 @@ had introduced and two claims that overstated what they fixed. All four settled:
   real bottom padding is the inset-aware `max(--window-pad, 18px + inset)`: on a
   landscape phone with a home indicator the reserve came up 15px short and put
   the control back under the commit row. Headless capture reports zero insets,
-  so no rig run could have seen it; the calc now mirrors the source rule, a pin
-  reads the DECLARATION (prose in the block cannot satisfy it), and the rig
-  forces a real inset for one measurement so the case is exercised at all.
+  so no rig run could have seen it; the calc now mirrors the source rule and a
+  pin reads the DECLARATION (prose in the block cannot satisfy it). A
+  forced-inset rig arm was tried and DELETED as vacuous (it added the inset to
+  the computed reserve, assuming exactly what it should test; the rig's own
+  comment records this), so the inset term's only guard is the CSS declaration
+  mirror, and the real-notched-device check stays owed.
 - Pinning the sheets' BOTTOM edge stretched them to full height (a two-line
   trade painting a 400px panel), which the fix never claimed and did not need:
   the inset-aware height cap alone fixes the off-screen case. The pin is gone

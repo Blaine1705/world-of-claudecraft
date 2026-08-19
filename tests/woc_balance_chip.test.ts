@@ -18,6 +18,21 @@ const wallet = vi.hoisted(() => ({
   verified: false,
 }));
 
+// The escaping test needs a HOSTILE catalog value: with only well-formed
+// catalog English in play, an attribute regex passes whether or not the
+// builder escapes. One key is wrapped to carry a double quote on demand;
+// every other key passes through to the real catalog.
+const hostile = vi.hoisted(() => ({ key: '' }));
+
+vi.mock('../src/ui/i18n', async (importOriginal) => {
+  const real = await importOriginal<typeof import('../src/ui/i18n')>();
+  return {
+    ...real,
+    t: (key: Parameters<typeof real.t>[0], params?: Parameters<typeof real.t>[1]) =>
+      key === hostile.key ? `injected "quote" ${real.t(key, params)}` : real.t(key, params),
+  };
+});
+
 vi.mock('../src/ui/wallet_balance', () => ({
   walletUiEnabled: () => wallet.enabled,
   walletConnectionView: () => wallet.connection,
@@ -94,10 +109,18 @@ describe('wocBalanceChipHtml: the four faces', () => {
     wallet.connection = { kind: 'linked' };
     wallet.balance = 1;
     wallet.verified = true;
-    const html = wocBalanceChipHtml();
-    // A quote inside an attribute would break the attribute; the builder escapes
-    // titles and aria labels, so no bare double quote survives inside one.
-    expect(/aria-label="[^"]*"/.test(html)).toBe(true);
-    expect(/title="[^"]*"/.test(html)).toBe(true);
+    // Inject a double quote through the aria label's catalog value: with the
+    // escaping removed, the raw quote lands inside the attribute and the
+    // entity form disappears, so both assertions flip.
+    hostile.key = 'wallet.balanceAria';
+    try {
+      const html = wocBalanceChipHtml();
+      expect(html).toContain('injected &quot;quote&quot;');
+      expect(html).not.toContain('injected "quote"');
+      expect(/aria-label="[^"]*"/.test(html)).toBe(true);
+      expect(/title="[^"]*"/.test(html)).toBe(true);
+    } finally {
+      hostile.key = '';
+    }
   });
 });

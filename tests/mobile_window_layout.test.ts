@@ -1,10 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const mobileCss = readFileSync(
-  new URL('../src/styles/hud.mobile.css', import.meta.url),
-  'utf8',
-).replace(/\r\n/g, '\n');
+const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8')
+  .replace(/\r\n/g, '\n')
+  // Comment-stripped, like every other source-text pin in the suite: without
+  // this a commented-out declaration satisfies the regex reads below, and
+  // these pins are the only automated coverage of the mobile floors and
+  // reserves (the measuring rig is manual).
+  .replace(/\/\*[\s\S]*?\*\//g, '');
 
 /** The declaration block (selector to closing brace) that carries `needle`,
  *  optionally the one whose selector line is `selector`. Anchoring on a
@@ -220,7 +223,7 @@ describe('mobile window layout CSS', () => {
     // on a phone with a home indicator, and a headless capture cannot see that
     // because it reports zero insets. The TOP one clears the sticky
     // .window > .panel-title, which paints over the sheet scrolling beneath it.
-    const block = blockContaining('scroll-padding-bottom:');
+    const block = blockContaining('scroll-padding-bottom:', 'body.mobile-touch #trade-window {');
     // The DECLARATION, not the block: the block also carries the prose that
     // explains the value, and prose satisfies a substring check on its own.
     const reserve = /scroll-padding-bottom:([^;]+);/.exec(block)?.[1] ?? '';
@@ -278,6 +281,23 @@ describe('mobile window layout CSS', () => {
       .find((b) => b.includes(':has(#trade-window') && b.includes('position: fixed'));
     expect(split, 'the side-by-side split rule exists').toBeDefined();
     expect(split ?? '', 'the split dock pins both edges').toMatch(/\n\s*bottom: calc\(max\(10px/);
+  });
+
+  it('the split dock marker is the one the HUD actually stamps', () => {
+    // The split rule keys on [data-window-open="1"] on BOTH #trade-window and
+    // #bags, and the stamp lives in hud.ts as dataset.windowOpen. Renaming
+    // either side alone would silently restore "bags covers the trade window
+    // entirely" (the blocking mobile defect this pass fixed), and only the
+    // manual BAGS_OVER E2E arm could see it; this cross-file pin is the cheap
+    // in-gate guard.
+    expect(mobileCss).toContain(
+      ':has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])',
+    );
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud, 'the HUD stamps the marker the selector reads').toContain(
+      "dataset.windowOpen = '1'",
+    );
+    expect(hud, 'and clears it on close').toContain('delete el.dataset.windowOpen');
   });
 
   it('floors the vendor purchase-quantity controls at 40px under a coarse pointer (phase 21)', () => {

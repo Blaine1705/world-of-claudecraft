@@ -4,9 +4,12 @@
 // (tests/hud_perf_budget.test.ts, the `*_painter.ts` sweep) counts its raw
 // writes: it repaints only when the trade window itself repaints, holds no
 // per-frame path, arms no driver of its own, and makes no forced-reflow layout
-// read. Its few in-place writes (the derived lines, the over-balance class, the
-// Send button's disabled flag) are event-driven and elided by value compare;
-// the gate's allowance row pins their exact count.
+// read. Its few in-place writes are event-driven and elided by value compare.
+// The gate's allowance row pins the exact count of the PROPERTY writes it
+// scans (.textContent, .classList, .dataset: the derived lines and the
+// over-balance class); the Send button's disabled flag is an IDL write the
+// driverless sweep does not count, so it is named here rather than claimed
+// pinned.
 //
 // The price field deliberately does NOT ride the window's repaint signature.
 // The window rebuilds its whole subtree when that signature changes, so putting

@@ -34,7 +34,8 @@ import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import type { TranslationKey } from './i18n';
 import { formatDateTime, formatDuration, formatNumber, t, tPlural } from './i18n';
-import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl } from './icons';
+import { itemNameColor } from './item_name_color';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { termsUrlFor } from './terms_link';
@@ -661,9 +662,11 @@ export class WocMarketWindow {
     instance?: ItemInstancePayload,
   ): string {
     const icon = iconDataUrl('item', itemId);
-    // Build-time color from the shared QUALITY_COLOR map (the vendor/bags
-    // convention); the default token keeps unknown qualities theme-correct.
-    const color = QUALITY_COLOR[quality] ?? 'var(--color-quality-default)';
+    // Build-time color through the shared itemNameColor family (the vendor/
+    // bags convention): Object.hasOwn inside it keeps a server-sent quality
+    // that collides with a prototype key on the fallback token instead of
+    // interpolating a function source into the style attribute.
+    const color = itemNameColor({ quality });
     // The .q-<rung> frame class: the same charset guard the shared icon helper
     // applies (the quality is server-sent on the wire; an unknown rung takes
     // the neutral frame).
@@ -1178,9 +1181,9 @@ export class WocMarketWindow {
                 `id="${listId}-o${i}" role="option" aria-selected="${i === active ? 'true' : 'false'}" ` +
                 `data-sell-index="${r.index}" data-opt="${i}">` +
                 `<img class="wm-combo-icon item-icon q-${rung}" data-tt-key="opt:${r.index}" src="${iconDataUrl('item', r.itemId)}" alt="" draggable="false" />` +
-                `<span class="wm-combo-name" style="color: ${
-                  QUALITY_COLOR[r.quality] ?? 'var(--color-quality-default)'
-                }">${esc(this.itemName(r.itemId))}</span></div>`
+                `<span class="wm-combo-name" style="color: ${itemNameColor({
+                  quality: r.quality,
+                })}">${esc(this.itemName(r.itemId))}</span></div>`
               );
             })
             .join('');

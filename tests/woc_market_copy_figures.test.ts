@@ -76,11 +76,24 @@ describe('marketplace copy names the live rule figures', () => {
     // fill, which is the one place a player of that locale would read it. The
     // digits survive translation (they are digits in all five), so each fill is
     // checked for the numbers its English twin spells.
-    const FILLS: Array<[string, readonly string[]]> = [
-      ['hudChrome.wocMarket.bidCloseNote', ['2', '30']],
-      ['hudChrome.wocMarket.buyNowNote', ['30']],
-      ['hudChrome.wocMarket.strikesTip', ['3', '14', '90']],
-    ];
+    // The expected figures are DERIVED from the English value, never a second
+    // hard-coded copy: with a literal list here, a rule retune that updates
+    // the constants and the English would leave this test green over five
+    // stale fills (each still contains the OLD digit). Deriving means the
+    // fills red until they are refilled to match the new English.
+    const FILLS: Array<[string, readonly string[]]> = (
+      [
+        ['hudChrome.wocMarket.bidCloseNote', market.bidCloseNote],
+        ['hudChrome.wocMarket.buyNowNote', market.buyNowNote],
+        ['hudChrome.wocMarket.strikesTip', market.strikesTip],
+      ] as const
+    ).map(([key, english]) => {
+      const figures = [...new Set(english.match(/\d+/g) ?? [])];
+      expect(figures.length, `${key}'s English spells at least one digit figure`).toBeGreaterThan(
+        0,
+      );
+      return [key, figures];
+    });
     for (const locale of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU']) {
       const src = readFileSync(`src/ui/i18n.locales/${locale}.ts`, 'utf8');
       for (const [key, figures] of FILLS) {
