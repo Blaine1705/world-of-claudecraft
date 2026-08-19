@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.promptAttack': '攻撃',
   'hudChrome.bootcamp.voiceGraduate': '鐘はおまえさんのために鳴った。海の向こうでイーストブルックが待っておる。もう大丈夫だ。',
   'hudChrome.bootcamp.voiceVeerOff': '待ちなさい、そっちは違う。金色の道は後ろだよ。',
   'hudChrome.bootcamp.voiceStationDoneB': 'だいぶ様になってきたな、間違いない。',

@@ -1007,7 +1007,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.skip"
   ],
   "zh_CN": [
-    "hudChrome.bootcamp.promptAttack",
     "hudChrome.bootcamp.promptHold",
     "hudChrome.bootcamp.promptPickUp",
     "hudChrome.bootcamp.promptRead",
@@ -1018,7 +1017,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "zh_TW": [
-    "hudChrome.bootcamp.promptAttack",
     "hudChrome.bootcamp.promptHold",
     "hudChrome.bootcamp.promptPickUp",
     "hudChrome.bootcamp.promptRead",
@@ -1029,7 +1027,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "ko_KR": [
-    "hudChrome.bootcamp.promptAttack",
     "hudChrome.bootcamp.promptHold",
     "hudChrome.bootcamp.promptPickUp",
     "hudChrome.bootcamp.promptRead",
@@ -1040,7 +1037,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "ja_JP": [
-    "hudChrome.bootcamp.promptAttack",
     "hudChrome.bootcamp.promptHold",
     "hudChrome.bootcamp.promptPickUp",
     "hudChrome.bootcamp.promptRead",
@@ -1217,7 +1213,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.tutorialGreeting.skip"
   ],
   "ru_RU": [
-    "hudChrome.bootcamp.promptAttack",
     "hudChrome.bootcamp.promptHold",
     "hudChrome.bootcamp.promptPickUp",
     "hudChrome.bootcamp.promptRead",

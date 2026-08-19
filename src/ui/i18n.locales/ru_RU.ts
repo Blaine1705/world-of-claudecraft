@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.promptAttack': 'Атака',
   'hudChrome.bootcamp.voiceGraduate': 'Колокол звонил по тебе. За водой ждет Истврук, и ты к нему готов.',
   'hudChrome.bootcamp.voiceVeerOff': 'Постой, дружок, не туда. Золотая тропа осталась позади.',
   'hudChrome.bootcamp.voiceStationDoneB': 'Дело у тебя спорится, точно говорю.',

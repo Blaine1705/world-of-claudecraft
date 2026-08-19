@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.promptAttack': '攻击',
   'hudChrome.bootcamp.voiceGraduate': '钟为你敲响了。海那头的东溪正等着你，你也准备好了。',
   'hudChrome.bootcamp.voiceVeerOff': '慢着，朋友，走反了。金色路径在你身后呢。',
   'hudChrome.bootcamp.voiceStationDoneB': '你越来越上手了，错不了。',

@@ -953,7 +953,7 @@ export const ru_RU: EnTranslations = {
       "promptRead": "Read",
       "promptRing": "Ring",
       "promptHold": "Hold",
-      "promptAttack": "Attack",
+      "promptAttack": "Атака",
       "voiceArrival": "Вот ты и на берегу, дружок. Видишь золотую тропу под ногами? Она знает дорогу лучше меня. Иди по ней.",
       "voiceFirstFlag": "Один флаг пройден. Не сбавляй шагу, осталось всего два.",
       "voiceRunDone": "Чистый забег, ничего не скажешь. Награда у надзирателя Пелла, ступай за ней.",
