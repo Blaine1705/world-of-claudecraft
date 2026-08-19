@@ -502,11 +502,13 @@ GPU work signs. Each rule names its seam and its guard.
   `tests/renderer_look_pieces_hold.test.ts`.
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
-  `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, plus the `arrival` mark
-  one per teleport-class landing), and the reveal counters. The CPU side of the
-  same picture is `perfStats().buildLedger` (`build_ledger_core.ts`: main-thread ms
-  per view build class and per zone feature builder, the worst frame, the slowest
-  builds) and `perfStats().zoneStreaming` (the last prepare's stage wall-times);
+  `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a
+  world gate's touch tail found unproven by any settle, the ones a walk mark used to
+  bless and block on), plus the `arrival` mark one per teleport-class landing), and the
+  reveal counters. The CPU side of the same picture is `perfStats().buildLedger`
+  (`build_ledger_core.ts`: main-thread ms per view build class and per zone feature
+  builder, each kind's worst sample and when it happened (`maxAtMs`, the one frame
+  anchor a nested `view-part:` kind keeps), the worst frame, the slowest builds) and `perfStats().zoneStreaming` (the last prepare's stage wall-times);
   the hitch tracker's `zone-build`, `view-create` and `off-frame` causes read from
   them, on a sample ALIGNED with the span its dt measures (`hitch_frame_align_core.ts`:
   the previous callback plus the gap before this one), so a cause inside a callback

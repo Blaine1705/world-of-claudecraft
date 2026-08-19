@@ -259,6 +259,10 @@ describe('far-LOD wiring (source pins)', () => {
     // threw them away with the temp.
     const composed = fnBody('src/render/characters/assets.ts', 'export function modularFarBake(');
     expect(composed).toContain('assembleModular(def, look, null, null, { skipDecals: true })');
+    // The fixed-rig bake's modular throwaway (prepareVisual) takes the same arm:
+    // the default look wears a scalp decal, minted and dropped per key otherwise.
+    const fixed = fnBody('src/render/characters/assets.ts', 'export function prepareVisual(');
+    expect(fixed).toContain('assembleModel(def, null, null, null, { skipDecals: true })');
     const attach = fnBody('src/render/characters/assets.ts', 'export function attachFaceDecals(');
     expect(attach.indexOf('if (opts?.skipDecals) return;')).toBeGreaterThan(-1);
     expect(attach.indexOf('if (opts?.skipDecals) return;')).toBeLessThan(attach.indexOf('headOf('));

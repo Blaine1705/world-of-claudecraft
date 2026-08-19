@@ -131,13 +131,28 @@ export function runWorldGateTouchLane(
   gatePriority: number,
   gate: { failed: boolean; timedOut: boolean },
 ): Promise<number> {
-  const label = target.name || target.type;
-  const key = gate.failed || gate.timedOut ? `${label}${TOUCH_UNPROVEN_UNSETTLED_SUFFIX}` : label;
   return runLinkedProgramTouchLane(queue, properties, target, gatePriority, {
     settled: false,
     onUnproven: (count) => {
       if (count <= 0) return;
+      const label = touchUnprovenLabel(target);
+      const key =
+        gate.failed || gate.timedOut ? `${label}${TOUCH_UNPROVEN_UNSETTLED_SUFFIX}` : label;
       recordGpuPrepEvent({ kind: 'touch-unproven', key, ageMs: 0, units: count });
     },
   });
+}
+
+/** The event key of a gate target: its name, else its render category (a live
+ *  entity gate's group is never named, only categorised `entity:<kind>`, and
+ *  every such gate collapsing to "Group" would leave the event unattributable),
+ *  else its type. A bounded set of strings either way, never per instance. */
+export function touchUnprovenLabel(target: {
+  name: string;
+  type: string;
+  userData: { renderCategory?: unknown };
+}): string {
+  if (target.name) return target.name;
+  const category = target.userData.renderCategory;
+  return typeof category === 'string' && category ? category : target.type;
 }

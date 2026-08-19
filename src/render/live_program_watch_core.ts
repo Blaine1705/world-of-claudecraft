@@ -126,11 +126,13 @@ export function absorbLivePrograms(
  * it was; a walk (when the length moved either way) is one number compare
  * per entry, and only a NEW program costs a label.
  *
- * A list that shrank is three releasing a program with its last material;
- * the walk still runs, so a release and a mint inside the same interval that
- * happen to cancel out in length are the one shape this misses (a released id
- * is never reused, so nothing else is). Memory is two numbers with three:
- * the id high-water mark and the last length.
+ * A list that shrank is three destroying a program (under the repo's patch a
+ * released program stays listed, parked, until the retention bound evicts
+ * it; only that eviction shrinks the list); the walk still runs, so a destroy
+ * and a mint inside the same interval that happen to cancel out in length
+ * are the one shape this misses (a destroyed id is never reused, so nothing
+ * else is; a parked program re-acquired keeps its id and is no mint). Memory
+ * is two numbers with three: the id high-water mark and the last length.
  */
 export function collectNewLivePrograms(
   watch: LiveProgramWatch,

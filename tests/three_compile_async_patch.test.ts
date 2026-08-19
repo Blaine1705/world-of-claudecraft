@@ -228,7 +228,23 @@ describe('three released program retention patch', () => {
     ).toBe(1);
   });
 
+  it('destroys an evicted program out of BOTH the list and the key map', () => {
+    // The worst failure mode of the hunk: a re-rolled patch that dropped the
+    // map delete would let acquireProgram hand back a DESTROYED program under
+    // a known key. The destroy body is upstream's, moved whole.
+    expect(
+      source.includes(
+        'function destroyProgram( program ) {\n\n\t\t// Remove from unordered set\n\t\tconst i = programs.indexOf( program );\n\t\tprograms[ i ] = programs[ programs.length - 1 ];\n\t\tprograms.pop();\n\n\t\t// Remove from map\n\t\tprogramsMap.delete( program.cacheKey );\n\n\t\t// Free WebGL resources\n\t\tprogram.destroy();',
+      ),
+      'destroyProgram no longer removes from the list, the map and the GL context together; re-run pnpm install',
+    ).toBe(true);
+  });
+
   it('exposes the retained list for monitoring beside info.programs', () => {
+    expect(
+      source.includes('retainedPrograms: retainedPrograms,'),
+      'WebGLPrograms no longer returns its retained list; re-run pnpm install',
+    ).toBe(true);
     expect(
       source.includes('info.retainedPrograms = programCache.retainedPrograms;'),
       'renderer.info.retainedPrograms is missing; re-run pnpm install',

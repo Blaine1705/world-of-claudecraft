@@ -17,6 +17,7 @@ import {
   runLinkedProgramTouchLane,
   runWorldGateTouchLane,
   TOUCH_UNPROVEN_UNSETTLED_SUFFIX,
+  touchUnprovenLabel,
 } from '../src/render/linked_program_touch_lane';
 
 interface RecordedUnit {
@@ -317,6 +318,27 @@ describe('runWorldGateTouchLane', () => {
     ).resolves.toBe(1);
     expect(relinked.uniforms).toHaveBeenCalledTimes(1);
     expect(gpuPrepEventsSnapshot().counts['touch-unproven']).toBe(1);
+  });
+
+  it('keys an unnamed target by its render category, so live entity gates stay attributable', async () => {
+    resetGpuPrepEventsForTest();
+    const { properties, target } = targetWith(settledMaterial(program()));
+    // A live entity gate's group is never named, only categorised.
+    target.name = '';
+    target.userData.renderCategory = 'entity:mob';
+    expect(touchUnprovenLabel(target)).toBe('entity:mob');
+    expect(touchUnprovenLabel(new THREE.Group())).toBe('Group');
+
+    await runWorldGateTouchLane(stubQueue(), properties, target, 20, {
+      failed: false,
+      timedOut: false,
+    });
+    expect(gpuPrepEventsSnapshot().events[0]).toMatchObject({
+      kind: 'touch-unproven',
+      key: 'entity:mob',
+      units: 1,
+    });
+    resetGpuPrepEventsForTest();
   });
 
   it('keys an unsettled gate apart, where unproven programs are expected', async () => {

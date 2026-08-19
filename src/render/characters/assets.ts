@@ -1454,7 +1454,11 @@ export function assembleModular(
   // the cache miss (whole-GLB clone + part merge) or a map hit.
   const variant = timeBuildSpan('view-part:assemble:variant', () => modularVariant(def.url, names));
   const root = timeBuildSpan('view-part:assemble:parts', () => cloneSkinned(variant.root));
-  timeBuildSpan('view-part:assemble:decals', () => attachFaceDecals(root, def, look, opts));
+  // A skipDecals compose records no decal sample: the kind's EMA prices a real
+  // decal step, and the far bake's throwaway would only add zeros to it.
+  if (!opts?.skipDecals) {
+    timeBuildSpan('view-part:assemble:decals', () => attachFaceDecals(root, def, look, opts));
+  }
   const recolorStarted = performance.now();
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
@@ -2164,8 +2168,11 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
-  // Pose a throwaway clone mid-idle, measure it, and bake the static mesh.
-  const temp = assembleModel(def);
+  // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
+  // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
+  // and the default look's scalp decal would otherwise be minted and thrown
+  // away per modular key, on the far crossing that first prepares the key.
+  const temp = assembleModel(def, null, null, null, { skipDecals: true });
   const idle = clips.get(def.clips.idle);
   if (idle) {
     const mixer = new THREE.AnimationMixer(temp);
