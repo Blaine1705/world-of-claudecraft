@@ -289,13 +289,31 @@ describe('nameplate_view - compile-gate stand-in', () => {
     expect(plan(otherPlayer(), viewer(), 2, true, false, false, true).hidden).toBe(false);
   });
 
-  it('overrides the toggles ONLY: range, corpses and plateless objects still hide', () => {
+  it('also beats the range and the plateless-object rule: a gated view has no other representation', () => {
+    // Both rules assume something is drawn in the world. Under a gate nothing
+    // is, and a view only exists inside the streaming radius (about 80 yd), so
+    // the plate stands in out to there, object views included.
     const far = ent({ kind: 'mob', pos: { x: 0, y: 0, z: NAMEPLATE_RANGE + 5 } });
-    expect(plan(far, viewer(), 2, true, false, true, true).hidden).toBe(true);
+    expect(plan(far, viewer(), 2, true, false, true, false).hidden).toBe(true);
+    expect(plan(far, viewer(), 2, true, false, true, true).hidden).toBe(false);
+    const crate = ent({ kind: 'object', templateId: 'crate' });
+    expect(plan(crate, viewer(), 2, true, false, true, false).hidden).toBe(true);
+    expect(plan(crate, viewer(), 2, true, false, true, true).hidden).toBe(false);
+  });
+
+  it('still hides what no gate is hiding: a looted corpse and the label-less carve-outs', () => {
     const corpse = ent({ kind: 'mob', dead: true, lootable: false });
     expect(plan(corpse, viewer(), 2, true, false, true, true).hidden).toBe(true);
-    const crate = ent({ kind: 'object', templateId: 'crate' });
-    expect(plan(crate, viewer(), 2, true, false, true, true).hidden).toBe(true);
+    // The sealed crypt door reads as back wall and the Vale Cup ball is a toy:
+    // both are deliberately label-less, gate or no gate.
+    const sealed = ent({
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: 'nythraxis_boss_arena',
+    });
+    expect(plan(sealed, viewer(), 2, true, false, true, true).hidden).toBe(true);
+    const ball = ent({ kind: 'mob', templateId: 'vale_cup_ball' });
+    expect(plan(ball, viewer(), 2, true, false, true, true).hidden).toBe(true);
   });
 
   it('never overrides the self plate (the local player view is never gated)', () => {

@@ -90,9 +90,10 @@ export function anyCharacterRigDrawing(rigs: EntityRigSlots): boolean {
 
 /**
  * The entity has NO in-world body this frame, so its nameplate is forced on as
- * the stand-in of last resort even when the player has toggled plates off. An
- * object view (no rigs) only qualifies through the arrival gate, which hides
- * its group the same way. Positional booleans, not an options object: the
+ * the stand-in of last resort even when the player has toggled plates off, and
+ * out past the nameplate range and the plateless-object rule. An object view
+ * (no rigs) only qualifies through the arrival gate, which hides its group the
+ * same way. Positional booleans, not an options object: the
  * nameplate painter calls this per entity per pass and stays allocation-free.
  *
  * `viewCompilePending` is the arrival gate (gateViewOnCompile) hiding the whole
@@ -133,8 +134,9 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     gate: 'gateViewOnCompile',
     file: 'src/render/renderer.ts',
     callSite: 'view.compileReady = this.gateViewOnCompile(view, group);',
-    hides: 'the arriving entity whole 3D group',
-    standIn: 'the nameplate, forced on by entityHasNoBody even with plates toggled off',
+    hides: 'the arriving entity whole 3D group, for EVERY non-self view, objects included',
+    standIn:
+      'the nameplate, forced on by entityHasNoBody: while the gate holds, the plate ignores both nameplate toggles, the 55 yd nameplate range and the plateless-object rule (nameplate_view.ts), so a gated ground-loot pile, chest or quest object is represented too, out to the view-create radius of about 80 yd. It stays hidden only where no body is being hidden from the player: a looted corpse, the deliberately label-less sealed crypt door and the Vale Cup ball',
   },
   {
     gate: 'gateSwapFlagOnCompile',
