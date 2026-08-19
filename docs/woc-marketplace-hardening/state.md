@@ -67,7 +67,18 @@ actually reads.
   edge after every scroll (116 assertions). One DEFERRAL was created rather than
   shipped: `--panel-border` stays undeclared, because its only consumers are 13
   Dungeon Finder borders and declaring it repaints a window this pass never
-  captured. Deferrals with owners are in the 15 section of
+  captured. Two further rounds followed (a fresh review of the fix round, then
+  the repo's `qa-checklist` over the whole range), and both found real things:
+  the scroll reserve was built on a flat token where the window's real padding
+  is inset-aware, so it fell 15px short on any notched phone and no headless
+  run could see it; pinning the sheets' bottom edge had quietly stretched both
+  to full height; the sell tab's locked-items caption fired for copies the
+  picker would never have listed; and the seller's fee estimate rode the
+  keystroke on the bucket the PAYMENT path shares. All fixed and pinned.
+  Verification at the end: the full vitest suite in four shards (41,314 tests,
+  zero failures), the real-browser suite (20 files, 131 tests), `npm run build`,
+  `tsc`, the malware scan, biome over the changed files, and the i18n and
+  manifest freshness gates, all green on the committed tree. Deferrals with owners are in the 15 section of
   progress.md; the audit checklist is the row-by-row record. 14 QA COMPLETE (2026-08-17,
   PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open,
   PUSHED per R4; release sync merge 8c0370585c of origin/release/v0.39.0 tip

@@ -90,15 +90,24 @@ purely cosmetic changes only). `qa-checklist` last.
 
 ## Acceptance criteria
 
-- [ ] The DESIGN.md audit checklist exists with every item applied or deferred with
-      reason
-- [ ] Stress content (longest names, largest numbers, zero states) renders correctly on
-      every surface; the grep for raw formatting is clean
-- [ ] Every market tooltip passes the tooltip-writing bar
-- [ ] Mobile captures show correct safe-area and touch layout
-- [ ] Fresh screenshot set committed at lowest preset, stress captures included, zero
-      TOTP-bearing captures remain
-- [ ] Zero behavior diffs (view-core test outputs unchanged)
+- [x] The DESIGN.md audit checklist exists with every item applied or deferred with
+      reason (`phase-15-design-audit.md`, sections A to K)
+- [x] Stress content (longest names, largest numbers, zero states) renders correctly on
+      every surface; the grep for raw formatting is clean (`tests/usd_text.test.ts`
+      widened to catch a glued ticker, `tests/woc_tokens_text.test.ts` scans every
+      caller)
+- [x] Every market tooltip passes the tooltip-writing bar (audit section I; the
+      figures are pinned to the server constants AND to the five fills)
+- [x] Mobile captures show correct safe-area and touch layout, measured rather
+      than eyeballed (152 floor checks per market pass, 116 header-clearance
+      assertions, the split at 440/440 with zero overlap). The insets themselves
+      cannot be proven headless, which the CSS says outright and the QA session
+      still owes on a real notched device
+- [x] Fresh screenshot set committed at lowest preset, stress captures included, zero
+      TOTP-bearing captures remain (79 shots in `docs/screenshots/woc-market/`)
+- [x] Zero behavior diffs in the rendering, with three deliberate exceptions
+      recorded in progress.md (the fee preview's request cadence, the busy-label
+      sequencing, and the token spelling unified at two digits)
 
 ## Wrap-up
 

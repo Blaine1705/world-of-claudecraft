@@ -3088,12 +3088,36 @@ the bag's quest gold, and reads the map with `Object.hasOwn` so a hostile wire
 quality cannot interpolate a prototype key), and the overlay-figure pin guards
 its slice end so it cannot go vacuous on the last row of a file.
 
+A FOURTH round (the repo's own `qa-checklist` over the whole range) closed the
+last four:
+
+- The sell tab's "locked items are not listed here" fired for ANY locked known
+  item, including a locked stack of cloth the picker would never have offered
+  and unlocking would never restore. The view core answers the real question
+  now (its own sell filter, lock arm inverted), so the caption is true whenever
+  it is shown.
+- The seller's fee estimate rode the keystroke on a per-minute bucket SHARED
+  with the bond quote, the settlement quote and the refresh: a seller trying
+  prices could spend the allowance the payment path needs. It is asked for once
+  the price settles; the bidder's live preview keeps its own cadence.
+- `woc_balance_chip.ts` was extracted with four faces and no test; it has one,
+  decisive against a collapsed tag.
+- The rig pinned the BID field's draft carry but not the SELL fields, which are
+  the ones that now rebuild under the seller's hands.
+
+The zero-headroom ceiling on the window fired during that work, which is the
+ratchet doing its job: the status chrome (spinner, loading line, error line,
+the exact end time a countdown carries) moved to `src/ui/woc_market_chrome.ts`
+and the ceiling came DOWN to 2621 rather than up.
+
 Judged, no change, with the reasoning:
 
-- The per-keystroke sell-fee estimate is the window's OWN established idiom (the
-  bid preview above it does the same, RTT-coalesced with at most one in flight,
-  no timer, because the window's contract forbids self-scheduling). Recorded for
-  the service owner rather than changed late in a presentation pass.
+- The presentation-only claim holds for the rendering, with three deliberate
+  exceptions a reviewer should be told about rather than discover: the seller's
+  fee preview is a new client-initiated request (now once per settled price),
+  the busy label sequences confirming into signing only at the real wallet
+  handoff, and the token spelling in the trade log went from four digits to the
+  two every other $WOC surface uses.
 - The buyer's pre-signature note now says the quote fixes the amount until it
   expires. Verified against the wire rather than taken on faith: a settlement
   carries `quoteReference` plus `quoteExpiresAtMs` and is refused outright when
