@@ -499,9 +499,14 @@ describe('resumeDroppedPrewarmEntries', () => {
     // live here, the together arm's second-arm continuations fired as one
     // 3 s task, and a batch-held unit starved the reveal gates behind it.
     expect(source).toContain(
-      'if (debt && unit.pieces) {\n                return runPrewarmPiecesSerially(unit.pieces, (piece) =>\n                  this.backgroundGpuWork.run(piece.run, priority, piece.id, options),\n                );\n              }',
+      'if (debt && unit.pieces) {\n                return runPrewarmPiecesSerially(unit.pieces, (piece) =>\n                  this.backgroundGpuWork.run(piece.run, priority, piece.id, {\n                    releaseTail: true,\n                  }),\n                );\n              }',
     );
-    expect(source).toContain('const options = { releaseTail: !debt };');
+    // A debt ROOT piece is one link: released under the tail cap, never a
+    // held queue head (batch 18). The batch fallback and the cosmetic resume
+    // keep the class-driven tail.
+    expect(source).toContain(
+      'return this.backgroundGpuWork.run(unit.run, priority, unit.id, {\n                releaseTail: !debt,\n              });',
+    );
     // The old bare `releaseTail: true,` pin drifted: after the debt-class
     // split the only remaining literal `true` belongs to the preview lane,
     // an unrelated call site. The resume lane's contract is the class-driven

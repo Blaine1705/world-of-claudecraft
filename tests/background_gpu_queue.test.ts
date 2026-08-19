@@ -1392,11 +1392,11 @@ describe('createBackgroundGpuQueue', () => {
       'const priority = debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME;',
     );
     expect(initial).toContain(
-      'this.backgroundGpuWork.run(piece.run, priority, piece.id, options),',
+      'this.backgroundGpuWork.run(piece.run, priority, piece.id, {\n                    releaseTail: true,\n                  }),',
     );
-    // Debt roots hold their tail (one root per unit, settled-before-next) so
-    // the driver link queue stays shallow; only cosmetic resume releases it.
-    expect(initial).toContain('const options = { releaseTail: !debt };');
+    // A debt ROOT piece is one link and releases its tail under the cap; a
+    // debt BATCH (no pieces) still holds it, cosmetic resume releases it.
+    expect(initial).toContain('releaseTail: !debt,');
     // The class decision itself must stay wired to the owning entry: with
     // `const debt = false` (or the wrong id) every priority claim above
     // silently degrades to BOOT_RESUME with the suite green (QA finding B1).

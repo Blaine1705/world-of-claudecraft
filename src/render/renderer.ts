@@ -7298,30 +7298,30 @@ export class Renderer {
               }),
             runUnit: (unit, entry) => {
               // Link/upload debt runs at BOOT_DEBT so the cosmetic BACKGROUND
-              // warmers (the preview lane) cannot starve it: production
-              // measured minutes of unpaid link debt behind the previews,
-              // surfacing as first-draw stalls (hitch-hunt P1). Debt keeps
-              // its tail HELD (releaseTail false): released tails let every
-              // debt batch's links pile into the driver concurrently, and
-              // with the whole manifest dropped that queue depth made every
-              // first draw block for seconds (measured sub-1-fps for a full
-              // minute locally). One ROOT per queue unit (unit.pieces) keeps
-              // the link queue shallow and lets live and reveal gates
-              // preempt between roots, waiting at most one root's settle
-              // (prewarm_resume.ts explains the batch-held shape it replaces).
+              // warmers (the preview lane) cannot starve it (hitch-hunt P1:
+              // minutes of unpaid link debt behind the previews). A debt
+              // BATCH (no pieces) keeps its tail HELD: released, its 16 to 32
+              // links piled into the driver at once (sub-1-fps for a minute
+              // with a dropped manifest). A debt ROOT piece releases its tail:
+              // ONE link, bounded by the released-tail cap, whereas a held
+              // root blocked the queue head for its whole link wait behind
+              // the driver's queue (batch 18: one root 4.0 s on the iGPU,
+              // the reveal lane starved past its watchdog).
               const debt = prewarmResumeIsDebt(entry.id);
               resumeLedger.noteStart(entry.id);
               const priority = debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME;
-              // Cosmetic resume keeps the released tail: held, each 16-root
-              // unit occupied the serial queue for seconds and live compile
-              // gates could not START (the captured travel-hitch amplifier).
-              const options = { releaseTail: !debt };
               if (debt && unit.pieces) {
                 return runPrewarmPiecesSerially(unit.pieces, (piece) =>
-                  this.backgroundGpuWork.run(piece.run, priority, piece.id, options),
+                  this.backgroundGpuWork.run(piece.run, priority, piece.id, {
+                    releaseTail: true,
+                  }),
                 );
               }
-              return this.backgroundGpuWork.run(unit.run, priority, unit.id, options);
+              // Cosmetic resume keeps the released tail: held, each 16-root
+              // unit blocked live compile gates for seconds (travel hitches).
+              return this.backgroundGpuWork.run(unit.run, priority, unit.id, {
+                releaseTail: !debt,
+              });
             },
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
