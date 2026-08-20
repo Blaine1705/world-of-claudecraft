@@ -35,6 +35,15 @@ const REDRIVE_INTERVAL_MS = 60_000;
 /** Listing-id page size for the residue walk. */
 const REDRIVE_PAGE = 500;
 
+/** How many FIFO-busy grant parks one scope absorbs before its remaining
+ *  settlement work stops for the pass (the review round's bound on the FIFO
+ *  close): each busy park already cost one full grant-entry deadline inside
+ *  the LOCKED sweep segment, and without a budget a save-wave wedge priced
+ *  the segment at one deadline PER ROW across both batch arms (up to
+ *  2 x SWEEP_BATCH deadlines of advisory-lock hold). Two is enough to ride
+ *  out one isolated wedged buyer without surrendering the pass. */
+const WOC_GRANT_BUSY_BUDGET = 2;
+
 /** The slice of the service the arms consume. The maps are the service's
  *  process-local ledgers (woc_market_local_ledgers.ts owns the arithmetic);
  *  the arms never construct or replace them, only read and mutate entries. */
@@ -65,6 +74,15 @@ export interface WocMarketDeliveryArms {
   returnListingItem(listing: WocListingRow): Promise<boolean>;
 }
 
+/** Process-lifetime count of stamp-ledger high-water crossings (the counted
+ *  half of the stamp bound: the warn line is the moment, this number is the
+ *  readout's history). Module-level like the db contention counters: one
+ *  delivery-arms instance per realm process. */
+let stampHighWaterCrossings = 0;
+export function wocStampHighWaterCount(): number {
+  return stampHighWaterCrossings;
+}
+
 export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliveryArms {
   /** Next time the delivered-residue arm may run (minute-scale: it converges
    *  an OLDER binary's crash residue, so every-pass cost bought nothing). */
@@ -77,15 +95,18 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
   let disposeDueAtMs = 0;
   /** One line per crossing, not per stamp: the stamp maps hold exactly-once
    *  intents nothing may drop, so the high-water is an incident signal (the
-   *  write-path rider's bound for the stamp side), and re-arming below the
-   *  mark keeps a hovering ledger from logging every beat. */
+   *  write-path rider's bound for the stamp side), COUNTED so the readout
+   *  can date it, and re-arming below the mark keeps a hovering ledger from
+   *  logging every beat. The TOTAL across both maps is what is compared:
+   *  the incident is entries held, wherever they sit. */
   let stampHighWaterWarned = false;
 
   function watchStampHighWater(): void {
-    const size = Math.max(ctx.pendingGrants.size, ctx.pendingMail.size);
-    if (size >= WOC_LOCAL_STAMP_HIGH_WATER) {
+    const total = ctx.pendingGrants.size + ctx.pendingMail.size;
+    if (total >= WOC_LOCAL_STAMP_HIGH_WATER) {
       if (!stampHighWaterWarned) {
         stampHighWaterWarned = true;
+        stampHighWaterCrossings++;
         console.warn(
           `[woc_market] delivery intent ledger high water: grants ${ctx.pendingGrants.size}, mail ${ctx.pendingMail.size} (cap-less by design; deliveries are stamping faster than they settle)`,
         );
@@ -123,10 +144,28 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
         if (out === 'advanced') {
           advanced++;
           ctx.parkedDeliveries.delete(settlement.id);
-        } else if (out === 'parked') {
-          wocParkRow(ctx.parkedDeliveries, settlement.id, nowMs + ctx.parkRetryMs);
-          scope.parked++;
+        } else if (out === 'parked' || out === 'parked_busy') {
+          // The park stat counts only parks that STOOD (a cap-refused park
+          // leaves the row un-excluded, so it retries next pass and counting
+          // it would overstate the standing set); the rotation stamp fires
+          // either way so a refused row still cycles off the batch head.
+          if (wocParkRow(ctx.parkedDeliveries, settlement.id, nowMs + ctx.parkRetryMs)) {
+            scope.parked++;
+          }
           await ctx.db.touchSettlementRow(settlement.id);
+          if (out === 'parked_busy') {
+            // The busy budget: each of these already cost one grant-entry
+            // deadline inside the locked segment, so past the budget the
+            // scope stops its settlement work exactly like a contended
+            // pass (same stop semantics, deliberately shared: the rows a
+            // break leaves behind are already 'delivering' and the next
+            // pass retries them).
+            scope.busyParks = (scope.busyParks ?? 0) + 1;
+            if (scope.busyParks >= WOC_GRANT_BUSY_BUDGET) {
+              scope.contended = true;
+              break;
+            }
+          }
         } else if (out === 'skip') {
           // 'skip' after custody was booked means the settlement or listing
           // row left the shape only a hand edit can produce: it is invisible
@@ -352,7 +391,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
     item: InvSlot,
     target: { characterId: number; name: string },
     custodyRef: string,
-  ): Promise<'handed' | 'mail' | 'abort'> {
+  ): Promise<'handed' | 'mail' | 'abort' | 'abort_busy'> {
     const fresh = await ctx.db.claimCustodyRef(ctx.realm, custodyRef);
     if (!fresh) {
       const state = await ctx.db.custodyRefState(custodyRef);
@@ -451,7 +490,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
     accountId: number,
     characterId: number,
     leaseNonce: string | undefined,
-  ): Promise<'handed' | 'abort'> {
+  ): Promise<'handed' | 'abort' | 'abort_busy'> {
     let out: 'booked' | 'lease_lost' | 'claim_missing' | 'busy' | 'session_lost';
     try {
       out = await ctx.custody.persistGrantSerialized(accountId, characterId, leaseNonce, (save) =>
@@ -468,14 +507,22 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
     }
     if (out === 'busy') {
       // The bounded head-of-line arm: nothing serialized, nothing written,
-      // everything durable intact; the next pass retries the SAME ref.
-      return 'abort';
+      // everything durable intact; the next pass retries the SAME ref. The
+      // distinct verdict is what lets the batch driver budget these.
+      return 'abort_busy';
     }
     if (out === 'session_lost') {
       // The session left or rotated DURING the FIFO wait: the
       // continuous-memory retry is dead (the pre-checks in handToBuyer
       // catch the earlier cases), so drop the entry and park for the
-      // operator, exactly like the fence arm below.
+      // operator, exactly like the fence arm below. RECORDED TRADE (the
+      // rider's review round): a buyer disconnecting between grantCopy and
+      // the slot means the leave flush, queued behind us, may persist the
+      // granted bags anyway while this row parks unfinalized; before the
+      // FIFO close the pre-captured blob would have committed under the
+      // still-valid nonce. The close is the safer direction (it is exactly
+      // the stale-blob ordering hazard the rider fixed), at the cost of a
+      // higher operator-park rate on this real race.
       ctx.pendingGrants.delete(custodyRef);
       return 'abort';
     }
@@ -507,12 +554,14 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
 
   /** One delivery attempt. 'advanced' finished the sale; 'parked' made no
    *  progress and cannot without outside change (the caller rotates and
-   *  backs the row off); 'skip' means another actor owns the row now;
-   *  'contended' means a bounded lock wait expired (the caller stops the
-   *  batch and the next pass retries). */
+   *  backs the row off); 'parked_busy' is the same park verdict when the
+   *  cause was the grant entry's FIFO deadline (the caller budgets these:
+   *  each one already cost a full deadline of locked-segment time); 'skip'
+   *  means another actor owns the row now; 'contended' means a bounded lock
+   *  wait expired (the caller stops the batch and the next pass retries). */
   async function deliverOne(
     settlement: WocSettlementRow,
-  ): Promise<'advanced' | 'parked' | 'skip' | 'contended'> {
+  ): Promise<'advanced' | 'parked' | 'parked_busy' | 'skip' | 'contended'> {
     const listing = await ctx.db.listingById(ctx.realm, settlement.listingId);
     if (!listing) return 'parked';
     if (listing.itemDisposed) {
@@ -543,6 +592,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
     let handed = false;
     if (listing.directedBuyerAccount !== null) {
       const hand = await handToBuyer(settlement, listing.item, target, custodyRef);
+      if (hand === 'abort_busy') return 'parked_busy';
       if (hand === 'abort') return 'parked';
       handed = hand === 'handed';
     }
@@ -667,8 +717,11 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
           advanced++;
           ctx.parkedReturns.delete(listing.id);
         } else {
-          wocParkRow(ctx.parkedReturns, listing.id, nowMs + ctx.parkRetryMs);
-          scope.parked++;
+          // Same stat rule as the delivery twin: count only standing parks,
+          // rotate either way.
+          if (wocParkRow(ctx.parkedReturns, listing.id, nowMs + ctx.parkRetryMs)) {
+            scope.parked++;
+          }
           await ctx.db.touchListingRow(listing.id);
         }
       } catch (err) {

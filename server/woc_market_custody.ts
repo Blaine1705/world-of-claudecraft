@@ -60,8 +60,9 @@ export interface WocCustodyGameHost {
  *  request open only invites a retry pile-up. NOTE this bounds only the
  *  wait: a job that STARTED holds the request for the transaction's own
  *  ceiling (pool checkout + BEGIN and the installing SET LOCAL under the
- *  15s session default + the five workload statements + the lock wait +
- *  COMMIT under the 65s driver backstop: 107s worst case, derived and
+ *  15s session default + the five workload statements + their five
+ *  inter-statement idle windows under the 10s save bound + the lock wait +
+ *  COMMIT under the 65s driver backstop: 157s worst case, derived and
  *  pinned in the tunables ladder, under the HTTP layer's 300s), so client
  *  fetch timeouts must be sized off THAT, not off this deadline. The FIFO
  *  occupancy story is wider still: the pre-job guild flush rides the 60s
@@ -138,10 +139,14 @@ export function createWocMarketCustody(
       if (!out.ok) return out;
       // The save-shaped snapshot, never the raw serialization: the session
       // save fixups (jail/spectate) must ride every durable blob. Bracketed
-      // for the per-listing serialize cost stat (module doc above).
-      const serializeStartMs = Date.now();
+      // for the per-listing serialize cost stat (module doc above) on the
+      // hi-res clock: the work is sub-millisecond CPU, so a Date.now bracket
+      // would systematically read 0 and under-report the very number the
+      // SAVE_IDLE sizing argument rests on (the tick_rate_meter idiom; the
+      // hi-res-clock ban is a sim rule, not a server one).
+      const serializeStartNs = process.hrtime.bigint();
       const snap = host.serializeCharacterForPersist(characterId);
-      const serializeMs = Date.now() - serializeStartMs;
+      const serializeMs = Number(process.hrtime.bigint() - serializeStartNs) / 1e6;
       escrowSerializeCount++;
       escrowSerializeTotalMs += serializeMs;
       if (serializeMs > escrowSerializeMaxMs) escrowSerializeMaxMs = serializeMs;
@@ -234,10 +239,12 @@ export function createWocMarketCustody(
         const releaseSlot = (): void => {
           escrowJobsInFlight.delete(characterId);
           escrowGate.release();
-          // The terminal sibling to 'started': a held sequence settled,
-          // whatever its outcome, so entered-minus-settled is the in-flight
-          // (and, when it grows, the wedged-FIFO) signal; the gate stats on
-          // the ops readout are the instantaneous truth.
+          // The terminal kind: a held sequence settled, whatever its
+          // outcome. 'started' is a strict subset of these (a refused
+          // sequence settles without starting), so the computable in-flight
+          // form is the four entered kinds minus settled (the vocabulary
+          // doc spells it out); the gate stats on the ops readout are the
+          // instantaneous truth.
           gameMetricsCounters().wocEscrowQueue('settled');
         };
         void work.then(releaseSlot, releaseSlot);
@@ -321,9 +328,13 @@ export function createWocMarketCustody(
         if (winner !== 'timeout') return winner;
         // Started work answers its truth (a 'busy' for a write that may
         // commit would park a delivered item as retryable); un-started work
-        // cancels clean.
+        // cancels clean, COUNTED: this is the one failure mode the FIFO
+        // close introduced, and a silent park would hide exactly the wedge
+        // an operator needs to see (the busy budget in the delivery arms
+        // alerts off the same signal).
         if (started) return await work;
         cancelled = true;
+        gameMetricsCounters().wocEscrowQueue('grant_busy');
         return 'busy';
       } finally {
         if (timer !== undefined) clearTimeout(timer);

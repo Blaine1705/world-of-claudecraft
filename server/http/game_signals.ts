@@ -167,13 +167,22 @@ export const GUILD_BANK_INCIDENTS = [
 export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
 /** The marketplace escrow-queue outcomes (the per-character save FIFO's
- *  listing entry): one counter with a fixed kind label, the guild-bank
+ *  custody entries): one counter with a fixed kind label, the guild-bank
  *  incident idiom. 'started' is the throughput baseline the refusal kinds
  *  and the flush failure are read against. 'realm_refused' is the
  *  realm-global gate at cap (the write-path rider's bound; the per-character
  *  kinds cannot see realm-wide saturation). 'settled' is the terminal
- *  sibling: a held sequence released its slot, whatever the outcome, so
- *  entered-minus-settled is the in-flight and wedged-FIFO signal. */
+ *  sibling: a held listing sequence released its slot, whatever the
+ *  outcome. NOTE the wedge arithmetic: 'started' is a strict SUBSET of the
+ *  sequences that settle (a deadline, depth-passed flush failure, or
+ *  books-dirty refusal settles without starting), so started-minus-settled
+ *  trends negative; the computable in-flight form is (started +
+ *  flush_failed + books_dirty_refused + deadline_refused) - settled, and
+ *  the gate's own stats on the ops readout are the instantaneous truth.
+ *  'grant_busy' is the delivered-save twin's head-of-line park (the
+ *  bounded grant entry found the buyer's FIFO wedged past the deadline and
+ *  the delivery row parked): the one failure mode the FIFO close
+ *  introduced, counted so it is never silent. */
 export const WOC_ESCROW_QUEUE_OUTCOMES = [
   'started',
   'deadline_refused',
@@ -182,6 +191,7 @@ export const WOC_ESCROW_QUEUE_OUTCOMES = [
   'flush_failed',
   'realm_refused',
   'settled',
+  'grant_busy',
 ] as const;
 export type WocEscrowQueueOutcome = (typeof WOC_ESCROW_QUEUE_OUTCOMES)[number];
 

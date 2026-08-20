@@ -102,6 +102,7 @@ function sourceOver(server: GameServer): GameStateSource {
     simEntities: () => server.sim.entities.size,
     simTickHz: () => server.simTickHz(),
     savePendingKeys: () => server.characterSaveQueues.pendingKeys(),
+    escrowGateInFlight: () => 0,
     tickPhaseMillis: () => server.tickPhaseMillis(),
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),

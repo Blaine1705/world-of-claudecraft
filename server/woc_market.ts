@@ -657,7 +657,7 @@ export interface WocMarketDb {
     bidId: number,
     signature: string,
     nowMs: number,
-  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused'>;
+  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused' | 'contended'>;
   /** Paid-but-undecided bonds, for the sweep to re-check, on the poll
    *  rotation order; excludeIds are the caller's backing-off parked rows. */
   confirmingBonds(
@@ -752,7 +752,7 @@ export interface WocMarketDb {
   submitSettlementSignature(
     id: number,
     signature: string,
-  ): Promise<'ok' | 'not_offered' | 'signature_reused'>;
+  ): Promise<'ok' | 'not_offered' | 'signature_reused' | 'contended'>;
   /** False on a CAS miss AND on a 23505 from the one-open-settlement index
    *  (the failed -> offered revival racing a second open settlement): callers
    *  must treat false as a typed refusal, never assume the row moved. */
@@ -1152,6 +1152,13 @@ export interface WocMarketDeps {
    *  sequence's honest tail is what outlives the grace window; the other
    *  guards are 2s-bounded, judged at the write-path rider). */
   draining?: () => boolean;
+  /** True while the realm escrow gate is at cap (main.ts wires the gate's
+   *  live stats). OPTIONAL like draining: absent means never saturated (the
+   *  rigs). Consulted by the two escrow entries BEFORE a single-use step-up
+   *  proof is consumed, so realm saturation refuses without burning an
+   *  honest seller's signature; the custody entry stays the authoritative
+   *  check. */
+  escrowSaturated?: () => boolean;
   now?: () => number;
   /** Per-pass observability sink (main.ts logs it). `saturated` names every arm
    *  that came back with a FULL batch, i.e. a backlog that is not draining.
@@ -1333,6 +1340,13 @@ export interface WocDeliveryScope {
   contended: boolean;
   /** Park EVENTS in this scope (rows newly parked or re-parked on a retry). */
   parked: number;
+  /** FIFO-busy grant parks in this scope (the delivered-save entry found the
+   *  buyer's save queue wedged past its deadline). Budgeted: past
+   *  WOC_GRANT_BUSY_BUDGET the delivery arms stop the scope's settlement
+   *  work like a contended pass, so a save-wave wedge costs the LOCKED sweep
+   *  segment a bounded number of deadlines, never one per row. Optional so
+   *  the eager entry's inline literal stays unchanged; absent reads as 0. */
+  busyParks?: number;
 }
 
 export class WocMarketService {
@@ -1389,8 +1403,6 @@ export class WocMarketService {
   private readonly driftWarn = new WocWireDriftWarner();
 
   private static readonly PARK_RETRY_MS = 60_000;
-  private static readonly REDRIVE_INTERVAL_MS = 60_000;
-  private static readonly REDRIVE_PAGE = 500;
 
   private pruneLocalLedgers(nowMs: number): void {
     pruneWocLocalLedgers(
@@ -1687,18 +1699,29 @@ export class WocMarketService {
      *  acceptance already verified an offer-bound proof. */
     stepUp?: WocStepUpProof;
   }): Promise<{ ok: true; listing: WocListingRow } | Refused> {
+    // The draining refusal (the escrow write-path rider), FIRST and IO-free:
+    // the HTTP listener stays open through the shutdown drain, and a listing
+    // accepted late in the grace window can enter an escrow sequence whose
+    // honest tail (guild flush plus the transaction ceiling) outlives
+    // pool.end(). Behind the health guard it would itself run two pooled
+    // reads on a closing pool. Only the ESCROW mutations refuse on drain
+    // (this method, and the directed consummation that calls it: that path
+    // escrows too, deliberately); the other guards are 2s-bounded and the
+    // drain window is seconds, judged at the rider. The existing paused
+    // answer (503, localized) is honest copy for "come back in a moment".
+    if (this.deps.draining?.()) return refuse('market_paused');
+    // The realm-gate pre-check, ALSO before any consumable is spent: the
+    // gate's own refusal lands inside runSerialized, AFTER guardStepUp has
+    // consumed the seller's single-use wallet challenge, so realm saturation
+    // (other players' load) would otherwise burn an honest seller's
+    // signature per retry. Racy by design (the authoritative check stays in
+    // the custody entry); it leaks only realm-wide saturation, the same
+    // class of state /readyz already serves unauthenticated.
+    if (this.deps.escrowSaturated?.()) return refuse('contended');
     // A suspended defaulter cannot list either, not just bid: the suspension is
     // a marketplace-wide hold (PRD "Integrity").
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
     if (gate) return gate;
-    // The draining refusal (the escrow write-path rider): the HTTP listener
-    // stays open through the shutdown drain, and a listing accepted late in
-    // the grace window can enter an escrow sequence whose honest tail
-    // (guild flush plus the transaction ceiling) outlives pool.end(). Only
-    // THIS mutation refuses on drain: the other guards are 2s-bounded and
-    // the drain window is seconds, judged at the rider. The existing paused
-    // answer (503, localized) is honest copy for "come back in a moment".
-    if (this.deps.draining?.()) return refuse('market_paused');
     const wallet = await this.deps.verifiedWallet(args.account);
     if (!wallet) return refuse('wallet_required');
     // Step-up BEFORE any business validation, deliberately: an unauthorized
@@ -2039,6 +2062,13 @@ export class WocMarketService {
     characterId: number,
     stepUp?: WocStepUpProof,
   ): Promise<{ ok: true; listing: WocListingRow | null } | Refused> {
+    // The same two IO-free pre-checks createListing leads with, for the same
+    // reasons: the seller-side acceptance consumes a single-use step-up
+    // proof below and then escrows through the inner createListing, so a
+    // drain or realm-gate refusal surfacing only there would burn the
+    // signature and (on drain) cost a reopen write on a closing pool.
+    if (this.deps.draining?.()) return refuse('market_paused');
+    if (this.deps.escrowSaturated?.()) return refuse('contended');
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(account));
     if (gate) return gate;
     const offer = await this.deps.db.directedOfferById(this.cfg.realm, offerId);
@@ -2570,6 +2600,10 @@ export class WocMarketService {
       );
     }
     if (submitted === 'signature_reused') return refuse('signature_reused');
+    // A contended recorder recorded NOTHING (the write-path rider's typed
+    // arm): the signature stays in the client's hand, so the retryable
+    // in-flight refusal is honest and the 2s bound never 500s a payment.
+    if (submitted === 'contended') return refuse('confirm_in_flight');
     const anchorMs = submitted.signatureAtMs;
     const confirmed = await this.deps.economy.confirm(bid.bondReference, signature);
     // Anti-snipe rides BOND PROGRESS, and progress means the CHAIN has seen
@@ -3023,6 +3057,9 @@ export class WocMarketService {
       const submitted = await this.deps.db.submitSettlementSignature(settlement.id, signature);
       if (submitted === 'not_offered') return refuse('not_active');
       if (submitted === 'signature_reused') return refuse('signature_reused');
+      // Same typed arm as the bond leg: contended recorded nothing, refuse
+      // retryable instead of a 500 on money in flight.
+      if (submitted === 'contended') return refuse('confirm_in_flight');
     }
     const confirmed = await this.deps.economy.confirm(settlement.quoteReference, signature);
     if (confirmed.settled) {

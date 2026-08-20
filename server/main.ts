@@ -392,6 +392,7 @@ import {
   wocMarketLockWaitTimeoutCount,
   wocMarketTxNeverStartedCount,
 } from './woc_market_db';
+import { wocStampHighWaterCount } from './woc_market_delivery';
 import { createWocEscrowGate } from './woc_market_escrow_gate';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
@@ -2836,6 +2837,12 @@ const wocMarketService = new WocMarketService({
   // arrives during the grace window refuses instead of entering an escrow
   // sequence pool.end() can land under.
   draining: () => !isReady(),
+  // The realm-gate pre-check (live stats read): refuses BEFORE a step-up
+  // proof is consumed; the custody entry stays the authoritative check.
+  escrowSaturated: () => {
+    const s = wocEscrowGate.stats();
+    return s.inFlight >= s.max;
+  },
   config: wocMarketConfig(),
   onSweepPass: (stats, saturated, elapsedMs) => {
     // One line per pass that did work, plus a loud arm-not-draining warning:
@@ -2909,6 +2916,9 @@ configureInternalWocMarketStuckRead(async () => ({
   // The extract-side per-listing serialize cost (event-loop CPU): the number
   // the SAVE_IDLE bound's sizing argument rests on.
   escrowSerialize: wocEscrowSerializeStats(),
+  // Stamp-ledger high-water crossings (the counted half of the intent-map
+  // bound: the maps never shed entries, so crossings are the incident count).
+  stampHighWater: wocStampHighWaterCount(),
   // The shared pg pool's live occupancy (the pool-wait observability the
   // pre-enable review asked for): waiting > 0 sustained means requests are
   // queueing for clients, the brownout precursor the read caches exist to
@@ -3452,6 +3462,7 @@ export async function startServer(): Promise<http.Server> {
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
     savePendingKeys: () => game.characterSaveQueues.pendingKeys(),
+    escrowGateInFlight: () => wocEscrowGate.stats().inFlight,
     tickPhaseMillis: () => game.tickPhaseMillis(),
     // Coerced at the untyped boundary: @types/pg hand-declares these getters,
     // so a pg upgrade that drops one type-checks clean and would otherwise

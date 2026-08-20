@@ -15,8 +15,8 @@ import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import {
   ESCROW_LOCK_TIMEOUT_MS,
-  GUARD_IDLE_TX_TIMEOUT_MS,
   PgWocMarketDb,
+  SAVE_IDLE_TX_TIMEOUT_MS,
   SETTLED_OFFER_GRACE_MS,
   TxNeverStarted,
   WOC_MARKET_OFFERS_PAIR_PENDING_INDEX,
@@ -1162,6 +1162,46 @@ describe('every guard transaction bounds its idle holds', () => {
     expect(src.match(/FOR UPDATE/g) ?? []).toEqual([]);
     // The five sweep claims keep their non-blocking shape in the same mode.
     expect(src.match(/FOR NO KEY UPDATE( OF \w+)? SKIP LOCKED/g) ?? []).toHaveLength(5);
+    // And no sibling module quietly grows its own lock clause outside this
+    // scan (the review round's durability note): the modules that touch
+    // marketplace rows carry a flat zero.
+    for (const sibling of [
+      'server/woc_market.ts',
+      'server/woc_market_delivery.ts',
+      'server/woc_market_custody.ts',
+      'server/woc_market_sweep.ts',
+      'server/woc_market_monitor.ts',
+    ]) {
+      const sib = stripComments(readFileSync(new URL(`../../${sibling}`, import.meta.url), 'utf8'));
+      expect(sib.length, sibling).toBeGreaterThan(0);
+      expect(sib.includes('FOR UPDATE'), sibling).toBe(false);
+      expect(sib.includes('FOR NO KEY UPDATE'), sibling).toBe(false);
+    }
+  });
+
+  it('every row-writing statement is ROUTED through the bounded seam (routing completeness)', async () => {
+    // The workload() rigs deliberately filter the envelope, so a writer
+    // reverted to this.pool.query would keep its per-writer pin green (the
+    // audit round's blocking find). This pin closes the routing direction
+    // the way the narrowing pin closes the mode: exact counts over the
+    // comment-stripped source. Every this.pool.query whose statement writes
+    // (UPDATE/INSERT/DELETE) must be one of the five sanctioned SKIP LOCKED
+    // sweep claims; everything else rides boundedWrite.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
+    expect(src.match(/this\.boundedWrite\(/g) ?? []).toHaveLength(38);
+    const poolCalls = src.split('this.pool.query(').slice(1);
+    // The verb must LEAD the statement (a read whose trailing slice brushes
+    // a neighboring function's write would otherwise misclassify).
+    const writingDirect = poolCalls.filter((slice) =>
+      /^\s*[`'"]?\s*(UPDATE|INSERT|DELETE)\b/.test(slice.slice(0, 60)),
+    );
+    for (const slice of writingDirect) {
+      expect(slice.slice(0, 900)).toContain('SKIP LOCKED');
+    }
+    expect(writingDirect).toHaveLength(5);
   });
 
   it('carries the idle-in-transaction bound at EVERY withTx site (completeness, comment-stripped)', async () => {
@@ -1213,10 +1253,13 @@ describe('every guard transaction bounds its idle holds', () => {
     // save bound, because they serialize a character blob between
     // statements; every other guard carries the 2s bound. A site quietly
     // switching tiers is a policy change, not a tidy-up.
-    expect(src.match(/\$\{SAVE_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(2);
-    // 11 since the write-path rider: the ten 2s-tier guards plus the
-    // bounded plain-write seam, which rides the guard tier by design.
-    expect(src.match(/\$\{GUARD_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(11);
+    // 3 since the write-path rider's fix round: the two save-bearing guards
+    // plus the bounded plain-write seam, which moved OFF the 2s guard tier
+    // on the save-site argument (its round-trip gaps are pure protocol
+    // idle, and a 2s idle kill there destroys a pooled client across the
+    // widest write surface in the market).
+    expect(src.match(/\$\{SAVE_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(3);
+    expect(src.match(/\$\{GUARD_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(10);
   });
 });
 
@@ -1456,14 +1499,18 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     const { pool, sql, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).touchBidPollRow(7);
     const raw = sql();
-    expect(raw).toHaveLength(5);
+    // FOUR statements since the fix round: both bounds ride ONE
+    // unparameterized query (each extra round trip here is a pure protocol
+    // gap Postgres reads as idle-in-transaction), and the idle bound is the
+    // SAVE tier, not the 2s guard tier, so an ordinary event-loop stall
+    // cannot 25P03-kill a pooled client across the whole write surface.
+    expect(raw).toHaveLength(4);
     expect(raw[0]).toBe('BEGIN');
-    expect(raw[1]).toBe(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
-    expect(raw[2]).toBe(
-      `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+    expect(raw[1]).toBe(
+      `SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}; SET LOCAL idle_in_transaction_session_timeout = ${SAVE_IDLE_TX_TIMEOUT_MS}`,
     );
-    expect(raw[3]).toContain('UPDATE woc_market_bids SET poll_parked_at = now()');
-    expect(raw[4]).toBe('COMMIT');
+    expect(raw[2]).toContain('UPDATE woc_market_bids SET poll_parked_at = now()');
+    expect(raw[3]).toBe('COMMIT');
     expect(workload()).toHaveLength(1);
   });
 
@@ -1471,22 +1518,27 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     // The sharpest plain-writer caller: buyNow's four compensation calls run
     // AFTER their request decided a typed refusal, and before the rider a
     // contended clear converted that decided 409 into a 500 while STILL
-    // leaving the lock held. The contract is now best-effort by design (the
-    // lock ages out through buy_now_lock_expires), so the contention
-    // classes resolve void, counted exactly ONCE (boundedWrite's tail; the
-    // swallow reads through the non-counting isContentionCode).
+    // leaving the lock held. The contract is best-effort by design (the
+    // lock ages out through buy_now_lock_expires): contention retries ONCE
+    // (the fix round's consequence repair, since an un-cleared lock's
+    // expiry mints an abandon record against the blameless holder) and then
+    // everything resolves void with a loud line.
     const counters = await import('../../server/woc_market_db');
+    const warns = vi.spyOn(console, 'error').mockImplementation(() => {});
     for (const code of ['55P03', '40P01', '25P03']) {
       const lockBefore = counters.wocMarketLockWaitTimeoutCount();
+      const deadlockBefore = counters.wocMarketDeadlockCount();
       const contended = writeClientPool(async () => {
         throw Object.assign(new Error('staged contention'), { code });
       });
       await expect(new PgWocMarketDb(contended).clearBuyNowLock(7, 3)).resolves.toBeUndefined();
-      // Counted once, never twice: the double-count would poison the rate
-      // an operator alerts on.
+      // Counted once PER ATTEMPT, two attempts for a persistently contended
+      // clear; the swallow's own second look rides the non-counting
+      // predicate, or these would read four and poison the alert rate.
       expect(counters.wocMarketLockWaitTimeoutCount()).toBe(
-        lockBefore + (code === '55P03' ? 1 : 0),
+        lockBefore + (code === '55P03' ? 2 : 0),
       );
+      expect(counters.wocMarketDeadlockCount()).toBe(deadlockBefore + (code === '40P01' ? 2 : 0));
     }
     // A checkout failure (never-started) is equally safe to swallow: nothing
     // ran, and the lock still ages out.
@@ -1497,12 +1549,19 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
       },
     } as unknown as Pool;
     await expect(new PgWocMarketDb(failing).clearBuyNowLock(7, 3)).resolves.toBeUndefined();
-    // A non-contention failure still surfaces: best-effort never means
-    // swallowing a real bug.
+    // A non-contention failure is swallowed too (best-effort BY CONTRACT:
+    // every caller decided its answer already, and a 500 here masks it),
+    // but LOUDLY: the error line is the surface for the real bug, judged
+    // over the earlier throw-through in the review round.
+    warns.mockClear();
     const buggy = writeClientPool(async () => {
       throw new Error('some real bug');
     });
-    await expect(new PgWocMarketDb(buggy).clearBuyNowLock(7, 3)).rejects.toThrow('some real bug');
+    await expect(new PgWocMarketDb(buggy).clearBuyNowLock(7, 3)).resolves.toBeUndefined();
+    expect(warns.mock.calls.some((c) => String(c[0]).includes('buy-now lock clear failed'))).toBe(
+      true,
+    );
+    warns.mockRestore();
   });
 
   it('cancelPendingListings rides the rotation order with the backoff exclusion', async () => {
@@ -2256,9 +2315,13 @@ describe('the escrow listing transaction, in SQL', () => {
     // would double every rate).
     expect(src.match(/if \(isLockContention\(err\)\)/g) ?? []).toHaveLength(1);
     expect(src.match(/^\s*isLockContention\(err\);$/gm) ?? []).toHaveLength(2);
+    // THREE non-counting second looks since the fix round: clearBuyNowLock's
+    // best-effort swallow plus the two money-path signature recorders, whose
+    // contended answer maps to the retryable confirm_in_flight at their
+    // callers instead of 500ing a payment already on chain.
     expect(
       src.match(/err instanceof TxNeverStarted \|\| isContentionCode\(err\)/g) ?? [],
-    ).toHaveLength(1);
+    ).toHaveLength(3);
 
     // Behavioral, one per answer shape. The typed-refusal shape: a checkout
     // failure on the bid path answers 'contended' and moves ONLY the

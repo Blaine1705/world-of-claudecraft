@@ -127,6 +127,9 @@ class FakeCustody implements WocMarketCustody {
   /** Force the NEXT grant persist to answer 'busy' without running (the
    *  wedged-FIFO head-of-line refusal; nothing serialized, nothing written). */
   failNextGrantBusy = false;
+  /** Force EVERY grant persist to answer 'busy' (the save-wave wedge shape
+   *  the busy budget exists for). */
+  alwaysGrantBusy = false;
 
   async persistGrantSerialized<T>(
     accountId: number,
@@ -135,6 +138,7 @@ class FakeCustody implements WocMarketCustody {
     persist: (save: CharacterSaveArgs) => Promise<T>,
   ): Promise<T | 'busy' | 'session_lost'> {
     this.grantRuns.push(characterId);
+    if (this.alwaysGrantBusy) return 'busy';
     if (this.failNextGrantBusy) {
       this.failNextGrantBusy = false;
       return 'busy';
@@ -594,6 +598,80 @@ describe('woc market fixtures', () => {
     expect(ITEMS[EPIC_ITEM].slot).toBeDefined();
     expect(ITEMS[RARE_ITEM].quality).toBe('rare');
     expect(ITEMS[RARE_ITEM].slot).toBeDefined();
+  });
+});
+
+describe('the realm-gate pre-check spares the step-up challenge (the write-path rider fix round)', () => {
+  it('refuses saturation BEFORE the proof is consumed: the same challenge lists once the gate clears', async () => {
+    // The review round's sharpest availability find: the gate's own refusal
+    // lands inside runSerialized, AFTER guardStepUp consumed the single-use
+    // wallet challenge, so realm saturation (other players' load) burned an
+    // honest seller's signature per retry. The pre-check answers first; the
+    // decisive proof is that the SAME challenge then succeeds.
+    const h = makeHarness();
+    let saturated = true;
+    h.deps.escrowSaturated = () => saturated;
+    const args = {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    };
+    const stepUp = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, args.params, null));
+    const refused = await h.service.createListing({ ...args, stepUp });
+    expect(refused).toEqual({ ok: false, reason: 'contended' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+    saturated = false;
+    const admitted = await h.service.createListing({ ...args, stepUp });
+    expect(admitted.ok).toBe(true);
+  });
+
+  it('an absent dep changes nothing (the rigs stay byte-identical)', async () => {
+    const h = makeHarness();
+    expect(h.deps.escrowSaturated).toBeUndefined();
+    const res = await createListingSteppedUp(h, {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res.ok).toBe(true);
+  });
+});
+
+describe('the grant busy budget bounds the delivery pass (the write-path rider fix round)', () => {
+  it('stops the scope after the budget instead of one deadline per row', async () => {
+    // Three directed sales whose buyers all read busy: without the budget
+    // the batch priced the LOCKED sweep segment at one grant deadline per
+    // row. The budget (2) stops the scope's settlement work like a
+    // contended pass; the rows stay 'delivering' and the next pass, with
+    // the wedge cleared, delivers them all.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    // A third epic so three directed sales can stage, and the wedge staged
+    // BEFORE the sales so their eager confirms park instead of delivering.
+    h.custody.bags.get(SELLER_CHAR)?.push({ itemId: EPIC_ITEM, count: 1 });
+    h.custody.alwaysGrantBusy = true;
+    const sales: number[] = [];
+    for (const sig of ['sig-budget-1', 'sig-budget-2', 'sig-budget-3']) {
+      const { listingId } = await directedSale(h, sig);
+      sales.push(listingId);
+    }
+    const runsBefore = h.custody.grantRuns.length;
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    await h.service.sweepPass();
+    // The budget bit: exactly TWO grant deadlines were paid this pass, not
+    // one per row.
+    expect(h.custody.grantRuns.length - runsBefore).toBe(2);
+    // The wedge clears; every sale converges.
+    h.custody.alwaysGrantBusy = false;
+    for (let i = 0; i < 3; i++) {
+      h.setNow(h.now() + PAST_BACKOFF_MS);
+      await h.service.sweepPass();
+    }
+    for (const listingId of sales) {
+      expect((await h.db.listingById(REALM, listingId))?.status).toBe('closed');
+    }
   });
 });
 

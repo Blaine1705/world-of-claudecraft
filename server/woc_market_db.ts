@@ -885,7 +885,8 @@ export const SAVE_IDLE_TX_TIMEOUT_MS = 10_000;
  *  the pre-job guild flush is an ordinary saveCharacter on the same FIFO
  *  whose statements ride the 60s heavy allowance, exceeding this whole
  *  workload sum on its own (the tunables ladder pins that relation, plus
- *  the 107s started-request ceiling derived from these constants). What
+ *  the 157s started-request ceiling derived from these constants,
+ *  inter-statement idle windows included). What
  *  bounds the player-facing impact in that tail is the queue wait deadline
  *  plus the depth cap plus the realm-global escrow gate (later requests
  *  refuse typed instead of stacking). Tightening the flush term itself
@@ -1345,9 +1346,19 @@ export class PgWocMarketDb implements WocMarketDb {
   private async boundedWrite(text: string, values: readonly unknown[]): Promise<QueryResult> {
     try {
       return await this.withTx(async (client) => {
-        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        // BOTH bounds in ONE unparameterized query, deliberately unlike the
+        // twelve guard sites (whose split form the F8 ruling kept for idiom
+        // consistency between real statements): here every round trip is a
+        // pure protocol gap Postgres reads as idle-in-transaction, so the
+        // merge removes one whole exposure window from ~38 writers. The
+        // idle bound rides the SAVE tier, not the 2s guard tier, on the
+        // save-site argument: a single-statement write holds its row lock
+        // only through COMMIT, waiters refuse at their own 2s lock bound
+        // regardless, and a 2s idle bound here would turn an ordinary
+        // event-loop stall into a 25P03 kill that DESTROYS a pooled client
+        // across the widest write surface in the market.
         await client.query(
-          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+          `SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}; SET LOCAL idle_in_transaction_session_timeout = ${SAVE_IDLE_TX_TIMEOUT_MS}`,
         );
         return await client.query(text, values as unknown[]);
       });
@@ -3110,23 +3121,44 @@ export class PgWocMarketDb implements WocMarketDb {
     // Best-effort BY CONTRACT (the write-path rider's sharpest plain-writer
     // fix): every caller is a compensation arm running AFTER its request
     // already decided (buyNow's four typed refusals, the overdue-expiry
-    // sweep), so a contended clear must never convert that decided answer
-    // into a 500. The contention classes are swallowed COUNTED (the
-    // boundedWrite tail already booked them); the lock is safe to leave
-    // standing because buy_now_lock_expires ages it out on its own, which
-    // is also why claimBuyNowLock treats an expired lock as claimable. A
-    // non-contention failure still throws: that is a bug to surface, not
-    // contention to shrug at.
-    try {
-      await this.boundedWrite(
+    // sweep), so NO failure here may convert that decided answer into a
+    // 500. A contended first attempt retries ONCE (the fix round's
+    // consequence repair: an un-cleared lock stands for its whole window and
+    // its expiry then mints an abandon record against the blameless holder,
+    // so the clear is worth a second 2s wait exactly when the first lost to
+    // a guard that has usually finished by then). After that EVERYTHING is
+    // swallowed with a loud line: contention was already counted by the
+    // boundedWrite tail, a non-contention failure is surfaced by the error
+    // line and the readout instead of by breaking the player's answer, and
+    // the lock is safe to leave standing because buy_now_lock_expires ages
+    // it out on its own (claimBuyNowLock treats an expired lock as
+    // claimable).
+    const clear = () =>
+      this.boundedWrite(
         `UPDATE woc_market_listings
             SET buy_now_lock_account = NULL, buy_now_lock_expires = NULL, updated_at = now()
           WHERE id = $1 AND buy_now_lock_account = $2`,
         [id, holderAccount],
       );
+    try {
+      await clear();
     } catch (err) {
-      if (err instanceof TxNeverStarted || isContentionCode(err)) return;
-      throw err;
+      if (err instanceof TxNeverStarted || isContentionCode(err)) {
+        try {
+          await clear();
+          return;
+        } catch (retryErr) {
+          console.error(
+            `[woc_market] buy-now lock clear stayed contended for listing ${id}; the lock ages out on its own`,
+            retryErr,
+          );
+          return;
+        }
+      }
+      console.error(
+        `[woc_market] buy-now lock clear failed for listing ${id}; the lock ages out on its own`,
+        err,
+      );
     }
   }
 
@@ -3442,7 +3474,7 @@ export class PgWocMarketDb implements WocMarketDb {
     bidId: number,
     signature: string,
     nowMs: number,
-  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused'> {
+  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused' | 'contended'> {
     try {
       // COALESCE: an idempotent resubmission of the same signature keeps the
       // FIRST recording moment (the poll park axis and the extension anchor
@@ -3472,6 +3504,14 @@ export class PgWocMarketDb implements WocMarketDb {
     } catch (err) {
       // 23505: the unique index caught this signature against ANOTHER bid.
       if ((err as { code?: string }).code === '23505') return 'signature_reused';
+      // The money-path patience arm (the write-path rider's fix round): this
+      // recorder is the only trace of a broadcast payment, and before the
+      // bounded seam it waited a contended holder out for the 15s session
+      // default; a bare 2s throw here would 500 a payment already on chain.
+      // A typed answer keeps the trace safe the honest way: nothing was
+      // recorded, the signature is still in the client's hand, and the
+      // caller maps this to the retryable confirm_in_flight refusal.
+      if (err instanceof TxNeverStarted || isContentionCode(err)) return 'contended';
       throw err;
     }
   }
@@ -3999,7 +4039,7 @@ export class PgWocMarketDb implements WocMarketDb {
   async submitSettlementSignature(
     id: number,
     signature: string,
-  ): Promise<'ok' | 'not_offered' | 'signature_reused'> {
+  ): Promise<'ok' | 'not_offered' | 'signature_reused' | 'contended'> {
     try {
       const res = await this.boundedWrite(
         `UPDATE woc_market_settlements
@@ -4010,6 +4050,10 @@ export class PgWocMarketDb implements WocMarketDb {
       return (res.rowCount ?? 0) > 0 ? 'ok' : 'not_offered';
     } catch (err) {
       if ((err as { code?: string }).code === '23505') return 'signature_reused';
+      // Same money-path patience arm as submitBondSignature: a contended
+      // recorder answers typed so the caller can refuse retryable instead
+      // of 500ing a payment whose signature was never recorded.
+      if (err instanceof TxNeverStarted || isContentionCode(err)) return 'contended';
       throw err;
     }
   }

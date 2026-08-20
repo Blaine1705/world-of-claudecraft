@@ -98,10 +98,19 @@ export const WOC_SIM_TICK_HZ = 'woc_sim_tick_hz';
 export const WOC_DB_POOL_CLIENTS = 'woc_db_pool_clients';
 
 /** Character-save FIFO keys with a queued or running write (the per-character
- *  serial writer's live map size). The escrow write-path rider's gauge: a
- *  sustained value near players-online means the save system is not
- *  draining, the precursor the wocEscrowQueue refusal counters alert on. */
+ *  serial writer's live map size). The escrow write-path rider's gauge. The
+ *  alert threshold is SUSTAINED values above the autosave wave's own
+ *  SAVE_CONCURRENCY (4): the wave bounds how many wave-driven saves run at
+ *  once, so a persistently higher reading means out-of-band writers are
+ *  queueing, the precursor the wocEscrowQueue refusal counters alert on. */
 export const WOC_SAVE_PENDING_KEYS = 'woc_character_save_pending_keys';
+
+/** The realm escrow gate's live occupancy (the write-path rider's
+ *  realm-global bound): the instantaneous truth the wocEscrowQueue counter
+ *  kinds approximate, exported to Prometheus so an alert rule can watch
+ *  sustained inFlight at the cap instead of scraping the secret-gated ops
+ *  readout. */
+export const WOC_ESCROW_GATE_IN_FLIGHT = 'woc_escrow_gate_in_flight';
 
 /** Per-phase authoritative-loop timing in SECONDS, labeled by phase and stat (p95/max). */
 export const WOC_SIM_TICK_PHASE_SECONDS = 'woc_sim_tick_phase_seconds';
@@ -254,6 +263,8 @@ export interface GameStateSource {
   simTickHz(): number | null;
   /** Character-save FIFO keys with a queued or running write. */
   savePendingKeys(): number;
+  /** The realm escrow gate's live in-flight count. */
+  escrowGateInFlight(): number;
   /** Per-phase p95/max in MILLISECONDS, keyed by phase name; missing phases are skipped. */
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
   /** pg pool saturation snapshot (pg Pool totalCount/idleCount/waitingCount). */
@@ -343,6 +354,15 @@ export function registerGameStateMetrics(
     registers: [registry],
     collect() {
       this.set(source.savePendingKeys());
+    },
+  });
+
+  new Gauge({
+    name: WOC_ESCROW_GATE_IN_FLIGHT,
+    help: 'Realm escrow gate occupancy (listing sequences holding a slot).',
+    registers: [registry],
+    collect() {
+      this.set(source.escrowGateInFlight());
     },
   });
 
@@ -523,7 +543,7 @@ export function registerGameStateMetrics(
   for (const kind of GUILD_BANK_INCIDENTS) guildBankIncidents.inc({ kind }, 0);
   const wocEscrowQueue = new Counter({
     name: WOC_ESCROW_QUEUE_TOTAL,
-    help: 'Marketplace escrow-queue outcomes on the per-character save FIFO (started, deadline_refused, depth_refused, books_dirty_refused, flush_failed), by kind.',
+    help: 'Marketplace escrow-queue outcomes on the per-character save FIFO custody entries (started, deadline_refused, depth_refused, books_dirty_refused, flush_failed, realm_refused, settled, grant_busy), by kind.',
     labelNames: ['kind'],
     registers: [registry],
   });

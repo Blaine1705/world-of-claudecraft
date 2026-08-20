@@ -1193,6 +1193,14 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // The drain rung's wiring: shutdown calls markDraining() first, and the
     // service reads the health flag live through this thunk.
     expect(code).toContain('draining: () => !isReady()');
+    // The realm-gate pre-check reads the LIVE stats (a captured boolean
+    // would freeze saturation at boot), and the gauge source feeds the
+    // exported occupancy metric off the same instance.
+    expect(code).toContain('escrowSaturated: () => {');
+    expect(code).toContain('escrowGateInFlight: () => wocEscrowGate.stats().inFlight');
+    // The stamp-ledger crossing counter rides the readout beside the
+    // serialize stats.
+    expect(code).toContain('stampHighWater: wocStampHighWaterCount()');
     // The pg pool gauge (the pre-enable review's pool-wait observability):
     // sustained waiting > 0 is the brownout precursor, and this readout is
     // where an operator already looks.

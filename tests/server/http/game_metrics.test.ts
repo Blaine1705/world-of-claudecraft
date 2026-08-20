@@ -29,6 +29,7 @@ import {
   WOC_COPPER_CREDITED_TOTAL,
   WOC_COPPER_SPENT_TOTAL,
   WOC_DB_POOL_CLIENTS,
+  WOC_ESCROW_GATE_IN_FLIGHT,
   WOC_ESCROW_QUEUE_TOTAL,
   WOC_FISHING_CASTS_TOTAL,
   WOC_FISHING_CATCHES_TOTAL,
@@ -75,6 +76,7 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     simEntities: () => 42,
     simTickHz: () => 20,
     savePendingKeys: () => 6,
+    escrowGateInFlight: () => 2,
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
     generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
@@ -137,6 +139,7 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(WOC_SIM_ENTITIES).toBe('woc_sim_entities');
     expect(WOC_SIM_TICK_HZ).toBe('woc_sim_tick_hz');
     expect(WOC_SAVE_PENDING_KEYS).toBe('woc_character_save_pending_keys');
+    expect(WOC_ESCROW_GATE_IN_FLIGHT).toBe('woc_escrow_gate_in_flight');
 
     for (const name of [
       WOC_PLAYERS_ONLINE,
@@ -145,6 +148,7 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
       WOC_SIM_ENTITIES,
       WOC_SIM_TICK_HZ,
       WOC_SAVE_PENDING_KEYS,
+      WOC_ESCROW_GATE_IN_FLIGHT,
     ]) {
       expect(text).toContain(`# TYPE ${name} gauge`);
     }
@@ -158,6 +162,9 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     // returns 6, and a live read at scrape time is what the no-drift test
     // below proves for the family.
     expect(sampleValue(text, /^woc_character_save_pending_keys (\d+)$/m)).toBe('6');
+    // The realm escrow gate's occupancy (the fix round: an alert rule needs
+    // it in /metrics, not only behind the dashboard secret).
+    expect(sampleValue(text, /^woc_escrow_gate_in_flight (\d+)$/m)).toBe('2');
   });
 
   it('exports pg pool saturation by state from the source snapshot', async () => {
@@ -506,9 +513,14 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       // The realm-global escrow gate was at cap (the write-path rider's
       // bound): realm-wide saturation the per-character kinds cannot see.
       'realm_refused',
-      // The terminal sibling: a held sequence released its slot, whatever
-      // its outcome, so entered-minus-settled is the wedge signal.
+      // The terminal sibling: a held listing sequence released its slot,
+      // whatever its outcome (the vocabulary doc owns the honest in-flight
+      // arithmetic; the gate stats are the instantaneous truth).
       'settled',
+      // The delivered-save twin's head-of-line park: the bounded grant
+      // entry found the buyer's FIFO wedged past its deadline (the one
+      // failure mode the FIFO close introduced, counted so never silent).
+      'grant_busy',
     ]);
 
     // Scrape BEFORE any increment: prom counters cannot backfill, so a rate

@@ -262,13 +262,16 @@ const MONOLITHS: MonolithRow[] = [
     // slice, paying for the rider's drain rung and re-pinning DOWN at the
     // exact count (4484 to 3984). The FIFO close then added the
     // persistGrantSerialized member and its contract doc to the
-    // WocMarketCustody interface the coordinator owns: declaration surface
-    // for an extracted implementation, the one shape a sibling cannot
-    // absorb, landing at exactly 4000 (net 484 DOWN across the rider). The
-    // ledgers stay on the service (live state); the bond payout walk is the
-    // next standing candidate.
+    // WocMarketCustody interface the coordinator owns (4000), and the
+    // rider's review round added the remaining declaration-and-rung
+    // surface no sibling can absorb: the escrowSaturated dep with its two
+    // pre-burn rungs (a gate refusal must not consume a signed step-up
+    // challenge), the recorders' typed contended arms, and the busyParks
+    // scope field the delivery budget reads. Exactly 4037, still net 447
+    // DOWN across the rider; the ledgers stay on the service (live state)
+    // and the bond payout walk is the next standing candidate.
     file: 'server/woc_market.ts',
-    ceiling: 4000,
+    ceiling: 4037,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

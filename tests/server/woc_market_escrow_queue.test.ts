@@ -804,7 +804,13 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
     expect(rig.db.escrowSaves).toHaveLength(0);
     expect(kinds).toEqual(['realm_refused']);
-    expect(gate.stats()).toEqual({ inFlight: 0, max: 0, refused: 1 });
+    expect(gate.stats()).toEqual({
+      inFlight: 0,
+      max: 0,
+      refused: 1,
+      reclaimed: 0,
+      oldestHoldMs: 0,
+    });
   });
 
   it('releases the gate slot when the WORK settles, not when the waiter returns', async () => {
@@ -835,20 +841,37 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     const retry = await createListing(rig);
     expect(retry.ok).toBe(true);
     expect(kinds).toEqual(['deadline_refused', 'settled', 'started', 'settled']);
-    expect(gate.stats()).toEqual({ inFlight: 0, max: 1, refused: 0 });
+    expect(gate.stats()).toEqual({
+      inFlight: 0,
+      max: 1,
+      refused: 0,
+      reclaimed: 0,
+      oldestHoldMs: 0,
+    });
   });
 
-  it('attributes the extract-side serialize cost per listing', async () => {
-    // Process-lifetime module counters, so assert DELTAS: one successful
-    // listing adds exactly one bracketed serialize with a sane duration.
+  it('attributes the extract-side serialize cost per listing, decisively', async () => {
+    // Process-lifetime module counters, so assert DELTAS, and pin them with
+    // a stubbed hi-res clock: the monotone forms (total >= before) were
+    // tautologies over accumulating counters (the audit round's vacuous
+    // pair), while a fixed 2.5ms bracket makes every accumulator decisive.
     const rig = makeRig();
     const before = wocEscrowSerializeStats();
-    const res = await createListing(rig);
-    expect(res.ok).toBe(true);
+    let tick = 0n;
+    const hrtime = vi.spyOn(process.hrtime, 'bigint').mockImplementation(() => {
+      tick += 2_500_000n;
+      return tick;
+    });
+    try {
+      const res = await createListing(rig);
+      expect(res.ok).toBe(true);
+    } finally {
+      hrtime.mockRestore();
+    }
     const after = wocEscrowSerializeStats();
     expect(after.count).toBe(before.count + 1);
-    expect(after.totalMs).toBeGreaterThanOrEqual(before.totalMs);
-    expect(after.maxMs).toBeGreaterThanOrEqual(before.maxMs);
+    expect(after.totalMs).toBeCloseTo(before.totalMs + 2.5, 6);
+    expect(after.maxMs).toBeGreaterThanOrEqual(2.5);
   });
 
   it('the delivered save rides the FIFO with an in-slot serialize (the closed carve-out)', async () => {
@@ -889,7 +912,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // The head-of-line bound the old carve-out demanded before the close was
     // safe: the locked delivery segment waits one bounded deadline, parks
     // the row, and moves on; the cancelled job later drains as a strict
-    // no-op.
+    // no-op. Counted under its own kind (the review round: the one failure
+    // mode the close introduced must never be silent).
+    const kinds = recordEscrowKinds();
     const rig = makeRig({ escrowWaitMs: 300 });
     let releaseQueue!: () => void;
     const held = new Promise<void>((resolve) => {
@@ -905,11 +930,92 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     });
     expect(out).toBe('busy');
     expect(persistRuns).toBe(0);
+    expect(kinds).toEqual(['grant_busy']);
     releaseQueue();
     await wedge;
     await settle();
     // The abandoned job drained without running the persist.
     expect(persistRuns).toBe(0);
+  });
+
+  it('a grant that STARTED before the deadline answers its real outcome, never busy', async () => {
+    // The twin of the runSerialized arm: a persist that may commit must
+    // never be reported 'busy' and parked as retryable (coverage round;
+    // mirrors the listing entry's identical pin).
+    const rig = makeRig({ escrowWaitMs: 200 });
+    let persistRuns = 0;
+    const out = await rig.custody.persistGrantSerialized(SELLER, SELLER_CHAR, NONCE, async () => {
+      persistRuns++;
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      return 'booked' as const;
+    });
+    expect(out).toBe('booked');
+    expect(persistRuns).toBe(1);
+  });
+
+  it('the grant entry never touches the realm gate, and session_lost covers every guard dimension', async () => {
+    // Two review-round pins in one rig. (1) The grant persist consumes NO
+    // realm-gate capacity (the sweep taking listing capacity would couple
+    // the two backpressure systems the spec designed apart). (2) The
+    // in-slot revalidation is a four-dimension guard, and every dimension
+    // must independently answer session_lost with the persist never run:
+    // the nonce arm is pinned in its own rotation test; here the
+    // wrong-account arm (the ownership fence), the torn-down-session arm,
+    // and the null-serialize arm.
+    const gate = createWocEscrowGate(1);
+    const rig = makeRig({ escrowGate: gate });
+    let persistRuns = 0;
+    const persist = async () => {
+      persistRuns++;
+      return 'booked' as const;
+    };
+    // Wrong account: another account may never persist under this character.
+    expect(await rig.custody.persistGrantSerialized(SELLER + 1, SELLER_CHAR, NONCE, persist)).toBe(
+      'session_lost',
+    );
+    // Torn-down session: no live session for the character id.
+    expect(await rig.custody.persistGrantSerialized(SELLER, 9999, NONCE, persist)).toBe(
+      'session_lost',
+    );
+    expect(persistRuns).toBe(0);
+    // The happy path under the same rig proves the guards above were the
+    // deciding arms (and leaves the gate provably untouched throughout).
+    expect(await rig.custody.persistGrantSerialized(SELLER, SELLER_CHAR, NONCE, persist)).toBe(
+      'booked',
+    );
+    expect(persistRuns).toBe(1);
+    // Null serialize: quarantine the session (serializeCharacterForPersist
+    // answers null for a quarantined session by contract).
+    rig.session.escrowQuarantined = true;
+    expect(await rig.custody.persistGrantSerialized(SELLER, SELLER_CHAR, NONCE, persist)).toBe(
+      'session_lost',
+    );
+    expect(persistRuns).toBe(1);
+    expect(gate.stats()).toEqual({
+      inFlight: 0,
+      max: 1,
+      refused: 0,
+      reclaimed: 0,
+      oldestHoldMs: 0,
+    });
+  });
+
+  it('a THROWING escrow job still releases both slots (the rejection arm of the release)', async () => {
+    // The review round: releaseSlot rides work.then(resolve, REJECT); a
+    // dropped rejection handler would leak the depth-cap slot AND a realm
+    // gate slot for the process lifetime on every throwing job.
+    const gate = createWocEscrowGate(1);
+    const rig = makeRig({ escrowGate: gate });
+    await expect(
+      rig.custody.runSerialized(SELLER_CHAR, async () => {
+        throw new Error('job blew up');
+      }),
+    ).rejects.toThrow('job blew up');
+    await settle();
+    expect(gate.stats().inFlight).toBe(0);
+    // The freed slots admit the next sequence.
+    const res = await createListing(rig);
+    expect(res.ok).toBe(true);
   });
 
   it('a lease rotated during the grant wait answers session_lost under the slot', async () => {

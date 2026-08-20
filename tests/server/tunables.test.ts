@@ -585,18 +585,28 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // number that cannot drift from the constants: once the escrow job has
     // STARTED, the request rides pool checkout + BEGIN and the installing
     // SET LOCAL under the session default + the five workload statements +
-    // the lock wait + COMMIT under the driver backstop. The wait deadline
-    // bounds only the un-started phase. The ceiling must stay under the
-    // HTTP layer's 300s so a wedged escrow surfaces as a typed or coded
-    // answer, never as a socket the client gave up on first.
+    // the lock wait + the five inter-statement idle windows under the SAVE
+    // bound (the review round's term: the character serialize and every
+    // round-trip gap run between statements, each bounded only by the
+    // idle-in-transaction kill) + COMMIT under the driver backstop. The
+    // wait deadline bounds only the un-started phase. The ceiling must stay
+    // under the HTTP layer's 300s so a wedged escrow surfaces as a typed or
+    // coded answer, never as a socket the client gave up on first.
     const startedCeilingMs =
       DB_POOL_CONNECT_TIMEOUT_MS +
       DB_STATEMENT_TIMEOUT_MS +
       ESCROW_STATEMENT_TIMEOUT_MS * 5 +
+      SAVE_IDLE_TX_TIMEOUT_MS * 5 +
       ESCROW_LOCK_TIMEOUT_MS +
       DB_QUERY_TIMEOUT_MS;
-    expect(startedCeilingMs).toBe(107_000);
+    expect(startedCeilingMs).toBe(157_000);
     expect(startedCeilingMs).toBeLessThan(300_000);
+    // The docblocks that QUOTE the ceiling scrape-pin against the derived
+    // figure, so re-tuning a constant cannot leave prose lying (the audit
+    // round's drift note).
+    const ceilingLabel = `${startedCeilingMs / 1000}s`;
+    expect(read('server/woc_market_custody.ts')).toContain(ceilingLabel);
+    expect(read('server/woc_market_db.ts')).toContain(ceilingLabel);
     // The realm-global escrow gate's sizing (the write-path rider). Equal to
     // the autosave wave's SAVE_CONCURRENCY by decision: the realm already
     // prices in that many concurrent character-save writes, so the gate adds
@@ -619,6 +629,15 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     const poolDefault = parseDbPoolMaxClients(undefined);
     expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBeLessThan(poolDefault);
     expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT + saveConcurrency).toBeLessThanOrEqual(poolDefault - 2);
+    // The gate's leak-reclaim ceiling sits far ABOVE any legitimate
+    // sequence: the honest started ceiling plus the pre-job guild flush's
+    // heavy allowance. A reclaim is therefore always an incident signal,
+    // never ordinary churn eating real capacity.
+    const { WOC_ESCROW_GATE_HOLD_CEILING_MS } = await import('../../server/woc_market_escrow_gate');
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBe(300_000);
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeGreaterThan(
+      startedCeilingMs + DB_HEAVY_STATEMENT_TIMEOUT_MS,
+    );
     // The park-ledger cap (the rider's growth bound) sits many multiples
     // above the sweep batch: each pass can park at most one batch per arm,
     // so the cap only bites a mass-park event while steady state never
