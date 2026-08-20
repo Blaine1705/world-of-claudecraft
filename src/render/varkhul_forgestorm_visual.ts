@@ -6,6 +6,8 @@
 
 import * as THREE from 'three';
 import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
+import type { ActiveVarkhulHammerZone } from '../sim/varkhul_hammers';
+import { VarkhulHammerVisuals } from './varkhul_hammer_visual';
 
 const SEGMENTS = 64;
 const GROUND_LIFT = 0.09;
@@ -110,13 +112,20 @@ function disposeVisual(visual: ForgestormVisual): void {
 export class VarkhulForgestormVisuals {
   private readonly visuals = new Map<number, ForgestormVisual>();
   private readonly activeIds = new Set<number>();
+  private readonly hammerVisuals: VarkhulHammerVisuals;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
-  ) {}
+  ) {
+    this.hammerVisuals = new VarkhulHammerVisuals(scene, groundY);
+  }
 
-  sync(warnings: readonly ActiveVarkhulForgestormWarning[]): void {
+  sync(
+    warnings: readonly ActiveVarkhulForgestormWarning[],
+    hammerZones: readonly ActiveVarkhulHammerZone[] = [],
+  ): void {
+    this.hammerVisuals.sync(hammerZones);
     if (warnings.length === 0 && this.visuals.size === 0) return;
     this.activeIds.clear();
     for (const warning of warnings) {
@@ -147,7 +156,15 @@ export class VarkhulForgestormVisuals {
     }
   }
 
+  syncWorld(world: {
+    activeVarkhulForgestormWarnings: readonly ActiveVarkhulForgestormWarning[];
+    activeVarkhulHammerZones: readonly ActiveVarkhulHammerZone[];
+  }): void {
+    this.sync(world.activeVarkhulForgestormWarnings, world.activeVarkhulHammerZones);
+  }
+
   update(dt: number, reducedMotion = false): void {
+    this.hammerVisuals.update(dt, reducedMotion);
     for (const visual of this.visuals.values()) {
       if (!reducedMotion) {
         visual.phase = (visual.phase + Math.max(0, dt) * 5) % (Math.PI * 2);
@@ -164,6 +181,7 @@ export class VarkhulForgestormVisuals {
   }
 
   dispose(): void {
+    this.hammerVisuals.dispose();
     for (const visual of this.visuals.values()) disposeVisual(visual);
     this.visuals.clear();
     this.activeIds.clear();

@@ -9,6 +9,7 @@ import {
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
   VARKHUL_MAKERS_BRAND_PER_STACK,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+  VARKHUL_MARKED_HAMMERS_AURA_ID,
 } from '../src/sim/encounters/varkhul';
 import {
   type AuraEffectInput,
@@ -56,6 +57,12 @@ describe('auraEffectDescriptor', () => {
     expect(hudChromeStrings.auraEffect.makersBrand).toBe(
       'For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.',
     );
+  });
+
+  it('does not describe the placement-only hammer mark as a zero-percent vulnerability', () => {
+    expect(
+      desc({ id: VARKHUL_MARKED_HAMMERS_AURA_ID, kind: 'vulnerability', value: 0 }),
+    ).toBeNull();
   });
 
   it('describes the cancelable protective Hourglass aura', () => {

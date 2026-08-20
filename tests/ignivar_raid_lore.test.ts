@@ -262,7 +262,9 @@ describe('Ignivar raid lore content', () => {
     expect(localizeSimText('The forge gate is sealed to you.')).not.toBeNull();
     for (const mechanic of [
       "Maker's Brand",
-      'Living Blueprint',
+      'Marked Hammers',
+      'Red-hot Metal',
+      'Red-hot Metal Barrier',
       'Forgestorm',
       "Anvil's Decree",
       "The Master's Assembly",

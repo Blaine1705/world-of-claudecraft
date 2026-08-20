@@ -5019,10 +5019,14 @@ export interface IgnivarEncounterState {
 
 export interface VarkhulEncounterState {
   makersBrandTimer: number;
-  blueprintTimer: number;
-  blueprintCastKey: number;
-  blueprintRemaining: number;
-  blueprintTargetIds: number[];
+  hammersTimer: number;
+  hammersCastKey: number;
+  hammersMarkRemaining: number;
+  hammersStrikeIndex: number;
+  hammersWarningRemaining: number;
+  hammersTargetIds: number[];
+  hammersPoints: Vec3[];
+  hammerFires: Array<{ id: string; pos: Vec3; remaining: number; tickTimer: number }>;
   forgestormTimer: number;
   forgestormCastKey: number;
   forgestormWaveIndex: number;
@@ -5032,7 +5036,7 @@ export interface VarkhulEncounterState {
   anvilStrikeIndex: number;
   anvilStrikeRemaining: number;
   anvilFacing: number;
-  majorAbility: 'none' | 'blueprint' | 'forgestorm' | 'anvil';
+  majorAbility: 'none' | 'hammers' | 'forgestorm' | 'anvil';
   assemblyTriggered: boolean;
   assemblyAddIds: number[];
   assemblyRemaining: number;

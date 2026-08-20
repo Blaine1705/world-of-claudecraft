@@ -567,6 +567,7 @@ import {
   type ActiveVarkhulForgestormWarning,
   activeVarkhulForgestormWarnings,
 } from './varkhul_forgestorm';
+import { type ActiveVarkhulHammerZone, activeVarkhulHammerZones } from './varkhul_hammers';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
@@ -2235,6 +2236,14 @@ export class Sim {
       warnings.push(...activeVarkhulForgestormWarnings(entity.id, entity.varkhul));
     }
     return warnings;
+  }
+  get activeVarkhulHammerZones(): ActiveVarkhulHammerZone[] {
+    const zones: ActiveVarkhulHammerZone[] = [];
+    for (const entity of this.entities.values()) {
+      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
+      zones.push(...activeVarkhulHammerZones(entity.id, entity.varkhul));
+    }
+    return zones;
   }
   get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
     const hourglasses: ActiveTemporalHourglass[] = [];

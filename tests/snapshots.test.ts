@@ -6281,11 +6281,14 @@ describe('Varkhul Forgestorm snapshot parity', () => {
       forgestormCastKey: 7,
       forgestormWaveIndex: 1,
       forgestormWarningRemaining: 1.4,
+      hammersWarningRemaining: 0,
+      hammersPoints: [],
+      hammerFires: [],
       forgestormPoints: [
         { x: player.pos.x + 5, y: player.pos.y, z: player.pos.z },
         { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
       ],
-    } as NonNullable<typeof boss.varkhul>;
+    } as unknown as NonNullable<typeof boss.varkhul>;
     server.sim.entities.set(boss.id, boss);
 
     broadcast(server);
@@ -6297,6 +6300,100 @@ describe('Varkhul Forgestorm snapshot parity', () => {
         r: 4,
         dur: 2.5,
         rem: 1.4,
+      }),
+    ]);
+  });
+});
+
+describe('Varkhul Marked Hammers snapshot parity', () => {
+  it('rebuilds warnings and fire zones after reconnect and clears an omitted set', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulHammers: [
+        {
+          id: '9901:hammer:2:0:0',
+          sourceId: 9901,
+          phase: 'warning',
+          x: 3,
+          z: 5,
+          r: 3,
+          dur: 1.25,
+          rem: 0.8,
+        },
+        {
+          id: '9901:fire:1:2:0',
+          sourceId: 9901,
+          phase: 'fire',
+          x: 7,
+          z: 8,
+          r: 2.4,
+          dur: 12,
+          rem: 6,
+        },
+      ],
+    });
+
+    expect(client.activeVarkhulHammerZones).toEqual([
+      expect.objectContaining({ id: '9901:hammer:2:0:0', phase: 'warning', radius: 3 }),
+      expect.objectContaining({ id: '9901:fire:1:2:0', phase: 'fire', radius: 2.4 }),
+    ]);
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulHammerZones).toEqual([]);
+  });
+
+  it('interest-scopes authoritative hammer and fire positions', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hammerwire', 'warrior');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9903,
+      MOBS.varkhul_forgefather_of_the_last_flame,
+      MOBS.varkhul_forgefather_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.varkhul = {
+      forgestormCastKey: 0,
+      forgestormWaveIndex: 0,
+      forgestormWarningRemaining: 0,
+      forgestormPoints: [],
+      hammersCastKey: 7,
+      hammersStrikeIndex: 1,
+      hammersWarningRemaining: 0.9,
+      hammersPoints: [
+        { x: player.pos.x + 5, y: player.pos.y, z: player.pos.z },
+        { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+      ],
+      hammerFires: [
+        {
+          id: `${boss.id}:fire:6:2:0`,
+          pos: { x: player.pos.x + 6, y: player.pos.y, z: player.pos.z },
+          remaining: 5,
+          tickTimer: 0.5,
+        },
+      ],
+    } as unknown as NonNullable<typeof boss.varkhul>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).varkhulHammers).toEqual([
+      expect.objectContaining({
+        id: `${boss.id}:hammer:7:1:0`,
+        sourceId: boss.id,
+        phase: 'warning',
+        r: 3,
+        dur: 1.25,
+        rem: 0.9,
+      }),
+      expect.objectContaining({
+        id: `${boss.id}:fire:6:2:0`,
+        phase: 'fire',
+        r: 2.4,
+        dur: 12,
+        rem: 5,
       }),
     ]);
   });

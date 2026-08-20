@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { isPlayerRemovableAura } from '../src/sim/aura_classify';
 import {
   clearVarkhulEncounterAuras,
   pointInVarkhulAnvilLane,
-  pointInVarkhulBlueprintLane,
   resetVarkhulEncounter,
-  selectVarkhulBlueprintTargets,
+  selectVarkhulHammerTargets,
   updateVarkhulEncounter,
   VARKHUL_ANVILS_DECREE_CAST_ID,
   VARKHUL_ANVILS_DECREE_LANE_MAX_HP,
@@ -20,8 +20,9 @@ import {
   VARKHUL_FORGESTORM_IMPACTS_PER_WAVE,
   VARKHUL_FORGESTORM_WARNING_SECONDS,
   VARKHUL_FORGESTORM_WAVES,
-  VARKHUL_LIVING_BLUEPRINT_AURA_ID,
-  VARKHUL_LIVING_BLUEPRINT_TARGETS,
+  VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP,
+  VARKHUL_HAMMER_FIRE_DURATION,
+  VARKHUL_HAMMER_FIRE_TICK_SECONDS,
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MAKERS_BRAND_DAMAGE_MAX_HP,
   VARKHUL_MAKERS_BRAND_DURATION,
@@ -29,6 +30,14 @@ import {
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
   VARKHUL_MAKERS_BRAND_PER_STACK,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+  VARKHUL_MARKED_HAMMERS_AURA_ID,
+  VARKHUL_MARKED_HAMMERS_CAST_ID,
+  VARKHUL_MARKED_HAMMERS_IMPACT_DAMAGE_MAX_HP,
+  VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
+  VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
+  VARKHUL_MARKED_HAMMERS_STRIKES,
+  VARKHUL_MARKED_HAMMERS_TARGETS,
+  VARKHUL_MARKED_HAMMERS_WARNING_SECONDS,
   VARKHUL_MASTERPIECE_UNBOUND_AURA_ID,
   VARKHUL_MASTERPIECE_UNBOUND_PULSE_MAX_HP,
   VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS,
@@ -36,6 +45,12 @@ import {
   VARKHUL_MASTERS_ASSEMBLY_AURA_ID,
   VARKHUL_MASTERS_ASSEMBLY_CAST_ID,
   VARKHUL_MASTERS_ASSEMBLY_SECONDS,
+  VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID,
+  VARKHUL_RED_HOT_METAL_AURA_ID,
+  VARKHUL_RED_HOT_METAL_DAMAGE_MAX_HP,
+  VARKHUL_RED_HOT_METAL_DURATION,
+  VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP,
+  VARKHUL_RED_HOT_METAL_TICK_SECONDS,
   VARKHUL_WARDEN_SHIELD_AURA_ID,
   varkhulForgestormPattern,
 } from '../src/sim/encounters/varkhul';
@@ -81,11 +96,70 @@ function addEncounterPlayer(
 function isolateMechanics(boss: Entity): NonNullable<Entity['varkhul']> {
   if (!boss.varkhul) throw new Error('Varkhul state was not initialized');
   boss.varkhul.makersBrandTimer = 999;
-  boss.varkhul.blueprintTimer = 999;
+  boss.varkhul.hammersTimer = 999;
   boss.varkhul.forgestormTimer = 999;
   boss.varkhul.anvilTimer = 999;
   boss.swingTimer = Number.POSITIVE_INFINITY;
   return boss.varkhul;
+}
+
+function deterministicHammerRun(seed: number) {
+  const { sim, boss } = claimedEncounter(seed);
+  const players = [
+    sim.player,
+    addEncounterPlayer(sim, boss, 'Determinism One'),
+    addEncounterPlayer(sim, boss, 'Determinism Two'),
+    addEncounterPlayer(sim, boss, 'Determinism Three'),
+    addEncounterPlayer(sim, boss, 'Determinism Four'),
+  ];
+  updateVarkhulEncounter(sim.ctx, boss);
+  const state = isolateMechanics(boss);
+  state.hammersTimer = DT;
+  updateVarkhulEncounter(sim.ctx, boss);
+  const targetIds = [...state.hammersTargetIds];
+  const offsets = [
+    { x: -12, z: -12 },
+    { x: 12, z: -12 },
+    { x: 12, z: 12 },
+  ];
+  for (let index = 0; index < targetIds.length; index++) {
+    const target = sim.entities.get(targetIds[index]);
+    const offset = offsets[index];
+    if (!target || !offset) throw new Error('Determinism target roster is incomplete');
+    target.pos = sim.ctx.groundPos(boss.pos.x + offset.x, boss.pos.z + offset.z);
+  }
+  state.hammersMarkRemaining = DT;
+  updateVarkhulEncounter(sim.ctx, boss);
+  const warnings = sim.activeVarkhulHammerZones.map((zone) => ({ ...zone }));
+  for (let strike = 0; strike < VARKHUL_MARKED_HAMMERS_STRIKES; strike++) {
+    state.hammersWarningRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+  }
+  const fires = sim.activeVarkhulHammerZones.map((zone) => ({ ...zone }));
+  for (const player of players) player.pos = { ...boss.pos };
+  for (let frame = 0; frame < VARKHUL_HAMMER_FIRE_DURATION / DT; frame++) {
+    updateVarkhulEncounter(sim.ctx, boss);
+  }
+  const events = sim.events.flatMap((event) =>
+    event.type === 'spellfxAt' && event.ability === VARKHUL_MARKED_HAMMERS_CAST_ID
+      ? [
+          {
+            type: event.type,
+            fx: event.fx,
+            x: event.x,
+            z: event.z,
+            radius: event.radius,
+          },
+        ]
+      : [],
+  );
+  return {
+    targetIds,
+    warnings,
+    fires,
+    events,
+    expiredZones: sim.activeVarkhulHammerZones,
+  };
 }
 
 describe('Varkhul encounter geometry and selection', () => {
@@ -96,20 +170,17 @@ describe('Varkhul encounter geometry and selection', () => {
     })) as Entity[];
     const tanks = new Set([1, 2]);
 
-    expect(selectVarkhulBlueprintTargets(players, tanks, 0).map((player) => player.id)).toEqual([
+    expect(selectVarkhulHammerTargets(players, tanks, 0).map((player) => player.id)).toEqual([
       3, 4, 5,
     ]);
-    expect(selectVarkhulBlueprintTargets(players, tanks, 2).map((player) => player.id)).toEqual([
+    expect(selectVarkhulHammerTargets(players, tanks, 2).map((player) => player.id)).toEqual([
       5, 6, 3,
     ]);
-    expect(VARKHUL_LIVING_BLUEPRINT_TARGETS).toBe(3);
+    expect(VARKHUL_MARKED_HAMMERS_TARGETS).toBe(3);
   });
 
-  it('keeps the marker center safe while resolving diagonal Blueprint lanes', () => {
-    const origin = { x: 0, z: 0 };
-    expect(pointInVarkhulBlueprintLane(origin, origin)).toBe(false);
-    expect(pointInVarkhulBlueprintLane(origin, { x: 8, z: 8 })).toBe(true);
-    expect(pointInVarkhulBlueprintLane(origin, { x: 8, z: 0 })).toBe(false);
+  it('replays a full Marked Hammers sequence identically for the same seed', () => {
+    expect(deterministicHammerRun(434)).toEqual(deterministicHammerRun(434));
   });
 
   it('rotates a deterministic five-impact Forgestorm pattern per wave', () => {
@@ -147,6 +218,17 @@ describe('Varkhul encounter behavior', () => {
     expect(VARKHUL_MAKERS_BRAND_MAX_STACKS).toBe(3);
     expect(VARKHUL_MAKERS_BRAND_PER_STACK).toBe(0.35);
     expect(VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS).toBe(2);
+    expect(VARKHUL_MARKED_HAMMERS_MARK_SECONDS).toBe(4);
+    expect(VARKHUL_MARKED_HAMMERS_STRIKES).toBe(3);
+    expect(VARKHUL_MARKED_HAMMERS_WARNING_SECONDS).toBe(1.25);
+    expect(VARKHUL_MARKED_HAMMERS_IMPACT_DAMAGE_MAX_HP).toBe(0.25);
+    expect(VARKHUL_RED_HOT_METAL_DURATION).toBe(10);
+    expect(VARKHUL_RED_HOT_METAL_TICK_SECONDS).toBe(2);
+    expect(VARKHUL_RED_HOT_METAL_DAMAGE_MAX_HP).toBe(0.04);
+    expect(VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP).toBe(0.3);
+    expect(VARKHUL_HAMMER_FIRE_DURATION).toBe(12);
+    expect(VARKHUL_HAMMER_FIRE_TICK_SECONDS).toBe(1);
+    expect(VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP).toBe(0.04);
     expect(VARKHUL_FORGESTORM_WAVES).toBe(3);
     expect(VARKHUL_ANVILS_DECREE_STRIKES).toBe(3);
     expect(VARKHUL_MASTERS_ASSEMBLY_SECONDS).toBe(20);
@@ -230,14 +312,14 @@ describe('Varkhul encounter behavior', () => {
     expect(brand?.stacks).toBe(VARKHUL_MAKERS_BRAND_MAX_STACKS);
   });
 
-  it('uses aura marks for Blueprint and resolves its four-second X warning once', () => {
+  it('marks separated players with Red-hot Metal, drops three hammer waves, and leaves fire', () => {
     const { sim, boss } = claimedEncounter(43);
     const players = [
       sim.player,
-      addEncounterPlayer(sim, boss, 'Blueprint One'),
-      addEncounterPlayer(sim, boss, 'Blueprint Two'),
-      addEncounterPlayer(sim, boss, 'Blueprint Three'),
-      addEncounterPlayer(sim, boss, 'Blueprint Four'),
+      addEncounterPlayer(sim, boss, 'Hammer One'),
+      addEncounterPlayer(sim, boss, 'Hammer Two'),
+      addEncounterPlayer(sim, boss, 'Hammer Three'),
+      addEncounterPlayer(sim, boss, 'Hammer Four'),
     ];
     for (const player of players) {
       player.maxHp = 1_000;
@@ -245,37 +327,158 @@ describe('Varkhul encounter behavior', () => {
     }
     updateVarkhulEncounter(sim.ctx, boss);
     const state = isolateMechanics(boss);
-    state.blueprintTimer = DT;
+    state.hammersTimer = DT;
 
     updateVarkhulEncounter(sim.ctx, boss);
 
     const marked = players.filter((player) =>
-      player.auras.some((aura) => aura.id === VARKHUL_LIVING_BLUEPRINT_AURA_ID),
+      player.auras.some((aura) => aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID),
     );
     expect(marked).toHaveLength(3);
     expect(marked).not.toContain(sim.player);
-    expect(boss.castingAbility).toBe('Living Blueprint');
-    const origin = marked[0];
-    const victim = players.find(
-      (player) => !marked.includes(player) && player.id !== sim.player.id,
+    expect(boss.castingAbility).toBe(VARKHUL_MARKED_HAMMERS_CAST_ID);
+    expect(state.hammersMarkRemaining).toBe(4);
+    for (const player of marked) {
+      const mark = player.auras.find((aura) => aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID);
+      const metal = player.auras.find((aura) => aura.id === VARKHUL_RED_HOT_METAL_AURA_ID);
+      const barrier = player.auras.find((aura) => aura.id === VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID);
+      expect(mark).toMatchObject({
+        remaining: 4,
+        duration: 4,
+        encounterOwned: true,
+      });
+      expect(metal).toMatchObject({
+        kind: 'dot',
+        value: Math.ceil(player.maxHp * VARKHUL_RED_HOT_METAL_DAMAGE_MAX_HP),
+        tickInterval: 2,
+        duration: 10,
+        encounterOwned: true,
+      });
+      expect(barrier).toMatchObject({
+        kind: 'heal_absorb',
+        value: Math.ceil(player.maxHp * VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP),
+        duration: 10,
+        encounterOwned: true,
+      });
+      expect(mark && isPlayerRemovableAura(mark)).toBe(false);
+      expect(metal && isPlayerRemovableAura(metal)).toBe(false);
+      expect(barrier && isPlayerRemovableAura(barrier)).toBe(false);
+    }
+
+    const firstMarked = marked[0];
+    const healer = marked[1];
+    const dot = firstMarked.auras.find((aura) => aura.id === VARKHUL_RED_HOT_METAL_AURA_ID);
+    const absorb = firstMarked.auras.find(
+      (aura) => aura.id === VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID,
     );
-    if (!origin || !victim) throw new Error('Blueprint test roster is incomplete');
-    origin.pos = { x: boss.pos.x - 20, y: boss.pos.y, z: boss.pos.z - 20 };
-    marked[1].pos = { x: boss.pos.x + 24, y: boss.pos.y, z: boss.pos.z - 13 };
-    marked[2].pos = { x: boss.pos.x + 18, y: boss.pos.y, z: boss.pos.z + 22 };
-    victim.pos = { x: origin.pos.x + 8, y: origin.pos.y, z: origin.pos.z + 8 };
-    sim.player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z };
-    state.blueprintRemaining = DT;
+    if (!dot || !absorb || !healer) throw new Error('Marked Hammers test roster is incomplete');
+    firstMarked.hp = firstMarked.maxHp;
+    dot.tickTimer = DT;
+    sim.tick();
+    expect(firstMarked.hp).toBe(firstMarked.maxHp - dot.value);
+    firstMarked.maxHp = 1_000;
+    firstMarked.hp = 500;
+    const firstHeal = Math.max(1, Math.floor(absorb.value / 2));
+    const remainingAbsorb = absorb.value - firstHeal;
+    const hpBehindBarrier = firstMarked.hp;
+    sim.ctx.applyHeal(healer, firstMarked, firstHeal, 'Test Heal', null, false);
+    expect(firstMarked.hp).toBe(hpBehindBarrier);
+    expect(
+      firstMarked.auras.find((aura) => aura.id === VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID)?.value,
+    ).toBe(remainingAbsorb);
+    sim.ctx.applyHeal(healer, firstMarked, remainingAbsorb + 20, 'Test Heal', null, false);
+    expect(firstMarked.hp).toBe(hpBehindBarrier + 20);
+    expect(firstMarked.auras.some((aura) => aura.id === VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID)).toBe(
+      false,
+    );
+    expect(firstMarked.auras.some((aura) => aura.id === VARKHUL_RED_HOT_METAL_AURA_ID)).toBe(true);
 
+    marked[0].pos = { x: boss.pos.x - 20, y: boss.pos.y, z: boss.pos.z - 20 };
+    marked[1].pos = { x: boss.pos.x + 20, y: boss.pos.y, z: boss.pos.z - 20 };
+    marked[2].pos = { x: boss.pos.x + 20, y: boss.pos.y, z: boss.pos.z + 20 };
+    state.hammersMarkRemaining = DT * 2;
     updateVarkhulEncounter(sim.ctx, boss);
+    expect(sim.activeVarkhulHammerZones).toHaveLength(0);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(sim.activeVarkhulHammerZones.filter((zone) => zone.phase === 'warning')).toHaveLength(3);
 
-    expect(victim.hp).toBe(600);
+    const impact = state.hammersPoints[0];
+    const outside = players.find((player) => player !== sim.player && !marked.includes(player));
+    if (!impact || !outside) throw new Error('Impact boundary test roster is incomplete');
+    firstMarked.pos = { ...impact };
+    sim.player.pos = { ...impact, x: impact.x + VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS };
+    outside.pos = {
+      ...impact,
+      x: impact.x + VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS + 0.01,
+    };
+    for (const player of [firstMarked, sim.player, outside]) player.hp = 1_000;
+    state.hammersWarningRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(firstMarked.hp).toBe(750);
+    expect(sim.player.hp).toBe(750);
+    expect(outside.hp).toBe(1_000);
+
+    for (let strike = 1; strike < VARKHUL_MARKED_HAMMERS_STRIKES; strike++) {
+      state.hammersWarningRemaining = DT;
+      updateVarkhulEncounter(sim.ctx, boss);
+    }
+
+    expect(state.majorAbility).toBe('none');
+    expect(state.hammerFires).toHaveLength(9);
     expect(
       marked.every(
-        (player) => !player.auras.some((aura) => aura.id === VARKHUL_LIVING_BLUEPRINT_AURA_ID),
+        (player) => !player.auras.some((aura) => aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID),
       ),
     ).toBe(true);
-    expect(state.majorAbility).toBe('none');
+    const fire = state.hammerFires[0];
+    sim.player.pos = { ...fire.pos };
+    sim.player.hp = 1_000;
+    fire.tickTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(sim.player.hp).toBe(
+      1_000 - Math.ceil(sim.player.maxHp * VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP),
+    );
+    expect(sim.activeVarkhulHammerZones.filter((zone) => zone.phase === 'fire')).toHaveLength(9);
+  });
+
+  it('ticks a twelve-second hammer fire twelve times and removes it at the endpoint', () => {
+    const { sim, boss } = claimedEncounter(431);
+    sim.player.maxHp = 1_000;
+    sim.player.hp = 1_000;
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.hammerFires.push({
+      id: `${boss.id}:fire:endpoint`,
+      pos: { ...sim.player.pos },
+      remaining: 12,
+      tickTimer: 1,
+    });
+
+    for (let frame = 0; frame < VARKHUL_HAMMER_FIRE_DURATION / DT; frame++) {
+      updateVarkhulEncounter(sim.ctx, boss);
+    }
+
+    expect(sim.player.hp).toBe(520);
+    expect(state.hammerFires).toEqual([]);
+  });
+
+  it('does not project hammer warnings or fires from a dead Varkhul', () => {
+    const { sim, boss } = claimedEncounter(432);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.hammersWarningRemaining = 1;
+    state.hammersPoints = [{ ...sim.player.pos }];
+    state.hammerFires.push({
+      id: `${boss.id}:fire:dead`,
+      pos: { ...sim.player.pos },
+      remaining: 5,
+      tickTimer: 0.5,
+    });
+    expect(sim.activeVarkhulHammerZones).toHaveLength(2);
+
+    boss.dead = true;
+
+    expect(sim.activeVarkhulHammerZones).toEqual([]);
   });
 
   it('publishes five GroundAoE warnings before each Forgestorm impact', () => {
@@ -380,19 +583,38 @@ describe('Varkhul encounter behavior', () => {
 
   it('shields the 50% assembly, exposes its artificer after the warden dies, and resumes when clear', () => {
     const { sim, boss } = claimedEncounter(46);
+    const markedPlayer = addEncounterPlayer(sim, boss, 'Assembly Mark');
     updateVarkhulEncounter(sim.ctx, boss);
-    isolateMechanics(boss);
+    const state = isolateMechanics(boss);
+    state.hammersTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    state.hammersMarkRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    state.hammersWarningRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    const persistentFireId = state.hammerFires[0]?.id;
+    expect(persistentFireId).toBeDefined();
+    expect(markedPlayer.auras.some((aura) => aura.id === VARKHUL_RED_HOT_METAL_AURA_ID)).toBe(true);
+    expect(
+      markedPlayer.auras.some((aura) => aura.id === VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID),
+    ).toBe(true);
     boss.hp = Math.floor(boss.maxHp * 0.5);
 
     updateVarkhulEncounter(sim.ctx, boss);
 
-    const state = boss.varkhul;
-    if (!state) throw new Error('Varkhul state disappeared');
     const adds = state.assemblyAddIds.map((id) => sim.entities.get(id)).filter(Boolean) as Entity[];
     expect(adds.map((add) => add.templateId).sort()).toEqual(
       [VARKHUL_EMBER_SENTINEL_ID, VARKHUL_CRUCIBLE_WARDEN_ID, VARKHUL_CINDER_ARTIFICER_ID].sort(),
     );
     expect(boss.auras.some((aura) => aura.id === VARKHUL_MASTERS_ASSEMBLY_AURA_ID)).toBe(true);
+    expect(state.hammerFires.some((fire) => fire.id === persistentFireId)).toBe(true);
+    expect(markedPlayer.auras.some((aura) => aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID)).toBe(
+      false,
+    );
+    expect(markedPlayer.auras.some((aura) => aura.id === VARKHUL_RED_HOT_METAL_AURA_ID)).toBe(true);
+    expect(
+      markedPlayer.auras.some((aura) => aura.id === VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID),
+    ).toBe(true);
     const warden = adds.find((add) => add.templateId === VARKHUL_CRUCIBLE_WARDEN_ID);
     const artificer = adds.find((add) => add.templateId === VARKHUL_CINDER_ARTIFICER_ID);
     if (!warden || !artificer) throw new Error('Assembly roles did not spawn');
@@ -437,7 +659,7 @@ describe('Varkhul encounter behavior', () => {
     const state = isolateMechanics(boss);
     state.assemblyTriggered = true;
     boss.hp = Math.floor(boss.maxHp * 0.2);
-    state.blueprintTimer = 10;
+    state.hammersTimer = 10;
     state.forgestormTimer = 10;
     state.anvilTimer = 10;
     state.makersBrandTimer = 10;
@@ -445,7 +667,7 @@ describe('Varkhul encounter behavior', () => {
     updateVarkhulEncounter(sim.ctx, boss);
 
     expect(boss.auras.some((aura) => aura.id === VARKHUL_MASTERPIECE_UNBOUND_AURA_ID)).toBe(true);
-    expect(state.blueprintTimer).toBeCloseTo(10 - DT * 1.25, 5);
+    expect(state.hammersTimer).toBeCloseTo(10 - DT * 1.25, 5);
     expect(state.forgestormTimer).toBeCloseTo(10 - DT * 1.25, 5);
     expect(state.anvilTimer).toBeCloseTo(10 - DT * 1.25, 5);
     expect(state.makersBrandTimer).toBeCloseTo(10 - DT, 5);
@@ -502,8 +724,8 @@ describe('Varkhul encounter behavior', () => {
     const addIds = [...state.assemblyAddIds];
     expect(addIds).toHaveLength(3);
     displaced.auras.push({
-      id: VARKHUL_LIVING_BLUEPRINT_AURA_ID,
-      name: 'Living Blueprint',
+      id: VARKHUL_MARKED_HAMMERS_AURA_ID,
+      name: VARKHUL_MARKED_HAMMERS_CAST_ID,
       kind: 'vulnerability',
       remaining: 4,
       duration: 4,
@@ -536,12 +758,34 @@ describe('Varkhul encounter behavior', () => {
         encounterOwned: true,
       },
       {
-        id: VARKHUL_LIVING_BLUEPRINT_AURA_ID,
-        name: 'Living Blueprint',
+        id: VARKHUL_MARKED_HAMMERS_AURA_ID,
+        name: VARKHUL_MARKED_HAMMERS_CAST_ID,
         kind: 'vulnerability',
         remaining: 4,
         duration: 4,
         value: 0,
+        sourceId: boss.id,
+        school: 'fire',
+        encounterOwned: true,
+      },
+      {
+        id: VARKHUL_RED_HOT_METAL_AURA_ID,
+        name: 'Red-hot Metal',
+        kind: 'dot',
+        remaining: 10,
+        duration: 10,
+        value: 40,
+        sourceId: boss.id,
+        school: 'fire',
+        encounterOwned: true,
+      },
+      {
+        id: VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID,
+        name: 'Red-hot Metal Barrier',
+        kind: 'heal_absorb',
+        remaining: 10,
+        duration: 10,
+        value: 300,
         sourceId: boss.id,
         school: 'fire',
         encounterOwned: true,
@@ -553,7 +797,10 @@ describe('Varkhul encounter behavior', () => {
     expect(
       sim.player.auras.some(
         (aura) =>
-          aura.id === VARKHUL_MAKERS_BRAND_AURA_ID || aura.id === VARKHUL_LIVING_BLUEPRINT_AURA_ID,
+          aura.id === VARKHUL_MAKERS_BRAND_AURA_ID ||
+          aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID ||
+          aura.id === VARKHUL_RED_HOT_METAL_AURA_ID ||
+          aura.id === VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID,
       ),
     ).toBe(false);
   });

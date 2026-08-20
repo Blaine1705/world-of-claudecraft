@@ -5140,7 +5140,7 @@ export class Renderer {
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.syncMeteorWarnings(this.sim.activeIgnivarMeteors);
     this.mageGroundFx.update(dt);
-    this.varkhulForgestormVisuals?.sync(this.sim.activeVarkhulForgestormWarnings);
+    this.varkhulForgestormVisuals?.syncWorld(this.sim);
     this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // The meteor fx registers and releases budget lights AFTER the pass (a
@@ -12578,8 +12578,8 @@ export class Renderer {
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.syncMeteorWarnings(this.sim.activeIgnivarMeteors);
     this.mageGroundFx.update(dt);
-    this.varkhulForgestormVisuals?.sync(this.sim.activeVarkhulForgestormWarnings);
-    this.varkhulForgestormVisuals?.update(dt);
+    this.varkhulForgestormVisuals?.syncWorld(this.sim);
+    this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // Same post-fx budget recovery as the prewarm frame path: a landing or
     // expiry must not dip the pinned visible count for the frame it lands on.

@@ -173,6 +173,7 @@ export type {
   ActiveIgnivarMeteorWarning,
   ActiveTemporalHourglass,
   ActiveVarkhulForgestormWarning,
+  ActiveVarkhulHammerZone,
 } from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {

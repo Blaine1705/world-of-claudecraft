@@ -1031,6 +1031,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/tent_open.glb": "/media/models/props/tent_open.92b3477806c6.glb",
   "models/props/tent_small.glb": "/media/models/props/tent_small.af9378727756.glb",
   "models/props/timber_pillar.glb": "/media/models/props/timber_pillar.fd43ef284a80.glb",
+  "models/props/varkhul_grand_forge.glb": "/media/models/props/varkhul_grand_forge.d3ffe6d57532.glb",
   "models/props/weapon_stand.glb": "/media/models/props/weapon_stand.ebe71c2c9f27.glb",
   "models/props/well.glb": "/media/models/props/well.9308ba09ea3b.glb",
   "models/props/wildheart_ancestor_ruin.glb": "/media/models/props/wildheart_ancestor_ruin.5f37b9de8ac2.glb",

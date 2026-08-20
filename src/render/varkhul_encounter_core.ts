@@ -3,9 +3,9 @@ import {
   VARKHUL_ANVILS_DECREE_STRIKE_SECONDS,
   VARKHUL_ANVILS_DECREE_STRIKES,
   VARKHUL_BOSS_ID,
-  VARKHUL_LIVING_BLUEPRINT_AURA_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
+  VARKHUL_MARKED_HAMMERS_AURA_ID,
 } from '../sim/encounters/varkhul';
 
 export type VarkhulVisualEntity = {
@@ -26,9 +26,8 @@ export type VarkhulVisualEntity = {
 
 export interface VarkhulEncounterVisualPlan {
   makersBrandStacks: number;
-  blueprintVisible: boolean;
-  blueprintProgress: number;
-  blueprintWorldRotation: number;
+  markedHammersVisible: boolean;
+  markedHammersProgress: number;
   anvilVisible: boolean;
   anvilProgress: number;
   anvilWorldRotation: number;
@@ -56,7 +55,7 @@ function anvilStrikeProgress(remaining: number, total: number): number {
 /** Keeps long radial warnings alive even when their owning body is outside the frustum. */
 export function varkhulEncounterBypassesCharacterCulling(entity: VarkhulVisualEntity): boolean {
   if (entity.kind === 'player') {
-    return entity.auras.some((aura) => aura.id === VARKHUL_LIVING_BLUEPRINT_AURA_ID);
+    return entity.auras.some((aura) => aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID);
   }
   return (
     entity.templateId === VARKHUL_BOSS_ID && entity.castingAbility === VARKHUL_ANVILS_DECREE_CAST_ID
@@ -82,9 +81,9 @@ export function varkhulEncounterVisualPlan(
     entity.kind === 'player'
       ? entity.auras.find((aura) => aura.id === VARKHUL_MAKERS_BRAND_AURA_ID)
       : undefined;
-  const blueprint =
+  const markedHammers =
     entity.kind === 'player'
-      ? entity.auras.find((aura) => aura.id === VARKHUL_LIVING_BLUEPRINT_AURA_ID)
+      ? entity.auras.find((aura) => aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID)
       : undefined;
   const anvilVisible =
     entity.templateId === VARKHUL_BOSS_ID &&
@@ -95,10 +94,8 @@ export function varkhulEncounterVisualPlan(
     makersBrandStacks: brand
       ? Math.max(1, Math.min(VARKHUL_MAKERS_BRAND_MAX_STACKS, brand.stacks ?? 1))
       : 0,
-    blueprintVisible: blueprint !== undefined,
-    blueprintProgress: auraProgress(blueprint),
-    // The sim resolves Blueprint on fixed diagonal world axes.
-    blueprintWorldRotation: Math.PI / 4,
+    markedHammersVisible: markedHammers !== undefined,
+    markedHammersProgress: auraProgress(markedHammers),
     anvilVisible,
     anvilProgress: anvilVisible
       ? anvilStrikeProgress(entity.castRemaining ?? anvilTotal, anvilTotal)

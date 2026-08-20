@@ -45,6 +45,7 @@ import {
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
   VARKHUL_MAKERS_BRAND_PER_STACK,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+  VARKHUL_MARKED_HAMMERS_AURA_ID,
 } from '../sim/encounters/varkhul';
 import type { AuraKind } from '../sim/types';
 import {
@@ -105,6 +106,10 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  * adding an AuraKind without player-facing explanation is a compile-time error.
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  // This is a four-second placement marker, not a damage-taken modifier. Its
+  // countdown and localized name are the complete tooltip; the generic
+  // vulnerability copy would misleadingly claim that it adds 0% damage taken.
+  if (a.id === VARKHUL_MARKED_HAMMERS_AURA_ID) return null;
   if (a.id === 'shaman_mending_current') {
     return a.poolPct !== undefined
       ? { key: `${KEY}.mendingCurrentPercent`, nums: { pct: round(a.poolPct) } }

@@ -3,14 +3,11 @@ import {
   VARKHUL_ANVIL_LANE_HALF_WIDTH,
   VARKHUL_ANVIL_LANE_INNER_RADIUS,
   VARKHUL_ANVIL_LANE_RANGE,
-  VARKHUL_BLUEPRINT_HALF_WIDTH,
-  VARKHUL_BLUEPRINT_INNER_RADIUS,
-  VARKHUL_BLUEPRINT_RANGE,
   VARKHUL_BOSS_ID,
 } from '../sim/encounters/varkhul';
 import { type VarkhulVisualEntity, varkhulEncounterVisualPlan } from './varkhul_encounter_core';
 
-export const VARKHUL_BLUEPRINT_VISUAL_NAME = 'varkhulLivingBlueprintTelegraph';
+export const VARKHUL_MARKED_HAMMERS_VISUAL_NAME = 'varkhulMarkedHammersTelegraph';
 export const VARKHUL_ANVIL_VISUAL_NAME = 'varkhulAnvilDecreeTelegraph';
 export const VARKHUL_BRAND_VISUAL_NAME = 'varkhulMakersBrandTelegraph';
 
@@ -72,14 +69,33 @@ function buildRadialLaneTelegraph(
   return group;
 }
 
-export function buildVarkhulBlueprintTelegraph(): THREE.Group {
-  return buildRadialLaneTelegraph(
-    VARKHUL_BLUEPRINT_VISUAL_NAME,
-    VARKHUL_BLUEPRINT_RANGE,
-    VARKHUL_BLUEPRINT_HALF_WIDTH,
-    VARKHUL_BLUEPRINT_INNER_RADIUS,
-    0xff3d18,
+export function buildVarkhulMarkedHammersTelegraph(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = VARKHUL_MARKED_HAMMERS_VISUAL_NAME;
+  group.userData.renderCategory = 'ui3d';
+  group.userData.actionable = true;
+  const ringMaterial = warningMaterial(0xff4a12, 0.68);
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(1.45, 1.72, 36).rotateX(-Math.PI / 2),
+    ringMaterial,
   );
+  ring.name = 'varkhulMarkedHammersRing';
+  ring.position.y = 0.09;
+  group.add(ring);
+
+  const hammerMaterial = warningMaterial(0xff7a1c, 0.9);
+  const hammer = new THREE.Group();
+  hammer.name = 'varkhulMarkedHammersHammer';
+  const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 3.8, 10), hammerMaterial);
+  handle.position.y = 3.35;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.15, 1.35), hammerMaterial);
+  head.position.y = 5.25;
+  hammer.add(handle, head);
+  group.add(hammer);
+  group.userData.ringMaterial = ringMaterial;
+  group.userData.hammerMaterial = hammerMaterial;
+  group.visible = false;
+  return group;
 }
 
 export function buildVarkhulAnvilTelegraph(): THREE.Group {
@@ -140,7 +156,32 @@ function syncBrandTelegraph(visual: THREE.Object3D, stacks: number, inverseScale
   }
 }
 
-export function syncVarkhulEncounterVisuals(group: THREE.Group, entity: VarkhulVisualEntity): void {
+function syncMarkedHammersTelegraph(
+  visual: THREE.Object3D,
+  visible: boolean,
+  progress: number,
+  inverseScale: number,
+  reducedMotion: boolean,
+): void {
+  visual.visible = visible;
+  if (!visible) return;
+  visual.scale.setScalar(inverseScale);
+  const hammer = visual.getObjectByName('varkhulMarkedHammersHammer');
+  if (hammer) {
+    hammer.position.y = reducedMotion ? 0.15 : 0.15 + Math.sin(progress * Math.PI * 6) * 0.12;
+    hammer.rotation.y = reducedMotion ? 0 : progress * Math.PI * 0.75;
+  }
+  const ringMaterial = visual.userData.ringMaterial as THREE.MeshBasicMaterial;
+  const hammerMaterial = visual.userData.hammerMaterial as THREE.MeshBasicMaterial;
+  ringMaterial.opacity = 0.58 + progress * 0.3;
+  hammerMaterial.opacity = 0.76 + progress * 0.2;
+}
+
+export function syncVarkhulEncounterVisuals(
+  group: THREE.Group,
+  entity: VarkhulVisualEntity,
+  reducedMotion = false,
+): void {
   const plan = varkhulEncounterVisualPlan(entity);
   if (entity.templateId === VARKHUL_BOSS_ID) {
     let anvil = group.getObjectByName(VARKHUL_ANVIL_VISUAL_NAME);
@@ -161,19 +202,18 @@ export function syncVarkhulEncounterVisuals(group: THREE.Group, entity: VarkhulV
   }
   if (entity.kind !== 'player') return;
 
-  let blueprint = group.getObjectByName(VARKHUL_BLUEPRINT_VISUAL_NAME);
-  if (!blueprint && plan.blueprintVisible) {
-    blueprint = buildVarkhulBlueprintTelegraph();
-    group.add(blueprint);
+  let markedHammers = group.getObjectByName(VARKHUL_MARKED_HAMMERS_VISUAL_NAME);
+  if (!markedHammers && plan.markedHammersVisible) {
+    markedHammers = buildVarkhulMarkedHammersTelegraph();
+    group.add(markedHammers);
   }
-  if (blueprint) {
-    syncLaneTelegraph(
-      blueprint,
-      plan.blueprintVisible,
-      plan.blueprintProgress,
-      plan.blueprintWorldRotation,
-      group.rotation.y,
+  if (markedHammers) {
+    syncMarkedHammersTelegraph(
+      markedHammers,
+      plan.markedHammersVisible,
+      plan.markedHammersProgress,
       plan.inverseEntityScale,
+      reducedMotion,
     );
   }
 
@@ -187,7 +227,7 @@ export function syncVarkhulEncounterVisuals(group: THREE.Group, entity: VarkhulV
 
 export function hasVisibleVarkhulEncounterTelegraph(group: THREE.Group): boolean {
   return (
-    group.getObjectByName(VARKHUL_BLUEPRINT_VISUAL_NAME)?.visible === true ||
+    group.getObjectByName(VARKHUL_MARKED_HAMMERS_VISUAL_NAME)?.visible === true ||
     group.getObjectByName(VARKHUL_ANVIL_VISUAL_NAME)?.visible === true
   );
 }
@@ -196,7 +236,7 @@ export function disposeVarkhulEncounterVisuals(group: THREE.Group): void {
   const geometries = new Set<THREE.BufferGeometry>();
   const materials = new Set<THREE.Material>();
   for (const name of [
-    VARKHUL_BLUEPRINT_VISUAL_NAME,
+    VARKHUL_MARKED_HAMMERS_VISUAL_NAME,
     VARKHUL_ANVIL_VISUAL_NAME,
     VARKHUL_BRAND_VISUAL_NAME,
   ]) {

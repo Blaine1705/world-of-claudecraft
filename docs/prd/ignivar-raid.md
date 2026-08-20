@@ -223,11 +223,19 @@ damage received from Varkhul by 35% per stack. Tanks swap at two stacks. A taunt
 changes the target of the next Brand without transferring or clearing the old
 tank's stacks.
 
-### Living Blueprint
+### Marked Hammers
 
-Varkhul selects three non-tanks for four seconds. Each target projects a fixed X
-of forge lanes. Players still inside any projected lane when the pattern resolves
-take 40% maximum health. Selection and lane geometry are deterministic.
+Varkhul marks three non-tanks for four seconds. The marked players also receive
+Red-hot Metal, which deals 4% maximum health every two seconds and absorbs healing
+equal to 30% maximum health. Both effects are encounter-owned and cannot be
+dispelled. Healers remove the absorb by healing through it.
+
+After the four-second mark, the forge creates three waves of enormous incandescent
+hammers around the marked players. Each hammer warns for 1.25 seconds, then falls
+for 25% maximum health in a three-yard circle and leaves a 2.4-yard fire zone for
+12 seconds. The fire deals 4% maximum health every second. Players carry the marks
+to the room edges so the persistent fire does not fill the center. Hammer positions,
+warning lifetimes, and fire zones are authoritative snapshot state.
 
 ### Forgestorm
 
@@ -307,7 +315,7 @@ the media manifest. Concept art is not a substitute for the six shipping GLBs.
     instance lifetime. Done for Normal.
 11. Maelin's three-quest lore chain, three records, and Ignivar core reveal.
     Done for the hidden development route.
-12. Varkhul's Maker's Brand, Living Blueprint, Forgestorm, Anvil's Decree,
+12. Varkhul's Maker's Brand, Marked Hammers, Red-hot Metal, Forgestorm, Anvil's Decree,
     Master's Assembly, and Masterpiece Unbound. Done for Normal; human tuning and
     final visual proof remain.
 13. Three authored ambient themes with per-room routing and versioned streams.

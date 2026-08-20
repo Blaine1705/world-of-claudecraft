@@ -1,10 +1,12 @@
 import type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
 import type { ResolvedAbility } from '../sim/sim';
 import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
+import type { ActiveVarkhulHammerZone } from '../sim/varkhul_hammers';
 import type { WorldInteractionOutcome } from './interaction';
 
 export type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
 export type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
+export type { ActiveVarkhulHammerZone } from '../sim/varkhul_hammers';
 
 export interface ActiveFrostRing {
   id: string;
@@ -40,6 +42,7 @@ export interface IWorldCombat {
   activeFrostRings: ActiveFrostRing[];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[];
+  activeVarkhulHammerZones: ActiveVarkhulHammerZone[];
   activeTemporalHourglasses: ActiveTemporalHourglass[];
   activeConsecrations: ActiveConsecration[];
   /** Remaining server-authoritative lifetime of a reactive ability window. */

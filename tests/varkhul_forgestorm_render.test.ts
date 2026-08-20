@@ -84,11 +84,16 @@ describe('Varkhul Forgestorm rendering', () => {
 
   it('reconciles the world projection in both renderer frame paths', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const visual = readFileSync(
+      new URL('../src/render/varkhul_forgestorm_visual.ts', import.meta.url),
+      'utf8',
+    );
     expect(
-      renderer.match(
-        /this\.varkhulForgestormVisuals\?\.sync\(this\.sim\.activeVarkhulForgestormWarnings\)/g,
-      ),
+      renderer.match(/this\.varkhulForgestormVisuals\?\.syncWorld\(this\.sim\)/g),
     ).toHaveLength(2);
+    expect(visual).toContain(
+      'this.sync(world.activeVarkhulForgestormWarnings, world.activeVarkhulHammerZones);',
+    );
     expect(renderer).toContain('new VarkhulForgestormVisuals(this.scene');
   });
 });

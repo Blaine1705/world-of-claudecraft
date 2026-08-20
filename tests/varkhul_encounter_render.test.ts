@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   buildVarkhulAnvilTelegraph,
-  buildVarkhulBlueprintTelegraph,
   buildVarkhulMakersBrandTelegraph,
+  buildVarkhulMarkedHammersTelegraph,
   disposeVarkhulEncounterVisuals,
   syncVarkhulEncounterVisuals,
   VARKHUL_ANVIL_VISUAL_NAME,
-  VARKHUL_BLUEPRINT_VISUAL_NAME,
   VARKHUL_BRAND_VISUAL_NAME,
+  VARKHUL_MARKED_HAMMERS_VISUAL_NAME,
 } from '../src/render/varkhul_encounter';
 import {
   varkhulEncounterBypassesCharacterCulling,
@@ -20,11 +20,8 @@ import {
   VARKHUL_ANVIL_LANE_INNER_RADIUS,
   VARKHUL_ANVIL_LANE_RANGE,
   VARKHUL_ANVILS_DECREE_CAST_ID,
-  VARKHUL_BLUEPRINT_HALF_WIDTH,
-  VARKHUL_BLUEPRINT_INNER_RADIUS,
-  VARKHUL_BLUEPRINT_RANGE,
-  VARKHUL_LIVING_BLUEPRINT_AURA_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
+  VARKHUL_MARKED_HAMMERS_AURA_ID,
 } from '../src/sim/encounters/varkhul';
 
 function player(
@@ -41,36 +38,44 @@ function player(
 }
 
 describe('Varkhul encounter rendering', () => {
-  it('matches Blueprint and Anvil lane geometry to the sim contract', () => {
-    const blueprint = buildVarkhulBlueprintTelegraph();
+  it('builds an enormous marked hammer and keeps Anvil lane geometry authoritative', () => {
+    const markedHammers = buildVarkhulMarkedHammersTelegraph();
     const anvil = buildVarkhulAnvilTelegraph();
-    expect(blueprint.userData).toMatchObject({
-      range: VARKHUL_BLUEPRINT_RANGE,
-      halfWidth: VARKHUL_BLUEPRINT_HALF_WIDTH,
-      innerRadius: VARKHUL_BLUEPRINT_INNER_RADIUS,
-      actionable: true,
-    });
+    expect(markedHammers.userData.actionable).toBe(true);
+    const hammer = markedHammers.getObjectByName('varkhulMarkedHammersHammer') as THREE.Group;
+    const head = hammer.children.find(
+      (child) => child instanceof THREE.Mesh && child.geometry instanceof THREE.BoxGeometry,
+    ) as THREE.Mesh<THREE.BoxGeometry>;
+    expect(head.geometry.parameters).toMatchObject({ width: 3.4, height: 1.15, depth: 1.35 });
     expect(anvil.userData).toMatchObject({
       range: VARKHUL_ANVIL_LANE_RANGE,
       halfWidth: VARKHUL_ANVIL_LANE_HALF_WIDTH,
       innerRadius: VARKHUL_ANVIL_LANE_INNER_RADIUS,
       actionable: true,
     });
-    expect(blueprint.children).toHaveLength(4);
     expect(anvil.children).toHaveLength(4);
   });
 
-  it('keeps Blueprint on fixed diagonal world axes while its player turns', () => {
+  it('keeps the marked hammer visible above its player for the four-second placement mark', () => {
     const group = new THREE.Group();
     group.rotation.y = 0.9;
-    const marked = player([{ id: VARKHUL_LIVING_BLUEPRINT_AURA_ID, remaining: 2, duration: 4 }]);
+    const marked = player([{ id: VARKHUL_MARKED_HAMMERS_AURA_ID, remaining: 4, duration: 4 }]);
     syncVarkhulEncounterVisuals(group, marked);
-    const visual = group.getObjectByName(VARKHUL_BLUEPRINT_VISUAL_NAME) as THREE.Group;
+    const visual = group.getObjectByName(VARKHUL_MARKED_HAMMERS_VISUAL_NAME) as THREE.Group;
     expect(visual.visible).toBe(true);
-    expect(visual.rotation.y + group.rotation.y).toBeCloseTo(Math.PI / 4);
     expect(visual.scale.x).toBeCloseTo(1 / 1.5);
+    expect(visual.getObjectByName('varkhulMarkedHammersHammer')).toBeDefined();
     expect(varkhulEncounterBypassesCharacterCulling(marked)).toBe(true);
     expect(varkhulEncounterViewVisibleDuringCompile(marked, true)).toBe(true);
+  });
+
+  it('freezes the marked hammer sway and spin when reduced motion is enabled', () => {
+    const group = new THREE.Group();
+    const marked = player([{ id: VARKHUL_MARKED_HAMMERS_AURA_ID, remaining: 2, duration: 4 }]);
+    syncVarkhulEncounterVisuals(group, marked, true);
+    const hammer = group.getObjectByName('varkhulMarkedHammersHammer') as THREE.Group;
+    expect(hammer.position.y).toBeCloseTo(0.15);
+    expect(hammer.rotation.y).toBe(0);
   });
 
   it('shows one ring per Maker brand stack and clears it with the aura', () => {
@@ -112,12 +117,12 @@ describe('Varkhul encounter rendering', () => {
   it('disposes all lazily attached Varkhul visuals before a rig is pooled', () => {
     const group = new THREE.Group();
     group.add(
-      buildVarkhulBlueprintTelegraph(),
+      buildVarkhulMarkedHammersTelegraph(),
       buildVarkhulAnvilTelegraph(),
       buildVarkhulMakersBrandTelegraph(),
     );
     disposeVarkhulEncounterVisuals(group);
-    expect(group.getObjectByName(VARKHUL_BLUEPRINT_VISUAL_NAME)).toBeUndefined();
+    expect(group.getObjectByName(VARKHUL_MARKED_HAMMERS_VISUAL_NAME)).toBeUndefined();
     expect(group.getObjectByName(VARKHUL_ANVIL_VISUAL_NAME)).toBeUndefined();
     expect(group.getObjectByName(VARKHUL_BRAND_VISUAL_NAME)).toBeUndefined();
   });

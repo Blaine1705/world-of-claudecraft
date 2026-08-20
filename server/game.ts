@@ -341,6 +341,7 @@ import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
+import { varkhulEncounterWireJson } from './varkhul_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -8497,6 +8498,7 @@ export class GameServer {
     const activeFrostRings = this.sim.activeFrostRings;
     const activeIgnivarMeteors = this.sim.activeIgnivarMeteors;
     const activeVarkhulForgestormWarnings = this.sim.activeVarkhulForgestormWarnings;
+    const activeVarkhulHammerZones = this.sim.activeVarkhulHammerZones;
     const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
     const activeConsecrations = this.sim.activeConsecrations;
     // Resolve every live session's interest anchor up front, each inside its own
@@ -8707,20 +8709,12 @@ export class GameServer {
           );
         const ignivarMeteorsJson =
           ignivarMeteors.length > 0 ? `,"ignivarMeteors":[${ignivarMeteors.join(',')}]` : '';
-        const varkhulForgestorm = activeVarkhulForgestormWarnings
-          .filter((warning) => {
-            const dx = warning.x - anchorEntity.pos.x;
-            const dz = warning.z - anchorEntity.pos.z;
-            return dx * dx + dz * dz <= EVENT_RADIUS * EVENT_RADIUS;
-          })
-          .map(
-            (warning) =>
-              `{"id":${warning.id},"sourceId":${warning.sourceId},"x":${round2(warning.x)},"z":${round2(warning.z)},"r":${round2(warning.radius)},"dur":${round2(warning.duration)},"rem":${round2(warning.remaining)}}`,
-          );
-        const varkhulForgestormJson =
-          varkhulForgestorm.length > 0
-            ? `,"varkhulForgestorm":[${varkhulForgestorm.join(',')}]`
-            : '';
+        const varkhulEncounterJson = varkhulEncounterWireJson(
+          activeVarkhulForgestormWarnings,
+          activeVarkhulHammerZones,
+          anchorEntity.pos,
+          EVENT_RADIUS,
+        );
         const temporalHourglasses = activeTemporalHourglasses
           .filter((hourglass) => {
             const dx = hourglass.x - anchorEntity.pos.x;
@@ -8754,7 +8748,7 @@ export class GameServer {
             : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${ignivarMeteorsJson}${varkhulForgestormJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${ignivarMeteorsJson}${varkhulEncounterJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
       },
       (err, resolved) =>

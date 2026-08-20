@@ -31,6 +31,24 @@ import {
   VARKHUL_FORGESTORM_RADIUS,
   VARKHUL_FORGESTORM_WARNING_SECONDS,
 } from '../varkhul_forgestorm';
+import {
+  VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP,
+  VARKHUL_HAMMER_FIRE_DURATION,
+  VARKHUL_HAMMER_FIRE_RADIUS,
+  VARKHUL_HAMMER_FIRE_TICK_SECONDS,
+  VARKHUL_MARKED_HAMMERS_IMPACT_DAMAGE_MAX_HP,
+  VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
+  VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
+  VARKHUL_MARKED_HAMMERS_STRIKES,
+  VARKHUL_MARKED_HAMMERS_TARGETS,
+  VARKHUL_MARKED_HAMMERS_WARNING_SECONDS,
+  VARKHUL_RED_HOT_METAL_DAMAGE_MAX_HP,
+  VARKHUL_RED_HOT_METAL_DURATION,
+  VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP,
+  VARKHUL_RED_HOT_METAL_TICK_SECONDS,
+  varkhulHammerFireId,
+  varkhulHammerImpactPoint,
+} from '../varkhul_hammers';
 
 export { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 export const VARKHUL_EMBER_SENTINEL_ID = IGNIVAR_EMBER_SENTINEL_ID;
@@ -46,14 +64,26 @@ export const VARKHUL_MAKERS_BRAND_MAX_STACKS = 3;
 export const VARKHUL_MAKERS_BRAND_PER_STACK = 0.35;
 export const VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS = 2;
 
-export const VARKHUL_LIVING_BLUEPRINT_CAST_ID = 'Living Blueprint';
-export const VARKHUL_LIVING_BLUEPRINT_AURA_ID = 'varkhul_living_blueprint';
-export const VARKHUL_LIVING_BLUEPRINT_TARGETS = 3;
-export const VARKHUL_LIVING_BLUEPRINT_SECONDS = 4;
-export const VARKHUL_LIVING_BLUEPRINT_DAMAGE_MAX_HP = 0.4;
-export const VARKHUL_BLUEPRINT_RANGE = 34;
-export const VARKHUL_BLUEPRINT_HALF_WIDTH = 2.25;
-export const VARKHUL_BLUEPRINT_INNER_RADIUS = 3;
+export const VARKHUL_MARKED_HAMMERS_CAST_ID = 'Marked Hammers';
+export const VARKHUL_MARKED_HAMMERS_AURA_ID = 'varkhul_marked_hammers';
+export const VARKHUL_RED_HOT_METAL_AURA_ID = 'varkhul_red_hot_metal';
+export const VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID = 'varkhul_red_hot_metal_absorb';
+export {
+  VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP,
+  VARKHUL_HAMMER_FIRE_DURATION,
+  VARKHUL_HAMMER_FIRE_RADIUS,
+  VARKHUL_HAMMER_FIRE_TICK_SECONDS,
+  VARKHUL_MARKED_HAMMERS_IMPACT_DAMAGE_MAX_HP,
+  VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
+  VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
+  VARKHUL_MARKED_HAMMERS_STRIKES,
+  VARKHUL_MARKED_HAMMERS_TARGETS,
+  VARKHUL_MARKED_HAMMERS_WARNING_SECONDS,
+  VARKHUL_RED_HOT_METAL_DAMAGE_MAX_HP,
+  VARKHUL_RED_HOT_METAL_DURATION,
+  VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP,
+  VARKHUL_RED_HOT_METAL_TICK_SECONDS,
+} from '../varkhul_hammers';
 
 export const VARKHUL_FORGESTORM_CAST_ID = 'Forgestorm';
 export const VARKHUL_FORGESTORM_WAVES = 3;
@@ -88,10 +118,10 @@ export const VARKHUL_MASTERPIECE_UNBOUND_DAMAGE_BONUS = 0.25;
 export const VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS = 3;
 export const VARKHUL_MASTERPIECE_UNBOUND_PULSE_MAX_HP = 0.05;
 
-const VARKHUL_FIRST_BLUEPRINT_SECONDS = 8;
+const VARKHUL_FIRST_HAMMERS_SECONDS = 8;
 const VARKHUL_FIRST_FORGESTORM_SECONDS = 20;
 const VARKHUL_FIRST_ANVIL_SECONDS = 32;
-const VARKHUL_BLUEPRINT_EVERY = 34;
+const VARKHUL_HAMMERS_EVERY = 34;
 const VARKHUL_FORGESTORM_EVERY = 38;
 const VARKHUL_ANVIL_EVERY = 42;
 const VARKHUL_WIPE_DAMAGE_MULTIPLIER = 100;
@@ -128,16 +158,16 @@ function tankIds(ctx: SimContext, boss: Entity): Set<number> {
   return result;
 }
 
-export function selectVarkhulBlueprintTargets(
+export function selectVarkhulHammerTargets(
   players: readonly Entity[],
   tanks: ReadonlySet<number>,
   castKey: number,
 ): Entity[] {
   const candidates = players.filter((player) => !player.dead && !tanks.has(player.id));
-  if (candidates.length <= VARKHUL_LIVING_BLUEPRINT_TARGETS) return candidates;
+  if (candidates.length <= VARKHUL_MARKED_HAMMERS_TARGETS) return candidates;
   const start = castKey % candidates.length;
   return Array.from(
-    { length: VARKHUL_LIVING_BLUEPRINT_TARGETS },
+    { length: VARKHUL_MARKED_HAMMERS_TARGETS },
     (_, index) => candidates[(start + index) % candidates.length],
   );
 }
@@ -159,20 +189,6 @@ function pointInRadialLanes(
     if (forward >= innerRadius && forward <= range && Math.abs(lateral) <= halfWidth) return true;
   }
   return false;
-}
-
-export function pointInVarkhulBlueprintLane(
-  origin: Pick<Vec3, 'x' | 'z'>,
-  point: Pick<Vec3, 'x' | 'z'>,
-): boolean {
-  return pointInRadialLanes(
-    origin,
-    Math.PI / 4,
-    point,
-    VARKHUL_BLUEPRINT_RANGE,
-    VARKHUL_BLUEPRINT_HALF_WIDTH,
-    VARKHUL_BLUEPRINT_INNER_RADIUS,
-  );
 }
 
 export function pointInVarkhulAnvilLane(
@@ -210,10 +226,14 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
   if (!boss.varkhul) {
     boss.varkhul = {
       makersBrandTimer: VARKHUL_MAKERS_BRAND_EVERY,
-      blueprintTimer: VARKHUL_FIRST_BLUEPRINT_SECONDS,
-      blueprintCastKey: 0,
-      blueprintRemaining: 0,
-      blueprintTargetIds: [],
+      hammersTimer: VARKHUL_FIRST_HAMMERS_SECONDS,
+      hammersCastKey: 0,
+      hammersMarkRemaining: 0,
+      hammersStrikeIndex: 0,
+      hammersWarningRemaining: 0,
+      hammersTargetIds: [],
+      hammersPoints: [],
+      hammerFires: [],
       forgestormTimer: VARKHUL_FIRST_FORGESTORM_SECONDS,
       forgestormCastKey: 0,
       forgestormWaveIndex: 0,
@@ -268,7 +288,10 @@ function clearEncounterWarnings(ctx: SimContext, boss: Entity): void {
 export function clearVarkhulEncounterAuras(player: Entity, sourceId?: number): void {
   player.auras = player.auras.filter(
     (aura) =>
-      (aura.id !== VARKHUL_MAKERS_BRAND_AURA_ID && aura.id !== VARKHUL_LIVING_BLUEPRINT_AURA_ID) ||
+      (aura.id !== VARKHUL_MAKERS_BRAND_AURA_ID &&
+        aura.id !== VARKHUL_MARKED_HAMMERS_AURA_ID &&
+        aura.id !== VARKHUL_RED_HOT_METAL_AURA_ID &&
+        aura.id !== VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID) ||
       (sourceId !== undefined && aura.sourceId !== sourceId),
   );
 }
@@ -276,13 +299,16 @@ export function clearVarkhulEncounterAuras(player: Entity, sourceId?: number): v
 function cancelMajorAbility(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   for (const player of playersInEncounter(ctx, boss, true)) {
     player.auras = player.auras.filter(
-      (aura) => aura.id !== VARKHUL_LIVING_BLUEPRINT_AURA_ID || aura.sourceId !== boss.id,
+      (aura) => aura.id !== VARKHUL_MARKED_HAMMERS_AURA_ID || aura.sourceId !== boss.id,
     );
   }
   clearEncounterWarnings(ctx, boss);
   st.majorAbility = 'none';
-  st.blueprintRemaining = 0;
-  st.blueprintTargetIds = [];
+  st.hammersMarkRemaining = 0;
+  st.hammersStrikeIndex = 0;
+  st.hammersWarningRemaining = 0;
+  st.hammersTargetIds = [];
+  st.hammersPoints = [];
   st.forgestormWarningRemaining = 0;
   st.forgestormPoints = [];
   st.anvilStrikeIndex = 0;
@@ -391,92 +417,206 @@ function castMakersBrand(ctx: SimContext, boss: Entity, target: Entity): boolean
   return true;
 }
 
-function startLivingBlueprint(
+function applyRedHotMetal(ctx: SimContext, boss: Entity, target: Entity): void {
+  ctx.applyAura(target, {
+    id: VARKHUL_RED_HOT_METAL_AURA_ID,
+    name: 'Red-hot Metal',
+    kind: 'dot',
+    remaining: VARKHUL_RED_HOT_METAL_DURATION,
+    duration: VARKHUL_RED_HOT_METAL_DURATION,
+    value: Math.ceil(target.maxHp * VARKHUL_RED_HOT_METAL_DAMAGE_MAX_HP),
+    tickInterval: VARKHUL_RED_HOT_METAL_TICK_SECONDS,
+    tickTimer: VARKHUL_RED_HOT_METAL_TICK_SECONDS,
+    sourceId: boss.id,
+    school: 'fire',
+    encounterOwned: true,
+  });
+  ctx.applyAura(target, {
+    id: VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID,
+    name: 'Red-hot Metal Barrier',
+    kind: 'heal_absorb',
+    remaining: VARKHUL_RED_HOT_METAL_DURATION,
+    duration: VARKHUL_RED_HOT_METAL_DURATION,
+    value: Math.ceil(target.maxHp * VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP),
+    sourceId: boss.id,
+    school: 'fire',
+    encounterOwned: true,
+  });
+}
+
+function startMarkedHammers(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
-  st.blueprintCastKey++;
-  const targets = selectVarkhulBlueprintTargets(players, tankIds(ctx, boss), st.blueprintCastKey);
-  st.majorAbility = 'blueprint';
-  st.blueprintRemaining = VARKHUL_LIVING_BLUEPRINT_SECONDS;
-  st.blueprintTargetIds = targets.map((target) => target.id);
-  st.blueprintTimer = VARKHUL_BLUEPRINT_EVERY;
-  boss.castingAbility = VARKHUL_LIVING_BLUEPRINT_CAST_ID;
-  boss.castTotal = VARKHUL_LIVING_BLUEPRINT_SECONDS;
-  boss.castRemaining = VARKHUL_LIVING_BLUEPRINT_SECONDS;
+  st.hammersCastKey++;
+  const targets = selectVarkhulHammerTargets(players, tankIds(ctx, boss), st.hammersCastKey);
+  st.majorAbility = 'hammers';
+  st.hammersMarkRemaining = VARKHUL_MARKED_HAMMERS_MARK_SECONDS;
+  st.hammersStrikeIndex = 0;
+  st.hammersWarningRemaining = 0;
+  st.hammersTargetIds = targets.map((target) => target.id);
+  st.hammersPoints = [];
+  st.hammersTimer = VARKHUL_HAMMERS_EVERY;
+  boss.castingAbility = VARKHUL_MARKED_HAMMERS_CAST_ID;
+  boss.castTotal =
+    VARKHUL_MARKED_HAMMERS_MARK_SECONDS +
+    VARKHUL_MARKED_HAMMERS_STRIKES * VARKHUL_MARKED_HAMMERS_WARNING_SECONDS;
+  boss.castRemaining = boss.castTotal;
   boss.castTargetId = null;
   boss.castAim = null;
   boss.channeling = true;
   for (const target of targets) {
     ctx.applyAura(target, {
-      id: VARKHUL_LIVING_BLUEPRINT_AURA_ID,
-      name: VARKHUL_LIVING_BLUEPRINT_CAST_ID,
+      id: VARKHUL_MARKED_HAMMERS_AURA_ID,
+      name: VARKHUL_MARKED_HAMMERS_CAST_ID,
       kind: 'vulnerability',
-      remaining: VARKHUL_LIVING_BLUEPRINT_SECONDS,
-      duration: VARKHUL_LIVING_BLUEPRINT_SECONDS,
+      remaining: VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
+      duration: VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
       value: 0,
       sourceId: boss.id,
       school: 'fire',
       encounterOwned: true,
     });
+    applyRedHotMetal(ctx, boss, target);
   }
 }
 
-function resolveLivingBlueprint(
+function startHammerWarning(ctx: SimContext, st: VarkhulEncounterState): void {
+  const targets = st.hammersTargetIds
+    .map((id) => ctx.entities.get(id))
+    .filter((entity): entity is Entity => entity?.kind === 'player' && !entity.dead);
+  st.hammersPoints = targets.map((target, targetIndex) => {
+    const point = varkhulHammerImpactPoint(
+      target.pos,
+      st.hammersCastKey,
+      st.hammersStrikeIndex,
+      targetIndex,
+    );
+    return ctx.groundPos(point.x, point.z);
+  });
+  st.hammersWarningRemaining = VARKHUL_MARKED_HAMMERS_WARNING_SECONDS;
+}
+
+function resolveHammerStrike(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
-  const origins = st.blueprintTargetIds
-    .map((id) => ctx.entities.get(id))
-    .filter((entity): entity is Entity => entity?.kind === 'player');
-  for (const origin of origins) {
+  for (let pointIndex = 0; pointIndex < st.hammersPoints.length; pointIndex++) {
+    const point = st.hammersPoints[pointIndex];
     ctx.emit({
       type: 'spellfxAt',
-      x: origin.pos.x,
-      z: origin.pos.z,
+      x: point.x,
+      z: point.z,
       school: 'fire',
-      fx: 'nova',
+      fx: 'meteorImpact',
       sourceId: boss.id,
-      radius: VARKHUL_BLUEPRINT_RANGE,
-      ability: VARKHUL_LIVING_BLUEPRINT_CAST_ID,
+      radius: VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
+      ability: VARKHUL_MARKED_HAMMERS_CAST_ID,
+    });
+    st.hammerFires.push({
+      id: varkhulHammerFireId(boss.id, st.hammersCastKey, st.hammersStrikeIndex, pointIndex),
+      pos: { ...point },
+      remaining: VARKHUL_HAMMER_FIRE_DURATION,
+      tickTimer: VARKHUL_HAMMER_FIRE_TICK_SECONDS,
     });
   }
   for (const player of players) {
-    if (!origins.some((origin) => pointInVarkhulBlueprintLane(origin.pos, player.pos))) continue;
+    if (
+      !st.hammersPoints.some(
+        (point) => dist2d(point, player.pos) <= VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
+      )
+    )
+      continue;
     dealFractionalDamage(
       ctx,
       boss,
       player,
-      VARKHUL_LIVING_BLUEPRINT_DAMAGE_MAX_HP,
-      VARKHUL_LIVING_BLUEPRINT_CAST_ID,
+      VARKHUL_MARKED_HAMMERS_IMPACT_DAMAGE_MAX_HP,
+      VARKHUL_MARKED_HAMMERS_CAST_ID,
     );
+  }
+  st.hammersStrikeIndex++;
+  st.hammersPoints = [];
+  if (st.hammersStrikeIndex < VARKHUL_MARKED_HAMMERS_STRIKES) {
+    startHammerWarning(ctx, st);
+    return;
   }
   for (const player of playersInEncounter(ctx, boss, true)) {
     player.auras = player.auras.filter(
-      (aura) => aura.id !== VARKHUL_LIVING_BLUEPRINT_AURA_ID || aura.sourceId !== boss.id,
+      (aura) => aura.id !== VARKHUL_MARKED_HAMMERS_AURA_ID || aura.sourceId !== boss.id,
     );
   }
-  st.blueprintRemaining = 0;
-  st.blueprintTargetIds = [];
+  st.hammersWarningRemaining = 0;
+  st.hammersTargetIds = [];
   st.majorAbility = 'none';
   clearBossCast(boss);
 }
 
-function updateLivingBlueprint(
+function updateMarkedHammers(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
   players: readonly Entity[],
   speed: number,
 ): void {
-  st.blueprintRemaining = Math.max(0, st.blueprintRemaining - DT * speed);
-  boss.castingAbility = VARKHUL_LIVING_BLUEPRINT_CAST_ID;
-  boss.castRemaining = st.blueprintRemaining;
-  if (st.blueprintRemaining <= CAST_COMPLETE_EPS) resolveLivingBlueprint(ctx, boss, st, players);
+  boss.castingAbility = VARKHUL_MARKED_HAMMERS_CAST_ID;
+  if (st.hammersMarkRemaining > 0) {
+    st.hammersMarkRemaining = Math.max(0, st.hammersMarkRemaining - DT * speed);
+    boss.castRemaining =
+      st.hammersMarkRemaining +
+      VARKHUL_MARKED_HAMMERS_STRIKES * VARKHUL_MARKED_HAMMERS_WARNING_SECONDS;
+    if (st.hammersMarkRemaining <= CAST_COMPLETE_EPS) startHammerWarning(ctx, st);
+    return;
+  }
+  st.hammersWarningRemaining = Math.max(0, st.hammersWarningRemaining - DT * speed);
+  boss.castRemaining =
+    (VARKHUL_MARKED_HAMMERS_STRIKES - st.hammersStrikeIndex) *
+      VARKHUL_MARKED_HAMMERS_WARNING_SECONDS -
+    (VARKHUL_MARKED_HAMMERS_WARNING_SECONDS - st.hammersWarningRemaining);
+  if (st.hammersWarningRemaining <= CAST_COMPLETE_EPS) {
+    resolveHammerStrike(ctx, boss, st, players);
+  }
+}
+
+function updateHammerFires(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): void {
+  for (let index = st.hammerFires.length - 1; index >= 0; index--) {
+    const fire = st.hammerFires[index];
+    fire.remaining = Math.max(0, fire.remaining - DT);
+    fire.tickTimer -= DT;
+    while (fire.tickTimer <= CAST_COMPLETE_EPS) {
+      fire.tickTimer += VARKHUL_HAMMER_FIRE_TICK_SECONDS;
+      ctx.emit({
+        type: 'spellfxAt',
+        x: fire.pos.x,
+        z: fire.pos.z,
+        school: 'fire',
+        fx: 'tick',
+        sourceId: boss.id,
+        radius: VARKHUL_HAMMER_FIRE_RADIUS,
+        ability: VARKHUL_MARKED_HAMMERS_CAST_ID,
+      });
+      for (const player of players) {
+        if (player.dead || dist2d(fire.pos, player.pos) > VARKHUL_HAMMER_FIRE_RADIUS) continue;
+        dealFractionalDamage(
+          ctx,
+          boss,
+          player,
+          VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP,
+          VARKHUL_MARKED_HAMMERS_CAST_ID,
+        );
+      }
+    }
+    if (fire.remaining <= CAST_COMPLETE_EPS) st.hammerFires.splice(index, 1);
+  }
 }
 
 function addForgestormWarnings(ctx: SimContext, boss: Entity, points: readonly Vec3[]): void {
@@ -892,8 +1032,8 @@ function updateMajorAbility(
   players: readonly Entity[],
   speed: number,
 ): boolean {
-  if (st.majorAbility === 'blueprint') {
-    updateLivingBlueprint(ctx, boss, st, players, speed);
+  if (st.majorAbility === 'hammers') {
+    updateMarkedHammers(ctx, boss, st, players, speed);
     return true;
   }
   if (st.majorAbility === 'forgestorm') {
@@ -918,6 +1058,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
   const st = initVarkhulEncounter(boss);
+  updateHammerFires(ctx, boss, st, players);
   updateMobTarget(ctx, boss);
   let target = resolveLivingTarget(boss, players);
   if (!target) return;
@@ -952,11 +1093,11 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
 
   if (updateMajorAbility(ctx, boss, st, players, speed)) return;
 
-  st.blueprintTimer -= DT * speed;
+  st.hammersTimer -= DT * speed;
   st.forgestormTimer -= DT * speed;
   st.anvilTimer -= DT * speed;
-  if (st.blueprintTimer <= CAST_COMPLETE_EPS) {
-    startLivingBlueprint(ctx, boss, st, players);
+  if (st.hammersTimer <= CAST_COMPLETE_EPS) {
+    startMarkedHammers(ctx, boss, st, players);
     return;
   }
   if (st.forgestormTimer <= CAST_COMPLETE_EPS) {

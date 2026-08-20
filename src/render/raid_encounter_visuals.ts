@@ -73,5 +73,5 @@ export function syncRaidEncounterVisuals(
     encounterEntities,
     reducedMotion,
   );
-  syncVarkhulEncounterVisuals(group, entity);
+  syncVarkhulEncounterVisuals(group, entity, reducedMotion);
 }
