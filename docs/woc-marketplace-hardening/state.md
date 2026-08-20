@@ -1472,6 +1472,61 @@ Resolved (Fernando, 2026-08-11):
     usual; cancel-pending must never tear a live settlement) and the 02
     handoff that clearBuyNowLock carries no holder guard.
 
+Resolved at the close-out prep ruling gate (Fernando, 2026-08-20, delegated
+in-session: "do whatever is absolutely best for the feature and project";
+the session's recommendations were presented first and adopted as proposed,
+recorded here as his rulings):
+
+- R12 (the Not-now lock release question, parked by the 14 QA round):
+  DOCUMENT ONLY. "Not now" keeps the buy-now lock running until the 270s
+  TTL lapses; a retry re-quotes the same settlement; expiry fires the
+  abandon cooldowns. An explicit release endpoint is a free lock-cycling
+  denial lever unless it joins the abandon-cooldown accounting, which makes
+  it a custody-adjacent server feature, not a small route; it stays product
+  debt with an owner in the follow-ups list and the runbook documents the
+  shipped behavior. Exposure is bounded at one lock window and R8's
+  cancel-intent bounds the seller's worst case.
+- R13 (the outage-forfeit ruling, parked by the 14 QA round): DOCUMENT
+  ONLY plus a named code follow-up. The strike side stays outage-fair
+  (strikeDefaultingBuyer spares outage-locked winners); the bond forfeit
+  stays ungated per R2. The runbook records the operational remedy: pause
+  trading during an economy-rail outage; after recovery, identify
+  outage-window defaults from the same evidence the strike-fairness path
+  reads and make players whole through the dashboard's refund-bond flow.
+  The automatic arm (the payment deadline pauses while the rail is
+  observed down, capped at one full window, or forfeit converts to refund
+  on outage evidence) is a named follow-up that needs its own ruling and
+  the 21 devnet evidence before code.
+- R14 (the terms re-consent question, parked by the 14 QA round): RE-PARK
+  to R6's enable-time checklist (owner: counsel via R6). Production holds
+  no real acceptances while WOC_MARKET_ENABLED is off, so the enable-time
+  checklist verifies that and keys acceptance to the counsel-approved text
+  (re-keying the durable flag if the label changed), making launch
+  re-consent moot. The post-launch reword policy remains counsel's
+  question; versioned acceptance is the code change if counsel ever rules
+  rewords need re-consent. The acceptance audit records the
+  RECORDED-vs-SHOWN distinction.
+- R15 (the fail-then-pay-again service contract, parked by the 14 QA
+  round): DOCUMENT ONLY. The contract is settled on paper in this rider
+  from the shipped state machine: transaction_failed only reports an
+  atomically failed transaction (a failed Solana transaction moves
+  nothing), a payment landing after quote_expired is recovered by the
+  ledger-proven adoption arm (the 09 QA paid-after-expiry fix), and a
+  timed-out confirming row goes EXPIRED, never rejected, keeping adoption
+  open (the R5 five-hour bound). The acceptance audit cites the code and
+  pins; the empirical observation stays a 21 devnet evidence row. A gap
+  found by the code walk comes back to Fernando as a code item.
+- R16 (the pg-suites-in-CI standing posture, 20/22): CHANGE CODE. The game
+  repo's CI test jobs gain a Postgres service and TEST_DATABASE_URL so the
+  floor-resident real-SQL suites run at the merge bar; the suites
+  self-classify into the always-run floor so no selection-semantics change
+  is needed, and the wiring must hold the fixed-db-name collision class
+  (never two concurrent batteries against one fixed-name database; an
+  isolated database instance per CI job satisfies it). The diff takes the
+  gate-integrity-reviewer per the dispatch rule; the accepted cost is
+  container boot plus the measured battery in the jobs that host floor
+  suites.
+
 Still open (a phase that hits one asks at session start):
 
 - R5 (phases 09/10/21): the chain-wiring operational decisions. The two 09
