@@ -280,8 +280,9 @@ describe('isHarvestableCorpse', () => {
     // (the one shipped template that used to sit there) into this list
     // instead, so every tagged template is harvestable. The release harvest-gap
     // fix then tags dune_troll, bogtoad and hedge_knight: 45. The Proving
-    // Shore tutorial island's shore_scuttler (a beast, meat) makes 46.
-    expect(included).toHaveLength(46);
+    // Shore tutorial island's shore_scuttler (a beast, meat) makes 46, and
+    // its tide-pool king mister_crabs (also meat) makes 47.
+    expect(included).toHaveLength(47);
     // ...and the untagged templates are counted rather than assumed: 186 of
     // them ship, all excluded before this change and all excluded after it,
     // since fen_troll was already tagged (claw, tusk) and only moves from

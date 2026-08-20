@@ -46,6 +46,19 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'src/ui/i18n.catalog/**',
       'src/ui/i18n.locales/**',
       'src/ui/i18n.ts',
+      // The matcher DICT sources and the entity-name tables the scan bundles
+      // (scripts/i18n_scan.mjs loadSources): a sim/server DICT row or a
+      // world-entity registration must move the cache key, or a stale
+      // registry replays over a fresh one (the src/sim tooltip-cache lesson,
+      // now for the src/ui matcher arm).
+      'src/ui/sim_i18n.ts',
+      'src/ui/sim_i18n.newlocales.ts',
+      'src/ui/server_i18n.ts',
+      'src/ui/server_i18n.newlocales.ts',
+      'src/ui/talent_i18n.ts',
+      'src/ui/talent_i18n.newlocales.ts',
+      'src/ui/world_entity_i18n.ts',
+      'src/sim/**',
       'src/admin/i18n.en.ts',
       'src/admin/i18n.locales/**',
       'src/admin/i18n.ts',
