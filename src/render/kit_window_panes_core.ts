@@ -14,8 +14,10 @@
 // off the ground, thin across one horizontal axis, and not tall-and-narrow
 // near the ground (that shape is a door frame). Inside an accepted assembly
 // the triangles facing along the thin axis are clustered by plane offset; the
-// pane is the largest-area cluster that is recessed behind the assembly's
-// outer face and clear of its sill. An assembly with no such cluster emits
+// pane is the DEEPEST qualifying cluster (recessed behind the assembly's
+// outer face, clear of its sill, and at least a quarter of the largest
+// qualifying area): kit windows layer a frame-wide surround plate in front
+// of the true glass, so area-first selection lit the whole arch. An assembly with no such cluster emits
 // nothing: doors, shuttered windows, and solid dormer faces go dark by
 // design.
 //
@@ -46,6 +48,9 @@ const PLANE_EPS_THIN_EXTENT_FRACTION = 0.02;
 // bottom tenth of the assembly.
 const OUTER_FACE_MARGIN_THIN_FRACTION = 0.1;
 const OUTER_FACE_MARGIN_EPS_MULTIPLIER = 2;
+// A qualifying cluster must carry at least this fraction of the largest
+// qualifying area before its depth can win (artifact slivers stay out).
+const PANE_MIN_AREA_FRACTION_OF_LARGEST = 0.25;
 const SILL_CLEARANCE_HEIGHT_FRACTION = 0.1;
 
 export interface KitWindowPane {
@@ -81,6 +86,8 @@ interface PaneSearch {
   thinX: boolean;
   eps: number;
   outerExtreme: number;
+  /** The opposite extreme: the assembly face nearest the building's core. */
+  innerExtreme: number;
   margin: number;
   sillY: number;
   clusters: Map<number, PlaneCluster>;
@@ -224,10 +231,12 @@ export function kitWindowPanes(
       Math.abs(maxAlongAxis - modelCenterAlongAxis) >= Math.abs(minAlongAxis - modelCenterAlongAxis)
         ? maxAlongAxis
         : minAlongAxis;
+    const innerExtreme = outerExtreme === maxAlongAxis ? minAlongAxis : maxAlongAxis;
     searches.set(root, {
       thinX,
       eps,
       outerExtreme,
+      innerExtreme,
       margin: Math.max(
         thinExtent * OUTER_FACE_MARGIN_THIN_FRACTION,
         eps * OUTER_FACE_MARGIN_EPS_MULTIPLIER,
@@ -282,15 +291,34 @@ export function kitWindowPanes(
     cluster.positions.push(ax, ay, az, bx, by, bz, cx, cy, cz);
   }
 
-  // The pane is the largest-area cluster that is recessed behind the outer
-  // face and clear of the sill; an assembly with none emits nothing.
+  // The pane is the DEEPEST qualifying cluster (nearest the assembly's inner
+  // extreme) among those recessed behind the outer face, clear of the sill,
+  // and carrying at least a quarter of the largest qualifying area. Deepest
+  // wins because these kit windows layer a frame-wide surround plate in
+  // front of the true glass: on the hexb ground-floor windows the plate
+  // spans the whole arch (area 0.020, full component width) while the glass
+  // sits deeper at about half the width (area 0.017), so area-first lit the
+  // frame instead of the window. The area floor keeps a deep sliver artifact
+  // from beating the real glass.
   const panes: KitWindowPane[] = [];
   for (const search of searches.values()) {
-    let best: PlaneCluster | null = null;
+    let maxQualifyingArea = 0;
     for (const cluster of search.clusters.values()) {
       if (Math.abs(cluster.offset - search.outerExtreme) <= search.margin) continue;
       if (cluster.minY < search.sillY) continue;
-      if (!best || cluster.area > best.area) best = cluster;
+      if (cluster.area > maxQualifyingArea) maxQualifyingArea = cluster.area;
+    }
+    let best: PlaneCluster | null = null;
+    let bestDepth = Infinity;
+    for (const cluster of search.clusters.values()) {
+      if (Math.abs(cluster.offset - search.outerExtreme) <= search.margin) continue;
+      if (cluster.minY < search.sillY) continue;
+      if (cluster.area < maxQualifyingArea * PANE_MIN_AREA_FRACTION_OF_LARGEST) continue;
+      const depth = Math.abs(cluster.offset - search.innerExtreme);
+      if (depth < bestDepth) {
+        bestDepth = depth;
+        best = cluster;
+      }
     }
     if (best) panes.push({ positions: best.positions });
   }

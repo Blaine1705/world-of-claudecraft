@@ -156,6 +156,27 @@ describe('kit window pane core', () => {
     }
   });
 
+  it('prefers the deepest qualifying plane over a wider frame surround plate', () => {
+    // The owner-caught round-5 bug: hexb ground-floor windows layer a
+    // frame-wide surround plate in front of the true glass, and area-first
+    // selection lit the whole arch. Deepest qualifying plane must win.
+    const frame = frameBox();
+    const plate = new THREE.BoxGeometry(0.36, 0.4, 0.06).translate(0.62, 1.3, 1.95);
+    const pane = new THREE.BoxGeometry(0.2, 0.3, 0.02).translate(0.7, 1.35, 1.93);
+    const merged = mergeGeometries([new THREE.BoxGeometry(2, 3, 4), frame, plate, pane], false);
+    if (!merged) throw new Error('failed to merge the surround fixture');
+    const panes = panesOf(merged);
+    expect(panes).toHaveLength(1);
+    const soup = panes[0].positions;
+    expect(soup.length).toBe(18);
+    for (let index = 2; index < soup.length; index += 3) {
+      expect(soup[index]).toBeCloseTo(1.94, 6);
+    }
+    const xs = soup.filter((_, index) => index % 3 === 0);
+    expect(Math.min(...xs)).toBeCloseTo(0.6, 6);
+    expect(Math.max(...xs)).toBeCloseTo(0.8, 6);
+  });
+
   it('merges split vertices so duplicated positions still form one component', () => {
     // Non-indexed geometry duplicates every shared corner; exact-position
     // merging must reconnect them into the same components as the indexed
