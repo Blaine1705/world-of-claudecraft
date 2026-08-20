@@ -1040,6 +1040,121 @@ describeDb('woc market directed rail against real Postgres', () => {
     }, 60_000);
   });
 
+  describe('the escrow stamp CAS and cap, in real SQL', () => {
+    function directEscrowListing(
+      realm: string,
+      sellerAccount: number,
+      sellerCharacter: number,
+      directedOfferId: number | null,
+    ) {
+      seq++;
+      return {
+        realm,
+        sellerAccount,
+        sellerCharacter,
+        sellerName: `StampSeller${seq}`,
+        sellerWallet: `wallet-stamp-${seq}`,
+        item: { itemId: 'amber_crimson_armor_plate', count: 1 },
+        itemId: 'amber_crimson_armor_plate',
+        quality: 'epic' as const,
+        params: {
+          format: 'buy_now' as const,
+          directedBuyerAccount: null,
+          startCents: 1000,
+          reserveCents: null,
+          buyNowCents: 1000,
+          durationHours: 12,
+          offerNext: false,
+        },
+        endsAtMs: BASE_MS + 12 * 60 * MINUTE_MS,
+        directedOfferId,
+      };
+    }
+
+    it('refuses a non-accepted or already-stamped offer and rolls the whole escrow back', async () => {
+      const realm = 'escrow-stamp-cas';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const characterId = await seedCharacter(realm, seller);
+      const pendingOffer = await seedOffer(realm, seller, buyer);
+      const priorListing = await seedListing(realm, seller);
+      const stampedOffer = await seedOffer(realm, seller, buyer, {
+        status: 'accepted',
+        listingId: priorListing,
+      });
+      const before = await marketDb.countActiveBySeller(realm, seller);
+
+      const onPending = await marketDb.escrowInsertListing(
+        { characterId, level: 10, state: SAVE_STATE, leaseNonce: undefined },
+        directEscrowListing(realm, seller, characterId, pendingOffer),
+      );
+      expect(onPending).toEqual({ ok: false, reason: 'not_pending' });
+      expect((await offerRow(pendingOffer)).status, 'the pending offer never adopts').toBe(
+        'pending',
+      );
+
+      const onStamped = await marketDb.escrowInsertListing(
+        { characterId, level: 10, state: SAVE_STATE, leaseNonce: undefined },
+        directEscrowListing(realm, seller, characterId, stampedOffer),
+      );
+      expect(onStamped).toEqual({ ok: false, reason: 'not_pending' });
+      const stamped = await pool.query(
+        `SELECT listing_id FROM woc_market_directed_offers WHERE id = $1`,
+        [stampedOffer],
+      );
+      expect(Number(stamped.rows[0].listing_id), 'one deal never re-stamps').toBe(priorListing);
+      expect(
+        await marketDb.countActiveBySeller(realm, seller),
+        'both refused escrows rolled their listing insert back',
+      ).toBe(before);
+    });
+
+    it('the authoritative cap count ignores closed listings', async () => {
+      const realm = 'escrow-cap-closed';
+      const seller = await seedAccount();
+      const characterId = await seedCharacter(realm, seller);
+      const rulesMod2 = await import('../server/woc_market_rules');
+      for (let i = 0; i < rulesMod2.WOC_MARKET_MAX_ACTIVE_LISTINGS; i++) {
+        await seedListing(realm, seller, { status: 'closed' });
+      }
+      const out = await marketDb.escrowInsertListing(
+        { characterId, level: 10, state: SAVE_STATE, leaseNonce: undefined },
+        directEscrowListing(realm, seller, characterId, null),
+      );
+      expect(out.ok, 'closed listings hold no escrow and count for nothing').toBe(true);
+    });
+  });
+
+  describe('reopen refuses resolved and stamped offers, in real SQL', () => {
+    it('a declined offer stays declined and a stamped acceptance stays stamped', async () => {
+      const realm = 'reopen-guards';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const declined = await seedOffer(realm, seller, buyer, { status: 'declined' });
+      expect(await marketDb.reopenDirectedOffer(realm, declined)).toBe(false);
+      expect((await offerRow(declined)).status, 'a dead deal never resurrects').toBe('declined');
+
+      const listing = await seedListing(realm, seller);
+      const stamped = await seedOffer(realm, seller, buyer, {
+        status: 'accepted',
+        listingId: listing,
+        sellerAccepted: true,
+      });
+      expect(await marketDb.reopenDirectedOffer(realm, stamped)).toBe(false);
+      expect(
+        await marketDb.expireDirectedOfferIfUnstamped(realm, stamped),
+        'a consummated deal never expires as rollback residue',
+      ).toBe(false);
+      const row = await pool.query(
+        `SELECT status, listing_id, seller_accepted FROM woc_market_directed_offers WHERE id = $1`,
+        [stamped],
+      );
+      expect(row.rows[0].status, 'a consummated deal never reopens').toBe('accepted');
+      expect(Number(row.rows[0].listing_id)).toBe(listing);
+      expect(row.rows[0].seller_accepted).toBe(true);
+    });
+  });
+
   describe('the offer-expiry sweep against a concurrent stamp, in real SQL', () => {
     it('SKIP LOCKED walks past a row a concurrent transaction holds', async () => {
       // The OUTER status qual (the EvalPlanQual guard beside the escrow
@@ -1518,6 +1633,28 @@ describeDb('woc market directed rail against real Postgres', () => {
         await client.query('ROLLBACK').catch(() => {});
         client.release();
       }
+    });
+  });
+
+  describe('strikes and terms, in real SQL', () => {
+    it('strikes escalate by one and a suspension never shortens', async () => {
+      const acc = await seedAccount();
+      const first = await marketDb.addStrike(acc, null);
+      expect(first).toMatchObject({ accountId: acc, strikes: 1, suspendedUntilMs: null });
+      const long = BASE_MS + 120 * MINUTE_MS;
+      const second = await marketDb.addStrike(acc, long);
+      expect(second.strikes).toBe(2);
+      expect(second.suspendedUntilMs).toBe(long);
+      const third = await marketDb.addStrike(acc, BASE_MS + 60 * MINUTE_MS);
+      expect(third.strikes, 'every strike counts').toBe(3);
+      expect(third.suspendedUntilMs, 'a shorter suspension never wins').toBe(long);
+    });
+
+    it('the FIRST terms acceptance is the durable one', async () => {
+      const acc = await seedAccount();
+      await marketDb.recordTermsAccepted(acc, BASE_MS);
+      await marketDb.recordTermsAccepted(acc, BASE_MS + 60 * MINUTE_MS);
+      expect(await marketDb.termsAcceptedAt(acc), 'consent is recorded once').toBe(BASE_MS);
     });
   });
 });

@@ -857,6 +857,13 @@ describeDb('woc market realm scoping against real Postgres', () => {
       // Preferred id from the other realm: refused, and the fallback lands on
       // the realm's own character, never the newer beta one.
       expect((await marketDb.deliveryTarget(alpha, buyer, bChar))?.characterId).toBe(aChar);
+      // Account scoping rides the same statements: a preferred id owned by a
+      // DIFFERENT account refuses, and the newest-character fallback never
+      // crosses accounts even inside the realm.
+      const outsider = await seedAccount();
+      const outsiderChar = await seedCharacter(alpha, outsider);
+      expect((await marketDb.deliveryTarget(alpha, buyer, outsiderChar))?.characterId).toBe(aChar);
+      expect(outsiderChar).toBeGreaterThan(aChar);
     }, 20_000);
   });
 

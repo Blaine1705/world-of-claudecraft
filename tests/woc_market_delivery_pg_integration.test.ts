@@ -174,17 +174,17 @@ describeDb('woc market delivery finalization against real Postgres', () => {
   async function seedListing(
     realm: string,
     sellerAccount: number,
-    over: { status?: string; itemDisposed?: boolean } = {},
+    over: { status?: string; itemDisposed?: boolean; resolution?: string | null } = {},
   ): Promise<number> {
     seq++;
     const res = await pool.query(
       `INSERT INTO woc_market_listings (
          realm, seller_account, seller_character, seller_name, seller_wallet,
          item, item_id, quality, format, start_cents, buy_now_cents,
-         offer_next, status, item_disposed, ends_at, base_ends_at
+         offer_next, status, item_disposed, resolution, ends_at, base_ends_at
        ) VALUES (
          $1, $2, $3, $4, $5, $6, $7, 'epic', 'auction_buy_now', 500, 1000,
-         false, $8, $9, to_timestamp($10 / 1000.0), to_timestamp($10 / 1000.0)
+         false, $8, $9, $10, to_timestamp($11 / 1000.0), to_timestamp($11 / 1000.0)
        ) RETURNING id`,
       [
         realm,
@@ -196,6 +196,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         'crown_of_embers',
         over.status ?? 'settling',
         over.itemDisposed ?? false,
+        over.resolution ?? null,
         BASE_MS + 60 * MINUTE_MS,
       ],
     );
@@ -1645,5 +1646,207 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       // instead of hiding under the 5s allowance.
       expect(p99).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 25);
     }, 30_000);
+  });
+
+  describe('custody claim intent ledger, in real SQL', () => {
+    it('the booked flip is one-way and every intent write refuses a booked claim', async () => {
+      const realm = 'custody-intent-ledger';
+      const ref = 'intent-ledger-1';
+      expect(await marketDb.claimCustodyRef(realm, ref)).toBe(true);
+      expect(await marketDb.markCustodyGrantIntent(ref, 4242)).toBe(true);
+      expect((await marketDb.custodyRefState(ref))?.grantCharacterId).toBe(4242);
+      // The one legal conversion: the mail intent WITHDRAWS the grant intent
+      // in the same statement.
+      expect(await marketDb.markCustodyMailIntent(ref)).toBe(true);
+      expect(await marketDb.custodyRefState(ref)).toEqual({
+        booked: false,
+        grantCharacterId: null,
+        mailIntent: true,
+      });
+      await marketDb.markCustodyRefBooked(ref);
+      const stamped = await pool.query(
+        `SELECT booked_at FROM woc_market_custody_claims WHERE custody_ref = $1`,
+        [ref],
+      );
+      expect(stamped.rows[0].booked_at).not.toBeNull();
+      // Booked: every intent write refuses and writes nothing.
+      expect(await marketDb.markCustodyGrantIntent(ref, 777)).toBe(false);
+      expect(await marketDb.markCustodyMailIntent(ref)).toBe(false);
+      expect(await marketDb.custodyRefState(ref)).toEqual({
+        booked: true,
+        grantCharacterId: null,
+        mailIntent: true,
+      });
+      // The flip is one-way: a re-book never moves the exactly-once evidence.
+      await new Promise((r) => setTimeout(r, 10));
+      await marketDb.markCustodyRefBooked(ref);
+      const again = await pool.query(
+        `SELECT booked_at FROM woc_market_custody_claims WHERE custody_ref = $1`,
+        [ref],
+      );
+      expect(again.rows[0].booked_at, 'booked_at never re-stamps').toEqual(
+        stamped.rows[0].booked_at,
+      );
+    });
+  });
+
+  describe('residue arm predicates, in real SQL', () => {
+    async function seedSale(realm: string, listingId: number, excluded = false): Promise<void> {
+      const saleId = await marketDb.insertSale({
+        realm,
+        listingId,
+        itemId: 'crown_of_embers',
+        item: { itemId: 'crown_of_embers', count: 1 },
+        priceCents: 1000,
+        amountBase: null,
+        sellerAccount: 1,
+        buyerAccount: 2,
+        sellerName: 'S',
+        buyerName: 'B',
+      });
+      if (excluded) expect(await marketDb.setSaleExcluded(saleId, true)).toBe('ok');
+    }
+
+    async function disposedFlag(id: number): Promise<boolean> {
+      const res = await pool.query(`SELECT item_disposed FROM woc_market_listings WHERE id = $1`, [
+        id,
+      ]);
+      return Boolean(res.rows[0].item_disposed);
+    }
+
+    it('disposeSoldResidueListings converges only SOLD residue proven by a LIVE sale row', async () => {
+      const realm = 'residue-dispose';
+      const seller = await seedAccount();
+      const soldWithSale = await seedListing(realm, seller, {
+        status: 'closed',
+        resolution: 'sold',
+      });
+      await seedSale(realm, soldWithSale);
+      const soldExcludedSale = await seedListing(realm, seller, {
+        status: 'closed',
+        resolution: 'sold',
+      });
+      await seedSale(realm, soldExcludedSale, true);
+      const cancelledWithSale = await seedListing(realm, seller, {
+        status: 'closed',
+        resolution: 'cancelled',
+      });
+      await seedSale(realm, cancelledWithSale);
+      expect(await marketDb.disposeSoldResidueListings(realm, 10)).toBe(1);
+      expect(await disposedFlag(soldWithSale)).toBe(true);
+      expect(
+        await disposedFlag(soldExcludedSale),
+        'a voided sale row proves nothing; the item must not vanish on it',
+      ).toBe(false);
+      expect(
+        await disposedFlag(cancelledWithSale),
+        'a cancelled listing keeps its return flight even beside a stray sale row',
+      ).toBe(false);
+    });
+
+    it('undisposedClosedListings returns only undisposed non-sold residue', async () => {
+      const realm = 'residue-return';
+      const seller = await seedAccount();
+      const returnable = await seedListing(realm, seller, {
+        status: 'closed',
+        resolution: 'unsettled',
+      });
+      const alreadyDisposed = await seedListing(realm, seller, {
+        status: 'closed',
+        resolution: 'unsettled',
+        itemDisposed: true,
+      });
+      const soldResidue = await seedListing(realm, seller, {
+        status: 'closed',
+        resolution: 'sold',
+      });
+      const rows = await marketDb.undisposedClosedListings(realm, 10, []);
+      expect(rows.map((r) => r.id)).toEqual([returnable]);
+      expect(
+        rows.map((r) => r.id),
+        'a disposed copy must never mail twice',
+      ).not.toContain(alreadyDisposed);
+      expect(
+        rows.map((r) => r.id),
+        'sold residue belongs to the dispose arm',
+      ).not.toContain(soldResidue);
+    });
+  });
+
+  describe('finalize guards, in real SQL', () => {
+    function guardArgs(
+      realm: string,
+      scene: { listingId: number; settlement: WocSettlementRow; winnerBidId: number },
+    ) {
+      return {
+        settlementId: scene.settlement.id,
+        listingId: scene.listingId,
+        bidId: scene.winnerBidId,
+        sale: {
+          realm,
+          listingId: scene.listingId,
+          itemId: 'crown_of_embers',
+          item: { itemId: 'crown_of_embers', count: 1 },
+          priceCents: 1000,
+          amountBase: null,
+          sellerAccount: 1,
+          buyerAccount: 2,
+          sellerName: 'S',
+          buyerName: 'B',
+        },
+      };
+    }
+
+    async function saleCount(listingId: number): Promise<number> {
+      const res = await pool.query(
+        `SELECT count(*)::int AS n FROM woc_market_sales WHERE listing_id = $1`,
+        [listingId],
+      );
+      return Number(res.rows[0].n);
+    }
+
+    it('refuses a settlement outside the delivering pair and writes NOTHING', async () => {
+      const realm = 'finalize-guards';
+      const scene = await seedScene(realm, 'confirmed');
+      expect(await marketDb.finalizeDeliveredSettlement(guardArgs(realm, scene))).toBe('stale');
+      const state = await pool.query(`SELECT state FROM woc_market_settlements WHERE id = $1`, [
+        scene.settlement.id,
+      ]);
+      expect(state.rows[0].state, 'the CAS moved nothing').toBe('confirmed');
+      expect(await saleCount(scene.listingId), 'no sale row on a refused finalize').toBe(0);
+      const listing = await pool.query(
+        `SELECT status, item_disposed FROM woc_market_listings WHERE id = $1`,
+        [scene.listingId],
+      );
+      expect(listing.rows[0]).toEqual({ status: 'settling', item_disposed: false });
+    });
+
+    it('keeps a closed listing resolution and never re-queues a settled bond', async () => {
+      const realm = 'finalize-keep';
+      const scene = await seedScene(realm, 'delivering');
+      // The listing was suspended mid-flight and the winner bond already paid
+      // back by the suspend teardown.
+      await pool.query(
+        `UPDATE woc_market_listings SET status = 'closed', resolution = 'suspended' WHERE id = $1`,
+        [scene.listingId],
+      );
+      await pool.query(`UPDATE woc_market_bids SET bond_state = 'refunded' WHERE id = $1`, [
+        scene.winnerBidId,
+      ]);
+      expect(await marketDb.finalizeDeliveredSettlement(guardArgs(realm, scene))).toBe('finalized');
+      const row = await pool.query(
+        `SELECT status, resolution, item_disposed FROM woc_market_listings WHERE id = $1`,
+        [scene.listingId],
+      );
+      expect(row.rows[0], 'the operator verdict survives the close tail').toEqual({
+        status: 'closed',
+        resolution: 'suspended',
+        item_disposed: true,
+      });
+      const bond = await pool.query(`SELECT bond_state FROM woc_market_bids WHERE id = $1`, [
+        scene.winnerBidId,
+      ]);
+      expect(bond.rows[0].bond_state, 'refunded money never re-queues').toBe('refunded');
+    });
   });
 });

@@ -2005,5 +2005,348 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         'only a pending_bond row blocks',
       ).toBe(true);
     });
+
+    it('abandonPendingBid is holder-scoped and voids only an unsigned pending bond', async () => {
+      const realm = `bid-abandon-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const other = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const pending = await seedBid(realm, listing, bidder, { bondState: 'pending' });
+      // Another account cannot void someone else's bond.
+      expect(await marketDb.abandonPendingBid(realm, pending, other)).toBe(false);
+      expect(await bidRow(pending)).toMatchObject({ status: 'pending_bond' });
+      // An ACTIVE bid (held bond) is not abandonable through this arm.
+      const active = await seedBid(realm, listing, bidder, {
+        status: 'active',
+        bondState: 'held',
+      });
+      expect(await marketDb.abandonPendingBid(realm, active, bidder)).toBe(false);
+      expect(await bidRow(active)).toMatchObject({ status: 'active', bond_state: 'held' });
+      // The holder abandons their own unsigned pending bond.
+      expect(await marketDb.abandonPendingBid(realm, pending, bidder)).toBe(true);
+      expect(await bidRow(pending)).toMatchObject({ status: 'cancelled', bond_state: 'void' });
+    });
+
+    it('the bond poll reads only SIGNED pending bonds', async () => {
+      const realm = `bid-poll-signed-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const other = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const signed = await seedBid(realm, listing, bidder, {
+        bondSignature: `poll-signed-${seq}`,
+      });
+      const unsigned = await seedBid(realm, listing, other);
+      const polled = await marketDb.confirmingBonds(realm, 10, []);
+      expect(polled.map((r) => r.id)).toEqual([signed]);
+      expect(
+        polled.map((r) => r.id),
+        'an unsigned bond has nothing for the chain to decide',
+      ).not.toContain(unsigned);
+    });
+
+    it('the cancel-intent converge read skips an UNEXPIRED locked window', async () => {
+      const realm = `cancel-window-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const locked = await seedListing(realm, seller, {
+        cancelRequestedAtMs: BASE_MS - 20 * MINUTE_MS,
+        lockAccount: buyer,
+        lockExpiresAtMs: BASE_MS + 5 * MINUTE_MS,
+      });
+      const expired = await seedListing(realm, seller, {
+        cancelRequestedAtMs: BASE_MS - 20 * MINUTE_MS,
+        lockAccount: buyer,
+        lockExpiresAtMs: BASE_MS - 5 * MINUTE_MS,
+      });
+      const batch = await marketDb.cancelPendingListings(realm, BASE_MS, 10, []);
+      expect(batch.map((r) => r.id)).toEqual([expired]);
+      expect(
+        batch.map((r) => r.id),
+        'the holder keeps their unexpired window',
+      ).not.toContain(locked);
+    });
+  });
+
+  describe('buy-now claim diagnosis and cooldown scoping, in real SQL', () => {
+    it('the diagnosis ladder refuses from the row state', async () => {
+      const realm = `claim-diag-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const own = await seedListing(realm, seller);
+      expect(
+        await marketDb.claimBuyNowLock(realm, own, seller, BASE_MS, BASE_MS + 5 * MINUTE_MS),
+      ).toBe('own_listing');
+      const ending = await seedListing(realm, seller, { status: 'ending' });
+      expect(
+        await marketDb.claimBuyNowLock(realm, ending, buyer, BASE_MS, BASE_MS + 5 * MINUTE_MS),
+      ).toBe('not_active');
+      const auctionOnly = await seedListing(realm, seller, { buyNowCents: null });
+      expect(
+        await marketDb.claimBuyNowLock(realm, auctionOnly, buyer, BASE_MS, BASE_MS + 5 * MINUTE_MS),
+      ).toBe('no_buy_now');
+    });
+
+    it('an OPEN settlement refuses the claim even with no lock standing', async () => {
+      const realm = `claim-open-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const rival = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      await pool.query(
+        `INSERT INTO woc_market_settlements (
+           listing_id, realm, bid_id, attempt, buyer_account, buyer_character,
+           buyer_name, buyer_wallet, amount_cents, state, deadline_at
+         ) VALUES ($1, $2, NULL, 0, $3, 1, 'B', 'w', 1000, 'offered',
+                   to_timestamp($4 / 1000.0))`,
+        [listing, realm, buyer, BASE_MS + 15 * MINUTE_MS],
+      );
+      expect(
+        await marketDb.claimBuyNowLock(realm, listing, rival, BASE_MS, BASE_MS + 5 * MINUTE_MS),
+        'a paying buyer is never raced by a rival probe',
+      ).toBe('locked');
+      expect((await listingRow(listing)).buy_now_lock_account, 'no rival stamp').toBeNull();
+    });
+
+    it('a recent abandon on ANOTHER listing starts no reclaim cooldown here', async () => {
+      const realm = `claim-scope-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const here = await seedListing(realm, seller);
+      const there = await seedListing(realm, seller);
+      await pool.query(
+        `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
+         VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))`,
+        [realm, there, buyer, BASE_MS - 1_000],
+      );
+      const claimed = await marketDb.claimBuyNowLock(
+        realm,
+        here,
+        buyer,
+        BASE_MS,
+        BASE_MS + 5 * MINUTE_MS,
+      );
+      expect(typeof claimed === 'object' && 'id' in claimed ? claimed.id : claimed).toBe(here);
+    });
+
+    it('a directed buyer at the account cap still claims their window', async () => {
+      const realm = `claim-directed-cap-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const other = await seedListing(realm, seller);
+      for (let i = 1; i <= 3; i++) {
+        await pool.query(
+          `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
+           VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))`,
+          [realm, other, buyer, BASE_MS - i * 1_000],
+        );
+      }
+      const directed = await seedListing(realm, seller, { directedBuyerAccount: buyer });
+      const claimed = await marketDb.claimBuyNowLock(
+        realm,
+        directed,
+        buyer,
+        BASE_MS,
+        BASE_MS + 5 * MINUTE_MS,
+      );
+      expect(
+        typeof claimed === 'object' && 'id' in claimed ? claimed.id : claimed,
+        'the public-loop cooldowns never gate a directed window',
+      ).toBe(directed);
+    });
+
+    it('closeCancelPendingListing skips while a bid stands', async () => {
+      const realm = `cancel-close-bids-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const bidder = await seedAccount();
+      const listing = await seedListing(realm, seller, {
+        cancelRequestedAtMs: BASE_MS - 20 * MINUTE_MS,
+        lockAccount: buyer,
+        lockExpiresAtMs: BASE_MS - 5 * MINUTE_MS,
+      });
+      await seedBid(realm, listing, bidder, { status: 'active', bondState: 'held' });
+      expect(await marketDb.closeCancelPendingListing(realm, listing, BASE_MS)).toBe('skip');
+      expect((await listingRow(listing)).status, 'a standing bid blocks the converge close').toBe(
+        'active',
+      );
+    });
+
+    it('submitBondSignature lands only on a pending bid and answers reuse typed', async () => {
+      const realm = `bond-sig-guards-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const outbid = await seedBid(realm, listing, bidder, { status: 'outbid' });
+      expect(await marketDb.submitBondSignature(outbid, `late-sig-${seq}`, BASE_MS)).toBe(
+        'not_pending',
+      );
+      expect((await bidRow(outbid)).bond_signature, 'no recording on a dead bid').toBeNull();
+      const first = await seedBid(realm, listing, bidder, { bondState: 'pending' });
+      const second = await seedBid(realm, listing, await seedAccount(), {
+        bondState: 'pending',
+      });
+      const shared = `shared-sig-${seq}`;
+      const landed = await marketDb.submitBondSignature(first, shared, BASE_MS);
+      expect(typeof landed === 'object').toBe(true);
+      expect(
+        await marketDb.submitBondSignature(second, shared, BASE_MS),
+        'one signature funds one bond',
+      ).toBe('signature_reused');
+      expect((await bidRow(second)).bond_signature).toBeNull();
+    });
+
+    it('bid state guards never move settled money', async () => {
+      const realm = `bid-state-guards-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const active = await seedBid(realm, listing, bidder, {
+        status: 'active',
+        bondState: 'pending',
+      });
+      expect(await marketDb.lapseBid(active), 'lapse reaps only pending bids').toBe(false);
+      expect(await bidRow(active)).toMatchObject({ status: 'active', bond_state: 'pending' });
+      const outbid = await seedBid(realm, listing, bidder, { status: 'outbid' });
+      expect(
+        await marketDb.setBidBondQuote(outbid, `dead-ref-${seq}`, BASE_MS + MINUTE_MS, 70),
+        'no quote lands on a dead bid',
+      ).toBe(false);
+      const due = await seedBid(realm, listing, bidder, {
+        status: 'outbid',
+        bondState: 'refund_due',
+      });
+      await marketDb.markBondHeld(due);
+      expect((await bidRow(due)).bond_state, 'a due refund is never re-held').toBe('refund_due');
+    });
+
+    it('the activation ladder, in real SQL', async () => {
+      const realm = `activate-ladder-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const rival = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const winner = await seedBid(realm, listing, bidder, {
+        status: 'active',
+        bondState: 'held',
+        amountCents: 900,
+      });
+      await pool.query(
+        `UPDATE woc_market_listings SET current_bid_cents = 900, current_bid_id = $2 WHERE id = $1`,
+        [listing, winner],
+      );
+      expect(await marketDb.activateBid(winner, BASE_MS), 'an active bid is not pending').toBe(
+        'not_pending',
+      );
+      expect(await bidRow(winner)).toMatchObject({ status: 'active' });
+      const equal = await seedBid(realm, listing, rival, { amountCents: 900 });
+      expect(await marketDb.activateBid(equal, BASE_MS), 'a tie never outbids').toBe('superseded');
+      expect(await bidRow(equal)).toMatchObject({ status: 'outbid' });
+      const higher = await seedBid(realm, listing, rival, { amountCents: 950 });
+      expect(await marketDb.activateBid(higher, BASE_MS)).toBe('activated');
+      expect(await bidRow(higher)).toMatchObject({ status: 'active' });
+      expect(await bidRow(winner), 'the demoted winner routes to refund').toMatchObject({
+        status: 'outbid',
+        bond_state: 'refund_due',
+      });
+    });
+
+    it('activation never demotes a WON prior row', async () => {
+      const realm = `activate-won-prior-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const wonPrior = await seedBid(realm, listing, bidder, {
+        status: 'won',
+        bondState: 'held',
+        amountCents: 900,
+      });
+      await pool.query(
+        `UPDATE woc_market_listings SET current_bid_cents = 900, current_bid_id = $2 WHERE id = $1`,
+        [listing, wonPrior],
+      );
+      const pending = await seedBid(realm, listing, await seedAccount(), { amountCents: 950 });
+      expect(await marketDb.activateBid(pending, BASE_MS)).toBe('activated');
+      expect(await bidRow(wonPrior), 'a won verdict is not an active bid to demote').toMatchObject({
+        status: 'won',
+        bond_state: 'held',
+      });
+    });
+
+    it('the abandon recorder exempt window, in real SQL', async () => {
+      const realm = `abandon-exempt-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const lockExp = BASE_MS - MINUTE_MS;
+      const exemptReason = rulesMod.WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS[0];
+      async function seedFailed(
+        listingId: number,
+        over: { deadlineMs?: number; sig?: string | null; reason?: string },
+      ): Promise<void> {
+        seq++;
+        await pool.query(
+          `INSERT INTO woc_market_settlements (
+             listing_id, realm, bid_id, attempt, buyer_account, buyer_character,
+             buyer_name, buyer_wallet, amount_cents, state, deadline_at,
+             tx_signature, fail_reason
+           ) VALUES ($1, $2, NULL, 0, $3, 1, 'B', 'w', 1000, 'failed',
+                     to_timestamp($4 / 1000.0), $5, $6)`,
+          [
+            listingId,
+            realm,
+            buyer,
+            over.deadlineMs ?? lockExp,
+            over.sig === undefined ? `exempt-sig-${seq}` : over.sig,
+            over.reason ?? exemptReason,
+          ],
+        );
+      }
+      async function recorded(listingId: number): Promise<number> {
+        const res = await pool.query(
+          `SELECT count(*)::int AS n FROM woc_market_buy_now_abandons
+            WHERE listing_id = $1 AND account = $2`,
+          [listingId, buyer],
+        );
+        return Number(res.rows[0].n);
+      }
+      // Exempt: the chain-plausible refusal with a REAL recorded signature on
+      // exactly this window records no abandon.
+      const exempt = await seedListing(realm, seller);
+      await seedFailed(exempt, {});
+      await marketDb.recordBuyNowAbandon(realm, exempt, buyer, lockExp);
+      expect(await recorded(exempt), 'a chain-plausible failure is not an abandon').toBe(0);
+      // A non-exempt reason records.
+      const wrongReason = await seedListing(realm, seller);
+      await seedFailed(wrongReason, { reason: 'buyer_default' });
+      await marketDb.recordBuyNowAbandon(realm, wrongReason, buyer, lockExp);
+      expect(await recorded(wrongReason), 'a plain default pays the window').toBe(1);
+      // A bare posted claim with NO signature records: one fabricated request
+      // must not bypass the cooldown arm.
+      const noSig = await seedListing(realm, seller);
+      await seedFailed(noSig, { sig: null });
+      await marketDb.recordBuyNowAbandon(realm, noSig, buyer, lockExp);
+      expect(await recorded(noSig)).toBe(1);
+      // A signature on a DIFFERENT window exempts nothing here.
+      const wrongWindow = await seedListing(realm, seller);
+      await seedFailed(wrongWindow, { deadlineMs: lockExp - MINUTE_MS });
+      await marketDb.recordBuyNowAbandon(realm, wrongWindow, buyer, lockExp);
+      expect(await recorded(wrongWindow)).toBe(1);
+      // The ledger dedupes on the window triple.
+      await marketDb.recordBuyNowAbandon(realm, wrongWindow, buyer, lockExp);
+      expect(await recorded(wrongWindow), 'one window, one row').toBe(1);
+    });
+
+    it('the schema enforces one bond per reference', async () => {
+      const realm = `bond-ref-unique-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const ref = `dup-ref-${seq}`;
+      await seedBid(realm, listing, bidder, { bondReference: ref });
+      await expect(
+        seedBid(realm, listing, await seedAccount(), { bondReference: ref }),
+      ).rejects.toMatchObject({ code: '23505' });
+    });
   });
 });
