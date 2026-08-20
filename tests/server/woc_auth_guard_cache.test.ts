@@ -233,19 +233,18 @@ describe('token arm', () => {
 });
 
 describe('moderation arm', () => {
-  it('caches the ROW, not the verdict: a suspension unlocks on time with no refetch', async () => {
+  it('serves a warm suspension verdict inside the TTL from one fetch', async () => {
     const r = rig();
     r.accounts.set(7, cleanRow({ suspended_until: new Date(NOW + 60_000).toISOString() }));
     expect((await r.cache.moderationStatusForAccount(7)).locked).toBe(true);
     r.advance(TTL - 1_000);
+    // Still warm: the second locked verdict came from the cached row.
     expect((await r.cache.moderationStatusForAccount(7)).locked).toBe(true);
-    r.advance(TTL - 1_000);
-    // The row refetches on TTL, but the flip below happens WITHIN a TTL
-    // window over one cached row: freeze the fetch count around it.
-    const beforeFlip = r.calls.moderation;
-    r.advance(60_000);
-    expect((await r.cache.moderationStatusForAccount(7)).locked).toBe(false);
-    expect(r.calls.moderation).toBeGreaterThanOrEqual(beforeFlip);
+    expect(r.calls.moderation).toBe(1);
+    // Past the TTL the row refetches exactly once.
+    r.advance(TTL);
+    expect((await r.cache.moderationStatusForAccount(7)).locked).toBe(true);
+    expect(r.calls.moderation).toBe(2);
   });
 
   it('flips locked to unlocked across suspended_until over ONE cached row', async () => {

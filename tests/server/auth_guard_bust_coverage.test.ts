@@ -53,16 +53,27 @@ interface Site {
 
 /** Every in-scope write site in one stripped source, by the column-precise
  *  classifier described in the header. */
-function discoverSites(file: string, src: string): { inScope: Site[]; accountDeletes: Site[] } {
+function discoverSites(
+  file: string,
+  src: string,
+): { inScope: Site[]; accountDeletes: Site[]; unclassifiable: Site[] } {
   const inScope: Site[] = [];
   const accountDeletes: Site[] = [];
+  const unclassifiable: Site[] = [];
   for (const m of src.matchAll(/\b(INSERT\s+INTO|DELETE\s+FROM|UPDATE)\s+auth_tokens\b/g)) {
     inScope.push({ file, index: m.index ?? 0, kind: 'auth_tokens' });
   }
   for (const m of src.matchAll(/\bUPDATE\s+accounts\b/g)) {
-    // The SET list ends at the WHERE (bounded window); only a write that
-    // touches a projected column invalidates a cached row.
-    const setClause = src.slice(m.index, (m.index ?? 0) + 700).split(/\bWHERE\b/)[0];
+    // The SET list ends at the WHERE. The window is generous, and a
+    // statement whose WHERE sits beyond it is UNCLASSIFIABLE and reds
+    // loudly below: a giant SET list must never silently classify out with
+    // a projected column hiding past the truncation.
+    const window = src.slice(m.index, (m.index ?? 0) + 1500);
+    if (!/\bWHERE\b/.test(window)) {
+      unclassifiable.push({ file, index: m.index ?? 0, kind: 'accounts_update_unbounded' });
+      continue;
+    }
+    const setClause = window.split(/\bWHERE\b/)[0];
     if (PROJECTION_COLUMNS.some((c) => setClause.includes(c))) {
       inScope.push({ file, index: m.index ?? 0, kind: 'accounts_update' });
     }
@@ -81,7 +92,7 @@ function discoverSites(file: string, src: string): { inScope: Site[]; accountDel
   for (const m of src.matchAll(/\bDELETE\s+FROM\s+accounts\b/g)) {
     accountDeletes.push({ file, index: m.index ?? 0, kind: 'accounts_delete' });
   }
-  return { inScope, accountDeletes };
+  return { inScope, accountDeletes, unclassifiable };
 }
 
 /** Top-level exported function spans: [header index, next header index). All
@@ -110,7 +121,11 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
     let totalInScope = 0;
     for (const file of files) {
       const src = sources.get(file) ?? '';
-      const { inScope } = discoverSites(file, src);
+      const { inScope, unclassifiable } = discoverSites(file, src);
+      expect(
+        unclassifiable,
+        `${file}: UPDATE accounts statements whose SET list outruns the scan window`,
+      ).toEqual([]);
       if (inScope.length === 0) continue;
       const spans = functionSpans(src);
       const rel = file.slice(SERVER_DIR.length + 1);
@@ -134,9 +149,10 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
           busts.length,
           `${rel}: ${span.name} writes the guard projection (${site.kind}) but calls no bust`,
         ).toBeGreaterThan(0);
-        const perFile = (discovered[rel] ??= {});
-        const perFn = (perFile[span.name] ??= { sites: [], busts });
-        perFn.sites.push(site.kind);
+        if (discovered[rel] === undefined) discovered[rel] = {};
+        const perFile = discovered[rel];
+        if (perFile[span.name] === undefined) perFile[span.name] = { sites: [], busts };
+        perFile[span.name].sites.push(site.kind);
       }
     }
     // The reconciliation table: DISCOVERED map, pinned exactly. A new writer
