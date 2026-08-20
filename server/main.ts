@@ -379,8 +379,8 @@ import {
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest } from './web_login_guard';
 import {
+  bustWocAuthGuardAccount,
   configureWocAuthGuardCache,
-  resetWocAuthGuardCache,
   wocAuthGuardCacheStats,
 } from './woc_auth_guard_cache';
 import { cachedWocBalance, handleWocBalance, parseWocBalanceQuery } from './woc_balance';
@@ -3326,8 +3326,18 @@ export async function startServer(): Promise<http.Server> {
   const game = liveGame();
   const generalChatQuotaListener = createGeneralChatQuotaListener({
     activeAccountIds: () => [...game.liveAccountIds()],
-    onResync: (accountIds, policies) => game.resyncGeneralChatRateLimits(accountIds, policies),
-    onChange: (accountId, policy) => game.applyGeneralChatRateLimitLive(accountId, policy),
+    onResync: (accountIds, policies) => {
+      game.resyncGeneralChatRateLimits(accountIds, policies);
+      // The auth-guard cache projects the policy columns: a resync means the
+      // rows may have moved under ANOTHER process's write, so the cached
+      // moderation rows drop too (closing the cross-process gap for this one
+      // projection slice at zero cost; every other column keeps the TTL bound).
+      for (const accountId of accountIds) bustWocAuthGuardAccount(accountId);
+    },
+    onChange: (accountId, policy) => {
+      game.applyGeneralChatRateLimitLive(accountId, policy);
+      bustWocAuthGuardAccount(accountId);
+    },
     onError: (error) => console.error('general chat quota listener failed:', error),
   });
   // LISTEN commits before the initial bounded resync, so no policy edit can be
@@ -3799,7 +3809,12 @@ export async function startServer(): Promise<http.Server> {
     // cache instance (the registry teardown rule; repeated boots in one
     // process would otherwise chain-leak each boot's whole cache).
     registerWocMarketReadCacheForBusts(null);
-    resetWocAuthGuardCache();
+    // Drop the auth-guard cache CONTENTS but keep the singleton armed: the
+    // marketplace runtime retains this same instance, so nulling the bust
+    // target here would leave a second in-process boot reading through a
+    // cache whose busts are dead (the reviewed W2 shape). One instance per
+    // process is the design; empty is the safe shutdown state.
+    wocAuthGuardCache.bustAll();
     await wocMarketMonitor.stop();
     await generalChatQuotaListener.stop();
     game.stop();

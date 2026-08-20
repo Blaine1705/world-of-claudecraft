@@ -13,9 +13,12 @@
 //    cached suspension unlocks on time, a cached token refuses at its own
 //    expires_at, and no verdict is ever frozen.
 //  - NO negative caching. A null probe (unknown, expired, or revoked row)
-//    installs nothing: an attacker spraying random bearers pays the same DB
+//    installs nothing: an attacker spraying INVALID bearers pays the same DB
 //    probe it pays today and can never become an LRU eviction lever over
-//    real entries.
+//    real entries. (VALID tokens are a perf-only lever: an account minting
+//    and using more than the token cap of real sessions evicts others'
+//    entries, costing them a re-fetch, never a wrong answer; login is
+//    turnstile-gated and rate-limited, and the caps are realm-sized.)
 //  - NO stale-serve. A failed refresh propagates exactly like the direct
 //    read's failure; nothing installs, and a warm-but-TTL-expired entry is
 //    dropped, not served.
@@ -31,6 +34,20 @@
 //    database; accounts and auth_tokens are not realm-scoped) is invisible
 //    here until the TTL lapses. WOC_AUTH_GUARD_CACHE_TTL_MS is that bound
 //    and is sized short because of it.
+//
+// Recorded bounds and acceptances: raw bearer values live as map keys for up
+// to the LRU lifetime (an idle entry is dropped on its next read or by
+// eviction, not swept), a heap-level exposure comparable to the auth_tokens
+// table's own plaintext rows and the accepted trade for keyed busts. The
+// flights map is unbounded by cap but bounded by CONCURRENT in-flight
+// probes (each entry self-clears at settle), so under pool saturation it
+// mirrors the pool queue, never outgrows it. This module deliberately FORKS
+// the generic cached_read.ts shapes rather than extending them with options:
+// no-stale-serve, no-negative-caching, the content-keyed install veto, and
+// the account index are security-load-bearing behavior, not configuration,
+// and burying them in a shared factory's option matrix is how one gets
+// quietly flipped; revisit only if a second consumer needs this exact
+// contract.
 
 import type {
   AccountModerationRow,
@@ -44,20 +61,43 @@ import { computeModerationStatus, tokenInfoFromRow } from './auth_guard_core';
  * The one staleness bound: an in-process refresh cadence AND the ceiling on
  * how long a revoked token or a fresh ban committed by ANOTHER process can
  * keep answering from this cache (same-process writes bust immediately).
- * 5 seconds: the six metered marketplace GETs poll at roughly 2s, so one
- * account's steady-state guard cost drops from about two dozen point reads
- * per window to two, while the cross-process delay stays shorter than the
- * shortest client-facing moderation surface would make visible.
+ * 5 seconds. Measured against the real client cadences (the trade window
+ * polls offers at 2s; the Exchange polls two GETs in parallel at 15s idle
+ * and 3s awaiting-chain), the guard-read reduction is 3x for the trade
+ * window, 2x for the idle Exchange (its 15s cadence exceeds the TTL, so
+ * only the two parallel GETs collapse), and 4x for the awaiting chain;
+ * raising the TTL to beat the idle cadence is exactly what the staleness
+ * contract refuses.
  */
 export const WOC_AUTH_GUARD_CACHE_TTL_MS = 5_000;
-/** LRU bound on cached token rows: far above a realm's concurrent bearer
- *  count; eviction costs one re-fetch, never correctness. */
-export const WOC_AUTH_GUARD_TOKEN_CACHE_MAX = 1_024;
-/** LRU bound on cached moderation rows, keyed by account id. */
-export const WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX = 1_024;
+/** LRU bound on cached token rows, sized against the realm admission cap
+ *  (MAX_PLAYERS_PER_REALM defaults to 5,000, the character_rank_cache sizing
+ *  precedent) TIMES a small per-account token multiple (web + desktop +
+ *  companion sessions), because LRU degrades as a CLIFF, not a slope: a
+ *  working set past the cap evicts every entry before its own next poll and
+ *  the guard load reverts to the uncached floor at exactly peak hours. Rows
+ *  are three small fields, so the headroom costs single-digit MB. Eviction
+ *  costs one re-fetch, never correctness; the stats on the stuck readout and
+ *  the prometheus series make thrash visible. */
+export const WOC_AUTH_GUARD_TOKEN_CACHE_MAX = 10_240;
+/** LRU bound on cached moderation rows, keyed by account id: the realm
+ *  admission cap with headroom (one row per account). */
+export const WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX = 5_120;
 /** The account-to-token index sweeps its eviction residue when it exceeds
  *  this multiple of the token cap (see the index note on the class). */
 export const WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR = 4;
+/** The recent-account-bust veto ledger's SOFT bound: past this size the
+ *  prune drops entries older than the retention, then keeps dropping
+ *  oldest-first down to the cap, but NEVER an entry younger than the
+ *  min-age floor (a fetch cannot outlive the pg deadlines, so only an
+ *  entry older than the floor is provably vetoing no live flight). Under a
+ *  bust burst across more distinct accounts than the cap inside the floor
+ *  window the map can exceed the cap for up to the floor duration; entries
+ *  are two numbers, so the excursion is bytes, and correctness is
+ *  one-directional (a retained entry can only over-decline an install). */
+export const WOC_AUTH_GUARD_RECENT_BUSTS_MAX = 512;
+export const WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS = 60_000;
+export const WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS = 20_000;
 
 /** The two raw-row readers (server/db.ts authTokenRowForToken and
  *  moderationRowForAccount in production; fakes in tests). */
@@ -118,6 +158,11 @@ class RowArm<K, V> {
     private readonly now: () => number,
     /** Called when a fresh row installs (the token arm indexes by account). */
     private readonly onInstall?: (key: K, row: V) => void,
+    /** Veto an install from the row's CONTENT and the flight's start time:
+     *  the token arm declines a row whose account was bust AFTER the fetch
+     *  began (an account-keyed bust cannot cancel a flight the index has
+     *  never seen, so the veto closes that half of the lost-bust race). */
+    private readonly installGuard?: (row: V, startedAtMs: number) => boolean,
   ) {}
 
   read(key: K): Promise<V | null> {
@@ -138,11 +183,16 @@ class RowArm<K, V> {
     const standing = this.flights.get(key);
     if (standing !== undefined && !standing.cancelled) return standing.promise;
     const flight: Flight<V> = { cancelled: false, promise: Promise.resolve(null) };
+    const startedAtMs = this.now();
     flight.promise = this.fetch(key)
       .then((row) => {
-        // Install only positive rows (no negative caching), and only when no
-        // bust landed mid-flight (the lost-bust epoch rule).
-        if (row !== null && !flight.cancelled) this.install(key, row);
+        // Install only positive rows (no negative caching), only when no
+        // bust landed mid-flight (the lost-bust epoch rule), and only when
+        // the row's content passes the veto (the account-keyed half of the
+        // same rule; see installGuard on the constructor).
+        if (row !== null && !flight.cancelled && this.installGuard?.(row, startedAtMs) !== false) {
+          this.install(key, row);
+        }
         return row;
       })
       .finally(() => {
@@ -210,6 +260,12 @@ export class WocAuthGuardCache {
   // residue here (over-busting is safe); the sweep below bounds it.
   private readonly tokensByAccount = new Map<number, Set<string>>();
   private indexSize = 0;
+  // When each account was last account-keyed-bust, for the install veto: a
+  // token fetch IN FLIGHT at bust time is invisible to the index (nothing is
+  // indexed until install), so a revocation sweep could otherwise be outrun
+  // by an install of the pre-delete row. Entries prune amortized; no flight
+  // outlives the fetch deadline, so an aged entry can veto nothing real.
+  private readonly recentAccountBusts = new Map<number, number>();
   private readonly now: () => number;
   private readonly tokenMax: number;
 
@@ -226,6 +282,7 @@ export class WocAuthGuardCache {
       this.tokenMax,
       this.now,
       (token, row) => this.indexToken(token, row.accountId),
+      (row, startedAtMs) => (this.recentAccountBusts.get(row.accountId) ?? -1) < startedAtMs,
     );
     this.accountArm = new RowArm(
       (accountId) => this.readers.fetchModerationRow(accountId),
@@ -259,6 +316,24 @@ export class WocAuthGuardCache {
   /** Drop the account's moderation row AND every indexed token of the
    *  account (account-keyed revocations and every moderation write). */
   bustAccount(accountId: number): void {
+    // Recorded BEFORE the keyed drops so a token fetch racing this bust is
+    // vetoed at install whatever interleaving the event loop deals.
+    this.recentAccountBusts.set(accountId, this.now());
+    if (this.recentAccountBusts.size > WOC_AUTH_GUARD_RECENT_BUSTS_MAX) {
+      const nowMs = this.now();
+      const staleCutoff = nowMs - WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS;
+      for (const [account, atMs] of this.recentAccountBusts) {
+        if (atMs < staleCutoff) this.recentAccountBusts.delete(account);
+      }
+      // Still above the cap after the retention pass (a bust burst): drop
+      // oldest-first down to the cap, but never an entry younger than the
+      // min-age floor, which no live flight can predate (see the constant).
+      const floorCutoff = nowMs - WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS;
+      for (const [account, atMs] of this.recentAccountBusts) {
+        if (this.recentAccountBusts.size <= WOC_AUTH_GUARD_RECENT_BUSTS_MAX) break;
+        if (atMs < floorCutoff) this.recentAccountBusts.delete(account);
+      }
+    }
     this.accountArm.bust(accountId);
     const tokens = this.tokensByAccount.get(accountId);
     if (tokens !== undefined) {
@@ -272,6 +347,7 @@ export class WocAuthGuardCache {
     this.tokenArm.bustAll();
     this.accountArm.bustAll();
     this.tokensByAccount.clear();
+    this.recentAccountBusts.clear();
     this.indexSize = 0;
   }
 
@@ -353,6 +429,12 @@ export function bustWocAuthGuardToken(token: string): void {
  *  and EVERY write that changes the account's moderation projection. */
 export function bustWocAuthGuardAccount(accountId: number): void {
   active?.bustAccount(accountId);
+}
+
+/** Flush everything (operator lever / test teardown); the singleton stays
+ *  armed so writers keep busting. */
+export function bustWocAuthGuardAll(): void {
+  active?.bustAll();
 }
 
 /** Stats for the stuck readout; null before boot wiring. */

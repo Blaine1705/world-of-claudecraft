@@ -310,8 +310,10 @@ export async function setGeneralChatRateLimit(input: {
     ]);
     await client.query('COMMIT');
     // The policy columns (messages/window_minutes) ride the cached guard
-    // read's projection; post-commit so a concurrent read cannot re-prime the
-    // old row. The pg_notify above already covers the OTHER processes.
+    // read's projection; post-commit so a concurrent read cannot re-prime
+    // the old row. Other processes learn through the pg_notify above ONLY
+    // because main.ts's listener also busts the guard cache on
+    // change/resync; the NOTIFY payload itself reaches nothing else here.
     bustWocAuthGuardAccount(input.accountId);
     return { before, after, changed: true };
   } catch (error) {

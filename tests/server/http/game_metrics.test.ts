@@ -21,6 +21,7 @@ import {
   registerGameStateMetrics,
   type TickPhaseMillis,
   WOC_ACCOUNTS_ONLINE,
+  WOC_AUTH_GUARD_CACHE,
   WOC_BATTLEGROUND_CAPTURES_TOTAL,
   WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
   WOC_BATTLEGROUND_MATCHES_TOTAL,
@@ -66,6 +67,10 @@ import {
   WOC_ESCROW_QUEUE_OUTCOMES,
   WS_DROP_CAUSES,
 } from '../../../server/http/game_signals';
+import {
+  configureWocAuthGuardCache,
+  resetWocAuthGuardCache,
+} from '../../../server/woc_auth_guard_cache';
 
 /** A GameStateSource returning fixed values; override any field per test. */
 function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
@@ -1188,6 +1193,39 @@ describe('guild bank activity log cache readout', () => {
     await registry.metrics();
     const second = await registry.metrics();
     expect(second).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="refreshes"} 1`);
+  });
+
+  it('exposes the auth-guard cache arms, zero-backfilled before boot and live after', async () => {
+    // Literal name pin: a rename must fail here, not merely swap a constant.
+    expect(WOC_AUTH_GUARD_CACHE).toBe('woc_auth_guard_cache');
+    resetWocAuthGuardCache();
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const cold = await registry.metrics();
+    // Unarmed (pre-boot): every series exists at zero so an alert rule can
+    // fire on its first real sample.
+    for (const arm of ['tokens', 'accounts']) {
+      for (const kind of ['reads', 'refreshes', 'evictions', 'busts', 'entries']) {
+        expect(cold).toContain(`${WOC_AUTH_GUARD_CACHE}{arm="${arm}",kind="${kind}"} 0`);
+      }
+    }
+    // Armed: the gauge reads the LIVE singleton on every scrape.
+    try {
+      const cache = configureWocAuthGuardCache({
+        fetchTokenRow: async () => ({
+          accountId: 7,
+          scope: 'full',
+          expiresAtMs: Date.now() + 3600_000,
+        }),
+        fetchModerationRow: async () => null,
+      });
+      await cache.accountAndScopeForToken('a'.repeat(64));
+      const warm = await registry.metrics();
+      expect(warm).toContain(`${WOC_AUTH_GUARD_CACHE}{arm="tokens",kind="reads"} 1`);
+      expect(warm).toContain(`${WOC_AUTH_GUARD_CACHE}{arm="tokens",kind="entries"} 1`);
+    } finally {
+      resetWocAuthGuardCache();
+    }
   });
 });
 

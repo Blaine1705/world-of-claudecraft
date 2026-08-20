@@ -1169,13 +1169,21 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // The auth-guard read cache (the second settled rider): ONE configure
     // call arms the singleton over the two REAL row fetchers, the SAME
     // instance rides the runtime injection above, its stats join this
-    // readout, and shutdown clears the singleton so busts never pin a dead
-    // instance across an in-process reboot.
+    // readout, and shutdown FLUSHES the cache while keeping the singleton
+    // armed: the runtime retains the same instance, so nulling the bust
+    // target would leave a second in-process boot reading through a cache
+    // no writer can bust (the review round's W2 shape).
     expect(code.match(/configureWocAuthGuardCache\(/g)).toHaveLength(1);
     expect(code).toContain('fetchTokenRow: authTokenRowForToken,');
     expect(code).toContain('fetchModerationRow: moderationRowForAccount,');
     expect(code).toContain('authGuard: wocAuthGuardCacheStats()');
-    expect(code).toContain('resetWocAuthGuardCache();');
+    expect(code).toContain('wocAuthGuardCache.bustAll();');
+    expect(code).not.toContain('resetWocAuthGuardCache');
+    // The quota NOTIFY listener busts the guard cache on BOTH arms, closing
+    // the cross-process gap for the policy columns (the one projection slice
+    // with an existing broadcast channel).
+    expect(code).toContain('onChange: (accountId, policy) => {');
+    expect(code.match(/bustWocAuthGuardAccount\(accountId\)/g)).toHaveLength(2);
     // The two degraded-state counters ride the same readout: the price
     // cache's memo ages and the idle-kill count (a stall storm's client
     // evictions must be a number an operator can watch, not log volume).

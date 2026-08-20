@@ -62,6 +62,7 @@ import {
   ROD_FEE_RECIPE_IDS,
   rodFeeForRecipe,
 } from '../fishing_telemetry';
+import { wocAuthGuardCacheStats } from '../woc_auth_guard_cache';
 import {
   type GameMetricsCounters,
   GENERAL_CHAT_QUOTA_DB_OUTCOMES,
@@ -159,6 +160,13 @@ export const WOC_ESCROW_QUEUE_TOTAL = 'woc_escrow_queue_total';
  *  with a `kind` label rather than six names: the vocabulary is closed and
  *  fixed, and an operator reads them together or not at all. */
 export const WOC_GUILD_BANK_LOG_CACHE = 'woc_guild_bank_log_cache';
+
+/** Marketplace auth-guard read cache readout (token and moderation arms),
+ *  labeled by arm and counter name. This is the one cache whose degradation
+ *  is a CLIFF (an over-cap working set evicts every entry before its next
+ *  poll), so the alertable series exists precisely to see the cliff form:
+ *  watch refreshes approaching reads, and evictions climbing. */
+export const WOC_AUTH_GUARD_CACHE = 'woc_auth_guard_cache';
 
 /** Total copper credited to acting players, labeled by economic surface. */
 export const WOC_COPPER_CREDITED_TOTAL = 'woc_copper_credited_total';
@@ -561,6 +569,27 @@ export function registerGameStateMetrics(
       this.set({ kind: 'busts' }, stats.busts);
       this.set({ kind: 'entries' }, stats.entries);
       this.set({ kind: 'dirty_guilds' }, stats.dirtyGuilds);
+    },
+  });
+  new Gauge({
+    name: WOC_AUTH_GUARD_CACHE,
+    help: 'Marketplace auth-guard read cache: reads, refreshes (the residual query rate), evictions, busts, and live entries, per arm (tokens, accounts). Zero until the boot wiring arms the cache.',
+    labelNames: ['arm', 'kind'],
+    registers: [registry],
+    collect() {
+      // The process singleton's stats accessor, null before the boot wiring
+      // arms the cache: the zero fallback keeps every series alive so an
+      // alert rule can fire on its first real sample (the zero-backfill rule
+      // the counters above follow).
+      const stats = wocAuthGuardCacheStats();
+      for (const arm of ['tokens', 'accounts'] as const) {
+        const armStats = stats?.[arm] ?? null;
+        this.set({ arm, kind: 'reads' }, armStats?.reads ?? 0);
+        this.set({ arm, kind: 'refreshes' }, armStats?.refreshes ?? 0);
+        this.set({ arm, kind: 'evictions' }, armStats?.evictions ?? 0);
+        this.set({ arm, kind: 'busts' }, armStats?.busts ?? 0);
+        this.set({ arm, kind: 'entries' }, armStats?.entries ?? 0);
+      }
     },
   });
   const copperCredited = new Counter({

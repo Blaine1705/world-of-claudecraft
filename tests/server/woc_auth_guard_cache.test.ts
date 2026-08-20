@@ -170,16 +170,22 @@ describe('token arm', () => {
     expect(r.cache.stats().tokens.entries).toBe(0);
   });
 
-  it('answers null after a token-keyed bust via a fresh probe', async () => {
+  it('answers null after a token-keyed bust via a fresh probe, leaving strangers warm', async () => {
     const r = rig();
     r.tokens.set('t1', liveToken());
+    r.tokens.set('stranger', liveToken(8));
     await r.cache.accountAndScopeForToken('t1');
+    await r.cache.accountAndScopeForToken('stranger');
     r.tokens.delete('t1');
     // Without the bust the cached row would still answer.
     await expect(r.cache.accountAndScopeForToken('t1')).resolves.not.toBeNull();
     r.cache.bustToken('t1');
     await expect(r.cache.accountAndScopeForToken('t1')).resolves.toBeNull();
-    expect(r.calls.token).toBe(2);
+    // KEYED, not a flush: the stranger's entry never refetches (a flush-all
+    // bust would turn every logout into a guard-read stampede).
+    const before = r.calls.token;
+    await expect(r.cache.accountAndScopeForToken('stranger')).resolves.not.toBeNull();
+    expect(r.calls.token).toBe(before);
   });
 
   it('declines the install of a fetch a bust cancelled mid-flight (lost-bust rule)', async () => {
@@ -210,6 +216,48 @@ describe('token arm', () => {
     expect(cache.stats().tokens.entries).toBe(0);
     resolveFetch(null);
     await expect(postBust).resolves.toBeNull();
+  });
+
+  it('vetoes the install of a token fetch an ACCOUNT-keyed bust outran (the index-blind race)', async () => {
+    // The account index only learns a token at INSTALL time, so an
+    // account-keyed bust (revocation sweep, prefix delete, password reset)
+    // cannot cancel a flight for a not-yet-cached token. The install veto
+    // closes that half of the lost-bust rule: a row fetched BEFORE the bust
+    // must never install after it.
+    let resolveFetch: (row: AuthTokenRow | null) => void = () => {};
+    let fetches = 0;
+    const cache = new WocAuthGuardCache(
+      {
+        fetchTokenRow: () => {
+          fetches += 1;
+          return new Promise((resolve) => {
+            resolveFetch = resolve;
+          });
+        },
+        fetchModerationRow: async () => null,
+      },
+      { now: () => NOW },
+    );
+    const inFlight = cache.accountAndScopeForToken('t1');
+    const settle = resolveFetch;
+    // The revocation commits and busts BY ACCOUNT while the fetch is mid-air.
+    cache.bustAccount(7);
+    settle(liveToken(7));
+    // The pre-bust joiner still receives its flight's answer once...
+    await expect(inFlight).resolves.toEqual({ accountId: 7, scope: 'full' });
+    // ...but the pre-delete row must NOT be installed: the next read
+    // re-probes instead of serving the revoked token for a TTL.
+    expect(cache.stats().tokens.entries).toBe(0);
+    const next = cache.accountAndScopeForToken('t1');
+    expect(fetches).toBe(2);
+    resolveFetch(null);
+    await expect(next).resolves.toBeNull();
+    // A STRANGER's fetch racing the same bust installs fine (the veto is
+    // keyed by the row's account, not a flush).
+    const stranger = cache.accountAndScopeForToken('t2');
+    resolveFetch(liveToken(8));
+    await expect(stranger).resolves.toEqual({ accountId: 8, scope: 'full' });
+    expect(cache.stats().tokens.entries).toBe(1);
   });
 
   it('evicts the coldest entry at the cap and counts it', async () => {
@@ -275,14 +323,33 @@ describe('moderation arm', () => {
     expect(r.cache.stats().accounts.entries).toBe(0);
   });
 
-  it('serves a fresh ban immediately after an account-keyed bust', async () => {
+  it('serves a fresh ban immediately after an account-keyed bust, leaving strangers warm', async () => {
     const r = rig();
     r.accounts.set(7, cleanRow());
+    r.accounts.set(8, cleanRow());
     expect((await r.cache.moderationStatusForAccount(7)).locked).toBe(false);
+    expect((await r.cache.moderationStatusForAccount(8)).locked).toBe(false);
     r.accounts.set(7, cleanRow({ banned_at: '2026-01-01T00:00:00Z' }));
     expect((await r.cache.moderationStatusForAccount(7)).locked).toBe(false);
     r.cache.bustAccount(7);
     expect((await r.cache.moderationStatusForAccount(7)).locked).toBe(true);
+    // KEYED on the moderation arm too: the stranger's row never refetched.
+    const before = r.calls.moderation;
+    expect((await r.cache.moderationStatusForAccount(8)).locked).toBe(false);
+    expect(r.calls.moderation).toBe(before);
+  });
+
+  it('evicts on the ACCOUNT arm at its own injected cap (constructor wiring)', async () => {
+    const r = rig({ accountMaxEntries: 1 });
+    r.accounts.set(7, cleanRow());
+    r.accounts.set(8, cleanRow());
+    await r.cache.moderationStatusForAccount(7);
+    await r.cache.moderationStatusForAccount(8);
+    expect(r.cache.stats().accounts).toMatchObject({ entries: 1, evictions: 1 });
+    // 7 was evicted by 8's install: re-reading it refetches.
+    const before = r.calls.moderation;
+    await r.cache.moderationStatusForAccount(7);
+    expect(r.calls.moderation).toBe(before + 1);
   });
 });
 
@@ -336,16 +403,27 @@ describe('account-keyed bust and the token index', () => {
 describe('constants and the singleton wiring', () => {
   it('pins the TTL and bounds, and the docblock prose derives from the constant', async () => {
     expect(WOC_AUTH_GUARD_CACHE_TTL_MS).toBe(5_000);
-    expect(WOC_AUTH_GUARD_TOKEN_CACHE_MAX).toBe(1_024);
-    expect(WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX).toBe(1_024);
+    // Sized against the 5,000-player realm admission cap (the
+    // character_rank_cache precedent) times a small per-account token
+    // multiple: LRU degrades as a cliff, so the caps sit ABOVE the realm
+    // working set, and the relation below keeps them ordered (more tokens
+    // than accounts, both above the realm cap).
+    expect(WOC_AUTH_GUARD_TOKEN_CACHE_MAX).toBe(10_240);
+    expect(WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX).toBe(5_120);
+    expect(WOC_AUTH_GUARD_TOKEN_CACHE_MAX).toBeGreaterThan(WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX);
+    expect(WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX).toBeGreaterThanOrEqual(5_000);
     expect(WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR).toBe(4);
     const src = (await import('node:fs')).readFileSync(
       new URL('../../server/woc_auth_guard_cache.ts', import.meta.url),
       'utf8',
     );
-    // The staleness prose must state the SAME bound the constant encodes: a
-    // TTL change that leaves the docblock behind reds here.
-    expect(src).toContain(`${WOC_AUTH_GUARD_CACHE_TTL_MS / 1000} seconds`);
+    // The staleness prose must state the SAME bound the constant encodes,
+    // ANCHORED to the TTL constant's own docblock (the comment block that
+    // ends at the constant declaration), not anywhere in the file.
+    const ttlDecl = src.indexOf('export const WOC_AUTH_GUARD_CACHE_TTL_MS');
+    expect(ttlDecl).toBeGreaterThan(0);
+    const ttlDoc = src.slice(src.lastIndexOf('/**', ttlDecl), ttlDecl);
+    expect(ttlDoc).toContain(`${WOC_AUTH_GUARD_CACHE_TTL_MS / 1000} seconds`);
   });
 
   it('routes the free bust functions through the configured singleton and no-ops after reset', async () => {

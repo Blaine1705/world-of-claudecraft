@@ -1,11 +1,19 @@
 // Real-Postgres coverage for the marketplace auth-guard read cache rider: the
 // token probe's expires_at qual against real rows (live, expired, deleted are
 // one indistinguishable null), the raw-row fetchers the cache composes, and
-// the REAL writer-to-bust chain end to end: every db.ts revocation writer and
-// every moderation chokepoint fires its bust from inside the real function
-// (post-COMMIT), and the cache singleton configured over the REAL fetchers
-// refuses on the very next read. The unit suites prove the cache mechanics
-// over fakes; THIS suite proves the SQL and the wiring those tests assume.
+// the REAL writer-to-bust chain end to end for every auth_tokens revocation
+// writer (revokeToken with a raw-SQL warm-stale control, revokeReadToken,
+// revokeCompanionToken with a seeded sibling survivor, revokeTokensExcept,
+// consumePasswordResetRequest) and the moderation writers (moderateAccount's
+// ban/suspend/unban arms, chat mute and unmute, the audited reactivate and
+// strike reset, the live strike writers, the quota policy setter both
+// directions, the deactivation flip): each fires its bust from inside the
+// real function (post-COMMIT), and the cache singleton configured over the
+// REAL fetchers refuses or refreshes on the very next read. The rig pins a
+// LONG cache TTL so every proof is decisive by construction (the control
+// proves a warm entry still serves until the bust), never by wall-clock
+// accident. The unit suites prove the cache mechanics over fakes; THIS
+// suite proves the SQL and the wiring those tests assume.
 //
 // Gate: TEST_DATABASE_URL (an admin URL on the dev Postgres from npm run
 // db:up). The suite creates and drops its own database and never touches the
@@ -84,10 +92,17 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
   /** The singleton over the REAL fetchers: what production wires at boot, so
    *  the writers' free bust calls reach exactly this instance. */
   function armCache(): WocAuthGuardCache {
-    cache = configureWocAuthGuardCache({
-      fetchTokenRow: db.authTokenRowForToken,
-      fetchModerationRow: db.moderationRowForAccount,
-    });
+    cache = configureWocAuthGuardCache(
+      {
+        fetchTokenRow: db.authTokenRowForToken,
+        fetchModerationRow: db.moderationRowForAccount,
+      },
+      // A LONG TTL: on the real clock the production 5s could lapse between
+      // the warm read and the post-write read on a loaded box, making every
+      // bust proof pass for the wrong reason. With five minutes, only the
+      // BUST can explain a fresh answer.
+      { ttlMs: 300_000 },
+    );
     return cache;
   }
 
@@ -147,7 +162,30 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
       accountId: account,
       scope: 'full',
     });
+    // CONTROL: delete the row with RAW SQL (no bust fires): the warm entry
+    // still answers, proving the entry is load-bearing and the fresh
+    // refusals in this suite can only come from the writers' busts.
+    await pool.query('DELETE FROM auth_tokens WHERE token = $1', [token]);
+    await expect(cache.accountAndScopeForToken(token)).resolves.toEqual({
+      accountId: account,
+      scope: 'full',
+    });
+    // The REAL writer (row already gone; the bust is what it contributes).
     await db.revokeToken(token);
+    await expect(cache.accountAndScopeForToken(token)).resolves.toBeNull();
+  });
+
+  it('refuses a revoked READ token on the next cached read (revokeReadToken fires the bust)', async () => {
+    const account = await seedAccount();
+    const token = newToken();
+    await db.createCompanionToken(token, account, 'companion');
+    armCache();
+    await expect(cache.accountAndScopeForToken(token)).resolves.toEqual({
+      accountId: account,
+      scope: 'read',
+    });
+    const removed = await db.revokeReadToken(token);
+    expect(removed).toBe(true);
     await expect(cache.accountAndScopeForToken(token)).resolves.toBeNull();
   });
 
@@ -290,6 +328,43 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
       reason: 'lifted',
     });
     expect((await cache.moderationStatusForAccount(target)).generalChatRateLimit).toBeNull();
+  });
+
+  it('serves each audited moderation writer fresh: mute, unmute, strike reset, reactivate', async () => {
+    const target = await seedAccount();
+    const operator = await seedAccount();
+    armCache();
+    expect((await cache.moderationStatusForAccount(target)).chatMutedUntil).toBeNull();
+    await moderationDb.muteAccountChat({
+      accountId: target,
+      adminAccountId: operator,
+      reason: 'spam',
+      expiresAt: new Date(Date.now() + 3600_000).toISOString(),
+    });
+    expect((await cache.moderationStatusForAccount(target)).chatMutedUntil).not.toBeNull();
+    await moderationDb.liftAccountChatMute({
+      accountId: target,
+      adminAccountId: operator,
+      reason: 'appeal',
+    });
+    expect((await cache.moderationStatusForAccount(target)).chatMutedUntil).toBeNull();
+    await chatFilterDb.applyChatStrike(target, 0);
+    expect((await cache.moderationStatusForAccount(target)).chatStrikes).toBe(1);
+    const reset = await moderationDb.resetChatStrikesAudited({
+      accountId: target,
+      adminAccountId: operator,
+      reason: 'appeal',
+    });
+    expect(reset).toBe(true);
+    expect((await cache.moderationStatusForAccount(target)).chatStrikes).toBe(0);
+    await db.setAccountDeactivated(target, true);
+    expect((await cache.moderationStatusForAccount(target)).deactivated).toBe(true);
+    await moderationDb.reactivateAccountAudited({
+      accountId: target,
+      adminAccountId: operator,
+      reason: 'owner request',
+    });
+    expect((await cache.moderationStatusForAccount(target)).locked).toBe(false);
   });
 
   it('locks a self-deactivated account on the next cached read', async () => {

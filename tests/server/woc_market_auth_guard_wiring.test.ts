@@ -58,7 +58,7 @@ function rig() {
   let nowMs = NOW;
   const tokens = new Map<string, AuthTokenRow>();
   const accounts = new Map<number, AccountModerationRow>();
-  const calls = { token: 0, moderation: 0, adminToken: 0 };
+  const calls = { token: 0, moderation: 0, adminToken: 0, adminRoles: 0 };
   tokens.set(TOKEN, { accountId: 7, scope: 'full', expiresAtMs: NOW + 3600_000 });
   tokens.set(ADMIN_TOKEN, { accountId: 9, scope: 'full', expiresAtMs: NOW + 3600_000 });
   accounts.set(7, {
@@ -95,11 +95,15 @@ function rig() {
       if (!row || (row.scope !== 'full' && row.scope !== 'read')) return null;
       return { accountId: row.accountId, scope: row.scope as 'full' | 'read' };
     },
-    adminRolesForAccount: async () => ({ username: 'ops', roles: ['superadmin'] }),
+    adminRolesForAccount: async () => {
+      calls.adminRoles += 1;
+      return { username: 'ops', roles: ['superadmin'] };
+    },
   });
   return {
     cache,
     tokens,
+    accounts,
     calls,
     advance: (ms: number) => {
       nowMs += ms;
@@ -197,8 +201,48 @@ describe('the admin surface stays uncached (behavioral contrast)', () => {
     // which is exactly what proves WHICH arm is cached and which is not.
     const playerAfter = await runGuards(status, TOKEN);
     expect(playerAfter.handler).toHaveBeenCalledTimes(1);
-    // And the admin resolutions never touched the cache's fetchers.
+    // And the admin resolutions never touched the cache's fetchers, while
+    // the staff-role read stays re-read per request (a dashboard revocation
+    // applies to the next call: the production design, not a test artifact).
     expect(r.calls.adminToken).toBe(2);
+    expect(r.calls.adminRoles).toBe(1);
     expect(r.calls.token).toBe(1);
+  });
+});
+
+describe('the refusal bodies over the cached bundle', () => {
+  it('emits the exact moderation 403 from a cached banned row', async () => {
+    const r = rig();
+    r.accounts.set(7, {
+      banned_at: '2026-01-01T00:00:00Z',
+      suspended_until: null,
+      moderation_reason: 'rmt',
+      chat_muted_until: null,
+      chat_strikes: 0,
+      deactivated_at: null,
+      messages: null,
+      window_minutes: null,
+    });
+    const { res, handler } = await runGuards(routeFor('GET', '/api/woc-market/status'), TOKEN);
+    expect(handler).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(403);
+    // The exact legacy moderation body, byte-compatible through the cached
+    // arm (moderationErrorBody over the per-read computed status).
+    expect(JSON.parse(res.body || '{}')).toEqual({
+      error: 'This account has been banned.',
+      code: 'moderation.banned',
+    });
+  });
+
+  it('emits the exact read-only 403 for a cached read-scope token on the ACTIVE guard', async () => {
+    const r = rig();
+    r.tokens.set(TOKEN, { accountId: 7, scope: 'read', expiresAtMs: NOW + 3600_000 });
+    const { res, handler } = await runGuards(routeFor('GET', '/api/woc-market/offers'), TOKEN);
+    expect(handler).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body || '{}')).toEqual({
+      error: 'this token is read-only',
+      code: 'auth.forbidden',
+    });
   });
 });

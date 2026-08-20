@@ -63,13 +63,37 @@ function discoverSites(
   for (const m of src.matchAll(/\b(INSERT\s+INTO|DELETE\s+FROM|UPDATE)\s+auth_tokens\b/g)) {
     inScope.push({ file, index: m.index ?? 0, kind: 'auth_tokens' });
   }
-  for (const m of src.matchAll(/\bUPDATE\s+accounts\b/g)) {
-    // The SET list ends at the WHERE. The window is generous, and a
-    // statement whose WHERE sits beyond it is UNCLASSIFIABLE and reds
-    // loudly below: a giant SET list must never silently classify out with
-    // a projected column hiding past the truncation.
-    const window = src.slice(m.index, (m.index ?? 0) + 1500);
+  // UPDATE accounts (schema-qualified spellings included) and the upsert
+  // shape INSERT INTO accounts ... ON CONFLICT ... DO UPDATE SET, which is a
+  // second door into the same columns. The scan window is STATEMENT-bounded:
+  // it ends at the first backtick or semicolon (the template-literal close
+  // or the DDL statement end), so neighboring source text can never bleed a
+  // projection-column mention into a statement that does not write one. The
+  // SET-list split at WHERE then classifies by written column. Known,
+  // recorded limit: a WHERE inside a SET-list subquery would end the split
+  // early and could hide a later projected column; no such statement shape
+  // exists in server/, and a new one lands as a NEW site the reconciliation
+  // map reds on, at which point this classifier gets taught the shape.
+  for (const m of src.matchAll(/\b(?:UPDATE|INSERT\s+INTO)\s+(?:\w+\.)?accounts\b/g)) {
+    let window = src.slice(m.index, (m.index ?? 0) + 2000);
+    const delim = window.slice(1).search(/[;\u0060]/);
+    if (delim >= 0) window = window.slice(0, delim + 1);
+    const isInsert = /^INSERT/i.test(m[0]);
+    if (isInsert) {
+      // A plain INSERT INTO accounts creates a row no token can reference
+      // yet (registration): out of scope BY RULE. The upsert arm's DO
+      // UPDATE SET list is the second door and classifies by column.
+      const doUpdate = window.match(/\bDO\s+UPDATE\b([\s\S]*)$/);
+      if (!doUpdate) continue;
+      const upsertSet = doUpdate[1].split(/\bWHERE\b/)[0];
+      if (PROJECTION_COLUMNS.some((c) => upsertSet.includes(c))) {
+        inScope.push({ file, index: m.index ?? 0, kind: 'accounts_update' });
+      }
+      continue;
+    }
     if (!/\bWHERE\b/.test(window)) {
+      // No WHERE inside the statement bound: either a truncated giant SET
+      // list or an unconditional whole-table write; both must red loudly.
       unclassifiable.push({ file, index: m.index ?? 0, kind: 'accounts_update_unbounded' });
       continue;
     }
@@ -95,12 +119,16 @@ function discoverSites(
   return { inScope, accountDeletes, unclassifiable };
 }
 
-/** Top-level exported function spans: [header index, next header index). All
- *  current writers are exported top-level functions; an in-scope site landing
- *  OUTSIDE every span (module scope, a hoisted SQL const, a class method)
- *  fails the totality assert loudly instead of escaping attribution. */
+/** Top-level function spans (exported or not): [header index, next header
+ *  index). An in-scope site landing OUTSIDE every span (module scope, a
+ *  hoisted SQL const, a class method above the first function) fails the
+ *  totality assert loudly instead of escaping attribution. Known limit: a
+ *  class METHOD below a top-level function is bracketed by that function's
+ *  span, so its attribution would name the wrong function; the deep-equal
+ *  reconciliation map still reds on the new site itself, which is the
+ *  fail-loud backstop (no class in server/ writes the projection today). */
 function functionSpans(src: string): { name: string; start: number; end: number }[] {
-  const headers = [...src.matchAll(/^export (?:async )?function (\w+)/gm)].map((m) => ({
+  const headers = [...src.matchAll(/^(?:export )?(?:async )?function (\w+)/gm)].map((m) => ({
     name: m[1],
     start: m.index ?? 0,
   }));
@@ -149,6 +177,19 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
           busts.length,
           `${rel}: ${span.name} writes the guard projection (${site.kind}) but calls no bust`,
         ).toBeGreaterThan(0);
+        // Post-COMMIT discipline, structurally: in a transactional writer the
+        // bust must sit AFTER the last COMMIT, or a concurrent read could
+        // re-prime the cache with pre-commit state between bust and commit.
+        const lastCommit = body.lastIndexOf("'COMMIT'");
+        if (lastCommit >= 0) {
+          const lastBust = Math.max(
+            body.lastIndexOf('bustWocAuthGuardToken('),
+            body.lastIndexOf('bustWocAuthGuardAccount('),
+          );
+          expect(lastBust, `${rel}: ${span.name} busts BEFORE its final COMMIT`).toBeGreaterThan(
+            lastCommit,
+          );
+        }
         if (discovered[rel] === undefined) discovered[rel] = {};
         const perFile = discovered[rel];
         if (perFile[span.name] === undefined) perFile[span.name] = { sites: [], busts };
@@ -229,13 +270,14 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
     // module; require_admin, admin.ts, every other guard bundle, and ws_auth
     // must never appear here.
     const importers = files
-      .filter((f) => (sources.get(f) ?? '').includes("from './woc_auth_guard_cache'"))
+      .filter((f) => /from '\.{1,2}\/woc_auth_guard_cache'/.test(sources.get(f) ?? ''))
       .map((f) => f.slice(SERVER_DIR.length + 1))
       .sort();
     expect(importers).toEqual([
       'chat_filter_db.ts',
       'db.ts',
       'general_chat_quota_db.ts',
+      'http/game_metrics.ts',
       'main.ts',
       'moderation_db.ts',
     ]);
