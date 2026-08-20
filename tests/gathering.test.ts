@@ -279,20 +279,27 @@ describe('isHarvestableCorpse', () => {
     // the yield table (this branch) then retires fen_troll from `excluded`
     // (the one shipped template that used to sit there) into this list
     // instead, so every tagged template is harvestable. The release harvest-gap
-    // fix then tags dune_troll, bogtoad and hedge_knight: 45. The Proving
-    // Shore tutorial island's shore_scuttler (a beast, meat) makes 46, and
-    // its tide-pool king mister_crabs (also meat) makes 47.
-    expect(included).toHaveLength(47);
-    // ...and the untagged templates are counted rather than assumed: 186 of
+    // fix then tags dune_troll, bogtoad and hedge_knight: 45. 46 once
+    // frostmane_yeti left the ogre family for beast (it renders as a yeti and
+    // was only ever tagged ogre from the generic-giant era), which puts it under
+    // the every-beast-pays-in-components rule and so gives it hide/fang/meat.
+    // The Proving Shore tutorial island's shore_scuttler (a beast, meat) makes
+    // 47, and its tide-pool king mister_crabs (also meat) makes 48.
+    expect(included).toHaveLength(48);
+    // ...and the untagged templates are counted rather than assumed: 188 of
     // them ship, all excluded before this change and all excluded after it,
     // since fen_troll was already tagged (claw, tusk) and only moves from
     // `excluded` into this list, never through `untagged`. (184 before the
     // v0.32.0 base merge, plus the untagged dragonkin egg from the brood and
     // the four untagged camp mobs the quest-dedupe pass added, minus
-    // shoal_scuttler once it gained a mapped tag; 186 with the Proving Shore
-    // tutorial island's training_effigy, a straw target that yields nothing.)
+    // shoal_scuttler once it gained a mapped tag. Plus the three practice
+    // dummies the Highwatch row added: a straw target carries no components.
+    // Minus frostmane_yeti, which gained hide/fang/meat with its move into
+    // the beast family: the same template the `included` count above picked
+    // up. Plus the Proving Shore tutorial island's training_effigy, a straw
+    // target that yields nothing either.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(186);
+    expect(untagged).toHaveLength(188);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

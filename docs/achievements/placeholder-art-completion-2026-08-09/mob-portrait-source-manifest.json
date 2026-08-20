@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "1b3cfe118c146253aa7d2192c303566388ef4db8894b64111d9fbb6981ffcef3",
+  "rendererFingerprint": "ba62c437c4b38f3db2078d29498d9b3a170a5051df5dbf569a692835cfc86484",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4276438,
-      "sha256": "d581413ee173919807e4f49ebbba676bc157a4311162263be1fe2699d3d7d65a",
+      "bytes": 4295455,
+      "sha256": "d3ab474c8a53b94e72d73058fac141df746d77414531c526f9d53a945755e87a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 233,
+  "portraitCount": 236,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -555,10 +555,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -567,19 +567,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#7a5230",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "6034b149c4db7d2b6a4f47cadcc95b8dc18d5d797c0fa7184936bd542d473f89",
+      "sourceFingerprint": "17e6b188b1ac7d21245ff163efd5a4ca48590ebc561e22aae08db33388b9cda8",
       "output": {
         "path": "public/ui/mobs/brakka_wallbreaker.webp",
-        "bytes": 1698,
-        "sha256": "ce242d711164958aaa5d5d12bc455a421991b397bd6f9bd46e8d61b4ecfa8913"
+        "bytes": 2430,
+        "sha256": "a5cea3cd85ab7b1307ab6f779b9b646652b0693a6ac76f007b11b1fd15e96c74"
       }
     },
     {
@@ -623,10 +623,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -635,19 +635,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#6e5235",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "7079a55338c9d2c4ddacce70fe087950a11c017412900d72513e259009962ce5",
+      "sourceFingerprint": "b4bbcc775cb6ab33bfa1a51c1f347856fe16236cfea4391833875dddab7d7be4",
       "output": {
         "path": "public/ui/mobs/brutok_skullsmasher.webp",
-        "bytes": 1690,
-        "sha256": "b92ff79a568b8643b140a3c9d1a2d1b316853a8f315183bf355fe33b4b5136bf"
+        "bytes": 2422,
+        "sha256": "ffb54ec9d2adeaa93d5d063c3529b8b6a3a0ba7550e3b395bdeb2139ab1ec8de"
       }
     },
     {
@@ -2024,8 +2024,42 @@
       }
     },
     {
+      "id": "friendly_player_dummy",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/friendly_player_dummy.webp",
+        "bytes": 1766,
+        "sha256": "9676d78d37b8a04415f9f14dc0670f02baaff3a501cb724d4a5b451893b2119d"
+      }
+    },
+    {
       "id": "frostmane_yeti",
-      "family": "ogre",
+      "family": "beast",
       "finderEncounter": false,
       "visualKey": "mob_yeti",
       "renderSpec": {
@@ -2050,11 +2084,11 @@
         "resolved": "#f2f6fa",
         "strength": 0.55
       },
-      "sourceFingerprint": "280f4ea3f3c3bd8b7308b129839033fd720a60cd08c36b44cad4b000ae2da8ac",
+      "sourceFingerprint": "7bf76cb394cb8f09d60ec27d276b8e36314485f234b8ebe2454c49eae3fa4e75",
       "output": {
         "path": "public/ui/mobs/frostmane_yeti.webp",
-        "bytes": 2094,
-        "sha256": "e917b5f04eda3625154f2383e686a4be9067a698cf9592cea88c196dd5441af3"
+        "bytes": 2006,
+        "sha256": "8bba2c34209a8c27cba78b254039802f161c9a08ce81d67aa74f64d40e1e19ea"
       }
     },
     {
@@ -2468,10 +2502,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -2480,19 +2514,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#564a3a",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "1a2e02e2ba3d68a61c7dc4f7d396e306add04ec1322913881204f32288107855",
+      "sourceFingerprint": "3d39a2ad5e8524e9a4030a11a2df8b71c66c69931180b7a6a436704862e69b49",
       "output": {
         "path": "public/ui/mobs/grave_silt_bulwark.webp",
-        "bytes": 1718,
-        "sha256": "9f9707aa55e23599b1d04d607e982e7eee5507fcc2a989b9f22b7a9bf92f9a3d"
+        "bytes": 2436,
+        "sha256": "ee660c515f266226a95649dfbc3ef2e79cc852d1c16e0258c8a5071e21248495"
       }
     },
     {
@@ -2722,7 +2756,7 @@
     },
     {
       "id": "gravenbark_shambler",
-      "family": "ogre",
+      "family": "elemental",
       "finderEncounter": false,
       "visualKey": "mob_treant",
       "renderSpec": {
@@ -2747,11 +2781,11 @@
         "resolved": "#4e4a3a",
         "strength": 0.72
       },
-      "sourceFingerprint": "e1dff52a98a8e0243ca635c31463a83e942a20f11e0871cb0e90b97fb1f0bbef",
+      "sourceFingerprint": "1d739235c146fe4a5742e01c488756225ecd6687fcf665bcfa98c5ebaa35b0b7",
       "output": {
         "path": "public/ui/mobs/gravenbark_shambler.webp",
-        "bytes": 1580,
-        "sha256": "6a25b20399cbf633139be02e69b4d338041119eabef4a54464b2e8a0b2d4bdba"
+        "bytes": 1634,
+        "sha256": "e56c11671f52da22d76e53b7237efebe1180368574af9ffe61e5b4618b47b852"
       }
     },
     {
@@ -2938,6 +2972,40 @@
         "path": "public/ui/mobs/hedge_knight.webp",
         "bytes": 2206,
         "sha256": "c5450c7580b790970e9fc465b8fbb516bef1b1b6ffba44413bb5fed6030374ae"
+      }
+    },
+    {
+      "id": "heroic_boss_dummy",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#c8503c",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "da1c7342d9c1815c8b3d83b1b0098b141127797d4b324e9f74ce1db12c179892",
+      "output": {
+        "path": "public/ui/mobs/heroic_boss_dummy.webp",
+        "bytes": 1838,
+        "sha256": "3d55a0544e8b558f43fb4b673d8887f5891a31689241b941134053deba9fd235"
       }
     },
     {
@@ -3169,10 +3237,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -3181,19 +3249,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#8f6f46",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "fb36d251044182d255da67481d8d0ec4d3f0d88c03ab018ab6eee778dd45119a",
+      "sourceFingerprint": "a0302554a6d323032808701d6cdbc14bd464ecefaf491ee50c9bf5ff5c207022",
       "output": {
         "path": "public/ui/mobs/korgath_the_bound.webp",
-        "bytes": 1734,
-        "sha256": "f349a8db91d48e4fee2dba313cdfafecd49f7741a05a43a5f129b64b71a57829"
+        "bytes": 2432,
+        "sha256": "212b14445e4b138b9090a433279075fa532d24249f5c579492a20a65d7a24466"
       }
     },
     {
@@ -4104,6 +4172,40 @@
       }
     },
     {
+      "id": "normal_boss_dummy",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8c5ac8",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "f812d654f4fbd72e10b9e81eea38e32c671c6a5be5d7df50e542050ac2d341e1",
+      "output": {
+        "path": "public/ui/mobs/normal_boss_dummy.webp",
+        "bytes": 1778,
+        "sha256": "2fa2483ed8531151b14bcdb5d6427fd3e87d9445b83d5e0545238f210b577cb3"
+      }
+    },
+    {
       "id": "nythraxis_heroic_priest_add",
       "family": "undead",
       "finderEncounter": false,
@@ -4285,10 +4387,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -4297,19 +4399,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#7e5c3e",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "9ba342acba22e2050273e65d746e4f0d65fe714c2b430ff9236d37f09e5a245a",
+      "sourceFingerprint": "784b48f069f27d00cb74bef308cb2cb6ff0e59604c24018acdc8eb8233ab2cd8",
       "output": {
         "path": "public/ui/mobs/ogre_crusher.webp",
-        "bytes": 1700,
-        "sha256": "8c5634dd74901664e3c77f13370165a0007e762f9f73defaa3df396fcd098231"
+        "bytes": 2394,
+        "sha256": "c26061d52b1a9ac0a4dd8f5eb11a73250ef8fea34d7593d9795e9cc233ee2ca2"
       }
     },
     {
@@ -4416,7 +4518,7 @@
     },
     {
       "id": "orchard_treant",
-      "family": "ogre",
+      "family": "elemental",
       "finderEncounter": false,
       "visualKey": "mob_treant",
       "renderSpec": {
@@ -4441,11 +4543,11 @@
         "resolved": "#c89838",
         "strength": 0.72
       },
-      "sourceFingerprint": "fb37d644119f6e204d7d4fce689f65ec83ecb571ec4cf7280e25da2742857294",
+      "sourceFingerprint": "cab66f4375f2d2a8b121a4e4723879a45694d3fb83b6fa782682c398311b7bd6",
       "output": {
         "path": "public/ui/mobs/orchard_treant.webp",
-        "bytes": 2066,
-        "sha256": "a8e67bf0b6ba1a88abd0fd2cb684d798eb09e90579501081f6ca82eb3d8a3493"
+        "bytes": 2096,
+        "sha256": "3a624ea64779dd4f0775724498f187889407d5b619a37fbaef6f4d4058b141ba"
       }
     },
     {
@@ -5102,10 +5204,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -5114,19 +5216,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#a07d4f",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "ca5aaa6d8ca1cb2129b8250768795d45af6f0fc6ecd28f38dab625a5b88f0e00",
+      "sourceFingerprint": "90af9202386f33e3b289a569088da3c4577286ec9e784d25e78456d1896ad3f0",
       "output": {
         "path": "public/ui/mobs/rift_boss_brute.webp",
-        "bytes": 1694,
-        "sha256": "125d0c25a876b68b59b1cbdb902e6991f3112b0b053675e34b0bbe9289c54fd0"
+        "bytes": 2438,
+        "sha256": "0be36edf51469beeece5f064e6455533ebabc62ec46783468f860a0dfb4f1256"
       }
     },
     {
@@ -5763,10 +5865,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -5775,19 +5877,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#9b8f6f",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "0a6d7b76285497cc2a233d5e9cc7219d8ee3b6e4087c22d4daf6128c0a08481c",
+      "sourceFingerprint": "0ba29760cd0032d555eae8cbc0865bf72c7e449915880cc1ab1ae1f82763c2de",
       "output": {
         "path": "public/ui/mobs/rift_stone_ogre.webp",
-        "bytes": 1722,
-        "sha256": "602cecaba84740ceb318d5ec541929996162c7557697dd815fc83463a64610b6"
+        "bytes": 2444,
+        "sha256": "c21df9aa3e6500be236f4201c85738fb324f6e1c18123b3c4ec528e3da03d378"
       }
     },
     {
@@ -6715,10 +6817,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -6727,19 +6829,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#8a2f6a",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "96bffbc0c0d22111ec9e624f144eda4efb9f81cd88e2827954b84fd859404151",
+      "sourceFingerprint": "bfd6a45fe0213b7d1ab4c7cbab84b66bb56d1b033e3c1ea1742df9d08a12daf2",
       "output": {
         "path": "public/ui/mobs/sundered_horror.webp",
-        "bytes": 1698,
-        "sha256": "e4b28b7f2ae2d74a15332cbd888ead8470bcc95b81451ef263850a357a27ab96"
+        "bytes": 2424,
+        "sha256": "f7a5f5d1395e0ff26d623e0bbf8d023483a37c0c35db0e2cef393c2e5e79d492"
       }
     },
     {
@@ -6934,10 +7036,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -6946,19 +7048,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#9e7b53",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "a06ae95d02f7d46194dbdd0bf75d298ed86b94ce61baf5a45d7c56a81972f842",
+      "sourceFingerprint": "bff7ca75c928b3dc7484d8a59f1525522d039d85b951c0309a9ff068e10adbec",
       "output": {
         "path": "public/ui/mobs/thornpeak_ogre.webp",
-        "bytes": 1706,
-        "sha256": "a16bb78a054124a49b4491e218f01fbd4b8dcda442fcfd77371f6563c13cc261"
+        "bytes": 2430,
+        "sha256": "4b9c73884684431d2826facd3884ab31637a6740261094635c240cd0477550eb"
       }
     },
     {
@@ -7353,7 +7455,7 @@
     },
     {
       "id": "treant_elder",
-      "family": "ogre",
+      "family": "elemental",
       "finderEncounter": false,
       "visualKey": "mob_treant",
       "renderSpec": {
@@ -7378,11 +7480,11 @@
         "resolved": "#4f7a38",
         "strength": 0.72
       },
-      "sourceFingerprint": "56fc84ce30ad2e011e11342cd95165dba2546411ebea52b55fdfc0b16a3b0bc8",
+      "sourceFingerprint": "2cdaae6f3c5d040ba74821b47236599703a55515a54e2e9b674cc862446183f2",
       "output": {
         "path": "public/ui/mobs/treant_elder.webp",
-        "bytes": 1778,
-        "sha256": "9d89e2246ef5336748e4c329df88b8411cb44db8d9a2849f801df874042fad6d"
+        "bytes": 1834,
+        "sha256": "237b61715b0b2cd8bbf8cf068a9e2371e2c3eaa12c8fadc26b70cbd3214e3b11"
       }
     },
     {
@@ -8017,10 +8119,10 @@
       "visualKey": "mob_ogre",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/giant.glb",
-          "path": "public/models/creatures/giant.glb",
-          "bytes": 52464,
-          "sha256": "9adbb2233f87c6524e3f07964a521dc86d05dae8d6882c2cb3f7267c3b52ee70"
+          "url": "models/creatures/ogre.glb",
+          "path": "public/models/creatures/ogre.glb",
+          "bytes": 494060,
+          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -8029,19 +8131,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#8c3b2e",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "acbf4ed2d777627ef9068bd7c1395f4df5158beed5e8a76efb208fc57c9c59fc",
+      "sourceFingerprint": "7465be705f9f55ef649fd8238a7155a3872a2361642152caf515e55cece36934",
       "output": {
         "path": "public/ui/mobs/warlord_drogmar.webp",
-        "bytes": 1718,
-        "sha256": "0352ec30b4fd22531f90e3b6524cdd36f9a9bc3a4a19d2e7eb53a3e87f57b7d7"
+        "bytes": 2398,
+        "sha256": "81f8995ecd5d7689366f1c7e8febdb0120600cc89004388eae977fc5fa3b061b"
       }
     },
     {

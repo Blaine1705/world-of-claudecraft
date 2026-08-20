@@ -1058,17 +1058,17 @@ export const id_ID: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Ruang Bawah Tanah",
+        "state": "Lantai Kebesaran",
+        "residence": "Lantai Hunian",
+        "tower": "Menara Pengawas"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Lantai Taman",
+        "solar": "Ruang Matahari"
       }
     },
     "compass": {
@@ -4876,6 +4876,7 @@ export const id_ID: EnTranslations = {
       "mageEleJet": "Pancaran Air menempati bilah peliharaan sebagai tombolnya sendiri: klik untuk mengunci seberkas sinar pembeku pada satu musuh, atau klik kanan (tekan dan tahan di perangkat seluler) agar elemental itu menembakkannya sendiri kapan pun sudah siap.",
       "formsHeading": "Perubahan Wujud",
       "formsNote": "Seorang druid bertarung dengan berganti wujud. Sebagian besar kemampuan druid terikat pada satu wujud tertentu, jadi wujud yang sedang kamu tempati menentukan apa yang bisa kamu rapalkan, dan berganti wujud menghabiskan sedikit mana. Kamu bisa berubah wujud masuk atau keluar dari pertempuran, sesering yang kamu mau.",
+      "formsAutoUnshift": "Penyembuhan atau sihir serangan yang dirapal saat berwujud akan mengeluarkanmu dari wujud itu secara otomatis. Keluar dari wujud dengan cara ini gratis dan tidak memakai jeda global, jadi sihir instan langsung meluncur begitu kau menekannya. Kembali ke wujud adalah kemampuan biasa dan tetap memakan mana serta jeda global.",
       "formsMoonwing": "Druid Keseimbangan mendapat satu wujud lagi, Wujud Burung Bulan, wujud perapal yang menjadi cara bertarung druid Keseimbangan. Inilah satu-satunya wujud hewan yang tetap mempertahankan mantramu, dan tongkat sihirmu hanya berfungsi dalam wujud ini atau dalam wujud perapal normalmu.",
       "formLine": {
         "form_bear": "Wujud tank: kulit tebal, Amarah alih-alih mana, dan ancaman ekstra agar musuh terus menyerangmu.",
@@ -7297,6 +7298,7 @@ export const id_ID: EnTranslations = {
       "shopMarksRequired": "Kamu butuh {marks} Tanda Delve untuk membeli {name}.",
       "shopSealPremiumOnly": "Segel ini hanya tunduk pada tangan sang ahli. Hanya taruhan Premium yang dapat membukanya.",
       "passageSealed": "Lorong itu tersegel.",
+      "enemiesRemain": "Kalahkan musuh yang tersisa terlebih dahulu.",
       "moveCloserPassage": "Mendekatlah ke lorong.",
       "moveCloserChest": "Mendekatlah ke peti.",
       "moveCloserReliquary": "Mendekatlah ke relikuari.",
@@ -10106,7 +10108,7 @@ export const id_ID: EnTranslations = {
       },
       "fear": {
         "name": "Cekaman",
-        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 8 detik. Kerusakan apa pun mematahkan efeknya."
+        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya."
       },
       "searing_pain": {
         "name": "Bakar",
@@ -10184,7 +10186,7 @@ export const id_ID: EnTranslations = {
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
         "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest: gigitan sebesar 70 plus 43 per poin combo yang juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan 30 energi."
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest, yang menghabiskan Darah Tua untuk serangan yang lebih kuat, juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -10247,7 +10249,7 @@ export const id_ID: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Darah Serigala",
-        "description": "Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
+        "description": "Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
       },
       "rip": {
         "name": "Celah Darah",
@@ -10352,7 +10354,7 @@ export const id_ID: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Menandai musuh selama 12 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 m dan menciptakan 1 Serpihan Jiwa."
+        "description": "Menandai musuh selama 15 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 yard dan menciptakan 1 Serpihan Jiwa."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10451,8 +10453,8 @@ export const id_ID: EnTranslations = {
         "description": "Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)"
       },
       "feral_charge": {
-        "name": "Terjangan Liar",
-        "description": "Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)"
+        "name": "Gelora Purba",
+        "description": "Lepaskan gelora purba. Dalam Wujud Serigala, regenerasi energi meningkat 100% selama 10 detik. Dalam Wujud Bruin, langsung menghasilkan 50 Amukan. (ciri khas Keganasan)"
       },
       "swiftmend": {
         "name": "Pemulihan Cepat",
@@ -10468,7 +10470,7 @@ export const id_ID: EnTranslations = {
       },
       "redharvest": {
         "name": "Panen Merah",
-        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan 30 energi. Berfungsi tanpa poin combo."
+        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo."
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",
@@ -10708,7 +10710,7 @@ export const id_ID: EnTranslations = {
       },
       "evocation": {
         "name": "Sumur Eter",
-        "description": "Restaura mana rápidamente. (talenta mage)"
+        "description": "Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 spell power. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)"
       },
       "flurry_of_knives": {
         "name": "Rentetan Pisau",
@@ -10716,7 +10718,7 @@ export const id_ID: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Pemulihan Liar",
-        "description": "Memulihkan 180 nyawa selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)"
+        "description": "Memulihkan 40% nyawa maksimummu selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)"
       },
       "frost_trap": {
         "name": "Jerat Rima",
@@ -10736,11 +10738,11 @@ export const id_ID: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Lolongan Ngeri",
-        "description": "Membuat musuh di dekatnya ketakutan hingga 3 detik. Kerusakan dapat membatalkan efek ini. (talenta Warlock)"
+        "description": "Membuat musuh di dekatnya ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)"
       },
       "ice_block": {
         "name": "Peti Es",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 detik. (talenta mage)"
+        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
       },
       "inner_focus": {
         "name": "Pikiran Hening",
@@ -10832,7 +10834,7 @@ export const id_ID: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Pikiran Melaju",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 detik. (talenta mage)"
+        "description": "Membuat mantra berikutnya yang memiliki waktu perapalan menjadi instan. Bertahan 60 detik. (talenta mage)"
       },
       "psychic_scream": {
         "name": "Jerit Psikis",
@@ -10949,7 +10951,7 @@ export const id_ID: EnTranslations = {
       },
       "prowl": {
         "name": "Mengintai",
-        "description": "Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran."
+        "description": "Masuk ke siluman saat dalam Wujud Serigala, bergerak 5% lebih lambat. Tidak dapat digunakan dalam pertempuran."
       },
       "rake": {
         "name": "Kupasan",
@@ -12511,7 +12513,7 @@ export const id_ID: EnTranslations = {
         "name": "Ferry Bell"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Buket Taman Dawnhold"
       },
       "ps_briny_lure": {
         "name": "Briny Lure"
@@ -13366,6 +13368,15 @@ export const id_ID: EnTranslations = {
       },
       "training_dummy": {
         "name": "Boneka Latihan"
+      },
+      "friendly_player_dummy": {
+        "name": "Boneka Pemain Sekutu"
+      },
+      "normal_boss_dummy": {
+        "name": "Boneka Bos Normal"
+      },
+      "heroic_boss_dummy": {
+        "name": "Boneka Bos Heroik"
       },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"
@@ -17165,9 +17176,9 @@ export const id_ID: EnTranslations = {
         "leaveText": "Kau menutup pintu benteng itu dan melangkah kembali ke angin Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Kastil Dawnhold",
+        "enterText": "Kau melangkah masuk ke aula Kastil Dawnhold yang hangat dan harum bunga.",
+        "leaveText": "Kau menyelinap keluar lagi ke halaman rumput taman yang bermandikan cahaya matahari."
       },
       "drowned_temple": {
         "name": "Kuil Tenggelam",

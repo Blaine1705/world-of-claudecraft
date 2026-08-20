@@ -51,6 +51,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
     // grew hud.ts by one line at HEAD without updating the row, so the gate
     // arrived red. Same exact-count, zero-slack intent as above.
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
     // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
     // additions are thin-consumer wiring to extracted modules (the two
     // LastKeepMapPainter declarations and the two walk-in map branches on the
@@ -63,8 +68,10 @@ const MONOLITHS: MonolithRow[] = [
     // the noticeboard event arm, and the vendor-stock hoist the tool-gate
     // source scan needs. Re-pinned 19620 -> 19623 by the review fixes: the
     // greeting's island prewarm takes the idle-pace two-call streaming idiom
-    // (three lines). Exact count: any further growth reds again.
-    ceiling: 19623,
+    // (three lines). LOWERED 19623 -> 19517 by the v0.39.0 base merge: the
+    // release lowered its own arm to 19387, and the island wiring lands on top
+    // of that smaller file. Exact merged count: any further growth reds again.
+    ceiling: 19517,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -85,6 +92,36 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
+    // Lowered again after extracting the delve interior build-cache scheduling
+    // (the position-keyed rebuild/retire decision plus the async build loop)
+    // into src/render/delve_interior_tracker.ts.
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging the delve tracker and prewarm work plus the release-owned
+    // weapon-skin identity repair leaves renderer.ts at the exact count below;
+    // any further growth reds again.
+    // Raised +38 for the vfx.mount-programs manifest entry (#2571: mounts had
+    // ZERO prewarm coverage, so the first sighting of any mount could freeze a
+    // live frame, worse on hardware without KHR_parallel_shader_compile where
+    // the runtime fallback gate is a no-op). The rig-building logic itself was
+    // extracted to src/render/mount_prewarm.ts; this was the coordinator's
+    // unavoidable thin-wiring cost (the manifest entry, its group bookkeeping,
+    // and cleanup/hide registration).
+    // Raised a further +34 (13792 -> 13826) in review response: the group-
+    // staging/scene-bookkeeping logic that first cut left inline here (and
+    // that inline copy is what hid the bug, an `Object3D.add` reparent that
+    // silently detached every staged rig from its group) moved into
+    // mount_prewarm.ts's stageMountPrewarmVisual too, but run() also grew
+    // real synchronous-desktop-path work plus an honest progress() (the
+    // entry's run() was previously a no-op that still reported 'completed'),
+    // and resumeUnits now links the shadow-depth program half it was missing.
+    // What remains is the manifest entry itself, the shared
+    // mountPrewarmGroup/mountPrewarmWarmed variables, and cleanup/hide
+    // registration: exactly the seam this ratchet exists to bound, not grow
+    // unchecked.
+    // Merging PR #3447 onto the corrected PR #3446 v0.39 wrapper leaves the
+    // renderer below this bound; any further growth reds again.
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
@@ -96,8 +133,11 @@ const MONOLITHS: MonolithRow[] = [
     // rectangle gate and the shared off-island empty set. LOWERED
     // 13729 -> 13712 by the noob-friendliness pass: the beacon memo, the
     // sparkle arm, and the new golden-trail hookup all moved out into
-    // island_guidance.ts, leaving two one-line call sites. Exact count.
-    ceiling: 13712,
+    // island_guidance.ts, leaving two one-line call sites. Re-pinned
+    // 13712 -> 13767 by the v0.39.0 base merge: the release arm sat at 13744
+    // (delve tracker, mount prewarm, shadow-depth prewarm) and the island's
+    // two call sites ride on top of it. Exact merged count.
+    ceiling: 13767,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -117,8 +157,10 @@ const MONOLITHS: MonolithRow[] = [
     // hidden-shell arms, the camera snap its origin tracking, and the
     // greeting hook its reduce-motion gate; all consumers of the extracted
     // modules, kept here because each needs the frame loop's private state.
-    // Exact count.
-    ceiling: 11583,
+    // Re-pinned 11583 -> 11590 by the v0.39.0 base merge: the release adds
+    // seven lines of its own bootstrap wiring, which auto-merged alongside the
+    // island's. Exact merged count.
+    ceiling: 11590,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -153,7 +195,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4150,
+    ceiling: 4147,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

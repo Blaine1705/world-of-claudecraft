@@ -83,9 +83,11 @@ describe('mob portrait source manifest', () => {
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     const liveIds = Object.keys(MOBS).sort();
-    // 233: the Proving Shore tutorial island adds training_effigy, shore_scuttler,
-    // and the mister_crabs tide-pool miniboss to the 230 the v0.37.0 re-bless sealed.
-    expect(liveIds).toHaveLength(233);
+    // 236: the 230 the v0.37.0 re-bless sealed, plus the Highwatch practice row's
+    // three dummies the v0.39.0 base landed, plus the Proving Shore tutorial
+    // island's training_effigy, shore_scuttler, and mister_crabs tide-pool
+    // miniboss. Both sides added three, so the base merge lands on 236.
+    expect(liveIds).toHaveLength(236);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

@@ -163,6 +163,7 @@ import {
   PALMREACH_ROADS,
   PALMREACH_ZONE,
 } from './content/palmreach';
+import { PRACTICE_DUMMY_CAMPS, PRACTICE_DUMMY_MOBS } from './content/practice_dummies';
 import { STATIONS } from './content/professions';
 import {
   PROVING_SHORE_CAMPS,
@@ -373,6 +374,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
+  ...PRACTICE_DUMMY_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
   ...NECROMANCY_MOBS,
@@ -524,6 +526,12 @@ export const CAMPS: CampDef[] = [
   // The Drakelands dragonkin brood belt (v0.35 rework) arrived after the
   // knights: same append-last rule, so every camp above keeps its draws.
   ...DRAKELANDS_BROOD_CAMPS,
+  // The Highwatch practice row (content/practice_dummies.ts) follows, same
+  // append-last rule. These three draw no world-gen rng at all (the spawn
+  // loop's dummy branch is rng-free), so they cannot move an earlier camp even
+  // in principle; they sit here so the array's one ordering rule has no
+  // exceptions to remember.
+  ...PRACTICE_DUMMY_CAMPS,
   // The Proving Shore's camps are all offStream (private rng sub-streams), so
   // their position in this array cannot shift any earlier camp's SHARED-STREAM
   // draws; they still append LAST by the standing rule. Entity ids after the
