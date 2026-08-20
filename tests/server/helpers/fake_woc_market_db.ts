@@ -130,6 +130,8 @@ export class FakeWocMarketDb implements WocMarketDb {
   // mutation, exactly where the Pg UPDATEs set updated_at = now()).
   private readonly listingTouchMs = new Map<number, number>();
   private readonly settlementTouchMs = new Map<number, number>();
+  /** wallet_links mirror for the claim's same-wallet twin guard; tests seed it. */
+  readonly walletLinks = new Map<number, string>();
   // sweep_parked_at mirrors: the rotation column the park writes. Kept apart
   // from the touch maps so a parked row cycles to the batch tail WITHOUT
   // refreshing its age (the Pg split this fake must model faithfully).
@@ -198,9 +200,10 @@ export class FakeWocMarketDb implements WocMarketDb {
     | { ok: true; id: number }
     | { ok: false; reason: 'lease_lost' | 'cap_reached' | 'contended' | 'not_pending' }
   > {
-    // The Pg transaction runs the character save first, then the cap check;
-    // the fake records the save it received either way (a refused escrow rolls
-    // the save back in Pg, but the SAVE ARGS still crossed the edge).
+    // The Pg transaction counts the cap FIRST and only then runs the fenced
+    // character save; the fake records the save ARGS it received either way,
+    // because the args cross the seam on every call and a refused escrow
+    // commits nothing in Pg (the rollback) or here (no store write).
     this.escrowSaves.push(structuredClone(save));
     if (this.failNextEscrowThrow !== null) {
       const err = this.failNextEscrowThrow;
@@ -467,9 +470,21 @@ export class FakeWocMarketDb implements WocMarketDb {
     return row;
   }
 
+  /** Stage a pre-pin legacy offer shape (null item) IN the store: the read
+   *  path hands out copies now, so tests can no longer mutate a live row. */
+  stageLegacyOfferWithoutItem(id: number): void {
+    const row = this.offers.get(id);
+    if (row) {
+      row.itemId = null;
+      row.itemPin = null;
+    }
+  }
+
   async directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null> {
     const row = this.offers.get(id);
-    return row && row.realm === realm ? row : null;
+    // Deep-copied on the way out like every other read (the header contract):
+    // a caller mutating the result must never edit the store.
+    return row && row.realm === realm ? structuredClone(row) : null;
   }
 
   // --- Step-up challenges (mirrors the Pg semantics: consume is an atomic
@@ -1031,7 +1046,9 @@ export class FakeWocMarketDb implements WocMarketDb {
     countCap: number,
     bondOlderThanMs: number,
   ): Promise<WocStuckCustodyClasses> {
-    // Counts SATURATE at countCap, mirroring the Pg inner-LIMIT subqueries.
+    // Counts SATURATE at countCap, mirroring the Pg inner-LIMIT subqueries,
+    // and the cap fails CLOSED to 1 exactly like the Pg clamp.
+    const cap = Number.isFinite(countCap) && countCap >= 1 ? Math.trunc(countCap) : 1;
     // Age signals mirror the Pg predicates: rotation (the parked maps) never
     // moves them, so a permanently parked row still ages into the readout;
     // the delivering class ages on the updated_at mirror stamped when the
@@ -1075,8 +1092,8 @@ export class FakeWocMarketDb implements WocMarketDb {
       .sort((a, b) => bondStuckSince(a) - bondStuckSince(b) || a.id - b.id);
     return {
       unbookedClaims: {
-        count: Math.min(claims.length, countCap),
-        saturated: claims.length >= countCap,
+        count: Math.min(claims.length, cap),
+        saturated: claims.length >= cap,
         sample: claims.slice(0, sampleLimit).map(([ref, c]) => ({
           custodyRef: ref,
           claimedAtMs: c.claimedAtMs,
@@ -1085,8 +1102,8 @@ export class FakeWocMarketDb implements WocMarketDb {
         })),
       },
       stuckDelivering: {
-        count: Math.min(delivering.length, countCap),
-        saturated: delivering.length >= countCap,
+        count: Math.min(delivering.length, cap),
+        saturated: delivering.length >= cap,
         sample: delivering.slice(0, sampleLimit).map((s) => ({
           id: s.id,
           listingId: s.listingId,
@@ -1095,8 +1112,8 @@ export class FakeWocMarketDb implements WocMarketDb {
         })),
       },
       undisposedListings: {
-        count: Math.min(undisposed.length, countCap),
-        saturated: undisposed.length >= countCap,
+        count: Math.min(undisposed.length, cap),
+        saturated: undisposed.length >= cap,
         sample: undisposed.slice(0, sampleLimit).map((l) => ({
           id: l.id,
           resolution: l.resolution,
@@ -1104,8 +1121,8 @@ export class FakeWocMarketDb implements WocMarketDb {
         })),
       },
       reviewSettlements: {
-        count: Math.min(review.length, countCap),
-        saturated: review.length >= countCap,
+        count: Math.min(review.length, cap),
+        saturated: review.length >= cap,
         sample: review.slice(0, sampleLimit).map((s) => ({
           id: s.id,
           listingId: s.listingId,
@@ -1114,8 +1131,8 @@ export class FakeWocMarketDb implements WocMarketDb {
         })),
       },
       stuckBonds: {
-        count: Math.min(stuckBonds.length, countCap),
-        saturated: stuckBonds.length >= countCap,
+        count: Math.min(stuckBonds.length, cap),
+        saturated: stuckBonds.length >= cap,
         sample: stuckBonds.slice(0, sampleLimit).map((b) => ({
           id: b.id,
           listingId: b.listingId,
@@ -1169,6 +1186,15 @@ export class FakeWocMarketDb implements WocMarketDb {
     // (the Pg probe's mirror; a rival's claim must not stamp a paying buyer).
     for (const s of this.settlements.values()) {
       if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) return 'locked';
+    }
+    // The same-wallet twin guard (the relink dance): the Pg transaction
+    // re-reads wallet_links under the listing lock and its claiming UPDATE
+    // carries the NOT EXISTS twin predicate. Tests seed walletLinks directly.
+    if (
+      typeof row.sellerWallet === 'string' &&
+      this.walletLinks.get(account) === row.sellerWallet
+    ) {
+      return 'own_listing';
     }
     // Steal-time abandon recording (public only), then the claimer's two
     // cooldown guards, mirroring the Pg transaction's order so a self-steal
@@ -1452,12 +1478,15 @@ export class FakeWocMarketDb implements WocMarketDb {
     signature: string,
     nowMs: number,
   ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused'> {
-    for (const [id, other] of this.bids) {
-      if (id !== bidId && other.bondSignature === signature) return 'signature_reused';
-    }
     const bid = this.bids.get(bidId);
     if (!bid || bid.status !== 'pending_bond') return 'not_pending';
     if (bid.bondSignature !== null && bid.bondSignature !== signature) return 'not_pending';
+    // The reuse verdict comes from the unique index, which Pg consults only
+    // when the guarded UPDATE actually matched: a dead bid answers
+    // not_pending even when the signature is spent elsewhere.
+    for (const [id, other] of this.bids) {
+      if (id !== bidId && other.bondSignature === signature) return 'signature_reused';
+    }
     // COALESCE mirror: the first recording moment wins across resubmits, and
     // a legacy-shaped row (signature set, stamp null) falls back to
     // placement, never the resubmit's clock.
@@ -1992,7 +2021,9 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (openIds.length === 0) return { settlements: [], lastListingId: null };
     const idSet = new Set(openIds);
     const matched = [...this.settlements.values()]
-      .filter((s) => s.realm === realm && s.state === 'delivered' && idSet.has(s.listingId))
+      // No realm qual here, mirroring the real second statement: the id page
+      // already scoped the realm.
+      .filter((s) => s.state === 'delivered' && idSet.has(s.listingId))
       .sort((a, b) => a.listingId - b.listingId)
       .map((s) => this.settlementOut(s));
     if (matched.length > maxSettlements) {

@@ -142,3 +142,109 @@ describe('directedOffersForAccount mirrors the two Pg grace clauses', () => {
     ).not.toContain(row.id);
   });
 });
+
+describe('fidelity fixes: twin guard, signature order, cap clamp, copies', () => {
+  const SAVE = {
+    characterId: 1,
+    level: 10,
+    state: {} as CharacterState,
+    leaseNonce: undefined,
+  };
+  function listingArgs(sellerAccount: number, wallet: string) {
+    return {
+      realm: REALM,
+      sellerAccount,
+      sellerCharacter: 1,
+      sellerName: 'S',
+      sellerWallet: wallet,
+      item: { itemId: 'itm_test', count: 1 },
+      itemId: 'itm_test',
+      quality: 'epic',
+      params: {
+        format: 'buy_now' as const,
+        directedBuyerAccount: null,
+        startCents: 100,
+        reserveCents: null,
+        buyNowCents: 100,
+        durationHours: 12,
+        offerNext: false,
+      },
+      endsAtMs: BASE_MS + 3_600_000,
+      directedOfferId: null,
+    };
+  }
+  function bidArgs(listingId: number, account: number) {
+    return {
+      realm: REALM,
+      listingId,
+      account,
+      characterId: account,
+      characterName: `C${account}`,
+      wallet: `w-${account}`,
+      amountCents: 200,
+      bondCents: 20,
+      nowMs: BASE_MS,
+      minNext: () => 0,
+    };
+  }
+
+  it('the claim refuses a relinked wallet twin like the Pg NOT EXISTS', async () => {
+    const db = new FakeWocMarketDb({ characters: [], now: () => BASE_MS });
+    const out = await db.escrowInsertListing(SAVE, listingArgs(1, 'twin-wallet'));
+    if (!out.ok) throw new Error(out.reason);
+    db.walletLinks.set(2, 'twin-wallet');
+    expect(await db.claimBuyNowLock(REALM, out.id, 2, BASE_MS, BASE_MS + 300_000)).toBe(
+      'own_listing',
+    );
+    db.walletLinks.set(2, 'other-wallet');
+    const claimed = await db.claimBuyNowLock(REALM, out.id, 2, BASE_MS, BASE_MS + 300_000);
+    expect(typeof claimed === 'object' && 'id' in claimed).toBe(true);
+  });
+
+  it('a dead bid answers not_pending even when its signature is spent elsewhere (the Pg order)', async () => {
+    const db = new FakeWocMarketDb({ characters: [], now: () => BASE_MS });
+    const listing = await db.escrowInsertListing(SAVE, listingArgs(1, 'w-order'));
+    if (!listing.ok) throw new Error(listing.reason);
+    const first = await db.insertPendingBid(bidArgs(listing.id, 2));
+    const second = await db.insertPendingBid(bidArgs(listing.id, 3));
+    const third = await db.insertPendingBid(bidArgs(listing.id, 4));
+    if (!first.ok || !second.ok || !third.ok) throw new Error('fixture bids refused');
+    expect(await db.submitBondSignature(first.bid.id, 'shared-sig', BASE_MS)).toMatchObject({
+      signatureAtMs: BASE_MS,
+    });
+    expect(await db.abandonPendingBid(REALM, second.bid.id, 3)).toBe(true);
+    expect(
+      await db.submitBondSignature(second.bid.id, 'shared-sig', BASE_MS),
+      'the guarded UPDATE misses first; the unique index is never consulted',
+    ).toBe('not_pending');
+    expect(await db.submitBondSignature(third.bid.id, 'shared-sig', BASE_MS)).toBe(
+      'signature_reused',
+    );
+  });
+
+  it('the readout cap fails closed to 1 and reads hand back copies', async () => {
+    const db = new FakeWocMarketDb({ characters: [], now: () => BASE_MS });
+    expect(await db.claimCustodyRef(REALM, 'cap-a')).toBe(true);
+    expect(await db.claimCustodyRef(REALM, 'cap-b')).toBe(true);
+    const out = await db.stuckCustodyReadout(REALM, BASE_MS + 1, 10, 0, BASE_MS + 1);
+    expect(out.unbookedClaims).toMatchObject({ count: 1, saturated: true });
+    const offer = await db.insertDirectedOffer({
+      realm: REALM,
+      sellerAccount: 1,
+      sellerCharacter: 1,
+      sellerName: 'S',
+      buyerAccount: 2,
+      buyerName: 'B',
+      usdCents: 100,
+      expiresAtMs: BASE_MS + 60_000,
+      itemId: 'itm_test',
+      itemPin: 'p',
+    });
+    expect(offer).not.toBe('offer_pending');
+    if (offer !== 'offer_pending') {
+      const read = await db.directedOfferById(REALM, offer.id);
+      if (read) read.status = 'declined' as typeof read.status;
+      expect((await db.directedOfferById(REALM, offer.id))?.status).toBe('pending');
+    }
+  });
+});
