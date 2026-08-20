@@ -454,6 +454,7 @@ const RENDER_PURE_CORES = [
   'src/render/affliction_familiar_core.ts',
   'src/render/quest_beacon_core.ts',
   'src/render/coach_trail_core.ts',
+  'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',

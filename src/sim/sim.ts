@@ -147,6 +147,7 @@ import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content
 import { applyTalentMods } from './content/classes';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
+import { PROVING_SHORE_ARRIVAL } from './content/proving_shore';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
@@ -2723,6 +2724,23 @@ export class Sim {
       this.ownPlayerPid = this.addPlayer(this.cfg.playerClass, this.cfg.playerName, {
         autoEquip: this.cfg.autoEquip,
       });
+      // The compulsory tutorial starts ASHORE, not one greeting sweep later.
+      // An offline session is always a fresh character, so landing at the
+      // mainland spawn first would stream Eastbrook behind the loading screen
+      // and then teleport away from it a second afterwards, paying for both
+      // worlds to show one. The greeting sweep's already-ashore arm then just
+      // plays Odo's welcome. Online is unaffected: the server rolls the
+      // newborn row at the same arrival (server/main.ts initialCharacterState).
+      const ownPlayer = this.cfg.compulsoryTutorial
+        ? this.entities.get(this.ownPlayerPid)
+        : undefined;
+      if (ownPlayer) {
+        ownPlayer.pos = this.groundPos(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z);
+        ownPlayer.prevPos = { ...ownPlayer.pos };
+        ownPlayer.facing = PROVING_SHORE_ARRIVAL.facing;
+        ownPlayer.prevFacing = ownPlayer.facing;
+        this.rebucket(ownPlayer);
+      }
     }
 
     // Escort quest NPCs (src/sim/escort.ts). Last on purpose: the spawns draw

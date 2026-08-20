@@ -128,7 +128,7 @@ describe('progressive terrain build', () => {
 
     const builtChunkCount = terrain.group.children.length;
     expect(builtChunkCount).toBeGreaterThan(0);
-    const before = terrain.groundResidency();
+    const before = terrain.groundResidency({ x: 0, z: 0 });
     for (const [cx, cz] of ownedCells) expect(before.isPending(cx, cz)).toBe(false);
     for (const [cx, cz] of neighborCells) expect(before.isPending(cx, cz)).toBe(false);
 
@@ -137,7 +137,7 @@ describe('progressive terrain build', () => {
     // Same state an unvisited zone starts in: not loaded, and the chunk-level
     // fog clamp treats every one of its owned cells as owed again.
     expect(terrain.isZoneLoaded(zone.id)).toBe(false);
-    const after = terrain.groundResidency();
+    const after = terrain.groundResidency({ x: 0, z: 0 });
     for (const [cx, cz] of ownedCells) expect(after.isPending(cx, cz)).toBe(true);
     // The neighbouring zone's own cells (including ITS gap cells) must
     // survive: unloadZone must not over-clear past the evicted zone's
@@ -335,7 +335,7 @@ describe('progressive terrain build', () => {
   });
 });
 
-// The outdoor fog clamp reads residency per CHUNK through groundResidency(),
+// The outdoor fog clamp reads residency per CHUNK through groundResidency({ x: 0, z: 0 }),
 // so these pin the terrain side of that seam: what starts pending, and exactly
 // when a cell stops being pending.
 describe('chunk-level ground residency', () => {
@@ -361,7 +361,7 @@ describe('chunk-level ground residency', () => {
     const { zoneAt } = await import('../src/sim/data');
 
     const terrain = buildTerrain(20061);
-    const { grid, isPending } = terrain.groundResidency();
+    const { grid, isPending } = terrain.groundResidency({ x: 0, z: 0 });
     const cells = allCells(grid);
     const pendingCount = (): number => cells.filter(([cx, cz]) => isPending(cx, cz)).length;
 
@@ -400,7 +400,7 @@ describe('chunk-level ground residency', () => {
     const { zoneAt } = await import('../src/sim/data');
 
     const terrain = buildTerrain(20061);
-    const { grid, isPending } = terrain.groundResidency();
+    const { grid, isPending } = terrain.groundResidency({ x: 0, z: 0 });
     const startedPending = allCells(grid).filter(([cx, cz]) => isPending(cx, cz));
 
     // Idle pace, stopped mid-build: terrain.ts marks a cell in its internal

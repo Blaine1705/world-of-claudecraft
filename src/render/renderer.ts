@@ -3981,8 +3981,7 @@ export class Renderer {
     onProgress?: (done: number, total: number) => void,
   ): Promise<void> {
     if (this.shutdownStarted) return;
-    const worldZones = this.sim.cfg.world?.zones ?? ZONES;
-    const zones = zonesWithinStreamingHorizon(worldZones, x, z, radius);
+    const zones = zonesWithinStreamingHorizon(this.sim.cfg.world?.zones ?? ZONES, x, z, radius);
     let done = 0;
     for (const zone of zones) {
       await this.prepareZoneAt(zone.hub.x, zone.hub.z);
@@ -4022,8 +4021,9 @@ export class Renderer {
     this.skyResidency.updateSkyResidency(cameraX, cameraZ);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
+    // The ACTIVE world's zones, never the module list.
     this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
-      ZONES,
+      this.sim.cfg.world?.zones ?? ZONES,
       cameraX,
       cameraZ,
       horizon,
@@ -4037,14 +4037,14 @@ export class Renderer {
   private evictFarZoneIfConstrained(currentZoneId: string, playerX: number, playerZ: number): void {
     if (!GFX.constrainedMemory) return;
     const zoneId = zonesEligibleForEviction(
-      ZONES,
+      this.sim.cfg.world?.zones ?? ZONES,
       this.preparedZones,
       currentZoneId,
       playerX,
       playerZ,
     )[0];
     if (!zoneId) return;
-    const zone = ZONES.find((z) => z.id === zoneId);
+    const zone = (this.sim.cfg.world?.zones ?? ZONES).find((z) => z.id === zoneId);
     if (!zone) return;
     this.terrainView.unloadZone(zone);
     this.waterView.unloadZone(zone.id);
@@ -10124,7 +10124,7 @@ export class Renderer {
       // ~53 yd pinned the view at the floor until that entire rectangle (and
       // its HDRI) finished: 198 s of 45-yard wall after a Drakelands portal.
       // Read live rather than cached: an editor rebuildTerrain swaps the view.
-      const ground = this.terrainView.groundResidency();
+      const ground = this.terrainView.groundResidency(this.camera.position);
       const detailSource = vista ? this.detailFogFar : fog.far;
       const atmosphericFar = dampedValue(detailSource, requestedFar, dt, ZONE_ENVIRONMENT_RESPONSE);
       // Ask the clamp only about ground the camera can see. Radially, the
