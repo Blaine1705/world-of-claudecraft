@@ -16,6 +16,13 @@ import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import { validCharName } from './auth';
+import {
+  type AccountModerationRow,
+  type AccountModerationStatus,
+  type AuthTokenRow,
+  computeModerationStatus,
+  tokenInfoFromRow,
+} from './auth_guard_core';
 import type { BankBonusFacts } from './bank_entitlements';
 import {
   configureLifetimeXpRankCache,
@@ -40,7 +47,6 @@ import {
   GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
   GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS,
 } from './general_chat_quota_config';
-import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import { GENERAL_CHAT_QUOTA_SCHEMA } from './general_chat_quota_schema';
 import { GITHUB_SCHEMA } from './github_db';
 import {
@@ -1447,26 +1453,10 @@ export interface AccountRow {
   totp_last_window?: string | number | null;
 }
 
-export interface AccountModerationStatus {
-  locked: boolean;
-  banned: boolean;
-  suspendedUntil: string | null;
-  // True only for a self-deactivated account (locked, not banned, no active
-  // suspension). Lets a caller distinguish the deactivation lock from a
-  // suspension so it can surface the correct message/code (e.g. the API pipeline
-  // requireAccount maps it to account.deactivated, not moderation.suspended).
-  deactivated?: boolean;
-  reason: string;
-  message: string;
-  // Chat mute is independent of `locked`: a muted account can still log in and
-  // play, it just can't send chat until `chatMutedUntil` passes. Surfaced here
-  // so the WS auth handshake can seed the live session without a second query.
-  chatMutedUntil: string | null;
-  chatStrikes: number;
-  // Sparse account policy. Null means Unlimited. Loaded in this existing auth
-  // read so a known-unlimited session never performs quota database work.
-  generalChatRateLimit?: GeneralChatRateLimit | null;
-}
+// The status shape (and its compute) moved to server/auth_guard_core.ts so the
+// direct read below and the marketplace guard cache share one source of truth;
+// re-exported here so the existing importers compile unchanged.
+export type { AccountModerationStatus } from './auth_guard_core';
 
 export interface AccountChatMuteStatus {
   mutedUntil: string | null;
@@ -1811,22 +1801,36 @@ export async function saveToken(
   );
 }
 
+// The raw token-probe row for the guard reads (the cache's refresh source and
+// the direct read's fetch half). The expires_at > now() qual stays as the
+// DB-side belt; expires_at is ALSO selected so tokenInfoFromRow can re-check
+// expiry at read time, which is what makes a cached row safe
+// (server/auth_guard_core.ts owns the pure half).
+export async function authTokenRowForToken(token: string): Promise<AuthTokenRow | null> {
+  const res = await pool.query(
+    'SELECT account_id, scope, expires_at FROM auth_tokens WHERE token = $1 AND expires_at > now()',
+    [token],
+  );
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    accountId: row.account_id,
+    scope: String(row.scope),
+    expiresAtMs: new Date(row.expires_at).getTime(),
+  };
+}
+
 // Account + scope for a live token. Every caller receives the authority context:
 // read routes may accept both scopes, while mutation and privileged boundaries
 // require exact full scope. Unknown database values fail closed instead of being
 // promoted to full authority. Such a historical token also cannot authenticate
 // its own logout; account-level revocation remains available to clear the row.
+// Fetch + pure verdict (tokenInfoFromRow), the same pair the marketplace guard
+// cache composes, so the two arms cannot drift.
 export async function accountAndScopeForToken(
   token: string,
 ): Promise<{ accountId: number; scope: TokenScope } | null> {
-  const res = await pool.query(
-    'SELECT account_id, scope FROM auth_tokens WHERE token = $1 AND expires_at > now()',
-    [token],
-  );
-  const row = res.rows[0];
-  if (!row) return null;
-  if (row.scope !== 'full' && row.scope !== 'read') return null;
-  return { accountId: row.account_id, scope: row.scope };
+  return tokenInfoFromRow(await authTokenRowForToken(token), Date.now());
 }
 
 export interface AccountInfoRow {
@@ -2824,9 +2828,14 @@ export async function lifetimeXpRankForCharacter(
   return readLifetimeXpRankForCharacter(characterId);
 }
 
-export async function moderationStatusForAccount(
+// The raw moderation row for the guard reads (the cache's refresh source and
+// the direct read's fetch half): the accounts moderation columns plus the
+// LEFT-JOINed chat-quota policy. Every time-dependent verdict is computed from
+// this row by computeModerationStatus (server/auth_guard_core.ts) at read
+// time, which is why the ROW and never the computed result may be cached.
+export async function moderationRowForAccount(
   accountId: number,
-): Promise<AccountModerationStatus> {
+): Promise<AccountModerationRow | null> {
   const res = await pool.query(
     `SELECT a.banned_at, a.suspended_until, a.moderation_reason, a.chat_muted_until,
             a.chat_strikes, a.deactivated_at, q.messages, q.window_minutes
@@ -2835,83 +2844,16 @@ export async function moderationStatusForAccount(
      WHERE a.id = $1`,
     [accountId],
   );
-  const row = res.rows[0];
-  if (!row) {
-    return {
-      locked: false,
-      banned: false,
-      suspendedUntil: null,
-      reason: '',
-      message: '',
-      chatMutedUntil: null,
-      chatStrikes: 0,
-      generalChatRateLimit: null,
-    };
-  }
-  const mutedUntilDate = row.chat_muted_until ? new Date(row.chat_muted_until) : null;
-  const chatMutedUntil =
-    mutedUntilDate && mutedUntilDate.getTime() > Date.now() ? mutedUntilDate.toISOString() : null;
-  const chatStrikes = Number(row.chat_strikes ?? 0);
-  const generalChatRateLimit =
-    row.messages === null || row.messages === undefined
-      ? null
-      : {
-          messages: Number(row.messages),
-          windowMinutes: Number(row.window_minutes),
-        };
-  // Admin-imposed states (ban, then active suspension) outrank a self-imposed
-  // deactivation: a banned+deactivated account must still surface the ban reason
-  // and label, not be relabelled "deactivated". All branches resolve to locked.
-  if (row.banned_at) {
-    return {
-      locked: true,
-      banned: true,
-      suspendedUntil: null,
-      reason: row.moderation_reason ?? '',
-      message: 'This account has been banned.',
-      chatMutedUntil,
-      chatStrikes,
-      generalChatRateLimit,
-    };
-  }
-  const suspendedUntil = row.suspended_until ? new Date(row.suspended_until) : null;
-  if (suspendedUntil && suspendedUntil.getTime() > Date.now()) {
-    return {
-      locked: true,
-      banned: false,
-      suspendedUntil: suspendedUntil.toISOString(),
-      reason: row.moderation_reason ?? '',
-      message: `This account is suspended until ${suspendedUntil.toUTCString()}.`,
-      chatMutedUntil,
-      chatStrikes,
-      generalChatRateLimit,
-    };
-  }
-  // A self-deactivated account is locked out of login + WS auth (same gate as
-  // banned/suspended) until an admin reactivates it.
-  if (row.deactivated_at) {
-    return {
-      locked: true,
-      banned: false,
-      suspendedUntil: null,
-      deactivated: true,
-      reason: '',
-      message: 'This account has been deactivated.',
-      chatMutedUntil,
-      chatStrikes,
-      generalChatRateLimit,
-    };
-  }
-  return {
-    locked: false,
-    banned: false,
-    suspendedUntil: null,
-    reason: '',
-    message: '',
-    chatMutedUntil,
-    chatStrikes,
-    generalChatRateLimit,
-  };
+  return res.rows[0] ?? null;
+}
+
+// Fetch + pure verdict (computeModerationStatus), the same pair the
+// marketplace guard cache composes, so the two arms cannot drift. The
+// decision ladder itself lives in server/auth_guard_core.ts.
+export async function moderationStatusForAccount(
+  accountId: number,
+): Promise<AccountModerationStatus> {
+  return computeModerationStatus(await moderationRowForAccount(accountId), Date.now());
 }
 
 export async function chatMuteStatusForAccount(accountId: number): Promise<AccountChatMuteStatus> {
