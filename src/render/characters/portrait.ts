@@ -117,9 +117,11 @@ function ensureRig(): PortraitRig {
     alpha: true,
     antialias: true,
     // The cost is permanent, not conditional: the flag makes every frame this
-    // context draws survive its own composite, whether or not the synchronous
-    // fallback arm ever reads the buffer back. It stays because that arm has
-    // to remain available on a context that cannot fence.
+    // context draws survive its own composite, whether or not an arm that reads
+    // the default framebuffer back runs. TWO arms depend on it now: the
+    // transfer arm snapshots this buffer with createImageBitmap, and the
+    // synchronous fallback reads it with toBlob (portrait_snapshot.ts). Do not
+    // drop the flag when one of them is retired.
     preserveDrawingBuffer: true,
   });
   newRenderer.debug.checkShaderErrors = shaderDebugRequested();

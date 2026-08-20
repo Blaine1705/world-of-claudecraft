@@ -66,12 +66,33 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `portrait_prewarm_core.ts` (the async capture's step order) +
   `portrait_capture_lane_core.ts` (one live capture per cache key). The CAPTURE
   itself is `portrait_snapshot.ts`, a thin GL adapter over the pure
-  `portrait_readback_core.ts` and the DOM-only `portrait_png_encode.ts`: it
+  `portrait_bitmap_transfer_core.ts` and `portrait_readback_core.ts`, the
+  worker client `portrait_bitmap_encode.ts` (with
+  `portrait_encode_worker.ts`) and the DOM-only `portrait_png_encode.ts`. It
+  has THREE arms, each falling through to the next. First it draws into the
+  rig's own drawing buffer, snapshots that frame with `createImageBitmap` and
+  TRANSFERS the bitmap to the encode worker, so no portrait byte ever reaches
+  the gameplay thread: measured on a Mesa iGPU under a loaded ride, p50 0 ms of
+  main-thread blocking per capture against 116 ms for the readback arm, and not
+  one capture in 24 blocking for over 16 ms. Failing that (no `Worker`, no
+  `OffscreenCanvas`, no `createImageBitmap`, or a latched worker failure) it
   renders into a `WebGLRenderTarget` and reads it back through three's
-  fence-backed `readRenderTargetPixelsAsync`, because `canvas.toBlob` off the
-  default framebuffer defers the PNG ENCODE but does the GPU READBACK
-  synchronously (67 to 118 ms per portrait unit, 1477 ms of self time across a
-  post-entry ride). The core owns the TWO software conversions that keep
+  fence-backed `readRenderTargetPixelsAsync`, which still beats the last arm
+  because `canvas.toBlob` off the default framebuffer defers the PNG ENCODE but
+  does the GPU READBACK synchronously (67 to 118 ms per portrait unit, 1477 ms
+  of self time across a post-entry ride); on an integrated GPU the fence only
+  says the bytes are READY, and `getBufferSubData` still blocks 28 to 76 ms
+  pulling them across, which is what the transfer arm exists to avoid. The
+  transfer arm claims the rig's ONE default framebuffer from its draw until its
+  snapshot is in hand, so a second capture in that window takes the readback arm
+  rather than drawing over a frame still being copied; its own failure is
+  latched separately (a dead worker must not cost the rig its fence-backed
+  readback too), and a worker that cannot even be CONSTRUCTED costs only the
+  arm, not the capture, which falls to the readback with the draw closure still
+  valid. Which arm each capture took, and every latch, is counted in
+  `gpu_prep_events.ts` (`perfStats().gpuPrep.events.portraits`): a host that
+  silently loses the top arm just gets slower, and nothing else in a capture
+  would say so. The core owns the TWO software conversions that keep
   the output the same colour toBlob's was: readPixels is bottom-up where
   ImageData is top-down, and both buffers hold premultiplied colour where a PNG
   holds straight alpha. The sRGB transfer is NOT one of them, it is done by the

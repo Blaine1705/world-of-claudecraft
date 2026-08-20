@@ -1,4 +1,11 @@
 import * as THREE from 'three';
+import { notePortraitArmLatched, notePortraitCaptureArm } from '../gpu_prep_events';
+import {
+  disposePortraitEncodeWorker,
+  encodeCanvasBitmapPng,
+  portraitBitmapEncodeSupport,
+} from './portrait_bitmap_encode';
+import { bitmapPortraitTransferUsable } from './portrait_bitmap_transfer_core';
 import { encodeCanvasPng, encodeRgbaPngDataUrl } from './portrait_png_encode';
 import {
   asyncPortraitReadbackUsable,
@@ -6,9 +13,32 @@ import {
   portraitReadbackByteLength,
 } from './portrait_readback_core';
 
-// The portrait capture's readback adapter: the thin GL half over the pure
-// buffer core (portrait_readback_core.ts) and the PNG encode
+// The portrait capture's transfer adapter: the thin GL half over the pure
+// cores (portrait_bitmap_transfer_core.ts, portrait_readback_core.ts), the
+// worker encode (portrait_bitmap_encode.ts) and the PNG encode
 // (portrait_png_encode.ts).
+//
+// THREE ARMS, in this order, each one falling through to the next:
+//
+// 1. TRANSFER. Draw into the rig's own drawing buffer, snapshot it with
+//    createImageBitmap and transfer that bitmap to the encode worker. The
+//    bytes never enter this thread at all, which is what an integrated GPU
+//    cares about: measured on a Mesa iGPU under a loaded ride, p50 0 ms of
+//    main-thread blocking per capture against 116 ms for arm 2, and not one
+//    capture in 24 blocking for over 16 ms.
+// 2. READBACK. Render into a WebGLRenderTarget and read it back through
+//    three's fence-backed readRenderTargetPixelsAsync. Needs no worker, and
+//    still beats arm 3 on a discrete GPU, but it ends with the pixels in a JS
+//    ArrayBuffer: getBufferSubData blocks 28 to 76 ms on an iGPU because the
+//    fence only says the data is READY, not that pulling it across is free.
+// 3. CANVAS. The original path: draw into the default framebuffer and let
+//    canvas.toBlob do a synchronous readback plus a deferred encode. Slowest
+//    on the main thread, but it needs no worker, no fence and no render
+//    target, so it is what keeps any failure above from dropping portraits.
+//
+// Arms 1 and 3 draw into the SAME default framebuffer and the same drawn frame
+// serves either, which is why a transfer that cannot even start (no worker) is
+// still encodable synchronously without a second draw.
 //
 // WHY THIS EXISTS. The capture used to render into the offscreen rig's DEFAULT
 // framebuffer (preserveDrawingBuffer: true) and call canvas.toBlob. toBlob
@@ -94,9 +124,19 @@ export class PortraitSnapshotTarget {
   /** Latched by any async failure, so one broken readback costs one portrait
    *  and every later capture takes the synchronous path instead. */
   private asyncFailed = false;
+  /** The same latch for the transfer arm: one worker failure costs one
+   *  portrait and sends every later capture down the readback arm. Separate
+   *  from `asyncFailed` because the two arms fail for unrelated reasons and a
+   *  worker that dies must not cost the rig its fence-backed readback too. */
+  private bitmapFailed = false;
   /** Bumped by dispose. A readback issued against the released buffers lands
    *  with a stale generation and writes nothing. */
   private generation = 0;
+  /** True from the draw until the transfer arm has copied that frame out of
+   *  the rig's ONE default framebuffer. A second capture in that window would
+   *  draw over the frame this one is still snapshotting, so it takes the
+   *  readback arm instead. */
+  private snapshotInFlight = false;
   /** True from the moment an async readback is issued until its bytes have
    *  been flipped out. `pixels` and `topDown` are shared by every capture on
    *  this rig while the lane above only dedupes per cache KEY, so a second
@@ -109,18 +149,49 @@ export class PortraitSnapshotTarget {
   /**
    * Draw one portrait and encode it as a PNG data URL.
    *
-   * `draw` MUST be called before this returns its promise, on both paths: the
+   * `draw` MUST be called before this returns its promise, on every arm: the
    * caller (runPortraitPrewarm) releases and disposes the subject as soon as
    * the promise exists, so nothing may be drawn after the first await. That is
    * also why the path is chosen up front rather than after a failure: once the
    * readback has been issued there is no subject left to re-render.
    */
   capture(renderer: PortraitSnapshotRenderer, draw: () => void): Promise<string | null> {
+    const contextLost = this.contextLost(renderer);
+    const support = portraitBitmapEncodeSupport();
+    if (
+      bitmapPortraitTransferUsable({
+        hasCreateImageBitmap: support.hasCreateImageBitmap,
+        hasWorker: support.hasWorker,
+        hasOffscreenCanvas: support.hasOffscreenCanvas,
+        failedBefore: this.bitmapFailed,
+        contextLost,
+        snapshotInFlight: this.snapshotInFlight,
+      })
+    ) {
+      const transferred = this.captureViaTransfer(renderer, draw);
+      // Null means the transfer never started, and the draw closure is still
+      // valid: the readback arm re-draws (into its own target) rather than
+      // letting this one capture pay the synchronous encode.
+      if (transferred) return transferred;
+    }
+    return this.captureViaReadback(renderer, draw, contextLost);
+  }
+
+  /**
+   * The readback arm, and the synchronous canvas arm below it: render into the
+   * target and read it back behind three's fence, or fall back to the draw
+   * plus `toBlob` that needs neither fence nor worker.
+   */
+  private captureViaReadback(
+    renderer: PortraitSnapshotRenderer,
+    draw: () => void,
+    contextLost: boolean,
+  ): Promise<string | null> {
     const readAsync = renderer.readRenderTargetPixelsAsync;
     const usable = asyncPortraitReadbackUsable({
       hasAsyncReadback: typeof readAsync === 'function',
       failedBefore: this.asyncFailed,
-      contextLost: this.contextLost(renderer),
+      contextLost,
       captureInFlight: this.captureInFlight,
     });
     if (!readAsync || !usable) return this.captureSync(renderer, draw);
@@ -141,7 +212,7 @@ export class PortraitSnapshotTarget {
       readback = readAsync.call(renderer, target, 0, 0, this.size, this.size, pixels);
     } catch {
       renderer.setRenderTarget(previousTarget, previousFace, previousMipmapLevel);
-      this.asyncFailed = true;
+      this.latchReadback();
       // Still inside the caller's synchronous window, so the subject is mounted
       // and the fallback can draw it.
       return this.captureSync(renderer, draw);
@@ -161,7 +232,8 @@ export class PortraitSnapshotTarget {
       const dest = this.ensureTopDown();
       flipUnpremultiplyInto(pixels, dest, this.size, this.size);
       return encodeRgbaPngDataUrl(dest, this.size, this.size).then((url) => {
-        if (url === null) this.asyncFailed = true;
+        if (url === null) this.latchReadback();
+        else notePortraitCaptureArm('readback');
         return url;
       });
     });
@@ -182,12 +254,12 @@ export class PortraitSnapshotTarget {
   private awaitReadback(readback: Promise<unknown>, pixels: Uint8Array): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       const backstop = setTimeout(() => {
-        this.asyncFailed = true;
+        this.latchReadback();
         resolve(false);
       }, PORTRAIT_READBACK_LIVENESS_BACKSTOP_MS);
       const settle = (landed: boolean): void => {
         clearTimeout(backstop);
-        if (!landed) this.asyncFailed = true;
+        if (!landed) this.latchReadback();
         resolve(landed);
       };
       readback.then(
@@ -197,16 +269,72 @@ export class PortraitSnapshotTarget {
     });
   }
 
-  /** Release the target and its buffers (graphics rebuild, page teardown). A
-   *  fresh context gets a fresh chance at the async path. */
+  /**
+   * The transfer arm: draw into the rig's default framebuffer and hand that
+   * frame to the encode worker as a transferable ImageBitmap.
+   *
+   * The snapshot is taken inside `encodeCanvasBitmapPng`, synchronously with
+   * the draw, so a later capture on the shared rig cannot bleed into this one
+   * (the same guarantee `toBlob` gives). Nothing here is shared between
+   * captures, so unlike the readback arm two of them may run at once.
+   */
+  private captureViaTransfer(
+    renderer: PortraitSnapshotRenderer,
+    draw: () => void,
+  ): Promise<string | null> | null {
+    draw();
+    this.snapshotInFlight = true;
+    const release = (): void => {
+      this.snapshotInFlight = false;
+    };
+    const encode = encodeCanvasBitmapPng(renderer.domElement, this.size, release);
+    if (!encode) {
+      // Never started (no worker could be built): nothing was copied, so the
+      // claim goes back at once and the caller picks another arm.
+      release();
+      this.latchTransfer();
+      return null;
+    }
+    const generation = this.generation;
+    return encode.then((url) => {
+      // A dispose released this rig while the encode was in flight; the URL
+      // belongs to a pre-rebuild frame and must not be committed, and the
+      // latch must not fire against a rig that no longer exists.
+      if (generation !== this.generation) return null;
+      if (url === null) this.latchTransfer();
+      else notePortraitCaptureArm('transfer');
+      return url;
+    });
+  }
+
+  /** Latch an arm off for the rest of this rig's life, once, and leave the
+   *  evidence: a host that silently loses an arm just gets slower, and the
+   *  counters are the only place that shows up. */
+  private latchTransfer(): void {
+    if (this.bitmapFailed) return;
+    this.bitmapFailed = true;
+    notePortraitArmLatched('transfer');
+  }
+
+  private latchReadback(): void {
+    if (this.asyncFailed) return;
+    this.asyncFailed = true;
+    notePortraitArmLatched('readback');
+  }
+
+  /** Release the target, its buffers and the encode worker (graphics rebuild,
+   *  page teardown). A fresh context gets a fresh chance at both async arms. */
   dispose(): void {
     this.target?.dispose();
     this.target = null;
     this.pixels = null;
     this.topDown = null;
     this.asyncFailed = false;
+    this.bitmapFailed = false;
     this.captureInFlight = false;
+    this.snapshotInFlight = false;
     this.generation++;
+    disposePortraitEncodeWorker();
   }
 
   /** The original path: render into the default framebuffer and let toBlob do
@@ -217,6 +345,7 @@ export class PortraitSnapshotTarget {
     draw: () => void,
   ): Promise<string | null> {
     draw();
+    notePortraitCaptureArm('canvas');
     return encodeCanvasPng(renderer.domElement);
   }
 
