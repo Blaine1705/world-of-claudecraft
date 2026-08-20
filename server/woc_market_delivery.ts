@@ -393,7 +393,12 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
       // would expire a still-live, still-provable retry into a permanent
       // operator-only park.
       pending.stampMs = ctx.now();
-      return commitGrant(custodyRef, snap.save);
+      return commitGrant(
+        custodyRef,
+        settlement.buyerAccount,
+        pending.characterId,
+        pending.leaseNonce,
+      );
     }
     // Fresh claim: stamp the durable grant intent BEFORE touching the bags, so
     // a crash at any later point leaves a claim that says "a grant may have
@@ -420,30 +425,38 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
       stampMs: ctx.now(),
     });
     watchStampHighWater();
-    return commitGrant(custodyRef, granted.save);
+    return commitGrant(
+      custodyRef,
+      settlement.buyerAccount,
+      target.characterId,
+      granted.save.leaseNonce,
+    );
   }
 
   /** The durable half of a direct hand-off: persist the granted bags and book
-   *  the ref in ONE transaction (saveDeliveredCharacterBooked). See
-   *  handToBuyer for what each outcome means to the caller.
-   *
-   *  RECORDED CARVE-OUT from the per-character save FIFO: unlike the escrow
-   *  listing write (createListing's runSerialized job), this write does NOT
-   *  ride enqueueCharacterWrite, so a stale autosave serialized before the
-   *  grant can still commit after it. That direction is item LOSS on the
-   *  buyer, not a mint, and the claims ledger plus the park subset make it
-   *  operator-recoverable (the lease_lost arm below documents exactly this
-   *  ambiguity); routing sweep-driven grants through the FIFO would also let
-   *  one wedged character save head-of-line block a delivery batch, which
-   *  needs its own bound before it is safe. Closing this half is filed as
-   *  packet follow-up work, not silently deferred. */
+   *  the ref in ONE transaction (saveDeliveredCharacterBooked), riding the
+   *  BUYER'S per-character save FIFO through custody's bounded
+   *  persistGrantSerialized (the escrow write-path rider CLOSED the old
+   *  carve-out here): the blob is re-serialized inside the FIFO slot, so a
+   *  stale pre-grant autosave always commits BEFORE the grant's save and
+   *  can never roll the delivered item back out of the buyer's durable
+   *  bags. The head-of-line bound the carve-out demanded is the entry's
+   *  wait deadline: a wedged FIFO answers 'busy' with nothing written and
+   *  this row simply PARKS (claim, grant intent, and ledger entry intact;
+   *  the batch rotation backs it off), so one stuck character save costs a
+   *  bounded wait, never the locked delivery segment. See handToBuyer for
+   *  what each outcome means to the caller. */
   async function commitGrant(
     custodyRef: string,
-    save: CharacterSaveArgs,
+    accountId: number,
+    characterId: number,
+    leaseNonce: string | undefined,
   ): Promise<'handed' | 'abort'> {
-    let out: 'booked' | 'lease_lost' | 'claim_missing';
+    let out: 'booked' | 'lease_lost' | 'claim_missing' | 'busy' | 'session_lost';
     try {
-      out = await ctx.db.saveDeliveredCharacterBooked(save, custodyRef);
+      out = await ctx.custody.persistGrantSerialized(accountId, characterId, leaseNonce, (save) =>
+        ctx.db.saveDeliveredCharacterBooked(save, custodyRef),
+      );
     } catch (err) {
       // Transient throw (pool exhaustion, timeout, connection reset): the
       // transaction may or may not have committed. Keep the claim, the grant
@@ -451,6 +464,19 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
       // and either sees the commit (handed) or retries this same session.
       // NEVER fall through to mail here: that was the B2b double copy.
       ctx.sweepError('deliver_grant', err);
+      return 'abort';
+    }
+    if (out === 'busy') {
+      // The bounded head-of-line arm: nothing serialized, nothing written,
+      // everything durable intact; the next pass retries the SAME ref.
+      return 'abort';
+    }
+    if (out === 'session_lost') {
+      // The session left or rotated DURING the FIFO wait: the
+      // continuous-memory retry is dead (the pre-checks in handToBuyer
+      // catch the earlier cases), so drop the entry and park for the
+      // operator, exactly like the fence arm below.
+      ctx.pendingGrants.delete(custodyRef);
       return 'abort';
     }
     if (out === 'booked') {

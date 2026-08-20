@@ -237,6 +237,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       runSerialized: () => {
         throw new Error('custody not exercised by this suite');
       },
+      persistGrantSerialized: () => {
+        throw new Error('custody not exercised by this suite');
+      },
       ownsLiveCharacter: () => true,
       escrowSessionLost: () => {},
       extractCopy: () => {
@@ -1623,6 +1626,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
         economy: proxyMod.createDevWocMarketEconomy(() => BASE_MS),
         custody: {
           runSerialized: () => {
+            throw new Error('custody not exercised');
+          },
+          persistGrantSerialized: () => {
             throw new Error('custody not exercised');
           },
           ownsLiveCharacter: () => true,

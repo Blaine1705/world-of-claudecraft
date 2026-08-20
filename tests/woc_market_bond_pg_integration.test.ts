@@ -95,6 +95,9 @@ const inertCustody: WocMarketCustody = {
   runSerialized() {
     throw new Error('not exercised');
   },
+  persistGrantSerialized() {
+    throw new Error('not exercised');
+  },
   ownsLiveCharacter() {
     return true;
   },

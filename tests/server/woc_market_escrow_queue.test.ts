@@ -851,6 +851,92 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(after.maxMs).toBeGreaterThanOrEqual(before.maxMs);
   });
 
+  it('the delivered save rides the FIFO with an in-slot serialize (the closed carve-out)', async () => {
+    // The hazard the close removes: a stale pre-grant autosave committing
+    // AFTER the grant's save rolled the delivered item back out of the
+    // buyer's durable bags. Riding the FIFO orders the persist after every
+    // earlier queued write, and serializing INSIDE the slot makes the blob
+    // reflect the live bags at run time, not at call time: proven here by
+    // granting an item DURING the wait and finding it in the persisted
+    // state.
+    const rig = makeRig();
+    let releaseQueue!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseQueue = resolve;
+    });
+    const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+      await held;
+    });
+    const persisted: CharacterState[] = [];
+    const grant = rig.custody.persistGrantSerialized(SELLER, SELLER_CHAR, NONCE, async (save) => {
+      persisted.push(save.state);
+      return 'booked' as const;
+    });
+    await settle();
+    // Still queued behind the wedge: nothing serialized yet.
+    expect(persisted).toHaveLength(0);
+    // The live bags change while the persist waits its turn; the in-slot
+    // serialize must carry this.
+    rig.server.sim.addItem(EPIC_ITEM, 1, rig.session.pid, { silent: true });
+    releaseQueue();
+    await wedge;
+    expect(await grant).toBe('booked');
+    expect(persisted).toHaveLength(1);
+    expect(persisted[0]?.inventory.some((s) => s.itemId === EPIC_ITEM)).toBe(true);
+  });
+
+  it('a wedged FIFO answers busy at the grant deadline, with nothing serialized or written', async () => {
+    // The head-of-line bound the old carve-out demanded before the close was
+    // safe: the locked delivery segment waits one bounded deadline, parks
+    // the row, and moves on; the cancelled job later drains as a strict
+    // no-op.
+    const rig = makeRig({ escrowWaitMs: 300 });
+    let releaseQueue!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseQueue = resolve;
+    });
+    const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+      await held;
+    });
+    let persistRuns = 0;
+    const out = await rig.custody.persistGrantSerialized(SELLER, SELLER_CHAR, NONCE, async () => {
+      persistRuns++;
+      return 'booked' as const;
+    });
+    expect(out).toBe('busy');
+    expect(persistRuns).toBe(0);
+    releaseQueue();
+    await wedge;
+    await settle();
+    // The abandoned job drained without running the persist.
+    expect(persistRuns).toBe(0);
+  });
+
+  it('a lease rotated during the grant wait answers session_lost under the slot', async () => {
+    // The pre-checks in the delivery arms catch a rotation BEFORE the wait;
+    // this is the in-slot re-validation catching one DURING it, the window
+    // where only the FIFO position knows the truth.
+    const rig = makeRig();
+    let releaseQueue!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseQueue = resolve;
+    });
+    const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+      await held;
+    });
+    let persistRuns = 0;
+    const grant = rig.custody.persistGrantSerialized(SELLER, SELLER_CHAR, NONCE, async () => {
+      persistRuns++;
+      return 'booked' as const;
+    });
+    await settle();
+    rig.session.leaseNonce = 'nonce-rotated';
+    releaseQueue();
+    await wedge;
+    expect(await grant).toBe('session_lost');
+    expect(persistRuns).toBe(0);
+  });
+
   it('a held escrow FIFO stalls only its own save: the saveAll wave drains every other character', async () => {
     // The owed saveAll-wave suppression MEASUREMENT (dbperf proof 3), taken
     // as a pinned fact: there is NO suppression mechanism, escrow protection
@@ -979,15 +1065,31 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(kinds).toEqual(['books_dirty_refused', 'settled']);
   });
 
-  it('the delivered-save twin keeps its recorded FIFO carve-out', () => {
-    // The carve-out is a decision, not an accident: exactly ONE runSerialized
-    // call site exists in the service (createListing), and commitGrant stays
-    // off the FIFO until its head-of-line bound is designed (recorded at the
-    // method). This pin dates the decision; widening or closing it must land
+  it('every custody FIFO write rides one of the two sanctioned custody entries', () => {
+    // The old commitGrant carve-out is CLOSED (the escrow write-path rider):
+    // the delivered save now rides custody's bounded persistGrantSerialized,
+    // so the FIFO surface is exactly TWO custody entries (the listing's
+    // runSerialized, the grant's persistGrantSerialized) and this pin holds
+    // the counts: exactly ONE runSerialized call site in the service
+    // (createListing), exactly ONE persistGrantSerialized call site in the
+    // delivery arms (commitGrant), zero direct enqueueCharacterWrite
+    // anywhere outside custody, and custody itself holds exactly the two
+    // host.enqueueCharacterWrite seams. Widening any of these must land
     // here in the same change.
     const src = stripComments(readFileSync(resolve(process.cwd(), 'server/woc_market.ts'), 'utf8'));
     expect(src.match(/\.runSerialized\(/g)).toHaveLength(1);
     expect(src).not.toContain('enqueueCharacterWrite');
+    // The coordinator DECLARES the member on the custody interface but never
+    // calls it: the call form (dot plus paren) is what stays at zero here.
+    expect(src).not.toContain('.persistGrantSerialized(');
+    const custodySrc = stripComments(
+      readFileSync(resolve(process.cwd(), 'server/woc_market_custody.ts'), 'utf8'),
+    );
+    expect(custodySrc.match(/host\.enqueueCharacterWrite/g)).toHaveLength(2);
+    const deliverySrc = stripComments(
+      readFileSync(resolve(process.cwd(), 'server/woc_market_delivery.ts'), 'utf8'),
+    );
+    expect(deliverySrc.match(/\.persistGrantSerialized\(/g)).toHaveLength(1);
     // The service module is not the only place a custody character write
     // could appear: the sweep and the monitor run the same domain on their
     // own clocks. Counting only in woc_market.ts would date a carve-out a
@@ -995,10 +1097,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     for (const sibling of [
       'server/woc_market_sweep.ts',
       'server/woc_market_monitor.ts',
-      // The extracted delivery arms carry the same flat zero: commitGrant's
-      // carve-out moved WITH the code, so the file that now owns it is the
-      // file this pin must watch (a scan that stopped at the coordinator
-      // would date a carve-out its own extraction had moved out of view).
+      // The extracted delivery arms reach the FIFO ONLY through the
+      // sanctioned persistGrantSerialized site counted above; everything
+      // else stays flat zero here like the sweep and the monitor.
       'server/woc_market_delivery.ts',
     ]) {
       const siblingSrc = stripComments(readFileSync(resolve(process.cwd(), sibling), 'utf8'));
@@ -1007,6 +1108,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
       expect(siblingSrc).toContain('export function create');
       expect(siblingSrc).not.toContain('.runSerialized(');
       expect(siblingSrc).not.toContain('enqueueCharacterWrite');
+      if (sibling !== 'server/woc_market_delivery.ts') {
+        expect(siblingSrc).not.toContain('persistGrantSerialized');
+      }
       // The realm-global escrow gate is custody-only by decision (the
       // write-path rider): the sweep and the monitor taking it would couple
       // their backpressure to the listing path's (the enqueueMarketWrite

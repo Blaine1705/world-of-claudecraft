@@ -21,6 +21,7 @@ import { ed25519 } from '@noble/curves/ed25519';
 import bs58 from 'bs58';
 import { describe, expect, it, vi } from 'vitest';
 import type {
+  CharacterSaveArgs,
   Refused,
   WocBidRow,
   WocBrowseQuery,
@@ -117,6 +118,38 @@ class FakeCustody implements WocMarketCustody {
       return 'contended';
     }
     return job();
+  }
+
+  /** Every persistGrantSerialized invocation's characterId, in order: the
+   *  pin that the delivered save rides the FIFO grant entry since the
+   *  write-path rider closed the commitGrant carve-out. */
+  readonly grantRuns: number[] = [];
+  /** Force the NEXT grant persist to answer 'busy' without running (the
+   *  wedged-FIFO head-of-line refusal; nothing serialized, nothing written). */
+  failNextGrantBusy = false;
+
+  async persistGrantSerialized<T>(
+    accountId: number,
+    characterId: number,
+    expectedNonce: string | undefined,
+    persist: (save: CharacterSaveArgs) => Promise<T>,
+  ): Promise<T | 'busy' | 'session_lost'> {
+    this.grantRuns.push(characterId);
+    if (this.failNextGrantBusy) {
+      this.failNextGrantBusy = false;
+      return 'busy';
+    }
+    // The real entry validates UNDER the FIFO slot: session live, owned, and
+    // the lease unrotated since the grant.
+    if (!this.bags.has(characterId)) return 'session_lost';
+    if (this.owners.get(characterId) !== accountId) return 'session_lost';
+    if (this.leaseNonce !== expectedNonce) return 'session_lost';
+    return persist({
+      characterId,
+      level: 10,
+      state: {} as unknown as CharacterState,
+      leaseNonce: this.leaseNonce,
+    });
   }
 
   ownsLiveCharacter(accountId: number, characterId: number): boolean {
@@ -7223,6 +7256,31 @@ describe('an unprovable hand-off parks instead of mailing a second copy', () => 
       grantCharacterId: CHAR_A,
       mailIntent: false,
     });
+  });
+
+  it('PARKS a busy FIFO grant persist and resumes it next pass (the closed carve-out)', async () => {
+    // The head-of-line bound the write-path rider shipped with the FIFO
+    // close: a wedged buyer save queue answers 'busy' from the bounded
+    // custody entry with nothing serialized or written, the row parks with
+    // its claim, grant intent, and ledger entry intact, and the NEXT pass
+    // resumes the SAME session's grant through a snapshot, never a second
+    // grantCopy and never the mail rail.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    const before = bagsOf(h, CHAR_A).length;
+    h.custody.failNextGrantBusy = true;
+    const { listingId } = await directedSale(h, 'sig-busy-1');
+    expect((await liveSettlement(h, listingId)).state).toBe('delivering');
+    // The grant reached the live bags; the persist never ran.
+    expect(bagsOf(h, CHAR_A)).toHaveLength(before + 1);
+    expect(h.custody.grantRuns, 'the FIFO entry was asked exactly once').toHaveLength(1);
+    expect(h.custody.parcels, 'a busy persist never falls through to mail').toHaveLength(0);
+    h.setNow(h.now() + PAST_BACKOFF_MS);
+    await h.service.sweepPass();
+    expect(h.custody.grantCalls, 'granted once; the retry was a snapshot').toBe(1);
+    expect(h.custody.grantRuns.length).toBeGreaterThanOrEqual(2);
+    expect(bagsOf(h, CHAR_A), 'still exactly one copy').toHaveLength(before + 1);
+    expect((await h.db.listingById(REALM, listingId))?.status).toBe('closed');
   });
 
   it('refreshes a provable resume on every attempt, so long contention cannot expire it', async () => {

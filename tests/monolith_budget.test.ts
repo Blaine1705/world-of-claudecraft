@@ -260,10 +260,15 @@ const MONOLITHS: MonolithRow[] = [
     // custody rail, the hand-off with its grant ledger, and the return
     // flight moved to server/woc_market_delivery.ts behind a WocDeliveryCtx
     // slice, paying for the rider's drain rung and re-pinning DOWN at the
-    // exact count. The ledgers stay on the service (live state); the bond
-    // payout walk is the next standing candidate.
+    // exact count (4484 to 3984). The FIFO close then added the
+    // persistGrantSerialized member and its contract doc to the
+    // WocMarketCustody interface the coordinator owns: declaration surface
+    // for an extracted implementation, the one shape a sibling cannot
+    // absorb, landing at exactly 4000 (net 484 DOWN across the rider). The
+    // ledgers stay on the service (live state); the bond payout walk is the
+    // next standing candidate.
     file: 'server/woc_market.ts',
-    ceiling: 3984,
+    ceiling: 4000,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

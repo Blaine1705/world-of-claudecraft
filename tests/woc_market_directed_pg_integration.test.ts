@@ -240,6 +240,9 @@ describeDb('woc market directed rail against real Postgres', () => {
       grantCopy: () => {
         throw new Error('grant not exercised by this suite');
       },
+      persistGrantSerialized: () => {
+        throw new Error('grant persist not exercised by this suite');
+      },
       snapshotCopy: () => {
         throw new Error('snapshot not exercised by this suite');
       },

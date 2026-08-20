@@ -1080,6 +1080,22 @@ export interface WocMarketCustody {
    *  the returned save already hold the earlier grant (same live session), so
    *  persisting it retries the delivery without minting a second copy. */
   snapshotCopy(accountId: number, characterId: number): WocCustodyGrant;
+  /** The delivered-save FIFO entry (the write-path rider closed the
+   *  commitGrant carve-out): run `persist` with a snapshot serialized INSIDE
+   *  the character's save-FIFO slot, so the grant's blob orders against the
+   *  buyer's autosaves exactly like the escrow write orders against the
+   *  seller's. 'busy' is the head-of-line bound (the FIFO stayed wedged past
+   *  the wait deadline; nothing serialized or written, the caller parks and
+   *  retries off its durable claim); 'session_lost' means the session left
+   *  or its lease rotated during the wait (park; only the operator can
+   *  attribute the earlier grant). Every caller's T must stay an object or
+   *  a literal distinct from these two sentinels. */
+  persistGrantSerialized<T>(
+    accountId: number,
+    characterId: number,
+    expectedNonce: string | undefined,
+    persist: (save: CharacterSaveArgs) => Promise<T>,
+  ): Promise<T | 'busy' | 'session_lost'>;
   /** Compensation for a failed escrow persist: the copy goes back into the
    *  extraction pid's live bags while that player exists (a queued teardown
    *  flush then persists it), or home by return parcel once it is gone. */

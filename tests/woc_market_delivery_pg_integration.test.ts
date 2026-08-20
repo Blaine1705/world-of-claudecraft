@@ -65,6 +65,11 @@ class ParcelCustody implements WocMarketCustody {
   runSerialized(): never {
     throw new Error('escrow extraction is not exercised by this suite');
   }
+  persistGrantSerialized(): never {
+    // Unreachable here BY CONSTRUCTION: grantCopy answers offline, so every
+    // delivery takes the mail rail and the FIFO grant entry never runs.
+    throw new Error('the grant persist is not exercised by this suite (buyers read offline)');
+  }
   ownsLiveCharacter(): boolean {
     return true;
   }

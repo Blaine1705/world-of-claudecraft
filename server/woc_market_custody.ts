@@ -262,6 +262,74 @@ export function createWocMarketCustody(
       }
     },
 
+    async persistGrantSerialized<T>(
+      accountId: number,
+      characterId: number,
+      expectedNonce: string | undefined,
+      persist: (save: {
+        characterId: number;
+        level: number;
+        state: CharacterState;
+        leaseNonce: string | undefined;
+      }) => Promise<T>,
+    ): Promise<T | 'busy' | 'session_lost'> {
+      // The delivered-save FIFO entry (the escrow write-path rider closes
+      // the commitGrant carve-out). The blob is serialized INSIDE the
+      // character's save-FIFO slot, so it is fresher than every previously
+      // committed autosave and every later autosave re-serializes fresher
+      // still: the same ordering guarantee the escrow write has, now on the
+      // buyer's side of a delivery. The HEAD-OF-LINE BOUND the carve-out
+      // demanded before this was safe: a FIFO busy past the wait deadline
+      // answers 'busy' with NOTHING serialized or written (the cancelled
+      // job is a strict no-op), so a wedged character save costs the locked
+      // delivery segment one bounded wait and a park, never the batch. No
+      // realm-gate slot and no depth cap here: the durable claim plus the
+      // caller's park rotation are the retry discipline, and concurrent
+      // attempts for one ref are FIFO-serialized and idempotent through the
+      // booked CAS.
+      let cancelled = false;
+      let started = false;
+      let timer: NodeJS.Timeout | undefined;
+      try {
+        const work = host.enqueueCharacterWrite<T | 'busy' | 'session_lost'>(
+          characterId,
+          async () => {
+            if (cancelled) return 'busy';
+            started = true;
+            // Validated UNDER the slot: a session that left or rotated its
+            // lease during the wait must park (only the operator can
+            // attribute the earlier grant), and the fresh serialize below is
+            // what makes the persisted blob the authoritative post-grant
+            // state rather than a snapshot the wait made stale.
+            const session = host.wocCustodySession(characterId);
+            if (!session || session.accountId !== accountId) return 'session_lost';
+            if (session.leaseNonce !== expectedNonce) return 'session_lost';
+            const snap = host.serializeCharacterForPersist(characterId);
+            if (!snap) return 'session_lost';
+            return persist({
+              characterId,
+              level: snap.level,
+              state: snap.state,
+              leaseNonce: session.leaseNonce,
+            });
+          },
+        );
+        const timeout = new Promise<'timeout'>((resolve) => {
+          timer = setTimeout(() => resolve('timeout'), escrowWaitMs);
+        });
+        const winner = await Promise.race([work, timeout]);
+        if (winner !== 'timeout') return winner;
+        // Started work answers its truth (a 'busy' for a write that may
+        // commit would park a delivered item as retryable); un-started work
+        // cancels clean.
+        if (started) return await work;
+        cancelled = true;
+        return 'busy';
+      } finally {
+        if (timer !== undefined) clearTimeout(timer);
+      }
+    },
+
     grantCopy(accountId: number, characterId: number, slot: InvSlot): WocCustodyGrant {
       // Delivery straight into the buyer's bags, for a deal struck face to face.
       // Every refusal here is ORDINARY and none of them is an error: a buyer who
