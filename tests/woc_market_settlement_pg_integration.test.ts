@@ -1797,8 +1797,14 @@ describeDb('woc market settlement guards against real Postgres', () => {
         status: 'closed',
         endsAtMs: BASE_MS - MINUTE_MS,
       });
+      // AT the bound: ends_at equal to now is already due (inclusive), the
+      // same convention the bid intake's not_active bound holds, so a listing
+      // at the close instant refuses bids AND gets claimed in the same tick.
+      const atBound = await seedListing(realm, seller, { endsAtMs: BASE_MS });
       const took = await marketDb.claimDueListings(realm, BASE_MS, 10);
-      expect(took.map((r) => r.id)).toEqual([due]);
+      expect(took.map((r) => r.id).sort((x, y) => x - y)).toEqual(
+        [due, atBound].sort((x, y) => x - y),
+      );
       expect((await listingRow(future)).status, 'an undue auction never closes early').toBe(
         'active',
       );
@@ -1852,6 +1858,14 @@ describeDb('woc market settlement guards against real Postgres', () => {
       expect(await marketDb.cancelListingIfUnbid(realm, listing, seller, BASE_MS)).toBe('has_bids');
       expect((await listingRow(listing)).status, 'every refusal left the listing standing').toBe(
         'active',
+      );
+      // The OTHER member of the probe's status set: an unpaid pending_bond
+      // bid is free to mint, and it alone must still deny the cancel (the
+      // one-window bound the cancel-intent ruling promises).
+      const pendingOnly = await seedListing(realm, seller);
+      await seedBid(realm, pendingOnly, bidder, { status: 'pending_bond' });
+      expect(await marketDb.cancelListingIfUnbid(realm, pendingOnly, seller, BASE_MS)).toBe(
+        'has_bids',
       );
     });
 

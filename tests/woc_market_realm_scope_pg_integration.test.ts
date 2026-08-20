@@ -361,7 +361,19 @@ describeDb('woc market realm scoping against real Postgres', () => {
         resolution: 'cancelled',
       });
       const b = await seedListing(beta, seller);
-      const bDirected = await seedListing(beta, seller, { directedBuyerAccount: buyer });
+      // Load-bearing by EXISTENCE: the exact sets below exclude this beta twin.
+      await seedListing(beta, seller, { directedBuyerAccount: buyer });
+      // Two ALPHA rows the buyer's directed read must also exclude: another
+      // buyer's directed sale (the addressee qual) and a CLOSED sale already
+      // addressed to this buyer (the liveness member). A second seller keeps
+      // the seller-keyed sets above unchanged.
+      const seller2 = await seedAccount();
+      await seedListing(alpha, seller2, { directedBuyerAccount: await seedAccount() });
+      await seedListing(alpha, seller2, {
+        directedBuyerAccount: buyer,
+        status: 'closed',
+        resolution: 'cancelled',
+      });
 
       expect(await marketDb.listingById(alpha, b), 'cross-realm point read').toBeNull();
       expect((await marketDb.listingById(alpha, a))?.id).toBe(a);
@@ -384,10 +396,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
       // The SAME seller holds two non-closed listings in beta; the count must
       // not see them (and the alpha closed row never counts).
       expect(await marketDb.countActiveBySeller(alpha, seller)).toBe(2);
+      // The exact set is the whole pin: it excludes the beta twin
+      // (bDirected), the other-addressee row, and the closed row at once.
       expect(listingIds(await marketDb.directedOffersForBuyer(alpha, buyer))).toEqual([aDirected]);
-      expect(listingIds(await marketDb.directedOffersForBuyer(alpha, buyer))).not.toContain(
-        bDirected,
-      );
 
       const ops = await marketDb.opsListings({
         realm: alpha,
@@ -498,36 +509,33 @@ describeDb('woc market realm scoping against real Postgres', () => {
         resolution: 'unsettled',
         updatedAtMs: old,
       });
-      const bUndisposed = await seedListing(beta, seller, {
+      // Load-bearing by EXISTENCE (this and the two beta rows below): the
+      // exact sets exclude them.
+      await seedListing(beta, seller, {
         status: 'closed',
         resolution: 'unsettled',
         updatedAtMs: old,
       });
       const aStranded = await seedListing(alpha, seller, { status: 'ending', updatedAtMs: old });
-      const bStranded = await seedListing(beta, seller, { status: 'ending', updatedAtMs: old });
+      await seedListing(beta, seller, { status: 'ending', updatedAtMs: old });
       // FRESH ending rows are mid-close, not stranded: the age bound must
       // keep them out of the reclaim batch.
       await seedListing(alpha, seller, { status: 'ending', updatedAtMs: BASE_MS });
       const aOpen = await seedListing(alpha, seller);
       const bOpen = await seedListing(beta, seller);
       const aDelivered = await seedSettlement(alpha, aOpen, buyer, { state: 'delivered' });
-      const bDelivered = await seedSettlement(beta, bOpen, buyer, { state: 'delivered' });
+      await seedSettlement(beta, bOpen, buyer, { state: 'delivered' });
 
+      // Each exact set below is the whole pin: it excludes the beta twin row
+      // (bUndisposed / bStranded / bDelivered) by equality.
       expect(listingIds(await marketDb.undisposedClosedListings(alpha, 10, []))).toEqual([
         aUndisposed,
       ]);
-      expect(listingIds(await marketDb.undisposedClosedListings(alpha, 10, []))).not.toContain(
-        bUndisposed,
-      );
       expect(listingIds(await marketDb.strandedListings(alpha, BASE_MS - HOUR_MS, 10))).toEqual([
         aStranded,
       ]);
-      expect(
-        listingIds(await marketDb.strandedListings(alpha, BASE_MS - HOUR_MS, 10)),
-      ).not.toContain(bStranded);
       const page = await marketDb.deliveredUnclosedSettlementsPage(alpha, 0, 50, 50);
       expect(settlementIds(page.settlements)).toEqual([aDelivered]);
-      expect(settlementIds(page.settlements)).not.toContain(bDelivered);
     }, 20_000);
 
     it('salesForItem reads only the realm ledger', async () => {
@@ -548,10 +556,11 @@ describeDb('woc market realm scoping against real Postgres', () => {
           buyerName: 'B',
         });
       const a = await sale(alpha);
-      const b = await sale(beta);
+      // Load-bearing by EXISTENCE: the exact set excludes the beta sale.
+      await sale(beta);
       const rows = await marketDb.salesForItem(alpha, 'crown_of_embers', 10);
+      // The exact set is the whole pin: it excludes the beta sale by equality.
       expect(ids(rows)).toEqual([a]);
-      expect(ids(rows)).not.toContain(b);
       // A voided sale leaves the price history too.
       expect(await marketDb.setSaleExcluded(a, true)).toBe('ok');
       expect(await marketDb.salesForItem(alpha, 'crown_of_embers', 10)).toEqual([]);
@@ -596,6 +605,12 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const buyer = await seedAccount();
       const a = await seedOffer(alpha, seller, buyer);
       const b = await seedOffer(beta, seller, buyer);
+      // A SAME-realm offer between two strangers: the exact sets below can
+      // then only be satisfied through the participant qual (buyer OR seller
+      // equals the queried account), not through realm scoping alone. This
+      // read is every account's trade poll; a participant strip would leak
+      // counterparties, prices, and item pins across the whole realm.
+      const strangers = await seedOffer(alpha, await seedAccount(), await seedAccount());
       expect(await marketDb.directedOfferById(alpha, b)).toBeNull();
       expect((await marketDb.directedOfferById(alpha, a))?.id).toBe(a);
       const forBuyer = await marketDb.directedOffersForAccount(alpha, buyer, BASE_MS);
@@ -610,7 +625,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
         page: 0,
         pageSize: 200,
       });
-      expect(ids(ops.rows)).toEqual([a]);
+      // The OPERATOR read is realm-wide by design: it sees the strangers'
+      // deal too, and still excludes the beta twin by equality.
+      expect(ids(ops.rows)).toEqual([a, strangers].sort((x, y) => x - y));
     }, 20_000);
 
     it('resolve and accept-side refuse a cross-realm pending offer and leave it pending', async () => {
@@ -631,9 +648,22 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const buyer = await seedAccount();
       const a = await seedOffer(alpha, seller, buyer, { expiresAtMs: BASE_MS - MINUTE_MS });
       const b = await seedOffer(beta, seller, buyer, { expiresAtMs: BASE_MS - MINUTE_MS });
+      // Two SAME-realm rows the due set must also exclude: a pending offer
+      // whose TTL has not run out (the due bound: a strip would expire live
+      // deals early) and a due-aged row already resolved (the inner status
+      // qual: a verdict never relabels to expired).
+      const undue = await seedOffer(alpha, await seedAccount(), buyer, {
+        expiresAtMs: BASE_MS + MINUTE_MS,
+      });
+      const resolved = await seedOffer(alpha, await seedAccount(), buyer, {
+        status: 'declined',
+        expiresAtMs: BASE_MS - MINUTE_MS,
+      });
       expect(await marketDb.expireDueDirectedOffers(alpha, BASE_MS, 10)).toBe(1);
       expect((await offerRow(a)).status).toBe('expired');
       expect((await offerRow(b)).status, 'beta due offer untouched').toBe('pending');
+      expect((await offerRow(undue)).status, 'a live TTL is not due').toBe('pending');
+      expect((await offerRow(resolved)).status, 'a verdict never relabels').toBe('declined');
     }, 20_000);
 
     it('the converge arm reads, reopens, and expires only within the realm', async () => {
@@ -702,7 +732,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const bListing = await seedListing(beta, seller);
       const old = BASE_MS - 2 * HOUR_MS;
       const aSigned = await seedBid(alpha, aListing, bidder, { bondSignature: `sig-a-${seq}` });
-      const bSigned = await seedBid(beta, bListing, bidder, { bondSignature: `sig-b-${seq}` });
+      // Load-bearing by EXISTENCE: the exact sets below exclude this beta
+      // twin and the beta refund twin further down.
+      await seedBid(beta, bListing, bidder, { bondSignature: `sig-b-${seq}` });
       const aStale = await seedBid(alpha, aListing, bidder, { placedAtMs: old });
       const bStale = await seedBid(beta, bListing, bidder, { placedAtMs: old });
       // Fresh AND unsigned: only the TTL, not the signature, spares it.
@@ -713,16 +745,20 @@ describeDb('woc market realm scoping against real Postgres', () => {
         status: 'outbid',
         bondState: 'refund_due',
       });
-      const bDue = await seedBid(beta, bListing, bidder, {
+      await seedBid(beta, bListing, bidder, {
         status: 'outbid',
         bondState: 'refund_due',
       });
+      // A RIVAL's same-realm bid: the account read below is a bid-history
+      // surface (amounts, bond states), so its exact set must be separable
+      // by the account qual, not by realm alone.
+      await seedBid(alpha, aListing, await seedAccount());
 
       expect(await marketDb.abandonPendingBid(alpha, bStale, bidder)).toBe(false);
       expect(await bidStatus(bStale)).toBe('pending_bond');
 
+      // The exact set is the whole pin: it excludes the beta twin (bSigned).
       expect(ids(await marketDb.confirmingBonds(alpha, 10, []))).toEqual([aSigned]);
-      expect(ids(await marketDb.confirmingBonds(alpha, 10, []))).not.toContain(bSigned);
 
       expect(await marketDb.lapsePendingBids(alpha, BASE_MS - HOUR_MS, 10)).toBe(1);
       expect(await bidStatus(aStale)).toBe('lapsed');
@@ -732,10 +768,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
       );
 
       const activity = await marketDb.bidsByAccount(alpha, bidder, 50);
-      expect(ids(activity).sort()).toEqual([aSigned, aStale, aDue, aFresh].sort());
+      expect(ids(activity)).toEqual([aSigned, aStale, aDue, aFresh].sort((x, y) => x - y));
 
+      // The exact set is the whole pin: it excludes the beta twin (bDue).
       expect(ids(await marketDb.bondsDue(alpha, 10))).toEqual([aDue]);
-      expect(ids(await marketDb.bondsDue(alpha, 10))).not.toContain(bDue);
     }, 20_000);
 
     it('the account-wide abandon cap counts only the realm ledger', async () => {
@@ -777,17 +813,27 @@ describeDb('woc market realm scoping against real Postgres', () => {
         over: Parameters<typeof seedSettlement>[3],
       ): Promise<number> => seedSettlement(realm, await seedListing(realm, seller), buyer, over);
       const aConfirming = await mk(alpha, { state: 'confirming', updatedAtMs: old });
-      const bConfirming = await mk(beta, { state: 'confirming', updatedAtMs: old });
+      // Load-bearing by EXISTENCE: the exact toEqual sets below exclude them.
+      await mk(beta, { state: 'confirming', updatedAtMs: old });
       const aConfirmed = await mk(alpha, { state: 'confirmed' });
       const bConfirmed = await mk(beta, { state: 'confirmed' });
       const aDelivering = await mk(alpha, { state: 'delivering' });
-      // Load-bearing by EXISTENCE: the exact toEqual sets below exclude them.
       await mk(beta, { state: 'delivering' });
       const aOverdue = await mk(alpha, { state: 'offered', deadlineAtMs: BASE_MS - MINUTE_MS });
       await mk(beta, { state: 'offered', deadlineAtMs: BASE_MS - MINUTE_MS });
+      // A STRANGER's same-realm settlement: the account activity read carries
+      // wallets, amounts, and signatures, so its exact set must be separable
+      // by the buyer qual, not by realm alone.
+      const stranger = await seedAccount();
+      await seedSettlement(alpha, await seedListing(alpha, seller), stranger, {
+        state: 'offered',
+        deadlineAtMs: BASE_MS + 15 * MINUTE_MS,
+      });
 
       const activity = await marketDb.settlementsByAccount(alpha, buyer, 50);
-      expect(ids(activity).sort()).toEqual([aConfirming, aConfirmed, aDelivering, aOverdue].sort());
+      expect(ids(activity)).toEqual(
+        [aConfirming, aConfirmed, aDelivering, aOverdue].sort((x, y) => x - y),
+      );
       expect(settlementIds(await marketDb.confirmingSettlements(alpha, 10))).toEqual([aConfirming]);
       expect(
         settlementIds(

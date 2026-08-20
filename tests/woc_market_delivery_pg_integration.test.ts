@@ -1732,6 +1732,15 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         resolution: 'cancelled',
       });
       await seedSale(realm, cancelledWithSale);
+      // The item_disposed = false arm's own negative: an ALREADY-disposed
+      // sold listing with a live sale row is converged history, not residue,
+      // and must not re-enter the batch count.
+      const alreadyDisposed = await seedListing(realm, seller, {
+        status: 'closed',
+        resolution: 'sold',
+        itemDisposed: true,
+      });
+      await seedSale(realm, alreadyDisposed);
       expect(await marketDb.disposeSoldResidueListings(realm, 10)).toBe(1);
       expect(await disposedFlag(soldWithSale)).toBe(true);
       expect(

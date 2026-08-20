@@ -939,6 +939,31 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
   // -------------------------------------------------------------------------
 
   describe('anti-snipe rides bond progress', () => {
+    it('the extension writes only to an ACTIVE listing', async () => {
+      // The status guard inside the extension transaction: a closed or ending
+      // row keeps its clock, or a late bond confirmation would perturb a
+      // subsequent reopen-then-claim cycle on a listing already resolved.
+      const realm = `extend-guard-${++seq}`;
+      const seller = await seedAccount();
+      const closed = await seedListing(realm, seller, {
+        status: 'closed',
+        endsAtMs: BASE_MS + MINUTE_MS,
+      });
+      expect(
+        await marketDb.extendAuctionForBondProgress(realm, closed, () => BASE_MS + 10 * MINUTE_MS),
+      ).toBe('skip');
+      const row = await pool.query(`SELECT ends_at FROM woc_market_listings WHERE id = $1`, [
+        closed,
+      ]);
+      expect((row.rows[0].ends_at as Date).getTime(), 'a closed row keeps its clock').toBe(
+        BASE_MS + MINUTE_MS,
+      );
+      const active = await seedListing(realm, seller, { endsAtMs: BASE_MS + MINUTE_MS });
+      expect(
+        await marketDb.extendAuctionForBondProgress(realm, active, () => BASE_MS + 10 * MINUTE_MS),
+      ).toBe('extended');
+    });
+
     it('extends only on a chain-seen verdict: pending extends, refused does not', async () => {
       const realm = `snipe-verdict-${++seq}`;
       const seller = await seedAccount();
@@ -1916,6 +1941,18 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         ok: false,
         reason: 'not_found',
       });
+      // The anti-enumeration ORDER: the directed verdict comes before every
+      // other refusal, so a cancel-stamped directed listing still answers
+      // not_found (cancel_pending would confirm a private trade is in
+      // flight to anyone probing guessable ids).
+      const cancelStamped = await seedListing(realm, seller, {
+        directedBuyerAccount: buyer,
+        cancelRequestedAtMs: BASE_MS - MINUTE_MS,
+      });
+      expect(await marketDb.insertPendingBid(bidArgs(realm, cancelStamped, stranger))).toEqual({
+        ok: false,
+        reason: 'not_found',
+      });
       expect(await bidCount(listing)).toBe(0);
     });
 
@@ -2038,9 +2075,16 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         bondSignature: `poll-signed-${seq}`,
       });
       await seedBid(realm, listing, other);
+      // A SIGNED spare in a dead status (a superseded bid keeps its recorded
+      // signature) separates the status member: signature presence alone must
+      // not put a bond back on the chain poll.
+      await seedBid(realm, listing, await seedAccount(), {
+        status: 'outbid',
+        bondSignature: `poll-signed-spare-${seq}`,
+      });
       const polled = await marketDb.confirmingBonds(realm, 10, []);
-      // Exactly the signed bond: the unsigned pending bond seeded above has
-      // nothing for the chain to decide.
+      // Exactly the signed PENDING bond: the unsigned pending bond has
+      // nothing for the chain to decide, and the signed outbid spare is done.
       expect(polled.map((r) => r.id)).toEqual([signed]);
     });
 
@@ -2059,15 +2103,57 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         lockExpiresAtMs: BASE_MS - 5 * MINUTE_MS,
       });
       const batch = await marketDb.cancelPendingListings(realm, BASE_MS, 10, []);
+      // The exact set: the holder keeps their unexpired window (the `locked`
+      // row is excluded by this equality).
       expect(batch.map((r) => r.id)).toEqual([expired]);
-      expect(
-        batch.map((r) => r.id),
-        'the holder keeps their unexpired window',
-      ).not.toContain(locked);
     });
   });
 
   describe('buy-now claim diagnosis and cooldown scoping, in real SQL', () => {
+    it('a twin steal of an EXPIRED lock refuses before the abandon recorder', async () => {
+      // The transaction ORDER: the wallet-twin guard sits above the
+      // steal-time abandon recorder, so a refused twin charges the dead
+      // holder nothing; only a legitimate steal is the "first look" that
+      // records the walk-away.
+      const realm = `claim-twin-steal-${++seq}`;
+      const seller = await seedAccount();
+      const holder = await seedAccount();
+      const twin = await seedAccount();
+      const listing = await seedListing(realm, seller, {
+        lockAccount: holder,
+        lockExpiresAtMs: BASE_MS - MINUTE_MS,
+      });
+      const wallet = await pool.query(
+        `SELECT seller_wallet FROM woc_market_listings WHERE id = $1`,
+        [listing],
+      );
+      await pool.query(`INSERT INTO wallet_links (account_id, pubkey) VALUES ($1, $2)`, [
+        twin,
+        wallet.rows[0].seller_wallet,
+      ]);
+      expect(
+        await marketDb.claimBuyNowLock(realm, listing, twin, BASE_MS, BASE_MS + 5 * MINUTE_MS),
+      ).toBe('own_listing');
+      const charged = async (): Promise<number> => {
+        const res = await pool.query(
+          `SELECT count(*)::int AS n FROM woc_market_buy_now_abandons WHERE account = $1`,
+          [holder],
+        );
+        return Number(res.rows[0].n);
+      };
+      expect(await charged(), 'the refused twin recorded nothing against the dead holder').toBe(0);
+      const stranger = await seedAccount();
+      const claimed = await marketDb.claimBuyNowLock(
+        realm,
+        listing,
+        stranger,
+        BASE_MS,
+        BASE_MS + 5 * MINUTE_MS,
+      );
+      expect(typeof claimed === 'object' && 'id' in claimed ? claimed.id : claimed).toBe(listing);
+      expect(await charged(), 'the legitimate steal is what charges the holder').toBe(1);
+    });
+
     it('the diagnosis ladder refuses from the row state', async () => {
       const realm = `claim-diag-${++seq}`;
       const seller = await seedAccount();
@@ -2119,13 +2205,15 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
         [realm, there, buyer, BASE_MS - 1_000],
       );
       // A RIVAL at the hourly cap spends nothing of ours: the cap counts the
-      // claimer's own ledger only.
+      // claimer's own ledger only. Derived from the cap constant so a raised
+      // cap keeps the rival AT it (a hard-coded three would silently drop
+      // below and vacate this pin).
       const rival = await seedAccount();
-      for (let i = 2; i <= 4; i++) {
+      for (let i = 1; i <= rulesMod.WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR; i++) {
         await pool.query(
           `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
            VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))`,
-          [realm, there, rival, BASE_MS - i * 1_000],
+          [realm, there, rival, BASE_MS - (i + 1) * 1_000],
         );
       }
       const claimed = await marketDb.claimBuyNowLock(
@@ -2143,7 +2231,9 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const other = await seedListing(realm, seller);
-      for (let i = 1; i <= 3; i++) {
+      // AT the cap by derivation, so a raised cap cannot silently move the
+      // buyer below it and vacate the exemption pin.
+      for (let i = 1; i <= rulesMod.WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR; i++) {
         await pool.query(
           `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
            VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))`,

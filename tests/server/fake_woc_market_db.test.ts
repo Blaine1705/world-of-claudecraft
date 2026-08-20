@@ -264,4 +264,115 @@ describe('fidelity fixes: twin guard, signature order, cap clamp, copies', () =>
       expect((await db.directedOfferById(REALM, offer.id))?.status).toBe('pending');
     }
   });
+
+  it('offer writes and list reads hand back independent rows, nested refs included', async () => {
+    const db = new FakeWocMarketDb({ characters: [], now: () => BASE_MS });
+    const inserted = await db.insertDirectedOffer({
+      realm: REALM,
+      sellerAccount: 1,
+      sellerCharacter: 1,
+      sellerName: 'S',
+      buyerAccount: 2,
+      buyerName: 'B',
+      usdCents: 100,
+      expiresAtMs: BASE_MS + 60_000,
+      itemId: 'itm_test',
+      itemPin: 'p',
+    });
+    if (inserted === 'offer_pending') throw new Error('fixture offer refused');
+    // The INSERT's returned row is a copy: mutating it never reaches the store.
+    inserted.status = 'declined' as typeof inserted.status;
+    expect((await db.directedOfferById(REALM, inserted.id))?.status).toBe('pending');
+    // accept-side clones the caller's ref on the way IN (the real path
+    // serializes to jsonb): mutating the caller's object after the call
+    // never reaches the store.
+    const callerRef = { index: 3, itemId: 'itm_test' };
+    const accepted = await db.acceptDirectedOfferSide(REALM, inserted.id, 'seller', callerRef);
+    callerRef.index = 9;
+    expect((await db.directedOfferById(REALM, inserted.id))?.itemRef).toEqual({
+      index: 3,
+      itemId: 'itm_test',
+    });
+    // ...and on the way OUT: the returned row's nested ref is independent too.
+    if (accepted?.itemRef) accepted.itemRef.index = 42;
+    expect((await db.directedOfferById(REALM, inserted.id))?.itemRef?.index).toBe(3);
+    // List reads hand back independent rows, nested ref included.
+    const listed = (await db.directedOffersForAccount(REALM, 2, BASE_MS)).find(
+      (o) => o.id === inserted.id,
+    );
+    if (listed?.itemRef) listed.itemRef.index = 77;
+    expect((await db.directedOfferById(REALM, inserted.id))?.itemRef?.index).toBe(3);
+    // The resolve CAS's returned row is a copy as well.
+    const resolved = await db.resolveDirectedOffer(REALM, inserted.id, 'declined');
+    if (resolved) resolved.status = 'pending' as typeof resolved.status;
+    expect((await db.directedOfferById(REALM, inserted.id))?.status).toBe('declined');
+  });
+
+  it('the stuck-bond sample orders on placed_at like the Pg query, not the coalesced age', async () => {
+    let clockMs = BASE_MS;
+    const db = new FakeWocMarketDb({ characters: [], now: () => clockMs });
+    const listing = await db.escrowInsertListing(SAVE, listingArgs(1, 'w-sample'));
+    if (!listing.ok) throw new Error(listing.reason);
+    // Axes DISAGREE: early placed late signed, versus late placed early
+    // signed. ORDER BY placed_at puts earlyPlaced first even though its
+    // coalesced stuck-since age is the younger of the two.
+    const earlyPlaced = await db.insertPendingBid({
+      ...bidArgs(listing.id, 2),
+      nowMs: BASE_MS,
+    });
+    const latePlaced = await db.insertPendingBid({
+      ...bidArgs(listing.id, 3),
+      nowMs: BASE_MS + 10_000,
+    });
+    if (!earlyPlaced.ok || !latePlaced.ok) throw new Error('fixture bids refused');
+    expect(
+      await db.submitBondSignature(latePlaced.bid.id, 'sig-early', BASE_MS + 20_000),
+    ).toMatchObject({ signatureAtMs: BASE_MS + 20_000 });
+    expect(
+      await db.submitBondSignature(earlyPlaced.bid.id, 'sig-late', BASE_MS + 30_000),
+    ).toMatchObject({ signatureAtMs: BASE_MS + 30_000 });
+    clockMs = BASE_MS + 60_000;
+    const out = await db.stuckCustodyReadout(REALM, 0, 1, 1_000, clockMs + 1);
+    expect(out.stuckBonds.sample.map((b) => b.id)).toEqual([earlyPlaced.bid.id]);
+    // stuck_since still reports the honest coalesced age axis per row.
+    expect(out.stuckBonds.sample[0]?.stuckSinceMs).toBe(BASE_MS + 30_000);
+  });
+
+  it('a twin steal of an EXPIRED lock refuses before the abandon recorder, like the Pg order', async () => {
+    let clockMs = BASE_MS - 10 * 60_000;
+    const db = new FakeWocMarketDb({ characters: [], now: () => clockMs });
+    const out = await db.escrowInsertListing(SAVE, listingArgs(1, 'steal-wallet'));
+    if (!out.ok) throw new Error(out.reason);
+    const holder = 5;
+    const held = await db.claimBuyNowLock(REALM, out.id, holder, clockMs, BASE_MS - 5 * 60_000);
+    expect(typeof held === 'object' && 'id' in held).toBe(true);
+    clockMs = BASE_MS;
+    db.walletLinks.set(6, 'steal-wallet');
+    expect(await db.claimBuyNowLock(REALM, out.id, 6, BASE_MS, BASE_MS + 300_000)).toBe(
+      'own_listing',
+    );
+    // The refused twin recorded NOTHING against the dead holder: the guard
+    // sits above the steal-time recorder, so the holder is charged only when
+    // a legitimate steal actually looks at the expired lock.
+    expect(db.buyNowAbandons.filter((a) => a.account === holder)).toHaveLength(0);
+    const legit = await db.claimBuyNowLock(REALM, out.id, 7, BASE_MS, BASE_MS + 300_000);
+    expect(typeof legit === 'object' && 'id' in legit).toBe(true);
+    expect(db.buyNowAbandons.filter((a) => a.account === holder)).toHaveLength(1);
+  });
+
+  it('a staged fence failure at a FULL cap answers cap_reached, like the Pg count-then-save order', async () => {
+    const db = new FakeWocMarketDb({ characters: [], now: () => BASE_MS });
+    const { WOC_MARKET_MAX_ACTIVE_LISTINGS } = await import('../../server/woc_market_rules');
+    for (let i = 0; i < WOC_MARKET_MAX_ACTIVE_LISTINGS; i++) {
+      const seeded = await db.escrowInsertListing(SAVE, listingArgs(1, 'w-cap'));
+      if (!seeded.ok) throw new Error(seeded.reason);
+    }
+    db.failNextEscrow = 'lease_lost';
+    const refused = await db.escrowInsertListing(SAVE, listingArgs(1, 'w-cap'));
+    expect(refused).toEqual({ ok: false, reason: 'cap_reached' });
+    expect(db.failNextEscrow, 'the unreached fence stays armed for the next call').toBe(
+      'lease_lost',
+    );
+    db.failNextEscrow = null;
+  });
 });

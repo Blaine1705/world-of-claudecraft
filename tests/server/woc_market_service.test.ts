@@ -8566,4 +8566,24 @@ describe('settlementQuote entry guards', () => {
     });
     expect((await getSettlement(h, settlement.id)).state, 'no revival, no write').toBe('offered');
   });
+
+  it('a past-deadline FAILED settlement stays failed: the deadline refuses before the revival', async () => {
+    // The ordering the source protects: a past-deadline 'failed' row must be
+    // left for the overdue sweep's default pass, never revived into an open
+    // row the method then refuses anyway. Moving the deadline check below the
+    // revival CAS would flip the state this arm pins.
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    expect(await h.db.transitionSettlement(settlement.id, ['offered'], 'failed')).toBe(true);
+    h.setNow(settlement.deadlineAtMs);
+    expect(await h.service.settlementQuote(BUYER_A, settlement.id)).toMatchObject({
+      ok: false,
+      reason: 'quote_expired',
+    });
+    expect((await getSettlement(h, settlement.id)).state, 'never revived').toBe('failed');
+  });
 });

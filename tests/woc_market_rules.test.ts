@@ -15,6 +15,7 @@ import {
   strikeSuspensionMs,
   validListingParams,
   validSettlementTransition,
+  WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
   WOC_MARKET_ANTI_SNIPE_CAP_SECONDS,
   WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS,
   WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS,
@@ -840,6 +841,11 @@ describe('the wire reason screens', () => {
     // pins, not constant round-trips: a drifted string must fail HERE.
     expect(WOC_MARKET_LEDGER_MATCHED_REASON).toBe('awaiting_finality');
     expect(WOC_MARKET_CONFIRM_UNAVAILABLE_REASON).toBe('service_unavailable');
+    // The abandon exempt LIST is pinned by composition, not just its member
+    // constant: adding a second member silently widens the abandon AND strike
+    // exemptions, and the ruling on the list obliges a new positive arm WITH
+    // any addition. This pin is that obligation's enforcement signal.
+    expect(WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS).toEqual(['service_unavailable']);
     expect([...WOC_MARKET_WIRE_PENDING_REASONS].sort()).toEqual([
       'awaiting_finality',
       'not_yet_visible',

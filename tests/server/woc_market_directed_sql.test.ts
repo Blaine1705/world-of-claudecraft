@@ -2493,6 +2493,22 @@ describe('the stuck-custody readout saturates, in SQL', () => {
     expect(params()[9]).toEqual([REALM, 1_000]);
   });
 
+  it('a bad countCap fails CLOSED to LIMIT 1 on every capped count', async () => {
+    // The cap is string-interpolated into the count subquery, so a non-finite
+    // or non-positive value would emit `LIMIT NaN` and error the operator
+    // readout; the clamp keeps the read tiny instead. Real-arm twin of the
+    // fake fidelity suite's clamp pin.
+    for (const bad of [0, Number.NaN]) {
+      const { pool, sql } = recordingPool();
+      await new PgWocMarketDb(pool).stuckCustodyReadout(REALM, 1_000, 20, bad, 1_000);
+      const counts = sql().filter((t) => t.includes('SELECT count(*)::int AS n FROM (SELECT 1'));
+      expect(counts).toHaveLength(5);
+      for (const [i, text] of counts.entries()) {
+        expect(text, `count ${i} clamps to 1 on countCap ${bad}`).toContain('LIMIT 1)');
+      }
+    }
+  });
+
   describe('activation and suspend lock shapes, in the statements', () => {
     it('activateBid locks the open bid set FIRST (ordered, FOR UPDATE), the listing after', async () => {
       const bidRow = {

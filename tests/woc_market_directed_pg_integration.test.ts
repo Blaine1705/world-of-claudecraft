@@ -1113,8 +1113,7 @@ describeDb('woc market directed rail against real Postgres', () => {
       const realm = 'escrow-cap-closed';
       const seller = await seedAccount();
       const characterId = await seedCharacter(realm, seller);
-      const rulesMod2 = await import('../server/woc_market_rules');
-      for (let i = 0; i < rulesMod2.WOC_MARKET_MAX_ACTIVE_LISTINGS; i++) {
+      for (let i = 0; i < rulesMod.WOC_MARKET_MAX_ACTIVE_LISTINGS; i++) {
         await seedListing(realm, seller, { status: 'closed' });
       }
       const out = await marketDb.escrowInsertListing(
@@ -1152,6 +1151,59 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect(row.rows[0].status, 'a consummated deal never reopens').toBe('accepted');
       expect(Number(row.rows[0].listing_id)).toBe(listing);
       expect(row.rows[0].seller_accepted).toBe(true);
+    });
+  });
+
+  describe('the resolve and accept-side pending CAS, in real SQL', () => {
+    it('a resolved offer gains no acceptance and never re-resolves', async () => {
+      // The 'pending' predicate on BOTH writes is the compare-and-set: two
+      // concurrent accepts both read pending, only one UPDATE matches. Its
+      // observable single-row face: a dead offer is inert to both methods.
+      const realm = 'offer-cas-status';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const declined = await seedOffer(realm, seller, buyer, { status: 'declined' });
+      expect(await marketDb.resolveDirectedOffer(realm, declined, 'withdrawn')).toBeNull();
+      expect((await offerRow(declined)).status, 'a verdict never relabels').toBe('declined');
+      expect(await marketDb.acceptDirectedOfferSide(realm, declined, 'buyer', null)).toBeNull();
+      expect(
+        await offerAcceptState(declined),
+        'a dead deal accumulates neither acceptance nor a ref',
+      ).toMatchObject({ buyerAccepted: false });
+
+      const live = await seedOffer(realm, seller, buyer);
+      expect(
+        (await marketDb.acceptDirectedOfferSide(realm, live, 'buyer', null))?.buyerAccepted,
+      ).toBe(true);
+      expect((await marketDb.resolveDirectedOffer(realm, live, 'declined'))?.status).toBe(
+        'declined',
+      );
+    });
+  });
+
+  describe('the ever-settled strike gate read, in real SQL', () => {
+    it('answers true only for the listing that ever opened a settlement', async () => {
+      // The directed close arm's double-strike guard: 'failed' is not an OPEN
+      // state, so this read is deliberately state-blind, and the listing_id
+      // qual is what keeps one listing's history from vouching for another.
+      const realm = 'ever-settled';
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const settled = await seedListing(realm, seller);
+      const sibling = await seedListing(realm, seller);
+      await pool.query(
+        `INSERT INTO woc_market_settlements (
+           listing_id, realm, attempt, buyer_account, buyer_character,
+           buyer_name, buyer_wallet, amount_cents, state, deadline_at
+         ) VALUES ($1, $2, 1, $3, $3, 'Buyer', 'wallet-buyer', 1000, 'failed',
+                   to_timestamp($4 / 1000.0))`,
+        [settled, realm, buyer, BASE_MS + 10 * MINUTE_MS],
+      );
+      expect(await marketDb.everSettledForListing(settled)).toBe(true);
+      expect(
+        await marketDb.everSettledForListing(sibling),
+        'a sibling listing has no history to answer with',
+      ).toBe(false);
     });
   });
 

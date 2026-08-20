@@ -205,16 +205,6 @@ export class FakeWocMarketDb implements WocMarketDb {
     // because the args cross the seam on every call and a refused escrow
     // commits nothing in Pg (the rollback) or here (no store write).
     this.escrowSaves.push(structuredClone(save));
-    if (this.failNextEscrowThrow !== null) {
-      const err = this.failNextEscrowThrow;
-      this.failNextEscrowThrow = null;
-      throw err;
-    }
-    if (this.failNextEscrow !== null) {
-      const reason = this.failNextEscrow;
-      this.failNextEscrow = null;
-      return { ok: false, reason };
-    }
     let active = 0;
     for (const row of this.listings.values()) {
       if (
@@ -229,6 +219,20 @@ export class FakeWocMarketDb implements WocMarketDb {
     // transaction's widened cap predicate (H12).
     if (active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
       return { ok: false, reason: 'cap_reached' };
+    }
+    // The forced-failure hooks model the FENCED SAVE, which the real
+    // transaction reaches only past the cap count: a staged fence failure at
+    // a full cap answers cap_reached and the hook stays armed for the next
+    // call, exactly as an unreached save fails nothing.
+    if (this.failNextEscrowThrow !== null) {
+      const err = this.failNextEscrowThrow;
+      this.failNextEscrowThrow = null;
+      throw err;
+    }
+    if (this.failNextEscrow !== null) {
+      const reason = this.failNextEscrow;
+      this.failNextEscrow = null;
+      return { ok: false, reason };
     }
     // The atomic offer stamp's CAS, checked BEFORE the insert lands in the
     // fake (one memory step models one atomic transaction: a miss leaves no
@@ -568,8 +572,12 @@ export class FakeWocMarketDb implements WocMarketDb {
           const latest = [...this.settlements.values()]
             .filter((s) => s.listingId === o.listingId)
             .sort((a, b) => b.id - a.id)[0];
+          // Deep copy per row (the header contract): a shallow spread would
+          // alias the nested itemRef object to the store row, so a caller
+          // mutating a returned offer would edit the fake's internal state
+          // where Postgres hands back independently parsed rows.
           return {
-            ...o,
+            ...structuredClone(o),
             listingStatus: l?.status ?? null,
             listingResolution: l?.resolution ?? null,
             settlementState: o.listingId === null ? null : (latest?.state ?? null),
@@ -618,9 +626,12 @@ export class FakeWocMarketDb implements WocMarketDb {
     else row.sellerAccepted = true;
     // item_id stays the BUYER's agreed item (stamped at creation); only the
     // seller's claimed extraction ref is recorded, mirroring the real UPDATE.
-    if (itemRef !== null) row.itemRef = itemRef;
+    // Clone on the way IN and OUT: the real path serializes the ref to jsonb,
+    // so neither the stored row nor the returned row may alias the caller's
+    // live object.
+    if (itemRef !== null) row.itemRef = structuredClone(itemRef);
     this.offerUpdatedMs.set(id, this.now());
-    return { ...row };
+    return structuredClone(row);
   }
 
   async reopenDirectedOffer(realm: string, id: number): Promise<boolean> {
@@ -1091,7 +1102,11 @@ export class FakeWocMarketDb implements WocMarketDb {
           b.bondSignature !== null &&
           bondStuckSince(b) <= bondOlderThanMs,
       )
-      .sort((a, b) => bondStuckSince(a) - bondStuckSince(b) || a.id - b.id);
+      // The SAMPLE orders on placed_at like the real query (the COALESCE age
+      // axis had no expression index; the real docblock concedes the axes can
+      // diverge by minutes while stuck_since still reports the honest age per
+      // row). The id tiebreak is the documented determinism aid.
+      .sort((a, b) => a.placedAtMs - b.placedAtMs || a.id - b.id);
     return {
       unbookedClaims: {
         count: Math.min(claims.length, cap),
