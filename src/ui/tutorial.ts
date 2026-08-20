@@ -284,7 +284,11 @@ export class TutorialOverlay {
     this.ensureDom();
     if (!this.root) return;
 
-    const moveKeys = ['forward', 'turnLeft', 'back', 'turnRight']
+    // The taught cluster is the four keys under the left hand, which is
+    // strafeLeft (A) and turnRight (D) since the tutorial's "A then W"
+    // ruling moved turnLeft to Q; naming turnLeft here would advertise
+    // W/Q/S/D to a brand new player.
+    const moveKeys = ['forward', 'strafeLeft', 'back', 'turnRight']
       .map((id) => keybinds.primaryLabel(id))
       .filter(Boolean)
       .join('/');

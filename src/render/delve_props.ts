@@ -4,7 +4,7 @@
 // The chest prefers the real dungeon-kit GLB (chest_gold) when loaded and falls
 // back to procedural geometry otherwise. The grave/wall/crate props each
 // prefer a small Tripo-generated GLB (see public/models/props/CLAUDE.md), same
-// fallback contract. No DOM, no sim imports (render-only).
+// fallback contract. No DOM, sim imports limited to pure view predicates (render-only otherwise).
 
 import * as THREE from 'three';
 import {

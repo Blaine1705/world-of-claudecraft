@@ -15,6 +15,7 @@ import {
   PROVING_SHORE_PROPS,
   PROVING_SHORE_QUESTS,
 } from '../src/sim/content/proving_shore';
+import { getActiveWorldContent } from '../src/sim/data';
 import { CRAB_SUMMON_SITE } from '../src/sim/interactions/crab_summon';
 import { LEDGE_GRAB_MAX } from '../src/sim/physics/ledge';
 import { campCrateShape } from '../src/sim/prop_layout';
@@ -179,17 +180,29 @@ describe('coachPromptPlan: which target carries the bubble', () => {
     // the approach side (north of the wall, where the jump launches).
     const apex = CLIMB_MIN_OVERHEAD - MANTLE_REACH;
     const grabCeiling = apex + LEDGE_GRAB_MAX;
-    const stacked = (PROVING_SHORE_PROPS.crates ?? []).filter(([, z]) => z === -27);
-    expect(stacked.length).toBeGreaterThanOrEqual(6);
-    stacked.forEach(([x, z, stack], i) => {
-      expect(stack, `crate[${i}] stack`).toBe(2);
-      const shape = campCrateShape(x, z, i);
+    // campCrateShape keys on the index within the MERGED world crate list
+    // (colliders.ts and props.ts both iterate PROPS.crates), and that index
+    // decides barrel vs crate, so the lane must be measured at its GLOBAL
+    // positions or the pin measures a fiction and cannot see an index shift
+    // caused by another zone gaining a crate.
+    const world = getActiveWorldContent().props.crates;
+    const lane: { x: number; z: number; stack?: number; index: number }[] = [];
+    world.forEach(([x, z, stack], index) => {
+      if (z === -27 && x <= -304 && x >= -312) lane.push({ x, z, stack, index });
+    });
+    expect(lane.length).toBeGreaterThanOrEqual(6);
+    // The lane's authored points are all present in the merged list.
+    const authored = (PROVING_SHORE_PROPS.crates ?? []).filter(([, z]) => z === -27);
+    expect(lane).toHaveLength(authored.length);
+    for (const { x, z, stack, index } of lane) {
+      expect(stack, `crate[${index}] stack`).toBe(2);
+      const shape = campCrateShape(x, z, index);
       const top = groundHeight(x, z, WORLD_SEED) + shape.top * 2;
       const approach = groundHeight(x, z + 2, WORLD_SEED);
       const rise = top - approach;
-      expect(rise, `crate[${i}] rise`).toBeGreaterThan(CLIMB_MIN_OVERHEAD + 0.05);
-      expect(rise, `crate[${i}] rise`).toBeLessThan(grabCeiling - 0.1);
-    });
+      expect(rise, `crate[${index}] rise`).toBeGreaterThan(CLIMB_MIN_OVERHEAD + 0.05);
+      expect(rise, `crate[${index}] rise`).toBeLessThan(grabCeiling - 0.1);
+    }
   });
 
   it('anchors the parkour asks on the authored obstacles', () => {

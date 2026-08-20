@@ -12,8 +12,6 @@
 // authored spawn position (stable across restarts and deploys, unlike entity ids)
 // and recorded on the persisted QuestProgress.
 
-import fs from 'node:fs';
-import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BOOTCAMP_COURSE_CHECKPOINTS } from '../src/sim/content/proving_shore';
 import { DUNGEONS, GROUND_OBJECTS, QUESTS } from '../src/sim/data';
@@ -23,6 +21,7 @@ import {
   recordInteractObjectCredit,
   sanitizeCreditedObjects,
 } from '../src/sim/quests/interact_object_credit';
+import { isObjectOpenedByViewer } from '../src/sim/quests/opened_object_view';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import { Sim } from '../src/sim/sim';
 import type { Entity, QuestProgress } from '../src/sim/types';
@@ -487,15 +486,33 @@ describe('abandoning the quest clears the ledger', () => {
 });
 
 describe('the ledger ships to clients (the opened-crate per-viewer hide)', () => {
-  it('keeps creditedObjects on the wire row so the client can hide spent objects', () => {
+  it('round-trips creditedObjects so a mirrored row still hides the object', () => {
     // The old questProgressForWire strip is deliberately GONE: the client
     // reads the ledger through opened_object_view.ts to render a credited
-    // ground object as gone for this player. This pins the qlog projection
-    // in server/game.ts staying a verbatim pass-through; a reintroduced
-    // strip would silently blind the hide again.
-    const gameTs = fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8');
-    expect(gameTs).toContain("maybe('qlog', [...meta.questLog.values()]);");
-    expect(gameTs).not.toContain('questProgressForWire');
+    // ground object as gone for this player. Behavioral, not a source-text
+    // pin: a reintroduced strip (or a JSON-hostile shape) fails this.
+    // The crate line's own authored spot, since the hide is scoped to that
+    // class (opened_object_view.ts OPENED_OBJECT_HIDE_ITEM_IDS).
+    const crate = GROUND_OBJECTS.find((o) => o.itemId === 'ps_castaway_crate')!.positions[0];
+    const qp: QuestProgress = {
+      questId: 'q_ps_the_wreck_line',
+      counts: [1],
+      state: 'active',
+      creditedObjects: [interactObjectCreditKey(0, crate)],
+    };
+    const wire = JSON.parse(JSON.stringify([qp])) as QuestProgress[];
+    expect(wire[0].creditedObjects).toEqual([interactObjectCreditKey(0, crate)]);
+    const mirrored = new Map(wire.map((q) => [q.questId, q]));
+    // The predicate the renderer, coach, and interact scan all share.
+    expect(
+      isObjectOpenedByViewer({ objectItemId: 'ps_castaway_crate', pos: crate }, mirrored),
+    ).toBe(true);
+    expect(
+      isObjectOpenedByViewer(
+        { objectItemId: 'ps_castaway_crate', pos: { x: crate.x + 40, z: crate.z } },
+        mirrored,
+      ),
+    ).toBe(false);
   });
 });
 

@@ -1,6 +1,7 @@
-// The spawn greeting (tutorial island): a one-time, text-free personal event
-// that offers every genuinely fresh character passage to the Proving Shore,
-// plus the ferry ride itself for the ones who accept.
+// The spawn greeting (tutorial island): the one-time, text-free ferry that
+// puts every genuinely fresh character on the Proving Shore. The tutorial is
+// compulsory (never asked, never skippable); the pier bell is the way back
+// off at any time.
 //
 // The sweep mirrors professions/prof_nudges.ts: 1 Hz beside the other mail
 // phase sweeps, zero rng (it only emits events, which draw nothing), so its
@@ -10,10 +11,7 @@
 // latches SILENTLY for an established character (an old save from before the
 // tutorial shipped must not be greeted like a newborn).
 //
-// firstCharacter is a runtime account fact, never persisted: the server
-// recomputes it at every join (the bankBonus idiom) and the offline Sim is
-// always a first character (offline runs are stateless by design).
-//
+
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/
 // game/net imports, no Math.random/Date.now, host-agnostic.
 
@@ -50,6 +48,13 @@ export function maybeEmitTutorialGreeting(meta: PlayerMeta, ctx: SimContext): bo
   if (!isFreshCharacter(meta)) return false;
   const p = ctx.entities.get(meta.entityId);
   if (!p) return false;
+  // The sibling command path's gates (resolveStartTutorial): never yank a
+  // ghost away from their corpse, and never teleport out of the instance
+  // plane. A fresh character can only be either through an odd resume, but
+  // the flag has already latched by here, so failing closed just means they
+  // walk to the pier bell themselves.
+  if (p.dead || p.ghost) return false;
+  if (p.pos.x > DUNGEON_X_THRESHOLD) return false;
   if (!isOnProvingShore(p.pos.x, p.pos.z)) {
     displacePlayer(ctx, p, PROVING_SHORE_ARRIVAL, 'The ferry sets you down on the Proving Shore.');
   }
@@ -61,13 +66,21 @@ export function maybeEmitTutorialGreeting(meta: PlayerMeta, ctx: SimContext): bo
  *  updateProfNudges): evaluates every player on the PostOffice's once-a-second
  *  cadence. Zero rng, so its position in the tick tail cannot fork the draw
  *  order (it only emits events, which draw nothing). */
-export function updateTutorialGreeting(ctx: SimContext): void {
+export function updateTutorialGreeting(ctx: SimContext, primaryPid: number): void {
   // The host opt-in (SimConfig.compulsoryTutorial): a deterministic test,
   // parity trace, or RL episode must never see a fresh character ferried
   // away mid-scenario, so the sweep only runs where a live world asked.
   if (!ctx.compulsoryTutorial) return;
   if (ctx.tickCount % 20 !== 0) return;
-  for (const meta of ctx.players.values()) maybeEmitTutorialGreeting(meta, ctx);
+  for (const meta of ctx.players.values()) {
+    // Only REAL characters ride the compulsory ferry: a persisted row
+    // (characterId, the server join path; a bare null-state harness join is
+    // latched at join instead) or the offline Sim's own primary player.
+    // Everything else addPlayer mints (dev bots, probe fixtures on a live
+    // server sim) has no character to teach and stays where it was put.
+    if (meta.characterId === undefined && meta.entityId !== primaryPid) continue;
+    maybeEmitTutorialGreeting(meta, ctx);
+  }
 }
 
 /** The ferry ride the greeting's accept button books: the standard

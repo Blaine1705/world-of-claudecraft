@@ -3827,6 +3827,7 @@ export class GameServer {
       bankBonus: meta.bankBonus,
       firstCharacter: meta.firstCharacter,
       appearance: meta.appearance ?? null,
+      tutorialGreetingSent: state === null,
     });
     const player = this.sim.entities.get(pid);
     if (player) {

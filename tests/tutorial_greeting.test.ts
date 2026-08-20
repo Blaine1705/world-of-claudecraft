@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
-import { NPCS } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, NPCS } from '../src/sim/data';
 import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -22,9 +22,10 @@ function greetCtx(sim: Sim) {
   const raw = {
     tickCount: 0,
     players: sim.players,
-    // The island-standing arm reads the fresh character's position (an
-    // auto-entered newborn skips Bryn's offer for Odo's arrival).
+    // The compulsory arm reads the fresh character's position: a newborn
+    // already ashore is welcomed in place, anyone else is ferried.
     entities: sim.entities,
+    compulsoryTutorial: true,
     emit: (e: SimEvent) => emitted.push(e),
   };
   return { ctx: raw as unknown as SimContext, emitted, raw };
@@ -74,6 +75,42 @@ describe('tutorial greeting one-shot', () => {
     expect(second.emitted).toEqual([]);
   });
 
+  it('never ferries anyone when the host has not opted in', () => {
+    // The gate every test, parity trace, and RL episode depends on: without
+    // SimConfig.compulsoryTutorial the sweep is inert, so a fresh character
+    // stays exactly where the scenario put them.
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+    const p = sim.entities.get(sim.playerId)!;
+    const before = { x: p.pos.x, z: p.pos.z };
+    sim.drainEvents();
+    for (let t = 0; t < 42; t++) sim.tick();
+    expect(sim.drainEvents().filter((e) => e.type === 'ferryIslandArrival')).toEqual([]);
+    expect(p.pos.x).toBeCloseTo(before.x, 3);
+    expect(p.pos.z).toBeCloseTo(before.z, 3);
+    expect(sim.players.get(sim.playerId)!.tutorialGreetingSent).toBe(false);
+  });
+
+  it('never ferries a ghost away from their corpse, nor out of an instance', () => {
+    // The sibling command path's gates, mirrored on the sweep.
+    const ghostSim = makeSim();
+    const ghost = ghostSim.entities.get(ghostSim.playerId)!;
+    ghost.dead = true;
+    ghost.ghost = true;
+    const ghostAt = { x: ghost.pos.x, z: ghost.pos.z };
+    expect(maybeEmitTutorialGreeting(ghostSim.players.get(ghostSim.playerId)!, ghostSim.ctx)).toBe(
+      false,
+    );
+    expect(ghost.pos.x).toBeCloseTo(ghostAt.x, 3);
+
+    const instanced = makeSim();
+    const p = instanced.entities.get(instanced.playerId)!;
+    p.pos.x = DUNGEON_X_THRESHOLD + 50;
+    expect(
+      maybeEmitTutorialGreeting(instanced.players.get(instanced.playerId)!, instanced.ctx),
+    ).toBe(false);
+    expect(p.pos.x).toBeCloseTo(DUNGEON_X_THRESHOLD + 50, 3);
+  });
+
   it('latches SILENTLY for an established character (a pre-tutorial save)', () => {
     const sim = makeSim();
     const meta = sim.players.get(sim.playerId)!;
@@ -98,12 +135,23 @@ describe('tutorial greeting one-shot', () => {
     const sim = makeSim();
     const { ctx, emitted, raw } = greetCtx(sim);
     raw.tickCount = 19;
-    updateTutorialGreeting(ctx);
+    updateTutorialGreeting(ctx, sim.playerId);
     expect(emitted).toEqual([]);
-    // The firing arm itself displaces through the real SimContext (covered
-    // by the real-tick test below); the stub only proves the cadence gate.
+    // ...and fires on the cadence boundary: the stub ctx cannot displace, so
+    // the positive arm is proved by the flag latching (the ferry itself is
+    // covered through real ticks below).
     const meta = sim.players.get(sim.playerId)!;
     expect(meta.tutorialGreetingSent).toBe(false);
+    // ...and FIRES on the boundary. Driven with the character already
+    // ashore so the stub ctx (which cannot displace) still exercises the
+    // real firing arm; the ferry itself is covered through real ticks below.
+    const p = sim.entities.get(sim.playerId)!;
+    p.pos.x = PROVING_SHORE_ARRIVAL.x;
+    p.pos.z = PROVING_SHORE_ARRIVAL.z;
+    raw.tickCount = 20;
+    updateTutorialGreeting(ctx, sim.playerId);
+    expect(meta.tutorialGreetingSent).toBe(true);
+    expect(emitted.some((e) => e.type === 'ferryIslandArrival')).toBe(true);
   });
 
   it('fires through the real Sim.tick mail phase within the first second', () => {

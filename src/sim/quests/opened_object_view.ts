@@ -16,6 +16,17 @@
 import { QUESTS } from '../data';
 import { interactObjectCreditKey } from './interact_object_credit';
 
+/**
+ * The ground-object classes that VANISH for a player who already credited
+ * them. Deliberately an opt-in list, not "every interact objective": most
+ * interact targets are meant to stay visible after their credit (the three
+ * watchbells each stand on their own headland, and a player walking the
+ * coast should still see the one they rang). The castaway crates are the
+ * exception the playtest asked for: they line one path, they are identical,
+ * and an opened one that still glints reads as a bug.
+ */
+export const OPENED_OBJECT_HIDE_ITEM_IDS: ReadonlySet<string> = new Set(['ps_castaway_crate']);
+
 /** The minimal entity shape the check reads (IWorld.entities values). */
 export interface OpenedObjectEntity {
   objectItemId?: string | null;
@@ -42,7 +53,7 @@ export function isObjectOpenedByViewer(
   questLog: ReadonlyMap<string, OpenedObjectQuestRow>,
 ): boolean {
   const itemId = entity.objectItemId;
-  if (!itemId) return false;
+  if (!itemId || !OPENED_OBJECT_HIDE_ITEM_IDS.has(itemId)) return false;
   for (const [questId, qp] of questLog) {
     if (qp.state !== 'active' && qp.state !== 'ready') continue;
     if (!qp.creditedObjects?.length) continue;

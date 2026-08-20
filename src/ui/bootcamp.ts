@@ -785,9 +785,12 @@ function paintChipSequence(host: HTMLElement, caps: readonly string[]): void {
 }
 
 /** Class-toggle sweep for the press-this-next glow (same-state no-ops). */
-/** Must mirror the qd-coach-pulse duration (styles/components.css). */
+/** The qd-coach-pulse duration (styles/components.css); the phase seed below
+ *  wraps on it, so the two must agree. Pinned by tests/bootcamp_glow.test.ts. */
 const GLOW_PULSE_MS = 900;
 
+/** Class-toggle sweep for the press-this-next glow, plus the phase seed that
+ *  keeps a recreated row's pulse continuous. */
 function syncGlow(selector: string, want: (el: HTMLElement) => boolean): void {
   for (const el of document.querySelectorAll<HTMLElement>(selector)) {
     const on = want(el);

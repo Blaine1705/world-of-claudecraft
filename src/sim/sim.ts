@@ -2054,6 +2054,12 @@ export class Sim {
   readonly playerGrid = new SpatialGrid();
   private engagedPids = new Set<number>();
   primaryId = -1; // the local/RL player in single-player contexts
+  // The pid of the player the CONSTRUCTOR itself created (cfg.noPlayer false),
+  // -1 on a server-shaped sim. The compulsory-tutorial sweep ferries only this
+  // player or persisted-row characters; the first addPlayer on a noPlayer sim
+  // claims primaryId too, and a test fixture's probe character must never be
+  // mistaken for the offline player (tutorial/greeting.ts).
+  private ownPlayerPid = -1;
   nextId = 1;
   events: SimEvent[] = [];
   // Owned by E1 (entity_roster drains it); stays on Sim because N1/M3 schedule into
@@ -2707,7 +2713,9 @@ export class Sim {
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {
-      this.addPlayer(this.cfg.playerClass, this.cfg.playerName, { autoEquip: this.cfg.autoEquip });
+      this.ownPlayerPid = this.addPlayer(this.cfg.playerClass, this.cfg.playerName, {
+        autoEquip: this.cfg.autoEquip,
+      });
     }
 
     // Escort quest NPCs (src/sim/escort.ts). Last on purpose: the spawns draw
@@ -2851,6 +2859,12 @@ export class Sim {
       autoEquip?: boolean;
       state?: CharacterState;
       characterId?: number;
+      // Pre-latch the compulsory-tutorial one-shot (sim/tutorial/greeting.ts):
+      // the server passes true for a BARE join (null character state), which
+      // is the test-harness shape, so a fixture character is never ferried
+      // off the spot its test put it on. A real character row always carries
+      // creation state and rides the ferry normally.
+      tutorialGreetingSent?: boolean;
       // Server-stamped bank bonus slots, recomputed from account facts at every
       // join (email/Discord/wallet/referrals). Overrides the persisted value so
       // unlinking lowers capacity at the next login; a shrink below the used slot
@@ -3058,7 +3072,7 @@ export class Sim {
       tierMailSent: new Map(),
       questedHobbies: new Map(),
       profTierTutorialSent: false,
-      tutorialGreetingSent: false,
+      tutorialGreetingSent: opts?.tutorialGreetingSent === true,
       firstCharacter: opts?.firstCharacter ?? true,
       profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
@@ -6388,11 +6402,11 @@ export class Sim {
     // first-tier tutorial personal events. Draws ZERO rng (it only emits events,
     // which draw nothing), so its mail-phase position cannot fork the draw order.
     updateProfNudges(this.ctx);
-    // The spawn greeting sweep (tutorial island): the one-shot personal
-    // greeting event for fresh characters. Draws ZERO rng (it only emits
-    // events, which draw nothing), so its mail-phase position cannot fork
-    // the draw order.
-    updateTutorialGreeting(this.ctx);
+    // The spawn greeting sweep (tutorial island): the one-shot compulsory
+    // ferry for fresh characters. Draws ZERO rng (it emits events and
+    // displaces, and displacePlayer itself draws nothing), so its
+    // mail-phase position cannot fork the draw order.
+    updateTutorialGreeting(this.ctx, this.ownPlayerPid);
     // The Gauntlet run sweep (tutorial island): per-tick flag credit for
     // q_ps_the_gauntlet, the same zero-rng argument as the greeting above.
     updateGauntletRuns(this.ctx);
