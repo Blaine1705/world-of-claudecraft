@@ -1158,6 +1158,143 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
     }, 20_000);
   });
 
+  describe('the NO KEY narrowing (write-path rider): FK-child inserts freed, exclusion kept', () => {
+    it('a guard-held listing row admits a bid-row insert; plain FOR UPDATE provably blocked it', async () => {
+      const realm = `nokey-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const bidInsert = `INSERT INTO woc_market_bids (
+           listing_id, realm, account, character_id, character_name, wallet,
+           amount_cents, status, bond_cents, bond_state, placed_at
+         ) VALUES ($1, $2, $3, $4, $5, $6, 700, 'pending_bond', 70, 'pending', now())`;
+      const holder = await pool.connect();
+      const child = await pool.connect();
+      try {
+        // The guard's exact narrowed mode: the FK KEY SHARE the child INSERT
+        // takes on the listing row no longer conflicts, so the insert
+        // proceeds WHILE the guard transaction runs. "Freed" means it never
+        // waits at all, not that it survived a wait: well under the bound.
+        await holder.query('BEGIN');
+        await holder.query('SELECT 1 FROM woc_market_listings WHERE id = $1 FOR NO KEY UPDATE', [
+          listingId,
+        ]);
+        await child.query('BEGIN');
+        await child.query('SET LOCAL lock_timeout = 1500');
+        const startedAt = Date.now();
+        await child.query(bidInsert, [
+          listingId,
+          realm,
+          buyer,
+          9100 + seq,
+          `NoKey${seq}`,
+          `wallet-nokey-${seq}`,
+        ]);
+        expect(Date.now() - startedAt).toBeLessThan(1_000);
+        await child.query('ROLLBACK');
+        await holder.query('ROLLBACK');
+
+        // The negative control: the OLD mode blocks the identical insert,
+        // which is what makes the arm above evidence of the narrowing rather
+        // than FK-locking trivia that was always true.
+        await holder.query('BEGIN');
+        await holder.query('SELECT 1 FROM woc_market_listings WHERE id = $1 FOR UPDATE', [
+          listingId,
+        ]);
+        await child.query('BEGIN');
+        await child.query('SET LOCAL lock_timeout = 1200');
+        await expect(
+          child.query(bidInsert, [
+            listingId,
+            realm,
+            buyer,
+            9200 + seq,
+            `NoKeyB${seq}`,
+            `wallet-nokeyb-${seq}`,
+          ]),
+        ).rejects.toMatchObject({ code: '55P03' });
+        await child.query('ROLLBACK');
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        await child.query('ROLLBACK').catch(() => {});
+        holder.release();
+        child.release();
+      }
+    }, 20_000);
+
+    it('the escrow accounts hold admits the abandon recorder; plain FOR UPDATE provably blocked it', async () => {
+      // escrowInsertListing's exact accounts statement against the abandon
+      // INSERT's FK KEY SHARE on the same row: the 05 blast-radius note
+      // (under the old mode the account could not insert into ANY table
+      // referencing accounts(id) while its escrow ran) stops being true.
+      const realm = `nokey-acct-${++seq}`;
+      const seller = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const abandonInsert = `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
+         VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))`;
+      const holder = await pool.connect();
+      const child = await pool.connect();
+      try {
+        await holder.query('BEGIN');
+        await holder.query('SELECT 1 FROM accounts WHERE id = $1 FOR NO KEY UPDATE', [seller]);
+        await child.query('BEGIN');
+        await child.query('SET LOCAL lock_timeout = 1500');
+        const startedAt = Date.now();
+        await child.query(abandonInsert, [realm, listingId, seller, BASE_MS]);
+        expect(Date.now() - startedAt).toBeLessThan(1_000);
+        await child.query('ROLLBACK');
+        await holder.query('ROLLBACK');
+
+        await holder.query('BEGIN');
+        await holder.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [seller]);
+        await child.query('BEGIN');
+        await child.query('SET LOCAL lock_timeout = 1200');
+        await expect(
+          child.query(abandonInsert, [realm, listingId, seller, BASE_MS + 1000]),
+        ).rejects.toMatchObject({ code: '55P03' });
+        await child.query('ROLLBACK');
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        await child.query('ROLLBACK').catch(() => {});
+        holder.release();
+        child.release();
+      }
+    }, 20_000);
+
+    it('same-account escrow holds still serialize: NO KEY UPDATE conflicts with itself', async () => {
+      // The cap's whole serialization argument rests on this: two escrow
+      // transactions for ONE account queue on the accounts row exactly as
+      // before the narrowing. The waiter fires its 55P03 at the bound while
+      // the holder stands, having genuinely WAITED; commit the holder and
+      // the identical statement proceeds.
+      const account = await seedAccount();
+      const a = await pool.connect();
+      const b = await pool.connect();
+      try {
+        await a.query('BEGIN');
+        await a.query('SELECT 1 FROM accounts WHERE id = $1 FOR NO KEY UPDATE', [account]);
+        await b.query('BEGIN');
+        await b.query('SET LOCAL lock_timeout = 1200');
+        const startedAt = Date.now();
+        await expect(
+          b.query('SELECT 1 FROM accounts WHERE id = $1 FOR NO KEY UPDATE', [account]),
+        ).rejects.toMatchObject({ code: '55P03' });
+        expect(Date.now() - startedAt).toBeGreaterThanOrEqual(1_000);
+        await b.query('ROLLBACK');
+        await a.query('COMMIT');
+        await b.query('BEGIN');
+        await b.query('SET LOCAL lock_timeout = 1200');
+        await b.query('SELECT 1 FROM accounts WHERE id = $1 FOR NO KEY UPDATE', [account]);
+        await b.query('ROLLBACK');
+      } finally {
+        await a.query('ROLLBACK').catch(() => {});
+        await b.query('ROLLBACK').catch(() => {});
+        a.release();
+        b.release();
+      }
+    }, 20_000);
+  });
+
   // -------------------------------------------------------------------------
   // The abandon-loop defenses (both ruling arms)
   // -------------------------------------------------------------------------

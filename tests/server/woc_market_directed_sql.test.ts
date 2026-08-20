@@ -292,7 +292,7 @@ describe('the directed-rail integrity statements, in SQL', () => {
     await new PgWocMarketDb(pool).expireDueDirectedOffers(REALM, 1_000, 25);
     const [text] = sql();
     expect(text).toContain("WHERE status = 'pending'");
-    expect(text).toContain('FOR UPDATE SKIP LOCKED');
+    expect(text).toContain('FOR NO KEY UPDATE SKIP LOCKED');
   });
 
   it('the ever-settled strike gate reads bare existence, no state filter', async () => {
@@ -805,7 +805,7 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
     // bounds now that the intent work added round trips inside its lock
     // window.
     const { pool, sql } = recordingTxPool((text) =>
-      text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')
+      text.includes('FROM woc_market_listings') && text.includes('FOR NO KEY UPDATE')
         ? {
             rows: [
               {
@@ -1032,7 +1032,7 @@ function recordingTxPool(
     seen.push(text);
     const forced = respond?.(text);
     if (forced) return forced;
-    if (text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')) {
+    if (text.includes('FROM woc_market_listings') && text.includes('FOR NO KEY UPDATE')) {
       return { rows: [{ status: 'settling' }], rowCount: 1 };
     }
     return { rows: [], rowCount: 1 };
@@ -1084,6 +1084,32 @@ const FINALIZE_ARGS = {
 } as const;
 
 describe('every guard transaction bounds its idle holds', () => {
+  it('every explicit row lock is FOR NO KEY UPDATE: no plain FOR UPDATE remains (completeness)', async () => {
+    // The write-path rider's narrowing pass, held as a ratchet: plain FOR
+    // UPDATE conflicts with the FOR KEY SHARE every FK-child INSERT takes
+    // (a bid against a guarded listing, an abandon against the escrow-held
+    // accounts row), and no guard here relies on that conflict for
+    // correctness (guard-vs-guard exclusion survives because NO KEY UPDATE
+    // conflicts with itself). A regressed site would matter most exactly
+    // where it is least visible, so the counts are exact: zero plain
+    // clauses, and the narrowed count moves in the same change as any new
+    // lock site. Comment-stripped: the history notes legitimately name the
+    // old mode. The pg battery proves the behavioral halves (self-conflict
+    // preserved, FK-child inserts freed with a plain-mode negative
+    // control); this floor keeps the SQL text from drifting back.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
+    const narrowed = src.match(/FOR NO KEY UPDATE/g) ?? [];
+    expect(narrowed).toHaveLength(21);
+    // 'FOR NO KEY UPDATE' does not contain the substring 'FOR UPDATE', so a
+    // plain match here is a real regressed clause, not a narrowed one.
+    expect(src.match(/FOR UPDATE/g) ?? []).toEqual([]);
+    // The five sweep claims keep their non-blocking shape in the same mode.
+    expect(src.match(/FOR NO KEY UPDATE( OF \w+)? SKIP LOCKED/g) ?? []).toHaveLength(5);
+  });
+
   it('carries the idle-in-transaction bound at EVERY withTx site (completeness, comment-stripped)', async () => {
     // The retrofit rule: a guard transaction that can sit idle between
     // statements camps a shared-pool client, so every one carries the 25P03
@@ -1198,9 +1224,9 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
     const seq = sql();
     const bidLocks = seq
       .map((t, i) => ({ t, i }))
-      .filter(({ t }) => t.includes('FROM woc_market_bids') && t.includes('FOR UPDATE'));
+      .filter(({ t }) => t.includes('FROM woc_market_bids') && t.includes('FOR NO KEY UPDATE'));
     const listingLock = seq.findIndex(
-      (t) => t.includes('FROM woc_market_listings') && t.includes('FOR UPDATE'),
+      (t) => t.includes('FROM woc_market_listings') && t.includes('FOR NO KEY UPDATE'),
     );
     expect(bidLocks, 'exactly the pre-lock and the re-lock').toHaveLength(2);
     const [preLock, reLock] = bidLocks;
@@ -1253,7 +1279,7 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
       .find((t) => t.includes("SET status = 'cancelled'") && t.includes('woc_market_bids'));
     expect(demote?.replace(/\s+/g, ' ')).toContain(carveOut.replace(/\s+/g, ' '));
     const suspend = recordingTxPool((text) => {
-      if (text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')) {
+      if (text.includes('FROM woc_market_listings') && text.includes('FOR NO KEY UPDATE')) {
         return { rows: [{ status: 'active', buy_now_lock_account: null }], rowCount: 1 };
       }
       // The open-settlement re-check must find nothing, or the transaction
@@ -1593,10 +1619,10 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     for (const method of ['async insertPendingBid', 'async activateBidTx']) {
       const start = src.indexOf(method);
       expect(start, method).toBeGreaterThan(-1);
-      // Guard the slice bound: with no FOR UPDATE after the method, indexOf
+      // Guard the slice bound: with no FOR NO KEY UPDATE after the method, indexOf
       // answers -1 and the slice silently widens to the whole file, turning
       // this into a vacuous somewhere-in-the-file pin.
-      const bound = src.indexOf('FOR UPDATE', start);
+      const bound = src.indexOf('FOR NO KEY UPDATE', start);
       expect(bound, `${method} still takes a row lock`).toBeGreaterThan(start);
       const head = src.slice(start, bound);
       expect(head, `${method} bounds its lock wait before the first row lock`).toContain(
@@ -1928,7 +1954,9 @@ describe('the escrow listing transaction, in SQL', () => {
     ).toBe(true);
     // Lock ORDER: accounts before characters (the createCharacterCapped
     // order), and the listing INSERT only after the fenced character write.
-    const accounts = seq.findIndex((t) => t.includes('FROM accounts') && t.includes('FOR UPDATE'));
+    const accounts = seq.findIndex(
+      (t) => t.includes('FROM accounts') && t.includes('FOR NO KEY UPDATE'),
+    );
     const character = seq.findIndex((t) => t.includes('UPDATE characters'));
     const insert = seq.findIndex((t) => t.includes('INSERT INTO woc_market_listings'));
     expect(accounts).toBeGreaterThan(0);
@@ -1960,7 +1988,7 @@ describe('the escrow listing transaction, in SQL', () => {
     // the deadlock victim, 25P03 its own idle-in-transaction bound firing on
     // a stalled event loop.
     const { pool } = recordingTxPool((text) => {
-      if (text.includes('FOR UPDATE')) {
+      if (text.includes('FOR NO KEY UPDATE')) {
         throw Object.assign(new Error(message), { code });
       }
       return undefined;
@@ -1995,7 +2023,7 @@ describe('the escrow listing transaction, in SQL', () => {
       const before = wocMarketIdleTxKillCount();
       const rig = (code: string) =>
         recordingTxPool((text) => {
-          if (text.includes('FOR UPDATE')) {
+          if (text.includes('FOR NO KEY UPDATE')) {
             throw Object.assign(new Error('boom'), { code });
           }
           return undefined;
@@ -2065,7 +2093,7 @@ describe('the escrow listing transaction, in SQL', () => {
       minNext: () => 100,
     };
     const { pool } = recordingTxPool((text) => {
-      if (text.includes('FOR UPDATE')) {
+      if (text.includes('FOR NO KEY UPDATE')) {
         throw Object.assign(new Error('idle kill'), { code: '25P03' });
       }
       return undefined;
@@ -2077,7 +2105,7 @@ describe('the escrow listing transaction, in SQL', () => {
     // A non-contention failure still surfaces: the catch maps ONLY the
     // contention codes, never a real bug.
     const { pool: buggy } = recordingTxPool((text) => {
-      if (text.includes('FOR UPDATE')) throw new Error('some real bug');
+      if (text.includes('FOR NO KEY UPDATE')) throw new Error('some real bug');
       return undefined;
     });
     await expect(new PgWocMarketDb(buggy).insertPendingBid(bidArgs)).rejects.toThrow(
@@ -2198,7 +2226,7 @@ describe('the escrow listing transaction, in SQL', () => {
     const makePool = (statementError: Error) => {
       const release = vi.fn();
       const query = async (text: string) => {
-        if (text.includes('FOR UPDATE')) throw statementError;
+        if (text.includes('FOR NO KEY UPDATE')) throw statementError;
         if (text === 'ROLLBACK') rolledBack.push(text);
         return { rows: [], rowCount: 1 };
       };
@@ -2225,7 +2253,7 @@ describe('the escrow listing transaction, in SQL', () => {
     // the service's ambiguous arm (park the copy, loudly) rather than
     // collapsing into the retry refusal whose compensation restores it.
     const { pool } = recordingTxPool((text) => {
-      if (text.includes('FOR UPDATE')) throw new Error('Connection terminated unexpectedly');
+      if (text.includes('FOR NO KEY UPDATE')) throw new Error('Connection terminated unexpectedly');
       return undefined;
     });
     const out = await new PgWocMarketDb(pool)
@@ -2254,7 +2282,7 @@ describe('the escrow listing transaction, in SQL', () => {
     // ordinary CI always runs.
     let onError: ((err: unknown) => void) | undefined;
     const query = async (text: string) => {
-      if (text.includes('FOR UPDATE')) {
+      if (text.includes('FOR NO KEY UPDATE')) {
         onError?.(
           Object.assign(new Error('terminating connection due to idle-in-transaction timeout'), {
             code: '25P03',
@@ -2465,7 +2493,7 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     // so can never deadlock against) a concurrent finalize holding a listing
     // row; a skipped row is the next beat's business.
     expect(text).toContain('ORDER BY l.id');
-    expect(text).toContain('FOR UPDATE OF l SKIP LOCKED');
+    expect(text).toContain('FOR NO KEY UPDATE OF l SKIP LOCKED');
     expect(params()[0]).toEqual([REALM, 25]);
   });
 
@@ -2585,7 +2613,7 @@ describe('the stuck-custody readout saturates, in SQL', () => {
   });
 
   describe('activation and suspend lock shapes, in the statements', () => {
-    it('activateBid locks the open bid set FIRST (ordered, FOR UPDATE), the listing after', async () => {
+    it('activateBid locks the open bid set FIRST (ordered, FOR NO KEY UPDATE), the listing after', async () => {
       const bidRow = {
         id: 5,
         listing_id: 77,
@@ -2607,10 +2635,10 @@ describe('the stuck-custody readout saturates, in SQL', () => {
         if (text.includes('SELECT listing_id FROM woc_market_bids')) {
           return { rows: [{ listing_id: 77 }], rowCount: 1 };
         }
-        if (text.includes('FROM woc_market_bids WHERE id = $1 FOR UPDATE')) {
+        if (text.includes('FROM woc_market_bids WHERE id = $1 FOR NO KEY UPDATE')) {
           return { rows: [bidRow], rowCount: 1 };
         }
-        if (text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')) {
+        if (text.includes('FROM woc_market_listings') && text.includes('FOR NO KEY UPDATE')) {
           // A vanished listing routes to the supersede arm; every lock
           // statement has already been ISSUED by then, which is all this
           // pin reads.
@@ -2624,13 +2652,13 @@ describe('the stuck-custody readout saturates, in SQL', () => {
         (t) =>
           t.includes('FROM woc_market_bids') &&
           t.includes("status IN ('pending_bond', 'active')") &&
-          t.includes('FOR UPDATE'),
+          t.includes('FOR NO KEY UPDATE'),
       );
       const ownLock = seq.findIndex((t) =>
-        t.includes('FROM woc_market_bids WHERE id = $1 FOR UPDATE'),
+        t.includes('FROM woc_market_bids WHERE id = $1 FOR NO KEY UPDATE'),
       );
       const listingLock = seq.findIndex(
-        (t) => t.includes('FROM woc_market_listings') && t.includes('FOR UPDATE'),
+        (t) => t.includes('FROM woc_market_listings') && t.includes('FOR NO KEY UPDATE'),
       );
       expect(openSet, 'the ordered open-set pre-lock exists').toBeGreaterThan(-1);
       expect(seq[openSet]).toContain('ORDER BY id');
@@ -2644,10 +2672,10 @@ describe('the stuck-custody readout saturates, in SQL', () => {
       await new PgWocMarketDb(pool).suspendListingIfSafe(REALM, 5, 1_000);
       const seq = sql();
       const preLock = seq.findIndex(
-        (t) => t.includes('FROM woc_market_bids') && t.includes('FOR UPDATE'),
+        (t) => t.includes('FROM woc_market_bids') && t.includes('FOR NO KEY UPDATE'),
       );
       const listingLock = seq.findIndex(
-        (t) => t.includes('FROM woc_market_listings') && t.includes('FOR UPDATE'),
+        (t) => t.includes('FROM woc_market_listings') && t.includes('FOR NO KEY UPDATE'),
       );
       expect(preLock).toBeGreaterThan(-1);
       expect(
@@ -2674,7 +2702,7 @@ describe('the stuck-custody readout saturates, in SQL', () => {
         directed_buyer_account: null,
       };
       const { pool, sql } = recordingTxPool((text) => {
-        if (text.includes('FROM woc_market_listings') && !text.includes('FOR UPDATE')) {
+        if (text.includes('FROM woc_market_listings') && !text.includes('FOR NO KEY UPDATE')) {
           return { rows: [listingRow], rowCount: 1 };
         }
         if (text.includes('FROM woc_market_settlements')) {
@@ -2685,7 +2713,7 @@ describe('the stuck-custody readout saturates, in SQL', () => {
       const out = await new PgWocMarketDb(pool).claimBuyNowLock(REALM, 5, 2, 1_000, 2_000);
       expect(out).toBe('locked');
       expect(
-        sql().some((t) => t.includes('FOR UPDATE')),
+        sql().some((t) => t.includes('FOR NO KEY UPDATE')),
         'the refusal held no lock',
       ).toBe(false);
       expect(sql().some((t) => t.includes('BEGIN'))).toBe(false);

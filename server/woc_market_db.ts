@@ -5,8 +5,16 @@
 // pure rules in woc_market_rules.ts.
 //
 // Concurrency model: every state transition is an atomic guarded UPDATE (or a
-// short SELECT ... FOR UPDATE transaction), never check-then-write; sweep
-// claims use FOR UPDATE SKIP LOCKED so a slow item never blocks the batch.
+// short SELECT ... FOR NO KEY UPDATE transaction), never check-then-write;
+// sweep claims use FOR NO KEY UPDATE SKIP LOCKED so a slow item never blocks
+// the batch. NO KEY on every explicit row lock (the escrow write-path rider):
+// guard-vs-guard exclusion is unchanged (the mode conflicts with itself), but
+// FK-child INSERTs (a bid against a guarded listing, an abandon against the
+// escrow-held accounts row) take FOR KEY SHARE, which plain FOR UPDATE
+// blocked and this mode admits. No guard writes a key column under its lock,
+// and none relies on the FK-share half for correctness (the insertSettlement
+// comment owns that argument: the explicit lock plus the re-read refuses,
+// the FK share never did).
 // Money is INTEGER USD CENTS end to end. Item snapshots are JSONB InvSlot
 // copies (the escrow-by-removal custody model in docs/prd/woc/marketplace.md).
 
@@ -1353,14 +1361,17 @@ export class PgWocMarketDb implements WocMarketDb {
         // Lock ORDER is accounts-then-characters, matching every established
         // capped-insert path (db.ts createCharacterCapped, maps_db, user_assets_db),
         // so no future accounts-first path can deadlock against this one. The cap
-        // is counted under the lock and NOT re-counted outside it. Blast radius,
-        // honestly: FOR UPDATE conflicts with the FOR KEY SHARE every FK-child
-        // INSERT takes on this row, so while the transaction runs the account
-        // cannot insert into ANY table referencing accounts(id); that width is
-        // what the 2s idle bound is really protecting (a NO KEY UPDATE
-        // narrowing is recorded follow-up work, measured to preserve the cap
-        // serialization).
-        await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [
+        // is counted under the lock and NOT re-counted outside it. NO KEY
+        // (the write-path rider, landing the recorded narrowing): the cap
+        // serialization needs only self-conflict, which NO KEY UPDATE keeps
+        // (two escrow inserts for one account still queue here), while the
+        // FOR KEY SHARE every FK-child INSERT takes on this row (an abandon
+        // record, a step-up challenge) no longer waits out this transaction.
+        // Nothing under this lock writes an accounts key column. The pg
+        // battery pins both halves: same-account creates still serialize at
+        // the cap, and a child insert proceeds where plain FOR UPDATE
+        // provably blocked it.
+        await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR NO KEY UPDATE', [
           listing.sellerAccount,
         ]);
         // The cap counts EVERY non-closed listing, directed included (H12),
@@ -1972,7 +1983,7 @@ export class PgWocMarketDb implements WocMarketDb {
           SELECT id FROM woc_market_directed_offers
            WHERE realm = $1 AND status = 'pending' AND expires_at <= to_timestamp($2 / 1000.0)
            LIMIT $3
-           FOR UPDATE SKIP LOCKED
+           FOR NO KEY UPDATE SKIP LOCKED
         )`,
       [realm, nowMs, limit],
     );
@@ -2068,7 +2079,7 @@ export class PgWocMarketDb implements WocMarketDb {
         // the 15 s session bound (the escrowInsertListing rationale; the rare
         // 55P03 surfaces as the typed 'contended' refusal below). The idle
         // bound joined when the cancel-intent work grew this transaction two
-        // extra round trips inside the FOR UPDATE window (the paid-window
+        // extra round trips inside the row-lock window (the paid-window
         // probe and the intent stamp): the guard-transaction rule, not the
         // older-guard retrofit deferral.
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
@@ -2083,7 +2094,7 @@ export class PgWocMarketDb implements WocMarketDb {
         // activateBid do (bids by id, then the listing).
         const res = await client.query(
           `SELECT ${LISTING_COLS} FROM woc_market_listings
-          WHERE realm = $1 AND id = $2 FOR UPDATE`,
+          WHERE realm = $1 AND id = $2 FOR NO KEY UPDATE`,
           [realm, id],
         );
         const row = res.rows[0];
@@ -2210,12 +2221,12 @@ export class PgWocMarketDb implements WocMarketDb {
           `SELECT id FROM woc_market_bids
           WHERE listing_id = $1 AND status IN ('pending_bond', 'active', 'won')
           ORDER BY id
-          FOR UPDATE`,
+          FOR NO KEY UPDATE`,
           [id],
         );
         const res = await client.query(
           `SELECT ${LISTING_COLS} FROM woc_market_listings
-          WHERE realm = $1 AND id = $2 FOR UPDATE`,
+          WHERE realm = $1 AND id = $2 FOR NO KEY UPDATE`,
           [realm, id],
         );
         const row = res.rows[0];
@@ -2313,7 +2324,7 @@ export class PgWocMarketDb implements WocMarketDb {
            WHERE realm = $1 AND status = 'active' AND ends_at <= to_timestamp($2 / 1000.0)
            ORDER BY ends_at
            LIMIT $3
-           FOR UPDATE SKIP LOCKED)
+           FOR NO KEY UPDATE SKIP LOCKED)
         RETURNING ${LISTING_COLS}`,
       [realm, nowMs, limit],
     );
@@ -2350,7 +2361,7 @@ export class PgWocMarketDb implements WocMarketDb {
           `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
         );
         const row = await client.query(
-          `SELECT status FROM woc_market_listings WHERE id = $1 FOR UPDATE`,
+          `SELECT status FROM woc_market_listings WHERE id = $1 FOR NO KEY UPDATE`,
           [id],
         );
         if (!row.rows[0] || row.rows[0].status === 'closed') return false;
@@ -2945,16 +2956,15 @@ export class PgWocMarketDb implements WocMarketDb {
         // Beyond the listing row this transaction also takes the settlement
         // reads (plain) and, on the recorder arm, the abandons INSERT's FK
         // share locks (accounts, listings): a non-cyclic blocking edge,
-        // bounded by lock_timeout and retryable. In practice the edge is
-        // thinner than it reads: FOR KEY SHARE does not conflict with the
-        // FOR NO KEY UPDATE an ordinary accounts UPDATE takes, so only an
-        // explicit FOR UPDATE on the abandoner's accounts row (today:
-        // escrowInsertListing, which locks accounts BEFORE any listing work
-        // and so cannot close a cycle with this listing-first hold) can make
-        // a claim wait here.
+        // bounded by lock_timeout and retryable. Since the write-path
+        // rider's narrowing that edge is gone in practice: FOR KEY SHARE
+        // conflicts with neither the FOR NO KEY UPDATE an ordinary accounts
+        // UPDATE takes nor the explicit NO KEY lock escrowInsertListing now
+        // holds on the seller's accounts row, so the abandon record no
+        // longer waits on anyone's escrow transaction.
         const res = await client.query(
           `SELECT ${LISTING_COLS} FROM woc_market_listings
-            WHERE realm = $1 AND id = $2 FOR UPDATE`,
+            WHERE realm = $1 AND id = $2 FOR NO KEY UPDATE`,
           [realm, id],
         );
         // The AUTHORITATIVE re-checks: everything the advisory pass answered,
@@ -3143,7 +3153,7 @@ export class PgWocMarketDb implements WocMarketDb {
         );
         const res = await client.query(
           `SELECT ${LISTING_COLS} FROM woc_market_listings
-            WHERE realm = $1 AND id = $2 FOR UPDATE`,
+            WHERE realm = $1 AND id = $2 FOR NO KEY UPDATE`,
           [realm, id],
         );
         const row = res.rows[0];
@@ -3242,7 +3252,7 @@ export class PgWocMarketDb implements WocMarketDb {
       // listing lock precisely because this path can commit a new bid.
       const res = await client.query(
         `SELECT ${LISTING_COLS} FROM woc_market_listings
-          WHERE realm = $1 AND id = $2 FOR UPDATE`,
+          WHERE realm = $1 AND id = $2 FOR NO KEY UPDATE`,
         [args.realm, args.listingId],
       );
       if (!res.rows[0]) return { ok: false, reason: 'not_found' as const };
@@ -3345,7 +3355,7 @@ export class PgWocMarketDb implements WocMarketDb {
         );
         const res = await client.query(
           `SELECT ${LISTING_COLS} FROM woc_market_listings
-            WHERE realm = $1 AND id = $2 FOR UPDATE`,
+            WHERE realm = $1 AND id = $2 FOR NO KEY UPDATE`,
           [realm, listingId],
         );
         if (!res.rows[0]) return 'skip' as const;
@@ -3574,18 +3584,18 @@ export class PgWocMarketDb implements WocMarketDb {
         `SELECT id FROM woc_market_bids
           WHERE listing_id = $1 AND status IN ('pending_bond', 'active')
           ORDER BY id
-          FOR UPDATE`,
+          FOR NO KEY UPDATE`,
         [peek.rows[0].listing_id],
       );
       const bidRes = await client.query(
-        `SELECT ${BID_COLS} FROM woc_market_bids WHERE id = $1 FOR UPDATE`,
+        `SELECT ${BID_COLS} FROM woc_market_bids WHERE id = $1 FOR NO KEY UPDATE`,
         [bidId],
       );
       if (!bidRes.rows[0]) return 'not_pending' as const;
       const bid = toBid(bidRes.rows[0]);
       if (bid.status !== 'pending_bond') return 'not_pending' as const;
       const listingRes = await client.query(
-        `SELECT ${LISTING_COLS} FROM woc_market_listings WHERE id = $1 FOR UPDATE`,
+        `SELECT ${LISTING_COLS} FROM woc_market_listings WHERE id = $1 FOR NO KEY UPDATE`,
         [bid.listingId],
       );
       const supersede = async (): Promise<void> => {
@@ -3650,7 +3660,7 @@ export class PgWocMarketDb implements WocMarketDb {
              AND bond_signature IS NULL
            ORDER BY placed_at
            LIMIT $3
-           FOR UPDATE SKIP LOCKED)`,
+           FOR NO KEY UPDATE SKIP LOCKED)`,
       [realm, cutoffMs, limit],
     );
     return res.rowCount ?? 0;
@@ -3817,7 +3827,7 @@ export class PgWocMarketDb implements WocMarketDb {
         // closer just closed; reproduced against a real database). The
         // explicit row lock plus a status re-read under it is what refuses.
         const lockRow = await client.query(
-          `SELECT status FROM woc_market_listings WHERE id = $1 FOR UPDATE`,
+          `SELECT status FROM woc_market_listings WHERE id = $1 FOR NO KEY UPDATE`,
           [args.listingId],
         );
         if (!lockRow.rows[0]) {
@@ -3990,7 +4000,7 @@ export class PgWocMarketDb implements WocMarketDb {
            WHERE realm = $1 AND state = 'confirmed'
            ORDER BY updated_at
            LIMIT $2
-           FOR UPDATE SKIP LOCKED)
+           FOR NO KEY UPDATE SKIP LOCKED)
         RETURNING ${SETTLEMENT_COLS}`,
       [realm, limit],
     );
@@ -4093,7 +4103,7 @@ export class PgWocMarketDb implements WocMarketDb {
                 WHERE s.listing_id = l.id AND s.excluded = false)
            ORDER BY l.id
            LIMIT $2
-           FOR UPDATE OF l SKIP LOCKED)`,
+           FOR NO KEY UPDATE OF l SKIP LOCKED)`,
       [realm, limit],
     );
     return res.rowCount ?? 0;
@@ -4165,11 +4175,11 @@ export class PgWocMarketDb implements WocMarketDb {
           `SELECT id FROM woc_market_bids
             WHERE listing_id = $1 AND (status IN ('pending_bond', 'active') OR id = $2)
             ORDER BY id
-            FOR UPDATE`,
+            FOR NO KEY UPDATE`,
           [args.listingId, args.bidId],
         );
         const listing = await client.query(
-          `SELECT status FROM woc_market_listings WHERE id = $1 FOR UPDATE`,
+          `SELECT status FROM woc_market_listings WHERE id = $1 FOR NO KEY UPDATE`,
           [args.listingId],
         );
         if (!listing.rows[0]) throw new TxAbort('stale' as const);
@@ -4184,7 +4194,7 @@ export class PgWocMarketDb implements WocMarketDb {
           `SELECT id FROM woc_market_bids
             WHERE listing_id = $1 AND status IN ('pending_bond', 'active')
             ORDER BY id
-            FOR UPDATE`,
+            FOR NO KEY UPDATE`,
           [args.listingId],
         );
         // sweep_parked_at clears on the terminal transition so a row that
