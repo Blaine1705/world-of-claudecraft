@@ -264,6 +264,107 @@ describe('token arm', () => {
     expect(cache.stats().tokens.entries).toBe(1);
   });
 
+  it('refetches for a reader that arrives AFTER an account bust instead of joining the stale flight', async () => {
+    // The JOIN half of the index-blind race: an account-keyed bust cannot
+    // cancel a flight for a not-yet-indexed token, so without the join
+    // re-check a reader arriving strictly after the revocation would be
+    // answered from the pre-delete snapshot. The pre-bust caller keeps the
+    // recorded once-per-flight acceptance; the post-bust arrival must not.
+    let nowMs = NOW;
+    const settlers: Array<(row: AuthTokenRow | null) => void> = [];
+    let fetches = 0;
+    const cache = new WocAuthGuardCache(
+      {
+        fetchTokenRow: () => {
+          fetches += 1;
+          return new Promise((resolve) => {
+            settlers.push(resolve);
+          });
+        },
+        fetchModerationRow: async () => null,
+      },
+      { now: () => nowMs },
+    );
+    const preBust = cache.accountAndScopeForToken('t1');
+    nowMs += 1;
+    cache.bustAccount(7);
+    nowMs += 1;
+    const postBust = cache.accountAndScopeForToken('t1');
+    // Only the one flight is in the air; the joiner decides at resolution.
+    expect(fetches).toBe(1);
+    settlers[0](liveToken(7));
+    // The pre-bust caller keeps its flight's answer (the judged acceptance)...
+    await expect(preBust).resolves.toEqual({ accountId: 7, scope: 'full' });
+    // ...the post-bust arrival refetched instead of accepting it, and the
+    // fresh probe's answer (the row is deleted) is what it returns.
+    expect(fetches).toBe(2);
+    settlers[1](null);
+    await expect(postBust).resolves.toBeNull();
+    expect(cache.stats().tokens.entries).toBe(0);
+  });
+
+  it('resumes installs for a bust account once a fetch starts after the bust (fence, not blacklist)', async () => {
+    let nowMs = NOW;
+    const settlers: Array<(row: AuthTokenRow | null) => void> = [];
+    let fetches = 0;
+    const cache = new WocAuthGuardCache(
+      {
+        fetchTokenRow: () => {
+          fetches += 1;
+          return new Promise((resolve) => {
+            settlers.push(resolve);
+          });
+        },
+        fetchModerationRow: async () => null,
+      },
+      { now: () => nowMs },
+    );
+    cache.bustAccount(7);
+    nowMs += 1;
+    const read = cache.accountAndScopeForToken('t1');
+    settlers[0](liveToken(7));
+    await expect(read).resolves.toEqual({ accountId: 7, scope: 'full' });
+    // The veto is a point-in-time fence, not a permanent per-account
+    // blacklist: the post-bust fetch's row installed and serves the next
+    // read without a refetch. (A permanent veto would silently disable the
+    // cache for every account after its first revocation or moderation
+    // write: the exact perf cliff this rider exists to prevent.)
+    expect(cache.stats().tokens.entries).toBe(1);
+    await cache.accountAndScopeForToken('t1');
+    expect(fetches).toBe(1);
+  });
+
+  it('anchors the entry TTL at the fetch START, so slow fetches never extend staleness', async () => {
+    let nowMs = NOW;
+    const settlers: Array<(row: AuthTokenRow | null) => void> = [];
+    let fetches = 0;
+    const cache = new WocAuthGuardCache(
+      {
+        fetchTokenRow: () => {
+          fetches += 1;
+          return new Promise((resolve) => {
+            settlers.push(resolve);
+          });
+        },
+        fetchModerationRow: async () => null,
+      },
+      { now: () => nowMs },
+    );
+    const read = cache.accountAndScopeForToken('t1');
+    // The fetch takes 2s to settle: the entry's age must count from the
+    // START (the row is as-of a snapshot no later than that), or the
+    // documented cross-process ceiling silently becomes TTL + fetch RTT.
+    nowMs += 2_000;
+    settlers[0](liveToken(7));
+    await read;
+    // TTL from the start: at start + TTL the entry is expired even though
+    // only TTL - 2s has passed since the install.
+    nowMs = NOW + TTL;
+    void cache.accountAndScopeForToken('t1');
+    expect(fetches).toBe(2);
+    settlers[1](null);
+  });
+
   it('evicts the coldest entry at the cap and counts it', async () => {
     const r = rig({ tokenMaxEntries: 2 });
     r.tokens.set('t1', liveToken(1));
@@ -398,10 +499,83 @@ describe('account-keyed bust and the token index', () => {
     expect(r.cache.recentBustLedgerSizeForTests()).toBeLessThanOrEqual(
       WOC_AUTH_GUARD_RECENT_BUSTS_MAX,
     );
-    // And a young entry always survives the prune: the newest bust is there.
+    // A young entry always survives a prune, pinned EXACTLY: age everything
+    // out past retention and bust once more; the prune leaves precisely the
+    // two young entries (the previous trigger bust, at the retention
+    // boundary, and the new one), never zero and never the pre-prune size.
     r.advance(WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS);
     r.cache.bustAccount(burst + 2);
-    expect(r.cache.recentBustLedgerSizeForTests()).toBeGreaterThanOrEqual(1);
+    expect(r.cache.recentBustLedgerSizeForTests()).toBe(2);
+    // And the surviving newest entry is LIVE, not merely counted: it still
+    // vetoes the install of a fetch that started before it (1ms later the
+    // fence lifts and the install lands, the fence-not-blacklist rule).
+    r.tokens.set('tv', liveToken(burst + 2));
+    await r.cache.accountAndScopeForToken('tv');
+    expect(r.cache.stats().tokens.entries).toBe(0);
+    r.advance(1);
+    await r.cache.accountAndScopeForToken('tv');
+    expect(r.cache.stats().tokens.entries).toBe(1);
+  });
+
+  it('runs the over-cap prune walk ONCE per wedged window, not once per bust (the fan-out stall)', async () => {
+    const r = rig();
+    // Fill past the cap inside the floor window: the first over-cap bust
+    // pays one walk, learns nothing can drop until the floor passes, and
+    // every further bust in the window skips the walk (a realm-wide resync
+    // fan-out at the 5,000-account cap otherwise pays a measured ~70ms of
+    // synchronous walks on the game-loop thread).
+    const burst = WOC_AUTH_GUARD_RECENT_BUSTS_MAX + 200;
+    for (let i = 1; i <= burst; i++) r.cache.bustAccount(i);
+    expect(r.cache.prunePassesForTests()).toBe(1);
+    // Once the floor has passed, the next bust prunes again (the gate is a
+    // delay, never a disable): size returns to the cap.
+    r.advance(WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS + 1);
+    r.cache.bustAccount(burst + 1);
+    expect(r.cache.prunePassesForTests()).toBe(2);
+    expect(r.cache.recentBustLedgerSizeForTests()).toBeLessThanOrEqual(
+      WOC_AUTH_GUARD_RECENT_BUSTS_MAX,
+    );
+  });
+
+  it('drops entries past RETENTION even below the floor pass cap target (the retention pass is live)', async () => {
+    const r = rig();
+    // Overfill, then age EVERYTHING past retention: the retention pass alone
+    // must clear the stale entries, taking the ledger BELOW the cap (the
+    // floor pass stops AT the cap, so a below-cap result proves the
+    // retention pass ran and is not shadowed by it).
+    const burst = WOC_AUTH_GUARD_RECENT_BUSTS_MAX + 40;
+    for (let i = 1; i <= burst; i++) r.cache.bustAccount(i);
+    r.advance(WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS + 1);
+    r.cache.bustAccount(burst + 1);
+    // Every burst entry was past retention: only the triggering bust stays.
+    expect(r.cache.recentBustLedgerSizeForTests()).toBe(1);
+  });
+
+  it('applies the lost-bust cancel on the MODERATION arm (same-key bust mid-flight)', async () => {
+    const nowMs = NOW;
+    const settlers: Array<(row: AccountModerationRow | null) => void> = [];
+    let fetches = 0;
+    const cache = new WocAuthGuardCache(
+      {
+        fetchTokenRow: async () => null,
+        fetchModerationRow: () => {
+          fetches += 1;
+          return new Promise((resolve) => {
+            settlers.push(resolve);
+          });
+        },
+      },
+      { now: () => nowMs },
+    );
+    const read = cache.moderationStatusForAccount(7);
+    cache.bustAccount(7);
+    settlers[0](cleanRow());
+    await read;
+    // The pre-bust moderation row must not install: the next read refetches.
+    expect(cache.stats().accounts.entries).toBe(0);
+    void cache.moderationStatusForAccount(7);
+    expect(fetches).toBe(2);
+    settlers[1](null);
   });
 
   it('stays safe over eviction residue and sweeps the index at its bound', async () => {
@@ -444,8 +618,12 @@ describe('constants and the singleton wiring', () => {
     // must sit above the floor for the same reason. Derived from the
     // exported db constants so a deadline raise reds here.
     const { DB_POOL_CONNECT_TIMEOUT_MS, DB_QUERY_TIMEOUT_MS } = await import('../../server/db');
+    // At least 5s ABOVE the derived flight bound, not equal to it: the veto
+    // is consulted a scheduling delay after the query settles, so equality
+    // would leave the "no live flight can predate the floor" claim resting
+    // on a zero-latency event loop.
     expect(WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS).toBeGreaterThanOrEqual(
-      DB_QUERY_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
+      DB_QUERY_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS + 5_000,
     );
     expect(WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS).toBeGreaterThan(
       WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS,
@@ -482,10 +660,17 @@ describe('constants and the singleton wiring', () => {
     await cache.accountAndScopeForToken('t1');
     tokens.delete('t1');
     bustWocAuthGuardToken('t1');
+    // The token arm's bust counter moved (the free function reached the
+    // singleton), and the fresh probe then answers null.
+    expect(wocAuthGuardCacheStats()?.tokens.busts).toBe(1);
     await expect(cache.accountAndScopeForToken('t1')).resolves.toBeNull();
     await cache.moderationStatusForAccount(7);
     bustWocAuthGuardAccount(7);
     expect(wocAuthGuardCacheStats()?.accounts.busts).toBe(1);
+    // The soft-bounded internals are numbers on the stats payload (the
+    // production observability for bounds that are soft BY DESIGN).
+    expect(wocAuthGuardCacheStats()?.recentBusts).toBe(1);
+    expect(wocAuthGuardCacheStats()?.index).toBe(0);
     // The free flush lever (no production caller yet: main.ts flushes
     // through its own instance handle) drains both arms through the
     // singleton so the export cannot rot unrun.
@@ -493,6 +678,10 @@ describe('constants and the singleton wiring', () => {
     bustWocAuthGuardAll();
     expect(wocAuthGuardCacheStats()?.tokens.entries).toBe(0);
     expect(wocAuthGuardCacheStats()?.accounts.entries).toBe(0);
+    // The flush accumulated into the bust counters (one flushed account
+    // entry on top of the earlier keyed bust) and drained the ledger.
+    expect(wocAuthGuardCacheStats()?.accounts.busts).toBe(2);
+    expect(wocAuthGuardCacheStats()?.recentBusts).toBe(0);
     resetWocAuthGuardCache();
     expect(wocAuthGuardDb()).toBeNull();
     // Busts against the cleared singleton are no-ops, not throws.

@@ -51,8 +51,22 @@ interface Site {
   kind: string;
 }
 
+/** A writer whose TABLE NAME arrives by interpolation is invisible to every
+ *  verb+table regex below, so that shape is banned across all of server/:
+ *  the sweep reds on any INSERT INTO / DELETE FROM / UPDATE followed by an
+ *  interpolation opener, forcing a literal spelling the classifier can see.
+ *  (An interpolated fragment INSIDE a guard-table statement is handled
+ *  separately: the window check below sends it to the unclassifiable arm,
+ *  because the column classifier cannot read columns it cannot see. An
+ *  interpolated SET list on a non-guard table, e.g. woc_market_db.ts's
+ *  directed-offer acceptance column, is out of this scan's scope.) */
+const INTERPOLATED_TABLE = /\b(?:INSERT\s+INTO|DELETE\s+FROM|UPDATE)\s+(?:\w+\.)?\$\{/i;
+
 /** Every in-scope write site in one stripped source, by the column-precise
- *  classifier described in the header. */
+ *  classifier described in the header. Every table regex accepts an optional
+ *  schema qualifier and matches case-insensitively: a public.auth_tokens or
+ *  lowercase-keyword spelling must be a discovered site, never an evasion
+ *  (both shapes proved to slip an earlier, narrower scan). */
 function discoverSites(
   file: string,
   src: string,
@@ -60,7 +74,9 @@ function discoverSites(
   const inScope: Site[] = [];
   const accountDeletes: Site[] = [];
   const unclassifiable: Site[] = [];
-  for (const m of src.matchAll(/\b(INSERT\s+INTO|DELETE\s+FROM|UPDATE)\s+auth_tokens\b/g)) {
+  for (const m of src.matchAll(
+    /\b(INSERT\s+INTO|DELETE\s+FROM|UPDATE)\s+(?:\w+\.)?auth_tokens\b/gi,
+  )) {
     inScope.push({ file, index: m.index ?? 0, kind: 'auth_tokens' });
   }
   // UPDATE accounts (schema-qualified spellings included) and the upsert
@@ -74,46 +90,56 @@ function discoverSites(
   // early and could hide a later projected column; no such statement shape
   // exists in server/, and a new one lands as a NEW site the reconciliation
   // map reds on, at which point this classifier gets taught the shape.
-  for (const m of src.matchAll(/\b(?:UPDATE|INSERT\s+INTO)\s+(?:\w+\.)?accounts\b/g)) {
+  for (const m of src.matchAll(/\b(?:UPDATE|INSERT\s+INTO)\s+(?:\w+\.)?accounts\b/gi)) {
     let window = src.slice(m.index, (m.index ?? 0) + 2000);
     const delim = window.slice(1).search(/[;\u0060]/);
     if (delim >= 0) window = window.slice(0, delim + 1);
+    if (window.includes('${')) {
+      // An interpolated fragment inside a guard-table statement defeats the
+      // column classifier: red loudly instead of guessing.
+      unclassifiable.push({ file, index: m.index ?? 0, kind: 'accounts_interpolated' });
+      continue;
+    }
     const isInsert = /^INSERT/i.test(m[0]);
     if (isInsert) {
       // A plain INSERT INTO accounts creates a row no token can reference
       // yet (registration): out of scope BY RULE. The upsert arm's DO
       // UPDATE SET list is the second door and classifies by column.
-      const doUpdate = window.match(/\bDO\s+UPDATE\b([\s\S]*)$/);
+      const doUpdate = window.match(/\bDO\s+UPDATE\b([\s\S]*)$/i);
       if (!doUpdate) continue;
-      const upsertSet = doUpdate[1].split(/\bWHERE\b/)[0];
+      const upsertSet = doUpdate[1].split(/\bWHERE\b/i)[0].toLowerCase();
       if (PROJECTION_COLUMNS.some((c) => upsertSet.includes(c))) {
         inScope.push({ file, index: m.index ?? 0, kind: 'accounts_update' });
       }
       continue;
     }
-    if (!/\bWHERE\b/.test(window)) {
+    if (!/\bWHERE\b/i.test(window)) {
       // No WHERE inside the statement bound: either a truncated giant SET
       // list or an unconditional whole-table write; both must red loudly.
       unclassifiable.push({ file, index: m.index ?? 0, kind: 'accounts_update_unbounded' });
       continue;
     }
-    const setClause = window.split(/\bWHERE\b/)[0];
+    const setClause = window.split(/\bWHERE\b/i)[0].toLowerCase();
     if (PROJECTION_COLUMNS.some((c) => setClause.includes(c))) {
       inScope.push({ file, index: m.index ?? 0, kind: 'accounts_update' });
     }
   }
   for (const m of src.matchAll(
-    /\b(INSERT\s+INTO|DELETE\s+FROM|UPDATE)\s+account_general_chat_rate_limits\b/g,
+    /\b(INSERT\s+INTO|DELETE\s+FROM|UPDATE)\s+(?:\w+\.)?account_general_chat_rate_limits\b/gi,
   )) {
-    const verb = m[1].split(/\s/)[0];
-    const head = src.slice(m.index, (m.index ?? 0) + 700).split(/\bWHERE\b|\bVALUES\b/)[0];
+    const verb = m[1].split(/\s/)[0].toUpperCase();
+    const head = src.slice(m.index, (m.index ?? 0) + 700).split(/\bWHERE\b|\bVALUES\b/i)[0];
+    if (head.includes('${')) {
+      unclassifiable.push({ file, index: m.index ?? 0, kind: 'quota_interpolated' });
+      continue;
+    }
     // A row DELETE removes the policy (the read's LEFT JOIN goes null): in
     // scope. INSERT/UPDATE are in scope only when they touch the projected
     // policy columns; the consume machinery's window/counter churn is not.
-    const policy = verb === 'DELETE' || /\bmessages\b|\bwindow_minutes\b/.test(head);
+    const policy = verb === 'DELETE' || /\bmessages\b|\bwindow_minutes\b/i.test(head);
     if (policy) inScope.push({ file, index: m.index ?? 0, kind: 'quota_policy' });
   }
-  for (const m of src.matchAll(/\bDELETE\s+FROM\s+accounts\b/g)) {
+  for (const m of src.matchAll(/\bDELETE\s+FROM\s+(?:\w+\.)?accounts\b/gi)) {
     accountDeletes.push({ file, index: m.index ?? 0, kind: 'accounts_delete' });
   }
   return { inScope, accountDeletes, unclassifiable };
@@ -123,10 +149,14 @@ function discoverSites(
  *  index). An in-scope site landing OUTSIDE every span (module scope, a
  *  hoisted SQL const, a class method above the first function) fails the
  *  totality assert loudly instead of escaping attribution. Known limit: a
- *  class METHOD below a top-level function is bracketed by that function's
- *  span, so its attribution would name the wrong function; the deep-equal
- *  reconciliation map still reds on the new site itself, which is the
- *  fail-loud backstop (no class in server/ writes the projection today). */
+ *  class METHOD or an arrow-const body below a top-level function is
+ *  bracketed by that function's span, so its attribution would name the
+ *  wrong function; the deep-equal reconciliation map still reds on the new
+ *  site itself, which is the fail-loud backstop (no class or arrow const in
+ *  server/ writes the projection today). Scope limit, stated on purpose:
+ *  the walk covers server/ only; every writer outside it is another PROCESS
+ *  against the shared database and falls under the recorded cross-process
+ *  TTL bound, not this same-process bust contract. */
 function functionSpans(src: string): { name: string; start: number; end: number }[] {
   const headers = [...src.matchAll(/^(?:export )?(?:async )?function (\w+)/gm)].map((m) => ({
     name: m[1],
@@ -259,6 +289,72 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
     expect(deletes.map((d) => d.file.slice(SERVER_DIR.length + 1))).toEqual([
       'federated_auth_db.ts',
     ]);
+  });
+
+  it('bans interpolated table names, and reds guard-table statements with interpolated fragments', () => {
+    // Positive controls first: each arm must actually see the banned shape,
+    // or the clean pass below is theatre.
+    expect(INTERPOLATED_TABLE.test('await pool.query(`DELETE FROM ${TOKENS_TABLE} WHERE 1`)')).toBe(
+      true,
+    );
+    expect(INTERPOLATED_TABLE.test('`update ${t} set x = 1`')).toBe(true);
+    expect(INTERPOLATED_TABLE.test("pool.query('UPDATE accounts SET locale = $2')")).toBe(false);
+    const interpolatedSet = discoverSites(
+      'probe.ts',
+      'export async function f() { await pool.query(`UPDATE accounts SET ${MOD_SET} WHERE id = $1`, [id]); }',
+    );
+    expect(interpolatedSet.unclassifiable.map((s) => s.kind)).toEqual(['accounts_interpolated']);
+    const interpolatedQuota = discoverSites(
+      'probe.ts',
+      'export async function f() { await pool.query(`UPDATE account_general_chat_rate_limits SET ${COLS} WHERE account_id = $1`, [id]); }',
+    );
+    expect(interpolatedQuota.unclassifiable.map((s) => s.kind)).toEqual(['quota_interpolated']);
+    for (const file of files) {
+      const src = sources.get(file) ?? '';
+      expect(
+        INTERPOLATED_TABLE.test(src),
+        `${file}: a write statement builds its table name by interpolation; the discovery scan cannot classify that shape, spell it literally`,
+      ).toBe(false);
+    }
+  });
+
+  it('classifies schema-qualified and lowercase spellings as sites (synthetic probes)', () => {
+    // Both shapes evaded the narrower first-cut regexes (proven by planted
+    // writers in a scratch tree during the rider QA); these probes pin the
+    // widened classifier so it cannot regress to the evadable form.
+    const qualified = discoverSites(
+      'probe.ts',
+      "export async function f() { await pool.query('DELETE FROM public.auth_tokens WHERE token = $1', [t]); }",
+    );
+    expect(qualified.inScope.map((s) => s.kind)).toEqual(['auth_tokens']);
+    const lowercase = discoverSites(
+      'probe.ts',
+      "export async function f() { await pool.query('delete from auth_tokens where token = $1', [t]); }",
+    );
+    expect(lowercase.inScope.map((s) => s.kind)).toEqual(['auth_tokens']);
+    const lowerUpdate = discoverSites(
+      'probe.ts',
+      "export async function f() { await pool.query('update accounts set banned_at = now() where id = $1', [id]); }",
+    );
+    expect(lowerUpdate.inScope.map((s) => s.kind)).toEqual(['accounts_update']);
+    const lowerDelete = discoverSites(
+      'probe.ts',
+      "export async function f() { await pool.query('delete from public.accounts where id = $1', [id]); }",
+    );
+    expect(lowerDelete.accountDeletes).toHaveLength(1);
+    const qualifiedPolicy = discoverSites(
+      'probe.ts',
+      "export async function f() { await pool.query('DELETE FROM public.account_general_chat_rate_limits WHERE account_id = $1', [id]); }",
+    );
+    expect(qualifiedPolicy.inScope.map((s) => s.kind)).toEqual(['quota_policy']);
+    // Negative control: a lowercase accounts write touching NO projection
+    // column still classifies out (the widening must not blunt the column
+    // precision).
+    const benign = discoverSites(
+      'probe.ts',
+      "export async function f() { await pool.query('update accounts set locale = $2 where id = $1', [id, l]); }",
+    );
+    expect(benign.inScope).toEqual([]);
   });
 
   it('scopes the cache to the marketplace: the import boundary is exact', () => {

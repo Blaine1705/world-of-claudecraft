@@ -120,6 +120,12 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
     return seq.toString(16).padStart(8, '0') + 'c'.repeat(56);
   }
 
+  /** The token arm's refresh counter: unchanged across a read proves the
+   *  answer came from the warm entry, not a re-probe. */
+  function wocAuthGuardCacheStatsRefreshes(): number {
+    return cache.stats().tokens.refreshes;
+  }
+
   it('probes a live token row with its expiry, and the qual hides an expired row', async () => {
     const account = await seedAccount();
     const live = newToken();
@@ -178,7 +184,12 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
   it('refuses a revoked READ token on the next cached read (revokeReadToken fires the bust)', async () => {
     const account = await seedAccount();
     const token = newToken();
+    const fullToken = newToken();
     await db.createCompanionToken(token, account, 'companion');
+    // The scope qual's violating fixture: a FULL token with the same value
+    // shape must survive a read-scoped revocation (the `scope = 'read'` arm
+    // is what makes revokeReadToken safe to expose to companion clients).
+    await db.saveToken(fullToken, account, 24, 'full', null);
     armCache();
     await expect(cache.accountAndScopeForToken(token)).resolves.toEqual({
       accountId: account,
@@ -187,14 +198,28 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
     const removed = await db.revokeReadToken(token);
     expect(removed).toBe(true);
     await expect(cache.accountAndScopeForToken(token)).resolves.toBeNull();
+    // The full token's ROW survived the scoped delete (fresh probe: the
+    // token-keyed bust dropped only the revoked value's entry anyway).
+    await expect(cache.accountAndScopeForToken(fullToken)).resolves.toEqual({
+      accountId: account,
+      scope: 'full',
+    });
+    // And revoking a FULL token through the read-scoped endpoint deletes
+    // nothing (the qual refuses, rowCount 0).
+    expect(await db.revokeReadToken(fullToken)).toBe(false);
   });
 
   it('refuses a revoked companion token AND its cached siblings (the prefix over-bust)', async () => {
     const account = await seedAccount();
+    const strangerAccount = await seedAccount();
     const doomed = newToken();
     const sibling = newToken();
+    // The account_id qual's violating fixture: ANOTHER account's companion
+    // token sharing the doomed 8-char prefix must survive the delete.
+    const strangerSamePrefix = doomed.slice(0, 8) + 'd'.repeat(56);
     await db.createCompanionToken(doomed, account, 'doomed');
     await db.createCompanionToken(sibling, account, 'sibling');
+    await db.createCompanionToken(strangerSamePrefix, strangerAccount, 'stranger');
     armCache();
     await expect(cache.accountAndScopeForToken(doomed)).resolves.toEqual({
       accountId: account,
@@ -214,14 +239,24 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
       accountId: account,
       scope: 'read',
     });
+    // The same-prefix stranger's ROW survived the account-scoped delete.
+    await expect(cache.accountAndScopeForToken(strangerSamePrefix)).resolves.toEqual({
+      accountId: strangerAccount,
+      scope: 'read',
+    });
   });
 
   it('keeps only the kept token after revokeTokensExcept, freshly probed', async () => {
     const account = await seedAccount();
+    const strangerAccount = await seedAccount();
     const kept = newToken();
     const dropped = newToken();
+    const strangerToken = newToken();
     await db.saveToken(kept, account, 24, 'full', null);
     await db.saveToken(dropped, account, 24, 'full', null);
+    // The account_id qual's violating fixture: another account's token must
+    // survive the sweep (a dropped qual would sign out the whole realm).
+    await db.saveToken(strangerToken, strangerAccount, 24, 'full', null);
     armCache();
     await cache.accountAndScopeForToken(kept);
     await cache.accountAndScopeForToken(dropped);
@@ -231,18 +266,35 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
       accountId: account,
       scope: 'full',
     });
+    await expect(cache.accountAndScopeForToken(strangerToken)).resolves.toEqual({
+      accountId: strangerAccount,
+      scope: 'full',
+    });
   });
 
   it('signs out every cached session when a password reset consumes', async () => {
     const account = await seedAccount();
+    const strangerAccount = await seedAccount();
     const token = newToken();
+    const strangerToken = newToken();
     await db.saveToken(token, account, 24, 'full', null);
+    // The in-transaction DELETE is account-wide, not realm-wide: a stranger's
+    // session survives the reset (the account_id qual's violating fixture).
+    await db.saveToken(strangerToken, strangerAccount, 24, 'full', null);
     await db.createPasswordResetRequest(account, 'reset-hash-1', 1);
     armCache();
     await cache.accountAndScopeForToken(token);
+    await cache.accountAndScopeForToken(strangerToken);
     const consumed = await db.consumePasswordResetRequest('reset-hash-1', 'new-hash');
     expect(consumed?.accountId).toBe(account);
     await expect(cache.accountAndScopeForToken(token)).resolves.toBeNull();
+    const before = wocAuthGuardCacheStatsRefreshes();
+    await expect(cache.accountAndScopeForToken(strangerToken)).resolves.toEqual({
+      accountId: strangerAccount,
+      scope: 'full',
+    });
+    // Still warm: the account-keyed bust did not touch the stranger's entry.
+    expect(wocAuthGuardCacheStatsRefreshes()).toBe(before);
   });
 
   it('locks a cached account on the next read after a REAL ban, and unlocks on unban', async () => {

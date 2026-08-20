@@ -1201,15 +1201,29 @@ describe('guild bank activity log cache readout', () => {
     resetWocAuthGuardCache();
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
+    // Exact-line matcher (a substring pin on `} 1` also matches 10 or 1.5).
+    const line = (metrics: string, arm: string, kind: string): string | undefined =>
+      metrics
+        .split('\n')
+        .find((l) => l.startsWith(`${WOC_AUTH_GUARD_CACHE}{arm="${arm}",kind="${kind}"}`));
     const cold = await registry.metrics();
     // Unarmed (pre-boot): every series exists at zero so an alert rule can
-    // fire on its first real sample.
+    // fire on its first real sample, the two soft-bound series included.
     for (const arm of ['tokens', 'accounts']) {
       for (const kind of ['reads', 'refreshes', 'evictions', 'busts', 'entries']) {
-        expect(cold).toContain(`${WOC_AUTH_GUARD_CACHE}{arm="${arm}",kind="${kind}"} 0`);
+        expect(line(cold, arm, kind)).toBe(
+          `${WOC_AUTH_GUARD_CACHE}{arm="${arm}",kind="${kind}"} 0`,
+        );
       }
     }
-    // Armed: the gauge reads the LIVE singleton on every scrape.
+    expect(line(cold, 'index', 'entries')).toBe(
+      `${WOC_AUTH_GUARD_CACHE}{arm="index",kind="entries"} 0`,
+    );
+    expect(line(cold, 'recent_busts', 'entries')).toBe(
+      `${WOC_AUTH_GUARD_CACHE}{arm="recent_busts",kind="entries"} 0`,
+    );
+    // Armed: the gauge reads the LIVE singleton on every scrape, on BOTH
+    // arms and on the soft-bound series.
     try {
       const cache = configureWocAuthGuardCache({
         fetchTokenRow: async () => ({
@@ -1220,9 +1234,24 @@ describe('guild bank activity log cache readout', () => {
         fetchModerationRow: async () => null,
       });
       await cache.accountAndScopeForToken('a'.repeat(64));
+      await cache.moderationStatusForAccount(7);
+      cache.bustAccount(8);
       const warm = await registry.metrics();
-      expect(warm).toContain(`${WOC_AUTH_GUARD_CACHE}{arm="tokens",kind="reads"} 1`);
-      expect(warm).toContain(`${WOC_AUTH_GUARD_CACHE}{arm="tokens",kind="entries"} 1`);
+      expect(line(warm, 'tokens', 'reads')).toBe(
+        `${WOC_AUTH_GUARD_CACHE}{arm="tokens",kind="reads"} 1`,
+      );
+      expect(line(warm, 'tokens', 'entries')).toBe(
+        `${WOC_AUTH_GUARD_CACHE}{arm="tokens",kind="entries"} 1`,
+      );
+      expect(line(warm, 'accounts', 'reads')).toBe(
+        `${WOC_AUTH_GUARD_CACHE}{arm="accounts",kind="reads"} 1`,
+      );
+      expect(line(warm, 'index', 'entries')).toBe(
+        `${WOC_AUTH_GUARD_CACHE}{arm="index",kind="entries"} 1`,
+      );
+      expect(line(warm, 'recent_busts', 'entries')).toBe(
+        `${WOC_AUTH_GUARD_CACHE}{arm="recent_busts",kind="entries"} 1`,
+      );
     } finally {
       resetWocAuthGuardCache();
     }

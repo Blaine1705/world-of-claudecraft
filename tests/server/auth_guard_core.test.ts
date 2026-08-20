@@ -196,5 +196,33 @@ describe('computeModerationStatus', () => {
       computeModerationStatus(modRow({ messages: '5', window_minutes: '10' }), NOW)
         .generalChatRateLimit,
     ).toEqual({ messages: 5, windowMinutes: 10 });
+    // The undefined half of the absent check (a projection that OMITS the
+    // key rather than joining a null): still Unlimited, never NaN numbers.
+    expect(
+      computeModerationStatus(modRow({ messages: undefined as unknown as null }), NOW)
+        .generalChatRateLimit,
+    ).toBeNull();
   });
+
+  it.each([
+    ['banned', { banned_at: '2026-01-01T00:00:00Z' }],
+    ['suspended', { suspended_until: new Date(NOW + 60_000).toISOString() }],
+    ['deactivated', { deactivated_at: '2026-01-02T00:00:00Z' }],
+  ] as const)(
+    'carries a live mute and the quota policy onto the %s locked shape',
+    (_label, over) => {
+      // Per-branch carry-through: each locked branch builds its own return
+      // object, so a branch hard-coding chatMutedUntil: null or
+      // generalChatRateLimit: null would pass every fixture that leaves them
+      // empty; this row leaves none of them empty.
+      const until = new Date(NOW + 30_000);
+      const status = computeModerationStatus(
+        modRow({ ...over, chat_muted_until: until.toISOString(), messages: 3, window_minutes: 7 }),
+        NOW,
+      );
+      expect(status.locked).toBe(true);
+      expect(status.chatMutedUntil).toBe(until.toISOString());
+      expect(status.generalChatRateLimit).toEqual({ messages: 3, windowMinutes: 7 });
+    },
+  );
 });

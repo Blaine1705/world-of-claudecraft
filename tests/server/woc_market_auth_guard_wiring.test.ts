@@ -245,4 +245,65 @@ describe('the refusal bodies over the cached bundle', () => {
       code: 'auth.forbidden',
     });
   });
+
+  it('emits the exact suspension 403 (with date) from a cached suspended row', async () => {
+    const r = rig();
+    const until = new Date(NOW + 3600_000);
+    r.accounts.set(7, {
+      banned_at: null,
+      suspended_until: until.toISOString(),
+      moderation_reason: 'griefing',
+      chat_muted_until: null,
+      chat_strikes: 0,
+      deactivated_at: null,
+      messages: null,
+      window_minutes: null,
+    });
+    const { res, handler } = await runGuards(routeFor('GET', '/api/woc-market/status'), TOKEN);
+    expect(handler).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body || '{}')).toEqual({
+      error: `This account is suspended until ${until.toUTCString()}.`,
+      code: 'moderation.suspended_until',
+      date: until.toISOString(),
+    });
+  });
+
+  it('emits the exact deactivation 403 from a cached deactivated row', async () => {
+    const r = rig();
+    r.accounts.set(7, {
+      banned_at: null,
+      suspended_until: null,
+      moderation_reason: null,
+      chat_muted_until: null,
+      chat_strikes: 0,
+      deactivated_at: '2026-01-01T00:00:00Z',
+      messages: null,
+      window_minutes: null,
+    });
+    const { res, handler } = await runGuards(routeFor('GET', '/api/woc-market/status'), TOKEN);
+    expect(handler).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body || '{}')).toEqual({
+      error: 'This account has been deactivated.',
+      code: 'account.deactivated',
+    });
+  });
+
+  it('emits the exact 401 body for an unknown bearer through the cached bundle', async () => {
+    const r = rig();
+    const { res, handler } = await runGuards(
+      routeFor('GET', '/api/woc-market/status'),
+      'f'.repeat(64),
+    );
+    expect(handler).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(401);
+    expect(JSON.parse(res.body || '{}')).toEqual({
+      error: 'not authenticated',
+      code: 'auth.required',
+    });
+    // The refusal came from a REAL probe through the cache (no negative
+    // caching): the fetch counter moved.
+    expect(r.calls.token).toBe(1);
+  });
 });
