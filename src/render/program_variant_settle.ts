@@ -14,6 +14,7 @@
 // over the same materials would have issued anyway, had it polled the variant.
 
 import type * as THREE from 'three';
+import { arrivalCoverActive } from './arrival_cover';
 import type { CompileGateScheduler, PieceDeadline } from './compile_gate';
 import type { PieceSettle } from './compile_gate_pieces';
 import { isProgramKnownReady, markProgramReady } from './linked_program_readiness';
@@ -59,13 +60,17 @@ export interface ProgramVariantSettleResult {
  * Poll every not-yet-proved program of `materials` until all answer ready or
  * `deadline` fires; each program that answers ready is recorded at once
  * (markProgramReady), so a deadline that ends the poll still leaves the ready
- * ones proved and the touch tail warms them. Every pass, the FIRST included,
- * rides the scheduler: the first used to run synchronously on the compile
- * piece's own resolution stack, which put its COMPLETION_STATUS queries
- * inside the queue's released tail where no unit's syncMs books them (review
- * of the scheduler PR); one zero-delay hop costs the settle nothing (the
- * piece's programs stay the likeliest to be ready) and takes the query class
- * off the compile stack.
+ * ones proved and the touch tail warms them. LIVE, every pass, the first
+ * included, rides the scheduler: the first used to run synchronously on the
+ * compile piece's own resolution stack, which put its COMPLETION_STATUS
+ * queries inside the queue's released tail where no unit's syncMs books them
+ * (review of the scheduler PR); the zero-delay hop takes the query class off
+ * the compile stack. UNDER A COVER the first pass stays synchronous: there is
+ * no visible frame to protect there, and the hop measurably starved the
+ * cover-window settles on the iGPU (batch 28: 47 to 75 reveal keys escaped by
+ * the watchdog with their links still in flight, and the first drawn frame
+ * after the lift blocked 1.25 s behind them, against 0.25 s with the
+ * synchronous pass).
  */
 export function settleProgramVariants(
   properties: MaterialPropertiesLike,
@@ -110,7 +115,8 @@ export function settleProgramVariants(
       resolve({ settled: true, ready, pending: 0 });
       return;
     }
-    scheduler.setTimeout(pass, 0);
+    if (arrivalCoverActive()) pass();
+    else scheduler.setTimeout(pass, 0);
   });
 }
 

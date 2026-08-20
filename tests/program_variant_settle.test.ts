@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { resetArrivalCoverForTest, setArrivalCover } from '../src/render/arrival_cover';
 import { CompileGateQueue, type PieceDeadline } from '../src/render/compile_gate';
 import { linkPieceWork } from '../src/render/compile_gate_pieces';
 import { isProgramKnownReady } from '../src/render/linked_program_readiness';
@@ -323,6 +324,30 @@ describe('settleProgramVariants', () => {
     });
     // The only timer ever armed was the first settle's zero-delay hop.
     expect(scheduler.armed).toEqual([0]);
+  });
+
+  it('keeps the first pass synchronous under an arrival cover: the cover window needs the settle throughput', async () => {
+    // Measured on the iGPU (batch 28): deferring the first pass under the
+    // cover starved the reveal settles (47 to 75 watchdog escapes with links
+    // still in flight) and the first drawn frame after the lift blocked
+    // 1.25 s behind them. There is no visible frame to protect under a cover,
+    // so the hop buys nothing there.
+    const material = new THREE.MeshStandardMaterial({ name: 'covered' });
+    const one = program('covered-one', 1);
+    const properties = propertiesFor(
+      new Map([[material, { programs: new Map<string, SettleProgramLike>([['only', one]]) }]]),
+    );
+    const scheduler = manualScheduler();
+    setArrivalCover(true);
+    try {
+      const settled = settleProgramVariants(properties, [material], live, scheduler);
+      // Polled on the caller's stack, no zero-delay hop armed.
+      expect(one.polls).toBe(1);
+      expect(scheduler.armed).toEqual([]);
+      await expect(settled).resolves.toEqual({ settled: true, ready: 1, pending: 0 });
+    } finally {
+      resetArrivalCoverForTest();
+    }
   });
 
   it('rejects when a poll throws, on the first pass or a later one, instead of hanging the piece', async () => {
