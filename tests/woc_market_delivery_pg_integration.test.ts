@@ -1751,25 +1751,19 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         status: 'closed',
         resolution: 'unsettled',
       });
-      const alreadyDisposed = await seedListing(realm, seller, {
+      await seedListing(realm, seller, {
         status: 'closed',
         resolution: 'unsettled',
         itemDisposed: true,
       });
-      const soldResidue = await seedListing(realm, seller, {
+      await seedListing(realm, seller, {
         status: 'closed',
         resolution: 'sold',
       });
       const rows = await marketDb.undisposedClosedListings(realm, 10, []);
+      // Exactly the returnable row: a disposed copy must never mail twice and
+      // sold residue belongs to the dispose arm, both excluded by the exact set.
       expect(rows.map((r) => r.id)).toEqual([returnable]);
-      expect(
-        rows.map((r) => r.id),
-        'a disposed copy must never mail twice',
-      ).not.toContain(alreadyDisposed);
-      expect(
-        rows.map((r) => r.id),
-        'sold residue belongs to the dispose arm',
-      ).not.toContain(soldResidue);
     });
   });
 

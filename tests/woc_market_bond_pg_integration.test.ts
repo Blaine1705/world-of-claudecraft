@@ -2037,13 +2037,11 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       const signed = await seedBid(realm, listing, bidder, {
         bondSignature: `poll-signed-${seq}`,
       });
-      const unsigned = await seedBid(realm, listing, other);
+      await seedBid(realm, listing, other);
       const polled = await marketDb.confirmingBonds(realm, 10, []);
+      // Exactly the signed bond: the unsigned pending bond seeded above has
+      // nothing for the chain to decide.
       expect(polled.map((r) => r.id)).toEqual([signed]);
-      expect(
-        polled.map((r) => r.id),
-        'an unsigned bond has nothing for the chain to decide',
-      ).not.toContain(unsigned);
     });
 
     it('the cancel-intent converge read skips an UNEXPIRED locked window', async () => {
@@ -2199,12 +2197,18 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       });
       const shared = `shared-sig-${seq}`;
       const landed = await marketDb.submitBondSignature(first, shared, BASE_MS);
-      expect(typeof landed === 'object').toBe(true);
+      expect(landed).toEqual({ signatureAtMs: BASE_MS });
+      expect((await bidRow(first)).bond_signature, 'the recording landed').toBe(shared);
       expect(
         await marketDb.submitBondSignature(second, shared, BASE_MS),
         'one signature funds one bond',
       ).toBe('signature_reused');
       expect((await bidRow(second)).bond_signature).toBeNull();
+      // A DEAD bid answers not_pending even on a spent signature: the guarded
+      // UPDATE misses first, so the unique index is never consulted (the
+      // verdict-order contract the fake mirrors).
+      expect(await marketDb.submitBondSignature(outbid, shared, BASE_MS)).toBe('not_pending');
+      expect((await bidRow(outbid)).bond_signature).toBeNull();
     });
 
     it('bid state guards never move settled money', async () => {
@@ -2256,6 +2260,14 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       const higher = await seedBid(realm, listing, rival, { amountCents: 950 });
       expect(await marketDb.activateBid(higher, BASE_MS)).toBe('activated');
       expect(await bidRow(higher)).toMatchObject({ status: 'active' });
+      const board = await pool.query(
+        `SELECT current_bid_cents, current_bid_id FROM woc_market_listings WHERE id = $1`,
+        [listing],
+      );
+      expect(board.rows[0], 'the listing board carries the activation').toEqual({
+        current_bid_cents: 950,
+        current_bid_id: String(higher),
+      });
       expect(await bidRow(winner), 'the demoted winner routes to refund').toMatchObject({
         status: 'outbid',
         bond_state: 'refund_due',
@@ -2371,7 +2383,7 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       await seedBid(realm, listing, bidder, { bondReference: ref });
       await expect(
         seedBid(realm, listing, await seedAccount(), { bondReference: ref }),
-      ).rejects.toMatchObject({ code: '23505' });
+      ).rejects.toMatchObject({ code: '23505', constraint: 'woc_market_bids_bond_reference_key' });
     });
   });
 });

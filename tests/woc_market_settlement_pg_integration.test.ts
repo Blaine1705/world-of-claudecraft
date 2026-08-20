@@ -1751,7 +1751,11 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const rival = await seedSettlement(realm, await seedListing(realm, seller), buyer);
 
       expect(await marketDb.submitSettlementSignature(offered.id, 'sig-shared')).toBe('ok');
-      expect(await settlementRow(offered.id)).toMatchObject({ state: 'confirming' });
+      const recorded = await pool.query(
+        `SELECT state, tx_signature FROM woc_market_settlements WHERE id = $1`,
+        [offered.id],
+      );
+      expect(recorded.rows[0]).toEqual({ state: 'confirming', tx_signature: 'sig-shared' });
 
       // A non-offered row refuses and takes nothing: the signature-first
       // recording belongs to the offered window only.
@@ -1812,21 +1816,18 @@ describeDb('woc market settlement guards against real Postgres', () => {
         state: 'failed',
         deadlineAtMs: BASE_MS - MINUTE_MS,
       });
-      const confirmingPast = await seedSettlement(realm, await seedListing(realm, seller), buyer, {
+      await seedSettlement(realm, await seedListing(realm, seller), buyer, {
         state: 'confirming',
         deadlineAtMs: BASE_MS - MINUTE_MS,
       });
-      const offeredFuture = await seedSettlement(realm, await seedListing(realm, seller), buyer, {
+      await seedSettlement(realm, await seedListing(realm, seller), buyer, {
         deadlineAtMs: BASE_MS + 15 * MINUTE_MS,
       });
       const due = await marketDb.overdueSettlements(realm, BASE_MS, 10);
+      // Exactly the offered and failed rows past deadline: the confirming row
+      // belongs to the review arm and the future deadline is not due, both
+      // excluded by the exact set.
       expect(due.map((r) => r.id)).toEqual([offeredPast.id, failedPast.id]);
-      const ids = due.map((r) => r.id);
-      expect(
-        ids,
-        'a confirming row belongs to the review arm, never the default arm',
-      ).not.toContain(confirmingPast.id);
-      expect(ids).not.toContain(offeredFuture.id);
     });
   });
 
@@ -1999,12 +2000,16 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const buyer = await seedAccount();
       await expect(seedListing(realm, seller, { status: 'bogus' })).rejects.toMatchObject({
         code: '23514',
+        constraint: 'woc_market_listings_status_check',
       });
       await expect(
         pool.query(`UPDATE woc_market_listings SET resolution = 'bogus' WHERE id = $1`, [
           await seedListing(realm, seller),
         ]),
-      ).rejects.toMatchObject({ code: '23514' });
+      ).rejects.toMatchObject({
+        code: '23514',
+        constraint: 'woc_market_listings_resolution_check',
+      });
       await expect(
         pool.query(
           `INSERT INTO woc_market_listings (
@@ -2015,7 +2020,7 @@ describeDb('woc market settlement guards against real Postgres', () => {
           [realm, seller],
         ),
         'a non-object custody copy never lands',
-      ).rejects.toMatchObject({ code: '23514' });
+      ).rejects.toMatchObject({ code: '23514', constraint: 'woc_market_listings_item_check' });
       await expect(
         pool.query(
           `INSERT INTO woc_market_listings (
@@ -2025,19 +2030,24 @@ describeDb('woc market settlement guards against real Postgres', () => {
                      500, now(), now())`,
           [realm, seller],
         ),
-      ).rejects.toMatchObject({ code: '23514' });
+      ).rejects.toMatchObject({ code: '23514', constraint: 'woc_market_listings_format_check' });
       const listing = await seedListing(realm, seller);
       await expect(seedBid(realm, listing, buyer, { status: 'bogus' })).rejects.toMatchObject({
         code: '23514',
+        constraint: 'woc_market_bids_status_check',
       });
       await expect(seedBid(realm, listing, buyer, { bondState: 'bogus' })).rejects.toMatchObject({
         code: '23514',
+        constraint: 'woc_market_bids_bond_state_check',
       });
       await expect(
         pool.query(`UPDATE woc_market_settlements SET state = 'bogus' WHERE id = $1`, [
           (await seedSettlement(realm, await seedListing(realm, seller), buyer)).id,
         ]),
-      ).rejects.toMatchObject({ code: '23514' });
+      ).rejects.toMatchObject({
+        code: '23514',
+        constraint: 'woc_market_settlements_state_check',
+      });
       await expect(
         pool.query(
           `INSERT INTO woc_market_directed_offers (
@@ -2046,7 +2056,33 @@ describeDb('woc market settlement guards against real Postgres', () => {
            ) VALUES ($1, $2, 1, 'S', $3, 'B', 100, 'bogus', now())`,
           [realm, seller, buyer],
         ),
-      ).rejects.toMatchObject({ code: '23514' });
+      ).rejects.toMatchObject({
+        code: '23514',
+        constraint: 'woc_market_directed_offers_status_check',
+      });
+      // The two remaining jsonb shape CHECKs: sales provenance and the
+      // directed offer's agreed-copy ref.
+      await expect(
+        pool.query(
+          `INSERT INTO woc_market_sales (
+             realm, listing_id, item_id, item, price_cents, amount_base,
+             seller_account, buyer_account, seller_name, buyer_name
+           ) VALUES ($1, $2, 'x', '"str"'::jsonb, 100, NULL, $3, $4, 'S', 'B')`,
+          [realm, listing, seller, buyer],
+        ),
+      ).rejects.toMatchObject({ code: '23514', constraint: 'woc_market_sales_item_check' });
+      await expect(
+        pool.query(
+          `INSERT INTO woc_market_directed_offers (
+             realm, seller_account, seller_character, seller_name, buyer_account,
+             buyer_name, usd_cents, status, expires_at, item_ref
+           ) VALUES ($1, $2, 1, 'S', $3, 'B', 100, 'pending', now(), '"str"'::jsonb)`,
+          [realm, seller, buyer],
+        ),
+      ).rejects.toMatchObject({
+        code: '23514',
+        constraint: 'woc_market_directed_offers_item_ref_check',
+      });
     });
   });
 });

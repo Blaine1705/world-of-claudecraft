@@ -467,7 +467,8 @@ export class FakeWocMarketDb implements WocMarketDb {
     };
     this.offers.set(row.id, row);
     this.offerUpdatedMs.set(row.id, this.now());
-    return row;
+    // Copy on the way out (the header contract): the store row stays private.
+    return structuredClone(row);
   }
 
   /** Stage a pre-pin legacy offer shape (null item) IN the store: the read
@@ -591,7 +592,8 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (row.status !== 'pending') return null;
     row.status = to;
     this.offerUpdatedMs.set(id, this.now());
-    return row;
+    // Copy on the way out (the header contract): the store row stays private.
+    return structuredClone(row);
   }
 
   async characterByName(
@@ -1187,31 +1189,12 @@ export class FakeWocMarketDb implements WocMarketDb {
     for (const s of this.settlements.values()) {
       if (s.listingId === id && OPEN_SETTLEMENT_STATES.includes(s.state)) return 'locked';
     }
-    // The same-wallet twin guard (the relink dance): the Pg transaction
-    // re-reads wallet_links under the listing lock and its claiming UPDATE
-    // carries the NOT EXISTS twin predicate. Tests seed walletLinks directly.
-    if (
-      typeof row.sellerWallet === 'string' &&
-      this.walletLinks.get(account) === row.sellerWallet
-    ) {
-      return 'own_listing';
-    }
-    // Steal-time abandon recording (public only), then the claimer's two
-    // cooldown guards, mirroring the Pg transaction's order so a self-steal
-    // refuses in the same call.
-    if (
-      row.buyNowLockAccount !== null &&
-      row.buyNowLockExpiresMs !== null &&
-      row.directedBuyerAccount === null
-    ) {
-      this.recordAbandon(realm, id, row.buyNowLockAccount, row.buyNowLockExpiresMs);
-    }
-    if (row.directedBuyerAccount === null) {
+    // Both cooldown arms probed with the LATER retry moment winning,
+    // mirroring the Pg cooldownRefused helper both passes share.
+    const cooldownRetryAtMs = (): number | null => {
       const reclaimCutoff = nowMs - WOC_MARKET_BUY_NOW_RECLAIM_COOLDOWN_SECONDS * 1000;
       const windowCutoff = nowMs - WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000;
       const mine = this.buyNowAbandons.filter((a) => a.realm === realm && a.account === account);
-      // Both arms are probed and the LATER retry moment wins, mirroring the
-      // Pg probe: the refusal names WHEN a retry can first succeed.
       const reclaimHits = mine.filter((a) => a.listingId === id && a.lockExpiresMs > reclaimCutoff);
       const reclaimAtMs =
         reclaimHits.length === 0
@@ -1229,12 +1212,37 @@ export class FakeWocMarketDb implements WocMarketDb {
         capBoundary === null
           ? null
           : capBoundary + WOC_MARKET_BUY_NOW_ABANDON_WINDOW_SECONDS * 1000;
-      if (reclaimAtMs !== null || capDrainsAtMs !== null) {
-        return {
-          refusal: 'claim_cooldown',
-          retryAtMs: Math.max(reclaimAtMs ?? 0, capDrainsAtMs ?? 0),
-        };
-      }
+      if (reclaimAtMs === null && capDrainsAtMs === null) return null;
+      return Math.max(reclaimAtMs ?? 0, capDrainsAtMs ?? 0);
+    };
+    // The ADVISORY pass mirror: on a public listing with NO standing lock the
+    // cooldown answers lock-free BEFORE the transaction's twin re-check runs.
+    if (row.buyNowLockAccount === null && row.directedBuyerAccount === null) {
+      const retryAtMs = cooldownRetryAtMs();
+      if (retryAtMs !== null) return { refusal: 'claim_cooldown', retryAtMs };
+    }
+    // The same-wallet twin guard (the relink dance): the Pg transaction
+    // re-reads wallet_links under the listing lock and its claiming UPDATE
+    // carries the NOT EXISTS twin predicate. Tests seed walletLinks directly.
+    if (
+      typeof row.sellerWallet === 'string' &&
+      this.walletLinks.get(account) === row.sellerWallet
+    ) {
+      return 'own_listing';
+    }
+    // Steal-time abandon recording (public only), then the in-transaction
+    // cooldown re-check, mirroring the Pg order so a self-steal refuses in
+    // the same call.
+    if (
+      row.buyNowLockAccount !== null &&
+      row.buyNowLockExpiresMs !== null &&
+      row.directedBuyerAccount === null
+    ) {
+      this.recordAbandon(realm, id, row.buyNowLockAccount, row.buyNowLockExpiresMs);
+    }
+    if (row.directedBuyerAccount === null) {
+      const retryAtMs = cooldownRetryAtMs();
+      if (retryAtMs !== null) return { refusal: 'claim_cooldown', retryAtMs };
     }
     row.buyNowLockAccount = account;
     row.buyNowLockExpiresMs = expiresAtMs;

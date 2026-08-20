@@ -2543,6 +2543,7 @@ describe('the stuck-custody readout saturates, in SQL', () => {
       );
       expect(openSet, 'the ordered open-set pre-lock exists').toBeGreaterThan(-1);
       expect(seq[openSet]).toContain('ORDER BY id');
+      expect(seq[openSet], 'every pre-lock walks the SAME direction').not.toContain('DESC');
       expect(ownLock).toBeGreaterThan(openSet);
       expect(listingLock, 'bids first, listing second').toBeGreaterThan(ownLock);
     });
@@ -2563,7 +2564,40 @@ describe('the stuck-custody readout saturates, in SQL', () => {
         'a WON bid can take a bond write in the expiry CTE, so it joins the pre-lock set',
       ).toContain("status IN ('pending_bond', 'active', 'won')");
       expect(seq[preLock]).toContain('ORDER BY id');
+      expect(seq[preLock], 'every pre-lock walks the SAME direction').not.toContain('DESC');
       expect(listingLock, 'bids first, listing second').toBeGreaterThan(preLock);
+    });
+
+    it('a lock-free open-settlement refusal takes NO row lock', async () => {
+      // The advisory pass exists so a refused claimer never holds the listing
+      // row against bids and the seller cancel; the verdict itself is shared
+      // with the in-transaction twin, so THIS is the arm's observable
+      // property.
+      const listingRow = {
+        seller_account: 1,
+        status: 'active',
+        buy_now_cents: 100,
+        cancel_requested_at: null,
+        buy_now_lock_account: null,
+        buy_now_lock_expires: null,
+        directed_buyer_account: null,
+      };
+      const { pool, sql } = recordingTxPool((text) => {
+        if (text.includes('FROM woc_market_listings') && !text.includes('FOR UPDATE')) {
+          return { rows: [listingRow], rowCount: 1 };
+        }
+        if (text.includes('FROM woc_market_settlements')) {
+          return { rows: [{ one: 1 }], rowCount: 1 };
+        }
+        return undefined;
+      });
+      const out = await new PgWocMarketDb(pool).claimBuyNowLock(REALM, 5, 2, 1_000, 2_000);
+      expect(out).toBe('locked');
+      expect(
+        sql().some((t) => t.includes('FOR UPDATE')),
+        'the refusal held no lock',
+      ).toBe(false);
+      expect(sql().some((t) => t.includes('BEGIN'))).toBe(false);
     });
   });
 });

@@ -250,9 +250,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
     const res = await pool.query(
       `INSERT INTO woc_market_directed_offers (
          realm, seller_account, seller_character, seller_name, buyer_account,
-         buyer_name, item_id, usd_cents, status, expires_at, updated_at
+         buyer_name, item_id, item_pin, usd_cents, status, expires_at, updated_at
        ) VALUES (
-         $1, $2, $3, $4, $5, $6, 'crown_of_embers', 1000, $7,
+         $1, $2, $3, $4, $5, $6, 'crown_of_embers', repeat('a', 64), 1000, $7,
          to_timestamp($8 / 1000.0), to_timestamp($9 / 1000.0)
        ) RETURNING id`,
       [
@@ -339,7 +339,8 @@ describeDb('woc market realm scoping against real Postgres', () => {
     return String(res.rows[0].state);
   }
 
-  const ids = (rows: readonly { id: number }[]): number[] => rows.map((r) => r.id).sort();
+  const ids = (rows: readonly { id: number }[]): number[] =>
+    rows.map((r) => r.id).sort((x, y) => x - y);
   const settlementIds = (rows: readonly WocSettlementRow[]): number[] => ids(rows);
   const listingIds = (rows: readonly WocListingRow[]): number[] => ids(rows);
 
@@ -355,7 +356,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const a = await seedListing(alpha, seller);
       const aDirected = await seedListing(alpha, seller, { directedBuyerAccount: buyer });
       // Closed rows must leave the public browse too (the liveness status set).
-      await seedListing(alpha, seller, { status: 'closed', resolution: 'cancelled' });
+      const aClosed = await seedListing(alpha, seller, {
+        status: 'closed',
+        resolution: 'cancelled',
+      });
       const b = await seedListing(beta, seller);
       const bDirected = await seedListing(beta, seller, { directedBuyerAccount: buyer });
 
@@ -372,9 +376,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
       });
       expect(listingIds(browse.rows)).toEqual([a]);
 
-      expect(listingIds(await marketDb.listingsBySeller(alpha, seller)).slice(0, 2)).toEqual([
+      expect(listingIds(await marketDb.listingsBySeller(alpha, seller))).toEqual([
         a,
         aDirected,
+        aClosed,
       ]);
       // The SAME seller holds two non-closed listings in beta; the count must
       // not see them (and the alpha closed row never counts).
@@ -739,10 +744,12 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const buyer = await seedAccount();
       const aListing = await seedListing(alpha, seller);
       const bListing = await seedListing(beta, seller);
-      // Three recent beta abandons by the SAME buyer (distinct lock expiries,
-      // the once-index key): at the cap there, free here.
-      for (let i = 1; i <= 3; i++)
+      // Recent beta abandons by the SAME buyer up to the cap (distinct lock
+      // expiries, the once-index key): at the cap there, free here.
+      const { WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR } = await import('../server/woc_market_rules');
+      for (let i = 1; i <= WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR; i++) {
         await seedAbandon(beta, bListing, buyer, BASE_MS - i * MINUTE_MS);
+      }
       const claimed = await marketDb.claimBuyNowLock(
         alpha,
         aListing,
@@ -786,21 +793,12 @@ describeDb('woc market realm scoping against real Postgres', () => {
           await marketDb.confirmingOverdueSettlements(alpha, BASE_MS - 6 * HOUR_MS, 10),
         ),
       ).toEqual([aConfirming]);
-      expect(settlementIds(await marketDb.confirmingSettlements(alpha, 10))).not.toContain(
-        bConfirming,
-      );
       expect(settlementIds(await marketDb.deliveringSettlements(alpha, 10, []))).toEqual([
         aDelivering,
       ]);
-      expect(settlementIds(await marketDb.deliveringSettlements(alpha, 10, []))).not.toContain(
-        bDelivering,
-      );
       expect(settlementIds(await marketDb.overdueSettlements(alpha, BASE_MS, 10))).toEqual([
         aOverdue,
       ]);
-      expect(settlementIds(await marketDb.overdueSettlements(alpha, BASE_MS, 10))).not.toContain(
-        bOverdue,
-      );
 
       expect(settlementIds(await marketDb.claimDeliverableSettlements(alpha, 10))).toEqual([
         aConfirmed,

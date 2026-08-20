@@ -201,6 +201,23 @@ describe('fidelity fixes: twin guard, signature order, cap clamp, copies', () =>
     expect(typeof claimed === 'object' && 'id' in claimed).toBe(true);
   });
 
+  it('a wallet twin AT the abandon cap gets claim_cooldown first, like the Pg advisory pass', async () => {
+    // On a public listing with NO standing lock the real advisory pass answers
+    // the cooldown lock-free BEFORE the transaction's twin re-check can run.
+    const db = new FakeWocMarketDb({ characters: [], now: () => BASE_MS });
+    const out = await db.escrowInsertListing(SAVE, listingArgs(1, 'order-wallet'));
+    if (!out.ok) throw new Error(out.reason);
+    const other = await db.escrowInsertListing(SAVE, listingArgs(9, 'w-other'));
+    if (!other.ok) throw new Error(other.reason);
+    db.walletLinks.set(3, 'order-wallet');
+    const { WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR } = await import('../../server/woc_market_rules');
+    for (let i = 1; i <= WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR; i++) {
+      await db.recordBuyNowAbandon(REALM, other.id, 3, BASE_MS - i * 1_000);
+    }
+    const refused = await db.claimBuyNowLock(REALM, out.id, 3, BASE_MS, BASE_MS + 300_000);
+    expect(refused).toMatchObject({ refusal: 'claim_cooldown' });
+  });
+
   it('a dead bid answers not_pending even when its signature is spent elsewhere (the Pg order)', async () => {
     const db = new FakeWocMarketDb({ characters: [], now: () => BASE_MS });
     const listing = await db.escrowInsertListing(SAVE, listingArgs(1, 'w-order'));
