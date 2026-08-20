@@ -5,6 +5,50 @@ actually reads.
 
 ## Where we are
 
+- ESCROW WRITE-PATH RIDER IMPLEMENT COMPLETE (2026-08-20, GAME repo, LOCAL
+  per R4: nothing pushed; the rider QA session pushes on PASS). Session
+  start b72873d24e; v0.40.0 sync merge 00334857e0 NON-TRIVIAL (59 commits,
+  the controller cross-hotbar packet; four conflicts re-derived from the
+  merged tree, release-merge-audit clean). Spec pair minted FIRST
+  (rider-escrow-write-path.md + its QA file, commit 0b87229b2d, the cluster
+  verbatim from the 16/17 registries plus recon corrections). All NINE
+  deliverables landed in order (occupancy bound before the FIFO close):
+  the honest occupancy tail (guild-flush relation + the DERIVED 157s
+  started ceiling, scrape-pinned), the realm escrow gate (cap 4, hold
+  ceiling 300s with a RECLAIMING saturation probe), the observability set
+  (two gauges, three new counter kinds, four contention classes + gate +
+  serialize + stamp + park-refusal numbers on the stuck readout, the
+  saveAll-wave fact pinned), the TxNeverStarted widening (11 tails, two
+  pinned exceptions), the FOR NO KEY UPDATE narrowing (21 clauses, zero
+  plain left, real-SQL proofs with negative controls plus the
+  KEY-SHARE-holder mode binding), the bounded plain writers (38 sites on
+  the merged-query save-tier seam, routing completeness pinned, recorders
+  answer typed contended -> confirm_in_flight, clearBuyNowLock
+  retry-once-swallow-all), the drain + saturation pre-burn rungs on BOTH
+  escrow entries, the ledger bounds (park cap 512 counted, stamp
+  high-water total-size counted re-arming), and the commitGrant FIFO close
+  (in-slot serialize, busy parks counted grant_busy and budgeted at 2 per
+  scope, park subset intact, the delivery arms extracted to
+  woc_market_delivery.ts paying woc_market.ts DOWN net 447 to 4037).
+  Reviews: four lanes + coverage + a FRESH fix-round review; every finding
+  applied or judged (the convergent blocker was the per-row FIFO wait in
+  the locked segment; the fresh review caught the reclaim dead behind the
+  saturation pre-check). Mutation record: 30 distinct, 28 BIT, 1 green
+  control, 1 in-round-upgraded survivor, 4 stale-verdict re-runs BIT
+  (rider section + re-verification block in phase-20-mutation-log.md).
+  Validation at the tip: tsc clean; pg battery SEVEN suites 241 tests zero
+  skips; DB-free set 974 tests; ci:changed exit 0; gate result in the
+  progress entry's final note. TWO MAINTAINER RULINGS OPEN: the
+  woc_market.ts ceiling raise 4000 -> 4037 inside the rider (net 447 DOWN
+  overall; declaration-surface justification), and the standing
+  woc_market_db.ts no-ratchet-row question (its rider growth +158, all
+  SQL-adjacent). The rider implement section in progress.md is the
+  registry the rider QA consumes (JUDGED and DEFERRED lists binding;
+  values registry inside; the directed_sql floor is now 116). NEXT =
+  docs/woc-marketplace-hardening/rider-escrow-write-path-qa.md, GAME repo,
+  wocc-marketplace, FRESH session, newest origin/release/** sync first;
+  after its PASS push comes the per-request auth-guard rider (constraints
+  in the 17 SESSION START DECISION bullet), then phase-21-devnet-dry-run.md.
 - 20 QA COMPLETE (2026-08-20, GAME repo, verdict PASS-WITH-FOLLOWUPS, every
   finding applied or judged with the file open; PUSHED per R4, gate PASS all
   12 steps at 8581ee5b2d, full-suite fallback, 41,708 tests plus browser

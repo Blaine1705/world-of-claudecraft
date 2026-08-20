@@ -5270,3 +5270,238 @@ in full. PUSHED per R4 with this note as the docs tip: git push origin
 feature/woc-marketplace, the pre-push floor being the check (no open PR on
 this branch); the three scratch lanes wocc-marketplace-mut1/2/3 REMOVED
 after their spot checks per the implement round's deferral.
+
+## Escrow write-path rider implement round (the first settled rider)
+
+GAME repo, worktree /Users/fernando/Documents/wocc-marketplace, branch
+feature/woc-marketplace. Session start b72873d24e (the 20 QA tip). Release
+sync: merge 00334857e0 of origin/release/v0.40.0 (59 commits, the controller
+cross-hotbar packet PR #3501; four conflicts resolved by re-deriving from the
+merged tree: hud.ts ratchet 19151 exact, main.ts 11555 exact, the hud
+update-drive split window 48 / chrome 83 / none 17, the shard-weight table
+unioned with the release CI harvest keeping the 43 branch-only files'
+local durations, the resolved-i18n pending slice regenerated via i18n:gen).
+The release-merge-audit skill ran on the merge: no marketplace overlap
+beyond count-pin surfaces, no legacy-arm divergence, no new endpoints, no
+injected-helper rebinding owed, no planning-premise breaks; both sides'
+intent verified surviving in every overlap file. LOCAL per R4: nothing
+pushed; the rider QA session pushes on PASS.
+
+SPEC PAIR minted first (0b87229b2d): rider-escrow-write-path.md carries the
+cluster verbatim from the 16/17 registries plus a findings-context section
+recording the recon corrections (16 blocking lock sites mostly on LISTINGS
+rows, the stale 4-x-statement phrasing, no saveAll suppression mechanism
+exists, nothing refused on drain, the negatively pinned FIFO carve-out, the
+substring pins the narrowing would red). Recon: three read-only Explore
+agents over the escrow write path, the locking surface, and the
+routes/monitor seam before any code.
+
+COMMITS (spec to close): 0b87229b2d spec pair; ccc81cf4e6 gate + honest
+occupancy + observability; b847072c55 TxNeverStarted widening; 8a91fafa62
+the FOR NO KEY UPDATE narrowing; 57c7ee92d7 the bounded plain writers;
+19e47fb9b5 the drain refusal; fa958644fd the delivery-arms extraction;
+d715a7e5c8 the ledger bounds; c626080516 the commitGrant FIFO close;
+7ab41bdf09 the four-lane review fix round; 136e18721c the recorder-arm
+pins; b54a6e5b45 the narrowed-mode behavioral pin; 793528b26b the
+park-refusal counter + the rider mutation section; 22523b4449 the
+reclaiming saturation probe + accept-rung coverage; 7d9fb28dbb the
+mutation re-verification rows.
+
+DELIVERABLES vs the spec, all nine landed (order held: occupancy before the
+FIFO close):
+1. Honest occupancy: the guild-flush term joined the exclusion comment and
+   a pinned relation (scraped DB_HEAVY_STATEMENT_TIMEOUT_MS exceeds the
+   whole workload sum); the started-request ceiling is DERIVED at 157s
+   (pool checkout + session-default BEGIN/SET LOCAL + five workload
+   statements + FIVE inter-statement idle windows at the save tier + lock
+   wait + driver-backstop COMMIT, the review round adding the idle term the
+   first 107s cut omitted) with scrape pins on both docblocks that quote
+   it; the flush-tier tightening stays REJECTED per the 06 ruling,
+   re-affirmed at the constant.
+2. The realm escrow gate (server/woc_market_escrow_gate.ts): cap 4 (equal
+   to scraped SAVE_CONCURRENCY, below the pool default, both-saturated
+   under pool minus two, all relation-pinned), immediate typed refusal, no
+   queue; slot held for the WORK lifecycle; the review round added the
+   hold-ceiling reclaim (300s, above 157s + the 60s heavy allowance,
+   counted and loud) and the fresh-review round made the SATURATION PROBE
+   reclaim (a bare stats read made a full wedge's outage permanent because
+   the pre-check refused before any acquire could reclaim); custody-only by
+   pin (sweep, monitor, and the grant entry all flat-zero).
+3. Observability: pendingKeys gauge woc_character_save_pending_keys (the
+   serial writer's pre-plumbed accessor, all three GameStateSource
+   implementations); gate occupancy gauge woc_escrow_gate_in_flight;
+   counter kinds realm_refused + settled + grant_busy (ordered vocabulary
+   pin, zero-backfill, help string current); contention classes deadlocks +
+   txNeverStarted counted beside idleTxKills + lockWaitTimeouts, all four
+   on the stuck readout with the gate stats, the hrtime-bracketed
+   escrowSerialize numbers, stampHighWater crossings, and parkRefusals; the
+   saveAll-wave measurement pinned as a fact (one wedged FIFO costs one
+   worker slot, the wave drains every other character and honestly waits).
+4. TxNeverStarted widening: eleven tails take the tag to their contention
+   arm (typed contended, or false on the no-open-settlement probe: parking
+   assumes least); the two recorded exceptions are exact-count pinned (the
+   plain-pool advisory reads where the tag cannot occur; the delivered-save
+   count-then-rethrow keeping commitGrant's evidence).
+5. The narrowing: all 21 lock clauses FOR NO KEY UPDATE (16 blocking + 5
+   SKIP LOCKED, judged together: the claims' FK-share skip change traced
+   benign and an improvement); zero plain FOR UPDATE left, completeness
+   pinned comment-stripped with sibling flat-zeros; real-SQL proofs with
+   plain-mode negative controls (freed bid insert against a guarded
+   listing, freed abandon against the escrow-held accounts row,
+   same-account NO KEY self-conflict at the cap), and the source's own mode
+   bound behaviorally (a held FOR KEY SHARE never blocks the real escrow
+   transaction: the mutation campaign's ex-survivor, closed in-round).
+6. The bounded plain writers: all 38 row-writing sites ride boundedWrite
+   (ONE merged SET LOCAL query, lock 2s + idle at the SAVE tier per the fix
+   round: the seam's round-trip gaps are pure protocol idle and a 2s kill
+   destroys a pooled client), classified and counted; the five SKIP LOCKED
+   sweep claims stay direct BY JUDGMENT (non-blocking by construction), as
+   do the module-level retention prunes (nightly, budget-bounded,
+   failure-isolated; a 2s refusal would only defer work to the next night)
+   and the reads; a routing completeness pin holds 38 bounded vs exactly 5
+   sanctioned direct write sites so the workload-filtered rigs cannot hide
+   an un-routed writer. clearBuyNowLock is best-effort by FULL contract:
+   retry once on contention (an un-cleared lock's expiry mints an abandon
+   record against the blameless holder), then swallow everything loudly.
+   The two money-path signature recorders answer typed 'contended' mapped
+   to the retryable confirm_in_flight at both callers (per-site judgment
+   the spec demanded: 500ing a payment already on chain was the defect,
+   and the old 15s wait usually won where the new 2s bound often loses).
+   The 57014 ruling STANDS untouched.
+7. The drain refusal: BOTH escrow entries (createListing and the directed
+   acceptance, which escrows through it) refuse market_paused FIRST and
+   IO-free, before the health guard's two pooled reads and before any
+   step-up proof is consumed; wired to the health module's drain flag
+   through the optional dep (absent in every rig). The saturation pre-check
+   rides beside it for the same pre-burn reason.
+8. Ledger bounds: park maps cap at 512 through wocParkRow (existing ids
+   always re-park; refusals counted on the readout; the parked stat counts
+   only standing parks), the relation pinned against scraped SWEEP_BATCH
+   with the 4096 SQL-sanity ceiling; stamp maps (exactly-once intents)
+   never shed: a counted, re-arming high-water warn at the TOTAL across
+   both maps, direct-rig pinned through a failing mail persist.
+9. The commitGrant FIFO close: the delivered save rides the buyer's
+   per-character FIFO through custody's bounded persistGrantSerialized
+   (in-slot serialize proven fresher than the wait by a mid-wait bag
+   change; account/session/nonce/serialize re-validated UNDER the slot,
+   every dimension independently pinned), with 'busy' parking the row
+   (claim, grant intent, ledger entry intact) counted as grant_busy, and
+   the delivery batch stopping the scope after WOC_GRANT_BUSY_BUDGET (2)
+   busy parks like a contended pass, so a save-wave wedge costs the LOCKED
+   sweep segment a bounded number of deadlines per pass, never one per row
+   (the convergent blocking find of the review round; the eager confirm
+   entry shares the bound through its own scope). The claims-ledger park
+   subset is intact (lease_lost, transient-throw, claim_missing arms
+   unchanged); the sanctioned-FIFO-entries pin counts the two custody
+   entries exactly; the extraction paying for it moved the delivery arms
+   to server/woc_market_delivery.ts (move-audited character-identical
+   after normalization by the fresh reviewer, the four diffs being exactly
+   the rider's intended edits).
+   Conditional not built: the F1 low-water cursor (blocked-prefix growth
+   never observed; the condition is recorded in the spec).
+
+REVIEWS. Four read-only lanes via plain Agent (privacy-security,
+database-performance, server-hot-path, test-coverage), all prompted for
+coverage: roughly 40 findings; the three implementation lanes converged on
+ONE blocking cluster (the per-row FIFO wait inside the locked delivery
+segment: up to 2 x SWEEP_BATCH x 5s of advisory-lock hold, plus the same
+waits inline in the eager confirm), and the coverage lane found two blocking
+pin holes (the workload-filter routing blindness over 36 of 38 bounded
+writers; three of the grant entry's four guard dimensions unpinned, the
+ownership fence included). EVERY finding applied or judged with the file
+open; the fix round (7ab41bdf09 + 793528b26b) was then re-reviewed FRESH,
+which found the dead-reclaim-behind-the-pre-check blocking interaction (two
+individually sound fixes composing into the exact outage they prevented)
+plus the fake-union type gap, both fixed in 22523b4449 with the directed
+acceptance's rung coverage; nits applied (the misattributing retry log, the
+approximate in-flight arithmetic comments, the spec-tier amendment note).
+
+JUDGED this round (binding; do NOT re-raise):
+- The gate's transient over-free after a reclaimed sequence later settles:
+  bounded by the reclaim count, rare by construction (a reclaim is already
+  an incident), cheaper than identity-tokened holds; documented at the
+  reclaim loop.
+- The pool "reserve" arithmetic (gate + wave <= pool minus 2) is SIZING,
+  not enforcement: nothing fences the remaining clients, which also serve
+  every non-market read; the gate comment says exactly this.
+- The session_lost race trade at the FIFO close: a buyer disconnecting
+  between grantCopy and the slot can have the leave flush persist the
+  granted bags while the row parks unfinalized for the operator; the close
+  is the SAFER direction (the pre-captured blob committing was the exact
+  stale-ordering hazard the rider fixed) and the expectation is recorded at
+  the arm.
+- The SKIP LOCKED claims' FK-share skip change (narrowed claims no longer
+  skip rows held only by an in-flight FK-child insert): every child traced,
+  benign and a slight improvement (fewer spurious skips); recorded here as
+  the judgment the mode rename implies.
+- The started/settled arithmetic is APPROXIMATE (a deadline-cancelled
+  sequence whose flush then rejects books two entered kinds): stated at
+  the vocabulary; the gate stats and gauge are the instantaneous truth.
+- insertSale has no production caller (the sale row is written inside
+  finalizeDeliveredSettlement): pre-existing dead interface member,
+  recorded as a maintainer cleanup item, not this rider's regression.
+- The routing pin's leading-verb regex would miss a hypothetical WITH-CTE
+  writer: no such site exists; noted in the pin's comment territory as
+  future-gameability, not a current gap.
+- The per-site lockWaitTimeouts split and pgPool high-water stay 22-owned
+  (the 17 QA judgment carried).
+- The per-tail behavioral coverage of the widening is 2 of 11 shapes with
+  the count pin decisive against both regression directions: judged
+  acceptable by the coverage lane and adopted.
+- The eager-confirm entry keeps its inline scope literal (bounded to the
+  same 2-deadline budget); its park-count discard stays as documented.
+- 57014 remains incident-shaped on statement blowouts (the 05 ruling,
+  upheld again): under the bounded seam contention surfaces as 55P03, so
+  the ruling and the classification never collide.
+
+MAINTAINER RULINGS OPEN (the rider QA re-judges, then Fernando):
+- The woc_market.ts ceiling raise 4000 -> 4037 inside the rider (net 447
+  DOWN across the rider, 4484 to 4037): the raise covers the
+  persistGrantSerialized interface contract doc, the escrowSaturated dep
+  with its two pre-burn rungs, and the busyParks scope field, argued as
+  declaration surface no sibling can absorb. Root CLAUDE.md makes any
+  raise a maintainer decision; recorded here rather than silently taken.
+- server/woc_market_db.ts still has NO ratchet row (the 17 QA question,
+  carried); its rider growth is net +158 lines, all SQL-adjacent
+  (boundedWrite, counters, the narrowing comments).
+
+VALUES REGISTRY (the rider QA re-judges): gate cap 4 = SAVE_CONCURRENCY,
+hold ceiling 300_000 > 157_000 + 60_000; WOC_GRANT_BUSY_BUDGET 2 per scope
+across both batch arms and the eager entry; park cap 512 in [8 x
+SWEEP_BATCH, 4096]; stamp high-water 512 on the two-map total, counted,
+re-arming; boundedWrite = BEGIN + ONE merged SET LOCAL (lock 2s, idle 10s
+save-tier) + statement + COMMIT, envelope pinned once raw; the started
+ceiling 157_000 derived and scrape-pinned in two docblocks; counter
+vocabulary eight kinds ordered; recorders' contended -> confirm_in_flight;
+clearBuyNowLock retry-once-swallow-all; drain + saturation rungs pre-burn
+on both escrow entries.
+
+MUTATION RECORD (the rider section + re-verification block in
+phase-20-mutation-log.md): 30 distinct mutants, 28 BIT, 1 deliberate green
+control, 1 first-scoring survivor upgraded to BIT in-round (the bond
+suite's freed-insert proof holds its own raw-client lock, so the escrow
+source's mode needed the KEY-SHARE-holder behavioral pin before the strip
+could bite: the wrong-suite class), 4 stale-verdict re-runs after pin edits
+all BIT. Serial lane over the committed tree; the two pg mutants ran alone.
+
+SUITE GROWTH: directed_sql 110 -> 116 (the floor reference in state.md and
+the gate docs should read 116); service 274 -> 283; escrow_queue 26 -> 36;
+NEW woc_market_escrow_gate (8) and woc_market_delivery (2) suites;
+local_ledgers 3 -> 5; fake fidelity 11 unchanged; the pg battery 236 ->
+241 (three narrowing proofs and the plain-writer bound in bond, the
+narrowed-mode binding in delivery), zero skips throughout.
+
+VALIDATION at the tip (all re-run fresh): npx tsc --noEmit clean; the
+seven-suite pg battery 241 tests zero skips with TEST_DATABASE_URL on the
+command line only, single lane; the DB-free marketplace set 974 tests
+across 23 files; npm run ci:changed exit 0 (warnings only, pre-existing);
+node scripts/gate_select.mjs on the committed tree: result recorded in the
+state.md bullet (run with TEST_DATABASE_URL only, no tail pipe, clear
+field).
+
+NEXT = docs/woc-marketplace-hardening/rider-escrow-write-path-qa.md, GAME
+repo, worktree wocc-marketplace, FRESH session, newest origin/release/**
+sync first; it audits b72873d24e to the recorded tip. After its PASS push:
+the second rider (the per-request auth-guard reads, design constraints in
+the 17 SESSION START DECISION bullet in state.md), then
+phase-21-devnet-dry-run.md.
