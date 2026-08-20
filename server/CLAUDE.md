@@ -65,6 +65,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `tick_profiler.ts` / `tick_rate_meter.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header) |
 | `mob_scan_tick_stats.ts` | folds the sim's per-tick mob-scan visit counters (`Sim.mobScanCounters`, observer-only) into the `PERF_TICK_LOG` heartbeat tokens (`aggroVisits=`/`threatVisits=`) and the admin tick-capture accumulators; `game.ts` keeps only the holder and the apply call |
 | `cached_read.ts` / `deeds_board_warm.ts` / `discord_status_cache.ts` | the three shared-read cache shapes: single-key `createCachedRead` (TTL, single-flight, stale-on-error, joiner-refusing bust) / the extended `singleFlight(run, epochOf?)` for per-scope epoch-keyed board flights / the keyed bounded per-account cache behind `GET /api/discord` (see Hot paths) |
+| `auth_guard_core.ts` / `woc_auth_guard_cache.ts` | the per-request auth-guard reads' pure core (token scope/expiry verdict + the moderation status ladder, computed from raw rows at read time) and the marketplace-scoped cache over them: raw rows only, no negative caching, no stale-serve, keyed busts every projection writer calls (post-COMMIT where transactional; completeness discovered by `tests/server/auth_guard_bust_coverage.test.ts`), consumed ONLY through the woc_market_routes guard bundle via `WocMarketRuntime.authGuardDb` (the admin gate and every other guard surface stay on the direct db reads; the import boundary is pinned). `WOC_AUTH_GUARD_CACHE_TTL_MS` (5s) is the cross-process revocation/ban delay ceiling: process-per-realm shares one database and accounts/auth_tokens are not realm-scoped, so a write committed by ANOTHER realm process is invisible here until the TTL lapses |
 | `retention_sweep.ts` | the advisory-locked, self-clocked nightly sweep of batched per-table prunes; every table that grows without bound registers here (see Hot paths) |
 | `concurrent_indexes.ts` | post-boot `CREATE INDEX CONCURRENTLY` seam for new indexes on big live tables |
 | `realm_readout_memo.ts` / `event_frame.ts` / `interest_candidates.ts` | broadcast build-once seams: per-pass realm readout memo (rides `maybeRaw`), serialize-once event frames (sent via `sendRaw`), per-cell shared interest gathering (see Hot paths) |
@@ -152,7 +153,11 @@ Three seams keep it flat; use them, never re-invent them.
   `pool.query` (the keyed third shape is for an account-scoped hot read);
   anything a moderation action can change MUST be bust-wired in the same change (TTL
   alone delays enforcement); a deliberately non-busted read (a moderation-invariant
-  COUNT) records why in a comment.
+  COUNT) records why in a comment. The marketplace auth-guard cache
+  (`woc_auth_guard_cache.ts`) extends this rule to the two guard reads: ANY new write
+  that changes what `authTokenRowForToken` or `moderationRowForAccount` returns must
+  call the matching `bustWocAuthGuard*` in the same change; the discovery pin
+  (`tests/server/auth_guard_bust_coverage.test.ts`) reds on an unbusted writer.
 
 - **Every table that grows without bound gets a retention story in the same change.**
   The nightly sweep (`retention_sweep.ts`, registered after listen in `main.ts`) runs
