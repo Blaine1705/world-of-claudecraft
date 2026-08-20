@@ -24,7 +24,7 @@ import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
 import { createWocMarketDeliveryArms, type WocMarketDeliveryArms } from './woc_market_delivery';
 import { logSafe, WocWireDriftWarner } from './woc_market_drift_warn';
-import { pruneWocLocalLedgers, wocBackedOffIds } from './woc_market_local_ledgers';
+import { pruneWocLocalLedgers, wocBackedOffIds, wocParkRow } from './woc_market_local_ledgers';
 import type { WocMarketReadCache } from './woc_market_read_cache';
 import { WOC_MARKET_BROWSE_CACHE_MAX_PAGE } from './woc_market_read_cache';
 import {
@@ -2679,7 +2679,7 @@ export class WocMarketService {
           // stuckBonds readout carries the visibility).
           const signedAtMs = bid.bondSignatureAtMs ?? bid.placedAtMs;
           if (nowMs - signedAtMs > WOC_MARKET_BOND_POLL_PARK_SECONDS * 1000) {
-            this.parkedBondPolls.set(bid.id, nowMs + WocMarketService.PARK_RETRY_MS);
+            wocParkRow(this.parkedBondPolls, bid.id, nowMs + WocMarketService.PARK_RETRY_MS);
             await this.deps.db.touchBidPollRow(bid.id);
           }
           continue;
@@ -2718,7 +2718,7 @@ export class WocMarketService {
           this.driftWarn.noteFail(confirmed.reason);
           const lapsed = await this.deps.db.lapseBid(bid.id);
           if (!lapsed) {
-            this.parkedBondPolls.set(bid.id, nowMs + WocMarketService.PARK_RETRY_MS);
+            wocParkRow(this.parkedBondPolls, bid.id, nowMs + WocMarketService.PARK_RETRY_MS);
             await this.deps.db.touchBidPollRow(bid.id);
           }
         }
@@ -3639,7 +3639,7 @@ export class WocMarketService {
       try {
         const out = await this.deps.db.closeCancelPendingListing(this.cfg.realm, listing.id, nowMs);
         if (out === 'skip') {
-          this.parkedCancelIntents.set(listing.id, nowMs + WocMarketService.PARK_RETRY_MS);
+          wocParkRow(this.parkedCancelIntents, listing.id, nowMs + WocMarketService.PARK_RETRY_MS);
           await this.deps.db.touchListingRow(listing.id);
           continue;
         }

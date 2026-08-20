@@ -13,8 +13,41 @@
  *  reference cannot pin memory for the process lifetime. */
 export const WOC_LOCAL_LEDGER_TTL_MS = 10 * 60_000;
 
+/** Hard entry bound for the PARK maps (the escrow write-path rider's growth
+ *  bound). Steady state is batch-scale (each pass can park at most one
+ *  SWEEP_BATCH of rows per arm, and the TTL prune reaps stale retries), so
+ *  the cap only bites a mass-park event, an economy outage parking every
+ *  delivery at once, where unbounded growth would also mean an unbounded
+ *  `id <> ALL($n)` array in every batch read (wocBackedOffIds inherits this
+ *  bound by construction). Sized at many multiples of the batch (the
+ *  tunables ladder pins the relation against the scraped SWEEP_BATCH). */
+export const WOC_LOCAL_PARK_MAX_ENTRIES = 512;
+
+/** Park a row's retry time, refusing NEW entries at the cap: a refused park
+ *  costs one batch slot next pass (the row simply retries un-excluded),
+ *  never memory. An EXISTING id may always re-park, or rotation itself
+ *  would die exactly at the cap. Returns whether the entry stands. */
+export function wocParkRow(
+  park: Map<number, number>,
+  id: number,
+  retryAtMs: number,
+  cap: number = WOC_LOCAL_PARK_MAX_ENTRIES,
+): boolean {
+  if (!park.has(id) && park.size >= cap) return false;
+  park.set(id, retryAtMs);
+  return true;
+}
+
+/** High-water mark for the STAMP maps (pendingGrants, pendingMail). These
+ *  hold exactly-once intents, so nothing here may ever DROP an entry: the
+ *  TTL prune is the only remover, and crossing this mark is an incident to
+ *  warn about (a delivery system stamping faster than it settles), never a
+ *  reason to shed state. */
+export const WOC_LOCAL_STAMP_HIGH_WATER = 512;
+
 /** The ids inside their backoff window (retry still in the future): the
- *  batch reads EXCLUDE them so a parked row costs no batch slot. */
+ *  batch reads EXCLUDE them so a parked row costs no batch slot; the array
+ *  is bounded by the park cap above. */
 export function wocBackedOffIds(parked: ReadonlyMap<number, number>, nowMs: number): number[] {
   const out: number[] = [];
   for (const [id, retryAtMs] of parked) {

@@ -619,6 +619,23 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     const poolDefault = parseDbPoolMaxClients(undefined);
     expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBeLessThan(poolDefault);
     expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT + saveConcurrency).toBeLessThanOrEqual(poolDefault - 2);
+    // The park-ledger cap (the rider's growth bound) sits many multiples
+    // above the sweep batch: each pass can park at most one batch per arm,
+    // so the cap only bites a mass-park event while steady state never
+    // grazes it. SWEEP_BATCH is a woc_market.ts module-private const, so
+    // scrape it like the siblings above.
+    const { WOC_LOCAL_PARK_MAX_ENTRIES } = await import('../../server/woc_market_local_ledgers');
+    const sweepBatchMatch = codeOnly(read('server/woc_market.ts')).match(
+      /^const SWEEP_BATCH = (\d+);$/m,
+    );
+    expect(sweepBatchMatch).not.toBeNull();
+    const sweepBatch = Number(sweepBatchMatch?.[1]);
+    expect(sweepBatch).toBeGreaterThan(0);
+    expect(WOC_LOCAL_PARK_MAX_ENTRIES).toBeGreaterThanOrEqual(sweepBatch * 8);
+    // And it stays SQL-sane: the cap bounds the batch reads' exclusion
+    // array, which must never grow toward the territory where a linear
+    // `<> ALL($n)` scan starts pricing the read.
+    expect(WOC_LOCAL_PARK_MAX_ENTRIES).toBeLessThanOrEqual(4_096);
   });
 
   it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {

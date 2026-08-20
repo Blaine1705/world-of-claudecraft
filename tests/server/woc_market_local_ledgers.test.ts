@@ -7,7 +7,10 @@ import { describe, expect, it } from 'vitest';
 import {
   pruneWocLocalLedgers,
   WOC_LOCAL_LEDGER_TTL_MS,
+  WOC_LOCAL_PARK_MAX_ENTRIES,
+  WOC_LOCAL_STAMP_HIGH_WATER,
   wocBackedOffIds,
+  wocParkRow,
 } from '../../server/woc_market_local_ledgers';
 
 describe('woc local ledgers', () => {
@@ -46,5 +49,41 @@ describe('woc local ledgers', () => {
 
   it('the shared TTL is the documented ten minutes', () => {
     expect(WOC_LOCAL_LEDGER_TTL_MS).toBe(600_000);
+  });
+
+  it('wocParkRow admits under the cap and refuses only NEW entries at it', () => {
+    // The growth bound (the escrow write-path rider): a mass-park event may
+    // fill the map to the cap and no further; a refused park costs the row
+    // one batch slot next pass, never memory.
+    const park = new Map<number, number>();
+    expect(wocParkRow(park, 1, 100, 2)).toBe(true);
+    // One BELOW the cap still admits (the boundary the cap must not
+    // overshoot by an off-by-one).
+    expect(wocParkRow(park, 2, 100, 2)).toBe(true);
+    // AT the cap: a new id refuses and writes nothing.
+    expect(wocParkRow(park, 3, 100, 2)).toBe(false);
+    expect(park.has(3)).toBe(false);
+    expect(park.size).toBe(2);
+    // An EXISTING id re-parks at the cap: rotation must not die exactly when
+    // the ledger is fullest.
+    expect(wocParkRow(park, 1, 900, 2)).toBe(true);
+    expect(park.get(1)).toBe(900);
+    // A prune-freed slot admits again.
+    park.delete(2);
+    expect(wocParkRow(park, 3, 100, 2)).toBe(true);
+  });
+
+  it('the caps are the documented values, and backedOffIds inherits the park bound', () => {
+    expect(WOC_LOCAL_PARK_MAX_ENTRIES).toBe(512);
+    expect(WOC_LOCAL_STAMP_HIGH_WATER).toBe(512);
+    // The default-cap arm (the call sites pass no cap): filling through
+    // wocParkRow can never hand the batch reads an exclusion array past the
+    // cap, which is what bounds the `id <> ALL($n)` SQL cost.
+    const park = new Map<number, number>();
+    for (let id = 0; id < WOC_LOCAL_PARK_MAX_ENTRIES + 50; id++) {
+      wocParkRow(park, id, 1_000_000);
+    }
+    expect(park.size).toBe(WOC_LOCAL_PARK_MAX_ENTRIES);
+    expect(wocBackedOffIds(park, 0).length).toBe(WOC_LOCAL_PARK_MAX_ENTRIES);
   });
 });

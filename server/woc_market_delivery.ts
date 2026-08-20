@@ -18,7 +18,11 @@ import type {
   WocSettlementRow,
   WocSweepErrorTag,
 } from './woc_market';
-import { wocBackedOffIds } from './woc_market_local_ledgers';
+import {
+  WOC_LOCAL_STAMP_HIGH_WATER,
+  wocBackedOffIds,
+  wocParkRow,
+} from './woc_market_local_ledgers';
 import {
   listingReturnCustodyRef,
   listingSoldNoticeCustodyRef,
@@ -71,6 +75,25 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
   /** The dispose arm's own minute gate (same cadence, independent clock so
    *  the two residue arms cannot hide each other's failures). */
   let disposeDueAtMs = 0;
+  /** One line per crossing, not per stamp: the stamp maps hold exactly-once
+   *  intents nothing may drop, so the high-water is an incident signal (the
+   *  write-path rider's bound for the stamp side), and re-arming below the
+   *  mark keeps a hovering ledger from logging every beat. */
+  let stampHighWaterWarned = false;
+
+  function watchStampHighWater(): void {
+    const size = Math.max(ctx.pendingGrants.size, ctx.pendingMail.size);
+    if (size >= WOC_LOCAL_STAMP_HIGH_WATER) {
+      if (!stampHighWaterWarned) {
+        stampHighWaterWarned = true;
+        console.warn(
+          `[woc_market] delivery intent ledger high water: grants ${ctx.pendingGrants.size}, mail ${ctx.pendingMail.size} (cap-less by design; deliveries are stamping faster than they settle)`,
+        );
+      }
+    } else {
+      stampHighWaterWarned = false;
+    }
+  }
 
   async function runDeliveryBatch(
     arm: 'delivered' | 'reconciled',
@@ -101,7 +124,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
           advanced++;
           ctx.parkedDeliveries.delete(settlement.id);
         } else if (out === 'parked') {
-          ctx.parkedDeliveries.set(settlement.id, nowMs + ctx.parkRetryMs);
+          wocParkRow(ctx.parkedDeliveries, settlement.id, nowMs + ctx.parkRetryMs);
           scope.parked++;
           await ctx.db.touchSettlementRow(settlement.id);
         } else if (out === 'skip') {
@@ -262,6 +285,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
       // crash at any later point leaves a claim that says which rail owns it.
       if (!(await ctx.db.markCustodyMailIntent(custodyRef))) return false;
       ctx.pendingMail.set(custodyRef, { stampMs: ctx.now(), written: false });
+      watchStampHighWater();
     } else {
       const state = await ctx.db.custodyRefState(custodyRef);
       if (state === null) {
@@ -387,6 +411,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
       // written attempt: that pair is what lets bookCustodyOnce proceed.
       if (!(await ctx.db.markCustodyMailIntent(custodyRef))) return 'abort';
       ctx.pendingMail.set(custodyRef, { stampMs: ctx.now(), written: false });
+      watchStampHighWater();
       return 'mail';
     }
     ctx.pendingGrants.set(custodyRef, {
@@ -394,6 +419,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
       leaseNonce: granted.save.leaseNonce,
       stampMs: ctx.now(),
     });
+    watchStampHighWater();
     return commitGrant(custodyRef, granted.save);
   }
 
@@ -615,7 +641,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
           advanced++;
           ctx.parkedReturns.delete(listing.id);
         } else {
-          ctx.parkedReturns.set(listing.id, nowMs + ctx.parkRetryMs);
+          wocParkRow(ctx.parkedReturns, listing.id, nowMs + ctx.parkRetryMs);
           scope.parked++;
           await ctx.db.touchListingRow(listing.id);
         }
