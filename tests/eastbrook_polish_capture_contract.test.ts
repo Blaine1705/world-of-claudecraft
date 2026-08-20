@@ -219,7 +219,7 @@ interface AttributionTargetFixture {
 // mount prewarm and shadow-depth bytes with the Proving Shore island_guidance
 // call sites, so the composite matches neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9ed378f68e390653b00ab4dc6eee657526200bda6a31cb45fd35845ecdcf3e10';
+  'e04ce8995015fb26b9d54efd182ac09395e0e3f2af4887abf0d277ed3a3a455c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
