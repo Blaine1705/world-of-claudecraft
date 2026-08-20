@@ -5525,7 +5525,12 @@ builds green, malware scan PASS (6,423 files, 0 high after priors). Run
 with TEST_DATABASE_URL on the command line only, no tail pipe, a clear
 field (no concurrent pg-suite runs; the mutation lane was idle). The two
 docs commits on top (this registry, a7d2587dbc and the gate-note wrap) are
-docs-only, the packet's recorded wrap pattern.
+docs-only, the packet's recorded wrap pattern. RE-RUN after the
+qa-checklist fix round at the FINAL tip 5f34d0769f (code tip 961aa1e411
+plus the registry docs): PASS again, ALL 12 STEPS green, full-suite
+fallback, 42,061 tests with the same expected fails and known skips,
+browser 131, typecheck, all builds, malware scan PASS; the pg battery and
+ci:changed were additionally re-run green at that tip before the gate.
 
 NEXT = docs/woc-marketplace-hardening/rider-escrow-write-path-qa.md, GAME
 repo, worktree wocc-marketplace, FRESH session, newest origin/release/**
