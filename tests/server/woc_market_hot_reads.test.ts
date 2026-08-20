@@ -1190,6 +1190,9 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     expect(code).toContain('escrowSerialize: wocEscrowSerializeStats()');
     // The character-save FIFO gauge reads the queue's live key count.
     expect(code).toContain('savePendingKeys: () => game.characterSaveQueues.pendingKeys()');
+    // The drain rung's wiring: shutdown calls markDraining() first, and the
+    // service reads the health flag live through this thunk.
+    expect(code).toContain('draining: () => !isReady()');
     // The pg pool gauge (the pre-enable review's pool-wait observability):
     // sustained waiting > 0 is the brownout precursor, and this readout is
     // where an operator already looks.

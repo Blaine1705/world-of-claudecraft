@@ -564,6 +564,65 @@ describe('woc market fixtures', () => {
   });
 });
 
+describe('the draining refusal on createListing (the write-path rider)', () => {
+  it('refuses while draining, BEFORE any custody action', async () => {
+    // The HTTP listener stays open through the shutdown drain, so a listing
+    // accepted late in the grace window could enter an escrow sequence
+    // whose honest tail outlives pool.end(). The drain rung answers the
+    // existing paused refusal (503, localized copy) and must land with
+    // nothing extracted and nothing written.
+    const h = makeHarness();
+    h.deps.draining = () => true;
+    const res = await createListingSteppedUp(h, {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res).toEqual({ ok: false, reason: 'market_paused' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+    expect(h.db.escrowSaves).toHaveLength(0);
+  });
+
+  it('an absent drain dep changes nothing: the same listing goes through', async () => {
+    // The dep is optional so every existing rig stays byte-identical; this
+    // arm pins that absence really is the no-refusal default (and every
+    // other test in this file rides it implicitly).
+    const h = makeHarness();
+    expect(h.deps.draining).toBeUndefined();
+    const res = await createListingSteppedUp(h, {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(res.ok).toBe(true);
+  });
+
+  it('a drain that flips false again admits the next listing (readiness is re-testable)', async () => {
+    // resetHealthForTests exists because readiness state is process-global;
+    // the service side must read the thunk LIVE, not capture its value.
+    const h = makeHarness();
+    let draining = true;
+    h.deps.draining = () => draining;
+    const refused = await createListingSteppedUp(h, {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(refused).toEqual({ ok: false, reason: 'market_paused' });
+    draining = false;
+    const admitted = await createListingSteppedUp(h, {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(admitted.ok).toBe(true);
+  });
+});
+
 describe('step-up enforcement on the custody movers (B6/R1)', () => {
   it('refuses a bearer-only createListing with stepup_required, touching nothing', async () => {
     // The B6 vector: a stolen session bearer lists the victim's valuables.

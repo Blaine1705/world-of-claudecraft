@@ -242,6 +242,7 @@ import {
   handleLivez,
   handleMetricsGate,
   handleReadyz,
+  isReady,
   markDraining,
   registerLivenessSource,
 } from './http/health';
@@ -2831,6 +2832,10 @@ const wocMarketService = new WocMarketService({
   ),
   verifiedWallet: async (account) => (await walletForAccount(account))?.pubkey ?? null,
   balanceTokens: (pubkey) => cachedWocBalance(pubkey),
+  // The drain flag: shutdown calls markDraining() FIRST, so a listing that
+  // arrives during the grace window refuses instead of entering an escrow
+  // sequence pool.end() can land under.
+  draining: () => !isReady(),
   config: wocMarketConfig(),
   onSweepPass: (stats, saturated, elapsedMs) => {
     // One line per pass that did work, plus a loud arm-not-draining warning:

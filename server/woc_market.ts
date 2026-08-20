@@ -1128,6 +1128,13 @@ export interface WocMarketDeps {
    *  instance here and onto the routes runtime, whose mutation handlers own
    *  the busts. */
   readCache?: WocMarketReadCache;
+  /** True once the process began its shutdown drain (main.ts wires the
+   *  health module's flag). OPTIONAL: absent means never draining (the test
+   *  rigs and sweep-only constructions), which cannot widen behavior, only
+   *  skip one refusal. Consulted by createListing alone (the escrow
+   *  sequence's honest tail is what outlives the grace window; the other
+   *  guards are 2s-bounded, judged at the write-path rider). */
+  draining?: () => boolean;
   now?: () => number;
   /** Per-pass observability sink (main.ts logs it). `saturated` names every arm
    *  that came back with a FULL batch, i.e. a backlog that is not draining.
@@ -1677,6 +1684,14 @@ export class WocMarketService {
     // a marketplace-wide hold (PRD "Integrity").
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
     if (gate) return gate;
+    // The draining refusal (the escrow write-path rider): the HTTP listener
+    // stays open through the shutdown drain, and a listing accepted late in
+    // the grace window can enter an escrow sequence whose honest tail
+    // (guild flush plus the transaction ceiling) outlives pool.end(). Only
+    // THIS mutation refuses on drain: the other guards are 2s-bounded and
+    // the drain window is seconds, judged at the rider. The existing paused
+    // answer (503, localized) is honest copy for "come back in a moment".
+    if (this.deps.draining?.()) return refuse('market_paused');
     const wallet = await this.deps.verifiedWallet(args.account);
     if (!wallet) return refuse('wallet_required');
     // Step-up BEFORE any business validation, deliberately: an unauthorized
