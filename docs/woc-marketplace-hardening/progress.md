@@ -6003,3 +6003,224 @@ repo, worktree wocc-marketplace, FRESH session, newest origin/release/**
 sync first; it audits f844a72eaa to the tip recorded in the final gate note
 and pushes on PASS per R4. After its PASS:
 docs/woc-marketplace-hardening/phase-21-devnet-dry-run.md.
+
+## Auth-guard read cache rider QA round (the paired QA session)
+
+GAME repo, worktree wocc-marketplace, branch feature/woc-marketplace.
+Audited f844a72eaa..e26c3ed9ec (code tip 1f9f8aac4a + the docs wrap) per
+rider-auth-guard-reads-qa.md; this session's release sync was EMPTY
+(origin/release/v0.40.0 tip 65b91fa190 still an ancestor; no merge commit,
+no audit owed). VERDICT: PASS-WITH-FOLLOWUPS, every fix applied in-session
+(commits 27262d293d fix + 7dd34268a8 test + 7b6e0badb0 the re-reviewed
+second fix + 3e77e6f44e the qa-checklist round + the docs wrap), pushed
+per R4.
+
+WHAT THE AUDIT DID. Every charter probe ran on the main thread: the
+discovery pin was gamed with EIGHT planted writer shapes in the throwaway
+worktree (hoisted module-scope SQL, new-file writer, buried projection
+column, second accounts DELETE, new-file upsert, class-method writer all
+RED correctly; schema-qualified and lowercase-keyword writers both EVADED,
+the round's first two findings); the install veto was attacked with four
+interleaving probes (post-bust recovery, double-bust mid-flight, burst
+prune vs live flight, moderation-arm lost-bust: all held); the 20-protocol
+independent spot-checks re-proved seven logged pins with the QA's own strip
+designs at different sites (all BIT); scope containment was verified by
+diffstat (23 files, no non-market guard surface touched), by the claudium
+per-request canary suite, and by an independent import grep; the registry's
+counts (suite sizes, 20-site reconciliation, 27/26/1 mutation totals, line
+counts incl. db.ts 4832 = net 44 down, whole-log 368) all reconciled
+against reality with zero drift found.
+
+REVIEWER REALITY: four lanes dispatched; security and hot-path delivered
+FULL reports unprompted (a first), coverage delivered unprompted,
+db-performance stayed silent after its one nudge, so that dimension
+carries the main thread's pass plus the implement round's delivered dbperf
+lane. The two delivered perf/security lanes independently measured the
+same quadratic-prune stall (~71-74ms at the 5,000-account fan-out) and the
+security lane executed the post-bust join race live.
+
+FIX ROUNDS RE-REVIEWED FRESH (the unreviewed-fix rule), and it earned its
+keep: a fresh security lane over the FIRST fix round executed a DEFEAT of
+the new join guard (a second same-account bust after the joiner arrives
+overwrites the single ledger slot and hides the bust from the joiner's
+arrival-time comparison; the pre-bust row was accepted, probe-confirmed).
+The SECOND fix (7b6e0badb0) widens the join guard to the install veto's
+own condition: ANY bust at or after flight start makes every joiner
+refetch, so the ledger-overwrite class dies structurally; the recorded
+once-per-flight stale answer now covers the flight CREATOR only (a
+deliberate tightening of that acceptance, safe direction). It also
+deepens the install freeze one level (the freezeShared precedent, with
+the frozen-Date setTime limit recorded), pins the freeze (it was
+unpinned), records the freshly-owned-row contract on the readers
+interface, and makes the floor/anchor comments state their enforced
+bounds honestly. The same lane confirmed everything else held: joiner
+fan-out collapse, bustAll coverage, no livelock (async, structurally
+terminating), the prune gate correctness-neutral, the 80s floor
+load-bearing (it forced a poisoning repro at 70s), no new bearer
+exposure, and every new pin decisive on revert.
+
+THE QA-CHECKLIST ROUND (dispatched LAST; the first agent died silently
+after its one nudge, its respawn delivered in full): verdict READY, 0
+blocking, 2 should-fix + 4 nits + one adversarial catch, ALL applied
+(3e77e6f44e): the joiner-termination invariant PINNED (N vetoed joiners
+collapse onto ONE fresh flight; the mutant that disables the flight
+cleanup dies fatally red in the spin the pin documents), a join-veto
+refetch counter on stats/readout/gauge (bust-storm refetches separable
+from misses), the redundant test-only size accessors folded into the
+stats fields, the unclassifiable message naming its interpolated arm, the
+header stating the join re-check beside the install veto, the readout
+comment and the pg helper named honestly. Its VERIFY items: the prune
+bench figures stand as session-measured claims (the mechanism is what is
+pinned; the bench script was a scratchpad throwaway), the pg suite and
+the gate both re-ran at the final tip. It also flagged the TTL
+fetch-start anchor's brownout regime (a probe slower than the 5s TTL
+installs already-expired, so cross-time reuse stops during a brownout
+while single-flight still collapses concurrent readers) as a real regime
+change: recorded in-code and HERE for the maintainer, not treated as a
+new ruling.
+
+FINDINGS: 34 total this round (21 from the main audit + four lanes, 6
+from the fresh fix-round review, 7 from the qa-checklist round); 25
+APPLIED across four commits, 9 judged-declined with reasons (below).
+The applied set:
+1. SECURITY (the round's one real race): a reader arriving AFTER an
+   account-keyed bust could join the PRE-bust token flight and be answered
+   with the pre-revocation row (the bust cannot cancel a flight the index
+   has never seen; the implement round's veto closed only the INSTALL
+   half). Fixed with a content-keyed JOIN GUARD: a joiner whose arrival
+   strictly postdates the account's bust refetches at flight settle; the
+   pre-bust joiners keep the recorded once-per-flight acceptance; same-ms
+   ties count as pre-bust on the join side while the install veto keeps
+   its fail-closed tie. Pinned + mutation-proven (qa_join_veto_strip).
+2. AVAILABILITY: the veto ledger's over-cap prune walked the whole map
+   TWICE per bust while wedged inside the floor window; the quota
+   listener's reconnect resync busts every live account, a measured ~73ms
+   synchronous event-loop stall at the 5,000-account realm cap (both
+   lanes measured it independently). Fixed with an amortization gate (a
+   failed pass records the earliest instant anything can cross the floor;
+   busts before that skip the walk): re-measured 0.8ms / ONE pass at the
+   same fan-out. Pinned (prune-pass counter) + mutation-proven.
+3. Discovery-scan evasions (the QA's own probes): schema-qualified table
+   names and lowercase SQL keywords evaded every regex. Fixed: all four
+   table regexes gained the qualifier arm and the i flag (verified
+   zero new matches across server/, so the 20-site reconciliation is
+   unchanged), plus an outright ban on interpolated TABLE names and an
+   unclassifiable-arm red for interpolated fragments inside guard-table
+   statements, all pinned by synthetic-source self-probes so the widened
+   classifier cannot regress silently.
+4. TTL anchored at fetch START (was install time: the documented 5s
+   cross-process ceiling was silently 5s + fetch RTT). Pinned + proven.
+5. Veto floor margin: MIN_AGE 70s (exactly the derived deadline sum) to
+   80s (+10s event-loop headroom); the relation pin now requires >= sum
+   + 5s so the margin cannot regress to zero.
+6. Observability: the account-index size and bust-ledger size (both
+   soft-bounded BY DESIGN) joined the stats payload, the stuck readout
+   (via the existing authGuard field), and the prometheus gauge as
+   arm=index / arm=recent_busts series; installed rows are now frozen
+   shallow (decoration-poisoning defense); the module header's
+   flights-bound and idle-high-water prose was made honest.
+7. Pin-quality set (coverage lane): the veto fence-release direction
+   pinned (a permanent-veto mutant survived the whole shipped suite: the
+   exact silent perf cliff); the retention pass pinned independently of
+   the floor pass; the decorative young-entry assert made exact (toBe(2)
+   plus a live-veto proof); the refusal matrix over the cached bundle
+   grew its suspended/deactivated/unknown-bearer rows; the pg revocation
+   writers got per-dimension violating fixtures (cross-account survivors
+   for revokeTokensExcept and the password-reset consume, the full-scope
+   survivor and refused-full-delete for revokeReadToken, the same-prefix
+   stranger survivor for revokeCompanionToken, this last mutation-proven
+   in the pg lane); the gauge test matches exact sample lines on both
+   arms; the core suite pins per-branch mute/policy carry-through and the
+   undefined-policy half; the direct read path gained mute/strikes/policy
+   and lapsed-suspension parity rows (the spec's parity-matrix gap); the
+   moderation-arm lost-bust cancel and bustAll counter accumulation are
+   exercised.
+
+JUDGED-DECLINED this round (binding; do NOT re-raise):
+- A backward wall-clock step between flight start and bust admits a
+  pre-bust row past the veto (security I2): consistent with the server's
+  clock usage everywhere; a monotonic-clock retrofit is not this cache's
+  call. Recorded.
+- The residue sweep's threshold-crossing walk lands inside one request
+  (~5.9ms at the 40k crossing, hot-path 3): amortized O(1), two orders
+  rarer than the prune it mirrors, now observable via the index series;
+  22's pre-enable audit re-judges with gauge data.
+- The per-account index has no local bound (hot-path 4): same
+  authenticated mint lever as the recorded companion-token thrash bound;
+  a local cap must also bust entries to stay sound, too subtle for a QA
+  fix round; FOLDED into the recorded 22 mint-cap deferral (owner:
+  22 pre-enable audit).
+- The hot_reads source pins ride that file's own line-first stripper
+  rather than the shared helper (coverage nit): pre-existing file-local
+  lexer, safe polarity (stripping only strengthens the positive pins);
+  swapping it mid-QA risks the file's many existing pins. Recorded as a
+  cleanup candidate, owner maintainer.
+- The runtime-without-authGuardDb fallback arm (REAL_GUARD_DB) is
+  unpinned at the unit level (coverage nit): it is the pre-rider default
+  every deployment exercises at boot-before-wiring, identical to the old
+  behavior; a unit exercise needs a live pool for no new information.
+- The busts stat counting read-time expiry drops alongside writer busts:
+  documented at the drop site instead of split (the series means
+  "entries invalidated"); a separate counter is not worth the shape
+  change against the sibling caches.
+- The flights map stays uncapped (hot-path 6, reported for coverage):
+  one small entry per concurrent in-flight probe, proportional overhead
+  on the pool's own pending queue; header prose corrected rather than a
+  cap added.
+- A vetoed joiner's re-read double-counts in the reads stat (fix-round
+  review): the re-read IS a real read; the inflation only appears during
+  a bust storm and refreshes stays exact; noted in the code.
+- The gauge's arm label now carries index/recent_busts beside the two
+  real arms, so a sum-by-kind recording rule would mix them (fix-round
+  review): help text warns, no in-repo rule aggregates it; a separate
+  metric name is recorded as a 22 cleanup candidate.
+
+MUTATION RECORD (the rider QA section in phase-20-mutation-log.md): 23
+distinct new live mutants (7 independent spot-checks incl. one pg, 16
+fix-round pins incl. one pg, the ledger-overwrite reintroduction, and
+the flight-cleanup spin), ALL BIT (one by fatal red), 0 survivors; 93
+stale-verdict re-run events across three blocks (every mutant whose
+pinning suite or source region moved, re-run at the tip that moved it),
+all re-BIT, pg rows alone in their lane, every revert byte-identical.
+Rider cumulative 50 distinct live, 49 BIT, 1 green control; whole log
+391.
+
+SUITE GROWTH this round: woc_auth_guard_cache 20 to 29;
+auth_guard_bust_coverage 4 to 6 (interpolation ban + synthetic
+self-probes); woc_market_auth_guard_wiring 7 to 10; auth_guard_core 21 to
+24; game_metrics gauge test extended (exact-line, both arms, three
+soft-bound series); account_server 41 to 43 (direct-path parity); the
+authguard pg suite 13 tests (fixtures strengthened in place). The pg
+battery stays EIGHT suites, 254 tests, zero skips.
+
+VALIDATION at the tip (all fresh this session): npx tsc --noEmit clean
+after every fix commit; the EIGHT-suite pg battery 254 tests zero skips
+one lane at a time (61+66+40+34+10+11+19+13), clear field,
+TEST_DATABASE_URL on the command line only; the DB-free marketplace +
+auth + guard-adjacent battery 22 files 1267 tests; claudium canary +
+moderation/chat/quota set + S3 + monolith + architecture + suite-duration
+green (re-run after the fix rounds); npm run ci:changed exit 0 (warnings
+only); an intermediate full gate at 7b6e0badb0 PASSED ALL 12 STEPS
+(full-suite fallback, 42,998 tests + browser 131, TEST_DATABASE_URL on
+the command line only, no tail pipe);
+node scripts/gate_select.mjs on the committed tree at the FINAL code tip
+3e77e6f44e: PASS, ALL 12 STEPS green, full-suite fallback (the
+conservative fail-safe on this branch), 42,999 tests passed with the 2
+expected fails and 26 known skips across 3,014 files plus the env-gated
+perf-budget skip, browser regressions 131, typecheck and all builds
+green, malware scan PASS; TEST_DATABASE_URL on the command line only, no
+tail pipe, detached run with the exit code captured to a file (the
+full-suite fallback outlives the harness's 10-minute background cap).
+The docs commits on top of 3e77e6f44e are docs-only, the packet's
+recorded wrap pattern.
+
+MAINTAINER RULINGS RE-SURFACED (still open, not re-decided): the
+woc_market.ts ceiling raise (+53 across the escrow rider's two raises,
+net 4484 to 4036 DOWN); the woc_market_db.ts no-ratchet-row question
+(largest marketplace file at 4783); the escrow gate hold-ceiling SIZING
+(300s buys exactly one queued heavy save). None touched by this round.
+
+PUSHED per R4 after PASS: origin feature/woc-marketplace (code + packet
+docs); the throwaway worktree wocc-marketplace-authmut deleted after the
+campaign closed. NEXT =
+docs/woc-marketplace-hardening/phase-21-devnet-dry-run.md.

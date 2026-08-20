@@ -5,6 +5,49 @@ actually reads.
 
 ## Where we are
 
+- AUTH-GUARD READ CACHE RIDER QA COMPLETE (2026-08-20, GAME repo, verdict
+  PASS-WITH-FOLLOWUPS with every fix applied in-session, PUSHED per R4).
+  Audited f844a72eaa..e26c3ed9ec; this session's v0.40.0 re-sync was EMPTY
+  (tip 65b91fa190 still an ancestor). The audit gamed the discovery pin
+  with eight planted writer shapes (six red correctly; schema-qualified
+  and lowercase spellings EVADED and are now fixed + self-probed), attacked
+  the install veto with four interleavings (all held), re-proved seven
+  logged pins with independent strip designs, and reconciled every
+  registry count (zero drift). 34 findings: 25 APPLIED (fix 27262d293d +
+  test 7dd34268a8 + the re-reviewed second fix 7b6e0badb0, whose fresh
+  security lane EXECUTED a defeat of the first join guard: a second
+  same-account bust overwrote the single ledger slot and hid the bust
+  from the joiner's arrival-time comparison; the guard now refetches
+  joiners on ANY bust at-or-after flight start, and the once-per-flight
+  stale answer covers the flight creator only; + the qa-checklist round
+  3e77e6f44e: the joiner-termination pin, the join-veto refetch counter,
+  accessor fold-in, honesty fixes), 9 judged-declined with
+  reasons; headline fixes: the
+  post-bust JOIN race (a reader arriving after an account-keyed bust could
+  be answered from the pre-bust flight; closed with a content-keyed join
+  guard, the join half of the implement round's install veto), the
+  quadratic over-cap ledger prune (a measured ~73ms event-loop stall at
+  the 5,000-account resync fan-out; amortized to one walk, re-measured
+  0.8ms), TTL now anchored at fetch start, veto floor 80s (+10s headroom,
+  margin relation-pinned), discovery scan hardened (qualifier + case +
+  interpolation ban), soft-bounded internals (index, bust ledger) now on
+  stats/stuck readout/prometheus, rows frozen shallow, refusal matrix and
+  pg symmetric fixtures completed. Reviewer reality: 3 of 4 lanes
+  delivered FULL reports (security + hot-path measured the same stall
+  independently; the security lane executed the join race live); dbperf
+  silent after one nudge, that dimension carries the main thread's pass.
+  Mutation record: 23 new distinct mutants ALL BIT (one by fatal red) +
+  93 stale-verdict re-run events all re-BIT (rider cumulative 50 live /
+  49 BIT / 1 green control; whole log 391). Validation fresh: tsc clean, pg battery EIGHT
+  suites 254 tests zero skips one lane at a time, DB-free battery 22
+  files 1267 tests, claudium canary green, ci:changed exit 0, gate
+  result recorded in the progress.md QA section. THREE MAINTAINER
+  RULINGS remain OPEN (re-surfaced, not re-decided): the woc_market.ts
+  ceiling raise (+53, net 448 DOWN), the woc_market_db.ts no-ratchet-row
+  question (4783), and the escrow gate hold-ceiling sizing. The
+  wocc-marketplace-authmut throwaway worktree is DELETED. NEXT =
+  docs/woc-marketplace-hardening/phase-21-devnet-dry-run.md (GAME +
+  service repos, FRESH session, newest origin/release/** sync first).
 - AUTH-GUARD READ CACHE RIDER IMPLEMENT COMPLETE (2026-08-20, GAME repo,
   LOCAL per R4: nothing pushed; the rider QA session pushes on PASS).
   Session start f844a72eaa; the v0.40.0 sync was EMPTY (the release tip

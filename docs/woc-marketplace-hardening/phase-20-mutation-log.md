@@ -559,3 +559,144 @@ verdict at that tip:
 Auth-guard rider final totals: 27 distinct live mutants, 26 BIT, 1
 deliberate green control, 0 unexplained survivors. Whole log after this
 section: 368 distinct mutants.
+
+## Auth-guard rider QA section (run by the rider QA session)
+
+Same protocol as the header. Venue: the throwaway worktree
+wocc-marketplace-authmut, one serial lane; the pg rows ran ALONE with
+TEST_DATABASE_URL on the command line while no other authguard-suite process
+existed. The QA's independent spot-checks (the 20 protocol: the QA's OWN
+strip designs at DIFFERENT sites than the logged rows) ran first at the
+audited tip e26c3ed9ec; the QA fix round (27262d293d + 7dd34268a8) then
+edited most pinning suites, so every spot-check whose owning suite moved
+re-ran at 7dd34268a8 (all re-BIT), and the fix round's own pins earned
+their mutants at that tip.
+
+Independent spot-checks (own designs, different sites than the logged rows):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| qa_expiry_compute_frozen | BIT | auth_guard_core, woc_auth_guard_cache, token_scope_db | rider QA; expiresAtMs > nowMs frozen to > 0 (the compute keeps the shape but ignores the clock); re-run at 7dd34268a8, 4 red |
+| qa_scope_allowlist_widened | BIT | auth_guard_core, token_scope_db | rider QA; a phantom third scope 'admin' admitted past the allowlist, caught by the fail-closed it.each arm; re-run at 7dd34268a8 |
+| qa_join_cancelled_flight | BIT | woc_auth_guard_cache | rider QA; read() joins CANCELLED flights again, caught by the lost-bust post-bust-reader pin; re-run at 7dd34268a8 |
+| qa_veto_tie_flip | BIT | woc_auth_guard_cache | rider QA; the install veto's tie flipped to allow (bustAt <= startedAt installs), caught by the frozen-clock race pin; re-run at 7dd34268a8 |
+| qa_mute_bust_removed | BIT | auth_guard_bust_coverage | rider QA; muteAccountChat's bust removed (the logged rows removed moderateAccount's and revokeCompanionToken's); re-run at 7dd34268a8 |
+| qa_shutdown_flush_removed | BIT | woc_market_hot_reads | rider QA; the wocAuthGuardCache.bustAll() shutdown line removed, caught by the production-wiring source pin (suite unedited by the fix round; the e26c3ed9ec verdict stands) |
+| qa_readtoken_bust_removed | BIT | woc_market_authguard_pg_integration | rider QA; revokeReadToken's bust removed, caught by the real writer-to-bust chain (pg lane, ran alone); re-run at 7dd34268a8 |
+
+The QA round's discovery-scan probes (planted in the throwaway tree, each
+reverted byte-identical) proved the shipped classifier red on the hoisted
+module-scope SQL const (totality arm), the new-file writer, the buried
+projection column in a long SET list, the second accounts DELETE, the
+new-file upsert, and the class-method writer (attributed to the preceding
+function, the fail-loud backstop), and proved TWO evasions: a
+schema-qualified `public.auth_tokens` writer and a lowercase-keyword writer
+both left every test green. The fix round closed both (widened
+case-insensitive regexes plus synthetic-source self-probes) and banned the
+interpolated-table shape outright; the rows below pin the closures.
+
+Fix-round pins, each given the strip it exists to catch:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| qa_join_veto_strip | BIT | woc_auth_guard_cache | rider QA fix; the join re-check removed from read(), a post-bust arrival is answered from the pre-bust flight (the security lane's W1, executed live before the fix) |
+| qa_veto_permanent | BIT | woc_auth_guard_cache | rider QA fix; the install veto made a permanent per-account blacklist, caught by the fence-release pin (2 red) |
+| qa_ttl_anchor_late | BIT | woc_auth_guard_cache | rider QA fix; the entry TTL anchored at install time again, caught by the fetch-start anchor pin |
+| qa_prune_gate_strip | BIT | woc_auth_guard_cache | rider QA fix; the prune amortization gate removed (every over-cap bust walks), caught by the one-pass counter pin |
+| qa_retention_pass_strip | BIT | woc_auth_guard_cache | rider QA fix; the retention pass stops deleting, caught by the below-cap retention pin (2 red) |
+| qa_floor_margin_regressed | BIT | woc_auth_guard_cache | rider QA fix; MIN_AGE dropped back to the marginless 70_000, caught by the +5s headroom relation pin |
+| qa_scan_qualified_narrowed | BIT | auth_guard_bust_coverage | rider QA fix; the schema-qualifier arm stripped from the auth_tokens regex, caught by the synthetic-source probe |
+| qa_scan_case_narrowed | BIT | auth_guard_bust_coverage | rider QA fix; the i flag stripped from the auth_tokens regex, caught by the lowercase synthetic probe |
+| qa_scan_interp_table_neutered | BIT | auth_guard_bust_coverage | rider QA fix; INTERPOLATED_TABLE made never-match, caught by its positive controls |
+| qa_scan_interp_window_strip | BIT | auth_guard_bust_coverage | rider QA fix; the guard-table window's interpolation check removed, caught by the accounts_interpolated synthetic probe |
+| qa_gauge_softbound_series_strip | BIT | game_metrics | rider QA fix; the index/recent_busts series dropped from the prometheus collect |
+| qa_pg_companion_account_qual_strip | BIT | woc_market_authguard_pg_integration | rider QA fix; revokeCompanionToken's account qual neutered (OR TRUE), caught by the new same-prefix stranger survivor (pg lane, ran alone) |
+
+Stale-verdict re-runs (the fix round edited auth_guard_core,
+woc_auth_guard_cache, auth_guard_bust_coverage, woc_market_auth_guard_wiring,
+game_metrics, and the authguard pg suite, so every logged mutant scored
+against one of them re-ran at 7dd34268a8): auth_core_expiry_strip,
+auth_core_scope_allowlist_strip, auth_core_expiry_boundary_flip,
+auth_core_suspension_clock_strip, auth_core_ban_unlocked,
+auth_cache_negative_install_v2, auth_cache_lostbust_cancel_strip,
+auth_cache_ttl_ignored, auth_cache_dead_entry_kept,
+auth_cache_account_bust_tokens_strip, auth_cache_single_flight_strip,
+auth_veto_strip, auth_ledger_floor_pass_strip, auth_bust_token_as_flush,
+auth_ledger_floor_regressed, auth_flush_lever_gutted,
+auth_bust_revoke_companion_strip, auth_bust_moderate_account_strip,
+auth_scan_shadow_writer_planted, auth_scan_upsert_planted,
+auth_bust_above_commit, auth_wiring_override_precedence_flip,
+auth_gauge_series_strip (DB-free), and auth_pg_token_qual_strip (pg lane,
+alone): ALL 24 re-BIT, every revert byte-identical. The two rows whose
+owning suites the fix round left untouched (auth_wiring_readout_stat_strip,
+auth_listener_bust_strip, both woc_market_hot_reads) stand on their
+1f9f8aac4a verdicts.
+
+Rider QA totals: 19 distinct new live mutants (7 spot-checks + 12 fix-round
+pins), 19 BIT, 0 survivors, 0 controls; 24 stale-verdict re-runs all BIT.
+Rider cumulative: 46 distinct live mutants, 45 BIT, 1 deliberate green
+control. Whole log after this section: 387 distinct mutants.
+
+The QA round's own fix was re-reviewed FRESH (the fix-rounds-are-unreviewed
+rule) and the reviewer executed a DEFEAT of the first join guard: the veto
+ledger keeps only the LAST bust per account, so a second same-account bust
+landing after a joiner overwrote the timestamp the joiner's arrival-time
+comparison consulted, and the pre-bust row was accepted. The second fix
+(7b6e0badb0) widens the join guard to the install veto's own condition
+(any bust at or after flight start makes every joiner refetch; the recorded
+once-per-flight stale answer now covers the flight CREATOR only), deepens
+the install freeze one level, and pins both. Its rows, plus the third
+stale-verdict block (the cache suite was edited again, so every mutant it
+scores re-ran at 7b6e0badb0):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| qa_join_guard_lastbust_overwrite | BIT | woc_auth_guard_cache | rider QA fix 2; the joiner-arrival narrowing reintroduced (the defeated first-fix form), caught ONLY by the new double-bust interleaving pin (1 red) |
+| qa_freeze_strip | BIT | woc_auth_guard_cache | rider QA fix 2; the install freeze removed, caught by the isFrozen pin |
+
+Third stale-verdict block at 7b6e0badb0, all re-BIT, reverts byte-identical:
+qa_join_veto_strip (2 red: both join pins), qa_veto_permanent,
+qa_ttl_anchor_late, qa_prune_gate_strip, qa_retention_pass_strip,
+qa_floor_margin_regressed, auth_core_expiry_strip,
+auth_core_suspension_clock_strip, auth_core_ban_unlocked,
+auth_cache_negative_install_v2, auth_cache_lostbust_cancel_strip,
+auth_cache_ttl_ignored, auth_cache_dead_entry_kept,
+auth_cache_account_bust_tokens_strip, auth_cache_single_flight_strip,
+auth_veto_strip, auth_ledger_floor_pass_strip, auth_bust_token_as_flush,
+auth_ledger_floor_regressed, auth_flush_lever_gutted, and the spot-checks
+qa_expiry_compute_frozen, qa_join_cancelled_flight, qa_veto_tie_flip
+(23 re-runs). Rows owned by suites the second fix did not touch stand on
+their 7dd34268a8 verdicts.
+
+Rider QA final totals: 21 distinct new live mutants (7 spot-checks + 14
+fix-round pins, two of them pg), 21 BIT, 0 survivors, 0 controls; 47
+stale-verdict re-runs across the two fix rounds, all BIT. Rider
+cumulative: 48 distinct live mutants, 47 BIT, 1 deliberate green control.
+Whole log after this section: 389 distinct mutants.
+
+The qa-checklist round (verdict READY, 0 blocking) closed with commit
+3e77e6f44e: the joiner-termination pin (its adversarial pass named the
+unpinned invariant), the join-veto refetch counter with its gauge series,
+the accessor fold-in, and message/comment honesty fixes. Its rows, plus
+the FINAL stale-verdict block (the cache, discovery, metrics, and pg
+suites were edited again, and main.ts moved near the readout pin's
+region, so every mutant scored against any of them re-ran at 3e77e6f44e):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| qa_flight_cleanup_strip | BIT | woc_auth_guard_cache | qa-checklist round; the flight registration's settle cleanup disabled, the vetoed joiner re-joins the flight it just left and the suite dies FATALLY red (worker heap OOM from the promise spin the termination pin documents); a fatal red, not a survivor |
+| qa_gauge_joinveto_series_strip | BIT | game_metrics | qa-checklist round; the join_veto refetch series dropped from the prometheus collect |
+
+Final stale-verdict block at 3e77e6f44e, ALL re-BIT, reverts
+byte-identical: the 25 cache/core-scored rows (the round-two list plus
+qa_join_guard_lastbust_overwrite and qa_freeze_strip), the 10
+discovery-scan rows, the 2 gauge rows, auth_wiring_readout_stat_strip
+(main.ts region adjacent), and the 2 pg rows (alone in their lane).
+Three stale-verdict blocks across the QA's fix rounds total 93 re-run
+events, every one BIT.
+
+Rider QA closing totals: 23 distinct new live mutants (7 independent
+spot-checks + 16 fix-round pins, two pg among them), 23 BIT (one by
+fatal red), 0 survivors, 0 controls. Rider cumulative: 50 distinct live
+mutants, 49 BIT, 1 deliberate green control, 0 unexplained survivors.
+Whole log after this section: 391 distinct mutants.
