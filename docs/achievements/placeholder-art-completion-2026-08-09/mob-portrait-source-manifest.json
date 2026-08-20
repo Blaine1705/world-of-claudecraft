@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "600c81bb2fa34ae7c136c570194e9cbc25b1cb7f2e3215fb373b2e38c5a9d16e",
+  "rendererFingerprint": "af6b01ef2aa12fcae9216e15ad51ddcad2d316b69f1ff37eba42626e200bd2e9",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4243678,
-      "sha256": "c6f56cd36e6104d083fe8ddf2af6bbf148e98ec850ccbd6a39ce70ae2960f353",
+      "bytes": 4264591,
+      "sha256": "26af3be575885fd600d471370b9d101800cf493a4b3239e737436f13fecd1c64",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 233,
+  "portraitCount": 239,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -3126,6 +3126,176 @@
         "path": "public/ui/mobs/idol_guardian.webp",
         "bytes": 2874,
         "sha256": "db4c3aeca2ee36664c26627cd6007e02a6aa5f9d6acbf19e263516d1713b0a88"
+      }
+    },
+    {
+      "id": "ignivar_cinder_artificer",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d17936",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "7687c709bf5666500f0fe1b318445145d42491de4269f42b71d53823409169a0",
+      "output": {
+        "path": "public/ui/mobs/ignivar_cinder_artificer.webp",
+        "bytes": 2190,
+        "sha256": "f02d657588961464634d296cecd48be08b86df42c48d7856fb6c4e74728a7b90"
+      }
+    },
+    {
+      "id": "ignivar_crucible_warden",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7c4529",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "f96f6f69fc0d7e0f81a99edb47a297862e0570f014c1a501d3815978b4a33c99",
+      "output": {
+        "path": "public/ui/mobs/ignivar_crucible_warden.webp",
+        "bytes": 2082,
+        "sha256": "5525450c614bd597c7fd1c8a9a9f9e48943e1023a31c551bfaf07c8a77aafdaf"
+      }
+    },
+    {
+      "id": "ignivar_ember_sentinel",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#b94b23",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "f4798aace53358bc1d9903244ce56a5c1b68a07e16fed20c2142f55ef8368237",
+      "output": {
+        "path": "public/ui/mobs/ignivar_ember_sentinel.webp",
+        "bytes": 2186,
+        "sha256": "7408f220d75d042bd0973a8fbdc38415d263740109b66a7158382a047a54a55a"
+      }
+    },
+    {
+      "id": "ignivar_heart_of_the_end",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_ignivar_heart_of_the_end",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/ignivar_heart_of_the_end.glb",
+          "path": "public/models/creatures/ignivar_heart_of_the_end.glb",
+          "bytes": 666744,
+          "sha256": "3ff28f2bdb651aea141f089b50c0bc3c656b0c970e8c6a99ce43eba39c676a5e"
+        },
+        "idle": "Idle",
+        "height": 1.8,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "3239dbd8b4243000ad983722a8a16a445ef1ebef58ead3cf5bad93d85a422d07",
+      "output": {
+        "path": "public/ui/mobs/ignivar_heart_of_the_end.webp",
+        "bytes": 2438,
+        "sha256": "089fa11f753e31c667fd378644fcb68f22581ab9af7e404490da9ad54920bb6a"
+      }
+    },
+    {
+      "id": "ignivar_herald_of_the_last_flame",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_ignivar",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/ignivar_herald.glb",
+          "path": "public/models/creatures/ignivar_herald.glb",
+          "bytes": 1463912,
+          "sha256": "0d522fe4bb3346342c628d596197c4da8ec895c7d728e425ab6dfb9e4d0247bf"
+        },
+        "idle": "Idle",
+        "height": 2.65,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "c108d109f45326ad6a09a91f13991b30927d84a3273d5454e52118f9cad4f44f",
+      "output": {
+        "path": "public/ui/mobs/ignivar_herald_of_the_last_flame.webp",
+        "bytes": 2376,
+        "sha256": "7a8116dec1c4c652d1cd15d0e9e72f6a8fbde5ad9efdf584c959cb34e4e93bbc"
       }
     },
     {
@@ -7593,6 +7763,40 @@
         "path": "public/ui/mobs/varkas_boneguard.webp",
         "bytes": 2808,
         "sha256": "e1a7d259f30a5f0e75e47a401a9bc034270f1d265612dd1ec00a858130b61e4d"
+      }
+    },
+    {
+      "id": "varkhul_forgefather_of_the_last_flame",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9f351c",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "46572d8413620e403691945eb17b0c3634191b755ef2634db2c27c38823ea951",
+      "output": {
+        "path": "public/ui/mobs/varkhul_forgefather_of_the_last_flame.webp",
+        "bytes": 2168,
+        "sha256": "c7b79b636ba471798ca5d2ba063ec94267e93c38ce7c341b757b5c3c41a6a2fb"
       }
     },
     {

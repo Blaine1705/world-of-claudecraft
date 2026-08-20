@@ -15,6 +15,7 @@ import {
   syncIgnivarModelVfx,
 } from '../src/render/ignivar_model_vfx';
 import {
+  IGNIVAR_APOCALYPSE_ADD_ID,
   IGNIVAR_FORGE_WAVE_CAST_ID,
   IGNIVAR_FRONTAL_CAST_ID,
   IGNIVAR_ROTATING_RAYS_CAST_ID,
@@ -24,6 +25,10 @@ import { IGNIVAR_BOSS_ID } from '../src/sim/types';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/creatures/ignivar_herald.glb');
+const HEART_ASSET_PATH = path.join(
+  REPO_ROOT,
+  'public/models/creatures/ignivar_heart_of_the_end.glb',
+);
 const SHIPPED_CLIPS = [
   'Attack',
   'Channel',
@@ -38,6 +43,7 @@ const SHIPPED_CLIPS = [
   'Run',
   'Walk',
 ];
+const HEART_SHIPPED_CLIPS = ['Attack', 'Cast', 'Death', 'Hit', 'Idle', 'Jump', 'Run', 'Walk'];
 
 describe('Ignivar boss model', () => {
   it('routes the raid boss to the contributor Colossus and its authored clips', () => {
@@ -59,6 +65,98 @@ describe('Ignivar boss model', () => {
       },
     });
     expect(manifestUrls()).toContain('models/creatures/ignivar_herald.glb');
+  });
+
+  it('routes Heart of the End to its stationary automaton visual', () => {
+    const key = visualKeyFor({ kind: 'mob', templateId: IGNIVAR_APOCALYPSE_ADD_ID } as never);
+
+    expect(key).toBe('mob_ignivar_heart_of_the_end');
+    expect(VISUALS.mob_ignivar_heart_of_the_end).toMatchObject({
+      url: 'models/creatures/ignivar_heart_of_the_end.glb',
+      height: 1.8,
+      yaw: -Math.PI / 2,
+      selfIllumination: 0.16,
+      envMapIntensity: 1.3,
+      deathTimeScale: 3,
+      clips: {
+        idle: 'Idle',
+        cast: 'Cast',
+        death: 'Death',
+      },
+    });
+    expect(VISUALS.mob_ignivar_heart_of_the_end.clips?.hit).toBeUndefined();
+    expect(manifestUrls()).toContain('models/creatures/ignivar_heart_of_the_end.glb');
+  });
+
+  it('ships Heart of the End as a compressed rig with cast and death clips', async () => {
+    await MeshoptDecoder.ready;
+    const bytes = readFileSync(HEART_ASSET_PATH);
+    expect(bytes.byteLength).toBeLessThan(1_000_000);
+    expect(MEDIA_ASSETS['models/creatures/ignivar_heart_of_the_end.glb']).toBe(
+      '/media/models/creatures/ignivar_heart_of_the_end.3ff28f2bdb65.glb',
+    );
+
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const root = (await io.readBinary(bytes)).getRoot();
+    expect(bytes.toString('utf8')).toContain('EXT_meshopt_compression');
+    expect(bytes.toString('utf8')).toContain('KHR_texture_basisu');
+    expect(root.listSkins()).toHaveLength(1);
+    expect(root.listSkins()[0].listJoints()).toHaveLength(41);
+    expect(root.listTextures()).toHaveLength(3);
+    expect(root.listTextures().map((texture) => texture.getMimeType())).toEqual([
+      'image/ktx2',
+      'image/ktx2',
+      'image/ktx2',
+    ]);
+    expect(
+      root
+        .listAnimations()
+        .map((animation) => animation.getName())
+        .sort(),
+    ).toEqual([...HEART_SHIPPED_CLIPS].sort());
+
+    for (const clipName of ['Cast', 'Death']) {
+      const animation = root.listAnimations().find((clip) => clip.getName() === clipName);
+      expect(animation, `${clipName} clip`).toBeDefined();
+      expect(animation?.listChannels()).toHaveLength(126);
+      const samplers = animation?.listSamplers() ?? [];
+      expect(
+        samplers.reduce((count, sampler) => count + (sampler.getInput()?.getCount() ?? 0), 0),
+      ).toBeGreaterThan(1_500);
+      let duration = 0;
+      let maxPoseDelta = 0;
+      for (const sampler of samplers) {
+        const times = sampler.getInput()?.getArray() ?? [];
+        const values = sampler.getOutput()?.getArray() ?? [];
+        for (const time of times) duration = Math.max(duration, Number(time));
+        if (times.length === 0 || values.length === 0) continue;
+        const stride = values.length / times.length;
+        for (let offset = stride; offset < values.length; offset += stride) {
+          for (let component = 0; component < stride; component++) {
+            maxPoseDelta = Math.max(
+              maxPoseDelta,
+              Math.abs(Number(values[offset + component]) - Number(values[component])),
+            );
+          }
+        }
+      }
+      expect(duration).toBeGreaterThan(5);
+      expect(maxPoseDelta, `${clipName} must contain authored pose motion`).toBeGreaterThan(0.01);
+    }
+
+    const primitives = root.listMeshes().flatMap((mesh) => mesh.listPrimitives());
+    expect(primitives).toHaveLength(1);
+    expect(primitives[0].getMode()).toBe(Primitive.Mode.TRIANGLES);
+    expect(primitives[0].listSemantics().sort()).toEqual([
+      'JOINTS_0',
+      'NORMAL',
+      'POSITION',
+      'TEXCOORD_0',
+      'WEIGHTS_0',
+    ]);
+    expect((primitives[0].getIndices()?.getCount() ?? 0) / 3).toBeLessThanOrEqual(4_000);
   });
 
   it('applies its readability controls without mutating the source material', () => {

@@ -455,18 +455,6 @@ const TRIPO_BIPED_FULL_RIG: ClipMap = {
   jump: 'Jump',
 };
 
-// Expanded Ignivar raid bodies are finalized through the manual KayKit lane so
-// Varkhul keeps a calibrated handslot.r for his separate hammer. The asset wave
-// deliberately bakes only this compact encounter vocabulary.
-const IGNIVAR_FORGE_BIPED: ClipMap = {
-  idle: 'Idle',
-  walk: 'Walking_A',
-  run: 'Running_A',
-  attack: ['1H_Melee_Attack_Chop'],
-  death: 'Death_A',
-  cast: 'Spellcasting',
-};
-
 // The Vineclaw Stalker's own attack (scripts/build_wildheart_stalker_anims.mjs, issue
 // #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack is shared by reference across all 5
 // Wildheart Basin mobs. This clip is baked off wildheart_stalker.glb's own donor poses
@@ -723,6 +711,18 @@ const IGNIVAR: ClipMap = {
   death: 'Death',
   cast: 'Channel',
   flourish: 'FistSpin360',
+};
+
+// Heart of the End is stationary in the encounter. Its generated Hit clip stays
+// unmapped so raid damage cannot interrupt the sustained Apocalypse cast pose.
+const IGNIVAR_HEART: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  death: 'Death',
+  cast: 'Cast',
+  jump: 'Jump',
 };
 
 const SPIDER: ClipMap = {
@@ -2228,52 +2228,16 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 3.2,
     attackTimeScale: 1,
   },
-  mob_ignivar_ember_sentinel: {
-    url: `${CREATURES}/ignivar_ember_sentinel.glb`,
-    height: 2.7,
-    yaw: 0,
-    clips: IGNIVAR_FORGE_BIPED,
-    walkRef: 1.5,
-    runRef: 3,
-    lazyPreload: true,
-  },
-  mob_ignivar_crucible_warden: {
-    url: `${CREATURES}/ignivar_crucible_warden.glb`,
-    height: 3.15,
-    yaw: 0,
-    clips: IGNIVAR_FORGE_BIPED,
-    walkRef: 1.4,
-    runRef: 2.8,
-    lazyPreload: true,
-  },
-  mob_ignivar_cinder_artificer: {
-    url: `${CREATURES}/ignivar_cinder_artificer.glb`,
-    height: 2.8,
-    yaw: 0,
-    clips: IGNIVAR_FORGE_BIPED,
-    walkRef: 1.5,
-    runRef: 3,
-    lazyPreload: true,
-  },
-  mob_varkhul: {
-    url: `${CREATURES}/varkhul_forge_master.glb`,
-    height: 4,
-    yaw: 0,
-    clips: IGNIVAR_FORGE_BIPED,
-    attach: [
-      {
-        url: `${WEAPONS}/varkhul_warhammer.glb`,
-        bone: 'handslot.r',
-        position: [0, 0, 0],
-        rotationY: Math.PI,
-      },
-    ],
-    selfIllumination: 0.12,
-    envMapIntensity: 1.4,
-    walkRef: 1.6,
-    runRef: 3.2,
-    attackTimeScale: 1,
-    lazyPreload: true,
+  mob_ignivar_heart_of_the_end: {
+    url: `${CREATURES}/ignivar_heart_of_the_end.glb`,
+    height: 1.8,
+    // Tripo authored the rig facing +X; character visuals face +Z at world facing 0.
+    yaw: -Math.PI / 2,
+    selfIllumination: 0.16,
+    envMapIntensity: 1.3,
+    clips: IGNIVAR_HEART,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
   },
   mob_water_elemental: {
     url: `${CREATURES}/water_elemental.glb`,
@@ -3064,10 +3028,7 @@ for (const propSet of NPC_PROP_SET_IDS) {
 
 const MOB_KEYS: Record<string, string> = {
   [IGNIVAR_BOSS_ID]: 'mob_ignivar',
-  ignivar_ember_sentinel: 'mob_ignivar_ember_sentinel',
-  ignivar_crucible_warden: 'mob_ignivar_crucible_warden',
-  ignivar_cinder_artificer: 'mob_ignivar_cinder_artificer',
-  varkhul_forgefather_of_the_last_flame: 'mob_varkhul',
+  ignivar_heart_of_the_end: 'mob_ignivar_heart_of_the_end',
   wildheart_stalker: 'mob_wildheart_stalker',
   wildheart_ravager: 'mob_wildheart_ravager',
   wildheart_hexcaller: 'mob_wildheart_hexcaller',
