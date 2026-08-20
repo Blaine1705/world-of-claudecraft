@@ -361,6 +361,12 @@ export class WocAuthGuardCache {
     return this.indexSize;
   }
 
+  /** The recent-bust veto ledger's size (test-only: the soft bound has no
+   *  other observable). */
+  recentBustLedgerSizeForTests(): number {
+    return this.recentAccountBusts.size;
+  }
+
   private indexToken(token: string, accountId: number): void {
     let set = this.tokensByAccount.get(accountId);
     if (set === undefined) {

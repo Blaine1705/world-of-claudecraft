@@ -15,6 +15,9 @@ import {
   WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX,
   WOC_AUTH_GUARD_CACHE_TTL_MS,
   WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR,
+  WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS,
+  WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS,
+  WOC_AUTH_GUARD_RECENT_BUSTS_MAX,
   WOC_AUTH_GUARD_TOKEN_CACHE_MAX,
   WocAuthGuardCache,
   wocAuthGuardCacheStats,
@@ -377,6 +380,27 @@ describe('account-keyed bust and the token index', () => {
     // t2 refetches (bust dropped it) and re-answers from the store.
     await expect(r.cache.accountAndScopeForToken('t2')).resolves.not.toBeNull();
     expect(r.calls.token).toBe(beforeOther + 1);
+  });
+
+  it('bounds the recent-bust veto ledger under a burst, never dropping young entries', async () => {
+    const r = rig();
+    // A burst of distinct-account busts inside the min-age floor: nothing is
+    // provably dead, so the ledger may exceed the cap (the documented soft
+    // bound) rather than drop an entry a live flight could still need.
+    const burst = WOC_AUTH_GUARD_RECENT_BUSTS_MAX + 40;
+    for (let i = 1; i <= burst; i++) r.cache.bustAccount(i);
+    expect(r.cache.recentBustLedgerSizeForTests()).toBe(burst);
+    // Age the burst past the min-age floor (still inside retention): the
+    // next bust's prune drops oldest-first down to the cap.
+    r.advance(WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS + 1);
+    r.cache.bustAccount(burst + 1);
+    expect(r.cache.recentBustLedgerSizeForTests()).toBeLessThanOrEqual(
+      WOC_AUTH_GUARD_RECENT_BUSTS_MAX,
+    );
+    // And a young entry always survives the prune: the newest bust is there.
+    r.advance(WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS);
+    r.cache.bustAccount(burst + 2);
+    expect(r.cache.recentBustLedgerSizeForTests()).toBeGreaterThanOrEqual(1);
   });
 
   it('stays safe over eviction residue and sweeps the index at its bound', async () => {
