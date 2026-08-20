@@ -1674,6 +1674,7 @@ export const ko_KR: EnTranslations = {
           "render": "렌더  제출 {submit}밀리초 | 월드 {world}밀리초 | 엔티티 {entities}밀리초",
           "scene": "장면   호출 {calls}회 | 삼각형 {triangles}개 | 뷰 {views}개",
           "hitches": "끊김 {hitches} | 셰이더 {shaders} | 업로드 {uploads} | 뷰 {views}",
+          "hitchesBuild": "구역 빌드 {zoneBuilds} | 프레임 외부 {offFrame} | GC {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "대기 중"
         },
@@ -1725,7 +1726,10 @@ export const ko_KR: EnTranslations = {
             "eventCpu": "이벤트 처리가 프레임 시간을 사용합니다",
             "shaderCompile": "게임 중 셰이더가 컴파일되고 있습니다",
             "textureUpload": "텍스처 업로드가 게임 끊김을 일으킵니다",
+            "zoneBuild": "구역 스트리밍 빌드가 끊김을 일으킵니다",
             "viewCreate": "엔티티 뷰 생성이 끊김을 일으킵니다",
+            "gcHitch": "긴 프레임 안에서 가비지 컬렉션이 실행되고 있습니다",
+            "offFrameHitch": "긴 프레임은 렌더 콜백 외부의 작업에서 발생합니다",
             "otherHitch": "원인을 알 수 없는 긴 프레임이 남아 있습니다",
             "assetStartup": "에셋 작업이 게임 시작을 지연시킵니다",
             "longTasks": "브라우저의 긴 작업이 프레임을 막습니다",

@@ -5,11 +5,11 @@ import './styles/index.css';
 import { captureFirstTouch, registerAttributionPayload } from './attribution';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
-import { afterActiveAnimationMs } from './game/active_animation_timer';
 import {
   syncAppViewport as syncAppViewportShared,
   syncSettledAppViewport,
 } from './game/app_viewport';
+import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_warmup';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import {
@@ -146,7 +146,7 @@ import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
-import { presentationGate } from './game/presentation_gate';
+import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -166,11 +166,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import {
-  loadingCurtainFadeMs,
-  resolveUiEffectsProfile,
-  worldEntryGpuSettleCoverMs,
-} from './game/ui_effects_profile';
+import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { attachWocMarketExchange } from './game/woc_market_wiring';
@@ -284,10 +280,8 @@ import {
   inWorldLookFor,
 } from './render/characters/player_look_core';
 import {
-  onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
-  portraitsReady,
   resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
@@ -378,6 +372,7 @@ import {
   maybeShowFirstRunCameraPrompt,
 } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
+import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -3907,56 +3902,39 @@ async function startGame(
         });
       return;
     }
-    // A teleport-sized jump (rift exit, dungeon door, hearthstone) can land
-    // anywhere: keep the classic blocking loading screen instead of dropping
-    // the player into a not-yet-built void. The destination rectangle is only
-    // half of it, so the arrival NEIGHBOURHOOD streams behind the same screen
-    // on every such jump, not just a rift exit: landing near a zone border
-    // with the neighbour unprepared leaves the residency clamp holding the
-    // view at MIN_OUTDOOR_FOG_FAR long after the screen lifts.
+    // A teleport-sized jump (rift exit, dungeon door, hearthstone) can land anywhere:
+    // keep the classic blocking loading screen instead of dropping the player into a
+    // not-yet-built void. The destination rectangle is only half of it, so the arrival
+    // NEIGHBOURHOOD streams behind the same screen on every such jump, not just a rift
+    // exit: a border landing with the neighbour unprepared leaves the fog clamp held.
     const resumeInput = gameInputReady;
     gameInputReady = false;
-    showLoadingScreen(t('loading.world'));
-    zoneWarmup = nextPaint()
-      .then(() =>
-        renderer.prepareZoneAt(zoneX, zoneZ, (done, total) =>
-          setLoadingProgressRange(done, total, 0, 55),
-        ),
-      )
-      .then(() =>
-        renderer.prepareZonesAround(
-          zoneX,
-          zoneZ,
-          riftExit ? RIFT_EXIT_STREAM_RADIUS : ARRIVAL_NEIGHBOR_STREAM_RADIUS,
-          (done, total) => setLoadingProgressRange(done, total, 55, 94),
-        ),
-      )
-      // An arrival with no overworld neighbourhood at all (a dungeon or rift
-      // interior, 99k yards off the strip) reports no progress above, so fill
-      // the band explicitly rather than letting the bar sit at 55.
-      .then(() => setLoadingProgressRange(1, 1, 55, 94))
-      .then(async () => {
-        setLoadingPercent(96, t('loading.enteringWorld'));
-        try {
-          await renderer.prewarmZoneAt(zoneX, zoneZ);
-        } catch (err) {
-          console.warn('Zone shader prewarm failed', err);
-        }
-      })
-      .then(() => setLoadingPercent(100, t('loading.enteringWorld')))
-      .then(nextPaint)
-      .then(() => {
-        hideLoadingScreen();
+    zoneWarmup = runBlockingArrivalWarmup({
+      renderer,
+      holdWorldDraw: gateInput.holdWorldDraw,
+      ui: {
+        showLoadingScreen,
+        setLoadingProgressRange,
+        setLoadingPercent,
+        hideLoadingScreen,
+        nextPaint,
+        fatalOverlay,
+      },
+      t,
+      technicalErrorMessage,
+      zoneX,
+      zoneZ,
+      online: online !== null,
+      neighborRadiusYd: riftExit ? RIFT_EXIT_STREAM_RADIUS : ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+      onRevealed: () => {
         gameInputReady = resumeInput;
         last = performance.now();
         acc = 0;
-      })
-      .catch((err) => {
-        fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
-      })
-      .finally(() => {
+      },
+      onSettled: () => {
         zoneWarmup = null;
-      });
+      },
+    });
   };
 
   // Camera follow state: keyboard turning advances facing in 20Hz sim steps,
@@ -4333,7 +4311,7 @@ async function startGame(
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
-  const gateInput = { hidden: false, desktopApp: DESKTOP_APP, graphicsRebuildPaused: false };
+  const gateInput = newPresentationGateInput(DESKTOP_APP);
   function frame(now: number): void {
     requestAnimationFrame(frame);
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
@@ -4535,12 +4513,13 @@ async function startGame(
         movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
-      // A hidden frame skips the draw, so timing it would dilute the renderer
-      // bucket with work that never happened.
+      // A hidden frame's draw is not timed (it never ran); the world draw is
+      // re-read here: maybeWarmCurrentZone above may have held it this frame.
       const rendererStart = gate.render ? perf.startTime() : 0;
+      const drawWorld = presentationGate(gateInput).drawWorld;
       traceStart = perf.startTrace();
       try {
-        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, gate.render);
+        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, drawWorld);
       } finally {
         perf.finishTrace(
           'renderer.sync',
@@ -4774,9 +4753,8 @@ async function startGame(
     // and the reticle is only consumed by the skipped draw (phase 4 QA F7).
     if (gate.render) syncGroundAimReticle();
     const onlineViews = renderer.views.size;
-    // A hidden frame skips the draw, so timing it would dilute the renderer
-    // bucket with work that never happened.
     const rendererStart = gate.render ? perf.startTime() : 0;
+    const drawWorld = presentationGate(gateInput).drawWorld;
     traceStart = perf.startTrace();
     try {
       renderer.sync(
@@ -4790,7 +4768,7 @@ async function startGame(
         adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
         selfMotion,
         selfAuthoritativeDiscontinuity,
-        gate.render,
+        drawWorld,
       );
     } finally {
       perf.finishTrace(
@@ -5206,14 +5184,12 @@ async function startGame(
           }
         }, loadingCurtainFadeDelayMs());
       };
-      afterActiveAnimationMs(
-        worldEntryGpuSettleCoverMs({
-          adaptiveBudget: GFX.autoGovernor,
-          constrainedMemory: GFX.constrainedMemory,
-          online: online !== null,
-        }),
+      settleWorldEntryCover({
+        adaptiveBudget: GFX.autoGovernor,
+        constrainedMemory: GFX.constrainedMemory,
+        online: online !== null,
         revealWorld,
-      );
+      });
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).
@@ -6778,6 +6754,7 @@ async function refreshCharacters(): Promise<void> {
     if (chars.some((c) => c.skinCatalog === 'mech')) void preloadMechAssets();
     if (api.realm) $('#charselect-realm').textContent = api.realm;
     listEl.innerHTML = '';
+    resetComposedRows();
     // Boot resume: a WebView reload during play sent us here with a persisted
     // active-play marker. If that character still exists on the marker's realm,
     // re-enter the world directly instead of showing char-select (a linkdead
@@ -6836,23 +6813,10 @@ async function refreshCharacters(): Promise<void> {
           look: charselectLook(c),
           catalog: c.skinCatalog ?? 'class',
         });
-      // A composed chip cannot hydrate from data attributes, so a row built
-      // before the portrait renderer is ready re-renders its own chip once the
-      // assets land (the crest placeholder shows until then).
-      if (charselectLook(c) && !portraitsReady()) {
-        onPortraitsReady(() => {
-          const chip = row.querySelector('.portrait-chip[data-portrait-composed]');
-          if (!chip?.isConnected) return;
-          chip.outerHTML = chipHtml();
-          // The module-scope onPortraitsReady listener in portrait_chip.ts
-          // (which arms crest-image fallbacks document-wide) is registered
-          // at import time, before this per-row callback, so it already ran
-          // by the time the swap above lands new elements in the DOM. Re-arm
-          // this row's fresh badge/portrait img explicitly, or a blocked or
-          // missing crest asset on it never falls back.
-          hydratePortraits(row);
-        });
-      }
+      // A composed chip cannot hydrate from data attributes, so the row
+      // repaints its own chip once the assets land and again once the composed
+      // capture behind it lands (the crest shows until then).
+      if (charselectLook(c)) trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));
       row.innerHTML = `${chipHtml()}
         <div class="char-id">
           <span class="char-name">${escapeHtml(c.name)}</span>

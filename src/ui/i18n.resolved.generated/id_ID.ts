@@ -1674,6 +1674,7 @@ export const id_ID: EnTranslations = {
           "render": "render  kirim {submit} ms | dunia {world} ms | entitas {entities} ms",
           "scene": "adegan   {calls} panggilan | {triangles} tris | {views} tampilan",
           "hitches": "tersendat {hitches} | shader {shaders} | unggahan {uploads} | tampilan {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "menunggu"
         },
@@ -1725,7 +1726,10 @@ export const id_ID: EnTranslations = {
             "eventCpu": "Pemrosesan event menghabiskan bingkai",
             "shaderCompile": "Shader sedang dikompilasi selama permainan",
             "textureUpload": "Unggahan tekstur menyebabkan tersendat dalam permainan",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Pembuatan tampilan entitas menyebabkan tersendat",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Bingkai panjang yang tak teratribusi masih tersisa",
             "assetStartup": "Startup permainan tertunda oleh pekerjaan aset",
             "longTasks": "Tugas peramban yang panjang memblokir bingkai",

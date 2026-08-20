@@ -1674,6 +1674,7 @@ export const pt_BR: EnTranslations = {
           "render": "render  envio {submit} ms | mundo {world} ms | entidades {entities} ms",
           "scene": "cena    {calls} chamadas | {triangles} tris | {views} visualizações",
           "hitches": "travamentos {hitches} | shaders {shaders} | envios {uploads} | visualizações {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "aguardando"
         },
@@ -1725,7 +1726,10 @@ export const pt_BR: EnTranslations = {
             "eventCpu": "O processamento de eventos está consumindo o quadro",
             "shaderCompile": "Shaders estão sendo compilados durante o jogo",
             "textureUpload": "Os carregamentos de texturas estão causando travamentos no jogo",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "A criação de visualizações de entidades está causando travamentos",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Ainda restam quadros longos não atribuídos",
             "assetStartup": "A inicialização do jogo está sendo atrasada pelo carregamento de recursos",
             "longTasks": "Tarefas longas do navegador estão bloqueando quadros",

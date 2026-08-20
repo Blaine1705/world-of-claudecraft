@@ -1674,6 +1674,7 @@ export const de_DE: EnTranslations = {
           "render": "Render  Submit {submit} ms | Welt {world} ms | Entitäten {entities} ms",
           "scene": "Szene   {calls} Aufrufe | {triangles} Tris | {views} Ansichten",
           "hitches": "Ruckler {hitches} | Shader {shaders} | Uploads {uploads} | Ansichten {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "wartet"
         },
@@ -1725,7 +1726,10 @@ export const de_DE: EnTranslations = {
             "eventCpu": "Die Ereignisverarbeitung beansprucht den Frame",
             "shaderCompile": "Shader werden während des Spiels kompiliert",
             "textureUpload": "Textur-Uploads verursachen Spielruckler",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Die Erstellung von Entitäts-Ansichten verursacht Ruckler",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Nicht zugeordnete lange Frames bleiben bestehen",
             "assetStartup": "Der Spielstart wird durch Asset-Arbeit verzögert",
             "longTasks": "Lange Browser-Aufgaben blockieren Frames",

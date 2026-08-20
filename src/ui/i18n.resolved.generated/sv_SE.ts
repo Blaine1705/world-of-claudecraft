@@ -1674,6 +1674,7 @@ export const sv_SE: EnTranslations = {
           "render": "render  inskickning {submit} ms | värld {world} ms | entiteter {entities} ms",
           "scene": "scen    {calls} anrop | {triangles} tri | {views} vyer",
           "hitches": "hack    {hitches} | shaders {shaders} | uppladdningar {uploads} | vyer {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "väntar"
         },
@@ -1725,7 +1726,10 @@ export const sv_SE: EnTranslations = {
             "eventCpu": "Händelsehantering förbrukar bildtiden",
             "shaderCompile": "Shaders kompileras under spelets gång",
             "textureUpload": "Texturuppladdningar orsakar hack i spelet",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Skapande av entitetsvyer orsakar hack",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Otillskrivna långa bilder kvarstår",
             "assetStartup": "Speluppstarten fördröjs av resursarbete",
             "longTasks": "Långa webbläsaruppgifter blockerar bilder",

@@ -12979,6 +12979,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图',
   'hudChrome.perf.diagnostics.metrics.hitches':
     '卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild': '区域构建 {zoneBuilds} | 帧外 {offFrame} | 垃圾回收 {gc}',
   'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
   'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
   'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
@@ -13021,7 +13022,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件处理占用帧时间',
   'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '游戏过程中正在编译着色器',
   'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '纹理上传导致游戏卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild': '区域流式构建导致卡顿',
   'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '实体视图创建导致卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch': '垃圾回收正在长帧内运行',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch': '长帧来自渲染回调之外的工作',
   'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未归因的长帧',
   'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '资源处理延迟了游戏启动',
   'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '浏览器长任务正在阻塞帧',

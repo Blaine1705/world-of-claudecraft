@@ -1674,6 +1674,7 @@ export const nl_NL: EnTranslations = {
           "render": "render  submit {submit} ms | wereld {world} ms | entiteiten {entities} ms",
           "scene": "scène   {calls} calls | {triangles} tris | {views} weergaven",
           "hitches": "haperingen {hitches} | shaders {shaders} | uploads {uploads} | weergaven {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "wachtend"
         },
@@ -1725,7 +1726,10 @@ export const nl_NL: EnTranslations = {
             "eventCpu": "Gebeurtenisverwerking verbruikt het frame",
             "shaderCompile": "Shaders worden gecompileerd tijdens het spelen",
             "textureUpload": "Textuur-uploads veroorzaken haperingen tijdens het spelen",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Het aanmaken van entiteitweergaven veroorzaakt haperingen",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Er blijven niet-toegewezen lange frames over",
             "assetStartup": "Het opstarten van het spel wordt vertraagd door assetwerk",
             "longTasks": "Lange browsertaken blokkeren frames",
