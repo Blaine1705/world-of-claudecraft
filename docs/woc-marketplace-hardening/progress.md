@@ -5806,21 +5806,36 @@ DELIVERABLES vs the spec, all seven landed:
 REVIEWS. Four read-only lanes dispatched via plain Agent
 (privacy-security-review, server-hot-path-reviewer,
 database-performance-reviewer, test-coverage-auditor), all prompted for
-coverage with the final-message delivery wording, all four completed with
-narration-only output (14 to 34 tool calls each), nudged once per the
-one-retry cap. Recorded honestly per the delivery protocol: any late report
-is folded in below if it arrived before the wrap; otherwise the four
-dimensions carry the MAIN THREAD'S OWN passes this round: the security probe
-(bust placement post-COMMIT at every transactional writer verified with
-files open, the repopulation race closed by the in-flight cancel, no
-negative caching, the admin boundary held by wiring AND behavior), the
-hot-path probe (hit path is map ops plus the same verdict allocation the
-direct path made; flights and index bounded; the per-message quota consume
-deliberately never busts), the db probe (the probe SQL keeps its
-primary-key point-read shape with one added column; the four pools the pg
-suite opens all close), and the coverage probe (which found and fixed the
-two fix-round items: the discovery window truncation hole and the
-decorative greater-or-equal tail).
+coverage. All four first completed with narration-only output (14 to 34
+tool calls each) and ALL FOUR DELIVERED FULL REPORTS after one nudge each
+(the 2026-08-11 pattern, not the zero-delivery one), the dbperf lane with
+measured plan evidence and a runtime proof. The MAIN THREAD independently
+found the round's one substantive defect BEFORE the reports landed and two
+lanes then proved the same race live: an ACCOUNT-keyed bust could not
+cancel an in-flight token fetch (nothing is indexed until install), so a
+revocation sweep could be outrun by an install of the pre-delete row and a
+revoked token could answer for one TTL in the SAME process, against the
+contract. Fixed with a content-keyed install veto (the row's account
+checked against a recent-bust ledger at install time; a stranger's racing
+fetch still installs), plus the ledger's two-pass soft-bounded prune the
+dbperf lane's probe demanded. Every other finding applied in the same
+round: shutdown flushes but keeps the singleton armed (the W2 reboot
+shape), LRU caps re-sized against the 5,000-player realm admission cap
+(the 1,024 figure sat under the working set and LRU degrades as a cliff),
+an alertable prometheus gauge for both arms, the quota NOTIFY listener now
+busts the guard cache (closing the cross-process gap for the policy
+columns), the discovery classifier gained the accounts-upsert arm,
+schema-qualified names, a statement-bounded window, non-exported function
+heads, and a structural bust-after-last-COMMIT pin, the keyed busts are
+proven keyed by stranger survivors on every arm, the wiring suite proves
+the 403 bodies and the per-request staff re-read, the pg suite pins a long
+TTL with a raw-SQL warm-stale control (every bust proof decisive by
+construction, never by wall-clock accident) and covers revokeReadToken
+plus the four audited moderation writers, and the TTL docblock's win claim
+was replaced with the measured per-surface factors (3x trade window, 2x
+idle Exchange, 4x awaiting chain). Fix commits 98813d67a2 and 02108093eb;
+the fix round's own code carries its own mutants and the edited pins'
+verdicts were re-run (the mutation log's review-round block).
 
 JUDGED this round (binding; do NOT re-raise):
 - Pre-bust in-flight joiners can receive the pre-revocation answer ONCE
@@ -5846,29 +5861,74 @@ JUDGED this round (binding; do NOT re-raise):
   1024 production constant (deriving a 1024-entry fixture would be pure
   runtime); the production values are exact-pinned with the TTL scrape pin,
   and the index-sweep fixture DERIVES from WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR.
-- Cross-process staleness stays the recorded 17 acceptance (TTL 5s ceiling);
-  the LISTEN/NOTIFY bust channel the quota module models is the recorded
-  option for 22's pre-enable audit, not this rider's scope.
+- Cross-process staleness stays the recorded 17 acceptance (TTL 5s ceiling)
+  for every projection column EXCEPT the chat-quota policy pair, whose
+  existing NOTIFY channel now busts the guard cache in every process at
+  zero cost (the dbperf lane's suggestion, adopted); a NOTIFY channel for
+  bans/revocations remains the recorded option for 22's pre-enable audit.
+- The stats shape stays the five-counter WocMarketReadCache form (reads,
+  refreshes, evictions, busts, entries), not the spec's hits/misses
+  wording: refreshes IS the residual DB query rate, reads minus refreshes
+  approximates hits (a flight joiner counts as neither), and matching the
+  sibling caches keeps the readout comparable (dbperf P2, judged).
+- Post-COMMIT placement is uniform in DISCIPLINE, not in shape: four
+  transactional writers bust after the finally, two after COMMIT inside the
+  try (matching the bustDiscordStatus precedent at the same site); the
+  structural pin holds bust-after-last-COMMIT for every shape (dbperf P2,
+  recorded).
+- The companion-token surface has no per-account mint cap, so a determined
+  authenticated account can thrash the token arm back to the uncached
+  baseline (never past it, never wrongly): the evictions counter and gauge
+  are the signal; the mint-cap fix belongs to the account surface and is
+  recorded for 22's pre-enable audit (hot-path P2, judged).
+- The invalid-bearer probe floor stays: a well-formed unknown 64-hex bearer
+  still costs one unmetered point read per request (the guard runs before
+  the limiter, and negative caching is refused on purpose); the cache
+  relieves authenticated repeat callers only. Recorded so no reader
+  assumes the floor is gone (hot-path F4).
+- The guardDb thunk keeps the runtime-injection shape rather than resolving
+  through the module singleton getter (the dbperf alternative): injection
+  preserves rig isolation (no test pays for wiring it never asked for),
+  and the shutdown bustAll-keep-armed fix closes the consistency hole the
+  getter would have closed, without coupling the routes to the cache
+  module (judged).
+- The cap env knobs the hot-path lane suggested stay code constants per
+  the escrow rider's convention (prefer constants unless an operator
+  genuinely needs the knob); 22's pre-enable audit re-judges with the
+  gauge data in hand.
+- The hot-path lane's micro-allocation nits (the seed promise on a miss,
+  the second now() per verdict, the Date copy in the fetcher) are declined
+  with reasons: each is semantically necessary or noise against the two
+  round-trips the hit removes; recorded here so they are not re-raised.
 
 VALUES REGISTRY (the rider QA re-judges): WOC_AUTH_GUARD_CACHE_TTL_MS 5_000
-(scrape-pinned to the docblock's "5 seconds"; the ONE accepted staleness,
-cross-process); WOC_AUTH_GUARD_TOKEN_CACHE_MAX 1_024;
-WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX 1_024; WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR 4
-(index residue bound 4x the token cap, swept amortized); guard precedence
+(scrape-pinned to its own docblock, anchored; the ONE accepted staleness,
+cross-process, except the quota policy columns which the NOTIFY listener
+busts across processes); WOC_AUTH_GUARD_TOKEN_CACHE_MAX 10_240 and
+WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX 5_120 (re-sized in the review round
+against the 5,000-player realm admission cap, relation-pinned: tokens above
+accounts, accounts at or above the realm cap);
+WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR 4 (index residue bound 4x the token cap,
+swept amortized); WOC_AUTH_GUARD_RECENT_BUSTS_MAX 512 with
+RETENTION_MS 60_000 and MIN_AGE_MS 20_000 (the veto ledger's soft bound:
+never drop an entry younger than the fetch deadline); guard precedence
 override > runtime cache > direct reads; bust vocabulary
-bustWocAuthGuardToken / bustWocAuthGuardAccount / bustWocAuthGuardAll;
-the discovery reconciliation 20 statements in 16 functions across 5 files
-with exactly 1 accounts-DELETE exemption (federated provision-race loser);
-the import boundary exactly {chat_filter_db, db, general_chat_quota_db,
-main, moderation_db}.
+bustWocAuthGuardToken / bustWocAuthGuardAccount / bustWocAuthGuardAll (the
+flush lever the review round restored); the prometheus gauge
+woc_auth_guard_cache{arm,kind} zero-backfilled; shutdown = bustAll, never
+reset (the singleton stays armed); the discovery reconciliation 20
+statements in 16 functions across 5 files with exactly 1 accounts-DELETE
+exemption (federated provision-race loser); the import boundary exactly
+{chat_filter_db, db, general_chat_quota_db, http/game_metrics, main,
+moderation_db}.
 
-MUTATION RECORD (the auth-guard rider section in phase-20-mutation-log.md):
-18 distinct mutants, 17 BIT, 1 deliberate green control, 0 unexplained
-survivors; the one pg mutant (the token qual strip) ran alone in its own
-lane. Fix-round stale-verdict re-runs: auth_cache_ttl_ignored,
-auth_bust_revoke_companion_strip, auth_bust_moderate_account_strip, and
-auth_scan_shadow_writer_planted re-run at the fix-round tip f0dc5f48d1, all
-four BIT again. Whole log 359 distinct mutants.
+MUTATION RECORD (the auth-guard rider section in phase-20-mutation-log.md,
+including the review-round block): 25 distinct live mutants, 24 BIT, 1
+deliberate green control, 0 unexplained survivors; one superseded row
+(the negative-install strip, its region rewritten by the veto fix, retired
+for its v2); the one pg mutant (the token qual strip) ran alone in its own
+lane; every stale verdict re-run after its source or pin moved (two
+re-verification blocks). Whole log 366 distinct mutants.
 
 SUITE GROWTH: NEW auth_guard_core (21), woc_auth_guard_cache (17),
 auth_guard_bust_coverage (4), woc_market_auth_guard_wiring (5), and the

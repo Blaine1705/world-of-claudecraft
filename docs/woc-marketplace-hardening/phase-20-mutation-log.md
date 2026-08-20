@@ -514,3 +514,34 @@ every mutant scored against an edited pin re-ran at that tip):
 Auth-guard rider totals stand: 18 distinct live mutants, 17 BIT, 1 green
 control; 4 stale-verdict re-runs all BIT. Whole log unchanged at 359
 distinct mutants.
+
+The review round's fix commits (98813d67a2 the four-lane findings,
+02108093eb the ledger pin) rewrote the install condition and edited most of
+the pinning suites, so the affected verdicts re-ran at 02108093eb and the
+round's own code earned its mutants:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| auth_veto_strip | BIT | woc_auth_guard_cache | review fix round; the install veto removed, the account-bust race test reds |
+| auth_ledger_floor_pass_strip | BIT | woc_auth_guard_cache | review fix round; the prune's oldest-first cap pass removed, the burst pin reds |
+| auth_bust_token_as_flush | BIT | woc_auth_guard_cache | review fix round; bustToken widened to a flush, the stranger-survivor pin reds |
+| auth_scan_upsert_planted | BIT | auth_guard_bust_coverage | review fix round; an unbusted INSERT INTO accounts ON CONFLICT DO UPDATE SET banned_at writer planted, the upsert arm discovers it |
+| auth_bust_above_commit | BIT | auth_guard_bust_coverage | review fix round; a bust hoisted above its COMMIT, the structural order pin reds |
+| auth_gauge_series_strip | BIT | game_metrics | review fix round; the entries series dropped from the prometheus gauge |
+| auth_listener_bust_strip | BIT | woc_market_hot_reads | review fix round; the quota listener's onChange bust removed, the count-2 wiring pin reds |
+| auth_cache_negative_install_v2 | BIT | woc_auth_guard_cache | review fix round; supersedes auth_cache_negative_install (its region was rewritten by the veto fix); 7 tests red |
+| auth_cache_lostbust_cancel_strip | BIT | woc_auth_guard_cache | RE-RUN at 02108093eb |
+| auth_cache_ttl_ignored | BIT | woc_auth_guard_cache | RE-RUN at 02108093eb; 3 tests red |
+| auth_cache_dead_entry_kept | BIT | woc_auth_guard_cache | RE-RUN at 02108093eb |
+| auth_cache_account_bust_tokens_strip | BIT | woc_auth_guard_cache | RE-RUN at 02108093eb; 2 tests red |
+| auth_cache_single_flight_strip | BIT | woc_auth_guard_cache | RE-RUN at 02108093eb |
+| auth_bust_revoke_companion_strip | BIT | auth_guard_bust_coverage | RE-RUN at 02108093eb |
+| auth_bust_moderate_account_strip | BIT | auth_guard_bust_coverage | RE-RUN at 02108093eb |
+| auth_scan_shadow_writer_planted | BIT | auth_guard_bust_coverage | RE-RUN at 02108093eb |
+| auth_wiring_override_precedence_flip | BIT | woc_market_auth_guard_wiring | RE-RUN at 02108093eb |
+
+Auth-guard rider totals after the review round: 25 distinct live mutants
+(18 original, minus the superseded negative-install row, plus its v2, plus
+the seven review-round mutants), 24 BIT, 1 deliberate green control, 0
+unexplained survivors; every stale verdict re-run after its source or pin
+moved. Whole log after this section: 366 distinct mutants.

@@ -28,15 +28,26 @@ actually reads.
   reconciliation, one reasoned DELETE exemption, the import-boundary
   equality), the EIGHTH pg suite (wocc_woc_market_authguard_verify, 11
   tests, real writer-to-bust chains, self-selects into the gate floor), and
-  docs/registry. Reviewer reality: four lanes dispatched, four
-  narration-only completions, nudged once each; the four dimensions carry
-  the main thread's own passes (which found and fixed the discovery-window
-  truncation hole and a decorative assert). Mutation record: 18 distinct,
-  17 BIT, 1 green control, 4 stale-verdict re-runs BIT (auth-guard rider
-  section in phase-20-mutation-log.md; whole log 359). Validation at the
-  tip: tsc clean; pg battery EIGHT suites 252 tests zero skips one lane at
-  a time; DB-free marketplace 850 + guard-adjacent 1012 + moderation set 68;
-  S3/monolith/architecture/suite-duration green; ci:changed exit 0; gate
+  docs/registry. Reviewer reality: four lanes dispatched, four full
+  reports delivered after one nudge each; the MAIN THREAD found the
+  round's one substantive defect first and two lanes proved the same race
+  live (an account-keyed bust could not cancel an in-flight token fetch,
+  so a revoked token could install and answer for one TTL in-process).
+  The review fix round (98813d67a2, 02108093eb) closed it with a
+  content-keyed install veto plus a soft-bounded recent-bust ledger, and
+  applied every other finding: shutdown flushes but keeps the singleton
+  armed, caps re-sized to 10_240/5_120 against the 5,000-player realm cap,
+  the woc_auth_guard_cache{arm,kind} prometheus gauge, quota NOTIFY
+  listener busts (cross-process for the policy columns), the discovery
+  classifier's upsert arm + statement-bounded window + bust-after-COMMIT
+  structural pin, keyed-bust stranger survivors on every arm, the 403
+  bodies over the cached bundle, and the pg suite's long-TTL rig with a
+  raw-SQL warm-stale control plus revokeReadToken and the four audited
+  moderation writers. Mutation record: 25 distinct live, 24 BIT, 1 green
+  control, every stale verdict re-run (whole log 366). Validation at the
+  tip: tsc clean; pg battery EIGHT suites 254 tests zero skips one lane at
+  a time; DB-free marketplace 850 + guard-adjacent and new suites; S3 /
+  monolith / architecture / suite-duration green; ci:changed exit 0; gate
   run recorded in the progress.md registry's final note. THREE MAINTAINER
   RULINGS remain OPEN (re-surfaced, not re-decided): the woc_market.ts
   ceiling raise (+53, net 448 DOWN), the woc_market_db.ts no-ratchet-row
