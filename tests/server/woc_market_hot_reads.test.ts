@@ -1193,10 +1193,11 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // The drain rung's wiring: shutdown calls markDraining() first, and the
     // service reads the health flag live through this thunk.
     expect(code).toContain('draining: () => !isReady()');
-    // The realm-gate pre-check reads the LIVE stats (a captured boolean
-    // would freeze saturation at boot), and the gauge source feeds the
-    // exported occupancy metric off the same instance.
-    expect(code).toContain('escrowSaturated: () => {');
+    // The realm-gate pre-check rides the gate's RECLAIMING probe (a bare
+    // stats read makes a full wedge's saturation permanent: the fix-round
+    // review's blocking find), and the gauge source feeds the exported
+    // occupancy metric off the same instance.
+    expect(code).toContain('escrowSaturated: () => wocEscrowGate.saturated()');
     expect(code).toContain('escrowGateInFlight: () => wocEscrowGate.stats().inFlight');
     // The stamp-ledger crossing counter rides the readout beside the
     // serialize stats.

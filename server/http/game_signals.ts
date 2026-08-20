@@ -176,9 +176,11 @@ export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
  *  outcome. NOTE the wedge arithmetic: 'started' is a strict SUBSET of the
  *  sequences that settle (a deadline, depth-passed flush failure, or
  *  books-dirty refusal settles without starting), so started-minus-settled
- *  trends negative; the computable in-flight form is (started +
- *  flush_failed + books_dirty_refused + deadline_refused) - settled, and
- *  the gate's own stats on the ops readout are the instantaneous truth.
+ *  trends negative; (started + flush_failed + books_dirty_refused +
+ *  deadline_refused) - settled APPROXIMATES in-flight (a deadline-cancelled
+ *  sequence whose flush then rejects books two entered kinds, drifting the
+ *  difference by one per occurrence), and the gate's own stats on the ops
+ *  readout are the instantaneous truth.
  *  'grant_busy' is the delivered-save twin's head-of-line park (the
  *  bounded grant entry found the buyer's FIFO wedged past the deadline and
  *  the delivery row parked): the one failure mode the FIFO close

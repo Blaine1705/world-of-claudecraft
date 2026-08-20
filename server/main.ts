@@ -2838,12 +2838,11 @@ const wocMarketService = new WocMarketService({
   // arrives during the grace window refuses instead of entering an escrow
   // sequence pool.end() can land under.
   draining: () => !isReady(),
-  // The realm-gate pre-check (live stats read): refuses BEFORE a step-up
-  // proof is consumed; the custody entry stays the authoritative check.
-  escrowSaturated: () => {
-    const s = wocEscrowGate.stats();
-    return s.inFlight >= s.max;
-  },
+  // The realm-gate pre-check: refuses BEFORE a step-up proof is consumed;
+  // the custody entry stays the authoritative check. The gate's own probe,
+  // never a bare stats read: the probe reclaims leaked holds first, or a
+  // full wedge would make its own saturation permanent.
+  escrowSaturated: () => wocEscrowGate.saturated(),
   config: wocMarketConfig(),
   onSweepPass: (stats, saturated, elapsedMs) => {
     // One line per pass that did work, plus a loud arm-not-draining warning:

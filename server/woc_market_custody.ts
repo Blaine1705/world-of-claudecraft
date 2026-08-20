@@ -241,10 +241,10 @@ export function createWocMarketCustody(
           escrowGate.release();
           // The terminal kind: a held sequence settled, whatever its
           // outcome. 'started' is a strict subset of these (a refused
-          // sequence settles without starting), so the computable in-flight
-          // form is the four entered kinds minus settled (the vocabulary
-          // doc spells it out); the gate stats on the ops readout are the
-          // instantaneous truth.
+          // sequence settles without starting); the four entered kinds
+          // minus settled APPROXIMATES in-flight (the vocabulary doc names
+          // the double-entered edge), and the gate stats on the ops readout
+          // are the instantaneous truth.
           gameMetricsCounters().wocEscrowQueue('settled');
         };
         void work.then(releaseSlot, releaseSlot);

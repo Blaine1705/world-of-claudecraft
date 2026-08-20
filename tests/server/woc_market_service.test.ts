@@ -705,6 +705,57 @@ describe('the realm-gate pre-check spares the step-up challenge (the write-path 
     expect(admitted.ok).toBe(true);
   });
 
+  it('acceptDirectedOffer pre-checks the same two rungs BEFORE its proof is consumed', async () => {
+    // The directed twin of the createListing test (the fix-round review:
+    // these two lines had zero coverage, and without the OUTER rung the
+    // seller's single-use offer-bound proof burns before the INNER
+    // createListing's rung refuses). Decisive form again: the SAME proof
+    // accepts once the gate clears.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    const offer = unwrap(
+      await h.service.createDirectedOffer({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        sellerCharacterName: 'Selara',
+        usdCents: 5000,
+        item: { itemId: EPIC_ITEM },
+        acceptTerms: true,
+      }),
+      'createDirectedOffer',
+    );
+    unwrap(
+      await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A),
+      'buyer accept',
+    );
+    let saturated = true;
+    h.deps.escrowSaturated = () => saturated;
+    const proof = await stepUpFor(h, SELLER, {
+      operation: 'accept_directed_offer',
+      offerId: offer.offer.id,
+    });
+    const refused = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+      proof,
+    );
+    expect(refused).toEqual({ ok: false, reason: 'contended' });
+    // The offer is untouched (still pending, not reopened) and the bags
+    // still hold the copy: the refusal preceded every consumable.
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+    saturated = false;
+    const accepted = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+      proof,
+    );
+    expect(accepted.ok, 'the SAME proof accepts once the gate clears').toBe(true);
+  });
+
   it('an absent dep changes nothing (the rigs stay byte-identical)', async () => {
     const h = makeHarness();
     expect(h.deps.escrowSaturated).toBeUndefined();

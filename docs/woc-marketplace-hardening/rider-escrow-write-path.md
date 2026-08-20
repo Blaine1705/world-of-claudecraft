@@ -223,8 +223,12 @@ series.
 
 6. **Bound and classify the plain-statement writers.** One shared bounded
    plain-write seam in woc_market_db.ts routes the direct-pool row-locking
-   writers through ONE new withTx site carrying the guard SET LOCALs
-   (lock_timeout `ESCROW_LOCK_TIMEOUT_MS`, idle `GUARD_IDLE_TX_TIMEOUT_MS`),
+   writers through ONE new withTx site carrying the lock bound
+   (`ESCROW_LOCK_TIMEOUT_MS`) and an idle bound (AMENDED in the review fix
+   round: the SAVE tier `SAVE_IDLE_TX_TIMEOUT_MS`, both bounds in one
+   merged query, because the seam's round-trip gaps are pure protocol idle
+   and a 2s kill there destroys a pooled client across the whole write
+   surface),
    so a contended row refuses at 2s as a classified, counted 55P03 instead
    of camping a pooled client for the 15s session default and dying as an
    unclassified 57014. The withTx completeness pin in

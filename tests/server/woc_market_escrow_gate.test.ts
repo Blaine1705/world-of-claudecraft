@@ -96,6 +96,30 @@ describe('woc escrow gate', () => {
     }
   });
 
+  it('saturated() RECLAIMS before answering: a full wedge cannot make its own outage permanent', () => {
+    // The fix-round review's blocking find: the service consults the
+    // saturation probe BEFORE any tryAcquire runs, so a probe that read
+    // bare stats would refuse every request forever once all slots leaked
+    // (the reclaim only ran inside tryAcquire, which nothing could reach).
+    let nowMs = 0;
+    const gate = createWocEscrowGate(2, { now: () => nowMs, holdCeilingMs: 10_000 });
+    expect(gate.tryAcquire()).toBe(true);
+    expect(gate.tryAcquire()).toBe(true);
+    expect(gate.saturated()).toBe(true);
+    // The full wedge: both holds age past the ceiling with NOTHING calling
+    // tryAcquire (the pre-check refuses upstream). The probe itself must
+    // reclaim and answer unsaturated.
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      nowMs = 10_000;
+      expect(gate.saturated()).toBe(false);
+      expect(gate.stats()).toMatchObject({ inFlight: 0, reclaimed: 2 });
+      expect(gate.tryAcquire()).toBe(true);
+    } finally {
+      errors.mockRestore();
+    }
+  });
+
   it('releases retire the OLDEST stamp, so a wedge over-reports rather than hides', () => {
     // Two holds; the NEWER sequence settles first. FIFO retirement means the
     // old stamp survives, so oldestHoldMs keeps aging (the pessimistic side:

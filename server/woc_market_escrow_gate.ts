@@ -60,6 +60,12 @@ export interface WocEscrowGate {
   /** Take a slot. False means the realm is at cap and the caller refuses the
    *  typed 'contended' without holding anything. */
   tryAcquire(): boolean;
+  /** The pre-burn saturation probe (the service consults it BEFORE spending
+   *  a step-up challenge). It RECLAIMS leaked holds first: a bare stats
+   *  read here would make the full-wedge outage permanent, because a
+   *  saturated pre-check refuses every request before any tryAcquire could
+   *  run the reclaim (the fix-round review's blocking find). */
+  saturated(): boolean;
   /** Release a slot when the WORK settles (the depth-cap slot's own
    *  lifecycle, not the waiter's return). */
   release(): void;
@@ -104,6 +110,10 @@ export function createWocEscrowGate(
       }
       holds.push(now());
       return true;
+    },
+    saturated(): boolean {
+      reclaimLeaked();
+      return holds.length >= max;
     },
     release(): void {
       // Floor at zero: a double release must never mint capacity.

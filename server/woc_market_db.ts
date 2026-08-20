@@ -3149,7 +3149,7 @@ export class PgWocMarketDb implements WocMarketDb {
           return;
         } catch (retryErr) {
           console.error(
-            `[woc_market] buy-now lock clear stayed contended for listing ${id}; the lock ages out on its own`,
+            `[woc_market] buy-now lock clear retry failed for listing ${id}; the lock ages out on its own`,
             retryErr,
           );
           return;
