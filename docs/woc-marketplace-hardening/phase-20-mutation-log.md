@@ -15,6 +15,14 @@ bind via NULLIF($n, $n); DDL mutants drop or loosen the named constraint.
 SURVIVED entries are the judged defense-in-depth singles, each paired with a
 listed double-strip mutant that BIT, or the deliberate no-op control.
 
+Lane isolation rule (the collision class this round hit once, in a gate run):
+every pg rig hard-codes its verify database name, so the SAME suite must
+never run in two processes at once; a collision reds the victim without
+running assertions, which a careless reader could score as a BIT. Run pg
+suites one lane at a time per suite (the three scratch lanes partitioned by
+suite, or strictly serialized), and treat a mid-run "database ... does not
+exist" as the collision signature, never as a verdict.
+
 | mutant | verdict | suites | history |
 |---|---|---|---|
 | SMOKE_claimCustodyRef_onconflict | BIT | woc_market_delivery_pg_integration | smoke |

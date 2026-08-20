@@ -781,9 +781,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const aConfirmed = await mk(alpha, { state: 'confirmed' });
       const bConfirmed = await mk(beta, { state: 'confirmed' });
       const aDelivering = await mk(alpha, { state: 'delivering' });
-      const bDelivering = await mk(beta, { state: 'delivering' });
+      // Load-bearing by EXISTENCE: the exact toEqual sets below exclude them.
+      await mk(beta, { state: 'delivering' });
       const aOverdue = await mk(alpha, { state: 'offered', deadlineAtMs: BASE_MS - MINUTE_MS });
-      const bOverdue = await mk(beta, { state: 'offered', deadlineAtMs: BASE_MS - MINUTE_MS });
+      await mk(beta, { state: 'offered', deadlineAtMs: BASE_MS - MINUTE_MS });
 
       const activity = await marketDb.settlementsByAccount(alpha, buyer, 50);
       expect(ids(activity).sort()).toEqual([aConfirming, aConfirmed, aDelivering, aOverdue].sort());

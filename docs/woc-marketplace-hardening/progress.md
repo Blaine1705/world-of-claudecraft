@@ -5083,6 +5083,16 @@ structuredClone returns, the lock-free floor pin's decisiveness (traced
 through the recorder), all constraint names against the DDL, and the docs
 counts against the artifacts.
 
+QA-CHECKLIST VERDICT: READY (0 blocking; its one should-fix, the lane
+isolation rule, now heads the mutation log's protocol; its nit, three unused
+beta bindings, unbound with an existence comment). Its independent samples:
+the production-untouched claim verified, 39 of 43 realm-taking methods driven
+by the new suite with the other four accounted for, the fake restructure
+traced branch by branch, the ratchet and shard-table posture confirmed
+by-design. Its standing observation (no CI arm runs the pg suites; they
+enforce at review time, not merge time) is the 22-owned posture already in
+the deferrals.
+
 FINAL VALIDATION NOTE: node scripts/gate_select.mjs PASS on the committed
 tree at 73e5f24fb0, ALL 12 STEPS green, full-suite fallback (the diff
 touches the fake helper, so the planner falls back by design): 41,698 tests
