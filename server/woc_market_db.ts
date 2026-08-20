@@ -2173,7 +2173,7 @@ export class PgWocMarketDb implements WocMarketDb {
         return toListing(updated.rows[0]);
       });
     } catch (err) {
-      if (isLockContention(err)) return 'contended' as const;
+      if (err instanceof TxNeverStarted || isLockContention(err)) return 'contended' as const;
       throw err;
     }
   }
@@ -2300,7 +2300,7 @@ export class PgWocMarketDb implements WocMarketDb {
         return toListing(updated.rows[0]);
       });
     } catch (err) {
-      if (isLockContention(err)) return 'contended' as const;
+      if (err instanceof TxNeverStarted || isLockContention(err)) return 'contended' as const;
       throw err;
     }
   }
@@ -2372,8 +2372,11 @@ export class PgWocMarketDb implements WocMarketDb {
       });
     } catch (err) {
       // Contention here means a settlement insert is landing; treat it like a
-      // live settlement and let the caller park the listing.
-      if (isLockContention(err)) return false;
+      // live settlement and let the caller park the listing. A never-started
+      // transaction gets the same answer for the opposite reason: the probe
+      // never ran, so claiming "no open settlement" would assert something
+      // nothing checked, and parking is the arm that assumes least.
+      if (err instanceof TxNeverStarted || isLockContention(err)) return false;
       throw err;
     }
   }
@@ -2587,7 +2590,10 @@ export class PgWocMarketDb implements WocMarketDb {
       // arm wants the raw error as its park-or-retry evidence. Skipping the
       // classifier here left the most contended lock in the market (the
       // characters row the game loop's autosave fights over) invisible to
-      // the lockWaitTimeouts tuning signal.
+      // the lockWaitTimeouts tuning signal. TxNeverStarted needs no arm
+      // here either: it is counted at its withTx throw sites and the raw
+      // rethrow already lands in commitGrant's transient abort (retry next
+      // pass off the durable claim), which is the widening's intent.
       isLockContention(err);
       throw err;
     });
@@ -2922,6 +2928,9 @@ export class PgWocMarketDb implements WocMarketDb {
         if (retryAtMs !== null) return { refusal: 'claim_cooldown', retryAtMs } as const;
       }
     } catch (err) {
+      // Deliberately NOT widened with TxNeverStarted: these advisory reads
+      // run on the plain pool (no withTx, no BEGIN), so the tag cannot occur
+      // here, and a checkout failure surfaces raw like any other pool read's.
       if (isLockContention(err)) return 'contended' as const;
       throw err;
     }
@@ -3039,7 +3048,7 @@ export class PgWocMarketDb implements WocMarketDb {
         return toListing(updated.rows[0]);
       });
     } catch (err) {
-      if (isLockContention(err)) return 'contended' as const;
+      if (err instanceof TxNeverStarted || isLockContention(err)) return 'contended' as const;
       throw err;
     }
   }
@@ -3192,7 +3201,7 @@ export class PgWocMarketDb implements WocMarketDb {
         return toListing(updated.rows[0]);
       });
     } catch (err) {
-      if (isLockContention(err)) return 'contended' as const;
+      if (err instanceof TxNeverStarted || isLockContention(err)) return 'contended' as const;
       throw err;
     }
   }
@@ -3303,7 +3312,8 @@ export class PgWocMarketDb implements WocMarketDb {
       // The idle kill (25P03) and any future contention code answer the
       // typed refusal instead of a raw 500 on the player's bid; the
       // activateBid wrapper is the shape precedent.
-      if (isLockContention(err)) return { ok: false, reason: 'contended' };
+      if (err instanceof TxNeverStarted || isLockContention(err))
+        return { ok: false, reason: 'contended' };
       throw err;
     });
   }
@@ -3351,7 +3361,7 @@ export class PgWocMarketDb implements WocMarketDb {
         return 'extended' as const;
       });
     } catch (err) {
-      if (isLockContention(err)) return 'contended' as const;
+      if (err instanceof TxNeverStarted || isLockContention(err)) return 'contended' as const;
       throw err;
     }
   }
@@ -3522,7 +3532,7 @@ export class PgWocMarketDb implements WocMarketDb {
       // the listing while re-locking a bid this transaction pre-locked)
       // retries on the bond poll's next pass instead of surfacing as a raw
       // sweep-arm failure.
-      if (isLockContention(err)) return 'contended';
+      if (err instanceof TxNeverStarted || isLockContention(err)) return 'contended';
       throw err;
     }
   }
@@ -3851,7 +3861,7 @@ export class PgWocMarketDb implements WocMarketDb {
       // authority; a racer sees 23505 and the whole transaction, winner stamp
       // included, rolls back.
       if ((err as { code?: string }).code === '23505') return 'live_settlement_exists';
-      if (isLockContention(err)) return 'contended';
+      if (err instanceof TxNeverStarted || isLockContention(err)) return 'contended';
       throw err;
     }
   }
@@ -4261,7 +4271,7 @@ export class PgWocMarketDb implements WocMarketDb {
         return (closed.rowCount ?? 0) > 0 ? ('finalized' as const) : ('already_final' as const);
       });
     } catch (err) {
-      if (isLockContention(err)) return 'contended';
+      if (err instanceof TxNeverStarted || isLockContention(err)) return 'contended';
       throw err;
     }
   }

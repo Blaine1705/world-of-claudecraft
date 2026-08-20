@@ -2085,6 +2085,66 @@ describe('the escrow listing transaction, in SQL', () => {
     );
   });
 
+  it('every guard tail maps TxNeverStarted like contention (the widening), with the two recorded exceptions', async () => {
+    // The write-path rider's widening: before it, only the escrow write
+    // mapped the never-started tag, so a pool-checkout timeout on any OTHER
+    // guard was a raw 500 in exactly the correlated volume (pool
+    // saturation) where a retryable typed answer matters most. The
+    // completeness form mirrors the idle-bound distribution pin above:
+    // exact counts over the comment-stripped source, so an eleventh widened
+    // tail or a dropped one moves a number here.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
+    const widened = src.match(/err instanceof TxNeverStarted \|\| isLockContention\(err\)/g) ?? [];
+    expect(widened).toHaveLength(11);
+    // The two exceptions, each load-bearing: exactly ONE un-widened
+    // `if (isLockContention(err))` tail remains (the advisory claim reads,
+    // which run on the plain pool where the tag cannot occur), and exactly
+    // one bare classify-to-count statement (the delivered-save tail, which
+    // rethrows RAW so commitGrant's transient arm keeps the evidence).
+    expect(src.match(/if \(isLockContention\(err\)\)/g) ?? []).toHaveLength(1);
+    expect(src.match(/^\s*isLockContention\(err\);$/gm) ?? []).toHaveLength(1);
+
+    // Behavioral, one per answer shape. The typed-refusal shape: a checkout
+    // failure on the bid path answers 'contended' and moves ONLY the
+    // never-started counter.
+    const bidArgs = {
+      realm: 'Claudemoon',
+      listingId: 9,
+      account: 7,
+      characterId: 21,
+      characterName: 'Bidder',
+      wallet: 'wallet-7',
+      amountCents: 5000,
+      bondCents: 250,
+      nowMs: 1_000_000,
+      minNext: () => 100,
+    };
+    const failingPool = {
+      query: async () => ({ rows: [], rowCount: 1 }),
+      connect: async () => {
+        throw new Error('timeout exceeded when trying to connect');
+      },
+    } as unknown as Pool;
+    const counters = await import('../../server/woc_market_db');
+    const neverStartedBefore = counters.wocMarketTxNeverStartedCount();
+    const lockBefore = counters.wocMarketLockWaitTimeoutCount();
+    expect(await new PgWocMarketDb(failingPool).insertPendingBid(bidArgs)).toEqual({
+      ok: false,
+      reason: 'contended',
+    });
+    expect(counters.wocMarketTxNeverStartedCount()).toBe(neverStartedBefore + 1);
+    expect(counters.wocMarketLockWaitTimeoutCount()).toBe(lockBefore);
+
+    // The false-arm shape: the no-open-settlement probe NEVER RAN, so it
+    // must answer false (park; assumes least), never "no settlement found".
+    expect(await new PgWocMarketDb(failingPool).closeListingIfNoOpenSettlement(9, 'no_bids')).toBe(
+      false,
+    );
+  });
+
   it("maps a CODELESS BEGIN failure to 'contended': nothing could have committed", async () => {
     // A pooled client whose socket died since its last use is not revalidated
     // at checkout, so it fails HERE with a codeless connection error instead
