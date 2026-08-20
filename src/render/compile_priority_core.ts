@@ -34,3 +34,18 @@ export function compilePriorityForTarget(
   }
   return GPU_WORK_PRIORITY.LIVE_VIEW;
 }
+
+/** The one predicate the renderer feeds compilePriorityForTarget: casting AT
+ *  the local player, never casting at all. A 20-strong crowd trading abilities
+ *  among itself made every crowd view ACTIONABLE and starved the reveal lane's
+ *  decor keys past their watchdog (batch 28); what the player must react to is
+ *  a cast aimed at them. Pure: the sim stays behind the lookup callback. */
+export function castingAtPlayerPredicate(
+  lookup: (id: number) => { castingAbility?: string | null; targetId?: number | null } | undefined,
+  playerId: number,
+): (id: number) => boolean {
+  return (id) => {
+    const caster = lookup(id);
+    return Boolean(caster?.castingAbility) && caster?.targetId === playerId;
+  };
+}

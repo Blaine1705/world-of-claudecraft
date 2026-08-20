@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import {
   type CompilePriorityNode,
+  castingAtPlayerPredicate,
   compilePriorityForTarget,
 } from '../src/render/compile_priority_core';
 
@@ -65,5 +66,23 @@ describe('compilePriorityForTarget', () => {
   it('keeps the old behavior for a caller that passes no cast predicate', () => {
     expect(compilePriorityForTarget(node(8), 7)).toBe(GPU_WORK_PRIORITY.LIVE_VIEW);
     expect(compilePriorityForTarget(node(7), 7)).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+  });
+});
+
+describe('castingAtPlayerPredicate', () => {
+  const table = new Map<number, { castingAbility?: string | null; targetId?: number | null }>([
+    [1, { castingAbility: 'fireball', targetId: 99 }],
+    [2, { castingAbility: 'fireball', targetId: 7 }],
+    [3, { castingAbility: null, targetId: 99 }],
+  ]);
+  const isCasting = castingAtPlayerPredicate((id) => table.get(id), 99);
+
+  it('is true only for a cast aimed at the player', () => {
+    // A crowd trading abilities among itself must not become ACTIONABLE:
+    // that starved the reveal lane past its watchdog on the iGPU crowd leg.
+    expect(isCasting(1)).toBe(true);
+    expect(isCasting(2)).toBe(false);
+    expect(isCasting(3)).toBe(false);
+    expect(isCasting(4)).toBe(false);
   });
 });

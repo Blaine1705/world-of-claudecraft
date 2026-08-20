@@ -191,7 +191,7 @@ import { buildCliffScree, type CliffScreeView } from './cliff_scree';
 import type { CompileGateResult } from './compile_gate';
 import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
 import { linkPieceWork } from './compile_gate_pieces';
-import { compilePriorityForTarget } from './compile_priority_core';
+import { castingAtPlayerPredicate, compilePriorityForTarget } from './compile_priority_core';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import {
@@ -8799,18 +8799,18 @@ export class Renderer {
   // first `live-gate` unit); the queue paces between units, never inside one,
   // and its released-tail cap now bounds the gate's links on the driver too.
   private compileGate(target: THREE.Object3D): Promise<unknown> {
-    const isCasting = (id: number): boolean => Boolean(this.sim.entities.get(id)?.castingAbility);
+    const lookup = (id: number) => this.sim.entities.get(id);
+    const isCasting = castingAtPlayerPredicate(lookup, this.sim.player.id);
     const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
-    // Compile the same variant pair the boot prewarm proved out, never a bare
+    // Compile the variant pair the boot prewarm proved out, never a bare
     // compileAsync at the ambient render target: three keys a program on the
-    // bound target's output colour space (WebGLPrograms getParameters), so on
-    // composer tiers an unbound compile links the canvas srgb variant while
-    // the scene pass draws the linear one, and the view's first visible frame
-    // still linked the real program synchronously (the measured 300-500ms
-    // border-crossing stall). The colour pass binds the tier-correct target;
-    // the skinned depth pass covers the renderer-owned shadow material that
-    // the colour walk cannot enumerate; the touch tail warms the linked
-    // programs' uniform tables so the reveal draw issues no synchronous query.
+    // bound target's output colour space, so on composer tiers an unbound
+    // compile links the canvas srgb variant while the scene pass draws the
+    // linear one, and the first visible frame still linked the real program
+    // synchronously (the measured 300-500 ms border-crossing stall). The
+    // colour pass binds the tier-correct target; the skinned depth pass covers
+    // the renderer-owned shadow material the colour walk cannot enumerate; the
+    // touch tail warms the linked programs' uniform tables (no reveal query).
     const color = (node: THREE.Object3D) => this.compilePrewarmColorPrograms(node, false);
     const shadow = (node: THREE.Object3D) => this.compileShadowPrograms(node);
     const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);
