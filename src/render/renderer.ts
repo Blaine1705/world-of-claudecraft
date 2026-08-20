@@ -240,6 +240,7 @@ import {
   entityViewCandidatePriority,
   entityViewDistanceSq,
   entityViewIsAdmitted,
+  isDistanceCullExemptObject,
   isPersistentPortalObject,
   entityViewShouldDrop as shouldDropView,
 } from './entity_view_policy_core';
@@ -4821,7 +4822,7 @@ export class Renderer {
       const required = e.id === center.id || e.id === center.targetId;
       if (required && !includeRequired) continue;
       const d2 = entityViewDistanceSq(e, center);
-      if (!required && d2 > rangeSq) continue;
+      if (!required && d2 > rangeSq && !isDistanceCullExemptObject(e)) continue;
       writeViewCandidate(
         this.viewCandidatePool,
         this.viewCandidates,
@@ -10762,9 +10763,8 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
-      // Distance rejection comes before effect/state derivation. Retained views
-      // outside the 80/96 yard visibility hysteresis rendered nothing before
-      // and still render nothing, so their aura and actionability work can wait.
+      // Distance rejection (isDistanceCullExemptObject excepted) comes before
+      // effect/state derivation, so a rejected view's aura/actionability work waits.
       const cdx = e.pos.x - p.pos.x,
         cdz = e.pos.z - p.pos.z;
       const d2 = cdx * cdx + cdz * cdz;
@@ -10776,7 +10776,8 @@ export class Renderer {
           d2,
           this.entityViewCreateRangeSq,
           this.entityViewDestroyRangeSq,
-        )
+        ) &&
+        !isDistanceCullExemptObject(e)
       ) {
         v.group.visible = false;
         continue;

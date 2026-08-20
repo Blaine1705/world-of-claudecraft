@@ -123,7 +123,17 @@ const MONOLITHS: MonolithRow[] = [
     // resolved count.
     // PR #3468 changes the shadow-depth prewarm material contract, but this
     // wrapper's combined renderer remains at the same resolved count.
-    ceiling: 13744,
+    // Raised +1 net (13744 -> 13745): the heroic Nythraxis wardstone view-priority
+    // fix adds one import (isDistanceCullExemptObject from entity_view_policy_core.ts,
+    // which owns the whole predicate) plus an extra AND term on two existing
+    // conditions (+2): the collectMissingViewCandidates create-range gate, and the
+    // per-frame visibility hysteresis check (a wardstone whose view is created beyond
+    // the create radius still latched invisible forever without this second site,
+    // since the hysteresis's own wasVisible state never gets a chance to widen to the
+    // destroy radius). A reflow of the comment right above that second site gives one
+    // line back, landing the file at +1 net. All the real logic lives behind the seam; this
+    // is the coordinator's unavoidable thin-wiring cost.
+    ceiling: 13745,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
