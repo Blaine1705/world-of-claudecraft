@@ -48,8 +48,14 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
+  RING_LESSON_ITEM_ID,
+  RING_LESSON_QUEST_ID,
+  type RingLessonPhase,
+  ringCardPlan,
+  ringLessonPhase,
 } from './bootcamp_view';
 import {
+  CASTER_CLASSES,
   type CoachPromptPlan,
   coachGlowBagItemId,
   coachGlowQuestId,
@@ -59,6 +65,7 @@ import {
   coachPromptPlan,
   GUIDE_VOICE_LINES,
   type GuideVoiceLineName,
+  parkourPromptPlan,
   VEER_GRACE_MS,
   VEER_NUDGE_COOLDOWN_MS,
   VEER_NUDGES_PER_STATION,
@@ -83,6 +90,17 @@ export class BootcampOverlay {
   // closing bell card only follows a graduation, never a casual revisit.
   private sawSail = false;
   private bellPhase = false;
+  // The ring equip lesson (bootcamp_view.ts ringLessonPhase): armed only
+  // when the pearl quest is seen moving THIS session (a reload with the
+  // ring already worn must not resurrect the card), ended when the
+  // character sheet is opened or the admire nudge times out.
+  private sawPearl = false;
+  private ringPhase: RingLessonPhase | null = null;
+  private ringCharSeen = false;
+  private ringAdmireUntil = 0;
+  private ringDone = false;
+  // Casters learn their slot-2 spell, not the melee Attack (Guy's note).
+  private casterClass = false;
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -127,6 +145,9 @@ export class BootcampOverlay {
     }
 
     this.lastFocus = focus;
+    this.casterClass = CASTER_CLASSES.has(world.cfg.playerClass);
+    if (focus?.questId === RING_LESSON_QUEST_ID) this.sawPearl = true;
+    this.ringPhase = this.computeRingPhase(world, onIsland);
     const isGauntlet = focus?.questId === GAUNTLET_QUEST_ID;
     this.lastCounts = isGauntlet ? questCounts(world) : 0;
 
@@ -151,6 +172,9 @@ export class BootcampOverlay {
     if (this.bellPhase) {
       this.step = null;
       nextRenderKey = `bell:${mode}`;
+    } else if (this.ringPhase !== null) {
+      this.step = null;
+      nextRenderKey = `ring:${this.ringPhase}:${mode}`;
     } else if (isGauntlet) {
       const next = computeBootcampStep({
         questActive: focus!.state !== 'available',
@@ -288,6 +312,41 @@ export class BootcampOverlay {
   // into every painter; the toggles are same-state no-ops between changes.
   private glowTick = 0;
 
+  /** How long the "press C" nudge stays up after the ring is worn before
+   *  the lesson lets go on its own. */
+  private static readonly RING_ADMIRE_MS = 45000;
+
+  /** The ring lesson's live phase: pure decision (bootcamp_view.ts) driven
+   *  by the world's bags and fingers, plus this driver's session latches
+   *  (armed by seeing the pearl quest move, ended by the character sheet
+   *  opening or the admire nudge timing out). */
+  private computeRingPhase(world: IWorld, onIsland: boolean): RingLessonPhase | null {
+    if (!onIsland || !this.sawPearl || this.ringDone) return null;
+    const questDone = world.questState(RING_LESSON_QUEST_ID) === 'done';
+    const equipped =
+      world.equipment.ring1 === RING_LESSON_ITEM_ID ||
+      world.equipment.ring2 === RING_LESSON_ITEM_ID;
+    const inBags = world.inventory.some((slot) => slot.itemId === RING_LESSON_ITEM_ID);
+    const phase = ringLessonPhase({ questDone, inBags, equipped, charSeen: this.ringCharSeen });
+    if (phase !== 'admire') {
+      this.ringAdmireUntil = 0;
+      return phase;
+    }
+    const charWindow = document.getElementById('char-window');
+    if (charWindow && charWindow.style.display === 'block') {
+      this.ringCharSeen = true;
+      this.ringDone = true;
+      return null;
+    }
+    const now = performance.now();
+    if (this.ringAdmireUntil === 0) this.ringAdmireUntil = now + BootcampOverlay.RING_ADMIRE_MS;
+    else if (now > this.ringAdmireUntil) {
+      this.ringDone = true;
+      return null;
+    }
+    return phase;
+  }
+
   private applyUiGlow(): void {
     this.glowTick = (this.glowTick + 1) % 10;
     if (this.glowTick !== 0) return;
@@ -308,10 +367,17 @@ export class BootcampOverlay {
     const vendorEl = document.querySelector<HTMLElement>('#vendor-window');
     const vendorOpen = vendorEl !== null && vendorEl.style.display === 'block';
     syncGlow('#vendor-window [data-close]', () => bagItem !== null && vendorOpen);
+    const ringEquip = this.ringPhase === 'equip';
     syncGlow(
       '#bags .bag-item',
-      (el) => bagItem !== null && !vendorOpen && el.dataset.coachItem === bagItem,
+      (el) =>
+        (bagItem !== null && !vendorOpen && el.dataset.coachItem === bagItem) ||
+        (ringEquip && el.dataset.coachItem === RING_LESSON_ITEM_ID),
     );
+    // The ring lesson's two menu asks: B while the ring waits in a bag, C
+    // once it is on the finger.
+    syncGlow('#mm-bag', () => ringEquip);
+    syncGlow('#mm-char', () => this.ringPhase === 'admire');
   }
 
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange
@@ -398,8 +464,25 @@ export class BootcampOverlay {
     this.ensureDom();
     if (!this.root) return;
     if (this.bellPhase) this.renderBellPanel(keybinds);
+    else if (this.ringPhase !== null) this.renderRingPanel(keybinds);
     else if (this.step !== null) this.renderLadderPanel(keybinds);
     else this.renderCoachPanel(keybinds);
+  }
+
+  /** The ring equip lesson's card (wear it, then see it on the sheet). */
+  private renderRingPanel(keybinds: Keybinds): void {
+    if (this.ringPhase === null) return;
+    const mode = currentInputHintMode();
+    const labels = this.coachLabels(keybinds);
+    const plan = ringCardPlan(this.ringPhase, mode);
+    const params: Record<string, string> = {};
+    for (const key of plan.params) params[key] = labels[key];
+    this.titleEl.textContent = t(plan.titleKey);
+    this.bodyEl.textContent = t(plan.bodyKey, params);
+    this.paintKeycaps(coachKeycaps(plan, mode, labels));
+    this.stepEl.textContent = '';
+    this.progressEl.style.display = 'none';
+    this.root!.classList.remove('tut-done');
   }
 
   private coachLabels(keybinds: Keybinds): Readonly<Record<CoachParam, string>> {
@@ -408,9 +491,11 @@ export class BootcampOverlay {
       interactKey: keybinds.primaryLabel('interact') || unbound,
       mapKey: keybinds.primaryLabel('map') || unbound,
       targetKey: keybinds.primaryLabel('target') || unbound,
-      // Slot 0 is the first action bar button (Attack, default Digit1).
-      attackKey: keybinds.primaryLabel('slot0') || unbound,
+      // Melee classes learn slot 0 (Attack, default Digit1); casters learn
+      // slot 1, where their level-1 spell sits (default Digit2).
+      attackKey: keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0') || unbound,
       bagsKey: keybinds.primaryLabel('bags') || unbound,
+      charKey: keybinds.primaryLabel('char') || unbound,
     };
   }
 
@@ -452,7 +537,7 @@ export class BootcampOverlay {
     const mode = currentInputHintMode();
 
     const labels = this.coachLabels(keybinds);
-    const plan = coachCardPlan(focus, mode);
+    const plan = coachCardPlan(focus, mode, this.casterClass);
     const npc = tEntity({ kind: 'npc', id: plan.npcId, field: 'name' });
     const params: Record<string, string> = {};
     if (plan.bodyHasNpc) params.npc = npc;
@@ -487,12 +572,7 @@ export class BootcampOverlay {
 
   private paintKeycaps(caps: readonly string[]): void {
     this.keysEl.replaceChildren();
-    for (const cap of caps) {
-      const chip = document.createElement('span');
-      chip.className = 'tut-keycap';
-      chip.textContent = cap;
-      this.keysEl.appendChild(chip);
-    }
+    paintChipSequence(this.keysEl, caps);
     this.keysEl.style.display = this.keysEl.childElementCount > 0 ? '' : 'none';
   }
 
@@ -502,14 +582,25 @@ export class BootcampOverlay {
   // interact reach, so appearing IS the signal to press.
   private updatePrompt(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
     if (!this.prompt || !this.promptChipEl || !this.promptVerbEl) return;
+    if (this.ringPhase !== null) {
+      this.hidePrompt();
+      return;
+    }
     const p = world.player;
     const mode = currentInputHintMode();
+
+    // Lane 2's parkour asks own the bubble while one is on screen: a jump
+    // plan in range beats the centered movement chips, or the Space ask
+    // would never surface on keyboard (the movement variant returns early).
+    const jumpPlan = this.step === 'turnwalk' && p ? parkourPromptPlan(p.pos) : null;
+    const jumpAskVisible = jumpPlan !== null && p !== null && coachPromptInRange(jumpPlan, p.pos);
 
     // The movement lessons carry a screen-anchored bubble (there is no world
     // point to stand it on: the lesson is the player's own hands), so the W
     // ask is as loud as the interact F. Keyboard only, the keycap rule.
     if (
       mode === 'keyboard' &&
+      !jumpAskVisible &&
       (this.step === 'forward' || this.step === 'turnwalk' || this.step === 'strafe')
     ) {
       const unbound = t('hud.options.unbound');
@@ -555,14 +646,27 @@ export class BootcampOverlay {
       return;
     }
 
-    // Kill lessons chip the target and attack binds (Tab, 1); everything
-    // else chips the interact bind per input family.
+    // Kill lessons chip the target and attack binds (Tab, 1); the parkour
+    // asks chip the jump bind (Space, or the pad's literal bottom face
+    // button); everything else chips the interact bind per input family.
     let chips: readonly string[];
     if (plan.kind === 'kill') {
       chips =
         mode === 'keyboard'
-          ? [keybinds.primaryLabel('target'), keybinds.primaryLabel('slot0')].filter(Boolean)
+          ? [
+              keybinds.primaryLabel('target'),
+              keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0'),
+            ].filter(Boolean)
           : [];
+    } else if (plan.kind === 'jump') {
+      chips =
+        mode === 'keyboard'
+          ? [keybinds.primaryLabel('jump')].filter(Boolean)
+          : mode === 'pad'
+            ? ['A']
+            : [];
+    } else if (plan.kind === 'use') {
+      chips = mode === 'keyboard' ? [keybinds.primaryLabel('bags')].filter(Boolean) : [];
     } else {
       const { chip } = coachPromptChip(mode, keybinds.primaryLabel('interact'));
       chips = chip ? [chip] : [];
@@ -605,12 +709,7 @@ export class BootcampOverlay {
   private paintPromptChips(caps: readonly string[]): void {
     if (!this.promptChipEl) return;
     this.promptChipEl.replaceChildren();
-    for (const cap of caps) {
-      const chip = document.createElement('span');
-      chip.className = 'tut-keycap';
-      chip.textContent = cap;
-      this.promptChipEl.appendChild(chip);
-    }
+    paintChipSequence(this.promptChipEl, caps);
     this.promptChipEl.style.display = caps.length > 0 ? '' : 'none';
   }
 
@@ -664,6 +763,24 @@ function railQuestState(world: IWorld, questId: string): CoachState | null {
   if (state === 'available') return 'available';
   if (state === 'ready') return 'ready';
   return null;
+}
+
+/** Keycap chips with a localized "then" between them: every multi-key row
+ *  on the island is a press SEQUENCE (D then W, Tab then 1, B then F), and
+ *  the playtest showed the order must be explicit. */
+function paintChipSequence(host: HTMLElement, caps: readonly string[]): void {
+  caps.forEach((cap, i) => {
+    if (i > 0) {
+      const sep = document.createElement('span');
+      sep.className = 'tut-keycap-then';
+      sep.textContent = t('hudChrome.bootcamp.keycapThen');
+      host.appendChild(sep);
+    }
+    const chip = document.createElement('span');
+    chip.className = 'tut-keycap';
+    chip.textContent = cap;
+    host.appendChild(chip);
+  });
 }
 
 /** Class-toggle sweep for the press-this-next glow (same-state no-ops). */

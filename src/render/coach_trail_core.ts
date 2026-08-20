@@ -40,6 +40,9 @@ export interface CoachTrailPlan {
  *  strand's anchor. */
 const STRIKE_YARD = { x: -336, z: -14 };
 const SCUTTLER_STRAND = { x: -380, z: -42 };
+/** The tide pool (interactions/crab_summon.ts CRAB_SUMMON_SITE; a render core
+ *  mirrors the coordinate, tests/coach_trail_core.test.ts pins them equal). */
+const CRAB_POOL = { x: -398, z: -17 };
 /** The signpost's reading spot (the noticeboard sentinel's authored stand). */
 const SIGNPOST_SPOT = { x: -312, z: 42.5 };
 
@@ -68,6 +71,8 @@ function activeEnd(questId: string): { x: number; z: number } {
       return STRIKE_YARD;
     case 'q_ps_shell_and_claw':
       return SCUTTLER_STRAND;
+    case 'q_ps_mother_of_pearl':
+      return CRAB_POOL;
     case 'q_ps_the_wreck_line': {
       const crates = cratePoints();
       return crates[crates.length - 1] ?? npcPos(PROVING_SHORE_QUESTS[questId].giverNpcId);
@@ -117,6 +122,9 @@ export function coachTrailPlan(
       idx <= 0
         ? { x: PROVING_SHORE_ARRIVAL.x, z: PROVING_SHORE_ARRIVAL.z }
         : npcPos(PROVING_SHORE_QUESTS[order[idx - 1]].turnInNpcId);
+    // Same-NPC legs (the relay's norm: every hand-in NPC is the next giver)
+    // yield a zero-length ribbon the consumer draws as nothing; the plan
+    // still keys the station so the glow and card stay in step.
     return { key: `${focus.questId}:available`, points: [from, npcPos(quest.giverNpcId)] };
   }
   if (focus.state === 'ready') {
@@ -145,6 +153,9 @@ export function coachTrailPlan(
   }
   if (focus.questId === 'q_ps_shell_and_claw') {
     return { key: 'shell:active', points: [npcPos(quest.giverNpcId), SCUTTLER_STRAND] };
+  }
+  if (focus.questId === 'q_ps_mother_of_pearl') {
+    return { key: 'pearl:active', points: [npcPos(quest.giverNpcId), CRAB_POOL] };
   }
   if (focus.questId === 'q_ps_the_wreck_line') {
     // The crate haul: giver, crate to crate in authored order, then the
@@ -225,6 +236,9 @@ export interface CoachGuides {
 const KILL_AREA_RINGS: Readonly<Record<string, { x: number; z: number; radius: number }>> = {
   q_ps_strike_true: { ...STRIKE_YARD, radius: 9 },
   q_ps_shell_and_claw: { ...SCUTTLER_STRAND, radius: 11 },
+  // The pearl detour: the ring marks the tide pool the summon happens at
+  // (and the fight, since the king spawns in it).
+  q_ps_mother_of_pearl: { ...CRAB_POOL, radius: 8 },
 };
 
 /** The non-character objective the vertical beam should stand over, or null
@@ -248,6 +262,10 @@ function beamTarget(
     }
     return { at: null, nearestCrate: false };
   }
+  // The pearl detour's target is a spot of water, never a character: the
+  // beam stands on the pool for the whole active leg (the summoned king
+  // spawns inside it, so the beam keeps marking the fight too).
+  if (focus.questId === 'q_ps_mother_of_pearl') return { at: CRAB_POOL, nearestCrate: false };
   if (focus.questId === 'q_ps_the_wreck_line') return { at: null, nearestCrate: true };
   if (focus.questId === 'q_ps_the_signpost') return { at: SIGNPOST_SPOT, nearestCrate: false };
   return { at: null, nearestCrate: false };

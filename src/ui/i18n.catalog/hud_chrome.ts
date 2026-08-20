@@ -673,7 +673,7 @@ export const hudChromeStrings = {
       'Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.',
     strafeTitle: 'Strafe the last lane',
     strafeBody:
-      'There is another way to move sideways. Hold {strafeKey} to strafe down the last lane until the red flag is behind you. Strafing keeps your eyes on a target while you move: you will fight this way one day.',
+      'There is another way to move sideways. Tap {strafeKey} to sidestep into the last lane, then hold {forwardKey} and strafe with {strafeKey} until the red flag is behind you. Strafing keeps your eyes on a target while you move: you will fight this way one day.',
     strafeBodyTouch:
       'There is another way to move sideways. Push the movement stick left to strafe down the last lane until the red flag is behind you.',
     strafeBodyPad:
@@ -738,6 +738,31 @@ export const hudChromeStrings = {
       'The scuttlers pinch back. Tap one to target it, then tap the first action bar button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyPad:
       'The scuttlers pinch back. Press your target button, then your first action button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    // Caster arms (mage, warlock, priest, druid): their first real button is
+    // the slot-2 spell, so the combat lessons teach the second button and
+    // speak of casting. WORDY by M16, so the five non-Latin overlays carry
+    // fills.
+    taskStrikeTrueBodyCaster:
+      'Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.',
+    taskStrikeTrueBodyCasterTouch:
+      'Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.',
+    taskStrikeTrueBodyCasterPad:
+      'Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.',
+    taskShellBodyCaster:
+      'The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    taskShellBodyCasterTouch:
+      'The scuttlers pinch back. Tap one to target it, then tap the second button on the action bar to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    taskShellBodyCasterPad:
+      'The scuttlers pinch back. Press your target button, then your second action button to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    // The pearl detour (q_ps_mother_of_pearl): using a bag item at a marked
+    // spot, a real fight, and looting a quest prize off the corpse. WORDY by
+    // M16, so the five non-Latin overlays carry fills.
+    taskPearlBody:
+      "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
+    taskPearlBodyTouch:
+      "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
+    taskPearlBodyPad:
+      "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
     taskWreckLineBody:
       'The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.',
     taskWreckLineBodyTouch:
@@ -765,6 +790,29 @@ export const hudChromeStrings = {
     promptRing: 'Ring',
     promptHold: 'Hold',
     promptAttack: 'Attack',
+    promptJump: 'Jump',
+    promptSummon: 'Summon',
+    // The ring equip lesson (bootcamp_view.ts ringCardPlan): the pearl
+    // quest's reward sits in the bags, and these two cards walk wearing it
+    // and admiring it. WORDY by M16, so the five non-Latin overlays carry
+    // fills.
+    ringEquipTitle: 'Wear your prize',
+    ringEquipBody:
+      'The Mother of Pearl is in your bags. Press {bagsKey} to open them, then left-click the ring to slide it onto your finger.',
+    ringEquipBodyTouch:
+      'The Mother of Pearl is in your bags. Open them and tap the ring to slide it onto your finger.',
+    ringEquipBodyPad:
+      'The Mother of Pearl is in your bags. Open them and choose the ring to slide it onto your finger.',
+    ringAdmireTitle: 'Look at you',
+    ringAdmireBody:
+      'It suits you. Press {charKey} to open your character sheet and see the ring on your hand, and every number it lifts.',
+    ringAdmireBodyTouch:
+      'It suits you. Open your character sheet from the menu and see the ring on your hand, and every number it lifts.',
+    ringAdmireBodyPad:
+      'It suits you. Open your character sheet from the menu and see the ring on your hand, and every number it lifts.',
+    // The word between sequenced keycap chips ("D then W"): press order made
+    // explicit, the playtest ask.
+    keycapThen: 'then',
     // Ferryman Odo's guiding voice: the CAPTION rows the coach card shows
     // while the (English) VO clip plays. Each row mirrors one
     // scripts/voices/extra_lines.mjs guide__odo__* line; reword the two

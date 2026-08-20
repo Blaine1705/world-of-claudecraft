@@ -231,11 +231,15 @@ describe('proving shore placement', () => {
     );
     const forcedKills = PROVING_SHORE_QUESTS.q_ps_strike_true.objectives[0].count ?? 0;
     const forcedCrabs = PROVING_SHORE_QUESTS.q_ps_shell_and_claw.objectives[0].count ?? 0;
+    const forcedBoss = PROVING_SHORE_QUESTS.q_ps_mother_of_pearl.objectives[0].count ?? 0;
     // Worst case low: every forced kill is a level-1 mob felled as late as
-    // player level 2. Worst case high: the effigy is a level-1 mob at player
-    // level 1, and every scuttler spawns level 2 and dies at player level 1.
-    const minKillXp = (forcedKills + forcedCrabs) * mobXpValue(1, 2);
-    const maxKillXp = forcedKills * mobXpValue(1, 1) + forcedCrabs * mobXpValue(2, 1);
+    // player level 2 (the boss is fixed level 2, felled at level 2). Worst
+    // case high: the effigy is a level-1 mob at player level 1, and every
+    // scuttler (and the boss) spawns level 2 and dies at player level 1.
+    const minKillXp =
+      (forcedKills + forcedCrabs) * mobXpValue(1, 2) + forcedBoss * mobXpValue(2, 2);
+    const maxKillXp =
+      forcedKills * mobXpValue(1, 1) + (forcedCrabs + forcedBoss) * mobXpValue(2, 1);
     const sailXp = PROVING_SHORE_QUESTS.q_ps_set_sail.xpReward;
     expect(questXp + minKillXp).toBeGreaterThanOrEqual(toLevel3);
     expect(questXp - sailXp + maxKillXp).toBeLessThan(toLevel3);
@@ -287,6 +291,7 @@ describe('proving shore placement', () => {
       'q_ps_the_gauntlet',
       'q_ps_strike_true',
       'q_ps_shell_and_claw',
+      'q_ps_mother_of_pearl',
       'q_ps_the_wreck_line',
       'q_ps_pouch_and_purse',
       'q_ps_the_signpost',
@@ -297,6 +302,9 @@ describe('proving shore placement', () => {
       ['warden_tam', 'overseer_pell'],
       ['overseer_pell', 'drillmaster_rook'],
       ['drillmaster_rook', 'tidewarden_nel'],
+      // Nel holds two stations: the miniboss detour leaves and returns to
+      // her watch, then she hands the salvage haul out as before.
+      ['tidewarden_nel', 'tidewarden_nel'],
       ['tidewarden_nel', 'quartermaster_finch'],
       ['quartermaster_finch', 'instructor_maren'],
       ['instructor_maren', 'instructor_maren'],

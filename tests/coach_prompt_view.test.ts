@@ -8,10 +8,16 @@ import { describe, expect, it } from 'vitest';
 // The generation-side line list (plain mjs data): the clip keys the UI plays
 // must each have a text entry the ElevenLabs pipeline renders.
 import { EXTRA_LINES } from '../scripts/voices/extra_lines.mjs';
-import { PROVING_SHORE_NPCS, PROVING_SHORE_QUESTS } from '../src/sim/content/proving_shore';
+import {
+  PROVING_SHORE_NPCS,
+  PROVING_SHORE_PROPS,
+  PROVING_SHORE_QUESTS,
+} from '../src/sim/content/proving_shore';
+import { CRAB_SUMMON_SITE } from '../src/sim/interactions/crab_summon';
 import { INTERACT_RANGE } from '../src/sim/types';
 import { BELL_STEP_TARGET } from '../src/ui/bootcamp_view';
 import {
+  BOOTCAMP_PARKOUR,
   type CoachPromptEntity,
   coachPromptChip,
   coachPromptInRange,
@@ -114,6 +120,75 @@ describe('coachPromptPlan: which target carries the bubble', () => {
     expect(p!.x).toBe(BELL_STEP_TARGET.x);
     expect(p!.z).toBe(BELL_STEP_TARGET.z);
     expect(p!.verbKey).toBe('hudChrome.bootcamp.promptRing');
+  });
+
+  it('asks for the lure at the pool, then attacks once the king is up', () => {
+    // The pearl detour's quarry is summoned: with no live boss the bubble
+    // stands on the tide pool with the bags-bind Summon ask; once he prowls
+    // it becomes the usual kill bubble on him.
+    const focus = { questId: 'q_ps_mother_of_pearl', state: 'active' as const };
+    const before = plan({ focus, entities: [] });
+    expect(before!.kind).toBe('use');
+    expect(before!.verbKey).toBe('hudChrome.bootcamp.promptSummon');
+    expect({ x: before!.x, z: before!.z }).toEqual({
+      x: CRAB_SUMMON_SITE.x,
+      z: CRAB_SUMMON_SITE.z,
+    });
+    const boss: CoachPromptEntity = {
+      kind: 'mob',
+      templateId: 'mister_crabs',
+      pos: { x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z + 3 },
+    };
+    const during = plan({ focus, entities: [boss] });
+    expect(during!.kind).toBe('kill');
+    expect(during!.verbKey).toBe('hudChrome.bootcamp.promptAttack');
+    expect({ x: during!.x, z: during!.z }).toEqual(boss.pos);
+    // A dead king reads as "not up": the lure ask returns for the re-summon.
+    const after = plan({ focus, entities: [{ ...boss, dead: true }] });
+    expect(after!.kind).toBe('use');
+  });
+
+  it('asks for the hurdle jump, then the crate step, then goes quiet', () => {
+    // Lane 2 runs south (-z): entering at the first flag the bubble aims at
+    // the hurdle rail; a stride past the rail it moves to the crate step; a
+    // stride past the crates the lane is clear and the ask ends.
+    const atFlag = plan({ step: 'turnwalk', playerPos: { x: -308, z: -16 } });
+    expect(atFlag!.kind).toBe('jump');
+    expect(atFlag!.verbKey).toBe('hudChrome.bootcamp.promptJump');
+    expect({ x: atFlag!.x, z: atFlag!.z }).toEqual(BOOTCAMP_PARKOUR[0]);
+    const pastRail = plan({ step: 'turnwalk', playerPos: { x: -308, z: -24.5 } });
+    expect({ x: pastRail!.x, z: pastRail!.z }).toEqual(BOOTCAMP_PARKOUR[1]);
+    expect(plan({ step: 'turnwalk', playerPos: { x: -308, z: -28.5 } })).toBeNull();
+  });
+
+  it('anchors the parkour asks on the authored obstacles', () => {
+    // The hurdle anchor sits mid-lane ON a fence rail spanning lane 2 wall
+    // to wall, and the crate-step anchor sits on the authored crate line: if
+    // the content moves, the bubbles move with it or this pins the drift.
+    const [hurdle, step] = BOOTCAMP_PARKOUR;
+    const rail = (PROVING_SHORE_PROPS.fences ?? []).find(
+      (f) => f.z1 === hurdle.z && f.z2 === hurdle.z && f.x1 <= hurdle.x && hurdle.x <= f.x2,
+    );
+    const railSpan = rail ?? { x1: 0, x2: 0 };
+    expect(rail, 'a lane 2 rail under the hurdle anchor').toBeTruthy();
+    // Wall to wall: the rail meets both lane walls so it cannot be walked
+    // around (lane 2's west wall x -312, east wall x -304).
+    expect(Math.min(railSpan.x1, railSpan.x2)).toBe(-312);
+    expect(Math.max(railSpan.x1, railSpan.x2)).toBe(-304);
+    const crates = PROVING_SHORE_PROPS.crates ?? [];
+    const stepRow = crates.filter(([, z]) => z === step.z);
+    expect(stepRow.length, 'the crate step under the second anchor').toBeGreaterThanOrEqual(6);
+    // Shoulder to shoulder across the lane: no slipping between crates. The
+    // narrowest collider is the barrel (r 0.44, prop_layout.ts
+    // campCrateShape), so adjacent points 1.1 apart always overlap or leave
+    // a gap smaller than any player body.
+    const xs = stepRow.map(([x]) => x).sort((a, b) => a - b);
+    for (let i = 1; i < xs.length; i++) {
+      const gap = xs[i] - xs[i - 1];
+      expect(gap, `crate spacing ${i}`).toBeLessThanOrEqual(1.15);
+    }
+    expect(Math.min(...xs)).toBeLessThanOrEqual(-311);
+    expect(Math.max(...xs)).toBeGreaterThanOrEqual(-305);
   });
 });
 

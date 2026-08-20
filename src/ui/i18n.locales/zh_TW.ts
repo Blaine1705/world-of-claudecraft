@@ -14,6 +14,49 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.promptAttack': '攻擊',
+  'hudChrome.bootcamp.keycapThen': '然後',
+  'hudChrome.bootcamp.promptSummon': '召喚',
+  'hudChrome.bootcamp.taskPearlBody':
+    '沿著金色路徑走到沙灘最西端的潮池。站在水邊，按 {bagsKey} 打開背包，用滑鼠左鍵點擊鹹水誘餌把牠引出來。像對付掠蟹那樣和牠戰鬥，等牠倒下後，對著牠的蟹殼按 {interactKey}，取走瑩潤珍珠。',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '沿著金色路徑走到沙灘最西端的潮池。站在水邊，打開背包點按鹹水誘餌把牠引出來。像對付掠蟹那樣和牠戰鬥，等牠倒下後，點按牠的蟹殼，取走瑩潤珍珠。',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '沿著金色路徑走到沙灘最西端的潮池。站在水邊，打開背包選擇鹹水誘餌把牠引出來。像對付掠蟹那樣和牠戰鬥，等牠倒下後，對著牠的蟹殼按下互動鍵，取走瑩潤珍珠。',
+  'hudChrome.bootcamp.ringEquipTitle': '戴上你的戰利品',
+  'hudChrome.bootcamp.ringEquipBody':
+    '珍珠之母就在你的背包裡。按 {bagsKey} 打開背包，然後用滑鼠左鍵點擊戒指，把它戴上手指。',
+  'hudChrome.bootcamp.ringEquipBodyTouch': '珍珠之母就在你的背包裡。打開背包，點按戒指把它戴上手指。',
+  'hudChrome.bootcamp.ringEquipBodyPad': '珍珠之母就在你的背包裡。打開背包，選擇戒指把它戴上手指。',
+  'hudChrome.bootcamp.ringAdmireTitle': '瞧瞧你',
+  'hudChrome.bootcamp.ringAdmireBody':
+    '很襯你。按 {charKey} 打開角色面板，看看戴在手上的戒指，以及它提升的每一項屬性。',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    '很襯你。從選單打開角色面板，看看戴在手上的戒指，以及它提升的每一項屬性。',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    '很襯你。從選單打開角色面板，看看戴在手上的戒指，以及它提升的每一項屬性。',
+  'entities.mobs.mister_crabs.name': '螃蟹先生',
+  'entities.items.ps_briny_lure.name': '鹹水誘餌',
+  'entities.items.ps_lustrous_pearl.name': '瑩潤珍珠',
+  'entities.items.mother_of_pearl.name': '珍珠之母',
+  'entities.quests.q_ps_mother_of_pearl.title': '珍珠之母',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '三隻蟹殼都敲開了，{playerName}。但沉船線上還有一位王，他守著的寶貝比這片沙灘上所有木箱加起來還值錢。帶上這枚鹹水誘餌，穿過殘骸，去沙灘最西端的潮池。站在水邊，按 B 打開背包，用滑鼠左鍵點擊誘餌，把他喚醒。螃蟹先生的鉗子比他那些小個子親戚狠得多，盯緊你的生命條，別停下攻擊，喘不過氣就沿著沙灘往後退。等他倒下，走到他的蟹殼前直到名字浮現，按 F 或用左鍵點擊，取走他攥著的瑩潤珍珠。把那顆珍珠帶回來給我。',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '瑩潤珍珠，還是從淺灘老王自己身上撬下來的。我父親幹活的每個清晨都會對那隻螃蟹脫帽致意；該給的敬意總要給。別動... 好了。穿好線，鑲好座，歸你了，{playerName}：珍珠之母。按 B 打開背包，用左鍵點擊戒指戴上它，再按 C 打開角色面板，看看它戴在你手上的樣子。小小一件東西，戴上它，你的每一分都會更強。',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': '擊敗螃蟹先生',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '取得瑩潤珍珠',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '走到一個草人跟前，按 {targetKey}，或用滑鼠左鍵點擊它，把它設為目標。然後按 {attackKey}，或點擊動作列上的第二個按鈕，施放你的法術。一直施放到一個散架為止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '走到一個草人跟前，點按它，把它設為目標。然後點按動作列上的第二個按鈕，施放你的法術。一直施放到一個散架為止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '走到一個草人跟前，按下目標鍵把它設為目標。然後按下第二個動作鍵，施放你的法術。一直施放到一個散架為止。',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '掠蟹是會回擊的。按 {targetKey}，或用滑鼠左鍵點擊一隻，把牠設為目標，然後按 {attackKey} 施放法術，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '掠蟹是會回擊的。點按一隻把牠設為目標，然後點按動作列上的第二個按鈕施放法術，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '掠蟹是會回擊的。按下目標鍵，再按下第二個動作鍵施放法術，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
   'hudChrome.bootcamp.voiceGraduate': '鐘為你敲響了。海那頭的東溪正等著你，你也準備好了。',
   'hudChrome.bootcamp.voiceVeerOff': '慢著，朋友，走反了。金色路徑在你身後呢。',
   'hudChrome.bootcamp.voiceStationDoneB': '你越來越上手了，錯不了。',
@@ -12858,7 +12901,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '第一面旗到手。推動右搖桿轉身，直到正對向南延伸的圍欄跑道，然後把左搖桿推向上方，沿跑道走到第二面旗。',
   'hudChrome.bootcamp.strafeTitle': '橫移走完最後一條跑道',
   'hudChrome.bootcamp.strafeBody':
-    '側向移動還有另一種辦法。按住 {strafeKey}，沿最後一條跑道橫移，直到紅旗被你甩在身後。橫移能讓你移動時視線始終鎖在目標上：總有一天你會這樣作戰。',
+    '側向移動還有另一種辦法。按一下 {strafeKey}，側步跨進最後一條跑道，然後按住 {forwardKey}，再用 {strafeKey} 橫移，直到紅旗被你甩在身後。橫移能讓你移動時視線始終鎖在目標上：總有一天你會這樣作戰。',
   'hudChrome.bootcamp.strafeBodyTouch':
     '側向移動還有另一種辦法。把移動搖桿推向左邊，沿最後一條跑道橫移，直到紅旗被你甩在身後。',
   'hudChrome.bootcamp.strafeBodyPad':

@@ -909,7 +909,7 @@ export const sv_SE: EnTranslations = {
       "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
       "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
       "strafeTitle": "Strafe the last lane",
-      "strafeBody": "There is another way to move sideways. Hold {strafeKey} to strafe down the last lane until the red flag is behind you. Strafing keeps your eyes on a target while you move: you will fight this way one day.",
+      "strafeBody": "There is another way to move sideways. Tap {strafeKey} to sidestep into the last lane, then hold {forwardKey} and strafe with {strafeKey} until the red flag is behind you. Strafing keeps your eyes on a target while you move: you will fight this way one day.",
       "strafeBodyTouch": "There is another way to move sideways. Push the movement stick left to strafe down the last lane until the red flag is behind you.",
       "strafeBodyPad": "There is another way to move sideways. Push the left stick left to strafe down the last lane until the red flag is behind you.",
       "cameraTitle": "Swing the camera",
@@ -938,6 +938,15 @@ export const sv_SE: EnTranslations = {
       "taskShellBody": "The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
       "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap the first action bar button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
       "taskShellBodyPad": "The scuttlers pinch back. Press your target button, then your first action button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskStrikeTrueBodyCaster": "Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.",
+      "taskStrikeTrueBodyCasterTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.",
+      "taskStrikeTrueBodyCasterPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.",
+      "taskShellBodyCaster": "The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyCasterTouch": "The scuttlers pinch back. Tap one to target it, then tap the second button on the action bar to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyCasterPad": "The scuttlers pinch back. Press your target button, then your second action button to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskPearlBody": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
+      "taskPearlBodyTouch": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
+      "taskPearlBodyPad": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
       "taskWreckLineBody": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
       "taskWreckLineBodyTouch": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
       "taskWreckLineBodyPad": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.",
@@ -954,6 +963,17 @@ export const sv_SE: EnTranslations = {
       "promptRing": "Ring",
       "promptHold": "Hold",
       "promptAttack": "Attack",
+      "promptJump": "Jump",
+      "promptSummon": "Summon",
+      "ringEquipTitle": "Wear your prize",
+      "ringEquipBody": "The Mother of Pearl is in your bags. Press {bagsKey} to open them, then left-click the ring to slide it onto your finger.",
+      "ringEquipBodyTouch": "The Mother of Pearl is in your bags. Open them and tap the ring to slide it onto your finger.",
+      "ringEquipBodyPad": "The Mother of Pearl is in your bags. Open them and choose the ring to slide it onto your finger.",
+      "ringAdmireTitle": "Look at you",
+      "ringAdmireBody": "It suits you. Press {charKey} to open your character sheet and see the ring on your hand, and every number it lifts.",
+      "ringAdmireBodyTouch": "It suits you. Open your character sheet from the menu and see the ring on your hand, and every number it lifts.",
+      "ringAdmireBodyPad": "It suits you. Open your character sheet from the menu and see the ring on your hand, and every number it lifts.",
+      "keycapThen": "then",
       "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
       "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
       "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
@@ -12493,6 +12513,15 @@ export const sv_SE: EnTranslations = {
       "dawnhold_posy": {
         "name": "Dawnhold Garden Posy"
       },
+      "ps_briny_lure": {
+        "name": "Briny Lure"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Lustrous Pearl"
+      },
+      "mother_of_pearl": {
+        "name": "Mother of Pearl"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
@@ -13829,6 +13858,9 @@ export const sv_SE: EnTranslations = {
       },
       "shore_scuttler": {
         "name": "Shore Scuttler"
+      },
+      "mister_crabs": {
+        "name": "Mister Crabs"
       },
       "rift_hellguard": {
         "name": "Helvetesvakt"
@@ -16458,6 +16490,19 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Shore Scuttler culled"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Mother of Pearl",
+        "text": "Three shells cracked, {playerName}, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk to his shell until its name shows and press F, or left-click it, to claim the Lustrous Pearl he hoards. Bring that pearl back to me.",
+        "completion": "The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, {playerName}: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.",
+        "objectives": {
+          "0": {
+            "label": "Mister Crabs slain"
+          },
+          "1": {
+            "label": "Lustrous Pearl claimed"
           }
         }
       },

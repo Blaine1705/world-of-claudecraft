@@ -848,6 +848,10 @@ export type ItemUse =
   // Thrown at the nearest murloc hut to torch it (q_deepfen_purge); see
   // src/sim/interactions/firebottle_hut.ts. Reusable, so it is never consumed.
   | { type: 'throw' }
+  // Used at its quest's summon site to call the named foe out (the Proving
+  // Shore's tide-pool miniboss); see src/sim/interactions/crab_summon.ts.
+  // Reusable like the firebottle, so a wipe can always retry.
+  | { type: 'summon' }
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.

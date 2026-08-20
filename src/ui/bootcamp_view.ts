@@ -97,7 +97,7 @@ const KEYBOARD: Record<BootcampStep, BootcampBodyPlan> = {
   talk: { bodyKey: 'hudChrome.bootcamp.talkBody', params: ['interactKey'] },
   forward: { bodyKey: 'hudChrome.bootcamp.forwardBody', params: ['forwardKey'] },
   turnwalk: { bodyKey: 'hudChrome.bootcamp.turnwalkBody', params: ['turnKey', 'forwardKey'] },
-  strafe: { bodyKey: 'hudChrome.bootcamp.strafeBody', params: ['strafeKey'] },
+  strafe: { bodyKey: 'hudChrome.bootcamp.strafeBody', params: ['strafeKey', 'forwardKey'] },
   camera: { bodyKey: 'hudChrome.bootcamp.cameraBody', params: [] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBody', params: ['interactKey'] },
 };
@@ -150,8 +150,10 @@ export function bootcampKeycaps(
   const caps: Record<BootcampStep, readonly string[]> = {
     talk: [labels.interactKey],
     forward: [labels.forwardKey],
+    // Sequences read in press order (the chips row separates them with a
+    // localized "then"): turn, THEN walk; sidestep, THEN walk.
     turnwalk: [labels.turnKey, labels.forwardKey],
-    strafe: [labels.strafeKey],
+    strafe: [labels.strafeKey, labels.forwardKey],
     camera: [],
     done: [labels.interactKey],
   };
@@ -199,13 +201,22 @@ export function coachFocus(stateOf: (questId: string) => CoachState | null): Coa
 export const COACH_ACTIVE_TARGETS: Readonly<Record<string, { x: number; z: number } | null>> = {
   q_ps_strike_true: { x: -336, z: -14 },
   q_ps_shell_and_claw: { x: -380, z: -42 },
+  // The tide pool (interactions/crab_summon.ts CRAB_SUMMON_SITE; a ui core
+  // mirrors the coordinate, tests/bootcamp_view.test.ts pins them equal).
+  q_ps_mother_of_pearl: { x: -398, z: -17 },
   q_ps_the_wreck_line: null,
   q_ps_pouch_and_purse: PROVING_SHORE_NPCS.quartermaster_finch.pos,
   q_ps_the_signpost: { x: -312, z: 42.5 },
   q_ps_set_sail: PROVING_SHORE_NPCS.ferryman_odo.pos,
 };
 
-export type CoachParam = 'interactKey' | 'mapKey' | 'targetKey' | 'attackKey' | 'bagsKey';
+export type CoachParam =
+  | 'interactKey'
+  | 'mapKey'
+  | 'targetKey'
+  | 'attackKey'
+  | 'bagsKey'
+  | 'charKey';
 
 export interface CoachCardPlan {
   /** Null on the active state: the overlay titles that card with the quest's
@@ -251,6 +262,10 @@ const COACH_BODY: Record<CoachState, Record<BootcampInputMode, TranslationKey>> 
  *  the pouch lesson's READY card walks the buckle-on before the hand-in. */
 interface CoachBodyOverride {
   keys: Record<BootcampInputMode, TranslationKey>;
+  /** Caster-class arms (mage, warlock, priest, druid): their first real
+   *  button is the slot-2 spell, so the combat lessons speak of casting and
+   *  the second button instead of swinging and the first. */
+  casterKeys?: Record<BootcampInputMode, TranslationKey>;
   /** Keyboard-arm bind labels the body splices. */
   params: readonly CoachParam[];
   bodyHasNpc: boolean;
@@ -265,6 +280,11 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
       touch: 'hudChrome.bootcamp.taskStrikeTrueBodyTouch',
       pad: 'hudChrome.bootcamp.taskStrikeTrueBodyPad',
     },
+    casterKeys: {
+      keyboard: 'hudChrome.bootcamp.taskStrikeTrueBodyCaster',
+      touch: 'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch',
+      pad: 'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad',
+    },
     params: ['targetKey', 'attackKey'],
     bodyHasNpc: false,
   },
@@ -274,7 +294,21 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
       touch: 'hudChrome.bootcamp.taskShellBodyTouch',
       pad: 'hudChrome.bootcamp.taskShellBodyPad',
     },
+    casterKeys: {
+      keyboard: 'hudChrome.bootcamp.taskShellBodyCaster',
+      touch: 'hudChrome.bootcamp.taskShellBodyCasterTouch',
+      pad: 'hudChrome.bootcamp.taskShellBodyCasterPad',
+    },
     params: ['targetKey', 'attackKey'],
+    bodyHasNpc: false,
+  },
+  q_ps_mother_of_pearl: {
+    keys: {
+      keyboard: 'hudChrome.bootcamp.taskPearlBody',
+      touch: 'hudChrome.bootcamp.taskPearlBodyTouch',
+      pad: 'hudChrome.bootcamp.taskPearlBodyPad',
+    },
+    params: ['bagsKey', 'interactKey'],
     bodyHasNpc: false,
   },
   q_ps_the_wreck_line: {
@@ -310,7 +344,11 @@ const COACH_READY_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
   },
 };
 
-export function coachCardPlan(focus: CoachFocus, mode: BootcampInputMode): CoachCardPlan {
+export function coachCardPlan(
+  focus: CoachFocus,
+  mode: BootcampInputMode,
+  caster = false,
+): CoachCardPlan {
   const quest = PROVING_SHORE_QUESTS[focus.questId];
   const giver = PROVING_SHORE_NPCS[quest.giverNpcId];
   const turnIn = PROVING_SHORE_NPCS[quest.turnInNpcId];
@@ -327,10 +365,15 @@ export function coachCardPlan(focus: CoachFocus, mode: BootcampInputMode): Coach
   }
   if (focus.state === 'active') {
     const override = COACH_ACTIVE_OVERRIDES[focus.questId];
+    const overrideKeys = override
+      ? caster && override.casterKeys
+        ? override.casterKeys
+        : override.keys
+      : null;
     return {
       titleKey: null,
       titleHasNpc: false,
-      bodyKey: override ? override.keys[mode] : COACH_BODY.active[mode],
+      bodyKey: overrideKeys ? overrideKeys[mode] : COACH_BODY.active[mode],
       params: mode === 'keyboard' ? (override ? override.params : ['mapKey']) : [],
       bodyHasNpc: override?.bodyHasNpc ?? false,
       npcId: override?.npcRole === 'giver' ? quest.giverNpcId : quest.turnInNpcId,
@@ -398,5 +441,66 @@ export function bellCardPlan(mode: BootcampInputMode): BellCardPlan {
     bodyKey: bodies[mode],
     params: mode === 'keyboard' ? ['interactKey'] : [],
     arrow: BELL_STEP_TARGET,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// The ring equip lesson (the Mother of Pearl hand-in's coda): the reward
+// sits in the bags, and the card walks wearing it (B, click the ring) and
+// then admiring it (C, the character sheet), Guy's equip-tutorial ask.
+// ---------------------------------------------------------------------------
+
+export const RING_LESSON_QUEST_ID = 'q_ps_mother_of_pearl';
+export const RING_LESSON_ITEM_ID = 'mother_of_pearl';
+
+export type RingLessonPhase = 'equip' | 'admire';
+
+export interface RingLessonState {
+  /** The pearl quest is handed in (the ring exists). */
+  questDone: boolean;
+  /** The ring sits in a bag slot. */
+  inBags: boolean;
+  /** The ring sits on a finger (either ring slot). */
+  equipped: boolean;
+  /** The character sheet has been opened since equipping (the lesson's end). */
+  charSeen: boolean;
+}
+
+/** Which ring-lesson card is due, or null when the lesson is over (or has
+ *  nothing to teach: the ring vanished to the bank or a vendor, their call). */
+export function ringLessonPhase(s: RingLessonState): RingLessonPhase | null {
+  if (!s.questDone) return null;
+  if (s.equipped) return s.charSeen ? null : 'admire';
+  return s.inBags ? 'equip' : null;
+}
+
+export interface RingCardPlan {
+  titleKey: TranslationKey;
+  bodyKey: TranslationKey;
+  params: readonly CoachParam[];
+}
+
+export function ringCardPlan(phase: RingLessonPhase, mode: BootcampInputMode): RingCardPlan {
+  if (phase === 'equip') {
+    const bodies: Record<BootcampInputMode, TranslationKey> = {
+      keyboard: 'hudChrome.bootcamp.ringEquipBody',
+      touch: 'hudChrome.bootcamp.ringEquipBodyTouch',
+      pad: 'hudChrome.bootcamp.ringEquipBodyPad',
+    };
+    return {
+      titleKey: 'hudChrome.bootcamp.ringEquipTitle',
+      bodyKey: bodies[mode],
+      params: mode === 'keyboard' ? ['bagsKey'] : [],
+    };
+  }
+  const bodies: Record<BootcampInputMode, TranslationKey> = {
+    keyboard: 'hudChrome.bootcamp.ringAdmireBody',
+    touch: 'hudChrome.bootcamp.ringAdmireBodyTouch',
+    pad: 'hudChrome.bootcamp.ringAdmireBodyPad',
+  };
+  return {
+    titleKey: 'hudChrome.bootcamp.ringAdmireTitle',
+    bodyKey: bodies[mode],
+    params: mode === 'keyboard' ? ['charKey'] : [],
   };
 }

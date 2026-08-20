@@ -221,6 +221,7 @@ const MOB_IDS = [
   // The Proving Shore (tutorial island, src/sim/content/proving_shore.ts).
   'training_effigy',
   'shore_scuttler',
+  'mister_crabs',
   // The Infernal Citadel set-piece (src/sim/content/rift/infernal_citadel.ts).
   'rift_hellguard',
   'rift_pact_acolyte',
@@ -552,6 +553,7 @@ const QUEST_IDS = [
   'q_ps_the_gauntlet',
   'q_ps_strike_true',
   'q_ps_shell_and_claw',
+  'q_ps_mother_of_pearl',
   'q_ps_the_wreck_line',
   'q_ps_pouch_and_purse',
   'q_ps_the_signpost',

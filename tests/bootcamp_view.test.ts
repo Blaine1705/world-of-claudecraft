@@ -31,6 +31,8 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
+  ringCardPlan,
+  ringLessonPhase,
 } from '../src/ui/bootcamp_view';
 import { t } from '../src/ui/i18n';
 
@@ -98,14 +100,16 @@ describe('copy plans', () => {
     }
   });
 
-  it('the strafe lesson asks for the strafe key alone', () => {
+  it('the strafe lesson sequences the strafe key then forward', () => {
     // The camera got its own end-of-course lesson, and the turn lesson
-    // already happened a lane ago: the strafe copy names ONE key and must
-    // reintroduce neither mouse-drag view control nor the turn key.
+    // already happened a lane ago: the strafe copy teaches the press ORDER
+    // (sidestep, then hold forward) and must reintroduce neither mouse-drag
+    // view control nor the turn key.
     const plan = bootcampBodyPlan('strafe', 'keyboard');
-    expect(plan.params).toEqual(['strafeKey']);
-    const body = t(plan.bodyKey, { strafeKey: 'Q' });
+    expect(plan.params).toEqual(['strafeKey', 'forwardKey']);
+    const body = t(plan.bodyKey, { strafeKey: 'Q', forwardKey: 'W' });
     expect(body).not.toMatch(/mouse/i);
+    expect(body.indexOf('Q')).toBeLessThan(body.indexOf('W'));
   });
 
   it('touch and pad copy never interpolate bind labels', () => {
@@ -122,7 +126,7 @@ describe('copy plans', () => {
     expect(bootcampKeycaps('talk', 'keyboard', labels)).toEqual(['F']);
     expect(bootcampKeycaps('forward', 'keyboard', labels)).toEqual(['W']);
     expect(bootcampKeycaps('turnwalk', 'keyboard', labels)).toEqual(['D', 'W']);
-    expect(bootcampKeycaps('strafe', 'keyboard', labels)).toEqual(['Q']);
+    expect(bootcampKeycaps('strafe', 'keyboard', labels)).toEqual(['Q', 'W']);
     // The camera lesson is mouse/stick work: no keycaps anywhere.
     expect(bootcampKeycaps('camera', 'keyboard', labels)).toEqual([]);
     expect(bootcampKeycaps('done', 'keyboard', labels)).toEqual(['F']);
@@ -215,6 +219,7 @@ describe('the rail coach', () => {
       targetKey: 'Tab',
       attackKey: '1',
       bagsKey: 'B',
+      charKey: 'C',
     };
     const at = (questId: string, state: CoachState, mode: 'keyboard' | 'touch' | 'pad') =>
       coachKeycaps(coachCardPlan({ questId, state }, mode), mode, labels);
@@ -225,11 +230,49 @@ describe('the rail coach', () => {
     expect(at('q_ps_set_sail', 'active', 'keyboard')).toEqual([]);
     expect(at('q_ps_strike_true', 'active', 'keyboard')).toEqual(['Tab', '1']);
     expect(at('q_ps_shell_and_claw', 'active', 'keyboard')).toEqual(['Tab', '1']);
+    expect(at('q_ps_mother_of_pearl', 'active', 'keyboard')).toEqual(['B', 'F']);
     expect(at('q_ps_the_wreck_line', 'active', 'keyboard')).toEqual(['F']);
     expect(at('q_ps_pouch_and_purse', 'active', 'keyboard')).toEqual(['F']);
     expect(at('q_ps_pouch_and_purse', 'ready', 'keyboard')).toEqual(['B', 'F']);
     expect(at('q_ps_shell_and_claw', 'available', 'touch')).toEqual([]);
     expect(at('q_ps_strike_true', 'active', 'pad')).toEqual([]);
+  });
+
+  it('the ring lesson phases and cards walk equip then admire', () => {
+    // Armed only once the pearl quest is done; the equip card asks for the
+    // bags, the admire card for the character sheet, and the lesson lets go
+    // once the sheet has been seen (or the ring left both bags and fingers).
+    const base = { questDone: true, inBags: true, equipped: false, charSeen: false };
+    expect(ringLessonPhase({ ...base, questDone: false })).toBeNull();
+    expect(ringLessonPhase(base)).toBe('equip');
+    expect(ringLessonPhase({ ...base, inBags: false, equipped: true })).toBe('admire');
+    expect(ringLessonPhase({ ...base, inBags: false, equipped: true, charSeen: true })).toBeNull();
+    expect(ringLessonPhase({ ...base, inBags: false })).toBeNull();
+
+    const labels = {
+      interactKey: 'F',
+      mapKey: 'M',
+      targetKey: 'Tab',
+      attackKey: '1',
+      bagsKey: 'B',
+      charKey: 'C',
+    };
+    const equip = ringCardPlan('equip', 'keyboard');
+    expect(coachKeycaps(equip, 'keyboard', labels)).toEqual(['B']);
+    const equipBody = t(equip.bodyKey, { bagsKey: 'B' });
+    expect(equipBody).toMatch(/ring/i);
+    expect(equipBody).not.toMatch(/\{\w+\}/);
+    const admire = ringCardPlan('admire', 'keyboard');
+    expect(coachKeycaps(admire, 'keyboard', labels)).toEqual(['C']);
+    const admireBody = t(admire.bodyKey, { charKey: 'C' });
+    expect(admireBody).toMatch(/character/i);
+    expect(admireBody).not.toMatch(/\{\w+\}/);
+    // Touch and pad arms interpolate nothing, the ladder's rule.
+    for (const phase of ['equip', 'admire'] as const) {
+      for (const mode of ['touch', 'pad'] as const) {
+        expect(ringCardPlan(phase, mode).params).toHaveLength(0);
+      }
+    }
   });
 
   it('quest-mechanic overrides replace the generic bodies with real lessons', () => {
@@ -270,6 +313,33 @@ describe('the rail coach', () => {
     // Quests without an override keep the generic three-state copy.
     const generic = coachCardPlan({ questId: 'q_ps_set_sail', state: 'active' }, 'keyboard');
     expect(generic.bodyKey).toBe('hudChrome.bootcamp.coachTaskBody');
+  });
+
+  it('caster classes get the second-button casting lesson for both fights', () => {
+    // Mage, warlock, priest, and druid open with a slot-2 spell, so their
+    // combat cards teach the SECOND action button and speak of casting; the
+    // melee arm keeps the first-button swing copy untouched.
+    for (const questId of ['q_ps_strike_true', 'q_ps_shell_and_claw'] as const) {
+      for (const mode of ['keyboard', 'touch', 'pad'] as const) {
+        const caster = coachCardPlan({ questId, state: 'active' }, mode, true);
+        const melee = coachCardPlan({ questId, state: 'active' }, mode, false);
+        expect(caster.bodyKey, `${questId}/${mode}`).toMatch(/Caster/);
+        expect(melee.bodyKey, `${questId}/${mode}`).not.toMatch(/Caster/);
+        const body = t(caster.bodyKey, { targetKey: 'Tab', attackKey: '2' });
+        expect(body, `${questId}/${mode}`).toMatch(/cast/i);
+        // Touch and pad have no key label to name, so their copy must say
+        // which button; the keyboard arm names the interpolated key itself.
+        if (mode !== 'keyboard') expect(body, `${questId}/${mode}`).toMatch(/second/i);
+        expect(body).not.toMatch(/\{\w+\}/);
+      }
+    }
+    // The caster flag changes nothing outside the two fight lessons.
+    const wreck = coachCardPlan(
+      { questId: 'q_ps_the_wreck_line', state: 'active' },
+      'keyboard',
+      true,
+    );
+    expect(wreck.bodyKey).not.toMatch(/Caster/);
   });
 });
 

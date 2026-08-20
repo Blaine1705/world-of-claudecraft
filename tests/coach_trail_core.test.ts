@@ -20,6 +20,7 @@ import {
   PROVING_SHORE_QUEST_ORDER,
   PROVING_SHORE_QUESTS,
 } from '../src/sim/content/proving_shore';
+import { CRAB_SUMMON_SITE } from '../src/sim/interactions/crab_summon';
 
 const GAUNTLET = PROVING_SHORE_QUEST_ORDER[0];
 
@@ -166,6 +167,28 @@ describe('coachGuides: the objective beam', () => {
     expect(shell.areaRing).toEqual({ x: -380, z: -42, radius: 11 });
     expect(coachGuides(reader({ q_ps_strike_true: 'ready' })).areaRing).toBeNull();
     expect(coachGuides(reader({ q_ps_the_wreck_line: 'active' })).areaRing).toBeNull();
+  });
+
+  it('walks the pearl detour: trail to the pool, beam and ring on it, back to Nel', () => {
+    // The render core mirrors the summon module's site; if the site moves,
+    // this pins the drift.
+    expect({ x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z }).toEqual({ x: -398, z: -17 });
+    const active = coachGuides(reader({ q_ps_mother_of_pearl: 'active' }));
+    expect(active.plan!.key).toBe('pearl:active');
+    expect(active.plan!.points).toEqual([
+      PROVING_SHORE_NPCS.tidewarden_nel.pos,
+      { x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z },
+    ]);
+    // A watery target, never a character: the beam and the camp ring both
+    // stand on the pool (the summoned king spawns inside it).
+    expect(active.beamAt).toEqual({ x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z });
+    expect(active.areaRing).toEqual({ x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z, radius: 8 });
+    // The hand-back leg walks from the pool to Nel.
+    const ready = coachTrailPlan(reader({ q_ps_mother_of_pearl: 'ready' }), 0);
+    expect(ready!.points).toEqual([
+      { x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z },
+      PROVING_SHORE_NPCS.tidewarden_nel.pos,
+    ]);
   });
 });
 

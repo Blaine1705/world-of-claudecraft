@@ -645,7 +645,20 @@
   }
   .tut-prompt-chips {
     display: flex;
+    align-items: center;
     gap: 4px;
+  }
+  /* The word between sequenced keycaps ("D then W"): quiet, lowercase, never
+     mistaken for a key itself. */
+  .tut-keycap-then {
+    font-size: 11px;
+    font-weight: 400;
+    color: #b8ad8e;
+    padding: 0 2px;
+    text-shadow: 0 1px 2px #000;
+  }
+  .tut-keys {
+    align-items: center;
   }
   .tut-prompt-verb {
     text-shadow: 0 1px 2px #000;

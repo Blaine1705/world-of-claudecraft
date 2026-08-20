@@ -14,6 +14,51 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.promptAttack': '攻撃',
+  'hudChrome.bootcamp.keycapThen': 'つぎに',
+  'hudChrome.bootcamp.promptSummon': '召喚',
+  'hudChrome.bootcamp.taskPearlBody':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、{bagsKey}を押してバッグを開き、潮の疑似餌を左クリックして奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻の上で{interactKey}を押して輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、バッグを開いて潮の疑似餌をタップし、奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻をタップして輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、バッグを開いて潮の疑似餌を選び、奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻の上でインタラクトボタンを押して輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.ringEquipTitle': '戦利品を身につけよう',
+  'hudChrome.bootcamp.ringEquipBody':
+    '真珠の母はバッグの中にある。{bagsKey}を押してバッグを開き、指輪を左クリックして指にはめよう。',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    '真珠の母はバッグの中にある。バッグを開いて指輪をタップし、指にはめよう。',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    '真珠の母はバッグの中にある。バッグを開いて指輪を選び、指にはめよう。',
+  'hudChrome.bootcamp.ringAdmireTitle': 'よく似合っている',
+  'hudChrome.bootcamp.ringAdmireBody':
+    'よく似合う。{charKey}を押してキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    'よく似合う。メニューからキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    'よく似合う。メニューからキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'entities.mobs.mister_crabs.name': 'ミスター・クラブス',
+  'entities.items.ps_briny_lure.name': '潮の疑似餌',
+  'entities.items.ps_lustrous_pearl.name': '輝く真珠',
+  'entities.items.mother_of_pearl.name': '真珠の母',
+  'entities.quests.q_ps_mother_of_pearl.title': '真珠の母',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '殻を三つ割ったな、{playerName}。だが難破線には王がいて、この浜のどの木箱よりも値打ちのある宝を抱え込んでいる。この潮の疑似餌を持って、難破船の先、浜の西の果てにある潮だまりへ行け。水際に立ち、Bを押してバッグを開き、疑似餌を左クリックして王を起こすんだ。ミスター・クラブスの挟みは小物どもよりずっと重い。体力バーから目を離さず、打ち続け、息が要るなら砂の上へ下がれ。王が倒れたら、名前が見えるまで殻に歩み寄り、Fを押すか左クリックして、王が抱え込む輝く真珠をもぎ取れ。その真珠をわたしのところへ持ち帰るんだ。',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '輝く真珠、それも浅瀬の老王その者からもぎ取ったものだ。わたしの父は働きに出る朝のたびに、あのカニに帽子を傾けて挨拶していた。敬意は払われるべきものだ。じっとして...ほら。糸を通し、留めて、おまえのものだ、{playerName}。真珠の母だよ。Bを押してバッグを開き、指輪を左クリックしてはめてみろ。それからCを押してキャラクターシートを開けば、手に収まった指輪が見えるはずだ。ささやかな品だが、身につければ全てが少しずつ強くなる。',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': 'ミスター・クラブス討伐',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '輝く真珠を入手',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '藁のかかしに歩み寄り、{targetKey}を押すか、左クリックしてターゲットにしよう。次に{attackKey}を押すか、アクションバーの二番目のボタンをクリックして呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの二番目のボタンをタップして呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に二番目のアクションボタンを押して呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '浜辺ガニは挟み返してくる。{targetKey}を押すか、左クリックして一匹をターゲットにし、{attackKey}を押して呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの二番目のボタンをタップして呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '浜辺ガニは挟み返してくる。ターゲットボタンを押し、次に二番目のアクションボタンを押して呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.voiceGraduate': '鐘はおまえさんのために鳴った。海の向こうでイーストブルックが待っておる。もう大丈夫だ。',
   'hudChrome.bootcamp.voiceVeerOff': '待ちなさい、そっちは違う。金色の道は後ろだよ。',
   'hudChrome.bootcamp.voiceStationDoneB': 'だいぶ様になってきたな、間違いない。',
@@ -13082,7 +13127,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '旗一本目、よし。右スティックを倒して回り、南へ延びる柵のレーンを正面に見たら、左スティックを上に倒して二本目の旗まで歩こう。',
   'hudChrome.bootcamp.strafeTitle': '最後のレーンを横歩き',
   'hudChrome.bootcamp.strafeBody':
-    '横に動く方法はもうひとつある。{strafeKey}を押したまま、赤い旗が背後に来るまで最後のレーンを横歩きしよう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。',
+    '横に動く方法はもうひとつある。{strafeKey}を軽く押して最後のレーンに一歩入り、次に{forwardKey}を押したまま{strafeKey}で横歩きし、赤い旗が背後に来るまで進もう。横歩きなら視線を敵に置いたまま動ける。いつか戦いでそう動く日が来る。',
   'hudChrome.bootcamp.strafeBodyTouch':
     '横に動く方法はもうひとつある。移動スティックを左に倒して、赤い旗が背後に来るまで最後のレーンを横滑りしよう。',
   'hudChrome.bootcamp.strafeBodyPad':

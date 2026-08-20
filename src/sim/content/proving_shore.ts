@@ -216,6 +216,41 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
     // crab meat, the tide_scuttler precedent.
     componentTags: ['meat'],
   },
+  // The old king of the shallows: the island's summon-only miniboss
+  // (interactions/crab_summon.ts calls him out of the tide pool at the
+  // strand's west end; no camp spawns him, the aldren idiom). Sized for a
+  // level 2 recruit fighting alone: a long meaty fight, never a lethal one.
+  // requiresQuestId keeps passers-by from griefing a summon they cannot be
+  // credited for.
+  mister_crabs: {
+    id: 'mister_crabs',
+    name: 'Mister Crabs',
+    minLevel: 2,
+    maxLevel: 2,
+    family: 'beast',
+    hpBase: 70,
+    hpPerLevel: 0,
+    dmgBase: 4,
+    dmgPerLevel: 0,
+    attackSpeed: 2.4,
+    armorPerLevel: 6,
+    // Slower than a recruit's run on purpose: a caster who keeps walking
+    // backward can keep casting, the lesson their combat card teaches.
+    moveSpeed: 6.2,
+    aggroRadius: 10,
+    canSwim: true,
+    requiresQuestId: 'q_ps_mother_of_pearl',
+    loot: [
+      { copper: 30, chance: 1 },
+      // The prize, for quest holders only (LootEntry.questId): nobody else
+      // can even damage him (requiresQuestId above), so the pearl never
+      // rots on a corpse a stranger tapped.
+      { itemId: 'ps_lustrous_pearl', chance: 1, questId: 'q_ps_mother_of_pearl' },
+    ],
+    scale: 1.7,
+    color: 0xb0402a,
+    componentTags: ['meat'],
+  },
 };
 
 export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
@@ -360,7 +395,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     // Facing south-west down her path toward the wreck line.
     facing: (3 * Math.PI) / 4,
     color: 0x3a6a6a,
-    questIds: ['q_ps_shell_and_claw', 'q_ps_the_wreck_line'],
+    questIds: ['q_ps_shell_and_claw', 'q_ps_mother_of_pearl', 'q_ps_the_wreck_line'],
     greeting:
       'The tide takes and the tide pays, $N. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path.',
   },
@@ -393,10 +428,11 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
       },
     ],
     // The rail's XP is budgeted as one number: quest XP (1140 total) plus the
-    // kill XP the objectives force (one effigy, three scuttlers) crosses the
+    // kill XP the objectives force (one effigy, three scuttlers, the tide-pool
+    // king) crosses the
     // level 3 threshold AT the final hand-in, never before (the window is
     // pinned in tests/proving_shore_content.test.ts).
-    xpReward: 120,
+    xpReward: 100,
     copperReward: 40,
     itemRewards: {},
   },
@@ -411,7 +447,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     objectives: [
       { type: 'kill', targetMobId: 'training_effigy', count: 1, label: 'Training Effigy felled' },
     ],
-    xpReward: 130,
+    xpReward: 110,
     copperReward: 60,
     itemRewards: {},
     requiresQuest: 'q_ps_the_gauntlet',
@@ -429,10 +465,36 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     objectives: [
       { type: 'kill', targetMobId: 'shore_scuttler', count: 3, label: 'Shore Scuttler culled' },
     ],
-    xpReward: 200,
+    xpReward: 170,
     copperReward: 80,
     itemRewards: {},
     requiresQuest: 'q_ps_strike_true',
+  },
+  // The miniboss lesson: using an item from the bags, a fight that asks for
+  // more than three swings, and looting a corpse for a QUEST item rather
+  // than coin. Nel grants the reusable Briny Lure on accept (requiredItems,
+  // re-granted if lost); the summon itself is gated in
+  // interactions/crab_summon.ts (at the pool, quest active, boss not up),
+  // and the pearl drops for quest holders only, so the chain can never
+  // strand. The reward is the island's keepsake ring, whose completion text
+  // walks the equip lesson (B to buckle it on, C to admire it).
+  q_ps_mother_of_pearl: {
+    id: 'q_ps_mother_of_pearl',
+    name: 'Mother of Pearl',
+    giverNpcId: 'tidewarden_nel',
+    turnInNpcId: 'tidewarden_nel',
+    text: "Three shells cracked, $N, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk to his shell until its name shows and press F, or left-click it, to claim the Lustrous Pearl he hoards. Bring that pearl back to me.",
+    completionText:
+      'The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, $N: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.',
+    objectives: [
+      { type: 'kill', targetMobId: 'mister_crabs', count: 1, label: 'Mister Crabs slain' },
+      { type: 'collect', itemId: 'ps_lustrous_pearl', count: 1, label: 'Lustrous Pearl claimed' },
+    ],
+    requiredItems: ['ps_briny_lure'],
+    xpReward: 150,
+    copperReward: 60,
+    itemRewards: { warrior: 'mother_of_pearl', rogue: 'mother_of_pearl', mage: 'mother_of_pearl' },
+    requiresQuest: 'q_ps_shell_and_claw',
   },
   q_ps_the_wreck_line: {
     id: 'q_ps_the_wreck_line',
@@ -450,10 +512,10 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Castaway Crate opened',
       },
     ],
-    xpReward: 220,
+    xpReward: 190,
     copperReward: 80,
     itemRewards: {},
-    requiresQuest: 'q_ps_shell_and_claw',
+    requiresQuest: 'q_ps_mother_of_pearl',
   },
   // The bank and bags lesson. Facts mirrored from the sim: the implicit
   // 16-slot backpack plus four bag sockets pooling capacity (BAG_SOCKETS,
@@ -480,7 +542,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     // a bag socket, and Maren must not take back the bag Finch just taught
     // them to wear.
     keepsCollectedItems: true,
-    xpReward: 200,
+    xpReward: 170,
     copperReward: 120,
     itemRewards: {},
     requiresQuest: 'q_ps_the_wreck_line',
@@ -509,7 +571,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Guild signpost read',
       },
     ],
-    xpReward: 120,
+    xpReward: 100,
     copperReward: 30,
     itemRewards: {},
     requiresQuest: 'q_ps_pouch_and_purse',
@@ -542,6 +604,7 @@ export const PROVING_SHORE_QUEST_ORDER: string[] = [
   'q_ps_the_gauntlet',
   'q_ps_strike_true',
   'q_ps_shell_and_claw',
+  'q_ps_mother_of_pearl',
   'q_ps_the_wreck_line',
   'q_ps_pouch_and_purse',
   'q_ps_the_signpost',
@@ -567,6 +630,39 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
     kind: 'quest',
     sellValue: 0,
     noVendorSell: true,
+  },
+  // The tide-pool summon (q_ps_mother_of_pearl): the reusable lure Nel hands
+  // over on accept (requiredItems re-grants it if lost) and the pearl the
+  // king drops for quest holders only. Both quest-bound, never sold.
+  ps_briny_lure: {
+    id: 'ps_briny_lure',
+    name: 'Briny Lure',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_ps_mother_of_pearl',
+    use: { type: 'summon' },
+    noVendorSell: true,
+  },
+  ps_lustrous_pearl: {
+    id: 'ps_lustrous_pearl',
+    name: 'Lustrous Pearl',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_ps_mother_of_pearl',
+    noVendorSell: true,
+  },
+  // The prize: plus one to everything, the island's keepsake. One ring for
+  // every class (all three reward archetypes name it), and deliberately
+  // slight, so the first real drop on the vale still feels like a step up.
+  mother_of_pearl: {
+    id: 'mother_of_pearl',
+    name: 'Mother of Pearl',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'uncommon',
+    requiredLevel: 1,
+    stats: { str: 1, agi: 1, sta: 1, int: 1, spi: 1 },
+    sellValue: 50,
   },
 };
 // Note there is deliberately NO ItemDef for ps_gauntlet_flag or
@@ -703,6 +799,26 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { x1: -304, z1: -33, x2: -335, z2: -36 }, // lane 3 south wall, to the finish
     //   (the west end past the red flag stays open: Overseer Pell stands
     //   there, and the finish line hands straight onto his yard path)
+    // The parkour hurdle: one low rail straight ACROSS lane 2, wall to wall,
+    // so the run south cannot walk around it. Fence colliders are isFence
+    // (colliders.ts), which the movement kernel's airborne path clears, so
+    // the only way past is the jump the coach's Space bubble asks for
+    // (BOOTCAMP_PARKOUR below pins the obstacle line the bubble anchors to).
+    { x1: -312, z1: -23, x2: -304, z2: -23 }, // lane 2 hurdle rail
+  ],
+  // The parkour step: a line of salvage crates ACROSS lane 2 past the hurdle,
+  // shoulder to shoulder so there is no slipping between them. Crate points
+  // become standable colliders (colliders.ts PROPS.crates: moveTopY + the
+  // matching mesh), so the lesson is jump ON, walk OVER, hop DOWN: the
+  // island's first taste of parkour, right after the first fence jump.
+  crates: [
+    [-311.2, -27],
+    [-310.1, -27],
+    [-309, -27],
+    [-307.9, -27],
+    [-306.8, -27],
+    [-305.7, -27],
+    [-304.6, -27],
   ],
   // The Gauntlet's flags mark its corners (pure dressing: no collider, no
   // entity; the bootcamp overlay detects arrival by position against the

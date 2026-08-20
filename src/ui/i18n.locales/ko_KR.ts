@@ -14,6 +14,51 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.promptAttack': '공격',
+  'hudChrome.bootcamp.keycapThen': '다음',
+  'hudChrome.bootcamp.promptSummon': '소환',
+  'hudChrome.bootcamp.taskPearlBody':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 {bagsKey}를 눌러 가방을 열고, 짠물 미끼를 왼쪽 클릭해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기에 대고 {interactKey}를 눌러 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 가방을 열고 짠물 미끼를 탭해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기를 탭해 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 가방을 열고 짠물 미끼를 선택해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기에 대고 상호작용 버튼을 눌러 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.ringEquipTitle': '전리품을 착용하세요',
+  'hudChrome.bootcamp.ringEquipBody':
+    '진주의 어머니가 가방 안에 있습니다. {bagsKey}를 눌러 가방을 열고, 반지를 왼쪽 클릭해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    '진주의 어머니가 가방 안에 있습니다. 가방을 열고 반지를 탭해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    '진주의 어머니가 가방 안에 있습니다. 가방을 열고 반지를 선택해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringAdmireTitle': '잘 어울리네요',
+  'hudChrome.bootcamp.ringAdmireBody':
+    '잘 어울립니다. {charKey}를 눌러 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    '잘 어울립니다. 메뉴에서 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    '잘 어울립니다. 메뉴에서 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'entities.mobs.mister_crabs.name': '미스터 크랩스',
+  'entities.items.ps_briny_lure.name': '짠물 미끼',
+  'entities.items.ps_lustrous_pearl.name': '영롱한 진주',
+  'entities.items.mother_of_pearl.name': '진주의 어머니',
+  'entities.quests.q_ps_mother_of_pearl.title': '진주의 어머니',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '껍데기 셋을 깼군요, {playerName}. 하지만 난파선 해안에는 왕이 있고, 그 왕은 이 백사장의 어느 상자보다 값진 보물을 깔고 앉아 있습니다. 이 짠물 미끼를 들고 난파선 너머, 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 B를 눌러 가방을 열고, 미끼를 왼쪽 클릭해 왕을 깨우세요. 미스터 크랩스의 집게는 작은 사촌들보다 훨씬 아픕니다. 생명력 막대를 살피고, 계속 공격하고, 숨을 돌려야 하면 모래 위로 물러나세요. 왕이 쓰러지면 이름이 보일 때까지 껍데기로 다가가 F를 누르거나 왼쪽 클릭해, 왕이 껴안고 있던 영롱한 진주를 차지하세요. 그 진주를 제게 가져오세요.',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '영롱한 진주, 그것도 얕은 바다의 늙은 왕에게서 직접 떼어 낸 것이군요. 제 아버지는 일 나가는 아침마다 그 게에게 모자를 들어 인사했습니다. 존경은 마땅히 치러야지요. 가만히... 됐습니다. 실에 꿰고, 고정하고, 이제 당신 것입니다, {playerName}. 진주의 어머니입니다. B를 눌러 가방을 열고 반지를 왼쪽 클릭해 끼워 보세요. 그런 다음 C를 눌러 캐릭터 창을 열면 손에 낀 반지가 보일 겁니다. 작은 물건이지만, 끼고 있으면 당신의 모든 것이 조금씩 나아집니다.',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': '미스터 크랩스 처치',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '영롱한 진주 획득',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '짚 허수아비에게 다가가 {targetKey}를 누르거나 왼쪽 클릭해 대상으로 잡으세요. 그런 다음 {attackKey}를 누르거나 행동 단축바의 두 번째 버튼을 클릭해 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 두 번째 버튼을 탭해 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 두 번째 행동 버튼을 눌러 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '종종게는 마주 집게를 휘두릅니다. {targetKey}를 누르거나 왼쪽 클릭해 한 마리를 대상으로 잡고, {attackKey}를 눌러 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 두 번째 버튼을 탭해 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '종종게는 마주 집게를 휘두릅니다. 대상 버튼을 누르고, 이어서 두 번째 행동 버튼을 눌러 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
   'hudChrome.bootcamp.voiceGraduate': '자네를 위해 종이 울렸네. 바다 건너 이스트브룩이 기다리고 있고, 자네는 준비가 되었네.',
   'hudChrome.bootcamp.voiceVeerOff': '잠깐, 친구. 그쪽이 아닐세. 황금 길은 뒤에 있네.',
   'hudChrome.bootcamp.voiceStationDoneB': '제법 손에 익어 가는군, 틀림없네.',
@@ -13091,7 +13136,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '깃발 하나 통과. 오른쪽 스틱을 밀어 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
   'hudChrome.bootcamp.strafeTitle': '마지막 길은 옆걸음으로',
   'hudChrome.bootcamp.strafeBody':
-    '옆으로 움직이는 또 다른 방법이 있습니다. {strafeKey}를 누른 채 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.',
+    '옆으로 움직이는 또 다른 방법이 있습니다. {strafeKey}를 눌러 마지막 길로 한 걸음 비켜선 다음, {forwardKey}를 누른 채 {strafeKey}로 옆걸음하며 붉은 깃발이 등 뒤로 갈 때까지 나아가세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.',
   'hudChrome.bootcamp.strafeBodyTouch':
     '옆으로 움직이는 또 다른 방법이 있습니다. 이동 스틱을 왼쪽으로 밀어 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요.',
   'hudChrome.bootcamp.strafeBodyPad':

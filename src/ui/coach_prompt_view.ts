@@ -15,6 +15,7 @@
 // guidance arrow.
 
 import { PROVING_SHORE_NPCS, PROVING_SHORE_QUESTS } from '../sim/content/proving_shore';
+import { CRAB_MOB_ID, CRAB_QUEST_ID, CRAB_SUMMON_SITE } from '../sim/interactions/crab_summon';
 import { INTERACT_RANGE } from '../sim/types';
 import { BELL_STEP_TARGET, type BootcampStep, type CoachFocus } from './bootcamp_view';
 import type { TranslationKey } from './i18n';
@@ -43,8 +44,10 @@ export interface CoachPromptPlan {
   range: number;
   /** The verb under the keycap: Talk, Turn in, Pick up, Read, Ring, Attack. */
   verbKey: TranslationKey;
-  /** 'kill' bubbles chip the target and attack binds instead of interact. */
-  kind: 'interact' | 'kill';
+  /** 'kill' bubbles chip the target and attack binds instead of interact;
+   *  'jump' bubbles chip the jump bind (the lane 2 parkour obstacles);
+   *  'use' bubbles chip the bags bind (the tide-pool lure). */
+  kind: 'interact' | 'kill' | 'jump' | 'use';
 }
 
 /** The minimal entity shape the crate and mob scans read
@@ -61,8 +64,19 @@ export interface CoachPromptEntity {
  *  catch the approach, tight enough to point at THIS camp. */
 export const KILL_PROMPT_RANGE = 12;
 
+/** The classes whose first real button is the SPELL on slot 2, not the
+ *  melee Attack on slot 1: their combat lessons teach {attackKey} = the
+ *  slot1 bind and speak of casting, not swinging. */
+export const CASTER_CLASSES: ReadonlySet<string> = new Set(['mage', 'warlock', 'priest', 'druid']);
+
+/** Which action-bar bind the combat lessons teach for this class. */
+export function attackBindFor(playerClass: string): 'slot0' | 'slot1' {
+  return CASTER_CLASSES.has(playerClass) ? 'slot1' : 'slot0';
+}
+
 const NPC_LIFT = 2.5;
 const OBJECT_LIFT = 1.6;
+const KILL_BUBBLE_LIFT = 0.55;
 
 function npcPlan(npcId: string, verbKey: TranslationKey): CoachPromptPlan | null {
   const npc = PROVING_SHORE_NPCS[npcId];
@@ -100,7 +114,12 @@ export function nearestMob(
 const KILL_LESSON_TEMPLATE: Readonly<Record<string, string>> = {
   q_ps_strike_true: 'training_effigy',
   q_ps_shell_and_claw: 'shore_scuttler',
+  [CRAB_QUEST_ID]: CRAB_MOB_ID,
 };
+
+/** How close to the tide pool the lure bubble shows (a step wider than the
+ *  summon gate itself, so the ask reads on approach). */
+export const LURE_PROMPT_RANGE = 10;
 
 /** The nearest live castaway crate to the player, or null between respawns. */
 export function nearestCrate(
@@ -123,6 +142,41 @@ export function nearestCrate(
 /** The signpost lesson's reading spot (mirrors COACH_ACTIVE_TARGETS: the
  *  noticeboard is a sentinel object, not a live entity the client can key). */
 const SIGNPOST_SPOT = { x: -312, z: 42.5 };
+
+/** Lane 2's parkour obstacles in running order (lane 2 runs SOUTH, so -z):
+ *  the hurdle rail the player jumps OVER, then the crate step they jump
+ *  ONTO. Each anchor sits mid-lane on its obstacle's line; both mirror the
+ *  PROVING_SHORE_PROPS fence + crate authoring
+ *  (tests/coach_prompt_view.test.ts pins them against the content). */
+export const BOOTCAMP_PARKOUR: readonly { x: number; z: number }[] = [
+  { x: -308, z: -23 },
+  { x: -308, z: -27 },
+];
+/** Wide enough to read the ask on approach, tight enough to mean THIS rail. */
+export const JUMP_PROMPT_RANGE = 9;
+/** A stride past the obstacle's line counts as cleared: the bubble moves on
+ *  to the next obstacle instead of nagging over a jump already landed. */
+const PARKOUR_PASSED_SLACK = 1.2;
+/** Above the hurdle rail's top, below the lane's sightline. */
+const JUMP_LIFT = 1.2;
+
+/** The next un-cleared lane 2 obstacle's bubble, or null once both are
+ *  behind the player. Exported for the consumer's movement-bubble yield:
+ *  the centered D-then-W chips give way while a jump ask is on screen. */
+export function parkourPromptPlan(playerPos: { x: number; z: number }): CoachPromptPlan | null {
+  for (const ob of BOOTCAMP_PARKOUR) {
+    if (playerPos.z <= ob.z - PARKOUR_PASSED_SLACK) continue;
+    return {
+      x: ob.x,
+      z: ob.z,
+      lift: JUMP_LIFT,
+      range: JUMP_PROMPT_RANGE,
+      verbKey: 'hudChrome.bootcamp.promptJump',
+      kind: 'jump',
+    };
+  }
+  return null;
+}
 
 /**
  * Where the interact bubble belongs for the current coach station, or null
@@ -148,9 +202,11 @@ export function coachPromptPlan(args: {
     };
   }
   if (args.step !== null) {
-    // The gauntlet ladder: only its two interact lessons carry a bubble.
+    // The gauntlet ladder: the two interact lessons bubble their NPC, and
+    // lane 2's run carries the parkour jump asks between its flags.
     if (args.step === 'talk') return npcPlan('warden_tam', 'hudChrome.bootcamp.promptTalk');
     if (args.step === 'done') return npcPlan('overseer_pell', 'hudChrome.bootcamp.promptTurnIn');
+    if (args.step === 'turnwalk') return parkourPromptPlan(args.playerPos);
     return null;
   }
   const focus = args.focus;
@@ -169,11 +225,25 @@ export function coachPromptPlan(args: {
   const quarry = KILL_LESSON_TEMPLATE[focus.questId];
   if (quarry) {
     const mob = nearestMob(args.entities, quarry, args.playerPos);
+    // The pearl detour's quarry is SUMMONED: until the king is up, the
+    // bubble stands on the tide pool asking for the lure (bags bind).
+    if (!mob && focus.questId === CRAB_QUEST_ID) {
+      return {
+        x: CRAB_SUMMON_SITE.x,
+        z: CRAB_SUMMON_SITE.z,
+        lift: OBJECT_LIFT,
+        range: LURE_PROMPT_RANGE,
+        verbKey: 'hudChrome.bootcamp.promptSummon',
+        kind: 'use',
+      };
+    }
     if (!mob) return null;
     return {
       x: mob.pos.x,
       z: mob.pos.z,
-      lift: NPC_LIFT,
+      // Low anchor: the mob's nameplate health bar owns the space over its
+      // head, and both must stay visible (playtest).
+      lift: KILL_BUBBLE_LIFT,
       range: KILL_PROMPT_RANGE,
       verbKey: 'hudChrome.bootcamp.promptAttack',
       kind: 'kill',

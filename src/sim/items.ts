@@ -42,6 +42,7 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
@@ -764,6 +765,10 @@ export function useItem(
   if (p.dead) return;
   if (def.use?.type === 'throw') {
     throwFirebottleAtNearestHut(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'summon') {
+    useBrinyLure(ctx, p, meta);
     return;
   }
   if (def.kind === 'food' || def.kind === 'drink') {
