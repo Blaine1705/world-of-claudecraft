@@ -1508,9 +1508,36 @@ export const hudChromeStrings = {
     buttons: 'Button Layout',
     resetButtons: 'Reset Button Layout',
     menuAction: 'Game Menu',
+    confirmAction: 'Confirm / Select',
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',
     help: 'Left stick moves, right stick looks. Open a window to use the on-screen pointer.',
+    // Cross hotbar: the trigger-modifier hotbar. The trigger and button names
+    // shown beside each row are hardware glyphs from gamepad_map, so only the
+    // chrome around them is keyed here.
+    crossHotbar: 'Cross Hotbar',
+    crossHotbarEnable: 'Enable Cross Hotbar',
+    crossHotbarExpand: 'Double Cross Hotbar',
+    crossHotbarHelp:
+      'Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.',
+    crossHotbarResetLayout: 'Reset Cross Hotbar',
+    crossHotbarPosition: '{trigger} + {button}',
+    crossHotbarOwnsButtons:
+      'The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.',
+    cancelAction: 'Cancel / Back',
+    subcommandsAction: 'Subcommands / Map',
+    cycleHudAction: 'Cycle Interface',
+    cycleSetAction: 'Change Hotbar Set',
+    crossHotbarDisplay: 'Bar Display',
+    crossHotbarDisplayFull: 'Full',
+    crossHotbarDisplayCompact: 'Compact',
+    crossHotbarDisplayMinimal: 'Only While Held',
+    crossHotbarArrangeChord: '{bumper} + {button}',
+    crossHotbarCarrying: 'Carrying {action}: confirm on a cell to place it, cancel to put it back.',
+    crossHotbarEditHint:
+      'Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.',
+    crossHotbarEditHelp:
+      'Hold the left bumper and press the top face button to arrange the bar with the controller.',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in
