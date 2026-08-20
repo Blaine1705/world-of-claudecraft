@@ -1201,6 +1201,7 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // The stamp-ledger crossing counter rides the readout beside the
     // serialize stats.
     expect(code).toContain('stampHighWater: wocStampHighWaterCount()');
+    expect(code).toContain('parkRefusals: wocParkRefusalCount()');
     // The pg pool gauge (the pre-enable review's pool-wait observability):
     // sustained waiting > 0 is the brownout precursor, and this readout is
     // where an operator already looks.

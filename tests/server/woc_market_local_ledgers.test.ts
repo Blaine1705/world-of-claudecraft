@@ -10,6 +10,7 @@ import {
   WOC_LOCAL_PARK_MAX_ENTRIES,
   WOC_LOCAL_STAMP_HIGH_WATER,
   wocBackedOffIds,
+  wocParkRefusalCount,
   wocParkRow,
 } from '../../server/woc_market_local_ledgers';
 
@@ -51,11 +52,12 @@ describe('woc local ledgers', () => {
     expect(WOC_LOCAL_LEDGER_TTL_MS).toBe(600_000);
   });
 
-  it('wocParkRow admits under the cap and refuses only NEW entries at it', () => {
+  it('wocParkRow admits under the cap and refuses only NEW entries at it, counting refusals', () => {
     // The growth bound (the escrow write-path rider): a mass-park event may
     // fill the map to the cap and no further; a refused park costs the row
     // one batch slot next pass, never memory.
     const park = new Map<number, number>();
+    const refusalsBefore = wocParkRefusalCount();
     expect(wocParkRow(park, 1, 100, 2)).toBe(true);
     // One BELOW the cap still admits (the boundary the cap must not
     // overshoot by an off-by-one).
@@ -68,9 +70,11 @@ describe('woc local ledgers', () => {
     // the ledger is fullest.
     expect(wocParkRow(park, 1, 900, 2)).toBe(true);
     expect(park.get(1)).toBe(900);
-    // A prune-freed slot admits again.
+    // A prune-freed slot admits again, and the one refusal above was
+    // COUNTED (the readout's mass-park signal).
     park.delete(2);
     expect(wocParkRow(park, 3, 100, 2)).toBe(true);
+    expect(wocParkRefusalCount()).toBe(refusalsBefore + 1);
   });
 
   it('the caps are the documented values, and backedOffIds inherits the park bound', () => {

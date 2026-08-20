@@ -394,6 +394,7 @@ import {
 } from './woc_market_db';
 import { wocStampHighWaterCount } from './woc_market_delivery';
 import { createWocEscrowGate } from './woc_market_escrow_gate';
+import { wocParkRefusalCount } from './woc_market_local_ledgers';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
 import { registerWocMarketReadCacheForBusts, WocMarketReadCache } from './woc_market_read_cache';
@@ -2919,6 +2920,9 @@ configureInternalWocMarketStuckRead(async () => ({
   // Stamp-ledger high-water crossings (the counted half of the intent-map
   // bound: the maps never shed entries, so crossings are the incident count).
   stampHighWater: wocStampHighWaterCount(),
+  // Cap-refused parks (each refused row costs a batch slot and a rotation
+  // write per pass; a rate here means a mass-park incident is at the cap).
+  parkRefusals: wocParkRefusalCount(),
   // The shared pg pool's live occupancy (the pool-wait observability the
   // pre-enable review asked for): waiting > 0 sustained means requests are
   // queueing for clients, the brownout precursor the read caches exist to

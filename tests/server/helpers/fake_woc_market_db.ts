@@ -1500,7 +1500,9 @@ export class FakeWocMarketDb implements WocMarketDb {
     bidId: number,
     signature: string,
     nowMs: number,
-  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused'> {
+    // 'contended' joins the declared union for interface parity (the fake
+    // itself never contends; tests stub the member to drive the arm).
+  ): Promise<{ signatureAtMs: number } | 'not_pending' | 'signature_reused' | 'contended'> {
     const bid = this.bids.get(bidId);
     if (!bid || bid.status !== 'pending_bond') return 'not_pending';
     if (bid.bondSignature !== null && bid.bondSignature !== signature) return 'not_pending';
@@ -1938,7 +1940,7 @@ export class FakeWocMarketDb implements WocMarketDb {
   async submitSettlementSignature(
     id: number,
     signature: string,
-  ): Promise<'ok' | 'not_offered' | 'signature_reused'> {
+  ): Promise<'ok' | 'not_offered' | 'signature_reused' | 'contended'> {
     const rec = this.settlements.get(id);
     if (!rec || rec.state !== 'offered') return 'not_offered';
     // The tx_signature UNIQUE constraint: any OTHER settlement already

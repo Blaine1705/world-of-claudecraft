@@ -346,3 +346,49 @@ Appendix totals: 45 distinct mutants, 43 BIT, 1 judged defense-in-depth
 single (double-strip proven), 1 deliberate green control; plus 5 independent
 re-verifications of existing rows, all BIT. Whole log after this round: 293
 distinct mutants.
+
+## Escrow write-path rider section (run by the rider implement session)
+
+Same protocol as the header: every strip occurrence-asserted (region-scoped
+where a literal repeats), git-diff-proven, run-proven by the Tests summary
+line, reverted by git checkout over the committed tree with a clean-status
+verify after. One serial lane in the rider worktree (no concurrent pg runs;
+the two pg mutants ran alone with TEST_DATABASE_URL). Replacement policy per
+the header; suites named per row are the OWNING suites the verdict was
+scored against.
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| rider_gate_cap_check | BIT | woc_market_escrow_gate | rider |
+| rider_gate_release_shift | BIT | woc_market_escrow_gate, woc_market_escrow_queue | rider |
+| rider_gate_reclaim_strip | BIT | woc_market_escrow_gate | rider |
+| rider_custody_realm_gate_strip | BIT | woc_market_escrow_queue | rider |
+| rider_custody_settled_emit_strip | BIT | woc_market_escrow_queue | rider |
+| rider_grant_busy_emit_strip | BIT | woc_market_escrow_queue | rider |
+| rider_grant_account_guard_strip | BIT | woc_market_escrow_queue | rider |
+| rider_grant_nonce_guard_strip | BIT | woc_market_escrow_queue | rider |
+| rider_grant_started_truth_strip | BIT | woc_market_escrow_queue | rider |
+| rider_busy_budget_strip | BIT | woc_market_service | rider |
+| rider_busy_verdict_strip | BIT | woc_market_service | rider |
+| rider_park_cap_strip | BIT | woc_market_local_ledgers | rider |
+| rider_stamp_total_strip | BIT | woc_market_delivery | rider |
+| rider_drain_rung_strip | BIT | woc_market_service | rider |
+| rider_saturated_rung_strip | BIT | woc_market_service | rider |
+| rider_recorder_contended_strip | BIT | woc_market_directed_sql | rider |
+| rider_clear_retry_strip | BIT | woc_market_directed_sql | rider |
+| rider_merged_set_strip | BIT | woc_market_directed_sql | rider |
+| rider_widening_strip_cancel | BIT | woc_market_directed_sql | rider |
+| rider_routing_revert_touch | BIT | woc_market_directed_sql | rider |
+| rider_narrowing_revert_bid | BIT | woc_market_directed_sql | rider |
+| rider_deadlock_count_strip | BIT | woc_market_directed_sql | rider |
+| rider_checkout_count_strip | BIT | woc_market_directed_sql | rider |
+| rider_serialize_total_strip | BIT | woc_market_escrow_queue | rider |
+| rider_highwater_count_strip | BIT | woc_market_delivery | rider |
+| rider_comment_only_control | SURVIVED | woc_market_directed_sql | rider; deliberate no-op control |
+| rider_pg_narrowing_negative_escrow | BIT | woc_market_delivery_pg_integration, woc_market_directed_sql | rider; SURVIVED its first scoring against the bond suite alone (that suite's freed-insert proof holds its own raw-client lock, so it cannot see the source's mode), upgraded by the KEY-SHARE-holder behavioral pin in b54a6e5b45 and re-scored against the owning suites |
+| rider_pg_plain_bound_strip | BIT | woc_market_bond_pg_integration | rider |
+
+Rider totals: 28 distinct mutants, 26 BIT, 1 deliberate green control, 1
+first-scoring survivor upgraded to BIT in-round (the wrong-suite class the
+header warns about: the fix was a new behavioral pin plus re-scoring, never
+a relaxed verdict). Whole log after this section: 321 distinct mutants.

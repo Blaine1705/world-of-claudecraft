@@ -23,17 +23,31 @@ export const WOC_LOCAL_LEDGER_TTL_MS = 10 * 60_000;
  *  tunables ladder pins the relation against the scraped SWEEP_BATCH). */
 export const WOC_LOCAL_PARK_MAX_ENTRIES = 512;
 
+/** Process-lifetime count of cap-refused parks (the review round: the
+ *  mass-park incident the cap exists for is exactly when an operator needs
+ *  to know parks are being refused, and each refused row also costs one
+ *  batch slot plus one rotation write per pass until the prune frees
+ *  room). Module-level like the db contention counters. */
+let parkRefusals = 0;
+export function wocParkRefusalCount(): number {
+  return parkRefusals;
+}
+
 /** Park a row's retry time, refusing NEW entries at the cap: a refused park
  *  costs one batch slot next pass (the row simply retries un-excluded),
  *  never memory. An EXISTING id may always re-park, or rotation itself
- *  would die exactly at the cap. Returns whether the entry stands. */
+ *  would die exactly at the cap. Returns whether the entry stands; every
+ *  refusal is counted. */
 export function wocParkRow(
   park: Map<number, number>,
   id: number,
   retryAtMs: number,
   cap: number = WOC_LOCAL_PARK_MAX_ENTRIES,
 ): boolean {
-  if (!park.has(id) && park.size >= cap) return false;
+  if (!park.has(id) && park.size >= cap) {
+    parkRefusals++;
+    return false;
+  }
   park.set(id, retryAtMs);
   return true;
 }
