@@ -93,7 +93,15 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered 19069 -> 19043 after the bag $WOC balance chip moved out to
     // src/ui/woc_balance_chip.ts (the ratchet's own rule: an extraction lowers
     // the ceiling, never raises it). Exact count, zero headroom.
-    ceiling: 19043,
+    // Re-pinned 19043 -> 19151 at the v0.40.0 sync merge (release tip
+    // a0a30f922b): the release's controller cross-hotbar wiring grew hud.ts
+    // on the release side (its row went to 19490 there, thin-consumer wiring
+    // to the extracted src/ui/hud/cross_hotbar/ domain, a maintainer decision
+    // documented on that row), and it lands here on top of this branch's
+    // woc_balance_chip extraction. The merged file counts exactly 19151.
+    // Re-derived from the merged tree, not taken from either side, keeping
+    // the zero-headroom posture: the next line added fails.
+    ceiling: 19151,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -187,7 +195,13 @@ const MONOLITHS: MonolithRow[] = [
     // b650d9d7d2): release-side growth only (its own row went to 11490); the
     // branch's main.ts lines are unchanged. Exact merged count, zero headroom.
     file: 'src/main.ts',
-    ceiling: 11493,
+    // The release side then grew the file for its gamepad work and lowered it
+    // again with the pad-selection extraction (the pad's own targeting rules
+    // moved to src/game/pad_target_pick.ts, its row landing at 11552).
+    // Re-pinned 11493 -> 11555 at the v0.40.0 sync merge (release tip
+    // a0a30f922b): release-side growth only; the branch's main.ts lines are
+    // unchanged. Exact merged count, zero headroom: the next line added fails.
+    ceiling: 11555,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

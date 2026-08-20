@@ -39,6 +39,7 @@ import {
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
+import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
 import {
@@ -53,6 +54,7 @@ import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
+import { cycleHudFocus } from './game/dpad_focus_nav';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -72,6 +74,7 @@ import {
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
+import { GAMEPAD_CANCEL, GAMEPAD_CYCLE_HUD, GAMEPAD_SUBCOMMANDS } from './game/gamepad_map';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
@@ -135,8 +138,11 @@ import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
+import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { padReelItemId } from './game/pad_reel';
+import { openTargetSubcommands } from './game/pad_subcommands';
+import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
@@ -824,6 +830,9 @@ preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
 window.addEventListener('resize', syncAppViewport);
+// The cross hotbar's lift depends on how tall it renders, which changes with the
+// window and the interface scale, so it is re-measured rather than assumed.
+window.addEventListener('resize', measureCrossHotbarLift);
 window.addEventListener('orientationchange', () => {
   syncAppViewport();
   window.setTimeout(syncAppViewport, 250);
@@ -2173,8 +2182,21 @@ async function startGame(
     });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
+  const crossHotbar = createCrossHotbar(() => hud, keybindScope);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
+    // Cancel backs out one step at a time: the top window, then the target. Only
+    // once there is nothing left to leave does the game menu come up, which is
+    // what keeps this distinct from the menu button rather than a second copy.
+    if (id === GAMEPAD_CANCEL) {
+      if (dismissCameraPrompt() || hud.cancelGroundAim() || hud.closeAll()) return;
+      world.targetEntity(null);
+      return;
+    }
+    if (id === GAMEPAD_CYCLE_HUD) {
+      cycleHudFocus();
+      return;
+    }
     if (id === 'escape') {
       if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
@@ -2197,6 +2219,20 @@ async function startGame(
       case 'targetFriendly':
         world.targetNearestFriendly();
         break;
+      // Selecting the people you talk to. The sim's friendly cycle answers heal
+      // eligibility and so skips every quest giver, which left a pad player with
+      // no way to pick one; targetEntity is the seam that already exists for it.
+      case 'targetNpcNext':
+      case 'targetNpcPrev': {
+        const next = nextNpcTarget(
+          world.entities.values(),
+          world.player.pos,
+          world.player.targetId ?? null,
+          id === 'targetNpcNext' ? 1 : -1,
+        );
+        if (next !== null) world.targetEntity(next);
+        break;
+      }
       case 'targetFriendlyNext':
         world.friendlyTabTarget();
         break;
@@ -2212,7 +2248,7 @@ async function startGame(
           world.useItem(reelRod);
           break;
         }
-        interactKey();
+        padTargetPick.interact();
         break;
       }
       case 'bags':
@@ -2230,6 +2266,14 @@ async function startGame(
       case 'map':
         hud.toggleMap();
         break;
+      // The target's subcommands, or the map when there is no target: one button
+      // for "what can I do with this", the way a console MMO spends its left face
+      // button. The menu itself is the one the mouse opens by right-clicking, so
+      // there is no second menu to keep in step with it.
+      case GAMEPAD_SUBCOMMANDS: {
+        if (!openTargetSubcommands()) hud.toggleMap();
+        break;
+      }
       case 'nameplates':
         renderer.showNameplates = !renderer.showNameplates;
         break;
@@ -2331,9 +2375,16 @@ async function startGame(
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
-    onConnectionChange: () => hud.refreshControllerLabels(),
+    onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
+    onCrossHotbarCast: (action) => {
+      padTargetPick.autoTarget(action);
+      hud.castCrossHotbarAction(action);
+    },
+    onOpenSpellbook: () => hud.openSpellbook(),
+    ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
+  crossHotbar.attach(gamepad);
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
 
@@ -2622,12 +2673,17 @@ async function startGame(
       const v = settings.set('gamepadEnabled', !!value);
       if (v) gamepad.start();
       else gamepad.stop();
+      // stop() releases the pad without an onConnectionChange, so pad mode has to
+      // be re-read here or the player who just turned the controller off is left
+      // with the desktop rows hidden behind a dead cross hotbar.
+      crossHotbar.syncPadMode(gamepad);
       return;
     }
     if (key === 'gamepadInvertY') {
       gamepad.setInvertY(settings.set('gamepadInvertY', !!value));
       return;
     }
+    if (crossHotbar.applySetting(gamepad, settings, key, value)) return;
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
       return;
@@ -3081,6 +3137,7 @@ async function startGame(
       entries: () => gamepadBindings.entries(),
       bind: (button, action) => gamepadBindings.bind(button, action),
       reset: () => gamepadBindings.reset(),
+      ...crossHotbar.hooks,
       // The connected pad's brand lives on the manager, not the (hardware-agnostic)
       // bindings, so surface it here for the Controller panel's glyph labels.
       kind: () => gamepad.getKind(),
@@ -3399,7 +3456,7 @@ async function startGame(
     ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
       hud.confirmToolEffectUse(prompt, proceed),
   };
-  function interactKey(): void {
+  function interactKey(preferNpcId?: number | null): void {
     if (world.bgInfo?.match?.state === 'active') {
       world.bgFlagAction();
       return;
@@ -3416,11 +3473,16 @@ async function startGame(
         t('errors.nothingInteract'),
         undefined,
         gatherEffectConfirm,
+        preferNpcId,
       ),
       input,
       mobileControls,
     );
   }
+
+  // The pad's own selection rules (which npc a talk press addresses, which enemy
+  // a cast picks) live in src/game/pad_target_pick.ts; this carries the calls.
+  const padTargetPick = createPadTargetPick({ world, interactKey });
 
   function attackNearest(): void {
     const p = world.player;

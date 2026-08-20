@@ -701,6 +701,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the desktop action bar, facet-routed; skipped on touch where hud.mobile.css sets #actionbar/#actionbar2/#actionbar3 to display:none the whole time (the mobile action ring below supersedes it), so ticking + painting it was pure waste every frame',
   },
   {
+    call: 'this.crossHotbar.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the controller cross hotbar, facet-routed; it owns its OWN actions and ticks its own view (a pad layout is decoupled from the keyboard hotbar), and a frame with no pad connected stops after one elided display write',
+  },
+  {
     call: 'this.currentMobileActionPage',
     band: 'frame',
     gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
@@ -1655,8 +1662,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // (the branch's woc_market window row against the release's own
       // window/chrome churn), so it cannot be reconciled by arithmetic across
       // a merge. The numbers below were counted from the merged table itself,
-      // not from either side's narrative.
-    ).toEqual({ window: 48, chrome: 82, none: 17 });
+      // not from either side's narrative. At the v0.40.0 sync the release's
+      // gamepad work took chrome to 83 while the branch keeps its 48th
+      // window row; the merged table counts window 48, chrome 83, none 17.
+    ).toEqual({ window: 48, chrome: 83, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
