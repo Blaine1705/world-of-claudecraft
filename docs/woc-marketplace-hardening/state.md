@@ -5,6 +5,36 @@ actually reads.
 
 ## Where we are
 
+- 21 DEVNET DRY RUN SESSION 1 (2026-08-20, SERVICE + GAME repos): R5
+  CLOSED IN FULL by three in-session rulings (fresh throwaway devnet mint
+  decimals 6; the WOC_MARKET_PRICE_MINT venue split; the same-day
+  amendment decoupling the fixed dev price from the fake-chain gate after
+  no Birdeye key proved available, spot 0.0001476 operator-supplied;
+  records in Rulings). SERVICE commits LOCAL per R4: 7284fbe + 2eedcfb
+  (the two ruled halves), then TWO review fix rounds 6c1b01f + 8db7734
+  (confinement: NEITHER price split may ride the live default mint on the
+  live chain arm; the override dev/test-gated; decode screens on both
+  mints; boot warns below the last refusal; compose dev-knob walls, all
+  pinned). Suite 603/596/0 at the tip; 10 distinct price-source mutants
+  ALL BIT + 10 stale-verdict re-runs re-BIT (whole log 401). ENVIRONMENT
+  STAGED: five keypairs + .env.devnet (gitignore verified BEFORE
+  writing), woc_devnet_service DB, devnet_setup.mjs in the packet dir.
+  ON-CHAIN LEGS BLOCKED: faucet 429 all session and Fernando answered
+  cannot-fund-today, so the mint is uncreated and every leg is parked;
+  per-leg status in "21 devnet dry-run evidence", resume runbook in
+  devnet.md. Both syncs were no-ops. Review round: three fresh lenses
+  (security, correctness, fix-round re-review), 34 findings total, 0
+  blocking, every one applied or judged (registry: the 21 section in
+  progress.md); flagged for the maintainer: the Python payout
+  DAILY_REWARD_WOC_USD_PRICE knob has NO env gate (pre-existing, 22
+  owns). THREE MAINTAINER RULINGS remain OPEN (re-surfaced, not
+  re-decided): woc_market.ts ceiling +53 net 448 DOWN; woc_market_db.ts
+  no-ratchet-row (4783); escrow gate hold-ceiling sizing; plus the
+  auth-rider TTL brownout note (recorded, not ruled). NOTHING pushed
+  anywhere (R4). NEXT = RESUME phase-21-devnet-dry-run.md in a FRESH
+  session once devnet SOL exists (devnet.md bottom section is the exact
+  runbook; the Birdeye key stays optional: the fixed-price path is
+  ruled); phase-21-qa.md runs only AFTER the legs are recorded.
 - AUTH-GUARD READ CACHE RIDER QA COMPLETE (2026-08-20, GAME repo, verdict
   PASS-WITH-FOLLOWUPS with every fix applied in-session, PUSHED per R4).
   Audited f844a72eaa..e26c3ed9ec; this session's v0.40.0 re-sync was EMPTY
@@ -1077,6 +1107,33 @@ actually reads.
   activateBid contention, ambiguous grantCopy refusal). Phase 04 consumes
   the amended entry, not the original.
 
+## 21 devnet dry-run evidence
+
+Cluster: Solana devnet (https://api.devnet.solana.com, single-RPC by
+necessity: the Ankr fallback needs its own key). Mint: NOT YET CREATED
+(fresh throwaway per R5, decimals 6; blocked on devnet SOL). Wallet roster
+(pubkeys; keys only in gitignored service-worktree files, see devnet.md):
+mint authority + fee payer HyD4RyRkeHF4EDzdWP1rMo7geNJbvsKb6umo45rzpE3C,
+escrow 2XH5UwqWCCRKLWeCKbHdV6VNsx1nVsrXAydAHkQmUZvr, treasury
+9fzukogxcT5c113MA7gNSeP1UMsc3eH27BXbBihWaUqf, buyer
+DiuB5C4mgoHf8nhBdcFWe2hCxu65mZVpssG2yUE9iN1z, seller
+Gpg44TKrWnkcVDtqoEwwwbjXB1MjxJ3naoTpZ1zpJz2a.
+
+| Leg | Status | Signatures / notes |
+|---|---|---|
+| Environment: keypairs, run env, service DB, setup script | STAGED 2026-08-20 | no signatures yet; devnet.md is the recipe and resume runbook |
+| Service price-source enablement (the two R5 code halves + two review fix rounds) | DONE 2026-08-20 | service commits 7284fbe (WOC_MARKET_PRICE_MINT) + 2eedcfb (dev price over the real chain) + 6c1b01f (confinement, allowlist gate, decode screens, warns, compose walls) + 8db7734 (mirror confinement, constructed-market warns, wall pins); suite 603/596/0 at the tip; 10 distinct mutants BIT, 10 stale-verdict re-runs re-BIT (20 log, 21 sections) |
+| Bond cycle: quote, charge, confirm, refund, forfeit | BLOCKED (devnet SOL) | double-release balance asserts + probe-not-resend observation ride this leg |
+| Settlement e2e: list, directed + public buy-now, pay, burn verify, deliver, fee split | BLOCKED (devnet SOL) | needs the dev realm against the staged service |
+| Hostile burn-redirect rejection | BLOCKED (devnet SOL) | must record the 10 verifier reason |
+| Observation: escrow gate + auth-guard cache under real contention; 16 lost-lock anti-phase | BLOCKED (rides the e2e leg) | carried from 16/17 and the riders |
+| Observation: real venue cadence + halt/recovered lines (11) | NOT OBSERVABLE THIS RUN | no Birdeye key on this machine (R5 amendment records it); a keyed future run uses WOC_MARKET_PRICE_MINT |
+
+Blocker record 2026-08-20: the public devnet faucet answered 429 all
+session and Fernando could not fund manually that day; no Birdeye key was
+available either (both asked and answered in-session, see the R5 records).
+The phase stays OPEN; the resume runbook is devnet.md's bottom section.
+
 ## Repos and branches
 
 | Repo | Worktree | Branch | Tip at packet creation |
@@ -1453,9 +1510,11 @@ Still open (a phase that hits one asks at session start):
   the 21 session start), closing R5 in full:
   - Devnet mint: a FRESH throwaway devnet SPL mint created for the dry run,
     decimals 6 (matching the live mint and DEFAULT_WOC_DECIMALS). Mint
-    authority, escrow, treasury, and buyer wallets are fresh local keypairs
-    held only in gitignored local env files (gitignore coverage verified
-    BEFORE any key is written); supply is minted per leg. Pubkeys and
+    authority, escrow, treasury, buyer, and seller wallets are fresh local
+    keypairs held only in gitignored local env files (gitignore coverage
+    verified BEFORE any key is written); supply is minted upfront to the
+    buyer (1,000,000 WOC, enough for every leg; the session ask said per
+    leg, implemented as the one upfront mint and recorded so). Pubkeys and
     transaction signatures are recorded in state.md; keys never leave the
     machine and nothing durable outlives the run (teardown is deleting the
     local files). The prior claudium devnet mint was considered and
@@ -1470,6 +1529,17 @@ Still open (a phase that hits one asks at session start):
     validated at boot; with tests. The dry run then prices the REAL mainnet
     WOC on the real venue while settling on the devnet mint, preserving the
     11 observation item (real venue cadence and the halt/recovered lines).
+    AMENDED the same day, mid-run: no Birdeye key exists on this machine and
+    none was obtainable in-session, so Fernando additionally ruled the fixed
+    dev price DECOUPLED from the fake-chain gate: devPriceSource rides the
+    NODE_ENV dev/test allowlist alone (WOC_MARKET_DEV_CHAIN no longer
+    required), so a devnet run prices from WOC_MARKET_DEV_USD_PER_TOKEN
+    (set locally to the operator-supplied spot, 0.0001476 USD per WOC,
+    2026-08-20) while the REAL chain arm settles the devnet mint. The
+    production posture holds (unset NODE_ENV refuses; compose pins
+    production). The 11 real-venue-cadence observation is recorded NOT
+    OBSERVABLE on devnet without a key; WOC_MARKET_PRICE_MINT stays the
+    path for a keyed future run.
 - R6 (phase 07, B7): counsel owns final Terms language. The phase produces drafts and a
   decision memo; counsel sign-off is a launch gate tracked here, not a packet deliverable.
   STATUS 2026-08-13: package READY, recorded SENT-TO-COUNSEL (the send is

@@ -700,3 +700,77 @@ spot-checks + 16 fix-round pins, two pg among them), 23 BIT (one by
 fatal red), 0 survivors, 0 controls. Rider cumulative: 50 distinct live
 mutants, 49 BIT, 1 deliberate green control, 0 unexplained survivors.
 Whole log after this section: 391 distinct mutants.
+
+## Devnet dry-run section (21): the service price-source pins
+
+Run 2026-08-20 in a throwaway SERVICE-repo worktree at 2eedcfb (deps
+symlinked from the primary worktree; baseline 55/55 green across
+market_bootstrap + market_dev_chain), each mutant occurrence-asserted
+(exactly one match before the edit), run-proven (55 tests reported in
+every mutated run), and reverted byte-identical (git diff --quiet after
+checkout; worktree deleted after the batch). These pins guard the two
+service changes the ruled devnet plan landed, both money-relevant (a
+mispriced venue prices real sales): the venue mint split
+(WOC_MARKET_PRICE_MINT) and the fixed dev price decoupled from the
+fake-chain gate.
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| m21_pricemint_refusal_strip | BIT (1 fail) | market_bootstrap | the set-but-invalid WOC_MARKET_PRICE_MINT refusal disabled (condition prefixed false); 'a mistyped price mint override refuses to construct' red on its named assertion |
+| m21_pricemint_override_ignored | BIT (2 fails) | market_bootstrap | marketPriceMint collapsed to the WOC_MINT chain; the precedence pin AND the captured-request pin (the address parameter must carry the override) both red |
+| m21_devprice_gate_always_on | BIT (1 fail) | market_dev_chain | the NODE_ENV allowlist gate removed (if false); 'the dev price venue is refused outside an affirmed dev or test NODE_ENV' red, failing-test name captured in a dedicated re-run |
+| m21_devprice_recoupled | BIT (2 fails) | market_dev_chain + market_bootstrap | the old devChainEnabled gate restored; the dev-NODE_ENV-alone arm and the real-chain fixed-price bootstrap pin both red |
+
+Section totals: 4 distinct mutants, 4 BIT, 0 survivors. Whole log after
+this section: 395 distinct mutants.
+
+The 21 review fix round (service commit 6c1b01f) edited both scored files
+and RENAMED the refusal test (now 'the price mint override: shape, decode,
+and NODE_ENV refusals; a valid dev one builds'; the first table's row also
+truncated the old name, which was 'a mistyped price mint override refuses
+to construct; a valid one builds': recorded here as the correction).
+Stale-verdict block at 6c1b01f, fresh throwaway worktree, baseline 57/57,
+all four re-run and re-BIT, reverts byte-identical: m21_pricemint_refusal_strip
+(as the rewritten screen line, 1 fail), m21_pricemint_override_ignored
+(2 fails: precedence + captured-request), m21_devprice_gate_always_on
+(1 fail on the renamed gate test), m21_devprice_recoupled (3 fails: the
+gate test plus BOTH bootstrap fixed-price arms, the confinement positive
+control now also depending on the decoupling). New pins from the fix
+round, same protocol:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| m21_confinement_strip | BIT (1 fail) | market_bootstrap | the dev-price + live-arm + live-default-mint refusal disabled; 'confinement: a fixed dev price refuses the LIVE mint on the live chain arm' red on its named negative arm |
+| m21_pricemint_prodgate_strip | BIT (1 fail) | market_bootstrap | the NODE_ENV allowlist refusal on a SET override disabled; the renamed refusal test red at its first mutated-guard arm (no-NODE_ENV; the production arm guards the same line and is reached only on a run where the first arm passes) |
+| m21_wocmint_screen_strip | BIT (1 fail) | market_bootstrap | the chain-mint shape+decode screen disabled; 'a mistyped WOC_MINT refuses to construct instead of crashing the boot' red |
+
+Section totals after the fix round: 7 distinct mutants (4 + 3), all BIT,
+0 survivors; 4 stale-verdict re-run events all re-BIT. Whole log: 398
+distinct mutants.
+
+The second fix round (service commit 8db7734, the re-review round: widened
+confinement, warns moved below the last refusal, both walls pinned) edited
+bootstrap and both bootstrap-scored suites again. Fresh throwaway worktree
+at 8db7734, baseline 64/64 across the three scored suites (compose
+conformance joined), every mutant occurrence-asserted, run-proven (64
+reported per run), reverts byte-identical, worktree deleted. The
+confinement mutant was RE-SCORED against the widened predicate (its old
+needle no longer exists): m21_confinement_strip now strips the unified
+(devPrice OR venue-split) live-default-mint refusal and bites through the
+confinement test (1 fail). Stale-verdict re-runs, all re-BIT:
+m21_pricemint_refusal_strip (1), m21_pricemint_override_ignored (4 fails
+now: precedence, captured-request, the MIRROR confinement arm, and the
+split-warn naming, all downstream of the collapsed override),
+m21_pricemint_prodgate_strip (1), m21_wocmint_screen_strip (1),
+m21_devprice_gate_always_on (1), m21_devprice_recoupled (4 fails: the
+gate test plus every fixed-price-dependent bootstrap arm). New pins:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| m21_fixed_warn_strip | BIT (1 fail) | market_bootstrap | the fixed-price boot warn branch disabled; 'both price splits warn at boot' red on the fixed-count assert |
+| m21_split_warn_strip | BIT (1 fail) | market_bootstrap | the venue/chain mint-split warn branch disabled (else-if false); the same test red on the split-count assert, proving the two branches die independently |
+| m21_compose_devwall_revert | BIT (1 fail) | compose_conformance | WOC_MARKET_DEV_CHAIN reverted from the pinned "" to env forwarding; 'the deployed economy service pins BOTH dev knobs EMPTY' red |
+
+Section totals after the second fix round: 10 distinct mutants (4 + 3 + 3,
+one re-scored in place), all BIT, 0 survivors; stale-verdict re-run events
+4 + 6 = 10, all re-BIT. Whole log: 401 distinct mutants.

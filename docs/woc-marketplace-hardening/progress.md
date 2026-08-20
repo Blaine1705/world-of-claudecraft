@@ -6224,3 +6224,112 @@ PUSHED per R4 after PASS: origin feature/woc-marketplace (code + packet
 docs); the throwaway worktree wocc-marketplace-authmut deleted after the
 campaign closed. NEXT =
 docs/woc-marketplace-hardening/phase-21-devnet-dry-run.md.
+
+## 21 devnet dry run, session 1 (2026-08-20, SERVICE + GAME repos, BLOCKED ON FUNDING)
+
+Two-repo session per the phase spec; service primary. SESSION START: both
+worktrees verified (pwd + branch), both CLEAN; service fetch found
+origin/master already contained (no merge); game fetch found
+feature/woc-marketplace 0 behind origin/release/v0.40.0 (tip 65b91fa190
+already an ancestor; no merge, no audit owed). Memory scan done
+(reusable-gotchas Solana/RPC + exactly-once clusters,
+open-source-repo-sensitive-material, install-dependencies-when-needed).
+
+RULING GATE FIRST, as the spec demands: the R5 open half (devnet mint)
+was presented with options and a recommendation and RULED by Fernando
+in-session: a FRESH throwaway devnet mint, decimals 6, all keypairs in
+gitignored local files. A companion gap surfaced during the recon carried
+its own ask: the Birdeye venue and the chain arm shared the one WOC_MINT
+knob and the fixed dev price was gated behind the FAKE chain, so a
+real-chain devnet run had no env-configurable price. RULED:
+WOC_MARKET_PRICE_MINT (venue override, default WOC_MINT). Later, when no
+Birdeye key proved available on the machine, a THIRD ask amended the
+plan: the fixed dev price DECOUPLED from the fake-chain gate (NODE_ENV
+allowlist alone), with the spot figure operator-supplied at 0.0001476
+USD per WOC. All three rulings recorded in state.md Rulings (R5 now
+CLOSED IN FULL) before the matching code.
+
+SERVICE COMMITS (LOCAL per R4, nothing pushed): 7284fbe the venue mint
+split (marketPriceMint precedence, wallet-grade validAddress refusal on
+a set-but-invalid override, compose pass-through kept blank, env docs +
+MARKET_SETTLEMENT env-table row + CLAUDE.md line); 2eedcfb the dev price
+over the real chain arm (devPriceSource rides explicitlyDevOrTest alone;
+gate pins rewritten, the dev-NODE_ENV-alone arm and a bootstrap-level
+real-chain fixed-price pin added). Validation: npm run build clean, npm
+test 599 tests / 592 pass / 0 fail / 7 default-tier pg skips, twice.
+Four new pins mutation-proven at the 20 protocol in a throwaway service
+worktree at 2eedcfb (occurrence-asserted, run-proven 55 tests per run,
+reverted byte-identical, worktree deleted): m21_pricemint_refusal_strip,
+m21_pricemint_override_ignored, m21_devprice_gate_always_on (failing
+test name captured in a dedicated re-run), m21_devprice_recoupled; all
+BIT; logged in phase-20-mutation-log.md (21 section; whole log 395 at
+that point, 401 after the review rounds recorded below).
+
+ENVIRONMENT STAGED: five fresh keypairs (authority/fee payer, escrow,
+treasury, buyer, seller) written ONLY after git check-ignore verified
+every filename; .env.devnet (gitignored) with local random secrets and
+the escrow key injected file-to-file, never through a terminal;
+dedicated woc_devnet_service database created on the dev Postgres; the
+idempotent setup script added to the packet dir (devnet_setup.mjs; it
+rides this session's closing packet-docs commit);
+devnet RPC health-probed OK; the Ankr fallback needs its own key so the
+run is single-RPC (recorded: probe-not-resend works single-RPC, only
+crash-replace needs two, out of scope).
+
+BLOCKED: the public devnet faucet answered 429 at every request size all
+session, and Fernando answered CANNOT FUND TODAY; no Birdeye key exists
+locally either (answered NO KEY AVAILABLE). So the mint is not created
+and every on-chain leg is parked: bond cycle (with the double-release
+balance asserts and probe-not-resend observation), settlement e2e,
+hostile burn-redirect, and the carried contention observations (escrow
+gate, auth-guard cache, 16 lost-lock anti-phase). The 11 venue-cadence
+observation is recorded NOT OBSERVABLE keyless (R5 amendment). Per-leg
+status lives in state.md "21 devnet dry-run evidence"; devnet.md carries
+the recipe and the exact resume runbook. The phase stays OPEN; NOTHING
+pushed anywhere (R4: the 21 QA pushes on PASS after the legs run).
+
+REVIEW ROUND (all three lenses fresh, prompted for coverage; every
+finding applied or judged with the file open): the security lens over
+270e337..2eedcfb returned 12 findings, 0 blocking; the correctness lens
+over the evidence trail returned 12 findings, 0 blocking, with a
+verified-clean list reproducing every checkable number (test counts,
+mutant arithmetic, hashes, pubkeys, DB, the 0-SOL on-chain balance
+corroborating the blocker record). Fix round 6c1b01f applied the
+security cluster: the CONFINEMENT (fixed price + live arm + live default
+mint refuses to construct), the venue override honored only under the
+dev/test allowlist, decode screens on BOTH configured mints (typo = the
+designed 503, not a boot crash; also closes the correctness lens's
+placeholder-boot footgun), boot warns for both splits, compose pinning
+the two dev knobs empty, plus the doc truth-ups (dev_chain header,
+trust-the-env breaker note, compose comments). Correctness fixes: the
+premature "committed" wording trued, the R5 record trued to five
+keypairs and the one upfront 1,000,000 WOC mint, ensureSol re-reads and
+judges the balance, the manual-funding floor raised to 0.7 SOL with the
+spend rationale, mint-record crash-ordering breadcrumb, runbook literals
+(port 8798, x-woc-economy-secret, the shared WOC_ECONOMY_INTERNAL_SECRET
+name both sides, blank-Birdeye inventory row, fill-WOC_MINT-before-boot,
+re-copy-after-reinstall). The fix round was RE-REVIEWED FRESH (10
+findings, 0 blocking): applied as 8db7734 (the MIRROR confinement, a
+venue override with the chain on the live default now refuses too;
+warns moved below the last construction refusal so they describe only a
+running market; warn-capture and compose active-line pins; float
+threshold Math.round; compose PRICE_MINT comment; .env.example
+every-arm decode note; the mutation-log prose corrections). JUDGED, no
+change, with reasons: the shared validAddress stays shape-only for the
+WALLET screens (the mint values got the decode check; a live-arm escrow
+wallet must equal the signer pubkey so the wallet class is covered
+structurally); the devnet RPC load-balancer re-read race is accepted
+(idempotent rerun recovers, comment records it); the confinement staying
+keyed on the DEFAULT_WOC_MINT constant is accepted and recorded in its
+comment. RECORDED FOR THE MAINTAINER, pre-existing and outside this
+diff (security lens): the Python payout service's
+DAILY_REWARD_WOC_USD_PRICE fixed-price knob has NO environment gate at
+all and compose forwards it raw, so a production .env value silently
+fixes that service's WOC price; owner: the 22 acceptance-bar audit
+(deferral, not fixed here: it is the live daily-reward rail, out of
+packet scope). Final round-3 self-review with files open (the round-3
+diff is tests, docs, and the two moved/widened blocks, re-proven by the
+mutant batch). Validation at the final tip 8db7734: build clean, suite
+603/596/0/7 skips; mutation record for the session: 10 distinct mutants
+ALL BIT (log sections; whole log 401), 10 stale-verdict re-run events
+all re-BIT.
