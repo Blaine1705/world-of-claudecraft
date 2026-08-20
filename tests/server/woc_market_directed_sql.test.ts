@@ -694,6 +694,40 @@ describe('the bond finality queue, in SQL', () => {
     expect(text).toContain('bond_signature IS NOT NULL');
   });
 
+  it('a contended signature recorder answers TYPED, recording nothing (both legs)', async () => {
+    // The fix round's money-path patience arm: the recorder is the only
+    // trace of a broadcast payment, so a 2s lock refusal must answer a
+    // typed retryable verdict, never throw into a 500 with the signature
+    // unrecorded. Both legs, all three contention codes plus never-started.
+    for (const code of ['55P03', '40P01', '25P03']) {
+      const contended = writeClientPool(async () => {
+        throw Object.assign(new Error('staged contention'), { code });
+      });
+      expect(await new PgWocMarketDb(contended).submitBondSignature(7, 'sig', 1_000)).toBe(
+        'contended',
+      );
+      expect(await new PgWocMarketDb(contended).submitSettlementSignature(7, 'sig')).toBe(
+        'contended',
+      );
+    }
+    const failing = {
+      query: async () => ({ rows: [], rowCount: 0 }),
+      connect: async () => {
+        throw new Error('timeout exceeded when trying to connect');
+      },
+    } as unknown as Pool;
+    expect(await new PgWocMarketDb(failing).submitBondSignature(7, 'sig', 1_000)).toBe('contended');
+    expect(await new PgWocMarketDb(failing).submitSettlementSignature(7, 'sig')).toBe('contended');
+    // A non-contention failure still surfaces raw: only the contention
+    // classes may stand between a payment and its recording.
+    const buggy = writeClientPool(async () => {
+      throw new Error('some real bug');
+    });
+    await expect(new PgWocMarketDb(buggy).submitBondSignature(7, 'sig', 1_000)).rejects.toThrow(
+      'some real bug',
+    );
+  });
+
   it('records a signature only against a still-pending bid', async () => {
     const { pool, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).submitBondSignature(7, 'sig', 1_000);

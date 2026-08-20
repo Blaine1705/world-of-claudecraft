@@ -601,6 +601,85 @@ describe('woc market fixtures', () => {
   });
 });
 
+describe('a contended recorder maps to the retryable in-flight refusal (the write-path rider fix round)', () => {
+  it('confirmBond and confirmSettlement answer confirm_in_flight, never a 500', async () => {
+    // Both legs staged through the REAL flows to the recording moment, then
+    // the recorder stubbed 'contended': the mapping is the unit under test,
+    // and the typed retryable refusal must reach the wire with nothing else
+    // disturbed (before the fix round this threw into a 500 with a payment
+    // already on chain and its signature unrecorded).
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    const listed = unwrap(
+      await createListingSteppedUp(h, {
+        account: SELLER,
+        characterId: SELLER_CHAR,
+        itemRef: { index: 0, itemId: EPIC_ITEM },
+        params: listingParams(),
+      }),
+      'createListing',
+    );
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listed.listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    h.db.submitBondSignature = async () => 'contended';
+    const bondOut = await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-map-bond');
+    expect(bondOut).toEqual({ ok: false, reason: 'confirm_in_flight' });
+    // The settlement leg rides the real directed flow to the offered state
+    // (the directedSale helper's own steps, stopped before its confirm), so
+    // the stubbed recorder is the ONLY divergence from a paying buyer.
+    const offer = unwrap(
+      await h.service.createDirectedOffer({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        sellerCharacterName: 'Selara',
+        usdCents: 5000,
+        item: { itemId: EPIC_ITEM },
+        acceptTerms: true,
+      }),
+      'createDirectedOffer',
+    );
+    unwrap(
+      await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A),
+      'buyer accept',
+    );
+    const accepted = unwrap(
+      await acceptSteppedUp(
+        h,
+        SELLER,
+        offer.offer.id,
+        { index: 0, itemId: EPIC_ITEM },
+        SELLER_CHAR,
+      ),
+      'seller accept',
+    );
+    if (!accepted.listing) throw new Error('no listing from the acceptance');
+    const bought = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: accepted.listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    unwrap(await h.service.settlementQuote(BUYER_A, bought.settlement.id), 'settlementQuote');
+    h.db.submitSettlementSignature = async () => 'contended';
+    const settleOut = await h.service.confirmSettlement(
+      BUYER_A,
+      bought.settlement.id,
+      'sig-map-settle',
+    );
+    expect(settleOut).toEqual({ ok: false, reason: 'confirm_in_flight' });
+  });
+});
+
 describe('the realm-gate pre-check spares the step-up challenge (the write-path rider fix round)', () => {
   it('refuses saturation BEFORE the proof is consumed: the same challenge lists once the gate clears', async () => {
     // The review round's sharpest availability find: the gate's own refusal
