@@ -992,7 +992,15 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // could appear: the sweep and the monitor run the same domain on their
     // own clocks. Counting only in woc_market.ts would date a carve-out a
     // sibling module had already widened, so those two carry a flat zero.
-    for (const sibling of ['server/woc_market_sweep.ts', 'server/woc_market_monitor.ts']) {
+    for (const sibling of [
+      'server/woc_market_sweep.ts',
+      'server/woc_market_monitor.ts',
+      // The extracted delivery arms carry the same flat zero: commitGrant's
+      // carve-out moved WITH the code, so the file that now owns it is the
+      // file this pin must watch (a scan that stopped at the coordinator
+      // would date a carve-out its own extraction had moved out of view).
+      'server/woc_market_delivery.ts',
+    ]) {
       const siblingSrc = stripComments(readFileSync(resolve(process.cwd(), sibling), 'utf8'));
       // Non-vacuity: a file read that silently produced nothing would satisfy
       // both absence checks below.

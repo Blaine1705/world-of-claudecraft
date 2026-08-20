@@ -255,8 +255,15 @@ const MONOLITHS: MonolithRow[] = [
     // cascade arm's prior-winner fetch into the store and re-pinned at the
     // shrunken count. The figure is the current count, zero headroom; the
     // delivery arms are the next standing candidate.
+    // The delivery arms LANDED as the candidate (the escrow write-path
+    // rider): the batch driver, both residue converges, the book-once
+    // custody rail, the hand-off with its grant ledger, and the return
+    // flight moved to server/woc_market_delivery.ts behind a WocDeliveryCtx
+    // slice, paying for the rider's drain rung and re-pinning DOWN at the
+    // exact count. The ledgers stay on the service (live state); the bond
+    // payout walk is the next standing candidate.
     file: 'server/woc_market.ts',
-    ceiling: 4484,
+    ceiling: 3984,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
