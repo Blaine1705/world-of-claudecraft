@@ -71,18 +71,17 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   fence-backed `readRenderTargetPixelsAsync`, because `canvas.toBlob` off the
   default framebuffer defers the PNG ENCODE but does the GPU READBACK
   synchronously (67 to 118 ms per portrait unit, 1477 ms of self time across a
-  post-entry ride). The core owns the THREE conversions that keep the output
-  the same colour toBlob's was: readPixels is bottom-up where ImageData is
-  top-down; both buffers hold premultiplied colour where a PNG holds straight
-  alpha; and three writes the LINEAR working space into any non-XR render
-  target whatever `renderer.outputColorSpace` says (`getParameters`, three
-  0.185.1: `target.texture.colorSpace` governs sampling, and nothing ever
-  samples this one), so the sRGB transfer the canvas used to carry has to be
-  applied here or every portrait comes back dark. Their ORDER is fixed:
-  unpremultiply, THEN encode, because `<colorspace_fragment>` runs before the
-  blend stage, so the canvas held `alpha * srgbEncode(colour)`, not
-  `srgbEncode(alpha * colour)`; the other order is wrong at every partially
-  covered texel, i.e. all along the silhouette. The target's buffers are shared
+  post-entry ride). The core owns the TWO software conversions that keep
+  the output the same colour toBlob's was: readPixels is bottom-up where
+  ImageData is top-down, and both buffers hold premultiplied colour where a PNG
+  holds straight alpha. The sRGB transfer is NOT one of them, it is done by the
+  GPU: the adapter gives the target texture `renderer.outputColorSpace`, so for
+  an UnsignedByte RGBA texture three allocates SRGB8_ALPHA8
+  (`getInternalFormat`, three 0.185.1) and WebGL2 converts linear to sRGB in
+  hardware as the framebuffer is written, which is why readPixels already hands
+  back encoded bytes. Both halves are load bearing and both are pinned by tests:
+  encoding a second time in software washes every portrait out, and dropping the
+  `texture.colorSpace` assignment makes every portrait dark. The target's buffers are shared
   by every capture on the rig while the lane dedupes per cache KEY only, so a
   second concurrent capture takes the synchronous path. That old synchronous
   path is also the fallback for a context that cannot fence, latched after any

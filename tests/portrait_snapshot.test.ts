@@ -108,7 +108,10 @@ describe('PortraitSnapshotTarget', () => {
     expect(height).toBe(SIZE);
   });
 
-  it('makes the target multisampled and colour-managed like the drawing buffer', async () => {
+  // The colorSpace assignment is what selects the sRGB internal format
+  // (SRGB8_ALPHA8), which is what makes the GPU encode linear to sRGB as the
+  // framebuffer is written. Drop it and every portrait comes back dark.
+  it('gives the target the renderer output colour space, so the GPU encodes on write', async () => {
     const h = harness();
     const snapshot = new PortraitSnapshotTarget(SIZE);
     let bound: THREE.WebGLRenderTarget | null = null;
@@ -124,6 +127,21 @@ describe('PortraitSnapshotTarget', () => {
     expect(target?.texture.colorSpace).toBe(THREE.SRGBColorSpace);
     expect(target?.texture.generateMipmaps).toBe(false);
     expect(target?.width).toBe(SIZE);
+  });
+
+  it('reads that colour space off the renderer rather than hardcoding it', async () => {
+    const h = harness({ outputColorSpace: THREE.LinearSRGBColorSpace });
+    const snapshot = new PortraitSnapshotTarget(SIZE);
+    let bound: THREE.WebGLRenderTarget | null = null;
+    const spy = h.renderer.setRenderTarget.bind(h.renderer);
+    h.renderer.setRenderTarget = (target, face, mip) => {
+      if (target) bound = target;
+      spy(target, face, mip);
+    };
+    void snapshot.capture(h.renderer, () => {});
+    expect((bound as THREE.WebGLRenderTarget | null)?.texture.colorSpace).toBe(
+      THREE.LinearSRGBColorSpace,
+    );
   });
 
   it('reuses one target and one readback buffer across captures', async () => {
@@ -312,10 +330,10 @@ describe('PortraitSnapshotTarget', () => {
     expect(h.calls).toEqual(['bind-target', 'unbind-target', 'read-async']);
   });
 
-  it('encodes the linear readback through the sRGB transfer', async () => {
-    // The shader writes the LINEAR working space into any non-XR render target
-    // whatever renderer.outputColorSpace says, so without this the portrait is
-    // darker than the toBlob path's was.
+  it('hands the readback bytes to the encode with no software colour transfer', async () => {
+    // The render target is SRGB8_ALPHA8 (see the colour-space pin above), so the
+    // GPU already encoded these bytes as it wrote them. Re-encoding in software
+    // would turn an opaque 128 into 188 and wash every portrait out.
     const h = harness();
     const snapshot = new PortraitSnapshotTarget(SIZE);
     const pending = snapshot.capture(h.renderer, () => {});
@@ -327,21 +345,8 @@ describe('PortraitSnapshotTarget', () => {
     await expect(pending).resolves.toBe('data:image/png;base64,async');
 
     const encoded = vi.mocked(encodeRgbaPngDataUrl).mock.calls[0][0];
-    expect(encoded[0]).toBe(188);
+    expect(encoded[0]).toBe(128);
     expect(encoded[3]).toBe(255);
-  });
-
-  it('passes the bytes through when the output space carries no sRGB transfer', async () => {
-    const h = harness({ outputColorSpace: THREE.LinearSRGBColorSpace });
-    const snapshot = new PortraitSnapshotTarget(SIZE);
-    const pending = snapshot.capture(h.renderer, () => {});
-    h.readback.buffer?.fill(128);
-    for (let at = 3; at < (h.readback.buffer?.length ?? 0); at += 4) {
-      if (h.readback.buffer) h.readback.buffer[at] = 255;
-    }
-    h.readback.resolve();
-    await expect(pending).resolves.toBe('data:image/png;base64,async');
-    expect(vi.mocked(encodeRgbaPngDataUrl).mock.calls[0][0][0]).toBe(128);
   });
 
   it('gives a rebuilt context a fresh chance at the async path', async () => {

@@ -56,7 +56,7 @@ function readBlobAsDataUrl(blob: Blob | null, resolve: (url: string | null) => v
 
 /**
  * Encode straight-alpha, top-down RGBA bytes (what
- * `flipUnpremultiplyEncodeInto` produces) as a PNG data URL, by way of a 2D
+ * `flipUnpremultiplyInto` produces) as a PNG data URL, by way of a 2D
  * canvas. Resolves null when no 2D context is available, which sends the
  * capture back down the synchronous fallback for good.
  */

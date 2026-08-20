@@ -1,9 +1,8 @@
 import * as THREE from 'three';
-import { ColorManagement, SRGBTransfer } from 'three';
 import { encodeCanvasPng, encodeRgbaPngDataUrl } from './portrait_png_encode';
 import {
   asyncPortraitReadbackUsable,
-  flipUnpremultiplyEncodeInto,
+  flipUnpremultiplyInto,
   portraitReadbackByteLength,
 } from './portrait_readback_core';
 
@@ -24,13 +23,13 @@ import {
 // runs getBufferSubData. The main thread pays the draw and the command
 // submission; the transfer waits for the GPU on its own.
 //
-// Three things change between the paths, and all three are undone before the
-// encode so the output matches what toBlob wrote: readPixels numbers rows from
-// the bottom while ImageData numbers them from the top, both the drawing buffer
-// and the target hold premultiplied colour while a PNG holds straight alpha,
-// and the shader's output conversion writes LINEAR values into any non-XR
-// render target whatever the renderer's outputColorSpace says. All three live
-// in the pure core, in the order the header there derives.
+// Two things change between the paths, and both are undone in software before
+// the encode so the output matches what toBlob wrote: readPixels numbers rows
+// from the bottom while ImageData numbers them from the top, and both the
+// drawing buffer and the target hold premultiplied colour while a PNG holds
+// straight alpha. Both live in the pure core. The sRGB transfer is NOT one of
+// them: the target texture carries the renderer's output colour space, so three
+// allocates it SRGB8_ALPHA8 and the GPU encodes linear to sRGB on write.
 
 /** Matches the offscreen rig's `antialias: true` drawing buffer, so the
  *  silhouette a render target captures is the one the default framebuffer
@@ -150,7 +149,6 @@ export class PortraitSnapshotTarget {
 
     this.captureInFlight = true;
     const generation = this.generation;
-    const encodeSrgb = ColorManagement.getTransfer(renderer.outputColorSpace) === SRGBTransfer;
     return this.awaitReadback(readback, pixels).then((landed) => {
       // A dispose released `pixels` and `topDown` while this readback was in
       // flight, and a capture on the rebuilt rig may already own the new ones
@@ -161,7 +159,7 @@ export class PortraitSnapshotTarget {
       this.captureInFlight = false;
       if (!landed) return null;
       const dest = this.ensureTopDown();
-      flipUnpremultiplyEncodeInto(pixels, dest, this.size, this.size, encodeSrgb);
+      flipUnpremultiplyInto(pixels, dest, this.size, this.size);
       return encodeRgbaPngDataUrl(dest, this.size, this.size).then((url) => {
         if (url === null) this.asyncFailed = true;
         return url;
@@ -240,9 +238,12 @@ export class PortraitSnapshotTarget {
       type: THREE.UnsignedByteType,
       samples: PORTRAIT_SNAPSHOT_SAMPLES,
     });
-    // Sampling metadata only: nothing ever samples this texture (its bytes go
-    // to readPixels), and the shader writes LINEAR into it regardless. The
-    // encode that keeps the portrait from coming back dark is the pure core's.
+    // Load bearing, and not for sampling: for an UnsignedByte RGBA texture
+    // whose colour space carries the sRGB transfer three allocates
+    // SRGB8_ALPHA8 (getInternalFormat, three 0.185.1), and WebGL2 then encodes
+    // linear to sRGB in hardware as the framebuffer is written. That is what
+    // reproduces the canvas path's bytes; drop this and every portrait comes
+    // back dark, encode a second time in software and every one washes out.
     target.texture.colorSpace = renderer.outputColorSpace;
     target.texture.generateMipmaps = false;
     this.target = target;

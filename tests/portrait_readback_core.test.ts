@@ -1,19 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   asyncPortraitReadbackUsable,
-  flipUnpremultiplyEncodeInto,
+  flipUnpremultiplyInto,
   portraitReadbackByteLength,
-  srgbEncodeByte,
   unpremultiplyByte,
 } from '../src/render/characters/portrait_readback_core';
-
-/** The sRGB OETF in floating point, written out independently of the module's
- *  lookup table so a pin compares against the curve and not against itself. */
-function referenceSrgbEncodeByte(channel: number): number {
-  const linear = channel / 255;
-  const encoded = linear <= 0.0031308 ? linear * 12.92 : 1.055 * linear ** (1 / 2.4) - 0.055;
-  return Math.round(encoded * 255);
-}
 
 /** A bottom-up RGBA buffer whose rows are filled with a per-row marker, the
  *  shape readPixels hands back. */
@@ -60,15 +51,17 @@ describe('unpremultiplyByte', () => {
   });
 });
 
-// The orientation / stride / alpha pins run with the transfer OFF so they
-// assert exactly one conversion each; the transfer has its own block below.
-describe('flipUnpremultiplyEncodeInto', () => {
+// The core does exactly TWO conversions in software, the flip and the
+// unpremultiply. The sRGB transfer belongs to the GPU: the capture's render
+// target is allocated SRGB8_ALPHA8 from its texture colour space, so readPixels
+// already returns encoded bytes.
+describe('flipUnpremultiplyInto', () => {
   it('reverses the row order (readPixels is bottom-up, ImageData is top-down)', () => {
     const width = 3;
     const height = 2;
     const source = bottomUpRows(width, height, 255);
     const dest = new Uint8ClampedArray(portraitReadbackByteLength(width, height));
-    flipUnpremultiplyEncodeInto(source, dest, width, height, false);
+    flipUnpremultiplyInto(source, dest, width, height);
     // Source row 0 (marker 0) is the BOTTOM row, so it must land last.
     const stride = width * 4;
     expect(dest[0]).toBe(1);
@@ -80,7 +73,7 @@ describe('flipUnpremultiplyEncodeInto', () => {
     const height = 2;
     const source = bottomUpRows(width, height, 255);
     const dest = new Uint8ClampedArray(portraitReadbackByteLength(width, height));
-    flipUnpremultiplyEncodeInto(source, dest, width, height, false);
+    flipUnpremultiplyInto(source, dest, width, height);
     const topRow: number[] = [];
     for (let x = 0; x < width; x++) topRow.push(dest[x * 4 + 1]);
     expect(topRow).toEqual([0, 1, 2]);
@@ -99,7 +92,7 @@ describe('flipUnpremultiplyEncodeInto', () => {
       100, 100, 100, 255,
     ]);
     const dest = new Uint8ClampedArray(8);
-    flipUnpremultiplyEncodeInto(source, dest, width, height, false);
+    flipUnpremultiplyInto(source, dest, width, height);
     expect([...dest.slice(0, 4)]).toEqual([100, 100, 100, 255]);
     expect([...dest.slice(4)]).toEqual([255, 255, 255, 128]);
   });
@@ -107,7 +100,7 @@ describe('flipUnpremultiplyEncodeInto', () => {
   it('writes a fully transparent texel as transparent black', () => {
     const source = new Uint8Array([0, 0, 0, 0]);
     const dest = new Uint8ClampedArray(4);
-    flipUnpremultiplyEncodeInto(source, dest, 1, 1, false);
+    flipUnpremultiplyInto(source, dest, 1, 1);
     expect([...dest]).toEqual([0, 0, 0, 0]);
   });
 
@@ -115,75 +108,33 @@ describe('flipUnpremultiplyEncodeInto', () => {
     const size = 256;
     const source = bottomUpRows(size, size, 255);
     const dest = new Uint8ClampedArray(portraitReadbackByteLength(size, size));
-    flipUnpremultiplyEncodeInto(source, dest, size, size, false);
+    flipUnpremultiplyInto(source, dest, size, size);
     const stride = size * 4;
     expect(dest[0]).toBe(size - 1);
     expect(dest[(size - 1) * stride]).toBe(0);
   });
 });
 
-describe('flipUnpremultiplyEncodeInto: the sRGB transfer', () => {
-  it('encodes a straight linear byte rather than passing it through', () => {
-    // A linear mid grey is NOT its own sRGB byte: leaving the transfer out is
-    // exactly the "every portrait came back dark" bug.
+describe('flipUnpremultiplyInto: no software colour transfer', () => {
+  it('passes a mid-range opaque byte through unchanged', () => {
+    // The GPU already encoded these bytes (the target is SRGB8_ALPHA8), so 128
+    // must stay 128. A software sRGB transfer would hand back 188 here, which
+    // is exactly the washed-out-portrait bug.
     const source = new Uint8Array([128, 128, 128, 255]);
     const dest = new Uint8ClampedArray(4);
-    flipUnpremultiplyEncodeInto(source, dest, 1, 1, true);
-    expect([...dest]).toEqual([188, 188, 188, 255]);
-    expect(dest[0]).not.toBe(128);
-    expect(dest[0]).toBe(referenceSrgbEncodeByte(128));
-  });
-
-  it('matches the reference curve across the whole byte domain', () => {
-    for (let i = 0; i < 256; i++) expect(srgbEncodeByte(i)).toBe(referenceSrgbEncodeByte(i));
-    expect(srgbEncodeByte(0)).toBe(0);
-    expect(srgbEncodeByte(255)).toBe(255);
-  });
-
-  it('leaves the bytes alone when the output space carries no sRGB transfer', () => {
-    const source = new Uint8Array([128, 128, 128, 255]);
-    const dest = new Uint8ClampedArray(4);
-    flipUnpremultiplyEncodeInto(source, dest, 1, 1, false);
+    flipUnpremultiplyInto(source, dest, 1, 1);
     expect([...dest]).toEqual([128, 128, 128, 255]);
   });
 
-  it('unpremultiplies BEFORE it encodes, which is what an edge texel shows', () => {
-    // Half-covered dark grey: the readback holds 32 at alpha 128.
+  it('applies the unpremultiply and nothing else to a partially covered texel', () => {
+    // Half-covered dark grey: the readback holds 32 at alpha 128. The only
+    // change is dividing the coverage back out; no curve is applied on top.
     const source = new Uint8Array([32, 32, 32, 128]);
     const dest = new Uint8ClampedArray(4);
-    flipUnpremultiplyEncodeInto(source, dest, 1, 1, true);
-
+    flipUnpremultiplyInto(source, dest, 1, 1);
     const straight = unpremultiplyByte(32, 128);
-    expect([...dest]).toEqual([
-      referenceSrgbEncodeByte(straight),
-      referenceSrgbEncodeByte(straight),
-      referenceSrgbEncodeByte(straight),
-      128,
-    ]);
-    // The other order (encode the premultiplied value, then divide alpha out)
-    // is a different number here, so this pin is decisive rather than
-    // incidental. `<colorspace_fragment>` runs before the blend stage, so the
-    // canvas held alpha * srgbEncode(colour) and toBlob handed the PNG
-    // srgbEncode(colour): the unpremultiply comes first.
-    const wrongOrder = unpremultiplyByte(referenceSrgbEncodeByte(32), 128);
-    expect(dest[0]).not.toBe(wrongOrder);
-    expect(dest[0]).toBe(137);
-    expect(wrongOrder).toBe(197);
-  });
-
-  it('is order-insensitive on a fully opaque texel', () => {
-    const source = new Uint8Array([90, 90, 90, 255]);
-    const dest = new Uint8ClampedArray(4);
-    flipUnpremultiplyEncodeInto(source, dest, 1, 1, true);
-    expect(dest[0]).toBe(referenceSrgbEncodeByte(90));
-    expect(unpremultiplyByte(referenceSrgbEncodeByte(90), 255)).toBe(dest[0]);
-  });
-
-  it('still writes a fully transparent texel as transparent black', () => {
-    const source = new Uint8Array([0, 0, 0, 0]);
-    const dest = new Uint8ClampedArray(4);
-    flipUnpremultiplyEncodeInto(source, dest, 1, 1, true);
-    expect([...dest]).toEqual([0, 0, 0, 0]);
+    expect(straight).toBe(64);
+    expect([...dest]).toEqual([straight, straight, straight, 128]);
   });
 });
 
