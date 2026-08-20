@@ -43,8 +43,12 @@ actually reads.
   over the committed spine and every finding was applied or judged, headlined
   by one PROVEN-vacuous pin (a slice over a lexicographic sort had gutted the
   listingsBySeller realm assertion) and a fake fidelity round two; the fix
-  round was mutation-verified (round6, incl. the two upgraded ex-survivors)
-  and re-reviewed fresh, and the final gate result is in the progress entry.
+  round was mutation-verified (round6, 9/9 bit, incl. the upgraded
+  ex-survivor claim_open_settlement_advisory and the re-proven
+  listingsBySeller pin), re-reviewed FRESH (0 blocking, 1 docs truth-up, 2
+  nits, all applied), and the closing gate PASS (all 12 steps at 73e5f24fb0,
+  full-suite fallback) is recorded in the progress entry's final validation
+  note.
   The 20 implement round section in progress.md is the registry the 20 QA
   session consumes (JUDGED and DEFERRED lists binding). NEXT =
   phase-20-qa.md, GAME repo, wocc-marketplace, FRESH session, newest

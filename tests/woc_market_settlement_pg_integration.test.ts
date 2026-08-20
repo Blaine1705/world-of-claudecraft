@@ -1088,7 +1088,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const listingId = await seedListing(realm, seller);
       const args = await saleArgs(realm, listingId, seller, buyer);
       await marketDb.insertSale(args);
-      await expect(marketDb.insertSale(args)).rejects.toMatchObject({ code: '23505' });
+      await expect(marketDb.insertSale(args)).rejects.toMatchObject({
+        code: '23505',
+        constraint: 'woc_market_sales_listing_once',
+      });
     });
 
     it('the boot repair voids a legacy duplicate sale instead of failing the boot', async () => {

@@ -5037,8 +5037,11 @@ the boundary follow-up on top; re-verified by mutation round6, 9/9 BIT):
   bond pg test now runs that exact case against real Postgres.
 - Applied should-fixes: abandon-cap fixtures derive from
   WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR; the two missing jsonb CHECK arms
-  (sales item, offer item_ref); constraint NAMES on every 23514/23505
-  assert; the fake's twin guard moved behind the advisory cooldown to match
+  (sales item, offer item_ref); constraint NAMES on every 23514 assert and
+  on this round's 23505 asserts (the fix-round re-review also named the
+  pre-existing insertSale duplicate; the CIC rebuild-on-duplicates arm stays
+  bare by design, pg does not populate err.constraint on an index-build
+  failure); the fake's twin guard moved behind the advisory cooldown to match
   the real pass order (red-first proven by the new at-cap twin fidelity
   arm); exact landed-signature asserts on both signature intakes; the
   activation ladder now asserts the listing board write; DESC-flip
@@ -5069,8 +5072,24 @@ the boundary follow-up on top; re-verified by mutation round6, 9/9 BIT):
   CIC cross-database wait measured absent, declared-timeout ratchet green
   with 90s headroom on the heaviest files, verify databases ~13 MB each.
 
-FINAL VALIDATION NOTE (after the fix round): gate re-run result and tip are
-recorded at the end of this section once the closing gate finishes.
+FIX-ROUND FRESH RE-REVIEW (a new read-only agent over f70dea28f2..73e5f24fb0):
+0 blocking, 1 should-fix (the state.md wording claimed the re-review and gate
+result before both existed; corrected), 2 nits (the insertSale duplicate
+23505 now names woc_market_sales_listing_once; the "two upgraded
+ex-survivors" wording corrected to the one logged survivor upgrade plus the
+re-proven listingsBySeller pin). Its verified-clean list covers the fake
+restructure's case-by-case fidelity to the real claim order, both
+structuredClone returns, the lock-free floor pin's decisiveness (traced
+through the recorder), all constraint names against the DDL, and the docs
+counts against the artifacts.
+
+FINAL VALIDATION NOTE: node scripts/gate_select.mjs PASS on the committed
+tree at 73e5f24fb0, ALL 12 STEPS green, full-suite fallback (the diff
+touches the fake helper, so the planner falls back by design): 41,698 tests
+passed with the 2 expected fails and 26 skips, browser regressions 131,
+typecheck and all builds green, run WITH TEST_DATABASE_URL only and a clear
+field (no concurrent pg-suite runs). The earlier FAIL at f70dea28f2 was the
+reviewer-collision documented above, not a regression.
 
 Registry for the 20 QA session: diff range 057b54141a..<tip below>; the
 JUDGED and DEFERRED lists above are binding; the mutation log and the
