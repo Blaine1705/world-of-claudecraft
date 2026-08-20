@@ -388,7 +388,21 @@ scored against.
 | rider_pg_narrowing_negative_escrow | BIT | woc_market_delivery_pg_integration, woc_market_directed_sql | rider; SURVIVED its first scoring against the bond suite alone (that suite's freed-insert proof holds its own raw-client lock, so it cannot see the source's mode), upgraded by the KEY-SHARE-holder behavioral pin in b54a6e5b45 and re-scored against the owning suites |
 | rider_pg_plain_bound_strip | BIT | woc_market_bond_pg_integration | rider |
 
-Rider totals: 28 distinct mutants, 26 BIT, 1 deliberate green control, 1
+Fix-round re-verifications (the stale-verdict rule: any mutant whose source
+or pinning test was edited after its verdict re-runs before the log is
+trusted), plus the two mutants the fix round's own code earned:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| rider_park_cap_strip | BIT | woc_market_local_ledgers | rider; RE-RUN after the counted-refusal edit to the pinning test |
+| rider_gate_cap_check | BIT | woc_market_escrow_gate | rider; RE-RUN after the probe rewrite |
+| rider_gate_release_shift | BIT | woc_market_escrow_gate, woc_market_escrow_queue | rider; RE-RUN after the probe rewrite |
+| rider_gate_reclaim_strip | BIT | woc_market_escrow_gate | rider; RE-RUN after the probe rewrite |
+| rider_gate_probe_reclaim_strip | BIT | woc_market_escrow_gate | rider fix round; the saturated() probe's own reclaim (a bare stats read makes a full wedge permanent) |
+| rider_accept_rungs_strip | BIT | woc_market_service | rider fix round; the directed acceptance's pre-burn saturation rung |
+
+Rider totals: 30 distinct mutants, 28 BIT, 1 deliberate green control, 1
 first-scoring survivor upgraded to BIT in-round (the wrong-suite class the
 header warns about: the fix was a new behavioral pin plus re-scoring, never
-a relaxed verdict). Whole log after this section: 321 distinct mutants.
+a relaxed verdict); 4 stale-verdict re-runs all BIT. Whole log after this
+section: 323 distinct mutants.
