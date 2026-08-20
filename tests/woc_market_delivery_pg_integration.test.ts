@@ -1571,6 +1571,36 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       }
     }, 20_000);
 
+    it('the escrow accounts lock IS the narrowed mode: a held FK KEY SHARE never blocks it', async () => {
+      // Binds the SOURCE's lock mode behaviorally (the rider's mutation
+      // round: the bond suite's freed-insert proof holds its own raw-client
+      // lock, so reverting escrowInsertListing itself to plain FOR UPDATE
+      // survived it). FOR KEY SHARE, exactly what an in-flight FK-child
+      // insert holds on the seller's accounts row, conflicts with plain FOR
+      // UPDATE but not with FOR NO KEY UPDATE: under the narrowed mode this
+      // escrow proceeds without waiting; a reverted mode would eat the 2s
+      // lock ceiling and answer contended.
+      const realm = 'escrow-narrowed-mode';
+      const account = await seedAccount();
+      const characterId = await seedCharacter(realm, account);
+      await seedLease(realm, characterId, 'escrow-nonce-live');
+      const holder = await pool.connect();
+      try {
+        await holder.query('BEGIN');
+        await holder.query('SELECT 1 FROM accounts WHERE id = $1 FOR KEY SHARE', [account]);
+        const startedAt = Date.now();
+        const out = await marketDb.escrowInsertListing(
+          { characterId, level: 12, state: SAVE_STATE, leaseNonce: 'escrow-nonce-live' },
+          escrowListing(realm, account, characterId),
+        );
+        expect(out.ok, 'proceeded under the held KEY SHARE').toBe(true);
+        expect(Date.now() - startedAt).toBeLessThan(1_000);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+    }, 20_000);
+
     it('runs beside the delivered-save twin on the same character without a deadlock', async () => {
       // The lock-graph probe: escrow takes accounts then characters; the
       // delivered save takes characters then the claim row. No reverse edge
