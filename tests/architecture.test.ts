@@ -603,6 +603,7 @@ const RENDER_PURE_CORES = [
   'src/render/zone_eviction_core.ts',
   'src/render/zone_prewarm_templates_core.ts',
   'src/render/characters/skeleton_update_core.ts',
+  'src/render/characters/material_program_shape_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));

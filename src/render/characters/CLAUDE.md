@@ -79,6 +79,13 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   without changing weights, matrices, draws, or shader math),
   `skinned_sort_spheres.ts` (static sort spheres so three never brute-forces
   a missing SkinnedMesh bounding sphere), `tinted_material_cache_core.ts`,
+  `material_program_shape_core.ts` (the per-object facts three re-derives a
+  material's program parameters from; its key is a fragment of the tinted
+  cache key, so a mounted material is shared only among meshes three would
+  not re-derive between) with `shadow_depth_materials.ts` (the same split for
+  the shadow pass: one shared MeshDepthMaterial per program shape, mounted as
+  `customDepthMaterial` on alpha-free skinned casters so three's one global
+  depth material stops flipping per caster),
   `visual_pool.ts`/`visual_pool_policy.ts` (own section below).
 - Appearance decals/motion: `stubble.ts` (own section below), `makeup.ts`
   (blush/eyeshadow on the same decal machinery; lipstick is deliberately a
