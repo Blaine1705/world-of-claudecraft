@@ -65,17 +65,20 @@ function compileMaterial(
 
 function sourceAsset(withEmissive: boolean): THREE.Group {
   const source = new THREE.Group();
-  // Round 4: kit fixtures carry a window-assembly component INSIDE the first
-  // mesh's geometry (a thin box at mid-height on the +z face, merged into
-  // the shell the way the single-mesh hexb GLBs model their frames), so the
-  // pane detector (kit_window_panes_core.ts) finds exactly one window per
-  // kit building. The opaque merge keeps the extra triangles off the
-  // TownEmissive mesh, so the civic mask counts below stay authored.
+  // Round 5: kit fixtures carry a window-assembly component INSIDE the first
+  // mesh's geometry, merged into the shell the way the single-mesh hexb GLBs
+  // model their windows: a frame box at mid-height on the +z face PLUS a
+  // recessed pane box sharing one exact corner vertex (max corner
+  // (0.8, 1.5, 2.0)), so the pane detector (kit_window_panes_core.ts) finds
+  // exactly one window per kit building and emits the pane box's back face
+  // as its recessed glass plane. The opaque merge keeps the extra triangles
+  // off the TownEmissive mesh, so the civic mask counts below stay authored.
   const shell = withEmissive
     ? mergeGeometries(
         [
           new THREE.BoxGeometry(2, 3, 4),
-          new THREE.BoxGeometry(0.4, 0.6, 0.08).translate(0.6, 0.9, 1.96),
+          new THREE.BoxGeometry(0.4, 0.6, 0.08).translate(0.6, 1.2, 1.96),
+          new THREE.BoxGeometry(0.2, 0.3, 0.02).translate(0.7, 1.35, 1.99),
         ],
         false,
       )

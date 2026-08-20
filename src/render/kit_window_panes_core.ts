@@ -2,23 +2,29 @@
 // free). The hexb kit GLBs carry no emissive materials or window markers:
 // their windows are just small recessed frame assemblies modeled into the one
 // building mesh. This core finds those assemblies in the raw geometry and
-// emits one amber pane rectangle per window, so the lit-window meshes sit
-// exactly in the models' real openings instead of guessed wall positions.
+// emits, per assembly, the assembly's recessed glass plane as a triangle
+// soup, matched to the opening's exact shape (arches come out as arches), so
+// the lit-window mesh IS the model's own glass geometry instead of a
+// rectangle guessed over it.
 //
 // How: split vertices are merged by exact position triple, triangles are
 // grouped into connected components via shared merged vertices, and each
 // component is classified against the model's bounding box. A window assembly
 // is a small component (bounded triangle count), short relative to the model,
 // off the ground, thin across one horizontal axis, and not tall-and-narrow
-// near the ground (that shape is a door frame). The pane fills 70 percent of
-// the assembly's thick horizontal extent and height, across its thin axis.
+// near the ground (that shape is a door frame). Inside an accepted assembly
+// the triangles facing along the thin axis are clustered by plane offset; the
+// pane is the largest-area cluster that is recessed behind the assembly's
+// outer face and clear of its sill. An assembly with no such cluster emits
+// nothing: doors, shuttered windows, and solid dormer faces go dark by
+// design.
 //
-// The thresholds below were validated in-browser against all five shipped
-// hexb kit models (hexb_home_a, hexb_home_b, hexb_tavern, hexb_workshop,
-// hexb_townhall): every authored window gained exactly one pane and no door,
-// chimney, or wall body was selected. All classification inputs are
-// normalized by the model bounding box (or are ratios), so the function works
-// identically in raw quantized attribute units and in float model units.
+// The classification thresholds were validated in-browser against all five
+// shipped hexb kit models, and the recessed-plane selection against the live
+// bank model: 12 panes glow and 9 assemblies stay correctly dark (doors,
+// shutters, dormer housings). All classification inputs are normalized by
+// the model bounding box (or are ratios), so the function works identically
+// in raw quantized attribute units and in float model units.
 const MIN_TRIANGLES = 6;
 const MAX_TRIANGLES = 130;
 const MIN_NORMALIZED_HEIGHT = 0.04;
@@ -28,19 +34,27 @@ const MAX_THIN_AXIS_FRACTION = 0.12;
 const MAX_THICK_AXIS_FRACTION = 0.42;
 const DOOR_MAX_NORMALIZED_BOTTOM = 0.3;
 const DOOR_MIN_HEIGHT_TO_WIDTH = 1.5;
-const PANE_FRACTION = 0.7;
+// Plane clustering along the assembly's thin axis: a triangle joins a cluster
+// only when its unit normal points along that axis, and cluster keys quantize
+// the centroid offset by an epsilon derived from the model and assembly
+// scale, so raw Int16 and float inputs cluster identically.
+const PLANE_NORMAL_MIN_AXIS_ALIGNMENT = 0.9;
+const PLANE_EPS_MODEL_SPAN_FRACTION = 5e-4;
+const PLANE_EPS_THIN_EXTENT_FRACTION = 0.02;
+// The outer face (the cluster nearest the component extreme farther from the
+// model center) is the frame front, never the glass; the sill band is the
+// bottom tenth of the assembly.
+const OUTER_FACE_MARGIN_THIN_FRACTION = 0.1;
+const OUTER_FACE_MARGIN_EPS_MULTIPLIER = 2;
+const SILL_CLEARANCE_HEIGHT_FRACTION = 0.1;
 
 export interface KitWindowPane {
-  /** Pane center, in the same units as the input positions. */
-  cx: number;
-  cy: number;
-  cz: number;
-  /** Pane extent along its thick horizontal axis, same units as positions. */
-  width: number;
-  /** Pane extent along y, same units as positions. */
-  height: number;
-  /** The assembly is thin along x: the pane lies in the YZ plane. */
-  thinX: boolean;
+  /**
+   * The pane's triangles as flat xyz triples (triangle soup, no dedup), in
+   * the same units as the input positions: the assembly's recessed glass
+   * plane, exactly as modeled.
+   */
+  positions: number[];
 }
 
 interface ComponentStats {
@@ -51,6 +65,25 @@ interface ComponentStats {
   maxX: number;
   maxY: number;
   maxZ: number;
+}
+
+interface PlaneCluster {
+  /** Summed triangle area (cross-product magnitude over two). */
+  area: number;
+  minY: number;
+  /** Representative plane offset: the first triangle's centroid coordinate. */
+  offset: number;
+  positions: number[];
+}
+
+interface PaneSearch {
+  /** The assembly is thin along x; otherwise thin along z. */
+  thinX: boolean;
+  eps: number;
+  outerExtreme: number;
+  margin: number;
+  sillY: number;
+  clusters: Map<number, PlaneCluster>;
 }
 
 /**
@@ -150,9 +183,12 @@ export function kitWindowPanes(
   const modelSpanY = modelMaxY - modelMinY;
   const modelSpanZ = modelMaxZ - modelMinZ;
   if (modelSpanX <= 0 || modelSpanY <= 0 || modelSpanZ <= 0) return [];
+  const modelMaxSpan = Math.max(modelSpanX, modelSpanY, modelSpanZ);
 
-  const panes: KitWindowPane[] = [];
-  for (const stats of components.values()) {
+  // Classify components; each accepted window assembly opens a pane search
+  // that the plane-clustering pass below fills.
+  const searches = new Map<number, PaneSearch>();
+  for (const [root, stats] of components) {
     if (stats.triangles < MIN_TRIANGLES || stats.triangles > MAX_TRIANGLES) continue;
     const spanX = stats.maxX - stats.minX;
     const spanY = stats.maxY - stats.minY;
@@ -176,14 +212,87 @@ export function kitWindowPanes(
       continue;
     }
     const thinX = spanX <= spanZ;
-    panes.push({
-      cx: (stats.minX + stats.maxX) / 2,
-      cy: (stats.minY + stats.maxY) / 2,
-      cz: (stats.minZ + stats.maxZ) / 2,
-      width: PANE_FRACTION * (thinX ? spanZ : spanX),
-      height: PANE_FRACTION * spanY,
+    const thinExtent = thinX ? spanX : spanZ;
+    const eps = Math.max(
+      modelMaxSpan * PLANE_EPS_MODEL_SPAN_FRACTION,
+      thinExtent * PLANE_EPS_THIN_EXTENT_FRACTION,
+    );
+    const minAlongAxis = thinX ? stats.minX : stats.minZ;
+    const maxAlongAxis = thinX ? stats.maxX : stats.maxZ;
+    const modelCenterAlongAxis = thinX ? (modelMinX + modelMaxX) / 2 : (modelMinZ + modelMaxZ) / 2;
+    const outerExtreme =
+      Math.abs(maxAlongAxis - modelCenterAlongAxis) >= Math.abs(minAlongAxis - modelCenterAlongAxis)
+        ? maxAlongAxis
+        : minAlongAxis;
+    searches.set(root, {
       thinX,
+      eps,
+      outerExtreme,
+      margin: Math.max(
+        thinExtent * OUTER_FACE_MARGIN_THIN_FRACTION,
+        eps * OUTER_FACE_MARGIN_EPS_MULTIPLIER,
+      ),
+      sillY: stats.minY + SILL_CLEARANCE_HEIGHT_FRACTION * spanY,
+      clusters: new Map(),
     });
+  }
+  if (searches.size === 0) return [];
+
+  // Cluster each accepted assembly's axis-facing triangles by plane offset.
+  for (let triangle = 0; triangle < triangleCount; triangle++) {
+    const base = triangle * 3;
+    const ia = indices ? indices[base] : base;
+    const search = searches.get(find(mergedByVertex[ia]));
+    if (!search) continue;
+    const ib = indices ? indices[base + 1] : base + 1;
+    const ic = indices ? indices[base + 2] : base + 2;
+    const ax = positions[ia * 3];
+    const ay = positions[ia * 3 + 1];
+    const az = positions[ia * 3 + 2];
+    const bx = positions[ib * 3];
+    const by = positions[ib * 3 + 1];
+    const bz = positions[ib * 3 + 2];
+    const cx = positions[ic * 3];
+    const cy = positions[ic * 3 + 1];
+    const cz = positions[ic * 3 + 2];
+    const abx = bx - ax;
+    const aby = by - ay;
+    const abz = bz - az;
+    const acx = cx - ax;
+    const acy = cy - ay;
+    const acz = cz - az;
+    const nx = aby * acz - abz * acy;
+    const ny = abz * acx - abx * acz;
+    const nz = abx * acy - aby * acx;
+    const normalLength = Math.hypot(nx, ny, nz);
+    if (normalLength <= 0) continue;
+    const alongAxis = (search.thinX ? nx : nz) / normalLength;
+    if (Math.abs(alongAxis) <= PLANE_NORMAL_MIN_AXIS_ALIGNMENT) continue;
+    const offset =
+      ((search.thinX ? ax : az) + (search.thinX ? bx : bz) + (search.thinX ? cx : cz)) / 3;
+    const key = Math.round(offset / search.eps);
+    let cluster = search.clusters.get(key);
+    if (!cluster) {
+      cluster = { area: 0, minY: Infinity, offset, positions: [] };
+      search.clusters.set(key, cluster);
+    }
+    cluster.area += normalLength / 2;
+    const triangleMinY = Math.min(ay, by, cy);
+    if (triangleMinY < cluster.minY) cluster.minY = triangleMinY;
+    cluster.positions.push(ax, ay, az, bx, by, bz, cx, cy, cz);
+  }
+
+  // The pane is the largest-area cluster that is recessed behind the outer
+  // face and clear of the sill; an assembly with none emits nothing.
+  const panes: KitWindowPane[] = [];
+  for (const search of searches.values()) {
+    let best: PlaneCluster | null = null;
+    for (const cluster of search.clusters.values()) {
+      if (Math.abs(cluster.offset - search.outerExtreme) <= search.margin) continue;
+      if (cluster.minY < search.sillY) continue;
+      if (!best || cluster.area > best.area) best = cluster;
+    }
+    if (best) panes.push({ positions: best.positions });
   }
   return panes;
 }

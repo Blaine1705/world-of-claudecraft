@@ -431,29 +431,31 @@ function normalizedAttributeScale(
   return 1;
 }
 
-// The merged lit-window quads for one kit building, in raw model space: one
-// PlaneGeometry per detected window assembly, across the assembly's thin
-// horizontal axis, dequantized and moved by the mesh node's model-root
-// transform (the caller settles matrixWorld while the clone is parentless at
-// the origin). A uniform amber vertex color rides the same vertex-color
-// emissive ladder as the shape buildings' authored windows.
+// The merged lit-window geometry for one kit building, in raw model space:
+// each detected assembly's recessed glass plane as the model's own triangles
+// (kit_window_panes_core.ts), concatenated into one soup, dequantized and
+// moved by the mesh node's model-root transform (the caller settles
+// matrixWorld while the clone is parentless at the origin). A uniform amber
+// vertex color rides the same vertex-color emissive ladder as the shape
+// buildings' authored windows.
 function kitWindowPaneGeometry(
   mesh: THREE.Mesh,
   panes: readonly KitWindowPane[],
 ): THREE.BufferGeometry | null {
   const position = mesh.geometry.getAttribute('position');
   if (panes.length === 0 || !position) return null;
-  const parts: THREE.BufferGeometry[] = [];
+  let total = 0;
+  for (const pane of panes) total += pane.positions.length;
+  if (total === 0) return null;
+  const soup = new Float32Array(total);
+  let cursor = 0;
   for (const pane of panes) {
-    const quad = new THREE.PlaneGeometry(pane.width, pane.height);
-    if (pane.thinX) quad.rotateY(Math.PI / 2);
-    quad.translate(pane.cx, pane.cy, pane.cz);
-    const part = quad.toNonIndexed();
-    part.deleteAttribute('uv');
-    parts.push(part);
+    soup.set(pane.positions, cursor);
+    cursor += pane.positions.length;
   }
-  const merged = mergeParts(parts, 'kit window panes');
-  if (!merged) return null;
+  const merged = new THREE.BufferGeometry();
+  merged.setAttribute('position', new THREE.Float32BufferAttribute(soup, 3));
+  merged.computeVertexNormals();
   const count = merged.getAttribute('position').count;
   const tint = new THREE.Color(KIT_WINDOW_AMBER);
   const colors = new Float32Array(count * 3);
@@ -509,11 +511,12 @@ function buildKitBuilding(
   // center the model on its footprint and rest its base at y 0 of the wrap
   clone.position.set(-(box.min.x + size.x / 2), -box.min.y, -(box.min.z + size.z / 2));
   wrap.scale.set(scaleX, scaleY, scaleZ);
-  // Lit window panes (owner refinement round 4): quads derived from the
-  // model's own window assemblies (kit_window_panes_core.ts), baked into raw
-  // model space, added AFTER the shadow traverse and AS A SIBLING of the
-  // clone inside the wrap, so the panes keep castShadow false, inherit the
-  // wrap's scale-to-dimensions transform, and share the clone's centering
+  // Lit window panes (owner refinement round 5): each assembly's recessed
+  // glass plane, lifted verbatim from the model's own window assemblies
+  // (kit_window_panes_core.ts) so the glow fits the openings exactly, baked
+  // into raw model space, added AFTER the shadow traverse and AS A SIBLING of
+  // the clone inside the wrap, so the panes keep castShadow false, inherit
+  // the wrap's scale-to-dimensions transform, and share the clone's centering
   // offset. matrixWorld still holds the parentless-origin update from above:
   // repositioning the clone does not recompute it.
   const paneGeometry = firstKitMesh
@@ -524,6 +527,11 @@ function buildKitBuilding(
     paneMaterial.name = `eastbrookTownKitPanes:${building.id}`;
     // A pane sits mid-opening and must read from both approaches.
     paneMaterial.side = THREE.DoubleSide;
+    // The pane triangles are coplanar with the model's own glass geometry;
+    // the polygon offset wins the depth fight without geometric displacement.
+    paneMaterial.polygonOffset = true;
+    paneMaterial.polygonOffsetFactor = -2;
+    paneMaterial.polygonOffsetUnits = -2;
     const panes = new THREE.Mesh(paneGeometry, paneMaterial);
     panes.name = `eastbrookBuildingEmissive:${building.id}`;
     panes.castShadow = false;

@@ -44,18 +44,22 @@ function sourceAsset(withEmissive: boolean): THREE.Group {
   const source = new THREE.Group();
   const opaque = new THREE.MeshStandardMaterial({ color: 0x789abc });
   opaque.name = 'TownOpaque';
-  // Round 4: kit fixtures carry a window-assembly component INSIDE the first
-  // mesh's geometry (a thin box at mid-height on the +z face, merged into the
-  // shell the way the single-mesh hexb GLBs model their frames), so the pane
-  // detector (kit_window_panes_core.ts, read from the source's first Mesh in
-  // buildKitBuilding) finds exactly one window per kit building. The
-  // template-path fixtures share the shape; their extra 12 triangles ride the
-  // opaque merge and stay inside the shell's bounding box.
+  // Round 5: kit fixtures carry a window-assembly component INSIDE the first
+  // mesh's geometry, merged into the shell the way the single-mesh hexb GLBs
+  // model their windows: a frame box at mid-height on the +z face PLUS a
+  // recessed pane box sharing one exact corner vertex (max corner
+  // (0.8, 1.5, 2.0)), so the pane detector (kit_window_panes_core.ts, read
+  // from the source's first Mesh in buildKitBuilding) finds exactly one
+  // window per kit building and emits the pane box's back face (z 1.98) as
+  // its recessed glass plane. The template-path fixtures share the shape;
+  // their extra 24 triangles ride the opaque merge and stay inside the
+  // shell's bounding box.
   const shell = withEmissive
     ? mergeGeometries(
         [
           new THREE.BoxGeometry(2, 3, 4),
-          new THREE.BoxGeometry(0.4, 0.6, 0.08).translate(0.6, 0.9, 1.96),
+          new THREE.BoxGeometry(0.4, 0.6, 0.08).translate(0.6, 1.2, 1.96),
+          new THREE.BoxGeometry(0.2, 0.3, 0.02).translate(0.7, 1.35, 1.99),
         ],
         false,
       )
@@ -202,14 +206,15 @@ describe('Eastbrook town renderer', () => {
         // Re-staged 2026-08 for the KTX2 kit-building path (buildKitBuilding
         // in src/render/eastbrook_town.ts,
         // docs/design/eastbrook-revamp/site-plan.md), then for owner
-        // refinement round 4: a kit group carries no merged
+        // refinement rounds 4 and 5: a kit group carries no merged
         // eastbrookBuildingOpaque mesh; it holds a wrap group of raw GLB
         // scene clones scaled to nativeDimensions (every cloned mesh casting
         // shadows) PLUS one merged amber window-pane mesh under the
-        // shape-path emissive name. The panes are derived from the model's
-        // own window assemblies (kit_window_panes_core.ts) and parented
-        // inside the wrap AS A SIBLING of the clone, after the shadow
-        // traverse, so they never cast shadows, inherit the wrap's
+        // shape-path emissive name. The panes are the models' own recessed
+        // glass planes, lifted verbatim from the detected window assemblies
+        // (kit_window_panes_core.ts) so the glow fits the openings exactly,
+        // and parented inside the wrap AS A SIBLING of the clone, after the
+        // shadow traverse, so they never cast shadows, inherit the wrap's
         // scale-to-dimensions transform, and share the clone's centering
         // offset. Flat ground grows no foundation skirt.
         expect(group?.getObjectByName(`eastbrookBuildingOpaque:${building.id}`)).toBeUndefined();
@@ -225,6 +230,15 @@ describe('Eastbrook town renderer', () => {
         expect((panes.material as THREE.Material).side, `${building.id} pane sidedness`).toBe(
           THREE.DoubleSide,
         );
+        // The pane triangles are coplanar with the model's own glass
+        // geometry (round 5): the polygon offset wins the depth fight
+        // without geometric displacement.
+        expect(
+          (panes.material as THREE.Material).polygonOffset,
+          `${building.id} pane polygon offset`,
+        ).toBe(true);
+        expect((panes.material as THREE.Material).polygonOffsetFactor).toBe(-2);
+        expect((panes.material as THREE.Material).polygonOffsetUnits).toBe(-2);
         const wrap = group?.children.find(
           (child): child is THREE.Group => child instanceof THREE.Group,
         );
@@ -232,20 +246,24 @@ describe('Eastbrook town renderer', () => {
         if (!wrap) throw new Error(`missing kit wrap group for ${building.id}`);
         // Sibling-of-the-clone contract: the pane mesh rides the wrap (so it
         // scales with the model) beside the clone, sharing its centering
-        // offset, and its single quad sits exactly on the fixture's window
-        // assembly (center 0.6, 0.9, 1.96 in raw model space).
+        // offset, and its geometry is exactly the fixture pane box's back
+        // face (round 5): two triangles at z 1.98 spanning x 0.6..0.8 and
+        // y 1.2..1.5 in raw model space.
         expect(panes.parent, `${building.id} pane parent`).toBe(wrap);
         const clone = wrap.children.find((child) => child !== panes);
         if (!clone) throw new Error(`missing kit clone for ${building.id}`);
         expect(panes.position.toArray(), `${building.id} pane offset`).toEqual(
           clone.position.toArray(),
         );
-        expect(panes.geometry.getAttribute('position').count, `${building.id} pane quad`).toBe(6);
+        expect(panes.geometry.getAttribute('position').count, `${building.id} pane face`).toBe(6);
         panes.geometry.computeBoundingBox();
-        const paneCenter = panes.geometry.boundingBox?.getCenter(new THREE.Vector3());
-        expect(paneCenter?.x, building.id).toBeCloseTo(0.6, 6);
-        expect(paneCenter?.y, building.id).toBeCloseTo(0.9, 6);
-        expect(paneCenter?.z, building.id).toBeCloseTo(1.96, 6);
+        const paneBounds = panes.geometry.boundingBox;
+        expect(paneBounds?.min.x, building.id).toBeCloseTo(0.6, 6);
+        expect(paneBounds?.max.x, building.id).toBeCloseTo(0.8, 6);
+        expect(paneBounds?.min.y, building.id).toBeCloseTo(1.2, 6);
+        expect(paneBounds?.max.y, building.id).toBeCloseTo(1.5, 6);
+        expect(paneBounds?.min.z, building.id).toBeCloseTo(1.98, 6);
+        expect(paneBounds?.max.z, building.id).toBeCloseTo(1.98, 6);
         const kitMeshes = meshesOf(wrap).filter((mesh) => mesh !== panes);
         expect(kitMeshes.length, building.id).toBeGreaterThan(0);
         expect(
