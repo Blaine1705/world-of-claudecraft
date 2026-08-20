@@ -5004,11 +5004,73 @@ VALIDATION (all on the committed tree):
 - The full marketplace pg battery, SEVEN suites, 232 tests, zero skips,
   multiple green runs against npm run db:up (TEST_DATABASE_URL only; the
   whole .env is never sourced).
-- DB-free marketplace suites green: directed_sql floor 108, service 573,
-  fake fidelity 9, routes, escrow_queue.
+- DB-free marketplace suites green: the directed_sql floor (108 tests), the
+  service suite plus the fake fidelity suite (279 between them), routes, and
+  escrow_queue.
 - npm run ci:changed exit 0 (warnings only, the pre-existing debt classes).
-- node scripts/gate_select.mjs on the committed tree: result recorded below
-  in this section's final validation note.
+- node scripts/gate_select.mjs on the committed tree: the FIRST run (at
+  f70dea28f2) failed exactly one file in the full-suite fallback step, the
+  directed pg suite, with the "database wocc_woc_market_directed_verify does
+  not exist" signature: a reviewer agent ran the same suite concurrently and
+  its boot dropped the gate's disposable database mid-run (cross-run
+  collision, not a regression; the file is green in isolation and in every
+  serialized battery). The final gate run on the finished tip is recorded in
+  the fix-round note below.
+
+
+REVIEW FIX ROUND (the two reviewer reports, every finding applied or judged;
+commits a083b149 "apply the coverage and db-performance review rounds" and
+the boundary follow-up on top; re-verified by mutation round6, 9/9 BIT):
+- BLOCKING (coverage): the listingsBySeller realm assertion was PROVEN
+  vacuous (a later edit had sliced a lexicographically sorted id list, so
+  the stripped statement returned the same window); fixed to the exact
+  three-row seller set with a numeric comparator, mutant re-run BIT.
+- BLOCKING (coverage): the realm_* mutant family's log transparency: the
+  harness always used TYPED arity-preserving replacements (never bare
+  deletion), but the log did not say so; the replacement policy is now in
+  the log header, and the re-run of the fixed pin plus the round6 rows carry
+  their history columns. The reviewer's arity-error premise was REFUTED
+  against the generator (judged with the file open), the transparency ask
+  was applied.
+- BLOCKING (coverage): the submitBondSignature verdict ORDER (dead bid with
+  a spent signature answers not_pending) was pinned only on the fake; the
+  bond pg test now runs that exact case against real Postgres.
+- Applied should-fixes: abandon-cap fixtures derive from
+  WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR; the two missing jsonb CHECK arms
+  (sales item, offer item_ref); constraint NAMES on every 23514/23505
+  assert; the fake's twin guard moved behind the advisory cooldown to match
+  the real pass order (red-first proven by the new at-cap twin fidelity
+  arm); exact landed-signature asserts on both signature intakes; the
+  activation ladder now asserts the listing board write; DESC-flip
+  negatives on both new pre-lock pins; the advisory open-settlement arm's
+  lock-free property pinned at the floor (upgrading that judged single to
+  PINNED); docs counts trued; this gate note added.
+- Applied nits: the dead not.toContain lines behind exact toEqual sets
+  folded into comments; the realm seedOffer stamps item_pin; the fake's two
+  remaining live-row returns (insertDirectedOffer, resolveDirectedOffer)
+  hand out copies; the bond-reference 23505 names its constraint; the
+  service quote-expiry guard pinned at its INCLUSIVE boundary (the first
+  attempt aged the clock one tick past the deadline and its mutant
+  survived; caught by round6 and fixed).
+- Judged, no change (binding): the exempt-reason positive arm exercises the
+  list's single member (the list is literal-pinned in two suites; a second
+  member owes a new arm WITH its addition); the legacy settlements-CHECK
+  evolution arm stays with the structural pins (staging a legacy constraint
+  needs a custom DDL rig; recorded for 22's pre-enable audit list); the
+  reviewer's claim that the fake's cancel paid-probe was quote-aware was a
+  misread of suspend's expirableOffered mirror (dismissed with both files
+  open); the plan_pins JSON-reporter anomaly the db-perf lane saw once in
+  seven runs is recorded as a prior, unreproducible, nothing attributable.
+- db-performance verdict: BLOCK on exactly the listingsBySeller finding
+  (already fixed in flight, which its report acknowledged); measured suite
+  costs recorded: all seven marketplace pg suites 13.1s wall in one parallel
+  run, all 20 TEST_DATABASE_URL suites 18.7s, the new realm suite 1.56s solo
+  with a ~0.8s boot against its 120s allowance, connection peak 28 of 100,
+  CIC cross-database wait measured absent, declared-timeout ratchet green
+  with 90s headroom on the heaviest files, verify databases ~13 MB each.
+
+FINAL VALIDATION NOTE (after the fix round): gate re-run result and tip are
+recorded at the end of this section once the closing gate finishes.
 
 Registry for the 20 QA session: diff range 057b54141a..<tip below>; the
 JUDGED and DEFERRED lists above are binding; the mutation log and the

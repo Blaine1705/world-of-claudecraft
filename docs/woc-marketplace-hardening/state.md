@@ -22,7 +22,7 @@ actually reads.
   guards, sweep batch predicates, strikes/terms upserts, the escrow stamp
   CAS, schema CHECK negatives, and two new DB-free lock-shape floor pins.
   (3) The mutation log (docs/woc-marketplace-hardening/phase-20-mutation-log.md):
-  241 distinct mutants, 232 red-on-strip green-on-restore, 8 judged
+  248 distinct mutants, 240 red-on-strip green-on-restore, 7 judged
   defense-in-depth singles EACH proven by a double strip that bit, 1
   deliberate no-op control; run in three scratch worktrees over the
   committed tree, never the shared tree. (4) Fake honesty: six divergences
@@ -37,7 +37,14 @@ actually reads.
   expiry-batch ceiling RE-DEFER to 21 (they need 21's at-scale rig); the
   pg-suites-in-CI posture RE-DEFERS to 22 (a gate-selection change owned by
   the close-out). Suite growth: 172 to 232 pg tests (seven suites, zero
-  skips), 106 to 108 floor pins, service suite +2 settlementQuote guards.
+  skips; the realm suite is 19 tests), 106 to 109 floor pins, service suite
+  +1 settlementQuote entry-guards test, fake fidelity suite 3 to 7. The two
+  reviewer rounds (test-coverage-auditor, database-performance-reviewer) ran
+  over the committed spine and every finding was applied or judged, headlined
+  by one PROVEN-vacuous pin (a slice over a lexicographic sort had gutted the
+  listingsBySeller realm assertion) and a fake fidelity round two; the fix
+  round was mutation-verified (round6, incl. the two upgraded ex-survivors)
+  and re-reviewed fresh, and the final gate result is in the progress entry.
   The 20 implement round section in progress.md is the registry the 20 QA
   session consumes (JUDGED and DEFERRED lists binding). NEXT =
   phase-20-qa.md, GAME repo, wocc-marketplace, FRESH session, newest
@@ -887,8 +894,8 @@ implementation-plan.md).
 
 Classification rule: a money/security predicate counts as REAL-SQL PINNED when
 deleting it turns a Postgres-suite test red, proven mutant by mutant in
-`docs/woc-marketplace-hardening/phase-20-mutation-log.md` (241 distinct mutants,
-232 red-on-strip, green-on-restore). After this round ZERO fake-only or
+`docs/woc-marketplace-hardening/phase-20-mutation-log.md` (248 distinct mutants,
+240 red-on-strip, green-on-restore). After this round ZERO fake-only or
 untested money/security predicates remain in `server/woc_market_db.ts` or its
 SQL-bearing siblings (`server/woc_market_sweep.ts`; `server/woc_market.ts`
 carries no SQL). The only mutation survivors are the judged
@@ -901,7 +908,8 @@ self_offer arms, step-up call sites, strike fairness gates) execute the same
 code over the fake and the real store, so a fake-backed service test IS a real
 pin of the guard; the fake can only lie about SQL, which is what the pg suites
 now pin. The two service guards found untested anywhere (settlementQuote
-not_yours and quote_expired) gained tests this round.
+not_yours and quote_expired, the latter at its inclusive boundary) gained
+tests this round.
 
 Coverage by domain (predicate family, owning pg suite):
 
@@ -989,8 +997,7 @@ load-bearing and pinned):
 | single survivor | twin that masks it | double-strip proof |
 |---|---|---|
 | claimBuyNowLock locked re-read realm qual | the lock-free peek's realm qual (pinned alone) | realm_2869_2914_combined BIT |
-| claimBuyNowLock open-settlement advisory arm | the in-transaction arm | claim_open_settlement_double BIT |
-| claimBuyNowLock open-settlement transaction arm | the advisory arm | claim_open_settlement_double BIT |
+| claimBuyNowLock open-settlement transaction arm | the advisory arm (now pinned alone: the floor's lock-free refusal test) | claim_open_settlement_double BIT |
 | claimBuyNowLock wallet-twin locked TS re-check | the claiming UPDATE's NOT EXISTS | claim_wallet_twin_double_strip BIT |
 | claimBuyNowLock wallet-twin NOT EXISTS | the locked TS re-check | claim_wallet_twin_double_strip BIT |
 | claimBuyNowLock zero-rows own_listing verdict | both twin guards above | claim_zero_rows_double BIT |

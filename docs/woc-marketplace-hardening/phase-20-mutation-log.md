@@ -6,8 +6,14 @@ mutant: lane worktree clean, literal replace asserted to its occurrence count,
 git diff proves the patch applied, vitest run on the owning suites with
 TEST_DATABASE_URL, the Tests summary line proves assertions RAN, revert by
 git checkout over the committed tree, byte-identical verification after.
-SURVIVED entries are the judged defense-in-depth singles; each pairs with a
-listed double-strip mutant that BIT, or is the deliberate no-op control.
+
+Replacement policy (so a red is never a parameter-arity artifact): a stripped
+qual that binds a parameter is replaced by a TYPED always-true over the same
+parameter (`realm = $n` becomes `$n::text = $n::text`), never deleted; a
+stripped TypeScript guard becomes `if (false)`; a dropped SET value keeps its
+bind via NULLIF($n, $n); DDL mutants drop or loosen the named constraint.
+SURVIVED entries are the judged defense-in-depth singles, each paired with a
+listed double-strip mutant that BIT, or the deliberate no-op control.
 
 | mutant | verdict | suites | history |
 |---|---|---|---|
@@ -23,9 +29,11 @@ listed double-strip mutant that BIT, or is the deliberate no-op control.
 | abandon_on_conflict | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 |
 | acceptedUnstamped_maxage_guard | BIT | woc_market_directed_pg_integration, woc_market_bond_pg_integration | core |
 | acceptedUnstamped_young_guard | BIT | woc_market_directed_pg_integration, woc_market_bond_pg_integration | core |
+| activate_listing_board_skip | BIT | woc_market_bond_pg_integration | round6 |
 | activate_listing_closed_or_ended | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 |
 | activate_not_pending | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
 | activate_outbid_prior_active_only | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
+| activate_prelock_desc_flip | BIT | woc_market_directed_sql | round6 |
 | activate_prelock_open_set | BIT | woc_market_directed_sql | batch3 > round4 > round5 |
 | activate_supersede_refund_due | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 |
 | activate_superseded | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
@@ -46,6 +54,7 @@ listed double-strip mutant that BIT, or is the deliberate no-op control.
 | bondSig_different_refuses | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 |
 | bondSig_reused_typed | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
 | bondSig_status_pending | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
+| bond_signature_value_dropped | BIT | woc_market_bond_pg_integration | round6 |
 | bondsDue_states | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | batch3 > round4 |
 | browse_status_liveness | BIT | woc_market_realm_scope_pg_integration | round5 |
 | cancelPending_lock_expired | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | core > round4 |
@@ -70,7 +79,7 @@ listed double-strip mutant that BIT, or is the deliberate no-op control.
 | claim_diag_no_buy_now | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
 | claim_diag_not_active | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
 | claim_diag_own_account | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
-| claim_open_settlement_advisory | SURVIVED | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
+| claim_open_settlement_advisory | BIT | woc_market_directed_sql | batch3 > round4 > round6 |
 | claim_open_settlement_double | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | round4 |
 | claim_open_settlement_tx | SURVIVED | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 > round4 |
 | claim_record_abandon_directed_exempt | BIT | woc_market_bond_pg_integration, woc_market_directed_pg_integration | batch3 |
@@ -106,9 +115,11 @@ listed double-strip mutant that BIT, or is the deliberate no-op control.
 | ddl_listing_format_check | BIT | woc_market_settlement_pg_integration | round5 |
 | ddl_listing_item_object_check | BIT | woc_market_settlement_pg_integration | round5 |
 | ddl_listing_status_check | BIT | woc_market_settlement_pg_integration | round5 |
+| ddl_offer_itemref_check_drop | BIT | woc_market_settlement_pg_integration | round6 |
 | ddl_offer_status_check | BIT | woc_market_settlement_pg_integration | round5 |
 | ddl_open2_predicate | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | batch3 |
 | ddl_pair_index_predicate | BIT | woc_market_directed_pg_integration, woc_market_bond_pg_integration | batch3 |
+| ddl_sales_item_check_drop | BIT | woc_market_settlement_pg_integration | round6 |
 | ddl_sales_once_columns | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | batch3 |
 | ddl_settlement_state_check | BIT | woc_market_settlement_pg_integration | round5 |
 | ddl_tx_signature_unique | BIT | woc_market_settlement_pg_integration | batch3 > round4 |
@@ -158,13 +169,14 @@ listed double-strip mutant that BIT, or is the deliberate no-op control.
 | outbidQueue_held_refund | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | batch3 |
 | overdue_deadline | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | core |
 | overdue_state_set | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | core > round4 |
+| quote_expired_boundary | BIT | woc_market_service | round6 > round6 |
 | realm_1343_escrowInsertListing.capCount | BIT | woc_market_realm_scope_pg_integration | realm |
 | realm_1401_escrowInsertListing.stamp | BIT | woc_market_realm_scope_pg_integration | realm |
 | realm_1423_listingById | BIT | woc_market_realm_scope_pg_integration | realm |
 | realm_1440_browseListings | BIT | woc_market_realm_scope_pg_integration | realm |
 | realm_1505_opsListings | BIT | woc_market_realm_scope_pg_integration | realm |
 | realm_1554_opsP2pTrades | BIT | woc_market_realm_scope_pg_integration | realm |
-| realm_1600_listingsBySeller | BIT | woc_market_realm_scope_pg_integration | realm |
+| realm_1600_listingsBySeller | BIT | woc_market_realm_scope_pg_integration | realm > round6 |
 | realm_1624_countActiveBySeller | BIT | woc_market_realm_scope_pg_integration | realm |
 | realm_1685_directedOfferById | BIT | woc_market_realm_scope_pg_integration | realm |
 | realm_1724_consumeStepUpChallenge | BIT | woc_market_stepup_pg_integration | realm |
@@ -233,6 +245,7 @@ listed double-strip mutant that BIT, or is the deliberate no-op control.
 | settle_quote_offered_only | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | core |
 | settle_signature_offered_only | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | core > round4 |
 | settle_signature_reused_typed | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | core > batch3 > round4 |
+| settle_signature_value_dropped | BIT | woc_market_settlement_pg_integration | round6 |
 | settle_transition_23505_false | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | core |
 | settle_transition_cas | BIT | woc_market_settlement_pg_integration, woc_market_delivery_pg_integration | core |
 | stepup_consume_account | BIT | woc_market_stepup_pg_integration | core |
@@ -253,4 +266,4 @@ listed double-strip mutant that BIT, or is the deliberate no-op control.
 | undisposed_item_disposed_false | BIT | woc_market_delivery_pg_integration, woc_market_settlement_pg_integration | core > round4 |
 | undisposed_not_sold | BIT | woc_market_delivery_pg_integration, woc_market_settlement_pg_integration | core > round4 |
 
-Totals: 241 distinct mutants, 232 BIT, 9 SURVIVED (1 no-op control + 8 judged twins).
+Totals: 248 distinct mutants, 240 BIT, 8 SURVIVED (1 no-op control + 7 judged twins, each double-strip proven).
