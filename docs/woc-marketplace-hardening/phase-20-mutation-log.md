@@ -286,8 +286,9 @@ independently re-verified five existing rows with its own strips (bid_own_accoun
 SMOKE_claimCustodyRef_onconflict via an ON CONFLICT DO UPDATE shape,
 settle_transition_cas, realm_1600_listingsBySeller, quote_expired_boundary;
 all five BIT), then ran the rows below for the predicates the audit lanes
-found unlogged or unpinned. Three rows needed an in-round fix before their
-mutant bit and say so in the history column. qa20_cap_bump_control is a
+found unlogged or unpinned. Two rows needed an in-round fix before their
+mutant bit, and the green control needed the same fix wave before reaching
+its expected green; each says so in the history column. qa20_cap_bump_control is a
 deliberate GREEN control: it raises WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR to 4
 and expects the bond suite to stay green, proving the at-cap fixtures derive
 from the constant (its FIRST run failed three fixtures that hard-coded the

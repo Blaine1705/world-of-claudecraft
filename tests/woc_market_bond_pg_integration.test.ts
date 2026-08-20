@@ -2104,7 +2104,9 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       const realm = `cancel-window-${++seq}`;
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const locked = await seedListing(realm, seller, {
+      // Load-bearing by EXISTENCE: the exact set below excludes this
+      // unexpired locked window.
+      await seedListing(realm, seller, {
         cancelRequestedAtMs: BASE_MS - 20 * MINUTE_MS,
         lockAccount: buyer,
         lockExpiresAtMs: BASE_MS + 5 * MINUTE_MS,
