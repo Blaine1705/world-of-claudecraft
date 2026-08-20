@@ -8558,7 +8558,8 @@ describe('settlementQuote entry guards', () => {
       ok: false,
       reason: 'not_yours',
     });
-    h.setNow(settlement.deadlineAtMs + 1);
+    // Inclusive at the bound: the deadline instant itself is already expired.
+    h.setNow(settlement.deadlineAtMs);
     expect(await h.service.settlementQuote(BUYER_A, settlement.id)).toMatchObject({
       ok: false,
       reason: 'quote_expired',
