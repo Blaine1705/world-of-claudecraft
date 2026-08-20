@@ -985,6 +985,10 @@ describe('wall and road geometry', () => {
         points: [
           {
             x: -92,
+            z: -40,
+          },
+          {
+            x: -92,
             z: -46,
           },
           {
@@ -994,6 +998,10 @@ describe('wall and road geometry', () => {
           {
             x: -92,
             z: -62,
+          },
+          {
+            x: -92,
+            z: -68,
           },
         ],
       },
@@ -1219,13 +1227,7 @@ describe('layout clearance and service anchors', () => {
         0.7853981633974483,
         'eastbrook_chapel',
       ],
-      [
-        'smith_haldren',
-        -7.893250516799595,
-        -125.3466252583998,
-        1.0303768265243132,
-        'station_eastbrook_forge',
-      ],
+      ['smith_haldren', -3.4, -112.5, 1.4784669920632976, 'eastbrook_blacksmith'],
       ['fisherman_brandt', -95, -50, -1.5707963267948966, 'eastbrook_quay'],
       ['foreman_odell', -84, -63, 0.6747409422235526, 'eastbrook_quay'],
       [

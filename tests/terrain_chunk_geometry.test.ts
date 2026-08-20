@@ -247,7 +247,15 @@ describe('generated chunk geometry is stable', () => {
     // (17.5,-5.5) and the tower knoll at (27,-13)). Computed twice in
     // separate processes, identical both times. An intended, looked-at world
     // change, not drift.
-    expect(digestOf(inRect)).toBe('13e988449bead7c3de1775d375f31023');
+    // Re-minted for owner refinement round 5: Smith Haldren's KayKit
+    // blacksmith lands on the civic green at (2,-112) (a decor prop with a
+    // clearance radius is a calm-anchor terrain input, so its pad levels the
+    // seat), and the quay walk road extends to run the full quay pad
+    // (z -40..-68; roads are height appliers) so the streetlamp planner
+    // seats more landside lamps for the dock area's dark nights. Computed
+    // twice in separate processes, identical both times. An intended,
+    // looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('deb494cb6c5ced14a217f9f5338e3960');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 

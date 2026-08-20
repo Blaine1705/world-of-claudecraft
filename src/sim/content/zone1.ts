@@ -1877,6 +1877,21 @@ export const ZONE1_PROPS: ZonePropsDef = {
     },
     // eyes over the runs
     { key: 'hexWatchtower', x: 27, z: -13, rot: 2.2, scale: 6.5, r: 2.4, h: 12 },
+    // Round 5 (owner): Smith Haldren gets his own KayKit blacksmith on the
+    // green between the civic square and the crafts lane, facing west toward
+    // the lane; hw/hd collide the measured wall box (hex_building_dims
+    // blacksmith 1.2876 x 1.2452 at scale 6.5), r stays the clearance radius.
+    {
+      key: 'hexBlacksmith',
+      x: 2,
+      z: -112,
+      rot: -1.5707963267948966,
+      scale: 6.5,
+      r: 4.5,
+      h: 9,
+      hw: 4.2,
+      hd: 4.05,
+    },
   ],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
   tents: [

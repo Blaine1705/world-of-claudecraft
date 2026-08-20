@@ -940,10 +940,16 @@ const ROADS = [
     existingRoadPoint: { x: -92, z: -54 },
     gateId: null,
     halfWidth: 1.5,
+    // Round 5 (owner): the quay walk runs the full pad so the streetlamp
+    // planner seats more landside lamps; the dock area read too dark at
+    // night (the seaside sites drop over the cove water by the planner's
+    // ground floor, so length is what buys lamps here).
     points: [
+      { x: -92, z: -40 },
       { x: -92, z: -46 },
       { x: -92, z: -54 },
       { x: -92, z: -62 },
+      { x: -92, z: -68 },
     ],
   },
   // A short lane from the inn's door down to the main street, so the inn
@@ -1028,14 +1034,12 @@ const APOTHECARY_POSITION = { x: -12, z: -97.5 } as const;
 // no rotation), so the smith's and cook's work points derive the same way.
 // Round 4: the smith stands on the yard's open corner, half a stride clear
 // of the crate that his old derived spot nearly touched, facing the anvil.
-const FORGE_ANVIL_POINT = {
-  x: FORGE_STATION.position.x + 1.4,
-  z: FORGE_STATION.position.z + 0.6,
-} as const;
-const SMITH_POSITION = {
-  x: FORGE_STATION.position.x - 1.6,
-  z: FORGE_STATION.position.z - 1.2,
-} as const;
+// Round 5 (owner): Smith Haldren works his own KayKit blacksmith on the green
+// between the civic square and the crafts lane (the zone1 decor prop at
+// (2, -112), west face at x -2.2), standing a stride off its door and facing
+// the shop. Forgemistress Darva keeps the crafting station.
+const BLACKSMITH_SHOP_CENTER = { x: 2, z: -112 } as const;
+const SMITH_POSITION = { x: -3.4, z: -112.5 } as const;
 const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 2.5, 0);
 // Round 4: the cook works the prep side, a stride clear of the open flame
 // (the kitchens campfire, the town's only open fire, burns at station +
@@ -1078,8 +1082,8 @@ const NPCS = [
   makeNpc(
     'smith_haldren',
     SMITH_POSITION,
-    facingToward(SMITH_POSITION, FORGE_ANVIL_POINT),
-    FORGE_STATION.id,
+    facingToward(SMITH_POSITION, BLACKSMITH_SHOP_CENTER),
+    'eastbrook_blacksmith',
   ),
   makeNpc('fisherman_brandt', { x: -95, z: -50 }, -1.5707963267948966, 'eastbrook_quay'),
   makeNpc('foreman_odell', { x: -84, z: -63 }, 0.6747409422235526, 'eastbrook_quay'),
