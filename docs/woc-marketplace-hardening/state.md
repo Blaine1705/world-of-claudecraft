@@ -5,6 +5,37 @@ actually reads.
 
 ## Where we are
 
+- 19 QA COMPLETE (2026-08-19, DASHBOARD repo, verdict PASS-WITH-FOLLOWUPS,
+  every finding applied or judged with the file open, PUSHED per R4:
+  dashboard ae6e46c..145d120, FOURTEEN commits incl. seven QA fix commits,
+  to origin/feature/woc-market-trading-controls, PR #13; game docs pushed
+  after verifying feature/woc-marketplace 0 behind origin/release/v0.40.0).
+  Session start 8eeaf8f, origin/master sync a NO-OP. Six coverage lanes +
+  hands-on probes over ae6e46c..8eeaf8f: ONE BLOCKING, reproduced live: node
+  --test treats positional args as glob patterns, so a renamed or deleted
+  security suite silently SHRANK test:security while the step stayed green;
+  fixed with the tests/harness/run_security_suites.mjs runner (single-source
+  list, loud refusal before any spawn, exit propagation, entry proven end to
+  end) and its guard suite; auth_policy joined the by-name list. Headline
+  fixes: custody sample-row leaf screening (an object leaf in a spine-valid
+  200 unmounted the Trading tab), optional gauge types, the p2p Listing
+  cross-link column, listing: alias + token/free-text separation, one-read
+  identity-keyed jump landings, the canonicalizer single-sourced into
+  src/proxy_path.ts, economy actor ByteString clamp, underscore route
+  helpers (phantom endpoints gone), a payout call-site drift scan set-equal
+  both ways, and a same-filter stale race that isolates the quotes
+  supersession. 28/28 mutants bit (11 independent spot-checks of the
+  implement round's proofs + 17 new-pin mutants); harness integrity and CI
+  honesty proven live; fix round RE-REVIEWED FRESH (0 blocking, everything
+  applied in 145d120). Final tree: npm test 276/0, check 0 errors, build
+  complete, npm audit 0, all re-proven from a FRESH clean clone. The
+  workflow's MAIDEN Actions runs both GREEN on the push (32328875415 push
+  1m06s, 32328875583 pull_request 1m10s). FOR FERNANDO: make the ci check
+  REQUIRED on the protected branch (verified: no ruleset or protection
+  exists on either branch yet) and confirm external-role POST payouts/send
+  stays intended. The 19 QA round section in progress.md is the registry
+  (JUDGED and DEFERRED lists binding). NEXT = phase-20-real-sql-coverage.md,
+  GAME repo, FRESH session, newest origin/release/** sync first.
 - 19 IMPLEMENT COMPLETE (2026-08-19, DASHBOARD repo, LOCAL per R4: nothing
   pushed in either repo; the 19 QA session pushes on PASS to
   origin/feature/woc-market-trading-controls, PR #13). Session start ae6e46c

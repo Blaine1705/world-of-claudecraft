@@ -41,7 +41,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 17 QA | phase-17-qa | game | DONE (QA PASS) | e3ab5f6f21 | PASS-WITH-FOLLOWUPS, never-sweep verdict SOUND, pushed per R4 (origin tip e3ab5f6f21); the 17 QA round section below is the registry (row trued up late by the 18 session) |
 | 18 | dashboard-guardrails | dashboard | DONE (impl) | c001d4a | DASHBOARD repo; H1 role gate, 6-decimal mint source, WMB_-only release, reference-tail forfeit confirmation, destination reset, immutable-id audit actor, independent summary reads; session start c001d4a (= PR #13 tip), origin/master sync NO-OP; three coverage lenses (0 blocking) + TWO fresh fix-round reviewers (both READY), every finding applied or judged; final tip e82303e, npm test 164 / check 0 / build 0; LOCAL, not pushed per R4 (18 QA pushes on PASS); the 18 implement round section below is the registry |
 | 18 QA | phase-18-qa | dashboard | DONE (QA PASS) | e82303e | PASS-WITH-FOLLOWUPS, every finding applied or judged; ONE blocking (the game proxy host-pinning bypass) fixed and mutation-proven; eight fix commits, final tip ae6e46c, npm test 183 / check 0 / build 0; PUSHED per R4 to origin/feature/woc-market-trading-controls (PR #13); the 18 QA round section below is the registry (row trued up by the 19 session; the section was always current) |
-| 19 | dashboard-tooling | dashboard | DONE (impl) | ae6e46c | DASHBOARD repo; all five deliverables landed: first CI workflow (act-style clean-clone proof green), component-render harness (esbuild JSX hook + happy-dom) closing the .tsx pin gap incl. every 18-round deferral, npm audit 0 (was 11), data-truth fixes (dead p2p trades, buy-now price, per-quote legs, superseding list loaders, locale sweep, wocDecimals guard, withdraw gate), investigation UX (find box, cross-links, Custody subtab on the stuck monitor, payout proxy explicit allowlist + actor header); two fresh lenses + a fresh fix-round re-review, every finding applied or judged; 10 mutation proofs bit; tests 183 to 254, check 0, build 0; 7 commits, tip 8eeaf8f, LOCAL not pushed per R4 (19 QA pushes on PASS); the 19 implement round section below is the registry |
+| 19 | dashboard-tooling | dashboard | DONE incl QA | ae6e46c | DASHBOARD repo; all five deliverables landed: first CI workflow (act-style clean-clone proof green), component-render harness (esbuild JSX hook + happy-dom) closing the .tsx pin gap incl. every 18-round deferral, npm audit 0 (was 11), data-truth fixes (dead p2p trades, buy-now price, per-quote legs, superseding list loaders, locale sweep, wocDecimals guard, withdraw gate), investigation UX (find box, cross-links, Custody subtab on the stuck monitor, payout proxy explicit allowlist + actor header); two fresh lenses + a fresh fix-round re-review, every finding applied or judged; 10 mutation proofs bit; tests 183 to 254, check 0, build 0; 7 commits, tip 8eeaf8f, LOCAL not pushed per R4 (19 QA pushes on PASS); the 19 implement round section below is the registry |
 | 19 QA | phase-19-qa | dashboard | NOT STARTED | | |
 | 20 | real-sql-coverage | game | NOT STARTED | | |
 | 20 QA | phase-20-qa | game | NOT STARTED | | |
@@ -4470,7 +4470,8 @@ DELIVERABLES:
    React's text-input change plugin ignores happy-dom-dispatched native
    events, a route-based fetch mock that installs over the REAL fetch, and a
    deferred() for deterministic races). devDependencies gained esbuild
-   (^0.28.1, already in the tree transitively via astro) and happy-dom: the
+   (^0.28.2, already in the tree transitively via astro; the QA round corrected
+   this line, which first said ^0.28.1) and happy-dom: the
    sanctioned test-harness exception, nothing ships in the production build.
    Every 18-round JSX deferral is now pinned in DOM tests:
    validateReleaseSubmit gates the POST (zero-POST pin), BOTH submit outcomes
@@ -4658,3 +4659,174 @@ worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13, branch
 integration/woc-market-trading, FRESH session, own origin/master sync first;
 it diffs ae6e46c..8eeaf8f and pushes on PASS to
 origin/feature/woc-market-trading-controls (PR #13).
+
+## 19 QA round (dashboard tooling)
+
+DASHBOARD repo, worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13,
+branch integration/woc-market-trading. Session start 8eeaf8f (the 19 implement
+tip; origin/master sync a NO-OP). Verdict PASS-WITH-FOLLOWUPS, every finding
+applied or judged with the file open; PUSHED per R4 (ae6e46c..145d120,
+FOURTEEN commits: the seven implement commits plus seven QA fix commits, to
+origin/feature/woc-market-trading-controls, PR #13). Baseline re-validated
+green before any change (npm test 254, check 0 errors, build complete); final
+tree npm test 276 pass 0 fail, check 0 errors, build complete, npm audit 0
+fresh, ALL re-proven from a FRESH clean clone of the final tip (npm ci, the
+workflow's exact step list).
+
+Six coverage lanes over ae6e46c..8eeaf8f (correctness+regression,
+test-decisiveness, security, dead-code/docs, cross-repo data-shape truth,
+CI-workflow truth) plus the session's own hands-on probes (CI honesty via
+seeded failures in a scratch clone, harness integrity via deliberately broken
+panels, fresh npm audit, an independent ambient-locale grep that concurred
+with the scan test). ONE BLOCKING, found independently by the hands-on probe
+AND the CI lane: node --test treats positional arguments as GLOB PATTERNS
+(node 22+), so a renamed or deleted security suite silently SHRANK
+test:security while the step stayed green, the exact decoration class the
+ci.yml comment claimed to prevent (node only errors when EVERY pattern
+misses; one lane initially reported the opposite from the all-missing case
+and was refuted by reproduction). Fixed with
+tests/harness/run_security_suites.mjs: the list lives once, a missing file
+refuses loudly before any test spawns, the child exit code propagates (null
+status fails), and deleting the runner itself reds the npm script; the guard
+suite tests/security_suites.test.ts pins the wiring, the membership (now
+EIGHT suites: auth_policy joined), both arms with injected deps, an
+end-to-end spawn of the REAL entry from a bare temp cwd, the ci.yml step
+wiring, and the flat-tests glob floor (any *.test.* stray anywhere reds it).
+
+Headline fixes beyond the blocker (~40 findings applied across seven
+commits):
+- Custody: the payload screen validated only class spines, so a 200 with an
+  object leaf in a sample row (the malformed-200 class 18 closed in the list
+  views) crashed the whole Trading tab; ROW_SCREENS now checks every
+  rendered leaf per class with additive game fields tolerated, poisoned-row
+  pins per class plus a DOM arm. The gauge fields went OPTIONAL in the type
+  (the runtime never required them; the compiler now enforces the
+  older-binary guards), unverified provenance fields left the row types so
+  the type predicate vouches only for checked leaves, and the health strip
+  stops feeding unproven values to its template slots.
+- Investigation UX: the p2p table gained the Listing cross-link column (an
+  operator followed a dead trade by hand-copying an id the table did not
+  even show); listing:N aliases id:N on the listings find box; exact tokens
+  moved APART from free text (a seller literally named "id:99" satisfied an
+  id:99 token search); per-view find placeholders stop promising wallet
+  search on p2p rows that carry none (they search signatures and listing
+  ids); a cross-link jump lands in ONE read (the mount used to buy a
+  default-filter fetch that was immediately superseded), lazy and
+  identity-keyed so a UTC-midnight rollover cannot re-buy it; listing links
+  mint the WYSIWYG listing:N token the buttons display; the dead
+  SearchRequest.seq plumbing removed.
+- Proxies: the two byte-equivalent canonicalizer copies (the logic that
+  carried the protocol-relative secret-egress class) single-sourced into
+  src/proxy_path.ts with both old names delegating; CLAUDE.md now says out
+  loud the economy proxy has NO canonicalizer and stays safe by
+  exact-literal matching only; the economy actor header gained the payout
+  ByteString clamp (a non-Latin1 username 500ed every economy admin
+  request; both clamps pinned with the id half proven intact); payout
+  secret attachment and the missing-secret 500-with-zero-upstream pinned;
+  the route-helper files took Astro's underscore prefix and the phantom
+  /api/payout_routes-class endpoints are confirmed gone from the built
+  manifest.
+- Decisiveness: a payout call-site drift scan (App.tsx api() literals
+  pinned set-equal BOTH WAYS to the allowlist, liveness floor, extraction
+  probes incl. one-level nested generics, an any-spelling belt outside
+  App.tsx); a same-filter stale race isolating the quotes supersession
+  through the panel (the existing pin's stale read carried a different
+  filter, so the affordance arm hid the paint whether or not the discard
+  worked); the wide-open landing DOM-pinned INTO the listings view with the
+  single-fetch count; INVESTIGATION_FROM literal-pinned (was
+  constant-self-compared); the '>9 $WOC' vacuous negative went whole-token
+  (empirically probed decisive); the truncation line and the idle-tx
+  degrade arm pinned; the p2pOutcome delivered-over-terminal carve-out
+  commented and pinned; ci job timeout-minutes 15; engines node 26.x; the
+  redundant ci- concurrency prefix dropped.
+
+MUTATION RECORD: 28/28 bit. Eleven independent spot-checks of the implement
+round's proof claims (release guard bypass, legs identity, quotes
+affordance, cross-link consumption, unknown-path zero-upstream, external
+wallet/send deny, forged actor header, raw reference on the wire, list seq
+discard, dead-with-settlement, JSX blanker regexCanStart) plus seventeen
+new-pin mutants across both fix rounds (incl. the runner entry call
+dropped, the refusal threshold off-by-one, the shared canonicalizer
+leading-slash strip, the custodyRef screen weakened, and the same-filter
+race proven to fail ALONE when the discard breaks). Harness integrity
+proven live: a deliberately broken MarketCustodyView and MarketTradingPanel
+each fail their DOM suites. CI honesty proven live: a seeded assertion
+failure reds npm test AND test:security in the clean clone.
+
+FIX-ROUND RE-REVIEW (fresh, two lenses over 8eeaf8f..716851c): 0 blocking,
+2 should-fix (the runner's real entry path unexecuted; custody row types
+keeping unverified provenance fields), 7 nits and notes, ALL applied in
+145d120 (incl. the same-filter race fixture's reference colliding with the
+audit fixture, which made one intermediate checkpoint vacuous, and the
+call-site scan's nested-generic blind spot). The decisiveness lens traced
+every new pin against its named regression.
+
+CROSS-REPO verified true against the real producers: the custody readout
+shape field-for-field vs server/woc_market.ts and the main.ts gauge merge
+(the dashboard reads NO field the game does not send; age axes correct;
+gauges degrade to a dash); the quote-leg identity seller+burn+treasury ===
+amountBase is exact by construction service-side (three-way from inception,
+no two-way history to mis-reconcile, bond quotes legs-null, the forfeit
+split never touches quote legs); all 17 payout method+path routes have live
+App.tsx call sites and every call site is allowlisted; the game proxy sends
+exactly the x-woc-dashboard-secret header the game's /internal gate
+requires.
+
+FIRST REAL ACTIONS RUNS (the workflow's maiden runs, on the R4 push): BOTH
+GREEN, push run 32328875415 in 1m06s and pull_request run 32328875583 in
+1m10s on 145d120; none of the known first-CI-run environment mismatches
+fired (lockfile npm ci on node 26 matches local).
+
+JUDGED this round (binding; do NOT re-raise):
+- Custody refresh dropping shown rows on a failed re-read: the repo's
+  deliberate failed-read-reports-error-and-NO-data policy.
+- The 3-class-era game binary window (two same-day feature-branch commits,
+  never on a release branch) rendering the whole custody payload malformed:
+  fails safe as the section error; no deployed binary can serve that shape.
+- The game's unsurfaced ops signals (sweep.lastOverrun, readCaches,
+  priceCache ages): conscious skip, wire them when an operator asks.
+- The game-side anti-enumeration 'unknown endpoint' 404 (game secret unset)
+  passing through verbatim as the section error: coupling a friendlier hint
+  to that string is more brittle than the honest passthrough.
+- quoteLegsMismatch is sum-only (a ratio-wrong split that still sums clean
+  passes): the payload carries no as-of fee schedule to verify against; the
+  rendered claim says exactly what is checked.
+- The locale scan catching only ambient spellings (a WRONG literal locale
+  escapes outside the two value-pinned files): the test declares
+  single-sourcing out of scope.
+- Game proxy 404/405-before-403: the same ruled pattern as the payout
+  proxy.
+- The actor clamp degrading printable-Latin1 characters that would not make
+  Headers.set throw: deliberate availability belt on display garnish; a
+  future non-ASCII user-ID scheme would degrade the identity half (moot
+  while ids are ASCII, noted).
+- The by-name gate list not absorbing the remaining auth_* infrastructure
+  suites: auth_policy (the role-gate policy suite) joined; the rest ride
+  the full suite in the same workflow.
+- The p2p double-fetch-on-mount class and the wasted-allocation initializer
+  concerns: closed by the lazy identity-keyed landing, not re-judged.
+
+DEFERRED with owners (the implement round's list stands, plus):
+- Fernando: make the ci check REQUIRED on the protected branch (repository
+  setting; VERIFIED this round via the API that no ruleset or branch
+  protection exists on either branch today, so a red run does not yet block
+  a merge). Standing: confirm the external role POSTing payouts/send stays
+  intended (pre-existing policy, pinned per-route).
+- 22 (service asks unchanged): wocDecimals + base-unit settled totals on
+  the market payloads; the summary refresh wedge (a never-resolving fetch
+  parks the 30s refresh permanently) stays a 22/runbook candidate.
+- Game-endpoint gaps unchanged: server-side search; offset paging for the
+  service quotes/audit reads.
+- tsconfig still type-checks src/ only (tests ride strip-types unchecked).
+
+Commits (dashboard, the QA round's seven): ee32af0 security-gate runner,
+534a25e custody screening + type truth, 81b86cf p2p listing cross-link +
+one-read landings, 48887e7 canonicalizer single-sourcing + economy clamp +
+underscore helpers, 003a1dd decisiveness round, 716851c dead fields + docs
+truth, 145d120 the fresh re-review round. Game repo: this ledger commit
+(plus the in-place esbuild ^0.28.2 correction in the 19 implement section
+above).
+
+NEXT = docs/woc-marketplace-hardening/phase-20-real-sql-coverage.md, GAME
+repo, worktree /Users/fernando/Documents/wocc-marketplace, FRESH session,
+newest origin/release/** sync first.
