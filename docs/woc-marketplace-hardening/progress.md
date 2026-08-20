@@ -5929,12 +5929,13 @@ floor: the qa-checklist round's S4), and bustWocAuthGuardAll is exercised
 by the unit suite with its no-production-caller note (N1).
 
 MUTATION RECORD (the auth-guard rider section in phase-20-mutation-log.md,
-including the review-round block): 25 distinct live mutants, 24 BIT, 1
-deliberate green control, 0 unexplained survivors; one superseded row
+including the review-round and qa-checklist blocks): 27 distinct live
+mutants, 26 BIT, 1 deliberate green control, 0 unexplained survivors; one
+superseded row
 (the negative-install strip, its region rewritten by the veto fix, retired
 for its v2); the one pg mutant (the token qual strip) ran alone in its own
-lane; every stale verdict re-run after its source or pin moved (two
-re-verification blocks). Whole log 366 distinct mutants.
+lane; every stale verdict re-run after its source or pin moved (three
+re-verification blocks). Whole log 368 distinct mutants.
 
 SUITE GROWTH (final, after the review fix round): NEW auth_guard_core
 (21), woc_auth_guard_cache (20), auth_guard_bust_coverage (4),
@@ -5985,9 +5986,17 @@ verified the moderation prose byte-identical against the pre-rider
 function, the S3 corpus unaffected by the relocation, commit hygiene
 across all twelve commits, and every acceptance criterion.
 
-GATE RE-RUN at the final code tip after the qa-checklist fixes: see the
-final gate note appended below by the wrap (the packet's recorded
-docs-ride-on-top pattern).
+GATE RE-RUN at the final code tip 1f9f8aac4a after the qa-checklist fix
+round: PASS again, ALL 12 STEPS green, full-suite fallback, 42,980 tests
+passed with the 2 expected fails and 26 known default skips across 3,014
+files plus the env-gated perf-budget skip, browser regressions 131,
+typecheck and all builds green; TEST_DATABASE_URL on the command line
+only, no tail pipe, clear field (the mutation lane was idle). The docs
+commits on top of 1f9f8aac4a (this note and the mutation-log rows) are
+docs-only, the packet's recorded wrap pattern. The qa-fix round's own
+code carries three mutation rows (floor regression, gutted flush lever,
+the floor-pass re-run), all BIT; rider mutation totals close at 27
+distinct live, 26 BIT, 1 green control.
 
 NEXT = docs/woc-marketplace-hardening/rider-auth-guard-reads-qa.md, GAME
 repo, worktree wocc-marketplace, FRESH session, newest origin/release/**

@@ -44,11 +44,17 @@ actually reads.
   bodies over the cached bundle, and the pg suite's long-TTL rig with a
   raw-SQL warm-stale control plus revokeReadToken and the four audited
   moderation writers. Mutation record: 25 distinct live, 24 BIT, 1 green
-  control, every stale verdict re-run (whole log 366). Validation at the
-  tip: tsc clean; pg battery EIGHT suites 254 tests zero skips one lane at
-  a time; DB-free marketplace 850 + guard-adjacent and new suites; S3 /
+  control, every stale verdict re-run; the qa-checklist round (READY, 0
+  blocking) then landed the derived veto-ledger floor (70s/90s against the
+  65s driver backstop, relation-pinned to the exported db deadlines), the
+  exercised flush lever, the gate note, and the count corrections (rider
+  mutants close at 27 distinct, 26 BIT, 1 green control; whole log 368).
+  Validation: tsc clean; pg battery EIGHT suites 254 tests zero skips one
+  lane at a time; DB-free marketplace and guard-adjacent suites green; S3 /
   monolith / architecture / suite-duration green; ci:changed exit 0; gate
-  run recorded in the progress.md registry's final note. THREE MAINTAINER
+  PASS ALL 12 STEPS TWICE (3e767bf483, independently reproduced by the
+  qa-checklist agent, and the final code tip 1f9f8aac4a; both full-suite
+  fallback, the second 42,980 tests plus browser 131). THREE MAINTAINER
   RULINGS remain OPEN (re-surfaced, not re-decided): the woc_market.ts
   ceiling raise (+53, net 448 DOWN), the woc_market_db.ts no-ratchet-row
   question (4783), and the escrow gate hold-ceiling sizing. The rider

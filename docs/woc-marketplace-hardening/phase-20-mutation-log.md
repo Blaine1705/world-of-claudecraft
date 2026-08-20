@@ -545,3 +545,17 @@ Auth-guard rider totals after the review round: 25 distinct live mutants
 the seven review-round mutants), 24 BIT, 1 deliberate green control, 0
 unexplained survivors; every stale verdict re-run after its source or pin
 moved. Whole log after this section: 366 distinct mutants.
+
+The qa-checklist fix round (1f9f8aac4a: the derived veto-ledger floor and
+the exercised flush lever) earned its own rows and re-ran the floor-pass
+verdict at that tip:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| auth_ledger_floor_regressed | BIT | woc_auth_guard_cache | qa-checklist round; the min-age floor dropped back to 20_000, under the driver backstop, caught by the db-deadline relation pin |
+| auth_flush_lever_gutted | BIT | woc_auth_guard_cache | qa-checklist round; bustWocAuthGuardAll emptied, caught by the singleton-wiring exercise |
+| auth_ledger_floor_pass_strip | BIT | woc_auth_guard_cache | RE-RUN at 1f9f8aac4a after the floor constants moved |
+
+Auth-guard rider final totals: 27 distinct live mutants, 26 BIT, 1
+deliberate green control, 0 unexplained survivors. Whole log after this
+section: 368 distinct mutants.
