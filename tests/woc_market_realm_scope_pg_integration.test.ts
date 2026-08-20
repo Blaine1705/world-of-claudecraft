@@ -741,9 +741,13 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const aFresh = await seedBid(alpha, aListing, bidder, {
         placedAtMs: BASE_MS - 10 * MINUTE_MS,
       });
+      // OLD and unsigned but NOT pending: the lapse sweep's status qual is
+      // what keeps it standing (a strip would flip it lapsed and VOID a
+      // refund the bond worker still owes).
       const aDue = await seedBid(alpha, aListing, bidder, {
         status: 'outbid',
         bondState: 'refund_due',
+        placedAtMs: old,
       });
       await seedBid(beta, bListing, bidder, {
         status: 'outbid',
@@ -766,6 +770,7 @@ describeDb('woc market realm scoping against real Postgres', () => {
       expect(await bidStatus(aFresh), 'a fresh unsigned bid outlives the sweep').toBe(
         'pending_bond',
       );
+      expect(await bidStatus(aDue), 'the sweep lapses only PENDING bids').toBe('outbid');
 
       const activity = await marketDb.bidsByAccount(alpha, bidder, 50);
       expect(ids(activity)).toEqual([aSigned, aStale, aDue, aFresh].sort((x, y) => x - y));
