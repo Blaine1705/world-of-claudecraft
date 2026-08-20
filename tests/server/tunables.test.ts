@@ -537,10 +537,13 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // LOCAL that installs the allowance run under the 15s session default, the
     // two LATER SET LOCALs run under the 4s allowance but are protocol
     // statements with no locks, IO, or planning (excluded from the sum on
-    // that ground), and COMMIT's only hard bound is the 65s driver
-    // query_timeout backstop, so a genuinely wedged job CAN exceed one
-    // autosave interval. What bounds the player-facing impact there is the
-    // queue wait deadline plus the depth cap, not this sum.
+    // that ground), COMMIT's only hard bound is the 65s driver
+    // query_timeout backstop, and the PRE-JOB GUILD FLUSH (an ordinary
+    // saveCharacter the escrow path triggers first, on the SAME FIFO) rides
+    // the 60s heavy allowance, the dominant term of the whole tail (its own
+    // relation is pinned below), so a genuinely wedged sequence CAN exceed
+    // one autosave interval. What bounds the player-facing impact there is
+    // the queue wait deadline plus the depth cap, not this sum.
     // AUTOSAVE_SECONDS is a game.ts MODULE-PRIVATE const, so a re-typed 30_000
     // here would stay green after a re-tuned save cadence; scrape it (comments
     // stripped first, the file's own idiom) and let the relation follow it.
@@ -562,6 +565,60 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     expect(
       ESCROW_STATEMENT_TIMEOUT_MS * 5 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
     ).toBeLessThan(autosaveMs);
+    // The honest occupancy tail (the escrow write-path rider). The pre-job
+    // guild flush is an ordinary saveCharacter on the SAME per-character
+    // FIFO, and its statements ride the 60s heavy allowance, so that ONE
+    // term exceeds the entire pinned workload sum above on its own: any
+    // occupancy story quoting the 27s sum without the flush term is
+    // dishonest, and this relation is what keeps the two numbers from
+    // quietly converging (a heavy-allowance cut below the workload sum
+    // would make the exclusion comment above overstate the tail). Threading
+    // a workload-scoped allowance through saveCharacter stays REJECTED as
+    // invasive (the 06 ruling, re-affirmed by the rider with the file
+    // open): the heavy allowance is correct for the logout-shaped saves
+    // whose loss is data loss, and the flush IS one of those saves.
+    const { DB_QUERY_TIMEOUT_MS } = await import('../../server/db');
+    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBeGreaterThan(
+      ESCROW_STATEMENT_TIMEOUT_MS * 5 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
+    );
+    // The started-request ceiling, DERIVED so the docblocks can state a
+    // number that cannot drift from the constants: once the escrow job has
+    // STARTED, the request rides pool checkout + BEGIN and the installing
+    // SET LOCAL under the session default + the five workload statements +
+    // the lock wait + COMMIT under the driver backstop. The wait deadline
+    // bounds only the un-started phase. The ceiling must stay under the
+    // HTTP layer's 300s so a wedged escrow surfaces as a typed or coded
+    // answer, never as a socket the client gave up on first.
+    const startedCeilingMs =
+      DB_POOL_CONNECT_TIMEOUT_MS +
+      DB_STATEMENT_TIMEOUT_MS +
+      ESCROW_STATEMENT_TIMEOUT_MS * 5 +
+      ESCROW_LOCK_TIMEOUT_MS +
+      DB_QUERY_TIMEOUT_MS;
+    expect(startedCeilingMs).toBe(107_000);
+    expect(startedCeilingMs).toBeLessThan(300_000);
+    // The realm-global escrow gate's sizing (the write-path rider). Equal to
+    // the autosave wave's SAVE_CONCURRENCY by decision: the realm already
+    // prices in that many concurrent character-save writes, so the gate adds
+    // at most the same load again. SAVE_CONCURRENCY is game.ts
+    // module-private, so scrape it like AUTOSAVE_SECONDS above; a re-tune of
+    // either side reds this pin and forces the sizing to be re-decided
+    // rather than silently diverging. Both saturated must still leave the
+    // pool headroom for the guard transactions and the sweep's locked
+    // segments (two clients at the default sizing).
+    const { WOC_ESCROW_GATE_MAX_IN_FLIGHT } = await import('../../server/woc_market_escrow_gate');
+    const { parseDbPoolMaxClients } = await import('../../server/db');
+    const saveConcurrencyMatch = codeOnly(read('server/game.ts')).match(
+      /^const SAVE_CONCURRENCY = (\d+);$/m,
+    );
+    expect(saveConcurrencyMatch).not.toBeNull();
+    const saveConcurrency = Number(saveConcurrencyMatch?.[1]);
+    expect(saveConcurrency).toBeGreaterThan(0);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBe(4);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBe(saveConcurrency);
+    const poolDefault = parseDbPoolMaxClients(undefined);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBeLessThan(poolDefault);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT + saveConcurrency).toBeLessThanOrEqual(poolDefault - 2);
   });
 
   it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {

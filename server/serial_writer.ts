@@ -37,9 +37,9 @@ export function createSerialWriter(): <T>(write: () => Promise<T>) => Promise<T>
 export interface KeyedSerialWriter<K> {
   enqueue<T>(key: K, write: () => Promise<T>): Promise<T>;
   /** How many keys hold a running or queued write right now (the leak pin:
-   *  a drained key must not retain its entry). No production caller yet by
-   *  design: the players-online-adjacent gauge that will read it rides the
-   *  hot-path follow-up work; tests are its only consumer until then. */
+   *  a drained key must not retain its entry). Production caller: the
+   *  woc_character_save_pending_keys gauge (server/http/game_metrics.ts)
+   *  reads it off GameServer's character-save queue at scrape time. */
   pendingKeys(): number;
 }
 

@@ -50,7 +50,8 @@ import {
 } from '../../server/http/game_signals';
 import type { CharacterSaveArgs, WocMarketCustody } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
-import { createWocMarketCustody } from '../../server/woc_market_custody';
+import { createWocMarketCustody, wocEscrowSerializeStats } from '../../server/woc_market_custody';
+import { createWocEscrowGate, type WocEscrowGate } from '../../server/woc_market_escrow_gate';
 import { createDevWocMarketEconomy } from '../../server/woc_market_proxy';
 import type { WocListingParams } from '../../server/woc_market_rules';
 import { WOC_MARKET_RESTRICTED_POLICY } from '../../server/woc_market_rules';
@@ -180,7 +181,12 @@ const blobHoldsItem = (state: CharacterState, itemId: string): boolean =>
   state.inventory.some((s) => s.itemId === itemId);
 
 function makeRig(
-  opts: { escrowWaitMs?: number; escrowWarnMs?: number; escrowWarnThrottleMs?: number } = {},
+  opts: {
+    escrowWaitMs?: number;
+    escrowWarnMs?: number;
+    escrowWarnThrottleMs?: number;
+    escrowGate?: WocEscrowGate;
+  } = {},
 ): Rig {
   const server = new GameServer();
   const join = (accountId: number, characterId: number, name: string): ClientSession => {
@@ -341,8 +347,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.bagsHold(EPIC_ITEM)).toBe(false);
     expect(rig.db.escrowSaves).toHaveLength(1);
     // The production readout for the arm that RAN: one job started, no
-    // refusal of any kind.
-    expect(kinds).toEqual(['started']);
+    // refusal of any kind, and its held slot settled (the terminal kind
+    // fires when the WORK settles, before the caller's await resumes).
+    expect(kinds).toEqual(['started', 'settled']);
   });
 
   it('the escrow blob is serialized inside the job, after every queued commit', async () => {
@@ -638,8 +645,10 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
     expect(rig.db.escrowSaves).toHaveLength(0);
     // Booked under its own kind (the throw is a different operator story from
-    // a queue that is merely busy), and still loud in the log.
-    expect(kinds).toEqual(['flush_failed']);
+    // a queue that is merely busy), and still loud in the log. The failed
+    // sequence still settles its slot: flush_failed without a paired settled
+    // would read as a wedged sequence on the entered-minus-settled signal.
+    expect(kinds).toEqual(['flush_failed', 'settled']);
     expect(
       logged.some((line) => line.includes(`guild-book flush failed for character ${SELLER_CHAR}`)),
     ).toBe(true);
@@ -679,9 +688,11 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.db.escrowSaves).toHaveLength(0);
     const retry = await createListing(rig);
     expect(retry.ok).toBe(true);
-    // The cancelled job books nothing between the two: it returns before the
-    // 'started' counter, which is what proves it never ran the job body.
-    expect(kinds).toEqual(['deadline_refused', 'started']);
+    // The cancelled job books nothing between the two beyond its own
+    // 'settled' (the abandoned work drained and released its slot): it
+    // returns before the 'started' counter, which is what proves it never
+    // ran the job body; the retry then books its own started plus settled.
+    expect(kinds).toEqual(['deadline_refused', 'settled', 'started', 'settled']);
   });
 
   it('a job that STARTED before the deadline answers its real outcome, never contended', async () => {
@@ -729,7 +740,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await wedge;
     const firstOut = await first;
     expect(firstOut.ok).toBe(true);
-    expect(kinds).toEqual(['depth_refused', 'started']);
+    // Exactly ONE settled: the depth-refused request held nothing, so only
+    // the first request's sequence releases a slot.
+    expect(kinds).toEqual(['depth_refused', 'started', 'settled']);
   });
 
   it('holds the depth-cap slot until the abandoned WORK settles, not until the waiter returns', async () => {
@@ -768,10 +781,114 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await wedge;
     await settle();
     // The slot IS released once the work finally settles: the character is
-    // not wedged out of listing for the process lifetime.
+    // not wedged out of listing for the process lifetime. The abandoned
+    // sequence's 'settled' lands exactly HERE (at work settlement, after the
+    // depth refusal above), which is the terminal kind proving the slot
+    // lifecycle rides the work, not the waiter.
     const third = await createListing(rig);
     expect(third.ok).toBe(true);
-    expect(kinds).toEqual(['deadline_refused', 'depth_refused', 'started']);
+    expect(kinds).toEqual(['deadline_refused', 'depth_refused', 'settled', 'started', 'settled']);
+  });
+
+  it('refuses contended at the realm-global gate, holding nothing', async () => {
+    // A saturated gate (cap 0 stands in for "every slot held by other
+    // characters": the per-character depth cap cannot produce this arm, so
+    // only the gate can). The refusal must hold no slot, extract nothing,
+    // and book its OWN kind: on the wire all the queue refusals answer the
+    // same 'contended', so the counter is the only discriminator.
+    const gate = createWocEscrowGate(0);
+    const rig = makeRig({ escrowGate: gate });
+    const kinds = recordEscrowKinds();
+    const res = await createListing(rig);
+    expect(res).toEqual({ ok: false, reason: 'contended' });
+    expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    expect(rig.db.escrowSaves).toHaveLength(0);
+    expect(kinds).toEqual(['realm_refused']);
+    expect(gate.stats()).toEqual({ inFlight: 0, max: 0, refused: 1 });
+  });
+
+  it('releases the gate slot when the WORK settles, not when the waiter returns', async () => {
+    // The gate slot rides the depth-cap slot's lifecycle: an abandoned
+    // (deadline-refused) sequence still holds its realm slot until its
+    // queued work drains, or 5s retries could stack realm-wide capacity
+    // onto FIFOs that are already wedged.
+    const gate = createWocEscrowGate(1);
+    const rig = makeRig({ escrowGate: gate, escrowWaitMs: 300 });
+    const kinds = recordEscrowKinds();
+    let releaseQueue!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseQueue = resolve;
+    });
+    const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+      await held;
+    });
+    const first = await createListing(rig);
+    expect(first).toEqual({ ok: false, reason: 'contended' });
+    expect(kinds).toEqual(['deadline_refused']);
+    // The waiter returned, the work is still wedged: the realm slot is HELD.
+    expect(gate.stats().inFlight).toBe(1);
+    releaseQueue();
+    await wedge;
+    await settle();
+    // The work settled: the slot is free and a fresh listing goes through.
+    expect(gate.stats().inFlight).toBe(0);
+    const retry = await createListing(rig);
+    expect(retry.ok).toBe(true);
+    expect(kinds).toEqual(['deadline_refused', 'settled', 'started', 'settled']);
+    expect(gate.stats()).toEqual({ inFlight: 0, max: 1, refused: 0 });
+  });
+
+  it('attributes the extract-side serialize cost per listing', async () => {
+    // Process-lifetime module counters, so assert DELTAS: one successful
+    // listing adds exactly one bracketed serialize with a sane duration.
+    const rig = makeRig();
+    const before = wocEscrowSerializeStats();
+    const res = await createListing(rig);
+    expect(res.ok).toBe(true);
+    const after = wocEscrowSerializeStats();
+    expect(after.count).toBe(before.count + 1);
+    expect(after.totalMs).toBeGreaterThanOrEqual(before.totalMs);
+    expect(after.maxMs).toBeGreaterThanOrEqual(before.maxMs);
+  });
+
+  it('a held escrow FIFO stalls only its own save: the saveAll wave drains every other character', async () => {
+    // The owed saveAll-wave suppression MEASUREMENT (dbperf proof 3), taken
+    // as a pinned fact: there is NO suppression mechanism, escrow protection
+    // is FIFO ordering alone, and the wave's worker-pool structure bounds
+    // the interaction to exactly this shape: a wedged escrow-held FIFO costs
+    // ONE worker slot (its character's save waits behind the job), every
+    // other character still drains through the remaining workers, and the
+    // wave's COMPLETION honestly waits out the held slot. At most
+    // SAVE_CONCURRENCY simultaneously escrow-held characters could stall the
+    // wave, which is why the realm gate is sized to that constant.
+    const rig = makeRig({ escrowWaitMs: 60_000 });
+    rig.join(22, 22, 'Belra');
+    rig.join(23, 23, 'Celra');
+    let releaseQueue!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseQueue = resolve;
+    });
+    // Stands in for a running escrow job: the job IS an enqueueCharacterWrite
+    // thunk, and holding the FIFO head is its only coupling to the wave.
+    const wedge = rig.server.enqueueCharacterWrite(SELLER_CHAR, async () => {
+      await held;
+    });
+    dbMock.saveCharacterState.mockClear();
+    const savedIds = () => dbMock.saveCharacterState.mock.calls.map((args) => args[0] as number);
+    let waveDone = false;
+    const wave = rig.server.saveAll('autosave').then(() => {
+      waveDone = true;
+    });
+    await settle();
+    // The free characters drained while the wedged one waits, and the wave
+    // is still honestly open (its completion includes the held save).
+    expect(savedIds().sort((a, b) => a - b)).toEqual([22, 23]);
+    expect(waveDone).toBe(false);
+    releaseQueue();
+    await wedge;
+    await wave;
+    expect(waveDone).toBe(true);
+    expect(savedIds()).toContain(SELLER_CHAR);
   });
 
   it('warns when a queue wait crosses the warn threshold', async () => {
@@ -857,8 +974,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
     expect(rig.db.escrowSaves).toHaveLength(0);
     // The in-job re-check refused, so the job never reached 'started': that
-    // pairing is what separates this arm from a job that ran and failed.
-    expect(kinds).toEqual(['books_dirty_refused']);
+    // pairing is what separates this arm from a job that ran and failed. The
+    // sequence still settles its held slot.
+    expect(kinds).toEqual(['books_dirty_refused', 'settled']);
   });
 
   it('the delivered-save twin keeps its recorded FIFO carve-out', () => {
@@ -881,6 +999,13 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
       expect(siblingSrc).toContain('export function create');
       expect(siblingSrc).not.toContain('.runSerialized(');
       expect(siblingSrc).not.toContain('enqueueCharacterWrite');
+      // The realm-global escrow gate is custody-only by decision (the
+      // write-path rider): the sweep and the monitor taking it would couple
+      // their backpressure to the listing path's (the enqueueMarketWrite
+      // latency chain recorded in the rider spec), so they carry the same
+      // flat zero for the gate they carry for the FIFO.
+      expect(siblingSrc).not.toContain('EscrowGate');
+      expect(siblingSrc).not.toContain('tryAcquire');
     }
   });
 

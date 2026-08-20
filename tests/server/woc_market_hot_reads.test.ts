@@ -1174,6 +1174,22 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // The 55P03 twin: every guard now carries the lock-wait bound, so its
     // fire rate is the tuning signal for ESCROW_LOCK_TIMEOUT_MS.
     expect(code).toContain('lockWaitTimeouts: wocMarketLockWaitTimeoutCount()');
+    // The remaining two contention classes (the write-path rider's label):
+    // without them, deadlocks and never-started checkouts hide inside the
+    // same 'contended' the lock counter explains.
+    expect(code).toContain('deadlocks: wocMarketDeadlockCount()');
+    expect(code).toContain('txNeverStarted: wocMarketTxNeverStartedCount()');
+    // The realm-global escrow gate: ONE instance, wired into custody AND
+    // serving its stats on the readout (a second instance would split the
+    // realm bound in two and neither half would bind).
+    expect(code.match(/createWocEscrowGate\(\)/g)).toHaveLength(1);
+    expect(code).toContain('{ escrowGate: wocEscrowGate }');
+    expect(code).toContain('escrowGate: wocEscrowGate.stats()');
+    // The extract-side serialize cost, the number the SAVE_IDLE sizing
+    // argument rests on.
+    expect(code).toContain('escrowSerialize: wocEscrowSerializeStats()');
+    // The character-save FIFO gauge reads the queue's live key count.
+    expect(code).toContain('savePendingKeys: () => game.characterSaveQueues.pendingKeys()');
     // The pg pool gauge (the pre-enable review's pool-wait observability):
     // sustained waiting > 0 is the brownout precursor, and this readout is
     // where an operator already looks.

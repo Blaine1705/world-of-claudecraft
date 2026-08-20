@@ -1968,14 +1968,20 @@ describe('the escrow listing transaction, in SQL', () => {
     const counters = await import('../../server/woc_market_db');
     const idleBefore = counters.wocMarketIdleTxKillCount();
     const lockBefore = counters.wocMarketLockWaitTimeoutCount();
+    const deadlockBefore = counters.wocMarketDeadlockCount();
+    const neverStartedBefore = counters.wocMarketTxNeverStartedCount();
     const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
     expect(out).toEqual({ ok: false, reason: 'contended' });
     // The counters partition the codes EXACTLY: 55P03 moves only the
-    // lock-wait counter, 25P03 only the idle-kill one, and 40P01 moves
-    // NEITHER, so a widened increment condition in the classifier (counting
-    // the whole contention set) fails on this row.
+    // lock-wait counter, 25P03 only the idle-kill one, 40P01 only the
+    // deadlock one (the write-path rider's contention-class label), and the
+    // never-started counter moves for NONE of them (the transaction here
+    // provably began), so a widened increment condition in the classifier
+    // (counting the whole contention set) fails on this row.
     expect(counters.wocMarketLockWaitTimeoutCount()).toBe(lockBefore + (code === '55P03' ? 1 : 0));
     expect(counters.wocMarketIdleTxKillCount()).toBe(idleBefore + (code === '25P03' ? 1 : 0));
+    expect(counters.wocMarketDeadlockCount()).toBe(deadlockBefore + (code === '40P01' ? 1 : 0));
+    expect(counters.wocMarketTxNeverStartedCount()).toBe(neverStartedBefore);
   });
 
   it('the 25P03 kill warns its DISTINCT line and counts; a 55P03 lock wait does neither', async () => {
@@ -2090,11 +2096,16 @@ describe('the escrow listing transaction, in SQL', () => {
       if (text === 'BEGIN') throw new Error('Connection terminated unexpectedly');
       return undefined;
     });
+    const counters = await import('../../server/woc_market_db');
+    const neverStartedBefore = counters.wocMarketTxNeverStartedCount();
     const out = await new PgWocMarketDb(pool).escrowInsertListing(SAVE, LISTING);
     expect(out).toEqual({ ok: false, reason: 'contended' });
     // A never-started transaction owes no ROLLBACK, and issuing one on the
     // dead session is what the tag's early rethrow exists to skip.
     expect(sql()).toEqual(['BEGIN']);
+    // The contention-class label: never-started is COUNTED (pool is the
+    // bottleneck, not a row), and it is the only counter this arm moves.
+    expect(counters.wocMarketTxNeverStartedCount()).toBe(neverStartedBefore + 1);
   });
 
   it('DISCARDS a begin-broken client instead of returning it to the pool', async () => {

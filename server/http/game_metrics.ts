@@ -97,6 +97,12 @@ export const WOC_SIM_TICK_HZ = 'woc_sim_tick_hz';
  *  family (a regression in its rate shows up here first in production). */
 export const WOC_DB_POOL_CLIENTS = 'woc_db_pool_clients';
 
+/** Character-save FIFO keys with a queued or running write (the per-character
+ *  serial writer's live map size). The escrow write-path rider's gauge: a
+ *  sustained value near players-online means the save system is not
+ *  draining, the precursor the wocEscrowQueue refusal counters alert on. */
+export const WOC_SAVE_PENDING_KEYS = 'woc_character_save_pending_keys';
+
 /** Per-phase authoritative-loop timing in SECONDS, labeled by phase and stat (p95/max). */
 export const WOC_SIM_TICK_PHASE_SECONDS = 'woc_sim_tick_phase_seconds';
 
@@ -246,6 +252,8 @@ export interface GameStateSource {
   simEntities(): number;
   /** Achieved sim Hz, or null while the rate meter is still warming up. */
   simTickHz(): number | null;
+  /** Character-save FIFO keys with a queued or running write. */
+  savePendingKeys(): number;
   /** Per-phase p95/max in MILLISECONDS, keyed by phase name; missing phases are skipped. */
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
   /** pg pool saturation snapshot (pg Pool totalCount/idleCount/waitingCount). */
@@ -326,6 +334,15 @@ export function registerGameStateMetrics(
     registers: [registry],
     collect() {
       this.set(source.wsConnections());
+    },
+  });
+
+  new Gauge({
+    name: WOC_SAVE_PENDING_KEYS,
+    help: 'Character-save FIFO keys with a queued or running write.',
+    registers: [registry],
+    collect() {
+      this.set(source.savePendingKeys());
     },
   });
 

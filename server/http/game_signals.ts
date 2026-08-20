@@ -168,14 +168,20 @@ export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
 /** The marketplace escrow-queue outcomes (the per-character save FIFO's
  *  listing entry): one counter with a fixed kind label, the guild-bank
- *  incident idiom. 'started' is the throughput baseline the three refusal
- *  kinds and the flush failure are read against. */
+ *  incident idiom. 'started' is the throughput baseline the refusal kinds
+ *  and the flush failure are read against. 'realm_refused' is the
+ *  realm-global gate at cap (the write-path rider's bound; the per-character
+ *  kinds cannot see realm-wide saturation). 'settled' is the terminal
+ *  sibling: a held sequence released its slot, whatever the outcome, so
+ *  entered-minus-settled is the in-flight and wedged-FIFO signal. */
 export const WOC_ESCROW_QUEUE_OUTCOMES = [
   'started',
   'deadline_refused',
   'depth_refused',
   'books_dirty_refused',
   'flush_failed',
+  'realm_refused',
+  'settled',
 ] as const;
 export type WocEscrowQueueOutcome = (typeof WOC_ESCROW_QUEUE_OUTCOMES)[number];
 

@@ -28,6 +28,7 @@ function stubSource(): GameStateSource {
     wsConnections: () => 0,
     simEntities: () => 0,
     simTickHz: () => 20,
+    savePendingKeys: () => 0,
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),

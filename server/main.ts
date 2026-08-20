@@ -377,7 +377,7 @@ import {
 import { allowedCorsOrigin, isWebClientRequest } from './web_login_guard';
 import { cachedWocBalance, handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { WocMarketService } from './woc_market';
-import { createWocMarketCustody } from './woc_market_custody';
+import { createWocMarketCustody, wocEscrowSerializeStats } from './woc_market_custody';
 import {
   PgWocMarketDb,
   pruneBookedWocCustodyClaimsBatch,
@@ -386,9 +386,12 @@ import {
   pruneResolvedWocOffersBatch,
   pruneWocBuyNowAbandonsBatch,
   wocCustodyClaimsRetentionWarning,
+  wocMarketDeadlockCount,
   wocMarketIdleTxKillCount,
   wocMarketLockWaitTimeoutCount,
+  wocMarketTxNeverStartedCount,
 } from './woc_market_db';
+import { createWocEscrowGate } from './woc_market_escrow_gate';
 import { createWocMarketMonitor } from './woc_market_monitor';
 import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
 import { registerWocMarketReadCacheForBusts, WocMarketReadCache } from './woc_market_read_cache';
@@ -2797,6 +2800,10 @@ const wocMarketReadCache = new WocMarketReadCache();
 // The wallet link/unlink writes in db.ts bust the activity readout through
 // the module-level registration (identity changes never wait out a TTL).
 registerWocMarketReadCacheForBusts(wocMarketReadCache);
+// The realm-global escrow in-flight bound (the escrow write-path rider):
+// constructed here, not inside the custody factory, so its stats can ride the
+// ops readout below alongside the counters it complements.
+const wocEscrowGate = createWocEscrowGate();
 const wocMarketService = new WocMarketService({
   db: wocMarketDb,
   economy: wocMarketEconomy,
@@ -2804,20 +2811,24 @@ const wocMarketService = new WocMarketService({
   // The step-up devsig arm rides the SAME double-gated switch as the dev
   // economy: impossible to reach in production, and one truth for "dev".
   stepUpDevSig: wocMarketDevService,
-  custody: createWocMarketCustody({
-    get sim() {
-      return liveGame().sim;
+  custody: createWocMarketCustody(
+    {
+      get sim() {
+        return liveGame().sim;
+      },
+      wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
+      persistMailBlob: () => liveGame().persistMailBlob(),
+      enqueueCharacterWrite: (characterId, job) =>
+        liveGame().enqueueCharacterWrite(characterId, job),
+      serializeCharacterForPersist: (characterId) =>
+        liveGame().serializeCharacterForPersist(characterId),
+      hasDirtyGuildBooks: (characterId) => liveGame().hasDirtyGuildBooks(characterId),
+      flushDirtyGuildBooks: (characterId) => liveGame().flushDirtyGuildBooks(characterId),
+      escrowSessionLost: (pid, characterId, kind) =>
+        liveGame().escrowSessionLost(pid, characterId, kind),
     },
-    wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
-    persistMailBlob: () => liveGame().persistMailBlob(),
-    enqueueCharacterWrite: (characterId, job) => liveGame().enqueueCharacterWrite(characterId, job),
-    serializeCharacterForPersist: (characterId) =>
-      liveGame().serializeCharacterForPersist(characterId),
-    hasDirtyGuildBooks: (characterId) => liveGame().hasDirtyGuildBooks(characterId),
-    flushDirtyGuildBooks: (characterId) => liveGame().flushDirtyGuildBooks(characterId),
-    escrowSessionLost: (pid, characterId, kind) =>
-      liveGame().escrowSessionLost(pid, characterId, kind),
-  }),
+    { escrowGate: wocEscrowGate },
+  ),
   verifiedWallet: async (account) => (await walletForAccount(account))?.pubkey ?? null,
   balanceTokens: (pubkey) => cachedWocBalance(pubkey),
   config: wocMarketConfig(),
@@ -2882,6 +2893,17 @@ configureInternalWocMarketStuckRead(async () => ({
   // Guard statements the 2s lock-wait bound refused (55P03): the tuning
   // signal for ESCROW_LOCK_TIMEOUT_MS, since players feel these as 409s.
   lockWaitTimeouts: wocMarketLockWaitTimeoutCount(),
+  // The other two contention classes (the write-path rider's label): a
+  // deadlock rate says two guards are CROSSING (a lock-order bug to find),
+  // and never-started says the POOL is the bottleneck, not a row.
+  deadlocks: wocMarketDeadlockCount(),
+  txNeverStarted: wocMarketTxNeverStartedCount(),
+  // The realm-global escrow bound's live occupancy and lifetime refusals,
+  // beside the per-event wocEscrowQueue counter it feeds.
+  escrowGate: wocEscrowGate.stats(),
+  // The extract-side per-listing serialize cost (event-loop CPU): the number
+  // the SAVE_IDLE bound's sizing argument rests on.
+  escrowSerialize: wocEscrowSerializeStats(),
   // The shared pg pool's live occupancy (the pool-wait observability the
   // pre-enable review asked for): waiting > 0 sustained means requests are
   // queueing for clients, the brownout precursor the read caches exist to
@@ -3424,6 +3446,7 @@ export async function startServer(): Promise<http.Server> {
     wsConnections: () => wss.clients.size,
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
+    savePendingKeys: () => game.characterSaveQueues.pendingKeys(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
     // Coerced at the untyped boundary: @types/pg hand-declares these getters,
     // so a pg upgrade that drops one type-checks clean and would otherwise

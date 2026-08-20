@@ -1841,7 +1841,7 @@ export class GameServer {
   private saveAllInFlight: Promise<void> | null = null;
   // One FIFO per character id: every durable LIVE-SESSION character write
   // rides it, so commit order is enqueue order (exceptions: server/CLAUDE.md).
-  private readonly characterSaveQueues = createKeyedSerialWriter<number>();
+  readonly characterSaveQueues = createKeyedSerialWriter<number>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.

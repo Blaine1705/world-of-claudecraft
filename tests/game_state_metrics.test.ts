@@ -101,6 +101,7 @@ function sourceOver(server: GameServer): GameStateSource {
     wsConnections: () => server.clients.size,
     simEntities: () => server.sim.entities.size,
     simTickHz: () => server.simTickHz(),
+    savePendingKeys: () => server.characterSaveQueues.pendingKeys(),
     tickPhaseMillis: () => server.tickPhaseMillis(),
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),

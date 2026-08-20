@@ -17,6 +17,7 @@ import type { CharacterState, Sim } from '../src/sim/sim';
 import { cloneItemInstancePayload, type InvSlot } from '../src/sim/types';
 import { gameMetricsCounters } from './http/game_signals';
 import type { WocCustodyExtract, WocCustodyGrant, WocMarketCustody } from './woc_market';
+import { createWocEscrowGate, type WocEscrowGate } from './woc_market_escrow_gate';
 
 /** The narrow slice of GameServer the custody module consumes (game.ts
  *  wocCustodySession / persistMailBlob plus the public sim, and the
@@ -58,9 +59,14 @@ export interface WocCustodyGameHost {
  *  connect deadline: past that, something is wedged and holding the HTTP
  *  request open only invites a retry pile-up. NOTE this bounds only the
  *  wait: a job that STARTED holds the request for the transaction's own
- *  ceiling (statement/lock/idle bounds plus the pool checkout, tens of
- *  seconds worst case, under the HTTP layer's 300s), so client fetch
- *  timeouts must be sized off THAT, not off this deadline. */
+ *  ceiling (pool checkout + BEGIN and the installing SET LOCAL under the
+ *  15s session default + the five workload statements + the lock wait +
+ *  COMMIT under the 65s driver backstop: 107s worst case, derived and
+ *  pinned in the tunables ladder, under the HTTP layer's 300s), so client
+ *  fetch timeouts must be sized off THAT, not off this deadline. The FIFO
+ *  occupancy story is wider still: the pre-job guild flush rides the 60s
+ *  heavy save allowance on the same FIFO, the tail's dominant term (the
+ *  honest-tail relation beside the ceiling pin). */
 export const ESCROW_QUEUE_WAIT_MS = 5_000;
 /** Queue waits past this warn. The throttle (30s, realm-global across every
  *  character on purpose: the signal is "escrow waits are slow", one line per
@@ -78,13 +84,41 @@ const LETTERS = {
   sold_notice: WOC_MARKET_SOLD_LETTER,
 } as const;
 
+/** Process-lifetime per-listing serialize cost (the escrow write-path rider):
+ *  the extract-side serializeCharacterForPersist is synchronous CPU on the
+ *  event loop, the same class of work the SAVE_IDLE bound exists for inside
+ *  the transaction, and until now its cost was invisible. Attributed here so
+ *  the ops readout carries a number, not a guess; the delivery pg suite's
+ *  escrow-cost test bounds the in-transaction half. Module-level like the
+ *  contention counters in woc_market_db.ts: one custody bridge per realm
+ *  process. */
+let escrowSerializeCount = 0;
+let escrowSerializeTotalMs = 0;
+let escrowSerializeMaxMs = 0;
+export function wocEscrowSerializeStats(): { count: number; totalMs: number; maxMs: number } {
+  return {
+    count: escrowSerializeCount,
+    totalMs: escrowSerializeTotalMs,
+    maxMs: escrowSerializeMaxMs,
+  };
+}
+
 export function createWocMarketCustody(
   host: WocCustodyGameHost,
-  opts: { escrowWaitMs?: number; escrowWarnMs?: number; escrowWarnThrottleMs?: number } = {},
+  opts: {
+    escrowWaitMs?: number;
+    escrowWarnMs?: number;
+    escrowWarnThrottleMs?: number;
+    /** The realm-global in-flight bound (the escrow write-path rider). One
+     *  gate per realm process; injectable so main.ts can put its stats on
+     *  the ops readout and tests can saturate it. */
+    escrowGate?: WocEscrowGate;
+  } = {},
 ): WocMarketCustody {
   const escrowWaitMs = opts.escrowWaitMs ?? ESCROW_QUEUE_WAIT_MS;
   const escrowWarnMs = opts.escrowWarnMs ?? ESCROW_QUEUE_WARN_MS;
   const escrowWarnThrottleMs = opts.escrowWarnThrottleMs ?? ESCROW_QUEUE_WARN_THROTTLE_MS;
+  const escrowGate = opts.escrowGate ?? createWocEscrowGate();
   /** Depth cap 1 per character: the ids with an escrow job queued or
    *  running. Released when the WORK settles; a FIFO that never settles
    *  (a non-query hang past every db bound) would pin its character's slot
@@ -103,8 +137,14 @@ export function createWocMarketCustody(
       const out = host.sim.extractTradableCopy(session.pid, ref);
       if (!out.ok) return out;
       // The save-shaped snapshot, never the raw serialization: the session
-      // save fixups (jail/spectate) must ride every durable blob.
+      // save fixups (jail/spectate) must ride every durable blob. Bracketed
+      // for the per-listing serialize cost stat (module doc above).
+      const serializeStartMs = Date.now();
       const snap = host.serializeCharacterForPersist(characterId);
+      const serializeMs = Date.now() - serializeStartMs;
+      escrowSerializeCount++;
+      escrowSerializeTotalMs += serializeMs;
+      if (serializeMs > escrowSerializeMaxMs) escrowSerializeMaxMs = serializeMs;
       if (!snap) {
         // The session raced a teardown mid-call: undo and report offline.
         restoreInto(host, session.pid, out.extracted);
@@ -139,6 +179,13 @@ export function createWocMarketCustody(
       // re-dirtied during the wait refuses rather than tears.
       if (escrowJobsInFlight.has(characterId)) {
         gameMetricsCounters().wocEscrowQueue('depth_refused');
+        return 'contended';
+      }
+      // The realm-global bound, checked AFTER the per-character cap so the
+      // more specific refusal wins, and BEFORE anything is held: a refused
+      // request holds no slot, no gate capacity, and has extracted nothing.
+      if (!escrowGate.tryAcquire()) {
+        gameMetricsCounters().wocEscrowQueue('realm_refused');
         return 'contended';
       }
       escrowJobsInFlight.add(characterId);
@@ -186,6 +233,12 @@ export function createWocMarketCustody(
         })();
         const releaseSlot = (): void => {
           escrowJobsInFlight.delete(characterId);
+          escrowGate.release();
+          // The terminal sibling to 'started': a held sequence settled,
+          // whatever its outcome, so entered-minus-settled is the in-flight
+          // (and, when it grows, the wedged-FIFO) signal; the gate stats on
+          // the ops readout are the instantaneous truth.
+          gameMetricsCounters().wocEscrowQueue('settled');
         };
         void work.then(releaseSlot, releaseSlot);
         const timeout = new Promise<'timeout'>((resolve) => {

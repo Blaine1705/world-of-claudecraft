@@ -873,12 +873,19 @@ export const SAVE_IDLE_TX_TIMEOUT_MS = 10_000;
  *  (measured: statement_timeout does not bound COMMIT), so a genuinely
  *  wedged transaction can exceed one 30s autosave interval, and reaching
  *  the driver backstop also costs the DISCARDED connection (withTx's
- *  codeless-failure rule below). What bounds the player-facing impact in
- *  that tail is the queue wait deadline plus the depth cap (later requests
- *  refuse typed instead of stacking); tightening the tail itself rides the
- *  hot-path follow-up with the guild-flush 60s term. The heavy allowance remains correct for the
+ *  codeless-failure rule below). The tail's DOMINANT term is none of these:
+ *  the pre-job guild flush is an ordinary saveCharacter on the same FIFO
+ *  whose statements ride the 60s heavy allowance, exceeding this whole
+ *  workload sum on its own (the tunables ladder pins that relation, plus
+ *  the 107s started-request ceiling derived from these constants). What
+ *  bounds the player-facing impact in that tail is the queue wait deadline
+ *  plus the depth cap plus the realm-global escrow gate (later requests
+ *  refuse typed instead of stacking). Tightening the flush term itself
+ *  stays REJECTED as invasive (the 06 ruling, re-affirmed by the escrow
+ *  write-path rider: it would thread a workload-scoped allowance through
+ *  saveCharacter). The heavy allowance remains correct for the
  *  LOGOUT-shaped saves (losing one is data loss; losing a listing attempt
- *  is a refusal the player retries). */
+ *  is a refusal the player retries), and the flush IS one of those saves. */
 export const ESCROW_STATEMENT_TIMEOUT_MS = 4_000;
 
 const LISTING_COLS =
@@ -1147,18 +1154,43 @@ export function wocMarketLockWaitTimeoutCount(): number {
   return lockWaitTimeouts;
 }
 
+/** Process-lifetime count of guard transactions killed as deadlock victims
+ *  (40P01). The class was classified 'contended' from the start but counted
+ *  by NEITHER sibling counter, so a lock-order regression (the exact defect
+ *  the crossing-shape pg tests exist for) was invisible on the readout: a
+ *  rate here says two guards are crossing, which is a bug to find, not
+ *  contention to tolerate (the escrow write-path rider's contention-class
+ *  label). */
+let deadlockCount = 0;
+
+export function wocMarketDeadlockCount(): number {
+  return deadlockCount;
+}
+
+/** Process-lifetime count of transactions that provably NEVER STARTED (the
+ *  checkout and BEGIN arms below). Arrives in volume under pool saturation,
+ *  which is exactly when an operator needs the class split from ordinary
+ *  lock contention: never-started says the POOL is the bottleneck, the lock
+ *  counter says a ROW is. */
+let txNeverStartedCount = 0;
+
+export function wocMarketTxNeverStartedCount(): number {
+  return txNeverStartedCount;
+}
+
 function isLockContention(err: unknown): boolean {
   const code = (err as { code?: string }).code;
   // 25P03: the guard transaction sat idle past its in-transaction timeout
   // (an event-loop stall on the shared box) and the server terminated the
   // session rather than let it hold the row lock unbounded. Plain
   // contention to the caller: retry immediately.
-  // Counting 55P03 here is sound because every guard routes its error
-  // through exactly one tail that calls this classifier once: most map it
-  // to their typed 'contended', the no-winner close probe answers false
+  // Counting 55P03 and 40P01 here is sound because every guard routes its
+  // error through exactly one tail that calls this classifier once: most map
+  // it to their typed 'contended', the no-winner close probe answers false
   // (park the listing), and the delivered-save tail classifies only to
   // count, then rethrows to commitGrant's transient arm.
   if (code === '55P03') lockWaitTimeouts++;
+  if (code === '40P01') deadlockCount++;
   return code === '55P03' || code === '40P01' || code === '25P03';
 }
 
@@ -1170,6 +1202,7 @@ export class PgWocMarketDb implements WocMarketDb {
     try {
       client = await this.pool.connect();
     } catch (err) {
+      txNeverStartedCount++;
       throw new TxNeverStarted(err);
     }
     // The idle-in-transaction timeout TERMINATES THE SESSION, and its
@@ -1203,6 +1236,7 @@ export class PgWocMarketDb implements WocMarketDb {
         await client.query('BEGIN');
       } catch (err) {
         beginFailed = true;
+        txNeverStartedCount++;
         throw new TxNeverStarted(err);
       }
       const out = await fn(client);

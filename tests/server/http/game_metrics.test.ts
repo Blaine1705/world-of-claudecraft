@@ -49,6 +49,7 @@ import {
   WOC_PLAYERS_ONLINE,
   WOC_ROD_FEE_COPPER,
   WOC_ROD_FEE_PAYMENTS_TOTAL,
+  WOC_SAVE_PENDING_KEYS,
   WOC_SIM_ENTITIES,
   WOC_SIM_TICK_HZ,
   WOC_SIM_TICK_PHASE_SECONDS,
@@ -73,6 +74,7 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     wsConnections: () => 5,
     simEntities: () => 42,
     simTickHz: () => 20,
+    savePendingKeys: () => 6,
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
     generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
@@ -134,6 +136,7 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(WOC_WS_CONNECTIONS).toBe('woc_ws_connections');
     expect(WOC_SIM_ENTITIES).toBe('woc_sim_entities');
     expect(WOC_SIM_TICK_HZ).toBe('woc_sim_tick_hz');
+    expect(WOC_SAVE_PENDING_KEYS).toBe('woc_character_save_pending_keys');
 
     for (const name of [
       WOC_PLAYERS_ONLINE,
@@ -141,6 +144,7 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
       WOC_WS_CONNECTIONS,
       WOC_SIM_ENTITIES,
       WOC_SIM_TICK_HZ,
+      WOC_SAVE_PENDING_KEYS,
     ]) {
       expect(text).toContain(`# TYPE ${name} gauge`);
     }
@@ -150,6 +154,10 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_ws_connections (\d+)$/m)).toBe('5');
     expect(sampleValue(text, /^woc_sim_entities (\d+)$/m)).toBe('42');
     expect(sampleValue(text, /^woc_sim_tick_hz (\d+)$/m)).toBe('20');
+    // The character-save FIFO gauge (the escrow write-path rider): the stub
+    // returns 6, and a live read at scrape time is what the no-drift test
+    // below proves for the family.
+    expect(sampleValue(text, /^woc_character_save_pending_keys (\d+)$/m)).toBe('6');
   });
 
   it('exports pg pool saturation by state from the source snapshot', async () => {
@@ -482,7 +490,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     // otherwise visible only as a throttled warn line), so a rename must fail
     // here rather than silently retire an operator's alert rule.
     expect(WOC_ESCROW_QUEUE_OUTCOMES).toEqual([
-      // The throughput baseline the four failure kinds are read against: a
+      // The throughput baseline the failure kinds are read against: a
       // refusal rate means nothing without the jobs that started.
       'started',
       // Waited past the queue deadline. Nothing was extracted (the job is
@@ -495,6 +503,12 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       'books_dirty_refused',
       // The pre-job guild-book flush itself failed.
       'flush_failed',
+      // The realm-global escrow gate was at cap (the write-path rider's
+      // bound): realm-wide saturation the per-character kinds cannot see.
+      'realm_refused',
+      // The terminal sibling: a held sequence released its slot, whatever
+      // its outcome, so entered-minus-settled is the wedge signal.
+      'settled',
     ]);
 
     // Scrape BEFORE any increment: prom counters cannot backfill, so a rate
