@@ -4837,7 +4837,7 @@ GAME repo, worktree /Users/fernando/Documents/wocc-marketplace, branch
 feature/woc-marketplace. Session start 057b54141a (the 19 QA docs tip);
 release sync a NO-OP (343 ahead, 0 behind origin/release/v0.40.0, still the
 newest release branch). LOCAL per R4: nothing pushed anywhere; the 20 QA
-session diffs 057b54141a..<tip recorded below> and pushes on PASS. Closes the
+session diffs 057b54141a..31d07c6375 (eleven commits) and pushes on PASS. Closes the
 "Money/security SQL is fake-only" medium (review.md medium list, first item).
 
 Commits (the five code/test commits; the docs commit rides on top):
@@ -5101,7 +5101,7 @@ typecheck and all builds green, run WITH TEST_DATABASE_URL only and a clear
 field (no concurrent pg-suite runs). The earlier FAIL at f70dea28f2 was the
 reviewer-collision documented above, not a regression.
 
-Registry for the 20 QA session: diff range 057b54141a..<tip below>; the
+Registry for the 20 QA session: diff range 057b54141a..31d07c6375; the
 JUDGED and DEFERRED lists above are binding; the mutation log and the
 state.md inventory are the artifacts to audit; reviewers this round were
 test-coverage-auditor and database-performance-reviewer (as read-only
