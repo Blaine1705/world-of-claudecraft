@@ -2934,6 +2934,7 @@ export const QUEST_NEW = {
     aldrenYell: '{name} křičí: "Nikdo nebude rušit králův odpočinek! Za Thornpeak!"',
     malricYell: '{name} křičí: "Smrt si mého krále nikdy nevezme! Rituál musí vytrvat!"',
     vossYell: '{name} křičí: "Nedostaneš se k němu! Král musí vytrvat!"',
+    crabsYell: '{name} křičí: "MOJE! Ta perla je moje a moje zůstane!"',
   },
   da_DK: {
     aldrenVision1: 'Min konge var en god mand.',
@@ -2953,6 +2954,7 @@ export const QUEST_NEW = {
     vossVision3: 'Vi burde have ladet ham hvile.',
     vossVision4: 'Hvis du finder krypten... så gør en ende på dette.',
     vossYell: '{name} råber: "Du når ham ikke! Kongen må bestå!"',
+    crabsYell: '{name} råber: "MIN! Perlen er min, og min bliver den!"',
   },
   id_ID: {
     aldrenVision1: 'Rajaku adalah orang yang baik.',
@@ -2974,6 +2976,7 @@ export const QUEST_NEW = {
     vossVision3: 'Seharusnya kita biarkan dia beristirahat.',
     vossVision4: 'Jika kau temukan kriptanya... akhiri ini.',
     vossYell: '{name} berteriak, "Kau takkan mencapainya! Sang raja harus bertahan!"',
+    crabsYell: '{name} berteriak, "PUNYAKU! Mutiara itu milikku, dan tetap milikku!"',
   },
   nl_NL: {
     aldrenVision1: 'Mijn koning was een goed man.',
@@ -2994,6 +2997,7 @@ export const QUEST_NEW = {
     vossVision3: 'We hadden hem moeten laten rusten.',
     vossVision4: 'Als je de crypte vindt... maak hier een eind aan.',
     vossYell: '{name} schreeuwt: "Je zult hem niet bereiken! De koning moet standhouden!"',
+    crabsYell: '{name} schreeuwt: "VAN MIJ! De parel is van mij, en van mij blijft ze!"',
   },
   pl_PL: {
     aldrenVision1: 'Mój król był dobrym człowiekiem.',
@@ -3013,6 +3017,7 @@ export const QUEST_NEW = {
     vossVision3: 'Powinniśmy byli pozwolić mu spocząć.',
     vossVision4: 'Jeśli odnajdziesz kryptę... zakończ to.',
     vossYell: '{name} krzyczy: "Nie dosięgniesz go! Król musi przetrwać!"',
+    crabsYell: '{name} krzyczy: "MOJA! Perła jest moja i moja pozostanie!"',
   },
   sv_SE: {
     aldrenVision1: 'Min kung var en god man.',
@@ -3032,6 +3037,7 @@ export const QUEST_NEW = {
     vossVision3: 'Vi borde ha låtit honom vila.',
     vossVision4: 'Om du finner kryptan... gör slut på detta.',
     vossYell: '{name} ropar: "Du skall inte nå honom! Kungen måste bestå!"',
+    crabsYell: '{name} ropar: "MIN! Pärlan är min, och min förblir den!"',
   },
   tr_TR: {
     aldrenVision1: 'Kralım iyi bir adamdı.',
@@ -3051,6 +3057,7 @@ export const QUEST_NEW = {
     vossVision3: 'Onu huzura bırakmalıydık.',
     vossVision4: 'Mahzeni bulursan... buna bir son ver.',
     vossYell: '{name} haykırıyor: "Ona ulaşamayacaksın! Kral dayanmalı!"',
+    crabsYell: '{name} bağırıyor: "BENİM! İnci benim ve benim kalacak!"',
   },
   vi_VN: {
     aldrenVision1: 'Đức vua của ta là một người tốt.',
@@ -3071,6 +3078,7 @@ export const QUEST_NEW = {
     vossVision3: 'Lẽ ra chúng ta nên để ngài yên nghỉ.',
     vossVision4: 'Nếu ngươi tìm thấy hầm mộ... hãy kết thúc chuyện này.',
     vossYell: '{name} hét lên, "Ngươi sẽ không tới được chỗ ngài! Đức vua phải trường tồn!"',
+    crabsYell: '{name} hét lên, "CỦA TA! Viên ngọc trai là của ta, mãi mãi là của ta!"',
   },
 };
 

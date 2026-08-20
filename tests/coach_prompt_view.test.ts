@@ -143,9 +143,14 @@ describe('coachPromptPlan: which target carries the bubble', () => {
     expect(during!.kind).toBe('kill');
     expect(during!.verbKey).toBe('hudChrome.bootcamp.promptAttack');
     expect({ x: during!.x, z: during!.z }).toEqual(boss.pos);
-    // A dead king reads as "not up": the lure ask returns for the re-summon.
-    const after = plan({ focus, entities: [{ ...boss, dead: true }] });
-    expect(after!.kind).toBe('use');
+    // While the king's corpse lies on the sand the press that matters is
+    // the loot (the pearl is on it), never a re-summon over its shell.
+    const corpse = plan({ focus, entities: [{ ...boss, dead: true }] });
+    expect(corpse!.kind).toBe('interact');
+    expect(corpse!.verbKey).toBe('hudChrome.bootcamp.promptPickUp');
+    expect({ x: corpse!.x, z: corpse!.z }).toEqual(boss.pos);
+    // Corpse gone (despawned unlooted): the lure ask returns for the retry.
+    expect(plan({ focus, entities: [] })!.kind).toBe('use');
   });
 
   it('asks for the hurdle jump, then the crate step, then goes quiet', () => {

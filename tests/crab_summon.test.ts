@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { PROVING_SHORE_NPCS } from '../src/sim/content/proving_shore';
 import { MOBS, QUESTS } from '../src/sim/data';
+import { summonQuestMob } from '../src/sim/encounters/quest_summon';
 import {
   CRAB_MOB_ID,
   CRAB_QUEST_ID,
@@ -161,6 +162,49 @@ describe('the Mother of Pearl chain in a real sim', () => {
     sim.ctx.dealDamage(sim.player, second!, 9_999, false, 'physical', null, 'hit');
     const qp = sim.questLog.get(CRAB_QUEST_ID)!;
     expect(qp.counts[0]).toBe(1);
+  });
+
+  it('stays silent for a player who never took the quest', () => {
+    const sim = makeSim();
+    // No quest, standing right at the pool with a lure smuggled into bags:
+    // the use is a silent no-op, never a toast and never a boss.
+    sim.ctx.addItem(LURE_ITEM_ID, 1, sim.playerId);
+    teleportTo(sim, CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z);
+    sim.drainEvents();
+    sim.useItem(LURE_ITEM_ID);
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    expect(liveBoss(sim)).toBeNull();
+  });
+
+  it('shares the pool: a second summoner raises their OWN king', () => {
+    // The island is shared, so the alive-gate is scoped to the caller's tap:
+    // a stranger's crab prowling the pool never queues another quest holder.
+    const sim = makeSim();
+    startQuest(sim);
+    teleportTo(sim, CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z);
+    // A stranger's summon (an unrelated owner id) stands at the pool.
+    summonQuestMob(
+      sim.ctx,
+      CRAB_MOB_ID,
+      { x: CRAB_SUMMON_SITE.x, y: 0, z: CRAB_SUMMON_SITE.z },
+      -1,
+      { perOwner: true },
+    );
+    const strangers = liveBoss(sim);
+    expect(strangers).toBeTruthy();
+    expect(strangers!.tappedById).toBe(-1);
+    // The player's own lure still works beside it.
+    sim.drainEvents();
+    sim.useItem(LURE_ITEM_ID);
+    const crabs = [...sim.entities.values()].filter(
+      (e) => e.kind === 'mob' && e.templateId === CRAB_MOB_ID && !e.dead,
+    );
+    expect(crabs).toHaveLength(2);
+    expect(crabs.some((c) => c.tappedById === sim.playerId)).toBe(true);
+    // But a SECOND use by the same player warns instead of stacking a third.
+    sim.drainEvents();
+    sim.useItem(LURE_ITEM_ID);
+    expect(errorTexts(sim.drainEvents())).toContain('Mister Crabs already prowls the pool!');
   });
 
   it('pins the anti-grief and reward wiring on the content records', () => {

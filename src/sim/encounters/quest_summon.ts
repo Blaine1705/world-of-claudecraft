@@ -13,9 +13,19 @@ export function summonQuestMob(
   templateId: string,
   pos: Vec3,
   ownerPid: number,
+  // perOwner scopes the duplicate guard to THIS summoner's tap: on a shared
+  // site (the island tide pool) every quest holder raises their own copy
+  // instead of queueing behind a stranger's. Omitted, the guard stays
+  // site-wide, the original Nythraxis behavior.
+  opts?: { perOwner?: boolean },
 ): void {
   const existing = [...ctx.entities.values()].some(
-    (e) => e.kind === 'mob' && e.templateId === templateId && !e.dead && dist2d(e.pos, pos) < 18,
+    (e) =>
+      e.kind === 'mob' &&
+      e.templateId === templateId &&
+      !e.dead &&
+      dist2d(e.pos, pos) < 18 &&
+      (!opts?.perOwner || e.tappedById === ownerPid),
   );
   if (existing) return;
   const template = MOBS[templateId];

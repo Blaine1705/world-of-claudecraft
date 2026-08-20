@@ -143,6 +143,12 @@ const baseEnTable = {
   'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
+  // Tide-pool summon refusals (src/sim/interactions/crab_summon.ts
+  // REASON_MESSAGE). Placeholder-free, so they register in the EXACT matcher
+  // automatically.
+  'error.crabQuestDone': 'You have what you came for. Tidewarden Nel waits on your prize.',
+  'error.crabLureTooFar': 'Carry the lure to the tide pool west of the wreck line.',
+  'error.crabAlreadyUp': 'Mister Crabs already prowls the pool!',
   // Firebottle hut burns (src/sim/interactions/firebottle_hut.ts REASON_MESSAGE).
   'error.firebottleNeeded': 'You need a firebottle to torch that.',
   'error.firebottleNotReady': 'Your firebottle is not ready yet.',
@@ -10179,7 +10185,8 @@ type QuestExtraKey =
   | 'awakens'
   | 'aldrenYell'
   | 'malricYell'
-  | 'vossYell';
+  | 'vossYell'
+  | 'crabsYell';
 
 export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string>> = {
   en: {
@@ -10200,6 +10207,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} yells, "None shall disturb the king\'s rest! For Thornpeak!"',
     malricYell: '{name} yells, "Death shall never claim my king! The ritual must endure!"',
     vossYell: '{name} yells, "You will not reach him! The king must endure!"',
+    crabsYell: '{name} yells, "MINE! The pearl is mine, and mine she stays!"',
   },
   en_CA: {
     ritualNeedsKey: 'The ritual circle is silent without the Crypt Keystone.',
@@ -10219,6 +10227,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} yells, "None shall disturb the king\'s rest! For Thornpeak!"',
     malricYell: '{name} yells, "Death shall never claim my king! The ritual must endure!"',
     vossYell: '{name} yells, "You will not reach him! The king must endure!"',
+    crabsYell: '{name} yells, "MINE! The pearl is mine, and mine she stays!"',
   },
   es: {
     ritualNeedsKey: 'El círculo ritual calla sin la Piedra clave de la cripta.',
@@ -10238,6 +10247,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "¡Nadie perturbará el descanso del rey! ¡Por Thornpeak!"',
     malricYell: '{name} grita: "¡La muerte nunca reclamará a mi rey! ¡El ritual debe perdurar!"',
     vossYell: '{name} grita: "¡No llegarás hasta él! ¡El rey debe perdurar!"',
+    crabsYell: '{name} grita: "MIA! La perla es mia, y mia se queda!"',
   },
   es_ES: {
     ritualNeedsKey: 'El círculo ritual calla sin la Piedra clave de la cripta.',
@@ -10257,6 +10267,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "¡Nadie perturbará el descanso del rey! ¡Por Thornpeak!"',
     malricYell: '{name} grita: "¡La muerte nunca reclamará a mi rey! ¡El ritual debe perdurar!"',
     vossYell: '{name} grita: "¡No llegarás hasta él! ¡El rey debe perdurar!"',
+    crabsYell: '{name} grita: "MIA! La perla es mia, y mia se queda!"',
   },
   fr_FR: {
     ritualNeedsKey: 'Le cercle rituel reste muet sans la clef de la crypte.',
@@ -10276,6 +10287,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} crie: "Nul ne troublera le repos du roi! Pour Thornpeak!"',
     malricYell: '{name} crie: "La mort ne prendra jamais mon roi! Le rituel doit durer!"',
     vossYell: '{name} crie: "Vous ne l’atteindrez pas! Le roi doit durer!"',
+    crabsYell: '{name} crie: "A MOI! La perle est a moi, et a moi elle restera!"',
   },
   fr_CA: {
     ritualNeedsKey: 'Le cercle rituel reste muet sans la clef de la crypte.',
@@ -10295,6 +10307,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} crie: "Nul ne troublera le repos du roi! Pour Thornpeak!"',
     malricYell: '{name} crie: "La mort ne prendra jamais mon roi! Le rituel doit durer!"',
     vossYell: '{name} crie: "Vous ne l’atteindrez pas! Le roi doit durer!"',
+    crabsYell: '{name} crie: "A MOI! La perle est a moi, et a moi elle restera!"',
   },
   it_IT: {
     ritualNeedsKey: 'Il cerchio rituale tace senza la Chiave di volta della cripta.',
@@ -10314,6 +10327,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grida: "Nessuno disturberà il riposo del re! Per Thornpeak!"',
     malricYell: '{name} grida: "La morte non reclamerà mai il mio re! Il rituale deve durare!"',
     vossYell: '{name} grida: "Non lo raggiungerai! Il re deve durare!"',
+    crabsYell: '{name} grida: "MIA! La perla e mia, e mia restera!"',
   },
   de_DE: {
     ritualNeedsKey: 'Der Ritualkreis schweigt ohne den Kryptenschlüsselstein.',
@@ -10333,6 +10347,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} ruft: "Niemand stört die Ruhe des Königs! Für Thornpeak!"',
     malricYell: '{name} ruft: "Der Tod soll meinen König nie fordern! Das Ritual muss bestehen!"',
     vossYell: '{name} ruft: "Ihr werdet ihn nicht erreichen! Der König muss bestehen!"',
+    crabsYell: '{name} ruft: "MEINS! Die Perle gehoert mir, und bei mir bleibt sie!"',
   },
   zh_CN: {
     ritualNeedsKey: '没有墓穴钥石，仪式法阵一片沉寂。',
@@ -10352,6 +10367,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}喊道：“谁也不得惊扰国王的安眠！为了 Thornpeak！”',
     malricYell: '{name}喊道：“死亡永远不能带走我的国王！仪式必须延续！”',
     vossYell: '{name}喊道：“你们到不了他身边！国王必须延续！”',
+    crabsYell: '{name}喊道：“我的！珍珠是我的，永远都是我的！”',
   },
   zh_TW: {
     ritualNeedsKey: '沒有墓穴鑰石，儀式法陣一片沉寂。',
@@ -10371,6 +10387,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}喊道：「誰也不得驚擾國王的安眠！為了 Thornpeak！」',
     malricYell: '{name}喊道：「死亡永遠不能帶走我的國王！儀式必須延續！」',
     vossYell: '{name}喊道：「你們到不了他身邊！國王必須延續！」',
+    crabsYell: '{name}喊道：「我的！珍珠是我的，永遠都是我的！」',
   },
   ko_KR: {
     ritualNeedsKey: '무덤 열쇠돌 없이는 의식진이 침묵합니다.',
@@ -10391,6 +10408,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     malricYell:
       '{name}이(가) 외칩니다. "죽음은 결코 내 왕을 데려가지 못한다! 의식은 계속되어야 한다!"',
     vossYell: '{name}이(가) 외칩니다. "너희는 그에게 닿지 못한다! 왕은 이어져야 한다!"',
+    crabsYell: '{name}이(가) 외칩니다. "내 거다! 진주는 내 것, 영원히 내 것이다!"',
   },
   ja_JP: {
     ritualNeedsKey: '墓所の要石がなければ、儀式陣は沈黙したままです。',
@@ -10410,6 +10428,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}が叫ぶ。「王の眠りを乱す者は許さぬ！ Thornpeakのために！」',
     malricYell: '{name}が叫ぶ。「死は我が王を奪えぬ！ 儀式は続かねばならぬ！」',
     vossYell: '{name}が叫ぶ。「お前たちは王に届かぬ！ 王は永らえねばならぬ！」',
+    crabsYell: '{name}が叫ぶ。「わしのだ！真珠はわしのもの、ずっとわしのものじゃ！」',
   },
   pt_BR: {
     ritualNeedsKey: 'O círculo ritual fica em silêncio sem a Pedra-chave da cripta.',
@@ -10429,6 +10448,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "Ninguém perturbará o descanso do rei! Por Thornpeak!"',
     malricYell: '{name} grita: "A morte jamais levará meu rei! O ritual deve perdurar!"',
     vossYell: '{name} grita: "Você não chegará até ele! O rei deve perdurar!"',
+    crabsYell: '{name} grita: "MINHA! A perola e minha, e minha ela fica!"',
   },
   ru_RU: {
     ritualNeedsKey: 'Ритуальный круг молчит без ключ-камня крипты.',
@@ -10449,6 +10469,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     malricYell:
       '{name} кричит: "Смерть никогда не заберет моего короля! Ритуал должен сохраниться!"',
     vossYell: '{name} кричит: "Вы не доберетесь до него! Король должен сохраниться!"',
+    crabsYell: '{name} кричит: "МОЯ! Жемчужина моя, моей и останется!"',
   },
   ...QUEST_NEW,
 };
@@ -11094,6 +11115,10 @@ const RULES: Rule[] = [
   {
     re: /^Deathstalker Voss yells, "You will not reach him! The king must endure!"$/,
     build: () => tQuestExtra('vossYell', { name: locMob('Deathstalker Voss') }),
+  },
+  {
+    re: /^Mister Crabs yells, "MINE! The pearl is mine, and mine she stays!"$/,
+    build: () => tQuestExtra('crabsYell', { name: locMob('Mister Crabs') }),
   },
   {
     re: /^You may choose a specialization at level (\d+)\.$/,

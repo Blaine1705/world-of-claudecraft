@@ -44,11 +44,14 @@ const REASON_MESSAGE: Record<CrabSummonReason, string | null> = {
   alreadyProwling: 'Mister Crabs already prowls the pool!',
 };
 
-/** A live Mister Crabs anywhere near the pool (the pre-summon gate, and the
- *  coach's "is he up" read). */
-export function liveCrabBoss(entities: Iterable<Entity>): Entity | null {
+/** A live Mister Crabs, optionally only the one tapped to `ownerPid`. The
+ *  summon gate passes the owner (a shared island: each quest holder raises
+ *  and fights their OWN king, never queues behind a stranger's); the coach's
+ *  "is he up" read passes no owner and takes any. */
+export function liveCrabBoss(entities: Iterable<Entity>, ownerPid?: number): Entity | null {
   for (const e of entities) {
     if (e.kind !== 'mob' || e.templateId !== CRAB_MOB_ID || e.dead) continue;
+    if (ownerPid !== undefined && e.tappedById !== ownerPid) continue;
     return e;
   }
   return null;
@@ -63,7 +66,7 @@ export function useBrinyLure(ctx: SimContext, player: Entity, meta: PlayerMeta):
   const check = crabSummonCheck({
     questState,
     distance: dist2d(player.pos, { x: CRAB_SUMMON_SITE.x, y: player.pos.y, z: CRAB_SUMMON_SITE.z }),
-    bossAlive: liveCrabBoss(ctx.entities.values()) !== null,
+    bossAlive: liveCrabBoss(ctx.entities.values(), meta.entityId) !== null,
   });
   if (!check.ok) {
     const message = REASON_MESSAGE[check.reason];
@@ -75,5 +78,6 @@ export function useBrinyLure(ctx: SimContext, player: Entity, meta: PlayerMeta):
     CRAB_MOB_ID,
     { x: CRAB_SUMMON_SITE.x, y: 0, z: CRAB_SUMMON_SITE.z },
     meta.entityId,
+    { perOwner: true },
   );
 }

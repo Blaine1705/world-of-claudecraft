@@ -230,7 +230,9 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
     family: 'beast',
     hpBase: 70,
     hpPerLevel: 0,
-    dmgBase: 4,
+    // Harder per pinch than a scuttler (4 per 2.0s): the quest copy promises
+    // it, and 6 per 2.4s is still a safe long fight for a level 2 recruit.
+    dmgBase: 6,
     dmgPerLevel: 0,
     attackSpeed: 2.4,
     armorPerLevel: 6,
@@ -241,7 +243,11 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
     canSwim: true,
     requiresQuestId: 'q_ps_mother_of_pearl',
     loot: [
-      { copper: 30, chance: 1 },
+      // Quest-gated like the pearl. The summon is repeatable while the quest
+      // is active (the no-strand rule), which makes this a reviewed and
+      // accepted micro-faucet: ~30 copper per full summon-kill cycle, well
+      // under any economy ceiling, and it closes at the hand-in.
+      { copper: 30, chance: 1, questId: 'q_ps_mother_of_pearl' },
       // The prize, for quest holders only (LootEntry.questId): nobody else
       // can even damage him (requiresQuestId above), so the pearl never
       // rots on a corpse a stranger tapped.

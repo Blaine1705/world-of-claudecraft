@@ -222,10 +222,13 @@ describe('content referential integrity', () => {
     // and blocking the downstream Galecrest chain via requiresQuest. The
     // "every quest reference resolves" test above only checks the mob id
     // exists, never that anything spawns it, so this closes that gap.
-    // bound_guardian is a Nythraxis raid-encounter add spawned by the
-    // encounter script itself (src/sim/encounters/nythraxis.ts), not a
-    // world camp or a dungeon spawn list, so it is a documented exception.
-    const RAID_ENCOUNTER_SPAWNED = new Set(['bound_guardian']);
+    // Script-spawned quest mobs are the documented exceptions: neither a
+    // world camp nor a dungeon spawn list creates them. bound_guardian is a
+    // Nythraxis raid-encounter add (src/sim/encounters/nythraxis.ts);
+    // mister_crabs is the Proving Shore's tide-pool summon, called up by the
+    // Briny Lure through summonQuestMob (src/sim/interactions/crab_summon.ts)
+    // and re-summonable while its quest is active, so it can never strand.
+    const SCRIPT_SPAWNED = new Set(['bound_guardian', 'mister_crabs']);
     const spawning = new Set<string>();
     for (const c of CAMPS) spawning.add(c.mobId);
     for (const d of DUNGEON_LIST) for (const s of d.spawns) spawning.add(s.mobId);
@@ -236,7 +239,7 @@ describe('content referential integrity', () => {
           obj.type === 'kill' &&
           obj.targetMobId &&
           !spawning.has(obj.targetMobId) &&
-          !RAID_ENCOUNTER_SPAWNED.has(obj.targetMobId)
+          !SCRIPT_SPAWNED.has(obj.targetMobId)
         ) {
           problems.push(`${q.id}: kill target ${obj.targetMobId} has no camp/dungeon spawn source`);
         }

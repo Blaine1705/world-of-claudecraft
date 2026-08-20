@@ -110,6 +110,27 @@ export function nearestMob(
   return best;
 }
 
+/** The nearest DEAD mob of a template: the pearl detour's loot window (the
+ *  king's corpse holds the prize, and the press that matters is Pick up,
+ *  not a re-summon). */
+export function nearestDeadMob(
+  entities: Iterable<CoachPromptEntity>,
+  templateId: string,
+  playerPos: { x: number; z: number },
+): CoachPromptEntity | null {
+  let best: CoachPromptEntity | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const e of entities) {
+    if (e.kind !== 'mob' || e.templateId !== templateId || !e.dead) continue;
+    const d = planar(e.pos.x, e.pos.z, playerPos.x, playerPos.z);
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
+  }
+  return best;
+}
+
 /** The two kill lessons' quarry (the Attack bubble's scan target). */
 const KILL_LESSON_TEMPLATE: Readonly<Record<string, string>> = {
   q_ps_strike_true: 'training_effigy',
@@ -157,6 +178,8 @@ export const JUMP_PROMPT_RANGE = 9;
 /** A stride past the obstacle's line counts as cleared: the bubble moves on
  *  to the next obstacle instead of nagging over a jump already landed. */
 const PARKOUR_PASSED_SLACK = 1.2;
+/** Half of lane 2's width plus a step of slack (walls at x -312 and -304). */
+const PARKOUR_LANE_HALF_WIDTH = 5;
 /** Above the hurdle rail's top, below the lane's sightline. */
 const JUMP_LIFT = 1.2;
 
@@ -165,6 +188,9 @@ const JUMP_LIFT = 1.2;
  *  the centered D-then-W chips give way while a jump ask is on screen. */
 export function parkourPromptPlan(playerPos: { x: number; z: number }): CoachPromptPlan | null {
   for (const ob of BOOTCAMP_PARKOUR) {
+    // Lane-scoped: lanes 1 and 3 run within 9 yd of the obstacles' x line,
+    // and a jump ask over there would point at a wall.
+    if (Math.abs(playerPos.x - ob.x) > PARKOUR_LANE_HALF_WIDTH) continue;
     if (playerPos.z <= ob.z - PARKOUR_PASSED_SLACK) continue;
     return {
       x: ob.x,
@@ -225,9 +251,22 @@ export function coachPromptPlan(args: {
   const quarry = KILL_LESSON_TEMPLATE[focus.questId];
   if (quarry) {
     const mob = nearestMob(args.entities, quarry, args.playerPos);
-    // The pearl detour's quarry is SUMMONED: until the king is up, the
-    // bubble stands on the tide pool asking for the lure (bags bind).
+    // The pearl detour's quarry is SUMMONED: while the king's corpse still
+    // lies on the sand the press that matters is the loot (the pearl is on
+    // it), and only with no corpse at all does the bubble stand on the tide
+    // pool asking for the lure (bags bind).
     if (!mob && focus.questId === CRAB_QUEST_ID) {
+      const corpse = nearestDeadMob(args.entities, CRAB_MOB_ID, args.playerPos);
+      if (corpse) {
+        return {
+          x: corpse.pos.x,
+          z: corpse.pos.z,
+          lift: KILL_BUBBLE_LIFT,
+          range: KILL_PROMPT_RANGE,
+          verbKey: 'hudChrome.bootcamp.promptPickUp',
+          kind: 'interact',
+        };
+      }
       return {
         x: CRAB_SUMMON_SITE.x,
         z: CRAB_SUMMON_SITE.z,
