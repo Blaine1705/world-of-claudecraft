@@ -463,3 +463,39 @@ that cannot fail is theatre):
 
 Rider QA totals: 16 distinct mutants, 16 BIT, 0 survivors, 0 controls. Whole
 log after this section: 341 distinct mutants.
+
+## Auth-guard rider section (run by the rider implement session)
+
+Same protocol as the header: every strip occurrence-asserted, git-diff-proven,
+run-proven by the Tests summary line, reverted by git checkout over the
+committed tree with a clean-status verify after each row. One serial lane in
+the throwaway worktree wocc-marketplace-authmut at the audited tip; the one
+pg mutant ran ALONE with TEST_DATABASE_URL on the command line (the
+fixed-database-name collision rule) while no other authguard-suite process
+existed on the machine. Suites named per row are the OWNING suites the
+verdict was scored against.
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| auth_core_expiry_strip | BIT | auth_guard_core, woc_auth_guard_cache | rider; the read-time expires_at re-check removed from tokenInfoFromRow (4 tests red across both suites) |
+| auth_core_scope_allowlist_strip | BIT | auth_guard_core | rider; the fail-closed scope allowlist removed (every unrecognized-scope arm red) |
+| auth_core_expiry_boundary_flip | BIT | auth_guard_core | rider; strictly-greater flipped to greater-or-equal, caught at the exact-instant pin |
+| auth_core_suspension_clock_strip | BIT | auth_guard_core, woc_auth_guard_cache | rider; the suspension lapse compare made clock-free (a suspended row locked forever), caught by the row-not-result flip pins in BOTH suites |
+| auth_core_ban_unlocked | BIT | auth_guard_core, woc_auth_guard_cache, woc_market_auth_guard_wiring | rider; the ban branch answers locked false (4 tests red incl. the pg-shaped ban message pin) |
+| auth_cache_negative_install | BIT | woc_auth_guard_cache | rider; null probes installed as entries (7 tests red: the eviction-lever defense plus every count that assumed no negative caching) |
+| auth_cache_lostbust_cancel_strip | BIT | woc_auth_guard_cache | rider; bust() stops cancelling the in-flight fetch, caught by the lost-bust install pin |
+| auth_cache_ttl_ignored | BIT | woc_auth_guard_cache | rider; the TTL freshness gate forced true (stale entries serve forever), caught by the TTL-refetch and no-stale-serve pins |
+| auth_cache_dead_entry_kept | BIT | woc_auth_guard_cache | rider; the expired-at-read-time entry drop removed, caught by the entries-after-expiry pin |
+| auth_cache_account_bust_tokens_strip | BIT | woc_auth_guard_cache, woc_market_auth_guard_wiring | rider; bustAccount stops dropping the account's indexed tokens (the prefix over-bust arm red in the unit suite and at the route level) |
+| auth_cache_single_flight_strip | BIT | woc_auth_guard_cache | rider; concurrent readers each start their own fetch |
+| auth_bust_revoke_companion_strip | BIT | auth_guard_bust_coverage | rider; revokeCompanionToken's bust call removed, the discovery reconciliation reds (pg twin: the same strip reds woc_market_authguard_pg_integration's over-bust proof) |
+| auth_bust_moderate_account_strip | BIT | auth_guard_bust_coverage | rider; moderateAccount's post-commit bust removed, the discovery reconciliation reds |
+| auth_wiring_override_precedence_flip | BIT | woc_market_auth_guard_wiring | rider; the runtime cache outranks the test override, caught by the precedence pin (a rig answered from a cache it cannot see) |
+| auth_wiring_readout_stat_strip | BIT | woc_market_hot_reads | rider; the authGuard stats field dropped from the stuck readout merge literal |
+| auth_scan_shadow_writer_planted | BIT | auth_guard_bust_coverage | rider; a NEW unbusted `UPDATE accounts SET banned_at` writer planted in db.ts, proving the discovery scan reds on a writer no hand list knows about |
+| auth_pg_token_qual_strip | BIT | woc_market_authguard_pg_integration | rider; the `expires_at > now()` qual dropped from the real probe SQL, caught by the expired-row refusal against real rows (pg lane, ran alone) |
+| auth_comment_only_control | SURVIVED | auth_guard_core, woc_auth_guard_cache, auth_guard_bust_coverage, woc_market_auth_guard_wiring | rider; deliberate no-op control (comment edit), all 47 tests green |
+
+Auth-guard rider totals: 18 distinct mutants, 17 BIT, 1 deliberate green
+control, 0 unexplained survivors. Whole log after this section: 359 distinct
+mutants.
