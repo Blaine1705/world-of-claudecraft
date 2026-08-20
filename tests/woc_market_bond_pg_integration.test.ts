@@ -1830,4 +1830,180 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       // defensive; the wire's empty-to-null collapse is pinned separately.
     });
   });
+
+  // -------------------------------------------------------------------------
+  // Bid intake: the refusal ladder insertPendingBid judges over the LOCKED
+  // listing row. Until now only the fake twin answered these words; each arm
+  // here lands real rows and reads the ledger back, so deleting a guard
+  // either mints a bid the ladder must refuse or refuses one it must mint.
+  // -------------------------------------------------------------------------
+
+  describe('bid intake refusal ladder, in real SQL', () => {
+    function bidArgs(
+      realm: string,
+      listingId: number,
+      account: number,
+      over: { wallet?: string; amountCents?: number; minNext?: number; nowMs?: number } = {},
+    ) {
+      seq++;
+      return {
+        realm,
+        listingId,
+        account,
+        characterId: 8000 + seq,
+        characterName: `Bidder${seq}`,
+        wallet: over.wallet ?? `wallet-intake-${seq}`,
+        amountCents: over.amountCents ?? 700,
+        bondCents: 70,
+        nowMs: over.nowMs ?? BASE_MS,
+        minNext: () => over.minNext ?? 0,
+      };
+    }
+
+    async function bidCount(listingId: number): Promise<number> {
+      const res = await pool.query(
+        `SELECT count(*)::int AS n FROM woc_market_bids WHERE listing_id = $1`,
+        [listingId],
+      );
+      return Number(res.rows[0].n);
+    }
+
+    it('refuses the seller account and the seller wallet twin as own_listing; a stranger lands', async () => {
+      const realm = `bid-own-${++seq}`;
+      const seller = await seedAccount();
+      const twin = await seedAccount();
+      const stranger = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const sellerWallet = String(
+        (await pool.query(`SELECT seller_wallet FROM woc_market_listings WHERE id = $1`, [listing]))
+          .rows[0].seller_wallet,
+      );
+      expect(await marketDb.insertPendingBid(bidArgs(realm, listing, seller))).toEqual({
+        ok: false,
+        reason: 'own_listing',
+      });
+      // A second account paying out to the seller's wallet is the seller.
+      expect(
+        await marketDb.insertPendingBid(bidArgs(realm, listing, twin, { wallet: sellerWallet })),
+      ).toEqual({ ok: false, reason: 'own_listing' });
+      expect(await bidCount(listing), 'the refusals minted nothing').toBe(0);
+      const landed = await marketDb.insertPendingBid(bidArgs(realm, listing, stranger));
+      expect(landed.ok, 'a stranger bids').toBe(true);
+      if (landed.ok) {
+        expect(landed.bid).toMatchObject({
+          listingId: listing,
+          account: stranger,
+          amountCents: 700,
+          bondCents: 70,
+          status: 'pending_bond',
+          bondState: 'pending',
+        });
+      }
+      expect(await bidCount(listing)).toBe(1);
+    });
+
+    it('a directed listing answers not_found to everyone, its designated buyer included', async () => {
+      const realm = `bid-directed-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const stranger = await seedAccount();
+      const listing = await seedListing(realm, seller, { directedBuyerAccount: buyer });
+      expect(await marketDb.insertPendingBid(bidArgs(realm, listing, buyer))).toEqual({
+        ok: false,
+        reason: 'not_found',
+      });
+      expect(await marketDb.insertPendingBid(bidArgs(realm, listing, stranger))).toEqual({
+        ok: false,
+        reason: 'not_found',
+      });
+      expect(await bidCount(listing)).toBe(0);
+    });
+
+    it('an ending status and a lapsed close both refuse not_active; the close bound is inclusive', async () => {
+      const realm = `bid-inactive-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const ending = await seedListing(realm, seller, { status: 'ending' });
+      expect(await marketDb.insertPendingBid(bidArgs(realm, ending, bidder))).toEqual({
+        ok: false,
+        reason: 'not_active',
+      });
+      const lapsed = await seedListing(realm, seller, { endsAtMs: BASE_MS });
+      expect(
+        await marketDb.insertPendingBid(bidArgs(realm, lapsed, bidder, { nowMs: BASE_MS })),
+        'ends_at equal to now is closed',
+      ).toEqual({ ok: false, reason: 'not_active' });
+      const open = await seedListing(realm, seller, { endsAtMs: BASE_MS + 1_000 });
+      expect(
+        (await marketDb.insertPendingBid(bidArgs(realm, open, bidder, { nowMs: BASE_MS }))).ok,
+        'one second before the close still bids',
+      ).toBe(true);
+    });
+
+    it('cancel-intent refuses new bids as cancel_pending', async () => {
+      const realm = `bid-cancel-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listing = await seedListing(realm, seller, {
+        cancelRequestedAtMs: BASE_MS - MINUTE_MS,
+      });
+      expect(await marketDb.insertPendingBid(bidArgs(realm, listing, bidder))).toEqual({
+        ok: false,
+        reason: 'cancel_pending',
+      });
+      expect(await bidCount(listing)).toBe(0);
+    });
+
+    it('bid_too_low is judged against the injected minimum, inclusive at the bound', async () => {
+      const realm = `bid-low-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      expect(
+        await marketDb.insertPendingBid(
+          bidArgs(realm, listing, bidder, { amountCents: 799, minNext: 800 }),
+        ),
+      ).toEqual({ ok: false, reason: 'bid_too_low' });
+      expect(
+        (
+          await marketDb.insertPendingBid(
+            bidArgs(realm, listing, bidder, { amountCents: 800, minNext: 800 }),
+          )
+        ).ok,
+      ).toBe(true);
+    });
+
+    it('already_pending is per listing and account, and only while the first bid is still pending_bond', async () => {
+      const realm = `bid-pending-${++seq}`;
+      const seller = await seedAccount();
+      const bidder = await seedAccount();
+      const other = await seedAccount();
+      const listing = await seedListing(realm, seller);
+      const sibling = await seedListing(realm, seller);
+      const first = await marketDb.insertPendingBid(bidArgs(realm, listing, bidder));
+      expect(first.ok).toBe(true);
+      expect(await marketDb.insertPendingBid(bidArgs(realm, listing, bidder))).toEqual({
+        ok: false,
+        reason: 'already_pending',
+      });
+      expect(
+        (await marketDb.insertPendingBid(bidArgs(realm, listing, other))).ok,
+        'per account',
+      ).toBe(true);
+      expect(
+        (await marketDb.insertPendingBid(bidArgs(realm, sibling, bidder))).ok,
+        'per listing',
+      ).toBe(true);
+      // Once the first bid leaves pending_bond the account may bid again here.
+      if (first.ok) {
+        await pool.query(`UPDATE woc_market_bids SET status = 'lapsed' WHERE id = $1`, [
+          first.bid.id,
+        ]);
+      }
+      expect(
+        (await marketDb.insertPendingBid(bidArgs(realm, listing, bidder))).ok,
+        'only a pending_bond row blocks',
+      ).toBe(true);
+    });
+  });
 });

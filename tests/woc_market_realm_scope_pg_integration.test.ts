@@ -401,7 +401,15 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const { alpha, beta } = realmPair('listing-guards');
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const b = await seedListing(beta, seller);
+      const holder = await seedAccount();
+      // The beta listing is LOCKED by a third account: the buy-now claim's
+      // lock-free peek would otherwise diagnose it 'locked' before the guard
+      // transaction ever refuses it, so only a realm-scoped peek answers the
+      // honest 'not_found'.
+      const b = await seedListing(beta, seller, {
+        lockAccount: holder,
+        lockExpiresAtMs: BASE_MS + 5 * MINUTE_MS,
+      });
       const before = await listingStatus(b);
 
       expect(await marketDb.cancelListingIfUnbid(alpha, b, seller, BASE_MS)).toBe('not_found');
@@ -427,7 +435,7 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const after = await listingStatus(b);
       expect(after, 'the beta row never moved').toEqual(before);
       expect(after.status).toBe('active');
-      expect(after.lockAccount).toBeNull();
+      expect(after.lockAccount).toBe(holder);
       const bids = await pool.query(
         `SELECT count(*)::int AS n FROM woc_market_bids WHERE listing_id = $1`,
         [b],
@@ -507,6 +515,30 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const page = await marketDb.deliveredUnclosedSettlementsPage(alpha, 0, 50, 50);
       expect(settlementIds(page.settlements)).toEqual([aDelivered]);
       expect(settlementIds(page.settlements)).not.toContain(bDelivered);
+    }, 20_000);
+
+    it('salesForItem reads only the realm ledger', async () => {
+      const { alpha, beta } = realmPair('sales');
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const sale = async (realm: string): Promise<number> =>
+        marketDb.insertSale({
+          realm,
+          listingId: await seedListing(realm, seller, { status: 'closed', resolution: 'sold' }),
+          itemId: 'crown_of_embers',
+          item: { itemId: 'crown_of_embers', count: 1 },
+          priceCents: 1000,
+          amountBase: null,
+          sellerAccount: seller,
+          buyerAccount: buyer,
+          sellerName: 'S',
+          buyerName: 'B',
+        });
+      const a = await sale(alpha);
+      const b = await sale(beta);
+      const rows = await marketDb.salesForItem(alpha, 'crown_of_embers', 10);
+      expect(ids(rows)).toEqual([a]);
+      expect(ids(rows)).not.toContain(b);
     }, 20_000);
 
     it('disposeSoldResidueListings converges only the realm residue', async () => {

@@ -987,6 +987,13 @@ describeDb('woc market directed rail against real Postgres', () => {
         gone.rows[0].reg,
         'the repair gate is armed only while the index is missing',
       ).toBeNull();
+      // The SAME pair in a sibling realm, seeded first so its id is the lowest
+      // of all: the repair's duplicate probe is realm-joined, so this row must
+      // survive untouched (a realm-blind probe would read the newer rows in
+      // the other realm as its duplicates and expire it).
+      const siblingRealm = await seedOffer(`${realm}-sibling`, seller, buyer, {
+        updatedAtMs: BASE_MS - 40 * MINUTE_MS,
+      });
       // Ascending stamps in insert order, the shape a real pre-bound database
       // has. The repair's tiebreak is the row ID (id > o.id), not the stamp,
       // so the survivor below is asserted as the last row inserted.
@@ -1007,6 +1014,9 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect((await offerRow(oldest)).status).toBe('expired');
       expect((await offerRow(middle)).status).toBe('expired');
       expect((await offerRow(newest)).status).toBe('pending');
+      expect((await offerRow(siblingRealm)).status, 'the other realm is not a duplicate').toBe(
+        'pending',
+      );
       const rebuilt = await pool.query(
         `SELECT i.indisvalid FROM pg_index i WHERE i.indexrelid = to_regclass($1)`,
         [indexName],
