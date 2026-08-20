@@ -5713,3 +5713,189 @@ sync first; it audits b72873d24e to the recorded tip. After its PASS push:
 the second rider (the per-request auth-guard reads, design constraints in
 the 17 SESSION START DECISION bullet in state.md), then
 phase-21-devnet-dry-run.md.
+
+## Auth-guard read cache rider implement round (the second settled rider)
+
+GAME repo, worktree /Users/fernando/Documents/wocc-marketplace, branch
+feature/woc-marketplace. Session start f844a72eaa (the escrow rider QA tip,
+pushed). Release sync: EMPTY (origin/release/v0.40.0 tip 65b91fa190 was
+already an ancestor of HEAD; "Already up to date", no merge commit, no audit
+owed). LOCAL per R4: nothing pushed; the rider QA session pushes on PASS.
+
+SPEC PAIR minted first (ab058a21f9): rider-auth-guard-reads.md carries the
+cluster verbatim from the 16 QA deferral and the 17 SESSION START DECISION,
+plus a findings-context section recording the recon corrections (three
+read-path lanes, a bust-surface lane, a cache-idiom lane, and main-thread
+probes): the guard runs BEFORE the read limiter, not behind it; the admin
+gate already resolves through the separate adminDb() bundle with NO
+moderation read; the hot offers GET rides the ACTIVE guard, which is why the
+cache covers the whole bundle; the bust surface measures 20 statements in 16
+functions across five files; the quota-consume stored procedure falls outside
+the cached projection by COLUMN; the generic cached_read factories stale-serve
+and so cannot carry an auth read; multi-realm processes sharing one database
+make the TTL bound real; no caller anywhere distinguishes an expired token
+from a deleted one, and no UPDATE auth_tokens exists (no sliding expiry to
+conflict with).
+
+COMMITS (spec to close): ab058a21f9 spec pair; 46911ec2c1 the pure-core
+extraction; bd856f76b3 the cache module; a933edf2b1 the marketplace wiring;
+14027a6d2c the writer busts + the discovery pin; e854b21f3f the eighth pg
+suite + server/CLAUDE.md; 1ca8645274 the mutation log; f0dc5f48d1 the fix
+round (discovery window hardening, the decorative assert, the lint unroll).
+
+DELIVERABLES vs the spec, all seven landed:
+1. The pure core (server/auth_guard_core.ts): tokenInfoFromRow (fail-closed
+   scope allowlist + read-time expires_at re-check, strictly-greater bound)
+   and computeModerationStatus (the exact ban/suspension/deactivation ladder,
+   every time compare at read time, byte-identical prose, a fresh object per
+   call), with the row types and the moved AccountModerationStatus
+   re-exported from db.ts so every importer compiles unchanged. db.ts is
+   fetch + pure compute on both reads (authTokenRowForToken now SELECTs
+   expires_at; the SQL qual stays as belt) and ends the rider at 4832 lines,
+   net 44 DOWN from 4876 under its 4980 ceiling.
+2. The cache (server/woc_auth_guard_cache.ts): raw rows only, both arms TTL
+   5s / LRU 1024 with counted eviction, per-key single-flight, the lost-bust
+   cancel rule, NO negative caching (null probes install nothing: the
+   eviction-lever defense), NO stale-serve (a failed refresh propagates and
+   installs nothing), the read-time expiry drop of a dead token entry, the
+   account-to-tokens index with the amortized residue sweep (bound 4x the
+   token cap), per-arm stats, and the boot-configured singleton whose free
+   bust functions the writers call.
+3. The busts at every discovered writer, post-COMMIT where transactional:
+   db.ts saveToken / revokeTokensExcept / revokeToken / revokeReadToken /
+   revokeCompanionToken (account-keyed: the prefix cannot address the cache,
+   over-busting is the safe direction) / consumePasswordResetRequest /
+   setAccountDeactivated; moderation_db.ts moderateAccount (one call after
+   the four-arm transaction, beside its hooks) / muteAccountChat /
+   liftAccountChatMute / reactivateAccountAudited / resetChatStrikesAudited;
+   chat_filter_db.ts applyChatStrike / resetChatStrikes;
+   general_chat_quota_db.ts setGeneralChatRateLimit (both the DELETE and the
+   upsert side).
+4. The marketplace-only wiring: main.ts arms the singleton over the two real
+   fetchers and injects the instance through WocMarketRuntime.authGuardDb;
+   the routes' guard thunk resolves test override FIRST, then the injected
+   cache, then the direct reads, so every existing rig is untouched; BOTH
+   player guards read through it; the admin gate keeps resolving through
+   adminDb(); stats ride the stuck readout; shutdown clears the singleton.
+5. The pins: the core matrix suite (21); the cache mechanics suite (17); the
+   discovery pin (comment-stripped whole-server walk, COLUMN-precise
+   classification that excludes the quota consume structurally, enclosing
+   function attribution with a loud totality arm for hoisted/module-scope
+   SQL and an unclassifiable arm for a SET list outrunning the window, the
+   exact 20-statement reconciliation map, the single reasoned
+   accounts-DELETE exemption, and the import-boundary equality that keeps
+   the cache reachable from exactly the writers plus main.ts); the wiring
+   suite (real middleware chains: cache live on both guards, override
+   precedence, revocation flip, and the ADMIN BEHAVIORAL CONTRAST: one
+   shared token store, revocation refuses the admin gate on the very next
+   request while the player cache still serves); the hot-reads wiring pins
+   (one configure call, real fetchers, stats field, shutdown reset).
+6. The eighth pg suite (tests/woc_market_authguard_pg_integration.test.ts,
+   fixed database wocc_woc_market_authguard_verify, the stepup suite's boot
+   pattern): the token qual against live/expired/deleted rows, the raw-row
+   fetchers over real timestamptz, and the REAL writer-to-bust chain for
+   revokeToken, the companion prefix delete (sibling survivor seeded), the
+   revoke-except keep, the password-reset consume, moderateAccount
+   ban/suspend/unban, the live strike writers, the quota policy setter both
+   directions, and the deactivation flip. 11 tests; skips green without the
+   env var; the gate dry-selection probe confirms the suite SELF-SELECTS
+   into the always-run floor (nine pg suites in the floor now).
+7. Docs and registry: server/CLAUDE.md gains the module row, the extended
+   bust rule, and the TTL's cross-process meaning; this section; state.md.
+
+REVIEWS. Four read-only lanes dispatched via plain Agent
+(privacy-security-review, server-hot-path-reviewer,
+database-performance-reviewer, test-coverage-auditor), all prompted for
+coverage with the final-message delivery wording, all four completed with
+narration-only output (14 to 34 tool calls each), nudged once per the
+one-retry cap. Recorded honestly per the delivery protocol: any late report
+is folded in below if it arrived before the wrap; otherwise the four
+dimensions carry the MAIN THREAD'S OWN passes this round: the security probe
+(bust placement post-COMMIT at every transactional writer verified with
+files open, the repopulation race closed by the in-flight cancel, no
+negative caching, the admin boundary held by wiring AND behavior), the
+hot-path probe (hit path is map ops plus the same verdict allocation the
+direct path made; flights and index bounded; the per-message quota consume
+deliberately never busts), the db probe (the probe SQL keeps its
+primary-key point-read shape with one added column; the four pools the pg
+suite opens all close), and the coverage probe (which found and fixed the
+two fix-round items: the discovery window truncation hole and the
+decorative greater-or-equal tail).
+
+JUDGED this round (binding; do NOT re-raise):
+- Pre-bust in-flight joiners can receive the pre-revocation answer ONCE
+  (the flight they joined resolves for them; nothing installs). This is the
+  cached_read epoch discipline verbatim, indistinguishable from the request
+  having arrived a moment earlier; recorded at the cache header.
+- saveToken notifies on INSERT although a fresh random token can have no
+  cached entry: kept so the auth_tokens writer class carries ZERO discovery
+  exemptions (the call is a no-op by construction and one line).
+- resetChatStrikesAudited busts only when a row actually reset (found):
+  a no-row update changes nothing the cache serves.
+- INSERT INTO accounts (registration) is out of the discovery classifier BY
+  RULE: a freshly created account cannot be cached (no token exists yet);
+  the classifier scans UPDATE accounts SET and DELETE FROM accounts only,
+  and the reasoning is recorded in the pin's header territory.
+- The read-scope-only revokeReadToken busts the token unconditionally even
+  when its scope qual deleted nothing (a full token passed): over-bust,
+  harmless, simpler than threading the rowCount.
+- The wiring-suite moderation rows for the admin contrast rely on the admin
+  gate having NO moderation read at all (AdminAuthDb): that absence is the
+  production design (staff is trusted operator authority), not a test gap.
+- The unit LRU/eviction fixtures use injected small caps rather than the
+  1024 production constant (deriving a 1024-entry fixture would be pure
+  runtime); the production values are exact-pinned with the TTL scrape pin,
+  and the index-sweep fixture DERIVES from WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR.
+- Cross-process staleness stays the recorded 17 acceptance (TTL 5s ceiling);
+  the LISTEN/NOTIFY bust channel the quota module models is the recorded
+  option for 22's pre-enable audit, not this rider's scope.
+
+VALUES REGISTRY (the rider QA re-judges): WOC_AUTH_GUARD_CACHE_TTL_MS 5_000
+(scrape-pinned to the docblock's "5 seconds"; the ONE accepted staleness,
+cross-process); WOC_AUTH_GUARD_TOKEN_CACHE_MAX 1_024;
+WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX 1_024; WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR 4
+(index residue bound 4x the token cap, swept amortized); guard precedence
+override > runtime cache > direct reads; bust vocabulary
+bustWocAuthGuardToken / bustWocAuthGuardAccount / bustWocAuthGuardAll;
+the discovery reconciliation 20 statements in 16 functions across 5 files
+with exactly 1 accounts-DELETE exemption (federated provision-race loser);
+the import boundary exactly {chat_filter_db, db, general_chat_quota_db,
+main, moderation_db}.
+
+MUTATION RECORD (the auth-guard rider section in phase-20-mutation-log.md):
+18 distinct mutants, 17 BIT, 1 deliberate green control, 0 unexplained
+survivors; the one pg mutant (the token qual strip) ran alone in its own
+lane. Fix-round stale-verdict re-runs: auth_cache_ttl_ignored,
+auth_bust_revoke_companion_strip, auth_bust_moderate_account_strip, and
+auth_scan_shadow_writer_planted re-run at the fix-round tip f0dc5f48d1, all
+four BIT again. Whole log 359 distinct mutants.
+
+SUITE GROWTH: NEW auth_guard_core (21), woc_auth_guard_cache (17),
+auth_guard_bust_coverage (4), woc_market_auth_guard_wiring (5), and the
+authguard pg suite (11); token_scope_db 5 to 7 (the live-expiry fixture
+correction plus the two read-time belt arms); woc_market_hot_reads 67 (the
+five wiring pins folded into the production-wiring test). The pg battery is
+EIGHT suites, 252 tests, zero skips (241 + 11).
+
+VALIDATION at the tip (all run fresh): npx tsc --noEmit clean; the
+EIGHT-suite pg battery 252 tests zero skips, one lane at a time with
+TEST_DATABASE_URL on the command line only, clear field; the DB-free
+marketplace battery 14 files 850 tests; the guard-adjacent and new suites
+20 files 1012 tests; the moderation/chat/quota set 68; the S3 guard,
+monolith budget (db.ts 4832 under 4980; no ratcheted file grew), and
+architecture tests green; suite_duration_budget green with the new pg
+suite; npm run ci:changed exit 0 (warnings only) after the fix round.
+node scripts/gate_select.mjs on the committed tree: recorded beside the
+final tip note below.
+
+MAINTAINER RULINGS RE-SURFACED (open, not re-decided): the woc_market.ts
+ceiling raise (+53 across the escrow rider's two raises, net 4484 to 4036
+DOWN); the woc_market_db.ts no-ratchet-row question (largest marketplace
+file at 4783); the escrow gate hold-ceiling SIZING deferral (300s buys one
+queued heavy save). None is touched by this rider.
+
+NEXT = docs/woc-marketplace-hardening/rider-auth-guard-reads-qa.md, GAME
+repo, worktree wocc-marketplace, FRESH session, newest origin/release/**
+sync first; it audits f844a72eaa to the tip recorded in the final gate note
+and pushes on PASS per R4. After its PASS:
+docs/woc-marketplace-hardening/phase-21-devnet-dry-run.md.

@@ -5,6 +5,48 @@ actually reads.
 
 ## Where we are
 
+- AUTH-GUARD READ CACHE RIDER IMPLEMENT COMPLETE (2026-08-20, GAME repo,
+  LOCAL per R4: nothing pushed; the rider QA session pushes on PASS).
+  Session start f844a72eaa; the v0.40.0 sync was EMPTY (the release tip
+  65b91fa190 was already an ancestor; no merge commit, no audit owed). Spec
+  pair minted FIRST (rider-auth-guard-reads.md + its QA file, ab058a21f9,
+  the cluster verbatim from the 16 QA deferral and the 17 SESSION START
+  DECISION plus recon corrections: the guard runs BEFORE the read limiter;
+  the admin gate already resolves through the separate adminDb() bundle;
+  the hot offers GET rides the ACTIVE guard so the cache covers the whole
+  bundle; the bust surface is 20 statements in 16 functions across 5 files;
+  the quota consume classifies OUT by column; cached_read stale-serves and
+  cannot carry an auth read). All seven deliverables landed: the pure core
+  (auth_guard_core.ts, byte-exact verdicts computed from raw rows at read
+  time; db.ts is fetch + compute and nets 44 lines DOWN to 4832), the cache
+  (woc_auth_guard_cache.ts: TTL 5s / LRU 1024 per arm, no negative caching,
+  no stale-serve, single-flight with the lost-bust cancel, read-time expiry,
+  the account-to-tokens index for the prefix over-bust), busts at every
+  discovered writer post-COMMIT, marketplace-only wiring (override > cache >
+  direct; admin uncached by wiring AND by behavioral contrast), the
+  discovery pin (column-precise, function-attributed, exact 20-site
+  reconciliation, one reasoned DELETE exemption, the import-boundary
+  equality), the EIGHTH pg suite (wocc_woc_market_authguard_verify, 11
+  tests, real writer-to-bust chains, self-selects into the gate floor), and
+  docs/registry. Reviewer reality: four lanes dispatched, four
+  narration-only completions, nudged once each; the four dimensions carry
+  the main thread's own passes (which found and fixed the discovery-window
+  truncation hole and a decorative assert). Mutation record: 18 distinct,
+  17 BIT, 1 green control, 4 stale-verdict re-runs BIT (auth-guard rider
+  section in phase-20-mutation-log.md; whole log 359). Validation at the
+  tip: tsc clean; pg battery EIGHT suites 252 tests zero skips one lane at
+  a time; DB-free marketplace 850 + guard-adjacent 1012 + moderation set 68;
+  S3/monolith/architecture/suite-duration green; ci:changed exit 0; gate
+  run recorded in the progress.md registry's final note. THREE MAINTAINER
+  RULINGS remain OPEN (re-surfaced, not re-decided): the woc_market.ts
+  ceiling raise (+53, net 448 DOWN), the woc_market_db.ts no-ratchet-row
+  question (4783), and the escrow gate hold-ceiling sizing. The rider
+  implement section in progress.md is the registry the rider QA consumes
+  (JUDGED list and values registry binding). NEXT =
+  docs/woc-marketplace-hardening/rider-auth-guard-reads-qa.md (GAME repo,
+  wocc-marketplace, FRESH session, newest origin/release/** sync first,
+  diffs f844a72eaa..the recorded tip, pushes on PASS per R4), then
+  phase-21-devnet-dry-run.md stays owed after it.
 - ESCROW WRITE-PATH RIDER QA COMPLETE (2026-08-20, GAME repo, verdict PASS,
   PUSHED per R4). Audited b72873d24e..7e07cf12a6. The v0.40.0 re-sync was
   NOT the expected no-op: 123 commits had landed (the GPU-preparation
@@ -1002,11 +1044,12 @@ implementation-plan.md).
   suites. Since 02 that concretely means
   `TEST_DATABASE_URL=postgres://eastbrook:<pw>@127.0.0.1:5433/eastbrook npx vitest run tests/woc_market_settlement_pg_integration.test.ts`
   (the suite creates and drops its own disposable database; without the env var it
-  SKIPS green, so a green default-tier run is not evidence it ran). Since 20
-  the marketplace battery is SEVEN suites: settlement, bond, delivery,
-  directed, plan_pins, stepup, and realm_scope
-  (`tests/woc_market_realm_scope_pg_integration.test.ts`), each on its own
-  disposable database name so lanes can run different suites concurrently.
+  SKIPS green, so a green default-tier run is not evidence it ran). Since the
+  auth-guard rider the marketplace battery is EIGHT suites: settlement, bond,
+  delivery, directed, plan_pins, stepup, realm_scope, and authguard
+  (`tests/woc_market_authguard_pg_integration.test.ts`), each on its own
+  disposable database name so lanes can run different suites concurrently
+  (never the SAME suite in two processes at once).
 - Game, monolith-listed file: `npx vitest run tests/monolith_budget.test.ts`.
 - Game, pre-merge / end of phase: commit first, then `node scripts/gate_select.mjs`
   (gate needs a committed tree; it stops at the FIRST failure, run later steps by hand if

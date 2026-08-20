@@ -499,3 +499,18 @@ verdict was scored against.
 Auth-guard rider totals: 18 distinct mutants, 17 BIT, 1 deliberate green
 control, 0 unexplained survivors. Whole log after this section: 359 distinct
 mutants.
+
+Fix-round re-verifications (the stale-verdict rule: the fix round
+f0dc5f48d1 edited the discovery suite and the suspension-TTL cache test, so
+every mutant scored against an edited pin re-ran at that tip):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| auth_cache_ttl_ignored | BIT | woc_auth_guard_cache | rider; RE-RUN after the exact-fetch-count rewrite of the suspension-TTL test |
+| auth_bust_revoke_companion_strip | BIT | auth_guard_bust_coverage | rider; RE-RUN after the discovery-window hardening |
+| auth_bust_moderate_account_strip | BIT | auth_guard_bust_coverage | rider; RE-RUN after the discovery-window hardening |
+| auth_scan_shadow_writer_planted | BIT | auth_guard_bust_coverage | rider; RE-RUN after the discovery-window hardening |
+
+Auth-guard rider totals stand: 18 distinct live mutants, 17 BIT, 1 green
+control; 4 stale-verdict re-runs all BIT. Whole log unchanged at 359
+distinct mutants.
