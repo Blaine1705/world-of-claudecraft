@@ -1377,6 +1377,10 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     const [text] = sql();
     expect(text).toContain('DELETE FROM woc_market_buy_now_abandons');
     expect(text).toContain('LIMIT $2');
+    // The age qual is the whole security of this prune: deleting in-window
+    // rows early erases cooldown evidence (cap evasion), so the cutoff text
+    // is pinned, not just the DELETE shape.
+    expect(text).toContain("lock_expires < now() - ($1 || ' days')::interval");
     // lock_expires has no global index, so an ORDER BY would plan a full
     // sort per batch (the retention prune rule pins the absence).
     expect(text).not.toContain('ORDER BY');
