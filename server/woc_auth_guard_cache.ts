@@ -37,11 +37,15 @@
 //
 // Recorded bounds and acceptances: raw bearer values live as map keys for up
 // to the LRU lifetime (an idle entry is dropped on its next read or by
-// eviction, not swept), a heap-level exposure comparable to the auth_tokens
+// eviction, not swept, so both arms hold their high-water mark, roughly
+// 10 MB worst case, for the process lifetime: an accepted trade against
+// sweep machinery), a heap-level exposure comparable to the auth_tokens
 // table's own plaintext rows and the accepted trade for keyed busts. The
-// flights map is unbounded by cap but bounded by CONCURRENT in-flight
-// probes (each entry self-clears at settle), so under pool saturation it
-// mirrors the pool queue, never outgrows it. This module deliberately FORKS
+// flights map has no cap of its own: it holds one small entry per
+// CONCURRENT in-flight probe (each self-clears at settle), so its size is
+// the request concurrency the pool's own pending queue already absorbs,
+// proportional overhead on an existing unbounded queue rather than a new
+// failure mode. This module deliberately FORKS
 // the generic cached_read.ts shapes rather than extending them with options:
 // no-stale-serve, no-negative-caching, the content-keyed install veto, and
 // the account index are security-load-bearing behavior, not configuration,
@@ -103,7 +107,10 @@ export const WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR = 4;
  *  over-decline an install). */
 export const WOC_AUTH_GUARD_RECENT_BUSTS_MAX = 512;
 export const WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS = 90_000;
-export const WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS = 70_000;
+// 65s + 5s (the derived flight bound) plus 10s of event-loop headroom: the
+// veto is consulted a scheduling delay after the query settles, so the floor
+// carries an explicit margin rather than equality with the driver deadlines.
+export const WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS = 80_000;
 
 /** The two raw-row readers (server/db.ts authTokenRowForToken and
  *  moderationRowForAccount in production; fakes in tests). */
@@ -134,15 +141,30 @@ export interface WocAuthGuardArmStats {
 export interface WocAuthGuardCacheStats {
   tokens: WocAuthGuardArmStats;
   accounts: WocAuthGuardArmStats;
+  /** Live size of the account-to-token index, eviction residue included: the
+   *  soft bound (token cap times the sweep factor) is a claim, and this is
+   *  the number that makes it observable in production, not only in tests. */
+  index: number;
+  /** Live size of the recent-bust veto ledger: soft-bounded BY DESIGN (the
+   *  cap can be exceeded for up to the min-age floor under a bust burst), so
+   *  an excursion must be a number an operator can see. */
+  recentBusts: number;
 }
 
 // A refresh in flight for one key. `cancelled` is the lost-bust guard: a bust
 // landing mid-refresh flips it, so the flight declines its install and a
 // post-bust reader refuses to join it (starting a fresh flight) rather than
-// receive pre-bust data.
+// receive pre-bust data. An ACCOUNT-keyed bust cannot flip `cancelled` on a
+// flight for a not-yet-indexed token, so that arm is closed twice over by
+// content: the install veto (installGuard) and the join re-check (joinGuard),
+// both keyed by the fetched row's account against the recent-bust ledger.
 interface Flight<V> {
   promise: Promise<V | null>;
   cancelled: boolean;
+  /** When the fetch began; the content-keyed guards compare bust times
+   *  against it, and installs anchor the entry TTL here so the documented
+   *  staleness ceiling is exact (TTL from fetch START, not settle). */
+  startedAtMs: number;
 }
 
 // One arm: a bounded LRU of raw rows with TTL, per-key single-flight, no
@@ -167,8 +189,15 @@ class RowArm<K, V> {
     /** Veto an install from the row's CONTENT and the flight's start time:
      *  the token arm declines a row whose account was bust AFTER the fetch
      *  began (an account-keyed bust cannot cancel a flight the index has
-     *  never seen, so the veto closes that half of the lost-bust race). */
+     *  never seen, so the veto closes the install half of the lost-bust
+     *  race). */
     private readonly installGuard?: (row: V, startedAtMs: number) => boolean,
+    /** The JOIN half of the same account-keyed race: a reader that arrives
+     *  strictly AFTER a bust must not accept a row fetched before it, even
+     *  though the pre-bust joiners of the same flight may (the recorded
+     *  once-per-flight acceptance). Returning false makes that reader
+     *  refetch instead. */
+    private readonly joinGuard?: (row: V, flightStartedAtMs: number, joinedAtMs: number) => boolean,
   ) {}
 
   read(key: K): Promise<V | null> {
@@ -187,9 +216,19 @@ class RowArm<K, V> {
       this.entries.delete(key);
     }
     const standing = this.flights.get(key);
-    if (standing !== undefined && !standing.cancelled) return standing.promise;
-    const flight: Flight<V> = { cancelled: false, promise: Promise.resolve(null) };
+    if (standing !== undefined && !standing.cancelled) {
+      const joinedAtMs = this.now();
+      return standing.promise.then((row) =>
+        row !== null && this.joinGuard?.(row, standing.startedAtMs, joinedAtMs) === false
+          ? // The row predates a bust this reader arrived after: re-read (the
+            // flight has settled and cleared, so this starts a fresh fetch or
+            // joins one another vetoed joiner already started).
+            this.read(key)
+          : row,
+      );
+    }
     const startedAtMs = this.now();
+    const flight: Flight<V> = { cancelled: false, promise: Promise.resolve(null), startedAtMs };
     flight.promise = this.fetch(key)
       .then((row) => {
         // Install only positive rows (no negative caching), only when no
@@ -197,7 +236,7 @@ class RowArm<K, V> {
         // the row's content passes the veto (the account-keyed half of the
         // same rule; see installGuard on the constructor).
         if (row !== null && !flight.cancelled && this.installGuard?.(row, startedAtMs) !== false) {
-          this.install(key, row);
+          this.install(key, row, startedAtMs);
         }
         return row;
       })
@@ -211,7 +250,7 @@ class RowArm<K, V> {
     return flight.promise;
   }
 
-  private install(key: K, row: V): void {
+  private install(key: K, row: V, startedAtMs: number): void {
     if (this.entries.size >= this.maxEntries && !this.entries.has(key)) {
       const coldest = this.entries.keys().next();
       if (!coldest.done) {
@@ -220,7 +259,13 @@ class RowArm<K, V> {
       }
     }
     this.entries.delete(key);
-    this.entries.set(key, { at: this.now(), row });
+    // The TTL anchors at the fetch START, not the install: the row's data is
+    // as-of a snapshot no later than the start, so anchoring here keeps the
+    // documented staleness ceiling exact instead of ceiling-plus-fetch-RTT.
+    // Rows are frozen shallow so no consumer can decorate a shared row in
+    // place and poison every other reader of the key.
+    Object.freeze(row);
+    this.entries.set(key, { at: startedAtMs, row });
     this.onInstall?.(key, row);
   }
 
@@ -266,12 +311,21 @@ export class WocAuthGuardCache {
   // residue here (over-busting is safe); the sweep below bounds it.
   private readonly tokensByAccount = new Map<number, Set<string>>();
   private indexSize = 0;
-  // When each account was last account-keyed-bust, for the install veto: a
-  // token fetch IN FLIGHT at bust time is invisible to the index (nothing is
-  // indexed until install), so a revocation sweep could otherwise be outrun
-  // by an install of the pre-delete row. Entries prune amortized; no flight
-  // outlives the fetch deadline, so an aged entry can veto nothing real.
+  // When each account was last account-keyed-bust, for the install veto and
+  // the join re-check: a token fetch IN FLIGHT at bust time is invisible to
+  // the index (nothing is indexed until install), so a revocation sweep
+  // could otherwise be outrun by an install of the pre-delete row, and a
+  // reader arriving after the bust could join the stale flight. Entries
+  // prune amortized; no flight outlives the fetch deadline, so an aged
+  // entry can veto nothing real.
   private readonly recentAccountBusts = new Map<number, number>();
+  // The prune runs at most once per window while wedged over the cap: a
+  // failed pass records the earliest instant any surviving entry can cross
+  // the min-age floor, and busts before that instant skip the walk (else a
+  // realm-wide bust fan-out pays a full-map walk PER BUST, a measured ~70ms
+  // synchronous stall at the 5,000-account realm cap).
+  private nextPruneAtMs = 0;
+  private prunePasses = 0;
   private readonly now: () => number;
   private readonly tokenMax: number;
 
@@ -289,6 +343,16 @@ export class WocAuthGuardCache {
       this.now,
       (token, row) => this.indexToken(token, row.accountId),
       (row, startedAtMs) => (this.recentAccountBusts.get(row.accountId) ?? -1) < startedAtMs,
+      (row, flightStartedAtMs, joinedAtMs) => {
+        // A joiner that arrived strictly AFTER the account's bust must not
+        // accept a row fetched before it (the join half of the index-blind
+        // race); a joiner that arrived before the bust keeps the recorded
+        // once-per-flight acceptance. Ties (same-ms arrival and bust) count
+        // as pre-bust: arrival order inside one clock tick is unknowable,
+        // and the install veto above already declines the tie fail-closed.
+        const bustAtMs = this.recentAccountBusts.get(row.accountId);
+        return !(bustAtMs !== undefined && bustAtMs >= flightStartedAtMs && bustAtMs < joinedAtMs);
+      },
     );
     this.accountArm = new RowArm(
       (accountId) => this.readers.fetchModerationRow(accountId),
@@ -305,6 +369,8 @@ export class WocAuthGuardCache {
     const info = tokenInfoFromRow(row, this.now());
     // A cached row the clock has carried past its expires_at is dead: drop it
     // so the entry cannot linger as a hit source for the rest of its TTL.
+    // (Rides bust(), so natural expiry counts into the busts stat: that
+    // series is "entries invalidated", not "writer busts" alone.)
     if (row !== null && info === null) this.tokenArm.bust(token);
     return info;
   }
@@ -327,17 +393,31 @@ export class WocAuthGuardCache {
     this.recentAccountBusts.set(accountId, this.now());
     if (this.recentAccountBusts.size > WOC_AUTH_GUARD_RECENT_BUSTS_MAX) {
       const nowMs = this.now();
-      const staleCutoff = nowMs - WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS;
-      for (const [account, atMs] of this.recentAccountBusts) {
-        if (atMs < staleCutoff) this.recentAccountBusts.delete(account);
-      }
-      // Still above the cap after the retention pass (a bust burst): drop
-      // oldest-first down to the cap, but never an entry younger than the
-      // min-age floor, which no live flight can predate (see the constant).
-      const floorCutoff = nowMs - WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS;
-      for (const [account, atMs] of this.recentAccountBusts) {
-        if (this.recentAccountBusts.size <= WOC_AUTH_GUARD_RECENT_BUSTS_MAX) break;
-        if (atMs < floorCutoff) this.recentAccountBusts.delete(account);
+      // Amortization gate: while wedged over the cap inside the floor window
+      // (a realm-wide bust fan-out), a walk that can drop nothing is skipped
+      // until the earliest instant the last failed pass proved an entry can
+      // cross the floor. Skipping only DELAYS pruning of an already-soft
+      // bound; every actual drop below stays floor-checked.
+      if (nowMs >= this.nextPruneAtMs) {
+        this.prunePasses += 1;
+        const staleCutoff = nowMs - WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS;
+        let oldestAtMs = Number.POSITIVE_INFINITY;
+        for (const [account, atMs] of this.recentAccountBusts) {
+          if (atMs < staleCutoff) this.recentAccountBusts.delete(account);
+          else if (atMs < oldestAtMs) oldestAtMs = atMs;
+        }
+        // Still above the cap after the retention pass (a bust burst): drop
+        // oldest-first down to the cap, but never an entry younger than the
+        // min-age floor, which no live flight can predate (see the constant).
+        const floorCutoff = nowMs - WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS;
+        for (const [account, atMs] of this.recentAccountBusts) {
+          if (this.recentAccountBusts.size <= WOC_AUTH_GUARD_RECENT_BUSTS_MAX) break;
+          if (atMs < floorCutoff) this.recentAccountBusts.delete(account);
+        }
+        this.nextPruneAtMs =
+          this.recentAccountBusts.size > WOC_AUTH_GUARD_RECENT_BUSTS_MAX
+            ? oldestAtMs + WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS
+            : 0;
       }
     }
     this.accountArm.bust(accountId);
@@ -355,10 +435,16 @@ export class WocAuthGuardCache {
     this.tokensByAccount.clear();
     this.recentAccountBusts.clear();
     this.indexSize = 0;
+    this.nextPruneAtMs = 0;
   }
 
   stats(): WocAuthGuardCacheStats {
-    return { tokens: this.tokenArm.stats(), accounts: this.accountArm.stats() };
+    return {
+      tokens: this.tokenArm.stats(),
+      accounts: this.accountArm.stats(),
+      index: this.indexSize,
+      recentBusts: this.recentAccountBusts.size,
+    };
   }
 
   /** The account-index entry count, eviction residue included (test-only:
@@ -371,6 +457,13 @@ export class WocAuthGuardCache {
    *  other observable). */
   recentBustLedgerSizeForTests(): number {
     return this.recentAccountBusts.size;
+  }
+
+  /** How many times the ledger prune actually walked the map (test-only: the
+   *  amortization gate's one observable; a realm-wide bust fan-out must pay
+   *  ONE walk, not one per bust). */
+  prunePassesForTests(): number {
+    return this.prunePasses;
   }
 
   private indexToken(token: string, accountId: number): void {

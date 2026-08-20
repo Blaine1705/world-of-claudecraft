@@ -573,7 +573,7 @@ export function registerGameStateMetrics(
   });
   new Gauge({
     name: WOC_AUTH_GUARD_CACHE,
-    help: 'Marketplace auth-guard read cache: reads, refreshes (the residual query rate), evictions, busts, and live entries, per arm (tokens, accounts). Zero until the boot wiring arms the cache.',
+    help: 'Marketplace auth-guard read cache: reads, refreshes (the residual query rate), evictions, busts, and live entries, per arm (tokens, accounts), plus the two soft-bounded internal collections (arm=index and arm=recent_busts, kind=entries): their bounds are soft BY DESIGN, so an excursion must be a series, not a claim. Zero until the boot wiring arms the cache.',
     labelNames: ['arm', 'kind'],
     registers: [registry],
     collect() {
@@ -590,6 +590,8 @@ export function registerGameStateMetrics(
         this.set({ arm, kind: 'busts' }, armStats?.busts ?? 0);
         this.set({ arm, kind: 'entries' }, armStats?.entries ?? 0);
       }
+      this.set({ arm: 'index', kind: 'entries' }, stats?.index ?? 0);
+      this.set({ arm: 'recent_busts', kind: 'entries' }, stats?.recentBusts ?? 0);
     },
   });
   const copperCredited = new Counter({
