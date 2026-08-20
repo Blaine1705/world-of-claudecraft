@@ -19,7 +19,7 @@ actually reads.
   cannot carry an auth read). All seven deliverables landed: the pure core
   (auth_guard_core.ts, byte-exact verdicts computed from raw rows at read
   time; db.ts is fetch + compute and nets 44 lines DOWN to 4832), the cache
-  (woc_auth_guard_cache.ts: TTL 5s / LRU 1024 per arm, no negative caching,
+  (woc_auth_guard_cache.ts: TTL 5s, realm-sized LRU caps, no negative caching,
   no stale-serve, single-flight with the lost-bust cancel, read-time expiry,
   the account-to-tokens index for the prefix over-bust), busts at every
   discovered writer post-COMMIT, marketplace-only wiring (override > cache >

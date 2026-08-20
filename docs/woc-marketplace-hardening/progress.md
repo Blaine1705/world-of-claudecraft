@@ -5917,10 +5917,16 @@ bustWocAuthGuardToken / bustWocAuthGuardAccount / bustWocAuthGuardAll (the
 flush lever the review round restored); the prometheus gauge
 woc_auth_guard_cache{arm,kind} zero-backfilled; shutdown = bustAll, never
 reset (the singleton stays armed); the discovery reconciliation 20
-statements in 16 functions across 5 files with exactly 1 accounts-DELETE
-exemption (federated provision-race loser); the import boundary exactly
-{chat_filter_db, db, general_chat_quota_db, http/game_metrics, main,
-moderation_db}.
+statements in 15 writer functions across 4 writer files (chat_filter_db 2,
+db 7, general_chat_quota_db 1, moderation_db 5), plus the ONE exempted
+delete (deleteUnusedFederatedProvision in federated_auth_db.ts, the 16th
+function and 5th file the older "16 across 5" phrasing counted); the
+import boundary exactly {chat_filter_db, db, general_chat_quota_db,
+http/game_metrics, main, moderation_db}. The veto ledger's min-age floor
+is RELATION-pinned against the exported db deadlines (min age at or above
+DB_QUERY_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS, retention above the
+floor: the qa-checklist round's S4), and bustWocAuthGuardAll is exercised
+by the unit suite with its no-production-caller note (N1).
 
 MUTATION RECORD (the auth-guard rider section in phase-20-mutation-log.md,
 including the review-round block): 25 distinct live mutants, 24 BIT, 1
@@ -5930,12 +5936,13 @@ for its v2); the one pg mutant (the token qual strip) ran alone in its own
 lane; every stale verdict re-run after its source or pin moved (two
 re-verification blocks). Whole log 366 distinct mutants.
 
-SUITE GROWTH: NEW auth_guard_core (21), woc_auth_guard_cache (17),
-auth_guard_bust_coverage (4), woc_market_auth_guard_wiring (5), and the
-authguard pg suite (11); token_scope_db 5 to 7 (the live-expiry fixture
-correction plus the two read-time belt arms); woc_market_hot_reads 67 (the
-five wiring pins folded into the production-wiring test). The pg battery is
-EIGHT suites, 252 tests, zero skips (241 + 11).
+SUITE GROWTH (final, after the review fix round): NEW auth_guard_core
+(21), woc_auth_guard_cache (20), auth_guard_bust_coverage (4),
+woc_market_auth_guard_wiring (7), and the authguard pg suite (13);
+token_scope_db 5 to 7 (the live-expiry fixture correction plus the two
+read-time belt arms); woc_market_hot_reads 67 (the wiring pins folded into
+the production-wiring test); game_metrics grew the gauge test. The pg
+battery is EIGHT suites, 254 tests, zero skips (241 + 13).
 
 VALIDATION at the tip (all run fresh): npx tsc --noEmit clean; the
 EIGHT-suite pg battery 252 tests zero skips, one lane at a time with
@@ -5945,14 +5952,42 @@ marketplace battery 14 files 850 tests; the guard-adjacent and new suites
 monolith budget (db.ts 4832 under 4980; no ratcheted file grew), and
 architecture tests green; suite_duration_budget green with the new pg
 suite; npm run ci:changed exit 0 (warnings only) after the fix round.
-node scripts/gate_select.mjs on the committed tree: recorded beside the
-final tip note below.
+node scripts/gate_select.mjs on the committed tree at 3e767bf483: PASS,
+ALL 12 STEPS green, full-suite fallback (the branch-vs-release diff spans
+412 paths including full-suite triggers, the conservative fail-safe; the
+selective speedup does not apply on this branch): 42,637 tests passed with
+the 2 expected fails and 369 known skips across 3,015 files, browser
+regressions 131, typecheck and all builds green; TEST_DATABASE_URL on the
+command line only, no tail pipe, clear field. Independently reproduced by
+the qa-checklist agent at the same tip (its own run, same 12-step PASS).
+RE-RUN at the final code tip after the qa-checklist fix round: the result
+is recorded in the gate re-run note at the end of this section.
 
 MAINTAINER RULINGS RE-SURFACED (open, not re-decided): the woc_market.ts
 ceiling raise (+53 across the escrow rider's two raises, net 4484 to 4036
 DOWN); the woc_market_db.ts no-ratchet-row question (largest marketplace
 file at 4783); the escrow gate hold-ceiling SIZING deferral (300s buys one
 queued heavy save). None is touched by this rider.
+
+QA-CHECKLIST ROUND (ran LAST beside the gate): verdict READY, 0 blocking,
+4 should-fix + 2 nits, ALL applied: S1 the missing gate note (above), S2
+the stale suite counts (corrected above), S3 state.md's self-contradicting
+cap figure (corrected there), S4 the veto ledger's bare 20s floor (now
+70s/90s, covering the 65s driver backstop plus checkout wait, the
+black-holed-server case, relation-pinned against the exported db
+deadlines), N1 the unexercised flush lever (now unit-exercised with its
+no-production-caller note), N2 the 16-function phrasing (spelled out in
+the values registry). Its adversarial pass probed and REFUTED three
+candidate gaps itself (out-of-tree writers are out-of-process dev tooling;
+the woc_market_strikes suspended_until write targets a different table;
+the hook chain ahead of each bust is throw-proof). The checklist also
+verified the moderation prose byte-identical against the pre-rider
+function, the S3 corpus unaffected by the relocation, commit hygiene
+across all twelve commits, and every acceptance criterion.
+
+GATE RE-RUN at the final code tip after the qa-checklist fixes: see the
+final gate note appended below by the wrap (the packet's recorded
+docs-ride-on-top pattern).
 
 NEXT = docs/woc-marketplace-hardening/rider-auth-guard-reads-qa.md, GAME
 repo, worktree wocc-marketplace, FRESH session, newest origin/release/**

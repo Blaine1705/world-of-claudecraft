@@ -9,6 +9,7 @@ import type { AccountModerationRow, AuthTokenRow } from '../../server/auth_guard
 import type { BearerActiveGuardDb } from '../../server/http/middleware/bearer_active_guard';
 import {
   bustWocAuthGuardAccount,
+  bustWocAuthGuardAll,
   bustWocAuthGuardToken,
   configureWocAuthGuardCache,
   resetWocAuthGuardCache,
@@ -437,6 +438,19 @@ describe('constants and the singleton wiring', () => {
     expect(WOC_AUTH_GUARD_TOKEN_CACHE_MAX).toBeGreaterThan(WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX);
     expect(WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX).toBeGreaterThanOrEqual(5_000);
     expect(WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR).toBe(4);
+    // The veto ledger's min-age floor must cover the WORST live-flight
+    // lifetime (driver query backstop + pool checkout wait), or a prune
+    // could drop the veto a still-in-flight fetch needs; the retention pass
+    // must sit above the floor for the same reason. Derived from the
+    // exported db constants so a deadline raise reds here.
+    const { DB_POOL_CONNECT_TIMEOUT_MS, DB_QUERY_TIMEOUT_MS } = await import('../../server/db');
+    expect(WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS).toBeGreaterThanOrEqual(
+      DB_QUERY_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
+    );
+    expect(WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS).toBeGreaterThan(
+      WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS,
+    );
+    expect(WOC_AUTH_GUARD_RECENT_BUSTS_MAX).toBe(512);
     const src = (await import('node:fs')).readFileSync(
       new URL('../../server/woc_auth_guard_cache.ts', import.meta.url),
       'utf8',
@@ -472,6 +486,13 @@ describe('constants and the singleton wiring', () => {
     await cache.moderationStatusForAccount(7);
     bustWocAuthGuardAccount(7);
     expect(wocAuthGuardCacheStats()?.accounts.busts).toBe(1);
+    // The free flush lever (no production caller yet: main.ts flushes
+    // through its own instance handle) drains both arms through the
+    // singleton so the export cannot rot unrun.
+    await cache.moderationStatusForAccount(7);
+    bustWocAuthGuardAll();
+    expect(wocAuthGuardCacheStats()?.tokens.entries).toBe(0);
+    expect(wocAuthGuardCacheStats()?.accounts.entries).toBe(0);
     resetWocAuthGuardCache();
     expect(wocAuthGuardDb()).toBeNull();
     // Busts against the cleared singleton are no-ops, not throws.

@@ -89,15 +89,21 @@ export const WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR = 4;
 /** The recent-account-bust veto ledger's SOFT bound: past this size the
  *  prune drops entries older than the retention, then keeps dropping
  *  oldest-first down to the cap, but NEVER an entry younger than the
- *  min-age floor (a fetch cannot outlive the pg deadlines, so only an
- *  entry older than the floor is provably vetoing no live flight). Under a
- *  bust burst across more distinct accounts than the cap inside the floor
- *  window the map can exceed the cap for up to the floor duration; entries
- *  are two numbers, so the excursion is bytes, and correctness is
- *  one-directional (a retained entry can only over-decline an install). */
+ *  min-age floor. The floor covers the WORST live-flight lifetime, the
+ *  driver-side query backstop plus a pool checkout wait
+ *  (DB_QUERY_TIMEOUT_MS 65s + DB_POOL_CONNECT_TIMEOUT_MS 5s, the
+ *  black-holed-server case, not merely the 15s statement deadline), so
+ *  only an entry older than the floor is provably vetoing no live flight;
+ *  the relation is pinned in the unit suite against the exported db
+ *  constants so a deadline raise reds instead of silently invalidating
+ *  the floor. Under a bust burst across more distinct accounts than the
+ *  cap inside the floor window the map can exceed the cap for up to the
+ *  floor duration; entries are two numbers, so the excursion is bytes,
+ *  and correctness is one-directional (a retained entry can only
+ *  over-decline an install). */
 export const WOC_AUTH_GUARD_RECENT_BUSTS_MAX = 512;
-export const WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS = 60_000;
-export const WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS = 20_000;
+export const WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS = 90_000;
+export const WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS = 70_000;
 
 /** The two raw-row readers (server/db.ts authTokenRowForToken and
  *  moderationRowForAccount in production; fakes in tests). */
@@ -437,8 +443,10 @@ export function bustWocAuthGuardAccount(accountId: number): void {
   active?.bustAccount(accountId);
 }
 
-/** Flush everything (operator lever / test teardown); the singleton stays
- *  armed so writers keep busting. */
+/** Flush everything; the singleton stays armed so writers keep busting.
+ *  No production site calls this yet (main.ts flushes through the instance
+ *  it holds at shutdown): it exists as the operator/test lever the spec
+ *  named, exercised by the unit suite so it cannot rot unrun. */
 export function bustWocAuthGuardAll(): void {
   active?.bustAll();
 }
