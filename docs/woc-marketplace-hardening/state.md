@@ -31,10 +31,16 @@ actually reads.
   re-decided): woc_market.ts ceiling +53 net 448 DOWN; woc_market_db.ts
   no-ratchet-row (4783); escrow gate hold-ceiling sizing; plus the
   auth-rider TTL brownout note (recorded, not ruled). NOTHING pushed
-  anywhere (R4). NEXT = RESUME phase-21-devnet-dry-run.md in a FRESH
-  session once devnet SOL exists (devnet.md bottom section is the exact
-  runbook; the Birdeye key stays optional: the fixed-price path is
-  ruled); phase-21-qa.md runs only AFTER the legs are recorded.
+  anywhere (R4). NEXT, reordered 2026-08-20 at Fernando's request (devnet
+  SOL arrives only near the end): RUN NOW =
+  docs/woc-marketplace-hardening/rider-close-out-prep.md (FRESH session,
+  three repos; the 21-independent half of 22: ruling gate over the five
+  parked questions, the ops runbook, the 19/22 wocDecimals cross-repo ask,
+  the acceptance-audit prep, the follow-ups draft), then its QA pair.
+  WHEN SOL EXISTS = resume phase-21-devnet-dry-run.md (devnet.md bottom
+  section is the exact runbook; the Birdeye key stays optional: the
+  fixed-price path is ruled), then phase-21-qa.md, then the shrunken
+  phase-22-close-out.md (devnet evidence rows, three gates, PR prep).
 - AUTH-GUARD READ CACHE RIDER QA COMPLETE (2026-08-20, GAME repo, verdict
   PASS-WITH-FOLLOWUPS with every fix applied in-session, PUSHED per R4).
   Audited f844a72eaa..e26c3ed9ec; this session's v0.40.0 re-sync was EMPTY

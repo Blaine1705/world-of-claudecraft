@@ -6333,3 +6333,15 @@ mutant batch). Validation at the final tip 8db7734: build clean, suite
 603/596/0/7 skips; mutation record for the session: 10 distinct mutants
 ALL BIT (log sections; whole log 401), 10 stale-verdict re-run events
 all re-BIT.
+
+RIDER MINTED same session, post-close (Fernando: devnet SOL arrives only
+near the end, asked for a file runnable now): rider-close-out-prep.md +
+rider-close-out-prep-qa.md pull the 21-independent half of 22 forward
+(ruling gate over the five parked questions: Not-now lock release,
+outage forfeit, terms re-consent, fail-then-pay-again contract,
+pg-suites-in-CI; the ops runbook absorbing every scattered 22-runbook
+obligation; the 19/22 wocDecimals + settled-total cross-repo ask; the
+acceptance-audit prep with devnet rows OPEN; the follow-ups draft).
+phase-22-close-out.md carries the matching shrink note. Session order is
+now: the rider pair FIRST (runnable immediately), the 21 resume when SOL
+exists, then 21 QA, then the shrunken 22.

@@ -1,5 +1,14 @@
 # Phase 22: Close-out (runbook, acceptance audit, gates, PR prep)
 
+NOTE (2026-08-20, recorded when the 21 dry run blocked on devnet SOL):
+`rider-close-out-prep.md` pulled the 21-independent half of this phase
+forward at Fernando's request: deliverable 1 (the runbook), the evidence
+prep for deliverable 2 (all non-devnet rows), the 19/22 wocDecimals
+cross-repo ask, and the deliverable-5 draft. When this phase finally runs
+(AFTER phase-21-qa.md), start from the rider's registry section in
+progress.md and do only what remains: the devnet rows of the audit, the
+three gate runs, the PR texts, and the follow-ups handover.
+
 SESSION START (do this first in every fresh session): this session spans all
 three repos. In `/Users/fernando/Documents/wocc-marketplace` (branch must be
 `feature/woc-marketplace`): `git fetch origin`, merge the newest `origin/release/**`
