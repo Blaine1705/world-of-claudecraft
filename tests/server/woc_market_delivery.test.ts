@@ -5,6 +5,7 @@
 // re-arming warn rather than a cap). The park-cap arithmetic lives in
 // tests/server/woc_market_local_ledgers.test.ts; the flow behavior rides the
 // service and escrow-queue suites.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import type { WocListingRow, WocSweepErrorTag } from '../../server/woc_market';
 import {
@@ -12,7 +13,11 @@ import {
   type WocDeliveryCtx,
   wocStampHighWaterCount,
 } from '../../server/woc_market_delivery';
-import { WOC_LOCAL_STAMP_HIGH_WATER } from '../../server/woc_market_local_ledgers';
+import {
+  WOC_LOCAL_PARK_MAX_ENTRIES,
+  WOC_LOCAL_STAMP_HIGH_WATER,
+  wocParkRefusalCount,
+} from '../../server/woc_market_local_ledgers';
 
 /** A minimal ctx whose mail persist FAILS after the intent stamp, so every
  *  drive adds one retained pendingMail entry (the stamp survives a persist
@@ -134,5 +139,73 @@ describe('the stamp-ledger high-water (counted, re-arming, never shedding)', () 
     } finally {
       warns.mockRestore();
     }
+  });
+
+  it('EVERY stamp site arms the watcher (call-site completeness, comment-stripped)', async () => {
+    // The behavioral case above reaches the crossing through ONE of the three
+    // stamp sites (the mail stamp in bookCustodyOnce). The other two, the
+    // hand-off mail stamp and the pendingGrants stamp, are invisible to it:
+    // dropping watchStampHighWater() after either leaves the suite green, and
+    // a realm whose held intents are all GRANT intents would then never warn
+    // and never count, which is exactly the incident the bound exists for.
+    // So the ARMING is pinned structurally, at every site, by exact count.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_delivery.ts', import.meta.url), 'utf8'),
+    );
+    const stampSites = src.split(/ctx\.pending(?:Grants|Mail)\.set\(/).slice(1);
+    expect(stampSites).toHaveLength(3);
+    for (const [i, site] of stampSites.entries()) {
+      expect(
+        site.slice(0, 400).includes('watchStampHighWater()'),
+        `stamp site ${i + 1} arms the high-water watcher`,
+      ).toBe(true);
+    }
+    // Totals agree, so an extra call cannot stand in for a missing one.
+    expect(src.match(/watchStampHighWater\(\);/g) ?? []).toHaveLength(3);
+  });
+});
+
+describe('a cap-refused park at the ARM (not just the unit)', () => {
+  it('claims no standing park but still rotates the row off the batch head', async () => {
+    // wocParkRow's refusal is pinned at the unit (local_ledgers), but the
+    // arm's own consequence is the part that can silently rot: the stat is
+    // incremented INSIDE the guard while the rotation write sits outside it,
+    // so rewriting `if (wocParkRow(...)) scope.parked++` to two statements
+    // is invisible to every other suite, and the standing-parks stat would
+    // then overstate during exactly the mass-park incident the cap exists
+    // for. Both halves are asserted here, in one drive.
+    const { ctx } = makeCtx();
+    const touched: number[] = [];
+    const db = ctx.db as unknown as Record<string, unknown>;
+    // A returns-arm drive: the shared rig stubs the delivery-side members,
+    // and a null delivery target is the cleanest way to make the arm's
+    // attempt answer false (the park path) rather than throw (the isolation
+    // path, which never reaches the park at all).
+    db.deliveryTarget = async () => null;
+    db.undisposedClosedListings = async () => [listing(77)];
+    db.touchListingRow = async (id: number) => {
+      touched.push(id);
+    };
+    // Fill the park map to the cap with OTHER ids, so listing 77's park is
+    // refused as a NEW entry rather than admitted as a re-park.
+    for (let i = 0; i < WOC_LOCAL_PARK_MAX_ENTRIES; i++) {
+      ctx.parkedReturns.set(1000 + i, 2_000_000);
+    }
+    const arms = createWocMarketDeliveryArms(ctx);
+    const scope = { contended: false, parked: 0 };
+    const refusalsBefore = wocParkRefusalCount();
+
+    await arms.returnUndisposedItems(1_000_000, scope);
+
+    // Refused and COUNTED, so the operator sees the cap biting...
+    expect(wocParkRefusalCount()).toBe(refusalsBefore + 1);
+    expect(ctx.parkedReturns.has(77)).toBe(false);
+    // ...the standing-parks stat does NOT claim it (the row is un-excluded
+    // and simply retries next pass)...
+    expect(scope.parked).toBe(0);
+    // ...and the rotation still fired, or a refused row would own the batch
+    // head every pass and starve the rest of the backlog.
+    expect(touched).toEqual([77]);
   });
 });

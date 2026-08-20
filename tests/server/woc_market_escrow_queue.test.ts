@@ -715,7 +715,13 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // A wait deadline the test can never reach: only the depth cap can
     // produce this refusal (the deadline path answers the identical literal,
     // which let a cap-less build pass an earlier version of this pin).
-    const rig = makeRig({ escrowWaitMs: 60_000 });
+    // A REAL gate, so the refusal's effect on realm capacity is observable:
+    // the per-character cap is checked BEFORE the gate precisely so a
+    // depth-refused request takes no realm slot, and the release lives only
+    // on the work promise, so a swapped order would acquire a hold that
+    // nothing ever releases (a leaked slot until the 300s reclaim).
+    const gate = createWocEscrowGate(4);
+    const rig = makeRig({ escrowWaitMs: 60_000, escrowGate: gate });
     const kinds = recordEscrowKinds();
     let releaseQueue!: () => void;
     const held = new Promise<void>((resolve) => {
@@ -726,6 +732,8 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     });
     const first = createListing(rig);
     await settle();
+    // Exactly one hold stands: the first request's.
+    expect(gate.stats().inFlight).toBe(1);
     // The second request refuses IMMEDIATELY (depth cap), while the first is
     // still waiting for the wedge.
     const startedAt = Date.now();
@@ -736,6 +744,9 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // here is unreachable, so a build that answered from the wrong arm would
     // show up as the wrong kind.
     expect(kinds).toEqual(['depth_refused']);
+    // And it took NO realm slot: still exactly the first request's hold.
+    expect(gate.stats().inFlight).toBe(1);
+    expect(gate.stats().refused).toBe(0);
     releaseQueue();
     await wedge;
     const firstOut = await first;
@@ -743,6 +754,10 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // Exactly ONE settled: the depth-refused request held nothing, so only
     // the first request's sequence releases a slot.
     expect(kinds).toEqual(['depth_refused', 'started', 'settled']);
+    // The realm is fully free again: a depth refusal that had taken a slot
+    // would strand it here, since only the work promise releases.
+    await settle();
+    expect(gate.stats().inFlight).toBe(0);
   });
 
   it('holds the depth-cap slot until the abandoned WORK settles, not until the waiter returns', async () => {

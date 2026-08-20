@@ -589,7 +589,7 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // bound (the review round's term: the character serialize and every
     // round-trip gap run between statements, each bounded only by the
     // idle-in-transaction kill) + COMMIT under the driver backstop. The
-    // wait deadline bounds only the un-started phase. The ceiling must stay
+    // wait deadline bounds only the un-started stage. The ceiling must stay
     // under the HTTP layer's 300s so a wedged escrow surfaces as a typed or
     // coded answer, never as a socket the client gave up on first.
     const startedCeilingMs =
@@ -618,7 +618,12 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // segments (two clients at the default sizing).
     const { WOC_ESCROW_GATE_MAX_IN_FLIGHT } = await import('../../server/woc_market_escrow_gate');
     const { parseDbPoolMaxClients } = await import('../../server/db');
-    const saveConcurrencyMatch = codeOnly(read('server/game.ts')).match(
+    // The SHARED block-aware stripper for the scrapes, not the file's local
+    // line-only codeOnly: a block-commented decoy declaration would otherwise
+    // feed the relation a wrong number (the stripper contract lives in
+    // tests/helpers/strip_comments.ts).
+    const { stripComments } = await import('../helpers/strip_comments');
+    const saveConcurrencyMatch = stripComments(read('server/game.ts')).match(
       /^const SAVE_CONCURRENCY = (\d+);$/m,
     );
     expect(saveConcurrencyMatch).not.toBeNull();
@@ -629,14 +634,31 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     const poolDefault = parseDbPoolMaxClients(undefined);
     expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBeLessThan(poolDefault);
     expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT + saveConcurrency).toBeLessThanOrEqual(poolDefault - 2);
-    // The gate's leak-reclaim ceiling sits far ABOVE any legitimate
-    // sequence: the honest started ceiling plus the pre-job guild flush's
-    // heavy allowance. A reclaim is therefore always an incident signal,
-    // never ordinary churn eating real capacity.
+    // The gate's leak-reclaim ceiling sits above a legitimate sequence, and
+    // the hold spans MORE than the sequence: the slot is taken before the
+    // guild flush and before the FIFO enqueue (woc_market_custody.ts
+    // runSerialized), so it also covers whatever that character already had
+    // queued, and the 5s waiter deadline does not end it (a cancelled job
+    // still settles only when the FIFO reaches it). So the comparand is the
+    // honest started ceiling plus the pre-job guild flush's heavy allowance
+    // plus a HEAD-OF-LINE term, and the pin states how many queued heavy
+    // saves the ceiling actually buys: exactly one. A second one exceeds it,
+    // which is the recorded degradation at the constant (a reclaim that can
+    // also fire on a still-legitimate hold, costing one over-admitted slot
+    // and a misleading line, never correctness). Re-tuning any term moves
+    // this arithmetic, which is the point: the slack is decided, not assumed.
     const { WOC_ESCROW_GATE_HOLD_CEILING_MS } = await import('../../server/woc_market_escrow_gate');
     expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBe(300_000);
+    const holdFloor = startedCeilingMs + DB_HEAVY_STATEMENT_TIMEOUT_MS;
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeGreaterThan(holdFloor);
+    // One queued heavy save fits.
     expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeGreaterThan(
-      startedCeilingMs + DB_HEAVY_STATEMENT_TIMEOUT_MS,
+      holdFloor + DB_HEAVY_STATEMENT_TIMEOUT_MS,
+    );
+    // Two do NOT: the ceiling's honest limit, asserted so the docblock's
+    // stated degradation cannot quietly become false in either direction.
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeLessThan(
+      holdFloor + DB_HEAVY_STATEMENT_TIMEOUT_MS * 2,
     );
     // The park-ledger cap (the rider's growth bound) sits many multiples
     // above the sweep batch: each pass can park at most one batch per arm,
@@ -644,7 +666,7 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // grazes it. SWEEP_BATCH is a woc_market.ts module-private const, so
     // scrape it like the siblings above.
     const { WOC_LOCAL_PARK_MAX_ENTRIES } = await import('../../server/woc_market_local_ledgers');
-    const sweepBatchMatch = codeOnly(read('server/woc_market.ts')).match(
+    const sweepBatchMatch = stripComments(read('server/woc_market.ts')).match(
       /^const SWEEP_BATCH = (\d+);$/m,
     );
     expect(sweepBatchMatch).not.toBeNull();

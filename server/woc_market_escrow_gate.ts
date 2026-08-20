@@ -41,12 +41,21 @@ export const WOC_ESCROW_GATE_MAX_IN_FLIGHT = 4;
  *  the process lifetime, and four such wedges would close the realm's
  *  listing path until a restart (the per-character cap made that a
  *  one-character outage; a realm-global bound must not amplify it into a
- *  realm one). The ceiling sits far above any legitimate sequence (the
- *  tunables ladder pins it above the honest started-request ceiling PLUS
- *  the guild-flush heavy allowance), so a reclaim is always an incident
- *  signal, never ordinary capacity churn; identity tokens make it exact
- *  (only the wedged hold is ever reclaimed), and the pg pool's own bounds
- *  remain the backstop for whatever the wedged sequence still holds. */
+ *  realm one). The slot is taken BEFORE the guild flush and the FIFO
+ *  enqueue, so a hold spans the character's queue wait as well as the
+ *  sequence itself, and the 5s waiter deadline does NOT end it (a
+ *  deadline-cancelled job still settles only when the FIFO reaches it).
+ *  The tunables ladder therefore prices the honest started-request ceiling
+ *  PLUS the guild-flush heavy allowance PLUS a bounded head-of-line term
+ *  (ONE heavy save queued ahead on the same character: 157s + 60s + 60s
+ *  leaves this 300s ceiling 23s of slack). Inside that bound
+ *  a reclaim is an incident signal rather than ordinary churn; PAST it (a
+ *  character whose queue holds two or more saves each taking the full
+ *  heavy allowance) the reclaim can also fire on a still-legitimate hold,
+ *  which costs one over-admitted slot and a misleading line, never
+ *  correctness. Identity tokens keep it exact (only the oldest hold past
+ *  the ceiling is reclaimed), and the pg pool's own bounds remain the
+ *  backstop for whatever the wedged sequence still holds. */
 export const WOC_ESCROW_GATE_HOLD_CEILING_MS = 300_000;
 
 /** One acquired slot. release() retires exactly this hold's stamp; calling
@@ -108,7 +117,7 @@ export function createWocEscrowGate(
       holds.delete(token);
       reclaimed++;
       console.error(
-        `[woc_market] escrow gate reclaimed a slot held past ${holdCeilingMs}ms: a listing sequence never settled (wedged save FIFO?); capacity restored, the wedge itself still needs an operator`,
+        `[woc_market] escrow gate reclaimed a slot held past ${holdCeilingMs}ms: a listing sequence never settled (wedged save FIFO, or a character queue deep in heavy saves); capacity restored, the cause itself still needs an operator`,
       );
     }
   }

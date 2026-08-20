@@ -369,7 +369,11 @@ const MONOLITHS: MonolithRow[] = [
     // DOWN across the rider; the ledgers stay on the service (live state)
     // and the bond payout walk is the next standing candidate.
     file: 'server/woc_market.ts',
-    ceiling: 4037,
+    // Down 4037 -> 4036 at the rider QA: the delivery-arms extraction left
+    // listingReturnCustodyRef imported here with its only use gone to
+    // woc_market_delivery.ts. The ratchet's own rule, an extraction lowers
+    // the ceiling, applies to the dead line the extraction forgot too.
+    ceiling: 4036,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

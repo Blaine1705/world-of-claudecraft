@@ -33,7 +33,6 @@ import {
   bondCents,
   type ListingParamsRefusal,
   listingEligibility,
-  listingReturnCustodyRef,
   listingSoldNoticeCustodyRef,
   minNextBidCents,
   settlementCustodyRef,
@@ -3174,10 +3173,10 @@ export class WocMarketService {
    *   the row's own state (the park-rotation timestamp touch,
    *   touchBidPollRow, is unguarded on purpose: idempotent bookkeeping a
    *   racing peer merely repeats): transitionSettlement's state guard, holdBondAndActivate
-   *   (an ordered FOR UPDATE re-read), the guarded lapse, and the anti-snipe
-   *   extension (extendAuctionForBondProgress re-reads the listing under FOR
-   *   UPDATE and recomputes against the base cap, so a racing peer moves the
-   *   close by observation skew, never by a second extension). A peer racing
+   *   (an ordered re-read under the row lock), the guarded lapse, and the
+   *   anti-snipe extension (extendAuctionForBondProgress re-reads the listing
+   *   under the row lock and recomputes against the base cap, so a racing peer
+   *   moves the close by observation skew, never by a second extension). A peer racing
    *   the same row costs duplicate confirm round trips for the overlap
    *   window, never a duplicate effect. The individual guarded writes still
    *   check out their own clients for their own bounded transactions; what an

@@ -10,7 +10,9 @@
 // one named account and must never enter a public result set), so it is pinned to a
 // literal rather than a shape.
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -1197,16 +1199,19 @@ describe('every guard transaction bounds its idle holds', () => {
     // The five sweep claims keep their non-blocking shape in the same mode.
     expect(src.match(/FOR NO KEY UPDATE( OF \w+)? SKIP LOCKED/g) ?? []).toHaveLength(5);
     // And no sibling module quietly grows its own lock clause outside this
-    // scan (the review round's durability note): the modules that touch
-    // marketplace rows carry a flat zero.
-    for (const sibling of [
-      'server/woc_market.ts',
-      'server/woc_market_delivery.ts',
-      'server/woc_market_custody.ts',
-      'server/woc_market_sweep.ts',
-      'server/woc_market_monitor.ts',
-    ]) {
-      const sib = stripComments(readFileSync(new URL(`../../${sibling}`, import.meta.url), 'utf8'));
+    // scan (the review round's durability note). DISCOVERED, not enumerated:
+    // a hand-kept list cannot see a NEW server/woc_market_*.ts module, which
+    // is exactly the case the note is about, so every marketplace module
+    // except the counted db one is swept and carries a flat zero.
+    const serverDir = fileURLToPath(new URL('../../server', import.meta.url));
+    const siblings = readdirSync(serverDir)
+      .filter((f) => f.startsWith('woc_market') && f.endsWith('.ts') && f !== 'woc_market_db.ts')
+      .sort();
+    // Non-vacuity: a glob that discovered nothing would satisfy every absence
+    // check below. The floor is the module count at the write-path rider.
+    expect(siblings.length).toBeGreaterThanOrEqual(16);
+    for (const sibling of siblings) {
+      const sib = stripComments(readFileSync(join(serverDir, sibling), 'utf8'));
       expect(sib.length, sibling).toBeGreaterThan(0);
       expect(sib.includes('FOR UPDATE'), sibling).toBe(false);
       expect(sib.includes('FOR NO KEY UPDATE'), sibling).toBe(false);
@@ -1227,6 +1232,19 @@ describe('every guard transaction bounds its idle holds', () => {
     );
     expect(src.match(/this\.boundedWrite\(/g) ?? []).toHaveLength(38);
     const poolCalls = src.split('this.pool.query(').slice(1);
+    // CLASSIFICATION TOTALITY first: the verb test below can only read a
+    // statement written INLINE, so a call whose first argument is an
+    // identifier (the hoisted-SQL idiom this same file already uses, e.g.
+    // boundedWrite(RECORD_ABANDON_SQL, ...)) would classify as a read and
+    // escape both counts silently. Every site must therefore open with a
+    // string or template literal; an unclassifiable one reds here instead of
+    // slipping through as an un-routed writer.
+    for (const slice of poolCalls) {
+      expect(
+        /^\s*[`'"]/.test(slice),
+        `every this.pool.query site opens with an inline statement, got: ${slice.slice(0, 60)}`,
+      ).toBe(true);
+    }
     // The verb must LEAD the statement (a read whose trailing slice brushes
     // a neighboring function's write would otherwise misclassify).
     const writingDirect = poolCalls.filter((slice) =>

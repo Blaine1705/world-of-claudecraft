@@ -236,11 +236,31 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
   it('reflects a fresh source read on every scrape (no drift)', async () => {
     const registry = new Registry();
     let players = 1;
-    registerGameStateMetrics(registry, stubSource({ playersOnline: () => players }));
+    // The two write-path rider gauges ride this pin too: both are documented
+    // as LIVE reads at scrape time, and a stub-value assertion alone would
+    // stay green if either were hoisted out of collect() and sampled once.
+    let pendingKeys = 2;
+    let gateInFlight = 1;
+    registerGameStateMetrics(
+      registry,
+      stubSource({
+        playersOnline: () => players,
+        savePendingKeys: () => pendingKeys,
+        escrowGateInFlight: () => gateInFlight,
+      }),
+    );
 
-    expect(sampleValue(await registry.metrics(), /^woc_players_online (\d+)$/m)).toBe('1');
+    const first = await registry.metrics();
+    expect(sampleValue(first, /^woc_players_online (\d+)$/m)).toBe('1');
+    expect(sampleValue(first, /^woc_character_save_pending_keys (\d+)$/m)).toBe('2');
+    expect(sampleValue(first, /^woc_escrow_gate_in_flight (\d+)$/m)).toBe('1');
     players = 9;
-    expect(sampleValue(await registry.metrics(), /^woc_players_online (\d+)$/m)).toBe('9');
+    pendingKeys = 7;
+    gateInFlight = 4;
+    const second = await registry.metrics();
+    expect(sampleValue(second, /^woc_players_online (\d+)$/m)).toBe('9');
+    expect(sampleValue(second, /^woc_character_save_pending_keys (\d+)$/m)).toBe('7');
+    expect(sampleValue(second, /^woc_escrow_gate_in_flight (\d+)$/m)).toBe('4');
   });
 
   it('maps a null tick Hz (rate-meter warmup) to 0 rather than omitting the series', async () => {
@@ -528,6 +548,17 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     // refusal (which is exactly the moment nobody wants a gap).
     const zeroed = await registry.metrics();
     expect(zeroed).toContain(`# TYPE ${WOC_ESCROW_QUEUE_TOTAL} counter`);
+    // The operator-facing HELP line enumerates the kinds by hand, so it is
+    // tied to the vocabulary here: without this a ninth kind leaves the help
+    // stale while the exact-vocabulary pin above stays green, and the help is
+    // the only place an operator reads what the labels mean.
+    const helpLine = zeroed
+      .split('\n')
+      .find((l) => l.startsWith(`# HELP ${WOC_ESCROW_QUEUE_TOTAL}`));
+    expect(helpLine, 'the escrow-queue counter carries a HELP line').toBeDefined();
+    for (const kind of WOC_ESCROW_QUEUE_OUTCOMES) {
+      expect(helpLine, `HELP names the ${kind} kind`).toContain(kind);
+    }
     for (const kind of WOC_ESCROW_QUEUE_OUTCOMES) {
       expect(
         sampleValue(zeroed, new RegExp(`^woc_escrow_queue_total\\{kind="${kind}"\\} (\\d+)$`, 'm')),

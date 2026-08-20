@@ -705,12 +705,14 @@ describe('the realm-gate pre-check spares the step-up challenge (the write-path 
     expect(admitted.ok).toBe(true);
   });
 
-  it('acceptDirectedOffer pre-checks the same two rungs BEFORE its proof is consumed', async () => {
+  it('acceptDirectedOffer pre-checks SATURATION before its proof is consumed', async () => {
     // The directed twin of the createListing test (the fix-round review:
-    // these two lines had zero coverage, and without the OUTER rung the
+    // these lines had zero coverage, and without the OUTER rung the
     // seller's single-use offer-bound proof burns before the INNER
     // createListing's rung refuses). Decisive form again: the SAME proof
-    // accepts once the gate clears.
+    // accepts once the gate clears. The DRAIN rung's twin lives in the
+    // pre-burn describe above; this one moves only escrowSaturated, so the
+    // title names the rung it actually exercises.
     const h = twoEpics(makeHarness());
     putBuyerOnline(h);
     const offer = unwrap(
@@ -802,6 +804,95 @@ describe('the grant busy budget bounds the delivery pass (the write-path rider f
     for (const listingId of sales) {
       expect((await h.db.listingById(REALM, listingId))?.status).toBe('closed');
     }
+  });
+});
+
+describe('the draining refusal is PRE-BURN on both escrow entries', () => {
+  it('createListing: refuses before the pooled health reads and before the proof is spent', async () => {
+    // The rung's whole justification is its POSITION: IO-free and ahead of
+    // the consumables. The existing drain tests assert only bags and saves,
+    // and the listing helper mints a fresh proof per call, so moving the
+    // rung below guardStepUp kept them green while burning an honest
+    // seller's single-use signature on every retry of a shutdown window.
+    // Decisive form, the saturation twin's: the SAME proof lists once the
+    // drain clears, and neither pooled read ran on the refusal.
+    const h = makeHarness();
+    const price = vi.spyOn(h.economy, 'price');
+    const strikeInfo = vi.spyOn(h.db, 'strikeInfo');
+    let draining = true;
+    h.deps.draining = () => draining;
+    const args = {
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    };
+    const stepUp = await stepUpFor(h, SELLER, listBindingFor(EPIC_ITEM, args.params, null));
+    price.mockClear();
+    strikeInfo.mockClear();
+
+    const refused = await h.service.createListing({ ...args, stepUp });
+    expect(refused).toEqual({ ok: false, reason: 'market_paused' });
+    // IO-free: the health guard's two pooled reads never ran on a closing
+    // pool, which is the stated reason the rung leads.
+    expect(price).not.toHaveBeenCalled();
+    expect(strikeInfo).not.toHaveBeenCalled();
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+
+    draining = false;
+    const admitted = await h.service.createListing({ ...args, stepUp });
+    expect(admitted.ok, 'the SAME proof lists once the drain clears').toBe(true);
+  });
+
+  it('acceptDirectedOffer: the OUTER drain rung refuses before its offer-bound proof is spent', async () => {
+    // The directed twin, which had no coverage at all: the seller's
+    // acceptance escrows through the inner createListing, so without the
+    // OUTER rung the single-use offer-bound proof burns before the inner
+    // one refuses. Deleting server/woc_market.ts's acceptDirectedOffer drain
+    // line was invisible to the whole suite before this.
+    const h = twoEpics(makeHarness());
+    putBuyerOnline(h);
+    const offer = unwrap(
+      await h.service.createDirectedOffer({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        sellerCharacterName: 'Selara',
+        usdCents: 5000,
+        item: { itemId: EPIC_ITEM },
+        acceptTerms: true,
+      }),
+      'createDirectedOffer',
+    );
+    unwrap(
+      await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A),
+      'buyer accept',
+    );
+    let draining = true;
+    h.deps.draining = () => draining;
+    const proof = await stepUpFor(h, SELLER, {
+      operation: 'accept_directed_offer',
+      offerId: offer.offer.id,
+    });
+    const refused = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+      proof,
+    );
+    expect(refused).toEqual({ ok: false, reason: 'market_paused' });
+    // Nothing consumed: the offer is untouched and the copy is still held.
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+
+    draining = false;
+    const accepted = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+      proof,
+    );
+    expect(accepted.ok, 'the SAME proof accepts once the drain clears').toBe(true);
   });
 });
 
