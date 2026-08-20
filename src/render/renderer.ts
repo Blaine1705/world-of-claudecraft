@@ -471,12 +471,14 @@ import { buildComposer, type PostPipeline } from './post';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
   compileRootLabel,
+  createPrewarmBudgetVariantHost,
   createPrewarmCompileLifecycle,
   type PrewarmCompileLifecycle,
   type RendererPrewarmCategory,
   type RendererPrewarmDiagnosticsBaselineStats,
   type RendererPrewarmManifestEntryStats,
   type RendererPrewarmStats,
+  runPrewarmBudgetVariants,
   summarizePrewarmManifest,
 } from './prewarm_compile_lifecycle';
 import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
@@ -560,6 +562,7 @@ import type {
   RendererPhaseStats,
   RendererQualityChangeStats,
 } from './renderer_perf_stats';
+import { disposeRendererPrewarmAndGroundFx } from './renderer_resource_lifecycle';
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
@@ -681,6 +684,7 @@ import { buildWaterFlora } from './water_flora';
 import {
   buildWeaponVfxPrewarmGroup,
   disposeWeaponEmissiveCache,
+  WEAPON_VFX_PREWARM_KEYS,
   weaponVfxPrewarmTextures,
 } from './weapon_vfx';
 import {
@@ -689,6 +693,7 @@ import {
   type WeaponSkinApplyDecision,
   WeaponSkinApplyQueue,
 } from './weapon_vfx_apply_queue_core';
+import { createWeaponVfxPrewarmSkinStage } from './weapon_vfx_prewarm';
 import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
@@ -3209,10 +3214,7 @@ export class Renderer {
       bestEffort(() => target.dispose());
     }
     this.envRTs.clear();
-    for (const material of this.prewarmDepthMaterials.values()) {
-      bestEffort(() => material.dispose());
-    }
-    this.prewarmDepthMaterials.clear();
+    disposeRendererPrewarmAndGroundFx(this, bestEffort);
     for (const bubble of this.chatBubbles.values()) bestEffort(() => bubble.el.remove());
     this.chatBubbles.clear();
     for (const id of [...this.views.keys()]) bestEffort(() => this.removeView(id, true));
@@ -3250,6 +3252,7 @@ export class Renderer {
     // pool, texture and material release with the rest of the GPU state.
     bestEffort(() => this.blobShadows?.dispose());
     this.blobShadows = null;
+    cleanupErrors.push(...(this.dungeons?.disposeAllInteriorResources().errors ?? []));
     bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
     if (webgl) {
@@ -5766,6 +5769,7 @@ export class Renderer {
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
+    const weaponVfxPrewarmSkinStage = createWeaponVfxPrewarmSkinStage(this.scene);
     const landmarkSlot = createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>
       buildImpactSitePrewarmGroup(this.impactSite.group, p.pos),
     );
@@ -5779,7 +5783,6 @@ export class Renderer {
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
     let mountPrewarmWarmed = 0;
     let surfaceDetailTexturesWarmed = 0;
-
     let renderPasses = 0;
     let playerPrewarmVisuals = 0;
     let playerPrewarmProgress: PrewarmEntryProgress | null = null;
@@ -5818,9 +5821,10 @@ export class Renderer {
     );
     this.gpuHitchCompileLifecycle = compileLifecycle;
     let vfxPrewarmBursts = 0;
-    let compileMode: RendererPrewarmStats['compileMode'] = 'none';
-    let compileMs = 0;
-    let compileTimedOut = false;
+    let compileMode: RendererPrewarmStats['compileMode'] = 'none',
+      compileMs = 0,
+      compileTimedOut = false;
+    const budgetVariantStats: NonNullable<RendererPrewarmManifestEntryStats['budgetVariants']> = [];
     // How many of [player/entity/npc]PrewarmGroup actually had a skinned-shadow
     // pre-compile pass run against them: 0 on a resumed programs.compile whose
     // archetype groups were already torn down by the main pass's cleanup, so the
@@ -5829,7 +5833,6 @@ export class Renderer {
     let compiledPrewarmRoots = 0;
     let textureUploads = 0;
     let diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null = null;
-
     type PrewarmManifestEntry = {
       id: string;
       category: RendererPrewarmCategory;
@@ -5847,9 +5850,9 @@ export class Renderer {
        * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
        * so a deadline return can never masquerade as completed again. */
       progress?: () => PrewarmEntryProgress | null;
+      budgetVariants?: () => NonNullable<RendererPrewarmManifestEntryStats['budgetVariants']>;
       detail?: () => string;
     };
-
     // Explicitly bounded units captured when their manifest entry misses the
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
@@ -5886,7 +5889,6 @@ export class Renderer {
       landmarkSlot.staged(),
       ['mounts', mountPrewarmGroup],
     ];
-
     const compileEntryUnits = (
       includeGroup: (groupId: string) => boolean = () => true,
     ): PrewarmResumeUnit[] => {
@@ -6002,40 +6004,16 @@ export class Renderer {
       for (const unit of units) compileLifecycle.recordFor(unit, 'programs.compile');
       return units;
     };
-
-    // Early compile submission: compileAsync links settle off-thread, so the
-    // sooner a unit is SUBMITTED the more of its link time overlaps the other
-    // manifest entries (surface-detail plus textures.scene alone are ~4.5 s of
-    // uploads on the reference desktop). The 'programs.compile-submit' entry
-    // fires every early-staged group's units right after those groups exist;
-    // 'programs.compile' submits the remainder (the late-staged weapon-vfx
-    // group, anything that did not exist yet at the early entry such as the
-    // landmark group staged at priority 48, and a RE-collection of the live
-    // scene, which world.settle-state and the entries after the early submit
-    // keep growing; the shared dedupe store keeps a re-collection from
-    // resubmitting what an earlier call already covered) and then awaits
-    // every submitted unit so all of their programs are READY before
-    // world.initial-frame renders; a program that is not ready by then links
-    // synchronously inside that frame, the measured first-draw stall class.
-    // Which groups each call collects and which it may mark as covered is
-    // the pure planCompileSubmission (prewarm_policy.ts), where the null-
-    // group and re-collection rules are pinned by tests.
+    // compile-submit overlaps off-thread linking with texture work; compile
+    // drains late groups and awaits readiness. Collection/dedupe is pure and
+    // pinned by planCompileSubmission tests in prewarm_policy.ts.
     const submittedCompileUnits: { id: string; done: Promise<void> }[] = [];
     const submittedCompileGroups = new Set<string>();
-    // Units built (their roots consumed from the shared dedupe store) but not
-    // yet submitted because the loop below hit the GPU submit deadline. The
-    // roots are marked seen at BUILD time, so these exact unit objects are the
-    // only remaining route to their compiles: the compile entry drains them
-    // first when it runs, and the post-manifest hand-off pushes any leftover
-    // to the resume lane (never dropped, hitch-hunt P1).
+    // Built-but-unsubmitted roots are retained and drained by compile/resume.
     const deferredSubmitUnits: PrewarmResumeUnit[] = [];
     let initialFrameDeferred: LinkDebt | null = null;
     const LATE_COMPILE_GROUPS = new Set(['weapon-vfx']);
     const RECOLLECT_COMPILE_GROUPS = new Set(['scene']);
-    // deadlineMs: the early entry stops at the GPU submit guard; the compile
-    // entry's tail call passes min(gpuSubmitDeadline, compileAwaitDeadline)
-    // so the submit loop can never eat the await reserve that keeps
-    // world.initial-frame's programs linked before it draws.
     const submitCompileUnits = async (
       includeLate: boolean,
       deadlineMs = gpuSubmitDeadline,
@@ -6065,10 +6043,6 @@ export class Renderer {
           pacing.shouldStop(performance.now()),
         );
       for (let i = 0; i < pending.length; i++) {
-        // Deadline-aware, checked BETWEEN units: one uninterrupted submit loop
-        // measured 22 s of synchronous prologue work in production, sailing
-        // past the 15 s hard deadline and dropping every entry behind it, the
-        // deadline-exempt debt payers included (hitch-hunt S1/S2).
         if (!(await pacing.awaitSlot(outOfTime))) {
           for (const deferred of pending.slice(i)) compileLifecycle.recordFor(deferred, lane);
           deferredSubmitUnits.push(...pending.slice(i));
@@ -6179,10 +6153,10 @@ export class Renderer {
         textureDelta: after.textures - before.textures,
         workDone: progress?.done,
         workPlanned: progress?.planned,
+        budgetVariants: entry.budgetVariants?.().slice(),
         detail: entry.detail?.(),
       });
     };
-
     // Hide every temp prewarm group currently staged in the scene without
     // removing it. Three's compile()/compileAsync() traverse the whole scene
     // regardless of visibility (see prewarm_pass.ts), so a hidden group still
@@ -6269,12 +6243,11 @@ export class Renderer {
       propMaterialPrewarmGroup = null;
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
+      weaponVfxPrewarmSkinStage.dispose();
       weaponVfxPrewarmGroup = null;
       mountPrewarmGroup = null;
     };
-
     const settleMinPasses = this.lowGfx ? 8 : 10;
-
     const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>
       [...mountPrewarmPendingKeys].map((key) => ({
         id: `mount:${key}`,
@@ -6288,7 +6261,6 @@ export class Renderer {
           mountPrewarmWarmed++;
         },
       }));
-
     const textureResumeUnits = (
       idPrefix: string,
       textures: readonly THREE.Texture[],
@@ -6297,14 +6269,12 @@ export class Renderer {
         id: `${idPrefix}:${index}`,
         run: () => this.prewarmTexture(texture),
       }));
-
     const weatherSlot = createPrewarmGroupSlot(variantSlotHost, 'weather.materials', {
       stage: () => this.weather.beginPrewarm(),
       hide: () => this.weather.hidePrewarm(),
       units: (textures) => textureResumeUnits('weather-materials', textures),
       cleanup: () => this.weather.endPrewarm(),
     });
-
     const manifest: PrewarmManifestEntry[] = [
       {
         id: 'views.required',
@@ -6759,33 +6729,33 @@ export class Renderer {
         category: 'vfx',
         priority: 61,
         required: false,
-        // Small explicit units: build the rig, upload its shared sprite
-        // textures, link its programs. Each is one bounded piece of work, so a
-        // deadline drop resumes them in idle time instead of rerunning the
-        // whole entry.
+        // The old `group` unit built all catalog specs synchronously after the
+        // loading cover had gone away. That made the measured 534 ms
+        // weapon-skins resume unit a live-frame hitch. Build and link one real
+        // spec per queue unit, with a deterministic texture step between the
+        // two phases. The aggregate group remains hidden and is still the
+        // compile census owner for any later world compile debt.
         resumeUnits: () => [
-          {
-            id: 'weapon-skins:group',
+          ...WEAPON_VFX_PREWARM_KEYS.map((key) => ({
+            id: `weapon-skins:build:${key}`,
             run: () => {
-              weaponVfxPrewarmGroup = buildWeaponVfxPrewarmGroup();
-              setRenderCategory(weaponVfxPrewarmGroup, 'prewarm');
-              this.scene.add(weaponVfxPrewarmGroup);
+              weaponVfxPrewarmSkinStage.stage(key);
+              weaponVfxPrewarmGroup = weaponVfxPrewarmSkinStage.group;
             },
-          },
+          })),
           {
             id: 'weapon-skins:textures',
             run: () => {
               for (const texture of weaponVfxPrewarmTextures()) this.prewarmTexture(texture);
             },
           },
-          {
-            id: 'weapon-skins:compile',
+          ...WEAPON_VFX_PREWARM_KEYS.map((key) => ({
+            id: `weapon-skins:compile:${key}`,
             run: async () => {
-              if (weaponVfxPrewarmGroup) {
-                await this.compilePrewarmColorPrograms(weaponVfxPrewarmGroup, false);
-              }
+              const skinGroup = weaponVfxPrewarmSkinStage.get(key);
+              if (skinGroup) await this.compilePrewarmColorPrograms(skinGroup, false);
             },
-          },
+          })),
         ],
         run: () => {
           weaponVfxPrewarmGroup = buildWeaponVfxPrewarmGroup();
@@ -7122,18 +7092,24 @@ export class Renderer {
               this.lastQualityChange = original.qualityChange;
             },
             async () => {
-              for (const levels of renderBudgetShaderPrewarmLevels(originalState)) {
-                if (performance.now() >= gpuSubmitDeadline) {
-                  compileTimedOut = true;
-                  break;
-                }
-                this.applyRenderBudgetState({ ...originalState, levels });
-                this.renderPrewarmPass(1 / 60);
-                renderPasses++;
-              }
+              compileTimedOut ||= runPrewarmBudgetVariants(
+                renderBudgetShaderPrewarmLevels(originalState),
+                budgetVariantStats,
+                createPrewarmBudgetVariantHost({
+                  deadlineMs: hardDeadline,
+                  programCount: () => this.webgl.info.programs?.length ?? 0,
+                  applyLevels: (levels) =>
+                    this.applyRenderBudgetState({ ...originalState, levels }),
+                  renderPass: () => {
+                    this.renderPrewarmPass(1 / 60);
+                    return ++renderPasses;
+                  },
+                }),
+              ).timedOut;
             },
           );
         },
+        budgetVariants: () => budgetVariantStats,
       },
       {
         id: 'sky.current-zone',
@@ -7326,6 +7302,10 @@ export class Renderer {
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
               resumeLedger.noteFailure(entry.id, unit.id);
+              if (entry.id === 'vfx.weapon-skins') {
+                weaponVfxPrewarmSkinStage.disposeFailure();
+                weaponVfxPrewarmGroup = null;
+              }
               console.warn(`Renderer prewarm resume unit failed: ${entry.id}:${unit.id}`, error);
             },
           });
@@ -9170,9 +9150,8 @@ export class Renderer {
   // origin, so a stale group would overlap the new build and its torch lights
   // would stack into the per-frame fire-light budget forever. Tracked per key;
   // every build retires the others (a descended-from floor included: there is
-  // no way back up). Geometries/materials are NOT disposed here: kit meshes
-  // share the loader cache and the instance-held kit materials, so only the
-  // scene-graph nodes and the light/flame registries are reclaimed.
+  // no way back up). DungeonInteriors owns only per-root resources; its shared
+  // kit cache and tint/glow materials remain resident for later floors.
   private riftInteriorGroups = new Map<string, THREE.Group>();
   // Protect Yumi maze interiors, one per match slot, built lazily like the
   // arena copies; their update() anchors the team beacons each frame.
@@ -9208,11 +9187,16 @@ export class Renderer {
   private riftFogAuthored = false;
   private fogState: FogSceneState = 'outdoor';
 
-  /** Drop a retired interior's scene nodes and prune its lights/flames out of
-   * the per-frame registries. See riftInteriorGroups for why nothing here
-   * calls dispose(): the meshes share cached kit geometry and materials. */
+  /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
     this.scene.remove(group);
+    this.releaseInteriorExternalRefs(group);
+    const resourceErrors = this.dungeons?.disposeInteriorResources(group).errors;
+    if (resourceErrors?.length) console.warn('Interior resource dispose failed', resourceErrors);
+  }
+
+  /** Remove renderer-side references that live outside an interior root. */
+  private releaseInteriorExternalRefs(group: THREE.Group): void {
     const doomed = new Set<THREE.Object3D>();
     group.traverse((o) => doomed.add(o));
     // pruneFireLights answers whether the registry changed, and the rank MUST
@@ -9237,6 +9221,7 @@ export class Renderer {
       this.flames,
       this.fireLightAdopter.sink,
       this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined,
+      (group) => this.releaseInteriorExternalRefs(group),
     );
     return this.dungeons;
   }

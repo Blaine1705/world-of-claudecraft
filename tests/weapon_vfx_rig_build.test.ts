@@ -12,19 +12,23 @@
 //      derivation rebuilds byte-identically on its next wearer.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { materialProgramSignature } from '../src/render/prewarm_policy';
 import { isSharedTexture } from '../src/render/shared_resource';
 import {
   buildWeaponVfxPrewarmGroup,
+  buildWeaponVfxPrewarmSkinGroup,
   clearWeaponVfxTextureCacheForTest,
   createWeaponVfx,
   disposeWeaponEmissiveCache,
+  disposeWeaponVfxPrewarmSkinGroups,
   TIERS,
   WEAPON_VFX,
+  WEAPON_VFX_PREWARM_KEYS,
   type WeaponVfxSpec,
 } from '../src/render/weapon_vfx';
 import { WEAPON_EMISSIVE_IDLE_CACHE_MAX } from '../src/render/weapon_vfx_emissive_cache_core';
+import { createWeaponVfxPrewarmSkinStage } from '../src/render/weapon_vfx_prewarm';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 interface StubCanvas {
@@ -140,6 +144,26 @@ const EPIC_SPEC: WeaponVfxSpec = {
   lore: '',
   fx: [],
 };
+
+describe('streamed weapon-skin prewarm staging', () => {
+  it('deduplicates catalog units and releases a partial batch on failure', () => {
+    const scene = new THREE.Scene();
+    const stage = createWeaponVfxPrewarmSkinStage(scene);
+    const key = WEAPON_VFX_PREWARM_KEYS[0];
+
+    const first = stage.stage(key);
+    expect(stage.group).toBe(scene.children[0]);
+    expect(stage.group?.visible).toBe(false);
+    expect(stage.group?.userData.renderCategory).toBe('prewarm');
+    expect(stage.stage(key)).toBe(first);
+    expect(stage.group?.children).toEqual([first]);
+
+    stage.disposeFailure();
+    expect(stage.group).toBeNull();
+    expect(scene.children).toHaveLength(0);
+    expect(stage.get(key)).toBeUndefined();
+  });
+});
 
 function weaponRoot(map: THREE.Texture | null = null): THREE.Mesh {
   const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
@@ -678,4 +702,90 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     expect(lights).toBe(specCount);
     expect(visibleLights).toBe(0);
   });
+
+  it('pins the resume key plan to the catalog exactly once, in catalog order', () => {
+    expect(WEAPON_VFX_PREWARM_KEYS).toEqual(Object.keys(WEAPON_VFX));
+    expect(new Set(WEAPON_VFX_PREWARM_KEYS).size).toBe(WEAPON_VFX_PREWARM_KEYS.length);
+  });
+
+  it('builds exactly one deterministic skin unit with the same hidden ownership contract', () => {
+    const keys = Object.keys(WEAPON_VFX);
+    expect(keys.length).toBeGreaterThan(1);
+    const first = keys[0];
+    const second = keys[1];
+    const firstGroup = buildWeaponVfxPrewarmSkinGroup(first);
+    const secondGroup = buildWeaponVfxPrewarmSkinGroup(second);
+
+    expect(firstGroup.name).toBe(`weapon-vfx-program-prewarm:${first}`);
+    expect(secondGroup.name).toBe(`weapon-vfx-program-prewarm:${second}`);
+    expect(firstGroup.getObjectByName(`prewarm-skin-host:${first}`)).toBeTruthy();
+    expect(firstGroup.getObjectByName(`prewarm-skin-host:${second}`)).toBeUndefined();
+    expect(secondGroup.getObjectByName(`prewarm-skin-host:${second}`)).toBeTruthy();
+
+    const firstLights: THREE.Object3D[] = [];
+    firstGroup.traverse((object) => {
+      if ((object as THREE.PointLight).isPointLight) firstLights.push(object);
+    });
+    expect(firstLights).toHaveLength(1);
+    expect(firstLights[0].visible).toBe(false);
+    expect(firstGroup.userData.renderCategory).toBe('prewarm');
+    expect(firstGroup.getObjectByName('weapon_vfx_extras')).toBeTruthy();
+    expect(secondGroup.userData.renderCategory).toBe('prewarm');
+  });
+
+  it('rejects an unknown skin before publishing a partial prewarm group', () => {
+    expect(() => buildWeaponVfxPrewarmSkinGroup('__missing_skin__')).toThrow(
+      /unknown weapon VFX prewarm skin/,
+    );
+  });
+
+  it.each(['texture', 'compile'])(
+    'terminally releases every skin already staged when the %s resume unit fails',
+    (failure) => {
+      const keys = Object.keys(WEAPON_VFX).slice(0, 2);
+      const staged: THREE.Group[] = [];
+      const disposals: ReturnType<typeof vi.fn>[] = [];
+      const seenGeometries = new Set<THREE.BufferGeometry>();
+      const seenMaterials = new Set<THREE.Material>();
+      try {
+        for (const key of keys) {
+          const group = buildWeaponVfxPrewarmSkinGroup(key);
+          staged.push(group);
+          group.traverse((object) => {
+            const renderable = object as THREE.Mesh;
+            if (
+              renderable.geometry &&
+              !(object as THREE.Object3D & { isSprite?: boolean }).isSprite &&
+              !seenGeometries.has(renderable.geometry)
+            ) {
+              seenGeometries.add(renderable.geometry);
+              disposals.push(vi.spyOn(renderable.geometry, 'dispose'));
+            }
+            const materials = renderable.material
+              ? Array.isArray(renderable.material)
+                ? renderable.material
+                : [renderable.material]
+              : [];
+            for (const material of materials) {
+              if (seenMaterials.has(material)) continue;
+              seenMaterials.add(material);
+              disposals.push(vi.spyOn(material, 'dispose'));
+            }
+          });
+          if (key === keys[1]) throw new Error(`${failure} failed`);
+        }
+      } catch (error) {
+        expect(error).toEqual(new Error(`${failure} failed`));
+        disposeWeaponVfxPrewarmSkinGroups(staged);
+      }
+
+      expect(staged).toHaveLength(2);
+      expect(disposals.length).toBeGreaterThan(0);
+      for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+      // The failure hook and aggregate cleanup may both run. The ownership
+      // seam must make that second terminal pass a no-op.
+      disposeWeaponVfxPrewarmSkinGroups(staged);
+      for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+    },
+  );
 });

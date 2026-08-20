@@ -202,6 +202,105 @@ function scenarioFromUrl(): { source: 'gameplay' | 'benchmark'; zoneOrScenario: 
 }
 
 type RendererPrewarmSnapshot = NonNullable<NonNullable<PerfSnapshot['renderer']>['prewarm']>;
+type RendererPrewarmCompileUnit = NonNullable<RendererPrewarmSnapshot['compileUnits']>[number];
+type RendererPrewarmBudgetVariant = NonNullable<
+  RendererPrewarmSnapshot['manifestEntries'][number]['budgetVariants']
+>[number];
+
+const PREWARM_REPORT_COMPILE_UNITS = 32;
+const PREWARM_REPORT_BUDGET_VARIANTS = 16;
+const PREWARM_REPORT_TRANSITIONS = 32;
+
+function rendererPrewarmCompileUnitSummary(
+  units: RendererPrewarmSnapshot['compileUnits'],
+): Record<string, unknown>[] | undefined {
+  return units?.slice(0, PREWARM_REPORT_COMPILE_UNITS).map((unit: RendererPrewarmCompileUnit) => ({
+    id: unit.id,
+    lane: unit.lane,
+    submittedAtMs: unit.submittedAtMs,
+    syncEndAtMs: unit.syncEndAtMs,
+    settledAtMs: unit.settledAtMs,
+    failedAtMs: unit.failedAtMs,
+    programsBefore: unit.programsBefore,
+    programsAfter: unit.programsAfter,
+    programDelta: unit.programDelta,
+    chargedLinks: unit.chargedLinks,
+    syncMs: unit.syncMs,
+    settledDurationMs: unit.settledDurationMs,
+    statusAtReveal: unit.statusAtReveal,
+  }));
+}
+
+function rendererPrewarmBudgetVariantSummary(
+  variants: RendererPrewarmSnapshot['manifestEntries'][number]['budgetVariants'],
+): Record<string, unknown>[] | undefined {
+  return variants
+    ?.slice(0, PREWARM_REPORT_BUDGET_VARIANTS)
+    .map((variant: RendererPrewarmBudgetVariant) => ({
+      index: variant.index,
+      levels: {
+        grass: variant.levels.grass,
+        foliage: variant.levels.foliage,
+        vfx: variant.levels.vfx,
+        lighting: variant.levels.lighting,
+        resolution: variant.levels.resolution,
+      },
+      elapsedMs: variant.elapsedMs,
+      syncMs: variant.syncMs,
+      programsBefore: variant.programsBefore,
+      programsAfter: variant.programsAfter,
+      programDelta: variant.programDelta,
+      passes: variant.passes,
+    }));
+}
+
+function rendererPrewarmPacingSummary(
+  pacing: RendererPrewarmSnapshot['prewarmPacing'],
+): Record<string, unknown> | null {
+  if (!pacing) return null;
+  const adaptive = pacing.adaptive;
+  return {
+    available: pacing.available,
+    source: pacing.source,
+    mode: pacing.mode,
+    linksPerSecond: pacing.linksPerSecond,
+    burst: pacing.burst,
+    compileBatchRoots: pacing.compileBatchRoots,
+    hardMaxMs: pacing.hardMaxMs,
+    chargedLinks: pacing.chargedLinks,
+    scope: pacing.scope,
+    submitStop: pacing.submitStop,
+    adaptive: adaptive
+      ? {
+          state: adaptive.state,
+          windowLinks: adaptive.windowLinks,
+          minWindowLinks: adaptive.minWindowLinks,
+          maxWindowLinks: adaptive.maxWindowLinks,
+          maxWindowObserved: adaptive.maxWindowObserved,
+          estimatedLinksPerUnit: adaptive.estimatedLinksPerUnit,
+          inFlightLinks: adaptive.inFlightLinks,
+          inFlightUnits: adaptive.inFlightUnits,
+          peakInFlightLinks: adaptive.peakInFlightLinks,
+          submittedUnits: adaptive.submittedUnits,
+          settledUnits: adaptive.settledUnits,
+          failedUnits: adaptive.failedUnits,
+          backoffCount: adaptive.backoffCount,
+          noProgressCount: adaptive.noProgressCount,
+          lastSettlementMs: adaptive.lastSettlementMs,
+          transitions: adaptive.transitions
+            .slice(0, PREWARM_REPORT_TRANSITIONS)
+            .map((transition) => ({
+              atMs: transition.atMs,
+              from: transition.from,
+              to: transition.to,
+              reason: transition.reason,
+              windowLinks: transition.windowLinks,
+              inFlightLinks: transition.inFlightLinks,
+            })),
+        }
+      : null,
+  };
+}
 
 function rendererPrewarmSummary(
   prewarm: RendererPrewarmSnapshot | null,
@@ -256,7 +355,10 @@ function rendererPrewarmSummary(
       workDone: entry.workDone,
       workPlanned: entry.workPlanned,
       detail: entry.detail,
+      budgetVariants: rendererPrewarmBudgetVariantSummary(entry.budgetVariants),
     })),
+    compileUnits: rendererPrewarmCompileUnitSummary(prewarm.compileUnits),
+    prewarmPacing: rendererPrewarmPacingSummary(prewarm.prewarmPacing),
   };
 }
 

@@ -35,8 +35,11 @@ export function submitPrewarmCompileUnit(
   } catch (error) {
     runResult = Promise.reject(error);
   }
-  lifecycle.markSyncEnd(record);
-  pacing.markSyncEnd(unit.id, programCount() - programsBefore);
+  const programsAfter = programCount();
+  const programDelta = programsAfter - programsBefore;
+  const chargedLinks = Number.isFinite(programDelta) ? Math.max(0, programDelta) : 0;
+  lifecycle.markSyncEnd(record, { programsBefore, programsAfter, chargedLinks });
+  pacing.markSyncEnd(unit.id, chargedLinks);
   return {
     id: unit.id,
     done: Promise.resolve(runResult).then(

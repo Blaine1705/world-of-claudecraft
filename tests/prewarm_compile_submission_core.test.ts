@@ -65,6 +65,32 @@ describe('prewarm compile submission core', () => {
     expect(events.slice(-2)).toEqual(['lifecycle:settled', 'pacing:settled']);
   });
 
+  it('passes before and after counts plus the charged delta to lifecycle telemetry', () => {
+    const { lifecycle, pacing } = harness();
+    let programs = 10;
+    submitPrewarmCompileUnit(
+      {
+        id: 'scene:0',
+        run: () => {
+          programs = 14;
+        },
+      },
+      'programs.compile-submit',
+      {
+        lifecycle,
+        pacing,
+        programCount: () => programs,
+        onError: vi.fn(),
+      },
+    );
+
+    expect(lifecycle.markSyncEnd).toHaveBeenCalledWith(expect.anything(), {
+      programsBefore: 10,
+      programsAfter: 14,
+      chargedLinks: 4,
+    });
+  });
+
   it('turns a synchronous throw into a fail-soft settled submission', async () => {
     const { events, lifecycle, pacing } = harness();
     const error = new Error('compile failed');

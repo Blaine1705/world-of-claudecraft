@@ -472,10 +472,8 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     const submitEntryAt = renderer.indexOf("id: 'programs.compile-submit',");
     expect(submitEntryAt).toBeGreaterThan(-1);
     expect(submitEntryAt).toBeLessThan(renderer.indexOf("id: 'surface-detail.textures'"));
-    // The tail submit is bounded by BOTH deadlines: gpuSubmitDeadline alone
-    // sits 1000 ms past compileAwaitDeadline, so an unbounded tail submit
-    // could eat the whole await reserve and leave world.initial-frame drawing
-    // still-linking programs (QA finding, hitch-hunt P1).
+    // The compile submit is bounded by the GPU submit deadline and the
+    // compile await reserve, so it cannot eat the initial-frame link window.
     expect(compileEntry).toContain(
       "await submitCompileUnits(\n            true,\n            Math.min(gpuSubmitDeadline, compileAwaitDeadline),\n            'programs.compile',\n          );",
     );
@@ -498,10 +496,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(compileEntry).not.toContain('performance.now() >= gpuSubmitDeadline');
     // The submit loop consults the pure decision BETWEEN units, with the
     // caller-chosen deadline, the Insane exemption flag, and the pacing
-    // lane's own hard-stop verdict: without this wiring the 22 s production
-    // overrun comes back with every unit test green (QA finding B2), and
-    // without the fourth argument the Insane arm has no stop at all (the
-    // 11.8 s compile-submit entry of the 17/08 production login).
+    // lane's own hard-stop verdict.
     expect(renderer).toContain(
       'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n          pacing.shouldStop(performance.now()),\n        )',
     );
@@ -863,13 +858,33 @@ it('prewarms adaptive quality shader variants behind the desktop loading cover',
 
   expect(entryAt).toBeGreaterThan(-1);
   expect(nextEntryAt).toBeGreaterThan(entryAt);
-  expect(entry).toContain('renderBudgetShaderPrewarmLevels(originalState)');
+  expect(entry).toContain('runPrewarmBudgetVariants(');
+  expect(entry).toContain('renderBudgetShaderPrewarmLevels(');
+  expect(entry).toContain('originalState');
   expect(entry).toContain('this.renderPrewarmPass(1 / 60)');
-  expect(entry).toContain('renderPasses++');
-  expect(entry).toContain('performance.now() >= gpuSubmitDeadline');
+  expect(entry).toContain('deadlineMs: hardDeadline');
   expect(entry).toContain('withRestoredPrewarmState(');
   expect(entry).not.toContain('compilePrewarmColorPrograms(this.scene');
   expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
+});
+
+it('records each budget shader level with timing and program deltas', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const entryAt = renderer.indexOf("id: 'programs.budget-variants'");
+  const entryEnd = renderer.indexOf("id: 'sky.current-zone'", entryAt);
+  const entry = renderer.slice(entryAt, entryEnd);
+  const lifecycle = readFileSync(
+    new URL('../src/render/prewarm_compile_lifecycle.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  expect(entry).toContain('budgetVariants');
+  expect(lifecycle).toContain('programsBefore');
+  expect(lifecycle).toContain('programsAfter');
+  expect(lifecycle).toContain('syncMs');
+  expect(lifecycle).toContain('passes');
 });
 it('settles linked desktop programs only until the independent hard deadline', () => {
   const renderer = readFileSync(

@@ -163,6 +163,28 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         workDone: 12,
         workPlanned: 20,
         detail: 'uploaded=12',
+        budgetVariants: [
+          {
+            index: 0,
+            levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9 },
+            elapsedMs: 24,
+            syncMs: 18,
+            programsBefore: 10,
+            programsAfter: 14,
+            programDelta: 4,
+            passes: 1,
+          },
+          {
+            index: 1,
+            levels: { grass: 0.86, foliage: 0.72, vfx: 0.84, lighting: 0.78, resolution: 0.9 },
+            elapsedMs: 20,
+            syncMs: 15,
+            programsBefore: 14,
+            programsAfter: 16,
+            programDelta: 2,
+            passes: 1,
+          },
+        ],
       },
     ],
     manifestCompleted: 12,
@@ -194,6 +216,74 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
       ],
     },
     diagnosticsBaseline: null,
+    compileUnits: [
+      {
+        id: 'programs.compile:0',
+        lane: 'programs.compile',
+        submittedAtMs: 100,
+        syncEndAtMs: 112,
+        settledAtMs: 140,
+        failedAtMs: null,
+        programsBefore: 10,
+        programsAfter: 14,
+        programDelta: 4,
+        chargedLinks: 4,
+        syncMs: 12,
+        settledDurationMs: 28,
+        statusAtReveal: 'settled' as const,
+        roots: Array.from({ length: 32 }, (_, index) => `root-${index}`),
+      },
+    ],
+    prewarmPacing: {
+      available: true,
+      source: 'default' as const,
+      mode: 'adaptive' as const,
+      linksPerSecond: null,
+      burst: 8,
+      compileBatchRoots: 32,
+      hardMaxMs: 5000,
+      chargedLinks: 4,
+      scope: 'compile-unit-sync-prologue' as const,
+      submitStop: {
+        submissions: 1,
+        usefulSettles: 1,
+        zeroDeltaSettles: 0,
+        zeroDeltaStreak: 0,
+        syncEnds: 1,
+        zeroDeltaSyncEnds: 0,
+        elapsedMs: 42,
+        sinceUsefulMs: 0,
+        stopped: false,
+        reason: null,
+      },
+      adaptive: {
+        state: 'ramp' as const,
+        windowLinks: 16,
+        minWindowLinks: 8,
+        maxWindowLinks: 32,
+        maxWindowObserved: 16,
+        estimatedLinksPerUnit: 4,
+        inFlightLinks: 4,
+        inFlightUnits: 1,
+        peakInFlightLinks: 24,
+        submittedUnits: 2,
+        settledUnits: 1,
+        failedUnits: 0,
+        backoffCount: 0,
+        noProgressCount: 0,
+        lastSettlementMs: 120,
+        transitions: [
+          {
+            atMs: 120,
+            from: 'ramp' as const,
+            to: 'steady' as const,
+            reason: 'mid-settlement' as const,
+            windowLinks: 16,
+            inFlightLinks: 4,
+          },
+        ],
+      },
+    },
   };
 }
 
@@ -602,7 +692,13 @@ describe('perf reporter payload', () => {
     const summaryEntries = (
       body.rawSummary as {
         rendererPrewarmSummary?: {
-          entries?: { id?: string; status?: string; workDone?: number; workPlanned?: number }[];
+          entries?: {
+            id?: string;
+            status?: string;
+            workDone?: number;
+            workPlanned?: number;
+            budgetVariants?: Record<string, unknown>[];
+          }[];
         };
       }
     ).rendererPrewarmSummary?.entries;
@@ -613,6 +709,28 @@ describe('perf reporter payload', () => {
       workDone: 12,
       workPlanned: 20,
     });
+    expect(summaryEntries?.[1]?.budgetVariants).toEqual([
+      {
+        index: 0,
+        levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9 },
+        elapsedMs: 24,
+        syncMs: 18,
+        programsBefore: 10,
+        programsAfter: 14,
+        programDelta: 4,
+        passes: 1,
+      },
+      {
+        index: 1,
+        levels: { grass: 0.86, foliage: 0.72, vfx: 0.84, lighting: 0.78, resolution: 0.9 },
+        elapsedMs: 20,
+        syncMs: 15,
+        programsBefore: 14,
+        programsAfter: 16,
+        programDelta: 2,
+        passes: 1,
+      },
+    ]);
     // The live stats object is NOT sent beside the summary. It was a second
     // copy of the same block under the ingest's 16 KB cap, and once its resume
     // getter started serializing, the copy the server rebuilds from a fixed key
@@ -636,6 +754,38 @@ describe('perf reporter payload', () => {
       failedUnitIds: ['vfx.weapon-skins:weapon-skins:compile'],
       entries: [{ id: 'vfx.weapon-skins', lane: 'cosmetic', planned: 3, started: 3, failed: 1 }],
     });
+    expect(prewarmSummary?.compileUnits).toEqual([
+      {
+        id: 'programs.compile:0',
+        lane: 'programs.compile',
+        submittedAtMs: 100,
+        syncEndAtMs: 112,
+        settledAtMs: 140,
+        failedAtMs: null,
+        programsBefore: 10,
+        programsAfter: 14,
+        programDelta: 4,
+        chargedLinks: 4,
+        syncMs: 12,
+        settledDurationMs: 28,
+        statusAtReveal: 'settled',
+      },
+    ]);
+    expect(prewarmSummary?.prewarmPacing).toMatchObject({
+      adaptive: {
+        peakInFlightLinks: 24,
+        transitions: [
+          {
+            atMs: 120,
+            from: 'ramp',
+            to: 'steady',
+            reason: 'mid-settlement',
+            windowLinks: 16,
+            inFlightLinks: 4,
+          },
+        ],
+      },
+    });
     expect(
       (body.rawSummary as { rendererFoliage?: { modelVisibleTrianglesByLod?: { core?: number } } })
         .rendererFoliage?.modelVisibleTrianglesByLod?.core,
@@ -651,6 +801,60 @@ describe('perf reporter payload', () => {
     snap.hiddenPresentSkips = 4321;
     const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(4321);
+  });
+
+  it('bounds prewarm unit and variant telemetry without copying root labels', () => {
+    const settings = new Settings();
+    const snap = snapshot();
+    const prewarm = snap.renderer?.prewarm;
+    if (!prewarm || !prewarm.compileUnits?.[0]) throw new Error('fixture prewarm is incomplete');
+    const baseUnit = prewarm.compileUnits[0];
+    prewarm.compileUnits = Array.from({ length: 40 }, (_, index) => ({
+      ...baseUnit,
+      id: `programs.compile:${index}`,
+      roots: Array.from({ length: 32 }, (_, rootIndex) => `root-${rootIndex}`),
+    }));
+    const variants = prewarm.manifestEntries[1]?.budgetVariants?.[0];
+    if (!variants) throw new Error('fixture variants are incomplete');
+    prewarm.manifestEntries[1].budgetVariants = Array.from({ length: 20 }, (_, index) => ({
+      ...variants,
+      index,
+    }));
+
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    const summary = (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          compileUnits?: Record<string, unknown>[];
+          entries?: { budgetVariants?: Record<string, unknown>[] }[];
+        };
+      }
+    ).rendererPrewarmSummary;
+    expect(summary?.compileUnits).toHaveLength(32);
+    expect(summary?.compileUnits?.[0]).not.toHaveProperty('roots');
+    expect(summary?.entries?.[1]?.budgetVariants).toHaveLength(16);
+  });
+
+  it('bounds adaptive transition telemetry at the literal 32-entry cap', () => {
+    const settings = new Settings();
+    const snap = snapshot();
+    const adaptive = snap.renderer?.prewarm?.prewarmPacing?.adaptive;
+    if (!adaptive || !adaptive.transitions[0])
+      throw new Error('fixture adaptive pacing is incomplete');
+    adaptive.transitions = Array.from({ length: 40 }, (_, index) => ({
+      ...adaptive.transitions[0],
+      atMs: index,
+    }));
+
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    const summary = (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          prewarmPacing?: { adaptive?: { transitions?: Record<string, unknown>[] } };
+        };
+      }
+    ).rendererPrewarmSummary;
+    expect(summary?.prewarmPacing?.adaptive?.transitions).toHaveLength(32);
   });
 
   it('carries the four dropped browser longtask fields into raw summary (#2479)', () => {
