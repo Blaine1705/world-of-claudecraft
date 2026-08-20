@@ -743,6 +743,20 @@ export const VOICE_PROMPTS = [
       'Ferry lanterns do not go out in water. That is the point of them.',
   },
 
+  // -- The Proving Shore (src/sim/content/proving_shore.ts) -----------------
+  {
+    npcId: 'ferryman_odo',
+    name: 'Ferryman Odo',
+    voiceDescription:
+      'The tutorial island ferryman and guiding voice, sun-bleached pier: a warm, weathered OLD ' +
+      'male voice, seventies, gravel under real kindness, unhurried grandfatherly encouragement ' +
+      'with a soft coastal lilt. Every line lands like advice from someone who has ferried a ' +
+      'thousand newcomers across and liked every one of them. Age 70s. Male.',
+    sampleText:
+      'Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. ' +
+      'Follow it, and when the bell rings for you, I will be right here at the pier.',
+  },
+
   // -- The Willowfen, Bridgemere (src/sim/content/willowfen.ts) -------------
   {
     npcId: 'waykeeper_pell',
@@ -1069,9 +1083,8 @@ export const VOICE_ALIAS = {
   // Camp outfitter rattling off bread, water, and a draught: the Highwatch
   // quartermaster's brisk, no-nonsense inventory cadence.
   quartermaster_finch: 'quartermaster_bree',
-  // Keeper of the Crossing waiting at his pier: the fogbound-lake
-  // ferrymaster's low, careful, water-wise calm.
-  ferryman_odo: 'ferrymaster_caddow',
+  // ferryman_odo graduated to his own designed old-man voice (VOICE_PROMPTS
+  // above): he is the island's spoken guide, not a role borrow.
   // The camp's Gilded Strongbox desk: Eastbrook's own bursar register, the
   // same institutional voice the brand speaks with in every town.
   bursar_wick: 'bursar_fernando',

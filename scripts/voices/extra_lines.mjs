@@ -51,11 +51,8 @@ export const EXTRA_LINES = [
   A('The wardstones still bind his soul.'),
   A('When the time comes, do not ignore them.'),
   A('Fail and we all perish'),
-  // Ferryman Odo, the Proving Shore's guiding voice. voiceNpc is the
-  // DESIGNED ferrymaster_caddow voice (the same one Odo's dialog aliases to,
-  // so the guide and the dialog share one throat); promote Odo to his own
-  // old-man VOICE_PROMPTS entry and re-render once an ElevenLabs key is on
-  // hand, exactly the npc_voice_prompts.mjs alias note's path.
+  // Ferryman Odo, the Proving Shore's guiding voice: his own designed
+  // old-man voice (VOICE_PROMPTS ferryman_odo).
   // EXPLICIT stable keys, not yellKey: these are played by key from the
   // island coach (src/ui/bootcamp.ts GUIDE_VOICE_LINES pins the same
   // literals; tests/coach_prompt_view.test.ts holds the two lists together),
@@ -63,37 +60,37 @@ export const EXTRA_LINES = [
   // while this text is what the English VO speaks.
   {
     key: 'guide__odo__arrival',
-    voiceNpc: 'ferrymaster_caddow',
+    voiceNpc: 'ferryman_odo',
     text: 'Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.',
   },
   {
     key: 'guide__odo__first_flag',
-    voiceNpc: 'ferrymaster_caddow',
+    voiceNpc: 'ferryman_odo',
     text: 'That is one flag down. Keep those legs moving, only two to go.',
   },
   {
     key: 'guide__odo__run_done',
-    voiceNpc: 'ferrymaster_caddow',
+    voiceNpc: 'ferryman_odo',
     text: 'A clean run, that. Overseer Pell holds your reward, go claim it.',
   },
   {
     key: 'guide__odo__station_done_a',
-    voiceNpc: 'ferrymaster_caddow',
+    voiceNpc: 'ferryman_odo',
     text: 'Fine work. On to the next, the path is already lit for you.',
   },
   {
     key: 'guide__odo__station_done_b',
-    voiceNpc: 'ferrymaster_caddow',
+    voiceNpc: 'ferryman_odo',
     text: 'You are getting the hang of this, no mistake.',
   },
   {
     key: 'guide__odo__veer_off',
-    voiceNpc: 'ferrymaster_caddow',
+    voiceNpc: 'ferryman_odo',
     text: 'Hold up, friend, that is the wrong way. The golden path is behind you.',
   },
   {
     key: 'guide__odo__graduate',
-    voiceNpc: 'ferrymaster_caddow',
+    voiceNpc: 'ferryman_odo',
     text: 'The bell is rung for you. Eastbrook waits across the water, and you are ready for it.',
   },
 ];

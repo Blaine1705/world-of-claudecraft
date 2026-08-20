@@ -153,10 +153,7 @@ describe('GUIDE_VOICE_LINES: the clip keys, the pipeline lines, the captions', (
         entry,
         `${line.clip} must be declared in scripts/voices/extra_lines.mjs`,
       ).toBeDefined();
-      // The designed voice Odo's own dialog aliases to (coverage requires a
-      // designed voice, not an alias); promote to ferryman_odo's own voice
-      // when one is designed, and move this pin with it.
-      expect(entry!.voiceNpc).toBe('ferrymaster_caddow');
+      expect(entry!.voiceNpc).toBe('ferryman_odo');
     }
   });
 
