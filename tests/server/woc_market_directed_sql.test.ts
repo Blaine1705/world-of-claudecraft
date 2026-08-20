@@ -14,6 +14,8 @@ import { readFileSync } from 'node:fs';
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  ESCROW_LOCK_TIMEOUT_MS,
+  GUARD_IDLE_TX_TIMEOUT_MS,
   PgWocMarketDb,
   SETTLED_OFFER_GRACE_MS,
   TxNeverStarted,
@@ -35,6 +37,62 @@ function recordingPool(): { pool: Pool; sql: () => string[]; params: () => unkno
     return { rows: [], rowCount: 0 };
   });
   return { pool: { query } as unknown as Pool, sql: () => seen, params: () => bound };
+}
+
+/** recordingPool for the BOUNDED plain writers (since the write-path rider
+ *  they ride one short transaction through boundedWrite): the same raw
+ *  recorder plus a connect() client so the seam can run, and workload views
+ *  that drop the protocol statements (BEGIN/COMMIT/ROLLBACK/SET LOCAL) with
+ *  their empty param rows, so a per-writer pin keeps asserting on the ONE
+ *  statement it is about. The bounded shape itself is pinned RAW, once, in
+ *  its dedicated test below; sql() here stays raw on purpose so a no-BEGIN
+ *  style negative can never go vacuous against this rig. */
+/** Wrap a bare query fn as a pool the bounded plain-write seam can drive:
+ *  the same fn answers pool.query and the checked-out client, with the
+ *  protocol statements (BEGIN/SET LOCAL/COMMIT/ROLLBACK) answered empty
+ *  BEFORE the fn runs, so a recording rig keeps seeing only its workload
+ *  statement and a THROWING responder fires on the workload statement, not
+ *  on BEGIN (which would misclassify the staged error as never-started). */
+function writeClientPool(
+  query: (text: string, values?: unknown[]) => Promise<{ rows: unknown[]; rowCount: number }>,
+): Pool {
+  const wrapped = async (text: string, values?: unknown[]) => {
+    if (
+      text === 'BEGIN' ||
+      text === 'COMMIT' ||
+      text === 'ROLLBACK' ||
+      text.startsWith('SET LOCAL')
+    ) {
+      return { rows: [], rowCount: 0 };
+    }
+    return query(text, values);
+  };
+  const client = { query: wrapped, release: () => {}, on: () => {}, removeListener: () => {} };
+  return { query: wrapped, connect: async () => client } as unknown as Pool;
+}
+
+function recordingWritePool(): {
+  pool: Pool;
+  sql: () => string[];
+  workload: () => string[];
+  workloadParams: () => unknown[][];
+} {
+  const seen: string[] = [];
+  const bound: unknown[][] = [];
+  const query = vi.fn(async (text: string, values?: unknown[]) => {
+    seen.push(text);
+    bound.push(values ?? []);
+    return { rows: [], rowCount: 0 };
+  });
+  const client = { query, release: () => {}, on: () => {}, removeListener: () => {} };
+  const isProtocol = (t: string) =>
+    t === 'BEGIN' || t === 'COMMIT' || t === 'ROLLBACK' || t.startsWith('SET LOCAL');
+  return {
+    pool: { query, connect: async () => client } as unknown as Pool,
+    sql: () => seen,
+    workload: () => seen.filter((t) => !isProtocol(t)),
+    workloadParams: () => bound.filter((_, i) => !isProtocol(seen[i] ?? '')),
+  };
 }
 
 const browseQuery = {
@@ -176,7 +234,7 @@ describe('the directed-rail integrity statements, in SQL', () => {
         };
       }),
     };
-    await new PgWocMarketDb(okPool as unknown as Pool).insertDirectedOffer({
+    await new PgWocMarketDb(writeClientPool(okPool.query)).insertDirectedOffer({
       realm: REALM,
       sellerAccount: 4,
       sellerCharacter: 21,
@@ -217,7 +275,7 @@ describe('the directed-rail integrity statements, in SQL', () => {
         });
       }),
     };
-    const out = await new PgWocMarketDb(dup as unknown as Pool).insertDirectedOffer(offerRow());
+    const out = await new PgWocMarketDb(writeClientPool(dup.query)).insertDirectedOffer(offerRow());
     expect(out).toBe('offer_pending');
     // A 23505 from any OTHER unique index (a desynced sequence after a
     // hand-built partial restore) must surface as the 500 it is, never as
@@ -231,7 +289,7 @@ describe('the directed-rail integrity statements, in SQL', () => {
       }),
     };
     await expect(
-      new PgWocMarketDb(foreign as unknown as Pool).insertDirectedOffer(offerRow()),
+      new PgWocMarketDb(writeClientPool(foreign.query)).insertDirectedOffer(offerRow()),
     ).rejects.toThrow('duplicate key');
   });
 
@@ -239,12 +297,12 @@ describe('the directed-rail integrity statements, in SQL', () => {
     // item_id is the BUYER's agreed item, stamped at creation beside the
     // pin; letting the seller's claimed ref overwrite it would show the
     // buyer an item they never agreed to while the deal awaits payment.
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).acceptDirectedOfferSide(REALM, 3, 'seller', {
       index: 0,
       itemId: 'other_item',
     });
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain('item_ref = COALESCE');
     expect(text).not.toContain('item_id =');
   });
@@ -271,9 +329,9 @@ describe('the directed-rail integrity statements, in SQL', () => {
   });
 
   it('the converge expire write carries the accepted-and-unstamped CAS', async () => {
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).expireDirectedOfferIfUnstamped(REALM, 3);
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain("SET status = 'expired'");
     expect(text).toContain("status = 'accepted'");
     expect(text).toContain('listing_id IS NULL');
@@ -511,9 +569,9 @@ describe('the listing-id stamp rides the escrow transaction, atomically', () => 
     // (an accepted-row listing_id write) is deliberately GONE from this
     // statement: reintroducing it would put a second stamp writer beside the
     // atomic one.
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     return new PgWocMarketDb(pool).resolveDirectedOffer(REALM, 3, 'declined').then(() => {
-      const [text] = sql();
+      const [text] = workload();
       expect(text).toContain("status = 'pending'");
       // No listing_id WRITE (RETURNING still projects the column).
       expect(text).not.toContain('listing_id =');
@@ -528,15 +586,15 @@ describe('abandoning a bid is a compare-and-set, not a read-then-write', () => {
     // cancelling another's bid; the status arm is what makes the button safe to
     // press at all, since a bond can land while the player is reaching for "Not
     // now", and cancelling THEN would drop a bid the auction already counts.
-    const { pool, sql, params } = recordingPool();
+    const { pool, workload, workloadParams } = recordingWritePool();
     await new PgWocMarketDb(pool).abandonPendingBid(REALM, 12, 34);
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain("status = 'cancelled'");
     expect(text).toContain("bond_state = 'void'");
     expect(text).toContain("status = 'pending_bond'");
     expect(text).toContain('account = $3');
     expect(text).toContain('realm = $1');
-    expect(params()[0]).toEqual([REALM, 12, 34]);
+    expect(workloadParams()[0]).toEqual([REALM, 12, 34]);
   });
 
   it('reports whether it actually matched, so the service can refuse', async () => {
@@ -544,16 +602,12 @@ describe('abandoning a bid is a compare-and-set, not a read-then-write', () => {
     // unconditionally would tell a player their bid was withdrawn while it was
     // still holding the listing lock.
     const seen: string[] = [];
-    const zero = {
-      query: vi.fn(async (t: string) => {
-        seen.push(t);
-        return { rows: [], rowCount: 0 };
-      }),
-    } as unknown as Pool;
+    const zero = writeClientPool(async (t: string) => {
+      seen.push(t);
+      return { rows: [], rowCount: 0 };
+    });
     expect(await new PgWocMarketDb(zero).abandonPendingBid(REALM, 12, 34)).toBe(false);
-    const one = {
-      query: vi.fn(async () => ({ rows: [], rowCount: 1 })),
-    } as unknown as Pool;
+    const one = writeClientPool(async () => ({ rows: [], rowCount: 1 }));
     expect(await new PgWocMarketDb(one).abandonPendingBid(REALM, 12, 34)).toBe(true);
   });
 });
@@ -641,9 +695,9 @@ describe('the bond finality queue, in SQL', () => {
   });
 
   it('records a signature only against a still-pending bid', async () => {
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).submitBondSignature(7, 'sig', 1_000);
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain("status = 'pending_bond'");
     // Idempotent on a retry of the SAME signature, so a client re-send is not
     // mistaken for a reuse.
@@ -658,9 +712,9 @@ describe('the bond finality queue, in SQL', () => {
     // verdict arriving after the fact, and a HELD bond (settled verdict whose
     // activation is retrying) must never void on a reorg-flipped verdict: a
     // voided held bond strands money where no refund arm reads.
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).lapseBid(7);
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain("status = 'lapsed'");
     expect(text).toContain("bond_state = 'void'");
     expect(text).toContain("status = 'pending_bond'");
@@ -1126,13 +1180,16 @@ describe('every guard transaction bounds its idle holds', () => {
     // insertPendingBid contended-tail shape), so match both forms.
     const txSites = src.match(/this\.withTx(<[^>\n]+>)?\(/g) ?? [];
     const idleBounds = src.match(/SET LOCAL idle_in_transaction_session_timeout/g) ?? [];
-    expect(txSites.length).toBe(12);
+    // 13 since the write-path rider: the twelve guard transactions plus the
+    // ONE bounded plain-write seam (boundedWrite), which routes every
+    // direct row-locking writer through the same two bounds.
+    expect(txSites.length).toBe(13);
     expect(idleBounds.length).toBe(txSites.length);
     // DISTRIBUTION, not just the count: a copy-paste retrofit can double one
     // site and skip another with the totals intact. Every withTx callback
     // must carry the bound near its head (the SET LOCALs open each guard).
     const slices = src.split(/this\.withTx(?:<[^>\n]+>)?\(/).slice(1);
-    expect(slices.length).toBe(12);
+    expect(slices.length).toBe(13);
     for (const [i, slice] of slices.entries()) {
       expect(
         slice.slice(0, 1600).includes('SET LOCAL idle_in_transaction_session_timeout'),
@@ -1157,7 +1214,9 @@ describe('every guard transaction bounds its idle holds', () => {
     // statements; every other guard carries the 2s bound. A site quietly
     // switching tiers is a policy change, not a tidy-up.
     expect(src.match(/\$\{SAVE_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(2);
-    expect(src.match(/\$\{GUARD_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(10);
+    // 11 since the write-path rider: the ten 2s-tier guards plus the
+    // bounded plain-write seam, which rides the guard tier by design.
+    expect(src.match(/\$\{GUARD_IDLE_TX_TIMEOUT_MS\}/g)).toHaveLength(11);
   });
 });
 
@@ -1310,21 +1369,21 @@ describe('the delivery close tail is ONE transaction, in SQL', () => {
 
 describe('the bond and lock lifecycle statements, in SQL', () => {
   it('setBidBondQuote refreshes only an UNPAID quote, in the statement', async () => {
-    const { pool, sql, params } = recordingPool();
+    const { pool, workload, workloadParams } = recordingWritePool();
     await new PgWocMarketDb(pool).setBidBondQuote(3, 'ref', 1_000, 82);
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain("status = 'pending_bond'");
     expect(text, 'the signature arm is the CAS').toContain('bond_signature IS NULL');
     expect(text, 'the adopted service figure rides the same guarded write').toContain(
       'bond_cents = $4',
     );
-    expect(params()[0]).toEqual([3, 'ref', 1_000, 82]);
+    expect(workloadParams()[0]).toEqual([3, 'ref', 1_000, 82]);
   });
 
   it('abandonPendingBid refuses to void a signed bond, in the statement', async () => {
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).abandonPendingBid(REALM, 3, 4);
-    const [text] = sql();
+    const [text] = workload();
     expect(text, 'a signed bond may be riding real money').toContain('bond_signature IS NULL');
   });
 
@@ -1380,11 +1439,70 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
   });
 
   it('touchBidPollRow writes the rotation stamp ONLY, never the age column', async () => {
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).touchBidPollRow(7);
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain('SET poll_parked_at = now()');
     expect(text).not.toContain('placed_at');
+  });
+
+  it('a bounded plain write carries the guard bounds in one short transaction (raw shape)', async () => {
+    // The write-path rider's seam, pinned RAW exactly once: every direct
+    // row-locking writer rides this five-statement envelope, so a contended
+    // row refuses at the 2s lock ceiling as a counted 55P03 instead of
+    // camping a pooled client for the 15s session default. The per-writer
+    // pins above assert through workload() and never see the envelope; this
+    // is the one place its shape is load-bearing.
+    const { pool, sql, workload } = recordingWritePool();
+    await new PgWocMarketDb(pool).touchBidPollRow(7);
+    const raw = sql();
+    expect(raw).toHaveLength(5);
+    expect(raw[0]).toBe('BEGIN');
+    expect(raw[1]).toBe(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+    expect(raw[2]).toBe(
+      `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+    );
+    expect(raw[3]).toContain('UPDATE woc_market_bids SET poll_parked_at = now()');
+    expect(raw[4]).toBe('COMMIT');
+    expect(workload()).toHaveLength(1);
+  });
+
+  it('clearBuyNowLock swallows an already-counted contention and keeps the decided answer', async () => {
+    // The sharpest plain-writer caller: buyNow's four compensation calls run
+    // AFTER their request decided a typed refusal, and before the rider a
+    // contended clear converted that decided 409 into a 500 while STILL
+    // leaving the lock held. The contract is now best-effort by design (the
+    // lock ages out through buy_now_lock_expires), so the contention
+    // classes resolve void, counted exactly ONCE (boundedWrite's tail; the
+    // swallow reads through the non-counting isContentionCode).
+    const counters = await import('../../server/woc_market_db');
+    for (const code of ['55P03', '40P01', '25P03']) {
+      const lockBefore = counters.wocMarketLockWaitTimeoutCount();
+      const contended = writeClientPool(async () => {
+        throw Object.assign(new Error('staged contention'), { code });
+      });
+      await expect(new PgWocMarketDb(contended).clearBuyNowLock(7, 3)).resolves.toBeUndefined();
+      // Counted once, never twice: the double-count would poison the rate
+      // an operator alerts on.
+      expect(counters.wocMarketLockWaitTimeoutCount()).toBe(
+        lockBefore + (code === '55P03' ? 1 : 0),
+      );
+    }
+    // A checkout failure (never-started) is equally safe to swallow: nothing
+    // ran, and the lock still ages out.
+    const failing = {
+      query: async () => ({ rows: [], rowCount: 0 }),
+      connect: async () => {
+        throw new Error('timeout exceeded when trying to connect');
+      },
+    } as unknown as Pool;
+    await expect(new PgWocMarketDb(failing).clearBuyNowLock(7, 3)).resolves.toBeUndefined();
+    // A non-contention failure still surfaces: best-effort never means
+    // swallowing a real bug.
+    const buggy = writeClientPool(async () => {
+      throw new Error('some real bug');
+    });
+    await expect(new PgWocMarketDb(buggy).clearBuyNowLock(7, 3)).rejects.toThrow('some real bug');
   });
 
   it('cancelPendingListings rides the rotation order with the backoff exclusion', async () => {
@@ -1723,9 +1841,9 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     // window whose refusal class says the chain plausibly saw money; a bare
     // signature deliberately does NOT exempt (one fabricated request would
     // bypass the cooldown arm).
-    const viaRecorder = recordingPool();
+    const viaRecorder = recordingWritePool();
     await new PgWocMarketDb(viaRecorder.pool).recordBuyNowAbandon(REALM, 7, 3, 1_000);
-    const [recorderText] = viaRecorder.sql();
+    const [recorderText] = viaRecorder.workload();
     expect(recorderText).toContain('WHERE NOT EXISTS');
     expect(recorderText).toContain('tx_signature IS NOT NULL');
     // The exempt list rides a BOUND parameter (no interpolation), and its
@@ -1733,7 +1851,7 @@ describe('the bond and lock lifecycle statements, in SQL', () => {
     // as attacker-mintable (wait out the TTL, post any string), and a
     // re-added member must consciously red this literal.
     expect(recorderText).toContain('ANY($5::text[])');
-    expect(viaRecorder.params()[0]?.[4]).toEqual(['service_unavailable']);
+    expect(viaRecorder.workloadParams()[0]?.[4]).toEqual(['service_unavailable']);
     expect(recorderText).toContain('ON CONFLICT (listing_id, account, lock_expires) DO NOTHING');
     const deadLock = {
       id: 7,
@@ -2127,13 +2245,20 @@ describe('the escrow listing transaction, in SQL', () => {
     );
     const widened = src.match(/err instanceof TxNeverStarted \|\| isLockContention\(err\)/g) ?? [];
     expect(widened).toHaveLength(11);
-    // The two exceptions, each load-bearing: exactly ONE un-widened
+    // The recorded exceptions, each load-bearing: exactly ONE un-widened
     // `if (isLockContention(err))` tail remains (the advisory claim reads,
-    // which run on the plain pool where the tag cannot occur), and exactly
-    // one bare classify-to-count statement (the delivered-save tail, which
-    // rethrows RAW so commitGrant's transient arm keeps the evidence).
+    // which run on the plain pool where the tag cannot occur), exactly TWO
+    // bare classify-to-count statements (the delivered-save tail and the
+    // bounded plain-write seam, both of which rethrow RAW so their callers
+    // keep the evidence), and exactly ONE swallow through the non-counting
+    // isContentionCode (clearBuyNowLock's best-effort contract: its error
+    // was already counted by boundedWrite's tail, so a counting second look
+    // would double every rate).
     expect(src.match(/if \(isLockContention\(err\)\)/g) ?? []).toHaveLength(1);
-    expect(src.match(/^\s*isLockContention\(err\);$/gm) ?? []).toHaveLength(1);
+    expect(src.match(/^\s*isLockContention\(err\);$/gm) ?? []).toHaveLength(2);
+    expect(
+      src.match(/err instanceof TxNeverStarted \|\| isContentionCode\(err\)/g) ?? [],
+    ).toHaveLength(1);
 
     // Behavioral, one per answer shape. The typed-refusal shape: a checkout
     // failure on the bid path answers 'contended' and moves ONLY the
@@ -2378,9 +2503,9 @@ describe('the custody claim primitives stay monotonic, in SQL', () => {
       (db: PgWocMarketDb) => db.markCustodyGrantIntent('ref-1', 21),
       (db: PgWocMarketDb) => db.markCustodyMailIntent('ref-1'),
     ]) {
-      const { pool, sql } = recordingPool();
+      const { pool, workload } = recordingWritePool();
       await run(new PgWocMarketDb(pool));
-      expect(sql()[0]).toContain('booked_at IS NULL');
+      expect(workload()[0]).toContain('booked_at IS NULL');
     }
   });
 
@@ -2388,9 +2513,9 @@ describe('the custody claim primitives stay monotonic, in SQL', () => {
     // The one legal conversion (a grantCopy refusal proves the bags are
     // untouched); two statements here would leave a crash window in which a
     // claim carries both rails.
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     await new PgWocMarketDb(pool).markCustodyMailIntent('ref-1');
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain('mail_intent_at = now()');
     expect(text).toContain('grant_character_id = NULL');
   });
@@ -2400,12 +2525,12 @@ describe('the custody claim primitives stay monotonic, in SQL', () => {
     // leave exactly one holder, and the loser must learn it lost (rowCount 0)
     // instead of taking a 23505 through the sweep's error path. The conflict
     // target names the primary key column pinned in the DDL floor above.
-    const { pool, sql, params } = recordingPool();
+    const { pool, workload, workloadParams } = recordingWritePool();
     await new PgWocMarketDb(pool).claimCustodyRef(REALM, 'ref-1');
-    const [text] = sql();
+    const [text] = workload();
     expect(text).toContain('INSERT INTO woc_market_custody_claims');
     expect(text).toContain('ON CONFLICT (custody_ref) DO NOTHING');
-    expect(params()[0]).toEqual([REALM, 'ref-1']);
+    expect(workloadParams()[0]).toEqual([REALM, 'ref-1']);
   });
 
   it('reads the claim state (booked flag plus both rail intents) from the row', async () => {
@@ -2510,16 +2635,16 @@ describe('the sweep reads that keep delivery converging, in SQL', () => {
     // The stuck classes age on updated_at; a rotation that touched it would
     // re-stamp a parked row every retry and hide it from the monitor forever
     // (the retry cadence is far inside the stuck threshold).
-    const { pool, sql } = recordingPool();
+    const { pool, workload } = recordingWritePool();
     const db = new PgWocMarketDb(pool);
     await db.touchSettlementRow(7);
     await db.touchListingRow(9);
-    for (const text of sql()) {
+    for (const text of workload()) {
       expect(text).toContain('SET sweep_parked_at = now()');
       expect(text).not.toContain('updated_at');
       expect(text).not.toContain('created_at');
     }
-    expect(sql()).toHaveLength(2);
+    expect(workload()).toHaveLength(2);
   });
 
   it('orders both park-rotated batch reads by the rotation expression', async () => {

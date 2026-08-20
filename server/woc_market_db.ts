@@ -18,7 +18,7 @@
 // Money is INTEGER USD CENTS end to end. Item snapshots are JSONB InvSlot
 // copies (the escrow-by-removal custody model in docs/prd/woc/marketplace.md).
 
-import type { Pool, PoolClient } from 'pg';
+import type { Pool, PoolClient, QueryResult } from 'pg';
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { InvSlot } from '../src/sim/types';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db';
@@ -1186,20 +1186,31 @@ export function wocMarketTxNeverStartedCount(): number {
   return txNeverStartedCount;
 }
 
+/** Pure membership test, NO counters: for the callers that see an error a
+ *  counting tail already classified (clearBuyNowLock's best-effort swallow
+ *  runs AFTER boundedWrite's tail booked the class; running the counting
+ *  classifier twice on one error would double every rate). */
+function isContentionCode(err: unknown): boolean {
+  const code = (err as { code?: string }).code;
+  return code === '55P03' || code === '40P01' || code === '25P03';
+}
+
 function isLockContention(err: unknown): boolean {
   const code = (err as { code?: string }).code;
   // 25P03: the guard transaction sat idle past its in-transaction timeout
   // (an event-loop stall on the shared box) and the server terminated the
   // session rather than let it hold the row lock unbounded. Plain
   // contention to the caller: retry immediately.
-  // Counting 55P03 and 40P01 here is sound because every guard routes its
-  // error through exactly one tail that calls this classifier once: most map
-  // it to their typed 'contended', the no-winner close probe answers false
-  // (park the listing), and the delivered-save tail classifies only to
-  // count, then rethrows to commitGrant's transient arm.
+  // Counting 55P03 and 40P01 here is sound because every guard and every
+  // bounded plain write routes its error through exactly one tail that
+  // calls this classifier once: most map it to their typed 'contended', the
+  // no-winner close probe answers false (park the listing), the
+  // delivered-save tail and boundedWrite classify only to count, then
+  // rethrow. A SECOND look at an already-counted error goes through
+  // isContentionCode above instead.
   if (code === '55P03') lockWaitTimeouts++;
   if (code === '40P01') deadlockCount++;
-  return code === '55P03' || code === '40P01' || code === '25P03';
+  return isContentionCode(err);
 }
 
 export class PgWocMarketDb implements WocMarketDb {
@@ -1315,6 +1326,34 @@ export class PgWocMarketDb implements WocMarketDb {
       client.release(
         asyncErr !== null || beginFailed || rollbackFailed || codelessFailure ? true : undefined,
       );
+    }
+  }
+
+  /** The bounded plain-write seam (the escrow write-path rider). Every
+   *  direct row-locking writer outside the guard transactions rides ONE
+   *  short transaction carrying the guard bounds, so a contended row
+   *  refuses as a classified, COUNTED 55P03 at the 2s ceiling instead of
+   *  camping a pooled client for the 15s session default and dying as an
+   *  unclassified 57014 nobody maps. Caller semantics are unchanged:
+   *  results and errors (the 23505 catches included) flow through exactly
+   *  as before, only bounded and counted; the classify-to-count tail is
+   *  the delivered-save shape. Deliberately NOT routed here, each by
+   *  judgment: the reads (no row locks), the five SKIP LOCKED sweep claims
+   *  (non-blocking by construction), and the module-level retention prunes
+   *  (nightly, budget-bounded, failure-isolated; a longer wait there is
+   *  the cheaper arm and a 2s refusal would only defer to the next night). */
+  private async boundedWrite(text: string, values: readonly unknown[]): Promise<QueryResult> {
+    try {
+      return await this.withTx(async (client) => {
+        await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+        await client.query(
+          `SET LOCAL idle_in_transaction_session_timeout = ${GUARD_IDLE_TX_TIMEOUT_MS}`,
+        );
+        return await client.query(text, values as unknown[]);
+      });
+    } catch (err) {
+      isLockContention(err);
+      throw err;
     }
   }
 
@@ -1690,7 +1729,7 @@ export class PgWocMarketDb implements WocMarketDb {
     // exact copy the buyer agreed to, and acceptance validates the extracted
     // copy against the pin before anything escrows.
     try {
-      const res = await this.pool.query(
+      const res = await this.boundedWrite(
         `INSERT INTO woc_market_directed_offers (
            realm, seller_account, seller_character, seller_name,
            buyer_account, buyer_name, usd_cents, expires_at, item_id, item_pin
@@ -1736,7 +1775,7 @@ export class PgWocMarketDb implements WocMarketDb {
   // --- Step-up challenges (server/woc_market_stepup.ts owns the semantics) --
 
   async createStepUpChallenge(row: NewWocStepUpChallenge): Promise<void> {
-    await this.pool.query(
+    await this.boundedWrite(
       `INSERT INTO woc_market_stepup_challenges
          (nonce, realm, account_id, wallet, operation, binding_digest, message, expires_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, to_timestamp($8 / 1000.0))`,
@@ -1764,7 +1803,7 @@ export class PgWocMarketDb implements WocMarketDb {
     // challenge; deliberately NOT expiry-scoped (unlike the wallet-link
     // consume): the verifier judges expiry from the returned row so the
     // player hears expired, not unknown.
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `DELETE FROM woc_market_stepup_challenges
         WHERE realm = $1 AND nonce = $2 AND account_id = $3
         RETURNING nonce, account_id, wallet, operation, binding_digest, message, expires_at`,
@@ -1784,7 +1823,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async pruneStepUpChallenges(realm: string, nowMs: number): Promise<number> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `DELETE FROM woc_market_stepup_challenges
         WHERE realm = $1 AND expires_at <= to_timestamp($2 / 1000.0)`,
       [realm, nowMs],
@@ -1867,7 +1906,7 @@ export class PgWocMarketDb implements WocMarketDb {
     // transaction itself (listing exists IFF the offer is stamped), so the
     // old second-call stamp arm this method carried is gone rather than
     // left as a dead reachable write.
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_directed_offers
           SET status = $3, updated_at = now()
         WHERE realm = $1 AND id = $2 AND status = 'pending'
@@ -1910,7 +1949,7 @@ export class PgWocMarketDb implements WocMarketDb {
     // stamped at creation beside the pin, and the seller's claimed ref must
     // not rewrite what the buyer's window shows (the pin refuses the escrow
     // on a real mismatch either way; this keeps the display honest too).
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_directed_offers
           SET ${col} = true,
               item_ref = COALESCE($3::jsonb, item_ref),
@@ -1943,7 +1982,7 @@ export class PgWocMarketDb implements WocMarketDb {
       // kept: it carries no custody proof, only their standing consent to the
       // immutable deal (usd_cents and item_pin never change), so re-consenting
       // would be pure liveness cost (the buyer may be offline for the retry).
-      const res = await this.pool.query(
+      const res = await this.boundedWrite(
         `UPDATE woc_market_directed_offers o
             SET status = 'pending', updated_at = now(),
                 seller_accepted = false, item_ref = NULL
@@ -2024,7 +2063,7 @@ export class PgWocMarketDb implements WocMarketDb {
    *  same CAS as reopenDirectedOffer (a raced late stamp fails the qual
    *  harmlessly), landing on 'expired' instead of 'pending'. */
   async expireDirectedOfferIfUnstamped(realm: string, id: number): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_directed_offers
           SET status = 'expired', updated_at = now()
         WHERE realm = $1 AND id = $2 AND status = 'accepted' AND listing_id IS NULL`,
@@ -2393,7 +2432,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async closeListing(id: number, resolution: WocListingResolution): Promise<void> {
-    await this.pool.query(
+    await this.boundedWrite(
       `UPDATE woc_market_listings
           SET status = 'closed', resolution = $2, updated_at = now()
         WHERE id = $1 AND status <> 'closed'`,
@@ -2402,7 +2441,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async markListingSettling(id: number): Promise<void> {
-    await this.pool.query(
+    await this.boundedWrite(
       `UPDATE woc_market_listings SET status = 'settling', updated_at = now()
         WHERE id = $1 AND status IN ('ending', 'active', 'settling')`,
       [id],
@@ -2460,7 +2499,7 @@ export class PgWocMarketDb implements WocMarketDb {
     // belongs to the overdue sweep's deadline pass (default, forfeit, strike,
     // cascade), and reopening around it would let that pass be skipped. The
     // next reclaim pass re-evaluates.
-    await this.pool.query(
+    await this.boundedWrite(
       `UPDATE woc_market_listings SET status = 'active', updated_at = now()
         WHERE id = $1 AND status IN ('ending', 'settling')
           AND NOT EXISTS (
@@ -2477,7 +2516,7 @@ export class PgWocMarketDb implements WocMarketDb {
    *  The old two-statement shape could crash between the status write and the
    *  bond write, leaving a held bond no sweep arm would ever reach. */
   async markBidOutbidQueueRefund(bidId: number): Promise<void> {
-    await this.pool.query(
+    await this.boundedWrite(
       `UPDATE woc_market_bids
           SET status = 'outbid',
               bond_state = CASE WHEN bond_state = 'held' THEN 'refund_due' ELSE bond_state END
@@ -2487,7 +2526,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async claimCustodyRef(realm: string, custodyRef: string): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `INSERT INTO woc_market_custody_claims (custody_ref, realm)
        VALUES ($2, $1)
        ON CONFLICT (custody_ref) DO NOTHING`,
@@ -2497,7 +2536,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async markCustodyRefBooked(custodyRef: string): Promise<void> {
-    await this.pool.query(
+    await this.boundedWrite(
       `UPDATE woc_market_custody_claims SET booked_at = now()
         WHERE custody_ref = $1 AND booked_at IS NULL`,
       [custodyRef],
@@ -2522,7 +2561,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async markCustodyGrantIntent(custodyRef: string, characterId: number): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_custody_claims SET grant_character_id = $2
         WHERE custody_ref = $1 AND booked_at IS NULL`,
       [custodyRef, characterId],
@@ -2534,7 +2573,7 @@ export class PgWocMarketDb implements WocMarketDb {
    *  statement: the one legal conversion is a grantCopy refusal (nothing
    *  entered the bags, so the hand-off provably left nothing behind). */
   async markCustodyMailIntent(custodyRef: string): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_custody_claims
           SET mail_intent_at = now(), grant_character_id = NULL
         WHERE custody_ref = $1 AND booked_at IS NULL`,
@@ -2773,7 +2812,7 @@ export class PgWocMarketDb implements WocMarketDb {
   async markItemDisposed(id: number): Promise<void> {
     // The rotation stamp clears with the terminal flag (see the finalize
     // transaction's settlement CAS for the rationale).
-    await this.pool.query(
+    await this.boundedWrite(
       `UPDATE woc_market_listings
           SET item_disposed = true, updated_at = now(), sweep_parked_at = NULL
         WHERE id = $1`,
@@ -3068,12 +3107,27 @@ export class PgWocMarketDb implements WocMarketDb {
    *  arm, clearing for a settlement whose window ended long ago, could wipe a
    *  NEW claimer's live lock that stole the expired one in between. */
   async clearBuyNowLock(id: number, holderAccount: number): Promise<void> {
-    await this.pool.query(
-      `UPDATE woc_market_listings
-          SET buy_now_lock_account = NULL, buy_now_lock_expires = NULL, updated_at = now()
-        WHERE id = $1 AND buy_now_lock_account = $2`,
-      [id, holderAccount],
-    );
+    // Best-effort BY CONTRACT (the write-path rider's sharpest plain-writer
+    // fix): every caller is a compensation arm running AFTER its request
+    // already decided (buyNow's four typed refusals, the overdue-expiry
+    // sweep), so a contended clear must never convert that decided answer
+    // into a 500. The contention classes are swallowed COUNTED (the
+    // boundedWrite tail already booked them); the lock is safe to leave
+    // standing because buy_now_lock_expires ages it out on its own, which
+    // is also why claimBuyNowLock treats an expired lock as claimable. A
+    // non-contention failure still throws: that is a bug to surface, not
+    // contention to shrug at.
+    try {
+      await this.boundedWrite(
+        `UPDATE woc_market_listings
+            SET buy_now_lock_account = NULL, buy_now_lock_expires = NULL, updated_at = now()
+          WHERE id = $1 AND buy_now_lock_account = $2`,
+        [id, holderAccount],
+      );
+    } catch (err) {
+      if (err instanceof TxNeverStarted || isContentionCode(err)) return;
+      throw err;
+    }
   }
 
   /** The overdue sweep's abandon recorder (public buy-now windows that
@@ -3092,7 +3146,7 @@ export class PgWocMarketDb implements WocMarketDb {
     account: number,
     lockExpiresAtMs: number,
   ): Promise<void> {
-    await this.pool.query(RECORD_ABANDON_SQL, [
+    await this.boundedWrite(RECORD_ABANDON_SQL, [
       realm,
       listingId,
       account,
@@ -3400,7 +3454,7 @@ export class PgWocMarketDb implements WocMarketDb {
       // pre-column row (signature set, stamp NULL) must fall back to
       // placed_at like every reader, never adopt the RESUBMIT's clock as its
       // first arrival.
-      const res = await this.pool.query(
+      const res = await this.boundedWrite(
         `UPDATE woc_market_bids
             SET bond_signature = $2,
                 bond_signature_at = COALESCE(
@@ -3452,7 +3506,9 @@ export class PgWocMarketDb implements WocMarketDb {
    *  autovacuum posture for woc_market_bids against that, not against the
    *  player-driven write rate. */
   async touchBidPollRow(id: number): Promise<void> {
-    await this.pool.query(`UPDATE woc_market_bids SET poll_parked_at = now() WHERE id = $1`, [id]);
+    await this.boundedWrite(`UPDATE woc_market_bids SET poll_parked_at = now() WHERE id = $1`, [
+      id,
+    ]);
   }
 
   /** One bond the chain decided against. Narrowed to pending_bond so a bid that
@@ -3466,7 +3522,7 @@ export class PgWocMarketDb implements WocMarketDb {
    *  so the poll can park the held survivor instead of re-polling it at the
    *  batch head every pass. */
   async lapseBid(bidId: number): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_bids SET status = 'lapsed', bond_state = 'void'
         WHERE id = $1 AND status = 'pending_bond' AND bond_state = 'pending'`,
       [bidId],
@@ -3488,7 +3544,7 @@ export class PgWocMarketDb implements WocMarketDb {
     expiresAtMs: number,
     bondCents: number,
   ): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_bids
           SET bond_reference = $2, bond_quote_expires = to_timestamp($3 / 1000.0),
               bond_cents = $4
@@ -3521,7 +3577,7 @@ export class PgWocMarketDb implements WocMarketDb {
    * bid stays with its poller until the chain decides.
    */
   async abandonPendingBid(realm: string, bidId: number, account: number): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_bids
           SET status = 'cancelled', bond_state = 'void'
         WHERE realm = $1 AND id = $2 AND account = $3 AND status = 'pending_bond'
@@ -3641,7 +3697,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async markBondHeld(bidId: number): Promise<void> {
-    await this.pool.query(
+    await this.boundedWrite(
       `UPDATE woc_market_bids SET bond_state = 'held' WHERE id = $1 AND bond_state = 'pending'`,
       [bidId],
     );
@@ -3737,17 +3793,20 @@ export class PgWocMarketDb implements WocMarketDb {
 
   async markBidStatus(bidId: number, status: WocBidStatus, from?: WocBidStatus[]): Promise<void> {
     if (from) {
-      await this.pool.query(
+      await this.boundedWrite(
         `UPDATE woc_market_bids SET status = $2 WHERE id = $1 AND status = ANY($3::text[])`,
         [bidId, status, from],
       );
       return;
     }
-    await this.pool.query(`UPDATE woc_market_bids SET status = $2 WHERE id = $1`, [bidId, status]);
+    await this.boundedWrite(`UPDATE woc_market_bids SET status = $2 WHERE id = $1`, [
+      bidId,
+      status,
+    ]);
   }
 
   async setBondState(bidId: number, from: WocBondState[], to: WocBondState): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_bids SET bond_state = $3
         WHERE id = $1 AND bond_state = ANY($2::text[])`,
       [bidId, from, to],
@@ -3927,7 +3986,7 @@ export class PgWocMarketDb implements WocMarketDb {
     expiresAtMs: number,
     amountBase: string | null,
   ): Promise<boolean> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `UPDATE woc_market_settlements
           SET quote_reference = $2, quote_expires = to_timestamp($3 / 1000.0),
               settled_amount_base = $4, updated_at = now()
@@ -3942,7 +4001,7 @@ export class PgWocMarketDb implements WocMarketDb {
     signature: string,
   ): Promise<'ok' | 'not_offered' | 'signature_reused'> {
     try {
-      const res = await this.pool.query(
+      const res = await this.boundedWrite(
         `UPDATE woc_market_settlements
             SET state = 'confirming', tx_signature = $2, updated_at = now()
           WHERE id = $1 AND state = 'offered'`,
@@ -3962,7 +4021,7 @@ export class PgWocMarketDb implements WocMarketDb {
     failReason?: string,
   ): Promise<boolean> {
     try {
-      const res = await this.pool.query(
+      const res = await this.boundedWrite(
         `UPDATE woc_market_settlements
             SET state = $3, fail_reason = COALESCE($4, fail_reason), updated_at = now()
           WHERE id = $1 AND state = ANY($2::text[])`,
@@ -4115,7 +4174,7 @@ export class PgWocMarketDb implements WocMarketDb {
    *  'delivering'), and rotating that column faster than the stuck threshold
    *  made a permanently parked row invisible to the monitor by construction. */
   async touchSettlementRow(id: number): Promise<void> {
-    await this.pool.query(
+    await this.boundedWrite(
       `UPDATE woc_market_settlements SET sweep_parked_at = now() WHERE id = $1`,
       [id],
     );
@@ -4125,9 +4184,10 @@ export class PgWocMarketDb implements WocMarketDb {
    *  the rotation expression, so a permanently refused return still cycles to
    *  the tail while its updated_at age keeps counting for the readout. */
   async touchListingRow(id: number): Promise<void> {
-    await this.pool.query(`UPDATE woc_market_listings SET sweep_parked_at = now() WHERE id = $1`, [
-      id,
-    ]);
+    await this.boundedWrite(
+      `UPDATE woc_market_listings SET sweep_parked_at = now() WHERE id = $1`,
+      [id],
+    );
   }
 
   /** The delivery close tail as ONE transaction: the 'delivered' transition,
@@ -4333,7 +4393,7 @@ export class PgWocMarketDb implements WocMarketDb {
   // ---------------------------------------------------------------------
 
   async insertSale(args: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>): Promise<number> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `INSERT INTO woc_market_sales (
          realm, listing_id, item_id, item, price_cents, amount_base,
          seller_account, buyer_account, seller_name, buyer_name
@@ -4367,10 +4427,10 @@ export class PgWocMarketDb implements WocMarketDb {
 
   async setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'> {
     try {
-      const res = await this.pool.query(`UPDATE woc_market_sales SET excluded = $2 WHERE id = $1`, [
-        id,
-        excluded,
-      ]);
+      const res = await this.boundedWrite(
+        `UPDATE woc_market_sales SET excluded = $2 WHERE id = $1`,
+        [id, excluded],
+      );
       return (res.rowCount ?? 0) > 0 ? 'ok' : 'miss';
     } catch (err) {
       // Re-including a voided row while its correction stands would violate
@@ -4397,7 +4457,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async addStrike(account: number, suspendedUntilMs: number | null): Promise<WocStrikeRow> {
-    const res = await this.pool.query(
+    const res = await this.boundedWrite(
       `INSERT INTO woc_market_strikes (account_id, strikes, suspended_until, updated_at)
        VALUES ($1, 1, to_timestamp($2 / 1000.0), now())
        ON CONFLICT (account_id) DO UPDATE
@@ -4418,7 +4478,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async clearStrikes(account: number): Promise<void> {
-    await this.pool.query('DELETE FROM woc_market_strikes WHERE account_id = $1', [account]);
+    await this.boundedWrite('DELETE FROM woc_market_strikes WHERE account_id = $1', [account]);
   }
 
   async termsAcceptedAt(account: number): Promise<number | null> {
@@ -4430,7 +4490,7 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async recordTermsAccepted(account: number, nowMs: number): Promise<void> {
-    await this.pool.query(
+    await this.boundedWrite(
       `INSERT INTO woc_market_terms (account_id, accepted_at)
        VALUES ($1, to_timestamp($2 / 1000.0))
        ON CONFLICT (account_id) DO NOTHING`,

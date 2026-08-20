@@ -1261,6 +1261,41 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       }
     }, 20_000);
 
+    it('a plain writer against a held row refuses at the 2s bound as a counted 55P03', async () => {
+      // The bounded plain-write seam, proven against real Postgres: before
+      // the rider, setBondState (and its 36 siblings) waited the full 15s
+      // session default on a contended row with the failure unclassified;
+      // now the wait dies at the guard lock ceiling and lands on the
+      // lock-wait counter like every guard transaction's.
+      const realm = `plainwrite-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      const listingId = await seedListing(realm, seller);
+      const bidId = await seedBid(realm, listingId, buyer, { status: 'pending_bond' });
+      const holder = await pool.connect();
+      try {
+        await holder.query('BEGIN');
+        await holder.query('SELECT 1 FROM woc_market_bids WHERE id = $1 FOR NO KEY UPDATE', [
+          bidId,
+        ]);
+        const counters = await import('../server/woc_market_db');
+        const lockBefore = counters.wocMarketLockWaitTimeoutCount();
+        const idleBefore = counters.wocMarketIdleTxKillCount();
+        const startedAt = Date.now();
+        await expect(marketDb.setBondState(bidId, ['pending'], 'held')).rejects.toMatchObject({
+          code: '55P03',
+        });
+        const elapsedMs = Date.now() - startedAt;
+        expect(elapsedMs).toBeGreaterThanOrEqual(1_500);
+        expect(elapsedMs).toBeLessThan(10_000);
+        expect(counters.wocMarketLockWaitTimeoutCount()).toBe(lockBefore + 1);
+        expect(counters.wocMarketIdleTxKillCount()).toBe(idleBefore);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+    }, 20_000);
+
     it('same-account escrow holds still serialize: NO KEY UPDATE conflicts with itself', async () => {
       // The cap's whole serialization argument rests on this: two escrow
       // transactions for ONE account queue on the accounts row exactly as
