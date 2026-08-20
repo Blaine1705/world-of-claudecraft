@@ -95,8 +95,8 @@ const build = await buildItemArtAudit({
   items,
   mapping,
   expected: {
-    catalogCount: 825,
-    liveItemCount: 840,
+    catalogCount: 828,
+    liveItemCount: 843,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

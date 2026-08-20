@@ -3458,13 +3458,14 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // all-unmapped subsets fall out of refused and land in spent instead.
     // Exact totals are pinned against the shipped catalog, not derived, so a
     // template that gains or loses a mapped tag moves one of them.
-    // 190/6: the Proving Shore's shore_scuttler carries the meat tag its
-    // tide_scuttler twin already has, so both of its subsets spend and none
-    // refuse, exactly +2/+0 (training_effigy has no tags and never enters
+    // 192/6: the Proving Shore's shore_scuttler AND its tide-pool king
+    // mister_crabs each carry the meat tag the tide_scuttler twin already
+    // has, so all four of their subsets spend and none refuse, exactly
+    // +2/+0 per template (training_effigy has no tags and never enters
     // the sweep).
-    expect(spent).toBe(190);
+    expect(spent).toBe(192);
     expect(refused).toBe(6);
-    expect(spent + refused).toBe(196);
+    expect(spent + refused).toBe(198);
   });
 
   // The eight mapped families and their item ids, spelled out. Deriving them
@@ -3556,8 +3557,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // affected subset now extracts. Exact totals are pinned against the
     // shipped catalog, not derived.
     expect(unmappedOffered).toBe(14);
-    // 288: the two Proving Shore templates' mapped-family extractions.
-    expect(extracted).toBe(288);
+    // 290: the three Proving Shore templates' mapped-family extractions
+    // (shore_scuttler, mister_crabs, and the shoal_scuttler twin).
+    expect(extracted).toBe(290);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {

@@ -366,8 +366,8 @@
   "sourceManifests": [
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
-      "acceptedSha256": "c06979852642395c30b53919be984573fc1704c6e96ee5833cf962d70653fcbd",
-      "acceptedBytes": 267009
+      "acceptedSha256": "be199670517bbabd2d28cdebc8c0ecc53da8448795b9e8e3a894d6eab52876df",
+      "acceptedBytes": 268033
     }
   ],
   "assets": [
@@ -2115,144 +2115,144 @@
       "kind": "mobPortrait",
       "id": "bogtoad",
       "runtimeUrl": "/ui/mobs/bogtoad.webp",
-      "acceptedSha256": "b5ecbb01a36f1aa03094efd54b79962ba3985d8ec8b5bc70f42bc159b0c80f7d",
-      "acceptedBytes": 1858,
+      "acceptedSha256": "c74d58d2b282328f588d9d51b1b66eb123a963b047410ab95b017518a33794bb",
+      "acceptedBytes": 1844,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "breach_wretch",
       "runtimeUrl": "/ui/mobs/breach_wretch.webp",
-      "acceptedSha256": "b6fdd777507a714fe00dd6635535f38dde194c3d7d4c1fead226b7e8d68e21e9",
-      "acceptedBytes": 1666,
+      "acceptedSha256": "7a472425d553051ade36fab448f8cb0091f2bb76a555e93b535ed21ea1a6f427",
+      "acceptedBytes": 1688,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "castaway_navigator",
       "runtimeUrl": "/ui/mobs/castaway_navigator.webp",
-      "acceptedSha256": "a4bd24428d9b603003bd67feb24c9563146e1ee675249f3cfd5c6df2d4eb5a77",
-      "acceptedBytes": 2638,
+      "acceptedSha256": "6711572931e5cfc6ed2d0aca599aa70c4ec92c6163b098bf3f222d90317cbe26",
+      "acceptedBytes": 2628,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "cindraleth_maw_matriarch",
       "runtimeUrl": "/ui/mobs/cindraleth_maw_matriarch.webp",
-      "acceptedSha256": "f886b941777bd4e4fb2796295b383e423083836d3880edfdcb2ecfd474178140",
-      "acceptedBytes": 2478,
+      "acceptedSha256": "7d8d2dad0b160e147bb719fc48db4fe092bfc2a789cf0ee21993cfa683d72a65",
+      "acceptedBytes": 2462,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "downs_bandit",
       "runtimeUrl": "/ui/mobs/downs_bandit.webp",
-      "acceptedSha256": "8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c",
-      "acceptedBytes": 1712,
+      "acceptedSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+      "acceptedBytes": 1710,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "drowsy_croaker",
       "runtimeUrl": "/ui/mobs/drowsy_croaker.webp",
-      "acceptedSha256": "46570e1af656c3b9e9428ee39ebac2682ed063e52bef25513a918f0d8cda2baf",
-      "acceptedBytes": 1840,
+      "acceptedSha256": "994a349fdcb47bfbbfe2af7f92eb7a6feaa95f38a1998147723fb585e240167a",
+      "acceptedBytes": 1860,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "fen_sprite",
       "runtimeUrl": "/ui/mobs/fen_sprite.webp",
-      "acceptedSha256": "3f1c378547f3a490f673583a82981efdb22f066823e4f7936089b2e3d9a3ee07",
-      "acceptedBytes": 1688,
+      "acceptedSha256": "27e20641545265cb933edf9220a7262ef69cd7b5fb9f8ea4ca943417b243303a",
+      "acceptedBytes": 1700,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "fisher_bram",
       "runtimeUrl": "/ui/mobs/fisher_bram.webp",
-      "acceptedSha256": "f9cb5ea940f598e3b5bdda5b85b8a3db8465ac6516d5f56abc851d5dd15fc7b8",
-      "acceptedBytes": 2600,
+      "acceptedSha256": "8f18935329142987a17c888b39dfd6bd30413fd0528933829e0b3e0f3c6f6fe5",
+      "acceptedBytes": 2618,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "gravedigger_mosley",
       "runtimeUrl": "/ui/mobs/gravedigger_mosley.webp",
-      "acceptedSha256": "d1506b30bf4a9a312cf8ce5c89d569e35d37ad549315e4b3871427abf638c009",
-      "acceptedBytes": 2666,
+      "acceptedSha256": "074e53c4715efc8139889b3232968c6ee54baefb984cb01ed571714b81b5d365",
+      "acceptedBytes": 2716,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "grubjaw",
       "runtimeUrl": "/ui/mobs/grubjaw.webp",
-      "acceptedSha256": "5b77f8b7a3704e7653f47819b50a22e446058baa60c880d07a027005aa5fa87a",
-      "acceptedBytes": 2170,
+      "acceptedSha256": "cd9810cbb956c043fe6d1a514c20d3a941afa19910b5fc005c460e66d1a2d2b1",
+      "acceptedBytes": 2172,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "harvest_sprite",
       "runtimeUrl": "/ui/mobs/harvest_sprite.webp",
-      "acceptedSha256": "5168f406c69e6470249d7bdbbd9c3742b603d497aac9719754d147df977937bd",
-      "acceptedBytes": 1752,
+      "acceptedSha256": "91acea51e4a36630146eb55e2b48a980405083aaa997e6325162722e77842c78",
+      "acceptedBytes": 1738,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "hedge_gnome",
       "runtimeUrl": "/ui/mobs/hedge_gnome.webp",
-      "acceptedSha256": "8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c",
-      "acceptedBytes": 1712,
+      "acceptedSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+      "acceptedBytes": 1710,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "mere_lurker",
       "runtimeUrl": "/ui/mobs/mere_lurker.webp",
-      "acceptedSha256": "5ea2fe8f6953714463a3438cbf20299d1eeac480557c1c8311603eeea44eb567",
-      "acceptedBytes": 1916,
+      "acceptedSha256": "dd958843a504ea6f07e97f92f0e5a477faa6eff52647e8c4af7e2ad5a02a4d0d",
+      "acceptedBytes": 1912,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "the_meredark",
       "runtimeUrl": "/ui/mobs/the_meredark.webp",
-      "acceptedSha256": "b14db6ec964ea25c6de9b588ade5da44e702b93fa5a270751751322170e8a616",
-      "acceptedBytes": 1820,
+      "acceptedSha256": "9317cb96146327564f5dbb821fed757b628e47ace76df133fd3f2acc91df4d0e",
+      "acceptedBytes": 1838,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "the_wreck_warden",
       "runtimeUrl": "/ui/mobs/the_wreck_warden.webp",
-      "acceptedSha256": "4f6b2c9259863befc5d1999f9be4eb26612a72bf7d1d35bf28abe7b2b6e8fa57",
-      "acceptedBytes": 2602,
+      "acceptedSha256": "e11030bfe58ca95bfa73670c6b35ae3004253f501352bac37c47152190b57006",
+      "acceptedBytes": 2584,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "training_dummy",
       "runtimeUrl": "/ui/mobs/training_dummy.webp",
-      "acceptedSha256": "eb21d6829704369512b11dd96ad60c1fbe75ffe366544017f19786bf1eba6566",
-      "acceptedBytes": 1798,
+      "acceptedSha256": "66efb4999739669201bd44e21aca2d6e222ba8dfeb410d018c1e5e7d156e0e65",
+      "acceptedBytes": 1790,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "willow_sprite",
       "runtimeUrl": "/ui/mobs/willow_sprite.webp",
-      "acceptedSha256": "b766e56fd7817a91616c6832f76d565a30fbda2c879a76f5e55a4957ef773eb2",
-      "acceptedBytes": 1724,
+      "acceptedSha256": "c1dc29dbb2a2f33a65306af3f7747a6f431d2af9961075fcb6d63a8bdcdebaa3",
+      "acceptedBytes": 1708,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "wreck_thief",
       "runtimeUrl": "/ui/mobs/wreck_thief.webp",
-      "acceptedSha256": "8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c",
-      "acceptedBytes": 1712,
+      "acceptedSha256": "b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d",
+      "acceptedBytes": 1710,
       "origin": "deterministic-rerender"
     }
   ]
