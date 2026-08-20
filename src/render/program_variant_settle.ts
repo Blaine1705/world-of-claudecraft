@@ -14,7 +14,6 @@
 // over the same materials would have issued anyway, had it polled the variant.
 
 import type * as THREE from 'three';
-import { arrivalCoverActive } from './arrival_cover';
 import type { CompileGateScheduler, PieceDeadline } from './compile_gate';
 import type { PieceSettle } from './compile_gate_pieces';
 import { isProgramKnownReady, markProgramReady } from './linked_program_readiness';
@@ -60,17 +59,21 @@ export interface ProgramVariantSettleResult {
  * Poll every not-yet-proved program of `materials` until all answer ready or
  * `deadline` fires; each program that answers ready is recorded at once
  * (markProgramReady), so a deadline that ends the poll still leaves the ready
- * ones proved and the touch tail warms them. LIVE, every pass, the first
- * included, rides the scheduler: the first used to run synchronously on the
- * compile piece's own resolution stack, which put its COMPLETION_STATUS
- * queries inside the queue's released tail where no unit's syncMs books them
- * (review of the scheduler PR); the zero-delay hop takes the query class off
- * the compile stack. UNDER A COVER the first pass stays synchronous: there is
- * no visible frame to protect there, and the hop measurably starved the
- * cover-window settles on the iGPU (batch 28: 47 to 75 reveal keys escaped by
- * the watchdog with their links still in flight, and the first drawn frame
- * after the lift blocked 1.25 s behind them, against 0.25 s with the
- * synchronous pass).
+ * ones proved and the touch tail warms them. The first pass runs
+ * synchronously (the piece's compile just resolved, so its programs are the
+ * likeliest to be ready right now); every later pass rides the scheduler at
+ * three's cadence.
+ *
+ * The first pass stays synchronous ON PURPOSE, and it is the one thing here
+ * that is not free: it runs inside the queue's released tail, so its queries
+ * are booked by no unit's syncMs (review of PR #3519). Deferring it by one
+ * zero-delay hop was built and measured on the iGPU teleport leg and dropped:
+ * the settle throughput fell far enough that 39 to 75 reveal keys escaped by
+ * their watchdog with links still in flight, and the first drawn frame after
+ * the loading screen lifted blocked 1.25 s behind them, against 0.25 s here
+ * (tmp/dropped/0005-settle-first-poll-defer.patch carries the numbers). The
+ * accounting gap is real and its fix is the other half: charge the tail to
+ * the unit through a spend hook, not move the work off the stack.
  */
 export function settleProgramVariants(
   properties: MaterialPropertiesLike,
@@ -108,15 +111,7 @@ export function settleProgramVariants(
         reject(error);
       }
     };
-    // Nothing pending needs no poll and keeps the historic no-timer shape
-    // (callers settle trivially for materials three never prepared). Any real
-    // poll is deferred: the query pass never runs on the caller's stack.
-    if (pending.length === 0) {
-      resolve({ settled: true, ready, pending: 0 });
-      return;
-    }
-    if (arrivalCoverActive()) pass();
-    else scheduler.setTimeout(pass, 0);
+    pass();
   });
 }
 
