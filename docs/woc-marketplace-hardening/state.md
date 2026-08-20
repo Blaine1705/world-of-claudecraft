@@ -36,10 +36,16 @@ actually reads.
   saturation pre-check). Mutation record: 30 distinct, 28 BIT, 1 green
   control, 1 in-round-upgraded survivor, 4 stale-verdict re-runs BIT
   (rider section + re-verification block in phase-20-mutation-log.md).
-  Validation at the tip: tsc clean; pg battery SEVEN suites 241 tests zero
-  skips; DB-free set 974 tests; ci:changed exit 0; gate PASS all 12 steps
-  at code tip 7d9fb28dbb (full-suite fallback, 42,059 tests plus browser
-  131, docs-only wrap commits on top). TWO MAINTAINER RULINGS OPEN: the
+  qa-checklist ran LAST (static beside the gate): READY, its 2 should-fix
+  and 4 nits ALL applied in 961aa1e411 (identity-tokened gate holds cure
+  the age-direction defect and retire the over-free judgment; the
+  pre-check's refusals now count into realm_refused; door-closing pin on
+  characterSaveQueues), with the 7 rewritten-region mutants re-run BIT
+  (rider log totals 32 live / 30 BIT). Validation at the tip: tsc clean;
+  pg battery SEVEN suites 241 tests zero skips; DB-free set 974+ tests;
+  ci:changed exit 0; gate PASS all 12 steps at 7d9fb28dbb and RE-RUN at
+  the final code tip after the qa-checklist round (the registry's final
+  gate note is authoritative for the re-run's recorded result). TWO MAINTAINER RULINGS OPEN: the
   woc_market.ts ceiling raise 4000 -> 4037 inside the rider (net 447 DOWN
   overall; declaration-surface justification), and the standing
   woc_market_db.ts no-ratchet-row question (its rider growth +158, all

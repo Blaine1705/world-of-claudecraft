@@ -401,8 +401,24 @@ trusted), plus the two mutants the fix round's own code earned:
 | rider_gate_probe_reclaim_strip | BIT | woc_market_escrow_gate | rider fix round; the saturated() probe's own reclaim (a bare stats read makes a full wedge permanent) |
 | rider_accept_rungs_strip | BIT | woc_market_service | rider fix round; the directed acceptance's pre-burn saturation rung |
 
-Rider totals: 30 distinct mutants, 28 BIT, 1 deliberate green control, 1
-first-scoring survivor upgraded to BIT in-round (the wrong-suite class the
-header warns about: the fix was a new behavioral pin plus re-scoring, never
-a relaxed verdict); 4 stale-verdict re-runs all BIT. Whole log after this
-section: 323 distinct mutants.
+The qa-checklist round rewrote the gate onto identity-tokened holds and
+added the pre-check refusal counting, superseding the five gate-region
+mutants above (their regions no longer exist in that form) and earning two
+new arms; all re-run against the rewritten source per the stale-verdict
+rule:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| rider_gate_cap_check_v2 | BIT | woc_market_escrow_gate | qa-checklist round; supersedes rider_gate_cap_check |
+| rider_gate_release_delete_v2 | BIT | woc_market_escrow_gate, woc_market_escrow_queue | qa-checklist round; supersedes rider_gate_release_shift |
+| rider_gate_reclaim_strip_v2 | BIT | woc_market_escrow_gate | qa-checklist round; supersedes rider_gate_reclaim_strip |
+| rider_gate_probe_count_strip | BIT | woc_market_escrow_gate | qa-checklist round; the probe's refused counting (S2's gate half) |
+| rider_gate_probe_reclaim_strip_v2 | BIT | woc_market_escrow_gate | qa-checklist round; supersedes rider_gate_probe_reclaim_strip |
+| rider_custody_gatehold_strip_v2 | BIT | woc_market_escrow_queue | qa-checklist round; supersedes rider_custody_realm_gate_strip (the hold-handle form) |
+| rider_wiring_emit_strip | BIT | woc_market_hot_reads | qa-checklist round; the pre-check's realm_refused emission (S2's wiring half) |
+
+Rider totals: 32 distinct LIVE mutants (the five superseded gate rows
+retire with their regions), 30 BIT, 1 deliberate green control, 1
+first-scoring survivor upgraded to BIT in-round; every stale verdict
+re-run after its source or pin moved. Whole log after this section: 325
+distinct mutants.

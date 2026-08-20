@@ -5418,9 +5418,9 @@ approximate in-flight arithmetic comments, the spec-tier amendment note).
 
 JUDGED this round (binding; do NOT re-raise):
 - The gate's transient over-free after a reclaimed sequence later settles:
-  bounded by the reclaim count, rare by construction (a reclaim is already
-  an incident), cheaper than identity-tokened holds; documented at the
-  reclaim loop.
+  SUPERSEDED by the qa-checklist round, which moved the gate to
+  identity-tokened holds (a reclaimed hold's late release is a no-op, so
+  the over-free window no longer exists; pinned directly).
 - The pool "reserve" arithmetic (gate + wave <= pool minus 2) is SIZING,
   not enforcement: nothing fences the remaining clients, which also serve
   every non-market read; the gate comment says exactly this.
@@ -5464,6 +5464,28 @@ MAINTAINER RULINGS OPEN (the rider QA re-judges, then Fernando):
 - server/woc_market_db.ts still has NO ratchet row (the 17 QA question,
   carried); its rider growth is net +158 lines, all SQL-adjacent
   (boundedWrite, counters, the narrowing comments).
+
+QA-CHECKLIST ROUND (ran LAST per the charter, static-only beside the gate
+run): verdict READY with 2 should-fix and 4 nits, ALL applied
+(961aa1e411). S1: the gate's positional FIFO hold retirement
+UNDER-reported a wedged hold's age on out-of-order settles (the docs
+claimed the safe direction backwards) and let churn starve the reclaim;
+cured at the root with identity-tokened holds (exact ages, the reclaim
+hits only the wedged hold, no over-free, churn-starvation and late-release
+no-op pinned). S2: pre-check saturation refusals were counted nowhere, so
+realm_refused stayed flat during sustained saturation; the probe now
+counts its true answers and the main.ts wiring emits the kind on the same
+arm (both halves mutation-proven). Nits: the retry's doubled worst-case
+latency stated at clearBuyNowLock; the flat-zero pins gain the
+characterSaveQueues token (the door-closing judgment: a narrowing getter
+on game.ts costs lines against its exact ceiling, so the pin closes the
+second door instead); the two pre-narrowing lock-mode comments and their
+CLAUDE.md mirror read mode-neutral; the delivery rig's partial ctx behind
+a throwing proxy. The checklist's clean sweep is its own record: zero src/
+files in the diff, no new player string, no new env name, no DDL, commit
+hygiene and the no-"phase" rule verified across all commits, CLAUDE.md
+claims checked symbol by symbol, and the exactly-once property probed
+hardest and unbroken under the busy park.
 
 VALUES REGISTRY (the rider QA re-judges): gate cap 4 = SAVE_CONCURRENCY,
 hold ceiling 300_000 > 157_000 + 60_000; WOC_GRANT_BUSY_BUDGET 2 per scope
