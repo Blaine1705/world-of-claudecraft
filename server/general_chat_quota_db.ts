@@ -5,6 +5,7 @@ import {
   GENERAL_CHAT_QUOTA_ADVISORY_NAMESPACE,
   GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
 } from './general_chat_quota_config';
+import { bustWocAuthGuardAccount } from './woc_auth_guard_cache';
 
 export {
   GENERAL_CHAT_QUOTA_ACQUIRE_TIMEOUT_MS,
@@ -308,6 +309,10 @@ export async function setGeneralChatRateLimit(input: {
       JSON.stringify({ accountId: input.accountId }),
     ]);
     await client.query('COMMIT');
+    // The policy columns (messages/window_minutes) ride the cached guard
+    // read's projection; post-commit so a concurrent read cannot re-prime the
+    // old row. The pg_notify above already covers the OTHER processes.
+    bustWocAuthGuardAccount(input.accountId);
     return { before, after, changed: true };
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});

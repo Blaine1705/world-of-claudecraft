@@ -81,6 +81,7 @@ import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
+import { bustWocAuthGuardAccount, bustWocAuthGuardToken } from './woc_auth_guard_cache';
 import { WOC_MARKET_SCHEMA } from './woc_market_db';
 import { bustWocMarketActivity } from './woc_market_read_cache';
 
@@ -1799,6 +1800,9 @@ export async function saveToken(
      VALUES ($1, $2, now() + ($3 || ' hours')::interval, $4, $5)`,
     [token, accountId, String(ttlHours), scope, label],
   );
+  // A fresh random token can have no cached guard entry; the call keeps the
+  // auth_tokens writer set exemption-free for the bust discovery pin.
+  bustWocAuthGuardToken(token);
 }
 
 // The raw token-probe row for the guard reads (the cache's refresh source and
@@ -1905,10 +1909,13 @@ export async function revokeTokensExcept(
   } else {
     await pool.query('DELETE FROM auth_tokens WHERE account_id = $1', [accountId]);
   }
+  // Account-keyed guard bust (over-busting the kept token costs one re-fetch).
+  bustWocAuthGuardAccount(accountId);
 }
 
 export async function revokeToken(token: string): Promise<void> {
   await pool.query('DELETE FROM auth_tokens WHERE token = $1', [token]);
+  bustWocAuthGuardToken(token);
 }
 
 // Revoke a read-scoped token by value (OAuth/RFC-7009 revocation, companion
@@ -1918,6 +1925,7 @@ export async function revokeReadToken(token: string): Promise<boolean> {
   const res = await pool.query(`DELETE FROM auth_tokens WHERE token = $1 AND scope = 'read'`, [
     token,
   ]);
+  bustWocAuthGuardToken(token);
   return (res.rowCount ?? 0) > 0;
 }
 
@@ -1971,6 +1979,10 @@ export async function revokeCompanionToken(accountId: number, prefix: string): P
       WHERE account_id = $1 AND scope = 'read' AND left(token, 8) = $2`,
     [accountId, prefix],
   );
+  // The cache is keyed by the FULL token this site does not hold, so the
+  // account-keyed bust drops every cached token of the account (over-busting
+  // is the safe direction; the survivors re-fetch).
+  bustWocAuthGuardAccount(accountId);
   return (res.rowCount ?? 0) > 0;
 }
 
@@ -2008,6 +2020,7 @@ export async function setAccountDeactivated(
     `UPDATE accounts SET deactivated_at = CASE WHEN $2 THEN now() ELSE NULL END WHERE id = $1`,
     [accountId, deactivated],
   );
+  bustWocAuthGuardAccount(accountId);
 }
 
 export async function setAccountLocale(accountId: number, locale: string | null): Promise<void> {
@@ -2178,6 +2191,7 @@ export async function consumePasswordResetRequest(
     // after COMMIT like the discord_db.ts sites. The expired/replayed-token arm
     // returns above without writing and must not evict a healthy snapshot.
     bustDiscordStatus(row.account_id);
+    bustWocAuthGuardAccount(row.account_id);
     return { accountId: row.account_id };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
