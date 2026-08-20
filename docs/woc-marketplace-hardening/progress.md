@@ -4830,3 +4830,193 @@ above).
 NEXT = docs/woc-marketplace-hardening/phase-20-real-sql-coverage.md, GAME
 repo, worktree /Users/fernando/Documents/wocc-marketplace, FRESH session,
 newest origin/release/** sync first.
+
+## 20 implement round (real-SQL coverage for money and security predicates)
+
+GAME repo, worktree /Users/fernando/Documents/wocc-marketplace, branch
+feature/woc-marketplace. Session start 057b54141a (the 19 QA docs tip);
+release sync a NO-OP (343 ahead, 0 behind origin/release/v0.40.0, still the
+newest release branch). LOCAL per R4: nothing pushed anywhere; the 20 QA
+session diffs 057b54141a..<tip recorded below> and pushes on PASS. Closes the
+"Money/security SQL is fake-only" medium (review.md medium list, first item).
+
+Commits (the five code/test commits; the docs commit rides on top):
+- 9d22c4474b test(woc-market): pin realm scoping against real Postgres
+- 74e04046f2 test(woc-market): pin the bid intake ladder and two realm
+  survivors in real SQL
+- 55b8b82759 test(woc-market): pin the fake-only money guards against real
+  Postgres
+- d9f119c556 test(woc-market): close the residual guard gaps the mutation
+  sweep exposed
+- fd80b6cc02 test(woc-market): true the fake db up to the real SQL it
+  imitates
+
+METHOD. Five read-only inventory agents swept server/woc_market_db.ts in
+slices (plus the service guards, the sweep lock, and the fake) and returned
+per-predicate coverage tables; in parallel a mutation campaign supplied the
+ground truth: every candidate predicate was stripped in a scratch worktree of
+the COMMITTED tree, the owning suites ran under TEST_DATABASE_URL, and the
+verdict was scored only when the harness proved the patch applied and tests
+RAN (the memory traps encoded: occurrence-counted literal replacement,
+git-diff apply proof, Tests-summary-line run proof, git-checkout revert over a
+clean lane, byte-identical verification, survivors re-run against the suite
+that owns the pin before scoring). Three lanes ran concurrently because every
+suite owns a distinct disposable database name. Where a strip survived, a pin
+was written, committed, and the mutant re-run; the campaign closed at
+241 distinct mutants, 232 BIT, 8 judged defense-in-depth singles (each
+PROVEN by a listed double strip that bit), 1 deliberate comment-only no-op
+control. Full per-mutant table: phase-20-mutation-log.md (committed beside
+this file). The inventory deliverable is the "Real-SQL predicate inventory
+(20)" section of state.md.
+
+NEW REAL-SQL PINS (the implement spine):
+- tests/woc_market_realm_scope_pg_integration.test.ts, NEW SUITE (20 tests):
+  cross-realm isolation for every realm-scoped statement, seeded as symmetric
+  realm PAIRS holding the SAME accounts so only the realm qual can separate
+  the rows; per-test realm pairs keep every count exact and -t safe. Also
+  pins browse's closed-row exclusion, the stranded age bound, the bid TTL
+  sweep's placed_at gate, voided sales leaving price history, deliveryTarget's
+  account scoping, the escrow cap's realm half, and the escrow stamp's
+  cross-realm refusal.
+- Bond suite: the insertPendingBid refusal ladder (own account, seller wallet
+  twin, directed not_found, ending/lapsed close inclusive at the bound,
+  cancel_pending, bid floor inclusive, already_pending per listing+account+
+  status), signature intake guards (not_pending writes nothing, cross-bid
+  reuse answers signature_reused off the partial unique index), bid state
+  guards (lapse, quote, markBondHeld never move settled money), the
+  activation ladder incl. the won-prior arm, the claim diagnosis ladder, the
+  open-settlement claim refusal, cooldown scoping (cross-listing, rival
+  accounts at the cap, directed exemption at the cap), closeCancel's bid
+  skip, the abandon recorder's exempt window (signature required, reason set,
+  per-buyer, per-window, dedupe), one bond per reference at the schema.
+- Settlement suite: the seller cancel ladder + paid-window refusal + one-shot
+  intent stamp, suspend's won-only release, terminal listing writes never
+  resurrect or relabel, claimDueListings' status+due bounds, the overdue
+  default arm's state set + deadline, the cascade candidate read (outbid-only,
+  inclusive floor, prior-winner exclusion), bondsDue states, settlement
+  signature intake (offered-only + reuse typed + non-offered writes nothing),
+  the CHECK-constraint negatives (listing status/format/resolution/item shape,
+  bid status/bond_state, settlement state, offer status).
+- Delivery suite: the custody claim intent ledger (one-way booked flip, intent
+  writes refuse a booked claim, mail intent withdraws the grant), finalize
+  guards (non-delivering rows refuse and write NOTHING, a closed listing keeps
+  its resolution, a refunded winner bond never re-queues), residue arms
+  (dispose only sold-with-live-sale, return only undisposed non-sold).
+- Directed suite: the escrow stamp CAS (pending/stamped offers refuse
+  not_pending and the whole escrow rolls back), the cap ignores closed
+  listings, reopen refuses declined and stamped offers, expireIfUnstamped
+  skips a stamped deal, the boot repair's realm-joined dedupe, strikes
+  (increment, GREATEST suspension, per-account clear), terms recorded once.
+- DB-free floor (tests/server/woc_market_directed_sql.test.ts): two new
+  lock-shape pins through the REAL methods on recording pools: activateBid's
+  ordered open-set pre-lock before the listing lock, and suspend's pre-lock
+  including 'won'.
+- Service suite: settlementQuote's not_yours and quote_expired entry guards
+  (found untested anywhere).
+
+FAKE HONESTY, fixed and pinned (tests/server/fake_woc_market_db.test.ts,
+commit fd80b6cc02):
+- submitBondSignature consulted the reuse scan BEFORE the pending guard;
+  Postgres reaches the unique index only when the guarded UPDATE matches, so
+  a dead bid must answer not_pending even on a spent signature.
+- claimBuyNowLock had NO same-wallet twin guard at all (the real transaction
+  re-reads wallet_links under the lock and its claiming UPDATE carries the
+  NOT EXISTS); the fake gains a walletLinks mirror and the guard.
+- stuckCustodyReadout did not clamp a non-positive countCap (real fails
+  closed to 1).
+- directedOfferById handed out the LIVE row against the file's copy-out
+  contract; one service test (the legacy no-item offer) staged its fixture
+  through that aliasing and now uses the explicit stageLegacyOfferWithoutItem
+  hook.
+- deliveredUnclosedSettlementsPage's settlements filter carried a realm qual
+  the real second statement does not have (the id page scopes it).
+- The escrow comment claimed the reverse of the real cap-then-save order
+  (comment truth-up; recording the save ARGS on a refused escrow is
+  deliberate seam recording and stays).
+
+FAKE DIVERGENCES JUDGED BENIGN, documented not changed (binding; do not
+re-raise): the fake's per-listing cooldown probe filters by realm where the
+real subquery keys on (listing_id, account) alone (a listing lives in exactly
+one realm, so the sets are equal); the id tiebreaks on confirmingBonds and the
+overdue reads (documented determinism aids; Pg leaves ties to the planner);
+insertSale surfaces the 23505 constraint name in the message only (no catch
+keys on err.constraint for sales); the lease fence is modeled by the
+failNextDeliveredSave hook rather than a lease table (the real fence is
+pg-pinned); the fake unions omit 'contended' (no contention exists in
+memory); settlementTouchMs's `?? 0` default is unreachable for store-created
+rows (insertSettlement stamps the touch map); agent A's report that the
+fake's cancel paid-probe was quote-aware was a MISREAD of suspend's
+expirableOffered arm, which mirrors the real suspend exactly (dismissed with
+both files open).
+
+JUDGED this round (binding; do NOT re-raise):
+- The eight defense-in-depth singles in the state.md inventory table: each
+  single strip is behaviorally invisible behind its live twin and each pair
+  is proven by a double-strip mutant that bit.
+- expireDueDirectedOffers' outer status qual (the EvalPlanQual belt) is
+  deterministically unreachable under FOR UPDATE SKIP LOCKED (the subselect
+  skips held rows, so the block-then-commit rig cannot stage the re-check);
+  it is pinned at the DB-free floor through the real statement text, and that
+  pin bit its mutant.
+- The three lock-shape belts (finalize pre-lock winner arm, activation
+  open-set pre-lock, suspend pre-lock 'won') cannot red deterministically in
+  a live race (the later row writes block anyway; a 40P01 maps to the typed
+  contended); each is pinned at the DB-free floor and each floor pin bit.
+- ORDER BY / LIMIT bounds that pick display order or batch size gate no
+  money and stay unpinned by policy (rotation orders and readout saturation
+  ARE pinned); the 40P01 partition arm stays with the mock-pool test.
+- The insertPendingBid locked-read realm qual and the claim's locked-read
+  realm qual are single-strip-equivalent behind their realm-scoped peeks
+  (proven for the claim by the combined mutant; the bid path has no peek, its
+  realm qual bit directly in the realm suite).
+
+PARKED ITEMS, disposed:
+- Standing planner assertions for the two rotation indexes (03/05): CLOSED.
+  The 17 round's plan suite test "both rotation-order batch reads ride their
+  COALESCE partials without a sort"
+  (tests/woc_market_plan_pins_pg_integration.test.ts) IS that standing
+  assertion, EXPLAIN-pinned through the recording pool on every DB-gated run;
+  verified green this round.
+- The at-scale advisory-cooldown concurrency proof (04, shared with 16), the
+  p99.9 inter-statement event-loop gap measurement (16), and the expiry
+  segment's measured full-batch ceiling (16 QA): RE-DEFERRED to 21 with
+  reason: all three need the at-scale rig and 21 owns the end-to-end
+  contention run (the 16 QA deferral already routes the contention run
+  there); nothing in this round's deterministic suites can stand in for a
+  measured at-scale result.
+- The pg-suites-in-CI standing posture (20/22): RE-DEFERRED to 22 with
+  reason: wiring Postgres into CI is a gate-selection change that needs the
+  gate-integrity reviewer and belongs to the close-out's acceptance-bar
+  audit; this round's bar (seven suites, zero skips under TEST_DATABASE_URL,
+  gate runs them when the env var is present, the always-run DB-free floor
+  grown by two lock-shape pins) is met and recorded.
+
+DEFERRED with owners (new this round):
+- 20-qa: independent spot-checks of the mutation log (the registry never
+  substitutes for the QA session's own mutants); the three scratch lanes
+  wocc-marketplace-mut1/2/3 are LEFT IN PLACE at the round's tip for exactly
+  that, remove them when done.
+- 22: whether the judged lock-shape belts deserve live chaos coverage on the
+  devnet dry-run's rig (observational, not blocking).
+
+VALIDATION (all on the committed tree):
+- npx tsc --noEmit clean throughout (run after every batch).
+- The full marketplace pg battery, SEVEN suites, 232 tests, zero skips,
+  multiple green runs against npm run db:up (TEST_DATABASE_URL only; the
+  whole .env is never sourced).
+- DB-free marketplace suites green: directed_sql floor 108, service 573,
+  fake fidelity 9, routes, escrow_queue.
+- npm run ci:changed exit 0 (warnings only, the pre-existing debt classes).
+- node scripts/gate_select.mjs on the committed tree: result recorded below
+  in this section's final validation note.
+
+Registry for the 20 QA session: diff range 057b54141a..<tip below>; the
+JUDGED and DEFERRED lists above are binding; the mutation log and the
+state.md inventory are the artifacts to audit; reviewers this round were
+test-coverage-auditor and database-performance-reviewer (as read-only
+Agents prompted for coverage) plus qa-checklist LAST, dispositions recorded
+below before the docs commit.
+
+NEXT = docs/woc-marketplace-hardening/phase-20-qa.md, GAME repo, worktree
+/Users/fernando/Documents/wocc-marketplace, FRESH session, newest
+origin/release/** sync first; it diffs the recorded range and pushes on PASS.

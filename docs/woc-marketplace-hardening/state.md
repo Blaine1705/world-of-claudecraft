@@ -5,6 +5,43 @@ actually reads.
 
 ## Where we are
 
+- 20 IMPLEMENT COMPLETE (2026-08-20, GAME repo, LOCAL per R4: nothing
+  pushed; the 20 QA session pushes on PASS). Session start 057b54141a,
+  release sync a NO-OP (343 ahead, 0 behind origin/release/v0.40.0). The
+  "money/security SQL is fake-only" medium is CLOSED: all four deliverables
+  landed. (1) The predicate INVENTORY is the "Real-SQL predicate inventory
+  (20)" section below, with zero remaining fake-only or untested
+  money/security predicates. (2) Real-SQL pins landed for every gap the
+  241-mutant campaign proved, headlined by the new cross-realm isolation
+  suite tests/woc_market_realm_scope_pg_integration.test.ts (realm quals
+  were fake-only across the whole store), the bid intake refusal ladder
+  (self-buy + wallet twin), settlement signature intake (offered-only CAS +
+  tx_signature reuse typed), the custody intent ledger's one-way booked
+  flip, the buy-now claim diagnosis ladder and cooldown scoping, the
+  abandon exempt window's five arms, the activation ladder, finalize's
+  guards, sweep batch predicates, strikes/terms upserts, the escrow stamp
+  CAS, schema CHECK negatives, and two new DB-free lock-shape floor pins.
+  (3) The mutation log (docs/woc-marketplace-hardening/phase-20-mutation-log.md):
+  241 distinct mutants, 232 red-on-strip green-on-restore, 8 judged
+  defense-in-depth singles EACH proven by a double strip that bit, 1
+  deliberate no-op control; run in three scratch worktrees over the
+  committed tree, never the shared tree. (4) Fake honesty: six divergences
+  FIXED and pinned in tests/server/fake_woc_market_db.test.ts
+  (submitBondSignature verdict order, the missing claim wallet-twin guard,
+  the readout cap clamp, directedOfferById live-row aliasing that one
+  service test exploited and now stages through an explicit hook, the
+  delivered-page realm qual, the escrow comment), benign divergences
+  documented in the 20 progress entry. Parked items: the 03/05 standing
+  planner assertions are CLOSED (17's plan suite rotation test is exactly
+  that assertion); the at-scale advisory-cooldown proof, p99.9 gap, and
+  expiry-batch ceiling RE-DEFER to 21 (they need 21's at-scale rig); the
+  pg-suites-in-CI posture RE-DEFERS to 22 (a gate-selection change owned by
+  the close-out). Suite growth: 172 to 232 pg tests (seven suites, zero
+  skips), 106 to 108 floor pins, service suite +2 settlementQuote guards.
+  The 20 implement round section in progress.md is the registry the 20 QA
+  session consumes (JUDGED and DEFERRED lists binding). NEXT =
+  phase-20-qa.md, GAME repo, wocc-marketplace, FRESH session, newest
+  origin/release/** sync first; it diffs 057b54141a to the recorded tip.
 - 19 QA COMPLETE (2026-08-19, DASHBOARD repo, verdict PASS-WITH-FOLLOWUPS,
   every finding applied or judged with the file open, PUSHED per R4:
   dashboard ae6e46c..145d120, FOURTEEN commits incl. seven QA fix commits,
@@ -834,13 +871,137 @@ implementation-plan.md).
   suites. Since 02 that concretely means
   `TEST_DATABASE_URL=postgres://eastbrook:<pw>@127.0.0.1:5433/eastbrook npx vitest run tests/woc_market_settlement_pg_integration.test.ts`
   (the suite creates and drops its own disposable database; without the env var it
-  SKIPS green, so a green default-tier run is not evidence it ran).
+  SKIPS green, so a green default-tier run is not evidence it ran). Since 20
+  the marketplace battery is SEVEN suites: settlement, bond, delivery,
+  directed, plan_pins, stepup, and realm_scope
+  (`tests/woc_market_realm_scope_pg_integration.test.ts`), each on its own
+  disposable database name so lanes can run different suites concurrently.
 - Game, monolith-listed file: `npx vitest run tests/monolith_budget.test.ts`.
 - Game, pre-merge / end of phase: commit first, then `node scripts/gate_select.mjs`
   (gate needs a committed tree; it stops at the FIRST failure, run later steps by hand if
   a known red is being carried).
 - Service (in `service/`): `npm run build` then `npm test`.
 - Dashboard: `npm test`, `npm run check`, `npm run build`.
+
+## Real-SQL predicate inventory (20)
+
+Classification rule: a money/security predicate counts as REAL-SQL PINNED when
+deleting it turns a Postgres-suite test red, proven mutant by mutant in
+`docs/woc-marketplace-hardening/phase-20-mutation-log.md` (241 distinct mutants,
+232 red-on-strip, green-on-restore). After this round ZERO fake-only or
+untested money/security predicates remain in `server/woc_market_db.ts` or its
+SQL-bearing siblings (`server/woc_market_sweep.ts`; `server/woc_market.ts`
+carries no SQL). The only mutation survivors are the judged
+defense-in-depth singles below, each PROVEN by a double-strip mutant that bit,
+plus the harness's deliberate comment-only control.
+
+Scope boundary, stated once: service-layer TypeScript guards in
+`server/woc_market.ts` (guardTerms, guardBalance, guardSuspended, the
+self_offer arms, step-up call sites, strike fairness gates) execute the same
+code over the fake and the real store, so a fake-backed service test IS a real
+pin of the guard; the fake can only lie about SQL, which is what the pg suites
+now pin. The two service guards found untested anywhere (settlementQuote
+not_yours and quote_expired) gained tests this round.
+
+Coverage by domain (predicate family, owning pg suite):
+
+- Listing lifecycle: escrow atomicity, the fenced save, the accounts-lock cap
+  count (closed-blind, directed-inclusive, boundary), the directed stamp CAS
+  and its rollback, browse liveness and the directed-exclusion qual, the seller
+  cancel ladder (not_yours/not_active/has_bids/paid-window/one-shot intent
+  stamp/failed-expiry/open probe with rollback), suspend arms (closed, lock
+  window, quoted-offered, won-only release, teardown carve-out, held-to-refund),
+  terminal writes (close/settle/reopen never resurrect or relabel), claim-due
+  status and due bounds, stranded age bound, dispose/return residue arms:
+  `tests/woc_market_settlement_pg_integration.test.ts`,
+  `tests/woc_market_delivery_pg_integration.test.ts`,
+  `tests/woc_market_directed_pg_integration.test.ts`.
+- Bids and bonds: the intake refusal ladder (self-buy account arm, seller
+  wallet twin, directed not_found, inactive and lapsed close inclusive at the
+  bound, cancel intent, bid floor inclusive, already_pending per listing and
+  account and status), signature-first intake (pending-only, different-sig
+  refusal, first-recording anchor, cross-bid reuse typed by the partial unique
+  index), bond quote and abandon immovability on a signed bond, lapse guards
+  (TTL gate, signed spare, held spare), the activation ladder (not_pending,
+  closed and ended, tie superseded inclusive, active-only prior demotion, won
+  prior untouched, supersede refund routing), bondsDue states, poll signed-only
+  and rotation exclusion: `tests/woc_market_bond_pg_integration.test.ts`,
+  `tests/woc_market_settlement_pg_integration.test.ts` (CAS floor, cascade,
+  payout races).
+- Settlements: the one-open-settlement partial unique index (insert, race,
+  revival refusal, schema swap), insertSettlement's winner CAS and closed
+  refusal pair, quote and signature offered-only CAS, tx_signature uniqueness
+  answered typed, transitionSettlement from-set CAS and its 23505 arm, the
+  overdue default-arm state set and deadline, the confirming review bound
+  (inclusive), deliverable claim CAS, delivered-page state qual, finalize (the
+  delivering/delivered CAS, once-per-listing sale index, close CAS with
+  resolution kept, winner bond held-only flip, teardown carve-out):
+  `tests/woc_market_settlement_pg_integration.test.ts`,
+  `tests/woc_market_delivery_pg_integration.test.ts`,
+  `tests/woc_market_bond_pg_integration.test.ts`.
+- Custody exactly-once: claimCustodyRef's ON CONFLICT mutex, the one-way
+  booked_at flip, intent writes refusing a booked claim, the mail-intent grant
+  withdrawal, saveDeliveredCharacterBooked's lease fence and claim_missing CAS
+  in one transaction, the crash-point matrix, booked-claims retention referent
+  guards: `tests/woc_market_delivery_pg_integration.test.ts`.
+- Buy-now claim: the diagnosis ladder (own account, not_active, no_buy_now,
+  cancel_pending, lock expiry), the open-settlement refusal pair, the
+  wallet-twin pair (locked re-check + the claiming UPDATE's NOT EXISTS), the
+  steal recorder and its directed exemption, the exempt window (signature,
+  reason set, per-buyer, per-window, dedupe), both cooldown probes (per-listing
+  scope and window, account-scoped hourly cap and window, later-moment-wins),
+  the directed cooldown exemptions on both passes, the holder-guarded clear:
+  `tests/woc_market_bond_pg_integration.test.ts`,
+  `tests/woc_market_directed_pg_integration.test.ts`.
+- Directed offers: pair-pending index and both 23505 belts, the boot repair's
+  realm-joined dedupe, resolve/accept-side pending CAS, reopen's three guards,
+  converge window bounds and prune-fallout guard, expiry sweep's SKIP LOCKED
+  and status quals, the ever-settled strike gate, strikes (increment,
+  suspension never shortens, per-account clear), terms recorded once:
+  `tests/woc_market_directed_pg_integration.test.ts`.
+- Step-up: single-use consume (account, realm, race), expiry answered by the
+  verifier, prune realm and boundary, nonce PK, operation CHECK, FK cascade:
+  `tests/woc_market_stepup_pg_integration.test.ts`.
+- Realm scoping, cross-cutting: every store statement's `realm` qual proven
+  against a symmetric realm pair (reads return only the realm's rows, writes
+  move only the realm's rows, the cap and cooldown ledgers count only the
+  realm's evidence, character resolution and delivery targets stay inside the
+  realm and the account): `tests/woc_market_realm_scope_pg_integration.test.ts`
+  (new this round; per-test realm pairs so every count is exact and -t safe).
+- Schema constraints: every money-state CHECK's negative arm (listing
+  status/format/resolution, bid status/bond_state, settlement state, offer
+  status, the jsonb object checks), bond_reference uniqueness, plus the
+  existing index-shape and boot-repair pins:
+  `tests/woc_market_settlement_pg_integration.test.ts`,
+  `tests/woc_market_bond_pg_integration.test.ts`.
+- Lock shapes and EPQ belts that no deterministic live race can reach are
+  pinned at the always-run DB-free floor through the REAL methods on recording
+  pools (`tests/server/woc_market_directed_sql.test.ts`): the finalize
+  pre-lock's winner arm, the activation open-set pre-lock order (new), the
+  suspend pre-lock's won member (new), the offer expiry sweep's outer
+  EvalPlanQual qual, plan-class regressions in
+  `tests/woc_market_plan_pins_pg_integration.test.ts`.
+
+Judged defense-in-depth singles (each single strip is behaviorally invisible
+behind its live twin; the DOUBLE strip named beside it bit, so the pair is
+load-bearing and pinned):
+
+| single survivor | twin that masks it | double-strip proof |
+|---|---|---|
+| claimBuyNowLock locked re-read realm qual | the lock-free peek's realm qual (pinned alone) | realm_2869_2914_combined BIT |
+| claimBuyNowLock open-settlement advisory arm | the in-transaction arm | claim_open_settlement_double BIT |
+| claimBuyNowLock open-settlement transaction arm | the advisory arm | claim_open_settlement_double BIT |
+| claimBuyNowLock wallet-twin locked TS re-check | the claiming UPDATE's NOT EXISTS | claim_wallet_twin_double_strip BIT |
+| claimBuyNowLock wallet-twin NOT EXISTS | the locked TS re-check | claim_wallet_twin_double_strip BIT |
+| claimBuyNowLock zero-rows own_listing verdict | both twin guards above | claim_zero_rows_double BIT |
+| insertSettlement INSERT..SELECT status belt | the FOR UPDATE closed check (pinned alone) | insertSettlement_closed_double_strip BIT |
+| reopenDirectedOffer NOT EXISTS pair guard | the pair index's named 23505 belt | reopen_notexists_plus_catch BIT |
+
+Deliberate non-goals, unchanged: pure ORDER BY and LIMIT bounds that select
+display order or batch size without gating money (the rotation orders and the
+readout saturation caps ARE pinned), column projections, and the `40P01` arm
+of the contention mapping (deadlock-victim runs are nondeterministic; the
+mock-pool partition test owns it).
 
 ## Rulings
 
