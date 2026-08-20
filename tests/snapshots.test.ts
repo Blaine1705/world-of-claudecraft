@@ -2500,7 +2500,10 @@ describe('client-side delta merge', () => {
       (client as any).applySnapshot(snap);
     };
     apply();
-    const mirrored = client.entities.get(e.id)!.auras.find((a) => a.id === 'fear_incap')!;
+    const mirroredEntity = client.entities.get(e.id);
+    if (!mirroredEntity) throw new Error('mirrored entity missing');
+    const mirrored = mirroredEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!mirrored) throw new Error('mirrored fear aura missing');
     expect(mirrored.breakThreshold).toBe(1);
 
     fearAura.breakThreshold = undefined;
@@ -5470,7 +5473,10 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     // the in-memory wire shape.
     const snap = JSON.parse(JSON.stringify({ t: 'snap', ents: [wire] }));
     (client as any).applySnapshot(snap);
-    const mirror = client.entities.get(pid)!.auras.find((a) => a.id === aura.id)!;
+    const mirrorEntity = client.entities.get(pid);
+    if (!mirrorEntity) throw new Error('mirrored entity missing');
+    const mirror = mirrorEntity.auras.find((a) => a.id === aura.id);
+    if (!mirror) throw new Error(`mirrored ${aura.id} aura missing`);
     return { wire, mirror };
   }
 
@@ -5680,13 +5686,19 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     });
     const client = bareClient(999);
     (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
-    const armed = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    const armedEntity = client.entities.get(pid);
+    if (!armedEntity) throw new Error('armed entity missing');
+    const armed = armedEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!armed) throw new Error('armed fear aura missing');
     expect(armed.breakThreshold).not.toBeUndefined();
 
     // Same aura identity, threshold gone: the in-place arm must CLEAR it.
     e.auras[e.auras.length - 1].breakThreshold = undefined;
     (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
-    const mirrored = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    const mirroredEntity = client.entities.get(pid);
+    if (!mirroredEntity) throw new Error('mirrored entity missing');
+    const mirrored = mirroredEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!mirrored) throw new Error('mirrored fear aura missing');
     // The fast path updates the SAME record object; assert both the clear
     // and the reuse, so this pin cannot silently slide onto the fresh-array
     // arm if the shape check ever changes.
@@ -5737,7 +5749,10 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
         },
       ],
     });
-    const mirror = client.entities.get(2)!.auras.find((a) => a.kind === 'buff_int')!;
+    const mirrorEntity = client.entities.get(2);
+    if (!mirrorEntity) throw new Error('mirrored entity missing');
+    const mirror = mirrorEntity.auras.find((a) => a.kind === 'buff_int');
+    if (!mirror) throw new Error('mirrored buff_int aura missing');
     expect(mirror.value).toBe(0);
   });
 });
