@@ -1162,10 +1162,20 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     expect(code.match(/new WocMarketReadCache\(\)/g)).toHaveLength(1);
     expect(code).toContain('readCache: wocMarketReadCache,');
     expect(code).toContain(
-      'configureWocMarketRuntime({ service: wocMarketService, readCache: wocMarketReadCache })',
+      'configureWocMarketRuntime({\n  service: wocMarketService,\n  readCache: wocMarketReadCache,\n  authGuardDb: wocAuthGuardCache,\n})',
     );
     expect(code).toContain('registerWocMarketReadCacheForBusts(wocMarketReadCache)');
     expect(code).toContain('readCaches: wocMarketReadCache.stats()');
+    // The auth-guard read cache (the second settled rider): ONE configure
+    // call arms the singleton over the two REAL row fetchers, the SAME
+    // instance rides the runtime injection above, its stats join this
+    // readout, and shutdown clears the singleton so busts never pin a dead
+    // instance across an in-process reboot.
+    expect(code.match(/configureWocAuthGuardCache\(/g)).toHaveLength(1);
+    expect(code).toContain('fetchTokenRow: authTokenRowForToken,');
+    expect(code).toContain('fetchModerationRow: moderationRowForAccount,');
+    expect(code).toContain('authGuard: wocAuthGuardCacheStats()');
+    expect(code).toContain('resetWocAuthGuardCache();');
     // The two degraded-state counters ride the same readout: the price
     // cache's memo ages and the idle-kill count (a stall storm's client
     // evictions must be a number an operator can watch, not log volume).

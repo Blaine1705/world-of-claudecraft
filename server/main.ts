@@ -122,6 +122,7 @@ import {
   accountAndScopeForToken,
   accountById,
   acquireCharacterLease,
+  authTokenRowForToken,
   type BgLeaderRow,
   bankBonusFactsForAccount,
   type CharacterRow,
@@ -149,6 +150,7 @@ import {
   listCompanionTokens,
   loadAccountCosmetics,
   loadWorldState,
+  moderationRowForAccount,
   moderationStatusForAccount,
   pool,
   primarySlugForAccount,
@@ -376,6 +378,11 @@ import {
   handleWalletUnlink,
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest } from './web_login_guard';
+import {
+  configureWocAuthGuardCache,
+  resetWocAuthGuardCache,
+  wocAuthGuardCacheStats,
+} from './woc_auth_guard_cache';
 import { cachedWocBalance, handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { WocMarketService } from './woc_market';
 import { createWocMarketCustody, wocEscrowSerializeStats } from './woc_market_custody';
@@ -2803,6 +2810,15 @@ const wocMarketReadCache = new WocMarketReadCache();
 // The wallet link/unlink writes in db.ts bust the activity readout through
 // the module-level registration (identity changes never wait out a TTL).
 registerWocMarketReadCacheForBusts(wocMarketReadCache);
+// The auth-guard read cache (the second settled rider): the marketplace
+// player guards read token/moderation rows through it; every writer in
+// db.ts/moderation_db.ts and siblings busts it through the module singleton
+// this configure call arms. Scoped to the marketplace bundle ONLY (the
+// import-boundary pin in tests/server/auth_guard_bust_coverage.test.ts).
+const wocAuthGuardCache = configureWocAuthGuardCache({
+  fetchTokenRow: authTokenRowForToken,
+  fetchModerationRow: moderationRowForAccount,
+});
 // The realm-global escrow in-flight bound (the escrow write-path rider):
 // constructed here, not inside the custody factory, so its stats can ride the
 // ops readout below alongside the counters it complements.
@@ -2873,7 +2889,11 @@ const wocMarketService = new WocMarketService({
   // default prints the identical line, and wiring a byte-identical copy here
   // meant every format tweak had to land in two places.
 });
-configureWocMarketRuntime({ service: wocMarketService, readCache: wocMarketReadCache });
+configureWocMarketRuntime({
+  service: wocMarketService,
+  readCache: wocMarketReadCache,
+  authGuardDb: wocAuthGuardCache,
+});
 // The dashboard's read-only ops views. Injected here so internal.ts never
 // imports the market route module (and admin/account behind it).
 configureInternalWocMarketReads(wocMarketService);
@@ -2903,6 +2923,9 @@ configureInternalWocMarketStuckRead(async () => ({
   // surface): eviction thrash or a bust storm is a DB-load incident in the
   // making, and this readout is where an operator already looks.
   readCaches: wocMarketReadCache.stats(),
+  // The auth-guard cache's two arms (token rows, moderation rows): a bust
+  // storm or eviction thrash here is DB pressure returning to the guards.
+  authGuard: wocAuthGuardCacheStats(),
   // The price cache's memo ages (null on the dev economy, which has no
   // cache): a stale-served or blanked price during a brownout is a NUMBER
   // here, not an invisible state the module never logs.
@@ -3776,6 +3799,7 @@ export async function startServer(): Promise<http.Server> {
     // cache instance (the registry teardown rule; repeated boots in one
     // process would otherwise chain-leak each boot's whole cache).
     registerWocMarketReadCacheForBusts(null);
+    resetWocAuthGuardCache();
     await wocMarketMonitor.stop();
     await generalChatQuotaListener.stop();
     game.stop();

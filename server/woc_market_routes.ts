@@ -16,7 +16,11 @@ import { accountAndScopeForToken, moderationStatusForAccount } from './db';
 import { ctxAccountId } from './http/context';
 import type { ErrorCode } from './http/error_codes';
 import { HttpError } from './http/errors';
-import { createActiveGuard, createReadGuard } from './http/middleware/bearer_active_guard';
+import {
+  type BearerActiveGuardDb,
+  createActiveGuard,
+  createReadGuard,
+} from './http/middleware/bearer_active_guard';
 import { withBody } from './http/middleware/body';
 import {
   rateLimit,
@@ -142,6 +146,13 @@ export interface WocMarketRuntime {
    *  no cache). Absent in rigs that install a bare fake service, in which
    *  case the service reads uncached and there is nothing to bust. */
   readCache?: WocMarketReadCache;
+  /** The cached guard bundle (the auth-guard read rider): main.ts injects the
+   *  WocAuthGuardCache instance here so the marketplace player guards read
+   *  through it while EVERY other surface (the admin gate below resolves
+   *  through adminDb(), the other domains' bundles, ws_auth) stays on the
+   *  direct db reads. Absent in rigs: guards fall back to the direct reads,
+   *  and the test override seam keeps absolute precedence over both. */
+  authGuardDb?: BearerActiveGuardDb;
 }
 
 let runtime: WocMarketRuntime | null = null;
@@ -957,21 +968,26 @@ async function adminClearStrikesHandler(ctx: Ctx): Promise<void> {
 
 // Bearer guards from the shared factories (LAZY db reads via the bundle, the
 // maps_routes pattern), so endpoint tests can install fakes without a pg pool.
+// Precedence per request: the test override, else the runtime-injected cached
+// bundle (production), else the direct db reads. The override outranks the
+// cache ON PURPOSE: a rig that fakes the guard rows must never be answered
+// from a cache it cannot see or bust.
 const REAL_GUARD_DB = { accountAndScopeForToken, moderationStatusForAccount };
-let guardDbBundle = REAL_GUARD_DB;
+let guardDbOverride: BearerActiveGuardDb | null = null;
 
 /** Override the bearer-guard db reads with fakes (test-only). */
 export function setWocMarketGuardDbForTests(overrides: Partial<typeof REAL_GUARD_DB>): void {
-  guardDbBundle = { ...REAL_GUARD_DB, ...overrides };
+  guardDbOverride = { ...REAL_GUARD_DB, ...overrides };
 }
 
 /** Restore the real bearer-guard db reads (test-only). */
 export function resetWocMarketGuardDbForTests(): void {
-  guardDbBundle = REAL_GUARD_DB;
+  guardDbOverride = null;
 }
 
-const readAccount = createReadGuard(() => guardDbBundle);
-const activeAccount = createActiveGuard(() => guardDbBundle);
+const guardDb = (): BearerActiveGuardDb => guardDbOverride ?? runtime?.authGuardDb ?? REAL_GUARD_DB;
+const readAccount = createReadGuard(guardDb);
+const activeAccount = createActiveGuard(guardDb);
 
 // BOLA loaders for the owner-scoped :id mutations (the require_owned seam):
 // absent and non-owned both answer the same 404 body, existence never leaks.
