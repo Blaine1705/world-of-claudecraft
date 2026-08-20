@@ -13,9 +13,14 @@
 // How: intercept the dev server's DOCUMENT response and attach the real
 // buildContentSecurityPolicy() output (inline-script hashes recomputed for the
 // dev HTML, exactly what the packaged shell does for dist/index.html), then run
-// enterOfflineGame and fail on any first-party CSP violation. Third-party
-// origins the CSP blocks by design (analytics beacon hosts) are warnings only.
-// The unit-level twin is tests/gltf_decoder_csp.test.ts (source-scan contract).
+// enterOfflineGame and fail on any first-party CSP violation. Violations are
+// collected two ways: the page's securitypolicyviolation ledger, and console
+// "Refused ..." texts, which also surface violations raised inside workers
+// (worker scopes never fire the page-level event). Third-party origins the CSP
+// blocks by design (analytics beacon hosts) are warnings only. Known limits:
+// the CSP is built against the dev origin, so the https/wss production arm of
+// the connect-src is exercised by tests/electron_shell_guards.test.ts instead,
+// and the unit-level source contract lives in tests/gltf_decoder_csp.test.ts.
 //
 // Needs: npm run dev (:5173). Usage: node scripts/csp_shell_smoke.mjs
 // (GAME_URL= overrides the dev server URL).
@@ -32,8 +37,12 @@ const {
 } = require('../electron/shell_guards.cjs');
 
 const GAME_URL = process.env.GAME_URL ?? 'http://127.0.0.1:5173';
-const origin = new URL(GAME_URL).origin;
+const gameUrl = new URL(GAME_URL);
+const origin = gameUrl.origin;
 const NEGATIVE_PROBE_HOST = 'csp-smoke-negative-probe.invalid';
+const WORLD_SETTLE_MS = 6000;
+const LATE_LOAD_DRAIN_MS = 2500;
+const PROBE_TIMEOUT_MS = 4000;
 
 let fail = 0;
 function check(name, cond, extra = '') {
@@ -60,7 +69,21 @@ const page = await browser.newPage();
 const pageErrors = [];
 page.on('pageerror', (e) => pageErrors.push(e.message));
 
-// Violation ledger, installed before any document script runs.
+// Console-text refusal ledger: violations raised inside workers reach the page
+// console but never the page's securitypolicyviolation event, and this ledger is
+// live for the whole run (no sampling window). The refusal message embeds the full
+// policy string, so classification must use the blocked URL it names, never the
+// message body.
+const consoleRefusals = [];
+const REFUSED_URL = /(?:Connecting to|cannot load|Refused to (?:connect|load)[^']*)\s+'?([^'\s]+)/;
+page.on('console', (m) => {
+  const text = m.text();
+  if (!/Refused|violates the following Content Security Policy/i.test(text)) return;
+  const url = REFUSED_URL.exec(text)?.[1] ?? '';
+  consoleRefusals.push({ directive: 'console', blocked: url.replace(/[.']+$/, '') });
+});
+
+// Event ledger, installed before any document script runs.
 await page.evaluateOnNewDocument(() => {
   window.__cspViolations = [];
   document.addEventListener('securitypolicyviolation', (e) => {
@@ -69,15 +92,20 @@ await page.evaluateOnNewDocument(() => {
 });
 
 // Attach the real desktop CSP to the document response only: a document's CSP header
-// governs everything the page loads, so per-asset interception is unnecessary.
+// governs everything the page loads, so per-asset interception is unnecessary. A
+// document we cannot re-fetch is ABORTED, never continued headerless: failing open
+// would make every later "no violations" verdict vacuous.
 await page.setRequestInterception(true);
 page.on('request', (req) => {
   void (async () => {
+    const isDoc =
+      req.resourceType() === 'document' &&
+      (req.url() === origin || req.url().startsWith(`${origin}/`));
+    if (!isDoc) {
+      await req.continue().catch(() => {});
+      return;
+    }
     try {
-      if (req.resourceType() !== 'document' || !req.url().startsWith(origin)) {
-        await req.continue();
-        return;
-      }
       const upstream = await fetch(req.url());
       const body = Buffer.from(await upstream.arrayBuffer());
       const csp = buildContentSecurityPolicy({
@@ -93,8 +121,8 @@ page.on('request', (req) => {
         body,
       });
     } catch (err) {
-      console.error('document interception failed:', err instanceof Error ? err.message : err);
-      await req.continue().catch(() => {});
+      console.error('document interception failed, aborting the navigation (fail closed):', err);
+      await req.abort().catch(() => {});
     }
   })();
 });
@@ -102,19 +130,22 @@ page.on('request', (req) => {
 await page.goto(GAME_URL, { waitUntil: 'networkidle2', timeout: 60000 });
 
 // Sanity: the CSP must actually be attached and enforced, or every later "no
-// violations" verdict is vacuous. A disallowed connect target must be refused.
+// violations" verdict is vacuous. The listener matches the probe's own host so a
+// concurrent unrelated violation cannot satisfy (or spuriously fail) this check.
 const enforcement = await page.evaluate(
-  (host) =>
+  (host, timeoutMs) =>
     new Promise((res) => {
       const on = (e) => {
+        if (!String(e.blockedURI).includes(host)) return;
         document.removeEventListener('securitypolicyviolation', on);
         res(e.effectiveDirective);
       };
       document.addEventListener('securitypolicyviolation', on);
       fetch(`https://${host}/`).catch(() => {});
-      setTimeout(() => res(null), 4000);
+      setTimeout(() => res(null), timeoutMs);
     }),
   NEGATIVE_PROBE_HOST,
+  PROBE_TIMEOUT_MS,
 );
 check(
   'CSP attached and enforced (negative probe refused)',
@@ -122,7 +153,7 @@ check(
   String(enforcement),
 );
 
-const booted = await enterOfflineGame(page, { settleMs: 6000 });
+const booted = await enterOfflineGame(page, { settleMs: WORLD_SETTLE_MS });
 check('offline world entry under the desktop CSP', booted);
 await page.screenshot({ path: 'tmp/csp_smoke_world.png' });
 
@@ -144,21 +175,35 @@ check(
   JSON.stringify(probe),
 );
 
-// First-party violations (app resources: self, data:, blob:, inline, the ws origin)
-// are failures; blocked third-party hosts are the CSP working as designed. Vite's own
-// HMR websocket (ws://...?token=...) is dev-harness tooling with no packaged-shell
-// counterpart, so a block on it is noise, never a finding.
-const violations = (await page.evaluate(() => window.__cspViolations ?? [])).filter(
+// Drain late async loads (textures still streaming past the settle) before the final
+// ledger read, then classify. First-party (failures): app resources on the dev origin,
+// data:/blob: URIs, ws targets, and the URI-less script violations ('inline', 'eval',
+// 'wasm-eval', empty). Vite's own HMR websocket (ws://<dev host>...?token=...) is
+// dev-harness tooling with no packaged-shell counterpart, so a block on it is noise.
+await new Promise((r) => setTimeout(r, LATE_LOAD_DRAIN_MS));
+const eventViolations = await page.evaluate(() => window.__cspViolations ?? []);
+const violations = [...eventViolations, ...consoleRefusals].filter(
   (v) => !v.blocked.includes(NEGATIVE_PROBE_HOST),
 );
-const isViteHmrSocket = (v) => v.blocked.startsWith('ws') && v.blocked.includes('?token=');
+const isViteHmrSocket = (v) => {
+  if (!v.blocked.startsWith('ws') || !v.blocked.includes('?token=')) return false;
+  try {
+    return new URL(v.blocked).hostname === gameUrl.hostname;
+  } catch {
+    return false;
+  }
+};
 const isFirstParty = (v) =>
   !isViteHmrSocket(v) &&
-  (v.blocked === 'inline' ||
+  (v.blocked === '' ||
+    v.blocked === 'inline' ||
+    v.blocked === 'eval' ||
+    v.blocked === 'wasm-eval' ||
     v.blocked.startsWith('data') ||
     v.blocked.startsWith('blob') ||
     v.blocked.startsWith('ws') ||
-    v.blocked.startsWith(origin));
+    v.blocked === origin ||
+    v.blocked.startsWith(`${origin}/`));
 const fatal = violations.filter(isFirstParty);
 for (const w of violations.filter((v) => !isFirstParty(v))) {
   console.log(`WARN third-party blocked by CSP (by design): ${w.directive} ${w.blocked}`);
