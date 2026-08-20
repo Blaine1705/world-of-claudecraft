@@ -40,8 +40,8 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 17 | db-retention-indexes | game | DONE | 0d1c5729a1 | all four deliverables landed, gate PASS; the 17 implement round section below is the registry (row trued up late by the 18 session) |
 | 17 QA | phase-17-qa | game | DONE (QA PASS) | e3ab5f6f21 | PASS-WITH-FOLLOWUPS, never-sweep verdict SOUND, pushed per R4 (origin tip e3ab5f6f21); the 17 QA round section below is the registry (row trued up late by the 18 session) |
 | 18 | dashboard-guardrails | dashboard | DONE (impl) | c001d4a | DASHBOARD repo; H1 role gate, 6-decimal mint source, WMB_-only release, reference-tail forfeit confirmation, destination reset, immutable-id audit actor, independent summary reads; session start c001d4a (= PR #13 tip), origin/master sync NO-OP; three coverage lenses (0 blocking) + TWO fresh fix-round reviewers (both READY), every finding applied or judged; final tip e82303e, npm test 164 / check 0 / build 0; LOCAL, not pushed per R4 (18 QA pushes on PASS); the 18 implement round section below is the registry |
-| 18 QA | phase-18-qa | dashboard | NOT STARTED | | |
-| 19 | dashboard-tooling | dashboard | NOT STARTED | | |
+| 18 QA | phase-18-qa | dashboard | DONE (QA PASS) | e82303e | PASS-WITH-FOLLOWUPS, every finding applied or judged; ONE blocking (the game proxy host-pinning bypass) fixed and mutation-proven; eight fix commits, final tip ae6e46c, npm test 183 / check 0 / build 0; PUSHED per R4 to origin/feature/woc-market-trading-controls (PR #13); the 18 QA round section below is the registry (row trued up by the 19 session; the section was always current) |
+| 19 | dashboard-tooling | dashboard | DONE (impl) | ae6e46c | DASHBOARD repo; all five deliverables landed: first CI workflow (act-style clean-clone proof green), component-render harness (esbuild JSX hook + happy-dom) closing the .tsx pin gap incl. every 18-round deferral, npm audit 0 (was 11), data-truth fixes (dead p2p trades, buy-now price, per-quote legs, superseding list loaders, locale sweep, wocDecimals guard, withdraw gate), investigation UX (find box, cross-links, Custody subtab on the stuck monitor, payout proxy explicit allowlist + actor header); two fresh lenses + a fresh fix-round re-review, every finding applied or judged; 10 mutation proofs bit; tests 183 to 254, check 0, build 0; 7 commits, tip 8eeaf8f, LOCAL not pushed per R4 (19 QA pushes on PASS); the 19 implement round section below is the registry |
 | 19 QA | phase-19-qa | dashboard | NOT STARTED | | |
 | 20 | real-sql-coverage | game | NOT STARTED | | |
 | 20 QA | phase-20-qa | game | NOT STARTED | | |
@@ -4435,3 +4435,226 @@ worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13, branch
 integration/woc-market-trading, FRESH session, own origin/master sync
 first; it diffs c001d4a..e82303e and pushes on PASS to
 origin/feature/woc-market-trading-controls (updates PR #13).
+
+## 19 implement round (dashboard tooling)
+
+DASHBOARD repo, worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13,
+branch integration/woc-market-trading. Session start ae6e46c (the 18 QA tip AND
+the PR #13 remote tip); origin/master sync a NO-OP. Baseline validated green
+before any change: npm test 183, check 0 errors, build 0. LOCAL per R4: NOTHING
+pushed in either repo; the 19 QA session pushes on PASS. Seven commits,
+ae6e46c..8eeaf8f. Validation held by hand (no reviewer roster or gate in this
+repo): npm test 254 pass 0 fail, npm run check 0 errors (the pre-existing
+React.FormEvent hint untouched), npm run build complete, all three ALSO proven
+from a CLEAN CLONE of the committed tip (npm ci from the lockfile, no .env, the
+workflow's exact step list) since pushing is the QA session's job.
+
+DELIVERABLES:
+1. CI (cd4f6cd audit fix, 31dd145 workflow, hardened in f226683): the repo's
+   first workflow, .github/workflows/ci.yml, runs npm ci, the security suites
+   BY NAME (the new test:security script: proxy authorization x3, release
+   form, summary loader, mint scan, audit actor; a renamed or deleted suite
+   turns the gate red instead of silently shrinking the glob), the full
+   suite, astro check + tsc, and the build, on every push and PR, with
+   per-ref concurrency, a read-only token, persist-credentials false, and the
+   org's v6 action tags. PROOF: act is not installed, so the act-style local
+   proof is a fresh git clone of the committed tip + npm ci + the four steps,
+   run TWICE (at 31dd145 and at the final tip 8eeaf8f), all green; the real
+   Actions run is exercised by the 19 QA push. Making the check REQUIRED on
+   the protected branch is a repository setting: Fernando's follow-up.
+2. Component-render harness (60f439d): tests/harness/register_jsx.mjs (a
+   node:module registerHooks load hook transforming .tsx with esbuild, plus a
+   resolve fallback for the panels' extensionless imports) and
+   tests/harness/component_harness.ts (happy-dom globals, react-dom createRoot
+   under act, setValue via the prototype setter + Simulate.change because
+   React's text-input change plugin ignores happy-dom-dispatched native
+   events, a route-based fetch mock that installs over the REAL fetch, and a
+   deferred() for deterministic races). devDependencies gained esbuild
+   (^0.28.1, already in the tree transitively via astro) and happy-dom: the
+   sanctioned test-harness exception, nothing ships in the production build.
+   Every 18-round JSX deferral is now pinned in DOM tests:
+   validateReleaseSubmit gates the POST (zero-POST pin), BOTH submit outcomes
+   route through releaseSubmitOutcome (reset-on-success, keep-on-failure),
+   the loaderRef supersession survives re-render, the subtab bar survives a
+   full economy outage with the game views still opening (tes-2), the
+   composite actor + title renders across all four panels (trading audit,
+   Discounts, ClaudiumAdminOperations x2, the treasury recovery message),
+   tablist ARIA completed (tabpanel, aria-controls, roving tabindex, arrow
+   keys) and pinned, status pill warn/err split, submit error/notice cleared
+   on subtab switch, decimals rendering (9000000000 base = 9,000 $WOC in the
+   DOM), outcome labeling, the quotes filter-change loading affordance, and
+   the stale-read discard at the panel level.
+3. npm audit (cd4f6cd): 11 advisories (5 high, 5 moderate, 1 low: astro,
+   @astrojs/node, fast-uri, js-yaml, nanoid, postcss, svgo, the yaml
+   language-server chain) all had non-breaking fixes; lockfile-only update;
+   npm audit now reports 0. NO accepted-risk list needed. The gate has no
+   npm-audit step by decision (external-world nondeterminism in a merge bar);
+   a scheduled audit job is noted for Fernando below.
+4. Data-truth fixes, each red-first or mutation-proven (60f439d, f226683,
+   8eeaf8f): p2pOutcome labels dead trades (a terminal non-sold listing is
+   dead REGARDLESS of settlement state; the settlement-bearing class, e.g.
+   resolution unsettled + latest settlement failed, is the dominant real one
+   and was the fresh correctness lens's headline catch); buy-now listings
+   show the price they sell at (listingPriceView/listingPriceLabel; the old
+   cell rendered currentBid ?? start for every format and threw buyNowCents
+   away); legsReconcile stays the documented sanity check (the window totals
+   still carry no base-unit settled total to sum against: the service-side
+   ask is DEFERRED, see below) but the REAL identity now runs per quote:
+   quoteLegsMismatch checks seller+burn+treasury === amountBase on every
+   quote row in view (the legs ride the quotes payload already) and the Note
+   cell flags a mismatch above the terminal reason; the MarketListViews
+   stale-response-wins race and shared busy flag closed with createListLoader
+   (the createSummaryLoader supersession pattern, only the winning load
+   clears busy) plus malformed-200 row screening (an object leaf in a
+   rendered cell unmounted the whole tab; same class as the 18 blocking);
+   the loading affordance covers the mixed-epoch window on filter changes,
+   page turns, and date changes (old rows never pose as the new filter's
+   answer), and the quotes section uses a quotesFilter stamp in
+   MarketSummaryState; release references paste case-leniently
+   (normalizeReleaseReference: prefix upper, hex lower) and go out
+   canonicalized, WMS_ still refused by name; wocDecimalsMismatch in
+   woc_mint.ts is the runtime reconciliation the divergence-hazard comment
+   promised (banner in the Claudium panel, which holds the one payload that
+   reports wocDecimals; an unreadable PRESENT value warns rather than staying
+   silent); withdrawalReadiness refuses a fresh withdraw before the wallets
+   payload lands (the conversion-at-fallback + skipped balance check window;
+   structurally the withdraw modal only opens from the wallets section today,
+   so the wiring is defense in depth, core-pinned, and no vacuous DOM pin was
+   fabricated for the unreachable path); the ambient-locale sweep fixed 31
+   toLocaleString sites across 8 files (ClaudiumAdminOperations had 11 beyond
+   the known set) with a red-first source scan
+   (tests/operator_locale_scan.test.ts: comment/string blanking that keeps
+   template expressions scanned, per-arm probes, walk floor, liveness
+   control, whole-file matching so wrapped calls cannot escape, and JSX-aware
+   regex-literal handling after the re-review caught the blanker regression).
+5. Investigation UX (60f439d): a find box on both list views filtering the
+   LOADED PAGE (the game reads carry no search parameter; substring over
+   name/wallet/item/signature plus exact id:/acct:/listing: tokens so id:12
+   cannot match 123); cross-links: accounts jump between the listing and p2p
+   views (landing wide open: status all, the 2024-01-01 investigation window,
+   page 0, so a jump cannot silently miss its target; consumed on hand
+   navigation so the token never re-applies on a return visit), custody rows
+   jump to their listing, and a WMB_ audit reference loads into the release
+   form (bond references only, isBondReference); the Custody subtab consumes
+   GET /internal/woc-market/stuck through the gated game proxy (the THIRD
+   allowlisted path, literal-pinned in the authorization matrix which also
+   self-extends): five stuck classes with saturating count labels (1000+),
+   truncation honesty (showing the oldest N of M), the correct age axes
+   (stuckDelivering on updatedAtMs, stuckBonds on stuckSinceMs), and the ops
+   gauges (sweep, pool, lock-wait timeouts, idle-tx kills) degrading to a
+   dash on older game binaries; paging kept on both list views (Pager now
+   DOM-tested); the p2p table gained the Tx column (signature tail, full
+   value on hover). The PAYOUT proxy joined the explicit-allowlist shape
+   (c023c40): payout_routes.ts, method-qualified, all 17 routes verified
+   against App.tsx, unknown paths 404 with zero upstream (red-run observed:
+   the old prefix rule proxied them), canonicalProxyPath gained the
+   normalized-output percent re-check (game parity), and operator identity
+   rides EVERY payout request as x-woc-daily-reward-actor (id-first
+   composite, forge-proof via fresh headers, ASCII-clamped).
+
+REVIEW ROUNDS: two fresh coverage lenses over ae6e46c..31dd145 (security: 0
+blocking, 2 should-fix, 2 nits, 6 notes; correctness: 0 blocking, 3
+should-fix, 4 nits, 7 notes), every finding applied or judged with the file
+open; the fix round (f226683) was RE-REVIEWED FRESH (0 blocking; its one
+should-fix was REAL: my regex-literal handling in the locale scan blanker
+read JSX closing tags as regex openers and silently swallowed one-line JSX
+cells, exactly where formatter calls live; fixed in 8eeaf8f with JSX controls,
+mutation-proven, plus its three nits). Mutation proofs across the session: 10
+bit by name (loaderRef remint via the effect-loop hang, release guard bypass,
+raw reference on the wire, quotes affordance arm, stale submit outcome kept,
+list supersession dropped x2, dead-with-settlement revert, cross-link clear
+revert, JSX-blanker revert) plus the two subagent proofs (payout prefix-rule
+restore, actor header removal); the affordance mutant SURVIVED its first test
+and forced a real test rewrite (the parked-first-load flow never left the
+quotes === null arm), which is what the proofs are for.
+
+JUDGED this round (binding unless 19 QA overrules; do NOT re-raise):
+- SHA-pinning the workflow actions: declined; the org convention (game repo,
+  23 workflows) is major-tag pinning, and the workflow rides the same v6 tags.
+- 404/405 decided before the 403 on the payout proxy: matches the sibling
+  proxies and the 18 QA binding judgment on the same class (authenticated-only
+  enumeration of a source-public list; middleware 401s anonymous callers).
+- No npm-audit step in the per-PR gate: a merge bar must not go red on
+  external-world drift unrelated to the change; a SCHEDULED audit job is
+  Fernando's call.
+- push + pull_request double-run on PR branches: the spec asks for both
+  events verbatim; cost noted, correctness unaffected.
+- The keyword-preceded regex gap in the locale-scan blanker (return /x/ reads
+  as division, body unblanked): documented in the scanner; no such literal
+  exists under src/ today and the failure mode is bounded to one line for
+  quotes (a backtick could reach further; accepted with the comment naming it).
+- Negative ages (clock skew) render "-" everywhere formatAge is used:
+  graceful and indistinguishable from unknown by design; a skew hint would be
+  over-engineering.
+- Late-resolving loads setState after unmount: harmless in React 18, no
+  warning, no leak; listed by the lens for completeness.
+- mockFetch restoring to the REAL fetch always (no nesting support): no
+  nested mocks exist and the self-heal is the point.
+- dead (listing X, settlement pending) is reachable and transiently
+  premature if the game can terminally resolve a listing while a settlement
+  is in flight; it self-corrects on delivery and the label surfaces both
+  facts. Game-side data question, not a dashboard defect.
+
+FOR FERNANDO (flagged, not changed; policy question the security lens raised):
+the EXTERNAL role can still POST admin/payouts/send, resend, tasks, and
+config through the payout proxy (the deny-list covers automation,
+daily-rewards, void, restore, wallet/send). That is pre-existing policy, now
+PINNED per-route by the new external-verdict matrix so any drift fails by
+name; payouts/send moves money, so confirm it stays intended.
+
+DEFERRED with owners:
+- 19 QA: the real GitHub Actions run (the push exercises the workflow; check
+  the run and note its state here per R4), and making the ci check REQUIRED
+  on the protected branch (repository setting, Fernando).
+- 22 (service ask, the 18-recorded item now concrete): the market admin
+  payloads still report no wocDecimals and the volume windows no base-unit
+  settled total; asking the service to report both closes the Trading tab's
+  constant-only rendering and lets legsReconcile verify the window identity
+  (per-quote reconciliation landed this round without a service change).
+- Service-side (recorded, cross-repo): body-borne actor fields on payout
+  mutations beyond void/restore still forward verbatim; the new header is
+  authoritative only if the payout service prefers it over the body when it
+  grows audit rows.
+- Server-side search remains a game-endpoint gap (the find box is honest
+  about filtering the loaded page); offset paging for the service quotes and
+  audit reads likewise (both are limit-bounded, not unbounded, so no fake
+  client paging was added).
+- The summary refresh wedge (a never-resolving fetch stops the 30s refresh
+  permanently because schedulePeriodicRefresh's in-flight guard never
+  releases): pre-existing mechanics, visible now as a sticky "Loading
+  quotes..."; a fetch deadline is a coherent follow-up for 22's runbook or a
+  rider, not a quiet inline change here.
+- tsconfig still type-checks src/ only; the harness and tests run unchecked
+  under strip-types (pre-existing convention, now covering more test code;
+  aligning @types/react to the runtime 18 would be the first step if Fernando
+  wants tests typechecked).
+
+SCREENSHOTS: not applicable; the pr-screenshots rig drives the GAME client
+(puppeteer against the play page), and the dashboard has no capture rig; its
+visual changes (Custody subtab, find boxes, cross-link buttons, pill tones)
+are DOM-pinned instead.
+
+CLAUDE.md (dashboard): commands section now names the harness, test:security,
+and the CI workflow; the view-core rule reworded (tests CAN import .tsx via
+the harness, which exists to pin WIRING, never to move decisions back into
+panels); the proxies bullet says all THREE proxies use explicit allowlists
+(the payout prefix-rule exception paragraph deleted) and names the
+canonicalizer contract; the audit bullet adds the payout actor header and the
+auditActorDisplay + title render convention; new operator-locale bullet; the
+token-figures bullet gained the wocDecimalsMismatch cross-check. README's
+Trading tab section covers the Custody view, find boxes, paging, and
+cross-links. Verified against the code.
+
+Commits (dashboard repo, session range ae6e46c..8eeaf8f, SEVEN): cd4f6cd
+audit fix (lockfile-only), 60f439d harness + trading tab (the body names the
+full inventory), c023c40 payout allowlist + actor header, b567940 locale
+sweep + scan, 31dd145 CI workflow + CLAUDE.md/README, f226683 the two-lens
+fix round, 8eeaf8f the fresh re-review round (JSX blanker + three nits). Two
+commits over the five-commit guideline: the two review rounds are committed
+separately from the work they audited, per the QA-workflow rule.
+
+NEXT = docs/woc-marketplace-hardening/phase-19-qa.md, DASHBOARD repo,
+worktree /Users/fernando/Documents/woc-rewards-dashboard-pr13, branch
+integration/woc-market-trading, FRESH session, own origin/master sync first;
+it diffs ae6e46c..8eeaf8f and pushes on PASS to
+origin/feature/woc-market-trading-controls (PR #13).

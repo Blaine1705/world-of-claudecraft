@@ -5,6 +5,41 @@ actually reads.
 
 ## Where we are
 
+- 19 IMPLEMENT COMPLETE (2026-08-19, DASHBOARD repo, LOCAL per R4: nothing
+  pushed in either repo; the 19 QA session pushes on PASS to
+  origin/feature/woc-market-trading-controls, PR #13). Session start ae6e46c
+  (the 18 QA tip AND the remote tip; origin/master sync a NO-OP). All five
+  deliverables landed with red-first or mutation-proven tests: the repo's
+  FIRST CI workflow (npm ci, security suites by name via test:security, full
+  suite, check, build; read-only token; proven act-style from a clean clone
+  of the committed tip TWICE since implement sessions do not push), the
+  component-render harness (esbuild JSX load hook + happy-dom under act;
+  devDeps esbuild + happy-dom, the sanctioned exception) closing EVERY
+  18-round JSX deferral (release money guard, both submit outcomes, loaderRef
+  supersession, tes-2 outage survival, four-panel composite actor, ARIA
+  tablist, pill tones, notice clearing, decimals render, quotes affordance),
+  npm audit 0 (was 11, lockfile-only), the data-truth batch (dead p2p trades
+  incl. the settlement-bearing class, buy-now price, per-quote legs identity
+  via quoteLegsMismatch since the window totals still lack a settled total,
+  superseding list loaders + malformed-200 screening, loading affordances,
+  case-lenient canonicalized release references, wocDecimalsMismatch banner,
+  withdrawalReadiness gate, the 31-site ambient-locale sweep with a
+  JSX-aware source scan), and the investigation UX (find box with exact
+  id:/acct: tokens, account cross-links between the list views + custody to
+  listings + audit WMB refs into the release form, consumed on hand
+  navigation; the Custody subtab consuming /internal/woc-market/stuck as the
+  THIRD game-proxy path with correct age axes and saturation labels; the
+  payout proxy moved to a method-qualified explicit allowlist with the
+  percent re-check and the x-woc-daily-reward-actor header on every request).
+  Two fresh lenses (0 blocking) + a FRESH fix-round re-review (caught a real
+  blanker regression: JSX closing tags read as regex openers; fixed +
+  mutation-proven), every finding applied or judged; 12 mutation proofs bit.
+  Tests 183 to 254, check 0 errors, build 0, clean-clone gate green. FOR
+  FERNANDO: external role can still POST payouts/send (pre-existing policy,
+  now pinned per-route; confirm intended) and the ci check must be made
+  REQUIRED in repo settings. Seven commits ae6e46c..8eeaf8f. The 19
+  implement round section in progress.md is the registry the 19 QA consumes
+  (JUDGED and DEFERRED lists binding). NEXT = phase-19-qa.md, FRESH session.
 - 18 QA COMPLETE (2026-08-19, PASS-WITH-FOLLOWUPS, every finding applied or
   judged with the file open, PUSHED per R4). DASHBOARD repo; session start e82303e
   (the implement tip AND the PR #13 remote tip); origin/master sync a NO-OP; game
