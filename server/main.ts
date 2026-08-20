@@ -237,7 +237,7 @@ import {
   selectApiEntry,
 } from './http/dispatch';
 import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
-import { setGameMetricsCounters } from './http/game_signals';
+import { gameMetricsCounters, setGameMetricsCounters } from './http/game_signals';
 import {
   handleLivez,
   handleMetricsGate,
@@ -2840,9 +2840,17 @@ const wocMarketService = new WocMarketService({
   draining: () => !isReady(),
   // The realm-gate pre-check: refuses BEFORE a step-up proof is consumed;
   // the custody entry stays the authoritative check. The gate's own probe,
-  // never a bare stats read: the probe reclaims leaked holds first, or a
-  // full wedge would make its own saturation permanent.
-  escrowSaturated: () => wocEscrowGate.saturated(),
+  // never a bare stats read (the probe reclaims leaked holds first, or a
+  // full wedge would make its own saturation permanent), and a true answer
+  // EMITS the realm_refused kind: the pre-check short-circuits tryAcquire,
+  // so without this the counter stayed flat during exactly the sustained
+  // saturation it exists to alert on (the qa-checklist find; the gate's
+  // own refused stat counts the same arm).
+  escrowSaturated: () => {
+    if (!wocEscrowGate.saturated()) return false;
+    gameMetricsCounters().wocEscrowQueue('realm_refused');
+    return true;
+  },
   config: wocMarketConfig(),
   onSweepPass: (stats, saturated, elapsedMs) => {
     // One line per pass that did work, plus a loud arm-not-draining warning:

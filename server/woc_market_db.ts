@@ -2850,7 +2850,7 @@ export class PgWocMarketDb implements WocMarketDb {
   > {
     // The REFUSAL path stays LOCK-FREE (the old single-UPDATE's property):
     // on a hot listing the refusal is the common path, and diagnosing it
-    // under FOR UPDATE serialized every hopeful behind the holder while each
+    // under the row lock serialized every hopeful behind the holder while each
     // held a pooled client (measured at two orders of magnitude of latency
     // amplification). This advisory pre-read answers every refusal class from
     // plain SELECTs (diagnose() owns six, cooldownRefused the seventh);
@@ -2963,7 +2963,7 @@ export class PgWocMarketDb implements WocMarketDb {
     // yet), which falls through and pays the transaction, where the
     // recording plus the re-check refuse it. Before the probes moved up
     // here, a cooled-down account's retries (20/min under the bid policy)
-    // each took the listing FOR UPDATE just to be refused, handing the
+    // each took the listing row lock just to be refused, handing the
     // proven-abusive caller a lock that blocks bids and the seller cancel.
     try {
       const peek = await this.pool.query(
@@ -3126,7 +3126,10 @@ export class PgWocMarketDb implements WocMarketDb {
     // consequence repair: an un-cleared lock stands for its whole window and
     // its expiry then mints an abandon record against the blameless holder,
     // so the clear is worth a second 2s wait exactly when the first lost to
-    // a guard that has usually finished by then). After that EVERYTHING is
+    // a guard that has usually finished by then; the cost is a worst case
+    // of two bounded attempts, roughly two 2s lock waits plus two pool
+    // checkouts, on a compensation arm whose answer is already decided,
+    // still far under the pre-rider 15s single wait). After that EVERYTHING is
     // swallowed with a loud line: contention was already counted by the
     // boundedWrite tail, a non-contention failure is surfaced by the error
     // line and the readout instead of by breaking the player's answer, and

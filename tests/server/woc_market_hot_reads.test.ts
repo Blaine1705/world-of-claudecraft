@@ -1197,7 +1197,8 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // stats read makes a full wedge's saturation permanent: the fix-round
     // review's blocking find), and the gauge source feeds the exported
     // occupancy metric off the same instance.
-    expect(code).toContain('escrowSaturated: () => wocEscrowGate.saturated()');
+    expect(code).toContain('if (!wocEscrowGate.saturated()) return false;');
+    expect(code).toContain("gameMetricsCounters().wocEscrowQueue('realm_refused')");
     expect(code).toContain('escrowGateInFlight: () => wocEscrowGate.stats().inFlight');
     // The stamp-ledger crossing counter rides the readout beside the
     // serialize stats.

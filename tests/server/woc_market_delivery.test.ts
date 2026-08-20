@@ -19,7 +19,7 @@ import { WOC_LOCAL_STAMP_HIGH_WATER } from '../../server/woc_market_local_ledger
  *  failure by design: it is the resume evidence). */
 function makeCtx(): { ctx: WocDeliveryCtx; sweepErrors: [WocSweepErrorTag, unknown][] } {
   const sweepErrors: [WocSweepErrorTag, unknown][] = [];
-  const ctx = {
+  const partial = {
     db: {
       deliveryTarget: async () => ({ characterId: 21, name: 'Aldan' }),
       claimCustodyRef: async () => true,
@@ -48,8 +48,20 @@ function makeCtx(): { ctx: WocDeliveryCtx; sweepErrors: [WocSweepErrorTag, unkno
     pendingMail: new Map<string, { stampMs: number; written: boolean }>(),
     parkRetryMs: 60_000,
     sweepBatch: 25,
-  } as unknown as WocDeliveryCtx;
-  return { ctx, sweepErrors };
+  };
+  // The partial rig hides behind a cast, so a FUTURE WocDeliveryCtx member
+  // the arms start reading would silently arrive undefined (the fake-union
+  // class at smaller radius). The proxy makes any unstubbed access fail
+  // loudly at test time instead.
+  const strict = new Proxy(partial, {
+    get(target, prop, receiver) {
+      if (typeof prop === 'string' && !(prop in target)) {
+        throw new Error(`WocDeliveryCtx member not stubbed by this rig: ${prop}`);
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+  }) as unknown as WocDeliveryCtx;
+  return { ctx: strict, sweepErrors };
 }
 
 const listing = (id: number): WocListingRow =>

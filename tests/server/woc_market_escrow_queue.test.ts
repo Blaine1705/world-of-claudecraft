@@ -1185,6 +1185,12 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     const src = stripComments(readFileSync(resolve(process.cwd(), 'server/woc_market.ts'), 'utf8'));
     expect(src.match(/\.runSerialized\(/g)).toHaveLength(1);
     expect(src).not.toContain('enqueueCharacterWrite');
+    // The gauge made GameServer.characterSaveQueues publicly readable, which
+    // opens a SECOND door (its enqueue) the two tokens above cannot see; the
+    // marketplace modules must never touch the field directly (the
+    // qa-checklist round's door-closing judgment: a narrowing getter on
+    // game.ts would cost lines against its zero-headroom ceiling).
+    expect(src).not.toContain('characterSaveQueues');
     // The coordinator DECLARES the member on the custody interface but never
     // calls it: the call form (dot plus paren) is what stays at zero here.
     expect(src).not.toContain('.persistGrantSerialized(');
@@ -1214,6 +1220,7 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
       expect(siblingSrc).toContain('export function create');
       expect(siblingSrc).not.toContain('.runSerialized(');
       expect(siblingSrc).not.toContain('enqueueCharacterWrite');
+      expect(siblingSrc).not.toContain('characterSaveQueues');
       if (sibling !== 'server/woc_market_delivery.ts') {
         expect(siblingSrc).not.toContain('persistGrantSerialized');
       }

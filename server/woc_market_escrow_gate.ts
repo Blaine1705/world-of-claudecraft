@@ -11,6 +11,13 @@
 // minus the queue (a queued waiter would just recreate the pile-up the
 // refusal exists to prevent; the client's retry loop is the queue).
 //
+// Holds are IDENTITY-TOKENED (the qa-checklist round): a release retires its
+// OWN stamp, never a positional guess, so out-of-order settlements report
+// every surviving hold's age EXACTLY, the leak reclaim fires exactly at the
+// ceiling for the wedged hold and no other, and a reclaimed sequence that
+// later settles releases nothing (its token is already gone), eliminating
+// the transient over-free the earlier FIFO approximation carried.
+//
 // Scope: acquired ONLY by the custody module's runSerialized entry (the
 // listing escrow path). The sweep, the monitor, and the grant persist never
 // touch it: the sweep's delivery work is bounded by its own batch sizes and
@@ -37,38 +44,46 @@ export const WOC_ESCROW_GATE_MAX_IN_FLIGHT = 4;
  *  realm one). The ceiling sits far above any legitimate sequence (the
  *  tunables ladder pins it above the honest started-request ceiling PLUS
  *  the guild-flush heavy allowance), so a reclaim is always an incident
- *  signal, never ordinary capacity churn; the pg pool's own bounds remain
- *  the backstop for whatever the wedged sequence still holds. */
+ *  signal, never ordinary capacity churn; identity tokens make it exact
+ *  (only the wedged hold is ever reclaimed), and the pg pool's own bounds
+ *  remain the backstop for whatever the wedged sequence still holds. */
 export const WOC_ESCROW_GATE_HOLD_CEILING_MS = 300_000;
+
+/** One acquired slot. release() retires exactly this hold's stamp; calling
+ *  it twice, or after the reclaim already retired the hold, is a no-op. */
+export interface WocEscrowHold {
+  release(): void;
+}
 
 export interface WocEscrowGateStats {
   inFlight: number;
   max: number;
-  /** Process-lifetime refusals at cap (the realm_refused counter's twin on
+  /** Process-lifetime refusals at cap, BOTH arms: the service's pre-burn
+   *  saturated() probe and tryAcquire (the realm_refused counter's twin on
    *  the ops readout: the counter alerts, this number dates the readout). */
   refused: number;
   /** Process-lifetime leaked-slot reclaims (each one was a sequence that
    *  outlived the hold ceiling: an incident, not churn). */
   reclaimed: number;
-  /** Age of the oldest standing hold, or 0 when idle. Releases retire the
-   *  OLDEST stamp, so with out-of-order settlements this over-reports age
-   *  rather than hiding a wedge, the safe side for an alarm. */
+  /** EXACT age of the oldest standing hold, or 0 when idle (identity
+   *  tokens: a release retires its own stamp, so churn cannot skew this). */
   oldestHoldMs: number;
 }
 
 export interface WocEscrowGate {
-  /** Take a slot. False means the realm is at cap and the caller refuses the
+  /** Take a slot. Null means the realm is at cap and the caller refuses the
    *  typed 'contended' without holding anything. */
-  tryAcquire(): boolean;
+  tryAcquire(): WocEscrowHold | null;
   /** The pre-burn saturation probe (the service consults it BEFORE spending
    *  a step-up challenge). It RECLAIMS leaked holds first: a bare stats
    *  read here would make the full-wedge outage permanent, because a
    *  saturated pre-check refuses every request before any tryAcquire could
-   *  run the reclaim (the fix-round review's blocking find). */
+   *  run the reclaim (the fix-round review's blocking find). A true answer
+   *  is COUNTED as a refusal: the pre-check short-circuits tryAcquire, so
+   *  without this the refused stat and the realm_refused counter would
+   *  stay flat during exactly the sustained saturation they exist to
+   *  surface (the qa-checklist round's find). */
   saturated(): boolean;
-  /** Release a slot when the WORK settles (the depth-cap slot's own
-   *  lifecycle, not the waiter's return). */
-  release(): void;
   stats(): WocEscrowGateStats;
 }
 
@@ -78,22 +93,19 @@ export function createWocEscrowGate(
 ): WocEscrowGate {
   const holdCeilingMs = opts.holdCeilingMs ?? WOC_ESCROW_GATE_HOLD_CEILING_MS;
   const now = opts.now ?? Date.now;
-  /** Acquisition stamps, oldest first. release() retires the head: when
-   *  settles happen out of acquisition order this ages the survivors
-   *  pessimistically, which keeps a genuine wedge visible (and reclaimable)
-   *  instead of letting a newer release erase the oldest stamp. */
-  const holds: number[] = [];
+  /** Acquisition stamps by identity token. Map iteration is insertion
+   *  order and stamps are monotone, so the first entry is the oldest. */
+  const holds = new Map<object, number>();
   let refused = 0;
   let reclaimed = 0;
 
   function reclaimLeaked(): void {
-    // A reclaimed sequence that LATER settles will release a younger
-    // sequence's stamp, transiently over-freeing by at most the reclaim
-    // count: bounded, rare (a reclaim is already an incident), and cheaper
-    // than identity-tokened holds against the realm outage this prevents.
     const cutoff = now() - holdCeilingMs;
-    while (holds.length > 0 && (holds[0] as number) <= cutoff) {
-      holds.shift();
+    for (const [token, stampMs] of holds) {
+      // Monotone stamps in insertion order: past the first survivor, every
+      // later entry is younger still.
+      if (stampMs > cutoff) break;
+      holds.delete(token);
       reclaimed++;
       console.error(
         `[woc_market] escrow gate reclaimed a slot held past ${holdCeilingMs}ms: a listing sequence never settled (wedged save FIFO?); capacity restored, the wedge itself still needs an operator`,
@@ -101,31 +113,43 @@ export function createWocEscrowGate(
     }
   }
 
+  function oldestHoldMs(): number {
+    for (const stampMs of holds.values()) return now() - stampMs;
+    return 0;
+  }
+
   return {
-    tryAcquire(): boolean {
+    tryAcquire(): WocEscrowHold | null {
       reclaimLeaked();
-      if (holds.length >= max) {
+      if (holds.size >= max) {
         refused++;
-        return false;
+        return null;
       }
-      holds.push(now());
-      return true;
+      const token = {};
+      holds.set(token, now());
+      return {
+        release(): void {
+          // Identity delete: a double release, or a release after the
+          // reclaim already retired this token, removes nothing.
+          holds.delete(token);
+        },
+      };
     },
     saturated(): boolean {
       reclaimLeaked();
-      return holds.length >= max;
-    },
-    release(): void {
-      // Floor at zero: a double release must never mint capacity.
-      holds.shift();
+      if (holds.size >= max) {
+        refused++;
+        return true;
+      }
+      return false;
     },
     stats(): WocEscrowGateStats {
       return {
-        inFlight: holds.length,
+        inFlight: holds.size,
         max,
         refused,
         reclaimed,
-        oldestHoldMs: holds.length > 0 ? now() - (holds[0] as number) : 0,
+        oldestHoldMs: oldestHoldMs(),
       };
     },
   };

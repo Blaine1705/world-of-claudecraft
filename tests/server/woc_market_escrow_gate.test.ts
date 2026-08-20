@@ -1,27 +1,34 @@
 // The realm-global escrow in-flight bound (the escrow write-path rider):
-// a counted cap with an immediate refusal, no queue, plus the review round's
-// leak ceiling (a slot held past the hold ceiling is reclaimed, counted and
-// loud, so a wedged save FIFO cannot convert into a permanent realm-wide
-// listing outage). The custody suite proves the wiring (refusal kind, slot
-// lifecycle against the real FIFO); this suite pins the gate's own
-// arithmetic in isolation under an injected clock.
+// a counted cap with an immediate refusal, no queue, the leak ceiling (a
+// hold past it is reclaimed, counted and loud), and IDENTITY-TOKENED holds
+// since the qa-checklist round (a release retires its own stamp, so ages
+// are exact, the reclaim hits only the wedged hold, and a reclaimed
+// sequence's late release is a no-op). The custody suite proves the wiring
+// (refusal kind, slot lifecycle against the real FIFO); this suite pins the
+// gate's own arithmetic in isolation under an injected clock.
 import { describe, expect, it, vi } from 'vitest';
 import {
   createWocEscrowGate,
   WOC_ESCROW_GATE_HOLD_CEILING_MS,
   WOC_ESCROW_GATE_MAX_IN_FLIGHT,
+  type WocEscrowHold,
 } from '../../server/woc_market_escrow_gate';
+
+function acquired(hold: WocEscrowHold | null): WocEscrowHold {
+  if (!hold) throw new Error('expected an acquired hold');
+  return hold;
+}
 
 describe('woc escrow gate', () => {
   it('admits up to the cap and refuses past it, counting refusals', () => {
     let nowMs = 1_000;
     const gate = createWocEscrowGate(2, { now: () => nowMs });
-    expect(gate.tryAcquire()).toBe(true);
-    expect(gate.tryAcquire()).toBe(true);
+    expect(gate.tryAcquire()).not.toBeNull();
+    expect(gate.tryAcquire()).not.toBeNull();
     // At cap: refused, and the refusal is COUNTED (the readout's lifetime
     // twin of the realm_refused counter kind).
-    expect(gate.tryAcquire()).toBe(false);
-    expect(gate.tryAcquire()).toBe(false);
+    expect(gate.tryAcquire()).toBeNull();
+    expect(gate.tryAcquire()).toBeNull();
     nowMs = 1_500;
     expect(gate.stats()).toEqual({
       inFlight: 2,
@@ -33,28 +40,28 @@ describe('woc escrow gate', () => {
     });
   });
 
-  it('release frees exactly one slot', () => {
+  it('a release frees exactly its own slot', () => {
     const gate = createWocEscrowGate(1, { now: () => 0 });
-    expect(gate.tryAcquire()).toBe(true);
-    expect(gate.tryAcquire()).toBe(false);
-    gate.release();
+    const hold = acquired(gate.tryAcquire());
+    expect(gate.tryAcquire()).toBeNull();
+    hold.release();
     expect(gate.stats().inFlight).toBe(0);
     expect(gate.stats().oldestHoldMs).toBe(0);
-    expect(gate.tryAcquire()).toBe(true);
+    expect(gate.tryAcquire()).not.toBeNull();
     expect(gate.stats()).toMatchObject({ inFlight: 1, max: 1, refused: 1, reclaimed: 0 });
   });
 
-  it('a double release floors at zero and never mints capacity', () => {
+  it('a double release is a no-op and never mints capacity', () => {
     const gate = createWocEscrowGate(2, { now: () => 0 });
-    expect(gate.tryAcquire()).toBe(true);
-    gate.release();
-    // The defensive extra release must not push inFlight negative: after it,
-    // the gate still admits exactly TWO acquisitions, not three.
-    gate.release();
+    const hold = acquired(gate.tryAcquire());
+    hold.release();
+    // The defensive extra release must not free anyone else's slot: after
+    // it, the gate still admits exactly TWO acquisitions, not three.
+    hold.release();
     expect(gate.stats().inFlight).toBe(0);
-    expect(gate.tryAcquire()).toBe(true);
-    expect(gate.tryAcquire()).toBe(true);
-    expect(gate.tryAcquire()).toBe(false);
+    expect(gate.tryAcquire()).not.toBeNull();
+    expect(gate.tryAcquire()).not.toBeNull();
+    expect(gate.tryAcquire()).toBeNull();
   });
 
   it('stats hands out a fresh snapshot a consumer cannot corrupt', () => {
@@ -72,7 +79,7 @@ describe('woc escrow gate', () => {
     });
   });
 
-  it('reclaims a slot held past the ceiling, counted and loud, at the next acquire', () => {
+  it('reclaims a hold past the ceiling, counted and loud, at the next acquire', () => {
     // The leak arm: a sequence that never settles must not close the realm's
     // listing path for the process lifetime. One BELOW the ceiling still
     // holds; AT the ceiling it is reclaimed and the freed slot admits.
@@ -80,12 +87,12 @@ describe('woc escrow gate', () => {
     const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const gate = createWocEscrowGate(1, { now: () => nowMs, holdCeilingMs: 10_000 });
-      expect(gate.tryAcquire()).toBe(true);
+      expect(gate.tryAcquire()).not.toBeNull();
       nowMs = 9_999;
-      expect(gate.tryAcquire()).toBe(false);
+      expect(gate.tryAcquire()).toBeNull();
       expect(gate.stats().reclaimed).toBe(0);
       nowMs = 10_000;
-      expect(gate.tryAcquire()).toBe(true);
+      expect(gate.tryAcquire()).not.toBeNull();
       const s = gate.stats();
       expect(s.reclaimed).toBe(1);
       expect(s.inFlight).toBe(1);
@@ -96,51 +103,108 @@ describe('woc escrow gate', () => {
     }
   });
 
-  it('saturated() RECLAIMS before answering: a full wedge cannot make its own outage permanent', () => {
-    // The fix-round review's blocking find: the service consults the
-    // saturation probe BEFORE any tryAcquire runs, so a probe that read
-    // bare stats would refuse every request forever once all slots leaked
-    // (the reclaim only ran inside tryAcquire, which nothing could reach).
+  it('saturated() RECLAIMS before answering and COUNTS a true answer as a refusal', () => {
+    // Two review rounds in one pin. The fix-round blocker: the service
+    // consults this probe BEFORE any tryAcquire, so a bare stats read would
+    // make a full wedge's saturation permanent (the reclaim, living only in
+    // tryAcquire, could never run). The qa-checklist find: the pre-check
+    // short-circuits tryAcquire, so an uncounted true answer would leave
+    // the refused stat and the realm_refused twin flat during exactly the
+    // sustained saturation they exist to surface.
     let nowMs = 0;
     const gate = createWocEscrowGate(2, { now: () => nowMs, holdCeilingMs: 10_000 });
-    expect(gate.tryAcquire()).toBe(true);
-    expect(gate.tryAcquire()).toBe(true);
+    expect(gate.tryAcquire()).not.toBeNull();
+    expect(gate.tryAcquire()).not.toBeNull();
     expect(gate.saturated()).toBe(true);
+    expect(gate.saturated()).toBe(true);
+    expect(gate.stats().refused).toBe(2);
     // The full wedge: both holds age past the ceiling with NOTHING calling
-    // tryAcquire (the pre-check refuses upstream). The probe itself must
-    // reclaim and answer unsaturated.
+    // tryAcquire. The probe itself must reclaim, answer unsaturated, and
+    // count nothing for the false answer.
     const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       nowMs = 10_000;
       expect(gate.saturated()).toBe(false);
-      expect(gate.stats()).toMatchObject({ inFlight: 0, reclaimed: 2 });
-      expect(gate.tryAcquire()).toBe(true);
+      expect(gate.stats()).toMatchObject({ inFlight: 0, reclaimed: 2, refused: 2 });
+      expect(gate.tryAcquire()).not.toBeNull();
     } finally {
       errors.mockRestore();
     }
   });
 
-  it('releases retire the OLDEST stamp, so a wedge over-reports rather than hides', () => {
-    // Two holds; the NEWER sequence settles first. FIFO retirement means the
-    // old stamp survives, so oldestHoldMs keeps aging (the pessimistic side:
-    // an alarm can fire early, never miss a wedge).
+  it('a release retires ITS OWN stamp: out-of-order settles keep every age exact', () => {
+    // The qa-checklist S1 cure. Under the earlier FIFO retirement, a newer
+    // sequence settling first removed the OLDEST stamp, so a wedged old
+    // hold's age was UNDER-reported and the reclaim could fire late or
+    // never under churn. Identity tokens make the surviving age exact.
     let nowMs = 0;
     const gate = createWocEscrowGate(2, { now: () => nowMs });
-    gate.tryAcquire();
+    acquired(gate.tryAcquire());
     nowMs = 5_000;
-    gate.tryAcquire();
+    const younger = acquired(gate.tryAcquire());
     nowMs = 6_000;
-    gate.release();
+    younger.release();
     expect(gate.stats().inFlight).toBe(1);
-    expect(gate.stats().oldestHoldMs).toBe(1_000);
+    // The WEDGED older hold reports its true age, not the younger's.
+    expect(gate.stats().oldestHoldMs).toBe(6_000);
+  });
+
+  it('churn cannot starve the reclaim: the wedged hold is reclaimed exactly at its ceiling', () => {
+    // The under-report consequence the S1 finding named: with positional
+    // retirement, steady churn kept replacing the oldest stamp and a
+    // permanently wedged slot never aged past the ceiling. With identity
+    // holds, churn touches only its own stamps.
+    let nowMs = 0;
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const gate = createWocEscrowGate(2, { now: () => nowMs, holdCeilingMs: 10_000 });
+      expect(gate.tryAcquire()).not.toBeNull(); // the wedge, never released
+      for (let i = 0; i < 20; i++) {
+        nowMs += 1_000;
+        const churn = acquired(gate.tryAcquire());
+        churn.release();
+      }
+      // 20s of churn later the wedged hold is long past its 10s ceiling:
+      // the next probe reclaims exactly one hold (the wedge), no churn
+      // stamp ever masked it.
+      expect(gate.saturated()).toBe(false);
+      expect(gate.stats()).toMatchObject({ inFlight: 0, reclaimed: 1 });
+    } finally {
+      errors.mockRestore();
+    }
+  });
+
+  it('a reclaimed hold releasing LATE is a no-op: no over-free window', () => {
+    // The judgment the identity tokens retire: under positional retirement
+    // a reclaimed sequence that later settled shifted a YOUNGER sequence's
+    // stamp, transiently over-freeing capacity. Now the late release finds
+    // its own token already gone and removes nothing.
+    let nowMs = 0;
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const gate = createWocEscrowGate(2, { now: () => nowMs, holdCeilingMs: 10_000 });
+      const wedge = acquired(gate.tryAcquire());
+      nowMs = 10_000;
+      // The probe reclaims the wedge; a fresh sequence takes a slot.
+      expect(gate.saturated()).toBe(false);
+      expect(gate.tryAcquire()).not.toBeNull();
+      expect(gate.stats().inFlight).toBe(1);
+      // The reclaimed sequence finally settles: nothing moves.
+      wedge.release();
+      expect(gate.stats().inFlight).toBe(1);
+      expect(gate.tryAcquire()).not.toBeNull();
+      expect(gate.tryAcquire()).toBeNull();
+    } finally {
+      errors.mockRestore();
+    }
   });
 
   it('defaults to the exported realm cap and hold ceiling', () => {
     const gate = createWocEscrowGate();
     for (let i = 0; i < WOC_ESCROW_GATE_MAX_IN_FLIGHT; i++) {
-      expect(gate.tryAcquire()).toBe(true);
+      expect(gate.tryAcquire()).not.toBeNull();
     }
-    expect(gate.tryAcquire()).toBe(false);
+    expect(gate.tryAcquire()).toBeNull();
     expect(gate.stats().max).toBe(WOC_ESCROW_GATE_MAX_IN_FLIGHT);
     // The ceiling constant itself: the tunables ladder pins its relation to
     // the honest sequence ceiling; here only the literal.

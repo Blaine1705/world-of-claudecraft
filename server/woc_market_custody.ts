@@ -189,7 +189,8 @@ export function createWocMarketCustody(
       // The realm-global bound, checked AFTER the per-character cap so the
       // more specific refusal wins, and BEFORE anything is held: a refused
       // request holds no slot, no gate capacity, and has extracted nothing.
-      if (!escrowGate.tryAcquire()) {
+      const gateHold = escrowGate.tryAcquire();
+      if (!gateHold) {
         gameMetricsCounters().wocEscrowQueue('realm_refused');
         return 'contended';
       }
@@ -238,7 +239,7 @@ export function createWocMarketCustody(
         })();
         const releaseSlot = (): void => {
           escrowJobsInFlight.delete(characterId);
-          escrowGate.release();
+          gateHold.release();
           // The terminal kind: a held sequence settled, whatever its
           // outcome. 'started' is a strict subset of these (a refused
           // sequence settles without starting); the four entered kinds
