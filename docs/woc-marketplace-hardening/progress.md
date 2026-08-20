@@ -44,7 +44,7 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 19 | dashboard-tooling | dashboard | DONE incl QA | ae6e46c | DASHBOARD repo; all five deliverables landed: first CI workflow (act-style clean-clone proof green), component-render harness (esbuild JSX hook + happy-dom) closing the .tsx pin gap incl. every 18-round deferral, npm audit 0 (was 11), data-truth fixes (dead p2p trades, buy-now price, per-quote legs, superseding list loaders, locale sweep, wocDecimals guard, withdraw gate), investigation UX (find box, cross-links, Custody subtab on the stuck monitor, payout proxy explicit allowlist + actor header); two fresh lenses + a fresh fix-round re-review, every finding applied or judged; 10 mutation proofs bit; tests 183 to 254, check 0, build 0; 7 commits, tip 8eeaf8f, LOCAL not pushed per R4 (19 QA pushes on PASS); the 19 implement round section below is the registry |
 | 19 QA | phase-19-qa | dashboard | DONE (QA PASS) | 8eeaf8f | PASS-WITH-FOLLOWUPS; ONE blocking reproduced live (node --test glob-pattern positional args silently shrank test:security; fixed with the run_security_suites.mjs runner + guard suite); ~40 findings applied across seven QA commits; 28/28 mutants bit; fix round re-reviewed FRESH; final tree 276/0, check 0, build 0, clean-clone green, maiden Actions runs green; PUSHED per R4 (dashboard ae6e46c..145d120 to PR #13); the 19 QA round section below is the registry (row trued up by the 20 QA session; the section was always current) |
 | 20 | real-sql-coverage | game | DONE incl QA | 057b54141a | the fake-only-SQL medium closed: predicate inventory in state.md, real-SQL pins for every fake-only or untested money/security predicate (pg battery 172 to 232, new realm-isolation suite), the 248-mutant log, six fake divergences fixed and pinned; tip 31d07c6375 plus the registry commit; the 20 implement round section below is the registry (row trued up by the 20 QA session) |
-| 20 QA | phase-20-qa | game | DONE (QA PASS) | 3ac20bef0e | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open; the inventory re-derivation found the account-scoping qual family separable only by realm (fixed with same-realm stranger fixtures) plus a log-completeness batch; three fix commits, 45 new mutants (43 BIT, one judged single double-strip proven, one green fixture-derivation control) plus five independent re-verifications of existing rows; pushes per R4 at the round's close, results in the section's final validation note |
+| 20 QA | phase-20-qa | game | DONE (QA PASS) | 3ac20bef0e | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open; the inventory re-derivation found the account-scoping qual family separable only by realm (fixed with same-realm stranger fixtures) plus a log-completeness batch; three fix commits, 45 new mutants (43 BIT, one judged single double-strip proven, one green fixture-derivation control) plus five independent re-verifications of existing rows; PUSHED per R4 (gate PASS all 12 steps at 8581ee5b2d, see the section's final validation note) |
 | 21 | devnet-dry-run | service + game | NOT STARTED | | needs rulings R5 |
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
@@ -5124,9 +5124,8 @@ GAME repo, worktree /Users/fernando/Documents/wocc-marketplace, branch
 feature/woc-marketplace. Session start 3ac20bef0e (the 20 implement registry
 tip); release sync a NO-OP (355 ahead, 0 behind origin/release/v0.40.0, still
 the newest release branch). Audited diff 057b54141a..31d07c6375 plus the
-registry commit. Pushes per R4 at this round's close; the final validation
-note below (appended after the closing gate) records the gate and push
-results.
+registry commit. PUSHED per R4 at the round's close; the final validation
+note below records the gate and push results.
 
 AUDIT SHAPE. Six read-only workflow lanes (inventory re-derivation,
 correctness vs the four deliverables, pin quality, docs truth, fake fidelity,
@@ -5255,3 +5254,19 @@ DB-free marketplace suites green (floor 110, service 274, fidelity 11,
 routes, escrow_queue; the rules suite gains the exempt-list composition
 pin inside its wire-screen test); npm run ci:changed exit 0; the gate
 and push results recorded in the final validation note below.
+
+FINAL VALIDATION NOTE: node scripts/gate_select.mjs PASS on the committed
+tree at 8581ee5b2d, ALL 12 STEPS green, full-suite fallback (the branch diff
+against origin/release/v0.40.0 spans broad paths by design): 41,708 tests
+passed with the 2 expected fails and 26 skips, browser regressions 131,
+typecheck and all builds green, malware scan PASS, run WITH
+TEST_DATABASE_URL only and a clear field (no concurrent pg-suite runs; the
+mutation lanes were idle). The fresh fix-round re-review (0 blocking, 1
+should-fix, 4 nits) and qa-checklist (READY, 0 blocking; its two in-range
+nits applied in 8581ee5b2d; its out-of-range observation, the
+tests/server/helpers/index.ts barrel omitting fake_woc_market_db since it
+landed, is noted for whenever that barrel is next touched) are both applied
+in full. PUSHED per R4 with this note as the docs tip: git push origin
+feature/woc-marketplace, the pre-push floor being the check (no open PR on
+this branch); the three scratch lanes wocc-marketplace-mut1/2/3 REMOVED
+after their spot checks per the implement round's deferral.

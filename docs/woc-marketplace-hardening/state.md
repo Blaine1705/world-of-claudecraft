@@ -6,9 +6,9 @@ actually reads.
 ## Where we are
 
 - 20 QA COMPLETE (2026-08-20, GAME repo, verdict PASS-WITH-FOLLOWUPS, every
-  finding applied or judged with the file open; pushes per R4 at the round's
-  close, gate and push results in the progress entry's final validation
-  note). Six audit lanes + the coverage
+  finding applied or judged with the file open; PUSHED per R4, gate PASS all
+  12 steps at 8581ee5b2d, full-suite fallback, 41,708 tests plus browser
+  131; details in the progress entry's final validation note). Six audit lanes + the coverage
   auditor + qa-checklist over 057b54141a..31d07c6375: the inventory
   re-derivation found the ACCOUNT-scoping qual family separable only by
   realm (trade poll participants, bid and settlement activity reads, the
