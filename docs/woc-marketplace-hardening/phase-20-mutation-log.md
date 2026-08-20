@@ -422,3 +422,44 @@ retire with their regions), 30 BIT, 1 deliberate green control, 1
 first-scoring survivor upgraded to BIT in-round; every stale verdict
 re-run after its source or pin moved. Whole log after this section: 325
 distinct mutants.
+
+## Escrow write-path rider QA section (run by the rider QA session)
+
+Same protocol as the header, with two additions this round: every strip ran
+in a THROWAWAY `git worktree` at the audited tip (so no mutation could touch
+the tree the reviewer agents were reading, and no uncommitted work was ever
+at risk from the `git checkout` revert), and no pg suite was involved, so
+nothing could collide on the fixed database names.
+
+INDEPENDENT SPOT-CHECKS of the rider's EXISTING pins, with the QA's own strip
+designs rather than the logged ones (the 20 independent-spot-check protocol).
+Where a logged row picked one site, this round deliberately picked a
+different one, so a pin that only covers the logged site would surface.
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| qa_narrowing_revert_accounts | BIT | woc_market_directed_sql | rider QA; the escrow ACCOUNTS clause, where the logged row used a bid clause |
+| qa_routing_revert_clearlock | BIT | woc_market_directed_sql | rider QA; clearBuyNowLock leaves the bounded seam |
+| qa_gate_cap_offbyone | BIT | woc_market_escrow_gate | rider QA; tryAcquire ONLY (the literal repeats in saturated(), caught by the occurrence assert and region-scoped) |
+| qa_grant_account_guard_strip | BIT | woc_market_escrow_queue | rider QA; the ACCOUNT guard re-validated under the FIFO slot |
+| qa_park_cap_offbyone | BIT | woc_market_local_ledgers | rider QA |
+| qa_busy_budget_widen | BIT | woc_market_service | rider QA; the locked segment's bound widened to 99 |
+
+PINS THIS ROUND ADDED, each given the strip it exists to catch (a new pin
+that cannot fail is theatre):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| qa_help_string_drop_kind | BIT | game_metrics | rider QA; the HELP line loses a kind while the vocabulary pin stays green |
+| qa_gate_gauge_frozen_sample | BIT | game_metrics | rider QA; the gate gauge sampled once instead of read live |
+| qa_routing_hoisted_sql_writer | BIT | woc_market_directed_sql | rider QA; a `this.pool.query(IDENTIFIER)` writer, invisible to the leading-verb classifier before the totality assert |
+| qa_grant_stamp_unarmed | BIT | woc_market_delivery | rider QA; the pendingGrants stamp stops arming the high-water watcher |
+| qa_park_stat_leaves_guard | BIT | woc_market_delivery | rider QA; the standing-park stat moves out of its refusal guard |
+| qa_gate_before_depth_cap | BIT | woc_market_escrow_queue | rider QA; the order swap that leaks a realm slot until the reclaim |
+| qa_sibling_lock_unscanned_file | BIT | woc_market_directed_sql | rider QA; a lock clause planted in woc_market_stepup.ts, a sibling the OLD hand-kept five-file list never scanned |
+| qa_hold_ceiling_widened | BIT | tunables | rider QA; 300_000 to 400_000, caught by the new upper bound |
+| qa_accept_drain_rung_strip | BIT | woc_market_service | rider QA; the directed acceptance's OUTER drain rung, which had no coverage at all before this round |
+| qa_create_drain_rung_sunk | BIT | woc_market_service | rider QA; createListing's drain rung sunk below the pooled health reads (region-scoped: the flat literal appears at BOTH entries, and the occurrence assert correctly refused the unscoped form) |
+
+Rider QA totals: 16 distinct mutants, 16 BIT, 0 survivors, 0 controls. Whole
+log after this section: 341 distinct mutants.

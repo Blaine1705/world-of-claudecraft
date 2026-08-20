@@ -45,6 +45,8 @@ Every session updates its row AND records the phase-start commit hash (QA diffs 
 | 19 QA | phase-19-qa | dashboard | DONE (QA PASS) | 8eeaf8f | PASS-WITH-FOLLOWUPS; ONE blocking reproduced live (node --test glob-pattern positional args silently shrank test:security; fixed with the run_security_suites.mjs runner + guard suite); ~40 findings applied across seven QA commits; 28/28 mutants bit; fix round re-reviewed FRESH; final tree 276/0, check 0, build 0, clean-clone green, maiden Actions runs green; PUSHED per R4 (dashboard ae6e46c..145d120 to PR #13); the 19 QA round section below is the registry (row trued up by the 20 QA session; the section was always current) |
 | 20 | real-sql-coverage | game | DONE incl QA | 057b54141a | the fake-only-SQL medium closed: predicate inventory in state.md, real-SQL pins for every fake-only or untested money/security predicate (pg battery 172 to 232, new realm-isolation suite), the 248-mutant log, six fake divergences fixed and pinned; tip 31d07c6375 plus the registry commit; the 20 implement round section below is the registry (row trued up by the 20 QA session) |
 | 20 QA | phase-20-qa | game | DONE (QA PASS) | 3ac20bef0e | PASS-WITH-FOLLOWUPS, every finding applied or judged with the file open; the inventory re-derivation found the account-scoping qual family separable only by realm (fixed with same-realm stranger fixtures) plus a log-completeness batch; three fix commits, 45 new mutants (43 BIT, one judged single double-strip proven, one green fixture-derivation control) plus five independent re-verifications of existing rows; PUSHED per R4 (gate PASS all 12 steps at 8581ee5b2d, see the section's final validation note) |
+| rider 1 | rider-escrow-write-path | game | DONE | 00334857e0 | the first settled rider: realm escrow gate, honest occupancy, observability, TxNeverStarted widening, the FOR NO KEY UPDATE narrowing, the bounded plain writers, the drain refusal, ledger bounds, and the commitGrant FIFO close; LOCAL per R4, the QA row below pushed it |
+| rider 1 QA | rider-escrow-write-path-qa | game | DONE (QA PASS) | 7e07cf12a6 | PASS, 14 findings applied and zero deferred as unfixed; v0.40.0 re-sync NON-trivial (123 commits, merge a22f111644, four conflicts re-derived, release-merge-audit clean); one of four reviewer lanes delivered, the rest carried by main-thread probes; 16 mutants ALL BIT (6 independent spot-checks + 10 proving the round's own new pins); pg battery 241 zero skips twice; gate GREEN; PUSHED per R4; two maintainer rulings surfaced |
 | 21 | devnet-dry-run | service + game | NOT STARTED | | needs rulings R5 |
 | 21 QA | phase-21-qa | service + game | NOT STARTED | | |
 | 22 | close-out | all three | NOT STARTED | | teardown offer lives in 22 QA |
@@ -5270,6 +5272,179 @@ in full. PUSHED per R4 with this note as the docs tip: git push origin
 feature/woc-marketplace, the pre-push floor being the check (no open PR on
 this branch); the three scratch lanes wocc-marketplace-mut1/2/3 REMOVED
 after their spot checks per the implement round's deferral.
+
+## Escrow write-path rider QA round (the paired QA for the first settled rider)
+
+GAME repo, worktree /Users/fernando/Documents/wocc-marketplace, branch
+feature/woc-marketplace. Session start 7e07cf12a6 (the rider implement tip).
+Audited b72873d24e..7e07cf12a6, the rider's own code being
+00334857e0..7e07cf12a6 (34 files, server plus tests plus packet docs).
+
+RELEASE SYNC: origin/release/v0.40.0 had moved 123 commits past the implement
+session's sync (the GPU-preparation scheduler, PR #3519), so the merge was NOT
+the expected no-op. Merge a22f111644, four conflicts, each RE-DERIVED from the
+merged tree rather than taken from a side: hud.ts unions both import edits (the
+release's isComposedPortraitKey and armPreviewOpen come in; prewarmPlayerPortrait
+deliberately does not, because this branch moved its only call site into
+preview_prewarm_wiring.ts, which imports it directly); the hud.ts ratchet re-pins
+to the exact merged 19154 and main.ts to 11519 (both parents' pins superseded,
+the file's own stated convention); the shard-weight table keeps this branch's
+NEWER harvest, verified a strict superset of the release's (2894 vs 2830, zero
+release-only rows); the resolved-i18n pending slice was regenerated with
+i18n:gen. Dependencies were reinstalled because the merge moved patches/ and the
+lockfile (the first of the three recorded release-merge gate hazards; the shard
+coverage floor and the CI sparse cone were both checked and clean).
+The release-merge-audit skill ran on the merge: the incoming delta touches ZERO
+server/ files, zero routes, zero marketplace code (one cosmetic GLB prop), so no
+legacy-arm divergence, no inventory rows owed, no injected-helper rebinding, and
+no planning premise invalidated. Both parents' intent was verified surviving in
+all 12 material overlap files mechanically (every line either side added, checked
+present in the merged file); the only "lost" lines are the superseded ceiling
+pins and the replaced import, each an intended resolution.
+
+REVIEWERS: four read-only lanes dispatched via plain Agent (privacy-security,
+database-performance, server-hot-path, test-coverage). ONE delivered
+(test-coverage, a full report); the other three were nudged once per the
+one-retry cap and did not deliver inside the session. Recorded honestly: the
+security, database-performance and hot-path dimensions therefore carry ONE pass
+this round, the main thread's own probes, on top of the implement round's four
+lanes over the same code. Every probe below was run directly.
+
+FINDINGS: 14 applied, zero deferred as unfixed. Three from the main thread's
+probes, eleven from the coverage lane, each verified with the file open before
+applying (no finding was taken on the reviewer's word).
+
+Main-thread probes:
+- P1 (should-fix): the unlocked-confirm docblock in woc_market.ts still
+  described holdBondAndActivate and extendAuctionForBondProgress as plain
+  FOR UPDATE re-reads, which the narrowing had made FOR NO KEY UPDATE. The
+  qa-checklist round's note claims it cured "the two pre-narrowing lock-mode
+  comments and their CLAUDE.md mirror", but it never touched woc_market.ts, so
+  this pair was missed. The completeness pin cannot see it by design (it scans
+  comment-STRIPPED source). Cured mode-neutral, the same way the db.ts pair was.
+- P2 (should-fix): the delivery-arms extraction left listingReturnCustodyRef
+  imported in woc_market.ts with its only use gone to woc_market_delivery.ts
+  (two occurrences at rider start, one now). Removed; the ratchet follows the
+  file DOWN 4037 -> 4036, the ratchet's own rule applied to the dead line the
+  extraction forgot.
+- P3 (nit): the packet's reserved word "phase" appeared in a new tunables
+  comment in its ordinary English sense; reworded to "stage".
+
+Coverage lane (all eleven applied): acceptDirectedOffer's drain rung had NO
+test at all and its saturation sibling's title claimed to cover "the same two
+rungs" (new test in the decisive same-proof form, title corrected); neither
+entry pinned the rung's pre-burn POSITION, so sinking it below the step-up burn
+stayed green (new test with spies proving the health guard's two pooled reads
+never ran); only one of the three stamp sites armed the high-water watcher under
+test (call-site completeness pin, exact count 3); the routing pin classified by
+a LEADING SQL verb and so was blind to a hoisted-SQL writer, an idiom the same
+file already uses (classification totality assert); the hold-ceiling relation
+priced ONE sequence though the hold spans the character's FIFO queue (see the
+deferral below); the depth-cap-before-gate ORDER was unpinned and a swap leaks a
+realm slot until the 300s reclaim (real gate injected, inFlight asserted before,
+during and after); the escrow-queue HELP line was unpinned (found independently
+by the main thread too); the no-drift live-read test covered neither new gauge;
+the cap-refused park's arm-level consequence was unpinned; the narrowing's
+flat-zero sibling list was hand-enumerated and missed 11 of the 16 marketplace
+modules (now DISCOVERED by glob with a non-vacuity floor); and the two new
+tunables scrapes rode the file's line-only stripper rather than the shared
+block-aware one.
+
+JUDGED this round (binding; do NOT re-raise):
+- acceptDirectedOffer runs both pre-burn rungs for the BUYER side too, which
+  never escrows unless the buyer presses last. Symmetric by design (either side
+  can be the trigger, and the offer state that would distinguish them is not
+  worth the branch); the cost of the rare false refusal is one retry.
+- returnUndisposedItems has no scope.contended entry guard and no busy budget,
+  unlike its two delivery siblings in the same LOCKED segment. Traced: it books
+  through the MAIL rail (bookCustodyOnce plus persistMailParcel), never through
+  persistGrantSerialized, so it cannot incur a grant-entry deadline; the busy
+  budget's bound on the locked segment is unaffected and the returns work is
+  independent of whatever contended.
+- `walked` in processDueBonds is write-only (biome noUnusedVariables). Traced to
+  the merge base: PRE-EXISTING, not the rider's, and a warning CI does not fail.
+
+MUTATION RECORD: 16 distinct mutants this round, ALL BIT, each occurrence-
+asserted (region-scoped where a literal repeats), diff-proven, run-proven by the
+vitest summary line, and reverted byte-identical with a clean-status verify. Run
+in a THROWAWAY git worktree at the audited tip, so no mutation could touch the
+tree the reviewer agents were reading, and no pg suite was involved.
+- SIX independent spot-checks over the rider's EXISTING pins, with the QA's own
+  strip designs rather than the logged ones (the 20 independent-spot-check
+  protocol): the narrowing reverted at the escrow ACCOUNTS clause (the log's row
+  used a bid clause), the routing reverted at clearBuyNowLock, the gate cap
+  off-by-one in tryAcquire ONLY (the literal repeats in saturated(), which the
+  occurrence assert caught), the grant entry's ACCOUNT guard stripped under the
+  slot, the park cap off-by-one, and the busy budget widened to 99. All BIT,
+  independently corroborating the money surface, the routing, the gate, the
+  custody guards, the ledger bound and the locked-segment bound.
+- TEN over the pins this round ADDED, so no new pin is theatre: help-string kind
+  dropped, gate gauge frozen to a single sample, a hoisted-SQL writer, the
+  pendingGrants stamp unarmed, the park stat moved out of its refusal guard, the
+  gate acquired before the depth cap, a lock clause planted in a sibling the OLD
+  hand-kept list never scanned, the hold ceiling widened past its honest bound,
+  the acceptance drain rung stripped, and createListing's drain rung sunk below
+  the pooled health reads (region-scoped after the flat form's occurrence assert
+  correctly refused: that literal appears at both entries).
+
+VALIDATION at the QA tip (all re-run fresh): npx tsc --noEmit clean; the SEVEN
+suite pg battery 241 tests zero skips (61 settlement, 66 bond, 40 delivery, 34
+directed, 10 plan_pins, 11 stepup, 19 realm_scope), ONE LANE AT A TIME with
+TEST_DATABASE_URL on the command line only, run twice (at the merge tip and
+again after the fix round) on a verified clear field: the one competing vitest
+run on this machine was checked with `ps eww` and carries no database URL, so
+its marketplace pg suites skip and cannot collide on the fixed database names.
+DB-free marketplace set 27 files, 1171 tests. npm run ci:changed exit 0
+(warnings only, the widened post-merge scope's pre-existing debt).
+
+THE TWO MAINTAINER RULINGS, RE-JUDGED (Fernando decides; the QA recommends):
+- The woc_market.ts ceiling. RECOMMEND APPROVE, with a correction to the
+  number. The registry describes it as "the ceiling raise 4000 -> 4037", but
+  the trace across the rider commits shows TWO raises, not one: the
+  delivery-arms extraction (fa958644fd) ratcheted the ceiling DOWN 4484 ->
+  3984 at the exact new size, then the commitGrant close took it to 4000 and
+  the review fix round to 4037, so the raise to judge is +53, not +37. It is
+  still the ratchet working rather than being evaded: a REAL extraction moved
+  744 lines into a new sibling behind the file's own seam, the ceiling was
+  lowered to the exact size first, and the +53 is declaration surface on the
+  coordinator's own dependency interface and scope type (the
+  persistGrantSerialized contract doc, the escrowSaturated dep with its two
+  pre-burn rungs, the busyParks field) that no sibling can absorb because it
+  IS the coordinator's seam. Net across the rider plus this QA round: 4484 ->
+  4036, 448 lines DOWN, plus a 744-line tested module that did not exist
+  before. (This round found and removed a dead import the extraction left, so
+  the number moved once more, 4037 -> 4036.)
+- The woc_market_db.ts ratchet row (the 17 QA question, carried twice).
+  RECOMMEND ADDING ONE, at its exact current size 4783. Confirmed: the file
+  has NO row (`grep -c "woc_market_db.ts" tests/monolith_budget.test.ts` is
+  0), and it is now the LARGEST marketplace file, larger than the woc_market.ts
+  coordinator (4036) that IS ratcheted, with nothing stopping it growing. Its
+  rider growth measured +161 net, not the +158 the registry records (the
+  qa-checklist round added three more lines after that figure was written).
+  The "all SQL-adjacent" argument is real but does not reach the data-as-code
+  exemption, which covers declarative TABLES; this file is logic (statement
+  builders plus transaction orchestration). Adding a row TIGHTENS the ratchet,
+  which the doctrine encourages, but the packet has carried this as a
+  maintainer question twice, so it is surfaced rather than taken. Suggested
+  seam if adopted: a woc_market_<domain>_db.ts sibling owning that domain's
+  statements. Note the same gap covers woc_market_delivery.ts (744) and
+  woc_market_custody.ts (526), both also unratcheted.
+
+DEFERRED, with owner (created this round):
+- The escrow gate's hold-ceiling SIZING (owner: maintainer, alongside the
+  rulings above). The 300s ceiling buys the honest 157s started-request
+  ceiling plus the guild-flush heavy allowance plus exactly ONE queued heavy
+  save, 23s of slack. The hold is taken BEFORE the guild flush and the FIFO
+  enqueue and the 5s waiter deadline does not end it, so a character whose
+  queue holds two or more saves each taking the full heavy allowance can have
+  a LEGITIMATE hold reclaimed: one over-admitted slot and a misleading
+  incident line, never correctness. This round made the prose and the pin
+  honest about that bound (both directions asserted, so neither can quietly
+  become false) rather than changing the constant, because raising it is a
+  sizing decision. Realistically the queue wait is milliseconds (the escrow
+  transaction measures p50 3.5ms, max 8.3ms), and a character queue of
+  full-allowance saves is itself an incident, which is why the QA did not
+  treat it as blocking.
 
 ## Escrow write-path rider implement round (the first settled rider)
 

@@ -5,6 +5,49 @@ actually reads.
 
 ## Where we are
 
+- ESCROW WRITE-PATH RIDER QA COMPLETE (2026-08-20, GAME repo, verdict PASS,
+  PUSHED per R4). Audited b72873d24e..7e07cf12a6. The v0.40.0 re-sync was
+  NOT the expected no-op: 123 commits had landed (the GPU-preparation
+  scheduler), merge a22f111644, four conflicts each RE-DERIVED from the
+  merged tree (hud.ts unions both import edits and re-pins to the exact
+  19154, main.ts to 11519, the shard table keeps this branch's newer harvest
+  after verifying it a strict superset, pending.ts regenerated); reinstall
+  needed because patches/ and the lockfile moved. release-merge-audit CLEAN:
+  the incoming delta touches zero server files, zero routes, zero
+  marketplace code, and both parents' intent was verified surviving in all
+  12 material overlap files mechanically. 14 FINDINGS APPLIED, zero deferred
+  as unfixed: three from the main thread (the unlocked-confirm docblock
+  still called two functions plain-FOR-UPDATE re-reads after the narrowing,
+  a dead import the delivery extraction left, the reserved word "phase") and
+  eleven from the coverage lane (the acceptance drain rung had NO test and
+  its sibling's title lied; neither entry pinned the rung's pre-burn
+  POSITION; two of three stamp sites never armed the watcher under test; the
+  routing pin was blind to a hoisted-SQL writer; the hold ceiling priced one
+  sequence though the hold spans the FIFO queue; the depth-before-gate order
+  was unpinned and a swap leaks a realm slot; the HELP line, the two new
+  gauges' live-read claim, the cap-refused park's arm consequence, the
+  hand-enumerated sibling list, and the line-only stripper). REVIEWER
+  REALITY: four lanes dispatched, ONE delivered even after the one-retry
+  nudge, so security, db-performance and hot-path carry ONE pass this round
+  (the main thread's own probes) on top of the implement round's four lanes.
+  16 MUTANTS, ALL BIT: six independent spot-checks of existing pins with the
+  QA's own strip designs at DIFFERENT sites than the logged rows, plus ten
+  proving every pin this round added. Validation: tsc clean; pg battery
+  SEVEN suites 241 tests zero skips run TWICE one lane at a time; DB-free
+  set 27 files 1171 tests; ci:changed exit 0; gate PASS on the committed
+  tree. TWO MAINTAINER RULINGS SURFACED with recommendations (details in the
+  progress.md QA section): the woc_market.ts ceiling raise is sound but the
+  number to judge is +53 across TWO raises, not the recorded +37, with the
+  net 4484 -> 4036 DOWN; and woc_market_db.ts still has no ratchet row while
+  being the largest marketplace file at 4783, recommend adding one. NEW
+  DEFERRAL (owner maintainer): the gate hold-ceiling SIZING buys exactly one
+  queued heavy save, so a deep save queue can reclaim a legitimate hold; the
+  prose and the pin were made honest about that bound rather than the
+  constant changed. NEXT = the SECOND settled rider, the per-request
+  auth-guard reads: MINT ITS SPEC PAIR FIRST from the 17 SESSION START
+  DECISION bullet below (GAME repo, wocc-marketplace, FRESH session, newest
+  origin/release/** sync first, implement stays LOCAL per R4), and
+  phase-21-devnet-dry-run.md stays owed after it.
 - ESCROW WRITE-PATH RIDER IMPLEMENT COMPLETE (2026-08-20, GAME repo, LOCAL
   per R4: nothing pushed; the rider QA session pushes on PASS). Session
   start b72873d24e; v0.40.0 sync merge 00334857e0 NON-TRIVIAL (59 commits,
@@ -50,12 +93,9 @@ actually reads.
   overall; declaration-surface justification), and the standing
   woc_market_db.ts no-ratchet-row question (its rider growth +158, all
   SQL-adjacent). The rider implement section in progress.md is the
-  registry the rider QA consumes (JUDGED and DEFERRED lists binding;
-  values registry inside; the directed_sql floor is now 116). NEXT =
-  docs/woc-marketplace-hardening/rider-escrow-write-path-qa.md, GAME repo,
-  wocc-marketplace, FRESH session, newest origin/release/** sync first;
-  after its PASS push comes the per-request auth-guard rider (constraints
-  in the 17 SESSION START DECISION bullet), then phase-21-devnet-dry-run.md.
+  registry the rider QA consumed (JUDGED and DEFERRED lists binding;
+  values registry inside; the directed_sql floor is now 116). Its QA has
+  now RUN and PASSED: see the bullet above, which owns the NEXT pointer.
 - 20 QA COMPLETE (2026-08-20, GAME repo, verdict PASS-WITH-FOLLOWUPS, every
   finding applied or judged with the file open; PUSHED per R4, gate PASS all
   12 steps at 8581ee5b2d, full-suite fallback, 41,708 tests plus browser
