@@ -182,7 +182,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
       const { inScope, unclassifiable } = discoverSites(file, src);
       expect(
         unclassifiable,
-        `${file}: UPDATE accounts statements whose SET list outruns the scan window`,
+        `${file}: guard-table statements the column classifier cannot read (a SET list outrunning the scan window, or an interpolated fragment inside the statement)`,
       ).toEqual([]);
       if (inScope.length === 0) continue;
       const spans = functionSpans(src);

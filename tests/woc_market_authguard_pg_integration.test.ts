@@ -120,9 +120,9 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
     return seq.toString(16).padStart(8, '0') + 'c'.repeat(56);
   }
 
-  /** The token arm's refresh counter: unchanged across a read proves the
-   *  answer came from the warm entry, not a re-probe. */
-  function wocAuthGuardCacheStatsRefreshes(): number {
+  /** The armed instance's token-arm refresh counter: unchanged across a
+   *  read proves the answer came from the warm entry, not a re-probe. */
+  function cacheTokenRefreshes(): number {
     return cache.stats().tokens.refreshes;
   }
 
@@ -288,13 +288,13 @@ describeDb('woc market auth-guard reads against real Postgres', () => {
     const consumed = await db.consumePasswordResetRequest('reset-hash-1', 'new-hash');
     expect(consumed?.accountId).toBe(account);
     await expect(cache.accountAndScopeForToken(token)).resolves.toBeNull();
-    const before = wocAuthGuardCacheStatsRefreshes();
+    const before = cacheTokenRefreshes();
     await expect(cache.accountAndScopeForToken(strangerToken)).resolves.toEqual({
       accountId: strangerAccount,
       scope: 'full',
     });
     // Still warm: the account-keyed bust did not touch the stranger's entry.
-    expect(wocAuthGuardCacheStatsRefreshes()).toBe(before);
+    expect(cacheTokenRefreshes()).toBe(before);
   });
 
   it('locks a cached account on the next read after a REAL ban, and unlocks on unban', async () => {

@@ -2923,8 +2923,10 @@ configureInternalWocMarketStuckRead(async () => ({
   // surface): eviction thrash or a bust storm is a DB-load incident in the
   // making, and this readout is where an operator already looks.
   readCaches: wocMarketReadCache.stats(),
-  // The auth-guard cache's two arms (token rows, moderation rows): a bust
-  // storm or eviction thrash here is DB pressure returning to the guards.
+  // The auth-guard cache readout: both arms (token rows, moderation rows)
+  // plus the soft-bounded internals (account index, recent-bust ledger) and
+  // the join-veto refetch counter; a bust storm or eviction thrash here is
+  // DB pressure returning to the guards.
   authGuard: wocAuthGuardCacheStats(),
   // The price cache's memo ages (null on the dev economy, which has no
   // cache): a stale-served or blanked price during a brownout is a NUMBER

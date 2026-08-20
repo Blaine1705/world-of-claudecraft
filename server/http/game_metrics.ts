@@ -592,6 +592,7 @@ export function registerGameStateMetrics(
       }
       this.set({ arm: 'index', kind: 'entries' }, stats?.index ?? 0);
       this.set({ arm: 'recent_busts', kind: 'entries' }, stats?.recentBusts ?? 0);
+      this.set({ arm: 'join_veto', kind: 'refetches' }, stats?.joinVetoRefetches ?? 0);
     },
   });
   const copperCredited = new Counter({

@@ -1222,6 +1222,9 @@ describe('guild bank activity log cache readout', () => {
     expect(line(cold, 'recent_busts', 'entries')).toBe(
       `${WOC_AUTH_GUARD_CACHE}{arm="recent_busts",kind="entries"} 0`,
     );
+    expect(line(cold, 'join_veto', 'refetches')).toBe(
+      `${WOC_AUTH_GUARD_CACHE}{arm="join_veto",kind="refetches"} 0`,
+    );
     // Armed: the gauge reads the LIVE singleton on every scrape, on BOTH
     // arms and on the soft-bound series.
     try {

@@ -339,6 +339,45 @@ describe('token arm', () => {
     expect(cache.stats().tokens.entries).toBe(0);
   });
 
+  it('bounds vetoed-joiner refetches: N joiners collapse onto ONE fresh flight and terminate', async () => {
+    // The re-read terminates only because a settled flight has already
+    // cleared its registration (the finally on the assigned promise chain),
+    // so a vetoed joiner can never re-join the flight it just left: N
+    // vetoed joiners cost exactly one extra fetch, not N and not a spin.
+    let nowMs = NOW;
+    const settlers: Array<(row: AuthTokenRow | null) => void> = [];
+    let fetches = 0;
+    const cache = new WocAuthGuardCache(
+      {
+        fetchTokenRow: () => {
+          fetches += 1;
+          return new Promise((resolve) => {
+            settlers.push(resolve);
+          });
+        },
+        fetchModerationRow: async () => null,
+      },
+      { now: () => nowMs },
+    );
+    const creator = cache.accountAndScopeForToken('t1');
+    nowMs += 1;
+    cache.bustAccount(7);
+    nowMs += 1;
+    const joiners = [
+      cache.accountAndScopeForToken('t1'),
+      cache.accountAndScopeForToken('t1'),
+      cache.accountAndScopeForToken('t1'),
+    ];
+    settlers[0](liveToken(7));
+    await expect(creator).resolves.toEqual({ accountId: 7, scope: 'full' });
+    // All three vetoed joiners collapsed onto ONE fresh flight.
+    expect(fetches).toBe(2);
+    settlers[1](null);
+    await expect(Promise.all(joiners)).resolves.toEqual([null, null, null]);
+    // And the veto-driven refetches are separable from ordinary misses.
+    expect(cache.stats().joinVetoRefetches).toBe(3);
+  });
+
   it('freezes installed rows one level deep (shared-row decoration defense)', async () => {
     const r = rig();
     const nested = new Date(NOW + 60_000);
@@ -543,21 +582,19 @@ describe('account-keyed bust and the token index', () => {
     // bound) rather than drop an entry a live flight could still need.
     const burst = WOC_AUTH_GUARD_RECENT_BUSTS_MAX + 40;
     for (let i = 1; i <= burst; i++) r.cache.bustAccount(i);
-    expect(r.cache.recentBustLedgerSizeForTests()).toBe(burst);
+    expect(r.cache.stats().recentBusts).toBe(burst);
     // Age the burst past the min-age floor (still inside retention): the
     // next bust's prune drops oldest-first down to the cap.
     r.advance(WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS + 1);
     r.cache.bustAccount(burst + 1);
-    expect(r.cache.recentBustLedgerSizeForTests()).toBeLessThanOrEqual(
-      WOC_AUTH_GUARD_RECENT_BUSTS_MAX,
-    );
+    expect(r.cache.stats().recentBusts).toBeLessThanOrEqual(WOC_AUTH_GUARD_RECENT_BUSTS_MAX);
     // A young entry always survives a prune, pinned EXACTLY: age everything
     // out past retention and bust once more; the prune leaves precisely the
     // two young entries (the previous trigger bust, at the retention
     // boundary, and the new one), never zero and never the pre-prune size.
     r.advance(WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS);
     r.cache.bustAccount(burst + 2);
-    expect(r.cache.recentBustLedgerSizeForTests()).toBe(2);
+    expect(r.cache.stats().recentBusts).toBe(2);
     // And the surviving newest entry is LIVE, not merely counted: it still
     // vetoes the install of a fetch that started before it (1ms later the
     // fence lifts and the install lands, the fence-not-blacklist rule).
@@ -584,9 +621,7 @@ describe('account-keyed bust and the token index', () => {
     r.advance(WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS + 1);
     r.cache.bustAccount(burst + 1);
     expect(r.cache.prunePassesForTests()).toBe(2);
-    expect(r.cache.recentBustLedgerSizeForTests()).toBeLessThanOrEqual(
-      WOC_AUTH_GUARD_RECENT_BUSTS_MAX,
-    );
+    expect(r.cache.stats().recentBusts).toBeLessThanOrEqual(WOC_AUTH_GUARD_RECENT_BUSTS_MAX);
   });
 
   it('drops entries past RETENTION even below the floor pass cap target (the retention pass is live)', async () => {
@@ -600,7 +635,7 @@ describe('account-keyed bust and the token index', () => {
     r.advance(WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS + 1);
     r.cache.bustAccount(burst + 1);
     // Every burst entry was past retention: only the triggering bust stays.
-    expect(r.cache.recentBustLedgerSizeForTests()).toBe(1);
+    expect(r.cache.stats().recentBusts).toBe(1);
   });
 
   it('applies the lost-bust cancel on the MODERATION arm (same-key bust mid-flight)', async () => {
@@ -640,14 +675,12 @@ describe('account-keyed bust and the token index', () => {
       await r.cache.accountAndScopeForToken(`t${i}`);
     }
     // The sweep bound held: residue never exceeds cap * factor + 1.
-    expect(r.cache.indexSizeForTests()).toBeLessThanOrEqual(
-      2 * WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR + 1,
-    );
+    expect(r.cache.stats().index).toBeLessThanOrEqual(2 * WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR + 1);
     // Over-busting an account whose tokens are mostly evicted cannot throw
     // and still drops the cached survivors.
     r.cache.bustAccount(7);
     expect(r.cache.stats().tokens.entries).toBe(0);
-    expect(r.cache.indexSizeForTests()).toBe(0);
+    expect(r.cache.stats().index).toBe(0);
   });
 });
 

@@ -28,7 +28,12 @@
 //    the site list complete); account-keyed busts drop the moderation row
 //    AND every indexed token of the account, which is what makes
 //    revokeCompanionToken's prefix-keyed delete safe without knowing the
-//    full token value (over-busting only costs one re-fetch).
+//    full token value (over-busting only costs one re-fetch). An
+//    account-keyed bust cannot cancel a token flight the index has never
+//    seen, so that race is closed TWICE by content against the recent-bust
+//    ledger: the install veto (nothing fetched before the bust installs)
+//    and the join re-check (every JOINER of such a flight refetches; only
+//    the flight creator can receive the one pre-bust answer).
 //  - The ONE accepted staleness is cross-process: a revocation or ban
 //    committed by ANOTHER realm process (process-per-realm shares one
 //    database; accounts and auth_tokens are not realm-scoped) is invisible
@@ -152,6 +157,10 @@ export interface WocAuthGuardCacheStats {
    *  cap can be exceeded for up to the min-age floor under a bust burst), so
    *  an excursion must be a number an operator can see. */
   recentBusts: number;
+  /** How many joiner reads the join re-check sent back for a fresh fetch:
+   *  separates veto-driven refetches from ordinary misses in the
+   *  reads/refreshes pair during a bust storm. */
+  joinVetoRefetches: number;
 }
 
 // A refresh in flight for one key. `cancelled` is the lost-bust guard: a bust
@@ -342,6 +351,7 @@ export class WocAuthGuardCache {
   // synchronous stall at the 5,000-account realm cap).
   private nextPruneAtMs = 0;
   private prunePasses = 0;
+  private joinVetoRefetchCount = 0;
   private readonly now: () => number;
   private readonly tokenMax: number;
 
@@ -367,8 +377,12 @@ export class WocAuthGuardCache {
         // per account, so a later same-account bust would overwrite and
         // hide the one that vetoed the joiner. Stricter than the recorded
         // once-per-flight acceptance (which now covers the flight CREATOR
-        // only); the cost is one extra fetch per joiner under a bust.
-        return (this.recentAccountBusts.get(row.accountId) ?? -1) < flightStartedAtMs;
+        // only); the cost is one extra fetch per joiner under a bust,
+        // counted below so a bust storm's refetches are separable from
+        // ordinary misses in the readout.
+        const fresh = (this.recentAccountBusts.get(row.accountId) ?? -1) < flightStartedAtMs;
+        if (!fresh) this.joinVetoRefetchCount += 1;
+        return fresh;
       },
     );
     this.accountArm = new RowArm(
@@ -461,19 +475,8 @@ export class WocAuthGuardCache {
       accounts: this.accountArm.stats(),
       index: this.indexSize,
       recentBusts: this.recentAccountBusts.size,
+      joinVetoRefetches: this.joinVetoRefetchCount,
     };
-  }
-
-  /** The account-index entry count, eviction residue included (test-only:
-   *  the sweep bound has no other observable). */
-  indexSizeForTests(): number {
-    return this.indexSize;
-  }
-
-  /** The recent-bust veto ledger's size (test-only: the soft bound has no
-   *  other observable). */
-  recentBustLedgerSizeForTests(): number {
-    return this.recentAccountBusts.size;
   }
 
   /** How many times the ledger prune actually walked the map (test-only: the
