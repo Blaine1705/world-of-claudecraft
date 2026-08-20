@@ -1,0 +1,361 @@
+// The marketplace-scoped cache over the two per-request auth-guard reads
+// (token probe + moderation status), the second settled perf rider. It is
+// consumed ONLY through the woc_market_routes guard bundle (main.ts injects
+// it via configureWocMarketRuntime); the admin surface, every other domain's
+// guard bundle, ws_auth, and the legacy resolvers stay on the direct db.ts
+// reads, and a wiring pin holds that boundary.
+//
+// SECURITY CONTRACT (this cache deliberately does NOT reuse the generic
+// cached_read.ts factories, whose stale-serve-on-error would unbound the
+// staleness during a DB brownout):
+//  - RAW ROWS ONLY. The verdicts (token expiry + scope, the moderation
+//    ban/suspension ladder) are computed per read by auth_guard_core, so a
+//    cached suspension unlocks on time, a cached token refuses at its own
+//    expires_at, and no verdict is ever frozen.
+//  - NO negative caching. A null probe (unknown, expired, or revoked row)
+//    installs nothing: an attacker spraying random bearers pays the same DB
+//    probe it pays today and can never become an LRU eviction lever over
+//    real entries.
+//  - NO stale-serve. A failed refresh propagates exactly like the direct
+//    read's failure; nothing installs, and a warm-but-TTL-expired entry is
+//    dropped, not served.
+//  - Busts are immediate and keyed. Every writer that changes what these
+//    reads return calls the matching free bust function below (the
+//    discovery pin in tests/server/auth_guard_bust_coverage.test.ts holds
+//    the site list complete); account-keyed busts drop the moderation row
+//    AND every indexed token of the account, which is what makes
+//    revokeCompanionToken's prefix-keyed delete safe without knowing the
+//    full token value (over-busting only costs one re-fetch).
+//  - The ONE accepted staleness is cross-process: a revocation or ban
+//    committed by ANOTHER realm process (process-per-realm shares one
+//    database; accounts and auth_tokens are not realm-scoped) is invisible
+//    here until the TTL lapses. WOC_AUTH_GUARD_CACHE_TTL_MS is that bound
+//    and is sized short because of it.
+
+import type {
+  AccountModerationRow,
+  AccountModerationStatus,
+  AuthTokenRow,
+  TokenScope,
+} from './auth_guard_core';
+import { computeModerationStatus, tokenInfoFromRow } from './auth_guard_core';
+
+/**
+ * The one staleness bound: an in-process refresh cadence AND the ceiling on
+ * how long a revoked token or a fresh ban committed by ANOTHER process can
+ * keep answering from this cache (same-process writes bust immediately).
+ * 5 seconds: the six metered marketplace GETs poll at roughly 2s, so one
+ * account's steady-state guard cost drops from about two dozen point reads
+ * per window to two, while the cross-process delay stays shorter than the
+ * shortest client-facing moderation surface would make visible.
+ */
+export const WOC_AUTH_GUARD_CACHE_TTL_MS = 5_000;
+/** LRU bound on cached token rows: far above a realm's concurrent bearer
+ *  count; eviction costs one re-fetch, never correctness. */
+export const WOC_AUTH_GUARD_TOKEN_CACHE_MAX = 1_024;
+/** LRU bound on cached moderation rows, keyed by account id. */
+export const WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX = 1_024;
+/** The account-to-token index sweeps its eviction residue when it exceeds
+ *  this multiple of the token cap (see the index note on the class). */
+export const WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR = 4;
+
+/** The two raw-row readers (server/db.ts authTokenRowForToken and
+ *  moderationRowForAccount in production; fakes in tests). */
+export interface WocAuthGuardReaders {
+  fetchTokenRow(token: string): Promise<AuthTokenRow | null>;
+  fetchModerationRow(accountId: number): Promise<AccountModerationRow | null>;
+}
+
+export interface WocAuthGuardCacheOptions {
+  /** Injected clock for tests; production callers omit it (Date.now). */
+  now?: () => number;
+  /** Test-only bound overrides; production callers omit them. */
+  ttlMs?: number;
+  tokenMaxEntries?: number;
+  accountMaxEntries?: number;
+}
+
+/** Per-arm counters, the WocMarketReadCache stats shape, for the stuck
+ *  readout: eviction thrash or a bust storm is a DB-load incident forming. */
+export interface WocAuthGuardArmStats {
+  reads: number;
+  refreshes: number;
+  evictions: number;
+  busts: number;
+  entries: number;
+}
+
+export interface WocAuthGuardCacheStats {
+  tokens: WocAuthGuardArmStats;
+  accounts: WocAuthGuardArmStats;
+}
+
+// A refresh in flight for one key. `cancelled` is the lost-bust guard: a bust
+// landing mid-refresh flips it, so the flight declines its install and a
+// post-bust reader refuses to join it (starting a fresh flight) rather than
+// receive pre-bust data.
+interface Flight<V> {
+  promise: Promise<V | null>;
+  cancelled: boolean;
+}
+
+// One arm: a bounded LRU of raw rows with TTL, per-key single-flight, no
+// negative caching, no stale-serve. Private to this module on purpose (the
+// generic cache seam is cached_read.ts; this shape exists for the auth
+// contract above and gets extracted only if a second consumer appears).
+class RowArm<K, V> {
+  private readonly entries = new Map<K, { at: number; row: V }>();
+  private readonly flights = new Map<K, Flight<V>>();
+  private readCount = 0;
+  private refreshCount = 0;
+  private evictionCount = 0;
+  private bustCount = 0;
+
+  constructor(
+    private readonly fetch: (key: K) => Promise<V | null>,
+    private readonly ttlMs: number,
+    private readonly maxEntries: number,
+    private readonly now: () => number,
+    /** Called when a fresh row installs (the token arm indexes by account). */
+    private readonly onInstall?: (key: K, row: V) => void,
+  ) {}
+
+  read(key: K): Promise<V | null> {
+    this.readCount += 1;
+    const entry = this.entries.get(key);
+    if (entry !== undefined) {
+      if (this.now() - entry.at < this.ttlMs) {
+        // LRU touch: a Map iterates in insertion order, so re-inserting on
+        // every sighting keeps the first key the coldest.
+        this.entries.delete(key);
+        this.entries.set(key, entry);
+        return Promise.resolve(entry.row);
+      }
+      // Past TTL: the entry may never serve again (no stale-serve), so it is
+      // dead weight either way; drop it before refreshing.
+      this.entries.delete(key);
+    }
+    const standing = this.flights.get(key);
+    if (standing !== undefined && !standing.cancelled) return standing.promise;
+    const flight: Flight<V> = { cancelled: false, promise: Promise.resolve(null) };
+    flight.promise = this.fetch(key)
+      .then((row) => {
+        // Install only positive rows (no negative caching), and only when no
+        // bust landed mid-flight (the lost-bust epoch rule).
+        if (row !== null && !flight.cancelled) this.install(key, row);
+        return row;
+      })
+      .finally(() => {
+        // Settled (fulfilled or rejected): clear only our own registration; a
+        // post-bust flight may already have replaced this one.
+        if (this.flights.get(key) === flight) this.flights.delete(key);
+      });
+    this.refreshCount += 1;
+    this.flights.set(key, flight);
+    return flight.promise;
+  }
+
+  private install(key: K, row: V): void {
+    if (this.entries.size >= this.maxEntries && !this.entries.has(key)) {
+      const coldest = this.entries.keys().next();
+      if (!coldest.done) {
+        this.entries.delete(coldest.value);
+        this.evictionCount += 1;
+      }
+    }
+    this.entries.delete(key);
+    this.entries.set(key, { at: this.now(), row });
+    this.onInstall?.(key, row);
+  }
+
+  bust(key: K): void {
+    if (this.entries.delete(key)) this.bustCount += 1;
+    const flight = this.flights.get(key);
+    if (flight !== undefined) flight.cancelled = true;
+  }
+
+  bustAll(): void {
+    this.bustCount += this.entries.size;
+    this.entries.clear();
+    for (const flight of this.flights.values()) flight.cancelled = true;
+  }
+
+  has(key: K): boolean {
+    return this.entries.has(key);
+  }
+
+  stats(): WocAuthGuardArmStats {
+    return {
+      reads: this.readCount,
+      refreshes: this.refreshCount,
+      evictions: this.evictionCount,
+      busts: this.bustCount,
+      entries: this.entries.size,
+    };
+  }
+}
+
+/**
+ * The cached guard bundle. Structurally a BearerActiveGuardDb, so
+ * createReadGuard/createActiveGuard consume it unchanged through the routes'
+ * lazy thunk; the test-override seam (setWocMarketGuardDbForTests) keeps
+ * absolute precedence over it.
+ */
+export class WocAuthGuardCache {
+  private readonly tokenArm: RowArm<string, AuthTokenRow>;
+  private readonly accountArm: RowArm<number, AccountModerationRow>;
+  // Which cached tokens belong to which account, so account-keyed busts
+  // (revocation sweeps, prefix deletes, moderation writes have no need) can
+  // drop every token entry of the account. Entries evicted by the LRU leave
+  // residue here (over-busting is safe); the sweep below bounds it.
+  private readonly tokensByAccount = new Map<number, Set<string>>();
+  private indexSize = 0;
+  private readonly now: () => number;
+  private readonly tokenMax: number;
+
+  constructor(
+    private readonly readers: WocAuthGuardReaders,
+    opts: WocAuthGuardCacheOptions = {},
+  ) {
+    this.now = opts.now ?? Date.now;
+    const ttl = opts.ttlMs ?? WOC_AUTH_GUARD_CACHE_TTL_MS;
+    this.tokenMax = opts.tokenMaxEntries ?? WOC_AUTH_GUARD_TOKEN_CACHE_MAX;
+    this.tokenArm = new RowArm(
+      (token) => this.readers.fetchTokenRow(token),
+      ttl,
+      this.tokenMax,
+      this.now,
+      (token, row) => this.indexToken(token, row.accountId),
+    );
+    this.accountArm = new RowArm(
+      (accountId) => this.readers.fetchModerationRow(accountId),
+      ttl,
+      opts.accountMaxEntries ?? WOC_AUTH_GUARD_ACCOUNT_CACHE_MAX,
+      this.now,
+    );
+  }
+
+  async accountAndScopeForToken(
+    token: string,
+  ): Promise<{ accountId: number; scope: TokenScope } | null> {
+    const row = await this.tokenArm.read(token);
+    const info = tokenInfoFromRow(row, this.now());
+    // A cached row the clock has carried past its expires_at is dead: drop it
+    // so the entry cannot linger as a hit source for the rest of its TTL.
+    if (row !== null && info === null) this.tokenArm.bust(token);
+    return info;
+  }
+
+  async moderationStatusForAccount(accountId: number): Promise<AccountModerationStatus> {
+    const row = await this.accountArm.read(accountId);
+    return computeModerationStatus(row, this.now());
+  }
+
+  /** Drop one token's cached row (a token-keyed revocation). */
+  bustToken(token: string): void {
+    this.tokenArm.bust(token);
+  }
+
+  /** Drop the account's moderation row AND every indexed token of the
+   *  account (account-keyed revocations and every moderation write). */
+  bustAccount(accountId: number): void {
+    this.accountArm.bust(accountId);
+    const tokens = this.tokensByAccount.get(accountId);
+    if (tokens !== undefined) {
+      for (const token of tokens) this.tokenArm.bust(token);
+      this.indexSize -= tokens.size;
+      this.tokensByAccount.delete(accountId);
+    }
+  }
+
+  bustAll(): void {
+    this.tokenArm.bustAll();
+    this.accountArm.bustAll();
+    this.tokensByAccount.clear();
+    this.indexSize = 0;
+  }
+
+  stats(): WocAuthGuardCacheStats {
+    return { tokens: this.tokenArm.stats(), accounts: this.accountArm.stats() };
+  }
+
+  /** The account-index entry count, eviction residue included (test-only:
+   *  the sweep bound has no other observable). */
+  indexSizeForTests(): number {
+    return this.indexSize;
+  }
+
+  private indexToken(token: string, accountId: number): void {
+    let set = this.tokensByAccount.get(accountId);
+    if (set === undefined) {
+      set = new Set();
+      this.tokensByAccount.set(accountId, set);
+    }
+    if (!set.has(token)) {
+      set.add(token);
+      this.indexSize += 1;
+    }
+    // Amortized residue sweep: entries the LRU evicted stay indexed until the
+    // index outgrows its bound, then every no-longer-cached token drops. The
+    // index can only grow via installs, so the sweep runs rarely.
+    if (this.indexSize > this.tokenMax * WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR) {
+      for (const [account, tokens] of this.tokensByAccount) {
+        for (const t of tokens) {
+          if (!this.tokenArm.has(t)) {
+            tokens.delete(t);
+            this.indexSize -= 1;
+          }
+        }
+        if (tokens.size === 0) this.tokensByAccount.delete(account);
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The process singleton and its free bust functions. The writer chokepoints
+// (server/db.ts token writers, the moderation writers) import and call the
+// busts directly, the discord_status_cache shape; they are no-ops until
+// main.ts configures the singleton at boot and again after it is cleared at
+// shutdown, so no rig or test pays for wiring it never asked for.
+// ---------------------------------------------------------------------------
+
+let active: WocAuthGuardCache | null = null;
+
+/** Build (or replace) the process singleton over the real row readers.
+ *  Called once at boot by main.ts; pass null-ish via reset on shutdown. */
+export function configureWocAuthGuardCache(
+  readers: WocAuthGuardReaders,
+  opts: WocAuthGuardCacheOptions = {},
+): WocAuthGuardCache {
+  active = new WocAuthGuardCache(readers, opts);
+  return active;
+}
+
+/** The live singleton, or null before boot wiring (callers fall back to the
+ *  direct db reads). */
+export function wocAuthGuardDb(): WocAuthGuardCache | null {
+  return active;
+}
+
+/** Clear the singleton (shutdown or test teardown) so busts never pin a dead
+ *  instance, mirroring registerWocMarketReadCacheForBusts(null). */
+export function resetWocAuthGuardCache(): void {
+  active = null;
+}
+
+/** Token-keyed bust: the writer knows the exact token value. */
+export function bustWocAuthGuardToken(token: string): void {
+  active?.bustToken(token);
+}
+
+/** Account-keyed bust: revocation sweeps, the prefix-keyed companion delete,
+ *  and EVERY write that changes the account's moderation projection. */
+export function bustWocAuthGuardAccount(accountId: number): void {
+  active?.bustAccount(accountId);
+}
+
+/** Stats for the stuck readout; null before boot wiring. */
+export function wocAuthGuardCacheStats(): WocAuthGuardCacheStats | null {
+  return active?.stats() ?? null;
+}

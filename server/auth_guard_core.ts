@@ -13,6 +13,10 @@
 import type { TokenScope } from './db';
 import type { GeneralChatRateLimit } from './general_chat_quota_db';
 
+// Re-exported for consumers of the pure core (the guard cache) that must not
+// import the pg-bearing db module even for a type.
+export type { TokenScope } from './db';
+
 // ── Token probe ─────────────────────────────────────────────────────────────
 
 /** The raw auth_tokens row the probe fetches (scope kept raw: the allowlist
