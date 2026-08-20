@@ -72,18 +72,18 @@ describe('islandScopeStreamsZone', () => {
 
 describe('cellCountsAsPending', () => {
   it('off the island, pending means exactly what it always meant', () => {
-    expect(cellCountsAsPending(true, 'eastbrook_vale', false)).toBe(true);
-    expect(cellCountsAsPending(true, ISLAND_ZONE_ID, false)).toBe(true);
-    expect(cellCountsAsPending(false, 'eastbrook_vale', false)).toBe(false);
+    expect(cellCountsAsPending(true, false, false)).toBe(true);
+    expect(cellCountsAsPending(true, true, false)).toBe(true);
+    expect(cellCountsAsPending(false, false, false)).toBe(false);
   });
 
   it('on the island, only island ground is still pending', () => {
     // The mainland will not be built while the player is here, so calling it
     // pending would pin the fog at ground nobody intends to draw.
-    expect(cellCountsAsPending(true, 'eastbrook_vale', true)).toBe(false);
-    expect(cellCountsAsPending(true, ISLAND_ZONE_ID, true)).toBe(true);
+    expect(cellCountsAsPending(true, false, true)).toBe(false);
+    expect(cellCountsAsPending(true, true, true)).toBe(true);
     // Built island ground is not pending either way.
-    expect(cellCountsAsPending(false, ISLAND_ZONE_ID, true)).toBe(false);
+    expect(cellCountsAsPending(false, true, true)).toBe(false);
   });
 
   it('lifts the fog wall the unbuilt mainland would otherwise pin', () => {
@@ -96,8 +96,9 @@ describe('cellCountsAsPending', () => {
     const built = (cx: number) => cx < 4; // only the island half is meshed
     const requested = 850;
     const pendingUnscoped = (cx: number) =>
-      cellCountsAsPending(!built(cx), mainlandOwner(cx), false);
-    const pendingScoped = (cx: number) => cellCountsAsPending(!built(cx), mainlandOwner(cx), true);
+      cellCountsAsPending(!built(cx), islandScopeStreamsZone(mainlandOwner(cx)), false);
+    const pendingScoped = (cx: number) =>
+      cellCountsAsPending(!built(cx), islandScopeStreamsZone(mainlandOwner(cx)), true);
     const camX = grid.originX + 3.5 * grid.size;
     const camZ = grid.originZ + 0.5 * grid.size;
     const walled = fogFarForBuiltGround(grid, (cx) => pendingUnscoped(cx), camX, camZ, requested);

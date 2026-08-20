@@ -116,13 +116,16 @@ export function islandVistaBounds(): {
  * player their horizon. Off the island the answer is unchanged, which is what
  * keeps this a scope rather than a behaviour change: the clamp still pins the
  * fog at genuinely unbuilt ground everywhere else in the world.
+ *
+ * `ownedByScope` is passed in already resolved rather than looked up here:
+ * the caller walks this per cell inside the clamp's grid scan, and the owning
+ * rectangle is fixed for the life of the view, so it is precomputed once.
  */
 export function cellCountsAsPending(
-  builtState: boolean,
-  ownerZoneId: string,
+  owedGeometry: boolean,
+  ownedByScope: boolean,
   isolated: boolean,
 ): boolean {
-  if (!builtState) return false;
-  if (!isolated) return true;
-  return islandScopeStreamsZone(ownerZoneId);
+  if (!owedGeometry) return false;
+  return !isolated || ownedByScope;
 }

@@ -21,7 +21,11 @@ import {
 import { isCanvasDrawableImage } from './canvas_drawable';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
-import { cellCountsAsPending, islandIsolationActive } from './island_isolation_core';
+import {
+  cellCountsAsPending,
+  islandIsolationActive,
+  islandScopeStreamsZone,
+} from './island_isolation_core';
 import {
   hasNightLightField,
   NIGHT_LIGHT_DECLARATIONS,
@@ -2034,6 +2038,17 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   };
   groundPending.fill(1);
   let islandScoped = false;
+  // Which cells the island scope would still build, precomputed ONCE: the
+  // grid and the zone rectangles are both fixed for the life of the view, and
+  // isPending is called in the clamp's tight grid walk (every frame, over
+  // hundreds of cells), so resolving the owning rectangle per call would put
+  // a rect scan on that hot path.
+  const islandCell = new Uint8Array(chunksX * chunksZ);
+  for (let cz = 0; cz < chunksZ; cz++) {
+    for (let cx = 0; cx < chunksX; cx++) {
+      islandCell[cz * chunksX + cx] = islandScopeStreamsZone(cellOwnerId(cx, cz)) ? 1 : 0;
+    }
+  }
   // "Pending" means ground that WILL be built and is not yet, never merely
   // ground that exists in the grid: the outdoor fog clamp pins the horizon at
   // the nearest pending cell, so a cell nobody intends to build would wall the
@@ -2042,12 +2057,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   // unbuilt mainland 101 yd east (island_isolation_core.ts).
   const residency = {
     grid,
-    isPending: (cx: number, cz: number): boolean =>
-      cellCountsAsPending(
-        groundPending[cz * chunksX + cx] === 1,
-        cellOwnerId(cx, cz),
-        islandScoped,
-      ),
+    isPending: (cx: number, cz: number): boolean => {
+      const i = cz * chunksX + cx;
+      return cellCountsAsPending(groundPending[i] === 1, islandCell[i] === 1, islandScoped);
+    },
   };
   const zoneCells = (zone: ZoneDef): [number, number][] => {
     const out: [number, number][] = [];
