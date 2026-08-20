@@ -275,3 +275,73 @@ exist" as the collision signature, never as a verdict.
 | undisposed_not_sold | BIT | woc_market_delivery_pg_integration, woc_market_settlement_pg_integration | core > round4 |
 
 Totals: 248 distinct mutants, 240 BIT, 8 SURVIVED (1 no-op control + 7 judged twins, each double-strip proven).
+
+## 20 QA round appendix (independent mutants, run by the QA session)
+
+Same harness protocol and replacement policy as above; run in the scratch
+lanes wocc-marketplace-mut1/2/3 over the committed QA-round tips (7b8083abe9,
+then c270f43dda and d9293f61f3 for the rows their fixes enabled), partitioned
+so no two lanes ran the same suite concurrently. The QA session first
+independently re-verified five existing rows with its own strips (bid_own_account,
+SMOKE_claimCustodyRef_onconflict via an ON CONFLICT DO UPDATE shape,
+settle_transition_cas, realm_1600_listingsBySeller, quote_expired_boundary;
+all five BIT), then ran the rows below for the predicates the audit lanes
+found unlogged or unpinned. Three rows needed an in-round fix before their
+mutant bit and say so in the history column. qa20_cap_bump_control is a
+deliberate GREEN control: it raises WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR to 4
+and expects the bond suite to stay green, proving the at-cap fixtures derive
+from the constant (its FIRST run failed three fixtures that hard-coded the
+cap; they now derive, and the re-run is green).
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| qa20_offersForAccount_participant | BIT | woc_market_realm_scope_pg_integration | qa20 |
+| qa20_bidsByAccount_account | BIT | woc_market_realm_scope_pg_integration | qa20 |
+| qa20_settlementsByAccount_buyer | BIT | woc_market_realm_scope_pg_integration | qa20 |
+| qa20_offersForBuyer_addressee | BIT | woc_market_realm_scope_pg_integration | qa20 |
+| qa20_offersForBuyer_not_closed | BIT | woc_market_realm_scope_pg_integration | qa20 |
+| qa20_expireDue_inner_due_bound | BIT | woc_market_realm_scope_pg_integration | qa20 |
+| qa20_expireDue_inner_status | SURVIVED | woc_market_realm_scope_pg_integration | qa20; masked by the floor-pinned outer status qual, judged single |
+| qa20_expireDue_status_double_strip | BIT | woc_market_realm_scope_pg_integration | qa20; the double-strip proof for the row above |
+| qa20_undisposed_status_closed | BIT | woc_market_realm_scope_pg_integration | qa20 |
+| qa20_lapse_inner_status | BIT | woc_market_realm_scope_pg_integration, woc_market_bond_pg_integration | qa20; survived until d9293f61f3 seeded the aged resolved bid |
+| qa20_confirmingBonds_status | BIT | woc_market_bond_pg_integration | qa20 |
+| qa20_extend_status_guard | BIT | woc_market_bond_pg_integration | qa20 |
+| qa20_twin_steal_record_order | BIT | woc_market_bond_pg_integration | qa20 |
+| qa20_anti_enum_directed_rerun | BIT | woc_market_bond_pg_integration | qa20; the directed-arm strip now also reds the verdict-order arm |
+| qa20_cap_bump_control | GREEN CONTROL | woc_market_bond_pg_integration | qa20; red on three hard-coded fixtures first, green after c270f43dda derives them |
+| qa20_cap_bump_plus_account_strip | BIT | woc_market_bond_pg_integration | qa20; the raised-cap account-qual strip still reds |
+| qa20_ddl_stepup_nonce_pk | BIT | woc_market_stepup_pg_integration | qa20 |
+| qa20_ddl_stepup_operation_check | BIT | woc_market_stepup_pg_integration | qa20 |
+| qa20_ddl_stepup_fk_cascade | BIT | woc_market_stepup_pg_integration | qa20 |
+| qa20_ddl_bond_signature_unique_drop | BIT | woc_market_bond_pg_integration | qa20 |
+| qa20_dispose_already_disposed | BIT | woc_market_delivery_pg_integration | qa20 |
+| qa20_ddl_listing_resolution_check | BIT | woc_market_settlement_pg_integration | qa20 |
+| qa20_ddl_bid_status_check | BIT | woc_market_settlement_pg_integration | qa20 |
+| qa20_liveSettlement_states | BIT | woc_market_settlement_pg_integration | qa20 |
+| qa20_insertOffer_23505_belt | BIT | woc_market_directed_pg_integration | qa20 |
+| qa20_resolveOffer_status_cas | BIT | woc_market_directed_pg_integration | qa20 |
+| qa20_acceptOffer_status_cas | BIT | woc_market_directed_pg_integration | qa20 |
+| qa20_everSettled_listing_qual | BIT | woc_market_directed_pg_integration | qa20 |
+| qa20_reopen_seller_reset_dropped | BIT | woc_market_directed_pg_integration | qa20 |
+| qa20_reopen_itemref_reset_dropped | BIT | woc_market_directed_pg_integration | qa20 |
+| qa20_svcquote_not_yours | BIT | woc_market_service | qa20 |
+| qa20_quote_revival_order | BIT | woc_market_service | qa20 |
+| qa20_suspend_prelock_desc | BIT | woc_market_directed_sql | qa20 |
+| qa20_readout_clamp_strip | BIT | woc_market_directed_sql | qa20 |
+| qa20_sweep_lock_realm | BIT | woc_market_sweep | qa20 |
+| qa20_prune_closed_pair_strip | BIT | woc_market_directed_sql | qa20 |
+| qa20_prune_booked_flag_strip | BIT | woc_market_directed_sql | qa20 |
+| qa20_prune_abandons_age_strip | BIT | woc_market_directed_sql | qa20; survived until c270f43dda pinned the cutoff text |
+| qa20_prune_resolved_status_strip | BIT | woc_market_directed_sql | qa20 |
+| qa20_fake_stuckbonds_order_revert | BIT | fake_woc_market_db | qa20 |
+| qa20_fake_accept_clone_strip | BIT | fake_woc_market_db | qa20 |
+| qa20_fake_account_clone_strip | BIT | fake_woc_market_db | qa20 |
+| qa20_fake_twin_record_order | BIT | fake_woc_market_db | qa20 |
+| qa20_fake_escrow_hook_order | BIT | fake_woc_market_db | qa20 |
+| qa20_rules_list_second_member | BIT | woc_market_rules | qa20 |
+
+Appendix totals: 45 distinct mutants, 43 BIT, 1 judged defense-in-depth
+single (double-strip proven), 1 deliberate green control; plus 5 independent
+re-verifications of existing rows, all BIT. Whole log after this round: 293
+distinct mutants.

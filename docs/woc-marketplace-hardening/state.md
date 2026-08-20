@@ -5,6 +5,34 @@ actually reads.
 
 ## Where we are
 
+- 20 QA COMPLETE (2026-08-20, GAME repo, verdict PASS-WITH-FOLLOWUPS, every
+  finding applied or judged with the file open; PUSHED per R4, hashes in the
+  progress entry's final validation note). Six audit lanes + the coverage
+  auditor + qa-checklist over 057b54141a..31d07c6375: the inventory
+  re-derivation found the ACCOUNT-scoping qual family separable only by
+  realm (trade poll participants, bid and settlement activity reads, the
+  directed addressee and its closed member; every fixture held only the
+  queried account's rows), fixed with same-realm stranger fixtures and BIT
+  mutants, plus a pinned-but-unlogged batch (step-up DDL trio, two CHECK
+  negatives, bond-signature unique index, insert-side pair belt,
+  liveSettlement states, reopen SET resets, suspend DESC flip, sweep lock
+  realm, retention prunes) now logged, and three genuinely unpinned holes
+  closed (the lapse sweep's inner status qual would have VOIDED a refund_due
+  bond, the abandon prune's age cutoff had no pin, the real readout clamp
+  was fake-pinned only). Fake fidelity: stuck-bond sample order, nested
+  itemRef aliasing both sides of acceptance, fence hooks below the cap
+  count, the twin-steal-records-nothing order, each with a reversion-BIT
+  arm. Five at-cap fixtures now DERIVE from
+  WOC_MARKET_BUY_NOW_ABANDONS_PER_HOUR (a green cap-bump control proves the
+  suite tracks the constant). Gate dry-selection probe: all seven pg suites
+  sit in the always-run floor, no coverage theater. Mutation record: 45 new
+  mutants, 43 BIT, 1 judged single (expireDue inner status, double-strip
+  proven, added to the judged table), 1 green control; 5 independent
+  re-verifications of existing rows all BIT; battery 232 to 236, floor 110,
+  fidelity 11. The 20 QA round section in progress.md is the registry
+  (JUDGED and DEFERRED lists binding). NEXT = the settled riders (the escrow
+  WRITE-path cluster, then the per-request auth-guard reads), owed BEFORE
+  docs/woc-marketplace-hardening/phase-21-devnet-dry-run.md.
 - 20 IMPLEMENT COMPLETE (2026-08-20, GAME repo, LOCAL per R4: nothing
   pushed; the 20 QA session pushes on PASS). Session start 057b54141a,
   release sync a NO-OP (343 ahead, 0 behind origin/release/v0.40.0). The
@@ -899,7 +927,9 @@ implementation-plan.md).
 Classification rule: a money/security predicate counts as REAL-SQL PINNED when
 deleting it turns a Postgres-suite test red, proven mutant by mutant in
 `docs/woc-marketplace-hardening/phase-20-mutation-log.md` (248 distinct mutants,
-240 red-on-strip, green-on-restore). After this round ZERO fake-only or
+240 red-on-strip, green-on-restore; the 20 QA round's appendix adds 45 more:
+43 red-on-strip, one judged single with its double-strip proof, and one
+deliberate green fixture-derivation control). After this round ZERO fake-only or
 untested money/security predicates remain in `server/woc_market_db.ts` or its
 SQL-bearing siblings (`server/woc_market_sweep.ts`; `server/woc_market.ts`
 carries no SQL). The only mutation survivors are the judged
@@ -913,7 +943,9 @@ code over the fake and the real store, so a fake-backed service test IS a real
 pin of the guard; the fake can only lie about SQL, which is what the pg suites
 now pin. The two service guards found untested anywhere (settlementQuote
 not_yours and quote_expired, the latter at its inclusive boundary) gained
-tests this round.
+tests this round, and both now carry log rows (qa20_svcquote_not_yours,
+quote_expired_boundary), as does the deadline-before-revival order
+(qa20_quote_revival_order against the failed-row arm).
 
 Coverage by domain (predicate family, owning pg suite):
 
@@ -986,6 +1018,32 @@ Coverage by domain (predicate family, owning pg suite):
   existing index-shape and boot-repair pins:
   `tests/woc_market_settlement_pg_integration.test.ts`,
   `tests/woc_market_bond_pg_integration.test.ts`.
+- Account scoping and participant privacy (added by the 20 QA round, which
+  re-derived the inventory and found these quals separable only by realm):
+  directedOffersForAccount's participant qual, bidsByAccount's and
+  settlementsByAccount's account quals, directedOffersForBuyer's addressee
+  and liveness quals (each now separated by same-realm stranger fixtures),
+  the resolve and accept-side pending CAS, the ever-settled strike gate's
+  listing qual, the auction extension's active guard, the lapse sweep's
+  inner status qual (an aged resolved refund-due bid survives the sweep),
+  the anti-enumeration verdict order on a cancel-stamped directed sale, the
+  twin-steal-records-nothing transaction order, the confirming-poll status
+  member, the claimDue inclusive bound, the residue dispose's
+  already-disposed negative, the step-up DDL trio (nonce PK, operation
+  CHECK, FK cascade), the listing resolution and bid status CHECK
+  negatives, the bond signature unique index, the insert-side pair 23505
+  belt, the sweep advisory lock's realm dimension, the four retention
+  prunes' money quals (incl. the abandon prune's age cutoff, floor-pinned
+  by the QA round), and the real readout cap clamp:
+  `tests/woc_market_realm_scope_pg_integration.test.ts`,
+  `tests/woc_market_bond_pg_integration.test.ts`,
+  `tests/woc_market_directed_pg_integration.test.ts`,
+  `tests/woc_market_settlement_pg_integration.test.ts`,
+  `tests/woc_market_delivery_pg_integration.test.ts`,
+  `tests/woc_market_stepup_pg_integration.test.ts`,
+  `tests/server/woc_market_directed_sql.test.ts`,
+  `tests/woc_market_sweep.test.ts`, `tests/server/woc_market_service.test.ts`,
+  `tests/woc_market_rules.test.ts` (the exempt-list composition pin).
 - Lock shapes and EPQ belts that no deterministic live race can reach are
   pinned at the always-run DB-free floor through the REAL methods on recording
   pools (`tests/server/woc_market_directed_sql.test.ts`): the finalize
@@ -1007,6 +1065,7 @@ load-bearing and pinned):
 | claimBuyNowLock zero-rows own_listing verdict | both twin guards above | claim_zero_rows_double BIT |
 | insertSettlement INSERT..SELECT status belt | the FOR UPDATE closed check (pinned alone) | insertSettlement_closed_double_strip BIT |
 | reopenDirectedOffer NOT EXISTS pair guard | the pair index's named 23505 belt | reopen_notexists_plus_catch BIT |
+| expireDueDirectedOffers inner status qual | the outer EvalPlanQual status qual (floor-pinned) | qa20_expireDue_status_double_strip BIT |
 
 Deliberate non-goals, unchanged: pure ORDER BY and LIMIT bounds that select
 display order or batch size without gating money (the rotation orders and the
