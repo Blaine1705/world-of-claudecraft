@@ -107,13 +107,16 @@ export const WOC_AUTH_GUARD_INDEX_SWEEP_FACTOR = 4;
  *  over-decline an install). */
 export const WOC_AUTH_GUARD_RECENT_BUSTS_MAX = 512;
 export const WOC_AUTH_GUARD_RECENT_BUST_RETENTION_MS = 90_000;
-// 65s + 5s (the derived flight bound) plus 10s of event-loop headroom: the
-// veto is consulted a scheduling delay after the query settles, so the floor
-// carries an explicit margin rather than equality with the driver deadlines.
+// 65s + 5s (the derived flight bound) plus event-loop headroom: the veto is
+// consulted a scheduling delay after the query settles, so the floor carries
+// an explicit margin rather than equality with the driver deadlines (10s
+// chosen; the unit pin enforces at least 5s, so the enforced floor is 75s).
 export const WOC_AUTH_GUARD_RECENT_BUST_MIN_AGE_MS = 80_000;
 
 /** The two raw-row readers (server/db.ts authTokenRowForToken and
- *  moderationRowForAccount in production; fakes in tests). */
+ *  moderationRowForAccount in production; fakes in tests). Contract: each
+ *  call returns a FRESHLY-OWNED row (never a shared/pooled object), because
+ *  the cache freezes installed rows in place. */
 export interface WocAuthGuardReaders {
   fetchTokenRow(token: string): Promise<AuthTokenRow | null>;
   fetchModerationRow(accountId: number): Promise<AccountModerationRow | null>;
@@ -192,12 +195,16 @@ class RowArm<K, V> {
      *  never seen, so the veto closes the install half of the lost-bust
      *  race). */
     private readonly installGuard?: (row: V, startedAtMs: number) => boolean,
-    /** The JOIN half of the same account-keyed race: a reader that arrives
-     *  strictly AFTER a bust must not accept a row fetched before it, even
-     *  though the pre-bust joiners of the same flight may (the recorded
-     *  once-per-flight acceptance). Returning false makes that reader
-     *  refetch instead. */
-    private readonly joinGuard?: (row: V, flightStartedAtMs: number, joinedAtMs: number) => boolean,
+    /** The JOIN half of the same account-keyed race: a JOINER must not
+     *  accept a row when ANY bust of its group landed at or after the
+     *  flight's start (returning false makes it refetch). Deliberately the
+     *  same condition as the install veto, and deliberately NOT compared
+     *  against the joiner's own arrival time: the ledger keeps only the
+     *  LAST bust per account, so a second bust arriving after the joiner
+     *  would overwrite and HIDE the one that vetoed it (found live by the
+     *  fix-round review). Only the flight CREATOR keeps the recorded
+     *  once-per-flight stale answer. */
+    private readonly joinGuard?: (row: V, flightStartedAtMs: number) => boolean,
   ) {}
 
   read(key: K): Promise<V | null> {
@@ -217,12 +224,13 @@ class RowArm<K, V> {
     }
     const standing = this.flights.get(key);
     if (standing !== undefined && !standing.cancelled) {
-      const joinedAtMs = this.now();
       return standing.promise.then((row) =>
-        row !== null && this.joinGuard?.(row, standing.startedAtMs, joinedAtMs) === false
-          ? // The row predates a bust this reader arrived after: re-read (the
-            // flight has settled and cleared, so this starts a fresh fetch or
-            // joins one another vetoed joiner already started).
+        row !== null && this.joinGuard?.(row, standing.startedAtMs) === false
+          ? // The row's group was bust since the flight began: re-read (the
+            // flight has settled and cleared, so this starts a fresh fetch,
+            // whose own start postdates the bust, or joins one another
+            // vetoed joiner already started; the re-read counts as a fresh
+            // read in the stats by design).
             this.read(key)
           : row,
       );
@@ -262,8 +270,16 @@ class RowArm<K, V> {
     // The TTL anchors at the fetch START, not the install: the row's data is
     // as-of a snapshot no later than the start, so anchoring here keeps the
     // documented staleness ceiling exact instead of ceiling-plus-fetch-RTT.
-    // Rows are frozen shallow so no consumer can decorate a shared row in
-    // place and poison every other reader of the key.
+    // (One recorded regime: a fetch slower than the TTL installs an
+    // already-expired entry, so cross-time reuse stops during a DB brownout;
+    // single-flight still collapses concurrent readers.) Rows are frozen one
+    // level deep (the freezeShared precedent) so no consumer can decorate a
+    // shared row or a nested object in place and poison every other reader
+    // of the key; a frozen Date's setTime remains callable (internal slot,
+    // not a property), the precedent's same recorded limit.
+    for (const value of Object.values(row as object)) {
+      if (typeof value === 'object' && value !== null) Object.freeze(value);
+    }
     Object.freeze(row);
     this.entries.set(key, { at: startedAtMs, row });
     this.onInstall?.(key, row);
@@ -343,15 +359,16 @@ export class WocAuthGuardCache {
       this.now,
       (token, row) => this.indexToken(token, row.accountId),
       (row, startedAtMs) => (this.recentAccountBusts.get(row.accountId) ?? -1) < startedAtMs,
-      (row, flightStartedAtMs, joinedAtMs) => {
-        // A joiner that arrived strictly AFTER the account's bust must not
-        // accept a row fetched before it (the join half of the index-blind
-        // race); a joiner that arrived before the bust keeps the recorded
-        // once-per-flight acceptance. Ties (same-ms arrival and bust) count
-        // as pre-bust: arrival order inside one clock tick is unknowable,
-        // and the install veto above already declines the tie fail-closed.
-        const bustAtMs = this.recentAccountBusts.get(row.accountId);
-        return !(bustAtMs !== undefined && bustAtMs >= flightStartedAtMs && bustAtMs < joinedAtMs);
+      (row, flightStartedAtMs) => {
+        // Any bust of the row's account at or after the flight's start makes
+        // every JOINER refetch (the join half of the index-blind race). The
+        // same condition as the install veto, on purpose, and NOT narrowed
+        // by the joiner's arrival time: the ledger keeps only the LAST bust
+        // per account, so a later same-account bust would overwrite and
+        // hide the one that vetoed the joiner. Stricter than the recorded
+        // once-per-flight acceptance (which now covers the flight CREATOR
+        // only); the cost is one extra fetch per joiner under a bust.
+        return (this.recentAccountBusts.get(row.accountId) ?? -1) < flightStartedAtMs;
       },
     );
     this.accountArm = new RowArm(

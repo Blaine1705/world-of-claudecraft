@@ -303,6 +303,58 @@ describe('token arm', () => {
     expect(cache.stats().tokens.entries).toBe(0);
   });
 
+  it('refetches for a joiner even when a SECOND same-account bust lands after it (ledger overwrite)', async () => {
+    // The veto ledger keeps only the LAST bust per account, so a second bust
+    // arriving after the joiner would overwrite and hide the one that vetoed
+    // it if the join guard compared against the joiner's arrival time; the
+    // guard therefore refetches on ANY bust at or after the flight's start
+    // (found live by the fix-round review, executed before the fix).
+    let nowMs = NOW;
+    const settlers: Array<(row: AuthTokenRow | null) => void> = [];
+    let fetches = 0;
+    const cache = new WocAuthGuardCache(
+      {
+        fetchTokenRow: () => {
+          fetches += 1;
+          return new Promise((resolve) => {
+            settlers.push(resolve);
+          });
+        },
+        fetchModerationRow: async () => null,
+      },
+      { now: () => nowMs },
+    );
+    const creator = cache.accountAndScopeForToken('t1');
+    nowMs += 1;
+    cache.bustAccount(7);
+    nowMs += 1;
+    const joiner = cache.accountAndScopeForToken('t1');
+    nowMs += 1;
+    cache.bustAccount(7);
+    settlers[0](liveToken(7));
+    await expect(creator).resolves.toEqual({ accountId: 7, scope: 'full' });
+    expect(fetches).toBe(2);
+    settlers[1](null);
+    await expect(joiner).resolves.toBeNull();
+    expect(cache.stats().tokens.entries).toBe(0);
+  });
+
+  it('freezes installed rows one level deep (shared-row decoration defense)', async () => {
+    const r = rig();
+    const nested = new Date(NOW + 60_000);
+    const tokenRow = liveToken(7);
+    r.tokens.set('t1', tokenRow);
+    r.accounts.set(7, cleanRow({ suspended_until: nested }));
+    await r.cache.accountAndScopeForToken('t1');
+    await r.cache.moderationStatusForAccount(7);
+    // The cache freezes the very objects the readers returned, nested
+    // object values included (a frozen Date's setTime remains callable,
+    // the freezeShared precedent's recorded limit).
+    expect(Object.isFrozen(tokenRow)).toBe(true);
+    expect(Object.isFrozen(r.accounts.get(7))).toBe(true);
+    expect(Object.isFrozen(nested)).toBe(true);
+  });
+
   it('resumes installs for a bust account once a fetch starts after the bust (fence, not blacklist)', async () => {
     let nowMs = NOW;
     const settlers: Array<(row: AuthTokenRow | null) => void> = [];
