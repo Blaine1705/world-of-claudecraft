@@ -64,7 +64,33 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
 - Portraits: `portrait.ts` (offscreen-WebGL headshot factory, caches data
   URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`) +
   `portrait_prewarm_core.ts` (the async capture's step order) +
-  `portrait_capture_lane_core.ts` (one live capture per cache key). The LIVE
+  `portrait_capture_lane_core.ts` (one live capture per cache key). The CAPTURE
+  itself is `portrait_snapshot.ts`, a thin GL adapter over the pure
+  `portrait_readback_core.ts` and the DOM-only `portrait_png_encode.ts`: it
+  renders into a `WebGLRenderTarget` and reads it back through three's
+  fence-backed `readRenderTargetPixelsAsync`, because `canvas.toBlob` off the
+  default framebuffer defers the PNG ENCODE but does the GPU READBACK
+  synchronously (67 to 118 ms per portrait unit, 1477 ms of self time across a
+  post-entry ride). The core owns the THREE conversions that keep the output
+  the same colour toBlob's was: readPixels is bottom-up where ImageData is
+  top-down; both buffers hold premultiplied colour where a PNG holds straight
+  alpha; and three writes the LINEAR working space into any non-XR render
+  target whatever `renderer.outputColorSpace` says (`getParameters`, three
+  0.185.1: `target.texture.colorSpace` governs sampling, and nothing ever
+  samples this one), so the sRGB transfer the canvas used to carry has to be
+  applied here or every portrait comes back dark. Their ORDER is fixed:
+  unpremultiply, THEN encode, because `<colorspace_fragment>` runs before the
+  blend stage, so the canvas held `alpha * srgbEncode(colour)`, not
+  `srgbEncode(alpha * colour)`; the other order is wrong at every partially
+  covered texel, i.e. all along the silhouette. The target's buffers are shared
+  by every capture on the rig while the lane dedupes per cache KEY only, so a
+  second concurrent capture takes the synchronous path. That old synchronous
+  path is also the fallback for a context that cannot fence, latched after any
+  async failure (including a readback that fulfils WITHOUT handing back the
+  buffer it was given, which three does when the target has no framebuffer:
+  encoding then would cache the previous portrait's face under this key). The
+  draw MUST happen before the capture promise exists: `runPortraitPrewarm`
+  releases the subject as soon as it holds one. The LIVE
   getters never capture on the calling frame, the composed
   `modularPortraitDataUrl` included: a miss answers null, kicks the async
   capture through the lane, and fires `onPortraitUpdate` when it lands (a
