@@ -113,10 +113,21 @@ export interface AccountWealthSweepDeps {
   refreshAccountPurseTotals(): Promise<void>;
   listEscrowStateRows(): Promise<EscrowStateRow[]>;
   applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise<void>;
+  // The cross-process guard (account_wealth_db.ts withAccountWealthSweepLock):
+  // the sweep's queries are global, so exactly one realm process may run a
+  // pass; a false return means a peer holds the lock and this tick is a no-op.
+  withSweepLock(run: () => Promise<void>): Promise<boolean>;
 }
 
-/** One full refresh: purse totals in SQL, then the Node-parsed escrow pass. */
-export async function refreshAccountWealth(deps: AccountWealthSweepDeps): Promise<void> {
+/** One full refresh: purse totals in SQL, then the Node-parsed escrow pass.
+ *  Callers other than tests reach it through the sweep loop, which wraps every
+ *  pass in the cross-process lock. */
+export async function refreshAccountWealth(
+  deps: Pick<
+    AccountWealthSweepDeps,
+    'refreshAccountPurseTotals' | 'listEscrowStateRows' | 'applyEscrowTotals'
+  >,
+): Promise<void> {
   await deps.refreshAccountPurseTotals();
   const rows = await deps.listEscrowStateRows();
   await deps.applyEscrowTotals(escrowTotalsFromStateRows(rows));
@@ -142,7 +153,10 @@ export function startAccountWealthSweep(
   let timer: NodeJS.Timeout | null = null;
   const run = async (): Promise<void> => {
     try {
-      await refreshAccountWealth(deps);
+      // A false return means a peer process holds the sweep lock and is
+      // running this pass globally; standing down until the next tick is the
+      // correct outcome, not an error.
+      await deps.withSweepLock(() => refreshAccountWealth(deps));
     } catch (err) {
       onError(err);
     }
@@ -176,6 +190,18 @@ export function configureTopWealthHolders(source: () => Promise<TopWealthHolderR
 export function resetTopWealthHoldersForTests(): void {
   topHoldersSource = null;
   topHoldersCache = null;
+}
+
+/** Drop the active suspicion-flag counts from a top-holders page. The flag
+ *  store is moderation data: the accounts list already strips flag counts for
+ *  callers without moderation.read, and the rich list must give the same
+ *  caller the same answer (no current role bundle grants accounts.read
+ *  without moderation.read, but the two surfaces must not disagree if one
+ *  ever does). */
+export function redactActiveFlagCounts(
+  rows: readonly TopWealthHolderRow[],
+): Omit<TopWealthHolderRow, 'activeFlagCount'>[] {
+  return rows.map(({ activeFlagCount: _redacted, ...rest }) => rest);
 }
 
 /** The cached top-holders board both admin dispatch arms read. */

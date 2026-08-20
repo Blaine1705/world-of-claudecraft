@@ -9,6 +9,7 @@ import {
   escrowTotalsFromStateRows,
   parseEscrowStateKey,
   readTopWealthHolders,
+  redactActiveFlagCounts,
   refreshAccountWealth,
   resetTopWealthHoldersForTests,
   startAccountWealthSweep,
@@ -145,7 +146,7 @@ describe('refreshAccountWealth', () => {
 });
 
 describe('startAccountWealthSweep', () => {
-  it('refreshes every interval, logs failures, and stops cleanly', async () => {
+  it('refreshes every interval under the lock, logs failures, and stops cleanly', async () => {
     vi.useFakeTimers();
     const onError = vi.fn();
     const deps = {
@@ -154,9 +155,14 @@ describe('startAccountWealthSweep', () => {
         .mockRejectedValueOnce(new Error('transient')),
       listEscrowStateRows: vi.fn(async () => []),
       applyEscrowTotals: vi.fn(async () => {}),
+      withSweepLock: vi.fn(async (run: () => Promise<void>) => {
+        await run();
+        return true;
+      }),
     };
     const sweep = startAccountWealthSweep(deps, { onError });
     await vi.advanceTimersByTimeAsync(ACCOUNT_WEALTH_REFRESH_MS);
+    expect(deps.withSweepLock).toHaveBeenCalledTimes(1);
     expect(deps.refreshAccountPurseTotals).toHaveBeenCalledTimes(1);
     expect(onError).toHaveBeenCalledTimes(1);
 
@@ -169,6 +175,24 @@ describe('startAccountWealthSweep', () => {
     await vi.advanceTimersByTimeAsync(ACCOUNT_WEALTH_REFRESH_MS * 3);
     expect(deps.refreshAccountPurseTotals).toHaveBeenCalledTimes(2);
   });
+
+  it('stands down for the tick when a peer process holds the sweep lock', async () => {
+    vi.useFakeTimers();
+    const onError = vi.fn();
+    const deps = {
+      refreshAccountPurseTotals: vi.fn(async () => {}),
+      listEscrowStateRows: vi.fn(async () => []),
+      applyEscrowTotals: vi.fn(async () => {}),
+      // A losing try-lock never runs the pass and is not an error.
+      withSweepLock: vi.fn(async () => false),
+    };
+    const sweep = startAccountWealthSweep(deps, { onError });
+    await vi.advanceTimersByTimeAsync(ACCOUNT_WEALTH_REFRESH_MS * 2);
+    expect(deps.withSweepLock).toHaveBeenCalledTimes(2);
+    expect(deps.refreshAccountPurseTotals).not.toHaveBeenCalled();
+    expect(onError).not.toHaveBeenCalled();
+    sweep.stop();
+  });
 });
 
 describe('readTopWealthHolders', () => {
@@ -180,5 +204,28 @@ describe('readTopWealthHolders', () => {
     await expect(readTopWealthHolders()).resolves.toBe(rows);
     await readTopWealthHolders();
     expect(source).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('redactActiveFlagCounts', () => {
+  it('drops the flag count and nothing else (the accounts-list moderation rule)', () => {
+    const row: TopWealthHolderRow = {
+      accountId: 7,
+      username: 'midas',
+      purseCopper: 1,
+      mailCopper: 2,
+      marketCopper: 3,
+      totalCopper: 6,
+      maxLevel: 60,
+      lastLogin: null,
+      bannedAt: null,
+      suspendedUntil: null,
+      activeFlagCount: 4,
+      updatedAt: '2026-08-19T06:20:00Z',
+    };
+    const [redacted] = redactActiveFlagCounts([row]);
+    expect('activeFlagCount' in redacted).toBe(false);
+    const { activeFlagCount: _dropped, ...rest } = row;
+    expect(redacted).toEqual(rest);
   });
 });

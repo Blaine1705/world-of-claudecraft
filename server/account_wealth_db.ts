@@ -8,9 +8,11 @@
 // characters.state JSONB blob, so a live "ORDER BY total gold" would detoast
 // every character's full state on every admin sort/page. The database-visible
 // purse only advances on the 30 s autosave anyway, so a ~60 s sweep loses no
-// freshness an admin query could ever observe, and the indexed total_copper
-// column makes wealth sorting, the top-holders board, and the flagged-account
-// gold trend all cheap indexed reads.
+// freshness an admin query could ever observe. The account_wealth_total index
+// serves the top-holders board directly; the accounts-list gold sort and the
+// flagged-account gold trend read the materialised COLUMN (one bigint instead
+// of a per-row blob detoast) but keep their surrounding join/aggregate cost,
+// the same shape as the list's sibling sorts.
 //
 // Guild treasuries are deliberately NOT folded into total_copper: the guild
 // bank keeps no depositor identity (src/sim/guild_bank.ts, the anonymous-pipe
@@ -34,6 +36,50 @@ CREATE TABLE IF NOT EXISTS account_wealth (
 CREATE INDEX IF NOT EXISTS account_wealth_total ON account_wealth (total_copper DESC);
 `;
 
+// The sweep's cross-process guard. The sweep queries are GLOBAL (they cover
+// every realm's characters and world_state rows), so with several realm
+// processes only one may run a pass at a time: N identical global upserts with
+// no guaranteed row ordering are lock contention and a deadlock shape, not
+// just wasted work. Same session-advisory-lock discipline as the retention
+// sweep (server/retention_sweep.ts): the lock rides a dedicated client for the
+// duration of the pass, a loser stands down until its next tick, and a client
+// whose lock state is unknown is DESTROYED rather than pooled, because a
+// leaked session lock on a pooled connection would silently stop every future
+// pass in every process.
+export const ACCOUNT_WEALTH_SWEEP_LOCK_KEY = 0x57_4f_43_03; // "WOC\x03"
+
+/** Run one sweep pass under the global advisory lock. Returns false (without
+ *  running) when a peer process holds the lock. */
+export async function withAccountWealthSweepLock(run: () => Promise<void>): Promise<boolean> {
+  const client = await pool.connect();
+  let destroyClient = false;
+  try {
+    let acquired = false;
+    try {
+      const result = await client.query('SELECT pg_try_advisory_lock($1) AS acquired', [
+        ACCOUNT_WEALTH_SWEEP_LOCK_KEY,
+      ]);
+      acquired = result.rows[0]?.acquired === true;
+    } catch (err) {
+      destroyClient = true;
+      throw err;
+    }
+    if (!acquired) return false;
+    try {
+      await run();
+    } finally {
+      try {
+        await client.query('SELECT pg_advisory_unlock($1)', [ACCOUNT_WEALTH_SWEEP_LOCK_KEY]);
+      } catch {
+        destroyClient = true;
+      }
+    }
+    return true;
+  } finally {
+    client.release(destroyClient || undefined);
+  }
+}
+
 /** Upsert every account's purse total from characters.state (the sweep's SQL
  *  arm). Accounts whose characters were all deleted get their purse zeroed so
  *  a stale row can never keep a vanished fortune on the rich list. */
@@ -50,7 +96,8 @@ export async function refreshAccountPurseTotals(): Promise<void> {
        purse_copper = EXCLUDED.purse_copper,
        total_copper = EXCLUDED.purse_copper
          + account_wealth.mail_copper + account_wealth.market_copper,
-       updated_at = now()`,
+       updated_at = now()
+     WHERE account_wealth.purse_copper IS DISTINCT FROM EXCLUDED.purse_copper`,
   );
   await pool.query(
     `UPDATE account_wealth w SET
@@ -123,6 +170,8 @@ export async function applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise
          total_copper = account_wealth.purse_copper
            + EXCLUDED.mail_copper + EXCLUDED.market_copper,
          updated_at = now()
+       WHERE account_wealth.mail_copper IS DISTINCT FROM EXCLUDED.mail_copper
+          OR account_wealth.market_copper IS DISTINCT FROM EXCLUDED.market_copper
        RETURNING account_id
      )
      UPDATE account_wealth w SET

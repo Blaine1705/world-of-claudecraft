@@ -4,6 +4,7 @@ import {
   LARGE_GOLD_MOVEMENT_LIMIT,
   LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
   readTopWealthHolders,
+  redactActiveFlagCounts,
 } from './account_wealth';
 import { accountWealthBreakdown, largeGoldMovementsForAccount } from './account_wealth_db';
 import { parseAdminAccountSort } from './admin_accounts_sort';
@@ -169,6 +170,7 @@ import {
   roleChangeHistory,
   setAccountAdminRoles,
 } from './staff_db';
+import { flagListResponse } from './suspicion_flag_list';
 import { isSuspicionFlagStatus } from './suspicion_flag_workflow';
 import { bustSuspicionFlagCache, readSuspicionFlagDataset } from './suspicion_flags';
 import {
@@ -662,32 +664,6 @@ function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeen
 function moderationHistoryTab(params: URLSearchParams): ModerationHistoryTab {
   const tab = params.get('tab');
   return tab === 'mine' || tab === 'notes' ? tab : 'all';
-}
-
-// Shared by both dispatch arms (the dual-arm rule): shape the cached flag
-// dataset into one filtered, paginated response. 'active' (the default tab)
-// is new + under_review; a concrete status filters to it; 'all' passes
-// everything through.
-function flagListResponse(
-  dataset: Awaited<ReturnType<typeof readSuspicionFlagDataset>>,
-  params: URLSearchParams,
-): unknown {
-  const statusParam = params.get('status');
-  const filtered = isSuspicionFlagStatus(statusParam)
-    ? dataset.rows.filter((row) => row.status === statusParam)
-    : statusParam === 'all'
-      ? dataset.rows
-      : dataset.rows.filter((row) => row.status === 'new' || row.status === 'under_review');
-  const { page, limit } = parsePageParams(params);
-  const offset = (page - 1) * limit;
-  return {
-    rows: filtered.slice(offset, offset + limit),
-    total: filtered.length,
-    page,
-    limit,
-    counts: dataset.countsByStatus,
-    truncated: dataset.truncated,
-  };
 }
 
 // Stamp each account row with its active suspicion-flag count. Only callers
@@ -1607,7 +1583,11 @@ export async function handleAdminApi(
       if (!adminOversightReadRateLimited(req, accountId).allowed) {
         return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
       }
-      return ok(res, { rows: await readTopWealthHolders() });
+      const rows = await readTopWealthHolders();
+      // Flag counts are moderation data: the same rule as the accounts list.
+      return identity.permissions.has('moderation.read')
+        ? ok(res, { rows })
+        : ok(res, { rows: redactActiveFlagCounts(rows) });
     }
     const accountWealthMatch = /^\/admin\/api\/accounts\/(\d+)\/wealth$/.exec(path);
     if (accountWealthMatch) {
@@ -1635,7 +1615,14 @@ export async function handleAdminApi(
       if (!adminOversightReadRateLimited(req, accountId).allowed) {
         return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
       }
-      return ok(res, flagListResponse(await readSuspicionFlagDataset(), url.searchParams));
+      return ok(
+        res,
+        flagListResponse(
+          await readSuspicionFlagDataset(),
+          url.searchParams,
+          parsePageParams(url.searchParams),
+        ),
+      );
     }
     if (path === '/admin/api/guilds') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -2472,12 +2459,21 @@ async function accountsHandler(ctx: Ctx): Promise<void> {
 }
 
 /** GET /admin/api/wealth/top: the rich list (top holders by materialised
- *  total), served from the TTL cache in server/account_wealth.ts. */
+ *  total), served from the TTL cache in server/account_wealth.ts. Flag counts
+ *  are stripped for callers without moderation.read, the same rule as the
+ *  accounts list. */
 async function wealthTopHandler(ctx: Ctx): Promise<void> {
   if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
     return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
   }
-  ok(ctx.res, { rows: await adminDb().topWealthHolders() });
+  const rows = await adminDb().topWealthHolders();
+  const identity = adminIdentityOf(ctx);
+  ok(
+    ctx.res,
+    identity?.permissions.has('moderation.read')
+      ? { rows }
+      : { rows: redactActiveFlagCounts(rows) },
+  );
 }
 
 /** GET /admin/api/accounts/:id/wealth: one account's gold breakdown (per
@@ -2514,7 +2510,14 @@ async function flagsHandler(ctx: Ctx): Promise<void> {
   if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
     return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
   }
-  ok(ctx.res, flagListResponse(await adminDb().suspicionFlagDataset(), ctx.url.searchParams));
+  ok(
+    ctx.res,
+    flagListResponse(
+      await adminDb().suspicionFlagDataset(),
+      ctx.url.searchParams,
+      parsePageParams(ctx.url.searchParams),
+    ),
+  );
 }
 
 /** POST /admin/api/flags/:id/status: one workflow move (validated against the

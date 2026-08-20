@@ -946,8 +946,15 @@ export async function listAccounts(
     sort === 'id' ? `a.id ${direction}` : `${column} ${direction}${nullsPolicy}, a.id ${direction}`;
   // Shared by the page and count queries so the two can never disagree.
   // $1 = ILIKE pattern, and the last parameter is the exact-id arm (NULL when
-  // the search is not numeric).
-  const matchSql = (idParam: string) => `(
+  // the search is not numeric). With NO search term the predicate stays the
+  // pre-search shape (a plain ILIKE '%' over username): the default listing is
+  // the most-opened page in the dashboard and must not pay the correlated
+  // character-match subqueries it is not using. The id parameter is still
+  // referenced (always NULL here) so both queries keep a fixed bind count.
+  const matchSql = (idParam: string) =>
+    search === ''
+      ? `(a.username ILIKE $1 AND ${idParam}::int IS NULL)`
+      : `(
        a.username ILIKE $1
        OR EXISTS (SELECT 1 FROM characters cs WHERE cs.account_id = a.id AND cs.name ILIKE $1)
        OR (${idParam}::int IS NOT NULL AND (a.id = ${idParam}

@@ -18,15 +18,17 @@ vi.mock('../server/db', () => ({
 }));
 
 import {
+  ACCOUNT_WEALTH_SWEEP_LOCK_KEY,
   accountWealthBreakdown,
   applyEscrowTotals,
   largeGoldMovementsForAccount,
   listEscrowStateRows,
   refreshAccountPurseTotals,
   topWealthHolders,
+  withAccountWealthSweepLock,
 } from '../server/account_wealth_db';
 
-const { query } = db;
+const { query, connect } = db;
 
 function queryResult<T extends QueryResultRow>(rows: T[], rowCount = rows.length): QueryResult<T> {
   return { command: '', rowCount, oid: 0, fields: [], rows };
@@ -46,6 +48,11 @@ describe('refreshAccountPurseTotals', () => {
     expect(upsert).toMatch(/\(c\.state->>'copper'\)::bigint/);
     expect(upsert).toMatch(/ON CONFLICT \(account_id\) DO UPDATE/);
     expect(upsert).toMatch(/\+ account_wealth\.mail_copper \+ account_wealth\.market_copper/);
+    // The conflict arm is CONDITIONAL: an unchanged purse must not rewrite the
+    // row (one dead tuple per account per minute, forever, otherwise).
+    expect(upsert).toMatch(
+      /WHERE account_wealth\.purse_copper IS DISTINCT FROM EXCLUDED\.purse_copper/,
+    );
     const [zero] = query.mock.calls[1];
     expect(zero).toMatch(/purse_copper = 0/);
     expect(zero).toMatch(/NOT EXISTS \(SELECT 1 FROM characters/);
@@ -77,6 +84,10 @@ describe('applyEscrowTotals', () => {
     expect(sql).toMatch(/unnest\(/);
     expect(sql).toMatch(/ON CONFLICT \(account_id\) DO UPDATE/);
     expect(sql).toMatch(/mail_copper = 0/); // the stale-escrow zeroing arm
+    // Conditional, like the purse arm: unchanged escrow must not rewrite rows.
+    expect(sql).toMatch(
+      /WHERE account_wealth\.mail_copper IS DISTINCT FROM EXCLUDED\.mail_copper\s+OR account_wealth\.market_copper IS DISTINCT FROM EXCLUDED\.market_copper/,
+    );
     expect(params).toEqual([
       [12, -1],
       ['', 'Oldname'],
@@ -240,5 +251,59 @@ describe('largeGoldMovementsForAccount', () => {
         createdAt: '2026-08-18T00:00:00Z',
       },
     ]);
+  });
+});
+
+describe('withAccountWealthSweepLock', () => {
+  function clientStub(acquired: boolean | 'error') {
+    const cquery = vi.fn(async (text: string) => {
+      if (/pg_try_advisory_lock/.test(text)) {
+        if (acquired === 'error') throw new Error('lock query failed');
+        return queryResult([{ acquired }]);
+      }
+      return queryResult([]);
+    });
+    const release = vi.fn();
+    connect.mockResolvedValue({ query: cquery, release } as unknown as PoolClient);
+    return { cquery, release };
+  }
+
+  it('runs the pass under the lock, unlocks on the SAME client, and pools it back', async () => {
+    const { cquery, release } = clientStub(true);
+    const run = vi.fn(async () => {});
+    await expect(withAccountWealthSweepLock(run)).resolves.toBe(true);
+    expect(run).toHaveBeenCalledTimes(1);
+    const statements = cquery.mock.calls.map((call) => call[0] as string);
+    expect(statements.some((s) => /pg_try_advisory_lock/.test(s))).toBe(true);
+    expect(statements.some((s) => /pg_advisory_unlock/.test(s))).toBe(true);
+    expect(cquery.mock.calls[0][1]).toEqual([ACCOUNT_WEALTH_SWEEP_LOCK_KEY]);
+    // A healthy pass pools the client back (no destroy argument).
+    expect(release).toHaveBeenCalledWith(undefined);
+  });
+
+  it('stands down without running when a peer holds the lock', async () => {
+    const { release } = clientStub(false);
+    const run = vi.fn(async () => {});
+    await expect(withAccountWealthSweepLock(run)).resolves.toBe(false);
+    expect(run).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledWith(undefined);
+  });
+
+  it('still unlocks when the pass throws, and DESTROYS a client whose lock state is unknown', async () => {
+    const { cquery, release } = clientStub(true);
+    await expect(
+      withAccountWealthSweepLock(async () => {
+        throw new Error('pass failed');
+      }),
+    ).rejects.toThrow('pass failed');
+    expect(
+      cquery.mock.calls.map((c) => c[0] as string).some((s) => /pg_advisory_unlock/.test(s)),
+    ).toBe(true);
+    expect(release).toHaveBeenCalledWith(undefined);
+
+    // A failed try-lock query leaves the lock state unknown: destroy, never pool.
+    const failed = clientStub('error');
+    await expect(withAccountWealthSweepLock(async () => {})).rejects.toThrow('lock query failed');
+    expect(failed.release).toHaveBeenCalledWith(true);
   });
 });

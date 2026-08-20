@@ -54,6 +54,7 @@ import {
   listEscrowStateRows,
   refreshAccountPurseTotals,
   topWealthHolders,
+  withAccountWealthSweepLock,
 } from './account_wealth_db';
 import {
   configureAdminGuildBoardCacheBust,
@@ -3523,6 +3524,9 @@ export async function startServer(): Promise<http.Server> {
     refreshAccountPurseTotals,
     listEscrowStateRows,
     applyEscrowTotals,
+    // The sweep's queries are global, so exactly one process across all realms
+    // runs a pass; losers of the advisory lock stand down until their next tick.
+    withSweepLock: withAccountWealthSweepLock,
   });
 
   const shutdown = async () => {

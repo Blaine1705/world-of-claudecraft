@@ -109,9 +109,9 @@
                 {:else if status === 'suspended'}
                   <Badge variant="warn">{t('accounts.badgeSuspended')}</Badge>
                 {/if}
-                {#if row.activeFlagCount > 0}
+                {#if (row.activeFlagCount ?? 0) > 0}
                   <Badge variant="bad">
-                    {t('flags.badgeFlagged', { n: fmtNumber(row.activeFlagCount) })}
+                    {t('flags.badgeFlagged', { n: fmtNumber(row.activeFlagCount ?? 0) })}
                   </Badge>
                 {/if}
               </td>

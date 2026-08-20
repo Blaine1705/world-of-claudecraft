@@ -235,7 +235,9 @@ export interface TopWealthHolderRow {
   lastLogin: string | null;
   bannedAt: string | null;
   suspendedUntil: string | null;
-  activeFlagCount: number;
+  // Present only when the operator holds moderation.read (the server strips
+  // it otherwise, the same rule as the accounts list).
+  activeFlagCount?: number;
   updatedAt: string;
 }
 
