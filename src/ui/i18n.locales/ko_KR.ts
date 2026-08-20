@@ -13143,13 +13143,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '깃발 하나 통과. (이동 스틱이 아니라) 세상 화면을 손가락으로 드래그해 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
   'hudChrome.bootcamp.turnwalkBodyPad':
     '깃발 하나 통과. 오른쪽 스틱을 밀어 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
-  'hudChrome.bootcamp.strafeTitle': '마지막 길은 옆걸음으로',
+  'hudChrome.bootcamp.strafeTitle':
+    '돌아서 걷기',
   'hudChrome.bootcamp.strafeBody':
-    '옆으로 움직이는 또 다른 방법이 있습니다. {strafeKey}를 눌러 마지막 길로 한 걸음 비켜선 다음, {forwardKey}를 누른 채 {strafeKey}로 옆걸음하며 붉은 깃발이 등 뒤로 갈 때까지 나아가세요. 옆걸음은 시선을 표적에 둔 채 움직이게 해 줍니다. 언젠가 전투에서 이렇게 움직이게 될 거예요.',
+    '모퉁이 하나 남았습니다. {turnLeftKey}를 누른 채 제자리에서 돌아 마지막 길을 정면에 두고, 다시 {forwardKey}를 누른 채 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
   'hudChrome.bootcamp.strafeBodyTouch':
-    '옆으로 움직이는 또 다른 방법이 있습니다. 이동 스틱을 왼쪽으로 밀어 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요.',
+    '모퉁이 하나 남았습니다. (이동 스틱이 아니라) 화면을 손가락으로 쓸어 방향을 돌려 마지막 길을 정면에 두고, 스틱을 위로 밀어 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
   'hudChrome.bootcamp.strafeBodyPad':
-    '옆으로 움직이는 또 다른 방법이 있습니다. 왼쪽 스틱을 왼쪽으로 밀어 붉은 깃발이 등 뒤로 갈 때까지 마지막 길을 옆걸음하세요.',
+    '모퉁이 하나 남았습니다. 오른쪽 스틱을 밀어 방향을 돌려 마지막 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
   'hudChrome.bootcamp.cameraTitle': '시점 돌리기',
   'hudChrome.bootcamp.cameraBody':
     '완주를 보고하기 전 마지막 가르침입니다. 마우스 오른쪽 버튼을 누른 채 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.',

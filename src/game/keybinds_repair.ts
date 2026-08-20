@@ -17,9 +17,8 @@
 // during its window persisted slot10/slot11 holding Q/E and strafeLeft/
 // strafeRight unbound. After the revert those explicit stored values stick (a
 // stored binding always wins over the current default), so pressing Q/E drives
-// action-bar slots and strafe is dead. Dropping the four keys re-seeds strafe
-// and slot10/slot11 to whatever the CURRENT defaults are (A/E strafe since the
-// tutorial's "A then W" ruling, Minus/Equal on the slots).
+// action-bar slots and strafe is dead. Dropping the four keys re-seeds strafe to
+// Q/E and slot10/slot11 to Minus/Equal, the current defaults.
 //
 // The same v0.24.0 window (#1792) also shipped Damage Meters defaulting to
 // KeyZ, so a profile matching the rest of Signature A typically also persisted

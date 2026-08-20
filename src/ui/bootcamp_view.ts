@@ -84,7 +84,15 @@ export function bootcampArrowTarget(
   return BOOTCAMP_COURSE_CHECKPOINTS[checkpointsReached] ?? null;
 }
 
-export type BootcampParam = 'forwardKey' | 'turnKey' | 'strafeKey' | 'interactKey';
+export type BootcampParam =
+  | 'forwardKey'
+  /** Turn RIGHT: lane 2's corner. */
+  | 'turnKey'
+  /** Turn LEFT: lane 3's corner. Both lanes teach the same shape, turn and
+   *  THEN walk, so the course never asks a new player to learn two idioms. */
+  | 'turnLeftKey'
+  | 'strafeKey'
+  | 'interactKey';
 
 export interface BootcampBodyPlan {
   bodyKey: TranslationKey;
@@ -97,7 +105,7 @@ const KEYBOARD: Record<BootcampStep, BootcampBodyPlan> = {
   talk: { bodyKey: 'hudChrome.bootcamp.talkBody', params: ['interactKey'] },
   forward: { bodyKey: 'hudChrome.bootcamp.forwardBody', params: ['forwardKey'] },
   turnwalk: { bodyKey: 'hudChrome.bootcamp.turnwalkBody', params: ['turnKey', 'forwardKey'] },
-  strafe: { bodyKey: 'hudChrome.bootcamp.strafeBody', params: ['strafeKey', 'forwardKey'] },
+  strafe: { bodyKey: 'hudChrome.bootcamp.strafeBody', params: ['turnLeftKey', 'forwardKey'] },
   camera: { bodyKey: 'hudChrome.bootcamp.cameraBody', params: [] },
   done: { bodyKey: 'hudChrome.bootcamp.doneBody', params: ['interactKey'] },
 };
@@ -144,16 +152,23 @@ export function bootcampTitleKey(step: BootcampStep): TranslationKey {
 export function bootcampKeycaps(
   step: BootcampStep,
   mode: BootcampInputMode,
-  labels: { forwardKey: string; turnKey: string; strafeKey: string; interactKey: string },
+  labels: {
+    forwardKey: string;
+    turnKey: string;
+    turnLeftKey: string;
+    strafeKey: string;
+    interactKey: string;
+  },
 ): readonly string[] {
   if (mode !== 'keyboard') return [];
   const caps: Record<BootcampStep, readonly string[]> = {
     talk: [labels.interactKey],
     forward: [labels.forwardKey],
-    // Sequences read in press order (the chips row separates them with a
-    // localized "then"): turn, THEN walk; sidestep, THEN walk.
+    // Both corners read in press order (the chips row separates them with a
+    // localized "then") and teach the SAME shape: turn, THEN walk. Lane 2
+    // turns right, lane 3 turns left.
     turnwalk: [labels.turnKey, labels.forwardKey],
-    strafe: [labels.strafeKey, labels.forwardKey],
+    strafe: [labels.turnLeftKey, labels.forwardKey],
     camera: [],
     done: [labels.interactKey],
   };

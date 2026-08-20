@@ -12908,13 +12908,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '第一面旗到手。用手指拖動世界畫面（不是移動搖桿）來轉身，直到正對向南延伸的圍欄跑道，然後把搖桿推向上方，沿跑道走到第二面旗。',
   'hudChrome.bootcamp.turnwalkBodyPad':
     '第一面旗到手。推動右搖桿轉身，直到正對向南延伸的圍欄跑道，然後把左搖桿推向上方，沿跑道走到第二面旗。',
-  'hudChrome.bootcamp.strafeTitle': '橫移走完最後一條跑道',
+  'hudChrome.bootcamp.strafeTitle':
+    '轉身，然後前進',
   'hudChrome.bootcamp.strafeBody':
-    '側向移動還有另一種辦法。按一下 {strafeKey}，側步跨進最後一條跑道，然後按住 {forwardKey}，再用 {strafeKey} 橫移，直到紅旗被你甩在身後。橫移能讓你移動時視線始終鎖在目標上：總有一天你會這樣作戰。',
+    '只剩最後一個彎。按住 {turnLeftKey} 原地轉身，直到正對最後一條跑道，然後再次按住 {forwardKey}，一直走到紅旗被你甩在身後。',
   'hudChrome.bootcamp.strafeBodyTouch':
-    '側向移動還有另一種辦法。把移動搖桿推向左邊，沿最後一條跑道橫移，直到紅旗被你甩在身後。',
+    '只剩最後一個彎。用手指劃動畫面（不是移動搖桿）轉身，直到正對最後一條跑道，然後把搖桿上推，一直走到紅旗被你甩在身後。',
   'hudChrome.bootcamp.strafeBodyPad':
-    '側向移動還有另一種辦法。把左搖桿推向左邊，沿最後一條跑道橫移，直到紅旗被你甩在身後。',
+    '只剩最後一個彎。推動右搖桿轉身，直到正對最後一條跑道，然後把左搖桿上推，一直走到紅旗被你甩在身後。',
   'hudChrome.bootcamp.cameraTitle': '轉動視角',
   'hudChrome.bootcamp.cameraBody':
     '交上成績之前還有最後一課：按住滑鼠右鍵並拖動，把視角繞著自己整整轉上一圈。知道身後站著什麼，才能打贏仗。',

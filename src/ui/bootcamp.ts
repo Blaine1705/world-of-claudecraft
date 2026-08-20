@@ -507,6 +507,7 @@ export class BootcampOverlay {
     const labels = {
       forwardKey: keybinds.primaryLabel('forward') || unbound,
       turnKey: keybinds.primaryLabel('turnRight') || unbound,
+      turnLeftKey: keybinds.primaryLabel('turnLeft') || unbound,
       strafeKey: keybinds.primaryLabel('strafeLeft') || unbound,
       interactKey: keybinds.primaryLabel('interact') || unbound,
     };
@@ -607,6 +608,7 @@ export class BootcampOverlay {
       const caps = bootcampKeycaps(this.step, mode, {
         forwardKey: keybinds.primaryLabel('forward') || unbound,
         turnKey: keybinds.primaryLabel('turnRight') || unbound,
+        turnLeftKey: keybinds.primaryLabel('turnLeft') || unbound,
         strafeKey: keybinds.primaryLabel('strafeLeft') || unbound,
         interactKey: keybinds.primaryLabel('interact') || unbound,
       });

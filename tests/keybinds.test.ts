@@ -340,18 +340,17 @@ describe('resetSlots (action-bar-only reset)', () => {
 });
 
 describe('Attack Move (shared key)', () => {
-  it('defaults to A, sharing the code with Strafe Left', () => {
-    // A strafes since the tutorial's "A then W" ruling (turn left moved to
-    // Q); Attack Move keeps riding the same shared A.
+  it('defaults to A, sharing the code with Turn Left', () => {
     const kb = new Keybinds();
     expect(actionAllowsShared('attackMove')).toBe(true);
-    expect(actionAllowsShared('strafeLeft')).toBe(false);
+    expect(actionAllowsShared('turnLeft')).toBe(false);
     expect(kb.codeAt('attackMove', 0)).toBe('KeyA');
-    expect(kb.codeAt('strafeLeft', 0)).toBe('KeyA');
-    expect(kb.codeAt('turnLeft', 0)).toBe('KeyQ');
-    // actionForCode prefers Strafe Left (earlier in the registry); Attack
-    // Move is dispatched ahead of it by Input only while its mode is on.
-    expect(kb.actionForCode('KeyA')).toBe('strafeLeft');
+    expect(kb.codeAt('turnLeft', 0)).toBe('KeyA');
+    // Classic-era layout: A/D turn, Q/E strafe.
+    expect(kb.codeAt('strafeLeft', 0)).toBe('KeyQ');
+    // actionForCode prefers Turn Left (earlier in the registry); Attack Move is
+    // dispatched ahead of it by Input only while its mode is on.
+    expect(kb.actionForCode('KeyA')).toBe('turnLeft');
   });
 
   it('keeps its shared A across a save/reload that rebinds another action', () => {
@@ -359,18 +358,18 @@ describe('Attack Move (shared key)', () => {
     first.bind('jump', 0, 'KeyT'); // any rebind persists the whole map
     const reloaded = new Keybinds();
     expect(reloaded.codeAt('attackMove', 0)).toBe('KeyA');
-    expect(reloaded.codeAt('strafeLeft', 0)).toBe('KeyA');
+    expect(reloaded.codeAt('turnLeft', 0)).toBe('KeyA');
   });
 
-  it('does not steal A from Strafe Left when (re)bound, nor get stolen', () => {
+  it('does not steal A from Turn Left when (re)bound, nor get stolen', () => {
     const kb = new Keybinds();
-    // rebinding Attack Move onto A must leave Strafe Left's A intact
+    // rebinding Attack Move onto A must leave Turn Left's A intact
     expect(kb.bind('attackMove', 0, 'KeyA')).toBe(true);
-    expect(kb.codeAt('strafeLeft', 0)).toBe('KeyA');
+    expect(kb.codeAt('turnLeft', 0)).toBe('KeyA');
     // and binding another action to A must not strip Attack Move's shared A
     expect(kb.bind('bags', 0, 'KeyA')).toBe(true);
     expect(kb.codeAt('attackMove', 0)).toBe('KeyA');
-    expect(kb.codeAt('strafeLeft', 0)).toBe(null); // non-shared loses it as usual
+    expect(kb.codeAt('turnLeft', 0)).toBe(null); // non-shared loses it as usual
   });
 });
 
@@ -572,14 +571,11 @@ describe('per-character scope', () => {
       }),
     );
     const fresh = new Keybinds('char:alice');
-    // Re-seeded to the CURRENT defaults (A strafes since the tutorial's
-    // "A then W" ruling; Q turns), not to the overhaul-era Q.
-    expect(fresh.codeAt('strafeLeft', 0)).toBe('KeyA');
+    expect(fresh.codeAt('strafeLeft', 0)).toBe('KeyQ');
     expect(fresh.codeAt('strafeRight', 0)).toBe('KeyE');
     expect(fresh.codeAt('slot10', 0)).toBe('Minus');
     expect(fresh.codeAt('slot11', 0)).toBe('Equal');
-    expect(fresh.actionForCode('KeyA')).toBe('strafeLeft');
-    expect(fresh.actionForCode('KeyQ')).toBe('turnLeft');
+    expect(fresh.actionForCode('KeyQ')).toBe('strafeLeft');
     expect(fresh.actionForCode('KeyE')).toBe('strafeRight');
   });
 

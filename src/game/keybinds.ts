@@ -99,15 +99,12 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'held',
     defaults: ['KeyS', 'ArrowDown'],
   },
-  // A strafes, Q turns (the playtest ruling: the Gauntlet's last lane
-  // teaches "A then W", and new players expect A to sidestep). D stays the
-  // turn key its own lane lesson teaches; E keeps the right-hand strafe.
   {
     id: 'turnLeft',
     label: 'Turn Left',
     category: 'Movement',
     kind: 'held',
-    defaults: ['KeyQ', 'ArrowLeft'],
+    defaults: ['KeyA', 'ArrowLeft'],
   },
   {
     id: 'turnRight',
@@ -121,7 +118,7 @@ export const BIND_ACTIONS: BindAction[] = [
     label: 'Strafe Left',
     category: 'Movement',
     kind: 'held',
-    defaults: ['KeyA'],
+    defaults: ['KeyQ'],
   },
   {
     id: 'strafeRight',

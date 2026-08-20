@@ -671,13 +671,18 @@ export const hudChromeStrings = {
       'Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.',
     turnwalkBodyPad:
       'Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.',
-    strafeTitle: 'Strafe the last lane',
+    // Lane 3's corner, taught with the SAME shape as lane 2's: turn to face
+    // the lane, THEN walk it. One idiom for both corners, and the same
+    // sentence on keyboard, touch and pad, so nobody has to learn the course
+    // twice (the playtest ruling). Only the hand differs: left here, right
+    // there.
+    strafeTitle: 'Turn, then walk',
     strafeBody:
-      'There is another way to move sideways. Tap {strafeKey} to sidestep into the last lane, then hold {forwardKey} and strafe with {strafeKey} until the red flag is behind you. Strafing keeps your eyes on a target while you move: you will fight this way one day.',
+      'One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.',
     strafeBodyTouch:
-      'There is another way to move sideways. Push the movement stick left to strafe down the last lane until the red flag is behind you.',
+      'One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.',
     strafeBodyPad:
-      'There is another way to move sideways. Push the left stick left to strafe down the last lane until the red flag is behind you.',
+      'One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.',
     cameraTitle: 'Swing the camera',
     cameraBody:
       'One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.',

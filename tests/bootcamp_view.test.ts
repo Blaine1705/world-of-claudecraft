@@ -100,16 +100,29 @@ describe('copy plans', () => {
     }
   });
 
-  it('the strafe lesson sequences the strafe key then forward', () => {
-    // The camera got its own end-of-course lesson, and the turn lesson
-    // already happened a lane ago: the strafe copy teaches the press ORDER
-    // (sidestep, then hold forward) and must reintroduce neither mouse-drag
-    // view control nor the turn key.
-    const plan = bootcampBodyPlan('strafe', 'keyboard');
-    expect(plan.params).toEqual(['strafeKey', 'forwardKey']);
-    const body = t(plan.bodyKey, { strafeKey: 'Q', forwardKey: 'W' });
+  it('both corners teach ONE shape: turn, then walk, on every input', () => {
+    // The playtest ruling. Lane 2 turns right and lane 3 turns left, but the
+    // instruction is the same sentence and the same press order in both, so a
+    // new player never learns the course twice. Keyboard names the two binds;
+    // touch and pad name their own affordances, in the same order.
+    const lane2 = bootcampBodyPlan('turnwalk', 'keyboard');
+    const lane3 = bootcampBodyPlan('strafe', 'keyboard');
+    expect(lane2.params).toEqual(['turnKey', 'forwardKey']);
+    expect(lane3.params).toEqual(['turnLeftKey', 'forwardKey']);
+    const body = t(lane3.bodyKey, { turnLeftKey: 'A', forwardKey: 'W' });
+    // Turn FIRST, walk second, and no sidestep anywhere in the lesson.
+    expect(body.indexOf('A')).toBeLessThan(body.indexOf('W'));
+    expect(body).not.toMatch(/strafe|sidestep/i);
     expect(body).not.toMatch(/mouse/i);
-    expect(body.indexOf('Q')).toBeLessThan(body.indexOf('W'));
+    for (const mode of ['touch', 'pad'] as const) {
+      const copy = t(bootcampBodyPlan('strafe', mode).bodyKey);
+      expect(copy, mode).toMatch(/turn/i);
+      expect(copy, mode).not.toMatch(/strafe|sidestep/i);
+      // The turn is named before the walk in every arm.
+      expect(copy.search(/turn/i), mode).toBeLessThan(copy.search(/walk|push the stick up/i));
+    }
+    // Both corners share a title, because they are the same lesson twice.
+    expect(t(bootcampTitleKey('strafe'))).toBe(t(bootcampTitleKey('turnwalk')));
   });
 
   it('touch and pad copy never interpolate bind labels', () => {
@@ -122,11 +135,18 @@ describe('copy plans', () => {
   });
 
   it('keycap chips show the ordered buttons per lesson, keyboard only', () => {
-    const labels = { forwardKey: 'W', turnKey: 'D', strafeKey: 'Q', interactKey: 'F' };
+    const labels = {
+      forwardKey: 'W',
+      turnKey: 'D',
+      turnLeftKey: 'A',
+      strafeKey: 'Q',
+      interactKey: 'F',
+    };
     expect(bootcampKeycaps('talk', 'keyboard', labels)).toEqual(['F']);
     expect(bootcampKeycaps('forward', 'keyboard', labels)).toEqual(['W']);
+    // The two corners: right then walk, left then walk.
     expect(bootcampKeycaps('turnwalk', 'keyboard', labels)).toEqual(['D', 'W']);
-    expect(bootcampKeycaps('strafe', 'keyboard', labels)).toEqual(['Q', 'W']);
+    expect(bootcampKeycaps('strafe', 'keyboard', labels)).toEqual(['A', 'W']);
     // The camera lesson is mouse/stick work: no keycaps anywhere.
     expect(bootcampKeycaps('camera', 'keyboard', labels)).toEqual([]);
     expect(bootcampKeycaps('done', 'keyboard', labels)).toEqual(['F']);

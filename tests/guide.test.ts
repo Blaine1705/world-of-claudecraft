@@ -1468,7 +1468,7 @@ describe('Guide controls reference completeness', () => {
     // whole claim the Arrow Keys row makes.
     expect(defaults.get('forward')).toEqual(['KeyW', 'ArrowUp']);
     expect(defaults.get('back')).toEqual(['KeyS', 'ArrowDown']);
-    expect(defaults.get('turnLeft')).toEqual(['KeyQ', 'ArrowLeft']);
+    expect(defaults.get('turnLeft')).toEqual(['KeyA', 'ArrowLeft']);
     expect(defaults.get('turnRight')).toEqual(['KeyD', 'ArrowRight']);
   });
 
