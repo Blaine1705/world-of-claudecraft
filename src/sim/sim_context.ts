@@ -278,6 +278,10 @@ export interface SimContextPrimitives {
   // backing field stays Sim-owned (the Market instance owns it), exposed here as a live
   // read-only view (never reassigned by the readout).
   readonly devCommands: boolean;
+  // The compulsory-tutorial host opt-in (SimConfig.compulsoryTutorial): the
+  // greeting sweep only force-ferries fresh characters where a live world
+  // turned it on; tests, parity traces, and the RL env keep it off.
+  readonly compulsoryTutorial: boolean;
   readonly marketListings: MarketListing[];
   // Bank system: the live array of every `banker: true` NPC id, seeded by
   // the Sim ctor NPC loop. bank.ts reads it to gate deposit/withdraw/buy-slots on
@@ -1356,6 +1360,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get devCommands() {
       return host.devCommands;
+    },
+    get compulsoryTutorial() {
+      return host.compulsoryTutorial;
     },
     get marketListings() {
       return host.marketListings;

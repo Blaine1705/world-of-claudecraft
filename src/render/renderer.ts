@@ -10967,8 +10967,8 @@ export class Renderer {
         const isPortalObject = isPersistentPortalObject(e);
         const vis = syncDelveInteractableVisibility(
           v.group,
-          e.templateId,
-          e.lootable,
+          e,
+          this.sim.questLog,
           v.compilePending,
           !isPortalObject || d2 <= this.entityViewCreateRangeSq,
         );

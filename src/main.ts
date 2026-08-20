@@ -5285,9 +5285,9 @@ async function startOffline(
         playerClass,
         playerName: name,
         devCommands: import.meta.env.DEV,
-        // The offline world runs the ranked rift portal scheduler like the live
-        // server (custom editor play-test maps keep it off: their zones differ).
+        // Live-world features (custom editor play-test maps keep both off).
         riftPortals: world === undefined,
+        compulsoryTutorial: world === undefined,
         valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
         // Match the live server's proven-safe idle-AI interest throttle. Ordinary
         // entity rigs are gone by 96 yd and mob aggro caps at 20 yd, so this removes

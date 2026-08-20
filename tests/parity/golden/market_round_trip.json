@@ -1542,8 +1542,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 996,
-      "state": "47791a02",
-      "events": "4f61a4a2",
+      "state": "b3248204",
+      "events": "3bc3e745",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1553,7 +1553,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 996,
-      "state": "47791a02",
+      "state": "b3248204",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1623,8 +1623,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1692,8 +1691,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1816,7 +1814,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 996,
-      "state": "5bb9f8a6",
+      "state": "7c653408",
       "events": "158e16a7",
       "rng": {
         "draws": 0,
@@ -1889,8 +1887,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1958,8 +1955,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -2082,7 +2078,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 996,
-      "state": "5bb9f8a6",
+      "state": "7c653408",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2155,8 +2151,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -2224,8 +2219,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [

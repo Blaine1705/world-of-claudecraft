@@ -68,7 +68,6 @@ import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professio
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
-import { questProgressForWire } from '../src/sim/quests/interact_object_credit';
 import {
   catalogCharacterCompletion,
   characterReliquaryOwnership,
@@ -2097,6 +2096,7 @@ export class GameServer {
       playerClass: 'warrior',
       noPlayer: true,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
+      compulsoryTutorial: true, // live realm: legacy fresh mainland rows get ferried too
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
       worldBossAtBoot: true,
@@ -9486,10 +9486,9 @@ export class GameServer {
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);
       maybe('cosmetics', anchorSession.accountCosmetics);
-      // questProgressForWire strips the server-only per-object interact ledger:
-      // the client never reads it, and this snapshot's build + stringify is the
-      // dominant avoidable broadcast cost, so it does not carry bookkeeping.
-      maybe('qlog', [...meta.questLog.values()].map(questProgressForWire));
+      // qlog carries creditedObjects (the opened-crate per-viewer hide,
+      // src/sim/quests/opened_object_view.ts): bounded, personal, on-change.
+      maybe('qlog', [...meta.questLog.values()]);
       maybe('qdone', [...meta.questsDone]);
       maybe('milestones', [...meta.unlockedMilestones]);
       // Book of Deeds: the earned map (deed id -> utcDay) and the COMPLETE

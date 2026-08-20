@@ -315,8 +315,8 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 995,
-      "state": "f7f6646c",
-      "events": "3125c738",
+      "state": "4fa49993",
+      "events": "e3ca349b",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -425,7 +425,6 @@
             }
           },
           "townFocus": {},
-          "tutorialGreetingSent": true,
           "xp": 36
         }
       ],
@@ -500,7 +499,7 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 995,
-      "state": "3c9d8991",
+      "state": "488e424a",
       "events": "4ca29829",
       "rng": {
         "draws": 2,
@@ -610,7 +609,6 @@
             }
           },
           "townFocus": {},
-          "tutorialGreetingSent": true,
           "xp": 36
         }
       ],
@@ -685,7 +683,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 995,
-      "state": "c12834d3",
+      "state": "13c8e3d4",
       "events": "663dceb7",
       "rng": {
         "draws": 2,
@@ -795,7 +793,6 @@
             }
           },
           "townFocus": {},
-          "tutorialGreetingSent": true,
           "xp": 36
         }
       ],
@@ -870,7 +867,7 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 995,
-      "state": "6c499b06",
+      "state": "820db09d",
       "events": "5fe0394b",
       "rng": {
         "draws": 4,
@@ -989,7 +986,6 @@
             }
           },
           "townFocus": {},
-          "tutorialGreetingSent": true,
           "xp": 72
         }
       ],
@@ -1064,7 +1060,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 995,
-      "state": "3b95dd29",
+      "state": "fc3d8464",
       "events": "054c944d",
       "rng": {
         "draws": 6,
@@ -1191,7 +1187,6 @@
             }
           },
           "townFocus": {},
-          "tutorialGreetingSent": true,
           "xp": 108
         }
       ],
@@ -1266,7 +1261,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 995,
-      "state": "dd58f186",
+      "state": "83568803",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -1393,7 +1388,6 @@
             }
           },
           "townFocus": {},
-          "tutorialGreetingSent": true,
           "xp": 108
         }
       ],

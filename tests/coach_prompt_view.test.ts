@@ -8,13 +8,19 @@ import { describe, expect, it } from 'vitest';
 // The generation-side line list (plain mjs data): the clip keys the UI plays
 // must each have a text entry the ElevenLabs pipeline renders.
 import { EXTRA_LINES } from '../scripts/voices/extra_lines.mjs';
+import { CLIMB_MIN_OVERHEAD } from '../src/sim/climb';
+import { MANTLE_REACH } from '../src/sim/colliders';
 import {
   PROVING_SHORE_NPCS,
   PROVING_SHORE_PROPS,
   PROVING_SHORE_QUESTS,
 } from '../src/sim/content/proving_shore';
 import { CRAB_SUMMON_SITE } from '../src/sim/interactions/crab_summon';
+import { LEDGE_GRAB_MAX } from '../src/sim/physics/ledge';
+import { campCrateShape } from '../src/sim/prop_layout';
 import { INTERACT_RANGE } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import { BELL_STEP_TARGET } from '../src/ui/bootcamp_view';
 import {
   BOOTCAMP_PARKOUR,
@@ -164,6 +170,26 @@ describe('coachPromptPlan: which target carries the bubble', () => {
     const pastRail = plan({ step: 'turnwalk', playerPos: { x: -308, z: -24.5 } });
     expect({ x: pastRail!.x, z: pastRail!.z }).toEqual(BOOTCAMP_PARKOUR[1]);
     expect(plan({ step: 'turnwalk', playerPos: { x: -308, z: -28.5 } })).toBeNull();
+  });
+
+  it('the parkour ledge tops sit in the climb band from the approach ground', () => {
+    // Two-high crate stacks must FORCE the climb move: taller than the
+    // jump-mantle can vault (CLIMB_MIN_OVERHEAD), inside the grab reach at
+    // apex (apex + LEDGE_GRAB_MAX). Measured against the real terrain on
+    // the approach side (north of the wall, where the jump launches).
+    const apex = CLIMB_MIN_OVERHEAD - MANTLE_REACH;
+    const grabCeiling = apex + LEDGE_GRAB_MAX;
+    const stacked = (PROVING_SHORE_PROPS.crates ?? []).filter(([, z]) => z === -27);
+    expect(stacked.length).toBeGreaterThanOrEqual(6);
+    stacked.forEach(([x, z, stack], i) => {
+      expect(stack, `crate[${i}] stack`).toBe(2);
+      const shape = campCrateShape(x, z, i);
+      const top = groundHeight(x, z, WORLD_SEED) + shape.top * 2;
+      const approach = groundHeight(x, z + 2, WORLD_SEED);
+      const rise = top - approach;
+      expect(rise, `crate[${i}] rise`).toBeGreaterThan(CLIMB_MIN_OVERHEAD + 0.05);
+      expect(rise, `crate[${i}] rise`).toBeLessThan(grabCeiling - 0.1);
+    });
   });
 
   it('anchors the parkour asks on the authored obstacles', () => {

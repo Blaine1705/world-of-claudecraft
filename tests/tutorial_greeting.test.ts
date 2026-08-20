@@ -12,7 +12,9 @@ import { maybeEmitTutorialGreeting, updateTutorialGreeting } from '../src/sim/tu
 import type { SimEvent } from '../src/sim/types';
 
 function makeSim(seed = 4120): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  // The greeting suite exercises the live-world arm, so it opts in like the
+  // offline client and the server do (SimConfig.compulsoryTutorial).
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, compulsoryTutorial: true });
 }
 
 function greetCtx(sim: Sim) {
@@ -29,19 +31,28 @@ function greetCtx(sim: Sim) {
 }
 
 describe('tutorial greeting one-shot', () => {
-  it('emits exactly once for a fresh character, carrying firstCharacter', () => {
+  it('forces a fresh mainland character onto the island, exactly once', () => {
+    // The tutorial is compulsory (the playtest ruling): no offer, no skip.
+    // A fresh character standing anywhere off the island (the offline Sim's
+    // town spawn, a legacy save that never played) is ferried straight to
+    // the arrival and welcomed by Odo.
     const sim = makeSim();
     const meta = sim.players.get(sim.playerId)!;
-    const first = greetCtx(sim);
-    expect(maybeEmitTutorialGreeting(meta, first.ctx)).toBe(true);
-    expect(first.emitted).toEqual([
-      { type: 'tutorialGreeting', pid: sim.playerId, firstCharacter: true },
+    const p = sim.entities.get(sim.playerId)!;
+    sim.drainEvents();
+    expect(maybeEmitTutorialGreeting(meta, sim.ctx)).toBe(true);
+    const events = sim.drainEvents();
+    expect(events.filter((e) => e.type === 'ferryIslandArrival')).toEqual([
+      { type: 'ferryIslandArrival', pid: sim.playerId, firstVisit: true },
     ]);
+    // The old opt-in dialog is gone with the choice itself.
+    expect(events.filter((e) => e.type === 'tutorialGreeting')).toEqual([]);
+    expect(p.pos.x).toBeCloseTo(PROVING_SHORE_ARRIVAL.x, 3);
+    expect(p.pos.z).toBeCloseTo(PROVING_SHORE_ARRIVAL.z, 3);
     expect(meta.tutorialGreetingSent).toBe(true);
 
-    const second = greetCtx(sim);
-    expect(maybeEmitTutorialGreeting(meta, second.ctx)).toBe(false);
-    expect(second.emitted).toEqual([]);
+    expect(maybeEmitTutorialGreeting(meta, sim.ctx)).toBe(false);
+    expect(sim.drainEvents().filter((e) => e.type === 'ferryIslandArrival')).toEqual([]);
   });
 
   it('greets a fresh character ALREADY ashore with the island arrival, not the ferry offer', () => {
@@ -89,9 +100,10 @@ describe('tutorial greeting one-shot', () => {
     raw.tickCount = 19;
     updateTutorialGreeting(ctx);
     expect(emitted).toEqual([]);
-    raw.tickCount = 20;
-    updateTutorialGreeting(ctx);
-    expect(emitted).toHaveLength(1);
+    // The firing arm itself displaces through the real SimContext (covered
+    // by the real-tick test below); the stub only proves the cadence gate.
+    const meta = sim.players.get(sim.playerId)!;
+    expect(meta.tutorialGreetingSent).toBe(false);
   });
 
   it('fires through the real Sim.tick mail phase within the first second', () => {
@@ -100,14 +112,16 @@ describe('tutorial greeting one-shot', () => {
     // The sweep runs on the 1 Hz cadence, so 21 real ticks cover the first
     // firing window through the actual mail-phase wiring, not a stub ctx.
     for (let t = 0; t < 21; t++) seen.push(...sim.tick());
-    const greetings = seen.filter((e) => e.type === 'tutorialGreeting');
-    expect(greetings).toEqual([
-      { type: 'tutorialGreeting', pid: sim.playerId, firstCharacter: true },
-    ]);
+    const arrivals = seen.filter((e) => e.type === 'ferryIslandArrival');
+    expect(arrivals).toEqual([{ type: 'ferryIslandArrival', pid: sim.playerId, firstVisit: true }]);
+    // The compulsory ferry landed the offline town spawn on the island.
+    const p = sim.entities.get(sim.playerId)!;
+    expect(p.pos.x).toBeCloseTo(PROVING_SHORE_ARRIVAL.x, 3);
+    expect(p.pos.z).toBeCloseTo(PROVING_SHORE_ARRIVAL.z, 3);
     // And never again on later swept ticks.
     const later: SimEvent[] = [];
     for (let t = 0; t < 21; t++) later.push(...sim.tick());
-    expect(later.filter((e) => e.type === 'tutorialGreeting')).toEqual([]);
+    expect(later.filter((e) => e.type === 'ferryIslandArrival')).toEqual([]);
   });
 
   it('the Gauntlet run credits its flags in running order, by position, through real ticks', () => {
@@ -151,7 +165,7 @@ describe('tutorial greeting one-shot', () => {
     const bare = sim.serializeCharacter(sim.playerId);
     expect(bare && 'tutorialGreetingSent' in bare).toBe(false);
 
-    maybeEmitTutorialGreeting(meta, greetCtx(sim).ctx);
+    maybeEmitTutorialGreeting(meta, sim.ctx);
     const saved = sim.serializeCharacter(sim.playerId);
     expect(saved?.tutorialGreetingSent).toBe(true);
 
@@ -164,13 +178,18 @@ describe('tutorial greeting one-shot', () => {
     expect(afterLoad.emitted).toEqual([]);
   });
 
-  it('carries firstCharacter: false when the server stamps a later character', () => {
+  it('forces a LATER fresh character ashore too: compulsory is per character', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('mage', 'Secondling', { firstCharacter: false });
     const meta = sim.players.get(pid)!;
-    const { ctx, emitted } = greetCtx(sim);
-    expect(maybeEmitTutorialGreeting(meta, ctx)).toBe(true);
-    expect(emitted).toEqual([{ type: 'tutorialGreeting', pid, firstCharacter: false }]);
+    sim.drainEvents();
+    expect(maybeEmitTutorialGreeting(meta, sim.ctx)).toBe(true);
+    const events = sim.drainEvents();
+    expect(events.filter((e) => e.type === 'ferryIslandArrival')).toEqual([
+      { type: 'ferryIslandArrival', pid, firstVisit: true },
+    ]);
+    const p = sim.entities.get(pid)!;
+    expect(p.pos.x).toBeCloseTo(PROVING_SHORE_ARRIVAL.x, 3);
   });
 });
 

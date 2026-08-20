@@ -1829,8 +1829,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 1010,
-      "state": "bb548a11",
-      "events": "b4542b1b",
+      "state": "6bd95d91",
+      "events": "5b8a06c8",
       "rng": {
         "draws": 44,
         "digest": "8329963e"
@@ -1840,7 +1840,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 1010,
-      "state": "8f6135d1",
+      "state": "b7ff3351",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -1923,8 +1923,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -2004,8 +2003,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -2117,7 +2115,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 1010,
-      "state": "8f6135d1",
+      "state": "b7ff3351",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -2200,8 +2198,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -2281,8 +2278,7 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [

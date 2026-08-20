@@ -4332,7 +4332,7 @@ export const en_CA: EnTranslations = {
       "arrowKeys": "Arrow Keys",
       "groupPet": "Pet commands",
       "petBar": "Pet bar: Attack, Stop, Taunt, Defensive, Aggressive (with a hunter or warlock pet out)",
-      "attackMoveNote": "Attack Move stays off until you switch it on: open the Key Bindings panel, turn it on, and the A row above starts working. With the cursor over the game world, it walks you toward the cursor and opens up on the enemy under it, or on the first hostile you meet along the way. While the option is on, A issues that attack move instead of turning left, so turn with the left arrow key, which Turn Left also carries by default, or give Turn Left a key of your own.",
+      "attackMoveNote": "Attack Move stays off until you switch it on: open the Key Bindings panel, turn it on, and the A row above starts working. With the cursor over the game world, it walks you toward the cursor and opens up on the enemy under it, or on the first hostile you meet along the way. While the option is on, A issues that attack move instead of strafing left, so sidestep with a key of your own, or keep strafing on E and turning on Q and the left arrow key.",
       "mobileHeading": "On mobile",
       "mobileBody": "Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere else to look, pinch with two fingers to zoom the camera, and on-screen buttons for your abilities and menus. A small arrow in the top left corner shows or hides the menu buttons, and the More button there holds the rest of your windows.",
       "controllerHeading": "On a controller",

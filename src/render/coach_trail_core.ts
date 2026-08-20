@@ -25,7 +25,10 @@ import {
  *  the objective counts the gauntlet leg keys on). */
 export interface CoachGuideReader {
   questState(id: string): string;
-  questLog: ReadonlyMap<string, { state: string; counts?: readonly number[] }>;
+  questLog: ReadonlyMap<
+    string,
+    { state: string; counts?: readonly number[]; creditedObjects?: readonly string[] }
+  >;
 }
 
 export interface CoachTrailPlan {

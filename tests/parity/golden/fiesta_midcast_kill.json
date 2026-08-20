@@ -31,8 +31,8 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 998,
-      "state": "7065b645",
-      "events": "f235a85f",
+      "state": "f4dcc20b",
+      "events": "341204d7",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 998,
-      "state": "371c71f2",
+      "state": "3026978c",
       "events": "f5e280c1",
       "rng": {
         "draws": 64,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 998,
-      "state": "02d0be94",
+      "state": "a0005d76",
       "events": "91a69131",
       "rng": {
         "draws": 280,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 998,
-      "state": "f033d915",
+      "state": "1b2be69b",
       "events": "ea2ec131",
       "rng": {
         "draws": 530,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 998,
-      "state": "366d4a20",
+      "state": "15a90ce6",
       "events": "442a7d38",
       "rng": {
         "draws": 542,
@@ -155,8 +155,7 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -229,8 +228,7 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -301,8 +299,7 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -370,8 +367,7 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -602,7 +598,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 998,
-      "state": "dd804072",
+      "state": "670a563c",
       "events": "69cae17b",
       "rng": {
         "draws": 542,
@@ -682,8 +678,7 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -756,8 +751,7 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -828,8 +822,7 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -897,8 +890,7 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1127,7 +1119,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 998,
-      "state": "5208ed97",
+      "state": "326bf749",
       "events": "8f6b807e",
       "rng": {
         "draws": 542,
@@ -1210,8 +1202,7 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1284,8 +1275,7 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1357,8 +1347,7 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1426,8 +1415,7 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1656,7 +1644,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 998,
-      "state": "4b1bc653",
+      "state": "846bd205",
       "events": "741638a5",
       "rng": {
         "draws": 788,
@@ -1667,7 +1655,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 998,
-      "state": "b021519e",
+      "state": "4d337b14",
       "events": "741638a5",
       "rng": {
         "draws": 972,
@@ -1750,8 +1738,7 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1824,8 +1811,7 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1897,8 +1883,7 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1966,8 +1951,7 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
-          "tutorialGreetingSent": true
+          "townFocus": {}
         }
       ],
       "entities": [

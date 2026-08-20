@@ -812,19 +812,21 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     // (BOOTCAMP_PARKOUR below pins the obstacle line the bubble anchors to).
     { x1: -312, z1: -23, x2: -304, z2: -23 }, // lane 2 hurdle rail
   ],
-  // The parkour step: a line of salvage crates ACROSS lane 2 past the hurdle,
-  // shoulder to shoulder so there is no slipping between them. Crate points
-  // become standable colliders (colliders.ts PROPS.crates: moveTopY + the
-  // matching mesh), so the lesson is jump ON, walk OVER, hop DOWN: the
-  // island's first taste of parkour, right after the first fence jump.
+  // The parkour LEDGE: a double-stacked wall of salvage crates ACROSS lane 2
+  // past the hurdle, shoulder to shoulder so there is no slipping between
+  // them. Two units high puts every top in the ledge-climb band
+  // (src/sim/climb.ts: taller than the jump-mantle can vault, inside the
+  // grab reach), so the only way over is the real climb move: jump at the
+  // wall, grab the lip, pull up, hop down the far side. The island's first
+  // taste of parkour, right after the fence jump, exactly the playtest ask.
   crates: [
-    [-311.2, -27],
-    [-310.1, -27],
-    [-309, -27],
-    [-307.9, -27],
-    [-306.8, -27],
-    [-305.7, -27],
-    [-304.6, -27],
+    [-311.2, -27, 2],
+    [-310.1, -27, 2],
+    [-309, -27, 2],
+    [-307.9, -27, 2],
+    [-306.8, -27, 2],
+    [-305.7, -27, 2],
+    [-304.6, -27, 2],
   ],
   // The Gauntlet's flags mark its corners (pure dressing: no collider, no
   // entity; the bootcamp overlay detects arrival by position against the

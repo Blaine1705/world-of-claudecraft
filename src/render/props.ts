@@ -1662,18 +1662,32 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   });
 
   // ---- crates: camp clutter (wooden crate / barrel mix), hideable ----------
-  getActiveWorldContent().props.crates.forEach(([x, z], i) => {
+  getActiveWorldContent().props.crates.forEach(([x, z, stack], i) => {
     const kind: PropKey = i % 3 === 2 ? 'barrel' : 'crateWooden';
     const s = kind === 'barrel' ? 1.25 : 1.3 + propRand(x, z, 5) * 0.15;
+    // Unit height mirrors campCrateShape (prop_layout.ts): barrel 1.13,
+    // crate 0.878 * scale. Stacked levels sit flush on each other's tops so
+    // the drawn pile and the collider top agree.
+    const unitH = kind === 'barrel' ? 1.13 : 0.878 * s;
     const y = ground(x, z);
     const g = new THREE.Group();
-    addParts(g, kind, {
-      scale: s,
-      euler: new THREE.Euler((propRand(x, z, 7) - 0.5) * 0.05, ((x * 13 + z * 7) % 1) * Math.PI, 0),
-    });
+    const levels = stack ?? 1;
+    for (let level = 0; level < levels; level++) {
+      const holder = new THREE.Group();
+      addParts(holder, kind, {
+        scale: s,
+        euler: new THREE.Euler(
+          level === 0 ? (propRand(x, z, 7) - 0.5) * 0.05 : 0,
+          ((x * 13 + z * 7 + level * 5) % 1) * Math.PI,
+          0,
+        ),
+      });
+      holder.position.y = level * unitH;
+      g.add(holder);
+    }
     g.position.set(x, y - 0.04, z);
     group.add(shadowed(g));
-    registerHideable(g, circleFootprint(x, z, 0.65, y + 1.35));
+    registerHideable(g, circleFootprint(x, z, 0.65, y + 1.35 + (levels - 1) * unitH));
   });
 
   // ---- murloc mud huts: giant swamp mushrooms, doorway facing camp center --

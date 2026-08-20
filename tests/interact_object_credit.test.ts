@@ -12,13 +12,14 @@
 // authored spawn position (stable across restarts and deploys, unlike entity ids)
 // and recorded on the persisted QuestProgress.
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BOOTCAMP_COURSE_CHECKPOINTS } from '../src/sim/content/proving_shore';
 import { DUNGEONS, GROUND_OBJECTS, QUESTS } from '../src/sim/data';
 import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
-  questProgressForWire,
   recordInteractObjectCredit,
   sanitizeCreditedObjects,
 } from '../src/sim/quests/interact_object_credit';
@@ -485,32 +486,16 @@ describe('abandoning the quest clears the ledger', () => {
   });
 });
 
-describe('questProgressForWire (the server-only ledger never ships to clients)', () => {
-  it('strips the ledger and leaves every field the client reads', () => {
-    const qp: QuestProgress = {
-      questId: BELLS_QUEST,
-      counts: [2],
-      state: 'active',
-      selection: 'pick',
-      resolvedCounts: [3],
-      creditedObjects: ['0@256.0,0.0'],
-    };
-    const wire = questProgressForWire(qp);
-    expect(wire.creditedObjects).toBeUndefined();
-    expect(wire).toEqual({
-      questId: BELLS_QUEST,
-      counts: [2],
-      state: 'active',
-      selection: 'pick',
-      resolvedCounts: [3],
-    });
-    expect(JSON.stringify(wire)).not.toContain('creditedObjects');
-    expect(qp.creditedObjects, 'the live progress is not mutated').toEqual(['0@256.0,0.0']);
-  });
-
-  it('passes a ledger-free progress through without allocating a copy', () => {
-    const qp: QuestProgress = { questId: BELLS_QUEST, counts: [0], state: 'active' };
-    expect(questProgressForWire(qp)).toBe(qp);
+describe('the ledger ships to clients (the opened-crate per-viewer hide)', () => {
+  it('keeps creditedObjects on the wire row so the client can hide spent objects', () => {
+    // The old questProgressForWire strip is deliberately GONE: the client
+    // reads the ledger through opened_object_view.ts to render a credited
+    // ground object as gone for this player. This pins the qlog projection
+    // in server/game.ts staying a verbatim pass-through; a reintroduced
+    // strip would silently blind the hide again.
+    const gameTs = fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8');
+    expect(gameTs).toContain("maybe('qlog', [...meta.questLog.values()]);");
+    expect(gameTs).not.toContain('questProgressForWire');
   });
 });
 

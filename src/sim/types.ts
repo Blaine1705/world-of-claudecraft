@@ -3673,7 +3673,12 @@ export interface ZonePropsDef {
   }[];
   tents: { x: number; z: number; rot: number; scale: number }[];
   marshReeds: [number, number][];
-  crates: [number, number][];
+  /** [x, z, stack?]: camp clutter crates/barrels. The optional third element
+   *  stacks that many identical units at the point (default 1); a stack of 2
+   *  puts the top in the ledge-climb band (src/sim/climb.ts), the Gauntlet's
+   *  parkour lesson. Collider top and drawn meshes stay in lockstep through
+   *  campCrateShape (prop_layout.ts). */
+  crates: [number, number, number?][];
   campfires: [number, number][];
   mudHuts: [number, number][];
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
@@ -6893,6 +6898,12 @@ export interface SimConfig {
   // scheduler (rift/portals.ts). Default OFF so deterministic tests, parity
   // traces, and the RL env keep a portal-free world unless they opt in.
   riftPortals?: boolean;
+  // Live worlds (server + offline client): the tutorial is COMPULSORY for a
+  // genuinely fresh character (never asked, never skippable): the greeting
+  // sweep ferries a fresh mainland character straight to the Proving Shore.
+  // Default OFF so deterministic tests, parity traces, and the RL env never
+  // teleport a fresh character mid-scenario unless they opt in.
+  compulsoryTutorial?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.

@@ -32,28 +32,28 @@ function isFreshCharacter(meta: PlayerMeta): boolean {
   return meta.lifetimeXp === 0 && meta.questsDone.size === 0 && meta.questLog.size === 0;
 }
 
-/** The greeting one-shot: emit once ever, on the character's first swept
- *  tick. Flips the persisted flag BEFORE the emit (the prof_nudges idiom).
- *  Returns whether it emitted. */
+/** The greeting one-shot: engage once ever, on the character's first swept
+ *  tick. Flips the persisted flag BEFORE acting (the prof_nudges idiom).
+ *  Returns whether it engaged.
+ *
+ *  The tutorial is COMPULSORY for a fresh character (the playtest ruling:
+ *  never ask, never offer a skip): a newborn already ashore (the server
+ *  rolls fresh rows at PROVING_SHORE_ARRIVAL) gets Odo's arrival welcome,
+ *  and a fresh character anywhere else (the offline Sim's town spawn, a
+ *  legacy save that never played) is ferried straight to the island. The
+ *  bell beside the pier remains the way OFF at any time, so the shore is
+ *  never a cage, just the front door. The old opt-in tutorialGreeting
+ *  dialog (Bryn's take-or-skip offer) is gone with the choice itself. */
 export function maybeEmitTutorialGreeting(meta: PlayerMeta, ctx: SimContext): boolean {
   if (meta.tutorialGreetingSent) return false;
   meta.tutorialGreetingSent = true;
   if (!isFreshCharacter(meta)) return false;
-  // A newborn who is ALREADY ashore (the server rolls fresh characters at
-  // PROVING_SHORE_ARRIVAL) skips Bryn's ferry offer, which would read as
-  // nonsense mid-island, and gets Odo's arrival welcome instead. Fresh
-  // characters standing anywhere else (the offline Sim's town spawn, legacy
-  // saves) keep the opt-in greeting.
   const p = ctx.entities.get(meta.entityId);
-  if (p && isOnProvingShore(p.pos.x, p.pos.z)) {
-    emitIslandArrival(ctx, p, meta);
-    return true;
+  if (!p) return false;
+  if (!isOnProvingShore(p.pos.x, p.pos.z)) {
+    displacePlayer(ctx, p, PROVING_SHORE_ARRIVAL, 'The ferry sets you down on the Proving Shore.');
   }
-  ctx.emit({
-    type: 'tutorialGreeting',
-    pid: meta.entityId,
-    firstCharacter: meta.firstCharacter,
-  });
+  emitIslandArrival(ctx, p, meta);
   return true;
 }
 
@@ -62,6 +62,10 @@ export function maybeEmitTutorialGreeting(meta: PlayerMeta, ctx: SimContext): bo
  *  cadence. Zero rng, so its position in the tick tail cannot fork the draw
  *  order (it only emits events, which draw nothing). */
 export function updateTutorialGreeting(ctx: SimContext): void {
+  // The host opt-in (SimConfig.compulsoryTutorial): a deterministic test,
+  // parity trace, or RL episode must never see a fresh character ferried
+  // away mid-scenario, so the sweep only runs where a live world asked.
+  if (!ctx.compulsoryTutorial) return;
   if (ctx.tickCount % 20 !== 0) return;
   for (const meta of ctx.players.values()) maybeEmitTutorialGreeting(meta, ctx);
 }

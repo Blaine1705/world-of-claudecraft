@@ -639,6 +639,7 @@ export class BootcampOverlay {
           focus: this.lastFocus,
           entities: world.entities.values(),
           playerPos: p.pos,
+          questLog: world.questLog,
         })
       : null;
     if (!plan || !p || !coachPromptInRange(plan, p.pos)) {
@@ -784,9 +785,23 @@ function paintChipSequence(host: HTMLElement, caps: readonly string[]): void {
 }
 
 /** Class-toggle sweep for the press-this-next glow (same-state no-ops). */
+/** Must mirror the qd-coach-pulse duration (styles/components.css). */
+const GLOW_PULSE_MS = 900;
+
 function syncGlow(selector: string, want: (el: HTMLElement) => boolean): void {
   for (const el of document.querySelectorAll<HTMLElement>(selector)) {
-    el.classList.toggle('qd-coach', want(el));
+    const on = want(el);
+    el.classList.toggle('qd-coach', on);
+    // Windows that repaint per frame (the quest tracker) recreate their rows,
+    // and a recreated node restarts the pulse animation from zero: a strobe,
+    // not a pulse. A negative delay seeded from the shared wall clock resumes
+    // every node mid-cycle, so the glow breathes continuously no matter how
+    // often its element is rebuilt.
+    if (on) {
+      el.style.animationDelay = `-${(performance.now() % GLOW_PULSE_MS).toFixed(0)}ms`;
+    } else if (el.style.animationDelay) {
+      el.style.animationDelay = '';
+    }
   }
 }
 

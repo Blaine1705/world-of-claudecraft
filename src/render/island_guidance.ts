@@ -11,6 +11,7 @@
 
 import type * as THREE from 'three';
 import { isOnProvingShore } from '../sim/content/proving_shore';
+import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import { CoachTrail } from './coach_trail';
 import { type CoachGuideReader, type CoachGuides, coachGuides } from './coach_trail_core';
 import { beaconNpcIds } from './quest_beacon_core';
@@ -93,8 +94,9 @@ export class IslandGuidance {
   }
 }
 
-/** The nearest live castaway crate to the player, the crate haul's beam
- *  anchor (crates despawn between respawns, so this follows the roster). */
+/** The nearest live castaway crate the player has NOT already opened, the
+ *  crate haul's beam anchor (crates despawn between respawns and a credited
+ *  crate is gone for this viewer, so this follows both). */
 function nearestLiveCrate(world: GuideWorld): { x: number; z: number } | null {
   const p = world.player;
   if (!p) return null;
@@ -102,6 +104,7 @@ function nearestLiveCrate(world: GuideWorld): { x: number; z: number } | null {
   let bestD = Number.POSITIVE_INFINITY;
   for (const e of world.entities.values()) {
     if (e.kind !== 'object' || e.objectItemId !== CRATE_OBJECT_ITEM_ID || e.dead) continue;
+    if (isObjectOpenedByViewer(e, world.questLog)) continue;
     const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
     if (d < bestD) {
       bestD = d;

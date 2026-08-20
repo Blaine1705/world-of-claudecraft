@@ -16,6 +16,10 @@
 
 import { PROVING_SHORE_NPCS, PROVING_SHORE_QUESTS } from '../sim/content/proving_shore';
 import { CRAB_MOB_ID, CRAB_QUEST_ID, CRAB_SUMMON_SITE } from '../sim/interactions/crab_summon';
+import {
+  isObjectOpenedByViewer,
+  type OpenedObjectQuestRow,
+} from '../sim/quests/opened_object_view';
 import { INTERACT_RANGE } from '../sim/types';
 import { BELL_STEP_TARGET, type BootcampStep, type CoachFocus } from './bootcamp_view';
 import type { TranslationKey } from './i18n';
@@ -142,15 +146,19 @@ const KILL_LESSON_TEMPLATE: Readonly<Record<string, string>> = {
  *  summon gate itself, so the ask reads on approach). */
 export const LURE_PROMPT_RANGE = 10;
 
-/** The nearest live castaway crate to the player, or null between respawns. */
+/** The nearest live castaway crate the player has NOT already opened, or
+ *  null between respawns (an opened crate is gone for this viewer, so the
+ *  bubble never points at a crate that would only refuse). */
 export function nearestCrate(
   entities: Iterable<CoachPromptEntity>,
   playerPos: { x: number; z: number },
+  questLog?: ReadonlyMap<string, OpenedObjectQuestRow>,
 ): CoachPromptEntity | null {
   let best: CoachPromptEntity | null = null;
   let bestD = Number.POSITIVE_INFINITY;
   for (const e of entities) {
     if (e.kind !== 'object' || e.objectItemId !== CRATE_OBJECT_ITEM_ID || e.dead) continue;
+    if (questLog && isObjectOpenedByViewer(e, questLog)) continue;
     const d = planar(e.pos.x, e.pos.z, playerPos.x, playerPos.z);
     if (d < bestD) {
       bestD = d;
@@ -216,6 +224,9 @@ export function coachPromptPlan(args: {
   focus: CoachFocus | null;
   entities: Iterable<CoachPromptEntity>;
   playerPos: { x: number; z: number };
+  /** The viewer's quest log, for the opened-crate skip (optional so the
+   *  bell/ladder callers stay unchanged). */
+  questLog?: ReadonlyMap<string, OpenedObjectQuestRow>;
 }): CoachPromptPlan | null {
   if (args.bellPhase) {
     return {
@@ -289,7 +300,7 @@ export function coachPromptPlan(args: {
     };
   }
   if (focus.questId === 'q_ps_the_wreck_line') {
-    const crate = nearestCrate(args.entities, args.playerPos);
+    const crate = nearestCrate(args.entities, args.playerPos, args.questLog);
     if (!crate) return null;
     return {
       x: crate.pos.x,
