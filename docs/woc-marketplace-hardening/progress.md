@@ -5495,9 +5495,15 @@ VALIDATION at the tip (all re-run fresh): npx tsc --noEmit clean; the
 seven-suite pg battery 241 tests zero skips with TEST_DATABASE_URL on the
 command line only, single lane; the DB-free marketplace set 974 tests
 across 23 files; npm run ci:changed exit 0 (warnings only, pre-existing);
-node scripts/gate_select.mjs on the committed tree: result recorded in the
-state.md bullet (run with TEST_DATABASE_URL only, no tail pipe, clear
-field).
+node scripts/gate_select.mjs on the committed tree at code tip 7d9fb28dbb:
+PASS, ALL 12 STEPS green, full-suite fallback (2,943 test files passed plus
+the env-gated perf-budget skip; 42,059 tests with the 2 expected fails and
+the 26 known default skips), browser regressions 131, typecheck and all
+builds green, malware scan PASS (6,423 files, 0 high after priors). Run
+with TEST_DATABASE_URL on the command line only, no tail pipe, a clear
+field (no concurrent pg-suite runs; the mutation lane was idle). The two
+docs commits on top (this registry, a7d2587dbc and the gate-note wrap) are
+docs-only, the packet's recorded wrap pattern.
 
 NEXT = docs/woc-marketplace-hardening/rider-escrow-write-path-qa.md, GAME
 repo, worktree wocc-marketplace, FRESH session, newest origin/release/**

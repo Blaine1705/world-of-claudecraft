@@ -37,8 +37,9 @@ actually reads.
   control, 1 in-round-upgraded survivor, 4 stale-verdict re-runs BIT
   (rider section + re-verification block in phase-20-mutation-log.md).
   Validation at the tip: tsc clean; pg battery SEVEN suites 241 tests zero
-  skips; DB-free set 974 tests; ci:changed exit 0; gate result in the
-  progress entry's final note. TWO MAINTAINER RULINGS OPEN: the
+  skips; DB-free set 974 tests; ci:changed exit 0; gate PASS all 12 steps
+  at code tip 7d9fb28dbb (full-suite fallback, 42,059 tests plus browser
+  131, docs-only wrap commits on top). TWO MAINTAINER RULINGS OPEN: the
   woc_market.ts ceiling raise 4000 -> 4037 inside the rider (net 447 DOWN
   overall; declaration-surface justification), and the standing
   woc_market_db.ts no-ratchet-row question (its rider growth +158, all
