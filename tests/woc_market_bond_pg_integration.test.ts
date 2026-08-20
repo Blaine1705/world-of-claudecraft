@@ -2120,6 +2120,16 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
          VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))`,
         [realm, there, buyer, BASE_MS - 1_000],
       );
+      // A RIVAL at the hourly cap spends nothing of ours: the cap counts the
+      // claimer's own ledger only.
+      const rival = await seedAccount();
+      for (let i = 2; i <= 4; i++) {
+        await pool.query(
+          `INSERT INTO woc_market_buy_now_abandons (realm, listing_id, account, lock_expires)
+           VALUES ($1, $2, $3, to_timestamp($4 / 1000.0))`,
+          [realm, there, rival, BASE_MS - i * 1_000],
+        );
+      }
       const claimed = await marketDb.claimBuyNowLock(
         realm,
         here,
@@ -2335,6 +2345,21 @@ describeDb('woc market bond and lock lifecycle against real Postgres', () => {
       // The ledger dedupes on the window triple.
       await marketDb.recordBuyNowAbandon(realm, wrongWindow, buyer, lockExp);
       expect(await recorded(wrongWindow), 'one window, one row').toBe(1);
+      // ANOTHER buyer's chain-plausible failure exempts nothing for ours.
+      const rivalBuyer = await seedAccount();
+      const rivalWindow = await seedListing(realm, seller);
+      seq++;
+      await pool.query(
+        `INSERT INTO woc_market_settlements (
+           listing_id, realm, bid_id, attempt, buyer_account, buyer_character,
+           buyer_name, buyer_wallet, amount_cents, state, deadline_at,
+           tx_signature, fail_reason
+         ) VALUES ($1, $2, NULL, 0, $3, 1, 'R', 'w', 1000, 'failed',
+                   to_timestamp($4 / 1000.0), $5, $6)`,
+        [rivalWindow, realm, rivalBuyer, lockExp, `exempt-sig-${seq}`, exemptReason],
+      );
+      await marketDb.recordBuyNowAbandon(realm, rivalWindow, buyer, lockExp);
+      expect(await recorded(rivalWindow), 'exemption is per buyer').toBe(1);
     });
 
     it('the schema enforces one bond per reference', async () => {

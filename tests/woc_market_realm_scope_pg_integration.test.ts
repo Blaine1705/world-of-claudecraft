@@ -354,6 +354,8 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const buyer = await seedAccount();
       const a = await seedListing(alpha, seller);
       const aDirected = await seedListing(alpha, seller, { directedBuyerAccount: buyer });
+      // Closed rows must leave the public browse too (the liveness status set).
+      await seedListing(alpha, seller, { status: 'closed', resolution: 'cancelled' });
       const b = await seedListing(beta, seller);
       const bDirected = await seedListing(beta, seller, { directedBuyerAccount: buyer });
 
@@ -370,9 +372,12 @@ describeDb('woc market realm scoping against real Postgres', () => {
       });
       expect(listingIds(browse.rows)).toEqual([a]);
 
-      expect(listingIds(await marketDb.listingsBySeller(alpha, seller))).toEqual([a, aDirected]);
+      expect(listingIds(await marketDb.listingsBySeller(alpha, seller)).slice(0, 2)).toEqual([
+        a,
+        aDirected,
+      ]);
       // The SAME seller holds two non-closed listings in beta; the count must
-      // not see them.
+      // not see them (and the alpha closed row never counts).
       expect(await marketDb.countActiveBySeller(alpha, seller)).toBe(2);
       expect(listingIds(await marketDb.directedOffersForBuyer(alpha, buyer))).toEqual([aDirected]);
       expect(listingIds(await marketDb.directedOffersForBuyer(alpha, buyer))).not.toContain(
@@ -381,7 +386,7 @@ describeDb('woc market realm scoping against real Postgres', () => {
 
       const ops = await marketDb.opsListings({
         realm: alpha,
-        status: 'all',
+        status: 'active',
         fromMs: 0,
         toMs: Date.now() + DAY_MS,
         page: 0,
@@ -495,6 +500,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
       });
       const aStranded = await seedListing(alpha, seller, { status: 'ending', updatedAtMs: old });
       const bStranded = await seedListing(beta, seller, { status: 'ending', updatedAtMs: old });
+      // FRESH ending rows are mid-close, not stranded: the age bound must
+      // keep them out of the reclaim batch.
+      await seedListing(alpha, seller, { status: 'ending', updatedAtMs: BASE_MS });
       const aOpen = await seedListing(alpha, seller);
       const bOpen = await seedListing(beta, seller);
       const aDelivered = await seedSettlement(alpha, aOpen, buyer, { state: 'delivered' });
@@ -539,6 +547,9 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const rows = await marketDb.salesForItem(alpha, 'crown_of_embers', 10);
       expect(ids(rows)).toEqual([a]);
       expect(ids(rows)).not.toContain(b);
+      // A voided sale leaves the price history too.
+      expect(await marketDb.setSaleExcluded(a, true)).toBe('ok');
+      expect(await marketDb.salesForItem(alpha, 'crown_of_embers', 10)).toEqual([]);
     }, 20_000);
 
     it('disposeSoldResidueListings converges only the realm residue', async () => {
@@ -689,6 +700,10 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const bSigned = await seedBid(beta, bListing, bidder, { bondSignature: `sig-b-${seq}` });
       const aStale = await seedBid(alpha, aListing, bidder, { placedAtMs: old });
       const bStale = await seedBid(beta, bListing, bidder, { placedAtMs: old });
+      // Fresh AND unsigned: only the TTL, not the signature, spares it.
+      const aFresh = await seedBid(alpha, aListing, bidder, {
+        placedAtMs: BASE_MS - 10 * MINUTE_MS,
+      });
       const aDue = await seedBid(alpha, aListing, bidder, {
         status: 'outbid',
         bondState: 'refund_due',
@@ -707,9 +722,12 @@ describeDb('woc market realm scoping against real Postgres', () => {
       expect(await marketDb.lapsePendingBids(alpha, BASE_MS - HOUR_MS, 10)).toBe(1);
       expect(await bidStatus(aStale)).toBe('lapsed');
       expect(await bidStatus(bStale), 'beta stale bid untouched').toBe('pending_bond');
+      expect(await bidStatus(aFresh), 'a fresh unsigned bid outlives the sweep').toBe(
+        'pending_bond',
+      );
 
       const activity = await marketDb.bidsByAccount(alpha, bidder, 50);
-      expect(ids(activity).sort()).toEqual([aSigned, aStale, aDue].sort());
+      expect(ids(activity).sort()).toEqual([aSigned, aStale, aDue, aFresh].sort());
 
       expect(ids(await marketDb.bondsDue(alpha, 10))).toEqual([aDue]);
       expect(ids(await marketDb.bondsDue(alpha, 10))).not.toContain(bDue);

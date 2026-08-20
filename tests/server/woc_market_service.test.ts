@@ -904,9 +904,9 @@ describe('step-up enforcement on the custody movers (B6/R1)', () => {
       acceptTerms: true,
     });
     if (!offer.ok) throw new Error(`offer refused: ${offer.reason}`);
-    // Null out the item on the stored row (a legacy pre-pin shape).
-    const row = await h.db.directedOfferById(REALM, offer.offer.id);
-    if (row) (row as { itemId: string | null }).itemId = null;
+    // Null out the item on the stored row (a legacy pre-pin shape); reads
+    // hand back copies, so the staging goes through the fake's own hook.
+    h.db.stageLegacyOfferWithoutItem(offer.offer.id);
     expect(
       await h.service.issueStepUpChallenge(SELLER, {
         operation: 'accept_directed_offer',
@@ -8543,5 +8543,26 @@ describe('review-round closures (the shared strike gate and the cooldown params)
       reason: 'claim_cooldown',
       params: { retryAfterSeconds: Math.ceil((retryAtMs - h.now()) / 1000) },
     });
+  });
+});
+
+describe('settlementQuote entry guards', () => {
+  it('refuses a foreign account and a lapsed deadline before any revival', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    expect(await h.service.settlementQuote(BUYER_B, settlement.id)).toMatchObject({
+      ok: false,
+      reason: 'not_yours',
+    });
+    h.setNow(settlement.deadlineAtMs + 1);
+    expect(await h.service.settlementQuote(BUYER_A, settlement.id)).toMatchObject({
+      ok: false,
+      reason: 'quote_expired',
+    });
+    expect((await getSettlement(h, settlement.id)).state, 'no revival, no write').toBe('offered');
   });
 });

@@ -1991,4 +1991,62 @@ describeDb('woc market settlement guards against real Postgres', () => {
       ).toEqual([refund, forfeit]);
     });
   });
+
+  describe('the schema CHECK constraints refuse unknown money states', () => {
+    it('every state, format, and shape CHECK rejects at the database', async () => {
+      const realm = `checks-${++seq}`;
+      const seller = await seedAccount();
+      const buyer = await seedAccount();
+      await expect(seedListing(realm, seller, { status: 'bogus' })).rejects.toMatchObject({
+        code: '23514',
+      });
+      await expect(
+        pool.query(`UPDATE woc_market_listings SET resolution = 'bogus' WHERE id = $1`, [
+          await seedListing(realm, seller),
+        ]),
+      ).rejects.toMatchObject({ code: '23514' });
+      await expect(
+        pool.query(
+          `INSERT INTO woc_market_listings (
+             realm, seller_account, seller_character, seller_name, seller_wallet,
+             item, item_id, quality, format, start_cents, ends_at, base_ends_at
+           ) VALUES ($1, $2, 1, 'S', 'w', '"str"'::jsonb, 'x', 'epic', 'auction',
+                     500, now(), now())`,
+          [realm, seller],
+        ),
+        'a non-object custody copy never lands',
+      ).rejects.toMatchObject({ code: '23514' });
+      await expect(
+        pool.query(
+          `INSERT INTO woc_market_listings (
+             realm, seller_account, seller_character, seller_name, seller_wallet,
+             item, item_id, quality, format, start_cents, ends_at, base_ends_at
+           ) VALUES ($1, $2, 1, 'S', 'w', '{}'::jsonb, 'x', 'epic', 'bogus',
+                     500, now(), now())`,
+          [realm, seller],
+        ),
+      ).rejects.toMatchObject({ code: '23514' });
+      const listing = await seedListing(realm, seller);
+      await expect(seedBid(realm, listing, buyer, { status: 'bogus' })).rejects.toMatchObject({
+        code: '23514',
+      });
+      await expect(seedBid(realm, listing, buyer, { bondState: 'bogus' })).rejects.toMatchObject({
+        code: '23514',
+      });
+      await expect(
+        pool.query(`UPDATE woc_market_settlements SET state = 'bogus' WHERE id = $1`, [
+          (await seedSettlement(realm, await seedListing(realm, seller), buyer)).id,
+        ]),
+      ).rejects.toMatchObject({ code: '23514' });
+      await expect(
+        pool.query(
+          `INSERT INTO woc_market_directed_offers (
+             realm, seller_account, seller_character, seller_name, buyer_account,
+             buyer_name, usd_cents, status, expires_at
+           ) VALUES ($1, $2, 1, 'S', $3, 'B', 100, 'bogus', now())`,
+          [realm, seller, buyer],
+        ),
+      ).rejects.toMatchObject({ code: '23514' });
+    });
+  });
 });

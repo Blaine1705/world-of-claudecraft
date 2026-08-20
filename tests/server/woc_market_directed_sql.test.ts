@@ -2492,4 +2492,78 @@ describe('the stuck-custody readout saturates, in SQL', () => {
     expect(params()[8]).toEqual([REALM, 1_000, 20]);
     expect(params()[9]).toEqual([REALM, 1_000]);
   });
+
+  describe('activation and suspend lock shapes, in the statements', () => {
+    it('activateBid locks the open bid set FIRST (ordered, FOR UPDATE), the listing after', async () => {
+      const bidRow = {
+        id: 5,
+        listing_id: 77,
+        account: 1,
+        character_id: 1,
+        character_name: 'x',
+        wallet: 'w',
+        amount_cents: 900,
+        status: 'pending_bond',
+        bond_cents: 90,
+        bond_state: 'pending',
+        bond_reference: null,
+        bond_quote_expires: null,
+        bond_signature: null,
+        bond_signature_at: null,
+        placed_at: new Date(0),
+      };
+      const { pool, sql } = recordingTxPool((text) => {
+        if (text.includes('SELECT listing_id FROM woc_market_bids')) {
+          return { rows: [{ listing_id: 77 }], rowCount: 1 };
+        }
+        if (text.includes('FROM woc_market_bids WHERE id = $1 FOR UPDATE')) {
+          return { rows: [bidRow], rowCount: 1 };
+        }
+        if (text.includes('FROM woc_market_listings') && text.includes('FOR UPDATE')) {
+          // A vanished listing routes to the supersede arm; every lock
+          // statement has already been ISSUED by then, which is all this
+          // pin reads.
+          return { rows: [], rowCount: 0 };
+        }
+        return undefined;
+      });
+      await new PgWocMarketDb(pool).activateBid(5, 1_000);
+      const seq = sql();
+      const openSet = seq.findIndex(
+        (t) =>
+          t.includes('FROM woc_market_bids') &&
+          t.includes("status IN ('pending_bond', 'active')") &&
+          t.includes('FOR UPDATE'),
+      );
+      const ownLock = seq.findIndex((t) =>
+        t.includes('FROM woc_market_bids WHERE id = $1 FOR UPDATE'),
+      );
+      const listingLock = seq.findIndex(
+        (t) => t.includes('FROM woc_market_listings') && t.includes('FOR UPDATE'),
+      );
+      expect(openSet, 'the ordered open-set pre-lock exists').toBeGreaterThan(-1);
+      expect(seq[openSet]).toContain('ORDER BY id');
+      expect(ownLock).toBeGreaterThan(openSet);
+      expect(listingLock, 'bids first, listing second').toBeGreaterThan(ownLock);
+    });
+
+    it('suspend pre-locks pending, active AND won bids before the listing', async () => {
+      const { pool, sql } = recordingTxPool();
+      await new PgWocMarketDb(pool).suspendListingIfSafe(REALM, 5, 1_000);
+      const seq = sql();
+      const preLock = seq.findIndex(
+        (t) => t.includes('FROM woc_market_bids') && t.includes('FOR UPDATE'),
+      );
+      const listingLock = seq.findIndex(
+        (t) => t.includes('FROM woc_market_listings') && t.includes('FOR UPDATE'),
+      );
+      expect(preLock).toBeGreaterThan(-1);
+      expect(
+        seq[preLock],
+        'a WON bid can take a bond write in the expiry CTE, so it joins the pre-lock set',
+      ).toContain("status IN ('pending_bond', 'active', 'won')");
+      expect(seq[preLock]).toContain('ORDER BY id');
+      expect(listingLock, 'bids first, listing second').toBeGreaterThan(preLock);
+    });
+  });
 });

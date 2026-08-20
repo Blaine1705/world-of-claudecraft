@@ -1648,6 +1648,12 @@ describeDb('woc market directed rail against real Postgres', () => {
       const third = await marketDb.addStrike(acc, BASE_MS + 60 * MINUTE_MS);
       expect(third.strikes, 'every strike counts').toBe(3);
       expect(third.suspendedUntilMs, 'a shorter suspension never wins').toBe(long);
+      // Clearing one account's record never touches another's.
+      const other = await seedAccount();
+      await marketDb.addStrike(other, null);
+      await marketDb.clearStrikes(acc);
+      expect(await marketDb.strikeInfo(acc)).toBeNull();
+      expect((await marketDb.strikeInfo(other))?.strikes, 'per-account clear').toBe(1);
     });
 
     it('the FIRST terms acceptance is the durable one', async () => {
