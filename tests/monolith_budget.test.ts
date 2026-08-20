@@ -51,12 +51,37 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
     // grew hud.ts by one line at HEAD without updating the row, so the gate
     // arrived red. Same exact-count, zero-slack intent as above.
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
     // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
     // additions are thin-consumer wiring to extracted modules (the two
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Raised for the controller cross hotbar, on top of the moved-base v0.39
+    // re-pin. The additions are thin-consumer wiring to an extracted domain
+    // (src/ui/hud/cross_hotbar/): the overlay's construction, its per-frame paint,
+    // and the one public seam the pad drives it through. Everything with substance
+    // (the view, painter, resolvers, panel-hooks shape) lives in that domain, and
+    // the earlier attempt to buy these lines by extracting UNRELATED pre-existing
+    // helpers out of hud.ts was reverted: refactoring code a change does not own to
+    // fit a budget inflates the diff and risks regressions elsewhere. A maintainer
+    // decision, taken rather than paid for with someone else's code. The last
+    // line is openSpellbook, which the pad needs so a confirm on an empty cell can
+    // reach the ability list; the toggle beside it would have closed it instead.
+    // castCrossHotbarAction is the other: it routes a pad press back through
+    // castSlot so a cross-hotbar cast keeps the SAME semantics a key press has
+    // (reticle, empower, sport, mouseover) instead of growing a second cast path,
+    // with the Attack branch beside it: Attack is the fixed slot-0 toggle rather
+    // than an ability, so it is the one action the seed cannot copy off the bar.
+    // Raised for the cross-hotbar cast-fallback fix: the fallback grows an item
+    // arm and a spoken refusal beside the ability one, and the shared item-use
+    // seam castSlot and the pad now both call. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 19490,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -77,14 +102,44 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
+    // Lowered again after extracting the delve interior build-cache scheduling
+    // (the position-keyed rebuild/retire decision plus the async build loop)
+    // into src/render/delve_interior_tracker.ts.
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging the delve tracker and prewarm work plus the release-owned
+    // weapon-skin identity repair leaves renderer.ts at the exact count below;
+    // any further growth reds again.
+    // Raised +38 for the vfx.mount-programs manifest entry (#2571: mounts had
+    // ZERO prewarm coverage, so the first sighting of any mount could freeze a
+    // live frame, worse on hardware without KHR_parallel_shader_compile where
+    // the runtime fallback gate is a no-op). The rig-building logic itself was
+    // extracted to src/render/mount_prewarm.ts; this was the coordinator's
+    // unavoidable thin-wiring cost (the manifest entry, its group bookkeeping,
+    // and cleanup/hide registration).
+    // Raised a further +34 (13792 -> 13826) in review response: the group-
+    // staging/scene-bookkeeping logic that first cut left inline here (and
+    // that inline copy is what hid the bug, an `Object3D.add` reparent that
+    // silently detached every staged rig from its group) moved into
+    // mount_prewarm.ts's stageMountPrewarmVisual too, but run() also grew
+    // real synchronous-desktop-path work plus an honest progress() (the
+    // entry's run() was previously a no-op that still reported 'completed'),
+    // and resumeUnits now links the shadow-depth program half it was missing.
+    // What remains is the manifest entry itself, the shared
+    // mountPrewarmGroup/mountPrewarmWarmed variables, and cleanup/hide
+    // registration: exactly the seam this ratchet exists to bound, not grow
+    // unchecked.
+    // Merging PR #3447 onto the corrected PR #3446 v0.39 wrapper leaves the
+    // renderer below this bound; any further growth reds again.
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // Merging release/v0.39.0 into the rickshaw: upstream pinned 13689, this side
-    // carried the jump-attitude wiring, and the merge lands at 13706. Pinned to
-    // that exact merged count per the ratchet's rule. The attitude application
-    // already lives in mount_jump_attitude.ts; the remainder is call glue.
-    ceiling: 13706,
+    // Merging release/v0.40.0 into the rickshaw: the merge lands at 13609, below
+    // both pins. Upstream's prewarm depth-material refactor and texture-sweep
+    // extraction were taken wholesale, which is most of the drop. Pinned to the
+    // exact merged count, the rule both parents already follow.
+    ceiling: 13609,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -94,7 +149,12 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Pinned at the exact merged count. This branch's extractions (the blocking
+    // arrival chain into src/game/arrival_warmup.ts, the world-entry settle
+    // cover joining it) net against the base's pad-selection extraction plus
+    // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
+    // landing below both parents' pins. Any further growth reds again.
+    ceiling: 11516,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -124,7 +184,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4150,
+    ceiling: 4147,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
