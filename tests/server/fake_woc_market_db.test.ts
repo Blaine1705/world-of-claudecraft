@@ -293,17 +293,22 @@ describe('fidelity fixes: twin guard, signature order, cap clamp, copies', () =>
       index: 3,
       itemId: 'itm_test',
     });
-    // ...and on the way OUT: the returned row's nested ref is independent too.
+    // ...and on the way OUT: the returned row's nested ref is independent
+    // too. Hard fixture asserts before each mutation, so a read that stops
+    // returning the row cannot let the arm pass vacuously.
+    expect(accepted?.itemRef).toBeDefined();
     if (accepted?.itemRef) accepted.itemRef.index = 42;
     expect((await db.directedOfferById(REALM, inserted.id))?.itemRef?.index).toBe(3);
     // List reads hand back independent rows, nested ref included.
     const listed = (await db.directedOffersForAccount(REALM, 2, BASE_MS)).find(
       (o) => o.id === inserted.id,
     );
+    expect(listed?.itemRef).toBeDefined();
     if (listed?.itemRef) listed.itemRef.index = 77;
     expect((await db.directedOfferById(REALM, inserted.id))?.itemRef?.index).toBe(3);
     // The resolve CAS's returned row is a copy as well.
     const resolved = await db.resolveDirectedOffer(REALM, inserted.id, 'declined');
+    expect(resolved).not.toBeNull();
     if (resolved) resolved.status = 'pending' as typeof resolved.status;
     expect((await db.directedOfferById(REALM, inserted.id))?.status).toBe('declined');
   });
