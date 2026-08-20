@@ -940,16 +940,20 @@ const ROADS = [
     existingRoadPoint: { x: -92, z: -54 },
     gateId: null,
     halfWidth: 1.5,
-    // Round 5 (owner): the quay walk runs the full pad so the streetlamp
-    // planner seats more landside lamps; the dock area read too dark at
-    // night (the seaside sites drop over the cove water by the planner's
-    // ground floor, so length is what buys lamps here).
+    // Round 5 (owner): the dock read too dark at night. The lamp planner
+    // samples every 26 yd of arc and alternates roadside, so the quay walk
+    // serpentines the full pad (the pad ground holds near -2, above the
+    // planner floor, so BOTH sides plant): the long run plus the swings
+    // buys 3 lamp samples where the straight stub earned one.
     points: [
-      { x: -92, z: -40 },
-      { x: -92, z: -46 },
-      { x: -92, z: -54 },
-      { x: -92, z: -62 },
-      { x: -92, z: -68 },
+      { x: -92, z: -32 },
+      { x: -92, z: -56 },
+      { x: -96, z: -61 },
+      { x: -92, z: -66 },
+      { x: -92, z: -74 },
+      { x: -96.5, z: -78 },
+      { x: -92, z: -82 },
+      { x: -92, z: -92 },
     ],
   },
   // A short lane from the inn's door down to the main street, so the inn
@@ -1082,7 +1086,9 @@ const NPCS = [
   makeNpc(
     'smith_haldren',
     SMITH_POSITION,
-    facingToward(SMITH_POSITION, BLACKSMITH_SHOP_CENTER),
+    // Round 5 (owner): the smith looks OUT from his shop door over the green
+    // toward the crafts lane, never at his own wall.
+    facingToward(BLACKSMITH_SHOP_CENTER, SMITH_POSITION),
     'eastbrook_blacksmith',
   ),
   makeNpc('fisherman_brandt', { x: -95, z: -50 }, -1.5707963267948966, 'eastbrook_quay'),

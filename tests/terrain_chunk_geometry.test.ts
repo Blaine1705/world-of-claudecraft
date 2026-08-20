@@ -255,7 +255,19 @@ describe('generated chunk geometry is stable', () => {
     // seats more landside lamps for the dock area's dark nights. Computed
     // twice in separate processes, identical both times. An intended,
     // looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('deb494cb6c5ced14a217f9f5338e3960');
+    // Re-minted again in round 5: the straight quay stub only ever earned
+    // the lamp planner one 26yd sample, so the quay walk re-lays as a
+    // serpentine running the whole pad and down to the south beach path
+    // (z -32..-92, two swings toward the deck line adding the arc that
+    // buys the second and third samples; the pad ground holds near -2,
+    // above the planner's -3 floor, so both roadsides plant). The dock
+    // district goes from two lamps to four: (-87.3,-45), (-99.4,-68.2) at
+    // the dockfront, (-88.2,-90.2) at the beach path mouth, plus the
+    // standing northeast shore lamp. Roads are height appliers, so the
+    // re-lay regrades along the new line. Computed twice in separate
+    // processes, identical both times. An intended, looked-at world
+    // change, not drift.
+    expect(digestOf(inRect)).toBe('fe924ca216d703d8bfa5b162d85216b8');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 
