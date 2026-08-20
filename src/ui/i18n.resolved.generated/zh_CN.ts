@@ -1588,6 +1588,7 @@ export const zh_CN: EnTranslations = {
           "render": "渲染  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 实体 {entities} 毫秒",
           "scene": "场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图",
           "hitches": "卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}",
+          "hitchesBuild": "区域构建 {zoneBuilds} | 帧外 {offFrame} | 垃圾回收 {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "等待中"
         },
@@ -1639,7 +1640,10 @@ export const zh_CN: EnTranslations = {
             "eventCpu": "事件处理占用帧时间",
             "shaderCompile": "游戏过程中正在编译着色器",
             "textureUpload": "纹理上传导致游戏卡顿",
+            "zoneBuild": "区域流式构建导致卡顿",
             "viewCreate": "实体视图创建导致卡顿",
+            "gcHitch": "垃圾回收正在长帧内运行",
+            "offFrameHitch": "长帧来自渲染回调之外的工作",
             "otherHitch": "仍有未归因的长帧",
             "assetStartup": "资源处理延迟了游戏启动",
             "longTasks": "浏览器长任务正在阻塞帧",

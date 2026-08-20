@@ -12978,6 +12978,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '장면   호출 {calls}회 | 삼각형 {triangles}개 | 뷰 {views}개',
   'hudChrome.perf.diagnostics.metrics.hitches':
     '끊김 {hitches} | 셰이더 {shaders} | 업로드 {uploads} | 뷰 {views}',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild': '구역 빌드 {zoneBuilds} | 프레임 외부 {offFrame} | GC {gc}',
   'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
   'hudChrome.perf.diagnostics.metrics.waitingValue': '대기 중',
   'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100: {headline}',
@@ -13017,7 +13018,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '이벤트 처리가 프레임 시간을 사용합니다',
   'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '게임 중 셰이더가 컴파일되고 있습니다',
   'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '텍스처 업로드가 게임 끊김을 일으킵니다',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild': '구역 스트리밍 빌드가 끊김을 일으킵니다',
   'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '엔티티 뷰 생성이 끊김을 일으킵니다',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch': '긴 프레임 안에서 가비지 컬렉션이 실행되고 있습니다',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch': '긴 프레임은 렌더 콜백 외부의 작업에서 발생합니다',
   'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '원인을 알 수 없는 긴 프레임이 남아 있습니다',
   'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '에셋 작업이 게임 시작을 지연시킵니다',
   'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '브라우저의 긴 작업이 프레임을 막습니다',

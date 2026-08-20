@@ -1588,6 +1588,7 @@ export const en_XA: EnTranslations = {
           "render": "[ŕéñðéŕ  šúƀɱíţ {submit} ɱš | ŵóŕļð {world} ɱš | éñţíţíéš {entities} ɱš]",
           "scene": "[šçéñé   {calls} çáļļš | {triangles} ţŕíš | {views} ʋíéŵš]",
           "hitches": "[ĥíţçĥéš {hitches} | šĥáðéŕš {shaders} | úþļóáðš {uploads} | ʋíéŵš {views}]",
+          "hitchesBuild": "[žóñé ƀúíļðš {zoneBuilds} | óƒƒ-ƒŕáɱé {offFrame} | ĝç {gc}]",
           "gpu": "[ĜÞÚ     {renderer}]",
           "waitingValue": "[ŵáíţíñĝ]"
         },
@@ -1639,7 +1640,10 @@ export const en_XA: EnTranslations = {
             "eventCpu": "[Éʋéñţ þŕóçéššíñĝ íš çóñšúɱíñĝ ţĥé ƒŕáɱé]",
             "shaderCompile": "[Šĥáðéŕš áŕé çóɱþíļíñĝ ðúŕíñĝ ĝáɱéþļáý]",
             "textureUpload": "[Ţéẋţúŕé úþļóáðš áŕé çáúšíñĝ ĝáɱéþļáý ĥíţçĥéš]",
+            "zoneBuild": "[Žóñé šţŕéáɱíñĝ ƀúíļðš áŕé çáúšíñĝ ĥíţçĥéš]",
             "viewCreate": "[Éñţíţý ʋíéŵ çŕéáţíóñ íš çáúšíñĝ ĥíţçĥéš]",
+            "gcHitch": "[Ĝáŕƀáĝé çóļļéçţíóñš áŕé ŕúññíñĝ íñšíðé ļóñĝ ƒŕáɱéš]",
+            "offFrameHitch": "[Ļóñĝ ƒŕáɱéš çóɱé ƒŕóɱ ŵóŕķ óúţšíðé ţĥé ŕéñðéŕ çáļļƀáçķ]",
             "otherHitch": "[Úñáţţŕíƀúţéð ļóñĝ ƒŕáɱéš ŕéɱáíñ]",
             "assetStartup": "[Ĝáɱé šţáŕţúþ íš ðéļáýéð ƀý áššéţ ŵóŕķ]",
             "longTasks": "[Ļóñĝ ƀŕóŵšéŕ ţášķš áŕé ƀļóçķíñĝ ƒŕáɱéš]",

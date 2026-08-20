@@ -29,6 +29,7 @@ import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import {
+  isComposedPortraitKey,
   onPortraitsReady,
   onPortraitUpdate,
   prewarmPlayerPortrait,
@@ -615,6 +616,7 @@ import {
   type PreviewPrewarmUnit,
   runPreviewPrewarmSchedule,
 } from './preview_prewarm_core';
+import { armPreviewOpen } from './preview_stand_in';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
 import { attachOverlayDrag } from './proc_overlay_drag';
@@ -2394,7 +2396,14 @@ export class Hud {
       this.targetFramePainter.invalidatePortrait();
       this.totFramePainter.invalidatePortrait();
     });
-    onPortraitUpdate((visualKey, skin) => {
+    onPortraitUpdate((visualKey, skin, key) => {
+      // A composed capture is keyed on the look SIGNATURE rather than on
+      // (class, skin), and the player's own frame is the only composed one
+      // (see drawPlayerFramePortrait), so its key is the one that lands here.
+      if (isComposedPortraitKey(key)) {
+        this.drawPlayerFramePortrait();
+        return;
+      }
       // The mech is not a class: a lazily-arriving chroma atlas must refresh
       // the frame of the player wearing it (drawMech falls back to the class
       // face until the atlas is resident).
@@ -2404,29 +2413,19 @@ export class Hud {
         }
         return;
       }
-      const playerClass = visualKey.startsWith('player_')
-        ? (visualKey.slice('player_'.length) as PlayerClass)
-        : null;
-      if (!playerClass) return;
+      if (!visualKey.startsWith('player_')) return;
+      const playerClass = visualKey.slice('player_'.length) as PlayerClass;
       if (playerClass === this.sim.cfg.playerClass && skin === (this.sim.player.skin ?? 0)) {
         this.drawPlayerFramePortrait();
       }
-      const target = this.targetPortraitSubject;
-      if (
-        target?.kind === 'player' &&
-        target.templateId === playerClass &&
-        (target.skin ?? 0) === skin
-      ) {
-        this.targetFramePainter.invalidatePortrait();
-      }
-      const targetOfTarget = this.totPortraitSubject;
-      if (
-        targetOfTarget?.kind === 'player' &&
-        targetOfTarget.templateId === playerClass &&
-        (targetOfTarget.skin ?? 0) === skin
-      ) {
-        this.totFramePainter.invalidatePortrait();
-      }
+      // The target and target-of-target frames stay on the stock class art, so
+      // each repaints on exactly the (class, skin) pair it framed.
+      const framed = (subject: Entity | null): boolean =>
+        subject?.kind === 'player' &&
+        subject.templateId === playerClass &&
+        (subject.skin ?? 0) === skin;
+      if (framed(this.targetPortraitSubject)) this.targetFramePainter.invalidatePortrait();
+      if (framed(this.totPortraitSubject)) this.totFramePainter.invalidatePortrait();
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
@@ -17127,6 +17126,7 @@ export class Hud {
     this.charPreview.setSkin(opts.skin);
     this.charPreview.setWeaponSkin(opts.weaponSkinId);
     this.charPreview.setFraming(opts.framing);
+    armPreviewOpen(this.charPreview, container, { cls: opts.cls, skin: opts.skin }, this.renderer);
   }
 
   /** Char-sheet / skin-picker mount: the SELF character with both currently

@@ -1588,6 +1588,7 @@ export const tr_TR: EnTranslations = {
           "render": "işleme  gönderim {submit} ms | dünya {world} ms | varlık {entities} ms",
           "scene": "sahne   {calls} çağrı | {triangles} üçgen | {views} görünüm",
           "hitches": "takılma {hitches} | gölgelendirici {shaders} | yükleme {uploads} | görünüm {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "bekleniyor"
         },
@@ -1639,7 +1640,10 @@ export const tr_TR: EnTranslations = {
             "eventCpu": "Olay işleme kareyi tüketiyor",
             "shaderCompile": "Gölgelendiriciler oynanış sırasında derleniyor",
             "textureUpload": "Doku yüklemeleri oynanış takılmalarına neden oluyor",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Varlık görünümü oluşturma takılmalara neden oluyor",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Nedeni belirlenemeyen uzun kareler kalıyor",
             "assetStartup": "Oyun başlangıcı varlık işi tarafından geciktiriliyor",
             "longTasks": "Uzun tarayıcı görevleri kareleri engelliyor",

@@ -29,7 +29,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "es_ES": [
     "hudChrome.controller.cancelAction",
@@ -51,7 +55,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_FR": [
     "hudChrome.controller.cancelAction",
@@ -73,7 +81,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_CA": [
     "hudChrome.controller.cancelAction",
@@ -95,7 +107,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "en_CA": [],
   "it_IT": [
@@ -118,7 +134,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "de_DE": [
     "hudChrome.controller.cancelAction",
@@ -140,7 +160,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "zh_CN": [
     "hudChrome.controller.crossHotbarPosition"
@@ -174,7 +198,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "ru_RU": [
     "hudChrome.controller.crossHotbarPosition"
@@ -199,7 +227,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "nl_NL": [
     "hudChrome.controller.cancelAction",
@@ -221,7 +253,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "pl_PL": [
     "hudChrome.controller.cancelAction",
@@ -243,7 +279,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "id_ID": [
     "hudChrome.controller.cancelAction",
@@ -265,7 +305,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "tr_TR": [
     "hudChrome.controller.cancelAction",
@@ -287,7 +331,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "sv_SE": [
     "hudChrome.controller.cancelAction",
@@ -309,7 +357,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "vi_VN": [
     "hudChrome.controller.cancelAction",
@@ -331,7 +383,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "da_DK": [
     "hudChrome.controller.cancelAction",
@@ -353,6 +409,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarResetLayout",
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
-    "hudChrome.controller.subcommandsAction"
+    "hudChrome.controller.subcommandsAction",
+    "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
+    "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ]
 };
