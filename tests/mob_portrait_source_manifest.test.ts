@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   type DriftManifest,
@@ -83,7 +83,7 @@ describe('mob portrait source manifest', () => {
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     const liveIds = Object.keys(MOBS).sort();
-    expect(liveIds).toHaveLength(233);
+    expect(liveIds).toHaveLength(239);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
@@ -246,7 +246,7 @@ describe('mob portrait source manifest', () => {
   it('derives the renderer fingerprint independently of the launch directory', () => {
     const probe = `
       import { buildPortraitRendererContract, portraitRendererFingerprint } from ${JSON.stringify(
-        join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs'),
+        pathToFileURL(join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs')).href,
       )};
       const contract = await buildPortraitRendererContract(${JSON.stringify(repoRoot)});
       process.stdout.write(portraitRendererFingerprint(contract));

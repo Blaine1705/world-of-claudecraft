@@ -35,6 +35,18 @@ import {
   GALEHEART_ECHO_DAMAGE,
   WARSPIRIT_CADENCE_STEPS,
 } from '../sim/combat/shaman_warspirit';
+import {
+  IGNIVAR_SOAK_REQUIRED_PLAYERS,
+  IGNIVAR_SOAK_SHARED_MAX_HP,
+} from '../sim/encounters/ignivar';
+import {
+  VARKHUL_MAKERS_BRAND_AURA_ID,
+  VARKHUL_MAKERS_BRAND_DURATION,
+  VARKHUL_MAKERS_BRAND_MAX_STACKS,
+  VARKHUL_MAKERS_BRAND_PER_STACK,
+  VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+  VARKHUL_MARKED_HAMMERS_AURA_ID,
+} from '../sim/encounters/varkhul';
 import type { AuraKind } from '../sim/types';
 import {
   ENRAGE_DMG_DONE,
@@ -94,10 +106,36 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  * adding an AuraKind without player-facing explanation is a compile-time error.
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  // This is a four-second placement marker, not a damage-taken modifier. Its
+  // countdown and localized name are the complete tooltip; the generic
+  // vulnerability copy would misleadingly claim that it adds 0% damage taken.
+  if (a.id === VARKHUL_MARKED_HAMMERS_AURA_ID) return null;
   if (a.id === 'shaman_mending_current') {
     return a.poolPct !== undefined
       ? { key: `${KEY}.mendingCurrentPercent`, nums: { pct: round(a.poolPct) } }
       : { key: `${KEY}.mendingCurrent`, nums: { value: round(a.value) } };
+  }
+  if (a.id === 'ignivar_shared_pyre') {
+    const total = pctFromFrac(IGNIVAR_SOAK_SHARED_MAX_HP);
+    return {
+      key: `${KEY}.sharedPyre`,
+      nums: {
+        total,
+        players: IGNIVAR_SOAK_REQUIRED_PLAYERS,
+        perPlayer: round(total / IGNIVAR_SOAK_REQUIRED_PLAYERS),
+      },
+    };
+  }
+  if (a.id === VARKHUL_MAKERS_BRAND_AURA_ID) {
+    return {
+      key: `${KEY}.makersBrand`,
+      nums: {
+        duration: VARKHUL_MAKERS_BRAND_DURATION,
+        max: VARKHUL_MAKERS_BRAND_MAX_STACKS,
+        pct: pctFromFrac(VARKHUL_MAKERS_BRAND_PER_STACK),
+        swap: VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+      },
+    };
   }
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
     return { key: `${KEY}.temporalHourglass`, nums: {} };

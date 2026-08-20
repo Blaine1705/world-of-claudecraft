@@ -170,7 +170,10 @@ export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
 export type {
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveIgnivarMeteorWarning,
   ActiveTemporalHourglass,
+  ActiveVarkhulForgestormWarning,
+  ActiveVarkhulHammerZone,
 } from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {

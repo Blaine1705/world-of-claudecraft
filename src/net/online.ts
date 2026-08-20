@@ -97,7 +97,10 @@ import {
   type AccountCosmetics,
   type ActiveConsecration,
   type ActiveFrostRing,
+  type ActiveIgnivarMeteorWarning,
   type ActiveTemporalHourglass,
+  type ActiveVarkhulForgestormWarning,
+  type ActiveVarkhulHammerZone,
   type ArenaInfo,
   type BankInfo,
   type CardMinigameInfo,
@@ -187,6 +190,7 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { decodeVarkhulHammerZones } from './varkhul_hammer_wire';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -1931,6 +1935,9 @@ export class ClientWorld implements IWorld {
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
+  activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
+  activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[] = [];
+  activeVarkhulHammerZones: ActiveVarkhulHammerZone[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   activeConsecrations: ActiveConsecration[] = [];
   private counterfangWindowDeadlineMs = 0;
@@ -2880,6 +2887,72 @@ export class ClientWorld implements IWorld {
           ];
         })
       : [];
+    this.activeIgnivarMeteors = Array.isArray(snap.ignivarMeteors)
+      ? snap.ignivarMeteors.flatMap((value: unknown): ActiveIgnivarMeteorWarning[] => {
+          if (!value || typeof value !== 'object') return [];
+          const meteor = value as Record<string, unknown>;
+          if (
+            typeof meteor.id !== 'string' ||
+            ![meteor.x, meteor.z, meteor.r, meteor.dur, meteor.rem, meteor.lead].every(
+              (entry) => typeof entry === 'number' && Number.isFinite(entry),
+            ) ||
+            (meteor.r as number) <= 0 ||
+            (meteor.dur as number) <= 0 ||
+            (meteor.rem as number) <= 0 ||
+            (meteor.lead as number) < 0 ||
+            (meteor.lead as number) >= (meteor.dur as number)
+          ) {
+            return [];
+          }
+          return [
+            {
+              id: meteor.id,
+              x: meteor.x as number,
+              z: meteor.z as number,
+              radius: meteor.r as number,
+              duration: meteor.dur as number,
+              remaining: Math.min(meteor.rem as number, meteor.dur as number),
+              warningLead: meteor.lead as number,
+            },
+          ];
+        })
+      : [];
+    this.activeVarkhulForgestormWarnings = Array.isArray(snap.varkhulForgestorm)
+      ? snap.varkhulForgestorm.flatMap((value: unknown): ActiveVarkhulForgestormWarning[] => {
+          if (!value || typeof value !== 'object') return [];
+          const warning = value as Record<string, unknown>;
+          if (
+            ![
+              warning.id,
+              warning.sourceId,
+              warning.x,
+              warning.z,
+              warning.r,
+              warning.dur,
+              warning.rem,
+            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
+            (warning.id as number) < 0 ||
+            (warning.sourceId as number) < 0 ||
+            (warning.r as number) <= 0 ||
+            (warning.dur as number) <= 0 ||
+            (warning.rem as number) <= 0
+          ) {
+            return [];
+          }
+          return [
+            {
+              id: warning.id as number,
+              sourceId: warning.sourceId as number,
+              x: warning.x as number,
+              z: warning.z as number,
+              radius: warning.r as number,
+              duration: warning.dur as number,
+              remaining: Math.min(warning.rem as number, warning.dur as number),
+            },
+          ];
+        })
+      : [];
+    this.activeVarkhulHammerZones = decodeVarkhulHammerZones(snap.varkhulHammers);
     this.activeTemporalHourglasses = Array.isArray(snap.hourglasses)
       ? snap.hourglasses.flatMap((value: unknown): ActiveTemporalHourglass[] => {
           if (!value || typeof value !== 'object') return [];

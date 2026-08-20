@@ -6,7 +6,13 @@ import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
-import { ALL_CLASSES, type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
+import {
+  ALL_CLASSES,
+  type Entity,
+  IGNIVAR_BOSS_ID,
+  isMechWearer,
+  type PlayerClass,
+} from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
@@ -92,6 +98,10 @@ export interface VisualDef {
   hover?: number;
   /** yaw applied so the model faces +Z (facing-0 convention) */
   yaw?: number;
+  /** Optional texture-aware ambient lift for exceptionally dark authored bodies. */
+  selfIllumination?: number;
+  /** Optional per-visual multiplier for scene environment reflections. */
+  envMapIntensity?: number;
   /** KayKit chars ship every accessory visible: non-skinned mesh nodes to KEEP.
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
@@ -169,8 +179,15 @@ const KAYKIT_EMOTES: Partial<Record<OverheadEmoteId, EmoteClipSpec>> = {
   salute: { clips: ['Spellcast_Raise', 'Block'], timeScale: 1.18 },
   cry: { clips: ['Hit_A', 'Sit_Floor_Down'], timeScale: 0.65 },
   bow: { clips: ['Sit_Floor_Down', 'Spellcast_Raise'], timeScale: 1.35 },
-  clap: { clips: ['1H_Melee_Attack_Slice_Diagonal', 'Cheer'], timeScale: 1.55, repeats: 2 },
-  roar: { clips: ['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop', 'Cheer'], timeScale: 0.9 },
+  clap: {
+    clips: ['1H_Melee_Attack_Slice_Diagonal', 'Cheer'],
+    timeScale: 1.55,
+    repeats: 2,
+  },
+  roar: {
+    clips: ['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop', 'Cheer'],
+    timeScale: 0.9,
+  },
   kneel: { clips: ['Sit_Floor_Down'], timeScale: 0.85 },
 };
 
@@ -681,6 +698,31 @@ const WATER_ELEMENTAL: ClipMap = {
   attack: ['Cast'],
   hit: ['Hit'],
   death: 'Death',
+};
+
+// The contributor-authored Colossus ships a dedicated rigid-rock rig and a
+// complete boss animation set. Its channel loop drives the socket-mounted
+// furnace/flamethrower VFX; impact pulses are synchronized by the encounter.
+const IGNIVAR: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  death: 'Death',
+  cast: 'Channel',
+  flourish: 'FistSpin360',
+};
+
+// Heart of the End is stationary in the encounter. Its generated Hit clip stays
+// unmapped so raid damage cannot interrupt the sustained Apocalypse cast pose.
+const IGNIVAR_HEART: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  death: 'Death',
+  cast: 'Cast',
+  jump: 'Jump',
 };
 
 const SPIDER: ClipMap = {
@@ -1477,7 +1519,11 @@ export const VISUALS: Record<string, VisualDef> = {
     show: [],
     attach: [
       { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+      {
+        url: `${WEAPONS}/spellbook_open.glb`,
+        bone: 'handslot.l',
+        gripRef: 'Spellbook_open',
+      },
     ],
     weaponSlots: [0], // mainhand (wand) swaps; spellbook offhand stays
     // Faint violet lift only, to tell this apart from the mage/priest models
@@ -2168,6 +2214,31 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
+  mob_ignivar: {
+    url: `${CREATURES}/ignivar_herald.glb`,
+    height: 2.65,
+    // The contributor rig is authored directly onto the game's +Z-facing bind.
+    yaw: 0,
+    // Preserve the furnace read in the dark coliseum without restoring the
+    // glossy HIFI treatment that clashed with the game's faceted materials.
+    selfIllumination: 0.2,
+    envMapIntensity: 1.6,
+    clips: IGNIVAR,
+    walkRef: 1.6,
+    runRef: 3.2,
+    attackTimeScale: 1,
+  },
+  mob_ignivar_heart_of_the_end: {
+    url: `${CREATURES}/ignivar_heart_of_the_end.glb`,
+    height: 1.8,
+    // Tripo authored the rig facing +X; character visuals face +Z at world facing 0.
+    yaw: -Math.PI / 2,
+    selfIllumination: 0.16,
+    envMapIntensity: 1.3,
+    clips: IGNIVAR_HEART,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+  },
   mob_water_elemental: {
     url: `${CREATURES}/water_elemental.glb`,
     height: 2.65,
@@ -2815,7 +2886,11 @@ export const VISUALS: Record<string, VisualDef> = {
     show: ['Mage_Hat'],
     attach: [
       { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+      {
+        url: `${WEAPONS}/spellbook_open.glb`,
+        bone: 'handslot.l',
+        gripRef: 'Spellbook_open',
+      },
     ],
     tint: 'entity',
     tintStrength: 0.55,
@@ -2952,6 +3027,8 @@ for (const propSet of NPC_PROP_SET_IDS) {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  [IGNIVAR_BOSS_ID]: 'mob_ignivar',
+  ignivar_heart_of_the_end: 'mob_ignivar_heart_of_the_end',
   wildheart_stalker: 'mob_wildheart_stalker',
   wildheart_ravager: 'mob_wildheart_ravager',
   wildheart_hexcaller: 'mob_wildheart_hexcaller',
@@ -3205,6 +3282,7 @@ const NPC_KEYS: Record<string, string> = {
   provisioner_fenna: 'npc_villager',
   wardsmith_orun: 'npc_smith',
   archivist_tullo: 'npc_villager_robed',
+  archivist_maelin_emberward: 'npc_villager_robed',
   // Professions 2.0 station masters: existing looks only (no new GLBs). The
   // forge and toolworks masters wear the smith's work apron; the weaver and
   // alchemist match the robed apothecary/herbalist look; the cook and tanner
