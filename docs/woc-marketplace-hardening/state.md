@@ -1449,7 +1449,27 @@ Still open (a phase that hits one asks at session start):
     adoption arm remains the recovery path and the bound is money-safe even
     against a real payment unobserved for the whole window. Values noted
     here for 21 per the 10 spec.
-  Still open: devnet mint choice (21).
+  The 21 item is RESOLVED (Fernando, 2026-08-20, proposed and confirmed at
+  the 21 session start), closing R5 in full:
+  - Devnet mint: a FRESH throwaway devnet SPL mint created for the dry run,
+    decimals 6 (matching the live mint and DEFAULT_WOC_DECIMALS). Mint
+    authority, escrow, treasury, and buyer wallets are fresh local keypairs
+    held only in gitignored local env files (gitignore coverage verified
+    BEFORE any key is written); supply is minted per leg. Pubkeys and
+    transaction signatures are recorded in state.md; keys never leave the
+    machine and nothing durable outlives the run (teardown is deleting the
+    local files). The prior claudium devnet mint was considered and
+    declined: its authority keypair survives in no checkout, so it cannot
+    fund wallets.
+  - Price venue during the run (companion gap surfaced with the ask): the
+    Birdeye venue and the chain arm shared the single WOC_MINT knob, and
+    the fixed dev price is gated behind the fake-chain arm, so a
+    real-devnet-chain run had no env-configurable price source. RULED: add
+    WOC_MARKET_PRICE_MINT, the venue's mint override, defaulting to
+    WOC_MINT so every existing deployment is byte-identical in behavior;
+    validated at boot; with tests. The dry run then prices the REAL mainnet
+    WOC on the real venue while settling on the devnet mint, preserving the
+    11 observation item (real venue cadence and the halt/recovered lines).
 - R6 (phase 07, B7): counsel owns final Terms language. The phase produces drafts and a
   decision memo; counsel sign-off is a launch gate tracked here, not a packet deliverable.
   STATUS 2026-08-13: package READY, recorded SENT-TO-COUNSEL (the send is
