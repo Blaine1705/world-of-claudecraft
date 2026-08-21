@@ -107,10 +107,36 @@ release-tooling arm).
    silently skipped in CI after R16; aligning them onto TEST_DATABASE_URL is
    the same class of decision and deliberately NOT folded into the R16 diff.
    Owner: 22 or a gate follow-up (gate-integrity reviewer).
+2b. Gate classifier asymmetry (NEW, rider QA's gate review): isCodePath
+   codes only the .github/workflows/ prefix while decideTestMode widens on
+   all of .github/, so a .github/actions/**-only PR classifies docs-only and
+   runs no tests; harmless while no composite action hosts a test
+   invocation (the job classification pin reds a uses: relocation of the
+   shard run), but if one ever does, widen isCodePath first. Same review
+   noted the cheapest remaining re-skip: a vite.config test.exclude glob
+   removes a suite family from every runner while both pins stay green
+   (pre-existing class, any suite family). Owner: gate follow-up
+   (gate-integrity reviewer).
+2c. Shared pg-gate helper option (JUDGED-DECLINED as a refactor in the
+   close-out rider; kept here as the option of record): if the twenty pg
+   suites ever adopt a shared TEST_DATABASE_URL gate helper, the
+   ci_workflow lane and browser exemption guards are LITERAL text scans of
+   the suite files and go blind the moment the literal moves into a helper
+   import; the guard must move to the helper's importers IN THE SAME
+   CHANGE. Owner: whoever takes the refactor.
 3. CIC-vs-open-transaction flake class inside a shard's shared database
    (player_metrics + daily_rewards against Strategy-B siblings): watch the
    first CI runs; the surgical fix is a single-fork lane for that glob.
-   Owner: whoever babysits the first runs.
+   Owner: whoever babysits the first runs. WIDENED by the rider QA's gate
+   review to the general class: four suites TRUNCATE shared tables in
+   beforeEach while twelve-plus siblings INSERT into them, all file-parallel
+   against one database per CI leg. Probed by the QA: three consecutive
+   full-battery runs (17 suites, 333 tests, one parallel vitest invocation
+   against a virgin database, a HARSHER shape than any single CI leg) all
+   green, so this stays a watch item, not a redesign; the remedy menu if it
+   bites is a per-worker database name, a single-fork lane for the
+   *_db_integration glob, or an advisory-lock mutex around the TRUNCATE
+   suites. Failure direction is RED (never a silent skip).
 4. woc_market_view pure-core extraction (owns the Exchange role=status
    regions / screen-reader announcements). Owner: a dedicated pass.
 5. The design/UI cluster deferred past 15, each with its recorded owner:
@@ -141,6 +167,17 @@ release-tooling arm).
    store-catalog + suspensions comments; server/db.ts PRD citation; the
    guide catalog's "No pay to win, ever" line (rides the P2 wiki follow-up);
    server/wallet_link.ts em-dash comment.
+9. Closure of record (rider QA sweep): the abandons-FK lock-registry edge
+   ("stays recorded for the 22 runbook", progress.md 3376) DISSOLVED when
+   the escrow write-path rider reworked the lock registry; nothing remains
+   to document. Recorded here so the sweep trail shows it closed rather
+   than dropped.
+10. Read-bucket 429 sizing re-judgment (parked by 16 as "re-judged
+   pre-enable"): the shared READ bucket's two-players-behind-one-NAT sizing
+   (server/ratelimit.ts) must be re-judged against real venue traffic
+   before enable; three or more worst-case players behind one NAT 429 each
+   other's polls. Owner: Fernando at the pre-enable review (with 2.
+   Maintainer rulings).
 
 ## 6. Service repo follow-ups
 
@@ -150,10 +187,14 @@ release-tooling arm).
 2. connectionTimeoutMillis still absent on production pg pools (inherited
    since 08).
 3. SEC-9 request-path sampling window shortening (heartbeat-only recording
-   or a per-second limit); the game half shipped in 16.
+   or a per-second limit); the game half shipped in 16. NEEDS A JUDGMENT
+   that the original assignment expected from 22 and the shrunken 22 will
+   not make: take or decline the remedy. Owner: Fernando.
 4. Manipulation economics: tie the quote ceiling to OBSERVED venue
    liquidity (birdeye_price.ts already reads it); the
-   MIN_LIQUIDITY/MAX_USD_CENTS ratio is the real bound.
+   MIN_LIQUIDITY/MAX_USD_CENTS ratio is the real bound. NEEDS A JUDGMENT
+   (same 22 reassignment as 6.3): take, decline, or defer with the venue
+   choice. Owner: Fernando.
 5. The adapter body-timeout observation; the RPC-defect retryable-vs-
    terminal policy; MAX_REPLACEABLE_AGE_MS env-knob question; the audited
    manual-adopt lever question; front-door rate limiting + secret entropy
@@ -166,6 +207,14 @@ release-tooling arm).
 7. Python payout DAILY_REWARD_WOC_USD_PRICE env gate (pre-existing, outside
    this packet's diff): the runbook carries the operational rule; a code
    gate needs Fernando's ruling on the payout service.
+8. WOC_DECIMALS parser unification (rider QA): the market bootstrap accepts
+   0..18 with a silent fallback to 6 on nonsense
+   (service/src/market/bootstrap.ts, wocDecimals) while the claudium
+   bootstrap parses the SAME variable through integerConfig(1..18) and
+   THROWS at boot on anything else; a combined boot cannot diverge (the
+   throw wins) but a market-only deployment silently defaults where the
+   other arm would refuse. Unify the bounds and add a boot warn on the
+   fallback.
 
 ## 7. Dashboard repo follow-ups
 
@@ -189,6 +238,14 @@ release-tooling arm).
    (align @types/react to runtime 18 first if changing).
 5. Payout-service half: the actor header is authoritative only if that
    service prefers it over body-borne actors when it grows audit rows.
+6. Wallets-arm exponent screening (rider QA, pre-existing beside the market
+   fix): ClaudiumPurchasesPanel still lets the wallets payload's
+   wocDecimals reach 10n ** BigInt(exponent) unscreened during render
+   (decimalToBaseUnits has no bound check or try/catch), the exact class
+   the Trading tab now screens; a fractional or huge reported value crashes
+   the panel. Same pass: treasury_withdrawal_request.ts parses the
+   service-supplied treasury balance with an uncapped, un-try/caught BigInt
+   during render (the MONEY_BASE_RE cap pattern applies).
 
 ## 8. P2/P3 PRD gaps not taken (review.md backlog)
 

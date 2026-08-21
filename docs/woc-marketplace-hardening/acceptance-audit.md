@@ -30,8 +30,11 @@ documents it).
    - B3 (production bond releaser did not exist): phase 09; crash-safe
      release protocol (persist before broadcast, probe on retry,
      signature-keyed finalize), SolanaMarketBondReleaser, all-or-nothing
-     boot. Tests: service test/market_bond_releaser.test.ts and
-     test/market_http.test.ts; the 09 ledger records five red-first proofs.
+     boot. Tests: service test/market_bond_releaser.test.ts, plus the
+     all-or-nothing boot pins in test/market_bootstrap.test.ts and the
+     unwired-503 arm in test/market_http.test.ts; the 09 ledger records five
+     red-first proofs. The live-cluster bond cycle remains the OPEN-21
+     residual (section D).
    - B4 (burn-leg redirect accepted): phase 10; the verifier proves the burn
      and rejects unexplained third-party credits. Tests: service
      test/market_solana_chain.test.ts (burn-redirect rejection pinned);
@@ -135,7 +138,8 @@ documents it).
 - Marketplace hot GETs rate-limited and cache-backed: EVIDENCED. The 16
   ledger (hot-path scale) plus the auth-guard rider (per-request read cache
   with the install veto); tests/woc_market_authguard_pg_integration.test.ts
-  and the hot-reads pins in tests/server/.
+  and the hot-reads pins in tests/server/. The at-scale contention
+  observations remain OPEN-21 residuals (section D).
 - Fresh desktop + mobile screenshots at lowest preset: EVIDENCED for the
   shipped UI (docs/screenshots/woc-market/, committed by 14/15; the 15 QA
   re-captured all 79 after the eyeball pass). Fernando's sign-off on the set
@@ -146,25 +150,29 @@ documents it).
 
 ### Service repo
 
-- npm run build + npm test green: EVIDENCED, re-run this session at tip
-  2c4a261: build clean, 604 tests, 597 pass, 7 env-gated skips, 0 fail;
-  604/604 zero skips with CLAUDIUM_TEST_DATABASE_URL on the command line.
+- npm run build + npm test green: EVIDENCED, last re-run by the rider QA at
+  tip d9a4f9b: build clean, 605 tests, 598 pass, 7 env-gated skips, 0 fail;
+  605/605 zero skips with CLAUDIUM_TEST_DATABASE_URL on the command line.
 - Query-string admin bypass regression test (B5): EVIDENCED.
   test/server_auth_http.test.ts; runs in the suite above.
 - Releaser wired; release_not_wired unreachable when configured; crash-safe
-  protocol tests: EVIDENCED. test/market_bond_releaser.test.ts,
-  test/market_http.test.ts (all-or-nothing boot pins); 09 ledger.
+  protocol tests: EVIDENCED. test/market_bond_releaser.test.ts;
+  test/market_bootstrap.test.ts (the all-or-nothing boot pins);
+  test/market_http.test.ts (the unwired-503 arm); 09 ledger. The devnet
+  release legs are the OPEN-21 residual (section D).
 - Verifier rejects burn-redirect and unexplained third-party credits:
   EVIDENCED. test/market_solana_chain.test.ts; 10 ledger. The live-cluster
   observation of the same rejection is OPEN-21 (hostile leg).
 - Oracle heartbeat warms the priced instance (H3): EVIDENCED.
   test/market_bootstrap.test.ts (mock-timer bootstrap pins, 11 ledger);
-  test/market_price_gate_signal.test.ts for the halt/recovered signal.
+  test/market_price_gate_signal.test.ts for the halt/recovered signal. The
+  live halt/recovered line observation remains an OPEN-21 residual
+  (section D; recorded NOT OBSERVABLE without a venue key).
 
 ### Dashboard repo
 
-- npm test + check + build green: EVIDENCED, re-run this session at tip
-  53913d7: 279 tests 0 fail, check 0 errors, build complete, plus
+- npm test + check + build green: EVIDENCED, last re-run by the rider QA at
+  tip fede8de: 282 tests 0 fail, check 0 errors, build complete, plus
   npm run test:security 66/66.
 - Game proxy role check enforced, non-privileged role exercised: EVIDENCED.
   The 18 ledger (H1); tests pinned in tests/ (the external-verdict matrix
@@ -208,21 +216,26 @@ documents it).
 
 ## C. The named verification items (phase-22 spec, pulled forward)
 
-1. R9: no hard-coded acceptTerms. VERIFIED THIS SESSION by grep over src/:
-   the two send paths carry the player's real choice and nothing else:
+1. R9: no hard-coded acceptTerms. VERIFIED THIS SESSION by grep over src/
+   (re-verified independently by the rider QA): FOUR send sites across the
+   two consent surfaces carry the player's real choice and nothing else:
    src/ui/woc_market_window.ts sends `acceptTerms: this.acceptTermsChecked()`
-   (the checkbox state), and src/ui/hud/woc_trade/woc_trade_controller.ts
-   sends `acceptTerms: this.wocTradeTermsAccepted || this.wocTradeTermsChecked`
+   (the checkbox state) on both its arms, and
+   src/ui/hud/woc_trade/woc_trade_controller.ts sends
+   `acceptTerms: this.wocTradeTermsAccepted || this.wocTradeTermsChecked`
    (durable acceptance learned from /me, or the consent row's checkbox) on
    both the offer-send and pay arms. No `acceptTerms: true` literal exists
    outside tests. PASS.
-2. The two dev-database classes (06 deploy notes): DOCUMENTED, dev-only by
+2. The two dev-database classes (06 deploy notes): EVIDENCED as dev-only by
    construction (production unreachable: the marketplace has never shipped).
    Raw-JSON pins refuse at acceptance and the deal reopens; accepted-unstamped
-   rows with a live listing are wiped or expired per the runbook's deploy
-   section (docs/woc-market-runbook.md section 6). No production action
-   exists to take now; the enable-time check is the claims-table query in
-   runbook section 3.
+   rows with a live listing are wiped or expired. The owning record is the 06
+   ledger's deploy notes in state.md ("dev databases carrying THIS BRANCH's
+   earlier builds"), which this audit inherits per the progress.md 06 QA
+   residual ("phase 22's pre-enable audit gains the two dev-database
+   classes"); the runbook deliberately does not carry them (they are not a
+   production procedure). No production action exists to take now; the
+   enable-time check is the claims-table query in runbook section 3.
 3. The bindOnTrade scan line (06 deploy notes): OPEN-ENABLE. The scan
    (listings' item payloads for bindOnTrade without boundTo) can only mean
    anything against the production database at enable time; it is step 3 of
@@ -231,7 +244,13 @@ documents it).
 4. R14 enable-time verification: OPEN-ENABLE. Verify production holds no
    acceptance rows recorded before the counsel-approved text, and re-key the
    durable flag if the label changed (R14 record in state.md Rulings; the
-   R6 memo's enable-time checklist carries it).
+   R6 memo's "What happens next" checklist carries it as its own numbered
+   item, added by the rider QA after the ledger check found the re-park
+   destination had never received it; follow-ups.md section 3 tracks it
+   too). The load-bearing distinction R14 turns on: the durable flag records
+   ACCEPTANCE THE PLAYER GAVE (a recorded act against a specific text),
+   never merely that a terms screen was SHOWN, which is why re-keying on a
+   text change is a verification step and not a data migration.
 5. R15 contract walk (fail-then-pay-again): SETTLED ON PAPER this rider.
    transaction_failed reports only an atomically failed transaction (a
    failed Solana transaction moves nothing; the verifier matches at

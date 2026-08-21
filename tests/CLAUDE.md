@@ -194,8 +194,9 @@ yourself or the S3 guard throws "status.json is missing".
   is set (dev DB via `npm run db:up`; without it they skip green), and SQL differential
   blocks gate on `WOCC_PG_DIFFERENTIAL=1`. Run the relevant ones before calling DB-shape
   work done. CI provisions a per-leg Postgres service and sets `TEST_DATABASE_URL` in the
-  shard gates and the nightly full suite (pinned per job span in `tests/ci_workflow.test.ts`,
-  with `tests/ci_pg_presence.test.ts` as the in-CI runtime guard), so the floor-resident pg
+  shard gates and the nightly full suite (pinned by the complete job classification in
+  `tests/ci_workflow.test.ts`, with `tests/ci_pg_presence.test.ts` as the runtime guard,
+  armed by the `WOCC_EXPECT_PG` sentinel in the same pinned env blocks), so the floor-resident pg
   suites run on every PR and the handful that classify `graph` join whenever the diff
   reaches them and always in full mode, merge_group, release-gate, and nightly. A local
   gate run without the variable therefore proves LESS than CI; DB-shape work should always

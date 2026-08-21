@@ -853,7 +853,7 @@ client perf pg suite against a VIRGIN database (1 fail on the
 worst-10s index assert before adding runConcurrentIndexMigrations to
 its beforeAll; 5/5 after; probe database dropped).
 
-The SECOND FIX ROUND (service commit on top of 06f6725: the pg
+The SECOND FIX ROUND (service commit 52fa0c2 on top of 06f6725: the pg
 kind-pin bond + heldUsdCents; dashboard dfd0f4d: the decisive 41-digit
 sum fixture, the quoteLegsMismatch cap arm, the DOM note pin, the
 banner sentence, the single-call JSX). New pins, same protocol; the two
@@ -888,3 +888,80 @@ COMMITTED BEFORE MUTATING this time; every prior CI-pin verdict re-run
 Section totals: 18 distinct mutants (6 service + 7 dashboard + 5 CI),
 all BIT, 0 survivors; 3 stale-verdict re-run events, all re-BIT. Whole
 log: 419 distinct mutants.
+
+## Close-out prep rider QA section (run by the rider QA session, 2026-08-20)
+
+The QA's OWN strips per the 20 protocol (the implement log never
+substitutes for the QA's mutants): committed trees only (service 52fa0c2
+then d9a4f9b, dashboard dfd0f4d then c0e99d2, game 2b9f583b2f), every run
+reporting the full suite count, git checkout reverts, status clean before
+and after every run; pg-scored runs with CLAUDIUM_TEST_DATABASE_URL (or
+TEST_DATABASE_URL for the game battery) on the command line only.
+
+SERVICE spot-checks. Two of the QA's strips SURVIVED the shipped pins and
+became new tests in d9a4f9b; both re-scored BIT after the fix:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_settledbase_window_strip | SURVIVED at 52fa0c2 (604/597/0); BIT (1 fail of 605) at d9a4f9b | market_store_pg (memory arm) | the memory volumeTotals window qual deleted: every suite stayed green because no fixture held a settled row outside a queried window, so all three overview windows silently agree; the new two-day-old settlement test reds it |
+| mrc_wocdecimals_falsy_coerce | SURVIVED at 52fa0c2; BIT (1 fail of 605) at d9a4f9b | market_bootstrap | the payload accessor coerced with OR-6: only 9 and nonsense were pinned, so the falsy valid zero fell back silently; the decimalsAt zero arm reds it |
+| mrc_wocdecimals_payload_delete | REFUSED AT COMPILE (tsc TS2741) | build | deleting the payload line cannot ship: MarketAdminOverview requires the field; recorded as a type-level refusal, not counted as a scored mutant |
+| mrc_wocdecimals_hardcode (re-run) | re-BIT (2 fails of 605) | market_http + market_bootstrap | pin file edited this round, verdict re-proven |
+| mrc_settledbase_pg_col_swap (re-run) | re-BIT (1 fail of 605, pg tier zero skips) | market_store_pg | pin file edited this round |
+| mrc_settledbase_pg_kind_qual_strip (re-run) | re-BIT (1 fail of 605, pg tier zero skips) | market_store_pg | pin file edited this round |
+
+DASHBOARD spot-checks. Two strips SURVIVED and became new pins in c0e99d2;
+both re-scored BIT:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_dash_clamp_zero | SURVIVED at dfd0f4d (281/281); BIT (1 fail of 282) at c0e99d2 | market_trading_view | safeWocDecimals lower bound tightened to positive: a reported zero silently re-scales by the constant; the decimals-0 pins red it |
+| mrc_dash_banner_direction | SURVIVED at dfd0f4d; BIT (1 fail of 282) at c0e99d2 | woc_mint | the banner equality widened to at-most: every existing fixture sat above the constant so the below-constant half was silence; the reported-3 and reported-0 arms red it |
+| mrc_dash_cap_41 | BIT at dfd0f4d (1 fail of 281); re-BIT (1 fail of 282) at c0e99d2 | market_trading_view | the 40-digit cap widened by one: the exact-41-digit-sum fixture is decisive both before and after the pin-file edit |
+| mrc_dash_legsreconcile_uncap (re-run) | re-BIT (1 fail of 282) | market_trading_view | pin file edited this round |
+| mrc_dash_screen_strip (re-run) | re-BIT (1 fail of 282) | market_summary_load | pin file edited this round |
+| mrc_dash_prefer_strip (re-run) | re-BIT (2 fails of 282) | market_trading_view + market_trading_panel_dom | pin file edited this round |
+
+THE CI PIN, SHAPE FOUR (game 2b9f583b2f). The QA's gate review EXECUTED a
+third-shape defeat (a cloned shard job whose run line is a block scalar is
+invisible to a run-line recognizer while half the matrix loses its
+database), so the pin was rebuilt as a complete job classification (every
+job key pg-wired, guarded DB-less, or test-free; token-scan cross-checks;
+sentinel WOCC_EXPECT_PG pinned beside the URL). Control 26/26 green;
+every prior CI verdict re-run per the stale rule; THIRTEEN mutants, all
+BIT at the full 26-test count:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_ci_envline_strip (re-run 3) | re-BIT (1 fail) | ci_workflow | pr-gate env block deleted; the span env regexes red |
+| mrc_ci_block_relocation (re-run 2) | re-BIT (1 fail) | ci_workflow | services+env moved verbatim onto lint; pr-gate span asserts red |
+| mrc_ci_matrix_split_new_job (re-run) | re-BIT (3 fails) | ci_workflow | pr-gate cloned inline without the DB block; completeness reds the unclassified key |
+| mrc_ci_blockscalar_split | BIT (2 fails) | ci_workflow | the gate review's measured defeat replayed: the clone's run line as a block scalar; completeness reds it where the run-line recognizer stayed green |
+| mrc_ci_npm_script_job | BIT (2 fails) | ci_workflow | a new job runs npm run test:pg; completeness reds the unclassified key |
+| mrc_ci_quoted_job_key | BIT (1 fail) | ci_workflow | a quoted "pr-pg" job running npm test; the widened key regex collects it and completeness reds it |
+| mrc_ci_5433_sneaky_service (re-run) | re-BIT (1 fail) | ci_workflow | unquoted 5433 mapping on pr-checks; the file-wide negative reds |
+| mrc_ci_5433_quoted | BIT (1 fail) | ci_workflow | the QUOTED "5433:5432" mapping that dodged the shipped matcher; the widened port matcher with positive controls reds it |
+| mrc_ci_sentinel_strip | BIT (1 fail) | ci_workflow | WOCC_EXPECT_PG deleted from pr-gate; the sentinel span regex reds |
+| mrc_ci_expression_run | BIT (1 fail) | ci_workflow | an expression-valued run line added to lint; the novelty refusal reds |
+| mrc_ci_testfree_gains_vitest | BIT (4 fails) | ci_workflow | a vitest step added to pr-checks; the test-free token cross-check reds |
+| mrc_ci_lane_gating_control (re-run) | re-BIT (1 fail) | ci_workflow | TEST_DATABASE_URL read appended to the first CI_LONG_SUITES file |
+| mrc_ci_browser_gating_control | BIT (1 fail) | ci_workflow | TEST_DATABASE_URL read appended to a tests/browser file; the browser coupled guard reds |
+
+The runtime twin was proven live both ways at 2b9f583b2f: armed via
+WOCC_EXPECT_PG=1 with no TEST_DATABASE_URL it FAILS; with the URL it
+passes; locally unarmed it reports SKIPPED.
+
+CONCURRENCY PROBE (not a mutant; the gate review's minimum ask): the full
+pg battery (17 suites, 333 tests) run THREE times as one parallel vitest
+invocation against a virgin database, all green; recorded with the widened
+watch item in follow-ups.md 5.3.
+
+Section totals: 13 new distinct mutants (2 service + 3 dashboard + 8 CI),
+all BIT after the fix round, 0 standing survivors (the 4 initial survivor
+verdicts are the finding, closed by the new pins); 11 re-run events, all
+re-BIT; 1 compile-refused strip recorded, not counted. Whole log: 432 by
+the chained convention (419 + 13). BOOKKEEPING CAVEAT for the 22
+close-out: an independent name census over the log's table rows reads a
+few higher than the chained totals (the early sections record some mutants
+in prose, and the divergence predates this rider); reconcile once at
+close-out if the ledger figure matters.

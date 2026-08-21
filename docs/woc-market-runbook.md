@@ -44,10 +44,12 @@ and counsel sign-off.
   "$WOC Exchange marketplace").
 - Dashboard refresh caveat: the Summary subtab's 30s refresh holds an
   in-flight guard, so a never-resolving fetch parks the refresh permanently
-  (a sticky "Loading quotes..." line). A page reload, a Status filter
-  toggle, a subtab round trip, or any pause/release submit restarts it. A
-  transient refresh failure replaces data with the error on purpose
-  (anti-mixed-epoch); do not ask for silent retention of stale rows.
+  (a sticky "Loading quotes..." line). Only TWO levers genuinely restart the
+  parked loop: a page reload, or a Status filter toggle (it rebuilds the
+  loader and its interval). A pause or release submit repaints once without
+  unparking the loop, and a subtab round trip does nothing (the panel stays
+  mounted). A transient refresh failure replaces data with the error on
+  purpose (anti-mixed-epoch); do not ask for silent retention of stale rows.
 
 ## 2. Pause and resume trading
 
@@ -73,6 +75,14 @@ LAST heartbeat reading and never polls the venue
   release lever still submits (a recorded dashboard follow-up).
 - PAUSE BEFORE DEPLOY in a live settlement window: see section 6.
 - PAUSE DURING AN ECONOMY-RAIL OUTAGE: see section 12.
+- "NOT NOW" ON THE PAY PROMPT (shipped behavior, ruled document-only, R12 in
+  the hardening records): a buyer declining the pay prompt KEEPS the buy-now
+  lock running until its TTL lapses (`server/woc_market_rules.ts`,
+  WOC_MARKET_BUY_NOW_LOCK_SECONDS, three quote TTLs, 270 seconds at the
+  shipped values); a retry re-quotes the same settlement, and expiry fires
+  the abandon cooldowns. There is no release endpoint by ruling (a free
+  release is a lock-cycling denial lever unless it joins the abandon-cooldown
+  accounting); expect locked listings to self-clear within the TTL.
 
 ## 3. Enabling the market (the pre-enable checks)
 
@@ -134,7 +144,9 @@ true.
   readout class is the visibility bound, aged by the
   WOC_MARKET_CONFIRMING_REVIEW_HOURS knob (`server/main.ts` wires it; the
   monitor falls back to six hours). Stuck age renders from stuckSinceMs,
-  not from placement time.
+  which is the signature-recording time where one exists; a legacy row with
+  no recorded signature time falls back to placement time (the COALESCE in
+  `server/woc_market_db.ts`, stuckCustodyReadout).
 - Refusal vocabulary you will see on releases, among others
   (`service/src/market/release_protocol.ts` is the full set):
   `release_unavailable`, `release_not_wired`, `release_in_flight`,
@@ -314,7 +326,8 @@ Per-class resolution:
 Retention interplay: unbooked rows are never pruned; booked rows are
 provenance and age out on `booked_at` after
 `WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS` (default 365). A boot warning
-(`server/main.ts`, wocCustodyClaimsRetentionWarning) fires when the custody
+(wocCustodyClaimsRetentionWarning, owned by `server/woc_market_db.ts` and
+wired by `server/main.ts`) fires when the custody
 window sits at or below the listings window or listings retention is
 keep-forever, either of which disarms the prune coupling.
 
@@ -440,21 +453,38 @@ shorten, and clears are per-account. A suspension freezes that account's
 participation while the sweeps continue to close, return and refund
 normally (suspension is not a wind-down; section 4 is).
 
+To correlate a stuck bond with the abandon-cooldown and suspension ledgers,
+use the raw buyer account id the stuckBonds readout carries: it is the one
+readout class that reports one (dashboard-gated on purpose,
+`server/woc_market_monitor.ts`), kept exactly so this correlation needs no
+hand SQL.
+
 ## 14. Retention, sweeps, and capacity
 
 - The 365-day custody-claims retention bounds the LAST game-side trace that a
-  memoRef delivered (the settlement row itself dies at 180 days), so a
+  memoRef delivered (the settlement row dies with its listing under
+  `WOC_MARKET_LISTINGS_RETENTION_DAYS`, default 180: settlements have no
+  retention entry of their own, they ride the listings cascade), so a
   reconciliation older than that must not assume claims rows exist; the
   service-side quote row and the chain are the durable trail.
-- The nightly retention sweep hour is provisional 05:00 UTC, which is US
+- The nightly retention sweep hour is provisional 05:00 UTC
+  (`RETENTION_SWEEP_UTC_HOUR`, `server/http/config.ts`), which is US
   evening peak. The deletion bound is 50,000 rows PER TABLE per run
   (`server/http/config.ts`, DEFAULT_RETENTION_SWEEP_MAX_ROWS_PER_RUN; the
   market registers five tables, so the aggregate can run well past one
   table's bound), and the bound counts PARENT rows only: listings deletes
   fan out through cascades (the hardening records estimate roughly 5x to
   15x physical rows). Revisit the hour before enabling on a busy realm.
-- Capacity math counts THIRTEEN steady per-realm DB connections (the base
-  pool plus the chat-quota feature's dedicated pool and LISTEN connection).
+- Capacity math counts thirteen steady per-realm DB connections at the
+  defaults: the base pool (`DB_POOL_MAX_CLIENTS`, `server/db.ts`, default
+  10, env-tunable, so re-count after tuning it) plus the chat-quota
+  feature's dedicated pool and LISTEN connection
+  (`server/general_chat_quota_config.ts`).
+- The production pg pools carry no connectionTimeoutMillis (a recorded
+  service-side follow-up): against a dead or unreachable database a checkout
+  HANGS instead of failing fast, so a wedged-everything symptom with a quiet
+  error log is consistent with database unreachability; check the database
+  before the app.
 - On the stuck readout: SUSTAINED `waiting > 0` on the pool gauge is the
   brownout precursor; lockWaitTimeouts and idleTxKills ride beside it. Typed
   `contended` refusals are the guard-transaction timeouts doing their job;
@@ -464,9 +494,11 @@ normally (suspension is not a wind-down; section 4 is).
   shared READ bucket (240/min) carries the recorded sizing note, two
   worst-case players behind one NAT, so a busy venue behind one IP will hit
   429s there first.
-- `/me`'s effective worst case is about 11 seconds under full saturation (the
-  6s between-reads deadline plus one in-flight read); a `/me` deadline
-  surfacing as a 500 during saturation is the incident signal, by design.
+- `/me`'s effective worst case is about 11 seconds under full saturation:
+  the between-reads deadline (WOC_MARKET_ME_READOUT_DEADLINE_MS,
+  `server/woc_market.ts`, 6 seconds) plus one in-flight pool checkout; a
+  `/me` deadline surfacing as a 500 during saturation is the incident
+  signal, by design.
 - `MARKET_BACKFILL_DRY_RUN` deliberately sits outside `.env.example`: it is
   an ops flag for the one-off backfill, not a deployment knob. It is READ
   in `server/db.ts` (set, it halts the boot after computing and printing
