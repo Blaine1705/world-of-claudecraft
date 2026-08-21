@@ -74,6 +74,7 @@ function setup(seed: number, templateId = 'forest_wolf') {
   const mob = createMob(9999, template, template.maxLevel, { x: 0, y: 0, z: 0 });
   mob.dead = true;
   mob.aiState = 'dead';
+  mob.lootable = true;
   mob.corpseTimer = 9999;
   mob.respawnTimer = 9999;
   internals.entities.set(mob.id, mob);

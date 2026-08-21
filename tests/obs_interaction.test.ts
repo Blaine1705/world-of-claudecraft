@@ -80,6 +80,7 @@ function makeLootableCorpse(sim: Sim, corpse: Entity, point: { x: number; z: num
   corpse.hp = 0;
   corpse.hostile = true;
   corpse.lootable = true;
+  corpse.corpseTimer = 60;
   corpse.tappedById = sim.player.id;
   corpse.harvestClaimedBy = sim.player.id;
   corpse.loot = { copper: 17, items: [] };
@@ -123,6 +124,22 @@ describe('RL interactable observation parity', () => {
     expect(sim.copper).toBe(copperBefore + 17);
     expect(corpse.loot).toBeNull();
     expect(corpse.lootable).toBe(false);
+  });
+
+  it('does not advertise a decayed corpse whose stale lootable flag remains set', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const [corpse] = mobFixtures(sim, 'forest_wolf', 1);
+    makeLootableCorpse(sim, corpse, { x: 35, z: 2 });
+    corpse.corpseTimer = 0;
+    parkOtherInteractables(sim, corpse);
+    standAt(sim, { x: 32, z: 0 });
+
+    expect(interactableObs(sim)).toEqual(EMPTY_INTERACTABLE);
+    const copperBefore = sim.copper;
+    applyAction(sim, ACTIONS.indexOf('interact'));
+    expect(sim.copper).toBe(copperBefore);
+    expect(corpse.loot?.copper).toBe(17);
+    expect(corpse.harvestClaimedBy).toBe(sim.player.id);
   });
 
   it('advertises and talks to a friendly quest mob through applyAction', () => {

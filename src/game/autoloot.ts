@@ -1,4 +1,5 @@
 import { isRaidInstancePos } from '../sim/instances/dungeons';
+import { corpseHasDecayed } from '../sim/respawn_policy';
 import { dist2d, INTERACT_RANGE } from '../sim/types';
 import type { IWorld } from '../world_api';
 
@@ -33,6 +34,7 @@ export class AutoLoot {
     const px = world.player.pos;
     for (const e of world.entities.values()) {
       if (e.kind !== 'mob' || !e.dead || !e.lootable || !e.loot) continue;
+      if (corpseHasDecayed(e.dead, e.corpseTimer)) continue;
       const tappedMine = e.tappedById == null || mine.has(e.tappedById);
       const personalMine = e.loot.items.some((slot) => slot.personalFor?.includes(world.playerId));
       const openToAll = e.loot.items.some((slot) => slot.openToAll && slot.count > 0);

@@ -77,6 +77,7 @@ function clearRiftToBossKill(sim: Sim, inst: RiftInstance): Entity {
       if (mob && mob.id !== inst.bossId) {
         mob.hp = 0;
         mob.dead = true;
+        mob.corpseTimer = 60;
       }
     }
     inst.litPylons = new Set(inst.pylonIds);
@@ -101,11 +102,13 @@ function clearRiftToBossKill(sim: Sim, inst: RiftInstance): Entity {
     if (mob && mob.id !== inst.bossId) {
       mob.hp = 0;
       mob.dead = true;
+      mob.corpseTimer = 60;
     }
   }
   const boss = sim.entities.get(inst.bossId!)!;
   boss.hp = 0;
   boss.dead = true;
+  boss.corpseTimer = 60;
   return boss;
 }
 

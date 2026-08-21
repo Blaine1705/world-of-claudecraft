@@ -8,6 +8,7 @@ import {
 } from './combat/necromancy_dominion';
 import { canUseForbiddenReflection } from './combat/warlock_talents';
 import { noticeboardDefByEntityId } from './content/noticeboards';
+import { corpseInteractionAvailability } from './corpse_interaction';
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
 import {
   ASCENSION_CHARGES,
@@ -244,7 +245,11 @@ export function encodeObs(sim: Sim): number[] {
 
   // --- target (9) ---
   const target = selectedTarget;
-  if (target && (!target.dead || target.lootable)) {
+  const targetCorpseInteractable =
+    target?.kind === 'mob' && target.dead
+      ? corpseInteractionAvailability(sim.ctx, target, p.id, true).canInteract
+      : false;
+  if (target && (!target.dead || targetCorpseInteractable)) {
     const d = dist2d(p.pos, target.pos);
     const rel = normAngle(angleTo(p.pos, target.pos) - p.facing);
     obs.push(1);
@@ -257,7 +262,7 @@ export function encodeObs(sim: Sim): number[] {
     obs.push(Math.sin(rel));
     obs.push(Math.cos(rel));
     obs.push(target.hostile ? 1 : 0);
-    obs.push(target.dead && target.lootable ? 1 : 0);
+    obs.push(targetCorpseInteractable ? 1 : 0);
     obs.push(target.aggroTargetId === p.id ? 1 : 0);
   } else {
     obs.push(0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -299,7 +304,11 @@ export function encodeObs(sim: Sim): number[] {
   let bestQuestEntity: Interactable | null = null;
   let bestQuestEntityD2 = INTERACT_RANGE * INTERACT_RANGE;
   sim.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
-    if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) {
+    if (
+      e.kind === 'mob' &&
+      corpseInteractionAvailability(sim.ctx, e, p.id, true).canInteract &&
+      d2 < bestCorpseD2
+    ) {
       bestCorpse = { e, d2, type: 0.33 };
       bestCorpseD2 = d2;
     }

@@ -1509,6 +1509,7 @@ function partyLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = 60;
       mob.lootable = true;
       mob.tappedById = a;
       mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1568,6 +1569,7 @@ function l1LootDistribution(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = 60;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c];
@@ -1701,6 +1703,7 @@ function masterLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = 60;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c, d];

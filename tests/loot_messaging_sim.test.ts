@@ -35,6 +35,7 @@ function partyOfThree(sim: Sim, itemId: string, mobId = 990501) {
   const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
   mob.dead = true;
   mob.lootable = true;
+  mob.corpseTimer = 60;
   mob.tappedById = a;
   mob.loot = { copper: 0, items: [{ itemId, count: 1 }] };
   sim.entities.set(mob.id, mob);

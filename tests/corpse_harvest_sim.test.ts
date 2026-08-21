@@ -152,6 +152,7 @@ function setup(seed = 11) {
   mob.dead = true;
   mob.aiState = 'dead';
   mob.corpseTimer = 9999;
+  mob.lootable = true;
   mob.respawnTimer = 9999;
   internals.entities.set(mob.id, mob);
 
@@ -205,6 +206,7 @@ function harvestCommand(
   corpse.dead = true;
   corpse.aiState = 'dead';
   corpse.corpseTimer = 9999;
+  corpse.lootable = true;
   corpse.respawnTimer = 9999;
   internals.entities.set(corpse.id, corpse);
   if (opts.townFocus) expectDefined(internals.players.get(a)).townFocus = { ...opts.townFocus };
@@ -333,6 +335,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     });
     noTagMob.dead = true;
     noTagMob.corpseTimer = 9999;
+    noTagMob.lootable = true;
     noTagMob.respawnTimer = 9999;
     internals.entities.set(noTagMob.id, noTagMob);
     sim.harvestCorpse(noTagMob.id, undefined, a);
@@ -428,6 +431,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
       const noYieldMob = createMob(7777, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       noYieldMob.dead = true;
       noYieldMob.corpseTimer = 9999;
+      noYieldMob.lootable = true;
       noYieldMob.respawnTimer = 9999;
       internals.entities.set(noYieldMob.id, noYieldMob);
       const before = mustPlayer(internals, a).inventory.length;
@@ -481,6 +485,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
+    mob.lootable = true;
     mob.respawnTimer = 9999;
     internals.entities.set(mob.id, mob);
 
@@ -613,6 +618,7 @@ describe('signed Pristine specimens (#1145)', () => {
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
+      corpse.lootable = true;
       corpse.respawnTimer = 9999;
       internals.entities.set(corpse.id, corpse);
       sim.harvestCorpse(corpse.id, [f.focus], a);
@@ -633,6 +639,7 @@ describe('signed Pristine specimens (#1145)', () => {
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.harvestCorpse(corpse.id, ['cloth'], a);
@@ -757,6 +764,7 @@ describe('two-specimen-family harvest capacity contract', () => {
     boar.dead = true;
     boar.aiState = 'dead';
     boar.corpseTimer = 9999;
+    boar.lootable = true;
     boar.respawnTimer = 9999;
     internals.entities.set(boar.id, boar);
     return boar;
@@ -1055,6 +1063,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.harvestCorpse(corpse.id, ['cloth'], a);
@@ -1219,6 +1228,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.drainEvents();
@@ -1317,6 +1327,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.harvestCorpse(corpse.id, ['hide', 'hide'], a);
@@ -1344,6 +1355,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     expect(template.componentTags).toEqual(['hide', 'tusk', 'meat']);
@@ -1392,6 +1404,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.drainEvents();
@@ -1425,8 +1438,8 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     expect(mob.corpseTimer).toBe(once.mob.corpseTimer);
     // `lootable` is pinned against the arm that decides it rather than against
     // the twin: this corpse has no loot, so it takes the collapse arm and ends
-    // false. Compared to the twin alone the line would hold even if the command
-    // never ran, since a createMob corpse starts out unlootable.
+    // false. Compared to the twin alone the line would hold if both commands
+    // were refused before the claim path, so the literal false pins the outcome.
     expect(mob.loot).toBeNull();
     expect(mob.lootable).toBe(false);
     expect(mob.lootable).toBe(once.mob.lootable);
@@ -1451,6 +1464,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
+      corpse.lootable = true;
       corpse.respawnTimer = 9999;
       internals.entities.set(corpse.id, corpse);
       const m = expectDefined(internals.players.get(a));
@@ -1529,6 +1543,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
           corpse.dead = true;
           corpse.aiState = 'dead';
           corpse.corpseTimer = 9999;
+          corpse.lootable = true;
           corpse.respawnTimer = 9999;
           internals.entities.set(corpse.id, corpse);
           return corpse.id;
@@ -1552,6 +1567,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
           corpse.dead = true;
           corpse.aiState = 'dead';
           corpse.corpseTimer = 9999;
+          corpse.lootable = true;
           corpse.respawnTimer = 9999;
           internals.entities.set(corpse.id, corpse);
           return corpse.id;
@@ -1617,6 +1633,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.drainEvents();
@@ -1812,6 +1829,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.drainEvents();
@@ -2028,6 +2046,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
           corpse.dead = true;
           corpse.aiState = 'dead';
           corpse.corpseTimer = 9999;
+          corpse.lootable = true;
           corpse.respawnTimer = 9999;
           internals.entities.set(corpse.id, corpse);
           return corpse.id;
@@ -2071,6 +2090,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
           corpse.dead = true;
           corpse.aiState = 'dead';
           corpse.corpseTimer = 9999;
+          corpse.lootable = true;
           corpse.respawnTimer = 9999;
           internals.entities.set(corpse.id, corpse);
           return corpse.id;
@@ -2094,6 +2114,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
           corpse.dead = true;
           corpse.aiState = 'dead';
           corpse.corpseTimer = 9999;
+          corpse.lootable = true;
           corpse.respawnTimer = 9999;
           internals.entities.set(corpse.id, corpse);
           return corpse.id;
@@ -2177,6 +2198,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
+    mob.lootable = true;
     mob.respawnTimer = 9999;
     internals.entities.set(mob.id, mob);
     return { sim, internals, a, mob };
@@ -2496,6 +2518,7 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
+    mob.lootable = true;
     mob.respawnTimer = 9999;
     internals.entities.set(mob.id, mob);
     // One tick re-indexes the spatial grid the interest scan reads
@@ -2684,6 +2707,7 @@ describe('a repeated component tag over the wire, through a real GameServer (#24
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
+    mob.lootable = true;
     mob.respawnTimer = 9999;
     internals.entities.set(mob.id, mob);
     // A hand-built frame, the untrusted shape the issue reproduces with, parsed
@@ -2779,6 +2803,7 @@ describe('an invalid component tag over the wire, through a real GameServer (#25
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
+    mob.lootable = true;
     mob.respawnTimer = 9999;
     internals.entities.set(mob.id, mob);
     // A hand-built frame, the untrusted shape the issue reproduces with, parsed
@@ -2944,6 +2969,7 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.harvestCorpse(corpse.id, ['horn'], a);
@@ -3368,6 +3394,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
+      corpse.lootable = true;
       corpse.respawnTimer = 9999;
       quietInternals.entities.set(corpse.id, corpse);
       quiet.drainEvents();
@@ -3629,6 +3656,7 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     corpse.dead = true;
     corpse.aiState = 'dead';
     corpse.corpseTimer = 9999;
+    corpse.lootable = true;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.drainEvents();
@@ -3720,6 +3748,7 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
       corpse.dead = true;
       corpse.aiState = 'dead';
       corpse.corpseTimer = 9999;
+      corpse.lootable = true;
       corpse.respawnTimer = 9999;
       internals.entities.set(corpse.id, corpse);
       let draws = 0;
@@ -3808,6 +3837,7 @@ describe('an unmapped-only pick over the wire, through a real GameServer (#2509)
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
+    mob.lootable = true;
     mob.respawnTimer = 9999;
     internals.entities.set(mob.id, mob);
     // `t: 'cmd'` is the real envelope; without it the dispatcher drops the
@@ -3845,6 +3875,7 @@ describe('an unmapped-only pick over the wire, through a real GameServer (#2509)
     okMob.dead = true;
     okMob.aiState = 'dead';
     okMob.corpseTimer = 9999;
+    okMob.lootable = true;
     okMob.respawnTimer = 9999;
     okInternals.entities.set(okMob.id, okMob);
     const okRaw = JSON.stringify({

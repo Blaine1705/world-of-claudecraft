@@ -26,7 +26,7 @@
 import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
-import { corpseInteractionAvailability } from './corpse_interaction';
+import { corpseCanInteract, corpseInteractionAvailability } from './corpse_interaction';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -128,7 +128,7 @@ export function lootCorpse(
     return false;
   }
   const mob = ctx.entities.get(mobId);
-  if (!mob?.lootable || !mob.loot) return false;
+  if (!mob || !corpseCanInteract(mob) || !mob.lootable || !mob.loot) return false;
   // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
   const ffaUnlocked = honorFfa && lootHasGoneFfa(mob.lootFfaTimer);
   const rights = corpseLootRights(ctx, mob, meta.entityId, ffaUnlocked);
@@ -221,7 +221,7 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
   const { meta, e: trigger } = r;
   if (isInRaidInstance(ctx, trigger.pos)) return; // silent: no error toast on a passive walk-by
   const mob = ctx.entities.get(mobId);
-  if (!mob?.lootable || !mob.loot) return;
+  if (!mob || !corpseCanInteract(mob) || !mob.lootable || !mob.loot) return;
   if (dist2d(trigger.pos, mob.pos) > INTERACT_RANGE) return;
 
   // ffaUnlocked=false: walk-by may auto-loot the trigger's own tap, their party's tap,
@@ -296,7 +296,7 @@ export function harvestCorpse(
     return;
   }
   const mob = ctx.entities.get(mobId);
-  if (mob?.kind !== 'mob' || !mob.dead) return;
+  if (!mob || !corpseCanInteract(mob)) return;
   const componentTags = MOBS[mob.templateId]?.componentTags;
   if (!isHarvestableCorpse(componentTags)) {
     ctx.error(meta.entityId, 'That corpse has nothing to harvest.');
@@ -875,7 +875,7 @@ export function interact(
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
-      if (target.kind === 'mob' && target.lootable) {
+      if (target.kind === 'mob' && corpseCanInteract(target)) {
         const availability = corpseInteractionAvailability(ctx, target, p.id, true);
         if (availability.canInteract) {
           // Unified press, targeted arm: same composition as the
@@ -951,7 +951,7 @@ export function interact(
   ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
     if (
       e.kind === 'mob' &&
-      e.lootable &&
+      corpseCanInteract(e) &&
       corpseInteractionAvailability(ctx, e, p.id, true).canInteract &&
       d2 < bestCorpseD2
     ) {

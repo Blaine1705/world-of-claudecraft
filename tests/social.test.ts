@@ -66,6 +66,7 @@ describe('parties', () => {
     const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 60;
     mob.tappedById = tapper;
     mob.lootRecipientIds = recipients;
     mob.loot = loot;

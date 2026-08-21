@@ -1,6 +1,7 @@
 import { MOBS } from '../sim/data';
 import { hasSharedLootRights, lootHasGoneFfa } from '../sim/loot/loot_ffa';
 import { isHarvestableCorpse } from '../sim/professions/gathering';
+import { corpseHasDecayed } from '../sim/respawn_policy';
 import type { Entity } from '../sim/types';
 
 /** Resolve the exact corpse content the local player can open in the loot popup.
@@ -45,6 +46,16 @@ export function corpseLootAvailability(
   partyMemberIds: readonly number[] | null = null,
 ) {
   const componentTags = MOBS[mob.templateId]?.componentTags;
+  if (corpseHasDecayed(mob.dead === true, mob.corpseTimer ?? 1)) {
+    return {
+      componentTags,
+      harvestable: false,
+      visibleItems: [],
+      visibleCopper: 0,
+      hasLoot: false,
+      canOpen: false,
+    };
+  }
   // isHarvestableCorpse, the sim's own predicate, not a tag count of our own
   // (#2513): a corpse whose every family is unmapped (no shipped template
   // since #2905 mapped fen_troll's claw and tusk; the fixtures retag one)

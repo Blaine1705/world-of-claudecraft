@@ -30,7 +30,15 @@ function ent(partial: Partial<Entity> & { id: number }): Entity {
 
 describe('deadTargetSelectable', () => {
   it('allows a lootable corpse regardless of owner', () => {
-    expect(deadTargetSelectable(ent({ id: 10, dead: true, lootable: true }), 1)).toBe(true);
+    expect(
+      deadTargetSelectable(ent({ id: 10, dead: true, lootable: true, corpseTimer: 60 }), 1),
+    ).toBe(true);
+  });
+
+  it('rejects a decayed lootable corpse', () => {
+    expect(
+      deadTargetSelectable(ent({ id: 10, dead: true, lootable: true, corpseTimer: 0 }), 1),
+    ).toBe(false);
   });
 
   it("allows the viewer's own pet", () => {
@@ -106,6 +114,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       templateId: 'kobold_miner',
       dead: true,
       lootable: true,
+      corpseTimer: 60,
       tappedById: 2,
       lootFfaTimer: 30,
       loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
@@ -143,6 +152,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       kind: 'mob' as const,
       dead: true,
       lootable: true,
+      corpseTimer: 60,
       tappedById: 2,
       lootFfaTimer: 30,
       loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
@@ -178,6 +188,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       templateId: 'kobold_miner',
       dead: true,
       lootable: true,
+      corpseTimer: 60,
       tappedById: 1,
       lootFfaTimer: 30,
       loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },

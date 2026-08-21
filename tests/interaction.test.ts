@@ -58,6 +58,7 @@ function corpse(
   }) as AnyEntity;
   mob.dead = true;
   mob.lootable = true;
+  mob.corpseTimer = 60;
   mob.tappedById = tappedById;
   mob.loot = { copper: 0, items };
   sim.addEntity(mob);
@@ -159,6 +160,22 @@ describe('interaction.lootCorpse', () => {
     expect(mob.loot).toBeNull(); // pruneCorpseLoot cleared the emptied corpse
     expect(player.targetId).toBeNull();
   });
+
+  it('refuses a decayed corpse even when stale loot remains on it', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 22, a, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.corpseTimer = 0;
+    sim.events = [];
+
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(false);
+    interaction.harvestCorpse(ctxOf(sim), mob.id, undefined, a);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(sim.countItem('rough_hide', a)).toBe(0);
+    expect(mob.loot?.items[0].count).toBe(1);
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(errors(sim)).toEqual([]);
+  });
 });
 
 describe('interaction.pickUpObject', () => {
@@ -240,6 +257,21 @@ describe('interaction.interact dispatch', () => {
     expect(sim.countItem('wolf_fang', a)).toBe(1);
     expect(obj.lootable).toBe(false);
     expect(errors(sim)).not.toContain("You don't have permission to loot that.");
+  });
+
+  it('target-path: skips a decayed corpse and falls through to a nearby object', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 21, a, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.corpseTimer = 0;
+    const obj = groundObj(sim, 'wolf_fang', 20, 21.5);
+    const player = sim.entities.get(a) as AnyEntity;
+    player.targetId = mob.id;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    expect(obj.lootable).toBe(false);
   });
 
   it('nearest-scan: with no target, picks up the nearest lootable object', () => {

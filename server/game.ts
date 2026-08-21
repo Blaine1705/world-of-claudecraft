@@ -76,6 +76,7 @@ import {
   curatorRankFromOwned,
   reliquaryWireJson,
 } from '../src/sim/reliquary';
+import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -1538,6 +1539,7 @@ function wireAura(a: Aura): WireAura {
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> {
+  const decayedCorpse = e.kind === 'mob' && corpseHasDecayed(e.dead, e.corpseTimer);
   const out: Record<string, unknown> = {
     x: round2(e.pos.x),
     y: round2(e.pos.y),
@@ -1548,7 +1550,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   };
   if (e.dead) out.dead = 1;
   if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
-  if (e.lootable) out.loot = 1;
+  if (e.lootable && !decayedCorpse) out.loot = 1;
   if (e.hostile) out.h = 1;
   if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
   // The target frame's resource bar: type + current/max, sent only for entities
@@ -1605,7 +1607,9 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // stranger's aged-out corpse again for a deliberate manual loot, the same
   // reliability contract hcb gives harvest claims. Flips once per corpse, so
   // the per-entity dyn cache re-serializes exactly one changed record.
-  if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
+  if (e.kind === 'mob' && e.lootable && !decayedCorpse && lootHasGoneFfa(e.lootFfaTimer))
+    out.ffa = 1;
+  if (decayedCorpse) out.cd = 1; // corpse decayed
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;
@@ -1634,7 +1638,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (includeAuras && e.auras.length > 0) {
     out.auras = e.auras.map(wireAura);
   }
-  if (e.kind === 'mob' && e.lootable && e.loot) {
+  if (e.kind === 'mob' && e.lootable && !decayedCorpse && e.loot) {
     out.lootList = { copper: e.loot.copper, items: e.loot.items };
   }
   return out;

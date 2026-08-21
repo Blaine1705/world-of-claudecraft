@@ -52,6 +52,26 @@ describe('corpseLootAvailability', () => {
     expect(result.canOpen).toBe(true);
   });
 
+  it('closes a decayed corpse even when stale loot fields remain mirrored', () => {
+    const result = corpseLootAvailability(
+      corpse({
+        templateId: 'forest_wolf',
+        dead: true,
+        lootable: true,
+        corpseTimer: 0,
+        loot: { copper: 50, items: [{ itemId: 'wolf_fang', count: 1 }] },
+        harvestClaimedBy: null,
+      }),
+      1,
+    );
+
+    expect(result.harvestable).toBe(false);
+    expect(result.hasLoot).toBe(false);
+    expect(result.visibleCopper).toBe(0);
+    expect(result.visibleItems).toEqual([]);
+    expect(result.canOpen).toBe(false);
+  });
+
   it('closes a depleted corpse whose every component family is unmapped (#2513)', () => {
     // fen_troll carried claw and tusk and HARVEST_COMPONENT_ITEMS mapped
     // neither, so the sim refused a harvest there. Both are mapped now (this

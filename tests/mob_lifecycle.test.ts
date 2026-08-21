@@ -241,4 +241,28 @@ describe('mob_lifecycle module: un-looted corpse loot on respawn (issue #1539)',
     expect(mob.loot).toBe(null);
     expect(mob.tappedById).toBe(null);
   });
+
+  it('corpse decay clears stale lootability even when respawn is still far away', () => {
+    const sim = makeSim();
+    const p = sim.player as any;
+    const mob = spawn(sim, 'forest_wolf', 5, 40, 40);
+    mob.spawnPos = { x: 40, y: mob.pos.y, z: 40 };
+    mob.dead = true;
+    mob.hp = 0;
+    mob.aiState = 'dead';
+    mob.lootable = true;
+    mob.loot = { copper: 120, items: [{ itemId: 'wolf_pelt', count: 1 }] };
+    mob.tappedById = p.id;
+    mob.respawnTimer = 900;
+    mob.corpseTimer = 0.05;
+
+    updateMob(ctxOf(sim), mob);
+
+    expect(mob.dead).toBe(true);
+    expect(mob.respawnTimer).toBeGreaterThan(0);
+    expect(mob.corpseTimer).toBeLessThanOrEqual(0);
+    expect(mob.lootable).toBe(false);
+    expect(mob.loot).toBeNull();
+    expect(sim.lootCorpse(mob.id)).toBe(false);
+  });
 });

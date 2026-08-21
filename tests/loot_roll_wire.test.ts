@@ -66,6 +66,7 @@ describe('loot roll self-snapshot parity', () => {
     const mob = createMob(990800, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 60;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
     sim.entities.set(mob.id, mob);
@@ -114,6 +115,7 @@ describe('loot roll self-snapshot parity', () => {
     const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 60;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
     sim.entities.set(mob.id, mob);
@@ -234,6 +236,7 @@ describe('a repeated pid in a masterAssign frame, through a real GameServer (#25
     const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 60;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
     sim.entities.set(mob.id, mob);
@@ -408,6 +411,7 @@ describe('the masterAssign pids length cap (#2524)', () => {
     const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 60;
     mob.tappedById = leader;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
     sim.entities.set(mob.id, mob);
