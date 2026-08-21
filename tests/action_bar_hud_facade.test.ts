@@ -21,8 +21,7 @@ describe('Hud action-bar facade', () => {
     const attackSlotStart = source.indexOf('// Slot 0 (Attack).', configurableStart);
     const configurableSlots = source.slice(configurableStart, attackSlotStart);
 
-    expect(configurableSlots.match(/btn\.addEventListener\('contextmenu'/g)).toHaveLength(1);
-    expect(configurableSlots).toContain('handleShiftClearContextMenu(e, clearSlot)');
+    expect(configurableSlots).toContain('bindShiftClear(btn, clearSlot);');
     expect(configurableSlots).toContain(
       'this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);',
     );
@@ -32,11 +31,26 @@ describe('Hud action-bar facade', () => {
       buildStart,
       source.indexOf('private buildCastBar()', buildStart),
     );
-    expect(actionBarBuild.match(/handleShiftClearContextMenu\(/g)).toHaveLength(2);
-    expect(actionBarBuild.match(/handleShiftClearKeydown\(/g)).toHaveLength(2);
+    // Only the attack slot (slot 0) still calls the two handlers directly; every
+    // configurable slot routes through bindShiftClear instead (checked above).
+    expect(actionBarBuild.match(/handleShiftClearContextMenu\(/g)).toHaveLength(1);
+    expect(actionBarBuild.match(/handleShiftClearKeydown\(/g)).toHaveLength(1);
     expect(actionBarBuild).toContain('handleShiftClearContextMenu(e, clearAttackSlotAction);');
     expect(actionBarBuild).toContain('this.attackSlotAction = null;');
     expect(actionBarBuild).toContain('this.saveAttackSlotAction();');
+
+    // bindShiftClear is the one place that knows a slot surface must offer BOTH
+    // desktop clear affordances; pin that its body still registers the pair, so a
+    // future surface cannot ship contextmenu without keydown (or vice versa).
+    const clearSource = readFileSync(
+      new URL('../src/ui/hud/action_bar/action_bar_clear.ts', import.meta.url),
+      'utf8',
+    );
+    const bindStart = clearSource.indexOf('export function bindShiftClear');
+    expect(bindStart).toBeGreaterThan(-1);
+    const bindBody = clearSource.slice(bindStart);
+    expect(bindBody).toContain("btn.addEventListener('contextmenu'");
+    expect(bindBody).toContain("btn.addEventListener('keydown'");
   });
 
   it('checks drag eligibility before every drop and the touch bar editor place', () => {

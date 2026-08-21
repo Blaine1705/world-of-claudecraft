@@ -642,8 +642,8 @@ export const hudChromeStrings = {
   // a grid of 4 buttons by 5 directions, with page tabs. It is the ONLY way to
   // bind a slot on touch, so its copy has to TEACH the two-tap language (place,
   // then swap) that replaces the long-press drag it retires. Every value here is
-  // WORDY by M16 except pageTab and buttonHeader (one short word plus a token),
-  // so the rest carry the five non-Latin fills.
+  // WORDY by M16 except pageTab (one short word plus a token), so the rest
+  // carry the five non-Latin fills.
   barEditor: {
     title: 'Edit Action Bar',
     close: 'Close bar editor',
