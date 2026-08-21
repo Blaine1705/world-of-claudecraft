@@ -7851,6 +7851,9 @@ export const vi_VN: EnTranslations = {
       "reload": "Tải lại",
       "quit": "Thoát",
       "fatalBody": "World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại."
+    },
+    "window": {
+      "exitToDesktop": "Exit to Desktop"
     }
   },
   "gpuNotice": {

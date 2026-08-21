@@ -7851,6 +7851,9 @@ export const id_ID: EnTranslations = {
       "reload": "Muat Ulang",
       "quit": "Keluar",
       "fatalBody": "World of ClaudeCraft mengalami kesalahan tak terduga dan perlu ditutup."
+    },
+    "window": {
+      "exitToDesktop": "Exit to Desktop"
     }
   },
   "gpuNotice": {

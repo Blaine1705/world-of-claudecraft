@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -36,6 +37,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "es_ES": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -62,6 +64,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_FR": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -88,6 +91,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_CA": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -115,6 +119,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -141,6 +146,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "de_DE": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -179,6 +185,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "pt_BR": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -208,6 +215,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -234,6 +242,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "nl_NL": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -260,6 +269,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "pl_PL": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -286,6 +296,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "id_ID": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -312,6 +323,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "tr_TR": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -338,6 +350,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "sv_SE": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -364,6 +377,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "vi_VN": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -390,6 +404,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "da_DK": [
+    "desktop.window.exitToDesktop",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",

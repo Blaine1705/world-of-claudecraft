@@ -7851,6 +7851,9 @@ export const sv_SE: EnTranslations = {
       "reload": "Ladda om",
       "quit": "Avsluta",
       "fatalBody": "World of ClaudeCraft stötte på ett oväntat fel och måste stängas."
+    },
+    "window": {
+      "exitToDesktop": "Exit to Desktop"
     }
   },
   "gpuNotice": {

@@ -7851,6 +7851,9 @@ export const it_IT: EnTranslations = {
       "reload": "Ricarica",
       "quit": "Esci",
       "fatalBody": "World of ClaudeCraft ha riscontrato un errore imprevisto e deve chiudersi."
+    },
+    "window": {
+      "exitToDesktop": "Exit to Desktop"
     }
   },
   "gpuNotice": {
