@@ -567,6 +567,9 @@ jobs:
     # leg that would have skipped green (the alternative, a separate
     # DB-only job, would mint new required-check names; see
     # docs/merge-queue.md before ever taking that trade).
+    # WOCC_EXPECT_PG arms the runtime sentinel (tests/ci_pg_presence.test.ts)
+    # on ANY runner brand: it travels in the same job-level env block the
+    # source pin fingerprints, so losing this block disarms nothing quietly.
     services:
       postgres:
         image: postgres:16-alpine
@@ -583,6 +586,7 @@ jobs:
           --health-retries 20
     env:
       TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/wocc_ci
+      WOCC_EXPECT_PG: '1'
 
     # fail-fast stays off: shards pass or fail independently, so one red shard
     # never cancels the others and a failure report always covers the whole
@@ -1180,6 +1184,7 @@ jobs:
           --health-retries 20
     env:
       TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/wocc_ci
+      WOCC_EXPECT_PG: '1'
 
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
     # the suite at PR tier so a red shard always means a real regression. The

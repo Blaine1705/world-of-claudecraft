@@ -37,7 +37,13 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     await db.pool.query('DELETE FROM client_perf_reports WHERE session_id LIKE $1', [
       `${MARKER}-%`,
     ]);
-  });
+    // 120s hook budget below, matching every sibling that runs the migration
+    // pass: the boot DDL rides an advisory lock and each CREATE INDEX
+    // CONCURRENTLY waits out sibling suites' snapshots on the shared CI
+    // database, so the default 10s hookTimeout is a flake at the merge bar
+    // (and a timed-out hook abandons the lock-holding client rather than
+    // aborting it).
+  }, 120_000);
 
   afterAll(async () => {
     await db.pool.query('DELETE FROM client_perf_reports WHERE session_id LIKE $1', [

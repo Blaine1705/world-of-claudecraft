@@ -124,6 +124,7 @@ jobs:
           --health-retries 20
     env:
       TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/wocc_ci
+      WOCC_EXPECT_PG: '1'
     strategy:
       fail-fast: false
       matrix:
