@@ -1000,6 +1000,23 @@ export class BagsWindow {
           this.openItemMenuFor(item, s, ev);
           return;
         }
+        // runBagAction's use/feed/equip/deposit arms call this.render()
+        // SYNCHRONOUSLY: the rebuild's focus-restore ladder re-seats focus
+        // onto the fresh row by data-focus-key before this click event ever
+        // finishes bubbling to Input's window-level mouse-click blur guard
+        // (src/game/input.ts releaseMouseActivatedFocus), so that guard's
+        // "did THIS click activate what's now focused" check never matches
+        // the rebuilt (structurally unrelated) node and never fires. Shed
+        // focus here, before the rebuild can re-seat it, for a real mouse
+        // click only (ev.detail > 0, the same discriminator the window-level
+        // guard already uses): the still-focused button would otherwise
+        // natively reactivate on the very next Space (the #bags panel guard
+        // stops propagation without preventDefault so Tab+Space keyboard
+        // reactivation keeps working), replaying the action and swallowing
+        // the jump (issue: a potion kept drinking instead of jumping).
+        // Keyboard activation (detail 0) is left alone so the restore ladder
+        // still lands Tab users on the next sensible control.
+        if (ev.detail > 0) row.blur();
         this.runBagAction(item, s, ev);
       });
       row.addEventListener('contextmenu', (ev) => {

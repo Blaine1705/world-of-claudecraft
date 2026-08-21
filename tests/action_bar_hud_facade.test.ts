@@ -44,6 +44,21 @@ describe('Hud action-bar facade', () => {
     expect(source.match(/actionBarController\.isAssignableAction\(/g)).toHaveLength(4);
   });
 
+  it("cancels a focused slot's native Space activation without blocking the jump key (issue: Space only blocked jump, never cast, never jumped)", () => {
+    // tests/browser/action_bar_space_jump.browser.test.ts pins the live
+    // behavior; this source pin keeps the ACTUAL buildActionBar wiring from
+    // regressing back to stopPropagation, which would silently swallow the
+    // keydown before it ever reaches Input's window-level jump handler.
+    const source = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const buildStart = source.indexOf('private buildActionBar(): void');
+    const keydownStart = source.indexOf("btn.addEventListener('keydown'", buildStart);
+    const keydownEnd = source.indexOf('});', keydownStart);
+    const keydownBlock = source.slice(keydownStart, keydownEnd);
+
+    expect(keydownBlock).toContain('e.preventDefault();');
+    expect(keydownBlock).not.toContain('e.stopPropagation();');
+  });
+
   it('cancels a mobile drag before exposing a newly loaded form page', () => {
     const clearTimeout = vi.fn();
     vi.stubGlobal('window', { clearTimeout });
