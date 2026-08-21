@@ -777,12 +777,13 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
     driverAllow: {},
   },
-  // The quest strip's seat. Its ONE rect helper is shared by all four measures
-  // (the app-viewport container, the band's occupants, the target frame's
-  // reserved slot and the strip's own height), and it runs only when a cheap
-  // key built from non-layout reads moves: the rendered content, the viewport,
-  // the tier/scale attributes, or the target frame coming or going. A steady
-  // HUD on the tracker's medium band takes no layout read at all.
+  // The quest strip's width bound. Its ONE rect helper is shared by all three
+  // measures (the app-viewport container, the strip's own CSS-seated anchor,
+  // and the band's occupants), and it runs only when a cheap key built from
+  // non-layout reads moves: the rendered content, the viewport, or the
+  // tier/scale attributes. The target frame is deliberately NOT in that key and
+  // is never measured: the anchor comes from hud.mobile.css. A steady HUD on
+  // the tracker's medium band takes no layout read at all.
   {
     file: 'hud/quest/quest_strip_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1 },

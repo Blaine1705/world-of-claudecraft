@@ -12,8 +12,10 @@
 // the strip repaints on the HUD's medium band and a pooled build would be one
 // more thing to get wrong for a list that is capped at five lines anyway.
 //
-// It takes no layout read: the seat comes in already measured from the
-// controller, which gates its measures behind a cheap invalidation key.
+// It takes no layout read: the width bound comes in already measured from the
+// controller, which gates its measures behind a cheap invalidation key. The
+// strip's ANCHOR is never written here at all: hud.mobile.css owns it, so no
+// paint can move the point the player's thumb learned.
 
 import type { PainterHostWriters } from '../../painter_host';
 import type { QuestStripBand, QuestStripStep } from './quest_strip_core';
@@ -22,8 +24,6 @@ const CLASS_EMPTY = 'empty';
 const CLASS_DONE = 'done';
 const CLASS_COMPLETE = 'complete';
 const CLASS_PRESSED = 'gesturing';
-const LEFT_PROP = 'left';
-const TOP_PROP = 'top';
 const MAX_WIDTH_PROP = 'max-width';
 const ARIA_LABEL_ATTR = 'aria-label';
 const HIDDEN = 'none';
@@ -118,14 +118,11 @@ export class QuestStripPainter {
     this.paintFlash(model.flash);
   }
 
-  /** Seat the strip at the band the core resolved. Left-top anchored, so a
-   *  changing objective count grows the box down and right instead of moving
-   *  the point the player's eye (and thumb) already learned. */
+  /** Bound the strip's width at the band the core resolved. The left-top anchor
+   *  is static CSS, so a changing objective count (or a target coming and going)
+   *  grows the box down and right from a point that never moves. */
   place(band: QuestStripBand): void {
-    const { root } = this.descriptor;
-    this.writers.setStyleProp(root, LEFT_PROP, `${band.left}px`);
-    this.writers.setStyleProp(root, TOP_PROP, `${band.top}px`);
-    this.writers.setStyleProp(root, MAX_WIDTH_PROP, `${band.maxWidth}px`);
+    this.writers.setStyleProp(this.descriptor.root, MAX_WIDTH_PROP, `${band.maxWidth}px`);
   }
 
   private paintFlash(flash: QuestStripFlash | null): void {

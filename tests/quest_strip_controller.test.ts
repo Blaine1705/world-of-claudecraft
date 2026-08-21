@@ -10,7 +10,13 @@
 //     pinned against the real t() catalog rather than a stub,
 //   - the handoff: on touch the tracker stops rendering its own markup and the
 //     strip is fed the SAME projection, which is what makes this a second
-//     presentation rather than a second data model.
+//     presentation rather than a second data model,
+//   - and the seat: the painter writes a max-width and nothing else, and the
+//     target frame coming or going changes not one byte of it. The strip used
+//     to reserve that frame's MEASURED box, so it started at the screen edge and
+//     slid right the first time the player targeted anything; the anchor is
+//     hud.mobile.css's now (--quest-strip-anchor-left) and the real resolved
+//     value is pinned in tests/browser/quest_strip.browser.test.ts.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QUESTS } from '../src/sim/data';
@@ -26,7 +32,7 @@ const SWIPE_PX = 40;
 
 const STRIP_MARKUP = `
   <div id="quest-strip" class="empty">
-    <button type="button" id="quest-strip-main" class="panel">
+    <button type="button" id="quest-strip-main">
       <span class="quest-strip-title-row">
         <span id="quest-strip-title" class="quest-strip-title"></span>
         <span id="quest-strip-complete" class="quest-complete"></span>
@@ -267,5 +273,80 @@ describe('the tracker hands its projection to the strip on touch', () => {
     rig.controller.update();
     expect(rig.element.innerHTML).toContain('title:q_wolves');
     expect(rig.root.classList.contains('empty')).toBe(true);
+  });
+});
+
+describe('the strip is seated by CSS, never by the painter', () => {
+  const CONTAINER_RECT = { left: 0, right: 874, top: 0, bottom: 402 };
+  /** Where hud.mobile.css seats the strip on this tier: past the target frame's
+   *  STATIC seat, whether or not a frame is there. */
+  const ANCHOR_RECT = { left: 276, right: 500, top: 6, bottom: 46 };
+  const TARGET_RECT = { left: 6, right: 250, top: 6, bottom: 47 };
+
+  function stubRect(
+    el: Element,
+    rect: { left: number; right: number; top: number; bottom: number },
+  ) {
+    Object.defineProperty(el, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ ...rect, width: rect.right - rect.left, height: rect.bottom - rect.top }),
+    });
+  }
+
+  /** happy-dom reports a zero box for everything, so the seat would early-return
+   *  and every pin below would pass vacuously. Stub the two boxes the seat
+   *  actually reads instead. */
+  function mountSeated() {
+    const rig = mountStrip();
+    stubRect(rig.root.parentElement as Element, CONTAINER_RECT);
+    stubRect(rig.root, ANCHOR_RECT);
+    return rig;
+  }
+
+  function addTargetFrame(): HTMLElement {
+    const frame = document.createElement('div');
+    frame.id = 'target-frame';
+    document.body.append(frame);
+    stubRect(frame, TARGET_RECT);
+    return frame;
+  }
+
+  it('writes a max-width and nothing else', () => {
+    const rig = mountSeated();
+    rig.controller.update([quest('a', 2)]);
+    expect(rig.root.style.maxWidth).not.toBe('');
+    // The anchor is the stylesheet's; an inline left or top here would be the
+    // painter taking it back.
+    expect(rig.root.style.left).toBe('');
+    expect(rig.root.style.top).toBe('');
+  });
+
+  it('writes the same bound with, without, and after losing a target frame', () => {
+    const rig = mountSeated();
+    rig.controller.update([quest('a', 2)]);
+    const untargeted = rig.root.getAttribute('style');
+    expect(untargeted).toBeTruthy();
+
+    const frame = addTargetFrame();
+    rig.controller.update([quest('a', 3)]);
+    expect(rig.root.getAttribute('style')).toBe(untargeted);
+
+    frame.remove();
+    rig.controller.update([quest('a', 2)]);
+    expect(rig.root.getAttribute('style')).toBe(untargeted);
+  });
+
+  it('lets a band occupant right of the anchor cap the width', () => {
+    // The one thing still measured: the buff bar grows leftward, so how far the
+    // strip may run is a real measure even though where it starts is not.
+    const rig = mountSeated();
+    const buffs = document.createElement('div');
+    buffs.id = 'buff-bar';
+    document.body.append(buffs);
+    stubRect(buffs, { left: 681, right: 860, top: 4, bottom: 40 });
+    rig.controller.update([quest('a', 2)]);
+    // 681 - QUEST_STRIP_BAND_GAP_PX (10) - the 276px anchor.
+    expect(rig.root.style.maxWidth).toBe('395px');
+    expect(rig.root.style.left).toBe('');
   });
 });

@@ -2,9 +2,9 @@
 // replacement for the right-anchored quest tracker on phones. It owns which
 // quest is shown (cycling arithmetic and the swipe orientation), the counter's
 // numeric inputs, the objective list the strip renders, and the band arithmetic
-// that turns measured boxes into a left edge and a max width. The painter owns
-// the measuring, the t() calls, and the formatting; registered in
-// tests/architecture.test.ts UI_PURE_CORES.
+// that turns measured boxes into a max width. The painter owns the measuring,
+// the t() calls, and the formatting; registered in tests/architecture.test.ts
+// UI_PURE_CORES.
 //
 // The tracker this replaces is unbounded in height, so every extra quest grows
 // it downward into the action ring. The strip shows one quest at a time in the
@@ -25,11 +25,13 @@ export const QUEST_STRIP_SWIPE_DEADZONE_PX = FLICK_DEADZONE_PX;
  *  so this only ever trims a pathological one. Height stays bounded either way. */
 export const QUEST_STRIP_MAX_OBJECTIVES = 4;
 
-/** Where the top band starts, and the margin its ends keep. */
+/** Where the top band starts, and the margin its right end keeps. Both are
+ *  mirrored by the #quest-strip rules in hud.mobile.css, which own the seat. */
 export const QUEST_STRIP_BAND_TOP_PX = 6;
 export const QUEST_STRIP_BAND_MIN_X_PX = 12;
 
-/** Clear space between the target frame's reserved slot and the strip. */
+/** Clear space between the target frame's static seat and the strip's anchor.
+ *  Mirrored by the --quest-strip-anchor-left derivation in hud.mobile.css. */
 export const QUEST_STRIP_TARGET_FRAME_GAP_PX = 26;
 
 /** Clear space between the strip and any other occupant of the band. */
@@ -166,56 +168,45 @@ export interface QuestStripBox {
 
 export interface QuestStripBandInputs {
   viewportWidth: number;
-  /** Everything that can legitimately share the top band (the combat row, the
-   *  menu control, the party frames, the buff and debuff bars, the minimap).
-   *  Each only counts while it actually overlaps the band vertically. */
+  /** The strip's CONSTANT anchor, in the same coordinates as the occupants.
+   *  hud.mobile.css owns it (--quest-strip-anchor-left, derived from the target
+   *  frame's static seat), so nothing measured here can move it. */
+  anchorLeft: number;
+  /** Everything that can legitimately share the top band (the party frames, the
+   *  buff and debuff bars, the minimap, the right tracker stack). Each only
+   *  counts while it overlaps the band vertically AND starts right of the
+   *  anchor. */
   occupants: readonly QuestStripBox[];
-  /** Right edge of the target frame's RESERVED slot, or null when no slot is
-   *  reserved. Reserved rather than measured so the strip holds its position
-   *  when the player drops their target and the frame disappears. */
-  reservedRight: number | null;
   /** Measured strip height; 0 before the first measure. */
   stripHeight: number;
 }
 
 export interface QuestStripBand {
-  left: number;
   /** A max-width, not a width: the strip hugs its text rather than filling the
    *  band, which would leave a mostly empty slab. */
   maxWidth: number;
-  top: number;
 }
 
 /**
- * Seat the strip in the measured gap the band's other occupants leave, rather
- * than at a fixed offset, so it survives a scale or safe-area change. Anchoring
- * off any single element was wrong twice over in the lab: off the button row it
- * broke when the row collapsed, and off the collapsed menu button it parked the
- * strip on top of the target frame once that frame moved into the same band.
- * The target frame is deliberately not an occupant: its reserved right edge is
- * supplied instead, so losing a target does not slide the strip left.
+ * How wide the strip may grow from its constant anchor before it reaches the
+ * band's next occupant. Only the WIDTH is answered here: the anchor itself is
+ * static CSS, because anything that moves it moves the point the player's thumb
+ * already learned. An occupant left of the anchor is therefore skipped rather
+ * than pushing the start right (the target frame, the party stack under it and
+ * the combat row all live there): the strip is seated as though the target
+ * frame were always present, so targeting and untargeting change nothing.
  */
 export function questStripBand(inputs: QuestStripBandInputs): QuestStripBand {
   const top = QUEST_STRIP_BAND_TOP_PX;
   const height = inputs.stripHeight > 0 ? inputs.stripHeight : QUEST_STRIP_FALLBACK_HEIGHT_PX;
   const bandBottom = top + height;
-  const reserved = inputs.reservedRight;
-  let left =
-    reserved !== null && reserved > 0
-      ? Math.max(QUEST_STRIP_BAND_MIN_X_PX, reserved + QUEST_STRIP_TARGET_FRAME_GAP_PX)
-      : QUEST_STRIP_BAND_MIN_X_PX;
+  const left = inputs.anchorLeft;
   let rightLimit = inputs.viewportWidth - QUEST_STRIP_BAND_MIN_X_PX;
-  const middle = inputs.viewportWidth / 2;
   for (const box of inputs.occupants) {
     if (box.right - box.left <= 0) continue;
     if (box.bottom <= top || box.top >= bandBottom) continue;
-    // Left of centre pushes the start right; right of centre caps the width.
-    if (box.left < middle) left = Math.max(left, box.right + QUEST_STRIP_BAND_GAP_PX);
-    else rightLimit = Math.min(rightLimit, box.left - QUEST_STRIP_BAND_GAP_PX);
+    if (box.left <= left) continue;
+    rightLimit = Math.min(rightLimit, box.left - QUEST_STRIP_BAND_GAP_PX);
   }
-  return {
-    left: Math.round(left),
-    maxWidth: Math.max(QUEST_STRIP_MIN_WIDTH_PX, Math.round(rightLimit - left)),
-    top,
-  };
+  return { maxWidth: Math.max(QUEST_STRIP_MIN_WIDTH_PX, Math.round(rightLimit - left)) };
 }

@@ -2454,8 +2454,10 @@ describe('client HTML shell', () => {
       // ONE control: the whole box cycles, so a tap never has to find a chevron.
       expect([...strip.matchAll(/<button /g)], name).toHaveLength(1);
       expect(strip, name).toContain('id="quest-strip-main"');
-      // It reuses the panel chrome rather than shipping a second copy of it.
-      expect(strip, name).toContain('class="panel"');
+      // It wears NO chrome: the strip's text sits straight on the 3D world and
+      // outlines itself (hud.mobile.css), so the .panel plate it used to reuse
+      // would be a slab drawn over the game.
+      expect(strip, name).not.toContain('class="panel"');
       // The objective lines are STATIC, exactly the cap the core enforces plus
       // the overflow line, so the painter mints no nodes on the HUD's band.
       const objectives = [...strip.matchAll(/class="quest-strip-obj"/g)];

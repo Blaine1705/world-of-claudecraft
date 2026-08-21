@@ -241,163 +241,156 @@ describe('questStripView', () => {
 });
 
 describe('questStripBand', () => {
-  // The measured 874x402 (iPhone 16 Pro landscape) band: the combat control row
-  // on the left, the buff bar on the right, and a reserved target-frame slot.
+  // The measured 874x402 (iPhone 16 Pro landscape) band: the buff bar on the
+  // right, the combat control row on the left, and the strip anchored past the
+  // target frame's static seat (--quest-strip-anchor-left, hud.mobile.css).
   const COMBAT_ROW = { left: 0, right: 200, top: 0, bottom: 44 };
   const BUFF_BAR = { left: 681, right: 860, top: 4, bottom: 40 };
+  const ANCHOR = 276;
 
-  it('seats the strip between the reserved target slot and the right occupant', () => {
+  it('runs from the anchor to the first occupant right of it', () => {
     const band = questStripBand({
       viewportWidth: 874,
+      anchorLeft: ANCHOR,
       occupants: [COMBAT_ROW, BUFF_BAR],
-      reservedRight: 250,
       stripHeight: 40,
     });
-    expect(band.top).toBe(6);
-    expect(band.left).toBe(276);
     expect(band.maxWidth).toBe(395);
   });
 
-  it('falls back to the edge margin when no target slot is reserved', () => {
+  it('runs to the far edge margin when nothing shares the band', () => {
     const band = questStripBand({
       viewportWidth: 874,
+      anchorLeft: ANCHOR,
       occupants: [],
-      reservedRight: null,
       stripHeight: 40,
     });
-    expect(band.left).toBe(12);
-    expect(band.maxWidth).toBe(850);
+    expect(band.maxWidth).toBe(874 - QUEST_STRIP_BAND_MIN_X_PX - ANCHOR);
   });
 
-  it('treats a non-positive reservation the same as no reservation', () => {
+  it('IGNORES an occupant left of the anchor instead of pushing the strip right', () => {
+    // The anchor is CSS-owned and target-independent; the party stack and the
+    // combat row live behind it, and nothing measured may move it.
+    const wide = { left: 0, right: 320, top: 0, bottom: 44 };
     const band = questStripBand({
       viewportWidth: 874,
-      occupants: [],
-      reservedRight: 0,
+      anchorLeft: ANCHOR,
+      occupants: [wide],
       stripHeight: 40,
     });
-    expect(band.left).toBe(12);
+    expect(band.maxWidth).toBe(874 - QUEST_STRIP_BAND_MIN_X_PX - ANCHOR);
   });
 
-  it('lets a left occupant push the start right past the reservation', () => {
+  it('ignores an occupant starting exactly ON the anchor', () => {
     const band = questStripBand({
       viewportWidth: 874,
-      occupants: [{ left: 0, right: 320, top: 0, bottom: 44 }],
-      reservedRight: 250,
+      anchorLeft: ANCHOR,
+      occupants: [{ left: ANCHOR, right: 500, top: 0, bottom: 44 }],
       stripHeight: 40,
     });
-    expect(band.left).toBe(330);
-    expect(band.maxWidth).toBe(532);
+    expect(band.maxWidth).toBe(874 - QUEST_STRIP_BAND_MIN_X_PX - ANCHOR);
   });
 
   it('lets a right occupant cap the width', () => {
     const band = questStripBand({
       viewportWidth: 874,
+      anchorLeft: QUEST_STRIP_BAND_MIN_X_PX,
       occupants: [BUFF_BAR],
-      reservedRight: null,
       stripHeight: 40,
     });
-    expect(band.left).toBe(12);
     expect(band.maxWidth).toBe(659);
   });
 
   it('ignores occupants that do not overlap the band vertically', () => {
-    const below = { left: 0, right: 320, top: 100, bottom: 160 };
-    const above = { left: 0, right: 320, top: -60, bottom: 4 };
+    const below = { left: 400, right: 720, top: 100, bottom: 160 };
+    const above = { left: 400, right: 720, top: -60, bottom: 4 };
     const band = questStripBand({
       viewportWidth: 874,
+      anchorLeft: QUEST_STRIP_BAND_MIN_X_PX,
       occupants: [below, above, BUFF_BAR],
-      reservedRight: null,
       stripHeight: 40,
     });
-    expect(band.left).toBe(12);
     expect(band.maxWidth).toBe(659);
   });
 
   it('ignores an occupant whose bottom sits exactly on the band top', () => {
     const band = questStripBand({
       viewportWidth: 874,
-      occupants: [{ left: 0, right: 320, top: -40, bottom: 6 }],
-      reservedRight: null,
+      anchorLeft: QUEST_STRIP_BAND_MIN_X_PX,
+      occupants: [{ left: 400, right: 720, top: -40, bottom: 6 }],
       stripHeight: 40,
     });
-    expect(band.left).toBe(12);
     expect(band.maxWidth).toBe(850);
   });
 
   it('ignores an occupant whose top sits exactly on the band bottom', () => {
     const band = questStripBand({
       viewportWidth: 874,
-      occupants: [{ left: 0, right: 320, top: 46, bottom: 90 }],
-      reservedRight: null,
+      anchorLeft: QUEST_STRIP_BAND_MIN_X_PX,
+      occupants: [{ left: 400, right: 720, top: 46, bottom: 90 }],
       stripHeight: 40,
     });
-    expect(band.left).toBe(12);
     expect(band.maxWidth).toBe(850);
   });
 
   it('ignores zero-width occupants (a hidden element still has a box)', () => {
     const band = questStripBand({
       viewportWidth: 874,
+      anchorLeft: QUEST_STRIP_BAND_MIN_X_PX,
       occupants: [{ left: 400, right: 400, top: 0, bottom: 44 }],
-      reservedRight: null,
       stripHeight: 40,
     });
-    expect(band.left).toBe(12);
     expect(band.maxWidth).toBe(850);
   });
 
   it('uses the fallback height before the strip has been measured', () => {
-    const lowOccupant = { left: 0, right: 320, top: 50, bottom: 90 };
+    const lowOccupant = { left: 400, right: 720, top: 50, bottom: 90 };
     const measured = questStripBand({
       viewportWidth: 874,
+      anchorLeft: QUEST_STRIP_BAND_MIN_X_PX,
       occupants: [lowOccupant],
-      reservedRight: null,
       stripHeight: 40,
     });
-    expect(measured.left).toBe(12);
+    expect(measured.maxWidth).toBe(850);
     const unmeasured = questStripBand({
       viewportWidth: 874,
+      anchorLeft: QUEST_STRIP_BAND_MIN_X_PX,
       occupants: [lowOccupant],
-      reservedRight: null,
       stripHeight: 0,
     });
-    expect(unmeasured.left).toBe(330);
+    expect(unmeasured.maxWidth).toBe(400 - QUEST_STRIP_BAND_GAP_PX - QUEST_STRIP_BAND_MIN_X_PX);
   });
 
   it('never squeezes below the minimum readable width', () => {
     const band = questStripBand({
       viewportWidth: 500,
-      occupants: [
-        { left: 0, right: 240, top: 0, bottom: 44 },
-        { left: 300, right: 500, top: 0, bottom: 44 },
-      ],
-      reservedRight: null,
+      anchorLeft: 250,
+      occupants: [{ left: 300, right: 500, top: 0, bottom: 44 }],
       stripHeight: 40,
     });
-    expect(band.left).toBe(250);
     expect(band.maxWidth).toBe(QUEST_STRIP_MIN_WIDTH_PX);
-  });
-
-  it('treats an occupant exactly at the mid-line as a right occupant (caps width, not left)', () => {
-    const band = questStripBand({
-      viewportWidth: 874,
-      occupants: [{ left: 437, right: 600, top: 0, bottom: 44 }],
-      reservedRight: null,
-      stripHeight: 40,
-    });
-    expect(band.left).toBe(12);
-    expect(band.maxWidth).toBe(415);
   });
 
   it('rounds fractional viewport and occupant measurements', () => {
     const band = questStripBand({
       viewportWidth: 874.5,
-      occupants: [{ left: 0, right: 200.4, top: 0, bottom: 44.3 }],
-      reservedRight: null,
+      anchorLeft: 210.4,
+      occupants: [{ left: 600.6, right: 800, top: 0, bottom: 44.3 }],
       stripHeight: 40,
     });
-    expect(band.left).toBe(210);
-    expect(band.maxWidth).toBe(652);
+    expect(band.maxWidth).toBe(380);
+  });
+
+  it('keeps the anchor out of the answer entirely (the strip is never moved)', () => {
+    // The band arithmetic returns a WIDTH and nothing else: there is no left or
+    // top to write, which is what makes a target coming or going unable to
+    // reseat the strip.
+    const band = questStripBand({
+      viewportWidth: 874,
+      anchorLeft: ANCHOR,
+      occupants: [BUFF_BAR],
+      stripHeight: 40,
+    });
+    expect(Object.keys(band)).toEqual(['maxWidth']);
   });
 });

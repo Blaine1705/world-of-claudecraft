@@ -1492,24 +1492,60 @@
       border: 3px double Highlight;
     }
   }
+  /* The width of #target-frame's content row: its 190px .uf-bars, the -18px
+     medallion overlap, and the 64px .portrait-wrap. Held here because the
+     quest strip's anchor is derived from it, so the two cannot drift apart. */
+  body.mobile-touch {
+    --target-frame-content-width: 236px;
+  }
+  /* The quest strip's CONSTANT anchor. The strip is seated as though the player
+     always had a target: just past where #target-frame's own STATIC seat ends,
+     whether or not the frame is there. It used to reserve the frame's MEASURED
+     box, which only held once the frame had appeared, so the strip started life
+     at the screen edge and slid right the first time a player targeted anything.
+     Every term is the target seat's own: its left literal, its content row, its
+     --target-frame-scale zoom and its tier transform. The frame lives inside
+     #ui and the strip inside the unzoomed #mobile-controls, so the frame's half
+     is scaled by --ui-scale and the trailing gap
+     (QUEST_STRIP_TARGET_FRAME_GAP_PX) is not. */
+  body.mobile-touch {
+    --quest-strip-anchor-left: calc(
+      var(--ui-scale, 1) *
+      (
+        max(20px, calc(env(safe-area-inset-left) + 10px)) +
+        var(--target-frame-content-width) *
+        var(--target-frame-scale, 1) *
+        0.82 *
+        var(--mobile-chrome-scale, 1)
+      ) +
+      26px
+    );
+  }
   /* The top-band quest strip (#quest-strip), the touch replacement for the
-     right-anchored #quest-tracker (hidden below on this HUD). LEFT-TOP anchored:
-     the painter writes only left/top/max-width, so a quest with four objectives
-     grows the box down and right from the point the player's thumb already
-     learned instead of moving it. Seated in viewport coordinates by
-     quest_strip_controller.ts, which is why it is a direct child of
-     #mobile-controls (the shared app-viewport box) and not of a transformed
-     control. */
+     right-anchored #quest-tracker (hidden below on this HUD). LEFT-TOP anchored,
+     and the anchor is AUTHORED: the painter writes only max-width, so neither a
+     quest with four objectives nor a target coming and going can move the point
+     the player's thumb already learned. It is a direct child of #mobile-controls
+     (the shared app-viewport box) and not of a transformed control, so the
+     measured width bound and this seat share one coordinate space. */
   body.mobile-touch #quest-strip {
     /* The hit surface grows by this much in every direction; see the ::before
-       below for why it is a constant rather than part of the panel. */
+       below for why it is a constant rather than part of the text block. */
     --quest-strip-hit-pad: 12px;
     /* The height BOUND, and the whole point of the strip: the tracker it
        replaces had none, so a second quest pushed it 42px into the action ring.
        Four objective lines plus the overflow line, clipped. */
     --quest-strip-objs-max-height: 72px;
+    /* The strip has NO plate: its glyphs sit straight on the 3D world, so they
+       carry the same reciprocal outline the overhead nameplates do
+       (--nameplate-text-shadow in hud.css), the HUD's idiom for text with
+       nothing behind it. Two opposed offsets, so a glyph keeps a dark edge over
+       bright sky and dark ground alike; a single drop shadow only darkens one
+       side. Declared once and INHERITED, so the title, the objective lines, the
+       counter hint and the chevrons carry it at every tier. */
+    --quest-strip-text-shadow: 1px 1px 3px #000, -1px -1px 3px #000;
     position: absolute;
-    left: 12px;
+    left: var(--quest-strip-anchor-left);
     top: 6px;
     max-width: 60%;
     display: block;
@@ -1534,26 +1570,39 @@
     line-height: 1.25;
     text-align: left;
     color: var(--color-text-overlay);
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--quest-strip-text-shadow);
+    /* No plate at all, and the UA button chrome has to go with it: an unstyled
+       <button> paints an opaque buttonface fill, which is the very slab the
+       strip exists to stop drawing over the world. */
+    -webkit-appearance: none;
+    appearance: none;
+    background: none;
+    border: 0;
+    /* The .panel plate this used to wear is gone (the markup dropped the class),
+       so keep the HUD-opacity slider the plate used to carry; it multiplies with
+       the root's --touch-opacity exactly as the nested boxes did before. */
+    opacity: var(--hud-opacity, 1);
     /* The one control on this strip: the whole box cycles, so the touch never
        has to find a small chevron. touch-action none because the gesture IS a
        horizontal swipe and the browser would otherwise claim it as a pan. */
     pointer-events: auto;
     touch-action: none;
   }
-  /* The hit surface is a CONSTANT pad around the panel, not padding inside it:
-     the visual box shrinks with the objective count (a one-objective quest is
-     half the height of a four-objective one) and a hit area that shrank with it
-     would fall under the touch floor exactly when the strip got small. Nothing
-     here clips it, which is why the height bound lives on .quest-strip-objs
-     instead of on this button. */
+  /* The hit surface is a CONSTANT pad around the text block, not padding inside
+     it: the visual box shrinks with the objective count (a one-objective quest
+     is half the height of a four-objective one) and a hit area that shrank with
+     it would fall under the touch floor exactly when the strip got small.
+     Nothing here clips it, which is why the height bound lives on
+     .quest-strip-objs instead of on this button. */
   body.mobile-touch #quest-strip-main::before {
     content: "";
     position: absolute;
     inset: calc(var(--quest-strip-hit-pad) * -1);
   }
+  /* Press feedback without chrome to tint: the whole block dims for the length
+     of the gesture, which is the only cue a plateless surface can give. */
   body.mobile-touch #quest-strip-main.gesturing {
-    border-color: var(--gold);
+    opacity: calc(var(--hud-opacity, 1) * 0.6);
   }
   body.mobile-touch #quest-strip-main:focus-visible {
     outline: 2px solid var(--gold);
@@ -1643,8 +1692,11 @@
     opacity: 0.75;
   }
   @media (forced-colors: active) {
+    /* An OUTLINE, not a border: the chromeless strip carries no border box to
+       thicken, and one added on press would shove the text 3px on every tap. */
     body.mobile-touch #quest-strip-main.gesturing {
-      border: 3px double Highlight;
+      outline: 3px double Highlight;
+      outline-offset: 2px;
     }
   }
   body.mobile-touch #mobile-action-ring button.empty .icon-label {
@@ -6395,6 +6447,21 @@
       left: max(6px, env(safe-area-inset-left));
       top: max(6px, env(safe-area-inset-top));
       transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
+    /* The quest strip's anchor tracks this tier's target seat: same derivation
+       as the portrait one, reading THIS rule's left literal and scale. */
+    body.mobile-touch {
+      --quest-strip-anchor-left: calc(
+        var(--ui-scale, 1) *
+        (
+          max(6px, env(safe-area-inset-left)) +
+          var(--target-frame-content-width) *
+          var(--target-frame-scale, 1) *
+          0.6 *
+          var(--mobile-chrome-scale, 1)
+        ) +
+        26px
+      );
     }
     body.mobile-touch #party-frames {
       left: max(6px, env(safe-area-inset-left));

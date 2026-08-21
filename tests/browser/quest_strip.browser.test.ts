@@ -3,21 +3,28 @@
 // mobile stylesheet and the real controller, so what a unit test cannot see is
 // pinned against real layout:
 //
-//   - the strip lands in the top band, clear of the target frame's reserved slot,
+//   - the strip lands in the top band, clear of the target frame's static seat,
 //   - it NEVER overlaps the action ring at 0, 1, 2 or 5 tracked quests, which is
 //     the defect it exists to fix (the tracker had no height bound at all and
 //     overlapped the ring by 122 x 42px at only two quests),
 //   - its height does not move with the quest count,
 //   - its LEFT-TOP anchor does not move when the shown quest's objective count
 //     changes, so the box grows down and right from a point the thumb learned,
-//   - it does not jump when the player drops their target,
+//   - its anchor is BYTE-IDENTICAL from first paint with no target, with a
+//     target, and after losing one again (the seat is derived from the target
+//     frame's STATIC seat in hud.mobile.css, never from its live box),
+//   - it wears NO plate: its glyphs sit on the world and carry their own
+//     reciprocal outline instead,
 //   - the hit surface stays a constant pad around a box that shrinks,
 //   - and tap / swipe cycling works through real pointer events.
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { buildQuestStrip } from '../../src/ui/hud/quest/quest_strip_controller';
-import { QUEST_STRIP_BAND_TOP_PX } from '../../src/ui/hud/quest/quest_strip_core';
+import {
+  QUEST_STRIP_BAND_TOP_PX,
+  QUEST_STRIP_TARGET_FRAME_GAP_PX,
+} from '../../src/ui/hud/quest/quest_strip_core';
 import type { TrackedQuest } from '../../src/ui/hud/quest/quest_tracker';
 import '../../src/styles/index.css';
 import { cleanup } from './_harness';
@@ -36,7 +43,7 @@ const SWIPE_PX = 40;
 
 const STRIP_MARKUP = `
   <div id="quest-strip" class="empty">
-    <button type="button" id="quest-strip-main" class="panel">
+    <button type="button" id="quest-strip-main">
       <span class="quest-strip-title-row">
         <span id="quest-strip-title" class="quest-strip-title"></span>
         <span id="quest-strip-complete" class="quest-complete"></span>
@@ -69,7 +76,11 @@ function quests(count: number, objectiveCount = 2): TrackedQuest[] {
 /** The shipped structure: the strip inside #mobile-controls beside the ring
  *  (matching index.html / play.html), and the left column the band's occupants
  *  live in. Party rows only render under .party-expanded; without it the
- *  container is 0x0 and the band looks freer than it is. */
+ *  container is 0x0 and the band looks freer than it is.
+ *
+ *  The target frame is NOT mounted: the strip must seat itself correctly before
+ *  the player has ever had a target, so every pin starts from that state and
+ *  calls addTarget() when it wants one. */
 function mountHud() {
   const controls = document.createElement('section');
   controls.id = 'mobile-controls';
@@ -110,22 +121,32 @@ function mountHud() {
 
   const ui = document.createElement('div');
   ui.id = 'ui';
-  const target = document.createElement('div');
-  target.id = 'target-frame';
-  target.className = 'unitframe';
-  target.style.display = 'flex';
-  const bars = document.createElement('div');
-  bars.className = 'uf-bars';
-  bars.textContent = 'Gravewyrm Acolyte';
-  target.append(bars);
   const party = document.createElement('div');
   party.id = 'party-frames';
   party.className = 'party-present below-target has-party-chip party-expanded';
   const rows = document.createElement('div');
   rows.className = 'party-rows';
   party.append(rows);
-  ui.append(target, party);
+  ui.append(party);
   document.body.append(ui);
+
+  /** The shipped target frame's real content row: the bars column and the
+   *  portrait medallion that overlaps it, which is what the CSS anchor is
+   *  derived from. */
+  const addTarget = (): HTMLElement => {
+    const target = document.createElement('div');
+    target.id = 'target-frame';
+    target.className = 'unitframe';
+    target.style.display = 'flex';
+    const bars = document.createElement('div');
+    bars.className = 'uf-bars';
+    bars.textContent = 'Gravewyrm Acolyte';
+    const portrait = document.createElement('div');
+    portrait.className = 'portrait-wrap';
+    target.append(bars, portrait);
+    ui.prepend(target);
+    return target;
+  };
 
   const controller = buildQuestStrip({ click: () => {} });
   if (!controller) throw new Error('the strip markup did not resolve');
@@ -133,11 +154,14 @@ function mountHud() {
   return {
     controller,
     ring,
-    target,
+    addTarget,
     root: el('quest-strip'),
     surface: el('quest-strip-main'),
     title: el('quest-strip-title'),
     counter: el('quest-strip-count'),
+    objective: document.querySelector('.quest-strip-obj:not(.quest-strip-more)') as HTMLElement,
+    prevArrow: el('quest-strip-prev'),
+    nextArrow: el('quest-strip-next'),
   };
 }
 
@@ -146,6 +170,13 @@ function pointer(type: string, clientX: number, clientY: number): MouseEvent {
     pointerId: 1,
     pointerType: 'touch',
   });
+}
+
+/** The alpha channel of a resolved color; a plate that was removed resolves to
+ *  the transparent keyword, which every engine serializes with an alpha of 0. */
+function alpha(color: string): number {
+  const parts = color.match(/[\d.]+/g);
+  return parts && parts.length === 4 ? Number(parts[3]) : 1;
 }
 
 function overlaps(a: DOMRect, b: DOMRect): boolean {
@@ -173,7 +204,7 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     return mountHud();
   }
 
-  it('seats itself in the top band, clear of the target frame it is measured beside', async () => {
+  it('seats itself in the top band, clear of the target frame it is derived from', async () => {
     const rig = await setup();
     rig.controller.update(quests(2));
 
@@ -181,8 +212,12 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     expect(getComputedStyle(rig.root).display).not.toBe('none');
     expect(box.width).toBeGreaterThan(0);
     expect(box.top).toBeCloseTo(QUEST_STRIP_BAND_TOP_PX, 0);
-    // Right of the target frame's slot, and fully on screen.
-    expect(box.left).toBeGreaterThan(rig.target.getBoundingClientRect().right);
+    // Past the frame's real seat, with the authored clearance, and fully on
+    // screen. The frame is added AFTER the strip already seated itself, which
+    // is the whole point: the anchor was derived, not measured.
+    const target = rig.addTarget().getBoundingClientRect();
+    expect(target.width).toBeGreaterThan(0);
+    expect(box.left - target.right).toBeCloseTo(QUEST_STRIP_TARGET_FRAME_GAP_PX, 0);
     expect(box.right).toBeLessThanOrEqual(width + EDGE_TOLERANCE_PX);
   });
 
@@ -234,32 +269,66 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     expect(shrunk.top).toBeCloseTo(start.top, 1);
   });
 
-  it('does not jump when the player drops their target', async () => {
+  it('holds a BYTE-IDENTICAL anchor with no target, with one, and after losing it', async () => {
     const rig = await setup();
+    // First paint, before the player has ever had a target: the state the old
+    // reservation could not seat correctly, because it had nothing to cache.
     rig.controller.update(quests(3));
-    const before = rig.root.getBoundingClientRect().left;
-    expect(before).toBeGreaterThan(0);
+    const first = rig.root.getBoundingClientRect().left;
+    expect(first).toBeGreaterThan(0);
 
-    // The frame's slot is RESERVED, so losing a target must not slide the strip
-    // left into the space it vacated.
-    rig.target.style.display = 'none';
+    const target = rig.addTarget();
     rig.controller.update(quests(3, 3));
-    expect(rig.root.getBoundingClientRect().left).toBeCloseTo(before, 1);
+    expect(rig.root.getBoundingClientRect().left).toBe(first);
+
+    target.remove();
+    rig.controller.update(quests(3, 2));
+    expect(rig.root.getBoundingClientRect().left).toBe(first);
   });
 
-  it('keeps a hit surface bigger than the panel, and bigger than the touch floor', async () => {
+  it('wears no plate: the text sits on the world and outlines itself', async () => {
+    const rig = await setup();
+    rig.controller.update(quests(3));
+
+    // Nothing paints a box behind the glyphs: no fill, no image, no plate
+    // shadow. (A fully transparent background-color resolves to alpha 0.)
+    for (const el of [rig.root, rig.surface]) {
+      const style = getComputedStyle(el);
+      expect(style.backgroundImage).toBe('none');
+      expect(style.boxShadow).toBe('none');
+      expect(alpha(style.backgroundColor)).toBe(0);
+    }
+
+    // So every glyph carries its own edge instead, the reciprocal outline the
+    // overhead nameplates use.
+    for (const el of [rig.title, rig.counter, rig.objective, rig.prevArrow, rig.nextArrow]) {
+      expect(getComputedStyle(el).textShadow, el.className || el.id).not.toBe('none');
+    }
+  });
+
+  it('keeps a visible focus ring now that the plate is gone', async () => {
+    const rig = await setup();
+    rig.controller.update(quests(3));
+    rig.surface.focus();
+    const style = getComputedStyle(rig.surface);
+    // The ring was never the panel's border, and it must not have left with it.
+    expect(style.outlineStyle).not.toBe('none');
+    expect(Number.parseFloat(style.outlineWidth)).toBeGreaterThan(0);
+  });
+
+  it('keeps a hit surface bigger than the text block, and bigger than the touch floor', async () => {
     const rig = await setup();
     // The smallest the visual box ever gets: one quest, one objective.
     rig.controller.update(quests(1, 1));
     const box = rig.surface.getBoundingClientRect();
 
-    // A touch just OUTSIDE the panel still lands on the strip: the pad is a
+    // A touch just OUTSIDE the text block still lands on the strip: the pad is a
     // constant, so it does not shrink with the box the way padding would.
     const outside = document.elementFromPoint(box.left - 6, box.top + box.height / 2);
     expect(outside === rig.surface || rig.surface.contains(outside)).toBe(true);
     const above = document.elementFromPoint(box.left + box.width / 2, box.top - 6);
     expect(above === rig.surface || rig.surface.contains(above)).toBe(true);
-    // And the panel itself already clears the touch floor at its smallest.
+    // And the block itself already clears the touch floor at its smallest.
     expect(box.height).toBeGreaterThanOrEqual(30);
   });
 
