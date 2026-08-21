@@ -198,6 +198,7 @@ import {
   serializeIgnoreList,
 } from './chat_ignore_core';
 import { cheaterTagLabel } from './cheater_tag';
+import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
@@ -610,7 +611,6 @@ import {
   type PlayerTooltipModel,
   playerTooltipHtml,
 } from './player_tooltip_view';
-import { bindChromeButtonKeyGuard, bindPointerBlur } from './pointer_blur';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
   buildPostEntryPreviewPrewarmUnits,
@@ -2755,35 +2755,10 @@ export class Hud {
       }
       this.toggleReliquaryTrackerCollapsed();
     });
-    // Pointer-only blur for the tracker headers (capture phase, so the quest
-    // tracker's refocus-on-repaint sees no focused header on the mouse path);
-    // keyboard activation keeps its focus. Rationale: src/ui/pointer_blur.ts.
-    bindPointerBlur($('#quest-tracker'), '.qt-header, .qt-title');
-    bindPointerBlur($('#deed-tracker'), '.dt-header');
-    bindPointerBlur($('#reliquary-tracker'), '.dt-header');
-    // The delve board, lockpick panel, map window, the bank + bags cluster, and the
-    // micromenu side rail are non-modal overlays, so canUseGameKeys() stays true and
-    // the global jump (Space) / chat (Enter) binds would otherwise hijack those keys
-    // on a focused panel button. Two halves, both from src/ui/pointer_blur.ts: the
-    // key guard (stop propagation, never the default, so native activation fires)
-    // and the pointer-only blur (a mouse click must not leave the button focused,
-    // or the next Space that escapes the game layer's preventDefault re-clicks it).
-    for (const panelId of [
-      '#delve-board',
-      '#lockpick-panel',
-      '#delve-rite-panel',
-      '#map-window',
-      '#bank-window',
-      '#bags',
-      '#deeds-window',
-      '#reliquary-window',
-      '#professions-window',
-      '#side-buttons',
-    ]) {
-      const panel = $(panelId);
-      bindChromeButtonKeyGuard(panel);
-      bindPointerBlur(panel);
-    }
+    // Chrome focus hygiene (the shared Enter/Space key guard + pointer-only focus
+    // drop) over the trackers, the non-modal overlay panels, and the micromenu rail:
+    // src/ui/chrome_focus_wiring.ts owns the root list and the rationale.
+    wireChromeFocus($);
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#map-close').addEventListener('click', () => {
       $('#map-window').style.display = 'none';

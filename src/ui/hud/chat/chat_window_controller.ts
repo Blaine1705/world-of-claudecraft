@@ -258,8 +258,8 @@ export class ChatWindowController {
       button.textContent = label;
       // Selecting a tab restyles in place (no strip rebuild), so a mouse click
       // would leave the tab focused and the next unshielded Space would natively
-      // re-click it. Pointer-only blur; keyboard selection (onTabKeyDown) keeps
-      // its roving focus.
+      // re-click it. Pointer-only blur; keyboard selection (a native Enter click,
+      // detail 0) keeps its focus, and onTabKeyDown's arrow roving is untouched.
       button.addEventListener('click', (event) => {
         this.selectTab(id, true);
         blurIfPointerClick(event, button);

@@ -23,7 +23,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { captureFocusKey, restoreFirstEnabled } from '../src/ui/focus_restore';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from '../src/ui/focus_restore';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 afterEach(() => {
@@ -162,6 +162,33 @@ describe('captureFocusKey', () => {
     expect(svg instanceof HTMLElement).toBe(false);
     stubActiveElement(svg);
     expect(captureFocusKey(root)).toBeNull();
+  });
+});
+
+describe('focusedWithin', () => {
+  it('returns the focused control inside the root', () => {
+    const { root, btn } = windowWithKeyedButton('k');
+    btn.focus();
+    expect(focusedWithin(root)).toBe(btn);
+  });
+
+  it('returns null when the ROOT ITSELF holds focus (pointer focus parked there by pointer_blur.ts)', () => {
+    // The park slot is not a control: a ladder that read it as one would resolve no
+    // key and land on its Close rung after every mouse click in the window.
+    const { root } = windowWithKeyedButton('k');
+    root.tabIndex = -1;
+    root.focus();
+    expect(document.activeElement).toBe(root);
+    expect(focusedWithin(root)).toBeNull();
+  });
+
+  it('returns null when focus is on <body> or in another window', () => {
+    const { root } = windowWithKeyedButton('k');
+    const other = windowWithKeyedButton('elsewhere');
+    other.btn.focus();
+    expect(focusedWithin(root)).toBeNull();
+    other.btn.blur();
+    expect(focusedWithin(root)).toBeNull();
   });
 });
 

@@ -114,9 +114,11 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     // opener captured by that handler would not be the button).
     expect(document.activeElement).not.toBe(btn);
     expect(focusedAtClick()).toBe(false);
-    // Space is the jump key again, not a menu key.
+    // Space is the jump key again, not a menu key. Read the raw key-held state,
+    // not readMoveInput(), whose 150ms tap latch is shared across this file's
+    // single Input (a reorder would make the latch read order-dependent).
     await userEvent.keyboard('[Space>]');
-    expect(input.readMoveInput().jump).toBe(true);
+    expect(input.debugState().movementHeld.jump).toBe(true);
     await userEvent.keyboard('[/Space]');
     expect(toggles()).toBe(1);
   });
@@ -130,9 +132,10 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     expect(toggles()).toBe(1);
   });
 
-  it('(b2) layer 2 alone: a stale-focused chrome button outside the rail guards is suppressed and blurred while blocked', async () => {
+  it('(b2) layer 2 alone: a stale mouse-focused chrome button outside the rail guards is suppressed while blocked, and a second Space stays suppressed', async () => {
     // A chrome button OUTSIDE every key-guarded container and dialog root, e.g.
     // a window button the audit missed: the input-layer guard is its only net.
+    // Focused by a real mouse click (no pointer drop bound here), the stale shape.
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = 'chrome';
@@ -141,16 +144,41 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
       count++;
     });
     document.body.appendChild(btn);
-    btn.focus();
+    await userEvent.click(btn);
+    expect(count).toBe(1);
     expect(document.activeElement).toBe(btn);
     blocked = true;
     await pressSpace();
-    expect(count).toBe(0);
-    // Prevented (not only blurred: blur alone would already cancel the keyup
-    // click here, so pin the preventDefault explicitly) ...
+    expect(count).toBe(1);
+    // Prevented, pinned explicitly through the post-Input listener.
     expect(lastKeydown).toEqual({ code: 'Space', prevented: true });
-    // ... AND blurred, so the stale focus cannot bite again.
-    expect(document.activeElement).not.toBe(btn);
+    // Focus is left alone (the guard suppresses, it never drops), and the next
+    // Space lands in the same guard: still no activation.
+    expect(document.activeElement).toBe(btn);
+    await pressSpace();
+    expect(count).toBe(1);
+    expect(lastKeydown).toEqual({ code: 'Space', prevented: true });
+  });
+
+  it('(b4) keyboard-placed focus (Tab) is suppressed and KEPT while blocked', async () => {
+    // The place a keyboard user Tabbed to must survive a Space the guard eats. Tab
+    // is pressed with input already blocked: unblocked, Input preventDefaults Tab
+    // for target-nearest, so the browser's focus navigation only runs while blocked.
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'chrome';
+    let count = 0;
+    btn.addEventListener('click', () => {
+      count++;
+    });
+    document.body.appendChild(btn);
+    blocked = true;
+    await userEvent.tab();
+    expect(document.activeElement).toBe(btn);
+    await pressSpace();
+    expect(count).toBe(0);
+    expect(lastKeydown).toEqual({ code: 'Space', prevented: true });
+    expect(document.activeElement).toBe(btn);
   });
 
   it('(b3) the blocked-state guard is Space-only: another key leaves a focused chrome button alone', async () => {

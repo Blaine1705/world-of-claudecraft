@@ -250,26 +250,10 @@ describe('hud.ts wiring pins (the surfaces the Space-reopens-last-menu fix cover
   const stripLineComments = (src: string): string => src.replace(/^\s*\/\/.*$/gm, '');
   const hud = stripLineComments(readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8'));
 
-  it('keeps the micromenu side rail in the shared panel guard array', () => {
-    const start = hud.indexOf("'#delve-board',");
-    expect(start).toBeGreaterThan(0);
-    const guardArray = hud.slice(start, hud.indexOf(']', start));
-    // The rail is the surface the bug was reported on: every #mm-* toggle and
-    // the daily rewards launcher live under it.
-    expect(guardArray).toContain("'#side-buttons'");
-  });
-
-  it('binds both halves of the contract (key guard + pointer blur) over the guard array', () => {
-    const start = hud.indexOf("'#delve-board',");
-    const loop = hud.slice(start, hud.indexOf('}', hud.indexOf(']', start)));
-    expect(loop).toContain('bindChromeButtonKeyGuard(panel)');
-    expect(loop).toContain('bindPointerBlur(panel)');
-  });
-
-  it('keeps the pointer-only blur on the tracker headers (their rebuilds re-focus themselves)', () => {
-    expect(hud).toContain("bindPointerBlur($('#quest-tracker'), '.qt-header, .qt-title')");
-    expect(hud).toContain("bindPointerBlur($('#deed-tracker'), '.dt-header')");
-    expect(hud).toContain("bindPointerBlur($('#reliquary-tracker'), '.dt-header')");
+  it('applies the chrome focus wiring (the rail, the panels, and the trackers) through its one entry point', () => {
+    // The root list and the per-root binding are pinned in
+    // tests/chrome_focus_wiring.test.ts; hud.ts must call the entry point.
+    expect(hud).toContain('wireChromeFocus($)');
   });
 
   it('marks the two non-dialog modal surfaces as dialog roots for the blocked-Space guard', () => {

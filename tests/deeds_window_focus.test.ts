@@ -148,6 +148,20 @@ describe('DeedsWindow: focus survives rebuilds', () => {
     expect(document.activeElement).toBe(fresh);
   });
 
+  it('moves focus NOWHERE on a rebuild while pointer focus is parked on the root (never to Close)', () => {
+    // The pointer-only focus drop (src/ui/pointer_blur.ts) parks a mouse click's
+    // focus on the window root; the root is not a control to restore, so the
+    // rebuild must leave it alone rather than fall through to Close.
+    const state = baseState();
+    const { w, el } = makeWindow(state);
+    el.focus();
+    expect(document.activeElement).toBe(el);
+    state.deedsEarned.set('prog_first_steps', '2026-07-12');
+    w.refreshIfChanged();
+    expect(document.activeElement).toBe(el);
+    expect(document.activeElement).not.toBe(el.querySelector('[data-close]'));
+  });
+
   it('falls back to Close when the focused watch card leaves the current filter', () => {
     const state = baseState();
     const { w, el } = makeWindow(state);

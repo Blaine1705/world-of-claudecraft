@@ -987,13 +987,13 @@ export class Input {
       // last-used menu" bug). Suppress that ONLY for a button outside every
       // dialog root: buttons inside the blocking surface (prompt dialogs, the
       // options window, the player card) keep their native Space activation.
-      // Blurring, not just preventing, so the stale focus cannot bite again.
+      // Suppress only, never blur: at keydown time the guard cannot tell stale
+      // pointer focus from the place a keyboard user just Tabbed to (Chromium
+      // flips :focus-visible on the very keypress), and every further Space
+      // lands in this same guard, so the focus position is left for the player.
       if (e.code === 'Space') {
         const active = document.activeElement;
-        if (active instanceof HTMLElement && isStaleChromeButton(active)) {
-          e.preventDefault();
-          active.blur();
-        }
+        if (active instanceof HTMLElement && isStaleChromeButton(active)) e.preventDefault();
       }
       return;
     }

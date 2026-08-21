@@ -125,10 +125,17 @@ export function captureFocusKey(root: HTMLElement): string | null {
  *
  * Note the containment check subsumes the `<body>` case a caller might otherwise special
  * case: `root` is a descendant of `<body>`, so `root.contains(document.body)` is false.
+ *
+ * The ROOT ITSELF is never "a focused control within": the pointer-only focus drop
+ * (src/ui/pointer_blur.ts) parks pointer focus on a window's dialog root so the Tab trap
+ * stays armed, and a repaint ladder that read the parked root as a focused control would
+ * resolve no key and fall through to its Close rung, planting focus on Close after every
+ * mouse click (the #2377 double-fire family). Callers that hand-roll `root.contains(active)`
+ * must use this helper instead (deeds_window.ts and bank_window.ts do).
  */
 export function focusedWithin(root: HTMLElement): HTMLElement | null {
   const active = document.activeElement;
-  if (!(active instanceof HTMLElement)) return null;
+  if (!(active instanceof HTMLElement) || active === root) return null;
   return root.contains(active) ? active : null;
 }
 

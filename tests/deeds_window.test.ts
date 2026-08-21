@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { audio } from '../src/game/audio';
+import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
 import { deedName } from '../src/ui/deed_i18n';
 import { Hud } from '../src/ui/hud';
 import { bindChromeButtonKeyGuard } from '../src/ui/pointer_blur';
@@ -881,21 +882,22 @@ describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
     // Book button has focus: without the guard, Space jumps the character and
     // Enter opens chat instead of activating the control. Mirror the bank pin
     // (tests/bank_window.test.ts): slice the guard array so removing the entry reds.
-    const start = hud.indexOf("'#delve-board',");
-    expect(start).toBeGreaterThan(0);
-    const guardArray = hud.slice(start, hud.indexOf(']', start));
-    expect(guardArray).toContain("'#deeds-window'");
-    // The shared guard body now lives in src/ui/pointer_blur.ts
+    // The root list lives in src/ui/chrome_focus_wiring.ts; hud.ts is a one-line
+    // consumer of its wiring entry point.
+    expect(CHROME_GUARDED_PANELS).toContain('#deeds-window');
+    expect(stripLineComments(hud)).toContain('wireChromeFocus($)');
+    // The shared guard body lives in src/ui/pointer_blur.ts
     // (bindChromeButtonKeyGuard), which the behavioral test below drives
     // directly: it stopPropagation's Enter/Space only when a BUTTON has focus
-    // and NEVER preventDefault's (native activation survives). Pin that hud.ts
-    // still binds it (plus the pointer-only blur) over every guarded panel.
-    const guardRegion = stripLineComments(hud.slice(start, hud.indexOf("$('#mm-map')", start)));
-    expect(guardRegion).toContain('bindChromeButtonKeyGuard(panel)');
-    expect(guardRegion).toContain('bindPointerBlur(panel)');
-    // The region itself must stay preventDefault-free as well: a default-preventing
-    // handler anywhere in it would kill the native activation the guard protects.
-    expect(guardRegion).not.toContain('preventDefault');
+    // and NEVER preventDefault's (native activation survives). Pin that the
+    // wiring binds it (plus the pointer-only drop) over every guarded panel and
+    // that the wiring itself stays preventDefault-free (a default-preventing
+    // handler there would kill the native activation the guard protects).
+    const wiring = stripLineComments(read('../src/ui/chrome_focus_wiring.ts'));
+    const loop = wiring.slice(wiring.indexOf('for (const panelId of CHROME_GUARDED_PANELS)'));
+    expect(loop).toContain('bindChromeButtonKeyGuard(panel)');
+    expect(loop).toContain('bindPointerBlur(panel)');
+    expect(wiring).not.toContain('preventDefault');
     const guardSrc = stripLineComments(read('../src/ui/pointer_blur.ts'));
     const bodyStart = guardSrc.indexOf('function bindChromeButtonKeyGuard');
     expect(bodyStart).toBeGreaterThan(0);

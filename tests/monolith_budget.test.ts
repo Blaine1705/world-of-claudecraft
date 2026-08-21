@@ -81,13 +81,12 @@ const MONOLITHS: MonolithRow[] = [
     // arm and a spoken refusal beside the ability one, and the shared item-use
     // seam castSlot and the pad now both call. Exact merged count, zero slack:
     // any further growth reds again.
-    // Raised 19490 -> 19504 (+14) for the stale-focus Space fix (PR #3506):
-    // thin-consumer wiring to extracted modules (pointer_blur, stale_chrome_focus,
-    // dialog_root: three tracker blurs, the rail in the guard array, two dialog
-    // marks) riding on the v0.40.0 zero-slack re-pin, with no branch-owned
-    // extraction left once the rationale comments became pointers. Maintainer
-    // decision, exact merged count: any further growth reds again.
-    ceiling: 19504,
+    // Lowered 19490 -> 19479 after the stale-focus Space fix (PR #3506) extracted
+    // its chrome focus wiring (the tracker drops plus the panel key-guard loop)
+    // into src/ui/chrome_focus_wiring.ts, leaving hud.ts a one-line consumer
+    // (wireChromeFocus($)). The ratchet's own rule: an extraction lowers the
+    // ceiling. Exact merged count, zero slack: any further growth reds again.
+    ceiling: 19479,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
