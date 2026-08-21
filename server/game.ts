@@ -76,6 +76,7 @@ import {
   curatorRankFromOwned,
   reliquaryWireJson,
 } from '../src/sim/reliquary';
+import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -1612,7 +1613,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // reliability contract hcb gives harvest claims. Flips once per corpse, so
   // the per-entity dyn cache re-serializes exactly one changed record.
   if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
-  if (e.kind === 'mob' && e.dead && e.corpseTimer <= 0) out.cd = 1; // corpse decayed
+  if (e.kind === 'mob' && corpseHasDecayed(e.dead, e.corpseTimer)) out.cd = 1; // corpse decayed
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;

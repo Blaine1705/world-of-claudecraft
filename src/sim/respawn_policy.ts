@@ -210,6 +210,6 @@ export function resolveRespawnSeconds(
  * rather than leaving an empty, unclickable body standing for the rest of the
  * respawn wait.
  */
-export function corpseHasDecayed(dead: boolean, corpseTimer: number): boolean {
-  return dead && corpseTimer <= 0;
+export function corpseHasDecayed(dead: boolean, corpseTimer: number | undefined): boolean {
+  return dead && corpseTimer !== undefined && corpseTimer <= 0;
 }

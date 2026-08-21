@@ -29,7 +29,13 @@ function ent(partial: Partial<Entity> & { id: number }): Entity {
 }
 
 describe('deadTargetSelectable', () => {
-  it('allows a lootable corpse regardless of owner', () => {
+  it('allows a lootable corpse inside an active corpse window', () => {
+    expect(
+      deadTargetSelectable(ent({ id: 10, dead: true, corpseTimer: 12, lootable: true }), 1),
+    ).toBe(true);
+  });
+
+  it('allows a freshly hand-built lootable corpse before a corpseTimer is assigned', () => {
     expect(deadTargetSelectable(ent({ id: 10, dead: true, lootable: true }), 1)).toBe(true);
   });
 

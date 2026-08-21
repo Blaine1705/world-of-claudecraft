@@ -404,6 +404,10 @@ describe('corpseHasDecayed: the render/wire admission signal', () => {
     expect(corpseHasDecayed(true, 1)).toBe(false);
   });
 
+  it('treats an uninitialized corpseTimer as not intentionally decayed', () => {
+    expect(corpseHasDecayed(true, undefined)).toBe(false);
+  });
+
   it('is true once the window elapses, at and past the zero boundary', () => {
     expect(corpseHasDecayed(true, 0)).toBe(true);
     expect(corpseHasDecayed(true, -1)).toBe(true);

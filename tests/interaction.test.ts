@@ -159,6 +159,27 @@ describe('interaction.lootCorpse', () => {
     expect(mob.loot).toBeNull(); // pruneCorpseLoot cleared the emptied corpse
     expect(player.targetId).toBeNull();
   });
+
+  it('keeps a fresh hand-built lootable corpse eligible before explicit corpse decay', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 22, a, [{ itemId: 'worn_sword', count: 1 }]);
+    expect(mob.corpseTimer).toBe(Number.POSITIVE_INFINITY);
+
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(true);
+
+    expect(sim.countItem('worn_sword', a)).toBe(1);
+  });
+
+  it('refuses an explicitly decayed lootable corpse', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 22, a, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.corpseTimer = 0;
+
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(false);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(mob.loot?.items[0].count).toBe(1);
+  });
 });
 
 describe('interaction.pickUpObject', () => {
