@@ -42,6 +42,7 @@ import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
+import { corpseHasDecayed } from '../respawn_policy';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -131,6 +132,18 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
   'nythraxis_heroic_rogue_add',
 ]);
 
+function expireDecayedCorpseInteractions(ctx: SimContext, mob: Entity): void {
+  if (!corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
+  if (!mob.lootable && !mob.loot && mob.lootRecipientIds === undefined) return;
+  mob.lootable = false;
+  mob.loot = null;
+  mob.lootRecipientIds = undefined;
+  for (const meta of ctx.players.values()) {
+    const player = ctx.entities.get(meta.entityId);
+    if (player?.targetId === mob.id) player.targetId = null;
+  }
+}
+
 export function updateMob(ctx: SimContext, mob: Entity): void {
   // Summoned quest add (widow hatchling): cancel its out-of-combat despawn while it
   // is fighting; resetEvadingMob (re)starts the countdown when it leashes home.
@@ -148,6 +161,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
+    expireDecayedCorpseInteractions(ctx, mob);
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;

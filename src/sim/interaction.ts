@@ -67,6 +67,7 @@ import {
   minWieldRequirementToWorkAny,
 } from './professions/wield_gate';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
+import { corpseHasDecayed } from './respawn_policy';
 import { noteReliquaryMark } from './reliquary';
 import type { SimContext } from './sim_context';
 import { interactSoulwell } from './soulwell';
@@ -128,7 +129,7 @@ export function lootCorpse(
     return false;
   }
   const mob = ctx.entities.get(mobId);
-  if (!mob?.lootable || !mob.loot) return false;
+  if (!mob?.lootable || !mob.loot || corpseHasDecayed(mob.dead, mob.corpseTimer)) return false;
   // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
   const ffaUnlocked = honorFfa && lootHasGoneFfa(mob.lootFfaTimer);
   const rights = corpseLootRights(ctx, mob, meta.entityId, ffaUnlocked);
@@ -221,7 +222,7 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
   const { meta, e: trigger } = r;
   if (isInRaidInstance(ctx, trigger.pos)) return; // silent: no error toast on a passive walk-by
   const mob = ctx.entities.get(mobId);
-  if (!mob?.lootable || !mob.loot) return;
+  if (!mob?.lootable || !mob.loot || corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
   if (dist2d(trigger.pos, mob.pos) > INTERACT_RANGE) return;
 
   // ffaUnlocked=false: walk-by may auto-loot the trigger's own tap, their party's tap,
@@ -297,6 +298,7 @@ export function harvestCorpse(
   }
   const mob = ctx.entities.get(mobId);
   if (mob?.kind !== 'mob' || !mob.dead) return;
+  if (corpseHasDecayed(true, mob.corpseTimer)) return;
   const componentTags = MOBS[mob.templateId]?.componentTags;
   if (!isHarvestableCorpse(componentTags)) {
     ctx.error(meta.entityId, 'That corpse has nothing to harvest.');

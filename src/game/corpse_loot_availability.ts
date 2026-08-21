@@ -1,6 +1,7 @@
 import { MOBS } from '../sim/data';
 import { hasSharedLootRights, lootHasGoneFfa } from '../sim/loot/loot_ffa';
 import { isHarvestableCorpse } from '../sim/professions/gathering';
+import { corpseHasDecayed } from '../sim/respawn_policy';
 import type { Entity } from '../sim/types';
 
 /** Resolve the exact corpse content the local player can open in the loot popup.
@@ -44,6 +45,16 @@ export function corpseLootAvailability(
   harvestStateReliable = true,
   partyMemberIds: readonly number[] | null = null,
 ) {
+  if (corpseHasDecayed(mob.dead, mob.corpseTimer)) {
+    return {
+      componentTags: MOBS[mob.templateId]?.componentTags,
+      harvestable: false,
+      visibleItems: [],
+      visibleCopper: 0,
+      hasLoot: false,
+      canOpen: false,
+    };
+  }
   const componentTags = MOBS[mob.templateId]?.componentTags;
   // isHarvestableCorpse, the sim's own predicate, not a tag count of our own
   // (#2513): a corpse whose every family is unmapped (no shipped template

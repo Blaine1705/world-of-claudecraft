@@ -262,8 +262,11 @@ interface AttributionTargetFixture {
 // hollowGates into the shared per-frame occluder update on top of the current
 // release renderer bytes, so the composite follows the merged bytes. No
 // capture was retaken.
+// Re-minted for the PR #3497 merge repair: the integration-side Eastbrook
+// evidence is retained while entity_view_policy_core.ts keeps the decayed-
+// corpse admission rule and its lifecycle repair. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9bd8edb5e6cc67d56b9dbc358cda2f544e0c39ec05143c65e7ee8604acd3de81';
+  '44f7e5150a6c11433849981e2d7299aadce4bbe7a55c68be6bdb5906eb9462b6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -1,6 +1,7 @@
 import { MOBS } from './data';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import { isHarvestableCorpse } from './professions/gathering';
+import { corpseHasDecayed } from './respawn_policy';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
 
@@ -16,7 +17,7 @@ export function corpseInteractionAvailability(
   entityId: number,
   honorFfa: boolean,
 ): CorpseInteractionAvailability {
-  if (mob.kind !== 'mob' || !mob.dead || !mob.lootable) {
+  if (mob.kind !== 'mob' || !mob.dead || !mob.lootable || corpseHasDecayed(true, mob.corpseTimer)) {
     return { harvestable: false, hasLootRights: false, canInteract: false };
   }
 

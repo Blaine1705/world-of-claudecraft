@@ -41,6 +41,26 @@ describe('corpseLootAvailability', () => {
     expect(result.canOpen).toBe(true);
   });
 
+  it('closes a decayed corpse even if stale loot and harvest fields remain', () => {
+    const result = corpseLootAvailability(
+      corpse({
+        templateId: 'forest_wolf',
+        dead: true,
+        corpseTimer: 0,
+        lootable: true,
+        loot: { copper: 25, items: [{ itemId: 'wolf_fang', count: 1 }] },
+        harvestClaimedBy: null,
+      }),
+      1,
+    );
+
+    expect(result.hasLoot).toBe(false);
+    expect(result.visibleCopper).toBe(0);
+    expect(result.visibleItems).toEqual([]);
+    expect(result.harvestable).toBe(false);
+    expect(result.canOpen).toBe(false);
+  });
+
   it('keeps a depleted skinnable corpse open for harvesting', () => {
     const result = corpseLootAvailability(
       corpse({ templateId: 'forest_wolf', loot: null, harvestClaimedBy: null }),
