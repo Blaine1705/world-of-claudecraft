@@ -986,6 +986,7 @@ export const fr_CA: EnTranslations = {
       "seconds": "{s} s",
       "autoShowHint": "Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou des soins, et ce panneau se ferme quelques secondes après la fin du combat.",
       "threatFallback": "Pas de menace en direct : affichage des dégâts sur {name}",
+      "threatFrozen": "Final threat vs {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Autres ({count})",

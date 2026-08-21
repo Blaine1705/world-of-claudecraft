@@ -986,6 +986,7 @@ export const pl_PL: EnTranslations = {
       "seconds": "{s}s",
       "autoShowHint": "Wiersze pojawiają się automatycznie, gdy twoja drużyna zadaje obrażenia lub leczy, a ten segment zamyka się kilka sekund po zakończeniu walki.",
       "threatFallback": "Brak zagrożenia na żywo: pokazywanie obrażeń wobec {name}",
+      "threatFrozen": "Final threat vs {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Inne ({count})",
