@@ -730,6 +730,13 @@ describe('ReliquaryWindow: refreshIfChanged elision and per-dimension repaint', 
       const id = relicIds(PAGE_ID)[2] ?? '';
       state.obtainCounts[id] = (state.obtainCounts[id] ?? 0) + 1;
     });
+    // Painter-side dimension: the summary's eye renders from deps.trackerShown(),
+    // and the switch can flip OUTSIDE this window (the Options row) while it is
+    // open. Without the |t sig arm the eye would keep its stale pressed state
+    // until an unrelated dimension happened to move.
+    expectDimension(rig, 'tracker visibility switch', () => {
+      rig.tracker.shown = !rig.tracker.shown;
+    });
   });
 
   it('latches the new painter state so an interaction is not followed by a second paint', () => {

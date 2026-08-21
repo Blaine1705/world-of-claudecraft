@@ -759,15 +759,21 @@ describe('tracker chrome', () => {
     expect(trackerBody, 'enabled read').toContain(
       "input.enabled = (settings?.get('showReliquaryTracker') ?? true) === true;",
     );
-    const hudStripped = stripComments(hud);
-    expect(hudStripped, 'window read').toContain(
+    // Scoped to the reliquaryWindow deps bag (the same discipline as
+    // trackerBody above): a matching line in another window's deps could not
+    // satisfy these.
+    const windowDeps = stripComments(
+      sliceBetween(hud, 'private readonly reliquaryWindow = new ReliquaryWindow({', '});'),
+    );
+    expect(windowDeps, 'window read').toContain(
       "trackerShown: () => (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true,",
     );
     // The write routes through the options seam (the playtime-eye doctrine),
-    // never a bare settings.set: the eye and the Options row keep ONE write
-    // path, so a future applySetting side effect for this key reaches both.
-    expect(hudStripped, 'window write').toContain(
-      "this.optionsHooks?.onSettingChange('showReliquaryTracker', shown);",
+    // never a bare settings.set, AND nudges the strip in the same handler: the
+    // whole body is the pin so dropping the immediate repaint (the onPinChanged
+    // immediacy contract) cannot pass either.
+    expect(windowDeps, 'window write plus nudge').toContain(
+      "this.optionsHooks?.onSettingChange('showReliquaryTracker', shown);\n      this.updateReliquaryTracker();",
     );
   });
 
@@ -776,10 +782,27 @@ describe('tracker chrome', () => {
     // where the quest tracker would (no phantom gap with zero quests). CSS
     // :empty matches only a childless, textless node, so the rule only works
     // while the questless render is the empty STRING; pin both halves so
-    // either drifting alone fails here.
-    expect(hudCss).toContain('#right-tracker-stack > :empty');
+    // either drifting alone fails here. The DECLARATION is part of the pin:
+    // an opacity/visibility swap would keep the selector while restoring the
+    // phantom gap.
+    expect(hudCss).toMatch(/#right-tracker-stack > :empty \{\s*display: none;/);
     const questController = read('../src/ui/hud/quest/quest_tracker_controller.ts');
     expect(stripComments(questController)).toContain("if (!view.visible) return '';");
+  });
+
+  it('keeps the eye toggle a legal pointer target on desktop (WCAG 2.5.8)', () => {
+    // The visual pill is ~20px tall; the invisible ::after hit extension (the
+    // char-playtime-eye idiom) is what clears the 24px floor, and it is inert
+    // without position: relative on the host. The mobile arm keeps the 40px
+    // coarse floor instead.
+    const componentsCss = read('../src/styles/components.css');
+    expect(componentsCss).toMatch(/\.reliquary-tracker-toggle \{\s*position: relative;/);
+    expect(componentsCss).toMatch(
+      /\.reliquary-tracker-toggle::after \{\s*content: "";\s*position: absolute;\s*inset: -6px;/,
+    );
+    expect(componentsCss).toMatch(
+      /body\.mobile-touch \.reliquary-tracker-toggle \{\s*min-height: 40px;/,
+    );
   });
 
   it('wires the tracker container in BOTH game entries, under the deed tracker', () => {

@@ -166,11 +166,16 @@ describe('TrackerStackAnchor', () => {
     /** rAF callbacks captured by the stub, in schedule order. */
     frames: Array<() => void>;
     cancelled: number[];
+    /** Every (type, handler) the install registered / removed on window. */
+    added: Array<{ type: string; handler: unknown }>;
+    removed: Array<{ type: string; handler: unknown }>;
     dispose(): void;
     restore(): void;
   }
 
-  /** Install over a synchronous rAF stub so the coalescing is observable. */
+  /** Install over a synchronous rAF stub so the coalescing is observable, with
+   *  the resize listener registration captured so dispose can be proven to
+   *  remove the SAME handler it added (not merely starve it via pending). */
   function installRig(): InstallRig {
     const stack = document.createElement('div');
     const wrap = document.createElement('div');
@@ -181,10 +186,22 @@ describe('TrackerStackAnchor', () => {
     };
     const frames: Array<() => void> = [];
     const cancelled: number[] = [];
+    const added: Array<{ type: string; handler: unknown }> = [];
+    const removed: Array<{ type: string; handler: unknown }> = [];
     const rawRaf = window.requestAnimationFrame;
     const rawCancel = window.cancelAnimationFrame;
+    const rawAdd = window.addEventListener.bind(window);
+    const rawRemove = window.removeEventListener.bind(window);
     window.requestAnimationFrame = ((cb: () => void) => frames.push(cb)) as never;
     window.cancelAnimationFrame = ((id: number) => cancelled.push(id)) as never;
+    window.addEventListener = ((type: string, handler: never, opts: never) => {
+      added.push({ type, handler });
+      rawAdd(type, handler, opts);
+    }) as never;
+    window.removeEventListener = ((type: string, handler: never, opts: never) => {
+      removed.push({ type, handler });
+      rawRemove(type, handler, opts);
+    }) as never;
     const installed = installTrackerStackAnchor({
       stack: () => stack,
       minimapWrap: () => wrap,
@@ -197,10 +214,14 @@ describe('TrackerStackAnchor', () => {
       geom,
       frames,
       cancelled,
+      added,
+      removed,
       dispose: installed.dispose,
       restore: () => {
         window.requestAnimationFrame = rawRaf;
         window.cancelAnimationFrame = rawCancel;
+        window.addEventListener = rawAdd as never;
+        window.removeEventListener = rawRemove as never;
       },
     };
   }
@@ -223,8 +244,8 @@ describe('TrackerStackAnchor', () => {
       window.dispatchEvent(new Event('resize'));
       expect(rig.frames).toHaveLength(2);
     } finally {
-      rig.restore();
       rig.dispose();
+      rig.restore();
     }
   });
 
@@ -234,14 +255,59 @@ describe('TrackerStackAnchor', () => {
       window.dispatchEvent(new Event('resize'));
       expect(rig.frames).toHaveLength(1);
       rig.dispose();
-      // The scheduled-but-unrun frame is cancelled, and a later resize
-      // schedules nothing: the listener is really gone.
-      expect(rig.cancelled).toHaveLength(1);
+      // The EXACT scheduled handle is cancelled (the stub minted id 1), so a
+      // stale or wrong-handle cancel cannot pass.
+      expect(rig.cancelled).toEqual([1]);
+      // The SAME handler reference the install registered is what dispose
+      // removed: proving removal by identity, not by the pending-slot side
+      // channel a two-line mutation could starve.
+      expect(rig.added.filter((e) => e.type === 'resize')).toHaveLength(1);
+      expect(rig.removed).toEqual(rig.added.filter((e) => e.type === 'resize'));
+      // And behaviorally: a later resize schedules nothing.
       window.dispatchEvent(new Event('resize'));
       expect(rig.frames).toHaveLength(1);
     } finally {
       rig.restore();
     }
+  });
+
+  it('dispose with no pending frame cancels nothing, and a second dispose is inert', () => {
+    const rig = installRig();
+    try {
+      rig.dispose();
+      expect(rig.cancelled).toEqual([]);
+      rig.dispose();
+      expect(rig.cancelled).toEqual([]);
+      expect(rig.removed.filter((e) => e.type === 'resize')).toHaveLength(2);
+    } finally {
+      rig.restore();
+    }
+  });
+
+  it('one apply costs one rect read per measured element (the header ceiling)', () => {
+    // The production shape passes two overhangs (zoom pill, clock), so one
+    // apply is bounded at three reads; this rig drives that exact shape and
+    // counts every rect call, closing the gap a source-count alone leaves
+    // (the second call site is inside a map over however many overhangs the
+    // host hands over).
+    const mk = (bottom: number, reads: { n: number }): HTMLElement => {
+      const el = document.createElement('div');
+      el.getBoundingClientRect = () => {
+        reads.n++;
+        return { bottom, width: 20, height: 20 } as DOMRect;
+      };
+      return el;
+    };
+    const reads = { n: 0 };
+    const anchor = new TrackerStackAnchor({
+      stack: () => document.createElement('div'),
+      minimapWrap: () => mk(268, reads),
+      overhangs: () => [mk(274, reads), mk(266, reads)],
+      uiScale: () => 1,
+    });
+    reads.n = 0;
+    anchor.apply();
+    expect(reads.n).toBe(3);
   });
 });
 
@@ -250,14 +316,26 @@ describe('tracker_stack_anchor source pins', () => {
   // it under the painter gate's scans, whose write contract it cannot satisfy:
   // the fallback path needs removeProperty, a verb the elided facet lacks).
   // These pins are what hold the header's cadence and write claims instead.
+  // COMMENT-STRIPPED before every pin: the module header narrates the same
+  // tokens in prose, so a raw read would let a comment stand in for the real
+  // call (and would red the exact counts on a harmless comment edit). The
+  // counts assume the house formatting (biome keeps a member call on one
+  // line); a spelling like a captured window alias would move them, which is
+  // accepted: it would be a deliberate edit to a five-line module, not drift.
   // Resolved via node:path, not `new URL`: this suite runs under happy-dom,
   // whose URL global refuses the file scheme composition the node arm allows.
-  const src = readFileSync(
-    join(dirname(fileURLToPath(import.meta.url)), '../src/ui/tracker_stack_anchor.ts'),
-    'utf8',
+  const stripComments = (text: string): string =>
+    text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+  const src = stripComments(
+    readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), '../src/ui/tracker_stack_anchor.ts'),
+      'utf8',
+    ),
   );
 
   it('bounds the layout reads: exactly two getBoundingClientRect call sites', () => {
+    // The per-apply ceiling itself is behavioral (the three-read test above);
+    // this pin holds the SITE count so a new read cannot land unnoticed.
     expect(src.split('.getBoundingClientRect()').length - 1).toBe(2);
   });
 
