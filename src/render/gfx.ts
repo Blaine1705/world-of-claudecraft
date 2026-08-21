@@ -15,6 +15,7 @@ import {
   installPbrPointLightShaderPruning,
   patchPbrRimGlowFragmentShader,
 } from './pbr_fragment_shader';
+import { markSharedMaterial } from './shared_resource';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -2063,6 +2064,9 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
   // on tiers without a field): props and buildings at range must haze with
   // the ground under them or the effect reads as nothing.
   attachBiomeHaze(mat);
-  matCache.set(key, mat);
+  // The dedupe cache hands the SAME instance to terrain, buildings, props and
+  // object views alike; the shared tag keeps every per-view/per-build disposal
+  // guard (shared_resource.ts) off it.
+  matCache.set(key, markSharedMaterial(mat));
   return mat;
 }

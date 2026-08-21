@@ -67,6 +67,7 @@ import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occl
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
+import { markOwnedMaterial, markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
@@ -392,7 +393,9 @@ function extractModule(name: string, pack: Pack, gltf: GLTF): void {
   if (!geos.length) throw new Error(`dungeon module has no meshes: ${name}`);
   const merged = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);
   if (!merged) throw new Error(`dungeon module merge failed: ${name}`);
-  moduleAssets.set(name, { geo: merged, pack });
+  // Kit geometry is a module-lifetime cache shared by every interior build;
+  // the shared tag keeps the interior-retire disposal off it.
+  moduleAssets.set(name, { geo: markSharedGeometry(merged), pack });
 }
 
 function loadModuleAsset(name: string, pack: Pack): Promise<void> {
@@ -1422,7 +1425,9 @@ export class DungeonInteriors {
     // the high/ultra parallax height response.
     if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial)
       applySurfaceDetail(mat as THREE.MeshStandardMaterial, 'stone');
-    this.packMats.set(pack, mat);
+    // Instance-lifetime cache reused by every interior build: shared-tagged so
+    // the retire disposal never frees it.
+    this.packMats.set(pack, markSharedMaterial(mat));
     return mat;
   }
 
@@ -1457,7 +1462,7 @@ export class DungeonInteriors {
     // re-applies the stone layer (identity-keyed guard: clones are fresh).
     if ((base as THREE.MeshStandardMaterial).isMeshStandardMaterial)
       applySurfaceDetail(base as THREE.MeshStandardMaterial, 'stone');
-    mat = base;
+    mat = markSharedMaterial(base);
     this.tintedMats.set(key, mat);
     return mat;
   }
@@ -1557,7 +1562,9 @@ export class DungeonInteriors {
       // untextured plastic AND link its own program on first sight. The
       // sibling tintedMaterial re-applies the same layer by hand for the same
       // reason; this site takes the shared helper.
-      const material = cloneMaterialWithHooks(base);
+      // Owned per-wall clone: strip the shared tag it inherits from the
+      // tagged pack/marsh material so the interior retire actually frees it.
+      const material = markOwnedMaterial(cloneMaterialWithHooks(base));
       // Hideable walls bypass emit(), so the Drowned Court's wet-stone tint is
       // applied to this per-wall clone directly (structural stone only: the
       // banners keep their true colors, same scoping as the marsh tint).
@@ -2271,18 +2278,22 @@ export class DungeonInteriors {
     scale = 1,
   ): void {
     if (this.lowGfx) return;
-    this.glowDecalGeo ??= new THREE.CircleGeometry(6.6, 20).rotateX(-Math.PI / 2);
+    this.glowDecalGeo ??= markSharedGeometry(
+      new THREE.CircleGeometry(6.6, 20).rotateX(-Math.PI / 2),
+    );
     this.glowDecalTex ??= radialGlowTexture();
     let mat = this.glowDecalMats.get(colorHex);
     if (!mat) {
-      mat = new THREE.MeshBasicMaterial({
-        map: this.glowDecalTex,
-        color: colorHex,
-        transparent: true,
-        opacity: 0.46,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      });
+      mat = markSharedMaterial(
+        new THREE.MeshBasicMaterial({
+          map: this.glowDecalTex,
+          color: colorHex,
+          transparent: true,
+          opacity: 0.46,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+      );
       this.glowDecalMats.set(colorHex, mat);
     }
     const glow = new THREE.Mesh(this.glowDecalGeo, mat);

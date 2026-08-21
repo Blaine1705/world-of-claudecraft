@@ -1198,7 +1198,15 @@ class Sfx {
       if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
     }
     for (const id of this.pendingLoops.keys()) {
-      if (isDynamicRiftId(id) && !activeIds.has(id)) this.pendingLoops.delete(id);
+      if (isDynamicRiftId(id) && !activeIds.has(id)) {
+        // Drop all three pending maps together (the unloop contract): deleting
+        // only pendingLoops orphaned the load/variant entries for every rift
+        // source that vanished mid-load, one stranded pair per portal/roller
+        // for the rest of the session.
+        this.pendingLoops.delete(id);
+        this.pendingLoopLoads.delete(id);
+        this.pendingLoopVariants.delete(id);
+      }
     }
   }
 

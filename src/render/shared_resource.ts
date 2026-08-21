@@ -39,3 +39,72 @@ export function markSharedTexture<T extends THREE.Texture>(texture: T): T {
 export function isSharedTexture(texture: THREE.Texture): boolean {
   return texture.userData.sharedRendererResource === true;
 }
+
+/**
+ * Material.copy deep-copies userData, so a clone() of a tagged shared material
+ * silently INHERITS the shared flag and every disposal guard skips it forever.
+ * A builder that clones a shared material into a view-owned or build-owned
+ * variant (a recolor, a tinted grade, an occluder-fade wall clone) must strip
+ * the tag so teardown actually frees the clone.
+ */
+export function markOwnedMaterial<T extends THREE.Material>(material: T): T {
+  delete material.userData.sharedRendererResource;
+  return material;
+}
+
+export interface UnsharedDisposeCounts {
+  geometries: number;
+  materials: number;
+}
+
+/**
+ * Dispose every geometry/material under `root` that is NOT tagged shared, in
+ * one traversal. This is the teardown half of the tagging contract above: the
+ * per-view object disposal (renderer removeView) and the interior retire path
+ * both call it, so a builder that mints an untagged resource gets it freed
+ * with the scene nodes, and a builder that shares one must tag it (or it will
+ * be freed out from under every other consumer).
+ *
+ * Mesh-scoped on purpose (`isMesh` only): Sprites/Points in view groups carry
+ * renderer-owned singleton materials (the loot sparkle, badge sprites) and are
+ * managed by their owners. `instanceBuffers` additionally calls dispose() on
+ * InstancedMeshes, releasing their per-build instanceMatrix GPU buffer, which
+ * is per-build state even when the geometry and material are shared kit
+ * resources. Returns counts so leak-guard tests can assert coverage.
+ */
+export function disposeUnsharedMeshResources(
+  root: THREE.Object3D,
+  opts: { geometries?: boolean; materials?: boolean; instanceBuffers?: boolean },
+): UnsharedDisposeCounts {
+  const seenGeometries = new Set<THREE.BufferGeometry>();
+  const seenMaterials = new Set<THREE.Material>();
+  let geometries = 0;
+  let materials = 0;
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    if (opts.instanceBuffers && (mesh as THREE.InstancedMesh).isInstancedMesh) {
+      (mesh as THREE.InstancedMesh).dispose();
+    }
+    if (
+      opts.geometries &&
+      mesh.geometry &&
+      !isSharedGeometry(mesh.geometry) &&
+      !seenGeometries.has(mesh.geometry)
+    ) {
+      seenGeometries.add(mesh.geometry);
+      mesh.geometry.dispose();
+      geometries++;
+    }
+    if (opts.materials) {
+      const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const material of list) {
+        if (!material || isSharedMaterial(material) || seenMaterials.has(material)) continue;
+        seenMaterials.add(material);
+        material.dispose();
+        materials++;
+      }
+    }
+  });
+  return { geometries, materials };
+}
