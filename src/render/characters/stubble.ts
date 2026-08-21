@@ -873,12 +873,7 @@ export function buildRegionDecalGeometry(
         const x = posData.data[v * 3];
         const y = posData.data[v * 3 + 1];
         const z = posData.data[v * 3 + 2];
-        const [t, az] = headAngles(
-          frame,
-          x,
-          y,
-          z,
-        );
+        const [t, az] = headAngles(frame, x, y, z);
         mt += t / 3;
         ma += az / 3;
         const nx = nrmData.data[v * 3];
