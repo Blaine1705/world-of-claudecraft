@@ -7338,7 +7338,6 @@ export class Hud {
         btn.blur();
       });
       btn.addEventListener('keydown', (e) => {
-        // preventDefault only: no stopPropagation, so Space still reaches Input's jump key.
         if (e.key !== ' ' && e.key !== 'Spacebar') return;
         e.preventDefault();
       });
@@ -19469,7 +19468,6 @@ export function abilityRequirementLines(
     }
   });
 }
-
 // A 2D canvas context is non-null for any attached canvas in this app; centralize
 // the assertion so the call sites do not each carry a non-null bang. Throws (a
 // dev-surfaced failure, never reached in practice) rather than asserting.
