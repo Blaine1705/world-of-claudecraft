@@ -4921,7 +4921,9 @@ export const hudChromeStrings = {
     // The summary band's eye toggle for the HUD tracker's master switch
     // (showReliquaryTracker). The label is the toggle's constant accessible
     // name (aria-pressed carries the state); each hint is the action the
-    // press performs, shown as the title (the helm-eye convention).
+    // press performs, rendered through the window's shared tooltip seam
+    // (reliquary_window.ts attachTooltip; that window never sets a native
+    // title, a pinned contract), not a title attribute.
     trackerToggleLabel: 'HUD tracker',
     trackerToggleShowHint: 'Show the Reliquary tracker on your screen',
     trackerToggleHideHint: 'Hide the Reliquary tracker from your screen',
