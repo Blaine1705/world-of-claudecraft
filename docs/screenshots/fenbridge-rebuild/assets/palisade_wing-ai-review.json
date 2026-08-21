@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "assetId": "palisade_wing",
-  "sourceFingerprint": "5a033c19da73c0b4e056fc79dd106c00e49dcef3c03d25f181c0cf06e223e59e",
+  "sourceFingerprint": "d22e0ab0b1aa6cf55ac29f9a2ce2bf39ccce17e3a19f64904b63c8e4d4998a7a",
   "reference": "docs/design/fenbridge-rebuild/references/palisade-wing-turnaround.png",
   "minimumOverallScore": 0.7,
   "requiredViews": [
