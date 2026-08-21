@@ -17,8 +17,9 @@
 // tests/proving_shore_content.test.ts). The way back is the Old Pier's clicked ferry bell
 // (setting graduates down in Eastbrook town), and the vale west strand's
 // twin bell rings a returning player back in for a refresher. Terrain: the
-// PS_* tables in world.ts (biome 'vale': the island shares the vale's sky,
-// palette, and song).
+// PS_* tables in world.ts (biome 'vale': the island shares the vale's sky
+// and palette; its song is its own dawn cue, the proving_shore zone theme
+// composed in src/game/music_themes_proving_shore.ts).
 
 import type {
   CampDef,

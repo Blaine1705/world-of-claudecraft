@@ -46,6 +46,10 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   garden: '/audio/music/garden.mp3?v=9ec0e18f6d81',
   gale: '/audio/music/gale.mp3?v=a940defc3275',
   farshore: '/audio/music/farshore.mp3?v=69d713cd3f3c',
+  // The tutorial island's dawn cue, candidate A of the three composed for the
+  // Proving Shore (music_themes_proving_shore.ts); the alternate candidate
+  // renders live under docs/music/proving-shore-candidates/ for audition.
+  proving_shore: '/audio/music/proving_shore.mp3?v=1e84b5a83d79',
   vale_cup: null,
   dungeon_hollow_crypt: '/audio/music/dungeon_hollow_crypt.mp3?v=4bb48c2d90fc',
   dungeon_sunken_bastion: '/audio/music/dungeon_sunken_bastion.mp3?v=db67d7df0f4b',

@@ -589,6 +589,21 @@ describe('world music zone selection', () => {
     expect(musicZoneForLocation('farshore_isle', 'vale', true, false)).toBe('farshore');
   });
 
+  it('gives the Proving Shore its own dawn cue instead of the vale loop', () => {
+    expect(musicZoneForLocation('proving_shore', 'vale', false, false)).toBe('proving_shore');
+    expect(buildMusicThemes().proving_shore).toBeDefined();
+  });
+
+  it('keeps Dawnrest Camp (the island hub, no town theme) on the dawn cue too', () => {
+    expect(musicZoneForLocation('proving_shore', 'vale', true, false)).toBe('proving_shore');
+  });
+
+  it('registers both alternate Proving Shore candidates for the editor and render pipeline', () => {
+    const themes = buildMusicThemes();
+    expect(themes.proving_shore_b).toBeDefined();
+    expect(themes.proving_shore_c).toBeDefined();
+  });
+
   it('borrows the nearest-mood cue for paint-only biomes', () => {
     expect(musicZoneForLocation('custom', 'beach', false, false)).toBe('jungle');
     expect(musicZoneForLocation('custom', 'desert', false, false)).toBe('ember');

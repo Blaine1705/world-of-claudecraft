@@ -127,6 +127,7 @@ describe('remastered soundtrack catalog', () => {
       'garden',
       'gale',
       'farshore',
+      'proving_shore',
       'vale_cup',
       'dungeon_hollow_crypt',
       'dungeon_sunken_bastion',
