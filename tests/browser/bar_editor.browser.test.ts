@@ -33,6 +33,7 @@ import {
 } from '../../src/ui/hud/action_bar/hotbar';
 import {
   MOBILE_ACTION_BUTTONS,
+  mobileActionSourceSlotCount,
   sourceSlotForMobileButton,
 } from '../../src/ui/hud/action_bar/mobile_action_page_view';
 import { RadialGesture } from '../../src/ui/hud/action_bar/radial_gesture_controller';
@@ -52,6 +53,12 @@ const VIEWPORT = { width: 844, height: 390, tier: 'hud-mobile-compact' };
 
 /** The WCAG 2.2 / house floor for a touch target (src/ui/CLAUDE.md). */
 const TOUCH_FLOOR_PX = 40;
+
+/** The span Hud hands the editor for the SHIPPED DEFAULT desktop row visibility
+ *  (both optional rows hidden). Wiring the rig with the real function is the
+ *  point: a span tied to those rows left the down row, the left row and all of
+ *  page 2 unbindable on a default character. */
+const DEFAULT_TOUCH_SPAN = mobileActionSourceSlotCount({ secondary: false, third: false });
 
 function mountShell() {
   // The More tray's Edit control, in the shipped markup shape.
@@ -136,7 +143,7 @@ describe(`bar editor at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
       onVisibilityChange: () => {},
       hideTooltip: () => {},
       barActions: () => bar,
-      sourceSlotCount: () => ACTION_BAR_ABILITY_SLOTS,
+      sourceSlotCount: () => DEFAULT_TOUCH_SPAN,
       editAllowed: () => true,
       // The SAME pure helpers the desktop HTML5 drop mutates through, so this rig
       // exercises the real persistence shape rather than a bespoke stub.
@@ -198,12 +205,39 @@ describe(`bar editor at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     rig.editor.open('charge');
     // Row 4 ('down'), button 1: a directional slot, unreachable before.
     const target = cells(rig.root)[3 * MOBILE_ACTION_BUTTONS + 1];
+    expect(target.dataset.barSlot).toBe('14');
+    expect(target.disabled).toBe(false);
     expect(nameOf(target)).toBe('');
     target.click();
 
     const slot = sourceSlotForMobileButton(0, 1, 'down');
     expect(rig.bar[slot - 1]).toEqual({ type: 'ability', id: 'charge' });
     expect(nameOf(target)).not.toBe('');
+  });
+
+  it('places an armed spell into a page-2 cell and disables only the tail past 33', async () => {
+    const rig = await setup();
+    rig.editor.open('charge');
+    tabs(rig.root)[1].click();
+
+    const grid = cells(rig.root);
+    // Page 2's resting row: slot 21, the first slot page 1 cannot reach.
+    const target = grid[0];
+    expect(target.dataset.barSlot).toBe('21');
+    expect(target.disabled).toBe(false);
+    target.click();
+    expect(rig.bar[20]).toEqual({ type: 'ability', id: 'charge' });
+    expect(nameOf(target)).not.toBe('');
+
+    // The grid keeps its geometry past the configurable span: those cells render
+    // but are inert, so an armed spell can never be dropped on the floor.
+    for (const cell of grid) {
+      const slot = Number(cell.dataset.barSlot);
+      expect(cell.disabled, `slot ${slot}`).toBe(slot > ACTION_BAR_ABILITY_SLOTS);
+      if (slot > ACTION_BAR_ABILITY_SLOTS) {
+        expect(cell.classList.contains('out-of-range'), `slot ${slot}`).toBe(true);
+      }
+    }
   });
 
   it('clears a bound cell with the Clear control, at the touch floor', async () => {

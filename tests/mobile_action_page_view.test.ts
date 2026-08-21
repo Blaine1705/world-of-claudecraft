@@ -17,6 +17,10 @@ import {
   RADIAL_SLOTS_PER_BUTTON,
 } from '../src/ui/hud/action_bar/radial_action_core';
 
+/** The touch span a character with only the primary DESKTOP row shown reaches,
+ *  which is the shipped default and the configuration the bug was reported on. */
+const DEFAULT_TOUCH_SPAN = mobileActionSourceSlotCount({ secondary: false, third: false });
+
 describe('mobilePageCount', () => {
   it('covers all 33 configurable action slots in two pages of four radial buttons', () => {
     expect(MOBILE_ACTION_SOURCE_SLOT_COUNT).toBe(33);
@@ -36,15 +40,21 @@ describe('mobilePageCount', () => {
     expect(mobilePageCount(0)).toBe(1);
   });
 
-  it('uses only enabled action-bar rows when deriving the mobile page count', () => {
-    expect(mobileActionSourceSlotCount({ secondary: false, third: false })).toBe(11);
-    expect(mobilePageCount(mobileActionSourceSlotCount({ secondary: false, third: false }))).toBe(
-      1,
-    );
-    expect(mobileActionSourceSlotCount({ secondary: true, third: false })).toBe(22);
-    expect(mobilePageCount(mobileActionSourceSlotCount({ secondary: true, third: false }))).toBe(2);
-    expect(mobileActionSourceSlotCount({ secondary: true, third: true })).toBe(33);
-    expect(mobilePageCount(mobileActionSourceSlotCount({ secondary: true, third: true }))).toBe(2);
+  it('spans the whole radial capacity whatever the optional desktop rows show', () => {
+    // The radial owns its own capacity: a hidden DESKTOP row is a desktop layout
+    // choice and must never shrink what touch can reach. Trimming it here left a
+    // default character unable to bind down, left, or any of page 2.
+    for (const secondary of [false, true]) {
+      for (const third of [false, true]) {
+        const where = `secondary=${secondary} third=${third}`;
+        expect(mobileActionSourceSlotCount({ secondary, third }), where).toBe(
+          MOBILE_ACTION_SOURCE_SLOT_COUNT,
+        );
+        expect(mobileActionSourceSlotCount({ secondary, third }), where).toBe(33);
+        expect(mobilePageCount(mobileActionSourceSlotCount({ secondary, third })), where).toBe(2);
+      }
+    }
+    expect(mobileActionSourceSlotCount()).toBe(MOBILE_ACTION_SOURCE_SLOT_COUNT);
   });
 });
 
@@ -139,10 +149,20 @@ describe('mobileButtonHasSourceSlot', () => {
     expect(mobileButtonHasSourceSlot(0, 3, MOBILE_ACTION_SOURCE_SLOT_COUNT, 'left')).toBe(true);
   });
 
-  it('respects a narrowed span when the optional desktop rows are hidden', () => {
-    const primaryOnly = mobileActionSourceSlotCount({ secondary: false, third: false });
-    expect(mobileButtonHasSourceSlot(0, 2, primaryOnly, 'right')).toBe(true); // slot 11
-    expect(mobileButtonHasSourceSlot(0, 3, primaryOnly, 'right')).toBe(false); // slot 12
+  it('reaches every direction and both pages at the DEFAULT desktop row visibility', () => {
+    // The reported bug: with only the primary desktop row shown (the default),
+    // the down row (13 to 16), the left row (17 to 20) and all of page 2 were
+    // unreachable, in the live ring and in the bar editor alike.
+    const span = DEFAULT_TOUCH_SPAN;
+    expect(mobileButtonHasSourceSlot(0, 3, span, 'right')).toBe(true); // slot 12
+    expect(mobileButtonHasSourceSlot(0, 0, span, 'down')).toBe(true); // slot 13
+    expect(mobileButtonHasSourceSlot(0, 3, span, 'down')).toBe(true); // slot 16
+    expect(mobileButtonHasSourceSlot(0, 0, span, 'left')).toBe(true); // slot 17
+    expect(mobileButtonHasSourceSlot(0, 3, span, 'left')).toBe(true); // slot 20
+    expect(mobileButtonHasSourceSlot(1, 0, span, 'center')).toBe(true); // slot 21
+    expect(mobileButtonHasSourceSlot(1, 0, span, 'down')).toBe(true); // slot 33
+    expect(mobileButtonHasSourceSlot(1, 1, span, 'down')).toBe(false); // slot 34
+    expect(mobilePageCount(span)).toBe(2);
   });
 });
 
@@ -195,17 +215,11 @@ describe('nextMobilePage', () => {
     expect(nextMobilePage(2, 3)).toBe(0);
   });
 
-  it('wraps within the enabled-row page count after optional bars are disabled', () => {
-    const primaryOnlyCount = mobilePageCount(
-      mobileActionSourceSlotCount({ secondary: false, third: false }),
-    );
-    const secondaryCount = mobilePageCount(
-      mobileActionSourceSlotCount({ secondary: true, third: false }),
-    );
+  it('cycles both pages at the default desktop row visibility', () => {
+    const pages = mobilePageCount(DEFAULT_TOUCH_SPAN);
 
-    expect(nextMobilePage(0, primaryOnlyCount)).toBe(0);
-    expect(nextMobilePage(1, secondaryCount)).toBe(0);
-    expect(clampMobilePage(6, primaryOnlyCount)).toBe(0);
-    expect(clampMobilePage(6, secondaryCount)).toBe(1);
+    expect(nextMobilePage(0, pages)).toBe(1);
+    expect(nextMobilePage(1, pages)).toBe(0);
+    expect(clampMobilePage(6, pages)).toBe(1);
   });
 });

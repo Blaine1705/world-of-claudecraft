@@ -14,10 +14,7 @@
 // desktop rows. Two pages of twenty expose slots 1 to 33; the last page's tail
 // positions carry no slot because the ring keeps a stable geometry.
 
-import {
-  ACTION_BAR_ABILITY_SLOTS,
-  ACTION_BAR_ABILITY_SLOTS_PER_ROW,
-} from './action_bar_layout_core';
+import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 import type { ActionBarVisibility } from './action_bar_visibility_core';
 import {
   RADIAL_SLOTS_PER_BUTTON,
@@ -47,12 +44,13 @@ export const MOBILE_ACTION_PAGE_COUNT = radialPageCount(
   MOBILE_ACTION_BUTTONS,
 );
 
-/** The number of hotbar source slots reachable through mobile paging for the
- *  currently visible action-bar rows. Hidden optional desktop rows stay hidden
- *  from the mobile page cycle too. */
-export function mobileActionSourceSlotCount(visibility: ActionBarVisibility): number {
-  if (!visibility.secondary) return ACTION_BAR_ABILITY_SLOTS_PER_ROW;
-  return visibility.third ? ACTION_BAR_ABILITY_SLOTS : ACTION_BAR_ABILITY_SLOTS_PER_ROW * 2;
+/** The hotbar source slots the touch ring and bar editor can reach. The radial
+ *  owns its own capacity, so the optional DESKTOP rows never narrow it: tying it
+ *  to them orphaned 22 slots (down, left, and all of page 2) for a default
+ *  character. The visibility is accepted, and ignored, so a caller holding one
+ *  needs no special case. */
+export function mobileActionSourceSlotCount(_visibility?: ActionBarVisibility): number {
+  return MOBILE_ACTION_SOURCE_SLOT_COUNT;
 }
 
 /** Number of pages needed to cover `totalSlots` source slots at

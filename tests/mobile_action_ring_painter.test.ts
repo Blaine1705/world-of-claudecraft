@@ -8,6 +8,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { AbilityDef } from '../src/sim/types';
+import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
 import type { ActionBarSlotElements } from '../src/ui/hud/action_bar/action_bar_painter';
 import {
   type ActionBarAbility,
@@ -20,12 +21,16 @@ import {
   clampMobilePage,
   MOBILE_ACTION_BUTTONS,
   mobileActionSourceSlotCount,
+  mobileButtonHasSourceSlot,
   mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
 } from '../src/ui/hud/action_bar/mobile_action_page_view';
 import { MobileActionRingPainter } from '../src/ui/hud/action_bar/mobile_action_ring_painter';
-import type { RadialPlacement } from '../src/ui/hud/action_bar/radial_action_core';
+import {
+  RADIAL_DIRECTIONS,
+  type RadialPlacement,
+} from '../src/ui/hud/action_bar/radial_action_core';
 import { radialCancelIsLive } from '../src/ui/hud/action_bar/radial_gesture_core';
 import {
   RADIAL_PETAL_DIRECTIONS,
@@ -460,9 +465,9 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       (key) => `URL(${key})`,
       (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
     );
-    // Two visible desktop rows: 22 reachable slots, so page 1's centres are
-    // 21, 22 (real) and 23, 24 (past the span and therefore hidden).
-    const visibleSlots = mobileActionSourceSlotCount({ secondary: true, third: false });
+    // A 22-slot span (the painter honours whatever span it is handed), so page
+    // 1's centres are 21, 22 (real) and 23, 24 (past the span, hidden).
+    const visibleSlots = 22;
     const pageBox = { page: 1 };
     const view = createActionBarView(
       {
@@ -484,6 +489,51 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     expect(calls).toContainEqual({ m: 'setDisplay', args: [els[2].btn, ''] });
     expect(calls).toContainEqual({ m: 'setDisplay', args: [els[3].btn, 'none'] });
     expect(calls).toContainEqual({ m: 'setDisplay', args: [els[4].btn, 'none'] });
+  });
+
+  it('spans slots 1 to 33 across both pages at the DEFAULT desktop row visibility', () => {
+    // The reported bug: the touch span followed the optional DESKTOP rows, so a
+    // default character's ring had ONE page and every down or left flick
+    // addressed a slot that could not be filled.
+    const span = mobileActionSourceSlotCount({ secondary: false, third: false });
+    const reachable: number[] = [];
+    for (let page = 0; page < mobilePageCount(span); page++) {
+      for (let button = 0; button < MOBILE_ACTION_BUTTONS; button++) {
+        for (const direction of RADIAL_DIRECTIONS) {
+          if (mobileButtonHasSourceSlot(page, button, span, direction)) {
+            reachable.push(sourceSlotForMobileButton(page, button, direction));
+          }
+        }
+      }
+    }
+    expect(reachable.sort((a, b) => a - b)).toEqual(
+      Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, (_, index) => index + 1),
+    );
+
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4].map((i) => slotElements(`ring${i}`));
+    const indicator = { tag: 'indicator' } as unknown as HTMLElement;
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        pageToggle: { tag: 'toggle' } as unknown as HTMLElement,
+        pageIndicator: indicator,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const pageBox = { page: 0 };
+    const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
+    painter.paint(view.tick(idleWorld()), pageBox.page, mobilePageCount(span), span);
+
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}'],
+    });
+    for (let i = 1; i <= MOBILE_ACTION_BUTTONS; i++) {
+      expect(calls).toContainEqual({ m: 'setDisplay', args: [els[i].btn, ''] });
+    }
   });
 });
 

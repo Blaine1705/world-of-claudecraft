@@ -27,9 +27,15 @@ import {
   resolveBarEditorTap,
   toggleBarEditorClear,
 } from '../src/ui/hud/action_bar/bar_editor/bar_editor_core';
-import { sourceSlotForMobileButton } from '../src/ui/hud/action_bar/mobile_action_page_view';
+import {
+  mobileActionSourceSlotCount,
+  sourceSlotForMobileButton,
+} from '../src/ui/hud/action_bar/mobile_action_page_view';
 
 const ALL_SLOTS = ACTION_BAR_ABILITY_SLOTS;
+/** The span the editor is wired with on a character showing only the primary
+ *  DESKTOP row, which is the shipped default and the reported configuration. */
+const DEFAULT_TOUCH_SPAN = mobileActionSourceSlotCount({ secondary: false, third: false });
 
 /** A cell by its grid coordinates, so a case reads as the tap a player makes. */
 function cellAt(page: number, direction: BarEditorCell['direction'], buttonIndex: number) {
@@ -83,11 +89,28 @@ describe('bar editor grid model', () => {
     for (const cell of cells) expect(cell.inRange).toBe(cell.slot <= ALL_SLOTS);
   });
 
-  it('hides the slots of a disabled desktop row from the grid', () => {
-    // With only the first bar row enabled, everything past it is out of range.
+  it('narrows to whatever span it is handed, cell by cell', () => {
     const cells = buildBarEditorGrid(0, ACTION_BAR_ABILITY_SLOTS_PER_ROW);
     for (const cell of cells) {
       expect(cell.inRange).toBe(cell.slot <= ACTION_BAR_ABILITY_SLOTS_PER_ROW);
+    }
+  });
+
+  it('keeps every cell of page 1 bindable at the DEFAULT desktop row visibility', () => {
+    // The reported bug: hiding the optional DESKTOP rows (the default) trimmed
+    // the editor to 11 slots, so the down row, the left row and page 2 refused
+    // every placement.
+    for (const cell of buildBarEditorGrid(0, DEFAULT_TOUCH_SPAN)) {
+      expect(cell.inRange, `page 1 slot ${cell.slot} (${cell.direction})`).toBe(true);
+    }
+    expect(barEditorPageCount(DEFAULT_TOUCH_SPAN)).toBe(2);
+  });
+
+  it('offers page 2 up to slot 33 and disables its tail at the default visibility', () => {
+    for (const cell of buildBarEditorGrid(1, DEFAULT_TOUCH_SPAN)) {
+      expect(cell.inRange, `page 2 slot ${cell.slot} (${cell.direction})`).toBe(
+        cell.slot <= ACTION_BAR_ABILITY_SLOTS,
+      );
     }
   });
 
@@ -185,6 +208,65 @@ describe('bar editor tap state machine', () => {
 // back on the source cancels), and the retired gesture's third case (releasing
 // outside any slot) has no tap analogue, so it is answered by the out-of-range
 // case above, which is the same "the pointer landed on nothing bindable" shape.
+describe('bar editor placement at the default desktop row visibility', () => {
+  const armed = armBarEditorAbility('fireball');
+
+  function defaultCell(page: number, direction: BarEditorCell['direction'], buttonIndex: number) {
+    const cell = buildBarEditorGrid(page, DEFAULT_TOUCH_SPAN).find(
+      (c) => c.direction === direction && c.buttonIndex === buttonIndex,
+    );
+    if (!cell) throw new Error(`no cell for ${direction}/${buttonIndex}`);
+    return cell;
+  }
+
+  it('accepts a placement into a DOWN cell (slots 13 to 16)', () => {
+    const cell = defaultCell(0, 'down', 3);
+    expect(cell.slot).toBe(16);
+    expect(resolveBarEditorTap(armed, cell, false)).toEqual({
+      kind: 'place',
+      abilityId: 'fireball',
+      slot: 16,
+      selection: BAR_EDITOR_IDLE,
+    });
+  });
+
+  it('accepts a placement into a LEFT cell (slots 17 to 20)', () => {
+    const cell = defaultCell(0, 'left', 0);
+    expect(cell.slot).toBe(17);
+    expect(resolveBarEditorTap(armed, cell, false)).toEqual({
+      kind: 'place',
+      abilityId: 'fireball',
+      slot: 17,
+      selection: BAR_EDITOR_IDLE,
+    });
+  });
+
+  it('accepts a placement into a page-2 cell (slots 21 to 33)', () => {
+    const cell = defaultCell(1, 'center', 0);
+    expect(cell.slot).toBe(21);
+    expect(resolveBarEditorTap(armed, cell, false)).toEqual({
+      kind: 'place',
+      abilityId: 'fireball',
+      slot: 21,
+      selection: BAR_EDITOR_IDLE,
+    });
+    const last = defaultCell(1, 'down', 0);
+    expect(last.slot).toBe(33);
+    expect(resolveBarEditorTap(armed, last, false).kind).toBe('place');
+  });
+
+  it('still refuses the tail past slot 33, keeping the armed spell armed', () => {
+    for (const [direction, buttonIndex] of [
+      ['down', 1],
+      ['left', 3],
+    ] as const) {
+      const cell = defaultCell(1, direction, buttonIndex);
+      expect(cell.slot).toBeGreaterThan(ACTION_BAR_ABILITY_SLOTS);
+      expect(resolveBarEditorTap(armed, cell, false)).toEqual({ kind: 'idle', selection: armed });
+    }
+  });
+});
+
 describe('the retired long-press drop decision, carried over', () => {
   it('resolves the target slot when it differs from the source', () => {
     const from = cellAt(0, 'center', 1);

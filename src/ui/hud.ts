@@ -7182,10 +7182,7 @@ export class Hud {
   }
 
   private mobileActionSourceSlotCount(): number {
-    return mobileActionSourceSlotCount({
-      secondary: Boolean(this.optionsHooks?.settings.get('showSecondaryActionBar')),
-      third: Boolean(this.optionsHooks?.settings.get('showThirdActionBar')),
-    });
+    return mobileActionSourceSlotCount();
   }
 
   private mobileActionPageCount(): number {

@@ -14,7 +14,12 @@ import { isInteractiveHudElement } from '../src/game/touch_router';
 import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
 import { BarEditorWindow } from '../src/ui/hud/action_bar/bar_editor/bar_editor_window';
 import type { HotbarAction } from '../src/ui/hud/action_bar/hotbar';
+import { mobileActionSourceSlotCount } from '../src/ui/hud/action_bar/mobile_action_page_view';
 import { t } from '../src/ui/i18n';
+
+/** The span Hud wires the editor with on a character showing only the primary
+ *  DESKTOP row: the shipped default, and the configuration the bug was on. */
+const DEFAULT_TOUCH_SPAN = mobileActionSourceSlotCount({ secondary: false, third: false });
 
 // jsdom ships no 2D canvas, so the procedural icon compositor cannot run here;
 // the window only ever uses the returned string as a CSS background-image.
@@ -40,7 +45,9 @@ interface Harness {
   clearBtn(): HTMLButtonElement;
 }
 
-function harness(options: { hideTooltip?: () => void } = {}): Harness {
+function harness(
+  options: { hideTooltip?: () => void; sourceSlotCount?: () => number } = {},
+): Harness {
   document.body.innerHTML = '<div id="bar-editor" class="window panel"></div>';
   const root = document.getElementById('bar-editor') as HTMLElement;
   const bar: HotbarAction[] = Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, () => null);
@@ -59,7 +66,7 @@ function harness(options: { hideTooltip?: () => void } = {}): Harness {
     onVisibilityChange: () => {},
     hideTooltip: options.hideTooltip ?? (() => {}),
     barActions: () => bar,
-    sourceSlotCount: () => ACTION_BAR_ABILITY_SLOTS,
+    sourceSlotCount: options.sourceSlotCount ?? (() => ACTION_BAR_ABILITY_SLOTS),
     editAllowed: () => !locked.value,
     placeAbility: (abilityId, slot) => {
       placed.push({ abilityId, slot });
@@ -154,6 +161,52 @@ describe('bar editor window: what a player sees', () => {
     expect(
       isInteractiveHudElement(h.root as unknown as Parameters<typeof isInteractiveHudElement>[0]),
     ).toBe(true);
+  });
+});
+
+describe('bar editor window: the DEFAULT desktop row visibility binds everything', () => {
+  // Wired exactly as Hud wires it for a character with the optional desktop rows
+  // hidden. That trimmed span used to strand the down row, the left row and all
+  // of page 2: the cells rendered but refused every placement.
+  let d: Harness;
+  beforeEach(() => {
+    d = harness({ sourceSlotCount: () => DEFAULT_TOUCH_SPAN });
+    d.window.open('heroic_strike');
+  });
+
+  it('leaves every page-1 cell enabled, including the down and left rows', () => {
+    expect(d.cells()).toHaveLength(20);
+    expect(d.tabs()).toHaveLength(2);
+    for (const cell of d.cells()) {
+      expect(cell.disabled, `slot ${cell.dataset.barSlot}`).toBe(false);
+    }
+  });
+
+  it('places an armed spell into a DOWN cell (slot 13 to 16)', () => {
+    const down = d.cells().find((cell) => cell.dataset.barSlot === '13') as HTMLButtonElement;
+    down.click();
+    expect(d.placed).toEqual([{ abilityId: 'heroic_strike', slot: 13 }]);
+    expect(d.bar[12]).toEqual({ type: 'ability', id: 'heroic_strike' });
+  });
+
+  it('places an armed spell into a LEFT cell (slot 17 to 20)', () => {
+    const left = d.cells().find((cell) => cell.dataset.barSlot === '20') as HTMLButtonElement;
+    left.click();
+    expect(d.placed).toEqual([{ abilityId: 'heroic_strike', slot: 20 }]);
+    expect(d.bar[19]).toEqual({ type: 'ability', id: 'heroic_strike' });
+  });
+
+  it('places an armed spell into a page-2 cell, and disables only the tail past 33', () => {
+    // The armed spell survives the page switch, which is the move the retired
+    // drag could never make.
+    d.tabs()[1].click();
+    const target = d.cells().find((cell) => cell.dataset.barSlot === '25') as HTMLButtonElement;
+    target.click();
+    expect(d.placed).toEqual([{ abilityId: 'heroic_strike', slot: 25 }]);
+    for (const cell of d.cells()) {
+      const slot = Number(cell.dataset.barSlot);
+      expect(cell.disabled, `slot ${slot}`).toBe(slot > ACTION_BAR_ABILITY_SLOTS);
+    }
   });
 });
 

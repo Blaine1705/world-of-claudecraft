@@ -61,8 +61,8 @@ export interface BarEditorWindowDeps {
   hideTooltip(): void;
   /** The bar's LIVE slot array (index 0 = barSlot 1), as Hud holds it. */
   barActions(): readonly HotbarAction[];
-  /** Configurable source slots reachable right now (hidden desktop rows stay
-   *  out of the editor exactly as they stay out of the ring's page cycle). */
+  /** Configurable source slots the editor may bind, which is the live ring's own
+   *  span: the same cells, so anything bindable here is castable there. */
   sourceSlotCount(): number;
   /** The "lock action bars" option: locked means the grid is read-only. */
   editAllowed(): boolean;
