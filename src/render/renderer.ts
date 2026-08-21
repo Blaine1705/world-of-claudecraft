@@ -9213,16 +9213,16 @@ export class Renderer {
 
   // Node drop + registry pruning + per-build GPU disposal: interior_retirement.ts.
   private retireInteriorGroup(group: THREE.Group): void {
-    retireInteriorGroupImpl(
+    const lightsChanged = retireInteriorGroupImpl(
       {
         scene: this.scene,
         fireLights: this.fireLights,
         flames: this.flames,
-        onLightRankDirty: () => void (this.lightRankDirty = true),
         retireHideables: (doomed) => this.dungeons?.retireHideables(doomed),
       },
       group,
     );
+    if (lightsChanged) this.lightRankDirty = true;
   }
 
   // The one construction point for DungeonInteriors: every build path (first

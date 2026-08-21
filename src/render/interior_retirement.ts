@@ -22,20 +22,20 @@ export interface InteriorRetirementHost {
   scene: Pick<THREE.Object3D, 'remove'>;
   fireLights: THREE.PointLight[];
   flames: THREE.Object3D[];
-  /** Called when pruneFireLights changed the registry. The rank MUST follow:
-   *  the rebuild guard compares ranked.length against a COUNT, so a retire
-   *  that removes as many lights as a same-microtask build added would leave
-   *  a stale rank holding the retired floor and missing the new one. */
-  onLightRankDirty: () => void;
   /** Unregister occluder-fade wall records owned by doomed nodes. */
   retireHideables: (doomed: ReadonlySet<THREE.Object3D>) => void;
 }
 
-export function retireInteriorGroup(host: InteriorRetirementHost, group: THREE.Group): void {
+/** Returns whether the fire-light registry changed. The caller's light rank
+ *  MUST follow a true return: the rebuild guard compares ranked.length
+ *  against a COUNT, so a retire that removes as many lights as a
+ *  same-microtask build added would leave a stale rank holding the retired
+ *  floor and missing the new one. */
+export function retireInteriorGroup(host: InteriorRetirementHost, group: THREE.Group): boolean {
   host.scene.remove(group);
   const doomed = new Set<THREE.Object3D>();
   group.traverse((o) => doomed.add(o));
-  if (pruneFireLights(host.fireLights, doomed)) host.onLightRankDirty();
+  const lightsChanged = pruneFireLights(host.fireLights, doomed);
   for (let i = host.flames.length - 1; i >= 0; i--) {
     if (doomed.has(host.flames[i])) host.flames.splice(i, 1);
   }
@@ -45,4 +45,5 @@ export function retireInteriorGroup(host: InteriorRetirementHost, group: THREE.G
     materials: true,
     instanceBuffers: true,
   });
+  return lightsChanged;
 }

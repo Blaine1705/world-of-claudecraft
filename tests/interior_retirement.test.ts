@@ -17,20 +17,16 @@ function fakeHost() {
   const scene = new THREE.Scene();
   const fireLights: THREE.PointLight[] = [];
   const flames: THREE.Object3D[] = [];
-  let rankDirty = 0;
   const retired: Array<ReadonlySet<THREE.Object3D>> = [];
   const host: InteriorRetirementHost = {
     scene,
     fireLights,
     flames,
-    onLightRankDirty: () => {
-      rankDirty++;
-    },
     retireHideables: (doomed) => {
       retired.push(doomed);
     },
   };
-  return { host, scene, fireLights, flames, rankDirty: () => rankDirty, retired };
+  return { host, scene, fireLights, flames, retired };
 }
 
 function buildFloor(scene: THREE.Scene) {
@@ -55,7 +51,7 @@ function buildFloor(scene: THREE.Scene) {
 
 describe('retireInteriorGroup', () => {
   it('removes the group, prunes registries, frees owned resources, keeps shared', () => {
-    const { host, scene, fireLights, flames, rankDirty, retired } = fakeHost();
+    const { host, scene, fireLights, flames, retired } = fakeHost();
     const floor = buildFloor(scene);
     fireLights.push(floor.light);
     flames.push(floor.flame);
@@ -71,14 +67,15 @@ describe('retireInteriorGroup', () => {
     floor.ownedGeo.addEventListener('dispose', () => disposed.add('ownedGeo'));
     floor.ownedMat.addEventListener('dispose', () => disposed.add('ownedMat'));
 
-    retireInteriorGroup(host, floor.group);
+    const lightsChanged = retireInteriorGroup(host, floor.group);
 
     expect(scene.children).not.toContain(floor.group);
     expect(scene.children).toContain(other.group);
-    // Registry pruning is scoped to the retired floor's nodes.
+    // Registry pruning is scoped to the retired floor's nodes, and the
+    // caller must be told to re-rank (its floor owned a registered light).
     expect(fireLights).toEqual([other.light]);
     expect(flames).toEqual([other.flame]);
-    expect(rankDirty()).toBe(1);
+    expect(lightsChanged).toBe(true);
     expect(retired.length).toBe(1);
     expect(retired[0].has(floor.flame)).toBe(true);
     // Disposal: per-build resources and instance buffers freed, shared kit
@@ -90,12 +87,10 @@ describe('retireInteriorGroup', () => {
     expect(disposed.has('kitMat')).toBe(false);
   });
 
-  it('leaves the light rank alone when the retired floor owned no fire light', () => {
-    const { host, scene, fireLights, rankDirty } = fakeHost();
+  it('reports no light change when the retired floor owned no fire light', () => {
+    const { host, scene } = fakeHost();
     const floor = buildFloor(scene);
     // The floor's light was never registered (lowGfx floors register none).
-    void fireLights;
-    retireInteriorGroup(host, floor.group);
-    expect(rankDirty()).toBe(0);
+    expect(retireInteriorGroup(host, floor.group)).toBe(false);
   });
 });
