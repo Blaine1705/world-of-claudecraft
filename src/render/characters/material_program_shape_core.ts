@@ -6,6 +6,15 @@
 // Keying the shared-material cache on the shape stops that. Three-free so a
 // plain Vitest can decide a mesh's shape. Keep the reads in step with three's
 // getParameters / setProgram if three is bumped.
+//
+// DELIBERATELY OMITTED: three's `batching` and `batchingColor`, which
+// prewarmDepthShapeKey (prewarm_depth_material.ts) and prewarmProgramContentKeys
+// (prewarm_policy.ts) both model. This key partitions the CHARACTER tinted
+// material cache, and a character mesh is a SkinnedMesh or a plain Mesh; no
+// BatchedMesh is constructed anywhere under src/ today. Adding the fields would
+// widen every key in the cache for a case that cannot occur, so the first
+// BatchedMesh in this tree is what should add them here, not speculation now.
+// The three implementations disagreeing is intentional and scoped, not drift.
 
 /** The per-object facts three derives a material's program parameters from.
  *  Object/geometry side only: the material-side halves of three's arms
@@ -98,8 +107,11 @@ export function meshProgramShape(object: ProgramShapeObject): ProgramShape {
   const morphAttributes = object.geometry?.morphAttributes;
   if (!morphAttributes) return { ...NONE, ...base };
   const { position, normal, color } = morphAttributes;
-  // three's precedence: position, then normal, then color
-  const counted = position ?? normal ?? color;
+  // three's precedence: position, then normal, then color. `||`, not `??`,
+  // mirroring three's own expression: equivalent while a slot is undefined,
+  // divergent the day one is null, and this key only stays honest by matching
+  // three byte for byte on a version bump.
+  const counted = position || normal || color;
   return {
     ...base,
     morphPosition: position !== undefined,

@@ -1894,7 +1894,10 @@ export function tintedMaterial(
   role: MaterialRole = 'body',
   claims: TintedMaterialClaims | null = null,
   mount: TintedMount = 'rig',
-  shapeKey = '',
+  // No default: a mounted clone is shared only among meshes of ONE program
+  // shape, and an omitted key silently restores the over-sharing this
+  // parameter exists to prevent. A single-shape caller passes '' on purpose.
+  shapeKey: string,
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -2107,6 +2110,9 @@ export function tintedFarMaterials(
       'body',
       claims,
       'far',
+      // One baked mesh per far LOD, so there is exactly one shape here and
+      // nothing to partition. Deliberate, not an omission.
+      '',
     ),
   );
 }

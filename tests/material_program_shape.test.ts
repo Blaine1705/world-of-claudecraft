@@ -413,6 +413,68 @@ describe('attachSharedDepthMaterials resets on a shape that stops being shareabl
 
     expect(mesh.customDepthMaterial).toBeUndefined();
   });
+
+  it('re-evaluates at the effect mount, not only at applyMaterials', async () => {
+    // applyMaterials is not the last word on what a caster draws:
+    // CharacterVisual.commitVisualMaterials reassigns mesh.material afterwards
+    // for ghost, stealth, ascended and rune-tint states, and the weapon-skin
+    // isolation sweep clones again. If the shared depth material were chosen
+    // only from the PRE-effect material, a caster mounting an alpha-tested
+    // overlay would keep a shared depth material that three then rewrites
+    // alphaTest onto every draw, bumping its version and recreating the very
+    // per-draw rebuild this module removes, on a material shared by every
+    // caster of that shape.
+    const { CharacterVisual } = await import('../src/render/characters/visual');
+    shadowDepthMaterialInternalsForTest.clear();
+    const source = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const mesh = skinnedMesh(morphGeometry(6), source);
+    const root = new THREE.Group();
+    root.add(mesh);
+
+    sweep(root);
+    const shared = mesh.customDepthMaterial;
+    expect(shared).toBeDefined();
+
+    // The state an effect leaves behind: an alpha-tested overlay mounted over
+    // the same mesh, which is what commitVisualMaterials assigns.
+    const overlay = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    overlay.map = tinyDataTexture();
+    overlay.alphaTest = 0.5;
+    const host = {
+      originalMaterials: new Map<THREE.Mesh, THREE.Material>([[mesh, source]]),
+      farMesh: null,
+      farMaterials: null,
+      effectMaterial: () => overlay,
+    };
+    (
+      CharacterVisual.prototype as unknown as {
+        commitVisualMaterials: (this: unknown) => void;
+      }
+    ).commitVisualMaterials.call(host);
+
+    expect(mesh.material).toBe(overlay);
+    expect(mesh.customDepthMaterial).toBeUndefined();
+  });
+
+  it('re-attaches a shared depth material when the effect mount is alpha-free', () => {
+    // The other direction: an ordinary effect (a tint clone) must NOT cost the
+    // caster its shared depth material, or every ghosted or dyed rig would
+    // silently fall back onto three's one flipping global.
+    shadowDepthMaterialInternalsForTest.clear();
+    const source = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const mesh = skinnedMesh(morphGeometry(6), source);
+    const root = new THREE.Group();
+    root.add(mesh);
+
+    sweep(root);
+    const shared = mesh.customDepthMaterial;
+
+    const tinted = new THREE.MeshStandardMaterial({ color: 0x223344 });
+    mesh.material = tinted;
+    attachSharedDepthMaterials(mesh, tinted);
+
+    expect(mesh.customDepthMaterial).toBe(shared);
+  });
 });
 
 describe('instanced meshes', () => {
