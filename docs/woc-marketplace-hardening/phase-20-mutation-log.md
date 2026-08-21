@@ -820,5 +820,54 @@ suite's 26 reported tests, git restore revert, status clean after):
 |---|---|---|---|
 | mrc_ci_envline_strip | BIT (1 fail) | ci_workflow | the pr-gate job-level env block deleted from ci.yml; the counted job-env pin (exactly two copies) red |
 
-Section totals: 8 distinct mutants (4 service + 3 dashboard + 1 CI),
-all BIT, 0 survivors. Whole log: 409 distinct mutants.
+The FIX ROUND (service 06f6725, dashboard e37cd02 + 43457cb: the bond
+exclusion pin, the banner reword, windowReconcileNote, the 40-digit
+parse cap, the overview-down composition test). New pins, same protocol
+(clean committed trees, run-proven at the full reported counts, git
+restore reverts, status clean after):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_settledbase_kind_filter_strip | BIT (1 fail) | market_http | the in-memory volume filter drops the kind qual so the settled bond enters the sums; the overview test red on the unchanged-settledBase pin |
+| mrc_dash_parse_cap_revert | BIT (1 fail) | market_trading_view | MONEY_BASE_RE reverted from {1,40} to +; the 41-digit refusal arms red |
+| mrc_dash_note_branch_strip | BIT (1 fail) | market_trading_view | windowReconcileNote's absent-total branch removed; the sanity-floor-note arm red |
+
+The GATE FIX ROUND (game commit 0343ed9271): the gate-integrity review
+EXECUTED a defeat of the first counted wiring pin (relocating both
+service blocks onto vitest-free jobs kept the file-wide counts green
+while re-skipping the battery), so the pin was rebuilt on per-job spans
+and tests/ci_pg_presence.test.ts joined as the runtime twin. The
+relocation is now a logged mutant and the original strip verdict was
+re-run against the rebuilt pin (verdicts go stale when a pin is
+edited). Same protocol; the relocation mutant was applied by script
+(delete from pr-gate, insert byte-identical into lint) so the OLD pin
+would have stayed green on it:
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_ci_block_relocation | BIT (1 fail) | ci_workflow | pr-gate's services+env block moved verbatim onto lint (file-wide counts unchanged); the pr-gate span assertion red |
+| mrc_ci_envline_strip (re-run) | re-BIT (1 fail) | ci_workflow | the original strip re-run against the span pin after the rewrite |
+
+Also proven red-first in the same round (a repair, not a mutant): the
+client perf pg suite against a VIRGIN database (1 fail on the
+worst-10s index assert before adding runConcurrentIndexMigrations to
+its beforeAll; 5/5 after; probe database dropped).
+
+The SECOND FIX ROUND (service commit on top of 06f6725: the pg
+kind-pin bond + heldUsdCents; dashboard dfd0f4d: the decisive 41-digit
+sum fixture, the quoteLegsMismatch cap arm, the DOM note pin, the
+banner sentence, the single-call JSX). New pins, same protocol; the two
+dashboard parse mutants were applied by script against the COMMITTED
+tree after the earlier uncommitted-revert slip ate a comment edit
+twice (re-applied both times; the lesson is re-learned: commit before
+mutating):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_settledbase_pg_kind_qual_strip | BIT (1 fail) | market_store_pg (pg tier) | the aggregate SQL's kind qual removed so the settled kind-pin bond enters the sums; the totals pins red |
+| mrc_dash_legsreconcile_uncap | BIT (1 fail) | market_trading_view | legsReconcile's local parse reverted to the uncapped inline regex; the exact-41-digit-sum fixture red (uncapped, it reconciles true) |
+| mrc_dash_quotelegs_uncap | BIT (1 fail) | market_trading_view | quoteLegsMismatch's local parse reverted the same way; the over-length not-applicable arm red |
+
+Section totals: 15 distinct mutants (6 service + 7 dashboard + 2 CI),
+all BIT, 0 survivors; 1 stale-verdict re-run, re-BIT. Whole log: 416
+distinct mutants.

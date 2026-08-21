@@ -52,14 +52,20 @@ documents it).
 2. Full bond cycle on devnet with a double-release balance assert: OPEN-21
    (state.md "21 devnet dry-run evidence", bond leg; environment STAGED,
    blocked on devnet SOL).
-3. Confirming settlements have a bounded resolution path (H15): EVIDENCED.
+3. Confirming settlements have a bounded resolution path (H15): EVIDENCED
+   for the BOUND, with one named pre-enable gap for the operator arm.
    Game side: the review park at WOC_MARKET_CONFIRMING_REVIEW_HOURS
-   (server/woc_market_routes.ts, server/woc_market_db.ts transitionSettlement
-   review arms; tests/woc_market_settlement_pg_integration.test.ts). Service
-   side: MAX_CONFIRMING_AGE_MS five hours, expired-never-rejected with the
+   (server/woc_market_routes.ts, clamped at 720h with a boot warn;
+   server/woc_market_db.ts transitionSettlement review arms;
+   tests/woc_market_settlement_pg_integration.test.ts). Service side:
+   MAX_CONFIRMING_AGE_MS five hours, expired-never-rejected with the
    adoption arms (service/src/market/quotes.ts; test/market_http.test.ts,
-   test/market_store_pg.test.ts). Ruling record: R5 (state.md). Operator
-   procedure: docs/woc-market-runbook.md section 10.
+   test/market_store_pg.test.ts). Ruling record: R5 (state.md). GAP,
+   surfaced by the rider's runbook verification: no route or tool drives
+   transitionSettlement for review resolution yet and hand SQL is
+   forbidden, so a parked review row has no legitimate manual exit; the
+   sanctioned operator surface is a pre-enable requirement (follow-ups
+   section 4). Operator guidance: docs/woc-market-runbook.md section 10.
 4. Buy-now and directed rails both enforce the wallet-twin self-deal guard
    (H14): EVIDENCED. wallet_links.pubkey is UNIQUE so the twin resolves at
    the wallet; both rails checked (06 ledger, H14 SEMANTICS bullet). Tests:

@@ -85,7 +85,14 @@ The bindOnTrade scan, the R14 verification, the claims-table empty-or-booked
 check, the EXPLAIN of the two repair quals against grown tables, the
 enable-vs-rolling-restart exclusion, and the R9 counsel-text verification of
 both consent surfaces. All documented as procedure in
-docs/woc-market-runbook.md section 3.
+docs/woc-market-runbook.md section 3. PLUS, surfaced by the rider's runbook
+verification: the OPERATOR ARM for resolving a parked review settlement
+does not exist (transitionSettlement has no route, admin command, or tool
+for review resolution; hand SQL is forbidden by the CAS design; the stuck
+route's own comment records the gap). A review row currently has no
+legitimate manual exit, so the sanctioned surface is a PRE-ENABLE
+requirement, not a nice-to-have. Owner: pre-enable (the 09/19-named
+release-tooling arm).
 
 ## 5. Game repo: engineering follow-ups with owners
 
@@ -164,7 +171,12 @@ docs/woc-market-runbook.md section 3.
 
 1. The summary refresh wedge: a never-resolving fetch parks the 30s refresh
    permanently; a fetch deadline is the coherent fix (runbook documents the
-   reload remedy meanwhile).
+   recovery levers meanwhile).
+1b. The fund-moving release form renders OUTSIDE the overview gate that
+   protects the pause control: during an overview outage the halt button
+   vanishes while the release lever still submits (surfaced by the rider's
+   runbook verification; MarketTradingPanel renders the form unguarded).
+   Decide whether the release form should require the overview in hand.
 2. Unrendered fields the producers already emit (verified absent from src/
    by sweep): settlement failReason, attention.confirmingExpired24h,
    distinctPrints, crossVenueGateArmed, twapUsdPerToken, spotUsdPerToken,

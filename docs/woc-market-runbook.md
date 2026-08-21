@@ -4,8 +4,10 @@ The operator's guide to running the $WOC Exchange (the P2P real-money
 marketplace): pausing and resuming trading, deploying safely, funding the
 escrow, reading the health surfaces, and resolving everything that can get
 stuck. Written from shipped behavior; every claim cites the owning module or
-doc. Configuration reference: DEPLOY.md ("$WOC Exchange marketplace" section)
-owns the env knobs and deploy coupling; this file owns the procedures.
+doc. Configuration reference: DEPLOY.md (the "$WOC market settlement service"
+bullet under "Operational notes") owns WOC_MARKET_SERVICE_URL, the health
+probe, and the deploy coupling; the remaining market knobs live in
+`.env.example`; this file owns the procedures.
 Historical rationale (rulings, measurements) lives in the hardening records at
 `docs/woc-marketplace-hardening/state.md` (Rulings and the per-round ledger);
 citations into that directory are historical context, not procedure.
@@ -18,12 +20,14 @@ and counsel sign-off.
 ## 1. Surfaces and probes
 
 - Dashboard (woc-daily-rewards-dashboard, Trading tab): the ops view of the
-  service. Its admin-exclusive levers are PAUSE and the audited read surface.
-  Bond refund and forfeit are internal-tier by design (the game drives its own
-  settlement lifecycle; release destinations resolve from the STORED quote,
-  never from the request), so do not look for them as dashboard buttons
-  outside the "Release a bond by hand" flow, which drives the service's
-  bond-release endpoint with a typed reference confirmation.
+  service. Its levers are PAUSE, the audited read surface, and the
+  "Release a bond by hand" flow (the service's admin bond-release endpoint;
+  the typed last-8-characters confirmation guards the FORFEIT direction
+  only, and the service authorizes entirely server-side either way). The
+  game-facing bond refund and forfeit endpoints are internal-tier by design
+  (the game drives its own settlement lifecycle; release destinations
+  resolve from the STORED quote, never from the request) and are absent
+  from the dashboard proxy on purpose.
 - Economy service (woc-daily-rewards-service, `service/src/market/`): quotes,
   settlement, the price oracle, bond custody and release. Ops endpoints are
   `/v1/market/admin/*` (admin secret plus actor header; see
@@ -40,7 +44,8 @@ and counsel sign-off.
   "$WOC Exchange marketplace").
 - Dashboard refresh caveat: the Summary subtab's 30s refresh holds an
   in-flight guard, so a never-resolving fetch parks the refresh permanently
-  (a sticky "Loading quotes..." line). The remedy is a page reload. A
+  (a sticky "Loading quotes..." line). A page reload, a Status filter
+  toggle, a subtab round trip, or any pause/release submit restarts it. A
   transient refresh failure replaces data with the error on purpose
   (anti-mixed-epoch); do not ask for silent retention of stale rows.
 
@@ -62,7 +67,10 @@ LAST heartbeat reading and never polls the venue
   renders the pause control only with the current state in hand, because a
   blind toggle is its own hazard. During an overview outage the fallback is
   the service endpoint directly: `POST /v1/market/admin/pause` with the two
-  secrets and the actor header (`service/src/market/routes.ts`).
+  secrets and the actor header (`service/src/market/routes.ts`). Know the
+  asymmetry: the fund-moving release form renders OUTSIDE that overview
+  gate, so during an overview outage the halt button vanishes while the
+  release lever still submits (a recorded dashboard follow-up).
 - PAUSE BEFORE DEPLOY in a live settlement window: see section 6.
 - PAUSE DURING AN ECONOMY-RAIL OUTAGE: see section 12.
 
@@ -87,10 +95,12 @@ on a production realm:
    scans are sized for pre-enable emptiness).
 7. Do not overlap the enable rollout with a rolling restart (section 6).
 8. A settlement stuck in `confirming` must have its bounded resolution path
-   live (`WOC_MARKET_CONFIRMING_REVIEW_HOURS`; section 10). This shipped; the
-   check is that the knob is not configured absurdly high, because it has NO
-   upper clamp and a huge value silently disables the review park and the
-   stuckBonds visibility class.
+   live (`WOC_MARKET_CONFIRMING_REVIEW_HOURS`; section 10). This shipped,
+   and the knob is clamped at 720 hours with a loud boot warn
+   (`server/woc_market_routes.ts`: the bound cannot be effectively disabled
+   by configuration); the enable check is that the OPERATOR arm for
+   resolving a parked review row exists by then (section 10: no sanctioned
+   surface drives that transition yet).
 
 ## 4. Wind-down (draining the market)
 
@@ -120,14 +130,21 @@ true.
   The typed last-8-characters confirmation is fat-finger protection, not the
   authorization gate; the service fails closed on its own.
 - Bonds have NO automatic time-based exit: the exit paths are the chain
-  deciding (settle, refund, forfeit) or operator resolution, and the
-  stuckBonds readout class is the visibility bound
-  (`server/woc_market_rules.ts`, WOC_MARKET_BOND_POLL_PARK_SECONDS, a code
-  constant). Stuck age renders from stuckSinceMs, not from placement time.
-- Refusal vocabulary you will see on releases: `release_unavailable`,
+  deciding (settle, refund, forfeit) or operator resolution. The stuckBonds
+  readout class is the visibility bound, aged by the
+  WOC_MARKET_CONFIRMING_REVIEW_HOURS knob (`server/main.ts` wires it; the
+  monitor falls back to six hours). Stuck age renders from stuckSinceMs,
+  not from placement time.
+- Refusal vocabulary you will see on releases, among others
+  (`service/src/market/release_protocol.ts` is the full set):
+  `release_unavailable`, `release_not_wired`, `release_in_flight`,
   `destination_account_unsupported`, `insufficient_sol_fee`,
-  `not_configured`, `release_failed`, `send_failed` (dev chain adds
-  `dev_chain_transaction_superseded` / `dev_chain_unknown_transaction`).
+  `not_configured`, `not_a_bond`, `already_refunded`, `already_forfeited`,
+  `not_releasable_<status>`, `unknown_reference`, `release_failed`,
+  `send_failed` (dev chain adds `dev_chain_transaction_superseded` /
+  `dev_chain_unknown_transaction`). Beware the SUCCESS-SHAPED
+  `nothing_collected`: a 200 that moved no money; the dashboard renders it
+  as a refund notice, so never read that notice as proof of movement.
 - A release claimed but never finished ages into the `releasing` attention
   count. Past the release protocol's age bound
   (`service/src/market/release_protocol.ts`, MAX_REPLACEABLE_AGE_MS, six
@@ -139,13 +156,16 @@ true.
 ## 6. Deploying the game server (marketplace consequences)
 
 THE DEPLOY IS FORWARD-ONLY. The marketplace schema's dedupe indexes and
-repair scans assume no old binary writes after the new boot ran.
+repair scans assume no old binary writes after the new boot ran. The
+old-binary behaviors in this section come from the hardening records (the
+old code is not in the tree); each is consistent with the DDL's own
+evolution notes.
 
 Before upgrading a realm that ever ran the market:
 
     -- both return zero after a successful new-binary boot, by construction
     SELECT listing_id FROM woc_market_settlements
-      WHERE state IN ('offered','confirming','confirmed','delivering','delivered')
+      WHERE state IN ('offered','confirming','confirmed','delivering','delivered','review')
       GROUP BY listing_id HAVING count(*) > 1;
     SELECT listing_id FROM woc_market_sales WHERE excluded = false
       GROUP BY listing_id HAVING count(*) > 1;
@@ -175,10 +195,12 @@ Mixed-fleet rules:
   (`woc_market_settlements_listing_latest` is the survivor). Free while the
   tables are empty; avoid boot ping-pong after enable.
 
-NEVER hand-drop `woc_market_settlements_open` or
+NEVER hand-drop `woc_market_settlements_open2` or
 `woc_market_sales_listing_once` during an incident: the validity gate re-arms
 and the next boot demotes surviving duplicate open settlements as
-`schema_dedupe`.
+`schema_dedupe`. (The retired `woc_market_settlements_open` is dropped by
+the new boot itself; `_open2` is the live dedupe index and its predicate
+includes `review`.)
 
 After an upgrade that repaired anything:
 
@@ -221,19 +243,25 @@ the watchdog stays loud.
   reads a zero breaker and a price moved BEFORE the deploy is accepted as-is
   (the cold-boot single-print exposure; recorded, ruled no gate). The boot
   warm-up prints an honest two-line warn pair.
-- Deploy coupling and bond-knob lockstep: DEPLOY.md owns the exact rule (both
-  sides at or after the contract tips; skew is asymmetric; keep
-  `WOC_MARKET_BOND_BPS` and the bond clamp pair identical on both sides until
-  the fleet converges). Mirror-vs-service bond drift is INVISIBLE to
-  operators at runtime, which is why the lockstep is a deploy-checklist item,
-  not a monitor.
+- Deploy coupling and bond lockstep: DEPLOY.md's coupling paragraph owns
+  the both-sides-at-or-after-the-contract-tips rule and the asymmetric skew
+  direction. The lockstep, stated actionably: the bond figures are SERVICE
+  env knobs (`service/src/market/peg.ts`; compose defaults 500 bps, 100 and
+  5000 cents) while the game's render-only mirror is HARDCODED constants
+  (`server/woc_market_rules.ts`), so keep the service knobs at the mirror's
+  values until both fleets are current. Mirror-vs-service drift is
+  INVISIBLE to operators at runtime, which is why this is a deploy
+  checklist item, not a monitor.
 - The service must keep reserving `awaiting_finality` for LEDGER-MATCHED
   payments (a named breaking change; DEPLOY.md).
 - The first sweep after enabling faces the accumulated backlog; expect one
   slow first pass.
 - Live `.env` must set `DATABASE_URL` (compose interpolation and the boot
-  both require it), and a whitespace-only admin secret now refuses the whole
-  boot instead of leaving a 503 ops tier up.
+  both require it). Secret posture, precisely: an EMPTY internal secret
+  refuses the whole boot; the ADMIN secret is different, a spaces-only
+  value trims to empty and leaves the service up with a 503
+  `admin_not_configured` ops tier (only non-printable characters throw),
+  so verify the admin secret is real after any secret rotation.
 
 ## 8. Escrow SOL funding (a manual op)
 
@@ -293,14 +321,17 @@ keep-forever, either of which disarms the prune coupling.
 ## 10. Settlements: review state, confirming age, terminal answers
 
 - A settlement parked in `review` (the confirming-age bound,
-  `WOC_MARKET_CONFIRMING_REVIEW_HOURS`, default six hours) needs a human:
-  VERIFY ON CHAIN first, then drive the transition through
-  `transitionSettlement` (`server/woc_market_db.ts`): review to `confirmed`
-  (the payment is real; delivery resumes) or review to `failed` (unpaid; the
-  overdue default pass takes over). NEVER hand-write SQL for these
-  transitions: hand SQL bypasses the compare-and-set guards.
-- The knob has NO upper clamp; a huge value silently disables the park and
-  the stuckBonds class. Treat any raise as a config review item.
+  `WOC_MARKET_CONFIRMING_REVIEW_HOURS`, default six hours, clamped at 720
+  with a loud boot warn) needs a human: VERIFY ON CHAIN first, then resolve
+  review to `confirmed` (the payment is real; delivery resumes) or review
+  to `failed` (unpaid; the overdue default pass takes over). KNOW THE GAP:
+  the transition machinery is `transitionSettlement`
+  (`server/woc_market_db.ts`) but NO route, admin command, or tool drives
+  it for review resolution yet (the stuck route's own comment records
+  this), and hand SQL is FORBIDDEN because it bypasses the compare-and-set
+  guards. Until the sanctioned operator surface lands (a pre-enable
+  follow-up with an owner in the hardening records), a review row has no
+  legitimate manual exit; escalate to the maintainer rather than improvise.
 - The service expires a `confirming` quote five hours past its expiry
   (`service/src/market/quotes.ts`, MAX_CONFIRMING_AGE_MS, code-owned; sized
   under the game's review bound and under RPC signature-history depth so the
@@ -311,27 +342,31 @@ keep-forever, either of which disarms the prune coupling.
   later-proven payment is an out-of-band re-confirm of the preserved
   signature; the overview's `confirmingExpired24h` counter is your cue that
   such rows exist.
-- Registered edge (pre-existing): a confirm on an already-expired or
-  superseded row answers the terminal reason at entry WITHOUT consulting the
-  ledger, so a buyer who signed before expiry and broadcast after is told
-  terminal while the money reached escrow. The adoption arms plus re-confirm
-  are the remedy; a chain probe on expired confirms is a recorded candidate
-  fix.
-- The confirm vocabulary table lives in `service/docs/MARKET_SETTLEMENT.md`;
-  read verdicts from there, not from memory.
+- Terminal-entry behavior, precisely: a confirm arriving on an EXPIRED or
+  SUPERSEDED row DOES consult the ledger at entry (the adoption arm in
+  `service/src/market/service.ts`), so a payment that broadcast late still
+  adopts its quote; only `refunded`, `forfeited`, and `rejected` answer
+  their terminal reason without a ledger read, which is correct since those
+  states already saw chain action.
+- The confirm vocabulary is documented in `service/docs/MARKET_SETTLEMENT.md`
+  (a prose list); read verdicts from there, not from memory.
 - TREASURY ROTATION RULE: the verifier resolves the treasury leg from the
   CURRENT config, so rotating the treasury wallet with quotes in flight
   REJECTS REAL PAYMENTS. Pause, drain the quote TTL window, rotate, resume.
-- RPC defects: a malformed balance row or envelope from the RPC surfaces as a
-  retryable throw, not a terminal verdict. If a vendor starts emitting them,
-  swap the endpoint rather than resolving rows against bad data.
+- RPC defects, by class (`service/src/market/solana_chain.ts`): a malformed
+  balance AMOUNT throws retryably; a malformed row (a non-string owner) is
+  silently DROPPED from consideration; a missing envelope answers pending
+  (`not_yet_visible`). None mints a terminal verdict. If a vendor starts
+  emitting malformed data, swap the endpoint rather than resolving rows
+  against it.
 
 ## 11. Price oracle health
 
 - The heartbeat feeds an edge-triggered halted/recovered operator signal
-  (`service/src/market/price_gate_signal.ts`): TWO lines per incident. The
-  recovered line carries the window depth it reopened on, so a breaker reset
-  is visible in the log. Refusal arms report the poll-clock window through a
+  (`service/src/market/price_gate_signal.ts`): two lines per steady-reason
+  incident, plus another halted line whenever the reason CHANGES while the
+  gate stays closed. The recovered line carries the window depth it
+  reopened on, so a breaker reset is visible in the log. Refusal arms report the poll-clock window through a
   non-mutating view (a refusal tells the truth and destroys nothing).
 - Every env knob that boot could not honor verbatim is named in a boot warn
   line; oracle knobs may only TIGHTEN their code defaults, and the tightening
@@ -361,25 +396,42 @@ keep-forever, either of which disarms the prune coupling.
 When the game cannot reach the economy service (bridge calls failing, the
 Exchange reporting itself unavailable):
 
-1. PAUSE TRADING (section 2) so no new payment windows open while the rail
-   is down. The pausedBanner tells winners payments wait; note that the
-   settlement window itself keeps running.
+1. PAUSE TRADING (section 2), promptly, so no new payment windows open
+   while the rail is down. The pausedBanner tells winners payments wait;
+   note that the settlement window itself keeps running, and an existing
+   window that lapses still defaults (only the STRIKE side of the sweep
+   pauses while the gate is unhealthy; closing, returning, and the forfeit
+   all proceed).
 2. After recovery, identify defaults whose payment window overlapped the
-   outage. The strike side is already outage-fair: `strikeDefaultingBuyer`
-   (`server/woc_market.ts`) is the single strike-fairness path and spares
-   outage-locked winners. The bond forfeit is NOT gated on outage evidence
-   (a deliberate money-policy ruling, R13 in the hardening records).
-3. MAKE THOSE PLAYERS WHOLE BY HAND: refund the forfeited bonds through the
-   dashboard's release flow, using the same outage evidence the strike path
-   read (the readout's outage-locked verdicts and the service's audit trail).
+   outage BY HAND: nothing durable records "outage-locked" per row, so the
+   evidence is the service pause audit trail (`/v1/market/admin/audit`),
+   the price-gate halted/recovered log lines, and the affected settlements'
+   deadlines. The strike side is outage-fair automatically:
+   `strikeDefaultingBuyer` (`server/woc_market.ts`) probes health at strike
+   time and spares a winner it cannot fairly strike; note the boundary
+   that a window which lapsed DURING the outage but was swept AFTER
+   recovery is struck normally, so those rows join the by-hand list. The
+   bond forfeit is NOT gated on outage evidence (a deliberate money-policy
+   ruling, R13 in the hardening records).
+3. RESTITUTION FOR A BOND THAT FORFEITED DURING THE OUTAGE IS A MANUAL
+   TREASURY-SIDE TRANSFER, approved by the maintainer and recorded in the
+   ops log. A forfeited bond is TERMINAL: the release protocol answers
+   `already_forfeited` and the dashboard deliberately has no bond-refund
+   proxy, and on other non-releasable states the flow can report a
+   successful-looking no-op (`nothing_collected`), so NEVER use the
+   dashboard release flow as the restitution mechanism or its output as
+   the restitution record. The forfeit split paid the treasury and the
+   burn, so restitution comes from the treasury balance.
 4. An automatic arm (the deadline pausing while the rail is observed down,
    or forfeit converting to refund on outage evidence) is a recorded
    follow-up that needs its own ruling; do not improvise it mid-incident.
 
 Related shipped behavior worth knowing during an outage: guardBalance is
 fail-closed (an economy outage blocks directed offer creation on purpose),
-and an economy outage can mint one recoverable abandon row per buyer (the
-outage verdict is exempt from the abandon ledger).
+and an economy outage CAN mint an abandon row against a buyer: the abandon
+ledger's exemption vocabulary exists (`server/woc_market_rules.ts`) but its
+verdict is not mintable on the live arm today, so the exemption never
+engages and such rows are part of the post-outage by-hand review.
 
 ## 13. Suspensions
 
@@ -395,23 +447,30 @@ normally (suspension is not a wind-down; section 4 is).
   reconciliation older than that must not assume claims rows exist; the
   service-side quote row and the chain are the durable trail.
 - The nightly retention sweep hour is provisional 05:00 UTC, which is US
-  evening peak; the deletion ceiling can reach about 100k parent rows per
-  night and listings deletes fan out roughly 5x to 15x through cascades.
-  Revisit the hour before enabling on a busy realm.
+  evening peak. The deletion bound is 50,000 rows PER TABLE per run
+  (`server/http/config.ts`, DEFAULT_RETENTION_SWEEP_MAX_ROWS_PER_RUN; the
+  market registers five tables, so the aggregate can run well past one
+  table's bound), and the bound counts PARENT rows only: listings deletes
+  fan out through cascades (the hardening records estimate roughly 5x to
+  15x physical rows). Revisit the hour before enabling on a busy realm.
 - Capacity math counts THIRTEEN steady per-realm DB connections (the base
   pool plus the chat-quota feature's dedicated pool and LISTEN connection).
 - On the stuck readout: SUSTAINED `waiting > 0` on the pool gauge is the
   brownout precursor; lockWaitTimeouts and idleTxKills ride beside it. Typed
   `contended` refusals are the guard-transaction timeouts doing their job;
   sustained contention is the incident, not the refusal.
-- The per-IP rate-limit triple is sized for two worst-case players behind one
-  NAT; a busy venue behind one IP will hit 429s (recorded at the constant).
+- The per-IP rate limits are six fused per-action buckets
+  (`server/ratelimit.ts`: list, bid, quote, confirm, read, stepup); the
+  shared READ bucket (240/min) carries the recorded sizing note, two
+  worst-case players behind one NAT, so a busy venue behind one IP will hit
+  429s there first.
 - `/me`'s effective worst case is about 11 seconds under full saturation (the
   6s between-reads deadline plus one in-flight read); a `/me` deadline
   surfacing as a 500 during saturation is the incident signal, by design.
-- `MARKET_BACKFILL_DRY_RUN` (`server/http/config.ts`) deliberately sits
-  outside `.env.example`: it is an ops flag for the one-off backfill, not a
-  deployment knob.
+- `MARKET_BACKFILL_DRY_RUN` deliberately sits outside `.env.example`: it is
+  an ops flag for the one-off backfill, not a deployment knob. It is READ
+  in `server/db.ts` (set, it halts the boot after computing and printing
+  the backfill plan); `server/http/config.ts` carries its documentation.
 
 ## 15. External dependencies
 

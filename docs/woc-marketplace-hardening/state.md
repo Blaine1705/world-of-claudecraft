@@ -1497,6 +1497,19 @@ recorded here as his rulings):
   observed down, capped at one full window, or forfeit converts to refund
   on outage evidence) is a named follow-up that needs its own ruling and
   the 21 devnet evidence before code.
+  AMENDED same session by the rider's runbook verification lane, which
+  proved the remedy's two mechanisms do not exist: a forfeited bond is
+  TERMINAL (the release protocol answers already_forfeited, the dashboard
+  deliberately proxies no bond-refund, and non-releasable states can
+  return the success-shaped nothing_collected that the dashboard renders
+  as a refund notice), and nothing durable records "outage-locked" per
+  row (the strike gate probes health at strike time). The corrected
+  remedy, carried by runbook section 12: identify affected defaults BY
+  HAND from the pause audit trail, the halted/recovered lines, and the
+  settlement deadlines; restitution for a forfeited bond is a MANUAL
+  TREASURY-SIDE TRANSFER approved by Fernando and recorded in the ops
+  log, never the dashboard release flow. The ruling's disposition
+  (document only, automatic arm needs its own ruling) is unchanged.
 - R14 (the terms re-consent question, parked by the 14 QA round): RE-PARK
   to R6's enable-time checklist (owner: counsel via R6). Production holds
   no real acceptances while WOC_MARKET_ENABLED is off, so the enable-time
