@@ -34,9 +34,7 @@ describe('isInertInstanceCorpse', () => {
     expect(isInertInstanceCorpse(riftCorpse())).toBe(true);
     // Each exclusion arm, one at a time.
     expect(isInertInstanceCorpse(riftCorpse({ dead: false }))).toBe(false);
-    expect(
-      isInertInstanceCorpse(riftCorpse({ spawnPos: { x: 0, y: 0, z: 0 } })),
-    ).toBe(false);
+    expect(isInertInstanceCorpse(riftCorpse({ spawnPos: { x: 0, y: 0, z: 0 } }))).toBe(false);
     expect(isInertInstanceCorpse(riftCorpse({ ownerId: 5 }))).toBe(false);
     expect(isInertInstanceCorpse(riftCorpse({ detonateTimer: 2 }))).toBe(false);
     expect(isInertInstanceCorpse(riftCorpse({ lootFfaTimer: 1.5 }))).toBe(false);

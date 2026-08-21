@@ -101,7 +101,5 @@ export function colliderCellAt(
   x: number,
   z: number,
 ): Collider[] | undefined {
-  return index.cells.get(
-    cellKey(Math.floor(x / index.cellSize), Math.floor(z / index.cellSize)),
-  );
+  return index.cells.get(cellKey(Math.floor(x / index.cellSize), Math.floor(z / index.cellSize)));
 }

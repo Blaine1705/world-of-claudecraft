@@ -14,6 +14,16 @@ import {
   isEastbrookGrandArmoury,
 } from './building_layout';
 import { CASTLE_WALL_LEDGES, castleParapetSegments, PARAPET_HALF } from './castle_layout';
+import {
+  buildColliderCellIndex,
+  type ColliderCellIndex,
+  cellKey,
+  cellKeyAt,
+  colliderBounds,
+  colliderCellAt,
+  GRID_CELL,
+  MAX_BODY_RADIUS,
+} from './collider_cells';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
@@ -44,19 +54,11 @@ import {
   STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
-import {
-  buildColliderCellIndex,
-  cellKey,
-  cellKeyAt,
-  type ColliderCellIndex,
-  colliderBounds,
-  colliderCellAt,
-  GRID_CELL,
-  MAX_BODY_RADIUS,
-} from './collider_cells';
+
 // Re-exported from the extracted cell-index module so existing importers keep
 // their './colliders' path.
 export { MAX_BODY_RADIUS } from './collider_cells';
+
 import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
 import {
   decorationHasCollider,
