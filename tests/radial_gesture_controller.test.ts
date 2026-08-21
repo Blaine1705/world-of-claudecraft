@@ -22,6 +22,7 @@ import {
   type RadialGestureDeps,
 } from '../src/ui/hud/action_bar/radial_gesture_controller';
 import { closeOpenTouchMenu } from '../src/ui/hud/tap_menu';
+import type { TapMenuAnchorRole } from '../src/ui/hud/tap_menu_core';
 import { makeWriterFacet } from '../src/ui/painter_host';
 
 const BUTTON_SIZE_PX = 40;
@@ -60,7 +61,13 @@ function rect(btn: HTMLElement, x: number, y: number): void {
 }
 
 function makeRig(
-  options: { appVw?: string; appVh?: string; safeAreaPx?: string; tapMenus?: boolean } = {},
+  options: {
+    appVw?: string;
+    appVh?: string;
+    safeAreaPx?: string;
+    tapMenus?: boolean;
+    anchorRole?: TapMenuAnchorRole;
+  } = {},
 ): Rig {
   const host = document.createElement('div');
   host.style.setProperty('--radial-radius-ratio', '1.35');
@@ -121,6 +128,7 @@ function makeRig(
       () => {},
     ),
     tapMenus: () => rig.tapMenus,
+    anchorRole: options.anchorRole,
     metricsHost: host,
     hasSlot: () => true,
     cast: (buttonIndex, direction) => rig.casts.push([buttonIndex, direction]),
@@ -513,5 +521,86 @@ describe('RadialGesture: the Escape path and the button open state', () => {
     expect(rig.buttons[0].getAttribute('aria-expanded')).toBe('true');
     up(rig, 0, 1, 100 + FLICK_PX, 100);
     expect(rig.buttons[0].getAttribute('aria-expanded')).toBe('false');
+  });
+});
+
+// anchorRole 'toggle': the parameter that lets a control with no action of its
+// own (the stance control) reuse this exact gesture layer instead of forking a
+// fourth dialect. Every assertion below is about the ROLE, not about stances.
+describe("RadialGesture: a 'toggle' anchor with no action of its own", () => {
+  it('opens the petals on a bare tap with tap mode OFF, and casts nothing', () => {
+    const rig = makeRig({ anchorRole: 'toggle' });
+    down(rig, 0, 1, 100, 100);
+    up(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.heldButtonIndex()).toBe(0);
+    // The petals become a real focusable menu, exactly as in tap mode.
+    expect(rig.petals.map((p) => p.tabIndex)).toEqual([0, 0, 0, 0]);
+    expect(rig.buttons[0].getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('closes again on the next press, in either mode', () => {
+    for (const tapMenus of [false, true]) {
+      document.body.replaceChildren();
+      const rig = makeRig({ anchorRole: 'toggle', tapMenus });
+      down(rig, 0, 1, 100, 100);
+      up(rig, 0, 1, 100, 100);
+      expect(rig.gesture.isOpen(), `tapMenus=${tapMenus}`).toBe(true);
+      down(rig, 0, 2, 100, 100);
+      expect(rig.gesture.isOpen(), `tapMenus=${tapMenus}`).toBe(false);
+      expect(rig.casts, `tapMenus=${tapMenus}`).toEqual([]);
+      expect(rig.cancels, `tapMenus=${tapMenus}`).toBe(1);
+    }
+  });
+
+  it('keeps the flick: a swipe past the deadzone still chooses that direction', () => {
+    const rig = makeRig({ anchorRole: 'toggle' });
+    down(rig, 0, 1, 100, 100);
+    move(rig, 0, 1, 100 + FLICK_PX, 100);
+    up(rig, 0, 1, 100 + FLICK_PX, 100);
+    expect(rig.casts).toEqual([[0, 'right']]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('backs out when the finger returns to the anchor with the petals up', () => {
+    const rig = makeRig({ anchorRole: 'toggle' });
+    down(rig, 0, 1, 100, 100);
+    move(rig, 0, 1, 100 + FLICK_PX, 100);
+    move(rig, 0, 1, 100, 100);
+    up(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([]);
+    expect(rig.cancels).toBe(1);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('dismisses on a press OUTSIDE the control, with tap mode off too', () => {
+    // A bare tap can open this row in either mode, so a row with no tap-driven
+    // way out would strand a player who opened it by accident.
+    const rig = makeRig({ anchorRole: 'toggle' });
+    down(rig, 0, 1, 100, 100);
+    up(rig, 0, 1, 100, 100);
+    expect(rig.gesture.isOpen()).toBe(true);
+    document.body.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.cancels).toBe(1);
+  });
+
+  it('an ACTION anchor is untouched: the ring still casts its centre on a tap', () => {
+    // The ring passes no role at all, so this is the shipped default arm.
+    const rig = makeRig();
+    down(rig, 0, 1, 100, 100);
+    up(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([[0, 'center']]);
+    expect(rig.gesture.isOpen()).toBe(false);
+    // And with tap mode ON it opens first, then casts the centre on the second
+    // press, which is the behaviour that shipped.
+    document.body.replaceChildren();
+    const tap = makeRig({ tapMenus: true });
+    down(tap, 0, 1, 100, 100);
+    expect(tap.casts).toEqual([]);
+    expect(tap.gesture.isOpen()).toBe(true);
+    down(tap, 0, 2, 100, 100);
+    expect(tap.casts).toEqual([[0, 'center']]);
   });
 });

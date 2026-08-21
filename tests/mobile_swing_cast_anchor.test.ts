@@ -96,10 +96,29 @@ describe('mobile swing/cast bar anchoring (issue 1577 (6))', () => {
     expect(frameBlock).toContain('transform-origin: center top;');
     const castBottom = bottomOffsetPx(ruleBlock('body.mobile-touch #castbar {'));
     const swingBottom = bottomOffsetPx(ruleBlock('body.mobile-touch #swingbar {'));
-    const petBottom = bottomOffsetPx(ruleBlock('body.mobile-touch #pet-frame {'));
     expect(castBottom).toBeGreaterThan(0);
     expect(swingBottom).toBeGreaterThan(castBottom);
-    expect(petBottom).toBeGreaterThan(swingBottom);
+    // The pet frame is the one column member that hangs the OTHER way: it drops
+    // BELOW the player frame, into the band between that frame's bottom edge and
+    // the screen's, so it is top-seated off the same line with a positive drop
+    // rather than stacked above the two bars. It used to sit at row-lift + 24px,
+    // sharing the (now retired) touch stance row's slot.
+    const petBlock = ruleBlock('body.mobile-touch #pet-frame {');
+    expect(petBlock).toContain(
+      'top: calc(var(--app-vh, 100dvh) - var(--mobile-button-row-lift) + var(--mobile-pet-frame-drop));',
+    );
+    expect(petBlock).toContain('bottom: auto;');
+    expect(petBlock).toContain('transform-origin: center top;');
+    // The drop is measured from the SAME row line the player frame's top sits on,
+    // so it has to clear that frame's own rendered height or the two overlap.
+    const drop = mobileCss.match(
+      /--mobile-pet-frame-drop: calc\(65px \* 0\.6 \* var\(--mobile-chrome-scale, 1\) \+ (\d+)px\)/,
+    );
+    expect(
+      drop,
+      'the landscape pet-frame drop must be derived from the frame scale',
+    ).not.toBeNull();
+    expect(Number((drop as RegExpMatchArray)[1])).toBeGreaterThan(0);
   });
 
   it('matches each bar width to the shorter player frame in landscape', () => {

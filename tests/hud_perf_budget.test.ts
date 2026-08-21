@@ -557,6 +557,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/consumable_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/menu/menu_strip_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/stance/stance_radial_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/quest/quest_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },

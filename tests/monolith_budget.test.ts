@@ -107,7 +107,13 @@ const MONOLITHS: MonolithRow[] = [
     // bindShiftClear, and the editor's three mutation callbacks now share ONE
     // tooltip hide inside the window, which pays for the new clearSlot callback
     // with two lines to spare. Exact count, zero slack.
-    ceiling: 19076,
+    // LOWERED 19076 -> 19052 by the touch stance radial: renderStanceBar's whole
+    // body (the row's markup, its per-button tooltip and click wiring, and the
+    // signature latch) moved behind a new hud/stance seam, and Hud kept the
+    // one-line frame call plus the callback bag the module is built with. The
+    // ratchet's own rule: an extraction lowers the ceiling in the same change.
+    // Exact count, zero slack.
+    ceiling: 19052,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

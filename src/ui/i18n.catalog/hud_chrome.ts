@@ -601,6 +601,17 @@ export const hudChromeStrings = {
     quickActionsAriaTap:
       'Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.',
     quickActionsLabel: 'Actions',
+    // The touch stance control: ONE circle on the button row wearing the stance
+    // (or paladin devotion aura) the player is in, with every other known stance
+    // on the radial's four directions. stanceRadial names the petal overlay;
+    // the two anchor names are the control's OWN accessible name and have to
+    // teach the gesture, because a touch device has no hover to discover it
+    // with. {stance} is the worn stance's own ability name, already localized by
+    // its own key, so no stance name lives here. Both anchor names are WORDY by
+    // M16, so the five non-Latin overlays carry real fills.
+    stanceRadial: 'Stances',
+    stanceAnchorAria: 'Stance: {stance}. Tap to open the stance ring, then pick another stance.',
+    stanceAnchorEmptyAria: 'No stance. Tap to open the stance ring, then pick a stance.',
     // The top-band quest strip (Phase 5): the touch replacement for the
     // right-anchored quest tracker, showing ONE quest with all of its objectives
     // instead of a list that grew into the action ring. questStripAria is the

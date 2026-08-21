@@ -8568,6 +8568,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.quickActionsAriaTap':
     '快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，然後點按其中一項。再次點按此控制項可關閉。',
   'hudChrome.mobile.quickActionsLabel': '操作',
+  'hudChrome.mobile.stanceRadial': '姿態',
+  'hudChrome.mobile.stanceAnchorAria': '姿態：{stance}。點按開啟姿態環，然後選擇其他姿態。',
+  'hudChrome.mobile.stanceAnchorEmptyAria': '無姿態。點按開啟姿態環，然後選擇一種姿態。',
   'hudChrome.mobile.questStripAria':
     '追蹤任務 {position}/{total}：{title}。點按可切換至下一個任務。',
   'hudChrome.mobile.questStripAriaSingle': '追蹤任務：{title}',

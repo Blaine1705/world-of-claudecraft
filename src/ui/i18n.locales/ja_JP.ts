@@ -8959,6 +8959,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.quickActionsAriaTap':
     'クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開き、項目をタップして選びます。もう一度タップすると閉じます。',
   'hudChrome.mobile.quickActionsLabel': '操作',
+  'hudChrome.mobile.stanceRadial': 'スタンス',
+  'hudChrome.mobile.stanceAnchorAria': 'スタンス：{stance}。タップしてスタンスリングを開き、別のスタンスを選びます。',
+  'hudChrome.mobile.stanceAnchorEmptyAria': 'スタンスなし。タップしてスタンスリングを開き、スタンスを選びます。',
   'hudChrome.mobile.questStripAria':
     '追跡中のクエスト {total} 件中 {position} 件目: {title}。次のクエストを表示するには操作してください。',
   'hudChrome.mobile.questStripAriaSingle': '追跡中のクエスト: {title}',

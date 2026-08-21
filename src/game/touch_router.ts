@@ -85,7 +85,9 @@ export interface TouchRouterEvent {
  *  container (`#mobile-action-ring`, `.mobile-action-slot`) and the consumables
  *  row it opens (`#mobile-consumable-strip`, a SIBLING of the ring rather than a
  *  child, so ring containment does not reach it), the radial petal overlay
- *  (`#mobile-action-radial`, a sibling too, whose petals take taps in tap mode),
+ *  (`#mobile-action-radial`, a sibling too, whose petals take taps in tap mode)
+ *  and the stance control's own radial (`#mobile-stance-radial`, a sibling for
+ *  exactly the same reason),
  *  the menu control's strip
  *  (`#mobile-menu-strip`, a sibling for the same reason, and whose caption and
  *  cancel target are not `.mobile-btn`), the top-band quest strip
@@ -101,6 +103,7 @@ const INTERACTIVE_HUD_SELECTORS = [
   '.mobile-action-slot',
   '#mobile-action-ring',
   '#mobile-action-radial',
+  '#mobile-stance-radial',
   '#mobile-consumable-strip',
   '#mobile-menu-strip',
   '#quest-strip',

@@ -672,7 +672,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'the stance/form bar; rebuilds its buttons behind a signature latch',
+    why: 'the stance/form bar, behind the hud/stance seam: the desktop row rebuilds its buttons behind a signature latch, and the touch shape paints the ring anchor through the shared write-elision facet with the icon RESOLVE key-diffed inside the painter',
   },
   {
     call: 'this.flushPendingProcAuraNotes',

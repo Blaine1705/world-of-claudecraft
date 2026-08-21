@@ -475,6 +475,7 @@ import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
+import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
@@ -696,11 +697,7 @@ import {
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
-import {
-  activeStanceBarAbilityId,
-  isStanceBarAbilityGroup,
-  stanceBarView,
-} from './stance_bar_view';
+import { isStanceBarAbilityGroup } from './stance_bar_view';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -1302,6 +1299,9 @@ export class Hud {
   private mobileActionPage = 0;
   private mobileActionRingView: ActionBarView | undefined;
   private mobileActionRingPainter: MobileActionRingPainter | undefined;
+  /** The warrior/paladin choice bar in both its shapes (desktop row, touch
+   *  radial), behind the hud/stance seam. Built with the action bars. */
+  private stanceBar!: StanceBarController;
   private crossHotbar: CrossHotbarController | undefined;
   // The consumables seat (touch): the ring's 5th arc position plus the row it
   // opens, built behind the action_bar seam. Stays undefined on a build without
@@ -1991,7 +1991,6 @@ export class Hud {
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
   // pet bar (the sideways consumables row and the Vale Cup indicator drop a band).
   private lastPetPresent = false;
-  private lastStanceBarSig = '';
   // Proc auras whose gain event arrived before the aura itself appeared in the
   // mirrored aura list (online: the event can beat the snapshot). Retried each
   // frame until the aura shows, then flushed as an FCT self-note.
@@ -7626,6 +7625,36 @@ export class Hud {
     );
     this.buildMobileActionRing();
     this.buildMobileConsumableSeat();
+    this.buildStanceBar();
+  }
+
+  // The warrior/paladin choice bar behind the hud/stance seam: the module owns
+  // BOTH shapes (the desktop row and the touch radial control) and Hud keeps only
+  // the world read, the cast, the tooltip and the icon resolution.
+  private buildStanceBar(): void {
+    this.stanceBar = new StanceBarController({
+      writers: this.writerFacet,
+      bar: $('#stancebar') as HTMLElement,
+      world: () => ({
+        playerClass: this.sim.cfg.playerClass,
+        known: this.sim.known,
+        auras: this.sim.player.auras,
+        ownerId: this.sim.player.id,
+      }),
+      isMobileLayout: () => this.isMobileLayout(),
+      iconBackground: (iconKey) => iconDataUrl('ability', iconKey),
+      abilityName: (known) => abilityDisplayName(known.def),
+      anchorName: (stanceName) =>
+        stanceName === null
+          ? t('hudChrome.mobile.stanceAnchorEmptyAria')
+          : t('hudChrome.mobile.stanceAnchorAria', { stance: stanceName }),
+      abilityTooltip: (known) => this.abilityTooltip(known),
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      hideTooltip: () => this.hideTooltip(),
+      consumePeekGuard: () => this.peekGuard.consume(),
+      clickSfx: () => audio.click(),
+      cast: (abilityId) => this.sim.castAbility(abilityId),
+    });
   }
 
   // Build the mobile action ring behind the action_bar seam
@@ -7915,61 +7944,11 @@ export class Hud {
     return findOwnPet(this.sim.entities.values(), this.sim.playerId);
   }
 
-  // The stance-style choice bar: one shared row above the action bars for
-  // warrior stances and paladin auras. Rebuilds only when the known choice set
-  // or active choice changes (sig elision, like the pet bar).
+  // The stance-style choice bar for warrior stances and paladin auras, behind the
+  // hud/stance seam: the desktop row and the touch radial are two shapes of one
+  // model, and both cast through this same castAbility call.
   private renderStanceBar(): void {
-    const bar = $('#stancebar') as HTMLElement;
-    const playerClass = this.sim.cfg.playerClass;
-    const usesChoiceBar = playerClass === 'warrior' || playerClass === 'paladin';
-    const knownStances = usesChoiceBar
-      ? this.sim.known.filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
-      : [];
-    const knownIds = knownStances.map((k) => k.def.id);
-    const activeId = activeStanceBarAbilityId(knownIds, this.sim.player.auras, this.sim.player.id);
-    const model = stanceBarView(playerClass, knownIds, activeId);
-    if (!model.visible) {
-      bar.style.display = 'none';
-      if (this.lastStanceBarSig !== '') {
-        bar.innerHTML = '';
-        this.lastStanceBarSig = '';
-      }
-      return;
-    }
-    bar.style.display = 'flex';
-    if (model.sig === this.lastStanceBarSig) return;
-    this.lastStanceBarSig = model.sig;
-    bar.innerHTML = '';
-    const group = document.createElement('div');
-    group.className = 'stancebar-group';
-    bar.appendChild(group);
-    for (const slot of model.slots) {
-      const known = knownStances.find((k) => k.def.id === slot.id);
-      if (!known) continue;
-      const name = abilityDisplayName(known.def);
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'stance-btn';
-      if (slot.active) btn.classList.add('active');
-      btn.setAttribute('aria-pressed', slot.active ? 'true' : 'false');
-      btn.title = name;
-      btn.setAttribute('aria-label', name);
-      const icon = document.createElement('span');
-      icon.className = 'icon-label';
-      icon.style.backgroundImage = `url(${iconDataUrl('ability', slot.iconKey)})`;
-      btn.appendChild(icon);
-      btn.addEventListener('click', () => {
-        if (this.peekGuard.consume()) {
-          this.hideTooltip();
-          btn.blur();
-          return;
-        }
-        audio.click();
-        this.sim.castAbility(slot.id);
-      });
-      this.attachTooltip(btn, () => this.abilityTooltip(known));
-      group.appendChild(btn);
-    }
+    this.stanceBar.render();
   }
 
   // `pet` is resolved ONCE per frame by update() and passed in, shared with the pet

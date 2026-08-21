@@ -8940,6 +8940,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.quickActionsAriaTap':
     '빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리며, 항목을 탭해 선택합니다. 컨트롤을 다시 탭하면 닫힙니다.',
   'hudChrome.mobile.quickActionsLabel': '실행',
+  'hudChrome.mobile.stanceRadial': '태세',
+  'hudChrome.mobile.stanceAnchorAria': '태세: {stance}. 탭하여 태세 링을 열고 다른 태세를 선택하세요.',
+  'hudChrome.mobile.stanceAnchorEmptyAria': '태세 없음. 탭하여 태세 링을 열고 태세를 선택하세요.',
   'hudChrome.mobile.questStripAria':
     '추적 중인 퀘스트 {total}개 중 {position}번째: {title}. 다음 퀘스트를 보려면 누르십시오.',
   'hudChrome.mobile.questStripAriaSingle': '추적 중인 퀘스트: {title}',

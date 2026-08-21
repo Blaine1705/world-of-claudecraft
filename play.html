@@ -1172,6 +1172,13 @@
       <button type="button" id="mobile-interact" data-i18n-title="hud.keybinds.actions.interact" data-i18n-aria="hud.keybinds.actions.interact" title="Interact / Loot" aria-label="Interact / Loot" data-icon="interact"><span class="mobile-label" data-i18n="hud.core.mobileUse">Use</span></button>
       <button type="button" id="mobile-jump" data-i18n-title="hud.keybinds.actions.jump" data-i18n-aria="hud.keybinds.actions.jump" title="Jump" aria-label="Jump" data-icon="jump"><span class="mobile-label" data-i18n="hudChrome.mobile.jump">Jump</span></button>
       <button type="button" id="mobile-action-page-toggle" data-i18n-aria="hudChrome.mobile.actionPageToggle" aria-label="Switch action page" data-icon="swap"><span class="mobile-action-page-indicator"></span></button>
+      <!-- The stance control: ONE circle on the ring's bottom row, one clear gap
+           past Jump, wearing the stance (or paladin devotion aura) the player is
+           in. It runs no action of its own: a tap opens #mobile-stance-radial and
+           the next press closes it, while a hold or a flick reaches a stance in
+           the same gesture. Warrior/paladin only; every other class never renders
+           it (the painter keeps it display:none). -->
+      <button class="mobile-btn" type="button" id="mobile-stance-anchor" aria-haspopup="true" aria-expanded="false" aria-pressed="false" data-i18n-aria="hudChrome.mobile.stanceAnchorEmptyAria" aria-label="No stance. Tap to open the stance ring, then pick a stance."><span class="icon-label"></span></button>
     </div>
     <div id="mobile-action-radial" role="group" data-i18n-aria="hudChrome.mobile.actionRadial" aria-label="Action directions">
       <button type="button" class="mobile-action-petal" data-radial-dir="up" data-mobile-index="0" tabindex="-1"></button>
@@ -1179,6 +1186,18 @@
       <button type="button" class="mobile-action-petal" data-radial-dir="down" data-mobile-index="2" tabindex="-1"></button>
       <button type="button" class="mobile-action-petal" data-radial-dir="left" data-mobile-index="3" tabindex="-1"></button>
       <button type="button" id="mobile-action-radial-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
+    </div>
+    <!-- The stance radial: the other known stances, on the same four directions
+         and the same circle the action ring's petals use, seated in viewport
+         coordinates by stance_radial_painter.ts. The cancel X sits ON the anchor,
+         so releasing where the gesture started backs out without switching. A
+         direction with no stance on it stays display:none and aria-hidden. -->
+    <div id="mobile-stance-radial" role="group" data-i18n-aria="hudChrome.mobile.stanceRadial" aria-label="Stances">
+      <button type="button" class="mobile-stance-petal" data-radial-dir="up" tabindex="-1"><span class="icon-label"></span></button>
+      <button type="button" class="mobile-stance-petal" data-radial-dir="right" tabindex="-1"><span class="icon-label"></span></button>
+      <button type="button" class="mobile-stance-petal" data-radial-dir="down" tabindex="-1"><span class="icon-label"></span></button>
+      <button type="button" class="mobile-stance-petal" data-radial-dir="left" tabindex="-1"><span class="icon-label"></span></button>
+      <button type="button" id="mobile-stance-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
     </div>
     <!-- Consumables row: opened by a hold or a leftward swipe on the ring's 5th
          seat, seated in viewport coordinates by consumable_strip_painter.ts. The

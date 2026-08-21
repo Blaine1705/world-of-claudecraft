@@ -12,6 +12,7 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
+import { Settings } from '../../src/game/settings';
 import type { ActionBarSlotElements } from '../../src/ui/hud/action_bar/action_bar_painter';
 import type {
   ActionBarSlotState,
@@ -30,8 +31,14 @@ import {
 import { MENU_STRIP_ITEMS } from '../../src/ui/hud/menu/menu_strip_core';
 import { MenuStripGesture } from '../../src/ui/hud/menu/menu_strip_gesture_controller';
 import { MenuStripPainter } from '../../src/ui/hud/menu/menu_strip_painter';
+import { buildStanceControl } from '../../src/ui/hud/stance/stance_control_controller';
+import {
+  STANCE_PETAL_DIRECTIONS,
+  stanceRadialView,
+} from '../../src/ui/hud/stance/stance_radial_core';
 import { closeOpenTouchMenu } from '../../src/ui/hud/tap_menu';
 import { makeWriterFacet } from '../../src/ui/painter_host';
+import { stanceBarView } from '../../src/ui/stance_bar_view';
 import '../../src/styles/index.css';
 import { cleanup } from './_harness';
 
@@ -197,11 +204,49 @@ function mountHud() {
   caption.append(captionText);
   menuStrip.append(...menuItems, menuCancel, caption);
 
-  controls.append(ring, radial, strip, row, menuStrip);
+  // The stance control: a ring child (its seat is Jump's own line) plus its own
+  // radial overlay, the fourth consumer of the shared tap-mode table.
+  const stanceAnchor = document.createElement('button');
+  stanceAnchor.type = 'button';
+  stanceAnchor.id = 'mobile-stance-anchor';
+  stanceAnchor.className = 'mobile-btn';
+  stanceAnchor.setAttribute('aria-haspopup', 'true');
+  stanceAnchor.setAttribute('aria-expanded', 'false');
+  stanceAnchor.setAttribute('aria-pressed', 'false');
+  const stanceAnchorIcon = document.createElement('span');
+  stanceAnchorIcon.className = 'icon-label';
+  stanceAnchor.append(stanceAnchorIcon);
+  ring.append(stanceAnchor);
+
+  const stanceRadial = document.createElement('div');
+  stanceRadial.id = 'mobile-stance-radial';
+  stanceRadial.setAttribute('role', 'group');
+  const stancePetals = STANCE_PETAL_DIRECTIONS.map((direction) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mobile-stance-petal';
+    btn.dataset.radialDir = direction;
+    btn.tabIndex = -1;
+    const icon = document.createElement('span');
+    icon.className = 'icon-label';
+    btn.append(icon);
+    return btn;
+  });
+  const stanceCancel = document.createElement('button');
+  stanceCancel.type = 'button';
+  stanceCancel.id = 'mobile-stance-cancel';
+  stanceCancel.tabIndex = -1;
+  stanceRadial.append(...stancePetals, stanceCancel);
+
+  controls.append(ring, radial, strip, row, menuStrip, stanceRadial);
   document.body.appendChild(controls);
   return {
     controls,
     ring,
+    stanceAnchor,
+    stanceRadial,
+    stancePetals,
+    stanceCancel,
     slotBtns,
     seat,
     radial,
@@ -260,6 +305,8 @@ afterEach(() => {
   document.body.className = '';
   document.documentElement.style.removeProperty('--app-vw');
   document.documentElement.style.removeProperty('--app-vh');
+  // The setting is real and persisted, so leave it as the product default.
+  new Settings().patch({ touchTapMenus: false });
 });
 
 describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
@@ -268,6 +315,10 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
     document.documentElement.style.setProperty('--app-vw', `${VIEWPORT.width}px`);
     document.documentElement.style.setProperty('--app-vh', `${VIEWPORT.height}px`);
+    // The stance control reads the setting through the SHARED tap_menu.ts cache
+    // rather than an injected flag, so this arm writes the real one. patch()
+    // persists and broadcasts, which is what drops that cache.
+    new Settings().patch({ touchTapMenus: tapMenus });
     const rig = mountHud();
 
     const casts: Array<[number, RadialDirection]> = [];
@@ -374,8 +425,32 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     });
     menuGesture.attach();
 
+    // The stance control reads tap mode through the SHARED tap_menu.ts cache, so
+    // this arm drives the same setting the other three read. It is built from the
+    // shipped markup exactly as Hud builds it.
+    const stances = ['battle_stance', 'defensive_stance', 'berserker_stance'];
+    const stanceCasts: string[] = [];
+    let wornStance = stances[0];
+    const stanceControl = buildStanceControl({
+      writers: writers(),
+      iconBackground: (key) => `#${key}`,
+      name: (id) => id,
+      anchorName: (m) => `stance ${m.activeId ?? 'none'}`,
+      cast: (id) => {
+        stanceCasts.push(id);
+        wornStance = id;
+      },
+    });
+    const paintStance = () =>
+      stanceControl?.render(stanceRadialView(stanceBarView('warrior', stances, wornStance)));
+    paintStance();
+
     return {
       ...rig,
+      stances,
+      stanceCasts,
+      stanceControl,
+      paintStance,
       casts,
       used,
       picks,
@@ -422,6 +497,49 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     expect(rig.casts).toEqual([[0, 'up']]);
     rig.paintRadial();
     expect(rig.radial.classList.contains('open')).toBe(false);
+  });
+
+  it('switches stance with taps only: open the ring, then tap the stance', async () => {
+    const rig = await setup(true);
+    tap(rig.stanceAnchor);
+    rig.paintStance();
+
+    // Opening casts NOTHING: the control runs no action of its own, so the tap
+    // that would be a "default" on the action ring is the one that opens here.
+    expect(rig.stanceCasts).toEqual([]);
+    expect(rig.stanceRadial.classList.contains('open')).toBe(true);
+    expect(rig.stanceAnchor.getAttribute('aria-expanded')).toBe('true');
+
+    const petal = rig.stancePetals[0];
+    const box = petal.getBoundingClientRect();
+    expect(box.width).toBeGreaterThanOrEqual(40);
+    expect(box.top).toBeGreaterThan(0);
+    expect(box.bottom).toBeLessThanOrEqual(VIEWPORT.height);
+    // Real hit-testing: the drag path keeps the overlay pointer-transparent, so
+    // without the sticky rule this petal would not be under a finger at all.
+    expect(getComputedStyle(petal).pointerEvents).toBe('auto');
+    expect(tappableAtItsCentre(petal)).toBe(true);
+
+    tap(petal, 2);
+    expect(rig.stanceCasts).toEqual([rig.stances[1]]);
+    rig.paintStance();
+    expect(rig.stanceRadial.classList.contains('open')).toBe(false);
+    // The anchor now wears what was picked, which is the whole readout.
+    expect(rig.stanceAnchor.getAttribute('aria-label')).toContain(rig.stances[1]);
+  });
+
+  it('with the setting OFF a bare tap still OPENS the stance ring, casting nothing', async () => {
+    // anchorRole 'toggle': a control with no action of its own reaches its menu
+    // from a bare tap in EITHER mode, and the next press closes it again.
+    const rig = await setup(false);
+    tap(rig.stanceAnchor);
+    rig.paintStance();
+    expect(rig.stanceCasts).toEqual([]);
+    expect(rig.stanceRadial.classList.contains('open')).toBe(true);
+    tap(rig.stanceAnchor, 2);
+    rig.paintStance();
+    expect(rig.stanceRadial.classList.contains('open')).toBe(false);
+    expect(rig.stanceCasts).toEqual([]);
   });
 
   it('uses a consumable with taps only: open the seat, then tap the item', async () => {

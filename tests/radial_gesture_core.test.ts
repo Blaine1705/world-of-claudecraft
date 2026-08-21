@@ -49,6 +49,29 @@ describe('resolveRadialRelease', () => {
     expect(release({ hasSlot: false })).toEqual({ kind: 'none' });
   });
 
+  it("a 'toggle' control's bare tap OPENS its petals rather than casting", () => {
+    // Quick Actions' rule, on a radial: a control with no action of its own has
+    // nothing for the centre to commit to, so the tap that would have cast is
+    // the one that reveals the choices. The stance control is the first such
+    // radial; the ring's buttons keep the 'action' default above.
+    expect(release({ anchorRole: 'toggle' })).toEqual({ kind: 'open' });
+    // Even with no petal on the centre: 'open' is about the CONTROL, not a slot.
+    expect(release({ anchorRole: 'toggle', hasSlot: false })).toEqual({ kind: 'open' });
+    // Directions still choose, and the open-then-back-out cancel is unchanged.
+    expect(release({ anchorRole: 'toggle', direction: 'up' })).toEqual({
+      kind: 'cast',
+      direction: 'up',
+    });
+    expect(release({ anchorRole: 'toggle', revealed: true })).toEqual({ kind: 'cancel' });
+    // A consumed press still wins over everything, including the open.
+    expect(release({ anchorRole: 'toggle', consumedElsewhere: true })).toEqual({ kind: 'none' });
+  });
+
+  it("the 'action' default is what the ring keeps, stated explicitly", () => {
+    expect(release({ anchorRole: 'action' })).toEqual({ kind: 'cast', direction: 'center' });
+    expect(release()).toEqual(release({ anchorRole: 'action' }));
+  });
+
   it('stays silent when another owner consumed the press', () => {
     // A rearrange drag or an empowered hold owns the finger; casting on top of
     // it is the double-fire that ate the player's next cast before.

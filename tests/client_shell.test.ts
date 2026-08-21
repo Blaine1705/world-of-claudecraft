@@ -1377,6 +1377,77 @@ describe('client HTML shell', () => {
     expect(touchRouterTs).toContain("'#mobile-action-radial',");
   });
 
+  it('carries the touch stance control and its radial in BOTH entries', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      // The anchor rides the RING, which is what puts its centre on the same
+      // line Jump and the Quick Actions control share (its CSS `bottom` is
+      // Jump's own expression). Being a ring child also means the touch router
+      // already treats it as interactive chrome.
+      const ringStart = entry.indexOf('id="mobile-action-ring"');
+      const anchorAt = entry.indexOf('id="mobile-stance-anchor"');
+      expect(anchorAt, `${name}: the stance anchor is missing`).toBeGreaterThan(ringStart);
+      expect(anchorAt, `${name}: the stance anchor left the ring`).toBeLessThan(
+        entry.indexOf('id="mobile-action-radial"'),
+      );
+      // It opens a menu and wears a state, so it says both. aria-pressed is the
+      // worn stance (the desktop row's .stance-btn carries the same).
+      expect(entry, name).toMatch(/id="mobile-stance-anchor"[^>]*aria-haspopup="true"/);
+      expect(entry, name).toMatch(/id="mobile-stance-anchor"[^>]*aria-expanded="false"/);
+      expect(entry, name).toMatch(/id="mobile-stance-anchor"[^>]*aria-pressed="false"/);
+      // A role-less div with an accessible name announces nothing: the overlay
+      // is a labelled GROUP of petals, exactly like the action radial.
+      expect(entry, name).toContain(
+        'id="mobile-stance-radial" role="group" data-i18n-aria="hudChrome.mobile.stanceRadial"',
+      );
+      const petals = [
+        ...entry.matchAll(/class="mobile-stance-petal"[^>]*data-radial-dir="(\w+)"/g),
+      ];
+      expect(
+        petals.map((m) => m[1]),
+        name,
+      ).toEqual(['up', 'right', 'down', 'left']);
+      // The overlay is a SIBLING of the ring: its petals are seated in viewport
+      // coordinates, so they must not inherit the ring's scaled corner box.
+      expect(entry.indexOf('id="mobile-stance-radial"'), name).toBeGreaterThan(
+        entry.indexOf('id="mobile-action-page-toggle"'),
+      );
+      // Real focusable <button>s, shipped OUT of the tab order: the gesture
+      // flips them in when the radial opens, exactly like the action petals.
+      for (const direction of ['up', 'right', 'down', 'left']) {
+        expect(entry, `${name}: ${direction} stance petal`).toMatch(
+          new RegExp(
+            `class="mobile-stance-petal" data-radial-dir="${direction}"[^>]*tabindex="-1"`,
+          ),
+        );
+      }
+      expect(entry, name).toMatch(/id="mobile-stance-cancel"[^>]*tabindex="-1"/);
+    }
+    // The anchor's centre sits on the button row by DERIVATION, not by a literal:
+    // this is #mobile-jump's own bottom expression, so the two can never drift.
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch #mobile-stance-anchor {\n' +
+        '    --mobile-stance-gap: calc(12px * var(--mobile-chrome-scale, 1));\n',
+    );
+    expect(hudMobileCss).toContain(
+      'bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--menu-btn-size) / 2);',
+    );
+    // The petals take pointer events only while the overlay is OPEN, the same
+    // rule the action radial and both strips carry.
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch #mobile-stance-radial.open .mobile-stance-petal,\n' +
+        '  body.mobile-touch #mobile-stance-radial.open #mobile-stance-cancel {\n' +
+        '    pointer-events: auto;\n' +
+        '  }',
+    );
+    // Touch-router coverage: the overlay is a SIBLING of the ring, so ring
+    // containment does not reach it and a tap on a petal would otherwise fall
+    // through to a camera drag.
+    expect(touchRouterTs).toContain("'#mobile-stance-radial',");
+  });
+
   // A stray </div> inside #mobile-controls once slipped through review: the tree still
   // LOOKED right (browsers reparent silently) while the ring, the radial overlay and the
   // consumables row ended up outside the region that positions them. Nothing else in this
@@ -1401,6 +1472,9 @@ describe('client HTML shell', () => {
         'id="mobile-combat-controls"',
         'id="mobile-action-ring"',
         'id="mobile-action-radial"',
+        'id="mobile-stance-anchor"',
+        'id="mobile-stance-radial"',
+        'id="mobile-stance-cancel"',
         'id="mobile-consumable-strip"',
         'id="mobile-consumable-cancel"',
         'id="mobile-menu-anchor"',
@@ -2961,11 +3035,14 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('right: calc(max(18px, env(safe-area-inset-right)) + 172px);');
     expect(hudMobileCss).toContain('left: calc(max(20px, env(safe-area-inset-left)) + 164px);');
     expect(hudMobileCss).toContain('right: calc(max(20px, env(safe-area-inset-right)) + 164px);');
-    // #stancebar is the only thing still in this flow on touch, and its old seat
-    // sat on the menu control's band, so the wrapper joins the bottom-centre
-    // column above the swing bar instead of carrying a raw viewport inset.
+    // Nothing renders in this flow on touch any more, but the wrapper keeps the
+    // bottom-centre column seat rather than a raw viewport inset, so anything put
+    // back here lands clear of the button row instead of on the menu control.
     expect(hudMobileCss).toContain('bottom: calc(var(--mobile-button-row-lift) + 24px);');
-    expect(hudMobileCss).toContain(
+    // #stancebar was the last occupant and now stands down whole: the touch shape
+    // of the choice bar is the ring's #mobile-stance-anchor plus its radial.
+    expect(hudMobileCss).toContain('body.mobile-touch #stancebar {\n    display: none;\n  }');
+    expect(hudMobileCss).not.toContain(
       'body.mobile-touch #stancebar {\n    justify-content: center;\n  }',
     );
   });

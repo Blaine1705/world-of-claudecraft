@@ -40,7 +40,7 @@
 
 import type { PainterHostWriters } from '../../painter_host';
 import { armTapMenuOutsideDismiss, registerTouchMenu } from '../tap_menu';
-import { resolveTapMenuPress } from '../tap_menu_core';
+import { resolveTapMenuPress, type TapMenuAnchorRole, type TapMenuPress } from '../tap_menu_core';
 import {
   FLICK_DEADZONE_PX,
   placeRadial,
@@ -101,6 +101,11 @@ export interface RadialGestureDeps {
   writers: PainterHostWriters;
   /** Tap mode (settings.touchTapMenus), read live at press time. */
   tapMenus(): boolean;
+  /** What a press on THIS control means beyond opening its petals. Defaults to
+   *  'action' (the ring's buttons cast their centre slot); a 'toggle' control
+   *  has no action of its own, so a bare tap opens the petals in EITHER mode and
+   *  the next press closes them. The rule is tap_menu_core.ts's. */
+  anchorRole?: TapMenuAnchorRole;
   /** The element whose computed style carries the radial geometry per tier. */
   metricsHost: HTMLElement;
   /** Whether a button plus direction maps to a real hotbar slot right now. */
@@ -197,12 +202,10 @@ export class RadialGesture {
         if ((e as MouseEvent).detail !== KEYBOARD_CLICK_DETAIL) return;
         if (this.deps.pressClaimed(index)) return;
         // Keyboard activation follows the same table as a tap, so Enter opens the
-        // petals in tap mode instead of casting past them.
-        if (this.deps.tapMenus()) {
-          this.resolveAnchorPress(index);
-          return;
-        }
-        if (this.deps.hasSlot(index, 'center')) this.deps.cast(index, 'center');
+        // petals in tap mode instead of casting past them, and opens a 'toggle'
+        // control's petals in either mode. An 'action' control with tap mode off
+        // resolves to 'default' there, which is the centre cast it always was.
+        this.resolveAnchorPress(index);
       });
     });
     // The backstop for a release the button never sees. It runs AFTER the
@@ -291,10 +294,16 @@ export class RadialGesture {
     this.sticky = { buttonIndex, btn, placement: this.measure(btn) };
     this.setPetalsFocusable(true);
     this.setExpanded(btn, true);
-    this.disarmOutside = armTapMenuOutsideDismiss(
-      () => [...this.deps.buttons, ...this.petals.map((p) => p.el), this.petalCancel],
-      () => this.dismissSticky(),
-    );
+    // Whether an outside press dismisses is the CORE's answer, not a second read
+    // of the setting: an 'action' control only ever opens this way in tap mode,
+    // while a 'toggle' control reaches it from a bare tap in either mode and so
+    // needs the tap-outside way back out in both.
+    if (this.press(true, 'outside').kind === 'dismiss') {
+      this.disarmOutside = armTapMenuOutsideDismiss(
+        () => [...this.deps.buttons, ...this.petals.map((p) => p.el), this.petalCancel],
+        () => this.dismissSticky(),
+      );
+    }
     this.petals[0]?.el.focus();
   }
 
@@ -320,33 +329,45 @@ export class RadialGesture {
     return true;
   }
 
+  /** Ask the shared table what a press means for this control. `open` is passed
+   *  rather than read so openSticky can ask about the state it is entering. */
+  private press(open: boolean, target: 'anchor' | 'outside'): TapMenuPress {
+    return resolveTapMenuPress({
+      tapMenus: this.deps.tapMenus(),
+      open,
+      target,
+      anchorRole: this.deps.anchorRole,
+    });
+  }
+
   /** The tap-outside path: close and report the radial as chosen-nothing. */
   private dismissSticky(): void {
-    const press = resolveTapMenuPress({
-      tapMenus: this.deps.tapMenus(),
-      open: this.sticky !== null,
-      target: 'outside',
-    });
-    if (press.kind !== 'dismiss') return;
+    if (this.press(this.sticky !== null, 'outside').kind !== 'dismiss') return;
     this.closeSticky();
     this.deps.onCancel();
   }
 
-  /** A tap-mode press on a ring button: open the petals, or cast the centre
-   *  action when they are already open for that button. */
+  /** A tap-driven press on a ring button: open the petals, close them again, or
+   *  cast the centre action when they are already open for that button. */
   private resolveAnchorPress(buttonIndex: number): void {
     const press = resolveTapMenuPress({
       tapMenus: true,
       open: this.sticky?.buttonIndex === buttonIndex,
       target: 'anchor',
+      anchorRole: this.deps.anchorRole,
     });
     if (press.kind === 'open') {
       this.openSticky(buttonIndex);
       return;
     }
-    if (press.kind !== 'default') return;
     // Focus goes back to the ring button either way (closeSticky hands it over),
     // so a keyboard user is left where they started rather than on a dead petal.
+    if (press.kind === 'dismiss') {
+      this.closeSticky();
+      this.deps.onCancel();
+      return;
+    }
+    if (press.kind !== 'default') return;
     this.closeSticky();
     if (this.deps.hasSlot(buttonIndex, 'center')) this.deps.cast(buttonIndex, 'center');
   }
@@ -371,7 +392,10 @@ export class RadialGesture {
     // by the click that follows, so one that never arrived would otherwise
     // swallow the next keyboard activation.
     this.suppressClick = false;
-    if (this.deps.tapMenus()) {
+    // What this control's own press means comes from the shared table, so tap
+    // mode and a 'toggle' control's close-again press are one rule rather than
+    // two reads of the setting.
+    if (this.press(this.sticky?.buttonIndex === buttonIndex, 'anchor').kind !== 'gesture') {
       this.suppressClick = true;
       if (e.pointerType === 'touch') e.preventDefault();
       this.resolveAnchorPress(buttonIndex);
@@ -461,11 +485,18 @@ export class RadialGesture {
       revealed: d.placement !== null,
       hasSlot: this.deps.hasSlot(d.buttonIndex, d.direction),
       consumedElsewhere: suppressed,
+      anchorRole: this.deps.anchorRole,
     });
     const buttonIndex = d.buttonIndex;
     this.clearDrag(d.pointerId);
     if (outcome.kind === 'cast') this.deps.cast(buttonIndex, outcome.direction);
-    else if (outcome.kind === 'cancel') this.deps.onCancel();
+    // The drag is already dropped above, so the petals can take the anchor's own
+    // press as the one that opened them. Suppress the click the browser fires
+    // after a mouse release, which would otherwise close them again at once.
+    else if (outcome.kind === 'open') {
+      this.suppressClick = true;
+      this.openSticky(buttonIndex);
+    } else if (outcome.kind === 'cancel') this.deps.onCancel();
   }
 
   /** Drop every live gesture and close the petals. Safe to call from any path. */

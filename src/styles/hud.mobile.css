@@ -1193,6 +1193,177 @@
       border: 3px double Highlight;
     }
   }
+  /* The stance control (#mobile-stance-anchor), the touch shape of the
+     warrior/paladin choice bar. It rides the RING rather than a seat of its own,
+     because that is what puts its centre on the same line Jump and the Quick
+     Actions control share for free: `bottom` here is Jump's own expression, so
+     the three circles are on one line at every tier and settings scale without a
+     second derivation to keep in sync. Horizontally it sits one clear circle gap
+     past Jump on that row, which is the only span on the line wide enough for it
+     at every landscape phone profile (the bottom-centre column's player frame
+     claims the middle, and the Quick Actions column claims the left).
+     Warrior/paladin only: stance_radial_painter.ts writes display:none for every
+     other class, so nothing here reserves the space. */
+  body.mobile-touch #mobile-stance-anchor {
+    --mobile-stance-gap: calc(12px * var(--mobile-chrome-scale, 1));
+    position: absolute;
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      2 -
+      var(--mobile-ring-hollow) +
+      var(--mobile-ring-secondary-size) /
+      2 +
+      var(--mobile-stance-gap)
+    );
+    bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--menu-btn-size) / 2);
+    width: var(--menu-btn-size);
+    height: var(--menu-btn-size);
+    pointer-events: auto;
+    border-color: #8b4e2c;
+  }
+  /* Left-handed mirrors the ring to the left, so the control mirrors with it:
+     the identical expression on the opposite edge, matching every other ring
+     child's mirror. */
+  body.mobile-touch.mobile-left-handed #mobile-stance-anchor {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      2 -
+      var(--mobile-ring-hollow) +
+      var(--mobile-ring-secondary-size) /
+      2 +
+      var(--mobile-stance-gap)
+    );
+    right: auto;
+  }
+  body.mobile-touch #mobile-stance-anchor .icon-label {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+  /* The worn stance reads as WORN: a steady gold rim, never a scale transform
+     (the motion-sickness rule), matching the desktop row's .stance-btn.active. */
+  body.mobile-touch #mobile-stance-anchor.active {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 10px color-mix(in srgb, var(--gold) 50%, transparent),
+      inset 0 0 8px color-mix(in srgb, var(--gold) 25%, transparent);
+  }
+  /* The stance radial (#mobile-stance-radial): the same circle, the same four
+     directions and the same read-back geometry tokens the action radial uses, so
+     a player who has learned the ring's flick has already learned this one. A
+     SIBLING of the ring for the same reason that one is: its petals are seated in
+     viewport coordinates (placeRadial edge-clamps them) instead of inside the
+     ring's own scaled, corner-anchored box. --radial-radius-ratio and
+     --radial-margin stay LITERAL values because the gesture layer reads them back
+     off the computed style, and the safe area rides in the PADDING for the same
+     reason the action radial's does. */
+  body.mobile-touch #mobile-stance-radial {
+    --radial-radius-ratio: 1.35;
+    --radial-margin: 6px;
+    --radial-petal-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    pointer-events: none;
+    opacity: var(--touch-opacity, 1);
+    z-index: 32;
+  }
+  body.mobile-touch #mobile-stance-radial.open {
+    display: block;
+  }
+  /* The dim is LOCAL to the radial and never a full-screen scrim: the other
+     thumb is still steering and the player must keep seeing the fight. */
+  body.mobile-touch #mobile-stance-radial::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle at var(--radial-x, 50%) var(--radial-y, 50%),
+      #05050cb0 0%,
+      #05050c80 calc(var(--radial-petal-size) * 1.9),
+      transparent calc(var(--radial-petal-size) * 2.6)
+    );
+    pointer-events: none;
+  }
+  /* Petals and the centre cancel target are seated by their CENTRE (the painter
+     writes left/top from placeRadial), so the negative margins pull each box
+     back onto its own centre point. */
+  body.mobile-touch .mobile-stance-petal,
+  body.mobile-touch #mobile-stance-cancel {
+    position: absolute;
+    width: var(--radial-petal-size);
+    height: var(--radial-petal-size);
+    margin-left: calc(var(--radial-petal-size) / -2);
+    margin-top: calc(var(--radial-petal-size) / -2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid #4a3d1d;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2d3048e8, #11121ee8 72%);
+    color: #eee8ff;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  body.mobile-touch .mobile-stance-petal .icon-label {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-stance-petal.live,
+  body.mobile-touch #mobile-stance-cancel.live {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--gold) 67%, transparent),
+      inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);
+  }
+  body.mobile-touch #mobile-stance-cancel {
+    border-color: #8b4e2c;
+    background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
+  }
+  body.mobile-touch #mobile-stance-cancel .ui-icon {
+    width: 22px;
+    height: 22px;
+    color: #ffdf9c;
+  }
+  /* Tap mode (settings.touchTapMenus) and assistive activation: the petals become
+     a persistent focusable menu, so they take pointer events the drag path
+     deliberately keeps off the overlay. The same rule the ring's own radial and
+     the two strips carry. */
+  body.mobile-touch #mobile-stance-radial.open .mobile-stance-petal,
+  body.mobile-touch #mobile-stance-radial.open #mobile-stance-cancel {
+    pointer-events: auto;
+  }
+  /* forced-colors keeps the chosen petal distinguishable by SHAPE, not hue:
+     the palette is replaced wholesale there, so the gold glow above vanishes. */
+  @media (forced-colors: active) {
+    body.mobile-touch .mobile-stance-petal.live,
+    body.mobile-touch #mobile-stance-cancel.live {
+      border: 3px double Highlight;
+    }
+  }
   /* The consumables row (#mobile-consumable-strip), opened by a hold or a
      leftward swipe on the ring's 5th seat. A SIBLING of the ring for the same
      reason the radial is: its items are seated in viewport coordinates
@@ -1948,11 +2119,12 @@
     transform: translate(-50%, -50%) rotate(-45deg);
     pointer-events: none;
   }
-  /* On touch the only thing still IN this flow is #stancebar: the player frame,
-     the pet frame and the pet bar are lifted out to their own fixed seats and every
-     desktop action bar is hidden. Its old seat overlapped the menu control, whose
-     band is on the row line below, so the wrapper joins the bottom-centre column
-     and takes the slot above the swing bar. */
+  /* Nothing renders IN this flow on touch any more: the player frame, the pet
+     frame and the pet bar are lifted out to their own fixed seats, every desktop
+     action bar is hidden, and #stancebar (the last occupant) stands down whole in
+     favour of the ring's stance control. The wrapper keeps its seat in the
+     bottom-centre column so a build that ever puts something back here lands
+     clear of the button row rather than on top of the menu control. */
   body.mobile-touch #bottom-bar {
     left: calc(max(18px, env(safe-area-inset-left)) + 172px);
     right: calc(max(18px, env(safe-area-inset-right)) + 172px);
@@ -2087,14 +2259,15 @@
     width: 100%;
     min-width: 0;
   }
-  /* The stance/aura row is left-aligned in its 100%-wide flow box on desktop,
-     which on touch parked it over the menu control's own column. Centre it in the
-     bottom-centre column instead; the wrapper's seat above already lifts it clear
-     of the row line. It shares the pet frame's slot deliberately: the choice bar
-     is warrior/paladin only and a permanent pet is hunter/warlock only, so the two
-     never render together and neither reserves a band the other leaves empty. */
+  /* The stance/aura ROW stands down whole on touch: three circles in the
+     bottom-centre column is a shape the button row has no span for, so the touch
+     shape is the single #mobile-stance-anchor on the ring's own row with the
+     other stances on its radial (see the ring section above).
+     stance_bar_controller.ts writes the inline display:none that actually hides
+     it; this rule is the belt to that braces, so a frame that has not run yet
+     never flashes the row. */
   body.mobile-touch #stancebar {
-    justify-content: center;
+    display: none;
   }
   /* Desktop groups the pet command bar and the pet health frame into one row
      (#pet-cluster). Mobile deliberately splits them again: the command bar belongs
@@ -2235,10 +2408,13 @@
   body.mobile-touch {
     --xhb-lift: 0px !important;
   }
-  /* Pad mode stands the stance bar down because the cross hotbar is seeded with
-     the stances. With no bar on touch, that would leave a warrior no way to
-     switch stance at all, so it keeps its mobile seat. */
-  body.mobile-touch.xhb-mode #stancebar {
+  /* Pad mode stands the desktop stance ROW down because the cross hotbar is
+     seeded with the stances, and on touch the cross hotbar itself stands down
+     (above), which would leave a warrior no way to switch stance at all. The
+     touch shape is no longer that row, so the exemption moves with it: the ring's
+     stance control is not #stancebar and pad mode never hides it. Kept as a rule
+     rather than deleted so the reasoning survives next to what it guards. */
+  body.mobile-touch.xhb-mode #mobile-stance-anchor {
     visibility: visible;
   }
   /* The community-links rail (Discord/GitHub/Donate) is hidden in-game on
@@ -2551,21 +2727,34 @@
   }
   /* Pet frame on mobile: the desktop rule keeps it in the #actionbar-stack flow,
      which does not exist here (the player frame is lifted out to position:fixed),
-     so re-seat it into the same reserved bottom-centre column, stacked ABOVE the
-     cast and swing bars (all of them offset off --mobile-button-row-lift, so the
-     column moves as one). Seating it on top of the column rather than between the
-     frame and the bars is deliberate:
-     the pet strip appears and disappears with the pet, and displacing the two bars
-     would move a cast bar mid-cast. It KEEPS its portrait here, unlike the cast bar
+     so re-seat it into the same reserved bottom-centre column. It hangs BELOW the
+     player frame, in the band between that frame's bottom edge and the screen's,
+     which is the one part of the column no other element uses: the cast bar, the
+     swing bar and the old pet-frame seat all stack UPWARD off
+     --mobile-button-row-lift, and putting the pet under its owner reads as one
+     unit instead of a strip floating above unrelated chrome. TOP-seated off the
+     same token for the same reason the player frame is: the rendered height is
+     content-driven and then scaled, so only the origin the scale leaves fixed can
+     land the box where the seat says, and that has to be the top edge.
+     --mobile-pet-frame-drop is the player frame's own rendered height plus a gap,
+     per tier; the band it drops into grows with env(safe-area-inset-bottom),
+     because the row-lift token it is measured from carries that inset already.
+     It KEEPS its portrait here, unlike the cast bar
      which drops its label: the frame is a tap target that selects the pet, and a
      portrait-less strip renders about 20px tall, under the 40x40 mobile touch
      floor. With the portrait the visible frame is ~48px rendered at this scale, so
      the tap area is the floor without an invisible band over the world. */
+  body.mobile-touch {
+    /* Portrait scale (0.82): the frame renders ~53px, so the drop clears it with
+       a 4px gap. The landscape media block below re-tunes it for that tier's
+       0.6 frame scale. */
+    --mobile-pet-frame-drop: calc(53px * var(--mobile-chrome-scale, 1) + 4px);
+  }
   body.mobile-touch #pet-frame {
     position: fixed;
     left: 50%;
-    top: auto;
-    bottom: calc(var(--mobile-button-row-lift) + 24px);
+    top: calc(var(--app-vh, 100dvh) - var(--mobile-button-row-lift) + var(--mobile-pet-frame-drop));
+    bottom: auto;
     z-index: 21;
     width: 300px;
     margin: 0;
@@ -2577,7 +2766,7 @@
     padding-left: 0;
     zoom: 1;
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
-    transform-origin: center bottom;
+    transform-origin: center top;
   }
   body.mobile-touch #pet-frame .uf-bars {
     width: 224px;
@@ -6410,12 +6599,18 @@
     }
     /* Same bottom-centre column as portrait, at the landscape frame scale so the
        strip matches the player frame's width.
-       0.6 renders the frame ~35px, under the 40px touch floor: deliberately the
-       SAME size as the #player-frame directly below it, which is itself a tap
+       0.6 renders the frame ~33px, under the 40px touch floor: deliberately the
+       SAME size as the #player-frame directly ABOVE it, which is itself a tap
        target (self-target) already shipping at this scale in landscape. Sizing
        the pet frame larger than the frame it hangs under to win the floor would
        invert their visual hierarchy; the landscape tier trades size for the
-       shorter viewport everywhere, and this follows the established baseline. */
+       shorter viewport everywhere, and this follows the established baseline.
+       The drop is the player frame's own rendered height at this scale
+       (65px * 0.6 * chrome-scale) plus a 4px gap, so the pet strip starts where
+       its owner ends. */
+    body.mobile-touch {
+      --mobile-pet-frame-drop: calc(65px * 0.6 * var(--mobile-chrome-scale, 1) + 4px);
+    }
     body.mobile-touch #pet-frame {
       transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
     }
@@ -6780,6 +6975,18 @@
      zone; castbar/swingbar move with it so they stay centred above it. */
   body.mobile-touch.hud-mobile-compact #player-frame {
     left: calc(50% - 15px);
+  }
+  /* The one tier where the band UNDER the player frame is the binding constraint.
+     It is --mobile-button-row-lift tall (69px at zero safe area on this tier) and
+     the player frame already spends 33px of it, so a 0.6-scaled pet strip (33px)
+     would finish within a pixel of the screen edge. 0.5 renders it ~27px, which
+     leaves a real 4px gap at BOTH ends, stays clear of the 24px WCAG 2.2 SC 2.5.8
+     minimum this frame already trades down to, and keeps it visually subordinate
+     to the frame it hangs under. Every other tier has room for the 0.6 above.
+     A device with a real bottom inset gets both back: the row-lift token carries
+     env(safe-area-inset-bottom), so the band grows with it. */
+  body.mobile-touch.hud-mobile-compact #pet-frame {
+    transform: translateX(-50%) scale(calc(0.5 * var(--mobile-chrome-scale, 1)));
   }
   body.mobile-touch.hud-mobile-compact #castbar,
   body.mobile-touch.hud-mobile-compact #swingbar,

@@ -9090,6 +9090,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.quickActionsAriaTap':
     'Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, затем нажмите нужный значок. Нажмите на элемент управления ещё раз, чтобы закрыть.',
   'hudChrome.mobile.quickActionsLabel': 'Действия',
+  'hudChrome.mobile.stanceRadial': 'Стойки',
+  'hudChrome.mobile.stanceAnchorAria': 'Стойка: {stance}. Нажмите, чтобы открыть круг стоек, затем выберите другую стойку.',
+  'hudChrome.mobile.stanceAnchorEmptyAria': 'Без стойки. Нажмите, чтобы открыть круг стоек, затем выберите стойку.',
   'hudChrome.mobile.questStripAria':
     'Отслеживаемое задание {position} из {total}: {title}. Нажмите, чтобы перейти к следующему.',
   'hudChrome.mobile.questStripAriaSingle': 'Отслеживаемое задание: {title}',
