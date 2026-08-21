@@ -986,6 +986,7 @@ export const nl_NL: EnTranslations = {
       "seconds": "{s}s",
       "autoShowHint": "Rijen verschijnen automatisch zodra je groep schade aanricht of geneest, en dit segment sluit een paar seconden na het einde van het gevecht.",
       "threatFallback": "Geen actieve dreiging: toont schade aan {name}",
+      "threatFrozen": "Final threat vs {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Overig ({count})",

@@ -314,6 +314,41 @@ describe('combat meters', () => {
     ]);
   });
 
+  it("latches the mob's live hate table so the fight's real threat survives its death", () => {
+    // The reported bug: real threat (stance/ability multipliers) runs well
+    // above raw damage. The kill clears the mob's hate table before the
+    // client ever reads it again, so without a latch the tab would
+    // "recalculate" down to the damage that landed the killing blow.
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const wolf = w.entities.get(50) as any;
+    wolf.threat = new Map([[1, 3000]]);
+    m.onEvent(dmg(1, 50, 400), w, party, 1000);
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 3000]]));
+
+    // the killing blow: the server clears the hate table before this event is
+    // even processed, exactly like the real death sequence
+    wolf.dead = true;
+    wolf.threat.clear();
+    m.onEvent(dmg(1, 50, 600), w, party, 1100);
+
+    // the snapshot survives the live table being wiped out from under it
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 3000]]));
+  });
+
+  it('never latches an empty hate table over a real one', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const wolf = w.entities.get(50) as any;
+    wolf.threat = new Map([[1, 900]]);
+    m.onEvent(dmg(1, 50, 100), w, party, 1000);
+    wolf.threat.clear(); // e.g. left combat but did not die
+    m.onEvent(dmg(1, 50, 50), w, party, 1100);
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 900]]));
+  });
+
   it('leaves an unowned mob and a pet whose owner is outside the party off the meter', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);

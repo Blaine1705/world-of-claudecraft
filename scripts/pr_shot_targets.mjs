@@ -3925,6 +3925,7 @@ export const TARGETS = [
     variants: [
       { key: 'live', charClass: 'warlock', charName: 'Nyxaris', scene: 'live' },
       { key: 'fallback', charClass: 'warlock', charName: 'Nyxaris', scene: 'fallback' },
+      { key: 'frozen', charClass: 'warlock', charName: 'Nyxaris', scene: 'frozen' },
     ],
     // A warlock with a real summoned Emberkin, because the pet is the whole
     // point: its hate is its own hate-table entry and the mob is swinging at it.
@@ -3959,6 +3960,11 @@ export const TARGETS = [
         meters.dock?.('heal');
         meters.dock?.('threat');
         meters.resetFrames?.();
+        // A world mob can carry incidental hate from something offscreen
+        // before this scene ever touches it; start every scene from a known
+        // empty table so none of them freeze on a snapshot the scene itself
+        // never intended.
+        mob.threat.clear();
         const hit = (sourceId, amount, ability) =>
           meters.onEvent({
             type: 'damage',
@@ -3970,20 +3976,40 @@ export const TARGETS = [
             ability,
             kind: 'hit',
           });
+
+        if (scene === 'frozen') {
+          // Seed the real hate table BEFORE the hits land: the panel's own
+          // freeze latch only ever reads mob.threat live, through
+          // Meters.onEvent, so it needs real numbers on the table while at
+          // least one hit is processed to have anything to freeze once the
+          // mob dies below.
+          mob.threat.set(player.id, 3200);
+          if (pet) mob.threat.set(pet.id, 4100);
+        }
         hit(player.id, 2400, 'Shadow Bolt');
         hit(player.id, 800, 'Corruption');
         if (pet) hit(pet.id, 2600, 'Ashbolt');
 
-        // The hate table the mob really compares: the Emberkin is ahead of its
-        // owner and is the one the mob is swinging at.
-        mob.threat.clear();
-        mob.threat.set(player.id, 3200);
-        if (pet) mob.threat.set(pet.id, 4100);
+        if (scene !== 'frozen') {
+          // The hate table the mob really compares: the Emberkin is ahead of
+          // its owner and is the one the mob is swinging at.
+          mob.threat.clear();
+          mob.threat.set(player.id, 3200);
+          if (pet) mob.threat.set(pet.id, 4100);
+        }
         mob.aggroTargetId = pet ? pet.id : player.id;
 
         if (scene === 'fallback') {
-          // Nothing live left: the tab has only the latched mob's damage to
-          // show, and must say so rather than pass it off as hate.
+          // Nothing live left, and no live table was ever seen: the tab has
+          // only the latched mob's damage to show, and must say so rather
+          // than pass it off as hate.
+          mob.dead = true;
+          mob.threat.clear();
+        } else if (scene === 'frozen') {
+          // The kill: the server clears the hate table before the client
+          // ever reads it again, exactly like the real death sequence. The
+          // tab must keep the fight's real numbers on screen, not
+          // recalculate down to the raw damage that landed the killing blow.
           mob.dead = true;
           mob.threat.clear();
         }

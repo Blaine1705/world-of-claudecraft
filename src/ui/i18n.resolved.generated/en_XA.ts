@@ -986,6 +986,7 @@ export const en_XA: EnTranslations = {
       "seconds": "[{s}š]",
       "autoShowHint": "[Ŕóŵš áþþéáŕ áúţóɱáţíçáļļý óñçé ýóúŕ þáŕţý ðéáļš ðáɱáĝé óŕ ĥéáļíñĝ, áñð ţĥíš šéĝɱéñţ çļóšéš á ƒéŵ šéçóñðš áƒţéŕ çóɱƀáţ éñðš.]",
       "threatFallback": "[Ñó ļíʋé ţĥŕéáţ: šĥóŵíñĝ ðáɱáĝé ţó {name}]",
+      "threatFrozen": "[Ƒíñáļ ţĥŕéáţ ʋš {name}]",
       "breakdownSummary": "[{tab}: {value}]",
       "breakdownRow": "[{value} ({percent})]",
       "breakdownOther": "[Óţĥéŕ ({count})]",

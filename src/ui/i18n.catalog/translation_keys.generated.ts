@@ -8973,6 +8973,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.meters.seconds'
   | 'hudChrome.meters.separate'
   | 'hudChrome.meters.threatFallback'
+  | 'hudChrome.meters.threatFrozen'
   | 'hudChrome.mobTooltip.boss'
   | 'hudChrome.mobTooltip.elite'
   | 'hudChrome.mobTooltip.familyDemon'
