@@ -185,6 +185,7 @@ import {
 } from './net/desktop_wallet_manager';
 import { shouldEnterDiscordOnboarding } from './net/discord_onboarding_gate';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
+import { entryTimedOut } from './net/entry_timeout';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -7040,8 +7041,11 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   };
   enterLoadingState(t('loading.connectingRealm'));
 
-  // wait for hello + first snapshot so the world starts populated
-  const waitStart = Date.now();
+  // wait for hello + first snapshot so the world starts populated. Tracks the
+  // last sign of life (entry_timeout.ts), not call start, so a legitimate
+  // transient-rejection retry on the FIRST join attempt (reconnect_policy.ts,
+  // pushed out via onConnectionLost below) is never killed mid-backoff.
+  let lastActivityAt = Date.now();
   const poll = setInterval(() => {
     if (world.connected && world.entities.has(world.playerId)) {
       clearInterval(poll);
@@ -7051,7 +7055,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       // completed, the session is known-good.
       if (api.realm) savePlayMarker(c.id, api.realm, Date.now());
       proceedToGame();
-    } else if (Date.now() - waitStart > 10000) {
+    } else if (entryTimedOut(lastActivityAt, Date.now())) {
       clearInterval(poll);
       world.close();
       clearCardProviders();
@@ -7092,6 +7096,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
   // the world resumes; onDisconnect above fires if the retries run out
   world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) => {
+    lastActivityAt = Date.now();
     checkpointActiveEntryDiagnostics('connection-lost', {
       attempt,
       maxAttempts,
