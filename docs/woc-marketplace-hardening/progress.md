@@ -6603,7 +6603,10 @@ integration/woc-market-settlement:feature/woc-market-settlement (PR
 #31), dashboard
 integration/woc-market-trading:feature/woc-market-trading-controls (PR
 #13); secret sweep of every outgoing diff clean (fixture values only).
-PR CI state recorded below after the push.
+PR CI AFTER THE PUSH, all green: dashboard PR #13 gate checks 2/2 pass
+(about 1m each); service PR #31 test checks 4/4 pass. The game branch
+has no PR, so its first CI run (and the shard-weight re-harvest,
+follow-ups 5.1) waits for the eventual 22 PR.
 
 DEFERRED (owners recorded): the CI shard-weight re-harvest fires at the
 FIRST real CI run of the R16 wiring (no PR exists on the game branch,
