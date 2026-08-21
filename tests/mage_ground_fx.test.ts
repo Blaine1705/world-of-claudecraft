@@ -532,25 +532,46 @@ describe('Mage meteor visual', () => {
 
     const pool = (fx as unknown as { materialPool: Map<string, THREE.Material[]> }).materialPool;
     const pooledMaterial = [...pool.values()][0][0];
-    vi.spyOn(pooledMaterial, 'dispose').mockImplementationOnce(() => {
+    const disposal = vi.spyOn(pooledMaterial, 'dispose').mockImplementationOnce(() => {
       throw new Error('pooled material dispose');
     });
     expect(() => fx.dispose()).toThrow(AggregateError);
     expect(pool.size).toBeGreaterThan(0);
+    expect([...pool.values()].flat()).toContain(pooledMaterial);
+
+    // The retry the retention exists for: a second dispose really re-attempts
+    // the retained material and, on success, drops it from the pool.
+    fx.dispose();
+    expect(disposal).toHaveBeenCalledTimes(2);
+    expect([...pool.values()].flat()).not.toContain(pooledMaterial);
   });
 
-  it('retains failed owned resources for a retry', () => {
+  it('keeps releasing the rest after one owned resource fails to dispose', () => {
+    // Unlike the pooled materials above, owned geometries are NOT retained:
+    // dispose() clears `meteors`, so the reference is gone either way. What
+    // this pins is that the failure is aggregated rather than fatal, and that
+    // the resources after it in the sweep are still released.
     const scene = new THREE.Scene();
     const fx = new MageGroundFx(scene, () => 3, vi.fn());
     fx.spawnMeteor({ x: 10, z: 20, radius: 6, duration: 5 });
-    const meteor = (fx as unknown as { meteors: { ownedGeometries: THREE.BufferGeometry[] }[] })
-      .meteors[0];
+    const meteor = (
+      fx as unknown as {
+        meteors: { ownedGeometries: THREE.BufferGeometry[]; rockMat: THREE.Material }[];
+      }
+    ).meteors[0];
     const ownedGeometry = meteor.ownedGeometries[0];
+    const laterGeometry = meteor.ownedGeometries[meteor.ownedGeometries.length - 1];
+    expect(laterGeometry).not.toBe(ownedGeometry);
     vi.spyOn(ownedGeometry, 'dispose').mockImplementationOnce(() => {
       throw new Error('owned geometry dispose');
     });
+    const laterDispose = vi.spyOn(laterGeometry, 'dispose');
+    const materialDispose = vi.spyOn(meteor.rockMat, 'dispose');
 
     expect(() => fx.dispose()).toThrow(AggregateError);
+    expect(laterDispose).toHaveBeenCalled();
+    expect(materialDispose).toHaveBeenCalled();
+    expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(0);
   });
 
   it('ignores late spawns and frame updates after terminal disposal', () => {
@@ -577,7 +598,6 @@ describe('Mage meteor visual', () => {
     expect((fx as unknown as { runes: unknown[] }).runes).toHaveLength(0);
     expect((fx as unknown as { snows: unknown[] }).snows).toHaveLength(0);
   });
-
 });
 
 describe('capRingLightness', () => {

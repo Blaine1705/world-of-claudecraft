@@ -938,7 +938,11 @@ export class MageGroundFx {
    * casts and is disposed once after those casts are detached.
    */
   dispose(): void {
-    if (this.disposed) return;
+    // No early return on `disposed`, exactly as WarlockMeteorFx: a partial
+    // failure below RETAINS what it could not release (the pool keeps every
+    // material whose dispose threw), and a latch here would strand it for the
+    // session with no way to re-attempt. A repeat call after a clean pass
+    // collects nothing and throws nothing.
     this.disposed = true;
 
     const errors: unknown[] = [];
