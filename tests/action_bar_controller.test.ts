@@ -598,6 +598,33 @@ describe('ActionBarController attack slot', () => {
     harness.controller.syncActiveForm();
     expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'claw' });
   });
+
+  it('keeps a spec-specific freed-slot ability across a build switch instead of deleting it from storage', () => {
+    const storage = new MemoryStorage();
+    const harness = makeHarness('warrior', ['strike'], bar(), storage);
+    harness.state.showAttackButton = false;
+    harness.controller.init();
+
+    harness.controller.replaceAttackAction({ type: 'ability', id: 'strike' });
+    harness.controller.saveAttackAction();
+    expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'strike' });
+
+    // Switching talent loadouts (or reconnecting under a different active
+    // build) reloads the layout against a different known-ability set. The
+    // attack slot is not scoped to any one build (a SavedLoadout's bar never
+    // captures it, unlike the 33 configurable slots), so the assignment must
+    // ride through the reload rather than be treated as garbage and deleted
+    // from storage the moment the granting build is not the active one.
+    harness.state.known = ['sunder_armor'];
+    harness.controller.reload();
+    expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'strike' });
+    expect(storage.getItem('woc_hotbar_warrior_ActionbarTester:s0')).not.toBeNull();
+
+    // Switching back to the original build must still show it.
+    harness.state.known = ['strike'];
+    harness.controller.reload();
+    expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'strike' });
+  });
 });
 
 describe('ActionBarController: passives never occupy an action slot', () => {
