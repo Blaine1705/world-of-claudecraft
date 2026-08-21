@@ -44,7 +44,7 @@ describe('Eastbrook town preload', () => {
     ['Low', '?gfx=low'],
     ['Standard', '?gfx=ultra'],
   ] as const)(
-    'registers all nine shipping assets plus both support models on %s',
+    'registers all ten shipping assets plus both support models on %s',
     async (_materialPath, search) => {
       vi.stubGlobal('window', { location: { search } });
       vi.stubGlobal('location', { search });
@@ -61,9 +61,14 @@ describe('Eastbrook town preload', () => {
       const module = await import('../src/render/eastbrook_town');
       const allUrls = [...module.EASTBROOK_TOWN_ASSET_URLS];
       const newUrls = [...module.EASTBROOK_TOWN_NEW_ASSET_URLS];
-      expect(newUrls).toHaveLength(9);
-      expect(new Set(newUrls).size).toBe(9);
-      expect(allUrls).toHaveLength(11);
+      // Re-pinned for owner refinement round 6: the town gained three coastal
+      // buildings, and one of them seats hexb_market.glb, a kit shell
+      // Eastbrook had never used, so the deduped URL set grows by exactly one
+      // (the other two re-use hexb_home_a and hexb_home_b shells the town
+      // already loads).
+      expect(newUrls).toHaveLength(10);
+      expect(new Set(newUrls).size).toBe(10);
+      expect(allUrls).toHaveLength(12);
       expect(mocks.loadGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
       const eastbrookTextureUrls = [
         '/textures/eastbrook_surface_atlas.webp',

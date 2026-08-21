@@ -136,7 +136,12 @@ describe('Eastbrook shared surface atlas', () => {
     // original/mirrored batch pair) are no longer created: 9 became 7. Then
     // the KTX2 kit-building path moved the five hexb shells onto their own
     // GLB materials, leaving only the chapel pair on the atlas: 7 became 2.
-    const expectedBindings = [2, 1, 1];
+    // Round 6b (owner) re-shelled the chapel onto the KayKit church, so the
+    // last town building leaves the template pipeline too and the town's only
+    // remaining atlas binding is the merged eastbrookTownMicroOpaqueBatch
+    // (the wells, stalls, benches and fences): 2 became 1. The Armoury and the
+    // banker chest are untouched, so their bindings hold at 1 each.
+    const expectedBindings = [1, 1, 1];
 
     expect(maps.length).toBeGreaterThan(0);
     expect(new Set(maps)).toEqual(new Set([atlas]));

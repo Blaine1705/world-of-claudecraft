@@ -25,6 +25,14 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
     ...EASTBROOK_LAYOUT.services.graveyard.position,
   },
   { id: 'gy_vale_chapel', name: 'Vale Chapel Yard', x: 4, z: -56 },
+  // The Vale runs z -180..180, but both yards above sit at its far SOUTH end,
+  // so the nearest-graveyard watershed against Fenbridge Barrow (z 286) fell at
+  // about z 114: every death in the northern third of the zone released into
+  // Mirefen Marsh, a zone the dead player has usually never seen. That went
+  // unnoticed until the Copper Dig relocated from z -86 to z 144 and took the
+  // level 1-7 mine content across the line with it. This third yard covers the
+  // Vale's north and pushes the watershed out past the zone border.
+  { id: 'gy_vale_north', name: 'Dig Road Graves', x: -22, z: 118 },
   // Mirefen Marsh (zone 2)
   {
     id: FENBRIDGE_LAYOUT.services.graveyard.id,

@@ -26,10 +26,14 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // unmoved. Re-pinned for owner refinement round 3 (the coastline pulled to
 // the town, re-threaded streets, three promoted home lots), which forks the
 // shared stream once more: retribution 55.75 to 52.45; holy and protection
-// unmoved. The wide 35-65s design band still holds.
+// unmoved. Re-pinned for owner refinement rounds 6 and 6b (the camps traded
+// ground, the harbour quarter and churchyard landed, the delve and its POI
+// moved to the Mirror Lake shore, three town NPCs were redistributed), which
+// forks the shared stream again: protection 38.65 to 42.7; holy and
+// retribution unmoved. The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 42.45,
-  protection: 38.65,
+  protection: 42.7,
   retribution: 52.45,
 };
 

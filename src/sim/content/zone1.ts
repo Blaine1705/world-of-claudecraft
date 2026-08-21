@@ -67,6 +67,18 @@ export const EASTBROOK_QUAY_TERRAIN_EDITS: HeightStamp[] = [
   { x: -92, z: -46, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
   { x: -92, z: -54, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
   { x: -92, z: -62, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
+  // Round 6: a narrow graded strip under the quay boardwalk itself. A berm ran
+  // along x -99 and punched up THROUGH the planks (groundHeight takes the max
+  // of terrain and deck surface, so the player walked over a dirt hump in the
+  // middle of the boardwalk and the boards drew underground). Radius 4.5 keeps
+  // every stamp east of x -103.5, clear of the cove water near x -104, so no
+  // wet cell is lifted.
+  { x: -98.5, z: -40, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -46, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -52, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -58, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -64, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -70, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
 ];
 
 // Sandy shoreline around the harbor cove's rims near the town (owner
@@ -147,13 +159,15 @@ export const ZONE1_ZONE: ZoneDef = {
   pois: [
     { x: -14, z: -102, label: 'Eastbrook', id: 'eastbrook' },
     { x: 2, z: -4, label: 'Wolf Run', id: 'wolf_run' },
-    { x: 65, z: 0, label: 'Boar Meadow', id: 'boar_meadow' },
+    // follows the boars to their new downs (round 6 swap, then the westward push)
+    { x: 84, z: -47, label: 'Boar Meadow', id: 'boar_meadow' },
     { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
     { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
     { x: -34, z: 142, label: 'Copper Dig', id: 'copper_dig' },
-    { x: 76, z: -76, label: 'Bandit Camp', id: 'bandit_camp' },
+    // stays with Gorrak's camp, which did not move in the round 6 swap
+    { x: 86, z: -86, label: 'Bandit Camp', id: 'bandit_camp' },
     { x: 80, z: 80, label: 'Fallen Chapel', id: 'fallen_chapel' },
-    { x: -5, z: -52, label: 'Reliquary Hill', id: 'reliquary_hill' },
+    { x: -136, z: 112, label: 'Reliquary Hill', id: 'reliquary_hill' },
     { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
     { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
     { x: 150, z: -46, label: 'The Farshore Causeway', id: 'the_farshore_causeway' },
@@ -1654,8 +1668,25 @@ export const ZONE1_CAMPS: CampDef[] = [
   // player to "the deep woods north of the wolf runs").
   { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
   // Boars: west meadow
-  { mobId: 'wild_boar', center: { x: 63, z: 16 }, radius: 26, count: 5 },
-  { mobId: 'wild_boar', center: { x: 84, z: -27 }, radius: 23.5, count: 4 },
+  // Round 6 (owner + team): the boar meadow and the bandit camp trade ground.
+  // The bandits sat closest of any hostile camp to the town gate (disc edge 41
+  // yd from the hub) while the harmless boars had the far meadow, so the two
+  // populations swap and both step north, spacing the zone's encounters more
+  // evenly. Row ORDER is untouched (a reorder would move every later camp's
+  // spawn); only the centers move. BOTH boar rows travel, because the bandit
+  // disc (radius 28.5) does not fit the meadow while the second boar camp
+  // holds its corner of it.
+  // Round 6b (owner): pushed further WEST, off the town's doorstep. Three
+  // things forced the exact spots: a camp levels a disc of radius*1.8 around
+  // itself, so the first placement was flattening the vale road at (30,-30) and
+  // lifting it a yard and a half; camp B sat close enough to Gorrak's camp that
+  // his tents read as bandit gear abandoned in the boar meadow; and camp A's
+  // disc edge was only 42 yd from the town hub. Now the road is outside both
+  // flatten discs, Gorrak's dressing is well clear, camp A's edge is 76 yd from
+  // town, and camp B rejoins Mogger on the downs, who was left behind by the
+  // first move.
+  { mobId: 'wild_boar', center: { x: 76, z: -51 }, radius: 26, count: 5 },
+  { mobId: 'wild_boar', center: { x: 118, z: -34 }, radius: 23.5, count: 4 },
   { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
   // Spiders: eastern woods
   { mobId: 'webwood_spider', center: { x: -70, z: 2 }, radius: 28.5, count: 6 },
@@ -1682,7 +1713,10 @@ export const ZONE1_CAMPS: CampDef[] = [
   // Bandits: southwest camp. Shifted off its own campfire collider and clear of the
   // boar meadow; the tents, crates and supply drops all stay inside the disc, and it
   // no longer merges with the outpost below.
-  { mobId: 'vale_bandit', center: { x: 50, z: -72 }, radius: 28.5, count: 6 },
+  // The main bandit band takes the old boar meadow, a step north of where the
+  // boars stood. Gorrak's own camp below stays put with the boss, so the
+  // Bandit Camp landmark and the ringleader fight keep their ground.
+  { mobId: 'vale_bandit', center: { x: 80, z: 15 }, radius: 28.5, count: 6 },
   { mobId: 'vale_bandit', center: { x: 90, z: -90 }, radius: 16, count: 5 },
   { mobId: 'gorrak', center: { x: 92, z: -92 }, radius: 2, count: 1 },
   // Undead: ruins northwest. The chapel guardians below are the same population, so
@@ -1822,12 +1856,27 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // against the fanned deck rectangles in sim/eastbrook_harbor.ts: each
     // hull's collider stays a full radius plus half-width clear of every
     // walkway, so nobody wedges between hull and rail.
-    { key: 'hexShipBlue', x: -108, z: -35.5, rot: -1.75, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: -109, z: -72.5, rot: 1.55, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: -123, z: -54, rot: -1.6, scale: 6, r: 4, h: 9, float: 0.55 },
+    // Round 6 (owner + team): the fleet re-berthed and grown. Four of the five
+    // hulls used to sit partly on dry land, one of them a yard and a half ABOVE
+    // the waterline in the middle of the graded quay pad, because a decorProp
+    // seats on raw terrain and only sinks to its float draft where the ground
+    // is already below the sea. These berths were measured against the cove
+    // bathymetry so every hull is wet across its whole footprint, and each lies
+    // alongside a pier in the gap the round 6 respacing opened.
+    { key: 'hexShipBlue', x: -115, z: -45, rot: -1.6, scale: 7, r: 4.6, h: 11, float: 0.55 },
+    { key: 'hexShipBlue', x: -115, z: -63, rot: 1.55, scale: 7, r: 4.6, h: 11, float: 0.55 },
+    // a smaller fishing hull riding the fairway west of the ferry berth
+    { key: 'seaBoatFishing', x: -122, z: -54, rot: 0, scale: 2.5, r: 2.4, h: 7, float: 0.5 },
     // dinghies riding the water in the pier gaps, Wickharbor-style
-    { key: 'hexBoat', x: -103, z: -48.5, rot: 0.7, scale: 6, float: 0.1 },
-    { key: 'hexBoat', x: -102, z: -60, rot: -1.9, scale: 6, float: 0.1 },
+    // the two dinghies pulled off the pad and into real water beside the piers
+    { key: 'hexBoat', x: -107.5, z: -47, rot: 0.7, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: -107, z: -61, rot: -1.9, scale: 6, float: 0.1 },
+    // Round 6 (owner): rowboats hauled up the strand south of the quay, the
+    // beached pose the Palmreach shore uses (a hull with no float rides the
+    // ground it stands on).
+    { key: 'rowboat', x: -98.5, z: -74.5, rot: 1.2, scale: 1, r: 1.4, h: 1.2 },
+    { key: 'rowboat', x: -95, z: -78, rot: -0.5, scale: 1, r: 1.4, h: 1.2 },
+    { key: 'rowboat', x: -100, z: -33, rot: 2.4, scale: 1, r: 1.4, h: 1.2 },
     // the small watch tower on the quay's north shoulder, eyes on the fairway
     { key: 'hexWatchtower', x: -89, z: -41, rot: -2.3, scale: 6.5, r: 2.4, h: 12 },
     // tidy quay dressing: the anchor by the tower, cargo clustered at the
@@ -1894,24 +1943,77 @@ export const ZONE1_PROPS: ZonePropsDef = {
       hw: 4.2,
       hd: 4.05,
     },
+    // Round 6 (owner): the Pale Keeper's yard rebuilt on the Evergarden
+    // churchyard idiom (content/evergarden.ts): a wrought-iron enclosure of
+    // corner pillars and 4yd rails at a 3.5yd pitch, walk-through dressing with
+    // no colliders, wrapping the graves with ONE side left gateless. The open
+    // side is the EAST, because that is where the chapel, Brother Aldric, the
+    // north road and the graveyard approach route all arrive; a closed box
+    // there would fence the road out of its own churchyard. The town chapel at
+    // (2,-78) sits a stride south of the south run, so church and yard read as
+    // one place, and the lot the removed rise house left is the west half.
+    { key: 'gardenIronPillar', x: -13, z: -73.5 },
+    { key: 'gardenIronPillar', x: 3.2, z: -73.5 },
+    { key: 'gardenIronPillar', x: -13, z: -66 },
+    { key: 'gardenIronPillar', x: 3.2, z: -66 },
+    { key: 'gardenIronFence', x: -11, z: -73.5 },
+    { key: 'gardenIronFence', x: -7.5, z: -73.5 },
+    { key: 'gardenIronFence', x: -4, z: -73.5 },
+    { key: 'gardenIronFence', x: -0.5, z: -73.5 },
+    { key: 'gardenIronFence', x: 2.2, z: -73.5 },
+    { key: 'gardenIronFence', x: -11, z: -66 },
+    { key: 'gardenIronFence', x: -7.5, z: -66 },
+    { key: 'gardenIronFence', x: -4, z: -66 },
+    { key: 'gardenIronFence', x: -0.5, z: -66 },
+    { key: 'gardenIronFence', x: 2.2, z: -66 },
+    { key: 'gardenIronFence', x: -13, z: -71.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: -13, z: -68, rot: Math.PI / 2 },
+    // two yews for churchyard shade, clear of both grave plots
+    { key: 'oakTree', x: -11.5, z: -71.8, rot: 0.6, scale: 1.3, r: 0.8, h: 9 },
+    { key: 'oakTree', x: -11.5, z: -67.6, rot: -1.1, scale: 1.2, r: 0.8, h: 9 },
+    // Round 6 (owner): kitchen gardens behind the harbour quarter's houses and
+    // a bench at each door. Walk-through dressing like the churchyard rails, so
+    // a garden never becomes an invisible wall across the seaward approach.
+    // Every spot was probed clear of the roads and of its own house footprint.
+    { key: 'fence', x: -77.1, z: -98.5, rot: 0.94, scale: 3 },
+    { key: 'fence', x: -75, z: -96.9, rot: 0.94, scale: 3 },
+    { key: 'fence', x: -78.7, z: -96.4, rot: -0.63, scale: 3 },
+    { key: 'fence', x: -45.1, z: -108.5, rot: 0.94, scale: 3 },
+    { key: 'fence', x: -43, z: -106.9, rot: 0.94, scale: 3 },
+    { key: 'fence', x: -46.7, z: -106.4, rot: -0.63, scale: 3 },
+    { key: 'shrubFlowering', x: -76.2, z: -97.6, rot: 0.3, scale: 0.9 },
+    { key: 'shrubFlowering', x: -44.2, z: -107.6, rot: -0.8, scale: 0.95 },
+    { key: 'kcasBench', x: -86.4, z: -105.2, rot: -2.2, scale: 1.6 },
+    { key: 'kcasBench', x: -72.4, z: -111.2, rot: -2.2, scale: 1.6 },
+    { key: 'kcasBench', x: -54.4, z: -115.2, rot: -2.2, scale: 1.6 },
   ],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
+  // The first two tents, the first two crates and the first campfire are the
+  // main bandit band's camp dressing and travelled north with it in the round 6
+  // swap; the rest belong to Gorrak's camp, which did not move.
   tents: [
-    { x: 62, z: -61, rot: 0.4, scale: 1 },
-    { x: 69, z: -69, rot: 2.1, scale: 1 },
+    { x: 58, z: 25, rot: 0.4, scale: 1 },
+    { x: 68, z: 16, rot: 2.1, scale: 1 },
     { x: 88, z: -86, rot: 1.2, scale: 1.3 },
     { x: 95, z: -94, rot: -0.6, scale: 1 },
+    // Round 6 (owner): a fisherman's camp on the strand south of the quay,
+    // sharing its fire with the rowboats hauled up beside it
+    { x: -90.5, z: -78.5, rot: -0.9, scale: 1 },
   ],
   crates: [
-    [60, -63],
-    [66, -67],
+    [56, 22],
+    [64, 26],
     [87, -88],
     [93, -90],
-    [70, -72],
+    [66, 14],
   ],
   campfires: [
-    [65, -65],
+    // off the camp centre on purpose: a campfire carries a collider, and a
+    // camp whose centre is blocked cannot seat its spawns
+    [59, 17],
     [90, -90],
+    // the shore camp's fire, beside the beached rowboats (round 6)
+    [-93.5, -76.5],
     [-30, 146],
     [-61, 56],
   ],
@@ -1958,6 +2060,23 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // the collider builder places the pylon colliders from this.
     ...(wallSegmentMirrored(segment) ? { mirrored: true as const } : {}),
   })),
-  graveyards: [{ ...EASTBROOK_LAYOUT.services.graveyard.position }, { x: 4, z: -56 }],
-  delveMarkers: [{ x: -5, z: -52, delveId: 'collapsed_reliquary' }],
+  // The third anchor is the north-Vale yard on the Copper Dig road: every
+  // graveyard record spawns a Pale Keeper, and a keeper with no graves under
+  // her reads as a bug, so the headstone cluster goes where the release does
+  // (content/graveyards.ts gy_vale_north).
+  graveyards: [
+    { ...EASTBROOK_LAYOUT.services.graveyard.position },
+    { x: 4, z: -56 },
+    { x: -22, z: 118 },
+    // Round 6 (owner): a second plot filling the west half of the churchyard
+    // enclosure. Anchors here render six more standable headstones; only the
+    // OVERWORLD_GRAVEYARDS rows spawn a Pale Keeper, so this plot adds graves
+    // without a second angel hovering ten yards from the first.
+    { x: -9, z: -70 },
+  ],
+  // Round 6b (owner): the Collapsed Reliquary moved off the town's chapel rise
+  // to the Mirror Lake shore. The lake's own margin is marsh and the north
+  // beach sits barely a foot above the tideline, so the mouth takes the
+  // nearest stable ground, 18 yd off the water.
+  delveMarkers: [{ x: -136, z: 112, delveId: 'collapsed_reliquary' }],
 };

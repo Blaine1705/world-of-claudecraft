@@ -197,8 +197,14 @@ interface AttributionTargetFixture {
 // captureContract leaf too. No capture was retaken: the accepted evidence
 // keeps its pre-move framing (frozen in the artifact-integrity suite) and
 // only the swept provenance bytes follow the merged inputs.
+// Re-minted for owner refinement round 6b: the chapel re-shell and the NPC
+// redistribution move the authoritativeLayout leaf (src/sim/eastbrook_layout.ts)
+// and re-aiming the apothecary-lin view at Lin's quayside stand moves the
+// captureContract leaf, so the composite mints anew. No capture was retaken:
+// the accepted evidence keeps its frozen framing and only the swept provenance
+// bytes follow the merged inputs.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '7966fe0fee74d26d72bd96747a56bb7aa9d8314eefdead83a4fe4fd4a46affbf';
+  'ba6e6072fdf28dd43539951a630e18e562ff5393c61b029873875ac03ee76373';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -888,11 +894,16 @@ describe('Eastbrook polish capture contract', () => {
     // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): Lin now serves
     // the market square, Saul the Ravenpost mailbox lane, and FURY the
     // graveyard approach (the view name stays immutable evidence naming).
+    // Re-pinned for owner refinement round 6b: the town's NPCs were
+    // redistributed by role along the dock road, moving Lin from the civic
+    // green to the quayside home at (-72, -96). Her portrait view follows her
+    // (target on the authored stand, camera 7 yd out along her facing);
+    // Saul and FURY did not move, so their rows are unchanged.
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
-        camera: { x: -15, y: 6, z: -104 },
-        target: { x: -12, y: 2.5, z: -97.5 },
+        camera: { x: -65, y: 6, z: -96 },
+        target: { x: -72, y: 2.5, z: -96 },
       },
       'ravenpost-chronicler': {
         subject: 'chronicler_saul',

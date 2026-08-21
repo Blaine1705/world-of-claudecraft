@@ -267,7 +267,27 @@ describe('generated chunk geometry is stable', () => {
     // re-lay regrades along the new line. Computed twice in separate
     // processes, identical both times. An intended, looked-at world
     // change, not drift.
-    expect(digestOf(inRect)).toBe('fe924ca216d703d8bfa5b162d85216b8');
+    // Re-minted for owner round 6 (the team-feedback wave). Four world edits
+    // reshape ground here, all of them intended: the boar and bandit camps
+    // traded ground and stepped north, so their flatten discs and calm rings
+    // moved with them (a camp levels a disc of radius*1.8 around its centre);
+    // the quay boardwalk gained a narrow graded strip under its planks, where a
+    // berm used to punch up THROUGH the deck; the churchyard enclosure, its
+    // second grave plot and the harbour quarter's gardens mint new calm
+    // anchors; and three coastal buildings joined the town. The rise house that
+    // left the chapel green does NOT appear here (buildings mint no calm pad).
+    // Computed twice in separate processes, identical both times. An intended,
+    // looked-at world change, not drift.
+    // Re-minted again for owner round 6b: three town NPCs were redistributed by
+    // role along the dock road (marshal_redbrook, apothecary_lin, card_master)
+    // and their calm pads travelled with them, while the Collapsed Reliquary
+    // delve marker and the reliquary_hill POI both left the town chapel rise
+    // for the Mirror Lake shore, taking their calm anchors off this ground. The
+    // chapel re-shell changes NO terrain: it swaps the building's mesh and
+    // height only, and a building mints no calm pad or height stamp. Computed
+    // twice in separate processes, identical both times. An intended,
+    // looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('206fba366edcfc5160616fe87f3ec1d5');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 

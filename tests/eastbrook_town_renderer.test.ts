@@ -332,12 +332,23 @@ describe('Eastbrook town renderer', () => {
     // kit shadow draws plus the chapel opaque and the micro opaque batch
     // (18); colorDraws is 28 (16 kit clone materials + 8 window-pane meshes,
     // one detected assembly per kit fixture, which never cast + the chapel
-    // opaque+emissive pair + the 2 micro batches).
+    // opaque+emissive pair + the 2 micro batches). Re-pinned again for round
+    // 6: the town gained the harbour quarter's three coastal buildings, so the
+    // ten kit instances give 20 kit shadow draws plus the chapel opaque and
+    // the micro opaque batch (22), and colorDraws is 34 (20 kit clone
+    // materials + 10 window panes + the chapel pair + the 2 micro batches).
+    // Round 6b (owner) re-shelled the chapel onto the KayKit church, so it
+    // leaves the template pipeline and joins the kit path: all ELEVEN lots are
+    // kit instances now. The chapel's single opaque template mesh plus its
+    // emissive mesh become two clone materials plus one window pane, so
+    // colorDraws goes 34 to 35 (22 clone materials + 11 window panes + the 2
+    // micro batches) and shadowDraws 22 to 23 (the 22 clones + the micro
+    // opaque batch). The panes still never cast.
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({
-      colorDraws: 28,
-      shadowDraws: 18,
-      buildingCount: 9,
-      roofHideTargetCount: 9,
+      colorDraws: 35,
+      shadowDraws: 23,
+      buildingCount: 11,
+      roofHideTargetCount: 11,
       microBatchCount: 2,
       wallBatchCount: 0,
       wallSegmentCount: 0,
@@ -504,8 +515,15 @@ describe('Eastbrook town renderer', () => {
     // models' own assemblies): 28 meshes are the 8 kit instances' 16 raw GLB
     // clones, their 8 window-pane meshes (one detected assembly per kit
     // fixture), the chapel opaque+emissive pair, and the 2 micro batches;
-    // the 4 wall InstancedMeshes no longer exist.
-    expect(meshes).toHaveLength(28);
+    // the 4 wall InstancedMeshes no longer exist. Round 6 grew every count by
+    // the harbour quarter's three coastal buildings: 34 meshes are the 10 kit
+    // instances' 20 raw GLB clones, their 10 window-pane meshes, the chapel
+    // pair, and the 2 micro batches. Round 6b re-shelled the chapel onto the
+    // KayKit church, which moves the last template-pipeline building onto the
+    // kit path: 35 meshes are the 11 kit instances' 22 raw GLB clones, their 11
+    // window-pane meshes, and the 2 micro batches, with no template building
+    // mesh left at all.
+    expect(meshes).toHaveLength(35);
     const kitBuildings = EASTBROOK_LAYOUT.buildings.filter((building) =>
       isKitBuildingAsset(building.assetId),
     );
@@ -521,9 +539,11 @@ describe('Eastbrook town renderer', () => {
     const templateMeshes = meshes.filter(
       (mesh) => !kitMeshes.includes(mesh) && !paneMeshes.includes(mesh as THREE.Mesh),
     );
-    expect(kitMeshes).toHaveLength(16);
-    expect(paneMeshes).toHaveLength(8);
-    expect(templateMeshes).toHaveLength(4);
+    expect(kitMeshes).toHaveLength(22);
+    expect(paneMeshes).toHaveLength(11);
+    // Round 6b: the only template-path meshes left in town are the 2 micro
+    // batches; the chapel pair that used to join them is a kit clone now.
+    expect(templateMeshes).toHaveLength(2);
     // The template pipeline swaps to shared Lambert vertex-color materials on
     // Low. The kit clones keep their OWN authored GLB materials on every tier
     // (their color is in KTX2 palette textures, not vertex colors), cloned
@@ -545,15 +565,15 @@ describe('Eastbrook town renderer', () => {
         ['TownOpaque', 'TownEmissive'].includes((mesh.material as THREE.Material).name),
       ),
     ).toBe(true);
-    expect(new Set(kitMeshes.map((mesh) => mesh.material)).size).toBe(16);
+    expect(new Set(kitMeshes.map((mesh) => mesh.material)).size).toBe(22);
     expect(
       paneMeshes.every((mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial'),
     ).toBe(true);
     expect(
       paneMeshes.every((mesh) => (mesh.material as THREE.MeshLambertMaterial).vertexColors),
     ).toBe(true);
-    expect(new Set(paneMeshes.map((mesh) => mesh.material)).size).toBe(8);
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 28, shadowDraws: 18 });
+    expect(new Set(paneMeshes.map((mesh) => mesh.material)).size).toBe(11);
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 35, shadowDraws: 23 });
   });
 
   it('mirrors exactly the first real wall chord after each asymmetric gate socket', async () => {
@@ -805,13 +825,23 @@ describe('Eastbrook repeated placement triangle budget', () => {
     // docs/design/eastbrook-revamp/site-plan.md), then the owner's Galecrest
     // building mix swapped five shells for the lighter hexb kit models, then
     // round 3 promoted the trio of decor homes into kit lots (two more
-    // hexb_home_a instances and one hexb_home_b, plus their skirts).
-    expect(budget.assetTriangles).toBe(24_685);
-    expect(budget.maximumFoundationTriangles).toBe(108);
+    // hexb_home_a instances and one hexb_home_b, plus their skirts). Round 6
+    // took eastbrook_home_rise back out (one hexb_home_a and its skirt), then
+    // appended the harbour quarter's three coastal buildings: the first
+    // hexb_market lot the town has ever seated (3,125), one more hexb_home_b
+    // (1,393), and one more hexb_home_a (1,011), plus a 12-triangle skirt
+    // each. Round 6b (owner) re-shelled the chapel onto the KayKit church:
+    // the bespoke eastbrook_chapel.glb (4,120) leaves the town's asset set and
+    // hex_church.glb (1,601) takes its one instance, so the aggregate DROPS by
+    // 2,519 with the building count and the 132-triangle skirt allowance
+    // unchanged. 29,203 becomes 26,684 and the runtime total 29,335 becomes
+    // 26,816, further under the 30,000 target than before.
+    expect(budget.assetTriangles).toBe(26_684);
+    expect(budget.maximumFoundationTriangles).toBe(132);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(24_793);
+    expect(budget.maximumRuntimeTriangles).toBe(26_816);
     expect(
       budget.maximumRuntimeTriangles,
       JSON.stringify({

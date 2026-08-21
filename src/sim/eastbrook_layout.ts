@@ -257,6 +257,19 @@ function deepFreeze<T>(value: T): T {
 export const REMOVED_EASTBROOK_PLACEMENTS = deepFreeze({
   buildings: [
     {
+      // Round 6 (owner): the house crowded the chapel green, standing between
+      // Brother Aldric and the graves where the churchyard wall now runs. Its
+      // lot is the north half of the new enclosure.
+      id: 'eastbrook_home_rise',
+      disposition: 'removed_after_live_review',
+      kind: 'house',
+      x: -8,
+      z: -82,
+      width: 6.9,
+      depth: 5.6,
+      rotation: 1.17,
+    },
+    {
       id: 'legacy_eastbrook_house_northeast',
       disposition: 'removed',
       kind: 'house',
@@ -626,13 +639,21 @@ const BUILDINGS = [
     -2.5535900500422257,
     0.8,
   ),
+  // Round 6b (owner): re-shelled as the KayKit church. The bespoke
+  // eastbrook_chapel.glb was the last pre-kit building in town and read as an
+  // odd grey leftover beside the coloured kit shells. The building ID is kept
+  // deliberately: Brother Aldric's stand and facing, FURY's anchor and the
+  // chapel capture view all resolve through it, so re-shelling changes the mesh
+  // without disturbing any of them. Footprint is unchanged (nothing new can
+  // collide with the churchyard rails), height raised so the spire reads, and
+  // the kit shell is 2,519 triangles lighter than the bespoke one.
   makeBuilding(
     'eastbrook_chapel',
-    '/models/props/eastbrook_chapel.glb',
+    '/models/biome/hex_church.glb',
     'chapel',
     { x: 2, z: -78 },
     5.5,
-    7,
+    9,
     6,
     0.7853981633974483,
   ),
@@ -676,15 +697,42 @@ const BUILDINGS = [
     5.6,
     -1.46,
   ),
+  // Round 6 (owner + team): the harbour quarter. The town used to stop dead at
+  // the inn and leave sixty yards of empty road between it and the quay, which
+  // read as a village with a dock bolted on rather than a harbour town. These
+  // six lots line the dock road out to the headland, alternating sides the way
+  // a real street grows, each seated on ground probed level (slope under 0.06)
+  // and dry, set back from the road centreline and clear of every neighbour.
+  // APPENDED, never inserted: zone1 spreads this array by index.
   makeBuilding(
-    'eastbrook_home_rise',
+    'eastbrook_quayside_home',
+    '/models/biome/hexb_home_b.glb',
+    'house',
+    { x: -82, z: -102 },
+    6.9,
+    10.6,
+    5.6,
+    -2.2,
+  ),
+  makeBuilding(
+    'eastbrook_harbour_market',
+    '/models/biome/hexb_market.glb',
+    'house',
+    { x: -68, z: -108 },
+    8.6,
+    7.5,
+    7,
+    -2.2,
+  ),
+  makeBuilding(
+    'eastbrook_dock_home',
     '/models/biome/hexb_home_a.glb',
     'house',
-    { x: -8, z: -82 },
+    { x: -50, z: -112 },
     6.9,
     9.4,
     5.6,
-    1.17,
+    -2.2,
   ),
 ] as const;
 
@@ -1033,7 +1081,7 @@ const TRADER_POSITION = localToWorld(
 );
 // Lin is a quest herbalist, not a merchant. Keep her already-clear civic-green
 // position without inventing a replacement stall or blocking the smithy sightline.
-const APOTHECARY_POSITION = { x: -12, z: -97.5 } as const;
+const APOTHECARY_POSITION = { x: -72, z: -96 } as const;
 // Station cluster props sit at station + world-axis offsets (town_props.ts,
 // no rotation), so the smith's and cook's work points derive the same way.
 // Round 4: the smith stands on the yard's open corner, half a stride clear
@@ -1070,7 +1118,13 @@ const FURY_POSITION = { x: -2, z: -74 } as const;
 // bank's rotated lot (the 45-degree townhall footprint owns that corner),
 // so the watch stands on the green south of the board instead: outside the
 // envelope, off the posting lane, facing the civic square he polices.
-const MARSHAL_POSITION = { x: 3.6, z: -95.6 } as const;
+// Round 6b (owner): the town's NPCs are laid out by ROLE along the dockside
+// road. Quest givers sit nearest the quay, because a new character spawns
+// there and the zone's welcome line sends them to Redbrook: he used to be an
+// eighty yard walk inland. Profession masters stay mid-town with their
+// crafting stations (a forge master cannot leave the forge), and service NPCs
+// sit out on the edges. Each group is spread, not clustered.
+const MARSHAL_POSITION = { x: -58, z: -102 } as const;
 
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
@@ -1078,10 +1132,15 @@ const NPCS = [
     'marshal_redbrook',
     MARSHAL_POSITION,
     facingToward(MARSHAL_POSITION, CIVIC_CENTER),
-    'eastbrook_noticeboard',
+    'eastbrook_harbour_market',
   ),
   makeNpc('trader_wilkes', TRADER_POSITION, MARKET_STALLS[1].rotation, MARKET_STALLS[1].id),
-  makeNpc('apothecary_lin', APOTHECARY_POSITION, -2.723368324010564, 'eastbrook_civic_well_beacon'),
+  makeNpc(
+    'apothecary_lin',
+    APOTHECARY_POSITION,
+    facingToward(APOTHECARY_POSITION, CIVIC_CENTER),
+    'eastbrook_quayside_home',
+  ),
   makeNpc('brother_aldric', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
   makeNpc(
     'smith_haldren',
@@ -1094,7 +1153,7 @@ const NPCS = [
   makeNpc('fisherman_brandt', { x: -95, z: -50 }, -1.5707963267948966, 'eastbrook_quay'),
   makeNpc('foreman_odell', { x: -84, z: -63 }, 0.6747409422235526, 'eastbrook_quay'),
   makeNpc('bursar_fernando', BANK.frontStandingPoint, BANK.rotation, BANK.id),
-  makeNpc('card_master', { x: -34, z: -92 }, -2.677945044588987, 'eastbrook_inn'),
+  makeNpc('card_master', { x: 20, z: -98 }, -2.677945044588987, 'eastbrook_bank'),
   makeNpc('chronicler_saul', SAUL_POSITION, TOOLWORKS.rotation, 'mailbox_eastbrook'),
   makeNpc('forgemistress_darva', DARVA_POSITION, SMITHY.rotation, FORGE_STATION.id),
   makeNpc(

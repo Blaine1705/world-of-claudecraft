@@ -382,9 +382,15 @@ describe('interaction.interact dispatch', () => {
     // board; the same 2yd offset south keeps him the nearest NPC (2.0yd, vs
     // bursar_fernando 4.9) with no lootable in scan range (the board sits
     // 8.7yd off).
+    // Re-pinned again for owner refinement round 6b, which redistributed the
+    // town's NPCs by role along the dock road: the q_wolves giver moved out to
+    // the harbour market at (-58, -102), so the probe follows him. The same 2yd
+    // offset south holds every premise this test needs: he is the only entity
+    // of any kind within 12yd of the stand, so he is the nearest quest NPC and
+    // no lootable or ground object is in interact's scan range.
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true }) as AnySim;
     const p = sim.player;
-    place(sim, p, 3.6, -97.6);
+    place(sim, p, -58, -100);
     expect(sim.questState('q_wolves')).toBe('available');
     interaction.interact(ctxOf(sim), p.id);
     expect(sim.questState('q_wolves')).toBe('active');

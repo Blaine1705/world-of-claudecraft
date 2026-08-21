@@ -111,11 +111,21 @@ const SHIPPED_PLACEMENT: { x: number; z: number }[] = [
   // follows it (was { x: -15, z: 55 }, the pre-move north-woods spot).
   { x: -10, z: 6 },
   { x: 20, z: 70 },
-  { x: 55, z: 12 },
-  { x: 80, z: -15 },
+  // Camps 3, 4 (wild_boar) and 9 (vale_bandit) re-pinned 2026-08 for the
+  // owner-approved population swap: the bandit camp sat closer to the town gate
+  // than any other hostile camp while the harmless boars held the far meadow,
+  // so the two traded ground and both stepped north. Like camp 0 above this is
+  // a maintainer-approved RELOCATION, not a spacing push, so the baselines
+  // follow the move rather than the bearing guard vetoing it (were
+  // { x: 55, z: 12 }, { x: 80, z: -15 } and { x: 65, z: -65 }). Both boar rows
+  // travelled because the bandit disc does not fit the meadow while the second
+  // boar camp holds its corner. The guard keeps its teeth for every later
+  // change: any drift from THESE spots still has to stay inside 15 degrees.
+  { x: 76, z: -51 },
+  { x: 118, z: -34 },
   { x: -60, z: 5 },
   { x: -75, z: 57 },
-  { x: 65, z: -65 },
+  { x: 80, z: 15 },
   { x: 80, z: 78 },
 ];
 

@@ -309,8 +309,12 @@ describe('parties', () => {
     // docs/design/eastbrook-revamp/site-plan.md): marshal_redbrook (the
     // q_wolves giver) now stands at (10, -97.5) by the noticeboard; stand the
     // duo just south of him so acceptQuest's interact-range gate passes.
-    teleport(sim, a, 10, -95.5);
-    teleport(sim, b, 10, -94.5);
+    // Re-pinned for owner refinement round 6b, which redistributed the town's
+    // NPCs by role along the dock road: Redbrook moved out to the harbour
+    // market at (-58, -102), so the duo stands 2 and 3 yards south of his new
+    // stand, both well inside the 5 yard interact gate.
+    teleport(sim, a, -58, -100);
+    teleport(sim, b, -58, -99);
     sim.acceptQuest('q_wolves', a);
     sim.acceptQuest('q_wolves', b);
     const wolf = nearestMob(sim, 'forest_wolf');

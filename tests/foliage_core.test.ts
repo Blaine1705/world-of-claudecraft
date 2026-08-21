@@ -36,7 +36,15 @@ describe('Eastbrook town grass exclusion', () => {
     // service-apron circle left the snapshot (63 obb + 28 circle). The
     // barracks garrison that took the lot is a zone1 decor prop, outside
     // this layout-derived snapshot by design.
-    expect(exclusions).toHaveLength(91);
+    // Re-pinned for round 6: eastbrook_home_rise was removed from the layout
+    // after live review, taking its footprint OBB and service-apron circle
+    // with it (62 obb + 27 circle). The wrought-iron churchyard enclosure
+    // that now holds its lot is a zone1 decor prop, so it does not come back
+    // into this snapshot. Re-pinned again for the same round's harbour
+    // quarter: the town gained three coastal buildings along the dock road,
+    // and each one contributes exactly two rows, a footprint OBB and a
+    // service-apron circle (65 obb + 30 circle).
+    expect(exclusions).toHaveLength(95);
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
@@ -69,7 +77,11 @@ describe('Eastbrook town grass exclusion', () => {
     // Re-pinned 2026-08 round 3: every kit building grew so its door reads
     // at player height (the chapel is a bespoke asset and stays as shipped),
     // and the three promoted homes carry first-class lots of their own now.
-    // Round 4 retired the Grand Armoury row with its placement.
+    // Round 4 retired the Grand Armoury row with its placement, and round 6
+    // retired the eastbrook_home_rise row the same way when the house came
+    // out of the layout after live review. Round 6 also grew the table by
+    // three rows when the town gained the coastal harbour-quarter buildings,
+    // including the first hexb_market lot Eastbrook has ever seated.
     const expectedObbDimensions = {
       eastbrook_bank: [4.3, 3.45],
       eastbrook_smithy: [4.2, 3.3],
@@ -79,7 +91,9 @@ describe('Eastbrook town grass exclusion', () => {
       eastbrook_toolworks: [3.45, 2.8],
       eastbrook_home_market: [3.45, 2.8],
       eastbrook_home_east: [3.45, 2.8],
-      eastbrook_home_rise: [3.45, 2.8],
+      eastbrook_quayside_home: [3.45, 2.8],
+      eastbrook_harbour_market: [4.3, 3.5],
+      eastbrook_dock_home: [3.45, 2.8],
     } as const;
     for (const [id, [halfWidth, halfDepth]] of Object.entries(expectedObbDimensions)) {
       expect(byId.get(id)).toMatchObject({ kind: 'obb', halfWidth, halfDepth });

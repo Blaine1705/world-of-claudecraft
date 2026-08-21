@@ -169,8 +169,12 @@ describe('Eastbrook Grand Armoury retirement (round 4)', () => {
     expect(EASTBROOK_LAYOUT.preservedBuildings).toEqual([]);
     expect(EASTBROOK_BUILDINGS_BY_ID.eastbrook_grand_armoury).toBeUndefined();
     // Round 4: the round-3 table held ten rows (armoury + nine layout lots);
-    // the armoury row left, so the table is exactly the nine authored lots.
-    expect(ZONE1_PROPS.buildings).toHaveLength(9);
+    // the armoury row left, so the table is exactly the authored lots.
+    // Round 6 (owner) then removed eastbrook_home_rise from the layout after
+    // live review, dropping the authored lots to eight rows, and afterwards
+    // appended the harbour quarter's three coastal buildings, so the table is
+    // eleven rows now.
+    expect(ZONE1_PROPS.buildings).toHaveLength(11);
     expect(ZONE1_PROPS.buildings.map((building) => building.id)).toEqual(
       EASTBROOK_LAYOUT.buildings.map((building) => building.id),
     );
@@ -256,13 +260,23 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     player.inCombat = true;
     expect(isResting(player)).toBe(false);
 
+    // The inn's rest footprint is the authored one and nothing else grants
+    // rest: the inn row plus its 2 yard padding is the whole area.
     player.inCombat = false;
+    player.pos.x = EASTBROOK_BUILDINGS_BY_ID.eastbrook_inn.position.x;
+    player.pos.z = EASTBROOK_BUILDINGS_BY_ID.eastbrook_inn.position.z;
+    expect(isResting(player)).toBe(true);
+
     player.pos.x = NPCS.card_master.pos.x;
     player.pos.z = NPCS.card_master.pos.z;
-    // The card table sits on the inn porch (anchored to eastbrook_inn),
-    // inside the inn's authored rest footprint, so resting there is the
-    // authored behavior.
-    expect(isResting(player)).toBe(true);
+    // The card table USED to sit on the inn porch (anchored to eastbrook_inn),
+    // inside the inn's authored rest footprint. Owner refinement round 6b
+    // redistributed the town's NPCs by role and moved the Card Master across
+    // to the bank at (20, -98), sixty yards off the inn at (-38, -88), so the
+    // authored behavior at his stand is now NO rest. The move is deliberate,
+    // and this row follows it rather than the reverse: rest belongs to the
+    // inn, not to the Card Master.
+    expect(isResting(player)).toBe(false);
     // The landmark's narrow threshold halo stays the adapter's rule for
     // custom worlds that place it.
     expect(buildingRestPadding(LANDMARK_FIXTURE)).toBe(0.9);
@@ -517,7 +531,18 @@ describe('Eastbrook Grand Armoury render seam (custom-world adapter)', () => {
     );
     // Re-pinned 2026-08 to the seed-162 envelope after the Eastbrook harbor
     // move's terrain re-sculpt (d19aa33f76,
-    // docs/design/eastbrook-revamp/site-plan.md).
+    // docs/design/eastbrook-revamp/site-plan.md). Re-pinned again for the
+    // round-6 camp and POI moves (wild boar and vale bandit centers, the
+    // boar_meadow and bandit_camp markers): the world-gen draws they feed
+    // shift the sampled ground under this lot by a fraction of a unit, so the
+    // envelope minimum and the skirt depth it derives both move. The entrance
+    // sample and the placement height are unchanged.
+    // Re-pinned once more for round 6b (the delve and reliquary_hill POI moved
+    // to the Mirror Lake shore, three town NPCs were redistributed): those
+    // draws land the sampled ground under this lot back on the exact
+    // pre-round-6 envelope, so the minimum and the skirt depth return to the
+    // values they carried before the camp and POI moves. The entrance sample
+    // and the placement height never moved through either round.
     expect(alternatePlacement.entranceGroundY).toBeCloseTo(7.886894391475175, 8);
     expect(alternatePlacement.minGroundY).toBeCloseTo(5.559724942256701, 8);
     expect(alternatePlacement.y).toBeCloseTo(6.536894391475174, 8);

@@ -55,6 +55,20 @@ describe('removed Eastbrook placement inventory', () => {
   it('literally pins every collision-bearing town placement being replaced', () => {
     expect(REMOVED_EASTBROOK_PLACEMENTS.buildings).toEqual([
       {
+        // Round 6 (owner): the rise house crowded the chapel green and stood
+        // between Brother Aldric and the graves, so it left the layout after
+        // live review and its lot became the north half of the new churchyard
+        // enclosure. It joins the inventory as a removed placement.
+        id: 'eastbrook_home_rise',
+        disposition: 'removed_after_live_review',
+        kind: 'house',
+        x: -8,
+        z: -82,
+        width: 6.9,
+        depth: 5.6,
+        rotation: 1.17,
+      },
+      {
         id: 'legacy_eastbrook_house_northeast',
         disposition: 'removed',
         kind: 'house',
@@ -362,8 +376,16 @@ describe('authoritative Eastbrook replacement plan', () => {
     // docs/design/eastbrook-revamp/site-plan.md), then again for owner
     // refinement round 3: every kit lot grew so its door reads at player
     // height, and the trio of homes that were zone1 decor props are
-    // first-class houses now (nine buildings; the chapel keeps its authored
-    // proportions).
+    // first-class houses now (the chapel keeps its authored proportions).
+    // Round 6 (owner) dropped eastbrook_home_rise from the table after live
+    // review, so the count fell to eight buildings, not nine, and the removed
+    // row now lives in REMOVED_EASTBROOK_PLACEMENTS.buildings. The same round
+    // then appended the harbour quarter, three coastal lots lining the dock
+    // road out to the headland, so the table is eleven buildings now.
+    // Round 6b (owner) re-shelled the chapel onto the KayKit church: same id,
+    // same position, same rotation and footprint, but the assetId is
+    // '/models/biome/hex_church.glb' and the height rose from 7 to 9 so the
+    // spire reads, which is why only those two fields moved in this table.
     expect(
       EASTBROOK_LAYOUT.buildings.map((building) => ({
         id: building.id,
@@ -425,7 +447,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       },
       {
         id: 'eastbrook_chapel',
-        assetId: '/models/props/eastbrook_chapel.glb',
+        assetId: '/models/biome/hex_church.glb',
         kind: 'chapel',
         position: {
           x: 2,
@@ -433,7 +455,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         },
         nativeDimensions: {
           width: 5.5,
-          height: 7,
+          height: 9,
           depth: 6,
         },
         rotation: 0.7853981633974483,
@@ -504,19 +526,51 @@ describe('authoritative Eastbrook replacement plan', () => {
         maxCornerRadius: 4.443253312607778,
       },
       {
-        id: 'eastbrook_home_rise',
+        id: 'eastbrook_quayside_home',
+        assetId: '/models/biome/hexb_home_b.glb',
+        kind: 'house',
+        position: {
+          x: -82,
+          z: -102,
+        },
+        nativeDimensions: {
+          width: 6.9,
+          height: 10.6,
+          depth: 5.6,
+        },
+        rotation: -2.2,
+        maxCornerRadius: 4.443253312607778,
+      },
+      {
+        id: 'eastbrook_harbour_market',
+        assetId: '/models/biome/hexb_market.glb',
+        kind: 'house',
+        position: {
+          x: -68,
+          z: -108,
+        },
+        nativeDimensions: {
+          width: 8.6,
+          height: 7.5,
+          depth: 7,
+        },
+        rotation: -2.2,
+        maxCornerRadius: 5.544366510251644,
+      },
+      {
+        id: 'eastbrook_dock_home',
         assetId: '/models/biome/hexb_home_a.glb',
         kind: 'house',
         position: {
-          x: -8,
-          z: -82,
+          x: -50,
+          z: -112,
         },
         nativeDimensions: {
           width: 6.9,
           height: 9.4,
           depth: 5.6,
         },
-        rotation: 1.17,
+        rotation: -2.2,
         maxCornerRadius: 4.443253312607778,
       },
     ]);
@@ -1100,6 +1154,11 @@ describe('layout clearance and service anchors', () => {
     // the civic square, the graveyard to the chapel green, and all sixteen
     // NPCs spread across the harbor districts (the quay pair anchor on
     // 'eastbrook_quay').
+    // Re-pinned again for owner refinement round 6b, which redistributed the
+    // town's NPCs by role along the dock road: marshal_redbrook moved out to
+    // the harbour market, apothecary_lin to the quayside home (her facing is
+    // derived from facingToward(CIVIC_CENTER) now, not a hand-set angle), and
+    // card_master across to the bank.
     expect(EASTBROOK_LAYOUT.services.playerStart).toEqual({
       id: 'eastbrook_player_start',
       position: { x: -94, z: -58 },
@@ -1223,7 +1282,7 @@ describe('layout clearance and service anchors', () => {
         2.4805494847391065,
         'eastbrook_market_stall_world_market',
       ],
-      ['marshal_redbrook', 3.6, -95.6, -1.919567330378804, 'eastbrook_noticeboard'],
+      ['marshal_redbrook', -58, -102, 1.5707963267948966, 'eastbrook_harbour_market'],
       [
         'trader_wilkes',
         -16.333512834321652,
@@ -1231,7 +1290,7 @@ describe('layout clearance and service anchors', () => {
         0.6610431688506869,
         'eastbrook_market_stall_provisions',
       ],
-      ['apothecary_lin', -12, -97.5, -2.723368324010564, 'eastbrook_civic_well_beacon'],
+      ['apothecary_lin', -72, -96, 1.673877935317597, 'eastbrook_quayside_home'],
       [
         'brother_aldric',
         5.181980515339464,
@@ -1249,7 +1308,7 @@ describe('layout clearance and service anchors', () => {
         -2.356194490192345,
         'eastbrook_bank',
       ],
-      ['card_master', -34, -92, -2.677945044588987, 'eastbrook_inn'],
+      ['card_master', 20, -98, -2.677945044588987, 'eastbrook_bank'],
       ['chronicler_saul', 10.2, -87.5, 0.5880026035475675, 'mailbox_eastbrook'],
       [
         'forgemistress_darva',

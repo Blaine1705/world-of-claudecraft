@@ -309,22 +309,30 @@ describe('Eastbrook authored gameplay data integration', () => {
     expect(ZONE1_PROPS.docks).toEqual([
       { x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } },
     ]);
+    // Re-pinned for owner refinement round 6: the vale bandit camp swapped
+    // centers with the wild boar camp, so the first two tents, the first two
+    // crates and the first campfire (the band's own dressing) travelled north
+    // with it, while Gorrak's rows stayed put. The same round added a
+    // fisherman's camp on the strand south of the quay, one tent and one fire
+    // beside the beached rowboats.
     expect(ZONE1_PROPS.tents).toEqual([
-      { x: 62, z: -61, rot: 0.4, scale: 1 },
-      { x: 69, z: -69, rot: 2.1, scale: 1 },
+      { x: 58, z: 25, rot: 0.4, scale: 1 },
+      { x: 68, z: 16, rot: 2.1, scale: 1 },
       { x: 88, z: -86, rot: 1.2, scale: 1.3 },
       { x: 95, z: -94, rot: -0.6, scale: 1 },
+      { x: -90.5, z: -78.5, rot: -0.9, scale: 1 },
     ]);
     expect(ZONE1_PROPS.crates).toEqual([
-      [60, -63],
-      [66, -67],
+      [56, 22],
+      [64, 26],
       [87, -88],
       [93, -90],
-      [70, -72],
+      [66, 14],
     ]);
     expect(ZONE1_PROPS.campfires).toEqual([
-      [65, -65],
+      [59, 17],
       [90, -90],
+      [-93.5, -76.5],
       [-30, 146],
       [-61, 56],
     ]);
@@ -339,12 +347,21 @@ describe('Eastbrook authored gameplay data integration', () => {
     ]);
     // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76): the
     // Eastbrook graveyard row moved to the chapel green; the second
-    // (exterior) row is unchanged.
+    // (exterior) row is unchanged. Re-pinned again for owner refinement
+    // round 6, which added two anchors: the north-Vale yard on the Copper Dig
+    // road that gives the new gy_vale_north release its headstones, and a
+    // second chapel-green plot filling the west half of the wrought-iron
+    // churchyard enclosure.
     expect(ZONE1_PROPS.graveyards).toEqual([
       { x: -2, z: -70 },
       { x: 4, z: -56 },
+      { x: -22, z: 118 },
+      { x: -9, z: -70 },
     ]);
-    expect(ZONE1_PROPS.delveMarkers).toEqual([{ x: -5, z: -52, delveId: 'collapsed_reliquary' }]);
+    // Re-pinned for owner refinement round 6b: the Collapsed Reliquary mouth
+    // left the town chapel rise and moved to the Mirror Lake shore, so the
+    // delve marker travels with it (src/sim/content/zone1.ts delveMarkers).
+    expect(ZONE1_PROPS.delveMarkers).toEqual([{ x: -136, z: 112, delveId: 'collapsed_reliquary' }]);
   });
 
   // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
@@ -770,6 +787,10 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   // list with the wall (36 became 30). Round 3 promoted the trio of decor
   // homes into layout buildings, adding their entrances (33). Round 4
   // retired the preserved armoury from placement, dropping its entrance (32).
+  // Round 6 removed eastbrook_home_rise from the layout after live review,
+  // dropping its entrance too (31), then appended the harbour quarter's three
+  // coastal buildings along the dock road, each bringing its own entrance
+  // back into the proof (34).
   it('pathfinds bidirectionally from the square to every service, NPC, station, and entrance', () => {
     // Middle of the new market square: inside the civic ring, clear of the
     // well beacon and the benches, and directly connected to the east-road
@@ -797,7 +818,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         (building) => ({ id: `${building.id}:entrance`, point: building.frontStandingPoint }),
       ),
     ];
-    expect(destinations).toHaveLength(32);
+    expect(destinations).toHaveLength(34);
     const moverProfiles = [
       { id: 'player', bodyRadius: PLAYER_BODY_RADIUS },
       // Pet locomotion deliberately shares PLAYER_BODY_RADIUS; keep this

@@ -312,8 +312,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // town refinement (re-threaded roads, three decor props promoted to layout
     // buildings, retuned terrain stamps): roads, props, and terrain are
     // world-gen inputs, so the same shared-stream shift applies; the koi now
-    // lands on session index 9.
-    expect(koiSession).toBe(9);
+    // lands on session index 9. Re-hunted once more for owner refinement
+    // rounds 6 and 6b (the boar and bandit camps traded ground, the harbour
+    // quarter and churchyard landed, the quay was regraded and re-berthed, the
+    // Collapsed Reliquary delve and its POI moved to the Mirror Lake shore, and
+    // three town NPCs were redistributed): all of those are world-gen inputs,
+    // so the shared stream forks again and the koi lands on session index 35.
+    expect(koiSession).toBe(35);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -350,20 +355,25 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // draws, the same cause as the dig-headland re-record. Re-hunted once more
     // 2026-08 for the round 3 town refinement (re-threaded roads, three decor
     // props promoted to layout buildings, retuned terrain stamps), the same
-    // cause again.
+    // cause again. Re-hunted for owner refinement rounds 6 and 6b (camps
+    // traded ground, the harbour quarter and churchyard landed, the quay was
+    // regraded and re-berthed, the delve and its POI moved to the Mirror Lake
+    // shore, three town NPCs were redistributed), the same cause once more:
+    // every index below is re-recorded in order, because each hunt's own loop
+    // length feeds the next one's stream position.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 29 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 137 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 21,
+        hitAt: 10,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 102,
+        hitAt: 165,
       },
     ];
     for (const hunt of hunts) {
@@ -426,8 +436,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // specimen lands on attempt index 4 (re-hunted 2026-08 for the Eastbrook
     // harbor move, layout v3, d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md, then again 2026-08 for the
-    // round 3 town refinement, same cause as the beat 12 to 14 hunts).
-    expect(hitAt).toBe(4);
+    // round 3 town refinement, same cause as the beat 12 to 14 hunts, then
+    // once more for owner refinement rounds 6 and 6b, again the same cause:
+    // the specimen now lands on attempt index 1.
+    expect(hitAt).toBe(1);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

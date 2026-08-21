@@ -55,11 +55,19 @@ describe('terrain vertex pipeline', () => {
     // coastline pulled to the town's doorstep (trimmed lobes, the seabed
     // apron row, re-laid beach stamps) and the re-threaded streets flip
     // splits again. Re-minted for round 4: the barracks garrison's calm-anchor
-    // pads reshape the probe chunk (the old town ground). Computed twice in
+    // pads reshape the probe chunk (the old town ground). Re-minted for owner
+    // round 6 and 6b, the team-feedback wave: the boar and bandit camps traded
+    // ground and stepped north, so their flatten discs and calm rings moved
+    // with them; the churchyard enclosure, its second grave plot and the
+    // harbour quarter's gardens mint new calm anchors; and round 6b moved the
+    // Collapsed Reliquary delve and the reliquary_hill POI off this ground to
+    // the Mirror Lake shore while three town NPCs took their calm pads
+    // dockside. The chapel re-shell contributes nothing here: a building mints
+    // no calm pad and this probe reads the heightfield only. Computed twice in
     // separate processes on the live tree,
     // identical both times.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      'acd1445b9090587eef2cbeb4305fc26321832abfabf651a5b2ba2db619ac4417',
+      'dee8a8eb173860b070e3ae337b36bdcfdd67ae3c1661b5691a0e930b96c638d6',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

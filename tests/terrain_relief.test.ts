@@ -69,7 +69,12 @@ describe('the calm field keeps graded features on their exact classic terrain', 
     // calm exactly 0, clear of every authored layer, and byte-identical to
     // the pre-move field (verified against a worktree at the last-minted
     // tree).
-    ['vale road', 30, -30, -1.871079984441121],
+    // Round 6b: 9 cm lower. The boar camp the owner moved west sits 50.6 yd
+    // away, inside its own calm RING (radius*1.1 plus skirt) though well
+    // outside its flatten disc, so the ring eases this sample toward the
+    // legacy field. Measured, understood, and far below anything a player
+    // can see on a road; the golden follows the intended move.
+    ['vale road', 30, -30, -1.777849597020717],
     ['peaks road', -98, 727, 10.139872348652359],
     ['marsh road', 20, 470, -1.769678368869094],
     ['frost road', -73, 1696, 13.619770689175878],

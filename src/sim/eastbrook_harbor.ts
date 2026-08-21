@@ -14,20 +14,27 @@ import { type GaleDeckDef, galeDeckSurfaceAt } from './gale_harbor';
 
 // Bounding box for the cheap early-out (the whole waterfront lives on the
 // cove's west rim).
-const DECKS_X1 = -120;
+// Widened with the round 6 pier respacing: this box silently CLIPS any deck
+// sample outside it, so it has to lead the geometry, not trail it.
+const DECKS_X1 = -122;
 const DECKS_X2 = -88;
-const DECKS_Z1 = -70;
-const DECKS_Z2 = -38;
+const DECKS_Z1 = -74;
+const DECKS_Z2 = -34;
 
 export const EASTBROOK_HARBOR_DECKS: GaleDeckDef[] = [
   // the quay boardwalk, laid along the pad's east lip; every pier roots on it
-  { x: -97.5, z: -54, rot: 0, hl: 14, hw: 1.5, ax: -94, az: -54 },
+  { x: -97.5, z: -54, rot: 0, hl: 16, hw: 1.5, ax: -94, az: -54 },
   // the ferry berth: the long middle pier, reaching the cove's deep water
   { x: -107, z: -54, rot: -Math.PI / 2, hl: 10, hw: 2.2, ax: -94, az: -54 },
-  // the two working piers fanned wide, the Wickharbor pattern: each keeps
-  // open water and breathing room on both sides (owner refinement)
-  { x: -104.5, z: -42.6, rot: -Math.PI / 2 + 0.12, hl: 7, hw: 1.6, ax: -94, az: -43 },
-  { x: -104.5, z: -65.4, rot: -Math.PI / 2 - 0.12, hl: 7, hw: 1.6, ax: -94, az: -65 },
+  // Round 6 (owner + team): the two working piers re-laid square to the quay on
+  // an even 14 yd pitch (roots at z -40, -54, -68) and run out to 8 yd. They
+  // used to sit 10.6 yd off the ferry berth and fan at 0.12 rad, which left no
+  // berth a hull could actually lie in: the gap between neighbouring piers was
+  // narrower than a ship is wide, so the fleet ended up moored on the beach.
+  // Square and evenly spaced, each gap now takes a berthed hull with water on
+  // both sides.
+  { x: -104.5, z: -40, rot: -Math.PI / 2, hl: 8, hw: 1.6, ax: -94, az: -40 },
+  { x: -104.5, z: -68, rot: -Math.PI / 2, hl: 8, hw: 1.6, ax: -94, az: -68 },
 ];
 
 /**
