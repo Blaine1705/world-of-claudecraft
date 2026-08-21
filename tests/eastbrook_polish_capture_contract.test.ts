@@ -265,8 +265,12 @@ interface AttributionTargetFixture {
 // Re-minted for the PR #3497 merge repair: the integration-side Eastbrook
 // evidence is retained while entity_view_policy_core.ts keeps the decayed-
 // corpse admission rule and its lifecycle repair. No capture was retaken.
+// Re-minted for the PR #3528 merge repair: the integration-side Eastbrook
+// evidence is retained while renderer.ts and entity_view_policy_core.ts add
+// the heroic Nythraxis wardstone distance-cull exemption. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '44f7e5150a6c11433849981e2d7299aadce4bbe7a55c68be6bdb5906eb9462b6';
+  'c38307bee25db65d352af3a6cee763e332d1a37e2bf6c0ccfeacfd490b4e2c07';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

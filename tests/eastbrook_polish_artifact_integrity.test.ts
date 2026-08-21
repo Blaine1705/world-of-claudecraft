@@ -849,10 +849,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the PR #3497 merge repair: the integration-side Eastbrook
 // evidence is retained while entity_view_policy_core.ts keeps the decayed-
 // corpse admission rule and its lifecycle repair. No capture was retaken.
+// Re-minted for the PR #3528 merge repair: the integration-side Eastbrook
+// evidence is retained while renderer.ts and entity_view_policy_core.ts add
+// the heroic Nythraxis wardstone distance-cull exemption. No capture was
+// retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '0c8956ed3807ca870ef195c6f94544d0bd78004eccc9420a1565b47d56eb1c66';
+  'ee4e8448d55703e144abfbdd771d7938fdf4c69df77205ebfc0d427c9c5c7382';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '44f7e5150a6c11433849981e2d7299aadce4bbe7a55c68be6bdb5906eb9462b6';
+  'c38307bee25db65d352af3a6cee763e332d1a37e2bf6c0ccfeacfd490b4e2c07';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1925,10 +1929,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the PR #3497 merge repair: entity_view_policy_core.ts
     // moved for the decayed-corpse admission rule plus lifecycle repair, then
     // this seal followed the swept evidence bytes. No capture was retaken.
+    // Re-minted for the PR #3528 merge repair: renderer.ts and
+    // entity_view_policy_core.ts moved for the heroic Nythraxis wardstone
+    // distance-cull exemption, then this seal followed the swept evidence
+    // bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('c7e7d7463b12160d3bdef6df7e5d00acf63b98e6aa494c1679f1c3e70e4ba2da');
+    ).toBe('70beaa0bb12683ae08cb26193d2632d65ca67105868826c1d5d877aa3711af47');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

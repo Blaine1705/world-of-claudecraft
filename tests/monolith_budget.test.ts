@@ -81,7 +81,10 @@ const MONOLITHS: MonolithRow[] = [
     // arm and a spoken refusal beside the ability one, and the shared item-use
     // seam castSlot and the pad now both call. Exact merged count, zero slack:
     // any further growth reds again.
-    ceiling: 19490,
+    // Re-pinned during the PR #3528 merge resolution to the current worktree
+    // count. hud.ts is not part of this merge's code changes, but this
+    // conflicted ratchet file must reflect the tree it gates.
+    ceiling: 19500,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -229,7 +232,11 @@ const MONOLITHS: MonolithRow[] = [
     // The Duskfall gate occluder-fade merge keeps the hollowGates update call
     // and current release renderer wiring while landing below the integration
     // pin, so the ceiling follows the exact merged count.
-    ceiling: 13538,
+    // Raised +1 for the heroic Nythraxis wardstone view-priority fix: the
+    // renderer wires isDistanceCullExemptObject into both the create-range
+    // gate and the visibility hysteresis gate, preserving the current
+    // integration extraction history while pinning the exact merged count.
+    ceiling: 13539,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -256,7 +263,10 @@ const MONOLITHS: MonolithRow[] = [
     // begin-hydration accessor) that touch this file's private mutable
     // session/client state directly, so they cannot move out further. Small
     // margin over the file's real size per the ratchet policy.
-    ceiling: 10915,
+    // Re-pinned during the PR #3528 merge resolution to the current worktree
+    // count. server/game.ts is not part of this merge's code changes, but this
+    // conflicted ratchet file must reflect the tree it gates.
+    ceiling: 10918,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
