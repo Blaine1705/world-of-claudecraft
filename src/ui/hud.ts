@@ -2755,27 +2755,19 @@ export class Hud {
       }
       this.toggleReliquaryTrackerCollapsed();
     });
-    // The tracker headers above are always-on overlay buttons whose repaints
-    // deliberately carry focus across a rebuild, so a MOUSE click would leave
-    // them focused forever and Space would keep toggling the tracker instead of
-    // jumping. Pointer-only blur (capture phase, so the rebuild's refocus check
-    // sees no focused header on the mouse path); keyboard activation runs
-    // through their keydown arms and keeps its focus.
+    // Pointer-only blur for the tracker headers (capture phase, so the quest
+    // tracker's refocus-on-repaint sees no focused header on the mouse path);
+    // keyboard activation keeps its focus. Rationale: src/ui/pointer_blur.ts.
     bindPointerBlur($('#quest-tracker'), '.qt-header, .qt-title');
     bindPointerBlur($('#deed-tracker'), '.dt-header');
     bindPointerBlur($('#reliquary-tracker'), '.dt-header');
     // The delve board, lockpick panel, map window, the bank + bags cluster, and the
     // micromenu side rail are non-modal overlays, so canUseGameKeys() stays true and
     // the global jump (Space) / chat (Enter) binds would otherwise hijack those keys
-    // on a focused panel button (the map's Quests toggle, a bank grid cell, a
-    // micromenu toggle, and each close button included). Stop propagation (but NOT
-    // the default, so the button's native activation still fires) when a panel
-    // button has focus, mirroring the quest-tracker guard above. The paired
-    // pointer-only blur is the other half of that contract: a MOUSE click must not
-    // leave the button holding focus (the canvas never takes it back), or the next
-    // Space that escapes the game layer's preventDefault natively re-activates it
-    // and the last-used menu reopens. Keyboard activation (click detail 0) keeps
-    // its focus, so Tab users lose nothing.
+    // on a focused panel button. Two halves, both from src/ui/pointer_blur.ts: the
+    // key guard (stop propagation, never the default, so native activation fires)
+    // and the pointer-only blur (a mouse click must not leave the button focused,
+    // or the next Space that escapes the game layer's preventDefault re-clicks it).
     for (const panelId of [
       '#delve-board',
       '#lockpick-panel',
@@ -3915,11 +3907,8 @@ export class Hud {
     if (!el) {
       el = document.createElement('div');
       el.id = 'emote-wheel';
-      // The wheel is an isModalOpen() surface (it blocks gameplay keys), so
-      // its root must read as a dialog: the input layer's blocked-state Space
-      // guard (src/game/stale_chrome_focus.ts) suppresses native Space
-      // activation on any button OUTSIDE a dialog root, and without this mark
-      // a pinned wheel's own emote buttons would lose keyboard activation.
+      // An isModalOpen() surface: a dialog root, so the blocked-state Space guard
+      // (src/game/stale_chrome_focus.ts) spares a pinned wheel's own emote buttons.
       markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') });
       document.getElementById('ui')?.appendChild(el);
       this.emoteWheelEl = el;
@@ -4007,11 +3996,8 @@ export class Hud {
 
   private renderEmoteEditor(): void {
     const el = $('#emote-editor');
-    // The emote editor is an isModalOpen() surface (it blocks gameplay keys), so
-    // its root must read as a dialog: the input layer's blocked-state Space guard
-    // (src/game/stale_chrome_focus.ts) suppresses native Space activation on any
-    // button OUTSIDE a dialog root, and without this mark the editor's own
-    // buttons would lose their keyboard activation while it is open.
+    // An isModalOpen() surface: a dialog root, so the blocked-state Space guard
+    // (src/game/stale_chrome_focus.ts) spares the editor's own buttons.
     markDialogRoot(el, { label: t('hudChrome.emoteEditor.title') });
     el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
     const count = document.createElement('div');

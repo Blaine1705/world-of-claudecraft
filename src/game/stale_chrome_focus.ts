@@ -15,9 +15,10 @@
 // which hud.ts marks explicitly for this guard), so a focused BUTTON outside
 // any dialog root is stale by definition while input is blocked. The pin in
 // tests/pointer_blur.test.ts keeps the two explicit marks from regressing. Non-modal panel
-// buttons (bags, bank, map) keep their deliberate Space activation either way:
-// their panels are dialog-rooted AND their keydowns never reach the window
-// handler (the hud.ts panel guard stops propagation).
+// buttons (bags, bank, map) keep their deliberate Space activation either way: a
+// focused panel button's keydown never reaches the window handler (the hud.ts
+// panel guard stops propagation), whether or not its panel is dialog-rooted (the
+// bags and bank windows are; the map window is a plain .window.panel).
 //
 // Host-agnostic (everything reached off the passed element) so it unit-tests
 // in plain Node; input.ts passes document.activeElement.

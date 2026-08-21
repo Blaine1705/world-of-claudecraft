@@ -490,3 +490,44 @@ describe('ChatWindowController', () => {
     });
   });
 });
+
+describe('ChatWindowController pointer-only blur (Space must not re-click the last-used tab)', () => {
+  // The discriminator is UIEvent.detail (src/ui/pointer_blur.ts): a pointer click
+  // carries detail > 0, keyboard and programmatic activation carry 0.
+  function click(detail: number): Event {
+    const event = new Event('click', { cancelable: true });
+    Object.defineProperty(event, 'detail', { value: detail });
+    return event;
+  }
+
+  it('a mouse click selects the tab and drops its focus; a keyboard click keeps it', () => {
+    const harness = makeHarness({ woc_chat_tabs: '["world","guild"]' });
+    harness.controller.init();
+
+    const world = tabButton(harness, 'world');
+    world.focus();
+    world.dispatchEvent(click(1));
+    expect(harness.storage.getItem('woc_chat_active_tab')).toBe('world');
+    expect(world.focused).toBe(false);
+
+    const guild = tabButton(harness, 'guild');
+    guild.focus();
+    guild.dispatchEvent(click(0));
+    expect(harness.storage.getItem('woc_chat_active_tab')).toBe('guild');
+    expect(guild.focused).toBe(true);
+  });
+
+  it('the "+" channel-menu trigger drops focus after a mouse click, on open and on toggle-close', () => {
+    const harness = makeHarness({ woc_chat_tabs: '["world"]' });
+    harness.controller.init();
+
+    const add = addButton(harness);
+    add.focus();
+    add.dispatchEvent(click(1));
+    expect(add.focused).toBe(false);
+    // Second pointer click on the still-open menu's own trigger: the toggle-close arm.
+    add.focus();
+    add.dispatchEvent(click(1));
+    expect(add.focused).toBe(false);
+  });
+});
