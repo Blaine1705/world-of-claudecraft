@@ -51,6 +51,7 @@ describe('the menu strip roster', () => {
   it('keeps the frequency order the swipe distance is priced against', () => {
     expect(MENU_STRIP_ITEMS.map((item) => item.id)).toEqual([
       'mount',
+      'chat',
       'map',
       'bags',
       'social',
@@ -60,12 +61,23 @@ describe('the menu strip roster', () => {
       'settings',
       'more',
     ]);
-    expect(MENU_STRIP_COUNT).toBe(9);
+    expect(MENU_STRIP_COUNT).toBe(10);
+  });
+
+  it('seats Chat SECOND, on its own strip button rather than the tray one', () => {
+    // The control's bare tap used to open chat; it opens the row now, so chat
+    // needs a seat of its own and it is the shortest gesture after Mount.
+    expect(MENU_STRIP_ITEMS[1].id).toBe('chat');
+    // NOT the tray's #mobile-chat: that button carries the press-and-hold log
+    // peek on its own pointer handlers, which the strip's synthesized click on
+    // the picked item would never reach.
+    expect(MENU_STRIP_ITEMS[1].elementId).toBe('mobile-menu-chat');
+    expect(MENU_STRIP_ITEMS.some((item) => item.elementId === 'mobile-chat')).toBe(false);
   });
 
   it('names a REAL button per item, so no action is implemented twice', () => {
-    // The four that moved out of the old row keep the ids their handlers are
-    // bound to; the five promoted out of the More tray get their own.
+    // The three that moved out of the old row keep the ids their handlers are
+    // bound to; the ones promoted out of the More tray get their own.
     const byId = new Map(MENU_STRIP_ITEMS.map((item) => [item.id, item.elementId]));
     expect(byId.get('social')).toBe('mobile-social');
     expect(byId.get('quest')).toBe('mobile-quest');
@@ -83,6 +95,7 @@ describe('the menu strip roster', () => {
     // another valid-but-wrong TranslationKey would fail nowhere else.
     expect(MENU_STRIP_ITEMS.map((item) => item.captionKey)).toEqual([
       'hudChrome.mounts.mount',
+      'hud.core.mobileChat',
       'hud.core.mobileMap',
       'hud.keybinds.actions.bags',
       'hud.core.mobileSocial',
@@ -98,17 +111,24 @@ describe('the menu strip roster', () => {
     expect(MENU_STRIP_DIRECTION).toBe('right');
   });
 
-  it('walks the row in well under a thumb arc at the gesture pitch', () => {
-    // The drawn spacing would need over 500px of travel to reach item 8.
-    expect(MENU_STRIP_PITCH_PX * (MENU_STRIP_COUNT - 1)).toBeLessThan(300);
+  it('walks the whole row inside a thumb arc at the gesture pitch', () => {
+    // What the gesture actually costs is the travel to the LAST item, far less
+    // than the drawn spacing (which would need over 500px to reach it). The
+    // budget is half the narrowest shipped landscape viewport, so the thumb never
+    // has to cross the screen centre to finish the swipe; adding Chat spent one
+    // more pitch of it.
+    const NARROWEST_LANDSCAPE_PX = 844;
+    expect(MENU_STRIP_PITCH_PX * (MENU_STRIP_COUNT - 1)).toBeLessThan(NARROWEST_LANDSCAPE_PX / 2);
   });
 });
 
 describe('resolveMenuStripRelease', () => {
-  it('runs the default action on a bare tap, so the control is still one tap to chat', () => {
+  it('OPENS the row on a bare tap: the control runs no action of its own', () => {
+    // It used to answer 'default' here, which opened chat. Chat is a strip item
+    // now, so the tap has nothing to run and reveals the row instead.
     expect(
       resolveMenuStripRelease({ index: -1, revealed: false, count: MENU_STRIP_COUNT }),
-    ).toEqual({ kind: 'default' });
+    ).toEqual({ kind: 'open' });
   });
 
   it('cancels a release back at the anchor once the row is open', () => {
@@ -124,9 +144,15 @@ describe('resolveMenuStripRelease', () => {
       kind: 'pick',
       index: 0,
     });
-    expect(resolveMenuStripRelease({ index: 8, revealed: true, count: MENU_STRIP_COUNT })).toEqual({
+    expect(
+      resolveMenuStripRelease({
+        index: MENU_STRIP_COUNT - 1,
+        revealed: true,
+        count: MENU_STRIP_COUNT,
+      }),
+    ).toEqual({
       kind: 'pick',
-      index: 8,
+      index: MENU_STRIP_COUNT - 1,
     });
   });
 
@@ -139,9 +165,9 @@ describe('resolveMenuStripRelease', () => {
     );
   });
 
-  it('falls back to the default action with an empty roster', () => {
+  it('falls back to opening the row with an empty roster', () => {
     expect(resolveMenuStripRelease({ index: 3, revealed: true, count: 0 })).toEqual({
-      kind: 'default',
+      kind: 'open',
     });
   });
 });
@@ -163,7 +189,7 @@ describe('shouldRevealMenuStrip', () => {
 });
 
 describe('menuCaptionCenterX', () => {
-  const centers = [100, 160, 220, 280, 340, 400, 460, 520, 580];
+  const centers = [100, 160, 220, 280, 340, 400, 460, 520, 580, 640];
 
   it('hides itself when nothing is live', () => {
     expect(menuCaptionCenterX({ centers, live: -1, viewportWidth: 844, margin: 6 })).toBeNull();
@@ -184,9 +210,9 @@ describe('menuCaptionCenterX', () => {
   });
 
   it('clamps the far end against the app viewport, not the drawn row', () => {
-    // The 9th item sits at 580 on a 620px box: unclamped the caption would hang
+    // The last item sits at 640 on a 620px box: unclamped the caption would hang
     // off the right edge.
-    expect(menuCaptionCenterX({ centers, live: 8, viewportWidth: 620, margin: 6 })).toBe(
+    expect(menuCaptionCenterX({ centers, live: 9, viewportWidth: 620, margin: 6 })).toBe(
       620 - 6 - MENU_CAPTION_HALF_PX,
     );
   });

@@ -1614,13 +1614,15 @@
       <div id="mobile-camera-stick" class="mobile-stick"></div>
       <div class="mobile-joy-label" data-i18n="hud.core.mobileCamera">Camera</div>
     </div>
-    <!-- The menu control: ONE seat replacing the five-button row that used to sit
+    <!-- Quick Actions: ONE seat replacing the five-button row that used to sit
          at top-left, further from either thumb than anything else in the HUD. A
-         tap opens chat; a hold or a rightward swipe opens #mobile-menu-strip.
+         tap opens #mobile-menu-strip; a hold or a rightward swipe opens it and
+         picks in the same gesture. The control runs no action of its own, which
+         is why a second tap closes the row again.
          The container id is kept: the Seeker build promotes the daily chest into
          it (src/main.ts wireWallet). -->
     <div id="mobile-combat-controls">
-      <button class="mobile-btn" type="button" id="mobile-menu-anchor" aria-expanded="false" data-i18n-title="hudChrome.mobile.menuControl" data-i18n-aria="hudChrome.mobile.menuControlAria" title="Menus" aria-label="Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more." aria-haspopup="true" data-icon="chat"><span class="mobile-label" data-i18n="hudChrome.mobile.menuLabel">Menu</span></button>
+      <button class="mobile-btn" type="button" id="mobile-menu-anchor" aria-expanded="false" data-i18n-title="hudChrome.mobile.quickActions" data-i18n-aria="hudChrome.mobile.quickActionsAria" title="Quick Actions" aria-label="Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one." aria-haspopup="true" data-icon="more"><span class="mobile-label" data-i18n="hudChrome.mobile.quickActionsLabel">Actions</span></button>
     </div>
     <div id="mobile-action-ring" data-i18n-aria="hudChrome.mobile.actionRing" aria-label="Combat actions">
       <button class="mobile-action-slot" type="button" data-mobile-index="0" aria-haspopup="true" aria-expanded="false"></button>
@@ -1654,23 +1656,25 @@
       <button type="button" class="mobile-consumable-item" data-consumable-index="5" tabindex="-1"></button>
       <button type="button" id="mobile-consumable-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
     </div>
-    <!-- The menu strip: nine actions extending rightward from the control, opened
-         by a hold or a rightward swipe and seated in viewport coordinates by
-         menu_strip_painter.ts. Every item is the REAL button its action was
-         already bound to, so a pick routes through the existing handler; Mount
-         leads the row (issue #2739). The cancel X sits ON the anchor, so
-         releasing where the gesture started backs out without opening anything,
-         and ONE caption names the live item instead of nine colliding labels. -->
-    <div id="mobile-menu-strip" role="group" data-i18n-aria="hudChrome.mobile.menuControl" aria-label="Menus">
+    <!-- The Quick Actions strip: ten actions extending rightward from the control,
+         opened by a tap, a hold or a rightward swipe and seated in viewport
+         coordinates by menu_strip_painter.ts. Every item is a REAL button the
+         touch HUD binds, so a pick routes through the existing handler; Mount
+         leads the row (issue #2739) and Chat follows it. The cancel X sits ON the
+         anchor, so releasing where the gesture started backs out without opening
+         anything, and ONE caption names the live item instead of ten colliding
+         labels. -->
+    <div id="mobile-menu-strip" role="group" data-i18n-aria="hudChrome.mobile.quickActions" aria-label="Quick Actions">
       <button type="button" class="mobile-menu-item" id="mobile-menu-mount" data-menu-index="0" data-i18n-title="hudChrome.keybinds.mount" data-i18n-aria="hudChrome.keybinds.mount" title="Mount / Dismount" aria-label="Mount / Dismount" data-icon="mount" tabindex="-1"></button>
-      <button type="button" class="mobile-menu-item" id="mobile-menu-map" data-menu-index="1" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map" tabindex="-1"></button>
-      <button type="button" class="mobile-menu-item" id="mobile-menu-bags" data-menu-index="2" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags" tabindex="-1"></button>
-      <button type="button" class="mobile-menu-item" id="mobile-social" data-menu-index="3" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social" tabindex="-1"></button>
-      <button type="button" class="mobile-menu-item" id="mobile-quest" data-menu-index="4" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog" tabindex="-1"></button>
-      <button type="button" class="mobile-menu-item" id="mobile-menu-char" data-menu-index="5" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character" tabindex="-1"></button>
-      <button type="button" class="mobile-menu-item" id="mobile-menu-spellbook" data-menu-index="6" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook" tabindex="-1"></button>
-      <button type="button" class="mobile-menu-item" id="mobile-menu" data-menu-index="7" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu" tabindex="-1"></button>
-      <button type="button" class="mobile-menu-item" id="mobile-more" data-menu-index="8" data-i18n-title="hud.core.mobileMoreAria" data-i18n-aria="hud.core.mobileMoreAria" title="Show more menus" aria-label="Show more menus" aria-controls="mobile-extra-controls" aria-expanded="false" data-icon="more" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-chat" data-menu-index="1" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-map" data-menu-index="2" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-bags" data-menu-index="3" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-social" data-menu-index="4" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-quest" data-menu-index="5" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-char" data-menu-index="6" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-spellbook" data-menu-index="7" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu" data-menu-index="8" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-more" data-menu-index="9" data-i18n-title="hud.core.mobileMoreAria" data-i18n-aria="hud.core.mobileMoreAria" title="Show more menus" aria-label="Show more menus" aria-controls="mobile-extra-controls" aria-expanded="false" data-icon="more" tabindex="-1"></button>
       <button type="button" id="mobile-menu-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
       <div id="mobile-menu-caption" class="panel" aria-hidden="true"><span class="tt-title"></span></div>
     </div>

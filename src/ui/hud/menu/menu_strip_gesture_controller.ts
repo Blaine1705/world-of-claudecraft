@@ -4,8 +4,9 @@
 // aria-expanded state and the Escape closer. This module supplies only what is
 // genuinely this menu's: the row grows RIGHT (fixed, because the muscle memory
 // the roster order buys depends on the direction never changing under the
-// player), the roster is a constant nine, and a bare tap runs the control's
-// default action (chat) rather than choosing an item.
+// player), the roster is a constant ten, and the control runs no action of its
+// own, so a bare tap OPENS the row and the next press closes it again
+// (anchorRole 'toggle', whose whole meaning lives in tap_menu_core.ts).
 //
 // It was a near-verbatim copy of the consumables row's gesture layer until the
 // rule of three was reached: identical drag state, metric reads, fallbacks,
@@ -42,8 +43,6 @@ export interface MenuStripGestureDeps {
   tapMenus(): boolean;
   /** Open the item at `index`. */
   pick(index: number): void;
-  /** A bare tap: run the control's default action. */
-  runDefault(): void;
   /** The player opened the row and chose nothing. */
   onCancel(): void;
   /** Repaint from openState(); called on every state change. */
@@ -51,7 +50,7 @@ export interface MenuStripGestureDeps {
 }
 
 /** The menu strip's release rule in the shared outcome shape. The strip's own
- *  'pick' / 'default' / 'cancel' table is already that shape, so this is a type
+ *  'pick' / 'open' / 'cancel' table is already that shape, so this is a type
  *  bridge rather than a second rule. */
 function release(input: StripReleaseInput): StripGestureOutcome {
   return resolveMenuStripRelease(input);
@@ -68,12 +67,16 @@ export class MenuStripGesture {
       cancel: deps.cancel,
       writers: deps.writers,
       tapMenus: () => deps.tapMenus(),
+      // Quick Actions has no action of its own to run, so its own press only
+      // ever opens or closes the row.
+      anchorRole: 'toggle',
       count: () => MENU_STRIP_COUNT,
       pitch: MENU_STRIP_PITCH_PX,
       direction: () => MENU_STRIP_DIRECTION,
       release,
       onPick: (index) => deps.pick(index),
-      onDefault: () => deps.runDefault(),
+      // No onDefault: resolveMenuStripRelease answers 'open' wherever another
+      // control would answer 'default'.
       onCancel: () => deps.onCancel(),
       repaint: () => deps.repaint(),
     });

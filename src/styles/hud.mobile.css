@@ -4946,21 +4946,13 @@
     display: none;
   }
   /* ---------- mobile Reliquary tracker ---------- */
-  /* The Reliquary tracker folds on exactly the same tiers, for the same reason:
-     glanceable decoration on a phone, with the window itself carrying the full
-     pin list. hud.ts routes the compact-tier tap to The Reliquary instead of the
-     invisible collapse toggle. */
+  /* HIDDEN on touch: the collection chase is glanceable decoration, and the one
+     line it still paints under the folded list sat directly below the minimap in
+     #right-tracker-stack, crowding the band the map and the deed tracker share.
+     Desktop keeps it. The Reliquary window itself stays reachable on touch from
+     the More tray's #mobile-reliquary button, so nothing loses its only entry
+     point (the compact-tier header tap that opened it was a second one). */
   body.mobile-touch #reliquary-tracker {
-    font-size: 11px;
-  }
-  body.mobile-touch #reliquary-tracker .dt-list {
-    max-height: 88px;
-    overflow: hidden;
-  }
-  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-list {
-    display: none;
-  }
-  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-chevron {
     display: none;
   }
   /* ---------- mobile Reliquary (standalone window) ---------- */

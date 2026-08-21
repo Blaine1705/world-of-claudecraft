@@ -34,6 +34,13 @@ what keeps the press that OPENED a menu from also closing it; and the registry
 any menu by name). A new gesture menu asks those three; it does not grow a fourth
 dialect.
 
+What a control's OWN press means is the one per-menu variable, and it is a
+PARAMETER of that table (`anchorRole`), never a second table: an `action` control
+runs its default action when pressed with its menu open (the radial's centre
+slot, the seat's first consumable), while a `toggle` control has no action of its
+own (Quick Actions), so a bare tap opens its row in EITHER mode and the next
+press closes it. A new menu picks a role; it does not fork the rule.
+
 The two STRIP menus go further and share their whole gesture layer:
 `strip_gesture_controller.ts` is the one implementation of pointer capture, the
 reveal timer, the single anchor measure, the window release backstop, sticky

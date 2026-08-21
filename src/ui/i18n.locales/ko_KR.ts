@@ -8934,6 +8934,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '메뉴. 탭하면 대화창이 열리고, 길게 누른 뒤 오른쪽으로 밀면 탈것, 지도, 가방 등을 열 수 있습니다.',
   'hudChrome.mobile.menuControlAriaTap':
     '메뉴. 탭하면 탈것, 지도, 가방 등의 메뉴 줄이 열립니다. 다시 탭하면 대화창이 열립니다.',
+  'hudChrome.mobile.quickActions': '빠른 실행',
+  'hudChrome.mobile.quickActionsAria':
+    '빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리고, 길게 누른 뒤 오른쪽으로 밀면 항목을 선택할 수 있습니다.',
+  'hudChrome.mobile.quickActionsAriaTap':
+    '빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리며, 항목을 탭해 선택합니다. 컨트롤을 다시 탭하면 닫힙니다.',
+  'hudChrome.mobile.quickActionsLabel': '실행',
   'hudChrome.mobile.questStripAria':
     '추적 중인 퀘스트 {total}개 중 {position}번째: {title}. 다음 퀘스트를 보려면 누르십시오.',
   'hudChrome.mobile.questStripAriaSingle': '추적 중인 퀘스트: {title}',

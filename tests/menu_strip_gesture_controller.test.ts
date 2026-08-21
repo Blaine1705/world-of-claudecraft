@@ -9,7 +9,8 @@
 // MenuStripGesture is a thin instantiation of the shared StripGesture
 // (src/ui/hud/strip_gesture_controller.ts), so every pin here drives that shared
 // layer through the parameters this menu supplies (direction, pitch, count, and
-// the tap-runs-chat default).
+// the anchorRole 'toggle' that makes a bare tap OPEN the row rather than run an
+// action the control does not have).
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { MENU_STRIP_COUNT } from '../src/ui/hud/menu/menu_strip_core';
@@ -45,7 +46,6 @@ interface Rig {
   cancel: HTMLButtonElement;
   gesture: MenuStripGesture;
   picks: number[];
-  defaults: number;
   cancels: number;
   repaints: number;
   /** settings.touchTapMenus, flipped per test. */
@@ -94,7 +94,6 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
     items,
     cancel,
     picks: [],
-    defaults: 0,
     cancels: 0,
     repaints: 0,
     tapMenus: options.tapMenus ?? false,
@@ -108,9 +107,6 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
     cancel,
     tapMenus: () => rig.tapMenus,
     pick: (index) => rig.picks.push(index),
-    runDefault: () => {
-      rig.defaults++;
-    },
     onCancel: () => {
       rig.cancels++;
     },
@@ -135,13 +131,40 @@ beforeEach(() => {
 });
 
 describe('MenuStripGesture: the release rules through real pointers', () => {
-  it('runs the default action on a tap and opens nothing', () => {
+  it('OPENS the row on a bare tap and picks nothing', () => {
+    // Quick Actions runs no action of its own, so the tap that used to open chat
+    // now reveals the row as a persistent, focusable menu.
     const rig = makeRig();
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
     rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
-    expect(rig.defaults).toBe(1);
+    expect(rig.gesture.isOpen()).toBe(true);
     expect(rig.picks).toEqual([]);
+    expect(rig.items.every((btn) => btn.tabIndex === 0)).toBe(true);
+  });
+
+  it('closes the row again on the next press of the control', () => {
+    const rig = makeRig();
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointerdown', 2, 100));
     expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.picks).toEqual([]);
+    expect(rig.cancels).toBe(1);
+    // And the click the browser synthesizes after that press must not reopen it.
+    rig.anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('dismisses the tapped-open row on a press outside it', () => {
+    const rig = makeRig();
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
+    const elsewhere = document.createElement('div');
+    document.body.append(elsewhere);
+    elsewhere.dispatchEvent(pointer('pointerdown', 2, 400));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.picks).toEqual([]);
+    expect(rig.cancels).toBe(1);
   });
 
   it('picks the item a rightward swipe lands on', () => {
@@ -151,7 +174,8 @@ describe('MenuStripGesture: the release rules through real pointers', () => {
     expect(rig.gesture.isOpen()).toBe(true);
     rig.anchor.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
     expect(rig.picks).toEqual([0]);
-    expect(rig.defaults).toBe(0);
+    // A pick closes the row: it is not left open behind the window it opened.
+    expect(rig.gesture.isOpen()).toBe(false);
   });
 
   it('cancels when the finger comes back to the anchor with the row open', () => {
@@ -162,7 +186,7 @@ describe('MenuStripGesture: the release rules through real pointers', () => {
     rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
     expect(rig.cancels).toBe(1);
     expect(rig.picks).toEqual([]);
-    expect(rig.defaults).toBe(0);
+    expect(rig.gesture.isOpen()).toBe(false);
   });
 
   it('ignores a LEFTWARD drag: the row only grows one way', () => {
@@ -170,8 +194,10 @@ describe('MenuStripGesture: the release rules through real pointers', () => {
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
     rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 - SWIPE_PX * 3));
     expect(rig.gesture.isOpen()).toBe(false);
+    // It reads as a bare tap, which opens the row rather than picking anything.
     rig.anchor.dispatchEvent(pointer('pointerup', 1, 100 - SWIPE_PX * 3));
-    expect(rig.defaults).toBe(1);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.picks).toEqual([]);
   });
 });
 
@@ -190,21 +216,20 @@ describe('MenuStripGesture: the window release backstop', () => {
     expect(rig.gesture.openState()).toBeNull();
     // Dropping is not resolving: a release the gesture never saw opens nothing.
     expect(rig.picks).toEqual([]);
-    expect(rig.defaults).toBe(0);
 
     // And the control is alive again, rather than dead under a painted row.
     rig.anchor.dispatchEvent(pointer('pointerdown', 2, 100));
     rig.anchor.dispatchEvent(pointer('pointerup', 2, 100));
-    expect(rig.defaults).toBe(1);
+    expect(rig.gesture.isOpen()).toBe(true);
   });
 
   it('leaves an ordinary release to the anchor, which resolves it first', () => {
     const rig = makeRig();
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
     // Bubbles to window, so the backstop runs on the same event and must find
-    // nothing left to drop rather than eating the default action.
+    // nothing left to drop rather than eating the release.
     rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
-    expect(rig.defaults).toBe(1);
+    expect(rig.gesture.isOpen()).toBe(true);
   });
 
   it('ignores a stray window release for a pointer it never armed', () => {
@@ -230,13 +255,13 @@ describe('MenuStripGesture: the clamp box', () => {
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
     rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
     const open = rig.gesture.openState();
-    // itemSize 40 + gap 8 = pitch 48 from an anchor centre at 80, so the ninth
-    // item's right edge lands at 512 + 20 = 532 and the 520px app box shifts the
-    // whole row 18px left. happy-dom's 1024px window would not have clamped.
+    // itemSize 40 + gap 8 = pitch 48 from an anchor centre at 80, so the tenth
+    // item's right edge lands at 560 + 20 = 580 and the 520px app box shifts the
+    // whole row 66px left. happy-dom's 1024px window would not have clamped.
     expect(window.innerWidth).toBeGreaterThan(520);
     expect(open?.placement.clamped).toBe(true);
     expect(open?.viewportWidth).toBe(520);
-    expect(open?.placement.centers[0]).toBe(110);
+    expect(open?.placement.centers[0]).toBe(62);
   });
 
   it('widens the edge margin to the safe area the overlay carries as padding', () => {
@@ -245,8 +270,8 @@ describe('MenuStripGesture: the clamp box', () => {
     rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
     const open = rig.gesture.openState();
     expect(open?.margin).toBe(30);
-    // margin becomes max(6, 30) = 30, so the same row shifts 42px instead of 18.
-    expect(open?.placement.centers[0]).toBe(86);
+    // margin becomes max(6, 30) = 30, so the same row shifts 90px instead of 66.
+    expect(open?.placement.centers[0]).toBe(38);
   });
 
   it('anchors the row on the measured centre of the control itself', () => {
@@ -293,10 +318,13 @@ describe('MenuStripGesture: the sticky path Phase 6 promotes', () => {
   it('does not mistake the click a resolved gesture leaves behind for an activation', () => {
     const rig = makeRig();
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
-    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
+    expect(rig.picks).toEqual([0]);
     rig.anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    // The row would be showing again if the synthetic click reopened it.
     expect(rig.gesture.isOpen()).toBe(false);
-    expect(rig.defaults).toBe(1);
+    expect(rig.picks).toEqual([0]);
   });
 
   it('ignores an item click while the menu is closed, so the row is inert', () => {
@@ -310,15 +338,13 @@ describe('MenuStripGesture: the sticky path Phase 6 promotes', () => {
 // player option. The RULES are tap_menu_core.ts's (its own suite); what is pinned
 // here is that the anchor's pointer path routes to them and arms no drag.
 describe('MenuStripGesture: tap mode', () => {
-  it('opens the row on a press and runs NO default action', () => {
+  it('opens the row on a press and picks nothing', () => {
     const rig = makeRig({ tapMenus: true });
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
-    expect(rig.defaults).toBe(0);
     expect(rig.picks).toEqual([]);
     expect(rig.gesture.isOpen()).toBe(true);
     // No drag armed, so the release resolves nothing and the row stays up.
     rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
-    expect(rig.defaults).toBe(0);
     expect(rig.gesture.isOpen()).toBe(true);
     expect(rig.gesture.liveIndex()).toBe(-1);
     expect(rig.items.every((btn) => btn.tabIndex === 0)).toBe(true);
@@ -333,13 +359,15 @@ describe('MenuStripGesture: tap mode', () => {
     expect(rig.items.every((btn) => btn.tabIndex === -1)).toBe(true);
   });
 
-  it('runs the default action when the anchor is pressed again', () => {
+  it('closes the row when the anchor is pressed again, running nothing', () => {
+    // The control has no default action to run here, so the second press is the
+    // way out rather than a chat toggle.
     const rig = makeRig({ tapMenus: true });
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
     rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
     rig.anchor.dispatchEvent(pointer('pointerdown', 2, 100));
-    expect(rig.defaults).toBe(1);
     expect(rig.picks).toEqual([]);
+    expect(rig.cancels).toBe(1);
     expect(rig.gesture.isOpen()).toBe(false);
   });
 
@@ -353,20 +381,18 @@ describe('MenuStripGesture: tap mode', () => {
     elsewhere.dispatchEvent(pointer('pointerdown', 2, 40));
     expect(rig.gesture.isOpen()).toBe(false);
     expect(rig.picks).toEqual([]);
-    expect(rig.defaults).toBe(0);
     expect(rig.cancels).toBe(1);
   });
 
-  it('with the setting OFF the swipe still picks and a tap still runs the default', () => {
+  it('with the setting OFF the swipe still picks in one gesture', () => {
+    // The promise of the setting: turning it off leaves the drag exactly as it
+    // was, so the row is still reachable and pickable without lifting a finger.
     const rig = makeRig();
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
-    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
-    expect(rig.defaults).toBe(1);
-
-    rig.anchor.dispatchEvent(pointer('pointerdown', 2, 100));
-    rig.anchor.dispatchEvent(pointer('pointermove', 2, 100 + SWIPE_PX));
-    rig.anchor.dispatchEvent(pointer('pointerup', 2, 100 + SWIPE_PX));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
     expect(rig.picks).toEqual([0]);
+    expect(rig.gesture.isOpen()).toBe(false);
   });
 });
 
@@ -382,9 +408,8 @@ describe('MenuStripGesture: the Escape path and the anchor open state', () => {
 
     expect(closeOpenTouchMenu()).toBe(true);
     expect(rig.gesture.isOpen()).toBe(false);
-    // A dismissal, never a choice: nothing is opened and nothing is defaulted.
+    // A dismissal, never a choice: nothing is opened.
     expect(rig.picks).toEqual([]);
-    expect(rig.defaults).toBe(0);
     expect(rig.cancels).toBe(1);
     expect(rig.items.every((btn) => btn.tabIndex === -1)).toBe(true);
   });

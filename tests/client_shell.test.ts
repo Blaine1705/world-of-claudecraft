@@ -2283,7 +2283,7 @@ describe('client HTML shell', () => {
     );
   });
 
-  it("collapses the five-button row into ONE menu control seated on the ring's Jump line", () => {
+  it("collapses the five-button row into ONE Quick Actions control on the ring's Jump line", () => {
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
@@ -2292,29 +2292,35 @@ describe('client HTML shell', () => {
         entry.indexOf('<div id="mobile-combat-controls">'),
         entry.indexOf('<div id="mobile-action-ring"'),
       );
-      // ONE control where five buttons used to be. It wears the chat icon
-      // because a bare tap opens chat, and it teaches the gesture in its own
-      // accessible name (touch has no hover to discover it with).
+      // ONE control where five buttons used to be. It wears the OVERFLOW glyph,
+      // not the chat one: a bare tap opens the row now and chat is an item in
+      // it, so a chat icon would name something the control no longer does. It
+      // teaches the gesture in its own accessible name (touch has no hover to
+      // discover it with).
       expect([...control.matchAll(/<button /g)], name).toHaveLength(1);
       expect(control, name).toContain('id="mobile-menu-anchor"');
-      expect(control, name).toContain('data-icon="chat"');
-      expect(control, name).toContain('data-i18n-aria="hudChrome.mobile.menuControlAria"');
-      expect(control, name).toContain('data-i18n="hudChrome.mobile.menuLabel"');
+      expect(control, name).toContain('data-icon="more"');
+      expect(control, `${name}: the anchor still wears the chat icon`).not.toContain(
+        'data-icon="chat"',
+      );
+      expect(control, name).toContain('data-i18n-aria="hudChrome.mobile.quickActionsAria"');
+      expect(control, name).toContain('data-i18n="hudChrome.mobile.quickActionsLabel"');
       // The five old row buttons are GONE from the row itself.
       for (const id of ['id="mobile-chat"', 'id="mobile-social"', 'id="mobile-quest"']) {
         expect(control, `${name}: ${id} still in the row`).not.toContain(id);
       }
 
-      // The strip: nine items, Mount first (issue #2739), each a real focusable
-      // button so Phase 6's tap mode has something to promote.
+      // The strip: ten items, Mount first (issue #2739) and Chat second, each a
+      // real focusable button so Phase 6's tap mode has something to promote.
       const strip = entry.slice(
         entry.indexOf('<div id="mobile-menu-strip"'),
         entry.indexOf('id="mobile-menu-caption"'),
       );
       const items = [...strip.matchAll(/class="mobile-menu-item"/g)];
-      expect(items, name).toHaveLength(9);
+      expect(items, name).toHaveLength(10);
       const order = [
         'id="mobile-menu-mount"',
+        'id="mobile-menu-chat"',
         'id="mobile-menu-map"',
         'id="mobile-menu-bags"',
         'id="mobile-social"',
@@ -2335,7 +2341,12 @@ describe('client HTML shell', () => {
       expect(
         [...strip.matchAll(/<button type="button" class="mobile-menu-item"/g)],
         name,
-      ).toHaveLength(9);
+      ).toHaveLength(10);
+      // The row positions the painter seats items by, renumbered with Chat in.
+      expect(
+        [...strip.matchAll(/data-menu-index="(\d+)"/g)].map((m) => m[1]),
+        name,
+      ).toEqual(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
       expect(strip, name).not.toContain('class="mobile-label"');
       expect(strip, name).toContain('id="mobile-menu-cancel"');
       // The More item keeps the dialog wiring the old row button carried, so
@@ -2348,7 +2359,10 @@ describe('client HTML shell', () => {
       );
 
       // Chat keeps a real button (and with it the press-and-hold log peek) in
-      // the More tray; the control's tap is the fast path to the same toggle.
+      // the More tray; the strip's own #mobile-menu-chat is the fast path to the
+      // same plain toggle, and is a SEPARATE element because a strip pick reaches
+      // its item through a synthesized click that no pointer-bound long press
+      // would ever see.
       const tray = entry.slice(
         entry.indexOf('<div id="mobile-extra-grid">'),
         entry.indexOf('<div id="mobile-window-backdrop"'),
@@ -2439,7 +2453,12 @@ describe('client HTML shell', () => {
       "this.bindButton('mobile-menu-spellbook', () => this.callbacks.onSpellbook());",
     );
     expect(mobileControlsTs).toContain(
-      'this.menuControl = buildMobileMenuControl({ runDefault: () => this.tapChat() });',
+      // No default-action callback: the control opens its own row and runs no
+      // action of its own, so the chat toggle moved to the strip's own seat.
+      'this.menuControl = buildMobileMenuControl();',
+    );
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-menu-chat', () => this.tapChat());",
     );
     expect(mobileControlsTs).not.toContain("bindButton('mobile-more-chat'");
     expect(mobileControlsTs).not.toContain("bindButton('mobile-more-social'");

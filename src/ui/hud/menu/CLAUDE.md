@@ -1,35 +1,45 @@
-<!-- src/ui/hud/menu/: the touch menu control (one seat + a nine-item strip).
+<!-- src/ui/hud/menu/: Quick Actions (one seat + a ten-item strip).
      Presentation and input only. Don't repeat root / src/ui / src/ui/hud
      CLAUDE.md, reference them. -->
 
-# src/ui/hud/menu/: the touch menu control
+# src/ui/hud/menu/: Quick Actions, the touch menu control
 
 One gesture control replacing the old five-button touch row (Chat, Social,
-Quests, Settings, More). A tap runs the default action (chat); a hold or a
-rightward swipe opens the nine-item strip: Mount, Map, Bags, Social, Quests,
-Character, Spells, Settings, More.
+Quests, Settings, More). It runs NO action of its own: a tap opens the ten-item
+strip (Mount, Chat, Map, Bags, Social, Quests, Character, Spells, Settings,
+More), a hold or a rightward swipe opens it and picks in one gesture, and the
+next press on the control closes it again.
 
 ## Load-bearing rules
 
 - **The roster order IS the design.** It is sorted by how often a player reaches
   for it, because swipe distance is the cost. Mount leads it (issue #2739). Do
   not reorder `MENU_STRIP_ITEMS` for tidiness.
-- **Nothing here implements an action.** Every strip item is a real `<button>`
-  the touch HUD already binds (`mobile_controls.ts`), so a pick activates that
-  button and the existing handler runs. Adding an action means adding its button
-  and its binding, never a callback that duplicates the handler.
+- **Nothing here implements an action, the control least of all.** Every strip
+  item is a real `<button>` the touch HUD already binds (`mobile_controls.ts`),
+  so a pick activates that button and the existing handler runs. Adding an action
+  means adding its button and its binding, never a callback that duplicates the
+  handler. The anchor takes no default-action callback at all.
+- **A pick reaches its item through a synthesized `click`.** That is why Chat is
+  seated by its own `#mobile-menu-chat` rather than the More tray's
+  `#mobile-chat`: the tray button carries the press-and-hold chat-log peek on
+  pointer handlers a click never reaches. Both buttons run the same `tapChat()`.
 - **The caption reuses the tooltip chrome.** `.panel` for the box and `.tt-title`
   for the text, which is why those `.tt-title` metrics are lifted out of the
   `#tooltip` id scope in `hud.css`. Never ship a second copy of them.
-- **One caption, never nine labels.** Nine 8px captions at this pitch collide and
-  clip, and they name eight things the player is not choosing.
+- **One caption, never ten labels.** Ten 8px captions at this pitch collide and
+  clip, and they name nine things the player is not choosing.
+- **The anchor's tap rule is `tap_menu_core.ts`'s, not this directory's.** The
+  control declares `anchorRole: 'toggle'` and the shared table answers what an
+  anchor press means in either mode; a bare tap resolves at RELEASE, which is
+  what leaves the swipe intact with `touchTapMenus` off.
 
 ## Shape
 
 | File | What it is |
 |---|---|
 | `menu_strip_core.ts` | PURE. Roster, release rules, reveal rule, caption clamp. Registered in `UI_PURE_CORES`. |
-| `menu_strip_gesture_controller.ts` | A thin instantiation of the SHARED `../strip_gesture_controller.ts` (pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, `aria-expanded`, the Escape closer, and the sticky path). It supplies only this menu's four parameters: the fixed rightward direction, the nine-item roster, the pitch, and the tap-runs-chat default. |
+| `menu_strip_gesture_controller.ts` | A thin instantiation of the SHARED `../strip_gesture_controller.ts` (pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, `aria-expanded`, the Escape closer, and the sticky path). It supplies only this menu's four parameters: the fixed rightward direction, the ten-item roster, the pitch, and the `anchorRole: 'toggle'` that turns a bare tap into an open. |
 | `menu_strip_painter.ts` | Thin painter: item seating, live highlight, caption text and position. Takes no layout read. |
 | `menu_control_controller.ts` | Builds it from the static markup and routes picks to the real buttons. |
 
@@ -61,5 +71,5 @@ Both this row and the consumables row dim a BAND along the row, never a circle a
 the anchor: `stripDimSpan` (`../action_bar/radial_action_core.ts`) measures from the
 open items and the painter writes `--strip-dim-x` / `--strip-extent-px`, so the
 extent scales with the item count and the mirror comes from the placement rather
-than from a body class. A circle wide enough to reach the ninth item washes the
+than from a body class. A circle wide enough to reach the last item washes the
 half of the screen the row never touches, which is what it did before.

@@ -2,10 +2,11 @@
 // it pays for. Composes the shipped markup shape, the real mobile stylesheet, the
 // placement core and the strip painter, so what a unit test cannot see is pinned
 // against real layout: the control renders as one circle on the action ring's
-// Jump line, its nine-item strip opens RIGHTWARD and stays on screen with the
-// cancel X sitting on the anchor, one caption names the live item, and the top
-// band the collapsed row vacated seats the target frame with the party stack
-// below it, clear of the move zone and holding its slot when the target drops.
+// Jump line wearing the OVERFLOW glyph rather than Chat's, its ten-item strip
+// opens RIGHTWARD and stays on screen with the cancel X sitting on the anchor,
+// one caption names the live item, and the top band the collapsed row vacated
+// seats the target frame with the party stack below it, clear of the move zone
+// and holding its slot when the target drops.
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
@@ -19,6 +20,7 @@ import { MenuStripPainter } from '../../src/ui/hud/menu/menu_strip_painter';
 import { resolveMobileHudLayout } from '../../src/ui/mobile_hud_layout';
 import { makeWriterFacet } from '../../src/ui/painter_host';
 import { PARTY_BELOW_TARGET_BOTTOM_PROP } from '../../src/ui/party_below_target_painter';
+import { hydrateIcons } from '../../src/ui/ui_icons';
 import '../../src/styles/index.css';
 import { cleanup } from './_harness';
 
@@ -60,6 +62,11 @@ function writers() {
   );
 }
 
+/** The anchor's glyph in the shipped markup (index.html / play.html, pinned
+ *  there by tests/client_shell.test.ts). It is the overflow mark, NOT chat's:
+ *  the control opens a row of actions and chat is one of them. */
+const ANCHOR_ICON = 'more';
+
 /** The shipped structure: the control inside #mobile-combat-controls, the ring
  *  beside it (for the Jump line the control's seat is derived from), and the
  *  strip as a SIBLING overlay, matching index.html / play.html. */
@@ -83,6 +90,7 @@ function mountControl() {
   anchor.type = 'button';
   anchor.id = 'mobile-menu-anchor';
   anchor.className = 'mobile-btn';
+  anchor.dataset.icon = ANCHOR_ICON;
   row.append(anchor);
 
   const strip = document.createElement('div');
@@ -93,6 +101,7 @@ function mountControl() {
     btn.className = 'mobile-menu-item';
     btn.id = item.elementId;
     btn.dataset.menuIndex = String(i);
+    btn.dataset.icon = item.id === 'chat' ? 'chat' : 'more';
     btn.tabIndex = -1;
     return btn;
   });
@@ -279,6 +288,21 @@ describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height }) => 
     return mountControl();
   }
 
+  it('wears the overflow glyph, not the chat one the strip now carries', async () => {
+    const rig = await setup();
+    hydrateIcons(rig.controls);
+    const glyph = rig.anchor.querySelector('.ui-icon');
+    expect(glyph, 'the anchor renders no icon at all').not.toBeNull();
+    // The Chat item's glyph is a DIFFERENT drawing: the anchor used to wear it,
+    // which named an action the control no longer runs.
+    const chatSeat = rig.items[MENU_STRIP_ITEMS.findIndex((item) => item.id === 'chat')];
+    const chatGlyph = chatSeat.querySelector('.ui-icon');
+    expect(chatGlyph).not.toBeNull();
+    expect(glyph?.innerHTML).not.toBe(chatGlyph?.innerHTML);
+    // And it is a real drawing rather than an unresolved placeholder.
+    expect(glyph?.innerHTML.length).toBeGreaterThan(0);
+  });
+
   it('renders ONE control, a true circle on the ring Jump line and above the touch floor', async () => {
     const rig = await setup();
     const box = rig.anchor.getBoundingClientRect();
@@ -299,7 +323,7 @@ describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height }) => 
     expect(box.left).toBeGreaterThanOrEqual(wheel.right - EDGE_TOLERANCE_PX);
   });
 
-  it('opens the nine-item strip RIGHTWARD and keeps every item on screen', async () => {
+  it('opens the ten-item strip RIGHTWARD and keeps every item on screen', async () => {
     const rig = await setup();
     const painter = new MenuStripPainter(writers(), {
       strip: rig.strip,
@@ -400,6 +424,8 @@ describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height }) => 
     expect(getComputedStyle(rig.caption).display).toBe('none');
 
     // The LAST item, the one whose caption is closest to running off the edge.
+    // The row is one item longer since Chat joined it, so this is also the pin
+    // that the extra pitch did not push the caption off screen.
     painter.paint({
       placement,
       ...shared,

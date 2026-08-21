@@ -570,25 +570,37 @@ export const hudChromeStrings = {
     // number the player never sees), and the group a sticky-mode menu belongs to.
     // WORDY by M16, so the five non-Latin overlays carry real fills.
     consumableSeat: 'Consumables',
-    // The menu control (Phase 4): ONE seat replacing the five-button row (Chat,
-    // Social, Quests, Settings, More) that sat at top-left, further from either
-    // thumb than anything else in the HUD. menuControl names both the control and
-    // the strip it opens; menuControlAria is the control's own accessible name,
-    // which has to TEACH the gesture because a touch device has no hover to
-    // discover it with. The nine strip items reuse the accessible names their own
-    // buttons already carry, and the live caption reuses those buttons' label
-    // keys, so no per-item key lives here. Both are WORDY by M16, so the five
-    // non-Latin overlays carry real fills; menuLabel ("Menu") is not.
+    // RETIRED in place: the same control's copy while it was named "Menus" and a
+    // bare tap opened chat. Both facts changed, so the four keys below were
+    // SUPERSEDED by the quickActions* set rather than reworded (the
+    // corpseHarvest.harvestTooltip precedent: an in-place reword leaves every
+    // locale's reviewed fill answering the old sentence). The keys stay, already
+    // filled, per the hud.core.mobileTarget retired-but-translated precedent.
     menuControl: 'Menus',
     menuControlAria:
       'Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.',
-    // The SAME control under settings.touchTapMenus, where a tap opens the strip
-    // and never opens chat: the gesture sentence above would teach the opposite
-    // of what the control does, so menu_control_controller.ts swaps the name when
-    // the setting flips.
     menuControlAriaTap:
       'Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.',
     menuLabel: 'Menu',
+    // Quick Actions: ONE seat replacing the five-button row (Chat, Social,
+    // Quests, Settings, More) that sat at top-left, further from either thumb
+    // than anything else in the HUD. quickActions names both the control and the
+    // strip it opens; quickActionsAria is the control's own accessible name,
+    // which has to TEACH the gesture because a touch device has no hover to
+    // discover it with. The ten strip items reuse the accessible names their own
+    // buttons already carry, and the live caption reuses those buttons' label
+    // keys, so no per-item key lives here. All four are WORDY by M16, so the five
+    // non-Latin overlays carry real fills.
+    quickActions: 'Quick Actions',
+    quickActionsAria:
+      'Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.',
+    // The SAME control under settings.touchTapMenus, where the row is opened and
+    // chosen from with separate taps rather than one gesture, so the swipe
+    // sentence above would teach something the control does not do;
+    // menu_control_controller.ts swaps the name when the setting flips.
+    quickActionsAriaTap:
+      'Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.',
+    quickActionsLabel: 'Actions',
     // The top-band quest strip (Phase 5): the touch replacement for the
     // right-anchored quest tracker, showing ONE quest with all of its objectives
     // instead of a list that grew into the action ring. questStripAria is the

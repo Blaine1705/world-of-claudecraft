@@ -37,8 +37,10 @@
 // buttons instead of a drag. The touchTapMenus setting is that same path
 // promoted to a player option: with it on, a press opens the row instead of
 // arming the drag, a press on the anchor with the row open runs the default
-// action, and a press outside dismisses. Every rule is tap_menu_core.ts's,
-// shared with the radial so the three menus cannot drift.
+// action, and a press outside dismisses. A control with NO default action of its
+// own (anchorRole 'toggle') reaches the same row from a bare tap in either mode
+// and closes it on the next press. Every rule is tap_menu_core.ts's, shared with
+// the radial so the three menus cannot drift.
 
 import type { PainterHostWriters } from '../painter_host';
 import {
@@ -52,7 +54,7 @@ import {
   stripCancelIsLive,
 } from './action_bar/radial_action_core';
 import { armTapMenuOutsideDismiss, registerTouchMenu } from './tap_menu';
-import { resolveTapMenuPress } from './tap_menu_core';
+import { resolveTapMenuPress, type TapMenuAnchorRole, type TapMenuPress } from './tap_menu_core';
 
 // Row geometry comes from the stylesheet, never from numbers here. An item is
 // the same rendered size as the anchor that opens it (both read --menu-btn-size
@@ -87,10 +89,13 @@ export interface StripMetrics {
   margin: number;
 }
 
-/** What a release on the anchor means, in the one shape both rows share. */
+/** What a release on the anchor means, in the one shape both rows share. A row
+ *  whose control has no default action of its own answers 'open' instead, which
+ *  turns the bare tap into the sticky menu rather than an action. */
 export type StripGestureOutcome =
   | { kind: 'pick'; index: number }
   | { kind: 'default' }
+  | { kind: 'open' }
   | { kind: 'cancel' };
 
 export interface StripReleaseInput {
@@ -115,6 +120,9 @@ export interface StripGestureDeps {
   writers: PainterHostWriters;
   /** Tap mode (settings.touchTapMenus), read live at press time. */
   tapMenus(): boolean;
+  /** What a press on THIS control means beyond opening its row. Defaults to
+   *  'action'; the rule itself is tap_menu_core.ts's, never restated here. */
+  anchorRole?: TapMenuAnchorRole;
   /** Row items open right now. */
   count(): number;
   /** Travel between adjacent items as the finger sees it. */
@@ -125,8 +133,9 @@ export interface StripGestureDeps {
   release(input: StripReleaseInput): StripGestureOutcome;
   /** Choose the item at `index` (open it, use it). */
   onPick(index: number): void;
-  /** A bare tap: run the control's default action. */
-  onDefault(): void;
+  /** A bare tap: run the control's default action. Omitted by a control that has
+   *  none, whose release rule answers 'open' where this would have been called. */
+  onDefault?(): void;
   /** The player opened the row and chose nothing. */
   onCancel(): void;
   /** Repaint from openState(). Supplied only by a control with no per-frame HUD
@@ -261,10 +270,12 @@ export class StripGesture {
     if (this.sticky || this.drag || this.deps.count() <= 0) return;
     this.sticky = this.measure();
     this.setRowFocusable(true);
-    // Only tap mode dismisses on an outside press: with the setting off the row
-    // is assistive-only and closes through its own items or its cancel X, which
-    // is what it did before the setting existed.
-    if (this.deps.tapMenus()) {
+    // Whether an outside press dismisses is the CORE's answer, not a second
+    // reading of the setting: for an 'action' control only tap mode listens (with
+    // the setting off the row is assistive-only and closes through its own items
+    // or its cancel X, which is what it did before the setting existed), while a
+    // 'toggle' control listens in either mode because a plain tap opens its row.
+    if (this.press(true, 'outside').kind === 'dismiss') {
       this.disarmOutside = armTapMenuOutsideDismiss(
         () => [this.deps.anchor, ...this.deps.items, this.deps.cancel],
         () => this.dismissSticky(),
@@ -299,33 +310,39 @@ export class StripGesture {
 
   /** The tap-outside path: close and report the row as chosen-nothing. */
   private dismissSticky(): void {
-    const press = resolveTapMenuPress({
-      tapMenus: this.deps.tapMenus(),
-      open: this.sticky !== null,
-      target: 'outside',
-    });
-    if (press.kind !== 'dismiss') return;
+    if (this.press(this.sticky !== null, 'outside').kind !== 'dismiss') return;
     this.closeSticky();
     this.deps.onCancel();
   }
 
-  /** A tap-mode press on the anchor: open the row, or run the control's default
-   *  action when it is already open. Never arms the drag. */
-  private onTapPress(e: PointerEvent): void {
-    const press = resolveTapMenuPress({
-      tapMenus: true,
-      open: this.sticky !== null,
-      target: 'anchor',
+  /** Ask the shared table what a press means for this control. `open` is passed
+   *  rather than read so openSticky can ask about the state it is entering. */
+  private press(open: boolean, target: 'anchor' | 'outside'): TapMenuPress {
+    return resolveTapMenuPress({
+      tapMenus: this.deps.tapMenus(),
+      open,
+      target,
+      anchorRole: this.deps.anchorRole,
     });
+  }
+
+  /** An anchor press the gesture layer does NOT own: open the row, close it
+   *  again, or run the control's default action. Never arms the drag. */
+  private onAnchorPress(e: PointerEvent, press: TapMenuPress): void {
     this.suppressClick = true;
     if (e.pointerType === 'touch') e.preventDefault();
     if (press.kind === 'open') {
       this.openSticky();
       return;
     }
+    if (press.kind === 'dismiss') {
+      this.closeSticky();
+      this.deps.onCancel();
+      return;
+    }
     if (press.kind !== 'default' || this.deps.count() <= 0) return;
     this.closeSticky();
-    this.deps.onDefault();
+    this.deps.onDefault?.();
   }
 
   /** True while the row is showing, from either path. */
@@ -404,8 +421,9 @@ export class StripGesture {
     // release and cleared by the click that follows it, so one that never
     // arrived would otherwise swallow the next assistive activation.
     this.suppressClick = false;
-    if (this.deps.tapMenus()) {
-      this.onTapPress(e);
+    const press = this.press(this.sticky !== null, 'anchor');
+    if (press.kind !== 'gesture') {
+      this.onAnchorPress(e, press);
       return;
     }
     if (this.drag || this.sticky) return;
@@ -462,7 +480,10 @@ export class StripGesture {
     this.suppressClick = true;
     this.cancelDrag();
     if (outcome.kind === 'pick') this.deps.onPick(outcome.index);
-    else if (outcome.kind === 'default') this.deps.onDefault();
+    else if (outcome.kind === 'default') this.deps.onDefault?.();
+    // The drag is already dropped above, so the row can take the anchor's own
+    // press as its opening one.
+    else if (outcome.kind === 'open') this.openSticky();
     else this.deps.onCancel();
   }
 

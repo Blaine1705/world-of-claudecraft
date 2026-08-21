@@ -364,9 +364,6 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
       pick: (index) => {
         picks.push(index);
       },
-      runDefault: () => {
-        picks.push(-1);
-      },
       onCancel: () => {
         cancels.menu++;
       },
@@ -450,6 +447,7 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
 
     expect(rig.picks).toEqual([]);
     expect(rig.menuStrip.classList.contains('open')).toBe(true);
+    expect(rig.menuItems).toHaveLength(MENU_STRIP_ITEMS.length);
     const item = rig.menuItems[3];
     expect(getComputedStyle(item).pointerEvents).toBe('auto');
     expect(tappableAtItsCentre(item)).toBe(true);
@@ -560,11 +558,33 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     swipe(rig.seat, -SWIPE_PX, 4);
     expect(rig.used).toEqual([0, 1]);
 
-    // The menu control: a bare tap runs the default action (-1 in this rig), a
-    // rightward swipe of the same distance picks item 1.
+    // Quick Actions: a bare tap OPENS the row (it runs no action of its own), a
+    // rightward swipe of the same distance picks item 1 in one gesture. The tap
+    // is resolved at RELEASE, which is what leaves room for the swipe.
     tap(rig.anchor, 5);
-    expect(rig.picks).toEqual([-1]);
-    swipe(rig.anchor, SWIPE_PX, 6);
-    expect(rig.picks).toEqual([-1, 1]);
+    expect(rig.picks).toEqual([]);
+    expect(rig.menuGesture.isOpen()).toBe(true);
+    // A second press on the control closes what the first one opened.
+    tap(rig.anchor, 6);
+    expect(rig.menuGesture.isOpen()).toBe(false);
+    expect(rig.picks).toEqual([]);
+
+    swipe(rig.anchor, SWIPE_PX, 7);
+    expect(rig.picks).toEqual([1]);
+  });
+
+  it('with the setting OFF the tapped-open row still reaches Chat, its second item', async () => {
+    // The tap used to open chat outright. It opens the row now, so chat has to
+    // be reachable from the row with one more ordinary tap.
+    const rig = await setup(false);
+    tap(rig.anchor);
+    expect(rig.menuStrip.classList.contains('open')).toBe(true);
+    expect(MENU_STRIP_ITEMS[1].id).toBe('chat');
+    const chat = rig.menuItems[1];
+    expect(getComputedStyle(chat).pointerEvents).toBe('auto');
+    expect(tappableAtItsCentre(chat)).toBe(true);
+    tap(chat, 2);
+    expect(rig.picks).toEqual([1]);
+    expect(rig.menuStrip.classList.contains('open')).toBe(false);
   });
 });

@@ -442,7 +442,7 @@ describe('resolveStripIndex', () => {
 });
 
 // The local dim's band. The whole point is that it FOLLOWS the row: the extent is
-// a function of how many items are actually open, so a nine-item menu and a
+// a function of how many items are actually open, so a ten-item menu and a
 // one-item consumables row never darken the same amount of screen.
 describe('stripDimSpan', () => {
   const ITEM = 46;

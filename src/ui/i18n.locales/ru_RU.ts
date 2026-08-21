@@ -9084,6 +9084,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Меню. Нажмите, чтобы открыть чат, или удерживайте и проведите вправо для транспорта, карты, сумок и других разделов.',
   'hudChrome.mobile.menuControlAriaTap':
     'Меню. Нажмите, чтобы открыть ряд меню: транспорт, карта, сумки и другие разделы. Нажмите ещё раз, чтобы открыть чат.',
+  'hudChrome.mobile.quickActions': 'Быстрые действия',
+  'hudChrome.mobile.quickActionsAria':
+    'Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, либо удерживайте и проведите вправо, чтобы выбрать.',
+  'hudChrome.mobile.quickActionsAriaTap':
+    'Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, затем нажмите нужный значок. Нажмите на элемент управления ещё раз, чтобы закрыть.',
+  'hudChrome.mobile.quickActionsLabel': 'Действия',
   'hudChrome.mobile.questStripAria':
     'Отслеживаемое задание {position} из {total}: {title}. Нажмите, чтобы перейти к следующему.',
   'hudChrome.mobile.questStripAriaSingle': 'Отслеживаемое задание: {title}',

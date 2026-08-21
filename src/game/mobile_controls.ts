@@ -507,17 +507,22 @@ export class MobileControls {
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
-    // The menu control's strip seats REAL buttons: four moved out of the old
+    // The Quick Actions strip seats REAL buttons: three moved out of the old
     // five-button row (social, quest, settings, more, all still bound by their
-    // own lines here) and five promoted out of the More tray, bound below to the
-    // SAME callbacks their tray twins use. A pick activates the button, so no
+    // own lines here) and the rest promoted out of the More tray, bound below to
+    // the SAME callbacks their tray twins use. A pick activates the button, so no
     // action is ever implemented twice.
     this.bindButton('mobile-menu-mount', () => this.callbacks.onMountToggle());
+    // Chat's strip seat runs the plain tap toggle. It is bindButton, not
+    // bindChatButton: the press-and-hold log peek stays on the tray's
+    // #mobile-chat, because a strip pick reaches its item through a synthesized
+    // click, which no pointer-bound long press would ever see.
+    this.bindButton('mobile-menu-chat', () => this.tapChat());
     this.bindButton('mobile-menu-map', () => this.callbacks.onMap());
     this.bindButton('mobile-menu-bags', () => this.callbacks.onBags());
     this.bindButton('mobile-menu-char', () => this.callbacks.onCharacter());
     this.bindButton('mobile-menu-spellbook', () => this.callbacks.onSpellbook());
-    this.menuControl = buildMobileMenuControl({ runDefault: () => this.tapChat() });
+    this.menuControl = buildMobileMenuControl();
     this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
     this.bindButton('mobile-donate', () => this.callbacks.onDonate());
     this.bindButton('mobile-wiki', () => this.callbacks.onWiki());

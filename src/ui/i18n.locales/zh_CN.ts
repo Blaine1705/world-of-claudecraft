@@ -8562,6 +8562,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。',
   'hudChrome.mobile.menuControlAriaTap':
     '菜单。点按打开菜单行：坐骑、地图、背包等。再次点按可打开聊天。',
+  'hudChrome.mobile.quickActions': '快捷操作',
+  'hudChrome.mobile.quickActionsAria':
+    '快捷操作。点按打开坐骑、聊天、地图、背包等操作行，或按住并向右滑动进行选择。',
+  'hudChrome.mobile.quickActionsAriaTap':
+    '快捷操作。点按打开坐骑、聊天、地图、背包等操作行，然后点按其中一项。再次点按该控件可关闭。',
+  'hudChrome.mobile.quickActionsLabel': '操作',
   'hudChrome.mobile.questStripAria':
     '追踪任务 {position}/{total}：{title}。点按可切换到下一个任务。',
   'hudChrome.mobile.questStripAriaSingle': '追踪任务：{title}',

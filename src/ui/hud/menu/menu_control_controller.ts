@@ -1,23 +1,24 @@
-// Builds and wires the touch menu control: the single seat that replaces the old
-// five-button row, plus the nine-item strip it opens (Phase 4 of the touch
+// Builds and wires Quick Actions: the single seat that replaces the old
+// five-button row, plus the ten-item strip it opens (Phase 4 of the touch
 // rework). The row it replaces sat 365 to 443px from the nearer thumb, the least
 // reachable chrome in the HUD, and buried Mount two taps behind the More modal
 // (issue #2739); the strip puts Mount at the shortest gesture on the control.
 //
-// Nothing here reimplements an action. Every strip item is a REAL button the
-// touch HUD already binds (four of them are the old row's own buttons, five are
-// promotions out of the More tray), so a pick activates that button and the
-// action runs through its existing handler. The default action (chat) is the one
-// exception: the chat button carries its own press-and-hold log peek, so it stays
-// where it is and the owner hands us its tap as a callback.
+// Nothing here reimplements an action, and the control itself runs none: every
+// strip item is a REAL button the touch HUD already binds, so a pick activates
+// that button and the action runs through its existing handler, while the
+// control's own tap only opens the row. Chat is one of those items now (the tray
+// button it used to run keeps the press-and-hold log peek), which is why this
+// module takes no default-action callback at all.
 //
 // The ANCHOR'S ACCESSIBLE NAME depends on the MODE, which is why this module
 // owns it rather than the static markup alone. A touch device has no hover to
 // discover the gesture with, so the name teaches it; under settings.touchTapMenus
-// a tap OPENS the strip and does not open chat, so the gesture sentence would
-// tell a screen-reader user the opposite of what the control does. It is rewritten
-// on the settings broadcast and again after a language switch, because the shell's
-// data-i18n-aria pass re-stamps the gesture-mode name on every locale change.
+// the row is opened and chosen from with separate taps, so the swipe sentence
+// would teach a screen-reader user something the control does not do. It is
+// rewritten on the settings broadcast and again after a language switch, because
+// the shell's data-i18n-aria pass re-stamps the gesture-mode name on every locale
+// change.
 //
 // The static markup lives in index.html / play.html (#mobile-menu-anchor,
 // #mobile-menu-strip). On a build that omits it, buildMobileMenuControl returns
@@ -39,12 +40,10 @@ const CAPTION_TEXT_SELECTOR = '.tt-title';
 const ARIA_LABEL_ATTR = 'aria-label';
 /** The two accessible names, one per mode. The gesture one is also the static
  *  markup's `data-i18n-aria`, so an unbuilt control still says something true. */
-const GESTURE_ARIA_KEY: TranslationKey = 'hudChrome.mobile.menuControlAria';
-const TAP_ARIA_KEY: TranslationKey = 'hudChrome.mobile.menuControlAriaTap';
+const GESTURE_ARIA_KEY: TranslationKey = 'hudChrome.mobile.quickActionsAria';
+const TAP_ARIA_KEY: TranslationKey = 'hudChrome.mobile.quickActionsAriaTap';
 
 export interface MobileMenuControlDeps {
-  /** A bare tap on the control: the same chat toggle the old Chat button ran. */
-  runDefault(): void;
   /** The player opened the strip and chose nothing. */
   onCancel?(): void;
   /**
@@ -75,7 +74,7 @@ function ownWriters(): PainterHostWriters {
 }
 
 /** Build the control, or return null when the markup is absent. */
-export function buildMobileMenuControl(deps: MobileMenuControlDeps): MobileMenuControl | null {
+export function buildMobileMenuControl(deps: MobileMenuControlDeps = {}): MobileMenuControl | null {
   const anchor = document.getElementById(ANCHOR_ID) as HTMLButtonElement | null;
   const strip = document.getElementById(STRIP_ID);
   const cancel = document.getElementById(CANCEL_ID);
@@ -109,10 +108,6 @@ export function buildMobileMenuControl(deps: MobileMenuControlDeps): MobileMenuC
       // Activate the real button: the action then runs through the handler the
       // old row or the More tray already bound to it, haptics included.
       itemEls[index]?.click();
-      anchor.blur();
-    },
-    runDefault: () => {
-      deps.runDefault();
       anchor.blur();
     },
     onCancel: () => deps.onCancel?.(),

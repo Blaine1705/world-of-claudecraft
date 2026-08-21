@@ -5,15 +5,17 @@
 // consumables row share one tested implementation. Registered in
 // tests/architecture.test.ts UI_PURE_CORES.
 //
-// The control replaces the old five-button row (Chat, Social, Quests, Settings,
-// More), which sat further from either thumb than anything else in the HUD. A tap
-// opens chat, the action a player reaches for mid-session far more than the rest;
-// a hold or a rightward swipe opens the nine-item strip.
+// The control (Quick Actions) replaces the old five-button row (Chat, Social,
+// Quests, Settings, More), which sat further from either thumb than anything else
+// in the HUD. It runs NO action of its own: a tap opens the ten-item strip, and a
+// hold or a rightward swipe opens it and picks in one gesture.
 //
 // The roster is ordered by how often a player reaches for it, because swipe
-// distance IS the cost: item 0 is one flick away, item 8 is the length of the row.
-// Mount leads it, which is the answer to issue #2739: today mount is two taps
-// behind the More modal, and here it is the shortest gesture on the control.
+// distance IS the cost: item 0 is one flick away, item 9 is the length of the row.
+// Mount leads it, which is the answer to issue #2739 (mount used to be two taps
+// behind the More modal, and here it is the shortest gesture on the control), and
+// Chat follows it, the action a player reaches for mid-session more than the rest
+// and the one the control's own tap used to run.
 
 import type { TranslationKey } from '../../i18n';
 import {
@@ -25,6 +27,7 @@ import {
 /** The strip roster's stable ids. Order is load-bearing (it IS the row order). */
 export type MenuActionId =
   | 'mount'
+  | 'chat'
   | 'map'
   | 'bags'
   | 'social'
@@ -37,10 +40,13 @@ export type MenuActionId =
 export interface MenuStripItem {
   id: MenuActionId;
   /**
-   * The id of the REAL button the strip seats. Four of them are the old row's own
-   * buttons and five are promotions out of the More tray, but every one is a
+   * The id of the REAL button the strip seats. Three of them are the old row's own
+   * buttons and the rest are promotions out of the More tray, but every one is a
    * button the touch HUD already binds, so a pick routes through the existing
-   * handler instead of a second copy of the action.
+   * handler instead of a second copy of the action. Chat is seated by its own
+   * strip button rather than the tray's #mobile-chat: that button carries the
+   * press-and-hold log peek on its pointer handlers, which a synthesized click
+   * would never reach.
    */
   elementId: string;
   /** The caption shown while the finger is over the item. */
@@ -49,6 +55,7 @@ export interface MenuStripItem {
 
 export const MENU_STRIP_ITEMS: readonly MenuStripItem[] = [
   { id: 'mount', elementId: 'mobile-menu-mount', captionKey: 'hudChrome.mounts.mount' },
+  { id: 'chat', elementId: 'mobile-menu-chat', captionKey: 'hud.core.mobileChat' },
   { id: 'map', elementId: 'mobile-menu-map', captionKey: 'hud.core.mobileMap' },
   { id: 'bags', elementId: 'mobile-menu-bags', captionKey: 'hud.keybinds.actions.bags' },
   { id: 'social', elementId: 'mobile-social', captionKey: 'hud.core.mobileSocial' },
@@ -80,7 +87,7 @@ export const MENU_CAPTION_HALF_PX = 56;
 
 /** What a release on the control does. */
 export type MenuStripOutcome =
-  | { kind: 'default' }
+  | { kind: 'open' }
   | { kind: 'pick'; index: number }
   | { kind: 'cancel' };
 
@@ -93,16 +100,16 @@ export interface MenuStripReleaseInput {
 }
 
 /**
- * The release rule. A bare tap runs the DEFAULT action (chat), so the control is
- * still a one-tap chat button for the player who never learns the gesture. Once
- * the row is OPEN, a release back in the anchor's own band means the player
- * looked and chose nothing, so back out instead of opening something they did
- * not pick.
+ * The release rule. A bare tap OPENS the row as a persistent menu, so the player
+ * who never learns the gesture still reaches every item with two ordinary taps;
+ * the control has no action of its own to run instead. Once the row is OPEN, a
+ * release back in the anchor's own band means the player looked and chose
+ * nothing, so back out instead of opening something they did not pick.
  */
 export function resolveMenuStripRelease(input: MenuStripReleaseInput): MenuStripOutcome {
-  if (input.count <= 0) return { kind: 'default' };
+  if (input.count <= 0) return { kind: 'open' };
   if (input.revealed && input.index < 0) return { kind: 'cancel' };
-  if (input.index < 0) return { kind: 'default' };
+  if (input.index < 0) return { kind: 'open' };
   return { kind: 'pick', index: Math.min(input.index, input.count - 1) };
 }
 
@@ -124,8 +131,8 @@ export interface MenuCaptionInput {
 /**
  * Where the caption's centre parks: over the live item, clamped so the box stays
  * on screen. Returns null when nothing is live, which is what hides it: ONE
- * caption for the item being chosen, never nine permanent labels (nine captions
- * at this pitch collide and clip, and they name eight things the player is not
+ * caption for the item being chosen, never ten permanent labels (ten captions
+ * at this pitch collide and clip, and they name nine things the player is not
  * choosing).
  */
 export function menuCaptionCenterX(input: MenuCaptionInput): number | null {
