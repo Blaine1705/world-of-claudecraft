@@ -28,6 +28,7 @@ import {
   RADIAL_PETAL_DIRECTIONS,
   RadialPetalPainter,
 } from '../../src/ui/hud/action_bar/radial_petal_painter';
+import { buildMobileMenuControl } from '../../src/ui/hud/menu/menu_control_controller';
 import { MENU_STRIP_ITEMS } from '../../src/ui/hud/menu/menu_strip_core';
 import { MenuStripGesture } from '../../src/ui/hud/menu/menu_strip_gesture_controller';
 import { MenuStripPainter } from '../../src/ui/hud/menu/menu_strip_painter';
@@ -39,6 +40,7 @@ import {
 import { closeOpenTouchMenu } from '../../src/ui/hud/tap_menu';
 import { makeWriterFacet } from '../../src/ui/painter_host';
 import { stanceBarView } from '../../src/ui/stance_bar_view';
+import { bindTouchTap } from '../../src/ui/touch_tap';
 import '../../src/styles/index.css';
 import { cleanup } from './_harness';
 
@@ -704,5 +706,83 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     tap(chat, 2);
     expect(rig.picks).toEqual([1]);
     expect(rig.menuStrip.classList.contains('open')).toBe(false);
+  });
+});
+
+// The menu strip seats REAL buttons the touch HUD already binds, so a pick runs
+// that button's own handler. A tap on a seated item ALREADY activated it, and
+// re-activating it ran the action twice: one tap on the seated More button
+// opened the tray and instantly closed it again. Pinned in a real browser
+// because it takes the browser's own compatibility click after a touch tap,
+// alongside the item's real binding, to produce the second run at all.
+describe(`a seated strip button at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
+  const MORE_INDEX = MENU_STRIP_ITEMS.findIndex((item) => item.id === 'more');
+  const TRAY_OPEN_CLASS = 'mobile-more-open';
+
+  async function setup(tapMenus: boolean) {
+    await page.viewport(VIEWPORT.width, VIEWPORT.height);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    document.documentElement.style.setProperty('--app-vw', `${VIEWPORT.width}px`);
+    document.documentElement.style.setProperty('--app-vh', `${VIEWPORT.height}px`);
+    new Settings().patch({ touchTapMenus: tapMenus });
+    const rig = mountHud();
+    // The REAL control, not a stub pick: how a pick reaches the seated button is
+    // exactly what is under test here.
+    const control = buildMobileMenuControl();
+    const more = document.getElementById(MENU_STRIP_ITEMS[MORE_INDEX].elementId) as HTMLElement;
+    // MobileControls binds the tray toggle through bindTouchTap, and AFTER the
+    // control is built; the promoted items are bound before it, so neither
+    // listener order may decide how often the action runs.
+    let runs = 0;
+    bindTouchTap(more, () => {
+      runs++;
+      document.body.classList.toggle(TRAY_OPEN_CLASS);
+    });
+    return { ...rig, control, more, runs: () => runs };
+  }
+
+  it('opens the More tray and LEAVES it open on a tap with the row sticky-open', async () => {
+    const rig = await setup(false);
+    // A plain tap on a toggle-role anchor opens the row as a sticky menu, which
+    // is the state a player reaches without ever turning tap mode on.
+    tap(rig.anchor, 1);
+    expect(rig.control?.gesture.isOpen()).toBe(true);
+
+    tap(rig.more, 2);
+    expect(rig.runs()).toBe(1);
+    expect(document.body.classList.contains(TRAY_OPEN_CLASS)).toBe(true);
+    // The pick closes the row behind the tray it opened.
+    expect(rig.control?.gesture.isOpen()).toBe(false);
+  });
+
+  it('leaves the tray open for a tap with tap mode ON too', async () => {
+    const rig = await setup(true);
+    tap(rig.anchor, 1);
+    expect(rig.control?.gesture.isOpen()).toBe(true);
+
+    tap(rig.more, 2);
+    expect(rig.runs()).toBe(1);
+    expect(document.body.classList.contains(TRAY_OPEN_CLASS)).toBe(true);
+  });
+
+  it('opens the tray once from a swipe release, which never touched the button', async () => {
+    // The gesture path has no originating activation, so the synthesized click
+    // is what runs the action and must stay.
+    const rig = await setup(false);
+    const { x, y } = centerOf(rig.anchor);
+    pointerEvent('pointerdown', rig.anchor, x, y, 1);
+    pointerEvent('pointermove', rig.anchor, x + SWIPE_PX * MENU_STRIP_ITEMS.length * 2, y, 1);
+    pointerEvent('pointerup', rig.anchor, x + SWIPE_PX * MENU_STRIP_ITEMS.length * 2, y, 1);
+    expect(rig.runs()).toBe(1);
+    expect(document.body.classList.contains(TRAY_OPEN_CLASS)).toBe(true);
+  });
+
+  it('runs it once for an assistive click on the item, which sends no pointers', async () => {
+    const rig = await setup(false);
+    rig.anchor.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+    expect(rig.control?.gesture.isOpen()).toBe(true);
+    rig.more.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+    expect(rig.runs()).toBe(1);
+    expect(document.body.classList.contains(TRAY_OPEN_CLASS)).toBe(true);
   });
 });

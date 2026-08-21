@@ -317,3 +317,45 @@ describe('ConsumableStripGesture: the Escape path and the seat open state', () =
     expect(rig.seat.getAttribute('aria-expanded')).toBe('false');
   });
 });
+
+// The row's items are strip-owned buttons with no handler of their own, so the
+// pick callback IS the action here: it must run once per activation, and once
+// only. The seated-button twin (the menu strip) is where a re-activated element
+// double-fired; this is the pin that the shared layer never grew a second call
+// for this row either.
+describe('ConsumableStripGesture: an activation uses the item exactly once', () => {
+  it('uses it once for a real touchscreen tap on a sticky-open item', () => {
+    const rig = makeRig();
+    // The assistive/sticky path, opened by a plain click on the seat.
+    rig.seat.click();
+    expect(rig.gesture.isOpen()).toBe(true);
+    // A real tap: the touch pointer pair, then the compatibility click the
+    // browser synthesizes for it.
+    rig.items[3].dispatchEvent(pointer('pointerdown', 1, 300));
+    rig.items[3].dispatchEvent(pointer('pointerup', 1, 300));
+    rig.items[3].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.used).toEqual([3]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('uses it once for an assistive click, and once for a tap-mode tap', () => {
+    const at = makeRig();
+    at.seat.click();
+    at.items[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(at.used).toEqual([1]);
+
+    document.body.replaceChildren();
+    const tap = makeRig({ tapMenus: true });
+    tap.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    tap.items[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(tap.used).toEqual([1]);
+  });
+
+  it('uses it once for a gesture release', () => {
+    const rig = makeRig();
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.seat.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    rig.seat.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
+    expect(rig.used).toEqual([0]);
+  });
+});

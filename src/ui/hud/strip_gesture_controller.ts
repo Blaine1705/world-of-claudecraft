@@ -98,6 +98,12 @@ export type StripGestureOutcome =
   | { kind: 'open' }
   | { kind: 'cancel' };
 
+/** How a pick was made. 'item' means the item element's OWN activation produced
+ *  it (a tap, an assistive click, Enter on the focused button), so anything
+ *  bound to that element has already run; 'gesture' means the swipe released on
+ *  it and nothing has activated the element at all. */
+export type StripPickSource = 'gesture' | 'item';
+
 export interface StripReleaseInput {
   /** resolveStripIndex's readout: -1 while the finger is still in the deadzone. */
   index: number;
@@ -131,8 +137,11 @@ export interface StripGestureDeps {
   direction(metrics: StripMetrics): StripDirection;
   /** What a release means. */
   release(input: StripReleaseInput): StripGestureOutcome;
-  /** Choose the item at `index` (open it, use it). */
-  onPick(index: number): void;
+  /** Choose the item at `index` (open it, use it). A row whose items are real
+   *  bound buttons routes a pick by activating one, so it must read `source`: an
+   *  'item' pick has already activated that element, and activating it a second
+   *  time runs the action twice. */
+  onPick(index: number, source: StripPickSource): void;
   /** A bare tap: run the control's default action. Omitted by a control that has
    *  none, whose release rule answers 'open' where this would have been called. */
   onDefault?(): void;
@@ -249,7 +258,7 @@ export class StripGesture {
         if (press.kind !== 'choose') return;
         const open = press.index < (this.sticky?.count ?? 0);
         this.closeSticky();
-        if (open) this.deps.onPick(press.index);
+        if (open) this.deps.onPick(press.index, 'item');
       });
     });
     cancel.addEventListener('click', () => {
@@ -479,7 +488,7 @@ export class StripGesture {
     });
     this.suppressClick = true;
     this.cancelDrag();
-    if (outcome.kind === 'pick') this.deps.onPick(outcome.index);
+    if (outcome.kind === 'pick') this.deps.onPick(outcome.index, 'gesture');
     else if (outcome.kind === 'default') this.deps.onDefault?.();
     // The drag is already dropped above, so the row can take the anchor's own
     // press as its opening one.

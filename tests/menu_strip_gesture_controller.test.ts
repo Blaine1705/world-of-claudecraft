@@ -18,6 +18,7 @@ import {
   MenuStripGesture,
   type MenuStripGestureDeps,
 } from '../src/ui/hud/menu/menu_strip_gesture_controller';
+import type { StripPickSource } from '../src/ui/hud/strip_gesture_controller';
 import { closeOpenTouchMenu } from '../src/ui/hud/tap_menu';
 import { makeWriterFacet } from '../src/ui/painter_host';
 
@@ -46,6 +47,9 @@ interface Rig {
   cancel: HTMLButtonElement;
   gesture: MenuStripGesture;
   picks: number[];
+  /** How each pick was made, which is what tells the owner whether the item's
+   *  own button has already run. */
+  pickSources: StripPickSource[];
   cancels: number;
   repaints: number;
   /** settings.touchTapMenus, flipped per test. */
@@ -94,6 +98,7 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
     items,
     cancel,
     picks: [],
+    pickSources: [],
     cancels: 0,
     repaints: 0,
     tapMenus: options.tapMenus ?? false,
@@ -106,7 +111,10 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
     items,
     cancel,
     tapMenus: () => rig.tapMenus,
-    pick: (index) => rig.picks.push(index),
+    pick: (index, source) => {
+      rig.picks.push(index);
+      rig.pickSources.push(source);
+    },
     onCancel: () => {
       rig.cancels++;
     },
@@ -435,5 +443,48 @@ describe('MenuStripGesture: the Escape path and the anchor open state', () => {
     expect(rig.anchor.getAttribute('aria-expanded')).toBe('true');
     rig.anchor.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
     expect(rig.anchor.getAttribute('aria-expanded')).toBe('false');
+  });
+});
+
+// The one thing about a pick the owner cannot work out for itself: whether the
+// item element has ALREADY been activated. The menu strip seats real bound
+// buttons and routes a gesture pick by clicking one, so a pick made BY a click
+// on that same item must be reported as such or the action runs twice
+// (menu_control_controller.test.ts drives that whole path end to end).
+describe('MenuStripGesture: where a pick came from', () => {
+  it('reports an item click as an item pick, not a gesture one', () => {
+    const rig = makeRig();
+    rig.anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    rig.items[3].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.picks).toEqual([3]);
+    expect(rig.pickSources).toEqual(['item']);
+  });
+
+  it('reports a tap-mode item tap as an item pick too', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.items[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.picks).toEqual([1]);
+    expect(rig.pickSources).toEqual(['item']);
+  });
+
+  it('reports a swipe release as a gesture pick, which touched no item', () => {
+    const rig = makeRig();
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
+    expect(rig.picks).toEqual([0]);
+    expect(rig.pickSources).toEqual(['gesture']);
+  });
+
+  it('picks ONCE per item activation, whatever else the element is bound to', () => {
+    const rig = makeRig();
+    rig.anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    // A real touchscreen tap: the touch pointer pair, then the compatibility
+    // click the browser synthesizes for it.
+    rig.items[2].dispatchEvent(pointer('pointerdown', 1, 200));
+    rig.items[2].dispatchEvent(pointer('pointerup', 1, 200));
+    rig.items[2].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.picks).toEqual([2]);
   });
 });

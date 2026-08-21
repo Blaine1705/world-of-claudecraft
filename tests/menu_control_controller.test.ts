@@ -12,9 +12,13 @@
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { SETTINGS_CHANGE_EVENT, Settings } from '../src/game/settings';
-import { buildMobileMenuControl } from '../src/ui/hud/menu/menu_control_controller';
+import {
+  buildMobileMenuControl,
+  type MobileMenuControl,
+} from '../src/ui/hud/menu/menu_control_controller';
 import { MENU_STRIP_ITEMS } from '../src/ui/hud/menu/menu_strip_core';
 import { t } from '../src/ui/i18n';
+import { bindTouchTap } from '../src/ui/touch_tap';
 
 const GESTURE_NAME = t('hudChrome.mobile.quickActionsAria');
 const TAP_NAME = t('hudChrome.mobile.quickActionsAriaTap');
@@ -132,5 +136,104 @@ describe('buildMobileMenuControl: the settings broadcast is the only invalidatio
     expect(buildMobileMenuControl()).not.toBeNull();
     window.dispatchEvent(new Event(SETTINGS_CHANGE_EVENT));
     expect(anchor.getAttribute('aria-label')).toBe(GESTURE_NAME);
+  });
+});
+
+// The strip seats REAL buttons the touch HUD already binds, so a pick must run
+// that button's action EXACTLY once, however the pick was made. A pick made by
+// CLICKING the item itself had already activated it, and re-clicking it ran the
+// action a second time: one tap on the seated #mobile-more opened the tray and
+// instantly closed it again. bindTouchTap is bound here exactly as
+// MobileControls binds it, on both sides of the build, because the production
+// order differs per item (#mobile-more is bound after the control, the promoted
+// items before it) and the listener order must not decide how often an action
+// runs.
+describe('buildMobileMenuControl: a pick runs the seated action exactly once', () => {
+  interface PickRig {
+    anchor: HTMLButtonElement;
+    control: MobileMenuControl;
+    item: HTMLButtonElement;
+    runs: number;
+  }
+
+  /** The seated button MobileControls binds, and the control around it. */
+  function pickRig(index: number, bindOrder: 'before' | 'after'): PickRig {
+    const anchor = mount();
+    const item = document.getElementById(MENU_STRIP_ITEMS[index].elementId) as HTMLButtonElement;
+    const rig = { anchor, item, runs: 0 } as PickRig;
+    const bind = (): void => {
+      bindTouchTap(item, () => {
+        rig.runs++;
+      });
+    };
+    if (bindOrder === 'before') bind();
+    const control = buildMobileMenuControl();
+    if (!control) throw new Error('the control must build over the mounted markup');
+    if (bindOrder === 'after') bind();
+    rig.control = control;
+    return rig;
+  }
+
+  function touchPointer(type: string, pointerId: number, clientX: number): MouseEvent {
+    return Object.assign(
+      new MouseEvent(type, { bubbles: true, button: 0, clientX, clientY: 320 }),
+      { pointerId, pointerType: 'touch' },
+    );
+  }
+
+  /** What a real touchscreen tap delivers: the touch pointer pair, then the
+   *  compatibility click the browser synthesizes for it. */
+  function touchTap(el: HTMLElement, pointerId: number): void {
+    el.dispatchEvent(touchPointer('pointerdown', pointerId, 100));
+    el.dispatchEvent(touchPointer('pointerup', pointerId, 100));
+    el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  }
+
+  for (const bindOrder of ['before', 'after'] as const) {
+    it(`runs it once for a tap on a sticky-open item, bound ${bindOrder} the build`, () => {
+      const rig = pickRig(9, bindOrder);
+      rig.control.gesture.openSticky();
+      touchTap(rig.item, 1);
+      expect(rig.runs).toBe(1);
+      expect(rig.control.gesture.isOpen()).toBe(false);
+    });
+
+    it(`runs it once for an assistive click, bound ${bindOrder} the build`, () => {
+      // VoiceOver and Switch Control activate a button with a plain click and
+      // emit no pointer events at all.
+      const rig = pickRig(9, bindOrder);
+      rig.control.gesture.openSticky();
+      rig.item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(rig.runs).toBe(1);
+    });
+  }
+
+  it('runs it once for a keyboard activation of the focused item', () => {
+    // Enter/Space on a focused button reports detail 0 and no pointer events.
+    const rig = pickRig(0, 'before');
+    rig.control.gesture.openSticky();
+    rig.item.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+    expect(rig.runs).toBe(1);
+  });
+
+  it('runs it once for a tap on the item with tap mode ON', () => {
+    setTapMenus(true);
+    const rig = pickRig(9, 'after');
+    rig.anchor.dispatchEvent(touchPointer('pointerdown', 1, 100));
+    expect(rig.control.gesture.isOpen()).toBe(true);
+    touchTap(rig.item, 2);
+    expect(rig.runs).toBe(1);
+    expect(rig.control.gesture.isOpen()).toBe(false);
+  });
+
+  it('runs it once for a gesture release, which never touched the item', () => {
+    // The swipe path has no originating click, so the synthesized one is what
+    // activates the button and must stay.
+    const rig = pickRig(0, 'after');
+    rig.anchor.dispatchEvent(touchPointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(touchPointer('pointermove', 1, 130));
+    rig.anchor.dispatchEvent(touchPointer('pointerup', 1, 130));
+    expect(rig.runs).toBe(1);
+    expect(rig.control.gesture.isOpen()).toBe(false);
   });
 });

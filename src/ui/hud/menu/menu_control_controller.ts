@@ -104,10 +104,14 @@ export function buildMobileMenuControl(deps: MobileMenuControlDeps = {}): Mobile
     cancel,
     writers,
     tapMenus: () => tapMenusEnabled(),
-    pick: (index) => {
-      // Activate the real button: the action then runs through the handler the
-      // old row or the More tray already bound to it, haptics included.
-      itemEls[index]?.click();
+    pick: (index, source) => {
+      // A gesture release never touched the item, so activating the real button
+      // is what runs the action, through the handler the old row or the More
+      // tray already bound to it, haptics included. A pick made BY clicking the
+      // item has already run that handler, and clicking it again ran the action
+      // twice (a tap on the seated More button opened the tray and immediately
+      // closed it).
+      if (source === 'gesture') itemEls[index]?.click();
       anchor.blur();
     },
     onCancel: () => deps.onCancel?.(),

@@ -45,8 +45,8 @@ export interface MenuStripItem {
    * button the touch HUD already binds, so a pick routes through the existing
    * handler instead of a second copy of the action. Chat is seated by its own
    * strip button rather than the tray's #mobile-chat: that button carries the
-   * press-and-hold log peek on its pointer handlers, which a synthesized click
-   * would never reach.
+   * press-and-hold log peek on its pointer handlers, which the synthesized click
+   * a swipe pick routes through would never reach.
    */
   elementId: string;
   /** The caption shown while the finger is over the item. */

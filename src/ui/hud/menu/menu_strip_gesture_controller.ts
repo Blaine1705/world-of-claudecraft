@@ -18,6 +18,7 @@ import type { PainterHostWriters } from '../../painter_host';
 import {
   StripGesture,
   type StripGestureOutcome,
+  type StripPickSource,
   type StripReleaseInput,
 } from '../strip_gesture_controller';
 import {
@@ -41,8 +42,9 @@ export interface MenuStripGestureDeps {
   writers: PainterHostWriters;
   /** Tap mode (settings.touchTapMenus), read live at press time. */
   tapMenus(): boolean;
-  /** Open the item at `index`. */
-  pick(index: number): void;
+  /** Open the item at `index`. `source` says whether the item's own button has
+   *  already been activated by the pick, which decides how the owner routes it. */
+  pick(index: number, source: StripPickSource): void;
   /** The player opened the row and chose nothing. */
   onCancel(): void;
   /** Repaint from openState(); called on every state change. */
@@ -74,7 +76,7 @@ export class MenuStripGesture {
       pitch: MENU_STRIP_PITCH_PX,
       direction: () => MENU_STRIP_DIRECTION,
       release,
-      onPick: (index) => deps.pick(index),
+      onPick: (index, source) => deps.pick(index, source),
       // No onDefault: resolveMenuStripRelease answers 'open' wherever another
       // control would answer 'default'.
       onCancel: () => deps.onCancel(),

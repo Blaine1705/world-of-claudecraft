@@ -604,3 +604,38 @@ describe("RadialGesture: a 'toggle' anchor with no action of its own", () => {
     expect(tap.casts).toEqual([[0, 'center']]);
   });
 });
+
+// The strips' seated-button defect has no twin here: a petal is an overlay
+// button nothing else binds, and a tap on one casts through the routing callback
+// directly rather than by re-activating the element. This is the pin that it
+// stays that way.
+describe('RadialGesture: a petal activation casts exactly once', () => {
+  it('casts once for a real touchscreen tap on a petal', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    // The touch pointer pair a petal never listens for, then the compatibility
+    // click the browser synthesizes for it.
+    rig.petals[2].dispatchEvent(
+      Object.assign(new MouseEvent('pointerdown', { bubbles: true, button: 0 }), {
+        pointerId: 2,
+        pointerType: 'touch',
+      }),
+    );
+    rig.petals[2].dispatchEvent(
+      Object.assign(new MouseEvent('pointerup', { bubbles: true, button: 0 }), {
+        pointerId: 2,
+        pointerType: 'touch',
+      }),
+    );
+    rig.petals[2].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.casts).toEqual([[0, PETAL_DIRECTIONS[2]]]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('casts once for an assistive click on a petal', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    rig.petals[3].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.casts).toEqual([[0, PETAL_DIRECTIONS[3]]]);
+  });
+});

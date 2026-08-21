@@ -515,8 +515,8 @@ export class MobileControls {
     this.bindButton('mobile-menu-mount', () => this.callbacks.onMountToggle());
     // Chat's strip seat runs the plain tap toggle. It is bindButton, not
     // bindChatButton: the press-and-hold log peek stays on the tray's
-    // #mobile-chat, because a strip pick reaches its item through a synthesized
-    // click, which no pointer-bound long press would ever see.
+    // #mobile-chat, because a strip pick made by a SWIPE reaches its item
+    // through a synthesized click, which no pointer-bound long press sees.
     this.bindButton('mobile-menu-chat', () => this.tapChat());
     this.bindButton('mobile-menu-map', () => this.callbacks.onMap());
     this.bindButton('mobile-menu-bags', () => this.callbacks.onBags());
