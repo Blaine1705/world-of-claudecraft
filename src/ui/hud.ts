@@ -458,6 +458,7 @@ import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
 import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
+import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
@@ -8406,6 +8407,11 @@ export class Hud {
   // would walk the interest-scoped roster twice per frame.
   private renderPetBar(pet: Entity | null): void {
     const bar = $('#petbar') as HTMLElement;
+    let secondaryFallback = false;
+    if (!pet || pet.dead) {
+      pet = livingSecondaryPet(this.sim.entities.values(), this.sim.playerId);
+      secondaryFallback = !!pet;
+    }
     // Value-diffed body-class flag the mobile top-band layout reads (see field doc):
     // toggled only on a real transition so the per-frame path stays write-free.
     // Deliberately toggled on EVERY host, not just touch: only body.mobile-touch
@@ -8430,10 +8436,11 @@ export class Hud {
     const cd = Math.ceil(Math.max(0, pet.petTauntTimer));
     const autoTaunt = pet.petAutoTaunt === true;
     const autoWaterJet = pet.petAutoWaterJet === true;
-    const canTaunt = petCanForceTaunt(pet.templateId);
-    const special = this.sim.petSpecialCommandsSupported
-      ? petSpecialButtonState(petTemplate, pet.petSkillTimer, pet.petAutoSkill)
-      : null;
+    const canTaunt = !secondaryFallback && petCanForceTaunt(pet.templateId);
+    const special =
+      !secondaryFallback && this.sim.petSpecialCommandsSupported
+        ? petSpecialButtonState(petTemplate, pet.petSkillTimer, pet.petAutoSkill)
+        : null;
     const ownerClass = this.sim.cfg.playerClass;
     const actionCooldownSig =
       pet.templateId === 'water_elemental'
@@ -8444,13 +8451,11 @@ export class Hud {
     const specialCooldownSig = special
       ? `${special.iconId}:${special.cooldown}:${special.autocast ? 'auto' : 'manual'}`
       : 'no-special';
-    // Feed-button reason (full HP / no food) folds in so the pet bar redraws
-    // when either flips, even while the pet stays otherwise unchanged.
     const feedSig =
       ownerClass === 'warlock'
         ? ''
         : (petFeedButtonState(pet.hp, pet.maxHp, this.hasPetFood()).reasonKey ?? 'ok');
-    const sig = `${pet.id}:${ownerClass}:${mode}:${actionCooldownSig}:${specialCooldownSig}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}:${feedSig}`;
+    const sig = `${secondaryFallback ? 'secondary' : 'primary'}:${pet.id}:${ownerClass}:${mode}:${actionCooldownSig}:${specialCooldownSig}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}:${feedSig}`;
     bar.style.display = 'flex';
     if (sig === this.lastPetBarSig) return;
     this.lastPetBarSig = sig;
@@ -8665,7 +8670,7 @@ export class Hud {
       petTooltip(t('hud.pet.petAttackTitle'), t('hud.pet.petAttackDesc')),
       () => this.sim.petAttack(),
     );
-    if (pet.templateId === 'water_elemental') {
+    if (!secondaryFallback && pet.templateId === 'water_elemental') {
       addButton(
         commands,
         PET_ACTION_ICONS.waterJet,
@@ -8730,7 +8735,7 @@ export class Hud {
         },
       );
     }
-    if (ownerClass === 'warlock') {
+    if (!secondaryFallback && ownerClass === 'warlock') {
       addButton(
         commands,
         PET_ACTION_ICONS.healDemon,
@@ -8740,22 +8745,16 @@ export class Hud {
           this.sim.healPet();
         },
       );
-    } else {
+    } else if (!secondaryFallback) {
       const feedState = petFeedButtonState(pet.hp, pet.maxHp, this.hasPetFood());
       addButton(
         commands,
         PET_ACTION_ICONS.feed,
-        // Accessible name stays "Heal Pet" even when disabled; the disabled
-        // reason lives in the rich tooltip below, never in the aria-label.
         t('hud.pet.healPet'),
         feedState.reasonKey
           ? petTooltip(t('hud.pet.healPet'), t(feedState.reasonKey))
           : petTooltip(t('hud.pet.healPet'), t('hud.pet.healPetDesc')),
         () => {
-          // Toggle: a second click cancels the pending feed instead of trapping
-          // the player in food-selection mode. Reaching this handler at all
-          // means feedState.disabled was false (the button no-ops while
-          // disabled), so the food check below is now just a defensive guard.
           if (this.pendingPetFeed) {
             this.cancelPetFeed();
             return;
@@ -8769,9 +8768,6 @@ export class Hud {
           $('#bags').style.display = 'flex';
           this.renderBags();
         },
-        // A pending feed stays clickable so the toggle can CANCEL it, even once
-        // the pet has regenerated back to full HP (which would otherwise flip
-        // feedState.disabled true and trap the player in food-selection mode).
         {
           active: this.pendingPetFeed,
           disabled: feedState.disabled && !this.pendingPetFeed,
