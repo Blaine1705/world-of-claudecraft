@@ -6633,6 +6633,30 @@
     }
   }
 
+  /* ---------- touch focus ring (the new interactive surfaces) ---------- */
+  /* The shared token-driven :focus-visible list in base.css covers .mobile-btn,
+     .action-btn and .x-btn, but none of the controls the touch rework added.
+     Every one of them is a real focus stop under tap and sticky mode (the strip
+     items, the petals, the seat, the three cancel targets, the bar editor's grid
+     and the spellbook's assign control), so without this they fall back to the
+     UA default ring over a dark gradient. Same token and same geometry as the
+     base list, so the ring reads identically wherever it lands.
+     #quest-strip-main keeps its own rule above: it is unplated text over the
+     live 3D world and outlines in --gold to stay legible there. */
+  body.mobile-touch .mobile-menu-item:focus-visible,
+  body.mobile-touch .mobile-consumable-item:focus-visible,
+  body.mobile-touch .mobile-action-petal:focus-visible,
+  body.mobile-touch .mobile-ring-seat:focus-visible,
+  body.mobile-touch #mobile-menu-cancel:focus-visible,
+  body.mobile-touch #mobile-consumable-cancel:focus-visible,
+  body.mobile-touch #mobile-action-radial-cancel:focus-visible,
+  body.mobile-touch .bar-editor-cell:focus-visible,
+  body.mobile-touch .bar-editor-tab:focus-visible,
+  body.mobile-touch .bar-editor-clear:focus-visible,
+  body.mobile-touch .spell-hotbar-assign:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   /* ---------- mobile hud layout tiers ---------- */
   /* Phase 3 of the mobile combat HUD rework: src/ui/mobile_hud_layout.ts resolves
      a responsive tier (compact/standard/tablet) from the live viewport, and

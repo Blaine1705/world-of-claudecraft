@@ -23,7 +23,7 @@
 // CSS in hud.mobile.css, per tier.
 
 import { formatNumber, t } from '../../i18n';
-import { makeWriterFacet, type PainterHostWriters } from '../../painter_host';
+import type { PainterHostWriters } from '../../painter_host';
 import {
   cycleQuestStrip,
   QUEST_STRIP_FALLBACK_HEIGHT_PX,
@@ -51,6 +51,7 @@ const COUNT_ID = 'quest-strip-count';
 const PREV_ID = 'quest-strip-prev';
 const NEXT_ID = 'quest-strip-next';
 const MORE_ID = 'quest-strip-more';
+const HINT_ID = 'quest-strip-hint';
 const OBJECTIVE_SELECTOR = '.quest-strip-obj:not(.quest-strip-more)';
 /** The strip only exists on the touch HUD; desktop keeps its tracker. */
 const TOUCH_BODY_CLASS = 'mobile-touch';
@@ -77,28 +78,18 @@ export interface QuestStripDeps {
   /** The HUD's click sound, played on a cycle so the tap confirms itself. */
   click(): void;
   /**
-   * Optional writer facet. The strip is cold chrome the tracker's medium-band
-   * update drives, so it owns a small facet of its own by default rather than
-   * reaching into the coordinator's shared caches, exactly like the menu
-   * control does.
+   * Hud's shared write-elision facet, handed down by QuestTrackerController. The
+   * strip paints on the tracker's medium band, so its writes belong in the
+   * coordinator's caches and its skips in the coordinator's skip-rate: a private
+   * facet here would be a second write cache inside a domain, which
+   * src/ui/hud/CLAUDE.md forbids for exactly this reason.
    */
-  writers?: PainterHostWriters;
+  writers: PainterHostWriters;
 }
 
 /** The strip's static markup, resolved once at build. Identical in shape to the
  *  painter's descriptor, which is built straight from it. */
 export type QuestStripElements = QuestStripPaintDescriptor;
-
-function ownWriters(): PainterHostWriters {
-  return makeWriterFacet(
-    new Map(),
-    new Map(),
-    new Map(),
-    new Map(),
-    () => {},
-    () => {},
-  );
-}
 
 function box(el: Element): QuestStripBox {
   const rect = el.getBoundingClientRect();
@@ -128,7 +119,7 @@ export class QuestStripController {
     // the default is the live one.
     private readonly win: Pick<Window, 'innerWidth' | 'innerHeight'> = window,
   ) {
-    this.painter = new QuestStripPainter(deps.writers ?? ownWriters(), els);
+    this.painter = new QuestStripPainter(deps.writers, els);
     this.gesture = new QuestStripGesture({
       surface: els.surface,
       cycle: (step) => this.cycle(step),
@@ -187,7 +178,7 @@ export class QuestStripController {
           })
         : '',
       counterVisible: view.counter.visible,
-      aria: this.ariaLabel(view),
+      hint: this.hintText(view),
       objectives,
       more:
         view.hiddenObjectives > 0
@@ -203,7 +194,7 @@ export class QuestStripController {
       model.title,
       model.completeLabel,
       model.counter,
-      model.aria,
+      model.hint,
       model.more,
       ...objectives.map((line) => `${line.done ? '1' : '0'}${line.text}`),
     ].join('\u0000');
@@ -215,7 +206,10 @@ export class QuestStripController {
     if (changed || this.seatKey === '') this.seat();
   }
 
-  private ariaLabel(view: QuestStripView): string {
+  /** The off-screen description: what the strip is and what activating it does.
+   *  The visible chevrons are a HINT rather than buttons, so the sentence is the
+   *  only place the cycle action is spelled out. */
+  private hintText(view: QuestStripView): string {
     if (!view.visible) return '';
     if (!view.counter.visible)
       return t('hudChrome.mobile.questStripAriaSingle', { title: view.title });
@@ -311,8 +305,9 @@ export function buildQuestStrip(deps: QuestStripDeps): QuestStripController | nu
   const prevArrow = document.getElementById(PREV_ID);
   const nextArrow = document.getElementById(NEXT_ID);
   const more = document.getElementById(MORE_ID);
+  const hint = document.getElementById(HINT_ID);
   if (!root || !surface || !title || !completeMark || !cycleHint) return null;
-  if (!counter || !prevArrow || !nextArrow || !more) return null;
+  if (!counter || !prevArrow || !nextArrow || !more || !hint) return null;
   const objectives = [...root.querySelectorAll<HTMLElement>(OBJECTIVE_SELECTOR)];
   if (objectives.length === 0) return null;
   return new QuestStripController(
@@ -327,6 +322,7 @@ export function buildQuestStrip(deps: QuestStripDeps): QuestStripController | nu
       nextArrow,
       objectives,
       more,
+      hint,
     },
     deps,
   );

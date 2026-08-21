@@ -876,6 +876,7 @@ export const en_XA: EnTranslations = {
       "consumableSeat": "[Çóñšúɱáƀļéš]",
       "menuControl": "[Ɱéñúš]",
       "menuControlAria": "[Ɱéñúš. Ţáþ ţó óþéñ çĥáţ, óŕ ĥóļð áñð šŵíþé ŕíĝĥţ ƒóŕ ɱóúñţš, ɱáþ, ƀáĝš áñð ɱóŕé.]",
+      "menuControlAriaTap": "[Ɱéñúš. Ţáþ ţó óþéñ ţĥé ɱéñú ŕóŵ: ɱóúñţš, ɱáþ, ƀáĝš áñð ɱóŕé. Ţáþ áĝáíñ ƒóŕ çĥáţ.]",
       "menuLabel": "[Ɱéñú]",
       "questStripAria": "[Ţŕáçķéð ɋúéšţ {position} óƒ {total}: {title}. Áçţíʋáţé ƒóŕ ţĥé ñéẋţ ɋúéšţ.]",
       "questStripAriaSingle": "[Ţŕáçķéð ɋúéšţ: {title}]",

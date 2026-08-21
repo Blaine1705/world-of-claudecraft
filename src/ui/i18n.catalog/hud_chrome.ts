@@ -582,6 +582,12 @@ export const hudChromeStrings = {
     menuControl: 'Menus',
     menuControlAria:
       'Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.',
+    // The SAME control under settings.touchTapMenus, where a tap opens the strip
+    // and never opens chat: the gesture sentence above would teach the opposite
+    // of what the control does, so menu_control_controller.ts swaps the name when
+    // the setting flips.
+    menuControlAriaTap:
+      'Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.',
     menuLabel: 'Menu',
     // The top-band quest strip (Phase 5): the touch replacement for the
     // right-anchored quest tracker, showing ONE quest with all of its objectives

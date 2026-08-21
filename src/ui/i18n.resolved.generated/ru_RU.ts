@@ -876,6 +876,7 @@ export const ru_RU: EnTranslations = {
       "consumableSeat": "Расходники",
       "menuControl": "Меню",
       "menuControlAria": "Меню. Нажмите, чтобы открыть чат, или удерживайте и проведите вправо для транспорта, карты, сумок и других разделов.",
+      "menuControlAriaTap": "Меню. Нажмите, чтобы открыть ряд меню: транспорт, карта, сумки и другие разделы. Нажмите ещё раз, чтобы открыть чат.",
       "menuLabel": "Menu",
       "questStripAria": "Отслеживаемое задание {position} из {total}: {title}. Нажмите, чтобы перейти к следующему.",
       "questStripAriaSingle": "Отслеживаемое задание: {title}",

@@ -29,13 +29,16 @@ Character, Spells, Settings, More.
 | File | What it is |
 |---|---|
 | `menu_strip_core.ts` | PURE. Roster, release rules, reveal rule, caption clamp. Registered in `UI_PURE_CORES`. |
-| `menu_strip_gesture_controller.ts` | Pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, and the sticky path (assistive activation and the `touchTapMenus` tap mode, whose rules come from `../tap_menu_core.ts`). |
+| `menu_strip_gesture_controller.ts` | A thin instantiation of the SHARED `../strip_gesture_controller.ts` (pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, `aria-expanded`, the Escape closer, and the sticky path). It supplies only this menu's four parameters: the fixed rightward direction, the nine-item roster, the pitch, and the tap-runs-chat default. |
 | `menu_strip_painter.ts` | Thin painter: item seating, live highlight, caption text and position. Takes no layout read. |
 | `menu_control_controller.ts` | Builds it from the static markup and routes picks to the real buttons. |
 
 Geometry is reused from `../action_bar/radial_action_core.ts`
-(`placeConsumableStrip`, `resolveStripIndex`): the menu strip and the consumables
-row are the same shape mirrored, so there is one tested implementation.
+(`placeConsumableStrip`, `resolveStripIndex`, plus the shared `STRIP_PITCH_PX`,
+`stripCancelIsLive` and `shouldRevealStrip`, which this core re-exports under its
+own names): the menu strip and the consumables row are the same shape mirrored, so
+there is one tested implementation. The gesture LAYER is shared the same way; see
+the parent `../CLAUDE.md`.
 
 ## Seating
 

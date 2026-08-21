@@ -11,6 +11,27 @@ import {
   shouldRevealConsumableStrip,
 } from '../src/ui/hud/action_bar/consumable_strip_core';
 import {
+  STRIP_PITCH_PX,
+  shouldRevealStrip,
+  stripCancelIsLive,
+} from '../src/ui/hud/action_bar/radial_action_core';
+
+// The row's cancel-is-live and reveal-early rules are the SHARED strip rules
+// under this row's names, and its pitch is the shared constant: the menu strip
+// held byte-identical copies of all three, so an edit to one taught two
+// different gestures with nothing checking it.
+describe('the consumables row shares the strip rules rather than restating them', () => {
+  it('takes its pitch from the shared constant', () => {
+    expect(CONSUMABLE_STRIP_PITCH_PX).toBe(STRIP_PITCH_PX);
+  });
+
+  it('takes the cancel-is-live and reveal-early rules from the shared core', () => {
+    expect(consumableStripCancelIsLive).toBe(stripCancelIsLive);
+    expect(shouldRevealConsumableStrip).toBe(shouldRevealStrip);
+  });
+});
+
+import {
   placeConsumableStrip,
   resolveStripIndex,
   STRIP_DEADZONE_PX,

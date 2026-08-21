@@ -1154,8 +1154,11 @@ describe('client HTML shell', () => {
       expect(entry, name).not.toContain('class="mobile-consumable-slot"');
       // The seat itself: inside the ring, on the arc, and NO LONGER hidden.
       expect(entry, name).toContain('id="mobile-consumable-seat"');
+      // aria-expanded is the state the retired #mobile-consumables-toggle carried
+      // and the gesture menus dropped: the row it opens is a persistent popup in
+      // sticky and tap mode, so the seat has to say whether it is showing.
       expect(entry, name).toMatch(
-        /id="mobile-consumable-seat" class="mobile-ring-seat" data-mobile-index="4"><\/button>/,
+        /id="mobile-consumable-seat" class="mobile-ring-seat" data-mobile-index="4" aria-haspopup="true" aria-expanded="false"><\/button>/,
       );
       expect(entry, name).not.toMatch(/id="mobile-consumable-seat"[^>]*\shidden/);
       // The row it opens: one item button per CONSUMABLE_BAR_SLOTS, indexed 0..5
@@ -2514,6 +2517,32 @@ describe('client HTML shell', () => {
     expect(stripRule).toContain('pointer-events: auto;');
     // A touch that starts on the strip is HUD chrome, never a camera drag.
     expect(touchRouterTs).toContain("'#quest-strip',");
+  });
+
+  it('derives the quest strip anchor from the target frame seat it copies, per tier', () => {
+    // --quest-strip-anchor-left re-derives #target-frame's STATIC seat by hand,
+    // because measuring the live frame is what used to slide the strip sideways
+    // every time a target came or went. That hand derivation copies the frame
+    // rule's own `left` literal AND its per-tier scale factor, so changing the
+    // frame without changing the anchor silently moves the strip: nothing else in
+    // the tree relates the two numbers. Pinned as EQUALITY between the two rules
+    // rather than against literals, so a deliberate re-seat stays a one-line
+    // change on each side and a one-sided one fails here.
+    const frames = [
+      ...hudMobileCss.matchAll(
+        /body\.mobile-touch #target-frame \{[^}]*?left:\s*([^;]+);[^}]*?transform:\s*scale\(calc\(([\d.]+)\s*\*/g,
+      ),
+    ].map((m) => ({ left: m[1].trim(), scale: m[2] }));
+    const anchors = [
+      ...hudMobileCss.matchAll(
+        /--quest-strip-anchor-left:\s*calc\(\s*var\(--ui-scale,\s*1\)\s*\*\s*\(\s*([\s\S]*?)\s*\+\s*var\(--target-frame-content-width\)\s*\*\s*var\(--target-frame-scale,\s*1\)\s*\*\s*([\d.]+)\s*\*/g,
+      ),
+    ].map((m) => ({ left: m[1].trim(), scale: m[2] }));
+    // Two tiers ship the pair today (standard and compact); a third tier that
+    // re-seats the frame must bring its anchor with it, which is why the counts
+    // are compared rather than only the entries that happen to line up.
+    expect(frames.length).toBe(2);
+    expect(anchors).toEqual(frames);
   });
 
   it('keeps joystick autorun on the move pad and Jump on the ring bottom row', () => {

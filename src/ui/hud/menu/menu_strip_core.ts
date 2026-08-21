@@ -16,6 +16,11 @@
 // behind the More modal, and here it is the shortest gesture on the control.
 
 import type { TranslationKey } from '../../i18n';
+import {
+  STRIP_PITCH_PX,
+  shouldRevealStrip,
+  stripCancelIsLive,
+} from '../action_bar/radial_action_core';
 
 /** The strip roster's stable ids. Order is load-bearing (it IS the row order). */
 export type MenuActionId =
@@ -62,10 +67,10 @@ export const MENU_STRIP_COUNT = MENU_STRIP_ITEMS.length;
  *  direction never changing under the player. */
 export const MENU_STRIP_DIRECTION = 'right' as const;
 
-/** Travel between adjacent items as the FINGER sees it, matching the consumables
- *  row: at the drawn spacing the ninth item would need well over 500px of drag,
- *  far past a comfortable thumb arc. */
-export const MENU_STRIP_PITCH_PX = 34;
+/** The shared strip pitch under this row's own name. Re-exported rather than
+ *  restated, so the menu strip and the consumables row cannot drift apart on the
+ *  one number a player's thumb learns. */
+export const MENU_STRIP_PITCH_PX = STRIP_PITCH_PX;
 
 /** Nominal half-width of the caption box, used to clamp its centre on screen
  *  without measuring it (a painter may take no forced layout read). Wider than
@@ -101,23 +106,10 @@ export function resolveMenuStripRelease(input: MenuStripReleaseInput): MenuStrip
   return { kind: 'pick', index: Math.min(input.index, input.count - 1) };
 }
 
-/**
- * Whether the cancel target is the live choice. It is a PLACE, not a direction:
- * the X sits on the anchor itself, so the band the finger started in is the way
- * out and the Y a thumb arc wanders to never matters.
- */
-export function menuStripCancelIsLive(index: number, revealed: boolean): boolean {
-  return revealed && index < 0;
-}
-
-/**
- * Whether a drag that just moved onto an item should pull the row up early.
- * Passing the deadzone is itself intent, so the player never waits out the
- * reveal timer to see what they already committed to.
- */
-export function shouldRevealMenuStrip(index: number, revealed: boolean): boolean {
-  return !revealed && index >= 0;
-}
+// The cancel-is-live and reveal-early rules are the SHARED strip rules under this
+// menu's own names (radial_action_core.ts owns the one implementation): they were
+// byte-identical to the consumables row's, doc comment included.
+export { shouldRevealStrip as shouldRevealMenuStrip, stripCancelIsLive as menuStripCancelIsLive };
 
 export interface MenuCaptionInput {
   /** Item centres from placeConsumableStrip, index 0 nearest the anchor. */

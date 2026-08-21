@@ -143,6 +143,10 @@ export function buildMobileConsumableSeat(
 
   const gesture = new ConsumableStripGesture({
     seat: seatBtn,
+    // Hud's shared facet, the same one the strip painter writes through: the
+    // seat's aria-expanded state must elide against the same cache as the rest
+    // of the seat's writes, never a second one.
+    writers: deps.writers,
     // The row's geometry tokens live on the overlay, which is a sibling of the
     // ring so its items are seated in viewport coordinates rather than inside
     // the ring's own scaled, corner-anchored box.

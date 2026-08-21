@@ -25,20 +25,34 @@ import { buildQuestStrip } from '../src/ui/hud/quest/quest_strip_controller';
 import { QUEST_STRIP_MAX_OBJECTIVES } from '../src/ui/hud/quest/quest_strip_core';
 import type { TrackedQuest } from '../src/ui/hud/quest/quest_tracker';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
+import { makeWriterFacet } from '../src/ui/painter_host';
 import type { IWorld } from '../src/world_api';
+
+/** A private facet per rig: the controller takes Hud's shared one in
+ *  production, and a test needs only the elision behaviour. */
+function writers() {
+  return makeWriterFacet(
+    new Map(),
+    new Map(),
+    new Map(),
+    new Map(),
+    () => {},
+    () => {},
+  );
+}
 
 /** Past QUEST_STRIP_SWIPE_DEADZONE_PX (22) in either direction. */
 const SWIPE_PX = 40;
 
 const STRIP_MARKUP = `
   <div id="quest-strip" class="empty">
-    <button type="button" id="quest-strip-main">
+    <button type="button" id="quest-strip-main" aria-labelledby="quest-strip-title quest-strip-complete quest-strip-count" aria-describedby="quest-strip-objs quest-strip-hint">
       <span class="quest-strip-title-row">
         <span id="quest-strip-title" class="quest-strip-title"></span>
         <span id="quest-strip-complete" class="quest-complete"></span>
         <span id="quest-strip-cycle" class="quest-strip-cycle" aria-hidden="true"><span id="quest-strip-prev" class="quest-strip-arrow">&#8249;</span><span id="quest-strip-count" class="quest-strip-count"></span><span id="quest-strip-next" class="quest-strip-arrow">&#8250;</span></span>
       </span>
-      <span class="quest-strip-objs">
+      <span id="quest-strip-objs" class="quest-strip-objs">
         <span class="quest-strip-obj"></span>
         <span class="quest-strip-obj"></span>
         <span class="quest-strip-obj"></span>
@@ -46,6 +60,7 @@ const STRIP_MARKUP = `
         <span id="quest-strip-more" class="quest-strip-obj quest-strip-more"></span>
       </span>
     </button>
+    <span id="quest-strip-hint" class="visually-hidden"></span>
   </div>`;
 
 function quest(id: string, objectiveCount = 1): TrackedQuest {
@@ -69,7 +84,7 @@ function mountStrip() {
   document.body.append(controls);
   document.body.classList.add('mobile-touch');
   const click = vi.fn();
-  const controller = buildQuestStrip({ click });
+  const controller = buildQuestStrip({ writers: writers(), click });
   if (!controller) throw new Error('the strip markup did not resolve');
   const el = (id: string) => document.getElementById(id) as HTMLElement;
   return {
@@ -80,6 +95,7 @@ function mountStrip() {
     title: el('quest-strip-title'),
     counter: el('quest-strip-count'),
     more: el('quest-strip-more'),
+    hint: el('quest-strip-hint'),
     objectives: [
       ...document.querySelectorAll<HTMLElement>('.quest-strip-obj:not(.quest-strip-more)'),
     ],
@@ -183,17 +199,36 @@ describe('the quest strip renders one quest in full', () => {
     expect(rig.more.style.display).not.toBe('none');
   });
 
-  it('names the position and the action in its accessible name', () => {
+  it('names the button from its own nodes and describes it with the objectives', () => {
     const rig = mountStrip();
-    rig.controller.update([quest('a'), quest('b'), quest('c')]);
-    const label = rig.surface.getAttribute('aria-label') ?? '';
-    expect(label).toContain('1');
-    expect(label).toContain('3');
-    expect(label).toContain('Title a');
-    // With nothing to cycle to the label drops the position instead of saying
+    rig.controller.update([quest('a', 2), quest('b'), quest('c')]);
+    // NO aria-label: one on a button REPLACES its subtree for name computation,
+    // which is what hid the objective progress from assistive tech entirely.
+    expect(rig.surface.hasAttribute('aria-label')).toBe(false);
+    // The name is the title, the complete marker and the position, all real
+    // nodes the painter already writes, so it moves with what is rendered.
+    expect(rig.surface.getAttribute('aria-labelledby')).toBe(
+      'quest-strip-title quest-strip-complete quest-strip-count',
+    );
+    expect(rig.title.textContent).toBe('Title a');
+    expect(rig.counter.textContent).toContain('1');
+    expect(rig.counter.textContent).toContain('3');
+    // The objectives are the DESCRIPTION, beside the activation hint, so the
+    // progress a sighted touch player reads is announced too.
+    expect(rig.surface.getAttribute('aria-describedby')).toBe('quest-strip-objs quest-strip-hint');
+    const described = rig.surface
+      .getAttribute('aria-describedby')
+      ?.split(' ')
+      .map((id) => document.getElementById(id)?.textContent ?? '')
+      .join(' ');
+    expect(described).toContain('Objective 0');
+    expect(described).toContain('0/3');
+    expect(described).toContain('Title a');
+    // With nothing to cycle to the hint drops the position instead of saying
     // "1 of 1" and promising a cycle that does nothing.
     rig.controller.update([quest('a')]);
-    expect(rig.surface.getAttribute('aria-label')).not.toContain('1 of 1');
+    expect(rig.hint.textContent).not.toContain('1 of 1');
+    expect(rig.hint.textContent).toContain('Title a');
   });
 
   it('marks a quest that is ready to turn in', () => {
@@ -244,6 +279,7 @@ describe('the tracker hands its projection to the strip on touch', () => {
     document.body.append(element);
     const questLog = new Map(entries.map((entry) => [entry.questId, entry]));
     const controller = new QuestTrackerController({
+      writers: writers(),
       element,
       document,
       world: () => ({ questLog }) as Pick<IWorld, 'questLog'>,

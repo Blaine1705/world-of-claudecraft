@@ -27,6 +27,7 @@ import { abilityDisplayName } from '../../../ability_display_name';
 import { markDialogRoot } from '../../../dialog_root';
 import { itemDisplayName } from '../../../entity_i18n';
 import { esc } from '../../../esc';
+import { captureFocusKey, restoreFirstEnabled } from '../../../focus_restore';
 import { formatNumber, t } from '../../../i18n';
 import { iconDataUrl } from '../../../icons';
 import { svgIcon } from '../../../ui_icons';
@@ -145,8 +146,19 @@ export class BarEditorWindow {
     this.render();
   }
 
+  /**
+   * Re-mint the whole window. Every control the player could be standing on is
+   * destroyed here, and BOTH callers are a control activation (a tab press, an
+   * in-game language switch), so the focused control's identity is carried
+   * across with the shared focus_restore seam rather than left on <body>.
+   *
+   * The degradation ladder is this window's own: the rebuilt equivalent first,
+   * then the active page tab, then the close button, so a key that no longer
+   * exists (a page that shrank away) still lands somewhere in the editor.
+   */
   private render(): void {
     const el = this.deps.root();
+    const focusKey = captureFocusKey(el);
     const totalSlots = this.deps.sourceSlotCount();
     this.page = clampBarEditorPage(this.page, totalSlots);
     markDialogRoot(el, { label: t('hudChrome.barEditor.title') });
@@ -160,9 +172,21 @@ export class BarEditorWindow {
     el.appendChild(this.buildClearControl());
     const caption = document.createElement('div');
     caption.className = 'bar-editor-caption';
+    // The editor is the ONLY binding path on touch, so its arm / place / swap /
+    // refuse feedback has to be announced, not only drawn.
+    caption.setAttribute('role', 'status');
     el.appendChild(caption);
     this.caption = caption;
     this.paint();
+    if (focusKey !== null) this.restoreFocusKey(el, focusKey);
+  }
+
+  private restoreFocusKey(root: HTMLElement, focusKey: string): void {
+    restoreFirstEnabled([
+      root.querySelector<HTMLElement>(`[data-focus-key="${focusKey}"]`),
+      this.tabs[this.page],
+      root.querySelector<HTMLElement>('[data-close]'),
+    ]);
   }
 
   private buildTabs(totalSlots: number): HTMLElement {
@@ -174,6 +198,7 @@ export class BarEditorWindow {
       const tab = document.createElement('button');
       tab.type = 'button';
       tab.className = 'bar-editor-tab';
+      tab.dataset.focusKey = `bar-editor:tab:${page}`;
       tab.setAttribute('role', 'tab');
       tab.textContent = t('hudChrome.barEditor.pageTab', {
         page: formatNumber(page + 1, { maximumFractionDigits: 0 }),
@@ -197,6 +222,7 @@ export class BarEditorWindow {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'bar-editor-clear';
+    btn.dataset.focusKey = 'bar-editor:clear';
     btn.textContent = t('hudChrome.barEditor.clear');
     btn.setAttribute('aria-label', t('hudChrome.barEditor.clearAria'));
     btn.addEventListener('click', () => this.toggleClear());
@@ -251,6 +277,7 @@ export class BarEditorWindow {
     btn.type = 'button';
     btn.className = 'bar-editor-cell';
     btn.dataset.barSlot = String(cell.slot);
+    btn.dataset.focusKey = `bar-editor:cell:${cell.slot}`;
     const icon = document.createElement('span');
     icon.className = 'bar-editor-cell-icon';
     const name = document.createElement('span');

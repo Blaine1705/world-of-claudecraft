@@ -9006,6 +9006,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.mobile.leaderboard'
   | 'hudChrome.mobile.menuControl'
   | 'hudChrome.mobile.menuControlAria'
+  | 'hudChrome.mobile.menuControlAriaTap'
   | 'hudChrome.mobile.menuLabel'
   | 'hudChrome.mobile.mounts'
   | 'hudChrome.mobile.nameplates'

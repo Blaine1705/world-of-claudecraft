@@ -501,6 +501,13 @@ export function clickMoveButtonLabel(value: number): string {
   return normalizeClickMoveButton(value) === 2 ? 'Right Click' : 'Left Click';
 }
 
+/**
+ * Fired on `window` after any settings write is persisted. It exists for readers
+ * that would otherwise rebuild the whole store to answer one question on a hot
+ * path (`tapMenusEnabled`), so they can cache and invalidate instead.
+ */
+export const SETTINGS_CHANGE_EVENT = 'woc:settingschange';
+
 export class Settings {
   private values: GameSettings;
 
@@ -528,6 +535,16 @@ export class Settings {
       localStorage.setItem(STORE_KEY, JSON.stringify(this.values));
     } catch {
       /* storage unavailable */
+    }
+    // Every consumer here holds its OWN Settings instance (the options panel
+    // writes through one, main.ts through another), so a live reader that caches
+    // a value cannot see the write any other way. One broadcast per persisted
+    // write, which is a player action, never a frame.
+    // Guarded on the METHOD, not on `window`: several Node suites stub a partial
+    // window global, and a settings write must never throw on a host that has no
+    // event target to broadcast into.
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new Event(SETTINGS_CHANGE_EVENT));
     }
   }
 

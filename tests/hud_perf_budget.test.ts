@@ -762,18 +762,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
     driverAllow: {},
   },
+  // The strip menus' SHARED gesture layer, which the consumables row and the menu
+  // control are both thin instantiations of (neither wrapper reads layout at all
+  // any more, which is why neither carries an allowance): ONE anchor rect plus
+  // ONE computed-style read taken at pointerdown, never again while the finger
+  // travels the row, and the painters that follow read only the cached placement
+  // (the menu caption included, which is why it clamps against a nominal
+  // half-width rather than measuring itself).
   {
-    file: 'hud/action_bar/consumable_strip_gesture_controller.ts',
-    reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
-    driverAllow: {},
-  },
-  // The menu control's gesture layer, the same twin one more time: ONE anchor
-  // rect plus ONE computed-style read taken at pointerdown, never again while
-  // the finger travels the row, and the painter that follows reads only the
-  // cached placement (the caption included, which is why it clamps against a
-  // nominal half-width rather than measuring itself).
-  {
-    file: 'hud/menu/menu_strip_gesture_controller.ts',
+    file: 'hud/strip_gesture_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
     driverAllow: {},
   },

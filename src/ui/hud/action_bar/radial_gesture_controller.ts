@@ -38,7 +38,8 @@
 // both strips so the three menus cannot drift. With the setting off nothing here
 // runs and the gesture path above is untouched.
 
-import { armTapMenuOutsideDismiss } from '../tap_menu';
+import type { PainterHostWriters } from '../../painter_host';
+import { armTapMenuOutsideDismiss, registerTouchMenu } from '../tap_menu';
 import { resolveTapMenuPress } from '../tap_menu_core';
 import {
   FLICK_DEADZONE_PX,
@@ -74,6 +75,10 @@ const APP_VIEWPORT_HEIGHT_PROP = '--app-vh';
 const FALLBACK_PETAL_SIZE_PX = 46;
 const FALLBACK_RADIUS_RATIO = 1.35;
 const FALLBACK_MARGIN_PX = 6;
+/** The pressed ring button's open state, so assistive tech is told the petals
+ *  are showing. It is written on the BUTTON the petals belong to, never on the
+ *  overlay: the button is the control a screen reader is standing on. */
+const ARIA_EXPANDED_ATTR = 'aria-expanded';
 
 /** A keyboard-activated click reports detail 0; a pointer-driven one does not.
  *  The pointer path below owns mouse and touch, so the click listener exists
@@ -91,6 +96,9 @@ export interface RadialPetalTarget {
 export interface RadialGestureDeps {
   /** The ring's action buttons, in ring index order. */
   buttons: readonly HTMLElement[];
+  /** Hud's shared write-elision facet, which the pressed button's aria-expanded
+   *  state is written through (the same cache the ring painter writes into). */
+  writers: PainterHostWriters;
   /** Tap mode (settings.touchTapMenus), read live at press time. */
   tapMenus(): boolean;
   /** The element whose computed style carries the radial geometry per tier. */
@@ -203,6 +211,9 @@ export class RadialGesture {
     const release = (e: Event) => this.clearDrag((e as PointerEvent).pointerId);
     window.addEventListener('pointerup', release);
     window.addEventListener('pointercancel', release);
+    // Escape belongs to Hud's single closeAll dispatcher, which asks the shared
+    // registry rather than knowing any menu by name.
+    registerTouchMenu(() => this.closeIfOpen());
   }
 
   /**
@@ -279,6 +290,7 @@ export class RadialGesture {
     if (this.sticky) this.closeSticky();
     this.sticky = { buttonIndex, btn, placement: this.measure(btn) };
     this.setPetalsFocusable(true);
+    this.setExpanded(btn, true);
     this.disarmOutside = armTapMenuOutsideDismiss(
       () => [...this.deps.buttons, ...this.petals.map((p) => p.el), this.petalCancel],
       () => this.dismissSticky(),
@@ -295,7 +307,17 @@ export class RadialGesture {
     this.setPetalsFocusable(false);
     this.disarmOutside?.();
     this.disarmOutside = null;
+    this.setExpanded(sticky.btn, false);
     sticky.btn.focus();
+  }
+
+  /** Escape's way out, called by Hud's closeAll dispatcher through the shared
+   *  registry. Reports whether it had anything to close, and casts nothing. */
+  closeIfOpen(): boolean {
+    if (this.sticky === null) return false;
+    this.closeSticky();
+    this.deps.onCancel();
+    return true;
   }
 
   /** The tap-outside path: close and report the radial as chosen-nothing. */
@@ -383,6 +405,13 @@ export class RadialGesture {
   private reveal(d: DragState): void {
     if (d.placement || d.pointerId !== this.revealOwner) return;
     d.placement = this.measure(d.btn);
+    this.setExpanded(d.btn, true);
+  }
+
+  /** The pressed button's popup state, through the shared elided writer so a
+   *  repeat of the same state costs no DOM write. */
+  private setExpanded(btn: HTMLElement, open: boolean): void {
+    this.deps.writers.setAttr(btn, ARIA_EXPANDED_ATTR, open ? 'true' : 'false');
   }
 
   /** Seat the radial around one ring button. The one place this module reads
@@ -450,6 +479,7 @@ export class RadialGesture {
     if (!d) return;
     if (d.revealTimer !== null) clearTimeout(d.revealTimer);
     this.drags.delete(pointerId);
+    if (d.placement) this.setExpanded(d.btn, false);
     if (this.revealOwner === pointerId) this.revealOwner = null;
   }
 }

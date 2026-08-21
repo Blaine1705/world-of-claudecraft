@@ -8560,6 +8560,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.menuControl': '菜单',
   'hudChrome.mobile.menuControlAria':
     '菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。',
+  'hudChrome.mobile.menuControlAriaTap':
+    '菜单。点按打开菜单行：坐骑、地图、背包等。再次点按可打开聊天。',
   'hudChrome.mobile.questStripAria':
     '追踪任务 {position}/{total}：{title}。点按可切换到下一个任务。',
   'hudChrome.mobile.questStripAriaSingle': '追踪任务：{title}',

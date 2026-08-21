@@ -162,6 +162,32 @@ export const STRIP_DEADZONE_PX = FLICK_DEADZONE_PX;
 
 export type StripDirection = 'left' | 'right';
 
+/** Travel between adjacent items as the FINGER sees it, shared by every strip
+ *  menu. Deliberately smaller than the visual pitch: at the drawn spacing the
+ *  far item of a six- or nine-item row would need 300 to 500px of drag, past a
+ *  comfortable thumb arc, while 34px traverses the whole row in roughly 200px
+ *  without the items looking cramped. ONE constant rather than one per menu, so
+ *  the swipe distance a player learns on one row is the distance on the next. */
+export const STRIP_PITCH_PX = 34;
+
+/**
+ * Whether the cancel target is the live choice. It is a PLACE, not a direction:
+ * the X sits on the anchoring control itself, so the band the finger started in
+ * is the way out and the Y a thumb arc wanders to never matters.
+ */
+export function stripCancelIsLive(index: number, revealed: boolean): boolean {
+  return revealed && index < 0;
+}
+
+/**
+ * Whether a drag that just moved onto an item should pull the row up early.
+ * Passing the deadzone is itself intent, so the player never waits out the
+ * reveal timer to see what they already committed to.
+ */
+export function shouldRevealStrip(index: number, revealed: boolean): boolean {
+  return !revealed && index >= 0;
+}
+
 export interface StripPlacementInput {
   /** Centre of the anchoring button. */
   anchorX: number;

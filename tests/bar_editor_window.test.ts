@@ -364,3 +364,58 @@ describe('bar editor window: the cold-window contracts', () => {
     expect(SOURCE).toContain("addEventListener('click'");
   });
 });
+
+// The editor re-mints its whole subtree on a page switch and on an in-game
+// language switch, so the control the player just activated is destroyed under
+// them. Without the shared focus_restore seam focus fell to <body> both times,
+// which strands a keyboard or Switch Control user mid-edit.
+describe('bar editor: focus survives the rebuild, and the caption is announced', () => {
+  it('keeps focus on the tab that was activated across the page switch', () => {
+    h.window.open();
+    const tabs = h.tabs();
+    expect(tabs.length).toBeGreaterThan(1);
+    tabs[1].focus();
+    expect(document.activeElement).toBe(tabs[1]);
+    tabs[1].click();
+    // A FRESH node with the same identity, never the destroyed one.
+    const rebuilt = h.tabs()[1];
+    expect(rebuilt).not.toBe(tabs[1]);
+    expect(document.activeElement).toBe(rebuilt);
+    expect(document.activeElement).not.toBe(document.body);
+  });
+
+  it('keeps focus on the cell that was activated across a language switch', () => {
+    h.window.open();
+    const cell = h.cells()[3];
+    cell.focus();
+    const slot = cell.dataset.barSlot;
+    h.window.relocalize();
+    const rebuilt = h.cells()[3];
+    expect(rebuilt).not.toBe(cell);
+    expect(rebuilt.dataset.barSlot).toBe(slot);
+    expect(document.activeElement).toBe(rebuilt);
+  });
+
+  it('degrades to the active tab when the focused control did not come back', () => {
+    h.window.open();
+    const clear = h.clearBtn();
+    clear.focus();
+    // The lock disables the Clear toggle, so the rebuilt equivalent cannot take
+    // focus and the ladder has to step past it rather than drop to <body>.
+    h.locked.value = true;
+    h.window.relocalize();
+    expect(h.clearBtn().disabled).toBe(true);
+    expect(document.activeElement).toBe(h.tabs()[0]);
+  });
+
+  it('announces the arm / place / refuse caption as a live status', () => {
+    h.window.open();
+    const caption = h.root.querySelector('.bar-editor-caption') as HTMLElement;
+    // The editor is the ONLY binding path on touch, so its confirmation cannot
+    // be drawn-only: without a live region an AT user gets no answer at all.
+    expect(caption.getAttribute('role')).toBe('status');
+    const before = caption.textContent;
+    h.cells()[0].click();
+    expect(caption.textContent).not.toBe(before);
+  });
+});

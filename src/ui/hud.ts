@@ -475,6 +475,7 @@ import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
+import { closeOpenTouchMenu } from './hud/tap_menu';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
@@ -2172,6 +2173,7 @@ export class Hud {
       },
     });
     this.questTracker = new QuestTrackerController({
+      writers: this.writerFacet,
       element: $('#quest-tracker'),
       document,
       world: () => this.sim,
@@ -3436,13 +3438,12 @@ export class Hud {
       case 'dev-command-window':
         this.devCommandWindow.close();
         break;
+      // Both route through the painter so focus returns to the opener (WCAG 2.2 AA).
       case 'char-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.charWindow.close();
         this.syncCharBagsPairing();
         break;
       case 'inspect-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.inspectWindow.close();
         break;
       case 'trade-window':
@@ -3452,12 +3453,11 @@ export class Hud {
       case 'market-window':
         this.closeMarket();
         break;
+      // Both route through the painter so focus returns to the opener (WCAG 2.2 AA).
       case 'mailbox-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.mailboxWindow.close();
         break;
       case 'bank-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.closeBank();
         break;
       case 'calendar-window':
@@ -3553,12 +3553,11 @@ export class Hud {
         // returns to the opener (WCAG), consistent with the toggle/X close path.
         this.talentsWindow.close();
         break;
+      // Both route through the painter so focus returns to the opener (WCAG 2.2 AA).
       case 'spellbook':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.spellbookWindow.close();
         break;
       case 'bar-editor':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.barEditorWindow.close();
         break;
       case 'quest-log-window':
@@ -18794,6 +18793,7 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
+    if (closeOpenTouchMenu()) return true;
     if (this.lootWindow.hasOpenChest) {
       this.closeLoot();
       return true;

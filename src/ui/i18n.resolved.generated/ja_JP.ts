@@ -876,6 +876,7 @@ export const ja_JP: EnTranslations = {
       "consumableSeat": "消耗品",
       "menuControl": "メニュー",
       "menuControlAria": "メニュー。タップでチャットを開き、長押しして右にスワイプすると騎乗、地図、バッグなどを開けます。",
+      "menuControlAriaTap": "メニュー。タップでメニュー列（騎乗、地図、バッグなど）を開きます。もう一度タップするとチャットが開きます。",
       "menuLabel": "Menu",
       "questStripAria": "追跡中のクエスト {total} 件中 {position} 件目: {title}。次のクエストを表示するには操作してください。",
       "questStripAriaSingle": "追跡中のクエスト: {title}",

@@ -876,6 +876,7 @@ export const zh_CN: EnTranslations = {
       "consumableSeat": "消耗品",
       "menuControl": "菜单",
       "menuControlAria": "菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。",
+      "menuControlAriaTap": "菜单。点按打开菜单行：坐骑、地图、背包等。再次点按可打开聊天。",
       "menuLabel": "Menu",
       "questStripAria": "追踪任务 {position}/{total}：{title}。点按可切换到下一个任务。",
       "questStripAriaSingle": "追踪任务：{title}",

@@ -30,6 +30,7 @@ import {
 import { MENU_STRIP_ITEMS } from '../../src/ui/hud/menu/menu_strip_core';
 import { MenuStripGesture } from '../../src/ui/hud/menu/menu_strip_gesture_controller';
 import { MenuStripPainter } from '../../src/ui/hud/menu/menu_strip_painter';
+import { closeOpenTouchMenu } from '../../src/ui/hud/tap_menu';
 import { makeWriterFacet } from '../../src/ui/painter_host';
 import '../../src/styles/index.css';
 import { cleanup } from './_harness';
@@ -112,6 +113,10 @@ function mountHud() {
     btn.type = 'button';
     btn.className = 'mobile-action-slot';
     btn.dataset.mobileIndex = String(i);
+    // Mirrors the shipped markup: the anchors ship closed, and the gesture
+    // layer moves the state from there.
+    btn.setAttribute('aria-haspopup', 'true');
+    btn.setAttribute('aria-expanded', 'false');
     return btn;
   });
   const seat = document.createElement('button');
@@ -119,6 +124,8 @@ function mountHud() {
   seat.id = 'mobile-consumable-seat';
   seat.className = 'mobile-ring-seat';
   seat.dataset.mobileIndex = String(MOBILE_ACTION_BUTTONS);
+  seat.setAttribute('aria-haspopup', 'true');
+  seat.setAttribute('aria-expanded', 'false');
   const attack = document.createElement('button');
   attack.type = 'button';
   attack.id = 'mobile-action-attack';
@@ -163,6 +170,8 @@ function mountHud() {
   anchor.type = 'button';
   anchor.id = 'mobile-menu-anchor';
   anchor.className = 'mobile-btn';
+  anchor.setAttribute('aria-haspopup', 'true');
+  anchor.setAttribute('aria-expanded', 'false');
   row.append(anchor);
 
   const menuStrip = document.createElement('div');
@@ -268,6 +277,7 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
 
     const radialGesture = new RadialGesture({
       buttons: rig.slotBtns,
+      writers: writers(),
       tapMenus: () => tapMenus,
       metricsHost: rig.radial,
       hasSlot: () => true,
@@ -310,6 +320,7 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
 
     const stripGesture = new ConsumableStripGesture({
       seat: rig.seat,
+      writers: writers(),
       tapMenus: () => tapMenus,
       metricsHost: rig.strip,
       items: rig.stripItems,
@@ -345,6 +356,7 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     });
     const menuGesture: MenuStripGesture = new MenuStripGesture({
       anchor: rig.anchor,
+      writers: writers(),
       tapMenus: () => tapMenus,
       metricsHost: rig.menuStrip,
       items: rig.menuItems,
@@ -473,6 +485,55 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     expect(rig.menuGesture.isOpen()).toBe(false);
     expect(rig.menuStrip.classList.contains('open')).toBe(false);
 
+    expect(rig.casts).toEqual([]);
+    expect(rig.used).toEqual([]);
+    expect(rig.picks).toEqual([]);
+    expect(rig.cancels).toEqual({ radial: 1, strip: 1, menu: 1 });
+  });
+
+  it('exposes the open state on every anchor, so assistive tech is told', async () => {
+    const rig = await setup(true);
+    // The retired #mobile-consumables-toggle carried aria-expanded and the
+    // gesture menus that replaced it carried none, which is the regression.
+    // Under tap mode each row is a persistent, focusable popup: an AT user who
+    // opens one has to be able to tell that it is open.
+    expect(rig.slotBtns[0].getAttribute('aria-expanded')).toBe('false');
+    expect(rig.seat.getAttribute('aria-expanded')).toBe('false');
+    expect(rig.anchor.getAttribute('aria-expanded')).toBe('false');
+
+    tap(rig.slotBtns[0]);
+    expect(rig.slotBtns[0].getAttribute('aria-expanded')).toBe('true');
+    // Only the pressed button, never the whole ring.
+    expect(rig.slotBtns[1].getAttribute('aria-expanded')).toBe('false');
+    rig.radialGesture.closeSticky();
+    expect(rig.slotBtns[0].getAttribute('aria-expanded')).toBe('false');
+
+    tap(rig.seat, 2);
+    expect(rig.seat.getAttribute('aria-expanded')).toBe('true');
+    rig.stripGesture.closeSticky();
+    expect(rig.seat.getAttribute('aria-expanded')).toBe('false');
+
+    tap(rig.anchor, 3);
+    expect(rig.anchor.getAttribute('aria-expanded')).toBe('true');
+    rig.menuGesture.closeSticky();
+    expect(rig.anchor.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('closes every open menu from the Escape dispatcher, casting nothing', async () => {
+    const rig = await setup(true);
+    // Hud.closeAll asks the shared registry; a keyboard or Switch Control user
+    // who opens one of these rows had no key-driven way out at all before it.
+    for (const [open, painted, isOpen] of [
+      [() => tap(rig.slotBtns[0]), rig.paintRadial, () => rig.radialGesture.isOpen()],
+      [() => tap(rig.seat, 2), rig.paintStrip, () => rig.stripGesture.isOpen()],
+      [() => tap(rig.anchor, 3), () => {}, () => rig.menuGesture.isOpen()],
+    ] as const) {
+      open();
+      expect(isOpen()).toBe(true);
+      expect(closeOpenTouchMenu()).toBe(true);
+      painted();
+      expect(isOpen()).toBe(false);
+    }
     expect(rig.casts).toEqual([]);
     expect(rig.used).toEqual([]);
     expect(rig.picks).toEqual([]);

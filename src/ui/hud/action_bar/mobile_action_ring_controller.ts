@@ -164,6 +164,10 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
   const overlay = document.getElementById(RADIAL_ID);
   const gesture = new RadialGesture({
     buttons: slotBtns,
+    // Hud's shared facet, the same one the ring and petal painters write
+    // through: the pressed button's aria-expanded state elides against the same
+    // cache as every other write on that button.
+    writers: deps.writers,
     tapMenus: () => tapMenusEnabled(),
     // The radial's own geometry tokens live on the overlay; the ring container
     // is the fallback for a build without the overlay markup, where the gesture

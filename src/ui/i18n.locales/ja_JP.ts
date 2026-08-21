@@ -8951,6 +8951,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.menuControl': 'メニュー',
   'hudChrome.mobile.menuControlAria':
     'メニュー。タップでチャットを開き、長押しして右にスワイプすると騎乗、地図、バッグなどを開けます。',
+  'hudChrome.mobile.menuControlAriaTap':
+    'メニュー。タップでメニュー列（騎乗、地図、バッグなど）を開きます。もう一度タップするとチャットが開きます。',
   'hudChrome.mobile.questStripAria':
     '追跡中のクエスト {total} 件中 {position} 件目: {title}。次のクエストを表示するには操作してください。',
   'hudChrome.mobile.questStripAriaSingle': '追跡中のクエスト: {title}',

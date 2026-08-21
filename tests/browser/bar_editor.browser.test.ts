@@ -36,6 +36,7 @@ import {
   sourceSlotForMobileButton,
 } from '../../src/ui/hud/action_bar/mobile_action_page_view';
 import { RadialGesture } from '../../src/ui/hud/action_bar/radial_gesture_controller';
+import { makeWriterFacet } from '../../src/ui/painter_host';
 import { bindTouchTap } from '../../src/ui/touch_tap';
 import '../../src/styles/index.css';
 import { cleanup } from './_harness';
@@ -265,6 +266,14 @@ describe('the live action ring no longer arms a rearrange', () => {
     const casts: Array<{ buttonIndex: number; direction: string }> = [];
     const gesture = new RadialGesture({
       buttons: rig.slotBtns,
+      writers: makeWriterFacet(
+        new Map(),
+        new Map(),
+        new Map(),
+        new Map(),
+        () => {},
+        () => {},
+      ),
       // The gesture arm, which is what this regression is about: tap mode is the
       // other arm and has its own suite.
       tapMenus: () => false,

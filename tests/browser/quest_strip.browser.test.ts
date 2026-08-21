@@ -27,6 +27,7 @@ import {
 } from '../../src/ui/hud/quest/quest_strip_core';
 import type { TrackedQuest } from '../../src/ui/hud/quest/quest_tracker';
 import '../../src/styles/index.css';
+import { makeWriterFacet } from '../../src/ui/painter_host';
 import { cleanup } from './_harness';
 
 // Both are real landscape phone viewports the touch HUD ships to: 844x390 is the
@@ -43,13 +44,13 @@ const SWIPE_PX = 40;
 
 const STRIP_MARKUP = `
   <div id="quest-strip" class="empty">
-    <button type="button" id="quest-strip-main">
+    <button type="button" id="quest-strip-main" aria-labelledby="quest-strip-title quest-strip-complete quest-strip-count" aria-describedby="quest-strip-objs quest-strip-hint">
       <span class="quest-strip-title-row">
         <span id="quest-strip-title" class="quest-strip-title"></span>
         <span id="quest-strip-complete" class="quest-complete"></span>
         <span id="quest-strip-cycle" class="quest-strip-cycle" aria-hidden="true"><span id="quest-strip-prev" class="quest-strip-arrow">&#8249;</span><span id="quest-strip-count" class="quest-strip-count"></span><span id="quest-strip-next" class="quest-strip-arrow">&#8250;</span></span>
       </span>
-      <span class="quest-strip-objs">
+      <span id="quest-strip-objs" class="quest-strip-objs">
         <span class="quest-strip-obj"></span>
         <span class="quest-strip-obj"></span>
         <span class="quest-strip-obj"></span>
@@ -57,6 +58,7 @@ const STRIP_MARKUP = `
         <span id="quest-strip-more" class="quest-strip-obj quest-strip-more"></span>
       </span>
     </button>
+    <span id="quest-strip-hint" class="visually-hidden"></span>
   </div>`;
 
 function quests(count: number, objectiveCount = 2): TrackedQuest[] {
@@ -148,7 +150,17 @@ function mountHud() {
     return target;
   };
 
-  const controller = buildQuestStrip({ click: () => {} });
+  const controller = buildQuestStrip({
+    writers: makeWriterFacet(
+      new Map(),
+      new Map(),
+      new Map(),
+      new Map(),
+      () => {},
+      () => {},
+    ),
+    click: () => {},
+  });
   if (!controller) throw new Error('the strip markup did not resolve');
   const el = (id: string) => document.getElementById(id) as HTMLElement;
   return {
@@ -160,6 +172,8 @@ function mountHud() {
     title: el('quest-strip-title'),
     counter: el('quest-strip-count'),
     objective: document.querySelector('.quest-strip-obj:not(.quest-strip-more)') as HTMLElement,
+    hint: el('quest-strip-hint'),
+    objectives: el('quest-strip-objs'),
     prevArrow: el('quest-strip-prev'),
     nextArrow: el('quest-strip-next'),
   };
@@ -353,5 +367,45 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     rig.surface.dispatchEvent(pointer('pointerdown', x, y));
     rig.surface.dispatchEvent(pointer('pointerup', x + SWIPE_PX, y));
     expect(rig.counter.textContent).toBe('2/3');
+  });
+
+  it('exposes the objective progress to assistive tech, not only to the eye', async () => {
+    const rig = await setup();
+    rig.controller.update(quests(3, 2));
+    // NO aria-label: one on a button REPLACES its whole subtree for name
+    // computation, so the objective lines the sighted touch player reads were
+    // never announced at all. The name comes from the strip's own nodes and the
+    // objectives are the DESCRIPTION.
+    expect(rig.surface.hasAttribute('aria-label')).toBe(false);
+    expect(rig.surface.getAttribute('aria-labelledby')).toBe(
+      'quest-strip-title quest-strip-complete quest-strip-count',
+    );
+    expect(rig.surface.getAttribute('aria-describedby')).toBe('quest-strip-objs quest-strip-hint');
+
+    // Every referenced id resolves to a real, non-empty node in the rendered
+    // tree, which is what a name/description computation would walk.
+    const textOf = (attr: string) =>
+      (rig.surface.getAttribute(attr) ?? '')
+        .split(' ')
+        .map((id) => {
+          const node = document.getElementById(id);
+          expect(node, `${attr} points at a missing #${id}`).not.toBeNull();
+          return node?.textContent ?? '';
+        })
+        .join(' ');
+    const name = textOf('aria-labelledby');
+    const description = textOf('aria-describedby');
+    expect(name).toContain(rig.title.textContent ?? '');
+    expect(name).toContain('1/3');
+    // The progress counts: the information the aria-label used to swallow.
+    expect(description).toMatch(/\d+\/\d+/);
+    expect(description).toContain('Gravewyrm Acolyte 1 slain');
+    expect(rig.hint.textContent?.length ?? 0).toBeGreaterThan(0);
+
+    // The NAME tracks the selection, because it is computed from the same nodes
+    // the strip repaints rather than from a stamped-on string.
+    rig.controller.cycle(1);
+    expect(textOf('aria-labelledby')).toContain(rig.title.textContent ?? '');
+    expect(textOf('aria-labelledby')).toContain('2/3');
   });
 });

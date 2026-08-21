@@ -4,6 +4,7 @@ import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
+import type { PainterHostWriters } from '../../painter_host';
 import { buildQuestStrip, type QuestStripController } from './quest_strip_controller';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 
@@ -14,6 +15,9 @@ export interface QuestTrackerSettingsPort {
 }
 
 export interface QuestTrackerControllerDeps {
+  /** Hud's shared write-elision facet, forwarded to the touch strip so its
+   *  band-driven writes elide against the same cache as every other HUD write. */
+  writers: PainterHostWriters;
   element: HTMLElement;
   document: Document;
   world(): Pick<IWorld, 'questLog'>;
@@ -31,7 +35,7 @@ export class QuestTrackerController {
   private readonly strip: QuestStripController | null;
 
   constructor(private readonly deps: QuestTrackerControllerDeps) {
-    this.strip = buildQuestStrip({ click: () => this.deps.click() });
+    this.strip = buildQuestStrip({ writers: deps.writers, click: () => this.deps.click() });
   }
 
   update(): void {

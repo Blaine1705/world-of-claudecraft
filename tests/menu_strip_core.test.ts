@@ -4,6 +4,12 @@
 // menu_strip_gesture_controller.test.ts).
 
 import { describe, expect, it } from 'vitest';
+import { CONSUMABLE_STRIP_PITCH_PX } from '../src/ui/hud/action_bar/consumable_strip_core';
+import {
+  STRIP_PITCH_PX,
+  shouldRevealStrip,
+  stripCancelIsLive,
+} from '../src/ui/hud/action_bar/radial_action_core';
 import {
   MENU_CAPTION_HALF_PX,
   MENU_STRIP_COUNT,
@@ -15,6 +21,22 @@ import {
   resolveMenuStripRelease,
   shouldRevealMenuStrip,
 } from '../src/ui/hud/menu/menu_strip_core';
+
+// The two strip menus walk at the SAME finger distance, and they must: a player
+// who learns the swipe on the consumables row uses it on the menu strip. The two
+// used to be separate 34px literals with a comment claiming they matched and
+// nothing checking it, so an edit to one silently taught two different gestures.
+describe('the strip menus share one pitch and one set of rules', () => {
+  it('takes its pitch from the shared constant, not a second literal', () => {
+    expect(MENU_STRIP_PITCH_PX).toBe(STRIP_PITCH_PX);
+    expect(CONSUMABLE_STRIP_PITCH_PX).toBe(STRIP_PITCH_PX);
+  });
+
+  it('takes the cancel-is-live and reveal-early rules from the shared core', () => {
+    expect(menuStripCancelIsLive).toBe(stripCancelIsLive);
+    expect(shouldRevealMenuStrip).toBe(shouldRevealStrip);
+  });
+});
 
 describe('the menu strip roster', () => {
   it('leads with Mount, the answer to issue #2739', () => {

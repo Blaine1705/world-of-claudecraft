@@ -1,74 +1,31 @@
-// The touch gesture layer for the consumables seat: pointer capture, the reveal
-// timer, and measuring the seat. Every RULE it applies lives in
-// consumable_strip_core.ts (what a release means, which way the row grows, when
-// it comes up) or radial_action_core.ts (where the items sit, which one a drag is
-// over), so this module reads pointers and reports; it decides nothing on its
-// own. It is the strip twin of radial_gesture_controller.ts and holds the same
-// contract.
+// The consumables seat's gesture layer: one instance of the shared StripGesture
+// (../strip_gesture_controller.ts), which owns pointer capture, the reveal
+// timer, the seat measure, the window release backstop, sticky/tap mode, the
+// aria-expanded state and the Escape closer. This module supplies only what is
+// genuinely this row's: the direction is RESOLVED per gesture (it grows LEFT off
+// the ring's top arc, and flips only when the left-handed mirror seats the ring
+// against the opposite edge), the count is however many consumables are carried
+// right now, and a bare tap USES the first one, because the common case is "heal
+// now" and making that require a swipe would be worse than the top-left bar it
+// replaces.
 //
-// The gesture: pointerdown arms, a quick tap uses the first consumable, a swipe
-// LEFT past the deadzone walks the row, and a stationary hold of RADIAL_REVEAL_MS
-// reveals it as a learning affordance. Using never waits for the reveal.
-// Releasing back in the seat's own X band with the row open cancels; the Y a
-// thumb arc wandered to is ignored on purpose, because that arc is a curve and
-// demanding a straight path would reject perfectly clear gestures.
-//
-// Two things that cost real time when they are missing:
-//   - Pointer capture is MANDATORY: the finger leaves the seat long before the
-//     release, and without capture the pointerup is delivered elsewhere and the
-//     gesture is silently lost. setPointerCapture is called inside try/catch
-//     because a synthetic or already-released pointer id throws, which is why
-//     the window-level release backstop exists: without it a throw plus a finger
-//     that left the seat strands the drag forever and the row stays painted.
-//   - The row is measured at pointerdown, not at the reveal: which way it grows
-//     decides which way a swipe counts up, so the direction has to exist before
-//     the first move can be resolved against it.
-//
-// STICKY MODE is the non-gesture path, for VoiceOver / TalkBack / Switch
-// Control: activation opens the row as a persistent, focusable menu of real
-// buttons instead of a drag. The touchTapMenus setting is that same path
-// promoted to a player option: with it on, a press opens the row instead of
-// arming the drag, a press on the seat with the row open uses the first
-// consumable, and a press outside dismisses. Every rule is tap_menu_core.ts's,
-// shared with the radial and the menu strip so the three cannot drift.
+// It was a near-verbatim copy of the menu control's gesture layer until the rule
+// of three was reached; see that module's header for the split.
 
-import { armTapMenuOutsideDismiss } from '../tap_menu';
-import { resolveTapMenuPress } from '../tap_menu_core';
+import type { PainterHostWriters } from '../../painter_host';
+import {
+  StripGesture,
+  type StripGestureOutcome,
+  type StripMetrics,
+  type StripReleaseInput,
+} from '../strip_gesture_controller';
 import {
   CONSUMABLE_STRIP_PITCH_PX,
-  consumableStripCancelIsLive,
   resolveConsumableStripDirection,
   resolveConsumableStripRelease,
-  shouldRevealConsumableStrip,
 } from './consumable_strip_core';
 import type { ConsumableStripOpenState } from './consumable_strip_painter';
-import {
-  placeConsumableStrip,
-  RADIAL_REVEAL_MS,
-  resolveStripIndex,
-  STRIP_DEADZONE_PX,
-  type StripDirection,
-  type StripPlacement,
-} from './radial_action_core';
-
-// Row geometry comes from the stylesheet, never from numbers here. An item is
-// the same rendered size as the seat that opens it (both read --menu-btn-size and
-// fold in --btn-scale), so the seat's own measured box IS the item size. The gap
-// and the edge margin are read back off the overlay's computed style and are
-// authored as LITERALS there: getComputedStyle hands back an unresolved calc()
-// for a custom property, so only a literal parses back to a number.
-const GAP_PROP = '--strip-gap';
-const EDGE_MARGIN_PROP = '--strip-margin';
-// The clamp box is the SHARED app-viewport box (#mobile-controls, #game-canvas,
-// #ui and #nameplates all size from it), never window.innerWidth: whenever the
-// two disagree (device emulation, pinch zoom, a mid-resize snapshot) a row
-// clamped against the window lands off the overlay it is painted into. It is a
-// px literal written by syncAppViewport, so it parses.
-const APP_VIEWPORT_WIDTH_PROP = '--app-vw';
-/** Applied only where the stylesheet is absent (a DOM without hud.mobile.css). */
-const FALLBACK_ITEM_SIZE_PX = 46;
-const FALLBACK_GAP_PX = 8;
-const FALLBACK_MARGIN_PX = 6;
+import type { StripDirection } from './radial_action_core';
 
 export interface ConsumableStripGestureDeps {
   /** The ring's 5th seat, which owns the press. */
@@ -79,6 +36,8 @@ export interface ConsumableStripGestureDeps {
   items: readonly HTMLElement[];
   /** The X that sits on top of the seat and backs out without using anything. */
   cancel: HTMLElement;
+  /** The write-elision facet the seat's aria-expanded state is written through. */
+  writers: PainterHostWriters;
   /** Tap mode (settings.touchTapMenus), read live at press time. */
   tapMenus(): boolean;
   /** Carried consumables right now. */
@@ -89,296 +48,74 @@ export interface ConsumableStripGestureDeps {
   onCancel(): void;
 }
 
-/** The measured row: fixed for the whole of one gesture, since the ring does not
- *  move under a press and the swipe distance to item N must stay predictable. */
-interface StripLayout {
-  placement: StripPlacement;
-  direction: StripDirection;
-  anchorX: number;
-  anchorY: number;
-  count: number;
-  itemSize: number;
+/** The row's release rule in the shared outcome shape. A bare tap resolves to
+ *  the FIRST consumable rather than to a default action, which is why the row's
+ *  own table has no 'default' arm to bridge. */
+function release(input: StripReleaseInput): StripGestureOutcome {
+  const outcome = resolveConsumableStripRelease(input);
+  return outcome.kind === 'use' ? { kind: 'pick', index: outcome.index } : { kind: 'cancel' };
 }
 
-interface DragState {
-  pointerId: number;
-  startX: number;
-  index: number;
-  revealed: boolean;
-  revealTimer: ReturnType<typeof setTimeout> | null;
-  layout: StripLayout;
-}
-
-function readMetric(style: CSSStyleDeclaration, prop: string, fallback: number): number {
-  const parsed = Number.parseFloat(style.getPropertyValue(prop));
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
-}
-
-function readPx(value: string): number {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-}
-
-/** The edge clearance the clamp keeps: the stylesheet's literal, widened to
- *  whatever the device's safe area actually claims. env() cannot live in that
- *  literal (a custom property comes back unresolved, see above), so the overlay
- *  carries the insets as padding, which is inert under the global border-box
- *  reset and, being a real property, does resolve to px. */
-function readEdgeMargin(style: CSSStyleDeclaration): number {
-  return Math.max(
-    readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
-    readPx(style.paddingTop),
-    readPx(style.paddingRight),
-    readPx(style.paddingBottom),
-    readPx(style.paddingLeft),
-  );
+function direction(metrics: StripMetrics): StripDirection {
+  return resolveConsumableStripDirection(metrics);
 }
 
 export class ConsumableStripGesture {
-  private drag: DragState | null = null;
-  /** Sticky mode: opened by assistive activation rather than a drag, and kept
-   *  open so it can be navigated and chosen without a pointer. */
-  private sticky: StripLayout | null = null;
-  /** Set when our own pointer handling resolved a gesture, so the synthetic click
-   *  the browser fires afterwards is not mistaken for an assistive activation. */
-  private suppressClick = false;
-  /** Disarms the tap-outside listener, while one is armed. */
-  private disarmOutside: (() => void) | null = null;
+  private readonly gesture: StripGesture;
 
-  constructor(private readonly deps: ConsumableStripGestureDeps) {}
-
-  /** Bind the seat and the row's own buttons. Called once, at build. */
-  attach(): void {
-    const { seat, cancel } = this.deps;
-    seat.addEventListener('pointerdown', (e) => this.onDown(e as PointerEvent));
-    seat.addEventListener('pointermove', (e) => this.onMove(e as PointerEvent));
-    seat.addEventListener('pointerup', (e) => this.onUp(e as PointerEvent));
-    seat.addEventListener('pointercancel', () => this.cancelDrag());
-    // The backstop for a release the seat never sees. It runs AFTER the seat's
-    // own handler on an ordinary release (the event bubbles), so the gesture
-    // resolves first and this finds nothing left to drop.
-    const release = (e: Event) => {
-      if ((e as PointerEvent).pointerId === this.drag?.pointerId) this.cancelDrag();
-    };
-    window.addEventListener('pointerup', release);
-    window.addEventListener('pointercancel', release);
-    // Assistive technologies activate a button with a plain click and emit no
-    // pointer events at all, so a click our own drag handling did not just
-    // produce is the non-gesture path asking for the menu.
-    seat.addEventListener('click', () => {
-      if (this.suppressClick) {
-        this.suppressClick = false;
-        return;
-      }
-      this.openSticky();
-    });
-    this.deps.items.forEach((btn, index) => {
-      btn.addEventListener('click', () => {
-        const press = resolveTapMenuPress({
-          tapMenus: this.deps.tapMenus(),
-          open: this.sticky !== null,
-          target: 'item',
-          index,
-        });
-        if (press.kind !== 'choose') return;
-        const carried = press.index < (this.sticky?.count ?? 0);
-        this.closeSticky();
-        if (carried) this.deps.use(press.index);
-      });
-    });
-    cancel.addEventListener('click', () => {
-      if (!this.sticky) return;
-      this.closeSticky();
-      this.deps.onCancel();
+  constructor(deps: ConsumableStripGestureDeps) {
+    this.gesture = new StripGesture({
+      anchor: deps.seat,
+      metricsHost: deps.metricsHost,
+      items: deps.items,
+      cancel: deps.cancel,
+      writers: deps.writers,
+      tapMenus: () => deps.tapMenus(),
+      count: () => deps.count(),
+      pitch: CONSUMABLE_STRIP_PITCH_PX,
+      direction,
+      release,
+      onPick: (index) => deps.use(index),
+      // Tap mode's second press on the seat: the row's default IS its first
+      // consumable, so the tap path and the release path quaff the same thing.
+      onDefault: () => deps.use(0),
+      onCancel: () => deps.onCancel(),
     });
   }
 
-  /**
-   * Open the row as a persistent, focusable menu. Assistive activation calls
-   * this, and so does a tap-mode press.
-   */
+  /** Bind the seat and the row's own buttons. Called once, at build. */
+  attach(): void {
+    this.gesture.attach();
+  }
+
+  /** Open the row as a persistent, focusable menu. Assistive activation calls
+   *  this, and so does a tap-mode press. */
   openSticky(): void {
-    if (this.sticky || this.drag || this.deps.count() <= 0) return;
-    this.sticky = this.measure();
-    this.setRowFocusable(true);
-    // Only tap mode dismisses on an outside press: with the setting off the row
-    // is assistive-only and closes through its own items or its cancel X, which
-    // is what it did before the setting existed.
-    if (this.deps.tapMenus()) {
-      this.disarmOutside = armTapMenuOutsideDismiss(
-        () => [this.deps.seat, ...this.deps.items, this.deps.cancel],
-        () => this.dismissSticky(),
-      );
-    }
-    this.deps.items[0]?.focus();
+    this.gesture.openSticky();
   }
 
   /** Close the sticky menu and hand focus back to the seat it came from. */
   closeSticky(): void {
-    if (!this.sticky) return;
-    this.sticky = null;
-    this.setRowFocusable(false);
-    this.disarmOutside?.();
-    this.disarmOutside = null;
-    this.deps.seat.focus();
+    this.gesture.closeSticky();
   }
 
-  /** The tap-outside path: close and report the row as chosen-nothing. */
-  private dismissSticky(): void {
-    const press = resolveTapMenuPress({
-      tapMenus: this.deps.tapMenus(),
-      open: this.sticky !== null,
-      target: 'outside',
-    });
-    if (press.kind !== 'dismiss') return;
-    this.closeSticky();
-    this.deps.onCancel();
-  }
-
-  /** A tap-mode press on the seat: open the row, or use the first consumable
-   *  when it is already open. Never arms the drag. */
-  private onTapPress(e: PointerEvent): void {
-    const press = resolveTapMenuPress({
-      tapMenus: true,
-      open: this.sticky !== null,
-      target: 'anchor',
-    });
-    this.suppressClick = true;
-    if (e.pointerType === 'touch') e.preventDefault();
-    if (press.kind === 'open') {
-      this.openSticky();
-      return;
-    }
-    if (press.kind !== 'default' || this.deps.count() <= 0) return;
-    this.closeSticky();
-    this.deps.use(0);
+  /** Escape's way out, through Hud's single closeAll dispatcher. */
+  closeIfOpen(): boolean {
+    return this.gesture.closeIfOpen();
   }
 
   /** True while the row is showing, from either path. */
   isOpen(): boolean {
-    return this.sticky !== null || this.drag?.revealed === true;
+    return this.gesture.isOpen();
   }
 
   /** What the painter needs to seat the row, or null while it is closed. */
   openState(): ConsumableStripOpenState | null {
-    const layout = this.sticky ?? (this.drag?.revealed ? this.drag.layout : null);
-    if (!layout) return null;
-    return {
-      placement: layout.placement,
-      anchorX: layout.anchorX,
-      anchorY: layout.anchorY,
-      count: layout.count,
-      itemSize: layout.itemSize,
-      // The sticky menu is chosen by FOCUS, not by travel, so no item is under a
-      // finger and the cancel target is not the live choice either.
-      live: this.sticky ? -1 : (this.drag?.index ?? -1),
-      cancelLive:
-        this.sticky === null &&
-        consumableStripCancelIsLive(this.drag?.index ?? -1, this.drag?.revealed === true),
-    };
-  }
-
-  private setRowFocusable(on: boolean): void {
-    const tabIndex = on ? 0 : -1;
-    for (const btn of this.deps.items) btn.tabIndex = tabIndex;
-    this.deps.cancel.tabIndex = tabIndex;
-  }
-
-  /** Measure the seat and lay the row out around it. The one place this module
-   *  reads layout, gated to an opening gesture rather than per frame. */
-  private measure(): StripLayout {
-    const rect = this.deps.seat.getBoundingClientRect();
-    const style = getComputedStyle(this.deps.metricsHost);
-    const itemSize = rect.width > 0 ? rect.width : FALLBACK_ITEM_SIZE_PX;
-    const anchorX = rect.x + rect.width / 2;
-    const shared = {
-      anchorX,
-      count: this.deps.count(),
-      itemSize,
-      gap: readMetric(style, GAP_PROP, FALLBACK_GAP_PX),
-      viewportWidth: readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth),
-      margin: readEdgeMargin(style),
-    };
-    const anchorY = rect.y + rect.height / 2;
-    const direction = resolveConsumableStripDirection(shared);
-    return {
-      placement: placeConsumableStrip({ ...shared, anchorY, direction }),
-      direction,
-      anchorX,
-      anchorY,
-      count: shared.count,
-      itemSize,
-    };
-  }
-
-  private onDown(e: PointerEvent): void {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    // A press always clears a stale suppression first: the flag is set on a
-    // release and cleared by the click that follows it, so one that never
-    // arrived would otherwise swallow the next assistive activation.
-    this.suppressClick = false;
-    if (this.deps.tapMenus()) {
-      this.onTapPress(e);
-      return;
-    }
-    if (this.drag || this.sticky) return;
-    if (this.deps.count() <= 0) return;
-    try {
-      this.deps.seat.setPointerCapture?.(e.pointerId);
-    } catch {
-      /* synthetic or already-released pointer id: the seat's own move/up
-         listeners still resolve the drag while the finger stays on it, and the
-         window backstop drops it when the finger leaves */
-    }
-    this.drag = {
-      pointerId: e.pointerId,
-      startX: e.clientX,
-      index: -1,
-      revealed: false,
-      layout: this.measure(),
-      revealTimer: setTimeout(() => this.reveal(), RADIAL_REVEAL_MS),
-    };
-    if (e.pointerType === 'touch') e.preventDefault();
-  }
-
-  private reveal(): void {
-    if (this.drag) this.drag.revealed = true;
-  }
-
-  private onMove(e: PointerEvent): void {
-    const d = this.drag;
-    if (!d || e.pointerId !== d.pointerId) return;
-    const next = resolveStripIndex(
-      e.clientX - d.startX,
-      CONSUMABLE_STRIP_PITCH_PX,
-      d.layout.count,
-      STRIP_DEADZONE_PX,
-      d.layout.direction,
-    );
-    if (next === d.index) return;
-    d.index = next;
-    if (shouldRevealConsumableStrip(next, d.revealed)) this.reveal();
-  }
-
-  private onUp(e: PointerEvent): void {
-    const d = this.drag;
-    if (!d || e.pointerId !== d.pointerId) return;
-    const outcome = resolveConsumableStripRelease({
-      index: d.index,
-      revealed: d.revealed,
-      count: d.layout.count,
-    });
-    this.suppressClick = true;
-    this.cancelDrag();
-    if (outcome.kind === 'use') this.deps.use(outcome.index);
-    else this.deps.onCancel();
+    return this.gesture.openState();
   }
 
   /** Drop the gesture and close the row. Safe to call from any path. */
   cancelDrag(): void {
-    const d = this.drag;
-    if (!d) return;
-    if (d.revealTimer !== null) clearTimeout(d.revealTimer);
-    this.drag = null;
+    this.gesture.cancelDrag();
   }
 }

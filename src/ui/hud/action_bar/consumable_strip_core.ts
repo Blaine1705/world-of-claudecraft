@@ -11,13 +11,17 @@
 // player holds it at; the left-handed HUD mirror flips the whole ring, which is
 // the one case resolveConsumableStripDirection exists for.
 
-import type { StripDirection } from './radial_action_core';
+import {
+  STRIP_PITCH_PX,
+  type StripDirection,
+  shouldRevealStrip,
+  stripCancelIsLive,
+} from './radial_action_core';
 
-/** Travel between adjacent items as the FINGER sees it. Deliberately smaller
- *  than the visual pitch: at the drawn spacing the sixth item would need over
- *  300px of drag, past a comfortable thumb arc, while 34px traverses the whole
- *  row in roughly 200px without the items looking cramped. */
-export const CONSUMABLE_STRIP_PITCH_PX = 34;
+/** The shared strip pitch under this row's own name. Re-exported rather than
+ *  restated: every strip menu walks at the same finger distance, and a second
+ *  literal is how the two rows would drift apart. */
+export const CONSUMABLE_STRIP_PITCH_PX = STRIP_PITCH_PX;
 
 /** What a release on the seat does. */
 export type ConsumableStripOutcome = { kind: 'use'; index: number } | { kind: 'cancel' };
@@ -47,23 +51,13 @@ export function resolveConsumableStripRelease(
   return { kind: 'use', index };
 }
 
-/**
- * Whether the cancel target is the live choice. It is a PLACE, not a direction:
- * the X sits on the seat itself, so the band the finger started in is the way
- * out and the Y a thumb arc wanders to never matters.
- */
-export function consumableStripCancelIsLive(index: number, revealed: boolean): boolean {
-  return revealed && index < 0;
-}
-
-/**
- * Whether a drag that just moved onto an item should pull the row up early.
- * Passing the deadzone is itself intent, so the player never waits out the
- * reveal timer to see what they already committed to.
- */
-export function shouldRevealConsumableStrip(index: number, revealed: boolean): boolean {
-  return !revealed && index >= 0;
-}
+// The cancel-is-live and reveal-early rules are the SHARED strip rules under this
+// row's own names (radial_action_core.ts owns the one implementation): they were
+// byte-identical in both strip cores, doc comment included.
+export {
+  shouldRevealStrip as shouldRevealConsumableStrip,
+  stripCancelIsLive as consumableStripCancelIsLive,
+};
 
 export interface ConsumableStripDirectionInput {
   /** Centre of the seat. */

@@ -12,6 +12,11 @@
 // the strip repaints on the HUD's medium band and a pooled build would be one
 // more thing to get wrong for a list that is capped at five lines anyway.
 //
+// The button's ACCESSIBLE NAME is markup, not a paint: aria-labelledby points at
+// the title, the complete marker and the position, so the objective lines stay
+// readable content instead of being replaced by an aria-label. What is painted is
+// the off-screen hint line aria-describedby names beside them.
+//
 // It takes no layout read: the width bound comes in already measured from the
 // controller, which gates its measures behind a cheap invalidation key. The
 // strip's ANCHOR is never written here at all: hud.mobile.css owns it, so no
@@ -25,7 +30,6 @@ const CLASS_DONE = 'done';
 const CLASS_COMPLETE = 'complete';
 const CLASS_PRESSED = 'gesturing';
 const MAX_WIDTH_PROP = 'max-width';
-const ARIA_LABEL_ATTR = 'aria-label';
 const HIDDEN = 'none';
 const SHOWN = '';
 
@@ -57,8 +61,10 @@ export interface QuestStripPaintModel {
   /** The "2/3" position hint, and whether there is anything to cycle to. */
   counter: string;
   counterVisible: boolean;
-  /** The button's accessible name: position, title and what activating does. */
-  aria: string;
+  /** The off-screen description line: what the strip is and what activating it
+   *  does. NOT an accessible name: the name comes from the title, the complete
+   *  marker and the position, which are real nodes aria-labelledby points at. */
+  hint: string;
   objectives: readonly QuestStripObjectiveLine[];
   /** The "+N more" overflow line, or '' when nothing was trimmed. */
   more: string;
@@ -81,6 +87,8 @@ export interface QuestStripPaintDescriptor {
   objectives: readonly HTMLElement[];
   /** The "+N more" line that follows them. */
   more: HTMLElement;
+  /** The off-screen line aria-describedby names beside the objectives. */
+  hint: HTMLElement;
 }
 
 export class QuestStripPainter {
@@ -113,7 +121,7 @@ export class QuestStripPainter {
     this.writers.setText(d.more, model.more);
     this.writers.setDisplay(d.more, model.more === '' ? HIDDEN : SHOWN);
 
-    this.writers.setAttr(d.surface, ARIA_LABEL_ATTR, model.aria);
+    this.writers.setText(d.hint, model.hint);
     this.writers.toggleClass(d.surface, CLASS_PRESSED, model.pressed);
     this.paintFlash(model.flash);
   }

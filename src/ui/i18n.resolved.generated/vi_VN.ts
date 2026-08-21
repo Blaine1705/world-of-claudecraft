@@ -876,6 +876,7 @@ export const vi_VN: EnTranslations = {
       "consumableSeat": "Consumables",
       "menuControl": "Menus",
       "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
       "menuLabel": "Menu",
       "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
       "questStripAriaSingle": "Tracked quest: {title}",

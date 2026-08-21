@@ -2,7 +2,21 @@ import { describe, expect, it, vi } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
+import { makeWriterFacet } from '../src/ui/painter_host';
 import type { IWorld } from '../src/world_api';
+
+/** A private facet per rig: the controller takes Hud's shared one in production,
+ *  and a test needs only the elision behaviour. */
+function writers() {
+  return makeWriterFacet(
+    new Map(),
+    new Map(),
+    new Map(),
+    new Map(),
+    () => {},
+    () => {},
+  );
+}
 
 function progress(questId: string, state: QuestProgress['state'] = 'active'): QuestProgress {
   return {
@@ -43,6 +57,7 @@ function harness(entries: QuestProgress[] = []) {
   };
   const click = vi.fn();
   const controller = new QuestTrackerController({
+    writers: writers(),
     element,
     document,
     world: () => ({ questLog }) as Pick<IWorld, 'questLog'>,

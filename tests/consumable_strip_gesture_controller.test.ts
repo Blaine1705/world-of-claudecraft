@@ -9,6 +9,11 @@
 //
 // The seat is ONE element, so the radial's per-pointer drag map has no twin
 // here: a second pointer on the same seat is correctly ignored.
+//
+// ConsumableStripGesture is a thin instantiation of the shared StripGesture
+// (src/ui/hud/strip_gesture_controller.ts), so every pin here drives that shared
+// layer through the parameters this row supplies (a resolved direction, the
+// carried count, and the tap-uses-the-first-consumable default).
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CONSUMABLE_BAR_SLOTS } from '../src/ui/hud/action_bar/consumable_bar_view';
@@ -16,6 +21,21 @@ import {
   ConsumableStripGesture,
   type ConsumableStripGestureDeps,
 } from '../src/ui/hud/action_bar/consumable_strip_gesture_controller';
+import { closeOpenTouchMenu } from '../src/ui/hud/tap_menu';
+import { makeWriterFacet } from '../src/ui/painter_host';
+
+/** A private facet per rig: the class takes Hud's shared one in production, and
+ *  a test only needs the elision behaviour, not the shared skip counters. */
+function writers() {
+  return makeWriterFacet(
+    new Map(),
+    new Map(),
+    new Map(),
+    new Map(),
+    () => {},
+    () => {},
+  );
+}
 
 const SEAT_SIZE_PX = 40;
 /** Past STRIP_DEADZONE_PX (22), so a move commits to an item and pulls the row
@@ -81,6 +101,7 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
   };
   const deps: ConsumableStripGestureDeps = {
     seat,
+    writers: writers(),
     metricsHost: host,
     items,
     cancel,
@@ -254,5 +275,45 @@ describe('ConsumableStripGesture: tap mode', () => {
     elsewhere.dispatchEvent(pointer('pointerdown', 2, 400));
     expect(rig.gesture.isOpen()).toBe(true);
     expect(rig.cancels).toBe(0);
+  });
+});
+
+// Escape belongs to Hud's single closeAll dispatcher, which asks the shared
+// tap-menu registry rather than knowing any menu by name. Before this the sticky
+// row had NO key-driven way out at all.
+describe('ConsumableStripGesture: the Escape path and the seat open state', () => {
+  it('closes the sticky row through the shared registry, using nothing', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    expect(rig.gesture.isOpen()).toBe(true);
+
+    expect(closeOpenTouchMenu()).toBe(true);
+    expect(rig.gesture.isOpen()).toBe(false);
+    // A dismissal, never a quaff.
+    expect(rig.used).toEqual([]);
+    expect(rig.cancels).toBe(1);
+    expect(rig.items.every((btn) => btn.tabIndex === -1)).toBe(true);
+  });
+
+  it('reports nothing to close while the row is down', () => {
+    const rig = makeRig();
+    expect(closeOpenTouchMenu()).toBe(false);
+    expect(rig.cancels).toBe(0);
+  });
+
+  it('tells assistive tech whether the row is showing', () => {
+    const rig = makeRig();
+    rig.seat.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.seat.getAttribute('aria-expanded')).toBe('true');
+    rig.gesture.closeSticky();
+    expect(rig.seat.getAttribute('aria-expanded')).toBe('false');
+
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    // The rig seats the button at the LEFT edge, so this row grows rightward
+    // (resolveConsumableStripDirection's mirror case).
+    rig.seat.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    expect(rig.seat.getAttribute('aria-expanded')).toBe('true');
+    rig.seat.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
+    expect(rig.seat.getAttribute('aria-expanded')).toBe('false');
   });
 });

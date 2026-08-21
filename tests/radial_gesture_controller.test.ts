@@ -21,6 +21,8 @@ import {
   RadialGesture,
   type RadialGestureDeps,
 } from '../src/ui/hud/action_bar/radial_gesture_controller';
+import { closeOpenTouchMenu } from '../src/ui/hud/tap_menu';
+import { makeWriterFacet } from '../src/ui/painter_host';
 
 const BUTTON_SIZE_PX = 40;
 /** The petal order the painter seats and the gesture is handed. */
@@ -110,6 +112,14 @@ function makeRig(
   };
   const deps: RadialGestureDeps = {
     buttons,
+    writers: makeWriterFacet(
+      new Map(),
+      new Map(),
+      new Map(),
+      new Map(),
+      () => {},
+      () => {},
+    ),
     tapMenus: () => rig.tapMenus,
     metricsHost: host,
     hasSlot: () => true,
@@ -421,5 +431,48 @@ describe('RadialGesture: tap mode', () => {
     move(rig, 0, 1, 100 + FLICK_PX, 100);
     up(rig, 0, 1, 100 + FLICK_PX, 100);
     expect(rig.casts).toEqual([[0, 'right']]);
+  });
+});
+
+// Escape belongs to Hud's single closeAll dispatcher, which asks the shared
+// tap-menu registry rather than knowing any menu by name. Before this the
+// tap-mode petals had NO key-driven way out at all.
+describe('RadialGesture: the Escape path and the button open state', () => {
+  it('closes the tap-mode petals through the shared registry, casting nothing', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    expect(rig.gesture.isOpen()).toBe(true);
+
+    expect(closeOpenTouchMenu()).toBe(true);
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.casts).toEqual([]);
+    expect(rig.cancels).toBe(1);
+    expect(rig.petals.map((p) => p.tabIndex)).toEqual([-1, -1, -1, -1]);
+  });
+
+  it('reports nothing to close while the petals are down', () => {
+    const rig = makeRig({ tapMenus: true });
+    expect(closeOpenTouchMenu()).toBe(false);
+    expect(rig.cancels).toBe(0);
+  });
+
+  it('tells assistive tech whether the petals are showing, on the pressed button', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    // The state lands on the BUTTON the petals belong to, which is the control a
+    // screen reader is standing on, never on the overlay.
+    expect(rig.buttons[0].getAttribute('aria-expanded')).toBe('true');
+    expect(rig.buttons[1].getAttribute('aria-expanded')).toBeNull();
+    rig.gesture.closeSticky();
+    expect(rig.buttons[0].getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('moves the same state on the gesture path, when a hold reveals the petals', () => {
+    const rig = makeRig();
+    down(rig, 0, 1, 100, 100);
+    move(rig, 0, 1, 100 + FLICK_PX, 100);
+    expect(rig.buttons[0].getAttribute('aria-expanded')).toBe('true');
+    up(rig, 0, 1, 100 + FLICK_PX, 100);
+    expect(rig.buttons[0].getAttribute('aria-expanded')).toBe('false');
   });
 });
