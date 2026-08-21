@@ -873,6 +873,7 @@ export const ja_JP: EnTranslations = {
       "radialRight": "右",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "消耗品",
       "targetCycle": "ターゲット切替",
       "targetCycleShort": "標的",
       "spellbookPageLabel": "ページ{page}",

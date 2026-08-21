@@ -729,11 +729,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the touch action ring; desktop skips the tick and the paint entirely',
   },
   {
-    call: 'this.consumableBarPainter.paint',
+    call: 'this.mobileConsumableSeat.paint',
     band: 'frame',
-    gate: 'this.isMobileLayout() && this.consumablesOpen && this.consumableBarView && this.consumableBarPainter',
+    gate: 'this.isMobileLayout()',
     surface: 'chrome',
-    why: 'the touch consumables quick bar, only while the row is expanded',
+    why: 'the touch consumables seat (the ring arc position showing the first carried consumable) plus the row it opens; desktop skips both',
   },
   {
     call: 'this.xpBarPainter.paint',

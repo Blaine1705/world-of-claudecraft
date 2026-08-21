@@ -873,6 +873,7 @@ export const cs_CZ: EnTranslations = {
       "radialRight": "Right",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Consumables",
       "targetCycle": "Přepnout cíl",
       "targetCycleShort": "Cíl",
       "spellbookPageLabel": "Strana {page}",

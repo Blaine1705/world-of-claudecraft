@@ -555,6 +555,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/action_bar/consumable_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },

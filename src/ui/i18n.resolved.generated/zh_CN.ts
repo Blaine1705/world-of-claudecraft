@@ -873,6 +873,7 @@ export const zh_CN: EnTranslations = {
       "radialRight": "右",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "消耗品",
       "targetCycle": "切换目标",
       "targetCycleShort": "目标",
       "spellbookPageLabel": "页{page}",

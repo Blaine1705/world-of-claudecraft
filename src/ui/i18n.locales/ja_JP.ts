@@ -8945,6 +8945,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': 'ページ{page}',
   'hudChrome.mobile.hideKeyboard': 'キーボードを隠す',
   'hudChrome.mobile.chatPlaceholder': '発言する... (! でコミュニティコマンド)',
+  'hudChrome.mobile.consumableSeat': '消耗品',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'ヴェイルカップ',
   'hudChrome.keybinds.categoryPet': 'ペット',

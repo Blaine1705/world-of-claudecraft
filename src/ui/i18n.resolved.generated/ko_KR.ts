@@ -873,6 +873,7 @@ export const ko_KR: EnTranslations = {
       "radialRight": "오른쪽",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "소모품",
       "targetCycle": "대상 전환",
       "targetCycleShort": "대상",
       "spellbookPageLabel": "페이지 {page}",

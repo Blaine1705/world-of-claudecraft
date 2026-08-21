@@ -873,6 +873,7 @@ export const vi_VN: EnTranslations = {
       "radialRight": "Right",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Consumables",
       "targetCycle": "Hoán đổi mục tiêu",
       "targetCycleShort": "Mục tiêu",
       "spellbookPageLabel": "Trang {page}",

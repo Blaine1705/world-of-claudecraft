@@ -699,10 +699,11 @@
       2
     );
   }
-  /* The arc's fifth seat (90deg, due up over the attack button) is RESERVED for
-     the consumables control, phase 3 of the touch rework. It keeps the seat so
-     the arc's equal-chord spacing is unchanged, and stays hidden until that
-     control is wired; the radial ring itself is the four seats below it. */
+  /* The arc's fifth seat (90deg, due up over the attack button) holds the
+     consumables control: it shows the first carried consumable, a tap uses it,
+     and a hold or a leftward swipe opens the row below. It sizes off the same
+     --menu-btn-size as the four action seats, so the arc's equal-chord spacing
+     is unchanged; the radial ring itself is the four seats below it. */
   body.mobile-touch .mobile-ring-seat {
     width: var(--menu-btn-size);
     height: var(--menu-btn-size);
@@ -1120,6 +1121,174 @@
   @media (forced-colors: active) {
     body.mobile-touch .mobile-action-petal.live,
     body.mobile-touch #mobile-action-radial-cancel.live {
+      border: 3px double Highlight;
+    }
+  }
+  /* The consumables row (#mobile-consumable-strip), opened by a hold or a
+     leftward swipe on the ring's 5th seat. A SIBLING of the ring for the same
+     reason the radial is: its items are seated in viewport coordinates
+     (placeConsumableStrip edge-clamps them) instead of inside the ring's own
+     scaled, corner-anchored box. --strip-gap and --strip-margin are READ BACK by
+     consumable_strip_gesture.ts, so both stay literal values: getComputedStyle
+     hands back an unresolved calc() for a custom property, and only a literal
+     parses. */
+  body.mobile-touch #mobile-consumable-strip {
+    --strip-gap: 8px;
+    --strip-margin: 6px;
+    --strip-item-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    pointer-events: none;
+    opacity: var(--touch-opacity, 1);
+    z-index: 32;
+  }
+  body.mobile-touch #mobile-consumable-strip.open {
+    display: block;
+  }
+  /* The dim is LOCAL to the row and never a full-screen scrim: the other thumb
+     is still steering and the player must keep seeing the fight. */
+  body.mobile-touch #mobile-consumable-strip::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle at var(--strip-x, 50%) var(--strip-y, 50%),
+      #05050cb0 0%,
+      #05050c80 calc(var(--strip-item-size) * 1.9),
+      transparent calc(var(--strip-item-size) * 2.6)
+    );
+    pointer-events: none;
+  }
+  /* Items and the cancel X are seated by their CENTRE (the painter writes
+     left/top from placeConsumableStrip), so the negative margins pull each box
+     back onto its own centre point. CIRCLES at the shared --menu-btn-size, the
+     same rendered size as the ring button they came from. */
+  body.mobile-touch .mobile-consumable-item,
+  body.mobile-touch #mobile-consumable-cancel {
+    position: absolute;
+    width: var(--strip-item-size);
+    height: var(--strip-item-size);
+    margin-left: calc(var(--strip-item-size) / -2);
+    margin-top: calc(var(--strip-item-size) / -2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid #4a3d1d;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2d3048e8, #11121ee8 72%);
+    color: #eee8ff;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  /* The item the drag is over, and the cancel X while the finger is back in the
+     seat's band: a steady border + glow, never a scale transform (the
+     motion-sickness rule). */
+  body.mobile-touch .mobile-consumable-item.live,
+  body.mobile-touch #mobile-consumable-cancel.live {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 12px #ffd100aa,
+      inset 0 0 8px #ffd10055;
+  }
+  /* The cancel X sits directly ON the seat, which puts it right of the rightmost
+     item once the row is open: releasing where the gesture started is the way
+     out, so the target is a place the thumb never had to leave. */
+  body.mobile-touch #mobile-consumable-cancel {
+    border-color: #8b4e2c;
+    background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
+  }
+  /* One icon size for the seat and the row: 22px, the ring's size, NOT the 27px
+     the top-row .mobile-btn paints art at (that size is calibrated for a 58x54
+     box and crowds a circle's rim). */
+  body.mobile-touch #mobile-consumable-strip .ui-icon,
+  body.mobile-touch #mobile-consumable-strip .ui-icon-art,
+  body.mobile-touch #mobile-consumable-seat .ui-icon,
+  body.mobile-touch #mobile-consumable-seat .ui-icon-art {
+    width: 22px;
+    height: 22px;
+    color: #ffdf9c;
+  }
+  /* The row's internals mirror the ring button's exactly (same painter, same
+     ActionBarState), so an item reads as the same control the seat shows. */
+  body.mobile-touch .mobile-consumable-item .icon-label {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+  }
+  body.mobile-touch .mobile-consumable-item .cd-overlay {
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(
+      transparent 0 calc(100% - var(--cd-fill, 0%)),
+      #000a calc(100% - var(--cd-fill, 0%))
+    );
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-item .recharge-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    background: #0008;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-item .cdtext {
+    position: relative;
+    font-size: 15px;
+    font-weight: bold;
+    text-shadow:
+      0 0 4px #000,
+      1px 1px 1px #000,
+      -1px -1px 1px #000,
+      1px -1px 1px #000,
+      -1px 1px 1px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-item .item-count {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-item .keybind {
+    display: none;
+  }
+  body.mobile-touch .mobile-consumable-item.empty .icon-label {
+    background-image: none;
+  }
+  body.mobile-touch .mobile-consumable-item.empty {
+    opacity: 0.4;
+  }
+  body.mobile-touch .mobile-consumable-item.unusable {
+    filter: grayscale(0.6);
+    opacity: 0.6;
+  }
+  /* Sticky mode (VoiceOver / Switch Control, and Phase 6's tap mode): the row
+     becomes a persistent focusable menu, so its buttons take pointer events the
+     drag path deliberately keeps off the overlay. */
+  body.mobile-touch #mobile-consumable-strip.open .mobile-consumable-item,
+  body.mobile-touch #mobile-consumable-strip.open #mobile-consumable-cancel {
+    pointer-events: auto;
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch .mobile-consumable-item.live,
+    body.mobile-touch #mobile-consumable-cancel.live {
       border: 3px double Highlight;
     }
   }

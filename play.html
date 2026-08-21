@@ -1162,7 +1162,7 @@
       <button class="mobile-action-slot" type="button" data-mobile-index="1"></button>
       <button class="mobile-action-slot" type="button" data-mobile-index="2"></button>
       <button class="mobile-action-slot" type="button" data-mobile-index="3"></button>
-      <button type="button" id="mobile-consumable-seat" class="mobile-ring-seat" data-mobile-index="4" hidden></button>
+      <button type="button" id="mobile-consumable-seat" class="mobile-ring-seat" data-mobile-index="4"></button>
       <button type="button" id="mobile-action-attack" data-icon="attack"></button>
       <button type="button" id="mobile-target-cycle" data-i18n-title="hudChrome.mobile.targetCycle" data-i18n-aria="hudChrome.mobile.targetCycle" title="Swap target" aria-label="Swap target" data-icon="target"><span class="mobile-label" data-i18n="hudChrome.mobile.targetCycleShort">Target</span></button>
       <button type="button" id="mobile-interact" data-i18n-title="hud.keybinds.actions.interact" data-i18n-aria="hud.keybinds.actions.interact" title="Interact / Loot" aria-label="Interact / Loot" data-icon="interact"><span class="mobile-label" data-i18n="hud.core.mobileUse">Use</span></button>
@@ -1175,6 +1175,19 @@
       <button type="button" class="mobile-action-petal" data-radial-dir="down" data-mobile-index="2"></button>
       <button type="button" class="mobile-action-petal" data-radial-dir="left" data-mobile-index="3"></button>
       <button type="button" id="mobile-action-radial-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close"></button>
+    </div>
+    <!-- Consumables row: opened by a hold or a leftward swipe on the ring's 5th
+         seat, seated in viewport coordinates by consumable_strip_painter.ts. The
+         cancel X sits ON the seat, so releasing back where the gesture started
+         backs out without quaffing anything. -->
+    <div id="mobile-consumable-strip" data-i18n-aria="hudChrome.mobile.consumableSeat" aria-label="Consumables">
+      <button type="button" class="mobile-consumable-item" data-consumable-index="0" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="1" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="2" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="3" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="4" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="5" tabindex="-1"></button>
+      <button type="button" id="mobile-consumable-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
     </div>
   </div>
       <div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" aria-hidden="true">

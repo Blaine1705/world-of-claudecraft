@@ -1,10 +1,11 @@
-// Real-browser regression for the radial action ring. Composes the shipped
-// markup shape, the real mobile stylesheet, the placement core and the petal
-// painter, so the three things a unit test cannot see are pinned against real
-// layout: the ring shows FOUR action buttons (the fifth arc seat is the reserved
-// consumables seat and stays hidden), a revealed radial keeps every petal fully
-// on screen at the corner the ring actually sits in, and the page toggle reports
-// the two pages the radial mapping needs.
+// Real-browser regression for the radial action ring and the consumables seat
+// that shares its arc. Composes the shipped markup shape, the real mobile
+// stylesheet, the placement cores and both overlay painters, so the things a
+// unit test cannot see are pinned against real layout: the ring shows FOUR action
+// buttons PLUS the consumables seat, a revealed radial keeps every petal fully on
+// screen at the corner the ring actually sits in, the consumables row opens
+// leftward and stays on screen with its cancel X sitting on the seat, and the
+// page toggle reports the two pages the radial mapping needs.
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
@@ -13,12 +14,15 @@ import type {
   ActionBarSlotState,
   ActionBarState,
 } from '../../src/ui/hud/action_bar/action_bar_view';
+import { CONSUMABLE_BAR_SLOTS } from '../../src/ui/hud/action_bar/consumable_bar_view';
+import { resolveConsumableStripDirection } from '../../src/ui/hud/action_bar/consumable_strip_core';
+import { ConsumableStripPainter } from '../../src/ui/hud/action_bar/consumable_strip_painter';
 import {
   MOBILE_ACTION_BUTTONS,
   mobilePageCount,
 } from '../../src/ui/hud/action_bar/mobile_action_page_view';
 import { MobileActionRingPainter } from '../../src/ui/hud/action_bar/mobile_action_ring_painter';
-import { placeRadial } from '../../src/ui/hud/action_bar/radial_action_core';
+import { placeConsumableStrip, placeRadial } from '../../src/ui/hud/action_bar/radial_action_core';
 import {
   RADIAL_PETAL_DIRECTIONS,
   RadialPetalPainter,
@@ -115,7 +119,6 @@ function mountRing() {
   seat.id = 'mobile-consumable-seat';
   seat.className = 'mobile-ring-seat';
   seat.dataset.mobileIndex = String(MOBILE_ACTION_BUTTONS);
-  seat.hidden = true;
   const attack = document.createElement('button');
   attack.type = 'button';
   attack.id = 'mobile-action-attack';
@@ -142,9 +145,38 @@ function mountRing() {
   cancel.id = 'mobile-action-radial-cancel';
   overlay.append(...petalBtns, cancel);
 
-  controls.append(ring, overlay);
+  const strip = document.createElement('div');
+  strip.id = 'mobile-consumable-strip';
+  const stripItems = Array.from({ length: CONSUMABLE_BAR_SLOTS }, (_, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mobile-consumable-item';
+    btn.dataset.consumableIndex = String(i);
+    btn.tabIndex = -1;
+    return btn;
+  });
+  const stripCancel = document.createElement('button');
+  stripCancel.type = 'button';
+  stripCancel.id = 'mobile-consumable-cancel';
+  stripCancel.tabIndex = -1;
+  strip.append(...stripItems, stripCancel);
+
+  controls.append(ring, overlay, strip);
   document.body.appendChild(controls);
-  return { ring, slotBtns, seat, attack, pageToggle, pageIndicator, overlay, petalBtns, cancel };
+  return {
+    ring,
+    slotBtns,
+    seat,
+    attack,
+    pageToggle,
+    pageIndicator,
+    overlay,
+    petalBtns,
+    cancel,
+    strip,
+    stripItems,
+    stripCancel,
+  };
 }
 
 afterEach(() => {
@@ -163,7 +195,7 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
     return mountRing();
   }
 
-  it('shows FOUR action buttons and keeps the reserved consumables seat hidden', async () => {
+  it('shows FOUR action buttons plus the consumables seat, all above the touch floor', async () => {
     const rig = await setup();
     const state: ActionBarState = {
       slots: Array.from({ length: MOBILE_ACTION_BUTTONS + 1 }, () => emptySlotState('empty')),
@@ -186,14 +218,187 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
 
     const visible = rig.slotBtns.filter((btn) => btn.getBoundingClientRect().width > 0);
     expect(visible).toHaveLength(4);
-    expect(rig.seat.getBoundingClientRect().width, 'the reserved seat must not render').toBe(0);
-    expect(getComputedStyle(rig.seat).display).toBe('none');
-    // Every rendered action button still clears the 40x40 mobile touch floor.
-    for (const btn of visible) {
+    // The fifth arc position is the consumables seat and now RENDERS: it shows
+    // the first carried consumable rather than reserving space for nothing.
+    const seatBox = rig.seat.getBoundingClientRect();
+    expect(getComputedStyle(rig.seat).display).not.toBe('none');
+    expect(seatBox.width, 'the consumables seat must render').toBeGreaterThan(0);
+    // Same rendered size as the action buttons: one --menu-btn-size per tier.
+    expect(seatBox.width).toBeCloseTo(visible[0].getBoundingClientRect().width, 1);
+    // A true CIRCLE, not the 58x54 top row's oval.
+    expect(seatBox.width).toBeCloseTo(seatBox.height, 1);
+    // Every rendered action button, and the seat, clears the 40x40 touch floor.
+    for (const btn of [...visible, rig.seat]) {
       const box = btn.getBoundingClientRect();
       expect(box.width).toBeGreaterThanOrEqual(40);
       expect(box.height).toBeGreaterThanOrEqual(40);
     }
+    // The seat stays fully on screen at both tiers (it is the top of the arc, so
+    // it is the seat closest to running off the top edge).
+    expect(seatBox.top).toBeGreaterThan(-EDGE_TOLERANCE_PX);
+    expect(seatBox.right).toBeLessThanOrEqual(window.innerWidth + EDGE_TOLERANCE_PX);
+  });
+
+  it('opens the consumables row LEFTWARD and keeps every item on screen', async () => {
+    const rig = await setup();
+    const painter = new ConsumableStripPainter(
+      writers(),
+      {
+        strip: rig.strip,
+        cancel: rig.stripCancel,
+        seat: slotElements(rig.seat),
+        items: rig.stripItems.map(slotElements),
+      },
+      () => '',
+    );
+    const state: ActionBarState = {
+      slots: Array.from({ length: CONSUMABLE_BAR_SLOTS + 1 }, () => emptySlotState('item')),
+      manySpells: false,
+    };
+
+    // Closed is the steady state and the row must not render at all.
+    painter.paint(state, null);
+    expect(getComputedStyle(rig.strip).display).toBe('none');
+    expect(rig.stripItems[0].getBoundingClientRect().width).toBe(0);
+
+    // The two geometry numbers the gesture reads back off this overlay are
+    // authored as LITERALS; a calc() would come back unresolved and misplace the
+    // whole row. Parse them the same way the gesture does.
+    const stripStyle = getComputedStyle(rig.strip);
+    const gap = Number.parseFloat(stripStyle.getPropertyValue('--strip-gap'));
+    const margin = Number.parseFloat(stripStyle.getPropertyValue('--strip-margin'));
+    expect(gap).toBeGreaterThan(0);
+    expect(margin).toBeGreaterThan(0);
+
+    // Lay the row out exactly as consumable_strip_gesture.ts does: off the seat's
+    // own measured box, so an item is the same rendered size as the seat.
+    const seatBox = rig.seat.getBoundingClientRect();
+    const anchorX = seatBox.x + seatBox.width / 2;
+    const anchorY = seatBox.y + seatBox.height / 2;
+    const shared = {
+      anchorX,
+      count: CONSUMABLE_BAR_SLOTS,
+      itemSize: seatBox.width,
+      gap,
+      viewportWidth: window.innerWidth,
+      margin,
+    };
+    const direction = resolveConsumableStripDirection(shared);
+    expect(direction, 'the shipped right-handed seat grows the row leftward').toBe('left');
+    const placement = placeConsumableStrip({ ...shared, anchorY, direction });
+    painter.paint(state, {
+      placement,
+      anchorX,
+      anchorY,
+      count: CONSUMABLE_BAR_SLOTS,
+      live: 2,
+      cancelLive: false,
+    });
+
+    expect(getComputedStyle(rig.strip).display).toBe('block');
+    // The row must never eat touches: the gesture owns the pointer through
+    // capture, and everything under it stays reachable.
+    expect(getComputedStyle(rig.strip).pointerEvents).toBe('none');
+    let previousLeft = Number.POSITIVE_INFINITY;
+    for (const [i, btn] of rig.stripItems.entries()) {
+      const box = btn.getBoundingClientRect();
+      expect(box.width, `item ${i} has no box`).toBeGreaterThan(0);
+      // Circles the size of the ring buttons, not the top row's oval.
+      expect(box.width).toBeCloseTo(seatBox.width, 1);
+      expect(box.height).toBeCloseTo(box.width, 1);
+      // Leftward, in order, and fully on screen.
+      expect(box.right, `item ${i} is not left of the seat`).toBeLessThanOrEqual(seatBox.left + 1);
+      expect(box.left, `item ${i} is not left of item ${i - 1}`).toBeLessThan(previousLeft);
+      previousLeft = box.left;
+      expect(box.left, `item ${i} overruns the left edge`).toBeGreaterThan(-EDGE_TOLERANCE_PX);
+      expect(box.top, `item ${i} overruns the top edge`).toBeGreaterThan(-EDGE_TOLERANCE_PX);
+      expect(box.bottom, `item ${i} overruns the bottom edge`).toBeLessThanOrEqual(
+        window.innerHeight + EDGE_TOLERANCE_PX,
+      );
+    }
+    // Teeth for the DIRECTION: the same row grown rightward from this seat would
+    // have run off the screen, which is exactly why the seat grows leftward. So
+    // 'left' above is a real decision, not a constant that happens to hold.
+    const naiveFarRight =
+      anchorX + (seatBox.width + gap) * CONSUMABLE_BAR_SLOTS + seatBox.width / 2;
+    expect(
+      naiveFarRight,
+      'a rightward row would have fit, so direction proves nothing',
+    ).toBeGreaterThan(window.innerWidth - margin);
+    // Leftward it fits WITHOUT clamping, so the swipe distance to item N stays
+    // exactly what the gesture pitch promises.
+    expect(placement.clamped, 'the row should not need shifting at this viewport').toBe(false);
+    // And it really is a full row, not a degenerate one the pins above would pass
+    // over: the far item sits most of a thumb arc away from the seat.
+    expect(anchorX - Math.min(...placement.centers)).toBeGreaterThan(280);
+    // The live item is the one marked, and only that one.
+    expect(rig.stripItems.filter((b) => b.classList.contains('live'))).toEqual([rig.stripItems[2]]);
+  });
+
+  it('sits the cancel X directly on top of the seat, right of the whole row', async () => {
+    const rig = await setup();
+    const painter = new ConsumableStripPainter(
+      writers(),
+      {
+        strip: rig.strip,
+        cancel: rig.stripCancel,
+        seat: slotElements(rig.seat),
+        items: rig.stripItems.map(slotElements),
+      },
+      () => '',
+    );
+    const state: ActionBarState = {
+      slots: Array.from({ length: CONSUMABLE_BAR_SLOTS + 1 }, () => emptySlotState('item')),
+      manySpells: false,
+    };
+    const seatBox = rig.seat.getBoundingClientRect();
+    const anchorX = seatBox.x + seatBox.width / 2;
+    const anchorY = seatBox.y + seatBox.height / 2;
+    const stripStyle = getComputedStyle(rig.strip);
+    const placement = placeConsumableStrip({
+      anchorX,
+      anchorY,
+      count: CONSUMABLE_BAR_SLOTS,
+      itemSize: seatBox.width,
+      gap: Number.parseFloat(stripStyle.getPropertyValue('--strip-gap')),
+      viewportWidth: window.innerWidth,
+      margin: Number.parseFloat(stripStyle.getPropertyValue('--strip-margin')),
+      direction: 'left',
+    });
+    // live -1 is the cancel target: the finger came back to the band it started
+    // in, which is the whole point of putting the X on the seat.
+    painter.paint(state, {
+      placement,
+      anchorX,
+      anchorY,
+      count: CONSUMABLE_BAR_SLOTS,
+      live: -1,
+      cancelLive: true,
+    });
+
+    const cancelBox = rig.stripCancel.getBoundingClientRect();
+    expect(cancelBox.width).toBeGreaterThan(0);
+    // Concentric with the seat: the X IS the seat's position, so releasing where
+    // the gesture started cancels without the thumb travelling anywhere.
+    expect(cancelBox.x + cancelBox.width / 2).toBeCloseTo(anchorX, 1);
+    expect(cancelBox.y + cancelBox.height / 2).toBeCloseTo(anchorY, 1);
+    // Overlapping boxes, not merely nearby ones.
+    expect(cancelBox.left).toBeLessThan(seatBox.right);
+    expect(cancelBox.right).toBeGreaterThan(seatBox.left);
+    expect(cancelBox.top).toBeLessThan(seatBox.bottom);
+    expect(cancelBox.bottom).toBeGreaterThan(seatBox.top);
+    // And therefore right of every item in the row.
+    for (const btn of rig.stripItems) {
+      expect(btn.getBoundingClientRect().right).toBeLessThanOrEqual(cancelBox.left + 1);
+    }
+    expect(rig.stripCancel.classList.contains('live')).toBe(true);
+    // The X clears the 40x40 touch floor too: it is a real release target.
+    expect(cancelBox.width).toBeGreaterThanOrEqual(40);
+    expect(cancelBox.height).toBeGreaterThanOrEqual(40);
+    // Local dim only, anchored on the seat: never a full-screen scrim, because
+    // the other thumb is still steering.
+    const dim = getComputedStyle(rig.strip, '::before');
+    expect(dim.backgroundImage).toContain('radial-gradient');
   });
 
   it('reports TWO pages on the toggle for the full 33-slot span', async () => {

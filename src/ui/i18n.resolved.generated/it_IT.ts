@@ -873,6 +873,7 @@ export const it_IT: EnTranslations = {
       "radialRight": "Right",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Consumables",
       "targetCycle": "Scambia bersaglio",
       "targetCycleShort": "Bersaglio",
       "spellbookPageLabel": "Pagina {page}",

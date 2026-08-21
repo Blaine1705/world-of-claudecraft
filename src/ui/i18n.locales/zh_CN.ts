@@ -8554,6 +8554,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': '页{page}',
   'hudChrome.mobile.hideKeyboard': '隐藏键盘',
   'hudChrome.mobile.chatPlaceholder': '说点什么...（! 显示社区指令）',
+  'hudChrome.mobile.consumableSeat': '消耗品',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷杯',
   'hudChrome.keybinds.categoryPet': '宠物',

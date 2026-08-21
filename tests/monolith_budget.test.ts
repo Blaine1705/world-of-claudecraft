@@ -88,7 +88,14 @@ const MONOLITHS: MonolithRow[] = [
     // Hud kept only the page state, the callback bag and the per-frame paint.
     // The ratchet's own rule: an extraction lowers the ceiling in the same
     // change. Exact count, zero slack.
-    ceiling: 19386,
+    // LOWERED 19386 -> 19263 by the touch consumables seat: buildMobileConsumableBar
+    // and useConsumableSlot (the markup lookup, the slot-element minting, the
+    // toggle/slot wiring, the tooltip binding and the view construction) moved
+    // behind the action_bar seam into hud/action_bar/consumable_seat_controller.ts,
+    // and Hud kept only the item-use callback and one per-frame paint. Same rule
+    // as the ring above: an extraction lowers the ceiling in the same change.
+    // Exact count, zero slack.
+    ceiling: 19263,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

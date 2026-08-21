@@ -873,6 +873,7 @@ export const nl_NL: EnTranslations = {
       "radialRight": "Right",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Consumables",
       "targetCycle": "Wissel van doel",
       "targetCycleShort": "Doel",
       "spellbookPageLabel": "Pagina {page}",

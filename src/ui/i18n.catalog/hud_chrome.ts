@@ -562,6 +562,14 @@ export const hudChromeStrings = {
     radialRight: 'Right',
     radialDown: 'Down',
     radialLeft: 'Left',
+    // The consumables seat (Phase 3): the ring's 5th arc position, showing the
+    // first carried consumable. A tap uses it; a hold or a leftward swipe opens
+    // the row of everything else being carried. One key names three things that
+    // must agree: the row overlay's accessible name, the seat's own slot label
+    // (so a screen reader reads "Consumables: Healing Potion" rather than a slot
+    // number the player never sees), and the group a sticky-mode menu belongs to.
+    // WORDY by M16, so the five non-Latin overlays carry real fills.
+    consumableSeat: 'Consumables',
     // Target swap (#mobile-target-cycle, replacing the old Target Closest
     // button): a crosshair-icon secondary button that cycles the hostile
     // target via the Tab-target path (acquire-nearest now lives on the ring's

@@ -873,6 +873,7 @@ export const sv_SE: EnTranslations = {
       "radialRight": "Right",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Consumables",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
       "spellbookPageLabel": "Sida {page}",

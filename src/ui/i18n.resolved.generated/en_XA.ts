@@ -873,6 +873,7 @@ export const en_XA: EnTranslations = {
       "radialRight": "[Ŕíĝĥţ]",
       "radialDown": "[Ðóŵñ]",
       "radialLeft": "[Ļéƒţ]",
+      "consumableSeat": "[Çóñšúɱáƀļéš]",
       "targetCycle": "[Šŵáþ ţáŕĝéţ]",
       "targetCycleShort": "[Ţáŕĝéţ]",
       "spellbookPageLabel": "[Þáĝé {page}]",

@@ -873,6 +873,7 @@ export const id_ID: EnTranslations = {
       "radialRight": "Right",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Consumables",
       "targetCycle": "Tukar sasaran",
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Halaman {page}",

@@ -112,6 +112,14 @@ const mobileActionRingTs = readFileSync(
   new URL('../src/ui/hud/action_bar/mobile_action_ring_controller.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const consumableSeatControllerTs = readFileSync(
+  new URL('../src/ui/hud/action_bar/consumable_seat_controller.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+const touchRouterTs = readFileSync(
+  new URL('../src/game/touch_router.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const playerCardControllerTs = readFileSync(
   new URL('../src/ui/hud/player_card/player_card_controller.ts', import.meta.url),
   'utf8',
@@ -1131,25 +1139,96 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("const desktopBtn = document.getElementById('mm-discord');");
   });
 
-  it('no longer ships the retired top-left consumables bar in either entry', () => {
-    // The quick bar moved into the action ring's 5th seat (hold or swipe from the
-    // ring button). Only the PLACEMENT was retired: consumable_bar_view.ts still
-    // owns the auto-populated list and is still pinned by its own suite.
-    //
-    // TODO(touch-ui): replace this absence check with positive pins on the new
-    // seat (role, slot count, touch-router coverage) when the ring-seat control
-    // lands. An absence assertion is not equivalent coverage.
+  it('seats the consumables control in the ring and its row beside it, in BOTH entries', () => {
+    // The quick bar moved OUT of the top-left corner (473px from the nearer
+    // thumb, under the 44px tap floor) and into the ring's 5th arc seat. Only the
+    // PLACEMENT changed: consumable_bar_view.ts still owns the auto-populated
+    // list and is still pinned by its own suite.
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
       expect(entry, name).not.toContain('id="mobile-consumables"');
       expect(entry, name).not.toContain('class="mobile-consumable-slot"');
+      // The seat itself: inside the ring, on the arc, and NO LONGER hidden.
+      expect(entry, name).toContain('id="mobile-consumable-seat"');
+      expect(entry, name).toMatch(
+        /id="mobile-consumable-seat" class="mobile-ring-seat" data-mobile-index="4"><\/button>/,
+      );
+      expect(entry, name).not.toMatch(/id="mobile-consumable-seat"[^>]*\shidden/);
+      // The row it opens: one item button per CONSUMABLE_BAR_SLOTS, indexed 0..5
+      // in document order, plus the cancel X.
+      const items = [
+        ...entry.matchAll(/class="mobile-consumable-item" data-consumable-index="(\d+)"/g),
+      ];
+      expect(
+        items.map((m) => m[1]),
+        name,
+      ).toEqual(['0', '1', '2', '3', '4', '5']);
+      expect(entry, name).toContain('id="mobile-consumable-cancel"');
+      // Real <button>s with tabindex="-1" from the start: the sticky/assistive
+      // path (and phase 6's tap mode) promotes them to tabindex 0 rather than
+      // rewriting a div soup, and the same buttons are what a pointer releases on.
+      expect(
+        (entry.match(/<button type="button" class="mobile-consumable-item"/g) ?? []).length,
+        name,
+      ).toBe(6);
+      expect(entry, name).toMatch(/id="mobile-consumable-cancel"[^>]*tabindex="-1"/);
+      // Accessible names come from data-i18n-aria, never a bare aria-label: the
+      // row is named for the control it belongs to and the X says what it does.
+      expect(entry, name).toContain(
+        'id="mobile-consumable-strip" data-i18n-aria="hudChrome.mobile.consumableSeat"',
+      );
+      expect(entry, name).toMatch(
+        /id="mobile-consumable-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel"/,
+      );
+      // The row is a SIBLING of the ring (after the radial overlay), so its items
+      // are seated in viewport coordinates instead of the ring's scaled corner box.
+      expect(entry.indexOf('id="mobile-consumable-strip"'), name).toBeGreaterThan(
+        entry.indexOf('id="mobile-action-radial"'),
+      );
     }
+    // The seat is styled off the shared gesture-menu token, and its row carries
+    // the two geometry literals consumable_strip_gesture.ts reads back.
     expect(hudMobileCss).not.toContain('#mobile-consumables');
     expect(hudMobileCss).not.toContain('.mobile-consumable-slot');
-    // The view model is untouched: the new seat consumes the same list.
-    expect(hudTs.match(/consumableBarItems\(/g) ?? []).toHaveLength(1);
+    expect(hudMobileCss).toContain('    --strip-gap: 8px;');
+    expect(hudMobileCss).toContain('    --strip-margin: 6px;');
+    expect(hudMobileCss).toContain(
+      '    --strip-item-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));',
+    );
+    // 22px icons, the ring's size, never the 58x54 top row's 27px painted art.
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch #mobile-consumable-strip .ui-icon,\n' +
+        '  body.mobile-touch #mobile-consumable-strip .ui-icon-art,\n' +
+        '  body.mobile-touch #mobile-consumable-seat .ui-icon,\n' +
+        '  body.mobile-touch #mobile-consumable-seat .ui-icon-art {\n' +
+        '    width: 22px;\n' +
+        '    height: 22px;\n',
+    );
+    // Local dim only: never a full-screen scrim, because the other thumb is still
+    // steering and the player must keep seeing the fight.
+    expect(hudMobileCss).toContain('  body.mobile-touch #mobile-consumable-strip::before {');
+    expect(hudMobileCss).toContain('      circle at var(--strip-x, 50%) var(--strip-y, 50%),');
+    // Touch-router coverage. The SEAT is covered by #mobile-action-ring
+    // containment (it is a child), but the ROW is a sibling, so it needs its own
+    // entry or a sticky-mode tap on an item falls through to a camera drag.
+    expect(touchRouterTs).toContain("'#mobile-action-ring',");
+    expect(touchRouterTs).toContain("'#mobile-consumable-strip',");
+    // The view model is untouched, and its ONE consumer is the extracted seat
+    // controller rather than the coordinator.
+    expect(hudTs).not.toContain('consumableBarItems(');
+    expect(consumableSeatControllerTs.match(/consumableBarItems\(/g) ?? []).toHaveLength(1);
+    // Item use routes through the SAME IWorld.useItem seam the retired bar used,
+    // still gated on the trade window, and still from the Hud rather than a
+    // second cast path inside the extracted module.
+    expect(hudTs).toContain(
+      '          if (this.tradeOpen) return false;\n          this.sim.useItem(id);',
+    );
+    expect(consumableSeatControllerTs.match(/deps\.useItem\(/g) ?? []).toHaveLength(1);
+    expect(consumableSeatControllerTs, 'the seat must not grow a second use path').not.toContain(
+      'sim.',
+    );
   });
 
   it('carries identical mobile-action-ring markup in BOTH entries', () => {
@@ -1166,11 +1245,10 @@ describe('client HTML shell', () => {
       expect(slotMatches).toHaveLength(4);
       const indices = slotMatches.map((m) => m[1]).sort();
       expect(indices).toEqual(['0', '1', '2', '3']);
-      // The arc's fifth seat is RESERVED for the consumables control and stays
-      // hidden until it is wired; keeping the seat is what preserves the arc's
-      // equal-chord spacing and its measured thumb reach.
+      // The arc's fifth seat holds the consumables control (pinned in full by the
+      // consumables test above); keeping it on the arc is what preserves the
+      // equal-chord spacing and the measured thumb reach.
       expect(entry).toContain('id="mobile-consumable-seat"');
-      expect(entry).toMatch(/id="mobile-consumable-seat"[^>]*hidden/);
     }
   });
 

@@ -873,6 +873,7 @@ export const da_DK: EnTranslations = {
       "radialRight": "Right",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Consumables",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
       "spellbookPageLabel": "Side {page}",

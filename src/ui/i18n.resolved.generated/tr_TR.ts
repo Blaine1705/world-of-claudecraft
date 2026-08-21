@@ -873,6 +873,7 @@ export const tr_TR: EnTranslations = {
       "radialRight": "Right",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Consumables",
       "targetCycle": "Hedefi değiştir",
       "targetCycleShort": "Hedef",
       "spellbookPageLabel": "Sayfa {page}",

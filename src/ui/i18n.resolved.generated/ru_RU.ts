@@ -873,6 +873,7 @@ export const ru_RU: EnTranslations = {
       "radialRight": "Вправо",
       "radialDown": "Down",
       "radialLeft": "Left",
+      "consumableSeat": "Расходники",
       "targetCycle": "Сменить цель",
       "targetCycleShort": "Цель",
       "spellbookPageLabel": "Страница {page}",

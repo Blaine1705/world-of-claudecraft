@@ -8978,6 +8978,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.mobile.actionRadialCancel'
   | 'hudChrome.mobile.actionRing'
   | 'hudChrome.mobile.chatPlaceholder'
+  | 'hudChrome.mobile.consumableSeat'
   | 'hudChrome.mobile.dailyRewards'
   | 'hudChrome.mobile.deeds'
   | 'hudChrome.mobile.haptics'

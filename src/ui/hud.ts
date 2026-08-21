@@ -361,7 +361,7 @@ import {
   planActionBarRestore,
 } from './hud/action_bar/action_bar_layout_sync';
 import { isActionBarEditAllowed } from './hud/action_bar/action_bar_lock';
-import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/action_bar_painter';
+import { ActionBarPainter } from './hud/action_bar/action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarView,
@@ -377,7 +377,10 @@ import {
   hasAutoAttackTarget,
   isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
-import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
+import {
+  buildMobileConsumableSeat,
+  type MobileConsumableSeat,
+} from './hud/action_bar/consumable_seat_controller';
 import {
   type AimPoint,
   abilityAoeRadius,
@@ -1308,17 +1311,10 @@ export class Hud {
   private mobileActionRingView: ActionBarView | undefined;
   private mobileActionRingPainter: MobileActionRingPainter | undefined;
   private crossHotbar: CrossHotbarController | undefined;
-  // Consumables quick bar (touch): the auto-populated potion/elixir/food/drink
-  // row behind the chevron chip next to the top-left trio. consumableBarIds is
-  // the ONE reused array the pure core fills WHEN THE ROW OPENS and that stays
-  // FROZEN while it is open: slots must not shift under the player's thumb the
-  // frame a stack depletes (a depleted item stays in place, greyed at count 0,
-  // exactly like a desktop bar item shortcut). Reopening refreshes the list.
-  private consumableBarView: ActionBarView | undefined;
-  private consumableBarPainter: ActionBarPainter | undefined;
-  private consumableBarSlotBtns: HTMLButtonElement[] = [];
-  private readonly consumableBarIds: string[] = [];
-  private consumablesOpen = false;
+  // The consumables seat (touch): the ring's 5th arc position plus the row it
+  // opens, built behind the action_bar seam. Stays undefined on a build without
+  // the markup, exactly like the ring.
+  private mobileConsumableSeat: MobileConsumableSeat | undefined;
   /** Ring button refs so castSlot's used-flash can hit the ring too (the
    *  desktop bar is display:none under body.mobile-touch). */
   private mobileRingAttackBtn: HTMLButtonElement | null = null;
@@ -7618,7 +7614,7 @@ export class Hud {
       crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName),
     );
     this.buildMobileActionRing();
-    this.buildMobileConsumableBar();
+    this.buildMobileConsumableSeat();
   }
 
   // Build the mobile action ring behind the action_bar seam
@@ -7673,137 +7669,29 @@ export class Hud {
     this.mobileActionRingView = ring.view;
     this.mobileActionRingPainter = ring.painter;
   }
-  // Consumables quick bar: the chevron chip next to the top-left trio expands a
-  // row auto-populated from the carried consumables (consumable_bar_view.ts),
-  // painted by another instance of the shared bar family. Touch has no way to
-  // drag an item onto the hotbar, so unlike the ring's paged slots this bar
-  // needs no setup: tap the chip, tap the potion. Collapsed by default and
-  // session-only (no persisted state, no settings entry). Defensive against
-  // missing markup like the ring (an older cached template leaves it unbuilt).
-  private buildMobileConsumableBar(): void {
-    const toggle = document.getElementById('mobile-consumables-toggle');
-    const row = document.getElementById('mobile-consumables-row');
-    const slotBtns = Array.from(
-      document.querySelectorAll<HTMLButtonElement>('.mobile-consumable-slot'),
-    ).sort(
-      (a, b) => Number(a.dataset.consumableIndex ?? 0) - Number(b.dataset.consumableIndex ?? 0),
-    );
-    if (!toggle || !row || slotBtns.length !== CONSUMABLE_BAR_SLOTS) return;
-    this.consumableBarSlotBtns = slotBtns;
-
-    const slotEls: ActionBarSlotElements[] = slotBtns.map((btn) => {
-      const label = document.createElement('span');
-      label.className = 'icon-label';
-      const countEl = document.createElement('span');
-      countEl.className = 'item-count';
-      const keybindEl = document.createElement('span');
-      keybindEl.className = 'keybind';
-      const cdOverlay = document.createElement('div');
-      cdOverlay.className = 'cd-overlay';
-      const cdText = document.createElement('div');
-      cdText.className = 'cdtext';
-      const rechargeOverlay = document.createElement('div');
-      rechargeOverlay.className = 'recharge-overlay';
-      btn.append(label, countEl, keybindEl, cdOverlay, rechargeOverlay, cdText);
-      return {
-        btn,
-        label,
-        countEl,
-        keybindEl,
-        cdOverlay,
-        cdText,
-        rechargeOverlay,
-      };
-    });
-
-    // bindTouchTap, not 'click', for the same reason as the ring: the browser
-    // only synthesizes click for the PRIMARY pointer, so a click-bound button
-    // goes dead while the other thumb holds the joystick.
-    bindTouchTap(toggle, () => {
-      audio.click();
-      this.consumablesOpen = !this.consumablesOpen;
-      // Snapshot the consumable list at OPEN time; it stays frozen while open
-      // so slot positions are tap-stable (see the field comment). Counts and
-      // the potion-cooldown sweep still update live off the sim each frame.
-      if (this.consumablesOpen) {
-        consumableBarItems(this.sim.inventory, (id) => ITEMS[id], this.consumableBarIds);
-      }
-      document.body.classList.toggle('mobile-consumables-open', this.consumablesOpen);
-      toggle.setAttribute('aria-expanded', this.consumablesOpen ? 'true' : 'false');
-      (toggle as HTMLElement).blur();
-    });
-    slotBtns.forEach((btn, i) => {
-      bindTouchTap(btn, () => {
-        if (this.peekGuard.consume()) {
-          this.hideTooltip();
-          btn.blur();
-          return;
-        }
-        audio.click();
-        this.useConsumableSlot(i);
-        btn.blur();
-      });
-      // Long-press-to-inspect, arming the peek guard the tap handler consumes
-      // (same contract as the ring: a long press must never quaff).
-      this.attachTooltip(btn, () => {
-        const id = this.consumableBarIds[i];
-        const item = id ? (ITEMS[id] ?? null) : null;
-        if (!item) return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}</div>`;
-        const count = this.inventoryCount(item.id);
-        return (
-          this.itemTooltip(item) +
-          `<div class="tt-sub">${esc(
-            count > 0
-              ? t('abilityUi.actionBar.itemInBags', {
-                  count: formatNumber(count, { maximumFractionDigits: 0 }),
-                })
-              : t('abilityUi.actionBar.itemNoneInBags'),
-          )}</div>`
-        );
-      });
-    });
-
-    this.consumableBarView = createActionBarView(
-      {
-        slots: Array.from({ length: CONSUMABLE_BAR_SLOTS }, (_, i) => ({
-          slotIndex: i,
-          isAttack: () => false,
-          hasAction: () => this.consumableBarIds[i] !== undefined,
-          ability: () => null,
-          item: () => {
-            const id = this.consumableBarIds[i];
-            return id ? (ITEMS[id] ?? null) : null;
-          },
-          keybindLabel: () => '',
-        })),
-      },
-      {
-        t,
-        abilityName: abilityDisplayName,
-        itemName: itemDisplayName,
-        slotLabel: (i) => formatAbilityNumber(i + 1),
-        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
-      },
-    );
-    this.consumableBarPainter = new ActionBarPainter(
-      this.writerFacet,
-      { container: row, slots: slotEls },
-      (iconKey) => this.actionBarIconBg(iconKey),
-    );
-  }
-
-  // Tap dispatch for a consumables-bar slot: the same seam as castSlot's item
-  // arm (IWorld.useItem, so offline runs the sim directly and online sends the
-  // authoritative 'use' command), minus the hotbar-eligibility gate: the bar's
-  // ids come pre-filtered from consumable_bar_view, which deliberately INCLUDES
-  // elixirs (usable from bags, just never hotbar-placeable).
-  private useConsumableSlot(i: number): void {
-    const id = this.consumableBarIds[i];
-    if (!id || this.tradeOpen) return;
-    this.sim.useItem(id);
-    if ($('#bags').style.display !== 'none') this.renderBags();
-    const btn = this.consumableBarSlotBtns[i];
-    if (btn) this.flashActionButton(btn);
+  // The consumables seat: the ring's 5th arc position plus the row a hold or a
+  // leftward swipe opens, built behind the action_bar seam
+  // (consumable_seat_controller.ts). Hud keeps only the item-use call, which is
+  // the SAME IWorld.useItem seam castSlot's item arm uses (offline runs the sim
+  // directly, online sends the authoritative 'use' command), minus the
+  // hotbar-eligibility gate: the ids come pre-filtered from consumable_bar_view,
+  // which deliberately INCLUDES elixirs (usable from bags, never hotbar-placeable).
+  private buildMobileConsumableSeat(): void {
+    this.mobileConsumableSeat =
+      buildMobileConsumableSeat({
+        writers: this.writerFacet,
+        iconBackground: (iconKey) => this.actionBarIconBg(iconKey),
+        lookupItem: (id) => ITEMS[id],
+        useItem: (id) => {
+          if (this.tradeOpen) return false;
+          this.sim.useItem(id);
+          if ($('#bags').style.display !== 'none') this.renderBags();
+          return true;
+        },
+        flash: (btn) => this.flashActionButton(btn),
+        hideTooltip: () => this.hideTooltip(),
+        consumePeekGuard: () => this.peekGuard.consume(),
+      }) ?? undefined;
   }
 
   // Resolve a core icon key to the slot label's background-image value. Kept on the
@@ -9447,21 +9335,10 @@ export class Hud {
       );
     }
 
-    // consumables quick bar: tick+paint ONLY while the row is expanded on touch.
-    // The id list is NOT recomputed here: it was snapshotted when the row opened
-    // and stays frozen so slots never shift under the player's thumb; counts,
-    // usability, and the shared potion-cooldown sweep still derive live from the
-    // sim/inventory every tick. Skipping the closed bar entirely is safe for the
-    // same reason ring paging is: all of that state lives on the sim, not the
-    // view, so the row is correct the frame it opens.
-    if (
-      this.isMobileLayout() &&
-      this.consumablesOpen &&
-      this.consumableBarView &&
-      this.consumableBarPainter
-    ) {
-      this.consumableBarPainter.paint(this.consumableBarView.tick(actionBarWorld));
-    }
+    // consumables seat: the seat itself paints every touch frame (it shows what
+    // the player is carrying, with no interaction needed), and the row it opens
+    // rides the same call. Reuses the desktop bar's world snapshot.
+    if (this.isMobileLayout()) this.mobileConsumableSeat?.paint(actionBarWorld);
 
     // xp bar: pre-cap shows the level bar; post-cap fills toward the next virtual
     // level (Max-Level XP Overflow), with distinct prestige/gold styling. The
