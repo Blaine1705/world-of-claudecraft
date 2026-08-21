@@ -16,12 +16,17 @@
 import { describe, expect, it } from 'vitest';
 
 describe('ci real-sql presence', () => {
-  it('GitHub Actions runs of this suite always carry TEST_DATABASE_URL', () => {
-    if (process.env.GITHUB_ACTIONS !== 'true') return;
-    expect(
-      process.env.TEST_DATABASE_URL,
-      'the pg suites are skipping green in CI: the per-leg Postgres service or its ' +
-        'job-level TEST_DATABASE_URL is gone from this job (see tests/ci_workflow.test.ts)',
-    ).toBeTruthy();
-  });
+  // runIf, not an early return: a local run reports this SKIPPED honestly
+  // instead of a green no-op, matching the repo idiom and the whole point
+  // of this suite (skips must speak).
+  it.runIf(process.env.GITHUB_ACTIONS === 'true')(
+    'GitHub Actions runs of this suite always carry TEST_DATABASE_URL',
+    () => {
+      expect(
+        process.env.TEST_DATABASE_URL,
+        'the pg suites are skipping green in CI: the per-leg Postgres service or its ' +
+          'job-level TEST_DATABASE_URL is gone from this job (see tests/ci_workflow.test.ts)',
+      ).toBeTruthy();
+    },
+  );
 });

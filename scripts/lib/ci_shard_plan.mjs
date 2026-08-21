@@ -62,6 +62,10 @@ import { classifySelectPaths, FLOOR_SANITY_MIN } from './gate_select_plan.mjs';
  */
 export const CI_GUARD_SUITES = Object.freeze([
   'tests/architecture.test.ts',
+  // Import-free by design (it only reads process.env), so it classifies
+  // graph and `vitest related` could never select it: guard membership is
+  // what puts the real-SQL runtime sentinel on every selective shard.
+  'tests/ci_pg_presence.test.ts',
   'tests/localization_fixes.test.ts',
   'tests/localization_coverage.test.ts',
   'tests/suite_duration_budget.test.ts',

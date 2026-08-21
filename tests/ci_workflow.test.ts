@@ -4,7 +4,11 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
-import { CI_LONG_SUITE_HALVES, resolveWorkerCount } from '../scripts/lib/ci_shard_plan.mjs';
+import {
+  CI_LONG_SUITE_HALVES,
+  CI_LONG_SUITES,
+  resolveWorkerCount,
+} from '../scripts/lib/ci_shard_plan.mjs';
 import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
 import {
   GENERATED_I18N_ARTIFACT_FILES,
@@ -16,6 +20,7 @@ import {
 import {
   buildFullGateSteps,
   I18N_ARTIFACTS,
+  I18N_RELEASE_TIER_SUITES,
   MANIFEST_ARTIFACTS,
 } from '../scripts/lib/gate_steps.mjs';
 import { PLAYWRIGHT_INSTALL_BLOCK } from './helpers/playwright_install_block';
@@ -1676,34 +1681,71 @@ describe('CI workflow parity', () => {
     expect(workflow).toContain('ci_balanced_sequencer.mjs');
   });
 
-  it('keeps the per-leg Postgres service and TEST_DATABASE_URL wired into both shard gates', () => {
+  it('keeps the per-leg Postgres service and TEST_DATABASE_URL wired into every shard gate', () => {
     // Ruling R16 (the woc-marketplace hardening state): the real-SQL pg
     // suites classify into the always-run floor but SKIP GREEN without
     // TEST_DATABASE_URL, so this wiring IS their presence at the merge bar.
     // Anchored to each vitest-running job's OWN span, never a file-wide
-    // count: the gate-integrity review demonstrated a whole-file count stays
-    // satisfied when the blocks are relocated onto jobs that run no vitest,
-    // which re-skips the entire battery while this pin stayed green.
-    // tests/ci_pg_presence.test.ts is the runtime twin (the suite itself
-    // goes red inside CI when the variable is absent; every diff that could
-    // lose the variable forces full mode, where that suite always runs), so
-    // a regression must defeat both a source pin and a live assertion.
+    // count (a count stayed green when the blocks were relocated onto
+    // vitest-free jobs), and the JOB SET IS DERIVED from the run lines, not
+    // hand-listed (a hand list stayed green when the shard matrix was split
+    // into a new job with no service): a new or renamed vitest-running job
+    // must either carry the block or join the named exemptions below, each
+    // of which carries its own coupled guard. tests/ci_pg_presence.test.ts
+    // is the runtime twin (red inside CI when the variable is absent, and a
+    // CI_GUARD_SUITES member so it rides every selective shard).
+    const spanBoundary = /\n {2}["#A-Za-z]/;
     const pgJobSpan = (source: string, name: string) => {
       const start = source.indexOf(`\n  ${name}:`);
       expect(start, `job ${name} exists`).toBeGreaterThanOrEqual(0);
       const rest = source.slice(start + 1);
-      const next = rest.search(/\n {2}[A-Za-z][A-Za-z0-9_-]*:[ \t]*(?:#[^\n]*)?\n/);
+      // Same boundary rule as jobSource above, plus quoted keys: ANY
+      // two-space line opening with a letter, quote, or comment terminates
+      // the span, so no neighbour's block can be swallowed into it.
+      const next = rest.search(spanBoundary);
       return next === -1 ? rest : rest.slice(0, next);
     };
+    const jobKeysIn = (source: string): string[] =>
+      [
+        ...source
+          .slice(source.indexOf('\njobs:'))
+          .matchAll(/\n {2}([A-Za-z][A-Za-z0-9_-]*):[ \t]*(?:#[^\n]*)?\n/g),
+      ].map((m) => m[1]);
+    const runsVitest = (span: string): boolean =>
+      /run: node scripts\/ci_shard_test\.mjs|run: npm test|npx --no-install vitest|npx vitest/.test(
+        span,
+      );
     const nightly = readFileSync(
       new URL('../.github/workflows/nightly.yml', import.meta.url),
       'utf8',
     );
+    // The derived vitest-running job sets, and the decision each member got.
+    const wired = { workflow: ['pr-gate', 'release-gate'], nightly: ['tests'] };
+    // Exempt WITH coupled guards: the lanes run only CI_LONG_SUITES, and no
+    // lane file may gate on TEST_DATABASE_URL (a pg suite becoming
+    // lane-resident would skip green in the DB-less lane forever);
+    // release-i18n runs only the fixed I18N_RELEASE_TIER_SUITES, same guard.
+    const exempt = ['pr-long-sims-a', 'pr-long-sims-b', 'release-i18n'];
+    for (const file of [...CI_LONG_SUITES, ...I18N_RELEASE_TIER_SUITES]) {
+      const gated = stripComments(
+        readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'),
+      ).includes('TEST_DATABASE_URL');
+      expect(gated, `${file} must not gate on TEST_DATABASE_URL (its job has no Postgres)`).toBe(
+        false,
+      );
+    }
+    expect(
+      jobKeysIn(workflow)
+        .filter((name) => runsVitest(pgJobSpan(workflow, name)))
+        .sort(),
+    ).toEqual([...wired.workflow, ...exempt].sort());
+    expect(jobKeysIn(nightly).filter((name) => runsVitest(pgJobSpan(nightly, name)))).toEqual(
+      wired.nightly,
+    );
     for (const [source, job] of [
-      [workflow, 'pr-gate'],
-      [workflow, 'release-gate'],
-      [nightly, 'tests'],
-    ] as const) {
+      ...wired.workflow.map((j) => [workflow, j] as const),
+      ...wired.nightly.map((j) => [nightly, j] as const),
+    ]) {
       const span = pgJobSpan(source, job);
       // One container per job leg (isolated fixed-name databases); the
       // health gate lives in the service options because a wait STEP would
@@ -1712,14 +1754,17 @@ describe('CI workflow parity', () => {
       expect(span, job).toContain('        image: postgres:16-alpine\n');
       expect(span, job).toContain('--health-cmd "pg_isready -U postgres -d wocc_ci"');
       expect(span, job).toContain('          - 5432:5432\n');
-      // The JOB-LEVEL env line (a step-level copy would not cover the leg).
+      // The JOB-LEVEL env line (a step-level copy would not cover the leg);
+      // other job env keys may precede it.
       expect(span, job).toMatch(
-        /\n {4}env:\n {6}TEST_DATABASE_URL: postgres:\/\/postgres:postgres@127\.0\.0\.1:5432\/wocc_ci\n/,
+        /\n {4}env:\n(?: {6}\S[^\n]*\n)*? {6}TEST_DATABASE_URL: postgres:\/\/postgres:postgres@127\.0\.0\.1:5432\/wocc_ci\n/,
       );
-      // The service maps 5432; 5433 is the dev-compose port that
-      // vite.config's intended-dead fallback DATABASE_URL names, and it must
-      // stay dead in CI.
-      expect(span, job).not.toMatch(/- 5433:|:5433\//);
     }
+    // FILE-WIDE, not per-span: 5433 is the dev-compose port that
+    // vite.config's intended-dead fallback DATABASE_URL names; a service
+    // mapping it ANYWHERE in CI (any job) would turn the roughly twenty
+    // deliberately-dead unit-suite URLs into live connections.
+    expect(workflow).not.toMatch(/- 5433:|:5433\//);
+    expect(nightly).not.toMatch(/- 5433:|:5433\//);
   });
 });
