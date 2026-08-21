@@ -986,6 +986,7 @@ export const tr_TR: EnTranslations = {
       "seconds": "{s}sn",
       "autoShowHint": "Satırlar, partindeki oyuncular hasar vermeye veya iyileştirmeye başladığında otomatik görünür; bu bölüm ise savaş bittikten birkaç saniye sonra kapanır.",
       "threatFallback": "Canlı tehdit yok: {name} için hasar gösteriliyor",
+      "threatFrozen": "Final threat vs {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Diğer ({count})",

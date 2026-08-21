@@ -781,6 +781,13 @@ export const hudChromeStrings = {
     // so is the point: a frozen damage readout under a "Threat" heading is what
     // players read as the meter having stopped updating.
     threatFallback: 'No live threat: showing damage to {name}',
+    // Threat tab subtitle when the engaged mob died or left mid-segment but DID
+    // have a live hate table on this segment: these are still real threat
+    // numbers, just latched at the last moment they were readable, not
+    // recalculated from damage. Distinct from threatFallback above (which has
+    // no threat numbers to show at all) so a tank who watched their threat
+    // climb past a boss's health does not read the kill as having erased it.
+    threatFrozen: 'Final threat vs {name}',
     // Hover breakdown for one bar: a header line, then one row per ability. On
     // the threat tab each contributor (member or pet) has its own bar, so the
     // panel is narrowed to that contributor's abilities.

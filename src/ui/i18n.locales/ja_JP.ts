@@ -5730,6 +5730,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.meters.breakdownRow': '{value}（{percent}）',
   'hudChrome.meters.threatFallback': 'リアルタイムのヘイトなし：{name}へのダメージを表示',
+  'hudChrome.meters.threatFrozen': '最終ヘイト: {name}',
   'hudChrome.meters.breakdownSummary': '{tab}：{value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}：{ability}',
