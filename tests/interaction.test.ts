@@ -23,6 +23,7 @@ import { terrainHeight } from '../src/sim/world';
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 type LootSlotLike = { itemId: string; count: number; openToAll?: boolean; personalFor?: number[] };
+const FRESH_CORPSE_TIMER = 60;
 
 function ctxOf(sim: Sim) {
   return (sim as AnySim).ctx;
@@ -57,6 +58,7 @@ function corpse(
     z,
   }) as AnyEntity;
   mob.dead = true;
+  mob.corpseTimer = FRESH_CORPSE_TIMER;
   mob.lootable = true;
   mob.tappedById = tappedById;
   mob.loot = { copper: 0, items };
@@ -163,7 +165,7 @@ describe('interaction.lootCorpse', () => {
   it('keeps a fresh hand-built lootable corpse eligible before explicit corpse decay', () => {
     const { sim, a } = twoPlayers();
     const mob = corpse(sim, 20, 22, a, [{ itemId: 'worn_sword', count: 1 }]);
-    expect(mob.corpseTimer).toBe(Number.POSITIVE_INFINITY);
+    expect(mob.corpseTimer).toBe(FRESH_CORPSE_TIMER);
 
     expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(true);
 

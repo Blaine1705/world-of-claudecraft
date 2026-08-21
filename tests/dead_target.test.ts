@@ -35,10 +35,6 @@ describe('deadTargetSelectable', () => {
     ).toBe(true);
   });
 
-  it('allows a freshly hand-built lootable corpse before a corpseTimer is assigned', () => {
-    expect(deadTargetSelectable(ent({ id: 10, dead: true, lootable: true }), 1)).toBe(true);
-  });
-
   it('rejects a decayed corpse even if stale lootability is still set', () => {
     expect(
       deadTargetSelectable(ent({ id: 10, dead: true, corpseTimer: 0, lootable: true }), 1),
@@ -117,6 +113,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       kind: 'mob',
       templateId: 'kobold_miner',
       dead: true,
+      corpseTimer: 12,
       lootable: true,
       tappedById: 2,
       lootFfaTimer: 30,
@@ -154,6 +151,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
     const stranger = () => ({
       kind: 'mob' as const,
       dead: true,
+      corpseTimer: 12,
       lootable: true,
       tappedById: 2,
       lootFfaTimer: 30,
@@ -189,6 +187,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       kind: 'mob',
       templateId: 'kobold_miner',
       dead: true,
+      corpseTimer: 12,
       lootable: true,
       tappedById: 1,
       lootFfaTimer: 30,

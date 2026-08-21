@@ -853,10 +853,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // evidence is retained while renderer.ts and entity_view_policy_core.ts add
 // the heroic Nythraxis wardstone distance-cull exemption. No capture was
 // retaken.
+// Re-minted for the v0.40 loot repair follow-up: the prior integration-side
+// entity_view_policy_core.ts bytes were already sealed in evidence but the
+// literal pins were stale. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ee4e8448d55703e144abfbdd771d7938fdf4c69df77205ebfc0d427c9c5c7382';
+  '9a81cc2526e8b30edec42a573c63e46a3e1c781c1a64777898d37047baf9bad3';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'c38307bee25db65d352af3a6cee763e332d1a37e2bf6c0ccfeacfd490b4e2c07';
+  '510e4e46ab9d696a5d7596386fae0e6420d8652614d88b4f160703c64eedaa1a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1933,10 +1936,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // entity_view_policy_core.ts moved for the heroic Nythraxis wardstone
     // distance-cull exemption, then this seal followed the swept evidence
     // bytes. No capture was retaken.
+    // Re-minted for the v0.40 loot repair follow-up: the first-order literal
+    // pins were stale against already-sealed evidence, then this seal followed
+    // the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('70beaa0bb12683ae08cb26193d2632d65ca67105868826c1d5d877aa3711af47');
+    ).toBe('5ce8d3171fbdb13d83aad0c08d6a66c04e76b38c2b71cb413700d4c19396cbb3');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

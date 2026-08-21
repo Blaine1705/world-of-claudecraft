@@ -482,8 +482,8 @@ describe('the death site consumes the policy', () => {
     expect(grix.respawnTimer).toBeGreaterThan(0);
     expect(corpseHasDecayed(grix.dead, grix.corpseTimer)).toBe(true);
     expect(grix.lootable).toBe(false);
-    expect(grix.loot).toBeNull();
-    expect(grix.lootRecipientIds).toBeUndefined();
+    expect(grix.loot).toEqual({ copper: 25, items: [{ itemId: 'wolf_fang', count: 1 }] });
+    expect(grix.lootRecipientIds).toEqual([sim.playerId]);
     expect(sim.player.targetId).toBeNull();
     expect(sim.lootCorpse(grix.id, sim.playerId)).toBe(false);
   });

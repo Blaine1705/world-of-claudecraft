@@ -269,8 +269,11 @@ interface AttributionTargetFixture {
 // evidence is retained while renderer.ts and entity_view_policy_core.ts add
 // the heroic Nythraxis wardstone distance-cull exemption. No capture was
 // retaken.
+// Re-minted for the v0.40 loot repair follow-up: the prior integration-side
+// entity_view_policy_core.ts bytes were already sealed in evidence but the
+// literal pin was stale. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c38307bee25db65d352af3a6cee763e332d1a37e2bf6c0ccfeacfd490b4e2c07';
+  '510e4e46ab9d696a5d7596386fae0e6420d8652614d88b4f160703c64eedaa1a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

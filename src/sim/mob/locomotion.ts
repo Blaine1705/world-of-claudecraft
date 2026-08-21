@@ -134,10 +134,8 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
 
 function expireDecayedCorpseInteractions(ctx: SimContext, mob: Entity): void {
   if (!corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
-  if (!mob.lootable && !mob.loot && mob.lootRecipientIds === undefined) return;
+  if (!mob.lootable) return;
   mob.lootable = false;
-  mob.loot = null;
-  mob.lootRecipientIds = undefined;
   for (const meta of ctx.players.values()) {
     const player = ctx.entities.get(meta.entityId);
     if (player?.targetId === mob.id) player.targetId = null;
