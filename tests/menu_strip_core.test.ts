@@ -30,6 +30,10 @@ describe('the strip menus share one pitch and one set of rules', () => {
   it('takes its pitch from the shared constant, not a second literal', () => {
     expect(MENU_STRIP_PITCH_PX).toBe(STRIP_PITCH_PX);
     expect(CONSUMABLE_STRIP_PITCH_PX).toBe(STRIP_PITCH_PX);
+    // The alias assertions above are identity by construction (both re-export
+    // the SAME binding), so re-introducing a second `= 34` literal on either
+    // side would still pass them. Pin the shared constant itself.
+    expect(STRIP_PITCH_PX).toBe(34);
   });
 
   it('takes the cancel-is-live and reveal-early rules from the shared core', () => {
@@ -69,6 +73,25 @@ describe('the menu strip roster', () => {
     expect(byId.get('more')).toBe('mobile-more');
     // Every element id is distinct, or two roster positions would fire one button.
     expect(new Set(byId.values()).size).toBe(MENU_STRIP_COUNT);
+  });
+
+  it('pins each item to its localized caption key, at its runtime home', () => {
+    // MENU_STRIP_ITEMS.captionKey is where the old static-markup mobileSocial /
+    // mobileSettings / questUi.tracker.title strings moved (see
+    // tests/localization_coverage.test.ts, the negative "no longer in the
+    // markup" pins). Nothing else pins these keys, so a deletion or a swap to
+    // another valid-but-wrong TranslationKey would fail nowhere else.
+    expect(MENU_STRIP_ITEMS.map((item) => item.captionKey)).toEqual([
+      'hudChrome.mounts.mount',
+      'hud.core.mobileMap',
+      'hud.keybinds.actions.bags',
+      'hud.core.mobileSocial',
+      'questUi.tracker.title',
+      'hud.keybinds.actions.char',
+      'abilityUi.spellbook.title',
+      'hud.core.mobileSettings',
+      'hud.core.mobileMore',
+    ]);
   });
 
   it('grows rightward from a control seated at the left of the bottom band', () => {

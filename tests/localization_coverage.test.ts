@@ -1880,10 +1880,13 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).not.toContain('data-i18n="hud.core.mobileTarget"');
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
-    // The Social button became an icon-only item in the mobile menu strip with
-    // a live caption (title/aria localize via hud.keybinds.actions.social);
-    // hud.core.mobileSocial stays in the catalog like mobileTarget but no
-    // longer appears in the markup.
+    // The Social button became an icon-only item in the mobile menu strip; its
+    // title/aria attribute still localizes via hud.keybinds.actions.social
+    // (index.html), but the live drag CAPTION now comes from
+    // hud.core.mobileSocial at its runtime home
+    // (MENU_STRIP_ITEMS.captionKey in menu_strip_core.ts, pinned in
+    // tests/menu_strip_core.test.ts), which is why the key stays in the
+    // catalog but no longer appears as static markup here.
     expect(html).not.toContain('data-i18n="hud.core.mobileSocial"');
     // The merged PvP window's launcher label (Thornhollow Fields + arenas on one
     // button); the old mobileArena key stays in the catalog like mobileTarget

@@ -1425,6 +1425,10 @@ describe('client HTML shell', () => {
     expect(mobileControlsRegion(broken, 'div')).toBe('<div id="a"></div>');
     expect(tagDepth('<div><div></div>', 'div')).toBe(1);
     expect(tagDepth('<div></div></div>', 'div')).toBe(-1);
+    // A stray close masked by a later, unrelated compensating open nets to
+    // zero (a pure final-count walker would call this balanced); the running
+    // minimum still catches the excursion.
+    expect(tagDepth('</div><div>', 'div')).toBe(-1);
   });
 
   it('stacks the optional third desktop row above the secondary row in both entries', () => {
@@ -3307,11 +3311,21 @@ function mobileControlsRegion(entry: string, tag: 'div' | 'section'): string | n
   return null;
 }
 
-/** Net open-minus-close depth for one tag name over a fragment. Zero means
- *  balanced; negative means a close arrived with nothing open. */
+/** Net open-minus-close depth for one tag name over a fragment, EXCEPT: a net
+ *  result of exactly 0 is replaced by the most negative RUNNING depth reached
+ *  along the way (0 if it never dipped below the start). A pure final count
+ *  can read 0 even when a stray close is later masked by an unrelated
+ *  compensating open elsewhere in the fragment ("</div> ... <div>" nets to
+ *  zero but was never actually balanced); tracking the running minimum
+ *  catches that excursion instead of only the total. A genuinely unbalanced,
+ *  nonzero-net fragment still reports its final depth unchanged. */
 function tagDepth(fragment: string, tag: string): number {
   const re = new RegExp(`<(/?)${tag}\\b[^>]*>`, 'g');
   let depth = 0;
-  for (let m = re.exec(fragment); m; m = re.exec(fragment)) depth += m[1] === '/' ? -1 : 1;
-  return depth;
+  let min = 0;
+  for (let m = re.exec(fragment); m; m = re.exec(fragment)) {
+    depth += m[1] === '/' ? -1 : 1;
+    if (depth < min) min = depth;
+  }
+  return depth === 0 ? min : depth;
 }

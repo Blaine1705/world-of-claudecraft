@@ -810,11 +810,43 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     // long enough to reveal the petals could also pick the slot up and swap it
     // on release. Binding on touch is the bar editor overlay now, so neither the
     // ring nor the gesture layer carries a drag seam at all.
-    for (const token of ['bindRingDrag', 'dragActive', 'hotbarDragActive']) {
-      expect(ring, `${token} must not survive the removal`).not.toContain(token);
-      expect(gesture, `${token} must not survive the removal`).not.toContain(token);
+    //
+    // The retired names are the REAL ones (verified against
+    // 65b91fa19:src/ui/hud.ts, where all four existed): bindMobileRingDrag,
+    // bindMobileActionDrag, mobileHotbarDrag, mobile-hotbar-dragging. A prior
+    // shape of this guard scanned for names that never existed in any version
+    // of the tree (bindRingDrag, dragActive, hotbarDragActive) and passed
+    // vacuously. radial_gesture_controller.ts legitimately uses drag
+    // vocabulary for the radial itself ('drags', 'DragState'), which is
+    // exactly why the tokens below are the retired construct's own literal
+    // names rather than a generic "drag" substring: a reintroduced rearrange
+    // would not need to touch any of those legitimate names at all.
+    const retiredTokens = [
+      'bindMobileRingDrag',
+      'bindMobileActionDrag',
+      'mobileHotbarDrag',
+      'mobile-hotbar-dragging',
+    ];
+    const scannedFiles: Array<{ name: string; code: string; positiveControl: string }> = [
+      { name: 'hud.ts', code: hud, positiveControl: 'buildMobileActionRing' },
+      {
+        name: 'mobile_action_ring_controller.ts',
+        code: ring,
+        positiveControl: 'MobileActionRingDeps',
+      },
+      { name: 'radial_gesture_controller.ts', code: gesture, positiveControl: 'RadialGesture' },
+    ];
+    for (const file of scannedFiles) {
+      // Positive control: prove the scan is reading real content, not an
+      // empty file or a stale path that would make every negative below
+      // vacuous.
+      expect(file.code, `${file.name} scan read no real content`).toContain(file.positiveControl);
+      for (const token of retiredTokens) {
+        expect(file.code, `${token} must not survive the removal (${file.name})`).not.toContain(
+          token,
+        );
+      }
     }
-    expect(hud).not.toContain('mobileHotbarDrag');
   });
 
   it('wires the page toggle button to cycleMobileActionPage', () => {

@@ -261,6 +261,45 @@ describe('RadialGesture: the window release backstop', () => {
   });
 });
 
+// See tests/mobile_action_ring_painter.test.ts "arms NO rearrange gesture on
+// the live ring" for the source-scan half of this pin (the retired
+// bindMobileRingDrag / bindMobileActionDrag / mobileHotbarDrag tokens). This
+// is the behavioral half: a held drag that reveals the petals and releases
+// over where a NEIGHBOUR button sits on screen must still resolve through
+// this button's own cast/cancel outcome, never rebind anything. The
+// RadialGestureDeps interface exposes no callback that could touch another
+// button's slot at all (only cast and onCancel), so this proves the negative
+// concretely rather than by interface inspection alone.
+describe('RadialGesture: a held drag toward a neighbour never rearranges anything', () => {
+  it('resolves through cast/cancel on the PRESSED button, even when the release lands over a neighbour', () => {
+    const rig = makeRig();
+    // Button 1's rect is seated at (200,180)-(240,220) (see makeRig). Pressing
+    // button 0 and dragging into that box is literally what the retired
+    // long-press rearrange read as "pick up button 0, drop it on button 1".
+    down(rig, 0, 1, 300, 200);
+    move(rig, 0, 1, 220, 200); // dx -80, past FLICK_DEADZONE_PX: reveals and resolves 'left'.
+    expect(rig.gesture.isOpen()).toBe(true);
+    up(rig, 0, 1, 220, 200);
+
+    // The only outcome is a cast of BUTTON 0's own 'left' slot: nothing
+    // addresses button 1, because the deps interface has no such callback.
+    expect(rig.casts).toEqual([[0, 'left']]);
+    expect(rig.cancels).toBe(0);
+  });
+
+  it('cancels rather than rebinding when the release lands back on the anchor', () => {
+    const rig = makeRig();
+    down(rig, 0, 1, 300, 200);
+    move(rig, 0, 1, 220, 200);
+    move(rig, 0, 1, 300, 200); // back to the anchor with the petals still up.
+    expect(rig.gesture.cancelIsLive()).toBe(true);
+    up(rig, 0, 1, 300, 200);
+
+    expect(rig.casts).toEqual([]);
+    expect(rig.cancels).toBe(1);
+  });
+});
+
 describe('RadialGesture: the clamp box', () => {
   it('clamps against the shared --app-vw/--app-vh box, not the window', () => {
     const rig = makeRig({ appVw: '400px', appVh: '300px' });

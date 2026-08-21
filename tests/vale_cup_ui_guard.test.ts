@@ -27,8 +27,8 @@ const briefingSrc = strip(read('src/ui/vale_cup_briefing.ts'));
 const bettingSrc = strip(read('src/ui/vale_cup_betting.ts'));
 const chargeSrc = strip(read('src/ui/vale_cup_charge.ts'));
 const flagSrc = strip(read('src/ui/vale_cup_flag.ts'));
-const hud = read('src/ui/hud.ts');
-const mobileActionRing = read('src/ui/hud/action_bar/mobile_action_ring_controller.ts');
+const hud = strip(read('src/ui/hud.ts'));
+const mobileActionRing = strip(read('src/ui/hud/action_bar/mobile_action_ring_controller.ts'));
 
 const ALL_PAINTERS: [name: string, code: string][] = [
   ['vale_cup_window.ts', windowSrc],

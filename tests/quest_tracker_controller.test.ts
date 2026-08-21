@@ -146,6 +146,18 @@ describe('QuestTrackerController', () => {
     expect(test.writes()).toBe(0);
   });
 
+  it('renders the tracker header label through the real questUi.tracker.title key, at its runtime home', () => {
+    // The static index.html markup dropped its data-i18n="questUi.tracker.title"
+    // node (tests/localization_coverage.test.ts pins the absence): the header
+    // label is now painted here, directly via t('questUi.tracker.title')
+    // (quest_tracker_controller.ts), never through the questTitle dep (which
+    // only names individual quest rows). English source: 'Quests'
+    // (src/ui/i18n.catalog/quests.ts).
+    const test = harness([progress('q_wolves')]);
+    test.controller.update();
+    expect(test.html()).toContain('<span class="qt-h-label">Quests</span>');
+  });
+
   it('persists a toggle, repaints the collapsed header, and restores header focus', () => {
     const test = harness([progress('q_wolves')]);
     test.controller.update();

@@ -73,4 +73,14 @@ describe('hotbar drag-drop clears the stale tooltip (#1485)', () => {
     expect(code).not.toContain('mobileHotbarDrag');
     expect(code).not.toContain('resolveMobileHotbarDrop');
   });
+
+  // The three arms above only pin RELATIVE ordering inside tapCell, which a
+  // narrowed guard cannot fail (see tests/bar_editor_window.test.ts for the
+  // behavioral pin that closes that gap). This pins the guard's own literal
+  // membership, so dropping any one kind from the condition fails here too.
+  it('pins the shared-hide guard membership: place, swap, and clear, and no other kind', () => {
+    expect(editorCode).toContain(
+      "if (tap.kind === 'place' || tap.kind === 'swap' || tap.kind === 'clear') {",
+    );
+  });
 });

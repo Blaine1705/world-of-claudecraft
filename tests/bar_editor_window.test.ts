@@ -14,6 +14,7 @@ import { isInteractiveHudElement } from '../src/game/touch_router';
 import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
 import { BarEditorWindow } from '../src/ui/hud/action_bar/bar_editor/bar_editor_window';
 import type { HotbarAction } from '../src/ui/hud/action_bar/hotbar';
+import { t } from '../src/ui/i18n';
 
 // jsdom ships no 2D canvas, so the procedural icon compositor cannot run here;
 // the window only ever uses the returned string as a CSS background-image.
@@ -39,7 +40,7 @@ interface Harness {
   clearBtn(): HTMLButtonElement;
 }
 
-function harness(): Harness {
+function harness(options: { hideTooltip?: () => void } = {}): Harness {
   document.body.innerHTML = '<div id="bar-editor" class="window panel"></div>';
   const root = document.getElementById('bar-editor') as HTMLElement;
   const bar: HotbarAction[] = Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, () => null);
@@ -56,7 +57,7 @@ function harness(): Harness {
     captureFocus: () => null,
     restoreFocus: () => {},
     onVisibilityChange: () => {},
-    hideTooltip: () => {},
+    hideTooltip: options.hideTooltip ?? (() => {}),
     barActions: () => bar,
     sourceSlotCount: () => ACTION_BAR_ABILITY_SLOTS,
     editAllowed: () => !locked.value,
@@ -277,6 +278,133 @@ describe('bar editor window: the Clear control', () => {
   it('carries an accessible name of its own', () => {
     h.window.open();
     expect(h.clearBtn().getAttribute('aria-label')).toBeTruthy();
+  });
+});
+
+// #1485: a drop that lands with the cursor already inside the target slot
+// fires no mouseenter, so the tooltip kept its pre-drop text. Every mutation
+// this window makes shares ONE deps.hideTooltip() call after the dispatch
+// (bar_editor_window.ts's tapCell); tests/hotbar_drop_tooltip.test.ts pins the
+// source-text shape of that guard (ordering plus the literal condition), and
+// this is the behavioral half: drive the real window and count the actual
+// calls, so a narrowed guard (dropping the clear arm, say) fails here even
+// though no string moved position.
+describe('bar editor window: hideTooltip fires on every mutation, never on an idle tap (#1485)', () => {
+  function withHideTooltipSpy() {
+    let calls = 0;
+    const h2 = harness({
+      hideTooltip: () => {
+        calls++;
+      },
+    });
+    return { ...h2, hideTooltipCalls: () => calls };
+  }
+
+  it('fires exactly once after a place', () => {
+    const h2 = withHideTooltipSpy();
+    h2.window.open('charge');
+    h2.cells()[5].click();
+    expect(h2.placed).toHaveLength(1);
+    expect(h2.hideTooltipCalls()).toBe(1);
+  });
+
+  it('fires exactly once after a swap', () => {
+    const h2 = withHideTooltipSpy();
+    h2.window.open();
+    h2.cells()[0].click();
+    h2.cells()[3].click();
+    expect(h2.swapped).toHaveLength(1);
+    expect(h2.hideTooltipCalls()).toBe(1);
+  });
+
+  it('fires exactly once after a clear', () => {
+    const h2 = withHideTooltipSpy();
+    h2.window.open();
+    h2.clearBtn().click();
+    h2.cells()[0].click();
+    expect(h2.cleared).toHaveLength(1);
+    expect(h2.hideTooltipCalls()).toBe(1);
+  });
+
+  it('does not fire when a tap only arms a pending pick (no mutation yet)', () => {
+    const h2 = withHideTooltipSpy();
+    h2.window.open();
+    h2.cells()[0].click();
+    expect(h2.swapped).toEqual([]);
+    expect(h2.hideTooltipCalls()).toBe(0);
+  });
+
+  it('does not fire on an idle tap: an empty cell with nothing armed', () => {
+    const h2 = withHideTooltipSpy();
+    h2.window.open();
+    h2.cells()[5].click();
+    expect(h2.placed).toEqual([]);
+    expect(h2.swapped).toEqual([]);
+    expect(h2.hideTooltipCalls()).toBe(0);
+  });
+
+  it('does not fire when a pending pick cancels on the same cell', () => {
+    const h2 = withHideTooltipSpy();
+    h2.window.open();
+    h2.cells()[0].click();
+    h2.cells()[0].click();
+    expect(h2.swapped).toEqual([]);
+    expect(h2.hideTooltipCalls()).toBe(0);
+  });
+});
+
+describe('bar editor window: the eligibility gate refuses an ineligible place (#hud.ts:5321)', () => {
+  it('an ineligible ability never reaches the bar, and the caption drops the armed name', () => {
+    // Mirrors the real gate at src/ui/hud.ts:5321
+    // (actionBarController.isAssignableAction): the deps-level placeAbility is
+    // the one place that can refuse, so a rejected ability must never reach
+    // placeAbilityOnSlot at all.
+    let eligible = false;
+    const bar: HotbarAction[] = Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, () => null);
+    const placed: Array<{ abilityId: string; slot: number }> = [];
+    const w = new BarEditorWindow({
+      root: () => h.root,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      onVisibilityChange: () => {},
+      hideTooltip: () => {},
+      barActions: () => bar,
+      sourceSlotCount: () => ACTION_BAR_ABILITY_SLOTS,
+      editAllowed: () => true,
+      placeAbility: (abilityId, slot) => {
+        if (!eligible) return;
+        placed.push({ abilityId, slot });
+        bar[slot - 1] = { type: 'ability', id: abilityId };
+      },
+      swapSlots: () => {},
+      clearSlot: () => {},
+    });
+
+    w.open('charge');
+    const caption = h.root.querySelector('.bar-editor-caption') as HTMLElement;
+    const armedCaption = caption.textContent;
+    // Armed names the spell (hudChrome.barEditor.armed), which is never the
+    // same text as the idle hint.
+    expect(armedCaption).not.toBe(t('hudChrome.barEditor.hint'));
+
+    const target = h.cells()[5];
+    target.click();
+
+    expect(placed).toEqual([]);
+    expect(bar[5]).toBeNull();
+    expect(target.classList.contains('empty')).toBe(true);
+    // The caption drops the armed name: the tap still disarms (there is
+    // nothing left to place), so it falls back to the idle hint rather than
+    // confirming a placement that never happened.
+    expect(caption.textContent).not.toBe(armedCaption);
+    expect(caption.textContent).toBe(t('hudChrome.barEditor.hint'));
+
+    // The gate genuinely gates: flip it and the SAME tap sequence places.
+    eligible = true;
+    w.open('charge');
+    h.cells()[5].click();
+    expect(placed).toEqual([{ abilityId: 'charge', slot: 6 }]);
   });
 });
 

@@ -1,6 +1,24 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Hud } from '../src/ui/hud';
+import { bindShiftClear } from '../src/ui/hud/action_bar/action_bar_clear';
+
+/** Slice one function's body out of a source string, bounded at ITS OWN closing
+ *  brace via a depth count rather than to end-of-file: a function appended
+ *  after the target in a later change must not silently satisfy a pin meant
+ *  for this one. */
+function sliceFunctionBody(source: string, startIndex: number): string {
+  const braceStart = source.indexOf('{', startIndex);
+  let depth = 0;
+  for (let i = braceStart; i < source.length; i++) {
+    if (source[i] === '{') depth++;
+    else if (source[i] === '}') {
+      depth--;
+      if (depth === 0) return source.slice(startIndex, i + 1);
+    }
+  }
+  throw new Error('sliceFunctionBody: unbalanced braces from the given start index');
+}
 
 vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
@@ -48,9 +66,47 @@ describe('Hud action-bar facade', () => {
     );
     const bindStart = clearSource.indexOf('export function bindShiftClear');
     expect(bindStart).toBeGreaterThan(-1);
-    const bindBody = clearSource.slice(bindStart);
+    // Bounded at bindShiftClear's OWN closing brace, not end-of-file: a
+    // function appended after it in a later change must not be able to
+    // satisfy this pair from outside the function under test.
+    const bindBody = sliceFunctionBody(clearSource, bindStart);
     expect(bindBody).toContain("btn.addEventListener('contextmenu'");
     expect(bindBody).toContain("btn.addEventListener('keydown'");
+  });
+
+  it('bindShiftClear actually WIRES both handlers: shift+contextmenu and shift+Delete clear; a plain contextmenu does not', () => {
+    const handlers: Record<string, (e: unknown) => void> = {};
+    const btn = {
+      addEventListener: (type: string, handler: (e: unknown) => void) => {
+        handlers[type] = handler;
+      },
+    } as unknown as HTMLElement;
+    let clears = 0;
+    bindShiftClear(btn, () => {
+      clears++;
+    });
+
+    handlers.contextmenu({ shiftKey: false, preventDefault: () => {} });
+    expect(clears).toBe(0);
+
+    handlers.contextmenu({ shiftKey: true, preventDefault: () => {} });
+    expect(clears).toBe(1);
+
+    handlers.keydown({
+      shiftKey: true,
+      key: 'Delete',
+      preventDefault: () => {},
+      stopPropagation: () => {},
+    });
+    expect(clears).toBe(2);
+
+    handlers.keydown({
+      shiftKey: false,
+      key: 'Delete',
+      preventDefault: () => {},
+      stopPropagation: () => {},
+    });
+    expect(clears).toBe(2);
   });
 
   it('checks drag eligibility before every drop and the touch bar editor place', () => {

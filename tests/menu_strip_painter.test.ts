@@ -14,7 +14,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { placeConsumableStrip } from '../src/ui/hud/action_bar/radial_action_core';
-import { MENU_CAPTION_HALF_PX } from '../src/ui/hud/menu/menu_strip_core';
 import { type MenuStripOpenState, MenuStripPainter } from '../src/ui/hud/menu/menu_strip_painter';
 import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host';
 
@@ -192,9 +191,14 @@ describe('MenuStripPainter: what it writes', () => {
     new MenuStripPainter(lit.writers, d).paint(open);
     expect(lit.calls).toContainEqual({ m: 'setText', args: [d.captionText, 'Bags'] });
     expect(lit.calls).toContainEqual({ m: 'toggleClass', args: [d.caption, 'shown', true] });
-    // Clamped by the core against a nominal half-width, never a measured box.
-    const left = styleProp(lit.calls, d.caption, 'left');
-    expect(Number.parseFloat(left ?? '')).toBeGreaterThanOrEqual(MARGIN + MENU_CAPTION_HALF_PX);
+    // Exact position, computed once from the core's own pinned math rather
+    // than a loose bound: centers[2] = ANCHOR_X + (ITEM_SIZE + GAP) * 3 =
+    // 40 + 48 * 3 = 184 (placeConsumableStrip, direction 'right',
+    // unclamped since the row never reaches the 844px viewport's right
+    // edge), and 184 sits inside menuCaptionCenterX's clamp band
+    // [MARGIN + MENU_CAPTION_HALF_PX, VIEWPORT_WIDTH - MARGIN -
+    // MENU_CAPTION_HALF_PX] = [62, 782], so it comes back unclamped.
+    expect(styleProp(lit.calls, d.caption, 'left')).toBe('184px');
 
     const idle = recordingFacet();
     new MenuStripPainter(idle.writers, d).paint(openState({ live: -1, caption: '' }));
