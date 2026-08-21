@@ -1119,6 +1119,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Lặn Xuống',
   'hudChrome.materialHint.usedBy': 'Được dùng bởi {crafts}.',
   'hudChrome.meters.threatFallback': 'Không có dữ liệu đe dọa trực tiếp: đang hiển thị sát thương gây cho {name}',
+  'hudChrome.meters.threatFrozen': 'Mức đe dọa cuối cùng với {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Bóng Đổ Môi Trường',
   'hudChrome.options.gfxAntiAliasing': 'Khử Răng Cưa',
   'hudChrome.options.gfxBloom': 'Độ Nở',

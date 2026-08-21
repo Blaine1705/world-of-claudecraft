@@ -1157,6 +1157,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Nurkowanie w dół',
   'hudChrome.materialHint.usedBy': 'Używane w: {crafts}.',
   'hudChrome.meters.threatFallback': 'Brak zagrożenia na żywo: pokazywanie obrażeń wobec {name}',
+  'hudChrome.meters.threatFrozen': 'Ostateczne zagrożenie wobec {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Okluzja otoczenia',
   'hudChrome.options.gfxAntiAliasing': 'Wygładzanie krawędzi',
   'hudChrome.options.gfxBloom': 'Bloom',

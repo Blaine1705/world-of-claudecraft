@@ -7099,7 +7099,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
   // the world resumes; onDisconnect above fires if the retries run out
   world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) => {
-    entryWatch.noteActivity();
+    entryWatch.noteActivity(nextRetryAtMs);
     checkpointActiveEntryDiagnostics('connection-lost', {
       attempt,
       maxAttempts,

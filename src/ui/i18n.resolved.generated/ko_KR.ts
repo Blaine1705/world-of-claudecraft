@@ -10787,7 +10787,7 @@ export const ko_KR: EnTranslations = {
       },
       "shadowstep": {
         "name": "그림자걸음",
-        "description": "그림자를 가로질러 대상에게 다가갑니다. (도적 특성)"
+        "description": "그림자를 가로질러 대상이 아군이든 적이든 다가가며, 황혼장막을 깨지 않습니다. (도적 특성)"
       },
       "silence": {
         "name": "침묵",

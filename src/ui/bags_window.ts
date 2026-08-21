@@ -300,6 +300,11 @@ export class BagsWindow {
   // concludes.
   private renderDeferredForDrag = false;
 
+  // Native HTML5 drop fires before dragend. A bag-cell drop consumes dragState
+  // in the drop handler, but the source row still needs to survive until its
+  // dragend handler clears the action-bar drag payload.
+  private nativeBagCellDropAwaitingDragEnd = false;
+
   // Bag hover/focus -> quest-tracker title highlight. One active row at a time;
   // cleared on leave/focusout, programmatic tooltip hide, rebuild, and close so
   // a stale class never sticks after the cell is torn down.
@@ -422,7 +427,7 @@ export class BagsWindow {
     // failing every later drop on the action bar or a bag cell. Defer the rebuild
     // instead of tearing the dragged row out from under it; the row's own dragend
     // (or the touch drag's onEnd) flushes it once the drag actually concludes.
-    if (this.deps.dragState.get()) {
+    if (this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd) {
       this.renderDeferredForDrag = true;
       return;
     }
@@ -519,6 +524,7 @@ export class BagsWindow {
   private flushDeferredRender(): void {
     if (!this.renderDeferredForDrag) return;
     this.renderDeferredForDrag = false;
+    this.nativeBagCellDropAwaitingDragEnd = false;
     this.render();
   }
 
@@ -1392,6 +1398,8 @@ export class BagsWindow {
       e.stopPropagation();
       const from = drag.index;
       this.deps.dragState.end();
+      this.nativeBagCellDropAwaitingDragEnd = true;
+      this.renderDeferredForDrag = true;
       this.dropOnBagCell(from, cell);
     });
   }
@@ -1651,7 +1659,7 @@ export class BagsWindow {
     // Same hazard as render() (see its comment): an innerHTML wipe here would tear a
     // mid-drag row out of the document just as easily. Defer to the same latch; the
     // eventual flush runs a full render(), a strict superset of a grid-only refresh.
-    if (this.deps.dragState.get()) {
+    if (this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd) {
       this.renderDeferredForDrag = true;
       return;
     }

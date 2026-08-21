@@ -1178,6 +1178,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Nuota Verso il Basso',
   'hudChrome.materialHint.usedBy': 'Usato da {crafts}.',
   'hudChrome.meters.threatFallback': 'Nessuna minaccia attiva: mostra i danni a {name}',
+  'hudChrome.meters.threatFrozen': 'Minaccia finale contro {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Occlusione Ambientale',
   'hudChrome.options.gfxAntiAliasing': 'Anti-Aliasing',
   'hudChrome.options.gfxBloom': 'Fioritura',

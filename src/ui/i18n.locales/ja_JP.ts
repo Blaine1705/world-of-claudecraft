@@ -9876,7 +9876,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）',
   'entities.abilities.psychic_scream.description': '8ヤード以内の敵を最大4秒間おののかせます。ダメージで効果が解けることがあります。',
-  'entities.abilities.shadowstep.description': '影を通り抜けて対象へ近づく。（ローグのタレント）',
+  'entities.abilities.shadowstep.description':
+    '影を通り抜け、敵味方を問わず対象へ近づく。ダスクヴェイルは解除されない。（ローグのタレント）',
   'entities.abilities.silence.description': '対象を4秒間沈黙させる。（プリーストのタレント）',
   'entities.abilities.tranquility.description':
     '4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）',

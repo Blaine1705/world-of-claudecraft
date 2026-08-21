@@ -1149,6 +1149,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Berenang ke Bawah',
   'hudChrome.materialHint.usedBy': 'Digunakan oleh {crafts}.',
   'hudChrome.meters.threatFallback': 'Tidak ada ancaman aktif: menampilkan kerusakan pada {name}',
+  'hudChrome.meters.threatFrozen': 'Ancaman akhir terhadap {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Oklusi Sekitar',
   'hudChrome.options.gfxAntiAliasing': 'Anti-Aliasing',
   'hudChrome.options.gfxBloom': 'Mekar',

@@ -986,7 +986,7 @@ export const id_ID: EnTranslations = {
       "seconds": "{s}d",
       "autoShowHint": "Baris muncul secara otomatis setelah partaimu memberikan kerusakan atau penyembuhan, dan segmen ini tertutup beberapa detik setelah pertarungan berakhir.",
       "threatFallback": "Tidak ada ancaman aktif: menampilkan kerusakan pada {name}",
-      "threatFrozen": "Final threat vs {name}",
+      "threatFrozen": "Ancaman akhir terhadap {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Lainnya ({count})",

@@ -986,7 +986,7 @@ export const da_DK: EnTranslations = {
       "seconds": "{s}s",
       "autoShowHint": "Rækker vises automatisk, når din gruppe påfører skade eller heling, og dette segment lukker et par sekunder efter kampens afslutning.",
       "threatFallback": "Ingen aktiv trussel: viser skade til {name}",
-      "threatFrozen": "Final threat vs {name}",
+      "threatFrozen": "Endelig trussel mod {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Andet ({count})",

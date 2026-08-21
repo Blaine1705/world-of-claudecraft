@@ -9446,7 +9446,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）',
   'entities.abilities.psychic_scream.description': '使 8 公尺內的敵人陷入恐懼，最多持續 4 秒。傷害可能打斷該效果。',
-  'entities.abilities.shadowstep.description': '穿過暗影，向你的目標邁進。（潛行者天賦）',
+  'entities.abilities.shadowstep.description':
+    '穿過暗影，向你的目標邁進，不論敵友，且不會打破暮幕。（潛行者天賦）',
   'entities.abilities.silence.description': '使目標沉默4秒。（牧師天賦）',
   'entities.abilities.tranquility.description':
     '引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）',

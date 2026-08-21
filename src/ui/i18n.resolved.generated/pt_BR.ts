@@ -986,7 +986,7 @@ export const pt_BR: EnTranslations = {
       "seconds": "{s}s",
       "autoShowHint": "As linhas aparecem automaticamente quando seu grupo causa dano ou cura, e este painel fecha alguns segundos após o fim do combate.",
       "threatFallback": "Sem ameaça ativa: mostrando dano a {name}",
-      "threatFrozen": "Final threat vs {name}",
+      "threatFrozen": "Ameaça final contra {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Outro ({count})",

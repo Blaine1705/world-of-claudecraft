@@ -5,6 +5,7 @@ import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { abilityRequirementKeys } from '../src/ui/hud/action_bar/ability_requirement_keys';
+import { classAbilityNamesEn } from '../src/ui/i18n.catalog/abilities';
 
 // Shadeslip repositions the CASTER and does nothing to the thing it steps to,
 // so it resolves against an ally the same way it resolves against an enemy
@@ -89,6 +90,9 @@ describe('Shadeslip steps to friend or foe', () => {
     const keys = abilityRequirementKeys(ABILITIES.shadowstep, 'subtlety').map((r) => r.key);
     expect(keys).toContain('anyTarget');
     expect(keys).not.toContain('enemyTarget');
+    expect(classAbilityNamesEn.entities.abilities.shadowstep.description).toContain(
+      'friend or foe',
+    );
     // An ordinary offensive ability is untouched.
     expect(abilityRequirementKeys(ABILITIES.eviscerate, 'subtlety').map((r) => r.key)).toContain(
       'enemyTarget',

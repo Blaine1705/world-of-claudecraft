@@ -10787,7 +10787,7 @@ export const en: EnTranslations = {
       },
       "shadowstep": {
         "name": "Shadeslip",
-        "description": "Steps through the shadows toward your target without breaking Duskveil. (Rogue talent)"
+        "description": "Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)"
       },
       "silence": {
         "name": "Hushword",

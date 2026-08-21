@@ -1175,6 +1175,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Nach unten schwimmen',
   'hudChrome.materialHint.usedBy': 'Verwendet von {crafts}.',
   'hudChrome.meters.threatFallback': 'Keine aktive Bedrohung: zeigt Schaden an {name}',
+  'hudChrome.meters.threatFrozen': 'Endgültige Bedrohung gegen {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Ambient Occlusion',
   'hudChrome.options.gfxAntiAliasing': 'Anti-Aliasing',
   'hudChrome.options.gfxBloom': 'Bloom',

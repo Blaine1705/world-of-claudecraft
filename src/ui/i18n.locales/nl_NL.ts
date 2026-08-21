@@ -1158,6 +1158,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Omlaag Zwemmen',
   'hudChrome.materialHint.usedBy': 'Gebruikt door {crafts}.',
   'hudChrome.meters.threatFallback': 'Geen actieve dreiging: toont schade aan {name}',
+  'hudChrome.meters.threatFrozen': 'Einddreiging tegen {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Omgevingsocclusie',
   'hudChrome.options.gfxAntiAliasing': 'Anti-Aliasing',
   'hudChrome.options.gfxBloom': 'Bloei',

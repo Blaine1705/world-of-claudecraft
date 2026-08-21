@@ -1150,6 +1150,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Svøm ned',
   'hudChrome.materialHint.usedBy': 'Bruges af {crafts}.',
   'hudChrome.meters.threatFallback': 'Ingen aktiv trussel: viser skade til {name}',
+  'hudChrome.meters.threatFrozen': 'Endelig trussel mod {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Omgivende okklusion',
   'hudChrome.options.gfxAntiAliasing': 'Anti-aliasing',
   'hudChrome.options.gfxBloom': 'Blomstring',

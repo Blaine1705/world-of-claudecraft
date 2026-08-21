@@ -10787,7 +10787,7 @@ export const ja_JP: EnTranslations = {
       },
       "shadowstep": {
         "name": "影すべり",
-        "description": "影を通り抜けて対象へ近づく。（ローグのタレント）"
+        "description": "影を通り抜け、敵味方を問わず対象へ近づく。ダスクヴェイルは解除されない。（ローグのタレント）"
       },
       "silence": {
         "name": "沈黙",

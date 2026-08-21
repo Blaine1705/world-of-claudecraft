@@ -434,6 +434,12 @@ export class ActionBarController {
     return isAbilityActionBarEligible(this.abilityDef(id));
   }
 
+  private isAttackSlotStoredAbilityEligible(id: string): boolean {
+    const ability = this.abilityDef(id);
+    if (ability === undefined) return this.deps.knownAbilityIds().includes(id);
+    return isAbilityActionBarEligible(ability);
+  }
+
   private formBarSeededKey(form: HotbarForm = this.activeFormState): string {
     return actionBarFormSeededKey(this.slotMapKey(form));
   }
@@ -601,12 +607,12 @@ export class ActionBarController {
       // placement gate) meant switching to a build that does not grant the
       // assigned ability read the stored value back as garbage and deleted
       // it outright, so switching back to the granting build could never
-      // restore it. Mirrors isAbilityPlacementAllowed's tolerance of ids the
-      // static client table does not resolve (host-provided known ids).
+      // restore it. Unknown host-provided ids are still allowed only when the
+      // current host says they are known; stale/corrupt unknown ids are dropped.
       this.attackActionState = readAttackSlotAction(
         this.deps.storage,
         key,
-        (id) => this.isAbilityPlacementAllowed(id),
+        (id) => this.isAttackSlotStoredAbilityEligible(id),
         (id) => this.keepsStoredItemId(id),
       );
       if (storedRaw !== null && this.attackActionState === null) this.deps.storage.removeItem(key);

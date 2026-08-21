@@ -52,6 +52,7 @@ import {
   scopeAllowsMutation,
   setAccountDeactivated,
   setAccountMarketingOptIn,
+  setInitialPasswordHashIfUnset,
   setTotpPending,
   updatePasswordHash,
 } from './db';
@@ -354,7 +355,13 @@ export async function handleAccountSetInitialPassword(
       code: 'account.password_too_long',
     });
   }
-  await updatePasswordHash(accountId, await hashPassword(next));
+  const changed = await setInitialPasswordHashIfUnset(accountId, await hashPassword(next));
+  if (!changed) {
+    return json(res, 409, {
+      error: 'this account already has a password, use change password instead',
+      code: 'account.password_already_set',
+    });
+  }
   // Best-effort security notice, same as the change/reset flows; never blocks on
   // mail state (a no-op when the account has no recovery email yet).
   emailPasswordChanged(acct);

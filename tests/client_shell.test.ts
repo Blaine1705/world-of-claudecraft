@@ -2650,6 +2650,12 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.vendor-open #vendor-window .panel-title .x-btn {\n    display: none;',
     );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #prompt-stack {\n    position: fixed;\n    left: max(10px, env(safe-area-inset-left));\n    right: max(10px, env(safe-area-inset-right));\n    top: max(12px, calc(env(safe-area-inset-top) + 12px));\n    transform: none;\n    z-index: 120;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #prompt-stack .prompt {\n    width: min(340px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));\n    min-width: 0;\n    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 20px);',
+    );
     expect(hudTs).toContain(
       "if (this.vendorOpen && document.body.classList.contains('mobile-touch')) this.closeVendor();",
     );

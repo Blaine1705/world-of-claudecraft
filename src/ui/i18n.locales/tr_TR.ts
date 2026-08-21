@@ -1148,6 +1148,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Aşağı Yüz',
   'hudChrome.materialHint.usedBy': '{crafts} tarafından kullanılır.',
   'hudChrome.meters.threatFallback': 'Canlı tehdit yok: {name} için hasar gösteriliyor',
+  'hudChrome.meters.threatFrozen': '{name} için son tehdit',
   'hudChrome.options.gfxAmbientOcclusion': 'Ortam Gölgelendirme',
   'hudChrome.options.gfxAntiAliasing': 'Kenar Yumuşatma',
   'hudChrome.options.gfxBloom': 'Parlama',

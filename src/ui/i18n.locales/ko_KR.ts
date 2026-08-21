@@ -9858,7 +9858,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '시전 시간이 있는 다음 주문을 즉시 시전합니다. 60초 동안 지속됩니다. (마법사 특성)',
   'entities.abilities.psychic_scream.description': '8미터 안의 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다.',
-  'entities.abilities.shadowstep.description': '그림자를 가로질러 대상에게 다가갑니다. (도적 특성)',
+  'entities.abilities.shadowstep.description':
+    '그림자를 가로질러 대상이 아군이든 적이든 다가가며, 황혼장막을 깨지 않습니다. (도적 특성)',
   'entities.abilities.tranquility.description':
     '4초 동안 회복 에너지를 집중해 30미터 안의 아군을 매초 42에서 52만큼 치유합니다. (드루이드 특성)',
   'hudChrome.auraEffect.combustionCrit': '화염 주문이 항상 치명타로 적중합니다',

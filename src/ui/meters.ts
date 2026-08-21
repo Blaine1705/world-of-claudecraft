@@ -197,6 +197,28 @@ export class MeterData {
     };
   }
 
+  private threatEntryBelongsToParty(world: IWorld, entityId: number, partyPids: Set<number>): boolean {
+    if (partyPids.has(entityId)) return true;
+    const entity = world.entities.get(entityId);
+    return entity?.kind === 'mob' && entity.ownerId !== null && partyPids.has(entity.ownerId);
+  }
+
+  private refreshThreatSnapshots(world: IWorld, partyPids: Set<number>): void {
+    if (!this.current) return;
+    for (const entity of world.entities.values()) {
+      if (entity.kind !== 'mob' || !entity.threat || entity.threat.size === 0) continue;
+      let partyOnTable = false;
+      for (const threatEntityId of entity.threat.keys()) {
+        if (this.threatEntryBelongsToParty(world, threatEntityId, partyPids)) {
+          partyOnTable = true;
+          break;
+        }
+      }
+      if (!partyOnTable) continue;
+      this.current.threatSnapshotByMob.set(entity.id, new Map(entity.threat));
+    }
+  }
+
   /** party membership check is supplied by the caller (self + party pids) */
   onEvent(ev: SimEvent, world: IWorld, partyPids: Set<number>, now: number): void {
     if (ev.type !== 'damage' && ev.type !== 'heal2') return;
@@ -214,6 +236,7 @@ export class MeterData {
     // dealing damage must not end the segment)
     if (!this.current) this.current = newEncounter(now);
     this.lastActivity = now;
+    this.refreshThreatSnapshots(world, partyPids);
 
     if (ev.type === 'damage' && sourceInParty && ev.kind === 'hit' && ev.amount > 0) {
       const target = world.entities.get(ev.targetId);

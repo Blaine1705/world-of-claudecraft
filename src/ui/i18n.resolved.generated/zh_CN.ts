@@ -10787,7 +10787,7 @@ export const zh_CN: EnTranslations = {
       },
       "shadowstep": {
         "name": "影步",
-        "description": "穿过暗影，向你的目标迈进。（潜行者天赋）"
+        "description": "穿过暗影，向你的目标迈进，不论敌友，且不会打破暮幕。（潜行者天赋）"
       },
       "silence": {
         "name": "沉默",

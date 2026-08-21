@@ -337,6 +337,50 @@ describe('combat meters', () => {
     expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 3000]]));
   });
 
+  it('refreshes frozen threat when healing threat lands between the last hit and death', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const wolf = w.entities.get(50) as any;
+    wolf.threat = new Map([[1, 3000]]);
+    m.onEvent(dmg(1, 50, 100), w, party, 1000);
+
+    wolf.threat = new Map([
+      [1, 3000],
+      [2, 120],
+    ]);
+    m.onEvent(heal(2, 1, 240, 'Flash Heal'), w, party, 1100);
+
+    wolf.dead = true;
+    wolf.threat.clear();
+    m.onEvent(dmg(1, 50, 600), w, party, 1200);
+
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(
+      new Map([
+        [1, 3000],
+        [2, 120],
+      ]),
+    );
+  });
+
+  it('refreshes frozen threat for flat threat events that deal zero damage', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const wolf = w.entities.get(50) as any;
+    wolf.threat = new Map([[1, 3000]]);
+    m.onEvent(dmg(1, 50, 100), w, party, 1000);
+
+    wolf.threat = new Map([[1, 3600]]);
+    m.onEvent(dmg(1, 50, 0, 'Taunt'), w, party, 1100);
+
+    wolf.dead = true;
+    wolf.threat.clear();
+    m.onEvent(dmg(1, 50, 600), w, party, 1200);
+
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 3600]]));
+  });
+
   it('never latches an empty hate table over a real one', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);

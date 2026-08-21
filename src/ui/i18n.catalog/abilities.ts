@@ -2501,7 +2501,7 @@ const classAbilityNamesEn = {
       [
         'shadowstep',
         'Shadeslip',
-        'Steps through the shadows toward your target without breaking Duskveil. (Rogue talent)',
+        'Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)',
       ],
       ['silence', 'Hushword', 'Silences the target for 4 sec. (Priest talent)'],
       [

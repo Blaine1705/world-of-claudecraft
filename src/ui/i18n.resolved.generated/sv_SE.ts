@@ -986,7 +986,7 @@ export const sv_SE: EnTranslations = {
       "seconds": "{s} s",
       "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas.",
       "threatFallback": "Inget levande hot: visar skada mot {name}",
-      "threatFrozen": "Final threat vs {name}",
+      "threatFrozen": "Slutligt hot mot {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Övrigt ({count})",

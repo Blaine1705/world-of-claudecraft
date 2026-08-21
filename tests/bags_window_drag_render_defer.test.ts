@@ -32,6 +32,8 @@ function harness() {
   document.body.appendChild(root);
   let inventory: InvSlot[] = [SWORD];
   const dragState = new ItemDragState();
+  let dragAction: { type: 'item'; id: string } | null = null;
+  const moveCalls: string[] = [];
   const noop = (): void => {};
   const deps: BagsWindowDeps = {
     itemIcon: () => '<span class="item-icon"></span>',
@@ -45,6 +47,13 @@ function harness() {
         bags: [null, null, null, null],
         bagCapacity: 16,
         copper: 0,
+        moveInventoryItem: (from: number, to: number) => {
+          moveCalls.push(`${from}->${to}`);
+          const next = [...inventory];
+          const [slot] = next.splice(from, 1);
+          if (slot) next.splice(to, 0, slot);
+          inventory = next;
+        },
       }) as unknown as IWorld,
     wocBalanceHtml: () => '',
     claudiumLauncherHtml: () => '',
@@ -74,9 +83,11 @@ function harness() {
     showError: noop,
     setPendingPetFeed: noop,
     resetPetBarSig: noop,
-    isHotbarItemId: () => false,
+    isHotbarItemId: (id) => id === 'healing_potion',
     useGatherTool: () => false,
-    setDragAction: noop,
+    setDragAction: (action) => {
+      dragAction = action;
+    },
     clearActionDropTargets: noop,
     dragState,
     isTouchHud: () => false,
@@ -89,6 +100,8 @@ function harness() {
   return {
     window: new BagsWindow(deps),
     dragState,
+    dragAction: () => dragAction,
+    moveCalls: () => [...moveCalls],
     root,
     setInventory: (next: InvSlot[]) => {
       inventory = next;
@@ -98,6 +111,8 @@ function harness() {
       [...root.querySelectorAll<HTMLElement>('.bag-grid [data-focus-key^="bag:"]')]
         .map((el) => el.dataset.focusKey)
         .sort(),
+    cellAt: (index: number) =>
+      root.querySelector<HTMLElement>(`.bag-grid [data-bag-index="${index}"]`),
   };
 }
 
@@ -148,5 +163,31 @@ describe('BagsWindow.render defers a rebuild that would tear out a live drag', (
     h.setInventory([SWORD, POTION]);
     h.window.render();
     expect(h.itemKeys()).toEqual(['bag:healing_potion:0', 'bag:worn_sword:0']);
+  });
+
+  it('defers the native bag-cell drop repaint until dragend clears action drag state', () => {
+    const h = harness();
+    h.setInventory([POTION]);
+    h.window.render();
+    const gridBefore = h.gridEl();
+    const row = h.root.querySelector<HTMLElement>('[data-focus-key="bag:healing_potion:0"]');
+    const emptyCell = h.cellAt(1);
+    expect(row).not.toBeNull();
+    expect(emptyCell).not.toBeNull();
+
+    row?.dispatchEvent(new Event('dragstart'));
+    expect(h.dragAction()).toEqual({ type: 'item', id: 'healing_potion' });
+
+    emptyCell?.dispatchEvent(new Event('drop', { bubbles: true, cancelable: true }));
+
+    expect(h.moveCalls()).toEqual(['0->1']);
+    expect(h.gridEl()).toBe(gridBefore);
+    expect(row?.isConnected).toBe(true);
+    expect(h.dragState.get()).toBeNull();
+    expect(h.dragAction()).toEqual({ type: 'item', id: 'healing_potion' });
+
+    row?.dispatchEvent(new Event('dragend'));
+    expect(h.dragAction()).toBeNull();
+    expect(h.gridEl()).not.toBe(gridBefore);
   });
 });

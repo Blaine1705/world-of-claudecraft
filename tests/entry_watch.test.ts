@@ -68,6 +68,23 @@ describe('watchWorldEntry', () => {
     expect(onTimedOut).toHaveBeenCalledTimes(1);
   });
 
+  it('extends through a scheduled retry whose backoff exceeds ENTRY_TIMEOUT_MS', () => {
+    const world = fakeWorld();
+    const onTimedOut = vi.fn();
+    const handle = watchWorldEntry(world, vi.fn(), onTimedOut);
+    const now = Date.now();
+    const longBackoff = ENTRY_TIMEOUT_MS * 2;
+
+    vi.advanceTimersByTime(100);
+    handle.noteActivity(now + longBackoff);
+
+    vi.advanceTimersByTime(longBackoff + ENTRY_TIMEOUT_MS - 250);
+    expect(onTimedOut).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(300);
+    expect(onTimedOut).toHaveBeenCalledTimes(1);
+  });
+
   it('cancel() stops polling: neither callback fires again', () => {
     const world = fakeWorld();
     const onReady = vi.fn();

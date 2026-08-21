@@ -18,8 +18,12 @@ interface EntryWatchWorld {
 }
 
 export interface EntryWatchHandle {
-  /** Push the timeout deadline out: call on every legitimate retry attempt. */
-  noteActivity(): void;
+  /**
+   * Push the timeout deadline out: call on every legitimate retry attempt.
+   * When a reconnect is already scheduled, pass its absolute retry time so a
+   * long backoff gets its own response window instead of timing out mid-wait.
+   */
+  noteActivity(nextRetryAtMs?: number): void;
   /** Stop polling. Idempotent. */
   cancel(): void;
 }
@@ -29,20 +33,25 @@ export function watchWorldEntry(
   onReady: () => void,
   onTimedOut: () => void,
 ): EntryWatchHandle {
-  let lastActivityAt = Date.now();
+  let deadlineAt = Date.now() + ENTRY_TIMEOUT_MS;
+  const extendDeadline = (nextRetryAtMs?: number): void => {
+    const retryDeadline =
+      typeof nextRetryAtMs === 'number' && Number.isFinite(nextRetryAtMs)
+        ? nextRetryAtMs + ENTRY_TIMEOUT_MS
+        : 0;
+    deadlineAt = Math.max(Date.now() + ENTRY_TIMEOUT_MS, retryDeadline);
+  };
   const poll = window.setInterval(() => {
     if (world.connected && world.entities.has(world.playerId)) {
       window.clearInterval(poll);
       onReady();
-    } else if (Date.now() - lastActivityAt > ENTRY_TIMEOUT_MS) {
+    } else if (Date.now() > deadlineAt) {
       window.clearInterval(poll);
       onTimedOut();
     }
   }, 50);
   return {
-    noteActivity: () => {
-      lastActivityAt = Date.now();
-    },
+    noteActivity: extendDeadline,
     cancel: () => window.clearInterval(poll),
   };
 }

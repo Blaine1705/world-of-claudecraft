@@ -986,7 +986,7 @@ export const vi_VN: EnTranslations = {
       "seconds": "{s}g",
       "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc.",
       "threatFallback": "Không có dữ liệu đe dọa trực tiếp: đang hiển thị sát thương gây cho {name}",
-      "threatFrozen": "Final threat vs {name}",
+      "threatFrozen": "Mức đe dọa cuối cùng với {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Khác ({count})",

@@ -986,7 +986,7 @@ export const cs_CZ: EnTranslations = {
       "seconds": "{s} s",
       "autoShowHint": "Řádky se zobrazí automaticky, jakmile tvoje skupina způsobí poškození nebo léčení, a tento segment se zavře několik sekund po skončení boje.",
       "threatFallback": "Žádný aktivní threat: zobrazuje se poškození vůči {name}",
-      "threatFrozen": "Final threat vs {name}",
+      "threatFrozen": "Konečná hrozba vůči {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Ostatní ({count})",

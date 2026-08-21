@@ -10031,7 +10031,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваше следующее заклинание со временем произнесения становится мгновенным. Действует 60 сек. (Талант мага)',
   'entities.abilities.psychic_scream.description': 'Приводит в ужас врагов в пределах 8 м на срок до 4 сек. Урон может разрушить эффект.',
   'entities.abilities.shadowstep.description':
-    'Вы проходите сквозь тени к своей цели. (талант разбойника)',
+    'Вы проходите сквозь тени к цели, будь то союзник или враг, не нарушая Сумрачную завесу. (талант разбойника)',
   'entities.abilities.silence.description':
     'Лишает цель возможности произносить заклинания на 4 сек. (талант жреца)',
   'entities.abilities.tranquility.description':

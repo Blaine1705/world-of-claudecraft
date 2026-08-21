@@ -6,7 +6,9 @@
 // after. On the broken tree: the potion is drunk a second time (duplicate
 // chat line, stack drops by 2) and no jump is requested. On the fixed tree:
 // one chat line, the stack drops by 1, and Space reaches the jump key.
-//   node scripts/focus_hijack_repro_shot.mjs   (needs `npm run dev` on :5173)
+//   SHOT_LABEL=before node scripts/focus_hijack_repro_shot.mjs
+//   SHOT_LABEL=after node scripts/focus_hijack_repro_shot.mjs
+// Requires `npm run dev` on :5173 unless GAME_URL points elsewhere.
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 

@@ -4090,6 +4090,23 @@
   body.mobile-touch.vendor-open #vendor-window .panel-title .x-btn {
     display: none;
   }
+  body.mobile-touch #prompt-stack {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(12px, calc(env(safe-area-inset-top) + 12px));
+    transform: none;
+    z-index: 120;
+    align-items: center;
+    pointer-events: none;
+  }
+  body.mobile-touch #prompt-stack .prompt {
+    width: min(340px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
+    min-width: 0;
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 20px);
+    box-sizing: border-box;
+    pointer-events: auto;
+  }
   /* The bank docks its bags companion side by side on touch exactly like the
      vendor cluster: a divided full-height panel split 50/50 at the viewport
      centre. This standalone block is also the neutralizer for the desktop

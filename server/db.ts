@@ -1889,6 +1889,19 @@ export async function updatePasswordHash(accountId: number, passwordHash: string
   if ((res.rowCount ?? 0) > 0) bustDiscordStatus(accountId);
 }
 
+export async function setInitialPasswordHashIfUnset(
+  accountId: number,
+  passwordHash: string,
+): Promise<boolean> {
+  const res = await pool.query(
+    'UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1 AND password_set = FALSE',
+    [accountId, passwordHash],
+  );
+  const changed = (res.rowCount ?? 0) > 0;
+  if (changed) bustDiscordStatus(accountId);
+  return changed;
+}
+
 // Revoke every token for an account except (optionally) the one in hand.
 // A password change keeps the current device signed in (pass its token);
 // a deactivate revokes everything (pass null).

@@ -7,10 +7,10 @@ to the document response (the same interception technique
 plus a 4s settle), on the same machine, same build, same seed.
 
 - `before.png`: `connect-src` missing `data:` (the pre-fix policy). Loading stalls at
-  `5/100` for the full wait: every Zstandard-supercompressed KTX2 GLB (170 shipped GLBs
-  carry zstd textures) throws "Refused to connect" when `KTX2Loader`'s `ZSTDDecoder` tries
-  to boot its WASM via `fetch("data:application/wasm;base64,...")`, so nothing after the
-  first zstd texture ever loads.
+  `5/100` for the full wait: every shipped Zstandard-supercompressed KTX2 GLB throws
+  "Refused to connect" when `KTX2Loader`'s `ZSTDDecoder` tries to boot its WASM via
+  `fetch("data:application/wasm;base64,...")`, so nothing after the first zstd texture
+  ever loads.
 - `after.png`: `connect-src` includes `data:` (this PR). The same wait reaches `85/100`
   with zero first-party CSP violations and zero page errors.
 

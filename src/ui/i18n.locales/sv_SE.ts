@@ -1147,6 +1147,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Simma nedåt',
   'hudChrome.materialHint.usedBy': 'Används av {crafts}.',
   'hudChrome.meters.threatFallback': 'Inget levande hot: visar skada mot {name}',
+  'hudChrome.meters.threatFrozen': 'Slutligt hot mot {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Omgivningsocklusion',
   'hudChrome.options.gfxAntiAliasing': 'Kantutjämning',
   'hudChrome.options.gfxBloom': 'Bloom',

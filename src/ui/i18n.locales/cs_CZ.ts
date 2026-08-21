@@ -1160,6 +1160,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.dive': 'Potopit se',
   'hudChrome.materialHint.usedBy': 'Používá se v: {crafts}.',
   'hudChrome.meters.threatFallback': 'Žádný aktivní threat: zobrazuje se poškození vůči {name}',
+  'hudChrome.meters.threatFrozen': 'Konečná hrozba vůči {name}',
   'hudChrome.options.gfxAmbientOcclusion': 'Ambient Occlusion',
   'hudChrome.options.gfxAntiAliasing': 'Anti-Aliasing',
   'hudChrome.options.gfxBloom': 'Bloom',
