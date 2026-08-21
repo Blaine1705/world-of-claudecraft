@@ -2576,24 +2576,25 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'error') {
       const wasConnected = this.connected;
       this.connected = false;
-      // Mid-reconnect, 'character already in world' is the transient window
-      // where the server has not yet noticed the old socket died (a
-      // black-holed drop sends no FIN/RST): keep backing off, the server's
-      // keepalive sweep flips the held session linkdead within a ping
-      // interval or two and the next retry resumes. Bounded, so a character
+      // 'character already in world' is the transient window where the
+      // server has not yet noticed the old socket died (a black-holed drop
+      // sends no FIN/RST): keep backing off, the server's keepalive sweep
+      // flips the held session linkdead within a ping interval or two and
+      // the next retry resumes. Applies on the very first join attempt too
+      // (a char-select "Enter World" click can land in this same window, see
+      // reconnect_policy.ts), not only mid-reconnect. Bounded, so a character
       // genuinely held by another device's live socket still ends fatal.
-      if (
-        isTransientReconnectRejection(msg.error, this.reconnectAttempts, this.conflictRejections)
-      ) {
+      if (isTransientReconnectRejection(msg.error, this.conflictRejections)) {
         this.conflictRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
-      // Mid-reconnect, 'authentication timed out' is the other transient
-      // window: a server event-loop stall kept the handshake from processing
-      // the first auth frame in time, or a database failure interrupted the
-      // handshake server-side. Keep backing off; the next retry lands after
-      // the stall clears or the database recovers. Bounded on its own counter.
-      if (isTransientTimeoutRejection(msg.error, this.reconnectAttempts, this.timeoutRejections)) {
+      // 'authentication timed out' is the other transient window: a server
+      // event-loop stall kept the handshake from processing the first auth
+      // frame in time, or a database failure interrupted the handshake
+      // server-side. Keep backing off; the next retry lands after the stall
+      // clears or the database recovers. Bounded on its own counter, and
+      // applies to a first join attempt exactly like a mid-reconnect one.
+      if (isTransientTimeoutRejection(msg.error, this.timeoutRejections)) {
         this.timeoutRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
