@@ -197,7 +197,11 @@ export class MeterData {
     };
   }
 
-  private threatEntryBelongsToParty(world: IWorld, entityId: number, partyPids: Set<number>): boolean {
+  private threatEntryBelongsToParty(
+    world: IWorld,
+    entityId: number,
+    partyPids: Set<number>,
+  ): boolean {
     if (partyPids.has(entityId)) return true;
     const entity = world.entities.get(entityId);
     return entity?.kind === 'mob' && entity.ownerId !== null && partyPids.has(entity.ownerId);
