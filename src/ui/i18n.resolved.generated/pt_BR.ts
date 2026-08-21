@@ -4367,6 +4367,7 @@ export const pt_BR: EnTranslations = {
       "ifHighContrastBackground": "Um fundo mais simples e de alto contraste atrás das telas de início e de personagem.",
       "ifInvertLookY": "Inverte a direção de cima para baixo da visão do mouse.",
       "ifShowItemLevel": "Adiciona uma linha de nível do item a cada dica de item. Desativado por padrão, o que mantém a dica clássica com apenas os atributos.",
+      "ifShowReliquaryTracker": "Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.",
       "ifShowPlaytime": "Mostra seu tempo de jogo total na ficha do personagem. Ativado por padrão, e a ficha tem um botão de olho que alterna isso por dispositivo, o que é útil se você transmite ao vivo ou tira capturas de tela. O total continua contando de qualquer jeito.",
       "ifShowOwnNameplate": "Desenha sua própria placa de nome acima da cabeça exatamente como os outros jogadores a veem, com todos os detalhes. Desative para a visão clássica.",
       "ifShowPlayerNameplates": "Desenha as placas de nome dos outros jogadores. Desativado deixa um centro urbano lotado menos poluído, e seu alvo atual continua legível de qualquer jeito.",

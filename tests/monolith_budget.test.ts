@@ -85,7 +85,7 @@ const MONOLITHS: MonolithRow[] = [
     // makeReliquaryTrackerInput (reliquary_tracker_view.ts), which paid for the
     // tracker-stack anchor wiring and the window's tracker-visibility deps in
     // the same change. Exact count, zero slack.
-    ceiling: 19489,
+    ceiling: 19487,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

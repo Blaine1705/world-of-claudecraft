@@ -8,6 +8,9 @@
 // transform; the compact tier really did paint the Reliquary chip over the
 // compass and clock (the bug that minted this module).
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { installTrackerStackAnchor, TrackerStackAnchor } from '../src/ui/tracker_stack_anchor';
 import {
@@ -157,22 +160,117 @@ describe('TrackerStackAnchor', () => {
     expect(writes).toEqual([`${Math.round(274 / 2) + TRACKER_STACK_ANCHOR_GAP_PX}px`]);
   });
 
-  it('installTrackerStackAnchor seats once immediately and re-applies on resize', () => {
+  interface InstallRig {
+    stack: HTMLElement;
+    geom: { bottom: number; measures: number };
+    /** rAF callbacks captured by the stub, in schedule order. */
+    frames: Array<() => void>;
+    cancelled: number[];
+    dispose(): void;
+    restore(): void;
+  }
+
+  /** Install over a synchronous rAF stub so the coalescing is observable. */
+  function installRig(): InstallRig {
     const stack = document.createElement('div');
     const wrap = document.createElement('div');
-    const geom = { bottom: 268 };
-    wrap.getBoundingClientRect = () =>
-      ({ bottom: geom.bottom, width: 170, height: 250 }) as DOMRect;
-    const anchor = installTrackerStackAnchor({
+    const geom = { bottom: 268, measures: 0 };
+    wrap.getBoundingClientRect = () => {
+      geom.measures++;
+      return { bottom: geom.bottom, width: 170, height: 250 } as DOMRect;
+    };
+    const frames: Array<() => void> = [];
+    const cancelled: number[] = [];
+    const rawRaf = window.requestAnimationFrame;
+    const rawCancel = window.cancelAnimationFrame;
+    window.requestAnimationFrame = ((cb: () => void) => frames.push(cb)) as never;
+    window.cancelAnimationFrame = ((id: number) => cancelled.push(id)) as never;
+    const installed = installTrackerStackAnchor({
       stack: () => stack,
       minimapWrap: () => wrap,
       overhangs: () => [],
       uiScale: () => 1,
     });
-    expect(anchor).toBeInstanceOf(TrackerStackAnchor);
-    expect(stack.style.top).toBe(`${268 + TRACKER_STACK_ANCHOR_GAP_PX}px`);
-    geom.bottom = 300;
-    window.dispatchEvent(new Event('resize'));
-    expect(stack.style.top).toBe(`${300 + TRACKER_STACK_ANCHOR_GAP_PX}px`);
+    expect(installed.anchor).toBeInstanceOf(TrackerStackAnchor);
+    return {
+      stack,
+      geom,
+      frames,
+      cancelled,
+      dispose: installed.dispose,
+      restore: () => {
+        window.requestAnimationFrame = rawRaf;
+        window.cancelAnimationFrame = rawCancel;
+      },
+    };
+  }
+
+  it('install seats once immediately, then coalesces a resize burst into ONE frame', () => {
+    const rig = installRig();
+    try {
+      expect(rig.stack.style.top).toBe(`${268 + TRACKER_STACK_ANCHOR_GAP_PX}px`);
+      const measuresAfterInstall = rig.geom.measures;
+      // A drag-resize fires the event at frame rate: five synchronous events
+      // must schedule exactly one frame and measure NOTHING until it runs.
+      rig.geom.bottom = 300;
+      for (let i = 0; i < 5; i++) window.dispatchEvent(new Event('resize'));
+      expect(rig.frames).toHaveLength(1);
+      expect(rig.geom.measures).toBe(measuresAfterInstall);
+      rig.frames[0]();
+      expect(rig.stack.style.top).toBe(`${300 + TRACKER_STACK_ANCHOR_GAP_PX}px`);
+      expect(rig.geom.measures).toBe(measuresAfterInstall + 1);
+      // The frame drained the pending slot: the next event schedules again.
+      window.dispatchEvent(new Event('resize'));
+      expect(rig.frames).toHaveLength(2);
+    } finally {
+      rig.restore();
+      rig.dispose();
+    }
+  });
+
+  it('dispose removes the resize listener and cancels a pending frame', () => {
+    const rig = installRig();
+    try {
+      window.dispatchEvent(new Event('resize'));
+      expect(rig.frames).toHaveLength(1);
+      rig.dispose();
+      // The scheduled-but-unrun frame is cancelled, and a later resize
+      // schedules nothing: the listener is really gone.
+      expect(rig.cancelled).toHaveLength(1);
+      window.dispatchEvent(new Event('resize'));
+      expect(rig.frames).toHaveLength(1);
+    } finally {
+      rig.restore();
+    }
+  });
+});
+
+describe('tracker_stack_anchor source pins', () => {
+  // The module is bare-named on purpose (a controller/painter name would put
+  // it under the painter gate's scans, whose write contract it cannot satisfy:
+  // the fallback path needs removeProperty, a verb the elided facet lacks).
+  // These pins are what hold the header's cadence and write claims instead.
+  // Resolved via node:path, not `new URL`: this suite runs under happy-dom,
+  // whose URL global refuses the file scheme composition the node arm allows.
+  const src = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), '../src/ui/tracker_stack_anchor.ts'),
+    'utf8',
+  );
+
+  it('bounds the layout reads: exactly two getBoundingClientRect call sites', () => {
+    expect(src.split('.getBoundingClientRect()').length - 1).toBe(2);
+  });
+
+  it('owns exactly one seat write and one removal, both elided behind lastTopPx', () => {
+    expect(src.split('.style.top =').length - 1).toBe(1);
+    expect(src.split(".removeProperty('top')").length - 1).toBe(1);
+    expect(src).toContain('if (top === this.lastTopPx) return;');
+  });
+
+  it('keeps the resize path coalesced and disposable', () => {
+    expect(src.split('window.addEventListener').length - 1).toBe(1);
+    expect(src).toContain('window.requestAnimationFrame');
+    expect(src).toContain('window.removeEventListener');
+    expect(src).toContain('window.cancelAnimationFrame');
   });
 });

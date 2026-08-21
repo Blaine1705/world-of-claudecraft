@@ -4367,6 +4367,7 @@ export const it_IT: EnTranslations = {
       "ifHighContrastBackground": "Uno sfondo più semplice e a contrasto più elevato dietro le schermate iniziale e dei personaggi.",
       "ifInvertLookY": "Inverte la direzione su e giù della visuale con il mouse.",
       "ifShowItemLevel": "Aggiunge una riga di livello oggetto a ogni suggerimento degli oggetti. Disattivata di default, il che mantiene il classico suggerimento con le sole statistiche.",
+      "ifShowReliquaryTracker": "Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.",
       "ifShowPlaytime": "Mostra il tuo tempo di gioco complessivo sulla scheda del personaggio. Attivata di default, e la scheda ha un pulsante a forma di occhio che la nasconde per dispositivo, comodo se streammi o fai screenshot. Il totale continua comunque a contare.",
       "ifShowOwnNameplate": "Disegna la tua targhetta sopra la testa esattamente come la vedono gli altri giocatori, decorazioni comprese. Disattivala per la visuale classica.",
       "ifShowPlayerNameplates": "Disegna le targhette degli altri giocatori. Disattivata sgombra un hub affollato, e il tuo bersaglio attuale resta comunque leggibile.",

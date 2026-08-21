@@ -4366,12 +4366,14 @@
   body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-chevron {
     display: none;
   }
+  /* ---------- mobile tracker chips (compact) ---------- */
   /* Compact count chips, both trackers at once: with the rows folded away the
      header is the whole surface, and the desktop treatment (14px title font on
      a bare underlined button) read enormous over the world on a 390px-tall
      phone. Restyle it as a pill in the minimap cluster's own chrome (the clock
      pill's palette) and hug the right rail under the minimap; the coarse-pointer
-     40px min-height keeps the tap target. */
+     40px min-height keeps the tap target. Its own banner section because the
+     rule spans BOTH trackers (the corpus scan credits by section). */
   body.mobile-touch.hud-mobile-compact #deed-tracker .dt-header,
   body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-header {
     margin: 0 0 4px auto;

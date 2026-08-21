@@ -6270,6 +6270,7 @@ export type TranslationKeyFlat =
   | 'guide.settingsPage.ifShowOwnNameplate'
   | 'guide.settingsPage.ifShowPlayerNameplates'
   | 'guide.settingsPage.ifShowPlaytime'
+  | 'guide.settingsPage.ifShowReliquaryTracker'
   | 'guide.settingsPage.ifStartAttack'
   | 'guide.settingsPage.ifStickyTarget'
   | 'guide.settingsPage.ifStopAutoAttack'

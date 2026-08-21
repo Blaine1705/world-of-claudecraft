@@ -12685,6 +12685,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifPlayerFrameScale': '自分のユニットフレームの大きさです。',
   'guide.settingsPage.ifShowAttackButton': 'アクションバーに攻撃ボタンを明示的に置きます。',
   'guide.settingsPage.ifShowItemLevel': 'すべてのアイテムのツールチップにアイテムレベルの行を加えます。初期設定はオフで、ステータスだけの昔ながらのツールチップが保たれます。',
+  'guide.settingsPage.ifShowReliquaryTracker': '聖遺物庫トラッカー（ピン留めしたページとその進行状況）をHUDに表示するかどうか。聖遺物庫ウィンドウにも対応する目のボタンがあり、ページをピン留めするとトラッカーは再び表示されます。',
   'guide.settingsPage.ifShowOwnNameplate': '自分の頭上のネームプレートを、他のプレイヤーに見えているとおりに、飾りも含めて描画します。昔ながらの見た目にしたいならオフにしましょう。',
   'guide.settingsPage.ifShowPlayerNameplates': '他のプレイヤーのネームプレートを描画します。オフにすると混み合った拠点がすっきりしますし、現在のターゲットはどちらでも読み取れるままです。',
   'guide.settingsPage.ifShowPlaytime': 'キャラクターシートに累計のプレイ時間を表示します。初期設定はオンで、シートには端末ごとに表示を切り替える目のボタンもあるので、配信やスクリーンショットのときに便利です。合計時間はどちらの場合も数え続けられます。',

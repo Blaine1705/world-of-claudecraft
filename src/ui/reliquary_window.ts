@@ -879,8 +879,13 @@ export class ReliquaryWindow {
         ownedFilter: input.ownedFilter,
         // Painter-side dimension: the rarity aggregate is window state (fetched
         // per open), not world state, so the generation rides here rather than
-        // in the pure sig fold.
-      }) + `|r${this.rarityGen}`
+        // in the pure sig fold. The tracker-visibility switch rides beside it
+        // for the same reason: the summary's eye renders from
+        // deps.trackerShown(), and without this dimension a flip landing while
+        // the window is open (today unreachable, the options window closes
+        // others, but that is a coincidence not a contract) would strand the
+        // eye's pressed state until an unrelated repaint.
+      }) + `|r${this.rarityGen}|t${this.deps.trackerShown() ? 1 : 0}`
     );
   }
 
@@ -920,8 +925,11 @@ export class ReliquaryWindow {
     // toggle whose accessible NAME stays constant while aria-pressed carries
     // the state; the action hint rides the shared tooltip seam in wire()
     // (this window never uses a native title attribute, a pinned contract).
-    // It lives on the summary band so it is visible from every shelf, right
-    // where the tracked count the strip mirrors is read out.
+    // Polarity is a deliberate ruling: pressed means "the tracker is SHOWN"
+    // (pressed = feature on, the standard toggle-button reading). The playtime
+    // eye inverts that (pressed = hidden); if the two are ever unified, this
+    // is the form to keep. It lives on the summary band so it is visible from
+    // every shelf, right where the tracked count the strip mirrors is read out.
     const shown = this.deps.trackerShown();
     return (
       `<div class="reliquary-summary${sealClass}"${sealAttr}>` +

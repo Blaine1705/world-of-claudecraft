@@ -4367,6 +4367,7 @@ export const fr_FR: EnTranslations = {
       "ifHighContrastBackground": "Un arrière-plan plus sobre et à contraste plus élevé derrière les écrans de démarrage et de personnage.",
       "ifInvertLookY": "Inverse le sens haut-bas de la visée à la souris.",
       "ifShowItemLevel": "Ajoute une ligne de niveau d'objet à chaque infobulle d'objet. Désactivé par défaut, ce qui conserve l'infobulle classique, uniquement centrée sur les statistiques.",
+      "ifShowReliquaryTracker": "Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.",
       "ifShowPlaytime": "Affiche votre temps de jeu cumulé sur la feuille de personnage. Activé par défaut, et la feuille comporte un bouton en forme d'œil qui le bascule par appareil, pratique si vous diffusez ou prenez des captures d'écran. Le total continue de s'accumuler dans tous les cas.",
       "ifShowOwnNameplate": "Affiche votre propre plaque de nom au-dessus de votre tête, exactement comme les autres joueurs la voient, fioritures comprises. Désactivez-la pour la vue classique.",
       "ifShowPlayerNameplates": "Affiche les plaques de nom des autres joueurs. Désactivée, elle désencombre une ville animée, et votre cible actuelle reste lisible dans tous les cas.",

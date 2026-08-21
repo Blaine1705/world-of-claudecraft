@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -40,6 +41,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "es_ES": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -70,6 +72,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "fr_FR": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -100,6 +103,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "fr_CA": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -131,6 +135,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -161,6 +166,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "de_DE": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -203,6 +209,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "pt_BR": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -236,6 +243,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -266,6 +274,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "nl_NL": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -296,6 +305,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "pl_PL": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -326,6 +336,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "id_ID": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -356,6 +367,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "tr_TR": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -386,6 +398,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "sv_SE": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -416,6 +429,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "vi_VN": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -446,6 +460,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "da_DK": [
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",

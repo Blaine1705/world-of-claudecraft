@@ -752,6 +752,36 @@ describe('tracker chrome', () => {
     expect(stripComments(hud)).toContain('onPinChanged: () => this.updateReliquaryTracker(),');
   });
 
+  it('wires the master switch to the ONE persisted key, read and written alike', () => {
+    // The literal key is the contract three surfaces share (the tracker build,
+    // the window eye, the Options row): a drifted spelling on any one of them
+    // would fork the switch into two settings that both look right alone.
+    expect(trackerBody, 'enabled read').toContain(
+      "input.enabled = (settings?.get('showReliquaryTracker') ?? true) === true;",
+    );
+    const hudStripped = stripComments(hud);
+    expect(hudStripped, 'window read').toContain(
+      "trackerShown: () => (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true,",
+    );
+    // The write routes through the options seam (the playtime-eye doctrine),
+    // never a bare settings.set: the eye and the Options row keep ONE write
+    // path, so a future applySetting side effect for this key reaches both.
+    expect(hudStripped, 'window write').toContain(
+      "this.optionsHooks?.onSettingChange('showReliquaryTracker', shown);",
+    );
+  });
+
+  it('couples the empty-tracker gap reclaim to the quest tracker really emptying', () => {
+    // hud.css drops an EMPTY stack child from the flex flow so the strip sits
+    // where the quest tracker would (no phantom gap with zero quests). CSS
+    // :empty matches only a childless, textless node, so the rule only works
+    // while the questless render is the empty STRING; pin both halves so
+    // either drifting alone fails here.
+    expect(hudCss).toContain('#right-tracker-stack > :empty');
+    const questController = read('../src/ui/hud/quest/quest_tracker_controller.ts');
+    expect(stripComments(questController)).toContain("if (!view.visible) return '';");
+  });
+
   it('wires the tracker container in BOTH game entries, under the deed tracker', () => {
     for (const html of [indexHtml, playHtml]) {
       // No aria-hidden on the container: the collapse header is a real,

@@ -4367,6 +4367,7 @@ export const zh_TW: EnTranslations = {
       "ifHighContrastBackground": "在起始畫面與角色畫面後方使用較樸素、對比較高的背景。",
       "ifInvertLookY": "反轉滑鼠視角的上下方向。",
       "ifShowItemLevel": "在每個物品提示框上加一行裝備等級。預設關閉，以保留經典的純屬性提示框。",
+      "ifShowReliquaryTracker": "控制聖物庫追蹤器（你釘選的書頁及其進度）是否顯示在介面上。聖物庫視窗中有對應的眼睛按鈕，釘選書頁時追蹤器也會重新開啟。",
       "ifShowPlaytime": "在角色面板上顯示你的生涯遊戲時長。預設開啟，而面板上有一個眼睛按鈕可以依裝置切換顯示與否，實況或截圖時很好用。無論如何，總時數都會繼續累計。",
       "ifShowOwnNameplate": "把你自己頭上的名條，完全照別的玩家看到的樣子畫出來，連裝飾都一併呈現。想要經典的視野就把它關掉。",
       "ifShowPlayerNameplates": "畫出其他玩家的名條。關閉能讓擁擠的主據點清爽許多，而無論哪一種，你目前的目標都保持清楚可讀。",

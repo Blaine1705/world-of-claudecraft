@@ -8211,6 +8211,7 @@
      being on screen. Pushed to the row's end so the readouts keep their left
      rhythm; the pin-button chip palette keeps it in the window's family. */
   .reliquary-tracker-toggle {
+    position: relative;
     flex: none;
     margin-left: auto;
     display: inline-flex;
@@ -8225,6 +8226,15 @@
     color: #ffe6a8;
     cursor: var(--cursor-point);
     white-space: nowrap;
+  }
+  /* Invisible hit extension over the ~20px visual pill (the char-playtime-eye
+     idiom, DESIGN.md 10.1): desktop pointer target clears the WCAG 2.5.8
+     floor; the mobile arm below keeps the 40px min-height instead. */
+  .reliquary-tracker-toggle::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 999px;
   }
   .reliquary-tracker-toggle .ui-icon {
     width: 14px;

@@ -12376,6 +12376,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAttackButton': '在你的動作列上放一個明確的「攻擊」按鈕。',
   'guide.settingsPage.ifShowItemLevel':
     '在每個物品提示框上加一行裝備等級。預設關閉，以保留經典的純屬性提示框。',
+  'guide.settingsPage.ifShowReliquaryTracker': '控制聖物庫追蹤器（你釘選的書頁及其進度）是否顯示在介面上。聖物庫視窗中有對應的眼睛按鈕，釘選書頁時追蹤器也會重新開啟。',
   'guide.settingsPage.ifShowOwnNameplate':
     '把你自己頭上的名條，完全照別的玩家看到的樣子畫出來，連裝飾都一併呈現。想要經典的視野就把它關掉。',
   'guide.settingsPage.ifShowPlayerNameplates':

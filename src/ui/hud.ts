@@ -4858,12 +4858,12 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#reliquary-window'),
     onPinChanged: () => this.updateReliquaryTracker(),
-    // The tracker's master visibility switch (the window's eye toggle and the
-    // Interface options row share the persisted setting; updateReliquaryTracker
-    // reads the same key as its `enabled` input).
+    // The tracker's master visibility switch; the write routes through the
+    // options seam (the playtime-eye doctrine: the eye and the Options row
+    // share ONE write path, so a future applySetting side effect reaches both).
     trackerShown: () => (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true,
     setTrackerShown: (shown) => {
-      this.optionsHooks?.settings.set('showReliquaryTracker', shown);
+      this.optionsHooks?.onSettingChange('showReliquaryTracker', shown);
       this.updateReliquaryTracker();
     },
   });
@@ -4889,11 +4889,10 @@ export class Hud {
     writers: this.writerFacet,
   });
   // Seats #right-tracker-stack below the minimap column's REAL rendered bottom
-  // (a wrapping zone label, the mobile chrome scale, and the compact-tier
-  // transform all move it), replacing the per-tier stylesheet constant that let
-  // the stack slide under the minimap. Re-applied from the slow band and on
-  // resize; the zoom pill and clock are the two absolutes that overhang the
-  // wrap's own box (see tracker_stack_anchor.ts).
+  // (a wrapping zone label, the mobile chrome scale, and the compact transform
+  // all move it past any stylesheet constant); slow band plus coalesced resize,
+  // with the zoom pill and clock as the two overhangs (tracker_stack_anchor.ts).
+  // The install's dispose is deliberately dropped: one Hud per page load.
   private readonly trackerStackAnchor = installTrackerStackAnchor({
     stack: () => $('#right-tracker-stack'),
     minimapWrap: () => $('#minimap-wrap'),
@@ -4902,7 +4901,7 @@ export class Hud {
       document.querySelector('#minimap-clock'),
     ],
     uiScale: () => getUiScale(),
-  });
+  }).anchor;
   // Event calendar window painter (calendar_view.ts month-grid core +
   // calendar_window.ts painter). System events expand from data rules; guild
   // events read the socialInfo mirror and book/remove through IWorld.
@@ -9864,8 +9863,7 @@ export class Hud {
     // The Reliquary tracker is always-on chrome for the same reason: pinned
     // pages fill from normal play, and an illuminated page drops off.
     if (slowHud) this.updateReliquaryTracker();
-    // Re-seat the tracker stack under the minimap column (bounded layout read;
-    // the module comment carries the cadence contract).
+    // Re-seat the tracker stack under the minimap column (bounded layout read).
     if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();

@@ -4367,6 +4367,7 @@ export const vi_VN: EnTranslations = {
       "ifHighContrastBackground": "Một nền đơn giản hơn, tương phản cao hơn phía sau màn hình khởi động và màn hình nhân vật.",
       "ifInvertLookY": "Đảo ngược hướng lên xuống khi nhìn bằng chuột.",
       "ifShowItemLevel": "Thêm một dòng cấp vật phẩm vào mọi chú thích vật phẩm. Mặc định tắt, giữ nguyên chú thích cổ điển chỉ hiện chỉ số.",
+      "ifShowReliquaryTracker": "Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.",
       "ifShowPlaytime": "Hiện tổng thời gian chơi trọn đời trên bảng nhân vật. Mặc định bật, và bảng nhân vật có một nút hình con mắt để bật/tắt riêng theo từng thiết bị, tiện lợi nếu bạn livestream hoặc chụp ảnh màn hình. Tổng thời gian vẫn tiếp tục được tính dù bật hay tắt.",
       "ifShowOwnNameplate": "Vẽ bảng tên phía trên đầu của chính bạn giống hệt như cách người chơi khác nhìn thấy, đầy đủ mọi điểm nhấn. Tắt đi để có góc nhìn cổ điển.",
       "ifShowPlayerNameplates": "Vẽ bảng tên của người chơi khác. Tắt đi giúp một khu trung tâm đông đúc bớt rối mắt, và mục tiêu hiện tại của bạn vẫn luôn đọc được dù có bật hay không.",
