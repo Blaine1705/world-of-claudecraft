@@ -28,6 +28,7 @@ import {
 import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
+import { helmSlotAvailable } from '../render/characters/player_look_core';
 import {
   isComposedPortraitKey,
   onPortraitsReady,
@@ -5060,6 +5061,10 @@ export class Hud {
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
     showError: (text) => this.showError(text),
+    // See player_look_core.ts helmSlotAvailable: false for a class kit with no
+    // head geometry or a Combat Mech wearer, so the eye offers nothing broken.
+    helmSlotAvailable: () =>
+      helmSlotAvailable(this.sim.cfg.playerClass, isMechWearer(this.sim.player)),
     helmHidden: () => this.sim.player?.helmHidden ?? false,
     toggleHelm: () => {
       const next = !(this.sim.player?.helmHidden ?? false);
