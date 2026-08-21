@@ -2576,6 +2576,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'グローバルクールダウン外',
   'abilityUi.tooltip.friendlyTarget': '味方対象',
   'abilityUi.tooltip.enemyTarget': '敵対象',
+  'abilityUi.tooltip.anyTarget': '敵味方いずれかの対象',
   'abilityUi.tooltip.selfOnly': '自分のみ',
   'abilityUi.tooltip.damageRange': '{min}から{max}',
   'abilityUi.tooltip.finisherDamage': '{base}にコンボポイントごと{perCombo}',
@@ -3061,6 +3062,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': '鉛の毒',
   'entities.abilities.crippling_poison.description':
     '対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。',
+  'entities.abilities.melting_acid.name': '融解の酸',
+  'entities.abilities.melting_acid.description':
+    '対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与えるとともに、12秒間、防御力を5%低下させます。',
+  'entities.abilities.nightshade_coating.name': 'ナイトシェードの塗毒',
+  'entities.abilities.nightshade_coating.description':
+    '対象をナイトシェードの毒で覆い、{damage}の自然ダメージを与えるとともに、12秒間、受ける治癒量を25%低下させます。',
   'entities.abilities.expose_armor.name': '装甲破り',
   'entities.abilities.expose_armor.description': '対象の守りを30秒間暴くフィニッシュ技。消費したコンボポイント1つにつき防御力を2%下げます（コンボポイント5：{damage}%）。',
   'entities.abilities.rupture.name': '止まらぬ出血',

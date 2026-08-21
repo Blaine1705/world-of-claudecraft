@@ -8796,6 +8796,7 @@ export const zh_CN: EnTranslations = {
       "offGlobalCooldown": "不触发公共冷却",
       "friendlyTarget": "友方目标",
       "enemyTarget": "敌方目标",
+      "anyTarget": "敌方或友方目标",
       "selfOnly": "仅对自己",
       "damageRange": "{min} 到 {max}",
       "finisherDamage": "{base} 加每个连击点 {perCombo}"
@@ -9583,6 +9584,14 @@ export const zh_CN: EnTranslations = {
       "crippling_poison": {
         "name": "沉铅毒液",
         "description": "以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。"
+      },
+      "melting_acid": {
+        "name": "熔蚀之酸",
+        "description": "以腐蚀性毒液泼洒目标，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。"
+      },
+      "nightshade_coating": {
+        "name": "夜影涂层",
+        "description": "为目标涂上夜影毒，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。"
       },
       "expose_armor": {
         "name": "护甲突破",

@@ -8796,6 +8796,7 @@ export const zh_TW: EnTranslations = {
       "offGlobalCooldown": "不觸發公共冷卻",
       "friendlyTarget": "友方目標",
       "enemyTarget": "敵方目標",
+      "anyTarget": "敵方或友方目標",
       "selfOnly": "僅對自己",
       "damageRange": "{min} 到 {max}",
       "finisherDamage": "{base} 加每個連擊點 {perCombo}"
@@ -9583,6 +9584,14 @@ export const zh_TW: EnTranslations = {
       "crippling_poison": {
         "name": "沉鉛之毒",
         "description": "用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。"
+      },
+      "melting_acid": {
+        "name": "熔蝕之酸",
+        "description": "以腐蝕性毒液潑灑目標，造成 {damage} 點自然傷害，並使其護甲降低 5%，持續 12 秒。"
+      },
+      "nightshade_coating": {
+        "name": "夜影塗層",
+        "description": "為目標塗上夜影之毒，造成 {damage} 點自然傷害，並使其受到的治療降低 25%，持續 12 秒。"
       },
       "expose_armor": {
         "name": "裂甲",

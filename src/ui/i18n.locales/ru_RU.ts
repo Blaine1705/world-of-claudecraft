@@ -2606,6 +2606,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'Вне глобального восстановления',
   'abilityUi.tooltip.friendlyTarget': 'Дружественная цель',
   'abilityUi.tooltip.enemyTarget': 'Вражеская цель',
+  'abilityUi.tooltip.anyTarget': 'Врага или союзника',
   'abilityUi.tooltip.selfOnly': 'Только на себя',
   'abilityUi.tooltip.damageRange': 'от {min} до {max}',
   'abilityUi.tooltip.finisherDamage': '{base} плюс {perCombo} за прием серии',
@@ -3086,6 +3087,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': 'Свинцовый яд',
   'entities.abilities.crippling_poison.description':
     'Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек.',
+  'entities.abilities.melting_acid.name': 'Разъедающая кислота',
+  'entities.abilities.melting_acid.description':
+    'Обливает цель едким ядом, нанося {damage} ед. урона от сил природы и снижая ее броню на 5% на 12 сек.',
+  'entities.abilities.nightshade_coating.name': 'Паслёновая обмазка',
+  'entities.abilities.nightshade_coating.description':
+    'Покрывает цель паслёновым ядом, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек.',
   'entities.abilities.expose_armor.name': 'Пролом брони',
   'entities.abilities.expose_armor.description': 'Завершающий приём, обнажающий цель на 30 сек.: каждая потраченная серия приёмов снижает её броню на 2% (5 серий приёмов: {damage}%).',
   'entities.abilities.rupture.name': 'Истечение кровью',

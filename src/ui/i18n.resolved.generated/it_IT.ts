@@ -8796,6 +8796,7 @@ export const it_IT: EnTranslations = {
       "offGlobalCooldown": "Fuori dal recupero globale",
       "friendlyTarget": "Bersaglio amico",
       "enemyTarget": "Bersaglio nemico",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Solo su di sé",
       "damageRange": "{min} a {max}",
       "finisherDamage": "{base} più {perCombo} per punto combo"
@@ -9583,6 +9584,14 @@ export const it_IT: EnTranslations = {
       "crippling_poison": {
         "name": "Veleno Plumbeo",
         "description": "Colpisce il bersaglio con un veleno plumbeo, infliggendo {damage} danni della Natura e rallentando la sua velocità di movimento del 50% per 12 sec."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Breccia nell'Armatura",

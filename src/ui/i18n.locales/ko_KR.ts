@@ -2554,6 +2554,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '공용 재사용 대기시간 없음',
   'abilityUi.tooltip.friendlyTarget': '아군 대상',
   'abilityUi.tooltip.enemyTarget': '적 대상',
+  'abilityUi.tooltip.anyTarget': '적 또는 아군 대상',
   'abilityUi.tooltip.selfOnly': '자신에게만',
   'abilityUi.tooltip.damageRange': '{min}에서 {max}',
   'abilityUi.tooltip.finisherDamage': '기본 {base}, 연계 점수당 {perCombo}',
@@ -3035,6 +3036,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': '둔중한 독',
   'entities.abilities.crippling_poison.description':
     '둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다.',
+  'entities.abilities.melting_acid.name': '녹이는 산',
+  'entities.abilities.melting_acid.description':
+    '대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 입히고 12초 동안 방어도를 5% 감소시킵니다.',
+  'entities.abilities.nightshade_coating.name': '밤그늘 도포',
+  'entities.abilities.nightshade_coating.description':
+    '대상에게 밤그늘 독을 발라 {damage}의 자연 피해를 입히고 12초 동안 받는 치유량을 25% 감소시킵니다.',
   'entities.abilities.expose_armor.name': '방어구 돌파',
   'entities.abilities.expose_armor.description': '대상의 방비를 30초 동안 드러내는 마무리 기술. 소모한 연계 점수 하나당 방어도를 2% 낮춥니다 (연계 점수 5: {damage}%).',
   'entities.abilities.rupture.name': '과다출혈',

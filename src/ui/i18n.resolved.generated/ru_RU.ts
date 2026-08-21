@@ -8796,6 +8796,7 @@ export const ru_RU: EnTranslations = {
       "offGlobalCooldown": "Вне глобального восстановления",
       "friendlyTarget": "Дружественная цель",
       "enemyTarget": "Вражеская цель",
+      "anyTarget": "Врага или союзника",
       "selfOnly": "Только на себя",
       "damageRange": "от {min} до {max}",
       "finisherDamage": "{base} плюс {perCombo} за прием серии"
@@ -9583,6 +9584,14 @@ export const ru_RU: EnTranslations = {
       "crippling_poison": {
         "name": "Свинцовый яд",
         "description": "Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек."
+      },
+      "melting_acid": {
+        "name": "Разъедающая кислота",
+        "description": "Обливает цель едким ядом, нанося {damage} ед. урона от сил природы и снижая ее броню на 5% на 12 сек."
+      },
+      "nightshade_coating": {
+        "name": "Паслёновая обмазка",
+        "description": "Покрывает цель паслёновым ядом, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек."
       },
       "expose_armor": {
         "name": "Пролом брони",

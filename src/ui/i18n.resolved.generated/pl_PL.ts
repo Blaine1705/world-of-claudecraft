@@ -8796,6 +8796,7 @@ export const pl_PL: EnTranslations = {
       "offGlobalCooldown": "Poza globalnym czasem odnowienia",
       "friendlyTarget": "Cel przyjazny",
       "enemyTarget": "Cel wrogi",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Tylko na siebie",
       "damageRange": "{min} do {max}",
       "finisherDamage": "{base} plus {perCombo} za punkt kombinacji"
@@ -9583,6 +9584,14 @@ export const pl_PL: EnTranslations = {
       "crippling_poison": {
         "name": "Ołowiany jad",
         "description": "Uderza cel ołowianym jadem, zadając {damage} obrażeń od Natury i spowalniając jego prędkość ruchu o 50% na 12 sek."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Wyłom w pancerzu",

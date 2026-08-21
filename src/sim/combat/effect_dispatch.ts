@@ -20,6 +20,7 @@ import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
+import { incapacitateDrCategory } from '../incapacitate_dr';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import {
@@ -49,7 +50,7 @@ import {
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
 import { resolveTalentHitMult } from '../talent_hit_mult';
-import { addThreat, dropThreat } from '../threat';
+import { addThreat } from '../threat';
 import type { AbilityDef, Aura, Entity } from '../types';
 import {
   angleTo,
@@ -235,6 +236,7 @@ import {
   stoneboundThreatMultiplier,
 } from './shaman_warspirit';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { clearHostileTargetingOnStealth } from './stealth_focus';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 import { warlockFearBreakThreshold } from './warlock_fear';
@@ -273,7 +275,16 @@ function dropsCombatOnStealth(ability: AbilityDef): boolean {
   return ability.id === 'vanish';
 }
 
-function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
+/**
+ * The combat-drop half of Vanish: clear the caster's own combat state (and the
+ * pet's, which escapes with its owner) and report the EXTRA ids the hostile
+ * scan must shake loose beyond the caster itself.
+ *
+ * It deliberately does not run that scan: the caller hands these ids to
+ * `clearHostileTargetingOnStealth`, which every stealth entry already runs, so
+ * the world-wide entity sweep happens once per cast instead of twice.
+ */
+function dropSelfFromCombat(ctx: SimContext, p: Entity): readonly number[] {
   p.combatTimer = 5;
   p.inCombat = false;
   p.autoAttack = false;
@@ -283,33 +294,12 @@ function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
   delete p.queuedOnSwingCostMultiplier;
 
   const pet = ctx.petOf(p.id);
-  const escapeIds = pet ? [p.id, pet.id] : [p.id];
-  if (pet) {
-    pet.combatTimer = 5;
-    pet.inCombat = false;
-    pet.aggroTargetId = null;
-    pet.targetId = null;
-  }
-
-  for (const entity of ctx.entities.values()) {
-    if (entity.kind !== 'mob' || entity.dead || !ctx.isHostileTo(p, entity)) continue;
-    let dropped = false;
-    for (const id of escapeIds) {
-      if (entity.threat.has(id) || entity.forcedTargetId === id) dropped = true;
-      dropThreat(entity, id);
-      if (entity.aggroTargetId === id) {
-        entity.aggroTargetId = null;
-        dropped = true;
-      }
-    }
-    if (!dropped) continue;
-    if (entity.ownerId !== null) {
-      if (entity.aggroTargetId === null) entity.inCombat = false;
-    } else if (entity.threat.size === 0 && entity.aggroTargetId === null) {
-      entity.aiState = 'evade';
-      entity.inCombat = false;
-    }
-  }
+  if (!pet) return [];
+  pet.combatTimer = 5;
+  pet.inCombat = false;
+  pet.aggroTargetId = null;
+  pet.targetId = null;
+  return [pet.id];
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -2083,8 +2073,13 @@ export function runEffects(
       }
       case 'incapacitate': {
         if (!target || target.dead) break;
-        const remaining = ability.fearDr
-          ? ctx.diminishedCrowdControlDuration(p, target, 'fear', eff.duration)
+        // Fear keeps its own ladder; every other incapacitate asks
+        // incapacitateDrCategory, which today diminishes Sap alone (and returns
+        // null, meaning "no ladder", for the rest). Deterministic either way:
+        // the resolver draws no rng.
+        const incapDrCategory = ability.fearDr ? 'fear' : incapacitateDrCategory(ability.id);
+        const remaining = incapDrCategory
+          ? ctx.diminishedCrowdControlDuration(p, target, incapDrCategory, eff.duration)
           : eff.duration;
         if (remaining === null) break;
         const warlockBreakThreshold = warlockFearBreakThreshold(ability.id, target.maxHp);
@@ -2140,7 +2135,11 @@ export function runEffects(
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
         }
-        ctx.enterCombat(p, target);
+        // Sap (noCombatEntry) is the classic out-of-combat setup tool: it must
+        // leave BOTH sides out of combat. Entering combat here aggroed the
+        // victim on the spot, so the moment the incapacitate expired it charged
+        // the rogue who was still standing there in Duskveil.
+        if (!ability.noCombatEntry) ctx.enterCombat(p, target);
         break;
       }
       case 'polymorph': {
@@ -3533,8 +3532,14 @@ export function runEffects(
             ability: ability.id,
           });
         }
-        if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
-          dropSelfFromHostileFocus(ctx, p);
+        if (eff.kind === 'stealth') {
+          // Concealment drops every hostile's LOCK on the caster, not just what
+          // they can newly acquire: a pet that already had the rogue targeted
+          // used to keep hitting them right through Duskveil (the PvP report).
+          // Vanish also drops the caster (and pet) out of combat first, so both
+          // halves settle in the SAME hostile sweep rather than one each.
+          const alsoDropped = dropsCombatOnStealth(ability) ? dropSelfFromCombat(ctx, p) : [];
+          clearHostileTargetingOnStealth(ctx, p, alsoDropped);
         }
         recalcPlayerStats(
           p,

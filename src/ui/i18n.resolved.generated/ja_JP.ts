@@ -8796,6 +8796,7 @@ export const ja_JP: EnTranslations = {
       "offGlobalCooldown": "グローバルクールダウン外",
       "friendlyTarget": "味方対象",
       "enemyTarget": "敵対象",
+      "anyTarget": "敵味方いずれかの対象",
       "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
@@ -9583,6 +9584,14 @@ export const ja_JP: EnTranslations = {
       "crippling_poison": {
         "name": "鉛の毒",
         "description": "対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。"
+      },
+      "melting_acid": {
+        "name": "融解の酸",
+        "description": "対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与えるとともに、12秒間、防御力を5%低下させます。"
+      },
+      "nightshade_coating": {
+        "name": "ナイトシェードの塗毒",
+        "description": "対象をナイトシェードの毒で覆い、{damage}の自然ダメージを与えるとともに、12秒間、受ける治癒量を25%低下させます。"
       },
       "expose_armor": {
         "name": "装甲破り",

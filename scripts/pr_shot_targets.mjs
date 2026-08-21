@@ -5794,6 +5794,115 @@ export const TARGETS = [
     },
   },
   {
+    key: 'ability-tooltip',
+    label: 'Ability tooltip + spellbook row (what a kit change actually reads as)',
+    // An ability's COPY is its whole player-facing surface: what the spellbook row
+    // and the hovered #tooltip say. No in-world HUD frame shows it, so a kit change
+    // (a reworded tooltip, a new requirement line, a newly learned ability) has no
+    // reviewable evidence without this target. Keyed to the modules that decide that
+    // copy rather than to a class table, so it fires for the change that owns the
+    // wording and not for every content edit.
+    when: [
+      'ui/hud/action_bar/ability_requirement_keys',
+      'sim/incapacitate_dr',
+      'sim/combat/stealth_focus',
+    ],
+    variants: [
+      // Every variant enters as the class that OWNS the ability: the standalone
+      // page enters with variant.charClass, and the default (warrior) knows none
+      // of these, which reads as "not known at level 20".
+      // The two utility poisons: new rows, so their BEFORE is "not in the book".
+      {
+        key: 'melting-acid',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'melting_acid',
+      },
+      {
+        key: 'nightshade-coating',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'nightshade_coating',
+      },
+      // Reworded copy: Sap gained its no-fight clause.
+      { key: 'sap', charClass: 'rogue', charName: 'Nightsliver', abilityId: 'sap' },
+      // Shadeslip is a row-5 talent grant, so the recipe allocates before it
+      // resolves. It carries the new "Enemy or friendly target" requirement line.
+      {
+        key: 'shadeslip',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'shadowstep',
+        talentRow: { 5: 'rog_r5_shadeslip' },
+      },
+      {
+        key: 'shadeslip-mobile',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'shadowstep',
+        talentRow: { 5: 'rog_r5_shadeslip' },
+        mobile: true,
+      },
+    ],
+    async capture(page, variant) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // The Escape above dismisses the entry overlays but also opens the game
+        // menu, which then sits behind the spellbook in frame. Close it through
+        // its own control so the shot is only the surface under review.
+        document.querySelector('#options-menu [data-close]')?.click();
+      });
+      await wait(300);
+      const setup = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { known: false };
+        sim.setPlayerLevel?.(20, player.id);
+        if (shot.talentRow) sim.applyTalents?.({ spec: null, rows: shot.talentRow }, player.id);
+        const resolved = sim.resolvedAbility?.(shot.abilityId);
+        game.hud.toggleSpellbook?.();
+        return { known: !!resolved, abilityName: resolved?.def.name ?? shot.abilityId };
+      }, variant);
+      if (!setup.known) throw new Error(`${variant.abilityId} is not known at level 20`);
+      if (!(await pollForSize(page, '#spellbook', 20, 250))) {
+        throw new Error('spellbook did not open');
+      }
+      // Hover the row through the real listeners so the SHARED #tooltip paints the
+      // copy under test, rather than asserting on the row markup alone.
+      await page.evaluate((shot) => {
+        const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
+        row?.scrollIntoView({ block: 'center' });
+        row?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        row?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      }, variant);
+      await wait(500);
+      const shown = await page.evaluate((shot) => {
+        const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
+        const tip = document.querySelector('#tooltip');
+        return {
+          row: !!row && getComputedStyle(row).display !== 'none',
+          tooltip: !!tip && getComputedStyle(tip).display !== 'none' && !!tip.textContent?.trim(),
+        };
+      }, variant);
+      if (!shown.row) throw new Error(`no spellbook row for ${variant.abilityId}`);
+      // The hovered tooltip is a POINTER surface: a touch viewport has no hover,
+      // so the mobile variant is about the spellbook ROW reading correctly at
+      // phone width and deliberately makes no tooltip claim. Asserting one there
+      // would fail on a platform difference rather than on a regression.
+      if (!variant.mobile && !shown.tooltip) {
+        throw new Error(`tooltip did not paint for ${variant.abilityId}`);
+      }
+      // Full frame on purpose: the shared #tooltip renders OUTSIDE #spellbook, so
+      // clipping to the window would cut off the copy this target exists to show.
+      return {};
+    },
+  },
+  {
     key: 'class-colors',
     label: 'Class color palette: chat names, party frames + minimap dots, character model',
     // .ts-suffixed so the substring does NOT also fire on tests/class_colors.test.ts

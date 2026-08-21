@@ -8796,6 +8796,7 @@ export const sv_SE: EnTranslations = {
       "offGlobalCooldown": "Utanför den globala nedkylningen",
       "friendlyTarget": "Vänligt mål",
       "enemyTarget": "Fiendemål",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Endast dig själv",
       "damageRange": "{min} till {max}",
       "finisherDamage": "{base} plus {perCombo} per kombopoäng"
@@ -9583,6 +9584,14 @@ export const sv_SE: EnTranslations = {
       "crippling_poison": {
         "name": "Blytungt gift",
         "description": "Träffar målet med ett blytungt gift som vållar {damage} naturskada och saktar dess förflyttningshastighet med 50 % i 12 sek."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Rustningsbräsch",

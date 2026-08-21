@@ -8796,6 +8796,7 @@ export const nl_NL: EnTranslations = {
       "offGlobalCooldown": "Buiten de globale afkoeltijd",
       "friendlyTarget": "Vriendelijk doelwit",
       "enemyTarget": "Vijandig doelwit",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Alleen jezelf",
       "damageRange": "{min} tot {max}",
       "finisherDamage": "{base} plus {perCombo} per combopunt"
@@ -9583,6 +9584,14 @@ export const nl_NL: EnTranslations = {
       "crippling_poison": {
         "name": "Loodzwaar Gif",
         "description": "Treft het doelwit met een loodzwaar gif, brengt {damage} Natuurschade toe en vertraagt de bewegingssnelheid met 50% gedurende 12 sec."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Pantserbres",

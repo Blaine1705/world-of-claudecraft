@@ -8796,6 +8796,7 @@ export const tr_TR: EnTranslations = {
       "offGlobalCooldown": "Genel bekleme süresinden bağımsız",
       "friendlyTarget": "Dost hedef",
       "enemyTarget": "Düşman hedef",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Yalnızca kendine",
       "damageRange": "{min} ila {max}",
       "finisherDamage": "{base} artı her kombo puanı için {perCombo}"
@@ -9583,6 +9584,14 @@ export const tr_TR: EnTranslations = {
       "crippling_poison": {
         "name": "Kurşuni Zehir",
         "description": "Hedefe kurşun gibi ağır bir zehirle vurur, {damage} Doğa hasarı verir ve hareket hızını 12 saniye boyunca %50 yavaşlatır."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Zırh Gediği",

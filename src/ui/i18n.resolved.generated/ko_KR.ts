@@ -8796,6 +8796,7 @@ export const ko_KR: EnTranslations = {
       "offGlobalCooldown": "공용 재사용 대기시간 없음",
       "friendlyTarget": "아군 대상",
       "enemyTarget": "적 대상",
+      "anyTarget": "적 또는 아군 대상",
       "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
@@ -9583,6 +9584,14 @@ export const ko_KR: EnTranslations = {
       "crippling_poison": {
         "name": "둔중한 독",
         "description": "둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
+      },
+      "melting_acid": {
+        "name": "녹이는 산",
+        "description": "대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 입히고 12초 동안 방어도를 5% 감소시킵니다."
+      },
+      "nightshade_coating": {
+        "name": "밤그늘 도포",
+        "description": "대상에게 밤그늘 독을 발라 {damage}의 자연 피해를 입히고 12초 동안 받는 치유량을 25% 감소시킵니다."
       },
       "expose_armor": {
         "name": "방어구 돌파",

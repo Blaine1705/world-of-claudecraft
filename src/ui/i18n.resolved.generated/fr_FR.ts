@@ -8796,6 +8796,7 @@ export const fr_FR: EnTranslations = {
       "offGlobalCooldown": "Hors temps de recharge global",
       "friendlyTarget": "Cible alliée",
       "enemyTarget": "Cible ennemie",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Sur soi uniquement",
       "damageRange": "{min} à {max}",
       "finisherDamage": "{base} plus {perCombo} par point de combo"
@@ -9583,6 +9584,14 @@ export const fr_FR: EnTranslations = {
       "crippling_poison": {
         "name": "Venin de plomb",
         "description": "Frappe la cible avec un venin de plomb, infligeant {damage} dégâts de Nature et réduisant sa vitesse de déplacement de 50% pendant 12 s."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Brèche d'armure",

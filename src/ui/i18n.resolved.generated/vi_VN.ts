@@ -8796,6 +8796,7 @@ export const vi_VN: EnTranslations = {
       "offGlobalCooldown": "Không tính vào hồi chiêu toàn cục",
       "friendlyTarget": "Mục tiêu đồng minh",
       "enemyTarget": "Mục tiêu địch",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Chỉ bản thân",
       "damageRange": "{min} đến {max}",
       "finisherDamage": "{base} cộng {perCombo} mỗi điểm combo"
@@ -9583,6 +9584,14 @@ export const vi_VN: EnTranslations = {
       "crippling_poison": {
         "name": "Nọc Độc Chì",
         "description": "Đánh mục tiêu bằng một loại nọc độc nặng như chì, gây {damage} sát thương Tự Nhiên và giảm 50% tốc độ di chuyển của nó trong 12 giây."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Xuyên Phá Giáp",

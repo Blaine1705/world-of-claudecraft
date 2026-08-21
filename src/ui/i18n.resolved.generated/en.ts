@@ -8796,6 +8796,7 @@ export const en: EnTranslations = {
       "offGlobalCooldown": "Off the global cooldown",
       "friendlyTarget": "Friendly target",
       "enemyTarget": "Enemy target",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Self only",
       "damageRange": "{min} to {max}",
       "finisherDamage": "{base} plus {perCombo} per combo point"
@@ -9578,11 +9579,19 @@ export const en: EnTranslations = {
       },
       "sap": {
         "name": "Sap",
-        "description": "Incapacitates the target for 8 sec. Must be stealthed and out of combat. Any damage breaks the effect."
+        "description": "Incapacitates the target for 8 sec without breaking Duskveil or starting a fight. Must be stealthed and out of combat. Any damage breaks the effect."
       },
       "crippling_poison": {
         "name": "Leaden Venom",
         "description": "Strikes the target with a leaden venom, dealing {damage} Nature damage and slowing its movement speed by 50% for 12 sec."
+      },
+      "melting_acid": {
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Armor Breach",

@@ -1045,6 +1045,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Festering Venom"
       },
       {
+        "id": "melting_acid",
+        "name": "Melting Acid"
+      },
+      {
+        "id": "nightshade_coating",
+        "name": "Nightshade Coating"
+      },
+      {
         "id": "blind",
         "name": "Dirt Toss"
       },

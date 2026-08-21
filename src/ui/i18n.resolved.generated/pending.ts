@@ -10,7 +10,12 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -42,7 +47,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "es_ES": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -74,7 +84,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "fr_FR": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -106,7 +121,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "fr_CA": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -139,7 +159,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -171,7 +196,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "de_DE": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -215,7 +245,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "pt_BR": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -250,7 +285,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -282,7 +322,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "nl_NL": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -314,7 +359,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "pl_PL": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -346,7 +396,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "id_ID": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -378,7 +433,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "tr_TR": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -410,7 +470,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "sv_SE": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -442,7 +507,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "vi_VN": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -474,7 +544,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "da_DK": [
+    "abilityUi.tooltip.anyTarget",
     "desktop.window.exitToDesktop",
+    "entities.abilities.melting_acid.description",
+    "entities.abilities.melting_acid.name",
+    "entities.abilities.nightshade_coating.description",
+    "entities.abilities.nightshade_coating.name",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
