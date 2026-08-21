@@ -2062,6 +2062,10 @@ export const sv_SE: EnTranslations = {
       "errPasswordLong": "Det nya lösenordet får vara högst 128 tecken.",
       "errPasswordUnchanged": "Det nya lösenordet måste skilja sig från det nuvarande.",
       "errPasswordConfirm": "De nya lösenorden stämmer inte överens.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "E-post (valfritt)",
       "emailHint": "Används endast för kontoåterställning. Använd Ändra e-post nedan för att uppdatera den.",
       "saveEmail": "Spara e-post",
@@ -3899,7 +3903,8 @@ export const sv_SE: EnTranslations = {
       "password_too_long": "Det nya lösenordet får vara högst 128 tecken.",
       "characters_online": "Logga ut alla dina karaktärer innan du inaktiverar kontot.",
       "deactivated": "Detta konto har inaktiverats. Kontakta en administratör för att återställa det.",
-      "not_found": "Kontot hittades inte."
+      "not_found": "Kontot hittades inte.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Ogiltigt karaktärsnamn. Använd 2-16 bokstäver.",

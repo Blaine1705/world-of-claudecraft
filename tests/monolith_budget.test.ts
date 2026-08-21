@@ -241,7 +241,11 @@ const MONOLITHS: MonolithRow[] = [
     // cover joining it) net against the base's pad-selection extraction plus
     // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
     // landing below both parents' pins. Any further growth reds again.
-    ceiling: 11516,
+    // Lowered again after extracting the account-portal DOM painters
+    // (setAccountFieldMsg, paintTwoFactorStatus, paintAccountPortal) into the
+    // new src/ui/account_portal_painter.ts, which paid for the Set-a-Password
+    // account-portal wiring the same change adds (net -20).
+    ceiling: 11500,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -40,6 +40,7 @@ import {
   handleAccountPasswordReset,
   handleAccountSetEmail,
   handleAccountSetInitialEmail,
+  handleAccountSetInitialPassword,
   handleAccountWhoami,
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
@@ -2267,6 +2268,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleAccountChangePassword(req, res, accountId, callerToken, {
         disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
       });
+    }
+    // Set a real password on an account that has none yet (an Apple- or
+    // Discord-provisioned account whose only credential is a random placeholder
+    // hash the owner never saw). Bearer-scoped; rejects once a real password
+    // already exists (that must go through the change-password flow above).
+    if (req.method === 'POST' && url === '/api/account/password/set-initial') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleAccountSetInitialPassword(req, res, accountId);
     }
     // Password reset is for users who are locked out, so both routes are
     // unauthenticated (rate-limited + web-login guarded above, and each handler is

@@ -10,6 +10,11 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -36,6 +41,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "es_ES": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -62,6 +72,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_FR": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -88,6 +103,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_CA": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -115,6 +135,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -141,6 +166,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "de_DE": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -179,6 +209,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "pt_BR": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -208,6 +243,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -234,6 +274,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "nl_NL": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -260,6 +305,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "pl_PL": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -286,6 +336,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "id_ID": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -312,6 +367,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "tr_TR": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -338,6 +398,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "sv_SE": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -364,6 +429,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "vi_VN": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -390,6 +460,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "da_DK": [
+    "apiError.account.password_already_set",
+    "hudChrome.account.passwordSet",
+    "hudChrome.account.setPasswordHint",
+    "hudChrome.account.setPasswordSubmit",
+    "hudChrome.account.setPasswordTitle",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",

@@ -5891,6 +5891,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordLong': '새 비밀번호는 128자 이하여야 합니다.',
   'hudChrome.account.errPasswordUnchanged': '새 비밀번호는 현재 비밀번호와 달라야 합니다.',
   'hudChrome.account.errPasswordConfirm': '새 비밀번호가 서로 일치하지 않습니다.',
+  'hudChrome.account.setPasswordTitle': '비밀번호 설정',
+  'hudChrome.account.setPasswordHint':
+    '이 계정은 Apple로 로그인 또는 Discord로 생성되어 아직 비밀번호가 설정되지 않았습니다. 비밀번호를 설정하면 Mac 및 Windows 데스크톱 앱이나 웹 등 다른 기기에서 로그인하거나 추가 로그인 방법을 연결할 수 있습니다.',
+  'hudChrome.account.setPasswordSubmit': '비밀번호 설정',
+  'hudChrome.account.passwordSet':
+    '비밀번호가 설정되었습니다. 이제 어디서나 사용자 이름과 비밀번호로 로그인할 수 있습니다.',
   'hudChrome.account.emailLabel': '이메일(선택 사항)',
   'hudChrome.account.emailHint': '계정 복구에만 사용됩니다. 마케팅 이메일은 보내지 않습니다.',
   'hudChrome.account.saveEmail': '이메일 저장',
@@ -8537,6 +8543,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.account.characters_online': '비활성화하기 전에 모든 캐릭터에서 로그아웃하세요.',
   'apiError.account.deactivated': '이 계정은 비활성화되었습니다. 복원하려면 관리자에게 문의하세요.',
   'apiError.account.not_found': '계정을 찾을 수 없습니다.',
+  'apiError.account.password_already_set':
+    '이 계정에는 이미 비밀번호가 설정되어 있습니다. 대신 비밀번호 변경을 이용하세요.',
   'apiError.character.name_invalid': '캐릭터 이름이 올바르지 않습니다. 2-16자의 글자를 사용하세요.',
   'apiError.character.name_not_allowed': '이 캐릭터 이름은 사용할 수 없습니다.',
   'apiError.character.invalid_class': '유효하지 않은 직업입니다.',

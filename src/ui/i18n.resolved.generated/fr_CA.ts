@@ -2062,6 +2062,10 @@ export const fr_CA: EnTranslations = {
       "errPasswordLong": "Le nouveau mot de passe doit contenir au plus 128 caractères.",
       "errPasswordUnchanged": "Le nouveau mot de passe doit être différent de l'actuel.",
       "errPasswordConfirm": "Les nouveaux mots de passe ne correspondent pas.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "E-mail (facultatif)",
       "emailHint": "Utilisé uniquement pour la récupération du compte. Nous n'envoyons jamais d'e-mail marketing.",
       "saveEmail": "Enregistrer l'e-mail",
@@ -3899,7 +3903,8 @@ export const fr_CA: EnTranslations = {
       "password_too_long": "Le nouveau mot de passe doit contenir au plus 128 caractères.",
       "characters_online": "Déconnectez tous vos personnages avant de désactiver le compte.",
       "deactivated": "Ce compte a été désactivé. Contactez un administrateur pour le rétablir.",
-      "not_found": "Compte introuvable."
+      "not_found": "Compte introuvable.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Nom de personnage invalide. Utilisez 2 à 16 lettres.",

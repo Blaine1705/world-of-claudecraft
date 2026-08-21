@@ -2062,6 +2062,10 @@ export const zh_TW: EnTranslations = {
       "errPasswordLong": "新密碼最多只能包含 128 個字元。",
       "errPasswordUnchanged": "新密碼必須與目前密碼不同。",
       "errPasswordConfirm": "兩次輸入的新密碼不一致。",
+      "setPasswordTitle": "設定密碼",
+      "setPasswordHint": "此帳號是透過「透過 Apple 登入」或 Discord 建立的，尚未設定密碼。設定密碼後即可在其他裝置（例如 Mac 與 Windows 桌面版）或網頁上使用使用者名稱和密碼登入，也可以連結其他登入方式。",
+      "setPasswordSubmit": "設定密碼",
+      "passwordSet": "密碼已設定。您現在可以在任何裝置上使用使用者名稱和密碼登入。",
       "emailLabel": "電子郵件（選填）",
       "emailHint": "僅用於帳號復原。我們絕不寄送行銷郵件。",
       "saveEmail": "儲存電子郵件",
@@ -3899,7 +3903,8 @@ export const zh_TW: EnTranslations = {
       "password_too_long": "新密碼最多只能包含 128 個字元。",
       "characters_online": "請先登出所有角色再進行停用。",
       "deactivated": "此帳號已停用。請聯絡管理員以還原。",
-      "not_found": "找不到帳號。"
+      "not_found": "找不到帳號。",
+      "password_already_set": "此帳號已設定密碼，請改用「變更密碼」。"
     },
     "character": {
       "name_invalid": "角色名稱無效。請使用 2-16 個字母。",

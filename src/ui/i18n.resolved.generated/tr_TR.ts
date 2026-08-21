@@ -2062,6 +2062,10 @@ export const tr_TR: EnTranslations = {
       "errPasswordLong": "Yeni parola en fazla 128 karakter olmalıdır.",
       "errPasswordUnchanged": "Yeni parola mevcut olandan farklı olmalıdır.",
       "errPasswordConfirm": "Yeni parolalar eşleşmiyor.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "E-posta (isteğe bağlı)",
       "emailHint": "Yalnızca hesap kurtarma için kullanılır. Güncellemek için aşağıdaki E-postayı Değiştir seçeneğini kullanın.",
       "saveEmail": "E-postayı Kaydet",
@@ -3899,7 +3903,8 @@ export const tr_TR: EnTranslations = {
       "password_too_long": "Yeni parola en fazla 128 karakter olmalıdır.",
       "characters_online": "Devre dışı bırakmadan önce tüm karakterlerinizden çıkış yapın.",
       "deactivated": "Bu hesap devre dışı bırakıldı. Geri yüklemek için bir yöneticiyle iletişime geçin.",
-      "not_found": "Hesap bulunamadı."
+      "not_found": "Hesap bulunamadı.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Geçersiz karakter adı. 2-16 harf kullanın.",

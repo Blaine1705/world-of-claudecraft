@@ -2062,6 +2062,10 @@ export const da_DK: EnTranslations = {
       "errPasswordLong": "Den nye adgangskode må højst være 128 tegn.",
       "errPasswordUnchanged": "Den nye adgangskode skal være forskellig fra den nuværende.",
       "errPasswordConfirm": "De nye adgangskoder stemmer ikke overens.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "E-mail (valgfri)",
       "emailHint": "Bruges kun til kontogendannelse. Brug Skift e-mail nedenfor for at opdatere den.",
       "saveEmail": "Gem e-mail",
@@ -3899,7 +3903,8 @@ export const da_DK: EnTranslations = {
       "password_too_long": "Den nye adgangskode må højst være på 128 tegn.",
       "characters_online": "Log ud af alle dine karakterer, før du deaktiverer.",
       "deactivated": "Denne konto er blevet deaktiveret. Kontakt en administrator for at genoprette den.",
-      "not_found": "Kontoen blev ikke fundet."
+      "not_found": "Kontoen blev ikke fundet.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Ugyldigt karakternavn. Brug 2-16 bogstaver.",

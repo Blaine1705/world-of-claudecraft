@@ -2062,6 +2062,10 @@ export const pt_BR: EnTranslations = {
       "errPasswordLong": "A nova senha deve ter no máximo 128 caracteres.",
       "errPasswordUnchanged": "A nova senha deve ser diferente da atual.",
       "errPasswordConfirm": "As novas senhas não coincidem.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "Email (opcional)",
       "emailHint": "Usado apenas para recuperação de conta. Nunca enviamos email de marketing.",
       "saveEmail": "Salvar email",
@@ -3899,7 +3903,8 @@ export const pt_BR: EnTranslations = {
       "password_too_long": "A nova senha deve ter no máximo 128 caracteres.",
       "characters_online": "Desconecte todos os seus personagens antes de desativar.",
       "deactivated": "Esta conta foi desativada. Contate um administrador para restaurá-la.",
-      "not_found": "Conta não encontrada."
+      "not_found": "Conta não encontrada.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Nome de personagem inválido. Use 2-16 letras.",

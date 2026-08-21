@@ -2287,6 +2287,12 @@ export const hudChromeStrings = {
     errPasswordLong: 'New password must be at most 128 characters.',
     errPasswordUnchanged: 'New password must be different from the current one.',
     errPasswordConfirm: 'New passwords do not match.',
+    // Set a Password (Apple/Discord-provisioned accounts with no password yet)
+    setPasswordTitle: 'Set a Password',
+    setPasswordHint:
+      'This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.',
+    setPasswordSubmit: 'Set Password',
+    passwordSet: 'Password set. You can now sign in with your username and password anywhere.',
     // Email
     emailLabel: 'Email (optional)',
     emailHint: 'Used only for account recovery. Use Change Email below to update it.',

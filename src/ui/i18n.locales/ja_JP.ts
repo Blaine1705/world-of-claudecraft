@@ -5905,6 +5905,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordLong': '新しいパスワードは128文字以内にしてください。',
   'hudChrome.account.errPasswordUnchanged': '新しいパスワードは現在のものと異なる必要があります。',
   'hudChrome.account.errPasswordConfirm': '新しいパスワードが一致しません。',
+  'hudChrome.account.setPasswordTitle': 'パスワードを設定',
+  'hudChrome.account.setPasswordHint':
+    'このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードが設定されていません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他のデバイスでサインインしたり、追加のサインイン方法を連携したりできます。',
+  'hudChrome.account.setPasswordSubmit': 'パスワードを設定',
+  'hudChrome.account.passwordSet':
+    'パスワードを設定しました。ユーザー名とパスワードでどこからでもサインインできます。',
   'hudChrome.account.emailLabel': 'メールアドレス（任意）',
   'hudChrome.account.emailHint': 'アカウント復旧にのみ使用します。宣伝メールは一切送信しません。',
   'hudChrome.account.saveEmail': 'メールを保存',
@@ -8562,6 +8568,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.account.deactivated':
     'このアカウントは無効化されています。復元するには管理者に連絡してください。',
   'apiError.account.not_found': 'アカウントが見つかりません。',
+  'apiError.account.password_already_set':
+    'このアカウントには既にパスワードが設定されています。「パスワードの変更」をご利用ください。',
   'apiError.character.name_invalid': 'キャラクター名が無効です。2-16文字の英字を使用してください。',
   'apiError.character.name_not_allowed': 'そのキャラクター名は使用できません。',
   'apiError.character.invalid_class': '無効なクラスです。',
