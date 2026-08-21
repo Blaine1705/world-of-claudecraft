@@ -953,6 +953,22 @@ export const cs_CZ: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Sklepení",
+        "state": "Reprezentační patro",
+        "residence": "Obytné patro",
+        "tower": "Strážní věž"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Zahradní patro",
+        "solar": "Sluneční komnata"
+      }
+    },
     "compass": {
       "N": "S",
       "NE": "SV",
@@ -4754,6 +4770,7 @@ export const cs_CZ: EnTranslations = {
       "mageEleJet": "Vodní proud má na liště mazlíčka vlastní tlačítko: klikni na něj a upevníš mrazivý paprsek na jednoho nepřítele, nebo klikni pravým tlačítkem (na mobilu podrž prst), aby ho elementál vypálil sám, kdykoli bude připravený.",
       "formsHeading": "Změna podoby",
       "formsNote": "Druid bojuje měněním podoby. Většina druidských schopností patří k jedné podobě, takže to, v jaké jsi právě podobě, rozhoduje, co můžeš seslat, a přeměna stojí trochu many. Měnit podobu můžeš v boji i mimo něj, tak často, jak chceš.",
+      "formsAutoUnshift": "Léčení nebo útočné kouzlo seslané v podobě tě z ní samo vyvede. Opuštění podoby tímto způsobem je zdarma a nespotřebuje globální dobu obnovy, takže okamžité kouzlo vyletí hned, jak ho stiskneš. Návrat do podoby je běžná schopnost a stále stojí manu i globální dobu obnovy.",
       "formsMoonwing": "Druid Měsíčního háje získá ještě jednu podobu, Podobu měsíčního křídla, v níž bojuje jako sesilatel. Je to jediná zvířecí podoba, která si ponechá tvá kouzla, a hůlka funguje jen v ní nebo v tvé běžné sesilatelské podobě.",
       "formLine": {
         "form_bear": "Tankovací podoba: silná kůže, vztek místo many a navíc hrozba, aby po tobě nepřátelé dál sekali.",
@@ -7171,6 +7188,7 @@ export const cs_CZ: EnTranslations = {
       "shopMarksRequired": "K nákupu {name} potřebuješ {marks} známek výprav.",
       "shopSealPremiumOnly": "Tato pečeť povolí jen mistrovské ruce. Otevře ji pouze prémiová sázka.",
       "passageSealed": "Průchod je zapečetěný.",
+      "enemiesRemain": "Nejprve poraz zbývající nepřátele.",
       "moveCloserPassage": "Přibliž se k průchodu.",
       "moveCloserChest": "Přibliž se k truhle.",
       "moveCloserReliquary": "Přibliž se k relikviáři.",
@@ -9980,7 +9998,7 @@ export const cs_CZ: EnTranslations = {
       },
       "fear": {
         "name": "Děs",
-        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 8 s. Jakékoli poškození efekt přeruší."
+        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší."
       },
       "searing_pain": {
         "name": "Sežehnutí",
@@ -10058,7 +10076,7 @@ export const cs_CZ: EnTranslations = {
       "ferocious_bite": {
         "name": "Krvavý skus",
         "description": "Dokončovací útok, který způsobí {damage}. Pouze ve vlčí podobě.",
-        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň: kousnutí za 70 plus 43 za combo bod, které navíc okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví 30 energie."
+        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k silnějšímu úderu, okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví energii."
       },
       "swipe": {
         "name": "Rozmáchlé drápy",
@@ -10121,7 +10139,7 @@ export const cs_CZ: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Vlčí krev",
-        "description": "Zvýší sílu útoku o {buff} na {duration} s. Pouze ve vlčí podobě."
+        "description": "Prudce obnoví {rage} energie a zvýší sílu útoku o {buff} na {duration} s. Pouze ve vlčí podobě."
       },
       "rip": {
         "name": "Krvavá trhlina",
@@ -10226,7 +10244,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Na 12 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše."
+        "description": "Na 15 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10342,7 +10360,7 @@ export const cs_CZ: EnTranslations = {
       },
       "redharvest": {
         "name": "Rudá sklizeň",
-        "description": "Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví 30 energie. Funguje i bez combo bodů."
+        "description": "Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví {rage} energie. Funguje i bez combo bodů."
       },
       "marrowbreak": {
         "name": "Lámání morku",
@@ -10582,7 +10600,7 @@ export const cs_CZ: EnTranslations = {
       },
       "evocation": {
         "name": "Éterická studna",
-        "description": "Restaura manu rápidamente. (mágovský talent)"
+        "description": "Kanalizuje po dobu 6 s: každou sekundu obnoví 100 many a získá 8 síly kouzel. Bonus se během kanalizování sčítá a trvá 15 s. (mágovský talent)"
       },
       "flurry_of_knives": {
         "name": "Smršť nožů",
@@ -10590,7 +10608,7 @@ export const cs_CZ: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Divoké zacelení",
-        "description": "Během 10 s obnoví 180 bodů zdraví. Pouze v Medvědí podobě. (druidský talent)"
+        "description": "Během 10 s obnoví 40 % maximálního zdraví. Pouze v Medvědí podobě. (druidský talent)"
       },
       "frost_trap": {
         "name": "Jinovatková léčka",
@@ -10610,11 +10628,11 @@ export const cs_CZ: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Děsivé zavytí",
-        "description": "Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)"
+        "description": "Vyděsí blízké nepřátele až na 5 s. Poškození v součtu 8 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)"
       },
       "ice_block": {
         "name": "Ledová rakev",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (mágovský talent)"
+        "description": "Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní již aktivní běžné škodlivé efekty a zabrání aplikaci nových běžných ovládacích efektů. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)"
       },
       "inner_focus": {
         "name": "Ztišená mysl",
@@ -10706,7 +10724,7 @@ export const cs_CZ: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Zrychlená mysl",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)"
+        "description": "Tvé další kouzlo s dobou sesílání bude okamžité. Trvá 60 s. (mágovský talent)"
       },
       "psychic_scream": {
         "name": "Výkřik hrůzy",
@@ -10823,7 +10841,7 @@ export const cs_CZ: EnTranslations = {
       },
       "prowl": {
         "name": "Plížení",
-        "description": "Vstoupíš do plížení ve vlčí podobě a pohybuješ se o 50 % pomaleji. Nelze použít v boji."
+        "description": "Vstoupíš do plížení ve vlčí podobě a pohybuješ se o 5 % pomaleji. Nelze použít v boji."
       },
       "rake": {
         "name": "Stažení z kůže",
@@ -12378,6 +12396,9 @@ export const cs_CZ: EnTranslations = {
       "pristine_claw": {
         "name": "Nedotčený dráp"
       },
+      "dawnhold_posy": {
+        "name": "Kytička ze zahrady zámku Dawnhold"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -13222,6 +13243,15 @@ export const cs_CZ: EnTranslations = {
       },
       "training_dummy": {
         "name": "Cvičný panák"
+      },
+      "friendly_player_dummy": {
+        "name": "Panák přátelského hráče"
+      },
+      "normal_boss_dummy": {
+        "name": "Panák normálního bosse"
+      },
+      "heroic_boss_dummy": {
+        "name": "Panák hrdinského bosse"
       },
       "ridge_stalker": {
         "name": "Hřebenový slídil"
@@ -16861,6 +16891,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Poslední tvrz",
         "enterText": "Vstupuješ do chladných, tichých síní Poslední tvrze.",
         "leaveText": "Zavíráš bránu tvrze za sebou a vracíš se do větru Dračích zemí."
+      },
+      "dawnhold_castle": {
+        "name": "Zámek Dawnhold",
+        "enterText": "Vstupuješ do teplých, květinami provoněných síní zámku Dawnhold.",
+        "leaveText": "Vyklouzneš zpátky na sluncem zalitý zahradní trávník."
       },
       "drowned_temple": {
         "name": "Utopený chrám",

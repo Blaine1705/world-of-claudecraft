@@ -953,6 +953,22 @@ export const ja_JP: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}：{story}",
+      "story": {
+        "undercroft": "地下蔵",
+        "state": "公務の階",
+        "residence": "居住の階",
+        "tower": "見張り塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}：{story}",
+      "story": {
+        "ground": "庭園の階",
+        "solar": "日だまりの間"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "北東",
@@ -4754,6 +4770,7 @@ export const ja_JP: EnTranslations = {
       "mageEleJet": "ウォータージェットはペットバーに独立したボタンとして並びます。クリックすれば凍てつく光線を敵一体に固定し、右クリック（モバイルでは長押し）すれば、準備が整うたびにエレメンタルが自分の判断で放つようになります。",
       "formsHeading": "変身",
       "formsNote": "ドルイドは姿を変えて戦います。ドルイドのアビリティはほとんどがいずれか一つの姿に属しているので、今どの姿でいるかが何を使えるかを決めます。変身にはわずかなマナがかかります。戦闘中でも戦闘外でも、好きなだけ変身し、また解くことができます。",
+      "formsAutoUnshift": "変身中に回復や攻撃の呪文を唱えると、姿はひとりでに解けます。こうして姿を解くのはマナもかからず、グローバルクールダウンも使いません。ですから即時発動の呪文は押した瞬間に飛びます。もう一度変身するのは普通のアビリティなので、マナもグローバルクールダウンもかかります。",
       "formsMoonwing": "均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。",
       "formLine": {
         "form_bear": "タンクの姿です。分厚い毛皮をまとい、マナの代わりにレイジを使い、追加の脅威で敵の矛先を自分に引きつけ続けます。",
@@ -7171,6 +7188,7 @@ export const ja_JP: EnTranslations = {
       "shopMarksRequired": "{name}を購入するにはデルヴの刻印が{marks}個必要だ。",
       "shopSealPremiumOnly": "この封印は達人の手にのみ応じる。極上の賭けだけが開くことができる。",
       "passageSealed": "通路は封じられている。",
+      "enemiesRemain": "残りの敵を先に倒せ。",
       "moveCloserPassage": "通路にもっと近づけ。",
       "moveCloserChest": "宝箱にもっと近づけ。",
       "moveCloserReliquary": "聖遺物匣にもっと近づけ。",
@@ -9980,7 +9998,7 @@ export const ja_JP: EnTranslations = {
       },
       "fear": {
         "name": "責め苦",
-        "description": "敵に恐怖を刻み、最大8秒間おびえさせます。ダメージを受けると効果が切れます。"
+        "description": "敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。"
       },
       "searing_pain": {
         "name": "灼熱",
@@ -10058,7 +10076,7 @@ export const ja_JP: EnTranslations = {
       "ferocious_bite": {
         "name": "血噛み",
         "description": "{damage}を与えるフィニッシュムーブです。ウルフフォーム専用。",
-        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：91にコンボポイントごとに55を加えたダメージの噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを30回復する。"
+        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：古き血を消費した強力な噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを回復する。"
       },
       "swipe": {
         "name": "薙ぎ払う爪",
@@ -10121,7 +10139,7 @@ export const ja_JP: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼の血",
-        "description": "攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
+        "description": "エネルギーを{rage}回復し、攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
       },
       "rip": {
         "name": "血裂",
@@ -10226,7 +10244,7 @@ export const ja_JP: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "納骨の印",
-        "description": "敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
+        "description": "敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
       },
       "unholy_command": {
         "name": "不浄の号令",
@@ -10325,8 +10343,8 @@ export const ja_JP: EnTranslations = {
         "description": "ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）"
       },
       "feral_charge": {
-        "name": "フェラルチャージ",
-        "description": "敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）"
+        "name": "原初の奔流",
+        "description": "原初の力を解き放ちます。ウルフフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）"
       },
       "swiftmend": {
         "name": "スウィフトメンド",
@@ -10342,7 +10360,7 @@ export const ja_JP: EnTranslations = {
       },
       "redharvest": {
         "name": "血の収穫",
-        "description": "古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを30回復する。コンボポイントが0でも使用できる。"
+        "description": "古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。"
       },
       "marrowbreak": {
         "name": "骨髄砕き",
@@ -10582,7 +10600,7 @@ export const ja_JP: EnTranslations = {
       },
       "evocation": {
         "name": "エーテルの井戸",
-        "description": "マナを急速に回復する。（メイジタレント）"
+        "description": "6秒間チャネルします。毎秒100マナを回復し、呪文威力が8上昇します。この効果はチャネル中に累積し、15秒間持続します。（メイジタレント）"
       },
       "flurry_of_knives": {
         "name": "短剣乱舞",
@@ -10590,7 +10608,7 @@ export const ja_JP: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "野生の癒し",
-        "description": "10秒かけて体力を180回復する。熊形態でのみ使用可能。（ドルイドのタレント）"
+        "description": "10秒かけて最大体力の40%を回復する。熊形態でのみ使用可能。（ドルイドのタレント）"
       },
       "frost_trap": {
         "name": "霧氷の罠",
@@ -10610,11 +10628,11 @@ export const ja_JP: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐怖の遠吠え",
-        "description": "周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）"
+        "description": "周囲の敵を最大5秒間恐怖状態にする。対象の最大体力の8%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）"
       },
       "ice_block": {
         "name": "冷たき棺",
-        "description": "自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）"
+        "description": "8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。すでにかかっている通常の有害な効果を取り除き、新たな通常の行動阻害効果の付与を防ぎます。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）"
       },
       "inner_focus": {
         "name": "静まる心",
@@ -10823,7 +10841,7 @@ export const ja_JP: EnTranslations = {
       },
       "prowl": {
         "name": "つけ狙い",
-        "description": "ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。"
+        "description": "ウルフフォーム中にステルス状態に入り、移動速度が5%低下する。戦闘中は使用できない。"
       },
       "rake": {
         "name": "皮剥ぎ",
@@ -12378,6 +12396,9 @@ export const ja_JP: EnTranslations = {
       "pristine_claw": {
         "name": "無傷の鉤爪"
       },
+      "dawnhold_posy": {
+        "name": "ドーンホールド庭園の小さな花束"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -13222,6 +13243,15 @@ export const ja_JP: EnTranslations = {
       },
       "training_dummy": {
         "name": "訓練用ダミー"
+      },
+      "friendly_player_dummy": {
+        "name": "味方プレイヤーダミー"
+      },
+      "normal_boss_dummy": {
+        "name": "ノーマルボスダミー"
+      },
+      "heroic_boss_dummy": {
+        "name": "ヒロイックボスダミー"
       },
       "ridge_stalker": {
         "name": "尾根の追跡者"
@@ -16861,6 +16891,11 @@ export const ja_JP: EnTranslations = {
         "name": "最後の砦",
         "enterText": "最後の砦の冷たく静まり返った広間へ足を踏み入れた。",
         "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
+      },
+      "dawnhold_castle": {
+        "name": "ドーンホールド城",
+        "enterText": "花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。",
+        "leaveText": "日差しあふれる庭園の芝生へと戻った。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

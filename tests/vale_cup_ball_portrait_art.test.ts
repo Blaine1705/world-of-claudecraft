@@ -24,7 +24,7 @@ describe('Vale Cup ball target portrait art', () => {
   it('pins the accepted generation and processing record', () => {
     const bytes = readFileSync(EVIDENCE_PATH);
     expect(bytes.byteLength).toBe(3316);
-    expect(sha256(bytes)).toBe('b9169b865723c28fa3fa000a725fac8aafd64459ce75677890d75a75ab886f96');
+    expect(sha256(bytes)).toBe('ff16d7f2dae949e4a85a60696d62b4dd24cec50b150e4524850a6a3dcb70d1a5');
     const evidence = JSON.parse(bytes.toString('utf8')) as {
       generationPrompt: string;
       references: AcceptedReference[];
@@ -70,23 +70,23 @@ describe('Vale Cup ball target portrait art', () => {
     expect(evidence.references).toEqual([
       {
         path: 'public/ui/mobs/wild_boar.webp',
-        bytes: 2832,
-        sha256: '6659380d8e6fed07b916c78026b8e860dd3a58d4e1569e25c049a18ac2faf06f',
+        bytes: 2824,
+        sha256: 'c53fe2d306738e14aec1f08339b1a48a274e2a4e8de6bb28b3f694fcb7a87a21',
       },
       {
         path: 'public/ui/mobs/training_dummy.webp',
-        bytes: 1812,
-        sha256: '400afcac22527f9e0145b7a1dcc39f068f8f50d265798497925559464cd70915',
+        bytes: 1790,
+        sha256: '66efb4999739669201bd44e21aca2d6e222ba8dfeb410d018c1e5e7d156e0e65',
       },
       {
         path: 'public/ui/mobs/stable_horse.webp',
-        bytes: 1964,
-        sha256: 'f302dc2653f312a7fba93fd68563b70e14bdd5b1cfc746b21d1549f88d9429be',
+        bytes: 1960,
+        sha256: 'ae6839c40d2839e30f89722c2ad5450af25b6864efe601ff3257a2c68c1061b8',
       },
       {
         path: 'public/ui/mobs/old_greyjaw.webp',
-        bytes: 2042,
-        sha256: '8f633043c612c2fa7b5a911afbf4b90d6d0aa57098666be2545d40fb8e6cde33',
+        bytes: 2046,
+        sha256: 'a4df215ed61a7f58f526b168be66815be716c7d7edac604785a27b373ecc7b4d',
       },
     ]);
     for (const reference of evidence.references) {

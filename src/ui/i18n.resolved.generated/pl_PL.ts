@@ -953,6 +953,22 @@ export const pl_PL: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Podziemia",
+        "state": "Piętro reprezentacyjne",
+        "residence": "Piętro mieszkalne",
+        "tower": "Wieża strażnicza"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Parter ogrodowy",
+        "solar": "Komnata słoneczna"
+      }
+    },
     "compass": {
       "N": "Pn",
       "NE": "PnW",
@@ -4754,6 +4770,7 @@ export const pl_PL: EnTranslations = {
       "mageEleJet": "Strumień wody zajmuje własny przycisk na pasku zwierzęcia: kliknij go, aby zablokować spowalniającą wiązkę na jednym wrogu, albo kliknij go prawym przyciskiem (przytrzymaj dotyk na urządzeniu mobilnym), aby pozwolić żywiołakowi rzucać go samodzielnie, gdy tylko będzie gotowy.",
       "formsHeading": "Zmiana kształtu",
       "formsNote": "Druid walczy, zmieniając kształt. Większość zdolności druida należy do jednej postaci, więc to, w jakiej formie się znajdujesz, decyduje, co możesz rzucić, a przemiana kosztuje odrobinę many. Możesz przemieniać się w walce i poza nią, tak często, jak chcesz.",
+      "formsAutoUnshift": "Leczenie lub zaklęcie zadające obrażenia rzucone w formie samo cię z niej wyprowadza. Opuszczenie formy w ten sposób jest darmowe i nie zużywa globalnego czasu odnowienia, więc błyskawiczne zaklęcie odpala się w chwili naciśnięcia. Powrót do formy to zwykła zdolność i nadal kosztuje manę oraz globalny czas odnowienia.",
       "formsMoonwing": "Druid o specjalizacji Równowaga zyskuje jeszcze jedną postać, Postać księżycowej sowy, formę rzucającego, w jakiej walczy. To jedyna zwierzęca postać, która zachowuje twoje zaklęcia, a różdżka działa tylko w niej albo w twojej zwykłej postaci rzucającego.",
       "formLine": {
         "form_bear": "Postać do tankowania: gruba skóra, wściekłość zamiast many i dodatkowe zagrożenie, dzięki któremu wrogowie wciąż atakują ciebie.",
@@ -7171,6 +7188,7 @@ export const pl_PL: EnTranslations = {
       "shopMarksRequired": "Potrzebujesz {marks} Znaków Eskapady, aby kupić: {name}.",
       "shopSealPremiumOnly": "Ta pieczęć ustępuje tylko ręce mistrza. Otworzyć ją może jedynie stawka Premium.",
       "passageSealed": "Przejście jest zapieczętowane.",
+      "enemiesRemain": "Najpierw pokonaj pozostałych wrogów.",
       "moveCloserPassage": "Podejdź bliżej przejścia.",
       "moveCloserChest": "Podejdź bliżej skrzyni.",
       "moveCloserReliquary": "Podejdź bliżej relikwiarza.",
@@ -9980,7 +9998,7 @@ export const pl_PL: EnTranslations = {
       },
       "fear": {
         "name": "Trwoga",
-        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez nawet 8 sek. Każde obrażenie przerywa efekt."
+        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają efekt."
       },
       "searing_pain": {
         "name": "Przypalenie",
@@ -10058,7 +10076,7 @@ export const pl_PL: EnTranslations = {
       "ferocious_bite": {
         "name": "Krwawe ukąszenie",
         "description": "Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci wilka.",
-        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa: ukąszenie za 70 plus 43 za punkt combo, które dodatkowo natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywraca 30 energii."
+        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na silniejszy cios, dodatkowo natychmiast zadają wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywracają energię."
       },
       "swipe": {
         "name": "Zamaszyste pazury",
@@ -10121,7 +10139,7 @@ export const pl_PL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wilcza krew",
-        "description": "Zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci wilka."
+        "description": "Natychmiast przywraca {rage} energii i zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci wilka."
       },
       "rip": {
         "name": "Krwawa szczelina",
@@ -10226,7 +10244,7 @@ export const pl_PL: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Oznacza wroga na 12 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 m i tworzy 1 Odłamek Duszy."
+        "description": "Oznacza wroga na 15 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 jardów i tworzy 1 Odłamek Duszy."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10325,8 +10343,8 @@ export const pl_PL: EnTranslations = {
         "description": "Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)"
       },
       "feral_charge": {
-        "name": "Dzika szarża",
-        "description": "Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)"
+        "name": "Pierwotny przypływ",
+        "description": "Wyzwalasz pierwotny przypływ. W Postaci wilka regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)"
       },
       "swiftmend": {
         "name": "Szybkie uzdrowienie",
@@ -10342,7 +10360,7 @@ export const pl_PL: EnTranslations = {
       },
       "redharvest": {
         "name": "Czerwone Żniwa",
-        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca 30 energii. Działa bez punktów combo."
+        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo."
       },
       "marrowbreak": {
         "name": "Łamacz szpiku",
@@ -10582,7 +10600,7 @@ export const pl_PL: EnTranslations = {
       },
       "evocation": {
         "name": "Studnia Eteru",
-        "description": "Restaura manę rápidamente. (talent maga)"
+        "description": "Kanalizujesz przez 6 sek.: co sekundę przywracasz 100 many i zyskujesz 8 mocy zaklęć. Premia kumuluje się podczas kanalizowania i trwa 15 sek. (talent maga)"
       },
       "flurry_of_knives": {
         "name": "Grad noży",
@@ -10590,7 +10608,7 @@ export const pl_PL: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Dzikie Gojenie",
-        "description": "Przywraca 180 zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)"
+        "description": "Przywraca 40% maksymalnego zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)"
       },
       "frost_trap": {
         "name": "Szronowa Pułapka",
@@ -10610,11 +10628,11 @@ export const pl_PL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Wycie Grozy",
-        "description": "Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)"
+        "description": "Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)"
       },
       "ice_block": {
         "name": "Zimna Trumna",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent maga)"
+        "description": "Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)"
       },
       "inner_focus": {
         "name": "Wyciszony Umysł",
@@ -10706,7 +10724,7 @@ export const pl_PL: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Pędzący Umysł",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent maga)"
+        "description": "Sprawia, że twoje następne zaklęcie z czasem rzucania jest natychmiastowe. Trwa 60 sek. (talent maga)"
       },
       "psychic_scream": {
         "name": "Psychiczny Krzyk",
@@ -10823,7 +10841,7 @@ export const pl_PL: EnTranslations = {
       },
       "prowl": {
         "name": "Podchody",
-        "description": "Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce."
+        "description": "Wchodzi w skradanie w postaci wilka, poruszając się o 5% wolniej. Nie można użyć w walce."
       },
       "rake": {
         "name": "Zdzieranie",
@@ -12378,6 +12396,9 @@ export const pl_PL: EnTranslations = {
       "pristine_claw": {
         "name": "Nieskazitelny Pazur"
       },
+      "dawnhold_posy": {
+        "name": "Bukiecik z ogrodu zamku Dawnhold"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },
@@ -13222,6 +13243,15 @@ export const pl_PL: EnTranslations = {
       },
       "training_dummy": {
         "name": "Manekin treningowy"
+      },
+      "friendly_player_dummy": {
+        "name": "Manekin przyjaznego gracza"
+      },
+      "normal_boss_dummy": {
+        "name": "Manekin normalnego bossa"
+      },
+      "heroic_boss_dummy": {
+        "name": "Manekin heroicznego bossa"
       },
       "ridge_stalker": {
         "name": "Grzbietowy Tropiciel"
@@ -16861,6 +16891,11 @@ export const pl_PL: EnTranslations = {
         "name": "Ostatnia Twierdza",
         "enterText": "Wchodzisz w zimne, ciche korytarze Ostatniej Twierdzy.",
         "leaveText": "Zamykasz za sobą bramę twierdzy i wracasz w wiatr Smoczych Ziem."
+      },
+      "dawnhold_castle": {
+        "name": "Zamek Dawnhold",
+        "enterText": "Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.",
+        "leaveText": "Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik."
       },
       "drowned_temple": {
         "name": "Zatopiona Świątynia",

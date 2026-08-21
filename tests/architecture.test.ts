@@ -326,8 +326,10 @@ const UI_PURE_CORES = [
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',
+  'src/ui/castle_plan_core.ts',
   'src/ui/map_gather_tip_memo.ts',
   'src/ui/map_window_view.ts',
   'src/ui/continent_land_mask_core.ts',
@@ -441,6 +443,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/delve_interior_cache_core.ts',
   'src/render/entity_view_policy_core.ts',
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
@@ -479,6 +482,7 @@ const RENDER_PURE_CORES = [
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
+  'src/render/foliage_decimation_core.ts',
   'src/render/gpu_queue_window_core.ts',
   'src/render/evil_eye_marker_core.ts',
   'src/render/lich_audio_state_core.ts',
@@ -559,6 +563,7 @@ const RENDER_PURE_CORES = [
   'src/render/far_surface_core.ts',
   'src/render/far_terrain_core.ts',
   'src/render/foliage_impostor_core.ts',
+  'src/render/lava_chain_core.ts',
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
