@@ -6614,6 +6614,23 @@ so that is the eventual 22 PR; follow-ups 5.1); the whole-log census
 reconciliation (22); the TRUNCATE-vs-INSERT and CIC flake watches
 (first CI runs); everything in follow-ups.md by section.
 
+LATE REVIEWER ADDENDUM (same session, after the push): the stalled docs
+fix-round reviewer delivered its report after the verdict; per the
+14-QA late-lane precedent its findings were applied and re-pushed. Two
+should-fix runbook corrections (the refresh-recovery levers gained the
+real third one, leaving the Trading TAB and returning remounts the
+panel; the connectionTimeoutMillis note re-scoped to the REWARD
+SERVICE's pools, since the game pools carry
+DB_POOL_CONNECT_TIMEOUT_MS 5s) plus the stuckBonds gate citation
+(internal.ts, not the monitor) and the loader-persists wording; its
+coverage nit predicted the upper-window-bound survivor, confirmed by
+execution and closed with future-settled fixtures in BOTH stores
+(service 70b71b6; both upper-bound strip mutants BIT, whole log 438);
+the dashboard no-banner negative gained the unreadable-arm sentence
+(cff8102). Everything else in its report verified the fix round
+accurate; the C.4 memo claim is unverifiable from the public repos by
+design (the memo is private) and stands as written.
+
 NEXT: docs/woc-marketplace-hardening/phase-21-devnet-dry-run.md resumes
 once devnet SOL exists (devnet.md bottom section is the runbook), then
 phase-21-qa.md, then the shrunken phase-22-close-out.md.

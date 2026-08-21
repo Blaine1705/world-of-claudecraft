@@ -151,7 +151,7 @@ documents it).
 ### Service repo
 
 - npm run build + npm test green: EVIDENCED, last re-run by the rider QA at
-  tip d9a4f9b: build clean, 605 tests, 598 pass, 7 env-gated skips, 0 fail;
+  tip 70b71b6: build clean, 605 tests, 598 pass, 7 env-gated skips, 0 fail;
   605/605 zero skips with CLAUDIUM_TEST_DATABASE_URL on the command line.
 - Query-string admin bypass regression test (B5): EVIDENCED.
   test/server_auth_http.test.ts; runs in the suite above.
@@ -172,7 +172,7 @@ documents it).
 ### Dashboard repo
 
 - npm test + check + build green: EVIDENCED, last re-run by the rider QA at
-  tip fede8de: 282 tests 0 fail, check 0 errors, build complete, plus
+  tip cff8102: 282 tests 0 fail, check 0 errors, build complete, plus
   npm run test:security 66/66.
 - Game proxy role check enforced, non-privileged role exercised: EVIDENCED.
   The 18 ledger (H1); tests pinned in tests/ (the external-verdict matrix

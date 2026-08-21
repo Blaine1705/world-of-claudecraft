@@ -972,11 +972,22 @@ at the full count; git checkout reverts; status clean):
 | mrc_ci_flow_style_job | BIT (1 fail) | ci_workflow | a flow-style job mapping; the unrecognized two-space-line refusal reds instead of swallowing it |
 | all 13 first-round CI mutants (re-run) | re-BIT (fail counts 1 to 4) | ci_workflow | the full first-round battery replayed against 1e932c5b61 |
 
-Section totals: 17 new distinct mutants (2 service + 3 dashboard + 12 CI),
+THE LATE REVIEWER ROUND (service 70b71b6, dashboard cff8102): the
+stalled docs fix-round reviewer delivered AFTER the verdict and push;
+its coverage nit predicted a survivor and was right. Applied at the 20
+protocol (committed trees, full counts, git checkout reverts, status
+clean):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_settledbase_upper_bound_strip | BIT (1 fail of 605) | market_store_pg (memory arm) | the upper window arm dropped from the memory loop; before 70b71b6 every settled fixture sat at or below every queried toMs so this SURVIVED by prediction; the future-settled fixture reds it |
+| mrc_settledbase_pg_upper_bound_strip | BIT (1 fail of 605, pg tier zero skips) | market_store_pg | the BETWEEN's upper arm neutralized with params preserved; the pg future-settled fixture reds the round-trip test |
+
+Section totals: 19 new distinct mutants (4 service + 3 dashboard + 12 CI),
 all BIT after the fix rounds, 0 standing survivors (the 4 initial survivor
-verdicts are the finding, closed by the new pins); 24 re-run events, all
-re-BIT; 1 compile-refused strip recorded, not counted. Whole log: 436 by
-the chained convention (419 + 17). BOOKKEEPING CAVEAT for the 22
+verdicts plus the predicted upper-bound survivor are the findings, closed
+by the new pins); 24 re-run events, all re-BIT; 1 compile-refused strip
+recorded, not counted. Whole log: 438 by the chained convention (419 + 19). BOOKKEEPING CAVEAT for the 22
 close-out: an independent name census over the log's table rows reads a
 few higher than the chained totals (the early sections record some mutants
 in prose, and the divergence predates this rider); reconcile once at

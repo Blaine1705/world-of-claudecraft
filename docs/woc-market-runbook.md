@@ -44,10 +44,12 @@ and counsel sign-off.
   "$WOC Exchange marketplace").
 - Dashboard refresh caveat: the Summary subtab's 30s refresh holds an
   in-flight guard, so a never-resolving fetch parks the refresh permanently
-  (a sticky "Loading quotes..." line). Only TWO levers genuinely restart the
-  parked loop: a page reload, or a Status filter toggle (it rebuilds the
-  loader and its interval). A pause or release submit repaints once without
-  unparking the loop, and a subtab round trip does nothing (the panel stays
+  (a sticky "Loading quotes..." line). THREE levers genuinely restart the
+  parked loop: a page reload; a Status filter toggle (it rebuilds the
+  refresh callback and its interval); or leaving the Trading TAB for any
+  other top-level tab and returning (the panel unmounts and remounts). A
+  pause or release submit repaints once without unparking the loop, and a
+  SUBTAB round trip inside the Trading tab does nothing (the panel stays
   mounted). A transient refresh failure replaces data with the error on
   purpose (anti-mixed-epoch); do not ask for silent retention of stale rows.
 
@@ -455,9 +457,9 @@ normally (suspension is not a wind-down; section 4 is).
 
 To correlate a stuck bond with the abandon-cooldown and suspension ledgers,
 use the raw buyer account id the stuckBonds readout carries: it is the one
-readout class that reports one (dashboard-gated on purpose,
-`server/woc_market_monitor.ts`), kept exactly so this correlation needs no
-hand SQL.
+readout class that reports one (the readout lives in
+`server/woc_market_monitor.ts`; the dashboard gate on the route lives in
+`server/internal.ts`), kept exactly so this correlation needs no hand SQL.
 
 ## 14. Retention, sweeps, and capacity
 
@@ -480,11 +482,13 @@ hand SQL.
   10, env-tunable, so re-count after tuning it) plus the chat-quota
   feature's dedicated pool and LISTEN connection
   (`server/general_chat_quota_config.ts`).
-- The production pg pools carry no connectionTimeoutMillis (a recorded
-  service-side follow-up): against a dead or unreachable database a checkout
-  HANGS instead of failing fast, so a wedged-everything symptom with a quiet
-  error log is consistent with database unreachability; check the database
-  before the app.
+- The REWARD SERVICE's production pg pools carry no connectionTimeoutMillis
+  (a recorded service-side follow-up): against a dead or unreachable
+  database a service checkout HANGS instead of failing fast, so a
+  wedged-service symptom with a quiet error log is consistent with database
+  unreachability; check the database before the app. The GAME server's
+  pools are not affected (DB_POOL_CONNECT_TIMEOUT_MS, `server/db.ts`, 5
+  seconds; the chat-quota pools carry their own bound).
 - On the stuck readout: SUSTAINED `waiting > 0` on the pool gauge is the
   brownout precursor; lockWaitTimeouts and idleTxKills ride beside it. Typed
   `contended` refusals are the guard-transaction timeouts doing their job;
