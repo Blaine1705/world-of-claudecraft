@@ -99,23 +99,36 @@ describe('prewarm report list sampling', () => {
 
   it('emits a heavy block once, then only when its content changes', () => {
     const gate = createPrewarmHeavyListGate();
-    expect(gate.shouldEmit('a')).toBe(true);
-    expect(gate.shouldEmit('a')).toBe(false);
-    expect(gate.shouldEmit('a')).toBe(false);
+    expect(gate.peek('a')).toBe(true);
+    gate.commit('a');
+    expect(gate.peek('a')).toBe(false);
+    expect(gate.peek('a')).toBe(false);
     // A change re-opens it, which is what keeps a late resume-lane result from
     // being swallowed: this is emit-on-change, not first-report-only.
-    expect(gate.shouldEmit('b')).toBe(true);
-    expect(gate.shouldEmit('b')).toBe(false);
+    expect(gate.peek('b')).toBe(true);
+    gate.commit('b');
+    expect(gate.peek('b')).toBe(false);
     // And back to a previously seen value still counts as a change, because the
     // gate compares against the LAST sent, not a set of everything ever sent.
-    expect(gate.shouldEmit('a')).toBe(true);
+    expect(gate.peek('a')).toBe(true);
+  });
+
+  it('does not record on peek, so an undelivered report cannot suppress the next', () => {
+    // The gate's whole reason for splitting peek from commit: a payload that is
+    // built and then rejected must leave the block owed, not marked as sent.
+    const gate = createPrewarmHeavyListGate();
+    expect(gate.peek('a')).toBe(true);
+    expect(gate.peek('a')).toBe(true);
+    expect(gate.peek('a')).toBe(true);
+    gate.commit('a');
+    expect(gate.peek('a')).toBe(false);
   });
 
   it('reopens after a reset, for a new session or a test', () => {
     const gate = createPrewarmHeavyListGate();
-    expect(gate.shouldEmit('a')).toBe(true);
-    expect(gate.shouldEmit('a')).toBe(false);
+    gate.commit('a');
+    expect(gate.peek('a')).toBe(false);
     gate.reset();
-    expect(gate.shouldEmit('a')).toBe(true);
+    expect(gate.peek('a')).toBe(true);
   });
 });

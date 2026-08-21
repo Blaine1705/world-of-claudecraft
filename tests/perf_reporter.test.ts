@@ -1630,6 +1630,55 @@ describe('perf reporter worst-window drain', () => {
       stop();
     }
   });
+
+  // The heavy prewarm lists follow the same delivery rule as the worst window
+  // above: consulted when the payload is built, committed only when the POST
+  // lands. These arms drive the real send path rather than the payload builder,
+  // because the split only matters across a failed request.
+  async function postedPrewarmLists(fetchImpl: ReturnType<typeof vi.fn>): Promise<boolean[]> {
+    installReporterFlowGlobals(fetchImpl);
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(900_000);
+    } finally {
+      stop();
+    }
+    expect(fetchImpl.mock.calls.length).toBeGreaterThan(1);
+    return fetchImpl.mock.calls.map((call) => {
+      const body = JSON.parse((call[1] as { body: string }).body) as {
+        rawSummary: { rendererPrewarmSummary?: { compileUnits?: unknown[] } };
+      };
+      return (body.rawSummary.rendererPrewarmSummary?.compileUnits?.length ?? 0) > 0;
+    });
+  }
+
+  it('stops re-sending the prewarm lists once a report carrying them lands', async () => {
+    const carried = await postedPrewarmLists(
+      vi.fn(async () => ({ ok: true, status: 204, text: async () => '' })),
+    );
+    expect(carried[0]).toBe(true);
+    expect(carried.slice(1).some(Boolean)).toBe(false);
+  });
+
+  it('re-sends the prewarm lists after the server rejects the report', async () => {
+    const carried = await postedPrewarmLists(
+      vi.fn(async () => ({ ok: false, status: 500, text: async () => 'nope' })),
+    );
+    expect(carried.every(Boolean)).toBe(true);
+  });
+
+  it('re-sends the prewarm lists after the send fails at the network layer', async () => {
+    const carried = await postedPrewarmLists(
+      vi.fn(async () => Promise.reject(new Error('offline'))),
+    );
+    expect(carried.every(Boolean)).toBe(true);
+  });
 });
 
 describe('gpuBucket software classification', () => {
@@ -1663,13 +1712,21 @@ describe('perf reporter streamed-prewarm emit-on-change gate', () => {
   // 5-minute beacon re-sends the same few KB describing the same one-time work.
   // Measured, that repetition was most of the headroom under the server's 16 KB
   // raw-summary cap.
-  function summaryOf(snap: ReturnType<typeof snapshot>) {
+  // `delivered` stands in for the POST succeeding, which is what commits the
+  // gate. Building a payload records nothing on its own (ruling R5's rule), so
+  // an undelivered build below deliberately leaves the block still owed.
+  function summaryOf(snap: ReturnType<typeof snapshot>, delivered = true) {
     const body = perfReporterInternalsForTest.payloadFromSnapshot(
       snap,
       new Settings(),
       'sess-gate',
       42,
     )!;
+    if (delivered) {
+      const fingerprint = perfReporterInternalsForTest.pendingPrewarmListFingerprint();
+      if (fingerprint !== null)
+        perfReporterInternalsForTest.prewarmHeavyListGate.commit(fingerprint);
+    }
     return (
       body.rawSummary as {
         rendererPrewarmSummary?: {
@@ -1695,6 +1752,25 @@ describe('perf reporter streamed-prewarm emit-on-change gate', () => {
     // Absent BECAUSE unchanged, said explicitly: a reader must not conclude the
     // lane did no work.
     expect(second?.prewarmListsUnchanged).toBe(true);
+  });
+
+  it('keeps the lists owed when the report carrying them is never delivered', () => {
+    // The gate is committed by a successful POST, not by building the payload.
+    // Without that split, a first beacon that failed would suppress the block
+    // for the rest of the session and stamp `prewarmListsUnchanged` pointing a
+    // reader at a row that never landed.
+    const undelivered = summaryOf(snapshot(), false);
+    expect(undelivered?.compileUnits?.length).toBeGreaterThan(0);
+
+    const retry = summaryOf(snapshot(), false);
+    expect(retry?.compileUnits?.length).toBeGreaterThan(0);
+    expect(retry?.prewarmListsUnchanged).toBeUndefined();
+
+    const delivered = summaryOf(snapshot());
+    expect(delivered?.compileUnits?.length).toBeGreaterThan(0);
+    const afterDelivery = summaryOf(snapshot(), false);
+    expect(afterDelivery?.compileUnits).toBeUndefined();
+    expect(afterDelivery?.prewarmListsUnchanged).toBe(true);
   });
 
   it('sends them again when the resume lane changes the block after boot', () => {

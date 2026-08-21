@@ -81,24 +81,34 @@ export function sampleTransitions<T>(units: readonly T[], limit = PREWARM_REPORT
  * the rule is emit-on-change, keyed on the content itself.
  *
  * The cheap scalar counters are unaffected and ride every report as before.
+ *
+ * Consulting and recording are SEPARATE, for the same reason the retained
+ * worst 10 s window drains only in the success branch (ruling R5): a report
+ * that is built but never delivered must not count as sent. Otherwise a failed
+ * first beacon would suppress the block for the rest of the session and stamp
+ * `prewarmListsUnchanged` pointing a reader at a row that never landed.
  */
 export interface PrewarmHeavyListGate {
-  /** True when this report should carry the lists. Records the fingerprint. */
-  shouldEmit(fingerprint: string): boolean;
+  /**
+   * True when this report should carry the lists. Records NOTHING, so it is
+   * safe to build a payload that is then dropped, rejected, or retried.
+   */
+  peek(fingerprint: string): boolean;
+  /** Record a fingerprint as DELIVERED. Call only once the post succeeded. */
+  commit(fingerprint: string): void;
   /** Forget what was sent (a new session, or a test). */
   reset(): void;
 }
 
 export function createPrewarmHeavyListGate(): PrewarmHeavyListGate {
-  let last: string | null = null;
+  let sent: string | null = null;
   return {
-    shouldEmit: (fingerprint) => {
-      if (fingerprint === last) return false;
-      last = fingerprint;
-      return true;
+    peek: (fingerprint) => fingerprint !== sent,
+    commit: (fingerprint) => {
+      sent = fingerprint;
     },
     reset: () => {
-      last = null;
+      sent = null;
     },
   };
 }

@@ -311,26 +311,34 @@ function rendererPrewarmPacingSummary(
 /** Emit-on-change gate for the heavy streamed-prewarm lists (see the core). */
 const prewarmHeavyListGate = createPrewarmHeavyListGate();
 
+/**
+ * The fingerprint the payload built last is CARRYING, awaiting delivery, or
+ * null when it carries no lists. Set once per build (payloadFromSnapshot calls
+ * the summary exactly once) and committed by `send` only on a successful post.
+ */
+let pendingPrewarmListFingerprint: string | null = null;
+
 function rendererPrewarmSummary(
   prewarm: RendererPrewarmSnapshot | null,
 ): Record<string, unknown> | null {
+  pendingPrewarmListFingerprint = null;
   if (!prewarm) return null;
   // Fingerprinted on the SAMPLED content, so a report carries the lists only
   // when they actually differ from the last one this session sent. The
   // renderer retains its boot snapshot, so without this every 5-minute beacon
   // re-sends a few KB describing the same one-time work, which measured as
   // most of the headroom under the server's 16 KB raw-summary cap.
-  const heavyLists = prewarmHeavyListGate.shouldEmit(
-    JSON.stringify([
-      rendererPrewarmCompileUnitSummary(prewarm.compileUnits),
-      prewarm.manifestEntries.map((entry) =>
-        rendererPrewarmBudgetVariantSummary(entry.budgetVariants),
-      ),
-      prewarm.prewarmPacing?.adaptive
-        ? sampleTransitions(prewarm.prewarmPacing.adaptive.transitions)
-        : null,
-    ]),
-  );
+  const fingerprint = JSON.stringify([
+    rendererPrewarmCompileUnitSummary(prewarm.compileUnits),
+    prewarm.manifestEntries.map((entry) =>
+      rendererPrewarmBudgetVariantSummary(entry.budgetVariants),
+    ),
+    prewarm.prewarmPacing?.adaptive
+      ? sampleTransitions(prewarm.prewarmPacing.adaptive.transitions)
+      : null,
+  ]);
+  const heavyLists = prewarmHeavyListGate.peek(fingerprint);
+  if (heavyLists) pendingPrewarmListFingerprint = fingerprint;
   return {
     elapsedMs: prewarm.elapsedMs,
     maxMs: prewarm.maxMs,
@@ -710,6 +718,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       return;
     }
     const token = options.tokenProvider();
+    const carriedPrewarmLists = pendingPrewarmListFingerprint;
     const bodyText = JSON.stringify(body);
     status.lastAttemptAt = Date.now();
     status.lastSkipReason = null;
@@ -754,6 +763,10 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
         // 10 s window resets only once its report is stored, so a failed post
         // carries the storm into the retry instead of losing it.
         options.perf.drainWorstWindow();
+        // Same rule for the heavy prewarm lists: they count as sent only once
+        // the row carrying them landed, so a failed post re-sends them instead
+        // of stamping `prewarmListsUnchanged` over a row that never existed.
+        if (carriedPrewarmLists !== null) prewarmHeavyListGate.commit(carriedPrewarmLists);
         devTraceLog(status, 'debug', `posted ${status.lastBodyBytes} bytes`);
       })
       .catch((err: unknown) => {
@@ -810,4 +823,5 @@ export const perfReporterInternalsForTest = {
   payloadFromSnapshot,
   PERF_REPORT_SCHEMA_VERSION,
   prewarmHeavyListGate,
+  pendingPrewarmListFingerprint: () => pendingPrewarmListFingerprint,
 };
