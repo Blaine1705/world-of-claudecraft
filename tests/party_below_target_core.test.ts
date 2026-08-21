@@ -14,6 +14,7 @@ import {
   type MeasuredBox,
   type PartyBelowTargetInputs,
   partyBelowTargetBottom,
+  reservedBelowTargetBottom,
 } from '../src/ui/party_below_target_core';
 import {
   PARTY_BELOW_TARGET_BOTTOM_PROP,
@@ -353,7 +354,7 @@ describe('below-target CSS derives from the measured bottom', () => {
 
   it('mobile base tier: var-driven top and a measured joystick-clearing rows bound', () => {
     expect(hudMobileCss).toContain(
-      'top: calc(var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 127px)) + 8px);',
+      'top: calc(var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 55px)) + 5px);',
     );
     expect(hudMobileCss).toContain(
       'max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 8px + var(--party-rows-frame-pad, 6px)));',
@@ -368,11 +369,117 @@ describe('below-target CSS derives from the measured bottom', () => {
 
   it('mobile landscape tier: var-driven top, measured bound inherited from base', () => {
     expect(hudMobileCss).toContain(
-      'top: calc(var(--party-below-target-bottom, calc(max(6px, env(safe-area-inset-top)) + 97px)) + 8px);',
+      'top: calc(var(--party-below-target-bottom, calc(max(6px, env(safe-area-inset-top)) + 41px)) + 5px);',
     );
     expect(hudMobileCss).not.toContain('top: calc(max(6px, env(safe-area-inset-top)) + 105px);');
     expect(hudMobileCss).not.toContain(
       'max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 160px);',
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The target frame's RESERVED slot (touch): the frame comes and goes with the
+// player's target, and on touch the party stack now hangs directly under it in
+// the band the collapsed menu row vacated, so laying out against the live box
+// would jump the whole stack the moment they deselect.
+// ---------------------------------------------------------------------------
+
+describe('reservedBelowTargetBottom (the held slot)', () => {
+  it('reports the live measure while a target is shown', () => {
+    expect(
+      reservedBelowTargetBottom({ measured: 199, reserved: 88, targetShown: true, reserve: true }),
+    ).toBe(199);
+  });
+
+  it('holds the last occupied bottom on touch when the target drops', () => {
+    expect(
+      reservedBelowTargetBottom({
+        measured: null,
+        reserved: 199,
+        targetShown: false,
+        reserve: true,
+      }),
+    ).toBe(199);
+  });
+
+  it('leaves desktop unchanged: no reservation, so the frames return to their anchor', () => {
+    expect(
+      reservedBelowTargetBottom({
+        measured: null,
+        reserved: 199,
+        targetShown: false,
+        reserve: false,
+      }),
+    ).toBeNull();
+  });
+
+  it('reports nothing before any target has ever been measured', () => {
+    expect(
+      reservedBelowTargetBottom({
+        measured: null,
+        reserved: null,
+        targetShown: false,
+        reserve: true,
+      }),
+    ).toBeNull();
+  });
+
+  it('never resurrects a stale reservation for a shown target that reports no push', () => {
+    // A dragged-away target frame no longer overlaps the party column, so the
+    // calc returns null and the frames must go back to their base anchor.
+    expect(
+      reservedBelowTargetBottom({
+        measured: null,
+        reserved: 199,
+        targetShown: true,
+        reserve: true,
+      }),
+    ).toBeNull();
+  });
+});
+
+describe('PartyBelowTargetPainter: the reserved slot end to end', () => {
+  function rig() {
+    const root = stubEl({ left: 0, right: 0, bottom: 0 });
+    const frame = stubEl({ left: 12, right: 232, bottom: 88 });
+    const debuffs = stubEl({ left: 12, right: 232, bottom: 199 }, 8);
+    const container = stubEl({ left: 12, right: 182, bottom: 400 });
+    const rows = stubEl({ left: 12, right: 236, bottom: 296, top: 227 });
+    const moveWheel = stubEl({ left: 18, right: 136, bottom: 364, top: 266, height: 98 });
+    const moveZone = stubEl({ left: 0, right: 132, bottom: 390, top: 250, height: 140 });
+    const { writers, props } = recordingWriters();
+    const painter = new PartyBelowTargetPainter(
+      writers,
+      {
+        container: asHtmlEl(container, root),
+        frame: asHtmlEl(frame, root),
+        debuffs: asHtmlEl(debuffs, root),
+        rows: () => asHtmlEl(rows, root),
+        moveWheel: () => asHtmlEl(moveWheel, root),
+        moveZone: () => asHtmlEl(moveZone, root),
+      },
+      { innerWidth: 844, innerHeight: 390 },
+    );
+    return { painter, props };
+  }
+
+  it('keeps the offset, and the rows bound, when a touch target drops', () => {
+    const { painter, props } = rig();
+    expect(painter.update(true, 5, true)).toBe(199);
+    expect(painter.update(false, 5, true)).toBe(199);
+    expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('199.0px');
+    // The rows bound rides the reservation too, or the stack would grow into
+    // the move zone the frame's slot was holding it clear of.
+    expect(props.get(PARTY_ROWS_TOP_PROP)).not.toBe('initial');
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).not.toBe('initial');
+  });
+
+  it('unsets on desktop when the target drops, exactly as before', () => {
+    const { painter, props } = rig();
+    expect(painter.update(true, 5, false)).toBe(199);
+    expect(painter.update(false, 5, false)).toBeNull();
+    expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('initial');
+    expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('initial');
   });
 });

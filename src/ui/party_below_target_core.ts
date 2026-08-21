@@ -64,3 +64,27 @@ export function partyBelowTargetBottom(inputs: PartyBelowTargetInputs): number |
   if (right <= party.left || left >= party.right) return null;
   return bottom / safeScale(inputs.uiScale);
 }
+
+export interface ReservedBelowTargetInput {
+  /** This frame's measure, or null when the frame is hidden or does not overlap. */
+  measured: number | null;
+  /** The last bottom the frame actually occupied, or null before the first one. */
+  reserved: number | null;
+  targetShown: boolean;
+  /** Whether the slot is held while the frame is hidden (touch only). */
+  reserve: boolean;
+}
+
+/**
+ * The bottom the party frames lay out against, HOLDING the target frame's slot
+ * while it is hidden. The frame comes and goes with the player's target, so
+ * anything seated off its live box jumps the moment they deselect. On touch the
+ * frame now sits in the top band the collapsed menu row vacated with the party
+ * stack hanging directly under it, so that jump lands mid-combat; laying out
+ * against the last box the frame occupied keeps the slot whether or not anything
+ * is in it. Desktop passes reserve: false and is unchanged.
+ */
+export function reservedBelowTargetBottom(input: ReservedBelowTargetInput): number | null {
+  if (input.targetShown) return input.measured;
+  return input.reserve ? input.reserved : null;
+}

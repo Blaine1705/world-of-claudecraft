@@ -556,6 +556,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/consumable_strip_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/menu/menu_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
@@ -762,6 +763,16 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   {
     file: 'hud/action_bar/consumable_strip_gesture_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
+    driverAllow: {},
+  },
+  // The menu control's gesture layer, the same twin one more time: ONE anchor
+  // rect plus ONE computed-style read taken at pointerdown, never again while
+  // the finger travels the row, and the painter that follows reads only the
+  // cached placement (the caption included, which is why it clamps against a
+  // nominal half-width rather than measuring itself).
+  {
+    file: 'hud/menu/menu_strip_gesture_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
     driverAllow: {},
   },

@@ -24,7 +24,11 @@
 // extra (idempotent, then elided) re-measure before the key settles.
 
 import type { PainterHostWriters } from './painter_host';
-import { partyBelowTargetBottom, safeScale } from './party_below_target_core';
+import {
+  partyBelowTargetBottom,
+  reservedBelowTargetBottom,
+  safeScale,
+} from './party_below_target_core';
 import { getUiScale } from './ui_scale';
 
 /** The custom property the below-target CSS rules read (author-space px). */
@@ -59,6 +63,9 @@ export interface PartyBelowTargetEls {
 export class PartyBelowTargetPainter {
   private lastKey = '';
   private lastBottom: number | null = null;
+  // The last bottom the target frame actually occupied, so the touch layout can
+  // hold its slot while the player has no target (see reservedBelowTargetBottom).
+  private reserved: number | null = null;
   // Bumped whenever the observed elements change size (see the ctor); part of
   // the invalidation key, so a content-driven size change re-measures.
   private resizeEpoch = 0;
@@ -105,13 +112,19 @@ export class PartyBelowTargetPainter {
           value === null ? PROP_UNSET : `${value.toFixed(1)}px`,
         );
       };
-      this.lastBottom = targetShown ? this.measure() : null;
+      const measured = targetShown ? this.measure() : null;
+      if (measured !== null) this.reserved = measured;
+      this.lastBottom = reservedBelowTargetBottom({
+        measured,
+        reserved: this.reserved,
+        targetShown,
+        reserve: mobile,
+      });
       set(PARTY_BELOW_TARGET_BOTTOM_PROP, this.lastBottom);
       // The two rows-bound sensors ride the same gate: with no push active
       // they unset, and the .party-rows rules fall back to their unbounded
       // defaults.
-      const sensors =
-        targetShown && this.lastBottom !== null ? this.measureRowsBound(mobile) : null;
+      const sensors = this.lastBottom !== null ? this.measureRowsBound(mobile) : null;
       set(PARTY_ROWS_TOP_PROP, sensors?.rowsTop ?? null);
       set(PARTY_ROWS_LIMIT_PROP, sensors?.limit ?? null);
     }

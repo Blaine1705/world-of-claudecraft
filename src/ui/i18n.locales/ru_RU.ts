@@ -9077,6 +9077,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
   'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение... (! команды сообщества)',
   'hudChrome.mobile.consumableSeat': 'Расходники',
+  'hudChrome.mobile.menuControl': 'Меню',
+  'hudChrome.mobile.menuControlAria':
+    'Меню. Нажмите, чтобы открыть чат, или удерживайте и проведите вправо для транспорта, карты, сумок и других разделов.',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.keybinds.categoryPet': 'Питомец',

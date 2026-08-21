@@ -8946,6 +8946,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': 'キーボードを隠す',
   'hudChrome.mobile.chatPlaceholder': '発言する... (! でコミュニティコマンド)',
   'hudChrome.mobile.consumableSeat': '消耗品',
+  'hudChrome.mobile.menuControl': 'メニュー',
+  'hudChrome.mobile.menuControlAria':
+    'メニュー。タップでチャットを開き、長押しして右にスワイプすると騎乗、地図、バッグなどを開けます。',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'ヴェイルカップ',
   'hudChrome.keybinds.categoryPet': 'ペット',

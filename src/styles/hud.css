@@ -5140,7 +5140,11 @@
     font-size: 12px;
     line-height: 1.5;
   }
-  #tooltip .tt-title {
+  /* Lifted out of the #tooltip id scope on purpose: other surfaces reuse the
+     tooltip's title metrics rather than shipping a second copy of them (the
+     touch menu control's live caption is the first). The --tooltip-scale rule
+     below and the mob-tooltip variant still out-specify this. */
+  .tt-title {
     font-family: var(--title-font);
     font-size: 13.5px;
     color: #fff;
@@ -5491,7 +5495,7 @@
   #tooltip {
     font-size: calc(12px * var(--tooltip-scale, 1));
   }
-  #tooltip .tt-title {
+  .tt-title {
     font-size: calc(13.5px * var(--tooltip-scale, 1));
   }
   #tooltip .tt-sub {

@@ -8555,6 +8555,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': '隱藏鍵盤',
   'hudChrome.mobile.chatPlaceholder': '說點什麼...（! 顯示社群指令）',
   'hudChrome.mobile.consumableSeat': '消耗品',
+  'hudChrome.mobile.menuControl': '選單',
+  'hudChrome.mobile.menuControlAria':
+    '選單。點按開啟聊天，或按住並向右滑動以使用坐騎、地圖、背包等。',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷盃',
   'hudChrome.keybinds.categoryPet': '寵物',

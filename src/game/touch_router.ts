@@ -84,7 +84,9 @@ export interface TouchRouterEvent {
  *  `hud.mobile.css` (`.mobile-btn`, `.action-btn`) plus the paged action ring
  *  container (`#mobile-action-ring`, `.mobile-action-slot`) and the consumables
  *  row it opens (`#mobile-consumable-strip`, a SIBLING of the ring rather than a
- *  child, so ring containment does not reach it), the generic
+ *  child, so ring containment does not reach it), the menu control's strip
+ *  (`#mobile-menu-strip`, a sibling for the same reason, and whose caption and
+ *  cancel target are not `.mobile-btn`), the generic
  *  window/panel chrome (`.window`, `.panel`), and the minimap/daily-chest/
  *  chat-log widgets (Phase 5 of the mobile combat HUD rework: none of these
  *  are `.window`/`.panel`/`.mobile-btn`, so a swipe starting on them was
@@ -95,6 +97,7 @@ const INTERACTIVE_HUD_SELECTORS = [
   '.mobile-action-slot',
   '#mobile-action-ring',
   '#mobile-consumable-strip',
+  '#mobile-menu-strip',
   '.window',
   '.panel',
   '#minimap-wrap',

@@ -1,3 +1,4 @@
+import { buildMobileMenuControl, type MobileMenuControl } from '../ui/hud/menu';
 import { t } from '../ui/i18n';
 import { bindTouchTap } from '../ui/touch_tap';
 import type { Input, TouchMoveInput } from './input';
@@ -328,6 +329,8 @@ export class MobileControls {
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
   private chromeFade: ChromeFadeHandle | null = null;
+  /** The touch menu control (the collapsed five-button row), built at start(). */
+  private menuControl: MobileMenuControl | null = null;
 
   private canvas = document.getElementById('game-canvas') as HTMLElement | null;
   private root = document.getElementById('mobile-controls') as HTMLElement | null;
@@ -435,6 +438,7 @@ export class MobileControls {
       this.releasePinch();
       this.touchOwners.releaseAll();
       this.cancelChatPress();
+      this.menuControl?.gesture.cancelDrag();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
@@ -443,6 +447,7 @@ export class MobileControls {
         this.releasePinch();
         this.touchOwners.releaseAll();
         this.cancelChatPress();
+        this.menuControl?.gesture.cancelDrag();
       }
     });
 
@@ -500,6 +505,17 @@ export class MobileControls {
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
+    // The menu control's strip seats REAL buttons: four moved out of the old
+    // five-button row (social, quest, settings, more, all still bound by their
+    // own lines here) and five promoted out of the More tray, bound below to the
+    // SAME callbacks their tray twins use. A pick activates the button, so no
+    // action is ever implemented twice.
+    this.bindButton('mobile-menu-mount', () => this.callbacks.onMountToggle());
+    this.bindButton('mobile-menu-map', () => this.callbacks.onMap());
+    this.bindButton('mobile-menu-bags', () => this.callbacks.onBags());
+    this.bindButton('mobile-menu-char', () => this.callbacks.onCharacter());
+    this.bindButton('mobile-menu-spellbook', () => this.callbacks.onSpellbook());
+    this.menuControl = buildMobileMenuControl({ runDefault: () => this.tapChat() });
     this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
     this.bindButton('mobile-donate', () => this.callbacks.onDonate());
     this.bindButton('mobile-wiki', () => this.callbacks.onWiki());

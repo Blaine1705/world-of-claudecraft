@@ -8927,6 +8927,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
   'hudChrome.mobile.chatPlaceholder': '메시지 입력... (! 커뮤니티 명령어)',
   'hudChrome.mobile.consumableSeat': '소모품',
+  'hudChrome.mobile.menuControl': '메뉴',
+  'hudChrome.mobile.menuControlAria':
+    '메뉴. 탭하면 대화창이 열리고, 길게 누른 뒤 오른쪽으로 밀면 탈것, 지도, 가방 등을 열 수 있습니다.',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '베일 컵',
   'hudChrome.keybinds.categoryPet': '펫',

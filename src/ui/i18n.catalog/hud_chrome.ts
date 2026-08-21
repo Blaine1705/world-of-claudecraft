@@ -570,6 +570,19 @@ export const hudChromeStrings = {
     // number the player never sees), and the group a sticky-mode menu belongs to.
     // WORDY by M16, so the five non-Latin overlays carry real fills.
     consumableSeat: 'Consumables',
+    // The menu control (Phase 4): ONE seat replacing the five-button row (Chat,
+    // Social, Quests, Settings, More) that sat at top-left, further from either
+    // thumb than anything else in the HUD. menuControl names both the control and
+    // the strip it opens; menuControlAria is the control's own accessible name,
+    // which has to TEACH the gesture because a touch device has no hover to
+    // discover it with. The nine strip items reuse the accessible names their own
+    // buttons already carry, and the live caption reuses those buttons' label
+    // keys, so no per-item key lives here. Both are WORDY by M16, so the five
+    // non-Latin overlays carry real fills; menuLabel ("Menu") is not.
+    menuControl: 'Menus',
+    menuControlAria:
+      'Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.',
+    menuLabel: 'Menu',
     // Target swap (#mobile-target-cycle, replacing the old Target Closest
     // button): a crosshair-icon secondary button that cycles the hostile
     // target via the Tab-target path (acquire-nearest now lives on the ring's

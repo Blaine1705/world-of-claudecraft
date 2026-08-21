@@ -403,23 +403,42 @@
     color: #c8b888;
     text-shadow: 1px 1px 2px #000;
   }
+  /* The menu control's seat. The five-button row it replaces sat alone at
+     TOP-LEFT, 365 to 443px from the nearer thumb: the least reachable chrome in
+     the HUD. One control fits in the left thumb's own band instead, just past the
+     movement wheel, and vacating the top-left band is what lets the target frame
+     and the party stack move up.
+     The Y is DERIVED rather than measured, so it needs no runtime pass: the ring's
+     bottom edge sits at 20px plus the safe area and Jump's centre is half the
+     attack button above that edge, both scaled by --btn-scale about the same
+     edge, so the control and Jump share one centre line at every tier.
+     Column-reverse because the Seeker build appends the promoted daily chest
+     here (src/main.ts wireWallet) and the band above the control is the free
+     one. */
   body.mobile-touch #mobile-combat-controls {
     position: absolute;
-    left: max(12px, env(safe-area-inset-left));
-    top: max(8px, env(safe-area-inset-top));
-    transform: scale(calc(var(--btn-scale, 1) * var(--mobile-chrome-scale, 1)));
-    transform-origin: left top;
-    display: grid;
-    /* Chat, Social, Quests, Settings, More: the low-priority row sits alone at
-       TOP-LEFT, far from both thumb clusters (movement cluster bottom-left,
-       combat ring bottom-right) and off the top-centre band (pet bar, banners).
-       Its single 54px row clears the target frame seat below it (top + 72px),
-       so a live target never renders under the buttons. */
-    grid-template-columns: repeat(5, 58px);
-    gap: 12px;
+    left: calc(max(12px, env(safe-area-inset-left)) + 152px);
+    bottom: calc(
+      20px +
+      env(safe-area-inset-bottom) +
+      var(--btn-scale, 1) *
+      (50px * var(--mobile-chrome-scale, 1) - var(--menu-btn-size) / 2)
+    );
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 8px;
     pointer-events: auto;
-    align-items: start;
     z-index: 30;
+  }
+  /* A true CIRCLE at the shared --menu-btn-size, not the row's 58x54 oval, and
+     scaled by the same --btn-scale the ring uses about the seat's own bottom
+     edge (which is the line the derived `bottom` above puts on Jump's centre). */
+  body.mobile-touch #mobile-menu-anchor {
+    width: var(--menu-btn-size);
+    height: var(--menu-btn-size);
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: center bottom;
   }
   body.mobile-touch .mobile-btn {
     width: 58px;
@@ -453,10 +472,6 @@
   body.mobile-touch .mobile-btn .ui-icon-art {
     width: 27px;
     height: 27px;
-  }
-  body.mobile-touch #mobile-more {
-    position: static;
-    z-index: 19;
   }
   body.mobile-touch #mobile-more .ui-icon {
     transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -1304,6 +1319,136 @@
       border: 3px double Highlight;
     }
   }
+  /* The menu strip (#mobile-menu-strip), opened by a hold or a rightward swipe on
+     the menu control. A SIBLING of #mobile-combat-controls, never a child: the
+     control carries a transform, so an absolutely seated descendant would resolve
+     against that box instead of the viewport the placement clamps against.
+     --strip-gap and --strip-margin are READ BACK by
+     menu_strip_gesture_controller.ts, so both stay literal values:
+     getComputedStyle hands back an unresolved calc() for a custom property, and
+     only a literal parses. The safe area rides in the overlay's PADDING for the
+     same reason the radial's does. */
+  body.mobile-touch #mobile-menu-strip {
+    --strip-gap: 8px;
+    --strip-margin: 6px;
+    --strip-item-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    pointer-events: none;
+    opacity: var(--touch-opacity, 1);
+    z-index: 32;
+  }
+  body.mobile-touch #mobile-menu-strip.open {
+    display: block;
+  }
+  /* The dim is LOCAL to the row and never a full-screen scrim: the other thumb is
+     still steering and the player must keep seeing the fight. */
+  body.mobile-touch #mobile-menu-strip::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle at var(--strip-x, 50%) var(--strip-y, 50%),
+      #05050cb0 0%,
+      #05050c80 calc(var(--strip-item-size) * 1.9),
+      transparent calc(var(--strip-item-size) * 6.5)
+    );
+    pointer-events: none;
+  }
+  /* Items and the cancel X are seated by their CENTRE (the painter writes
+     left/top from placeConsumableStrip), so the negative margins pull each box
+     back onto its own centre point. CIRCLES at the shared --menu-btn-size, the
+     same rendered size as the control that opens them. */
+  body.mobile-touch .mobile-menu-item,
+  body.mobile-touch #mobile-menu-cancel {
+    position: absolute;
+    width: var(--strip-item-size);
+    height: var(--strip-item-size);
+    margin-left: calc(var(--strip-item-size) / -2);
+    margin-top: calc(var(--strip-item-size) / -2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid #4a3d1d;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2d3048e8, #11121ee8 72%);
+    color: #eee8ff;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  /* The item the drag is over, and the cancel X while the finger is back in the
+     anchor's band: a steady border + glow, never a scale transform (the
+     motion-sickness rule). */
+  body.mobile-touch .mobile-menu-item.live,
+  body.mobile-touch #mobile-menu-cancel.live {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--gold) 67%, transparent),
+      inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);
+  }
+  /* The cancel X sits directly ON the control, which puts it left of the whole
+     row once it is open: releasing where the gesture started is the way out, so
+     the target is a place the thumb never had to leave. */
+  body.mobile-touch #mobile-menu-cancel {
+    border-color: #8b4e2c;
+    background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
+  }
+  /* One icon size across the strip: 22px, the ring's size, NOT the 27px the
+     top-row .mobile-btn paints art at (that size is calibrated for a 58x54 box
+     and crowds a circle's rim). */
+  body.mobile-touch #mobile-menu-strip .ui-icon,
+  body.mobile-touch #mobile-menu-strip .ui-icon-art {
+    width: 22px;
+    height: 22px;
+    color: #ffdf9c;
+  }
+  /* ONE caption for the LIVE item instead of nine permanent labels: nine 8px
+     captions at this pitch collide and clip ("Characte"), and they name eight
+     things the player is not choosing. It reuses the game's own tooltip chrome
+     (.panel for the box, .tt-title for the text, whose metrics are lifted out of
+     the #tooltip id scope in hud.css so there is no second copy of them). Parked
+     above the live item: the painter writes only the clamped centre, and the
+     lift off that centre is expressed here. */
+  body.mobile-touch #mobile-menu-caption {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: none;
+    max-width: 45vw;
+    padding: 4px 9px;
+    transform: translate(-50%, calc(-100% - var(--strip-item-size) / 2 - 8px));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-menu-caption.shown {
+    display: block;
+  }
+  /* Sticky mode (VoiceOver / Switch Control, and Phase 6's tap mode): the row
+     becomes a persistent focusable menu, so its buttons take pointer events the
+     drag path deliberately keeps off the overlay. */
+  body.mobile-touch #mobile-menu-strip.open .mobile-menu-item,
+  body.mobile-touch #mobile-menu-strip.open #mobile-menu-cancel {
+    pointer-events: auto;
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch .mobile-menu-item.live,
+    body.mobile-touch #mobile-menu-cancel.live {
+      border: 3px double Highlight;
+    }
+  }
   body.mobile-touch #mobile-action-ring button.empty .icon-label {
     background-image: none;
   }
@@ -1720,8 +1865,6 @@
   body.mobile-touch.seeker-wallet-enabled
     #mobile-combat-controls
     #mobile-daily-rewards:not([hidden]) {
-    grid-column: 1;
-    grid-row: 2;
     position: static;
     display: flex;
     width: 58px;
@@ -1780,10 +1923,10 @@
   body.mobile-touch.mobile-chat-open #chatlog-wrap,
   body.mobile-touch.mobile-chat-open #chatlog-tabs,
   body.mobile-touch.mobile-chat-open #chat-input,
-  body.mobile-touch.mobile-chat-open #mobile-chat {
+  body.mobile-touch.mobile-chat-open #mobile-menu-anchor {
     opacity: 1;
   }
-  body.mobile-touch.mobile-chat-open #mobile-combat-controls #mobile-chat {
+  body.mobile-touch.mobile-chat-open #mobile-combat-controls #mobile-menu-anchor {
     opacity: 1;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -1986,7 +2129,8 @@
     display: block;
     pointer-events: none;
   }
-  body.mobile-touch.mobile-chatlog-peek #mobile-chat {
+  body.mobile-touch.mobile-chatlog-peek #mobile-chat,
+  body.mobile-touch.mobile-chatlog-peek #mobile-menu-anchor {
     border-color: var(--gold);
     box-shadow:
       0 0 0 1px var(--gold),
@@ -2199,16 +2343,9 @@
   }
   body.mobile-touch #target-frame {
     left: max(20px, calc(env(safe-area-inset-left) + 10px));
-    top: calc(max(8px, env(safe-area-inset-top)) + 72px);
+    top: max(8px, env(safe-area-inset-top));
     transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
-  }
-  /* The Seeker chest occupies the shortcut grid's second row. Reserve that
-     row before seating actionable unit frames, including the maximum 1.3
-     Action Button Size setting, with at least an 8px gap below the 54px chest.
-     Non-Seeker mobile keeps the compact +72px target seat. */
-  body.mobile-touch.seeker-wallet-enabled #target-frame {
-    top: calc(max(8px, env(safe-area-inset-top)) + 140px);
   }
   /* Target of Target on mobile: a DELIBERATE placement, not fallthrough.
      showTargetOfTarget is a user-chosen HUD option (reachable from the mobile
@@ -2233,15 +2370,12 @@
   body.mobile-touch #party-frames {
     position: fixed;
     left: max(20px, calc(env(safe-area-inset-left) + 10px));
-    top: calc(max(8px, env(safe-area-inset-top)) + 74px);
+    top: calc(max(8px, env(safe-area-inset-top)) + 2px);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     width: auto;
     z-index: 5;
-  }
-  body.mobile-touch.seeker-wallet-enabled #party-frames {
-    top: calc(max(8px, env(safe-area-inset-top)) + 142px);
   }
   /* The member-rows wrapper carries the adaptive double-stack the container used to: a
      CSS grid with grid-auto-flow: column and 2 explicit rows does the adaptive part with
@@ -2258,7 +2392,7 @@
     column-gap: 4px;
     row-gap: 0;
     max-width: calc(100dvw - max(20px, calc(env(safe-area-inset-left) + 10px)) - 10px);
-    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 129px);
+    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 57px);
     overflow: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
@@ -2280,14 +2414,15 @@
     grid-template-rows: none;
   }
   body.mobile-touch #party-frames.below-target {
-    /* Below the target frame's MEASURED bottom (see the hud.css below-target
-       rule): --party-below-target-bottom replaces the hand-nudged +135px
-       constant, so the chip and frames clear the target's #tf-debuffs strip at
-       any buff count. The var fallback reproduces the old constant (safe-area
-       + 127px + the 8px gap = the old +135px) until the first measure lands. */
+    /* Below the target frame's RESERVED bottom (party_below_target_painter.ts
+       holds the slot while the frame is hidden, so the stack never jumps when
+       the player drops their target). The var fallback tracks the target seat's
+       own top band until the first measure lands, and the 5px gap is the same
+       clearance the control and the frames keep from each other elsewhere in
+       this column. */
     top: calc(
-      var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 127px)) +
-      8px
+      var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 55px)) +
+      5px
     );
   }
   body.mobile-touch #party-frames.below-target .party-rows {
@@ -2727,6 +2862,12 @@
      and stops overlapping it; mirror every absolutely positioned ring child by
      swapping its right: offset to the identical left: expression so the
      crescent arcs for a left thumb instead of a right one. */
+  /* Left-handed mirror: the control follows the thumb the ring left behind, and
+     its row self-clamps back on screen from the far edge (placeConsumableStrip). */
+  body.mobile-touch.mobile-left-handed #mobile-combat-controls {
+    left: auto;
+    right: calc(max(12px, env(safe-area-inset-right)) + 152px);
+  }
   body.mobile-touch.mobile-left-handed #mobile-action-ring {
     left: max(18px, env(safe-area-inset-left));
     right: auto;
@@ -5643,11 +5784,6 @@
       font-size: 8px;
       color: #d7c987aa;
     }
-    body.mobile-touch #mobile-combat-controls {
-      top: max(6px, env(safe-area-inset-top));
-      grid-template-columns: repeat(5, 54px);
-      gap: 10px;
-    }
     body.mobile-touch .mobile-btn {
       width: 54px;
       height: 48px;
@@ -5932,32 +6068,24 @@
     }
     body.mobile-touch #target-frame {
       left: max(6px, env(safe-area-inset-left));
-      top: calc(max(6px, env(safe-area-inset-top)) + 56px);
+      top: max(6px, env(safe-area-inset-top));
       transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
-    }
-    /* Landscape buttons use a 48px first row and 10px gap. Reserve the scaled
-       two-row grid at the maximum Action Button Size before seating target. */
-    body.mobile-touch.seeker-wallet-enabled #target-frame {
-      top: calc(max(6px, env(safe-area-inset-top)) + 132px);
     }
     body.mobile-touch #party-frames {
       left: max(6px, env(safe-area-inset-left));
-      top: calc(max(6px, env(safe-area-inset-top)) + 58px);
-    }
-    body.mobile-touch.seeker-wallet-enabled #party-frames {
-      top: calc(max(6px, env(safe-area-inset-top)) + 134px);
+      top: calc(max(6px, env(safe-area-inset-top)) + 2px);
     }
     body.mobile-touch #party-frames .party-rows {
       max-width: calc(100dvw - max(6px, env(safe-area-inset-left)) - 10px);
-      max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 113px);
+      max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 57px);
     }
     body.mobile-touch #party-frames.below-target {
-      /* Landscape twin of the measured below-target offset above: the var
-         fallback reproduces the old hand-nudged +105px constant (safe-area
-         + 97px + the 8px gap) until the first measure lands. */
+      /* Landscape twin of the reserved below-target offset above; the var
+         fallback tracks this tier's own target seat until the first measure
+         lands. */
       top: calc(
-        var(--party-below-target-bottom, calc(max(6px, env(safe-area-inset-top)) + 97px)) +
-        8px
+        var(--party-below-target-bottom, calc(max(6px, env(safe-area-inset-top)) + 41px)) +
+        5px
       );
     }
     /* No landscape .party-rows override for below-target: the base tier's
@@ -6178,6 +6306,16 @@
     right: max(14px, env(safe-area-inset-right));
     bottom: calc(10px + env(safe-area-inset-bottom));
   }
+  /* The control keeps Jump's centre line at this tier too, mirroring the compact
+     ring's own numbers above: bottom 10px, and half of its 84px attack button. */
+  body.mobile-touch.hud-mobile-compact #mobile-combat-controls {
+    bottom: calc(
+      10px +
+      env(safe-area-inset-bottom) +
+      var(--btn-scale, 1) *
+      (42px * var(--mobile-chrome-scale, 1) - var(--menu-btn-size) / 2)
+    );
+  }
   /* The 40px touch floor above is shorter than the toggle's natural scaled size,
      so its border-box inner height (40px - 2 * 2px border = 36px) is tighter than
      the standard/tablet tiers. The base page-indicator digit (20px text + a 2px
@@ -6259,6 +6397,16 @@
     --mobile-ring-toggle-size: calc(56px * var(--mobile-chrome-scale, 1));
     --mobile-ring-secondary-size: calc(60px * var(--mobile-chrome-scale, 1));
     --mobile-ring-hollow: calc(123px * var(--mobile-chrome-scale, 1));
+  }
+  /* Tablet twin of the compact seat: the base 20px ring bottom, and half of this
+     tier's 116px attack button. */
+  body.mobile-touch.hud-mobile-tablet #mobile-combat-controls {
+    bottom: calc(
+      20px +
+      env(safe-area-inset-bottom) +
+      var(--btn-scale, 1) *
+      (58px * var(--mobile-chrome-scale, 1) - var(--menu-btn-size) / 2)
+    );
   }
   body.mobile-touch.hud-mobile-tablet #right-tracker-stack {
     width: calc(220px * var(--mobile-chrome-scale, 1));
