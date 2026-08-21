@@ -7260,9 +7260,9 @@ export class Hud {
         btn.blur();
       });
       btn.addEventListener('keydown', (e) => {
+        // preventDefault only: no stopPropagation, so Space still reaches Input's jump key.
         if (e.key !== ' ' && e.key !== 'Spacebar') return;
         e.preventDefault();
-        e.stopPropagation();
       });
       this.attachTooltip(btn, () => {
         if (slot === 0 && this.attackSlotIsAttack()) {

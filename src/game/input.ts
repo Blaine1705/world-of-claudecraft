@@ -1325,13 +1325,16 @@ export class Input {
     e.preventDefault?.();
   }
 
-  // A native <button> (action-bar slot, bag row, sidebar icon...) keeps
-  // browser focus after a mouse click. Left focused, it hijacks the very next
-  // Space or Enter meant for jump/chat: the browser replays that still-focused
-  // button's own native Space/Enter click-activation, re-using whatever it
-  // does (dismounting, re-consuming a potion...) instead of, or alongside,
-  // the intended game action. Shed focus right after a MOUSE-driven
-  // activation so the next keypress reaches gameplay untouched.
+  // A native <button> (action-bar slot, bag row, sidebar icon...) OR a
+  // custom [role="button"] control (chat quest/deed links, the quest tracker
+  // header, the right-click marker menu) keeps browser focus after a mouse
+  // click. Left focused, it hijacks the very next Space or Enter meant for
+  // jump/chat: the browser replays (a real <button>) or the element's own
+  // keydown arm re-runs (a role="button") that still-focused control's
+  // activation, re-using whatever it does (dismounting, re-consuming a
+  // potion, reopening a quest link...) instead of, or alongside, the
+  // intended game action. Shed focus right after a MOUSE-driven activation
+  // so the next keypress reaches gameplay untouched.
   //
   // A keyboard Enter/Space activation also fires 'click', but with detail 0
   // (no click count) versus >=1 for a real mouse click, so a button reached
@@ -1342,8 +1345,24 @@ export class Input {
   // onMouseUp always treats it as mouse-driven.
   private releaseMouseActivatedFocus(e: { type: string; detail?: number }): void {
     if (e.type === 'click' && e.detail === 0) return;
-    const active = document.activeElement as { tagName?: string; blur?: () => void } | null;
-    if ((active?.tagName ?? '').toLowerCase() === 'button') active?.blur?.();
+    const active = document.activeElement as {
+      tagName?: string;
+      getAttribute?: (name: string) => string | null;
+      blur?: () => void;
+    } | null;
+    if (active && this.isMouseActivatableFocusTarget(active)) active.blur?.();
+  }
+
+  // Same discriminator dialog_key_activation.ts already uses for the
+  // confirm-dialog family (`button, [role="button"]`): a custom interactive
+  // control mimics native button semantics without the tag, so it hijacks
+  // Space/Enter exactly like a real <button> once mouse-focused.
+  private isMouseActivatableFocusTarget(active: {
+    tagName?: string;
+    getAttribute?: (name: string) => string | null;
+  }): boolean {
+    if ((active.tagName ?? '').toLowerCase() === 'button') return true;
+    return active.getAttribute?.('role') === 'button';
   }
 
   private onMouseUp(e: MouseEvent): void {
