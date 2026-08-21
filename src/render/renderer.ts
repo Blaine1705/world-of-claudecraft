@@ -481,7 +481,10 @@ import {
   runPrewarmBudgetVariants,
   summarizePrewarmManifest,
 } from './prewarm_compile_lifecycle';
-import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
+import {
+  runPrewarmCompileSubmission,
+  submitPrewarmCompileUnit,
+} from './prewarm_compile_submission_core';
 import { prewarmDepthMaterial } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
@@ -684,7 +687,6 @@ import { buildWaterFlora } from './water_flora';
 import {
   buildWeaponVfxPrewarmGroup,
   disposeWeaponEmissiveCache,
-  WEAPON_VFX_PREWARM_KEYS,
   weaponVfxPrewarmTextures,
 } from './weapon_vfx';
 import {
@@ -693,7 +695,7 @@ import {
   type WeaponSkinApplyDecision,
   WeaponSkinApplyQueue,
 } from './weapon_vfx_apply_queue_core';
-import { createWeaponVfxPrewarmSkinStage } from './weapon_vfx_prewarm';
+import { createWeaponVfxPrewarmSkinStage, weaponVfxPrewarmUnits } from './weapon_vfx_prewarm';
 import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
@@ -6004,12 +6006,28 @@ export class Renderer {
       for (const unit of units) compileLifecycle.recordFor(unit, 'programs.compile');
       return units;
     };
-    // compile-submit overlaps off-thread linking with texture work; compile
-    // drains late groups and awaits readiness. Collection/dedupe is pure and
-    // pinned by planCompileSubmission tests in prewarm_policy.ts.
+    // Early compile submission: compileAsync links settle off-thread, so the
+    // sooner a unit is SUBMITTED the more of its link time overlaps the other
+    // manifest entries (surface-detail plus textures.scene alone are ~4.5 s of
+    // uploads on the reference desktop). 'programs.compile-submit' fires every
+    // early-staged group's units right after those groups exist;
+    // 'programs.compile' submits the remainder (the late-staged weapon-vfx
+    // group, anything that did not exist yet at the early entry, and a
+    // RE-collection of the live scene) and then awaits every submitted unit so
+    // all of their programs are READY before world.initial-frame renders; a
+    // program not ready by then links synchronously inside that frame, the
+    // measured first-draw stall class. Which groups each call collects is the
+    // pure planCompileSubmission (prewarm_policy.ts); the submit LOOP, its
+    // deadline rule and its never-drop contract are
+    // runPrewarmCompileSubmission (prewarm_compile_submission_core.ts).
     const submittedCompileUnits: { id: string; done: Promise<void> }[] = [];
     const submittedCompileGroups = new Set<string>();
-    // Built-but-unsubmitted roots are retained and drained by compile/resume.
+    // Units built (their roots consumed from the shared dedupe store) but not
+    // yet submitted because the loop hit the GPU submit deadline. The roots are
+    // marked seen at BUILD time, so these exact unit objects are the only
+    // remaining route to their compiles: the compile entry drains them first,
+    // and the post-manifest hand-off pushes any leftover to the resume lane
+    // (never dropped, hitch-hunt P1).
     const deferredSubmitUnits: PrewarmResumeUnit[] = [];
     let initialFrameDeferred: LinkDebt | null = null;
     const LATE_COMPILE_GROUPS = new Set(['weapon-vfx']);
@@ -6035,27 +6053,17 @@ export class Renderer {
       // Earlier-deferred units resubmit ahead of the fresh collection; their
       // groups are already marked, so the plan above never re-collected them.
       const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];
-      const outOfTime = () =>
-        prewarmSubmitShouldStop(
-          performance.now(),
-          deadlineMs,
-          policy.finishFullManifestBeforeReveal,
-          pacing.shouldStop(performance.now()),
-        );
-      for (let i = 0; i < pending.length; i++) {
-        if (!(await pacing.awaitSlot(outOfTime))) {
-          for (const deferred of pending.slice(i)) compileLifecycle.recordFor(deferred, lane);
-          deferredSubmitUnits.push(...pending.slice(i));
-          // The deferred units' compiles now settle AFTER the manifest, so
-          // the warm entity/NPC pools must not publish from the manifest's
-          // finally block with unlinked programs: the settle-then-publish
-          // arm below publishes them once the resume lane drains (same
-          // contract as the compile entry's whole-deferral path).
-          deferPoolPublication ||= poolsAwaitPublication();
-          return;
-        }
-        const unit = pending[i];
-        submittedCompileUnits.push(
+      const { submitted, deferred } = await runPrewarmCompileSubmission(pending, {
+        outOfTime: () =>
+          prewarmSubmitShouldStop(
+            performance.now(),
+            deadlineMs,
+            policy.finishFullManifestBeforeReveal,
+            pacing.shouldStop(performance.now()),
+          ),
+        awaitSlot: (outOfTime) => pacing.awaitSlot(outOfTime),
+        recordDeferred: (unit) => compileLifecycle.recordFor(unit, lane),
+        submit: (unit) =>
           submitPrewarmCompileUnit(unit, lane, {
             lifecycle: compileLifecycle,
             pacing,
@@ -6063,11 +6071,17 @@ export class Renderer {
             onError: (err) =>
               console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err),
           }),
-        );
-        // Yield between unit submissions: each carries up to 32 synchronous
-        // compileAsync prologue walks, and links progress off-thread anyway.
-        await new Promise<void>((resolve) => setTimeout(resolve, 0));
-      }
+        yieldSlice: () => new Promise<void>((resolve) => setTimeout(resolve, 0)),
+      });
+      submittedCompileUnits.push(...submitted);
+      if (deferred.length === 0) return;
+      deferredSubmitUnits.push(...(deferred as PrewarmResumeUnit[]));
+      // The deferred units' compiles now settle AFTER the manifest, so the warm
+      // entity/NPC pools must not publish from the manifest's finally block
+      // with unlinked programs: the settle-then-publish arm below publishes
+      // them once the resume lane drains (same contract as the compile entry's
+      // whole-deferral path).
+      deferPoolPublication ||= poolsAwaitPublication();
     };
 
     const runEntry = async (
@@ -6729,34 +6743,18 @@ export class Renderer {
         category: 'vfx',
         priority: 61,
         required: false,
-        // The old `group` unit built all catalog specs synchronously after the
-        // loading cover had gone away. That made the measured 534 ms
-        // weapon-skins resume unit a live-frame hitch. Build and link one real
-        // spec per queue unit, with a deterministic texture step between the
-        // two phases. The aggregate group remains hidden and is still the
-        // compile census owner for any later world compile debt.
-        resumeUnits: () => [
-          ...WEAPON_VFX_PREWARM_KEYS.map((key) => ({
-            id: `weapon-skins:build:${key}`,
-            run: () => {
-              weaponVfxPrewarmSkinStage.stage(key);
-              weaponVfxPrewarmGroup = weaponVfxPrewarmSkinStage.group;
-            },
-          })),
-          {
-            id: 'weapon-skins:textures',
-            run: () => {
+        // One bounded unit per catalog spec; the plan and the reason it is
+        // split live in weapon_vfx_prewarm.ts (weaponVfxPrewarmUnits).
+        resumeUnits: () =>
+          weaponVfxPrewarmUnits(weaponVfxPrewarmSkinStage, {
+            prewarmTextures: () => {
               for (const texture of weaponVfxPrewarmTextures()) this.prewarmTexture(texture);
             },
-          },
-          ...WEAPON_VFX_PREWARM_KEYS.map((key) => ({
-            id: `weapon-skins:compile:${key}`,
-            run: async () => {
-              const skinGroup = weaponVfxPrewarmSkinStage.get(key);
-              if (skinGroup) await this.compilePrewarmColorPrograms(skinGroup, false);
+            compile: (group) => this.compilePrewarmColorPrograms(group, false),
+            publishGroup: (group) => {
+              weaponVfxPrewarmGroup = group;
             },
-          })),
-        ],
+          }),
         run: () => {
           weaponVfxPrewarmGroup = buildWeaponVfxPrewarmGroup();
           setRenderCategory(weaponVfxPrewarmGroup, 'prewarm');
@@ -7096,7 +7094,9 @@ export class Renderer {
                 renderBudgetShaderPrewarmLevels(originalState),
                 budgetVariantStats,
                 createPrewarmBudgetVariantHost({
-                  deadlineMs: hardDeadline,
+                  // The submit guard, never hardDeadline: see the field's own
+                  // contract in prewarm_compile_lifecycle.ts.
+                  deadlineMs: gpuSubmitDeadline,
                   programCount: () => this.webgl.info.programs?.length ?? 0,
                   applyLevels: (levels) =>
                     this.applyRenderBudgetState({ ...originalState, levels }),
@@ -7302,9 +7302,12 @@ export class Renderer {
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
               resumeLedger.noteFailure(entry.id, unit.id);
+              // Per SKIN, never the whole catalog: the ledger's boundary is
+              // one unit, and the skins staged before this one keep their
+              // linked programs (see WeaponVfxPrewarmSkinStage).
               if (entry.id === 'vfx.weapon-skins') {
-                weaponVfxPrewarmSkinStage.disposeFailure();
-                weaponVfxPrewarmGroup = null;
+                weaponVfxPrewarmSkinStage.disposeFailedUnit(unit.id);
+                weaponVfxPrewarmGroup = weaponVfxPrewarmSkinStage.group;
               }
               console.warn(`Renderer prewarm resume unit failed: ${entry.id}:${unit.id}`, error);
             },

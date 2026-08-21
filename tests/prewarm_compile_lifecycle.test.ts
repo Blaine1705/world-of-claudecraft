@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   COMPILE_UNIT_ROOT_LABELS,
@@ -147,6 +148,24 @@ describe('prewarm compile lifecycle', () => {
     expect(applied).toBe(1);
     expect(stats).toHaveLength(1);
     expect(stats[0]).toMatchObject({ index: 0, passes: 1 });
+  });
+
+  it('is handed the renderer GPU submit guard, never the hard deadline (source pin)', () => {
+    // Every variant runs a real renderPrewarmPass, and an already-started
+    // WebGL call cannot be cancelled: launching one at hardDeadline - epsilon
+    // overshoots the wall and defers every entry behind it, the deadline-exempt
+    // debt payers included. The unit tests above pass literal deadlines, so
+    // only a source pin can catch the call site swapping the two clocks.
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const call = source.indexOf('createPrewarmBudgetVariantHost({');
+    expect(call).toBeGreaterThan(-1);
+    const host = source.slice(call, source.indexOf('})', call));
+    expect(host).toContain('deadlineMs: gpuSubmitDeadline,');
+    expect(host).not.toContain('deadlineMs: hardDeadline,');
+    // And the guard itself stays a real reserve carved out of the wall.
+    expect(source).toContain(
+      'const gpuSubmitDeadline = Math.max(started, hardDeadline - PREWARM_GPU_SUBMIT_GUARD_MS);',
+    );
   });
 
   it('records the synchronous and asynchronous boundaries on the injected clock', () => {

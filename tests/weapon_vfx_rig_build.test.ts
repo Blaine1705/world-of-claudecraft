@@ -28,7 +28,10 @@ import {
   type WeaponVfxSpec,
 } from '../src/render/weapon_vfx';
 import { WEAPON_EMISSIVE_IDLE_CACHE_MAX } from '../src/render/weapon_vfx_emissive_cache_core';
-import { createWeaponVfxPrewarmSkinStage } from '../src/render/weapon_vfx_prewarm';
+import {
+  createWeaponVfxPrewarmSkinStage,
+  weaponVfxPrewarmSkinUnitKey,
+} from '../src/render/weapon_vfx_prewarm';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 interface StubCanvas {
@@ -146,7 +149,7 @@ const EPIC_SPEC: WeaponVfxSpec = {
 };
 
 describe('streamed weapon-skin prewarm staging', () => {
-  it('deduplicates catalog units and releases a partial batch on failure', () => {
+  it('deduplicates catalog units into one hidden aggregate group', () => {
     const scene = new THREE.Scene();
     const stage = createWeaponVfxPrewarmSkinStage(scene);
     const key = WEAPON_VFX_PREWARM_KEYS[0];
@@ -157,11 +160,67 @@ describe('streamed weapon-skin prewarm staging', () => {
     expect(stage.group?.userData.renderCategory).toBe('prewarm');
     expect(stage.stage(key)).toBe(first);
     expect(stage.group?.children).toEqual([first]);
+  });
 
-    stage.disposeFailure();
-    expect(stage.group).toBeNull();
-    expect(scene.children).toHaveLength(0);
-    expect(stage.get(key)).toBeUndefined();
+  it('releases only the failed unit and leaves every other staged skin linked', () => {
+    // The resume lane reports failures per unit. Disposing the whole catalog
+    // would drop the already-linked programs of every earlier skin (three
+    // releases a program with its last material) and leave the later build
+    // units to re-stage a fresh group: dispose-then-relink in live frames.
+    const scene = new THREE.Scene();
+    const stage = createWeaponVfxPrewarmSkinStage(scene);
+    const [failedKey, survivorKey] = WEAPON_VFX_PREWARM_KEYS;
+    expect(survivorKey).toBeDefined();
+
+    const failed = stage.stage(failedKey);
+    const survivor = stage.stage(survivorKey);
+    const survivorMaterials: THREE.Material[] = [];
+    survivor.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material) survivorMaterials.push(...(Array.isArray(material) ? material : [material]));
+    });
+    expect(survivorMaterials.length).toBeGreaterThan(0);
+    const survivorDisposals = survivorMaterials.map((material) => vi.spyOn(material, 'dispose'));
+    const failedGeometry = vi.fn();
+    failed.traverse((object) => {
+      const geometry = (object as THREE.Mesh).geometry;
+      if (geometry) vi.spyOn(geometry, 'dispose').mockImplementation(failedGeometry);
+    });
+
+    stage.disposeFailedUnit(`weapon-skins:compile:${failedKey}`);
+
+    expect(stage.get(failedKey)).toBeUndefined();
+    expect(failedGeometry).toHaveBeenCalled();
+    // The aggregate survives with the untouched skin still mounted, so the
+    // remaining compile units still find their groups.
+    expect(stage.get(survivorKey)).toBe(survivor);
+    expect(stage.group).toBe(scene.children[0]);
+    expect(stage.group?.children).toEqual([survivor]);
+    for (const disposal of survivorDisposals) expect(disposal).not.toHaveBeenCalled();
+  });
+
+  it('releases nothing for a unit that owns no skin group', () => {
+    // The shared-texture unit and any unrecognised id: the staged skins are
+    // still valid, so a failure there must not cost them their programs.
+    const scene = new THREE.Scene();
+    const stage = createWeaponVfxPrewarmSkinStage(scene);
+    const key = WEAPON_VFX_PREWARM_KEYS[0];
+    const staged = stage.stage(key);
+
+    stage.disposeFailedUnit('weapon-skins:textures');
+    stage.disposeFailedUnit('weapon-skins:build:no-such-skin');
+    stage.disposeFailedUnit('some-other-entry:unit');
+
+    expect(stage.get(key)).toBe(staged);
+    expect(stage.group?.children).toEqual([staged]);
+  });
+
+  it('maps only the two per-skin unit ids to a key', () => {
+    expect(weaponVfxPrewarmSkinUnitKey('weapon-skins:build:flame_sword')).toBe('flame_sword');
+    expect(weaponVfxPrewarmSkinUnitKey('weapon-skins:compile:flame_sword')).toBe('flame_sword');
+    expect(weaponVfxPrewarmSkinUnitKey('weapon-skins:textures')).toBeNull();
+    expect(weaponVfxPrewarmSkinUnitKey('weapon-skins:group')).toBeNull();
+    expect(weaponVfxPrewarmSkinUnitKey('mount:tiger')).toBeNull();
   });
 });
 
@@ -704,8 +763,30 @@ describe('buildWeaponVfxPrewarmGroup', () => {
   });
 
   it('pins the resume key plan to the catalog exactly once, in catalog order', () => {
+    // WEAPON_VFX_PREWARM_KEYS is Object.freeze(Object.keys(WEAPON_VFX)), so
+    // comparing it against Object.keys(WEAPON_VFX) cannot fail and neither can
+    // a uniqueness check over Object.keys. Literals are the only thing here
+    // that notices the catalog, or the unit plan derived from it, drifting.
+    expect(WEAPON_VFX_PREWARM_KEYS).toHaveLength(23);
+    expect(WEAPON_VFX_PREWARM_KEYS[0]).toBe('ice_fang');
+    expect(WEAPON_VFX_PREWARM_KEYS[WEAPON_VFX_PREWARM_KEYS.length - 1]).toBe('cinderlatch');
+    // And the plan really is the catalog, in its own order.
     expect(WEAPON_VFX_PREWARM_KEYS).toEqual(Object.keys(WEAPON_VFX));
-    expect(new Set(WEAPON_VFX_PREWARM_KEYS).size).toBe(WEAPON_VFX_PREWARM_KEYS.length);
+  });
+
+  it('plans one build and one compile unit per catalog skin, with literal ids', () => {
+    // 23 skins, 2 per-skin units each plus the one shared texture unit: what
+    // the PR claims the streamed lane replaced the single 534 ms unit with.
+    const buildIds = WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:build:${key}`);
+    const compileIds = WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:compile:${key}`);
+    expect(buildIds[0]).toBe('weapon-skins:build:ice_fang');
+    expect(compileIds[compileIds.length - 1]).toBe('weapon-skins:compile:cinderlatch');
+    expect(new Set([...buildIds, ...compileIds, 'weapon-skins:textures']).size).toBe(47);
+    // Every planned id round-trips through the failure-boundary key mapping,
+    // so no unit can fail into "owns nothing" by an id typo.
+    for (const id of [...buildIds, ...compileIds]) {
+      expect(weaponVfxPrewarmSkinUnitKey(id)).not.toBeNull();
+    }
   });
 
   it('builds exactly one deterministic skin unit with the same hidden ownership contract', () => {

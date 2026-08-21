@@ -472,8 +472,10 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     const submitEntryAt = renderer.indexOf("id: 'programs.compile-submit',");
     expect(submitEntryAt).toBeGreaterThan(-1);
     expect(submitEntryAt).toBeLessThan(renderer.indexOf("id: 'surface-detail.textures'"));
-    // The compile submit is bounded by the GPU submit deadline and the
-    // compile await reserve, so it cannot eat the initial-frame link window.
+    // The tail submit is bounded by BOTH deadlines: gpuSubmitDeadline alone
+    // sits 1000 ms past compileAwaitDeadline, so an unbounded tail submit
+    // could eat the whole await reserve and leave world.initial-frame drawing
+    // still-linking programs (QA finding, hitch-hunt P1).
     expect(compileEntry).toContain(
       "await submitCompileUnits(\n            true,\n            Math.min(gpuSubmitDeadline, compileAwaitDeadline),\n            'programs.compile',\n          );",
     );
@@ -496,20 +498,33 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(compileEntry).not.toContain('performance.now() >= gpuSubmitDeadline');
     // The submit loop consults the pure decision BETWEEN units, with the
     // caller-chosen deadline, the Insane exemption flag, and the pacing
-    // lane's own hard-stop verdict.
+    // lane's own hard-stop verdict: without this wiring the 22 s production
+    // overrun comes back with every unit test green (QA finding B2), and
+    // without the fourth argument the Insane arm has no stop at all (the
+    // 11.8 s compile-submit entry of the 17/08 production login).
     expect(renderer).toContain(
-      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n          pacing.shouldStop(performance.now()),\n        )',
+      'outOfTime: () =>\n          prewarmSubmitShouldStop(\n            performance.now(),\n            deadlineMs,\n            policy.finishFullManifestBeforeReveal,\n            pacing.shouldStop(performance.now()),\n          ),',
     );
-    expect(renderer).toContain('if (!(await pacing.awaitSlot(outOfTime))) {');
+    expect(renderer).toContain('awaitSlot: (outOfTime) => pacing.awaitSlot(outOfTime),');
     expect(renderer).toContain(
       'submitPrewarmCompileUnit(unit, lane, {\n            lifecycle: compileLifecycle,\n            pacing,',
     );
+    // The loop itself is the extracted runPrewarmCompileSubmission, which owns
+    // the between-units check and the never-drop contract; the renderer keeps
+    // only the wiring above and the deferral bookkeeping below.
+    expect(renderer).toContain('await runPrewarmCompileSubmission(pending, {');
+    const submissionCore = readFileSync(
+      new URL('../src/render/prewarm_compile_submission_core.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(submissionCore).toContain('if (!(await host.awaitSlot(host.outOfTime))) {');
+    expect(submissionCore).toContain('const deferred = pending.slice(i);');
     // The deferral lifecycle, pinned end to end (QA finding B3): stopped
     // units are retained, drained FIRST by the next submission (their groups
     // are already marked, so the plan cannot re-collect them), any leftover
     // is handed to the resume lane under the synthetic id, and the mid-run
     // deferral withholds warm-pool publication like the whole-entry path.
-    expect(renderer).toContain('deferredSubmitUnits.push(...pending.slice(i));');
+    expect(renderer).toContain('deferredSubmitUnits.push(...(deferred as PrewarmResumeUnit[]));');
     expect(renderer).toContain(
       'const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];',
     );
@@ -862,7 +877,14 @@ it('prewarms adaptive quality shader variants behind the desktop loading cover',
   expect(entry).toContain('renderBudgetShaderPrewarmLevels(');
   expect(entry).toContain('originalState');
   expect(entry).toContain('this.renderPrewarmPass(1 / 60)');
-  expect(entry).toContain('deadlineMs: hardDeadline');
+  // The GPU SUBMIT GUARD, never the hard deadline. Each variant runs a real
+  // prewarm pass and an already-started WebGL call cannot be cancelled, so a
+  // pass launched at hardDeadline - epsilon overshoots the wall and defers
+  // every entry behind it, the deadline-exempt debt payers included. The
+  // negative arm is the one that matters: this entry was briefly handed
+  // hardDeadline, and the pin that had guarded it was rewritten to match.
+  expect(entry).toContain('deadlineMs: gpuSubmitDeadline');
+  expect(entry).not.toContain('deadlineMs: hardDeadline');
   expect(entry).toContain('withRestoredPrewarmState(');
   expect(entry).not.toContain('compilePrewarmColorPrograms(this.scene');
   expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');

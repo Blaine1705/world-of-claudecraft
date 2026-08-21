@@ -208,7 +208,16 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    ceiling: 13546,
+    // Lowered again by the streamed-prewarm branch, which paid for its lines
+    // with two extractions instead of by deleting rationale: the compile SUBMIT
+    // LOOP with its deadline rule and never-drop contract
+    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
+    // beside the per-unit submit it already owned) and the weapon-skin resume
+    // unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts, beside
+    // the stage whose failure boundary shares its unit ids). The file lands
+    // below its previous pin with every load-bearing comment restored, so the
+    // ceiling is the exact new count: any growth reds again.
+    ceiling: 13534,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -261,6 +270,17 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/colliders.ts',
     ceiling: 2660,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
+  },
+  {
+    // Newly tracked. It was already larger than several budgeted files and had
+    // no row at all, so it was drifting unwatched: this branch's interior
+    // resource-lifecycle work grew it from 2807 to the count below even after
+    // extracting src/render/interior_resource_lifecycle.ts. Pinned at the exact
+    // current count per the ratchet's rule; any further growth reds, and the
+    // fix is extraction behind the seam named here.
+    file: 'src/render/dungeon.ts',
+    ceiling: 2882,
+    seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];
 

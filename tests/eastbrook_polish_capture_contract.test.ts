@@ -262,7 +262,7 @@ interface AttributionTargetFixture {
 // extraction. The renderer leaf moved; no capture was retaken because both
 // changes are behavior-neutral for the accepted visual evidence.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ff0a6e015376c3ca60905266cc7fae95c0fd7b341e908c1f713d464cb0a8dc14';
+  'ff1be822c1d27e8ac60aa3f8fc09c9a3f2003803f517ce60fe6a9b2bd39bf2d7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

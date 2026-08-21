@@ -54,6 +54,17 @@ export interface PrewarmBudgetVariantHost {
 }
 
 export interface PrewarmBudgetVariantHostOptions {
+  /**
+   * The caller's GPU SUBMIT GUARD, never its hard deadline.
+   *
+   * Each variant runs a real prewarm render pass, and an already-started WebGL
+   * call cannot be cancelled, so a pass launched at `hardDeadline - epsilon`
+   * overshoots the wall and defers every manifest entry behind it, the
+   * deadline-exempt debt payers included (`prewarmEntryShouldDefer`). The
+   * guard exists precisely to leave room for the last started GPU unit to
+   * settle. Pinned at the renderer call site by
+   * tests/prewarm_compile_lifecycle.test.ts.
+   */
   deadlineMs: number;
   programCount: () => number;
   applyLevels: (levels: RenderBudgetLevels) => void;
