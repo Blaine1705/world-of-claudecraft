@@ -1053,7 +1053,14 @@
     display: block;
   }
   /* The dim is LOCAL to the radial and never a full-screen scrim: the other
-     thumb is still steering and the player must keep seeing the fight. */
+     thumb is still steering and the player must keep seeing the fight.
+     STACKING, stated because nothing else in the tree relates the two numbers:
+     the overlay's z-index (32) sits deliberately ABOVE the ring's (31), and both
+     are positioned siblings inside #mobile-controls, so this scrim paints over
+     every ring button while the petals and the on-anchor cancel target, being
+     DOM children of the overlay, paint over the scrim. Dropping the overlay to
+     or below the ring would let its buttons punch straight through the dim.
+     Pinned in tests/browser/radial_action_ring.browser.test.ts. */
   body.mobile-touch #mobile-action-radial::before {
     content: "";
     position: absolute;
@@ -1068,6 +1075,22 @@
       transparent calc(var(--radial-petal-size) * 2.6)
     );
     pointer-events: none;
+  }
+  /* The scrim above reaches about 2.6 petal sizes, which clears the petal spread
+     with room to spare but NOT the rest of the cluster: from a pressed seat the
+     attack toggle, Jump, the consumables seat and the page badge sit up to 4.5
+     petal sizes out (measured), so they kept full brightness beside a dark scrim
+     and read as painted ON TOP of it. Growing the scrim to reach them would wash
+     roughly half a landscape phone, which is the one thing the local dim exists
+     to avoid, so the ring recedes instead of the scrim spreading. The PRESSED
+     anchor is exempt: the gesture layer already marks it aria-expanded while its
+     petals are up (radial_gesture_controller.ts), so the control the thumb is
+     holding is named by the attribute a screen reader already reads rather than
+     by a second bespoke class. */
+  body.mobile-touch.game-active #mobile-controls:has(#mobile-action-radial.open)
+    #mobile-action-ring
+    > button:not([aria-expanded="true"]) {
+    opacity: 0.4;
   }
   /* Petals and the centre cancel target are seated by their CENTRE (the painter
      writes left/top from placeRadial), so the negative margins pull each box
@@ -1403,12 +1426,25 @@
   body.mobile-touch #mobile-consumable-strip::before,
   body.mobile-touch #mobile-menu-strip::before {
     content: "";
+    /* The ANCHOR-side ramp, inside the band rather than added to it. The far end
+       already fades out along the row, but the anchor end used to reach full
+       strength at its first pixel, so the band ended in a hard vertical cut
+       through the control the row grew from. Kept inside the measured span on
+       purpose: adding it outside would push new darkness back over the anchor
+       button, which is the one control the player is still holding. */
+    --strip-dim-anchor-fade: 14px;
     position: absolute;
     left: var(--strip-dim-x, 0px);
     top: calc(var(--strip-y, 50%) - var(--strip-item-size));
     width: var(--strip-extent-px, 0px);
     height: calc(var(--strip-item-size) * 2);
-    background: linear-gradient(to right, #05050cb0 0%, #05050c80 45%, transparent 100%);
+    background: linear-gradient(
+      to right,
+      transparent 0,
+      #05050cb0 var(--strip-dim-anchor-fade),
+      #05050c80 45%,
+      transparent 100%
+    );
     /* The band has no soft edge of its own along the cross axis, so the mask
        supplies one; without it the row sits in a hard-edged dark stripe. */
     -webkit-mask-image: linear-gradient(
@@ -1696,7 +1732,7 @@
         0.82 *
         var(--mobile-chrome-scale, 1)
       ) +
-      26px
+      11px
     );
   }
   /* The top-band quest strip (#quest-strip), the touch replacement for the
@@ -6675,7 +6711,7 @@
           0.6 *
           var(--mobile-chrome-scale, 1)
         ) +
-        26px
+        11px
       );
     }
     body.mobile-touch #party-frames {

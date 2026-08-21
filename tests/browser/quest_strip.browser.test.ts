@@ -220,7 +220,7 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
 
   it('seats itself in the top band, clear of the target frame it is derived from', async () => {
     const rig = await setup();
-    rig.controller.update(quests(2));
+    rig.controller.update(quests(2), 0);
 
     const box = rig.root.getBoundingClientRect();
     expect(getComputedStyle(rig.root).display).not.toBe('none');
@@ -238,7 +238,7 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
   it('never overlaps the action ring, at ANY quest count', async () => {
     const rig = await setup();
     for (const count of [0, 1, 2, 5]) {
-      rig.controller.update(quests(count, 4));
+      rig.controller.update(quests(count, 4), 0);
       const ring = rig.ring.getBoundingClientRect();
       expect(ring.width, 'the ring must render for this pin to mean anything').toBeGreaterThan(0);
       if (count === 0) {
@@ -256,7 +256,7 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     const rig = await setup();
     const heights = new Set<number>();
     for (const count of [1, 2, 5]) {
-      rig.controller.update(quests(count));
+      rig.controller.update(quests(count), 0);
       heights.add(Math.round(rig.root.getBoundingClientRect().height));
     }
     // ONE height across every count: the strip shows one quest, so the log's
@@ -267,17 +267,17 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
 
   it('holds its left-top anchor as the shown quest gains objectives', async () => {
     const rig = await setup();
-    rig.controller.update(quests(3, 1));
+    rig.controller.update(quests(3, 1), 0);
     const start = rig.root.getBoundingClientRect();
 
-    rig.controller.update(quests(3, 4));
+    rig.controller.update(quests(3, 4), 0);
     const grown = rig.root.getBoundingClientRect();
     expect(grown.left).toBeCloseTo(start.left, 1);
     expect(grown.top).toBeCloseTo(start.top, 1);
     // It grew DOWNWARD from that anchor rather than moving.
     expect(grown.height).toBeGreaterThan(start.height);
 
-    rig.controller.update(quests(3, 1));
+    rig.controller.update(quests(3, 1), 0);
     const shrunk = rig.root.getBoundingClientRect();
     expect(shrunk.left).toBeCloseTo(start.left, 1);
     expect(shrunk.top).toBeCloseTo(start.top, 1);
@@ -287,22 +287,22 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     const rig = await setup();
     // First paint, before the player has ever had a target: the state the old
     // reservation could not seat correctly, because it had nothing to cache.
-    rig.controller.update(quests(3));
+    rig.controller.update(quests(3), 0);
     const first = rig.root.getBoundingClientRect().left;
     expect(first).toBeGreaterThan(0);
 
     const target = rig.addTarget();
-    rig.controller.update(quests(3, 3));
+    rig.controller.update(quests(3, 3), 0);
     expect(rig.root.getBoundingClientRect().left).toBe(first);
 
     target.remove();
-    rig.controller.update(quests(3, 2));
+    rig.controller.update(quests(3, 2), 0);
     expect(rig.root.getBoundingClientRect().left).toBe(first);
   });
 
   it('wears no plate: the text sits on the world and outlines itself', async () => {
     const rig = await setup();
-    rig.controller.update(quests(3));
+    rig.controller.update(quests(3), 0);
 
     // Nothing paints a box behind the glyphs: no fill, no image, no plate
     // shadow. (A fully transparent background-color resolves to alpha 0.)
@@ -322,7 +322,7 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
 
   it('keeps a visible focus ring now that the plate is gone', async () => {
     const rig = await setup();
-    rig.controller.update(quests(3));
+    rig.controller.update(quests(3), 0);
     rig.surface.focus();
     const style = getComputedStyle(rig.surface);
     // The ring was never the panel's border, and it must not have left with it.
@@ -333,7 +333,7 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
   it('keeps a hit surface bigger than the text block, and bigger than the touch floor', async () => {
     const rig = await setup();
     // The smallest the visual box ever gets: one quest, one objective.
-    rig.controller.update(quests(1, 1));
+    rig.controller.update(quests(1, 1), 0);
     const box = rig.surface.getBoundingClientRect();
 
     // A touch just OUTSIDE the text block still lands on the strip: the pad is a
@@ -348,7 +348,7 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
 
   it('cycles on a tap and on a swipe, in both directions', async () => {
     const rig = await setup();
-    rig.controller.update(quests(3));
+    rig.controller.update(quests(3), 0);
     const box = rig.surface.getBoundingClientRect();
     const y = box.top + box.height / 2;
     const x = box.left + box.width / 2;
@@ -371,7 +371,7 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
 
   it('exposes the objective progress to assistive tech, not only to the eye', async () => {
     const rig = await setup();
-    rig.controller.update(quests(3, 2));
+    rig.controller.update(quests(3, 2), 0);
     // NO aria-label: one on a button REPLACES its whole subtree for name
     // computation, so the objective lines the sighted touch player reads were
     // never announced at all. The name comes from the strip's own nodes and the
@@ -407,5 +407,27 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     rig.controller.cycle(1);
     expect(textOf('aria-labelledby')).toContain(rig.title.textContent ?? '');
     expect(textOf('aria-labelledby')).toContain('2/3');
+  });
+
+  it('switches to the quest that just made progress, and stays laid out', async () => {
+    const rig = await setup();
+    const tracked = quests(3, 2);
+    rig.controller.update(tracked, 1000);
+    expect(rig.counter.textContent).toBe('1/3');
+    const anchorLeft = rig.root.getBoundingClientRect().left;
+
+    // The only mutation is a kill credit on the THIRD quest's first objective.
+    const progressed = quests(3, 2);
+    progressed[2].objectives = [
+      { ...progressed[2].objectives[0], current: progressed[2].objectives[0].current + 1 },
+      progressed[2].objectives[1],
+    ];
+    rig.controller.update(progressed, 1050);
+
+    expect(rig.counter.textContent).toBe('3/3');
+    expect(rig.title.textContent).toBe(tracked[2].title);
+    expect(rig.objective.textContent).toContain('1/6');
+    // The switch repaints the content; the learned anchor must not move with it.
+    expect(rig.root.getBoundingClientRect().left).toBeCloseTo(anchorLeft, 1);
   });
 });

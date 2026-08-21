@@ -32,7 +32,7 @@ export const QUEST_STRIP_BAND_MIN_X_PX = 12;
 
 /** Clear space between the target frame's static seat and the strip's anchor.
  *  Mirrored by the --quest-strip-anchor-left derivation in hud.mobile.css. */
-export const QUEST_STRIP_TARGET_FRAME_GAP_PX = 26;
+export const QUEST_STRIP_TARGET_FRAME_GAP_PX = 11;
 
 /** Clear space between the strip and any other occupant of the band. */
 export const QUEST_STRIP_BAND_GAP_PX = 10;
@@ -209,4 +209,84 @@ export function questStripBand(inputs: QuestStripBandInputs): QuestStripBand {
     rightLimit = Math.min(rightLimit, box.left - QUEST_STRIP_BAND_GAP_PX);
   }
   return { maxWidth: Math.max(QUEST_STRIP_MIN_WIDTH_PX, Math.round(rightLimit - left)) };
+}
+
+/** How long a hand cycle owns the strip before objective progress may move the
+ *  selection again. The player who just swiped to a quest is reading it, and a
+ *  kill credit landing a beat later must not yank it away under them. */
+export const QUEST_STRIP_CYCLE_GRACE_MS = 5000;
+
+/**
+ * Which tracked quest just made progress, by index into `next`, or null when
+ * none did. Matched by quest id rather than by position, so an accept or an
+ * abandon reshuffling the list cannot read as progress on the quest that
+ * inherited a slot.
+ *
+ * Progress is any of: an objective count rising, an objective crossing into
+ * done, or the quest itself turning complete. A quest that is NEW to the list is
+ * deliberately not progress: accepting one is not a reason to take the strip off
+ * the quest the player is working. Multiple quests progressing in the same tick
+ * resolve to the FIRST in tracked order, which is the log's own acceptance
+ * order, so the choice is stable rather than dependent on iteration accidents.
+ */
+export function detectQuestProgress(
+  previous: readonly TrackedQuest[],
+  next: readonly TrackedQuest[],
+): number | null {
+  if (previous.length === 0 || next.length === 0) return null;
+  for (let i = 0; i < next.length; i++) {
+    const quest = next[i];
+    const before = previous.find((candidate) => candidate.id === quest.id);
+    if (!before) continue;
+    if (quest.complete && !before.complete) return i;
+    if (questObjectivesProgressed(before, quest)) return i;
+  }
+  return null;
+}
+
+function questObjectivesProgressed(before: TrackedQuest, after: TrackedQuest): boolean {
+  for (let i = 0; i < after.objectives.length; i++) {
+    const was = before.objectives[i];
+    if (!was) continue;
+    const now = after.objectives[i];
+    if (now.current > was.current) return true;
+    // A completion the count alone does not show: the requirement itself can
+    // fall (a shared or scaled objective), which still finishes the line.
+    if (now.current >= now.total && was.current < was.total) return true;
+  }
+  return false;
+}
+
+/**
+ * Whether a hand cycle still owns the selection. `lastCycleAt` is null until the
+ * player has cycled at all, and both times come from the HUD's monotonic frame
+ * clock: this module never reads one of its own.
+ */
+export function questStripCycleGraceHolds(
+  lastCycleAt: number | null,
+  now: number,
+  graceMs: number = QUEST_STRIP_CYCLE_GRACE_MS,
+): boolean {
+  if (lastCycleAt === null) return false;
+  if (!Number.isFinite(lastCycleAt) || !Number.isFinite(now)) return false;
+  return now - lastCycleAt >= 0 && now - lastCycleAt < graceMs;
+}
+
+export interface QuestStripProgressJumpInput {
+  previous: readonly TrackedQuest[];
+  next: readonly TrackedQuest[];
+  /** Monotonic ms from the HUD frame clock, threaded in by the controller. */
+  now: number;
+  /** When the player last cycled by hand, or null if they never have. */
+  lastCycleAt: number | null;
+  graceMs?: number;
+}
+
+/** The index the strip should switch to because that quest just progressed, or
+ *  null to leave the player's selection exactly where it is. */
+export function questStripProgressJump(input: QuestStripProgressJumpInput): number | null {
+  const index = detectQuestProgress(input.previous, input.next);
+  if (index === null) return null;
+  if (questStripCycleGraceHolds(input.lastCycleAt, input.now, input.graceMs)) return null;
+  return index;
 }

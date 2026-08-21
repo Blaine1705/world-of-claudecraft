@@ -33,12 +33,18 @@ export interface QuestTrackerControllerDeps {
  *  rather than projecting the log a second time. */
 export class QuestTrackerController {
   private readonly strip: QuestStripController | null;
+  /** The last frame time Hud handed down. The collapse toggle re-renders off a
+   *  user gesture rather than a frame, so it reuses it instead of minting a
+   *  clock here; the strip's grace is measured in seconds and cannot see the
+   *  one-tick staleness. */
+  private lastNow = 0;
 
   constructor(private readonly deps: QuestTrackerControllerDeps) {
     this.strip = buildQuestStrip({ writers: deps.writers, click: () => this.deps.click() });
   }
 
-  update(): void {
+  update(now: number): void {
+    this.lastNow = now;
     let collapsed = this.deps.settings.collapsed();
     const quests: TrackedQuest[] = [];
     for (const progress of this.deps.world().questLog.values()) {
@@ -76,7 +82,7 @@ export class QuestTrackerController {
     // On touch the strip IS the tracker: the right-anchored markup is hidden in
     // hud.mobile.css, so rendering it would be a string build a phone never sees.
     if (this.strip?.active() === true) {
-      this.strip.update(quests);
+      this.strip.update(quests, now);
       if (this.deps.element.innerHTML !== '') this.deps.element.innerHTML = '';
       return;
     }
@@ -90,7 +96,7 @@ export class QuestTrackerController {
     const refocus = active?.classList.contains('qt-header') === true;
     this.deps.settings.setCollapsed(!this.deps.settings.collapsed());
     this.deps.click();
-    this.update();
+    this.update(this.lastNow);
     if (refocus) this.deps.element.querySelector<HTMLElement>('.qt-header')?.focus();
   }
 

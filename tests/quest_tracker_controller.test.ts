@@ -85,8 +85,8 @@ describe('QuestTrackerController', () => {
   it('renders authoritative quests in acceptance order and elides an identical paint', () => {
     const test = harness([progress('q_wolves'), progress('q_boars', 'ready')]);
 
-    test.controller.update();
-    test.controller.update();
+    test.controller.update(0);
+    test.controller.update(0);
 
     expect(test.writes()).toBe(1);
     expect(test.html()).toContain('title:q_wolves');
@@ -114,7 +114,7 @@ describe('QuestTrackerController', () => {
     const proto = { questId: 'constructor', state: 'active' as const, counts: [0] };
     const test = harness([progress('q_wolves'), ghost, proto, progress('q_boars', 'ready')]);
 
-    test.controller.update();
+    test.controller.update(0);
 
     expect(test.html()).toContain('q_ghost_of_v33');
     // The title SAYS unknown (the questUi.tracker.unknownQuest sentence
@@ -137,8 +137,8 @@ describe('QuestTrackerController', () => {
     const test = harness();
     test.setCollapsed(true);
 
-    test.controller.update();
-    test.controller.update();
+    test.controller.update(0);
+    test.controller.update(0);
 
     expect(test.settings.setCollapsed).toHaveBeenCalledTimes(1);
     expect(test.settings.setCollapsed).toHaveBeenCalledWith(false);
@@ -154,13 +154,13 @@ describe('QuestTrackerController', () => {
     // only names individual quest rows). English source: 'Quests'
     // (src/ui/i18n.catalog/quests.ts).
     const test = harness([progress('q_wolves')]);
-    test.controller.update();
+    test.controller.update(0);
     expect(test.html()).toContain('<span class="qt-h-label">Quests</span>');
   });
 
   it('persists a toggle, repaints the collapsed header, and restores header focus', () => {
     const test = harness([progress('q_wolves')]);
-    test.controller.update();
+    test.controller.update(0);
 
     test.controller.toggleCollapsed();
 

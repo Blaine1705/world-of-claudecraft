@@ -47,6 +47,45 @@ const VIEWPORTS = [
  *  stylesheet declares and the gesture reads back. */
 const EDGE_TOLERANCE_PX = 0.5;
 
+/** The colour stops of a resolved linear-gradient, in serialization order.
+ *  Used to prove the row dim ramps in at BOTH ends: the far end always faded
+ *  along the row, but the anchor end used to reach full strength at its first
+ *  pixel, which drew a hard vertical cut through the control the row grew from. */
+function gradientStops(image: string): string[] {
+  return image.match(/rgba?\([^)]*\)\s+[\d.]+(?:px|%)/g) ?? [];
+}
+
+/** Assert both ends of a row dim ramp, and return the anchor-side ramp length. */
+function expectSoftBothEnds(image: string, bandWidth: number): number {
+  const stops = gradientStops(image);
+  expect(stops.length).toBeGreaterThanOrEqual(4);
+  expect(stops[0]).toMatch(/rgba\(0, 0, 0, 0\)\s+0px/);
+  expect(stops[stops.length - 1]).toMatch(/rgba\(0, 0, 0, 0\)\s+100%/);
+  const ramp = Number.parseFloat(stops[1].slice(stops[1].lastIndexOf(' ') + 1));
+  // Short enough to stay a soft edge rather than a second fade, and it lives
+  // INSIDE the measured band, so it can never push darkness onto the anchor.
+  expect(ramp).toBeGreaterThanOrEqual(12);
+  expect(ramp).toBeLessThanOrEqual(16);
+  expect(ramp).toBeLessThan(bandWidth / 2);
+  return ramp;
+}
+
+/** Clear space the scrim must still have past the outermost petal, so it backs
+ *  the spread rather than ending on it. */
+const PETAL_SCRIM_MARGIN_PX = 20;
+
+/** Where the radial scrim reaches zero, resolved off the rendered gradient
+ *  rather than recomputed from the authored multiplier. */
+function scrimTransparentRadius(overlay: HTMLElement, petalSize: number): number {
+  const image = getComputedStyle(overlay, '::before').backgroundImage;
+  const stops = image.match(/rgba?\([^)]*\)\s+([\d.]+)px/g) ?? [];
+  const last = stops[stops.length - 1] ?? '';
+  const parsed = Number.parseFloat(last.slice(last.lastIndexOf(' ') + 1));
+  // The last stop is authored as a multiple of the petal size; if an engine ever
+  // hands it back unresolved, fall back to that same relation rather than 0.
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : petalSize * 2.6;
+}
+
 function emptySlotState(kind: ActionBarSlotState['kind']): ActionBarSlotState {
   return {
     kind,
@@ -478,6 +517,15 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
     // The fade starts at the seat end, which is the right edge on a leftward row.
     expect(rig.strip.classList.contains('dim-flip')).toBe(true);
     expect(getComputedStyle(rig.strip, '::before').transform).toBe('matrix(-1, 0, 0, 1, 0, 0)');
+    // NEITHER end is a hard cut: the far end fades along the row and the anchor
+    // end ramps in over a short run, which the scaleX(-1) mirror carries with it.
+    const ramp = expectSoftBothEnds(
+      getComputedStyle(rig.strip, '::before').backgroundImage,
+      full.width,
+    );
+    // The ramp is a fraction of one item, so it softens the edge without
+    // undercutting the seat the row grew from.
+    expect(ramp).toBeLessThan(itemSize / 2);
 
     // The extent is a function of the OPEN item count, which is the whole point
     // of measuring it rather than hard-coding a radius.
@@ -528,6 +576,7 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
     expect(rig.strip.classList.contains('dim-flip')).toBe(false);
     expect(mirroredDim.transform).toBe('none');
     expect(mirroredDim.backgroundImage).toContain('to right');
+    expectSoftBothEnds(mirroredDim.backgroundImage, Number.parseFloat(mirroredDim.width));
     document.body.classList.remove('mobile-left-handed');
   });
 
@@ -647,5 +696,159 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
     // The dim is a gradient anchored on the radial, not a flat full-screen wash.
     const scrim = getComputedStyle(rig.overlay, '::before');
     expect(scrim.backgroundImage).toContain('radial-gradient');
+  });
+
+  it('paints the scrim OVER the ring and the petals over the scrim', async () => {
+    const rig = await setup();
+    rig.overlay.classList.add('open');
+    const ringStyle = getComputedStyle(rig.ring);
+    const overlayStyle = getComputedStyle(rig.overlay);
+
+    // Paint order is fully determined by these three facts, so they are what is
+    // pinned rather than a screenshot: both boxes are positioned children of the
+    // SAME parent (so one stacking context orders them), both carry a numeric
+    // z-index, and the overlay's is the higher. The reported defect is what the
+    // opposite ordering looks like: the ring's buttons punching through the dim.
+    expect(rig.ring.parentElement).toBe(rig.overlay.parentElement);
+    expect(ringStyle.position).toBe('absolute');
+    expect(overlayStyle.position).toBe('absolute');
+    const ringZ = Number(ringStyle.zIndex);
+    const overlayZ = Number(overlayStyle.zIndex);
+    expect(Number.isFinite(ringZ)).toBe(true);
+    expect(Number.isFinite(overlayZ)).toBe(true);
+    expect(overlayZ).toBeGreaterThan(ringZ);
+    // And the petals plus the cancel target are DOM children of the overlay, so
+    // they paint after its ::before rather than under it.
+    for (const el of [...rig.petalBtns, rig.cancel]) {
+      expect(el.parentElement).toBe(rig.overlay);
+    }
+
+    // Hit testing is the other half and must NOT follow paint order here: the
+    // scrim is pointer-events:none, so the other thumb keeps steering and every
+    // ring button under the dim stays reachable.
+    expect(getComputedStyle(rig.overlay, '::before').pointerEvents).toBe('none');
+    const attackBox = rig.attack.getBoundingClientRect();
+    expect(
+      document.elementFromPoint(
+        attackBox.x + attackBox.width / 2,
+        attackBox.y + attackBox.height / 2,
+      ),
+    ).toBe(rig.attack);
+  });
+
+  it('recedes the untargeted ring buttons and leaves the pressed anchor lit', async () => {
+    const rig = await setup();
+    const lit = (el: HTMLElement) => Number(getComputedStyle(el).opacity);
+    // Closed: nothing recedes.
+    for (const btn of [...rig.slotBtns, rig.seat, rig.attack, rig.pageToggle]) {
+      expect(lit(btn)).toBe(1);
+    }
+
+    // Open from the first seat, exactly as radial_gesture_controller marks it.
+    rig.overlay.classList.add('open');
+    rig.slotBtns[0].setAttribute('aria-expanded', 'true');
+    expect(lit(rig.slotBtns[0])).toBe(1);
+    for (const btn of [rig.slotBtns[1], rig.seat, rig.attack, rig.pageToggle]) {
+      expect(lit(btn)).toBeLessThan(1);
+    }
+
+    // Teeth: the buttons that recede are exactly the ones the local scrim cannot
+    // reach, which is why receding them is the fix rather than a bigger scrim.
+    const overlayStyle = getComputedStyle(rig.overlay);
+    const petalSize = Number.parseFloat(overlayStyle.getPropertyValue('--radial-petal-size'));
+    const anchorBox = rig.slotBtns[0].getBoundingClientRect();
+    const placement = placeRadial({
+      buttonCx: anchorBox.x + anchorBox.width / 2,
+      buttonCy: anchorBox.y + anchorBox.height / 2,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      radius:
+        anchorBox.width * Number.parseFloat(overlayStyle.getPropertyValue('--radial-radius-ratio')),
+      petalHalf: anchorBox.width / 2,
+      margin: Number.parseFloat(overlayStyle.getPropertyValue('--radial-margin')),
+    });
+    const scrimReach = scrimTransparentRadius(rig.overlay, petalSize);
+    const attackBox = rig.attack.getBoundingClientRect();
+    expect(
+      Math.hypot(
+        attackBox.x + attackBox.width / 2 - placement.originX,
+        attackBox.y + attackBox.height / 2 - placement.originY,
+      ),
+      'the attack toggle is inside the scrim, so the recede proves nothing',
+    ).toBeGreaterThan(scrimReach);
+
+    // Closing restores every button, so the recede is a gesture state and not a
+    // permanent dimming of the ring.
+    rig.overlay.classList.remove('open');
+    rig.slotBtns[0].setAttribute('aria-expanded', 'false');
+    for (const btn of [...rig.slotBtns, rig.seat, rig.attack, rig.pageToggle]) {
+      expect(lit(btn)).toBe(1);
+    }
+  });
+
+  it('covers the whole petal spread with the scrim, at every seat', async () => {
+    const rig = await setup();
+    const petalPainter = new RadialPetalPainter(
+      writers(),
+      {
+        overlay: rig.overlay,
+        cancel: rig.cancel,
+        bar: { container: rig.overlay, slots: rig.petalBtns.map(slotElements) },
+      },
+      () => '',
+    );
+    const petalState: ActionBarState = {
+      slots: RADIAL_PETAL_DIRECTIONS.map(() => emptySlotState('empty')),
+      manySpells: false,
+    };
+    const overlayStyle = getComputedStyle(rig.overlay);
+    const ratio = Number.parseFloat(overlayStyle.getPropertyValue('--radial-radius-ratio'));
+    const margin = Number.parseFloat(overlayStyle.getPropertyValue('--radial-margin'));
+    const petalSize = Number.parseFloat(overlayStyle.getPropertyValue('--radial-petal-size'));
+    const scrimReach = scrimTransparentRadius(rig.overlay, petalSize);
+    expect(scrimReach).toBeGreaterThan(0);
+
+    // The seat page does not change the radial's geometry (the petals are the
+    // same four positions holding a different slot set), so every seat is walked
+    // instead: the corner ones are the edge-clamped cases.
+    let clampedSeen = false;
+    for (const anchor of [...rig.slotBtns, rig.seat]) {
+      const rect = anchor.getBoundingClientRect();
+      const placement = placeRadial({
+        buttonCx: rect.x + rect.width / 2,
+        buttonCy: rect.y + rect.height / 2,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        radius: rect.width * ratio,
+        petalHalf: rect.width / 2,
+        margin,
+      });
+      clampedSeen ||=
+        placement.originX !== rect.x + rect.width / 2 ||
+        placement.originY !== rect.y + rect.height / 2;
+      petalPainter.paint(petalState, placement, 'center', true);
+      // The scrim is drawn from the SAME origin the petals are seated from, so a
+      // clamped radial takes its dim with it.
+      const scrim = getComputedStyle(rig.overlay, '::before');
+      const centre = /circle at ([\d.]+)px ([\d.]+)px/.exec(scrim.backgroundImage);
+      expect(centre, 'the scrim must be anchored on the radial origin').not.toBeNull();
+      expect(Number(centre?.[1])).toBeCloseTo(placement.originX, 0);
+      expect(Number(centre?.[2])).toBeCloseTo(placement.originY, 0);
+      // Every petal's FAR CORNER is inside the scrim, with a real margin left,
+      // so the dim never stops short of the spread it exists to back.
+      for (const petal of [...rig.petalBtns, rig.cancel]) {
+        const box = petal.getBoundingClientRect();
+        const far = Math.max(
+          Math.hypot(box.left - placement.originX, box.top - placement.originY),
+          Math.hypot(box.right - placement.originX, box.top - placement.originY),
+          Math.hypot(box.left - placement.originX, box.bottom - placement.originY),
+          Math.hypot(box.right - placement.originX, box.bottom - placement.originY),
+        );
+        expect(far, `${petal.id || petal.dataset.radialDir} outruns the scrim`).toBeLessThan(
+          scrimReach - PETAL_SCRIM_MARGIN_PX,
+        );
+      }
+    }
+    expect(clampedSeen, 'no seat exercised the edge clamp').toBe(true);
   });
 });

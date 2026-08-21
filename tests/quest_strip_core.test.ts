@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   clampQuestIndex,
   cycleQuestStrip,
+  detectQuestProgress,
   QUEST_STRIP_BAND_GAP_PX,
   QUEST_STRIP_BAND_MIN_X_PX,
   QUEST_STRIP_BAND_TOP_PX,
+  QUEST_STRIP_CYCLE_GRACE_MS,
   QUEST_STRIP_FALLBACK_HEIGHT_PX,
   QUEST_STRIP_MAX_OBJECTIVES,
   QUEST_STRIP_MIN_WIDTH_PX,
@@ -12,6 +14,8 @@ import {
   QUEST_STRIP_TARGET_FRAME_GAP_PX,
   questStripBand,
   questStripCounter,
+  questStripCycleGraceHolds,
+  questStripProgressJump,
   questStripStep,
   questStripView,
 } from '../src/ui/hud/quest/quest_strip_core';
@@ -40,10 +44,11 @@ describe('quest strip constants', () => {
     expect(QUEST_STRIP_MAX_OBJECTIVES).toBe(4);
     expect(QUEST_STRIP_BAND_TOP_PX).toBe(6);
     expect(QUEST_STRIP_BAND_MIN_X_PX).toBe(12);
-    expect(QUEST_STRIP_TARGET_FRAME_GAP_PX).toBe(26);
+    expect(QUEST_STRIP_TARGET_FRAME_GAP_PX).toBe(11);
     expect(QUEST_STRIP_BAND_GAP_PX).toBe(10);
     expect(QUEST_STRIP_MIN_WIDTH_PX).toBe(150);
     expect(QUEST_STRIP_FALLBACK_HEIGHT_PX).toBe(56);
+    expect(QUEST_STRIP_CYCLE_GRACE_MS).toBe(5000);
   });
 });
 
@@ -392,5 +397,140 @@ describe('questStripBand', () => {
       stripHeight: 40,
     });
     expect(Object.keys(band)).toEqual(['maxWidth']);
+  });
+});
+
+// The auto-show half: which tracked quest just earned the band, and when a hand
+// cycle still outranks it. Both are pure, so the whole decision is driven here
+// rather than through the controller's DOM.
+describe('detectQuestProgress', () => {
+  const tracked = (
+    id: string,
+    objectives: TrackedQuest['objectives'],
+    complete = false,
+  ): TrackedQuest => ({
+    id,
+    number: 1,
+    title: `Quest ${id}`,
+    complete,
+    objectives,
+  });
+
+  const wolves = (current: number) => [objective('Wolves slain', current, 6)];
+
+  it('reports the quest whose objective count rose', () => {
+    const before = [tracked('a', wolves(0)), tracked('b', wolves(1))];
+    const after = [tracked('a', wolves(0)), tracked('b', wolves(2))];
+    expect(detectQuestProgress(before, after)).toBe(1);
+  });
+
+  it('reports an objective crossing into done even when the count did not move', () => {
+    // A shared or scaled requirement can FALL, which finishes the line without
+    // the current count changing; the strip should still surface it.
+    const before = [tracked('a', [objective('Runes cleansed', 3, 6)])];
+    const after = [tracked('a', [objective('Runes cleansed', 3, 3)])];
+    expect(detectQuestProgress(before, after)).toBe(0);
+  });
+
+  it('reports a quest that just turned complete', () => {
+    const before = [tracked('a', wolves(6)), tracked('b', wolves(0))];
+    const after = [tracked('a', wolves(6), true), tracked('b', wolves(0))];
+    expect(detectQuestProgress(before, after)).toBe(0);
+  });
+
+  it('reports nothing when nothing moved', () => {
+    const before = [tracked('a', wolves(2)), tracked('b', wolves(3))];
+    const after = [tracked('a', wolves(2)), tracked('b', wolves(3))];
+    expect(detectQuestProgress(before, after)).toBeNull();
+  });
+
+  it('does NOT treat a newly tracked quest as progress', () => {
+    // Accepting a quest is not a reason to take the band off the one the player
+    // is working, so a quest with no previous entry is skipped entirely.
+    const before = [tracked('a', wolves(1))];
+    const after = [tracked('a', wolves(1)), tracked('b', wolves(0))];
+    expect(detectQuestProgress(before, after)).toBeNull();
+  });
+
+  it('does NOT treat a removed quest as progress on the quest that inherited its slot', () => {
+    // Matching by id rather than by position is what makes this hold: quest 'b'
+    // moves from index 1 to index 0 with its counts untouched.
+    const before = [tracked('a', wolves(0)), tracked('b', wolves(4))];
+    const after = [tracked('b', wolves(4))];
+    expect(detectQuestProgress(before, after)).toBeNull();
+  });
+
+  it('takes the FIRST in tracked order when two quests progress in one tick', () => {
+    const before = [tracked('a', wolves(0)), tracked('b', wolves(0)), tracked('c', wolves(0))];
+    const after = [tracked('a', wolves(0)), tracked('b', wolves(1)), tracked('c', wolves(1))];
+    expect(detectQuestProgress(before, after)).toBe(1);
+  });
+
+  it('reports nothing from or to an empty list', () => {
+    expect(detectQuestProgress([], [tracked('a', wolves(1))])).toBeNull();
+    expect(detectQuestProgress([tracked('a', wolves(1))], [])).toBeNull();
+  });
+
+  it('tolerates an objective list that grew under the same quest id', () => {
+    const before = [tracked('a', wolves(1))];
+    const after = [tracked('a', [...wolves(1), objective('Totems burned', 0, 3)])];
+    expect(detectQuestProgress(before, after)).toBeNull();
+  });
+});
+
+describe('questStripCycleGraceHolds', () => {
+  it('never holds before the player has cycled at all', () => {
+    expect(questStripCycleGraceHolds(null, 10_000)).toBe(false);
+  });
+
+  it('holds inside the grace window and releases on its far edge', () => {
+    expect(questStripCycleGraceHolds(1000, 1000)).toBe(true);
+    expect(questStripCycleGraceHolds(1000, 1000 + QUEST_STRIP_CYCLE_GRACE_MS - 1)).toBe(true);
+    expect(questStripCycleGraceHolds(1000, 1000 + QUEST_STRIP_CYCLE_GRACE_MS)).toBe(false);
+    expect(questStripCycleGraceHolds(1000, 20_000)).toBe(false);
+  });
+
+  it('takes an explicit window', () => {
+    expect(questStripCycleGraceHolds(1000, 2000, 3000)).toBe(true);
+    expect(questStripCycleGraceHolds(1000, 2000, 500)).toBe(false);
+  });
+
+  it('does not hold on a clock that ran backwards or is not a number', () => {
+    expect(questStripCycleGraceHolds(5000, 1000)).toBe(false);
+    expect(questStripCycleGraceHolds(Number.NaN, 1000)).toBe(false);
+    expect(questStripCycleGraceHolds(1000, Number.NaN)).toBe(false);
+  });
+});
+
+describe('questStripProgressJump', () => {
+  const tracked = (id: string, current: number): TrackedQuest => ({
+    id,
+    number: 1,
+    title: `Quest ${id}`,
+    complete: false,
+    objectives: [objective('Wolves slain', current, 6)],
+  });
+  const before = [tracked('a', 0), tracked('b', 0)];
+  const after = [tracked('a', 0), tracked('b', 1)];
+
+  it('jumps to the progressed quest when no cycle is holding', () => {
+    expect(
+      questStripProgressJump({ previous: before, next: after, now: 9000, lastCycleAt: null }),
+    ).toBe(1);
+    expect(
+      questStripProgressJump({ previous: before, next: after, now: 9000, lastCycleAt: 1000 }),
+    ).toBe(1);
+  });
+
+  it('is suppressed while a hand cycle is still holding the selection', () => {
+    expect(
+      questStripProgressJump({ previous: before, next: after, now: 3000, lastCycleAt: 1000 }),
+    ).toBeNull();
+  });
+
+  it('stays null when nothing progressed, cycle or no cycle', () => {
+    expect(
+      questStripProgressJump({ previous: before, next: before, now: 9000, lastCycleAt: null }),
+    ).toBeNull();
   });
 });

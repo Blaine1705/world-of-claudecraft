@@ -1,6 +1,9 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { QUEST_STRIP_MAX_OBJECTIVES } from '../src/ui/hud/quest/quest_strip_core';
+import {
+  QUEST_STRIP_MAX_OBJECTIVES,
+  QUEST_STRIP_TARGET_FRAME_GAP_PX,
+} from '../src/ui/hud/quest/quest_strip_core';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 // The CSS extraction moved the :root tokens and the reset/base
@@ -1233,6 +1236,13 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('    left: var(--strip-dim-x, 0px);');
     expect(hudMobileCss).toContain('    width: var(--strip-extent-px, 0px);');
     expect(hudMobileCss).not.toContain('circle at var(--strip-x, 50%) var(--strip-y, 50%),');
+    // Soft at BOTH ends: the anchor-side ramp is a length INSIDE the measured
+    // band, so the darkening never reaches full strength on the control the row
+    // grew from and never has to be paid for by widening the span.
+    expect(hudMobileCss).toContain('    --strip-dim-anchor-fade: 14px;');
+    expect(hudMobileCss).toContain(
+      '      transparent 0,\n      #05050cb0 var(--strip-dim-anchor-fade),\n',
+    );
     // Touch-router coverage. The SEAT is covered by #mobile-action-ring
     // containment (it is a child), but the ROW is a sibling, so it needs its own
     // entry or a sticky-mode tap on an item falls through to a camera drag.
@@ -2640,6 +2650,13 @@ describe('client HTML shell', () => {
     // are compared rather than only the entries that happen to line up.
     expect(frames.length).toBe(2);
     expect(anchors).toEqual(frames);
+    // The trailing term is the clear space past that seat, and it is the ONE
+    // number the derivation does not take from the frame rule, so it is pinned
+    // against the constant the core and the browser regression both read.
+    const gaps = [
+      ...hudMobileCss.matchAll(/--quest-strip-anchor-left:[\s\S]*?\)\s*\+\s*(\d+)px\s*\);/g),
+    ].map((m) => Number(m[1]));
+    expect(gaps).toEqual([QUEST_STRIP_TARGET_FRAME_GAP_PX, QUEST_STRIP_TARGET_FRAME_GAP_PX]);
   });
 
   it('keeps joystick autorun on the move pad and Jump on the ring bottom row', () => {

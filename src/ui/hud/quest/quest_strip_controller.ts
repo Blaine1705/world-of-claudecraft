@@ -31,6 +31,7 @@ import {
   type QuestStripStep,
   type QuestStripView,
   questStripBand,
+  questStripProgressJump,
   questStripView,
 } from './quest_strip_core';
 import { QuestStripGesture } from './quest_strip_gesture_controller';
@@ -108,6 +109,13 @@ export class QuestStripController {
    *  strings, so a locale change repaints without a relocalize hook. */
   private signature = '';
   private seatKey = '';
+  /** The last frame time the tracker handed down, and when the player last
+   *  cycled by hand, both on the HUD's monotonic clock. The controller never
+   *  reads a clock of its own, so a cycle timestamps itself off the most recent
+   *  repaint; that is at most one medium-band tick stale, which the multi-second
+   *  grace below cannot notice. */
+  private nowMs = 0;
+  private lastCycleAt: number | null = null;
 
   private readonly painter: QuestStripPainter;
   private readonly gesture: QuestStripGesture;
@@ -139,9 +147,23 @@ export class QuestStripController {
 
   /** Take the tracked quests the tracker already projected. The selection is
    *  CLAMPED rather than reset, so completing a quest does not throw the player
-   *  back to the first one mid-fight. */
-  update(quests: readonly TrackedQuest[]): void {
+   *  back to the first one mid-fight.
+   *
+   *  A quest that just made objective progress TAKES the strip: the one line the
+   *  band shows should be the one the player is being given credit for. The pure
+   *  core owns both halves of that decision (what counts as progress, and the
+   *  grace that leaves a hand cycle alone for a few seconds), so `now` is the
+   *  HUD's frame clock passed straight through. */
+  update(quests: readonly TrackedQuest[], now: number): void {
+    this.nowMs = now;
+    const jump = questStripProgressJump({
+      previous: this.quests,
+      next: quests,
+      now,
+      lastCycleAt: this.lastCycleAt,
+    });
     this.quests = quests;
+    if (jump !== null) this.index = jump;
     this.repaint();
   }
 
@@ -149,6 +171,7 @@ export class QuestStripController {
   cycle(step: QuestStripStep): void {
     if (this.quests.length < 2) return;
     this.index = cycleQuestStrip(this.index, step, this.quests.length);
+    this.lastCycleAt = this.nowMs;
     this.flashPhase = this.flashPhase === 0 ? 1 : 0;
     this.flash = { step, phase: this.flashPhase };
     this.deps.click();

@@ -494,6 +494,18 @@ describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height }) => 
     expect(rig.strip.classList.contains('dim-flip')).toBe(false);
     expect(dim.transform).toBe('none');
     expect(dim.backgroundImage).toContain('to right');
+    // NEITHER end is a hard cut. The far end always faded along the row; the
+    // anchor end used to reach full strength at its first pixel and drew a
+    // vertical edge straight through the control, so it ramps in too. The ramp
+    // lives INSIDE the measured band, which is what keeps it off the control.
+    const stops = dim.backgroundImage.match(/rgba?\([^)]*\)\s+[\d.]+(?:px|%)/g) ?? [];
+    expect(stops.length).toBeGreaterThanOrEqual(4);
+    expect(stops[0]).toMatch(/rgba\(0, 0, 0, 0\)\s+0px/);
+    expect(stops[stops.length - 1]).toMatch(/rgba\(0, 0, 0, 0\)\s+100%/);
+    const ramp = Number.parseFloat(stops[1].slice(stops[1].lastIndexOf(' ') + 1));
+    expect(ramp).toBeGreaterThanOrEqual(12);
+    expect(ramp).toBeLessThanOrEqual(16);
+    expect(ramp).toBeLessThan(opened.itemSize / 2);
     // It ends one item past the last item's centre, so the fade clears the row.
     expect(left + dimWidth).toBeCloseTo(lastCenter + opened.itemSize, 0);
     // The reported defect: the darkening used to reach the screen's left edge and

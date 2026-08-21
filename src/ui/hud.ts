@@ -6423,7 +6423,7 @@ export class Hud {
     this.mountRaceStrip.relocalize();
     this.mountRaceControls.relocalize();
     this.refreshKeybindLabels();
-    this.updateQuestTracker();
+    this.updateQuestTracker(performance.now());
     // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
     // a plain update() early-returns here and re-emits nothing. relocalize()
     // clears it for exactly one rebuild (#2529).
@@ -9258,7 +9258,7 @@ export class Hud {
         restEl.title = rest.labelKey ? t(rest.labelKey) : '';
       }
 
-      this.updateQuestTracker();
+      this.updateQuestTracker(now);
       this.updateDelveTracker();
       this.updateRiftTracker();
       // Party frames run on the ~4Hz mediumHud band (the enclosing block) for EVERY tier.
@@ -9620,8 +9620,8 @@ export class Hud {
     }
   }
 
-  private updateQuestTracker(): void {
-    this.questTracker.update();
+  private updateQuestTracker(now: number): void {
+    this.questTracker.update(now);
   }
 
   /** Flip the persisted tracker-collapsed preference (the header click/keyboard
