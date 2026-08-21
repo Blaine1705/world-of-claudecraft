@@ -830,12 +830,12 @@ describe('perf reporter payload', () => {
         };
       }
     ).rendererPrewarmSummary;
-    expect(summary?.compileUnits).toHaveLength(32);
+    expect(summary?.compileUnits).toHaveLength(12);
     expect(summary?.compileUnits?.[0]).not.toHaveProperty('roots');
-    expect(summary?.entries?.[1]?.budgetVariants).toHaveLength(16);
+    expect(summary?.entries?.[1]?.budgetVariants).toHaveLength(8);
   });
 
-  it('bounds adaptive transition telemetry at the literal 32-entry cap', () => {
+  it('bounds adaptive transition telemetry at the literal 12-entry cap', () => {
     const settings = new Settings();
     const snap = snapshot();
     const adaptive = snap.renderer?.prewarm?.prewarmPacing?.adaptive;
@@ -854,7 +854,11 @@ describe('perf reporter payload', () => {
         };
       }
     ).rendererPrewarmSummary;
-    expect(summary?.prewarmPacing?.adaptive?.transitions).toHaveLength(32);
+    expect(summary?.prewarmPacing?.adaptive?.transitions).toHaveLength(12);
+    // The MOST RECENT ones: a pacer's end state is what a report is read for,
+    // and the fixture numbers each transition by index so this is decisive.
+    expect(summary?.prewarmPacing?.adaptive?.transitions?.[0]?.atMs).toBe(28);
+    expect(summary?.prewarmPacing?.adaptive?.transitions?.at(-1)?.atMs).toBe(39);
   });
 
   it('carries the four dropped browser longtask fields into raw summary (#2479)', () => {

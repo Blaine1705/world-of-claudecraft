@@ -3,6 +3,11 @@ import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
 import { analyzePerfSuggestions } from './perf_doctor';
+import {
+  PREWARM_REPORT_BUDGET_VARIANTS,
+  sampleCompileUnits,
+  sampleTransitions,
+} from './perf_prewarm_lists_core';
 import { jitteredPerfReportDelay } from './perf_report_schedule';
 import type { Settings } from './settings';
 import type { WorldTelemetry } from './world_telemetry';
@@ -207,14 +212,13 @@ type RendererPrewarmBudgetVariant = NonNullable<
   RendererPrewarmSnapshot['manifestEntries'][number]['budgetVariants']
 >[number];
 
-const PREWARM_REPORT_COMPILE_UNITS = 32;
-const PREWARM_REPORT_BUDGET_VARIANTS = 16;
-const PREWARM_REPORT_TRANSITIONS = 32;
-
 function rendererPrewarmCompileUnitSummary(
   units: RendererPrewarmSnapshot['compileUnits'],
 ): Record<string, unknown>[] | undefined {
-  return units?.slice(0, PREWARM_REPORT_COMPILE_UNITS).map((unit: RendererPrewarmCompileUnit) => ({
+  // Absent stays absent: an empty array and a client that sent no list at all
+  // are different signals to a reader.
+  if (!units) return undefined;
+  return sampleCompileUnits(units).map((unit: RendererPrewarmCompileUnit) => ({
     id: unit.id,
     lane: unit.lane,
     submittedAtMs: unit.submittedAtMs,
@@ -287,16 +291,14 @@ function rendererPrewarmPacingSummary(
           backoffCount: adaptive.backoffCount,
           noProgressCount: adaptive.noProgressCount,
           lastSettlementMs: adaptive.lastSettlementMs,
-          transitions: adaptive.transitions
-            .slice(0, PREWARM_REPORT_TRANSITIONS)
-            .map((transition) => ({
-              atMs: transition.atMs,
-              from: transition.from,
-              to: transition.to,
-              reason: transition.reason,
-              windowLinks: transition.windowLinks,
-              inFlightLinks: transition.inFlightLinks,
-            })),
+          transitions: sampleTransitions(adaptive.transitions).map((transition) => ({
+            atMs: transition.atMs,
+            from: transition.from,
+            to: transition.to,
+            reason: transition.reason,
+            windowLinks: transition.windowLinks,
+            inFlightLinks: transition.inFlightLinks,
+          })),
         }
       : null,
   };

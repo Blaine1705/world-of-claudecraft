@@ -480,6 +480,51 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
     }));
   const resume = sanitizePrewarmResume(value.resume);
   if (resume) out.resume = resume;
+  // The streamed-prewarm diagnostic, carried across truncation on a TIGHTER
+  // sample than the verbatim path. A report that overflows the byte cap is a
+  // report from a heavy session, which is exactly when "which unit stalled"
+  // and "did the pacer back off" are worth having: dropping these here would
+  // lose the signal precisely where it matters. Same shape as the verbatim
+  // path so a reader needs one parser, just fewer members.
+  const compileUnits = Array.isArray(value.compileUnits) ? value.compileUnits : null;
+  if (compileUnits) {
+    out.compileUnits = compileUnits
+      .slice(0, PREWARM_COMPACT_COMPILE_UNITS_MAX)
+      .filter(isRecord)
+      .map((unit) => ({
+        id: textIn(unit.id, 80),
+        lane: textIn(unit.lane, 40),
+        syncMs: nullableNumberIn(unit.syncMs, 0, 600_000),
+        settledDurationMs: nullableNumberIn(unit.settledDurationMs, 0, 600_000),
+        programDelta: nullableNumberIn(unit.programDelta, -10_000, 10_000),
+        statusAtReveal: textIn(unit.statusAtReveal, 16),
+      }));
+  }
+  const pacing = value.prewarmPacing;
+  if (isRecord(pacing)) {
+    const adaptive = isRecord(pacing.adaptive) ? pacing.adaptive : null;
+    const transitions = adaptive && Array.isArray(adaptive.transitions) ? adaptive.transitions : [];
+    out.prewarmPacing = {
+      mode: textIn(pacing.mode, 24),
+      source: textIn(pacing.source, 24),
+      adaptive: adaptive
+        ? {
+            state: textIn(adaptive.state, 24),
+            backoffCount: nullableNumberIn(adaptive.backoffCount, 0, 100_000),
+            noProgressCount: nullableNumberIn(adaptive.noProgressCount, 0, 100_000),
+            transitions: transitions
+              .slice(0, PREWARM_COMPACT_TRANSITIONS_MAX)
+              .filter(isRecord)
+              .map((transition) => ({
+                atMs: nullableNumberIn(transition.atMs, 0, 600_000),
+                from: textIn(transition.from, 24),
+                to: textIn(transition.to, 24),
+                reason: textIn(transition.reason, 40),
+              })),
+          }
+        : null,
+    };
+  }
   return out;
 }
 
@@ -493,6 +538,50 @@ const PREWARM_RESUME_ENTRIES_MAX = 24;
 // so this is a deliberate copy, the same pattern as CROWD_BUCKET_LABELS above.
 const PREWARM_RESUME_STATUSES = ['none', 'scheduled', 'done', 'failed'] as const;
 const PREWARM_RESUME_LANES = ['debt', 'cosmetic'] as const;
+
+// The streamed-prewarm diagnostic lists, bounded on the SAME rule as the
+// resume block above and for the same reason: they ride the verbatim raw path,
+// the client caps are advisory (any token holder can post a hand-rolled
+// report), and an unbounded list reaches storage on every report that fits
+// under the body cap. Mirrors PREWARM_REPORT_COMPILE_UNITS /
+// PREWARM_REPORT_BUDGET_VARIANTS / PREWARM_REPORT_TRANSITIONS in
+// src/game/perf_reporter.ts; server/ cannot import src/game, so this is a
+// deliberate copy, the same pattern as PREWARM_RESUME_STATUSES above.
+// A length clamp, not a field rebuild: the shapes are read as opaque
+// diagnostics, and it is their UNBOUNDED length that is the defect.
+// The compact path's own, tighter sample: it exists to fit a report that
+// already overflowed, so it carries fewer members and fewer fields per member.
+const PREWARM_COMPACT_COMPILE_UNITS_MAX = 6;
+const PREWARM_COMPACT_TRANSITIONS_MAX = 6;
+const PREWARM_COMPILE_UNITS_MAX = 12;
+const PREWARM_BUDGET_VARIANTS_MAX = 8;
+const PREWARM_PACING_TRANSITIONS_MAX = 12;
+
+/** Bound the client-supplied prewarm diagnostic lists in place. */
+function boundPrewarmDiagnosticLists(prewarm: Record<string, unknown>): void {
+  if (Array.isArray(prewarm.compileUnits)) {
+    prewarm.compileUnits = prewarm.compileUnits
+      .slice(0, PREWARM_COMPILE_UNITS_MAX)
+      .filter(isRecord);
+  }
+  for (const key of ['manifestEntries', 'entries']) {
+    const entries = prewarm[key];
+    if (!Array.isArray(entries)) continue;
+    for (const entry of entries) {
+      if (!isRecord(entry) || !Array.isArray(entry.budgetVariants)) continue;
+      entry.budgetVariants = entry.budgetVariants
+        .slice(0, PREWARM_BUDGET_VARIANTS_MAX)
+        .filter(isRecord);
+    }
+  }
+  const pacing = prewarm.prewarmPacing;
+  if (!isRecord(pacing)) return;
+  const adaptive = pacing.adaptive;
+  if (!isRecord(adaptive) || !Array.isArray(adaptive.transitions)) return;
+  adaptive.transitions = adaptive.transitions
+    .slice(0, PREWARM_PACING_TRANSITIONS_MAX)
+    .filter(isRecord);
+}
 
 function sanitizePrewarmResume(value: unknown): Record<string, unknown> | null {
   if (!isRecord(value)) return null;
@@ -579,6 +668,7 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
       const resume = sanitizePrewarmResume(prewarm.resume);
       if (resume) prewarm.resume = resume;
       else delete prewarm.resume;
+      boundPrewarmDiagnosticLists(prewarm);
     }
     const boundedText = JSON.stringify(parsed);
     const maxBytes = devTraceAllowed ? RAW_SUMMARY_DEV_TRACE_MAX_BYTES : RAW_SUMMARY_MAX_BYTES;

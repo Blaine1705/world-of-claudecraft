@@ -623,6 +623,233 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('bounds the streamed-prewarm diagnostic lists on the verbatim raw path', async () => {
+    // compileUnits, per-entry budgetVariants and the adaptive pacing
+    // transitions are client-supplied lists riding the same verbatim path the
+    // resume block does. The client caps them, but any token holder can post a
+    // hand-rolled report, so the bound has to be here.
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'public-hostile-prewarm-lists',
+        rawSummary: {
+          seconds: 30,
+          rendererPrewarmSummary: {
+            compileUnits: Array.from({ length: 200 }, (_, i) => ({ id: `unit-${i}` })),
+            manifestEntries: [
+              {
+                id: 'programs.budget-variants',
+                budgetVariants: Array.from({ length: 100 }, (_, i) => ({ index: i })),
+              },
+              // A non-array rides through untouched rather than throwing.
+              { id: 'sky.current-zone', budgetVariants: 'not-an-array' },
+            ],
+            prewarmPacing: {
+              adaptive: {
+                transitions: Array.from({ length: 200 }, (_, i) => ({ atMs: i })),
+              },
+            },
+          },
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const raw = stored.rawSummary as Record<string, unknown>;
+    expect(raw.truncated).toBeUndefined();
+    const prewarm = raw.rendererPrewarmSummary as Record<string, unknown>;
+    expect((prewarm.compileUnits as unknown[]).length).toBe(12);
+    const entries = prewarm.manifestEntries as Record<string, unknown>[];
+    expect((entries[0].budgetVariants as unknown[]).length).toBe(8);
+    expect(entries[1].budgetVariants).toBe('not-an-array');
+    const adaptive = (prewarm.prewarmPacing as Record<string, unknown>).adaptive as Record<
+      string,
+      unknown
+    >;
+    expect((adaptive.transitions as unknown[]).length).toBe(12);
+  });
+
+  it('keeps a full client-capped prewarm snapshot under the raw summary byte cap', async () => {
+    // The three new lists are large enough that a LEGITIMATE report can cross
+    // RAW_SUMMARY_MAX_BYTES and get routed into compactRawSummary, whose
+    // compactPrewarmSummary carries none of them: the diagnostic that motivated
+    // the fields would be the first thing dropped. This pins that a snapshot at
+    // exactly the client caps still rides the verbatim path.
+    const res = fakeRes();
+    const compileUnit = (i: number) => ({
+      id: `weapon-skins:compile:skin_${i}`,
+      lane: 'programs.compile-submit',
+      submittedAtMs: 1000 + i,
+      syncEndAtMs: 1010 + i,
+      settledAtMs: 1200 + i,
+      failedAtMs: null,
+      programsBefore: i,
+      programsAfter: i + 2,
+      programDelta: 2,
+      chargedLinks: 2,
+      syncMs: 10.5,
+      settledDurationMs: 190.25,
+      statusAtReveal: 'settled',
+    });
+    const budgetVariant = (i: number) => ({
+      index: i,
+      levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 },
+      elapsedMs: 12.5,
+      syncMs: 11.25,
+      programsBefore: i,
+      programsAfter: i + 3,
+      programDelta: 3,
+      passes: 1,
+    });
+    const transition = (i: number) => ({
+      atMs: 500 + i,
+      from: 'steady',
+      to: 'backoff',
+      reason: 'no-progress',
+      windowLinks: 8,
+      inFlightLinks: 4,
+    });
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'full-prewarm-snapshot',
+        rawSummary: {
+          seconds: 60,
+          rendererPrewarmSummary: {
+            elapsedMs: 14_000,
+            manifestPlanned: 40,
+            manifestCompleted: 38,
+            compileUnits: Array.from({ length: 12 }, (_, i) => compileUnit(i)),
+            manifestEntries: [
+              {
+                id: 'programs.budget-variants',
+                category: 'world',
+                status: 'completed',
+                budgetVariants: Array.from({ length: 8 }, (_, i) => budgetVariant(i)),
+              },
+            ],
+            prewarmPacing: {
+              available: true,
+              mode: 'adaptive',
+              adaptive: {
+                state: 'steady',
+                transitions: Array.from({ length: 12 }, (_, i) => transition(i)),
+              },
+            },
+          },
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const raw = stored.rawSummary as Record<string, unknown>;
+    // Not truncated: the whole point. A red here means the caps and the byte
+    // budget have drifted apart and the compact path is now silently eating
+    // the streamed-prewarm diagnostic.
+    expect(raw.truncated).toBeUndefined();
+    const prewarm = raw.rendererPrewarmSummary as Record<string, unknown>;
+    expect((prewarm.compileUnits as unknown[]).length).toBe(12);
+    expect(
+      ((prewarm.manifestEntries as Record<string, unknown>[])[0].budgetVariants as unknown[])
+        .length,
+    ).toBe(8);
+    // The real constraint, stated as a budget rather than a pass/fail on this
+    // one fixture: the three streamed lists together must stay a minority of
+    // the 16 KB raw-summary cap, because a real report also carries the 32
+    // pre-existing manifest entries, the resume block, and every non-prewarm
+    // section beside them. Measured against a real capture, a compile unit
+    // costs about 280 bytes, so 32 of them (the caps this PR first shipped)
+    // was ~9 KB and pushed every compiled session's report into the compact
+    // path.
+    const listBytes = Buffer.byteLength(
+      JSON.stringify([
+        prewarm.compileUnits,
+        (prewarm.manifestEntries as Record<string, unknown>[])[0].budgetVariants,
+        ((prewarm.prewarmPacing as Record<string, unknown>).adaptive as Record<string, unknown>)
+          .transitions,
+      ]),
+    );
+    expect(listBytes).toBeLessThan(6 * 1024);
+  });
+
+  it('carries the streamed-prewarm diagnostic across truncation into the compact path', async () => {
+    // The other half of the byte story: when a report DOES overflow, the
+    // compact rebuild must still say which unit stalled and whether the pacer
+    // backed off. Before this, compactPrewarmSummary knew none of these fields,
+    // so the diagnostic was dropped exactly on the heavy sessions it was added
+    // to explain.
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'compact-prewarm-diagnostic',
+        rawSummary: {
+          seconds: 30,
+          rendererPrewarmSummary: {
+            manifestPlanned: 40,
+            compileUnits: Array.from({ length: 40 }, (_, i) => ({
+              id: `weapon-skins:compile:skin_${i}`,
+              lane: 'programs.compile',
+              syncMs: i,
+              settledDurationMs: i * 2,
+              programDelta: 3,
+              statusAtReveal: 'settled',
+            })),
+            prewarmPacing: {
+              mode: 'adaptive',
+              source: 'knobs',
+              adaptive: {
+                state: 'backoff',
+                backoffCount: 4,
+                noProgressCount: 1,
+                transitions: Array.from({ length: 40 }, (_, i) => ({
+                  atMs: i,
+                  from: 'steady',
+                  to: 'backoff',
+                  reason: 'no-progress',
+                })),
+              },
+            },
+          },
+          // Forces the compact path.
+          oversized: 'x'.repeat(40_000),
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const raw = stored.rawSummary as Record<string, unknown>;
+    expect(raw.truncated).toBe(true);
+    const prewarm = raw.rendererPrewarmSummary as Record<string, unknown>;
+    // Present, and on the compact path's own tighter sample.
+    const units = prewarm.compileUnits as Record<string, unknown>[];
+    expect(units).toHaveLength(6);
+    expect(units[0]).toEqual({
+      id: 'weapon-skins:compile:skin_0',
+      lane: 'programs.compile',
+      syncMs: 0,
+      settledDurationMs: 0,
+      programDelta: 3,
+      statusAtReveal: 'settled',
+    });
+    const adaptive = (prewarm.prewarmPacing as Record<string, unknown>).adaptive as Record<
+      string,
+      unknown
+    >;
+    expect(adaptive.state).toBe('backoff');
+    expect(adaptive.backoffCount).toBe(4);
+    expect(adaptive.transitions as unknown[]).toHaveLength(6);
+    // And the whole compacted report still fits, which is the point of the path.
+    expect(Buffer.byteLength(JSON.stringify(raw))).toBeLessThan(16 * 1024);
+  });
+
   it('stores the four browser longtask fields inside raw summary, bounded (#2479)', async () => {
     const res = fakeRes();
 
