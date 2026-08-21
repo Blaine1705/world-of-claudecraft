@@ -25,6 +25,8 @@ const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8')
 // pinned below carry comments that name the very tokens the pins look for.
 // Only WHOLE-line comments: a trailing-comment or URL-bearing code line must
 // survive intact, or the pins below would stop seeing the code they guard.
+// A regex, not a lexer: assumes no `/*` inside a string or regex literal in the scanned
+// sources (true for hud.ts, pointer_blur.ts and chrome_focus_wiring.ts today).
 const stripLineComments = (src: string): string =>
   src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 

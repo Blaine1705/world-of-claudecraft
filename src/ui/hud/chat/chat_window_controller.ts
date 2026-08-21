@@ -367,10 +367,13 @@ export class ChatWindowController {
   // Combat never reorder (they are not entries in `chatTabs`), so Alt+Arrow on
   // either is left alone, including for the browser's own back/forward accelerator.
   private onTabKeyDown(id: ChatTabId, order: readonly ChatTabId[], event: KeyboardEvent): void {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-    const step = event.key === 'ArrowLeft' ? -1 : 1;
+    const arrow = event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+    if (!arrow && event.key !== 'Home' && event.key !== 'End') return;
     if (event.altKey) {
-      if (!isChatOpenTab(id)) return;
+      // Alt+Arrow reorders; Alt+Home/End is not a reorder gesture and falls through
+      // to nothing (never a roving move either).
+      if (!arrow || !isChatOpenTab(id)) return;
+      const step = event.key === 'ArrowLeft' ? -1 : 1;
       const next = stepChatTab(this.chatTabs, id, step);
       if (next === this.chatTabs) return;
       event.preventDefault();
@@ -383,10 +386,9 @@ export class ChatWindowController {
     }
     const index = order.indexOf(id);
     if (index < 0) return;
-    // Reuse the shared roving-index core instead of hand-rolled wrap math, so
-    // chat tabs stay consistent with every other tablist in the HUD (only the
-    // arrow keys reach it: the early return above filters everything else).
-    // `step` is unused here; `rovingTarget` reads the key.
+    // Reuse the shared roving-index core (arrows wrap, Home/End jump to the
+    // ends) instead of hand-rolled wrap math, so chat tabs stay consistent with
+    // every other tablist in the HUD; `rovingTarget` reads the key.
     const nextIndex = rovingTarget(event.key, index, order.length, 'horizontal');
     if (nextIndex === null) return;
     event.preventDefault();

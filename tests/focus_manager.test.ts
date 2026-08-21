@@ -386,7 +386,7 @@ describe('opener capture vs the pointer-only focus drop (src/ui/pointer_blur.ts)
     keyboard.release(false);
   });
 
-  it('records the parked window ROOT as the opener for a window opened by a mouse click inside a dialog-rooted window', () => {
+  it('records a focused window ROOT (where the pointer drop parks a click inside a dialog-rooted window) as the next opener', () => {
     // Inside a dialog-rooted window the drop parks focus on the window's root
     // (src/ui/pointer_blur.ts, pinned there and in the browser suite); the opener
     // capture accepts any rendered element, so the next window records that root,

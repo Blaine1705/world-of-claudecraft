@@ -393,6 +393,28 @@ describe('ChatWindowController', () => {
       expect(harness.combatLog.classList.contains('active')).toBe(false);
     });
 
+    it('Home and End jump roving focus to the first and last tab (WAI-ARIA tablist keys)', () => {
+      const harness = makeHarness({ woc_chat_tabs: '["world","guild"]' });
+      harness.controller.init();
+
+      const end = keydown('End');
+      tabButton(harness, 'all').dispatchEvent(end);
+      expect(tabButton(harness, 'guild').focused).toBe(true);
+      expect(end.defaultPrevented).toBe(true);
+
+      const home = keydown('Home');
+      tabButton(harness, 'guild').dispatchEvent(home);
+      expect(tabButton(harness, 'all').focused).toBe(true);
+      expect(home.defaultPrevented).toBe(true);
+
+      // Alt+Home is not a reorder gesture: no move, no reorder, keystroke left alone.
+      const altHome = keydown('Home', true);
+      tabButton(harness, 'world').dispatchEvent(altHome);
+      expect(harness.storage.getItem('woc_chat_tabs')).toBe('["world","guild"]');
+      expect(tabButton(harness, 'all').focused).toBe(true);
+      expect(altHome.defaultPrevented).toBe(false);
+    });
+
     it('wraps roving focus from the last tab back to the first (and vice versa)', () => {
       const harness = makeHarness({ woc_chat_tabs: '["world"]' });
       harness.controller.init();

@@ -50,16 +50,23 @@ describe('input.ts blocked-state guard (source pin, the fast lane twin of the br
   const input = readFileSync(join(__dirname, '../src/game/input.ts'), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^\s*\/\/.*$/gm, '');
+  // The guard block: from the staleness check to the blocked branch's own `return;`.
   const guardAt = input.indexOf('isStaleChromeButton(active)');
+  const guardEnd = input.indexOf('return;', guardAt);
+  const guard = guardAt > 0 && guardEnd > guardAt ? input.slice(guardAt, guardEnd) : '';
+
+  it('locates the guard block (anti-vacuity for both pins below)', () => {
+    expect(guardAt).toBeGreaterThan(0);
+    expect(guardEnd).toBeGreaterThan(guardAt);
+    expect(guard.length).toBeGreaterThan(20);
+  });
 
   it('prevents the default for a stale chrome button on Space while blocked', () => {
-    expect(guardAt).toBeGreaterThan(0);
-    const guard = input.slice(guardAt, guardAt + 160);
     expect(guard).toContain('e.preventDefault()');
   });
 
   it('suppresses without blurring: the guard never drops the focus position', () => {
-    const guard = input.slice(guardAt, guardAt + 400);
+    expect(guard.length).toBeGreaterThan(20);
     expect(guard).not.toContain('.blur(');
   });
 });

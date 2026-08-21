@@ -60,7 +60,7 @@ mobile portrait *and* landscape before calling UI work done.
     rendered element; returning focus to a still-open window's root re-arms its trap, a
     closed one fails `canFocus` and restores nothing). Repaint ladders are the other reader
     of the parked root and never treat it as a focused control (`focusedWithin` refuses the
-    root itself). Two modality discriminators coexist on purpose: `UIEvent.detail` for click
+    root it is handed and any root matching the park selector). Two modality discriminators coexist on purpose: `UIEvent.detail` for click
     activation (this), and the pointerdown flag for focus-driven tooltips (`hud.ts`); pick by
     what the handler receives, a click or a focus event.
   - **Focus across a REBUILD is the other half, and a different module:** a painter that wipes

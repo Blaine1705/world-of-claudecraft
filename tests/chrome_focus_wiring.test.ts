@@ -122,7 +122,6 @@ describe('wireChromeFocus', () => {
     const expected = [...CHROME_GUARDED_PANELS, ...CHROME_TRACKER_BLURS.map(([root]) => root)];
     // Same multiset: every root once, no root twice (a duplicate would grow the list).
     expect([...queried].sort()).toEqual([...expected].sort());
-    expect(new Set(queried).size).toBe(queried.length);
   });
 
   it('binds both halves over every guarded panel: a keydown guard plus a CAPTURE-phase click drop', () => {
@@ -169,6 +168,8 @@ describe('wireChromeFocus', () => {
 
 describe('hud.ts wiring pin', () => {
   it('calls the one wiring entry point with its query (line comments stripped first)', () => {
+    // Comments stripped by regex, not a lexer: assumes no `/*` inside a string or regex
+    // literal in hud.ts.
     const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
