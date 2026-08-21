@@ -774,3 +774,51 @@ gate test plus every fixed-price-dependent bootstrap arm). New pins:
 Section totals after the second fix round: 10 distinct mutants (4 + 3 + 3,
 one re-scored in place), all BIT, 0 survivors; stale-verdict re-run events
 4 + 6 = 10, all re-BIT. Whole log: 401 distinct mutants.
+
+## Close-out prep rider section (run by the rider implement session)
+
+The 19/22 cross-repo ask's SERVICE half (commit 2c4a261 on
+integration/woc-market-settlement): the admin overview gains wocDecimals
+(read from the wired settlement config through
+MarketSettlementService.configuredWocDecimals, never env) and every
+volume window gains settledBase (the payer-total base-unit sum). New
+money pins at the 20 protocol: mutants applied to the CLEAN committed
+tree at 2c4a261, each run reporting the full 604-test count (tests
+proven RAN), reverts via git restore (byte-identical by construction),
+git status clean before and after every run. The pg-scored mutant ran
+the full suite with CLAUDIUM_TEST_DATABASE_URL on the command line
+(604/604 zero skips baseline).
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_settledbase_mem_leg_swap | BIT (1 fail) | market_http | the in-memory sum reads q.seller.base instead of q.amount.base; 'the overview reports price health, fee schedule, volume and bond exposure' red on the settledBase absolute pin (90k vs 100k tokens at 9 decimals) |
+| mrc_settledbase_pg_col_swap | BIT (1 fail) | market_store_pg (pg tier) | the SQL sums seller_base instead of amount_base; 'postgres: quotes survive a restart, supersede correctly, and aggregate in SQL' red on the settledBase literal ('90000000000000' vs '100000000000000') |
+| mrc_wocdecimals_hardcode | BIT (2 fails) | market_http + market_bootstrap | configuredWocDecimals returns 6 instead of the wired config; the overview http pin (rig wires 9, env empty) and the bootstrap wired-decimals pin both red |
+| mrc_wocdecimals_env_copy | BIT (2 fails) | market_http + market_bootstrap | admin.ts reads Number(env.WOC_DECIMALS ?? 6) instead of the service accessor; the http pin red (env empty reports 6, rig wired 9) and the bootstrap nonsense arm red (NaN vs the wired 6) |
+
+The DASHBOARD half (commit 53913d7 on integration/woc-market-trading):
+the Trading tab prefers the reported wocDecimals through
+effectiveWocDecimals, legsReconcile upgrades to the real sum
+reconciliation on a reported settledBase, and the loader screens a
+garbled decimals leaf. Same protocol: clean committed tree at 53913d7,
+every run reporting the full 279-test count, git restore reverts,
+status clean before and after.
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_dash_prefer_strip | BIT (2 fails) | market_trading_view + market_trading_panel_dom | effectiveWocDecimals returns the constant unconditionally; the preference arms and the DOM reported-9 render + banner test both red |
+| mrc_dash_reconcile_strip | BIT (1 fail) | market_trading_view | legsReconcile returns true after the sanity floor, ignoring settledBase; the sum-reconciliation test red on its one-base-unit-off arm |
+| mrc_dash_screen_strip | BIT (1 fail) | market_summary_load | the wocDecimals screen arm replaced with true; the object-valued-leaf test red on its six garbled-decimals payloads |
+
+The R16 CI wiring (game commit 462c234031): the per-leg Postgres service
+and job-level TEST_DATABASE_URL in the two shard gates and nightly,
+pinned by the new counted assertions in tests/ci_workflow.test.ts. One
+mutant at the same protocol (clean committed tree, run-proven at the
+suite's 26 reported tests, git restore revert, status clean after):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_ci_envline_strip | BIT (1 fail) | ci_workflow | the pr-gate job-level env block deleted from ci.yml; the counted job-env pin (exactly two copies) red |
+
+Section totals: 8 distinct mutants (4 service + 3 dashboard + 1 CI),
+all BIT, 0 survivors. Whole log: 409 distinct mutants.
