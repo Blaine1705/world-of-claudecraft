@@ -26,6 +26,14 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     process.env.DATABASE_URL = DB_URL;
     db = await import('../server/db');
     await db.ensureSchema();
+    // The worst-10s index this suite asserts on is a CREATE INDEX
+    // CONCURRENTLY, which ensureSchema cannot build (it runs in a
+    // transaction; see the CONCURRENT_INDEX_MIGRATIONS comment in
+    // server/db.ts), so a FRESH database (every CI container) needs the
+    // migration pass a real server boot would have run. A dev database that
+    // booted a server carries the index already, which is why this was
+    // invisible locally.
+    await db.runConcurrentIndexMigrations();
     await db.pool.query('DELETE FROM client_perf_reports WHERE session_id LIKE $1', [
       `${MARKER}-%`,
     ]);

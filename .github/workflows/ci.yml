@@ -561,7 +561,12 @@ jobs:
     # so readiness needs no wait step; the password is a throwaway literal
     # for an ephemeral loopback container, not a secret. Port 5432 on
     # purpose: the vitest fallback DATABASE_URL names 5433 and must stay a
-    # dead letter.
+    # dead letter. ACCEPTED COST, recorded: services boot before the first
+    # step regardless of the step gate, so docs-only and release-to-main
+    # legs pay a container boot to no-op, and a registry outage can red a
+    # leg that would have skipped green (the alternative, a separate
+    # DB-only job, would mint new required-check names; see
+    # docs/merge-queue.md before ever taking that trade).
     services:
       postgres:
         image: postgres:16-alpine

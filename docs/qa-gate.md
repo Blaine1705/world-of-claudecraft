@@ -227,6 +227,19 @@ its affected set with the given paths themselves; the property is pinned by exec
 `tests/ci_shard_plan.test.ts`). The entry regenerates the generated artifacts once per
 job before spawning, since `npx vitest` has no npm lifecycle.
 
+**The real-SQL arm.** The shard gates and nightly's full suite each carry a per-job
+Postgres service and a job-level `TEST_DATABASE_URL`, so the pg integration suites
+(which skip green without the variable) actually run at the merge bar: the
+floor-resident ones on every PR, the `graph`-classified ones whenever selection reaches
+them and always in full mode. The wiring is pinned per job span in
+`tests/ci_workflow.test.ts` and guarded at runtime by `tests/ci_pg_presence.test.ts`
+(red inside GitHub Actions whenever the variable is missing; any diff that could lose it
+forces full mode, where that suite always runs). Two asymmetries to know: a LOCAL
+`gate_select`/`gate` run sets no `TEST_DATABASE_URL` itself, so a green local gate
+proves less than CI unless you export it for the run; and the shard weight table
+predates the suites running in CI (they were harvested skipping), so the packing is
+approximate until the first post-wiring harvest lands.
+
 **The long-sims lanes** (Phase 4; split in two by the lane-diet PR). The
 `CI_LONG_SUITES` files (`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90
 seconds inside a full-mode shard, the chronomancy balance sweep among them, plus the

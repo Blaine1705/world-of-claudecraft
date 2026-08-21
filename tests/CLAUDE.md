@@ -194,9 +194,14 @@ yourself or the S3 guard throws "status.json is missing".
   is set (dev DB via `npm run db:up`; without it they skip green), and SQL differential
   blocks gate on `WOCC_PG_DIFFERENTIAL=1`. Run the relevant ones before calling DB-shape
   work done. CI provisions a per-leg Postgres service and sets `TEST_DATABASE_URL` in the
-  shard gates and the nightly full suite (pinned in `tests/ci_workflow.test.ts`), so the
-  pg suites RUN at the merge bar; a local gate run without the variable therefore proves
-  LESS than CI, and DB-shape work should always set it locally.
+  shard gates and the nightly full suite (pinned per job span in `tests/ci_workflow.test.ts`,
+  with `tests/ci_pg_presence.test.ts` as the in-CI runtime guard), so the floor-resident pg
+  suites run on every PR and the handful that classify `graph` join whenever the diff
+  reaches them and always in full mode, merge_group, release-gate, and nightly. A local
+  gate run without the variable therefore proves LESS than CI; DB-shape work should always
+  set it locally. Fresh-database caveat: a suite asserting on a `CREATE INDEX CONCURRENTLY`
+  index must run `runConcurrentIndexMigrations()` itself; `ensureSchema()` alone leaves a
+  virgin CI database without those indexes even though a booted dev database has them.
 - **DOM in tests, the two-branch rule.** The default Vitest env is plain Node (no
   `document`/`window`). Game-HUD/UI tests stay there: stub a single global on `globalThis`
   (`localStorage` in `keybinds.test.ts`, `WebSocket` in `snapshots.test.ts`) or build a small
