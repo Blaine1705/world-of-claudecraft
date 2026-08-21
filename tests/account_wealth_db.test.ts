@@ -256,7 +256,7 @@ describe('largeGoldMovementsForAccount', () => {
 
 describe('withAccountWealthSweepLock', () => {
   function clientStub(acquired: boolean | 'error') {
-    const cquery = vi.fn(async (text: string) => {
+    const cquery = vi.fn(async (text: string, _params?: unknown[]) => {
       if (/pg_try_advisory_lock/.test(text)) {
         if (acquired === 'error') throw new Error('lock query failed');
         return queryResult([{ acquired }]);
