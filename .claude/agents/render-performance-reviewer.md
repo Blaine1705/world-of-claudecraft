@@ -62,20 +62,33 @@ Do this before interpreting a number or accepting a performance claim.
 Answer each question OF THE DIFF with a path and stable symbol, never a guess.
 
 1. **Where is the GPU work prepared?** For every new material or texture a live frame can first
-   reach, name its prewarm manifest twin or its compile/reveal gate. Check every variant: tier
-   substitution, skinning, instancing, morphs, shadow depth, dye or colorway, texture-slot
-   presence, and light-count conditions. Flag a post-boot bare `scene.add`, a first-cast
-   module cache, a visible program-key mutation, a bare clone of a patched material, or a
-   visible object with no stand-in. Use the scheduler contract, `materialProgramSignature`,
-   `cloneMaterialWithHooks`, `ENTITY_GATE_STAND_INS`, and the relevant pins in
-   `tests/ability_material_prewarm_sweep.test.ts`, `tests/renderer_compile_gate.test.ts`,
-   `tests/prewarm_policy.test.ts`, and `tests/entity_gate_stand_in.test.ts`.
+   reach, name its prewarm manifest twin or the gate covering its first appearance
+   (`compileGate`, `attachSceneGroupGated` in `gated_scene_attach.ts`, a reveal gate). Check
+   every variant: tier substitution, skinning, instancing, morphs, shadow depth, dye or
+   colorway, texture-slot presence, and light-count conditions. Flag a post-boot bare
+   `scene.add` of a group carrying new materials, a module-scope cache filled on first cast
+   that is not registered in `ABILITY_MATERIAL_SOURCES`, a visible program-key mutation, a
+   bare `Material.clone()` of a patched material (it must go through `cloneMaterialWithHooks`
+   in `material_clone_hooks.ts`), or a visible object with no stand-in. The program-key inputs
+   are enumerated, not sampled: texture-slot presence, `transparent` / `blending` /
+   `alphaToCoverage` / `alphaHash`, `defines`, `onBeforeCompile` / `customProgramCacheKey`,
+   skinning and instancing, and any `needsUpdate` on an already-drawn material. Use the
+   scheduler contract, `materialProgramSignature`, `ENTITY_GATE_STAND_INS`, and the relevant
+   pins in `tests/ability_material_prewarm_sweep.test.ts`,
+   `tests/renderer_compile_gate.test.ts`, `tests/prewarm_policy.test.ts`, and
+   `tests/entity_gate_stand_in.test.ts`.
 2. **Are lights, contexts, queues, and frame work safe?** A post-boot directional, hemisphere,
-   spot, or rect-area light can invalidate visible programs; point lights must use the existing
-   budget. A secondary context must link, upload, debug-configure, and tear down before drawing.
-   New work must use the existing queue, lane, admission budget, label kind, and stand-in. No
-   bespoke idle loop, fourth gate, tuned wall clock, per-frame Three.js allocation, or unbounded
-   traversal. Check `tests/render_light_census_pin.test.ts`, `tests/point_light_budget.test.ts`,
+   spot, or rect-area light can invalidate visible programs; re-grading the constructor's one
+   sun/hemi pair through `interior_light_rig.ts` is the sanctioned shape. Point lights ride the
+   pad budget (`point_light_budget.ts`, `reparentStrandedLightsToScene`), and a root a reveal
+   gate has shown is never hidden again. A secondary context must link with `compileAsync`,
+   upload with `uploadTexturesInSlices` (`texture_prewarm.ts`) before its first draw, set
+   `debug.checkShaderErrors = shaderDebugRequested()` on the renderer it just built ahead of
+   that renderer's first `render()`, and carry a teardown story (`trackWebGLContext`,
+   `context_release.ts`) because live contexts are capped per GPU process. New work must use
+   the existing queue, lane, admission budget, label kind, and stand-in. No bespoke idle loop,
+   fourth gate, tuned wall clock, per-frame Three.js allocation, or unbounded traversal. Check
+   `tests/render_light_census_pin.test.ts`, `tests/point_light_budget.test.ts`,
    `tests/shader_debug_flag.test.ts`, `tests/background_gpu_queue.test.ts`, and
    `tests/gpu_prep_admission.test.ts` where applicable.
 3. **Which stage caused the stall?** Never collapse all driver work into "shader compile".
