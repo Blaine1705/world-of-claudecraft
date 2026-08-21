@@ -37,6 +37,12 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   saveCharacterAndMarketState: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({
+    isAi: false,
+    isStreamer: false,
+    streamerLinks: {},
+  })),
   openPlaySession: (...args: unknown[]) => openPlaySession(...(args as [])),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: (...args: unknown[]) => closePlaySession(...(args as [])),
@@ -618,6 +624,7 @@ describe('GameServer sessions', () => {
     const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 60;
     mob.tappedById = leaver.pid;
     mob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -629,6 +636,7 @@ describe('GameServer sessions', () => {
     });
     lateMob.dead = true;
     lateMob.lootable = true;
+    lateMob.corpseTimer = 60;
     lateMob.tappedById = leaver.pid;
     lateMob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];
     lateMob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -693,6 +701,7 @@ describe('GameServer sessions', () => {
     const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 60;
     mob.tappedById = leaver.pid;
     mob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
