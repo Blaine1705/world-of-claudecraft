@@ -81,7 +81,11 @@ const MONOLITHS: MonolithRow[] = [
     // arm and a spoken refusal beside the ability one, and the shared item-use
     // seam castSlot and the pad now both call. Exact merged count, zero slack:
     // any further growth reds again.
-    ceiling: 19490,
+    // Lowered after extracting the Reliquary-tracker input construction into
+    // makeReliquaryTrackerInput (reliquary_tracker_view.ts), which paid for the
+    // tracker-stack anchor wiring and the window's tracker-visibility deps in
+    // the same change. Exact count, zero slack.
+    ceiling: 19487,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
