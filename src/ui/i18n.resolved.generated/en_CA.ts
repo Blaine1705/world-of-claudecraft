@@ -7856,6 +7856,9 @@ export const en_CA: EnTranslations = {
       "reload": "Reload",
       "quit": "Quit",
       "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
+    },
+    "window": {
+      "exitToDesktop": "Exit to Desktop"
     }
   },
   "gpuNotice": {

@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -41,6 +42,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "es_ES": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -72,6 +74,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "fr_FR": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -103,6 +106,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "fr_CA": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -135,6 +139,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -166,6 +171,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "de_DE": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -209,6 +215,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "pt_BR": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -243,6 +250,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -274,6 +282,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "nl_NL": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -305,6 +314,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "pl_PL": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -336,6 +346,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "id_ID": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -367,6 +378,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "tr_TR": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -398,6 +410,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "sv_SE": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -429,6 +442,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "vi_VN": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
@@ -460,6 +474,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "da_DK": [
+    "desktop.window.exitToDesktop",
     "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",

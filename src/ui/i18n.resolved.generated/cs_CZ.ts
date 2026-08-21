@@ -7856,6 +7856,9 @@ export const cs_CZ: EnTranslations = {
       "reload": "Načíst znovu",
       "quit": "Ukončit",
       "fatalBody": "World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít."
+    },
+    "window": {
+      "exitToDesktop": "Exit to Desktop"
     }
   },
   "gpuNotice": {
