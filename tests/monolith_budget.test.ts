@@ -226,7 +226,10 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    ceiling: 13546,
+    // The Duskfall gate occluder-fade merge keeps the hollowGates update call
+    // and current release renderer wiring while landing below the integration
+    // pin, so the ceiling follows the exact merged count.
+    ceiling: 13538,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
