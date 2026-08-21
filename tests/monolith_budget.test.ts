@@ -81,12 +81,17 @@ const MONOLITHS: MonolithRow[] = [
     // arm and a spoken refusal beside the ability one, and the shared item-use
     // seam castSlot and the pad now both call. Exact merged count, zero slack:
     // any further growth reds again.
-    // Lowered 19490 -> 19479 after the stale-focus Space fix (PR #3506) extracted
-    // its chrome focus wiring (the tracker drops plus the panel key-guard loop)
-    // into src/ui/chrome_focus_wiring.ts, leaving hud.ts a one-line consumer
-    // (wireChromeFocus($)). The ratchet's own rule: an extraction lowers the
-    // ceiling. Exact merged count, zero slack: any further growth reds again.
-    ceiling: 19479,
+    // Lowered after extracting the Reliquary-tracker input construction into
+    // makeReliquaryTrackerInput (reliquary_tracker_view.ts), which paid for the
+    // tracker-stack anchor wiring and the window's tracker-visibility deps in
+    // the same change. Exact count, zero slack.
+    // Lowered again (to 19476 on the merged base) after the stale-focus Space
+    // fix (PR #3506) extracted its chrome focus wiring (the tracker drops plus
+    // the panel key-guard loop) into src/ui/chrome_focus_wiring.ts, leaving
+    // hud.ts a one-line consumer (wireChromeFocus($)). The ratchet's own rule:
+    // an extraction lowers the ceiling. Exact merged count, zero slack: any
+    // further growth reds again.
+    ceiling: 19476,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
