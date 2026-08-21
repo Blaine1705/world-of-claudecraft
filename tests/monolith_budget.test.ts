@@ -113,7 +113,14 @@ const MONOLITHS: MonolithRow[] = [
     // one-line frame call plus the callback bag the module is built with. The
     // ratchet's own rule: an extraction lowers the ceiling in the same change.
     // Exact count, zero slack.
-    ceiling: 19052,
+    // Upstream lowered the SAME pin twice on its own arm: the Reliquary-tracker
+    // input construction moved into makeReliquaryTrackerInput
+    // (reliquary_tracker_view.ts), and the stale-focus Space fix (PR #3506)
+    // moved the chrome focus wiring (the tracker drops plus the panel key-guard
+    // loop) into src/ui/chrome_focus_wiring.ts, leaving hud.ts a one-line
+    // consumer (wireChromeFocus($)). The pin below is the MERGED reality of both
+    // arms of extraction. Exact count, zero slack: any further growth reds again.
+    ceiling: 19038,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
