@@ -30,8 +30,12 @@ actually reads.
   mutation record 18 distinct all BIT + 3 re-runs re-BIT (whole log 419).
   Validation: service 604/604 pg zero skips, dashboard 281/281 + check +
   build + security 66/66, game tsc clean + gate PASS all 12 steps at
-  0343ed9271 mid-round and the FINAL gate at the registry tip (closing
-  note below is authoritative). The rider section in progress.md is the
+  0343ed9271 mid-round and the FINAL gate at the registry tip. CLOSING
+  GATE NOTE (authoritative): node scripts/gate_select.mjs PASS at
+  3f571c38e6, all 12 steps green, full-suite fallback, 43,000 tests
+  passed (2 expected fail, 27 skipped) + browser 131, malware scan 0
+  high, TEST_DATABASE_URL on the command line only; this closing note is
+  the only commit past the gated tip. The rider section in progress.md is the
   registry (JUDGED-DECLINED list binding). NEXT =
   docs/woc-marketplace-hardening/rider-close-out-prep-qa.md (FRESH
   session, three repos; diffs game 5f86e975af..tip, service
