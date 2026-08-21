@@ -254,6 +254,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/eastbrook-vale-rebuild/',
       '            /docs/screenshots/far-foliage-impostors/',
       '            /docs/screenshots/fenbridge-rebuild/',
+      '            /docs/screenshots/fiendhide-armor-buff-tooltip/',
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-social-v1/',
       '            /docs/screenshots/item-art-consistency-2026-08-09/',
