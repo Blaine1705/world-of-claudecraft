@@ -956,11 +956,27 @@ pg battery (17 suites, 333 tests) run THREE times as one parallel vitest
 invocation against a virgin database, all green; recorded with the widened
 watch item in follow-ups.md 5.3.
 
-Section totals: 13 new distinct mutants (2 service + 3 dashboard + 8 CI),
-all BIT after the fix round, 0 standing survivors (the 4 initial survivor
-verdicts are the finding, closed by the new pins); 11 re-run events, all
-re-BIT; 1 compile-refused strip recorded, not counted. Whole log: 432 by
-the chained convention (419 + 13). BOOKKEEPING CAVEAT for the 22
+THE SECOND HARDENING ROUND (game 1e932c5b61): the FRESH review of the
+shape-four fix proved three residual doors (an unguarded dbless
+classification, a step-level env override blanking legs under a satisfied
+job-level pin, an unclassifiable job-level uses) plus spelling gaps; all
+closed. Four new mutants, and per the stale rule all thirteen prior CI
+verdicts re-run against the hardened pin (control 26/26 green; every run
+at the full count; git checkout reverts; status clean):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_ci_step_env_override | BIT (1 fail) | ci_workflow | a step-level TEST_DATABASE_URL: '' under pr-gate's run step; the exactly-one-occurrence count reds |
+| mrc_ci_job_level_uses | BIT (2 fails) | ci_workflow | a reusable-workflow job added; completeness AND the uses novelty refusal red |
+| mrc_ci_blockscalar_expression | BIT (1 fail) | ci_workflow | a run block-scalar whose line begins with an expression; the expression-initial refusal reds |
+| mrc_ci_flow_style_job | BIT (1 fail) | ci_workflow | a flow-style job mapping; the unrecognized two-space-line refusal reds instead of swallowing it |
+| all 13 first-round CI mutants (re-run) | re-BIT (fail counts 1 to 4) | ci_workflow | the full first-round battery replayed against 1e932c5b61 |
+
+Section totals: 17 new distinct mutants (2 service + 3 dashboard + 12 CI),
+all BIT after the fix rounds, 0 standing survivors (the 4 initial survivor
+verdicts are the finding, closed by the new pins); 24 re-run events, all
+re-BIT; 1 compile-refused strip recorded, not counted. Whole log: 436 by
+the chained convention (419 + 17). BOOKKEEPING CAVEAT for the 22
 close-out: an independent name census over the log's table rows reads a
 few higher than the chained totals (the early sections record some mutants
 in prose, and the divergence predates this rider); reconcile once at
