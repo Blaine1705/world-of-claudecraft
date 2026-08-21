@@ -40,7 +40,23 @@ row are the same shape mirrored, so there is one tested implementation.
 ## Seating
 
 Static seating is CSS (`src/styles/hud.mobile.css`, per tier): the anchor sits on
-the action ring's Jump line so the bottom of the HUD reads as one row. Only the
-strip's own item positions are measured, because they depend on where the anchor
-actually is and are edge-clamped against the shared app-viewport box (`--app-vw`),
-never `window.innerWidth`.
+the action ring's Jump line so the bottom of the HUD reads as one row. The rest of
+that row hangs off `--mobile-button-row-lift`, the per-tier distance from the
+viewport bottom to the row's TOP line: the bottom-centre `#player-frame` puts its
+top ON it, and the cast bar, swing bar, pet frame and stance bar stack above it.
+Only the strip's own item positions are measured, because they depend on where the
+anchor actually is and are edge-clamped against the shared app-viewport box
+(`--app-vw`), never `window.innerWidth`.
+
+The open row also RAISES `#mobile-controls` over `#ui`. The row crosses the whole
+bottom band including `#player-frame`, and a child z-index cannot escape its parent
+stacking context, so the raise has to happen on the context itself.
+
+## The local dim
+
+Both this row and the consumables row dim a BAND along the row, never a circle at
+the anchor: `stripDimSpan` (`../action_bar/radial_action_core.ts`) measures from the
+open items and the painter writes `--strip-dim-x` / `--strip-extent-px`, so the
+extent scales with the item count and the mirror comes from the placement rather
+than from a body class. A circle wide enough to reach the ninth item washes the
+half of the screen the row never touches, which is what it did before.

@@ -22,7 +22,11 @@ import {
   mobilePageCount,
 } from '../../src/ui/hud/action_bar/mobile_action_page_view';
 import { MobileActionRingPainter } from '../../src/ui/hud/action_bar/mobile_action_ring_painter';
-import { placeConsumableStrip, placeRadial } from '../../src/ui/hud/action_bar/radial_action_core';
+import {
+  placeConsumableStrip,
+  placeRadial,
+  type StripDirection,
+} from '../../src/ui/hud/action_bar/radial_action_core';
 import {
   RADIAL_PETAL_DIRECTIONS,
   RadialPetalPainter,
@@ -293,6 +297,7 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
       count: CONSUMABLE_BAR_SLOTS,
       live: 2,
       cancelLive: false,
+      itemSize: seatBox.width,
     });
 
     expect(getComputedStyle(rig.strip).display).toBe('block');
@@ -374,6 +379,7 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
       count: CONSUMABLE_BAR_SLOTS,
       live: -1,
       cancelLive: true,
+      itemSize: seatBox.width,
     });
 
     const cancelBox = rig.stripCancel.getBoundingClientRect();
@@ -395,10 +401,134 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
     // The X clears the 40x40 touch floor too: it is a real release target.
     expect(cancelBox.width).toBeGreaterThanOrEqual(40);
     expect(cancelBox.height).toBeGreaterThanOrEqual(40);
-    // Local dim only, anchored on the seat: never a full-screen scrim, because
-    // the other thumb is still steering.
-    const dim = getComputedStyle(rig.strip, '::before');
-    expect(dim.backgroundImage).toContain('radial-gradient');
+    // The dim's own shape is pinned by the row-dim test below.
+  });
+
+  it('runs the local dim ALONG the row instead of circling the seat', async () => {
+    const rig = await setup();
+    const painter = new ConsumableStripPainter(
+      writers(),
+      {
+        strip: rig.strip,
+        cancel: rig.stripCancel,
+        seat: slotElements(rig.seat),
+        items: rig.stripItems.map(slotElements),
+      },
+      () => '',
+    );
+    const state: ActionBarState = {
+      slots: Array.from({ length: CONSUMABLE_BAR_SLOTS + 1 }, () => emptySlotState('item')),
+      manySpells: false,
+    };
+    const stripStyle = getComputedStyle(rig.strip);
+    const gap = Number.parseFloat(stripStyle.getPropertyValue('--strip-gap'));
+    const margin = Number.parseFloat(stripStyle.getPropertyValue('--strip-margin'));
+    const seatBox = rig.seat.getBoundingClientRect();
+    const anchorX = seatBox.x + seatBox.width / 2;
+    const anchorY = seatBox.y + seatBox.height / 2;
+    const itemSize = seatBox.width;
+
+    const openAt = (count: number, direction: StripDirection) => {
+      const placement = placeConsumableStrip({
+        anchorX,
+        anchorY,
+        count,
+        itemSize,
+        gap,
+        viewportWidth: window.innerWidth,
+        margin,
+        direction,
+      });
+      painter.paint(state, {
+        placement,
+        anchorX,
+        anchorY,
+        count,
+        live: -1,
+        cancelLive: false,
+        itemSize,
+      });
+      const dim = getComputedStyle(rig.strip, '::before');
+      return {
+        placement,
+        left: Number.parseFloat(dim.left),
+        width: Number.parseFloat(dim.width),
+        top: Number.parseFloat(dim.top),
+        height: Number.parseFloat(dim.height),
+      };
+    };
+
+    // The shipped right-handed seat: the row grows LEFT, so the band runs from
+    // the seat leftward and ENDS at the seat, never past it.
+    const full = openAt(CONSUMABLE_BAR_SLOTS, 'left');
+    const lastCenter = full.placement.centers[CONSUMABLE_BAR_SLOTS - 1];
+    expect(full.left + full.width).toBeCloseTo(anchorX, 0);
+    // Just past the last item's centre: one item size beyond it, so the fade
+    // lands clear of the item rather than on top of it.
+    expect(full.left).toBeCloseTo(lastCenter - itemSize, 0);
+    expect(full.left).toBeLessThan(lastCenter);
+    // LOCAL, not a screen wash: the band covers the row and no more. A circle
+    // wide enough to reach the far item would have covered far more than this.
+    expect(full.width).toBeLessThan(window.innerWidth * 0.6);
+    expect(full.left).toBeGreaterThan(-EDGE_TOLERANCE_PX);
+    // The band stays inside the row's own vertical band: it is a line, not a blob.
+    expect(full.height).toBeLessThanOrEqual(itemSize * 2 + 1);
+    expect(full.top).toBeLessThanOrEqual(anchorY - seatBox.height / 2);
+    expect(full.top + full.height).toBeGreaterThanOrEqual(anchorY + seatBox.height / 2);
+    // The fade starts at the seat end, which is the right edge on a leftward row.
+    expect(rig.strip.classList.contains('dim-flip')).toBe(true);
+    expect(getComputedStyle(rig.strip, '::before').transform).toBe('matrix(-1, 0, 0, 1, 0, 0)');
+
+    // The extent is a function of the OPEN item count, which is the whole point
+    // of measuring it rather than hard-coding a radius.
+    const short = openAt(2, 'left');
+    expect(short.width).toBeLessThan(full.width);
+    expect(short.left + short.width).toBeCloseTo(anchorX, 0);
+
+    // The left-handed mirror seats the ring against the opposite edge, so the row
+    // grows RIGHT and the band has to flip with it.
+    document.body.classList.add('mobile-left-handed');
+    const mirroredSeat = rig.seat.getBoundingClientRect();
+    const mirroredAnchorX = mirroredSeat.x + mirroredSeat.width / 2;
+    expect(mirroredAnchorX).toBeLessThan(anchorX);
+    const mirroredDirection = resolveConsumableStripDirection({
+      anchorX: mirroredAnchorX,
+      count: CONSUMABLE_BAR_SLOTS,
+      itemSize,
+      gap,
+      viewportWidth: window.innerWidth,
+      margin,
+    });
+    expect(mirroredDirection, 'the mirrored seat has no room to grow leftward').toBe('right');
+    const mirroredPlacement = placeConsumableStrip({
+      anchorX: mirroredAnchorX,
+      anchorY: mirroredSeat.y + mirroredSeat.height / 2,
+      count: CONSUMABLE_BAR_SLOTS,
+      itemSize,
+      gap,
+      viewportWidth: window.innerWidth,
+      margin,
+      direction: mirroredDirection,
+    });
+    painter.paint(state, {
+      placement: mirroredPlacement,
+      anchorX: mirroredAnchorX,
+      anchorY: mirroredSeat.y + mirroredSeat.height / 2,
+      count: CONSUMABLE_BAR_SLOTS,
+      live: -1,
+      cancelLive: false,
+      itemSize,
+    });
+    const mirroredDim = getComputedStyle(rig.strip, '::before');
+    expect(Number.parseFloat(mirroredDim.left)).toBeCloseTo(mirroredAnchorX, 0);
+    expect(Number.parseFloat(mirroredDim.left) + Number.parseFloat(mirroredDim.width)).toBeCloseTo(
+      mirroredPlacement.centers[CONSUMABLE_BAR_SLOTS - 1] + itemSize,
+      0,
+    );
+    expect(rig.strip.classList.contains('dim-flip')).toBe(false);
+    expect(mirroredDim.transform).toBe('none');
+    expect(mirroredDim.backgroundImage).toContain('to right');
+    document.body.classList.remove('mobile-left-handed');
   });
 
   it('reports TWO pages on the toggle for the full 33-slot span', async () => {

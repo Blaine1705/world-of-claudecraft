@@ -12,6 +12,7 @@ import {
   resolveRadialDirection,
   resolveStripIndex,
   STRIP_DEADZONE_PX,
+  stripDimSpan,
 } from '../src/ui/hud/action_bar/radial_action_core';
 
 // The shipping ring geometry: 4 buttons, 5 actions each, over the 33 reachable
@@ -437,5 +438,84 @@ describe('resolveStripIndex', () => {
   it('accepts a caller deadzone', () => {
     expect(resolveStripIndex(-30, PITCH, 6, 40)).toBe(-1);
     expect(resolveStripIndex(-30, PITCH, 6, 10)).toBe(0);
+  });
+});
+
+// The local dim's band. The whole point is that it FOLLOWS the row: the extent is
+// a function of how many items are actually open, so a nine-item menu and a
+// one-item consumables row never darken the same amount of screen.
+describe('stripDimSpan', () => {
+  const ITEM = 46;
+  const leftRow = (n: number) => Array.from({ length: n }, (_, i) => 400 - 54 * (i + 1));
+  const rightRow = (n: number) => Array.from({ length: n }, (_, i) => 200 + 54 * (i + 1));
+
+  it('runs from the anchor to one item past the last centre, rightward', () => {
+    const span = stripDimSpan({ anchorX: 200, centers: rightRow(9), count: 9, itemSize: ITEM });
+    expect(span.anchorAtRight).toBe(false);
+    expect(span.left).toBe(200);
+    // Last centre is 200 + 54 * 9 = 686, so the band ends at 686 + 46 = 732.
+    expect(span.width).toBe(532);
+    expect(span.left + span.width).toBe(732);
+  });
+
+  it('mirrors when the row grew leftward, putting the anchor at the right edge', () => {
+    const span = stripDimSpan({ anchorX: 400, centers: leftRow(6), count: 6, itemSize: ITEM });
+    expect(span.anchorAtRight).toBe(true);
+    // Last centre is 400 - 54 * 6 = 76, so the band starts at 76 - 46 = 30.
+    expect(span.width).toBe(370);
+    expect(span.left).toBe(30);
+    expect(span.left + span.width).toBe(400);
+  });
+
+  it('scales the extent with the number of OPEN items, not the row capacity', () => {
+    const centers = leftRow(6);
+    const two = stripDimSpan({ anchorX: 400, centers, count: 2, itemSize: ITEM });
+    const six = stripDimSpan({ anchorX: 400, centers, count: 6, itemSize: ITEM });
+    expect(two.width).toBe(154);
+    expect(six.width).toBe(370);
+    expect(two.width).toBeLessThan(six.width);
+    // The band always ends AT the anchor on a leftward row, whatever the count.
+    expect(two.left + two.width).toBe(400);
+  });
+
+  it('closes to nothing when the row carries no items', () => {
+    expect(stripDimSpan({ anchorX: 400, centers: [], count: 0, itemSize: ITEM })).toEqual({
+      left: 400,
+      width: 0,
+      anchorAtRight: false,
+    });
+    expect(
+      stripDimSpan({ anchorX: 400, centers: leftRow(6), count: 0, itemSize: ITEM }).width,
+    ).toBe(0);
+  });
+
+  it('never reads past the centres the placement actually produced', () => {
+    const span = stripDimSpan({ anchorX: 400, centers: leftRow(2), count: 6, itemSize: ITEM });
+    expect(span.width).toBe(154);
+    expect(Number.isFinite(span.left)).toBe(true);
+  });
+
+  it('takes the CLAMPED centres as given, so a shifted row dims where it renders', () => {
+    // placeConsumableStrip shifts the whole row when the far item would run off
+    // screen; the band has to follow the shift, not the unclamped ideal.
+    const clamped = placeConsumableStrip({
+      anchorX: 120,
+      anchorY: 300,
+      count: 6,
+      itemSize: ITEM,
+      gap: 8,
+      viewportWidth: 844,
+      margin: 6,
+      direction: 'left',
+    });
+    expect(clamped.clamped).toBe(true);
+    const span = stripDimSpan({
+      anchorX: 120,
+      centers: clamped.centers,
+      count: 6,
+      itemSize: ITEM,
+    });
+    expect(span.left).toBeCloseTo(clamped.centers[5] - ITEM, 5);
+    expect(span.left + span.width).toBeCloseTo(120, 5);
   });
 });

@@ -11,22 +11,31 @@
 // tail positions the player is not carrying.
 //
 // The seating is the one thing here that cannot be CSS: it depends on where the
-// seat actually is, edge-clamped by placeConsumableStrip. Static layout (size,
-// shape, dim, transitions) stays in hud.mobile.css per tier, and every write
-// routes through the injected PainterHostWriters, matching the ring painter.
+// seat actually is, edge-clamped by placeConsumableStrip. The local dim's BAND is
+// measured for the same reason (stripDimSpan turns the open row into the strip it
+// darkens, so a two-potion row never dims as much screen as a six-potion one);
+// static layout (size, shape, colours, transitions) stays in hud.mobile.css per
+// tier, and every write routes through the injected PainterHostWriters, matching
+// the ring painter.
 
 import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarSlotElements } from './action_bar_painter';
 import { ActionBarPainter } from './action_bar_painter';
 import type { ActionBarState } from './action_bar_view';
-import type { StripPlacement } from './radial_action_core';
+import { type StripPlacement, stripDimSpan } from './radial_action_core';
 
 const CLASS_OPEN = 'open';
 const CLASS_LIVE = 'live';
+/** Marks the band whose anchor is at its RIGHT edge, which is where the dim's
+ *  fade starts. Set from the placement, never from the left-handed body class,
+ *  so the runtime direction and the dim can never disagree. */
+const CLASS_DIM_FLIP = 'dim-flip';
 const LEFT_PROP = 'left';
 const TOP_PROP = 'top';
 const ORIGIN_X_PROP = '--strip-x';
 const ORIGIN_Y_PROP = '--strip-y';
+const DIM_X_PROP = '--strip-dim-x';
+const DIM_EXTENT_PROP = '--strip-extent-px';
 
 /** Everything the painter needs about an OPEN row. Null means closed, which is
  *  the steady state and costs one elided class toggle. */
@@ -44,6 +53,9 @@ export interface ConsumableStripOpenState {
    *  seat's band with the row open). Never true in sticky mode, where the choice
    *  is made by focus rather than by travel. */
   cancelLive: boolean;
+  /** Rendered size of one item, so the dim knows how far past the last item its
+   *  fade has to reach. The gesture already measured it off the seat. */
+  itemSize: number;
 }
 
 export interface ConsumableStripPaintDescriptor {
@@ -83,6 +95,15 @@ export class ConsumableStripPainter {
 
     this.writers.setStyleProp(strip, ORIGIN_X_PROP, `${open.anchorX}px`);
     this.writers.setStyleProp(strip, ORIGIN_Y_PROP, `${open.anchorY}px`);
+    const dim = stripDimSpan({
+      anchorX: open.anchorX,
+      centers: open.placement.centers,
+      count: open.count,
+      itemSize: open.itemSize,
+    });
+    this.writers.setStyleProp(strip, DIM_X_PROP, `${dim.left}px`);
+    this.writers.setStyleProp(strip, DIM_EXTENT_PROP, `${dim.width}px`);
+    this.writers.toggleClass(strip, CLASS_DIM_FLIP, dim.anchorAtRight);
     this.writers.setStyleProp(cancel, LEFT_PROP, `${open.anchorX}px`);
     this.writers.setStyleProp(cancel, TOP_PROP, `${open.anchorY}px`);
     this.writers.toggleClass(cancel, CLASS_LIVE, open.cancelLive);

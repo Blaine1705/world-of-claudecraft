@@ -1220,9 +1220,16 @@ describe('client HTML shell', () => {
         '    height: 22px;\n',
     );
     // Local dim only: never a full-screen scrim, because the other thumb is still
-    // steering and the player must keep seeing the fight.
-    expect(hudMobileCss).toContain('  body.mobile-touch #mobile-consumable-strip::before {');
-    expect(hudMobileCss).toContain('      circle at var(--strip-x, 50%) var(--strip-y, 50%),');
+    // steering and the player must keep seeing the fight. It is a BAND along the
+    // row, sized from what the painter measured, not a circle at the seat: a
+    // circle wide enough to reach the far item washes the screen beside the row.
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch #mobile-consumable-strip::before,\n' +
+        '  body.mobile-touch #mobile-menu-strip::before {',
+    );
+    expect(hudMobileCss).toContain('    left: var(--strip-dim-x, 0px);');
+    expect(hudMobileCss).toContain('    width: var(--strip-extent-px, 0px);');
+    expect(hudMobileCss).not.toContain('circle at var(--strip-x, 50%) var(--strip-y, 50%),');
     // Touch-router coverage. The SEAT is covered by #mobile-action-ring
     // containment (it is a child), but the ROW is a sibling, so it needs its own
     // entry or a sticky-mode tap on an item falls through to a camera drag.
@@ -1596,9 +1603,12 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('transparent var(--xp-ring-arc) 360deg');
     // Own HP/mana lives bottom-center (the one part of the screen every
     // other mobile element deliberately leaves empty), not top-left.
+    // TOP-seated on the button row's line (the frame's scaled height is
+    // content-driven, so only a top anchor can put its top edge there).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: 50%;\n    top: auto;\n    bottom: calc(14px + env(safe-area-inset-bottom));\n    z-index: 21;',
+      'top: calc(var(--app-vh, 100dvh) - var(--mobile-button-row-lift));\n    bottom: auto;\n    z-index: 21;',
     );
+    expect(hudMobileCss).toContain('transform-origin: center top;');
     expect(hudMobileCss).toContain(
       'body.mobile-touch #player-frame .portrait-wrap {\n    z-index: 3;\n  }',
     );
@@ -2583,8 +2593,10 @@ describe('client HTML shell', () => {
     // player frame, in both the base and landscape rules; on the compact tier
     // both nudge 40px left so Jump's ring-row seat keeps a clear circle on
     // 740px-wide phones.
-    expect(hudMobileCss).toContain('bottom: calc(68px + env(safe-area-inset-bottom));');
-    expect(hudMobileCss).toContain('bottom: calc(62px + env(safe-area-inset-bottom));');
+    // Both bars hang off the same button-row token the player frame's top does,
+    // so the whole bottom-centre column moves as one.
+    expect(hudMobileCss).toContain('bottom: calc(var(--mobile-button-row-lift) + 6px);');
+    expect(hudMobileCss).toContain('bottom: calc(var(--mobile-button-row-lift) + 15px);');
     expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-left-handed #castbar');
     // Nudged further right from the original -40px to clear more of the
     // joystick zone; castbar/swingbar still move together with it.
@@ -2872,10 +2884,15 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('height: min(36vh, 172px);');
     expect(hudMobileCss).toContain('left: calc(max(18px, env(safe-area-inset-left)) + 172px);');
     expect(hudMobileCss).toContain('right: calc(max(18px, env(safe-area-inset-right)) + 172px);');
-    expect(hudMobileCss).toContain('bottom: calc(64px + env(safe-area-inset-bottom));');
     expect(hudMobileCss).toContain('left: calc(max(20px, env(safe-area-inset-left)) + 164px);');
     expect(hudMobileCss).toContain('right: calc(max(20px, env(safe-area-inset-right)) + 164px);');
-    expect(hudMobileCss).toContain('bottom: calc(57px + env(safe-area-inset-bottom));');
+    // #stancebar is the only thing still in this flow on touch, and its old seat
+    // sat on the menu control's band, so the wrapper joins the bottom-centre
+    // column above the swing bar instead of carrying a raw viewport inset.
+    expect(hudMobileCss).toContain('bottom: calc(var(--mobile-button-row-lift) + 24px);');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #stancebar {\n    justify-content: center;\n  }',
+    );
   });
 
   it('hides the desktop action bars on touch: the mobile action ring supersedes them', () => {

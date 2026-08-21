@@ -91,6 +91,7 @@ interface StripLayout {
   anchorX: number;
   anchorY: number;
   count: number;
+  itemSize: number;
 }
 
 interface DragState {
@@ -211,6 +212,7 @@ export class ConsumableStripGesture {
       anchorX: layout.anchorX,
       anchorY: layout.anchorY,
       count: layout.count,
+      itemSize: layout.itemSize,
       // The sticky menu is chosen by FOCUS, not by travel, so no item is under a
       // finger and the cancel target is not the live choice either.
       live: this.sticky ? -1 : (this.drag?.index ?? -1),
@@ -249,6 +251,7 @@ export class ConsumableStripGesture {
       anchorX,
       anchorY,
       count: shared.count,
+      itemSize,
     };
   }
 

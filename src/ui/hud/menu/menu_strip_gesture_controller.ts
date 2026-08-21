@@ -98,6 +98,7 @@ interface StripLayout {
   anchorY: number;
   viewportWidth: number;
   margin: number;
+  itemSize: number;
 }
 
 interface DragState {
@@ -226,6 +227,7 @@ export class MenuStripGesture {
       anchorY: layout.anchorY,
       viewportWidth: layout.viewportWidth,
       margin: layout.margin,
+      itemSize: layout.itemSize,
       // The sticky menu is chosen by FOCUS, not by travel, so no item is under a
       // finger and the cancel target is not the live choice either.
       live: this.liveIndex(),
@@ -266,6 +268,7 @@ export class MenuStripGesture {
       anchorY,
       viewportWidth,
       margin,
+      itemSize,
     };
   }
 

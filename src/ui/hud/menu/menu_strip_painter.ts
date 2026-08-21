@@ -2,26 +2,32 @@
 // cancel X that sits on top of the anchor, and the single live caption.
 //
 // The seating is the one thing here that cannot be CSS: it depends on where the
-// anchor actually is, edge-clamped by placeConsumableStrip. Static layout (size,
-// shape, dim, transitions) stays in hud.mobile.css per tier, and every write
-// routes through the injected PainterHostWriters, matching the ring and the
-// consumables row.
+// anchor actually is, edge-clamped by placeConsumableStrip. The local dim's BAND
+// is measured for the same reason (stripDimSpan turns the open row into the strip
+// it darkens); static layout (size, shape, colours, transitions) stays in
+// hud.mobile.css per tier, and every write routes through the injected
+// PainterHostWriters, matching the ring and the consumables row.
 //
 // It takes no layout read of its own: the caption is centred from the CACHED
 // placement the gesture measured once, clamped by the pure core against a nominal
 // half-width, so a caption never costs a forced reflow while the finger travels.
 
 import type { PainterHostWriters } from '../../painter_host';
-import type { StripPlacement } from '../action_bar/radial_action_core';
+import { type StripPlacement, stripDimSpan } from '../action_bar/radial_action_core';
 import { menuCaptionCenterX } from './menu_strip_core';
 
 const CLASS_OPEN = 'open';
 const CLASS_LIVE = 'live';
 const CLASS_SHOWN = 'shown';
+/** Marks the band whose anchor is at its RIGHT edge, which is where the dim's
+ *  fade starts. Set from the placement, so the row and its dim cannot disagree. */
+const CLASS_DIM_FLIP = 'dim-flip';
 const LEFT_PROP = 'left';
 const TOP_PROP = 'top';
 const ORIGIN_X_PROP = '--strip-x';
 const ORIGIN_Y_PROP = '--strip-y';
+const DIM_X_PROP = '--strip-dim-x';
+const DIM_EXTENT_PROP = '--strip-extent-px';
 
 /** Everything the painter needs about an OPEN strip. Null means closed, which is
  *  the steady state and costs one elided class toggle. */
@@ -42,6 +48,9 @@ export interface MenuStripOpenState {
   viewportWidth: number;
   /** The edge clearance the clamp keeps. */
   margin: number;
+  /** Rendered size of one item, so the dim knows how far past the last item its
+   *  fade has to reach. The gesture already measured it off the anchor. */
+  itemSize: number;
   /** The live item's localized name, or '' when nothing is live. */
   caption: string;
 }
@@ -74,6 +83,15 @@ export class MenuStripPainter {
 
     this.writers.setStyleProp(strip, ORIGIN_X_PROP, `${open.anchorX}px`);
     this.writers.setStyleProp(strip, ORIGIN_Y_PROP, `${open.anchorY}px`);
+    const dim = stripDimSpan({
+      anchorX: open.anchorX,
+      centers: open.placement.centers,
+      count: items.length,
+      itemSize: open.itemSize,
+    });
+    this.writers.setStyleProp(strip, DIM_X_PROP, `${dim.left}px`);
+    this.writers.setStyleProp(strip, DIM_EXTENT_PROP, `${dim.width}px`);
+    this.writers.toggleClass(strip, CLASS_DIM_FLIP, dim.anchorAtRight);
     this.writers.setStyleProp(cancel, LEFT_PROP, `${open.anchorX}px`);
     this.writers.setStyleProp(cancel, TOP_PROP, `${open.anchorY}px`);
     this.writers.toggleClass(cancel, CLASS_LIVE, open.cancelLive);

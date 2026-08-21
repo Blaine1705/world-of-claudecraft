@@ -210,6 +210,45 @@ export function placeConsumableStrip(input: StripPlacementInput): StripPlacement
   return { centers, pitch, clamped };
 }
 
+export interface StripDimInput {
+  /** Centre of the anchoring button. */
+  anchorX: number;
+  /** Item centres from placeConsumableStrip, index 0 nearest the anchor. */
+  centers: readonly number[];
+  /** How many of those positions are actually open; the tail stays hidden. */
+  count: number;
+  itemSize: number;
+}
+
+export interface StripDimSpan {
+  /** Left edge of the dim band, in the anchor's own space. */
+  left: number;
+  /** Length of the band along the row axis. Zero closes the dim entirely. */
+  width: number;
+  /** True when the anchor is at the band's RIGHT edge, i.e. the row grew
+   *  leftward. It is what the fade has to start from, so the painter reports it
+   *  rather than the direction: the row's own centres already carry the mirror. */
+  anchorAtRight: boolean;
+}
+
+/**
+ * The band the local dim covers: a line from the anchor along the row, ending
+ * one item size past the LAST OPEN item's centre so the fade lands clear of it.
+ * A circle cannot do this job. The row is many items long and its anchor sits at
+ * one end of the bottom band, so any circle wide enough to reach the far item
+ * also washes half the screen on the side the row never reaches, which reads as
+ * a dim anchored on the screen edge rather than on the control.
+ */
+export function stripDimSpan(input: StripDimInput): StripDimSpan {
+  const open = Math.min(input.count, input.centers.length);
+  if (open <= 0) return { left: input.anchorX, width: 0, anchorAtRight: false };
+  const last = input.centers[open - 1];
+  if (!Number.isFinite(last)) return { left: input.anchorX, width: 0, anchorAtRight: false };
+  const anchorAtRight = last < input.anchorX;
+  const width = Math.abs(last - input.anchorX) + input.itemSize;
+  return { left: anchorAtRight ? input.anchorX - width : input.anchorX, width, anchorAtRight };
+}
+
 /**
  * Which strip item a horizontal drag is over, or -1 while still inside the
  * deadzone (meaning the gesture is still a tap). Travel along the direction the

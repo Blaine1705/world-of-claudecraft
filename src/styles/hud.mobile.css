@@ -145,6 +145,16 @@
   body.mobile-touch.game-active.touch-item-dragging #mobile-controls {
     z-index: 96;
   }
+  /* The open menu strip crosses the whole bottom band, including the bottom-centre
+     #player-frame. That frame lives in #ui (z 80) while the strip lives in this
+     layer (z 60), and a child's z-index cannot escape its parent stacking context,
+     so the row can only be lifted over the frame by raising the context itself.
+     Scoped to the open row, and no companion pointer-events neutralizer: unlike
+     the drag window above, the whole point of the local dim is that the other
+     thumb keeps steering while the row is up. */
+  body.mobile-touch.game-active #mobile-controls:has(#mobile-menu-strip.open) {
+    z-index: 96;
+  }
   /* Only the RING is the drop target: the raise lifts the whole controls
      subtree (a child's z-index cannot escape its parent stacking context),
      so every other pointer-active control up there (the move zone, the
@@ -579,6 +589,42 @@
   }
   body.mobile-touch.hud-mobile-tablet {
     --menu-btn-size: calc(76px * var(--mobile-chrome-scale, 1));
+  }
+  /* Distance from the viewport bottom to the TOP LINE of the bottom button row.
+     The menu control and Jump share one centre line, and the control is the
+     taller of the two, so its top edge IS that line. Everything in the
+     bottom-centre column hangs off this one token: the player frame's top sits
+     ON the line and the cast bar, swing bar, pet frame and stance bar stack
+     above it, which is what makes the bottom band read as one row instead of
+     three independently tuned stacks.
+     Each tier's two literals are the SAME pair #mobile-combat-controls derives
+     its own seat from (the ring's bottom inset and half its attack button), so
+     the row's bottom edge and its top line can never drift apart; the sign on
+     --menu-btn-size is what separates them (the seat subtracts the control's
+     half-height to reach Jump's centre, this adds it back to reach the top). */
+  body.mobile-touch {
+    --mobile-button-row-lift: calc(
+      20px +
+      env(safe-area-inset-bottom) +
+      var(--btn-scale, 1) *
+      (50px * var(--mobile-chrome-scale, 1) + var(--menu-btn-size) / 2)
+    );
+  }
+  body.mobile-touch.hud-mobile-compact {
+    --mobile-button-row-lift: calc(
+      10px +
+      env(safe-area-inset-bottom) +
+      var(--btn-scale, 1) *
+      (42px * var(--mobile-chrome-scale, 1) + var(--menu-btn-size) / 2)
+    );
+  }
+  body.mobile-touch.hud-mobile-tablet {
+    --mobile-button-row-lift: calc(
+      20px +
+      env(safe-area-inset-bottom) +
+      var(--btn-scale, 1) *
+      (58px * var(--mobile-chrome-scale, 1) + var(--menu-btn-size) / 2)
+    );
   }
   body.mobile-touch #mobile-action-ring {
     /* Chrome-scale folded into every ring size var (the arc offsets below are
@@ -1169,21 +1215,40 @@
     display: block;
   }
   /* The dim is LOCAL to the row and never a full-screen scrim: the other thumb
-     is still steering and the player must keep seeing the fight. */
-  body.mobile-touch #mobile-consumable-strip::before {
+     is still steering and the player must keep seeing the fight. It FOLLOWS the
+     row rather than circling the seat: --strip-dim-x and --strip-extent-px are
+     the band stripDimSpan measured from the open items, so the darkening ends
+     one item past the last one instead of washing the screen on the side the
+     row never reaches. .dim-flip says the seat is at the band's right edge (the
+     row grew leftward), which is the end the fade starts from; the painter sets
+     it from the placement, so the left-handed mirror carries automatically. */
+  body.mobile-touch #mobile-consumable-strip::before,
+  body.mobile-touch #mobile-menu-strip::before {
     content: "";
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(
-      circle at var(--strip-x, 50%) var(--strip-y, 50%),
-      #05050cb0 0%,
-      #05050c80 calc(var(--strip-item-size) * 1.9),
-      transparent calc(var(--strip-item-size) * 2.6)
+    left: var(--strip-dim-x, 0px);
+    top: calc(var(--strip-y, 50%) - var(--strip-item-size));
+    width: var(--strip-extent-px, 0px);
+    height: calc(var(--strip-item-size) * 2);
+    background: linear-gradient(to right, #05050cb0 0%, #05050c80 45%, transparent 100%);
+    /* The band has no soft edge of its own along the cross axis, so the mask
+       supplies one; without it the row sits in a hard-edged dark stripe. */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      #000 34%,
+      #000 66%,
+      transparent 100%
     );
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 66%, transparent 100%);
     pointer-events: none;
+  }
+  /* One gradient, mirrored in place rather than a second copy of it: the scale is
+     about the band's own centre, so the box is unchanged and only the fade's
+     direction reverses. Not motion, so it is outside the reduced-motion rule. */
+  body.mobile-touch #mobile-consumable-strip.dim-flip::before,
+  body.mobile-touch #mobile-menu-strip.dim-flip::before {
+    transform: scaleX(-1);
   }
   /* Items and the cancel X are seated by their CENTRE (the painter writes
      left/top from placeConsumableStrip), so the negative margins pull each box
@@ -1339,23 +1404,9 @@
   body.mobile-touch #mobile-menu-strip.open {
     display: block;
   }
-  /* The dim is LOCAL to the row and never a full-screen scrim: the other thumb is
-     still steering and the player must keep seeing the fight. */
-  body.mobile-touch #mobile-menu-strip::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(
-      circle at var(--strip-x, 50%) var(--strip-y, 50%),
-      #05050cb0 0%,
-      #05050c80 calc(var(--strip-item-size) * 1.9),
-      transparent calc(var(--strip-item-size) * 6.5)
-    );
-    pointer-events: none;
-  }
+  /* The row dim is the shared ::before rule up with the consumables row: nine
+     items is far too long a row for any circle to cover without washing the
+     screen beside it, which is what it used to do. */
   /* Items and the cancel X are seated by their CENTRE (the painter writes
      left/top from placeConsumableStrip), so the negative margins pull each box
      back onto its own centre point. CIRCLES at the shared --menu-btn-size, the
@@ -1838,10 +1889,15 @@
     transform: translate(-50%, -50%) rotate(-45deg);
     pointer-events: none;
   }
+  /* On touch the only thing still IN this flow is #stancebar: the player frame,
+     the pet frame and the pet bar are lifted out to their own fixed seats and every
+     desktop action bar is hidden. Its old seat overlapped the menu control, whose
+     band is on the row line below, so the wrapper joins the bottom-centre column
+     and takes the slot above the swing bar. */
   body.mobile-touch #bottom-bar {
     left: calc(max(18px, env(safe-area-inset-left)) + 172px);
     right: calc(max(18px, env(safe-area-inset-right)) + 172px);
-    bottom: calc(64px + env(safe-area-inset-bottom));
+    bottom: calc(var(--mobile-button-row-lift) + 24px);
     width: auto;
     transform: none;
     z-index: 18;
@@ -1923,12 +1979,14 @@
   body.mobile-touch #castbar {
     position: fixed;
     left: 50%;
-    /* Centred just above the bottom-centre #player-frame (14px inset + its
-       scaled ~48px height + a gap), the classic seat: with Chat/More moved to
-       the top-left trio the band over the player frame is free again, and the old
-       left-strip seat now belongs to Jump's hollow seat around the joystick
-       (a cast bar rendered behind a button, z 19 vs 30, was unreadable). */
-    bottom: calc(68px + env(safe-area-inset-bottom));
+    /* Centred just above the bottom-centre #player-frame, the classic seat: with
+       Chat/More moved to the top-left trio the band over the player frame is free
+       again, and the old left-strip seat now belongs to Jump's hollow seat around
+       the joystick (a cast bar rendered behind a button, z 19 vs 30, was
+       unreadable). Measured off the button row's top line rather than off the
+       viewport bottom, because that line is where the player frame's top now
+       sits: a raw inset would have to guess the frame's scaled height. */
+    bottom: calc(var(--mobile-button-row-lift) + 6px);
     width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
     min-width: 0;
     height: 6px;
@@ -1950,7 +2008,7 @@
   body.mobile-touch #swingbar {
     position: fixed;
     left: 50%;
-    bottom: calc(76px + env(safe-area-inset-bottom));
+    bottom: calc(var(--mobile-button-row-lift) + 15px);
     width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
     min-width: 0;
     height: 5px;
@@ -1969,6 +2027,15 @@
   body.mobile-touch #actionbar-stack {
     width: 100%;
     min-width: 0;
+  }
+  /* The stance/aura row is left-aligned in its 100%-wide flow box on desktop,
+     which on touch parked it over the menu control's own column. Centre it in the
+     bottom-centre column instead; the wrapper's seat above already lifts it clear
+     of the row line. It shares the pet frame's slot deliberately: the choice bar
+     is warrior/paladin only and a permanent pet is hunter/warlock only, so the two
+     never render together and neither reserves a band the other leaves empty. */
+  body.mobile-touch #stancebar {
+    justify-content: center;
   }
   /* Desktop groups the pet command bar and the pet health frame into one row
      (#pet-cluster). Mobile deliberately splits them again: the command bar belongs
@@ -2387,15 +2454,19 @@
   body.mobile-touch #player-frame {
     position: fixed;
     left: 50%;
-    top: auto;
-    bottom: calc(14px + env(safe-area-inset-bottom));
+    /* TOP-seated, and the transform origin moves with it. The frame's rendered
+       height is content-driven and then scaled, so a bottom-anchored seat can
+       never land its TOP on the button row's line: only the origin the scale
+       leaves fixed can, and that has to be the top edge. */
+    top: calc(var(--app-vh, 100dvh) - var(--mobile-button-row-lift));
+    bottom: auto;
     z-index: 21;
     width: 300px;
     margin: 0;
     display: flex;
     justify-content: flex-start;
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
-    transform-origin: center bottom;
+    transform-origin: center top;
   }
   body.mobile-touch .warlock-doom-frame {
     position: fixed;
@@ -2422,8 +2493,9 @@
   /* Pet frame on mobile: the desktop rule keeps it in the #actionbar-stack flow,
      which does not exist here (the player frame is lifted out to position:fixed),
      so re-seat it into the same reserved bottom-centre column, stacked ABOVE the
-     cast and swing bars (player frame 14px, cast 68px, swing 76px). Seating it on
-     top of the column rather than between the frame and the bars is deliberate:
+     cast and swing bars (all of them offset off --mobile-button-row-lift, so the
+     column moves as one). Seating it on top of the column rather than between the
+     frame and the bars is deliberate:
      the pet strip appears and disappears with the pet, and displacing the two bars
      would move a cast bar mid-cast. It KEEPS its portrait here, unlike the cast bar
      which drops its label: the frame is a tap target that selects the pet, and a
@@ -2434,7 +2506,7 @@
     position: fixed;
     left: 50%;
     top: auto;
-    bottom: calc(88px + env(safe-area-inset-bottom));
+    bottom: calc(var(--mobile-button-row-lift) + 24px);
     z-index: 21;
     width: 300px;
     margin: 0;
@@ -5311,7 +5383,7 @@
   }
   /* The picked-up cell for a pending swap: a steady border, never a scale
      transform (the motion-sickness rule in src/ui/CLAUDE.md). */
-  body.mobile-touch #bar-editor .bar-editor-cell[aria-pressed='true'] {
+  body.mobile-touch #bar-editor .bar-editor-cell[aria-pressed="true"] {
     border-color: var(--gold);
     box-shadow: 0 0 8px #d9b45c88;
   }
@@ -6235,7 +6307,6 @@
     body.mobile-touch #bottom-bar {
       left: calc(max(20px, env(safe-area-inset-left)) + 164px);
       right: calc(max(20px, env(safe-area-inset-right)) + 164px);
-      bottom: calc(57px + env(safe-area-inset-bottom));
     }
     body.mobile-touch #xpbar {
       display: none;
@@ -6253,25 +6324,20 @@
       mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
     }
     body.mobile-touch #castbar {
-      /* Centred above the bottom-centre player frame like the base rule, one
-         notch lower to match the shorter landscape frame band. Width matches
-         the landscape #player-frame's rendered width (300px * 0.6 below). */
-      bottom: calc(62px + env(safe-area-inset-bottom));
+      /* The seat itself rides the shared button-row token from the base rule and
+         needs no landscape notch; only the width, which matches the landscape
+         #player-frame's rendered width (300px * 0.6 below), changes here. */
       width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
       min-width: 0;
       height: 5px;
     }
     body.mobile-touch #swingbar {
-      /* Same landscape notch as #castbar above, stacked one bar-height higher
-         so the two never overlap when both are active. */
-      bottom: calc(70px + env(safe-area-inset-bottom));
       width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
       min-width: 0;
       height: 4px;
     }
-    /* Same bottom-centre column as portrait, one notch lower to match the shorter
-       landscape band (player frame 10px, cast 62px, swing 70px), and at the
-       landscape frame scale so the strip matches the player frame's width.
+    /* Same bottom-centre column as portrait, at the landscape frame scale so the
+       strip matches the player frame's width.
        0.6 renders the frame ~35px, under the 40px touch floor: deliberately the
        SAME size as the #player-frame directly below it, which is itself a tap
        target (self-target) already shipping at this scale in landscape. Sizing
@@ -6279,7 +6345,6 @@
        invert their visual hierarchy; the landscape tier trades size for the
        shorter viewport everywhere, and this follows the established baseline. */
     body.mobile-touch #pet-frame {
-      bottom: calc(80px + env(safe-area-inset-bottom));
       transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
     }
     body.mobile-touch #petbar {
@@ -6319,8 +6384,6 @@
        the portrait-level rule already seats it correctly here (no landscape override). */
     body.mobile-touch #player-frame {
       left: 50%;
-      top: auto;
-      bottom: calc(10px + env(safe-area-inset-bottom));
       width: 300px;
       transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
     }

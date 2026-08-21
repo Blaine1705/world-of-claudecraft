@@ -16,18 +16,35 @@ import {
   MENU_STRIP_ITEMS,
 } from '../../src/ui/hud/menu/menu_strip_core';
 import { MenuStripPainter } from '../../src/ui/hud/menu/menu_strip_painter';
+import { resolveMobileHudLayout } from '../../src/ui/mobile_hud_layout';
 import { makeWriterFacet } from '../../src/ui/painter_host';
 import { PARTY_BELOW_TARGET_BOTTOM_PROP } from '../../src/ui/party_below_target_painter';
 import '../../src/styles/index.css';
 import { cleanup } from './_harness';
 
 // Both are real landscape phone viewports the touch HUD ships to: 844x390 is the
-// iPhone 14/15 class and 874x402 the iPhone 16 Pro, and they land on different
-// layout tiers, which is the point of running the same pins twice.
+// iPhone 14/15 class and 874x402 the iPhone 16 Pro. Their tier is DERIVED from the
+// same core the applier runs, never hand-written: a hand-written tier is how this
+// file previously ran the 16 Pro on the standard tier while the device itself gets
+// the compact one, and every pin below then measured a layout no phone renders.
 const VIEWPORTS = [
-  { label: '844x390', width: 844, height: 390, tier: 'hud-mobile-compact' },
-  { label: '874x402', width: 874, height: 402, tier: '' },
+  { label: '844x390', width: 844, height: 390 },
+  { label: '874x402', width: 874, height: 402 },
 ] as const;
+
+function tierClasses(width: number, height: number): string {
+  return resolveMobileHudLayout({
+    width,
+    height,
+    safeAreaTop: 0,
+    safeAreaRight: 0,
+    safeAreaBottom: 0,
+    safeAreaLeft: 0,
+    touchMode: true,
+    menuOpen: false,
+    chatOpen: false,
+  }).classes.join(' ');
+}
 
 const EDGE_TOLERANCE_PX = 0.5;
 const TOUCH_FLOOR_PX = 40;
@@ -143,6 +160,109 @@ function mountLeftColumn(memberCount: number) {
   return { ui, target, party, rows };
 }
 
+/** The bottom-centre column, in its shipped nesting: #player-frame and #stancebar
+ *  both live inside #bottom-bar's stack under #ui, which is the stacking context
+ *  the strip has to clear. Real content, because the frame's rendered height is
+ *  content-driven and then scaled, and the seat under test is about its TOP. */
+function mountBottomColumn() {
+  const ui = document.createElement('div');
+  ui.id = 'ui';
+  ui.innerHTML = `
+    <div id="bottom-bar"><div id="actionbar-row"><div id="actionbar-stack">
+      <div id="pet-cluster">
+        <div id="petbar" class="panel"><div class="stancebar-group">
+          <button type="button" class="stance-btn"></button>
+          <button type="button" class="stance-btn"></button>
+        </div></div>
+      </div>
+      <div id="player-frame" class="unitframe" role="group" tabindex="0">
+        <div class="portrait-wrap" id="pf-portrait-wrap">
+          <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+          <div class="level-chip" id="pf-level">1</div>
+        </div>
+        <div class="uf-bars">
+          <div class="uf-name" id="pf-name">Hero</div>
+          <div class="bar hp"><div class="bar-fill" id="pf-hp"></div></div>
+          <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div></div>
+        </div>
+      </div>
+      <div id="stancebar"><div class="stancebar-group">
+        <button type="button" class="stance-btn"></button>
+        <button type="button" class="stance-btn"></button>
+        <button type="button" class="stance-btn"></button>
+      </div></div>
+    </div></div></div>`;
+  document.body.appendChild(ui);
+  const el = (id: string) => ui.querySelector(`#${id}`) as HTMLElement;
+  const stancebar = el('stancebar');
+  const petbar = el('petbar');
+  // Both bars are JS-flipped to flex by their own renderers; the CSS seat under
+  // test only applies once they render, so the fixture flips them the same way.
+  stancebar.style.display = 'flex';
+  petbar.style.display = 'flex';
+  return {
+    ui,
+    playerFrame: el('player-frame'),
+    stancebar,
+    stanceGroup: stancebar.querySelector('.stancebar-group') as HTMLElement,
+    petbar,
+  };
+}
+
+/** Lay the row out exactly as MenuStripGesture does and paint it open. */
+function openMenuStrip(
+  rig: ReturnType<typeof mountControl>,
+  viewportWidth: number,
+  live: number,
+  caption: string,
+) {
+  const painter = new MenuStripPainter(writers(), {
+    strip: rig.strip,
+    items: rig.items,
+    cancel: rig.cancel,
+    caption: rig.caption,
+    captionText: rig.captionText,
+  });
+  const anchorBox = rig.anchor.getBoundingClientRect();
+  const stripStyle = getComputedStyle(rig.strip);
+  const anchorX = anchorBox.x + anchorBox.width / 2;
+  const anchorY = anchorBox.y + anchorBox.height / 2;
+  const itemSize = anchorBox.width;
+  const margin = Number.parseFloat(stripStyle.getPropertyValue('--strip-margin'));
+  const placement = placeConsumableStrip({
+    anchorX,
+    anchorY,
+    count: MENU_STRIP_COUNT,
+    itemSize,
+    gap: Number.parseFloat(stripStyle.getPropertyValue('--strip-gap')),
+    viewportWidth,
+    margin,
+    direction: MENU_STRIP_DIRECTION,
+  });
+  painter.paint({
+    placement,
+    anchorX,
+    anchorY,
+    live,
+    cancelLive: false,
+    viewportWidth,
+    margin,
+    itemSize,
+    caption,
+  });
+  return { anchorX, anchorY, itemSize, placement };
+}
+
+/** Boxes that share any real area, past the sub-pixel tolerance. */
+function overlaps(a: DOMRect, b: DOMRect): boolean {
+  return (
+    a.left < b.right - EDGE_TOLERANCE_PX &&
+    a.right > b.left + EDGE_TOLERANCE_PX &&
+    a.top < b.bottom - EDGE_TOLERANCE_PX &&
+    a.bottom > b.top + EDGE_TOLERANCE_PX
+  );
+}
+
 afterEach(() => {
   cleanup();
   document.body.className = '';
@@ -150,10 +270,10 @@ afterEach(() => {
   document.documentElement.style.removeProperty('--app-vh');
 });
 
-describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height, tier }) => {
+describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height }) => {
   async function setup() {
     await page.viewport(width, height);
-    document.body.className = `mobile-touch game-active${tier ? ` ${tier}` : ''}`;
+    document.body.className = `mobile-touch game-active ${tierClasses(width, height)}`;
     document.documentElement.style.setProperty('--app-vw', `${width}px`);
     document.documentElement.style.setProperty('--app-vh', `${height}px`);
     return mountControl();
@@ -222,6 +342,7 @@ describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height, tier 
       cancelLive: false,
       viewportWidth: width,
       margin,
+      itemSize,
       caption: 'Bags',
     });
 
@@ -264,6 +385,7 @@ describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height, tier 
       anchorY: anchorBox.y + anchorBox.height / 2,
       viewportWidth: width,
       margin: Number.parseFloat(stripStyle.getPropertyValue('--strip-margin')),
+      itemSize: anchorBox.width,
     };
     const placement = placeConsumableStrip({
       ...shared,
@@ -306,6 +428,144 @@ describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height, tier 
     document.body.append(tooltip);
     expect(getComputedStyle(rig.captionText).fontFamily).toBe(getComputedStyle(title).fontFamily);
     expect(getComputedStyle(rig.captionText).fontSize).toBe(getComputedStyle(title).fontSize);
+  });
+
+  it('seats the player frame TOP on the button row top line', async () => {
+    const rig = await setup();
+    const column = mountBottomColumn();
+    const frame = column.playerFrame.getBoundingClientRect();
+    const anchor = rig.anchor.getBoundingClientRect();
+    const jump = rig.jump.getBoundingClientRect();
+    // The frame is scaled by a transform, so the RENDERED box is the only honest
+    // measure: its layout height is the unscaled one and says nothing about where
+    // the top lands.
+    expect(frame.height).toBeGreaterThan(0);
+    expect(frame.height).toBeLessThan(column.playerFrame.offsetHeight);
+    // The contract: one top line across the bottom band.
+    expect(frame.top).toBeCloseTo(anchor.top, 0);
+    // Jump is the SHORTER of the two buttons and shares the control's CENTRE
+    // line, so its own top sits exactly half the height difference lower. That
+    // gap is the pin, not a slack tolerance.
+    expect(anchor.top + anchor.height / 2).toBeCloseTo(jump.top + jump.height / 2, 0);
+    expect(jump.top - frame.top).toBeCloseTo((anchor.height - jump.height) / 2, 0);
+    // The frame still ends above the viewport edge it used to be anchored to.
+    expect(frame.bottom).toBeLessThanOrEqual(height + EDGE_TOLERANCE_PX);
+    // And it never lands on the control it lines up with.
+    expect(overlaps(frame, anchor)).toBe(false);
+  });
+
+  it('runs the strip dim from the control along the row, not across the screen', async () => {
+    const rig = await setup();
+    const opened = openMenuStrip(rig, width, -1, '');
+    const dim = getComputedStyle(rig.strip, '::before');
+    const left = Number.parseFloat(dim.left);
+    const dimWidth = Number.parseFloat(dim.width);
+    const lastCenter = opened.placement.centers[MENU_STRIP_COUNT - 1];
+
+    // The origin IS the control's rendered centre: the band starts there and
+    // grows the way the row does.
+    expect(left).toBeCloseTo(opened.anchorX, 0);
+    expect(rig.strip.classList.contains('dim-flip')).toBe(false);
+    expect(dim.transform).toBe('none');
+    expect(dim.backgroundImage).toContain('to right');
+    // It ends one item past the last item's centre, so the fade clears the row.
+    expect(left + dimWidth).toBeCloseTo(lastCenter + opened.itemSize, 0);
+    // The reported defect: the darkening used to reach the screen's left edge and
+    // wash the half of it the row never touches. Nothing left of the control now.
+    expect(left).toBeGreaterThan(width * 0.15);
+    expect(dimWidth).toBeLessThan(width);
+    // A line, not a blob: it stays inside the row's own vertical band.
+    const top = Number.parseFloat(dim.top);
+    const dimHeight = Number.parseFloat(dim.height);
+    expect(dimHeight).toBeLessThanOrEqual(opened.itemSize * 2 + 1);
+    expect(top).toBeLessThanOrEqual(opened.anchorY - opened.itemSize / 2);
+    expect(top + dimHeight).toBeGreaterThanOrEqual(opened.anchorY + opened.itemSize / 2);
+  });
+
+  it('keeps the stance bar and the pet bar clear of the control, frame and move zone', async () => {
+    const rig = await setup();
+    const column = mountBottomColumn();
+    const anchor = rig.anchor.getBoundingClientRect();
+    const frame = column.playerFrame.getBoundingClientRect();
+    const zone = rig.controls.querySelector('#mobile-move-zone') as HTMLElement;
+    const moveZone = zone.getBoundingClientRect();
+    const wheel = rig.moveJoystick.getBoundingClientRect();
+
+    for (const [name, bar] of [
+      ['stance bar', column.stanceGroup],
+      ['pet bar', column.petbar],
+    ] as const) {
+      const box = bar.getBoundingClientRect();
+      // Rendered and tappable, not merely absent.
+      expect(box.width, `${name} must render`).toBeGreaterThan(0);
+      expect(box.height, `${name} must render`).toBeGreaterThanOrEqual(TOUCH_FLOOR_PX);
+      expect(box.left, `${name} runs off the left edge`).toBeGreaterThan(-EDGE_TOLERANCE_PX);
+      expect(box.right, `${name} runs off the right edge`).toBeLessThanOrEqual(
+        width + EDGE_TOLERANCE_PX,
+      );
+      expect(box.top, `${name} runs off the top edge`).toBeGreaterThan(-EDGE_TOLERANCE_PX);
+      expect(box.bottom, `${name} runs off the bottom edge`).toBeLessThanOrEqual(
+        height + EDGE_TOLERANCE_PX,
+      );
+      expect(overlaps(box, anchor), `${name} covers the menu control`).toBe(false);
+      expect(overlaps(box, frame), `${name} covers the player frame`).toBe(false);
+      expect(overlaps(box, moveZone), `${name} covers the move capture zone`).toBe(false);
+      expect(overlaps(box, wheel), `${name} covers the move wheel`).toBe(false);
+    }
+    // Teeth for the seat: the stance bar's own flow box still spans the band the
+    // control sits under, so it is the SEAT that clears it, not luck about width.
+    expect(column.stancebar.getBoundingClientRect().width).toBeGreaterThan(
+      column.stanceGroup.getBoundingClientRect().width,
+    );
+  });
+
+  it('paints the open strip ABOVE the bottom-centre player frame', async () => {
+    const rig = await setup();
+    const column = mountBottomColumn();
+    openMenuStrip(rig, width, 3, 'Friends');
+    const frame = column.playerFrame.getBoundingClientRect();
+
+    // Only the items that actually cross the frame can prove anything.
+    const crossing = rig.items.filter((btn) => overlaps(btn.getBoundingClientRect(), frame));
+    expect(crossing.length, 'no strip item crosses the player frame').toBeGreaterThan(0);
+    const probe = (btn: HTMLElement) => {
+      const box = btn.getBoundingClientRect();
+      return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+    };
+    for (const btn of crossing) {
+      const hit = probe(btn);
+      expect(hit === btn || btn.contains(hit), `${btn.id} is buried under the frame`).toBe(true);
+    }
+
+    // The caption carries pointer-events: none by design, so its own stacking is
+    // only provable through the context that owns it: the raise happens on
+    // #mobile-controls, because a child z-index cannot escape its parent.
+    const controlsZ = Number(getComputedStyle(rig.controls).zIndex);
+    const uiZ = Number(getComputedStyle(column.ui).zIndex);
+    expect(getComputedStyle(rig.caption).display).toBe('block');
+    expect(rig.strip.contains(rig.caption)).toBe(true);
+    expect(controlsZ).toBeGreaterThan(uiZ);
+
+    // Teeth: with the row CLOSED the touch layer sits back under #ui, and the
+    // very same probe finds the frame instead. Without this the pins above would
+    // pass on any stacking at all.
+    const buriedProbe = crossing[0];
+    const box = buriedProbe.getBoundingClientRect();
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    rig.strip.classList.remove('open');
+    expect(Number(getComputedStyle(rig.controls).zIndex)).toBeLessThan(uiZ);
+    rig.strip.classList.add('open');
+    // And the frame really is hit-testable at that point, so the pass above is
+    // the stacking order rather than an inert element underneath. Raising #ui is
+    // what proves it: raising the FRAME cannot, since a child's z-index never
+    // escapes its parent context, which is the whole reason the fix lives on
+    // #mobile-controls.
+    column.ui.style.zIndex = '999';
+    const buried = document.elementFromPoint(x, y);
+    expect(buried === column.playerFrame || column.playerFrame.contains(buried)).toBe(true);
+    column.ui.style.removeProperty('z-index');
+    expect(probe(buriedProbe)).toBe(buriedProbe);
   });
 });
 
@@ -359,11 +619,6 @@ describe('left-column reflow at 844x390', () => {
     const rig = await setup(4);
     const anchor = rig.anchor.getBoundingClientRect();
     const target = rig.target.getBoundingClientRect();
-    const overlaps = (a: DOMRect, b: DOMRect) =>
-      a.left < b.right - EDGE_TOLERANCE_PX &&
-      a.right > b.left + EDGE_TOLERANCE_PX &&
-      a.top < b.bottom - EDGE_TOLERANCE_PX &&
-      a.bottom > b.top + EDGE_TOLERANCE_PX;
     expect(overlaps(target, anchor)).toBe(false);
   });
 });
