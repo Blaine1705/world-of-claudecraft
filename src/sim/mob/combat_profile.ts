@@ -94,7 +94,7 @@ export function updateMobCombatProfile(
     // and ignores the flee-recovery grace: past it the mob goes home, however
     // the fight has been dragged. Checked before the soft leash so a tethered
     // mob can never be walked out one anchor-refresh at a time.
-    const hardLeash = MOBS[mob.templateId]?.hardLeashRadius;
+    const hardLeash = mob.ignoreHardLeash ? undefined : MOBS[mob.templateId]?.hardLeashRadius;
     if (hardLeash !== undefined && dist2d(mob.pos, mob.spawnPos) > hardLeash) {
       startEvadeHome(mob);
       return 'done';

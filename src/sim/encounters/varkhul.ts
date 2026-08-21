@@ -28,27 +28,88 @@ import {
   type Vec3,
 } from '../types';
 import {
-  VARKHUL_FORGESTORM_RADIUS,
-  VARKHUL_FORGESTORM_WARNING_SECONDS,
-} from '../varkhul_forgestorm';
+  VARKHUL_ANVIL_METEOR_CAST_ID,
+  VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP,
+  VARKHUL_ANVIL_METEOR_RADIUS,
+  VARKHUL_ANVIL_METEOR_WARNING_SECONDS,
+  varkhulAnvilMeteorId,
+  varkhulAnvilMeteorPattern,
+} from '../varkhul_anvil_meteors';
 import {
-  VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP,
-  VARKHUL_HAMMER_FIRE_DURATION,
-  VARKHUL_HAMMER_FIRE_RADIUS,
-  VARKHUL_HAMMER_FIRE_TICK_SECONDS,
-  VARKHUL_MARKED_HAMMERS_IMPACT_DAMAGE_MAX_HP,
-  VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
-  VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
-  VARKHUL_MARKED_HAMMERS_STRIKES,
-  VARKHUL_MARKED_HAMMERS_TARGETS,
-  VARKHUL_MARKED_HAMMERS_WARNING_SECONDS,
+  VARKHUL_ANVILS_DECREE_CAST_ID,
+  VARKHUL_ANVILS_DECREE_STRIKE_SECONDS,
+  VARKHUL_ANVILS_DECREE_STRIKES,
+  varkhulAnvilsDecreeDamageMaxHp,
+} from '../varkhul_anvils_decree';
+import {
+  VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS,
+  VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS,
+  VARKHUL_ASSEMBLY_CORE_BASE_DAMAGE,
+  VARKHUL_ASSEMBLY_CORE_PICKUP_RADIUS,
+  VARKHUL_ASSEMBLY_CORE_WINDOW_SECONDS,
+  VARKHUL_ASSEMBLY_FORGE_DELIVERY_RADIUS,
+  VARKHUL_ASSEMBLY_FORGE_MAX_HP,
+  VARKHUL_ASSEMBLY_LINK_FAILURE_DAMAGE_HEROIC,
+  VARKHUL_ASSEMBLY_LINK_FAILURE_DAMAGE_NORMAL,
+  VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_HEROIC,
+  VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_NORMAL,
+  VARKHUL_ASSEMBLY_LINK_FIREBALL_DURATION,
+  VARKHUL_ASSEMBLY_LINK_FIREBALL_RADIUS,
+  VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS,
+  VARKHUL_ASSEMBLY_LINK_PAD_DISTANCE,
+  VARKHUL_ASSEMBLY_LINK_PAD_RADIUS,
+  VARKHUL_ASSEMBLY_LINK_SYMBOLS,
+  VARKHUL_ASSEMBLY_PARTIAL_DAMAGE_TAKEN_BONUS,
+  VARKHUL_ASSEMBLY_PARTIAL_STUN_SECONDS,
+  VARKHUL_ASSEMBLY_STUN_DAMAGE_TAKEN_BONUS,
+  VARKHUL_ASSEMBLY_STUN_SECONDS,
+  VARKHUL_ASSEMBLY_UNSTABLE_REACTION_DAMAGE,
+  varkhulAssemblyAnvilTarget,
+  varkhulAssemblyAnvilTargetAngle,
+  varkhulAssemblyAnvilTargetReady,
+  varkhulAssemblyArmAligned,
+  varkhulAssemblyBestHammerControl,
+  varkhulAssemblyBurdenDamageMaxHp,
+  varkhulAssemblyFireballCadence,
+  varkhulAssemblyFireballPattern,
+  varkhulAssemblyHammerControlAt,
+  varkhulAssemblyLinkAssignments,
+  varkhulAssemblyLinkOutcome,
+  varkhulAssemblyLinkPadAtSlot,
+  varkhulAssemblyLinkSeconds,
+  varkhulAssemblyRounds,
+  varkhulAssemblyStepArm,
+} from '../varkhul_assembly';
+import {
+  VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
+  VARKHUL_CINDER_FIRE_RADIUS,
+  VARKHUL_CINDER_FIRE_TICK_SECONDS,
+  VARKHUL_CINDER_ORB_DAMAGE_MAX_HP,
+  VARKHUL_CINDER_ORB_DURATION,
+  VARKHUL_CINDER_ORB_HIT_RADIUS,
+  VARKHUL_CINDER_ORB_PROJECTILES_PER_TARGET,
+  VARKHUL_CINDER_ORB_SPEED,
+  VARKHUL_CINDER_ORBS_MARK_SECONDS,
+  VARKHUL_CINDER_ORBS_TARGETS,
   VARKHUL_RED_HOT_METAL_DAMAGE_MAX_HP,
   VARKHUL_RED_HOT_METAL_DURATION,
   VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP,
   VARKHUL_RED_HOT_METAL_TICK_SECONDS,
-  varkhulHammerFireId,
-  varkhulHammerImpactPoint,
-} from '../varkhul_hammers';
+  varkhulCinderFireCanSpawn,
+  varkhulCinderFireId,
+  varkhulCinderOrbProjectileId,
+} from '../varkhul_cinder_orbs';
+import { positionVarkhulLinkPracticeBots } from '../varkhul_dev_raid';
+import {
+  VARKHUL_FORGESTORM_RADIUS,
+  VARKHUL_FORGESTORM_WARNING_SECONDS,
+} from '../varkhul_forgestorm';
+import {
+  pointInVarkhulFrontal,
+  VARKHUL_FRONTAL_CAST_ID,
+  VARKHUL_FRONTAL_CAST_SECONDS,
+  varkhulFrontalDamageMaxHp,
+} from '../varkhul_frontal';
 
 export { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 export const VARKHUL_EMBER_SENTINEL_ID = IGNIVAR_EMBER_SENTINEL_ID;
@@ -64,51 +125,67 @@ export const VARKHUL_MAKERS_BRAND_MAX_STACKS = 3;
 export const VARKHUL_MAKERS_BRAND_PER_STACK = 0.35;
 export const VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS = 2;
 
-export const VARKHUL_MARKED_HAMMERS_CAST_ID = 'Marked Hammers';
-export const VARKHUL_MARKED_HAMMERS_AURA_ID = 'varkhul_marked_hammers';
+export {
+  VARKHUL_FRONTAL_CAST_ID,
+  VARKHUL_FRONTAL_CAST_SECONDS,
+  VARKHUL_FRONTAL_DAMAGE_MAX_HP_HEROIC,
+  VARKHUL_FRONTAL_DAMAGE_MAX_HP_NORMAL,
+  VARKHUL_FRONTAL_HALF_ANGLE,
+  VARKHUL_FRONTAL_RANGE,
+} from '../varkhul_frontal';
+
+export const VARKHUL_CINDER_ORBS_CAST_ID = 'Cinder Orbs';
+export const VARKHUL_CINDER_ORBS_AURA_ID = 'varkhul_cinder_orbs';
 export const VARKHUL_RED_HOT_METAL_AURA_ID = 'varkhul_red_hot_metal';
 export const VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID = 'varkhul_red_hot_metal_absorb';
 export {
-  VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP,
-  VARKHUL_HAMMER_FIRE_DURATION,
-  VARKHUL_HAMMER_FIRE_RADIUS,
-  VARKHUL_HAMMER_FIRE_TICK_SECONDS,
-  VARKHUL_MARKED_HAMMERS_IMPACT_DAMAGE_MAX_HP,
-  VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
-  VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
-  VARKHUL_MARKED_HAMMERS_STRIKES,
-  VARKHUL_MARKED_HAMMERS_TARGETS,
-  VARKHUL_MARKED_HAMMERS_WARNING_SECONDS,
+  VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
+  VARKHUL_CINDER_FIRE_MAX_FIELDS,
+  VARKHUL_CINDER_FIRE_RADIUS,
+  VARKHUL_CINDER_FIRE_TICK_SECONDS,
+  VARKHUL_CINDER_ORB_DAMAGE_MAX_HP,
+  VARKHUL_CINDER_ORB_DURATION,
+  VARKHUL_CINDER_ORB_HIT_RADIUS,
+  VARKHUL_CINDER_ORB_PROJECTILES_PER_TARGET,
+  VARKHUL_CINDER_ORB_SPEED,
+  VARKHUL_CINDER_ORBS_MARK_SECONDS,
+  VARKHUL_CINDER_ORBS_TARGETS,
   VARKHUL_RED_HOT_METAL_DAMAGE_MAX_HP,
   VARKHUL_RED_HOT_METAL_DURATION,
   VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP,
   VARKHUL_RED_HOT_METAL_TICK_SECONDS,
-} from '../varkhul_hammers';
+} from '../varkhul_cinder_orbs';
 
 export const VARKHUL_FORGESTORM_CAST_ID = 'Forgestorm';
 export const VARKHUL_FORGESTORM_WAVES = 3;
 export const VARKHUL_FORGESTORM_IMPACTS_PER_WAVE = 5;
 export const VARKHUL_FORGESTORM_DAMAGE_MAX_HP = 0.3;
+
+export {
+  VARKHUL_ANVILS_DECREE_CAST_ID,
+  VARKHUL_ANVILS_DECREE_DAMAGE_MAX_HP,
+  VARKHUL_ANVILS_DECREE_STRIKE_SECONDS,
+  VARKHUL_ANVILS_DECREE_STRIKES,
+} from '../varkhul_anvils_decree';
 export {
   VARKHUL_FORGESTORM_RADIUS,
   VARKHUL_FORGESTORM_WARNING_SECONDS,
 } from '../varkhul_forgestorm';
-
-export const VARKHUL_ANVILS_DECREE_CAST_ID = "Anvil's Decree";
-export const VARKHUL_ANVILS_DECREE_STRIKES = 3;
-export const VARKHUL_ANVILS_DECREE_STRIKE_SECONDS = 2;
-export const VARKHUL_ANVILS_DECREE_RAIDWIDE_MAX_HP = 0.1;
-export const VARKHUL_ANVILS_DECREE_LANE_MAX_HP = 0.35;
-export const VARKHUL_ANVIL_LANE_RANGE = 38;
-export const VARKHUL_ANVIL_LANE_HALF_WIDTH = 2.5;
-export const VARKHUL_ANVIL_LANE_INNER_RADIUS = 3;
 export const VARKHUL_FORGE_LOCAL_POS = { x: 0, z: 22 } as const;
 
 export const VARKHUL_MASTERS_ASSEMBLY_CAST_ID = "The Master's Assembly";
 export const VARKHUL_MASTERS_ASSEMBLY_AURA_ID = 'varkhul_masters_assembly';
 export const VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD = 0.5;
-export const VARKHUL_MASTERS_ASSEMBLY_SECONDS = 20;
+export const VARKHUL_MASTERS_ASSEMBLY_SECONDS = 45;
 export const VARKHUL_WARDEN_SHIELD_AURA_ID = 'varkhul_warden_shield';
+export const VARKHUL_ASSEMBLY_FIXATE_AURA_ID = 'varkhul_assembly_fixate';
+export const VARKHUL_ASSEMBLY_CORE_AURA_ID = 'varkhul_molten_core';
+export const VARKHUL_ASSEMBLY_LINK_AURA_ID = 'varkhul_forge_link';
+export const VARKHUL_ASSEMBLY_STUN_AURA_ID = 'varkhul_forge_shattered';
+export const VARKHUL_ASSEMBLY_REPAIR_CAST_ID = 'Repair Protocol';
+export const VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID = 'Forge Convergence';
+export const VARKHUL_ASSEMBLY_LINK_CAST_ID = 'Forge Links';
+export const VARKHUL_ASSEMBLY_REPAIR_HEAL_MAX_HP = 0.15;
 
 export const VARKHUL_MASTERPIECE_UNBOUND_AURA_ID = 'varkhul_masterpiece_unbound';
 export const VARKHUL_MASTERPIECE_UNBOUND_HP_THRESHOLD = 0.2;
@@ -118,17 +195,20 @@ export const VARKHUL_MASTERPIECE_UNBOUND_DAMAGE_BONUS = 0.25;
 export const VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS = 3;
 export const VARKHUL_MASTERPIECE_UNBOUND_PULSE_MAX_HP = 0.05;
 
-const VARKHUL_FIRST_HAMMERS_SECONDS = 8;
+const VARKHUL_FIRST_CINDER_ORBS_SECONDS = 8;
+const VARKHUL_FIRST_FRONTAL_SECONDS = 13;
 const VARKHUL_FIRST_FORGESTORM_SECONDS = 20;
 const VARKHUL_FIRST_ANVIL_SECONDS = 32;
-const VARKHUL_HAMMERS_EVERY = 34;
+const VARKHUL_CINDER_ORBS_EVERY = 34;
+const VARKHUL_FRONTAL_EVERY = 26;
 const VARKHUL_FORGESTORM_EVERY = 38;
 const VARKHUL_ANVIL_EVERY = 42;
 const VARKHUL_WIPE_DAMAGE_MULTIPLIER = 100;
+const VARKHUL_ASSEMBLY_WARDEN_FIRST_CAST_SECONDS = 1.5;
 const VARKHUL_ASSEMBLY_ADD_OFFSETS = [
   { id: VARKHUL_EMBER_SENTINEL_ID, x: -10, z: 11 },
   { id: VARKHUL_CRUCIBLE_WARDEN_ID, x: 10, z: 11 },
-  { id: VARKHUL_CINDER_ARTIFICER_ID, x: 0, z: 18 },
+  { id: VARKHUL_CINDER_ARTIFICER_ID, x: -28, z: -28 },
 ] as const;
 
 function encounterInstance(ctx: SimContext, boss: Entity) {
@@ -158,51 +238,17 @@ function tankIds(ctx: SimContext, boss: Entity): Set<number> {
   return result;
 }
 
-export function selectVarkhulHammerTargets(
+export function selectVarkhulCinderOrbTargets(
   players: readonly Entity[],
   tanks: ReadonlySet<number>,
   castKey: number,
 ): Entity[] {
   const candidates = players.filter((player) => !player.dead && !tanks.has(player.id));
-  if (candidates.length <= VARKHUL_MARKED_HAMMERS_TARGETS) return candidates;
+  if (candidates.length <= VARKHUL_CINDER_ORBS_TARGETS) return candidates;
   const start = castKey % candidates.length;
   return Array.from(
-    { length: VARKHUL_MARKED_HAMMERS_TARGETS },
+    { length: VARKHUL_CINDER_ORBS_TARGETS },
     (_, index) => candidates[(start + index) % candidates.length],
-  );
-}
-
-function pointInRadialLanes(
-  origin: Pick<Vec3, 'x' | 'z'>,
-  facing: number,
-  point: Pick<Vec3, 'x' | 'z'>,
-  range: number,
-  halfWidth: number,
-  innerRadius: number,
-): boolean {
-  const dx = point.x - origin.x;
-  const dz = point.z - origin.z;
-  for (let lane = 0; lane < 4; lane++) {
-    const angle = facing + (lane * Math.PI) / 2;
-    const forward = dx * Math.sin(angle) + dz * Math.cos(angle);
-    const lateral = dx * Math.cos(angle) - dz * Math.sin(angle);
-    if (forward >= innerRadius && forward <= range && Math.abs(lateral) <= halfWidth) return true;
-  }
-  return false;
-}
-
-export function pointInVarkhulAnvilLane(
-  origin: Pick<Vec3, 'x' | 'z'>,
-  facing: number,
-  point: Pick<Vec3, 'x' | 'z'>,
-): boolean {
-  return pointInRadialLanes(
-    origin,
-    facing,
-    point,
-    VARKHUL_ANVIL_LANE_RANGE,
-    VARKHUL_ANVIL_LANE_HALF_WIDTH,
-    VARKHUL_ANVIL_LANE_INNER_RADIUS,
   );
 }
 
@@ -226,14 +272,17 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
   if (!boss.varkhul) {
     boss.varkhul = {
       makersBrandTimer: VARKHUL_MAKERS_BRAND_EVERY,
-      hammersTimer: VARKHUL_FIRST_HAMMERS_SECONDS,
-      hammersCastKey: 0,
-      hammersMarkRemaining: 0,
-      hammersStrikeIndex: 0,
-      hammersWarningRemaining: 0,
-      hammersTargetIds: [],
-      hammersPoints: [],
-      hammerFires: [],
+      frontalTimer: VARKHUL_FIRST_FRONTAL_SECONDS,
+      frontalCastKey: 0,
+      frontalCastRemaining: 0,
+      frontalFacing: boss.facing,
+      frontalTargetId: null,
+      cinderOrbsTimer: VARKHUL_FIRST_CINDER_ORBS_SECONDS,
+      cinderOrbsCastKey: 0,
+      cinderOrbsMarkRemaining: 0,
+      cinderOrbsTargetIds: [],
+      cinderFires: [],
+      cinderOrbProjectiles: [],
       forgestormTimer: VARKHUL_FIRST_FORGESTORM_SECONDS,
       forgestormCastKey: 0,
       forgestormWaveIndex: 0,
@@ -242,12 +291,34 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       anvilTimer: VARKHUL_FIRST_ANVIL_SECONDS,
       anvilStrikeIndex: 0,
       anvilStrikeRemaining: 0,
-      anvilFacing: boss.facing,
+      anvilMeteorCastKey: 0,
+      anvilMeteorBatches: [],
       majorAbility: 'none',
       assemblyTriggered: false,
+      assemblyPhase: 'done',
       assemblyAddIds: [],
       assemblyRemaining: 0,
       assemblyWipeResolved: false,
+      assemblyDroppedAddIds: [],
+      assemblyCores: [],
+      assemblyForgeHp: VARKHUL_ASSEMBLY_FORGE_MAX_HP,
+      assemblyDeliveryWindowRemaining: 0,
+      assemblyDeliveredCoreIds: [],
+      assemblyArtificerRepaired: false,
+      assemblyFixateTargetId: null,
+      assemblyLinkAssignments: [],
+      assemblyLinkPadProgress: [],
+      assemblyLinkPadSlots: [],
+      assemblyLinkArmAngles: [],
+      assemblyLinkHammerControls: [],
+      assemblyLinkAnvilReady: [],
+      assemblyLinkHammerReady: [],
+      assemblyLinkFireballTimer: 0,
+      assemblyLinkFireballWave: 0,
+      assemblyLinkRound: 0,
+      assemblyLinkRounds: 1,
+      assemblyLinkRemaining: 0,
+      assemblyStunRemaining: 0,
       masterpieceTriggered: false,
       masterpieceRemaining: 0,
       masterpiecePulseTimer: VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS,
@@ -289,9 +360,12 @@ export function clearVarkhulEncounterAuras(player: Entity, sourceId?: number): v
   player.auras = player.auras.filter(
     (aura) =>
       (aura.id !== VARKHUL_MAKERS_BRAND_AURA_ID &&
-        aura.id !== VARKHUL_MARKED_HAMMERS_AURA_ID &&
+        aura.id !== VARKHUL_CINDER_ORBS_AURA_ID &&
         aura.id !== VARKHUL_RED_HOT_METAL_AURA_ID &&
-        aura.id !== VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID) ||
+        aura.id !== VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID &&
+        aura.id !== VARKHUL_ASSEMBLY_FIXATE_AURA_ID &&
+        aura.id !== VARKHUL_ASSEMBLY_CORE_AURA_ID &&
+        aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID) ||
       (sourceId !== undefined && aura.sourceId !== sourceId),
   );
 }
@@ -299,20 +373,20 @@ export function clearVarkhulEncounterAuras(player: Entity, sourceId?: number): v
 function cancelMajorAbility(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   for (const player of playersInEncounter(ctx, boss, true)) {
     player.auras = player.auras.filter(
-      (aura) => aura.id !== VARKHUL_MARKED_HAMMERS_AURA_ID || aura.sourceId !== boss.id,
+      (aura) => aura.id !== VARKHUL_CINDER_ORBS_AURA_ID || aura.sourceId !== boss.id,
     );
   }
   clearEncounterWarnings(ctx, boss);
   st.majorAbility = 'none';
-  st.hammersMarkRemaining = 0;
-  st.hammersStrikeIndex = 0;
-  st.hammersWarningRemaining = 0;
-  st.hammersTargetIds = [];
-  st.hammersPoints = [];
+  st.frontalCastRemaining = 0;
+  st.frontalTargetId = null;
+  st.cinderOrbsMarkRemaining = 0;
+  st.cinderOrbsTargetIds = [];
   st.forgestormWarningRemaining = 0;
   st.forgestormPoints = [];
   st.anvilStrikeIndex = 0;
   st.anvilStrikeRemaining = 0;
+  st.anvilMeteorBatches = [];
   clearBossCast(boss);
 }
 
@@ -417,6 +491,82 @@ function castMakersBrand(ctx: SimContext, boss: Entity, target: Entity): boolean
   return true;
 }
 
+function startFrontal(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): void {
+  const tanks = tankIds(ctx, boss);
+  const candidates = players.filter((player) => !player.dead && !tanks.has(player.id));
+  const pool = candidates.length > 0 ? candidates : players.filter((player) => !player.dead);
+  if (pool.length === 0) {
+    st.frontalTimer = 2;
+    return;
+  }
+  st.frontalCastKey++;
+  const target = pool[st.frontalCastKey % pool.length];
+  st.majorAbility = 'frontal';
+  st.frontalTimer = VARKHUL_FRONTAL_EVERY;
+  st.frontalCastRemaining = VARKHUL_FRONTAL_CAST_SECONDS;
+  st.frontalTargetId = target.id;
+  st.frontalFacing = Math.atan2(target.pos.x - boss.pos.x, target.pos.z - boss.pos.z);
+  boss.facing = st.frontalFacing;
+  boss.castingAbility = VARKHUL_FRONTAL_CAST_ID;
+  boss.castTotal = VARKHUL_FRONTAL_CAST_SECONDS;
+  boss.castRemaining = VARKHUL_FRONTAL_CAST_SECONDS;
+  boss.castTargetId = target.id;
+  boss.castAim = { ...target.pos };
+  boss.channeling = false;
+}
+
+function releaseFrontal(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): void {
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  for (const player of players) {
+    if (!pointInVarkhulFrontal(boss.pos, st.frontalFacing, player.pos)) continue;
+    dealFractionalDamage(
+      ctx,
+      boss,
+      player,
+      varkhulFrontalDamageMaxHp(difficulty),
+      VARKHUL_FRONTAL_CAST_ID,
+    );
+  }
+  ctx.emit({
+    type: 'spellfxAt',
+    x: boss.pos.x + Math.sin(st.frontalFacing) * 15,
+    z: boss.pos.z + Math.cos(st.frontalFacing) * 15,
+    school: 'fire',
+    fx: 'burst',
+    sourceId: boss.id,
+    radius: 8,
+    ability: VARKHUL_FRONTAL_CAST_ID,
+  });
+  st.frontalCastRemaining = 0;
+  st.frontalTargetId = null;
+  st.majorAbility = 'none';
+  clearBossCast(boss);
+}
+
+function updateFrontal(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+  speed: number,
+): void {
+  st.frontalCastRemaining = Math.max(0, st.frontalCastRemaining - DT * speed);
+  boss.facing = st.frontalFacing;
+  boss.castingAbility = VARKHUL_FRONTAL_CAST_ID;
+  boss.castRemaining = st.frontalCastRemaining;
+  if (st.frontalCastRemaining <= CAST_COMPLETE_EPS) releaseFrontal(ctx, boss, st, players);
+}
+
 function applyRedHotMetal(ctx: SimContext, boss: Entity, target: Entity): void {
   ctx.applyAura(target, {
     id: VARKHUL_RED_HOT_METAL_AURA_ID,
@@ -444,36 +594,35 @@ function applyRedHotMetal(ctx: SimContext, boss: Entity, target: Entity): void {
   });
 }
 
-function startMarkedHammers(
+function startCinderOrbs(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
-  st.hammersCastKey++;
-  const targets = selectVarkhulHammerTargets(players, tankIds(ctx, boss), st.hammersCastKey);
-  st.majorAbility = 'hammers';
-  st.hammersMarkRemaining = VARKHUL_MARKED_HAMMERS_MARK_SECONDS;
-  st.hammersStrikeIndex = 0;
-  st.hammersWarningRemaining = 0;
-  st.hammersTargetIds = targets.map((target) => target.id);
-  st.hammersPoints = [];
-  st.hammersTimer = VARKHUL_HAMMERS_EVERY;
-  boss.castingAbility = VARKHUL_MARKED_HAMMERS_CAST_ID;
-  boss.castTotal =
-    VARKHUL_MARKED_HAMMERS_MARK_SECONDS +
-    VARKHUL_MARKED_HAMMERS_STRIKES * VARKHUL_MARKED_HAMMERS_WARNING_SECONDS;
+  st.cinderOrbsCastKey++;
+  const targets = selectVarkhulCinderOrbTargets(players, tankIds(ctx, boss), st.cinderOrbsCastKey);
+  if (targets.length === 0) {
+    st.cinderOrbsTimer = 2;
+    return;
+  }
+  st.majorAbility = 'cinderOrbs';
+  st.cinderOrbsMarkRemaining = VARKHUL_CINDER_ORBS_MARK_SECONDS;
+  st.cinderOrbsTargetIds = targets.map((target) => target.id);
+  st.cinderOrbsTimer = VARKHUL_CINDER_ORBS_EVERY;
+  boss.castingAbility = VARKHUL_CINDER_ORBS_CAST_ID;
+  boss.castTotal = VARKHUL_CINDER_ORBS_MARK_SECONDS;
   boss.castRemaining = boss.castTotal;
   boss.castTargetId = null;
   boss.castAim = null;
   boss.channeling = true;
   for (const target of targets) {
     ctx.applyAura(target, {
-      id: VARKHUL_MARKED_HAMMERS_AURA_ID,
-      name: VARKHUL_MARKED_HAMMERS_CAST_ID,
+      id: VARKHUL_CINDER_ORBS_AURA_ID,
+      name: VARKHUL_CINDER_ORBS_CAST_ID,
       kind: 'vulnerability',
-      remaining: VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
-      duration: VARKHUL_MARKED_HAMMERS_MARK_SECONDS,
+      remaining: VARKHUL_CINDER_ORBS_MARK_SECONDS,
+      duration: VARKHUL_CINDER_ORBS_MARK_SECONDS,
       value: 0,
       sourceId: boss.id,
       school: 'fire',
@@ -483,30 +632,11 @@ function startMarkedHammers(
   }
 }
 
-function startHammerWarning(ctx: SimContext, st: VarkhulEncounterState): void {
-  const targets = st.hammersTargetIds
-    .map((id) => ctx.entities.get(id))
-    .filter((entity): entity is Entity => entity?.kind === 'player' && !entity.dead);
-  st.hammersPoints = targets.map((target, targetIndex) => {
-    const point = varkhulHammerImpactPoint(
-      target.pos,
-      st.hammersCastKey,
-      st.hammersStrikeIndex,
-      targetIndex,
-    );
-    return ctx.groundPos(point.x, point.z);
-  });
-  st.hammersWarningRemaining = VARKHUL_MARKED_HAMMERS_WARNING_SECONDS;
-}
-
-function resolveHammerStrike(
-  ctx: SimContext,
-  boss: Entity,
-  st: VarkhulEncounterState,
-  players: readonly Entity[],
-): void {
-  for (let pointIndex = 0; pointIndex < st.hammersPoints.length; pointIndex++) {
-    const point = st.hammersPoints[pointIndex];
+function releaseCinderOrbs(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  for (let targetIndex = 0; targetIndex < st.cinderOrbsTargetIds.length; targetIndex++) {
+    const target = ctx.entities.get(st.cinderOrbsTargetIds[targetIndex]);
+    if (target?.kind !== 'player' || target.dead) continue;
+    const point = ctx.groundPos(target.pos.x, target.pos.z);
     ctx.emit({
       type: 'spellfxAt',
       x: point.x,
@@ -514,86 +644,71 @@ function resolveHammerStrike(
       school: 'fire',
       fx: 'meteorImpact',
       sourceId: boss.id,
-      radius: VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
-      ability: VARKHUL_MARKED_HAMMERS_CAST_ID,
+      radius: VARKHUL_CINDER_FIRE_RADIUS,
+      ability: VARKHUL_CINDER_ORBS_CAST_ID,
     });
-    st.hammerFires.push({
-      id: varkhulHammerFireId(boss.id, st.hammersCastKey, st.hammersStrikeIndex, pointIndex),
-      pos: { ...point },
-      remaining: VARKHUL_HAMMER_FIRE_DURATION,
-      tickTimer: VARKHUL_HAMMER_FIRE_TICK_SECONDS,
-    });
-  }
-  for (const player of players) {
-    if (
-      !st.hammersPoints.some(
-        (point) => dist2d(point, player.pos) <= VARKHUL_MARKED_HAMMERS_IMPACT_RADIUS,
-      )
-    )
-      continue;
-    dealFractionalDamage(
-      ctx,
-      boss,
-      player,
-      VARKHUL_MARKED_HAMMERS_IMPACT_DAMAGE_MAX_HP,
-      VARKHUL_MARKED_HAMMERS_CAST_ID,
-    );
-  }
-  st.hammersStrikeIndex++;
-  st.hammersPoints = [];
-  if (st.hammersStrikeIndex < VARKHUL_MARKED_HAMMERS_STRIKES) {
-    startHammerWarning(ctx, st);
-    return;
+    if (varkhulCinderFireCanSpawn(st.cinderFires.length)) {
+      st.cinderFires.push({
+        id: varkhulCinderFireId(boss.id, st.cinderOrbsCastKey, targetIndex),
+        pos: { ...point },
+        tickTimer: VARKHUL_CINDER_FIRE_TICK_SECONDS,
+      });
+    }
+    const rotation = st.cinderOrbsCastKey * 0.47 + (targetIndex * Math.PI) / 6;
+    for (
+      let projectileIndex = 0;
+      projectileIndex < VARKHUL_CINDER_ORB_PROJECTILES_PER_TARGET;
+      projectileIndex++
+    ) {
+      const angle =
+        rotation + (projectileIndex * Math.PI * 2) / VARKHUL_CINDER_ORB_PROJECTILES_PER_TARGET;
+      st.cinderOrbProjectiles.push({
+        id: varkhulCinderOrbProjectileId(
+          boss.id,
+          st.cinderOrbsCastKey,
+          targetIndex,
+          projectileIndex,
+        ),
+        ownerId: target.id,
+        pos: { ...point },
+        dir: { x: Math.sin(angle), z: Math.cos(angle) },
+        remaining: VARKHUL_CINDER_ORB_DURATION,
+        hitPlayerIds: [target.id],
+      });
+    }
   }
   for (const player of playersInEncounter(ctx, boss, true)) {
     player.auras = player.auras.filter(
-      (aura) => aura.id !== VARKHUL_MARKED_HAMMERS_AURA_ID || aura.sourceId !== boss.id,
+      (aura) => aura.id !== VARKHUL_CINDER_ORBS_AURA_ID || aura.sourceId !== boss.id,
     );
   }
-  st.hammersWarningRemaining = 0;
-  st.hammersTargetIds = [];
+  st.cinderOrbsTargetIds = [];
   st.majorAbility = 'none';
   clearBossCast(boss);
 }
 
-function updateMarkedHammers(
+function updateCinderOrbs(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
-  players: readonly Entity[],
   speed: number,
 ): void {
-  boss.castingAbility = VARKHUL_MARKED_HAMMERS_CAST_ID;
-  if (st.hammersMarkRemaining > 0) {
-    st.hammersMarkRemaining = Math.max(0, st.hammersMarkRemaining - DT * speed);
-    boss.castRemaining =
-      st.hammersMarkRemaining +
-      VARKHUL_MARKED_HAMMERS_STRIKES * VARKHUL_MARKED_HAMMERS_WARNING_SECONDS;
-    if (st.hammersMarkRemaining <= CAST_COMPLETE_EPS) startHammerWarning(ctx, st);
-    return;
-  }
-  st.hammersWarningRemaining = Math.max(0, st.hammersWarningRemaining - DT * speed);
-  boss.castRemaining =
-    (VARKHUL_MARKED_HAMMERS_STRIKES - st.hammersStrikeIndex) *
-      VARKHUL_MARKED_HAMMERS_WARNING_SECONDS -
-    (VARKHUL_MARKED_HAMMERS_WARNING_SECONDS - st.hammersWarningRemaining);
-  if (st.hammersWarningRemaining <= CAST_COMPLETE_EPS) {
-    resolveHammerStrike(ctx, boss, st, players);
-  }
+  boss.castingAbility = VARKHUL_CINDER_ORBS_CAST_ID;
+  st.cinderOrbsMarkRemaining = Math.max(0, st.cinderOrbsMarkRemaining - DT * speed);
+  boss.castRemaining = st.cinderOrbsMarkRemaining;
+  if (st.cinderOrbsMarkRemaining <= CAST_COMPLETE_EPS) releaseCinderOrbs(ctx, boss, st);
 }
 
-function updateHammerFires(
+function updateCinderFires(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
-  for (let index = st.hammerFires.length - 1; index >= 0; index--) {
-    const fire = st.hammerFires[index];
-    fire.remaining = Math.max(0, fire.remaining - DT);
+  for (const fire of st.cinderFires) {
     fire.tickTimer -= DT;
     while (fire.tickTimer <= CAST_COMPLETE_EPS) {
-      fire.tickTimer += VARKHUL_HAMMER_FIRE_TICK_SECONDS;
+      fire.tickTimer += VARKHUL_CINDER_FIRE_TICK_SECONDS;
       ctx.emit({
         type: 'spellfxAt',
         x: fire.pos.x,
@@ -601,21 +716,65 @@ function updateHammerFires(
         school: 'fire',
         fx: 'tick',
         sourceId: boss.id,
-        radius: VARKHUL_HAMMER_FIRE_RADIUS,
-        ability: VARKHUL_MARKED_HAMMERS_CAST_ID,
+        radius: VARKHUL_CINDER_FIRE_RADIUS,
+        ability: VARKHUL_CINDER_ORBS_CAST_ID,
       });
       for (const player of players) {
-        if (player.dead || dist2d(fire.pos, player.pos) > VARKHUL_HAMMER_FIRE_RADIUS) continue;
+        if (player.dead || dist2d(fire.pos, player.pos) > VARKHUL_CINDER_FIRE_RADIUS) continue;
         dealFractionalDamage(
           ctx,
           boss,
           player,
-          VARKHUL_HAMMER_FIRE_DAMAGE_MAX_HP,
-          VARKHUL_MARKED_HAMMERS_CAST_ID,
+          VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
+          VARKHUL_CINDER_ORBS_CAST_ID,
         );
       }
     }
-    if (fire.remaining <= CAST_COMPLETE_EPS) st.hammerFires.splice(index, 1);
+  }
+}
+
+function updateCinderOrbProjectiles(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): void {
+  for (let index = st.cinderOrbProjectiles.length - 1; index >= 0; index--) {
+    const projectile = st.cinderOrbProjectiles[index];
+    const speed = projectile.speed ?? VARKHUL_CINDER_ORB_SPEED;
+    const radius = projectile.radius ?? VARKHUL_CINDER_ORB_HIT_RADIUS;
+    const ability = projectile.ability ?? VARKHUL_CINDER_ORBS_CAST_ID;
+    projectile.pos.x += projectile.dir.x * speed * DT;
+    projectile.pos.z += projectile.dir.z * speed * DT;
+    projectile.remaining = Math.max(0, projectile.remaining - DT);
+    for (const player of players) {
+      if (
+        player.dead ||
+        projectile.hitPlayerIds.includes(player.id) ||
+        dist2d(projectile.pos, player.pos) > radius
+      ) {
+        continue;
+      }
+      projectile.hitPlayerIds.push(player.id);
+      dealFractionalDamage(
+        ctx,
+        boss,
+        player,
+        projectile.damageMaxHp ?? VARKHUL_CINDER_ORB_DAMAGE_MAX_HP,
+        ability,
+      );
+      ctx.emit({
+        type: 'spellfxAt',
+        x: projectile.pos.x,
+        z: projectile.pos.z,
+        school: 'fire',
+        fx: 'burst',
+        sourceId: boss.id,
+        radius,
+        ability,
+      });
+    }
+    if (projectile.remaining <= CAST_COMPLETE_EPS) st.cinderOrbProjectiles.splice(index, 1);
   }
 }
 
@@ -737,27 +896,80 @@ function anvilWorldPosition(ctx: SimContext, boss: Entity): Vec3 {
   return ctx.groundPos(origin.x + VARKHUL_FORGE_LOCAL_POS.x, origin.z + VARKHUL_FORGE_LOCAL_POS.z);
 }
 
-function setAnvilStrikeFacing(st: VarkhulEncounterState): void {
-  st.anvilFacing = ((st.anvilStrikeIndex + st.forgestormCastKey) * Math.PI) / 8;
-}
-
 function startAnvilsDecree(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   st.majorAbility = 'anvil';
   st.anvilTimer = VARKHUL_ANVIL_EVERY;
   st.anvilStrikeIndex = 0;
+  st.anvilMeteorCastKey++;
   st.anvilStrikeRemaining = VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
-  setAnvilStrikeFacing(st);
   const forge = anvilWorldPosition(ctx, boss);
   boss.pos = { ...forge };
   boss.prevPos = { ...forge };
-  boss.facing = st.anvilFacing;
-  boss.prevFacing = st.anvilFacing;
   boss.castingAbility = VARKHUL_ANVILS_DECREE_CAST_ID;
   boss.castTotal = VARKHUL_ANVILS_DECREE_STRIKES * VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
   boss.castRemaining = boss.castTotal;
   boss.castTargetId = null;
   boss.castAim = { ...forge };
   boss.channeling = true;
+}
+
+function startAnvilMeteors(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  const instance = encounterInstance(ctx, boss);
+  if (instance?.difficulty !== 'heroic') return;
+  const origin = ctx.instanceOriginOf(instance);
+  st.anvilMeteorBatches.push({
+    castKey: st.anvilMeteorCastKey,
+    strikeIndex: st.anvilStrikeIndex,
+    remaining: VARKHUL_ANVIL_METEOR_WARNING_SECONDS,
+    points: varkhulAnvilMeteorPattern(st.anvilMeteorCastKey, st.anvilStrikeIndex, origin).map(
+      (point) => ctx.groundPos(point.x, point.z),
+    ),
+  });
+}
+
+function updateAnvilMeteors(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): void {
+  for (const batch of st.anvilMeteorBatches) {
+    batch.remaining = Math.max(0, batch.remaining - DT);
+    if (batch.remaining > CAST_COMPLETE_EPS) continue;
+    for (let meteorIndex = 0; meteorIndex < batch.points.length; meteorIndex++) {
+      const point = batch.points[meteorIndex];
+      const persistentId = varkhulAnvilMeteorId(
+        boss.id,
+        batch.castKey,
+        batch.strikeIndex,
+        meteorIndex,
+      );
+      ctx.emit({
+        type: 'spellfxAt',
+        x: point.x,
+        z: point.z,
+        school: 'fire',
+        fx: 'meteorImpact',
+        sourceId: boss.id,
+        radius: VARKHUL_ANVIL_METEOR_RADIUS,
+        ability: VARKHUL_ANVIL_METEOR_CAST_ID,
+        persistentId,
+      });
+      for (const player of players) {
+        if (player.dead || dist2d(point, player.pos) > VARKHUL_ANVIL_METEOR_RADIUS) continue;
+        dealFractionalDamage(
+          ctx,
+          boss,
+          player,
+          VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP,
+          VARKHUL_ANVIL_METEOR_CAST_ID,
+        );
+      }
+    }
+  }
+  st.anvilMeteorBatches = st.anvilMeteorBatches.filter(
+    (batch) => batch.remaining > CAST_COMPLETE_EPS,
+  );
 }
 
 function resolveAnvilStrike(
@@ -767,6 +979,8 @@ function resolveAnvilStrike(
   players: readonly Entity[],
 ): void {
   const forge = anvilWorldPosition(ctx, boss);
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  const damageMaxHp = varkhulAnvilsDecreeDamageMaxHp(difficulty, st.anvilStrikeIndex);
   ctx.emit({
     type: 'spellfxAt',
     x: forge.x,
@@ -774,26 +988,12 @@ function resolveAnvilStrike(
     school: 'fire',
     fx: 'nova',
     sourceId: boss.id,
-    radius: VARKHUL_ANVIL_LANE_RANGE,
     ability: VARKHUL_ANVILS_DECREE_CAST_ID,
   });
   for (const player of players) {
-    dealFractionalDamage(
-      ctx,
-      boss,
-      player,
-      VARKHUL_ANVILS_DECREE_RAIDWIDE_MAX_HP,
-      VARKHUL_ANVILS_DECREE_CAST_ID,
-    );
-    if (player.dead || !pointInVarkhulAnvilLane(forge, st.anvilFacing, player.pos)) continue;
-    dealFractionalDamage(
-      ctx,
-      boss,
-      player,
-      VARKHUL_ANVILS_DECREE_LANE_MAX_HP,
-      VARKHUL_ANVILS_DECREE_CAST_ID,
-    );
+    dealFractionalDamage(ctx, boss, player, damageMaxHp, VARKHUL_ANVILS_DECREE_CAST_ID);
   }
+  startAnvilMeteors(ctx, boss, st);
   st.anvilStrikeIndex++;
   if (st.anvilStrikeIndex >= VARKHUL_ANVILS_DECREE_STRIKES) {
     st.anvilStrikeRemaining = 0;
@@ -802,9 +1002,6 @@ function resolveAnvilStrike(
     return;
   }
   st.anvilStrikeRemaining = VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
-  setAnvilStrikeFacing(st);
-  boss.facing = st.anvilFacing;
-  boss.prevFacing = st.anvilFacing;
 }
 
 function updateAnvilsDecree(
@@ -820,7 +1017,6 @@ function updateAnvilsDecree(
     (VARKHUL_ANVILS_DECREE_STRIKES - 1 - st.anvilStrikeIndex) *
       VARKHUL_ANVILS_DECREE_STRIKE_SECONDS +
     st.anvilStrikeRemaining;
-  boss.facing = st.anvilFacing;
   if (st.anvilStrikeRemaining <= CAST_COMPLETE_EPS) {
     resolveAnvilStrike(ctx, boss, st, players);
   }
@@ -851,17 +1047,93 @@ function spawnAssemblyAdd(
   add.inCombat = true;
   add.aiState = 'attack';
   add.aggroTargetId = boss.aggroTargetId;
+  if (templateId === VARKHUL_CRUCIBLE_WARDEN_ID) {
+    add.bigCastTimer = VARKHUL_ASSEMBLY_WARDEN_FIRST_CAST_SECONDS;
+    add.ignoreHardLeash = true;
+  }
   ctx.addEntity(add);
   boss.summonedIds.push(add.id);
   instance.mobIds.push(add.id);
   return add;
 }
 
+function assignAssemblyFixate(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  sentinelOverride?: Entity,
+): Entity | null {
+  const players = playersInEncounter(ctx, boss);
+  const current = players.find((player) => player.id === st.assemblyFixateTargetId) ?? null;
+  const sentinel =
+    sentinelOverride ??
+    st.assemblyAddIds
+      .map((id) => ctx.entities.get(id))
+      .find((add) => add?.templateId === VARKHUL_EMBER_SENTINEL_ID);
+  if (current) return current;
+  if (st.assemblyFixateTargetId !== null) {
+    const previous = ctx.entities.get(st.assemblyFixateTargetId);
+    if (previous) {
+      previous.auras = previous.auras.filter(
+        (aura) => aura.id !== VARKHUL_ASSEMBLY_FIXATE_AURA_ID || aura.sourceId !== boss.id,
+      );
+    }
+  }
+  const nonTanks = players.filter((player) => !tankIds(ctx, boss).has(player.id));
+  const pool = nonTanks.length > 0 ? nonTanks : players;
+  const target = pool.length > 0 ? pool[boss.id % pool.length] : null;
+  st.assemblyFixateTargetId = target?.id ?? null;
+  if (!sentinel || !target) return target;
+  sentinel.ignoreHardLeash = true;
+  sentinel.forcedTargetId = target.id;
+  sentinel.forcedTargetTimer = VARKHUL_MASTERS_ASSEMBLY_SECONDS;
+  sentinel.aggroTargetId = target.id;
+  ctx.applyAura(target, {
+    id: VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
+    name: "Sentinel's Gaze",
+    kind: 'vulnerability',
+    remaining: VARKHUL_MASTERS_ASSEMBLY_SECONDS,
+    duration: VARKHUL_MASTERS_ASSEMBLY_SECONDS,
+    value: 0,
+    sourceId: boss.id,
+    school: 'fire',
+    encounterOwned: true,
+  });
+  return target;
+}
+
 function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   cancelMajorAbility(ctx, boss, st);
   st.assemblyTriggered = true;
+  st.assemblyPhase = 'adds';
   st.assemblyRemaining = VARKHUL_MASTERS_ASSEMBLY_SECONDS;
   st.assemblyWipeResolved = false;
+  st.assemblyDroppedAddIds = [];
+  st.assemblyCores = [];
+  st.assemblyForgeHp = VARKHUL_ASSEMBLY_FORGE_MAX_HP;
+  st.assemblyDeliveryWindowRemaining = 0;
+  st.assemblyDeliveredCoreIds = [];
+  st.assemblyArtificerRepaired = false;
+  st.assemblyLinkAssignments = [];
+  st.assemblyLinkPadProgress = [];
+  st.assemblyLinkPadSlots = [];
+  st.assemblyLinkArmAngles = [];
+  st.assemblyLinkHammerControls = [];
+  st.assemblyLinkAnvilReady = [];
+  st.assemblyLinkHammerReady = [];
+  st.assemblyLinkFireballTimer = 0;
+  st.assemblyLinkFireballWave = 0;
+  st.assemblyLinkRound = 0;
+  st.assemblyLinkRounds = varkhulAssemblyRounds(
+    encounterInstance(ctx, boss)?.difficulty ?? 'normal',
+  );
+  st.assemblyLinkRemaining = 0;
+  st.assemblyStunRemaining = 0;
+  boss.damageImmune = true;
+  boss.knockbackResistance = 1;
+  const forge = anvilWorldPosition(ctx, boss);
+  boss.pos = { ...forge };
+  boss.prevPos = { ...forge };
   const adds = VARKHUL_ASSEMBLY_ADD_OFFSETS.map((spawn) =>
     spawnAssemblyAdd(ctx, boss, spawn.id, spawn.x, spawn.z),
   ).filter((add): add is Entity => add !== null);
@@ -870,48 +1142,515 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
     id: VARKHUL_MASTERS_ASSEMBLY_AURA_ID,
     name: VARKHUL_MASTERS_ASSEMBLY_CAST_ID,
     kind: 'absorb',
-    remaining: VARKHUL_MASTERS_ASSEMBLY_SECONDS,
-    duration: VARKHUL_MASTERS_ASSEMBLY_SECONDS,
+    remaining: 999,
+    duration: 999,
     value: boss.maxHp * VARKHUL_WIPE_DAMAGE_MULTIPLIER,
     sourceId: boss.id,
     school: 'fire',
     encounterOwned: true,
   });
-  const warden = adds.find((add) => add.templateId === VARKHUL_CRUCIBLE_WARDEN_ID);
-  const artificer = adds.find((add) => add.templateId === VARKHUL_CINDER_ARTIFICER_ID);
-  if (warden && artificer) {
-    ctx.applyAura(artificer, {
-      id: VARKHUL_WARDEN_SHIELD_AURA_ID,
-      name: 'Crucible Guard',
-      kind: 'absorb',
-      remaining: VARKHUL_MASTERS_ASSEMBLY_SECONDS,
-      duration: VARKHUL_MASTERS_ASSEMBLY_SECONDS,
-      value: artificer.maxHp * VARKHUL_WIPE_DAMAGE_MULTIPLIER,
-      sourceId: warden.id,
-      school: 'fire',
-      encounterOwned: true,
-    });
-  }
-  if (artificer) {
-    artificer.castingAbility = VARKHUL_MASTERS_ASSEMBLY_CAST_ID;
-    artificer.castTotal = VARKHUL_MASTERS_ASSEMBLY_SECONDS;
-    artificer.castRemaining = VARKHUL_MASTERS_ASSEMBLY_SECONDS;
-    artificer.castTargetId = null;
-    artificer.castAim = null;
-    artificer.channeling = true;
+  const sentinel = adds.find((add) => add.templateId === VARKHUL_EMBER_SENTINEL_ID);
+  assignAssemblyFixate(ctx, boss, st, sentinel);
+}
+
+function clearAssemblyPlayerAuras(ctx: SimContext, boss: Entity): void {
+  for (const player of playersInEncounter(ctx, boss, true)) {
+    player.auras = player.auras.filter(
+      (aura) =>
+        aura.id !== VARKHUL_ASSEMBLY_FIXATE_AURA_ID &&
+        aura.id !== VARKHUL_ASSEMBLY_CORE_AURA_ID &&
+        aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID,
+    );
   }
 }
 
 function finishAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  boss.damageImmune = false;
+  boss.damageFloorHp = undefined;
+  boss.knockbackResistance = 0;
   boss.auras = boss.auras.filter(
     (aura) => aura.id !== VARKHUL_MASTERS_ASSEMBLY_AURA_ID || aura.sourceId !== boss.id,
   );
-  st.assemblyRemaining = 0;
+  clearAssemblyPlayerAuras(ctx, boss);
+  st.cinderOrbProjectiles = st.cinderOrbProjectiles.filter(
+    (projectile) => !projectile.id.startsWith(`${boss.id}:assembly-links:`),
+  );
   for (const id of st.assemblyAddIds) {
     const add = ctx.entities.get(id);
     if (add) clearBossCast(add);
   }
-  st.assemblyAddIds = [];
+}
+
+function dropDeadAssemblyCores(ctx: SimContext, st: VarkhulEncounterState): void {
+  for (const addId of st.assemblyAddIds) {
+    if (st.assemblyDroppedAddIds.includes(addId)) continue;
+    const add = ctx.entities.get(addId);
+    if (!add?.dead) continue;
+    st.assemblyDroppedAddIds.push(addId);
+    st.assemblyCores.push({
+      id: `varkhul-core:${addId}`,
+      sourceAddId: addId,
+      pos: { ...add.pos },
+      carrierId: null,
+      delivered: false,
+      burdenStacks: 0,
+      burdenTickTimer: VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS,
+    });
+  }
+}
+
+function removeCoreAura(player: Entity): void {
+  player.auras = player.auras.filter((aura) => aura.id !== VARKHUL_ASSEMBLY_CORE_AURA_ID);
+}
+
+function ejectDeliveredCores(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  const forge = anvilWorldPosition(ctx, boss);
+  const delivered = st.assemblyCores.filter((core) => core.delivered);
+  for (let index = 0; index < delivered.length; index++) {
+    const core = delivered[index];
+    const angle = (index * Math.PI * 2) / Math.max(1, delivered.length) + 0.45;
+    core.delivered = false;
+    core.carrierId = null;
+    core.pos = ctx.groundPos(forge.x + Math.sin(angle) * 5, forge.z + Math.cos(angle) * 5);
+  }
+  st.assemblyDeliveredCoreIds = [];
+  st.assemblyDeliveryWindowRemaining = 0;
+}
+
+function applyLinkAuras(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  for (const assignment of st.assemblyLinkAssignments) {
+    const player = ctx.entities.get(assignment.playerId);
+    if (player?.kind !== 'player' || player.dead) continue;
+    ctx.applyAura(player, {
+      id: VARKHUL_ASSEMBLY_LINK_AURA_ID,
+      name: 'Forge Link',
+      kind: 'vulnerability',
+      remaining: st.assemblyLinkRemaining,
+      duration: st.assemblyLinkRemaining,
+      value: 0,
+      stacks: assignment.symbol + 1,
+      charges: assignment.role === 'hammer' ? 2 : 1,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+  }
+}
+
+function startAssemblyConvergence(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  const instance = encounterInstance(ctx, boss);
+  if (!instance) return;
+  const origin = ctx.instanceOriginOf(instance);
+  const center = ctx.groundPos(origin.x, origin.z);
+  for (const player of playersInEncounter(ctx, boss)) {
+    player.pos = { ...center };
+    player.prevPos = { ...center };
+    player.vx = 0;
+    player.vy = 0;
+    player.vz = 0;
+    player.jumping = false;
+    player.onGround = true;
+    player.fallStartY = center.y;
+    ctx.rebucket(player);
+  }
+  clearAssemblyPlayerAuras(ctx, boss);
+  st.assemblyPhase = 'convergence';
+  st.assemblyWipeResolved = false;
+  st.assemblyLinkAssignments = [];
+  st.assemblyLinkPadProgress = [];
+  st.assemblyLinkPadSlots = [];
+  st.assemblyLinkArmAngles = [];
+  st.assemblyLinkHammerControls = [];
+  st.assemblyLinkAnvilReady = [];
+  st.assemblyLinkHammerReady = [];
+  st.assemblyLinkFireballTimer = 0;
+  st.assemblyLinkFireballWave = 0;
+  st.assemblyLinkRemaining = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
+  boss.castingAbility = VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID;
+  boss.castTotal = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
+  boss.castRemaining = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
+  boss.castTargetId = null;
+  boss.castAim = { ...center };
+  boss.channeling = true;
+  ctx.emit({
+    type: 'spellfxAt',
+    x: center.x,
+    z: center.z,
+    school: 'fire',
+    fx: 'nova',
+    sourceId: boss.id,
+    radius: 6,
+    ability: VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID,
+  });
+}
+
+function updateAssemblyConvergence(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  st.assemblyLinkRemaining = Math.max(0, st.assemblyLinkRemaining - DT);
+  boss.castingAbility = VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID;
+  boss.castRemaining = st.assemblyLinkRemaining;
+  if (st.assemblyLinkRemaining <= CAST_COMPLETE_EPS) startAssemblyLinkRound(ctx, boss, st, 0);
+}
+
+function startAssemblyLinkRound(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  round: number,
+): void {
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  const players = playersInEncounter(ctx, boss);
+  st.assemblyPhase = 'links';
+  st.assemblyWipeResolved = false;
+  st.assemblyLinkRound = round;
+  st.assemblyLinkRemaining = varkhulAssemblyLinkSeconds(difficulty);
+  st.assemblyLinkAssignments = varkhulAssemblyLinkAssignments(
+    players.map((player) => player.id),
+    boss.id,
+    round,
+  ).map((assignment) => ({ ...assignment, locked: false }));
+  st.assemblyLinkPadProgress = Array.from({ length: VARKHUL_ASSEMBLY_LINK_SYMBOLS }, () => 0);
+  st.assemblyLinkPadSlots = Array.from(
+    { length: VARKHUL_ASSEMBLY_LINK_SYMBOLS },
+    (_, slot) => slot,
+  );
+  st.assemblyLinkArmAngles = Array.from(
+    { length: VARKHUL_ASSEMBLY_LINK_SYMBOLS },
+    (_, symbol) => varkhulAssemblyAnvilTargetAngle(symbol, round) + Math.PI / 2,
+  );
+  st.assemblyLinkHammerControls = Array.from(
+    { length: VARKHUL_ASSEMBLY_LINK_SYMBOLS },
+    () => 'off',
+  );
+  st.assemblyLinkAnvilReady = Array.from({ length: VARKHUL_ASSEMBLY_LINK_SYMBOLS }, () => false);
+  st.assemblyLinkHammerReady = Array.from({ length: VARKHUL_ASSEMBLY_LINK_SYMBOLS }, () => false);
+  st.assemblyLinkFireballTimer = 1.2;
+  st.assemblyLinkFireballWave = 0;
+  clearAssemblyPlayerAuras(ctx, boss);
+  applyLinkAuras(ctx, boss, st);
+  boss.castingAbility = VARKHUL_ASSEMBLY_LINK_CAST_ID;
+  boss.castTotal = st.assemblyLinkRemaining;
+  boss.castRemaining = st.assemblyLinkRemaining;
+  boss.castTargetId = null;
+  boss.castAim = null;
+  boss.channeling = true;
+}
+
+function shatterAssemblyForge(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  stunSeconds = VARKHUL_ASSEMBLY_STUN_SECONDS,
+  damageTakenBonus = VARKHUL_ASSEMBLY_STUN_DAMAGE_TAKEN_BONUS,
+): void {
+  finishAssembly(ctx, boss, st);
+  st.assemblyPhase = 'stunned';
+  st.assemblyStunRemaining = stunSeconds;
+  st.assemblyLinkRemaining = 0;
+  boss.aiState = 'idle';
+  boss.aggroTargetId = null;
+  clearBossCast(boss);
+  ctx.applyAura(boss, {
+    id: VARKHUL_ASSEMBLY_STUN_AURA_ID,
+    name: 'Forge Shattered',
+    kind: 'vulnerability',
+    remaining: stunSeconds,
+    duration: stunSeconds,
+    value: damageTakenBonus,
+    sourceId: boss.id,
+    school: 'fire',
+    encounterOwned: true,
+  });
+  const forge = anvilWorldPosition(ctx, boss);
+  ctx.emit({
+    type: 'spellfxAt',
+    x: forge.x,
+    z: forge.z,
+    school: 'fire',
+    fx: 'meteorImpact',
+    sourceId: boss.id,
+    radius: 14,
+    ability: 'Unstable Reaction',
+  });
+}
+
+function deliverCore(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  core: VarkhulEncounterState['assemblyCores'][number],
+  carrier: Entity,
+): void {
+  removeCoreAura(carrier);
+  core.carrierId = null;
+  core.delivered = true;
+  core.pos = anvilWorldPosition(ctx, boss);
+  st.assemblyForgeHp = Math.max(
+    VARKHUL_ASSEMBLY_UNSTABLE_REACTION_DAMAGE,
+    st.assemblyForgeHp - VARKHUL_ASSEMBLY_CORE_BASE_DAMAGE,
+  );
+  if (st.assemblyDeliveryWindowRemaining <= 0) {
+    st.assemblyDeliveredCoreIds = [];
+    st.assemblyDeliveryWindowRemaining = VARKHUL_ASSEMBLY_CORE_WINDOW_SECONDS;
+  }
+  st.assemblyDeliveredCoreIds.push(core.id);
+  ctx.emit({
+    type: 'spellfxAt',
+    x: core.pos.x,
+    z: core.pos.z,
+    school: 'fire',
+    fx: 'nova',
+    sourceId: boss.id,
+    radius: VARKHUL_ASSEMBLY_FORGE_DELIVERY_RADIUS,
+    ability: 'Molten Core',
+  });
+  if (st.assemblyDeliveredCoreIds.length < 3) return;
+  st.assemblyForgeHp = Math.max(0, st.assemblyForgeHp - VARKHUL_ASSEMBLY_UNSTABLE_REACTION_DAMAGE);
+  startAssemblyConvergence(ctx, boss, st);
+}
+
+function updateAssemblyCores(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): boolean {
+  const forge = anvilWorldPosition(ctx, boss);
+  for (const core of st.assemblyCores) {
+    if (core.delivered) continue;
+    const carrier =
+      core.carrierId === null
+        ? null
+        : (players.find((player) => player.id === core.carrierId) ?? null);
+    const detachedCarrier =
+      core.carrierId === null ? null : (ctx.entities.get(core.carrierId) ?? null);
+    if (carrier?.kind === 'player' && !carrier.dead) {
+      core.pos = { ...carrier.pos };
+      core.burdenTickTimer -= DT;
+      if (core.burdenTickTimer <= CAST_COMPLETE_EPS) {
+        core.burdenTickTimer += VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS;
+        core.burdenStacks++;
+        dealFractionalDamage(
+          ctx,
+          boss,
+          carrier,
+          varkhulAssemblyBurdenDamageMaxHp(core.burdenStacks),
+          'Molten Burden',
+        );
+      }
+      if (!carrier.dead && dist2d(carrier.pos, forge) <= VARKHUL_ASSEMBLY_FORGE_DELIVERY_RADIUS) {
+        deliverCore(ctx, boss, st, core, carrier);
+        if (st.assemblyPhase === 'convergence') return true;
+      }
+      continue;
+    }
+    if (detachedCarrier) removeCoreAura(detachedCarrier);
+    core.carrierId = null;
+    const player = players.find(
+      (candidate) =>
+        !candidate.dead &&
+        !st.assemblyCores.some((other) => other.carrierId === candidate.id) &&
+        dist2d(candidate.pos, core.pos) <= VARKHUL_ASSEMBLY_CORE_PICKUP_RADIUS,
+    );
+    if (!player) continue;
+    core.carrierId = player.id;
+    core.burdenStacks = 0;
+    core.burdenTickTimer = VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS;
+    ctx.applyAura(player, {
+      id: VARKHUL_ASSEMBLY_CORE_AURA_ID,
+      name: 'Molten Core',
+      kind: 'vulnerability',
+      remaining: 999,
+      duration: 999,
+      value: 0,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+  }
+  if (st.assemblyDeliveryWindowRemaining > 0) {
+    st.assemblyDeliveryWindowRemaining = Math.max(0, st.assemblyDeliveryWindowRemaining - DT);
+    if (st.assemblyDeliveryWindowRemaining <= CAST_COMPLETE_EPS) {
+      ejectDeliveredCores(ctx, boss, st);
+    }
+  }
+  return false;
+}
+
+function spawnAssemblyLinkFireballs(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  forge: Vec3,
+): void {
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  for (const [index, fireball] of varkhulAssemblyFireballPattern(
+    forge,
+    difficulty,
+    st.assemblyLinkRound,
+    st.assemblyLinkFireballWave,
+  ).entries()) {
+    st.cinderOrbProjectiles.push({
+      id: `${boss.id}:assembly-links:${st.assemblyLinkRound}:${st.assemblyLinkFireballWave}:${index}`,
+      ownerId: boss.id,
+      pos: ctx.groundPos(fireball.x, fireball.z),
+      dir: { x: fireball.dirX, z: fireball.dirZ },
+      remaining: VARKHUL_ASSEMBLY_LINK_FIREBALL_DURATION,
+      hitPlayerIds: [],
+      radius: VARKHUL_ASSEMBLY_LINK_FIREBALL_RADIUS,
+      duration: VARKHUL_ASSEMBLY_LINK_FIREBALL_DURATION,
+      speed: VARKHUL_CINDER_ORB_SPEED,
+      damageMaxHp:
+        difficulty === 'heroic'
+          ? VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_HEROIC
+          : VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_NORMAL,
+      ability: VARKHUL_ASSEMBLY_LINK_CAST_ID,
+    });
+  }
+  st.assemblyLinkFireballWave++;
+  st.assemblyLinkFireballTimer += varkhulAssemblyFireballCadence(difficulty);
+}
+
+function updateAssemblyLinks(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  st.assemblyLinkRemaining = Math.max(0, st.assemblyLinkRemaining - DT);
+  boss.castingAbility = VARKHUL_ASSEMBLY_LINK_CAST_ID;
+  boss.castRemaining = st.assemblyLinkRemaining;
+  const forge = anvilWorldPosition(ctx, boss);
+  positionVarkhulLinkPracticeBots(ctx, forge, st);
+  const players = playersInEncounter(ctx, boss);
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  st.assemblyLinkFireballTimer -= DT;
+  if (st.assemblyLinkFireballTimer <= CAST_COMPLETE_EPS) {
+    spawnAssemblyLinkFireballs(ctx, boss, st, forge);
+  }
+  for (const assignment of st.assemblyLinkAssignments) {
+    const player = ctx.entities.get(assignment.playerId);
+    const aura = player?.auras.find((entry) => entry.id === VARKHUL_ASSEMBLY_LINK_AURA_ID);
+    if (aura) aura.remaining = st.assemblyLinkRemaining;
+  }
+  for (let symbol = 0; symbol < VARKHUL_ASSEMBLY_LINK_SYMBOLS; symbol++) {
+    const assignments = st.assemblyLinkAssignments.filter(
+      (assignment) => assignment.symbol === symbol && !assignment.locked,
+    );
+    if (assignments.length === 0) continue;
+    const living = assignments.flatMap((assignment) => {
+      const player = ctx.entities.get(assignment.playerId);
+      return player?.kind === 'player' && !player.dead ? [{ assignment, player }] : [];
+    });
+    const pad = varkhulAssemblyLinkPadAtSlot(
+      forge,
+      st.assemblyLinkPadSlots[symbol] ?? symbol,
+      st.assemblyLinkRound,
+    );
+    const target = varkhulAssemblyAnvilTarget(pad, symbol, st.assemblyLinkRound);
+    const targetAngle = varkhulAssemblyAnvilTargetAngle(symbol, st.assemblyLinkRound);
+    const assignedAnvil = assignments.find((assignment) => assignment.role === 'anvil');
+    const assignedHammer = assignments.find((assignment) => assignment.role === 'hammer');
+    const anvil = living.find(({ assignment }) => assignment.role === 'anvil')?.player ?? null;
+    const hammer = living.find(({ assignment }) => assignment.role === 'hammer')?.player ?? null;
+    const anvilReady =
+      assignedAnvil === undefined ||
+      (anvil !== null && varkhulAssemblyAnvilTargetReady(anvil.pos, target));
+    const previousArmAngle = st.assemblyLinkArmAngles[symbol] ?? targetAngle + Math.PI / 2;
+    const control =
+      assignedHammer === undefined
+        ? varkhulAssemblyBestHammerControl(previousArmAngle, targetAngle)
+        : hammer === null
+          ? 'off'
+          : varkhulAssemblyHammerControlAt(forge, pad, hammer.pos);
+    let armAngle = varkhulAssemblyStepArm(previousArmAngle, control, difficulty, DT);
+    if (assignedHammer === undefined && varkhulAssemblyArmAligned(armAngle, targetAngle)) {
+      armAngle = targetAngle;
+    }
+    const aligned = varkhulAssemblyArmAligned(armAngle, targetAngle);
+    const hammerReady = control === 'brake';
+    st.assemblyLinkArmAngles[symbol] = armAngle;
+    st.assemblyLinkHammerControls[symbol] = control;
+    st.assemblyLinkAnvilReady[symbol] = anvilReady;
+    st.assemblyLinkHammerReady[symbol] = hammerReady;
+    if (anvilReady && hammerReady && aligned) {
+      st.assemblyLinkPadProgress[symbol] = Math.min(
+        VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS,
+        (st.assemblyLinkPadProgress[symbol] ?? 0) + DT,
+      );
+    } else {
+      st.assemblyLinkPadProgress[symbol] = 0;
+    }
+    if (st.assemblyLinkPadProgress[symbol] < VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS) continue;
+    for (const assignment of assignments) {
+      assignment.locked = true;
+      const player = ctx.entities.get(assignment.playerId);
+      if (player) {
+        player.auras = player.auras.filter(
+          (aura) => aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID || aura.sourceId !== boss.id,
+        );
+      }
+    }
+    ctx.emit({
+      type: 'spellfxAt',
+      x: pad.x,
+      z: pad.z,
+      school: 'fire',
+      fx: 'nova',
+      sourceId: boss.id,
+      radius: VARKHUL_ASSEMBLY_LINK_PAD_RADIUS,
+      ability: VARKHUL_ASSEMBLY_LINK_CAST_ID,
+    });
+  }
+  if (
+    st.assemblyLinkAssignments.length > 0 &&
+    st.assemblyLinkAssignments.every((assignment) => assignment.locked)
+  ) {
+    if (st.assemblyLinkRound + 1 < st.assemblyLinkRounds) {
+      startAssemblyLinkRound(ctx, boss, st, st.assemblyLinkRound + 1);
+    } else {
+      shatterAssemblyForge(ctx, boss, st);
+    }
+    return;
+  }
+  boss.castRemaining = st.assemblyLinkRemaining;
+  if (st.assemblyLinkRemaining <= CAST_COMPLETE_EPS && !st.assemblyWipeResolved) {
+    st.assemblyWipeResolved = true;
+    const lockedSymbols = new Set(
+      st.assemblyLinkAssignments
+        .filter((assignment) => assignment.locked)
+        .map((assignment) => assignment.symbol),
+    ).size;
+    const outcome = varkhulAssemblyLinkOutcome(lockedSymbols);
+    if (outcome === 'partial') {
+      shatterAssemblyForge(
+        ctx,
+        boss,
+        st,
+        VARKHUL_ASSEMBLY_PARTIAL_STUN_SECONDS,
+        VARKHUL_ASSEMBLY_PARTIAL_DAMAGE_TAKEN_BONUS,
+      );
+      return;
+    }
+    finishAssembly(ctx, boss, st);
+    st.assemblyPhase = 'done';
+    st.assemblyAddIds = [];
+    clearBossCast(boss);
+    boss.aiState = 'attack';
+    const damage =
+      difficulty === 'heroic'
+        ? VARKHUL_ASSEMBLY_LINK_FAILURE_DAMAGE_HEROIC
+        : VARKHUL_ASSEMBLY_LINK_FAILURE_DAMAGE_NORMAL;
+    for (const player of players) {
+      if (!player.dead) {
+        dealFractionalDamage(ctx, boss, player, damage, VARKHUL_ASSEMBLY_LINK_CAST_ID);
+      }
+    }
+    ctx.emit({
+      type: 'spellfxAt',
+      x: forge.x,
+      z: forge.z,
+      school: 'fire',
+      fx: 'meteorImpact',
+      sourceId: boss.id,
+      radius: VARKHUL_ASSEMBLY_LINK_PAD_DISTANCE,
+      ability: VARKHUL_ASSEMBLY_LINK_CAST_ID,
+    });
+  }
 }
 
 function updateMastersAssembly(
@@ -920,45 +1659,149 @@ function updateMastersAssembly(
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): boolean {
-  if (!st.assemblyTriggered || st.assemblyAddIds.length === 0) return false;
+  if (!st.assemblyTriggered || st.assemblyPhase === 'done') return false;
+  const forge = anvilWorldPosition(ctx, boss);
+  boss.pos = { ...forge };
+  boss.prevPos = { ...forge };
+  if (st.assemblyPhase === 'stunned') {
+    st.assemblyStunRemaining = Math.max(0, st.assemblyStunRemaining - DT);
+    boss.aiState = 'idle';
+    boss.aggroTargetId = null;
+    if (st.assemblyStunRemaining <= CAST_COMPLETE_EPS) {
+      st.assemblyPhase = 'done';
+      st.assemblyAddIds = [];
+      boss.auras = boss.auras.filter((aura) => aura.id !== VARKHUL_ASSEMBLY_STUN_AURA_ID);
+    }
+    return st.assemblyPhase !== 'done';
+  }
+  if (st.assemblyPhase === 'links') {
+    updateAssemblyLinks(ctx, boss, st);
+    return true;
+  }
+  if (st.assemblyPhase === 'convergence') {
+    updateAssemblyConvergence(ctx, boss, st);
+    return true;
+  }
   const adds = st.assemblyAddIds.map((id) => ctx.entities.get(id)).filter(Boolean) as Entity[];
   const liveAdds = adds.filter((add) => !add.dead);
-  const warden = liveAdds.find((add) => add.templateId === VARKHUL_CRUCIBLE_WARDEN_ID);
-  const artificer = liveAdds.find((add) => add.templateId === VARKHUL_CINDER_ARTIFICER_ID);
-  if (!warden && artificer) {
-    artificer.auras = artificer.auras.filter((aura) => aura.id !== VARKHUL_WARDEN_SHIELD_AURA_ID);
-  }
-  if (liveAdds.length === 0) {
-    finishAssembly(ctx, boss, st);
-    return false;
-  }
-  if (artificer) {
-    st.assemblyRemaining = Math.max(0, st.assemblyRemaining - DT);
-    artificer.castingAbility = VARKHUL_MASTERS_ASSEMBLY_CAST_ID;
-    artificer.castTotal = VARKHUL_MASTERS_ASSEMBLY_SECONDS;
-    artificer.castRemaining = st.assemblyRemaining;
-    artificer.channeling = true;
-    if (st.assemblyRemaining <= CAST_COMPLETE_EPS && !st.assemblyWipeResolved) {
-      st.assemblyWipeResolved = true;
-      wipeEncounter(ctx, boss, players, VARKHUL_MASTERS_ASSEMBLY_CAST_ID);
+  dropDeadAssemblyCores(ctx, st);
+  const sentinel = adds.find((add) => add.templateId === VARKHUL_EMBER_SENTINEL_ID);
+  if (sentinel?.dead && st.assemblyFixateTargetId !== null) {
+    const target = ctx.entities.get(st.assemblyFixateTargetId);
+    if (target) {
+      target.auras = target.auras.filter(
+        (aura) => aura.id !== VARKHUL_ASSEMBLY_FIXATE_AURA_ID || aura.sourceId !== boss.id,
+      );
     }
-  } else {
-    st.assemblyRemaining = 0;
+    st.assemblyFixateTargetId = null;
+  }
+  if (liveAdds.length === 0) st.assemblyPhase = 'cores';
+  if (st.assemblyPhase === 'cores' && updateAssemblyCores(ctx, boss, st, players)) return true;
+  st.assemblyRemaining = Math.max(0, st.assemblyRemaining - DT);
+  if (st.assemblyRemaining <= CAST_COMPLETE_EPS && !st.assemblyWipeResolved) {
+    st.assemblyWipeResolved = true;
+    wipeEncounter(ctx, boss, players, VARKHUL_MASTERS_ASSEMBLY_CAST_ID);
   }
   boss.aiState = 'attack';
   return true;
 }
 
-export function updateVarkhulAssemblyArtificer(add: Entity): void {
-  if (
-    add.templateId !== VARKHUL_CINDER_ARTIFICER_ID ||
-    add.castingAbility !== VARKHUL_MASTERS_ASSEMBLY_CAST_ID
-  )
-    return;
+export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): boolean {
+  let boss: Entity | null = null;
+  for (const entity of ctx.entities.values()) {
+    if (
+      entity.templateId === VARKHUL_BOSS_TEMPLATE_ID &&
+      entity.varkhul?.assemblyPhase === 'adds' &&
+      entity.varkhul.assemblyAddIds.includes(add.id)
+    ) {
+      boss = entity;
+      break;
+    }
+  }
+  if (!boss?.varkhul) return false;
   add.inCombat = true;
-  add.aiState = 'attack';
-  add.aggroTargetId = null;
-  add.channeling = true;
+  if (add.templateId === VARKHUL_CINDER_ARTIFICER_ID) {
+    add.castingAbility = VARKHUL_ASSEMBLY_REPAIR_CAST_ID;
+    add.castTotal = 0;
+    add.castRemaining = 0;
+    add.castTargetId = boss.id;
+    add.castAim = { ...boss.pos };
+    add.channeling = false;
+    if (ctx.isStunned(add)) return true;
+    if (dist2d(add.pos, boss.pos) <= VARKHUL_ASSEMBLY_FORGE_DELIVERY_RADIUS) {
+      add.aiState = 'attack';
+      if (!boss.varkhul.assemblyArtificerRepaired) {
+        boss.varkhul.assemblyArtificerRepaired = true;
+        ctx.applyHeal(
+          add,
+          boss,
+          Math.ceil(boss.maxHp * VARKHUL_ASSEMBLY_REPAIR_HEAL_MAX_HP),
+          VARKHUL_ASSEMBLY_REPAIR_CAST_ID,
+          undefined,
+          false,
+        );
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: add.id,
+          targetId: boss.id,
+          school: 'fire',
+          fx: 'projectile',
+        });
+      }
+      return true;
+    }
+    add.aiState = 'chase';
+    if (!ctx.isRooted(add)) {
+      ctx.moveToward(add, boss.pos, add.moveSpeed * ctx.moveSpeedMult(add));
+    }
+    add.facing = steadyAngleTo(add.pos, boss.pos, add.facing);
+    return true;
+  }
+  if (add.templateId === VARKHUL_EMBER_SENTINEL_ID) {
+    const fixateTarget = assignAssemblyFixate(ctx, boss, boss.varkhul, add);
+    if (!fixateTarget) return true;
+    add.forcedTargetId = fixateTarget.id;
+    add.forcedTargetTimer = Math.max(add.forcedTargetTimer, DT * 2);
+    add.aggroTargetId = fixateTarget.id;
+  }
+  if (add.templateId === VARKHUL_CRUCIBLE_WARDEN_ID) {
+    const bigCast = MOBS[add.templateId]?.bigCast;
+    if (!bigCast) return false;
+    add.ignoreHardLeash = true;
+    add.aiState = 'attack';
+    updateMobTarget(ctx, add);
+    const target = add.aggroTargetId === null ? null : ctx.entities.get(add.aggroTargetId);
+    if (target && !target.dead) add.facing = steadyAngleTo(add.pos, target.pos, add.facing);
+    if (ctx.isStunned(add)) return true;
+    if (add.castingAbility === bigCast.castId) {
+      add.castRemaining = Math.max(0, add.castRemaining - DT);
+      if (add.castRemaining <= CAST_COMPLETE_EPS) {
+        clearBossCast(add);
+        const school = bigCast.school ?? 'nature';
+        ctx.emit({ type: 'spellfx', sourceId: add.id, targetId: add.id, school, fx: 'nova' });
+        for (const player of playersInEncounter(ctx, boss)) {
+          if (dist2d(player.pos, add.pos) > bigCast.radius) continue;
+          const damage = Math.round(
+            ctx.rng.range(bigCast.min, bigCast.max) * (add.mechanicDamageMult ?? 1),
+          );
+          ctx.dealDamage(add, player, damage, false, school, bigCast.name, 'hit', true);
+        }
+      }
+      return true;
+    }
+    add.bigCastTimer = Math.max(0, add.bigCastTimer - DT);
+    if (add.bigCastTimer <= CAST_COMPLETE_EPS && add.castingAbility === null) {
+      add.bigCastTimer = bigCast.every + bigCast.castTime;
+      add.castingAbility = bigCast.castId;
+      add.castTotal = bigCast.castTime;
+      add.castRemaining = bigCast.castTime;
+      add.castTargetId = null;
+      add.castAim = null;
+      add.channeling = false;
+    }
+    return true;
+  }
+  return false;
 }
 
 function startMasterpieceUnbound(boss: Entity, st: VarkhulEncounterState): void {
@@ -1017,9 +1860,13 @@ export function resetVarkhulEncounter(ctx: SimContext, boss: Entity): void {
   ctx.despawnSummonedAdds(boss);
   boss.varkhul = undefined;
   boss.enraged = false;
+  boss.damageImmune = false;
+  boss.damageFloorHp = Math.ceil(boss.maxHp * VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD);
+  boss.knockbackResistance = 0;
   boss.auras = boss.auras.filter(
     (aura) =>
       aura.id !== VARKHUL_MASTERS_ASSEMBLY_AURA_ID &&
+      aura.id !== VARKHUL_ASSEMBLY_STUN_AURA_ID &&
       aura.id !== VARKHUL_MASTERPIECE_UNBOUND_AURA_ID,
   );
   clearBossCast(boss);
@@ -1032,8 +1879,12 @@ function updateMajorAbility(
   players: readonly Entity[],
   speed: number,
 ): boolean {
-  if (st.majorAbility === 'hammers') {
-    updateMarkedHammers(ctx, boss, st, players, speed);
+  if (st.majorAbility === 'frontal') {
+    updateFrontal(ctx, boss, st, players, speed);
+    return true;
+  }
+  if (st.majorAbility === 'cinderOrbs') {
+    updateCinderOrbs(ctx, boss, st, speed);
     return true;
   }
   if (st.majorAbility === 'forgestorm') {
@@ -1058,7 +1909,9 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
   const st = initVarkhulEncounter(boss);
-  updateHammerFires(ctx, boss, st, players);
+  updateCinderFires(ctx, boss, st, players);
+  updateCinderOrbProjectiles(ctx, boss, st, players);
+  updateAnvilMeteors(ctx, boss, st, players);
   updateMobTarget(ctx, boss);
   let target = resolveLivingTarget(boss, players);
   if (!target) return;
@@ -1093,11 +1946,16 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
 
   if (updateMajorAbility(ctx, boss, st, players, speed)) return;
 
-  st.hammersTimer -= DT * speed;
+  st.cinderOrbsTimer -= DT * speed;
+  st.frontalTimer -= DT * speed;
   st.forgestormTimer -= DT * speed;
   st.anvilTimer -= DT * speed;
-  if (st.hammersTimer <= CAST_COMPLETE_EPS) {
-    startMarkedHammers(ctx, boss, st, players);
+  if (st.frontalTimer <= CAST_COMPLETE_EPS) {
+    startFrontal(ctx, boss, st, players);
+    return;
+  }
+  if (st.cinderOrbsTimer <= CAST_COMPLETE_EPS) {
+    startCinderOrbs(ctx, boss, st, players);
     return;
   }
   if (st.forgestormTimer <= CAST_COMPLETE_EPS) {

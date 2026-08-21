@@ -4,12 +4,15 @@ import {
   IGNIVAR_SOAK_SHARED_MAX_HP,
 } from '../src/sim/encounters/ignivar';
 import {
+  VARKHUL_ASSEMBLY_CORE_AURA_ID,
+  VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
+  VARKHUL_ASSEMBLY_LINK_AURA_ID,
+  VARKHUL_CINDER_ORBS_AURA_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MAKERS_BRAND_DURATION,
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
   VARKHUL_MAKERS_BRAND_PER_STACK,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
-  VARKHUL_MARKED_HAMMERS_AURA_ID,
 } from '../src/sim/encounters/varkhul';
 import {
   type AuraEffectInput,
@@ -59,10 +62,23 @@ describe('auraEffectDescriptor', () => {
     );
   });
 
-  it('does not describe the placement-only hammer mark as a zero-percent vulnerability', () => {
-    expect(
-      desc({ id: VARKHUL_MARKED_HAMMERS_AURA_ID, kind: 'vulnerability', value: 0 }),
-    ).toBeNull();
+  it('does not describe the Cinder placement mark as a zero-percent vulnerability', () => {
+    expect(desc({ id: VARKHUL_CINDER_ORBS_AURA_ID, kind: 'vulnerability', value: 0 })).toBeNull();
+  });
+
+  it('teaches each live Assembly assignment from its authoritative constants', () => {
+    expect(desc({ id: VARKHUL_ASSEMBLY_FIXATE_AURA_ID, kind: 'vulnerability', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.varkhulSentinelsGaze',
+      nums: {},
+    });
+    expect(desc({ id: VARKHUL_ASSEMBLY_CORE_AURA_ID, kind: 'vulnerability', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.varkhulMoltenCore',
+      nums: { interval: 2, min: 2, max: 10 },
+    });
+    expect(desc({ id: VARKHUL_ASSEMBLY_LINK_AURA_ID, kind: 'vulnerability', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.varkhulForgeLink',
+      nums: { hold: 1.5 },
+    });
   });
 
   it('describes the cancelable protective Hourglass aura', () => {

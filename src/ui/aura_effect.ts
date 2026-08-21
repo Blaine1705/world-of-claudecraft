@@ -40,12 +40,15 @@ import {
   IGNIVAR_SOAK_SHARED_MAX_HP,
 } from '../sim/encounters/ignivar';
 import {
+  VARKHUL_ASSEMBLY_CORE_AURA_ID,
+  VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
+  VARKHUL_ASSEMBLY_LINK_AURA_ID,
+  VARKHUL_CINDER_ORBS_AURA_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MAKERS_BRAND_DURATION,
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
   VARKHUL_MAKERS_BRAND_PER_STACK,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
-  VARKHUL_MARKED_HAMMERS_AURA_ID,
 } from '../sim/encounters/varkhul';
 import type { AuraKind } from '../sim/types';
 import {
@@ -56,6 +59,10 @@ import {
   RECKLESSNESS_RAGE_GEN,
   SUNDER_ARMOR_PCT_PER_STACK,
 } from '../sim/types';
+import {
+  VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS,
+  VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS,
+} from '../sim/varkhul_assembly';
 
 export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 
@@ -109,7 +116,22 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   // This is a four-second placement marker, not a damage-taken modifier. Its
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.
-  if (a.id === VARKHUL_MARKED_HAMMERS_AURA_ID) return null;
+  if (a.id === VARKHUL_CINDER_ORBS_AURA_ID) return null;
+  if (a.id === VARKHUL_ASSEMBLY_FIXATE_AURA_ID) {
+    return { key: `${KEY}.varkhulSentinelsGaze`, nums: {} };
+  }
+  if (a.id === VARKHUL_ASSEMBLY_CORE_AURA_ID) {
+    return {
+      key: `${KEY}.varkhulMoltenCore`,
+      nums: { interval: VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS, min: 2, max: 10 },
+    };
+  }
+  if (a.id === VARKHUL_ASSEMBLY_LINK_AURA_ID) {
+    return {
+      key: `${KEY}.varkhulForgeLink`,
+      nums: { hold: VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS },
+    };
+  }
   if (a.id === 'shaman_mending_current') {
     return a.poolPct !== undefined
       ? { key: `${KEY}.mendingCurrentPercent`, nums: { pct: round(a.poolPct) } }

@@ -1,5 +1,5 @@
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
-import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
+import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
@@ -26,6 +26,7 @@ import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL, type RiftTier } from './types';
+import { setupVarkhulDevRaid } from './varkhul_dev_raid';
 
 const MAX_DEV_SPAWNS = 20;
 const DEV_SPAWN_RADIUS = 4;
@@ -768,6 +769,23 @@ export function handleDevChat(
     return null;
   }
 
+  const varkhulRaidMatch = raw.match(
+    /^\/(?:dev\s+varkhulraid|devvarkhulraid)(?:\s+(normal|heroic))?\s*$/i,
+  );
+  if (varkhulRaidMatch) {
+    const difficulty = varkhulRaidMatch[1]?.toLowerCase() as 'normal' | 'heroic' | undefined;
+    const result = setupVarkhulDevRaid(ctx, pid, difficulty);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Varkhul raid ${result.reused ? 'reset' : 'ready'}: ${result.allies} stationary, invulnerable allies spread around the Inner Crucible. Use /dev varkhulraid normal or /dev varkhulraid heroic to rebuild the room at that difficulty.`,
+      );
+    }
+    return null;
+  }
+
   if (/^\/(?:dev\s+heal|devheal)\s*$/i.test(raw)) {
     const entity = ctx.entities.get(pid);
     if (entity && !entity.dead) entity.hp = entity.maxHp;
@@ -844,7 +862,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev immortal, /dev ignivarraid [boss], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

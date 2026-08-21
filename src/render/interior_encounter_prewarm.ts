@@ -14,6 +14,7 @@ export interface InteriorEncounterPrewarmSpec {
   soulRendPlayerClasses: boolean;
   soulRendVfxWeaponSkins: boolean;
   soulRendLivePlayerVisuals: boolean;
+  varkhulVisuals?: boolean;
 }
 
 export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarmSpec> = {
@@ -21,6 +22,12 @@ export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarm
     soulRendPlayerClasses: true,
     soulRendVfxWeaponSkins: true,
     soulRendLivePlayerVisuals: true,
+  },
+  ignivar_depths: {
+    soulRendPlayerClasses: false,
+    soulRendVfxWeaponSkins: false,
+    soulRendLivePlayerVisuals: false,
+    varkhulVisuals: true,
   },
 };
 

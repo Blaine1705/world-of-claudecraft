@@ -5,9 +5,14 @@
 // actionable geometry.
 
 import * as THREE from 'three';
+import type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
+import type {
+  ActiveVarkhulCinderFire,
+  ActiveVarkhulCinderOrbProjectile,
+} from '../sim/varkhul_cinder_orbs';
 import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
-import type { ActiveVarkhulHammerZone } from '../sim/varkhul_hammers';
-import { VarkhulHammerVisuals } from './varkhul_hammer_visual';
+import { VarkhulAssemblyVisuals } from './varkhul_assembly_visual';
+import { VarkhulCinderOrbVisuals } from './varkhul_cinder_orb_visual';
 
 const SEGMENTS = 64;
 const GROUND_LIFT = 0.09;
@@ -112,20 +117,23 @@ function disposeVisual(visual: ForgestormVisual): void {
 export class VarkhulForgestormVisuals {
   private readonly visuals = new Map<number, ForgestormVisual>();
   private readonly activeIds = new Set<number>();
-  private readonly hammerVisuals: VarkhulHammerVisuals;
+  private readonly cinderOrbVisuals: VarkhulCinderOrbVisuals;
+  private readonly assemblyVisuals: VarkhulAssemblyVisuals;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
   ) {
-    this.hammerVisuals = new VarkhulHammerVisuals(scene, groundY);
+    this.cinderOrbVisuals = new VarkhulCinderOrbVisuals(scene, groundY);
+    this.assemblyVisuals = new VarkhulAssemblyVisuals(scene, groundY);
   }
 
   sync(
     warnings: readonly ActiveVarkhulForgestormWarning[],
-    hammerZones: readonly ActiveVarkhulHammerZone[] = [],
+    cinderFires: readonly ActiveVarkhulCinderFire[] = [],
+    cinderOrbProjectiles: readonly ActiveVarkhulCinderOrbProjectile[] = [],
   ): void {
-    this.hammerVisuals.sync(hammerZones);
+    this.cinderOrbVisuals.sync(cinderFires, cinderOrbProjectiles);
     if (warnings.length === 0 && this.visuals.size === 0) return;
     this.activeIds.clear();
     for (const warning of warnings) {
@@ -158,13 +166,21 @@ export class VarkhulForgestormVisuals {
 
   syncWorld(world: {
     activeVarkhulForgestormWarnings: readonly ActiveVarkhulForgestormWarning[];
-    activeVarkhulHammerZones: readonly ActiveVarkhulHammerZone[];
+    activeVarkhulCinderFires: readonly ActiveVarkhulCinderFire[];
+    activeVarkhulCinderOrbProjectiles: readonly ActiveVarkhulCinderOrbProjectile[];
+    activeVarkhulAssemblies: readonly ActiveVarkhulAssembly[];
   }): void {
-    this.sync(world.activeVarkhulForgestormWarnings, world.activeVarkhulHammerZones);
+    this.assemblyVisuals.sync(world.activeVarkhulAssemblies);
+    this.sync(
+      world.activeVarkhulForgestormWarnings,
+      world.activeVarkhulCinderFires,
+      world.activeVarkhulCinderOrbProjectiles,
+    );
   }
 
   update(dt: number, reducedMotion = false): void {
-    this.hammerVisuals.update(dt, reducedMotion);
+    this.cinderOrbVisuals.update(dt, reducedMotion);
+    this.assemblyVisuals.update(dt, reducedMotion);
     for (const visual of this.visuals.values()) {
       if (!reducedMotion) {
         visual.phase = (visual.phase + Math.max(0, dt) * 5) % (Math.PI * 2);
@@ -181,7 +197,8 @@ export class VarkhulForgestormVisuals {
   }
 
   dispose(): void {
-    this.hammerVisuals.dispose();
+    this.cinderOrbVisuals.dispose();
+    this.assemblyVisuals.dispose();
     for (const visual of this.visuals.values()) disposeVisual(visual);
     this.visuals.clear();
     this.activeIds.clear();

@@ -189,6 +189,7 @@ export function dealDamage(
   if (resolution) resolution.landedHpLoss = 0;
   if (resolvedHpLoss) alreadyFinal = true;
   if (target.dead) return 0;
+  if (target.damageImmune) return 0;
   // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
   // owner has the gating quest active/ready may harm it; other hits are a no-op.
   if (questGateBlocksDamage(ctx.players, source, target)) return 0;
@@ -634,6 +635,10 @@ export function dealDamage(
   // sharing, so only damage that would reach health can be reduced/transferred.
   if (!resolvedHpLoss) {
     amount = mitigateVicariousSuffering(ctx, source, target, amount, abilityId);
+  }
+
+  if (target.damageFloorHp !== undefined) {
+    amount = Math.min(amount, Math.max(0, target.hp - target.damageFloorHp));
   }
 
   // Sacred Bulwark (Guardian Ward): an enemy lethal hit spends the ward, clamps

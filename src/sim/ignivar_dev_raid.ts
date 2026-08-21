@@ -1,5 +1,6 @@
 import { DUNGEONS } from './data';
 import { IGNIVAR_FORGE_APPROACH_ID } from './ignivar_raid_ids';
+import { resetRaidDevBot } from './raid_dev_bot';
 import type { SimContext } from './sim_context';
 
 const IGNIVAR_DUNGEON_ID = 'ignivar_raid_arena';
@@ -57,32 +58,6 @@ export function ignivarDevRaidTravelRoster(
   return { ok: true, memberIds: [...party.members] };
 }
 
-function resetIgnivarDevBot(ctx: SimContext, botPid: number, x: number, z: number): boolean {
-  ctx.setPlayerLevel(20, botPid);
-  const botMeta = ctx.players.get(botPid);
-  if (botMeta) botMeta.devAnchored = true;
-  const bot = ctx.entities.get(botPid);
-  if (!bot) return false;
-  bot.pos = ctx.groundPos(x, z);
-  bot.prevPos = { ...bot.pos };
-  bot.vx = 0;
-  bot.vz = 0;
-  bot.targetId = null;
-  bot.autoAttack = false;
-  bot.castingAbility = null;
-  bot.castRemaining = 0;
-  bot.castTotal = 0;
-  bot.castTargetId = null;
-  bot.castAim = null;
-  bot.inCombat = false;
-  bot.devGod = false;
-  bot.profilerInvulnerable = true;
-  bot.hp = bot.maxHp;
-  bot.resource = bot.maxResource;
-  ctx.rebucket(bot);
-  return true;
-}
-
 /** Spreads the anchored practice roster behind the first trash pull. */
 export function stageIgnivarDevRaidAtApproach(ctx: SimContext, pid: number): IgnivarDevRaidResult {
   const player = ctx.entities.get(pid);
@@ -120,7 +95,7 @@ export function stageIgnivarDevRaidAtApproach(ctx: SimContext, pid: number): Ign
     if (botPid === undefined) continue;
     const column = IGNIVAR_APPROACH_COLUMNS[index % IGNIVAR_APPROACH_COLUMNS.length];
     const row = IGNIVAR_APPROACH_ROWS[Math.floor(index / IGNIVAR_APPROACH_COLUMNS.length)];
-    resetIgnivarDevBot(ctx, botPid, stageX + column, stageZ + row);
+    resetRaidDevBot(ctx, botPid, stageX + column, stageZ + row);
     instance.enteredBy.add(botPid);
   }
   return { ok: true, allies: IGNIVAR_DEV_BOT_COUNT, reused: true };
@@ -234,7 +209,7 @@ export function setupIgnivarDevRaid(ctx: SimContext, pid: number): IgnivarDevRai
     const memberAngle = -Math.PI / 2 + (memberIndex / IGNIVAR_DEV_POD_SIZE) * Math.PI * 2;
     const podX = origin.x + Math.cos(podAngle) * IGNIVAR_DEV_POD_CENTER_RADIUS;
     const podZ = origin.z + Math.sin(podAngle) * IGNIVAR_DEV_POD_CENTER_RADIUS;
-    resetIgnivarDevBot(
+    resetRaidDevBot(
       ctx,
       botPid,
       podX + Math.cos(memberAngle) * IGNIVAR_DEV_POD_MEMBER_RADIUS,

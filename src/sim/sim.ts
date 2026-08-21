@@ -564,10 +564,20 @@ import {
 } from './talent_save_migration';
 import * as unstuckMod from './unstuck';
 import {
+  type ActiveVarkhulAnvilMeteorWarning,
+  activeVarkhulAnvilMeteorWarnings,
+} from './varkhul_anvil_meteors';
+import { type ActiveVarkhulAssembly, activeVarkhulAssembly } from './varkhul_assembly';
+import {
+  type ActiveVarkhulCinderFire,
+  type ActiveVarkhulCinderOrbProjectile,
+  activeVarkhulCinderFires,
+  activeVarkhulCinderOrbProjectiles,
+} from './varkhul_cinder_orbs';
+import {
   type ActiveVarkhulForgestormWarning,
   activeVarkhulForgestormWarnings,
 } from './varkhul_forgestorm';
-import { type ActiveVarkhulHammerZone, activeVarkhulHammerZones } from './varkhul_hammers';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
@@ -2237,13 +2247,45 @@ export class Sim {
     }
     return warnings;
   }
-  get activeVarkhulHammerZones(): ActiveVarkhulHammerZone[] {
-    const zones: ActiveVarkhulHammerZone[] = [];
+  get activeVarkhulAnvilMeteors(): ActiveVarkhulAnvilMeteorWarning[] {
+    const warnings: ActiveVarkhulAnvilMeteorWarning[] = [];
     for (const entity of this.entities.values()) {
       if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
-      zones.push(...activeVarkhulHammerZones(entity.id, entity.varkhul));
+      for (const batch of entity.varkhul.anvilMeteorBatches ?? []) {
+        warnings.push(...activeVarkhulAnvilMeteorWarnings(entity.id, batch));
+      }
     }
-    return zones;
+    return warnings;
+  }
+  get activeVarkhulAssemblies(): ActiveVarkhulAssembly[] {
+    const assemblies: ActiveVarkhulAssembly[] = [];
+    for (const entity of this.entities.values()) {
+      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
+      const active = activeVarkhulAssembly(
+        entity.id,
+        entity.varkhul,
+        entity.pos,
+        (id) => this.entities.get(id)?.pos,
+      );
+      if (active) assemblies.push(active);
+    }
+    return assemblies;
+  }
+  get activeVarkhulCinderFires(): ActiveVarkhulCinderFire[] {
+    const fires: ActiveVarkhulCinderFire[] = [];
+    for (const entity of this.entities.values()) {
+      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
+      fires.push(...activeVarkhulCinderFires(entity.id, entity.varkhul));
+    }
+    return fires;
+  }
+  get activeVarkhulCinderOrbProjectiles(): ActiveVarkhulCinderOrbProjectile[] {
+    const projectiles: ActiveVarkhulCinderOrbProjectile[] = [];
+    for (const entity of this.entities.values()) {
+      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
+      projectiles.push(...activeVarkhulCinderOrbProjectiles(entity.id, entity.varkhul));
+    }
+    return projectiles;
   }
   get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
     const hourglasses: ActiveTemporalHourglass[] = [];

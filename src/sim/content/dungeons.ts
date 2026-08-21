@@ -12,6 +12,7 @@ import {
   IGNIVAR_SECOND_WING_ID,
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
+import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
 import {
@@ -48,6 +49,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     boss: true,
     ccImmune: true,
     slowImmune: true,
+    damageFloorPct: 0.5,
     hpBase: 80000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 52,
@@ -111,7 +113,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 13,
     hardLeashRadius: 18,
     bigCast: {
-      castId: 'crucible_quake',
+      castId: VARKHUL_CRUCIBLE_QUAKE_CAST_ID,
       name: 'Crucible Quake',
       castTime: 2.5,
       every: 12,

@@ -252,19 +252,32 @@ damage received from Varkhul by 35% per stack. Tanks swap at two stacks. A taunt
 changes the target of the next Brand without transferring or clearing the old
 tank's stacks.
 
-### Marked Hammers
+### Forgefather's Sweep
 
-Varkhul marks three non-tanks for four seconds. The marked players also receive
+Every 26 seconds Varkhul locks his facing toward a non-tank and winds up for 2.5
+seconds. He then sweeps a 120-degree, 30-yard frontal that deals 65% maximum
+health on Normal and 90% on Heroic. The facing does not follow the target after
+the cast begins. Its full actionable footprint remains visible on every graphics
+tier.
+
+### Cinder Orbs
+
+Varkhul marks three non-tanks for four seconds. The marked players must spread
+away from the raid and from one another. They also receive
 Red-hot Metal, which deals 4% maximum health every two seconds and absorbs healing
 equal to 30% maximum health. Both effects are encounter-owned and cannot be
 dispelled. Healers remove the absorb by healing through it.
 
-After the four-second mark, the forge creates three waves of enormous incandescent
-hammers around the marked players. Each hammer warns for 1.25 seconds, then falls
-for 25% maximum health in a three-yard circle and leaves a 2.4-yard fire zone for
-12 seconds. The fire deals 4% maximum health every second. Players carry the marks
-to the room edges so the persistent fire does not fill the center. Hammer positions,
-warning lifetimes, and fire zones are authoritative snapshot state.
+After the four-second mark, each living target permanently scars their current
+position with a 2.4-yard fire field that deals 4% maximum health every second. At
+the same instant, six oversized Cinder Orbs burst radially from each target and
+travel across the room at nine yards per second for 5.5 seconds. Every orb deals
+20% maximum health on contact and can hit each player only once. The marked player
+is immune to their own initial fan so the release itself is not an unavoidable
+hit. Players carry the marks to the room edges to keep the permanent fire out of
+the center and spread apart to separate the eighteen projectile origins. Fire
+positions, projectile positions, directions, and remaining travel times are
+authoritative snapshot state.
 
 ### Forgestorm
 
@@ -276,16 +289,57 @@ and online clients receive the same remaining time and geometry.
 ### Anvil's Decree
 
 Varkhul turns toward the grand forge and resolves three strikes two seconds
-apart. Every strike deals 10% maximum health raidwide and 35% maximum health in
-its four cardinal forge lanes. The cast serializes with other major mechanics so
-their safe and dangerous spaces never become ambiguous.
+apart. On Normal the strikes deal 10%, 10%, and 20% maximum health raidwide. On
+Heroic they deal 14%, 14%, and 25%. The impacts have no directional ground lane:
+the raid responds with healing and defensives instead of positional movement. The
+cast serializes with other major mechanics so its healing check does not overlap
+another major sequence. On Heroic only, each hammer impact also marks three
+deterministic meteor locations for 1.8 seconds. Each meteor has a 3.5-yard impact
+radius and deals 35% maximum health. These falling-meteor warnings are
+authoritative snapshot state. Neither the raidwide hammer impact nor its meteors
+apply camera shake.
 
 ### The Master's Assembly
 
-At 50% health Varkhul shields himself and assembles one automaton of each type.
-The Crucible Warden protects the Cinder Artificer, while the Artificer channels a
-20-second raid wipe. Killing all three constructs removes Varkhul's protection
-and resumes the encounter.
+At 50% health Varkhul becomes immune, moves to the grand forge, and begins a
+45-second assembly sequence. He creates one automaton of each role:
+
+- The Cinder Artificer is a repair automaton. It enters from the south-west
+  corner, walks toward Varkhul, and heals him for 15% maximum health if it
+  arrives. Players can slow, root, and stun it.
+- The Ember Sentinel fixates a non-tank. A large eye over that player's head
+  identifies the chase target.
+- The Crucible Warden is an interruptible caster. It opens with Crucible Quake
+  after 1.5 seconds and repeats the cast every 12 seconds.
+
+Each dead automaton drops one Molten Core. A nearby player automatically picks it
+up and must carry it within three yards of the forge. The carrier suffers Molten
+Burden every two seconds, ramping through 2%, 4%, 6%, 8%, and 10% maximum health
+per tick. A delivered core removes 20 of the forge's 100 health, but ordinary
+deliveries cannot reduce it below 40. All three cores must reach the forge inside
+the same six-second delivery window. Succeeding causes Unstable Reaction for the
+remaining 40 health; failing the window ejects the cores so the raid can try
+again. The forge has a persistent world-space health display throughout this
+phase.
+
+Breaking the forge pulls every living raider to the center of the room and begins
+a four-second Forge Convergence channel. No symbols are assigned during this
+transition. When the channel completes, Forge Links starts as a ten-player spatial
+interface. Five symbols are assigned to pairs of players and appear both above
+their heads and on five three-yard rune pads around the forge. Partners are joined
+only by their matching symbol, with no world-space guidance line. The Anvil player
+occupies the bright hollow-symbol receptacle inside their rune. The Hammer player
+uses three distinct outer plates: the left arrow rotates a visible fire arm
+counter-clockwise, the right arrow rotates it clockwise, and the square center
+plate brakes it. When the arm points at the inner receptacle, both players hold
+their positions for 1.5 seconds to lock the symbol. Normal gives one 25-second
+round; Heroic gives one 22-second round and sends five crossing fireballs through
+the room instead of three. A missing or dead partner is replaced by the forge echo.
+Five locks shatter Varkhul's shield, stun him for 15 seconds, and increase damage
+taken by 50%. Three or four locks still end the interface with an eight-second stun
+and 25% increased damage taken. Zero to two locks end it without a stun and deal
+20% maximum-health raid damage on Normal or 25% on Heroic. The interface therefore
+always resolves when its timer expires and never waits indefinitely.
 
 ### Masterpiece Unbound
 
@@ -344,7 +398,7 @@ the media manifest. Concept art is not a substitute for the six shipping GLBs.
     instance lifetime. Done for Normal.
 11. Maelin's three-quest lore chain, three records, and Ignivar core reveal.
     Done for the hidden development route.
-12. Varkhul's Maker's Brand, Marked Hammers, Red-hot Metal, Forgestorm, Anvil's Decree,
+12. Varkhul's Maker's Brand, Cinder Orbs, Red-hot Metal, Forgestorm, Anvil's Decree,
     Master's Assembly, and Masterpiece Unbound. Done for Normal; human tuning and
     final visual proof remain.
 13. Three authored ambient themes with per-room routing and versioned streams.

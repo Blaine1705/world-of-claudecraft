@@ -46,11 +46,12 @@ import {
 } from '../encounters/ignivar';
 import {
   resetVarkhulEncounter,
-  updateVarkhulAssemblyArtificer,
+  updateVarkhulAssemblyAutomaton,
   updateVarkhulEncounter,
   VARKHUL_BOSS_ID,
   VARKHUL_CINDER_ARTIFICER_ID,
-  VARKHUL_MASTERS_ASSEMBLY_CAST_ID,
+  VARKHUL_CRUCIBLE_WARDEN_ID,
+  VARKHUL_EMBER_SENTINEL_ID,
 } from '../encounters/varkhul';
 import { isEscortNpcTemplate } from '../escort';
 import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
@@ -274,10 +275,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   if (
-    mob.templateId === VARKHUL_CINDER_ARTIFICER_ID &&
-    mob.castingAbility === VARKHUL_MASTERS_ASSEMBLY_CAST_ID
+    (mob.templateId === VARKHUL_CINDER_ARTIFICER_ID ||
+      mob.templateId === VARKHUL_CRUCIBLE_WARDEN_ID ||
+      mob.templateId === VARKHUL_EMBER_SENTINEL_ID) &&
+    updateVarkhulAssemblyAutomaton(ctx, mob)
   ) {
-    updateVarkhulAssemblyArtificer(mob);
     return;
   }
 

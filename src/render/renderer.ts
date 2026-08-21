@@ -4964,7 +4964,7 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
-    this.mageGroundFx.syncMeteorWarnings(this.sim.activeIgnivarMeteors);
+    this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
     this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());
@@ -12379,7 +12379,7 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
-    this.mageGroundFx.syncMeteorWarnings(this.sim.activeIgnivarMeteors);
+    this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
     this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());

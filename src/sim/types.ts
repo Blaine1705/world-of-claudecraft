@@ -6,6 +6,7 @@ import type { GatheringProfessionId, ToolEffectId } from './content/professions'
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
+import type { VarkhulAssemblyHammerControl, VarkhulAssemblyPhase } from './varkhul_assembly';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -1491,6 +1492,9 @@ export interface MobTemplate {
   // an ordinary mob across the map one leash-length at a time; a mob carrying
   // this cannot be kited off its ground (mob/combat_profile.ts).
   hardLeashRadius?: number;
+  /** Optional mandatory encounter threshold. Damage cannot move the mob below
+   * this max-HP fraction until encounter logic clears its runtime floor. */
+  damageFloorPct?: number;
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
@@ -4651,6 +4655,14 @@ export interface Entity extends ClientMirroredEntityFields {
    *  combat presentation remains active without /dev god's outgoing damage
    *  multiplier. Server-private and never persisted. */
   profilerInvulnerable?: boolean;
+  /** Encounter-owned hard immunity. This is authoritative gameplay state and is
+   * checked before every damage modifier, absorb, exact-copy, and dev path. */
+  damageImmune?: boolean;
+  /** Runtime HP floor initialized from MobTemplate.damageFloorPct. */
+  damageFloorHp?: number;
+  /** Encounter adds that must pursue their assigned player throughout an arena
+   * can opt out of a template's ordinary open-world hard tether. */
+  ignoreHardLeash?: boolean;
   /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
   devSpawnOwnerId?: number;
   /** Dev/test healer target: friendly-selectable inert dummy instance. */
@@ -5019,14 +5031,29 @@ export interface IgnivarEncounterState {
 
 export interface VarkhulEncounterState {
   makersBrandTimer: number;
-  hammersTimer: number;
-  hammersCastKey: number;
-  hammersMarkRemaining: number;
-  hammersStrikeIndex: number;
-  hammersWarningRemaining: number;
-  hammersTargetIds: number[];
-  hammersPoints: Vec3[];
-  hammerFires: Array<{ id: string; pos: Vec3; remaining: number; tickTimer: number }>;
+  frontalTimer: number;
+  frontalCastKey: number;
+  frontalCastRemaining: number;
+  frontalFacing: number;
+  frontalTargetId: number | null;
+  cinderOrbsTimer: number;
+  cinderOrbsCastKey: number;
+  cinderOrbsMarkRemaining: number;
+  cinderOrbsTargetIds: number[];
+  cinderFires: Array<{ id: string; pos: Vec3; tickTimer: number }>;
+  cinderOrbProjectiles: Array<{
+    id: string;
+    ownerId: number;
+    pos: Vec3;
+    dir: { x: number; z: number };
+    remaining: number;
+    hitPlayerIds: number[];
+    radius?: number;
+    duration?: number;
+    speed?: number;
+    damageMaxHp?: number;
+    ability?: string;
+  }>;
   forgestormTimer: number;
   forgestormCastKey: number;
   forgestormWaveIndex: number;
@@ -5035,12 +5062,52 @@ export interface VarkhulEncounterState {
   anvilTimer: number;
   anvilStrikeIndex: number;
   anvilStrikeRemaining: number;
-  anvilFacing: number;
-  majorAbility: 'none' | 'hammers' | 'forgestorm' | 'anvil';
+  anvilMeteorCastKey: number;
+  anvilMeteorBatches: Array<{
+    castKey: number;
+    strikeIndex: number;
+    remaining: number;
+    points: Vec3[];
+  }>;
+  majorAbility: 'none' | 'frontal' | 'cinderOrbs' | 'forgestorm' | 'anvil';
   assemblyTriggered: boolean;
+  assemblyPhase: VarkhulAssemblyPhase;
   assemblyAddIds: number[];
   assemblyRemaining: number;
   assemblyWipeResolved: boolean;
+  assemblyDroppedAddIds: number[];
+  assemblyCores: Array<{
+    id: string;
+    sourceAddId: number;
+    pos: Vec3;
+    carrierId: number | null;
+    delivered: boolean;
+    burdenStacks: number;
+    burdenTickTimer: number;
+  }>;
+  assemblyForgeHp: number;
+  assemblyDeliveryWindowRemaining: number;
+  assemblyDeliveredCoreIds: string[];
+  assemblyArtificerRepaired: boolean;
+  assemblyFixateTargetId: number | null;
+  assemblyLinkAssignments: Array<{
+    playerId: number;
+    symbol: number;
+    role: 'anvil' | 'hammer';
+    locked: boolean;
+  }>;
+  assemblyLinkPadProgress: number[];
+  assemblyLinkPadSlots: number[];
+  assemblyLinkArmAngles: number[];
+  assemblyLinkHammerControls: VarkhulAssemblyHammerControl[];
+  assemblyLinkAnvilReady: boolean[];
+  assemblyLinkHammerReady: boolean[];
+  assemblyLinkFireballTimer: number;
+  assemblyLinkFireballWave: number;
+  assemblyLinkRound: number;
+  assemblyLinkRounds: number;
+  assemblyLinkRemaining: number;
+  assemblyStunRemaining: number;
   masterpieceTriggered: boolean;
   masterpieceRemaining: number;
   masterpiecePulseTimer: number;

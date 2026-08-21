@@ -91,9 +91,8 @@ describe('Varkhul Forgestorm rendering', () => {
     expect(
       renderer.match(/this\.varkhulForgestormVisuals\?\.syncWorld\(this\.sim\)/g),
     ).toHaveLength(2);
-    expect(visual).toContain(
-      'this.sync(world.activeVarkhulForgestormWarnings, world.activeVarkhulHammerZones);',
-    );
+    expect(visual).toContain('world.activeVarkhulCinderFires');
+    expect(visual).toContain('world.activeVarkhulCinderOrbProjectiles');
     expect(renderer).toContain('new VarkhulForgestormVisuals(this.scene');
   });
 });

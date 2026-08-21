@@ -2291,6 +2291,9 @@ export const ko_KR: EnTranslations = {
     "auraEffect": {
       "sharedPyre": "원 안에 최소 {players}명의 플레이어가 있어야 합니다",
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
+      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
+      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
+      "varkhulForgeLink": "Match your symbol. Anvil: stand on the hollow inner receptor. Hammer: use the outer arrows to rotate the fire arm, then brake on the square when aligned. Hold for {hold} sec.",
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
       "mendingCurrent": "치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다",

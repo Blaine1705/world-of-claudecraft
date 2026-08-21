@@ -99,8 +99,11 @@ import {
   type ActiveFrostRing,
   type ActiveIgnivarMeteorWarning,
   type ActiveTemporalHourglass,
+  type ActiveVarkhulAnvilMeteorWarning,
+  type ActiveVarkhulAssembly,
+  type ActiveVarkhulCinderFire,
+  type ActiveVarkhulCinderOrbProjectile,
   type ActiveVarkhulForgestormWarning,
-  type ActiveVarkhulHammerZone,
   type ArenaInfo,
   type BankInfo,
   type CardMinigameInfo,
@@ -190,7 +193,11 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
-import { decodeVarkhulHammerZones } from './varkhul_hammer_wire';
+import { decodeVarkhulAnvilMeteors, decodeVarkhulAssemblies } from './varkhul_assembly_wire';
+import {
+  decodeVarkhulCinderFires,
+  decodeVarkhulCinderOrbProjectiles,
+} from './varkhul_cinder_orb_wire';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -1937,7 +1944,10 @@ export class ClientWorld implements IWorld {
   activeFrostRings: ActiveFrostRing[] = [];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[] = [];
-  activeVarkhulHammerZones: ActiveVarkhulHammerZone[] = [];
+  activeVarkhulCinderFires: ActiveVarkhulCinderFire[] = [];
+  activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[] = [];
+  activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[] = [];
+  activeVarkhulAssemblies: ActiveVarkhulAssembly[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   activeConsecrations: ActiveConsecration[] = [];
   private counterfangWindowDeadlineMs = 0;
@@ -2952,7 +2962,12 @@ export class ClientWorld implements IWorld {
           ];
         })
       : [];
-    this.activeVarkhulHammerZones = decodeVarkhulHammerZones(snap.varkhulHammers);
+    this.activeVarkhulCinderFires = decodeVarkhulCinderFires(snap.varkhulCinderFires);
+    this.activeVarkhulCinderOrbProjectiles = decodeVarkhulCinderOrbProjectiles(
+      snap.varkhulCinderOrbs,
+    );
+    this.activeVarkhulAnvilMeteors = decodeVarkhulAnvilMeteors(snap.varkhulAnvilMeteors);
+    this.activeVarkhulAssemblies = decodeVarkhulAssemblies(snap.varkhulAssemblies);
     this.activeTemporalHourglasses = Array.isArray(snap.hourglasses)
       ? snap.hourglasses.flatMap((value: unknown): ActiveTemporalHourglass[] => {
           if (!value || typeof value !== 'object') return [];

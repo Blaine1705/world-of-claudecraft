@@ -342,7 +342,7 @@ import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
-import { varkhulEncounterWireJson } from './varkhul_wire';
+import { type VarkhulEncounterWireWorld, varkhulEncounterWireJson } from './varkhul_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -8498,10 +8498,15 @@ export class GameServer {
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     const activeFrostRings = this.sim.activeFrostRings;
     const activeIgnivarMeteors = this.sim.activeIgnivarMeteors;
-    const activeVarkhulForgestormWarnings = this.sim.activeVarkhulForgestormWarnings;
-    const activeVarkhulHammerZones = this.sim.activeVarkhulHammerZones;
     const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
     const activeConsecrations = this.sim.activeConsecrations;
+    const varkhulEncounterWorld: VarkhulEncounterWireWorld = {
+      activeVarkhulForgestormWarnings: this.sim.activeVarkhulForgestormWarnings,
+      activeVarkhulCinderFires: this.sim.activeVarkhulCinderFires,
+      activeVarkhulCinderOrbProjectiles: this.sim.activeVarkhulCinderOrbProjectiles,
+      activeVarkhulAnvilMeteors: this.sim.activeVarkhulAnvilMeteors,
+      activeVarkhulAssemblies: this.sim.activeVarkhulAssemblies,
+    };
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -8711,8 +8716,7 @@ export class GameServer {
         const ignivarMeteorsJson =
           ignivarMeteors.length > 0 ? `,"ignivarMeteors":[${ignivarMeteors.join(',')}]` : '';
         const varkhulEncounterJson = varkhulEncounterWireJson(
-          activeVarkhulForgestormWarnings,
-          activeVarkhulHammerZones,
+          varkhulEncounterWorld,
           anchorEntity.pos,
           EVENT_RADIUS,
         );

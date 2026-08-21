@@ -96,6 +96,42 @@ describe('Mage meteor visual', () => {
     expect(landed).toHaveBeenCalledOnce();
   });
 
+  it('reconciles a secondary encounter meteor stream without pruning either owner', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+    const first = {
+      id: 'ignivar:1',
+      x: 1,
+      z: 2,
+      radius: 2.4,
+      duration: 2.5,
+      remaining: 2,
+      warningLead: 0.75,
+    };
+    const second = {
+      id: 'varkhul:1',
+      x: 4,
+      z: 5,
+      radius: 3.5,
+      duration: 1.8,
+      remaining: 1.2,
+      warningLead: 0,
+    };
+
+    fx.syncWorldMeteorWarnings({
+      activeIgnivarMeteors: [first],
+      activeVarkhulAnvilMeteors: [second],
+    });
+    expect(scene.children.filter((child) => child.name === 'mage-meteor-fx')).toHaveLength(2);
+    fx.syncMeteorWarnings([], [second]);
+    expect(
+      scene.children.find((child) => child.userData.persistentMeteorId === first.id),
+    ).toBeUndefined();
+    expect(
+      scene.children.find((child) => child.userData.persistentMeteorId === second.id),
+    ).toBeDefined();
+  });
+
   it('lets the contributor fire disc own Ignivar ground detail without hiding countdown', () => {
     const scene = new THREE.Scene();
     const fx = new MageGroundFx(scene, () => 0, vi.fn());

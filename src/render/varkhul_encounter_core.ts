@@ -1,36 +1,41 @@
 import {
-  VARKHUL_ANVILS_DECREE_CAST_ID,
-  VARKHUL_ANVILS_DECREE_STRIKE_SECONDS,
-  VARKHUL_ANVILS_DECREE_STRIKES,
+  VARKHUL_ASSEMBLY_CORE_AURA_ID,
+  VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
+  VARKHUL_ASSEMBLY_LINK_AURA_ID,
   VARKHUL_BOSS_ID,
+  VARKHUL_CINDER_ORBS_AURA_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
-  VARKHUL_MARKED_HAMMERS_AURA_ID,
 } from '../sim/encounters/varkhul';
+import { VARKHUL_FRONTAL_CAST_ID } from '../sim/varkhul_frontal';
 
 export type VarkhulVisualEntity = {
   kind: string;
   templateId: string;
-  castingAbility: string | null;
+  scale?: number;
+  castingAbility?: string | null;
   castRemaining?: number;
   castTotal?: number;
-  facing?: number;
-  scale?: number;
   auras: readonly {
     id: string;
     stacks?: number;
     remaining?: number;
     duration?: number;
+    value?: number;
+    charges?: number;
   }[];
 };
 
 export interface VarkhulEncounterVisualPlan {
   makersBrandStacks: number;
-  markedHammersVisible: boolean;
-  markedHammersProgress: number;
-  anvilVisible: boolean;
-  anvilProgress: number;
-  anvilWorldRotation: number;
+  cinderOrbsVisible: boolean;
+  cinderOrbsProgress: number;
+  frontalVisible: boolean;
+  frontalProgress: number;
+  fixateVisible: boolean;
+  moltenCoreVisible: boolean;
+  linkSymbol: number | null;
+  linkRole: 'anvil' | 'hammer' | null;
   inverseEntityScale: number;
 }
 
@@ -42,23 +47,19 @@ function auraProgress(aura: { remaining?: number; duration?: number } | undefine
   );
 }
 
-function anvilStrikeProgress(remaining: number, total: number): number {
-  const strikeSeconds = VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
-  const elapsed = Math.max(0, total - Math.max(0, remaining));
-  const strikeIndex = Math.min(
-    VARKHUL_ANVILS_DECREE_STRIKES - 1,
-    Math.floor(elapsed / strikeSeconds),
-  );
-  return Math.min(1, Math.max(0, (elapsed - strikeIndex * strikeSeconds) / strikeSeconds));
-}
-
-/** Keeps long radial warnings alive even when their owning body is outside the frustum. */
+/** Keeps actionable player marks alive even when their owning body is outside the frustum. */
 export function varkhulEncounterBypassesCharacterCulling(entity: VarkhulVisualEntity): boolean {
-  if (entity.kind === 'player') {
-    return entity.auras.some((aura) => aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID);
-  }
   return (
-    entity.templateId === VARKHUL_BOSS_ID && entity.castingAbility === VARKHUL_ANVILS_DECREE_CAST_ID
+    (entity.templateId === VARKHUL_BOSS_ID && entity.castingAbility === VARKHUL_FRONTAL_CAST_ID) ||
+    (entity.kind === 'player' &&
+      entity.auras.some((aura) =>
+        [
+          VARKHUL_CINDER_ORBS_AURA_ID,
+          VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
+          VARKHUL_ASSEMBLY_CORE_AURA_ID,
+          VARKHUL_ASSEMBLY_LINK_AURA_ID,
+        ].includes(aura.id),
+      ))
   );
 }
 
@@ -81,26 +82,32 @@ export function varkhulEncounterVisualPlan(
     entity.kind === 'player'
       ? entity.auras.find((aura) => aura.id === VARKHUL_MAKERS_BRAND_AURA_ID)
       : undefined;
-  const markedHammers =
+  const cinderOrbs =
     entity.kind === 'player'
-      ? entity.auras.find((aura) => aura.id === VARKHUL_MARKED_HAMMERS_AURA_ID)
+      ? entity.auras.find((aura) => aura.id === VARKHUL_CINDER_ORBS_AURA_ID)
       : undefined;
-  const anvilVisible =
-    entity.templateId === VARKHUL_BOSS_ID &&
-    entity.castingAbility === VARKHUL_ANVILS_DECREE_CAST_ID;
-  const anvilTotal =
-    entity.castTotal ?? VARKHUL_ANVILS_DECREE_STRIKES * VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
+  const fixate = entity.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_FIXATE_AURA_ID);
+  const moltenCore = entity.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_CORE_AURA_ID);
+  const link = entity.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_LINK_AURA_ID);
+  const frontalVisible =
+    entity.templateId === VARKHUL_BOSS_ID && entity.castingAbility === VARKHUL_FRONTAL_CAST_ID;
   return {
     makersBrandStacks: brand
       ? Math.max(1, Math.min(VARKHUL_MAKERS_BRAND_MAX_STACKS, brand.stacks ?? 1))
       : 0,
-    markedHammersVisible: markedHammers !== undefined,
-    markedHammersProgress: auraProgress(markedHammers),
-    anvilVisible,
-    anvilProgress: anvilVisible
-      ? anvilStrikeProgress(entity.castRemaining ?? anvilTotal, anvilTotal)
+    cinderOrbsVisible: cinderOrbs !== undefined,
+    cinderOrbsProgress: auraProgress(cinderOrbs),
+    frontalVisible,
+    frontalProgress: frontalVisible
+      ? Math.min(
+          1,
+          Math.max(0, 1 - (entity.castRemaining ?? 0) / Math.max(0.01, entity.castTotal ?? 0.01)),
+        )
       : 0,
-    anvilWorldRotation: entity.facing ?? 0,
+    fixateVisible: fixate !== undefined,
+    moltenCoreVisible: moltenCore !== undefined,
+    linkSymbol: link ? Math.max(0, Math.min(4, Math.floor((link.stacks ?? 1) - 1))) : null,
+    linkRole: link ? (link.charges === 2 ? 'hammer' : 'anvil') : null,
     inverseEntityScale: 1 / Math.max(0.01, entity.scale ?? 1),
   };
 }

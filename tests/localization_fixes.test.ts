@@ -612,6 +612,12 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('localizes Varkhul Forge Convergence in the visible cast bar', () => {
+    setLanguage('es');
+    expect(localizeSimAuraName('Forge Convergence')).toBe('Convergencia de la Forja');
+    setLanguage('en');
+  });
+
   it('resolves every player-visible Warlock resource, ability, and row aura name', () => {
     setLanguage('zh_CN');
     for (const name of [

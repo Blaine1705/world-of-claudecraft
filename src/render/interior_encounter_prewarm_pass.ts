@@ -23,10 +23,13 @@ import type { InteriorEncounterPrewarmHost } from './interior_encounter_prewarm_
 import { collectObjectTextures } from './material_texture_slots';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import { setRenderCategory } from './renderer_diagnostics';
+import { buildVarkhulAssemblyPrewarmVisual } from './varkhul_assembly_visual';
+import { buildVarkhulEncounterPrewarmVisual } from './varkhul_encounter';
 import { WEAPON_VFX } from './weapon_vfx';
 
 const startedByHost = new WeakMap<object, Set<string>>();
 const keepAliveByHost = new WeakMap<object, CharacterVisual[]>();
+const varkhulKeepAliveByHost = new WeakMap<object, THREE.Group[]>();
 const liveWarmedByVisual = new WeakMap<CharacterVisual, Set<string>>();
 // One live body warms at a time, per host. Each pass waits for its own idle
 // slot, but a raid arrives together: six independent waits resolve in the SAME
@@ -142,15 +145,16 @@ async function runInteriorEncounterPrewarm(
   // prewarm_policy.ts). The catalog is 30-odd rigs held for the session; the
   // live arm below is bounded by the bodies actually in the room, so THAT is
   // the half a constrained device keeps.
-  if (GFX.constrainedMemory) return;
+  if (GFX.constrainedMemory && !spec.varkhulVisuals) return;
   const plan = planInteriorEncounterPrewarm(spec, {
-    playerClasses: ALL_CLASSES,
-    weaponSkinIds: vfxWeaponSkinIds(WEAPON_SKINS, WEAPON_VFX),
+    playerClasses: GFX.constrainedMemory ? [] : ALL_CLASSES,
+    weaponSkinIds: GFX.constrainedMemory ? [] : vfxWeaponSkinIds(WEAPON_SKINS, WEAPON_VFX),
   });
   const group = new THREE.Group();
   group.name = 'interior-encounter-prewarm';
   placeHiddenPrewarmGroup(host, group);
   const keepAlive: CharacterVisual[] = [];
+  const varkhulKeepAlive: THREE.Group[] = [];
   let idx = 0;
   const place = (visual: CharacterVisual): void => {
     visual.root.visible = true;
@@ -194,6 +198,18 @@ async function runInteriorEncounterPrewarm(
   const units: Array<() => void> = [
     ...plan.playerClasses.map((cls) => () => buildPlayerClass(cls)),
     ...plan.weaponSkinIds.map((skinId) => () => buildWeaponSkin(skinId)),
+    ...(spec.varkhulVisuals
+      ? [
+          () => {
+            const encounter = buildVarkhulEncounterPrewarmVisual();
+            const assembly = buildVarkhulAssemblyPrewarmVisual();
+            encounter.position.set(-12, 0, 0);
+            assembly.position.set(12, 0, 0);
+            group.add(encounter, assembly);
+            varkhulKeepAlive.push(encounter, assembly);
+          },
+        ]
+      : []),
   ];
   await runIdleQueue(units, (unit) => unit(), {
     batchSize: 1,
@@ -212,6 +228,13 @@ async function runInteriorEncounterPrewarm(
     for (const visual of keepAlive) {
       visual.root.removeFromParent();
       visual.root.visible = false;
+    }
+    const heldVarkhul = varkhulKeepAliveByHost.get(host) ?? [];
+    heldVarkhul.push(...varkhulKeepAlive);
+    varkhulKeepAliveByHost.set(host, heldVarkhul);
+    for (const visual of varkhulKeepAlive) {
+      visual.removeFromParent();
+      visual.visible = false;
     }
   }
 }

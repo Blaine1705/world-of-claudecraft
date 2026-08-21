@@ -1527,7 +1527,7 @@ describe('Ignivar encounter renderer', () => {
       /syncRaidEncounterVisuals\([\s\S]*?this\.sim\.entities,[\s\S]*?\);[\s\S]*?continue;/,
     );
     expect(
-      renderer.match(/this\.mageGroundFx\.syncMeteorWarnings\(this\.sim\.activeIgnivarMeteors\)/g),
+      renderer.match(/this\.mageGroundFx\.syncWorldMeteorWarnings\(this\.sim\);/g),
     ).toHaveLength(2);
     expect(renderer).toContain('this.mageGroundFx.impactMeteor(ev.persistentId, ev.x, ev.z)');
     expect(renderer).toContain('warningLead: ev.warningLead');

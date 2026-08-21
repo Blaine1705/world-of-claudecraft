@@ -6296,9 +6296,8 @@ describe('Varkhul Forgestorm snapshot parity', () => {
       forgestormCastKey: 7,
       forgestormWaveIndex: 1,
       forgestormWarningRemaining: 1.4,
-      hammersWarningRemaining: 0,
-      hammersPoints: [],
-      hammerFires: [],
+      cinderFires: [],
+      cinderOrbProjectiles: [],
       forgestormPoints: [
         { x: player.pos.x + 5, y: player.pos.y, z: player.pos.z },
         { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
@@ -6320,48 +6319,108 @@ describe('Varkhul Forgestorm snapshot parity', () => {
   });
 });
 
-describe('Varkhul Marked Hammers snapshot parity', () => {
-  it('rebuilds warnings and fire zones after reconnect and clears an omitted set', () => {
+describe('Varkhul Cinder Orbs snapshot parity', () => {
+  it('rebuilds Heroic meteors and the pair interface after reconnect', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       t: 'snap',
       ents: [],
-      varkhulHammers: [
+      varkhulAnvilMeteors: [{ id: 'meteor:1', x: 3, z: 5, r: 3.5, dur: 1.8, rem: 1.2, lead: 0 }],
+      varkhulAssemblies: [
         {
-          id: '9901:hammer:2:0:0',
-          sourceId: 9901,
-          phase: 'warning',
-          x: 3,
-          z: 5,
-          r: 3,
-          dur: 1.25,
-          rem: 0.8,
-        },
-        {
-          id: '9901:fire:1:2:0',
-          sourceId: 9901,
-          phase: 'fire',
-          x: 7,
-          z: 8,
-          r: 2.4,
-          dur: 12,
-          rem: 6,
+          bossId: 7,
+          phase: 'links',
+          fx: 10,
+          fz: 20,
+          hp: 0,
+          mhp: 100,
+          win: 0,
+          round: 1,
+          rounds: 2,
+          rem: 18,
+          cores: [],
+          assign: [{ pid: 1, sym: 2, role: 1, lock: 0 }],
+          pads: [
+            {
+              sym: 2,
+              x: 14,
+              z: 24,
+              r: 3,
+              p: 0.5,
+              ar: 0,
+              hr: 1,
+              ta: 1.2,
+              aa: 1.25,
+              c: 2,
+              al: 1,
+              lock: 0,
+            },
+          ],
         },
       ],
     });
 
-    expect(client.activeVarkhulHammerZones).toEqual([
-      expect.objectContaining({ id: '9901:hammer:2:0:0', phase: 'warning', radius: 3 }),
-      expect.objectContaining({ id: '9901:fire:1:2:0', phase: 'fire', radius: 2.4 }),
+    expect(client.activeVarkhulAnvilMeteors).toEqual([
+      expect.objectContaining({ id: 'meteor:1', radius: 3.5, remaining: 1.2 }),
+    ]);
+    expect(client.activeVarkhulAssemblies).toEqual([
+      expect.objectContaining({ bossId: 7, phase: 'links', round: 1, rounds: 2 }),
     ]);
     (client as any).applySnapshot({ t: 'snap', ents: [] });
-    expect(client.activeVarkhulHammerZones).toEqual([]);
+    expect(client.activeVarkhulAnvilMeteors).toEqual([]);
+    expect(client.activeVarkhulAssemblies).toEqual([]);
   });
 
-  it('interest-scopes authoritative hammer and fire positions', () => {
+  it('rebuilds permanent fires and traveling orbs after reconnect, then clears omissions', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulCinderFires: [
+        {
+          id: '9901:cinder-fire:2:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          r: 2.4,
+        },
+      ],
+      varkhulCinderOrbs: [
+        {
+          id: '9901:cinder-orbs:2:0:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          dx: 1,
+          dz: 0,
+          r: 1.1,
+          dur: 5.5,
+          rem: 4,
+        },
+      ],
+    });
+
+    expect(client.activeVarkhulCinderFires).toEqual([
+      expect.objectContaining({ id: '9901:cinder-fire:2:0', radius: 2.4 }),
+    ]);
+    expect(client.activeVarkhulCinderOrbProjectiles).toEqual([
+      expect.objectContaining({
+        id: '9901:cinder-orbs:2:0:0',
+        radius: 1.1,
+        remaining: 4,
+        dirX: 1,
+        dirZ: 0,
+      }),
+    ]);
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulCinderFires).toEqual([]);
+    expect(client.activeVarkhulCinderOrbProjectiles).toEqual([]);
+  });
+
+  it('interest-scopes authoritative Cinder fire and orb positions', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Hammerwire', 'warrior');
+    const session = joinServer(server, fc, 1, 'Cinderwire', 'warrior');
     const player = server.sim.entities.get(session.pid)!;
     const boss = createMob(
       9903,
@@ -6374,19 +6433,34 @@ describe('Varkhul Marked Hammers snapshot parity', () => {
       forgestormWaveIndex: 0,
       forgestormWarningRemaining: 0,
       forgestormPoints: [],
-      hammersCastKey: 7,
-      hammersStrikeIndex: 1,
-      hammersWarningRemaining: 0.9,
-      hammersPoints: [
-        { x: player.pos.x + 5, y: player.pos.y, z: player.pos.z },
-        { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
-      ],
-      hammerFires: [
+      cinderFires: [
         {
-          id: `${boss.id}:fire:6:2:0`,
+          id: `${boss.id}:cinder-fire:6:0`,
           pos: { x: player.pos.x + 6, y: player.pos.y, z: player.pos.z },
-          remaining: 5,
           tickTimer: 0.5,
+        },
+        {
+          id: `${boss.id}:cinder-fire:6:1`,
+          pos: { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+          tickTimer: 0.5,
+        },
+      ],
+      cinderOrbProjectiles: [
+        {
+          id: `${boss.id}:cinder-orbs:6:0:0`,
+          ownerId: player.id,
+          pos: { x: player.pos.x + 7, y: player.pos.y, z: player.pos.z },
+          dir: { x: 1, z: 0 },
+          remaining: 4,
+          hitPlayerIds: [player.id],
+        },
+        {
+          id: `${boss.id}:cinder-orbs:6:0:1`,
+          ownerId: player.id,
+          pos: { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+          dir: { x: -1, z: 0 },
+          remaining: 4,
+          hitPlayerIds: [player.id],
         },
       ],
     } as unknown as NonNullable<typeof boss.varkhul>;
@@ -6394,21 +6468,22 @@ describe('Varkhul Marked Hammers snapshot parity', () => {
 
     broadcast(server);
 
-    expect(lastSnap(fc.sent).varkhulHammers).toEqual([
+    expect(lastSnap(fc.sent).varkhulCinderFires).toEqual([
       expect.objectContaining({
-        id: `${boss.id}:hammer:7:1:0`,
+        id: `${boss.id}:cinder-fire:6:0`,
         sourceId: boss.id,
-        phase: 'warning',
-        r: 3,
-        dur: 1.25,
-        rem: 0.9,
-      }),
-      expect.objectContaining({
-        id: `${boss.id}:fire:6:2:0`,
-        phase: 'fire',
         r: 2.4,
-        dur: 12,
-        rem: 5,
+      }),
+    ]);
+    expect(lastSnap(fc.sent).varkhulCinderOrbs).toEqual([
+      expect.objectContaining({
+        id: `${boss.id}:cinder-orbs:6:0:0`,
+        sourceId: boss.id,
+        dx: 1,
+        dz: 0,
+        r: 1.1,
+        dur: 5.5,
+        rem: 4,
       }),
     ]);
   });

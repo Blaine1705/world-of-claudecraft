@@ -113,8 +113,11 @@ export const IWORLD_MEMBERS = [
   { name: 'activeConsecrations', kind: 'data' },
   { name: 'activeFrostRings', kind: 'data' },
   { name: 'activeIgnivarMeteors', kind: 'data' },
-  { name: 'activeVarkhulHammerZones', kind: 'data' },
+  { name: 'activeVarkhulCinderFires', kind: 'data' },
+  { name: 'activeVarkhulCinderOrbProjectiles', kind: 'data' },
   { name: 'activeVarkhulForgestormWarnings', kind: 'data' },
+  { name: 'activeVarkhulAnvilMeteors', kind: 'data' },
+  { name: 'activeVarkhulAssemblies', kind: 'data' },
   { name: 'activeTemporalHourglasses', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
@@ -609,8 +612,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(326);
-    expect(DATA_MEMBERS.length).toBe(89);
+    expect(IWORLD_MEMBERS.length).toBe(329);
+    expect(DATA_MEMBERS.length).toBe(92);
     expect(METHOD_MEMBERS.length).toBe(237);
   });
   it('has no duplicate member names', () => {
@@ -640,8 +643,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
+      'activeVarkhulAnvilMeteors',
+      'activeVarkhulAssemblies',
+      'activeVarkhulCinderFires',
+      'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
-      'activeVarkhulHammerZones',
       'applyEnchant',
       'applyTalents',
       'archetypeTitle',
@@ -963,8 +969,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
+      'activeVarkhulAnvilMeteors',
+      'activeVarkhulAssemblies',
+      'activeVarkhulCinderFires',
+      'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
-      'activeVarkhulHammerZones',
       'archetypeTitle',
       'arenaInfo',
       'bagCapacity',
@@ -1362,7 +1371,10 @@ const FACET_COMBAT = [
   'activeIgnivarMeteors',
   'activeTemporalHourglasses',
   'activeVarkhulForgestormWarnings',
-  'activeVarkhulHammerZones',
+  'activeVarkhulCinderFires',
+  'activeVarkhulCinderOrbProjectiles',
+  'activeVarkhulAnvilMeteors',
+  'activeVarkhulAssemblies',
   'reactiveAbilityWindowRemaining',
   'castAbility',
   'castAbilityAt',
@@ -1897,8 +1909,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(326);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(326);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(329);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(329);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

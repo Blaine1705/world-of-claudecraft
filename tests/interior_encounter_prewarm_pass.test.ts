@@ -204,6 +204,19 @@ describe('interior encounter prewarm pass (driven)', () => {
     expect(host.compiled.length).toBe(afterFirst);
   });
 
+  it('compiles and retains the Varkhul encounter and Assembly visual families', async () => {
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    expect(host.compiled).toContain('varkhul-encounter-prewarm-entity');
+    expect(host.compiled).toContain('varkhul-assembly-prewarm');
+
+    const afterFirst = host.compiled.length;
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    expect(host.compiled).toHaveLength(afterFirst);
+  });
+
   it('retries an interior whose first prewarm pass failed', async () => {
     // The interior key is claimed BEFORE the work runs, so without the failure
     // arm giving it back a pass that rejected (a compile that threw, a queue

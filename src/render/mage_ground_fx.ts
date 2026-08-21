@@ -455,11 +455,21 @@ export class MageGroundFx {
   }
 
   /** Reconciles warnings from authoritative snapshots with their live event visual. */
-  syncMeteorWarnings(warnings: readonly MeteorWarningState[]): void {
+  syncWorldMeteorWarnings(world: {
+    activeIgnivarMeteors: readonly MeteorWarningState[];
+    activeVarkhulAnvilMeteors: readonly MeteorWarningState[];
+  }): void {
+    this.syncMeteorWarnings(world.activeIgnivarMeteors, world.activeVarkhulAnvilMeteors);
+  }
+
+  syncMeteorWarnings(
+    warnings: readonly MeteorWarningState[],
+    secondaryWarnings: readonly MeteorWarningState[] = [],
+  ): void {
     const activeIds = new Set<string>();
-    for (const warning of warnings) {
+    const syncWarning = (warning: MeteorWarningState): void => {
       activeIds.add(warning.id);
-      if (this.resolvedPersistentMeteorIds.has(warning.id)) continue;
+      if (this.resolvedPersistentMeteorIds.has(warning.id)) return;
       const existing = this.meteors.find((meteor) => meteor.persistentId === warning.id);
       if (existing) {
         existing.snapshotManaged = true;
@@ -473,7 +483,7 @@ export class MageGroundFx {
           advanceGroundFireAoe(existing.ignivarFireAoe, authoritativeElapsed - existing.elapsed);
         }
         existing.elapsed = authoritativeElapsed;
-        continue;
+        return;
       }
       this.spawnMeteor({
         x: warning.x,
@@ -486,7 +496,9 @@ export class MageGroundFx {
       });
       const spawned = this.meteors.find((meteor) => meteor.persistentId === warning.id);
       if (spawned) spawned.snapshotManaged = true;
-    }
+    };
+    for (const warning of warnings) syncWarning(warning);
+    for (const warning of secondaryWarnings) syncWarning(warning);
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const meteor = this.meteors[i];
       if (!meteor.snapshotManaged || !meteor.persistentId || activeIds.has(meteor.persistentId)) {

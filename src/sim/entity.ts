@@ -758,6 +758,9 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   const dmgMult = template.elite ? 1.5 : 1;
   e.maxHp = Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
   e.hp = e.maxHp;
+  if (template.damageFloorPct !== undefined) {
+    e.damageFloorHp = Math.ceil(e.maxHp * template.damageFloorPct);
+  }
   const dmg = (template.dmgBase + template.dmgPerLevel * (level - 1)) * dmgMult;
   e.weapon = {
     min: Math.round(dmg * 0.8),
