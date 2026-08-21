@@ -27,8 +27,9 @@ export interface PrewarmCompileSubmissionLoopHost {
   /** Record a unit the loop is handing to the resume lane, before it defers. */
   recordDeferred: (unit: PrewarmCompileUnitLike) => void;
   /** Submit one unit and RECORD it, in the same step. The recording must not
-   *  be deferred to the loop's return value: see runPrewarmCompileSubmission. */
-  submit: (unit: PrewarmCompileUnitLike) => void;
+   *  be deferred to the loop's return value: see runPrewarmCompileSubmission.
+   *  Any return value is ignored, so a caller may push and return the length. */
+  submit: (unit: PrewarmCompileUnitLike) => unknown;
   /** Yield between unit submissions. */
   yieldSlice: () => Promise<void>;
 }

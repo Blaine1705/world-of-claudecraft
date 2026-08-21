@@ -507,8 +507,12 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     );
     expect(renderer).toContain('awaitSlot: (outOfTime) => pacing.awaitSlot(outOfTime),');
     expect(renderer).toContain(
-      'submitPrewarmCompileUnit(unit, lane, {\n            lifecycle: compileLifecycle,\n            pacing,',
+      'submitPrewarmCompileUnit(unit, lane, {\n              lifecycle: compileLifecycle,\n              pacing,',
     );
+    // Pushed as each unit is submitted, never collected from the loop's return:
+    // a rejection inside the loop must not lose already-submitted units from
+    // the set the compile entry awaits.
+    expect(renderer).toContain('submit: (unit) =>\n          submittedCompileUnits.push(');
     // The loop itself is the extracted runPrewarmCompileSubmission, which owns
     // the between-units check and the never-drop contract; the renderer keeps
     // only the wiring above and the deferral bookkeeping below.

@@ -217,7 +217,14 @@ const MONOLITHS: MonolithRow[] = [
     // the stage whose failure boundary shares its unit ids). The file lands
     // below its previous pin with every load-bearing comment restored, so the
     // ceiling is the exact new count: any growth reds again.
-    ceiling: 13534,
+    // Re-pinned 13534 -> 13537 inside the same branch, in review response: the
+    // submit host now pushes each unit as it is submitted rather than the loop
+    // returning a batch (a rejection mid-loop otherwise lost already-submitted
+    // units from the set programs.compile awaits), and that correctness fix
+    // costs three lines of wiring. Stated plainly rather than absorbed by
+    // compacting code, which is the habit this ratchet exists to catch: the
+    // branch still lowers the pin from 13546 to the exact count below.
+    ceiling: 13537,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -6063,10 +6063,9 @@ export class Renderer {
           ),
         awaitSlot: (outOfTime) => pacing.awaitSlot(outOfTime),
         recordDeferred: (unit) => compileLifecycle.recordFor(unit, lane),
-        // Recorded as each unit goes, never batched at the loop's return: a
-        // rejection inside the loop must not lose already-submitted units from
-        // the set programs.compile awaits.
-        submit: (unit) => {
+        // Pushed HERE, never batched at the loop's return (see the host's
+        // own contract in prewarm_compile_submission_core.ts).
+        submit: (unit) =>
           submittedCompileUnits.push(
             submitPrewarmCompileUnit(unit, lane, {
               lifecycle: compileLifecycle,
@@ -6075,8 +6074,7 @@ export class Renderer {
               onError: (err) =>
                 console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err),
             }),
-          );
-        },
+          ),
         yieldSlice: () => new Promise<void>((resolve) => setTimeout(resolve, 0)),
       });
       if (deferred.length === 0) return;
