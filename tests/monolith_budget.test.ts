@@ -145,10 +145,14 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
+    // Lowered again wiring the hollow-gate occluder fade (buildHollowGates):
+    // hoisting the repeated camera/look-at reads the new update() call needed
+    // into shared locals collapsed the four existing per-frame view calls
+    // beside it, more than paying for the new call's own lines, so the
+    // merged file lands below the castle branch's own pin too.
     // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
     // keeps the delve tracker and mount prewarm extractions while preserving
-    // the wrapper's later renderer wiring, so the ceiling is the exact
-    // resolved count.
+    // the wrapper's later renderer wiring.
     // PR #3468 changes the shadow-depth prewarm material contract, but this
     // wrapper's combined renderer remains at the same resolved count.
     // Lowered again on the integration branch, which combines three extractions
@@ -236,7 +240,13 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    ceiling: 13546,
+    // Merging release/v0.40.0 into the hollow-gate occluder fade branch keeps
+    // both the gate fade's local hoisting and the v0.40.0 renderer wiring, so
+    // the ceiling is the exact merged count.
+    // Merging PR #3470 into the release branch keeps the hollow-gate update on
+    // top of the GPU-preparation scheduler renderer bytes, so the ceiling is
+    // the exact resolved count.
+    ceiling: 13538,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

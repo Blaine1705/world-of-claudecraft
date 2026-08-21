@@ -258,8 +258,16 @@ interface AttributionTargetFixture {
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for the Duskfall gate occluder-fade fix merged into release/v0.40.0:
+// renderer.ts wires hollowGates into the shared per-frame occluder update on
+// top of the v0.40.0 renderer bytes, so the composite follows the merged
+// bytes. No capture was retaken.
+// Re-minted for the PR #3470 merge into the release branch: the hollow-gate
+// occluder fade survives on top of the GPU-preparation scheduler renderer
+// bytes, so the composite follows the resolved renderer. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd13c65d42e6d6e89cb900fb18151f754db3f6451e5540c1800044939c2d63c74';
+  '9bd8edb5e6cc67d56b9dbc358cda2f544e0c39ec05143c65e7ee8604acd3de81';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

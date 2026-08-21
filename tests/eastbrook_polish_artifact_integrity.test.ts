@@ -842,10 +842,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for the Duskfall gate occluder-fade fix merged into
+// release/v0.40.0: the first-order composite follows renderer.ts on top of
+// the v0.40.0 renderer bytes, then this seal follows the swept evidence
+// bytes. No capture was retaken.
+// Re-minted for the PR #3470 merge into the release branch: the first-order
+// composite follows the resolved renderer bytes, then this seal follows the
+// swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e90376277eb15b71ca3902a2b9c5fd8d1f248037f18e655fb810463100682bd5';
+  'fdaffee4b63b87e4527258d20815fd927edde6cb40239744556e4215037ad3c7';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'd13c65d42e6d6e89cb900fb18151f754db3f6451e5540c1800044939c2d63c74';
+  '9bd8edb5e6cc67d56b9dbc358cda2f544e0c39ec05143c65e7ee8604acd3de81';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1913,10 +1920,18 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the second three patch-hash bump (pnpm-lock.yaml, the count
     // 0 instanced-mesh render-list skip): same order, the composite first, then
     // this seal. No capture was retaken.
+    // Re-minted for the Duskfall gate occluder-fade fix merged into
+    // release/v0.40.0. The first-order composite follows renderer.ts on top of
+    // the v0.40.0 renderer bytes, then this second-order performance seal
+    // follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the PR #3470 merge into the release branch. The
+    // first-order composite follows the resolved renderer bytes, then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('0db82eec8102fb4ff3afaf934419299c33560469cef27894e43806fe4f0eb56d');
+    ).toBe('91bb7a80267d1e8e2461dc9d8a3d164e55591373b85e55e6c3ddab9af56e74b0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
