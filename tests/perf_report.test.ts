@@ -672,6 +672,54 @@ describe('perf report ingestion', () => {
     expect((adaptive.transitions as unknown[]).length).toBe(12);
   });
 
+  it('bounds the same lists under the legacy rendererPrewarm key', async () => {
+    // The sanitizer walks BOTH prewarm keys because a client older than the
+    // summary-only change still sends the twin, and any token holder can post
+    // either. Without this case the loop could lose its second key in a
+    // refactor and the suite would stay green. The current client also emits
+    // its manifest entries as `entries`, not `manifestEntries`, so that arm of
+    // the per-entry clamp is exercised here too.
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'public-hostile-legacy-prewarm-key',
+        rawSummary: {
+          seconds: 30,
+          rendererPrewarm: {
+            compileUnits: Array.from({ length: 200 }, (_, i) => ({ id: `unit-${i}` })),
+            entries: [
+              {
+                id: 'programs.budget-variants',
+                budgetVariants: Array.from({ length: 100 }, (_, i) => ({ index: i })),
+              },
+            ],
+            prewarmPacing: {
+              adaptive: { transitions: Array.from({ length: 200 }, (_, i) => ({ atMs: i })) },
+            },
+          },
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const prewarm = (stored.rawSummary as Record<string, unknown>).rendererPrewarm as Record<
+      string,
+      unknown
+    >;
+    expect((prewarm.compileUnits as unknown[]).length).toBe(12);
+    expect(
+      ((prewarm.entries as Record<string, unknown>[])[0].budgetVariants as unknown[]).length,
+    ).toBe(8);
+    const adaptive = (prewarm.prewarmPacing as Record<string, unknown>).adaptive as Record<
+      string,
+      unknown
+    >;
+    expect((adaptive.transitions as unknown[]).length).toBe(12);
+  });
+
   it('keeps a full client-capped prewarm snapshot under the raw summary byte cap', async () => {
     // The three new lists are large enough that a LEGITIMATE report can cross
     // RAW_SUMMARY_MAX_BYTES and get routed into compactRawSummary, whose
