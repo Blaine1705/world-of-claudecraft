@@ -10884,7 +10884,6 @@ export class GameServer {
   private send(session: ClientSession, obj: unknown): void {
     this.sendRaw(session, JSON.stringify(obj));
   }
-
   private sendCommandOutcome(session: ClientSession, msg: ClientMessage, succeeded: boolean): void {
     if (!Number.isSafeInteger(msg.rid) || (msg.rid ?? 0) <= 0) return;
     this.send(session, { t: 'commandOutcome', rid: msg.rid, ok: succeeded });
