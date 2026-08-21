@@ -10154,7 +10154,7 @@ export class Renderer {
         // chunks land, exactly as streaming always behaved; the far mesh
         // stands beneath it, so no fog wall and no hole is ever visible.
         if (settleVistaEntry) {
-          const entryHaze = horizonHazePlan(this.farVista.envelopeFar);
+          const entryHaze = horizonHazePlan(this.farVista.envelopeFar, this.camera.position);
           fog.far = entryHaze.far;
           fog.near = entryHaze.near;
         }
@@ -10163,7 +10163,7 @@ export class Renderer {
         // every gameplay distance, a gentle realm-tinted aerial blend where
         // the open sea meets the sky, so the horizon melts instead of
         // cutting a razor line (and interiors still hand off smoothly).
-        const haze = horizonHazePlan(this.farVista.envelopeFar);
+        const haze = horizonHazePlan(this.farVista.envelopeFar, this.camera.position);
         fog.far = dampedValue(fog.far, haze.far, dt, ZONE_ENVIRONMENT_RESPONSE);
         fog.near = dampedValue(fog.near, haze.near, dt, ZONE_ENVIRONMENT_RESPONSE);
       } else {

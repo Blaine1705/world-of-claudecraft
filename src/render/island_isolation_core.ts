@@ -23,10 +23,10 @@
 //                       the residency clamp stops seeing the mainland and the
 //                       horizon opens over the sea.
 //   render/renderer.ts  the streaming lane only queues island zones.
-//   render/far_terrain  the vista's tile grid is bounded to the island and its
-//                       sea, which IS the panorama backdrop: the same coarse
-//                       far mesh the mainland uses, planned over four tiles
-//                       instead of twelve.
+//   render/far_terrain  the horizon haze band starts over the strait instead
+//                       of at a fraction of the view envelope, so the far
+//                       shore reads as distance rather than as a flat pale
+//                       cutout with crisp trees on it.
 //
 // Pure: no Three, no DOM, no wall clock, no rng. Registered in
 // RENDER_PURE_CORES (tests/architecture.test.ts); driven directly by
@@ -105,6 +105,42 @@ export function islandVistaBounds(): {
     minZ: ISLAND_RECT.minZ,
     maxZ: ISLAND_RECT.maxZ,
   };
+}
+
+/**
+ * The horizon haze band for an isolated island view.
+ *
+ * Lifting the fog wall showed the far shore, and the far shore looked wrong:
+ * a flat pale strip of ground with fully saturated trees standing on it. The
+ * cause is that the aerial haze field (biome_haze_field) tints TERRAIN and
+ * WATER from 110 units out but never touches foliage or props, which is
+ * invisible on the mainland where the ground between you and the horizon
+ * fades continuously, and glaring across a strait where hazed ground meets
+ * unhazed trees with nothing in between. Scene fog covers everything, so a
+ * band placed over the strait restores one consistent aerial perspective and
+ * the far coast reads as distance again.
+ *
+ * The ordinary band is a fraction of the whole view envelope, roughly 920
+ * units out on this tier, because the far mesh normally paints ranges that
+ * ARE that distant. Nothing across the strait is remotely that far, which is
+ * why the envelope band left it untouched.
+ *
+ * The near edge is measured, not chosen: the nearest dry mainland ground is
+ * 133 units from the arrival, and the island's own ground reaches 203 units
+ * along its northern spit, so no radius separates them cleanly. 130 puts
+ * every piece of the far shore inside the band with a yard or two of margin,
+ * and the island ground it also catches is that same northern spit, seen
+ * across the same water, which wants the same aerial cue anyway. Everything
+ * the coached run actually uses (the camp, the strand, the Gauntlet lanes,
+ * the pearl cove) sits well inside 130 units of the arrival and is never
+ * touched. tests/island_isolation_core.test.ts re-measures both distances
+ * from the live terrain rather than trusting these numbers.
+ */
+export const ISLAND_HAZE_NEAR_YD = 130;
+export const ISLAND_HAZE_FAR_YD = 900;
+
+export function islandHorizonHaze(): { near: number; far: number } {
+  return { near: ISLAND_HAZE_NEAR_YD, far: ISLAND_HAZE_FAR_YD };
 }
 
 /**
