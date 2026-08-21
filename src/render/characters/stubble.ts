@@ -852,33 +852,53 @@ export function buildRegionDecalGeometry(
     tris = next;
   }
 
+  const nrmData = attrs.get('normal');
+  const posData = attrs.get('position');
+  const lift = headHeight(frame) * DECAL_LIFT;
+
   // 4b. drop the underside of the nose, AFTER subdividing so its edge is as
   //     fine as the rest of the decal. (Culling whole head faces here instead
   //     takes a bite out of the philtrum, which is the very thing the cull
-  //     exists to keep.) The vertices it orphans cost a few hundred bytes and
-  //     are never referenced.
-  const nrmData = attrs.get('normal');
-  const posData = attrs.get('position');
+  //     exists to keep.) Test both the source surface and the lifted decal
+  //     surface production returns: the male nose cap has boundary slivers
+  //     that only enter this angular window after the normal lift.
   if (nrmData && posData) {
     tris = tris.filter(([a, b, c]) => {
       let mt = 0;
       let ma = 0;
+      let liftedMt = 0;
+      let liftedMa = 0;
       let ny = 0;
       for (const v of [a, b, c]) {
+        const x = posData.data[v * 3];
+        const y = posData.data[v * 3 + 1];
+        const z = posData.data[v * 3 + 2];
         const [t, az] = headAngles(
           frame,
-          posData.data[v * 3],
-          posData.data[v * 3 + 1],
-          posData.data[v * 3 + 2],
+          x,
+          y,
+          z,
         );
         mt += t / 3;
         ma += az / 3;
         const nx = nrmData.data[v * 3];
         const nyv = nrmData.data[v * 3 + 1];
         const nz = nrmData.data[v * 3 + 2];
-        ny += nyv / (Math.hypot(nx, nyv, nz) || 1) / 3;
+        const len = Math.hypot(nx, nyv, nz) || 1;
+        const nnx = nx / len;
+        const nny = nyv / len;
+        const nnz = nz / len;
+        const [liftedT, liftedAz] = headAngles(
+          frame,
+          Math.fround(x + nnx * lift),
+          Math.fround(y + nny * lift),
+          Math.fround(z + nnz * lift),
+        );
+        liftedMt += liftedT / 3;
+        liftedMa += liftedAz / 3;
+        ny += nny / 3;
       }
-      return !isNoseUnderside(mt, ma, ny);
+      return !isNoseUnderside(mt, ma, ny) && !isNoseUnderside(liftedMt, liftedMa, ny);
     });
     if (!tris.length) return null;
   }
@@ -889,7 +909,6 @@ export function buildRegionDecalGeometry(
   if (!pos) return null;
   const count = pos.data.length / 3;
   const uv = new Float32Array(count * 2);
-  const lift = headHeight(frame) * DECAL_LIFT;
   for (let i = 0; i < count; i++) {
     const x = pos.data[i * 3];
     const y = pos.data[i * 3 + 1];
