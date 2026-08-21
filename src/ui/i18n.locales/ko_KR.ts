@@ -8930,6 +8930,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.menuControl': '메뉴',
   'hudChrome.mobile.menuControlAria':
     '메뉴. 탭하면 대화창이 열리고, 길게 누른 뒤 오른쪽으로 밀면 탈것, 지도, 가방 등을 열 수 있습니다.',
+  'hudChrome.mobile.questStripAria':
+    '추적 중인 퀘스트 {total}개 중 {position}번째: {title}. 다음 퀘스트를 보려면 누르십시오.',
+  'hudChrome.mobile.questStripAriaSingle': '추적 중인 퀘스트: {title}',
+  'hudChrome.mobile.questStripMore': '외 {count}개',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '베일 컵',
   'hudChrome.keybinds.categoryPet': '펫',

@@ -4,6 +4,7 @@ import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
+import { buildQuestStrip, type QuestStripController } from './quest_strip_controller';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 
 export interface QuestTrackerSettingsPort {
@@ -22,9 +23,16 @@ export interface QuestTrackerControllerDeps {
   click(): void;
 }
 
-/** Owns quest tracker projection, collapse persistence, and elided DOM updates. */
+/** Owns quest tracker projection, collapse persistence, and elided DOM updates.
+ *  The projection has TWO presentations: this right-anchored tracker on desktop,
+ *  and the top-band strip on touch, which is handed the same TrackedQuest[]
+ *  rather than projecting the log a second time. */
 export class QuestTrackerController {
-  constructor(private readonly deps: QuestTrackerControllerDeps) {}
+  private readonly strip: QuestStripController | null;
+
+  constructor(private readonly deps: QuestTrackerControllerDeps) {
+    this.strip = buildQuestStrip({ click: () => this.deps.click() });
+  }
 
   update(): void {
     let collapsed = this.deps.settings.collapsed();
@@ -60,6 +68,13 @@ export class QuestTrackerController {
     if (collapsed && quests.length === 0 && this.deps.settings.available()) {
       this.deps.settings.setCollapsed(false);
       collapsed = false;
+    }
+    // On touch the strip IS the tracker: the right-anchored markup is hidden in
+    // hud.mobile.css, so rendering it would be a string build a phone never sees.
+    if (this.strip?.active() === true) {
+      this.strip.update(quests);
+      if (this.deps.element.innerHTML !== '') this.deps.element.innerHTML = '';
+      return;
     }
     const html = this.renderHtml(questTrackerView(quests, collapsed));
     if (this.deps.element.innerHTML !== html) this.deps.element.innerHTML = html;

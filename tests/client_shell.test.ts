@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { QUEST_STRIP_MAX_OBJECTIVES } from '../src/ui/hud/quest/quest_strip_core';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 // The CSS extraction moved the :root tokens and the reset/base
@@ -1374,6 +1375,7 @@ describe('client HTML shell', () => {
         'id="mobile-menu-anchor"',
         'id="mobile-menu-strip"',
         'id="mobile-menu-cancel"',
+        'id="quest-strip"',
       ]) {
         expect(body, `${name}: ${id} escaped #mobile-controls`).toContain(id);
       }
@@ -2427,6 +2429,58 @@ describe('client HTML shell', () => {
     expect(mobileActionRingTs).toContain('handleMobileAttackTap(');
     expect(mobileActionRingTs).toContain('activateAttack: () => deps.activateFixedAttackSlot(),');
     expect(hudTs).toContain('activateFixedAttackSlot: () => this.activateFixedAttackSlot(),');
+  });
+
+  it('replaces the right-anchored quest tracker with the top-band strip on touch', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      // To the end of the touch-controls container, whose tag differs per entry
+      // (a <section> in index.html, a <div> in play.html), so the bound is the
+      // More tray that follows it in both.
+      const stripAt = entry.indexOf('<div id="quest-strip"');
+      const strip = entry.slice(stripAt, entry.indexOf('id="mobile-extra-controls"', stripAt));
+      // ONE control: the whole box cycles, so a tap never has to find a chevron.
+      expect([...strip.matchAll(/<button /g)], name).toHaveLength(1);
+      expect(strip, name).toContain('id="quest-strip-main"');
+      // It reuses the panel chrome rather than shipping a second copy of it.
+      expect(strip, name).toContain('class="panel"');
+      // The objective lines are STATIC, exactly the cap the core enforces plus
+      // the overflow line, so the painter mints no nodes on the HUD's band.
+      const objectives = [...strip.matchAll(/class="quest-strip-obj"/g)];
+      expect(objectives, name).toHaveLength(QUEST_STRIP_MAX_OBJECTIVES);
+      expect(strip, name).toContain('id="quest-strip-more"');
+      // The chevrons are a HINT, never buttons: hidden from assistive tech,
+      // which reads the position off the control's own accessible name instead.
+      expect(strip, name).toContain(
+        'id="quest-strip-cycle" class="quest-strip-cycle" aria-hidden="true"',
+      );
+      expect(strip, name).not.toContain('<button type="button" id="quest-strip-prev"');
+      expect(strip, name).not.toContain('<button type="button" id="quest-strip-next"');
+      // Starts hidden: an unlabeled empty box must never flash before the first
+      // tracked quest arrives.
+      expect(entry, name).toContain('<div id="quest-strip" class="empty">');
+    }
+    // The tracker it replaces is HIDDEN on touch, not restyled; desktop is
+    // untouched, and the other trackers in the stack are unaffected.
+    expect(hudMobileCss).toContain('body.mobile-touch #quest-tracker {\n    display: none;\n  }');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #quest-tracker {\n    font-size:');
+    expect(hudCss).toContain('#quest-tracker {');
+    // The hit surface is a CONSTANT pad around a box that shrinks with the
+    // objective count, so it never falls under the touch floor.
+    expect(hudMobileCss).toContain('--quest-strip-hit-pad: 12px;');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #quest-strip-main::before {\n    content: "";\n    position: absolute;\n    inset: calc(var(--quest-strip-hit-pad) * -1);',
+    );
+    // The swipe is horizontal, so the browser must not claim it as a pan, and
+    // the box takes pointer events over an otherwise click-through layer.
+    const stripRule =
+      /body\.mobile-touch #quest-strip-main \{([^}]*)\}/.exec(hudMobileCss)?.[1] ?? '';
+    expect(stripRule).toContain('touch-action: none;');
+    expect(stripRule).toContain('pointer-events: auto;');
+    // A touch that starts on the strip is HUD chrome, never a camera drag.
+    expect(touchRouterTs).toContain("'#quest-strip',");
   });
 
   it('keeps joystick autorun on the move pad and Jump on the ring bottom row', () => {

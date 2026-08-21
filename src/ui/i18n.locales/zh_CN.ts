@@ -8558,6 +8558,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.menuControl': '菜单',
   'hudChrome.mobile.menuControlAria':
     '菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。',
+  'hudChrome.mobile.questStripAria':
+    '追踪任务 {position}/{total}：{title}。点按可切换到下一个任务。',
+  'hudChrome.mobile.questStripAriaSingle': '追踪任务：{title}',
+  'hudChrome.mobile.questStripMore': '还有 {count} 项',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷杯',
   'hudChrome.keybinds.categoryPet': '宠物',

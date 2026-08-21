@@ -1823,6 +1823,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/action_bar/radial_gesture_controller.ts',
   'src/ui/hud/menu/menu_control_controller.ts',
   'src/ui/hud/menu/menu_strip_gesture_controller.ts',
+  'src/ui/hud/quest/quest_strip_controller.ts',
+  'src/ui/hud/quest/quest_strip_gesture_controller.ts',
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',

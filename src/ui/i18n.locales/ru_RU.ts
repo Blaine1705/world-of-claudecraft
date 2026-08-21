@@ -9080,6 +9080,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.menuControl': 'Меню',
   'hudChrome.mobile.menuControlAria':
     'Меню. Нажмите, чтобы открыть чат, или удерживайте и проведите вправо для транспорта, карты, сумок и других разделов.',
+  'hudChrome.mobile.questStripAria':
+    'Отслеживаемое задание {position} из {total}: {title}. Нажмите, чтобы перейти к следующему.',
+  'hudChrome.mobile.questStripAriaSingle': 'Отслеживаемое задание: {title}',
+  'hudChrome.mobile.questStripMore': 'ещё {count}',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.keybinds.categoryPet': 'Питомец',

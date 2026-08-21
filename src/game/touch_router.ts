@@ -86,7 +86,9 @@ export interface TouchRouterEvent {
  *  row it opens (`#mobile-consumable-strip`, a SIBLING of the ring rather than a
  *  child, so ring containment does not reach it), the menu control's strip
  *  (`#mobile-menu-strip`, a sibling for the same reason, and whose caption and
- *  cancel target are not `.mobile-btn`), the generic
+ *  cancel target are not `.mobile-btn`), the top-band quest strip
+ *  (`#quest-strip`, whose whole box is one swipe target and whose constant hit
+ *  pad reaches past the panel `.panel` would match), the generic
  *  window/panel chrome (`.window`, `.panel`), and the minimap/daily-chest/
  *  chat-log widgets (Phase 5 of the mobile combat HUD rework: none of these
  *  are `.window`/`.panel`/`.mobile-btn`, so a swipe starting on them was
@@ -98,6 +100,7 @@ const INTERACTIVE_HUD_SELECTORS = [
   '#mobile-action-ring',
   '#mobile-consumable-strip',
   '#mobile-menu-strip',
+  '#quest-strip',
   '.window',
   '.panel',
   '#minimap-wrap',

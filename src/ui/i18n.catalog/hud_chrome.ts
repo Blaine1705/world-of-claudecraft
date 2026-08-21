@@ -583,6 +583,21 @@ export const hudChromeStrings = {
     menuControlAria:
       'Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.',
     menuLabel: 'Menu',
+    // The top-band quest strip (Phase 5): the touch replacement for the
+    // right-anchored quest tracker, showing ONE quest with all of its objectives
+    // instead of a list that grew into the action ring. questStripAria is the
+    // strip's accessible name and has to say what activating it DOES, because
+    // the visible chevrons are a hint rather than buttons; questStripAriaSingle
+    // drops the position when there is nothing to cycle to. The objective lines
+    // reuse questUi.detail.objectiveProgress and the "(Complete)" marker reuses
+    // questUi.tracker.complete, so no key for either lives here.
+    // questStripCounter is token-only and so exempt from the M16 non-Latin fill
+    // requirement; the two aria strings and questStripMore are WORDY, so the
+    // five non-Latin overlays carry real fills.
+    questStripAria: 'Tracked quest {position} of {total}: {title}. Activate for the next quest.',
+    questStripAriaSingle: 'Tracked quest: {title}',
+    questStripCounter: '{position}/{total}',
+    questStripMore: '+{count} more',
     // Target swap (#mobile-target-cycle, replacing the old Target Closest
     // button): a crosshair-icon secondary button that cycles the hostile
     // target via the Tab-target path (acquire-nearest now lives on the ring's

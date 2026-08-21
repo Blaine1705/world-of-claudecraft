@@ -1441,6 +1441,161 @@
       border: 3px double Highlight;
     }
   }
+  /* The top-band quest strip (#quest-strip), the touch replacement for the
+     right-anchored #quest-tracker (hidden below on this HUD). LEFT-TOP anchored:
+     the painter writes only left/top/max-width, so a quest with four objectives
+     grows the box down and right from the point the player's thumb already
+     learned instead of moving it. Seated in viewport coordinates by
+     quest_strip_controller.ts, which is why it is a direct child of
+     #mobile-controls (the shared app-viewport box) and not of a transformed
+     control. */
+  body.mobile-touch #quest-strip {
+    /* The hit surface grows by this much in every direction; see the ::before
+       below for why it is a constant rather than part of the panel. */
+    --quest-strip-hit-pad: 12px;
+    /* The height BOUND, and the whole point of the strip: the tracker it
+       replaces had none, so a second quest pushed it 42px into the action ring.
+       Four objective lines plus the overflow line, clipped. */
+    --quest-strip-objs-max-height: 72px;
+    position: absolute;
+    left: 12px;
+    top: 6px;
+    max-width: 60%;
+    display: block;
+    pointer-events: none;
+    opacity: var(--touch-opacity, 1);
+    z-index: 31;
+  }
+  body.mobile-touch #quest-strip.empty {
+    display: none;
+  }
+  body.mobile-touch #quest-strip-main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    width: 100%;
+    min-height: 30px;
+    padding: 4px 8px;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    line-height: 1.25;
+    text-align: left;
+    color: var(--color-text-overlay);
+    text-shadow: 1px 1px 2px #000;
+    /* The one control on this strip: the whole box cycles, so the touch never
+       has to find a small chevron. touch-action none because the gesture IS a
+       horizontal swipe and the browser would otherwise claim it as a pan. */
+    pointer-events: auto;
+    touch-action: none;
+  }
+  /* The hit surface is a CONSTANT pad around the panel, not padding inside it:
+     the visual box shrinks with the objective count (a one-objective quest is
+     half the height of a four-objective one) and a hit area that shrank with it
+     would fall under the touch floor exactly when the strip got small. Nothing
+     here clips it, which is why the height bound lives on .quest-strip-objs
+     instead of on this button. */
+  body.mobile-touch #quest-strip-main::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--quest-strip-hit-pad) * -1);
+  }
+  body.mobile-touch #quest-strip-main.gesturing {
+    border-color: var(--gold);
+  }
+  body.mobile-touch #quest-strip-main:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  /* A FIXED line box, so the row is exactly as tall with the position hint as
+     without it. Letting the children size it made the strip 1px shorter at a
+     single tracked quest, which is a height that moves with the quest count:
+     the one thing the strip exists to stop. */
+  body.mobile-touch .quest-strip-title-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    line-height: 15px;
+  }
+  body.mobile-touch .quest-strip-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-family: var(--title-font);
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body.mobile-touch #quest-strip-complete {
+    flex: none;
+  }
+  /* The position hint. A HINT, never buttons: the chevrons say the thing cycles,
+     which "2/3" alone does not, and making them targets was what earned the
+     "what is the +2 supposed to do" report in the lab. */
+  body.mobile-touch .quest-strip-cycle {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--gold);
+    font-size: 10px;
+  }
+  body.mobile-touch .quest-strip-arrow {
+    opacity: 0.65;
+  }
+  /* The cycle confirms itself: the chevron matching the direction taken pulses,
+     which is how a player learns the swipe did something. TWO alternating
+     classes because re-adding one class does not restart an animation, and the
+     only other way to force it is a reflow read on the paint path. */
+  body.mobile-touch .quest-strip-arrow.flash-a,
+  body.mobile-touch .quest-strip-arrow.flash-b {
+    animation: quest-strip-arrow-flash 320ms ease-out;
+  }
+  @keyframes quest-strip-arrow-flash {
+    0% {
+      opacity: 1;
+      color: #fff;
+    }
+    100% {
+      opacity: 0.65;
+      color: var(--gold);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch .quest-strip-arrow.flash-a,
+    body.mobile-touch .quest-strip-arrow.flash-b {
+      animation: none;
+    }
+  }
+  body.mobile-touch .quest-strip-objs {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    width: 100%;
+    max-height: var(--quest-strip-objs-max-height);
+    overflow: hidden;
+  }
+  body.mobile-touch .quest-strip-obj {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body.mobile-touch .quest-strip-obj.done {
+    color: var(--color-text-success);
+  }
+  body.mobile-touch .quest-strip-more {
+    opacity: 0.75;
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch #quest-strip-main.gesturing {
+      border: 3px double Highlight;
+    }
+  }
   body.mobile-touch #mobile-action-ring button.empty .icon-label {
     background-image: none;
   }
@@ -2736,8 +2891,12 @@
     top: max(150px, env(safe-area-inset-top));
     width: calc(190px * var(--mobile-chrome-scale, 1));
   }
+  /* The right-anchored tracker is REPLACED on touch by #quest-strip above, not
+     restyled: it is fixed-width per tier and unbounded in height, so every extra
+     quest grew it down into the action ring. Desktop keeps it untouched, and the
+     other trackers in #right-tracker-stack are unaffected. */
   body.mobile-touch #quest-tracker {
-    font-size: 11px;
+    display: none;
   }
   body.mobile-touch #meters-window {
     position: fixed;
@@ -6239,9 +6398,6 @@
       top: 94px;
       transform: scale(1.27);
     }
-    body.mobile-touch #quest-tracker {
-      display: none;
-    }
     body.mobile-touch #meters-window {
       position: fixed;
       left: calc(max(20px, env(safe-area-inset-left)) + 112px);
@@ -6372,8 +6528,20 @@
     width: calc(148px * var(--mobile-chrome-scale, 1));
     top: max(96px, env(safe-area-inset-top));
   }
-  body.mobile-touch.hud-mobile-compact #quest-tracker {
+  /* Compact (short landscape phones): the strip keeps its anchor and its type
+     scale but bounds the objective block harder, because this tier has the least
+     vertical room between the band and the action ring. */
+  body.mobile-touch.hud-mobile-compact #quest-strip {
+    --quest-strip-objs-max-height: 60px;
+  }
+  body.mobile-touch.hud-mobile-compact #quest-strip-main {
     font-size: 10px;
+  }
+  body.mobile-touch.hud-mobile-compact .quest-strip-title {
+    font-size: 11px;
+  }
+  body.mobile-touch.hud-mobile-compact .quest-strip-title-row {
+    line-height: 14px;
   }
   body.mobile-touch.hud-mobile-compact #minimap-wrap {
     /* Keep compact phones slightly tighter than the landscape baseline while

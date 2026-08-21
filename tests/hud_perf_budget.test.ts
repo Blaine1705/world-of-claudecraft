@@ -557,6 +557,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/consumable_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/menu/menu_strip_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/quest/quest_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
@@ -774,6 +775,17 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   {
     file: 'hud/menu/menu_strip_gesture_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
+    driverAllow: {},
+  },
+  // The quest strip's seat. Its ONE rect helper is shared by all four measures
+  // (the app-viewport container, the band's occupants, the target frame's
+  // reserved slot and the strip's own height), and it runs only when a cheap
+  // key built from non-layout reads moves: the rendered content, the viewport,
+  // the tier/scale attributes, or the target frame coming or going. A steady
+  // HUD on the tracker's medium band takes no layout read at all.
+  {
+    file: 'hud/quest/quest_strip_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
   // The gather-node hover tip (the phase 14 QA's countdown clock): pointer

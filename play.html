@@ -1211,6 +1211,31 @@
       <button type="button" id="mobile-menu-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
       <div id="mobile-menu-caption" class="panel" aria-hidden="true"><span class="tt-title"></span></div>
     </div>
+    <!-- Top-band quest strip: the touch replacement for the right-anchored
+         #quest-tracker, which is fixed-width per tier and UNBOUNDED in height
+         (measured: 122 x 42px over the action ring at only two quests). ONE
+         quest at a time with all of its objectives, so the height stops being a
+         function of the quest count. A tap or a swipe LEFT advances, a swipe
+         RIGHT goes back, and the chevrons flanking the position are a HINT, not
+         buttons. Seated by quest_strip_controller.ts against the band's measured
+         occupants; the objective lines are static because the strip caps them at
+         QUEST_STRIP_MAX_OBJECTIVES plus the overflow line. -->
+    <div id="quest-strip" class="empty">
+      <button type="button" id="quest-strip-main" class="panel">
+        <span class="quest-strip-title-row">
+          <span id="quest-strip-title" class="quest-strip-title"></span>
+          <span id="quest-strip-complete" class="quest-complete"></span>
+          <span id="quest-strip-cycle" class="quest-strip-cycle" aria-hidden="true"><span id="quest-strip-prev" class="quest-strip-arrow">&#8249;</span><span id="quest-strip-count" class="quest-strip-count"></span><span id="quest-strip-next" class="quest-strip-arrow">&#8250;</span></span>
+        </span>
+        <span class="quest-strip-objs">
+          <span class="quest-strip-obj"></span>
+          <span class="quest-strip-obj"></span>
+          <span class="quest-strip-obj"></span>
+          <span class="quest-strip-obj"></span>
+          <span id="quest-strip-more" class="quest-strip-obj quest-strip-more"></span>
+        </span>
+      </button>
+    </div>
   </div>
       <div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" aria-hidden="true">
         <div class="panel-title">
