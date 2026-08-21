@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "es_ES": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "fr_FR": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "fr_CA": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "de_DE": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "nl_NL": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "pl_PL": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "id_ID": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "tr_TR": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "sv_SE": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "vi_VN": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ],
+  "da_DK": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title"
+  ]
 };
