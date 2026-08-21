@@ -258,6 +258,28 @@ describe('PortraitSnapshotTarget', () => {
       expect(encodeCanvasPng).toHaveBeenCalledTimes(1);
     });
 
+    it('does not latch the rebuilt rig when a stale backstop expires after dispose', async () => {
+      // A graphics rebuild during an in-flight capture: dispose CLEARS the
+      // latch so the new rig gets a fresh chance at the fence-backed arm, and
+      // the stale backstop must not take it away again. Without the guard the
+      // rebuilt rig silently spends the rest of the session on the synchronous
+      // toBlob path, which is the slow arm this whole change exists to avoid.
+      const h = harness();
+      const snapshot = new PortraitSnapshotTarget(SIZE);
+      const wedged = snapshot.capture(h.renderer, () => {});
+      snapshot.dispose();
+      await vi.advanceTimersByTimeAsync(PORTRAIT_READBACK_LIVENESS_BACKSTOP_MS + 1);
+      await expect(wedged).resolves.toBeNull();
+
+      // The next capture still takes the async arm.
+      h.calls.length = 0;
+      vi.mocked(encodeCanvasPng).mockClear();
+      const next = snapshot.capture(h.renderer, () => {});
+      h.readback.resolve();
+      await expect(next).resolves.toBe('data:image/png;base64,async');
+      expect(encodeCanvasPng).not.toHaveBeenCalled();
+    });
+
     it('leaves no armed backstop behind once a readback lands', async () => {
       const h = harness();
       const snapshot = new PortraitSnapshotTarget(SIZE);

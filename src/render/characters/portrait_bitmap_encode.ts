@@ -32,6 +32,13 @@ type WorkerResponse = { requestId: number; url?: string; error?: string };
 
 let worker: Worker | null = null;
 let workerUnavailable = false;
+// Bumped by every dispose. A failure that started before a graphics rebuild
+// must not latch the transfer arm off for the rig that replaced it: dispose
+// deliberately CLEARS `workerUnavailable` to give the new rig a fresh chance,
+// and an in-flight rejection, backstop or worker error landing afterwards
+// would silently take it away again. Sync failures need no guard; only the
+// ones that can outlive their own capture carry the epoch.
+let epoch = 0;
 let nextRequestId = 1;
 const waiters = new Map<number, (url: string | null) => void>();
 
@@ -106,14 +113,15 @@ export function encodeCanvasBitmapPng(
     markUnavailable();
     return null;
   }
+  const at = epoch;
   return snapshot.then(
     (bitmap) => {
       onSnapshot?.();
-      return transfer(active, bitmap, size);
+      return transfer(active, bitmap, size, at);
     },
     () => {
       onSnapshot?.();
-      markUnavailable();
+      markUnavailableAt(at);
       return null;
     },
   );
@@ -123,6 +131,7 @@ export function encodeCanvasBitmapPng(
  *  settle with null rather than hanging, and a rebuilt rig gets a fresh chance
  *  at the worker path. */
 export function disposePortraitEncodeWorker(): void {
+  epoch++;
   terminate();
   workerUnavailable = false;
 }
@@ -151,14 +160,20 @@ function ensureWorker(): Worker | null {
     // requests already in flight.
     waiter(typeof response.url === 'string' ? response.url : null);
   });
-  const fail = (): void => markUnavailable();
+  const at = epoch;
+  const fail = (): void => markUnavailableAt(at);
   created.addEventListener('error', fail);
   created.addEventListener('messageerror', fail);
   worker = created;
   return created;
 }
 
-function transfer(active: Worker, bitmap: ImageBitmap, size: number): Promise<string | null> {
+function transfer(
+  active: Worker,
+  bitmap: ImageBitmap,
+  size: number,
+  at: number,
+): Promise<string | null> {
   // The snapshot is asynchronous, so the worker this request was meant for can
   // die (or be disposed) between the call and the bitmap. Posting to it anyway
   // would leave a request nothing ever answers, held open until the backstop.
@@ -170,7 +185,7 @@ function transfer(active: Worker, bitmap: ImageBitmap, size: number): Promise<st
   return new Promise<string | null>((resolve) => {
     const backstop = setTimeout(() => {
       waiters.delete(requestId);
-      markUnavailable();
+      markUnavailableAt(at);
       resolve(null);
     }, PORTRAIT_ENCODE_LIVENESS_BACKSTOP_MS);
     waiters.set(requestId, (url) => {
@@ -183,7 +198,7 @@ function transfer(active: Worker, bitmap: ImageBitmap, size: number): Promise<st
       clearTimeout(backstop);
       waiters.delete(requestId);
       bitmap.close();
-      markUnavailable();
+      markUnavailableAt(at);
       resolve(null);
     }
   });
@@ -194,6 +209,11 @@ function transfer(active: Worker, bitmap: ImageBitmap, size: number): Promise<st
 function markUnavailable(): void {
   terminate();
   workerUnavailable = true;
+}
+
+/** The same, from a path that may have outlived its own rig (see `epoch`). */
+function markUnavailableAt(at: number): void {
+  if (at === epoch) markUnavailable();
 }
 
 function terminate(): void {

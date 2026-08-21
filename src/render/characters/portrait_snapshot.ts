@@ -252,14 +252,24 @@ export class PortraitSnapshotTarget {
    * The success path hands back the very buffer it filled.
    */
   private awaitReadback(readback: Promise<unknown>, pixels: Uint8Array): Promise<boolean> {
+    // Captured with the readback, not read at latch time: a graphics rebuild
+    // during an in-flight capture disposes this rig and CLEARS `asyncFailed`,
+    // so a stale rejection landing afterwards would latch the fence-backed arm
+    // off for the REBUILT rig and cost it every later portrait. The commit
+    // paths below already carry this guard; the latches are the ones that
+    // outlive their own capture.
+    const generation = this.generation;
+    const latchIfCurrent = (): void => {
+      if (generation === this.generation) this.latchReadback();
+    };
     return new Promise<boolean>((resolve) => {
       const backstop = setTimeout(() => {
-        this.latchReadback();
+        latchIfCurrent();
         resolve(false);
       }, PORTRAIT_READBACK_LIVENESS_BACKSTOP_MS);
       const settle = (landed: boolean): void => {
         clearTimeout(backstop);
-        if (!landed) this.latchReadback();
+        if (!landed) latchIfCurrent();
         resolve(landed);
       };
       readback.then(
@@ -273,10 +283,22 @@ export class PortraitSnapshotTarget {
    * The transfer arm: draw into the rig's default framebuffer and hand that
    * frame to the encode worker as a transferable ImageBitmap.
    *
-   * The snapshot is taken inside `encodeCanvasBitmapPng`, synchronously with
-   * the draw, so a later capture on the shared rig cannot bleed into this one
-   * (the same guarantee `toBlob` gives). Nothing here is shared between
-   * captures, so unlike the readback arm two of them may run at once.
+   * `encodeCanvasBitmapPng` calls `createImageBitmap` in the same synchronous
+   * block as the draw, but the HTML spec does NOT promise the pixel copy
+   * happens at call time (the copy runs in a queued task), so the claim is held
+   * until the snapshot promise resolves rather than released at the call. That
+   * is correct under both readings: if the copy really is synchronous the extra
+   * hold only costs a concurrent capture its top arm, and if it is not, the
+   * hold is what keeps a later draw out of the frame being copied.
+   *
+   * Known gap, deliberately not closed here: `captureSync` draws into this same
+   * default framebuffer and takes NO claim, and it is reachable while a
+   * snapshot is in flight (transfer arm skipped on the claim, then the readback
+   * arm unusable because it is latched or already busy). Closing it needs a
+   * capture that can defer its draw, and the contract above forbids that: the
+   * caller releases the subject as soon as the promise exists. Nothing here is
+   * shared between transfer captures, so unlike the readback arm two of them
+   * may run at once.
    */
   private captureViaTransfer(
     renderer: PortraitSnapshotRenderer,

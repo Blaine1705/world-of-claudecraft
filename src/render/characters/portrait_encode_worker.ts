@@ -76,3 +76,8 @@ scope.addEventListener('message', (event) => {
       }),
     );
 });
+
+// No public surface: this file is a worker ENTRY, loaded by URL from
+// portrait_bitmap_encode.ts. The empty export is what makes it a module for
+// `type: "module"` (and for the test that imports it to drive its handler).
+export {};
