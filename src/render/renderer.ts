@@ -287,7 +287,6 @@ import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
 import {
   createFireLightAdopter,
-  pruneFireLights,
   reparentStrandedLightsToScene,
   runFireLightBudgetPass,
 } from './fire_light_registry';
@@ -355,6 +354,7 @@ import {
   type FogSceneState,
   isOpenAirFogState,
 } from './interior_light_rig';
+import { retireInteriorGroup as retireInteriorGroupImpl } from './interior_retirement';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -8497,9 +8497,7 @@ export class Renderer {
         e.templateId !== 'delve_destructible_wall'
       ) {
         if (!this.sparkleMat) {
-          // Renderer-lifetime singleton on every loot sparkle Sprite; tagged
-          // shared defensively (the mesh-scoped view disposal skips Sprites
-          // today, but a widened traversal must never free this).
+          // Renderer-lifetime singleton; shared-tagged so no disposal frees it.
           this.sparkleMat = markSharedMaterial(
             new THREE.SpriteMaterial({
               map: sparkleTexture(),
@@ -8550,11 +8548,13 @@ export class Renderer {
       if (result.reused) body.rotation.y = (e.id % 7) * 0.45;
       objectMesh = body;
       if (!this.sparkleMat) {
-        this.sparkleMat = new THREE.SpriteMaterial({
-          map: sparkleTexture(),
-          transparent: true,
-          depthWrite: false,
-        });
+        this.sparkleMat = markSharedMaterial(
+          new THREE.SpriteMaterial({
+            map: sparkleTexture(),
+            transparent: true,
+            depthWrite: false,
+          }),
+        );
         if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
       }
       sparkle = new THREE.Sprite(this.sparkleMat);
@@ -9174,10 +9174,8 @@ export class Renderer {
   // empty slot frees after 60s and the next run rebuilds at the same z-stacked
   // origin, so a stale group would overlap the new build and its torch lights
   // would stack into the per-frame fire-light budget forever. Tracked per key;
-  // every build retires the others (a descended-from floor included: there is
-  // no way back up). Retiring also disposes the build's own unshared
-  // geometry/materials and instance buffers; the shared kit caches are
-  // tagged in dungeon.ts and survive (see retireInteriorGroup).
+  // every build retires the others (a descended-from floor included), which
+  // also frees the build's own unshared GPU resources (interior_retirement.ts).
   private riftInteriorGroups = new Map<string, THREE.Group>();
   // Protect Yumi maze interiors, one per match slot, built lazily like the
   // arena copies; their update() anchors the team beacons each frame.
@@ -9213,32 +9211,18 @@ export class Renderer {
   private riftFogAuthored = false;
   private fogState: FogSceneState = 'outdoor';
 
-  /** Drop a retired interior's scene nodes, prune its lights/flames out of
-   * the per-frame registries, and free its per-build GPU resources. Cached
-   * kit geometry and the pack/tint/glow material caches are shared-tagged
-   * (dungeon.ts), so the disposal below frees only what THIS build minted:
-   * the rift platform/ice/pool/illusion-wall meshes, per-wall occluder-fade
-   * clones, and every InstancedMesh's per-build instanceMatrix buffer. A
-   * 1-2 hour rift session descends through dozens of floors; before this,
-   * each retired floor left all of that resident for the session. */
+  // Node drop + registry pruning + per-build GPU disposal: interior_retirement.ts.
   private retireInteriorGroup(group: THREE.Group): void {
-    this.scene.remove(group);
-    const doomed = new Set<THREE.Object3D>();
-    group.traverse((o) => doomed.add(o));
-    // pruneFireLights answers whether the registry changed, and the rank MUST
-    // follow: the rebuild guard compares ranked.length against a COUNT, so a
-    // retire that removes as many lights as a same-microtask build added would
-    // leave a stale rank holding the retired floor and missing the new one.
-    if (pruneFireLights(this.fireLights, doomed)) this.lightRankDirty = true;
-    for (let i = this.flames.length - 1; i >= 0; i--) {
-      if (doomed.has(this.flames[i])) this.flames.splice(i, 1);
-    }
-    this.dungeons?.retireHideables(doomed);
-    disposeUnsharedMeshResources(group, {
-      geometries: true,
-      materials: true,
-      instanceBuffers: true,
-    });
+    retireInteriorGroupImpl(
+      {
+        scene: this.scene,
+        fireLights: this.fireLights,
+        flames: this.flames,
+        onLightRankDirty: () => void (this.lightRankDirty = true),
+        retireHideables: (doomed) => this.dungeons?.retireHideables(doomed),
+      },
+      group,
+    );
   }
 
   // The one construction point for DungeonInteriors: every build path (first
@@ -9717,10 +9701,9 @@ export class Renderer {
                 this.riftInteriorGroups.set(key, group);
               })
               .catch((err) => {
-                // Release the key: it was claimed synchronously above, and a
-                // failed build that kept it would block this floor from ever
-                // rebuilding (and strand the entry in builtInteriors).
-                this.builtInteriors.delete(key);
+                // Cooldown release: immediate would retry a hard failure every
+                // frame; keeping the key blocked the floor from rebuilding.
+                setTimeout(() => this.builtInteriors.delete(key), 15000);
                 console.error('Failed to build rift interior:', err);
               });
           }
@@ -10289,6 +10272,7 @@ export class Renderer {
     this.nameplatePainter.remove(id);
     const idx = this.clickTargets.indexOf(v.clickTarget);
     if (idx >= 0) this.clickTargets.splice(idx, 1);
+    let disposeObjectResources = false;
     if (v.visual) {
       // Character geometry/materials are shared per-asset caches and must
       // survive interest churn, dispose only per-instance mixer bindings.
@@ -10308,13 +10292,10 @@ export class Renderer {
           height: v.height,
         });
       } else {
-        // Object views own their geometries AND materials unless tagged shared
-        // (shared_resource.ts): door/portal/kit resources are prewarmed and
-        // tagged, while per-view mints (rift puzzle prop glows and recolors,
-        // delve glow discs) are not, and interest churn used to leak every one
-        // of those materials for the session.
+        // Object views own geometry and materials unless shared-tagged; churn
+        // used to leak them. Traversal runs BELOW the state-visual disposes.
         if (v.objectMesh) disposeSoulwellVisual(v.objectMesh);
-        disposeUnsharedMeshResources(v.group, { geometries: true, materials: true });
+        disposeObjectResources = true;
       }
     }
     v.iceBlockVisual?.dispose();
@@ -10326,6 +10307,8 @@ export class Renderer {
     v.paladinOathChainVisual?.dispose();
     v.paladinAegisVisual?.dispose();
     v.paladinSunVerdictVisual?.dispose();
+    if (disposeObjectResources)
+      disposeUnsharedMeshResources(v.group, { geometries: true, materials: true });
     this.audioSink?.mountEngineReset(id);
     this.views.delete(id);
   }

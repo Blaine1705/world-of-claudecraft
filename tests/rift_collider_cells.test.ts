@@ -127,7 +127,10 @@ describe('rift collider cell index', () => {
       const rand = lcg(11);
       const points = samplePoints(fixture.origin, rand);
       for (const p of points) {
-        for (const r of [0.05, 0.3, 0.5, MAX_BODY_RADIUS]) {
+        // 1.0 exceeds MAX_BODY_RADIUS: the movement arm must fall back to the
+        // full floor list (the boulder push resolves at r = 1.0, and a
+        // single-cell read at that radius could miss a wall 0.8-1.0 yd out).
+        for (const r of [0.05, 0.3, 0.5, MAX_BODY_RADIUS, 1.0]) {
           const fast = resolvePosition(
             WORLD_SEED,
             p.x,
@@ -179,6 +182,97 @@ describe('rift collider cell index', () => {
       expect(checkedBlocked).toBeGreaterThan(0);
       expect(checkedClear).toBeGreaterThan(0);
     }
+  });
+
+  it('resolves floor 0 identically at slot 0 and a later slot, negative local z included', () => {
+    // The regression this pins: the O(1) region lookup derived its candidate
+    // origin with riftOriginAt, whose slot-major floor() maps a z just SOUTH
+    // of a slot's floor 0 into the previous slot's top floor, so floor 0 of
+    // every slot past 0 silently lost collision on its south half (the entry
+    // area at local z -11 included). Same collider list, two slots: every
+    // local-frame answer must match, and the sweep must hit real colliders
+    // in the negative-z window.
+    const plan = generateRiftFloor(777001, 25, 0);
+    const colliders = layoutColliders(plan.layout);
+    const o0 = riftInstanceOrigin(0, 0);
+    const o5 = riftInstanceOrigin(5, 0);
+    const t0 = allocRiftCollisionToken();
+    const t5 = allocRiftCollisionToken();
+    setRiftRegion(t0, o0.x, o0.z, colliders);
+    setRiftRegion(t5, o5.x, o5.z, colliders);
+    let movedNegativeZ = 0;
+    for (let lx = -RIFT_REGION_HALF_X; lx <= RIFT_REGION_HALF_X; lx += 1.7) {
+      for (let lz = -RIFT_REGION_HALF_Z; lz <= RIFT_REGION_HALF_Z; lz += 2.9) {
+        const a = resolvePosition(
+          WORLD_SEED,
+          o0.x + lx,
+          o0.z + lz,
+          0.5,
+          false,
+          undefined,
+          undefined,
+          t0,
+        );
+        const b = resolvePosition(
+          WORLD_SEED,
+          o5.x + lx,
+          o5.z + lz,
+          0.5,
+          false,
+          undefined,
+          undefined,
+          t5,
+        );
+        expect(b.x - o5.x, `lx=${lx} lz=${lz}`).toBeCloseTo(a.x - o0.x, 9);
+        expect(b.z - o5.z, `lx=${lx} lz=${lz}`).toBeCloseTo(a.z - o0.z, 9);
+        if (lz < 0 && (Math.abs(a.x - (o0.x + lx)) > 1e-4 || Math.abs(a.z - (o0.z + lz)) > 1e-4))
+          movedNegativeZ++;
+      }
+    }
+    // Vacuousness guard: the south half must contain real pushes, or the
+    // parity above proves nothing about the regression window.
+    expect(movedNegativeZ).toBeGreaterThan(0);
+    // Sight parity through the south wall, the exact live symptom.
+    const from = { x: o5.x, z: o5.z - 25 };
+    const to = { x: o5.x, z: o5.z + 5 };
+    const at0 = lineOfSightClear(
+      WORLD_SEED,
+      { x: o0.x, z: o0.z - 25 },
+      { x: o0.x, z: o0.z + 5 },
+      0.05,
+      undefined,
+      t0,
+    );
+    expect(lineOfSightClear(WORLD_SEED, from, to, 0.05, undefined, t5)).toBe(at0);
+  });
+
+  it('still pushes a wide body off a wall past the registration margin', () => {
+    // The boulder-push shape: r = 1.0 against a wall whose surface sits
+    // between MAX_BODY_RADIUS and r away from the sample point. The
+    // single-cell contract cannot see that wall; the wide-radius fallback
+    // must. Probe real walls: walk points 0.9 yd off every box collider face
+    // and require at least some of them to resolve away at r = 1.0.
+    const { fixture, colliders } = publishFloor(24601, 30, 0, 5);
+    let pushed = 0;
+    for (const c of colliders) {
+      if (c.type !== 'obb') continue;
+      const p = {
+        x: fixture.origin.x + c.x + (c.hw + 0.9) * Math.cos(c.rot),
+        z: fixture.origin.z + c.z + (c.hw + 0.9) * Math.sin(c.rot),
+      };
+      const res = resolvePosition(
+        WORLD_SEED,
+        p.x,
+        p.z,
+        1.0,
+        false,
+        undefined,
+        undefined,
+        fixture.indexed,
+      );
+      if (Math.abs(res.x - p.x) > 1e-4 || Math.abs(res.z - p.z) > 1e-4) pushed++;
+    }
+    expect(pushed).toBeGreaterThan(0);
   });
 
   it('detects the region only inside the half-extent box, edges inclusive', () => {

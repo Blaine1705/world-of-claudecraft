@@ -49,7 +49,7 @@ import {
   PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
-  riftOriginAt,
+  riftNearestFloorOriginZ,
   STRIP_MAX_X,
   STRIP_MIN_X,
   yumiMazeOriginAt,
@@ -1888,8 +1888,10 @@ interface RiftRegion {
 // token -> floor origin z -> region. Every region shares RIFT_X_MIN as its ox
 // and floor origins are RIFT_FLOOR_SPACING (340) apart while regions span
 // +/- RIFT_REGION_HALF_Z (160), so origins never collide and oz is a unique
-// key. riftOriginAt derives the only candidate origin for a position, making
-// the lookup O(1) instead of a scan over every occupied slot.
+// key. riftNearestFloorOriginZ derives the only candidate origin for a
+// position, making the lookup O(1) instead of a scan over every occupied
+// slot (NEVER riftOriginAt here: its slot clamp maps the south half of a
+// floor 0 into the previous slot's top floor).
 const RIFT_REGIONS = new Map<number, Map<number, RiftRegion>>();
 let NEXT_RIFT_TOKEN = 1;
 
@@ -1912,19 +1914,33 @@ export function setRiftRegion(
     byOz = new Map();
     RIFT_REGIONS.set(token, byOz);
   }
-  byOz.set(oz, { ox, oz, colliders, cells: buildColliderCellIndex(colliders, cellSize) });
+  // The seam may only WIDEN cells (the reference token's one giant cell): a
+  // smaller-than-GRID_CELL cell would break the registration-margin
+  // completeness argument, so clamp.
+  const size = cellSize === undefined ? undefined : Math.max(cellSize, GRID_CELL);
+  byOz.set(oz, { ox, oz, colliders, cells: buildColliderCellIndex(colliders, size) });
 }
 
 export function clearRiftRegion(token: number, ox: number, oz: number): void {
-  RIFT_REGIONS.get(token)?.delete(oz);
+  const byOz = RIFT_REGIONS.get(token);
+  if (!byOz) return;
+  // oz is the key (every origin shares RIFT_X_MIN as its ox); the ox guard
+  // keeps a mismatched clear from deleting someone else's region if that
+  // invariant ever breaks. Drop the emptied inner map so throwaway Sims
+  // (character creation constructs one per call) leave nothing behind.
+  if (byOz.get(oz)?.ox === ox) byOz.delete(oz);
+  if (byOz.size === 0) RIFT_REGIONS.delete(token);
 }
 
 function riftRegionAt(token: number, x: number, z: number): RiftRegion | null {
   const byOz = RIFT_REGIONS.get(token);
   if (!byOz) return null;
   // The nearest floor origin is the only region that can contain (x, z):
-  // regions are 320 deep on 340 spacing, so they never overlap.
-  const region = byOz.get(riftOriginAt(z).z);
+  // regions are 320 deep on 340 spacing, so they never overlap. MUST be the
+  // true nearest-origin derivation (riftNearestFloorOriginZ, allocation-free,
+  // once per movement resolve and per 0.5 yd sight sample), never
+  // riftOriginAt: see the map comment above.
+  const region = byOz.get(riftNearestFloorOriginZ(z));
   if (!region) return null;
   if (Math.abs(x - region.ox) > RIFT_REGION_HALF_X || Math.abs(z - region.oz) > RIFT_REGION_HALF_Z)
     return null;
@@ -2003,8 +2019,10 @@ export function resolvePosition(
     const lz = z - region.oz;
     // Single-cell read by the ORIGINAL point, the same contract as the
     // open-world arm below: complete for r <= MAX_BODY_RADIUS via the
-    // registration margin (collider_cells.ts).
-    const list = colliderCellAt(region.cells, lx, lz);
+    // registration margin (collider_cells.ts). A wider body (the boulder
+    // push resolves at r = 1.0) falls back to the full floor list, which is
+    // exactly the pre-index scan: rare, per-interaction, and byte-identical.
+    const list = r <= MAX_BODY_RADIUS ? colliderCellAt(region.cells, lx, lz) : region.colliders;
     if (!list) return { x, z };
     const local = resolveAgainst(list, lx, lz, r, ignoreFences);
     return { x: local.x + region.ox, z: local.z + region.oz };

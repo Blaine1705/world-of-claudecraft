@@ -995,20 +995,24 @@ export class DungeonInteriors {
 
   private templeWaterMaterial(): THREE.ShaderMaterial {
     if (this.waterMat) return this.waterMat;
-    this.waterMat = new THREE.ShaderMaterial({
-      uniforms: {
-        ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
-        uTime: sharedUniforms.uTime,
-        uShallow: { value: new THREE.Color(0x49c9bd) },
-        uDeep: { value: new THREE.Color(0x07303c) },
-        uGlow: { value: new THREE.Color(0x76f0dd) },
-      },
-      vertexShader: TEMPLE_WATER_VERT,
-      fragmentShader: TEMPLE_WATER_FRAG,
-      transparent: true,
-      depthWrite: false,
-      fog: true,
-    });
+    // Instance-lifetime cache (temple + drowned-court floods); shared-tagged
+    // like flameGeo so an interior retire can never free it.
+    this.waterMat = markSharedMaterial(
+      new THREE.ShaderMaterial({
+        uniforms: {
+          ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
+          uTime: sharedUniforms.uTime,
+          uShallow: { value: new THREE.Color(0x49c9bd) },
+          uDeep: { value: new THREE.Color(0x07303c) },
+          uGlow: { value: new THREE.Color(0x76f0dd) },
+        },
+        vertexShader: TEMPLE_WATER_VERT,
+        fragmentShader: TEMPLE_WATER_FRAG,
+        transparent: true,
+        depthWrite: false,
+        fog: true,
+      }),
+    );
     return this.waterMat;
   }
 
@@ -2238,7 +2242,10 @@ export class DungeonInteriors {
     const dir = pt.x < 0 ? 1 : -1; // toward the centre aisle
     p.add('torch_mounted', pt.x + dir * 0.98, 5.5, pt.z, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 1.6);
 
-    this.flameGeo ??= new THREE.ConeGeometry(0.22, 0.6, 6);
+    // Instance-lifetime cache shared by every interior's torch flames; the
+    // shared tag keeps the interior-retire disposal off it (untagged, the
+    // first rift-floor retire would free it under every other interior).
+    this.flameGeo ??= markSharedGeometry(new THREE.ConeGeometry(0.22, 0.6, 6));
     const flame = new THREE.Mesh(
       this.flameGeo,
       new THREE.MeshLambertMaterial({

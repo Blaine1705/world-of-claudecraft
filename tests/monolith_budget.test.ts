@@ -286,7 +286,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/colliders.ts',
-    ceiling: 2660,
+    // Lowered from 2660 after the cell-index math moved out to
+    // collider_cells.ts (the ratchet rule: extraction lowers the ceiling).
+    ceiling: 2630,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
 ];

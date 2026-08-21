@@ -6403,8 +6403,11 @@ export class Sim {
       // Instance corpse fields (a cleared rift floor's packs) never decay or
       // respawn, so once every dead-branch effect is provably spent the corpse
       // stops paying updateMob. Radius-gated like the live cull: the radius is
-      // the interest-drop radius, so a skipped corpse is by definition out of
-      // every player's replicated view. Dead mobs draw no rng, so the skip
+      // the interest-drop radius, so a skipped corpse is outside every
+      // player's replicated view EXCEPT a viewer's own target (targets get
+      // NPC_DROP_RADIUS, slightly wider); that is safe today because the only
+      // frozen fields are two timers nothing serializes, and any change to
+      // that must re-check this exception. Dead mobs draw no rng, so the skip
       // cannot shift the shared draw order.
       if (!isInertInstanceCorpse(mob)) return false;
     } else if (

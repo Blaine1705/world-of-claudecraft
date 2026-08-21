@@ -49,8 +49,17 @@ export function colliderBounds(c: Collider): {
   if (c.type === 'circle') {
     return { minX: c.x - c.r, maxX: c.x + c.r, minZ: c.z - c.r, maxZ: c.z + c.r };
   }
-  const ext = Math.hypot(c.hw, c.hd);
-  return { minX: c.x - ext, maxX: c.x + ext, minZ: c.z - ext, maxZ: c.z + ext };
+  // Exact AABB of the rotated OBB. The old circumscribed hypot(hw, hd) bound
+  // filed a long thin wall (half-length ~75) into every cell of its floor,
+  // defeating the cell separation for exactly the collider class rift floors
+  // have most of. Tightening is behavior-safe: bounds only ever ADD colliders
+  // to cells, and an over-included collider is a push-out no-op, so shrinking
+  // to the true extent cannot change any resolution result.
+  const cos = Math.abs(Math.cos(c.rot));
+  const sin = Math.abs(Math.sin(c.rot));
+  const ex = c.hw * cos + c.hd * sin;
+  const ez = c.hw * sin + c.hd * cos;
+  return { minX: c.x - ex, maxX: c.x + ex, minZ: c.z - ez, maxZ: c.z + ez };
 }
 
 /** A cell index over one fixed collider list (a generated rift floor). Built

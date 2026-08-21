@@ -143,7 +143,11 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
  * - owned corpses: pets/demons unravel via their corpseTimer;
  * - detonate fuses: Death Throes must still burst;
  * - FFA windows: the owner-lock lapse must still count down;
- * - auras: the caller would also skip updateAuras;
+ * - auras: the caller would also skip updateAuras (whose dead arm still
+ *   recomputes `stealthed`), and unbreakable-control auras survive death, so
+ *   such corpses simply keep ticking rather than risk frozen aura state;
+ * - a stealth-flagged corpse: the dead updateAuras arm is what clears the
+ *   flag, so it must run at least until the flag settles;
  * - Nythraxis: onBossDeath drives its death dialogue from the dead branch;
  * - worldBoss templates: the world-boss scheduler reads boss.corpseTimer to
  *   reclaim the corpse (none spawn in an instance band today; insurance).
@@ -156,6 +160,7 @@ export function isInertInstanceCorpse(mob: Entity): boolean {
     mob.detonateTimer === Infinity &&
     mob.lootFfaTimer <= 0 &&
     mob.auras.length === 0 &&
+    !mob.stealthed &&
     !mob.nythraxis &&
     MOBS[mob.templateId]?.worldBoss !== true
   );

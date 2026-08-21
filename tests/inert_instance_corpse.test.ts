@@ -41,6 +41,13 @@ describe('isInertInstanceCorpse', () => {
     const withAura = riftCorpse();
     withAura.auras.push({ id: 'x', kind: 'dot', duration: 3, value: 1 } as never);
     expect(isInertInstanceCorpse(withAura)).toBe(false);
+    // A stealth-flagged corpse must keep ticking: updateAuras' dead arm is
+    // what settles the flag, and freezing it could ship a stealthed corpse.
+    expect(isInertInstanceCorpse(riftCorpse({ stealthed: true }))).toBe(false);
+    // Nythraxis: its death dialogue is driven from the dead branch.
+    const nythraxis = riftCorpse();
+    (nythraxis as { nythraxis?: unknown }).nythraxis = { phase: 'dead', deathSpoken: false };
+    expect(isInertInstanceCorpse(nythraxis)).toBe(false);
   });
 
   it('rejects a world-boss template corpse even inside an instance band', () => {

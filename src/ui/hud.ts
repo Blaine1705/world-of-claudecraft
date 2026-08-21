@@ -1593,9 +1593,7 @@ export class Hud {
   private resurrectHealerBtnEl = $('#resurrect-healer-btn');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
-  // WeakMaps on purpose (all four): keyed by element, never enumerated, and a
-  // strong Map pinned every removed party/raid row's subtree for the session.
-  private hotWriteCache: SingleSlotCache = new WeakMap();
+  private hotWriteCache: SingleSlotCache = new WeakMap(); // WeakMap rationale: painter_host.ts
   // Multi-slot caches for the per-frame writers: one element holds many
   // custom properties / toggled classes, so these key per (element, prop) and
   // (element, class) instead of the single slot per element hotWriteCache uses.
