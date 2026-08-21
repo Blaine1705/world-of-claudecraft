@@ -103,12 +103,13 @@ const NYTHRAXIS_SOUL_REND_MARKS_HEROIC = 6;
 // rng, so the normal trace and parity golden are unchanged. Both dealDamage
 // calls below pass alreadyFinal for their calibrated-lethal heroic case, so a
 // source-side damage-done reduction on the boss (Direhowl) cannot pull either
-// hit back under 100%; Veilbound Mark reaches the same class of reduction
-// through an ungated fold elsewhere in dealDamage and is not yet closed here
-// (issue #3508).
+// hit back under 100%. Deathless Rage also suppresses the matching Veilbound
+// Mark reduction around its final heroic hit, because that source-side fold
+// applies before dealDamage reaches the alreadyFinal-guarded folds.
 const NYTHRAXIS_SOUL_REND_HEROIC_MULT = 1.5;
 const NYTHRAXIS_DEATHLESS_PCT = 0.82;
 const NYTHRAXIS_DEATHLESS_PCT_HEROIC = 1.15;
+const VEILBOUND_MARK_ID = 'veilbound_mark';
 
 // Whether this boss's claimed instance is heroic (the arena instance is found
 // the same way the add spawns find it: by mobIds membership).
@@ -1240,10 +1241,32 @@ export function updateNythraxisDeathlessRage(
   // The cast resolved uninterrupted: the wardens task fails for this attempt.
   deedsMod.onDeathlessRageResolvedForDeeds(ctx, boss);
   for (const p of playersInNythraxisRoom(ctx, boss)) {
+    dealNythraxisDeathlessRageHit(ctx, boss, p, ragePct);
+  }
+  // Heroic: an uninterrupted Deathless Rage (the pillar cast) raises the court
+  // right after it lands, and it repeats each Deathless Rage cycle in phase 2 -
+  // but only once the previous court has fallen, so the adds never stack.
+  if (isHeroicNythraxis(ctx, boss) && !nythraxisHeroicCourtPending(ctx, st)) {
+    startNythraxisHeroicSummon(ctx, boss, st);
+  }
+}
+
+function dealNythraxisDeathlessRageHit(
+  ctx: SimContext,
+  boss: Entity,
+  target: Entity,
+  ragePct: number,
+): void {
+  const alreadyFinal = ragePct > 1;
+  const suppressedVeilboundMarks = alreadyFinal
+    ? boss.auras.filter((aura) => aura.id === VEILBOUND_MARK_ID && aura.sourceId === target.id)
+    : [];
+  for (const aura of suppressedVeilboundMarks) aura.id = `${VEILBOUND_MARK_ID}_suppressed`;
+  try {
     ctx.dealDamage(
       boss,
-      p,
-      Math.ceil(p.maxHp * ragePct),
+      target,
+      Math.ceil(target.maxHp * ragePct),
       false,
       'shadow',
       'Deathless Rage',
@@ -1258,15 +1281,14 @@ export function updateNythraxisDeathlessRage(
       // damage-done debuff on the boss (Direhowl's aoeAttackPower pct form)
       // from pulling it back under the raid's health pool. Normal's 82% was
       // never a guaranteed kill by design, so it keeps taking every source-
-      // side reduction it always did (Direhowl included).
-      ragePct > 1,
+      // side reduction it always did (Direhowl included). The matching
+      // Veilbound Mark on the boss is suppressed for the same final heroic
+      // hit because that source-side reduction is applied before alreadyFinal
+      // in dealDamage.
+      alreadyFinal,
     );
-  }
-  // Heroic: an uninterrupted Deathless Rage (the pillar cast) raises the court
-  // right after it lands, and it repeats each Deathless Rage cycle in phase 2 -
-  // but only once the previous court has fallen, so the adds never stack.
-  if (isHeroicNythraxis(ctx, boss) && !nythraxisHeroicCourtPending(ctx, st)) {
-    startNythraxisHeroicSummon(ctx, boss, st);
+  } finally {
+    for (const aura of suppressedVeilboundMarks) aura.id = VEILBOUND_MARK_ID;
   }
 }
 
