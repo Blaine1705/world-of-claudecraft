@@ -8206,6 +8206,47 @@
     font-weight: 400;
     color: var(--color-text-muted);
   }
+  /* The HUD-tracker eye at the summary's right edge: a pressed toggle (the
+     paperdoll helm/playtime eye idiom) whose lit state mirrors the strip
+     being on screen. Pushed to the row's end so the readouts keep their left
+     rhythm; the pin-button chip palette keeps it in the window's family. */
+  .reliquary-tracker-toggle {
+    flex: none;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid #6a5320;
+    background: #241c0c;
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .reliquary-tracker-toggle .ui-icon {
+    width: 14px;
+    height: 14px;
+    flex: none;
+  }
+  /* Hidden state: the eye-off glyph plus a dimmed chip, so the switch reads
+     at a glance without relying on the icon swap alone. */
+  .reliquary-tracker-toggle[aria-pressed="false"] {
+    color: var(--color-text-muted);
+    border-color: #4a3d1d;
+  }
+  .reliquary-tracker-toggle:hover {
+    filter: brightness(1.12);
+  }
+  .reliquary-tracker-toggle:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .reliquary-tracker-toggle {
+    min-height: 40px;
+  }
   /* Phase 6: Curator rank seal chrome (cosmetic only; no combat info).
      Phase 14 removed this block's reduced-motion box-shadow suppression on
      purpose: the tier glows are STATIC shadows that never animate, so hiding

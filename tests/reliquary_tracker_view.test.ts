@@ -14,11 +14,13 @@ import { describe, expect, it } from 'vitest';
 import { DEED_WATCH_CAP } from '../src/ui/deeds_view';
 import {
   buildReliquaryTrackerViewInto,
+  makeReliquaryTrackerInput,
   makeReliquaryTrackerView,
   pruneReliquaryPins,
   RELIQUARY_FLASH_BUILDS,
   RELIQUARY_TRACK_CAP,
   type ReliquaryTrackerView,
+  type ReliquaryTrackerWorld,
   reliquaryTrackerOwnershipSig,
   toggleReliquaryPin,
 } from '../src/ui/reliquary_tracker_view';
@@ -52,7 +54,7 @@ function completionFrom(progress: Progress): (pageId: string) => ReliquaryPageCo
 function build(
   out: ReliquaryTrackerView,
   progress: Progress,
-  opts: { pinned?: string[]; sig?: number; collapsed?: boolean } = {},
+  opts: { pinned?: string[]; sig?: number; collapsed?: boolean; enabled?: boolean } = {},
 ): ReliquaryTrackerView {
   return buildReliquaryTrackerViewInto(out, {
     pinned: new Set(opts.pinned ?? []),
@@ -60,6 +62,7 @@ function build(
     completion: completionFrom(progress),
     ownershipSig: () => opts.sig ?? 0,
     collapsed: opts.collapsed ?? false,
+    enabled: opts.enabled ?? true,
   });
 }
 
@@ -315,6 +318,7 @@ describe('buildReliquaryTrackerViewInto: allocation contract', () => {
         pinned: new Set(),
         pageIds: Object.keys(progress),
         completion: counting,
+        enabled: true,
         ownershipSig: () => {
           sigCalls++;
           return sig;
@@ -352,6 +356,7 @@ describe('buildReliquaryTrackerViewInto: allocation contract', () => {
         pinned: new Set(['page']),
         pageIds: ['page'],
         completion: counting,
+        enabled: true,
         ownershipSig: () => {
           sigCalls++;
           return 7;
@@ -564,6 +569,121 @@ describe('pruneReliquaryPins', () => {
 });
 
 // ---------------------------------------------------------------------------
+describe('makeReliquaryTrackerInput', () => {
+  const makeWorld = (): ReliquaryTrackerWorld & {
+    itemsDiscovered: Set<string>;
+    mounts: string[];
+  } => {
+    const itemsDiscovered = new Set<string>();
+    const mounts: string[] = [];
+    return {
+      itemsDiscovered,
+      mounts,
+      reliquaryPageCompletion: (pageId) =>
+        pageId === 'page' ? { owned: 1, total: 4, complete: false } : null,
+      deedStats: { itemsDiscovered },
+      reliquaryMarks: new Set<string>(),
+      deedsEarned: new Map<string, string>(),
+      ownedMounts: () => mounts,
+      accountCosmetics: { weaponSkinIds: [] },
+    };
+  };
+
+  it('routes completion reads to the LIVE world (a swap is picked up, not the minted one)', () => {
+    let world = makeWorld();
+    const input = makeReliquaryTrackerInput(() => world);
+    expect(input.completion('page')).toEqual({ owned: 1, total: 4, complete: false });
+    // Swap the world behind the thunk (the offline-to-online transition): the
+    // REUSED input must follow without being re-minted.
+    world = makeWorld();
+    world.reliquaryPageCompletion = () => null;
+    expect(input.completion('page')).toBeNull();
+  });
+
+  it('moves the ownership signature when any surface grows', () => {
+    const world = makeWorld();
+    const input = makeReliquaryTrackerInput(() => world);
+    const before = input.ownershipSig();
+    world.itemsDiscovered.add('relic');
+    const afterItem = input.ownershipSig();
+    expect(afterItem).not.toBe(before);
+    world.mounts.push('mount');
+    expect(input.ownershipSig()).not.toBe(afterItem);
+  });
+
+  it('mints the per-build fields at their safe defaults (shown, expanded, unpinned)', () => {
+    const input = makeReliquaryTrackerInput(makeWorld);
+    expect(input.enabled).toBe(true);
+    expect(input.collapsed).toBe(false);
+    expect(input.pinned.size).toBe(0);
+  });
+});
+
+describe('the master switch (enabled)', () => {
+  it('hides the strip and pays for no world reads while disabled', () => {
+    const view = makeReliquaryTrackerView();
+    let completionCalls = 0;
+    let sigCalls = 0;
+    buildReliquaryTrackerViewInto(view, {
+      pinned: new Set(['page']),
+      pageIds: ['page'],
+      completion: (pageId) => {
+        completionCalls++;
+        return completionFrom({ page: { owned: 1, total: 4 } })(pageId);
+      },
+      ownershipSig: () => {
+        sigCalls++;
+        return 1;
+      },
+      collapsed: false,
+      enabled: false,
+    });
+    expect(view.visible).toBe(false);
+    expect(view.count).toBe(0);
+    // The whole point of the early-out: a player who turned the strip off
+    // pays nothing for it, pinned or not, every slow band.
+    expect(completionCalls).toBe(0);
+    expect(sigCalls).toBe(0);
+  });
+
+  it('still carries the collapse through, so re-enable restores the same fold state', () => {
+    const view = makeReliquaryTrackerView();
+    build(
+      view,
+      { page: { owned: 1, total: 4 } },
+      { pinned: ['page'], enabled: false, collapsed: true },
+    );
+    expect(view.collapsed).toBe(true);
+  });
+
+  it('re-enabling is a first sighting: fills that happened while hidden do not flash', () => {
+    const progress: Progress = { page: { owned: 1, total: 4 } };
+    const view = makeReliquaryTrackerView();
+    build(view, progress, { pinned: ['page'] });
+    expect(view.lines[0].flash).toBe(false);
+    // Hidden across the fill: the previous-build table is cleared, so the
+    // owned rise is invisible to the delta pass when the strip returns.
+    build(view, progress, { pinned: ['page'], enabled: false });
+    progress.page.owned = 3;
+    const shown = build(view, progress, { pinned: ['page'] });
+    expect(shown.visible).toBe(true);
+    expect(shown.lines[0].owned).toBe(3);
+    expect(shown.lines[0].flash).toBe(false);
+  });
+
+  it('a fill while VISIBLE still flashes after an enabled build (control arm)', () => {
+    // The control for the test above: same fill, no hidden build in between,
+    // so a broken prev-table clear cannot pass both.
+    const progress: Progress = { page: { owned: 1, total: 4 } };
+    const view = makeReliquaryTrackerView();
+    build(view, progress, { pinned: ['page'] });
+    progress.page.owned = 3;
+    const shown = build(view, progress, { pinned: ['page'] });
+    expect(shown.lines[0].flash).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Chrome the strip depends on outside this module
 // ---------------------------------------------------------------------------
 
@@ -601,17 +721,27 @@ describe('tracker chrome', () => {
     // stale ranking straight through the fill that should have re-ranked it,
     // which is invisible in the pure core (it takes the number, not the reads).
     // Pinned as five separate lines so the failure names the missing surface.
-    expect(trackerBody, 'itemsDiscovered').toContain(
-      'itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,',
+    // The reads live in makeReliquaryTrackerInput (this module) since the
+    // input construction was extracted out of hud.ts; the factory body is the
+    // scope so a matching line elsewhere can never satisfy a pin.
+    const viewSrc = read('../src/ui/reliquary_tracker_view.ts');
+    const factoryBody = stripComments(
+      sliceBetween(viewSrc, 'export function makeReliquaryTrackerInput(', '\nexport function'),
     );
-    expect(trackerBody, 'reliquaryMarks').toContain('marks: this.sim.reliquaryMarks.size,');
-    // The input object is minted once and reused (the deed tracker's
-    // allocation-free drive precedent): the lazy-init spelling is the pin.
-    expect(trackerBody, 'reused input').toContain('this.reliquaryTrackerInput ??= {');
-    expect(trackerBody, 'deedsEarned').toContain('deedsEarned: this.sim.deedsEarned.size,');
-    expect(trackerBody, 'ownedMounts').toContain('mounts: this.sim.ownedMounts().length,');
-    expect(trackerBody, 'weaponSkinIds').toContain(
-      'weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,',
+    expect(factoryBody, 'itemsDiscovered').toContain(
+      'itemsDiscovered: w.deedStats.itemsDiscovered.size,',
+    );
+    expect(factoryBody, 'reliquaryMarks').toContain('marks: w.reliquaryMarks.size,');
+    expect(factoryBody, 'deedsEarned').toContain('deedsEarned: w.deedsEarned.size,');
+    expect(factoryBody, 'ownedMounts').toContain('mounts: w.ownedMounts().length,');
+    expect(factoryBody, 'weaponSkinIds').toContain(
+      'weaponSkins: w.accountCosmetics.weaponSkinIds.length,',
+    );
+    // The input object is minted once by the factory and reused (the deed
+    // tracker's allocation-free drive precedent): the lazy-init spelling over
+    // the live-world thunk is the pin.
+    expect(trackerBody, 'reused input').toContain(
+      'this.reliquaryTrackerInput ??= makeReliquaryTrackerInput(() => this.sim);',
     );
   });
 

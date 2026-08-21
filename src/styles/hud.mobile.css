@@ -4366,6 +4366,23 @@
   body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-chevron {
     display: none;
   }
+  /* Compact count chips, both trackers at once: with the rows folded away the
+     header is the whole surface, and the desktop treatment (14px title font on
+     a bare underlined button) read enormous over the world on a 390px-tall
+     phone. Restyle it as a pill in the minimap cluster's own chrome (the clock
+     pill's palette) and hug the right rail under the minimap; the coarse-pointer
+     40px min-height keeps the tap target. */
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-header,
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-header {
+    margin: 0 0 4px auto;
+    gap: 5px;
+    padding: 2px 12px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: radial-gradient(circle at 50% 30%, #2c2c3a, #14141d);
+    box-shadow: 0 2px 4px #0009;
+  }
   /* ---------- mobile Reliquary (standalone window) ---------- */
   /* Full-bleed safe-area panel, horizontal shelf chips, 40px targets. The
      body column collapses the desktop rail into a chip row (deeds idiom). */
@@ -5978,9 +5995,14 @@
   body.mobile-touch.hud-mobile-compact.mobile-chat-open #chat-input {
     bottom: calc(env(safe-area-inset-bottom) + 68px);
   }
+  /* Resting seat only: tracker_stack_anchor.ts re-seats the stack below the
+     minimap column's REAL rendered bottom (the 0.57-scaled column ends near
+     140px at stock chrome scale, and the old 96px seat painted the tracker
+     chips over the compass and clock). The constant here is the no-JS
+     first-paint fallback, tuned to the stock-scale measurement. */
   body.mobile-touch.hud-mobile-compact #right-tracker-stack {
     width: calc(148px * var(--mobile-chrome-scale, 1));
-    top: max(96px, env(safe-area-inset-top));
+    top: max(140px, env(safe-area-inset-top));
   }
   body.mobile-touch.hud-mobile-compact #quest-tracker {
     font-size: 10px;
