@@ -515,7 +515,7 @@ describe('chat-moderation live-state pushes (server/chat_mod_live.ts wiring)', (
     hydration.release();
   });
 
-  it('liftChatMuteLive does not override an active DB mute in an in-flight hydration', () => {
+  it('liftChatMuteLive pushes the unmute into an in-flight hydration', () => {
     const server = new GameServer();
     const ws = fakeWs();
     expectJoined(server.join(ws, 11, 101, 'WasMuted', 'warrior', null));
@@ -525,7 +525,7 @@ describe('chat-moderation live-state pushes (server/chat_mod_live.ts wiring)', (
     server.liftChatMuteLive(11);
 
     const dbMuted = { ...UNMUTED, mutedUntil: '2099-01-01T00:00:00.000Z' };
-    expect(hydration.resolve(dbMuted)).toEqual(dbMuted);
+    expect(hydration.resolve(dbMuted)).toEqual(UNMUTED);
     hydration.release();
   });
 

@@ -1057,16 +1057,15 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
     {
       label: 'unmute',
       hydrated: '2099-01-01T00:00:00.000Z',
-      committed: { mutedUntil: null, reason: 'lifted', strikes: 1 },
-      expected: { mutedUntil: '2099-01-01T00:00:00.000Z', reason: '', chatStrikes: 1 },
+      committed: { mutedUntil: null, reason: '', strikes: 1 },
+      expected: { mutedUntil: null, reason: '', chatStrikes: 1 },
     },
   ])(
     // Reproduces the RESUME race server/chat_mod_live.ts exists to close (the
-    // reported bug: a linkdead session's reconnect): a mute pushed onto this
-    // account WHILE the auth query snapshot below is still in flight must win
-    // over that now-stale snapshot. A local live unmute does not prove it is
-    // newer than an active DB mute snapshot from another process, so that arm
-    // fails closed and keeps the mute. Strikes remain independently fenced.
+    // reported bug: a linkdead session's reconnect): a mute or committed admin
+    // unmute pushed onto this account WHILE the auth query snapshot below is
+    // still in flight must win over that now-stale snapshot. Strikes remain
+    // independently fenced.
     'uses a committed chat-moderation $label that arrives during auth hydration on resume',
     async ({ hydrated, committed, expected }) => {
       const current = setup();

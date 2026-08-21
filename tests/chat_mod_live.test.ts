@@ -23,19 +23,31 @@ describe('ChatModerationLiveState', () => {
     hydration.release();
   });
 
-  it('does not let a local live unmute override an active DB mute from another process', () => {
+  it('prefers a live unmute pushed after hydration began over the stale muted snapshot', () => {
     const state = new ChatModerationLiveState();
     const hydration = state.beginHydration(1);
-    // The live push only proves this process changed after hydration began; it
-    // does not prove that a concurrent DB snapshot mute from another process is
-    // older. Fail closed and keep the active mute.
+    // Admin lift-mute commits before the live push. If this handshake's DB
+    // read began before that commit, the live unmute is newer than the muted
+    // snapshot it resolves against.
     state.muteChanged(1, { mutedUntil: null, reason: '' });
     const dbMuted = { ...MUTE, strikes: 0 };
-    expect(hydration.resolve(dbMuted)).toEqual(dbMuted);
+    expect(hydration.resolve(dbMuted)).toEqual(UNMUTED);
     hydration.release();
   });
 
-  it('trusts the fresh snapshot when the only push happened BEFORE hydration began', () => {
+  it('does not let an older cached local unmute override a fresh DB mute', () => {
+    const state = new ChatModerationLiveState();
+    // A local unmute cached before this hydration may be stale relative to a
+    // later mute committed by another process. With no new push during this
+    // hydration, the DB read wins.
+    state.muteChanged(1, { mutedUntil: null, reason: '' });
+    const hydration = state.beginHydration(1);
+    const fresh = { ...MUTE, strikes: 0 };
+    expect(hydration.resolve(fresh)).toEqual(fresh);
+    hydration.release();
+  });
+
+  it('trusts the fresh snapshot when the only mute push happened BEFORE hydration began', () => {
     const state = new ChatModerationLiveState();
     // A push that already landed (and, in production, already committed to
     // the DB the fresh read below models) is old news by the time hydration
