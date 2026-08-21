@@ -126,6 +126,7 @@ export class MobileActionRingPainter {
       this.petals.source.tick(),
       placement,
       this.petals.source.liveDirection(),
+      this.petals.source.cancelIsLive(),
     );
   }
 }

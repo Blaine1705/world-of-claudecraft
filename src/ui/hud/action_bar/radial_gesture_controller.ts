@@ -1,8 +1,9 @@
 // The touch gesture layer for the radial action ring: pointer capture, the
 // reveal timer, and measuring the pressed button. Every RULE it applies lives in
-// radial_gesture_core.ts (what a release means) or radial_action_core.ts (which
-// direction a drag points at, where the petals sit), so this module reads
-// pointers and reports; it decides nothing on its own.
+// radial_gesture_core.ts (what a release means, whether the cancel target is the
+// live choice) or radial_action_core.ts (which direction a drag points at, where
+// the petals sit), so this module reads pointers and reports; it decides nothing
+// on its own.
 //
 // The gesture: pointerdown arms, a quick tap casts the button's centre action, a
 // flick past FLICK_DEADZONE_PX casts that direction, and a stationary hold of
@@ -11,11 +12,20 @@
 // inside a global cooldown. Releasing back at the anchor with the petals open
 // cancels.
 //
-// Two things that cost real time when they are missing:
+// Three things that cost real time when they are missing:
 //   - Pointer capture is MANDATORY: a flick leaves the button long before the
 //     release, and without capture the pointerup is delivered elsewhere and the
 //     gesture is silently lost. setPointerCapture is called inside try/catch
-//     because a synthetic or already-released pointer id throws.
+//     because a synthetic or already-released pointer id throws, which is
+//     exactly why the window-level release backstop below exists: without it a
+//     throw plus a finger that left the button strands the drag forever and
+//     every ring button goes dead under a painted overlay.
+//   - Drags are keyed PER POINTER ID. Combat is played with two thumbs, so a
+//     second ring button pressed while the first is still held must cast too;
+//     one shared drag slot dropped it. The petal overlay stays single-owner
+//     (one reveal is seated around one button and two cannot coexist visually),
+//     so only the FIRST press to arm may open it: the second thumb still casts,
+//     it just casts without the learning affordance.
 //   - The press is shared. A rearrange long-press drag and an empowered-ability
 //     hold both bind the same button, so the radial asks before it acts and
 //     stays silent when one of them owns the press.
@@ -28,7 +38,11 @@ import {
   type RadialPlacement,
   resolveRadialDirection,
 } from './radial_action_core';
-import { resolveRadialRelease, shouldRevealOnDrag } from './radial_gesture_core';
+import {
+  radialCancelIsLive,
+  resolveRadialRelease,
+  shouldRevealOnDrag,
+} from './radial_gesture_core';
 
 // Petal geometry comes from the stylesheet, never from numbers here. A petal is
 // the same rendered size as the ring button that reveals it (both read
@@ -39,6 +53,13 @@ import { resolveRadialRelease, shouldRevealOnDrag } from './radial_gesture_core'
 // custom property, so only a literal parses back to a number.
 const RADIUS_RATIO_PROP = '--radial-radius-ratio';
 const EDGE_MARGIN_PROP = '--radial-margin';
+// The clamp box is the SHARED app-viewport box (#mobile-controls, #game-canvas,
+// #ui and #nameplates all size from it), never window.innerWidth/innerHeight:
+// whenever the two disagree (device emulation, pinch zoom, a mid-resize
+// snapshot) a petal clamped against the window lands off the overlay it is
+// painted into. Both are px literals written by syncAppViewport, so they parse.
+const APP_VIEWPORT_WIDTH_PROP = '--app-vw';
+const APP_VIEWPORT_HEIGHT_PROP = '--app-vh';
 /** Applied only where the stylesheet is absent (a DOM without hud.mobile.css). */
 const FALLBACK_PETAL_SIZE_PX = 46;
 const FALLBACK_RADIUS_RATIO = 1.35;
@@ -65,8 +86,9 @@ export interface RadialGestureDeps {
   /** A rearrange long-press drag went active under the finger. */
   dragActive(): boolean;
   /** Read and CLEAR the shared "this release was a drag, not a tap" flag. Read
-   *  on every release, armed or not: the empowered-hold path sets it on a press
-   *  the radial never armed, and a flag left set would swallow the next cast. */
+   *  on every release the radial owns, and on an unowned one only while no other
+   *  press is live: the empowered-hold path sets it on a press the radial never
+   *  armed, and a flag left set would swallow the next cast. */
   takeSuppressedPress(): boolean;
   /** The player opened the radial and chose nothing. */
   onCancel(): void;
@@ -88,8 +110,31 @@ function readMetric(style: CSSStyleDeclaration, prop: string, fallback: number):
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function readPx(value: string): number {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+/** The edge clearance the clamp keeps: the stylesheet's literal, widened to
+ *  whatever the device's safe area actually claims. env() cannot live in that
+ *  literal (a custom property comes back unresolved, see above), so the overlay
+ *  carries the insets as padding, which is inert under the global border-box
+ *  reset and, being a real property, does resolve to px. */
+function readEdgeMargin(style: CSSStyleDeclaration): number {
+  return Math.max(
+    readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
+    readPx(style.paddingTop),
+    readPx(style.paddingRight),
+    readPx(style.paddingBottom),
+    readPx(style.paddingLeft),
+  );
+}
+
 export class RadialGesture {
-  private drag: DragState | null = null;
+  private readonly drags = new Map<number, DragState>();
+  /** The one pointer allowed to open the petal overlay: the first press to arm
+   *  while nothing else was held. Cleared with that drag. */
+  private revealOwner: number | null = null;
 
   constructor(private readonly deps: RadialGestureDeps) {}
 
@@ -99,48 +144,67 @@ export class RadialGesture {
       btn.addEventListener('pointerdown', (e) => this.onDown(e as PointerEvent, index, btn));
       btn.addEventListener('pointermove', (e) => this.onMove(e as PointerEvent));
       btn.addEventListener('pointerup', (e) => this.onUp(e as PointerEvent));
-      btn.addEventListener('pointercancel', () => this.cancel());
+      btn.addEventListener('pointercancel', (e) => this.clearDrag((e as PointerEvent).pointerId));
       btn.addEventListener('click', (e) => {
         if ((e as MouseEvent).detail !== KEYBOARD_CLICK_DETAIL) return;
         if (this.deps.pressClaimed(index)) return;
         if (this.deps.hasSlot(index, 'center')) this.deps.cast(index, 'center');
       });
     });
+    // The backstop for a release the button never sees. It runs AFTER the
+    // button's own handler on an ordinary release (the event bubbles), so the
+    // gesture resolves first and this finds nothing left to drop.
+    const release = (e: Event) => this.clearDrag((e as PointerEvent).pointerId);
+    window.addEventListener('pointerup', release);
+    window.addEventListener('pointercancel', release);
   }
 
   /** True while the petals are showing, which is what makes the ring painter
    *  tick and paint them. */
   isOpen(): boolean {
-    return this.drag?.placement != null;
+    return this.owner()?.placement != null;
   }
 
   /** The ring button the open radial belongs to, or -1 when nothing is held.
    *  The petal view resolves its slots against this. */
   heldButtonIndex(): number {
-    return this.drag?.buttonIndex ?? -1;
+    return this.owner()?.buttonIndex ?? -1;
   }
 
   /** The direction the drag currently points at (the petal highlighted, or
    *  'center' for the cancel target). */
   liveDirection(): RadialDirection {
-    return this.drag?.direction ?? 'center';
+    return this.owner()?.direction ?? 'center';
   }
 
   placement(): RadialPlacement | null {
-    return this.drag?.placement ?? null;
+    return this.owner()?.placement ?? null;
+  }
+
+  /** Whether the centre cancel target is the live choice, straight from the
+   *  shared rule so the painter never re-derives it. */
+  cancelIsLive(): boolean {
+    return radialCancelIsLive(this.liveDirection(), this.isOpen());
+  }
+
+  /** The drag the petal overlay belongs to. A second thumb's press casts but
+   *  never paints, so every readout above answers for this one. */
+  private owner(): DragState | null {
+    return this.revealOwner === null ? null : (this.drags.get(this.revealOwner) ?? null);
   }
 
   private onDown(e: PointerEvent, buttonIndex: number, btn: HTMLElement): void {
-    if (this.drag) return;
+    if (this.drags.has(e.pointerId)) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     if (this.deps.pressClaimed(buttonIndex)) return;
     try {
       btn.setPointerCapture?.(e.pointerId);
     } catch {
       /* synthetic or already-released pointer id: the button-level move/up
-         listeners still resolve the drag while the finger stays on it */
+         listeners still resolve the drag while the finger stays on it, and the
+         window backstop drops it when the finger leaves */
     }
-    this.drag = {
+    const drag: DragState = {
       pointerId: e.pointerId,
       buttonIndex,
       btn,
@@ -148,37 +212,39 @@ export class RadialGesture {
       startY: e.clientY,
       direction: 'center',
       placement: null,
-      revealTimer: setTimeout(() => this.reveal(), RADIAL_REVEAL_MS),
+      revealTimer: null,
     };
+    if (this.revealOwner === null) this.revealOwner = e.pointerId;
+    drag.revealTimer = setTimeout(() => this.reveal(drag), RADIAL_REVEAL_MS);
+    this.drags.set(e.pointerId, drag);
     if (e.pointerType === 'touch') e.preventDefault();
   }
 
   /** Measure the pressed button and seat the radial around it. The one place
    *  this module reads layout, gated to the reveal rather than per frame. */
-  private reveal(): void {
-    const d = this.drag;
-    if (!d || d.placement) return;
+  private reveal(d: DragState): void {
+    if (d.placement || d.pointerId !== this.revealOwner) return;
     const rect = d.btn.getBoundingClientRect();
     const style = getComputedStyle(this.deps.metricsHost);
     const petalSize = rect.width > 0 ? rect.width : FALLBACK_PETAL_SIZE_PX;
     d.placement = placeRadial({
       buttonCx: rect.x + rect.width / 2,
       buttonCy: rect.y + rect.height / 2,
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
+      viewportWidth: readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth),
+      viewportHeight: readMetric(style, APP_VIEWPORT_HEIGHT_PROP, window.innerHeight),
       radius: petalSize * readMetric(style, RADIUS_RATIO_PROP, FALLBACK_RADIUS_RATIO),
       petalHalf: petalSize / 2,
-      margin: readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
+      margin: readEdgeMargin(style),
     });
   }
 
   private onMove(e: PointerEvent): void {
-    const d = this.drag;
-    if (!d || e.pointerId !== d.pointerId) return;
+    const d = this.drags.get(e.pointerId);
+    if (!d) return;
     // A rearrange drag activating under the finger takes the press over; the
     // petals must not sit on top of the slot the player is dragging.
     if (this.deps.dragActive()) {
-      this.cancel();
+      this.clearDrag(d.pointerId);
       return;
     }
     const next = resolveRadialDirection(
@@ -188,16 +254,20 @@ export class RadialGesture {
     );
     if (next === d.direction) return;
     d.direction = next;
-    if (shouldRevealOnDrag(next, d.placement !== null)) this.reveal();
+    if (shouldRevealOnDrag(next, d.placement !== null)) this.reveal(d);
   }
 
   private onUp(e: PointerEvent): void {
-    // Consumed FIRST and unconditionally: the rearrange drag's own release
-    // handler runs before this one and arms the flag, and an empowered hold
-    // arms it on a press the radial never took.
+    const d = this.drags.get(e.pointerId);
+    if (!d) {
+      // Not a press the radial armed (an empowered hold or bind mode took it).
+      // The flag those paths set still has to be cleared or it swallows the next
+      // cast, but only while nothing else is held: a second thumb's release must
+      // never consume the flag its neighbour's hold armed.
+      if (this.drags.size === 0) this.deps.takeSuppressedPress();
+      return;
+    }
     const suppressed = this.deps.takeSuppressedPress();
-    const d = this.drag;
-    if (!d || e.pointerId !== d.pointerId) return;
     const outcome = resolveRadialRelease({
       direction: d.direction,
       revealed: d.placement !== null,
@@ -205,16 +275,21 @@ export class RadialGesture {
       consumedElsewhere: suppressed || this.deps.dragActive(),
     });
     const buttonIndex = d.buttonIndex;
-    this.cancel();
+    this.clearDrag(d.pointerId);
     if (outcome.kind === 'cast') this.deps.cast(buttonIndex, outcome.direction);
     else if (outcome.kind === 'cancel') this.deps.onCancel();
   }
 
-  /** Drop the gesture and close the petals. Safe to call from any path. */
+  /** Drop every live gesture and close the petals. Safe to call from any path. */
   cancel(): void {
-    const d = this.drag;
+    for (const pointerId of [...this.drags.keys()]) this.clearDrag(pointerId);
+  }
+
+  private clearDrag(pointerId: number): void {
+    const d = this.drags.get(pointerId);
     if (!d) return;
     if (d.revealTimer !== null) clearTimeout(d.revealTimer);
-    this.drag = null;
+    this.drags.delete(pointerId);
+    if (this.revealOwner === pointerId) this.revealOwner = null;
   }
 }

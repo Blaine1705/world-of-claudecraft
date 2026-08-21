@@ -750,6 +750,21 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1, '.scrollTop': 4 },
     driverAllow: {},
   },
+  // The two touch gesture layers of the mobile action ring, one entry each because they
+  // are twins: ONE button/seat rect plus ONE computed-style read, taken when a press
+  // OPENS the overlay (the radial's reveal, the strip's pointerdown measure) and never
+  // again while the finger travels. Both numbers are per gesture, not per frame or per
+  // move: the painters that follow read only the cached placement.
+  {
+    file: 'hud/action_bar/radial_gesture_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
+    driverAllow: {},
+  },
+  {
+    file: 'hud/action_bar/consumable_strip_gesture_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
+    driverAllow: {},
+  },
   // The gather-node hover tip (the phase 14 QA's countdown clock): pointer
   // -driven repaints plus ONE 1 Hz interval armed only while a COOLDOWN tip
   // is shown, disposed on hide and by the ready flip. Its tick re-enters

@@ -1,0 +1,296 @@
+// @vitest-environment happy-dom
+// Pointer-level regressions for the radial ring's gesture controller: the DOM
+// half that radial_gesture_core.ts owns no part of. The RULES have their own
+// suite (radial_gesture_core.test.ts); everything here is about pointer
+// bookkeeping, which is where the defects actually were.
+//
+// Four of them, each pinned below:
+//   - one shared drag slot, so a second thumb on a second ring button was
+//     dropped entirely (combat is played with two thumbs),
+//   - no release path other than the button's own, so a setPointerCapture throw
+//     plus a finger that left the button stranded the drag forever,
+//   - the petal clamp measured against window.innerWidth/innerHeight while the
+//     overlay is sized from the shared --app-vw/--app-vh box, and never widened
+//     for the device's safe area,
+//   - the shared "this release was a drag" flag consumed before the pointer-id
+//     guard, so one thumb's release cleared the flag the other thumb's hold set.
+
+import { beforeEach, describe, expect, it } from 'vitest';
+import type { RadialDirection } from '../src/ui/hud/action_bar/radial_action_core';
+import {
+  RadialGesture,
+  type RadialGestureDeps,
+} from '../src/ui/hud/action_bar/radial_gesture_controller';
+
+const BUTTON_SIZE_PX = 40;
+/** Past FLICK_DEADZONE_PX (22), so a move resolves to a direction and pulls the
+ *  petals up without waiting out the reveal timer. */
+const FLICK_PX = 30;
+
+interface Rig {
+  buttons: HTMLButtonElement[];
+  host: HTMLElement;
+  gesture: RadialGesture;
+  casts: Array<[number, RadialDirection]>;
+  cancels: number;
+  suppressed: { value: boolean; takes: number };
+  claimed: Set<number>;
+}
+
+function rect(btn: HTMLElement, x: number, y: number): void {
+  btn.getBoundingClientRect = () =>
+    ({
+      x,
+      y,
+      left: x,
+      top: y,
+      width: BUTTON_SIZE_PX,
+      height: BUTTON_SIZE_PX,
+      right: x + BUTTON_SIZE_PX,
+      bottom: y + BUTTON_SIZE_PX,
+    }) as DOMRect;
+}
+
+function makeRig(options: { appVw?: string; appVh?: string; safeAreaPx?: string } = {}): Rig {
+  const host = document.createElement('div');
+  host.style.setProperty('--radial-radius-ratio', '1.35');
+  host.style.setProperty('--radial-margin', '6px');
+  host.style.setProperty('--app-vw', options.appVw ?? '400px');
+  host.style.setProperty('--app-vh', options.appVh ?? '300px');
+  for (const side of ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']) {
+    host.style.setProperty(side, options.safeAreaPx ?? '0px');
+  }
+  document.body.append(host);
+
+  const buttons = [0, 1].map(() => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    document.body.append(btn);
+    return btn;
+  });
+  // Both near the bottom-right corner, which is where the ring actually sits and
+  // the only place the edge clamp does anything.
+  rect(buttons[0], 360, 180);
+  rect(buttons[1], 200, 180);
+
+  const rig: Rig = {
+    buttons,
+    host,
+    casts: [],
+    cancels: 0,
+    suppressed: { value: false, takes: 0 },
+    claimed: new Set<number>(),
+    gesture: null as unknown as RadialGesture,
+  };
+  const deps: RadialGestureDeps = {
+    buttons,
+    metricsHost: host,
+    hasSlot: () => true,
+    cast: (buttonIndex, direction) => rig.casts.push([buttonIndex, direction]),
+    pressClaimed: (buttonIndex) => rig.claimed.has(buttonIndex),
+    dragActive: () => false,
+    takeSuppressedPress: () => {
+      rig.suppressed.takes++;
+      const was = rig.suppressed.value;
+      rig.suppressed.value = false;
+      return was;
+    },
+    onCancel: () => {
+      rig.cancels++;
+    },
+  };
+  rig.gesture = new RadialGesture(deps);
+  rig.gesture.attach();
+  return rig;
+}
+
+function pointer(type: string, pointerId: number, clientX: number, clientY: number): MouseEvent {
+  return Object.assign(new MouseEvent(type, { bubbles: true, button: 0, clientX, clientY }), {
+    pointerId,
+    pointerType: 'touch',
+  });
+}
+
+function down(rig: Rig, button: number, pointerId: number, x = 0, y = 0): void {
+  rig.buttons[button].dispatchEvent(pointer('pointerdown', pointerId, x, y));
+}
+
+function move(rig: Rig, button: number, pointerId: number, x: number, y = 0): void {
+  rig.buttons[button].dispatchEvent(pointer('pointermove', pointerId, x, y));
+}
+
+function up(rig: Rig, button: number, pointerId: number, x = 0, y = 0): void {
+  rig.buttons[button].dispatchEvent(pointer('pointerup', pointerId, x, y));
+}
+
+beforeEach(() => {
+  document.body.replaceChildren();
+});
+
+describe('RadialGesture: two thumbs, two ring buttons', () => {
+  it('casts BOTH presses when a second ring button is pressed under the first', () => {
+    const rig = makeRig();
+    down(rig, 0, 1);
+    down(rig, 1, 2);
+    up(rig, 0, 1);
+    up(rig, 1, 2);
+    // One shared drag slot dropped the second press entirely: onDown returned
+    // early while any drag was live, so the second thumb cast nothing.
+    expect(rig.casts).toEqual([
+      [0, 'center'],
+      [1, 'center'],
+    ]);
+  });
+
+  it('keeps each press on its own start point, so one thumb never flicks for the other', () => {
+    const rig = makeRig();
+    down(rig, 0, 1, 100, 100);
+    down(rig, 1, 2, 300, 100);
+    // Pointer 2 flicks right from ITS start; pointer 1 never moved.
+    move(rig, 1, 2, 300 + FLICK_PX, 100);
+    up(rig, 1, 2, 300 + FLICK_PX, 100);
+    up(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([
+      [1, 'right'],
+      [0, 'center'],
+    ]);
+  });
+
+  it('opens the petal overlay for the FIRST press only, and the second still casts', () => {
+    const rig = makeRig();
+    down(rig, 0, 1, 100, 100);
+    down(rig, 1, 2, 300, 100);
+    // The second thumb flicks first. Two reveals cannot coexist visually, so it
+    // resolves its own direction without seating a second overlay.
+    move(rig, 1, 2, 300 + FLICK_PX, 100);
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.gesture.heldButtonIndex()).toBe(0);
+
+    move(rig, 0, 1, 100 + FLICK_PX, 100);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.heldButtonIndex()).toBe(0);
+    expect(rig.gesture.liveDirection()).toBe('right');
+
+    up(rig, 1, 2, 300 + FLICK_PX, 100);
+    expect(rig.casts).toEqual([[1, 'right']]);
+  });
+});
+
+describe('RadialGesture: the window release backstop', () => {
+  it('drops a drag whose release never reaches the button', () => {
+    const rig = makeRig();
+    // The exact shape the backstop exists for: capture throws, so the finger
+    // leaving the button takes every pointer event with it.
+    rig.buttons[0].setPointerCapture = () => {
+      throw new Error('no capture for a synthetic pointer id');
+    };
+    down(rig, 0, 1, 100, 100);
+    move(rig, 0, 1, 100 + FLICK_PX, 100);
+    expect(rig.gesture.isOpen()).toBe(true);
+
+    window.dispatchEvent(Object.assign(new MouseEvent('pointerup'), { pointerId: 1 }));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.gesture.heldButtonIndex()).toBe(-1);
+    // Dropping is not resolving: a release the gesture never saw must not cast.
+    expect(rig.casts).toEqual([]);
+
+    // And the ring is alive again. Before the backstop the stranded drag kept
+    // every button dead under a painted overlay.
+    down(rig, 1, 2);
+    up(rig, 1, 2);
+    expect(rig.casts).toEqual([[1, 'center']]);
+  });
+
+  it('leaves an ordinary release to the button, which resolves it first', () => {
+    const rig = makeRig();
+    down(rig, 0, 1);
+    // Bubbles to window, so the backstop runs on the same event and must find
+    // nothing left to drop rather than eating the cast.
+    up(rig, 0, 1);
+    expect(rig.casts).toEqual([[0, 'center']]);
+  });
+
+  it('drops only the matching pointer, never a neighbour still held', () => {
+    const rig = makeRig();
+    down(rig, 0, 1);
+    down(rig, 1, 2);
+    window.dispatchEvent(Object.assign(new MouseEvent('pointercancel'), { pointerId: 1 }));
+    up(rig, 1, 2);
+    up(rig, 0, 1);
+    expect(rig.casts).toEqual([[1, 'center']]);
+  });
+});
+
+describe('RadialGesture: the clamp box', () => {
+  it('clamps against the shared --app-vw/--app-vh box, not the window', () => {
+    const rig = makeRig({ appVw: '400px', appVh: '300px' });
+    down(rig, 0, 1, 380, 200);
+    move(rig, 0, 1, 380 + FLICK_PX, 200);
+    // radius 40 * 1.35 = 54, petalHalf 20, margin 6 -> reach 80. The button
+    // centre is 380, so the app box (400 wide) pulls the origin in to 320 while
+    // happy-dom's 1024px window would have left it at 380.
+    expect(window.innerWidth).toBeGreaterThan(400);
+    expect(rig.gesture.placement()?.originX).toBe(320);
+    expect(rig.gesture.placement()?.originY).toBe(200);
+  });
+
+  it('widens the edge margin to the safe area the overlay carries as padding', () => {
+    const rig = makeRig({ appVw: '400px', appVh: '300px', safeAreaPx: '30px' });
+    down(rig, 0, 1, 380, 200);
+    move(rig, 0, 1, 380 + FLICK_PX, 200);
+    // margin becomes max(6, 30) = 30, so reach is 104 and the origin lands at
+    // 400 - 104 = 296 instead of the bare-literal 320.
+    expect(rig.gesture.placement()?.originX).toBe(296);
+  });
+});
+
+describe('RadialGesture: the cancel target', () => {
+  it('reports the cancel target live only once the petals are up', () => {
+    const rig = makeRig();
+    down(rig, 0, 1, 100, 100);
+    // Centred, but nothing revealed: the centre is still a plain tap.
+    expect(rig.gesture.liveDirection()).toBe('center');
+    expect(rig.gesture.cancelIsLive()).toBe(false);
+
+    move(rig, 0, 1, 100 + FLICK_PX, 100);
+    expect(rig.gesture.cancelIsLive()).toBe(false);
+    move(rig, 0, 1, 100, 100);
+    expect(rig.gesture.cancelIsLive()).toBe(true);
+
+    up(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([]);
+    expect(rig.cancels).toBe(1);
+  });
+});
+
+describe('RadialGesture: the shared suppressed-press flag', () => {
+  it('does not let one thumb consume the flag another thumb armed', () => {
+    const rig = makeRig();
+    // Button 1 is owned by an empowered hold, so the radial never arms on it.
+    rig.claimed.add(1);
+    down(rig, 0, 1, 100, 100);
+    down(rig, 1, 2, 300, 100);
+    // The hold resolves and arms the shared flag on its own release.
+    rig.suppressed.value = true;
+    up(rig, 1, 2, 300, 100);
+    expect(rig.suppressed.value).toBe(true);
+
+    up(rig, 0, 1, 100, 100);
+    // Consumed by the press it was armed against, which therefore stays silent.
+    expect(rig.suppressed.value).toBe(false);
+    expect(rig.casts).toEqual([]);
+  });
+
+  it('still clears a stale flag on an unowned release while nothing else is held', () => {
+    const rig = makeRig();
+    rig.claimed.add(1);
+    rig.suppressed.value = true;
+    up(rig, 1, 2, 300, 100);
+    expect(rig.suppressed.value).toBe(false);
+
+    // The next real press casts instead of being swallowed by the leftover flag.
+    down(rig, 0, 1);
+    up(rig, 0, 1);
+    expect(rig.casts).toEqual([[0, 'center']]);
+  });
+});

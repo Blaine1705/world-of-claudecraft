@@ -12,7 +12,7 @@
 //     its CENTRE action for the current page),
 //   - a THIRD one over the 4 direction petals, resolving against whichever ring
 //     button the gesture currently holds,
-//   - the gesture layer (radial_gesture.ts) and the petal painter, and
+//   - the gesture layer (radial_gesture_controller.ts) and the petal painter, and
 //   - the ring painter, which owns both layers so Hud.update() keeps one call.
 //
 // The static markup lives in index.html / play.html (#mobile-action-ring,
@@ -41,7 +41,7 @@ import { handleMobileAttackTap } from './hotbar';
 import { MOBILE_ACTION_BUTTONS } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import type { RadialDirection, RadialPlacement } from './radial_action_core';
-import { RadialGesture } from './radial_gesture';
+import { RadialGesture } from './radial_gesture_controller';
 import { RADIAL_PETAL_DIRECTIONS, RadialPetalPainter } from './radial_petal_painter';
 
 const RING_ID = 'mobile-action-ring';
@@ -391,6 +391,10 @@ class RadialPetalSource {
 
   liveDirection(): RadialDirection {
     return this.gesture.liveDirection();
+  }
+
+  cancelIsLive(): boolean {
+    return this.gesture.cancelIsLive();
   }
 
   tick(): ActionBarState {

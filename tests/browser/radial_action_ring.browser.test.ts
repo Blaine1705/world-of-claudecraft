@@ -270,7 +270,7 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
     expect(gap).toBeGreaterThan(0);
     expect(margin).toBeGreaterThan(0);
 
-    // Lay the row out exactly as consumable_strip_gesture.ts does: off the seat's
+    // Lay the row out exactly as the strip gesture controller does: off the seat's
     // own measured box, so an item is the same rendered size as the seat.
     const seatBox = rig.seat.getBoundingClientRect();
     const anchorX = seatBox.x + seatBox.width / 2;
@@ -470,7 +470,7 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
         petalHalf: rect.width / 2,
         margin,
       });
-      petalPainter.paint(petalState, placement, 'center');
+      petalPainter.paint(petalState, placement, 'center', true);
 
       for (const petal of rig.petalBtns) {
         const box = petal.getBoundingClientRect();

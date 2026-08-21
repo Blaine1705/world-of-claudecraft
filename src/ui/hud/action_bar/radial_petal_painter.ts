@@ -42,6 +42,10 @@ export interface RadialPetalSource {
   isOpen(): boolean;
   placement(): RadialPlacement | null;
   liveDirection(): RadialDirection;
+  /** Whether the centre cancel target is the live choice. Comes from the gesture
+   *  layer's radialCancelIsLive so the rule has ONE author; re-deriving it here
+   *  would give the painter a second, drifting copy. */
+  cancelIsLive(): boolean;
   /** Tick the petal action-bar view for the currently held ring button. */
   tick(): ActionBarState;
 }
@@ -67,15 +71,21 @@ export class RadialPetalPainter {
   }
 
   /** Show the petals seated around `placement`, painting each from the shared
-   *  ActionBarState and marking `live` the one the drag currently points at. */
-  paint(state: ActionBarState, placement: RadialPlacement, live: RadialDirection): void {
+   *  ActionBarState and marking `live` the one the drag currently points at.
+   *  `cancelLive` arrives resolved from the gesture layer's shared rule. */
+  paint(
+    state: ActionBarState,
+    placement: RadialPlacement,
+    live: RadialDirection,
+    cancelLive: boolean,
+  ): void {
     const { overlay, cancel, bar } = this.descriptor;
     this.writers.toggleClass(overlay, CLASS_OPEN, true);
     this.writers.setStyleProp(overlay, ORIGIN_X_PROP, `${placement.originX}px`);
     this.writers.setStyleProp(overlay, ORIGIN_Y_PROP, `${placement.originY}px`);
     this.writers.setStyleProp(cancel, LEFT_PROP, `${placement.originX}px`);
     this.writers.setStyleProp(cancel, TOP_PROP, `${placement.originY}px`);
-    this.writers.toggleClass(cancel, CLASS_LIVE, live === 'center');
+    this.writers.toggleClass(cancel, CLASS_LIVE, cancelLive);
 
     this.barPainter.paint(state);
     for (let i = 0; i < bar.slots.length; i++) {

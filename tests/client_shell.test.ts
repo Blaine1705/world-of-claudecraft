@@ -1177,7 +1177,7 @@ describe('client HTML shell', () => {
       // Accessible names come from data-i18n-aria, never a bare aria-label: the
       // row is named for the control it belongs to and the X says what it does.
       expect(entry, name).toContain(
-        'id="mobile-consumable-strip" data-i18n-aria="hudChrome.mobile.consumableSeat"',
+        'id="mobile-consumable-strip" role="group" data-i18n-aria="hudChrome.mobile.consumableSeat"',
       );
       expect(entry, name).toMatch(
         /id="mobile-consumable-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel"/,
@@ -1189,11 +1189,22 @@ describe('client HTML shell', () => {
       );
     }
     // The seat is styled off the shared gesture-menu token, and its row carries
-    // the two geometry literals consumable_strip_gesture.ts reads back.
+    // the two geometry literals the strip gesture controller reads back.
     expect(hudMobileCss).not.toContain('#mobile-consumables');
     expect(hudMobileCss).not.toContain('.mobile-consumable-slot');
     expect(hudMobileCss).toContain('    --strip-gap: 8px;');
     expect(hudMobileCss).toContain('    --strip-margin: 6px;');
+    // The safe area cannot ride in that literal (a custom property is handed
+    // back unresolved), so the overlay carries the insets as padding, which
+    // resolves and which the gesture folds into the same clamp margin.
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch #mobile-consumable-strip {\n' +
+        '    --strip-gap: 8px;\n' +
+        '    --strip-margin: 6px;\n' +
+        '    --strip-item-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));\n' +
+        '    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)\n' +
+        '      env(safe-area-inset-left);\n',
+    );
     expect(hudMobileCss).toContain(
       '    --strip-item-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));',
     );
@@ -1257,8 +1268,11 @@ describe('client HTML shell', () => {
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry, name).toContain('id="mobile-action-radial"');
-      expect(entry, name).toContain('data-i18n-aria="hudChrome.mobile.actionRadial"');
+      // A role-less div with an accessible name announces nothing: the overlay
+      // is a labelled GROUP of petals in both entries, never a bare aria-label.
+      expect(entry, name).toContain(
+        'id="mobile-action-radial" role="group" data-i18n-aria="hudChrome.mobile.actionRadial"',
+      );
       expect(entry, name).toContain('id="mobile-action-radial-cancel"');
       expect(entry, name).toContain('data-i18n-aria="hudChrome.mobile.actionRadialCancel"');
       const petals = [
@@ -1279,6 +1293,52 @@ describe('client HTML shell', () => {
         '<button type="button" class="mobile-action-petal" data-radial-dir="up"',
       );
     }
+  });
+
+  // A stray </div> inside #mobile-controls once slipped through review: the tree still
+  // LOOKED right (browsers reparent silently) while the ring, the radial overlay and the
+  // consumables row ended up outside the region that positions them. Nothing else in this
+  // file walks structure, so this pins the region's own nesting in both entries.
+  it('keeps the #mobile-controls region balanced and holding the whole touch HUD', () => {
+    for (const [name, entry, tag] of [
+      ['index.html', html, 'section'],
+      ['play.html', playHtml, 'div'],
+    ] as const) {
+      const region = mobileControlsRegion(entry, tag);
+      expect(region, `${name}: #mobile-controls never closes`).not.toBeNull();
+      const body = region as string;
+      // Balanced INSIDE: an extra open or an extra close anywhere in the region
+      // moves the depth walk off zero.
+      expect(tagDepth(body, 'div'), `${name}: unbalanced <div> nesting`).toBe(0);
+      expect(tagDepth(body, 'button'), `${name}: unbalanced <button> nesting`).toBe(0);
+      // And the whole touch HUD is still INSIDE it. A stray close would end the
+      // region early and strand whatever followed at body level.
+      for (const id of [
+        'id="mobile-move-joystick"',
+        'id="mobile-camera-joystick"',
+        'id="mobile-combat-controls"',
+        'id="mobile-action-ring"',
+        'id="mobile-action-radial"',
+        'id="mobile-consumable-strip"',
+        'id="mobile-consumable-cancel"',
+      ]) {
+        expect(body, `${name}: ${id} escaped #mobile-controls`).toContain(id);
+      }
+      // The More tray is a SIBLING that follows, so a region swallowing it means
+      // the closing tag was consumed by an unbalanced child instead.
+      expect(body, `${name}: the More tray was swallowed`).not.toContain(
+        'id="mobile-extra-controls"',
+      );
+    }
+  });
+
+  // Teeth for the walker itself: every assertion above is "balanced / contained",
+  // which a walker that returned the whole document would also satisfy.
+  it('the #mobile-controls nesting walk fails on a stray closing tag', () => {
+    const broken = '<div id="mobile-controls"><div id="a"></div></div></div><div id="after"></div>';
+    expect(mobileControlsRegion(broken, 'div')).toBe('<div id="a"></div>');
+    expect(tagDepth('<div><div></div>', 'div')).toBe(1);
+    expect(tagDepth('<div></div></div>', 'div')).toBe(-1);
   });
 
   it('stacks the optional third desktop row above the secondary row in both entries', () => {
@@ -2530,10 +2590,40 @@ describe('client HTML shell', () => {
 
   it('keeps the radial geometry the gesture reads back as LITERAL custom properties', () => {
     // getComputedStyle hands back an UNRESOLVED calc() for a custom property, so
-    // radial_gesture.ts can only parse a literal. A calc() here would silently
+    // the radial gesture controller can only parse a literal. A calc() here would
     // parse as its first number and misplace every petal.
     expect(hudMobileCss).toContain('    --radial-radius-ratio: 1.35;');
     expect(hudMobileCss).toContain('    --radial-margin: 6px;');
+    // The safe area cannot ride in that literal for the same reason, so the
+    // overlay carries the insets as padding: a real property DOES resolve to px,
+    // and it is inert under the global border-box reset (the padding box every
+    // petal is seated in is unchanged).
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch #mobile-action-radial {\n' +
+        '    --radial-radius-ratio: 1.35;\n' +
+        '    --radial-margin: 6px;\n' +
+        '    --radial-petal-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));\n' +
+        '    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)\n' +
+        '      env(safe-area-inset-left);\n',
+    );
+    // One icon size across the ring and both overlays. The cancel glyph was a
+    // 40% share of its circle, which scaled per tier and read as a different
+    // control beside the consumables X at 22px.
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch #mobile-action-radial-cancel .ui-icon {\n' +
+        '    width: 22px;\n' +
+        '    height: 22px;\n',
+    );
+    // The live glow resolves from the same accent token as the border it sits
+    // under, never a second hand-copied spelling of --gold.
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch .mobile-action-petal.live,\n' +
+        '  body.mobile-touch #mobile-action-radial-cancel.live {\n' +
+        '    border-color: var(--gold);\n' +
+        '    box-shadow:\n' +
+        '      0 0 12px color-mix(in srgb, var(--gold) 67%, transparent),\n' +
+        '      inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);\n',
+    );
     // The dim is local to the radial, never a full-screen scrim: the other thumb
     // is still steering and the player must keep seeing the fight.
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-action-radial::before {');
@@ -2930,3 +3020,31 @@ describe('pet cluster layout', () => {
     expect(hudMobileSrc).toMatch(/body\.mobile-touch #pet-frame \{[^}]*position: fixed/);
   });
 });
+
+/** The INSIDE of the #mobile-controls region: everything between its opening tag
+ *  and the matching close, or null when it never closes. Walks only `tag`, which
+ *  is the region's own element (a <section> in index.html, a <div> in play.html),
+ *  so a stray close inside ends the region early and the containment assertions
+ *  above catch it. */
+function mobileControlsRegion(entry: string, tag: 'div' | 'section'): string | null {
+  const open = entry.indexOf(`<${tag} id="mobile-controls"`);
+  if (open < 0) return null;
+  const bodyStart = entry.indexOf('>', open) + 1;
+  const re = new RegExp(`<(/?)${tag}\\b[^>]*>`, 'g');
+  re.lastIndex = bodyStart;
+  let depth = 1;
+  for (let m = re.exec(entry); m; m = re.exec(entry)) {
+    depth += m[1] === '/' ? -1 : 1;
+    if (depth === 0) return entry.slice(bodyStart, m.index);
+  }
+  return null;
+}
+
+/** Net open-minus-close depth for one tag name over a fragment. Zero means
+ *  balanced; negative means a close arrived with nothing open. */
+function tagDepth(fragment: string, tag: string): number {
+  const re = new RegExp(`<(/?)${tag}\\b[^>]*>`, 'g');
+  let depth = 0;
+  for (let m = re.exec(fragment); m; m = re.exec(fragment)) depth += m[1] === '/' ? -1 : 1;
+  return depth;
+}

@@ -12,7 +12,8 @@
 //   - createActionBarView over the seat plus the row, so the seat and the item it
 //     duplicates can never disagree (slot 0 is the seat, slots 1..n the row),
 //   - consumable_bar_view.ts UNCHANGED for the auto-populated list itself,
-//   - the gesture layer (consumable_strip_gesture.ts) and the strip painter.
+//   - the gesture layer (consumable_strip_gesture_controller.ts) and the strip
+//     painter.
 //
 // The static markup lives in index.html / play.html (#mobile-consumable-seat,
 // #mobile-consumable-strip). On a build that omits it, buildMobileConsumableSeat
@@ -28,7 +29,7 @@ import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarSlotElements } from './action_bar_painter';
 import { type ActionBarWorldInput, createActionBarView } from './action_bar_view';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
-import { ConsumableStripGesture } from './consumable_strip_gesture';
+import { ConsumableStripGesture } from './consumable_strip_gesture_controller';
 import { ConsumableStripPainter } from './consumable_strip_painter';
 
 const SEAT_ID = 'mobile-consumable-seat';

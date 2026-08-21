@@ -1,6 +1,6 @@
 // The consumables seat's decision core: what a release means, when the row comes
 // up, and which way it grows. Every branch the gesture layer can take is driven
-// here, so the DOM module (consumable_strip_gesture.ts) can stay rule-free.
+// here, so the DOM module (consumable_strip_gesture_controller.ts) stays rule-free.
 
 import { describe, expect, it } from 'vitest';
 import {

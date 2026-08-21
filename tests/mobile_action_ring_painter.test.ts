@@ -26,6 +26,7 @@ import {
 } from '../src/ui/hud/action_bar/mobile_action_page_view';
 import { MobileActionRingPainter } from '../src/ui/hud/action_bar/mobile_action_ring_painter';
 import type { RadialPlacement } from '../src/ui/hud/action_bar/radial_action_core';
+import { radialCancelIsLive } from '../src/ui/hud/action_bar/radial_gesture_core';
 import {
   RADIAL_PETAL_DIRECTIONS,
   RadialPetalPainter,
@@ -562,7 +563,7 @@ describe('RadialPetalPainter: measured seating + live highlight', () => {
 
   it('seats each petal at its placement offset from the radial origin', () => {
     const { calls, els, overlay, painter } = petalRig();
-    painter.paint(petalState(), petalPlacement(300, 200, 60), 'center');
+    painter.paint(petalState(), petalPlacement(300, 200, 60), 'center', true);
 
     expect(calls).toContainEqual({ m: 'toggleClass', args: [overlay, 'open', true] });
     expect(calls).toContainEqual({ m: 'setStyleProp', args: [overlay, '--radial-x', '300px'] });
@@ -577,21 +578,44 @@ describe('RadialPetalPainter: measured seating + live highlight', () => {
 
   it('marks exactly the live direction, and the cancel target at the centre', () => {
     const { calls, els, cancel, painter } = petalRig();
-    painter.paint(petalState(), petalPlacement(300, 200, 60), 'right');
+    painter.paint(
+      petalState(),
+      petalPlacement(300, 200, 60),
+      'right',
+      radialCancelIsLive('right', true),
+    );
 
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[1].btn, 'live', true] });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[0].btn, 'live', false] });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [cancel, 'live', false] });
 
     calls.length = 0;
-    painter.paint(petalState(), petalPlacement(300, 200, 60), 'center');
+    painter.paint(
+      petalState(),
+      petalPlacement(300, 200, 60),
+      'center',
+      radialCancelIsLive('center', true),
+    );
     expect(calls).toContainEqual({ m: 'toggleClass', args: [cancel, 'live', true] });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[1].btn, 'live', false] });
   });
 
+  it('takes the cancel highlight from the caller, never from the direction alone', () => {
+    // The rule lives in radialCancelIsLive: the centre is only a WAY OUT once the
+    // petals are up, so a centred drag that has not revealed must not light the X.
+    const { calls, cancel, painter } = petalRig();
+    painter.paint(
+      petalState(),
+      petalPlacement(300, 200, 60),
+      'center',
+      radialCancelIsLive('center', false),
+    );
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [cancel, 'live', false] });
+  });
+
   it('paints each petal through the shared ActionBarPainter icon path', () => {
     const { calls, els, painter } = petalRig();
-    painter.paint(petalState(), petalPlacement(300, 200, 60), 'center');
+    painter.paint(petalState(), petalPlacement(300, 200, 60), 'center', true);
     expect(calls).toContainEqual({
       m: 'setStyleProp',
       args: [els[0].label, 'background-image', 'URL(ability:petal-up-p0)'],
@@ -600,7 +624,7 @@ describe('RadialPetalPainter: measured seating + live highlight', () => {
 
   it('closes with a single elided class toggle and no seating rewrite', () => {
     const { calls, overlay, painter } = petalRig();
-    painter.paint(petalState(), petalPlacement(300, 200, 60), 'center');
+    painter.paint(petalState(), petalPlacement(300, 200, 60), 'center', true);
     calls.length = 0;
     painter.hide();
     expect(calls).toEqual([{ m: 'toggleClass', args: [overlay, 'open', false] }]);
@@ -647,6 +671,7 @@ describe('MobileActionRingPainter: the petal layer rides the ring paint', () => 
           isOpen: () => open,
           placement: () => (open ? petalPlacement(300, 200, 60) : null),
           liveDirection: () => 'up' as const,
+          cancelIsLive: () => false,
           tick: () => petalView.tick(idleWorld()),
         },
       },

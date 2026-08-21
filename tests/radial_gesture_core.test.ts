@@ -1,5 +1,6 @@
 // Tests for the radial gesture's decision core: what a press, a drag and a
-// release MEAN. The DOM half (radial_gesture.ts) owns no rules, so every branch
+// release MEAN. The DOM half (radial_gesture_controller.ts) owns no rules, so
+// every branch
 // a finger can take is decided here and driven without a browser.
 
 import { describe, expect, it } from 'vitest';

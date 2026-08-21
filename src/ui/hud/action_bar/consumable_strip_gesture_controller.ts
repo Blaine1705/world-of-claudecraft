@@ -3,7 +3,8 @@
 // consumable_strip_core.ts (what a release means, which way the row grows, when
 // it comes up) or radial_action_core.ts (where the items sit, which one a drag is
 // over), so this module reads pointers and reports; it decides nothing on its
-// own. It is the strip twin of radial_gesture.ts and holds the same contract.
+// own. It is the strip twin of radial_gesture_controller.ts and holds the same
+// contract.
 //
 // The gesture: pointerdown arms, a quick tap uses the first consumable, a swipe
 // LEFT past the deadzone walks the row, and a stationary hold of RADIAL_REVEAL_MS
@@ -16,7 +17,9 @@
 //   - Pointer capture is MANDATORY: the finger leaves the seat long before the
 //     release, and without capture the pointerup is delivered elsewhere and the
 //     gesture is silently lost. setPointerCapture is called inside try/catch
-//     because a synthetic or already-released pointer id throws.
+//     because a synthetic or already-released pointer id throws, which is why
+//     the window-level release backstop exists: without it a throw plus a finger
+//     that left the seat strands the drag forever and the row stays painted.
 //   - The row is measured at pointerdown, not at the reveal: which way it grows
 //     decides which way a swipe counts up, so the direction has to exist before
 //     the first move can be resolved against it.
@@ -52,6 +55,12 @@ import {
 // for a custom property, so only a literal parses back to a number.
 const GAP_PROP = '--strip-gap';
 const EDGE_MARGIN_PROP = '--strip-margin';
+// The clamp box is the SHARED app-viewport box (#mobile-controls, #game-canvas,
+// #ui and #nameplates all size from it), never window.innerWidth: whenever the
+// two disagree (device emulation, pinch zoom, a mid-resize snapshot) a row
+// clamped against the window lands off the overlay it is painted into. It is a
+// px literal written by syncAppViewport, so it parses.
+const APP_VIEWPORT_WIDTH_PROP = '--app-vw';
 /** Applied only where the stylesheet is absent (a DOM without hud.mobile.css). */
 const FALLBACK_ITEM_SIZE_PX = 46;
 const FALLBACK_GAP_PX = 8;
@@ -98,6 +107,26 @@ function readMetric(style: CSSStyleDeclaration, prop: string, fallback: number):
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function readPx(value: string): number {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+/** The edge clearance the clamp keeps: the stylesheet's literal, widened to
+ *  whatever the device's safe area actually claims. env() cannot live in that
+ *  literal (a custom property comes back unresolved, see above), so the overlay
+ *  carries the insets as padding, which is inert under the global border-box
+ *  reset and, being a real property, does resolve to px. */
+function readEdgeMargin(style: CSSStyleDeclaration): number {
+  return Math.max(
+    readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
+    readPx(style.paddingTop),
+    readPx(style.paddingRight),
+    readPx(style.paddingBottom),
+    readPx(style.paddingLeft),
+  );
+}
+
 export class ConsumableStripGesture {
   private drag: DragState | null = null;
   /** Sticky mode: opened by assistive activation rather than a drag, and kept
@@ -116,6 +145,14 @@ export class ConsumableStripGesture {
     seat.addEventListener('pointermove', (e) => this.onMove(e as PointerEvent));
     seat.addEventListener('pointerup', (e) => this.onUp(e as PointerEvent));
     seat.addEventListener('pointercancel', () => this.cancelDrag());
+    // The backstop for a release the seat never sees. It runs AFTER the seat's
+    // own handler on an ordinary release (the event bubbles), so the gesture
+    // resolves first and this finds nothing left to drop.
+    const release = (e: Event) => {
+      if ((e as PointerEvent).pointerId === this.drag?.pointerId) this.cancelDrag();
+    };
+    window.addEventListener('pointerup', release);
+    window.addEventListener('pointercancel', release);
     // Assistive technologies activate a button with a plain click and emit no
     // pointer events at all, so a click our own drag handling did not just
     // produce is the non-gesture path asking for the menu.
@@ -201,8 +238,8 @@ export class ConsumableStripGesture {
       count: this.deps.count(),
       itemSize,
       gap: readMetric(style, GAP_PROP, FALLBACK_GAP_PX),
-      viewportWidth: window.innerWidth,
-      margin: readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
+      viewportWidth: readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth),
+      margin: readEdgeMargin(style),
     };
     const anchorY = rect.y + rect.height / 2;
     const direction = resolveConsumableStripDirection(shared);
@@ -223,7 +260,8 @@ export class ConsumableStripGesture {
       this.deps.seat.setPointerCapture?.(e.pointerId);
     } catch {
       /* synthetic or already-released pointer id: the seat's own move/up
-         listeners still resolve the drag while the finger stays on it */
+         listeners still resolve the drag while the finger stays on it, and the
+         window backstop drops it when the finger leaves */
     }
     this.drag = {
       pointerId: e.pointerId,

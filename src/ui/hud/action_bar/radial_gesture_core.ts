@@ -1,6 +1,7 @@
 // Pure decision core for the touch radial gesture: what a press, a drag and a
 // release MEAN. The DOM half (pointer capture, the reveal timer, measuring the
-// pressed button) lives in radial_gesture.ts, which owns no rules of its own, so
+// pressed button) lives in radial_gesture_controller.ts, which owns no rules of
+// its own, so
 // a Vitest drives every branch here without a browser.
 //
 // resolveRadialDirection in radial_action_core.ts answers WHERE a drag points;

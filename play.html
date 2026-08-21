@@ -1169,7 +1169,7 @@
       <button type="button" id="mobile-jump" data-i18n-title="hud.keybinds.actions.jump" data-i18n-aria="hud.keybinds.actions.jump" title="Jump" aria-label="Jump" data-icon="jump"><span class="mobile-label" data-i18n="hudChrome.mobile.jump">Jump</span></button>
       <button type="button" id="mobile-action-page-toggle" data-i18n-aria="hudChrome.mobile.actionPageToggle" aria-label="Switch action page" data-icon="swap"><span class="mobile-action-page-indicator"></span></button>
     </div>
-    <div id="mobile-action-radial" data-i18n-aria="hudChrome.mobile.actionRadial" aria-label="Action directions">
+    <div id="mobile-action-radial" role="group" data-i18n-aria="hudChrome.mobile.actionRadial" aria-label="Action directions">
       <button type="button" class="mobile-action-petal" data-radial-dir="up" data-mobile-index="0"></button>
       <button type="button" class="mobile-action-petal" data-radial-dir="right" data-mobile-index="1"></button>
       <button type="button" class="mobile-action-petal" data-radial-dir="down" data-mobile-index="2"></button>
@@ -1180,7 +1180,7 @@
          seat, seated in viewport coordinates by consumable_strip_painter.ts. The
          cancel X sits ON the seat, so releasing back where the gesture started
          backs out without quaffing anything. -->
-    <div id="mobile-consumable-strip" data-i18n-aria="hudChrome.mobile.consumableSeat" aria-label="Consumables">
+    <div id="mobile-consumable-strip" role="group" data-i18n-aria="hudChrome.mobile.consumableSeat" aria-label="Consumables">
       <button type="button" class="mobile-consumable-item" data-consumable-index="0" tabindex="-1"></button>
       <button type="button" class="mobile-consumable-item" data-consumable-index="1" tabindex="-1"></button>
       <button type="button" class="mobile-consumable-item" data-consumable-index="2" tabindex="-1"></button>

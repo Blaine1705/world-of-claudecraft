@@ -974,12 +974,18 @@
      instead of inside the ring's own scaled, corner-anchored box; the painter
      writes only that measured seating, everything below is static per tier.
      --radial-radius-ratio and --radial-margin are READ BACK by
-     radial_gesture.ts, so both stay literal values: getComputedStyle hands back
-     an unresolved calc() for a custom property, and only a literal parses. */
+     radial_gesture_controller.ts, so both stay literal values: getComputedStyle
+     hands back an unresolved calc() for a custom property, and only a literal
+     parses. The safe area cannot ride in that literal for the same reason, so
+     the overlay carries the insets as PADDING, which does resolve: inert under
+     the global border-box reset (the padding box every petal is seated in is
+     unchanged) and readable off the same computed style. */
   body.mobile-touch #mobile-action-radial {
     --radial-radius-ratio: 1.35;
     --radial-margin: 6px;
     --radial-petal-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
     position: absolute;
     left: 0;
     top: 0;
@@ -1039,16 +1045,19 @@
   body.mobile-touch #mobile-action-radial-cancel.live {
     border-color: var(--gold);
     box-shadow:
-      0 0 12px #ffd100aa,
-      inset 0 0 8px #ffd10055;
+      0 0 12px color-mix(in srgb, var(--gold) 67%, transparent),
+      inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);
   }
   body.mobile-touch #mobile-action-radial-cancel {
     border-color: #8b4e2c;
     background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
   }
+  /* One icon size across the ring and both overlays: 22px, never a percentage
+     of the circle (that scaled the glyph per tier and read as a different
+     control beside the seat's 22px X). */
   body.mobile-touch #mobile-action-radial-cancel .ui-icon {
-    width: 40%;
-    height: 40%;
+    width: 22px;
+    height: 22px;
     color: #ffdf9c;
   }
   /* The petal internals mirror the ring button's exactly (same painter, same
@@ -1129,13 +1138,16 @@
      reason the radial is: its items are seated in viewport coordinates
      (placeConsumableStrip edge-clamps them) instead of inside the ring's own
      scaled, corner-anchored box. --strip-gap and --strip-margin are READ BACK by
-     consumable_strip_gesture.ts, so both stay literal values: getComputedStyle
-     hands back an unresolved calc() for a custom property, and only a literal
-     parses. */
+     consumable_strip_gesture_controller.ts, so both stay literal values:
+     getComputedStyle hands back an unresolved calc() for a custom property, and
+     only a literal parses. The safe area rides in the overlay's PADDING for the
+     same reason the radial's does. */
   body.mobile-touch #mobile-consumable-strip {
     --strip-gap: 8px;
     --strip-margin: 6px;
     --strip-item-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
     position: absolute;
     left: 0;
     top: 0;
@@ -1196,8 +1208,8 @@
   body.mobile-touch #mobile-consumable-cancel.live {
     border-color: var(--gold);
     box-shadow:
-      0 0 12px #ffd100aa,
-      inset 0 0 8px #ffd10055;
+      0 0 12px color-mix(in srgb, var(--gold) 67%, transparent),
+      inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);
   }
   /* The cancel X sits directly ON the seat, which puts it right of the rightmost
      item once the row is open: releasing where the gesture started is the way
