@@ -468,11 +468,18 @@ describe('attachSharedDepthMaterials resets on a shape that stops being shareabl
 
     sweep(root);
     const shared = mesh.customDepthMaterial;
+    expect(shared).toBeDefined();
 
+    // Cleared FIRST, or the assertion below would hold with the function body
+    // emptied: sweep() already left the shared material mounted, so re-reading
+    // it would prove nothing about the re-attach.
+    mesh.customDepthMaterial = undefined;
     const tinted = new THREE.MeshStandardMaterial({ color: 0x223344 });
     mesh.material = tinted;
     attachSharedDepthMaterials(mesh, tinted);
 
+    // Back, and the SAME cached instance: the shape key is object-side, so an
+    // ordinary effect clone must not mint a second material for one shape.
     expect(mesh.customDepthMaterial).toBe(shared);
   });
 });

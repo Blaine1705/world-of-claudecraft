@@ -10,6 +10,11 @@ vi.mock('../server/db', () => ({
 import { accountAndScopeForToken, getCharacter, insertClientPerfReport } from '../server/db';
 import { handlePerfReport, perfReportInternalsForTest } from '../server/perf_report';
 import { resetRateLimitClock, setRateLimitClock } from '../server/ratelimit';
+import {
+  PREWARM_REPORT_BUDGET_VARIANTS,
+  PREWARM_REPORT_COMPILE_UNITS,
+  PREWARM_REPORT_TRANSITIONS,
+} from '../src/game/perf_prewarm_lists_core';
 
 // PERF_REPORT_MAX_PER_MINUTE / PERF_REPORT_WINDOW_MS are un-exported constants in
 // server/perf_report; mirror them here (30 posts per 60s window per IP).
@@ -222,6 +227,27 @@ describe('perf report ingestion', () => {
     // cross-boundary pin is the drift guard.
     const { CROWD_BUCKET_LABELS } = await import('../src/game/crowd_bucket');
     expect([...perfReportInternalsForTest.CROWD_BUCKET_LABELS]).toEqual([...CROWD_BUCKET_LABELS]);
+  });
+
+  it('keeps the client and server prewarm list caps in lockstep', async () => {
+    // Same deliberate-copy pattern as the crowd labels and the schema version:
+    // server/ cannot import src/game, so the two constant sets are written
+    // twice. Nothing else notices if one side is lowered and the other is not,
+    // and the consequence is silent: the server would keep trimming a list the
+    // client already trimmed, or store more than the client's own budget
+    // reasoning assumed.
+    expect(perfReportInternalsForTest.PREWARM_COMPILE_UNITS_MAX).toBe(PREWARM_REPORT_COMPILE_UNITS);
+    expect(perfReportInternalsForTest.PREWARM_BUDGET_VARIANTS_MAX).toBe(
+      PREWARM_REPORT_BUDGET_VARIANTS,
+    );
+    expect(perfReportInternalsForTest.PREWARM_PACING_TRANSITIONS_MAX).toBe(
+      PREWARM_REPORT_TRANSITIONS,
+    );
+    // And to literals, so lowering BOTH sides in lockstep still has to be a
+    // deliberate edit here rather than a silent drift.
+    expect(perfReportInternalsForTest.PREWARM_COMPILE_UNITS_MAX).toBe(12);
+    expect(perfReportInternalsForTest.PREWARM_BUDGET_VARIANTS_MAX).toBe(8);
+    expect(perfReportInternalsForTest.PREWARM_PACING_TRANSITIONS_MAX).toBe(12);
   });
 
   it('keeps the client and server schema versions in lockstep', async () => {
@@ -770,13 +796,17 @@ describe('perf report ingestion', () => {
             elapsedMs: 14_000,
             manifestPlanned: 40,
             manifestCompleted: 38,
-            compileUnits: Array.from({ length: 12 }, (_, i) => compileUnit(i)),
+            compileUnits: Array.from({ length: PREWARM_REPORT_COMPILE_UNITS }, (_, i) =>
+              compileUnit(i),
+            ),
             manifestEntries: [
               {
                 id: 'programs.budget-variants',
                 category: 'world',
                 status: 'completed',
-                budgetVariants: Array.from({ length: 8 }, (_, i) => budgetVariant(i)),
+                budgetVariants: Array.from({ length: PREWARM_REPORT_BUDGET_VARIANTS }, (_, i) =>
+                  budgetVariant(i),
+                ),
               },
             ],
             prewarmPacing: {
@@ -784,7 +814,9 @@ describe('perf report ingestion', () => {
               mode: 'adaptive',
               adaptive: {
                 state: 'steady',
-                transitions: Array.from({ length: 12 }, (_, i) => transition(i)),
+                transitions: Array.from({ length: PREWARM_REPORT_TRANSITIONS }, (_, i) =>
+                  transition(i),
+                ),
               },
             },
           },
@@ -822,7 +854,10 @@ describe('perf report ingestion', () => {
           .transitions,
       ]),
     );
-    expect(listBytes).toBeLessThan(6 * 1024);
+    // Sized from the exported caps, so RAISING a cap grows the fixture and
+    // trips this budget instead of silently decoupling the claim above from
+    // the constants it is about.
+    expect(listBytes).toBeLessThan(7 * 1024);
   });
 
   it('carries the streamed-prewarm diagnostic across truncation into the compact path', async () => {
@@ -840,14 +875,28 @@ describe('perf report ingestion', () => {
           seconds: 30,
           rendererPrewarmSummary: {
             manifestPlanned: 40,
-            compileUnits: Array.from({ length: 40 }, (_, i) => ({
-              id: `weapon-skins:compile:skin_${i}`,
-              lane: 'programs.compile',
-              syncMs: i,
-              settledDurationMs: i * 2,
-              programDelta: 3,
-              statusAtReveal: 'settled',
-            })),
+            compileUnits: [
+              // One FAILED unit, deliberately the cheapest by sync time: it
+              // must survive compaction on the failure rule alone.
+              {
+                id: 'weapon-skins:compile:skin_failed',
+                lane: 'programs.compile',
+                syncMs: 0,
+                settledDurationMs: 0,
+                failedAtMs: 1234,
+                programDelta: 0,
+                statusAtReveal: 'failed',
+              },
+              ...Array.from({ length: 40 }, (_, i) => ({
+                id: `weapon-skins:compile:skin_${i}`,
+                lane: 'programs.compile',
+                syncMs: i,
+                settledDurationMs: i * 2,
+                failedAtMs: null,
+                programDelta: 3,
+                statusAtReveal: 'settled',
+              })),
+            ],
             prewarmPacing: {
               mode: 'adaptive',
               source: 'knobs',
@@ -879,13 +928,28 @@ describe('perf report ingestion', () => {
     // Present, and on the compact path's own tighter sample.
     const units = prewarm.compileUnits as Record<string, unknown>[];
     expect(units).toHaveLength(6);
+    // The SLOWEST five plus the failure, not the first six. Taking the first
+    // would keep the cheapest units, and this block exists to answer "which
+    // unit stalled" on exactly the heavy reports that reach it. Emitted in
+    // ORIGINAL order, so a reader still sees a timeline rather than a ranking;
+    // the failure leads here because it was posted first, not because it won.
+    expect(units.map((unit) => unit.id)).toEqual([
+      'weapon-skins:compile:skin_failed',
+      'weapon-skins:compile:skin_35',
+      'weapon-skins:compile:skin_36',
+      'weapon-skins:compile:skin_37',
+      'weapon-skins:compile:skin_38',
+      'weapon-skins:compile:skin_39',
+    ]);
+    // Every retained member is field-shaped by the compact path, never copied
+    // verbatim.
     expect(units[0]).toEqual({
-      id: 'weapon-skins:compile:skin_0',
+      id: 'weapon-skins:compile:skin_failed',
       lane: 'programs.compile',
       syncMs: 0,
       settledDurationMs: 0,
-      programDelta: 3,
-      statusAtReveal: 'settled',
+      programDelta: 0,
+      statusAtReveal: 'failed',
     });
     const adaptive = (prewarm.prewarmPacing as Record<string, unknown>).adaptive as Record<
       string,

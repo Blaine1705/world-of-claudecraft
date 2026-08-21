@@ -166,6 +166,14 @@ describe('prewarm compile lifecycle', () => {
     expect(source).toContain(
       'const gpuSubmitDeadline = Math.max(started, hardDeadline - PREWARM_GPU_SUBMIT_GUARD_MS);',
     );
+    // Pinned to its LITERAL, not just by symbol name: set the constant to 0 and
+    // the whole "submit guard, never the hard deadline" fix silently becomes a
+    // no-op with every other assertion above still green.
+    expect(source).toContain('const PREWARM_GPU_SUBMIT_GUARD_MS = 1000;');
+    // Its sibling reserve, for the same reason: the compile entry's tail passes
+    // min(gpuSubmitDeadline, compileAwaitDeadline), so a zeroed await reserve
+    // would let the submit loop eat the initial frame's link window.
+    expect(source).toContain('const PREWARM_COMPILE_AWAIT_RESERVE_MS = 2000;');
   });
 
   it('records the synchronous and asynchronous boundaries on the injected clock', () => {

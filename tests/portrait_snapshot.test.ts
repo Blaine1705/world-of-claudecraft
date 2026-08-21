@@ -280,6 +280,25 @@ describe('PortraitSnapshotTarget', () => {
       expect(encodeCanvasPng).not.toHaveBeenCalled();
     });
 
+    it('does not latch the rebuilt rig when a stale readback REJECTS after dispose', async () => {
+      // latchIfCurrent guards two arms: the backstop above and this rejection
+      // path. Only the backstop was exercised, so a guard applied to one and
+      // not the other would have passed.
+      const h = harness();
+      const snapshot = new PortraitSnapshotTarget(SIZE);
+      const pending = snapshot.capture(h.renderer, () => {});
+      snapshot.dispose();
+      h.readback.reject();
+      await expect(pending).resolves.toBeNull();
+
+      h.calls.length = 0;
+      vi.mocked(encodeCanvasPng).mockClear();
+      const next = snapshot.capture(h.renderer, () => {});
+      h.readback.resolve();
+      await expect(next).resolves.toBe('data:image/png;base64,async');
+      expect(encodeCanvasPng).not.toHaveBeenCalled();
+    });
+
     it('leaves no armed backstop behind once a readback lands', async () => {
       const h = harness();
       const snapshot = new PortraitSnapshotTarget(SIZE);

@@ -26,13 +26,14 @@ export interface PrewarmCompileSubmissionLoopHost {
   awaitSlot: (outOfTime: () => boolean) => Promise<boolean>;
   /** Record a unit the loop is handing to the resume lane, before it defers. */
   recordDeferred: (unit: PrewarmCompileUnitLike) => void;
-  submit: (unit: PrewarmCompileUnitLike) => SubmittedPrewarmCompileUnit;
+  /** Submit one unit and RECORD it, in the same step. The recording must not
+   *  be deferred to the loop's return value: see runPrewarmCompileSubmission. */
+  submit: (unit: PrewarmCompileUnitLike) => void;
   /** Yield between unit submissions. */
   yieldSlice: () => Promise<void>;
 }
 
 export interface PrewarmCompileSubmissionResult {
-  submitted: SubmittedPrewarmCompileUnit[];
   /** Non-empty when the loop stopped early; these units are NEVER dropped. */
   deferred: PrewarmCompileUnitLike[];
 }
@@ -56,22 +57,28 @@ export interface PrewarmCompileSubmissionResult {
  *
  * The yield between submissions matters: each unit carries up to 32 synchronous
  * compileAsync prologue walks, and links progress off-thread anyway.
+ *
+ * `host.submit` records each unit as it goes, rather than the loop returning a
+ * batch the caller records afterwards. That ordering is load bearing: if
+ * `awaitSlot` or `yieldSlice` ever rejects, a batch returned only on the happy
+ * path would lose the units already submitted in that call from the set
+ * `programs.compile` awaits, and world.initial-frame would draw believing
+ * programs were ready that nobody waited on.
  */
 export async function runPrewarmCompileSubmission(
   pending: readonly PrewarmCompileUnitLike[],
   host: PrewarmCompileSubmissionLoopHost,
 ): Promise<PrewarmCompileSubmissionResult> {
-  const submitted: SubmittedPrewarmCompileUnit[] = [];
   for (let i = 0; i < pending.length; i++) {
     if (!(await host.awaitSlot(host.outOfTime))) {
       const deferred = pending.slice(i);
       for (const unit of deferred) host.recordDeferred(unit);
-      return { submitted, deferred };
+      return { deferred };
     }
-    submitted.push(host.submit(pending[i]));
+    host.submit(pending[i]);
     await host.yieldSlice();
   }
-  return { submitted, deferred: [] };
+  return { deferred: [] };
 }
 
 /** Keep lifecycle and pacing transitions identical for every compile unit. */

@@ -1004,12 +1004,29 @@ export class MageGroundFx {
       };
     };
 
-    for (const meteor of this.meteors) collectRoot(meteor.root);
-    for (const rune of this.runes) collectRoot(rune.group);
-    for (const snow of this.snows) {
-      collectRoot(snow.points);
-      collectRoot(snow.ring);
-    }
+    // Detach status per ENTRY, not discarded: a root whose traverse or detach
+    // threw is still in the scene and still drawing, so clearing the arrays
+    // below would strand it with nothing left holding a reference. Those
+    // entries are retained for the next dispose(), the same rule the pooled
+    // materials follow.
+    // Judged on the node's ACTUAL state, never on whether an attempt threw:
+    // collectRoot's detach has a parent.remove fallback, and its `detached`
+    // flag stays false when the first arm threw even though the fallback
+    // succeeded and the node really is off the scene. What decides retention is
+    // whether the root is still attached (still drawing) or was never
+    // traversed (its resources were never collected).
+    const stranded = <T>(entries: readonly T[], roots: (entry: T) => THREE.Object3D[]): T[] =>
+      entries.filter((entry) => {
+        let held = false;
+        for (const root of roots(entry)) {
+          const outcome = collectRoot(root);
+          if (!outcome.traversed || root.parent !== null) held = true;
+        }
+        return held;
+      });
+    const strandedMeteors = stranded(this.meteors, (meteor) => [meteor.root]);
+    const strandedRunes = stranded(this.runes, (rune) => [rune.group]);
+    const strandedSnows = stranded(this.snows, (snow) => [snow.points, snow.ring]);
 
     for (const meteor of this.meteors) {
       for (const geometry of meteor.ownedGeometries) geometries.add(geometry);
@@ -1055,9 +1072,17 @@ export class MageGroundFx {
     for (const instancedMesh of instancedMeshes) {
       attempt(() => instancedMesh.dispose());
     }
+    const geometryStatus = new Map<THREE.BufferGeometry, boolean>();
     for (const geometry of geometries) {
-      attempt(() => geometry.dispose());
+      geometryStatus.set(
+        geometry,
+        attempt(() => geometry.dispose()),
+      );
     }
+    // A class-level geometry is nulled only once it really went. Nulling one
+    // whose dispose threw would drop the last reference to live GPU memory.
+    const keepGeometry = <T extends THREE.BufferGeometry>(geometry: T | null): T | null =>
+      geometry && geometryStatus.get(geometry) !== true ? geometry : null;
     const materialStatus = new Map<THREE.Material, boolean>();
     for (const material of materials) {
       const disposed = attempt(() => material.dispose());
@@ -1078,14 +1103,19 @@ export class MageGroundFx {
     }
 
     this.meteors.length = 0;
+    this.meteors.push(...strandedMeteors);
     this.runes.length = 0;
+    this.runes.push(...strandedRunes);
     this.snows.length = 0;
-    this.meteorGeo = null;
-    this.meteorCoronaGeo = null;
-    this.meteorCrackGeos = null;
-    this.meteorTrailGeo = null;
-    this.meteorFlameGeo = null;
-    this.runeRingGeo = null;
+    this.snows.push(...strandedSnows);
+    this.meteorGeo = keepGeometry(this.meteorGeo);
+    this.meteorCoronaGeo = keepGeometry(this.meteorCoronaGeo);
+    this.meteorCrackGeos =
+      this.meteorCrackGeos?.filter((geometry) => geometryStatus.get(geometry) !== true) ?? null;
+    if (this.meteorCrackGeos?.length === 0) this.meteorCrackGeos = null;
+    this.meteorTrailGeo = keepGeometry(this.meteorTrailGeo);
+    this.meteorFlameGeo = keepGeometry(this.meteorFlameGeo);
+    this.runeRingGeo = keepGeometry(this.runeRingGeo);
     if (errors.length > 0) throw new AggregateError(errors, 'MageGroundFx disposal failed');
   }
 

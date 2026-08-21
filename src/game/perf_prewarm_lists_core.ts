@@ -1,9 +1,12 @@
 // Which members of the streamed-prewarm diagnostic lists a perf report can
 // afford to carry, and which ones are worth carrying.
 //
-// Sizing, measured against a real capture
-// (projected through the report's own field mapping): a compile unit costs
-// about 280 bytes, a manifest entry about 190, a pacing transition about 115.
+// Sizing, measured by projecting a real capture through the report's own field
+// mapping (the capture: tmp/load_probe-shader-memory-probes-insane-vsync-cold.json,
+// 27 compile units, 32 manifest entries, 12 pacing transitions; the artifact is
+// a local probe dump, not committed, so treat the figures as the recorded
+// provenance of this decision rather than a reproducible fixture): a compile
+// unit costs about 280 bytes, a manifest entry about 190, a transition 115.
 // The pre-existing prewarm summary (32 manifest entries plus the resume block)
 // is already about 7 KB of the server's 16 KB raw-summary budget, and the rest
 // of rawSummary takes several more. Carrying 32 compile units would add ~9 KB

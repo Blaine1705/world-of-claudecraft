@@ -31,6 +31,7 @@ import { WEAPON_EMISSIVE_IDLE_CACHE_MAX } from '../src/render/weapon_vfx_emissiv
 import {
   createWeaponVfxPrewarmSkinStage,
   weaponVfxPrewarmSkinUnitKey,
+  weaponVfxPrewarmUnits,
 } from '../src/render/weapon_vfx_prewarm';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
@@ -772,6 +773,87 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     expect(WEAPON_VFX_PREWARM_KEYS[WEAPON_VFX_PREWARM_KEYS.length - 1]).toBe('cinderlatch');
     // And the plan really is the catalog, in its own order.
     expect(WEAPON_VFX_PREWARM_KEYS).toEqual(Object.keys(WEAPON_VFX));
+  });
+
+  it('drives the real plan: builds, then one textures unit, then compiles', () => {
+    // The previous version of this case re-derived the ids from the catalog
+    // with its own template literal and never called weaponVfxPrewarmUnits, so
+    // it proved the regex matched the TEST's strings. Reordering the three
+    // phases, which is the whole point of the streaming split, left it green.
+    const staged: string[] = [];
+    const compiled: string[] = [];
+    let textures = 0;
+    const groups = new Map<string, THREE.Group>();
+    const stage = {
+      group: null,
+      get: (key: string) => groups.get(key),
+      stage: (key: string) => {
+        staged.push(key);
+        const group = new THREE.Group();
+        groups.set(key, group);
+        return group;
+      },
+      disposeFailedUnit: () => {},
+      dispose: () => {},
+    };
+    const published: (THREE.Group | null)[] = [];
+
+    const units = weaponVfxPrewarmUnits(stage, {
+      prewarmTextures: () => {
+        textures++;
+      },
+      compile: async (group) => {
+        compiled.push([...groups].find(([, g]) => g === group)?.[0] ?? '?');
+      },
+      publishGroup: (group) => published.push(group),
+    });
+
+    const ids = units.map((unit) => unit.id);
+    expect(ids).toHaveLength(47);
+    // Phase order is the contract: every build, then the single shared-texture
+    // unit, then every compile. A compile that ran before its build would find
+    // no group and link nothing.
+    expect(ids.slice(0, 23)).toEqual(
+      WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:build:${key}`),
+    );
+    expect(ids[23]).toBe('weapon-skins:textures');
+    expect(ids.slice(24)).toEqual(
+      WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:compile:${key}`),
+    );
+    expect(ids[0]).toBe('weapon-skins:build:ice_fang');
+    expect(ids[46]).toBe('weapon-skins:compile:cinderlatch');
+
+    // Running the plan in order stages every skin once and compiles each one.
+    for (const unit of units.slice(0, 24)) unit.run();
+    expect(staged).toEqual([...WEAPON_VFX_PREWARM_KEYS]);
+    expect(textures).toBe(1);
+    expect(published).toHaveLength(23);
+  });
+
+  it('skips a compile whose skin was released, without throwing', () => {
+    // What the per-skin failure boundary relies on: after disposeFailedUnit
+    // drops one skin, that skin's remaining compile unit must no-op rather
+    // than throw or link a stale group.
+    const compiled: string[] = [];
+    const stage = {
+      group: null,
+      get: () => undefined,
+      stage: () => new THREE.Group(),
+      disposeFailedUnit: () => {},
+      dispose: () => {},
+    };
+    const units = weaponVfxPrewarmUnits(stage, {
+      prewarmTextures: () => {},
+      compile: async (group) => {
+        compiled.push(group.uuid);
+      },
+      publishGroup: () => {},
+    });
+
+    const compileUnit = units.find((unit) => unit.id.startsWith('weapon-skins:compile:'));
+    expect(compileUnit).toBeDefined();
+    expect(() => compileUnit?.run()).not.toThrow();
+    expect(compiled).toEqual([]);
   });
 
   it('plans one build and one compile unit per catalog skin, with literal ids', () => {

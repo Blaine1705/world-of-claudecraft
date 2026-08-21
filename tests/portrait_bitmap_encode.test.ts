@@ -283,6 +283,82 @@ describe('encodeCanvasBitmapPng', () => {
     expect(portraitBitmapEncodeSupport().hasWorker).toBe(true);
   });
 
+  // The epoch guard: a failure that STARTED before a graphics rebuild must not
+  // latch the transfer arm off for the rig that replaced it. dispose
+  // deliberately clears the latch to give the new rig a fresh chance, and
+  // without the guard a stale rejection, backstop or worker error landing
+  // afterwards silently takes it away again, costing every later portrait the
+  // slow synchronous path. Three call sites route through markUnavailableAt and
+  // each gets its own arm here.
+  it('does not latch the rebuilt rig when a stale worker error lands after dispose', async () => {
+    restore = stubHost();
+    const pending = encodeCanvasBitmapPng(CANVAS, SIZE);
+    await Promise.resolve();
+    const stale = FakeWorker.instances[0];
+
+    disposePortraitEncodeWorker();
+    await expect(pending).resolves.toBeNull();
+    // The terminated worker still fires its error listener.
+    stale.crash();
+
+    expect(portraitBitmapEncodeSupport().hasWorker).toBe(true);
+  });
+
+  it('does not latch the rebuilt rig when a stale snapshot rejection lands after dispose', async () => {
+    const rejectSnapshot: { fire?: (reason: unknown) => void } = {};
+    restore = stubHost({
+      createImageBitmap: () =>
+        new Promise((_resolve, reject) => {
+          rejectSnapshot.fire = reject;
+        }),
+    });
+    const pending = encodeCanvasBitmapPng(CANVAS, SIZE);
+    expect(pending).not.toBeNull();
+
+    disposePortraitEncodeWorker();
+    rejectSnapshot.fire?.(new Error('stale snapshot'));
+    await expect(pending).resolves.toBeNull();
+
+    expect(portraitBitmapEncodeSupport().hasWorker).toBe(true);
+  });
+
+  it('disarms an in-flight backstop on dispose, leaving no timer to fire late', async () => {
+    // Why the transfer backstop needs no epoch arm of its own: terminate()
+    // drains every waiter, and each waiter clears its own backstop, so the
+    // timer is gone before a rebuilt rig exists. Pinned rather than assumed,
+    // because if that drain ever stopped clearing the timer the stale timeout
+    // WOULD reach markUnavailableAt and the epoch guard would become the only
+    // thing standing between it and the new rig.
+    vi.useFakeTimers();
+    try {
+      restore = stubHost();
+      const pending = encodeCanvasBitmapPng(CANVAS, SIZE);
+      await Promise.resolve();
+      expect(vi.getTimerCount()).toBe(1);
+
+      disposePortraitEncodeWorker();
+      await expect(pending).resolves.toBeNull();
+      expect(vi.getTimerCount()).toBe(0);
+
+      await vi.advanceTimersByTimeAsync(PORTRAIT_ENCODE_LIVENESS_BACKSTOP_MS + 1);
+      expect(portraitBitmapEncodeSupport().hasWorker).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('still latches a CURRENT failure, so the guard is not a blanket exemption', async () => {
+    // The positive control: without it, a guard that never latches anything
+    // would pass all three cases above.
+    restore = stubHost();
+    const pending = encodeCanvasBitmapPng(CANVAS, SIZE);
+    await Promise.resolve();
+    FakeWorker.instances[0].crash();
+    await expect(pending).resolves.toBeNull();
+
+    expect(portraitBitmapEncodeSupport().hasWorker).toBe(false);
+  });
+
   // The drawing buffer holds premultiplied colour and toBlob reads it with no
   // colour conversion. Left to the host defaults, a browser that unpremultiplies
   // or converts into a display space would ship different portrait edges to its

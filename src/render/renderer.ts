@@ -6053,7 +6053,7 @@ export class Renderer {
       // Earlier-deferred units resubmit ahead of the fresh collection; their
       // groups are already marked, so the plan above never re-collected them.
       const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];
-      const { submitted, deferred } = await runPrewarmCompileSubmission(pending, {
+      const { deferred } = await runPrewarmCompileSubmission(pending, {
         outOfTime: () =>
           prewarmSubmitShouldStop(
             performance.now(),
@@ -6063,17 +6063,22 @@ export class Renderer {
           ),
         awaitSlot: (outOfTime) => pacing.awaitSlot(outOfTime),
         recordDeferred: (unit) => compileLifecycle.recordFor(unit, lane),
-        submit: (unit) =>
-          submitPrewarmCompileUnit(unit, lane, {
-            lifecycle: compileLifecycle,
-            pacing,
-            programCount: () => this.webgl.info.programs?.length ?? 0,
-            onError: (err) =>
-              console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err),
-          }),
+        // Recorded as each unit goes, never batched at the loop's return: a
+        // rejection inside the loop must not lose already-submitted units from
+        // the set programs.compile awaits.
+        submit: (unit) => {
+          submittedCompileUnits.push(
+            submitPrewarmCompileUnit(unit, lane, {
+              lifecycle: compileLifecycle,
+              pacing,
+              programCount: () => this.webgl.info.programs?.length ?? 0,
+              onError: (err) =>
+                console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err),
+            }),
+          );
+        },
         yieldSlice: () => new Promise<void>((resolve) => setTimeout(resolve, 0)),
       });
-      submittedCompileUnits.push(...submitted);
       if (deferred.length === 0) return;
       deferredSubmitUnits.push(...(deferred as PrewarmResumeUnit[]));
       // The deferred units' compiles now settle AFTER the manifest, so the warm

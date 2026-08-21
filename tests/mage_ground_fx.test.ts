@@ -516,12 +516,49 @@ describe('Mage meteor visual', () => {
     expect(rootDetach).toHaveBeenCalledOnce();
     expect(firstDispose).toHaveBeenCalledOnce();
     expect(laterDispose).toHaveBeenCalledOnce();
+    // removeFromParent threw but the parent.remove fallback landed, so the
+    // node really is off the scene and its entry is NOT retained: retention is
+    // judged on where the node ended up, never on whether an attempt threw.
     expect(scene.children).toHaveLength(0);
     expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(0);
     expect((fx as unknown as { snows: unknown[] }).snows).toHaveLength(0);
+
+    // The geometry whose dispose threw IS retained, so the second pass
+    // re-attempts exactly it and nothing else. Nulling it on the first pass
+    // would have dropped the last reference to live GPU memory.
     fx.dispose();
-    expect(firstDispose).toHaveBeenCalledOnce();
+    expect(firstDispose).toHaveBeenCalledTimes(2);
     expect(laterDispose).toHaveBeenCalledOnce();
+  });
+
+  it('retains a root it could not detach, so a later dispose can try again', () => {
+    // The failure that matters: a root still attached to the scene is still
+    // DRAWING. Clearing its entry would strand it with nothing holding a
+    // reference and no route to a second attempt.
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+    fx.spawnMeteor({ x: 10, z: 20, radius: 6, duration: 5 });
+
+    const root = scene.children[0];
+    // Both detach arms fail, so the node genuinely stays in the scene.
+    const removeFromParent = vi.spyOn(root, 'removeFromParent').mockImplementationOnce(() => {
+      throw new Error('root detach');
+    });
+    const sceneRemove = vi.spyOn(scene, 'remove').mockImplementationOnce(() => {
+      throw new Error('scene remove');
+    });
+
+    expect(() => fx.dispose()).toThrow(AggregateError);
+    expect(removeFromParent).toHaveBeenCalledOnce();
+    expect(sceneRemove).toHaveBeenCalledOnce();
+    expect(scene.children).toContain(root);
+    const meteors = (fx as unknown as { meteors: unknown[] }).meteors;
+    expect(meteors).toHaveLength(1);
+
+    // The retry detaches it for real and drops the entry.
+    fx.dispose();
+    expect(scene.children).not.toContain(root);
+    expect(meteors).toHaveLength(0);
   });
 
   it('retains failed pooled material occupancy for a retry', () => {
