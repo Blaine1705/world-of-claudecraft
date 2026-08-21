@@ -451,6 +451,29 @@ describe('Nythraxis encounter module (N1)', () => {
     for (const p of [heroic.tank, ...heroic.dps]) expect(p.dead).toBe(true);
   });
 
+  it('Veilbound Mark on the boss cannot save a full-health player from failed heroic Deathless Rage', () => {
+    const heroic = setup({ difficulty: 'heroic' });
+    const st = nythraxis.initNythraxisEncounter(heroic.boss);
+    st.phase = 2;
+    st.deathlessCastRemaining = 0.01; // completes this update, no channels ran
+    heroic.tank.maxHp = 1000;
+    heroic.tank.hp = 1000;
+    heroic.ctx.applyAura(heroic.boss, {
+      id: 'veilbound_mark',
+      name: 'Veil Mark',
+      kind: 'dot',
+      remaining: 6,
+      duration: 6,
+      value: 12,
+      sourceId: heroic.tank.id,
+      school: 'holy',
+    });
+
+    nythraxis.updateNythraxisDeathlessRage(heroic.ctx, heroic.boss, st);
+
+    expect(heroic.tank.dead).toBe(true);
+  });
+
   it('a Direhowl debuff still mitigates the survivable normal-mode Deathless Rage hit', () => {
     // Normal's 82% was never calibrated as a guaranteed kill (unlike heroic's
     // 115%), so the alreadyFinal skip above must stay heroic-only: Direhowl
