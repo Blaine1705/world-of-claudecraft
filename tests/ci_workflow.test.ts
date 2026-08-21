@@ -1722,7 +1722,8 @@ describe('CI workflow parity', () => {
     // Token scan over span CONTENT, deliberately not anchored to `run: `:
     // block scalars, npm-script names, and pnpm forms all carry one of these
     // tokens somewhere in the step that runs them.
-    const testTokens = /vitest|ci_shard_test|npm test|npm run test|node --test|node --run test|pnpm (?:run )?test/;
+    const testTokens =
+      /vitest|ci_shard_test|npm test|npm run test|node --test|node --run test|pnpm (?:run )?test/;
     const nightly = readFileSync(
       new URL('../.github/workflows/nightly.yml', import.meta.url),
       'utf8',
