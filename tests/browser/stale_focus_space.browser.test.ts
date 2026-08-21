@@ -16,6 +16,8 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { Input } from '../../src/game/input';
 import { Keybinds } from '../../src/game/keybinds';
+import { markDialogRoot } from '../../src/ui/dialog_root';
+import { FocusManager } from '../../src/ui/focus_manager';
 import { bindChromeButtonKeyGuard, bindPointerBlur } from '../../src/ui/pointer_blur';
 import { installPromptDialog } from '../../src/ui/prompt_dialog';
 
@@ -193,5 +195,45 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     await pressSpace();
     expect(count).toBe(1);
     expect(document.activeElement).toBe(btn);
+  });
+
+  it('(e) a pointer click inside a dialog-rooted window parks focus on the root: the Tab trap stays armed and Space still jumps', async () => {
+    // The real markDialogRoot shape (role=dialog + tabindex=-1) under a real
+    // FocusManager trap, which cycles Tab only while focus is INSIDE the root: a
+    // blur to the body would silently disarm it on the mouse path.
+    const dialog = document.createElement('div');
+    markDialogRoot(dialog, { label: 'window' });
+    const first = document.createElement('button');
+    first.type = 'button';
+    first.textContent = 'first';
+    const second = document.createElement('button');
+    second.type = 'button';
+    second.textContent = 'second';
+    let count = 0;
+    second.addEventListener('click', () => {
+      count++;
+    });
+    dialog.append(first, second);
+    document.body.appendChild(dialog);
+    bindChromeButtonKeyGuard(dialog);
+    bindPointerBlur(dialog);
+    const trap = new FocusManager().open({ root: () => dialog });
+    try {
+      await userEvent.click(second);
+      expect(count).toBe(1);
+      // Parked on the root: not the clicked button, not the body.
+      expect(document.activeElement).toBe(dialog);
+      // Space on the root (a DIV) is the jump key again; nothing re-activates.
+      await userEvent.keyboard('[Space>]');
+      expect(input.debugState().movementHeld.jump).toBe(true);
+      await userEvent.keyboard('[/Space]');
+      expect(count).toBe(1);
+      // Tab: the trap is still armed (focus is inside the root), so it enters the
+      // window's cycle at the first control instead of walking out of it.
+      await userEvent.tab();
+      expect(document.activeElement).toBe(first);
+    } finally {
+      trap.release(false);
+    }
   });
 });

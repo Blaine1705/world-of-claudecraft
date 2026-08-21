@@ -15,13 +15,34 @@ import {
   bindChromeButtonKeyGuard,
   bindPointerBlur,
   blurIfPointerClick,
+  dropPointerFocus,
+  POINTER_FOCUS_PARK_SELECTOR,
 } from '../src/ui/pointer_blur';
+
+/** A dialog root in the markDialogRoot shape: role=dialog, and tabindex="-1" unless
+ *  the test models a root that never got the stamp (then it is not focusable). */
+class FakeRoot {
+  focused = 0;
+  lastFocusOptions: { preventScroll?: boolean } | undefined;
+  constructor(private readonly withTabindex = true) {}
+  hasAttribute(name: string): boolean {
+    return name === 'tabindex' && this.withTabindex;
+  }
+  focus(options?: { preventScroll?: boolean }): void {
+    this.focused++;
+    this.lastFocusOptions = options;
+  }
+}
 
 class FakeButton {
   blurred = 0;
   tagName = 'BUTTON';
-  constructor(private readonly selectorMatches: string[]) {}
-  closest(selector: string): FakeButton | null {
+  constructor(
+    private readonly selectorMatches: string[],
+    private readonly dialogRoot: FakeRoot | null = null,
+  ) {}
+  closest(selector: string): FakeButton | FakeRoot | null {
+    if (selector === POINTER_FOCUS_PARK_SELECTOR) return this.dialogRoot;
     return this.selectorMatches.includes(selector) ? this : null;
   }
   blur(): void {
@@ -68,7 +89,66 @@ describe('blurIfPointerClick', () => {
   });
 });
 
+describe('dropPointerFocus (where the focus goes)', () => {
+  it('parks focus on the enclosing focusable dialog root instead of blurring to the body', () => {
+    // The root keeps FocusManager's Tab trap armed (it cycles only while focus is
+    // inside the root) and, being a DIV, can never be re-activated by Space.
+    const root = new FakeRoot();
+    const btn = new FakeButton([], root);
+    dropPointerFocus(btn);
+    expect(root.focused).toBe(1);
+    expect(root.lastFocusOptions).toEqual({ preventScroll: true });
+    expect(btn.blurred).toBe(0);
+  });
+
+  it('blurs to the body when the dialog root is not focusable (no tabindex stamp)', () => {
+    // focus() on an unfocusable root would silently no-op and leave the button
+    // holding focus: the one outcome worse than a body blur.
+    const root = new FakeRoot(false);
+    const btn = new FakeButton([], root);
+    dropPointerFocus(btn);
+    expect(root.focused).toBe(0);
+    expect(btn.blurred).toBe(1);
+  });
+
+  it('blurs to the body outside every dialog root (rail, trackers, chat tabs)', () => {
+    const btn = new FakeButton([]);
+    dropPointerFocus(btn);
+    expect(btn.blurred).toBe(1);
+  });
+
+  it('blurs when the element has no closest() at all (a minimal fake or a detached node)', () => {
+    let blurred = 0;
+    dropPointerFocus({
+      blur: () => {
+        blurred++;
+      },
+    });
+    expect(blurred).toBe(1);
+  });
+
+  it('routes blurIfPointerClick through the same park-or-blur decision', () => {
+    const root = new FakeRoot();
+    const btn = new FakeButton([], root);
+    blurIfPointerClick({ detail: 1, target: btn }, btn);
+    expect(root.focused).toBe(1);
+    expect(btn.blurred).toBe(0);
+    blurIfPointerClick({ detail: 0, target: btn }, btn);
+    expect(root.focused).toBe(1);
+  });
+});
+
 describe('bindPointerBlur (delegated)', () => {
+  it('parks a pointer click inside a dialog-rooted panel on the root (the trapped-window case)', () => {
+    const container = new FakeContainer();
+    bindPointerBlur(container, 'button');
+    const root = new FakeRoot();
+    const btn = new FakeButton(['button'], root);
+    container.dispatch('click', { detail: 1, target: btn });
+    expect(root.focused).toBe(1);
+    expect(btn.blurred).toBe(0);
+  });
+
   it('binds a capture-phase click listener, so the blur precedes the target handler', () => {
     const container = new FakeContainer();
     bindPointerBlur(container, 'button');

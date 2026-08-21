@@ -20,8 +20,15 @@
 // panel guard stops propagation), whether or not its panel is dialog-rooted (the
 // bags and bank windows are; the map window is a plain .window.panel).
 //
+// Known residual: the graphics rebuild pause blocks input with no surface at all,
+// so a keyboard-focused chrome button loses both its activation and its focus to
+// a Space pressed during that pause (the pause is short, and every other blocked
+// state puts the keyboard user's focus inside a dialog root).
+//
 // Host-agnostic (everything reached off the passed element) so it unit-tests
-// in plain Node; input.ts passes document.activeElement.
+// in plain Node; input.ts passes document.activeElement. Registered as a pure
+// core in tests/architecture.test.ts (UI_PURE_CORES, a src/game leaf like
+// presentation_gate.ts), so the purity sweep keeps it import-free.
 
 /** The slice of an element the staleness check needs. */
 export interface FocusedChromeEl {

@@ -242,6 +242,23 @@ describe('FocusManager Tab trap cycle', () => {
     expect(fakeDoc.activeElement).toBe(b); // the hidden member is not a cycle stop
   });
 
+  it('cycles from the focused root itself (pointer focus parked there by pointer_blur.ts) into the first and last controls', () => {
+    // A mouse click inside a dialog-rooted window parks focus on the root rather
+    // than the body (src/ui/pointer_blur.ts): root.contains(root) holds, so the
+    // trap stays armed and the next Tab enters the cycle instead of leaving it.
+    const root = new FakeHTMLElement();
+    const a = new FakeHTMLElement({ focusable: true });
+    const b = new FakeHTMLElement({ focusable: true });
+    root.append(a, b);
+    new FocusManager().open({ root: () => el(root) });
+    fakeDoc.activeElement = root;
+    expect(tab()).toBe(true);
+    expect(fakeDoc.activeElement).toBe(a);
+    fakeDoc.activeElement = root;
+    expect(tab(true)).toBe(true);
+    expect(fakeDoc.activeElement).toBe(b);
+  });
+
   it('does NOT trap Tab when focus is outside the window (game Tab-targeting preserved)', () => {
     const root = new FakeHTMLElement();
     root.append(new FakeHTMLElement({ focusable: true }));

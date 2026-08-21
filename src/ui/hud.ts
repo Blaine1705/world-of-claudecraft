@@ -3907,12 +3907,12 @@ export class Hud {
     if (!el) {
       el = document.createElement('div');
       el.id = 'emote-wheel';
-      // An isModalOpen() surface: a dialog root, so the blocked-state Space guard
-      // (src/game/stale_chrome_focus.ts) spares a pinned wheel's own emote buttons.
-      markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') });
       document.getElementById('ui')?.appendChild(el);
       this.emoteWheelEl = el;
     }
+    // An isModalOpen() surface: a dialog root (re-marked per show, so its name follows a
+    // language switch); the blocked-state Space guard (stale_chrome_focus.ts) spares it.
+    markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') });
     const slots = this.emoteWheelSlots.filter(isOverheadEmoteId).slice(0, EMOTE_WHEEL_LIMIT);
     el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
     slots.forEach((id, i) => {
