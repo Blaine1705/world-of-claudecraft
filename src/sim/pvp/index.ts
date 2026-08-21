@@ -32,6 +32,8 @@ export {
   repeatHonorMultiplier,
 } from './honor';
 export {
+  DOUBLE_HONOR_LEAD_HOURS,
+  DOUBLE_HONOR_LEAD_MS,
   DOUBLE_HONOR_MULTIPLIER,
   DOUBLE_HONOR_WEEKDAYS,
   doubleHonorActive,

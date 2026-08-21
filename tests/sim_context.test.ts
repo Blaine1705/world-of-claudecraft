@@ -332,6 +332,7 @@ function makeFakeHost() {
     delvePetStash: new Map(),
     utcDay: '',
     resetDay: '',
+    eventLeadDay: '',
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),

@@ -328,7 +328,7 @@ export function awardBattlegroundHonor(
   // nothing else: the issue that asked for the event scopes it to the 5v5
   // CTF explicitly, which is also the classic-era battleground-holiday shape.
   // The anti-farm decay applies first, then the event, inside the one floor.
-  const eventMult = honorEventMultiplier(ctx.resetDay);
+  const eventMult = honorEventMultiplier(ctx.resetDay, ctx.eventLeadDay);
   // Weekend loss boost (owner tuning for the early, gearless realm): while
   // the event window is open, a played-out loss or draw pays the WIN base,
   // still decayed and still doubled, so queueing on an event day is never a
@@ -340,7 +340,7 @@ export function awardBattlegroundHonor(
   // owner knobs, and retuning DOUBLE_HONOR_MULTIPLIER to exactly 1 must not
   // silently switch the loss boost off with it.
   const base =
-    outcome === 'win' || doubleHonorActive(ctx.resetDay)
+    outcome === 'win' || doubleHonorActive(ctx.resetDay, ctx.eventLeadDay)
       ? BATTLEGROUND_WIN_HONOR
       : BATTLEGROUND_LOSS_HONOR;
   const reason: HonorReason = outcome === 'win' ? 'battleground_win' : 'battleground_complete';
@@ -392,7 +392,9 @@ export function awardBattlegroundKillHonor(
   return grantHonor(
     ctx,
     meta,
-    BATTLEGROUND_KILL_HONOR * repeatHonorMultiplier(repeats) * honorEventMultiplier(ctx.resetDay),
+    BATTLEGROUND_KILL_HONOR *
+      repeatHonorMultiplier(repeats) *
+      honorEventMultiplier(ctx.resetDay, ctx.eventLeadDay),
     'battleground_kill',
   );
 }
@@ -410,7 +412,9 @@ export function awardBattlegroundAssistHonor(
   return grantHonor(
     ctx,
     meta,
-    BATTLEGROUND_ASSIST_HONOR * repeatHonorMultiplier(repeats) * honorEventMultiplier(ctx.resetDay),
+    BATTLEGROUND_ASSIST_HONOR *
+      repeatHonorMultiplier(repeats) *
+      honorEventMultiplier(ctx.resetDay, ctx.eventLeadDay),
     'battleground_assist',
   );
 }
