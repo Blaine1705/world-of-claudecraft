@@ -30,9 +30,11 @@
 //
 // STICKY MODE is the non-gesture path, for VoiceOver / TalkBack / Switch Control:
 // activation opens the row as a persistent, focusable menu of real buttons
-// instead of a drag. Phase 6 promotes exactly this path to the touchTapMenus
-// setting (a tap opens the menu rather than running the default), which is why
-// openSticky() is public and takes no pointer state.
+// instead of a drag. The touchTapMenus setting is that same path promoted to a
+// player option: with it on, a press opens the row instead of arming the drag, a
+// press on the anchor with the row open runs the default action, and a press
+// outside dismisses. Every rule is tap_menu_core.ts's, shared with the radial and
+// the consumables row so the three cannot drift.
 
 import {
   placeConsumableStrip,
@@ -41,6 +43,8 @@ import {
   STRIP_DEADZONE_PX,
   type StripPlacement,
 } from '../action_bar/radial_action_core';
+import { armTapMenuOutsideDismiss } from '../tap_menu';
+import { resolveTapMenuPress } from '../tap_menu_core';
 import {
   MENU_STRIP_COUNT,
   MENU_STRIP_DIRECTION,
@@ -79,6 +83,8 @@ export interface MenuStripGestureDeps {
   items: readonly HTMLElement[];
   /** The X that sits on top of the anchor and backs out without opening. */
   cancel: HTMLElement;
+  /** Tap mode (settings.touchTapMenus), read live at press time. */
+  tapMenus(): boolean;
   /** Open the item at `index`. */
   pick(index: number): void;
   /** A bare tap: run the control's default action. */
@@ -143,6 +149,8 @@ export class MenuStripGesture {
   /** Set when our own pointer handling resolved a gesture, so the synthetic click
    *  the browser fires afterwards is not mistaken for an assistive activation. */
   private suppressClick = false;
+  /** Disarms the tap-outside listener, while one is armed. */
+  private disarmOutside: (() => void) | null = null;
 
   constructor(private readonly deps: MenuStripGestureDeps) {}
 
@@ -173,9 +181,15 @@ export class MenuStripGesture {
     });
     this.deps.items.forEach((btn, index) => {
       btn.addEventListener('click', () => {
-        if (!this.sticky) return;
+        const press = resolveTapMenuPress({
+          tapMenus: this.deps.tapMenus(),
+          open: this.sticky !== null,
+          target: 'item',
+          index,
+        });
+        if (press.kind !== 'choose') return;
         this.closeSticky();
-        this.deps.pick(index);
+        this.deps.pick(press.index);
       });
     });
     cancel.addEventListener('click', () => {
@@ -186,13 +200,22 @@ export class MenuStripGesture {
   }
 
   /**
-   * Open the row as a persistent, focusable menu. The pointer path never calls
-   * this; assistive activation does, and Phase 6's tap mode will.
+   * Open the row as a persistent, focusable menu. Assistive activation calls
+   * this, and so does a tap-mode press.
    */
   openSticky(): void {
     if (this.sticky || this.drag) return;
     this.sticky = this.measure();
     this.setRowFocusable(true);
+    // Only tap mode dismisses on an outside press: with the setting off the row
+    // is assistive-only and closes through its own items or its cancel X, which
+    // is what it did before the setting existed.
+    if (this.deps.tapMenus()) {
+      this.disarmOutside = armTapMenuOutsideDismiss(
+        () => [this.deps.anchor, ...this.deps.items, this.deps.cancel],
+        () => this.dismissSticky(),
+      );
+    }
     this.deps.repaint();
     this.deps.items[0]?.focus();
   }
@@ -202,8 +225,41 @@ export class MenuStripGesture {
     if (!this.sticky) return;
     this.sticky = null;
     this.setRowFocusable(false);
+    this.disarmOutside?.();
+    this.disarmOutside = null;
     this.deps.repaint();
     this.deps.anchor.focus();
+  }
+
+  /** The tap-outside path: close and report the row as chosen-nothing. */
+  private dismissSticky(): void {
+    const press = resolveTapMenuPress({
+      tapMenus: this.deps.tapMenus(),
+      open: this.sticky !== null,
+      target: 'outside',
+    });
+    if (press.kind !== 'dismiss') return;
+    this.closeSticky();
+    this.deps.onCancel();
+  }
+
+  /** A tap-mode press on the anchor: open the row, or run the default action
+   *  when it is already open. Never arms the drag. */
+  private onTapPress(e: PointerEvent): void {
+    const press = resolveTapMenuPress({
+      tapMenus: true,
+      open: this.sticky !== null,
+      target: 'anchor',
+    });
+    this.suppressClick = true;
+    if (e.pointerType === 'touch') e.preventDefault();
+    if (press.kind === 'open') {
+      this.openSticky();
+      return;
+    }
+    if (press.kind !== 'default') return;
+    this.closeSticky();
+    this.deps.runDefault();
   }
 
   /** True while the row is showing, from either path. */
@@ -273,8 +329,16 @@ export class MenuStripGesture {
   }
 
   private onDown(e: PointerEvent): void {
-    if (this.drag || this.sticky) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    // A press always clears a stale suppression first: the flag is set on a
+    // release and cleared by the click that follows it, so one that never
+    // arrived would otherwise swallow the next assistive activation.
+    this.suppressClick = false;
+    if (this.deps.tapMenus()) {
+      this.onTapPress(e);
+      return;
+    }
+    if (this.drag || this.sticky) return;
     try {
       this.deps.anchor.setPointerCapture?.(e.pointerId);
     } catch {

@@ -1346,6 +1346,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
   'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',
   'hudChrome.options.mobileLeftHanded': '왼손잡이 레이아웃',
+  'hudChrome.options.touchTapMenus': '탭 메뉴',
+  'hudChrome.options.touchTapMenusNote': '스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다.',
   'hudChrome.options.itemLevelLine': '아이템 레벨 {level}',
   'hudChrome.options.itemScoreLine': '점수 {score}',
   'hudChrome.landing.highContrast': '고대비',
@@ -13115,5 +13117,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.armed': '칸을 눌러 {name}을(를) 배치하세요.',
   'hudChrome.barEditor.picked': '다른 칸을 눌러 {name}과(와) 바꾸세요.',
   'hudChrome.barEditor.locked': '행동 단축바가 인터페이스 설정에서 잠겨 있습니다.',
+  'hudChrome.barEditor.clear': '비우기',
+  'hudChrome.barEditor.clearAria': '슬롯 비우기',
+  'hudChrome.barEditor.clearArmed': '슬롯을 탭하면 비워집니다.',
   'hudChrome.spellbook.assignAria': '{name}을(를) 놓을 칸 선택',
 };

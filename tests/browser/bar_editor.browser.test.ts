@@ -26,7 +26,11 @@ import { page } from 'vitest/browser';
 import { ACTION_BAR_ABILITY_SLOTS } from '../../src/ui/hud/action_bar/action_bar_layout_core';
 import { BarEditorWindow } from '../../src/ui/hud/action_bar/bar_editor/bar_editor_window';
 import type { HotbarAction } from '../../src/ui/hud/action_bar/hotbar';
-import { placeAbilityOnSlot, swapHotbarSlots } from '../../src/ui/hud/action_bar/hotbar';
+import {
+  clearHotbarSlot,
+  placeAbilityOnSlot,
+  swapHotbarSlots,
+} from '../../src/ui/hud/action_bar/hotbar';
 import {
   MOBILE_ACTION_BUTTONS,
   sourceSlotForMobileButton,
@@ -141,6 +145,9 @@ describe(`bar editor at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
       swapSlots: (a, b) => {
         bar.splice(0, bar.length, ...swapHotbarSlots(bar, a - 1, b - 1));
       },
+      clearSlot: (slot) => {
+        bar.splice(0, bar.length, ...clearHotbarSlot(bar, slot - 1));
+      },
     });
     bindTouchTap(shell.edit, () => editor.open());
     return { ...shell, bar, editor };
@@ -198,6 +205,33 @@ describe(`bar editor at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     expect(nameOf(target)).not.toBe('');
   });
 
+  it('clears a bound cell with the Clear control, at the touch floor', async () => {
+    const rig = await setup();
+    rig.editor.open();
+    const clear = rig.root.querySelector<HTMLButtonElement>('.bar-editor-clear');
+    expect(clear, 'the editor must offer a clear control on touch').not.toBeNull();
+    const clearBtn = clear as HTMLButtonElement;
+    const size = clearBtn.getBoundingClientRect();
+    expect(size.width).toBeGreaterThanOrEqual(TOUCH_FLOOR_PX);
+    expect(size.height).toBeGreaterThanOrEqual(TOUCH_FLOOR_PX);
+    // On screen with the rest of the overlay, not pushed past the sheet's edge.
+    const rootBox = rig.root.getBoundingClientRect();
+    expect(size.right).toBeLessThanOrEqual(rootBox.right + 1);
+
+    const grid = cells(rig.root);
+    expect(nameOf(grid[0])).not.toBe('');
+    clearBtn.click();
+    expect(clearBtn.getAttribute('aria-pressed')).toBe('true');
+    grid[0].click();
+
+    // Slot 1 is emptied through the same bar the desktop drop mutates, and the
+    // cell repaints as empty rather than keeping a stale name.
+    expect(rig.bar[0]).toBeNull();
+    expect(nameOf(grid[0])).toBe('');
+    expect(grid[0].classList.contains('empty')).toBe(true);
+    expect(clearBtn.getAttribute('aria-pressed')).toBe('false');
+  });
+
   it('swaps two cells with two taps and repaints both', async () => {
     const rig = await setup();
     rig.editor.open();
@@ -231,6 +265,9 @@ describe('the live action ring no longer arms a rearrange', () => {
     const casts: Array<{ buttonIndex: number; direction: string }> = [];
     const gesture = new RadialGesture({
       buttons: rig.slotBtns,
+      // The gesture arm, which is what this regression is about: tap mode is the
+      // other arm and has its own suite.
+      tapMenus: () => false,
       metricsHost: rig.ring,
       hasSlot: () => true,
       cast: (buttonIndex, direction) => casts.push({ buttonIndex, direction }),

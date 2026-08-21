@@ -19,11 +19,13 @@ import {
   type BarEditorSelection,
   barEditorCaption,
   barEditorCellAria,
+  barEditorClearArmed,
   barEditorPageCount,
   barEditorPickedSlot,
   buildBarEditorGrid,
   clampBarEditorPage,
   resolveBarEditorTap,
+  toggleBarEditorClear,
 } from '../src/ui/hud/action_bar/bar_editor/bar_editor_core';
 import { sourceSlotForMobileButton } from '../src/ui/hud/action_bar/mobile_action_page_view';
 
@@ -246,5 +248,54 @@ describe('bar editor accessible names and caption', () => {
     expect(barEditorCaption({ kind: 'slot', slot: 3 }, 'Fireball', deps)).toContain(
       'hudChrome.barEditor.picked',
     );
+    expect(barEditorCaption(toggleBarEditorClear(BAR_EDITOR_IDLE), null, deps)).toContain(
+      'hudChrome.barEditor.clearArmed',
+    );
+  });
+});
+
+// The Clear control: touch's only way to EMPTY a slot, since the desktop clear is
+// shift plus right-click. It is an ARMED MODE rather than a per-cell control,
+// which is what these cases pin.
+describe('bar editor clear mode', () => {
+  const armed = toggleBarEditorClear(BAR_EDITOR_IDLE);
+
+  it('arms and disarms from the same control', () => {
+    expect(armed).toEqual({ kind: 'clear' });
+    expect(barEditorClearArmed(armed)).toBe(true);
+    expect(toggleBarEditorClear(armed)).toEqual(BAR_EDITOR_IDLE);
+    expect(barEditorClearArmed(BAR_EDITOR_IDLE)).toBe(false);
+    // Arming over a pending pick REPLACES it rather than stacking two modes.
+    expect(toggleBarEditorClear({ kind: 'slot', slot: 3 })).toEqual({ kind: 'clear' });
+  });
+
+  it('empties the bound cell that is tapped and disarms itself', () => {
+    const tap = resolveBarEditorTap(armed, cellAt(0, 'up', 1), true);
+    expect(tap).toEqual({
+      kind: 'clear',
+      slot: sourceSlotForMobileButton(0, 1, 'up'),
+      selection: BAR_EDITOR_IDLE,
+    });
+  });
+
+  it('stays armed on an empty cell instead of silently dropping the mode', () => {
+    const tap = resolveBarEditorTap(armed, cellAt(0, 'up', 1), false);
+    expect(tap.kind).toBe('idle');
+    expect(tap.selection).toEqual(armed);
+  });
+
+  it('is inert on an out-of-range tail cell, armed or not', () => {
+    const tail = { buttonIndex: 3, direction: 'left' as const, slot: 99, inRange: false };
+    const tap = resolveBarEditorTap(armed, tail, true);
+    expect(tap.kind).toBe('idle');
+    expect(tap.selection).toEqual(armed);
+  });
+
+  it('never picks a cell up while clear is armed, so a clear cannot become a swap', () => {
+    const first = resolveBarEditorTap(armed, cellAt(0, 'center', 0), true);
+    expect(first.kind).toBe('clear');
+    // And the next tap is an ordinary pick again, because the clear disarmed.
+    const second = resolveBarEditorTap(first.selection, cellAt(0, 'center', 1), true);
+    expect(second.kind).toBe('pick');
   });
 });

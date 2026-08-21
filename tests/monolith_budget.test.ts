@@ -102,7 +102,12 @@ const MONOLITHS: MonolithRow[] = [
     // hud/action_bar/bar_editor/. Hud kept only the window construction, its two
     // mutation callbacks and the public opener, so the file lands 185 lines
     // below its old pin even after the wiring. Exact count, zero slack.
-    ceiling: 19078,
+    // LOWERED 19078 -> 19076 by the bar editor's Clear control: the desktop
+    // slot's two shift-clear listeners moved behind action_bar_clear.ts's own
+    // bindShiftClear, and the editor's three mutation callbacks now share ONE
+    // tooltip hide inside the window, which pays for the new clearSlot callback
+    // with two lines to spare. Exact count, zero slack.
+    ceiling: 19076,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -269,7 +274,12 @@ const MONOLITHS: MonolithRow[] = [
     // window) lives in src/ui/hud/action_bar/bar_editor/, and the same change
     // LOWERS hud.ts by 185. Maintainer decision, exact merged count: any further
     // growth reds again.
-    ceiling: 11517,
+    // RESTORED and LOWERED 11517 -> 11499 by tap mode: raising a ceiling is a
+    // maintainer decision, so that +1 is paid back with an extraction rather than
+    // kept. main.ts carried a private escapeHtml duplicating src/ui/esc.ts, the
+    // canonical escaper the repo already mandates for every interpolation, so the
+    // copy is deleted and its 36 call sites use esc(). Exact count, zero slack.
+    ceiling: 11499,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

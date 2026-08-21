@@ -17,6 +17,7 @@
 
 import { t } from '../../i18n';
 import { makeWriterFacet, type PainterHostWriters } from '../../painter_host';
+import { tapMenusEnabled } from '../tap_menu';
 import { MENU_STRIP_ITEMS } from './menu_strip_core';
 import { MenuStripGesture } from './menu_strip_gesture_controller';
 import { MenuStripPainter } from './menu_strip_painter';
@@ -84,6 +85,7 @@ export function buildMobileMenuControl(deps: MobileMenuControlDeps): MobileMenuC
     metricsHost: strip,
     items: itemEls,
     cancel,
+    tapMenus: () => tapMenusEnabled(),
     pick: (index) => {
       // Activate the real button: the action then runs through the handler the
       // old row or the More tray already bound to it, haptics included.

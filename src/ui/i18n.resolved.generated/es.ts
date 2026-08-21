@@ -900,7 +900,10 @@ export const es: EnTranslations = {
       "hint": "Tap a slot, then another, to swap them.",
       "armed": "Tap a slot to place {name}.",
       "picked": "Tap another slot to swap with {name}.",
-      "locked": "Action bars are locked in Interface options."
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Usa el joystick de movimiento para moverte y arrastra la pantalla para mirar alrededor. Da unos pasos para empezar.",
@@ -1444,7 +1447,9 @@ export const es: EnTranslations = {
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
-      "mobileLeftHanded": "Diseño para zurdos"
+      "mobileLeftHanded": "Diseño para zurdos",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Opciones",

@@ -28,6 +28,7 @@ import { itemDisplayName } from '../../entity_i18n';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { bindTouchTap } from '../../touch_tap';
+import { tapMenusEnabled } from '../tap_menu';
 import type { ActionBarSlotElements } from './action_bar_painter';
 import {
   type ActionBarAbility,
@@ -163,6 +164,7 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
   const overlay = document.getElementById(RADIAL_ID);
   const gesture = new RadialGesture({
     buttons: slotBtns,
+    tapMenus: () => tapMenusEnabled(),
     // The radial's own geometry tokens live on the overlay; the ring container
     // is the fallback for a build without the overlay markup, where the gesture
     // still casts and only the reveal has nothing to show.
@@ -311,7 +313,15 @@ function buildRadialPetals(
   );
   const ordered = RADIAL_PETAL_DIRECTIONS.map((dir) => byDirection.get(dir));
   if (!overlay || !cancel || ordered.some((btn) => btn === undefined)) return null;
-  const petalEls = (ordered as HTMLButtonElement[]).map(slotElements);
+  const petalBtns = ordered as HTMLButtonElement[];
+  const petalEls = petalBtns.map(slotElements);
+  // Tap mode chooses a petal by tapping it, so the gesture layer needs the petal
+  // buttons themselves. They exist only now: the overlay lookup runs after the
+  // gesture the ring buttons are already bound to.
+  gesture.attachPetals(
+    RADIAL_PETAL_DIRECTIONS.map((direction, i) => ({ direction, el: petalBtns[i] as HTMLElement })),
+    cancel,
+  );
 
   const view = createActionBarView(
     {

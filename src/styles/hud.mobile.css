@@ -1178,6 +1178,13 @@
   body.mobile-touch .mobile-action-petal.oor {
     border-color: #a33;
   }
+  /* Tap mode (settings.touchTapMenus) and assistive activation: the petals become
+     a persistent focusable menu, so they take pointer events the drag path
+     deliberately keeps off the overlay. The same rule the two strips carry. */
+  body.mobile-touch #mobile-action-radial.open .mobile-action-petal,
+  body.mobile-touch #mobile-action-radial.open #mobile-action-radial-cancel {
+    pointer-events: auto;
+  }
   /* forced-colors keeps the chosen petal distinguishable by SHAPE, not hue:
      the palette is replaced wholesale there, so the gold glow above vanishes. */
   @media (forced-colors: active) {
@@ -5461,6 +5468,30 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  /* The Clear toggle's own row. Touch has no shift + right-click, so emptying a
+     slot is a MODE here: armed, the next cell tap clears that slot. */
+  body.mobile-touch #bar-editor .bar-editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+  body.mobile-touch #bar-editor .bar-editor-clear {
+    min-width: 88px;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 2px solid #4a3d1d;
+    border-radius: 7px;
+    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    color: #c8b888;
+    font: 600 14px / 1 var(--ui-font);
+  }
+  body.mobile-touch #bar-editor .bar-editor-clear.active {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  body.mobile-touch #bar-editor .bar-editor-clear:disabled {
+    opacity: 0.5;
   }
   body.mobile-touch #bar-editor .bar-editor-caption {
     margin-top: 10px;

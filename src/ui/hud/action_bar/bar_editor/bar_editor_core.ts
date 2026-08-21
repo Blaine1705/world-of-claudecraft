@@ -11,7 +11,7 @@
 // release (an accidental slot 1/2 swap mid-combat was reported). Setup leaves
 // the live combat surface entirely: the editor explodes ONE page into a real
 // grid of focusable buttons and mutates it with taps, so no gesture is involved
-// and it works under the future tap-mode setting by construction.
+// and it works under the touchTapMenus setting by construction.
 
 import type { InterpolationValues, TranslationKey } from '../../../i18n';
 import {
@@ -88,13 +88,16 @@ export function clampBarEditorPage(page: number, totalSlots: number): number {
  *  - `ability`: a spell arrived armed from the spellbook; the next tap places it.
  *  - `slot`: a cell is picked up; the next tap swaps with it, or cancels when it
  *    lands back on the same cell.
+ *  - `clear`: the Clear control is armed; the next tap on a bound cell empties it.
  */
 export type BarEditorSelection =
   | { readonly kind: 'none' }
   | { readonly kind: 'ability'; readonly abilityId: string }
-  | { readonly kind: 'slot'; readonly slot: number };
+  | { readonly kind: 'slot'; readonly slot: number }
+  | { readonly kind: 'clear' };
 
 export const BAR_EDITOR_IDLE: BarEditorSelection = { kind: 'none' };
+export const BAR_EDITOR_CLEAR_ARMED: BarEditorSelection = { kind: 'clear' };
 
 /** The mutation a tap resolves to, plus the selection that survives it. */
 export type BarEditorTap =
@@ -106,6 +109,7 @@ export type BarEditorTap =
       readonly selection: BarEditorSelection;
     }
   | { readonly kind: 'pick'; readonly slot: number; readonly selection: BarEditorSelection }
+  | { readonly kind: 'clear'; readonly slot: number; readonly selection: BarEditorSelection }
   | {
       readonly kind: 'swap';
       readonly from: number;
@@ -131,6 +135,13 @@ export function resolveBarEditorTap(
   cellIsBound: boolean,
 ): BarEditorTap {
   if (!cell.inRange) return { kind: 'idle', selection };
+  if (selection.kind === 'clear') {
+    // An empty cell keeps clear ARMED rather than disarming: a mis-tap on a gap
+    // in the grid must not silently take the mode away mid-cleanup. The Clear
+    // control itself is the way out.
+    if (!cellIsBound) return { kind: 'idle', selection };
+    return { kind: 'clear', slot: cell.slot, selection: BAR_EDITOR_IDLE };
+  }
   if (selection.kind === 'ability') {
     return {
       kind: 'place',
@@ -150,6 +161,21 @@ export function resolveBarEditorTap(
 /** Arm a spell handed over by the spellbook's assign control. */
 export function armBarEditorAbility(abilityId: string): BarEditorSelection {
   return { kind: 'ability', abilityId };
+}
+
+/**
+ * Toggle the Clear control. Arming it is what gives touch a way to EMPTY a slot
+ * at all: the desktop clear is shift + right-click, which no phone can produce,
+ * so before this a bound slot could only ever be swapped or overwritten. Pressing
+ * it again disarms, and so does any tap it consumes.
+ */
+export function toggleBarEditorClear(selection: BarEditorSelection): BarEditorSelection {
+  return selection.kind === 'clear' ? BAR_EDITOR_IDLE : BAR_EDITOR_CLEAR_ARMED;
+}
+
+/** Whether the Clear control is armed, for its pressed state. */
+export function barEditorClearArmed(selection: BarEditorSelection): boolean {
+  return selection.kind === 'clear';
 }
 
 /** The cell a pending swap picked up, or -1 when nothing is picked up. Lets a
@@ -195,5 +221,6 @@ export function barEditorCaption(
   if (selection.kind === 'slot') {
     return deps.t('hudChrome.barEditor.picked', { name: nameForSelection ?? '' });
   }
+  if (selection.kind === 'clear') return deps.t('hudChrome.barEditor.clearArmed');
   return deps.t('hudChrome.barEditor.hint');
 }

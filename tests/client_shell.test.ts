@@ -1350,7 +1350,28 @@ describe('client HTML shell', () => {
       expect(entry, name).toContain(
         '<button type="button" class="mobile-action-petal" data-radial-dir="up"',
       );
+      // Tap mode makes them a persistent focusable menu, so every petal and the
+      // cancel target ship OUT of the tab order and the gesture flips them in,
+      // exactly like the two strips' items.
+      for (const direction of ['up', 'right', 'down', 'left']) {
+        expect(entry, `${name}: ${direction} petal`).toMatch(
+          new RegExp(`data-radial-dir="${direction}"[^>]*tabindex="-1"`),
+        );
+      }
+      expect(entry, name).toMatch(/id="mobile-action-radial-cancel"[^>]*tabindex="-1"/);
     }
+    // The petals take pointer events only while the overlay is OPEN: the drag
+    // path keeps them off the overlay, and tap mode needs them tappable.
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch #mobile-action-radial.open .mobile-action-petal,\n' +
+        '  body.mobile-touch #mobile-action-radial.open #mobile-action-radial-cancel {\n' +
+        '    pointer-events: auto;\n' +
+        '  }',
+    );
+    // Touch-router coverage: the overlay is a SIBLING of the ring, so ring
+    // containment does not reach it and a tap on a petal would otherwise fall
+    // through to a camera drag.
+    expect(touchRouterTs).toContain("'#mobile-action-radial',");
   });
 
   // A stray </div> inside #mobile-controls once slipped through review: the tree still

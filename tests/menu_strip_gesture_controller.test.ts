@@ -28,9 +28,11 @@ interface Rig {
   defaults: number;
   cancels: number;
   repaints: number;
+  /** settings.touchTapMenus, flipped per test. */
+  tapMenus: boolean;
 }
 
-function makeRig(options: { appVw?: string; safeAreaPx?: string } = {}): Rig {
+function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: boolean } = {}): Rig {
   const host = document.createElement('div');
   host.style.setProperty('--strip-gap', '8px');
   host.style.setProperty('--strip-margin', '6px');
@@ -75,6 +77,7 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string } = {}): Rig {
     defaults: 0,
     cancels: 0,
     repaints: 0,
+    tapMenus: options.tapMenus ?? false,
     gesture: null as unknown as MenuStripGesture,
   };
   const deps: MenuStripGestureDeps = {
@@ -82,6 +85,7 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string } = {}): Rig {
     metricsHost: host,
     items,
     cancel,
+    tapMenus: () => rig.tapMenus,
     pick: (index) => rig.picks.push(index),
     runDefault: () => {
       rig.defaults++;
@@ -278,5 +282,69 @@ describe('MenuStripGesture: the sticky path Phase 6 promotes', () => {
     const rig = makeRig();
     rig.items[2].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(rig.picks).toEqual([]);
+  });
+});
+
+// The touchTapMenus setting: the same sticky path VoiceOver already used, now a
+// player option. The RULES are tap_menu_core.ts's (its own suite); what is pinned
+// here is that the anchor's pointer path routes to them and arms no drag.
+describe('MenuStripGesture: tap mode', () => {
+  it('opens the row on a press and runs NO default action', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    expect(rig.defaults).toBe(0);
+    expect(rig.picks).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+    // No drag armed, so the release resolves nothing and the row stays up.
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
+    expect(rig.defaults).toBe(0);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.liveIndex()).toBe(-1);
+    expect(rig.items.every((btn) => btn.tabIndex === 0)).toBe(true);
+  });
+
+  it('opens the item that is tapped, then closes', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.items[4].click();
+    expect(rig.picks).toEqual([4]);
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.items.every((btn) => btn.tabIndex === -1)).toBe(true);
+  });
+
+  it('runs the default action when the anchor is pressed again', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointerdown', 2, 100));
+    expect(rig.defaults).toBe(1);
+    expect(rig.picks).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('dismisses on a press outside the row, opening nothing', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    expect(rig.gesture.isOpen()).toBe(true);
+
+    const elsewhere = document.createElement('div');
+    document.body.append(elsewhere);
+    elsewhere.dispatchEvent(pointer('pointerdown', 2, 40));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.picks).toEqual([]);
+    expect(rig.defaults).toBe(0);
+    expect(rig.cancels).toBe(1);
+  });
+
+  it('with the setting OFF the swipe still picks and a tap still runs the default', () => {
+    const rig = makeRig();
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
+    expect(rig.defaults).toBe(1);
+
+    rig.anchor.dispatchEvent(pointer('pointerdown', 2, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 2, 100 + SWIPE_PX));
+    rig.anchor.dispatchEvent(pointer('pointerup', 2, 100 + SWIPE_PX));
+    expect(rig.picks).toEqual([0]);
   });
 });

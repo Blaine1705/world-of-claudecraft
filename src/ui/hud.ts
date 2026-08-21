@@ -346,6 +346,7 @@ import {
   actionBarBindStatus,
 } from './hud/action_bar/action_bar_bind_core';
 import {
+  bindShiftClear,
   handleShiftClearContextMenu,
   handleShiftClearKeydown,
 } from './hud/action_bar/action_bar_clear';
@@ -5322,12 +5323,14 @@ export class Hud {
       this.hotbarActions = placeAbilityOnSlot(this.hotbarActions, abilityId, slot - 1);
       this.saveSlotMap();
       this.spellbookWindow.refreshHotbarControls();
-      this.hideTooltip();
     },
     swapSlots: (slotA, slotB) => {
       this.hotbarActions = swapHotbarSlots(this.hotbarActions, slotA - 1, slotB - 1);
       this.saveSlotMap();
-      this.hideTooltip();
+    },
+    clearSlot: (slot) => {
+      this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
+      this.saveSlotMap();
     },
   });
   // Quest-log window painter (questlog_view.ts core + questlog_window.ts painter).
@@ -7393,12 +7396,7 @@ export class Hud {
           btn.classList.remove('drop-target', 'oor', 'queued', 'unusable');
           this.hideTooltip();
         };
-        btn.addEventListener('contextmenu', (e) => {
-          handleShiftClearContextMenu(e, clearSlot);
-        });
-        btn.addEventListener('keydown', (e) => {
-          handleShiftClearKeydown(e, clearSlot);
-        });
+        bindShiftClear(btn, clearSlot);
         btn.addEventListener('dragstart', (e) => {
           if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
             e.preventDefault();

@@ -40,11 +40,13 @@ import {
   type BarEditorSelection,
   barEditorCaption,
   barEditorCellAria,
+  barEditorClearArmed,
   barEditorPageCount,
   barEditorPickedSlot,
   buildBarEditorGrid,
   clampBarEditorPage,
   resolveBarEditorTap,
+  toggleBarEditorClear,
 } from './bar_editor_core';
 
 /** Hud-supplied glue. Every mutation leaves through these, never through a
@@ -67,6 +69,8 @@ export interface BarEditorWindowDeps {
   placeAbility(abilityId: string, slot: number): void;
   /** Swap two 1-based bar slots (the desktop drop's own path). */
   swapSlots(slotA: number, slotB: number): void;
+  /** Empty a 1-based bar slot (the desktop shift-clear's own path). */
+  clearSlot(slot: number): void;
 }
 
 /** One painted cell and the grid position it stands for. Collected as the node
@@ -84,6 +88,7 @@ export class BarEditorWindow {
   private selection: BarEditorSelection = BAR_EDITOR_IDLE;
   private readonly cells: CellRef[] = [];
   private caption: HTMLElement | null = null;
+  private clearBtn: HTMLButtonElement | null = null;
   private readonly tabs: HTMLButtonElement[] = [];
 
   constructor(private readonly deps: BarEditorWindowDeps) {}
@@ -147,10 +152,12 @@ export class BarEditorWindow {
     markDialogRoot(el, { label: t('hudChrome.barEditor.title') });
     this.cells.length = 0;
     this.tabs.length = 0;
+    this.clearBtn = null;
     el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.barEditor.title'))}</span><div class="panel-title-actions"><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.barEditor.close'))}">${svgIcon('close')}</button></div></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.appendChild(this.buildTabs(totalSlots));
     el.appendChild(this.buildGrid(totalSlots));
+    el.appendChild(this.buildClearControl());
     const caption = document.createElement('div');
     caption.className = 'bar-editor-caption';
     el.appendChild(caption);
@@ -176,6 +183,33 @@ export class BarEditorWindow {
       this.tabs.push(tab);
     }
     return strip;
+  }
+
+  /** The Clear toggle. Touch had no way to EMPTY a slot at all (the desktop clear
+   *  is shift plus right-click, which a phone cannot produce), so a bound slot
+   *  could only be swapped or overwritten. Armed, the next cell tap empties that
+   *  slot; it is a MODE rather than a per-cell control because the grid's cells
+   *  are already the tap surface, and a second control per cell would halve every
+   *  target at the tier that needs them largest. */
+  private buildClearControl(): HTMLElement {
+    const row = document.createElement('div');
+    row.className = 'bar-editor-actions';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'bar-editor-clear';
+    btn.textContent = t('hudChrome.barEditor.clear');
+    btn.setAttribute('aria-label', t('hudChrome.barEditor.clearAria'));
+    btn.addEventListener('click', () => this.toggleClear());
+    row.appendChild(btn);
+    this.clearBtn = btn;
+    return row;
+  }
+
+  private toggleClear(): void {
+    if (!this.deps.editAllowed()) return;
+    this.selection = toggleBarEditorClear(this.selection);
+    audio.click();
+    this.paint();
   }
 
   private buildGrid(totalSlots: number): HTMLElement {
@@ -244,7 +278,14 @@ export class BarEditorWindow {
     this.selection = tap.selection;
     if (tap.kind === 'place') this.deps.placeAbility(tap.abilityId, tap.slot);
     else if (tap.kind === 'swap') this.deps.swapSlots(tap.from, tap.to);
+    else if (tap.kind === 'clear') this.deps.clearSlot(tap.slot);
     if (tap.kind !== 'idle') audio.click();
+    // ONE tooltip hide for every mutation the editor makes (the desktop drop's
+    // stale-tooltip rule), so each Hud callback stays the bar write plus the
+    // shared save and no third one can forget it.
+    if (tap.kind === 'place' || tap.kind === 'swap' || tap.kind === 'clear') {
+      this.deps.hideTooltip();
+    }
     this.paint();
   }
 
@@ -268,6 +309,12 @@ export class BarEditorWindow {
           formatIndex: (value) => formatNumber(value, { maximumFractionDigits: 0 }),
         }),
       );
+    }
+    const clearArmed = barEditorClearArmed(this.selection);
+    if (this.clearBtn) {
+      this.clearBtn.setAttribute('aria-pressed', clearArmed ? 'true' : 'false');
+      this.clearBtn.classList.toggle('active', clearArmed);
+      this.clearBtn.disabled = !this.deps.editAllowed();
     }
     this.tabs.forEach((tab, page) => {
       tab.setAttribute('aria-selected', page === this.page ? 'true' : 'false');

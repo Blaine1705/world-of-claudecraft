@@ -900,7 +900,10 @@ export const da_DK: EnTranslations = {
       "hint": "Tap a slot, then another, to swap them.",
       "armed": "Tap a slot to place {name}.",
       "picked": "Tap another slot to swap with {name}.",
-      "locked": "Action bars are locked in Interface options."
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -1444,7 +1447,9 @@ export const da_DK: EnTranslations = {
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",
-      "mobileLeftHanded": "Venstrehånds layout"
+      "mobileLeftHanded": "Venstrehånds layout",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Valg",

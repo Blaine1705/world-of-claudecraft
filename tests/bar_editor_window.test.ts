@@ -32,9 +32,11 @@ interface Harness {
   bar: HotbarAction[];
   placed: Array<{ abilityId: string; slot: number }>;
   swapped: Array<{ a: number; b: number }>;
+  cleared: number[];
   locked: { value: boolean };
   cells(): HTMLButtonElement[];
   tabs(): HTMLButtonElement[];
+  clearBtn(): HTMLButtonElement;
 }
 
 function harness(): Harness {
@@ -46,6 +48,7 @@ function harness(): Harness {
   bar[1] = { type: 'ability', id: 'battle_shout' };
   const placed: Array<{ abilityId: string; slot: number }> = [];
   const swapped: Array<{ a: number; b: number }> = [];
+  const cleared: number[] = [];
   const locked = { value: false };
   const window = new BarEditorWindow({
     root: () => root,
@@ -65,6 +68,10 @@ function harness(): Harness {
       swapped.push({ a, b });
       [bar[a - 1], bar[b - 1]] = [bar[b - 1], bar[a - 1]];
     },
+    clearSlot: (slot) => {
+      cleared.push(slot);
+      bar[slot - 1] = null;
+    },
   });
   return {
     window,
@@ -72,9 +79,11 @@ function harness(): Harness {
     bar,
     placed,
     swapped,
+    cleared,
     locked,
     cells: () => [...root.querySelectorAll<HTMLButtonElement>('.bar-editor-cell')],
     tabs: () => [...root.querySelectorAll<HTMLButtonElement>('.bar-editor-tab')],
+    clearBtn: () => root.querySelector<HTMLButtonElement>('.bar-editor-clear') as HTMLButtonElement,
   };
 }
 
@@ -229,6 +238,48 @@ describe('bar editor window: the action-bar lock', () => {
   });
 });
 
+describe('bar editor window: the Clear control', () => {
+  it('empties the next tapped slot through the shared clear path, then disarms', () => {
+    h.window.open();
+    expect(h.clearBtn().getAttribute('aria-pressed')).toBe('false');
+
+    h.clearBtn().click();
+    expect(h.clearBtn().getAttribute('aria-pressed')).toBe('true');
+    // Slot 1 (button 0, centre) holds heroic_strike in the harness bar.
+    h.cells()[0].click();
+    expect(h.cleared).toEqual([1]);
+    expect(h.bar[0]).toBeNull();
+    expect(h.swapped).toEqual([]);
+    // One tap, one clear: the mode disarms so the next tap is an ordinary pick.
+    expect(h.clearBtn().getAttribute('aria-pressed')).toBe('false');
+    h.cells()[1].click();
+    expect(h.cleared).toEqual([1]);
+  });
+
+  it('toggles back off without touching the bar', () => {
+    h.window.open();
+    h.clearBtn().click();
+    h.clearBtn().click();
+    expect(h.clearBtn().getAttribute('aria-pressed')).toBe('false');
+    h.cells()[0].click();
+    expect(h.cleared).toEqual([]);
+  });
+
+  it('is disabled while the action bars are locked', () => {
+    h.locked.value = true;
+    h.window.open();
+    expect(h.clearBtn().disabled).toBe(true);
+    h.clearBtn().click();
+    h.cells()[0].click();
+    expect(h.cleared).toEqual([]);
+  });
+
+  it('carries an accessible name of its own', () => {
+    h.window.open();
+    expect(h.clearBtn().getAttribute('aria-label')).toBeTruthy();
+  });
+});
+
 describe('bar editor window: open / close lifecycle', () => {
   it('returns focus to the opener on close', () => {
     const opener = document.createElement('button');
@@ -248,6 +299,7 @@ describe('bar editor window: open / close lifecycle', () => {
       editAllowed: () => true,
       placeAbility: () => {},
       swapSlots: () => {},
+      clearSlot: () => {},
     });
     w.open();
     w.close();

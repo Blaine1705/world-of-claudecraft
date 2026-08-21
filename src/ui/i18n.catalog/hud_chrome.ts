@@ -659,6 +659,11 @@ export const hudChromeStrings = {
     armed: 'Tap a slot to place {name}.',
     picked: 'Tap another slot to swap with {name}.',
     locked: 'Action bars are locked in Interface options.',
+    // The Clear toggle: touch's only way to EMPTY a slot, since the desktop
+    // clear is shift plus right-click.
+    clear: 'Clear',
+    clearAria: 'Clear a slot',
+    clearArmed: 'Tap a slot to clear it.',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -1542,6 +1547,11 @@ export const hudChromeStrings = {
     // for left-thumb-dominant players; the same setting as the Key Bindings
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
+    // Touch accessibility toggle (off by default): every gesture menu opens on a
+    // tap instead of a swipe or a hold. The note below is the row's description.
+    touchTapMenus: 'Tap menus',
+    touchTapMenusNote:
+      'Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close.',
   },
   // Choice-row talents (the rows tab in the talents window). The row OPTION
   // names/descriptions are sim content (English source, localized with the

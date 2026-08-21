@@ -84,7 +84,9 @@ export interface TouchRouterEvent {
  *  `hud.mobile.css` (`.mobile-btn`, `.action-btn`) plus the paged action ring
  *  container (`#mobile-action-ring`, `.mobile-action-slot`) and the consumables
  *  row it opens (`#mobile-consumable-strip`, a SIBLING of the ring rather than a
- *  child, so ring containment does not reach it), the menu control's strip
+ *  child, so ring containment does not reach it), the radial petal overlay
+ *  (`#mobile-action-radial`, a sibling too, whose petals take taps in tap mode),
+ *  the menu control's strip
  *  (`#mobile-menu-strip`, a sibling for the same reason, and whose caption and
  *  cancel target are not `.mobile-btn`), the top-band quest strip
  *  (`#quest-strip`, whose whole box is one swipe target and whose constant hit
@@ -98,6 +100,7 @@ const INTERACTIVE_HUD_SELECTORS = [
   '.action-btn',
   '.mobile-action-slot',
   '#mobile-action-ring',
+  '#mobile-action-radial',
   '#mobile-consumable-strip',
   '#mobile-menu-strip',
   '#quest-strip',

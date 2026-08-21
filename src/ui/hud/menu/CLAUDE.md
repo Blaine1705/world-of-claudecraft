@@ -29,7 +29,7 @@ Character, Spells, Settings, More.
 | File | What it is |
 |---|---|
 | `menu_strip_core.ts` | PURE. Roster, release rules, reveal rule, caption clamp. Registered in `UI_PURE_CORES`. |
-| `menu_strip_gesture_controller.ts` | Pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, and the sticky (assistive / Phase 6 tap mode) path. |
+| `menu_strip_gesture_controller.ts` | Pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, and the sticky path (assistive activation and the `touchTapMenus` tap mode, whose rules come from `../tap_menu_core.ts`). |
 | `menu_strip_painter.ts` | Thin painter: item seating, live highlight, caption text and position. Takes no layout read. |
 | `menu_control_controller.ts` | Builds it from the static markup and routes picks to the real buttons. |
 

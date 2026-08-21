@@ -26,6 +26,7 @@ import { abilityDisplayName } from '../../ability_display_name';
 import { itemDisplayName } from '../../entity_i18n';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
+import { tapMenusEnabled } from '../tap_menu';
 import type { ActionBarSlotElements } from './action_bar_painter';
 import { type ActionBarWorldInput, createActionBarView } from './action_bar_view';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
@@ -148,6 +149,7 @@ export function buildMobileConsumableSeat(
     metricsHost: strip,
     items: itemBtns,
     cancel,
+    tapMenus: () => tapMenusEnabled(),
     count: () => ids.length,
     use: (index) => {
       const id = ids[index];

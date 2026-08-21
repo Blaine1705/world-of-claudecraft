@@ -4,8 +4,9 @@
 # src/ui/hud/action_bar/bar_editor/: the touch bar editor
 
 One ring page, exploded into a 4-button by 5-direction grid of real buttons,
-with page tabs. Tap-to-place and tap-to-swap. It is the ONLY way to bind an
-action bar slot on touch.
+with page tabs. Tap-to-place, tap-to-swap, and a Clear toggle that empties the
+next slot tapped. It is the ONLY way to bind an action bar slot on touch, and
+the only way to EMPTY one there (the desktop clear is shift plus right-click).
 
 ## Load-bearing rules
 
@@ -15,12 +16,20 @@ action bar slot on touch.
   radial gestures, so a hold long enough to open the petals could pick a slot up
   and swap it on release. Do not reintroduce a binding gesture on the ring.
 - **Zero gestures, by construction.** Every control here is a focusable
-  `<button>` driven by `click`. That is what makes it work under the Phase 6 tap
-  mode without a second code path, and what makes it keyboard-reachable.
-- **Mutations leave through the deps, never through a local write path.** Both
-  callbacks land on the SAME `placeAbilityOnSlot` / `swapHotbarSlots` plus
-  `saveSlotMap` route the desktop HTML5 drop uses, so offline and online behave
-  identically and no `IWorld` member was added.
+  `<button>` driven by `click`. That is what makes it work under the
+  `touchTapMenus` setting without a second code path, and what makes it
+  keyboard-reachable.
+- **Clear is a MODE, not a per-cell control.** The grid's cells are already the
+  tap surface, and a second control inside each one would halve every target at
+  the tier that needs them largest. Arming survives a tap on an empty cell (a
+  mis-tap must not take the mode away mid-cleanup) and ends on the tap it
+  consumes or on the toggle itself.
+- **Mutations leave through the deps, never through a local write path.** All
+  three callbacks land on the SAME `placeAbilityOnSlot` / `swapHotbarSlots` /
+  `clearHotbarSlot` plus `saveSlotMap` route the desktop drop and shift-clear
+  use, so offline and online behave identically and no `IWorld` member was added.
+  The tooltip hide that follows a mutation lives HERE, once, rather than in each
+  Hud callback.
 - **A pending pick survives a page switch.** Moving a binding between pages is
   exactly the move the old drag could never make; clearing the selection on a tab
   press would take it away again.

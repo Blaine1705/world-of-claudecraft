@@ -207,6 +207,14 @@ export const BOOL_SETTINGS = {
   // gameplay space is the primary camera path; this is an opt-in alternative for
   // players who prefer a dedicated stick. Gated on body.mobile-camera-joystick-on.
   mobileCameraJoystick: { def: false },
+  // off by default: replaces every touch gesture menu (the action radial, the
+  // consumables row, the menu control) with a tap-only flow. Opening a menu casts
+  // nothing, a second tap on the control runs its default action, and a tap
+  // outside dismisses. This is what closes WCAG 2.5.1 (Pointer Gestures) for the
+  // touch HUD: without it the 16 directional actions are reachable only by a
+  // path-based flick, and it is also the answer for players who cannot hold and
+  // drag reliably.
+  touchTapMenus: { def: false },
   // on by default: mask configured swear words in chat with ****. Purely a
   // local display choice; the server sends raw text and each client decides.
   // (Slurs are blocked server-side regardless and never reach here.)

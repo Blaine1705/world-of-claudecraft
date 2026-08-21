@@ -19,6 +19,18 @@ and performance rules.
 - `Hud` retains cross-window coordination, the shared writer caches, and the frame
   loop. A domain owns its local state, rendering, persistence, and event handling.
 
+## Tap mode is shared, never per menu
+
+`settings.touchTapMenus` replaces every touch gesture menu (the action radial,
+the consumables row, the menu strip) with a tap-only flow, which is what closes
+WCAG 2.5.1 for the touch HUD. It must mean the same thing in all three or it is
+not a mode: `tap_menu_core.ts` owns the whole table (open / choose / default /
+dismiss, plus the untouched gesture path when the setting is off) and
+`tap_menu.ts` owns the two host-reaching halves (the live setting read and the
+capture-phase outside-dismiss listener, which is what keeps the press that
+OPENED a menu from also closing it). A new gesture menu asks those two; it does
+not grow a fourth dialect.
+
 ## Preservation contract
 
 - Keep existing DOM selectors, event order, focus restoration, storage keys, and

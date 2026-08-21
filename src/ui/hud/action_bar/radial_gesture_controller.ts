@@ -29,7 +29,17 @@
 //   - The press is shared. A rearrange long-press drag and an empowered-ability
 //     hold both bind the same button, so the radial asks before it acts and
 //     stays silent when one of them owns the press.
+//
+// STICKY MODE is the tap-only path the touchTapMenus setting turns on, built to
+// the shape the two strips already had: a press REVEALS the petals as a
+// persistent menu of real, focusable buttons and casts nothing, a second press on
+// the ring button casts its centre action, tapping a petal casts that direction,
+// and a press outside dismisses. Every rule is tap_menu_core.ts's, shared with
+// both strips so the three menus cannot drift. With the setting off nothing here
+// runs and the gesture path above is untouched.
 
+import { armTapMenuOutsideDismiss } from '../tap_menu';
+import { resolveTapMenuPress } from '../tap_menu_core';
 import {
   FLICK_DEADZONE_PX,
   placeRadial,
@@ -70,9 +80,19 @@ const FALLBACK_MARGIN_PX = 6;
  *  only to keep Enter / Space working on a focused ring button. */
 const KEYBOARD_CLICK_DETAIL = 0;
 
+/** One petal button and the direction it stands for, in the order they are
+ *  seated. Handed over after the overlay is built, since the petals are minted
+ *  from the same markup lookup that needs the gesture to already exist. */
+export interface RadialPetalTarget {
+  direction: RadialDirection;
+  el: HTMLElement;
+}
+
 export interface RadialGestureDeps {
   /** The ring's action buttons, in ring index order. */
   buttons: readonly HTMLElement[];
+  /** Tap mode (settings.touchTapMenus), read live at press time. */
+  tapMenus(): boolean;
   /** The element whose computed style carries the radial geometry per tier. */
   metricsHost: HTMLElement;
   /** Whether a button plus direction maps to a real hotbar slot right now. */
@@ -128,11 +148,29 @@ function readEdgeMargin(style: CSSStyleDeclaration): number {
   );
 }
 
+/** The tap-mode menu: which ring button revealed the petals, and where they are
+ *  seated. Measured once on opening, exactly like a drag's placement. */
+interface StickyState {
+  buttonIndex: number;
+  btn: HTMLElement;
+  placement: RadialPlacement;
+}
+
 export class RadialGesture {
   private readonly drags = new Map<number, DragState>();
   /** The one pointer allowed to open the petal overlay: the first press to arm
    *  while nothing else was held. Cleared with that drag. */
   private revealOwner: number | null = null;
+  /** Tap mode's open menu. Never coexists with a drag: a tap-mode press returns
+   *  before the drag map is touched. */
+  private sticky: StickyState | null = null;
+  private petals: readonly RadialPetalTarget[] = [];
+  private petalCancel: HTMLElement | null = null;
+  /** Disarms the tap-outside listener, while one is armed. */
+  private disarmOutside: (() => void) | null = null;
+  /** Set when a tap-mode press resolved on pointerdown, so the click the browser
+   *  fires afterwards cannot resolve it a second time. */
+  private suppressClick = false;
 
   constructor(private readonly deps: RadialGestureDeps) {}
 
@@ -144,8 +182,18 @@ export class RadialGesture {
       btn.addEventListener('pointerup', (e) => this.onUp(e as PointerEvent));
       btn.addEventListener('pointercancel', (e) => this.clearDrag((e as PointerEvent).pointerId));
       btn.addEventListener('click', (e) => {
+        if (this.suppressClick) {
+          this.suppressClick = false;
+          return;
+        }
         if ((e as MouseEvent).detail !== KEYBOARD_CLICK_DETAIL) return;
         if (this.deps.pressClaimed(index)) return;
+        // Keyboard activation follows the same table as a tap, so Enter opens the
+        // petals in tap mode instead of casting past them.
+        if (this.deps.tapMenus()) {
+          this.resolveAnchorPress(index);
+          return;
+        }
         if (this.deps.hasSlot(index, 'center')) this.deps.cast(index, 'center');
       });
     });
@@ -157,32 +205,134 @@ export class RadialGesture {
     window.addEventListener('pointercancel', release);
   }
 
+  /**
+   * Bind the petal buttons and the centre cancel target, so tap mode can choose
+   * from them. Called once, right after the overlay is built; a build without the
+   * overlay markup never calls it and tap mode then behaves as a plain tap.
+   */
+  attachPetals(petals: readonly RadialPetalTarget[], cancel: HTMLElement): void {
+    this.petals = petals;
+    this.petalCancel = cancel;
+    this.setPetalsFocusable(false);
+    petals.forEach(({ direction, el }, index) => {
+      el.addEventListener('click', () => {
+        const press = resolveTapMenuPress({
+          tapMenus: this.deps.tapMenus(),
+          open: this.sticky !== null,
+          target: 'item',
+          index,
+        });
+        if (press.kind !== 'choose') return;
+        const buttonIndex = this.sticky?.buttonIndex ?? -1;
+        this.closeSticky();
+        if (buttonIndex >= 0 && this.deps.hasSlot(buttonIndex, direction)) {
+          this.deps.cast(buttonIndex, direction);
+        }
+      });
+    });
+    cancel.addEventListener('click', () => {
+      if (!this.sticky) return;
+      this.closeSticky();
+      this.deps.onCancel();
+    });
+  }
+
   /** True while the petals are showing, which is what makes the ring painter
    *  tick and paint them. */
   isOpen(): boolean {
-    return this.owner()?.placement != null;
+    return this.sticky !== null || this.owner()?.placement != null;
   }
 
   /** The ring button the open radial belongs to, or -1 when nothing is held.
    *  The petal view resolves its slots against this. */
   heldButtonIndex(): number {
-    return this.owner()?.buttonIndex ?? -1;
+    return this.sticky?.buttonIndex ?? this.owner()?.buttonIndex ?? -1;
   }
 
   /** The direction the drag currently points at (the petal highlighted, or
    *  'center' for the cancel target). */
   liveDirection(): RadialDirection {
+    // A tap-mode menu is chosen by tapping a petal, not by travel, so no
+    // direction is under a finger and nothing is highlighted.
+    if (this.sticky) return 'center';
     return this.owner()?.direction ?? 'center';
   }
 
   placement(): RadialPlacement | null {
-    return this.owner()?.placement ?? null;
+    return this.sticky?.placement ?? this.owner()?.placement ?? null;
   }
 
   /** Whether the centre cancel target is the live choice, straight from the
    *  shared rule so the painter never re-derives it. */
   cancelIsLive(): boolean {
+    if (this.sticky) return false;
     return radialCancelIsLive(this.liveDirection(), this.isOpen());
+  }
+
+  /**
+   * Open the petals as a persistent, focusable menu around `buttonIndex`. Tap
+   * mode's own path: it measures the same way a reveal does and casts nothing.
+   */
+  openSticky(buttonIndex: number): void {
+    const btn = this.deps.buttons[buttonIndex];
+    if (!btn || this.drags.size > 0) return;
+    if (this.sticky) this.closeSticky();
+    this.sticky = { buttonIndex, btn, placement: this.measure(btn) };
+    this.setPetalsFocusable(true);
+    this.disarmOutside = armTapMenuOutsideDismiss(
+      () => [...this.deps.buttons, ...this.petals.map((p) => p.el), this.petalCancel],
+      () => this.dismissSticky(),
+    );
+    this.petals[0]?.el.focus();
+  }
+
+  /** Close the tap-mode menu and hand focus back to the ring button it came
+   *  from. Safe to call from any path. */
+  closeSticky(): void {
+    const sticky = this.sticky;
+    if (!sticky) return;
+    this.sticky = null;
+    this.setPetalsFocusable(false);
+    this.disarmOutside?.();
+    this.disarmOutside = null;
+    sticky.btn.focus();
+  }
+
+  /** The tap-outside path: close and report the radial as chosen-nothing. */
+  private dismissSticky(): void {
+    const press = resolveTapMenuPress({
+      tapMenus: this.deps.tapMenus(),
+      open: this.sticky !== null,
+      target: 'outside',
+    });
+    if (press.kind !== 'dismiss') return;
+    this.closeSticky();
+    this.deps.onCancel();
+  }
+
+  /** A tap-mode press on a ring button: open the petals, or cast the centre
+   *  action when they are already open for that button. */
+  private resolveAnchorPress(buttonIndex: number): void {
+    const press = resolveTapMenuPress({
+      tapMenus: true,
+      open: this.sticky?.buttonIndex === buttonIndex,
+      target: 'anchor',
+    });
+    if (press.kind === 'open') {
+      this.openSticky(buttonIndex);
+      return;
+    }
+    if (press.kind !== 'default') return;
+    // Focus goes back to the ring button either way (closeSticky hands it over),
+    // so a keyboard user is left where they started rather than on a dead petal.
+    this.closeSticky();
+    if (this.deps.hasSlot(buttonIndex, 'center')) this.deps.cast(buttonIndex, 'center');
+  }
+
+  private setPetalsFocusable(on: boolean): void {
+    const tabIndex = on ? 0 : -1;
+    for (const petal of this.petals) petal.el.tabIndex = tabIndex;
+    if (this.petalCancel) this.petalCancel.tabIndex = tabIndex;
   }
 
   /** The drag the petal overlay belongs to. A second thumb's press casts but
@@ -195,6 +345,16 @@ export class RadialGesture {
     if (this.drags.has(e.pointerId)) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     if (this.deps.pressClaimed(buttonIndex)) return;
+    // A press always clears a stale suppression first: it is set here and cleared
+    // by the click that follows, so one that never arrived would otherwise
+    // swallow the next keyboard activation.
+    this.suppressClick = false;
+    if (this.deps.tapMenus()) {
+      this.suppressClick = true;
+      if (e.pointerType === 'touch') e.preventDefault();
+      this.resolveAnchorPress(buttonIndex);
+      return;
+    }
     try {
       btn.setPointerCapture?.(e.pointerId);
     } catch {
@@ -222,10 +382,17 @@ export class RadialGesture {
    *  this module reads layout, gated to the reveal rather than per frame. */
   private reveal(d: DragState): void {
     if (d.placement || d.pointerId !== this.revealOwner) return;
-    const rect = d.btn.getBoundingClientRect();
+    d.placement = this.measure(d.btn);
+  }
+
+  /** Seat the radial around one ring button. The one place this module reads
+   *  layout, gated to an opening (a drag's reveal or a tap-mode press) rather
+   *  than per frame. */
+  private measure(btn: HTMLElement): RadialPlacement {
+    const rect = btn.getBoundingClientRect();
     const style = getComputedStyle(this.deps.metricsHost);
     const petalSize = rect.width > 0 ? rect.width : FALLBACK_PETAL_SIZE_PX;
-    d.placement = placeRadial({
+    return placeRadial({
       buttonCx: rect.x + rect.width / 2,
       buttonCy: rect.y + rect.height / 2,
       viewportWidth: readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth),
@@ -275,6 +442,7 @@ export class RadialGesture {
   /** Drop every live gesture and close the petals. Safe to call from any path. */
   cancel(): void {
     for (const pointerId of [...this.drags.keys()]) this.clearDrag(pointerId);
+    this.closeSticky();
   }
 
   private clearDrag(pointerId: number): void {

@@ -900,7 +900,10 @@ export const zh_CN: EnTranslations = {
       "hint": "点按一个栏位，再点按另一个，即可交换。",
       "armed": "点按一个栏位以放置{name}。",
       "picked": "点按另一个栏位以与{name}交换。",
-      "locked": "动作条已在界面选项中锁定。"
+      "locked": "动作条已在界面选项中锁定。",
+      "clear": "清除",
+      "clearAria": "清除一个槽位",
+      "clearArmed": "点击一个槽位即可清除。"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -1444,7 +1447,9 @@ export const zh_CN: EnTranslations = {
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局"
+      "mobileLeftHanded": "左手布局",
+      "touchTapMenus": "点击菜单",
+      "touchTapMenusNote": "用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。"
     },
     "talentRows": {
       "tab": "抉择",

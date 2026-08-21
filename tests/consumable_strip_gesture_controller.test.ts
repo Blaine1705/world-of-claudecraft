@@ -24,12 +24,16 @@ const SWIPE_PX = 30;
 
 interface Rig {
   seat: HTMLButtonElement;
+  items: HTMLButtonElement[];
+  cancel: HTMLButtonElement;
   gesture: ConsumableStripGesture;
   used: number[];
   cancels: number;
+  /** settings.touchTapMenus, flipped per test. */
+  tapMenus: boolean;
 }
 
-function makeRig(options: { appVw?: string; safeAreaPx?: string } = {}): Rig {
+function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: boolean } = {}): Rig {
   const host = document.createElement('div');
   host.style.setProperty('--strip-gap', '8px');
   host.style.setProperty('--strip-margin', '6px');
@@ -68,8 +72,11 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string } = {}): Rig {
 
   const rig: Rig = {
     seat,
+    items,
+    cancel,
     used: [],
     cancels: 0,
+    tapMenus: options.tapMenus ?? false,
     gesture: null as unknown as ConsumableStripGesture,
   };
   const deps: ConsumableStripGestureDeps = {
@@ -77,6 +84,7 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string } = {}): Rig {
     metricsHost: host,
     items,
     cancel,
+    tapMenus: () => rig.tapMenus,
     count: () => CONSUMABLE_BAR_SLOTS,
     use: (index) => rig.used.push(index),
     onCancel: () => {
@@ -159,5 +167,92 @@ describe('ConsumableStripGesture: the clamp box', () => {
     rig.seat.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
     // margin becomes max(6, 30) = 30, so the same row shifts 38px instead of 14.
     expect(rig.gesture.openState()?.placement.centers[0]).toBe(90);
+  });
+});
+
+// The touchTapMenus setting: the same sticky path VoiceOver already used, now a
+// player option. The RULES are tap_menu_core.ts's (its own suite); what is pinned
+// here is that the seat's pointer path routes to them and arms no drag.
+describe('ConsumableStripGesture: tap mode', () => {
+  it('opens the row on a press and uses NOTHING', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    expect(rig.used).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+    // No drag armed, so the release resolves nothing and the row stays up.
+    rig.seat.dispatchEvent(pointer('pointerup', 1, 100));
+    expect(rig.used).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+    // Chosen by focus, not by travel: no item is live and the cancel X is not
+    // the live target either.
+    expect(rig.gesture.openState()?.live).toBe(-1);
+    expect(rig.gesture.openState()?.cancelLive).toBe(false);
+    expect(rig.items.map((btn) => btn.tabIndex)).toEqual([0, 0, 0, 0, 0, 0]);
+  });
+
+  it('uses the item that is tapped, then closes', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.items[2].click();
+    expect(rig.used).toEqual([2]);
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.items.map((btn) => btn.tabIndex)).toEqual([-1, -1, -1, -1, -1, -1]);
+  });
+
+  it('uses the FIRST consumable when the seat is pressed again', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.seat.dispatchEvent(pointer('pointerup', 1, 100));
+    rig.seat.dispatchEvent(pointer('pointerdown', 2, 100));
+    expect(rig.used).toEqual([0]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('dismisses on a press outside the row, using nothing', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    expect(rig.gesture.isOpen()).toBe(true);
+
+    const elsewhere = document.createElement('div');
+    document.body.append(elsewhere);
+    elsewhere.dispatchEvent(pointer('pointerdown', 2, 400));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.used).toEqual([]);
+    expect(rig.cancels).toBe(1);
+  });
+
+  it('does not let the synthetic click reopen the row it just closed', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.seat.dispatchEvent(pointer('pointerup', 1, 100));
+    // Second press uses the first consumable and closes; the click the browser
+    // fires after it must not be read as an assistive activation.
+    rig.seat.dispatchEvent(pointer('pointerdown', 2, 100));
+    rig.seat.dispatchEvent(pointer('pointerup', 2, 100));
+    rig.seat.click();
+    expect(rig.used).toEqual([0]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('with the setting OFF the swipe still walks the row and no outside tap closes it', () => {
+    const rig = makeRig();
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.seat.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    expect(rig.gesture.isOpen()).toBe(true);
+    rig.seat.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
+    expect(rig.used).toEqual([0]);
+
+    // The assistive sticky path is unchanged too, suppression included: the click
+    // the browser fires after the drag is not read as an activation, and only the
+    // next one opens the row.
+    rig.seat.click();
+    expect(rig.gesture.isOpen()).toBe(false);
+    rig.seat.click();
+    expect(rig.gesture.isOpen()).toBe(true);
+    const elsewhere = document.createElement('div');
+    document.body.append(elsewhere);
+    elsewhere.dispatchEvent(pointer('pointerdown', 2, 400));
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.cancels).toBe(0);
   });
 });

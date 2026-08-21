@@ -1309,6 +1309,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '顯示每日獎勵寶箱',
   'hudChrome.options.mobileCameraJoystick': '攝影機搖桿',
   'hudChrome.options.mobileLeftHanded': '左手配置',
+  'hudChrome.options.touchTapMenus': '點擊選單',
+  'hudChrome.options.touchTapMenusNote': '用點擊代替滑動來開啟動作、消耗品與選單控制項。點擊項目即可使用，再次點擊控制項執行其一般操作，點擊外部則關閉。',
   'hudChrome.options.itemLevelLine': '物品等級 {level}',
   'hudChrome.options.itemScoreLine': '評分 {score}',
   'hudChrome.landing.highContrast': '高對比度',
@@ -12882,5 +12884,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.armed': '點按一個欄位以放置 {name}。',
   'hudChrome.barEditor.picked': '點按另一個欄位以與 {name} 交換。',
   'hudChrome.barEditor.locked': '動作列已在介面選項中鎖定。',
+  'hudChrome.barEditor.clear': '清除',
+  'hudChrome.barEditor.clearAria': '清除一個欄位',
+  'hudChrome.barEditor.clearArmed': '點擊一個欄位即可清除。',
   'hudChrome.spellbook.assignAria': '為 {name} 選擇一個欄位',
 };

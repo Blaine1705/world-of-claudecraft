@@ -23,18 +23,24 @@ import {
 } from '../src/ui/hud/action_bar/radial_gesture_controller';
 
 const BUTTON_SIZE_PX = 40;
+/** The petal order the painter seats and the gesture is handed. */
+const PETAL_DIRECTIONS: RadialDirection[] = ['up', 'right', 'down', 'left'];
 /** Past FLICK_DEADZONE_PX (22), so a move resolves to a direction and pulls the
  *  petals up without waiting out the reveal timer. */
 const FLICK_PX = 30;
 
 interface Rig {
   buttons: HTMLButtonElement[];
+  petals: HTMLButtonElement[];
+  petalCancel: HTMLButtonElement;
   host: HTMLElement;
   gesture: RadialGesture;
   casts: Array<[number, RadialDirection]>;
   cancels: number;
   suppressed: { value: boolean; takes: number };
   claimed: Set<number>;
+  /** settings.touchTapMenus, flipped per test. */
+  tapMenus: boolean;
 }
 
 function rect(btn: HTMLElement, x: number, y: number): void {
@@ -51,7 +57,9 @@ function rect(btn: HTMLElement, x: number, y: number): void {
     }) as DOMRect;
 }
 
-function makeRig(options: { appVw?: string; appVh?: string; safeAreaPx?: string } = {}): Rig {
+function makeRig(
+  options: { appVw?: string; appVh?: string; safeAreaPx?: string; tapMenus?: boolean } = {},
+): Rig {
   const host = document.createElement('div');
   host.style.setProperty('--radial-radius-ratio', '1.35');
   host.style.setProperty('--radial-margin', '6px');
@@ -73,17 +81,36 @@ function makeRig(options: { appVw?: string; appVh?: string; safeAreaPx?: string 
   rect(buttons[0], 360, 180);
   rect(buttons[1], 200, 180);
 
+  // The petal overlay's own buttons, in the order the painter seats them. Tap
+  // mode chooses by tapping one, so the gesture needs them; the drag path never
+  // touches them.
+  const petals = PETAL_DIRECTIONS.map(() => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.tabIndex = -1;
+    document.body.append(btn);
+    return btn;
+  });
+  const petalCancel = document.createElement('button');
+  petalCancel.type = 'button';
+  petalCancel.tabIndex = -1;
+  document.body.append(petalCancel);
+
   const rig: Rig = {
     buttons,
+    petals,
+    petalCancel,
     host,
     casts: [],
     cancels: 0,
     suppressed: { value: false, takes: 0 },
     claimed: new Set<number>(),
+    tapMenus: options.tapMenus ?? false,
     gesture: null as unknown as RadialGesture,
   };
   const deps: RadialGestureDeps = {
     buttons,
+    tapMenus: () => rig.tapMenus,
     metricsHost: host,
     hasSlot: () => true,
     cast: (buttonIndex, direction) => rig.casts.push([buttonIndex, direction]),
@@ -100,6 +127,10 @@ function makeRig(options: { appVw?: string; appVh?: string; safeAreaPx?: string 
   };
   rig.gesture = new RadialGesture(deps);
   rig.gesture.attach();
+  rig.gesture.attachPetals(
+    PETAL_DIRECTIONS.map((direction, i) => ({ direction, el: petals[i] })),
+    petalCancel,
+  );
   return rig;
 }
 
@@ -291,5 +322,104 @@ describe('RadialGesture: the shared suppressed-press flag', () => {
     down(rig, 0, 1);
     up(rig, 0, 1);
     expect(rig.casts).toEqual([[0, 'center']]);
+  });
+});
+
+// The touchTapMenus setting (WCAG 2.5.1): the 16 directional actions were
+// reachable only by a path-based flick, so tap mode promotes the strips' sticky
+// path to the radial. Every rule comes from tap_menu_core.ts; what is pinned here
+// is the pointer bookkeeping around it.
+describe('RadialGesture: tap mode', () => {
+  it('opens the petals on a press and casts NOTHING', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.heldButtonIndex()).toBe(0);
+    expect(rig.gesture.placement()).not.toBeNull();
+    // Nothing is under a finger, so no petal is highlighted and the centre is not
+    // the way out the way it is mid-drag.
+    expect(rig.gesture.liveDirection()).toBe('center');
+    expect(rig.gesture.cancelIsLive()).toBe(false);
+    // The release must not resolve anything either: the menu stays up.
+    up(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+  });
+
+  it('makes the petals real focusable buttons while open, and inert when closed', () => {
+    const rig = makeRig({ tapMenus: true });
+    expect(rig.petals.map((p) => p.tabIndex)).toEqual([-1, -1, -1, -1]);
+    down(rig, 0, 1, 100, 100);
+    expect(rig.petals.map((p) => p.tabIndex)).toEqual([0, 0, 0, 0]);
+    expect(rig.petalCancel.tabIndex).toBe(0);
+    expect(document.activeElement).toBe(rig.petals[0]);
+
+    rig.gesture.closeSticky();
+    expect(rig.petals.map((p) => p.tabIndex)).toEqual([-1, -1, -1, -1]);
+    expect(rig.petalCancel.tabIndex).toBe(-1);
+  });
+
+  it('casts the direction of the petal that is tapped, then closes', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    rig.petals[1].click();
+    expect(rig.casts).toEqual([[0, 'right']]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('casts the centre action when the ring button is tapped again', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    up(rig, 0, 1, 100, 100);
+    down(rig, 0, 2, 100, 100);
+    expect(rig.casts).toEqual([[0, 'center']]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('dismisses on a press outside the menu, casting nothing', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    // The press that OPENED it must not also dismiss it: the document listener is
+    // armed mid-dispatch of that very event, and only a capture listener is
+    // guaranteed to have been passed already.
+    expect(rig.gesture.isOpen()).toBe(true);
+
+    const elsewhere = document.createElement('div');
+    document.body.append(elsewhere);
+    elsewhere.dispatchEvent(pointer('pointerdown', 2, 10, 10));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.casts).toEqual([]);
+    expect(rig.cancels).toBe(1);
+  });
+
+  it('treats a press on another ring button as opening THAT menu, not an outside tap', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    down(rig, 1, 2, 300, 100);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.heldButtonIndex()).toBe(1);
+    expect(rig.casts).toEqual([]);
+    expect(rig.cancels).toBe(0);
+  });
+
+  it('leaves an empowered-hold button alone, exactly as the gesture path does', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.claimed.add(0);
+    down(rig, 0, 1, 100, 100);
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.casts).toEqual([]);
+  });
+
+  it('with the setting OFF a petal tap does nothing and the flick still casts', () => {
+    const rig = makeRig();
+    rig.petals[1].click();
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(false);
+
+    down(rig, 0, 1, 100, 100);
+    move(rig, 0, 1, 100 + FLICK_PX, 100);
+    up(rig, 0, 1, 100 + FLICK_PX, 100);
+    expect(rig.casts).toEqual([[0, 'right']]);
   });
 });

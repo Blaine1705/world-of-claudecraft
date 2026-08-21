@@ -26,10 +26,14 @@
 //
 // STICKY MODE is the non-gesture path, for VoiceOver / TalkBack / Switch
 // Control: activation opens the row as a persistent, focusable menu of real
-// buttons instead of a drag. Phase 6 promotes exactly this path to the
-// touchTapMenus setting (a tap opens the menu rather than using), which is why
-// openSticky() is public and takes no pointer state.
+// buttons instead of a drag. The touchTapMenus setting is that same path
+// promoted to a player option: with it on, a press opens the row instead of
+// arming the drag, a press on the seat with the row open uses the first
+// consumable, and a press outside dismisses. Every rule is tap_menu_core.ts's,
+// shared with the radial and the menu strip so the three cannot drift.
 
+import { armTapMenuOutsideDismiss } from '../tap_menu';
+import { resolveTapMenuPress } from '../tap_menu_core';
 import {
   CONSUMABLE_STRIP_PITCH_PX,
   consumableStripCancelIsLive,
@@ -75,6 +79,8 @@ export interface ConsumableStripGestureDeps {
   items: readonly HTMLElement[];
   /** The X that sits on top of the seat and backs out without using anything. */
   cancel: HTMLElement;
+  /** Tap mode (settings.touchTapMenus), read live at press time. */
+  tapMenus(): boolean;
   /** Carried consumables right now. */
   count(): number;
   /** Use the carried consumable at `index`. */
@@ -136,6 +142,8 @@ export class ConsumableStripGesture {
   /** Set when our own pointer handling resolved a gesture, so the synthetic click
    *  the browser fires afterwards is not mistaken for an assistive activation. */
   private suppressClick = false;
+  /** Disarms the tap-outside listener, while one is armed. */
+  private disarmOutside: (() => void) | null = null;
 
   constructor(private readonly deps: ConsumableStripGestureDeps) {}
 
@@ -166,10 +174,16 @@ export class ConsumableStripGesture {
     });
     this.deps.items.forEach((btn, index) => {
       btn.addEventListener('click', () => {
-        if (!this.sticky) return;
-        const carried = index < this.sticky.count;
+        const press = resolveTapMenuPress({
+          tapMenus: this.deps.tapMenus(),
+          open: this.sticky !== null,
+          target: 'item',
+          index,
+        });
+        if (press.kind !== 'choose') return;
+        const carried = press.index < (this.sticky?.count ?? 0);
         this.closeSticky();
-        if (carried) this.deps.use(index);
+        if (carried) this.deps.use(press.index);
       });
     });
     cancel.addEventListener('click', () => {
@@ -180,13 +194,22 @@ export class ConsumableStripGesture {
   }
 
   /**
-   * Open the row as a persistent, focusable menu. The pointer path never calls
-   * this; assistive activation does, and Phase 6's tap mode will.
+   * Open the row as a persistent, focusable menu. Assistive activation calls
+   * this, and so does a tap-mode press.
    */
   openSticky(): void {
     if (this.sticky || this.drag || this.deps.count() <= 0) return;
     this.sticky = this.measure();
     this.setRowFocusable(true);
+    // Only tap mode dismisses on an outside press: with the setting off the row
+    // is assistive-only and closes through its own items or its cancel X, which
+    // is what it did before the setting existed.
+    if (this.deps.tapMenus()) {
+      this.disarmOutside = armTapMenuOutsideDismiss(
+        () => [this.deps.seat, ...this.deps.items, this.deps.cancel],
+        () => this.dismissSticky(),
+      );
+    }
     this.deps.items[0]?.focus();
   }
 
@@ -195,7 +218,40 @@ export class ConsumableStripGesture {
     if (!this.sticky) return;
     this.sticky = null;
     this.setRowFocusable(false);
+    this.disarmOutside?.();
+    this.disarmOutside = null;
     this.deps.seat.focus();
+  }
+
+  /** The tap-outside path: close and report the row as chosen-nothing. */
+  private dismissSticky(): void {
+    const press = resolveTapMenuPress({
+      tapMenus: this.deps.tapMenus(),
+      open: this.sticky !== null,
+      target: 'outside',
+    });
+    if (press.kind !== 'dismiss') return;
+    this.closeSticky();
+    this.deps.onCancel();
+  }
+
+  /** A tap-mode press on the seat: open the row, or use the first consumable
+   *  when it is already open. Never arms the drag. */
+  private onTapPress(e: PointerEvent): void {
+    const press = resolveTapMenuPress({
+      tapMenus: true,
+      open: this.sticky !== null,
+      target: 'anchor',
+    });
+    this.suppressClick = true;
+    if (e.pointerType === 'touch') e.preventDefault();
+    if (press.kind === 'open') {
+      this.openSticky();
+      return;
+    }
+    if (press.kind !== 'default' || this.deps.count() <= 0) return;
+    this.closeSticky();
+    this.deps.use(0);
   }
 
   /** True while the row is showing, from either path. */
@@ -256,8 +312,16 @@ export class ConsumableStripGesture {
   }
 
   private onDown(e: PointerEvent): void {
-    if (this.drag || this.sticky) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    // A press always clears a stale suppression first: the flag is set on a
+    // release and cleared by the click that follows it, so one that never
+    // arrived would otherwise swallow the next assistive activation.
+    this.suppressClick = false;
+    if (this.deps.tapMenus()) {
+      this.onTapPress(e);
+      return;
+    }
+    if (this.drag || this.sticky) return;
     if (this.deps.count() <= 0) return;
     try {
       this.deps.seat.setPointerCapture?.(e.pointerId);

@@ -900,7 +900,10 @@ export const ja_JP: EnTranslations = {
       "hint": "スロットをタップし、もう一つタップすると入れ替わります。",
       "armed": "スロットをタップして{name}を配置します。",
       "picked": "別のスロットをタップして{name}と入れ替えます。",
-      "locked": "アクションバーはインターフェース設定でロックされています。"
+      "locked": "アクションバーはインターフェース設定でロックされています。",
+      "clear": "クリア",
+      "clearAria": "スロットをクリア",
+      "clearArmed": "スロットをタップするとクリアします。"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -1444,7 +1447,9 @@ export const ja_JP: EnTranslations = {
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト"
+      "mobileLeftHanded": "左利き用レイアウト",
+      "touchTapMenus": "タップメニュー",
+      "touchTapMenusNote": "アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。"
     },
     "talentRows": {
       "tab": "選択",

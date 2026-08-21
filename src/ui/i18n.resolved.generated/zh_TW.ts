@@ -900,7 +900,10 @@ export const zh_TW: EnTranslations = {
       "hint": "點按一個欄位，再點按另一個即可交換。",
       "armed": "點按一個欄位以放置 {name}。",
       "picked": "點按另一個欄位以與 {name} 交換。",
-      "locked": "動作列已在介面選項中鎖定。"
+      "locked": "動作列已在介面選項中鎖定。",
+      "clear": "清除",
+      "clearAria": "清除一個欄位",
+      "clearArmed": "點擊一個欄位即可清除。"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -1444,7 +1447,9 @@ export const zh_TW: EnTranslations = {
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
-      "mobileLeftHanded": "左手配置"
+      "mobileLeftHanded": "左手配置",
+      "touchTapMenus": "點擊選單",
+      "touchTapMenusNote": "用點擊代替滑動來開啟動作、消耗品與選單控制項。點擊項目即可使用，再次點擊控制項執行其一般操作，點擊外部則關閉。"
     },
     "talentRows": {
       "tab": "抉擇",

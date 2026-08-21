@@ -1350,6 +1350,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'デイリー報酬の宝箱を表示',
   'hudChrome.options.mobileCameraJoystick': 'カメラスティック',
   'hudChrome.options.mobileLeftHanded': '左利き用レイアウト',
+  'hudChrome.options.touchTapMenus': 'タップメニュー',
+  'hudChrome.options.touchTapMenusNote': 'アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。',
   'hudChrome.options.itemLevelLine': 'アイテムレベル {level}',
   'hudChrome.options.itemScoreLine': 'スコア {score}',
   'hudChrome.landing.highContrast': '高コントラスト',
@@ -13106,5 +13108,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.armed': 'スロットをタップして{name}を配置します。',
   'hudChrome.barEditor.picked': '別のスロットをタップして{name}と入れ替えます。',
   'hudChrome.barEditor.locked': 'アクションバーはインターフェース設定でロックされています。',
+  'hudChrome.barEditor.clear': 'クリア',
+  'hudChrome.barEditor.clearAria': 'スロットをクリア',
+  'hudChrome.barEditor.clearArmed': 'スロットをタップするとクリアします。',
   'hudChrome.spellbook.assignAria': '{name}を配置するスロットを選択',
 };

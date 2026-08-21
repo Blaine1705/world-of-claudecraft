@@ -1368,6 +1368,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'Показывать сундук ежедневных наград',
   'hudChrome.options.mobileCameraJoystick': 'Джойстик камеры',
   'hudChrome.options.mobileLeftHanded': 'Раскладка для левшей',
+  'hudChrome.options.touchTapMenus': 'Меню по нажатию',
+  'hudChrome.options.touchTapMenusNote': 'Открывайте элементы действий, расходников и меню нажатием вместо смахивания. Нажмите на предмет, чтобы использовать его, нажмите на элемент ещё раз для обычного действия или нажмите за его пределами, чтобы закрыть.',
   'hudChrome.options.itemLevelLine': 'Уровень предмета {level}',
   'hudChrome.options.itemScoreLine': 'Оценка {score}',
   'hudChrome.landing.highContrast': 'Высокая контрастность',
@@ -13284,5 +13286,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.armed': 'Коснитесь ячейки, чтобы поместить туда {name}.',
   'hudChrome.barEditor.picked': 'Коснитесь другой ячейки, чтобы поменять местами с {name}.',
   'hudChrome.barEditor.locked': 'Панели действий заблокированы в настройках интерфейса.',
+  'hudChrome.barEditor.clear': 'Очистить',
+  'hudChrome.barEditor.clearAria': 'Очистить ячейку',
+  'hudChrome.barEditor.clearArmed': 'Нажмите на ячейку, чтобы очистить её.',
   'hudChrome.spellbook.assignAria': 'Выберите ячейку для {name}',
 };
