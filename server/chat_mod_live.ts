@@ -114,12 +114,11 @@ export class ChatModerationLiveState {
       resolve: (hydrated) => {
         const latest = this.#latest.get(accountId);
         const pushedMute = latest !== undefined && latest.muteGeneration !== capturedMuteGeneration;
-        const useMute = pushedMute && !(latest.mutedUntil === null && hydrated.mutedUntil !== null);
         const useStrikes =
           latest !== undefined && latest.strikesGeneration !== capturedStrikesGeneration;
         return {
-          mutedUntil: useMute ? latest.mutedUntil : hydrated.mutedUntil,
-          reason: useMute ? latest.reason : hydrated.reason,
+          mutedUntil: pushedMute ? latest.mutedUntil : hydrated.mutedUntil,
+          reason: pushedMute ? latest.reason : hydrated.reason,
           strikes: useStrikes ? latest.strikes : hydrated.strikes,
         };
       },
