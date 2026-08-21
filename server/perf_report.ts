@@ -414,6 +414,23 @@ function sanitizeGpuQueueUnit(unit: Record<string, unknown>): Record<string, unk
   };
 }
 
+/** The per-level budget-variant costs, rebuilt field by field, or nothing when
+ *  the entry carries none (every entry but programs.budget-variants). */
+function compactBudgetVariants(value: unknown): Record<string, unknown> {
+  if (!Array.isArray(value)) return {};
+  const variants = value
+    .slice(0, PREWARM_COMPACT_BUDGET_VARIANTS_MAX)
+    .filter(isRecord)
+    .map((variant) => ({
+      index: nullableNumberIn(variant.index, 0, 1000),
+      elapsedMs: nullableNumberIn(variant.elapsedMs, 0, 600_000),
+      syncMs: nullableNumberIn(variant.syncMs, 0, 600_000),
+      programDelta: nullableNumberIn(variant.programDelta, -10_000, 10_000),
+      passes: nullableNumberIn(variant.passes, 0, 100_000),
+    }));
+  return variants.length > 0 ? { budgetVariants: variants } : {};
+}
+
 function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
   if (!isRecord(value)) return null;
   const out: Record<string, unknown> = {};
@@ -477,6 +494,12 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
       workDone: nullableNumberIn(entry.workDone, 0, 100_000),
       workPlanned: nullableNumberIn(entry.workPlanned, 0, 100_000),
       detail: textIn(entry.detail, 160),
+      // Carried across truncation for the same reason compileUnits and the
+      // pacing transitions are: the per-level costs are the whole point of the
+      // budget-variants entry, and dropping them here loses them on exactly the
+      // overflowing reports they explain. Only one entry ever carries them, so
+      // the cost is one small list, and every field is rebuilt not copied.
+      ...compactBudgetVariants(entry.budgetVariants),
     }));
   const resume = sanitizePrewarmResume(value.resume);
   if (resume) out.resume = resume;
@@ -492,6 +515,9 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
       (unit) => ({
         id: textIn(unit.id, 80),
         lane: textIn(unit.lane, 40),
+        // The field the ranking above SELECTS on: without it a reader sees
+        // units chosen by the failure rule with no way to tell which failed.
+        failedAtMs: nullableNumberIn(unit.failedAtMs, 0, 600_000),
         syncMs: nullableNumberIn(unit.syncMs, 0, 600_000),
         settledDurationMs: nullableNumberIn(unit.settledDurationMs, 0, 600_000),
         programDelta: nullableNumberIn(unit.programDelta, -10_000, 10_000),
@@ -512,7 +538,7 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
             backoffCount: nullableNumberIn(adaptive.backoffCount, 0, 100_000),
             noProgressCount: nullableNumberIn(adaptive.noProgressCount, 0, 100_000),
             transitions: transitions
-              .slice(0, PREWARM_COMPACT_TRANSITIONS_MAX)
+              .slice(-PREWARM_COMPACT_TRANSITIONS_MAX)
               .filter(isRecord)
               .map((transition) => ({
                 atMs: nullableNumberIn(transition.atMs, 0, 600_000),
@@ -558,6 +584,9 @@ const PREWARM_RESUME_LANES = ['debt', 'cosmetic'] as const;
 // already overflowed, so it carries fewer members and fewer fields per member.
 const PREWARM_COMPACT_COMPILE_UNITS_MAX = 6;
 const PREWARM_COMPACT_TRANSITIONS_MAX = 6;
+const PREWARM_COMPACT_BUDGET_VARIANTS_MAX = 6;
+// Scanned before ranking; far above any legitimate report (the client cap is 12).
+const PREWARM_COMPILE_UNITS_SCAN_MAX = 256;
 
 /**
  * The most diagnostic `limit` compile units, in their original order.
@@ -570,7 +599,11 @@ const PREWARM_COMPACT_TRANSITIONS_MAX = 6;
  * is a deliberate copy, the same pattern as PREWARM_RESUME_STATUSES above.
  */
 function rankedCompileUnits(units: unknown[], limit: number): Record<string, unknown>[] {
-  const records = units.filter(isRecord);
+  // Bounded BEFORE the sort, the same shape as PERF_SUGGESTION_IDS_SCAN_MAX
+  // above: a legitimate payload is at most the client cap, and an unauthenticated
+  // ingest should not sort an attacker-sized array even once. The scan bound sits
+  // far above any real report, so ranking is unaffected in practice.
+  const records = units.slice(0, PREWARM_COMPILE_UNITS_SCAN_MAX).filter(isRecord);
   if (records.length <= limit) return records;
   return records
     .map((unit, index) => ({ unit, index }))
@@ -581,6 +614,11 @@ function rankedCompileUnits(units: unknown[], limit: number): Record<string, unk
       if (failed !== 0) return failed;
       const sync = numberIn(b.unit.syncMs, 0, 600_000, 0) - numberIn(a.unit.syncMs, 0, 600_000, 0);
       if (sync !== 0) return sync;
+      // The client's own tie-break, so the two copies really do rank alike.
+      const settled =
+        numberIn(b.unit.settledDurationMs, 0, 600_000, 0) -
+        numberIn(a.unit.settledDurationMs, 0, 600_000, 0);
+      if (settled !== 0) return settled;
       return a.index - b.index;
     })
     .slice(0, limit)
@@ -614,8 +652,10 @@ function boundPrewarmDiagnosticLists(prewarm: Record<string, unknown>): void {
   if (!isRecord(pacing)) return;
   const adaptive = pacing.adaptive;
   if (!isRecord(adaptive) || !Array.isArray(adaptive.transitions)) return;
+  // The MOST RECENT, matching sampleTransitions on the client: a pacer's end
+  // state is what a report is read for, and keeping the front would drop it.
   adaptive.transitions = adaptive.transitions
-    .slice(0, PREWARM_PACING_TRANSITIONS_MAX)
+    .slice(-PREWARM_PACING_TRANSITIONS_MAX)
     .filter(isRecord);
 }
 

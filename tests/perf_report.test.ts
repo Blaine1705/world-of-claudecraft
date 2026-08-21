@@ -696,6 +696,13 @@ describe('perf report ingestion', () => {
       unknown
     >;
     expect((adaptive.transitions as unknown[]).length).toBe(12);
+    // Membership, not just length: the tail, so the pacer's end state survives.
+    expect((adaptive.transitions as Record<string, unknown>[]).map((t) => t.atMs)).toEqual([
+      188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199,
+    ]);
+    // compileUnits are kept by RANK, not position: the hostile fixture gives
+    // them no timings, so the stable tie-break keeps the first twelve here.
+    expect((prewarm.compileUnits as { id: string }[])[0].id).toBe('unit-0');
   });
 
   it('bounds the same lists under the legacy rendererPrewarm key', async () => {
@@ -860,6 +867,179 @@ describe('perf report ingestion', () => {
     expect(listBytes).toBeLessThan(7 * 1024);
   });
 
+  it('keeps a REALISTIC full report under the raw summary cap, prewarm block included', async () => {
+    // The byte test above measures the three lists in isolation, which is the
+    // arithmetic and not the failure. The failure the first cap of 32 actually
+    // had was a whole report crossing 16 KB: a real rawSummary also carries 32
+    // manifest entries, the resume block, browser, gpuQueue, assets, input,
+    // hud, netPipeline and the window rollups. This fixture approximates one.
+    const res = fakeRes();
+    const entry = (i: number) => ({
+      id: `programs.entry-${i}`,
+      category: 'world',
+      required: i % 2 === 0,
+      status: 'completed',
+      elapsedMs: 120.5 + i,
+      remainingMsAfter: 9000 - i * 10,
+      programDelta: i,
+      textureDelta: i * 2,
+      workDone: i,
+      workPlanned: i + 1,
+      detail: `mode=async;timedOut=false;compileRoots=${i}`,
+    });
+    const window = () => ({
+      frameMs: { p50: 8.4, p95: 21.7, p99: 44.2, max: 180.5 },
+      fps: { avg: 58.2, min: 22.1 },
+      longFrames: 4,
+    });
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'realistic-full-report',
+        rawSummary: {
+          graphicsConfigVersion: 16,
+          seconds: 300,
+          frames: 17_400,
+          hiddenPresentSkips: 12,
+          windows: { worst10s: window(), last60s: window(), session: window() },
+          mainMs: { p50: 6.2, p95: 18.4, p99: 39.1 },
+          rendererPhaseMs: { cull: 1.2, entities: 3.4, nameplates: 0.8, post: 2.1, present: 4.4 },
+          rendererFoliage: { grass: 0.6, buckets: 18, drawn: 12_400 },
+          rendererBudget: { level: 0.85, drops: 3, raises: 1 },
+          rendererQualityBuckets: { levels: { grass: 1, foliage: 1, vfx: 1, weapons: 1 } },
+          rendererDiagnostics: { prewarmGroups: 6, categories: 9 },
+          rendererGpuQueue: { units: 40, stalls: 2, slowestMs: 118.4, waits: 6 },
+          assets: { preload: { count: 220, ms: 4100 }, byType: { glb: 130, ktx2: 90 } },
+          input: { latencyMs: { p50: 12.1, p95: 28.9 } },
+          hud: { paints: 900, skipped: 120 },
+          netPipeline: { snapshots: 6000, events: 1400, bytes: 2_400_000 },
+          heapSawtooth: { collections: 115, medianMb: 620, peakMb: 1480 },
+          browser: { longTasks: { totalMs: 2600, avg: 86.7, max: 430, lastAge: 4200 } },
+          rendererPrewarmSummary: {
+            elapsedMs: 14_000,
+            maxMs: 15_000,
+            remainingMs: 1000,
+            budgetUsedRatio: 0.93,
+            timedOut: false,
+            createdViews: 57,
+            candidateViews: 60,
+            renderPasses: 42,
+            programsDelta: 480,
+            texturesDelta: 220,
+            compileMode: 'async',
+            compileMs: 5400,
+            compileTimedOut: false,
+            manifestPlanned: 40,
+            manifestCompleted: 38,
+            manifestPartial: 1,
+            manifestSkipped: 0,
+            manifestTimedOut: 1,
+            manifestFailed: 0,
+            partialEntryIds: ['vfx.weapon-skins'],
+            timedOutEntryIds: ['sky.current-zone'],
+            failedEntryIds: [],
+            resume: {
+              status: 'done',
+              plannedEntries: 3,
+              plannedUnits: 47,
+              startedUnits: 47,
+              failedUnits: 0,
+              failedUnitIds: [],
+              entries: [{ id: 'vfx.weapon-skins', lane: 'cosmetic', planned: 47, started: 47 }],
+            },
+            entries: Array.from({ length: 32 }, (_, i) => entry(i)),
+            compileUnits: Array.from({ length: PREWARM_REPORT_COMPILE_UNITS }, (_, i) => ({
+              id: `weapon-skins:compile:skin_${i}`,
+              lane: 'programs.compile-submit',
+              submittedAtMs: 1000 + i,
+              syncEndAtMs: 1010 + i,
+              settledAtMs: 1200 + i,
+              failedAtMs: null,
+              programsBefore: i,
+              programsAfter: i + 2,
+              programDelta: 2,
+              chargedLinks: 2,
+              syncMs: 10.5,
+              settledDurationMs: 190.25,
+              statusAtReveal: 'settled',
+            })),
+            prewarmPacing: {
+              available: true,
+              source: 'knobs',
+              mode: 'adaptive',
+              linksPerSecond: 40,
+              burst: 8,
+              compileBatchRoots: 32,
+              hardMaxMs: 15_000,
+              chargedLinks: 480,
+              scope: 'world',
+              submitStop: null,
+              adaptive: {
+                state: 'steady',
+                windowLinks: 8,
+                minWindowLinks: 2,
+                maxWindowLinks: 16,
+                maxWindowObserved: 14,
+                estimatedLinksPerUnit: 2.1,
+                inFlightLinks: 0,
+                inFlightUnits: 0,
+                peakInFlightLinks: 12,
+                submittedUnits: 47,
+                settledUnits: 47,
+                failedUnits: 0,
+                backoffCount: 2,
+                noProgressCount: 0,
+                lastSettlementMs: 13_400,
+                transitions: Array.from({ length: PREWARM_REPORT_TRANSITIONS }, (_, i) => ({
+                  atMs: 500 + i,
+                  from: 'steady',
+                  to: 'backoff',
+                  reason: 'no-progress',
+                  windowLinks: 8,
+                  inFlightLinks: 4,
+                })),
+              },
+            },
+          },
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const raw = stored.rawSummary as Record<string, unknown>;
+    // The whole point: a realistic report at the shipped caps still rides the
+    // verbatim path. A red here means the caps and the byte budget drifted
+    // apart and the streamed-prewarm diagnostic is being silently compacted
+    // away again, which is the failure the cap of 32 had.
+    expect(raw.truncated).toBeUndefined();
+    const prewarm = raw.rendererPrewarmSummary as Record<string, unknown>;
+    expect((prewarm.compileUnits as unknown[]).length).toBe(PREWARM_REPORT_COMPILE_UNITS);
+    expect((prewarm.entries as unknown[]).length).toBe(32);
+    // Recorded so the margin is visible rather than implied: this fixture
+    // lands here against the 16 KB cap, and the three streamed lists are the
+    // part this branch added.
+    const totalBytes = Buffer.byteLength(JSON.stringify(raw));
+    const listBytes = Buffer.byteLength(
+      JSON.stringify([
+        prewarm.compileUnits,
+        (prewarm.prewarmPacing as Record<string, unknown>).adaptive,
+      ]),
+    );
+    // A BAND, not a ceiling alone. The lower bound catches a change that
+    // silently guts the block (a dropped field reads as "still green" against a
+    // ceiling alone). The upper bound is an EARLY WARNING deliberately set below
+    // the real 16 KB cliff: this fixture measures 15286 bytes, so a first report
+    // has only about 1.1 KB of margin, and a test that only asserted "under the
+    // cap" would go red for the first time on the change that already broke it.
+    // Later reports in a session are far smaller: the client's emit-on-change
+    // gate drops the ~6.6 KB of streamed-prewarm lists once they stop changing,
+    // which is what buys that margin back for the rest of the session.
+    expect(listBytes).toBeGreaterThan(2 * 1024);
+    expect(totalBytes).toBeLessThan(15_500);
+  });
+
   it('carries the streamed-prewarm diagnostic across truncation into the compact path', async () => {
     // The other half of the byte story: when a report DOES overflow, the
     // compact rebuild must still say which unit stalled and whether the pacer
@@ -946,11 +1126,15 @@ describe('perf report ingestion', () => {
     expect(units[0]).toEqual({
       id: 'weapon-skins:compile:skin_failed',
       lane: 'programs.compile',
+      // The field the ranking selects on rides along, or a reader cannot tell
+      // WHICH of the six was the failure it was chosen for.
+      failedAtMs: 1234,
       syncMs: 0,
       settledDurationMs: 0,
       programDelta: 0,
       statusAtReveal: 'failed',
     });
+    expect(units[1].failedAtMs).toBeNull();
     const adaptive = (prewarm.prewarmPacing as Record<string, unknown>).adaptive as Record<
       string,
       unknown

@@ -632,7 +632,14 @@ function snapshot(): PerfSnapshot {
   };
 }
 
-beforeEach(() => installBrowserGlobals());
+beforeEach(() => {
+  installBrowserGlobals();
+  // The heavy streamed-prewarm lists ride an emit-ON-CHANGE gate whose state is
+  // module-level (one per page, like the reporter itself). Reset it per case or
+  // an earlier test's identical fixture silently gates the lists off in a later
+  // one, and every length assertion below becomes order-dependent.
+  perfReporterInternalsForTest.prewarmHeavyListGate.reset();
+});
 
 describe('perf reporter payload', () => {
   it('summarizes renderer performance without copying the full user agent', () => {
@@ -1648,5 +1655,73 @@ describe('gpuBucket software classification', () => {
         'ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)',
       ),
     ).toBe('intel-uhd');
+  });
+});
+
+describe('perf reporter streamed-prewarm emit-on-change gate', () => {
+  // The renderer RETAINS its boot prewarm snapshot, so without this gate every
+  // 5-minute beacon re-sends the same few KB describing the same one-time work.
+  // Measured, that repetition was most of the headroom under the server's 16 KB
+  // raw-summary cap.
+  function summaryOf(snap: ReturnType<typeof snapshot>) {
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snap,
+      new Settings(),
+      'sess-gate',
+      42,
+    )!;
+    return (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          compileUnits?: unknown[];
+          prewarmListsUnchanged?: boolean;
+          prewarmPacing?: { adaptive?: { transitions?: unknown[] } };
+          entries?: { budgetVariants?: unknown[] }[];
+        };
+      }
+    ).rendererPrewarmSummary;
+  }
+
+  it('sends the lists on the first report and omits them while unchanged', () => {
+    const first = summaryOf(snapshot());
+    expect(first?.compileUnits?.length).toBeGreaterThan(0);
+    expect(first?.prewarmPacing?.adaptive?.transitions?.length).toBeGreaterThan(0);
+    expect(first?.prewarmListsUnchanged).toBeUndefined();
+
+    const second = summaryOf(snapshot());
+    expect(second?.compileUnits).toBeUndefined();
+    expect(second?.prewarmPacing?.adaptive?.transitions).toBeUndefined();
+    expect(second?.entries?.some((entry) => entry.budgetVariants !== undefined)).toBe(false);
+    // Absent BECAUSE unchanged, said explicitly: a reader must not conclude the
+    // lane did no work.
+    expect(second?.prewarmListsUnchanged).toBe(true);
+  });
+
+  it('sends them again when the resume lane changes the block after boot', () => {
+    // Not "first report only": the background resume lane can still finish
+    // units after the first beacon, and that genuinely changes the diagnostic.
+    summaryOf(snapshot());
+    const changed = snapshot();
+    const prewarm = changed.renderer?.prewarm;
+    if (!prewarm?.compileUnits?.[0]) throw new Error('fixture prewarm is incomplete');
+    prewarm.compileUnits = [
+      { ...prewarm.compileUnits[0], id: 'weapon-skins:compile:resumed-later' },
+      ...prewarm.compileUnits.slice(1),
+    ];
+
+    const after = summaryOf(changed);
+    expect(after?.compileUnits?.length).toBeGreaterThan(0);
+    expect(after?.prewarmListsUnchanged).toBeUndefined();
+  });
+
+  it('keeps the cheap scalar counters on every report', () => {
+    // The gate is about the LISTS. Everything a fleet query aggregates on must
+    // still ride each beacon, or the gate would be a telemetry regression.
+    summaryOf(snapshot());
+    const second = summaryOf(snapshot()) as Record<string, unknown>;
+    expect(second.manifestPlanned).toBeDefined();
+    expect(second.compileMs).toBeDefined();
+    expect(second.resume).toBeDefined();
+    expect((second.entries as unknown[]).length).toBeGreaterThan(0);
   });
 });

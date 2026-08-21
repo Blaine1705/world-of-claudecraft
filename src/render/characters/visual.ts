@@ -447,6 +447,12 @@ export class CharacterVisual {
       );
       this.originalMaterials.set(decal, decal.material);
       decal.material = this.effectMaterial(decal.material);
+      // Against what is MOUNTED, same rule and same reason as
+      // commitVisualMaterials: applyMaterials chose this caster's shared depth
+      // material from the pre-effect material a line ago, and the effect swap
+      // can be one that getDepthMaterial would write a non-default alphaTest
+      // onto. Benign today only because no effect material sets alphaTest.
+      attachSharedDepthMaterials(decal, decal.material);
       decal.castShadow = this.shadowOn;
       decal.receiveShadow = false;
       decal.frustumCulled = false;

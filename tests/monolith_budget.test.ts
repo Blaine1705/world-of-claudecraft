@@ -208,23 +208,24 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    // Lowered again by the streamed-prewarm branch, which paid for its lines
-    // with two extractions instead of by deleting rationale: the compile SUBMIT
-    // LOOP with its deadline rule and never-drop contract
+    // RAISED 13546 -> 13548 (+2) by the streamed-prewarm branch. A raise, not a
+    // lowering, and stated as one: the branch extracts the compile SUBMIT LOOP
+    // with its deadline rule and never-drop contract
     // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
-    // beside the per-unit submit it already owned) and the weapon-skin resume
-    // unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts, beside
-    // the stage whose failure boundary shares its unit ids). The file lands
-    // below its previous pin with every load-bearing comment restored, so the
-    // ceiling is the exact new count: any growth reds again.
-    // Re-pinned 13534 -> 13537 inside the same branch, in review response: the
-    // submit host now pushes each unit as it is submitted rather than the loop
-    // returning a batch (a rejection mid-loop otherwise lost already-submitted
-    // units from the set programs.compile awaits), and that correctness fix
-    // costs three lines of wiring. Stated plainly rather than absorbed by
-    // compacting code, which is the habit this ratchet exists to catch: the
-    // branch still lowers the pin from 13546 to the exact count below.
-    ceiling: 13537,
+    // beside the per-unit submit that module already owned) and the weapon-skin
+    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
+    // beside the stage whose failure boundary shares its unit ids), and those
+    // two extractions still do not quite cover what it adds.
+    //
+    // The history matters because it is the failure mode this ratchet exists to
+    // catch. An earlier revision of this branch reported a NET REDUCTION while
+    // deleting 41 lines of load-bearing comments, 11 blank lines and folding
+    // three `let` declarations into one comma statement: the extractions were
+    // real but the number was bought with formatting. Every comment is restored,
+    // the blank lines are back, the declarations are separate again, and the
+    // count below is what the extractions alone earn. Maintainer decision, and
+    // deliberately a visible +2 rather than an invisible -9.
+    ceiling: 13548,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

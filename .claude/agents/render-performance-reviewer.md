@@ -116,7 +116,8 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
 4. **Are the memory claims separated?** Review four distinct buckets:
 
    - GC pauses: forced-GC boundary behavior and long-task/frame overlap. Boundary collections
-     must be outside the measured frame window (`readSettledHeapSnapshot`, `HeapSawtooth`);
+     must be outside the measured frame window (`HeapSawtooth` / `createHeapSawtooth`,
+     `src/game/heap_sawtooth.ts`);
    - JS allocation churn: allocation rate or an optional bounded allocation profile. It describes
      production, not retained objects;
    - retained JS heap: settled used-heap deltas and GC-floor valleys after idle, not raw peak heap

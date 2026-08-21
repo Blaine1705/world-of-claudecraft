@@ -894,23 +894,26 @@ it('prewarms adaptive quality shader variants behind the desktop loading cover',
   expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
 });
 
-it('records each budget shader level with timing and program deltas', () => {
+it('wires the budget-variant recorder into the manifest entry', () => {
+  // This used to grep the WHOLE of prewarm_compile_lifecycle.ts for
+  // programsBefore/programsAfter/syncMs/passes, all of which already appear in
+  // RendererPrewarmCompileUnitStats (and one of which a comment satisfied), so
+  // it stayed green with the budget-variant recorder deleted. The RECORDING
+  // behaviour is covered directly in tests/prewarm_compile_lifecycle.test.ts;
+  // what belongs here is only that the entry is wired to it and publishes the
+  // stats, bounded to the entry's own slice.
   const renderer = readFileSync(
     new URL('../src/render/renderer.ts', import.meta.url),
     'utf8',
   ).replace(/\r\n/g, '\n');
   const entryAt = renderer.indexOf("id: 'programs.budget-variants'");
   const entryEnd = renderer.indexOf("id: 'sky.current-zone'", entryAt);
-  const entry = renderer.slice(entryAt, entryEnd);
-  const lifecycle = readFileSync(
-    new URL('../src/render/prewarm_compile_lifecycle.ts', import.meta.url),
-    'utf8',
-  ).replace(/\r\n/g, '\n');
-  expect(entry).toContain('budgetVariants');
-  expect(lifecycle).toContain('programsBefore');
-  expect(lifecycle).toContain('programsAfter');
-  expect(lifecycle).toContain('syncMs');
-  expect(lifecycle).toContain('passes');
+  expect(entryAt).toBeGreaterThan(-1);
+  expect(entryEnd).toBeGreaterThan(entryAt);
+  const entry = codeWithoutLineComments(renderer.slice(entryAt, entryEnd));
+  expect(entry).toContain('runPrewarmBudgetVariants(');
+  expect(entry).toContain('budgetVariantStats');
+  expect(entry).toContain('budgetVariants: () => budgetVariantStats');
 });
 it('settles linked desktop programs only until the independent hard deadline', () => {
   const renderer = readFileSync(

@@ -4,6 +4,7 @@ import { crowdBucketLabel } from './crowd_bucket';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
 import { analyzePerfSuggestions } from './perf_doctor';
 import {
+  createPrewarmHeavyListGate,
   PREWARM_REPORT_BUDGET_VARIANTS,
   sampleCompileUnits,
   sampleTransitions,
@@ -260,6 +261,7 @@ function rendererPrewarmBudgetVariantSummary(
 
 function rendererPrewarmPacingSummary(
   pacing: RendererPrewarmSnapshot['prewarmPacing'],
+  heavyLists: boolean,
 ): Record<string, unknown> | null {
   if (!pacing) return null;
   const adaptive = pacing.adaptive;
@@ -291,23 +293,44 @@ function rendererPrewarmPacingSummary(
           backoffCount: adaptive.backoffCount,
           noProgressCount: adaptive.noProgressCount,
           lastSettlementMs: adaptive.lastSettlementMs,
-          transitions: sampleTransitions(adaptive.transitions).map((transition) => ({
-            atMs: transition.atMs,
-            from: transition.from,
-            to: transition.to,
-            reason: transition.reason,
-            windowLinks: transition.windowLinks,
-            inFlightLinks: transition.inFlightLinks,
-          })),
+          transitions: heavyLists
+            ? sampleTransitions(adaptive.transitions).map((transition) => ({
+                atMs: transition.atMs,
+                from: transition.from,
+                to: transition.to,
+                reason: transition.reason,
+                windowLinks: transition.windowLinks,
+                inFlightLinks: transition.inFlightLinks,
+              }))
+            : undefined,
         }
       : null,
   };
 }
 
+/** Emit-on-change gate for the heavy streamed-prewarm lists (see the core). */
+const prewarmHeavyListGate = createPrewarmHeavyListGate();
+
 function rendererPrewarmSummary(
   prewarm: RendererPrewarmSnapshot | null,
 ): Record<string, unknown> | null {
   if (!prewarm) return null;
+  // Fingerprinted on the SAMPLED content, so a report carries the lists only
+  // when they actually differ from the last one this session sent. The
+  // renderer retains its boot snapshot, so without this every 5-minute beacon
+  // re-sends a few KB describing the same one-time work, which measured as
+  // most of the headroom under the server's 16 KB raw-summary cap.
+  const heavyLists = prewarmHeavyListGate.shouldEmit(
+    JSON.stringify([
+      rendererPrewarmCompileUnitSummary(prewarm.compileUnits),
+      prewarm.manifestEntries.map((entry) =>
+        rendererPrewarmBudgetVariantSummary(entry.budgetVariants),
+      ),
+      prewarm.prewarmPacing?.adaptive
+        ? sampleTransitions(prewarm.prewarmPacing.adaptive.transitions)
+        : null,
+    ]),
+  );
   return {
     elapsedMs: prewarm.elapsedMs,
     maxMs: prewarm.maxMs,
@@ -345,6 +368,12 @@ function rendererPrewarmSummary(
       failedUnitIds: prewarm.resume.failedUnitIds,
       entries: prewarm.resume.entries,
     },
+    prewarmPacing: rendererPrewarmPacingSummary(prewarm.prewarmPacing, heavyLists),
+    compileUnits: heavyLists ? rendererPrewarmCompileUnitSummary(prewarm.compileUnits) : undefined,
+    // Absent because unchanged since the last beacon, not absent because there
+    // was nothing: a reader that sees this flag knows to look at an earlier row
+    // for the same session rather than concluding the lane did no work.
+    prewarmListsUnchanged: heavyLists ? undefined : true,
     entries: prewarm.manifestEntries.map((entry) => ({
       id: entry.id,
       category: entry.category,
@@ -357,10 +386,10 @@ function rendererPrewarmSummary(
       workDone: entry.workDone,
       workPlanned: entry.workPlanned,
       detail: entry.detail,
-      budgetVariants: rendererPrewarmBudgetVariantSummary(entry.budgetVariants),
+      ...(heavyLists
+        ? { budgetVariants: rendererPrewarmBudgetVariantSummary(entry.budgetVariants) }
+        : {}),
     })),
-    compileUnits: rendererPrewarmCompileUnitSummary(prewarm.compileUnits),
-    prewarmPacing: rendererPrewarmPacingSummary(prewarm.prewarmPacing),
   };
 }
 
@@ -780,4 +809,5 @@ export const perfReporterInternalsForTest = {
   viewportBucket,
   payloadFromSnapshot,
   PERF_REPORT_SCHEMA_VERSION,
+  prewarmHeavyListGate,
 };

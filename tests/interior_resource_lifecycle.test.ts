@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { attachSceneGroupGated } from '../src/render/gated_scene_attach';
@@ -6,7 +7,13 @@ import {
   createOwnedInteriorResourceRegistry,
   runInteriorBuildTransaction,
 } from '../src/render/interior_resource_lifecycle';
-import { markSharedGeometry, markSharedMaterial } from '../src/render/shared_resource';
+import { gfxInternalsForTest, surfaceMat } from '../src/render/gfx';
+import {
+  isSharedMaterial,
+  markSharedGeometry,
+  markSharedMaterial,
+} from '../src/render/shared_resource';
+import { detailedSurfaceMat } from '../src/render/worn_stone';
 
 describe('owned interior resource lifecycle', () => {
   it('rolls back a partially built root and preserves the asset error when disposal fails', async () => {
@@ -251,5 +258,87 @@ describe('owned interior resource lifecycle', () => {
     expect(materialDispose).toHaveBeenCalledOnce();
     expect(onFailure).toHaveBeenCalledOnce();
     expect(registry.dispose()).toEqual({ attempted: 0, disposed: 0, errors: [] });
+  });
+});
+
+// The collector claims everything WITHOUT a shared marker, so its correctness
+// rests entirely on every shared input actually carrying one. That is an
+// invariant about producers, not about the collector, and the synthetic cases
+// above cannot see it: they mark their own fixtures. These drive the REAL
+// shared caches an interior root draws from.
+describe('shared caches an interior root draws from are not claimable', () => {
+  it('marks every material surfaceMat hands back', () => {
+    // One instance per key, reused process-wide. Unmarked, retiring one
+    // interior disposes a material the overworld is still drawing with.
+    const a = surfaceMat({ color: 0x336699, roughness: 0.5 });
+    const b = surfaceMat({ color: 0x336699, roughness: 0.5 });
+    expect(b).toBe(a);
+    expect(isSharedMaterial(a)).toBe(true);
+  });
+
+  it('marks the detailed clone too, not just its base', () => {
+    const restore = gfxInternalsForTest.overrideSettings({
+      standardMaterials: true,
+      surfaceDetail: true,
+    });
+    try {
+      const detailed = detailedSurfaceMat({ color: 0x223344 }, 'stone');
+      expect(isSharedMaterial(detailed)).toBe(true);
+    } finally {
+      restore();
+    }
+  });
+
+  it('claims neither a cache material nor a marked kit geometry off a real root', () => {
+    // The shape the defect took: a dressing module clones a cached GLB kit
+    // (clone(true) shares geometry and material BY REFERENCE) and skins other
+    // props from the surfaceMat cache, all under the interior group the
+    // registry sweeps.
+    const kitGeometry = markSharedGeometry(new THREE.BufferGeometry());
+    const kitMaterial = markSharedMaterial(new THREE.MeshBasicMaterial());
+    const cacheMaterial = surfaceMat({ color: 0x8899aa });
+    const ownedGeometry = new THREE.BufferGeometry();
+
+    const root = new THREE.Group();
+    root.add(new THREE.Mesh(kitGeometry, kitMaterial));
+    root.add(new THREE.Mesh(ownedGeometry, cacheMaterial));
+
+    const registry = createOwnedInteriorResourceRegistry();
+    collectOwnedInteriorResources(root, registry);
+
+    const kitGeometryDispose = vi.spyOn(kitGeometry, 'dispose');
+    const kitMaterialDispose = vi.spyOn(kitMaterial, 'dispose');
+    const cacheMaterialDispose = vi.spyOn(cacheMaterial, 'dispose');
+    const ownedGeometryDispose = vi.spyOn(ownedGeometry, 'dispose');
+
+    registry.dispose();
+
+    expect(kitGeometryDispose).not.toHaveBeenCalled();
+    expect(kitMaterialDispose).not.toHaveBeenCalled();
+    expect(cacheMaterialDispose).not.toHaveBeenCalled();
+    // The genuinely per-root resource still goes, or the registry would be
+    // doing nothing at all.
+    expect(ownedGeometryDispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('has every interior dressing module mark its kit (source pin)', () => {
+    // delve_marsh_dressing shipped with no shared_resource import at all while
+    // its three siblings had one, which is exactly how the defect got in. A
+    // module that lands under an interior root and clones a cached kit has to
+    // mark it; this pin is what makes a new one notice.
+    for (const module of [
+      'delve_marsh_dressing',
+      'dawnhold_dressing',
+      'lastkeep_dressing',
+      'rift_decor',
+      'wildheart_props',
+    ]) {
+      const source = readFileSync(
+        new URL(`../src/render/${module}.ts`, import.meta.url),
+        'utf8',
+      );
+      expect(source, `${module} must mark its shared kit`).toContain('markSharedGeometry');
+      expect(source, `${module} must mark its shared kit`).toContain('markSharedMaterial');
+    }
   });
 });

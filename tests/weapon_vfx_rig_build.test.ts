@@ -902,53 +902,76 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     );
   });
 
-  it.each(['texture', 'compile'])(
-    'terminally releases every skin already staged when the %s resume unit fails',
-    (failure) => {
-      const keys = Object.keys(WEAPON_VFX).slice(0, 2);
-      const staged: THREE.Group[] = [];
-      const disposals: ReturnType<typeof vi.fn>[] = [];
-      const seenGeometries = new Set<THREE.BufferGeometry>();
-      const seenMaterials = new Set<THREE.Material>();
-      try {
-        for (const key of keys) {
-          const group = buildWeaponVfxPrewarmSkinGroup(key);
-          staged.push(group);
-          group.traverse((object) => {
-            const renderable = object as THREE.Mesh;
-            if (
-              renderable.geometry &&
-              !(object as THREE.Object3D & { isSprite?: boolean }).isSprite &&
-              !seenGeometries.has(renderable.geometry)
-            ) {
-              seenGeometries.add(renderable.geometry);
-              disposals.push(vi.spyOn(renderable.geometry, 'dispose'));
-            }
-            const materials = renderable.material
-              ? Array.isArray(renderable.material)
-                ? renderable.material
-                : [renderable.material]
-              : [];
-            for (const material of materials) {
-              if (seenMaterials.has(material)) continue;
-              seenMaterials.add(material);
-              disposals.push(vi.spyOn(material, 'dispose'));
-            }
-          });
-          if (key === keys[1]) throw new Error(`${failure} failed`);
+  it('releases each staged skin exactly once, and a second terminal pass is a no-op', () => {
+    // This case used to be an it.each over 'texture' and 'compile' titled
+    // "terminally releases every skin already staged when the %s resume unit
+    // fails". It drove neither resume unit: it threw its own error and called
+    // the disposer itself, so the two arms differed only in a message string,
+    // and the title named whole-catalog behaviour this branch deliberately
+    // replaced with a per-skin boundary. What it actually pins is the disposer's
+    // own contract, so that is what it says now. The per-skin failure boundary
+    // is covered in 'streamed weapon-skin prewarm staging' above, and the
+    // renderer's wiring to it by the source pin below.
+    const keys = Object.keys(WEAPON_VFX).slice(0, 2);
+    const staged: THREE.Group[] = [];
+    const disposals: ReturnType<typeof vi.fn>[] = [];
+    const seenGeometries = new Set<THREE.BufferGeometry>();
+    const seenMaterials = new Set<THREE.Material>();
+    for (const key of keys) {
+      const group = buildWeaponVfxPrewarmSkinGroup(key);
+      staged.push(group);
+      group.traverse((object) => {
+        const renderable = object as THREE.Mesh;
+        if (
+          renderable.geometry &&
+          !(object as THREE.Object3D & { isSprite?: boolean }).isSprite &&
+          !seenGeometries.has(renderable.geometry)
+        ) {
+          seenGeometries.add(renderable.geometry);
+          disposals.push(vi.spyOn(renderable.geometry, 'dispose'));
         }
-      } catch (error) {
-        expect(error).toEqual(new Error(`${failure} failed`));
-        disposeWeaponVfxPrewarmSkinGroups(staged);
-      }
+        const materials = renderable.material
+          ? Array.isArray(renderable.material)
+            ? renderable.material
+            : [renderable.material]
+          : [];
+        for (const material of materials) {
+          if (seenMaterials.has(material)) continue;
+          seenMaterials.add(material);
+          disposals.push(vi.spyOn(material, 'dispose'));
+        }
+      });
+    }
 
-      expect(staged).toHaveLength(2);
-      expect(disposals.length).toBeGreaterThan(0);
-      for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
-      // The failure hook and aggregate cleanup may both run. The ownership
-      // seam must make that second terminal pass a no-op.
-      disposeWeaponVfxPrewarmSkinGroups(staged);
-      for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
-    },
-  );
+    disposeWeaponVfxPrewarmSkinGroups(staged);
+    expect(staged).toHaveLength(2);
+    expect(disposals.length).toBeGreaterThan(0);
+    for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+
+    // The failure hook and the aggregate cleanup may both run, so the ownership
+    // seam has to make the second terminal pass a no-op.
+    disposeWeaponVfxPrewarmSkinGroups(staged);
+    for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+  });
+
+  it('wires the renderer resume failure hook to the PER-SKIN release (source pin)', () => {
+    // The production call site has no behavioural test (it needs a Renderer),
+    // and it is exactly where the whole-catalog regression lived: onUnitError
+    // called disposeFailure(), which cleared all 47. Nothing else would notice
+    // it coming back.
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const hookAt = renderer.indexOf('onUnitError: (entry, unit, error) => {');
+    expect(hookAt).toBeGreaterThan(-1);
+    const hook = codeWithoutLineComments(
+      renderer.slice(hookAt, renderer.indexOf('},', hookAt)),
+    );
+    expect(hook).toContain("if (entry.id === 'vfx.weapon-skins') {");
+    // The unit's OWN id, so the boundary is one skin.
+    expect(hook).toContain('weaponVfxPrewarmSkinStage.disposeFailedUnit(unit.id);');
+    // The aggregate is republished, never nulled: nulling it was what made the
+    // remaining compile units no-op against a missing census owner.
+    expect(hook).toContain('weaponVfxPrewarmGroup = weaponVfxPrewarmSkinStage.group;');
+    // And the whole-catalog release is gone from the renderer entirely.
+    expect(renderer).not.toContain('disposeFailure(');
+  });
 });

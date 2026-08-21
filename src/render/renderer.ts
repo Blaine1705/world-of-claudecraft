@@ -5785,6 +5785,7 @@ export class Renderer {
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
     let mountPrewarmWarmed = 0;
     let surfaceDetailTexturesWarmed = 0;
+
     let renderPasses = 0;
     let playerPrewarmVisuals = 0;
     let playerPrewarmProgress: PrewarmEntryProgress | null = null;
@@ -5823,9 +5824,9 @@ export class Renderer {
     );
     this.gpuHitchCompileLifecycle = compileLifecycle;
     let vfxPrewarmBursts = 0;
-    let compileMode: RendererPrewarmStats['compileMode'] = 'none',
-      compileMs = 0,
-      compileTimedOut = false;
+    let compileMode: RendererPrewarmStats['compileMode'] = 'none';
+    let compileMs = 0;
+    let compileTimedOut = false;
     const budgetVariantStats: NonNullable<RendererPrewarmManifestEntryStats['budgetVariants']> = [];
     // How many of [player/entity/npc]PrewarmGroup actually had a skinned-shadow
     // pre-compile pass run against them: 0 on a resumed programs.compile whose
@@ -5835,6 +5836,7 @@ export class Renderer {
     let compiledPrewarmRoots = 0;
     let textureUploads = 0;
     let diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null = null;
+
     type PrewarmManifestEntry = {
       id: string;
       category: RendererPrewarmCategory;
@@ -5855,6 +5857,7 @@ export class Renderer {
       budgetVariants?: () => NonNullable<RendererPrewarmManifestEntryStats['budgetVariants']>;
       detail?: () => string;
     };
+
     // Explicitly bounded units captured when their manifest entry misses the
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
@@ -5891,6 +5894,7 @@ export class Renderer {
       landmarkSlot.staged(),
       ['mounts', mountPrewarmGroup],
     ];
+
     const compileEntryUnits = (
       includeGroup: (groupId: string) => boolean = () => true,
     ): PrewarmResumeUnit[] => {
@@ -6006,6 +6010,7 @@ export class Renderer {
       for (const unit of units) compileLifecycle.recordFor(unit, 'programs.compile');
       return units;
     };
+
     // Early compile submission: compileAsync links settle off-thread, so the
     // sooner a unit is SUBMITTED the more of its link time overlaps the other
     // manifest entries (surface-detail plus textures.scene alone are ~4.5 s of
@@ -6174,6 +6179,7 @@ export class Renderer {
         detail: entry.detail?.(),
       });
     };
+
     // Hide every temp prewarm group currently staged in the scene without
     // removing it. Three's compile()/compileAsync() traverse the whole scene
     // regardless of visibility (see prewarm_pass.ts), so a hidden group still
@@ -6264,7 +6270,9 @@ export class Renderer {
       weaponVfxPrewarmGroup = null;
       mountPrewarmGroup = null;
     };
+
     const settleMinPasses = this.lowGfx ? 8 : 10;
+
     const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>
       [...mountPrewarmPendingKeys].map((key) => ({
         id: `mount:${key}`,
@@ -6278,6 +6286,7 @@ export class Renderer {
           mountPrewarmWarmed++;
         },
       }));
+
     const textureResumeUnits = (
       idPrefix: string,
       textures: readonly THREE.Texture[],
@@ -6286,12 +6295,14 @@ export class Renderer {
         id: `${idPrefix}:${index}`,
         run: () => this.prewarmTexture(texture),
       }));
+
     const weatherSlot = createPrewarmGroupSlot(variantSlotHost, 'weather.materials', {
       stage: () => this.weather.beginPrewarm(),
       hide: () => this.weather.hidePrewarm(),
       units: (textures) => textureResumeUnits('weather-materials', textures),
       cleanup: () => this.weather.endPrewarm(),
     });
+
     const manifest: PrewarmManifestEntry[] = [
       {
         id: 'views.required',

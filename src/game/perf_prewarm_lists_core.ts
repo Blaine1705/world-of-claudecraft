@@ -66,3 +66,39 @@ export function sampleCompileUnits<T extends SampledCompileUnit>(
 export function sampleTransitions<T>(units: readonly T[], limit = PREWARM_REPORT_TRANSITIONS): T[] {
   return units.length <= limit ? [...units] : units.slice(units.length - limit);
 }
+
+/**
+ * Whether a report should carry the heavy streamed-prewarm lists at all.
+ *
+ * The prewarm snapshot is a BOOT event that the renderer retains, so every
+ * later beacon (one per 5 minutes, for the session's lifetime) would otherwise
+ * re-send the same few KB describing the same one-time work. Measured, that is
+ * about 6.6 KB of a roughly 15.3 KB realistic report against a 16 KB server cap:
+ * the repetition is most of the headroom.
+ *
+ * It is NOT simply "first report only": the background resume lane can still
+ * finish units after the first beacon, which genuinely changes the block. So
+ * the rule is emit-on-change, keyed on the content itself.
+ *
+ * The cheap scalar counters are unaffected and ride every report as before.
+ */
+export interface PrewarmHeavyListGate {
+  /** True when this report should carry the lists. Records the fingerprint. */
+  shouldEmit(fingerprint: string): boolean;
+  /** Forget what was sent (a new session, or a test). */
+  reset(): void;
+}
+
+export function createPrewarmHeavyListGate(): PrewarmHeavyListGate {
+  let last: string | null = null;
+  return {
+    shouldEmit: (fingerprint) => {
+      if (fingerprint === last) return false;
+      last = fingerprint;
+      return true;
+    },
+    reset: () => {
+      last = null;
+    },
+  };
+}

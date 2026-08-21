@@ -2156,6 +2156,11 @@ export class Vfx {
             k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
           );
         }
+        // Spliced BEFORE the callback, not after. onImpact is renderer code
+        // that can spawn (an impact commonly starts another effect), and a
+        // spawn pushes onto this same array while this loop is walking it by
+        // index. Removing the finished projectile first keeps the walk sound
+        // and keeps a re-entrant spawn from being skipped or double-visited.
         this.projectiles.splice(i, 1);
         pr.onImpact?.(target);
         continue;
