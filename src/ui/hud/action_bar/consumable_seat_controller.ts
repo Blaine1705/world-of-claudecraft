@@ -24,23 +24,40 @@ import type { ItemDef } from '../../../sim/types';
 import { formatAbilityNumber } from '../../ability_description';
 import { abilityDisplayName } from '../../ability_display_name';
 import { itemDisplayName } from '../../entity_i18n';
+import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
+import { StripCaptionPainter } from '../strip_caption_painter';
 import { tapMenusEnabled } from '../tap_menu';
 import type { ActionBarSlotElements } from './action_bar_painter';
-import { type ActionBarWorldInput, createActionBarView } from './action_bar_view';
+import { type ActionBarWorldInput, createActionBarView, inventoryCount } from './action_bar_view';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
 import { ConsumableStripGesture } from './consumable_strip_gesture_controller';
 import { ConsumableStripPainter } from './consumable_strip_painter';
+import { itemInBagsLine } from './item_bags_line_core';
+import { stripCaptionCenterX } from './radial_action_core';
 
 const SEAT_ID = 'mobile-consumable-seat';
 const STRIP_ID = 'mobile-consumable-strip';
 const CANCEL_ID = 'mobile-consumable-cancel';
+const CAPTION_ID = 'mobile-consumable-caption';
+const CAPTION_TEXT_SELECTOR = '.tt-title';
 const ITEM_SELECTOR = '.mobile-consumable-item';
 const ITEM_INDEX_DATASET = 'consumableIndex';
 /** The seat's own slot label, so a screen reader names the control rather than
  *  reading a slot number the player never sees. */
 const SEAT_LABEL_KEY: TranslationKey = 'hudChrome.mobile.consumableSeat';
+/**
+ * Paints between rescans of the carried consumables while the row is CLOSED.
+ * The list only moves on a pickup, a use, a sale or a loot, and neither IWorld
+ * exposes a revision to gate on, so the scan (four kind passes over the whole
+ * inventory plus an insertion sort) rides a divider rather than running on every
+ * frame of every touch session. Twelve frames is about 200ms at 60fps, inside
+ * the quarter second a player would notice on a seat they are not looking at,
+ * and a USE (the one edge they are looking at) forces the next paint to rescan
+ * regardless.
+ */
+const CLOSED_RESCAN_FRAMES = 12;
 
 /** Everything the seat needs from Hud, as callbacks. */
 export interface MobileConsumableSeatDeps {
@@ -55,6 +72,12 @@ export interface MobileConsumableSeatDeps {
   useItem(itemId: string): boolean;
   /** The used-flash the cast path gives every other action button. */
   flash(btn: HTMLButtonElement): void;
+  /** Bind the shared long-press / focus tooltip to a row item, exactly as the
+   *  retired quick bar did: the sticky and tap-mode paths make these real
+   *  focusable buttons, so identification cannot rest on the caption alone. */
+  attachTooltip(el: HTMLElement, html: () => string): void;
+  /** The shared item tooltip body, so the row says what the desktop bar says. */
+  itemTooltip(item: ItemDef): string;
   hideTooltip(): void;
   consumePeekGuard(): void;
 }
@@ -92,11 +115,14 @@ export function buildMobileConsumableSeat(
   const seatBtn = document.getElementById(SEAT_ID) as HTMLButtonElement | null;
   const strip = document.getElementById(STRIP_ID);
   const cancel = document.getElementById(CANCEL_ID);
+  const caption = document.getElementById(CAPTION_ID);
+  const captionText = caption?.querySelector<HTMLElement>(CAPTION_TEXT_SELECTOR) ?? null;
   const itemBtns = Array.from(document.querySelectorAll<HTMLButtonElement>(ITEM_SELECTOR)).sort(
     (a, b) =>
       Number(a.dataset[ITEM_INDEX_DATASET] ?? 0) - Number(b.dataset[ITEM_INDEX_DATASET] ?? 0),
   );
   if (!seatBtn || !strip || !cancel || itemBtns.length !== CONSUMABLE_BAR_SLOTS) return null;
+  if (!caption || !captionText) return null;
 
   // The ONE reused array the pure core fills. It is FROZEN while the row is open
   // so an item never shifts out from under the thumb travelling toward it (a
@@ -104,6 +130,16 @@ export function buildMobileConsumableSeat(
   // item shortcut), and refreshed on every closed frame so the seat always shows
   // what the player is actually carrying.
   const ids: string[] = [];
+  // The most recent inventory snapshot the paint saw, so a tooltip resolved on a
+  // long press reads the same stack counts the row was painted from.
+  let inventory: readonly { itemId: string; count: number }[] = [];
+  let framesSinceScan = CLOSED_RESCAN_FRAMES;
+  let wasOpen = false;
+  // The caption's resolve, not just its write, is elided: the row is frozen
+  // while open, so the localized name can only change when the finger moves to
+  // another item.
+  let captionLive = -1;
+  let captionName = '';
 
   const view = createActionBarView(
     {
@@ -140,6 +176,22 @@ export function buildMobileConsumableSeat(
     { strip, cancel, seat: slotElements(seatBtn), items: itemBtns.map(slotElements) },
     (iconKey) => deps.iconBackground(iconKey),
   );
+  const captionPainter = new StripCaptionPainter(deps.writers, {
+    box: caption,
+    text: captionText,
+  });
+
+  // The row's items are real focusable buttons in sticky and tap mode, and a
+  // long press on one peeks it. Both need the identification the retired quick
+  // bar had: the same item tooltip the desktop bar shows, plus the in-bags line.
+  // The SEAT itself takes none, by design: a hold there opens the row.
+  itemBtns.forEach((btn, i) => {
+    deps.attachTooltip(btn, () => {
+      const item = itemAt(deps, ids, i);
+      if (!item) return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}</div>`;
+      return deps.itemTooltip(item) + itemInBagsLine(inventoryCount(inventory, item.id));
+    });
+  });
 
   const gesture = new ConsumableStripGesture({
     seat: seatBtn,
@@ -162,6 +214,9 @@ export function buildMobileConsumableSeat(
       deps.hideTooltip();
       audio.click();
       if (deps.useItem(id)) deps.flash(seatBtn);
+      // A use is the one inventory change the player is watching, so the next
+      // painted frame rescans instead of waiting out the divider.
+      framesSinceScan = CLOSED_RESCAN_FRAMES;
       seatBtn.blur();
     },
     onCancel: () => {
@@ -173,10 +228,39 @@ export function buildMobileConsumableSeat(
 
   return {
     paint(world: ActionBarWorldInput): void {
-      if (!gesture.isOpen()) {
-        consumableBarItems(world.inventory, (id) => deps.lookupItem(id), ids);
+      inventory = world.inventory;
+      const open = gesture.openState();
+      // Frozen while the row is open (an item must not shift out from under a
+      // travelling thumb), rescanned on the frame the row closes, and otherwise
+      // on the divider above rather than on every frame.
+      if (open === null) {
+        if (wasOpen || ++framesSinceScan >= CLOSED_RESCAN_FRAMES) {
+          consumableBarItems(world.inventory, (id) => deps.lookupItem(id), ids);
+          framesSinceScan = 0;
+        }
       }
-      painter.paint(view.tick(world), gesture.openState());
+      wasOpen = open !== null;
+      painter.paint(view.tick(world), open);
+      // ONE caption for the item under the finger: the row's icons alone cannot
+      // tell a healing potion from a mana one at a glance mid-fight.
+      const live = open ? open.live : -1;
+      if (live !== captionLive) {
+        captionLive = live;
+        const item = live >= 0 ? itemAt(deps, ids, live) : null;
+        captionName = item ? itemDisplayName(item) : '';
+      }
+      captionPainter.paint(
+        captionName,
+        open
+          ? stripCaptionCenterX({
+              centers: open.placement.centers,
+              live,
+              viewportWidth: open.viewportWidth,
+              margin: open.margin,
+            })
+          : null,
+        open?.anchorY ?? 0,
+      );
     },
     gesture,
     seatBtn,

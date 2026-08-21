@@ -557,6 +557,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/consumable_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/menu/menu_strip_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/strip_caption_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/stance/stance_radial_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/quest/quest_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
@@ -777,11 +778,16 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   // The quest strip's width bound. Its ONE rect helper is shared by all three
   // measures (the app-viewport container, the strip's own CSS-seated anchor,
-  // and the band's occupants), and it runs only when a cheap key built from
-  // non-layout reads moves: the rendered content, the viewport, or the
-  // tier/scale attributes. The target frame is deliberately NOT in that key and
-  // is never measured: the anchor comes from hud.mobile.css. A steady HUD on
-  // the tracker's medium band takes no layout read at all.
+  // and the band's occupants). It is ENTERED on every repaint and gated inside
+  // by a cheap key built from non-layout reads: the rendered content, the
+  // viewport, the tier/scale attributes, and each band occupant's classes plus
+  // child count. On top of that key it re-measures unconditionally every
+  // SEAT_REMEASURE_TICKS tracker ticks (about once a second on the medium
+  // band), because an occupant can change WIDTH with no attribute and no child
+  // count moving (a buff's stack text, a longer zone name) and no cheap signal
+  // exists for it. So a steady HUD is bounded at roughly one measure per
+  // second, never per frame. The target frame is deliberately NOT in that key
+  // and is never measured: the anchor comes from hud.mobile.css.
   {
     file: 'hud/quest/quest_strip_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1 },

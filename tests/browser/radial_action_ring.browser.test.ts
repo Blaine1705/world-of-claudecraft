@@ -26,11 +26,13 @@ import {
   placeConsumableStrip,
   placeRadial,
   type StripDirection,
+  stripCaptionCenterX,
 } from '../../src/ui/hud/action_bar/radial_action_core';
 import {
   RADIAL_PETAL_DIRECTIONS,
   RadialPetalPainter,
 } from '../../src/ui/hud/action_bar/radial_petal_painter';
+import { StripCaptionPainter } from '../../src/ui/hud/strip_caption_painter';
 import { makeWriterFacet } from '../../src/ui/painter_host';
 import '../../src/styles/index.css';
 import { cleanup } from './_harness';
@@ -202,7 +204,14 @@ function mountRing() {
   stripCancel.type = 'button';
   stripCancel.id = 'mobile-consumable-cancel';
   stripCancel.tabIndex = -1;
-  strip.append(...stripItems, stripCancel);
+  const caption = document.createElement('div');
+  caption.id = 'mobile-consumable-caption';
+  caption.className = 'panel';
+  caption.setAttribute('aria-hidden', 'true');
+  const captionText = document.createElement('span');
+  captionText.className = 'tt-title';
+  caption.append(captionText);
+  strip.append(...stripItems, stripCancel, caption);
 
   controls.append(ring, overlay, strip);
   document.body.appendChild(controls);
@@ -219,6 +228,8 @@ function mountRing() {
     strip,
     stripItems,
     stripCancel,
+    caption,
+    captionText,
   };
 }
 
@@ -377,6 +388,103 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
     expect(anchorX - Math.min(...placement.centers)).toBeGreaterThan(280);
     // The live item is the one marked, and only that one.
     expect(rig.stripItems.filter((b) => b.classList.contains('live'))).toEqual([rig.stripItems[2]]);
+  });
+
+  it('names the item under the finger in ONE caption, kept on screen', async () => {
+    // The identification the retired top-left quick bar had and the seat lost:
+    // six potion icons at ring size are not tellable apart mid-fight, so the
+    // traversed item is NAMED. Real layout is the point here: the box is
+    // tooltip chrome sized by its own text, so only a browser can show that it
+    // renders, clears the row, and stays inside the viewport at the far item.
+    const rig = await setup();
+    const captionPainter = new StripCaptionPainter(writers(), {
+      box: rig.caption,
+      text: rig.captionText,
+    });
+
+    // Closed: nothing named.
+    captionPainter.paint('', null, 0);
+    expect(getComputedStyle(rig.caption).display).toBe('none');
+
+    const stripStyle = getComputedStyle(rig.strip);
+    const gap = Number.parseFloat(stripStyle.getPropertyValue('--strip-gap'));
+    const margin = Number.parseFloat(stripStyle.getPropertyValue('--strip-margin'));
+    const seatBox = rig.seat.getBoundingClientRect();
+    const anchorX = seatBox.x + seatBox.width / 2;
+    const anchorY = seatBox.y + seatBox.height / 2;
+    const shared = {
+      anchorX,
+      count: CONSUMABLE_BAR_SLOTS,
+      itemSize: seatBox.width,
+      gap,
+      viewportWidth: window.innerWidth,
+      margin,
+    };
+    const placement = placeConsumableStrip({
+      ...shared,
+      anchorY,
+      direction: resolveConsumableStripDirection(shared),
+    });
+    // The row must be open for the items to have boxes to clear.
+    new ConsumableStripPainter(
+      writers(),
+      {
+        strip: rig.strip,
+        cancel: rig.stripCancel,
+        seat: slotElements(rig.seat),
+        items: rig.stripItems.map(slotElements),
+      },
+      () => '',
+    ).paint(
+      {
+        slots: Array.from({ length: CONSUMABLE_BAR_SLOTS + 1 }, () => emptySlotState('item')),
+        manySpells: false,
+      },
+      {
+        placement,
+        anchorX,
+        anchorY,
+        count: CONSUMABLE_BAR_SLOTS,
+        live: 0,
+        cancelLive: false,
+        itemSize: seatBox.width,
+      },
+    );
+
+    // Every position along the row, including the far one hard against the edge.
+    for (const live of [0, 2, CONSUMABLE_BAR_SLOTS - 1]) {
+      captionPainter.paint(
+        'Greater Healing Potion',
+        stripCaptionCenterX({
+          centers: placement.centers,
+          live,
+          viewportWidth: window.innerWidth,
+          margin,
+        }),
+        anchorY,
+      );
+      const box = rig.caption.getBoundingClientRect();
+      expect(getComputedStyle(rig.caption).display, `live ${live} is not shown`).toBe('block');
+      expect(rig.captionText.textContent).toBe('Greater Healing Potion');
+      expect(box.width, `caption ${live} has no box`).toBeGreaterThan(0);
+      expect(box.left, `caption ${live} overruns the left edge`).toBeGreaterThan(
+        -EDGE_TOLERANCE_PX,
+      );
+      expect(box.right, `caption ${live} overruns the right edge`).toBeLessThanOrEqual(
+        window.innerWidth + EDGE_TOLERANCE_PX,
+      );
+      // Parked ABOVE the row, so the finger travelling it never covers the name.
+      expect(box.bottom, `caption ${live} sits on the row`).toBeLessThanOrEqual(
+        rig.stripItems[live].getBoundingClientRect().top + 1,
+      );
+      // It is chrome, never a target: the gesture owns the pointer.
+      expect(getComputedStyle(rig.caption).pointerEvents).toBe('none');
+    }
+
+    // ONE caption, never a label per item: the box is a single element and the
+    // row's own items carry no text of their own.
+    expect(document.querySelectorAll('#mobile-consumable-caption').length).toBe(1);
+    for (const btn of rig.stripItems) expect(btn.textContent).toBe('');
   });
 
   it('sits the cancel X directly on top of the seat, right of the whole row', async () => {

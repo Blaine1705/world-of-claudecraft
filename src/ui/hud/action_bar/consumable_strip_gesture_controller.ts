@@ -15,6 +15,7 @@
 import type { PainterHostWriters } from '../../painter_host';
 import {
   StripGesture,
+  type StripGestureOpenState,
   type StripGestureOutcome,
   type StripMetrics,
   type StripReleaseInput,
@@ -24,7 +25,6 @@ import {
   resolveConsumableStripDirection,
   resolveConsumableStripRelease,
 } from './consumable_strip_core';
-import type { ConsumableStripOpenState } from './consumable_strip_painter';
 import type { StripDirection } from './radial_action_core';
 
 export interface ConsumableStripGestureDeps {
@@ -109,8 +109,11 @@ export class ConsumableStripGesture {
     return this.gesture.isOpen();
   }
 
-  /** What the painter needs to seat the row, or null while it is closed. */
-  openState(): ConsumableStripOpenState | null {
+  /** What the painter needs to seat the row, or null while it is closed. The
+   *  SHARED shape rather than the painter's narrower one: the caption clamps
+   *  against the same viewport width and edge margin the row was placed with,
+   *  and re-measuring them would cost a forced reflow per pointer move. */
+  openState(): StripGestureOpenState | null {
     return this.gesture.openState();
   }
 

@@ -157,8 +157,34 @@ describe('the quest strip cycles through real pointer events', () => {
     const rig = mountStrip();
     rig.controller.update([quest('a'), quest('b'), quest('c')], 0);
     swipe(rig.surface, -SWIPE_PX);
-    rig.surface.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    // detail 1: a browser-synthesized compatibility click carries a click count,
+    // which is what separates it from the assistive path above.
+    rig.surface.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
     expect(rig.title.textContent).toBe('Title b');
+  });
+
+  it('lets an assistive click through after a swipe that fired no click at all', () => {
+    const rig = mountStrip();
+    rig.controller.update([quest('a'), quest('b'), quest('c')], 0);
+    // Past the browser's tap slop, so no compatibility click follows the release
+    // and the suppression it armed is left standing.
+    swipe(rig.surface, -SWIPE_PX);
+    expect(rig.title.textContent).toBe('Title b');
+    // The next activation is click-only (VoiceOver, Switch Control, Enter on the
+    // focused button). A latched suppression used to swallow it whole.
+    rig.surface.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.title.textContent).toBe('Title c');
+  });
+
+  it('clears a stale suppression at the next press, never carrying it into a tap', () => {
+    const rig = mountStrip();
+    rig.controller.update([quest('a'), quest('b'), quest('c')], 0);
+    swipe(rig.surface, -SWIPE_PX);
+    // A real tap now, with its own compatibility click: the press clears what the
+    // swipe left behind, and the release arms it again for exactly this click.
+    swipe(rig.surface, 0);
+    rig.surface.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+    expect(rig.title.textContent).toBe('Title c');
   });
 
   it('cycles nowhere with a single tracked quest, and hides the position hint', () => {
@@ -384,6 +410,81 @@ describe('the strip is seated by CSS, never by the painter', () => {
     // 681 - QUEST_STRIP_BAND_GAP_PX (10) - the 276px anchor.
     expect(rig.root.style.maxWidth).toBe('395px');
     expect(rig.root.style.left).toBe('');
+  });
+});
+
+// The seat used to be ENTERED only when the rendered quest TEXT changed, so its
+// own cheap key (viewport, body class, root style) could never be consulted:
+// a rotation, a tier flip, and every band occupant coming or going left the
+// strip on a bound measured for a band that no longer existed.
+describe('the strip re-seats without the quest text changing', () => {
+  const CONTAINER_RECT = { left: 0, right: 874, top: 0, bottom: 402 };
+  const ANCHOR_RECT = { left: 276, right: 500, top: 6, bottom: 46 };
+
+  function stubRect(
+    el: Element,
+    rect: { left: number; right: number; top: number; bottom: number },
+  ) {
+    Object.defineProperty(el, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ ...rect, width: rect.right - rect.left, height: rect.bottom - rect.top }),
+    });
+  }
+
+  /** The strip plus one band occupant (the buff bar), whose box the test moves.
+   *  Occupants are shell-static, so they are mounted before the first seat. */
+  function mountWithBuffBar() {
+    const rig = mountStrip();
+    stubRect(rig.root.parentElement as Element, CONTAINER_RECT);
+    stubRect(rig.root, ANCHOR_RECT);
+    const buffs = document.createElement('div');
+    buffs.id = 'buff-bar';
+    document.body.append(buffs);
+    stubRect(buffs, { left: 681, right: 860, top: 4, bottom: 40 });
+    return { ...rig, buffs };
+  }
+
+  /** The SAME rendered strings every call, so nothing in the content signature
+   *  can be what moves the bound. */
+  const sameQuest = () => [quest('a', 2)];
+
+  it('re-seats on a body-class change (a tier flip) with identical quest text', () => {
+    const { controller, root, buffs } = mountWithBuffBar();
+    controller.update(sameQuest(), 0);
+    expect(root.style.maxWidth).toBe('395px');
+    // The tier flip moves the buff bar; the quest text does not move at all.
+    stubRect(buffs, { left: 601, right: 860, top: 4, bottom: 40 });
+    document.body.classList.add('mobile-landscape');
+    controller.update(sameQuest(), 50);
+    expect(root.style.maxWidth).toBe('315px');
+  });
+
+  it('re-seats when a band occupant gains content', () => {
+    const { controller, root, buffs } = mountWithBuffBar();
+    controller.update(sameQuest(), 0);
+    expect(root.style.maxWidth).toBe('395px');
+    // A buff gained: the bar grows leftward, and its child count is the cheap
+    // non-layout signal the key reads for it.
+    buffs.append(document.createElement('div'));
+    stubRect(buffs, { left: 621, right: 860, top: 4, bottom: 40 });
+    controller.update(sameQuest(), 50);
+    expect(root.style.maxWidth).toBe('335px');
+  });
+
+  it('re-measures within the bounded periodic window when only a WIDTH moved', () => {
+    // The occupant change no cheap signal can see: same element, same classes,
+    // same child count, wider box (a longer zone name, a stack count growing).
+    // The periodic sweep is what catches it, inside SEAT_REMEASURE_TICKS ticks.
+    const { controller, root, buffs } = mountWithBuffBar();
+    controller.update(sameQuest(), 0);
+    expect(root.style.maxWidth).toBe('395px');
+    stubRect(buffs, { left: 561, right: 860, top: 4, bottom: 40 });
+    // Nothing the cheap key can see moved, so the bound holds until the sweep
+    // lands on the SEAT_REMEASURE_TICKS'th tracker tick.
+    for (let tick = 1; tick <= 2; tick++) controller.update(sameQuest(), tick * 50);
+    expect(root.style.maxWidth).toBe('395px');
+    controller.update(sameQuest(), 150);
+    expect(root.style.maxWidth).toBe('275px');
   });
 });
 

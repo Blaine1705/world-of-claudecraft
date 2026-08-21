@@ -120,7 +120,11 @@ const MONOLITHS: MonolithRow[] = [
     // loop) into src/ui/chrome_focus_wiring.ts, leaving hud.ts a one-line
     // consumer (wireChromeFocus($)). The pin below is the MERGED reality of both
     // arms of extraction. Exact count, zero slack: any further growth reds again.
-    ceiling: 19038,
+    // LOWERED 19038 -> 19032 by the touch review fixes: the action-bar tooltip's
+    // in-bags sub-line moved into hud/action_bar/item_bags_line_core.ts, which
+    // the consumables row's restored item tooltip shares, and paid for its own
+    // two callback lines with nine to spare. Exact count, zero slack.
+    ceiling: 19032,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

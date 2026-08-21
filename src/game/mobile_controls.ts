@@ -1,3 +1,4 @@
+import { canTakeFocus } from '../ui/focus_manager';
 import { buildMobileMenuControl, type MobileMenuControl } from '../ui/hud/menu';
 import { t } from '../ui/i18n';
 import { bindTouchTap } from '../ui/touch_tap';
@@ -633,12 +634,16 @@ export class MobileControls {
       triggerHaptic(HAPTIC_TAP, this.hapticsOn);
       if (button.closest('#mobile-extra-controls')) {
         this.closeMoreModal();
-        // Establish the More trigger as the destination window's return target
-        // before its synchronous callback captures focus. The body-class
-        // observer then releases the old More trap without restoring it and
-        // focuses the newly opened window, avoiding focus inside aria-hidden
-        // More content during the modal-to-modal handoff.
-        document.getElementById('mobile-more')?.focus();
+        // Establish the destination window's return target before its
+        // synchronous callback captures focus. The body-class observer then
+        // releases the old More trap without restoring it and focuses the newly
+        // opened window, avoiding focus inside aria-hidden More content during
+        // the modal-to-modal handoff. The More trigger is a Quick Actions strip
+        // item, so it is unrendered whenever that strip is closed and focusing
+        // it would silently drop to <body>; the always-visible anchor takes it
+        // then.
+        const more = document.getElementById('mobile-more');
+        (canTakeFocus(more) ? more : document.getElementById('mobile-menu-anchor'))?.focus();
       }
       cb();
     };

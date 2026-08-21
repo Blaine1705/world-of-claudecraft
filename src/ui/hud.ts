@@ -408,6 +408,7 @@ import {
   placeItemOnSlot,
   swapHotbarSlots,
 } from './hud/action_bar/hotbar';
+import { itemInBagsLine } from './hud/action_bar/item_bags_line_core';
 import {
   clampMobilePage,
   mobileActionSourceSlotCount,
@@ -1421,6 +1422,7 @@ export class Hud {
   private readonly mobileMoreDialog = new MobileMoreDialogController(this.focusManager, {
     trigger: () => document.getElementById('mobile-more'),
     dialog: () => document.getElementById('mobile-extra-controls'),
+    fallback: () => document.getElementById('mobile-menu-anchor'),
   });
   // The control that opened the shared #ctx-menu (the chat "+" button), so the
   // outside-click closer can defer to that opener's own toggle click. Cleared on
@@ -7372,18 +7374,7 @@ export class Hud {
         if (known) return this.abilityTooltip(known) + clearHint;
         const item = this.itemForSlot(slot);
         if (item) {
-          const count = this.inventoryCount(item.id);
-          return (
-            this.itemTooltip(item) +
-            `<div class="tt-sub">${esc(
-              count > 0
-                ? t('abilityUi.actionBar.itemInBags', {
-                    count: formatNumber(count, { maximumFractionDigits: 0 }),
-                  })
-                : t('abilityUi.actionBar.itemNoneInBags'),
-            )}</div>` +
-            clearHint
-          );
+          return this.itemTooltip(item) + itemInBagsLine(this.inventoryCount(item.id)) + clearHint;
         }
         return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
       });
@@ -7735,6 +7726,8 @@ export class Hud {
           return true;
         },
         flash: (btn) => this.flashActionButton(btn),
+        attachTooltip: (el, html) => this.attachTooltip(el, html),
+        itemTooltip: (item) => this.itemTooltip(item),
         hideTooltip: () => this.hideTooltip(),
         consumePeekGuard: () => this.peekGuard.consume(),
       }) ?? undefined;
@@ -17472,15 +17465,16 @@ export class Hud {
     // Drop the frames below the target frame only when the measured target
     // stack (frame + #tf-debuffs strip) actually overlaps their column: the
     // painter keeps --party-below-target-bottom current (measuring only when
-    // its cheap key changes), and a null bottom (no target, no overlap, e.g. a
-    // dragged-away target frame) keeps the frames at their base anchor.
+    // its cheap key changes) and reports whether the seat is in play at all (no
+    // overlap, e.g. a dragged-away target frame, keeps the frames at their base
+    // anchor; touch holds the seat with no target off the tier's fallback).
     const targetShown = !!target && target.kind !== 'object';
-    const stackBottom = this.partyBelowTargetPainter.update(
+    const belowTarget = this.partyBelowTargetPainter.update(
       targetShown,
       info?.members.length ?? 0,
       this.isMobileLayout(),
     );
-    this.partyFramesPainter.setBelowTarget(stackBottom !== null);
+    this.partyFramesPainter.setBelowTarget(belowTarget);
     if (!info) {
       // Clear only on the transition out of a party (matching the inline `innerHTML
       // !== ''` guard), so a persistently party-less HUD does no per-frame work.

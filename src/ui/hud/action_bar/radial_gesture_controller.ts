@@ -106,7 +106,9 @@ export interface RadialGestureDeps {
    *  has no action of its own, so a bare tap opens the petals in EITHER mode and
    *  the next press closes them. The rule is tap_menu_core.ts's. */
   anchorRole?: TapMenuAnchorRole;
-  /** The element whose computed style carries the radial geometry per tier. */
+  /** The element whose computed style carries the radial geometry per tier. It
+   *  is the petal OVERLAY, which is also the element the painted petals are
+   *  positioned against, so its padding defines the frame measure() works in. */
   metricsHost: HTMLElement;
   /** Whether a button plus direction maps to a real hotbar slot right now. */
   hasSlot(buttonIndex: number, direction: RadialDirection): boolean;
@@ -114,12 +116,15 @@ export interface RadialGestureDeps {
    *  SAME castSlot path a plain ring tap uses; only the input differs. */
   cast(buttonIndex: number, direction: RadialDirection): void;
   /** Another owner already claims this press (an empowered-ability hold, bind
-   *  mode), so the radial must not arm at all. */
+   *  mode). The claim is over the pointer GESTURE and the centre action it runs,
+   *  so the radial arms no drag and casts no centre on a claimed button; the
+   *  tap-mode and keyboard paths still open its petals, which is the only way its
+   *  four directions are reachable at all. */
   pressClaimed(buttonIndex: number): boolean;
   /** Read and CLEAR the shared "this release was a drag, not a tap" flag. Read
-   *  on every release the radial owns, and on an unowned one only while no other
-   *  press is live: the empowered-hold path sets it on a press the radial never
-   *  armed, and a flag left set would swallow the next cast. */
+   *  on every release, owned or not: the empowered-hold path sets it on a press
+   *  the radial never armed, so that press's own release is what clears it, and a
+   *  flag left standing would swallow the next cast made by any other button. */
   takeSuppressedPress(): boolean;
   /** The player opened the radial and chose nothing. */
   onCancel(): void;
@@ -146,19 +151,29 @@ function readPx(value: string): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
-/** The edge clearance the clamp keeps: the stylesheet's literal, widened to
- *  whatever the device's safe area actually claims. env() cannot live in that
- *  literal (a custom property comes back unresolved, see above), so the overlay
- *  carries the insets as padding, which is inert under the global border-box
- *  reset and, being a real property, does resolve to px. */
-function readEdgeMargin(style: CSSStyleDeclaration): number {
-  return Math.max(
-    readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
-    readPx(style.paddingTop),
-    readPx(style.paddingRight),
-    readPx(style.paddingBottom),
-    readPx(style.paddingLeft),
-  );
+/** The device safe area. env() cannot live in the geometry custom properties (a
+ *  custom property comes back unresolved, see above), so the overlay carries the
+ *  insets as padding, which is a real property and does resolve to px.
+ *
+ *  That padding is NOT inert: every petal is an absolutely positioned child of
+ *  the overlay, so the left/top the painter writes resolves against the overlay's
+ *  PADDING box. These four numbers are therefore the offset between the viewport
+ *  and the frame the petals are actually seated in, which is why measure() works
+ *  in that frame rather than in viewport coordinates. */
+interface EdgeInsets {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+function readInsets(style: CSSStyleDeclaration): EdgeInsets {
+  return {
+    top: readPx(style.paddingTop),
+    right: readPx(style.paddingRight),
+    bottom: readPx(style.paddingBottom),
+    left: readPx(style.paddingLeft),
+  };
 }
 
 /** The tap-mode menu: which ring button revealed the petals, and where they are
@@ -200,11 +215,11 @@ export class RadialGesture {
           return;
         }
         if ((e as MouseEvent).detail !== KEYBOARD_CLICK_DETAIL) return;
-        if (this.deps.pressClaimed(index)) return;
         // Keyboard activation follows the same table as a tap, so Enter opens the
         // petals in tap mode instead of casting past them, and opens a 'toggle'
-        // control's petals in either mode. An 'action' control with tap mode off
-        // resolves to 'default' there, which is the centre cast it always was.
+        // control's petals in either mode. A claimed button is deliberately NOT
+        // refused here: the claim (an empowered hold) owns the POINTER gesture,
+        // and refusing the key too left the four directions unreachable.
         this.resolveAnchorPress(index);
       });
     });
@@ -347,11 +362,14 @@ export class RadialGesture {
     this.deps.onCancel();
   }
 
-  /** A tap-driven press on a ring button: open the petals, close them again, or
-   *  cast the centre action when they are already open for that button. */
+  /** A tap- or key-driven press on a ring button: open the petals, close them
+   *  again, or run the control's own action. The setting is read LIVE rather than
+   *  assumed on: with tap mode off, Enter on a ring button casts its centre slot
+   *  (what a click always did) instead of opening a menu the player never asked
+   *  for. */
   private resolveAnchorPress(buttonIndex: number): void {
     const press = resolveTapMenuPress({
-      tapMenus: true,
+      tapMenus: this.deps.tapMenus(),
       open: this.sticky?.buttonIndex === buttonIndex,
       target: 'anchor',
       anchorRole: this.deps.anchorRole,
@@ -367,8 +385,28 @@ export class RadialGesture {
       this.deps.onCancel();
       return;
     }
+    // With tap mode off the shared table hands a bare anchor press back to the
+    // POINTER layer, and a key activation has no pointer layer to hand it to.
+    // What a bare activation MEANS per role is already the release table's
+    // answer, so ask it rather than writing the rule a second time here.
+    if (press.kind === 'gesture') {
+      const outcome = resolveRadialRelease({
+        direction: 'center',
+        revealed: false,
+        hasSlot: this.deps.hasSlot(buttonIndex, 'center'),
+        consumedElsewhere: this.deps.pressClaimed(buttonIndex),
+        anchorRole: this.deps.anchorRole,
+      });
+      if (outcome.kind === 'cast') this.deps.cast(buttonIndex, outcome.direction);
+      else if (outcome.kind === 'open') this.openSticky(buttonIndex);
+      return;
+    }
     if (press.kind !== 'default') return;
     this.closeSticky();
+    // The centre action belongs to whoever claimed the press: the empowered hold
+    // fires it from its own release, so the radial only steps aside here rather
+    // than casting it a second time.
+    if (this.deps.pressClaimed(buttonIndex)) return;
     if (this.deps.hasSlot(buttonIndex, 'center')) this.deps.cast(buttonIndex, 'center');
   }
 
@@ -387,7 +425,6 @@ export class RadialGesture {
   private onDown(e: PointerEvent, buttonIndex: number, btn: HTMLElement): void {
     if (this.drags.has(e.pointerId)) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    if (this.deps.pressClaimed(buttonIndex)) return;
     // A press always clears a stale suppression first: it is set here and cleared
     // by the click that follows, so one that never arrived would otherwise
     // swallow the next keyboard activation.
@@ -401,6 +438,12 @@ export class RadialGesture {
       this.resolveAnchorPress(buttonIndex);
       return;
     }
+    // A claim (an empowered hold, bind mode) owns the POINTER, so the drag never
+    // arms under one. It is refused HERE rather than at the head of the handler
+    // on purpose: the tap-driven paths above open and close the petals without a
+    // drag, and refusing them too left every direction of a claimed button
+    // unreachable by tap, by sticky menu and by key alike.
+    if (this.deps.pressClaimed(buttonIndex)) return;
     try {
       btn.setPointerCapture?.(e.pointerId);
     } catch {
@@ -440,19 +483,32 @@ export class RadialGesture {
 
   /** Seat the radial around one ring button. The one place this module reads
    *  layout, gated to an opening (a drag's reveal or a tap-mode press) rather
-   *  than per frame. */
+   *  than per frame.
+   *
+   *  WHY THE FRAME IS THE OVERLAY'S PADDING BOX, not the viewport: the petals are
+   *  absolutely positioned children of the overlay, so the coordinates the painter
+   *  writes are resolved against its padding box, and the safe-area inset the
+   *  overlay carries as padding is exactly the offset between the two. Measuring
+   *  in viewport coordinates displaced every petal by that inset on a notched
+   *  device, and folding the same inset into the clamp margin counted it twice.
+   *  Shifting the anchor and shrinking the clamp box here counts it once, and
+   *  leaves the margin the stylesheet's own literal clearance INSIDE the safe
+   *  area. */
   private measure(btn: HTMLElement): RadialPlacement {
     const rect = btn.getBoundingClientRect();
     const style = getComputedStyle(this.deps.metricsHost);
     const petalSize = rect.width > 0 ? rect.width : FALLBACK_PETAL_SIZE_PX;
+    const inset = readInsets(style);
     return placeRadial({
-      buttonCx: rect.x + rect.width / 2,
-      buttonCy: rect.y + rect.height / 2,
-      viewportWidth: readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth),
-      viewportHeight: readMetric(style, APP_VIEWPORT_HEIGHT_PROP, window.innerHeight),
+      buttonCx: rect.x + rect.width / 2 - inset.left,
+      buttonCy: rect.y + rect.height / 2 - inset.top,
+      viewportWidth:
+        readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth) - inset.left - inset.right,
+      viewportHeight:
+        readMetric(style, APP_VIEWPORT_HEIGHT_PROP, window.innerHeight) - inset.top - inset.bottom,
       radius: petalSize * readMetric(style, RADIUS_RATIO_PROP, FALLBACK_RADIUS_RATIO),
       petalHalf: petalSize / 2,
-      margin: readEdgeMargin(style),
+      margin: readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
     });
   }
 
@@ -473,10 +529,11 @@ export class RadialGesture {
     const d = this.drags.get(e.pointerId);
     if (!d) {
       // Not a press the radial armed (an empowered hold or bind mode took it).
-      // The flag those paths set still has to be cleared or it swallows the next
-      // cast, but only while nothing else is held: a second thumb's release must
-      // never consume the flag its neighbour's hold armed.
-      if (this.drags.size === 0) this.deps.takeSuppressedPress();
+      // This release IS the one the flag those paths set was armed against, so it
+      // is consumed here whatever else is held. Deferring it while a neighbouring
+      // thumb held a drag left the flag standing for THAT thumb's release to
+      // consume, which cancelled a cast the hold had nothing to do with.
+      this.deps.takeSuppressedPress();
       return;
     }
     const suppressed = this.deps.takeSuppressedPress();

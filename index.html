@@ -1665,7 +1665,8 @@
     <!-- Consumables row: opened by a hold or a leftward swipe on the ring's 5th
          seat, seated in viewport coordinates by consumable_strip_painter.ts. The
          cancel X sits ON the seat, so releasing back where the gesture started
-         backs out without quaffing anything. -->
+         backs out without quaffing anything, and ONE caption names the item the
+         finger is on, which is how a potion is told from an elixir mid-fight. -->
     <div id="mobile-consumable-strip" role="group" data-i18n-aria="hudChrome.mobile.consumableSeat" aria-label="Consumables">
       <button type="button" class="mobile-consumable-item" data-consumable-index="0" tabindex="-1"></button>
       <button type="button" class="mobile-consumable-item" data-consumable-index="1" tabindex="-1"></button>
@@ -1674,6 +1675,7 @@
       <button type="button" class="mobile-consumable-item" data-consumable-index="4" tabindex="-1"></button>
       <button type="button" class="mobile-consumable-item" data-consumable-index="5" tabindex="-1"></button>
       <button type="button" id="mobile-consumable-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
+      <div id="mobile-consumable-caption" class="panel" aria-hidden="true"><span class="tt-title"></span></div>
     </div>
     <!-- The Quick Actions strip: ten actions extending rightward from the control,
          opened by a tap, a hold or a rightward swipe and seated in viewport

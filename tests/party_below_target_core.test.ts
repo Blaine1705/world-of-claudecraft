@@ -11,10 +11,10 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import {
+  belowTargetSlot,
   type MeasuredBox,
   type PartyBelowTargetInputs,
   partyBelowTargetBottom,
-  reservedBelowTargetBottom,
 } from '../src/ui/party_below_target_core';
 import {
   PARTY_BELOW_TARGET_BOTTOM_PROP,
@@ -182,12 +182,12 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
 
   it('measures once, writes the author-space bottom, and elides steady frames', () => {
     const { painter, frame, debuffs, props } = build();
-    expect(painter.update(true, 5, false)).toBe(199);
+    expect(painter.update(true, 5, false)).toBe(true);
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('199.0px');
     expect(frame.rectReads).toBe(1);
     expect(debuffs.rectReads).toBe(1);
     // Steady state: same inputs, no further layout reads.
-    for (let i = 0; i < 5; i++) expect(painter.update(true, 5, false)).toBe(199);
+    for (let i = 0; i < 5; i++) expect(painter.update(true, 5, false)).toBe(true);
     expect(frame.rectReads).toBe(1);
     expect(debuffs.rectReads).toBe(1);
   });
@@ -197,14 +197,14 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
     painter.update(true, 5, false);
     debuffs.children = 18;
     debuffs.rect.bottom = 254;
-    expect(painter.update(true, 5, false)).toBe(254);
+    expect(painter.update(true, 5, false)).toBe(true);
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('254.0px');
     expect(frame.rectReads).toBe(2);
     // A drag commit updates the frame's inline style: the key must catch it.
     frame.attrs.style = 'left: 900px; top: 40px;';
     frame.rect = { left: 900, right: 1120, bottom: 116 };
     debuffs.rect = { left: 900, right: 1120, bottom: 254 };
-    expect(painter.update(true, 5, false)).toBeNull();
+    expect(painter.update(true, 5, false)).toBe(false);
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('initial');
   });
 
@@ -279,11 +279,12 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
     try {
       const { painter, frame, props } = build();
       expect(fired.length).toBe(1);
-      expect(painter.update(true, 5, false)).toBe(199);
+      expect(painter.update(true, 5, false)).toBe(true);
+      expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('199.0px');
       expect(frame.rectReads).toBe(1);
       frame.rect.bottom = 250;
       for (const cb of fired) cb();
-      expect(painter.update(true, 5, false)).toBe(250);
+      expect(painter.update(true, 5, false)).toBe(true);
       expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('250.0px');
       expect(frame.rectReads).toBe(2);
     } finally {
@@ -291,14 +292,15 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
     }
   });
 
-  it('unsets the property and reports null while no target is shown', () => {
+  it('unsets the property and drops the seat while no target is shown (desktop)', () => {
     const { painter, frame, props } = build();
     painter.update(true, 5, false);
-    expect(painter.update(false, 5, false)).toBeNull();
+    expect(painter.update(false, 5, false)).toBe(false);
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('initial');
     // No re-measure while off, and a fresh measure once a target returns.
     expect(frame.rectReads).toBe(1);
-    expect(painter.update(true, 5, false)).toBe(199);
+    expect(painter.update(true, 5, false)).toBe(true);
+    expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('199.0px');
     expect(frame.rectReads).toBe(2);
   });
 });
@@ -379,67 +381,48 @@ describe('below-target CSS derives from the measured bottom', () => {
 });
 
 // ---------------------------------------------------------------------------
-// The target frame's RESERVED slot (touch): the frame comes and goes with the
+// The target frame's HELD slot (touch): the frame comes and goes with the
 // player's target, and on touch the party stack now hangs directly under it in
-// the band the collapsed menu row vacated, so laying out against the live box
-// would jump the whole stack the moment they deselect.
+// the band the collapsed menu row vacated, so releasing the seat would jump the
+// whole stack the moment they deselect. The seat is held; the measured bottom
+// is NOT retained, because nothing would ever invalidate it.
 // ---------------------------------------------------------------------------
 
-describe('reservedBelowTargetBottom (the held slot)', () => {
+describe('belowTargetSlot (the held seat)', () => {
   it('reports the live measure while a target is shown', () => {
-    expect(
-      reservedBelowTargetBottom({ measured: 199, reserved: 88, targetShown: true, reserve: true }),
-    ).toBe(199);
+    expect(belowTargetSlot({ measured: 199, targetShown: true, reserve: true })).toEqual({
+      active: true,
+      bottom: 199,
+    });
   });
 
-  it('holds the last occupied bottom on touch when the target drops', () => {
-    expect(
-      reservedBelowTargetBottom({
-        measured: null,
-        reserved: 199,
-        targetShown: false,
-        reserve: true,
-      }),
-    ).toBe(199);
+  it('holds the seat on touch when the target drops, with no bottom of its own', () => {
+    // Unsetting is what lets the per-tier var() fallback (authored beside the
+    // target frame's own static seat) resolve, which is correct at every tier.
+    expect(belowTargetSlot({ measured: null, targetShown: false, reserve: true })).toEqual({
+      active: true,
+      bottom: null,
+    });
   });
 
-  it('leaves desktop unchanged: no reservation, so the frames return to their anchor', () => {
-    expect(
-      reservedBelowTargetBottom({
-        measured: null,
-        reserved: 199,
-        targetShown: false,
-        reserve: false,
-      }),
-    ).toBeNull();
+  it('leaves desktop unchanged: no held seat, so the frames return to their anchor', () => {
+    expect(belowTargetSlot({ measured: null, targetShown: false, reserve: false })).toEqual({
+      active: false,
+      bottom: null,
+    });
   });
 
-  it('reports nothing before any target has ever been measured', () => {
-    expect(
-      reservedBelowTargetBottom({
-        measured: null,
-        reserved: null,
-        targetShown: false,
-        reserve: true,
-      }),
-    ).toBeNull();
-  });
-
-  it('never resurrects a stale reservation for a shown target that reports no push', () => {
+  it('drops the seat for a shown target that reports no push', () => {
     // A dragged-away target frame no longer overlaps the party column, so the
     // calc returns null and the frames must go back to their base anchor.
-    expect(
-      reservedBelowTargetBottom({
-        measured: null,
-        reserved: 199,
-        targetShown: true,
-        reserve: true,
-      }),
-    ).toBeNull();
+    expect(belowTargetSlot({ measured: null, targetShown: true, reserve: true })).toEqual({
+      active: false,
+      bottom: null,
+    });
   });
 });
 
-describe('PartyBelowTargetPainter: the reserved slot end to end', () => {
+describe('PartyBelowTargetPainter: the held slot end to end', () => {
   function rig() {
     const root = stubEl({ left: 0, right: 0, bottom: 0 });
     const frame = stubEl({ left: 12, right: 232, bottom: 88 });
@@ -464,21 +447,37 @@ describe('PartyBelowTargetPainter: the reserved slot end to end', () => {
     return { painter, props };
   }
 
-  it('keeps the offset, and the rows bound, when a touch target drops', () => {
+  it('keeps the seat but UNSETS the measured bottom when a touch target drops', () => {
     const { painter, props } = rig();
-    expect(painter.update(true, 5, true)).toBe(199);
-    expect(painter.update(false, 5, true)).toBe(199);
+    expect(painter.update(true, 5, true)).toBe(true);
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('199.0px');
-    // The rows bound rides the reservation too, or the stack would grow into
-    // the move zone the frame's slot was holding it clear of.
+    // The seat is still held (the stack must not jump on a deselect), but the
+    // offset now comes from the tier's authored var() fallback rather than from
+    // a cached measure taken under whatever tier and buff count was live then.
+    expect(painter.update(false, 5, true)).toBe(true);
+    expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('initial');
+    // The rows bound rides the held seat, or the stack would grow into the move
+    // zone the seat is holding it clear of.
     expect(props.get(PARTY_ROWS_TOP_PROP)).not.toBe('initial');
     expect(props.get(PARTY_ROWS_LIMIT_PROP)).not.toBe('initial');
   });
 
-  it('unsets on desktop when the target drops, exactly as before', () => {
+  it('re-measures the held seat on a rotation, instead of holding a stale one', () => {
+    // The bug the retained measure carried: nothing invalidated it, so a
+    // rotation or a tier flip while untargeted kept the previous tier's number.
     const { painter, props } = rig();
-    expect(painter.update(true, 5, false)).toBe(199);
-    expect(painter.update(false, 5, false)).toBeNull();
+    painter.update(true, 5, true);
+    painter.update(false, 5, true);
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('266.0px');
+    painter.update(false, 6, true);
+    expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('initial');
+    expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('227.0px');
+  });
+
+  it('drops the seat entirely on desktop when the target drops, exactly as before', () => {
+    const { painter, props } = rig();
+    expect(painter.update(true, 5, false)).toBe(true);
+    expect(painter.update(false, 5, false)).toBe(false);
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('initial');
     expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('initial');
   });

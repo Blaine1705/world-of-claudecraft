@@ -78,7 +78,9 @@ const FALLBACK_MARGIN_PX = 6;
  *  control it replaced carried it and the gesture menus dropped it (#seam). */
 const ARIA_EXPANDED_ATTR = 'aria-expanded';
 
-/** The measured row metrics a direction rule is resolved against. */
+/** The measured row metrics a direction rule is resolved against. Every distance
+ *  here is in the overlay's padding-box frame (see measure()), which is the frame
+ *  the painter's coordinates are resolved in. */
 export interface StripMetrics {
   /** Centre of the anchoring control. */
   anchorX: number;
@@ -115,7 +117,9 @@ export interface StripReleaseInput {
 export interface StripGestureDeps {
   /** The control that owns the press (the seat, the menu control). */
   anchor: HTMLElement;
-  /** The element whose computed style carries the row geometry per tier. */
+  /** The element whose computed style carries the row geometry per tier. It is
+   *  the row OVERLAY, which is also the element the painted items are positioned
+   *  against, so its padding defines the frame measure() works in. */
   metricsHost: HTMLElement;
   /** The row's item buttons, in row order (index 0 nearest the anchor). */
   items: readonly HTMLElement[];
@@ -194,19 +198,29 @@ function readPx(value: string): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
-/** The edge clearance the clamp keeps: the stylesheet's literal, widened to
- *  whatever the device's safe area actually claims. env() cannot live in that
- *  literal (a custom property comes back unresolved, see above), so the overlay
- *  carries the insets as padding, which is inert under the global border-box
- *  reset and, being a real property, does resolve to px. */
-function readEdgeMargin(style: CSSStyleDeclaration): number {
-  return Math.max(
-    readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
-    readPx(style.paddingTop),
-    readPx(style.paddingRight),
-    readPx(style.paddingBottom),
-    readPx(style.paddingLeft),
-  );
+/** The device safe area. env() cannot live in the geometry custom properties (a
+ *  custom property comes back unresolved, see above), so the overlay carries the
+ *  insets as padding, which is a real property and does resolve to px.
+ *
+ *  That padding is NOT inert: every row item is an absolutely positioned child of
+ *  the overlay, so the left/top the painter writes resolves against the overlay's
+ *  PADDING box. These four numbers are therefore the offset between the viewport
+ *  and the frame the row is actually seated in, which is why measure() works in
+ *  that frame rather than in viewport coordinates. */
+interface EdgeInsets {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+function readInsets(style: CSSStyleDeclaration): EdgeInsets {
+  return {
+    top: readPx(style.paddingTop),
+    right: readPx(style.paddingRight),
+    bottom: readPx(style.paddingBottom),
+    left: readPx(style.paddingLeft),
+  };
 }
 
 export class StripGesture {
@@ -397,20 +411,33 @@ export class StripGesture {
   }
 
   /** Measure the anchor and lay the row out around it. The one place this module
-   *  reads layout, gated to an opening gesture rather than per frame. */
+   *  reads layout, gated to an opening gesture rather than per frame.
+   *
+   *  WHY THE FRAME IS THE OVERLAY'S PADDING BOX, not the viewport: the row items
+   *  are absolutely positioned children of the overlay, so the coordinates the
+   *  painter writes are resolved against its padding box, and the safe-area inset
+   *  the overlay carries as padding is exactly the offset between the two.
+   *  Measuring in viewport coordinates displaced every item by that inset on a
+   *  notched device, and folding the same inset into the clamp margin counted it
+   *  twice. Shifting the anchor and shrinking the clamp box here counts it once,
+   *  and leaves the margin the stylesheet's own literal clearance INSIDE the safe
+   *  area. Everything downstream (the caption clamp, the dim band) then reads one
+   *  consistent frame. */
   private measure(): StripGestureLayout {
     const rect = this.deps.anchor.getBoundingClientRect();
     const style = getComputedStyle(this.deps.metricsHost);
     const itemSize = rect.width > 0 ? rect.width : FALLBACK_ITEM_SIZE_PX;
+    const inset = readInsets(style);
     const metrics: StripMetrics = {
-      anchorX: rect.x + rect.width / 2,
+      anchorX: rect.x + rect.width / 2 - inset.left,
       count: this.deps.count(),
       itemSize,
       gap: readMetric(style, GAP_PROP, FALLBACK_GAP_PX),
-      viewportWidth: readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth),
-      margin: readEdgeMargin(style),
+      viewportWidth:
+        readMetric(style, APP_VIEWPORT_WIDTH_PROP, window.innerWidth) - inset.left - inset.right,
+      margin: readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
     };
-    const anchorY = rect.y + rect.height / 2;
+    const anchorY = rect.y + rect.height / 2 - inset.top;
     const direction = this.deps.direction(metrics);
     return {
       placement: placeConsumableStrip({ ...metrics, anchorY, direction }),

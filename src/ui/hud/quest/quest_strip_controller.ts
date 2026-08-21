@@ -54,6 +54,18 @@ const NEXT_ID = 'quest-strip-next';
 const MORE_ID = 'quest-strip-more';
 const HINT_ID = 'quest-strip-hint';
 const OBJECTIVE_SELECTOR = '.quest-strip-obj:not(.quest-strip-more)';
+/**
+ * Repaints between forced band re-measures. The strip paints on the tracker's
+ * MEDIUM band (about 4 Hz), so four ticks is roughly one measure per second.
+ * The cheap key below catches every occupant change that shows up in an
+ * attribute or a child count, but a band occupant can also change WIDTH with
+ * neither moving (a buff icon whose stack text grows, the minimap's zone label
+ * swapping to a longer name), and there is no non-layout signal for that. One
+ * bounded re-measure per second is the price of the strip not overlapping the
+ * buff bar until the next quest event; it is one rect helper over five static
+ * occupants, off the frame band entirely.
+ */
+const SEAT_REMEASURE_TICKS = 4;
 /** The strip only exists on the touch HUD; desktop keeps its tracker. */
 const TOUCH_BODY_CLASS = 'mobile-touch';
 
@@ -109,6 +121,7 @@ export class QuestStripController {
    *  strings, so a locale change repaints without a relocalize hook. */
   private signature = '';
   private seatKey = '';
+  private ticksSinceSeatMeasure = 0;
   /** The last frame time the tracker handed down, and when the player last
    *  cycled by hand, both on the HUD's monotonic clock. The controller never
    *  reads a clock of its own, so a cycle timestamps itself off the most recent
@@ -116,6 +129,9 @@ export class QuestStripController {
    *  grace below cannot notice. */
   private nowMs = 0;
   private lastCycleAt: number | null = null;
+
+  /** Resolved on the first seat: every band occupant is a static shell element. */
+  private occupantEls: (Element | null)[] | null = null;
 
   private readonly painter: QuestStripPainter;
   private readonly gesture: QuestStripGesture;
@@ -165,6 +181,12 @@ export class QuestStripController {
     this.quests = quests;
     if (jump !== null) this.index = jump;
     this.repaint();
+    // The bounded periodic re-measure, counted on the TRACKER's tick rather
+    // than on repaints, so a burst of gesture repaints cannot pull it forward.
+    if (++this.ticksSinceSeatMeasure >= SEAT_REMEASURE_TICKS) {
+      this.ticksSinceSeatMeasure = 0;
+      this.seat(true);
+    }
   }
 
   /** Move the selection, wrapping in both directions. */
@@ -221,12 +243,16 @@ export class QuestStripController {
       model.more,
       ...objectives.map((line) => `${line.done ? '1' : '0'}${line.text}`),
     ].join('\u0000');
-    const changed = signature !== this.signature;
     this.signature = signature;
     // The press and the chevron pulse are transient, so they always paint; the
     // content behind them rides the elided writers either way.
     this.painter.paint(model);
-    if (changed || this.seatKey === '') this.seat();
+    // Entered EVERY repaint and gated inside: the band's occupants (the buff
+    // bars, the party stack, the minimap's zone label) come and go without the
+    // quest text moving, and so do a rotation and a tier flip, so gating the
+    // ENTRY on the rendered text left every one of those unseated until the
+    // next quest event.
+    this.seat(false);
   }
 
   /** The off-screen description: what the strip is and what activating it does.
@@ -248,13 +274,33 @@ export class QuestStripController {
   }
 
   /**
+   * The band occupants' non-layout signature: what each one is (its classes)
+   * and how much it holds (its child count, which is what a buff gained or a
+   * party member joined moves). Element refs are resolved ONCE, since every
+   * selector names a static element of the shell.
+   */
+  private occupantKey(doc: Document): string {
+    if (this.occupantEls === null) {
+      this.occupantEls = BAND_OCCUPANT_SELECTORS.map((selector) => doc.querySelector(selector));
+    }
+    let key = '';
+    for (const el of this.occupantEls) {
+      if (!el) continue;
+      key += `${el.className}:${el.childElementCount};`;
+    }
+    return key;
+  }
+
+  /**
    * Measure the band and bound the strip's width. Gated behind a key built only
    * from non-layout reads, so a steady HUD costs no rect read at all; it runs on
-   * a content change (the strip's own box moved) or a layout change (viewport,
-   * tier, UI scale). The target frame is not in the key, which is the point:
-   * neither its class nor its style may change what this writes.
+   * a content change (the strip's own box moved), a layout change (viewport,
+   * tier, UI scale) or an occupant change (a bar appearing, the zone label
+   * swapping), plus the bounded periodic sweep `forced` carries for the width
+   * changes no cheap signal can see. The target frame is not in the key, which
+   * is the point: neither its class nor its style may change what this writes.
    */
-  private seat(): void {
+  private seat(forced: boolean): void {
     const doc = this.els.root.ownerDocument;
     const key = [
       this.signature,
@@ -262,8 +308,9 @@ export class QuestStripController {
       this.win.innerHeight,
       doc.body?.getAttribute('class') ?? '',
       doc.documentElement.getAttribute('style') ?? '',
+      this.occupantKey(doc),
     ].join('|');
-    if (key === this.seatKey) return;
+    if (!forced && key === this.seatKey) return;
 
     // The strip is seated inside #mobile-controls, which is sized from the
     // shared app-viewport box, so the container's own box is both the clamp
@@ -289,8 +336,7 @@ export class QuestStripController {
     if (own.right - own.left <= 0) return;
 
     const occupants: QuestStripBox[] = [];
-    for (const selector of BAND_OCCUPANT_SELECTORS) {
-      const el = doc.querySelector(selector);
+    for (const el of this.occupantEls ?? []) {
       if (!el) continue;
       const measured = shift(box(el));
       if (measured.right - measured.left <= 0) continue;

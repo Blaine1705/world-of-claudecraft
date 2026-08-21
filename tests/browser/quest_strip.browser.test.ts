@@ -123,6 +123,22 @@ function mountHud() {
 
   const ui = document.createElement('div');
   ui.id = 'ui';
+  // The band occupant the strip's width is actually bounded by. Seated with
+  // inline geometry rather than the shipped aura painter: what is under test is
+  // the RE-BOUND, so the fixture only has to own a box that moves.
+  const buffBar = document.createElement('div');
+  buffBar.id = 'buff-bar';
+  buffBar.style.cssText =
+    'position: fixed; top: 4px; right: 8px; height: 34px; display: flex; justify-content: flex-end;';
+  const addBuff = (): HTMLElement => {
+    const buff = document.createElement('div');
+    buff.className = 'buff';
+    buff.style.cssText = 'width: 34px; height: 34px;';
+    buffBar.append(buff);
+    return buff;
+  };
+  addBuff();
+  ui.append(buffBar);
   const party = document.createElement('div');
   party.id = 'party-frames';
   party.className = 'party-present below-target has-party-chip party-expanded';
@@ -167,6 +183,8 @@ function mountHud() {
     controller,
     ring,
     addTarget,
+    buffBar,
+    addBuff,
     root: el('quest-strip'),
     surface: el('quest-strip-main'),
     title: el('quest-strip-title'),
@@ -298,6 +316,49 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     target.remove();
     rig.controller.update(quests(3, 2), 0);
     expect(rig.root.getBoundingClientRect().left).toBe(first);
+  });
+
+  it('re-bounds when a band occupant grows, with the quest text unchanged', async () => {
+    // The strip used to enter its seat measure only when the rendered quest
+    // TEXT changed, so a buff gained mid-fight (which grows the bar leftward
+    // into the band) left the strip on a bound for a band that no longer
+    // existed until the next quest event.
+    const rig = await setup();
+    const same = () => quests(3, 2);
+    const cap = () => Number.parseFloat(rig.root.style.maxWidth);
+    rig.controller.update(same(), 0);
+    const start = rig.root.getBoundingClientRect();
+    const startCap = cap();
+    expect(startCap).toBeGreaterThan(0);
+    expect(rig.buffBar.getBoundingClientRect().width).toBeGreaterThan(0);
+
+    // Six more buffs: the bar grows leftward into the strip's lane.
+    for (let i = 0; i < 6; i++) rig.addBuff();
+    rig.controller.update(same(), 50);
+    expect(cap()).toBeLessThan(startCap);
+    // The tightened cap really does end the strip's lane before the bar.
+    expect(rig.root.getBoundingClientRect().left).toBeCloseTo(start.left, 1);
+    expect(start.left + cap()).toBeLessThanOrEqual(
+      rig.buffBar.getBoundingClientRect().left + EDGE_TOLERANCE_PX,
+    );
+  });
+
+  it('re-bounds within the periodic window when an occupant only gets WIDER', async () => {
+    // The change no cheap signal can see: the same element, the same classes,
+    // the same child count, a wider box. Only the bounded periodic sweep
+    // catches it, and it must catch it inside its own window.
+    const rig = await setup();
+    const same = () => quests(3, 2);
+    const cap = () => Number.parseFloat(rig.root.style.maxWidth);
+    rig.controller.update(same(), 0);
+    const startCap = cap();
+    expect(startCap).toBeGreaterThan(0);
+
+    const buff = rig.buffBar.firstElementChild as HTMLElement;
+    buff.style.width = '320px';
+    // Nothing the cheap key can see moved, so the sweep is what must catch it.
+    for (let tick = 1; tick <= 4; tick++) rig.controller.update(same(), tick * 250);
+    expect(cap()).toBeLessThan(startCap);
   });
 
   it('wears no plate: the text sits on the world and outlines itself', async () => {

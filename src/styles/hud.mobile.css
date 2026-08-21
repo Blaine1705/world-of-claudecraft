@@ -1030,9 +1030,11 @@
      radial_gesture_controller.ts, so both stay literal values: getComputedStyle
      hands back an unresolved calc() for a custom property, and only a literal
      parses. The safe area cannot ride in that literal for the same reason, so
-     the overlay carries the insets as PADDING, which does resolve: inert under
-     the global border-box reset (the padding box every petal is seated in is
-     unchanged) and readable off the same computed style. */
+     the overlay carries the insets as PADDING, which is a real property and does
+     resolve. That padding is NOT inert: an absolutely positioned child resolves
+     against the PADDING box, so it shifts every petal by the inset. The gesture
+     layer seats the radial in that same padding-box frame (see its measure()),
+     which is what makes the inset count exactly once. */
   body.mobile-touch #mobile-action-radial {
     --radial-radius-ratio: 1.35;
     --radial-margin: 6px;
@@ -1670,14 +1672,18 @@
     height: 22px;
     color: #ffdf9c;
   }
-  /* ONE caption for the LIVE item instead of nine permanent labels: nine 8px
-     captions at this pitch collide and clip ("Characte"), and they name eight
-     things the player is not choosing. It reuses the game's own tooltip chrome
+  /* ONE caption for the LIVE item instead of a permanent label per item: 8px
+     captions at this pitch collide and clip ("Characte"), and they name things
+     the player is not choosing. It reuses the game's own tooltip chrome
      (.panel for the box, .tt-title for the text, whose metrics are lifted out of
      the #tooltip id scope in hud.css so there is no second copy of them). Parked
      above the live item: the painter writes only the clamped centre, and the
-     lift off that centre is expressed here. */
-  body.mobile-touch #mobile-menu-caption {
+     lift off that centre is expressed here.
+     Shared by BOTH strip menus, like the ::before dim band above: the
+     consumables row names the item under the finger (a potion told from an
+     elixir mid-fight), the Quick Actions row names the destination. */
+  body.mobile-touch #mobile-menu-caption,
+  body.mobile-touch #mobile-consumable-caption {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -1690,7 +1696,8 @@
     text-overflow: ellipsis;
     pointer-events: none;
   }
-  body.mobile-touch #mobile-menu-caption.shown {
+  body.mobile-touch #mobile-menu-caption.shown,
+  body.mobile-touch #mobile-consumable-caption.shown {
     display: block;
   }
   /* Sticky mode (VoiceOver / Switch Control, and Phase 6's tap mode): the row
@@ -2917,12 +2924,14 @@
     grid-template-rows: none;
   }
   body.mobile-touch #party-frames.below-target {
-    /* Below the target frame's RESERVED bottom (party_below_target_painter.ts
-       holds the slot while the frame is hidden, so the stack never jumps when
-       the player drops their target). The var fallback tracks the target seat's
-       own top band until the first measure lands, and the 5px gap is the same
-       clearance the control and the frames keep from each other elsewhere in
-       this column. */
+    /* Below the target frame's measured bottom while a target is shown. The
+       seat itself is HELD when it is not (party_below_target_painter.ts keeps
+       the class on, so the stack never jumps when the player drops their
+       target) but the measured bottom is unset then, and this fallback holds
+       the slot: it tracks the target seat's own top band, so it is right at
+       this tier by construction rather than by whatever measure happened to be
+       cached. The 5px gap is the same clearance the control and the frames keep
+       from each other elsewhere in this column. */
     top: calc(
       var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 55px)) +
       5px
@@ -6782,9 +6791,9 @@
       max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 57px);
     }
     body.mobile-touch #party-frames.below-target {
-      /* Landscape twin of the reserved below-target offset above; the var
-         fallback tracks this tier's own target seat until the first measure
-         lands. */
+      /* Landscape twin of the held below-target offset above; the var fallback
+         tracks this tier's own target seat, and holds the slot whenever no
+         target is shown. */
       top: calc(
         var(--party-below-target-bottom, calc(max(6px, env(safe-area-inset-top)) + 41px)) +
         5px

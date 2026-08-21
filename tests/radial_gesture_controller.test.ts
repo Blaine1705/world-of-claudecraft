@@ -321,13 +321,38 @@ describe('RadialGesture: the clamp box', () => {
     expect(rig.gesture.placement()?.originY).toBe(200);
   });
 
-  it('widens the edge margin to the safe area the overlay carries as padding', () => {
+  // The overlay carries the device safe area as PADDING, and its petals are
+  // absolutely positioned children, so what the painter writes is resolved
+  // against the PADDING box rather than the viewport. The gesture layer
+  // therefore measures in that frame. NOT coverable by the real-browser suite:
+  // env(safe-area-inset-*) resolves to 0 on a headless desktop viewport, so only
+  // a stubbed computed style can drive the nonzero arm at all.
+  it('seats the petals in the overlay padding-box frame, so the inset never displaces them', () => {
+    const rig = makeRig({ appVw: '400px', appVh: '600px', safeAreaPx: '44px' });
+    // Button 1 is seated at (200,180)-(240,220), so its centre is (220,200) in
+    // VIEWPORT coordinates and nothing about it is near a clamp here.
+    down(rig, 1, 1, 220, 200);
+    move(rig, 1, 1, 220 + FLICK_PX, 200);
+    // The painter writes these into a padding box that starts 44px in on both
+    // axes, so the cluster lands back on the button's real centre: 176 + 44 =
+    // 220 and 156 + 44 = 200. Written in viewport coordinates it would have been
+    // pushed a whole inset off the control it belongs to.
+    expect(rig.gesture.placement()?.originX).toBe(220 - 44);
+    expect(rig.gesture.placement()?.originY).toBe(200 - 44);
+  });
+
+  it('reserves the safe-area inset ONCE, never twice', () => {
     const rig = makeRig({ appVw: '400px', appVh: '300px', safeAreaPx: '30px' });
     down(rig, 0, 1, 380, 200);
     move(rig, 0, 1, 380 + FLICK_PX, 200);
-    // margin becomes max(6, 30) = 30, so reach is 104 and the origin lands at
-    // 400 - 104 = 296 instead of the bare-literal 320.
-    expect(rig.gesture.placement()?.originX).toBe(296);
+    // The clamp box is the app box minus both insets (400 - 60 = 340 wide,
+    // 300 - 60 = 240 tall) and the margin stays the stylesheet's own 6px, so the
+    // reach is 54 + 20 + 6 = 80 and the origin clamps to 340 - 80 = 260 by
+    // 240 - 80 = 160. Rendered that is 290 by 190, exactly one reach inside the
+    // safe area. Folding the inset into the margin INSTEAD (the old max(6, 30))
+    // wrote 296 into a box already offset by 30, spending the inset twice.
+    expect(rig.gesture.placement()?.originX).toBe(260);
+    expect(rig.gesture.placement()?.originY).toBe(160);
   });
 });
 
@@ -351,7 +376,7 @@ describe('RadialGesture: the cancel target', () => {
 });
 
 describe('RadialGesture: the shared suppressed-press flag', () => {
-  it('does not let one thumb consume the flag another thumb armed', () => {
+  it('never lets an empowered release on one button cancel the cast on another', () => {
     const rig = makeRig();
     // Button 1 is owned by an empowered hold, so the radial never arms on it.
     rig.claimed.add(1);
@@ -359,13 +384,18 @@ describe('RadialGesture: the shared suppressed-press flag', () => {
     down(rig, 1, 2, 300, 100);
     // The hold resolves and arms the shared flag on its own release.
     rig.suppressed.value = true;
+    const takes = rig.suppressed.takes;
     up(rig, 1, 2, 300, 100);
-    expect(rig.suppressed.value).toBe(true);
-
-    up(rig, 0, 1, 100, 100);
-    // Consumed by the press it was armed against, which therefore stays silent.
+    // THAT release is the one the flag was armed against, so it consumes it on
+    // the spot and its own ghost click stays suppressed. Leaving it standing
+    // while the neighbouring drag was live is what fed it to the wrong release.
+    expect(rig.suppressed.takes).toBe(takes + 1);
     expect(rig.suppressed.value).toBe(false);
     expect(rig.casts).toEqual([]);
+
+    up(rig, 0, 1, 100, 100);
+    // Button 0 had nothing to do with the hold, so its cast survives.
+    expect(rig.casts).toEqual([[0, 'center']]);
   });
 
   it('still clears a stale flag on an unowned release while nothing else is held', () => {
@@ -458,14 +488,6 @@ describe('RadialGesture: tap mode', () => {
     expect(rig.gesture.heldButtonIndex()).toBe(1);
     expect(rig.casts).toEqual([]);
     expect(rig.cancels).toBe(0);
-  });
-
-  it('leaves an empowered-hold button alone, exactly as the gesture path does', () => {
-    const rig = makeRig({ tapMenus: true });
-    rig.claimed.add(0);
-    down(rig, 0, 1, 100, 100);
-    expect(rig.gesture.isOpen()).toBe(false);
-    expect(rig.casts).toEqual([]);
   });
 
   it('with the setting OFF a petal tap does nothing and the flick still casts', () => {
@@ -602,6 +624,81 @@ describe("RadialGesture: a 'toggle' anchor with no action of its own", () => {
     expect(tap.gesture.isOpen()).toBe(true);
     down(tap, 0, 2, 100, 100);
     expect(tap.casts).toEqual([[0, 'center']]);
+  });
+});
+
+// A CLAIMED button (its centre slot holds an empowered ability, so the hold owns
+// the press) used to be refused at the head of every path, which left its four
+// DIRECTIONS unreachable by tap mode, by the sticky menu and by the keyboard
+// alike: the claim is over the pointer GESTURE, and nothing else.
+describe('RadialGesture: a claimed button keeps its tap and key paths', () => {
+  it('opens the sticky petals on a tap-mode press, and a petal tap casts that direction', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.claimed.add(0);
+    down(rig, 0, 1, 100, 100);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.heldButtonIndex()).toBe(0);
+    rig.petals[1].click();
+    expect(rig.casts).toEqual([[0, 'right']]);
+  });
+
+  it('opens on a keyboard activation', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.claimed.add(0);
+    rig.buttons[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.casts).toEqual([]);
+  });
+
+  it('still refuses the FLICK, which is the gesture the hold owns', () => {
+    const rig = makeRig();
+    rig.claimed.add(0);
+    down(rig, 0, 1, 100, 100);
+    move(rig, 0, 1, 100 + FLICK_PX, 100);
+    up(rig, 0, 1, 100 + FLICK_PX, 100);
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('leaves the centre to the hold on the second tap-mode press, casting it once', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.claimed.add(0);
+    down(rig, 0, 1, 100, 100);
+    up(rig, 0, 1, 100, 100);
+    // The hold fires the empowered centre from its OWN binding on this press, so
+    // the radial only gets out of the way rather than casting it a second time.
+    down(rig, 0, 2, 100, 100);
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+});
+
+// Enter / Space on a focused ring button reads the touchTapMenus setting LIVE.
+// It used to assume the setting was on, so a keyboard player with it OFF got a
+// petal menu where the pre-branch behaviour cast the centre slot.
+describe('RadialGesture: keyboard activation follows the live setting', () => {
+  it('casts the centre slot with the setting OFF', () => {
+    const rig = makeRig();
+    rig.buttons[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.casts).toEqual([[0, 'center']]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('opens the petals with the setting ON', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.buttons[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+  });
+
+  it("opens a 'toggle' control in EITHER mode, since it has no centre action", () => {
+    for (const tapMenus of [false, true]) {
+      document.body.replaceChildren();
+      const rig = makeRig({ anchorRole: 'toggle', tapMenus });
+      rig.buttons[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(rig.gesture.isOpen(), `tapMenus=${tapMenus}`).toBe(true);
+      expect(rig.casts, `tapMenus=${tapMenus}`).toEqual([]);
+    }
   });
 });
 

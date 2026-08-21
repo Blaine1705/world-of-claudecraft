@@ -238,6 +238,7 @@ const UI_PURE_CORES = [
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/quest_strip_core.ts',
+  'src/ui/hud/action_bar/item_bags_line_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/pet_bar_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',

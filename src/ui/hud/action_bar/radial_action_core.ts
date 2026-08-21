@@ -295,3 +295,38 @@ export function resolveStripIndex(
   const index = Math.floor(travel / pitch);
   return Math.min(Math.max(index, 0), count - 1);
 }
+
+/** Nominal half-width of a strip menu's live caption box, used to clamp its
+ *  centre on screen without measuring it (a painter may take no forced layout
+ *  read). Wider than the longest caption either row shows at the compact tier's
+ *  text size, so the clamp errs toward keeping the box fully visible. */
+export const STRIP_CAPTION_HALF_PX = 56;
+
+export interface StripCaptionInput {
+  /** Item centres from placeConsumableStrip, index 0 nearest the anchor. */
+  centers: readonly number[];
+  /** The item the finger is over, or -1 for none. */
+  live: number;
+  viewportWidth: number;
+  margin: number;
+  halfWidth?: number;
+}
+
+/**
+ * Where a strip menu's caption centre parks: over the live item, clamped so the
+ * box stays on screen. Returns null when nothing is live, which is what hides
+ * it: ONE caption for the item being chosen, never a permanent label per item
+ * (labels at this pitch collide and clip, and they name things the player is
+ * not choosing). Shared by both strip menus, like the geometry above.
+ */
+export function stripCaptionCenterX(input: StripCaptionInput): number | null {
+  const center = input.live >= 0 ? input.centers[input.live] : undefined;
+  if (center === undefined || !Number.isFinite(center)) return null;
+  const half = input.halfWidth ?? STRIP_CAPTION_HALF_PX;
+  const min = input.margin + half;
+  const max = input.viewportWidth - input.margin - half;
+  // A viewport narrower than the caption itself cannot satisfy both bounds; the
+  // centre is the least-bad answer and keeps the box symmetric.
+  if (max < min) return input.viewportWidth / 2;
+  return Math.min(Math.max(center, min), max);
+}

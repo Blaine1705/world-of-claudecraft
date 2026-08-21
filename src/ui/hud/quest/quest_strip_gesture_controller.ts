@@ -25,6 +25,11 @@
 
 import { type QuestStripStep, questStripStep } from './quest_strip_core';
 
+/** An assistive or keyboard activation reports detail 0; a pointer-driven click
+ *  reports its click count. Only the latter can be the compatibility click a
+ *  release synthesizes, which is the one the gesture path suppresses. */
+const ASSISTIVE_CLICK_DETAIL = 0;
+
 export interface QuestStripGestureDeps {
   /** The strip's own button: the visual panel plus its constant hit pad. */
   surface: HTMLElement;
@@ -59,11 +64,17 @@ export class QuestStripGesture {
     };
     window.addEventListener('pointerup', release);
     window.addEventListener('pointercancel', release);
-    surface.addEventListener('click', () => {
-      if (this.suppressClick) {
+    surface.addEventListener('click', (e) => {
+      // Only a COMPATIBILITY click is ever suppressed. The browser reports one
+      // with a click count (detail 1); an assistive or keyboard activation
+      // reports 0 and is the strip's primary path, so a suppression left standing
+      // by a release no click ever followed (a swipe past the browser's tap slop)
+      // can never swallow it.
+      if (this.suppressClick && (e as MouseEvent).detail !== ASSISTIVE_CLICK_DETAIL) {
         this.suppressClick = false;
         return;
       }
+      this.suppressClick = false;
       this.deps.cycle(1);
     });
   }
@@ -78,6 +89,11 @@ export class QuestStripGesture {
   private onDown(e: PointerEvent): void {
     if (this.pointerId !== null) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    // A press always clears a stale suppression first: it is set on a release and
+    // cleared by the click that follows it, so one that never arrived would
+    // otherwise swallow the next activation. Both sibling gesture layers
+    // (radial_gesture_controller, strip_gesture_controller) do the same.
+    this.suppressClick = false;
     this.pointerId = e.pointerId;
     this.startX = e.clientX;
     try {
