@@ -5,8 +5,9 @@
 // quest_gated_entity.ts uses to decide the quest-gate hide, so the renderer's
 // distance-cull exemption cannot drift from which objects are actually
 // interact-only raid/dungeon furniture; do not duplicate that predicate here.
-import { corpseHasDecayed } from '../sim/respawn_policy';
+
 import { isInteractOnlyInstanceObject } from '../sim/quest_gated_entity';
+import { corpseHasDecayed } from '../sim/respawn_policy';
 import type { Entity, QuestProgress } from '../sim/types';
 import { interactionLandmarkViewPriority } from './prewarm_policy';
 import type { QuestObjectGate } from './quest_object_gate_core';
