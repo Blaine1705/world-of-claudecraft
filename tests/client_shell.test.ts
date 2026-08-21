@@ -2182,7 +2182,9 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('338px *'); // base consumables dock offset
     expect(hudMobileCss).toContain('310px *'); // landscape consumables dock offset
     // Top-LEFT anchor: the bar's single 54px row clears the target-frame seat
-    // below it (top + 72px) and leaves the top-centre band to the pet bar.
+    // below it (top + 72px); the pet bar keeps the top-centre band ONLY once
+    // its own worst-case width clears this row (and the consumables toggle
+    // chip docked past it), see the #petbar clamp pin below.
     expect(hudMobileCss).toContain(
       'position: absolute;\n    left: max(12px, env(safe-area-inset-left));\n    top: max(8px, env(safe-area-inset-top));',
     );
@@ -2192,8 +2194,17 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'pointer-events: auto;\n    align-items: start;\n    z-index: 30;',
     );
+    // #petbar centers at left:50% only once that clears the top-left trio AND
+    // the consumables toggle chip docked past it (both live outside #ui, in
+    // real viewport pixels, hence the /var(--ui-scale) conversion back into
+    // #ui's zoomed logical space); otherwise it docks past them instead, so a
+    // worst-case pet bar can never steal #mobile-more's tap target again
+    // (scripts/mobile_hud_overlap_audit.mjs exercises the live geometry).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #petbar {\n    position: fixed;\n    left: 50%;\n    top: max(8px, env(safe-area-inset-top));',
+      'body.mobile-touch #petbar {\n    position: fixed;\n    left: max(\n      50%,\n      calc(',
+    );
+    expect(hudMobileCss).toContain(
+      '338px *\n          var(--btn-scale, 1) *\n          var(--mobile-chrome-scale, 1) +\n          50px\n        ) /\n        var(--ui-scale, 1) +\n        121px',
     );
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');

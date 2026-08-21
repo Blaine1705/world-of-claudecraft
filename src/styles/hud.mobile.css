@@ -1508,9 +1508,50 @@
   body.mobile-touch #pet-cluster {
     display: contents;
   }
+  /* Issue: on a narrow landscape phone the true-centered pet bar can reach far
+     enough left to sit on top of the #mobile-combat-controls row (Chat/Social/
+     Quests/Settings/More) or the #mobile-consumables-toggle chip docked right
+     past it, stealing More's tap target (bags/spellbook/character become
+     unreachable). left:50% stays the norm on a wide viewport, but never below
+     the toggle chip's own right edge (the trio's 338px un-scaled row -- the
+     wider tier, safe for the narrower landscape tier too -- plus the chip's own
+     10px dock gap and 40px width, echoing #mobile-consumables' own dock formula
+     above) plus HALF the pet bar's own worst-case rendered width (121px: a
+     4-button command group (attack/special/taunt/feed) + the 1-button stance
+     toggle). transform still centers around whichever left this resolves to,
+     so a wider (mode-menu-open) bar stays centered on that same anchor rather
+     than drifting further. Also clears #buff-bar on its right at the default
+     UI Scale (verified together, alongside #mobile-more, by the widest-pet-
+     plus-populated-buff-bar sweep in scripts/mobile_hud_overlap_audit.mjs);
+     a large UI Scale (below) grows both bars together and can still narrow
+     that margin, a pre-existing tension between two independently dynamic-
+     width bars this fix does not fully close, deliberately scoped to the
+     reported bug (#mobile-more unreachable), not a #buff-bar readability
+     regression. The trio and the chip live OUTSIDE #ui, in real viewport
+     pixels; #petbar lives inside it, zoomed by --ui-scale (src/ui/ui_scale.ts,
+     hudChrome.options.uiScale, 0.85 to 1.4), so that reference (the "+ 50px"
+     is the chip's own 10px dock gap plus 40px width) is converted back into
+     #ui's logical space the same way target_frame_pos.ts / #fiesta-augments
+     do. The +121px half-width stays OUTSIDE that division: it is already an
+     #ui-logical length (the zoom grows the bar's own rendered buttons
+     together with this reservation), so dividing it too would under-reserve
+     and the bar would crowd the chip again above a UI Scale of 1. */
   body.mobile-touch #petbar {
     position: fixed;
-    left: 50%;
+    left: max(
+      50%,
+      calc(
+        (
+          max(12px, env(safe-area-inset-left)) +
+          338px *
+          var(--btn-scale, 1) *
+          var(--mobile-chrome-scale, 1) +
+          50px
+        ) /
+        var(--ui-scale, 1) +
+        121px
+      )
+    );
     top: max(8px, env(safe-area-inset-top));
     transform: translateX(-50%);
     align-self: auto;
@@ -5787,8 +5828,9 @@
     body.mobile-touch #petbar {
       top: max(6px, env(safe-area-inset-top));
       /* No scale(0.88) on landscape: it shrank the 40px pet command buttons to
-         ~35px, below the 40px touch floor. Keep them full-size (the two-group bar
-         still fits the top-centre band on the narrowest 740px landscape phone). */
+         ~35px, below the 40px touch floor. Keep them full-size; the base rule's
+         `left` clamp (above) is what keeps the bar clear of the top-left trio on
+         the narrowest 740px landscape phone, not centering alone. */
       transform: translateX(-50%);
     }
     body.mobile-touch #chatlog-wrap {
