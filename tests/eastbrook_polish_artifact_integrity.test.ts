@@ -804,10 +804,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // first-order composite follows the resolved renderer.ts and prewarm_policy.ts
 // bytes, then these seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for the island far-shore haze band (renderer.ts passes the camera
+// to horizonHazePlan): the first-order composite follows those bytes, then
+// these seals follow the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '320de69822ea9ae858340d94ea60308cabe801b5a73934b7a3536220f602acf6';
+  'a6e7bed5f23a266a8605ed1c39e7263f9314800c7003e863d9fd9e66fd90224a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e04ce8995015fb26b9d54efd182ac09395e0e3f2af4887abf0d277ed3a3a455c';
+  '61bc6d96627ec1bcfd03911cea470b8ec7b5b4c2c92c5396c326989989587bb6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1843,10 +1846,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // The first-order composite follows the resolved renderer.ts and
     // prewarm_policy.ts bytes, then this second-order performance seal follows
     // the swept evidence bytes. No capture was retaken.
+    // Re-minted for the island far-shore haze band: the first-order composite
+    // follows renderer.ts, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('f7fcbd28150b01becc8240ee4b7bed74d19775c0801ce125214202ce152c3fa7');
+    ).toBe('813101036b256040ed5d0c4723ff28046a6cf9f6178249f156be0ec6a33d0abd');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

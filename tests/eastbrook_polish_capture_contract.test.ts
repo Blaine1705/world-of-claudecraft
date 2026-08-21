@@ -218,8 +218,11 @@ interface AttributionTargetFixture {
 // resolved renderer.ts and prewarm_policy.ts combine the release's delve tracker,
 // mount prewarm and shadow-depth bytes with the Proving Shore island_guidance
 // call sites, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the island far-shore haze band: renderer.ts passes the camera
+// to horizonHazePlan at its two call sites, so the composite follows those
+// bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e04ce8995015fb26b9d54efd182ac09395e0e3f2af4887abf0d277ed3a3a455c';
+  '61bc6d96627ec1bcfd03911cea470b8ec7b5b4c2c92c5396c326989989587bb6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
