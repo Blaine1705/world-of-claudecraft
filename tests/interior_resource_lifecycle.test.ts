@@ -2,12 +2,12 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { attachSceneGroupGated } from '../src/render/gated_scene_attach';
+import { gfxInternalsForTest, surfaceMat } from '../src/render/gfx';
 import {
   collectOwnedInteriorResources,
   createOwnedInteriorResourceRegistry,
   runInteriorBuildTransaction,
 } from '../src/render/interior_resource_lifecycle';
-import { gfxInternalsForTest, surfaceMat } from '../src/render/gfx';
 import {
   isSharedMaterial,
   markSharedGeometry,
@@ -333,10 +333,7 @@ describe('shared caches an interior root draws from are not claimable', () => {
       'rift_decor',
       'wildheart_props',
     ]) {
-      const source = readFileSync(
-        new URL(`../src/render/${module}.ts`, import.meta.url),
-        'utf8',
-      );
+      const source = readFileSync(new URL(`../src/render/${module}.ts`, import.meta.url), 'utf8');
       expect(source, `${module} must mark its shared kit`).toContain('markSharedGeometry');
       expect(source, `${module} must mark its shared kit`).toContain('markSharedMaterial');
     }

@@ -962,9 +962,7 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const hookAt = renderer.indexOf('onUnitError: (entry, unit, error) => {');
     expect(hookAt).toBeGreaterThan(-1);
-    const hook = codeWithoutLineComments(
-      renderer.slice(hookAt, renderer.indexOf('},', hookAt)),
-    );
+    const hook = codeWithoutLineComments(renderer.slice(hookAt, renderer.indexOf('},', hookAt)));
     expect(hook).toContain("if (entry.id === 'vfx.weapon-skins') {");
     // The unit's OWN id, so the boundary is one skin.
     expect(hook).toContain('weaponVfxPrewarmSkinStage.disposeFailedUnit(unit.id);');
