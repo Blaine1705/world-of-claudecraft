@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
+import { FOCUSABLE_SELECTOR, FocusManager } from '../src/ui/focus_manager';
 
 // Pointer-lock tests keep explicit coordinates so the held-lock behavior stays
 // independent from the old edge-only path.
@@ -1160,6 +1161,133 @@ describe('Input Space handling', () => {
 
     expect(preventDefault).toHaveBeenCalledTimes(1);
     expect(input.readMoveInput().jump).toBe(true);
+  });
+});
+
+describe('Input mouse-click focus guard (issue: clicked HUD buttons hijack Space/Enter)', () => {
+  it('blurs a HUD button left focused by a real mouse click', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    // A real mouse click reports a click count (detail) of 1 or more.
+    windowListeners.get('click')!({ type: 'click', detail: 1 });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('parks a dialog-rooted button on the focus-trap root instead of blurring to body', () => {
+    const { windowListeners, documentListeners } = makeInput();
+    const doc = (globalThis as any).document;
+    class TrapElement {
+      children: TrapElement[] = [];
+      parent: TrapElement | null = null;
+      isConnected = true;
+      blur = vi.fn(() => {
+        doc.activeElement = doc.body;
+      });
+      focus = vi.fn((options?: { preventScroll?: boolean }) => {
+        doc.activeElement = this;
+        if (this === root) expect(options).toEqual({ preventScroll: true });
+      });
+      constructor(
+        readonly tagName: string,
+        private readonly focusable = false,
+        private readonly dialogRoot: TrapElement | null = null,
+      ) {}
+      append(...children: TrapElement[]): void {
+        for (const child of children) {
+          child.parent = this;
+          this.children.push(child);
+        }
+      }
+      closest(selector: string): TrapElement | null {
+        return selector === '[role="dialog"]' ? this.dialogRoot : null;
+      }
+      contains(el: TrapElement | null): boolean {
+        for (let n: TrapElement | null = el; n; n = n.parent) if (n === this) return true;
+        return false;
+      }
+      getClientRects(): { length: number }[] {
+        return [{ length: 1 }];
+      }
+      hasAttribute(name: string): boolean {
+        return name === 'tabindex';
+      }
+      matches(): boolean {
+        return false;
+      }
+      querySelectorAll(selector: string): TrapElement[] {
+        const descendants: TrapElement[] = [];
+        const walk = (node: TrapElement): void => {
+          for (const child of node.children) {
+            descendants.push(child);
+            walk(child);
+          }
+        };
+        walk(this);
+        return selector === FOCUSABLE_SELECTOR ? descendants.filter((el) => el.focusable) : [];
+      }
+    }
+    vi.stubGlobal('HTMLElement', TrapElement);
+    const root = new TrapElement('DIV');
+    const button = new TrapElement('BUTTON', true, root);
+    const next = new TrapElement('BUTTON', true, root);
+    root.append(button, next);
+    doc.body = new TrapElement('BODY');
+    new FocusManager().open({ root: () => root as unknown as HTMLElement });
+    doc.activeElement = button;
+
+    windowListeners.get('click')!({ type: 'click', detail: 1 });
+
+    expect(root.focus).toHaveBeenCalledTimes(1);
+    expect(button.blur).not.toHaveBeenCalled();
+    expect(doc.activeElement).toBe(root);
+
+    const preventDefault = vi.fn();
+    documentListeners.get('keydown')!({ key: 'Tab', shiftKey: false, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+    expect(doc.activeElement).toBe(button);
+  });
+
+  it('leaves a button focused and activated via keyboard (Tab then Enter/Space) alone', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    // A keyboard-synthesized click reports detail 0 (no mouse click count).
+    windowListeners.get('click')!({ type: 'click', detail: 0 });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('does not touch focus when nothing HUD-button-like is focused', () => {
+    const { windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'INPUT' };
+
+    // Would throw if the guard assumed activeElement always has a blur().
+    expect(() => windowListeners.get('click')!({ type: 'click', detail: 1 })).not.toThrow();
+  });
+
+  it('blurs a focused HUD button on a right-click release (equip-via-right-click has no click event)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: null });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a primary-button mouseup to the click handler (no double-fire)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    windowListeners.get('mouseup')!({ button: 0, clientX: 100, clientY: 100, target: null });
+
+    expect(blur).not.toHaveBeenCalled();
   });
 });
 

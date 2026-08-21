@@ -132,10 +132,11 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     expect(toggles()).toBe(1);
   });
 
-  it('(b2) layer 2 alone: a stale mouse-focused chrome button outside the rail guards is suppressed while blocked, and a second Space stays suppressed', async () => {
+  it('(b2) layer 2 alone: a stale focused chrome button outside the rail guards is suppressed while blocked, and a second Space stays suppressed', async () => {
     // A chrome button OUTSIDE every key-guarded container and dialog root, e.g.
     // a window button the audit missed: the input-layer guard is its only net.
-    // Focused by a real mouse click (no pointer drop bound here), the stale shape.
+    // Seed focus directly to isolate this layer: mouse clicks now hit Input's
+    // global pointer-focus release before the blocked-state Space guard is needed.
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = 'chrome';
@@ -144,12 +145,12 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
       count++;
     });
     document.body.appendChild(btn);
-    await userEvent.click(btn);
-    expect(count).toBe(1);
+    btn.focus();
+    expect(count).toBe(0);
     expect(document.activeElement).toBe(btn);
     blocked = true;
     await pressSpace();
-    expect(count).toBe(1);
+    expect(count).toBe(0);
     // Prevented, pinned explicitly through the post-Input listener.
     expect(lastKeydown).toEqual({ code: 'Space', prevented: true });
     // Focus is left alone (the guard suppresses, it never drops), and the next
@@ -158,7 +159,7 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     expect(document.activeElement).toBe(btn);
     lastKeydown = null;
     await pressSpace();
-    expect(count).toBe(1);
+    expect(count).toBe(0);
     expect(lastKeydown).toEqual({ code: 'Space', prevented: true });
   });
 
