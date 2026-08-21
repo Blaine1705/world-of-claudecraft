@@ -1675,4 +1675,34 @@ describe('CI workflow parity', () => {
     expect(viteConfig).toContain('passWithNoTests: false');
     expect(workflow).toContain('ci_balanced_sequencer.mjs');
   });
+
+  it('keeps the per-leg Postgres service and TEST_DATABASE_URL wired into both shard gates', () => {
+    // Ruling R16 (the woc-marketplace hardening state): the real-SQL pg
+    // suites classify into the always-run floor but SKIP GREEN without
+    // TEST_DATABASE_URL, so this wiring IS their presence at the merge bar.
+    // Removing a service block or the job-level env line would silently drop
+    // hundreds of money/security tests from CI; this pin makes that removal
+    // red instead. Counted, not just contained: exactly one copy per shard
+    // gate (pr-gate and release-gate), at job-level indentation.
+    const jobEnvLine =
+      /\n {4}env:\n {6}TEST_DATABASE_URL: postgres:\/\/postgres:postgres@127\.0\.0\.1:5432\/wocc_ci\n/g;
+    expect(workflow.match(jobEnvLine)?.length).toBe(2);
+    expect(workflow.match(/ {8}image: postgres:16-alpine\n/g)?.length).toBe(2);
+    // The health gate lives in the service options (a wait STEP would break
+    // the step-count pins above); a container without it races the first
+    // suite.
+    expect(workflow.match(/--health-cmd "pg_isready -U postgres -d wocc_ci"/g)?.length).toBe(2);
+    // The service maps 5432; 5433 is the dev-compose port that vite.config's
+    // intended-dead fallback DATABASE_URL names, and it must stay dead in CI.
+    expect(workflow.match(/ {10}- 5432:5432\n/g)?.length).toBe(2);
+    expect(workflow).not.toMatch(/- 5433:|:5433\//);
+    // The nightly full-suite backstop carries the same wiring once.
+    const nightly = readFileSync(
+      new URL('../.github/workflows/nightly.yml', import.meta.url),
+      'utf8',
+    );
+    expect(nightly.match(jobEnvLine)?.length).toBe(1);
+    expect(nightly.match(/ {8}image: postgres:16-alpine\n/g)?.length).toBe(1);
+    expect(nightly).not.toMatch(/- 5433:|:5433\//);
+  });
 });

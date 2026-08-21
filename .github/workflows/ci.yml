@@ -552,6 +552,33 @@ jobs:
     timeout-minutes: 37
     runs-on: ubuntu-latest
 
+    # The real-SQL merge bar (ruling R16, recorded in the woc-marketplace
+    # hardening state): every shard leg gets its own Postgres so the
+    # floor-resident pg suites RUN here instead of skipping green on a
+    # missing TEST_DATABASE_URL. One isolated instance per job leg holds the
+    # suites' fixed-database-name contract (two concurrent batteries must
+    # never share a server). The health check lives in the service options
+    # so readiness needs no wait step; the password is a throwaway literal
+    # for an ephemeral loopback container, not a secret. Port 5432 on
+    # purpose: the vitest fallback DATABASE_URL names 5433 and must stay a
+    # dead letter.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wocc_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wocc_ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/wocc_ci
+
     # fail-fast stays off: shards pass or fail independently, so one red shard
     # never cancels the others and a failure report always covers the whole
     # suite.
@@ -1129,6 +1156,25 @@ jobs:
     # minute looser now that the base is measured rather than projected.
     timeout-minutes: 36
     runs-on: ubuntu-latest
+
+    # Same real-SQL wiring as pr-gate (ruling R16): a per-leg Postgres and
+    # TEST_DATABASE_URL so the pg suites run at the release bar too.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wocc_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wocc_ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/wocc_ci
 
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
     # the suite at PR tier so a red shard always means a real regression. The
