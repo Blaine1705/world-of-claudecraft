@@ -61,6 +61,7 @@ import {
   buildBagGrid,
   buildBagListRows,
   resolveDepositSubmit,
+  vendorSellIsInstant,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { markDialogRoot } from './dialog_root';
@@ -106,7 +107,8 @@ const SORT_SETTLE_STAGGER_CAP = 20;
 // (outside #bags). A window-level close() removes any that are open so it never leaves
 // an orphaned aria-modal dialog floating over the closed window (the show* paths
 // already clear a prior same-type prompt with these classes).
-const BAG_PROMPT_SELECTOR = '.discard-item-prompt, .sell-quantity-prompt, .bank-deposit-prompt';
+const BAG_PROMPT_SELECTOR =
+  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt';
 // Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
 // which hide #bags without running close(): they must not strand a still-visible
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
@@ -987,11 +989,13 @@ export class BagsWindow {
           ev.preventDefault();
           return;
         }
-        // At a vendor, Ctrl/Meta right-click owns the split-stack sell prompt.
+        // At a vendor, Ctrl/Meta right-click owns the bulk-sell shortcut
+        // (sellBagItem's ctrl arm; the SHIFT arm, not this one, owns the
+        // split-stack quantity prompt).
         if (this.deps.vendorOpen()) {
           if (!ev.ctrlKey && !ev.metaKey) return;
           ev.preventDefault();
-          this.sellBagItem(s, ev);
+          this.sellBagItem(item, s, ev);
           return;
         }
         ev.preventDefault();
@@ -1428,7 +1432,7 @@ export class BagsWindow {
         this.deps.showError(t('itemUi.tooltip.cannotVendor'));
         return;
       case 'vendorSell':
-        this.sellBagItem(s, ev);
+        this.sellBagItem(item, s, ev);
         break;
       case 'bankDeposit': {
         // The command is inventory-index-based, so resolve the exact clicked stack
@@ -1687,16 +1691,42 @@ export class BagsWindow {
     return index >= 0 ? { slotIndex: index } : undefined;
   }
 
-  private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
+  private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
+    const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
     if (ev.ctrlKey || ev.metaKey) {
-      this.deps.world().sellItem(slot.itemId, count);
+      if (instant) {
+        this.deps.world().sellItem(slot.itemId, count);
+      } else if (count > 1) {
+        // Ctrl/meta means "sell now", but that intent does not name WHICH
+        // copy of a stack spanning multiple slots: route through the same
+        // confirm-quantity prompt the shift arm uses (itemId-scoped, exactly
+        // ctrl's own existing bulk-sell semantics), rather than instant-
+        // selling a stack that might carry an enchanted or masterwork unit
+        // with zero confirmation.
+        const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
+        this.showSellQuantityPrompt(slot.itemId, heldTotal);
+      } else {
+        // A single, precisely-addressed copy: the same confirm the plain
+        // click below uses, so ctrl-click cannot bypass the safety net this
+        // fix exists to add.
+        this.showSellConfirmPrompt(item, slot);
+      }
     } else if (ev.shiftKey && count > 1) {
       // The prompt's cap is every copy of this item across the whole bag, not just
       // the ONE slot that was clicked: a stackable item's per-slot count tops out at
       // its stackSize (commonly 20), so a player holding more sits in other slots.
       const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
       this.showSellQuantityPrompt(slot.itemId, heldTotal);
+    } else if (!instant) {
+      // Anything short of true junk (common+ quality, ANY instance payload:
+      // an enchant, masterwork bake, signer, bound-to, or lock, or a crafted
+      // marker) confirms before it sells. A plain click on gray junk keeps
+      // the existing one-step sale; everything else gets the same safety net
+      // destroy already has (showDiscardItemPrompt), so selling junk one
+      // item at a time can no longer vendor an adjacent, unrelated valuable
+      // item on a single stray click (the enchanted-offhand-vanishes report).
+      this.showSellConfirmPrompt(item, slot);
     } else {
       this.deps.world().sellItem(slot.itemId, undefined, this.copyRefFor(slot));
     }
@@ -1832,6 +1862,67 @@ export class BagsWindow {
     window.setTimeout(() => {
       input.focus();
       input.select();
+    }, 0);
+  }
+
+  /** Confirm before a PLAIN or ctrl-click sells anything vendorSellIsInstant
+   *  (bags_view.ts) does not clear on its own (see sellBagItem). Exactly one unit
+   *  of the SLOT the player clicked, never an itemId-only guess: the index is
+   *  RE-RESOLVED at SUBMIT time (bagStackIndex, reference identity), not the
+   *  index captured when the dialog opened, because the bag can repaint under an
+   *  open prompt (a trade, a mail send, another sale) exactly the way it can
+   *  under the bank deposit prompt (resolveDepositSubmit's own doc: "depositing
+   *  the wrong item is worse than dismissing"). A copy that is no longer there
+   *  REFUSES rather than falling back to sellItem's untargeted, itemId-only
+   *  walk: silently vendoring a DIFFERENT copy of the same id (the enchanted one,
+   *  if it is the only one left) would be exactly the defect this fix exists to
+   *  close. Reuses the sellQuantityTitle/Confirm/Cancel wording rather than
+   *  minting new keys: "Sell {item}" already carries the one thing a confirm
+   *  dialog needs to say, and every locale already has it. */
+  private showSellConfirmPrompt(item: ItemDef, slot: InvSlot): void {
+    document.querySelectorAll('.sell-confirm-prompt').forEach((el) => {
+      el.remove();
+    });
+    const opener = document.activeElement as HTMLElement | null;
+    const stack = document.getElementById('prompt-stack');
+    if (!stack) return;
+    const prompt = document.createElement('div');
+    prompt.className = 'prompt panel sell-confirm-prompt';
+    const itemName = itemDisplayName(item);
+    prompt.innerHTML = `<div class="prompt-text">${esc(t('itemUi.vendor.sellQuantityTitle', { item: itemName }))}</div>`;
+    const confirm = document.createElement('button');
+    confirm.className = 'btn';
+    confirm.textContent = t('itemUi.vendor.sellQuantityConfirm');
+    const cancel = document.createElement('button');
+    cancel.className = 'btn';
+    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
+    const close = () => prompt.remove();
+    prompt.append(confirm, cancel);
+    const { dismiss, dismissAndReturn } = this.installPromptDialog(prompt, opener, close);
+    const submit = () => {
+      const index = bagStackIndex(this.deps.world().inventory, slot);
+      dismiss();
+      if (index < 0) {
+        // The named copy left the bags while the dialog was open: refuse rather
+        // than guess. Voices the sim's own "You don't have that item." line
+        // (sim_i18n.ts error.noItem) so a stale confirm reads exactly like the
+        // sim's own stale-slot refusal everywhere else in this window.
+        this.deps.showError(tSim('error.noItem'));
+        return;
+      }
+      this.deps.world().sellItem(slot.itemId, 1, { slotIndex: index });
+      this.deps.hideTooltip();
+      // A sold unstacked slot (the common case here: every non-junk gear kind is
+      // stack-capped at 1) empties and the 'vendor' event's renderBags() detaches
+      // the opener; land on the always-present close button rather than letting
+      // focus fall to <body>, the same reasoning showDiscardItemPrompt documents.
+      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+    };
+    confirm.addEventListener('click', submit);
+    cancel.addEventListener('click', dismissAndReturn);
+    stack.appendChild(prompt);
+    window.setTimeout(() => {
+      confirm.focus();
     }, 0);
   }
 

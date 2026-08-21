@@ -1655,6 +1655,71 @@ export const TARGETS = [
     },
   },
   {
+    key: 'vendor-sell-confirm',
+    label:
+      'Vendor: a plain click on a valuable item confirms before selling; junk still sells instantly',
+    when: ['ui/bags_view', 'ui/bags_window'],
+    // On a base checkout the click sells the sword outright (no dialog exists yet),
+    // so the SAME recipe shoots the honest BEFORE state (the bag empties on the
+    // spot). On the fix, the same click opens the confirm prompt instead and the
+    // sword stays put until the player actually confirms.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const vendor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'quartermaster_bree',
+        );
+        if (!vendor) return { ok: false, reason: 'no vendor entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        p.pos.x = vendor.pos.x + 2;
+        p.pos.z = vendor.pos.z;
+        p.prevPos = { ...p.pos };
+        // A common-quality sword (needs confirm) beside a poor-quality junk stack
+        // (still sells on the spot): the same click, two different outcomes.
+        try {
+          sim.addItem('eastbrook_arming_sword', 1);
+        } catch {}
+        try {
+          sim.addItem('tangled_weed', 1);
+        } catch {}
+        // Force hidden first so the poll below cannot pass on a window left up
+        // by an earlier target in the same run (the vendor-tool-gate precedent).
+        // openVendor opens its bags companion itself (hud.ts: renderBags plus
+        // an explicit display:flex), so no separate toggleBags call is needed
+        // or wanted here (that would TOGGLE an already-open companion closed).
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(vendor.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`vendor-sell-confirm setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#vendor-window'))) {
+        throw new Error('vendor window did not open');
+      }
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(300);
+      await page.evaluate(() => {
+        const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
+          b.getAttribute('aria-label')?.includes('Eastbrook Arming Sword'),
+        );
+        cell?.click();
+      });
+      await wait(400);
+      return {};
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
