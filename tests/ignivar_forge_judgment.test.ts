@@ -859,32 +859,42 @@ describe('Ignivar Forge Judgment', () => {
     const wallCracks = visual.getObjectByName(IGNIVAR_JUDGMENT_WALL_CRACKS_NAME);
     if (!wallCracks) throw new Error('Judgment wall cracks were not built');
     expect(wallCracks.children).toHaveLength(2);
-    expect(wallCracks.children.every((child) => child instanceof THREE.LineSegments)).toBe(true);
-    expect(wallCracks.children.some((child) => child instanceof THREE.Mesh)).toBe(false);
+    expect(wallCracks.children.every((child) => child instanceof THREE.Mesh)).toBe(true);
+    expect(wallCracks.children.some((child) => child instanceof THREE.LineSegments)).toBe(false);
     expect(wallCracks.userData.gameplayGeometry).toBe(false);
-    const crackGeometry = (wallCracks.children[0] as THREE.LineSegments).geometry;
-    const crackPositions = crackGeometry.getAttribute('position');
-    expect(crackPositions.count).toBeGreaterThan(100);
     const shell = IGNIVAR_LAYOUT.shellPolygon;
     if (!shell) throw new Error('Ignivar shell polygon is missing');
-    for (let index = 0; index < crackPositions.count; index++) {
-      const x = crackPositions.getX(index);
-      const z = crackPositions.getZ(index);
-      expect(crackPositions.getY(index)).toBeGreaterThanOrEqual(0.349);
-      expect(polygonContainsPoint(shell, x, z)).toBe(true);
-      expect(
-        Math.min(
-          ...shell.map((start, edge) =>
-            distanceToSegment(x, z, start, shell[(edge + 1) % shell.length]),
-          ),
-        ),
-      ).toBeCloseTo(1.08, 4);
-    }
     for (const line of wallCracks.children) {
-      const material = (line as THREE.LineSegments).material as THREE.LineBasicMaterial;
+      const crackGeometry = (line as THREE.Mesh).geometry;
+      const crackPositions = crackGeometry.getAttribute('position');
+      expect(crackPositions.count).toBeGreaterThan(700);
+      expect(crackPositions.count % 3).toBe(0);
+      for (let index = 0; index < crackPositions.count; index++) {
+        const x = crackPositions.getX(index);
+        const z = crackPositions.getZ(index);
+        expect(crackPositions.getY(index)).toBeGreaterThanOrEqual(0.349);
+        expect(polygonContainsPoint(shell, x, z)).toBe(true);
+        expect(
+          Math.min(
+            ...shell.map((start, edge) =>
+              distanceToSegment(x, z, start, shell[(edge + 1) % shell.length]),
+            ),
+          ),
+        ).toBeCloseTo(1.08, 4);
+      }
+      for (let index = 0; index < crackPositions.count; index += 3) {
+        const a = new THREE.Vector3().fromBufferAttribute(crackPositions, index);
+        const b = new THREE.Vector3().fromBufferAttribute(crackPositions, index + 1);
+        const c = new THREE.Vector3().fromBufferAttribute(crackPositions, index + 2);
+        expect(new THREE.Vector3().crossVectors(b.sub(a), c.sub(a)).lengthSq()).toBeGreaterThan(
+          1e-8,
+        );
+      }
+      const material = (line as THREE.Mesh).material as THREE.MeshBasicMaterial;
       expect(material.userData.ignivarFireTime).toBeUndefined();
       expect(material.blending).toBe(THREE.AdditiveBlending);
-      expect(material.toneMapped).toBe(true);
+      expect(material.toneMapped).toBe(false);
+      expect(material.side).toBe(THREE.DoubleSide);
     }
     syncIgnivarForgeJudgmentVisual(
       visual,
@@ -900,7 +910,7 @@ describe('Ignivar Forge Judgment', () => {
     expect(wallCracks?.visible).toBe(true);
     expect(wallCracks?.userData.phase).toBe('warning');
     const warningWallOpacity = (
-      (wallCracks.children[1] as THREE.LineSegments).material as THREE.LineBasicMaterial
+      (wallCracks.children[1] as THREE.Mesh).material as THREE.MeshBasicMaterial
     ).opacity;
     const warningGroups = visual.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME)?.children ?? [];
     expect(
@@ -969,7 +979,7 @@ describe('Ignivar Forge Judgment', () => {
     expect(wallCracks?.visible).toBe(true);
     expect(wallCracks?.userData.phase).toBe('active');
     expect(
-      ((wallCracks.children[1] as THREE.LineSegments).material as THREE.LineBasicMaterial).opacity,
+      ((wallCracks.children[1] as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity,
     ).toBeGreaterThan(warningWallOpacity);
     const surface = visual.getObjectByName('ignivarForgeJudgmentFireSurface') as THREE.Mesh;
     const boundary = visual.getObjectByName('ignivarForgeJudgmentFireBoundary') as THREE.Mesh;

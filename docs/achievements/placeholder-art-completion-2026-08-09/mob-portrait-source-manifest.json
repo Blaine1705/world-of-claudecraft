@@ -3,32 +3,32 @@
   "purpose": "Binds every shipped mob portrait to the actual renderer job, model, attachment, tint, renderer, and output bytes.",
   "bootstrapReview": {
     "path": "docs/achievements/placeholder-art-completion-2026-08-09/portrait-manifest-bootstrap-review.md",
-    "bytes": 1532,
-    "sha256": "bfcef01e1be303722e0c3d5414837a61f8fa735c638ef097d08fe4ba6c0a3e31"
+    "bytes": 1510,
+    "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "e57e9e64d6b7286c2277458c5964f7b8d7a363463f93401f8acea645d2f9cf5a",
+  "rendererFingerprint": "0bffb282846c891357df57a72a0340354fdcadcc7bcf7362cefb3744966ff2b0",
   "renderer": {
     "trackedFiles": [
       {
         "path": "scripts/render_finder_portraits.mjs",
-        "bytes": 11242,
-        "sha256": "45df4ba938de3c512a8fd0255aad05417d614eca9bc1b8947ff5a15a4d3bb516"
+        "bytes": 10988,
+        "sha256": "5f9b0357f3062fee9cc2021a0bfbd43691b2a30b09e90c96d989171c0f89cec7"
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 9164,
-        "sha256": "b51d94e071e623cfdfc9ddeb028398672f4b73f058e6ce23872c7a20d0febfe2"
+        "bytes": 8916,
+        "sha256": "641ff277a3bf8af96ae7ce579cd55286dd8f76f6af04d5da35bf0f42318e3aff"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
-        "bytes": 1392,
-        "sha256": "93038bf1a45a2505484318a726e3ad438459253fc007d4be6dc37c18f13a77d7"
+        "bytes": 1356,
+        "sha256": "ab4f2b23cebeb6e346856786b9d3fe95010b2db058ef0d990bb1ee34847533ed"
       }
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4266063,
-      "sha256": "2a5833bebcf96054c5eb3c34dc6af81ddfac2750a2f2b210da935aba009cfcae",
+      "bytes": 4265911,
+      "sha256": "b3e52fcb165d5191f56d376faa792659a133012317990a367bdb2a46c15820c0",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3166,68 +3166,68 @@
       "id": "ignivar_crucible_warden",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "mob_ignivar_crucible_warden",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/crucible_warden.glb",
+          "path": "public/models/creatures/crucible_warden.glb",
+          "bytes": 346648,
+          "sha256": "3654b6db685a0db79d956378126b37643f2f36b61397251f3aa0a8e1bf33a7aa"
         },
-        "idle": "Flying_Idle",
+        "idle": "Idle",
         "height": 2.2,
-        "yaw": null,
-        "hover": 0.3,
+        "yaw": 0,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7c4529",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "f96f6f69fc0d7e0f81a99edb47a297862e0570f014c1a501d3815978b4a33c99",
+      "sourceFingerprint": "fca9eeae3b07a7f1e16f5687194d05c61f606ce29ff9583584e15339328bbca0",
       "output": {
         "path": "public/ui/mobs/ignivar_crucible_warden.webp",
-        "bytes": 2082,
-        "sha256": "5525450c614bd597c7fd1c8a9a9f9e48943e1023a31c551bfaf07c8a77aafdaf"
+        "bytes": 2656,
+        "sha256": "72bb027632881f614f68850484937127bee353514b4f3c1894f7bcfa4b9dd309"
       }
     },
     {
       "id": "ignivar_ember_sentinel",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "mob_ignivar_ember_sentinel",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/ember_sentinel.glb",
+          "path": "public/models/creatures/ember_sentinel.glb",
+          "bytes": 335460,
+          "sha256": "7667f2f6965f1abb7efe729b3e96c11ad4a38f38ea7d905e6f5761d17a2ed471"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
-        "yaw": null,
-        "hover": 0.3,
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": 0,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#b94b23",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "f4798aace53358bc1d9903244ce56a5c1b68a07e16fed20c2142f55ef8368237",
+      "sourceFingerprint": "36fde3d25e38e6c8b9807986b5618ebae736a534022bf4404c709216a84222dd",
       "output": {
         "path": "public/ui/mobs/ignivar_ember_sentinel.webp",
-        "bytes": 2186,
-        "sha256": "7408f220d75d042bd0973a8fbdc38415d263740109b66a7158382a047a54a55a"
+        "bytes": 2146,
+        "sha256": "d749146493d74a9f62c282469efdc51d0b75b803193223f9715501d5ed88d587"
       }
     },
     {

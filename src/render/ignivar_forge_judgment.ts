@@ -28,6 +28,8 @@ const WALL_CRACK_SEGMENTS = 8;
 // Shell edges are wall centrelines. Move past the one-yard half-thickness and
 // a small epsilon so both glow layers sit visibly in front of the inner face.
 const WALL_CRACK_INSET = 1.08;
+const WALL_CRACK_HALO_HALF_WIDTH = 0.22;
+const WALL_CRACK_CORE_HALF_WIDTH = 0.075;
 
 function additiveMaterial(color: number, opacity: number): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
@@ -332,26 +334,74 @@ function buildWallCracks(): THREE.Group {
       }
     }
   }
-  const crackGeometry = new THREE.BufferGeometry().setFromPoints(points);
-  const haloMaterial = new THREE.LineBasicMaterial({
-    color: 0xe11c05,
+  const crackRibbonGeometry = (halfWidth: number): THREE.BufferGeometry => {
+    const vertices: number[] = [];
+    for (let index = 0; index < points.length; index += 2) {
+      const start = points[index];
+      const end = points[index + 1];
+      const dx = end.x - start.x;
+      const dz = end.z - start.z;
+      const horizontalLength = Math.hypot(dx, dz);
+      const dy = end.y - start.y;
+      const segmentLength = Math.hypot(horizontalLength, dy);
+      if (horizontalLength <= 1e-6 || segmentLength <= 1e-6) continue;
+      const tangentX = dx / horizontalLength;
+      const tangentZ = dz / horizontalLength;
+      const horizontalOffset = (dy / segmentLength) * halfWidth;
+      const verticalOffset = (-horizontalLength / segmentLength) * halfWidth;
+      const offsetX = tangentX * horizontalOffset;
+      const offsetZ = tangentZ * horizontalOffset;
+      const startLowY = Math.max(0.35, start.y + verticalOffset);
+      const startHighY = Math.max(0.35, start.y - verticalOffset);
+      const endLowY = Math.max(0.35, end.y + verticalOffset);
+      const endHighY = Math.max(0.35, end.y - verticalOffset);
+      vertices.push(
+        start.x + offsetX,
+        startLowY,
+        start.z + offsetZ,
+        end.x + offsetX,
+        endLowY,
+        end.z + offsetZ,
+        end.x - offsetX,
+        endHighY,
+        end.z - offsetZ,
+        start.x + offsetX,
+        startLowY,
+        start.z + offsetZ,
+        end.x - offsetX,
+        endHighY,
+        end.z - offsetZ,
+        start.x - offsetX,
+        startHighY,
+        start.z - offsetZ,
+      );
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    return geometry;
+  };
+  const haloMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff1600,
     transparent: true,
-    opacity: 0.3,
+    opacity: 0.42,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+    toneMapped: false,
   });
-  const coreMaterial = new THREE.LineBasicMaterial({
-    color: 0xff8a24,
+  const coreMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffb13b,
     transparent: true,
-    opacity: 0.72,
+    opacity: 0.92,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+    toneMapped: false,
   });
-  const halo = new THREE.LineSegments(crackGeometry, haloMaterial);
+  const halo = new THREE.Mesh(crackRibbonGeometry(WALL_CRACK_HALO_HALF_WIDTH), haloMaterial);
   halo.name = 'ignivarForgeJudgmentWallCrackHalo';
-  halo.scale.set(1.002, 1, 1.002);
   halo.renderOrder = 11;
-  const core = new THREE.LineSegments(crackGeometry, coreMaterial);
+  const core = new THREE.Mesh(crackRibbonGeometry(WALL_CRACK_CORE_HALF_WIDTH), coreMaterial);
   core.name = 'ignivarForgeJudgmentWallCrackCore';
   core.renderOrder = 12;
 
@@ -366,8 +416,8 @@ function syncWallCracks(wallCracks: THREE.Object3D, phase: 'hidden' | 'warning' 
   wallCracks.userData.phase = phase;
   if (phase === 'hidden') return;
   const active = phase === 'active';
-  (wallCracks.userData.haloMaterial as THREE.Material).opacity = active ? 0.52 : 0.24;
-  (wallCracks.userData.coreMaterial as THREE.Material).opacity = active ? 0.94 : 0.58;
+  (wallCracks.userData.haloMaterial as THREE.Material).opacity = active ? 0.68 : 0.42;
+  (wallCracks.userData.coreMaterial as THREE.Material).opacity = active ? 1 : 0.92;
 }
 
 function buildFire(): THREE.Group {
