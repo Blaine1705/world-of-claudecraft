@@ -473,3 +473,43 @@ describe('meteor/flamestrike asset binding', () => {
     expect(SFX_CLIPS.flamestrike.url.split('?')[0]).toBe('/audio/sfx/flamestrike.mp3');
   });
 });
+
+// The build step's ORDER, which is load-bearing rather than cosmetic.
+//
+// writeSfxManifest validates every custom key's resolved gain (category
+// baseline + keyTrimDb) against the per-key ceiling in
+// sfx_gain_ceiling.generated.json, and throws when the resolved value exceeds
+// it. writeSfxGainCeilings is what puts a key INTO that file, measured from the
+// audio. Running the manifest first therefore means a newly-added custom key
+// carrying a positive trim can never bootstrap: its ceiling does not exist yet,
+// so it defaults to 0dB, the bounds check throws, and the manifest is left
+// stale on disk.
+//
+// That failure mode is quiet in the worst way. The command exits non-zero, but
+// if the stale manifest is committed anyway the missing key is simply absent
+// from SFX_CLIPS, so the cue never loads and the game plays silence with
+// nothing red anywhere. Two shipped cues were lost to exactly this: a mount's
+// summon call and a mount's three reverse takes, both present on disk and
+// reachable in code.
+//
+// Ceilings depend only on the catalog and the audio files, never on the
+// manifest, so generating them first is safe as well as correct.
+describe('build_sfx_manifest.mjs step order', () => {
+  const entryScript = readFileSync(
+    path.join(fileURLToPath(new URL('..', import.meta.url)), 'scripts/build_sfx_manifest.mjs'),
+    'utf8',
+  );
+
+  it('writes the gain ceilings before the manifest that validates against them', () => {
+    const ceilingsAt = entryScript.indexOf('writeSfxGainCeilings(');
+    const manifestAt = entryScript.indexOf('writeSfxManifest(');
+    expect(ceilingsAt).toBeGreaterThan(-1);
+    expect(manifestAt).toBeGreaterThan(-1);
+    expect(
+      ceilingsAt,
+      'writeSfxGainCeilings must run BEFORE writeSfxManifest: the manifest validates ' +
+        'resolved gains against the ceiling file, so a new custom key with a positive ' +
+        'trim cannot bootstrap if the ceilings are written second',
+    ).toBeLessThan(manifestAt);
+  });
+});
