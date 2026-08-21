@@ -54,6 +54,7 @@ import {
   IGNIVAR_SHOULDER_FIRE_RIGHT_NAME,
 } from '../src/render/ignivar_model_vfx';
 import {
+  IGNIVAR_ROTATING_RAY_BLADE_NAME,
   IGNIVAR_ROTATING_RAY_BORDER_NAME,
   IGNIVAR_ROTATING_RAY_FILL_NAME,
   IGNIVAR_ROTATING_RAY_TICKS_NAME,
@@ -615,6 +616,30 @@ describe('Ignivar encounter renderer', () => {
       expect(batchedTicks.geometry.getAttribute('color').count).toBe(40);
       expect((batchedTicks.material as THREE.MeshBasicMaterial).vertexColors).toBe(true);
       expect(fireBeam?.getObjectByName(IGNIVAR_FIRE_BEAM_OUTER_NAME)).toBeDefined();
+      const blade = fireBeam?.getObjectByName(IGNIVAR_ROTATING_RAY_BLADE_NAME) as THREE.Group;
+      expect(blade).toBeDefined();
+      expect(blade.children.length).toBeGreaterThanOrEqual(4);
+      expect(blade.position.y).toBeGreaterThan(1);
+      expect(blade.position.z).toBeCloseTo(IGNIVAR_ROTATING_RAYS_RANGE - 1, 8);
+      let bladeVertices = 0;
+      blade.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        object.updateMatrix();
+        const positions = object.geometry.getAttribute('position') as THREE.BufferAttribute;
+        const point = new THREE.Vector3();
+        for (let index = 0; index < positions.count; index++) {
+          point.fromBufferAttribute(positions, index).applyMatrix4(object.matrix);
+          bladeVertices++;
+          expect(Math.abs(point.x + blade.position.x)).toBeLessThanOrEqual(
+            IGNIVAR_ROTATING_RAYS_HALF_WIDTH + 1e-6,
+          );
+          expect(point.z + blade.position.z).toBeGreaterThanOrEqual(
+            IGNIVAR_ROTATING_RAYS_INNER_RANGE,
+          );
+          expect(point.z + blade.position.z).toBeLessThanOrEqual(IGNIVAR_ROTATING_RAYS_RANGE);
+        }
+      });
+      expect(bladeVertices).toBeGreaterThan(0);
       expectAuthoredFireBeamInside(fireBeam, {
         innerRange: IGNIVAR_ROTATING_RAYS_INNER_RANGE,
         range: IGNIVAR_ROTATING_RAYS_RANGE,
@@ -923,6 +948,9 @@ describe('Ignivar encounter renderer', () => {
     expect(
       fireBeams.every((beam) => !beam.getObjectByName(IGNIVAR_FIRE_BEAM_CORE_NAME)?.visible),
     ).toBe(true);
+    expect(
+      fireBeams.every((beam) => !beam.getObjectByName(IGNIVAR_ROTATING_RAY_BLADE_NAME)?.visible),
+    ).toBe(true);
     const rayFloorLayers = Array.from({ length: 3 }, (_, rayIndex) => {
       const layers = rays?.children.filter((child) => child.userData.rayIndex === rayIndex) ?? [];
       return {
@@ -961,6 +989,9 @@ describe('Ignivar encounter renderer', () => {
     expect(fireBeams.every((beam) => beam.userData.phase === 'active')).toBe(true);
     expect(
       fireBeams.every((beam) => beam.getObjectByName(IGNIVAR_FIRE_BEAM_CORE_NAME)?.visible),
+    ).toBe(true);
+    expect(
+      fireBeams.every((beam) => beam.getObjectByName(IGNIVAR_ROTATING_RAY_BLADE_NAME)?.visible),
     ).toBe(true);
     const activeOpacities = floorOpacities();
     for (let rayIndex = 0; rayIndex < activeOpacities.length; rayIndex++) {

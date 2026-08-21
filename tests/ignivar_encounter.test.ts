@@ -80,7 +80,8 @@ import {
 import {
   IGNIVAR_FIRST_METEOR_SECONDS,
   IGNIVAR_METEOR_CAST_ID,
-  IGNIVAR_METEOR_COUNT,
+  IGNIVAR_METEOR_COUNT_HEROIC,
+  IGNIVAR_METEOR_COUNT_NORMAL,
   IGNIVAR_METEOR_DAMAGE_MAX_HP,
   IGNIVAR_METEOR_EVERY,
   IGNIVAR_METEOR_RADIUS,
@@ -724,7 +725,7 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS).toBe(3);
     expect(IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP).toBe(0.35);
     expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBe(4);
-    expect(IGNIVAR_MOLTEN_ARMOR_DURATION).toBe(30);
+    expect(IGNIVAR_MOLTEN_ARMOR_DURATION).toBe(26);
     expect(IGNIVAR_MOLTEN_ARMOR_PER_STACK).toBe(0.35);
     expect(IGNIVAR_FRONTAL_CAST_SECONDS).toBe(3);
     expect(IGNIVAR_CONDUIT_ACTIVE_SECONDS).toBe(10);
@@ -1304,7 +1305,7 @@ describe('Ignivar encounter', () => {
         event.fx === 'meteorFall' &&
         event.ability === IGNIVAR_METEOR_CAST_ID,
     );
-    expect(warnings).toHaveLength(IGNIVAR_METEOR_COUNT);
+    expect(warnings).toHaveLength(IGNIVAR_METEOR_COUNT_NORMAL);
     expect(warnings.every((warning) => warning.radius === IGNIVAR_METEOR_RADIUS)).toBe(true);
     expect(warnings.every((warning) => warning.duration === IGNIVAR_METEOR_TELEGRAPH_SECONDS)).toBe(
       true,
@@ -1320,7 +1321,8 @@ describe('Ignivar encounter', () => {
 
     const impact = boss.ignivar.meteorPoints[0];
     sim.player.pos = { x: impact.x, y: boss.pos.y, z: impact.z };
-    safePlayer.pos = { ...boss.pos };
+    safePlayer.pos = { x: boss.pos.x + 33, y: boss.pos.y, z: boss.pos.z };
+    safePlayer.prevPos = { ...safePlayer.pos };
     sim.tick();
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(safePlayer.hp).toBe(safePlayer.maxHp);
@@ -1341,6 +1343,105 @@ describe('Ignivar encounter', () => {
       warnings.map((warning) => warning.persistentId),
     );
     expect(boss.ignivar.meteorPoints).toEqual([]);
+  });
+
+  it('casts two additional Falling Cinders with the Heroic encounter path', () => {
+    const { sim, boss } = claimedHeroicEncounter(8103);
+    const meteorTargets = Array.from({ length: IGNIVAR_METEOR_COUNT_HEROIC }, (_, index) => {
+      const player = addEncounterPlayer(sim, boss, `Heroic Meteor ${index + 1}`);
+      const angle = (index * Math.PI * 2) / IGNIVAR_METEOR_COUNT_HEROIC;
+      player.pos = {
+        x: boss.pos.x + Math.sin(angle) * 18,
+        y: boss.pos.y,
+        z: boss.pos.z + Math.cos(angle) * 18,
+      };
+      player.prevPos = { ...player.pos };
+      return player;
+    });
+    updateIgnivarEncounter(sim.ctx, boss);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    boss.ignivar.brandTimer = 999;
+    boss.ignivar.forgeStrikeTimer = 999;
+    boss.ignivar.frontalTimer = 999;
+    boss.ignivar.skyfireTimer = 999;
+    boss.ignivar.rotatingRaysTimer = 999;
+    boss.ignivar.forgeWaveTimer = 999;
+    boss.ignivar.soakTimer = 999;
+    boss.ignivar.forgeChainsTimer = 999;
+    boss.ignivar.meteorTimer = 0;
+    boss.swingTimer = 999;
+
+    const warnings = sim
+      .tick()
+      .filter(
+        (event): event is Extract<SimEvent, { type: 'spellfxAt' }> =>
+          event.type === 'spellfxAt' &&
+          event.fx === 'meteorFall' &&
+          event.ability === IGNIVAR_METEOR_CAST_ID,
+      );
+
+    expect(warnings).toHaveLength(IGNIVAR_METEOR_COUNT_HEROIC);
+    expect(boss.ignivar.meteorPoints).toHaveLength(IGNIVAR_METEOR_COUNT_HEROIC);
+    for (const target of meteorTargets) {
+      expect(
+        boss.ignivar.meteorPoints.some(
+          (point) => point.x === target.pos.x && point.z === target.pos.z,
+        ),
+      ).toBe(true);
+    }
+    const frozenWarnings = boss.ignivar.meteorPoints.map((point) => ({ ...point }));
+    for (const target of meteorTargets) {
+      target.pos.x = boss.pos.x;
+      target.pos.z = boss.pos.z;
+    }
+    sim.tick();
+    expect(boss.ignivar.meteorPoints).toEqual(frozenWarnings);
+  });
+
+  it('targets five distinct non-tanks and freezes their positions on Normal', () => {
+    const { sim, boss } = claimedEncounter(8113);
+    const meteorTargets = Array.from({ length: IGNIVAR_METEOR_COUNT_NORMAL }, (_, index) => {
+      const player = addEncounterPlayer(sim, boss, `Normal Meteor ${index + 1}`);
+      const angle = (index * Math.PI * 2) / IGNIVAR_METEOR_COUNT_NORMAL;
+      player.pos = {
+        x: boss.pos.x + Math.sin(angle) * 18,
+        y: boss.pos.y,
+        z: boss.pos.z + Math.cos(angle) * 18,
+      };
+      player.prevPos = { ...player.pos };
+      return player;
+    });
+    updateIgnivarEncounter(sim.ctx, boss);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    boss.targetId = sim.player.id;
+    boss.ignivar.brandTimer = 999;
+    boss.ignivar.forgeStrikeTimer = 999;
+    boss.ignivar.frontalTimer = 999;
+    boss.ignivar.skyfireTimer = 999;
+    boss.ignivar.rotatingRaysTimer = 999;
+    boss.ignivar.forgeWaveTimer = 999;
+    boss.ignivar.soakTimer = 999;
+    boss.ignivar.meteorTimer = 0;
+    boss.swingTimer = 999;
+
+    sim.tick();
+
+    expect(boss.ignivar.meteorPoints).toHaveLength(IGNIVAR_METEOR_COUNT_NORMAL);
+    expect(boss.ignivar.meteorPoints).toEqual(
+      expect.arrayContaining(meteorTargets.map(({ pos }) => ({ x: pos.x, z: pos.z }))),
+    );
+    expect(
+      boss.ignivar.meteorPoints.some(
+        (point) => point.x === sim.player.pos.x && point.z === sim.player.pos.z,
+      ),
+    ).toBe(false);
+    const frozenWarnings = boss.ignivar.meteorPoints.map((point) => ({ ...point }));
+    for (const target of meteorTargets) {
+      target.pos.x = boss.pos.x;
+      target.pos.z = boss.pos.z;
+    }
+    sim.tick();
+    expect(boss.ignivar.meteorPoints).toEqual(frozenWarnings);
   });
 
   it('starts Falling Cinders naturally after 13 seconds and every 17 seconds thereafter', () => {
@@ -1870,6 +1971,50 @@ describe('Ignivar encounter', () => {
     expect(secondTank.auras.find((aura) => aura.id === IGNIVAR_MOLTEN_ARMOR_AURA_ID)?.stacks).toBe(
       1,
     );
+  });
+
+  it('clears the first tank before a complete two-strike rotation returns to them', () => {
+    const { sim, boss } = claimedEncounter(7440);
+    const secondTankPid = sim.addPlayer('paladin', 'Rotation Tank');
+    const secondTank = sim.entities.get(secondTankPid);
+    if (!secondTank) throw new Error('Rotation tank did not spawn');
+    sim.player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z - 2 };
+    sim.player.prevPos = { ...sim.player.pos };
+    secondTank.pos = { ...sim.player.pos };
+    secondTank.prevPos = { ...secondTank.pos };
+    sim.player.devGod = true;
+    secondTank.devGod = true;
+    updateIgnivarEncounter(sim.ctx, boss);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    boss.ignivar.brandTimer = 999;
+    boss.ignivar.frontalTimer = 999;
+    boss.ignivar.skyfireTimer = 999;
+    boss.ignivar.meteorTimer = 999;
+    boss.ignivar.rotatingRaysTimer = 999;
+    boss.ignivar.forgeWaveTimer = 999;
+    boss.ignivar.soakTimer = 999;
+    boss.ignivar.overlapTimer = 999;
+    boss.swingTimer = 999;
+    boss.forcedTargetId = sim.player.id;
+    boss.forcedTargetTimer = 60;
+
+    boss.ignivar.forgeStrikeTimer = 0;
+    updateIgnivarEncounter(sim.ctx, boss);
+    boss.ignivar.forgeStrikeTimer = 0;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(sim.player.auras.find((aura) => aura.id === IGNIVAR_MOLTEN_ARMOR_AURA_ID)).toMatchObject(
+      { stacks: 2, remaining: 26, duration: 26 },
+    );
+
+    boss.forcedTargetId = secondTank.id;
+    boss.forcedTargetTimer = 60;
+    boss.ignivar.forgeStrikeTimer = IGNIVAR_FORGE_STRIKE_EVERY;
+    for (let tick = 0; tick < (IGNIVAR_FORGE_STRIKE_EVERY * 2) / DT; tick++) sim.tick();
+
+    expect(secondTank.auras.find((aura) => aura.id === IGNIVAR_MOLTEN_ARMOR_AURA_ID)?.stacks).toBe(
+      2,
+    );
+    expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_MOLTEN_ARMOR_AURA_ID)).toBe(false);
   });
 
   it('makes two real Forge Strike stacks amplify Ignivar melee swings by seventy percent', () => {
@@ -2853,6 +2998,7 @@ describe('Ignivar encounter', () => {
     expect(boss.forcedTargetTimer).toBeLessThan(3);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.frontalTimer = 0;
+    boss.ignivar.meteorTimer = 999;
 
     updateIgnivarEncounter(sim.ctx, boss);
     let sawRelease = false;
@@ -3275,6 +3421,7 @@ describe('Ignivar encounter', () => {
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 999;
     boss.ignivar.frontalTimer = 999;
+    boss.ignivar.meteorTimer = 999;
     boss.swingTimer = 999;
 
     const ticksPastOriginalDeadline = Math.round(IGNIVAR_APOCALYPSE_CAST_SECONDS / DT) + 1;

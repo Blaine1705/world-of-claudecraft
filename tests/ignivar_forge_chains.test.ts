@@ -1,9 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { movementCrossesIgnivarForgeChain } from '../src/sim/ignivar_forge_chains';
+import {
+  IGNIVAR_FORGE_CHAINS_BREAK_DISTANCE,
+  IGNIVAR_FORGE_CHAINS_WARNING_DISTANCE,
+  movementCrossesIgnivarForgeChain,
+} from '../src/sim/ignivar_forge_chains';
 
 describe('Ignivar Forge Chains crossing geometry', () => {
   const first = { x: -5, y: 0, z: 0 };
   const second = { x: 5, y: 0, z: 0 };
+
+  it('starts the visual danger warning two yards before the chain can break', () => {
+    expect(IGNIVAR_FORGE_CHAINS_WARNING_DISTANCE).toBe(8);
+    expect(IGNIVAR_FORGE_CHAINS_BREAK_DISTANCE).toBe(10);
+  });
 
   it('catches a fast player movement that tunnels across the chain', () => {
     expect(

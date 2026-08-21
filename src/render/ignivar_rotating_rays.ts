@@ -18,6 +18,7 @@ export const IGNIVAR_ROTATING_RAYS_VISUAL_NAME = 'ignivarRotatingRaysTelegraph';
 export const IGNIVAR_ROTATING_RAY_FILL_NAME = 'ignivarRotatingRayFill';
 export const IGNIVAR_ROTATING_RAY_BORDER_NAME = 'ignivarRotatingRayBorder';
 export const IGNIVAR_ROTATING_RAY_TICKS_NAME = 'ignivarRotatingRayHeatTicks';
+export const IGNIVAR_ROTATING_RAY_BLADE_NAME = 'ignivarRotatingRayBlade';
 
 function telegraphMaterial(color: number, opacity: number): THREE.MeshBasicMaterial {
   const material = new THREE.MeshBasicMaterial({
@@ -132,6 +133,48 @@ function buildHeatTicks(): THREE.Group {
   return ticks;
 }
 
+function buildFlameBlade(): THREE.Group {
+  const blade = new THREE.Group();
+  blade.name = IGNIVAR_ROTATING_RAY_BLADE_NAME;
+  blade.position.set(0, 2.25, IGNIVAR_ROTATING_RAYS_RANGE - 1);
+  blade.userData.gameplayGeometry = false;
+
+  const outerMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff4b08,
+    transparent: true,
+    opacity: 0.82,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
+  });
+  const coreMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffd36a,
+    transparent: true,
+    opacity: 0.94,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
+  });
+  const outerGeometry = new THREE.OctahedronGeometry(0.62, 0);
+  const coreGeometry = new THREE.OctahedronGeometry(0.38, 0);
+
+  for (const lateral of [-0.38, 0, 0.38]) {
+    const outer = new THREE.Mesh(outerGeometry, outerMaterial);
+    outer.position.x = lateral;
+    outer.scale.set(lateral === 0 ? 0.8 : 0.55, lateral === 0 ? 1.75 : 1.3, 0.55);
+    outer.rotation.z = lateral * -0.85;
+    outer.renderOrder = 12;
+    blade.add(outer);
+  }
+
+  const core = new THREE.Mesh(coreGeometry, coreMaterial);
+  core.scale.set(0.68, 1.55, 0.48);
+  core.renderOrder = 13;
+  blade.add(core);
+  blade.visible = false;
+  return blade;
+}
+
 function setTelegraphOpacity(object: THREE.Object3D, multiplier: number): void {
   object.traverse((child) => {
     const renderable = child as THREE.Object3D & {
@@ -162,6 +205,7 @@ export function buildIgnivarRotatingRaysTelegraph(): THREE.Group {
       startHalfWidth: IGNIVAR_ROTATING_RAYS_HALF_WIDTH,
       endHalfWidth: IGNIVAR_ROTATING_RAYS_HALF_WIDTH,
     });
+    fireBeam.add(buildFlameBlade());
     for (const visual of [fill, border, ticks, fireBeam]) {
       visual.rotation.y = offset;
       visual.userData.rayIndex = ray;
@@ -188,6 +232,8 @@ export function syncIgnivarRotatingRaysTelegraph(
   for (const child of root.children) {
     if (child.userData.vfxLayer === 'fireBeam') {
       syncIgnivarFireBeamPresentation(child, phase, windupProgress);
+      const blade = child.getObjectByName(IGNIVAR_ROTATING_RAY_BLADE_NAME);
+      if (blade) blade.visible = phase === 'active';
       continue;
     }
     const layer = child.userData.telegraphLayer as string | undefined;

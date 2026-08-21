@@ -14,6 +14,7 @@ const CLEANSE_EDGE_WIDTH = 0.16;
 export const IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME = 'ignivarWaterCleanseFootprint';
 export const IGNIVAR_CONDUIT_CLEANSE_BOUNDARY_NAME = 'ignivarWaterCleanseBoundary';
 export const IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME = 'ignivarWaterActivationRune';
+export const IGNIVAR_CONDUIT_READY_AIM_RING_NAME = 'ignivarWaterReadyAimRing';
 
 const templates = new Map<IgnivarConduitState, THREE.Group>();
 let stableTemplate: THREE.Group | null = null;
@@ -87,6 +88,13 @@ function addReadyVisual(group: THREE.Group): void {
   lowerHalo.name = 'ignivarWaterReadyLowerHalo';
   lowerHalo.rotation.z = Math.PI / 8;
   marker.add(lowerHalo);
+
+  // Float above the stone lip so the ready conduit reads as a target from the
+  // player camera instead of being hidden inside its own base.
+  const aimRing = horizontalMesh(new THREE.RingGeometry(1.48, 1.72, 32), readyMaterial, 0.94);
+  aimRing.name = IGNIVAR_CONDUIT_READY_AIM_RING_NAME;
+  aimRing.renderOrder = 2;
+  marker.add(aimRing);
   group.add(marker);
 }
 

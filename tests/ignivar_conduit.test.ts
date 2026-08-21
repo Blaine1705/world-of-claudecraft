@@ -5,6 +5,7 @@ import {
   IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME,
   IGNIVAR_CONDUIT_CLEANSE_BOUNDARY_NAME,
   IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME,
+  IGNIVAR_CONDUIT_READY_AIM_RING_NAME,
   isIgnivarWaterConduitTemplate,
   isStableIgnivarWaterConduitTransition,
   syncIgnivarWaterConduitVisibility,
@@ -29,6 +30,15 @@ function maximumPlanarRadius(geometry: THREE.BufferGeometry): number {
   let radius = 0;
   for (let index = 0; index < positions.count; index++) {
     radius = Math.max(radius, Math.hypot(positions.getX(index), positions.getY(index)));
+  }
+  return radius;
+}
+
+function minimumPlanarRadius(geometry: THREE.BufferGeometry): number {
+  const positions = geometry.getAttribute('position');
+  let radius = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < positions.count; index++) {
+    radius = Math.min(radius, Math.hypot(positions.getX(index), positions.getY(index)));
   }
   return radius;
 }
@@ -100,6 +110,14 @@ describe('Ignivar water conduit renderer', () => {
     const cooldownState = cooldown.group.getObjectByName('ignivarWaterConduit:cooldown');
     expect(readyState?.getObjectByName('ignivarWaterReadyMarker')).toBeDefined();
     expect(readyState?.getObjectByName('ignivarWaterReadyCore')).toBeDefined();
+    expect(readyState?.getObjectByName(IGNIVAR_CONDUIT_READY_AIM_RING_NAME)).toBeDefined();
+    const aimRing = meshNamed(readyState as THREE.Object3D, IGNIVAR_CONDUIT_READY_AIM_RING_NAME);
+    expect(aimRing.visible).toBe(true);
+    expect(aimRing.position.y).toBeGreaterThan(0.9);
+    expect(aimRing.rotation.x).toBeCloseTo(-Math.PI / 2, 8);
+    expect(minimumPlanarRadius(aimRing.geometry)).toBeCloseTo(1.48, 5);
+    expect(maximumPlanarRadius(aimRing.geometry)).toBeCloseTo(1.72, 5);
+    expect((aimRing.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.7);
     expect(readyState?.getObjectByName(IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME)).toBeUndefined();
     expect(activeState?.getObjectByName('ignivarWaterColumnCore')).toBeDefined();
     expect(activeState?.getObjectByName('ignivarWaterReadyMarker')).toBeUndefined();

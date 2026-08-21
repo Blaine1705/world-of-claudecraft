@@ -12,12 +12,14 @@ function linkedPlayers() {
   const first = {
     id: 10,
     kind: 'player',
-    auras: [{ id: IGNIVAR_FORGE_CHAINS_AURA_ID, value2: 20 }],
+    pos: { x: 40, y: 2, z: 60 },
+    auras: [{ id: IGNIVAR_FORGE_CHAINS_AURA_ID, value2: 20, duration: 8, remaining: 5 }],
   };
   const second = {
     id: 20,
     kind: 'player',
-    auras: [{ id: IGNIVAR_FORGE_CHAINS_AURA_ID, value2: 10 }],
+    pos: { x: 46, y: 2, z: 68 },
+    auras: [{ id: IGNIVAR_FORGE_CHAINS_AURA_ID, value2: 10, duration: 8, remaining: 5 }],
   };
   const firstGroup = new THREE.Group();
   firstGroup.position.set(40, 2, 60);
@@ -91,6 +93,124 @@ describe('Ignivar Forge Chains rendering', () => {
 
     const chain = firstGroup.getObjectByName(IGNIVAR_FORGE_CHAIN_VISUAL_NAME) as THREE.Group;
     expect(chain.userData.strained).toBe(true);
+  });
+
+  it('warns before the tether reaches its break distance', () => {
+    const { first, firstGroup, secondGroup, views } = linkedPlayers();
+    secondGroup.position.set(
+      firstGroup.position.x + 8.5,
+      firstGroup.position.y,
+      firstGroup.position.z,
+    );
+
+    syncIgnivarForgeChainVisual(firstGroup, first, views, 0.1);
+
+    const chain = firstGroup.getObjectByName(IGNIVAR_FORGE_CHAIN_VISUAL_NAME) as THREE.Group;
+    expect(chain.userData.warning).toBe(true);
+    expect(chain.userData.strained).toBe(false);
+    expect(
+      chain.children.filter((child) => child.userData.forgeChainWarningAnchor === true),
+    ).toHaveLength(2);
+    expect(
+      chain.children
+        .filter((child) => child.userData.forgeChainWarningAnchor === true)
+        .every((child) => child.visible),
+    ).toBe(true);
+  });
+
+  it('keeps warning anchors hidden below eight yards and during attachment grace', () => {
+    const { first, firstGroup, secondGroup, views } = linkedPlayers();
+    secondGroup.position.set(
+      firstGroup.position.x + 7.9,
+      firstGroup.position.y,
+      firstGroup.position.z,
+    );
+    syncIgnivarForgeChainVisual(firstGroup, first, views, 0.1);
+    const chain = firstGroup.getObjectByName(IGNIVAR_FORGE_CHAIN_VISUAL_NAME) as THREE.Group;
+    expect(chain.userData.warning).toBe(false);
+    expect(
+      chain.children
+        .filter((child) => child.userData.forgeChainWarningAnchor === true)
+        .every((child) => !child.visible),
+    ).toBe(true);
+
+    secondGroup.position.x = firstGroup.position.x + 8.5;
+    first.auras[0].remaining = 6;
+    syncIgnivarForgeChainVisual(firstGroup, first, views, 0.1);
+    expect(chain.userData.warning).toBe(false);
+    expect(
+      chain.children
+        .filter((child) => child.userData.forgeChainWarningAnchor === true)
+        .every((child) => !child.visible),
+    ).toBe(true);
+
+    first.auras[0].remaining = 5.5;
+    syncIgnivarForgeChainVisual(firstGroup, first, views, 0.1);
+    expect(chain.userData.warning).toBe(true);
+    expect(
+      chain.children
+        .filter((child) => child.userData.forgeChainWarningAnchor === true)
+        .every((child) => child.visible),
+    ).toBe(true);
+  });
+
+  it('uses authoritative entity distance for warning state while views interpolate', () => {
+    const { first, firstGroup, secondGroup, views } = linkedPlayers();
+    const authoritative = new Map([
+      [first.id, { pos: first.pos }],
+      [20, { pos: { x: first.pos.x + 7.5, y: 2, z: first.pos.z } }],
+    ]);
+    secondGroup.position.set(firstGroup.position.x + 8.5, 2, firstGroup.position.z);
+
+    syncIgnivarForgeChainVisual(firstGroup, first, views, 0.1, authoritative);
+    const chain = firstGroup.getObjectByName(IGNIVAR_FORGE_CHAIN_VISUAL_NAME) as THREE.Group;
+    expect(chain.userData.warning).toBe(false);
+    expect(
+      chain.children
+        .filter((child) => child.userData.forgeChainWarningAnchor === true)
+        .every((child) => !child.visible),
+    ).toBe(true);
+
+    authoritative.set(20, { pos: { x: first.pos.x + 8.5, y: 2, z: first.pos.z } });
+    secondGroup.position.x = firstGroup.position.x + 7.5;
+    syncIgnivarForgeChainVisual(firstGroup, first, views, 0.1, authoritative);
+    expect(chain.userData.warning).toBe(true);
+    expect(
+      chain.children
+        .filter((child) => child.userData.forgeChainWarningAnchor === true)
+        .every((child) => child.visible),
+    ).toBe(true);
+  });
+
+  it('switches warning and strain exactly at the authoritative eight and ten yard limits', () => {
+    const { first, firstGroup, views } = linkedPlayers();
+    const authoritative = new Map([
+      [first.id, { pos: first.pos }],
+      [20, { pos: { x: first.pos.x + 8, y: 2, z: first.pos.z } }],
+    ]);
+    syncIgnivarForgeChainVisual(firstGroup, first, views, 0.1, authoritative);
+    const chain = firstGroup.getObjectByName(IGNIVAR_FORGE_CHAIN_VISUAL_NAME) as THREE.Group;
+    expect(chain.userData.warning).toBe(true);
+    expect(chain.userData.strained).toBe(false);
+    const anchors = chain.children.filter(
+      (child) => child.userData.forgeChainWarningAnchor === true,
+    );
+    expect(anchors).toHaveLength(2);
+    expect(anchors.every((anchor) => anchor.visible)).toBe(true);
+    const warningScale = anchors[0].scale.x;
+    const warningColor = (
+      chain.userData.warningAnchorMaterial as THREE.MeshBasicMaterial
+    ).color.clone();
+
+    authoritative.set(20, { pos: { x: first.pos.x + 10, y: 2, z: first.pos.z } });
+    syncIgnivarForgeChainVisual(firstGroup, first, views, 0.1, authoritative);
+    expect(chain.userData.warning).toBe(true);
+    expect(chain.userData.strained).toBe(true);
+    expect(anchors.every((anchor) => anchor.visible)).toBe(true);
+    expect(anchors[0].scale.x).toBeGreaterThan(warningScale);
+    expect(
+      (chain.userData.warningAnchorMaterial as THREE.MeshBasicMaterial).color.r,
+    ).toBeGreaterThan(warningColor.r);
   });
 
   it('matches the horizontal damage check when the partner has a vertical offset', () => {

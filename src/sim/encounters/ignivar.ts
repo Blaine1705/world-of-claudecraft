@@ -45,12 +45,15 @@ import {
 import {
   IGNIVAR_FIRST_METEOR_SECONDS,
   IGNIVAR_METEOR_CAST_ID,
+  IGNIVAR_METEOR_COUNT_HEROIC,
+  IGNIVAR_METEOR_COUNT_NORMAL,
   IGNIVAR_METEOR_DAMAGE_MAX_HP,
   IGNIVAR_METEOR_EVERY,
   IGNIVAR_METEOR_RADIUS,
   IGNIVAR_METEOR_REVEAL_DELAY_SECONDS,
   IGNIVAR_METEOR_TELEGRAPH_SECONDS,
   ignivarMeteorPattern,
+  ignivarMeteorTargetOrder,
   ignivarMeteorWarningId,
   pointInIgnivarMeteor,
 } from '../ignivar_meteors';
@@ -91,7 +94,7 @@ export const IGNIVAR_FORGE_STRIKE_EVERY = 14;
 export const IGNIVAR_FORGE_STRIKE_MAX_HP = 0.35;
 export const IGNIVAR_FORGE_WAVE_CAST_ID = 'Forge Wave';
 export const IGNIVAR_MOLTEN_ARMOR_AURA_ID = 'ignivar_molten_armor';
-export const IGNIVAR_MOLTEN_ARMOR_DURATION = 30;
+export const IGNIVAR_MOLTEN_ARMOR_DURATION = 26;
 export const IGNIVAR_MOLTEN_ARMOR_PER_STACK = 0.35;
 export const IGNIVAR_MOLTEN_ARMOR_MAX_STACKS = 3;
 export const IGNIVAR_FRONTAL_EVERY = 28;
@@ -543,6 +546,17 @@ function updateForgeJudgment(
   }
   if (st.forgeJudgmentPhase !== 'warning' && st.forgeJudgmentPhase !== 'active') return false;
 
+  // Heroic Brands persist through Judgment. Their ordinary proximity pulse
+  // therefore keeps running inside the shared refuge instead of becoming an
+  // unrelated raid-wide hit or pausing for the whole intermission.
+  if (heroic) {
+    st.overlapTimer = Math.max(0, st.overlapTimer - DT);
+    if (st.overlapTimer <= CAST_COMPLETE_EPS) {
+      updateBrandOverlap(ctx, boss, players);
+      st.overlapTimer = IGNIVAR_OVERLAP_PULSE_SECONDS;
+    }
+  }
+
   const origin = holdIgnivarAtJudgmentOrigin(ctx, boss);
   st.forgeJudgmentRemaining = Math.max(0, st.forgeJudgmentRemaining - DT);
   boss.castingAbility = IGNIVAR_JUDGMENT_CAST_ID;
@@ -749,12 +763,32 @@ function startSkyfire(
   emitMobYell(ctx, boss, 'The sky itself will burn!');
 }
 
-function startMeteorRain(ctx: SimContext, boss: Entity, st: IgnivarEncounterState): void {
+function startMeteorRain(
+  ctx: SimContext,
+  boss: Entity,
+  st: IgnivarEncounterState,
+  players: readonly Entity[],
+  heroic: boolean,
+): void {
   const instance = encounterInstance(ctx, boss);
   const arenaOrigin = instance ? ctx.instanceOriginOf(instance) : boss.pos;
   const castKey = (Math.imul(ctx.tickCount, 0x9e3779b1) ^ boss.id) >>> 0;
+  const meteorCount = heroic ? IGNIVAR_METEOR_COUNT_HEROIC : IGNIVAR_METEOR_COUNT_NORMAL;
+  const targets = ignivarMeteorTargetOrder(
+    castKey,
+    players
+      .filter((player) => !player.dead)
+      .map((player) => ({ id: player.id, x: player.pos.x, z: player.pos.z })),
+    boss.aggroTargetId,
+    meteorCount,
+  );
   st.meteorCastKey = castKey;
-  st.meteorPoints = ignivarMeteorPattern(castKey, arenaOrigin);
+  st.meteorPoints = ignivarMeteorPattern(
+    castKey,
+    arenaOrigin,
+    heroic ? 'heroic' : 'normal',
+    targets,
+  );
   st.meteorImpactRemaining = IGNIVAR_METEOR_TELEGRAPH_SECONDS;
   st.meteorTimer = st.lastInfernoTriggered ? IGNIVAR_FINAL_METEOR_EVERY : IGNIVAR_METEOR_EVERY;
   for (let meteorIndex = 0; meteorIndex < st.meteorPoints.length; meteorIndex++) {
@@ -820,6 +854,7 @@ function updateMeteorRain(
   boss: Entity,
   st: IgnivarEncounterState,
   players: readonly Entity[],
+  heroic: boolean,
 ): void {
   st.meteorTimer = Math.max(0, st.meteorTimer - DT);
   if (st.meteorImpactRemaining > 0) {
@@ -829,7 +864,7 @@ function updateMeteorRain(
     }
   }
   if (st.meteorTimer <= CAST_COMPLETE_EPS && st.meteorPoints.length === 0) {
-    startMeteorRain(ctx, boss, st);
+    startMeteorRain(ctx, boss, st, players, heroic);
   }
 }
 
@@ -1578,7 +1613,7 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
   }
   const sharedPyreBusy =
     !finalPhase && updateSharedPyre(ctx, boss, st, players, !ignivarMajorAbilityActive(st));
-  updateMeteorRain(ctx, boss, st, players);
+  updateMeteorRain(ctx, boss, st, players, heroic);
   players = playersInEncounter(ctx, boss);
   target = resolveLivingTarget(boss, players);
   if (!target) return;

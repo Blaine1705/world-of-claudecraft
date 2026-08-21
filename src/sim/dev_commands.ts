@@ -5,7 +5,11 @@ import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
-import { setupIgnivarDevRaid } from './ignivar_dev_raid';
+import {
+  ignivarDevRaidTravelRoster,
+  setupIgnivarDevRaid,
+  stageIgnivarDevRaidAtApproach,
+} from './ignivar_dev_raid';
 import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID } from './ignivar_raid_ids';
 import { enterDungeon, instanceInfoAt } from './instances/dungeons';
 import { mountItemId, mountOwned } from './mounts';
@@ -697,14 +701,23 @@ export function handleDevChat(
     return null;
   }
 
-  if (/^\/(?:dev\s+ignivarraid|devignivarraid)\s*$/i.test(raw)) {
+  const ignivarRaidMatch = raw.match(/^\/(?:dev\s+ignivarraid|devignivarraid)(?:\s+(boss))?\s*$/i);
+  if (ignivarRaidMatch) {
     const player = ctx.entities.get(pid);
     const currentRoom = player ? instanceInfoAt(ctx, player.pos)?.dungeonId : null;
-    if (currentRoom === IGNIVAR_FORGE_APPROACH_ID) {
-      emitDevLog(ctx, pid, '[dev] Ignivar raid approach is already ready.');
+    const skipToBoss = ignivarRaidMatch[1]?.toLowerCase() === 'boss';
+    if (currentRoom === IGNIVAR_FORGE_APPROACH_ID && !skipToBoss) {
+      const result = stageIgnivarDevRaidAtApproach(ctx, pid);
+      if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+      else
+        emitDevLog(
+          ctx,
+          pid,
+          '[dev] Ignivar approach formation reset. Use /dev ignivarraid boss to move the practice raid directly to Ignivar.',
+        );
       return null;
     }
-    if (currentRoom !== IGNIVAR_RAID_ARENA_ID) {
+    if (currentRoom !== IGNIVAR_RAID_ARENA_ID && !skipToBoss) {
       ctx.setDungeonDifficulty('normal', pid);
       if (!enterDungeon(ctx, IGNIVAR_RAID_ARENA_ID, pid, true)) return null;
       const result = setupIgnivarDevRaid(ctx, pid);
@@ -720,12 +733,28 @@ export function handleDevChat(
       for (const memberId of raid.members) {
         enterDungeon(ctx, IGNIVAR_FORGE_APPROACH_ID, memberId, true);
       }
+      const staged = stageIgnivarDevRaidAtApproach(ctx, pid);
+      if (!staged.ok) {
+        ctx.error(pid, `[dev] ${staged.message}`);
+        return null;
+      }
       emitDevLog(
         ctx,
         pid,
-        `[dev] Ignivar raid ready: ${result.allies} stationary, invulnerable allies entered the Halls of the First Tempering. Defeat all three automaton packs to open the Herald gate.`,
+        `[dev] Ignivar raid ready: ${result.allies} stationary, invulnerable allies entered the Halls of the First Tempering in a spread formation. Defeat all three automaton packs to open the Herald gate, then use /dev ignivarraid again in Ignivar's room to place the soak pods. Use /dev ignivarraid boss to skip there now.`,
       );
       return null;
+    }
+    if (currentRoom !== IGNIVAR_RAID_ARENA_ID) {
+      if (currentRoom === null) ctx.setDungeonDifficulty('normal', pid);
+      const travelRoster = ignivarDevRaidTravelRoster(ctx, pid);
+      if (!travelRoster.ok) {
+        ctx.error(pid, `[dev] ${travelRoster.message}`);
+        return null;
+      }
+      for (const memberId of travelRoster.memberIds) {
+        if (!enterDungeon(ctx, IGNIVAR_RAID_ARENA_ID, memberId, true)) return null;
+      }
     }
     const result = setupIgnivarDevRaid(ctx, pid);
     if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
@@ -815,7 +844,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev immortal, /dev ignivarraid, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev immortal, /dev ignivarraid [boss], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

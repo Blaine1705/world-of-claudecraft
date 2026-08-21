@@ -2,6 +2,7 @@
 // the single safe footprint come from the same pure geometry as the sim.
 
 import * as THREE from 'three';
+import { IGNIVAR_LAYOUT } from '../sim/dungeon_layout';
 import {
   IGNIVAR_JUDGMENT_ARENA_RADIUS,
   IGNIVAR_JUDGMENT_SHELTER_COUNT,
@@ -19,9 +20,14 @@ export const IGNIVAR_JUDGMENT_SHELTERS_NAME = 'ignivarForgeJudgmentShelters';
 export const IGNIVAR_JUDGMENT_SAFE_MARKER_NAME = 'ignivarForgeJudgmentSafeMarker';
 export const IGNIVAR_JUDGMENT_CUES_NAME = 'ignivarForgeJudgmentCues';
 export const IGNIVAR_JUDGMENT_DANGER_SCAR_NAME = 'ignivarForgeJudgmentDangerScar';
+export const IGNIVAR_JUDGMENT_WALL_CRACKS_NAME = 'ignivarForgeJudgmentWallCracks';
 
 const FIRE_SEGMENTS = 96;
 const CUE_BEAM_BASE_RANGE = 18.25;
+const WALL_CRACK_SEGMENTS = 8;
+// Shell edges are wall centrelines. Move past the one-yard half-thickness and
+// a small epsilon so both glow layers sit visibly in front of the inner face.
+const WALL_CRACK_INSET = 1.08;
 
 function additiveMaterial(color: number, opacity: number): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
@@ -266,6 +272,104 @@ function buildCue(index: number): THREE.Group {
   return cue;
 }
 
+function buildWallCracks(): THREE.Group {
+  const wallCracks = new THREE.Group();
+  wallCracks.name = IGNIVAR_JUDGMENT_WALL_CRACKS_NAME;
+  wallCracks.userData.gameplayGeometry = false;
+  wallCracks.userData.phase = 'hidden';
+
+  const points: THREE.Vector3[] = [];
+  const shell = IGNIVAR_LAYOUT.shellPolygon;
+  if (!shell || shell.length !== WALL_CRACK_SEGMENTS) {
+    throw new Error('Ignivar wall cracks require the canonical octagonal shell');
+  }
+  for (let wall = 0; wall < WALL_CRACK_SEGMENTS; wall++) {
+    const start = shell[wall];
+    const end = shell[(wall + 1) % shell.length];
+    const edgeLength = Math.hypot(end.x - start.x, end.z - start.z);
+    const tangentX = (end.x - start.x) / edgeLength;
+    const tangentZ = (end.z - start.z) / edgeLength;
+    // The canonical shell is counter-clockwise, so the left normal points
+    // into the room. The inset prevents z-fighting on every cardinal and
+    // diagonal wall instead of approximating the octagon with a circle.
+    const inwardX = -tangentZ;
+    const inwardZ = tangentX;
+    const wallX = (start.x + end.x) * 0.5 + inwardX * WALL_CRACK_INSET;
+    const wallZ = (start.z + end.z) * 0.5 + inwardZ * WALL_CRACK_INSET;
+    for (let crack = 0; crack < 5; crack++) {
+      const baseTangent = (crack - 2) * 2.15 + Math.sin(wall * 3.1 + crack) * 0.55;
+      let previousTangent = baseTangent;
+      let previousY = 0.35 + (crack % 2) * 0.35;
+      for (let branch = 1; branch <= 4; branch++) {
+        const nextTangent =
+          baseTangent + Math.sin(wall * 2.7 + crack * 4.3 + branch * 1.9) * (0.45 + branch * 0.18);
+        const nextY = previousY + 1.45 + ((wall + crack + branch) % 2) * 0.28;
+        points.push(
+          new THREE.Vector3(
+            wallX + tangentX * previousTangent,
+            previousY,
+            wallZ + tangentZ * previousTangent,
+          ),
+          new THREE.Vector3(wallX + tangentX * nextTangent, nextY, wallZ + tangentZ * nextTangent),
+        );
+        if (branch === 2 || branch === 3) {
+          const forkTangent = nextTangent + (branch === 2 ? -1.25 : 1.15);
+          points.push(
+            new THREE.Vector3(
+              wallX + tangentX * nextTangent,
+              nextY,
+              wallZ + tangentZ * nextTangent,
+            ),
+            new THREE.Vector3(
+              wallX + tangentX * forkTangent,
+              nextY + 0.75,
+              wallZ + tangentZ * forkTangent,
+            ),
+          );
+        }
+        previousTangent = nextTangent;
+        previousY = nextY;
+      }
+    }
+  }
+  const crackGeometry = new THREE.BufferGeometry().setFromPoints(points);
+  const haloMaterial = new THREE.LineBasicMaterial({
+    color: 0xe11c05,
+    transparent: true,
+    opacity: 0.3,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const coreMaterial = new THREE.LineBasicMaterial({
+    color: 0xff8a24,
+    transparent: true,
+    opacity: 0.72,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const halo = new THREE.LineSegments(crackGeometry, haloMaterial);
+  halo.name = 'ignivarForgeJudgmentWallCrackHalo';
+  halo.scale.set(1.002, 1, 1.002);
+  halo.renderOrder = 11;
+  const core = new THREE.LineSegments(crackGeometry, coreMaterial);
+  core.name = 'ignivarForgeJudgmentWallCrackCore';
+  core.renderOrder = 12;
+
+  wallCracks.add(halo, core);
+  wallCracks.userData.haloMaterial = haloMaterial;
+  wallCracks.userData.coreMaterial = coreMaterial;
+  return wallCracks;
+}
+
+function syncWallCracks(wallCracks: THREE.Object3D, phase: 'hidden' | 'warning' | 'active'): void {
+  wallCracks.visible = phase !== 'hidden';
+  wallCracks.userData.phase = phase;
+  if (phase === 'hidden') return;
+  const active = phase === 'active';
+  (wallCracks.userData.haloMaterial as THREE.Material).opacity = active ? 0.52 : 0.24;
+  (wallCracks.userData.coreMaterial as THREE.Material).opacity = active ? 0.94 : 0.58;
+}
+
 function buildFire(): THREE.Group {
   const fire = new THREE.Group();
   fire.name = IGNIVAR_JUDGMENT_FIRE_NAME;
@@ -374,7 +478,8 @@ export function buildIgnivarForgeJudgmentVisual(): THREE.Group {
     cues.add(buildCue(index));
   }
   const fire = buildFire();
-  root.add(warnings, cues, fire, shelters);
+  const wallCracks = buildWallCracks();
+  root.add(warnings, cues, fire, shelters, wallCracks);
   root.userData.ignivarJudgmentFire = fire;
   root.userData.ignivarSafeOffsetX = 0;
   root.userData.ignivarSafeOffsetZ = 0;
@@ -407,6 +512,7 @@ export function syncIgnivarForgeJudgmentVisual(
   const warnings = root.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME);
   const shelters = root.getObjectByName(IGNIVAR_JUDGMENT_SHELTERS_NAME);
   const cues = root.getObjectByName(IGNIVAR_JUDGMENT_CUES_NAME);
+  const wallCracks = root.getObjectByName(IGNIVAR_JUDGMENT_WALL_CRACKS_NAME);
   const offsets = ignivarForgeShelterOffsets(rotation);
   for (let index = 0; index < offsets.length; index++) {
     const warning = warnings?.children[index];
@@ -438,4 +544,5 @@ export function syncIgnivarForgeJudgmentVisual(
     root.userData.ignivarSafeOffsetZ = safe.z;
   }
   if (shelters) shelters.visible = phase === 'active';
+  if (wallCracks) syncWallCracks(wallCracks, phase);
 }

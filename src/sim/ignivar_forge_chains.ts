@@ -10,6 +10,7 @@ export const IGNIVAR_FORGE_CHAINS_BREAK_DISTANCE = 10;
 export const IGNIVAR_FORGE_CHAINS_PAIR_COUNT = 5;
 export const IGNIVAR_FORGE_CHAINS_ATTACH_GRACE_SECONDS = 2.5;
 export const IGNIVAR_FORGE_CHAINS_STRAIN_SECONDS = 0.75;
+export const IGNIVAR_FORGE_CHAINS_WARNING_DISTANCE = 8;
 
 export type IgnivarForgeChainsUpdate = 'idle' | 'active' | 'resolved';
 

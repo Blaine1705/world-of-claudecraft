@@ -13,15 +13,18 @@ import {
   IGNIVAR_JUDGMENT_SAFE_MARKER_NAME,
   IGNIVAR_JUDGMENT_SHELTERS_NAME,
   IGNIVAR_JUDGMENT_VISUAL_NAME,
+  IGNIVAR_JUDGMENT_WALL_CRACKS_NAME,
   IGNIVAR_JUDGMENT_WARNINGS_NAME,
   ignivarForgeGroundFireGlsl,
   ignivarForgeShelterClipGlsl,
   syncIgnivarForgeJudgmentVisual,
 } from '../src/render/ignivar_forge_judgment';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { IGNIVAR_LAYOUT } from '../src/sim/dungeon_layout';
 import {
   IGNIVAR_APOCALYPSE_HP_THRESHOLD,
   IGNIVAR_BRAND_AURA_ID,
+  IGNIVAR_BRAND_RADIUS,
   IGNIVAR_FINAL_FIRST_ROTATING_RAYS_SECONDS,
   IGNIVAR_FINAL_FRONTAL_EVERY,
   IGNIVAR_FINAL_METEOR_EVERY,
@@ -36,6 +39,7 @@ import {
   IGNIVAR_SKYFIRE_CAST_ID,
   updateIgnivarEncounter,
 } from '../src/sim/encounters/ignivar';
+import { polygonContainsPoint } from '../src/sim/geometry2d';
 import { IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../src/sim/ignivar_arena';
 import {
   IGNIVAR_JUDGMENT_ACTIVE_SECONDS,
@@ -175,6 +179,19 @@ function finaleTrace(seed: number) {
     }
   }
   return { casts, meteors };
+}
+
+function distanceToSegment(
+  x: number,
+  z: number,
+  start: { x: number; z: number },
+  end: { x: number; z: number },
+): number {
+  const dx = end.x - start.x;
+  const dz = end.z - start.z;
+  const lengthSq = dx * dx + dz * dz;
+  const t = Math.max(0, Math.min(1, ((x - start.x) * dx + (z - start.z) * dz) / lengthSq));
+  return Math.hypot(x - (start.x + dx * t), z - (start.z + dz * t));
 }
 
 describe('Ignivar Forge Judgment', () => {
@@ -465,6 +482,65 @@ describe('Ignivar Forge Judgment', () => {
     expect(boss.ignivar.forgeJudgmentPhase).toBe('done');
     expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
     expect(brandedAlly.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
+  });
+
+  it('keeps Heroic Brand proximity local inside the Judgment safe refuge', () => {
+    const { sim, boss } = claimedEncounter(7320, 'heroic');
+    const closeAlly = addEncounterPlayer(sim, boss, 'Close Safe Ally');
+    const farAlly = addEncounterPlayer(sim, boss, 'Far Safe Ally');
+    applyBrand(sim.player, boss);
+    boss.hp = Math.floor(boss.maxHp * IGNIVAR_JUDGMENT_HP_THRESHOLD);
+    updateIgnivarEncounter(sim.ctx, boss);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('warning');
+
+    const origin = instanceOrigin(
+      DUNGEONS.ignivar_raid_arena.index,
+      sim.instances.find((entry) => entry.dungeonId === 'ignivar_raid_arena')?.slot ?? 0,
+    );
+    const safe = ignivarForgeShelterPoints(origin, boss.ignivar.forgeJudgmentRotation)[
+      boss.ignivar.forgeJudgmentSafeIndex
+    ];
+    sim.player.pos = { x: safe.x, y: boss.pos.y, z: safe.z };
+    sim.player.prevPos = { ...sim.player.pos };
+    closeAlly.pos = { x: safe.x + 3, y: boss.pos.y, z: safe.z };
+    closeAlly.prevPos = { ...closeAlly.pos };
+    farAlly.pos = { x: safe.x - 5, y: boss.pos.y, z: safe.z };
+    farAlly.prevPos = { ...farAlly.pos };
+    expect(
+      Math.hypot(closeAlly.pos.x - sim.player.pos.x, closeAlly.pos.z - sim.player.pos.z),
+    ).toBeLessThan(IGNIVAR_BRAND_RADIUS);
+    expect(
+      Math.hypot(farAlly.pos.x - sim.player.pos.x, farAlly.pos.z - sim.player.pos.z),
+    ).toBeGreaterThan(IGNIVAR_BRAND_RADIUS);
+    boss.ignivar.overlapTimer = 0;
+    boss.ignivar.forgeJudgmentPulseTimer = 0;
+    const carrierHp = sim.player.hp;
+    const closeHp = closeAlly.hp;
+    const farHp = farAlly.hp;
+
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(sim.player.hp).toBe(carrierHp - Math.ceil(sim.player.maxHp * 0.06));
+    expect(closeAlly.hp).toBe(closeHp - Math.ceil(closeAlly.maxHp * 0.06));
+    expect(farAlly.hp).toBe(farHp);
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('warning');
+
+    const hpAfterFirstPulse = closeAlly.hp;
+    for (let tick = 0; tick < 1 / DT - 1; tick++) updateIgnivarEncounter(sim.ctx, boss);
+    expect(closeAlly.hp).toBe(hpAfterFirstPulse);
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(closeAlly.hp).toBe(hpAfterFirstPulse - Math.ceil(closeAlly.maxHp * 0.06));
+    expect(farAlly.hp).toBe(farHp);
+
+    boss.ignivar.forgeJudgmentRemaining = IGNIVAR_JUDGMENT_ACTIVE_SECONDS + DT;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('active');
+    boss.ignivar.overlapTimer = 0;
+    const activeHp = closeAlly.hp;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(closeAlly.hp).toBe(activeHp - Math.ceil(closeAlly.maxHp * 0.06));
+    expect(farAlly.hp).toBe(farHp);
   });
 
   it('draws the random layout deterministically from the encounter RNG', () => {
@@ -780,6 +856,36 @@ describe('Ignivar Forge Judgment', () => {
     expect(visual.name).toBe(IGNIVAR_JUDGMENT_VISUAL_NAME);
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME)?.children).toHaveLength(3);
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_SHELTERS_NAME)?.children).toHaveLength(3);
+    const wallCracks = visual.getObjectByName(IGNIVAR_JUDGMENT_WALL_CRACKS_NAME);
+    if (!wallCracks) throw new Error('Judgment wall cracks were not built');
+    expect(wallCracks.children).toHaveLength(2);
+    expect(wallCracks.children.every((child) => child instanceof THREE.LineSegments)).toBe(true);
+    expect(wallCracks.children.some((child) => child instanceof THREE.Mesh)).toBe(false);
+    expect(wallCracks.userData.gameplayGeometry).toBe(false);
+    const crackGeometry = (wallCracks.children[0] as THREE.LineSegments).geometry;
+    const crackPositions = crackGeometry.getAttribute('position');
+    expect(crackPositions.count).toBeGreaterThan(100);
+    const shell = IGNIVAR_LAYOUT.shellPolygon;
+    if (!shell) throw new Error('Ignivar shell polygon is missing');
+    for (let index = 0; index < crackPositions.count; index++) {
+      const x = crackPositions.getX(index);
+      const z = crackPositions.getZ(index);
+      expect(crackPositions.getY(index)).toBeGreaterThanOrEqual(0.349);
+      expect(polygonContainsPoint(shell, x, z)).toBe(true);
+      expect(
+        Math.min(
+          ...shell.map((start, edge) =>
+            distanceToSegment(x, z, start, shell[(edge + 1) % shell.length]),
+          ),
+        ),
+      ).toBeCloseTo(1.08, 4);
+    }
+    for (const line of wallCracks.children) {
+      const material = (line as THREE.LineSegments).material as THREE.LineBasicMaterial;
+      expect(material.userData.ignivarFireTime).toBeUndefined();
+      expect(material.blending).toBe(THREE.AdditiveBlending);
+      expect(material.toneMapped).toBe(true);
+    }
     syncIgnivarForgeJudgmentVisual(
       visual,
       warning.judgmentPhase,
@@ -791,6 +897,11 @@ describe('Ignivar Forge Judgment', () => {
     );
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME)?.visible).toBe(true);
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_SHELTERS_NAME)?.visible).toBe(false);
+    expect(wallCracks?.visible).toBe(true);
+    expect(wallCracks?.userData.phase).toBe('warning');
+    const warningWallOpacity = (
+      (wallCracks.children[1] as THREE.LineSegments).material as THREE.LineBasicMaterial
+    ).opacity;
     const warningGroups = visual.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME)?.children ?? [];
     expect(
       warningGroups.map((group) =>
@@ -855,6 +966,11 @@ describe('Ignivar Forge Judgment', () => {
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_WARNINGS_NAME)?.visible).toBe(false);
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_SHELTERS_NAME)?.visible).toBe(true);
     expect(visual.getObjectByName(IGNIVAR_JUDGMENT_FIRE_NAME)?.visible).toBe(true);
+    expect(wallCracks?.visible).toBe(true);
+    expect(wallCracks?.userData.phase).toBe('active');
+    expect(
+      ((wallCracks.children[1] as THREE.LineSegments).material as THREE.LineBasicMaterial).opacity,
+    ).toBeGreaterThan(warningWallOpacity);
     const surface = visual.getObjectByName('ignivarForgeJudgmentFireSurface') as THREE.Mesh;
     const boundary = visual.getObjectByName('ignivarForgeJudgmentFireBoundary') as THREE.Mesh;
     expect((surface.material as THREE.Material).userData.ignivarShelterClip).toBe(true);

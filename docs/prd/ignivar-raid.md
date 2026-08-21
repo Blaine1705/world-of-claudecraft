@@ -108,12 +108,19 @@ Rain of Cinders damage.
 
 Falling Cinders runs independently of Ignivar's cast queue. Its first pattern
 starts after 13 seconds and subsequent patterns begin every 17 seconds, including
-while another mechanic is being cast. Five deterministic random impact points
-appear as clean red circles for 2.5 seconds. For the first 0.75 seconds only the
-circles are visible, then molten meteors descend from the sky and land exactly
-when the warning expires. A player inside an impact circle takes 35% maximum
-health as fire damage. The points stay inside the arena and are separated enough
-that their damage areas cannot overlap.
+while another mechanic is being cast. Normal selects up to five distinct player
+positions; Heroic selects up to seven. Both avoid the current tank when the raid
+has enough alternatives. The selected positions are frozen when the warning begins,
+so the circles never follow their targets. Stacked selections fan outward
+deterministically to keep the pattern readable: Normal uses at least six yards of
+separation within 25 yards of the arena center, while Heroic uses eight yards
+within 27 yards. Any remaining points in a short-handed group fill the same
+deterministic spread.
+
+The impact points appear as clean red circles for 2.5 seconds. For the first
+0.75 seconds only the circles are visible, then molten meteors descend from the
+sky and land exactly when the warning expires. A player inside an impact circle
+takes 35% maximum health as fire damage.
 
 ## Revolving Inferno
 
@@ -122,7 +129,8 @@ Ignivar projects three narrow rays at equal angles for a two-second stationary
 warning, then rotates them for eight seconds at 18 degrees per second, completing
 144 degrees during the active window. The direction alternates between clockwise
 and counterclockwise on successive casts. Each ray retains its exact floor lane
-and adds a white-hot core, turbulent orange fire, and ember trail. Players move
+and adds a white-hot core, turbulent orange fire, an incandescent blade head,
+and an ember trail. Players move
 through the three safe gaps as the pattern turns. A ray crossing pulses every
 half second for 20% maximum health as fire damage, making a brief mistake
 recoverable while repeated contact remains lethal.
@@ -161,10 +169,12 @@ the Pyre carrier when an unbranded non-tank is available.
 
 Ignivar uses Forge Strike every 14 seconds while its target is in melee range.
 The strike deals 35% maximum health as fire damage, then applies one stack of
-Molten Armor for 30 seconds. Each stack increases all damage received by 35%,
+Molten Armor for 26 seconds. Each stack increases all damage received by 35%,
 including the next Forge Strike and Ignivar's melee swings. The intended Normal
-response is to swap tanks at two stacks. Conduit water only removes Brand of the
-Pyre and never removes Molten Armor.
+response is to swap tanks at two stacks. With a 14-second strike cadence, the
+first tank's mark expires before the complete two-strike rotation returns to
+them. Conduit water only removes Brand of the Pyre and never removes Molten
+Armor.
 
 ## Apocalypse add
 
@@ -197,11 +207,30 @@ refuge during the warning. For the remaining eight seconds, fire covers the whol
 arena and pulses for 12% maximum health every 0.5 seconds everywhere except the
 single 5.5-yard safe footprint. The two decoy shelters offer no protection.
 On Normal, entering the intermission extinguishes every existing Brand of the
-Pyre. On Heroic, every Brand persists for the full intermission. The water
-conduits remain frozen in their current state on both difficulties. No rotating
-rays or other boss mechanics run during the intermission. All three shelters
+Pyre. On Heroic, every Brand persists for the full intermission and continues its
+ordinary six-percent proximity pulse every second within 4.5 yards. A branded
+player who enters the shared refuge beside other players therefore damages only
+those nearby players; Judgment does not add a separate raid-wide Brand hit. The
+water conduits remain frozen in their current state on both difficulties. No
+rotating rays or other boss mechanics run during the intermission. Red-hot wall
+fissures intensify around the arena perimeter as non-actionable ambience while
+the established floor and shelter geometry remain unchanged. All three shelters
 shatter with heavy fire releases when it ends, then regular mechanics resume
 after a short recovery window.
+
+## Heroic Chains of the Forge
+
+At 18 seconds and every 32 seconds thereafter, Ignivar links the raid into as
+many as five proximity pairs for eight seconds. The links have a 2.5-second
+attachment grace period. After that grace, a chain begins flashing and gains
+endpoint warning flares at eight yards. Reaching ten yards strains the chain;
+remaining at that distance for 0.75 seconds severs it and executes both linked
+players. Returning inside ten yards clears the accumulated strain.
+
+An unrelated player who moves through a live chain is executed and that pair's
+chain immediately breaks; the linked players survive that crossing. The chain
+warning, dangerous distance, and crossing rule are identical at every graphics
+tier.
 
 Two simultaneous adds are a Heroic candidate, not a Normal requirement. The party
 split and DPS check must be tested with the intended 2-2-6 composition before that

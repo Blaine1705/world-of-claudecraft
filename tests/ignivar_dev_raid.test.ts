@@ -373,7 +373,8 @@ describe('/dev ignivarraid', () => {
   it('enters the Normal forge approach with a full practice raid from the open world', () => {
     const sim = devSim();
     sim.chat('/dev ignivarraid');
-    expect(ignivarBots(sim)).toHaveLength(9);
+    const bots = ignivarBots(sim);
+    expect(bots).toHaveLength(9);
     expect(sim.partyOf(sim.playerId)).toMatchObject({ raid: true, leader: sim.playerId });
     expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_FORGE_APPROACH_ID);
     expect(sim.dungeonDifficulty()).toBe('normal');
@@ -388,6 +389,188 @@ describe('/dev ignivarraid', () => {
         (instance) => instance.dungeonId === IGNIVAR_RAID_ARENA_ID && instance.partyKey !== null,
       ),
     ).toBeDefined();
+    const botEntities = bots.map((meta) => sim.entities.get(meta.entityId));
+    const stagedPositions = botEntities.map((bot) => (bot ? { ...bot.pos } : null));
+    expect(
+      botEntities
+        .map((bot) => (bot ? [bot.pos.x - sim.player.pos.x, bot.pos.z - sim.player.pos.z] : null))
+        .sort(
+          (first, second) =>
+            (first?.[1] ?? 0) - (second?.[1] ?? 0) || (first?.[0] ?? 0) - (second?.[0] ?? 0),
+        ),
+    ).toEqual([
+      [-8, 5],
+      [0, 5],
+      [8, 5],
+      [-8, 9],
+      [0, 9],
+      [8, 9],
+      [-8, 13],
+      [0, 13],
+      [8, 13],
+    ]);
+    expect(
+      new Set(
+        botEntities.map((bot) => (bot ? `${bot.pos.x.toFixed(3)}:${bot.pos.z.toFixed(3)}` : '')),
+      ).size,
+    ).toBe(9);
+    for (const bot of botEntities) {
+      expect(bot).toBeDefined();
+      if (!bot) continue;
+      expect(sim.instanceInfoAt(bot.pos)?.dungeonId).toBe(IGNIVAR_FORGE_APPROACH_ID);
+      expect(dist2d(sim.player.pos, bot.pos)).toBeGreaterThan(4);
+    }
+    const approachMobs = [...sim.entities.values()].filter(
+      (entity) =>
+        entity.kind === 'mob' &&
+        sim.instanceInfoAt(entity.pos)?.dungeonId === IGNIVAR_FORGE_APPROACH_ID,
+    );
+    expect(approachMobs.length).toBeGreaterThan(0);
+    sim.tick();
+    expect(approachMobs.every((mob) => !mob.inCombat && mob.aiState === 'idle')).toBe(true);
+
+    sim.player.pos.z += 20;
+    sim.player.prevPos = { ...sim.player.pos };
+    for (const bot of botEntities) {
+      if (!bot) continue;
+      bot.pos.x += 30;
+      bot.pos.z -= 25;
+      bot.prevPos = { ...bot.pos };
+    }
+    sim.chat('/dev ignivarraid');
+    expect(botEntities.map((bot) => (bot ? bot.pos : null))).toEqual(stagedPositions);
+  });
+
+  it('reuses the staged approach roster when skipping to the boss', () => {
+    const sim = devSim();
+    sim.chat('/dev ignivarraid');
+    const before = ignivarBots(sim).map((meta) => meta.entityId);
+
+    sim.chat('/dev ignivarraid boss');
+
+    expect(ignivarBots(sim).map((meta) => meta.entityId)).toEqual(before);
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(sim.partyOf(sim.player.id)?.members).toHaveLength(10);
+    for (const botId of before) {
+      const bot = sim.entities.get(botId);
+      expect(sim.instanceInfoAt(bot?.pos ?? sim.player.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+      expect(dist2d(sim.player.pos, bot?.pos ?? sim.player.pos)).toBeGreaterThan(
+        IGNIVAR_BRAND_RADIUS,
+      );
+    }
+  });
+
+  it('does not let a nonleader shortcut move a human party', () => {
+    const sim = devSim();
+    const memberPid = sim.addPlayer('rogue', 'Human Party Member');
+    const member = sim.entities.get(memberPid);
+    if (!member) throw new Error('Human party member did not spawn');
+    const party = sim.ctx.formDungeonFinderGroup(
+      [sim.player.id, memberPid].map((pid) => ({
+        partyId: null,
+        leaderPid: pid,
+        members: [pid],
+      })),
+      { raid: false },
+    );
+    if (!party) throw new Error('Human party did not form');
+    const playerBefore = { ...sim.player.pos };
+    const memberBefore = { ...member.pos };
+    const claimsBefore = sim.instances.filter((instance) => instance.partyKey !== null).length;
+
+    sim.chat('/dev ignivarraid boss', memberPid);
+
+    expect(sim.player.pos).toEqual(playerBefore);
+    expect(member.pos).toEqual(memberBefore);
+    expect(sim.partyOf(memberPid)).toBe(party);
+    expect(sim.instances.filter((instance) => instance.partyKey !== null)).toHaveLength(
+      claimsBefore,
+    );
+    expect(ignivarBots(sim)).toHaveLength(0);
+  });
+
+  it('does not let a human raid leader move an adulterated ten-player roster', () => {
+    const sim = devSim();
+    const humanPid = sim.addPlayer('mage', 'Human Raider');
+    const botPids = Array.from({ length: 8 }, (_, index) => {
+      const pod = Math.floor(index / 3) + 1;
+      const member = (index % 3) + 1;
+      return sim.ctx.spawnDevBot(`IgnivarG${pod}Bot${member}`);
+    });
+    expect(botPids.every((pid) => pid >= 0)).toBe(true);
+    const members = [sim.player.id, ...botPids, humanPid];
+    const party = sim.ctx.formDungeonFinderGroup(
+      members.map((pid) => ({ partyId: null, leaderPid: pid, members: [pid] })),
+      { raid: true },
+    );
+    if (!party) throw new Error('Adulterated raid did not form');
+    expect(party.leader).toBe(sim.player.id);
+    const before = new Map(
+      members.map((pid) => {
+        const entity = sim.entities.get(pid);
+        if (!entity) throw new Error(`Missing raid member ${pid}`);
+        return [pid, { ...entity.pos }] as const;
+      }),
+    );
+    const claimsBefore = sim.instances.filter((instance) => instance.partyKey !== null).length;
+
+    sim.chat('/dev ignivarraid boss');
+
+    for (const [pid, pos] of before) expect(sim.entities.get(pid)?.pos).toEqual(pos);
+    expect(sim.partyOf(sim.player.id)).toBe(party);
+    expect(sim.instances.filter((instance) => instance.partyKey !== null)).toHaveLength(
+      claimsBefore,
+    );
+    expect(ignivarBots(sim)).toHaveLength(8);
+  });
+
+  it('rejects an exact-size dev raid containing a bot outside the Ignivar allowlist', () => {
+    const sim = devSim();
+    const expectedBotPids = Array.from({ length: 8 }, (_, index) => {
+      const pod = Math.floor(index / 3) + 1;
+      const member = (index % 3) + 1;
+      return sim.ctx.spawnDevBot(`IgnivarG${pod}Bot${member}`);
+    });
+    const foreignBotPid = sim.ctx.spawnDevBot('ForeignPracticeBot');
+    const members = [sim.player.id, ...expectedBotPids, foreignBotPid];
+    expect(members).toHaveLength(10);
+    const party = sim.ctx.formDungeonFinderGroup(
+      members.map((pid) => ({ partyId: null, leaderPid: pid, members: [pid] })),
+      { raid: true },
+    );
+    if (!party) throw new Error('Foreign-bot raid did not form');
+    const before = new Map(
+      members.map((pid) => {
+        const entity = sim.entities.get(pid);
+        if (!entity) throw new Error(`Missing raid member ${pid}`);
+        return [pid, { ...entity.pos }] as const;
+      }),
+    );
+    const claimsBefore = sim.instances.filter((instance) => instance.partyKey !== null).length;
+
+    sim.chat('/dev ignivarraid boss');
+
+    for (const [pid, pos] of before) expect(sim.entities.get(pid)?.pos).toEqual(pos);
+    expect(sim.partyOf(sim.player.id)).toBe(party);
+    expect(sim.instances.filter((instance) => instance.partyKey !== null)).toHaveLength(
+      claimsBefore,
+    );
+  });
+
+  it('can skip the approach and place the full raid in boss soak pods', () => {
+    const sim = devSim();
+
+    sim.chat('/dev ignivarraid boss');
+
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    const bots = ignivarBots(sim).map((meta) => sim.entities.get(meta.entityId));
+    expect(bots).toHaveLength(9);
+    for (const bot of bots) {
+      expect(bot).toBeDefined();
+      if (!bot) continue;
+      expect(sim.instanceInfoAt(bot.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+      expect(dist2d(sim.player.pos, bot.pos)).toBeGreaterThan(IGNIVAR_BRAND_RADIUS);
+    }
   });
 
   it('is gated when dev commands are disabled', () => {

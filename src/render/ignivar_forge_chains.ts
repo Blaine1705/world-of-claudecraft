@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import {
+  IGNIVAR_FORGE_CHAINS_ATTACH_GRACE_SECONDS,
   IGNIVAR_FORGE_CHAINS_AURA_ID,
   IGNIVAR_FORGE_CHAINS_BREAK_DISTANCE,
+  IGNIVAR_FORGE_CHAINS_WARNING_DISTANCE,
 } from '../sim/ignivar_forge_chains';
 
 export const IGNIVAR_FORGE_CHAIN_VISUAL_NAME = 'ignivarForgeChain';
@@ -17,7 +19,8 @@ export interface IgnivarForgeChainVisualEntity {
   id: number;
   kind: string;
   scale?: number;
-  auras: readonly { id: string; value2?: number }[];
+  pos?: { x: number; y: number; z: number };
+  auras: readonly { id: string; value2?: number; remaining?: number; duration?: number }[];
 }
 
 export interface IgnivarForgeChainVisualView {
@@ -79,10 +82,21 @@ export function buildIgnivarForgeChainVisual(): THREE.Group {
     root.add(flame);
   }
 
+  const warningAnchorMaterial = hdrMaterial(5.4, 0.24, 0.012, 0.86);
+  const warningAnchorGeometry = new THREE.SphereGeometry(0.34, 10, 7);
+  for (let index = 0; index < 2; index++) {
+    const anchor = new THREE.Mesh(warningAnchorGeometry, warningAnchorMaterial);
+    anchor.userData.forgeChainWarningAnchor = true;
+    anchor.userData.chainWarningAnchorIndex = index;
+    anchor.visible = false;
+    root.add(anchor);
+  }
+
   root.userData.outerBeam = outerBeam;
   root.userData.coreBeam = coreBeam;
   root.userData.linkMaterial = linkMaterial;
   root.userData.flameMaterial = flameMaterial;
+  root.userData.warningAnchorMaterial = warningAnchorMaterial;
   root.userData.animationTime = 0;
   root.visible = false;
   return root;
@@ -137,7 +151,15 @@ export function syncIgnivarForgeChainVisual(
   const sin = Math.sin(owner.rotation.y);
   direction.set(cos * dx - sin * dz, partnerPosition.y - owner.position.y, sin * dx + cos * dz);
   const length = direction.length();
-  const horizontalLength = Math.hypot(dx, dz);
+  const authoritativePartner = entities?.get(partnerId)?.pos;
+  const authoritativeOwner = entity.pos;
+  const horizontalLength =
+    authoritativeOwner && authoritativePartner
+      ? Math.hypot(
+          authoritativePartner.x - authoritativeOwner.x,
+          authoritativePartner.z - authoritativeOwner.z,
+        )
+      : Math.hypot(dx, dz);
   if (length <= 0.01) {
     root.visible = false;
     return;
@@ -151,7 +173,14 @@ export function syncIgnivarForgeChainVisual(
   // Damage authority intentionally ignores vertical movement. Keep the full 3D
   // length for beam placement, but never turn a safe horizontal tether red just
   // because one endpoint is jumping or standing on uneven presentation terrain.
-  const strained = horizontalLength >= IGNIVAR_FORGE_CHAINS_BREAK_DISTANCE;
+  const elapsed =
+    aura.duration !== undefined && aura.remaining !== undefined
+      ? Math.max(0, aura.duration - aura.remaining)
+      : IGNIVAR_FORGE_CHAINS_ATTACH_GRACE_SECONDS;
+  const graceComplete = elapsed + 1e-6 >= IGNIVAR_FORGE_CHAINS_ATTACH_GRACE_SECONDS;
+  const strained = graceComplete && horizontalLength >= IGNIVAR_FORGE_CHAINS_BREAK_DISTANCE;
+  const warning = graceComplete && horizontalLength >= IGNIVAR_FORGE_CHAINS_WARNING_DISTANCE;
+  root.userData.warning = warning;
   root.userData.strained = strained;
 
   const animationTime = Number(root.userData.animationTime ?? 0) + Math.max(0, dt);
@@ -159,17 +188,34 @@ export function syncIgnivarForgeChainVisual(
   const motionTime = reducedMotion ? 0 : animationTime;
   const pulse = reducedMotion
     ? 0.88
-    : 0.88 + Math.sin(motionTime * (strained ? 22 : 11) + entity.id) * 0.12;
+    : 0.88 + Math.sin(motionTime * (strained ? 22 : warning ? 17 : 11) + entity.id) * 0.12;
   const outerBeam = root.userData.outerBeam as THREE.Mesh;
   const coreBeam = root.userData.coreBeam as THREE.Mesh;
   const outerMaterial = outerBeam.material as THREE.MeshBasicMaterial;
   const coreMaterial = coreBeam.material as THREE.MeshBasicMaterial;
   const linkMaterial = root.userData.linkMaterial as THREE.MeshBasicMaterial;
   const flameMaterial = root.userData.flameMaterial as THREE.MeshBasicMaterial;
-  outerMaterial.color.setRGB(strained ? 5.4 : 2.7, strained ? 0.035 : 0.12, 0.008);
-  coreMaterial.color.setRGB(strained ? 6.8 : 4.5, strained ? 0.38 : 0.9, 0.08);
-  linkMaterial.color.setRGB(strained ? 5.8 : 3.3, strained ? 0.12 : 0.38, 0.025);
-  flameMaterial.color.setRGB(strained ? 6.2 : 4.2, strained ? 0.2 : 0.48, 0.018);
+  const warningAnchorMaterial = root.userData.warningAnchorMaterial as THREE.MeshBasicMaterial;
+  outerMaterial.color.setRGB(
+    strained ? 5.4 : warning ? 4.1 : 2.7,
+    strained ? 0.035 : warning ? 0.08 : 0.12,
+    0.008,
+  );
+  coreMaterial.color.setRGB(
+    strained ? 6.8 : warning ? 5.8 : 4.5,
+    strained ? 0.38 : warning ? 0.62 : 0.9,
+    0.08,
+  );
+  linkMaterial.color.setRGB(
+    strained ? 5.8 : warning ? 4.7 : 3.3,
+    strained ? 0.12 : warning ? 0.22 : 0.38,
+    0.025,
+  );
+  flameMaterial.color.setRGB(
+    strained ? 6.2 : warning ? 5.2 : 4.2,
+    strained ? 0.2 : warning ? 0.32 : 0.48,
+    0.018,
+  );
   outerBeam.position.z = length * 0.5;
   outerBeam.scale.set(1 + pulse * 0.16, length, 1 + pulse * 0.16);
   coreBeam.position.z = length * 0.5;
@@ -217,4 +263,16 @@ export function syncIgnivarForgeChainVisual(
     flameIndex++;
   }
   flameMaterial.opacity = (strained ? 0.62 : 0.5) + pulse * 0.18;
+
+  for (const child of root.children) {
+    if (child.userData.forgeChainWarningAnchor !== true) continue;
+    const anchorIndex = Number(child.userData.chainWarningAnchorIndex ?? 0);
+    child.visible = warning;
+    child.position.set(0, 0, anchorIndex === 0 ? 0 : length);
+    child.scale.setScalar((strained ? 1.25 : 1) * (0.82 + pulse * 0.25));
+  }
+  warningAnchorMaterial.color.setRGB(strained ? 7.2 : 5.4, strained ? 0.08 : 0.24, 0.012);
+  warningAnchorMaterial.opacity = warning
+    ? Math.min(1, (strained ? 0.96 : 0.72) + pulse * 0.12)
+    : 0;
 }
