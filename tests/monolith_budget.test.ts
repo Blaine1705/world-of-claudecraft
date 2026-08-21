@@ -226,7 +226,17 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    ceiling: 13546,
+    // Re-pinned 13546 -> 13561 (+15) when the fast-loading-screen-variety branch
+    // rebased from release/v0.36.0 onto release/v0.40.0, which had pinned this
+    // row at its exact size (zero slack), so any branch addition arrives red.
+    // The branch's additions here are thin-consumer wiring to extracted seams:
+    // the onCharacterAssetReady subscription plus its handler, which only
+    // enqueues a re-apply for views whose weapon skin GLB just landed. The
+    // substance lives in src/render/characters/assets.ts (the ready registry)
+    // and src/render/characters/visual.ts (refreshWeaponSkin), so no clean
+    // branch-owned extraction remains. Maintainer decision, exact merged count:
+    // any further growth reds again.
+    ceiling: 13561,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -241,7 +251,16 @@ const MONOLITHS: MonolithRow[] = [
     // cover joining it) net against the base's pad-selection extraction plus
     // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
     // landing below both parents' pins. Any further growth reds again.
-    ceiling: 11516,
+    // Re-pinned 11516 -> 11522 (+6) for the fast-loading-screen-variety rebase
+    // onto release/v0.40.0, whose pin above is this file's exact size (zero
+    // slack). The branch is net-extractive here: it MOVES the eager mob-body
+    // stream, far-vista settle and background preload lane out of the entry
+    // path into src/game/post_entry_warmups_core.ts, and the backdrop rotation
+    // into src/ui/loading_backdrop.ts. What is left in main.ts is the call
+    // wiring for both (the controller construction and the runPostEntryWarmups
+    // options object), which is the firewall's job. Maintainer decision, exact
+    // merged count: any further growth reds again.
+    ceiling: 11522,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

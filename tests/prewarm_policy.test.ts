@@ -81,7 +81,7 @@ it('pins the production soft, compile, hard, and view budgets plus their policy 
     'constrainedCompileMaxMs: PREWARM_COMPILE_MAX_MS_CONSTRAINED,',
     'maxViewsLow: VIEW_PREWARM_MAX_VIEWS_LOW,',
     'maxViewsHigh: VIEW_PREWARM_MAX_VIEWS_HIGH,',
-    '? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED\n      : VIEW_PREWARM_HARD_MAX_MS;',
+    '? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED\n      : (pacing.knobs.hardMaxMs ?? VIEW_PREWARM_HARD_MAX_MS);',
     'const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);',
     'const hardMaxMs = Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);',
   ]) {
