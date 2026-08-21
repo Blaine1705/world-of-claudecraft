@@ -1603,10 +1603,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // corpse harvest claim (single-use, first-come): the online corpse picker
   // must stop offering a corpse another player already harvested
   if (e.harvestClaimedBy !== null) out.hcb = e.harvestClaimedBy;
-  // loot owner-lock lapse (FFA): the online corpse picker must offer a
-  // stranger's aged-out corpse again for a deliberate manual loot, the same
-  // reliability contract hcb gives harvest claims. Flips once per corpse, so
-  // the per-entity dyn cache re-serializes exactly one changed record.
+  // loot owner-lock lapse (FFA): the online corpse picker must offer it again.
   if (e.kind === 'mob' && e.lootable && !decayedCorpse && lootHasGoneFfa(e.lootFfaTimer))
     out.ffa = 1;
   if (decayedCorpse) out.cd = 1; // corpse decayed
@@ -1624,9 +1621,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     if (e.petAutoSkill) out.px = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
-  // Remote Paladins need the compact active-charge count so every client can
-  // render Ascension's orbiting seals. Self snapshots additionally carry pdev
-  // with the exact Devotion value and remaining duration for the local HUD.
+  // Remote Paladins need the compact active-charge count for Ascension seals.
   if (e.kind === 'player' && e.templateId === 'paladin') {
     // Omit-when-default like the fields above (review 3050): the idle 0 was
     // serialized into every snapshot for every remote paladin.
