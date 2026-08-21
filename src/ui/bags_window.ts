@@ -292,6 +292,12 @@ export class BagsWindow {
   // a window shown without a paint would always converge on the first probe.
   private lastMoneyCopper = -1;
 
+  // Set when render() or refreshGrid() skipped a rebuild because a bag row was
+  // mid-drag (see render()'s own comment). Flushed by flushDeferredRender(),
+  // called from the dragged row's own end-of-drag handlers once the drag
+  // concludes.
+  private renderDeferredForDrag = false;
+
   // Bag hover/focus -> quest-tracker title highlight. One active row at a time;
   // cleared on leave/focusout, programmatic tooltip hide, rebuild, and close so
   // a stale class never sticks after the cell is torn down.
@@ -407,6 +413,17 @@ export class BagsWindow {
   }
 
   render(): void {
+    // A native drag's source row dies with the rest of the grid on an innerHTML
+    // rebuild, and a browser never fires dragend on a row that already left the
+    // document: ItemDragState (and the hotbar-eligible dragAction it feeds) would
+    // then stay stuck on the stale drag for the rest of the session, silently
+    // failing every later drop on the action bar or a bag cell. Defer the rebuild
+    // instead of tearing the dragged row out from under it; the row's own dragend
+    // (or the touch drag's onEnd) flushes it once the drag actually concludes.
+    if (this.deps.dragState.get()) {
+      this.renderDeferredForDrag = true;
+      return;
+    }
     // Rebuild tears down hovered cells without mouseleave; drop any tracker glow.
     this.clearTrackerHighlight();
     const el = this.deps.root();
@@ -489,6 +506,18 @@ export class BagsWindow {
       }
       this.close();
     });
+  }
+
+  /** Catch up a rebuild render() or refreshGrid() deferred (see render()'s own
+   *  comment) because a bag row was mid-drag. Called from that row's own
+   *  end-of-drag handlers: native dragend, or the touch drag's onEnd. By the
+   *  time either fires, ItemDragState has already cleared (the ordinary
+   *  dragend/onEnd teardown runs first), so this only needs to check the latch,
+   *  not the live drag state again. */
+  private flushDeferredRender(): void {
+    if (!this.renderDeferredForDrag) return;
+    this.renderDeferredForDrag = false;
+    this.render();
   }
 
   // The classic bag bar: the implicit backpack, the 4 equip sockets, and the
@@ -1038,6 +1067,7 @@ export class BagsWindow {
         this.deps.setDragAction(null);
         this.deps.clearActionDropTargets();
         this.deps.markEquipDropTargets(null);
+        this.flushDeferredRender();
       });
       // A fresh press clears any stale suppression: the flag is only ever meant to
       // swallow the ONE synthetic click that trails the drag it was set by, so a drag
@@ -1090,6 +1120,7 @@ export class BagsWindow {
         },
         onEnd: () => {
           this.deps.markEquipDropTargets(null);
+          this.flushDeferredRender();
         },
       });
       this.attachRowTooltip(row, item, s);
@@ -1275,6 +1306,7 @@ export class BagsWindow {
       this.deps.dragState.end();
       this.deps.clearActionDropTargets();
       this.deps.markEquipDropTargets(null);
+      this.flushDeferredRender();
     });
     bindTouchItemDrag(row, {
       state: this.deps.dragState,
@@ -1309,6 +1341,7 @@ export class BagsWindow {
       },
       onEnd: () => {
         this.deps.markEquipDropTargets(null);
+        this.flushDeferredRender();
       },
     });
     return row;
@@ -1594,6 +1627,13 @@ export class BagsWindow {
   // Refresh only the grid contents (used by live search) so the search input keeps
   // focus and caret position across keystrokes.
   private refreshGrid(): void {
+    // Same hazard as render() (see its comment): an innerHTML wipe here would tear a
+    // mid-drag row out of the document just as easily. Defer to the same latch; the
+    // eventual flush runs a full render(), a strict superset of a grid-only refresh.
+    if (this.deps.dragState.get()) {
+      this.renderDeferredForDrag = true;
+      return;
+    }
     // Grid rebuild tears down hovered cells without mouseleave.
     this.clearTrackerHighlight();
     const grid = this.deps.root().querySelector('.bag-grid') as HTMLElement | null;
