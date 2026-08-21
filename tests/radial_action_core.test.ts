@@ -47,11 +47,11 @@ describe('resolveRadialDirection', () => {
     expect(resolveRadialDirection(21, 0)).toBe('center');
     expect(resolveRadialDirection(22, 0)).toBe('right');
     expect(resolveRadialDirection(23, 0)).toBe('right');
-    // the deadzone is radial, not per-axis: a diagonal of the same length counts
     expect(resolveRadialDirection(-21, 0)).toBe('center');
     expect(resolveRadialDirection(-22, 0)).toBe('left');
     expect(resolveRadialDirection(0, -22)).toBe('up');
     expect(resolveRadialDirection(0, 22)).toBe('down');
+    // the deadzone is radial, not per-axis: a diagonal of the same length counts
     expect(resolveRadialDirection(15, 15)).toBe('center');
     expect(resolveRadialDirection(16, 16)).toBe('right');
   });
@@ -109,6 +109,12 @@ describe('radialSourceSlot (direction-major, the default)', () => {
       [33, 34, 35, 36],
       [37, 38, 39, 40],
     ]);
+  });
+
+  it('maps a direction-major query at a non-4 buttonsPerPage width', () => {
+    expect(
+      radialSourceSlot({ page: 1, buttonIndex: 2, direction: 'right', buttonsPerPage: 3 }),
+    ).toBe(24);
   });
 
   it('honours a caller start slot (slot 0 is the fixed attack toggle)', () => {
@@ -296,6 +302,11 @@ describe('placeRadial', () => {
     expect(noMargin.originX).toBe(787);
     expect(noMargin.originY).toBe(315);
   });
+
+  it('takes the clamp arm at exactly viewportWidth = reach * 2 (the tie boundary)', () => {
+    const placed = placeRadial({ ...base, viewportWidth: 190, buttonCx: 170, buttonCy: 200 });
+    expect(placed.originX).toBe(95);
+  });
 });
 
 describe('placeConsumableStrip', () => {
@@ -350,6 +361,36 @@ describe('placeConsumableStrip', () => {
     expect(strip.centers).toEqual([]);
     expect(strip.clamped).toBe(false);
     expect(strip.pitch).toBe(54);
+  });
+
+  it('stays unclamped for an empty list anchored near the right edge', () => {
+    const strip = placeConsumableStrip({
+      ...item,
+      anchorX: 870,
+      anchorY: 340,
+      direction: 'right',
+      count: 0,
+    });
+    expect(strip.centers).toEqual([]);
+    expect(strip.clamped).toBe(false);
+  });
+
+  it('stays unclamped for an empty list anchored near the left edge', () => {
+    const strip = placeConsumableStrip({
+      ...item,
+      anchorX: 10,
+      anchorY: 340,
+      direction: 'left',
+      count: 0,
+    });
+    expect(strip.centers).toEqual([]);
+    expect(strip.clamped).toBe(false);
+  });
+
+  it('treats an exact fit at the margin as unclamped (shortfall = 0)', () => {
+    const strip = placeConsumableStrip({ ...item, anchorX: 355, anchorY: 340, count: 6 });
+    expect(strip.clamped).toBe(false);
+    expect(strip.centers[5]).toBe(31);
   });
 });
 

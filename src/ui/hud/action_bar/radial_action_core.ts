@@ -195,6 +195,7 @@ export function placeConsumableStrip(input: StripPlacementInput): StripPlacement
   const direction = input.direction ?? 'left';
   const sign = direction === 'left' ? -1 : 1;
   const pitch = input.itemSize + input.gap;
+  if (input.count <= 0) return { centers: [], pitch, clamped: false };
   const half = input.itemSize / 2;
   const centers: number[] = [];
   for (let i = 0; i < input.count; i++) centers.push(input.anchorX + sign * pitch * (i + 1));

@@ -85,6 +85,10 @@ describe('clampQuestIndex', () => {
     expect(clampQuestIndex(2, 0)).toBe(0);
     expect(clampQuestIndex(Number.NaN, 3)).toBe(0);
   });
+
+  it('truncates a fractional index toward zero rather than rounding', () => {
+    expect(clampQuestIndex(1.9, 3)).toBe(1);
+  });
 });
 
 describe('cycleQuestStrip', () => {
@@ -124,6 +128,10 @@ describe('cycleQuestStrip', () => {
   it('handles a step larger than the tracked set', () => {
     expect(cycleQuestStrip(0, 4, 3)).toBe(1);
     expect(cycleQuestStrip(0, -4, 3)).toBe(2);
+  });
+
+  it('truncates a fractional step toward zero before wrapping', () => {
+    expect(cycleQuestStrip(0, 1.5, 3)).toBe(1);
   });
 });
 
@@ -212,16 +220,23 @@ describe('questStripView', () => {
     expect(questStripView(TWO, -3).id).toBe('q1');
   });
 
+  it('truncates a fractional requested index toward zero', () => {
+    const view = questStripView(THREE, 1.9);
+    expect(view.index).toBe(1);
+    expect(view.id).toBe('q2');
+  });
+
   it('carries the turn-in ready state through', () => {
     const ready: TrackedQuest = { ...quest('q1'), complete: true };
     expect(questStripView([ready], 0).complete).toBe(true);
     expect(questStripView([quest('q1')], 0).complete).toBe(false);
   });
 
-  it('hands the caller its own arrays (no shared empty view)', () => {
+  it('hands the caller its own arrays and counter object (no shared empty view)', () => {
     const a = questStripView([], 0);
     const b = questStripView([], 0);
     expect(a.objectives).not.toBe(b.objectives);
+    expect(a.counter).not.toBe(b.counter);
   });
 });
 
@@ -252,6 +267,16 @@ describe('questStripBand', () => {
     });
     expect(band.left).toBe(12);
     expect(band.maxWidth).toBe(850);
+  });
+
+  it('treats a non-positive reservation the same as no reservation', () => {
+    const band = questStripBand({
+      viewportWidth: 874,
+      occupants: [],
+      reservedRight: 0,
+      stripHeight: 40,
+    });
+    expect(band.left).toBe(12);
   });
 
   it('lets a left occupant push the start right past the reservation', () => {
@@ -287,6 +312,28 @@ describe('questStripBand', () => {
     });
     expect(band.left).toBe(12);
     expect(band.maxWidth).toBe(659);
+  });
+
+  it('ignores an occupant whose bottom sits exactly on the band top', () => {
+    const band = questStripBand({
+      viewportWidth: 874,
+      occupants: [{ left: 0, right: 320, top: -40, bottom: 6 }],
+      reservedRight: null,
+      stripHeight: 40,
+    });
+    expect(band.left).toBe(12);
+    expect(band.maxWidth).toBe(850);
+  });
+
+  it('ignores an occupant whose top sits exactly on the band bottom', () => {
+    const band = questStripBand({
+      viewportWidth: 874,
+      occupants: [{ left: 0, right: 320, top: 46, bottom: 90 }],
+      reservedRight: null,
+      stripHeight: 40,
+    });
+    expect(band.left).toBe(12);
+    expect(band.maxWidth).toBe(850);
   });
 
   it('ignores zero-width occupants (a hidden element still has a box)', () => {
@@ -330,5 +377,27 @@ describe('questStripBand', () => {
     });
     expect(band.left).toBe(250);
     expect(band.maxWidth).toBe(QUEST_STRIP_MIN_WIDTH_PX);
+  });
+
+  it('treats an occupant exactly at the mid-line as a right occupant (caps width, not left)', () => {
+    const band = questStripBand({
+      viewportWidth: 874,
+      occupants: [{ left: 437, right: 600, top: 0, bottom: 44 }],
+      reservedRight: null,
+      stripHeight: 40,
+    });
+    expect(band.left).toBe(12);
+    expect(band.maxWidth).toBe(415);
+  });
+
+  it('rounds fractional viewport and occupant measurements', () => {
+    const band = questStripBand({
+      viewportWidth: 874.5,
+      occupants: [{ left: 0, right: 200.4, top: 0, bottom: 44.3 }],
+      reservedRight: null,
+      stripHeight: 40,
+    });
+    expect(band.left).toBe(210);
+    expect(band.maxWidth).toBe(652);
   });
 });
