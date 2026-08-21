@@ -111,8 +111,10 @@ release-tooling arm).
    codes only the .github/workflows/ prefix while decideTestMode widens on
    all of .github/, so a .github/actions/**-only PR classifies docs-only and
    runs no tests; harmless while no composite action hosts a test
-   invocation (the job classification pin reds a uses: relocation of the
-   shard run), but if one ever does, widen isCodePath first. Same review
+   invocation (the job classification pin reds a uses: relocation OUT OF a
+   wired job, and after the fix-round review it refuses any job-level
+   uses: outright as unclassifiable novelty), but if one ever does, widen
+   isCodePath first. Same review
    noted the cheapest remaining re-skip: a vite.config test.exclude glob
    removes a suite family from every runner while both pins stay green
    (pre-existing class, any suite family). Owner: gate follow-up
