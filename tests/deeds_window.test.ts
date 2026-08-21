@@ -890,11 +890,18 @@ describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
     // directly: it stopPropagation's Enter/Space only when a BUTTON has focus
     // and NEVER preventDefault's (native activation survives). Pin that hud.ts
     // still binds it (plus the pointer-only blur) over every guarded panel.
-    const guardRegion = hud.slice(start, hud.indexOf("$('#mm-map')", start));
+    const guardRegion = stripLineComments(hud.slice(start, hud.indexOf("$('#mm-map')", start)));
     expect(guardRegion).toContain('bindChromeButtonKeyGuard(panel)');
     expect(guardRegion).toContain('bindPointerBlur(panel)');
+    // The region itself must stay preventDefault-free as well: a default-preventing
+    // handler anywhere in it would kill the native activation the guard protects.
+    expect(guardRegion).not.toContain('preventDefault');
     const guardSrc = stripLineComments(read('../src/ui/pointer_blur.ts'));
-    const guardBody = guardSrc.slice(guardSrc.indexOf('function bindChromeButtonKeyGuard'));
+    const bodyStart = guardSrc.indexOf('function bindChromeButtonKeyGuard');
+    expect(bodyStart).toBeGreaterThan(0);
+    // Bound the slice at the function's closing brace so the negative below never
+    // polices whatever follows the guard in the module.
+    const guardBody = guardSrc.slice(bodyStart, guardSrc.indexOf('\n}\n', bodyStart) + 3);
     expect(guardBody).toContain("tagName !== 'BUTTON'");
     expect(guardBody).toContain('ke.stopPropagation()');
     expect(guardBody).not.toContain('preventDefault');

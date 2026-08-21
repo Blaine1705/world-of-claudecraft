@@ -26,6 +26,11 @@ import { installPromptDialog } from '../../src/ui/prompt_dialog';
 // main.ts's gameplayInputBlocked() (modal / prompt / camera prompt / rebuild).
 let input: Input;
 let blocked = false;
+// The last keydown as the window saw it AFTER Input's own listener ran (this
+// listener is registered after Input's, both bubble phase), so a test can assert
+// whether Input prevented the default: blur alone would already cancel the keyup
+// click in Chromium, so without this the preventDefault would be undecidable.
+let lastKeydown: { code: string; prevented: boolean } | null = null;
 
 beforeAll(() => {
   const canvas = document.createElement('canvas');
@@ -50,6 +55,9 @@ beforeAll(() => {
     new Keybinds(),
   );
   canvas.remove();
+  window.addEventListener('keydown', (e) => {
+    lastKeydown = { code: e.code, prevented: e.defaultPrevented };
+  });
 });
 
 afterEach(async () => {
@@ -57,13 +65,21 @@ afterEach(async () => {
   // clear the fixtures and the blocked flag.
   await userEvent.keyboard('[/Space]').catch(() => undefined);
   blocked = false;
+  lastKeydown = null;
   document.body.innerHTML = '';
 });
 
 /** A micromenu-rail fixture wired exactly the way hud.ts wires #side-buttons:
  *  the chrome key guard (Enter/Space stopPropagation, native default kept) plus
  *  the delegated capture-phase pointer-only blur. */
-function makeRail(): { rail: HTMLElement; btn: HTMLButtonElement; toggles: () => number } {
+function makeRail(): {
+  rail: HTMLElement;
+  btn: HTMLButtonElement;
+  toggles: () => number;
+  /** Whether the button still held focus when its OWN click handler ran (the
+   *  capture-phase drop must land before it on the pointer path). */
+  focusedAtClick: () => boolean | null;
+} {
   const rail = document.createElement('div');
   rail.id = 'side-buttons';
   const btn = document.createElement('button');
@@ -71,14 +87,16 @@ function makeRail(): { rail: HTMLElement; btn: HTMLButtonElement; toggles: () =>
   btn.id = 'mm-char';
   btn.textContent = 'Character';
   let count = 0;
+  let focusedAtClick: boolean | null = null;
   btn.addEventListener('click', () => {
     count++;
+    focusedAtClick = document.activeElement === btn;
   });
   rail.appendChild(btn);
   document.body.appendChild(rail);
   bindChromeButtonKeyGuard(rail);
   bindPointerBlur(rail);
-  return { rail, btn, toggles: () => count };
+  return { rail, btn, toggles: () => count, focusedAtClick: () => focusedAtClick };
 }
 
 async function pressSpace(): Promise<void> {
@@ -88,11 +106,14 @@ async function pressSpace(): Promise<void> {
 
 describe('stale focus vs Space (the reported bug and its fix)', () => {
   it('(a) mouse-click a micromenu button, then Space: no re-toggle, jump requested', async () => {
-    const { btn, toggles } = makeRail();
+    const { btn, toggles, focusedAtClick } = makeRail();
     await userEvent.click(btn);
     expect(toggles()).toBe(1);
-    // Layer 1: the pointer click must not leave the button focused.
+    // Layer 1: the pointer click must not leave the button focused, and the drop
+    // landed in the capture phase, BEFORE the button's own handler ran (so an
+    // opener captured by that handler would not be the button).
     expect(document.activeElement).not.toBe(btn);
+    expect(focusedAtClick()).toBe(false);
     // Space is the jump key again, not a menu key.
     await userEvent.keyboard('[Space>]');
     expect(input.readMoveInput().jump).toBe(true);
@@ -100,7 +121,7 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     expect(toggles()).toBe(1);
   });
 
-  it('(b) mouse-click, open a modal, then Space: the stale button does not activate', async () => {
+  it('(b) mouse-click, open a modal, then Space: the stale button does not activate (layers 1 and 2 composed; the click already dropped the focus)', async () => {
     const { btn, toggles } = makeRail();
     await userEvent.click(btn);
     expect(toggles()).toBe(1);
@@ -125,12 +146,29 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     blocked = true;
     await pressSpace();
     expect(count).toBe(0);
-    // Blurred, not just suppressed, so the stale focus cannot bite again.
+    // Prevented (not only blurred: blur alone would already cancel the keyup
+    // click here, so pin the preventDefault explicitly) ...
+    expect(lastKeydown).toEqual({ code: 'Space', prevented: true });
+    // ... AND blurred, so the stale focus cannot bite again.
     expect(document.activeElement).not.toBe(btn);
   });
 
+  it('(b3) the blocked-state guard is Space-only: another key leaves a focused chrome button alone', async () => {
+    // Delete the `e.code === 'Space'` narrowing in Input.onKeyDown and this reds:
+    // every key would then be prevented and blur the focused control while blocked.
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'chrome';
+    document.body.appendChild(btn);
+    btn.focus();
+    blocked = true;
+    await userEvent.keyboard('[KeyA]');
+    expect(lastKeydown).toEqual({ code: 'KeyA', prevented: false });
+    expect(document.activeElement).toBe(btn);
+  });
+
   it('(c) keyboard focus on a micromenu button: Space DOES activate it, and does not jump', async () => {
-    const { btn, toggles } = makeRail();
+    const { btn, toggles, focusedAtClick } = makeRail();
     btn.focus(); // where Tab would land
     await userEvent.keyboard('[Space>]');
     // The rail guard stopped the keydown before the game layer: no jump. Read
@@ -140,12 +178,18 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     await userEvent.keyboard('[/Space]');
     // Native activation on keyup: the menu opens for keyboard users.
     expect(toggles()).toBe(1);
-    // And keyboard users keep their focus position (no pointer blur).
+    // And keyboard users keep their focus position (no pointer blur): the button
+    // was still focused when its own handler ran, and still is.
+    expect(focusedAtClick()).toBe(true);
     expect(document.activeElement).toBe(btn);
   });
 
-  it('(d) a button inside an open prompt dialog still activates with Space', async () => {
-    // The real prompt recipe: window behind goes inert, prompt owns its keys.
+  it('(d) the prompt-dialog recipe: a prompt button keeps Space activation while blocked', async () => {
+    // The real prompt recipe: window behind goes inert, prompt owns its keys. The
+    // prompt stops the Space keydown itself (prompt_dialog.ts), before it can reach
+    // Input, so this is the integration test of that recipe under the blocked state;
+    // the dialog-root carve-out in the guard itself is (d2), whose keydown DOES reach
+    // Input.
     const windowBehind = document.createElement('div');
     document.body.appendChild(windowBehind);
     const prompt = document.createElement('div');
@@ -170,17 +214,18 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     confirm.focus();
     await pressSpace();
     expect(confirmed).toBe(1);
-    // The blocked-state guard must not have blurred the dialog's own control.
+    // The prompt's own control keeps its focus.
     expect(document.activeElement).toBe(confirm);
     handle.dismiss();
   });
 
-  it('(d2) a button inside any [role="dialog"] root (options window shape) keeps Space activation while blocked', async () => {
+  it('(d2) a button inside a markDialogRoot root (options window shape) keeps Space activation while blocked', async () => {
     // Unlike the prompt (which stops propagation itself), an options-window
     // button's keydown DOES reach the window handler; the stale_chrome_focus
-    // dialog carve-out is what keeps its native activation alive.
+    // dialog carve-out is what keeps its native activation alive. Built with the
+    // real markDialogRoot, the shape every window root in the tree carries.
     const dialog = document.createElement('div');
-    dialog.setAttribute('role', 'dialog');
+    markDialogRoot(dialog, { label: 'options' });
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = 'setting';
@@ -194,6 +239,8 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     btn.focus();
     await pressSpace();
     expect(count).toBe(1);
+    // Reached Input and was left alone: neither prevented nor blurred.
+    expect(lastKeydown).toEqual({ code: 'Space', prevented: false });
     expect(document.activeElement).toBe(btn);
   });
 
@@ -217,12 +264,15 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     document.body.appendChild(dialog);
     bindChromeButtonKeyGuard(dialog);
     bindPointerBlur(dialog);
-    const trap = new FocusManager().open({ root: () => dialog });
+    const fm = new FocusManager();
+    const trap = fm.open({ root: () => dialog });
     try {
       await userEvent.click(second);
       expect(count).toBe(1);
-      // Parked on the root: not the clicked button, not the body.
+      // Parked on the root: not the clicked button, not the body. A window opened
+      // by that click would record the root as its opener, never the stale button.
       expect(document.activeElement).toBe(dialog);
+      expect(fm.activeFocusable()).toBe(dialog);
       // Space on the root (a DIV) is the jump key again; nothing re-activates.
       await userEvent.keyboard('[Space>]');
       expect(input.debugState().movementHeld.jump).toBe(true);

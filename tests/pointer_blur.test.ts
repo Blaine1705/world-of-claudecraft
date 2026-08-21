@@ -19,6 +19,10 @@ import {
   POINTER_FOCUS_PARK_SELECTOR,
 } from '../src/ui/pointer_blur';
 
+// The park selector as a LITERAL (never the imported constant: a fake that matched
+// the constant against itself would stay green if its value drifted).
+const DIALOG_ROOT_SELECTOR = '[role="dialog"]';
+
 /** A dialog root in the markDialogRoot shape: role=dialog, and tabindex="-1" unless
  *  the test models a root that never got the stamp (then it is not focusable). */
 class FakeRoot {
@@ -42,7 +46,7 @@ class FakeButton {
     private readonly dialogRoot: FakeRoot | null = null,
   ) {}
   closest(selector: string): FakeButton | FakeRoot | null {
-    if (selector === POINTER_FOCUS_PARK_SELECTOR) return this.dialogRoot;
+    if (selector === DIALOG_ROOT_SELECTOR) return this.dialogRoot;
     return this.selectorMatches.includes(selector) ? this : null;
   }
   blur(): void {
@@ -90,6 +94,10 @@ describe('blurIfPointerClick', () => {
 });
 
 describe('dropPointerFocus (where the focus goes)', () => {
+  it('parks on the markDialogRoot shape only (role=dialog), pinned as a literal', () => {
+    expect(POINTER_FOCUS_PARK_SELECTOR).toBe(DIALOG_ROOT_SELECTOR);
+  });
+
   it('parks focus on the enclosing focusable dialog root instead of blurring to the body', () => {
     // The root keeps FocusManager's Tab trap armed (it cycles only while focus is
     // inside the root) and, being a DIV, can never be re-activated by Space.
@@ -167,6 +175,14 @@ describe('bindPointerBlur (delegated)', () => {
     expect(btn.blurred).toBe(1);
   });
 
+  it("defaults the selector to 'button' (the guard-loop panels and the rail rely on it)", () => {
+    const container = new FakeContainer();
+    bindPointerBlur(container);
+    const btn = new FakeButton(['button']);
+    container.dispatch('click', { detail: 1, target: btn });
+    expect(btn.blurred).toBe(1);
+  });
+
   it('ignores clicks whose target matches nothing', () => {
     const container = new FakeContainer();
     bindPointerBlur(container, '.micro-btn');
@@ -229,8 +245,10 @@ describe('hud.ts wiring pins (the surfaces the Space-reopens-last-menu fix cover
   // Source pins in the bank/deeds guard-array style: the browser E2E
   // (tests/browser/stale_focus_space.browser.test.ts) drives the real helpers
   // over a FIXTURE rail, so without these pins hud.ts could silently drop the
-  // real wiring while every behavioral suite stays green.
-  const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
+  // real wiring while every behavioral suite stays green. Line comments are
+  // stripped first so a commented-out call can never satisfy a pin.
+  const stripLineComments = (src: string): string => src.replace(/^\s*\/\/.*$/gm, '');
+  const hud = stripLineComments(readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8'));
 
   it('keeps the micromenu side rail in the shared panel guard array', () => {
     const start = hud.indexOf("'#delve-board',");
@@ -261,5 +279,25 @@ describe('hud.ts wiring pins (the surfaces the Space-reopens-last-menu fix cover
     // root, so dropping either mark would eat their keyboard Space activation.
     expect(hud).toContain("markDialogRoot(el, { label: t('hudChrome.emoteEditor.title') })");
     expect(hud).toContain("markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') })");
+  });
+
+  it('re-marks the emote wheel on every show, not once at creation (its name follows a language switch)', () => {
+    // The wheel element is created once (the `if (!el)` block) and shown many
+    // times; a mark inside the create block would freeze the aria-label in the
+    // language of the first show. Pin the call to the per-show region: after the
+    // create block closes and before the show paints the wheel's contents.
+    const start = hud.indexOf('private showEmoteWheel(');
+    expect(start).toBeGreaterThan(0);
+    const createBlock = hud.indexOf('if (!el) {', start);
+    expect(createBlock).toBeGreaterThan(start);
+    const createBlockEnd = hud.indexOf('\n    }\n', createBlock);
+    expect(createBlockEnd).toBeGreaterThan(createBlock);
+    const paint = hud.indexOf('el.innerHTML =', start);
+    const mark = hud.indexOf(
+      "markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') })",
+      start,
+    );
+    expect(mark).toBeGreaterThan(createBlockEnd);
+    expect(mark).toBeLessThan(paint);
   });
 });

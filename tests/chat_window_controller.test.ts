@@ -522,12 +522,21 @@ describe('ChatWindowController pointer-only blur (Space must not re-click the la
     harness.controller.init();
 
     const add = addButton(harness);
+    const menu = harness.document.getElementById('ctx-menu');
+    if (!menu) throw new Error('missing #ctx-menu');
     add.focus();
     add.dispatchEvent(click(1));
+    expect(menu.style.display).toBe('block');
     expect(add.focused).toBe(false);
     // Second pointer click on the still-open menu's own trigger: the toggle-close arm.
     add.focus();
     add.dispatchEvent(click(1));
+    expect(menu.style.display).toBe('none');
     expect(add.focused).toBe(false);
+    // Keyboard activation (detail 0) keeps its focus on either arm.
+    add.focus();
+    add.dispatchEvent(click(0));
+    expect(menu.style.display).toBe('block');
+    expect(add.focused).toBe(true);
   });
 });
