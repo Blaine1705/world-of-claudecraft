@@ -2927,6 +2927,14 @@
   }
   body.mobile-touch #minimap-disc {
     order: 1;
+    /* Rim satellites on touch: the wrapper shrinks the whole cluster, so each badge
+       counter-scales back to a readable size and takes a bigger box than desktop.
+       The inset then centres that box on the disc's 45 degree rim point, keeping the
+       desktop corner placement through the scale: (1 - cos(45deg)) / 2 of the disc
+       box is where a corner satellite's centre meets the rim. */
+    --rim-satellite-size: 44px;
+    --rim-satellite-scale: 1.25;
+    --rim-satellite-inset: calc(14.645% - var(--rim-satellite-size) / 2);
   }
   body.mobile-touch #minimap-coords {
     order: 2;
@@ -2940,37 +2948,32 @@
     transform: none;
     margin: 5px auto 0;
   }
-  /* The minimap wrapper is scaled down on touch, so counter-scale the disc
-     controls and place them in a row below the aura strip, left of the map. */
+  /* Each satellite keeps the disc corner it claims on desktop; only its size and
+     the counter-scale change, so a phone shows the same badge-on-the-rim cluster. */
   body.mobile-touch #raid-lockout {
-    left: auto;
-    right: calc(100% + 10px);
-    top: 156px;
-    bottom: auto;
-    width: 44px;
-    height: 44px;
+    left: var(--rim-satellite-inset);
+    bottom: var(--rim-satellite-inset);
+    width: var(--rim-satellite-size);
+    height: var(--rim-satellite-size);
     border-width: 2px;
-    transform: scale(1.25);
-    transform-origin: right top;
+    transform: scale(var(--rim-satellite-scale));
   }
   body.mobile-touch #raid-lockout svg {
     width: 24px;
     height: 24px;
   }
   body.mobile-touch #mail-indicator {
-    right: calc(100% + 74px);
-    top: 156px;
-    bottom: auto;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
+    right: var(--rim-satellite-inset);
+    bottom: var(--rim-satellite-inset);
+    width: var(--rim-satellite-size);
+    height: var(--rim-satellite-size);
+    min-width: var(--rim-satellite-size);
+    min-height: var(--rim-satellite-size);
     padding: 0;
     justify-content: center;
     border-radius: 999px;
     border-width: 2px;
-    transform: scale(1.25);
-    transform-origin: right top;
+    transform: scale(var(--rim-satellite-scale));
   }
   body.mobile-touch #mail-indicator .ui-icon {
     width: 22px;
@@ -2987,25 +2990,19 @@
     font-size: 11px;
     line-height: 16px;
   }
-  /* The Merchant's coin continues the same disc-control row, left of the envelope. */
+  /* The Merchant's coin keeps the top-left corner the desktop rule gives it. */
   body.mobile-touch #market-indicator {
-    /* Clear the desktop anchor before re-anchoring on the other side: the coin
-       pins left on the disc, and left + width + right all non-auto is
-       over-constrained (LTR drops `right`), so without this it never joins the
-       row. Same reason #raid-lockout clears left and #mail-indicator bottom. */
-    left: auto;
-    right: calc(100% + 138px);
-    top: 156px;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
+    left: var(--rim-satellite-inset);
+    top: var(--rim-satellite-inset);
+    width: var(--rim-satellite-size);
+    height: var(--rim-satellite-size);
+    min-width: var(--rim-satellite-size);
+    min-height: var(--rim-satellite-size);
     padding: 0;
     justify-content: center;
     border-radius: 999px;
     border-width: 2px;
-    transform: scale(1.25);
-    transform-origin: right top;
+    transform: scale(var(--rim-satellite-scale));
   }
   body.mobile-touch #market-indicator .ui-icon {
     width: 22px;
@@ -6544,12 +6541,6 @@
       right: max(6px, env(safe-area-inset-right));
       top: max(6px, env(safe-area-inset-top));
       transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
-    }
-    body.mobile-touch #raid-lockout,
-    body.mobile-touch #mail-indicator,
-    body.mobile-touch #market-indicator {
-      top: 94px;
-      transform: scale(1.27);
     }
     body.mobile-touch #meters-window {
       position: fixed;
