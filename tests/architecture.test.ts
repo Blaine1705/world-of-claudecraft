@@ -365,6 +365,7 @@ const UI_PURE_CORES = [
   'src/ui/reliquary_view.ts',
   'src/ui/reliquary_sheet_view.ts',
   'src/ui/reliquary_tracker_view.ts',
+  'src/ui/tracker_stack_anchor_core.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
@@ -413,6 +414,7 @@ const UI_PURE_CORES = [
   'src/ui/dpad_nav_core.ts',
   'src/game/graphics_rebuild_core.ts',
   'src/game/presentation_gate.ts',
+  'src/game/stale_chrome_focus.ts',
   'src/game/perf_diagnosis_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
@@ -627,6 +629,7 @@ const BARE_NAMED = [
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
   'src/game/presentation_gate.ts',
+  'src/game/stale_chrome_focus.ts',
   'src/render/compile_gate.ts',
   'src/render/link_rate_budget.ts',
   'src/render/prewarm_compile_lifecycle.ts',
@@ -1421,6 +1424,7 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
 // instead of only agreeing with itself.
 const EXPECTED_BARE_NAMED = [
   'src/game/presentation_gate.ts',
+  'src/game/stale_chrome_focus.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
@@ -1926,6 +1930,11 @@ const UI_DOM_MODULES = [
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
   'src/ui/town_focus_window.ts',
+  // The tracker-stack seat applier: owns a resize listener and bounded
+  // getBoundingClientRect reads by design (the module comment carries the
+  // cadence contract); the seat math itself is the tracker_stack_anchor_core
+  // pure core.
+  'src/ui/tracker_stack_anchor.ts',
   'src/ui/tutorial.ts',
   'src/ui/ui_effects_applier.ts',
   'src/ui/ui_icons.ts',

@@ -11,6 +11,7 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -31,13 +32,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "es_ES": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -58,13 +64,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "fr_FR": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -85,13 +96,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "fr_CA": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -112,14 +128,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "en_CA": [],
   "it_IT": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -140,13 +161,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "de_DE": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -167,10 +193,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "zh_CN": [
     "hudChrome.controller.crossHotbarPosition"
@@ -186,6 +216,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -206,16 +237,21 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "ru_RU": [
     "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -236,13 +272,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "nl_NL": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -263,13 +304,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "pl_PL": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -290,13 +336,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "id_ID": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -317,13 +368,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "tr_TR": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -344,13 +400,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "sv_SE": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -371,13 +432,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "vi_VN": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -398,13 +464,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ],
   "da_DK": [
     "desktop.window.exitToDesktop",
+    "guide.settingsPage.ifShowReliquaryTracker",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -425,9 +496,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.options.showReliquaryTracker",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
-    "hudChrome.perf.diagnostics.metrics.hitchesBuild"
+    "hudChrome.perf.diagnostics.metrics.hitchesBuild",
+    "hudChrome.reliquary.trackerToggleHideHint",
+    "hudChrome.reliquary.trackerToggleLabel",
+    "hudChrome.reliquary.trackerToggleShowHint"
   ]
 };
