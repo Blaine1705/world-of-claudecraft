@@ -67,8 +67,8 @@ import {
   minWieldRequirementToWorkAny,
 } from './professions/wield_gate';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
-import { corpseHasDecayed } from './respawn_policy';
 import { noteReliquaryMark } from './reliquary';
+import { corpseHasDecayed } from './respawn_policy';
 import type { SimContext } from './sim_context';
 import { interactSoulwell } from './soulwell';
 import {
