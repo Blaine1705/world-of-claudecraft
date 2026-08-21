@@ -5545,6 +5545,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.autoShowHint':
     '一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。',
   'hudChrome.mobile.actionPageToggle': '切换动作页',
+  'hudChrome.mobile.actionRadial': '技能方向',
+  'hudChrome.mobile.actionRadialCancel': '取消动作',
+  'hudChrome.mobile.radialCenter': '中心',
+  'hudChrome.mobile.radialRight': '右',
   'hudChrome.mobile.actionRing': '战斗动作',
   'hudChrome.mobile.haptics': '震动反馈',
   'hudChrome.mobile.hapticsOff': '震动反馈：关',

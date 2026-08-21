@@ -1162,13 +1162,19 @@
       <button class="mobile-action-slot" type="button" data-mobile-index="1"></button>
       <button class="mobile-action-slot" type="button" data-mobile-index="2"></button>
       <button class="mobile-action-slot" type="button" data-mobile-index="3"></button>
-      <button class="mobile-action-slot" type="button" data-mobile-index="4"></button>
+      <button type="button" id="mobile-consumable-seat" class="mobile-ring-seat" data-mobile-index="4" hidden></button>
       <button type="button" id="mobile-action-attack" data-icon="attack"></button>
       <button type="button" id="mobile-target-cycle" data-i18n-title="hudChrome.mobile.targetCycle" data-i18n-aria="hudChrome.mobile.targetCycle" title="Swap target" aria-label="Swap target" data-icon="target"><span class="mobile-label" data-i18n="hudChrome.mobile.targetCycleShort">Target</span></button>
       <button type="button" id="mobile-interact" data-i18n-title="hud.keybinds.actions.interact" data-i18n-aria="hud.keybinds.actions.interact" title="Interact / Loot" aria-label="Interact / Loot" data-icon="interact"><span class="mobile-label" data-i18n="hud.core.mobileUse">Use</span></button>
       <button type="button" id="mobile-jump" data-i18n-title="hud.keybinds.actions.jump" data-i18n-aria="hud.keybinds.actions.jump" title="Jump" aria-label="Jump" data-icon="jump"><span class="mobile-label" data-i18n="hudChrome.mobile.jump">Jump</span></button>
       <button type="button" id="mobile-action-page-toggle" data-i18n-aria="hudChrome.mobile.actionPageToggle" aria-label="Switch action page" data-icon="swap"><span class="mobile-action-page-indicator"></span></button>
     </div>
+    <div id="mobile-action-radial" data-i18n-aria="hudChrome.mobile.actionRadial" aria-label="Action directions">
+      <button type="button" class="mobile-action-petal" data-radial-dir="up" data-mobile-index="0"></button>
+      <button type="button" class="mobile-action-petal" data-radial-dir="right" data-mobile-index="1"></button>
+      <button type="button" class="mobile-action-petal" data-radial-dir="down" data-mobile-index="2"></button>
+      <button type="button" class="mobile-action-petal" data-radial-dir="left" data-mobile-index="3"></button>
+      <button type="button" id="mobile-action-radial-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close"></button>
     </div>
   </div>
       <div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" aria-hidden="true">

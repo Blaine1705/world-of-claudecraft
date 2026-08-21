@@ -81,7 +81,14 @@ const MONOLITHS: MonolithRow[] = [
     // arm and a spoken refusal beside the ability one, and the shared item-use
     // seam castSlot and the pad now both call. Exact merged count, zero slack:
     // any further growth reds again.
-    ceiling: 19490,
+    // LOWERED 19490 -> 19386 by the touch radial ring: buildMobileActionRing's
+    // whole body (the markup lookup, the slot-element minting, the attack /
+    // slot / page-toggle wiring and both view constructions) moved behind the
+    // action_bar seam into hud/action_bar/mobile_action_ring_controller.ts, and
+    // Hud kept only the page state, the callback bag and the per-frame paint.
+    // The ratchet's own rule: an extraction lowers the ceiling in the same
+    // change. Exact count, zero slack.
+    ceiling: 19386,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -549,13 +549,29 @@
   body.mobile-touch #mount-race-strip .mr-timer {
     width: 110px;
   }
+  /* ONE button size per tier for every touch gesture menu: the ring's action
+     buttons, the radial petals, and the reserved consumables seat all read
+     --menu-btn-size, so retuning a tier moves one number instead of three.
+     Declared on the BODY, not on the ring: the radial overlay is a sibling of
+     the ring rather than a child, and a token scoped to either one would leave
+     the other resolving var() against nothing and collapsing to its intrinsic
+     size. The tier rules below outrank it on specificity alone. */
+  body.mobile-touch {
+    --menu-btn-size: calc(64px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch.hud-mobile-compact {
+    --menu-btn-size: calc(54px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch.hud-mobile-tablet {
+    --menu-btn-size: calc(76px * var(--mobile-chrome-scale, 1));
+  }
   body.mobile-touch #mobile-action-ring {
     /* Chrome-scale folded into every ring size var (the arc offsets below are
        expressed in these vars, so the whole cluster shrinks proportionally and keeps
        its equal-chord geometry). Standard-tier sizes all stay >= 40px at 0.85x
        (smallest: toggle 52 * 0.85 = 44.2), so no clamp is needed here. */
     --mobile-ring-attack-size: calc(100px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-action-size: calc(64px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-action-size: var(--menu-btn-size);
     --mobile-ring-radius: calc(190px * var(--mobile-chrome-scale, 1));
     --mobile-ring-toggle-size: calc(52px * var(--mobile-chrome-scale, 1));
     --mobile-ring-secondary-size: calc(56px * var(--mobile-chrome-scale, 1));
@@ -683,7 +699,13 @@
       2
     );
   }
-  body.mobile-touch .mobile-action-slot[data-mobile-index="4"] {
+  /* The arc's fifth seat (90deg, due up over the attack button) is RESERVED for
+     the consumables control, phase 3 of the touch rework. It keeps the seat so
+     the arc's equal-chord spacing is unchanged, and stays hidden until that
+     control is wired; the radial ring itself is the four seats below it. */
+  body.mobile-touch .mobile-ring-seat {
+    width: var(--menu-btn-size);
+    height: var(--menu-btn-size);
     right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);
     bottom: calc(
       var(--mobile-ring-attack-size) /
@@ -692,6 +714,9 @@
       var(--mobile-ring-action-size) /
       2
     );
+  }
+  body.mobile-touch #mobile-action-ring > button[hidden] {
+    display: none;
   }
   /* The crescent-hollow trio between the attack button and the arc, all on
      the --mobile-ring-hollow circle in 45deg steps: Use (interact/loot) due
@@ -940,6 +965,163 @@
   }
   body.mobile-touch #mobile-action-ring button .keybind {
     display: none;
+  }
+  /* The radial direction petals (#mobile-action-radial). Revealed under a held
+     ring button after RADIAL_REVEAL_MS, or the moment a flick passes the
+     deadzone. The overlay is a SIBLING of the ring rather than a child so its
+     petals are seated in viewport coordinates (placeRadial edge-clamps them)
+     instead of inside the ring's own scaled, corner-anchored box; the painter
+     writes only that measured seating, everything below is static per tier.
+     --radial-radius-ratio and --radial-margin are READ BACK by
+     radial_gesture.ts, so both stay literal values: getComputedStyle hands back
+     an unresolved calc() for a custom property, and only a literal parses. */
+  body.mobile-touch #mobile-action-radial {
+    --radial-radius-ratio: 1.35;
+    --radial-margin: 6px;
+    --radial-petal-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    pointer-events: none;
+    opacity: var(--touch-opacity, 1);
+    z-index: 32;
+  }
+  body.mobile-touch #mobile-action-radial.open {
+    display: block;
+  }
+  /* The dim is LOCAL to the radial and never a full-screen scrim: the other
+     thumb is still steering and the player must keep seeing the fight. */
+  body.mobile-touch #mobile-action-radial::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle at var(--radial-x, 50%) var(--radial-y, 50%),
+      #05050cb0 0%,
+      #05050c80 calc(var(--radial-petal-size) * 1.9),
+      transparent calc(var(--radial-petal-size) * 2.6)
+    );
+    pointer-events: none;
+  }
+  /* Petals and the centre cancel target are seated by their CENTRE (the painter
+     writes left/top from placeRadial), so the negative margins pull each box
+     back onto its own centre point. */
+  body.mobile-touch .mobile-action-petal,
+  body.mobile-touch #mobile-action-radial-cancel {
+    position: absolute;
+    width: var(--radial-petal-size);
+    height: var(--radial-petal-size);
+    margin-left: calc(var(--radial-petal-size) / -2);
+    margin-top: calc(var(--radial-petal-size) / -2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid #4a3d1d;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2d3048e8, #11121ee8 72%);
+    color: #eee8ff;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  /* The petal the drag currently points at, and the cancel target while the
+     finger is back at the anchor: a steady border + glow, never a scale
+     transform (the motion-sickness rule). */
+  body.mobile-touch .mobile-action-petal.live,
+  body.mobile-touch #mobile-action-radial-cancel.live {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 12px #ffd100aa,
+      inset 0 0 8px #ffd10055;
+  }
+  body.mobile-touch #mobile-action-radial-cancel {
+    border-color: #8b4e2c;
+    background: radial-gradient(circle at 35% 30%, #3a2430e8, #16101ae8 72%);
+  }
+  body.mobile-touch #mobile-action-radial-cancel .ui-icon {
+    width: 40%;
+    height: 40%;
+    color: #ffdf9c;
+  }
+  /* The petal internals mirror the ring button's exactly (same painter, same
+     ActionBarState), so a petal reads as the same control the ring shows. */
+  body.mobile-touch .mobile-action-petal .icon-label {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+  }
+  body.mobile-touch .mobile-action-petal .cd-overlay {
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(
+      transparent 0 calc(100% - var(--cd-fill, 0%)),
+      #000a calc(100% - var(--cd-fill, 0%))
+    );
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-action-petal .recharge-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    background: #0008;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-action-petal .cdtext {
+    position: relative;
+    font-size: 15px;
+    font-weight: bold;
+    text-shadow:
+      0 0 4px #000,
+      1px 1px 1px #000,
+      -1px -1px 1px #000,
+      1px -1px 1px #000,
+      -1px 1px 1px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-action-petal .item-count {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-action-petal .keybind {
+    display: none;
+  }
+  body.mobile-touch .mobile-action-petal.empty .icon-label {
+    background-image: none;
+  }
+  body.mobile-touch .mobile-action-petal.empty {
+    opacity: 0.4;
+  }
+  body.mobile-touch .mobile-action-petal.unusable {
+    filter: grayscale(0.6);
+    opacity: 0.6;
+  }
+  body.mobile-touch .mobile-action-petal.oor {
+    border-color: #a33;
+  }
+  /* forced-colors keeps the chosen petal distinguishable by SHAPE, not hue:
+     the palette is replaced wholesale there, so the gold glow above vanishes. */
+  @media (forced-colors: active) {
+    body.mobile-touch .mobile-action-petal.live,
+    body.mobile-touch #mobile-action-radial-cancel.live {
+      border: 3px double Highlight;
+    }
   }
   body.mobile-touch #mobile-action-ring button.empty .icon-label {
     background-image: none;
@@ -2416,7 +2598,7 @@
     );
     right: auto;
   }
-  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="4"] {
+  body.mobile-touch.mobile-left-handed .mobile-ring-seat {
     left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);
     right: auto;
   }
@@ -5807,7 +5989,7 @@
      touch floor with max(), and target/use (50 * 0.85 = 42.5) clear it. */
   body.mobile-touch.hud-mobile-compact #mobile-action-ring {
     --mobile-ring-attack-size: calc(84px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-action-size: calc(54px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-action-size: var(--menu-btn-size);
     --mobile-ring-radius: calc(160px * var(--mobile-chrome-scale, 1));
     --mobile-ring-toggle-size: max(40px, calc(46px * var(--mobile-chrome-scale, 1)));
     --mobile-ring-secondary-size: calc(50px * var(--mobile-chrome-scale, 1));
@@ -5891,7 +6073,7 @@
      rule: 226 * 2 * sin(11.25deg) = 88 = action-size 76 + a 12px edge gap. */
   body.mobile-touch.hud-mobile-tablet #mobile-action-ring {
     --mobile-ring-attack-size: calc(116px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-action-size: calc(76px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-action-size: var(--menu-btn-size);
     --mobile-ring-radius: calc(226px * var(--mobile-chrome-scale, 1));
     --mobile-ring-toggle-size: calc(56px * var(--mobile-chrome-scale, 1));
     --mobile-ring-secondary-size: calc(60px * var(--mobile-chrome-scale, 1));

@@ -5736,6 +5736,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.autoShowHint':
     'パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。',
   'hudChrome.mobile.actionPageToggle': '行動ページ切替',
+  'hudChrome.mobile.actionRadial': 'アクション方向',
+  'hudChrome.mobile.actionRadialCancel': 'アクションをキャンセル',
+  'hudChrome.mobile.radialCenter': '中央',
+  'hudChrome.mobile.radialRight': '右',
   'hudChrome.mobile.actionRing': '戦闘アクション',
   'hudChrome.mobile.haptics': '振動',
   'hudChrome.mobile.hapticsOff': '振動オフ',

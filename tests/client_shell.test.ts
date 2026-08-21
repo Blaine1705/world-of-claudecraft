@@ -108,6 +108,10 @@ const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8')
   /\r\n/g,
   '\n',
 );
+const mobileActionRingTs = readFileSync(
+  new URL('../src/ui/hud/action_bar/mobile_action_ring_controller.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const playerCardControllerTs = readFileSync(
   new URL('../src/ui/hud/player_card/player_card_controller.ts', import.meta.url),
   'utf8',
@@ -1154,12 +1158,48 @@ describe('client HTML shell', () => {
       expect(entry).toContain('id="mobile-action-ring"');
       expect(entry).toContain('id="mobile-action-attack"');
       expect(entry).toContain('id="mobile-action-page-toggle"');
+      // FOUR radial action buttons: each carries a centre tap plus 4 flick
+      // directions, so 4 x 5 x 2 pages reaches all 33 configurable slots.
       const slotMatches = [
         ...entry.matchAll(/class="mobile-action-slot"[^>]*data-mobile-index="(\d+)"/g),
       ];
-      expect(slotMatches).toHaveLength(5);
+      expect(slotMatches).toHaveLength(4);
       const indices = slotMatches.map((m) => m[1]).sort();
-      expect(indices).toEqual(['0', '1', '2', '3', '4']);
+      expect(indices).toEqual(['0', '1', '2', '3']);
+      // The arc's fifth seat is RESERVED for the consumables control and stays
+      // hidden until it is wired; keeping the seat is what preserves the arc's
+      // equal-chord spacing and its measured thumb reach.
+      expect(entry).toContain('id="mobile-consumable-seat"');
+      expect(entry).toMatch(/id="mobile-consumable-seat"[^>]*hidden/);
+    }
+  });
+
+  it('carries the radial petal overlay in BOTH entries, one button per direction', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).toContain('id="mobile-action-radial"');
+      expect(entry, name).toContain('data-i18n-aria="hudChrome.mobile.actionRadial"');
+      expect(entry, name).toContain('id="mobile-action-radial-cancel"');
+      expect(entry, name).toContain('data-i18n-aria="hudChrome.mobile.actionRadialCancel"');
+      const petals = [
+        ...entry.matchAll(/class="mobile-action-petal"[^>]*data-radial-dir="(\w+)"/g),
+      ];
+      expect(
+        petals.map((m) => m[1]),
+        name,
+      ).toEqual(['up', 'right', 'down', 'left']);
+      // The overlay is a SIBLING of the ring: the petals are seated in viewport
+      // coordinates, so they must not inherit the ring's scaled corner box.
+      expect(entry.indexOf('id="mobile-action-radial"'), name).toBeGreaterThan(
+        entry.indexOf('id="mobile-action-page-toggle"'),
+      );
+      // Real <button>s from the start, so the phase 6 tap-only mode has focusable
+      // items to promote rather than a div soup to rewrite.
+      expect(entry, name).toContain(
+        '<button type="button" class="mobile-action-petal" data-radial-dir="up"',
+      );
     }
   });
 
@@ -2100,8 +2140,11 @@ describe('client HTML shell', () => {
     // The attack toggle's fallback fires only with no live hostile target and
     // never while auto-attacking. Its fixed mobile control must not route through
     // the desktop slot 0, which can hold an assigned action.
-    expect(hudTs).toContain('handleMobileAttackTap(');
-    expect(hudTs).toContain('activateAttack: () => this.activateFixedAttackSlot(),');
+    // The ring's construction lives behind the action_bar seam now
+    // (mobile_action_ring_controller.ts); Hud supplies the callbacks.
+    expect(mobileActionRingTs).toContain('handleMobileAttackTap(');
+    expect(mobileActionRingTs).toContain('activateAttack: () => deps.activateFixedAttackSlot(),');
+    expect(hudTs).toContain('activateFixedAttackSlot: () => this.activateFixedAttackSlot(),');
   });
 
   it('keeps joystick autorun on the move pad and Jump on the ring bottom row', () => {
@@ -2299,8 +2342,11 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       '.mobile-action-slot[data-mobile-index="1"] {\n    left: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-radius) *\n      0.9239 -',
     );
+    // The arc's fifth seat is now the RESERVED consumables seat (.mobile-ring-seat),
+    // keeping the same 90deg geometry in both handedness mirrors so the reserve
+    // costs no arc spacing.
     expect(hudMobileCss).toContain(
-      '.mobile-action-slot[data-mobile-index="4"] {\n    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);\n    right: auto;\n  }',
+      '.mobile-ring-seat {\n    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);\n    right: auto;\n  }',
     );
     // Use (180deg, due left), Target swap (135deg, the up-left diagonal) and
     // the page toggle (90deg, due up over the attack button, to Target's
@@ -2338,7 +2384,7 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.hud-mobile-compact #mobile-action-ring {\n' +
         '    --mobile-ring-attack-size: calc(84px * var(--mobile-chrome-scale, 1));\n' +
-        '    --mobile-ring-action-size: calc(54px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-action-size: var(--menu-btn-size);\n' +
         '    --mobile-ring-radius: calc(160px * var(--mobile-chrome-scale, 1));\n' +
         '    --mobile-ring-toggle-size: max(40px, calc(46px * var(--mobile-chrome-scale, 1)));\n' +
         '    --mobile-ring-secondary-size: calc(50px * var(--mobile-chrome-scale, 1));\n' +
@@ -2350,7 +2396,7 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.hud-mobile-tablet #mobile-action-ring {\n' +
         '    --mobile-ring-attack-size: calc(116px * var(--mobile-chrome-scale, 1));\n' +
-        '    --mobile-ring-action-size: calc(76px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-action-size: var(--menu-btn-size);\n' +
         '    --mobile-ring-radius: calc(226px * var(--mobile-chrome-scale, 1));\n' +
         '    --mobile-ring-toggle-size: calc(56px * var(--mobile-chrome-scale, 1));\n' +
         '    --mobile-ring-secondary-size: calc(60px * var(--mobile-chrome-scale, 1));\n' +
@@ -2365,6 +2411,62 @@ describe('client HTML shell', () => {
     // mobile More tray, issue #1577, so it no longer needs a coupled offset).
     // PR #1674 relaxed the shrink from 0.44 to 0.57 for minimap legibility.
     expect(hudMobileCss).toContain('transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));');
+  });
+
+  it('sizes every gesture-menu button from one --menu-btn-size token per tier', () => {
+    // The ring's action buttons, the radial petals and the reserved consumables
+    // seat all read one token, so retuning a tier moves one number. Declared on
+    // the BODY: the radial overlay is a sibling of the ring, so a token scoped
+    // to either one leaves the other resolving var() against nothing and
+    // collapsing to its intrinsic size. Pin the literal values, since every
+    // consumer is a var() that would silently fall back if it were deleted.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch {\n' +
+        '    --menu-btn-size: calc(64px * var(--mobile-chrome-scale, 1));\n' +
+        '  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact {\n' +
+        '    --menu-btn-size: calc(54px * var(--mobile-chrome-scale, 1));\n' +
+        '  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-tablet {\n' +
+        '    --menu-btn-size: calc(76px * var(--mobile-chrome-scale, 1));\n' +
+        '  }',
+    );
+    // Every consumer, so a token that stops reaching one of them fails here.
+    expect(hudMobileCss).toContain('    --mobile-ring-action-size: var(--menu-btn-size);');
+    expect(hudMobileCss).toContain(
+      '  body.mobile-touch .mobile-ring-seat {\n' +
+        '    width: var(--menu-btn-size);\n' +
+        '    height: var(--menu-btn-size);\n',
+    );
+    // The ring cluster is transform-scaled by --btn-scale and the overlay is
+    // not, so the petals fold the same scale in or they render a different size
+    // than the button that revealed them.
+    expect(hudMobileCss).toContain(
+      '    --radial-petal-size: calc(var(--menu-btn-size) * var(--btn-scale, 1));',
+    );
+  });
+
+  it('keeps the radial geometry the gesture reads back as LITERAL custom properties', () => {
+    // getComputedStyle hands back an UNRESOLVED calc() for a custom property, so
+    // radial_gesture.ts can only parse a literal. A calc() here would silently
+    // parse as its first number and misplace every petal.
+    expect(hudMobileCss).toContain('    --radial-radius-ratio: 1.35;');
+    expect(hudMobileCss).toContain('    --radial-margin: 6px;');
+    // The dim is local to the radial, never a full-screen scrim: the other thumb
+    // is still steering and the player must keep seeing the fight.
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-action-radial::before {');
+    expect(hudMobileCss).toContain('circle at var(--radial-x, 50%) var(--radial-y, 50%),');
+    expect(hudMobileCss).not.toMatch(
+      /#mobile-action-radial(::before)? \{[^}]*background:\s*#[0-9a-f]+;/,
+    );
+    // Closed by default: the overlay only exists while a button is held.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-radial.open {\n    display: block;\n  }',
+    );
   });
 
   it('shrinks the compact-tier page-toggle digit so it is not clipped by the ring circle', () => {
