@@ -18,6 +18,8 @@ import {
   charselectLook,
   composedLook,
   helmSlotAvailable,
+  helmSlotAvailableForEntity,
+  helmSlotAvailableForLook,
   inWorldLookFor,
   modularLookChanged,
 } from '../src/render/characters/player_look_core';
@@ -175,6 +177,35 @@ describe('helmSlotAvailable (issue: hide helmet does nothing)', () => {
     // (renderer.ts skips its look via the same isMechWearer guard), so even a
     // helmed class kit has nothing the eye could hide while mech-skinned.
     expect(helmSlotAvailable('warrior', true)).toBe(false);
+  });
+});
+
+describe('helmSlotAvailableForLook', () => {
+  it('is derived from the composed look that the renderer will draw', () => {
+    expect(helmSlotAvailableForLook(null)).toBe(false);
+    expect(helmSlotAvailableForLook(composedLook({ gender: 'male' }, 'knight', false))).toBe(true);
+    expect(helmSlotAvailableForLook(composedLook({ gender: 'male' }, 'rogue', false))).toBe(false);
+  });
+});
+
+describe('helmSlotAvailableForEntity', () => {
+  it('probes the shown look when the current player has hidden the helm', () => {
+    const hidden = playerEntity({ modularAppearance: { gender: 'male' }, helmHidden: true });
+    expect(helmSlotAvailableForEntity(hidden, (e) => inWorldLookFor(e, CLASS_KIT))).toBe(true);
+  });
+
+  it('returns false for fixed rigs and replacement bodies', () => {
+    expect(
+      helmSlotAvailableForEntity(playerEntity({ modularAppearance: null }), (e) =>
+        inWorldLookFor(e, CLASS_KIT),
+      ),
+    ).toBe(false);
+    expect(
+      helmSlotAvailableForEntity(
+        playerEntity({ modularAppearance: { gender: 'male' }, skinCatalog: 'mech' }),
+        (e) => inWorldLookFor(e, CLASS_KIT),
+      ),
+    ).toBe(false);
   });
 });
 

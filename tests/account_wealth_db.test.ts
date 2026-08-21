@@ -276,7 +276,9 @@ describe('withAccountWealthSweepLock', () => {
     const statements = cquery.mock.calls.map((call) => call[0] as string);
     expect(statements.some((s) => /pg_try_advisory_lock/.test(s))).toBe(true);
     expect(statements.some((s) => /pg_advisory_unlock/.test(s))).toBe(true);
-    expect(cquery.mock.calls[0][1]).toEqual([ACCOUNT_WEALTH_SWEEP_LOCK_KEY]);
+    const firstCall = cquery.mock.calls[0] as Parameters<TestQuery> | undefined;
+    expect(firstCall).toBeDefined();
+    expect(firstCall?.[1]).toEqual([ACCOUNT_WEALTH_SWEEP_LOCK_KEY]);
     // A healthy pass pools the client back (no destroy argument).
     expect(release).toHaveBeenCalledWith(undefined);
   });

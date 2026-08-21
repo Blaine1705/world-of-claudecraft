@@ -162,8 +162,19 @@ describe('suspicionFlagsForAccount', () => {
 describe('transitionSuspicionFlag', () => {
   function clientStub(currentStatus: string | null) {
     const cquery = vi.fn<TestQuery>(async (text: string) => {
-      if (/SELECT status FROM account_suspicion_flags/.test(text)) {
-        return queryResult(currentStatus === null ? [] : [{ status: currentStatus }]);
+      if (/WHERE id = \$1 FOR UPDATE/.test(text)) {
+        return queryResult(
+          currentStatus === null
+            ? []
+            : [
+                {
+                  account_id: 42,
+                  source: 'bot_detector',
+                  kind: 'session_automation',
+                  status: currentStatus,
+                },
+              ],
+        );
       }
       return queryResult([]);
     });
@@ -185,10 +196,11 @@ describe('transitionSuspicionFlag', () => {
     const statements = cquery.mock.calls.map((call) => call[0]);
     expect(statements[0]).toBe('BEGIN');
     expect(statements[1]).toMatch(/FOR UPDATE/);
-    expect(statements[2]).toMatch(/UPDATE account_suspicion_flags SET status/);
-    expect(statements[3]).toMatch(/INSERT INTO account_suspicion_flag_events/);
-    expect(statements[4]).toBe('COMMIT');
-    expect(cquery.mock.calls[3][1]).toEqual([11, 7, 'new', 'under_review', 'looking']);
+    expect(statements[2]).toMatch(/AND id <> \$4/);
+    expect(statements[3]).toMatch(/UPDATE account_suspicion_flags SET status/);
+    expect(statements[4]).toMatch(/INSERT INTO account_suspicion_flag_events/);
+    expect(statements[5]).toBe('COMMIT');
+    expect(cquery.mock.calls[4][1]).toEqual([11, 7, 'new', 'under_review', 'looking']);
     expect(release).toHaveBeenCalled();
   });
 
@@ -206,6 +218,39 @@ describe('transitionSuspicionFlag', () => {
     expect(statements.some((s) => /UPDATE account_suspicion_flags/.test(s))).toBe(false);
     expect(release).toHaveBeenCalled();
     expect(query).not.toHaveBeenCalled();
+  });
+
+  it('returns invalid_transition when reopening would collide with an active sibling', async () => {
+    const cquery = vi.fn<TestQuery>(async (text: string) => {
+      if (/WHERE id = \$1 FOR UPDATE/.test(text)) {
+        return queryResult([
+          {
+            account_id: 42,
+            source: 'bot_detector',
+            kind: 'session_automation',
+            status: 'cleared',
+          },
+        ]);
+      }
+      if (/AND id <> \$4/.test(text)) return queryResult([{ id: 12 }]);
+      return queryResult([]);
+    });
+    const release = vi.fn();
+    connect.mockResolvedValue({ query: cquery, release } as unknown as PoolClient);
+
+    const result = await transitionSuspicionFlag({
+      flagId: 11,
+      adminAccountId: 7,
+      to: 'under_review',
+      note: 'new evidence',
+    });
+
+    expect(result).toEqual({ ok: false, error: 'invalid_transition' });
+    const statements = cquery.mock.calls.map((call) => call[0]);
+    expect(statements.some((s) => /AND id <> \$4/.test(s))).toBe(true);
+    expect(statements.some((s) => /UPDATE account_suspicion_flags/.test(s))).toBe(false);
+    expect(statements).toContain('ROLLBACK');
+    expect(release).toHaveBeenCalled();
   });
 
   it('reports a missing flag as not_found', async () => {

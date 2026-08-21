@@ -23,14 +23,15 @@ describe('ChatModerationLiveState', () => {
     hydration.release();
   });
 
-  it('prefers a live unmute pushed after hydration began over the stale muted snapshot', () => {
+  it('does not let a local live unmute override an active DB mute from another process', () => {
     const state = new ChatModerationLiveState();
     const hydration = state.beginHydration(1);
-    // The mirror image: an admin lifts the mute while the stale (still
-    // muted) snapshot read is in flight.
+    // The live push only proves this process changed after hydration began; it
+    // does not prove that a concurrent DB snapshot mute from another process is
+    // older. Fail closed and keep the active mute.
     state.muteChanged(1, { mutedUntil: null, reason: '' });
-    const staleMuted = { ...MUTE, strikes: 0 };
-    expect(hydration.resolve(staleMuted)).toEqual(UNMUTED);
+    const dbMuted = { ...MUTE, strikes: 0 };
+    expect(hydration.resolve(dbMuted)).toEqual(dbMuted);
     hydration.release();
   });
 

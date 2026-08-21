@@ -314,7 +314,7 @@ export async function transitionSuspicionFlag(input: {
   try {
     await client.query('BEGIN');
     const current = await client.query(
-      `SELECT status FROM account_suspicion_flags WHERE id = $1 FOR UPDATE`,
+      `SELECT account_id, source, kind, status FROM account_suspicion_flags WHERE id = $1 FOR UPDATE`,
       [input.flagId],
     );
     if (!current.rows[0]) {
@@ -325,6 +325,30 @@ export async function transitionSuspicionFlag(input: {
     if (!allowedSuspicionFlagTransition(from, input.to)) {
       await client.query('ROLLBACK');
       return { ok: false, error: 'invalid_transition' };
+    }
+    if (input.to === 'new' || input.to === 'under_review') {
+      const activeSibling = await client.query(
+        `SELECT id
+         FROM account_suspicion_flags
+         WHERE account_id = $1
+           AND source = $2
+           AND kind = $3
+           AND id <> $4
+           AND status = ANY($5::text[])
+         LIMIT 1
+         FOR UPDATE`,
+        [
+          current.rows[0].account_id,
+          current.rows[0].source,
+          current.rows[0].kind,
+          input.flagId,
+          [...SUSPICION_FLAG_ACTIVE_STATUSES],
+        ],
+      );
+      if (activeSibling.rows[0]) {
+        await client.query('ROLLBACK');
+        return { ok: false, error: 'invalid_transition' };
+      }
     }
     await client.query(
       `UPDATE account_suspicion_flags SET status = $2, updated_at = now() WHERE id = $1`,

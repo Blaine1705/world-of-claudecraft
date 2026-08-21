@@ -328,6 +328,7 @@ describe('Hud Warlock pet signature bar', () => {
 
     const stanceMenu = document.querySelector<HTMLButtonElement>('[data-focus-key="stance-menu"]');
     expect(stanceMenu).not.toBeNull();
+    expect(document.querySelector<HTMLButtonElement>('[data-focus-key="pet_mend"]')).toBeNull();
   });
 
   it('still hides the pet bar once every demon is gone', () => {

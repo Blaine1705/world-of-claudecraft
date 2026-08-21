@@ -917,6 +917,7 @@ const ACCOUNT_SORT_COLUMNS: Record<AdminAccountSort, string> = {
   last_login: 'a.last_login',
   total_copper: 'total_copper',
 };
+const POSTGRES_INT_MAX = 2_147_483_647;
 
 export async function listAccounts(
   search: string,
@@ -930,7 +931,11 @@ export async function listAccounts(
   // id, so admins can paste an id from a report and land on the account; the
   // username/character-name partial match still applies alongside.
   const numericSearch =
-    /^\d+$/.test(search) && Number.isSafeInteger(Number(search)) ? Number(search) : null;
+    /^\d+$/.test(search) &&
+    Number.isSafeInteger(Number(search)) &&
+    Number(search) <= POSTGRES_INT_MAX
+      ? Number(search)
+      : null;
   const offset = (page - 1) * limit;
   const direction = dir === 'asc' ? 'ASC' : 'DESC';
   const column = ACCOUNT_SORT_COLUMNS[sort];

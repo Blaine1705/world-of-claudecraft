@@ -4093,7 +4093,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
     [-136, 743],
     [52, 817],
     [28, 847],
-    // The practice row's single fire, three feet in front of the normal boss
+    // The practice row's single fire, 1.5 yards in front of the normal boss
     // dummy. The mark is derived from the row itself (content/practice_dummies.ts)
     // so it follows the row if the pitch is ever retuned.
     PRACTICE_ROW_CAMPFIRE,

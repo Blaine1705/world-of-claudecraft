@@ -3,14 +3,11 @@
 // abilities (talents included) instead of reading the actually-applied aura's value, so
 // a stale or foreign talent state could show the wrong armor number.
 //
-// Single offline client repro (no second player needed): cast Fiendhide (rank 3, base
-// armor 80) BEFORE learning Pact Deepened, so the live aura keeps value 80. Then select
-// Pact Deepened (doubles Fiendhide's armor for its owner going forward, but does not
-// retroactively touch the already-applied aura). Hovering the still-active buff icon:
-//   BEFORE the fix: the tooltip prose re-resolves "demon_skin" through the character's
-//   CURRENT talents (now including Pact Deepened) and shows 160, contradicting the
-//   mechanical effect line below it, which reads the real applied value (80).
-//   AFTER the fix: both lines read the real applied aura value (80).
+// Single offline client capture (no second player needed): cast Fiendhide (rank 3,
+// base armor 80) BEFORE learning Pact Deepened, then select Pact Deepened. Talent
+// recompute reconciles the active aura, so the still-active buff updates from 80
+// to 160 and the tooltip's prose and mechanical effect line should agree before
+// and after the talent change.
 //
 // Usage: BROWSER_PATH=/path/to/chrome node scripts/fiendhide_tooltip_shot.mjs
 // (needs `npm run dev` running on :5173)
@@ -75,6 +72,12 @@ async function hoverBuffAndCapture(page, outFile) {
   return page.$eval('#tooltip', (el) => el.textContent ?? '');
 }
 
+function assertTooltipText(text, expected) {
+  if (!text.includes(expected)) {
+    throw new Error(`expected tooltip to include ${expected}, got: ${text}`);
+  }
+}
+
 async function main() {
   const browser = await puppeteer.launch({
     executablePath: BROWSER_PATH,
@@ -92,6 +95,7 @@ async function main() {
 
     const beforeText = await hoverBuffAndCapture(page, `${OUT}/before-tooltip.png`);
     console.log('before:', beforeText);
+    assertTooltipText(beforeText, '80');
 
     const sel = await selectPactDeepened(page);
     console.log('selectTalentRow Pact Deepened:', sel);
@@ -100,6 +104,7 @@ async function main() {
 
     const afterText = await hoverBuffAndCapture(page, `${OUT}/after-tooltip.png`);
     console.log('after:', afterText);
+    assertTooltipText(afterText, '160');
   } finally {
     await browser.close();
   }
