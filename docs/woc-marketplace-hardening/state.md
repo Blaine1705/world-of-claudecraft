@@ -5,6 +5,41 @@ actually reads.
 
 ## Where we are
 
+- CLOSE-OUT PREP RIDER QA DONE (2026-08-20, THREE repos, verdict
+  PASS-WITH-FOLLOWUPS, every finding applied or judged, PUSHED per R4:
+  game e6ea9968f6..the wrap tip to origin/feature/woc-marketplace;
+  service 52fa0c2..d9a4f9b to feature/woc-market-settlement (PR #31);
+  dashboard dfd0f4d..fede8de to feature/woc-market-trading-controls (PR
+  #13)). All three syncs NO-OPS. Eleven audit lanes + the QA's own
+  hands. THE HEADLINE: the gate review defeated the THIRD pin shape (a
+  block-scalar shard clone invisible to the run-line recognizer), so the
+  R16 pin is now SHAPE FOUR (2b9f583b2f hardened 1e932c5b61): complete
+  job-key classification (wired / guarded-dbless with a forcing
+  function / test-free), token cross-checks, novelty refusals
+  (expression runs, job-level uses, unrecognized job spellings), the
+  browser coupled guard, widened 5433 matchers with positive controls,
+  exactly-one-occurrence env pins, the WOCC_EXPECT_PG sentinel arming
+  the runtime twin on any runner, and the other four workflow files
+  enumerated from the git index and pinned test-free. FOUR of the QA's
+  own mutants SURVIVED the shipped pins and are closed with new tests:
+  the volume WINDOW BOUND (both stores, service d9a4f9b), decimals-0
+  (both repos), the banner's below-constant direction (dashboard
+  c0e99d2). Mutation record this QA: 17 new distinct all BIT + 24
+  stale re-runs all re-BIT (whole log 436); pg battery probed 3x
+  parallel against a virgin database, green. Runbook corrected against
+  code (refresh-recovery levers, R12 Not-now documented, anchors for
+  every bare literal); audit citations repaired (boot pins to
+  market_bootstrap, dev-database classes to the 06 ledger, R14's
+  checklist item ACTUALLY added to the counsel memo); follow-ups gains
+  the QA's items. Validation: service 605/605 pg zero skips + build;
+  dashboard 282/282 + check + build + security 66/66; game tsc clean +
+  gate_select PASS ALL 12 STEPS TWICE (040a1ca7a1 and 87bc9df8be, full
+  fallback, 43,000 tests + browser 131, TEST_DATABASE_URL command line
+  only). The QA round section in progress.md is the registry
+  (JUDGED-DECLINED list binding). NEXT = RESUME
+  phase-21-devnet-dry-run.md once devnet SOL exists (devnet.md bottom
+  section is the runbook), then phase-21-qa.md, then the shrunken
+  phase-22-close-out.md.
 - CLOSE-OUT PREP RIDER IMPLEMENT DONE (2026-08-20, THREE repos, LOCAL per
   R4: nothing pushed; the paired QA pushes on PASS). All three syncs
   NO-OPS. RULING GATE: Fernando delegated in-session and the presented

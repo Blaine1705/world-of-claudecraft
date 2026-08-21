@@ -6470,3 +6470,147 @@ state.md (the closing note is authoritative). NOTHING PUSHED anywhere
 NEXT: docs/woc-marketplace-hardening/rider-close-out-prep-qa.md, FRESH
 session, three repos, diffs: game 5f86e975af..the registry tip, service
 8db7734..52fa0c2, dashboard 145d120..dfd0f4d; pushes on PASS per R4.
+
+## Close-out prep rider QA round (2026-08-20, THREE repos, verdict PASS-WITH-FOLLOWUPS, every finding applied or judged)
+
+Session start: game e6ea9968f6 on feature/woc-marketplace (0 behind
+origin/release/v0.40.0, sync a NO-OP; no release-merge-audit owed),
+service 52fa0c2 (0 behind origin/master), dashboard dfd0f4d (0 behind
+origin/master); all trees clean.
+
+AUDIT: eleven read-only lanes (gate-integrity-reviewer and
+test-coverage-auditor as repo reviewers, nine workflow lanes:
+runbook-vs-game with 40+ claims verified, obligation sweep, audit-table
+honesty with ten rows re-derived, service security + correctness,
+dashboard security + correctness, cleanup/constraints, ruling ledger),
+plus the QA's own hands: five runbook spot-checks, the R9 grep
+reproduced independently (four send sites, two surfaces, no literal),
+follow-ups line refs spot-checked, the closing commit verified
+docs-only, the rider mutation-log arithmetic re-derived (18 distinct +
+3 re-runs confirmed).
+
+THE HEADLINE: the gate review DEFEATED the third pin shape with a
+measured exploit (a run-line recognizer misses a shard clone whose
+command is a `run: |` block scalar; half the matrix loses its database
+with every pin green; the same recognizer already missed the two live
+browser jobs). Rebuilt as SHAPE FOUR (game 2b9f583b2f): complete
+job-key classification (every key pg-wired, guarded DB-less, or
+test-free; set-equality completeness), token-scan cross-checks over
+comment-stripped span content, expression-run refusal, the browser
+coupled guard (script-to-config-to-include-to-scan chain through the
+shared walker), widened quoted/host-bound 5433 matchers with positive
+controls, and the WOCC_EXPECT_PG sentinel pinned beside the URL so
+tests/ci_pg_presence.test.ts arms on ANY runner brand. The FRESH
+re-review of that fix round found three residual doors (an unguarded
+dbless classification; a step-level env override blanking legs under a
+satisfied job-level pin; an unclassifiable job-level uses) plus
+spelling gaps, ALL closed in 1e932c5b61: the dbless forcing function
+(every member names its coupled guard, label set pinned),
+exactly-one-occurrence pins on both variables per wired job, job-level
+uses and expression-initial lines refused as novelty, the token
+alternation widened, unrecognized two-space jobs-body lines refused
+instead of swallowed, and the four other workflow files enumerated from
+the git index and pinned test-free.
+
+MUTATION SPOT-CHECKS (the QA's own strips; the full record is the
+rider QA section of phase-20-mutation-log.md): FOUR SURVIVORS proven by
+execution and closed with new pins: the memory volumeTotals WINDOW
+BOUND was entirely unpinned (all three overview windows silently agree
+with it stripped; service d9a4f9b adds the two-day-old settlement
+fixture in BOTH stores, the empty-window zero-string shape, and the pg
+heldUsdCents pin); the decimals-0 edge unpinned on BOTH repos (a falsy
+coercion or a positive-only clamp re-scales a valid 0-decimal mint
+silently; service decimalsAt('0'), dashboard clamp/loader/banner-zero
+pins in c0e99d2); the banner's below-constant direction unpinned
+(every fixture sat above the constant). 17 new distinct mutants all
+BIT, 24 stale-verdict re-runs all re-BIT, 1 compile-refused strip;
+whole log 436. CONCURRENCY PROBE (the gate review's minimum ask): the
+full pg battery (17 suites, 333 tests) three times as one parallel
+vitest invocation against a virgin database, all green; the
+TRUNCATE-vs-INSERT class stays the widened watch item in follow-ups
+5.3, failure direction RED.
+
+OTHER FINDINGS APPLIED: client_perf's migration beforeAll gains the
+120s budget its siblings use (the default 10s hookTimeout was a
+merge-bar flake on the shared CI database, and a timed-out hook
+abandons the advisory-lock client); the two 5432 dead-letter fallbacks
+moved to 5433 (5432 is live inside CI legs now; both suites verified
+never-connecting); the "rides every selective shard" comments
+corrected (one leg executes the sentinel; the env is job-level so one
+suffices); WOCC_EXPECT_PG declared in turbo.json; runbook corrections
+(the refresh-recovery levers narrowed to the two that work, verified
+against the dashboard code; the R12 Not-now behavior documented with
+WOC_MARKET_BUY_NOW_LOCK_SECONDS; capacity literals anchored to
+DB_POOL_MAX_CLIENTS, WOC_MARKET_ME_READOUT_DEADLINE_MS,
+RETENTION_SWEEP_UTC_HOUR, WOC_MARKET_LISTINGS_RETENTION_DAYS;
+stuck-age's COALESCE fallback stated; the suspension correlation via
+the stuckBonds raw account id absorbed; the missing
+connectionTimeoutMillis surfaced as an operator note); audit-table
+repairs (the dev-database classes re-cited to their real 06 ledger
+record with the verdict token fixed; the all-or-nothing boot pins
+re-attributed to market_bootstrap.test.ts; R14's re-park destination
+ACTUALLY given its checklist item in the counsel memo plus the
+RECORDED-vs-SHOWN sentence; the four consent send sites named; OPEN-21
+residuals cross-referenced inline on three rows; validation rows moved
+to the QA tips); follow-ups additions (classifier asymmetry + the
+vite-exclude re-skip class, the shared-helper guard-move dependency,
+the TRUNCATE-vs-INSERT watch widening, the abandons-FK closure of
+record, the read-bucket 429 re-judgment, SEC-9 and
+manipulation-economics marked as needing Fernando's judgment, the
+wallets-arm exponent screening + treasury parse cap, WOC_DECIMALS
+parser unification); dashboard CLAUDE.md's token bullet names both
+payload-holding panels; the brittle no-banner negative anchored to the
+banner sentence (fede8de); qa-gate.md and tests/CLAUDE.md updated to
+the shape-four and sentinel reality.
+
+JUDGED-DECLINED this round (do not re-raise): the R13 record's
+un-struck original remedy sentence (historical ruling record; the
+amendment in the same bullet and runbook section 12 carry the corrected
+procedure); null wocDecimals landing as the overview error (out of
+contract, fail-honest, the settledBase-null principle); the 0..18 range
+open-coded in loader and clamp (rule of three; both sides pinned at
+19); the overview-outage banner-strip residual (documented section
+independence; the release-form gate question is follow-ups 7.1b); a
+schema CHECK tying settlement kind to non-null legs (the reconciliation
+exists to catch exactly that class at render); mutation-log rows naming
+files only in section prose (format consistency); the whole-log census
+divergence (predates the rider; reconciliation deferred to 22 with the
+caveat recorded in the log).
+
+FIX-ROUND RE-REVIEWS: the gate side re-reviewed FRESH (no criticals, no
+vacuous assertions; its three warnings closed in 1e932c5b61, which was
+itself validated reviewer-prescription-plus-mutants: 4 new mutants and
+all 13 prior CI verdicts re-run, all BIT). The docs side: the spawned
+fresh reviewer stalled through two nudges, so the re-review completed
+as the sanctioned careful self-review with files open (every claim in
+0bba4ea5d5 verified against code, including the refresh-recovery
+mechanics re-derived from periodic_refresh.ts and MarketTradingPanel).
+
+VALIDATION at the tips: service npm run build clean + 605/598/0
+default + 605/605 pg zero skips (CLAUDIUM_TEST_DATABASE_URL on the
+command line); dashboard 282/282 + check 0 errors + build complete +
+test:security 66/66; game npx tsc --noEmit clean, the workflow pin
+battery green, the sentinel proven red-without-URL and green-with-URL,
+and gate_select PASS ALL 12 STEPS TWICE (040a1ca7a1 mid-round and
+87bc9df8be at the registry-adjacent tip, both full-suite fallback,
+43,000 tests + browser 131, TEST_DATABASE_URL on the command line
+only; the first run failed at changed-files biome on a format diff in
+the new pin, fixed in 040a1ca7a1). This wrap-up commit is the only one
+past the gated tip, docs-only per the closing-note convention.
+
+PUSHED per R4: game feature/woc-marketplace, service
+integration/woc-market-settlement:feature/woc-market-settlement (PR
+#31), dashboard
+integration/woc-market-trading:feature/woc-market-trading-controls (PR
+#13); secret sweep of every outgoing diff clean (fixture values only).
+PR CI state recorded below after the push.
+
+DEFERRED (owners recorded): the CI shard-weight re-harvest fires at the
+FIRST real CI run of the R16 wiring (no PR exists on the game branch,
+so that is the eventual 22 PR; follow-ups 5.1); the whole-log census
+reconciliation (22); the TRUNCATE-vs-INSERT and CIC flake watches
+(first CI runs); everything in follow-ups.md by section.
+
+NEXT: docs/woc-marketplace-hardening/phase-21-devnet-dry-run.md resumes
+once devnet SOL exists (devnet.md bottom section is the runbook), then
+phase-21-qa.md, then the shrunken phase-22-close-out.md.
