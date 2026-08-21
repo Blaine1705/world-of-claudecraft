@@ -2064,6 +2064,10 @@ export const zh_CN: EnTranslations = {
       "errPasswordLong": "新密码最多只能包含 128 个字符。",
       "errPasswordUnchanged": "新密码必须与当前密码不同。",
       "errPasswordConfirm": "两次输入的新密码不一致。",
+      "setPasswordTitle": "设置密码",
+      "setPasswordHint": "该账户是通过\"通过 Apple 登录\"或 Discord 创建的，尚未设置密码。设置密码后即可在其他设备（例如 Mac 和 Windows 桌面客户端）或网页上使用用户名和密码登录，也可以绑定其他登录方式。",
+      "setPasswordSubmit": "设置密码",
+      "passwordSet": "密码已设置。现在可以在任何设备上使用用户名和密码登录。",
       "emailLabel": "邮箱（可选）",
       "emailHint": "仅用于账户找回。我们绝不发送营销邮件。",
       "saveEmail": "保存邮箱",
@@ -3904,7 +3908,8 @@ export const zh_CN: EnTranslations = {
       "password_too_long": "新密码最多只能包含 128 个字符。",
       "characters_online": "请先登出所有角色再进行注销。",
       "deactivated": "此账户已注销。请联系管理员以恢复。",
-      "not_found": "未找到账户。"
+      "not_found": "未找到账户。",
+      "password_already_set": "该账户已设置密码，请改用\"修改密码\"。"
     },
     "character": {
       "name_invalid": "角色名称无效。请使用 2-16 个字母。",

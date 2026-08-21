@@ -345,6 +345,9 @@ export interface AccountInfo {
   createdAt: string;
   characterCount: number;
   twoFactorEnabled: boolean;
+  // False for an account provisioned by Apple or Discord sign-in that never got
+  // a real, owner-chosen password (see setInitialPassword below).
+  passwordSet: boolean;
 }
 
 // Carries the HTTP status alongside the server's error text so callers can
@@ -725,6 +728,14 @@ export class Api {
 
   async changePassword(current: string, next: string): Promise<void> {
     await this.post('/api/account/password', { current, next });
+  }
+
+  // Set a real password on an account that has none yet (an Apple- or
+  // Discord-provisioned account whose only credential is a random placeholder
+  // hash the owner never saw). Bearer-scoped; the server rejects it once a real
+  // password exists (use changePassword from there).
+  async setInitialPassword(next: string): Promise<void> {
+    await this.post('/api/account/password/set-initial', { next });
   }
 
   // Request a password-reset email (for a locked-out user). Always resolves: the

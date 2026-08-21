@@ -1391,6 +1391,23 @@
                 <button type="submit" class="btn btn-primary" data-i18n="hudChrome.account.savePassword">Update Password</button>
               </form>
 
+              <!-- Shown instead of Change Password for an Apple- or Discord-provisioned
+                   account (passwordSet:false): there is no current password to re-verify. -->
+              <form id="account-set-password-form" class="account-form" novalidate hidden>
+                <h4 class="account-form-title" data-i18n="hudChrome.account.setPasswordTitle">Set a Password</h4>
+                <p class="account-hint" data-i18n="hudChrome.account.setPasswordHint">This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.</p>
+                <div class="auth-field">
+                  <label for="account-set-new-pass" class="auth-label" data-i18n="hudChrome.account.newPassword">New password</label>
+                  <input id="account-set-new-pass" type="password" maxlength="128" autocomplete="new-password" />
+                </div>
+                <div class="auth-field">
+                  <label for="account-set-confirm-pass" class="auth-label" data-i18n="hudChrome.account.confirmNewPassword">Confirm new password</label>
+                  <input id="account-set-confirm-pass" type="password" maxlength="128" autocomplete="new-password" />
+                </div>
+                <div id="account-set-password-msg" class="auth-field-msg" aria-live="polite"></div>
+                <button type="submit" class="btn btn-primary" data-i18n="hudChrome.account.setPasswordSubmit">Set Password</button>
+              </form>
+
               <div class="account-form">
                 <div class="auth-field">
                   <label for="account-email" class="auth-label" data-i18n="hudChrome.account.emailLabel">Email (optional)</label>

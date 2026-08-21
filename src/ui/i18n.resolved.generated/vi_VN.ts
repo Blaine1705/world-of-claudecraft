@@ -2064,6 +2064,10 @@ export const vi_VN: EnTranslations = {
       "errPasswordLong": "Mật khẩu mới phải có nhiều nhất 128 ký tự.",
       "errPasswordUnchanged": "Mật khẩu mới phải khác với mật khẩu hiện tại.",
       "errPasswordConfirm": "Mật khẩu mới không khớp.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "Email (tùy chọn)",
       "emailHint": "Chỉ dùng để khôi phục tài khoản. Dùng Đổi Email bên dưới để cập nhật.",
       "saveEmail": "Lưu Email",
@@ -3904,7 +3908,8 @@ export const vi_VN: EnTranslations = {
       "password_too_long": "Mật khẩu mới phải có tối đa 128 ký tự.",
       "characters_online": "Hãy đăng xuất tất cả nhân vật của bạn trước khi vô hiệu hóa tài khoản.",
       "deactivated": "Tài khoản này đã bị vô hiệu hóa. Hãy liên hệ quản trị viên để khôi phục.",
-      "not_found": "Không tìm thấy tài khoản."
+      "not_found": "Không tìm thấy tài khoản.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Tên nhân vật không hợp lệ. Dùng 2-16 chữ cái.",

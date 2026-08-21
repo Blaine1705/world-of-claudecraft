@@ -2064,6 +2064,10 @@ export const id_ID: EnTranslations = {
       "errPasswordLong": "Kata sandi baru maksimal 128 karakter.",
       "errPasswordUnchanged": "Kata sandi baru harus berbeda dari yang saat ini.",
       "errPasswordConfirm": "Kata sandi baru tidak cocok.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "Email (opsional)",
       "emailHint": "Hanya digunakan untuk pemulihan akun. Gunakan Ubah Email di bawah untuk memperbaruinya.",
       "saveEmail": "Simpan Email",
@@ -3904,7 +3908,8 @@ export const id_ID: EnTranslations = {
       "password_too_long": "Kata sandi baru harus maksimal 128 karakter.",
       "characters_online": "Keluarkan semua karakter Anda sebelum menonaktifkan akun.",
       "deactivated": "Akun ini telah dinonaktifkan. Hubungi admin untuk memulihkannya.",
-      "not_found": "Akun tidak ditemukan."
+      "not_found": "Akun tidak ditemukan.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Nama karakter tidak valid. Gunakan 2-16 huruf.",

@@ -2064,6 +2064,10 @@ export const cs_CZ: EnTranslations = {
       "errPasswordLong": "Nové heslo smí mít nejvýše 128 znaků.",
       "errPasswordUnchanged": "Nové heslo se musí lišit od aktuálního.",
       "errPasswordConfirm": "Nová hesla se neshodují.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "E-mail (volitelné)",
       "emailHint": "Používá se jen pro obnovu účtu. Níže použij Změnit e-mail, pokud ho chceš aktualizovat.",
       "saveEmail": "Uložit e-mail",
@@ -3904,7 +3908,8 @@ export const cs_CZ: EnTranslations = {
       "password_too_long": "Nové heslo smí mít nejvýše 128 znaků.",
       "characters_online": "Před deaktivací odhlas všechny své postavy.",
       "deactivated": "Tento účet byl deaktivován. Kontaktuj admina kvůli obnovení.",
-      "not_found": "Účet nenalezen."
+      "not_found": "Účet nenalezen.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Neplatné jméno postavy. Použij 2-16 písmen.",

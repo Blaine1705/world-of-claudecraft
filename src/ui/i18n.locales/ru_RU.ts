@@ -5969,6 +5969,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordLong': 'Новый пароль должен содержать не более 128 символов.',
   'hudChrome.account.errPasswordUnchanged': 'Новый пароль должен отличаться от текущего.',
   'hudChrome.account.errPasswordConfirm': 'Новые пароли не совпадают.',
+  'hudChrome.account.setPasswordTitle': 'Установить пароль',
+  'hudChrome.account.setPasswordHint':
+    'Эта учётная запись была создана через вход через Apple или Discord, и у неё ещё нет пароля. Установите пароль, чтобы входить с других устройств, например настольных приложений для Mac и Windows или через веб, а также чтобы привязать дополнительные способы входа.',
+  'hudChrome.account.setPasswordSubmit': 'Установить пароль',
+  'hudChrome.account.passwordSet':
+    'Пароль установлен. Теперь вы можете входить с логином и паролем на любом устройстве.',
   'hudChrome.account.emailLabel': 'Эл. почта (необязательно)',
   'hudChrome.account.emailHint':
     'Используется только для восстановления аккаунта. Мы не рассылаем рекламные письма.',
@@ -8697,6 +8703,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.account.deactivated':
     'Этот аккаунт деактивирован. Для восстановления обратитесь к администратору.',
   'apiError.account.not_found': 'Аккаунт не найден.',
+  'apiError.account.password_already_set':
+    'У этой учётной записи уже есть пароль. Используйте вместо этого смену пароля.',
   'apiError.character.name_invalid': 'Недопустимое имя персонажа. Используйте 2-16 букв.',
   'apiError.character.name_not_allowed': 'Это имя персонажа запрещено.',
   'apiError.character.invalid_class': 'Недопустимый класс.',

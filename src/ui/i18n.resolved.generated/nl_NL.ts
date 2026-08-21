@@ -2064,6 +2064,10 @@ export const nl_NL: EnTranslations = {
       "errPasswordLong": "Het nieuwe wachtwoord mag hoogstens 128 tekens lang zijn.",
       "errPasswordUnchanged": "Het nieuwe wachtwoord moet verschillen van het huidige.",
       "errPasswordConfirm": "De nieuwe wachtwoorden komen niet overeen.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "E-mail (optioneel)",
       "emailHint": "Alleen gebruikt voor accountherstel. Gebruik E-mail Wijzigen hieronder om het bij te werken.",
       "saveEmail": "E-mail Opslaan",
@@ -3904,7 +3908,8 @@ export const nl_NL: EnTranslations = {
       "password_too_long": "Nieuw wachtwoord mag maximaal 128 tekens lang zijn.",
       "characters_online": "Log al je personages uit voordat je het account deactiveert.",
       "deactivated": "Dit account is gedeactiveerd. Neem contact op met een beheerder om het te herstellen.",
-      "not_found": "Account niet gevonden."
+      "not_found": "Account niet gevonden.",
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Ongeldige personagenaam. Gebruik 2-16 letters.",

@@ -482,6 +482,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Sets a real password on an account that has none yet (an Apple- or
+  // Discord-provisioned account); once one exists it 409s to the change flow above.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/account/password/set-initial',
+    handler: 'handleApi arm: /api/account/password/set-initial (handleAccountSetInitialPassword)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // Unauthenticated by design: forgot takes a username and always answers 200
   // (anti-enumeration); reset is authorized by the emailed token.
   {

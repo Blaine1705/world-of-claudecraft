@@ -2064,6 +2064,10 @@ export const ja_JP: EnTranslations = {
       "errPasswordLong": "新しいパスワードは128文字以内にしてください。",
       "errPasswordUnchanged": "新しいパスワードは現在のものと異なる必要があります。",
       "errPasswordConfirm": "新しいパスワードが一致しません。",
+      "setPasswordTitle": "パスワードを設定",
+      "setPasswordHint": "このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードが設定されていません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他のデバイスでサインインしたり、追加のサインイン方法を連携したりできます。",
+      "setPasswordSubmit": "パスワードを設定",
+      "passwordSet": "パスワードを設定しました。ユーザー名とパスワードでどこからでもサインインできます。",
       "emailLabel": "メールアドレス（任意）",
       "emailHint": "アカウント復旧にのみ使用します。宣伝メールは一切送信しません。",
       "saveEmail": "メールを保存",
@@ -3904,7 +3908,8 @@ export const ja_JP: EnTranslations = {
       "password_too_long": "新しいパスワードは128文字以内にしてください。",
       "characters_online": "無効化する前にすべてのキャラクターからログアウトしてください。",
       "deactivated": "このアカウントは無効化されています。復元するには管理者に連絡してください。",
-      "not_found": "アカウントが見つかりません。"
+      "not_found": "アカウントが見つかりません。",
+      "password_already_set": "このアカウントには既にパスワードが設定されています。「パスワードの変更」をご利用ください。"
     },
     "character": {
       "name_invalid": "キャラクター名が無効です。2-16文字の英字を使用してください。",
