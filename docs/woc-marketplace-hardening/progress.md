@@ -6345,3 +6345,128 @@ acceptance-audit prep with devnet rows OPEN; the follow-ups draft).
 phase-22-close-out.md carries the matching shrink note. Session order is
 now: the rider pair FIRST (runnable immediately), the 21 resume when SOL
 exists, then 21 QA, then the shrunken 22.
+
+## Close-out prep rider implement round (2026-08-20, THREE repos, LOCAL per R4)
+
+Session start: game 5f86e975af on feature/woc-marketplace (0 behind
+origin/release/v0.40.0, sync a NO-OP), service 8db7734 on
+integration/woc-market-settlement (0 behind origin/master), dashboard
+145d120 on integration/woc-market-trading (0 behind origin/master); all
+three trees clean; no release-merge-audit owed. Baselines re-proven before
+any change: service 604 tests at tip after the round (from 603), dashboard
+276, both green.
+
+RULING GATE: the five parked questions were presented with
+recommendations; Fernando delegated in-session ("do whatever is absolutely
+best for the feature and project") and the recommendations were adopted as
+rulings R12 to R16 (records in state.md Rulings; commit b06708443b landed
+BEFORE any implementation). R12 Not-now document-only (release route =
+product debt), R13 outage forfeit document-only plus a named follow-up
+(AMENDED same session, see below), R14 terms re-consent re-parked to R6's
+enable-time checklist, R15 fail-then-pay-again settled on paper, R16
+pg-suites-in-CI = CHANGE CODE. The five re-surface items were re-surfaced
+verbatim, not re-decided (woc_market.ts ceiling, woc_market_db.ts
+no-ratchet-row, escrow hold-ceiling sizing, auth-rider TTL brownout, R11).
+
+DELIVERABLES, all four landed:
+1. Ops runbook docs/woc-market-runbook.md (game bd14b215ad, corrected
+   b23d0b2f6d): sixteen sections absorbing every swept obligation (the
+   sweep lane walked state.md and progress.md end to end; seed list of
+   fourteen all found plus eleven unlisted obligations). VERIFIED CLAIM BY
+   CLAIM by a dedicated correctness lane against both repos: 2 HIGH (the
+   outage remedy cited a dashboard refund flow that cannot refund a
+   terminal forfeit and an outage-locked readout that does not exist;
+   procedure rewritten to manual evidence gathering plus a treasury-side
+   restitution transfer, R13 record amended), 7 MEDIUM and ~10 LOW claims
+   corrected (720h review clamp, live _open2 index plus the review state
+   in the detection query, admin-secret 503 posture, DEPLOY.md citation
+   truth, stuck-bond age knob, ledger-consulting terminal entries, RPC
+   defect classes, 50k-per-table sweep bound, six rate buckets, halt-line
+   count, forfeit-only typed confirmation). The verification also
+   surfaced a NEW PRE-ENABLE GAP: no sanctioned surface drives
+   transitionSettlement for review resolution (hand SQL forbidden by
+   design); recorded in the runbook, the audit, and follow-ups section 4.
+2. The 19/22 cross-repo ask, CODE COMPLETE both repos. SERVICE (2c4a261 +
+   06f6725 + 52fa0c2): MarketAdminOverview.wocDecimals from the WIRED
+   settlement config via MarketSettlementService.configuredWocDecimals
+   (never env; the http rig wires 9 against an empty env as the decisive
+   pin), MarketVolumeTotals.settledBase = SUM(amount_base) both stores; a
+   settled bond sits in-window in BOTH the http and pg rigs so a kind
+   drift inflates the pins (found unpinned by the reviews, closed, strip
+   proven at both stores); heldUsdCents pinned; docs updated with the
+   one-scalar caveat. DASHBOARD (53913d7 + e37cd02 + 43457cb + dfd0f4d):
+   effectiveWocDecimals prefers the reported figure with the constant
+   fallback (older service byte-identical), the wocDecimalsMismatch
+   banner renders on the Trading tab (string reworded: names the
+   constant-fallback surfaces, verify-on-chain instruction, two-sided
+   disagreement wording), legsReconcile upgrades to the real sum
+   reconciliation on settledBase with the visible windowReconcileNote
+   downgrade line when absent, the loader screens a garbled wocDecimals
+   or settledBase into the overview error (no payload value can reach
+   10n ** BigInt), and every BigInt money parse is capped at the
+   NUMERIC(40,0) width with DECISIVE over-length arms (exact-sum 41-digit
+   fixtures after the first arm proved vacuous).
+3. Acceptance audit prep docs/woc-marketplace-hardening/acceptance-audit.md:
+   every non-devnet row evidenced (the R9 grep ran this session: both
+   acceptTerms send sites carry the player's real choice, PASS); devnet
+   rows OPEN with the pointer; the enable-time rows named OPEN-ENABLE.
+4. Follow-ups draft docs/woc-marketplace-hardening/follow-ups.md, grouped
+   by owner from the full deferral sweep (closures cross-checked), plus
+   the rider's own additions (weight re-harvest at first CI run,
+   WOCC_PG_DIFFERENTIAL alignment, CIC flake watch, the review-resolution
+   operator route as a PRE-ENABLE requirement, the dashboard release-form
+   overview-gate question).
+
+R16 IMPLEMENTATION (game 462c234031, hardened 0343ed9271 + 1fd4692460):
+pr-gate, release-gate, and nightly's tests job each carry a per-job
+postgres:16-alpine service (health gate in options, no step added, port
+5432 so the 5433 dead letter stays dead) and a job-level
+TEST_DATABASE_URL; the gate-integrity review PROVED the client_perf pg
+suite red on every fresh database (CREATE INDEX CONCURRENTLY never built
+by ensureSchema; fixed test-first against a virgin database) and EXECUTED
+two pin defeats (file-wide counts survive relocation; a hand-listed job
+set survives a matrix split), both closed: the pin now derives the
+vitest-running job set from the run lines with guard-coupled lane/i18n
+exemptions, and tests/ci_pg_presence.test.ts (a CI_GUARD_SUITES member,
+honest local skip) reds inside GitHub Actions whenever the variable is
+missing. Accepted container-boot cost recorded at the service block;
+qa-gate.md and tests/CLAUDE.md carry the real-SQL arm, the four
+graph-classified suites, the stale-weight caveat, and the local asymmetry.
+
+REVIEW ROUNDS: five recon lanes, then gate-integrity + security +
+correctness + runbook-verification lanes, then a FRESH review of every
+fix round (three rounds deep on the gate side; the final hardening round
+was specified by the fresh gate reviewer and self-reviewed with files
+open plus five adversarial mutants in lieu of a fourth spawn). Every
+finding applied or judged. JUDGED-DECLINED (do not re-raise): the
+older-service downgrade note rendering on healthy zero-sale windows
+(visible-downgrade by design, calm copy); settledBase null landing on
+the caution line (out of contract; the economy proxy relays bodies
+verbatim); the shared tests/helpers pg-gate refactor across all 20
+suites (the derived-set pin plus the guard suite covers the class; kept
+as a follow-ups option); parameterizing the existing jobSource helper
+instead of the aligned-boundary sibling (recorded chore); the
+gate-review's PG17-local-vs-PG16-CI caveat (CI pins 16; the plan-shape
+suites run there). Reviewer reality: all lanes delivered after one nudge
+each (the idle-nudge gotcha); the service dist/ stale-mutant artifact the
+fix-round reviewer caught was erased by the next tsc run and the
+commit-before-mutating rule is re-learned (two uncommitted comment edits
+were eaten by mutant reverts and re-applied).
+
+MUTATION RECORD (the rider section of phase-20-mutation-log.md): 18
+distinct mutants, all BIT, 0 survivors, 3 stale-verdict re-run events all
+re-BIT; whole log 419.
+
+VALIDATION at the tips: service npm run build clean, 604/597/0 default,
+604/604 zero skips with CLAUDIUM_TEST_DATABASE_URL on the command line;
+dashboard 281/281, check 0 errors, build complete, test:security 66/66;
+game npx tsc --noEmit clean, ci:changed exit 0 (warnings only), the
+workflow pin battery 330 green across eight suites, gate_select PASS all
+12 steps at 0343ed9271 mid-round (full fallback; TEST_DATABASE_URL on the
+command line only), and the FINAL gate run at the registry tip recorded in
+state.md (the closing note is authoritative). NOTHING PUSHED anywhere
+(R4); the paired QA session pushes on PASS.
+
+NEXT: docs/woc-marketplace-hardening/rider-close-out-prep-qa.md, FRESH
+session, three repos, diffs: game 5f86e975af..the registry tip, service
+8db7734..52fa0c2, dashboard 145d120..dfd0f4d; pushes on PASS per R4.

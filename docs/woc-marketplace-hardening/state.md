@@ -5,6 +5,39 @@ actually reads.
 
 ## Where we are
 
+- CLOSE-OUT PREP RIDER IMPLEMENT DONE (2026-08-20, THREE repos, LOCAL per
+  R4: nothing pushed; the paired QA pushes on PASS). All three syncs
+  NO-OPS. RULING GATE: Fernando delegated in-session and the presented
+  recommendations became R12 to R16 (records in Rulings; R13 AMENDED same
+  session after the runbook verification proved its restitution mechanism
+  nonexistent: manual treasury-side transfer, never the dashboard release
+  flow). All four deliverables landed: the ops runbook
+  (docs/woc-market-runbook.md, claim-by-claim verified, 2 HIGH + 7 MEDIUM
+  corrections applied, and it surfaced a NEW PRE-ENABLE GAP: no sanctioned
+  surface drives transitionSettlement review resolution); the 19/22
+  cross-repo ask CODE COMPLETE (service reports wocDecimals from the wired
+  config + per-window settledBase, tips 2c4a261..52fa0c2; dashboard
+  prefers the reported exponent with the divergence banner, real sum
+  reconciliation, screened leaves, capped money parses, tips
+  53913d7..dfd0f4d); the acceptance audit prep (acceptance-audit.md, every
+  non-devnet row evidenced, R9 grep PASS); the follow-ups draft
+  (follow-ups.md). R16 implemented: per-job Postgres + TEST_DATABASE_URL
+  in pr-gate/release-gate/nightly (game 462c234031 hardened through
+  1fd4692460 after the gate-integrity review proved the client_perf suite
+  red on fresh databases, test-first fixed, and executed two pin defeats,
+  both closed with a derived job-set pin + the ci_pg_presence guard
+  suite). Reviews: nine lanes total, every finding applied or judged;
+  mutation record 18 distinct all BIT + 3 re-runs re-BIT (whole log 419).
+  Validation: service 604/604 pg zero skips, dashboard 281/281 + check +
+  build + security 66/66, game tsc clean + gate PASS all 12 steps at
+  0343ed9271 mid-round and the FINAL gate at the registry tip (closing
+  note below is authoritative). The rider section in progress.md is the
+  registry (JUDGED-DECLINED list binding). NEXT =
+  docs/woc-marketplace-hardening/rider-close-out-prep-qa.md (FRESH
+  session, three repos; diffs game 5f86e975af..tip, service
+  8db7734..52fa0c2, dashboard 145d120..dfd0f4d; pushes on PASS), then
+  RESUME phase-21-devnet-dry-run.md once devnet SOL exists, then
+  phase-21-qa.md, then the shrunken phase-22-close-out.md.
 - 21 DEVNET DRY RUN SESSION 1 (2026-08-20, SERVICE + GAME repos): R5
   CLOSED IN FULL by three in-session rulings (fresh throwaway devnet mint
   decimals 6; the WOC_MARKET_PRICE_MINT venue split; the same-day

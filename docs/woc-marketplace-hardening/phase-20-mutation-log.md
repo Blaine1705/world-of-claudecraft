@@ -868,6 +868,23 @@ mutating):
 | mrc_dash_legsreconcile_uncap | BIT (1 fail) | market_trading_view | legsReconcile's local parse reverted to the uncapped inline regex; the exact-41-digit-sum fixture red (uncapped, it reconciles true) |
 | mrc_dash_quotelegs_uncap | BIT (1 fail) | market_trading_view | quoteLegsMismatch's local parse reverted the same way; the over-length not-applicable arm red |
 
-Section totals: 15 distinct mutants (6 service + 7 dashboard + 2 CI),
-all BIT, 0 survivors; 1 stale-verdict re-run, re-BIT. Whole log: 416
-distinct mutants.
+The GATE HARDENING ROUND (game commit 1fd4692460): the fresh gate
+review executed two more defeats (a shard-matrix split onto a new job
+evaded the hand-listed pin; the 5433 dead-letter guard had narrowed to
+per-span), so the pin now DERIVES the vitest-running job set with
+guard-coupled exemptions, the 5433 negatives are file-wide again, and
+the runtime sentinel joined CI_GUARD_SUITES with an honest local skip.
+COMMITTED BEFORE MUTATING this time; every prior CI-pin verdict re-run
+(verdicts stale on pin edit):
+
+| mutant | verdict | suites | history |
+|---|---|---|---|
+| mrc_ci_matrix_split_new_job | BIT (5 fails) | ci_workflow | pr-gate cloned as pr-gate-b WITHOUT the DB block (the exact prior evasion); the derived set equality and the span asserts red |
+| mrc_ci_5433_sneaky_service | BIT (1 fail) | ci_workflow | a postgres service mapping 5433:5432 added to pr-checks; the restored file-wide dead-letter negative red |
+| mrc_ci_lane_gating_control | BIT (1 fail) | ci_workflow | a TEST_DATABASE_URL read appended to the first CI_LONG_SUITES file; the lane-exemption coupled guard red |
+| mrc_ci_block_relocation (re-run) | re-BIT (1 fail) | ci_workflow | the lint relocation against the derived-set pin |
+| mrc_ci_envline_strip (re-run 2) | re-BIT (1 fail) | ci_workflow | the pr-gate env strip against the derived-set pin |
+
+Section totals: 18 distinct mutants (6 service + 7 dashboard + 5 CI),
+all BIT, 0 survivors; 3 stale-verdict re-run events, all re-BIT. Whole
+log: 419 distinct mutants.
