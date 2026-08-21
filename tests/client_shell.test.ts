@@ -581,7 +581,7 @@ describe('client HTML shell', () => {
     // the pin carries TWO (#mobile-combat-controls #mobile-chat), so opacity 1 wins while
     // chat is open even though .mobile-chrome-idle stays armed during a keyboard reply.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn,',
+      'body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn {',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-chat-open #mobile-combat-controls #mobile-chat {\n    opacity: 1;',
@@ -1127,58 +1127,25 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("const desktopBtn = document.getElementById('mm-discord');");
   });
 
-  it('ships the consumables quick bar in BOTH entries, collapsed by default', () => {
+  it('no longer ships the retired top-left consumables bar in either entry', () => {
+    // The quick bar moved into the action ring's 5th seat (hold or swipe from the
+    // ring button). Only the PLACEMENT was retired: consumable_bar_view.ts still
+    // owns the auto-populated list and is still pinned by its own suite.
+    //
+    // TODO(touch-ui): replace this absence check with positive pins on the new
+    // seat (role, slot count, touch-router coverage) when the ring-seat control
+    // lands. An absence assertion is not equivalent coverage.
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry, name).toContain('id="mobile-consumables"');
-      // aria-label on a role-less div is prohibited ARIA (ignored by screen
-      // readers); the container carries role="group" so the name is exposed.
-      expect(entry, name).toMatch(/id="mobile-consumables" role="group"/);
-      // The chevron chip starts collapsed (aria-expanded false; hud.ts flips it)
-      // and reuses the existing bags-filter key, so the bar adds no i18n keys.
-      expect(entry, name).toMatch(/id="mobile-consumables-toggle"[^>]*aria-expanded="false"/);
-      expect(entry, name).toMatch(/id="mobile-consumables-toggle"[^>]*data-icon="next"/);
-      expect(entry, name).toMatch(
-        /id="mobile-consumables-toggle"[^>]*data-i18n-aria="hudChrome\.bags\.filterConsumable"/,
-      );
-      const slots = [
-        ...entry.matchAll(/class="mobile-consumable-slot"[^>]*data-consumable-index="(\d+)"/g),
-      ];
-      expect(slots, name).toHaveLength(6);
-      expect(slots.map((m) => m[1]).sort(), name).toEqual(['0', '1', '2', '3', '4', '5']);
+      expect(entry, name).not.toContain('id="mobile-consumables"');
+      expect(entry, name).not.toContain('class="mobile-consumable-slot"');
     }
-    // The row shows only via the session-only body toggle, and empty slots
-    // collapse away so the open row is as wide as what the player carries.
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-consumables-open #mobile-consumables-row {',
-    );
-    expect(hudMobileCss).toContain('body.mobile-touch .mobile-consumable-slot.empty {');
-    // A touch starting on the bar must never double as a camera drag.
-    expect(readFileSync(new URL('../src/game/touch_router.ts', import.meta.url), 'utf8')).toContain(
-      "'#mobile-consumables',",
-    );
-    // The open row extends RIGHTWARD from the toggle along the top band (restored
-    // by owner request; v0.23.0 had dropped it below the chip). top:0 + a left offset
-    // past the 40px toggle flow it sideways; the pet classes drop it a band so it
-    // clears the pet bar (mobile-pet-active). Overlap is gated by the mobile HUD audit.
-    const consumRowStart = hudMobileCss.indexOf('body.mobile-touch #mobile-consumables-row {');
-    const consumRow = hudMobileCss.slice(consumRowStart, hudMobileCss.indexOf('}', consumRowStart));
-    expect(consumRow).toMatch(/top: 0;/);
-    expect(consumRow).toMatch(/left: calc\(40px \+ 6px\);/);
-    expect(consumRow).toMatch(/right: auto;/);
-    // Pet classes drop the sideways row one band so it never overlaps the pet bar.
-    expect(hudMobileCss).toMatch(
-      /body\.mobile-touch\.mobile-pet-active #mobile-consumables-row \{\n {4}top: calc\(100% \+ 6px\);/,
-    );
-    // The id list is snapshotted at OPEN time and stays frozen while open, so
-    // slots never shift under the thumb the frame a stack depletes: exactly one
-    // consumableBarItems CALL (the toggle handler's snapshot), none per-frame.
+    expect(hudMobileCss).not.toContain('#mobile-consumables');
+    expect(hudMobileCss).not.toContain('.mobile-consumable-slot');
+    // The view model is untouched: the new seat consumes the same list.
     expect(hudTs.match(/consumableBarItems\(/g) ?? []).toHaveLength(1);
-    expect(hudTs).toContain(
-      'consumableBarItems(this.sim.inventory, (id) => ITEMS[id], this.consumableBarIds);',
-    );
   });
 
   it('carries identical mobile-action-ring markup in BOTH entries', () => {
@@ -1750,12 +1717,8 @@ describe('client HTML shell', () => {
       expect(entry).toContain('id="mobile-crafting"');
     }
     expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-more-open #mobile-controls');
-    expect(html).toContain(
-      '</div>\n    </div>\n  </section>\n      <div id="mobile-extra-controls"',
-    );
-    expect(playHtml).toContain(
-      '</div>\n    </div>\n  </div>\n      <div id="mobile-extra-controls"',
-    );
+    expect(html).toContain('</div>\n  </section>\n      <div id="mobile-extra-controls"');
+    expect(playHtml).toContain('</div>\n  </div>\n      <div id="mobile-extra-controls"');
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-extra-controls {\n    position: fixed;\n    left: 50%;\n    top: 50%;\n    bottom: auto;\n    --mobile-more-open-transform: translate(-50%, -50%);\n    --mobile-more-closed-transform: translate(-50%, -46%) scale(0.96);\n    transform: var(--mobile-more-closed-transform);',
     );
@@ -2097,12 +2060,9 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('grid-template-columns: repeat(5, 54px);');
     expect(hudMobileCss).not.toContain('grid-template-columns: 52px;');
     expect(hudMobileCss).not.toContain('mobile-portrait-primary');
-    // The #mobile-consumables chip docks just PAST the bar, so its left offset must
-    // track the bar's 5-column scaled width in base/landscape (base 5x58+4x12=338,
-    // landscape 5x54+4x10=310). Pinned so a future bar-width
-    // change updates both and the chip never slides back under the buttons.
-    expect(hudMobileCss).toContain('338px *'); // base consumables dock offset
-    expect(hudMobileCss).toContain('310px *'); // landscape consumables dock offset
+    // The retired consumables chip used to dock just past the button bar, which
+    // pinned the bar's scaled 5-column width here (338px base / 310px landscape).
+    // Nothing anchors off that width any more, so the pins went with the chip.
     // Top-LEFT anchor: the bar's single 54px row clears the target-frame seat
     // below it (top + 72px) and leaves the top-centre band to the pet bar.
     expect(hudMobileCss).toContain(

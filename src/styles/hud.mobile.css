@@ -1033,190 +1033,6 @@
       transition: opacity 0.12s ease;
     }
   }
-  /* Consumables quick bar: a quiet chevron chip docked right of the top-left
-     trio that expands a row of the carried potions/elixirs/food/drink
-     (auto-populated by consumable_bar_view.ts, painted by the shared action
-     bar painter, so the cd-overlay/count/state classes below mirror the
-     ring's). Collapsed by default and session-only: the row shows only under
-     body.mobile-consumables-open, and empty slots collapse away so the open
-     row is exactly as wide as what the player carries. The left anchor adds
-     the bar's SCALED width (5 columns + 4 gaps) to the bar's own safe-area
-     anchor so a grown --btn-scale never slides the bar under the chip. */
-  body.mobile-touch #mobile-consumables {
-    position: absolute;
-    left: calc(
-      max(12px, env(safe-area-inset-left)) +
-      338px *
-      var(--btn-scale, 1) *
-      var(--mobile-chrome-scale, 1) +
-      10px
-    );
-    top: max(8px, env(safe-area-inset-top));
-    /* Right reservation sized for the WORST-CASE visual overhang: flex-wrap
-       decides on the untransformed layout width, but the container then scales
-       by --btn-scale (max 1.3) from left top, so the painted row extends past
-       its layout edge by (scale - 1) x row width. 260px keeps the scaled row
-       clear of everything in #ui above it (buff column at right 98px+, the
-       daily-chest rail, the minimap corner): on an 844px landscape phone,
-       (844 - 260 - left(1.3)) x 1.3 + left(1.3) = 684 = the buff column edge. */
-    right: calc(260px + env(safe-area-inset-right));
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    /* The container spans the top band; only its BUTTONS take touches, so an
-       empty stretch stays camera-draggable (touch_router matches the target's
-       closest #mobile-consumables, which pointer-events: none prevents). */
-    pointer-events: none;
-    transform: scale(var(--btn-scale, 1));
-    transform-origin: left top;
-    z-index: 30;
-  }
-  body.mobile-touch #mobile-consumables-toggle {
-    /* Width stays a hard 40px (the touch floor is never scaled); only the height
-       folds in chrome-scale (54 * 0.85 = 45.9, still >= 40). The portrait override
-       below keeps its own 44px height. */
-    width: 40px;
-    height: calc(54px * var(--mobile-chrome-scale, 1));
-    padding: 0;
-    display: inline-flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    pointer-events: auto;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
-    border-radius: 12px;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
-    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    color: #d8b98a;
-    cursor: var(--cursor-point);
-    opacity: 0.85;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
-  }
-  body.mobile-touch #mobile-consumables-toggle .ui-icon {
-    width: 14px;
-    height: 14px;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    body.mobile-touch #mobile-consumables-toggle .ui-icon {
-      transition: transform 0.12s ease;
-    }
-  }
-  body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle {
-    opacity: 1;
-    border-color: var(--gold-dim);
-    color: #ffdf9c;
-  }
-  body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle .ui-icon {
-    transform: rotate(90deg);
-  }
-  /* The open row extends RIGHTWARD from the toggle chip along the top band
-     (restored by owner request; v0.23.0 had dropped it BELOW the chip to leave the
-     top-centre band to the pet bar). It is a single nowrap line so it never wraps
-     down over the world. The two pet classes still own the top-centre line while a
-     pet is out (body.mobile-pet-active), so the row then drops one band to clear the
-     pet bar; overlap in every state is gated by the pet-bar top-band probe. */
-  body.mobile-touch #mobile-consumables-row {
-    display: none;
-    position: absolute;
-    top: 0;
-    /* Anchor to the RIGHT edge of the 40px toggle (its first child), not the
-       container: #mobile-consumables is a wide stretched band (left..right:260px),
-       so `left: 100%` would fling the row to the far right edge and off a 740px
-       viewport. 40px (toggle width) + 6px gap flows it just past the toggle. */
-    left: calc(40px + 6px);
-    right: auto;
-    gap: 8px;
-  }
-  /* Pet classes: the pet bar sits on the top-centre line, so the row (which flows
-     right across the centre) drops below the toggle while a pet is out. Still
-     sideways + nowrap, just one band lower. */
-  body.mobile-touch.mobile-pet-active #mobile-consumables-row {
-    top: calc(100% + 6px);
-  }
-  body.mobile-touch.mobile-consumables-open #mobile-consumables-row {
-    display: flex;
-    flex-wrap: nowrap;
-  }
-  body.mobile-touch .mobile-consumable-slot {
-    position: relative;
-    /* 48 * 0.85 = 40.8, still clear of the 40px touch floor. */
-    width: calc(48px * var(--mobile-chrome-scale, 1));
-    height: calc(48px * var(--mobile-chrome-scale, 1));
-    padding: 0;
-    flex: none;
-    pointer-events: auto;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
-    border-radius: 50%;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
-    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    color: #eee8ff;
-    cursor: var(--cursor-point);
-    overflow: hidden;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
-  }
-  body.mobile-touch .mobile-consumable-slot:active {
-    border-color: var(--gold);
-  }
-  /* Same cd-overlay/count/state structure as the ring buttons (shared painter). */
-  body.mobile-touch .mobile-consumable-slot .icon-label {
-    position: absolute;
-    inset: 3px;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-  }
-  body.mobile-touch .mobile-consumable-slot .cd-overlay {
-    position: absolute;
-    inset: 0;
-    /* Radial clock wipe (issue 1660), circular to match the round slot. */
-    background: conic-gradient(
-      transparent 0 calc(100% - var(--cd-fill, 0%)),
-      #000a calc(100% - var(--cd-fill, 0%))
-    );
-    border-radius: 50%;
-    pointer-events: none;
-  }
-  body.mobile-touch .mobile-consumable-slot .cdtext {
-    position: relative;
-    font-size: 13px;
-    font-weight: bold;
-    /* Legible outline on any icon (issue 1660), matching the desktop cdtext. */
-    text-shadow:
-      0 0 4px #000,
-      1px 1px 1px #000,
-      -1px -1px 1px #000,
-      1px -1px 1px #000,
-      -1px 1px 1px #000;
-    pointer-events: none;
-  }
-  body.mobile-touch .mobile-consumable-slot .item-count {
-    position: absolute;
-    right: 4px;
-    bottom: 2px;
-    font-size: 11px;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
-    pointer-events: none;
-  }
-  body.mobile-touch .mobile-consumable-slot .keybind {
-    display: none;
-  }
-  body.mobile-touch .mobile-consumable-slot.empty {
-    display: none;
-  }
-  body.mobile-touch .mobile-consumable-slot.unusable {
-    filter: grayscale(0.6);
-    opacity: 0.6;
-  }
-  body.mobile-touch .mobile-consumable-slot.used {
-    border-color: var(--gold);
-  }
   body.mobile-touch #mobile-extra-controls {
     position: fixed;
     left: 50%;
@@ -1582,8 +1398,7 @@
      excludes the action ring and both joysticks -- cosmetic declutter only,
      never the actionable info the graphics fairness rule protects (HP/target/
      cast bars aren't in this selector list). */
-  body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn,
-  body.mobile-touch.mobile-chrome-idle #mobile-consumables-toggle {
+  body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn {
     opacity: 0.5;
   }
   /* Chat has full contrast while open: when the player is deliberately using chat
@@ -2772,20 +2587,13 @@
   body.mobile-touch #vcup-match-hud .vcuph-phase {
     font-size: 10px;
   }
-  /* The Vale Cup indicator/strip hug the top edge, but they yield the top-centre
-     line to whatever else needs it: the sideways consumables row when it is open
-     (no pet), and the pet bar when a pet is out. Drop one band in either case; drop
-     a second band when BOTH a pet is out (pet bar on the top line) AND the row is
-     open (it took the pet bar's usual second band), so the three never stack. */
-  body.mobile-touch.mobile-consumables-open #vcup-indicator,
+  /* The Vale Cup indicator/strip hug the top edge, but yield the top-centre line
+     to the pet bar when a pet is out. (The consumables row used to compete for the
+     same line; it now lives in the action ring and is transient, so it no longer
+     displaces anything.) */
   body.mobile-touch.mobile-pet-active #vcup-indicator,
-  body.mobile-touch.mobile-consumables-open #vcup-match-hud,
   body.mobile-touch.mobile-pet-active #vcup-match-hud {
     top: calc(env(safe-area-inset-top) + 64px);
-  }
-  body.mobile-touch.mobile-pet-active.mobile-consumables-open #vcup-indicator,
-  body.mobile-touch.mobile-pet-active.mobile-consumables-open #vcup-match-hud {
-    top: calc(env(safe-area-inset-top) + 122px);
   }
   body.mobile-touch .window {
     max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
@@ -5476,18 +5284,6 @@
       top: max(6px, env(safe-area-inset-top));
       grid-template-columns: repeat(5, 54px);
       gap: 10px;
-    }
-    /* Landscape bar is 5x54px + 4x10px gaps = 310px wide; keep the chip docked
-       just past it on the same compressed top line. */
-    body.mobile-touch #mobile-consumables {
-      left: calc(
-        max(12px, env(safe-area-inset-left)) +
-        310px *
-        var(--btn-scale, 1) *
-        var(--mobile-chrome-scale, 1) +
-        10px
-      );
-      top: max(6px, env(safe-area-inset-top));
     }
     body.mobile-touch .mobile-btn {
       width: 54px;
