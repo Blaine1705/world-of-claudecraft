@@ -881,7 +881,22 @@ export const ko_KR: EnTranslations = {
       "targetCycleShort": "대상",
       "spellbookPageLabel": "페이지 {page}",
       "hideKeyboard": "키보드 숨기기",
-      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)"
+      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "행동 단축바 배치 편집"
+    },
+    "barEditor": {
+      "title": "행동 단축바 편집",
+      "close": "행동 단축바 편집 닫기",
+      "pages": "행동 단축바 페이지",
+      "pageTab": "Page {page}",
+      "buttonHeader": "버튼 {button}",
+      "cellAria": "버튼 {button}, {direction}: {action}",
+      "emptyCellAria": "버튼 {button}, {direction}: 비어 있음",
+      "hint": "칸을 누른 뒤 다른 칸을 누르면 서로 바뀝니다.",
+      "armed": "칸을 눌러 {name}을(를) 배치하세요.",
+      "picked": "다른 칸을 눌러 {name}과(와) 바꾸세요.",
+      "locked": "행동 단축바가 인터페이스 설정에서 잠겨 있습니다."
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -2514,7 +2529,8 @@ export const ko_KR: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
-      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
+      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거",
+      "assignAria": "{name}을(를) 놓을 칸 선택"
     },
     "nameplate": {
       "mobLevel": "{level}",

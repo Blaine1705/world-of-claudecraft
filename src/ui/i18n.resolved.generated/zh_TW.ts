@@ -881,7 +881,22 @@ export const zh_TW: EnTranslations = {
       "targetCycleShort": "目標",
       "spellbookPageLabel": "頁{page}",
       "hideKeyboard": "隱藏鍵盤",
-      "chatPlaceholder": "說點什麼...（! 顯示社群指令）"
+      "chatPlaceholder": "說點什麼...（! 顯示社群指令）",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "編輯動作列配置"
+    },
+    "barEditor": {
+      "title": "編輯動作列",
+      "close": "關閉動作列編輯器",
+      "pages": "動作列頁面",
+      "pageTab": "Page {page}",
+      "buttonHeader": "按鈕 {button}",
+      "cellAria": "按鈕 {button}，{direction}：{action}",
+      "emptyCellAria": "按鈕 {button}，{direction}：空",
+      "hint": "點按一個欄位，再點按另一個即可交換。",
+      "armed": "點按一個欄位以放置 {name}。",
+      "picked": "點按另一個欄位以與 {name} 交換。",
+      "locked": "動作列已在介面選項中鎖定。"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -2514,7 +2529,8 @@ export const zh_TW: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "將 {name} 加入動作列",
-      "removeFromBarAria": "將 {name} 從動作列移除"
+      "removeFromBarAria": "將 {name} 從動作列移除",
+      "assignAria": "為 {name} 選擇一個欄位"
     },
     "nameplate": {
       "mobLevel": "{level}",

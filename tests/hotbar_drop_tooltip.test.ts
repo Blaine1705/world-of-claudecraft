@@ -4,7 +4,7 @@
 // "empty slot" hint, or the previous ability's name after a swap). Every sibling
 // slot mutation (clearSlot, the context-menu clear, char/bags window drops) already
 // calls hideTooltip() on mutate; the two hotbar drop-completion paths did not.
-// Guard that both now clear the tooltip after the slot is rearranged.
+// Guard that every live slot mutation clears the tooltip after the rearrange.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -26,15 +26,33 @@ describe('hotbar drag-drop clears the stale tooltip (#1485)', () => {
     expect(hideIdx).toBeGreaterThan(saveIdx);
   });
 
-  it('mobile drag finish calls hideTooltip after swapping slots', () => {
-    // The mobile finish handler swaps by pointer target; isolate from its swap call
-    // to the clearMobileHotbarDrag teardown.
-    const start = code.indexOf('resolveMobileHotbarDrop(drag.sourceIndex, targetIndex)');
+  // The touch arm of #1485 moved with the gesture that caused it. The mobile
+  // long-press rearrange is retired (it reached only the four visible ring
+  // centres and armed underneath the radial); the bar editor is the touch
+  // binding path now, and BOTH of its mutations owe the same stale-tooltip
+  // clear, so this pins the pair rather than the one finish handler.
+  it('the bar editor swap clears the stale tooltip after saving', () => {
+    const start = code.indexOf('swapSlots: (slotA, slotB) => {');
     expect(start).toBeGreaterThan(-1);
-    const handler = code.slice(start, code.indexOf('this.clearMobileHotbarDrag();', start));
+    const handler = code.slice(start, code.indexOf('},', start));
     const saveIdx = handler.indexOf('this.saveSlotMap();');
     const hideIdx = handler.indexOf('this.hideTooltip();');
     expect(saveIdx).toBeGreaterThan(-1);
     expect(hideIdx).toBeGreaterThan(saveIdx);
+  });
+
+  it('the bar editor place clears the stale tooltip after saving', () => {
+    const start = code.indexOf('placeAbility: (abilityId, slot) => {');
+    expect(start).toBeGreaterThan(-1);
+    const handler = code.slice(start, code.indexOf('},', start));
+    const saveIdx = handler.indexOf('this.saveSlotMap();');
+    const hideIdx = handler.indexOf('this.hideTooltip();');
+    expect(saveIdx).toBeGreaterThan(-1);
+    expect(hideIdx).toBeGreaterThan(saveIdx);
+  });
+
+  it('leaves no long-press rearrange path behind to reintroduce the bug', () => {
+    expect(code).not.toContain('mobileHotbarDrag');
+    expect(code).not.toContain('resolveMobileHotbarDrop');
   });
 });

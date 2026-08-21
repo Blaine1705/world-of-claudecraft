@@ -881,7 +881,22 @@ export const en_XA: EnTranslations = {
       "targetCycleShort": "[Ţáŕĝéţ]",
       "spellbookPageLabel": "[Þáĝé {page}]",
       "hideKeyboard": "[Ĥíðé ķéýƀóáŕð]",
-      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (! ƒóŕ çóɱɱúñíţý çóɱɱáñðš)]"
+      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (! ƒóŕ çóɱɱúñíţý çóɱɱáñðš)]",
+      "barEditor": "[Éðíţ Ɓáŕš]",
+      "barEditorAria": "[Éðíţ ţĥé áçţíóñ ƀáŕ ļáýóúţ]"
+    },
+    "barEditor": {
+      "title": "[Éðíţ Áçţíóñ Ɓáŕ]",
+      "close": "[Çļóšé ƀáŕ éðíţóŕ]",
+      "pages": "[Áçţíóñ ƀáŕ þáĝéš]",
+      "pageTab": "[Þáĝé {page}]",
+      "buttonHeader": "[Ɓúţţóñ {button}]",
+      "cellAria": "[Ɓúţţóñ {button}, {direction}: {action}]",
+      "emptyCellAria": "[Ɓúţţóñ {button}, {direction}: éɱþţý]",
+      "hint": "[Ţáþ á šļóţ, ţĥéñ áñóţĥéŕ, ţó šŵáþ ţĥéɱ.]",
+      "armed": "[Ţáþ á šļóţ ţó þļáçé {name}.]",
+      "picked": "[Ţáþ áñóţĥéŕ šļóţ ţó šŵáþ ŵíţĥ {name}.]",
+      "locked": "[Áçţíóñ ƀáŕš áŕé ļóçķéð íñ Íñţéŕƒáçé óþţíóñš.]"
     },
     "tutorial": {
       "moveBodyTouch": "[Úšé ţĥé ɱóʋéɱéñţ šţíçķ ţó ɱóʋé áñð ðŕáĝ ţĥé šçŕééñ ţó ļóóķ áŕóúñð. Ţáķé á ƒéŵ šţéþš ţó ƀéĝíñ.]",
@@ -2514,7 +2529,8 @@ export const en_XA: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "[Áðð {name} ţó áçţíóñ ƀáŕ]",
-      "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]"
+      "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]",
+      "assignAria": "[Çĥóóšé á šļóţ ƒóŕ {name}]"
     },
     "nameplate": {
       "mobLevel": "[{level}]",

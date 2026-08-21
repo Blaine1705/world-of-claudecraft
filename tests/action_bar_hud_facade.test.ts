@@ -39,50 +39,53 @@ describe('Hud action-bar facade', () => {
     expect(actionBarBuild).toContain('this.saveAttackSlotAction();');
   });
 
-  it('checks drag eligibility before normal-bar and configurable slot 0 drops', () => {
+  it('checks drag eligibility before every drop and the touch bar editor place', () => {
+    // Four desktop drag/drop sites plus the bar editor's placeAbility, the touch
+    // binding path: it takes the SAME eligibility gate the desktop drop takes,
+    // so a passive or unknown ability cannot reach a slot through the overlay.
     const source = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    expect(source.match(/actionBarController\.isAssignableAction\(/g)).toHaveLength(4);
+    expect(source.match(/actionBarController\.isAssignableAction\(/g)).toHaveLength(5);
+    expect(source).toContain(
+      "if (!this.actionBarController.isAssignableAction({ type: 'ability', id: abilityId })) return;",
+    );
   });
 
-  it('cancels a mobile drag before exposing a newly loaded form page', () => {
-    const clearTimeout = vi.fn();
-    vi.stubGlobal('window', { clearTimeout });
-    vi.stubGlobal('document', {
-      body: { classList: { remove: vi.fn() } },
-      querySelectorAll: () => [],
-    });
+  // WAS: 'cancels a mobile drag before exposing a newly loaded form page'. The
+  // long-press rearrange that drag belonged to is retired, so there is no drag
+  // to cancel here any more. What still matters at this seam is the OTHER half
+  // that test covered: a form swap must drop the desktop drag AND re-clamp the
+  // ring page, or the newly loaded bar is exposed through a stale page.
+  it('drops the desktop drag and re-clamps the ring page on a form swap', () => {
     const hud = Object.create(Hud.prototype) as unknown as {
       actionBarController: { syncActiveForm(): boolean };
       dragAction: unknown;
       mobileActionPage: number;
-      mobileHotbarDrag: {
-        pointerId: number;
-        sourceIndex: number;
-        startX: number;
-        startY: number;
-        active: boolean;
-        timer: number;
-        targetIndex: number | null;
-      } | null;
+      currentMobileActionPage(): number;
       syncActiveHotbarForm(): void;
     };
     hud.actionBarController = { syncActiveForm: () => true };
     hud.dragAction = { action: { type: 'ability', id: 'strike' }, sourceIndex: 0 };
-    hud.mobileActionPage = 0;
-    hud.mobileHotbarDrag = {
-      pointerId: 7,
-      sourceIndex: 2,
-      startX: 10,
-      startY: 20,
-      active: true,
-      timer: 99,
-      targetIndex: 4,
-    };
+    hud.mobileActionPage = 4;
+    hud.currentMobileActionPage = () => 1;
 
     hud.syncActiveHotbarForm();
 
     expect(hud.dragAction).toBeNull();
-    expect(hud.mobileHotbarDrag).toBeNull();
-    expect(clearTimeout).toHaveBeenCalledWith(99);
+    expect(hud.mobileActionPage).toBe(1);
+  });
+
+  it('leaves no touch long-press rearrange path on the action bar', () => {
+    const source = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    for (const token of [
+      'mobileHotbarDrag',
+      'bindMobileActionDrag',
+      'bindMobileRingDrag',
+      'mobile-hotbar-dragging',
+    ]) {
+      expect(source, `${token} must not survive the removal`).not.toContain(token);
+    }
+    // The desktop HTML5 path is untouched: both halves still there.
+    expect(source).toContain("btn.addEventListener('dragstart', (e) => {");
+    expect(source).toContain("btn.addEventListener('dragover', (e) => {");
   });
 });

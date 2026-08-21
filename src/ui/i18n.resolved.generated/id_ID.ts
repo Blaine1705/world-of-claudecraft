@@ -881,7 +881,22 @@ export const id_ID: EnTranslations = {
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Halaman {page}",
       "hideKeyboard": "Sembunyikan papan ketik",
-      "chatPlaceholder": "Katakan sesuatu..."
+      "chatPlaceholder": "Katakan sesuatu...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options."
     },
     "tutorial": {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
@@ -2514,7 +2529,8 @@ export const id_ID: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Tambahkan {name} ke bilah aksi",
-      "removeFromBarAria": "Hapus {name} dari bilah aksi"
+      "removeFromBarAria": "Hapus {name} dari bilah aksi",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

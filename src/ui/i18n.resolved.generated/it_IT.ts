@@ -881,7 +881,22 @@ export const it_IT: EnTranslations = {
       "targetCycleShort": "Bersaglio",
       "spellbookPageLabel": "Pagina {page}",
       "hideKeyboard": "Nascondi tastiera",
-      "chatPlaceholder": "Scrivi qualcosa..."
+      "chatPlaceholder": "Scrivi qualcosa...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options."
     },
     "tutorial": {
       "moveBodyTouch": "Usa il joystick di movimento per muoverti e trascina lo schermo per guardarti intorno. Fai qualche passo per iniziare.",
@@ -2514,7 +2529,8 @@ export const it_IT: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Aggiungi {name} alla barra azioni",
-      "removeFromBarAria": "Rimuovi {name} dalla barra azioni"
+      "removeFromBarAria": "Rimuovi {name} dalla barra azioni",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

@@ -83,8 +83,6 @@ export interface RadialGestureDeps {
   /** Another owner already claims this press (an empowered-ability hold, bind
    *  mode), so the radial must not arm at all. */
   pressClaimed(buttonIndex: number): boolean;
-  /** A rearrange long-press drag went active under the finger. */
-  dragActive(): boolean;
   /** Read and CLEAR the shared "this release was a drag, not a tap" flag. Read
    *  on every release the radial owns, and on an unowned one only while no other
    *  press is live: the empowered-hold path sets it on a press the radial never
@@ -241,12 +239,6 @@ export class RadialGesture {
   private onMove(e: PointerEvent): void {
     const d = this.drags.get(e.pointerId);
     if (!d) return;
-    // A rearrange drag activating under the finger takes the press over; the
-    // petals must not sit on top of the slot the player is dragging.
-    if (this.deps.dragActive()) {
-      this.clearDrag(d.pointerId);
-      return;
-    }
     const next = resolveRadialDirection(
       e.clientX - d.startX,
       e.clientY - d.startY,
@@ -272,7 +264,7 @@ export class RadialGesture {
       direction: d.direction,
       revealed: d.placement !== null,
       hasSlot: this.deps.hasSlot(d.buttonIndex, d.direction),
-      consumedElsewhere: suppressed || this.deps.dragActive(),
+      consumedElsewhere: suppressed,
     });
     const buttonIndex = d.buttonIndex;
     this.clearDrag(d.pointerId);

@@ -1243,6 +1243,55 @@ describe('client HTML shell', () => {
     );
   });
 
+  it('carries the touch bar editor and its Edit control in BOTH entries', () => {
+    // Phase 4.5. Binding a slot on touch used to ride the long-press rearrange,
+    // which reached only the four visible ring centres (the 16 directional slots
+    // per page had no binding path at all) and armed underneath the radial. The
+    // overlay replaces it, so its markup and its two entry points have to ship in
+    // both entries or touch players lose slot binding on one of them.
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      // The window itself: an empty .window panel the painter fills, exactly the
+      // spellbook's shape, so the shared mobile sheet rules and the managed-close
+      // path (topmostOpenWindow reads `.window.panel`) both reach it.
+      expect(entry, name).toContain('<div id="bar-editor" class="window panel"></div>');
+      // The Edit control lives in the More tray's grid, beside the relocated
+      // chat button, and follows the tray's .mobile-btn pattern (icon + label).
+      expect(entry, name).toMatch(
+        /<button type="button" class="mobile-btn" id="mobile-bar-editor"[^>]*data-icon="swap"><span class="mobile-label" data-i18n="hudChrome\.mobile\.barEditor">/,
+      );
+      // Accessible name from data-i18n-aria, never a bare aria-label.
+      expect(entry, name).toContain(
+        'id="mobile-bar-editor" data-i18n-title="hudChrome.mobile.barEditorAria" data-i18n-aria="hudChrome.mobile.barEditorAria"',
+      );
+      // It sits INSIDE the More tray, which only exists under body.mobile-touch,
+      // so the control never appears on desktop (desktop binds by dragging onto
+      // the visible bars, which this change does not touch).
+      const gridStart = entry.indexOf('<div id="mobile-extra-grid">');
+      const gridEnd = entry.indexOf('</div>', gridStart);
+      expect(gridStart, name).toBeGreaterThan(-1);
+      expect(
+        entry.slice(gridStart, gridEnd).includes('id="mobile-bar-editor"'),
+        `${name}: the Edit control escaped the More tray`,
+      ).toBe(true);
+    }
+    // The overlay is sheeted on touch through the SHARED mobile sheet base and
+    // the centered-sheet exception, not a bespoke pin of its own.
+    expect(hudMobileCss).toContain('  body.mobile-touch #bar-editor,');
+    expect(hudMobileCss).toContain('  body.mobile-touch #bar-editor .bar-editor-grid {');
+    expect(hudMobileCss).toContain('    grid-template-columns: auto repeat(4, 1fr);');
+    // Touch-router coverage: the overlay is `.window panel`, which the router
+    // already names, so a tap on a cell can never fall through to a camera drag.
+    expect(touchRouterTs).toContain("'.window',");
+    expect(touchRouterTs).toContain("'.panel',");
+    // And the retired gesture leaves nothing behind on the live combat surface.
+    expect(hudTs).not.toContain('mobileHotbarDrag');
+    expect(hudTs).not.toContain('bindMobileRingDrag');
+    expect(hudMobileCss).not.toContain('.mobile-action-slot.drop-target');
+  });
+
   it('carries identical mobile-action-ring markup in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="actionbar3"');

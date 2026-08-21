@@ -614,6 +614,36 @@ export const hudChromeStrings = {
     // consecutive-lowercase run), so the five non-Latin overlays carry real fills
     // and the Latin overlays stay pending.
     chatPlaceholder: 'Say something... (! for community commands)',
+    // The More tray's Edit control (#mobile-bar-editor), which opens the bar
+    // editor. Touch-only: desktop binds by dragging onto the visible bars, so the
+    // control never appears there. barEditor is the tiny on-button caption (the
+    // tray's buttons are narrow, so it stays two short words); barEditorAria is
+    // the spoken name. Both WORDY by M16, so the five non-Latin overlays carry
+    // real fills.
+    barEditor: 'Edit Bars',
+    barEditorAria: 'Edit the action bar layout',
+  },
+  // The touch bar editor overlay (Phase 4.5): one action-ring page exploded into
+  // a grid of 4 buttons by 5 directions, with page tabs. It is the ONLY way to
+  // bind a slot on touch, so its copy has to TEACH the two-tap language (place,
+  // then swap) that replaces the long-press drag it retires. Every value here is
+  // WORDY by M16 except pageTab and buttonHeader (one short word plus a token),
+  // so the rest carry the five non-Latin fills.
+  barEditor: {
+    title: 'Edit Action Bar',
+    close: 'Close bar editor',
+    // The tab strip's own group name, distinct from the per-tab names below.
+    pages: 'Action bar pages',
+    pageTab: 'Page {page}',
+    buttonHeader: 'Button {button}',
+    // A cell is named by the control it belongs to and the direction the player
+    // flicks to reach it, never by a slot number touch never shows.
+    cellAria: 'Button {button}, {direction}: {action}',
+    emptyCellAria: 'Button {button}, {direction}: empty',
+    hint: 'Tap a slot, then another, to swap them.',
+    armed: 'Tap a slot to place {name}.',
+    picked: 'Tap another slot to swap with {name}.',
+    locked: 'Action bars are locked in Interface options.',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -2978,6 +3008,12 @@ export const hudChromeStrings = {
   spellbook: {
     addToBarAria: 'Add {name} to action bar',
     removeFromBarAria: 'Remove {name} from action bar',
+    // The touch-only assign control beside the +/- toggle: the + drops a spell on
+    // the FIRST free slot, which is not a choice, and touch has no drag to make
+    // one with. This opens the bar editor with the spell already armed, so the
+    // next tap decides where it goes. WORDY by M16, so the five non-Latin
+    // overlays carry real fills.
+    assignAria: 'Choose a slot for {name}',
   },
   // Live overworld mob nameplate level badge text. Level renders in its own
   // element so con-color styling applies to the badge without recoloring the

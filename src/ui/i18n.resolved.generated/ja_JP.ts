@@ -881,7 +881,22 @@ export const ja_JP: EnTranslations = {
       "targetCycleShort": "標的",
       "spellbookPageLabel": "ページ{page}",
       "hideKeyboard": "キーボードを隠す",
-      "chatPlaceholder": "発言する... (! でコミュニティコマンド)"
+      "chatPlaceholder": "発言する... (! でコミュニティコマンド)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "アクションバーの配置を編集"
+    },
+    "barEditor": {
+      "title": "アクションバーの編集",
+      "close": "アクションバー編集を閉じる",
+      "pages": "アクションバーのページ",
+      "pageTab": "Page {page}",
+      "buttonHeader": "ボタン{button}",
+      "cellAria": "ボタン{button}、{direction}：{action}",
+      "emptyCellAria": "ボタン{button}、{direction}：空き",
+      "hint": "スロットをタップし、もう一つタップすると入れ替わります。",
+      "armed": "スロットをタップして{name}を配置します。",
+      "picked": "別のスロットをタップして{name}と入れ替えます。",
+      "locked": "アクションバーはインターフェース設定でロックされています。"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -2514,7 +2529,8 @@ export const ja_JP: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
-      "removeFromBarAria": "{name}をアクションバーから削除"
+      "removeFromBarAria": "{name}をアクションバーから削除",
+      "assignAria": "{name}を配置するスロットを選択"
     },
     "nameplate": {
       "mobLevel": "{level}",

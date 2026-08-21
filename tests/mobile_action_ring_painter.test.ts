@@ -756,6 +756,10 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     new URL('../src/ui/hud/action_bar/mobile_action_ring_controller.ts', import.meta.url),
     'utf8',
   );
+  const gesture = readFileSync(
+    new URL('../src/ui/hud/action_bar/radial_gesture_controller.ts', import.meta.url),
+    'utf8',
+  );
 
   it('builds the mobile action ring from buildActionBar', () => {
     expect(hud).toContain('this.buildMobileActionRing();');
@@ -789,18 +793,28 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     expect(ring).toContain("deps.itemForSlot(deps.sourceSlot(i, 'center'))");
   });
 
-  it('binds the empowered hold and the rearrange drag BEFORE the radial gesture', () => {
-    // Order decides who wins a release: both of those arm the shared
-    // suppress flag from their own pointerup, and the radial reads it. Attached
-    // first, the radial would cast on top of a rearrange drag.
+  it('binds the empowered hold BEFORE the radial gesture', () => {
+    // Order decides who wins a release: the hold arms the shared suppress flag
+    // from its own pointerup and the radial reads it. Attached first, the radial
+    // would cast on top of an empowered hold.
     const hold = ring.indexOf('deps.bindEmpoweredHold(btn');
-    const drag = ring.indexOf('deps.bindRingDrag(btn');
     const attach = ring.indexOf('gesture.attach();');
     expect(hold).toBeGreaterThan(-1);
-    expect(drag).toBeGreaterThan(hold);
-    expect(attach).toBeGreaterThan(drag);
+    expect(attach).toBeGreaterThan(hold);
     expect(ring).toContain('takeSuppressedPress: () => deps.takeSuppressedClick(),');
     expect(hud).toContain('takeSuppressedClick: () => {');
+  });
+
+  it('arms NO rearrange gesture on the live ring', () => {
+    // The long-press rearrange this replaces opened under the radial: a hold
+    // long enough to reveal the petals could also pick the slot up and swap it
+    // on release. Binding on touch is the bar editor overlay now, so neither the
+    // ring nor the gesture layer carries a drag seam at all.
+    for (const token of ['bindRingDrag', 'dragActive', 'hotbarDragActive']) {
+      expect(ring, `${token} must not survive the removal`).not.toContain(token);
+      expect(gesture, `${token} must not survive the removal`).not.toContain(token);
+    }
+    expect(hud).not.toContain('mobileHotbarDrag');
   });
 
   it('wires the page toggle button to cycleMobileActionPage', () => {

@@ -95,7 +95,14 @@ const MONOLITHS: MonolithRow[] = [
     // and Hud kept only the item-use callback and one per-frame paint. Same rule
     // as the ring above: an extraction lowers the ceiling in the same change.
     // Exact count, zero slack.
-    ceiling: 19263,
+    // LOWERED 19263 -> 19078 by the touch bar editor: the mobile long-press
+    // rearrange (the MobileHotbarDrag type, the field, clearMobileHotbarDrag,
+    // bindMobileActionDrag, bindMobileRingDrag and the two point-to-slot hit
+    // tests) is DELETED, and the overlay that replaces it lives in
+    // hud/action_bar/bar_editor/. Hud kept only the window construction, its two
+    // mutation callbacks and the public opener, so the file lands 185 lines
+    // below its old pin even after the wiring. Exact count, zero slack.
+    ceiling: 19078,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -255,7 +262,14 @@ const MONOLITHS: MonolithRow[] = [
     // cover joining it) net against the base's pad-selection extraction plus
     // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
     // landing below both parents' pins. Any further growth reds again.
-    ceiling: 11516,
+    // Raised 11516 -> 11517 (+1) for the touch bar editor: the More tray's Edit
+    // control routes through MobileControlCallbacks, whose bag is wired here and
+    // nowhere else, so the ONE line is `onBarEditor: () => hud.toggleBarEditor()`.
+    // Everything with substance (the grid model, the tap state machine, the
+    // window) lives in src/ui/hud/action_bar/bar_editor/, and the same change
+    // LOWERS hud.ts by 185. Maintainer decision, exact merged count: any further
+    // growth reds again.
+    ceiling: 11517,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

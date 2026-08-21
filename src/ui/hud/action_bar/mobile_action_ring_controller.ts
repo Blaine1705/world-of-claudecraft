@@ -85,8 +85,6 @@ export interface MobileActionRingDeps {
   empoweredAbilityIdForSlot(slot: number): string | null;
   /** True while the action bar is in keybind-rebinding mode. */
   bindModeActive(): boolean;
-  /** True while a rearrange long-press drag is active under the finger. */
-  hotbarDragActive(): boolean;
   /** Read and clear the drag path's "this release was a drag, not a tap" flag. */
   takeSuppressedClick(): boolean;
   castSlot(slot: number): void;
@@ -99,7 +97,6 @@ export interface MobileActionRingDeps {
   hideTooltip(): void;
   consumePeekGuard(): void;
   bindEmpoweredHold(btn: HTMLButtonElement, resolveSlot: () => number): void;
-  bindRingDrag(btn: HTMLButtonElement, ringIndex: number): void;
 }
 
 export interface MobileActionRing {
@@ -140,9 +137,9 @@ function orderedByIndex(selector: string): HTMLButtonElement[] {
 /**
  * Build the ring, or return null when the markup is absent.
  *
- * Wiring ORDER is load-bearing: the empowered hold and the rearrange drag are
- * bound BEFORE gesture.attach(), so on a release their pointerup handlers run
- * first and the radial sees the flag they set instead of casting on top of them.
+ * Wiring ORDER is load-bearing: the empowered hold is bound BEFORE
+ * gesture.attach(), so on a release its pointerup handler runs first and the
+ * radial sees the flag it set instead of casting on top of it.
  */
 export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionRing | null {
   const attackBtn = document.getElementById(ATTACK_ID) as HTMLButtonElement | null;
@@ -181,7 +178,6 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
     pressClaimed: (buttonIndex) =>
       deps.bindModeActive() ||
       deps.empoweredAbilityIdForSlot(deps.sourceSlot(buttonIndex, 'center')) !== null,
-    dragActive: () => deps.hotbarDragActive(),
     takeSuppressedPress: () => deps.takeSuppressedClick(),
     onCancel: () => {
       deps.consumePeekGuard();
@@ -191,7 +187,6 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
 
   slotBtns.forEach((btn, i) => {
     deps.bindEmpoweredHold(btn, () => deps.sourceSlot(i, 'center'));
-    deps.bindRingDrag(btn, i);
   });
   gesture.attach();
 

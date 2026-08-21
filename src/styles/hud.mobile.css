@@ -923,14 +923,6 @@
   body.mobile-touch .mobile-action-slot:active {
     border-color: var(--gold);
   }
-  /* Long-press-to-pick-up state for the ring's touch swap (bindMobileRingDrag):
-     a steady border + glow, never a scale transform (motion-sickness rule), on
-     both the picked-up source slot and whichever slot the finger is currently
-     over. Mirrors the desktop .action-btn.drop-target treatment. */
-  body.mobile-touch .mobile-action-slot.drop-target {
-    border-color: #7fd1ff;
-    box-shadow: 0 0 8px #7fd1ff88;
-  }
   body.mobile-touch #mobile-action-ring button .cdtext {
     position: relative;
     font-size: 15px;
@@ -3360,6 +3352,7 @@
   body.mobile-touch #options-menu,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #spellbook,
+  body.mobile-touch #bar-editor,
   body.mobile-touch #vendor-window,
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window,
@@ -4226,6 +4219,7 @@
   body.mobile-touch #warfare-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #spellbook,
+  body.mobile-touch #bar-editor,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
   body.mobile-touch #options-menu.gfx-wide,
@@ -4310,6 +4304,7 @@
      at a tighter width, so these stay a compact centered card rather than
      stretching to the wider group's clamp. */
   body.mobile-touch #spellbook,
+  body.mobile-touch #bar-editor,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
   body.mobile-touch #options-menu.gfx-wide,
@@ -5101,6 +5096,114 @@
     font-size: 10px;
     color: #c8b888;
     white-space: nowrap;
+  }
+  /* ---------- bar editor (touch slot binding) ---------- */
+  /* The touch bar editor: one action-ring page exploded into a 4-button by
+     5-direction grid of real buttons, plus page tabs. It is the ONLY binding
+     path on touch, so every control here holds the 40x40 tap floor and none of
+     it depends on a gesture. Touch-only by construction: the window is opened
+     from the More tray's Edit control and the spellbook's assign control, both
+     of which only exist under body.mobile-touch. */
+  body.mobile-touch #bar-editor .bar-editor-tabs {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0;
+  }
+  body.mobile-touch #bar-editor .bar-editor-tab {
+    flex: 1 1 0;
+    min-height: 40px;
+    border: 2px solid #4a3d1d;
+    border-radius: 7px;
+    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    color: #c8b888;
+    font: 600 14px / 1 var(--ui-font);
+  }
+  body.mobile-touch #bar-editor .bar-editor-tab.active {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  /* One leading direction column plus one column per ring button. */
+  body.mobile-touch #bar-editor .bar-editor-grid {
+    display: grid;
+    grid-template-columns: auto repeat(4, 1fr);
+    gap: 4px;
+    align-items: center;
+  }
+  body.mobile-touch #bar-editor .bar-editor-head {
+    font-size: 10px;
+    color: #c8b888;
+    text-align: center;
+    white-space: nowrap;
+  }
+  body.mobile-touch #bar-editor .bar-editor-cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 52px;
+    padding: 3px;
+    border: 2px solid #4a3d1d;
+    border-radius: 7px;
+    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    color: #e8dcc0;
+    overflow: hidden;
+  }
+  /* The picked-up cell for a pending swap: a steady border, never a scale
+     transform (the motion-sickness rule in src/ui/CLAUDE.md). */
+  body.mobile-touch #bar-editor .bar-editor-cell[aria-pressed='true'] {
+    border-color: var(--gold);
+    box-shadow: 0 0 8px #d9b45c88;
+  }
+  body.mobile-touch #bar-editor .bar-editor-cell.empty {
+    opacity: 0.75;
+  }
+  /* Tail positions past the configurable span: they render so the grid keeps the
+     ring's geometry, but they bind nothing. */
+  body.mobile-touch #bar-editor .bar-editor-cell.out-of-range {
+    opacity: 0.25;
+  }
+  body.mobile-touch #bar-editor .bar-editor-cell-icon {
+    width: 26px;
+    height: 26px;
+    background-size: cover;
+    background-position: center;
+  }
+  body.mobile-touch #bar-editor .bar-editor-cell-name {
+    max-width: 100%;
+    font-size: 9px;
+    line-height: 1.1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch #bar-editor .bar-editor-caption {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #c8b888;
+    text-align: center;
+  }
+  /* The spellbook's touch-only assign control, beside the +/- toggle: it opens
+     this editor with the row's spell armed, which is how a touch player chooses
+     a slot at all. */
+  body.mobile-touch #spellbook .spell-hotbar-assign {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    margin-inline-end: 4px;
+    border: 2px solid #4a3d1d;
+    border-radius: 7px;
+    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    color: var(--gold);
+  }
+  body.mobile-touch #spellbook .spell-hotbar-assign .ui-icon {
+    width: 20px;
+    height: 20px;
   }
   body.mobile-touch #quest-dialog .qd-list-item,
   body.mobile-touch #quest-log-window .ql-item,

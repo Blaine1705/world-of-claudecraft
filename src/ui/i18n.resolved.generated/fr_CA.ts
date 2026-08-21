@@ -881,7 +881,22 @@ export const fr_CA: EnTranslations = {
       "targetCycleShort": "Cible",
       "spellbookPageLabel": "Page {page}",
       "hideKeyboard": "Masquer le clavier",
-      "chatPlaceholder": "Dites quelque chose…"
+      "chatPlaceholder": "Dites quelque chose…",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options."
     },
     "tutorial": {
       "moveBodyTouch": "Utilise le joystick de déplacement pour te déplacer et fais glisser l'écran pour regarder autour de toi. Fais quelques pas pour commencer.",
@@ -2514,7 +2529,8 @@ export const fr_CA: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Ajouter {name} à la barre d'action",
-      "removeFromBarAria": "Retirer {name} de la barre d'action"
+      "removeFromBarAria": "Retirer {name} de la barre d'action",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

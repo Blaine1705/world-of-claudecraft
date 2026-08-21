@@ -881,7 +881,22 @@ export const nl_NL: EnTranslations = {
       "targetCycleShort": "Doel",
       "spellbookPageLabel": "Pagina {page}",
       "hideKeyboard": "Toetsenbord verbergen",
-      "chatPlaceholder": "Zeg iets..."
+      "chatPlaceholder": "Zeg iets...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options."
     },
     "tutorial": {
       "moveBodyTouch": "Gebruik de bewegingsstick om te bewegen en sleep over het scherm om rond te kijken. Zet een paar stappen om te beginnen.",
@@ -2514,7 +2529,8 @@ export const nl_NL: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name} toevoegen aan actiebalk",
-      "removeFromBarAria": "{name} verwijderen van actiebalk"
+      "removeFromBarAria": "{name} verwijderen van actiebalk",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

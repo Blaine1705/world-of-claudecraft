@@ -881,7 +881,22 @@ export const zh_CN: EnTranslations = {
       "targetCycleShort": "目标",
       "spellbookPageLabel": "页{page}",
       "hideKeyboard": "隐藏键盘",
-      "chatPlaceholder": "说点什么...（! 显示社区指令）"
+      "chatPlaceholder": "说点什么...（! 显示社区指令）",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "编辑动作条布局"
+    },
+    "barEditor": {
+      "title": "编辑动作条",
+      "close": "关闭动作条编辑器",
+      "pages": "动作条页面",
+      "pageTab": "Page {page}",
+      "buttonHeader": "按钮{button}",
+      "cellAria": "按钮{button}，{direction}：{action}",
+      "emptyCellAria": "按钮{button}，{direction}：空",
+      "hint": "点按一个栏位，再点按另一个，即可交换。",
+      "armed": "点按一个栏位以放置{name}。",
+      "picked": "点按另一个栏位以与{name}交换。",
+      "locked": "动作条已在界面选项中锁定。"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -2514,7 +2529,8 @@ export const zh_CN: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
-      "removeFromBarAria": "从动作条移除{name}"
+      "removeFromBarAria": "从动作条移除{name}",
+      "assignAria": "为{name}选择一个栏位"
     },
     "nameplate": {
       "mobLevel": "{level}",

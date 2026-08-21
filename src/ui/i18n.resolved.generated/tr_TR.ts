@@ -881,7 +881,22 @@ export const tr_TR: EnTranslations = {
       "targetCycleShort": "Hedef",
       "spellbookPageLabel": "Sayfa {page}",
       "hideKeyboard": "Klavyeyi gizle",
-      "chatPlaceholder": "Bir şey söyle..."
+      "chatPlaceholder": "Bir şey söyle...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options."
     },
     "tutorial": {
       "moveBodyTouch": "Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.",
@@ -2514,7 +2529,8 @@ export const tr_TR: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name} yeteneğini eylem çubuğuna ekle",
-      "removeFromBarAria": "{name} yeteneğini eylem çubuğundan kaldır"
+      "removeFromBarAria": "{name} yeteneğini eylem çubuğundan kaldır",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

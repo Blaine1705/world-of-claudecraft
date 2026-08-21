@@ -377,6 +377,7 @@ import {
   hasAutoAttackTarget,
   isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
+import { BarEditorWindow } from './hud/action_bar/bar_editor';
 import {
   buildMobileConsumableSeat,
   type MobileConsumableSeat,
@@ -406,7 +407,6 @@ import {
   parseHotbarAction,
   placeAbilityOnSlot,
   placeItemOnSlot,
-  resolveMobileHotbarDrop,
   swapHotbarSlots,
 } from './hud/action_bar/hotbar';
 import {
@@ -1208,16 +1208,6 @@ const CHAT_TEMPLATE_KEYS = {
   roll: 'hud.chat.templates.roll',
   say: 'hud.chat.templates.say',
 } satisfies Record<string, TranslationKey>;
-type MobileHotbarDrag = {
-  pointerId: number;
-  sourceIndex: number;
-  startX: number;
-  startY: number;
-  active: boolean;
-  timer: number;
-  targetIndex: number | null;
-};
-
 // world map: terrain is pre-rendered for the whole zone at this resolution
 // (cached per zone) and a sub-rect is blitted for the current zoom.
 const MAP_BG_RES = 480;
@@ -1368,7 +1358,6 @@ export class Hud {
   // The windows publish and read it through their deps; the state itself is a shared
   // module, not another cross-window field cluster on this coordinator.
   private readonly itemDragState = new ItemDragState();
-  private mobileHotbarDrag: MobileHotbarDrag | null = null;
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
@@ -3567,6 +3556,10 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.spellbookWindow.close();
         break;
+      case 'bar-editor':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.barEditorWindow.close();
+        break;
       case 'quest-log-window':
         this.questlogWindow.close();
         break;
@@ -4715,9 +4708,9 @@ export class Hud {
       this.charWindow.dropOnEquipSlot(itemId, slot, target),
     dropOnActionSlot: (itemId, slot) => this.placeHotbarItemFromTouch(itemId, slot),
     dropOnActionRingSlot: (itemId, ringIndex) => {
-      // Bounded like mobileRingSlotFromPoint (the phase 14 QA): a stale
-      // data-mobile-index past the live ring must map to no seat, never to
-      // a computed bar slot past the end of the bar.
+      // Bounded (the phase 14 QA): a stale data-mobile-index past the live
+      // ring must map to no seat, never to a computed bar slot past the end
+      // of the bar.
       if (ringIndex >= this.mobileRingSlotBtns.length) return;
       this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex));
     },
@@ -5310,6 +5303,32 @@ export class Hud {
       this.dragAction = action ? { action, sourceIndex: null } : null;
     },
     clearActionDropTargets: () => this.clearActionDropTargets(),
+    openBarEditor: (abilityId) => this.openBarEditor(abilityId),
+  });
+  // The touch bar editor (hud/action_bar/bar_editor/): the ONLY binding path on
+  // touch, replacing the retired long-press rearrange. Both mutations land on the
+  // SAME helpers the desktop HTML5 drop uses, so no second write path exists.
+  private readonly barEditorWindow = new BarEditorWindow({
+    root: () => $('#bar-editor'),
+    closeOthers: () => this.closeOtherWindows('#bar-editor'),
+    ...this.windowFocus('#bar-editor'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+    hideTooltip: () => this.hideTooltip(),
+    barActions: () => this.hotbarActions,
+    sourceSlotCount: () => this.mobileActionSourceSlotCount(),
+    editAllowed: () => isActionBarEditAllowed(this.actionBarsLocked(), 'drop'),
+    placeAbility: (abilityId, slot) => {
+      if (!this.actionBarController.isAssignableAction({ type: 'ability', id: abilityId })) return;
+      this.hotbarActions = placeAbilityOnSlot(this.hotbarActions, abilityId, slot - 1);
+      this.saveSlotMap();
+      this.spellbookWindow.refreshHotbarControls();
+      this.hideTooltip();
+    },
+    swapSlots: (slotA, slotB) => {
+      this.hotbarActions = swapHotbarSlots(this.hotbarActions, slotA - 1, slotB - 1);
+      this.saveSlotMap();
+      this.hideTooltip();
+    },
   });
   // Quest-log window painter (questlog_view.ts core + questlog_window.ts painter).
   // It composes the presentation bag (icon/money/tooltip) for the reward row and
@@ -5545,7 +5564,6 @@ export class Hud {
       touchTimer = undefined;
     };
     const showAt = (x: number, y: number, trigger: 'touch' | 'mouse' | 'focus') => {
-      if (this.mobileHotbarDrag?.active) return;
       // Touch-only path: showing the tooltip means the held control is being
       // inspected, so the release click should peek, not fire its action.
       this.peekGuard.tooltipShown(trigger);
@@ -6482,6 +6500,7 @@ export class Hud {
     this.socialWindow.relocalize();
     this.cardDuelWindow.relocalize();
     this.spellbookWindow.relocalize();
+    this.barEditorWindow.relocalize();
     this.lockpickController.relocalize();
     this.tutorial.relocalize(this.sim, this.keybinds);
     // The ring latches its page indicator on the page/count pair; dropping the
@@ -6684,7 +6703,6 @@ export class Hud {
   private syncActiveHotbarForm(): void {
     if (!this.actionBarController.syncActiveForm()) return;
     this.dragAction = null;
-    this.clearMobileHotbarDrag();
     this.mobileActionPage = this.currentMobileActionPage();
   }
 
@@ -7453,7 +7471,6 @@ export class Hud {
           this.dragAction = null;
           this.clearActionDropTargets();
         });
-        this.bindMobileActionDrag(btn, slot);
       } else {
         // Slot 0 (Attack). Right-click removes the Attack toggle from the bar
         // (Interface option showAttackButton -> off), freeing the slot and its key
@@ -7639,7 +7656,6 @@ export class Hud {
       itemForSlot: (slot) => this.itemForSlot(slot),
       empoweredAbilityIdForSlot: (slot) => this.empoweredAbilityIdForSlot(slot),
       bindModeActive: () => this.actionBarBind !== null,
-      hotbarDragActive: () => this.mobileHotbarDrag?.active === true,
       takeSuppressedClick: () => {
         if (!this.suppressNextActionClick) return false;
         this.suppressNextActionClick = false;
@@ -7661,7 +7677,6 @@ export class Hud {
       hideTooltip: () => this.hideTooltip(),
       consumePeekGuard: () => this.peekGuard.consume(),
       bindEmpoweredHold: (btn, resolveSlot) => this.bindEmpoweredActionHold(btn, resolveSlot),
-      bindRingDrag: (btn, i) => this.bindMobileRingDrag(btn, i),
     });
     if (!ring) return;
     this.mobileRingAttackBtn = ring.attackBtn;
@@ -7707,221 +7722,12 @@ export class Hud {
   }
 
   private clearActionDropTargets(): void {
-    // All desktop rows (#actionbar, #actionbar2, and #actionbar3) hold .action-btn slots; the
-    // mobile action ring's paged slots are .mobile-action-slot instead.
-    document
-      .querySelectorAll('.action-btn.drop-target, .mobile-action-slot.drop-target')
-      .forEach((el) => {
-        el.classList.remove('drop-target');
-      });
-  }
-
-  private mobileRingSlotFromPoint(x: number, y: number): number | null {
-    const el = document
-      .elementFromPoint(x, y)
-      ?.closest?.('.mobile-action-slot') as HTMLElement | null;
-    const raw = el?.dataset.mobileIndex;
-    if (!raw) return null;
-    const idx = Number(raw);
-    return Number.isInteger(idx) && idx >= 0 && idx < this.mobileRingSlotBtns.length ? idx : null;
-  }
-
-  private actionButtonSlotFromPoint(x: number, y: number): number | null {
-    const el = document
-      .elementFromPoint(x, y)
-      ?.closest?.('.action-btn') as HTMLButtonElement | null;
-    const raw = el?.dataset.hotbarSlot;
-    if (!raw) return null;
-    const slot = Number(raw);
-    return Number.isInteger(slot) && slot >= 1 ? slot : null;
-  }
-
-  private clearMobileHotbarDrag(): void {
-    const drag = this.mobileHotbarDrag;
-    if (drag) window.clearTimeout(drag.timer);
-    this.mobileHotbarDrag = null;
-    document.body.classList.remove('mobile-hotbar-dragging');
-    document
-      .querySelectorAll('.action-btn.mobile-drag-source, .mobile-action-slot.mobile-drag-source')
-      .forEach((el) => {
-        el.classList.remove('mobile-drag-source');
-        el.removeAttribute('aria-grabbed');
-      });
-    this.clearActionDropTargets();
-  }
-
-  private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
-    btn.addEventListener('pointerdown', (e) => {
-      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
-      if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
-      if (this.empoweredAbilityIdForSlot(slot)) return;
-      // Any populated slot (ability or item) can be picked up and swapped by
-      // touch, matching desktop drag-and-drop which does not special-case
-      // items either.
-      if (!this.actionForSlot(slot)) return;
-      this.clearMobileHotbarDrag();
-      const sourceIndex = slot - 1;
-      const drag: MobileHotbarDrag = {
-        pointerId: e.pointerId,
-        sourceIndex,
-        startX: e.clientX,
-        startY: e.clientY,
-        active: false,
-        targetIndex: null,
-        timer: window.setTimeout(() => {
-          const current = this.mobileHotbarDrag;
-          if (!current || current.pointerId !== e.pointerId) return;
-          current.active = true;
-          current.targetIndex = sourceIndex;
-          this.suppressNextActionClick = true;
-          document.body.classList.add('mobile-hotbar-dragging');
-          btn.classList.add('mobile-drag-source');
-          btn.classList.add('drop-target');
-          btn.setAttribute('aria-grabbed', 'true');
-          this.hideTooltip();
-          try {
-            btn.setPointerCapture?.(e.pointerId);
-          } catch {
-            /* pointer already released */
-          }
-        }, 320),
-      };
-      this.mobileHotbarDrag = drag;
+    // Desktop HTML5 drag-and-drop only: all three rows (#actionbar, #actionbar2,
+    // #actionbar3) hold .action-btn slots. Touch binding is the bar editor overlay,
+    // which never marks a drop target.
+    document.querySelectorAll('.action-btn.drop-target').forEach((el) => {
+      el.classList.remove('drop-target');
     });
-
-    btn.addEventListener('pointermove', (e) => {
-      const drag = this.mobileHotbarDrag;
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      const moved = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
-      if (!drag.active && moved > 9) {
-        this.clearMobileHotbarDrag();
-        return;
-      }
-      if (!drag.active) return;
-      e.preventDefault();
-      const targetSlot = this.actionButtonSlotFromPoint(e.clientX, e.clientY);
-      const targetIndex = targetSlot !== null ? targetSlot - 1 : null;
-      drag.targetIndex = targetIndex;
-      this.clearActionDropTargets();
-      const targetBtn = targetSlot !== null ? this.abilityButtons[targetSlot]?.btn : null;
-      if (targetBtn) targetBtn.classList.add('drop-target');
-      this.abilityButtons[drag.sourceIndex + 1]?.btn.classList.add('mobile-drag-source');
-    });
-
-    const finish = (e: PointerEvent) => {
-      const drag = this.mobileHotbarDrag;
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      const wasActive = drag.active;
-      const targetIndex = drag.targetIndex;
-      if (wasActive) {
-        e.preventDefault();
-        this.suppressNextActionClick = true;
-        const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
-        if (resolvedTarget !== null) {
-          this.hotbarActions = swapHotbarSlots(
-            this.hotbarActions,
-            drag.sourceIndex,
-            resolvedTarget,
-          );
-          this.saveSlotMap();
-          // Match the desktop drop: clear the now-stale tooltip for the rearranged
-          // slot so a long-press peek resolves the new content (#1485).
-          this.hideTooltip();
-        }
-      }
-      this.clearMobileHotbarDrag();
-    };
-    btn.addEventListener('pointerup', finish);
-    btn.addEventListener('pointercancel', finish);
-  }
-
-  // Touch swap for the mobile action ring, the one bar actually visible on a
-  // touch device (the desktop #actionbar/#actionbar2/#actionbar3 rows bindMobileActionDrag
-  // wires above are display:none under body.mobile-touch, so without this the
-  // ring had no rearrange path at all). Same long-press-then-drag gesture as
-  // bindMobileActionDrag, sharing the one mobileHotbarDrag field (only one
-  // drag can be live at a time) and the pure resolveMobileHotbarDrop/
-  // swapHotbarSlots helpers; only the point-to-slot hit test differs, since
-  // ring buttons are .mobile-action-slot, not .action-btn, and a ring
-  // position's underlying bar slot depends on the current paged page.
-  private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
-    btn.addEventListener('pointerdown', (e) => {
-      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
-      if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
-      const sourceSlot = this.mobileSourceSlotForButton(ringIndex);
-      if (this.empoweredAbilityIdForSlot(sourceSlot)) return;
-      if (!this.actionForSlot(sourceSlot)) return;
-      this.clearMobileHotbarDrag();
-      const sourceIndex = sourceSlot - 1;
-      const drag: MobileHotbarDrag = {
-        pointerId: e.pointerId,
-        sourceIndex,
-        startX: e.clientX,
-        startY: e.clientY,
-        active: false,
-        targetIndex: null,
-        timer: window.setTimeout(() => {
-          const current = this.mobileHotbarDrag;
-          if (!current || current.pointerId !== e.pointerId) return;
-          current.active = true;
-          current.targetIndex = sourceIndex;
-          document.body.classList.add('mobile-hotbar-dragging');
-          btn.classList.add('mobile-drag-source', 'drop-target');
-          btn.setAttribute('aria-grabbed', 'true');
-          this.hideTooltip();
-          try {
-            btn.setPointerCapture?.(e.pointerId);
-          } catch {
-            /* pointer already released */
-          }
-        }, 320),
-      };
-      this.mobileHotbarDrag = drag;
-    });
-
-    btn.addEventListener('pointermove', (e) => {
-      const drag = this.mobileHotbarDrag;
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      const moved = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
-      if (!drag.active && moved > 9) {
-        this.clearMobileHotbarDrag();
-        return;
-      }
-      if (!drag.active) return;
-      e.preventDefault();
-      const targetRingIndex = this.mobileRingSlotFromPoint(e.clientX, e.clientY);
-      const targetIndex =
-        targetRingIndex !== null ? this.mobileSourceSlotForButton(targetRingIndex) - 1 : null;
-      drag.targetIndex = targetIndex;
-      this.clearActionDropTargets();
-      const targetBtn = targetRingIndex !== null ? this.mobileRingSlotBtns[targetRingIndex] : null;
-      if (targetBtn) targetBtn.classList.add('drop-target');
-      btn.classList.add('mobile-drag-source');
-    });
-
-    const finish = (e: PointerEvent) => {
-      const drag = this.mobileHotbarDrag;
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      const wasActive = drag.active;
-      const targetIndex = drag.targetIndex;
-      if (wasActive) {
-        e.preventDefault();
-        this.suppressNextActionClick = true;
-        const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
-        if (resolvedTarget !== null) {
-          this.hotbarActions = swapHotbarSlots(
-            this.hotbarActions,
-            drag.sourceIndex,
-            resolvedTarget,
-          );
-          this.saveSlotMap();
-          this.hideTooltip();
-        }
-      }
-      this.clearMobileHotbarDrag();
-    };
-    btn.addEventListener('pointerup', finish);
-    btn.addEventListener('pointercancel', finish);
   }
 
   // Repaint the side-menu button keycaps + aria labels from the current bindings.
@@ -17569,6 +17375,15 @@ export class Hud {
 
   toggleSpellbook(): void {
     this.spellbookWindow.toggle();
+  }
+
+  /** Open the touch bar editor, optionally with a spell armed for the next tap. */
+  openBarEditor(abilityId: string | null = null): void {
+    this.barEditorWindow.open(abilityId);
+  }
+
+  toggleBarEditor(): void {
+    this.barEditorWindow.toggle();
   }
 
   // -------------------------------------------------------------------------

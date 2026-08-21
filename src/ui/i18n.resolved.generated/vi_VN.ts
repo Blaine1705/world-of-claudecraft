@@ -881,7 +881,22 @@ export const vi_VN: EnTranslations = {
       "targetCycleShort": "Mục tiêu",
       "spellbookPageLabel": "Trang {page}",
       "hideKeyboard": "Ẩn bàn phím",
-      "chatPlaceholder": "Nói gì đó..."
+      "chatPlaceholder": "Nói gì đó...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options."
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -2514,7 +2529,8 @@ export const vi_VN: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Thêm {name} vào thanh kỹ năng",
-      "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng"
+      "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

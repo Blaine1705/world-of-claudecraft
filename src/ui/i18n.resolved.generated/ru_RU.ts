@@ -881,7 +881,22 @@ export const ru_RU: EnTranslations = {
       "targetCycleShort": "Цель",
       "spellbookPageLabel": "Страница {page}",
       "hideKeyboard": "Скрыть клавиатуру",
-      "chatPlaceholder": "Напишите сообщение... (! команды сообщества)"
+      "chatPlaceholder": "Напишите сообщение... (! команды сообщества)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Изменить раскладку панели действий"
+    },
+    "barEditor": {
+      "title": "Редактор панели действий",
+      "close": "Закрыть редактор панели",
+      "pages": "Страницы панели действий",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Кнопка {button}",
+      "cellAria": "Кнопка {button}, {direction}: {action}",
+      "emptyCellAria": "Кнопка {button}, {direction}: пусто",
+      "hint": "Коснитесь одной ячейки, затем другой, чтобы поменять их местами.",
+      "armed": "Коснитесь ячейки, чтобы поместить туда {name}.",
+      "picked": "Коснитесь другой ячейки, чтобы поменять местами с {name}.",
+      "locked": "Панели действий заблокированы в настройках интерфейса."
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -2514,7 +2529,8 @@ export const ru_RU: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Добавить {name} на панель действий",
-      "removeFromBarAria": "Убрать {name} с панели действий"
+      "removeFromBarAria": "Убрать {name} с панели действий",
+      "assignAria": "Выберите ячейку для {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

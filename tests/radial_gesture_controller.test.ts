@@ -88,7 +88,6 @@ function makeRig(options: { appVw?: string; appVh?: string; safeAreaPx?: string 
     hasSlot: () => true,
     cast: (buttonIndex, direction) => rig.casts.push([buttonIndex, direction]),
     pressClaimed: (buttonIndex) => rig.claimed.has(buttonIndex),
-    dragActive: () => false,
     takeSuppressedPress: () => {
       rig.suppressed.takes++;
       const was = rig.suppressed.value;

@@ -881,7 +881,22 @@ export const da_DK: EnTranslations = {
       "targetCycleShort": "Mål",
       "spellbookPageLabel": "Side {page}",
       "hideKeyboard": "Skjul tastatur",
-      "chatPlaceholder": "Sig noget..."
+      "chatPlaceholder": "Sig noget...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options."
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -2514,7 +2529,8 @@ export const da_DK: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Tilføj {name} til handlingslinjen",
-      "removeFromBarAria": "Fjern {name} fra handlingslinjen"
+      "removeFromBarAria": "Fjern {name} fra handlingslinjen",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
