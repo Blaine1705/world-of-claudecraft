@@ -154,12 +154,14 @@ describe('DeedsWindow: focus survives rebuilds', () => {
     // rebuild must leave it alone rather than fall through to Close.
     const state = baseState();
     const { w, el } = makeWindow(state);
+    const closeBefore = el.querySelector('[data-close]');
+    expect(closeBefore).not.toBeNull();
     el.focus();
     expect(document.activeElement).toBe(el);
     state.deedsEarned.set('prog_first_steps', '2026-07-12');
     w.refreshIfChanged();
+    expect(el.querySelector('[data-close]')).not.toBe(closeBefore); // really rebuilt
     expect(document.activeElement).toBe(el);
-    expect(document.activeElement).not.toBe(el.querySelector('[data-close]'));
   });
 
   it('falls back to Close when the focused watch card leaves the current filter', () => {

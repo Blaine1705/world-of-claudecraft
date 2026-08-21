@@ -385,4 +385,19 @@ describe('opener capture vs the pointer-only focus drop (src/ui/pointer_blur.ts)
     expect(keyboard.opener()).toBe(trigger);
     keyboard.release(false);
   });
+
+  it('records the parked window ROOT as the opener for a window opened by a mouse click inside a dialog-rooted window', () => {
+    // Inside a dialog-rooted window the drop parks focus on the window's root
+    // (src/ui/pointer_blur.ts, pinned there and in the browser suite); the opener
+    // capture accepts any rendered element, so the next window records that root,
+    // never the clicked button. Restoring to a still-open window's root re-arms
+    // its trap; a closed one fails canFocus and restores nothing.
+    const parkedRoot = new FakeHTMLElement();
+    const nextRoot = new FakeHTMLElement();
+    nextRoot.append(new FakeHTMLElement({ focusable: true }));
+    parkedRoot.focus();
+    const trap = new FocusManager().open({ root: () => el(nextRoot) });
+    expect(trap.opener()).toBe(parkedRoot);
+    trap.release(false);
+  });
 });

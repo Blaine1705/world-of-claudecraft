@@ -247,7 +247,8 @@ describe('hud.ts wiring pins (the surfaces the Space-reopens-last-menu fix cover
   // over a FIXTURE rail, so without these pins hud.ts could silently drop the
   // real wiring while every behavioral suite stays green. Line comments are
   // stripped first so a commented-out call can never satisfy a pin.
-  const stripLineComments = (src: string): string => src.replace(/^\s*\/\/.*$/gm, '');
+  const stripLineComments = (src: string): string =>
+    src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   const hud = stripLineComments(readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8'));
 
   it('applies the chrome focus wiring (the rail, the panels, and the trackers) through its one entry point', () => {

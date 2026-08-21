@@ -990,7 +990,9 @@ export class Input {
       // Suppress only, never blur: at keydown time the guard cannot tell stale
       // pointer focus from the place a keyboard user just Tabbed to (Chromium
       // flips :focus-visible on the very keypress), and every further Space
-      // lands in this same guard, so the focus position is left for the player.
+      // lands in this same guard, so the focus position is left for the player
+      // (Enter on a stale button stays a residual either way; the pointer drop
+      // on every wired surface is what removes the stale focus).
       if (e.code === 'Space') {
         const active = document.activeElement;
         if (active instanceof HTMLElement && isStaleChromeButton(active)) e.preventDefault();

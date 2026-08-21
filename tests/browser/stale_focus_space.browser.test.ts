@@ -153,8 +153,10 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
     // Prevented, pinned explicitly through the post-Input listener.
     expect(lastKeydown).toEqual({ code: 'Space', prevented: true });
     // Focus is left alone (the guard suppresses, it never drops), and the next
-    // Space lands in the same guard: still no activation.
+    // Space lands in the same guard: still no activation. Reset the record first
+    // so the second assertion cannot pass on the first press.
     expect(document.activeElement).toBe(btn);
+    lastKeydown = null;
     await pressSpace();
     expect(count).toBe(1);
     expect(lastKeydown).toEqual({ code: 'Space', prevented: true });

@@ -182,6 +182,20 @@ describe('focusedWithin', () => {
     expect(focusedWithin(root)).toBeNull();
   });
 
+  it('returns null for a dialog root NESTED inside the root (the park lands on the nearest one)', () => {
+    // dropPointerFocus parks on closest([role="dialog"]); a window that nests a
+    // second dialog root would otherwise see the inner root as a keyless control
+    // and fall through to Close.
+    const { root } = windowWithKeyedButton('k');
+    const inner = document.createElement('div');
+    inner.setAttribute('role', 'dialog');
+    inner.tabIndex = -1;
+    root.appendChild(inner);
+    inner.focus();
+    expect(document.activeElement).toBe(inner);
+    expect(focusedWithin(root)).toBeNull();
+  });
+
   it('returns null when focus is on <body> or in another window', () => {
     const { root } = windowWithKeyedButton('k');
     const other = windowWithKeyedButton('elsewhere');

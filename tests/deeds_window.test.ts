@@ -25,7 +25,8 @@ const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8')
 // pinned below carry comments that name the very tokens the pins look for.
 // Only WHOLE-line comments: a trailing-comment or URL-bearing code line must
 // survive intact, or the pins below would stop seeing the code they guard.
-const stripLineComments = (src: string): string => src.replace(/^\s*\/\/.*$/gm, '');
+const stripLineComments = (src: string): string =>
+  src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 const painter = read('../src/ui/deeds_window.ts');
 const tracker = read('../src/ui/deed_tracker_painter.ts');
@@ -894,7 +895,9 @@ describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
     // that the wiring itself stays preventDefault-free (a default-preventing
     // handler there would kill the native activation the guard protects).
     const wiring = stripLineComments(read('../src/ui/chrome_focus_wiring.ts'));
-    const loop = wiring.slice(wiring.indexOf('for (const panelId of CHROME_GUARDED_PANELS)'));
+    const loopStart = wiring.indexOf('for (const panelId of CHROME_GUARDED_PANELS)');
+    expect(loopStart).toBeGreaterThan(0);
+    const loop = wiring.slice(loopStart);
     expect(loop).toContain('bindChromeButtonKeyGuard(panel)');
     expect(loop).toContain('bindPointerBlur(panel)');
     expect(wiring).not.toContain('preventDefault');

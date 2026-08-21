@@ -383,9 +383,10 @@ export class ChatWindowController {
     }
     const index = order.indexOf(id);
     if (index < 0) return;
-    // Reuse the shared roving-index core (Home/End come along for free) instead
-    // of hand-rolled wrap math, so chat tabs stay consistent with every other
-    // tablist in the HUD. `step` is unused here; `rovingTarget` reads the key.
+    // Reuse the shared roving-index core instead of hand-rolled wrap math, so
+    // chat tabs stay consistent with every other tablist in the HUD (only the
+    // arrow keys reach it: the early return above filters everything else).
+    // `step` is unused here; `rovingTarget` reads the key.
     const nextIndex = rovingTarget(event.key, index, order.length, 'horizontal');
     if (nextIndex === null) return;
     event.preventDefault();

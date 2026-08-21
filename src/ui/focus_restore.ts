@@ -126,16 +126,21 @@ export function captureFocusKey(root: HTMLElement): string | null {
  * Note the containment check subsumes the `<body>` case a caller might otherwise special
  * case: `root` is a descendant of `<body>`, so `root.contains(document.body)` is false.
  *
- * The ROOT ITSELF is never "a focused control within": the pointer-only focus drop
- * (src/ui/pointer_blur.ts) parks pointer focus on a window's dialog root so the Tab trap
- * stays armed, and a repaint ladder that read the parked root as a focused control would
- * resolve no key and fall through to its Close rung, planting focus on Close after every
- * mouse click (the #2377 double-fire family). Callers that hand-roll `root.contains(active)`
- * must use this helper instead (deeds_window.ts and bank_window.ts do).
+ * A DIALOG ROOT is never "a focused control within": the pointer-only focus drop
+ * (src/ui/pointer_blur.ts) parks pointer focus on the nearest `[role="dialog"]` root so the
+ * Tab trap stays armed, and a repaint ladder that read a parked root as a focused control
+ * would resolve no key and fall through to its Close rung, planting focus on Close after
+ * every mouse click (the #2377 double-fire family). Refused by identity (the root passed in)
+ * AND by shape (any element that is itself a dialog root, so a root nested inside `root` is
+ * refused too). Repaint ladders that hand-roll `root.contains(active)` must use this helper
+ * instead (deeds_window.ts, bank_window.ts and form_draft.ts do; the remaining bare
+ * containment reads in src/ui are trap boundary checks or dataset-keyed reads that cannot
+ * resolve a root into a Close fallback).
  */
-export function focusedWithin(root: HTMLElement): HTMLElement | null {
+export function focusedWithin(root: ParentNode): HTMLElement | null {
   const active = document.activeElement;
   if (!(active instanceof HTMLElement) || active === root) return null;
+  if (active.getAttribute('role') === 'dialog') return null;
   return root.contains(active) ? active : null;
 }
 

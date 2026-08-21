@@ -180,12 +180,14 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     const state = baseState();
     const { w, el } = makeWindow(state);
     w.refreshIfChanged();
+    const closeBefore = el.querySelector('[data-close]');
+    expect(closeBefore).not.toBeNull();
     el.focus();
     expect(document.activeElement).toBe(el);
     state.identity.craftSkills.cooking = 40;
     w.refreshIfChanged();
+    expect(el.querySelector('[data-close]')).not.toBe(closeBefore); // really rebuilt
     expect(document.activeElement).toBe(el);
-    expect(document.activeElement).not.toBe(el.querySelector('[data-close]'));
   });
 
   it('keeps Close the only focusable control on the CHARM-LESS surface', () => {

@@ -21,7 +21,7 @@
 // Host-agnostic: everything is reached through the injected query and the
 // pointer_blur helpers, so it unit-tests in plain Node against hand-rolled fakes.
 
-import { bindChromeButtonKeyGuard, bindPointerBlur } from './pointer_blur';
+import { bindChromeButtonKeyGuard, bindPointerBlur, type ListenerHost } from './pointer_blur';
 
 /** Non-modal overlay roots (and the micromenu rail) whose BUTTONs take the shared
  *  key guard plus the pointer-only focus drop. */
@@ -46,18 +46,9 @@ export const CHROME_TRACKER_BLURS: readonly (readonly [root: string, selector: s
   ['#reliquary-tracker', '.dt-header'],
 ];
 
-/** The slice of a root element the wiring binds to. */
-export interface ChromeRootEl {
-  addEventListener(
-    type: string,
-    listener: (e: Event) => void,
-    options?: boolean | { capture?: boolean },
-  ): void;
-}
-
 /** Bind both halves over every guarded panel and the pointer drop over every
  *  tracker. `query` resolves a selector to its root (hud.ts passes `$`). */
-export function wireChromeFocus(query: (selector: string) => ChromeRootEl): void {
+export function wireChromeFocus(query: (selector: string) => ListenerHost): void {
   for (const [root, selector] of CHROME_TRACKER_BLURS) bindPointerBlur(query(root), selector);
   for (const panelId of CHROME_GUARDED_PANELS) {
     const panel = query(panelId);

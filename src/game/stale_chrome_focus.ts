@@ -24,10 +24,14 @@
 // time it cannot tell stale pointer focus from the place a keyboard user just
 // Tabbed to (Chromium flips :focus-visible on the very keypress), every further
 // Space lands in the same guard, and the unblocked path prevents Space anyway,
-// so dropping focus would only cost a keyboard user their place. Known residual:
-// the graphics rebuild pause blocks input with no surface at all, so a
-// keyboard-focused chrome button loses its Space activation during that pause
-// (short, and every other blocked state puts focus inside a dialog root).
+// so dropping focus would cost a keyboard user their place for no Space gain.
+// Known residuals: (1) Enter on a stale mouse-focused chrome button still
+// natively activates it while blocked (the guard is Space-only; Enter carries
+// the same keydown-time ambiguity, and a blur here would only have shielded it
+// incidentally), which the pointer-only drop on every wired surface is the real
+// answer to; (2) the graphics rebuild pause blocks input with no surface at all,
+// so a keyboard-focused chrome button loses its Space activation during that
+// pause (short, and every other blocked state puts focus inside a dialog root).
 //
 // Host-agnostic (everything reached off the passed element) so it unit-tests
 // in plain Node; input.ts passes document.activeElement. Registered as a pure

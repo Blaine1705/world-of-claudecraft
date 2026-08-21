@@ -48,14 +48,43 @@ class FakeControl {
   }
 }
 
-function wire(): Map<string, FakeRoot> {
+function keydown(
+  key: string,
+  tagName: string,
+): {
+  key: string;
+  code: string;
+  target: { tagName: string };
+  stopped: number;
+  prevented: number;
+  stopPropagation(): void;
+  preventDefault(): void;
+} {
+  return {
+    key,
+    code: '',
+    target: { tagName },
+    stopped: 0,
+    prevented: 0,
+    stopPropagation() {
+      this.stopped++;
+    },
+    preventDefault() {
+      this.prevented++;
+    },
+  };
+}
+
+function wire(): { roots: Map<string, FakeRoot>; queried: string[] } {
   const roots = new Map<string, FakeRoot>();
+  const queried: string[] = [];
   wireChromeFocus((selector) => {
     const root = new FakeRoot();
     roots.set(selector, root);
+    queried.push(selector);
     return root;
   });
-  return roots;
+  return { roots, queried };
 }
 
 describe('the wired roots (the surfaces the fix covers)', () => {
@@ -63,10 +92,19 @@ describe('the wired roots (the surfaces the fix covers)', () => {
     expect(CHROME_GUARDED_PANELS).toContain('#side-buttons');
   });
 
-  it('keeps the bank + bags cluster and the Book of Deeds among the guarded panels', () => {
-    expect(CHROME_GUARDED_PANELS).toEqual(
-      expect.arrayContaining(['#bank-window', '#bags', '#deeds-window']),
-    );
+  it('pins the whole guarded-panel list (every root the fix wires, in bind order)', () => {
+    expect(CHROME_GUARDED_PANELS).toEqual([
+      '#delve-board',
+      '#lockpick-panel',
+      '#delve-rite-panel',
+      '#map-window',
+      '#bank-window',
+      '#bags',
+      '#deeds-window',
+      '#reliquary-window',
+      '#professions-window',
+      '#side-buttons',
+    ]);
   });
 
   it('keeps the three trackers, keyed to their header (and quest row) controls', () => {
@@ -80,14 +118,15 @@ describe('the wired roots (the surfaces the fix covers)', () => {
 
 describe('wireChromeFocus', () => {
   it('resolves every guarded panel and every tracker root exactly once', () => {
-    const roots = wire();
-    expect([...roots.keys()].sort()).toEqual(
-      [...CHROME_GUARDED_PANELS, ...CHROME_TRACKER_BLURS.map(([root]) => root)].sort(),
-    );
+    const { queried } = wire();
+    const expected = [...CHROME_GUARDED_PANELS, ...CHROME_TRACKER_BLURS.map(([root]) => root)];
+    // Same multiset: every root once, no root twice (a duplicate would grow the list).
+    expect([...queried].sort()).toEqual([...expected].sort());
+    expect(new Set(queried).size).toBe(queried.length);
   });
 
   it('binds both halves over every guarded panel: a keydown guard plus a CAPTURE-phase click drop', () => {
-    const roots = wire();
+    const { roots } = wire();
     for (const panelId of CHROME_GUARDED_PANELS) {
       const root = roots.get(panelId);
       if (!root) throw new Error(`unwired panel ${panelId}`);
@@ -99,11 +138,20 @@ describe('wireChromeFocus', () => {
       root.dispatch('click', { detail: 1, target: btn });
       root.dispatch('click', { detail: 0, target: btn });
       expect(btn.blurred, panelId).toBe(1);
+      // And the keydown listener is the real chrome key guard: Enter on a focused
+      // BUTTON stops propagation (never the default); on a DIV it bubbles.
+      const onButton = keydown('Enter', 'BUTTON');
+      root.dispatch('keydown', onButton);
+      expect(onButton.stopped, panelId).toBe(1);
+      expect(onButton.prevented, panelId).toBe(0);
+      const onDiv = keydown('Enter', 'DIV');
+      root.dispatch('keydown', onDiv);
+      expect(onDiv.stopped, panelId).toBe(0);
     }
   });
 
   it('binds the capture-phase click drop over every tracker, keyed to its own selector', () => {
-    const roots = wire();
+    const { roots } = wire();
     for (const [trackerId, selector] of CHROME_TRACKER_BLURS) {
       const root = roots.get(trackerId);
       if (!root) throw new Error(`unwired tracker ${trackerId}`);
@@ -121,10 +169,9 @@ describe('wireChromeFocus', () => {
 
 describe('hud.ts wiring pin', () => {
   it('calls the one wiring entry point with its query (line comments stripped first)', () => {
-    const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8').replace(
-      /^\s*\/\/.*$/gm,
-      '',
-    );
+    const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
     expect(hud).toContain('wireChromeFocus($)');
   });
 });

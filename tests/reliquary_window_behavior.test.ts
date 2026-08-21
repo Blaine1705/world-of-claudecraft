@@ -585,12 +585,14 @@ describe('ReliquaryWindow: focus survives a rebuild', () => {
     const ids = relicIds(PAGE_ID);
     for (const id of ids.slice(0, 4)) state.itemsDiscovered.add(id);
     const rig = makeWindow(state, { nav: 'overview' });
+    const closeBefore = rig.el.querySelector('[data-close]');
+    expect(closeBefore).not.toBeNull();
     rig.el.focus();
     expect(document.activeElement).toBe(rig.el);
     state.itemsDiscovered.add(ids[4] ?? '');
     rig.w.refreshIfChanged();
+    expect(rig.el.querySelector('[data-close]')).not.toBe(closeBefore); // really rebuilt
     expect(document.activeElement).toBe(rig.el);
-    expect(document.activeElement).not.toBe(rig.el.querySelector('[data-close]'));
   });
 
   it('falls back to Close when the focused control is gone after the rebuild', () => {

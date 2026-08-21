@@ -93,7 +93,8 @@ export function blurIfPointerClick(e: ClickLike, el: BlurrableEl | null | undefi
   if (e.detail > 0 && el) dropPointerFocus(el);
 }
 
-interface ListenerHost {
+/** The slice of a root element the delegated forms bind to. */
+export interface ListenerHost {
   addEventListener(
     type: string,
     listener: (e: Event) => void,
