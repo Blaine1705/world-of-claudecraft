@@ -106,7 +106,7 @@ const VC_BOT_CLASSES = [
 
 function spawnCupBot(sim: Sim, role: SportRole): { pid: number; role: SportRole } {
   const cls = VC_BOT_CLASSES[sim.vcup.botPids.length % VC_BOT_CLASSES.length];
-  const pid = sim.addPlayer(cls, nextBotName(sim));
+  const pid = sim.addPlayer(cls, nextBotName(sim), { bot: true });
   sim.vcup.botPids.push(pid);
   return { pid, role };
 }

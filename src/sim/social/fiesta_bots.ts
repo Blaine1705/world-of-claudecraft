@@ -58,7 +58,7 @@ export function startFiestaPractice(sim: Sim): boolean {
     { cls: 'rogue', name: 'Sneakbot' },
   ];
   for (let i = 0; i < kit.length; i++) {
-    const pid = sim.addPlayer(kit[i].cls, kit[i].name);
+    const pid = sim.addPlayer(kit[i].cls, kit[i].name, { bot: true });
     const botMeta = sim.players.get(pid);
     if (botMeta) botMeta.isFiestaBot = true;
     const e = sim.entities.get(pid);
