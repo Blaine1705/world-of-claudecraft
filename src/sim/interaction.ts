@@ -133,7 +133,9 @@ export function lootCorpse(
   }
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot || corpseHasDecayed(mob.dead, mob.corpseTimer)) return false;
-  // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
+  // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may
+  // loot. The flag is threaded into distribution too, so an outside looter keeps what
+  // they take instead of it being split by the absent tapping party's strategies.
   const ffaUnlocked = honorFfa && lootHasGoneFfa(mob.lootFfaTimer);
   const rights = corpseLootRights(ctx, mob, meta.entityId, ffaUnlocked);
   if (!rights.shared && !rights.personal && !rights.open) {
@@ -146,7 +148,7 @@ export function lootCorpse(
   }
   let didLoot = false;
   if (rights.shared && mob.loot.copper > 0) {
-    distributeLootCopper(ctx, mob, meta);
+    distributeLootCopper(ctx, mob, meta, ffaUnlocked);
     didLoot = true;
   }
   // Capacity gate: an item that doesn't fit the looter's bags STAYS on the
@@ -189,7 +191,7 @@ export function lootCorpse(
         if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) break;
         ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
         s.count--;
-      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta)) {
+      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta, ffaUnlocked)) {
         s.count--;
       } else {
         break;
