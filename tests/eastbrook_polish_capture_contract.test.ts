@@ -259,7 +259,7 @@ interface AttributionTargetFixture {
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd13c65d42e6d6e89cb900fb18151f754db3f6451e5540c1800044939c2d63c74';
+  '11dac296a3139a4d4c576fcd0385e7c7d9d337a437cd96d51776ba2d6ff2cff7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
