@@ -9076,6 +9076,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'Visa sekundärt handlingsfält',
   'errors.api.desktopCodeInvalid':
     'Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.',
+  'desktop.titlebar.exitGame': 'Avsluta spelet',
   'desktop.crash.body': 'Spelvyn slutade fungera. Ladda om den?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft stötte på ett oväntat fel och måste stängas.',
   'desktop.crash.quit': 'Avsluta',

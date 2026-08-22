@@ -12,7 +12,6 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -54,7 +53,6 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -96,7 +94,6 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -138,7 +135,6 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -181,7 +177,6 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -223,7 +218,6 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -277,7 +271,6 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -322,7 +315,6 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -364,7 +356,6 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -406,7 +397,6 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -448,7 +438,6 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -490,7 +479,6 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -532,7 +520,6 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -574,7 +561,6 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",
@@ -616,7 +602,6 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "abilityUi.tooltip.anyTarget",
     "apiError.account.password_already_set",
-    "desktop.window.exitToDesktop",
     "entities.abilities.melting_acid.description",
     "entities.abilities.melting_acid.name",
     "entities.abilities.nightshade_coating.description",

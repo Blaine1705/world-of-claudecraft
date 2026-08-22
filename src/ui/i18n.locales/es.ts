@@ -9413,6 +9413,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'Mostrar barra de acción secundaria',
   'errors.api.desktopCodeInvalid':
     'El código de inicio de sesión de escritorio no es válido o expiró. Inténtalo de nuevo.',
+  'desktop.titlebar.exitGame': 'Salir del juego',
   'desktop.crash.body': 'La vista del juego dejó de funcionar. ¿Recargarla?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft tuvo un error inesperado y debe cerrarse.',
   'desktop.crash.quit': 'Salir',

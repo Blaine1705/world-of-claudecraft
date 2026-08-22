@@ -9242,6 +9242,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'Secundaire actiebalk tonen',
   'errors.api.desktopCodeInvalid':
     'Desktop-inlogcode is ongeldig of verlopen. Probeer het opnieuw.',
+  'desktop.titlebar.exitGame': 'Spel afsluiten',
   'desktop.crash.body': 'De spelweergave werkt niet meer. Opnieuw laden?',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft is op een onverwachte fout gestuit en moet worden afgesloten.',

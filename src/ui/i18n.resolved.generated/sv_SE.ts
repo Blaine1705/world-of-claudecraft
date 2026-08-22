@@ -7863,8 +7863,8 @@ export const sv_SE: EnTranslations = {
       "quit": "Avsluta",
       "fatalBody": "World of ClaudeCraft stötte på ett oväntat fel och måste stängas."
     },
-    "window": {
-      "exitToDesktop": "Exit to Desktop"
+    "titlebar": {
+      "exitGame": "Avsluta spelet"
     }
   },
   "gpuNotice": {

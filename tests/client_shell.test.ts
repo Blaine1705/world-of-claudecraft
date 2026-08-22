@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { shellStrings } from '../src/ui/i18n.catalog/shell';
+import { es_ES, fr_CA } from '../src/ui/i18n.resolved.generated';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 // The CSS extraction moved the :root tokens and the reset/base
@@ -88,6 +89,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const desktopShellIntegrationTs = readFileSync(
+  new URL('../src/game/desktop_shell_integration.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const padTargetPickTs = readFileSync(
   new URL('../src/game/pad_target_pick.ts', import.meta.url),
   'utf8',
@@ -97,10 +102,6 @@ const padTargetPickTs = readFileSync(
 const stripLineComments = (source: string) => source.replace(/^\s*\/\/.*$/gm, '');
 const mainTsCode = stripLineComments(mainTs);
 const padTargetPickCode = stripLineComments(padTargetPickTs);
-const desktopShellIntegrationTs = readFileSync(
-  new URL('../src/game/desktop_shell_integration.ts', import.meta.url),
-  'utf8',
-).replace(/\r\n/g, '\n');
 const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -225,11 +226,11 @@ describe('client HTML shell', () => {
     expect(controls[1]).toBe(controls[0]);
     expect(controls[0]).toContain('type="button"');
     expect(controls[0]).toContain('class="desktop-login-exit"');
-    expect(controls[0]).toContain('data-i18n="desktop.window.exitToDesktop"');
-    expect(controls[0]).toContain('data-i18n-title="desktop.window.exitToDesktop"');
-    expect(controls[0]).toContain('title="Exit to Desktop"');
+    expect(controls[0]).toContain('data-i18n="desktop.titlebar.exitGame"');
+    expect(controls[0]).toContain('data-i18n-title="desktop.titlebar.exitGame"');
+    expect(controls[0]).toContain('title="Exit Game"');
     expect(controls[0]).toMatch(/\n\s+hidden\s*\n/);
-    expect(controls[0]).toContain('>Exit to Desktop</button>');
+    expect(controls[0]).toContain('>Exit Game</button>');
     for (const entry of [html, playHtml]) {
       expect(entry.match(/id="desktop-login-exit"/g)).toHaveLength(1);
       const headerActions = entry.match(/<div class="header-actions">([\s\S]*?)<\/div>/)?.[1] ?? '';
@@ -270,14 +271,27 @@ describe('client HTML shell', () => {
     expect(mainTs).not.toContain('desktop-login-exit');
   });
 
-  it('pins the approved Exit to Desktop glossary values', () => {
-    expect(shellStrings.en.desktop.window.exitToDesktop).toBe('Exit to Desktop');
+  it('pins the approved Exit Game values in every locale overlay and dialect resolution', () => {
+    expect(shellStrings.en.desktop.titlebar.exitGame).toBe('Exit Game');
     for (const [locale, translation] of [
-      ['zh_CN', '退出到桌面'],
-      ['zh_TW', '離開至桌面'],
-      ['ja_JP', 'デスクトップに戻る'],
-      ['ko_KR', '바탕 화면으로 나가기'],
-      ['ru_RU', 'Выйти на рабочий стол'],
+      ['cs_CZ', 'Ukončit hru'],
+      ['da_DK', 'Afslut spillet'],
+      ['de_DE', 'Spiel beenden'],
+      ['es', 'Salir del juego'],
+      ['fr_FR', 'Quitter le jeu'],
+      ['id_ID', 'Keluar dari Gim'],
+      ['it_IT', 'Esci dal gioco'],
+      ['ja_JP', 'ゲームを終了'],
+      ['ko_KR', '게임 종료'],
+      ['nl_NL', 'Spel afsluiten'],
+      ['pl_PL', 'Zakończ grę'],
+      ['pt_BR', 'Sair do jogo'],
+      ['ru_RU', 'Выйти из игры'],
+      ['sv_SE', 'Avsluta spelet'],
+      ['tr_TR', 'Oyundan Çık'],
+      ['vi_VN', 'Thoát trò chơi'],
+      ['zh_CN', '退出游戏'],
+      ['zh_TW', '離開遊戲'],
     ]) {
       const overlay = readFileSync(
         new URL(`../src/ui/i18n.locales/${locale}.ts`, import.meta.url),
@@ -285,8 +299,10 @@ describe('client HTML shell', () => {
       )
         .replace(/(^|[^:])\/\/[^\n]*/gm, '$1')
         .replace(/\/\*[\s\S]*?\*\//g, '');
-      expect(overlay).toContain(`'desktop.window.exitToDesktop': '${translation}'`);
+      expect(overlay).toContain(`'desktop.titlebar.exitGame': '${translation}'`);
     }
+    expect(es_ES.desktop.titlebar.exitGame).toBe('Salir del juego');
+    expect(fr_CA.desktop.titlebar.exitGame).toBe('Quitter le jeu');
   });
 
   it('uses the painted combat-status crest in both game entries', () => {

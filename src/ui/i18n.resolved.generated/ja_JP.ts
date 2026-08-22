@@ -7863,8 +7863,8 @@ export const ja_JP: EnTranslations = {
       "quit": "終了",
       "fatalBody": "World of ClaudeCraft で予期しないエラーが発生したため、終了します。"
     },
-    "window": {
-      "exitToDesktop": "デスクトップに戻る"
+    "titlebar": {
+      "exitGame": "ゲームを終了"
     }
   },
   "gpuNotice": {

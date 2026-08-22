@@ -7863,8 +7863,8 @@ export const nl_NL: EnTranslations = {
       "quit": "Afsluiten",
       "fatalBody": "World of ClaudeCraft is op een onverwachte fout gestuit en moet worden afgesloten."
     },
-    "window": {
-      "exitToDesktop": "Exit to Desktop"
+    "titlebar": {
+      "exitGame": "Spel afsluiten"
     }
   },
   "gpuNotice": {

@@ -156,8 +156,12 @@ export const shellStrings = {
         quit: 'Quit',
         fatalBody: 'World of ClaudeCraft hit an unexpected error and needs to close.',
       },
-      window: {
-        exitToDesktop: 'Exit to Desktop',
+      // Borderless-mode title-bar control (index.html / play.html pre-game
+      // headers): the only way out when the shell hides the native window
+      // controls. Namespaced `titlebar`, never `window`, so the key never reads
+      // as a browser-global reach in the src/ui purity sweep.
+      titlebar: {
+        exitGame: 'Exit Game',
       },
     },
     // Software-rendering notice (src/ui/gpu_notice_toast.ts): shown once when

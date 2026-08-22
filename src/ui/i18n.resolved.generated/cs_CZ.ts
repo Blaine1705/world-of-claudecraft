@@ -7863,8 +7863,8 @@ export const cs_CZ: EnTranslations = {
       "quit": "Ukončit",
       "fatalBody": "World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít."
     },
-    "window": {
-      "exitToDesktop": "Exit to Desktop"
+    "titlebar": {
+      "exitGame": "Ukončit hru"
     }
   },
   "gpuNotice": {

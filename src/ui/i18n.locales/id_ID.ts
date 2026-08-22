@@ -9861,6 +9861,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'Tampilkan Bilah Aksi Sekunder',
   'errors.api.desktopCodeInvalid':
     'Kode masuk desktop tidak valid atau kedaluwarsa. Silakan coba lagi.',
+  'desktop.titlebar.exitGame': 'Keluar dari Gim',
   'desktop.crash.body': 'Tampilan gim berhenti bekerja. Muat ulang?',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft mengalami kesalahan tak terduga dan perlu ditutup.',
