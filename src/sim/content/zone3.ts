@@ -3119,7 +3119,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 180, str: 6, sta: 7 },
     sellValue: 3600,
-    requiredClass: ['warrior', 'paladin'],
+    requiredClass: ['warrior', 'paladin', 'shaman'],
     set: 'crownforged', // 3rd Bonewrought piece, unlocks the set's 3-piece bonus
   },
   nighttalon_grips: {
@@ -3169,7 +3169,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 150, str: 7, sta: 6 },
     sellValue: 3600,
-    requiredClass: ['warrior', 'paladin'],
+    requiredClass: ['warrior', 'paladin', 'shaman'],
     set: 'crownforged',
   },
   nighttalon_waistband: {
@@ -3329,7 +3329,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // and adds a complementary secondary (heroic_variants.ts). Off the stat budget.
     hitRating: 20,
     sellValue: 12000,
-    requiredClass: ['warrior', 'paladin'],
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   crownforged_warspaulders: {
     id: 'crownforged_warspaulders',
@@ -3342,7 +3342,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 260, str: 7, sta: 8 },
     hitRating: 20,
     sellValue: 12000,
-    requiredClass: ['warrior', 'paladin'],
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   nighttalon_crown: {
     id: 'nighttalon_crown',
