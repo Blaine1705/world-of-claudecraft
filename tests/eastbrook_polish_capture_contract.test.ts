@@ -268,8 +268,10 @@ interface AttributionTargetFixture {
 // Re-minted for the review-fix round (the nearby-view floor in
 // prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
 // both runtime leaves moved. No capture was retaken.
+// Re-minted for the loading-hitch delivery (renderer.ts and
+// view_priority_policy.ts): both runtime leaves moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e922918ac730f196234a3d450f04845affc5d5986804dff6135fe36efe94b4d2';
+  '8f23254dfe111e9aa20eadf875942eb2fd569d771afbae9c1e05c0447e4ebfc0';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
