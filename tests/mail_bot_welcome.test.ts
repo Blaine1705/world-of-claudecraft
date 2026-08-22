@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import type { Sim } from '../src/sim/sim';
+import { startFiestaPractice } from '../src/sim/social/fiesta_bots';
 import { makeWorld } from './vale_cup_util';
 
 vi.setConfig({ testTimeout: 30000 });
@@ -48,5 +49,26 @@ describe('bot players receive no welcome mail', () => {
     expect(letters(sim).length).toBe(0);
     // Pre-welcomed, so no later path can ever mint the letter for this meta.
     expect(sim.players.get(pid)?.mailWelcomed).toBe(true);
+  });
+
+  // The per-site pins below exist so a refactor of a spawner cannot silently
+  // drop its bot flag: each site is exercised through its own entry point.
+
+  it('a /dev bot spawn creates no letters', () => {
+    const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
+    const pid = sim.spawnDevBot('Helper');
+    expect(pid).toBeGreaterThan(0);
+    const book = letters(sim);
+    expect(book.length).toBe(1);
+    expect(book[0].recipientName).toBe('Watcher');
+  });
+
+  it('a fiesta practice set creates no letters for its three bots', () => {
+    const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
+    expect(startFiestaPractice(sim)).toBe(true);
+    expect(sim.fiestaBotPids.length).toBe(3);
+    const book = letters(sim);
+    expect(book.length).toBe(1);
+    expect(book[0].recipientName).toBe('Watcher');
   });
 });

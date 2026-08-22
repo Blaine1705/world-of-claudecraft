@@ -118,26 +118,32 @@ describe('parseArgs', () => {
 
 interface HarnessOptions {
   liveLeases?: string;
-  mailRows?: Array<{ key: string; data: unknown }>;
+  mailRows?: Array<{ key: string; data: unknown; updated_at?: string; age_seconds?: number }>;
   characters?: CharacterRow[];
+  updateRowCount?: number;
 }
 
 function queryResult(rows: unknown[] = []) {
   return { rows, rowCount: rows.length };
 }
 
+const STALE_ROW = { updated_at: '2026-08-22 01:00:00.123456+00', age_seconds: 3600 };
+
 function purgeHarness(options: HarnessOptions = {}) {
   const statements: string[] = [];
   const querySpy = vi.fn(async (text: string, _values?: unknown[]) => {
     statements.push(text);
-    if (text.includes('SELECT key, data FROM world_state')) {
-      return queryResult(options.mailRows ?? []);
+    if (text.includes('age_seconds')) {
+      return queryResult((options.mailRows ?? []).map((r) => ({ ...STALE_ROW, ...r })));
     }
     if (text.includes('count(*)') && text.includes('character_leases')) {
       return queryResult([{ count: options.liveLeases ?? '0' }]);
     }
     if (text.includes('SELECT id, name FROM characters')) {
       return queryResult(options.characters ?? []);
+    }
+    if (text.startsWith('UPDATE world_state')) {
+      return { rows: [], rowCount: options.updateRowCount ?? 1 };
     }
     return queryResult();
   });
@@ -207,10 +213,54 @@ describe('runMailBotWelcomePurgeMigration', () => {
 
   it('apply refuses while the realm holds a live lease and rolls back', async () => {
     const h = purgeHarness({ mailRows: [BOT_BOOK], characters: CHARACTERS, liveLeases: '1' });
-    await expect(runMailBotWelcomePurgeMigration(['--apply'], h.runtime)).rejects.toThrow(
-      'still holds live character leases',
-    );
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      await expect(runMailBotWelcomePurgeMigration(['--apply'], h.runtime)).rejects.toThrow(
+        'still holds live character leases',
+      );
+    } finally {
+      log.mockRestore();
+    }
     expect(h.statements.at(-1)).toBe('ROLLBACK');
     expect(h.statements.some((s) => s.startsWith('UPDATE world_state'))).toBe(false);
+  });
+
+  it('apply refuses a mail row fresher than the autosave window (idle server still running)', async () => {
+    // Character leases cannot prove the stop: an idle realm holds zero leases
+    // while flushPeriodicSaves still rewrites the book every 30s. Freshness can.
+    const h = purgeHarness({
+      mailRows: [{ ...BOT_BOOK, age_seconds: 12 }],
+      characters: CHARACTERS,
+    });
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      await expect(runMailBotWelcomePurgeMigration(['--apply'], h.runtime)).rejects.toThrow(
+        'game server is still running',
+      );
+    } finally {
+      log.mockRestore();
+    }
+    expect(h.statements.some((s) => s.startsWith('UPDATE world_state'))).toBe(false);
+    expect(h.statements.at(-1)).toBe('ROLLBACK');
+  });
+
+  it('apply aborts loudly when the CAS write misses (concurrent autosave)', async () => {
+    const h = purgeHarness({ mailRows: [BOT_BOOK], characters: CHARACTERS, updateRowCount: 0 });
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      await expect(runMailBotWelcomePurgeMigration(['--apply'], h.runtime)).rejects.toThrow(
+        'Concurrent write detected',
+      );
+    } finally {
+      log.mockRestore();
+    }
+    expect(h.statements.at(-1)).toBe('ROLLBACK');
+  });
+
+  it('a --realm that matches no mail row throws instead of reporting empty success', async () => {
+    const h = purgeHarness({ mailRows: [] });
+    await expect(
+      runMailBotWelcomePurgeMigration(['--realm', 'Cluademoon'], h.runtime),
+    ).rejects.toThrow('No mail row exists for realm "Cluademoon"');
   });
 });
