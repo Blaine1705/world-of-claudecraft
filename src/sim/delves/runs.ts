@@ -165,6 +165,42 @@ export function delveOccupancyRadius(run: DelveRun): number {
  *  south-margin tests in tests/delves.test.ts. */
 export const DELVE_OCCUPANCY_SOUTH_MARGIN = 40;
 
+/** True when a player entity stands inside a run's rooms. The band is asymmetric
+ *  on purpose (see DELVE_OCCUPANCY_SOUTH_MARGIN): a symmetric one reaches into the
+ *  south neighbor slot's rooms, so it could bind a player to the wrong slot's run. */
+function insideDelveRunBand(e: Entity, run: DelveRun): boolean {
+  const dz = e.pos.z - run.origin.z;
+  return (
+    Math.abs(e.pos.x - run.origin.x) < 120 &&
+    dz > -DELVE_OCCUPANCY_SOUTH_MARGIN &&
+    dz < delveOccupancyRadius(run)
+  );
+}
+
+/** Move a live run onto `key` after its stamped key went stale. partyKey is stamped
+ *  once at claimDelveRun, so any membership change mid-run (an invite accepted, a duo
+ *  disbanding) flips instanceKeyFor and strands the run: no plates, no exit portal,
+ *  no respawn, no way out. Two guards keep the move safe: the run only leaves its old
+ *  key when NO member still holds it, so a splintering duo keeps the run with whoever
+ *  kept the party; and it never lands on a key another run already owns, so two solo
+ *  delvers who party up mid-run cannot end up sharing one member list. */
+function rebindDelveRun(ctx: SimContext, run: DelveRun, key: string): boolean {
+  if (run.partyKey === null || run.partyKey === key) return false;
+  if (ctx.partyMembersForKey(run.partyKey).length > 0) return false;
+  if (ctx.delveRuns.some((other) => other !== run && other.partyKey === key)) return false;
+  run.partyKey = key;
+  return true;
+}
+
+function rebindDelveRunToOccupant(ctx: SimContext, e: Entity, key: string): DelveRun | null {
+  for (const run of ctx.delveRuns) {
+    if (run.partyKey === null || run.partyKey === key) continue;
+    if (!insideDelveRunBand(e, run)) continue;
+    if (rebindDelveRun(ctx, run, key)) return run;
+  }
+  return null;
+}
+
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
   const byPlayer = delveRunForPlayer(ctx, e.id);
   if (byPlayer) return byPlayer;
@@ -300,7 +336,10 @@ export function delveRunForPlayer(ctx: SimContext, pid: number): DelveRun | null
   if (!isDelvePos(e.pos.x)) return null;
   const delve = delveAt(e.pos.x);
   if (!delve) return null;
-  return ctx.delveRuns.find((r) => r.delveId === delve.id && r.partyKey === key) ?? null;
+  return (
+    ctx.delveRuns.find((r) => r.delveId === delve.id && r.partyKey === key) ??
+    rebindDelveRunToOccupant(ctx, e, key)
+  );
 }
 
 export function delveRunForMob(ctx: SimContext, mobId: number): DelveRun | null {
@@ -625,27 +664,26 @@ export function updateDelveRuns(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return;
   for (const run of ctx.delveRuns) {
     if (run.partyKey === null) continue;
-    const origin = run.origin;
     let occupied = false;
+    let strandedKey: string | null = null;
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
-      if (!e) continue;
-      // Asymmetric band: rooms extend north up to ~536u but only ~11u south
-      // of the origin (see DELVE_OCCUPANCY_SOUTH_MARGIN for the geometry). The
-      // old symmetric +-radius check reached [-536, -143] into the SOUTH
-      // neighbor's rooms (slots sit 620u apart), letting busy neighbors pin an
-      // abandoned run claimed forever. delveRunForPlayer keeps its symmetric
-      // band on purpose: it is key-gated, so cross-slot binding is unreachable.
-      const dz = e.pos.z - origin.z;
-      if (
-        Math.abs(e.pos.x - origin.x) < 120 &&
-        dz > -DELVE_OCCUPANCY_SOUTH_MARGIN &&
-        dz < delveOccupancyRadius(run)
-      ) {
-        occupied = true;
+      // insideDelveRunBand is the asymmetric band: the old symmetric +-radius check
+      // reached into the SOUTH neighbor's rooms, letting busy neighbors pin an
+      // abandoned run claimed forever. delveRunForPlayer keeps its symmetric band on
+      // purpose: it is key-gated, so cross-slot binding is unreachable there.
+      if (!e || !insideDelveRunBand(e, run)) continue;
+      occupied = true;
+      const key = ctx.instanceKeyFor(meta.entityId);
+      if (key === run.partyKey) {
+        strandedKey = null;
         break;
       }
+      strandedKey ??= key;
     }
+    // Catches an occupant who changed party and then never moved or acted, so the
+    // on-demand re-bind in delveRunForPlayer never ran for them.
+    if (strandedKey !== null) rebindDelveRun(ctx, run, strandedKey);
     if (occupied) run.emptyFor = 0;
     else {
       run.emptyFor += 1;
