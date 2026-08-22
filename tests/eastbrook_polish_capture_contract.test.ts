@@ -272,8 +272,14 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40 loot repair follow-up: the prior integration-side
 // entity_view_policy_core.ts bytes were already sealed in evidence but the
 // literal pin was stale. No capture was retaken.
+// Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
+// extraction. The renderer leaf moved; no capture was retaken because both
+// changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the v0.40 merge-forward: the batch renderer and entity-view
+// evidence repairs combine with PR #3531 shader-memory renderer bytes. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '510e4e46ab9d696a5d7596386fae0e6420d8652614d88b4f160703c64eedaa1a';
+  '0275bb240f5ce841ceb2928f9901419d2c77d079ea320021f3d81507af607cba';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

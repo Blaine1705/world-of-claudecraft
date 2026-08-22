@@ -246,7 +246,27 @@ const MONOLITHS: MonolithRow[] = [
     // renderer wires isDistanceCullExemptObject into both the create-range
     // gate and the visibility hysteresis gate, preserving the current
     // integration extraction history while pinning the exact merged count.
-    ceiling: 13539,
+    // RAISED 13546 -> 13548 (+2) by the streamed-prewarm branch. A raise, not a
+    // lowering, and stated as one: the branch extracts the compile SUBMIT LOOP
+    // with its deadline rule and never-drop contract
+    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
+    // beside the per-unit submit that module already owned) and the weapon-skin
+    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
+    // beside the stage whose failure boundary shares its unit ids), and those
+    // two extractions still do not quite cover what it adds.
+    //
+    // The history matters because it is the failure mode this ratchet exists to
+    // catch. An earlier revision of this branch reported a NET REDUCTION while
+    // deleting 41 lines of load-bearing comments, 11 blank lines and folding
+    // three `let` declarations into one comma statement: the extractions were
+    // real but the number was bought with formatting. Every comment is restored,
+    // the blank lines are back, the declarations are separate again, and the
+    // count below is what the extractions alone earn. Maintainer decision, and
+    // deliberately a visible +2 rather than an invisible -9.
+    // The v0.40 merge-forward combines those release-tip renderer bytes with
+    // the batch's tighter ratchet. The merged renderer lands at this exact
+    // count, below the release-side ceiling, so future growth still reds.
+    ceiling: 13541,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -312,6 +332,17 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/colliders.ts',
     ceiling: 2660,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
+  },
+  {
+    // Newly tracked. It was already larger than several budgeted files and had
+    // no row at all, so it was drifting unwatched: this branch's interior
+    // resource-lifecycle work grew it from 2807 to the count below even after
+    // extracting src/render/interior_resource_lifecycle.ts. Pinned at the exact
+    // current count per the ratchet's rule; any further growth reds, and the
+    // fix is extraction behind the seam named here.
+    file: 'src/render/dungeon.ts',
+    ceiling: 2882,
+    seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];
 
