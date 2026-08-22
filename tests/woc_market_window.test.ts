@@ -1404,6 +1404,53 @@ describe('woc_market_window: the Sell form offers only what the format permits',
     expect(ifFalse, 'and never a reserve').not.toContain('sell-reserve');
   });
 
+  // The same gate, second round: the starting bid and the next-highest-bidder
+  // fallback both describe BIDDING, so a pure buy-now (which takes no bids)
+  // must offer neither. What shipped after the first gating pass still
+  // rendered both unconditionally: a buy-now seller was asked for a starting
+  // bid that exists only for sorting and offered a fallback about bidders that
+  // cannot exist.
+  it('gates the starting bid on the auction arm; a pure buy-now never asks for one', () => {
+    const form = between('const form = selected', 'private activityHtml(');
+    // Anchor on the parenthesized ternary, NOT the bare comparison: the format
+    // <select> above it carries the same comparison inside its option markup,
+    // and anchoring there once made this whole test pass vacuously.
+    const gateAt = form.indexOf("(this.sellFormat === 'auction'");
+    expect(gateAt, 'the price-field format gate exists').toBeGreaterThanOrEqual(0);
+    const auctionArm = form.slice(gateAt, form.indexOf('sellDuration'));
+    const [ifTrue, ifFalse] = auctionArm.split(': `<label>');
+    expect(ifTrue, 'an auction asks for its starting bid').toContain('sell-start');
+    expect(ifFalse, 'a pure buy-now never asks for a starting bid').not.toContain('sell-start');
+    const beforeArm = form.slice(0, gateAt);
+    expect(beforeArm, 'no unconditional starting-bid field above the gate').not.toContain(
+      'sell-start',
+    );
+  });
+
+  it('gates the next-highest-bidder fallback on the auction format', () => {
+    const form = between('const form = selected', 'private activityHtml(');
+    const tail = form.slice(form.indexOf('sellDuration'));
+    const gate = tail.indexOf("this.sellFormat === 'auction'");
+    expect(gate, 'the fallback checkbox sits behind its own format gate').toBeGreaterThanOrEqual(0);
+    expect(
+      tail.indexOf('sell-offer-next'),
+      'the checkbox renders inside the gate, not before it',
+    ).toBeGreaterThan(gate);
+  });
+
+  it('submits a synthesized starting bid for a pure buy-now (sort key only, strictly below)', () => {
+    // The server REQUIRES startCents on every format and a public buy-now must
+    // price STRICTLY above it (woc_market_rules validListingParams), while the
+    // detail view documents the start as existing "only for sorting" on a
+    // buy-now. So the hidden field is synthesized maximal-valid: one cent under
+    // the price, never typed by the seller.
+    const submit = betweenCode('private async submitListing(', 'private async payBond(');
+    expect(submit).toContain("format === 'buy_now'");
+    expect(submit, 'the synthetic start is one cent under the buy-now price').toContain(
+      'buyNowCents - 1',
+    );
+  });
+
   it('re-renders when the format changes, or the gate never moves', () => {
     const handler = between("if (field === 'sell-format')", "if (field === 'sell-duration')");
     expect(handler).toContain('this.sellFormat = value');

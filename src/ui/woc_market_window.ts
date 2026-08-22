@@ -1257,7 +1257,6 @@ export class WocMarketWindow {
         `<option value="auction" ${this.sellFormat === 'auction' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatAuction'))}</option>` +
         `<option value="buy_now" ${this.sellFormat === 'buy_now' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatBuyNow'))}</option>` +
         `</select></label>` +
-        `<label>${esc(t('hudChrome.wocMarket.sellStart'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-start" data-focus-key="wm-sell-start" /></label>` +
         // Only the fields the CHOSEN format actually permits. The server refuses
         // a reserve on a buy-now (bad_reserve) and a buy-now price on an auction
         // (bad_buy_now), so rendering both unconditionally offered every seller
@@ -1270,17 +1269,29 @@ export class WocMarketWindow {
         // seller opts in by naming a price rather than by picking a third entry
         // from the format list. A PURE buy-now still forbids a reserve, which
         // would describe nothing on a listing with no bidding.
+        //
+        // The starting bid rides the same gate: it describes bidding, so a pure
+        // buy-now never asks for one. The server still requires startCents on
+        // every format (it is the browse sort key), so submitListing synthesizes
+        // it for a buy-now instead of asking the seller for a number that is
+        // never shown and never bid against.
         (this.sellFormat === 'auction'
-          ? `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
+          ? `<label>${esc(t('hudChrome.wocMarket.sellStart'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-start" data-focus-key="wm-sell-start" /></label>` +
+            `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
             `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellReserveNote'))}</p>` +
             `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" /></label>` +
             `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellBuyNowAuctionNote'))}</p>`
           : `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" required /></label>` +
             `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellBuyNowNote'))}</p>`) +
         `<label>${esc(t('hudChrome.wocMarket.sellDuration'))}<select data-field="sell-duration" data-focus-key="wm-sell-duration">${durations}</select></label>` +
-        `<label class="wm-offer-next"><input type="checkbox" data-field="sell-offer-next" data-focus-key="wm-sell-offer-next" ${this.sellOfferNext ? 'checked' : ''} /> ${esc(
-          t('hudChrome.wocMarket.sellOfferNext'),
-        )}</label>` +
+        // The next-highest-bidder fallback describes bidders, so only an
+        // auction offers it; on a pure buy-now the absent checkbox reads as
+        // false at submit, which is the only value the format can mean.
+        (this.sellFormat === 'auction'
+          ? `<label class="wm-offer-next"><input type="checkbox" data-field="sell-offer-next" data-focus-key="wm-sell-offer-next" ${this.sellOfferNext ? 'checked' : ''} /> ${esc(
+              t('hudChrome.wocMarket.sellOfferNext'),
+            )}</label>`
+          : '') +
         `<div class="wm-disclosures">` +
         `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellFeeNote'))}</p>` +
         feeLines +
@@ -2290,9 +2301,21 @@ export class WocMarketWindow {
       return;
     }
     const format = this.field<HTMLSelectElement>('[data-field="sell-format"]')?.value ?? 'auction';
-    const startCents = this.numberFieldCents('[data-field="sell-start"]');
     const reserveCents = this.numberFieldCents('[data-field="sell-reserve"]');
     const buyNowCents = this.numberFieldCents('[data-field="sell-buy-now"]');
+    // A pure buy-now renders no starting-bid field: the start describes
+    // bidding, and a buy-now takes no bids. The server still requires
+    // startCents on every format (validListingParams; it is the browse sort
+    // key, per the detail view's "exists only for sorting"), and a public
+    // buy-now must price STRICTLY above it, so synthesize the maximal valid
+    // value: one cent under the price. Never shown (the detail suppresses the
+    // starting-bid line for buy-now) and never bid against.
+    const startCents =
+      format === 'buy_now'
+        ? buyNowCents === null
+          ? null
+          : buyNowCents - 1
+        : this.numberFieldCents('[data-field="sell-start"]');
     const durationHours = Number(
       this.field<HTMLSelectElement>('[data-field="sell-duration"]')?.value ?? '',
     );
