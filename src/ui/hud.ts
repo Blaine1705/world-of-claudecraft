@@ -1,5 +1,6 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
+import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
@@ -28,6 +29,7 @@ import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import {
+  isComposedPortraitKey,
   onPortraitsReady,
   onPortraitUpdate,
   prewarmPlayerPortrait,
@@ -51,11 +53,7 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
-import {
-  RELIQUARY_PAGE_ORDER,
-  RELIQUARY_PAGES,
-  RELIQUARY_PAGES_BY_ID,
-} from '../sim/content/reliquary';
+import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -194,6 +192,7 @@ import {
   serializeIgnoreList,
 } from './chat_ignore_core';
 import { cheaterTagLabel } from './cheater_tag';
+import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
@@ -268,6 +267,7 @@ import { DeedsWindow } from './deeds_window';
 import { DevCommandWindow } from './dev_command_window';
 import { devTierByIndex, devTierDisplayName } from './dev_tier';
 import { bindDialogKeyActivation } from './dialog_key_activation';
+import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
@@ -394,6 +394,7 @@ import {
   HOTBAR_ACTION_MIME,
   type HotbarAction,
   handleMobileAttackTap,
+  isAbilityActionBarEligible,
   loadoutKnownAbilityIds,
   parseHotbarAction,
   placeAbilityOnSlot,
@@ -436,6 +437,13 @@ import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/
 import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
+import {
+  CrossHotbarController,
+  type CrossHotbarHold,
+  type CrossHotbarOverlayAction,
+  type CrossHotbarPanelHooks,
+  crossHotbarResolvers,
+} from './hud/cross_hotbar';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
@@ -604,6 +612,7 @@ import {
   type PreviewPrewarmUnit,
   runPreviewPrewarmSchedule,
 } from './preview_prewarm_core';
+import { armPreviewOpen } from './preview_stand_in';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
 import { attachOverlayDrag } from './proc_overlay_drag';
@@ -648,9 +657,9 @@ import {
 import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
 import {
   buildReliquaryTrackerViewInto,
+  makeReliquaryTrackerInput,
   makeReliquaryTrackerView,
   type ReliquaryTrackerInput,
-  reliquaryTrackerOwnershipSig,
 } from './reliquary_tracker_view';
 import {
   buildReliquaryUnlockPlan,
@@ -664,7 +673,7 @@ import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import { localizeSimAuraName, localizeSimText, tSim } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import {
   advanceSkillLevelObservation,
@@ -715,6 +724,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
@@ -801,13 +811,14 @@ export interface ThemeHooks {
 }
 
 // Read/rebind the gamepad's button→action layout from the options panel.
-export interface GamepadBindingsHooks {
+export interface GamepadBindingsHooks extends CrossHotbarPanelHooks {
   entries(): { button: number; action: string }[];
   bind(button: number, action: string): void;
   reset(): void;
   // Detected brand of the connected pad, so the panel labels each button with the
   // glyph printed on that controller ('generic' combined labels when none/unknown).
   kind(): GamepadKind;
+  // The cross hotbar layout: the action-bar slot each position casts, per set.
 }
 
 export interface ReportHooks {
@@ -1257,6 +1268,7 @@ export class Hud {
   private mobileActionPage = 0;
   private mobileActionRingView: ActionBarView | undefined;
   private mobileActionRingPainter: MobileActionRingPainter | undefined;
+  private crossHotbar: CrossHotbarController | undefined;
   // Consumables quick bar (touch): the auto-populated potion/elixir/food/drink
   // row behind the chevron chip next to the top-left trio. consumableBarIds is
   // the ONE reused array the pure core fills WHEN THE ROW OPENS and that stays
@@ -2336,7 +2348,14 @@ export class Hud {
       this.targetFramePainter.invalidatePortrait();
       this.totFramePainter.invalidatePortrait();
     });
-    onPortraitUpdate((visualKey, skin) => {
+    onPortraitUpdate((visualKey, skin, key) => {
+      // A composed capture is keyed on the look SIGNATURE rather than on
+      // (class, skin), and the player's own frame is the only composed one
+      // (see drawPlayerFramePortrait), so its key is the one that lands here.
+      if (isComposedPortraitKey(key)) {
+        this.drawPlayerFramePortrait();
+        return;
+      }
       // The mech is not a class: a lazily-arriving chroma atlas must refresh
       // the frame of the player wearing it (drawMech falls back to the class
       // face until the atlas is resident).
@@ -2346,29 +2365,19 @@ export class Hud {
         }
         return;
       }
-      const playerClass = visualKey.startsWith('player_')
-        ? (visualKey.slice('player_'.length) as PlayerClass)
-        : null;
-      if (!playerClass) return;
+      if (!visualKey.startsWith('player_')) return;
+      const playerClass = visualKey.slice('player_'.length) as PlayerClass;
       if (playerClass === this.sim.cfg.playerClass && skin === (this.sim.player.skin ?? 0)) {
         this.drawPlayerFramePortrait();
       }
-      const target = this.targetPortraitSubject;
-      if (
-        target?.kind === 'player' &&
-        target.templateId === playerClass &&
-        (target.skin ?? 0) === skin
-      ) {
-        this.targetFramePainter.invalidatePortrait();
-      }
-      const targetOfTarget = this.totPortraitSubject;
-      if (
-        targetOfTarget?.kind === 'player' &&
-        targetOfTarget.templateId === playerClass &&
-        (targetOfTarget.skin ?? 0) === skin
-      ) {
-        this.totFramePainter.invalidatePortrait();
-      }
+      // The target and target-of-target frames stay on the stock class art, so
+      // each repaints on exactly the (class, skin) pair it framed.
+      const framed = (subject: Entity | null): boolean =>
+        subject?.kind === 'player' &&
+        subject.templateId === playerClass &&
+        (subject.skin ?? 0) === skin;
+      if (framed(this.targetPortraitSubject)) this.targetFramePainter.invalidatePortrait();
+      if (framed(this.totPortraitSubject)) this.totFramePainter.invalidatePortrait();
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
@@ -2696,29 +2705,10 @@ export class Hud {
       }
       this.toggleReliquaryTrackerCollapsed();
     });
-    // The delve board, lockpick panel, map window, and the bank + bags cluster are
-    // non-modal overlays, so canUseGameKeys() stays true and the global jump (Space)
-    // / chat (Enter) binds would otherwise hijack those keys on a focused panel
-    // button (the map's Quests toggle, a bank grid cell, and each close button
-    // included). Stop propagation (but NOT the default, so the button's native
-    // activation still fires) when a panel button has focus, mirroring the
-    // quest-tracker guard above.
-    for (const panelId of [
-      '#delve-board',
-      '#lockpick-panel',
-      '#delve-rite-panel',
-      '#map-window',
-      '#bank-window',
-      '#bags',
-      '#deeds-window',
-      '#reliquary-window',
-      '#professions-window',
-    ]) {
-      $(panelId).addEventListener('keydown', (e) => {
-        if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
-        if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') e.stopPropagation();
-      });
-    }
+    // Chrome focus hygiene (the shared Enter/Space key guard + pointer-only focus
+    // drop) over the trackers, the non-modal overlay panels, and the micromenu rail:
+    // src/ui/chrome_focus_wiring.ts owns the root list and the rationale.
+    wireChromeFocus($);
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#map-close').addEventListener('click', () => {
       $('#map-window').style.display = 'none';
@@ -3840,6 +3830,9 @@ export class Hud {
       document.getElementById('ui')?.appendChild(el);
       this.emoteWheelEl = el;
     }
+    // An isModalOpen() surface: a dialog root (re-marked per show, so its name follows a
+    // language switch); the blocked-state Space guard (stale_chrome_focus.ts) spares it.
+    markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') });
     const slots = this.emoteWheelSlots.filter(isOverheadEmoteId).slice(0, EMOTE_WHEEL_LIMIT);
     el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
     slots.forEach((id, i) => {
@@ -3923,6 +3916,9 @@ export class Hud {
 
   private renderEmoteEditor(): void {
     const el = $('#emote-editor');
+    // An isModalOpen() surface: a dialog root, so the blocked-state Space guard
+    // (src/game/stale_chrome_focus.ts) spares the editor's own buttons.
+    markDialogRoot(el, { label: t('hudChrome.emoteEditor.title') });
     el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
     const count = document.createElement('div');
     count.className = 'emote-editor-count';
@@ -4799,6 +4795,14 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#reliquary-window'),
     onPinChanged: () => this.updateReliquaryTracker(),
+    // The tracker's master visibility switch; the write routes through the
+    // options seam (the playtime-eye doctrine: the eye and the Options row
+    // share ONE write path, so a future applySetting side effect reaches both).
+    trackerShown: () => (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true,
+    setTrackerShown: (shown) => {
+      this.optionsHooks?.onSettingChange('showReliquaryTracker', shown);
+      this.updateReliquaryTracker();
+    },
   });
   // Watchlist HUD tracker (#deed-tracker): slow-band painter over the one
   // reused tracker-view container (allocation-light by contract).
@@ -4821,6 +4825,20 @@ export class Hud {
     root: () => $('#reliquary-tracker'),
     writers: this.writerFacet,
   });
+  // Seats #right-tracker-stack below the minimap column's REAL rendered bottom
+  // (a wrapping zone label, the mobile chrome scale, and the compact transform
+  // all move it past any stylesheet constant); slow band plus coalesced resize,
+  // with the zoom pill and clock as the two overhangs (tracker_stack_anchor.ts).
+  // The install's dispose is deliberately dropped: one Hud per page load.
+  private readonly trackerStackAnchor = installTrackerStackAnchor({
+    stack: () => $('#right-tracker-stack'),
+    minimapWrap: () => $('#minimap-wrap'),
+    overhangs: () => [
+      document.querySelector('#minimap-zoom'),
+      document.querySelector('#minimap-clock'),
+    ],
+    uiScale: () => getUiScale(),
+  }).anchor;
   // Event calendar window painter (calendar_view.ts month-grid core +
   // calendar_window.ts painter). System events expand from data rules; guild
   // events read the socialInfo mirror and book/remove through IWorld.
@@ -6574,6 +6592,13 @@ export class Hud {
 
   private syncSlotMap(): void {
     this.actionBarController.syncKnownAbilities();
+    // The pad's bar gets the same offer minus passives, and stances ride along
+    // because pad mode hides the stance bar: a stance learned after the seed
+    // (Defensive Stance, the druid forms) is otherwise unreachable without the
+    // arrange chord. Seeded ids are already marked seen, so this never re-offers.
+    this.optionsHooks?.gamepad.syncCrossHotbarKnown(
+      this.sim.known.filter((k) => isAbilityActionBarEligible(k.def)).map((k) => k.def.id),
+    );
     this.mobileActionPage = this.currentMobileActionPage();
   }
 
@@ -6788,6 +6813,52 @@ export class Hud {
   }
 
   // Shared entry point for hotbar clicks and the 1..0-= keybinds.
+  /**
+   * Fire an action the cross hotbar holds. Routed through castSlot by finding the
+   * action on the bar, so a pad press gets the SAME semantics a key press does
+   * (ground-aim reticle, empower release, sport tap, mouseover cast, the
+   * auto-attack QoL) rather than a second cast path that would drift from it.
+   *
+   * The bar is seeded from the action bar, so the lookup almost always hits. An
+   * action arranged onto the pad and nowhere else falls back to a plain cast (the
+   * one case without a reticle) or, for an item, to the shared item-use seam.
+   */
+  castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
+    if (action.id === CROSS_HOTBAR_ATTACK_ID) {
+      this.activateFixedAttackSlot();
+      return;
+    }
+    // Matched against the EFFECTIVE action of each slot, never the raw array: with
+    // the Attack button on, slot 0 IS Attack and whatever the array holds at index
+    // 0 is not reachable there, so delegating by array index fired auto-attack
+    // instead of the ability the player pressed.
+    let slot = -1;
+    // barSlot 0 is that Attack seat and 1..length are the configurable slots, so
+    // the last one is length itself, not length - 1.
+    for (let i = 0; i <= this.hotbarActions.length && slot < 0; i++) {
+      const onBar = this.actionForSlot(i);
+      if (onBar?.type === action.type && onBar.id === action.id) slot = i;
+    }
+    if (slot >= 0) {
+      this.castSlot(slot);
+      return;
+    }
+    // The sim owns the refusal for an ability the player no longer knows.
+    if (action.type === 'ability') {
+      this.sim.castAbility(action.id);
+      return;
+    }
+    if (this.tradeOpen) return;
+    if (this.isHotbarItemId(action.id)) {
+      this.useHotbarItem(action.id);
+      return;
+    }
+    // A cell left holding an item this client cannot use is a stale binding, so
+    // refuse it out loud rather than eating the press.
+    this.showError(tSim('error.noItem'));
+  }
+
   castSlot(barSlot: number): void {
     if (this.isGroundAimActive()) {
       if (this.groundAim.activeSlot === barSlot) {
@@ -6877,13 +6948,17 @@ export class Hud {
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
-      // Gathering tools route through the interact-style handler first
-      // (#2343); everything else (and fishing implements) keeps the plain
-      // useItem command.
-      if (!this.tryGatherToolUse(action.id)) this.sim.useItem(action.id);
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      this.useHotbarItem(action.id);
       this.flashActionSlot(barSlot);
     }
+  }
+
+  // The one item-use path a bar press takes, keyboard or pad: gathering tools
+  // route through the interact-style handler first (#2343); everything else
+  // (and fishing implements) keeps the plain useItem command.
+  private useHotbarItem(itemId: string): void {
+    if (!this.tryGatherToolUse(itemId)) this.sim.useItem(itemId);
+    if ($('#bags').style.display !== 'none') this.renderBags();
   }
 
   private mobileActionSourceSlotCount(): number {
@@ -7321,6 +7396,11 @@ export class Hud {
       (iconKey) => this.actionBarIconBg(iconKey),
     );
 
+    this.crossHotbar = CrossHotbarController.create(
+      this.writerFacet,
+      (k) => this.actionBarIconBg(k),
+      crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName),
+    );
     this.buildMobileActionRing();
     this.buildMobileConsumableBar();
   }
@@ -9238,6 +9318,10 @@ export class Hud {
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
     if (!this.isMobileLayout())
       this.actionBarPainter.paint(this.actionBarView.tick(actionBarWorld));
+    // Painted whatever the desktop bar did: the cross hotbar owns its OWN ticked
+    // state, so it is not a re-presentation of the row above and does not follow
+    // that row's mobile gate.
+    this.crossHotbar?.paint(actionBarWorld);
 
     // mobile action ring: the paged touch cluster replacing the bar above
     // (view/painter stay undefined if the ring DOM never got built, e.g. an
@@ -9533,6 +9617,8 @@ export class Hud {
     // The Reliquary tracker is always-on chrome for the same reason: pinned
     // pages fill from normal play, and an illuminated page drops off.
     if (slowHud) this.updateReliquaryTracker();
+    // Re-seat the tracker stack under the minimap column (bounded layout read).
+    if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
@@ -16134,42 +16220,18 @@ export class Hud {
   // what lets the core hold its default (nothing-pinned) ranking instead of
   // re-folding all 28 catalog pages every slow tick.
   private updateReliquaryTracker(): void {
-    const collapsed =
-      (this.optionsHooks?.settings.get('reliquaryTrackerCollapsed') ?? false) === true;
-    this.reliquaryTrackerInput ??= {
-      pinned: this.reliquaryWindow.pinned,
-      pageIds: RELIQUARY_PAGE_ORDER,
-      completion: (pageId) => this.sim.reliquaryPageCompletion(pageId),
-      // The deliberate asymmetry, recorded here because the two halves read as
-      // an inconsistency otherwise: pinned pages (at most RELIQUARY_TRACK_CAP,
-      // five) are read LIVE on every slow build, while the whole-catalog default scan
-      // memoizes on this signature. The signature is cheap but has a documented
-      // same-band blind spot (an add and a remove on ONE surface inside a single
-      // 500ms band cancel out), and five live reads sit comfortably inside the
-      // slow-band budget, so the pages the player explicitly chose get the exact
-      // answer and the whole-catalog scan gets the cheap one. Accepted with it:
-      // the mount count is the expensive read here, not a cheap one. Offline,
-      // Sim.ownedMounts() copies the whole bags-plus-bank array before scanning
-      // it, and every completion() call above pays that copy again through
-      // Sim.reliquaryOwnershipSurfaces(); online, ClientWorld returns a stored
-      // field. Accepted because this is the 500ms band with at most five pinned
-      // reads. A thunk, not a value, so the signature (and that copy) is skipped
-      // entirely while the player has pins: only the default branch reads it.
-      ownershipSig: () =>
-        reliquaryTrackerOwnershipSig({
-          itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
-          marks: this.sim.reliquaryMarks.size,
-          deedsEarned: this.sim.deedsEarned.size,
-          mounts: this.sim.ownedMounts().length,
-          weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,
-        }),
-      collapsed,
-    };
+    const settings = this.optionsHooks?.settings;
+    // The pinned-live vs memoized-default cost asymmetry is recorded on the
+    // factory (makeReliquaryTrackerInput); the closures read this.sim at call
+    // time, so the reused input survives world swaps.
+    this.reliquaryTrackerInput ??= makeReliquaryTrackerInput(() => this.sim);
     const input = this.reliquaryTrackerInput;
-    // Per-build fields: the pin set is re-read live off the window store and
-    // the collapse off settings; everything else on the reused input is stable.
+    // Per-build fields: the pin set is re-read live off the window store, the
+    // collapse and the master visibility switch off settings; everything else
+    // on the reused input is stable.
     input.pinned = this.reliquaryWindow.pinned;
-    input.collapsed = collapsed;
+    input.collapsed = (settings?.get('reliquaryTrackerCollapsed') ?? false) === true;
+    input.enabled = (settings?.get('showReliquaryTracker') ?? true) === true;
     const view = buildReliquaryTrackerViewInto(this.reliquaryTrackerView, input);
     // Compact touch tier: the rows are folded away (hud.mobile.css) and the header
     // is a count chip that opens The Reliquary (see the #reliquary-tracker
@@ -16671,6 +16733,7 @@ export class Hud {
     this.charPreview.setSkin(opts.skin);
     this.charPreview.setWeaponSkin(opts.weaponSkinId);
     this.charPreview.setFraming(opts.framing);
+    armPreviewOpen(this.charPreview, container, { cls: opts.cls, skin: opts.skin }, this.renderer);
   }
 
   /** Char-sheet / skin-picker mount: the SELF character with both currently
@@ -17333,6 +17396,11 @@ export class Hud {
   // The spellbook window lives in SpellbookWindow (spellbook_view.ts core +
   // spellbook_window.ts painter), which renders the class kit + bar toggles and
   // refreshes the +/- controls from hud.update() while open.
+  /** Open the spellbook; unlike the toggle, calling it twice does not close it. */
+  openSpellbook(): void {
+    if (!this.spellbookWindow.isOpen) this.toggleSpellbook();
+  }
+
   toggleSpellbook(): void {
     this.spellbookWindow.toggle();
   }
@@ -18702,6 +18770,32 @@ export class Hud {
    *  dropped normalized position to the options window's open performance panel. */
   onPerfOverlayMoved(x: number, y: number): void {
     this.optionsWindow.onPerfOverlayMoved(x, y);
+  }
+
+  /** What an untouched cross hotbar is filled from: this character's action bar,
+   *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
+  crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
+    return {
+      bar: this.hotbarActions.map((a) => (a ? { type: a.type, id: a.id } : null)),
+      // Attack leads: it is on no hotbar slot to copy (the desktop bar draws it as
+      // a fixed button), so a pad player would otherwise have no auto-attack at all.
+      extras: [
+        CROSS_HOTBAR_ATTACK_ID,
+        ...this.sim.known
+          .filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
+          .map((k) => k.def.id),
+      ],
+    };
+  }
+
+  /** The bar's own arrange surface, whole rather than proxied method by method. */
+  crossHotbarEdit(): CrossHotbarController | null {
+    return this.crossHotbar ?? null;
+  }
+
+  /** Open or close the controller cross hotbar (the pad's held-trigger bar). */
+  setCrossHotbar(hold: CrossHotbarHold | null): void {
+    this.crossHotbar?.setHold(hold);
   }
 
   /** Called by main.ts when a pad connects/disconnects: re-label the Controller

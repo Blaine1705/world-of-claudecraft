@@ -923,6 +923,58 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // first-order composite follows the retained self-spirit prewarm and delve
 // rebuild renderer bytes, then this seal follows the swept evidence bytes. No
 // capture was retaken.
+// Re-minted for the GPU-preparation scheduler batch and its second and third
+// passes: renderer.ts and prewarm_policy.ts moved again, the seals follow the
+// swept evidence bytes. No capture was retaken.
+// Re-minted for the touch tail's readiness fix (the walk no longer asks the
+// driver): renderer.ts moved, the seals follow the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the build-ledger instrumentation (timed view and zone
+// builds, the arrival mark): renderer.ts and entity_view_policy_core.ts
+// moved, the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the build-span sink wiring (view-part sub-spans): renderer.ts
+// moved, the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the composed-look pieces hold (live candidate path wiring):
+// renderer.ts moved, the seals follow the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for the gc hitch cause (the heap read on the hitch sample):
+// renderer.ts moved, the seals follow the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for the deferred-decal stand-in (the live candidate path builds
+// the body without its face decals): renderer.ts moved, the seals follow the
+// swept evidence bytes. No capture was retaken.
+// Re-minted for the compile gate's piece cut (one queue unit per material
+// group of the target): renderer.ts moved, the seals follow the swept evidence
+// bytes. No capture was retaken.
+// Re-minted for the hitch sample alignment (the top-of-sync reading and the
+// aligned end-of-sync sample): renderer.ts moved, the seals follow the swept
+// evidence bytes. No capture was retaken.
+// Re-minted for the compile gate's variant settle (the third piece arm) and
+// the shadow arm's every-mesh depth twin: renderer.ts moved, the seals follow
+// the swept evidence bytes. No capture was retaken.
+// Re-minted for the resume lane ordering (program debt before upload debt):
+// prewarm_policy.ts moved, the seals follow the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the three patch-hash bump in pnpm-lock.yaml: the lockfile is a
+// hashed leaf of the town fingerprint, so the seals follow the swept evidence
+// bytes. No capture was retaken.
+// Re-minted for the merge of upstream/main into the GPU-preparation
+// scheduler branch: both parents' renderer and prewarm bytes combine in one
+// tree, so the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the second three patch-hash bump in pnpm-lock.yaml (the count 0
+// instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
+// fingerprint, so the seals follow the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
+// extraction. The renderer leaf moved; no capture was retaken because both
+// changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
 // Re-minted for the Sowfield demolition: the Vale Cup removal moves
 // renderer.ts, the first-order composite follows it, and this seal follows
 // the swept evidence bytes. No capture was retaken.
@@ -950,9 +1002,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // renderer and layout bytes combine in one tree, so the composite mints a
 // value matching neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '74e1f191303b9dae9bddc1693d776d830b4254554ecaca913c930d60d897b525';
+  'b30ad6d964b24f8570d35bfbc389d05ce1b720bcd10b8f0052d5dc5b90d4126c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'b6fa2e0e7bbde05a87615d05294a3eaba462cb672c086ba1974624b06035177a';
+  'e922918ac730f196234a3d450f04845affc5d5986804dff6135fe36efe94b4d2';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2014,6 +2066,48 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // The first-order composite follows the retained self-spirit prewarm and
     // delve rebuild renderer bytes, then this second-order performance seal
     // follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the r185 frozen-camera aim fix, then for the far-bake
+    // compile gate (renderer.ts wiring). The first-order composite follows
+    // renderer.ts, then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-minted for the touch tail's readiness fix (renderer.ts wiring): the
+    // first-order composite follows renderer.ts, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
+    // Re-minted for the build-ledger instrumentation (renderer.ts and
+    // entity_view_policy_core.ts wiring): same order, the composite first,
+    // then this seal over the swept evidence bytes. No capture was retaken.
+    // Re-minted for the build-span sink wiring (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the composed-look pieces hold (renderer.ts): same order,
+    // the composite first, then this seal. No capture was retaken.
+    // Re-minted for the gc hitch cause (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the deferred-decal stand-in (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the compile gate's piece cut (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the hitch sample alignment (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the compile gate's variant settle and the every-mesh depth
+    // twin (renderer.ts): same order, the composite first, then this seal. No
+    // capture was retaken.
+    // Re-minted for the resume lane ordering (prewarm_policy.ts): same order,
+    // the composite first, then this seal. No capture was retaken.
+    // Re-minted for the three patch-hash bump (pnpm-lock.yaml): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the merge of upstream/main into the GPU-preparation
+    // scheduler branch: both parents' renderer and prewarm bytes combine in one
+    // tree, so the seals follow the swept evidence bytes. No capture was retaken.
+    // Re-minted for the second three patch-hash bump (pnpm-lock.yaml, the count
+    // 0 instanced-mesh render-list skip): same order, the composite first, then
+    // this seal. No capture was retaken.
+    // Re-minted for the fast-loading-screen-variety merge with release/v0.40.0
+    // (renderer.ts moved on both sides): same order, the composite first, then
+    // this seal. No capture was retaken.
+    // Re-minted for the review-fix round (prewarm_policy.ts and renderer.ts
+    // moved): same order, the composite first, then this seal. No capture
+    // was retaken.
     // Re-minted for the Sowfield demolition. The first-order composite follows
     // the Vale Cup removal in renderer.ts, then this second-order performance
     // seal follows the swept evidence bytes. No capture was retaken.
@@ -2040,7 +2134,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('00094d50a0cf47c207724ed720bb7b15f0df46723be1cec3a341c79432f6294c');
+    ).toBe('0d3ec7db52b2b6b3502aa38c63fa6639e69b2fb3abeaacd6be8dea5a1d950f35');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

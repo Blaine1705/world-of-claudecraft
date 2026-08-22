@@ -701,6 +701,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the desktop action bar, facet-routed; skipped on touch where hud.mobile.css sets #actionbar/#actionbar2/#actionbar3 to display:none the whole time (the mobile action ring below supersedes it), so ticking + painting it was pure waste every frame',
   },
   {
+    call: 'this.crossHotbar.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the controller cross hotbar, facet-routed; it owns its OWN actions and ticks its own view (a pad layout is decoupled from the keyboard hotbar), and a frame with no pad connected stops after one elided display write',
+  },
+  {
     call: 'this.currentMobileActionPage',
     band: 'frame',
     gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
@@ -1267,6 +1274,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the always-on Reliquary tracker (not gated on a window): pinned pages fill from normal play and an illuminated page drops off',
   },
   {
+    call: 'this.trackerStackAnchor.apply',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'seats #right-tracker-stack below the minimap column, whose rendered height moves with the zone label and mobile chrome scale; a bounded layout read, elided write (tracker_stack_anchor.ts owns the cadence contract)',
+  },
+  {
     call: 'this.calendarWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.calendarWindow.isOpen',
@@ -1591,7 +1605,11 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // release's own window/chrome churn), so it cannot be reconciled by
       // arithmetic across a merge. The numbers below were set from a suite run
       // on the merged tree, not from either side's narrative.
-    ).toEqual({ window: 43, chrome: 79, none: 17 });
+      // chrome 83 -> 84: the tracker-stack anchor apply (seats the stack below
+      // the minimap column; tracker_stack_anchor.ts).
+      // window 47 -> 43, chrome 84 -> 81: the Vale Cup retirement (the New
+      // Eastbrook program) removed the cup rows on the other side of this merge.
+    ).toEqual({ window: 43, chrome: 81, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
