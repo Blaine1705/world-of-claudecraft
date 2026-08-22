@@ -81,7 +81,17 @@ const MONOLITHS: MonolithRow[] = [
     // arm and a spoken refusal beside the ability one, and the shared item-use
     // seam castSlot and the pad now both call. Exact merged count, zero slack:
     // any further growth reds again.
-    ceiling: 19490,
+    // Lowered after extracting the Reliquary-tracker input construction into
+    // makeReliquaryTrackerInput (reliquary_tracker_view.ts), which paid for the
+    // tracker-stack anchor wiring and the window's tracker-visibility deps in
+    // the same change. Exact count, zero slack.
+    // Lowered again (to 19476 on the merged base) after the stale-focus Space
+    // fix (PR #3506) extracted its chrome focus wiring (the tracker drops plus
+    // the panel key-guard loop) into src/ui/chrome_focus_wiring.ts, leaving
+    // hud.ts a one-line consumer (wireChromeFocus($)). The ratchet's own rule:
+    // an extraction lowers the ceiling. Exact merged count, zero slack: any
+    // further growth reds again.
+    ceiling: 19476,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -226,17 +236,34 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    // Re-pinned 13546 -> 13561 (+15) when the fast-loading-screen-variety branch
-    // rebased from release/v0.36.0 onto release/v0.40.0, which had pinned this
-    // row at its exact size (zero slack), so any branch addition arrives red.
-    // The branch's additions here are thin-consumer wiring to extracted seams:
-    // the onCharacterAssetReady subscription plus its handler, which only
-    // enqueues a re-apply for views whose weapon skin GLB just landed. The
-    // substance lives in src/render/characters/assets.ts (the ready registry)
-    // and src/render/characters/visual.ts (refreshWeaponSkin), so no clean
-    // branch-owned extraction remains. Maintainer decision, exact merged count:
-    // any further growth reds again.
-    ceiling: 13561,
+    // RAISED 13546 -> 13548 (+2) by the streamed-prewarm branch. A raise, not a
+    // lowering, and stated as one: the branch extracts the compile SUBMIT LOOP
+    // with its deadline rule and never-drop contract
+    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
+    // beside the per-unit submit that module already owned) and the weapon-skin
+    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
+    // beside the stage whose failure boundary shares its unit ids), and those
+    // two extractions still do not quite cover what it adds.
+    //
+    // The history matters because it is the failure mode this ratchet exists to
+    // catch. An earlier revision of this branch reported a NET REDUCTION while
+    // deleting 41 lines of load-bearing comments, 11 blank lines and folding
+    // three `let` declarations into one comma statement: the extractions were
+    // real but the number was bought with formatting. Every comment is restored,
+    // the blank lines are back, the declarations are separate again, and the
+    // count below is what the extractions alone earn. Maintainer decision, and
+    // deliberately a visible +2 rather than an invisible -9.
+    // Re-pinned 13548 -> 13563 (+15) when the fast-loading-screen-variety
+    // branch merged release/v0.40.0 (its rebase onto the release had already
+    // paid this row's zero-slack pin once, at 13561 over the pre-streamed-
+    // prewarm base). The branch's additions here are thin-consumer wiring to
+    // extracted seams: the onCharacterAssetReady subscription plus its
+    // handler, which only enqueues a re-apply for views whose weapon skin GLB
+    // just landed. The substance lives in src/render/characters/assets.ts
+    // (the ready registry) and src/render/characters/visual.ts
+    // (refreshWeaponSkin), so no clean branch-owned extraction remains.
+    // Maintainer decision, exact merged count: any further growth reds again.
+    ceiling: 13563,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -297,6 +324,17 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/colliders.ts',
     ceiling: 2660,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
+  },
+  {
+    // Newly tracked. It was already larger than several budgeted files and had
+    // no row at all, so it was drifting unwatched: this branch's interior
+    // resource-lifecycle work grew it from 2807 to the count below even after
+    // extracting src/render/interior_resource_lifecycle.ts. Pinned at the exact
+    // current count per the ratchet's rule; any further growth reds, and the
+    // fix is extraction behind the seam named here.
+    file: 'src/render/dungeon.ts',
+    ceiling: 2882,
+    seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];
 

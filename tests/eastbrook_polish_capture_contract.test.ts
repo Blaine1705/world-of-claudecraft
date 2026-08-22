@@ -258,8 +258,15 @@ interface AttributionTargetFixture {
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
+// extraction. The renderer leaf moved; no capture was retaken because both
+// changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '154100281a15bd720d87e820d033dcb66f562fef49e0665af821ebdbceb33d99';
+  'ad0a052b8c4ce3e905755efc6664c20a34b992c63c9f8eb09a14e729bf8867dd';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

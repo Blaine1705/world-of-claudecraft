@@ -53,11 +53,7 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
-import {
-  RELIQUARY_PAGE_ORDER,
-  RELIQUARY_PAGES,
-  RELIQUARY_PAGES_BY_ID,
-} from '../sim/content/reliquary';
+import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -198,6 +194,7 @@ import {
   serializeIgnoreList,
 } from './chat_ignore_core';
 import { cheaterTagLabel } from './cheater_tag';
+import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
@@ -272,6 +269,7 @@ import { DeedsWindow } from './deeds_window';
 import { DevCommandWindow } from './dev_command_window';
 import { devTierByIndex, devTierDisplayName } from './dev_tier';
 import { bindDialogKeyActivation } from './dialog_key_activation';
+import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
@@ -661,9 +659,9 @@ import {
 import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
 import {
   buildReliquaryTrackerViewInto,
+  makeReliquaryTrackerInput,
   makeReliquaryTrackerView,
   type ReliquaryTrackerInput,
-  reliquaryTrackerOwnershipSig,
 } from './reliquary_tracker_view';
 import {
   buildReliquaryUnlockPlan,
@@ -728,6 +726,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
@@ -2753,29 +2752,10 @@ export class Hud {
       }
       this.toggleReliquaryTrackerCollapsed();
     });
-    // The delve board, lockpick panel, map window, and the bank + bags cluster are
-    // non-modal overlays, so canUseGameKeys() stays true and the global jump (Space)
-    // / chat (Enter) binds would otherwise hijack those keys on a focused panel
-    // button (the map's Quests toggle, a bank grid cell, and each close button
-    // included). Stop propagation (but NOT the default, so the button's native
-    // activation still fires) when a panel button has focus, mirroring the
-    // quest-tracker guard above.
-    for (const panelId of [
-      '#delve-board',
-      '#lockpick-panel',
-      '#delve-rite-panel',
-      '#map-window',
-      '#bank-window',
-      '#bags',
-      '#deeds-window',
-      '#reliquary-window',
-      '#professions-window',
-    ]) {
-      $(panelId).addEventListener('keydown', (e) => {
-        if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
-        if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') e.stopPropagation();
-      });
-    }
+    // Chrome focus hygiene (the shared Enter/Space key guard + pointer-only focus
+    // drop) over the trackers, the non-modal overlay panels, and the micromenu rail:
+    // src/ui/chrome_focus_wiring.ts owns the root list and the rationale.
+    wireChromeFocus($);
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#map-close').addEventListener('click', () => {
       $('#map-window').style.display = 'none';
@@ -3902,6 +3882,9 @@ export class Hud {
       document.getElementById('ui')?.appendChild(el);
       this.emoteWheelEl = el;
     }
+    // An isModalOpen() surface: a dialog root (re-marked per show, so its name follows a
+    // language switch); the blocked-state Space guard (stale_chrome_focus.ts) spares it.
+    markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') });
     const slots = this.emoteWheelSlots.filter(isOverheadEmoteId).slice(0, EMOTE_WHEEL_LIMIT);
     el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
     slots.forEach((id, i) => {
@@ -3985,6 +3968,9 @@ export class Hud {
 
   private renderEmoteEditor(): void {
     const el = $('#emote-editor');
+    // An isModalOpen() surface: a dialog root, so the blocked-state Space guard
+    // (src/game/stale_chrome_focus.ts) spares the editor's own buttons.
+    markDialogRoot(el, { label: t('hudChrome.emoteEditor.title') });
     el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
     const count = document.createElement('div');
     count.className = 'emote-editor-count';
@@ -4861,6 +4847,14 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#reliquary-window'),
     onPinChanged: () => this.updateReliquaryTracker(),
+    // The tracker's master visibility switch; the write routes through the
+    // options seam (the playtime-eye doctrine: the eye and the Options row
+    // share ONE write path, so a future applySetting side effect reaches both).
+    trackerShown: () => (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true,
+    setTrackerShown: (shown) => {
+      this.optionsHooks?.onSettingChange('showReliquaryTracker', shown);
+      this.updateReliquaryTracker();
+    },
   });
   // Watchlist HUD tracker (#deed-tracker): slow-band painter over the one
   // reused tracker-view container (allocation-light by contract).
@@ -4883,6 +4877,20 @@ export class Hud {
     root: () => $('#reliquary-tracker'),
     writers: this.writerFacet,
   });
+  // Seats #right-tracker-stack below the minimap column's REAL rendered bottom
+  // (a wrapping zone label, the mobile chrome scale, and the compact transform
+  // all move it past any stylesheet constant); slow band plus coalesced resize,
+  // with the zoom pill and clock as the two overhangs (tracker_stack_anchor.ts).
+  // The install's dispose is deliberately dropped: one Hud per page load.
+  private readonly trackerStackAnchor = installTrackerStackAnchor({
+    stack: () => $('#right-tracker-stack'),
+    minimapWrap: () => $('#minimap-wrap'),
+    overhangs: () => [
+      document.querySelector('#minimap-zoom'),
+      document.querySelector('#minimap-clock'),
+    ],
+    uiScale: () => getUiScale(),
+  }).anchor;
   // Event calendar window painter (calendar_view.ts month-grid core +
   // calendar_window.ts painter). System events expand from data rules; guild
   // events read the socialInfo mirror and book/remove through IWorld.
@@ -9844,6 +9852,8 @@ export class Hud {
     // The Reliquary tracker is always-on chrome for the same reason: pinned
     // pages fill from normal play, and an illuminated page drops off.
     if (slowHud) this.updateReliquaryTracker();
+    // Re-seat the tracker stack under the minimap column (bounded layout read).
+    if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
@@ -16589,42 +16599,18 @@ export class Hud {
   // what lets the core hold its default (nothing-pinned) ranking instead of
   // re-folding all 28 catalog pages every slow tick.
   private updateReliquaryTracker(): void {
-    const collapsed =
-      (this.optionsHooks?.settings.get('reliquaryTrackerCollapsed') ?? false) === true;
-    this.reliquaryTrackerInput ??= {
-      pinned: this.reliquaryWindow.pinned,
-      pageIds: RELIQUARY_PAGE_ORDER,
-      completion: (pageId) => this.sim.reliquaryPageCompletion(pageId),
-      // The deliberate asymmetry, recorded here because the two halves read as
-      // an inconsistency otherwise: pinned pages (at most RELIQUARY_TRACK_CAP,
-      // five) are read LIVE on every slow build, while the whole-catalog default scan
-      // memoizes on this signature. The signature is cheap but has a documented
-      // same-band blind spot (an add and a remove on ONE surface inside a single
-      // 500ms band cancel out), and five live reads sit comfortably inside the
-      // slow-band budget, so the pages the player explicitly chose get the exact
-      // answer and the whole-catalog scan gets the cheap one. Accepted with it:
-      // the mount count is the expensive read here, not a cheap one. Offline,
-      // Sim.ownedMounts() copies the whole bags-plus-bank array before scanning
-      // it, and every completion() call above pays that copy again through
-      // Sim.reliquaryOwnershipSurfaces(); online, ClientWorld returns a stored
-      // field. Accepted because this is the 500ms band with at most five pinned
-      // reads. A thunk, not a value, so the signature (and that copy) is skipped
-      // entirely while the player has pins: only the default branch reads it.
-      ownershipSig: () =>
-        reliquaryTrackerOwnershipSig({
-          itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
-          marks: this.sim.reliquaryMarks.size,
-          deedsEarned: this.sim.deedsEarned.size,
-          mounts: this.sim.ownedMounts().length,
-          weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,
-        }),
-      collapsed,
-    };
+    const settings = this.optionsHooks?.settings;
+    // The pinned-live vs memoized-default cost asymmetry is recorded on the
+    // factory (makeReliquaryTrackerInput); the closures read this.sim at call
+    // time, so the reused input survives world swaps.
+    this.reliquaryTrackerInput ??= makeReliquaryTrackerInput(() => this.sim);
     const input = this.reliquaryTrackerInput;
-    // Per-build fields: the pin set is re-read live off the window store and
-    // the collapse off settings; everything else on the reused input is stable.
+    // Per-build fields: the pin set is re-read live off the window store, the
+    // collapse and the master visibility switch off settings; everything else
+    // on the reused input is stable.
     input.pinned = this.reliquaryWindow.pinned;
-    input.collapsed = collapsed;
+    input.collapsed = (settings?.get('reliquaryTrackerCollapsed') ?? false) === true;
+    input.enabled = (settings?.get('showReliquaryTracker') ?? true) === true;
     const view = buildReliquaryTrackerViewInto(this.reliquaryTrackerView, input);
     // Compact touch tier: the rows are folded away (hud.mobile.css) and the header
     // is a count chip that opens The Reliquary (see the #reliquary-tracker

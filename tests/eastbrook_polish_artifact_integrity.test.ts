@@ -842,10 +842,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
+// extraction. The renderer leaf moved; no capture was retaken because both
+// changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '4d32215d013545b4f61aa3926ece451637a882ff4bc5358ebc4542a006349b77';
+  'e3b50b08929b9ab044f4055e1330aa34774e5b38034882af19f892e071f395f4';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '154100281a15bd720d87e820d033dcb66f562fef49e0665af821ebdbceb33d99';
+  'ad0a052b8c4ce3e905755efc6664c20a34b992c63c9f8eb09a14e729bf8867dd';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1913,10 +1920,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the second three patch-hash bump (pnpm-lock.yaml, the count
     // 0 instanced-mesh render-list skip): same order, the composite first, then
     // this seal. No capture was retaken.
+    // Re-minted for the fast-loading-screen-variety merge with release/v0.40.0
+    // (renderer.ts moved on both sides): same order, the composite first, then
+    // this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('97c0bd867f5fcd967a41f9116012bd096de067ae25cbc8b47530a90b1c36e61e');
+    ).toBe('4d4c73bd34b6ce3e9eba33e34c1ca5571db5553bb8eea844971672a6d862273c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
