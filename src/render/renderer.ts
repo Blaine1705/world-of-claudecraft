@@ -6086,15 +6086,11 @@ export class Renderer {
         status = 'failed';
         console.warn(`Renderer prewarm entry failed: ${entry.id}`, err);
       }
-      // Honesty gate: an entry that hit its deadline (or deferred to the
-      // background lane) with planned work remaining reports 'partial' with
-      // its counts, never 'completed'.
+      // Deadline-limited work with planned units remaining reports 'partial',
+      // never 'completed'.
       const progress = entry.progress?.() ?? null;
       if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
-      // Entries that explicitly expose a partial resume are also allowed to
-      // recover from a failed indivisible unit. Their cursor/progress owner
-      // keeps the failed item in this remainder; entries without this hook
-      // retain the historical fail-once behavior.
+      // Explicit partial resumes may also recover failed indivisible units.
       if (status === 'partial' || status === 'failed') {
         const partialUnits = entry.resumePartialUnits?.() ?? [];
         if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });

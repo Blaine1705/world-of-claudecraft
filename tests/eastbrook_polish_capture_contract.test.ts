@@ -271,7 +271,7 @@ interface AttributionTargetFixture {
 // Re-minted for the loading-hitch delivery (renderer.ts and
 // view_priority_policy.ts): both runtime leaves moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '8f23254dfe111e9aa20eadf875942eb2fd569d771afbae9c1e05c0447e4ebfc0';
+  '8990c030de29a30dc08c8000380cbc634dc9f95b4dc9ddc60f5666cf8da008a2';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
