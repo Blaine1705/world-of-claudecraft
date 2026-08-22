@@ -263,7 +263,15 @@ const MONOLITHS: MonolithRow[] = [
     // (the ready registry) and src/render/characters/visual.ts
     // (refreshWeaponSkin), so no clean branch-owned extraction remains.
     // Maintainer decision, exact merged count: any further growth reds again.
-    ceiling: 13563,
+    // Re-pinned 13563 -> 13573 (+10) for the review-fix round: the nearby-view
+    // floor on the shared prewarm budget (the decision lives in
+    // src/render/prewarm_policy.ts portalPrewarmViewBudget and
+    // nearbyPrewarmViewBudget; the renderer carries the two call sites and the
+    // rationale comment) and the weapon-skin early-out in onCharacterAssetReady
+    // (the predicate lives in src/render/characters/assets.ts). Both additions
+    // are thin-consumer wiring to their extracted seams. Exact count, zero
+    // slack: any further growth reds again.
+    ceiling: 13573,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -287,7 +295,13 @@ const MONOLITHS: MonolithRow[] = [
     // wiring for both (the controller construction and the runPostEntryWarmups
     // options object), which is the firewall's job. Maintainer decision, exact
     // merged count: any further growth reds again.
-    ceiling: 11522,
+    // Re-pinned 11522 -> 11534 (+12) for the review-fix round: the mob-body
+    // stream kick moved from the post-fade callback to the first-paint
+    // checkpoint (kickCharacterPreloadStream, the seam stays in
+    // src/game/post_entry_warmups_core.ts), which costs the call wiring plus
+    // the placement rationale where the reader needs it. Exact count, zero
+    // slack: any further growth reds again.
+    ceiling: 11534,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

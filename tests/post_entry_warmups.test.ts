@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  type CharacterStreamKickDependencies,
+  kickCharacterPreloadStream,
   type PostEntryWarmupDependencies,
   runPostEntryWarmups,
 } from '../src/game/post_entry_warmups_core';
@@ -10,8 +12,6 @@ function dependencies(
   return {
     settleFarVista: vi.fn().mockResolvedValue(true),
     onFarVistaSettled: vi.fn(),
-    startCharacterPreloads: vi.fn().mockReturnValue(3),
-    onCharacterPreloadsStarted: vi.fn(),
     startBackgroundPreloads: vi.fn().mockReturnValue(5),
     onBackgroundPreloadsStarted: vi.fn(),
     onWarmupError: vi.fn(),
@@ -19,27 +19,48 @@ function dependencies(
   };
 }
 
+function kickDependencies(
+  overrides: Partial<CharacterStreamKickDependencies> = {},
+): CharacterStreamKickDependencies {
+  return {
+    startCharacterPreloads: vi.fn().mockReturnValue(3),
+    onCharacterPreloadsStarted: vi.fn(),
+    ...overrides,
+  };
+}
+
+describe('kickCharacterPreloadStream', () => {
+  it('starts the deferred character stream and reports the count', () => {
+    const deps = kickDependencies();
+
+    kickCharacterPreloadStream(deps);
+
+    expect(deps.startCharacterPreloads).toHaveBeenCalledOnce();
+    expect(deps.onCharacterPreloadsStarted).toHaveBeenCalledWith(3);
+  });
+
+  it('is decoupled from the post-reveal warmups so main.ts can run it at first paint', () => {
+    // The wiring contract behind the reviewer's iOS pop-in finding: the mob-body
+    // stream must be startable WITHOUT the far-vista settle or the background
+    // preload lane, because those wait for the reveal while the creature fetches
+    // begin on the first painted frame.
+    const deps = kickDependencies({ startCharacterPreloads: vi.fn().mockReturnValue(0) });
+
+    kickCharacterPreloadStream(deps);
+
+    expect(deps.onCharacterPreloadsStarted).toHaveBeenCalledWith(0);
+  });
+});
+
 describe('runPostEntryWarmups', () => {
   it('starts fail-soft streaming without automatic secondary-context GPU work', async () => {
-    const order: string[] = [];
-    const deps = dependencies({
-      startCharacterPreloads: vi.fn(() => {
-        order.push('characters');
-        return 3;
-      }),
-      startBackgroundPreloads: vi.fn(() => {
-        order.push('background');
-        return 5;
-      }),
-    });
+    const deps = dependencies();
 
     await runPostEntryWarmups(deps);
     await Promise.resolve();
 
-    expect(order).toEqual(['characters', 'background']);
     expect(deps.settleFarVista).toHaveBeenCalledOnce();
     expect(deps.onFarVistaSettled).toHaveBeenCalledWith(true);
-    expect(deps.onCharacterPreloadsStarted).toHaveBeenCalledWith(3);
     expect(deps.onBackgroundPreloadsStarted).toHaveBeenCalledWith(5);
     expect(deps.onWarmupError).not.toHaveBeenCalled();
   });
@@ -51,7 +72,6 @@ describe('runPostEntryWarmups', () => {
     await runPostEntryWarmups(deps);
     await Promise.resolve();
 
-    expect(deps.startCharacterPreloads).toHaveBeenCalledOnce();
     expect(deps.startBackgroundPreloads).toHaveBeenCalledOnce();
     expect(deps.onBackgroundPreloadsStarted).toHaveBeenCalledWith(5);
     expect(deps.onWarmupError).toHaveBeenCalledWith('far-vista', failure);
@@ -67,7 +87,6 @@ describe('runPostEntryWarmups', () => {
 
     await runPostEntryWarmups(deps);
 
-    expect(deps.startCharacterPreloads).toHaveBeenCalledOnce();
     expect(deps.startBackgroundPreloads).toHaveBeenCalledOnce();
     expect(deps.onBackgroundPreloadsStarted).toHaveBeenCalledWith(5);
     expect(deps.onWarmupError).toHaveBeenCalledWith('far-vista', failure);

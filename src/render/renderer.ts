@@ -159,6 +159,7 @@ import {
 import { logAssetMissOnce } from './characters/asset_miss_log';
 import {
   characterResidencySources,
+  isWeaponSkinModelUrl,
   mechAssetsReady,
   mountAssetsReady,
   onCharacterAssetReady,
@@ -495,6 +496,7 @@ import {
 import {
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
+  nearbyPrewarmViewBudget,
   orderedPrewarmIds,
   orderPrewarmResumeEntries,
   type PrewarmEntryProgress,
@@ -502,6 +504,7 @@ import {
   partitionMandatoryLandmarkCandidates,
   partitionResidentSkyBiomes,
   planCompileSubmission,
+  portalPrewarmViewBudget,
   prewarmBuildDeadline,
   prewarmCompileAwaitDeadline,
   prewarmEntryResumesAfterSkip,
@@ -510,7 +513,6 @@ import {
   prewarmProgramContentKeys,
   prewarmResumeIsDebt,
   prewarmSubmitShouldStop,
-  remainingPrewarmViewBudget,
   resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
   skyAssetInlineWaitMs,
@@ -6358,10 +6360,14 @@ export class Renderer {
         priority: 14,
         required: true,
         run: () => {
+          // Portals draw only what the shared budget can spare past the nearby
+          // floor: they are the least actionable views on the shared cap, and
+          // with the small 12/16 budgets an unreserved draw here could leave
+          // views.nearby below with zero slots at a landmark-heavy spawn.
           const result = this.createPersistentPortalViews(
             createdViewTypes,
             buildDeadline,
-            remainingPrewarmViewBudget(policy.maxViews, createdViews),
+            portalPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),
           );
           portalViewsCreated = result.created;
           createdViews += result.created;
@@ -6382,7 +6388,7 @@ export class Renderer {
           this.collectMissingViewCandidates(p, VIEW_PREWARM_RANGE_SQ, false);
           candidateViews = this.viewCandidates.length;
           const result = this.createCandidateViews(
-            remainingPrewarmViewBudget(policy.maxViews, createdViews),
+            nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),
             createdViewTypes,
             buildDeadline,
           );
@@ -9026,6 +9032,10 @@ export class Renderer {
 
   private readonly onCharacterAssetReady = (url: string): void => {
     if (this.shutdownStarted) return;
+    // This fires for EVERY character GLB arrival, including the streamed
+    // creature bodies that can never be a weapon skin, and the scan below
+    // mints a skin-url string per skinned view: drop non-skin urls first.
+    if (!isWeaponSkinModelUrl(url)) return;
     for (const [id] of this.views) {
       const skinId = this.sim.entities.get(id)?.weaponSkinId ?? null;
       if (!skinId || weaponSkinModelUrl(skinId) !== url) continue;

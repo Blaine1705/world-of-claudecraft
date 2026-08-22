@@ -2,6 +2,19 @@ import { selectLoadingBackdropPath } from './loading_backdrop_core';
 
 type AssetUrlResolver = (logicalPath: string) => string;
 type RandomUnitSource = () => number;
+type SaveDataSource = () => boolean;
+
+/** Data Saver preference via the nonstandard Network Information API; guarded
+ *  so the read is safe on engines without it (and in plain-Node tests). */
+function navigatorPrefersReducedData(): boolean {
+  try {
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } })
+      .connection;
+    return connection?.saveData === true;
+  } catch {
+    return false;
+  }
+}
 
 export class LoadingBackdropController {
   private readonly preloadLink: HTMLLinkElement;
@@ -13,6 +26,7 @@ export class LoadingBackdropController {
     private readonly curtain: HTMLElement,
     private readonly resolveAssetUrl: AssetUrlResolver,
     private readonly randomUnit: RandomUnitSource = Math.random,
+    private readonly prefersReducedData: SaveDataSource = navigatorPrefersReducedData,
   ) {
     const documentRef = curtain.ownerDocument;
     const existing = documentRef.head.querySelector<HTMLLinkElement>(
@@ -46,6 +60,10 @@ export class LoadingBackdropController {
   /** Select and preload the next cycle without changing the visible curtain. */
   prepareNextCycle(): void {
     if (this.preparedPath) return;
+    // Data Saver: the next cycle is a speculative full-size WebP for a cycle
+    // many sessions never reach, so skip the fetch and let enterNewCycle
+    // select and load on demand when a cycle actually starts.
+    if (this.prefersReducedData()) return;
     this.preparedPath = this.selectNextPath();
     this.setPreload(this.preparedPath, 'low');
   }

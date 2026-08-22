@@ -57,4 +57,40 @@ describe('LoadingBackdropController', () => {
     );
     vi.unstubAllGlobals();
   });
+
+  it('skips the speculative next-cycle fetch under Data Saver', () => {
+    document.head.innerHTML = '';
+    document.body.innerHTML = '<div id="loading-screen"></div>';
+    const curtain = document.querySelector<HTMLElement>('#loading-screen');
+    if (!curtain) throw new Error('loading-screen fixture is missing');
+
+    const random = vi.fn().mockReturnValueOnce(0).mockReturnValueOnce(0.999_999);
+    const controller = new LoadingBackdropController(
+      curtain,
+      (path) => `/media${path}`,
+      random,
+      () => true,
+    );
+
+    controller.prepareInitial();
+    const preload = document.head.querySelector<HTMLLinkElement>(
+      'link[data-loading-backdrop-preload]',
+    );
+    expect(preload?.getAttribute('href')).toBe(`/media${LOADING_BACKDROP_PATHS[0]}`);
+
+    // No speculative fetch: the preload link is untouched and no path was drawn.
+    controller.enterNewCycle();
+    controller.prepareNextCycle();
+    expect(random).toHaveBeenCalledTimes(1);
+    expect(preload?.getAttribute('fetchpriority')).toBe('high');
+    expect(preload?.getAttribute('href')).toBe(`/media${LOADING_BACKDROP_PATHS[0]}`);
+
+    // The next cycle still rotates, fetching on demand when it actually starts.
+    controller.enterNewCycle();
+    expect(random).toHaveBeenCalledTimes(2);
+    expect(preload?.getAttribute('href')).toBe(`/media${LOADING_BACKDROP_PATHS.at(-1)}`);
+    expect(curtain.style.getPropertyValue('--loading-backdrop-image')).toBe(
+      `url("/media${LOADING_BACKDROP_PATHS.at(-1)}")`,
+    );
+  });
 });

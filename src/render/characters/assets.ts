@@ -543,6 +543,13 @@ const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
 // weapon (the swapAttachDef guard below) instead of throwing. Base item weapons
 // stay resident so the player's own hands are never empty at spawn.
 const streamedSkinUrls = new Set(weaponSkinModelUrls());
+
+/** True for a weapon-skin cosmetic model url. Exported so asset-ready
+ *  consumers (renderer.onCharacterAssetReady) can drop every other character
+ *  GLB arrival, creature bodies included, before scanning live views. */
+export function isWeaponSkinModelUrl(url: string): boolean {
+  return streamedSkinUrls.has(url);
+}
 function streamedCharacterUrlsFor(profile: Readonly<GfxSettings>): string[] {
   return allPreloadUrls.filter(
     (url) =>
@@ -578,6 +585,12 @@ function notifyCharacterAssetReady(url: string): void {
   }
 }
 
+// Keyed on the RAW url for every caller (the eager boot loop and the streamed
+// lanes); readers resolve through assetUrl(url). Consistent today because no
+// url this function loads is aliased (LOW_URL_ALIAS only rewrites the rogue
+// body, which preloads under its own raw entry); an alias added inside
+// models/creatures/ or the weapon-skin set would make that asset look
+// permanently non-resident, so key any such future entry resolved.
 function prepareCharacterUrl(url: string): Promise<void> {
   if (gltfByUrl.has(url)) return Promise.resolve();
   const existing = characterLoadTasks.get(url);
@@ -679,9 +692,12 @@ for (const [key, list] of Object.entries(SKINS)) {
 // and almost all of them are OTHER players' cosmetics. skinTexture() fails soft
 // to the embedded default and every apply site heals through ensureSkinTexture()
 // (visual.ts constructor + setSkin, portrait.ts before its one-shot snapshot),
-// so a deferred atlas costs a brief fallback, never a crash or a stall. Both
+// so a deferred atlas costs a brief fallback, never a crash or a stall.
 // The on-demand recovery seam is platform-neutral, so retaining those atlases
 // before first paint on desktop only lengthens the gate and raises its peak.
+// A deliberate kill-switch, not dead code: flipping it true restores the eager
+// boot sweep and the charactersReady atlas gate below wholesale if the
+// deferral ever has to be reverted; tests/ios_entry_memory.test.ts pins it off.
 const eagerSkinAtlases = false;
 if (eagerSkinAtlases) {
   for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
@@ -721,8 +737,9 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
 export async function charactersReady(maxAttempts = 3): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
-    // Deferred atlases (every iOS WebKit host) are not boot assets: gating the
-    // preview on them would re-create the exact entry-footprint spike the deferral removes.
+    // Deferred atlases (every host, see eagerSkinAtlases above) are not boot
+    // assets: gating the preview on them would re-create the exact
+    // entry-footprint spike the deferral removes.
     const missingSkins = eagerSkinAtlases
       ? [...bootSkinUrls].filter((url) => !skinTexByUrl.has(url))
       : [];

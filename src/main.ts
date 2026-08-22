@@ -146,7 +146,7 @@ import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
-import { runPostEntryWarmups } from './game/post_entry_warmups_core';
+import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
@@ -5034,8 +5034,11 @@ async function startGame(
     }
   }
   // The mob-body stream, the far-vista settle, and the background preload lane
-  // no longer hold the curtain either: runPostEntryWarmups (revealWorld below)
-  // starts all three fail-soft once the painted world is interactive.
+  // no longer hold the curtain either. The mob-body stream starts at the
+  // first-paint checkpoint below (on iOS these are the actionable creature
+  // bodies, and the entry allocation spike has cleared by first paint), while
+  // runPostEntryWarmups (revealWorld below) starts the other two fail-soft once
+  // the revealed world is interactive.
   setLoadingPercent(100, t('loading.enteringWorld'));
   loadPhaseStart('first-frame-wait');
   await nextPaint();
@@ -5053,6 +5056,20 @@ async function startGame(
     requestAnimationFrame(() => {
       entryDiagnostics.checkpoint('first-paint');
       loadPhaseEnd('first-frame-wait');
+      // Kick the deferred creature-body fetches now, before the settle cover and
+      // the curtain fade: until a creature GLB arrives its view, nameplate, and
+      // click target do not exist, so every ms the stream waits past first paint
+      // widens the pop-in window on the tight-memory profile (desktop's stream
+      // set is empty). The allocation spike the stream was deferred past has
+      // cleared by this frame.
+      kickCharacterPreloadStream({
+        startCharacterPreloads: startStreamedCharacterPreloads,
+        onCharacterPreloadsStarted: (count) => {
+          if (count > 0) {
+            console.info(`[entry-guard] streaming ${count} deferred character assets`);
+          }
+        },
+      });
       loadPhaseStart('settle-cover');
       const revealWorld = (): void => {
         loadPhaseEnd('settle-cover');
@@ -5157,7 +5174,8 @@ async function startGame(
               },
             );
           }
-          // Fail-soft streams start only after the painted world is interactive.
+          // The remaining fail-soft lanes start only after the revealed world is
+          // interactive (the mob-body stream already left at first paint above).
           // The classic fog remains the complete fallback while the far grid
           // finishes in parallel. Optional secondary WebGL previews stay lazy:
           // warming them here would contend with the player's first input.
@@ -5168,12 +5186,6 @@ async function startGame(
                 ...renderEntryDiagnostics(),
                 farVistaReady,
               });
-            },
-            startCharacterPreloads: startStreamedCharacterPreloads,
-            onCharacterPreloadsStarted: (count) => {
-              if (count > 0) {
-                console.info(`[entry-guard] streaming ${count} deferred character assets`);
-              }
             },
             startBackgroundPreloads: beginBackgroundPreloads,
             onBackgroundPreloadsStarted: (count) => {

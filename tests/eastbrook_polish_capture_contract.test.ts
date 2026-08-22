@@ -265,8 +265,11 @@ interface AttributionTargetFixture {
 // the renderer runtime leaf moved on both sides of the merge (this branch's
 // character asset-ready wiring, the release's shader-memory probes). No
 // capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ad0a052b8c4ce3e905755efc6664c20a34b992c63c9f8eb09a14e729bf8867dd';
+  'e922918ac730f196234a3d450f04845affc5d5986804dff6135fe36efe94b4d2';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

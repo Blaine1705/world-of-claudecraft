@@ -322,17 +322,23 @@ describe('post-entry mob-body streaming', () => {
     expect(assetsSource).toContain('if (streamedUrlSet.has(url)) ensureCharacterUrl(url);');
   });
 
-  it('starts the stream after first paint, not inside the entry gate', () => {
+  it('starts the stream at first paint, not inside the entry gate', () => {
     const firstPaintAt = mainSource.indexOf("checkpoint('first-paint')");
-    const schedulerAt = mainSource.indexOf('void runPostEntryWarmups({', firstPaintAt);
+    const kickAt = mainSource.indexOf('kickCharacterPreloadStream({', firstPaintAt);
     const streamAt = mainSource.indexOf(
       'startCharacterPreloads: startStreamedCharacterPreloads,',
-      schedulerAt,
+      kickAt,
     );
+    // The review fix: the kick rides the first-paint frame itself, AHEAD of
+    // the GPU settle cover and the curtain fade. The old post-fade placement
+    // widened the iOS creature pop-in window by settle plus fade, and the
+    // allocation spike the stream was deferred past has cleared by first paint.
+    const settleCoverAt = mainSource.indexOf("loadPhaseStart('settle-cover')", firstPaintAt);
     const assetsAwaitAt = mainSource.indexOf('await assetsReady(');
     expect(firstPaintAt).toBeGreaterThan(-1);
-    expect(schedulerAt).toBeGreaterThan(firstPaintAt);
-    expect(streamAt).toBeGreaterThan(firstPaintAt);
+    expect(kickAt).toBeGreaterThan(firstPaintAt);
+    expect(streamAt).toBeGreaterThan(kickAt);
+    expect(settleCoverAt).toBeGreaterThan(streamAt);
     expect(streamAt).toBeGreaterThan(assetsAwaitAt);
   });
 

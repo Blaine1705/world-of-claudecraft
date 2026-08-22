@@ -41,4 +41,27 @@ describe('streamed character asset readiness', () => {
     expect(readyUrls.filter((url) => url === TARGET_URL)).toHaveLength(1);
     unsubscribe();
   });
+
+  it('classifies weapon-skin urls so the renderer can skip non-skin arrivals', async () => {
+    vi.resetModules();
+    const stubGltf = () => ({ scene: new THREE.Group(), animations: [] as never[] });
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
+      loadHdr: vi.fn(() => new Promise(() => undefined)),
+      loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      releaseGltf: vi.fn(),
+    }));
+
+    const assets = await import('../src/render/characters/assets');
+    const { weaponSkinModelUrls } = await import('../src/render/characters/manifest');
+
+    // Every real skin model url is recognized; a streamed creature body (the
+    // most frequent asset-ready emitter) is not, so the renderer's per-view
+    // scan never runs for one.
+    const skinUrls = weaponSkinModelUrls();
+    expect(skinUrls.length).toBeGreaterThan(0);
+    for (const url of skinUrls) expect(assets.isWeaponSkinModelUrl(url)).toBe(true);
+    expect(assets.isWeaponSkinModelUrl('models/creatures/wolf.glb')).toBe(false);
+  });
 });

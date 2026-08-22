@@ -1,6 +1,7 @@
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { LOADING_BACKDROP_PATHS, selectLoadingBackdropPath } from '../src/ui/loading_backdrop_core';
 
 describe('loading backdrop selection', () => {
@@ -27,6 +28,26 @@ describe('loading backdrop selection', () => {
         statSync(diskPath).size,
         `${logicalPath} should stay under 300 KB`,
       ).toBeLessThanOrEqual(300_000);
+    }
+  });
+
+  it('pins the catalog against the shipped directory and the media manifest, both ways', () => {
+    // The reverse of the existence pin above: an orphan file committed under
+    // public/textures/loading/ that no rotation can ever reach fails here.
+    const loadingDir = join(process.cwd(), 'public', 'textures', 'loading');
+    const onDisk = readdirSync(loadingDir).filter((name) => !name.startsWith('.'));
+    expect(new Set(onDisk)).toEqual(
+      new Set(LOADING_BACKDROP_PATHS.map((logicalPath) => logicalPath.split('/').at(-1))),
+    );
+
+    // assetUrl falls back to the raw path on a manifest miss, so a backdrop
+    // absent from MEDIA_ASSETS would 404 in production while the disk pins
+    // above stay green: assert each path resolves to a content-hashed url.
+    for (const logicalPath of LOADING_BACKDROP_PATHS) {
+      const manifestKey = logicalPath.replace(/^\/+/, '');
+      expect(MEDIA_ASSETS[manifestKey], manifestKey).toMatch(
+        /^\/media\/textures\/loading\/[^/]+\.webp$/,
+      );
     }
   });
 

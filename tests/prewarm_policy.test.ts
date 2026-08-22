@@ -9,12 +9,15 @@ import {
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   NEARBY_LANDMARK_STREAM_RADIUS,
+  NEARBY_VIEW_PREWARM_FLOOR,
+  nearbyPrewarmViewBudget,
   orderedPrewarmIds,
   orderPrewarmResumeEntries,
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
   partitionResidentSkyBiomes,
   planCompileSubmission,
+  portalPrewarmViewBudget,
   prewarmBuildDeadline,
   prewarmCompileAwaitDeadline,
   prewarmEntryResumesAfterSkip,
@@ -189,6 +192,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(p.maxMs).toBe(3000);
     expect(p.compileMaxMs).toBe(1500);
     expect(p.maxViews).toBe(16);
+    expect(p.nearbyViewFloor).toBe(NEARBY_VIEW_PREWARM_FLOOR);
     expect(p.yieldBetweenEntries).toBe(true);
     expect(p.linkPassPerEntry).toBe(false);
     expect(p.compileBeforeFirstFrame).toBe(true);
@@ -218,7 +222,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'this.createPersistentPortalViews(\n            createdViewTypes,\n            buildDeadline,',
     );
     expect(renderer).toContain(
-      'this.createCandidateViews(\n            remainingPrewarmViewBudget(policy.maxViews, createdViews),\n            createdViewTypes,\n            buildDeadline,',
+      'this.createCandidateViews(\n            nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),\n            createdViewTypes,\n            buildDeadline,',
     );
   });
 
@@ -983,6 +987,9 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
     // The production-hub fix: only self plus one required/nearby view may build
     // synchronously at entry, never a crowd that reveals on the first live submit.
     expect(p.maxViews).toBe(2);
+    // No nearby floor on top of the constrained cap: 2 is a process-survival
+    // ceiling, and the deferred mob-body stream covers nearby entities.
+    expect(p.nearbyViewFloor).toBe(0);
     expect(p.finishFullManifestBeforeReveal).toBe(false);
   });
 
@@ -1019,7 +1026,12 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
       'utf8',
     ).replace(/\r\n/g, '\n');
     expect(renderer).toContain('const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;');
-    expect(renderer).toContain('remainingPrewarmViewBudget(policy.maxViews, createdViews)');
+    expect(renderer).toContain(
+      'portalPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor)',
+    );
+    expect(renderer).toContain(
+      'nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor)',
+    );
   });
 
   it('moves programs.compile to just before world.initial-frame', () => {
@@ -1053,6 +1065,50 @@ describe('remainingPrewarmViewBudget', () => {
   it('normalizes fractional and invalid budgets', () => {
     expect(remainingPrewarmViewBudget(2.9, 1.2)).toBe(1);
     expect(remainingPrewarmViewBudget(-1, 0)).toBe(0);
+  });
+});
+
+describe('the nearby view floor on the shared budget (review should-fix)', () => {
+  // The reported starvation: required and landmark views drain the shared
+  // counter while bypassing the cap, and portals draw before nearby, so with
+  // the 12/16 budgets a landmark-plus-portal-heavy spawn left zero slots for
+  // the nearby entity views, the most actionable entry on the shared cap.
+  it('portals may only draw what remains past the floor', () => {
+    expect(portalPrewarmViewBudget(12, 0, 4)).toBe(8);
+    expect(portalPrewarmViewBudget(12, 5, 4)).toBe(3);
+    expect(portalPrewarmViewBudget(12, 8, 4)).toBe(0);
+    expect(portalPrewarmViewBudget(12, 20, 4)).toBe(0);
+  });
+
+  it('nearby always keeps at least the floor, even with the counter drained', () => {
+    expect(nearbyPrewarmViewBudget(12, 0, 4)).toBe(12);
+    expect(nearbyPrewarmViewBudget(12, 10, 4)).toBe(4);
+    expect(nearbyPrewarmViewBudget(12, 12, 4)).toBe(4);
+    // Required plus landmarks alone past the cap: nearby still gets the floor,
+    // so total entry views are bounded by maxViews plus the floor.
+    expect(nearbyPrewarmViewBudget(12, 20, 4)).toBe(4);
+  });
+
+  it('a zero floor reproduces the plain shared-budget draw (the constrained arm)', () => {
+    expect(portalPrewarmViewBudget(2, 2, 0)).toBe(0);
+    expect(nearbyPrewarmViewBudget(2, 2, 0)).toBe(0);
+    expect(nearbyPrewarmViewBudget(2, 1, 0)).toBe(1);
+  });
+
+  it('normalizes a fractional or negative floor', () => {
+    expect(portalPrewarmViewBudget(12, 0, 4.9)).toBe(8);
+    expect(nearbyPrewarmViewBudget(12, 12, -1)).toBe(0);
+  });
+
+  it('the unconstrained floor never exceeds the smallest tier budget', () => {
+    // resolvePrewarmPolicy clamps by min(floor, baseMaxViews); the constant
+    // itself must sit under the 12-view low tier for the clamp to be a no-op
+    // on both desktop tiers.
+    expect(NEARBY_VIEW_PREWARM_FLOOR).toBeLessThanOrEqual(12);
+    expect(NEARBY_VIEW_PREWARM_FLOOR).toBeGreaterThan(0);
+    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).nearbyViewFloor).toBe(
+      NEARBY_VIEW_PREWARM_FLOOR,
+    );
   });
 });
 
