@@ -44,6 +44,7 @@ import {
 } from '../pvp';
 import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
+import { settleTeleportArrival } from '../teleport_arrival';
 import { type Aura, DT, type Entity, type Vec3 } from '../types';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
 import { bgBackfillSeat, pickBgBackfillGroup } from './battleground_backfill';
@@ -1143,6 +1144,7 @@ function placeInBg(
   e.facing = team === 0 ? 0 : Math.PI; // face the field
   e.prevFacing = e.facing;
   ctx.rebucket(e);
+  settleTeleportArrival(e);
   ctx.readyArenaFighter(e, { clearPrep: true });
   // readyArenaFighter revives but does NOT clear the spirit arm: a fighter
   // seated (or re-seated by the form-up hold) must never stay a ghost.
