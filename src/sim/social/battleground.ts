@@ -684,7 +684,10 @@ function backfillBgMatches(ctx: SimContext): void {
       eligible.push({ index: i, size: g.pids.length, waited: g.waited });
     });
     const pickedAt = pickBgBackfillGroup(eligible.map((c) => ({ size: c.size, waited: c.waited })));
-    if (pickedAt < 0) return; // no eligible solo waiting: no later match can do better
+    // backfillDeclined is scoped to THIS match, so an empty list here only rules
+    // out this match: a later one that never made this offer can still want the
+    // same solo.
+    if (pickedAt < 0) continue;
     const index = eligible[pickedAt].index;
     const [group] = ctx.bgQueue.splice(index, 1);
     // ASK, never seat. The seat is a teleport into a live rated 5v5 that also

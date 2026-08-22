@@ -3638,6 +3638,73 @@ describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
     expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
   });
 
+  it('keeps sweeping past a match a solo declined, so a second short match still gets offered them', () => {
+    // Review catch: an empty eligible list was read as proof no LATER match
+    // could do better either, which only holds for the four match-independent
+    // filters. backfillDeclined is scoped to the one match that made the offer,
+    // so a solo who turned down match A's seat blanked match A's list on every
+    // following tick, and that used to abort the whole sweep: match B stayed a
+    // fighter short forever even though the same solo was still fair game for it.
+    const sim = makeWorld();
+    const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
+    const pids: number[] = [];
+    for (let i = 0; i < 20; i++) {
+      const pid = sim.addPlayer(classes[i % 5], `P${i}`);
+      tp(sim, pid, (i % 5) * 2 - 4, -40);
+      must(sim.entities.get(pid), 'entity').level = 20;
+      pids.push(pid);
+    }
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    sim.tick(); // both 5v5 pops land as offers in the same tick
+    acceptAllBgOffers(sim);
+
+    const matches: BgMatch[] = [];
+    const seenMatches = new Set<BgMatch>();
+    for (const m of sim.ctx.bgMatches.values()) {
+      if (seenMatches.has(m)) continue;
+      seenMatches.add(m);
+      matches.push(m);
+    }
+    expect(matches, 'twenty queued solos really seat two concurrent matches').toHaveLength(2);
+    const [matchA, matchB] = matches;
+    toActive(sim, matchA);
+    toActive(sim, matchB);
+
+    // Both matches go a fighter down.
+    bgResolveDesertion(sim.ctx, matchA.teams[0][4]);
+    bgResolveDesertion(sim.ctx, matchB.teams[0][4]);
+    expect(matchA.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+    expect(matchB.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+
+    // The lone queued solo is offered match A's seat first (the older match)...
+    const solo = sim.addPlayer('warrior', 'Solo');
+    tp(sim, solo, 6, -40);
+    must(sim.entities.get(solo), 'entity').level = 20;
+    sim.bgQueueJoin(solo);
+    sim.tick();
+    const firstOffer = must(bgProposalFor(sim.ctx, solo), 'match A offer');
+    expect(firstOffer.backfill?.match, 'match A is offered first').toBe(matchA);
+    bgRespond(sim.ctx, false, solo); // ...and turns it down.
+
+    // The next tick used to stop dead on match A's now-empty eligible list.
+    sim.tick();
+    const secondOffer = must(bgProposalFor(sim.ctx, solo), 'match B offer after the decline');
+    expect(
+      secondOffer.backfill?.match,
+      'the sweep kept going and match B offered the same solo the seat',
+    ).toBe(matchB);
+
+    acceptBackfillOffer(sim, solo);
+    expect(matchB.teams[0], 'match B got its fifth back').toHaveLength(BG_TEAM_SIZE);
+    expect(matchA.teams[0], 'match A never got a second chance at the decliner').toHaveLength(
+      BG_TEAM_SIZE - 1,
+    );
+    expect(
+      sim.ctx.bgProposals.some((p) => p.backfill?.match === matchA),
+      'match A holds no re-offer to the decliner',
+    ).toBe(false);
+  });
+
   // The leaver already pays (bgResolveDesertion charges rating and an L). This
   // is the other half: the four who stayed get their fifth back rather than
   // playing out a rated 4v5, which at BG_TEAM_SIZE 5 is most of a match.
