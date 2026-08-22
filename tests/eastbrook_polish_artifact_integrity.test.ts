@@ -859,13 +859,20 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
 // extraction. The renderer leaf moved; no capture was retaken because both
 // changes are behavior-neutral for the accepted visual evidence.
-// Re-minted for the v0.40 merge-forward: the batch renderer and entity-view
-// evidence repairs combine with PR #3531 shader-memory renderer bytes. No
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
 // capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
+// Re-minted for the v0.40 base merge-forward: the release-batch renderer bytes
+// and the fast-loading-screen-variety renderer/prewarm bytes now seal the same
+// merged tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '7fb676f03e7b94cb825fec333edf7605b71a222902fa8a82357432064f8d663d';
+  '7262d00c1f751f046938e47117f2708481ce7afb711d8bff04b2f431d5378264';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '0275bb240f5ce841ceb2928f9901419d2c77d079ea320021f3d81507af607cba';
+  'd3cbbfc0c21741f9c09e7bee455b5737dcaeec55eca4ecd415798d7d55e2ae0b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1933,22 +1940,19 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the second three patch-hash bump (pnpm-lock.yaml, the count
     // 0 instanced-mesh render-list skip): same order, the composite first, then
     // this seal. No capture was retaken.
-    // Re-minted for the Duskfall gate occluder-fade merge (renderer.ts): same
-    // order, the composite first, then this seal. No capture was retaken.
-    // Re-minted for the PR #3497 merge repair: entity_view_policy_core.ts
-    // moved for the decayed-corpse admission rule plus lifecycle repair, then
-    // this seal followed the swept evidence bytes. No capture was retaken.
-    // Re-minted for the PR #3528 merge repair: renderer.ts and
-    // entity_view_policy_core.ts moved for the heroic Nythraxis wardstone
-    // distance-cull exemption, then this seal followed the swept evidence
-    // bytes. No capture was retaken.
-    // Re-minted for the v0.40 loot repair follow-up: the first-order literal
-    // pins were stale against already-sealed evidence, then this seal followed
-    // the swept evidence bytes. No capture was retaken.
+    // Re-minted for the fast-loading-screen-variety merge with release/v0.40.0
+    // (renderer.ts moved on both sides): same order, the composite first, then
+    // this seal. No capture was retaken.
+    // Re-minted for the review-fix round (prewarm_policy.ts and renderer.ts
+    // moved): same order, the composite first, then this seal. No capture
+    // was retaken.
+    // Re-minted for the v0.40 base merge-forward (renderer.ts and
+    // prewarm_policy.ts moved): same order, the composite first, then this
+    // seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('d4bd5678862e2bf7a94478b79d7dfe56ebbad562116644eff3f119bcfd562ea2');
+    ).toBe('0a325b513638ab72d24ed83d127162acea22cf8332256ebea94e8673d6f22d26');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
