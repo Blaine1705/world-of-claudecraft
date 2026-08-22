@@ -111,7 +111,10 @@ describe('static file streams on client abort', () => {
       // `closed` pins the descriptor actually being released: `destroyed`
       // alone would stay true even under a future { autoClose: false }.
       expect(await until(() => packStream()?.stream.destroyed === true, 3000)).toBe(true);
-      expect(packStream()?.stream.closed).toBe(true);
+      // closed flips on the close event after the fd is actually released,
+      // strictly later than destroyed: poll it too or a loaded CI worker can
+      // read inside the gap (measured ~1-4% under drifted observation).
+      expect(await until(() => packStream()?.stream.closed === true, 3000)).toBe(true);
     } finally {
       await close(server);
     }
