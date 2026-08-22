@@ -9,8 +9,8 @@
     "applyTaunt pet auto-taunt arm (~8110)",
     "applyTaunt pet manual-taunt arm (petTaunt, ~4885)"
   ],
-  "draws": 1885,
-  "drawDigest": "d0492d35",
+  "draws": 1890,
+  "drawDigest": "f679fd73",
   "frames": [
     {
       "tick": 0,
@@ -244,8 +244,8 @@
       "state": "ce03655c",
       "events": "847f1c18",
       "rng": {
-        "draws": 1691,
-        "digest": "4ab1c4e9"
+        "draws": 1692,
+        "digest": "83d0b4ee"
       }
     },
     {
@@ -255,8 +255,8 @@
       "state": "0c685cb3",
       "events": "da808749",
       "rng": {
-        "draws": 1849,
-        "digest": "2e99426a"
+        "draws": 1853,
+        "digest": "4dfcf0d9"
       }
     },
     {
@@ -266,8 +266,8 @@
       "state": "470eee98",
       "events": "741638a5",
       "rng": {
-        "draws": 1849,
-        "digest": "2e99426a"
+        "draws": 1853,
+        "digest": "4dfcf0d9"
       },
       "label": "pet-taunt",
       "players": [
@@ -527,11 +527,11 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 967,
-      "state": "882df313",
-      "events": "255734a4",
+      "state": "c35f7572",
+      "events": "4f50ed0d",
       "rng": {
-        "draws": 1885,
-        "digest": "d0492d35"
+        "draws": 1890,
+        "digest": "f679fd73"
       },
       "label": "final",
       "players": [
@@ -686,7 +686,7 @@
           "facing": 1.570796,
           "fallStartY": -2,
           "fiveSecondRule": 99,
-          "hp": 333,
+          "hp": 345,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
@@ -726,7 +726,7 @@
         {
           "aggroTargetId": 965,
           "aiState": "attack",
-          "combatTimer": 0.15,
+          "combatTimer": 0.2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -737,7 +737,7 @@
           "forcedTargetId": 965,
           "forcedTargetTimer": 2.8,
           "hostile": true,
-          "hp": 49946,
+          "hp": 49948,
           "id": 966,
           "inCombat": true,
           "kind": "mob",
@@ -778,7 +778,7 @@
             ],
             [
               965,
-              36
+              34
             ]
           ],
           "weapon": {

@@ -1814,13 +1814,21 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [...EASTBROOK_LAYOUT.roads[1].points], // the main street: market square east to the harbor quay
   [
     ...EASTBROOK_LAYOUT.roads[2].points,
-    { x: -24, z: -132 },
-    { x: -12, z: -135 },
-    { x: 12, z: -131 },
+    // Owner report (round 6e): the old beach line (-24,-132)(-12,-135)(12,-131)
+    // dipped under the bay south of town (min height -4.49 vs water -4.3), so
+    // the map painted the meadow road cut by the sea. This arc hugs the dry
+    // sand instead: every sample along it, across a 2.5yd half-width, holds at
+    // least 1.2yd of freeboard over WATER_LEVEL (probed against live terrain).
+    { x: -24, z: -128.5 },
+    { x: -16, z: -130 },
+    { x: -10, z: -126.5 },
+    { x: -4, z: -123.5 },
+    { x: 4, z: -123 },
+    { x: 12, z: -126 },
     { x: 30, z: -30 },
     { x: 50, z: -50 },
     { x: 65, z: -65 },
-  ], // crafts lane, then the coast track southwest to the bandit camp
+  ], // crafts lane, then the coast track along the bay, north to the boar meadow
   [...EASTBROOK_LAYOUT.roads[3].points], // the beach promenade
   [...EASTBROOK_LAYOUT.roads[4].points], // civic link across the squares
   [...EASTBROOK_LAYOUT.roads[5].points, { x: -96, z: -66 }], // the quay walk, joining the flank track (the freed dig ground)
@@ -1915,18 +1923,10 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // Flower plantings along the lamplit streets (owner refinement round 3):
     // walk-through dressing (no r/h), every cluster a hand-checked 2.2yd plus
     // off its street's centerline so nothing sits on the track.
-    { key: 'flowerGlow', x: -17.5, z: -94.5, rot: 0.4, scale: 1.7 },
     { key: 'shrubFlowering', x: -19, z: -95.5, rot: 1.8, scale: 1.0 },
-    { key: 'flowerGlow', x: -18.5, z: -108.5, rot: -0.7, scale: 1.6 },
-    { key: 'flowerGlow', x: 9.4, z: -84.2, rot: 2.1, scale: 1.6 },
     { key: 'shrubFlowering', x: 8.6, z: -82.6, rot: -1.2, scale: 0.95 },
-    { key: 'flowerGlow', x: 2.6, z: -71.2, rot: 0.9, scale: 1.7 },
     { key: 'shrubFlowering', x: -30, z: -96.4, rot: 0.2, scale: 1.05 },
-    { key: 'flowerGlow', x: -34, z: -103.6, rot: -2.4, scale: 1.7 },
-    { key: 'flowerGlow', x: -52, z: -84.4, rot: 1.3, scale: 1.6 },
-    { key: 'flowerGlow', x: -14.6, z: -113, rot: -0.3, scale: 1.6 },
     { key: 'shrubFlowering', x: -7.2, z: -124, rot: 2.7, scale: 0.95 },
-    { key: 'flowerGlow', x: -35.2, z: -94.6, rot: 1.1, scale: 1.5 },
     // fairway buoys marking the channel to the ferry berth
     { key: 'seaBuoy', x: -126, z: -46, rot: 0.4, scale: 3, float: 0.15 },
     { key: 'seaBuoyFlag', x: -124, z: -62, rot: -0.8, scale: 3, float: 0.15 },
@@ -2009,9 +2009,7 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { key: 'shrubFlowering', x: -44.2, z: -107.6, rot: -0.8, scale: 0.95 },
     // Round 6c (owner): blooms where the west road ends in the boar meadow,
     // walk-through like every flower, set off the painted track
-    { key: 'flowerGlow', x: 61, z: -70, rot: 0.7, scale: 1.6 },
     { key: 'shrubFlowering', x: 55, z: -66, rot: -1.2, scale: 0.95 },
-    { key: 'flowerGlow', x: 68, z: -73, rot: 2.1, scale: 1.5 },
     { key: 'shrubFlowering', x: 50, z: -76, rot: 0.3, scale: 0.9 },
     { key: 'kcasBench', x: -86.4, z: -105.2, rot: -2.2, scale: 1.6 },
     { key: 'kcasBench', x: -72.4, z: -111.2, rot: -2.2, scale: 1.6 },

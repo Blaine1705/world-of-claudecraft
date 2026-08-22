@@ -306,7 +306,14 @@ describe('generated chunk geometry is stable', () => {
     // flower drifts whose walk-through props each mint an optional calm
     // pad. Computed twice in separate processes, identical both times. An
     // intended, looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('008311a2fb5e3f3a41139e8d0f1aace4');
+    // Re-minted in round 6e (owner reports): the eleven flowerGlow street and
+    // meadow plantings left the zone (their optional calm pads with them),
+    // Brother Halven's NPC pad followed his delve to the Mirror Lake mouth at
+    // (-136,112), and the road[2] coast track re-arced onto dry sand around
+    // the bay south of town (roads are height appliers). All inside the rect,
+    // east of x = -180. Computed twice in separate processes, identical both
+    // times. An intended, looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('e4d3c0c435e13599cdebf10b44e9a213');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 

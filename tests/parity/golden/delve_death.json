@@ -146,7 +146,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 975,
-      "state": "5a4145ae",
+      "state": "b15f26f6",
       "events": "7e11bbdc",
       "rng": {
         "draws": 1,
@@ -222,7 +222,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 1.625573,
+          "fallStartY": -1.952555,
           "fiveSecondRule": 99,
           "hp": 93,
           "id": 960,
@@ -277,7 +277,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 975,
-      "state": "46c9a853",
+      "state": "db798734",
       "events": "51e2a64e",
       "rng": {
         "draws": 1,
@@ -364,7 +364,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 1.692712,
+          "fallStartY": -1.334391,
           "fiveSecondRule": 99.1,
           "hp": 185,
           "id": 960,
@@ -385,9 +385,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -5,
-            "y": 1.692712,
-            "z": -54.044
+            "x": -136,
+            "y": -1.334391,
+            "z": 109.956
           },
           "potionCooldownUntil": -1,
           "resource": 100,
@@ -420,7 +420,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 975,
-      "state": "46c9a853",
+      "state": "db798734",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -507,7 +507,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 1.692712,
+          "fallStartY": -1.334391,
           "fiveSecondRule": 99.1,
           "hp": 185,
           "id": 960,
@@ -528,9 +528,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -5,
-            "y": 1.692712,
-            "z": -54.044
+            "x": -136,
+            "y": -1.334391,
+            "z": 109.956
           },
           "potionCooldownUntil": -1,
           "resource": 100,
