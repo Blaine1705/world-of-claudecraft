@@ -621,20 +621,17 @@ describe('fire-light adoption sink', () => {
     );
     // retireInteriorGroup must dirty the rank on REMOVAL: the guard is a count,
     // so an add and a remove of equal size would leave the rank stale. The
-    // retire body lives in interior_retirement.ts now, so the rule spans two
-    // halves: the module's prune ANSWERS whether it removed anything and
-    // returns that flag (pruneFireLights, covered behaviourally below), and
-    // the renderer half marks the rank dirty on a true return.
+    // prune now ANSWERS whether it removed anything (pruneFireLights, covered
+    // behaviourally below), so the renderer half is a single guarded statement
+    // instead of a mark buried in a loop whose position a scan could only
+    // approximate.
     const retireStart = renderer.indexOf('private retireInteriorGroup(');
     const retireEnd = renderer.indexOf('private ensureDungeons(', retireStart);
     expect(retireStart).toBeGreaterThan(-1);
     expect(retireEnd).toBeGreaterThan(retireStart);
     expect(renderer.slice(retireStart, retireEnd)).toContain(
-      'if (lightsChanged) this.lightRankDirty = true;',
+      'if (pruneFireLights(this.fireLights, doomed)) this.lightRankDirty = true;',
     );
-    const retirement = sourceOf('../src/render/interior_retirement.ts');
-    expect(retirement).toContain('const lightsChanged = pruneFireLights(host.fireLights, doomed);');
-    expect(retirement).toContain('return lightsChanged;');
   });
 
   it('reports whether a prune actually removed a light', () => {
@@ -716,32 +713,24 @@ describe('fire-light adoption sink', () => {
       );
     }
 
-    // And the raw array escapes the seam exactly twice, each to a subsystem
-    // whose release path SPLICES, which an append-only sink cannot express:
-    // the battleground (buildBgFieldLights hides its own lights) and the
-    // interior-retirement host (interior_retirement.ts prunes via
-    // pruneFireLights, the audited helper pinned above). Every other
-    // subsystem takes `fireLightAdopter.sink`. The budget pass reads the
-    // registry too, so its own method is excluded rather than counted.
+    // And the raw array escapes the seam exactly once, to the battleground:
+    // buildBgFieldLights hides its own lights and its release path SPLICES,
+    // which an append-only sink cannot express. Every other subsystem takes
+    // `fireLightAdopter.sink`. The budget pass reads the registry too, so its
+    // own method is excluded rather than counted.
     // Whitespace-tolerant on both halves: a Biome reflow that wraps the
     // property or moves the call's closing brace must not turn this red, since
     // no seam was crossed. Only a genuinely NEW handoff should.
     const budget = budgetFireLightsBody(renderer);
     const outsideBudget = renderer.replace(budget, '');
     const handoffs = [...outsideBudget.matchAll(/fireLights:\s*this\.fireLights\b/g)];
-    expect(handoffs).toHaveLength(2);
+    expect(handoffs).toHaveLength(1);
     const bgStart = outsideBudget.search(/const view =\s*buildBattleground\(/);
     const bgEnd = outsideBudget.indexOf('this.scene.add(view.group);', bgStart);
     expect(bgStart).toBeGreaterThan(-1);
     expect(bgEnd).toBeGreaterThan(bgStart);
-    const retireStart2 = outsideBudget.indexOf('private retireInteriorGroup(');
-    const retireEnd2 = outsideBudget.indexOf('private ensureDungeons(', retireStart2);
-    expect(retireStart2).toBeGreaterThan(-1);
-    const inRange = (index: number, start: number, end: number): boolean =>
-      index > start && index < end;
-    const sites = handoffs.map((h) => h.index as number);
-    expect(sites.some((i) => inRange(i, bgStart, bgEnd))).toBe(true);
-    expect(sites.some((i) => inRange(i, retireStart2, retireEnd2))).toBe(true);
+    expect(handoffs[0].index).toBeGreaterThan(bgStart);
+    expect(handoffs[0].index).toBeLessThan(bgEnd);
   });
 
   it('gives the jail gate light to the budget with its authored intensity', () => {
