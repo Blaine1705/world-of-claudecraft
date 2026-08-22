@@ -268,8 +268,12 @@ interface AttributionTargetFixture {
 // Re-minted for the review-fix round (the nearby-view floor in
 // prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
 // both runtime leaves moved. No capture was retaken.
+// Re-minted for the rift long-session perf merge with release/v0.40.0:
+// renderer.ts moved on both sides (this branch's material disposal and
+// retry-gate wiring, the release's loading-screen-variety work). No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e922918ac730f196234a3d450f04845affc5d5986804dff6135fe36efe94b4d2';
+  '0ae18f49a7e84da560792fa91765e96a4ea4731fb11f28524f9e1b2f3e15cdc7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
