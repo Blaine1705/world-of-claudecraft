@@ -112,6 +112,29 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
     expect(foe.autoAttack).toBe(false);
   });
 
+  it("Smokestep clears a hostile player's selection when it points at the rogue's pet", () => {
+    const { sim, rogue, foe, rogueId } = duelRig();
+    summonPet(internals(sim).ctx, rogue, DEMON_TEMPLATE);
+    const pet = sim.petOf(rogue.id)!;
+    teleport(sim, pet, 2, 0);
+    foe.targetId = pet.id;
+    foe.autoAttack = true;
+    foe.queuedOnSwing = 'heroic_strike';
+    foe.queuedOnSwingFree = true;
+    foe.queuedOnSwingCostMultiplier = 0.5;
+    rogue.inCombat = true;
+    rogue.gcdRemaining = 0;
+    rogue.resource = rogue.maxResource;
+
+    sim.castAbility('vanish', rogueId);
+
+    expect(foe.targetId).toBeNull();
+    expect(foe.autoAttack).toBe(false);
+    expect(foe.queuedOnSwing).toBeNull();
+    expect(foe.queuedOnSwingFree).toBeUndefined();
+    expect(foe.queuedOnSwingCostMultiplier).toBeUndefined();
+  });
+
   it('a hostile mob drops its hate-table entry and taunt lock', () => {
     const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);

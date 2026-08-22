@@ -1175,6 +1175,27 @@ describe('Input mouse-click focus guard (issue: clicked HUD buttons hijack Space
     expect(blur).toHaveBeenCalledTimes(1);
   });
 
+  it('parks mouse-click focus on an enclosing dialog root instead of blurring to the body', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const focus = vi.fn();
+    const root = {
+      focus,
+      hasAttribute: (name: string) => name === 'tabindex',
+    };
+    const button = {
+      tagName: 'BUTTON',
+      blur,
+      closest: (selector: string) => (selector === '[role="dialog"]' ? root : null),
+    };
+    (globalThis as any).document.activeElement = button;
+
+    windowListeners.get('click')!({ type: 'click', detail: 1 });
+
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(blur).not.toHaveBeenCalled();
+  });
+
   it('leaves a button focused and activated via keyboard (Tab then Enter/Space) alone', () => {
     const { windowListeners } = makeInput();
     const blur = vi.fn();

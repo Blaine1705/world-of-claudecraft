@@ -78,7 +78,12 @@ export function clearHostileTargetingOnStealth(
       continue;
     }
     if (entity.kind !== 'player' || entity.id === hidden.id) continue;
-    if (entity.targetId !== hidden.id || !ctx.isHostileTo(hidden, entity)) continue;
+    if (
+      entity.targetId === null ||
+      !focusIds.includes(entity.targetId) ||
+      !ctx.isHostileTo(hidden, entity)
+    )
+      continue;
     entity.targetId = null;
     entity.autoAttack = false;
     entity.queuedOnSwing = null;

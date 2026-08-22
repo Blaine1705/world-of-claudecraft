@@ -1367,9 +1367,32 @@ export class Input {
     const active = document.activeElement as {
       tagName?: string;
       getAttribute?: (name: string) => string | null;
+      closest?: (selector: string) => unknown;
+      focus?: (options?: { preventScroll?: boolean }) => void;
+      hasAttribute?: (name: string) => boolean;
       blur?: () => void;
     } | null;
-    if (active && this.isMouseActivatableFocusTarget(active)) active.blur?.();
+    if (active && this.isMouseActivatableFocusTarget(active)) this.dropMouseActivatedFocus(active);
+  }
+
+  private dropMouseActivatedFocus(active: {
+    closest?: (selector: string) => unknown;
+    focus?: (options?: { preventScroll?: boolean }) => void;
+    hasAttribute?: (name: string) => boolean;
+    blur?: () => void;
+  }): void {
+    const root = active.closest?.('[role="dialog"]') as
+      | {
+          focus?: (options?: { preventScroll?: boolean }) => void;
+          hasAttribute?: (name: string) => boolean;
+        }
+      | null
+      | undefined;
+    if (root && root !== active && root.hasAttribute?.('tabindex') && root.focus) {
+      root.focus({ preventScroll: true });
+      return;
+    }
+    active.blur?.();
   }
 
   // Same discriminator dialog_key_activation.ts already uses for the
