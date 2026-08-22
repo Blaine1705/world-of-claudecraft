@@ -24,6 +24,8 @@ export interface EntryDetailHorizonInput {
   compileReady: boolean;
   terrainReadyFar: number;
   frameMs: number;
+  /** The renderer governor identified display pacing rather than render load. */
+  externallyPaced?: boolean;
 }
 
 const targetAt = (step: number, targetFar: number): number =>
@@ -50,7 +52,7 @@ export function advanceEntryDetailHorizon(
     input.compileReady &&
     input.terrainReadyFar >= nextCap &&
     Number.isFinite(input.frameMs) &&
-    input.frameMs <= ENTRY_DETAIL_HORIZON_HEADROOM_MS;
+    (input.externallyPaced || input.frameMs <= ENTRY_DETAIL_HORIZON_HEADROOM_MS);
   const stableFrames = healthy ? state.stableFrames + 1 : 0;
   if (stableFrames < ENTRY_DETAIL_HORIZON_STABLE_FRAMES) {
     return { ...state, stableFrames };

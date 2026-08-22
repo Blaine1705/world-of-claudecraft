@@ -128,8 +128,8 @@ describe('reveal gate wiring (source pins)', () => {
       'this.propsRevealGate = createRevealGate(revealHost, (key) => this.propsView.revealRoots(key));',
     );
     expect(wiring).toContain('this.propsView.setRevealGate(this.propsRevealGate);');
-    // The band arm of the props gate arms at WORLD ENTRY (the tail of the
-    // boot prewarm), never in the constructor: armed under the curtain, the
+    // The band arm of the props gate installs at the start of EVERY scene
+    // prewarm, never in the constructor: armed under the curtain, the
     // bands beyond half the fog would queue their compiles beside the
     // manifest's near-first units for content the initial frame links
     // anyway. The negative scans the WHOLE constructor, bounded on its
@@ -144,12 +144,24 @@ describe('reveal gate wiring (source pins)', () => {
     // bucket past half the fog would queue a compile beside the manifest's
     // near-first units for content the initial frame links anyway.
     expect(constructorBody).not.toContain('this.foliage.setRevealGate');
+    const prewarm = rendererSource.slice(
+      anchor(rendererSource, 'async prewarmInitialScene('),
+      anchor(rendererSource, 'const policy: PrewarmPolicy = resolvePrewarmPolicy'),
+    );
+    expect(prewarm).toContain('this.installSceneryRevealGates();');
+    expect(prewarm).toContain('this.initialGpuWorkStart = null;');
+    const install = rendererSource.slice(
+      anchor(rendererSource, 'private installSceneryRevealGates(): void {'),
+      anchor(rendererSource, 'armEntryDetailHorizon(): void {'),
+    );
+    expect(install).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
+    expect(install).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
     const entryArm = rendererSource.slice(
       anchor(rendererSource, 'armEntryDetailHorizon(): void {'),
       anchor(rendererSource, 'setHitchLogEnabled(enabled: boolean)'),
     );
-    expect(entryArm).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
-    expect(entryArm).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
+    expect(entryArm).not.toContain('setBandRevealGate');
+    expect(entryArm).not.toContain('this.foliage.setRevealGate');
     expect(wiring).toContain('this.eastbrookTownView.setRevealGate(');
     expect(wiring).toContain('this.fenbridgeTownView.setRevealGate(');
     // The foliage buckets ride the SAME host and the same queue: one more
@@ -161,6 +173,32 @@ describe('reveal gate wiring (source pins)', () => {
     expect(
       rendererSource.match(/const revealHost = createRevealCompileHost\(/g) ?? [],
     ).toHaveLength(1);
+  });
+
+  it('covers graphics rebuild prewarm and bounds the entry-only first-paint barrier', () => {
+    const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const rebuild = main.slice(
+      anchor(main, 'prewarmRenderer: async (next) => {'),
+      anchor(main, 'validateRenderer: (next) => {'),
+    );
+    expect(rebuild).toContain('await next.prewarmInitialScene();');
+
+    const entry = main.slice(
+      anchor(main, 'const initialPrewarmResumeStartGate = createInitialPrewarmResumeStartGate();'),
+      anchor(main, "entryDiagnostics.checkpoint('first-paint');"),
+    );
+    expect(entry).toContain('resumeAfterFirstPaint: initialPrewarmResumeStartGate.wait,');
+    expect(entry.indexOf('initialPrewarmResumeStartGate.armBackstop();')).toBeLessThan(
+      entry.indexOf('await nextPaint();'),
+    );
+  });
+
+  it("lets the detail horizon inherit the governor's observed external display pacing", () => {
+    const demandAt = anchor(rendererSource, 'const detailHorizonDemandFar =');
+    const vistaAt = rendererSource.indexOf('if (vista) {', demandAt);
+    expect(vistaAt).toBeGreaterThan(demandAt);
+    const ambience = rendererSource.slice(demandAt, vistaAt);
+    expect(ambience).toContain('this.renderBudgetState.externalFrameCap,');
   });
 
   it('props threads the gate into the per-frame far-cell and band updates', () => {

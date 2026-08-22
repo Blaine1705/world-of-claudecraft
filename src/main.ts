@@ -294,7 +294,7 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
-import { initialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate_core';
+import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -4986,6 +4986,7 @@ async function startGame(
   }
   setLoadingPercent(90, t('loading.enteringWorld'));
   loadPhaseStart('prewarm-initial');
+  const initialPrewarmResumeStartGate = createInitialPrewarmResumeStartGate();
   renderer.armEntryDetailHorizon();
   try {
     const prewarm = await renderer.prewarmInitialScene({
@@ -5019,6 +5020,7 @@ async function startGame(
     // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
   }
+  initialPrewarmResumeStartGate.armBackstop();
   loadPhaseEnd('prewarm-initial');
   // Paperdoll and portrait preview prewarms start after reveal as paced background
   // GPU units. Measured on the reference desktop, awaiting the paperdoll,
@@ -5038,8 +5040,8 @@ async function startGame(
       console.warn('Character preview shell prewarm failed', err);
     }
   }
-  // The mob-body stream, the far-vista settle, and the background preload lane
-  // no longer hold the curtain either. The mob-body stream starts at the
+  // The mob-body stream and far-vista settle no longer hold the curtain either.
+  // The mob-body stream starts at the
   // first-paint checkpoint below (on iOS these are the actionable creature
   // bodies, and the entry allocation spike has cleared by first paint), while
   // runPostEntryWarmups (revealWorld below) starts the other two fail-soft once

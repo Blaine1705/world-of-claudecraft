@@ -116,11 +116,6 @@ export const battlegroundAssetPrewarm = createBattlegroundAssetPrewarm(
   },
 );
 
-/** Full-readiness compatibility seam used by an actual match-entry gate. */
-export function ensureBattlegroundAssets(): Promise<void> {
-  return battlegroundAssetPrewarm.commit();
-}
-
 /** The renderer-owned hooks the field plugs into (the yumi signature shape). */
 export interface BattlegroundLightHooks {
   lowGfx: boolean;
@@ -332,6 +327,8 @@ export function buildBattleground(
   // (the paint texture array, one GLB per asset group), and the renderer's
   // build call is synchronous. Everything lands in the same group, so a player
   // who arrives mid-stream sees the field fill in rather than nothing at all.
+  // Queue intent normally commits the prewarm first; reconnecting directly
+  // into an active match deliberately takes this fail-soft streaming path.
   void (async () => {
     try {
       const { bgFieldHeightLocal } = await import('../sim/battleground_field');

@@ -121,4 +121,30 @@ describe('entry detail horizon admission', () => {
       ],
     });
   });
+
+  it('does not inspect compile lifecycle records after the entry horizon is inactive', () => {
+    const admission = new EntryDetailHorizonAdmission(700);
+    const records = new Proxy([] as never[], {
+      get() {
+        throw new Error('inactive horizon scanned compile records');
+      },
+    });
+
+    expect(admission.advanceFromFrame(true, 700, records, 700, 16)).toBe(700);
+    expect(admission.snapshot().holdReason).toBe('inactive');
+  });
+
+  it('accepts a healthy externally paced 30 Hz display as frame headroom', () => {
+    let state = createEntryDetailHorizonState(700);
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_STABLE_FRAMES; i++) {
+      state = advanceEntryDetailHorizon(state, {
+        targetFar: 700,
+        compileReady: true,
+        terrainReadyFar: 700,
+        frameMs: 1000 / 30,
+        externallyPaced: true,
+      });
+    }
+    expect(state.cap).toBe(ENTRY_DETAIL_HORIZON_STEPS[1]);
+  });
 });

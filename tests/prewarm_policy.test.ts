@@ -180,20 +180,21 @@ describe('initial entry detail admission wiring', () => {
     expect(mark).not.toContain('entryDetailHorizon.');
   });
 
-  it('installs the scenery reveal gates when the entry horizon arms, before settle-state', () => {
+  it('installs the scenery reveal gates for every scene prewarm, before settle-state', () => {
     const renderer = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
     ).replace(/\r\n/g, '\n');
-    const armAt = renderer.indexOf('armEntryDetailHorizon(): void {');
-    const armEnd = renderer.indexOf('\n  /**', armAt);
-    const arm = renderer.slice(armAt, armEnd);
+    const installAt = renderer.indexOf('private installSceneryRevealGates(): void {');
+    const prewarmAt = renderer.indexOf('async prewarmInitialScene(');
+    const policyAt = renderer.indexOf('const policy: PrewarmPolicy', prewarmAt);
+    const prewarmStart = renderer.slice(prewarmAt, policyAt);
     const settleAt = renderer.indexOf("id: 'world.settle-state'");
 
-    expect(armAt).toBeGreaterThan(-1);
-    expect(settleAt).toBeGreaterThan(armAt);
-    expect(arm).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
-    expect(arm).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
+    expect(installAt).toBeGreaterThan(-1);
+    expect(prewarmAt).toBeGreaterThan(installAt);
+    expect(settleAt).toBeGreaterThan(prewarmAt);
+    expect(prewarmStart).toContain('this.installSceneryRevealGates();');
     expect(renderer.slice(settleAt)).not.toContain(
       'this.propsView.setBandRevealGate(this.propsRevealGate);',
     );

@@ -4422,10 +4422,14 @@ export class Renderer {
   }
 
   /** Contract the entry-only detail field while the loading cover still owns presentation. */
-  armEntryDetailHorizon(): void {
-    this.detailFogFar = this.entryDetailHorizon.arm(this.detailFogFar, this.farVista.enabled);
+  private installSceneryRevealGates(): void {
     this.propsView.setBandRevealGate(this.propsRevealGate);
     this.foliage.setRevealGate(this.foliageRevealGate);
+  }
+
+  /** Contract the entry-only detail field while the loading cover still owns presentation. */
+  armEntryDetailHorizon(): void {
+    this.detailFogFar = this.entryDetailHorizon.arm(this.detailFogFar, this.farVista.enabled);
   }
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
@@ -5665,6 +5669,10 @@ export class Renderer {
     } = {},
   ): Promise<RendererPrewarmStats> {
     this.initialGpuWorkStart = options.resumeAfterFirstPaint ?? null;
+    void this.initialGpuWorkStart?.then(() => {
+      this.initialGpuWorkStart = null;
+    });
+    this.installSceneryRevealGates();
     const policy: PrewarmPolicy = resolvePrewarmPolicy({
       constrainedMemory: GFX.constrainedMemory,
       asyncCompileSupported: this.asyncCompileSupported,
@@ -9880,9 +9888,16 @@ export class Renderer {
       const requestedFar = vista ? FOGLESS_DETAIL_FAR : preset.far * (this.lowGfx ? 1 : g.farScale);
       this.lastRequestedFogFar = requestedFar;
       this.lastRequestedFogNear = preset.near;
+      // Residency is read per CHUNK, through the terrain view's own accessor.
+      // Asking per ZONE meant an unprepared 36-to-54 chunk rectangle within
+      // ~53 yd pinned the view at the floor until that entire rectangle (and
+      // its HDRI) finished: 198 s of 45-yard wall after a Drakelands portal.
+      // Read live rather than cached: an editor rebuildTerrain swaps the view.
       const ground = this.terrainView.groundResidency();
-      // Directional rather than radial, so orbiting the camera does not let an
-      // off-screen pending chunk collapse visible scenery.
+      // Ask the clamp only about ground the camera can see. Radially, the
+      // binding chunk orbits with the third-person boom, so standing still and
+      // turning on the spot dragged the detail horizon between 170 and 700
+      // yards and deleted mid-field scenery and shadows with it.
       this.camera.getWorldDirection(this.residencyForward);
       this.residencyCone.forwardX = this.residencyForward.x;
       this.residencyCone.forwardZ = this.residencyForward.z;
@@ -9904,9 +9919,14 @@ export class Renderer {
         this.gpuHitchCompileLifecycle?.records ?? null,
         residencyFar,
         Math.max(0, dt * 1000),
+        this.renderBudgetState.externalFrameCap,
       );
       if (vista) {
-        // Settle fog behind the curtain; detail expands separately by readiness.
+        // Entry settle (one-shot, armed by farVistaReady behind the opaque
+        // curtain): start scene fog AT the horizon haze band instead of
+        // easing it out over the first seconds on screen. The detail horizon
+        // remains separately admission-governed below; coarse terrain stands
+        // beneath it, so no fog wall or hole is visible while it expands.
         if (settleVistaEntry) {
           const entryHaze = horizonHazePlan(this.farVista.envelopeFar);
           fog.far = entryHaze.far;

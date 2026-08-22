@@ -271,8 +271,11 @@ interface AttributionTargetFixture {
 // Re-minted after merging release/v0.40.0 into the loading-hitch branch:
 // renderer.ts combines mandatory entry admission with the release's rift
 // long-session resource lifecycle changes. No capture was retaken.
+// Re-minted for the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission, and restored rationale): the
+// renderer integration leaf moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '91ee03f71f9d4e30b10129f56b18e2ff887b7774e5d6d22dd5fafa4f79bd126b';
+  '9c27fa70eb3c517d53238235c4d7baeb3f539fd68c6dfa3e2e1165129140e556';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

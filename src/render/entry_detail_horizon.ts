@@ -17,6 +17,7 @@ export interface EntryDetailHorizonSample {
   compileReady: boolean;
   terrainReadyFar: number;
   frameMs: number;
+  externallyPaced?: boolean;
 }
 
 export type EntryDetailHorizonHoldReason =
@@ -79,13 +80,21 @@ export class EntryDetailHorizonAdmission {
     records: readonly InitialFrameCompileRecord[] | null,
     terrainReadyFar: number,
     frameMs: number,
+    externallyPaced = false,
   ): number {
+    // Entry completion is permanent. Avoid walking the retained diagnostics
+    // lifecycle or allocating a LinkDebt/sample on every later outdoor frame.
+    if (!enabled || !this.active) {
+      this.demand = targetFar;
+      return this.demand;
+    }
     return this.advance({
       enabled,
       targetFar,
       compileReady: records === null || initialFrameDeferral(records) === null,
       terrainReadyFar,
       frameMs,
+      externallyPaced,
     });
   }
 
@@ -109,7 +118,10 @@ export class EntryDetailHorizonAdmission {
   private reasonFor(sample: EntryDetailHorizonSample): EntryDetailHorizonHoldReason {
     if (!sample.compileReady) return 'compile-debt';
     if (sample.terrainReadyFar < this.nextCap(sample.targetFar)) return 'terrain';
-    if (!Number.isFinite(sample.frameMs) || sample.frameMs > ENTRY_DETAIL_HORIZON_HEADROOM_MS) {
+    if (
+      !sample.externallyPaced &&
+      (!Number.isFinite(sample.frameMs) || sample.frameMs > ENTRY_DETAIL_HORIZON_HEADROOM_MS)
+    ) {
       return 'frame';
     }
     return 'stabilizing';

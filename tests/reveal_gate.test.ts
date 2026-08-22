@@ -6,6 +6,10 @@ import {
   setGpuPrepClockForTest,
 } from '../src/render/gpu_prep_events';
 import {
+  createPrewarmResumeStartGate,
+  PREWARM_RESUME_START_BACKSTOP_MS,
+} from '../src/render/prewarm_resume_start_gate_core';
+import {
   createRevealGate,
   REVEAL_GATE_WATCHDOG_MS,
   REVEAL_SOFT_DEADLINE_MIN_MS,
@@ -199,6 +203,33 @@ describe('reveal gate driver', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     state.fireAt(REVEAL_GATE_WATCHDOG_MS);
     expect(gpuPrepEventsSnapshot().events[0].ageMs).toBe(REVEAL_GATE_WATCHDOG_MS);
+  });
+
+  it('still reveals when the initial-paint owner never releases its bounded barrier', async () => {
+    const start = fakeSchedule();
+    const reveal = fakeSchedule();
+    const compile = vi.fn(() => new Promise(() => undefined));
+    const startGate = createPrewarmResumeStartGate({
+      timeoutMs: PREWARM_RESUME_START_BACKSTOP_MS,
+      schedule: start.schedule,
+    });
+    const gate = createRevealGate(
+      {
+        compile,
+        schedule: reveal.schedule,
+        startAfterInitialPaint: () => startGate.wait,
+      },
+      () => [{}],
+    );
+
+    expect(gate.allow('cull:stuck-entry')).toBe(false);
+    expect(compile).not.toHaveBeenCalled();
+    start.state.fireAt(PREWARM_RESUME_START_BACKSTOP_MS);
+    await flushMicrotasks();
+    expect(compile).toHaveBeenCalledOnce();
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    reveal.state.fireAt(REVEAL_GATE_WATCHDOG_MS);
+    expect(gate.allow('cull:stuck-entry')).toBe(true);
   });
 
   it('the watchdog reveal lands in the GPU-preparation ring, not only the console', () => {
