@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "es_ES": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "fr_FR": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "fr_CA": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "de_DE": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "nl_NL": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "pl_PL": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "id_ID": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "tr_TR": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "sv_SE": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "vi_VN": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ],
+  "da_DK": [
+    "hudChrome.steam.wishlist",
+    "hudChrome.steam.wishlistAria",
+    "hudChrome.steam.wishlistShort"
+  ]
 };

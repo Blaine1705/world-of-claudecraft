@@ -2926,7 +2926,10 @@ export const sv_SE: EnTranslations = {
       "unlink": "Koppla bort Steam",
       "linked": "Länkat till Steam-kontot {id}",
       "benefits": "Länka ditt Steam-konto från skrivbordsappen så speglas bedrifterna du fullbordar som Steam-prestationer.",
-      "noTicket": "Steam lämnade ingen länkbiljett. Starta Steam och försök igen."
+      "noTicket": "Steam lämnade ingen länkbiljett. Starta Steam och försök igen.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

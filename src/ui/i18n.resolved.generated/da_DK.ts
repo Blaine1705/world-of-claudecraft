@@ -2926,7 +2926,10 @@ export const da_DK: EnTranslations = {
       "unlink": "Fjern Steam-tilknytning",
       "linked": "Tilknyttet Steam-kontoen {id}",
       "benefits": "Tilknyt din Steam-konto fra skrivebordsappen for at spejle de bedrifter, du opnår, som Steam-præstationer.",
-      "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen."
+      "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

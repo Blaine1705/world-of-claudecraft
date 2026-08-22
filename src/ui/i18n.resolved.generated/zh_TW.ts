@@ -2926,7 +2926,10 @@ export const zh_TW: EnTranslations = {
       "unlink": "取消連結 Steam",
       "linked": "已連結 Steam 帳號 {id}",
       "benefits": "在桌面應用程式中連結你的 Steam 帳號，將你獲得的功績同步為 Steam 成就。",
-      "noTicket": "Steam 未提供連結憑證。請先啟動 Steam，然後重試。"
+      "noTicket": "Steam 未提供連結憑證。請先啟動 Steam，然後重試。",
+      "wishlist": "在 Steam 上加入願望清單",
+      "wishlistAria": "在 Steam 上加入願望清單：開啟 World of ClaudeCraft 商店頁面",
+      "wishlistShort": "加入願望清單"
     },
     "epic": {
       "title": "Epic",

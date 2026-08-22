@@ -2926,7 +2926,10 @@ export const vi_VN: EnTranslations = {
       "unlink": "Hủy Liên Kết Steam",
       "linked": "Đã liên kết với tài khoản Steam {id}",
       "benefits": "Hãy liên kết tài khoản Steam từ ứng dụng máy tính để các kỳ công bạn lập được đồng bộ thành thành tựu Steam.",
-      "noTicket": "Steam không cung cấp vé liên kết. Hãy khởi động Steam rồi thử lại."
+      "noTicket": "Steam không cung cấp vé liên kết. Hãy khởi động Steam rồi thử lại.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

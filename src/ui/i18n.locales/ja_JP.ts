@@ -9791,6 +9791,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。',
   'hudChrome.steam.noTicket':
     'Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。',
+  'hudChrome.steam.wishlist': 'Steam でウィッシュリストに追加',
+  'hudChrome.steam.wishlistAria': 'Steam でウィッシュリストに追加: World of ClaudeCraft のストアページを開く',
+  'hudChrome.steam.wishlistShort': 'ウィッシュリスト',
   'hudChrome.epic.link': 'Epicと連携',
   'hudChrome.epic.unlink': 'Epic連携を解除',
   'hudChrome.epic.linked': 'Epicアカウント {id} と連携済み',

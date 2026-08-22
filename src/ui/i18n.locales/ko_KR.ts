@@ -9766,6 +9766,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.',
   'hudChrome.steam.noTicket':
     'Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요.',
+  'hudChrome.steam.wishlist': 'Steam에서 위시리스트에 추가',
+  'hudChrome.steam.wishlistAria': 'Steam에서 위시리스트에 추가: World of ClaudeCraft 상점 페이지 열기',
+  'hudChrome.steam.wishlistShort': '위시리스트',
   'hudChrome.epic.link': 'Epic 연동',
   'hudChrome.epic.unlink': 'Epic 연동 해제',
   'hudChrome.epic.linked': 'Epic 계정 {id}에 연동됨',

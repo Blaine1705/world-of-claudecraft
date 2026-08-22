@@ -2926,7 +2926,10 @@ export const ja_JP: EnTranslations = {
       "unlink": "Steam連携を解除",
       "linked": "Steamアカウント {id} と連携済み",
       "benefits": "デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。",
-      "noTicket": "Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。"
+      "noTicket": "Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。",
+      "wishlist": "Steam でウィッシュリストに追加",
+      "wishlistAria": "Steam でウィッシュリストに追加: World of ClaudeCraft のストアページを開く",
+      "wishlistShort": "ウィッシュリスト"
     },
     "epic": {
       "title": "Epic",
