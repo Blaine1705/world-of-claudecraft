@@ -8,14 +8,14 @@
     "casting lifecycle (C4a)",
     "effect dispatch + spell damage (C4b/C1)"
   ],
-  "draws": 798,
-  "drawDigest": "743f161d",
+  "draws": 797,
+  "drawDigest": "cfd3edb6",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "be7c350e",
+      "state": "63d6bb3b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -93,7 +93,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 54,
           "id": 994,
@@ -107,17 +107,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -141,7 +141,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1000,
-      "state": "58ede271",
+      "state": "f5398aa9",
       "events": "cde12e22",
       "rng": {
         "draws": 2,
@@ -152,7 +152,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1000,
-      "state": "9add0e08",
+      "state": "88a8775c",
       "events": "93b43192",
       "rng": {
         "draws": 2,
@@ -163,7 +163,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1000,
-      "state": "d3f12bd8",
+      "state": "8f71ebec",
       "events": "a3c3c83c",
       "rng": {
         "draws": 136,
@@ -174,7 +174,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1000,
-      "state": "aa398dd0",
+      "state": "c44efb70",
       "events": "69b35b96",
       "rng": {
         "draws": 304,
@@ -185,7 +185,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1000,
-      "state": "838095f9",
+      "state": "ce2c5831",
       "events": "30d173ba",
       "rng": {
         "draws": 507,
@@ -196,7 +196,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1000,
-      "state": "a2e019fa",
+      "state": "10be3b76",
       "events": "b42a06f7",
       "rng": {
         "draws": 714,
@@ -207,11 +207,11 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 1000,
-      "state": "4056f7f3",
+      "state": "da8012df",
       "events": "741638a5",
       "rng": {
-        "draws": 798,
-        "digest": "743f161d"
+        "draws": 797,
+        "digest": "cfd3edb6"
       },
       "label": "final",
       "players": [
@@ -334,9 +334,9 @@
           "resource": 816,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 26,
           "stats": {

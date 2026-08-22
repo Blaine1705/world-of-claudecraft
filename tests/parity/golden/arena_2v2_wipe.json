@@ -8,8 +8,8 @@
     "first kill does not end the match; team wipe (isArenaTeamWiped) does",
     "endArenaMatch ranked Elo on both teams (arena2v2 standings) + returnFromArena"
   ],
-  "draws": 1997,
-  "drawDigest": "aa98492e",
+  "draws": 2014,
+  "drawDigest": "734644c6",
   "frames": [
     {
       "tick": 0,
@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1002,
-      "state": "38f24b1b",
+      "state": "0bda874b",
       "events": "c2885fdb",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1002,
-      "state": "402cfb3c",
+      "state": "7ac99c64",
       "events": "09d1db15",
       "rng": {
         "draws": 94,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1002,
-      "state": "eeed70ea",
+      "state": "9ceb06f2",
       "events": "556cc9b7",
       "rng": {
         "draws": 290,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1002,
-      "state": "564e3deb",
+      "state": "0944c80b",
       "events": "033a46fd",
       "rng": {
         "draws": 514,
@@ -73,7 +73,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1002,
-      "state": "bcedd572",
+      "state": "65d24642",
       "events": "8ed87acb",
       "rng": {
         "draws": 526,
@@ -433,9 +433,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -481,9 +481,9 @@
           "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 34,
           "stats": {
@@ -538,9 +538,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -588,9 +588,9 @@
           "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 26,
           "stats": {
@@ -614,7 +614,7 @@
       "tick": 102,
       "time": 5.1,
       "nextId": 1002,
-      "state": "b0c2c6f2",
+      "state": "1d0adbf2",
       "events": "ce126c29",
       "rng": {
         "draws": 533,
@@ -984,9 +984,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1032,9 +1032,9 @@
           "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 34,
           "stats": {
@@ -1089,9 +1089,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -1139,9 +1139,9 @@
           "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 26,
           "stats": {
@@ -1165,7 +1165,7 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 1002,
-      "state": "0996e90a",
+      "state": "75ca7842",
       "events": "9da7e506",
       "rng": {
         "draws": 541,
@@ -1607,9 +1607,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1655,9 +1655,9 @@
           "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 34,
           "stats": {
@@ -1712,9 +1712,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -1762,9 +1762,9 @@
           "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 26,
           "stats": {
@@ -1788,7 +1788,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1002,
-      "state": "d56460ae",
+      "state": "3f983626",
       "events": "741638a5",
       "rng": {
         "draws": 758,
@@ -1799,7 +1799,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1002,
-      "state": "d1833d3e",
+      "state": "86511a0a",
       "events": "741638a5",
       "rng": {
         "draws": 1028,
@@ -1810,7 +1810,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 1002,
-      "state": "74ebbc13",
+      "state": "65f4600b",
       "events": "741638a5",
       "rng": {
         "draws": 1336,
@@ -1821,33 +1821,33 @@
       "tick": 200,
       "time": 10,
       "nextId": 1002,
-      "state": "072f07b7",
+      "state": "c7700c53",
       "events": "741638a5",
       "rng": {
-        "draws": 1663,
-        "digest": "3711dccd"
+        "draws": 1671,
+        "digest": "f2f8faad"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 1002,
-      "state": "697bd350",
+      "state": "f3d9585a",
       "events": "a1baf867",
       "rng": {
-        "draws": 1856,
-        "digest": "49435848"
+        "draws": 1867,
+        "digest": "4108db04"
       }
     },
     {
       "tick": 243,
       "time": 12.15,
       "nextId": 1002,
-      "state": "0fac55d5",
+      "state": "7b70b383",
       "events": "741638a5",
       "rng": {
-        "draws": 1997,
-        "digest": "aa98492e"
+        "draws": 2014,
+        "digest": "734644c6"
       },
       "label": "returned",
       "players": [
@@ -1879,9 +1879,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -1976,9 +1973,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -2079,9 +2073,6 @@
               "baked_bread",
               "footpad_jerkin",
               "rusty_dagger"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -2180,9 +2171,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -2277,7 +2265,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 4.00947,
+          "fallStartY": 3.080808,
           "fiveSecondRule": 111.15,
           "hp": 632,
           "id": 998,
@@ -2292,15 +2280,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 4.00947,
+            "y": 3.080808,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2326,7 +2314,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 5.258106,
+          "fallStartY": 3.062652,
           "fiveSecondRule": 111.15,
           "hp": 308,
           "id": 999,
@@ -2341,16 +2329,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 3,
-            "y": 5.258106,
+            "y": 3.062652,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 34,
           "stats": {
@@ -2377,7 +2365,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0835,
           "dualWielding": true,
-          "fallStartY": 5.810025,
+          "fallStartY": 3.167589,
           "fiveSecondRule": 111.15,
           "hp": 385,
           "id": 1000,
@@ -2399,16 +2387,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 6,
-            "y": 5.810025,
+            "y": 3.167589,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -2435,7 +2423,7 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fallStartY": 3.716074,
+          "fallStartY": 4.017742,
           "fiveSecondRule": 111.15,
           "hp": 282,
           "id": 1001,
@@ -2450,16 +2438,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 9,
-            "y": 3.716074,
+            "y": 4.017742,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 26,
           "stats": {
@@ -2483,11 +2471,11 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 1002,
-      "state": "0fac55d5",
+      "state": "7b70b383",
       "events": "741638a5",
       "rng": {
-        "draws": 1997,
-        "digest": "aa98492e"
+        "draws": 2014,
+        "digest": "734644c6"
       },
       "label": "final",
       "players": [
@@ -2519,9 +2507,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -2616,9 +2601,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -2719,9 +2701,6 @@
               "baked_bread",
               "footpad_jerkin",
               "rusty_dagger"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -2820,9 +2799,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -2917,7 +2893,7 @@
           "critChance": 0.067,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
-          "fallStartY": 4.00947,
+          "fallStartY": 3.080808,
           "fiveSecondRule": 111.15,
           "hp": 632,
           "id": 998,
@@ -2932,15 +2908,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 4.00947,
+            "y": 3.080808,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2966,7 +2942,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 5.258106,
+          "fallStartY": 3.062652,
           "fiveSecondRule": 111.15,
           "hp": 308,
           "id": 999,
@@ -2981,16 +2957,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 3,
-            "y": 5.258106,
+            "y": 3.062652,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 34,
           "stats": {
@@ -3017,7 +2993,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0835,
           "dualWielding": true,
-          "fallStartY": 5.810025,
+          "fallStartY": 3.167589,
           "fiveSecondRule": 111.15,
           "hp": 385,
           "id": 1000,
@@ -3039,16 +3015,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 6,
-            "y": 5.810025,
+            "y": 3.167589,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -3075,7 +3051,7 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fallStartY": 3.716074,
+          "fallStartY": 4.017742,
           "fiveSecondRule": 111.15,
           "hp": 282,
           "id": 1001,
@@ -3090,16 +3066,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 9,
-            "y": 3.716074,
+            "y": 4.017742,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 959,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 26,
           "stats": {

@@ -10,14 +10,14 @@
     "updatePet melee arm: close + auto-taunt + mobSwing (PET_COMBAT_LINGER owner inCombat)",
     "petFollow heel transition (pets return to a moved owner)"
   ],
-  "draws": 1436,
-  "drawDigest": "1e15a018",
+  "draws": 1435,
+  "drawDigest": "737b0656",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "b7932198",
+      "state": "6554aea1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -90,7 +90,7 @@
           "critChance": 0.0625,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 69,
           "id": 994,
@@ -104,18 +104,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 50,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 7,
           "stats": {
@@ -139,7 +139,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1003,
-      "state": "16cda63b",
+      "state": "988e413b",
       "events": "c2384e94",
       "rng": {
         "draws": 15,
@@ -150,7 +150,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1003,
-      "state": "ed7b020e",
+      "state": "80fa24ce",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -161,7 +161,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1003,
-      "state": "8e377c42",
+      "state": "bfba3d12",
       "events": "a7f4d6fb",
       "rng": {
         "draws": 189,
@@ -172,7 +172,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1003,
-      "state": "94ede86c",
+      "state": "71185dcc",
       "events": "741638a5",
       "rng": {
         "draws": 359,
@@ -183,7 +183,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1003,
-      "state": "b90dd482",
+      "state": "ff1652f2",
       "events": "ba09b188",
       "rng": {
         "draws": 552,
@@ -194,7 +194,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1003,
-      "state": "4328ab47",
+      "state": "47742267",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -205,7 +205,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1003,
-      "state": "06733e86",
+      "state": "db070bb2",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -323,9 +323,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -566,7 +566,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1003,
-      "state": "ebad02bc",
+      "state": "36b6b724",
       "events": "741638a5",
       "rng": {
         "draws": 963,
@@ -577,7 +577,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1003,
-      "state": "81ea8185",
+      "state": "d70dd3ad",
       "events": "741638a5",
       "rng": {
         "draws": 1185,
@@ -588,22 +588,22 @@
       "tick": 180,
       "time": 9,
       "nextId": 1003,
-      "state": "9562ee10",
+      "state": "306ad668",
       "events": "741638a5",
       "rng": {
-        "draws": 1436,
-        "digest": "1e15a018"
+        "draws": 1435,
+        "digest": "737b0656"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1003,
-      "state": "9562ee10",
+      "state": "306ad668",
       "events": "741638a5",
       "rng": {
-        "draws": 1436,
-        "digest": "1e15a018"
+        "draws": 1435,
+        "digest": "737b0656"
       },
       "label": "final",
       "players": [
@@ -716,9 +716,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {

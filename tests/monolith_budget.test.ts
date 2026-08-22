@@ -150,7 +150,9 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/sim.ts',
     // Re-pinned to the eastbrook-plus-tutorial integration merge output:
     // both parents' additions combine, so keep the exact merged count.
-    ceiling: 12457,
+    // Re-pinned for the local tutorial-tweaks merge (the staged first death and
+    // the ability drill hook into the coordinator); exact merged count.
+    ceiling: 12463,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

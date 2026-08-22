@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1014,
-      "state": "a019b04a",
+      "state": "feb8e31a",
       "events": "d2893db6",
       "rng": {
         "draws": 39,
@@ -215,9 +215,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -264,9 +264,9 @@
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -912,7 +912,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1014,
-      "state": "245d94da",
+      "state": "2f4b80da",
       "events": "f0222241",
       "rng": {
         "draws": 42,
@@ -1099,9 +1099,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1148,9 +1148,9 @@
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -1796,7 +1796,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1014,
-      "state": "ace6f559",
+      "state": "ca94cdcd",
       "events": "27c297f3",
       "rng": {
         "draws": 42,
@@ -1807,7 +1807,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1014,
-      "state": "a48656bb",
+      "state": "97c6027f",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1818,7 +1818,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1014,
-      "state": "3878e099",
+      "state": "33475f8d",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1829,7 +1829,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1014,
-      "state": "1384dfa9",
+      "state": "9a5e7fd5",
       "events": "cd57c7b0",
       "rng": {
         "draws": 44,
@@ -1840,7 +1840,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 1014,
-      "state": "25fe8971",
+      "state": "c759464d",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -2039,9 +2039,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2089,9 +2089,9 @@
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -2115,7 +2115,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 1014,
-      "state": "25fe8971",
+      "state": "c759464d",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -2314,9 +2314,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2364,9 +2364,9 @@
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {

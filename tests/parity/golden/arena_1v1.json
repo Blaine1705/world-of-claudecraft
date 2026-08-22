@@ -8,8 +8,8 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 982,
-  "drawDigest": "9ce472c2",
+  "draws": 959,
+  "drawDigest": "ee9c4e43",
   "frames": [
     {
       "tick": 0,
@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1000,
-      "state": "becd3016",
+      "state": "4a2958a2",
       "events": "b2d538b6",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1000,
-      "state": "26e0af4f",
+      "state": "340743a7",
       "events": "6db907de",
       "rng": {
         "draws": 70,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1000,
-      "state": "e2373df7",
+      "state": "6bc6fac3",
       "events": "bac9a702",
       "rng": {
         "draws": 292,
@@ -62,33 +62,33 @@
       "tick": 100,
       "time": 5,
       "nextId": 1000,
-      "state": "8141e7a4",
+      "state": "5c540b20",
       "events": "c65626fa",
       "rng": {
-        "draws": 529,
-        "digest": "e710594e"
+        "draws": 530,
+        "digest": "1cb4e884"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
       "nextId": 1000,
-      "state": "37882851",
+      "state": "2334c66d",
       "events": "164c017f",
       "rng": {
-        "draws": 787,
-        "digest": "22f85826"
+        "draws": 781,
+        "digest": "bba8277e"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
       "nextId": 1000,
-      "state": "da260492",
+      "state": "3099570a",
       "events": "741638a5",
       "rng": {
-        "draws": 982,
-        "digest": "9ce472c2"
+        "draws": 959,
+        "digest": "ee9c4e43"
       },
       "label": "final",
       "players": [
@@ -332,9 +332,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -381,9 +381,9 @@
           "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 34,
           "stats": {

@@ -9,8 +9,8 @@
     "augment wave: fiestaPickOffers + arenaAugmentPick (fiestaAugments on meta + augmentOffer/Chosen events)",
     "multi-player meta"
   ],
-  "draws": 1176,
-  "drawDigest": "1ab1c3cb",
+  "draws": 1175,
+  "drawDigest": "a357421c",
   "frames": [
     {
       "tick": 0,
@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1002,
-      "state": "934dad25",
+      "state": "fad49369",
       "events": "0eccbde3",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1002,
-      "state": "7ceb45d0",
+      "state": "f57d861c",
       "events": "09d1db15",
       "rng": {
         "draws": 66,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1002,
-      "state": "1999ea0c",
+      "state": "fc6cfbf8",
       "events": "556cc9b7",
       "rng": {
         "draws": 247,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1002,
-      "state": "ce2f9f15",
+      "state": "7c01e9c9",
       "events": "033a46fd",
       "rng": {
         "draws": 485,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1002,
-      "state": "83be525e",
+      "state": "6afcf4fa",
       "events": "19e44103",
       "rng": {
         "draws": 755,
@@ -85,22 +85,22 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1002,
-      "state": "b625722d",
+      "state": "904fef61",
       "events": "741638a5",
       "rng": {
-        "draws": 1038,
-        "digest": "bee5a5dc"
+        "draws": 1040,
+        "digest": "07193096"
       }
     },
     {
       "tick": 163,
       "time": 8.15,
       "nextId": 1002,
-      "state": "6b52bb94",
+      "state": "c226b600",
       "events": "6ca92b72",
       "rng": {
-        "draws": 1176,
-        "digest": "1ab1c3cb"
+        "draws": 1175,
+        "digest": "a357421c"
       },
       "label": "final",
       "players": [
@@ -438,9 +438,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -486,9 +486,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -543,9 +543,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -594,9 +594,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {

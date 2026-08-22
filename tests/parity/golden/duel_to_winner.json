@@ -29,7 +29,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1000,
-      "state": "a0cd7a19",
+      "state": "529a50dd",
       "events": "10f26bf0",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1000,
-      "state": "ec1ae24a",
+      "state": "062f99b6",
       "events": "fd44c0a2",
       "rng": {
         "draws": 0,
@@ -51,7 +51,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1000,
-      "state": "97656207",
+      "state": "bcc1519f",
       "events": "8e6b0b70",
       "rng": {
         "draws": 137,
@@ -62,7 +62,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 1000,
-      "state": "ae04a14a",
+      "state": "580641cc",
       "events": "bb2083a5",
       "rng": {
         "draws": 152,
@@ -96,9 +96,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "delveClears": {},
@@ -156,9 +153,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "delveClears": {},
@@ -216,7 +210,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 0.449488,
+          "fallStartY": 2.499205,
           "fiveSecondRule": 102.05,
           "hp": 100,
           "id": 998,
@@ -231,15 +225,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 0.449488,
+            "y": 2.499205,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -265,7 +259,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.3323,
+          "fallStartY": 1.962233,
           "fiveSecondRule": 102.05,
           "hp": 54,
           "id": 999,
@@ -280,16 +274,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 4,
-            "y": 0.3323,
+            "y": 1.962233,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -313,7 +307,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 1000,
-      "state": "2085b595",
+      "state": "c72f8a47",
       "events": "3d1e2bd1",
       "rng": {
         "draws": 152,
@@ -350,9 +344,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "delveClears": {},
@@ -412,9 +403,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "delveClears": {},
@@ -472,7 +460,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 0.449488,
+          "fallStartY": 2.499205,
           "fiveSecondRule": 102.05,
           "hp": 100,
           "id": 998,
@@ -487,15 +475,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 0.449488,
+            "y": 2.499205,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -521,7 +509,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.3323,
+          "fallStartY": 1.962233,
           "fiveSecondRule": 102.05,
           "hp": 1,
           "id": 999,
@@ -536,16 +524,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 4,
-            "y": 0.3323,
+            "y": 1.962233,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -569,7 +557,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1000,
-      "state": "86e820a0",
+      "state": "753f75d6",
       "events": "50f1f91b",
       "rng": {
         "draws": 305,
@@ -580,7 +568,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1000,
-      "state": "6f0f0d33",
+      "state": "5ead1215",
       "events": "741638a5",
       "rng": {
         "draws": 520,
@@ -591,7 +579,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1000,
-      "state": "905da150",
+      "state": "a8153458",
       "events": "741638a5",
       "rng": {
         "draws": 527,
@@ -628,9 +616,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -697,9 +682,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -764,7 +746,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 0.449488,
+          "fallStartY": 2.499205,
           "fiveSecondRule": 104.05,
           "hp": 100,
           "id": 998,
@@ -779,15 +761,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 0.449488,
+            "y": 2.499205,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -813,7 +795,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.3323,
+          "fallStartY": 1.962233,
           "fiveSecondRule": 104.05,
           "hp": 7,
           "id": 999,
@@ -828,16 +810,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 4,
-            "y": 0.3323,
+            "y": 1.962233,
             "z": -40
           },
           "potionCooldownUntil": -1,
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
