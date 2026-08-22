@@ -316,7 +316,11 @@ import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
-import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
+import {
+  isInertInstanceCorpse,
+  resetEvadingMob as resetEvadingMobFn,
+  updateMob as updateMobFn,
+} from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { findNearbyAllies } from './mob/nearby_allies';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
@@ -6395,14 +6399,25 @@ export class Sim {
   private shouldSkipIdleMobTick(mob: Entity): boolean {
     const radius = this.cfg.idleMobTickRadius ?? 0;
     if (radius <= 0) return false;
-    if (
-      mob.dead ||
+    if (mob.dead) {
+      // Instance corpse fields (a cleared rift floor's packs) never decay or
+      // respawn, so once every dead-branch effect is provably spent the corpse
+      // stops paying updateMob. Radius-gated like the live cull: the radius is
+      // the interest-drop radius, so a skipped corpse is outside every
+      // player's replicated view EXCEPT a viewer's own target (targets get
+      // NPC_DROP_RADIUS, slightly wider); that is safe today because the only
+      // frozen fields are two timers nothing serializes, and any change to
+      // that must re-check this exception. Dead mobs draw no rng, so the skip
+      // cannot shift the shared draw order.
+      if (!isInertInstanceCorpse(mob)) return false;
+    } else if (
       mob.ownerId !== null ||
       mob.aiState !== 'idle' ||
       mob.inCombat ||
       mob.auras.length > 0
-    )
+    ) {
       return false;
+    }
     if (this.players.size === 0) return true;
     return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
@@ -6974,11 +6989,19 @@ export class Sim {
   }
 
   private hasLineOfSight(source: Entity, target: Entity): boolean {
-    const run =
-      this.delveRunForMob(source.id) ??
-      this.delveRunForMob(target.id) ??
-      this.delveRunForPlayer(source.id) ??
-      this.delveRunForPlayer(target.id);
+    // The delve-run lookup is O(active runs x mobs per run) and allocates a
+    // party key per call, and this method sits on every ranged auto-attack,
+    // AoE pulse, and LOS-gated cast. Only a sight line with an endpoint
+    // inside the delve band can ever consume run.modules (lineOfSightClear's
+    // delve arm keys off from.x), so every other combat sight check skips
+    // all four lookups. Mirrors the movement path's isDelvePos guard.
+    const inDelve = isDelvePos(source.pos.x) || isDelvePos(target.pos.x);
+    const run = inDelve
+      ? (this.delveRunForMob(source.id) ??
+        this.delveRunForMob(target.id) ??
+        this.delveRunForPlayer(source.id) ??
+        this.delveRunForPlayer(target.id))
+      : undefined;
     return lineOfSightClear(
       this.cfg.seed,
       source.pos,

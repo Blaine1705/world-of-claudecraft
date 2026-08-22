@@ -852,14 +852,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the review-fix round (the nearby-view floor in
 // prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
 // both runtime leaves moved. No capture was retaken.
-// Re-minted for the loading-hitch delivery (renderer.ts and
-// view_priority_policy.ts): both runtime leaves moved. No capture was retaken.
-// Re-minted for the mandatory entry-landmark compile admission fix
-// (renderer.ts): the runtime renderer leaf moved. No capture was retaken.
+// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
+// renderer.ts combines mandatory entry admission with the release's rift
+// long-session resource lifecycle changes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e0ebb762e229dfb5a5cd14101a76d8d80e21943418a9f4b0eac64b63218ef97d';
+  '30713e58fa1f89aa8eebfddebf4aa3b3af6f624df48ec14c0031b62335bf3499';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3b8f9248e922ef465e840d8c7b5a90155ce867ddf08bf6f45844d610936ffff9';
+  '91ee03f71f9d4e30b10129f56b18e2ff887b7774e5d6d22dd5fafa4f79bd126b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1933,12 +1932,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the review-fix round (prewarm_policy.ts and renderer.ts
     // moved): same order, the composite first, then this seal. No capture
     // was retaken.
-    // Re-minted for the mandatory entry-landmark compile admission fix
-    // (renderer.ts): same order. No capture was retaken.
+    // Re-minted after merging release/v0.40.0 into the loading-hitch branch
+    // (renderer.ts moved on both sides): same order, the composite first,
+    // then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('8ab10a7f38754a8ad0c0accd9f91391832398e947b1e5237140c8128bec9f333');
+    ).toBe('9be496d1c75f8dc09f514a9480f8c6675810f50623b0881fb23e36dadc1075a6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
