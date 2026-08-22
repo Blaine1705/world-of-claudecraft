@@ -294,6 +294,7 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
+import { initialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate_core';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -4988,6 +4989,7 @@ async function startGame(
   renderer.armEntryDetailHorizon();
   try {
     const prewarm = await renderer.prewarmInitialScene({
+      resumeAfterFirstPaint: initialPrewarmResumeStartGate.wait,
       onEntryStart: (id, category) =>
         entryDiagnostics.checkpoint('prewarm-start', {
           ...renderEntryDiagnostics(),
@@ -5031,7 +5033,7 @@ async function startGame(
   // context and retains the documented lazy first-open path.
   if (!GFX.tightMemory) {
     try {
-      hud.prewarmCharPreviewShell();
+      loadSpan('char-preview-shell', () => hud.prewarmCharPreviewShell());
     } catch (err) {
       console.warn('Character preview shell prewarm failed', err);
     }
@@ -5058,6 +5060,7 @@ async function startGame(
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
       entryDiagnostics.checkpoint('first-paint');
+      initialPrewarmResumeStartGate.release();
       loadPhaseEnd('first-frame-wait');
       // Kick the deferred creature-body fetches now, before the settle cover and
       // the curtain fade: until a creature GLB arrives its view, nameplate, and

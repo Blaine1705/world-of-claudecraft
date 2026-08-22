@@ -174,6 +174,33 @@ describe('reveal gate driver', () => {
     expect(warns).toHaveBeenCalledOnce();
   });
 
+  it('starts reveal work and its watchdog clock only after the initial paint gate', async () => {
+    const start = deferred();
+    const compile = vi.fn(() => new Promise(() => undefined));
+    const { state, schedule } = fakeSchedule();
+    let clock = 26_000;
+    setGpuPrepClockForTest(() => clock);
+    const gate = createRevealGate(
+      { compile, schedule, startAfterInitialPaint: () => start.promise as Promise<void> },
+      () => [{}],
+    );
+
+    expect(gate.allow('cull:thornpeak')).toBe(false);
+    expect(compile).not.toHaveBeenCalled();
+    expect(state.armedMs).toEqual([]);
+
+    clock = 35_000;
+    start.resolve();
+    await flushMicrotasks();
+    expect(compile).toHaveBeenCalledOnce();
+    expect(state.armedMs).toEqual([REVEAL_GATE_WATCHDOG_MS]);
+
+    clock = 45_000;
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    state.fireAt(REVEAL_GATE_WATCHDOG_MS);
+    expect(gpuPrepEventsSnapshot().events[0].ageMs).toBe(REVEAL_GATE_WATCHDOG_MS);
+  });
+
   it('the watchdog reveal lands in the GPU-preparation ring, not only the console', () => {
     // A console.warn is not readable from a capture: the watchdog is the one
     // escape that hides a link which never settled, so it must leave a

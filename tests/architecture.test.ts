@@ -516,6 +516,7 @@ const RENDER_PURE_CORES = [
   'src/render/lich_audio_state_core.ts',
   'src/render/needle_of_fate_vfx_core.ts',
   'src/render/prewarm_resume_ledger_core.ts',
+  'src/render/prewarm_resume_start_gate_core.ts',
   'src/render/preview_prewarm_lane.ts',
   'src/render/sentence_vfx_core.ts',
   'src/render/umbral_anchor_vfx_core.ts',

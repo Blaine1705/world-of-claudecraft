@@ -236,6 +236,45 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(compiled).toEqual([torso, eyes, hair]);
   });
 
+  it('holds an ordinary live gate until the initial-paint barrier settles', async () => {
+    const renderer = harness();
+    let release!: () => void;
+    renderer.initialGpuWorkStart = new Promise<void>((resolve) => (release = resolve));
+    renderer.sim = { player: { id: 1, targetId: null }, entities: new Map() };
+    const runPieces = vi.fn(() => Promise.resolve({ failed: false, timedOut: false }));
+    renderer.liveCompileGates = { runPieces };
+    renderer.compilePrewarmColorPrograms = vi.fn(() => Promise.resolve());
+    renderer.compileShadowPrograms = vi.fn(() => Promise.resolve());
+    renderer.webgl = { properties: { get: () => ({}) } };
+    renderer.uploadGateTexturesGated = vi.fn(() => Promise.resolve(0));
+    renderer.touchLinkedProgramsGated = vi.fn(() => Promise.resolve(0));
+    const target = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+
+    const pending = renderer.compileGate(target);
+    expect(runPieces).not.toHaveBeenCalled();
+    release();
+    await pending;
+    expect(runPieces).toHaveBeenCalledOnce();
+  });
+
+  it('starts a targeted live gate immediately despite the initial-paint barrier', async () => {
+    const renderer = harness();
+    renderer.initialGpuWorkStart = new Promise<void>(() => undefined);
+    renderer.sim = { player: { id: 1, targetId: 7 }, entities: new Map() };
+    const runPieces = vi.fn(() => Promise.resolve({ failed: false, timedOut: false }));
+    renderer.liveCompileGates = { runPieces };
+    renderer.compilePrewarmColorPrograms = vi.fn(() => Promise.resolve());
+    renderer.compileShadowPrograms = vi.fn(() => Promise.resolve());
+    renderer.webgl = { properties: { get: () => ({}) } };
+    renderer.uploadGateTexturesGated = vi.fn(() => Promise.resolve(0));
+    renderer.touchLinkedProgramsGated = vi.fn(() => Promise.resolve(0));
+    const target = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+    target.userData.entityId = 7;
+
+    await renderer.compileGate(target);
+    expect(runPieces).toHaveBeenCalledOnce();
+  });
+
   it('never compiles a live gate at the ambient render target (colour-space cache-key trap)', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const gateStart = source.indexOf('private compileGate(');
@@ -251,6 +290,8 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(node, false)');
     expect(gateMethod).toContain('this.compileShadowPrograms(node)');
     expect(gateMethod).toContain('this.liveCompileGates.runPieces(');
+    expect(gateMethod).toContain('compileMayStartBeforeInitialPaint(priority)');
+    expect(gateMethod).toContain('this.initialGpuWorkStart');
     expect(gateMethod).toContain('linkPieceWork(target, color, shadow, settle),');
     expect(gateMethod).not.toContain('this.liveCompileGates.run(');
     expect(gateMethod).toContain('this.uploadGateTexturesGated(target, priority)');

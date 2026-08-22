@@ -123,6 +123,7 @@ describe('reveal gate wiring (source pins)', () => {
     expect(wiring).toContain(
       'predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),',
     );
+    expect(wiring).toContain('startAfterInitialPaint: () => this.initialGpuWorkStart,');
     expect(wiring).toContain(
       'this.propsRevealGate = createRevealGate(revealHost, (key) => this.propsView.revealRoots(key));',
     );
@@ -143,12 +144,12 @@ describe('reveal gate wiring (source pins)', () => {
     // bucket past half the fog would queue a compile beside the manifest's
     // near-first units for content the initial frame links anyway.
     expect(constructorBody).not.toContain('this.foliage.setRevealGate');
-    const entryTail = rendererSource.slice(
-      anchor(rendererSource, 'this.prewarmedZonePrograms.add(activeZone.id);'),
-      anchor(rendererSource, '[entry-guard] prewarm done:'),
+    const entryArm = rendererSource.slice(
+      anchor(rendererSource, 'armEntryDetailHorizon(): void {'),
+      anchor(rendererSource, 'setHitchLogEnabled(enabled: boolean)'),
     );
-    expect(entryTail).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
-    expect(entryTail).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
+    expect(entryArm).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
+    expect(entryArm).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
     expect(wiring).toContain('this.eastbrookTownView.setRevealGate(');
     expect(wiring).toContain('this.fenbridgeTownView.setRevealGate(');
     // The foliage buckets ride the SAME host and the same queue: one more
@@ -313,14 +314,15 @@ describe('reveal gate wiring (source pins)', () => {
     // the hard deadline (13.8 s instead of stalling after one unit), and the
     // whole manifest behind it (settle-state, textures, the initial frame)
     // times out. Hidden decor is the reveal gates' job, not the sweep's.
-    const sweep = rendererSource.slice(
-      anchor(rendererSource, "id: 'scene',"),
-      anchor(rendererSource, 'compileRootDistanceSq(root, this.sim.player.pos.x'),
+    const compileUnits = read('../src/render/initial_scene_compile_units.ts');
+    const sweep = compileUnits.slice(
+      anchor(compileUnits, "id: 'scene',"),
+      anchor(compileUnits, 'compileRootDistanceSq(root, options.playerX'),
     );
     // The scene unit's collector call, whitespace-agnostic: the visible-only
     // flag is the literal `true` second argument.
     expect(sweep).toMatch(
-      /compileRoots\(\s*this\.scene\.children\.filter\(\(root\) => !stagedRoots\.has\(root\)\),\s*true,\s*\)/,
+      /compileRoots\(\s*options\.scene\.children\.filter\(\(root\) => !stagedRoots\.has\(root\)\),\s*true,\s*\)/,
     );
     // The background (idle) zone prepare compiles the shadow-pass depth
     // variant AFTER the colour one, inside the same queue unit.

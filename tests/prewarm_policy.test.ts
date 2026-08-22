@@ -4,6 +4,7 @@ import {
   BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
   CONSTRAINED_PREWARM_KEEP,
   CONSTRAINED_PREWARM_RESUME,
+  compileGroupRunsBeforeInitialPaint,
   constrainedEntryViewCreateBudget,
   interactionLandmarkViewPriority,
   mandatoryLandmarkViewsReady,
@@ -112,6 +113,7 @@ const MANIFEST_IDS = [
   'foliage.materials',
   'foliage.great-tree-materials',
   'world.settle-state',
+  'post.initial-frame',
   'programs.compile-submit',
   'surface-detail.textures',
   'weather.materials',
@@ -176,6 +178,25 @@ describe('initial entry detail admission wiring', () => {
     const markEnd = renderer.indexOf('\n  /**', markAt);
     const mark = renderer.slice(markAt, markEnd);
     expect(mark).not.toContain('entryDetailHorizon.');
+  });
+
+  it('installs the scenery reveal gates when the entry horizon arms, before settle-state', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const armAt = renderer.indexOf('armEntryDetailHorizon(): void {');
+    const armEnd = renderer.indexOf('\n  /**', armAt);
+    const arm = renderer.slice(armAt, armEnd);
+    const settleAt = renderer.indexOf("id: 'world.settle-state'");
+
+    expect(armAt).toBeGreaterThan(-1);
+    expect(settleAt).toBeGreaterThan(armAt);
+    expect(arm).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
+    expect(arm).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
+    expect(renderer.slice(settleAt)).not.toContain(
+      'this.propsView.setBandRevealGate(this.propsRevealGate);',
+    );
   });
 });
 
@@ -318,6 +339,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // first-draw stalls in live frames.
     expect(prewarmResumeIsDebt('programs.compile')).toBe(true);
     expect(prewarmResumeIsDebt('programs.compile-submit')).toBe(true);
+    expect(prewarmResumeIsDebt('programs.compile-post-paint')).toBe(true);
     expect(prewarmResumeIsDebt('textures.scene')).toBe(true);
     expect(prewarmResumeIsDebt('surface-detail.textures')).toBe(true);
     // The foliage species stream in with travel (ambient scene, not an
@@ -331,6 +353,29 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmResumeIsDebt('vfx.weapon-skins')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.mount-programs')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
+  });
+
+  it('admits only the visible scene compile group before first paint', () => {
+    expect(compileGroupRunsBeforeInitialPaint('scene')).toBe(true);
+    for (const id of [
+      'doors',
+      'interiors',
+      'players',
+      'mobs',
+      'npcs',
+      'objects',
+      'props',
+      'ghost-fade-variants',
+      'character-effect-variants',
+      'ability-materials',
+      'foliage',
+      'great-tree',
+      'weapon-vfx',
+      'landmarks.impact-site',
+      'mounts',
+    ]) {
+      expect(compileGroupRunsBeforeInitialPaint(id), id).toBe(false);
+    }
   });
 
   it('orders resume entries program debt, upload debt, then cosmetic, stable within each class', () => {
@@ -544,9 +589,11 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // Deferred units count into the honesty gate: planned includes them and
     // the dropped count marks the entry partial, never completed.
     expect(compileEntry).toContain(
-      'compileUnitsPlanned = submittedCompileUnits.length + deferredSubmitUnits.length;',
+      'compileUnitsPlanned =\n            submittedCompileUnits.length +\n            deferredSubmitUnits.length +\n            postPaintCompileUnits.length;',
     );
-    expect(compileEntry).toContain('compileUnitsDropped = deferredSubmitUnits.length;');
+    expect(compileEntry).toContain(
+      'compileUnitsDropped = deferredSubmitUnits.length + postPaintCompileUnits.length;',
+    );
     // The await-all is bounded (see the dedicated reserve test below), so the
     // literal Promise.all is no longer the awaited expression directly; it is
     // captured and raced against the reserved deadline.
@@ -846,11 +893,17 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
         '\n',
       ),
     );
+    const compileUnits = codeWithoutLineComments(
+      readFileSync(
+        new URL('../src/render/initial_scene_compile_units.ts', import.meta.url),
+        'utf8',
+      ).replace(/\r\n/g, '\n'),
+    );
     // The dedupe key comes from the shared pure helper, never a hand-rolled
     // string that can drift from three's cache key again.
-    expect(renderer).toContain('prewarmProgramContentKeys(');
-    expect(renderer).toContain('hasInstanceColor: ');
-    expect(renderer).toContain('morphTargetCount: ');
+    expect(compileUnits).toContain('prewarmProgramContentKeys(');
+    expect(compileUnits).toContain('hasInstanceColor: ');
+    expect(compileUnits).toContain('morphTargetCount: ');
     // The prewarm depth material must match the REAL shadow pass variant, and
     // that derivation lives in the shared factory (src/render/prewarm_depth_material.ts),
     // pinned against three's WebGLShadowMap source by its own test. The renderer
@@ -1244,13 +1297,12 @@ describe('archetype and scene-texture progress hooks stay honest (review round 2
   it('reports scene textures in matching units: initialized done against examined planned', () => {
     const entry = block('textures.scene', 'vfx.atlas');
     expect(entry).toContain('deadlineExempt: true');
-    expect(entry).toContain('done: batched.initialized');
-    expect(entry).toContain('planned: batched.planned');
+    expect(entry).toContain('progress: () => sceneTextureAdmission?.progress() ?? null');
     // The regression shape: workDone as a GPU-residency delta an
     // already-resident texture never moves, mismatched against a planned that
     // counts every texture examined. The delta stays in detail(), labeled.
-    expect(entry).not.toContain('done: batched.uploaded');
-    expect(entry).toContain('uploadedDelta=${textureUploads}');
+    expect(entry).not.toContain('done: sceneTextureUploadDelta()');
+    expect(entry).toContain('uploadedDelta=${sceneTextureUploadDelta()}');
   });
 
   it('the portal entry details its own created count beside the labeled cumulative counter', () => {
@@ -1597,47 +1649,27 @@ describe('constrained entry view creation ramp', () => {
     expect(elapsedIncrementAt).toBeGreaterThan(createAt);
   });
 
-  it('uses the bounded texture path for constrained prewarm', () => {
+  it('uses the bounded shared-cursor texture path for constrained prewarm', () => {
     const renderer = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
     ).replace(/\r\n/g, '\n');
+    const admission = readFileSync(
+      new URL('../src/render/initial_scene_texture_admission.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).toContain(
-      `await this.prewarmInitialSceneTexturesBatched(
-            Math.max(1, policy.textureBatchSize),
-            Math.max(0, gpuSubmitDeadline - performance.now()),
-          );`,
+      'collectInitialPresentationTextures(this.scene, this.views, p.id, p.targetId)',
     );
-    const collectionStart = renderer.indexOf('private collectInitialSceneTextures(');
-    const collectionEnd = renderer.indexOf(
-      '\n  private async prewarmInitialSceneTexturesBatched(',
-      collectionStart,
-    );
-    const collectionMethod = renderer.slice(collectionStart, collectionEnd);
-    expect(collectionMethod).toContain('collectObjectTextures(this.scene, true)');
-    expect(collectionMethod).toContain('for (const view of this.views.values())');
-    expect(collectionMethod).toContain('collectObjectTextures(view.group, false, textures)');
-
-    const methodStart = renderer.indexOf('private async prewarmInitialSceneTexturesBatched(');
-    const methodEnd = renderer.indexOf('\n  private renderPrewarmPass(', methodStart);
-    const method = renderer.slice(methodStart, methodEnd);
-    const batchLoopAt = method.indexOf('for (let i = 0;');
-    const deadlineAt = method.indexOf('const deadline = performance.now() + Math.max(0, maxMs)');
-    const deadlineGuardAt = method.indexOf('performance.now() < deadline', batchLoopAt);
-    const batchStepAt = method.indexOf('i += batch', batchLoopAt);
-    const batchEndAt = method.indexOf('Math.min(textures.length, i + batch)', batchLoopAt);
-    const uploadAt = method.indexOf('this.prewarmTexture(textures[j])');
-    const yieldAt = method.indexOf('await sleep(0)');
-    expect(methodStart).toBeGreaterThan(-1);
-    expect(methodEnd).toBeGreaterThan(methodStart);
-    expect(deadlineAt).toBeGreaterThan(-1);
-    expect(batchLoopAt).toBeGreaterThan(-1);
-    expect(deadlineGuardAt).toBeGreaterThan(batchLoopAt);
-    expect(batchStepAt).toBeGreaterThan(deadlineGuardAt);
-    expect(batchEndAt).toBeGreaterThan(batchLoopAt);
-    expect(uploadAt).toBeGreaterThan(batchLoopAt);
-    expect(yieldAt).toBeGreaterThan(uploadAt);
-    expect(method.slice(yieldAt - 100, yieldAt)).toContain('performance.now() < deadline');
+    expect(admission).toContain('collectObjectTextures(scene, true)');
+    expect(admission).toContain('for (const root of priorityRoots)');
+    expect(admission).toContain('collectObjectTextures(root, false, textures)');
+    expect(renderer).toContain('await ensureSceneTextureAdmission().drainBefore(');
+    expect(renderer).toContain('sceneTextureAdmission?.admitOneBefore(deadlineMs);');
+    expect(admission).toContain('while (this.cursor < this.textures.length');
+    expect(admission).toContain('this.now() < deadlineMs');
+    expect(admission).toContain('await this.yieldSlice()');
+    expect(admission).toContain('return this.textures.slice(this.cursor);');
   });
 
   it('settles the capped world before early compile submission and texture collection', () => {

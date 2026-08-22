@@ -273,7 +273,12 @@ const MONOLITHS: MonolithRow[] = [
     // slack: any further growth reds again.
     // Entry-detail admission moved the settle step ahead of compile/texture
     // collection while deleting the old reveal-time arm: exact count, no slack.
-    ceiling: 13564,
+    // Lowered by extracting the initial-scene texture collection and shared
+    // admission cursor into initial_scene_texture_admission.ts.
+    // Lowered again by extracting the compile-root collection, near-first
+    // ordering and program-content dedupe into initial_scene_compile_units.ts.
+    // Exact count after formatting, zero slack.
+    ceiling: 13513,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

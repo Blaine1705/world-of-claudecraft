@@ -193,7 +193,11 @@ import { buildCliffScree, type CliffScreeView } from './cliff_scree';
 import type { CompileGateResult } from './compile_gate';
 import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
 import { linkPieceWork } from './compile_gate_pieces';
-import { castingAtPlayerPredicate, compilePriorityForTarget } from './compile_priority_core';
+import {
+  castingAtPlayerPredicate,
+  compileMayStartBeforeInitialPaint,
+  compilePriorityForTarget,
+} from './compile_priority_core';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import {
@@ -350,7 +354,13 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
-import { initialFrameArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
+import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
+import { buildInitialSceneCompileUnits } from './initial_scene_compile_units';
+import {
+  collectInitialPresentationTextures,
+  InitialSceneTextureAdmission,
+  initialSceneTextureResumeUnits,
+} from './initial_scene_texture_admission';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import {
   applyInteriorLightRig,
@@ -471,6 +481,7 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import { withSceneHiddenForPresentationPrewarm } from './presentation_prewarm';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
   compileRootLabel,
@@ -495,8 +506,8 @@ import {
   withHiddenPrewarmGroups,
 } from './prewarm_pass';
 import {
+  compileGroupRunsBeforeInitialPaint,
   mandatoryLandmarkViewsReady,
-  materialProgramSignature,
   nearbyPrewarmViewBudget,
   orderedPrewarmIds,
   orderPrewarmResumeEntries,
@@ -511,7 +522,6 @@ import {
   prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
-  prewarmProgramContentKeys,
   prewarmResumeIsDebt,
   prewarmSubmitShouldStop,
   resolvePrewarmEntryStatus,
@@ -520,12 +530,10 @@ import {
   withRestoredPrewarmState,
 } from './prewarm_policy';
 import {
-  buildPrewarmCompileUnits,
-  compileRootDistanceSq,
-  orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
   resumeDroppedPrewarmEntries,
+  runPrewarmCompileResumeUnit,
   runPrewarmPiecesSerially,
   settlePrewarmBeforePublish,
   trackPrefetch,
@@ -635,7 +643,7 @@ import {
   type TemporalHourglassVisual,
 } from './temporal_hourglass_visual';
 import { buildTerrain, hasTerrainSplatAssets, type TerrainView } from './terrain';
-import { runTexturePrepLane, texturePieceLabel } from './texture_prep_lane';
+import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { uploadDataTextureInChunks } from './texture_upload';
 import { sparkleTexture } from './textures';
@@ -1951,6 +1959,7 @@ export class Renderer {
     visibleViews: 0,
   };
   private lastPrewarmStats: RendererPrewarmStats | null = null;
+  private initialGpuWorkStart: Promise<void> | null = null;
   private gpuHitchCompileLifecycle: PrewarmCompileLifecycle | null = null;
   private gpuHitchPacing: PrewarmPacingHandle | null = null;
   private readonly renderDiagnostics = new RenderDiagnostics({
@@ -2564,6 +2573,7 @@ export class Renderer {
         upload: (target, priority) => this.uploadGateTexturesGated(target, priority),
         touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),
         predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),
+        startAfterInitialPaint: () => this.initialGpuWorkStart,
       });
       this.propsRevealGate = createRevealGate(revealHost, (key) => this.propsView.revealRoots(key));
       this.propsView.setRevealGate(this.propsRevealGate);
@@ -4413,6 +4423,8 @@ export class Renderer {
   /** Contract the entry-only detail field while the loading cover still owns presentation. */
   armEntryDetailHorizon(): void {
     this.detailFogFar = this.entryDetailHorizon.arm(this.detailFogFar, this.farVista.enabled);
+    this.propsView.setBandRevealGate(this.propsRevealGate);
+    this.foliage.setRevealGate(this.foliageRevealGate);
   }
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
@@ -5495,43 +5507,6 @@ export class Renderer {
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
   private prewarmRenderTarget: THREE.WebGLRenderTarget | null = null;
 
-  private collectInitialSceneTextures(): THREE.Texture[] {
-    const textures = collectObjectTextures(this.scene, true);
-    // Async shader compilation temporarily hides non-self entity groups. Include
-    // those already-created views explicitly so their textures do not all upload
-    // during the first live submit when the compile gate restores visibility.
-    for (const view of this.views.values()) {
-      collectObjectTextures(view.group, false, textures);
-    }
-    return [...textures];
-  }
-
-  private async prewarmInitialSceneTexturesBatched(
-    batchSize: number,
-    maxMs: number,
-  ): Promise<{ uploaded: number; initialized: number; planned: number; trimmed: boolean }> {
-    const before = this.webgl.info.memory.textures;
-    const deadline = performance.now() + Math.max(0, maxMs);
-    const textures = this.collectInitialSceneTextures();
-    const batch = Math.max(1, Math.floor(batchSize));
-    let initialized = 0;
-    for (let i = 0; i < textures.length && performance.now() < deadline; i += batch) {
-      const end = Math.min(textures.length, i + batch);
-      for (let j = i; j < end; j++) this.prewarmTexture(textures[j]);
-      initialized = end;
-      if (end < textures.length && performance.now() < deadline) await sleep(0);
-    }
-    // `initialized` is the progress unit matching `planned` (textures examined);
-    // `uploaded` is a GPU-residency delta an already-resident texture never
-    // moves, kept for the upload diagnostics only.
-    return {
-      uploaded: Math.max(0, this.webgl.info.memory.textures - before),
-      initialized,
-      planned: textures.length,
-      trimmed: initialized < textures.length,
-    };
-  }
-
   // Drop an out-of-band render burst (prewarm pass, screenshot, scene census)
   // from the perf counters. The zeroing runs on EVERY profile so a synchronous
   // perfStats() read right after the burst never serves a stale out-of-band
@@ -5650,6 +5625,17 @@ export class Renderer {
     }
   }
 
+  private renderPresentationPrewarmPass(): boolean {
+    const post = this.post;
+    if (!post) return false;
+    try {
+      withSceneHiddenForPresentationPrewarm(this.scene, () => post.render());
+      return true;
+    } finally {
+      this.discardOutOfBandDraws();
+    }
+  }
+
   private diagnosticsBaselineForPrewarm(): RendererPrewarmDiagnosticsBaselineStats | null {
     if (!this.renderDiagnostics.enabled) return null;
     const snapshot = this.renderDiagnostics.collect();
@@ -5675,9 +5661,11 @@ export class Renderer {
     options: {
       maxMs?: number;
       hardMaxMs?: number;
+      resumeAfterFirstPaint?: Promise<void>;
       onEntryStart?: (id: string, category: RendererPrewarmCategory) => void;
     } = {},
   ): Promise<RendererPrewarmStats> {
+    this.initialGpuWorkStart = options.resumeAfterFirstPaint ?? null;
     const policy: PrewarmPolicy = resolvePrewarmPolicy({
       constrainedMemory: GFX.constrainedMemory,
       asyncCompileSupported: this.asyncCompileSupported,
@@ -5818,10 +5806,27 @@ export class Renderer {
     // counter shared with the required/landmark/portal substeps, so reporting
     // it as this entry's done would exceed the entry's planned candidates.
     let nearbyViewsCreated = 0;
-    let sceneTextureProgress: PrewarmEntryProgress | null = null;
-    // Batched-arm-only count of scene textures actually initialized; null on
-    // the synchronous desktop path, which tracks only the upload delta.
-    let sceneTexturesInitialized: number | null = null;
+    let sceneTextureAdmission: InitialSceneTextureAdmission<THREE.Texture> | null = null;
+    let sceneTextureMemoryBefore: number | null = null;
+    let textureUploads = 0;
+    const sceneTextureUploadDelta = (): number =>
+      Math.max(
+        0,
+        this.webgl.info.memory.textures -
+          (sceneTextureMemoryBefore ?? this.webgl.info.memory.textures),
+      );
+    const ensureSceneTextureAdmission = (): InitialSceneTextureAdmission<THREE.Texture> => {
+      if (!sceneTextureAdmission) {
+        sceneTextureMemoryBefore = this.webgl.info.memory.textures;
+        sceneTextureAdmission = new InitialSceneTextureAdmission(
+          collectInitialPresentationTextures(this.scene, this.views, p.id, p.targetId),
+          (texture) => this.prewarmTexture(texture),
+        );
+      }
+      return sceneTextureAdmission;
+    };
+    const sceneTextureRemainder = (): readonly THREE.Texture[] =>
+      ensureSceneTextureAdmission().remaining();
     let skyWarmedInlineBiomes = 0;
     let skyDeferredBiomes: (typeof initialSkyBiomes)[number][] = [];
     let skyWarmComplete = false;
@@ -5849,7 +5854,6 @@ export class Renderer {
     // detail string below does not overstate what a resumed run actually did
     // (#2571 review).
     let compiledPrewarmRoots = 0;
-    let textureUploads = 0;
     let diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null = null;
 
     type PrewarmManifestEntry = {
@@ -5912,117 +5916,21 @@ export class Renderer {
 
     const compileEntryUnits = (
       includeGroup: (groupId: string) => boolean = () => true,
+      lifecycleLane = 'programs.compile',
     ): PrewarmResumeUnit[] => {
-      // One compileAsync call still has a synchronous traversal prologue and its
-      // linker cannot be cancelled. Material-bearing leaves keep each unit small
-      // enough for the hard-deadline check between units to remain meaningful.
-      const compileRoots = (
-        roots: readonly THREE.Object3D[],
-        visibleOnly: boolean,
-      ): THREE.Object3D[] => {
-        const materialRoots: THREE.Object3D[] = [];
-        const collect = (child: THREE.Object3D): void => {
-          const renderable = child as RenderableDiagnosticObject;
-          if (renderable.material) materialRoots.push(child);
-        };
-        for (const root of roots) {
-          if (visibleOnly) root.traverseVisible(collect);
-          else root.traverse(collect);
-        }
-        return materialRoots;
-      };
-      const stagedGroups = stagedCompileGroupsNow();
-      const stagedRoots = new Set<THREE.Object3D>(
-        stagedGroups.flatMap(([, group]) => (group ? [group] : [])),
-      );
-      const units = buildPrewarmCompileUnits(
-        [
-          ...(includeGroup('scene')
-            ? [
-                {
-                  id: 'scene',
-                  // Near-first: the resume lane drains these in order, and the
-                  // debt the camera can reach first must be the debt paid
-                  // first (hitch-hunt P3a; the S10 632-681 ms submit stalls
-                  // were reveals winning the race against their own compile).
-                  // Anchored on the PLAYER, not the camera: the early submit
-                  // runs before the first updateCamera, when the camera still
-                  // sits at its constructor default.
-                  roots: orderRootsByDistanceSq(
-                    compileRoots(
-                      this.scene.children.filter((root) => !stagedRoots.has(root)),
-                      true,
-                    ),
-                    (root) =>
-                      compileRootDistanceSq(root, this.sim.player.pos.x, this.sim.player.pos.z),
-                  ),
-                },
-              ]
-            : []),
-          ...stagedGroups.flatMap(([id, group]) =>
-            group && includeGroup(id) ? [{ id, roots: compileRoots(group.children, false) }] : [],
-          ),
-        ],
-        async (root) => {
-          await this.compilePrewarmColorPrograms(root, false);
-          await this.compileShadowPrograms(root);
-          compiledPrewarmRoots++;
-        },
-        {
-          // NOT batched into one compileAsync call per unit: an A/B measured
-          // no gain (11.5 s vs 11.9 s on a cold full entry) because the
-          // remaining compile time is the driver's parallel link work for
-          // genuinely new programs, not the per-call prologue walk. The
-          // driver's own shader disk cache makes that first-entry cost
-          // vanish on subsequent sessions.
-          // Program-content keys: two leaves whose materials produce the same
-          // PROGRAM (same defines) and share the shape bits link the same
-          // programs, so the duplicate costs a submission for nothing. The
-          // material half of the key is a program SIGNATURE (type, hook
-          // identity via customProgramCacheKey, map-presence bits, blending
-          // and vertex-color bits), not the uuid: distinct GLB materials by
-          // the hundred share programs, and the uuid key kept 2,725 roots
-          // alive for ~500 unique programs, which made the mass submission
-          // pay ~5,450 compileAsync prologues (~2.3 ms each, measured 12.4 s
-          // behind the curtain). An imperfect signature is fail-soft, not a
-          // freeze: world.initial-frame still runs guaranteed and links any
-          // residue behind the cover.
-          dedupeKeys: (root) => {
-            const mesh = root as THREE.Mesh & {
-              isSkinnedMesh?: boolean;
-              isInstancedMesh?: boolean;
-              isBatchedMesh?: boolean;
-              instanceColor?: unknown;
-            };
-            const material = mesh.material;
-            const materials = Array.isArray(material) ? material : material ? [material] : [];
-            const morphs = mesh.geometry?.morphAttributes;
-            const colorAttribute = mesh.geometry?.attributes?.color as
-              | { itemSize?: number }
-              | undefined;
-            return prewarmProgramContentKeys(
-              {
-                isSkinnedMesh: mesh.isSkinnedMesh === true,
-                isInstancedMesh: mesh.isInstancedMesh === true,
-                hasInstanceColor: mesh.instanceColor != null,
-                isBatchedMesh: mesh.isBatchedMesh === true,
-                hasMorphPositions: morphs?.position !== undefined,
-                morphTargetCount: morphs?.position?.length ?? 0,
-                morphNormalCount: morphs?.normal?.length ?? 0,
-                morphColorCount: morphs?.color?.length ?? 0,
-                hasTangents: mesh.geometry?.attributes?.tangent !== undefined,
-                hasNormals: mesh.geometry?.attributes?.normal !== undefined,
-                vertexColorItemSize: colorAttribute?.itemSize ?? 0,
-                castShadow: mesh.castShadow === true,
-              },
-              materials.map((entry) => materialProgramSignature(entry)),
-            );
-          },
-          sharedDedupe: compileDedupe,
-          batchSize: compileBatchRoots,
-        },
-      );
-      for (const unit of units) compileLifecycle.recordFor(unit, 'programs.compile');
+      const units = buildInitialSceneCompileUnits({
+        scene: this.scene,
+        stagedGroups: stagedCompileGroupsNow(),
+        includeGroup,
+        playerX: this.sim.player.pos.x,
+        playerZ: this.sim.player.pos.z,
+        batchSize: compileBatchRoots,
+        sharedDedupe: compileDedupe,
+        compileColor: (root) => this.compilePrewarmColorPrograms(root, false),
+        compileShadow: (root) => this.compileShadowPrograms(root),
+        onCompiledRoot: () => compiledPrewarmRoots++,
+      });
+      for (const unit of units) compileLifecycle.recordFor(unit, lifecycleLane);
       return units;
     };
 
@@ -6030,10 +5938,9 @@ export class Renderer {
     // sooner a unit is SUBMITTED the more of its link time overlaps the other
     // manifest entries (surface-detail plus textures.scene alone are ~4.5 s of
     // uploads on the reference desktop). 'programs.compile-submit' fires every
-    // early-staged group's units right after those groups exist;
-    // 'programs.compile' submits the remainder (the late-staged weapon-vfx
-    // group, anything that did not exist yet at the early entry, and a
-    // RE-collection of the live scene) and then awaits every submitted unit so
+    // visible-scene units right after they exist; hidden staged catalogs are
+    // classified as post-paint debt and retain their stand-ins. The final
+    // compile entry submits the visible remainder and then awaits it so
     // all of their programs are READY before world.initial-frame renders; a
     // program not ready by then links synchronously inside that frame, the
     // measured first-draw stall class. Which groups each call collects is the
@@ -6049,7 +5956,9 @@ export class Renderer {
     // and the post-manifest hand-off pushes any leftover to the resume lane
     // (never dropped, hitch-hunt P1).
     const deferredSubmitUnits: PrewarmResumeUnit[] = [];
+    const postPaintCompileUnits: PrewarmResumeUnit[] = [];
     let initialFrameDeferred: LinkDebt | null = null;
+    let budgetVariantsDeferred: LinkDebt | null = null;
     const LATE_COMPILE_GROUPS = new Set(['weapon-vfx']);
     const RECOLLECT_COMPILE_GROUPS = new Set(['scene']);
     const submitCompileUnits = async (
@@ -6067,8 +5976,20 @@ export class Renderer {
         recollect: RECOLLECT_COMPILE_GROUPS,
         includeLate,
       });
-      const collect = new Set(plan.collect);
-      const units = compileEntryUnits((groupId) => collect.has(groupId));
+      const collect = new Set(
+        plan.collect.filter(
+          (groupId) =>
+            !options.resumeAfterFirstPaint || compileGroupRunsBeforeInitialPaint(groupId),
+        ),
+      );
+      const delayed = new Set(plan.collect.filter((groupId) => !collect.has(groupId)));
+      const units = compileEntryUnits((groupId) => collect.has(groupId), lane);
+      const delayedUnits = compileEntryUnits(
+        (groupId) => delayed.has(groupId),
+        'programs.compile-post-paint',
+      );
+      postPaintCompileUnits.push(...delayedUnits);
+      deferPoolPublication ||= delayedUnits.length > 0;
       for (const groupId of plan.mark) submittedCompileGroups.add(groupId);
       // Earlier-deferred units resubmit ahead of the fresh collection; their
       // groups are already marked, so the plan above never re-collected them.
@@ -6095,7 +6016,10 @@ export class Renderer {
                 console.warn(`Renderer async prewarm compile failed: ${unit.id}`, err),
             }),
           ),
-        yieldSlice: () => new Promise<void>((resolve) => setTimeout(resolve, 0)),
+        yieldSlice: async () => {
+          sceneTextureAdmission?.admitOneBefore(deadlineMs);
+          await sleep(0);
+        },
       });
       if (deferred.length === 0) return;
       deferredSubmitUnits.push(...(deferred as PrewarmResumeUnit[]));
@@ -6302,14 +6226,8 @@ export class Renderer {
         },
       }));
 
-    const textureResumeUnits = (
-      idPrefix: string,
-      textures: readonly THREE.Texture[],
-    ): PrewarmResumeUnit[] =>
-      [...new Set(textures)].map((texture) => ({
-        id: texturePieceLabel(`upload:${idPrefix}`, texture),
-        run: () => this.prewarmTexture(texture),
-      }));
+    const textureResumeUnits = (idPrefix: string, textures: readonly THREE.Texture[]) =>
+      initialSceneTextureResumeUnits(idPrefix, textures, (texture) => this.prewarmTexture(texture));
 
     const weatherSlot = createPrewarmGroupSlot(variantSlotHost, 'weather.materials', {
       stage: () => this.weather.beginPrewarm(),
@@ -6630,7 +6548,24 @@ export class Renderer {
         deadlineExempt: true,
         run: () => {
           this.prewarmWorldFrame(1 / 60);
+          ensureSceneTextureAdmission();
         },
+      },
+      {
+        // Warm only the composer's fullscreen presentation path. The scene
+        // root is hidden for this pass, so catalog/texture debt cannot turn it
+        // into the same multi-second whole-world submit as the first frame.
+        id: 'post.initial-frame',
+        category: 'post',
+        priority: 45,
+        required: true,
+        // This is the presentation-owned half of world.initial-frame. It is
+        // independent from hidden catalog debt and never submits scene roots.
+        deadlineExempt: true,
+        run: () => {
+          if (this.renderPresentationPrewarmPass()) renderPasses++;
+        },
+        detail: () => (this.post ? 'composer-only' : 'direct-renderer'),
       },
       {
         // Early compile submission (see submitCompileUnits above): every
@@ -6649,9 +6584,8 @@ export class Renderer {
           await submitCompileUnits(false, gpuSubmitDeadline, 'programs.compile-submit');
         },
         detail: () =>
-          deferredSubmitUnits.length > 0
-            ? `submitted=${submittedCompileUnits.length};deferred=${deferredSubmitUnits.length}`
-            : `submitted=${submittedCompileUnits.length}`,
+          `submitted=${submittedCompileUnits.length};deferred=${deferredSubmitUnits.length}` +
+          `;postPaint=${postPaintCompileUnits.length}`,
       },
       {
         // The worn-stone family maps (normal/AO/rough/displacement/metal) and
@@ -6707,25 +6641,18 @@ export class Renderer {
         priority: 50,
         required: true,
         deadlineExempt: true,
-        resumeUnits: () => textureResumeUnits('scene', this.collectInitialSceneTextures()),
+        resumeUnits: () => textureResumeUnits('scene', sceneTextureRemainder()),
+        resumePartialUnits: () => textureResumeUnits('scene', sceneTextureRemainder()),
         run: async () => {
-          const batched = await this.prewarmInitialSceneTexturesBatched(
+          await ensureSceneTextureAdmission().drainBefore(
+            gpuSubmitDeadline,
             Math.max(1, policy.textureBatchSize),
-            Math.max(0, gpuSubmitDeadline - performance.now()),
           );
-          textureUploads = batched.uploaded;
-          sceneTexturesInitialized = batched.initialized;
-          sceneTextureProgress = {
-            done: batched.initialized,
-            planned: batched.planned,
-            trimmed: batched.trimmed,
-          };
         },
-        progress: () => sceneTextureProgress,
+        progress: () => sceneTextureAdmission?.progress() ?? null,
         detail: () =>
-          sceneTexturesInitialized === null
-            ? `uploadedDelta=${textureUploads}`
-            : `initialized=${sceneTexturesInitialized};uploadedDelta=${textureUploads}`,
+          `initialized=${sceneTextureAdmission?.progress().initialized ?? 0};` +
+          `uploadedDelta=${sceneTextureUploadDelta()}`,
       },
       {
         id: 'vfx.atlas',
@@ -6965,9 +6892,7 @@ export class Renderer {
         category: 'world',
         priority: 70,
         required: true,
-        // Never sacrificed to the soft deadline (the live draw path's one
-        // submit); the hard deadline stays the backstop. The pass draws only
-        // when the compile lane left no link debt, else it defers (initial_frame_core.ts).
+        // Deadline-exempt, but draws only when the compile lane has no link debt.
         deadlineExempt: true,
         run: () => {
           initialFrameDeferred = initialFrameDeferral(compileLifecycle.records);
@@ -6975,7 +6900,7 @@ export class Renderer {
           this.renderPrewarmPass(1 / 60);
           renderPasses++;
         },
-        ...initialFrameArms(() => initialFrameDeferred),
+        ...deferredPassArms(() => initialFrameDeferred),
       },
       {
         id: 'programs.compile',
@@ -7027,11 +6952,14 @@ export class Renderer {
             Math.min(gpuSubmitDeadline, compileAwaitDeadline),
             'programs.compile',
           );
-          compileUnitsPlanned = submittedCompileUnits.length + deferredSubmitUnits.length;
+          compileUnitsPlanned =
+            submittedCompileUnits.length +
+            deferredSubmitUnits.length +
+            postPaintCompileUnits.length;
           // Honesty gate: units deferred mid-run went to the resume lane, so
           // this entry must report 'partial', never 'completed'
           // (resolvePrewarmEntryStatus reads trimmed via the dropped count).
-          compileUnitsDropped = deferredSubmitUnits.length;
+          compileUnitsDropped = deferredSubmitUnits.length + postPaintCompileUnits.length;
           // Await every submitted unit so all of their programs are READY
           // before world.initial-frame renders (a program still linking by
           // then links synchronously inside that frame, the measured
@@ -7095,6 +7023,8 @@ export class Renderer {
         required: true,
         deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported,
         run: async () => {
+          budgetVariantsDeferred = initialFrameDeferral(compileLifecycle.records);
+          if (budgetVariantsDeferred) return;
           if (!GFX.autoGovernor || !this.asyncCompileSupported) return;
           const originalState = this.renderBudgetGovernor.state();
           await withRestoredPrewarmState(
@@ -7113,8 +7043,6 @@ export class Renderer {
                 renderBudgetShaderPrewarmLevels(originalState),
                 budgetVariantStats,
                 createPrewarmBudgetVariantHost({
-                  // The submit guard, never hardDeadline: see the field's own
-                  // contract in prewarm_compile_lifecycle.ts.
                   deadlineMs: gpuSubmitDeadline,
                   programCount: () => this.webgl.info.programs?.length ?? 0,
                   applyLevels: (levels) =>
@@ -7128,6 +7056,7 @@ export class Renderer {
             },
           );
         },
+        ...deferredPassArms(() => budgetVariantsDeferred, false),
         budgetVariants: () => budgetVariantStats,
       },
       {
@@ -7264,6 +7193,12 @@ export class Renderer {
         units: deferredSubmitUnits.splice(0, deferredSubmitUnits.length),
       });
     }
+    if (postPaintCompileUnits.length > 0) {
+      droppedEntries.push({
+        id: 'programs.compile-post-paint',
+        units: postPaintCompileUnits.splice(0, postPaintCompileUnits.length),
+      });
+    }
 
     // Either arm needs the settle-then-publish scheduling below: real dropped
     // work (droppedEntries), or the compile entry's resumeUnits callback
@@ -7288,6 +7223,7 @@ export class Renderer {
       }
       void settlePrewarmBeforePublish(
         async () => {
+          await options.resumeAfterFirstPaint;
           // If 'programs.compile' itself was deferred past the hard deadline,
           // its early-submitted units may still be settling off-thread; wait
           // them out before the resume lane (and pool publication) proceeds,
@@ -7310,18 +7246,28 @@ export class Renderer {
               const debt = prewarmResumeIsDebt(entry.id);
               resumeLedger.noteStart(entry.id);
               const priority = debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME;
-              if (debt && unit.pieces) {
-                return runPrewarmPiecesSerially(unit.pieces, (piece) =>
-                  this.backgroundGpuWork.run(piece.run, priority, piece.id, {
-                    releaseTail: true,
-                  }),
-                );
-              }
-              // Cosmetic resume keeps the released tail (held, a 16-root unit
-              // blocked live compile gates for seconds: travel hitches).
-              return this.backgroundGpuWork.run(unit.run, priority, unit.id, {
-                releaseTail: !debt,
-              });
+              const run = () => {
+                if (debt && unit.pieces) {
+                  return runPrewarmPiecesSerially(unit.pieces, (piece) =>
+                    this.backgroundGpuWork.run(piece.run, priority, piece.id, {
+                      releaseTail: true,
+                    }),
+                  );
+                }
+                // Cosmetic resume keeps the released tail (held, a 16-root unit
+                // blocked live compile gates for seconds: travel hitches).
+                return this.backgroundGpuWork.run(unit.run, priority, unit.id, {
+                  releaseTail: !debt,
+                });
+              };
+              return entry.id.startsWith('programs.compile')
+                ? runPrewarmCompileResumeUnit(
+                    unit,
+                    compileLifecycle,
+                    'programs.compile-resume',
+                    run,
+                  )
+                : run();
             },
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
@@ -7387,6 +7333,7 @@ export class Renderer {
       const generation = this.lifecycleGeneration;
       void skyAssetPrefetch.task
         .then(async () => {
+          await options.resumeAfterFirstPaint;
           if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
           for (const biome of resumeBiomes) {
             // BOOT_RESUME throughout: the dome/env uploads inside the helper
@@ -7419,6 +7366,7 @@ export class Renderer {
 
     const elapsed = performance.now() - started;
     const finalCounts = liveProgramWatch.programCounts(this.webgl);
+    textureUploads = sceneTextureUploadDelta();
     const stats: RendererPrewarmStats = {
       elapsedMs: roundMs(elapsed),
       maxMs: roundMs(maxMs),
@@ -7449,10 +7397,6 @@ export class Renderer {
     };
     this.lastPrewarmStats = stats;
     this.prewarmedZonePrograms.add(activeZone.id);
-    // World entry: from here every prop band's first fog reveal is gated
-    // (props.ts setBandRevealGate explains why not under the curtain).
-    this.propsView.setBandRevealGate(this.propsRevealGate);
-    this.foliage.setRevealGate(this.foliageRevealGate);
     // Dev-channel diagnostic (pairs with main.ts's "[entry-guard] scene built"): one
     // line naming where the entry-time main-thread budget went, for isolating
     // world-entry process kills on real devices.
@@ -8821,11 +8765,16 @@ export class Renderer {
     const color = (node: THREE.Object3D) => this.compilePrewarmColorPrograms(node, false);
     const shadow = (node: THREE.Object3D) => this.compileShadowPrograms(node);
     const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);
-    const linked = this.liveCompileGates.runPieces(
-      linkPieceWork(target, color, shadow, settle),
-      VIEW_COMPILE_GATE_MAX_MS,
-      { priority, label: `live-gate:${target.name || target.type}` },
-    );
+    const submit = () =>
+      this.liveCompileGates.runPieces(
+        linkPieceWork(target, color, shadow, settle),
+        VIEW_COMPILE_GATE_MAX_MS,
+        { priority, label: `live-gate:${target.name || target.type}` },
+      );
+    const startAfterInitialPaint = compileMayStartBeforeInitialPaint(priority)
+      ? null
+      : this.initialGpuWorkStart;
+    const linked = startAfterInitialPaint ? startAfterInitialPaint.then(submit, submit) : submit();
     // The uploads and the touch tail ride OUTSIDE the gate's own queue units,
     // and must: their pieces are queue units themselves, so awaiting them from
     // inside a unit holding a released-tail cap slot would park the drain loop
