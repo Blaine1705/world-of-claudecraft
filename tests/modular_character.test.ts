@@ -51,6 +51,7 @@ import {
   OUTFIT_COLORWAY_IDS,
   OUTFIT_COLORWAYS,
   outfitDye,
+  outfitDyeFallbackHex,
   outfitSwatchHex,
   outfitSwatchHexes,
   randomHairStyles,
@@ -764,6 +765,28 @@ describe('outfit colorways', () => {
     }
     // a hue colorway stays a flat single-stop chip
     expect(outfitSwatchHexes('knight', 'crimson')).toHaveLength(1);
+  });
+
+  it('normalizes the low-tier dye fallback to full brightness on its dominant channel', () => {
+    for (const set of ARMOR_SETS) {
+      for (const id of OUTFIT_COLORWAY_IDS) {
+        const hex = outfitDyeFallbackHex(set, id);
+        const r = (hex >> 16) & 0xff;
+        const g = (hex >> 8) & 0xff;
+        const b = hex & 0xff;
+        // the brightest channel of the swatch's own colour reads at full
+        // strength once scaled up, or the fallback is still crushing the
+        // atlas toward black exactly like the bug it exists to fix
+        expect(Math.max(r, g, b), `${set}/${id}`).toBe(255);
+      }
+    }
+  });
+
+  it('keeps the fallback hue distinct across colorways, like the swatch chip it is derived from', () => {
+    const hexes = OUTFIT_COLORWAY_IDS.map((id) => outfitDyeFallbackHex('mage', id));
+    // classic shares a native hue family with at most one dye target, same
+    // tolerance as the swatch-chip distinctness test above
+    expect(new Set(hexes).size).toBeGreaterThanOrEqual(OUTFIT_COLORWAY_IDS.length - 2);
   });
 });
 
