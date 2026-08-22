@@ -48,13 +48,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_mother_of_pearl.objectives.0.label': 'ミスター・クラブス討伐',
   'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '輝く真珠を入手',
   'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
-    '藁のかかしに歩み寄り、{targetKey}を押すか、左クリックしてターゲットにしよう。次に{attackKey}を押すか、アクションバーの二番目のボタンをクリックして呪文を唱えよう。一体が崩れるまで唱え続けること。',
+    '藁のかかしに歩み寄り、左クリックしてターゲットにしよう。画面上部にその名前が表示される。そうしたら{attackKey}を押すか、アクションバーの二番目のボタンをクリックして呪文を唱えよう。一体が崩れるまで唱え続けること。',
   'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
     '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの二番目のボタンをタップして呪文を唱えよう。一体が崩れるまで唱え続けること。',
   'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
     '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に二番目のアクションボタンを押して呪文を唱えよう。一体が崩れるまで唱え続けること。',
   'hudChrome.bootcamp.taskShellBodyCaster':
-    '浜辺ガニは挟み返してくる。{targetKey}を押すか、左クリックして一匹をターゲットにし、{attackKey}を押して呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+    '浜辺ガニは挟み返してくる。左クリックで一匹をターゲットにし、{attackKey}を押して呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskShellBodyCasterTouch':
     '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの二番目のボタンをタップして呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskShellBodyCasterPad':
@@ -13032,13 +13032,45 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.coachReadyBodyPad':
     '{npc}のもとへ行き、インタラクトボタンを押して納め、報酬を受け取ろう。',
   'hudChrome.bootcamp.taskStrikeTrueBody':
-    '藁のかかしに歩み寄り、{targetKey}を押すか、左クリックしてターゲットにしよう。次に{attackKey}を押すか、アクションバーの最初のボタンをクリックして打ち込もう。一体が崩れるまで打ち続けること。',
+    '藁のかかしに歩み寄り、左クリックしてターゲットにしよう。画面上部にその名前が表示される。そうしたら{attackKey}を押すか、アクションバーの最初のボタンをクリックして打ち込もう。一体が崩れるまで打ち続けること。',
   'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
     '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの最初のボタンをタップして打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.promptTurnIn':
+    'クエスト報告',
+  'hudChrome.bootcamp.promptSelect':
+    '選択',
+  'hudChrome.bootcamp.promptUseAbility':
+    'アビリティ使用',
+  'hudChrome.bootcamp.taskHoneBody':
+    'かかしを左クリックしてターゲットにし、{abilityKey}を押して{ability}を使おう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    'かかしをタップしてターゲットにし、アクションバーの{ability}をタップしよう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    'かかしをターゲットにし、{ability}が入ったアクションボタンを押そう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.promptKneel':
+    'ひざまずく',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    '浜辺の道を南へ進み、たましいの石まで歩いて{interactKey}を押し、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    '浜辺の道を南へ進み、たましいの石まで歩いてタップし、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    '浜辺の道を南へ進み、たましいの石まで歩いて操作ボタンを押し、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    '君は死んだ。だが失ったものはない。「魂を解放」を押せば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    '君は死んだ。だが失ったものはない。「魂を解放」をタップすれば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    '君は死んだ。だが失ったものはない。「魂を解放」を選べば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。それを押せば、何の代償もなく元どおりだ。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。タップすれば、何の代償もなく元どおりだ。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。それを選べば、何の代償もなく元どおりだ。',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に最初のアクションボタンを押して打ち込もう。一体が崩れるまで打ち続けること。',
   'hudChrome.bootcamp.taskShellBody':
-    '浜辺ガニは挟み返してくる。{targetKey}を押すか、左クリックして一匹をターゲットにし、{attackKey}を押して打ち込み、そのまま打ち続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+    '浜辺ガニは挟み返してくる。左クリックで一匹をターゲットにし、{attackKey}を押して打ち込み、そのまま打ち続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskShellBodyTouch':
     '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの最初のボタンをタップして打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskShellBodyPad':

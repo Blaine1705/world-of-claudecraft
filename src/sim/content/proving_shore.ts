@@ -448,16 +448,47 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Strike True',
     giverNpcId: 'overseer_pell',
     turnInNpcId: 'drillmaster_rook',
-    text: 'Footwork first, now the arm, $N. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.',
+    text: 'Footwork first, now the arm, $N. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.',
     completionText:
       'One clean fell, and your grip already surer. Remember the feel of it, $N: target, strike, and keep striking. Straw never minds. The next thing you swing at will.',
     objectives: [
       { type: 'kill', targetMobId: 'training_effigy', count: 1, label: 'Training Effigy felled' },
     ],
-    xpReward: 110,
+    xpReward: 60,
     copperReward: 60,
     itemRewards: {},
     requiresQuest: 'q_ps_the_gauntlet',
+  },
+  // The yard's second drill: the action bar. Strike True teaches the swing,
+  // which is not the game; a player who leaves the island auto-attacking has
+  // learned the wrong lesson. The objective is a sentinel interact with no
+  // ground entity of its own (the ps_gauntlet_flag idiom): credit rides the
+  // damage the class's OWN attack deals, in tutorial/ability_drill.ts, so an
+  // autoattack counts for nothing. The coach card names each class's button
+  // from the live kit rather than saying "press 1" at a mage, and a warrior
+  // standing in the yard is loaned the rage their press bills, because
+  // Reaver Strike is greyed out at zero rage exactly when the coach points
+  // at it.
+  q_ps_hone_the_edge: {
+    id: 'q_ps_hone_the_edge',
+    name: 'Hone the Edge',
+    giverNpcId: 'drillmaster_rook',
+    turnInNpcId: 'drillmaster_rook',
+    text: 'A swing is a swing, $N, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.',
+    completionText:
+      'Now you are fighting instead of flailing. That row grows every level you take, $N, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'ps_ability_drill',
+        count: 3,
+        label: 'Ability landed on an effigy',
+      },
+    ],
+    xpReward: 60,
+    copperReward: 60,
+    itemRewards: {},
+    requiresQuest: 'q_ps_strike_true',
   },
   // The first real fight: the wreck line's scuttlers pinch back, which is the
   // whole lesson after a target that never did.
@@ -466,7 +497,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Shell and Claw',
     giverNpcId: 'drillmaster_rook',
     turnInNpcId: 'tidewarden_nel',
-    text: 'Straw never minds, $N, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: target one with Tab or a left-click, press 1, and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.',
+    text: 'Straw never minds, $N, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, press 1, and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.',
     completionText:
       'Three shells cracked and all your fingers kept: a fair first fight, $N. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.',
     objectives: [
@@ -475,7 +506,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     xpReward: 170,
     copperReward: 80,
     itemRewards: {},
-    requiresQuest: 'q_ps_strike_true',
+    requiresQuest: 'q_ps_hone_the_edge',
   },
   // The miniboss lesson: using an item from the bags, a fight that asks for
   // more than three swings, and looting a corpse for a QUEST item rather
@@ -519,7 +550,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Castaway Crate opened',
       },
     ],
-    xpReward: 190,
+    xpReward: 160,
     copperReward: 80,
     itemRewards: {},
     requiresQuest: 'q_ps_mother_of_pearl',
@@ -578,10 +609,37 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Guild signpost read',
       },
     ],
-    xpReward: 100,
+    xpReward: 70,
     copperReward: 30,
     itemRewards: {},
     requiresQuest: 'q_ps_pouch_and_purse',
+  },
+  // The last lesson, and the one nobody wants to meet for the first time
+  // with a wolf still chewing on them. The death is SCRIPTED and consented
+  // to (walk to the stone, press interact) and free of consequence: this
+  // game charges no durability on death. Credit lands on either
+  // resurrection path so the lesson cannot strand a player who took the
+  // Spirit Healer, though the copy sends them to their body.
+  q_ps_the_long_walk: {
+    id: 'q_ps_the_long_walk',
+    name: 'The Long Walk',
+    giverNpcId: 'instructor_maren',
+    turnInNpcId: 'instructor_maren',
+    text: 'One lesson left, $N, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Walk south down the shore road to the Passing Stone, kneel at it, and let the shore take you. You will wake as a spirit at the yard behind my camp, grey and quiet, and nothing there can touch you. Then walk back to your own body and step into it. That is the whole of it: your body waits, the walk is free, and you lose nothing by making it.',
+    completionText:
+      'And back you come, no worse for it. Remember what that felt like, $N, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'ps_passing_stone',
+        count: 1,
+        label: 'Walked back from the dead',
+      },
+    ],
+    xpReward: 60,
+    copperReward: 30,
+    itemRewards: {},
+    requiresQuest: 'q_ps_the_signpost',
   },
   q_ps_set_sail: {
     id: 'q_ps_set_sail',
@@ -597,7 +655,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     xpReward: 150,
     copperReward: 50,
     itemRewards: {},
-    requiresQuest: 'q_ps_the_signpost',
+    requiresQuest: 'q_ps_the_long_walk',
   },
 };
 
@@ -610,11 +668,13 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
 export const PROVING_SHORE_QUEST_ORDER: string[] = [
   'q_ps_the_gauntlet',
   'q_ps_strike_true',
+  'q_ps_hone_the_edge',
   'q_ps_shell_and_claw',
   'q_ps_mother_of_pearl',
   'q_ps_the_wreck_line',
   'q_ps_pouch_and_purse',
   'q_ps_the_signpost',
+  'q_ps_the_long_walk',
   'q_ps_set_sail',
 ];
 
@@ -634,6 +694,16 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
   ps_ferry_bell: {
     id: 'ps_ferry_bell',
     name: 'Ferry Bell',
+    kind: 'quest',
+    sellValue: 0,
+    noVendorSell: true,
+  },
+  // The death lesson's rite stone (q_ps_the_long_walk). Like the bells, it
+  // is a world fixture that is never picked up; the item def exists so the
+  // ground object has a name to show.
+  ps_passing_stone: {
+    id: 'ps_passing_stone',
+    name: 'Passing Stone',
     kind: 'quest',
     sellValue: 0,
     noVendorSell: true,
@@ -726,6 +796,24 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
       { x: -327, z: 24 },
       { x: -320, z: 31 },
     ],
+  },
+  {
+    itemId: 'ps_passing_stone',
+    name: 'Passing Stone',
+    // The death lesson (q_ps_the_long_walk, tutorial/death_lesson.ts): the
+    // island stages a player's first death somewhere nothing is hunting
+    // them, because the alternative is learning it in the vale with a wolf
+    // still chewing. interaction.ts routes the click to the rite BEFORE the
+    // pickup path (the ferry bell's precedent), and the rite refuses unless
+    // the lesson is active, so the stone can never be a griefing tool.
+    //
+    // Sited on the shore road between the camp and the Gauntlet: dry
+    // ground, on the walk the player already knows, and 65 yd from the
+    // island graveyard, which leaves about a 30 yd ghost run once the
+    // 35 yd corpse-resurrect reach is subtracted. Long enough to teach the
+    // walk back, short enough that a first death is not a punishment.
+    // tests/death_lesson.test.ts pins both distances.
+    positions: [{ x: -312, z: -6 }],
   },
   {
     itemId: 'ps_ferry_bell',

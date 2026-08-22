@@ -317,6 +317,7 @@ const UI_PURE_CORES = [
   'src/ui/tutorial_greeting_view.ts',
   'src/ui/bootcamp_view.ts',
   'src/ui/coach_prompt_view.ts',
+  'src/ui/objective_glow_view.ts',
   'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_view.ts',
   'src/ui/market_price_view.ts',

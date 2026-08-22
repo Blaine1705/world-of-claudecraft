@@ -30,10 +30,12 @@ import { coachTrailPlan, distanceToTrail } from '../render/coach_trail_core';
 import type { Renderer } from '../render/renderer';
 import { BOOTCAMP_COURSE_CHECKPOINTS, isOnProvingShore } from '../sim/content/proving_shore';
 import { GAUNTLET_QUEST_ID } from '../sim/tutorial/gauntlet_run';
+import { startingAttackFor } from '../sim/tutorial/starting_attack';
 import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { IWorld } from '../world_api';
 import {
+  BELL_STEP_TARGET,
   type BootcampParam,
   type BootcampStep,
   bellCardPlan,
@@ -48,6 +50,7 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
+  type DeathLessonPhase,
   RING_LESSON_ITEM_ID,
   RING_LESSON_QUEST_ID,
   type RingLessonPhase,
@@ -73,6 +76,15 @@ import {
 } from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
+import { iconDataUrl } from './icons';
+import { objectiveGlowPlanAt } from './objective_glow_view';
+
+/** Peak opacity of the wrong-way bloom at full intensity. Deliberately shy of
+ *  opaque: it is a hint at the edge of vision, never a curtain. */
+const GLOW_MAX_OPACITY = 0.72;
+
+/** The Attack toggle's icon id (hud.ts resolves ATTACK_ICON_KEY to it). */
+const AUTO_ATTACK_ICON_ID = 'attack';
 
 // The island rectangle: the card never shows off the Proving Shore. Both
 // axes matter; the x column alone also covers four mainland zones
@@ -101,6 +113,11 @@ export class BootcampOverlay {
   private ringDone = false;
   // Casters learn their slot-2 spell, not the melee Attack (Guy's note).
   private casterClass = false;
+  // The attack THIS class was taught (starting_attack.ts), resolved once per
+  // update beside casterClass so the card and the bubble read the same
+  // answer without either reaching for the world again.
+  private taughtAbilityId: string | null = null;
+  private deathPhase: DeathLessonPhase = 'alive';
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -119,6 +136,9 @@ export class BootcampOverlay {
   private promptPainted = { visible: false, sx: Number.NaN, sy: Number.NaN };
   private promptGroundKey = '';
   private promptGroundY = 0;
+  // The wrong-way edge glow's element and its repaint memo.
+  private glowEl: HTMLElement | null = null;
+  private glowPainted = '';
 
   // Called every HUD frame. Cheap no-op while no rail quest is moving.
   update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
@@ -146,6 +166,10 @@ export class BootcampOverlay {
 
     this.lastFocus = focus;
     this.casterClass = CASTER_CLASSES.has(world.cfg.playerClass);
+    this.taughtAbilityId = startingAttackFor(world.cfg.playerClass).abilityId;
+    // The death lesson's arc, read straight off the player: alive, dead but
+    // not yet released, or walking back as a spirit.
+    this.deathPhase = p.ghost ? 'ghost' : p.dead ? 'dead' : 'alive';
     if (focus?.questId === RING_LESSON_QUEST_ID) this.sawPearl = true;
     this.ringPhase = this.computeRingPhase(world, onIsland);
     const isGauntlet = focus?.questId === GAUNTLET_QUEST_ID;
@@ -194,6 +218,7 @@ export class BootcampOverlay {
     }
 
     this.updatePrompt(world, renderer, keybinds);
+    this.paintObjectiveGlow(world, renderer);
     this.applyUiGlow();
     this.updateGuideVoice(world, focus);
   }
@@ -458,6 +483,60 @@ export class BootcampOverlay {
     this.prompt = prompt;
     this.promptChipEl = chips;
     this.promptVerbEl = verb;
+
+    // The wrong-way glow (objective_glow_view.ts): a golden bloom down the
+    // edge the objective lies past. Pointer-transparent and aria-hidden by
+    // construction; it is a direction cue, and the coach card already says
+    // where to go in words.
+    const glow = document.createElement('div');
+    glow.className = 'tut-objective-glow';
+    glow.setAttribute('aria-hidden', 'true');
+    ui.appendChild(glow);
+    this.glowEl = glow;
+  }
+
+  /**
+   * Paint (or clear) the wrong-way edge glow for this frame.
+   *
+   * Reads the CAMERA's yaw, not the character's facing: a player can run one
+   * way while looking another, and the cue is about what they can see. The
+   * objective is the coach's own arrow target, so the glow and the card can
+   * never point at different things.
+   */
+  private paintObjectiveGlow(world: IWorld, renderer: Renderer): void {
+    const el = this.glowEl;
+    if (!el) return;
+    const objective = this.currentObjectivePos();
+    const p = world.player;
+    const plan = objective && p ? objectiveGlowPlanAt(renderer.camYaw, p.pos, objective) : null;
+    // Memoized: this runs every HUD frame, and writing identical style
+    // strings would dirty the compositor for nothing.
+    const key = plan ? `${plan.side}:${Math.round(plan.intensity * 20)}` : '';
+    if (key === this.glowPainted) return;
+    this.glowPainted = key;
+    if (!plan) {
+      el.style.opacity = '0';
+      return;
+    }
+    el.classList.toggle('tut-glow-right', plan.side === 'right');
+    el.classList.toggle('tut-glow-left', plan.side === 'left');
+    el.style.opacity = String(GLOW_MAX_OPACITY * plan.intensity);
+  }
+
+  /** Where the coach is currently pointing, or null when it points nowhere
+   *  (the crate line, which is deliberately arrow-free). */
+  private currentObjectivePos(): { x: number; z: number } | null {
+    if (this.bellPhase) return BELL_STEP_TARGET;
+    // The ring lesson is an INVENTORY lesson (buckle the ring on, open the
+    // sheet): there is nowhere to walk, so there is no wrong way to face.
+    if (this.ringPhase !== null) return null;
+    const focus = this.lastFocus;
+    if (!focus) return null;
+    // The coach card's own arrow, deliberately: the glow and the card can
+    // then never point at different things. It covers the Gauntlet too (its
+    // active leg falls back to the course's finish), which is where a new
+    // player is most likely to be facing the wrong way.
+    return coachCardPlan(focus, 'keyboard', this.casterClass, this.deathPhase).arrow;
   }
 
   private renderPanel(keybinds: Keybinds): void {
@@ -494,6 +573,9 @@ export class BootcampOverlay {
       // Melee classes learn slot 0 (Attack, default Digit1); casters learn
       // slot 1, where their level-1 spell sits (default Digit2).
       attackKey: keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0') || unbound,
+      // The ability drill points at the class's OWN attack, which never
+      // sits on the Attack toggle: slot 1 for everyone (starting_attack.ts).
+      abilityKey: keybinds.primaryLabel('slot1') || unbound,
       bagsKey: keybinds.primaryLabel('bags') || unbound,
       charKey: keybinds.primaryLabel('char') || unbound,
     };
@@ -538,10 +620,11 @@ export class BootcampOverlay {
     const mode = currentInputHintMode();
 
     const labels = this.coachLabels(keybinds);
-    const plan = coachCardPlan(focus, mode, this.casterClass);
+    const plan = coachCardPlan(focus, mode, this.casterClass, this.deathPhase);
     const npc = tEntity({ kind: 'npc', id: plan.npcId, field: 'name' });
     const params: Record<string, string> = {};
     if (plan.bodyHasNpc) params.npc = npc;
+    if (plan.bodyHasAbility) params.ability = this.taughtAbilityName();
     for (const key of plan.params) params[key] = labels[key];
 
     this.titleEl.textContent = plan.titleKey
@@ -615,7 +698,7 @@ export class BootcampOverlay {
       const contentKey = `move:${this.step}:${caps.join(',')}`;
       if (this.promptContentKey !== contentKey) {
         this.promptContentKey = contentKey;
-        this.paintPromptChips(caps);
+        this.paintPromptChips(caps.map((cap) => ({ cap })));
         this.promptVerbEl.textContent = t('hudChrome.bootcamp.promptHold');
       }
       this.prompt.classList.add('tut-prompt-center');
@@ -642,6 +725,8 @@ export class BootcampOverlay {
           entities: world.entities.values(),
           playerPos: p.pos,
           questLog: world.questLog,
+          targetId: p.targetId,
+          deathPhase: this.deathPhase,
         })
       : null;
     if (!plan || !p || !coachPromptInRange(plan, p.pos)) {
@@ -649,32 +734,42 @@ export class BootcampOverlay {
       return;
     }
 
-    // Kill lessons chip the target and attack binds (Tab, 1); the parkour
-    // asks chip the jump bind (Space, or the pad's literal bottom face
-    // button); everything else chips the interact bind per input family.
-    let chips: readonly string[];
-    if (plan.kind === 'kill') {
-      chips =
-        mode === 'keyboard'
-          ? [
-              keybinds.primaryLabel('target'),
-              keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0'),
-            ].filter(Boolean)
-          : [];
+    // The kill lessons' first half asks for a CLICK, which needs no chip on
+    // any input family: the bubble sits on the quarry and the verb reads
+    // Select. Its second half names the button that hits: the keycap on a
+    // keyboard, and on touch the action-bar ICON itself, because a phone
+    // player has no key to be told about and is looking for the picture.
+    // The parkour asks chip the jump bind (Space, or the pad's literal
+    // bottom face button); everything else chips interact per input family.
+    let chips: readonly PromptChip[];
+    if (plan.kind === 'select') {
+      chips = [];
+    } else if (plan.kind === 'kill') {
+      if (mode === 'keyboard') {
+        const cap = keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0');
+        chips = cap ? [{ cap }] : [];
+      } else if (mode === 'touch') {
+        chips = [{ abilityIcon: this.promptAttackIconId() }];
+      } else {
+        chips = [];
+      }
     } else if (plan.kind === 'jump') {
       chips =
         mode === 'keyboard'
-          ? [keybinds.primaryLabel('jump')].filter(Boolean)
+          ? [keybinds.primaryLabel('jump')].filter(Boolean).map((cap) => ({ cap }))
           : mode === 'pad'
-            ? ['A']
+            ? [{ cap: 'A' }]
             : [];
     } else if (plan.kind === 'use') {
-      chips = mode === 'keyboard' ? [keybinds.primaryLabel('bags')].filter(Boolean) : [];
+      chips =
+        mode === 'keyboard'
+          ? [keybinds.primaryLabel('bags')].filter(Boolean).map((cap) => ({ cap }))
+          : [];
     } else {
       const { chip } = coachPromptChip(mode, keybinds.primaryLabel('interact'));
-      chips = chip ? [chip] : [];
+      chips = chip ? [{ cap: chip }] : [];
     }
-    const contentKey = `${plan.verbKey}:${chips.join(',')}:${mode}`;
+    const contentKey = `${plan.verbKey}:${chips.map(chipKey).join(',')}:${mode}`;
     if (this.promptContentKey !== contentKey) {
       this.promptContentKey = contentKey;
       this.paintPromptChips(chips);
@@ -709,11 +804,28 @@ export class BootcampOverlay {
     }
   }
 
-  private paintPromptChips(caps: readonly string[]): void {
+  private paintPromptChips(chips: readonly PromptChip[]): void {
     if (!this.promptChipEl) return;
     this.promptChipEl.replaceChildren();
-    paintChipSequence(this.promptChipEl, caps);
-    this.promptChipEl.style.display = caps.length > 0 ? '' : 'none';
+    paintPromptChipSequence(this.promptChipEl, chips);
+    this.promptChipEl.style.display = chips.length > 0 ? '' : 'none';
+  }
+
+  /** The localized name of the attack this class was taught, for the ability
+   *  drill's card. Falls back to the Attack toggle's own label for a class
+   *  the kit leaves with nothing but a swing. */
+  private taughtAbilityName(): string {
+    const abilityId = this.taughtAbilityId;
+    if (!abilityId) return t('hudChrome.bootcamp.promptAttack');
+    return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  }
+
+  /** Which action-bar icon the touch combat bubble shows: the Attack toggle
+   *  for a class that swings, and the taught spell for one that casts (a
+   *  caster has no melee autoattack worth pointing a new player at). */
+  private promptAttackIconId(): string {
+    if (!this.casterClass) return AUTO_ATTACK_ICON_ID;
+    return this.taughtAbilityId ?? AUTO_ATTACK_ICON_ID;
   }
 
   private hidePrompt(): void {
@@ -732,6 +844,8 @@ export class BootcampOverlay {
     this.prompt?.remove();
     this.root = null;
     this.prompt = null;
+    this.glowEl = null;
+    this.glowPainted = '';
     this.promptChipEl = null;
     this.promptVerbEl = null;
     this.promptContentKey = '';
@@ -769,20 +883,47 @@ function railQuestState(world: IWorld, questId: string): CoachState | null {
 }
 
 /** Keycap chips with a localized "then" between them: every multi-key row
- *  on the island is a press SEQUENCE (D then W, Tab then 1, B then F), and
- *  the playtest showed the order must be explicit. */
+ *  on the island is a press SEQUENCE (D then W, B then F), and the playtest
+ *  showed the order must be explicit. */
 function paintChipSequence(host: HTMLElement, caps: readonly string[]): void {
-  caps.forEach((cap, i) => {
+  paintPromptChipSequence(
+    host,
+    caps.map((cap) => ({ cap })),
+  );
+}
+
+/** One bubble chip: a keycap the player presses, or the action-bar icon they
+ *  tap. Touch has no keys to name, so its combat bubble shows the button's
+ *  own picture rather than a word for a key that does not exist there. */
+type PromptChip = { readonly cap: string } | { readonly abilityIcon: string };
+
+/** Repaint identity for a chip row (the memo key). */
+function chipKey(chip: PromptChip): string {
+  return 'cap' in chip ? chip.cap : `icon:${chip.abilityIcon}`;
+}
+
+function paintPromptChipSequence(host: HTMLElement, chips: readonly PromptChip[]): void {
+  chips.forEach((chip, i) => {
     if (i > 0) {
       const sep = document.createElement('span');
       sep.className = 'tut-keycap-then';
       sep.textContent = t('hudChrome.bootcamp.keycapThen');
       host.appendChild(sep);
     }
-    const chip = document.createElement('span');
-    chip.className = 'tut-keycap';
-    chip.textContent = cap;
-    host.appendChild(chip);
+    if ('cap' in chip) {
+      const el = document.createElement('span');
+      el.className = 'tut-keycap';
+      el.textContent = chip.cap;
+      host.appendChild(el);
+      return;
+    }
+    const el = document.createElement('span');
+    el.className = 'tut-keycap tut-keycap-icon';
+    el.style.backgroundImage = `url(${iconDataUrl('ability', chip.abilityIcon)})`;
+    // Decorative: the verb beside it already says what the press does, and
+    // the icon repeats the action bar the player is looking at.
+    el.setAttribute('aria-hidden', 'true');
+    host.appendChild(el);
   });
 }
 

@@ -178,6 +178,9 @@ describe('the rail coach', () => {
         for (const mode of ['keyboard', 'touch', 'pad'] as const) {
           const plan = coachCardPlan({ questId, state }, mode);
           const params: Record<string, string> = { npc: 'X' };
+          // {ability} rides bodyHasAbility, not params, because the ability
+          // drill names the class's attack on touch and pad too.
+          if (plan.bodyHasAbility) params.ability = 'X';
           for (const p of plan.params) params[p] = 'X';
           const body = t(plan.bodyKey, params);
           expect(body, `${questId}/${state}/${mode}`).toBeTruthy();
@@ -238,6 +241,7 @@ describe('the rail coach', () => {
       mapKey: 'M',
       targetKey: 'Tab',
       attackKey: '1',
+      abilityKey: '2',
       bagsKey: 'B',
       charKey: 'C',
     };
@@ -248,8 +252,10 @@ describe('the rail coach', () => {
     // The generic task card's only param is the map key, which stays an
     // aside in the copy, never a chip (Set Sail is the one generic task).
     expect(at('q_ps_set_sail', 'active', 'keyboard')).toEqual([]);
-    expect(at('q_ps_strike_true', 'active', 'keyboard')).toEqual(['Tab', '1']);
-    expect(at('q_ps_shell_and_claw', 'active', 'keyboard')).toEqual(['Tab', '1']);
+    // One chip, not two: the combat lessons ask for a click and then ONE
+    // key, so no targeting bind is ever chipped.
+    expect(at('q_ps_strike_true', 'active', 'keyboard')).toEqual(['1']);
+    expect(at('q_ps_shell_and_claw', 'active', 'keyboard')).toEqual(['1']);
     expect(at('q_ps_mother_of_pearl', 'active', 'keyboard')).toEqual(['B', 'F']);
     expect(at('q_ps_the_wreck_line', 'active', 'keyboard')).toEqual(['F']);
     expect(at('q_ps_pouch_and_purse', 'active', 'keyboard')).toEqual(['F']);
@@ -274,6 +280,7 @@ describe('the rail coach', () => {
       mapKey: 'M',
       targetKey: 'Tab',
       attackKey: '1',
+      abilityKey: '2',
       bagsKey: 'B',
       charKey: 'C',
     };
@@ -299,18 +306,22 @@ describe('the rail coach', () => {
     // Strike True teaches targeting and the swing; the Wreck Line teaches
     // the pickup press; the pouch lesson's hand-in card walks the buckle-on.
     const strike = coachCardPlan({ questId: 'q_ps_strike_true', state: 'active' }, 'keyboard');
-    expect(strike.params).toEqual(['targetKey', 'attackKey']);
-    const strikeBody = t(strike.bodyKey, { targetKey: 'Tab', attackKey: '1' });
+    // No {targetKey}: the select half of the lesson asks for a CLICK now,
+    // so the card names one key, the attack, and never a targeting bind.
+    expect(strike.params).toEqual(['attackKey']);
+    const strikeBody = t(strike.bodyKey, { attackKey: '1' });
     expect(strikeBody).toMatch(/target/i);
+    expect(strikeBody).toMatch(/left-click/i);
     expect(strikeBody).not.toMatch(/\{\w+\}/);
     const wreck = coachCardPlan({ questId: 'q_ps_the_wreck_line', state: 'active' }, 'keyboard');
     expect(wreck.params).toEqual(['interactKey']);
     expect(t(wreck.bodyKey, { interactKey: 'F' })).toMatch(/crate/i);
     // The scuttler cull's card carries the retreat warning.
     const shell = coachCardPlan({ questId: 'q_ps_shell_and_claw', state: 'active' }, 'keyboard');
-    expect(shell.params).toEqual(['targetKey', 'attackKey']);
-    const shellBody = t(shell.bodyKey, { targetKey: 'Tab', attackKey: '1' });
+    expect(shell.params).toEqual(['attackKey']);
+    const shellBody = t(shell.bodyKey, { attackKey: '1' });
     expect(shellBody).toMatch(/retreat/i);
+    expect(shellBody).toMatch(/left-click/i);
     expect(shellBody).not.toMatch(/\{\w+\}/);
     // The pouch lesson's ACTIVE card walks the stall purchase, naming the
     // GIVER (Quartermaster Finch, who runs the stall), not the turn-in.
@@ -378,6 +389,34 @@ describe('the closing bell card', () => {
       expect(body).not.toMatch(/\{\w+\}/);
       expect(t(plan.titleKey)).toBeTruthy();
       if (mode !== 'keyboard') expect(plan.params).toHaveLength(0);
+    }
+  });
+});
+
+describe('the ability drill card', () => {
+  it('names the class attack on EVERY input arm, not just the keyboard', () => {
+    // The keyboard arm chips a keycap; touch and pad have no key to name, so
+    // the ability's own name is what identifies the button there. A card
+    // that only spliced it on keyboard would leave a phone player reading
+    // "tap {ability} on the action bar".
+    for (const mode of ['keyboard', 'touch', 'pad'] as const) {
+      const plan = coachCardPlan({ questId: 'q_ps_hone_the_edge', state: 'active' }, mode);
+      expect(plan.bodyHasAbility, mode).toBe(true);
+      const body = t(plan.bodyKey, { ability: 'Cinderbolt', abilityKey: '2' });
+      expect(body, mode).toMatch(/Cinderbolt/);
+      expect(body, mode).not.toMatch(/\{\w+\}/);
+    }
+  });
+
+  it('is the only card that splices an ability name', () => {
+    // bodyHasAbility is opt-in; every other card would render a stray {ability}
+    // if it were ever set by accident.
+    for (const questId of PROVING_SHORE_QUEST_ORDER) {
+      if (questId === 'q_ps_hone_the_edge') continue;
+      for (const state of ['available', 'active', 'ready'] as CoachState[]) {
+        const plan = coachCardPlan({ questId, state }, 'keyboard');
+        expect(plan.bodyHasAbility, `${questId}/${state}`).toBe(false);
+      }
     }
   });
 });

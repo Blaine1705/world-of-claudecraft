@@ -732,13 +732,48 @@ export const hudChromeStrings = {
     // Wreck Line, and the buckle-on for the pouch before Maren's hand-in.
     // WORDY by M16, so the five non-Latin overlays carry real fills.
     taskStrikeTrueBody:
-      'Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.',
+      'Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.',
     taskStrikeTrueBodyTouch:
       'Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.',
     taskStrikeTrueBodyPad:
       'Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.',
+    // The ability drill (q_ps_hone_the_edge): the yard's second lesson, and
+    // the one that stops a graduate leaving the island auto-attacking.
+    // {ability} is the localized name of THIS class's own attack and
+    // {abilityKey} the key it sits on, both derived from the live kit, so
+    // the card never tells a mage to press 1.
+    taskHoneBody:
+      'Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.',
+    taskHoneBodyTouch:
+      'Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.',
+    taskHoneBodyPad:
+      'Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.',
+    // The death lesson (q_ps_the_long_walk). Three bodies, because the
+    // lesson has three moments and a single static card would be wrong for
+    // two of them: walk to the stone, release the spirit, walk back. The
+    // copy names the literal buttons the death screen shows.
+    taskLongWalkBody:
+      'Walk south down the shore road to the Passing Stone and press {interactKey} to kneel. Nothing out here can hurt you, and this costs you nothing.',
+    taskLongWalkBodyTouch:
+      'Walk south down the shore road to the Passing Stone and tap it to kneel. Nothing out here can hurt you, and this costs you nothing.',
+    taskLongWalkBodyPad:
+      'Walk south down the shore road to the Passing Stone and press your interact button to kneel. Nothing out here can hurt you, and this costs you nothing.',
+    // Dead, spirit not yet released.
+    taskLongWalkDeadBody:
+      'You have died. Nothing is lost. Press Release Spirit to rise as a ghost at the graveyard behind the camp.',
+    taskLongWalkDeadBodyTouch:
+      'You have died. Nothing is lost. Tap Release Spirit to rise as a ghost at the graveyard behind the camp.',
+    taskLongWalkDeadBodyPad:
+      'You have died. Nothing is lost. Choose Release Spirit to rise as a ghost at the graveyard behind the camp.',
+    // A ghost walking back to the body.
+    taskLongWalkGhostBody:
+      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Press it and you are whole again, with no penalty at all.',
+    taskLongWalkGhostBodyTouch:
+      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Tap it and you are whole again, with no penalty at all.',
+    taskLongWalkGhostBodyPad:
+      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Choose it and you are whole again, with no penalty at all.',
     taskShellBody:
-      'The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Left-click one to make it your target, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyTouch:
       'The scuttlers pinch back. Tap one to target it, then tap the first action bar button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyPad:
@@ -748,13 +783,13 @@ export const hudChromeStrings = {
     // speak of casting. WORDY by M16, so the five non-Latin overlays carry
     // fills.
     taskStrikeTrueBodyCaster:
-      'Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.',
+      'Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.',
     taskStrikeTrueBodyCasterTouch:
       'Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.',
     taskStrikeTrueBodyCasterPad:
       'Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.',
     taskShellBodyCaster:
-      'The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Left-click one to make it your target, then press {attackKey} to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyCasterTouch:
       'The scuttlers pinch back. Tap one to target it, then tap the second button on the action bar to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyCasterPad:
@@ -789,12 +824,21 @@ export const hudChromeStrings = {
     // (bootcamp.ts + coach_prompt_view.ts): one keycap chip plus one short
     // verb, readable without reading the card. Deliberately terse.
     promptTalk: 'Talk',
-    promptTurnIn: 'Turn in',
+    promptTurnIn: 'Turn in quest',
     promptPickUp: 'Pick up',
     promptRead: 'Read',
     promptRing: 'Ring',
     promptHold: 'Hold',
+    // The kill lessons' first half: click or tap the quarry to make it your
+    // target. Deliberately carries no keycap, because the press it asks for
+    // is the one a new player already owns.
+    promptSelect: 'Select',
     promptAttack: 'Attack',
+    // The ability drill's second half: the press it wants is the class's own
+    // button, not the swing the previous lesson taught.
+    promptUseAbility: 'Use ability',
+    // The death lesson's rite: kneeling at the Passing Stone.
+    promptKneel: 'Kneel',
     promptJump: 'Jump',
     promptSummon: 'Summon',
     // The ring equip lesson (bootcamp_view.ts ringCardPlan): the pearl

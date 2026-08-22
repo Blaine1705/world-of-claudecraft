@@ -38,8 +38,15 @@ import { en } from '../src/ui/i18n.catalog';
 
 const AT_ORIGIN = { x: 0, z: 0 };
 
+/** Fixture ids are only ever compared against a targetId, so any distinct
+ *  number does; a counter keeps every fixture in a case unique. */
+let nextId = 1;
 function crate(x: number, z: number, dead = false): CoachPromptEntity {
-  return { kind: 'object', objectItemId: 'ps_castaway_crate', dead, pos: { x, z } };
+  return { id: nextId++, kind: 'object', objectItemId: 'ps_castaway_crate', dead, pos: { x, z } };
+}
+
+function mob(templateId: string, x: number, z: number, dead = false): CoachPromptEntity {
+  return { id: nextId++, kind: 'mob', templateId, dead, pos: { x, z } };
 }
 
 function plan(over: {
@@ -48,6 +55,7 @@ function plan(over: {
   focus?: { questId: string; state: 'available' | 'active' | 'ready' } | null;
   entities?: CoachPromptEntity[];
   playerPos?: { x: number; z: number };
+  targetId?: number | null;
 }) {
   return coachPromptPlan({
     bellPhase: over.bellPhase ?? false,
@@ -55,6 +63,7 @@ function plan(over: {
     focus: over.focus ?? null,
     entities: over.entities ?? [],
     playerPos: over.playerPos ?? AT_ORIGIN,
+    targetId: over.targetId,
   });
 }
 
@@ -76,17 +85,64 @@ describe('coachPromptPlan: which target carries the bubble', () => {
     expect(p!.verbKey).toBe('hudChrome.bootcamp.promptTurnIn');
   });
 
-  it('bubbles the nearest live quarry with Attack for the kill lessons', () => {
-    const near = { kind: 'mob', templateId: 'training_effigy', pos: { x: 4, z: 0 } };
-    const far = { kind: 'mob', templateId: 'training_effigy', pos: { x: 30, z: 0 } };
-    const felled = { kind: 'mob', templateId: 'training_effigy', dead: true, pos: { x: 1, z: 0 } };
+  it('bubbles the nearest live quarry for the kill lessons', () => {
+    const near = mob('training_effigy', 4, 0);
+    const far = mob('training_effigy', 30, 0);
+    const felled = mob('training_effigy', 1, 0, true);
     const p = plan({
       focus: { questId: 'q_ps_strike_true', state: 'active' },
       entities: [far, felled, near],
+      targetId: near.id,
     });
     expect(p!.x).toBe(4);
     expect(p!.kind).toBe('kill');
     expect(p!.verbKey).toBe('hudChrome.bootcamp.promptAttack');
+  });
+
+  describe('the kill lessons split select from strike', () => {
+    // The CX ask: a new player told to press two things at once does
+    // neither. The bubble asks for the click first and names the attack
+    // button only once the quarry is actually selected.
+    const focus = { questId: 'q_ps_strike_true', state: 'active' as const };
+
+    it('asks for the click while nothing is selected', () => {
+      const quarry = mob('training_effigy', 4, 0);
+      const p = plan({ focus, entities: [quarry], targetId: null });
+      expect(p!.kind).toBe('select');
+      expect(p!.verbKey).toBe('hudChrome.bootcamp.promptSelect');
+      // Still standing on the quarry: the click it wants has a target.
+      expect(p!.x).toBe(quarry.pos.x);
+    });
+
+    it('treats a missing targetId the same as nothing selected', () => {
+      const quarry = mob('training_effigy', 4, 0);
+      expect(plan({ focus, entities: [quarry] })!.kind).toBe('select');
+    });
+
+    it('still asks for the click when the WRONG effigy is selected', () => {
+      // The decisive case for comparing ids rather than "has any target":
+      // a player who tabbed onto the far effigy is being pointed at the
+      // near one, and pressing attack would swing at neither.
+      const near = mob('training_effigy', 4, 0);
+      const far = mob('training_effigy', 30, 0);
+      const p = plan({ focus, entities: [near, far], targetId: far.id });
+      expect(p!.x).toBe(near.pos.x);
+      expect(p!.kind).toBe('select');
+    });
+
+    it('names the attack only once the bubbled quarry IS the target', () => {
+      const quarry = mob('training_effigy', 4, 0);
+      const p = plan({ focus, entities: [quarry], targetId: quarry.id });
+      expect(p!.kind).toBe('kill');
+      expect(p!.verbKey).toBe('hudChrome.bootcamp.promptAttack');
+    });
+
+    it('splits the scuttler cull the same way', () => {
+      const scuttler = mob('shore_scuttler', 3, 0);
+      const cull = { questId: 'q_ps_shell_and_claw', state: 'active' as const };
+      expect(plan({ focus: cull, entities: [scuttler], targetId: null })!.kind).toBe('select');
+      expect(plan({ focus: cull, entities: [scuttler], targetId: scuttler.id })!.kind).toBe('kill');
+    });
   });
 
   it('stays quiet for a kill lesson with no live quarry in the roster', () => {
@@ -142,11 +198,12 @@ describe('coachPromptPlan: which target carries the bubble', () => {
       z: CRAB_SUMMON_SITE.z,
     });
     const boss: CoachPromptEntity = {
+      id: nextId++,
       kind: 'mob',
       templateId: 'mister_crabs',
       pos: { x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z + 3 },
     };
-    const during = plan({ focus, entities: [boss] });
+    const during = plan({ focus, entities: [boss], targetId: boss.id });
     expect(during!.kind).toBe('kill');
     expect(during!.verbKey).toBe('hudChrome.bootcamp.promptAttack');
     expect({ x: during!.x, z: during!.z }).toEqual(boss.pos);
@@ -255,6 +312,7 @@ describe('coachPromptInRange: the show gate mirrors the interact reach', () => {
 describe('nearestCrate: the haul scan', () => {
   it('ignores non-crate objects entirely', () => {
     const bell: CoachPromptEntity = {
+      id: nextId++,
       kind: 'object',
       objectItemId: 'ps_ferry_bell',
       pos: { x: 1, z: 0 },

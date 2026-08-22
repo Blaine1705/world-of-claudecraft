@@ -20,8 +20,15 @@ import {
   isObjectOpenedByViewer,
   type OpenedObjectQuestRow,
 } from '../sim/quests/opened_object_view';
+import { ABILITY_DRILL_MOB_ID, ABILITY_DRILL_QUEST_ID } from '../sim/tutorial/ability_drill';
 import { INTERACT_RANGE } from '../sim/types';
-import { BELL_STEP_TARGET, type BootcampStep, type CoachFocus } from './bootcamp_view';
+import {
+  BELL_STEP_TARGET,
+  type BootcampStep,
+  type CoachFocus,
+  DEATH_LESSON_QUEST_ID,
+  type DeathLessonPhase,
+} from './bootcamp_view';
 import type { TranslationKey } from './i18n';
 
 /** Planar distance (sim dist2d needs full Vec3s; the prompt only has x/z). */
@@ -46,17 +53,24 @@ export interface CoachPromptPlan {
   lift: number;
   /** Interact reach for this target kind (the show gate). */
   range: number;
-  /** The verb under the keycap: Talk, Turn in, Pick up, Read, Ring, Attack. */
+  /** The verb under the keycap: Talk, Turn in quest, Pick up, Read, Ring,
+   *  Select, Attack. */
   verbKey: TranslationKey;
-  /** 'kill' bubbles chip the target and attack binds instead of interact;
+  /** 'select' asks for the CLICK that picks the quarry and carries no keycap
+   *  at all (a new player has a mouse or a finger before they have a key
+   *  chart); 'kill' is the same bubble once the quarry IS the target, and
+   *  chips the attack bind (desktop) or the action-bar icon (touch);
    *  'jump' bubbles chip the jump bind (the lane 2 parkour obstacles);
    *  'use' bubbles chip the bags bind (the tide-pool lure). */
-  kind: 'interact' | 'kill' | 'jump' | 'use';
+  kind: 'interact' | 'select' | 'kill' | 'jump' | 'use';
 }
 
 /** The minimal entity shape the crate and mob scans read
  *  (IWorld.entities values). */
 export interface CoachPromptEntity {
+  /** Entity id, compared against the viewer's targetId so the kill lessons
+   *  can tell "nothing selected yet" from "selected, now hit it". */
+  id: number;
   kind: string;
   templateId?: string;
   objectItemId?: string | null;
@@ -138,6 +152,7 @@ export function nearestDeadMob(
 /** The two kill lessons' quarry (the Attack bubble's scan target). */
 const KILL_LESSON_TEMPLATE: Readonly<Record<string, string>> = {
   q_ps_strike_true: 'training_effigy',
+  [ABILITY_DRILL_QUEST_ID]: ABILITY_DRILL_MOB_ID,
   q_ps_shell_and_claw: 'shore_scuttler',
   [CRAB_QUEST_ID]: CRAB_MOB_ID,
 };
@@ -171,6 +186,10 @@ export function nearestCrate(
 /** The signpost lesson's reading spot (mirrors COACH_ACTIVE_TARGETS: the
  *  noticeboard is a sentinel object, not a live entity the client can key). */
 const SIGNPOST_SPOT = { x: -312, z: 42.5 };
+
+/** The Passing Stone's spot (mirrors PROVING_SHORE_OBJECTS; pinned equal in
+ *  tests/coach_prompt_view.test.ts). */
+const PASSING_STONE_SPOT = { x: -312, z: -6 };
 
 /** Lane 2's parkour obstacles in running order (lane 2 runs SOUTH, so -z):
  *  the hurdle rail the player jumps OVER, then the crate step they jump
@@ -227,6 +246,15 @@ export function coachPromptPlan(args: {
   /** The viewer's quest log, for the opened-crate skip (optional so the
    *  bell/ladder callers stay unchanged). */
   questLog?: ReadonlyMap<string, OpenedObjectQuestRow>;
+  /** Where the viewer is in the death lesson's arc: the stone's bubble is
+   *  for the living only. Defaults to 'alive' so every other caller is
+   *  unchanged. */
+  deathPhase?: DeathLessonPhase;
+  /** The viewer's current target (entity.targetId), which splits every kill
+   *  lesson into its two halves: pick the quarry, then hit it. Optional so
+   *  the bell/ladder callers stay unchanged; absent reads as "nothing
+   *  selected", which is the safe half to show. */
+  targetId?: number | null;
 }): CoachPromptPlan | null {
   if (args.bellPhase) {
     return {
@@ -247,6 +275,7 @@ export function coachPromptPlan(args: {
     return null;
   }
   const focus = args.focus;
+  const deathPhase = args.deathPhase ?? 'alive';
   if (!focus) return null;
   const quest = PROVING_SHORE_QUESTS[focus.questId];
   if (!quest) return null;
@@ -288,6 +317,12 @@ export function coachPromptPlan(args: {
       };
     }
     if (!mob) return null;
+    // Two halves, because asking for both presses at once is what confused
+    // new players: until the quarry IS the target the bubble asks only for
+    // the click that selects it, and only then does it name the button that
+    // hits it. Comparing ids rather than "has any target" matters: a player
+    // who tabbed onto the wrong effigy still needs the select ask.
+    const selected = args.targetId != null && args.targetId === mob.id;
     return {
       x: mob.pos.x,
       z: mob.pos.z,
@@ -295,8 +330,14 @@ export function coachPromptPlan(args: {
       // head, and both must stay visible (playtest).
       lift: KILL_BUBBLE_LIFT,
       range: KILL_PROMPT_RANGE,
-      verbKey: 'hudChrome.bootcamp.promptAttack',
-      kind: 'kill',
+      // The ability drill asks for a different press on the same effigies,
+      // so its second half names the ability rather than the swing.
+      verbKey: selected
+        ? focus.questId === ABILITY_DRILL_QUEST_ID
+          ? 'hudChrome.bootcamp.promptUseAbility'
+          : 'hudChrome.bootcamp.promptAttack'
+        : 'hudChrome.bootcamp.promptSelect',
+      kind: selected ? 'kill' : 'select',
     };
   }
   if (focus.questId === 'q_ps_the_wreck_line') {
@@ -308,6 +349,19 @@ export function coachPromptPlan(args: {
       lift: OBJECT_LIFT,
       range: PROMPT_OBJECT_RANGE,
       verbKey: 'hudChrome.bootcamp.promptPickUp',
+      kind: 'interact',
+    };
+  }
+  if (focus.questId === DEATH_LESSON_QUEST_ID) {
+    // Only while alive: a ghost has already knelt, and its business is with
+    // its own corpse, which the death screen's own button owns.
+    if (deathPhase !== 'alive') return null;
+    return {
+      x: PASSING_STONE_SPOT.x,
+      z: PASSING_STONE_SPOT.z,
+      lift: OBJECT_LIFT,
+      range: PROMPT_OBJECT_RANGE,
+      verbKey: 'hudChrome.bootcamp.promptKneel',
       kind: 'interact',
     };
   }

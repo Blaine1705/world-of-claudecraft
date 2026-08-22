@@ -50,6 +50,7 @@ import {
 import { stunDrCategory } from '../stun_dr';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, dropThreat } from '../threat';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
 import type { AbilityDef, Aura, Entity } from '../types';
 import {
   angleTo,
@@ -412,6 +413,14 @@ export function runEffects(
   facingOverride?: number,
 ): void {
   const ability = res.def;
+  // The island's ability drill (tutorial/ability_drill.ts): the lesson is
+  // "use your own button on an effigy", so it credits on DELIVERY, not on
+  // damage. Here rather than in dealDamage for two reasons: this runs once
+  // per cast instead of once per damage instance, and a hit that lands for
+  // zero (a resisted bolt, a full absorb) was still the press the coach
+  // asked for. The resist branch that returns before this point credits
+  // itself (combat/casting_lifecycle.ts). Draws no rng.
+  if (target) creditAbilityDrill(ctx, p, target, ability.id);
   const vespersGloomtitheStacks = gloomtitheStacksForCast(p, ability.id);
   const initialTarget = target;
   const ascensionFxTargetId = target?.id ?? p.id;

@@ -72,6 +72,7 @@ import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { noteReliquaryMark } from './reliquary';
 import type { SimContext } from './sim_context';
 import { interactSoulwell } from './soulwell';
+import { PASSING_STONE_OBJECT_ID, tryPassingStone } from './tutorial/death_lesson';
 import { creditSignpostRead } from './tutorial/signpost_read';
 import {
   cloneItemInstancePayload,
@@ -820,6 +821,11 @@ export function pickUpObject(
   }
   // The Proving Shore ferry bells travel, never loot: route the click to the
   // ferry handler before the pickup path so ringing always sails.
+  // The Passing Stone performs the death lesson's rite, never loots: same
+  // reasoning as the bells above, so a bare click always kneels.
+  if (objectItemId === PASSING_STONE_OBJECT_ID) {
+    return tryPassingStone(ctx, p, meta);
+  }
   if (objectItemId === FERRY_BELL_OBJECT_ID) {
     return tryRingFerryBell(ctx, obj, p, meta);
   }

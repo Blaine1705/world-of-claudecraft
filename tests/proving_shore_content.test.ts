@@ -290,23 +290,31 @@ describe('proving shore placement', () => {
     expect(PROVING_SHORE_QUEST_ORDER).toEqual([
       'q_ps_the_gauntlet',
       'q_ps_strike_true',
+      'q_ps_hone_the_edge',
       'q_ps_shell_and_claw',
       'q_ps_mother_of_pearl',
       'q_ps_the_wreck_line',
       'q_ps_pouch_and_purse',
       'q_ps_the_signpost',
+      'q_ps_the_long_walk',
       'q_ps_set_sail',
     ]);
     const relay = PROVING_SHORE_QUEST_ORDER.map((id) => PROVING_SHORE_QUESTS[id]);
     expect(relay.map((q) => [q.giverNpcId, q.turnInNpcId])).toEqual([
       ['warden_tam', 'overseer_pell'],
       ['overseer_pell', 'drillmaster_rook'],
+      // Rook holds two stations: the yard drills the swing, then the
+      // action bar, both on the same effigies.
+      ['drillmaster_rook', 'drillmaster_rook'],
       ['drillmaster_rook', 'tidewarden_nel'],
       // Nel holds two stations: the miniboss detour leaves and returns to
       // her watch, then she hands the salvage haul out as before.
       ['tidewarden_nel', 'tidewarden_nel'],
       ['tidewarden_nel', 'quartermaster_finch'],
       ['quartermaster_finch', 'instructor_maren'],
+      ['instructor_maren', 'instructor_maren'],
+      // Maren holds three stations: the board, the death lesson, and the
+      // crossing that sends a graduate off the island.
       ['instructor_maren', 'instructor_maren'],
       ['instructor_maren', 'ferryman_odo'],
     ]);
