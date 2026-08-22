@@ -3827,6 +3827,7 @@ export const ja_JP: EnTranslations = {
       "unlockedBorderHint": "新しい枠飾りを獲得: {name}。功績の書で着用できます。",
       "broadcastLine": "{name}が功績「{deed}」を達成しました",
       "rarityLine": "冒険者の{percent}が達成",
+      "stillToVisit": "未訪問の地点：{places}",
       "trackerLabel": "功績",
       "collapseHint": "功績トラッカーを折りたたむ",
       "expandHint": "功績トラッカーを展開",

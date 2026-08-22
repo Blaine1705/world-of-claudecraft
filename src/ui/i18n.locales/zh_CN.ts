@@ -9153,6 +9153,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.deedsRetroSummary.other': '你的编年史已更新：补录 {count} 项功绩。',
   'hudChrome.deeds.broadcastLine': '{name} 达成了功绩：{deed}',
   'hudChrome.deeds.rarityLine': '{percent} 的冒险者已达成',
+  'hudChrome.deeds.stillToVisit': '尚待探访：{places}',
   'hudChrome.deeds.trackerLabel': '功绩',
   'hudChrome.deeds.collapseHint': '折叠功绩追踪器',
   'hudChrome.deeds.expandHint': '展开功绩追踪器',

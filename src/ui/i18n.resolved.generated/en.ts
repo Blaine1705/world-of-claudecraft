@@ -3827,6 +3827,7 @@ export const en: EnTranslations = {
       "unlockedBorderHint": "New border earned: {name}. Wear it from the Book of Deeds.",
       "broadcastLine": "{name} has accomplished a deed: {deed}",
       "rarityLine": "Earned by {percent} of adventurers",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Deeds",
       "collapseHint": "Collapse deed tracker",
       "expandHint": "Expand deed tracker",

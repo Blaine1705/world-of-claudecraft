@@ -3827,6 +3827,7 @@ export const es_ES: EnTranslations = {
       "unlockedBorderHint": "Nuevo borde conseguido: {name}. Lúcelo desde el Libro de Gestas.",
       "broadcastLine": "{name} ha logrado una gesta: {deed}",
       "rarityLine": "Conseguida por el {percent} de los aventureros",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Gestas",
       "collapseHint": "Contraer el seguimiento de gestas",
       "expandHint": "Expandir el seguimiento de gestas",

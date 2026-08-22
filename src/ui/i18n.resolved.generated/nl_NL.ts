@@ -3827,6 +3827,7 @@ export const nl_NL: EnTranslations = {
       "unlockedBorderHint": "Nieuwe rand verdiend: {name}. Draag hem via het Boek der Daden.",
       "broadcastLine": "{name} heeft een daad volbracht: {deed}",
       "rarityLine": "Behaald door {percent} van de avonturiers",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Daden",
       "collapseHint": "Klap de dadenvolglijst in",
       "expandHint": "Klap de dadenvolglijst uit",

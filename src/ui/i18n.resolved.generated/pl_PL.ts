@@ -3827,6 +3827,7 @@ export const pl_PL: EnTranslations = {
       "unlockedBorderHint": "Zdobyto nowe obramowanie: {name}. Załóż je w Księdze Czynów.",
       "broadcastLine": "{name} dokonuje czynu: {deed}",
       "rarityLine": "Zdobyty przez {percent} poszukiwaczy przygód",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Czyny",
       "collapseHint": "Zwiń podgląd czynów",
       "expandHint": "Rozwiń podgląd czynów",

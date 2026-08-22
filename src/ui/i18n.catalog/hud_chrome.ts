@@ -5005,6 +5005,11 @@ export const hudChromeStrings = {
     unlockedBorderHint: 'New border earned: {name}. Wear it from the Book of Deeds.',
     broadcastLine: '{name} has accomplished a deed: {deed}',
     rarityLine: 'Earned by {percent} of adventurers',
+    // The exploration-deed card's still-missing-places line (deeds_window.ts
+    // missingPoiLabels): which named places an unearned wayfarer deed still
+    // needs, so a player is never left guessing which one of the ten never
+    // registered.
+    stillToVisit: 'Still to visit: {places}',
     trackerLabel: 'Deeds',
     collapseHint: 'Collapse deed tracker',
     expandHint: 'Expand deed tracker',

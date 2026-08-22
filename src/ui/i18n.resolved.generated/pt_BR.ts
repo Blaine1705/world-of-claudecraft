@@ -3827,6 +3827,7 @@ export const pt_BR: EnTranslations = {
       "unlockedBorderHint": "Nova moldura conquistada: {name}. Use-a pelo Livro dos Feitos.",
       "broadcastLine": "{name} realizou um feito: {deed}",
       "rarityLine": "Conquistado por {percent} dos aventureiros",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Feitos",
       "collapseHint": "Recolher o rastreador de feitos",
       "expandHint": "Expandir o rastreador de feitos",

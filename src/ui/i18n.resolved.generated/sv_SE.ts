@@ -3827,6 +3827,7 @@ export const sv_SE: EnTranslations = {
       "unlockedBorderHint": "Ny ram förtjänad: {name}. Bär den via Bedrifternas bok.",
       "broadcastLine": "{name} har fullbordat en bedrift: {deed}",
       "rarityLine": "Fullbordad av {percent} av äventyrarna",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Bedrifter",
       "collapseHint": "Fäll ihop bedriftsspåraren",
       "expandHint": "Fäll ut bedriftsspåraren",

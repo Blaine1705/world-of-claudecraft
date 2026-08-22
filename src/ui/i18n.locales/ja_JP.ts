@@ -9556,6 +9556,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.deedsRetroSummary.other': '年代記が追いつきました: {count} 件の功績を記録。',
   'hudChrome.deeds.broadcastLine': '{name}が功績「{deed}」を達成しました',
   'hudChrome.deeds.rarityLine': '冒険者の{percent}が達成',
+  'hudChrome.deeds.stillToVisit': '未訪問の地点：{places}',
   'hudChrome.deeds.trackerLabel': '功績',
   'hudChrome.deeds.collapseHint': '功績トラッカーを折りたたむ',
   'hudChrome.deeds.expandHint': '功績トラッカーを展開',

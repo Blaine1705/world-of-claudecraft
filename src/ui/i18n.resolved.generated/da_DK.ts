@@ -3827,6 +3827,7 @@ export const da_DK: EnTranslations = {
       "unlockedBorderHint": "Ny ramme optjent: {name}. Bær den fra Bedrifternes Bog.",
       "broadcastLine": "{name} har fuldbragt en bedrift: {deed}",
       "rarityLine": "Opnået af {percent} af eventyrerne",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Bedrifter",
       "collapseHint": "Fold bedriftssporing sammen",
       "expandHint": "Fold bedriftssporing ud",

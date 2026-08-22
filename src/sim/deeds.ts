@@ -293,7 +293,14 @@ const SAUL_TALKS_REQUIRED = 9;
 // chr_peaks_waking_witness (inside interest scope, pinned literal).
 // Exported for the placement suite's mirror-lake standability arm, which used
 // to carry its own copy of this number and could drift silently.
-export const POI_VISIT_RADIUS = 20;
+// 24, not a rounder number: the tightest as-authored gap between two named
+// places in any wayfarer zone is Eastbrook Vale's eastbrook<->reliquary_hill
+// pair at ~49.2yd (tests/gather_node_placement.test.ts pins every other
+// zone's pois wider apart than that). A visit radius has to stay under half
+// of that or two distinct "visit all named places" entries could both grant
+// from one spot, so 24 is the most forgiving value that still leaves every
+// zone's catch circles apart.
+export const POI_VISIT_RADIUS = 24;
 const THUNZHARR_WITNESS_RADIUS = 100;
 
 // ---------------------------------------------------------------------------

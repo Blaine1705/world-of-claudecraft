@@ -3827,6 +3827,7 @@ export const tr_TR: EnTranslations = {
       "unlockedBorderHint": "Yeni çerçeve kazanıldı: {name}. Yiğitlikler Kitabı'ndan tak.",
       "broadcastLine": "{name} bir yiğitliğe imza attı: {deed}",
       "rarityLine": "Maceracıların {percent} kadarı kazandı",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Yiğitlikler",
       "collapseHint": "Yiğitlik takipçisini daralt",
       "expandHint": "Yiğitlik takipçisini genişlet",

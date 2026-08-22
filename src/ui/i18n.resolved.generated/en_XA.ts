@@ -3827,6 +3827,7 @@ export const en_XA: EnTranslations = {
       "unlockedBorderHint": "[Ñéŵ ƀóŕðéŕ éáŕñéð: {name}. Ŵéáŕ íţ ƒŕóɱ ţĥé Ɓóóķ óƒ Ðééðš.]",
       "broadcastLine": "[{name} ĥáš áççóɱþļíšĥéð á ðééð: {deed}]",
       "rarityLine": "[Éáŕñéð ƀý {percent} óƒ áðʋéñţúŕéŕš]",
+      "stillToVisit": "[Šţíļļ ţó ʋíšíţ: {places}]",
       "trackerLabel": "[Ðééðš]",
       "collapseHint": "[Çóļļáþšé ðééð ţŕáçķéŕ]",
       "expandHint": "[Éẋþáñð ðééð ţŕáçķéŕ]",

@@ -9,6 +9,7 @@
 
 import { audio } from '../game/audio';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
+import { ZONES } from '../sim/data';
 import { DEEDS_RECENT_CAP } from '../sim/deeds';
 import type { DeedsRarity, IWorld } from '../world_api';
 import { deedDesc, deedName, deedTitleText } from './deed_i18n';
@@ -29,10 +30,12 @@ import {
   toggleWatch,
 } from './deeds_view';
 import { markDialogRoot } from './dialog_root';
+import { zonePoiLabel } from './entity_i18n';
 import { esc } from './esc';
 import { focusedWithin } from './focus_restore';
 import {
   formatDateTime,
+  formatList,
   formatNumber,
   getLanguage,
   languageTag,
@@ -525,6 +528,22 @@ export class DeedsWindow {
     return `<div class="deeds-list">${model.entries.map((entry) => this.entryHtml(entry)).join('')}</div>`;
   }
 
+  /** Resolve poi:<zoneId>:<poiId> marks (the core's missingPoiMarkIds) to
+   *  their localized display names, via the same zonePoiLabel the world map
+   *  renders its labels from. A mark whose zone/poi no longer resolves is
+   *  dropped rather than shown as a raw id (content can rename/retire a
+   *  poi id; the mark itself stays parked in an old save either way). */
+  private missingPoiLabels(markIds: readonly string[]): string[] {
+    const labels: string[] = [];
+    for (const markId of markIds) {
+      const [, zoneId, poiId] = markId.split(':');
+      const poiIndex = ZONES.find((z) => z.id === zoneId)?.pois.findIndex((p) => p.id === poiId);
+      if (poiIndex === undefined || poiIndex < 0) continue;
+      labels.push(zonePoiLabel(zoneId, poiIndex));
+    }
+    return labels;
+  }
+
   private entryHtml(entry: DeedEntryModel): string {
     const name = deedName(entry.id);
     const chips: string[] = [];
@@ -581,6 +600,17 @@ export class DeedsWindow {
         maximumFractionDigits: 1,
       });
       body += `<div class="deed-rarity">${esc(t('hudChrome.deeds.rarityLine', { percent }))}</div>`;
+    }
+    // Which named places are still outstanding on an exploration wayfarer
+    // deed, so a player is never left re-walking a whole zone to find the
+    // one mark that never registered (it did; they just could not see which
+    // one). The .deed-rarity class is reused rather than a bespoke one: both
+    // lines are the same "muted secondary fact under the blurb" role.
+    const missingPlaces = this.missingPoiLabels(entry.missingPoiMarkIds);
+    if (missingPlaces.length > 0) {
+      body += `<div class="deed-rarity">${esc(
+        t('hudChrome.deeds.stillToVisit', { places: formatList(missingPlaces) }),
+      )}</div>`;
     }
     let foot = '';
     if (entry.earnedDay !== null) {

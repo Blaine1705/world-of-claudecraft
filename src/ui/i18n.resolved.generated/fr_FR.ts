@@ -3827,6 +3827,7 @@ export const fr_FR: EnTranslations = {
       "unlockedBorderHint": "Nouvelle bordure obtenue : {name}. Portez-la depuis le Livre des hauts faits.",
       "broadcastLine": "{name} a accompli un haut fait: {deed}",
       "rarityLine": "Obtenu par {percent} des aventuriers",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Hauts faits",
       "collapseHint": "Réduire le suivi des hauts faits",
       "expandHint": "Déployer le suivi des hauts faits",
