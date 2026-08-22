@@ -35,11 +35,14 @@ export function compilePriorityForTarget(
   return GPU_WORK_PRIORITY.LIVE_VIEW;
 }
 
-/** Entry admission: only information the player can act on may compete with
- * the first presented world frame. Ordinary live views keep their canvas
+/** Entry admission: actionable views and views the entry manifest itself
+ * awaits may compile before first paint. Ordinary live views keep their canvas
  * stand-in until the shared first-paint gate releases. */
-export function compileMayStartBeforeInitialPaint(priority: number): boolean {
-  return priority >= GPU_WORK_PRIORITY.ACTIONABLE_VIEW;
+export function compileMayStartBeforeInitialPaint(
+  priority: number,
+  requiredForEntry = false,
+): boolean {
+  return requiredForEntry || priority >= GPU_WORK_PRIORITY.ACTIONABLE_VIEW;
 }
 
 /** The one predicate the renderer feeds compilePriorityForTarget: casting AT

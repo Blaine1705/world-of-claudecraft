@@ -278,7 +278,7 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by extracting the compile-root collection, near-first
     // ordering and program-content dedupe into initial_scene_compile_units.ts.
     // Exact count after formatting, zero slack.
-    ceiling: 13513,
+    ceiling: 13510,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

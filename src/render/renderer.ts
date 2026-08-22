@@ -4699,7 +4699,7 @@ export class Renderer {
     for (const entity of mandatory) {
       let view = this.views.get(entity.id);
       if (!view) {
-        this.createView(entity);
+        this.createView(entity, undefined, true);
         view = this.views.get(entity.id);
         if (view) {
           sampleCreatedViewType(createdViewTypes, entity);
@@ -4708,9 +4708,7 @@ export class Renderer {
       }
       if (view?.compileReady) compileWaits.push(view.compileReady);
     }
-    // Parallel compile resolves, rejects, or clears through the per-view 1500ms
-    // fail-soft guard. Without parallel compile there are no promises and the
-    // views begin ready for the per-entry synchronous link pass.
+    // Entry-required gates bypass the post-paint barrier awaited by this manifest.
     await Promise.all(compileWaits);
     if (!mandatoryLandmarkViewsReady(ids, this.views)) {
       throw new Error('Mandatory interaction landmark views did not become ready');
@@ -8311,16 +8309,16 @@ export class Renderer {
     return group;
   }
 
-  private createView(e: Entity, opts?: AssembleOptions): void {
+  private createView(e: Entity, opts?: AssembleOptions, requiredForEntry = false): void {
     const started = performance.now();
-    this.buildView(e, opts);
+    this.buildView(e, opts, requiredForEntry);
     const view = this.views.get(e.id);
     if (!view) return;
     const kind = viewBuildClass(e, this.sim.player.id, view.visual);
     this.buildLedger.record(`view:${kind}`, performance.now() - started, started);
   }
 
-  private buildView(e: Entity, opts?: AssembleOptions): void {
+  private buildView(e: Entity, opts?: AssembleOptions, requiredForEntry = false): void {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
     let visual: CharacterVisual | null = null;
@@ -8720,7 +8718,7 @@ export class Renderer {
     // the compilePending flag (only the non-self loop does), so gating it would
     // strand the player invisible. Other entities un-hide via that loop.
     if (view && e.id !== this.sim.player.id) {
-      view.compileReady = this.gateViewOnCompile(view, group);
+      view.compileReady = this.gateViewOnCompile(view, group, requiredForEntry);
     }
     // Warm an already-mounted entity's engine clips at view creation too: the
     // mountKey-edge preload below only fires on a CHANGE, but a remote rider
@@ -8749,7 +8747,7 @@ export class Renderer {
   // crowd of composed players arriving in a live frame: 500 to 711 ms on the
   // first `live-gate` unit); the queue paces between units, never inside one,
   // and its released-tail cap now bounds the gate's links on the driver too.
-  private compileGate(target: THREE.Object3D): Promise<unknown> {
+  private compileGate(target: THREE.Object3D, requiredForEntry = false): Promise<unknown> {
     const lookup = (id: number) => this.sim.entities.get(id);
     const isCasting = castingAtPlayerPredicate(lookup, this.sim.player.id);
     const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
@@ -8771,7 +8769,7 @@ export class Renderer {
         VIEW_COMPILE_GATE_MAX_MS,
         { priority, label: `live-gate:${target.name || target.type}` },
       );
-    const startAfterInitialPaint = compileMayStartBeforeInitialPaint(priority)
+    const startAfterInitialPaint = compileMayStartBeforeInitialPaint(priority, requiredForEntry)
       ? null
       : this.initialGpuWorkStart;
     const linked = startAfterInitialPaint ? startAfterInitialPaint.then(submit, submit) : submit();
@@ -8819,15 +8817,14 @@ export class Renderer {
     console.error('Live shader compile gate failed', error);
   }
 
-  // Generic anti-freeze layer. A freshly-streamed view links its shader programs
-  // SYNCHRONOUSLY on first draw - a 50-1700ms frame stall (the open-world travel
-  // hitch). Instead link them OFF the main thread and keep the view hidden until
-  // ready: it pops in a frame or two late rather than freezing. Unlike the boot
-  // prewarm this enumerates NOTHING, so new content and render-state variants the
-  // prewarm cannot anticipate (e.g. the env-map-lit material that links only when
-  // you walk into a biome) never hitch in-world. The prewarm stays a pure
-  // optimization: already-compiled spawn content resolves instantly, no pop-in.
-  private gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null {
+  // Generic anti-freeze layer: link a freshly streamed view off-thread and keep
+  // it hidden until ready. This also covers variants the boot prewarm cannot
+  // anticipate; already-compiled spawn content resolves without visible pop-in.
+  private gateViewOnCompile(
+    view: EntityView,
+    group: THREE.Group,
+    requiredForEntry = false,
+  ): Promise<void> | null {
     if (!this.asyncCompileSupported) return null;
     const generation = this.lifecycleGeneration;
     const priorVisibility = group.visible;
@@ -8836,7 +8833,7 @@ export class Renderer {
     // The canvas nameplate (name, target marker, health, and cast bar) keeps
     // painting while the 3D group is gated, so actionable information has an
     // immediate placeholder without first-drawing a still-linking shader.
-    return this.compileGate(group).then(
+    return this.compileGate(group, requiredForEntry).then(
       () => {
         if (!this.shutdownStarted && generation === this.lifecycleGeneration) {
           view.compilePending = false;

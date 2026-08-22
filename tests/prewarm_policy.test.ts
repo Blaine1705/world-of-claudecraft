@@ -1491,13 +1491,14 @@ describe('mandatory interaction-landmark prewarm', () => {
     const helperEnd = renderer.indexOf('\n  private createPersistentPortalViews(', helperStart);
     const helper = renderer.slice(helperStart, helperEnd);
     const partitionAt = helper.indexOf('partitionMandatoryLandmarkCandidates(');
-    const createAt = helper.indexOf('this.createView(entity)');
+    const createAt = helper.indexOf('this.createView(entity, undefined, true)');
     const compileWaitAt = helper.indexOf('await Promise.all(compileWaits)');
     const readinessAt = helper.indexOf('mandatoryLandmarkViewsReady(ids, this.views)');
     expect(helperStart).toBeGreaterThan(-1);
     expect(helperEnd).toBeGreaterThan(helperStart);
     expect(partitionAt).toBeGreaterThan(-1);
     expect(createAt).toBeGreaterThan(partitionAt);
+    expect(helper).toContain('this.createView(entity, undefined, true)');
     expect(compileWaitAt).toBeGreaterThan(createAt);
     expect(readinessAt).toBeGreaterThan(compileWaitAt);
     expect(helper).not.toContain('remainingPrewarmViewBudget');
@@ -1520,7 +1521,7 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(gateStart).toBeGreaterThan(-1);
     expect(gateEnd).toBeGreaterThan(gateStart);
     expect(gate).toContain('if (!this.asyncCompileSupported) return null;');
-    expect(gate).toContain('this.compileGate(group)');
+    expect(gate).toContain('this.compileGate(group, requiredForEntry)');
     expect(gate).toContain('view.compilePending = false;');
     expect(gate).toContain(
       'The canvas nameplate (name, target marker, health, and cast bar) keeps',

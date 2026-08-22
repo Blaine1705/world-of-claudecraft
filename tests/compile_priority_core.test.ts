@@ -94,4 +94,9 @@ describe('compileMayStartBeforeInitialPaint', () => {
     expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.LIVE_VIEW)).toBe(false);
     expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.VISIBLE_PREWARM)).toBe(false);
   });
+
+  it('admits an entry-required view without promoting ordinary live views', () => {
+    expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.LIVE_VIEW, true)).toBe(true);
+    expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.LIVE_VIEW, false)).toBe(false);
+  });
 });
