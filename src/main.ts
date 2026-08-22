@@ -165,7 +165,7 @@ import {
   resolveUiEffectsProfile,
   worldEntryGpuSettleCoverMs,
 } from './game/ui_effects_profile';
-import { currentResetDay, currentUtcDay } from './game/utc_day';
+import { feedSimCalendar } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
@@ -4384,10 +4384,9 @@ async function startGame(
 
     if (offlineSim) {
       acc += frameDt;
-      // Supply the UTC day for the delve daily reset (the sim never reads the wall
-      // clock itself, to stay deterministic).
-      offlineSim.utcDay = currentUtcDay();
-      offlineSim.resetDay = currentResetDay();
+      // Supply the host calendar keys (the sim never reads the wall clock
+      // itself, to stay deterministic).
+      feedSimCalendar(offlineSim);
       while (acc >= DT) {
         const { mi, facing } = resolveMove(
           mouselook,

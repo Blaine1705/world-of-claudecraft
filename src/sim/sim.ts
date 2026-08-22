@@ -2145,6 +2145,10 @@ export class Sim {
   // local one, so a daily never rolls over mid-evening the way midnight UTC did.
   // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
   resetDay = '';
+  // The weekend event early-open probe: the reset-day key DOUBLE_HONOR_LEAD_HOURS
+  // ahead of now, fed by the host beside resetDay (server: `eventLeadDayKey`;
+  // offline: `feedSimCalendar`). '' = no calendar, the event never opens early.
+  eventLeadDay = '';
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
   // id. Constructed in the ctor after the SimContext (it consumes the seam); Sim
@@ -5297,6 +5301,9 @@ export class Sim {
       },
       get resetDay() {
         return sim.resetDay;
+      },
+      get eventLeadDay() {
+        return sim.eventLeadDay;
       },
       get utcDay() {
         return sim.utcDay;

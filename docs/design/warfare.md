@@ -290,11 +290,14 @@ Phase 1 starts with these owner-selected values:
 
 Every weekend is the Double Honor Weekend: every Thornhollow Fields Honor
 award (the result, the kill and assist drip, and the first-win bonus) pays
-`DOUBLE_HONOR_MULTIPLIER` (2x) times its normal amount for the Saturday and
-Sunday reset windows (`src/sim/pvp/honor_event.ts`, applied by the
-battleground award paths in `honor.ts` before their single floor). In realm
-time that is Saturday 3 AM to Monday 3 AM: the event rolls on the reset-day
-boundary like every other daily window, and a host that sets no calendar
+`DOUBLE_HONOR_MULTIPLIER` (2x) times its normal amount while the weekend
+window is open (`src/sim/pvp/honor_event.ts`, applied by the battleground
+award paths in `honor.ts` before their single floor). The window opens
+`DOUBLE_HONOR_LEAD_HOURS` (12) before the Saturday reset window and closes
+at Monday's reset: in realm time that is Friday 3 PM to Monday 3 AM. The
+open rides a second host-fed key (`eventLeadDay`, the reset-day key probed
+that many hours ahead), the close rides the reset-day boundary like every
+other daily window, and a host that sets no calendar (both keys empty)
 never runs it. Battleground only, never arena or Fiesta Honor: that is the
 scope the feature request asked for by name, and it is the classic-era shape,
 where a battleground holiday weekend boosted one battleground's faucet.

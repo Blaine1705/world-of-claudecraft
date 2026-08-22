@@ -247,6 +247,12 @@ export interface SimContextPrimitives {
   // daily boundary. '' means the host set no calendar, so nothing ever rolls over
   // and same-seed replays stay reproducible.
   readonly resetDay: string;
+  // Host-supplied early-open probe for the weekend Double Honor window ('' =
+  // unknown): the reset-day key the realm will be in DOUBLE_HONOR_LEAD_HOURS
+  // from now, so the event opens that many hours before the Saturday window
+  // (src/sim/pvp/honor_event.ts). Only the event reads this; every daily
+  // rollover stays on `resetDay` above.
+  readonly eventLeadDay: string;
   // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
   // the backing array stays on Sim, mutated in place (push), so read-only ref.
   readonly pendingMobRespawns: PendingMobRespawn[];
@@ -1327,6 +1333,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get resetDay() {
       return host.resetDay;
+    },
+    get eventLeadDay() {
+      return host.eventLeadDay;
     },
     get utcDay() {
       return host.utcDay;

@@ -15,10 +15,14 @@
 // "Saturday" is the realm's own reset window: the day is read from the
 // HOST-provided `resetDay` key (the same boundary the first-win bonus and the
 // per-opponent daily counters roll on), never from a wall clock, so the event
-// opens and closes at the realm's 3 AM reset exactly like every other daily
-// window. An empty `resetDay` means the host set no calendar (headless runs,
-// replays, parity traces): the event never fires there, keeping those runs
-// byte-identical to what they were.
+// closes at the realm's 3 AM reset exactly like every other daily window. The
+// OPEN comes DOUBLE_HONOR_LEAD_HOURS earlier: the host also feeds an
+// `eventLeadDay` probe (the reset-day key that many hours ahead of now), and
+// the window is open when EITHER key reads a weekend day, so the event runs
+// Friday 3 PM through Monday 3 AM realm time. The event stays off only when
+// BOTH keys are empty (no host calendar: headless runs, replays, parity
+// traces), keeping those runs byte-identical to what they were; a host feeds
+// both keys or neither, never just one.
 //
 // The weekday is computed arithmetically from the `YYYY-MM-DD` key (Sakamoto's
 // congruence) rather than through `Date`: the weekday of a calendar date is a
@@ -27,9 +31,28 @@
 
 /** Days of the week the event runs, 0=Sunday..6=Saturday (matching
  *  `getUTCDay` and the calendar view's weekday convention). The Saturday and
- *  Sunday RESET WINDOWS, so in realm time the event opens Saturday 3 AM and
- *  closes Monday 3 AM: the whole weekend, never mid-evening. */
+ *  Sunday RESET WINDOWS, opened early by the lead below, so in realm time the
+ *  event runs Friday 3 PM through Monday 3 AM: the whole weekend, never
+ *  mid-evening. */
 export const DOUBLE_HONOR_WEEKDAYS: readonly number[] = [6, 0];
+
+/** The early open: how many hours BEFORE the Saturday reset window the event
+ *  opens. The hosts feed the sim a second day key probed this far ahead of
+ *  now (`eventLeadDay`), so with the 3 AM reset the window opens Friday 3 PM
+ *  realm time. At 12 hours, a realm on US Eastern opens while Saturday
+ *  morning is already underway on the far side of the date line (7 AM in New
+ *  Zealand), so those players get their whole weekend instead of joining
+ *  Saturday evening. The close is unchanged: Monday's own 3 AM reset. The
+ *  lead is real time, not wall-clock: on a DST-shift night the wall-clock
+ *  lead reads 11 or 13 hours, which never lands near the Friday open
+ *  (mainstream zones shift early Sunday morning) and is masked by the
+ *  resetDay arm on Sunday. */
+export const DOUBLE_HONOR_LEAD_HOURS = 12;
+
+/** The same lead in epoch milliseconds, for the hosts that build the probe
+ *  (server/raid_reset.ts `eventLeadDayKey`, src/game/utc_day.ts
+ *  `eventLeadDayOf`). */
+export const DOUBLE_HONOR_LEAD_MS = DOUBLE_HONOR_LEAD_HOURS * 3_600_000;
 
 /** Event multiplier applied to every battleground honor award while the
  *  window is open. 2x is owner tuning in the same spirit as the classic-era
@@ -68,13 +91,20 @@ export function weekdayOfDayKey(dayKey: string): number {
   );
 }
 
-/** Is the weekly Double Honor window open for this host-provided reset day? */
-export function doubleHonorActive(resetDay: string): boolean {
-  return DOUBLE_HONOR_WEEKDAYS.includes(weekdayOfDayKey(resetDay));
+/** Is the weekly Double Honor window open? Open when the realm's own reset
+ *  day is a weekend day, OR when the host's `eventLeadDay` probe (the reset
+ *  day DOUBLE_HONOR_LEAD_HOURS ahead of now) already reads one: the second
+ *  arm is what opens the window Friday 3 PM, and the first is what holds it
+ *  open through Sunday evening until Monday's reset. */
+export function doubleHonorActive(resetDay: string, eventLeadDay: string): boolean {
+  return (
+    DOUBLE_HONOR_WEEKDAYS.includes(weekdayOfDayKey(resetDay)) ||
+    DOUBLE_HONOR_WEEKDAYS.includes(weekdayOfDayKey(eventLeadDay))
+  );
 }
 
 /** The factor honor.ts applies to every battleground award:
- *  DOUBLE_HONOR_MULTIPLIER while the Saturday window is open, otherwise 1. */
-export function honorEventMultiplier(resetDay: string): number {
-  return doubleHonorActive(resetDay) ? DOUBLE_HONOR_MULTIPLIER : 1;
+ *  DOUBLE_HONOR_MULTIPLIER while the weekend window is open, otherwise 1. */
+export function honorEventMultiplier(resetDay: string, eventLeadDay: string): number {
+  return doubleHonorActive(resetDay, eventLeadDay) ? DOUBLE_HONOR_MULTIPLIER : 1;
 }

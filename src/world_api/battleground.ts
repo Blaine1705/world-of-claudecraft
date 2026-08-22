@@ -118,11 +118,12 @@ export interface BgInfo {
   firstWinBonusReady: boolean;
   /** The weekly Double Honor event (src/sim/pvp/honor_event.ts) is running:
    *  every Thornhollow Fields honor award pays DOUBLE_HONOR_MULTIPLIER times
-   *  its normal amount through the weekend's reset windows, and a played-out
-   *  loss pays the win base (battleground only, never arena or Fiesta
-   *  honor). Drives the event chip on the Thornhollow
-   *  Fields tab; a realm-wide fact on the same reset-day boundary as
-   *  `firstWinBonusReady` above, riding the same refresh cadence. */
+   *  its normal amount from DOUBLE_HONOR_LEAD_HOURS before the Saturday
+   *  reset window (Friday 3 PM realm time) until Monday's reset, and a
+   *  played-out loss pays the win base (battleground only, never arena or
+   *  Fiesta honor). Drives the event chip on the Thornhollow Fields tab; a
+   *  realm-wide fact riding the same refresh cadence as `firstWinBonusReady`
+   *  above (which itself still rolls on the reset day alone). */
   doubleHonorActive: boolean;
   /** The live queue-pop offer awaiting my answer, or null. Counts only, never
    *  names: the ten have not been introduced, and a decline must not leak who

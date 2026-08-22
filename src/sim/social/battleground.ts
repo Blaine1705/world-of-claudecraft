@@ -2173,9 +2173,10 @@ export function bgInfoFor(
     // per-viewer wire builder must not mutate the daily window it reports on.
     firstWinBonusReady: bgFirstWinBonusAvailable(ctx.resetDay, meta),
     // The weekly Double Honor window, read off the same host-provided reset
-    // day the first-win flag above rolls on. Realm-wide fact, not per-viewer
-    // state, so the read is trivially mutation-free.
-    doubleHonorActive: doubleHonorActive(ctx.resetDay),
+    // day the first-win flag above rolls on plus the early-open lead probe.
+    // Realm-wide fact, not per-viewer state, so the read is trivially
+    // mutation-free.
+    doubleHonorActive: doubleHonorActive(ctx.resetDay, ctx.eventLeadDay),
     match: matchInfo,
     ladder: ladder ?? bgLadder(ctx),
   };

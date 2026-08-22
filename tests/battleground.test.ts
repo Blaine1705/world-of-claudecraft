@@ -3115,8 +3115,13 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(true);
     sim.resetDay = '2026-08-10'; // Monday: the chip drops on the rollover
     expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(false);
+    // The 12-hour early open: Friday, once the host's lead probe reads Saturday.
+    sim.resetDay = '2026-08-07';
+    sim.eventLeadDay = '2026-08-08';
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(true);
     // No host calendar, no event (headless and parity runs stay untouched).
     sim.resetDay = '';
+    sim.eventLeadDay = '';
     expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(false);
   });
 

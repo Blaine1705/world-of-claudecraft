@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DOUBLE_HONOR_LEAD_HOURS,
+  DOUBLE_HONOR_LEAD_MS,
   DOUBLE_HONOR_MULTIPLIER,
   DOUBLE_HONOR_WEEKDAYS,
   doubleHonorActive,
@@ -50,36 +52,63 @@ describe('weekdayOfDayKey', () => {
 
 describe('weekly Double Honor window', () => {
   it('opens on Saturday and Sunday reset days and only there', () => {
-    // The two weekend RESET WINDOWS: in realm time the event runs Saturday
-    // 3 AM through Monday 3 AM.
+    // The two weekend RESET WINDOWS: with the early open below, in realm time
+    // the event runs Friday 3 PM through Monday 3 AM.
     expect(DOUBLE_HONOR_WEEKDAYS).toEqual([6, 0]);
-    expect(doubleHonorActive('2026-08-15')).toBe(true); // a Saturday
-    expect(doubleHonorActive('2026-08-16')).toBe(true); // its Sunday
-    const weekdays = ['2026-08-17', '2026-08-18', '2026-08-19', '2026-08-20', '2026-08-21'];
+    expect(doubleHonorActive('2026-08-15', '2026-08-15')).toBe(true); // a Saturday
+    expect(doubleHonorActive('2026-08-16', '2026-08-16')).toBe(true); // its Sunday
+    // Monday through Thursday, both keys inside the same weekday: closed.
+    const weekdays = ['2026-08-17', '2026-08-18', '2026-08-19', '2026-08-20'];
     for (const day of weekdays) {
-      expect(doubleHonorActive(day), day).toBe(false);
+      expect(doubleHonorActive(day, day), day).toBe(false);
     }
-    expect(doubleHonorActive('2026-08-22')).toBe(true); // the next Saturday
+    expect(doubleHonorActive('2026-08-22', '2026-08-22')).toBe(true); // the next Saturday
     // A host that set no calendar never runs the event, so headless runs,
     // replays, and parity traces stay byte-identical to what they were.
-    expect(doubleHonorActive('')).toBe(false);
+    expect(doubleHonorActive('', '')).toBe(false);
+  });
+
+  it('opens DOUBLE_HONOR_LEAD_HOURS early, once the lead probe reads Saturday', () => {
+    expect(DOUBLE_HONOR_LEAD_HOURS).toBe(12);
+    expect(DOUBLE_HONOR_LEAD_MS).toBe(DOUBLE_HONOR_LEAD_HOURS * 3_600_000);
+    // Friday 3 PM realm time onward: the reset day still reads Friday but the
+    // lead probe has crossed into Saturday, so the window is open.
+    expect(doubleHonorActive('2026-08-21', '2026-08-22')).toBe(true);
+    // Friday before 3 PM: both keys read Friday, the window is still closed.
+    expect(doubleHonorActive('2026-08-21', '2026-08-21')).toBe(false);
+    // Sunday evening: the probe already reads Monday, but the reset day holds
+    // the window open until Monday's own 3 AM reset (the close is unchanged).
+    expect(doubleHonorActive('2026-08-16', '2026-08-17')).toBe(true);
+    // Monday morning after the reset: closed on both arms.
+    expect(doubleHonorActive('2026-08-17', '2026-08-17')).toBe(false);
+    // Each arm opens the window on its own (the union, pinned per arm).
+    expect(doubleHonorActive('2026-08-15', '')).toBe(true);
+    expect(doubleHonorActive('', '2026-08-15')).toBe(true);
   });
 
   it('multiplies by the event constant inside the window and by 1 outside it', () => {
     expect(DOUBLE_HONOR_MULTIPLIER).toBe(2);
-    expect(honorEventMultiplier('2026-08-15')).toBe(DOUBLE_HONOR_MULTIPLIER);
-    expect(honorEventMultiplier('2026-08-16')).toBe(DOUBLE_HONOR_MULTIPLIER);
-    expect(honorEventMultiplier('2026-08-14')).toBe(1); // the Friday before
-    expect(honorEventMultiplier('2026-08-17')).toBe(1); // the Monday after
-    expect(honorEventMultiplier('')).toBe(1);
+    expect(honorEventMultiplier('2026-08-15', '2026-08-16')).toBe(DOUBLE_HONOR_MULTIPLIER);
+    expect(honorEventMultiplier('2026-08-16', '2026-08-16')).toBe(DOUBLE_HONOR_MULTIPLIER);
+    // The early Friday open pays the multiplier too.
+    expect(honorEventMultiplier('2026-08-21', '2026-08-22')).toBe(DOUBLE_HONOR_MULTIPLIER);
+    expect(honorEventMultiplier('2026-08-14', '2026-08-14')).toBe(1); // Friday, pre-open
+    expect(honorEventMultiplier('2026-08-17', '2026-08-17')).toBe(1); // the Monday after
+    expect(honorEventMultiplier('', '')).toBe(1);
   });
 
-  it('is deterministic: the same key always answers the same way', () => {
+  it('is deterministic: the same keys always answer the same way', () => {
     const run = () =>
-      ['2026-08-15', '2026-08-16', ''].map((key) => [
-        weekdayOfDayKey(key),
-        doubleHonorActive(key),
-        honorEventMultiplier(key),
+      (
+        [
+          ['2026-08-15', '2026-08-15'],
+          ['2026-08-21', '2026-08-22'],
+          ['', ''],
+        ] as const
+      ).map(([resetDay, eventLeadDay]) => [
+        weekdayOfDayKey(resetDay),
+        doubleHonorActive(resetDay, eventLeadDay),
+        honorEventMultiplier(resetDay, eventLeadDay),
       ]);
     expect(run()).toEqual(run());
   });

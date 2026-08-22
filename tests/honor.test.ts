@@ -632,6 +632,27 @@ describe('weekly Double Honor', () => {
     expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, monday)).toBe(5);
   });
 
+  it('opens 12 hours early: Friday pays double once the lead probe reads Saturday', () => {
+    const sim = world();
+    sim.resetDay = '2026-08-21'; // a Friday
+    sim.eventLeadDay = '2026-08-21'; // Friday morning: the probe has not crossed yet
+    const pid = sim.addPlayer('warrior', 'EarlyBird');
+    const meta = sim.meta(pid)!;
+
+    // Before the probe crosses, Friday is an ordinary weekday.
+    const morning = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, morning)).toBe(5);
+
+    // From 3 PM realm time the host's probe reads Saturday: every award path
+    // doubles, and the loss boost opens with the same window.
+    sim.eventLeadDay = '2026-08-22';
+    const evening = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, evening)).toBe(10);
+    const loss = awardBattlegroundHonor(sim.ctx, meta, '["character:fri"]', 'loss');
+    expect(loss.total).toBe(BATTLEGROUND_WIN_HONOR * 2);
+    expect(loss.firstWinBonus, 'a loss never claims the daily bonus').toBe(0);
+  });
+
   it('pays a played-out loss and draw the WIN base during the weekend, and the loss base outside it', () => {
     const sim = world();
     sim.resetDay = '2026-08-16'; // a Sunday, inside the window
