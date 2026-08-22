@@ -275,7 +275,19 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact count of the merged file: the base's 13573 plus
     // this branch's +11 across its two arms above. Exact merged count, zero
     // slack: any further growth reds again.
-    ceiling: 13584,
+    // Entry-detail admission moved the settle step ahead of compile/texture
+    // collection while deleting the old reveal-time arm: exact count, no slack.
+    // Lowered by extracting the initial-scene texture collection and shared
+    // admission cursor into initial_scene_texture_admission.ts.
+    // Lowered again by extracting the compile-root collection, near-first
+    // ordering and program-content dedupe into initial_scene_compile_units.ts.
+    // The release's rift lifecycle wiring brings the combined renderer to this
+    // exact count after formatting, with zero slack.
+    // Review hardening restores the measured residency rationale at its live
+    // call site and adds only thin wiring for rebuild reveal-gate installation,
+    // entry-barrier cleanup and observed display pacing; the policy and timer
+    // ownership remain in sibling modules. Exact count, zero slack.
+    ceiling: 13541,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -293,7 +305,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 11516 -> 11522 (+6) for the fast-loading-screen-variety rebase
     // onto release/v0.40.0, whose pin above is this file's exact size (zero
     // slack). The branch is net-extractive here: it MOVES the eager mob-body
-    // stream, far-vista settle and background preload lane out of the entry
+    // stream and far-vista settle out of the entry
     // path into src/game/post_entry_warmups_core.ts, and the backdrop rotation
     // into src/ui/loading_backdrop.ts. What is left in main.ts is the call
     // wiring for both (the controller construction and the runPostEntryWarmups
@@ -305,7 +317,10 @@ const MONOLITHS: MonolithRow[] = [
     // src/game/post_entry_warmups_core.ts), which costs the call wiring plus
     // the placement rationale where the reader needs it. Exact count, zero
     // slack: any further growth reds again.
-    ceiling: 11534,
+    // The bounded first-paint gate is now owned per startGame invocation rather
+    // than by a mutable render-core singleton. Its browser timer lives in the
+    // sibling adapter; main pays only factory/arm wiring. Exact count, zero slack.
+    ceiling: 11536,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
