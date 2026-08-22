@@ -79,6 +79,10 @@ describe('remastered soundtrack catalog', () => {
         '/audio/music/night.mp3',
         '44f582c437208d480fc0cb828e1ed91f254ccd4cd0236a0815c97e76fb75394e',
       ],
+      proving_shore: [
+        '/audio/music/proving_shore.mp3',
+        '485a6985c03baf0a7f796c62c25553efa838be787164103f78a7f75a9fd4c090',
+      ],
     } as const satisfies Partial<Record<MusicZone, readonly [string, string]>>;
 
     for (const [zone, [url, expectedHash]] of Object.entries(supplied)) {
@@ -127,6 +131,7 @@ describe('remastered soundtrack catalog', () => {
       'garden',
       'gale',
       'farshore',
+      'proving_shore',
       'vale_cup',
       'dungeon_hollow_crypt',
       'dungeon_sunken_bastion',

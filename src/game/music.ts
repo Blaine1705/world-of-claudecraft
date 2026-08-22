@@ -35,6 +35,7 @@ export type MusicZone =
   | 'garden'
   | 'gale'
   | 'farshore'
+  | 'proving_shore'
   | 'vale_cup'
   | 'dungeon_hollow_crypt'
   | 'dungeon_sunken_bastion'
@@ -59,6 +60,12 @@ const TOWN_MUSIC: Record<string, MusicZone> = {
 // its own vigil theme instead of the vale's playful loop.
 const ZONE_MUSIC: Partial<Record<string, MusicZone>> = {
   farshore_isle: 'farshore',
+  // The tutorial island paints as vale, but it is the first thing a new
+  // player ever hears and it deserves its own cue rather than the mainland's.
+  // One entry covers the whole island: Dawnrest Camp is a hub with no town
+  // theme, and that path falls through to ZONE_MUSIC (same as Gullhaven on
+  // the Farshore).
+  proving_shore: 'proving_shore',
 };
 
 // Every overworld biome resolves to a bespoke theme; the paint-only biomes
