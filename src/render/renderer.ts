@@ -84,6 +84,7 @@ import {
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
 import { createBuildLedger } from './build_ledger_core';
+import { BuildRetryGate } from './build_retry_gate';
 import { setBuildSpanSink } from './build_spans';
 import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
@@ -9166,6 +9167,10 @@ export class Renderer {
   // ---------------------------------------------------------------------
 
   private builtInteriors = new Set<string>();
+  // A hard rift build failure releases its builtInteriors key behind this
+  // cooldown, so the retry is neither per-frame nor never (build_retry_gate.ts
+  // explains why it is a timestamp, not a timer).
+  private readonly riftBuildRetry = new BuildRetryGate(15000);
   // Rift interiors are the one interior class whose world origin is REUSED: an
   // empty slot frees after 60s and the next run rebuilds at the same z-stacked
   // origin, so a stale group would overlap the new build and its torch lights
@@ -9684,7 +9689,10 @@ export class Renderer {
       if (rf) {
         void ensureDungeonAssets().catch(() => undefined);
         const key = `rift:${rf.instanceId}:${rf.contentHash}:${rf.floorIndex}`;
-        if (!this.builtInteriors.has(key)) {
+        if (
+          !this.builtInteriors.has(key) &&
+          this.riftBuildRetry.shouldAttempt(key, performance.now())
+        ) {
           const o = rf.origin;
           if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 250) {
             this.builtInteriors.add(key);
@@ -9708,8 +9716,8 @@ export class Renderer {
                 this.riftInteriorGroups.set(key, group);
               })
               .catch((err) => {
-                // Cooldown key release: a hard failure retries in 15s, not per frame.
-                setTimeout(() => this.builtInteriors.delete(key), 15000);
+                this.builtInteriors.delete(key);
+                this.riftBuildRetry.markFailed(key, performance.now());
                 console.error('Failed to build rift interior:', err);
               });
           }

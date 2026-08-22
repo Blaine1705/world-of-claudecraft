@@ -259,7 +259,13 @@ const MONOLITHS: MonolithRow[] = [
     // sparkle tags and the rift build-key cooldown, all thin consumers of
     // extracted modules). Exact merged count, zero slack: any further growth
     // reds again.
-    ceiling: 13551,
+    // Raised +8 in the same branch's review round: the rift build-failure
+    // cooldown swapped its untracked setTimeout (a handle that outlives
+    // teardown and can fire into a recycled renderer) for a timestamp gate.
+    // The gate logic lives in src/render/build_retry_gate.ts; this is the
+    // coordinator's thin-wiring cost (import, field + rationale comment, the
+    // wrapped attempt condition). Exact count, zero slack.
+    ceiling: 13559,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -1900,8 +1900,9 @@ export function allocRiftCollisionToken(): number {
 }
 
 /** Publish a rift floor's generated collider set. `cellSize` is a test seam:
- *  the equivalence suite publishes a reference region with one enormous cell
- *  to reproduce the pre-index full-list scan (see collider_cells.ts). */
+ *  the equivalence suite publishes a reference region with cellSize Infinity,
+ *  one all-covering cell that reproduces the pre-index full-list scan (see
+ *  collider_cells.ts: a finite size quadrants at the local origin instead). */
 export function setRiftRegion(
   token: number,
   ox: number,

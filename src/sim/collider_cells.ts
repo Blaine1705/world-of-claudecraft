@@ -77,7 +77,10 @@ export interface ColliderCellIndex {
  * on for exact equivalence with a full-list scan.
  *
  * `cellSize` is a test seam: the equivalence suite publishes a reference
- * region with one enormous cell to reproduce the pre-index full-list scan.
+ * region with cellSize Infinity, collapsing the index to ONE cell that holds
+ * the whole list in order (the pre-index full-list scan). It must be Infinity,
+ * not merely huge: a finite size splits at the local origin into quadrant
+ * cells, and rift local coordinates straddle 0 on both axes.
  */
 export function buildColliderCellIndex(
   colliders: readonly Collider[],

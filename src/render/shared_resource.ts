@@ -60,21 +60,22 @@ export interface UnsharedDisposeCounts {
 /**
  * Dispose every geometry/material under `root` that is NOT tagged shared, in
  * one traversal. This is the teardown half of the tagging contract above: the
- * per-view object disposal (renderer removeView) and the interior retire path
- * both call it, so a builder that mints an untagged resource gets it freed
- * with the scene nodes, and a builder that shares one must tag it (or it will
- * be freed out from under every other consumer).
+ * per-view object disposal (renderer removeView) calls it, so a builder that
+ * mints an untagged resource gets it freed with the scene nodes, and a builder
+ * that shares one must tag it (or it will be freed out from under every other
+ * consumer). Interior teardown does NOT come through here: a retired interior
+ * is torn down by the interior resource registry
+ * (interior_resource_lifecycle.ts), which also owns releasing InstancedMesh
+ * per-build instance buffers.
  *
  * Mesh-scoped on purpose (`isMesh` only): Sprites/Points in view groups carry
  * renderer-owned singleton materials (the loot sparkle, badge sprites) and are
- * managed by their owners. `instanceBuffers` additionally calls dispose() on
- * InstancedMeshes, releasing their per-build instanceMatrix GPU buffer, which
- * is per-build state even when the geometry and material are shared kit
- * resources. Returns counts so leak-guard tests can assert coverage.
+ * managed by their owners. Returns counts so leak-guard tests can assert
+ * coverage.
  */
 export function disposeUnsharedMeshResources(
   root: THREE.Object3D,
-  opts: { geometries?: boolean; materials?: boolean; instanceBuffers?: boolean },
+  opts: { geometries?: boolean; materials?: boolean },
 ): UnsharedDisposeCounts {
   const seenGeometries = new Set<THREE.BufferGeometry>();
   const seenMaterials = new Set<THREE.Material>();
@@ -83,9 +84,6 @@ export function disposeUnsharedMeshResources(
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
-    if (opts.instanceBuffers && (mesh as THREE.InstancedMesh).isInstancedMesh) {
-      (mesh as THREE.InstancedMesh).dispose();
-    }
     if (
       opts.geometries &&
       mesh.geometry &&

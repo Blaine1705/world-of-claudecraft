@@ -86,7 +86,11 @@ describe('disposeUnsharedMeshResources', () => {
     expect(sharedDisposed).toBe(false);
   });
 
-  it('releases InstancedMesh instance buffers only when asked', () => {
+  it('never releases InstancedMesh instance buffers (the interior registry owns that)', () => {
+    // Boundary pin: view teardown frees unshared geometry/materials only.
+    // InstancedMesh.dispose() (the per-build instanceMatrix buffer) belongs to
+    // interior teardown via interior_resource_lifecycle.ts, and a view-side
+    // dispose here would yank a live interior's instance buffer.
     const root = new THREE.Group();
     const geo = markSharedGeometry(new THREE.BoxGeometry(1, 1, 1));
     const mat = markSharedMaterial(new THREE.MeshBasicMaterial());
@@ -98,12 +102,6 @@ describe('disposeUnsharedMeshResources', () => {
     });
     disposeUnsharedMeshResources(root, { geometries: true, materials: true });
     expect(disposed).toBe(0);
-    disposeUnsharedMeshResources(root, {
-      geometries: true,
-      materials: true,
-      instanceBuffers: true,
-    });
-    expect(disposed).toBe(1);
   });
 
   it('markOwnedMaterial strips the shared tag a clone inherits', () => {

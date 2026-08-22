@@ -21,12 +21,22 @@ import { generateRiftFloor } from '../src/sim/rift/rift_gen';
 // instead of scanning it whole. These suites pin the load-bearing claim: the
 // subset resolution is EXACTLY the full-list resolution, on real generated
 // floors, across the whole region, for every live radius. The reference token
-// publishes the same colliders into one enormous cell, which reproduces the
-// pre-index full-list scan (same list, same order) through the same public
-// API, so any divergence is the index's fault by construction.
+// publishes the same colliders into ONE cell covering every finite coordinate,
+// which reproduces the pre-index full-list scan (same list, same order)
+// through the same public API, so any divergence is the index's fault by
+// construction.
 
 const WORLD_SEED = 1;
-const HUGE_CELL = 1e9;
+// The reference token's cell size MUST be Infinity, not merely huge: rift
+// local coordinates straddle 0 on both axes, so any FINITE size splits the
+// region into four quadrant cells around the origin and an interior sample
+// resolves against roughly half the floor's colliders instead of all of them.
+// With Infinity, Math.floor(x / cellSize) is +/-0 for every finite coordinate
+// and cellKey's integer bias collapses -0 onto 0, so build and lookup both
+// land in a single cell holding the whole list in input order. The
+// construction guard suite below PROVES that premise per fixture rather than
+// assuming it.
+const FULL_LIST_CELL = Number.POSITIVE_INFINITY;
 
 // Deterministic jitter without Math.random (the test asserts exact positions,
 // so its own inputs must be reproducible run to run).
@@ -53,7 +63,7 @@ function publishFloor(seed: number, baseLevel: number, floorIndex: number, slot:
   const indexed = allocRiftCollisionToken();
   const reference = allocRiftCollisionToken();
   setRiftRegion(indexed, origin.x, origin.z, colliders);
-  setRiftRegion(reference, origin.x, origin.z, colliders, HUGE_CELL);
+  setRiftRegion(reference, origin.x, origin.z, colliders, FULL_LIST_CELL);
   return {
     fixture: {
       label: `seed ${seed} level ${baseLevel} floor ${floorIndex}`,
@@ -84,6 +94,32 @@ describe('rift collider cell index', () => {
     publishFloor(48271, 35, 2, 1),
     publishFloor(90210, 58, 5, 2),
   ];
+
+  it('reference arm: one infinite cell holds the whole list, checked not assumed', () => {
+    // buildColliderCellIndex is pure, so rebuilding with the fixture's inputs
+    // reproduces exactly the index setRiftRegion stored for the reference
+    // token. If this ever splits (a finite cell size quietly quadrants around
+    // the local origin), the equivalence suites above stop being full-list
+    // comparisons, so fail loudly here instead.
+    for (const { colliders } of floors) {
+      const ref = buildColliderCellIndex(colliders, FULL_LIST_CELL);
+      expect(ref.cells.size).toBe(1);
+      const all = ref.cells.values().next().value;
+      expect(all).toBeDefined();
+      expect(all?.length).toBe(colliders.length);
+      for (let i = 0; i < colliders.length; i++) expect(all?.[i]).toBe(colliders[i]);
+      // The finite-size failure mode is a quadrant split: a sample in every
+      // local-frame quadrant must read the SAME single full list.
+      for (const [qx, qz] of [
+        [-5, -50],
+        [-5, 50],
+        [5, -50],
+        [5, 50],
+      ] as const) {
+        expect(colliderCellAt(ref, qx, qz)).toBe(all);
+      }
+    }
+  });
 
   it('registers every collider reachable from a point into that point cell', () => {
     for (const { colliders } of floors) {
