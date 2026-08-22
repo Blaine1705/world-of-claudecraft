@@ -32,7 +32,13 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   clone and cannot depend on the whole of `assets.ts` to do it; the spec rides
   `Material.userData.armorDye`, which `clone()` copies while it drops the hook.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/
-  ghost plumbing, one-shot triggers, death/revive edge logic.
+  ghost plumbing, one-shot triggers, death/revive edge logic. A transparent
+  effect (ghost run, stealth, Shadowform, Moonkin) is a new program per rig
+  material, so its clones link hidden behind the same compile gate before the
+  swap commits (`stageEffectSwap`, twinning each source mesh's KIND because
+  three keys `skinning` on `isSkinnedMesh`); the Soul Rend mark is exempt and
+  commits at once, being actionable raid information
+  (`tests/character_effect_compile_gate.test.ts`).
 - `halo.ts`: the class halo (`buildHalo`, driven by `VisualDef.halo` +
   `haloUpOffset`/`haloRadius` overrides). Texture, per-color materials, and
   per-radius geometries are shared never-disposed caches, so radii MUST come
@@ -56,7 +62,60 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   drives it live via `setModular`) with `preview_appearance.ts`,
   `preview_policy.ts`, `preview_framing.ts`.
 - Portraits: `portrait.ts` (offscreen-WebGL headshot factory, caches data
-  URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`).
+  URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`) +
+  `portrait_prewarm_core.ts` (the async capture's step order) +
+  `portrait_capture_lane_core.ts` (one live capture per cache key). The CAPTURE
+  itself is `portrait_snapshot.ts`, a thin GL adapter over the pure
+  `portrait_bitmap_transfer_core.ts` and `portrait_readback_core.ts`, the
+  worker client `portrait_bitmap_encode.ts` (with
+  `portrait_encode_worker.ts`) and the DOM-only `portrait_png_encode.ts`. It
+  has THREE arms, each falling through to the next. First it draws into the
+  rig's own drawing buffer, snapshots that frame with `createImageBitmap` and
+  TRANSFERS the bitmap to the encode worker, so no portrait byte ever reaches
+  the gameplay thread: measured on a Mesa iGPU under a loaded ride, p50 0 ms of
+  main-thread blocking per capture against 116 ms for the readback arm, and not
+  one capture in 24 blocking for over 16 ms. Failing that (no `Worker`, no
+  `OffscreenCanvas`, no `createImageBitmap`, or a latched worker failure) it
+  renders into a `WebGLRenderTarget` and reads it back through three's
+  fence-backed `readRenderTargetPixelsAsync`, which still beats the last arm
+  because `canvas.toBlob` off the default framebuffer defers the PNG ENCODE but
+  does the GPU READBACK synchronously (67 to 118 ms per portrait unit, 1477 ms
+  of self time across a post-entry ride); on an integrated GPU the fence only
+  says the bytes are READY, and `getBufferSubData` still blocks 28 to 76 ms
+  pulling them across, which is what the transfer arm exists to avoid. The
+  transfer arm claims the rig's ONE default framebuffer from its draw until its
+  snapshot is in hand, so a second capture in that window takes the readback arm
+  rather than drawing over a frame still being copied; its own failure is
+  latched separately (a dead worker must not cost the rig its fence-backed
+  readback too), and a worker that cannot even be CONSTRUCTED costs only the
+  arm, not the capture, which falls to the readback with the draw closure still
+  valid. Which arm each capture took, and every latch, is counted in
+  `gpu_prep_events.ts` (`perfStats().gpuPrep.events.portraits`): a host that
+  silently loses the top arm just gets slower, and nothing else in a capture
+  would say so. The core owns the TWO software conversions that keep
+  the output the same colour toBlob's was: readPixels is bottom-up where
+  ImageData is top-down, and both buffers hold premultiplied colour where a PNG
+  holds straight alpha. The sRGB transfer is NOT one of them, it is done by the
+  GPU: the adapter gives the target texture `renderer.outputColorSpace`, so for
+  an UnsignedByte RGBA texture three allocates SRGB8_ALPHA8
+  (`getInternalFormat`, three 0.185.1) and WebGL2 converts linear to sRGB in
+  hardware as the framebuffer is written, which is why readPixels already hands
+  back encoded bytes. Both halves are load bearing and both are pinned by tests:
+  encoding a second time in software washes every portrait out, and dropping the
+  `texture.colorSpace` assignment makes every portrait dark. The target's buffers are shared
+  by every capture on the rig while the lane dedupes per cache KEY only, so a
+  second concurrent capture takes the synchronous path. That old synchronous
+  path is also the fallback for a context that cannot fence, latched after any
+  async failure (including a readback that fulfils WITHOUT handing back the
+  buffer it was given, which three does when the target has no framebuffer:
+  encoding then would cache the previous portrait's face under this key). The
+  draw MUST happen before the capture promise exists: `runPortraitPrewarm`
+  releases the subject as soon as it holds one. The LIVE
+  getters never capture on the calling frame, the composed
+  `modularPortraitDataUrl` included: a miss answers null, kicks the async
+  capture through the lane, and fires `onPortraitUpdate` when it lands (a
+  composed capture is named by its cache key, the listener's third argument,
+  since no (class, skin) pair describes one).
 - Weapons/props: `weapon_grip.ts`, `held_item_grips.ts`, `back_grips.ts`,
   `stow_transition.ts`, `skin_attack.ts`, `weapon_skin_materials.ts`, and
   `weapon_attack_style_core.ts`, a CROSS-SUBSYSTEM seam
@@ -66,10 +125,24 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   without changing weights, matrices, draws, or shader math),
   `skinned_sort_spheres.ts` (static sort spheres so three never brute-forces
   a missing SkinnedMesh bounding sphere), `tinted_material_cache_core.ts`,
+  `material_program_shape_core.ts` (the per-object facts three re-derives a
+  material's program parameters from; its key is a fragment of the tinted
+  cache key, so a mounted material is shared only among meshes three would
+  not re-derive between) with `shadow_depth_materials.ts` (the same split for
+  the shadow pass: one shared MeshDepthMaterial per program shape, mounted as
+  `customDepthMaterial` on alpha-free skinned casters so three's one global
+  depth material stops flipping per caster),
   `visual_pool.ts`/`visual_pool_policy.ts` (own section below).
 - Appearance decals/motion: `stubble.ts` (own section below), `makeup.ts`
   (blush/eyeshadow on the same decal machinery; lipstick is deliberately a
-  material tint on the mouth PART instead), `hair_sway.ts` (long-hair motion
+  material tint on the mouth PART instead), `look_pieces.ts` (a composed
+  look's decal maps and cuts as deduped PIECES of the GPU work queue, painted
+  a row band per unit, the map's buffer allocated inside the first band's
+  unit and never in the deciding frame; a live candidate whose pieces are not resident builds
+  its body at once WITHOUT the face decals, the stand-in, and
+  `CharacterVisual.attachDeferredDecals` adds them through the compile gate
+  once they land; never deferred under a cover or for the target: the producer
+  contract in `src/render/CLAUDE.md`), `hair_sway.ts` (long-hair motion
   via morph targets, not shaders, so the low-tier Lambert rebuild cannot drop
   it), `underhair.generated.ts` (regenerated by the Fit Studio server,
   `scripts/asset_pipeline/lib/fit_studio.mjs`; never hand-edit).
@@ -79,7 +152,15 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   code and registered per ability; the template future ability-animation work
   follows.
 - Pure selection cores: `modular.ts` (composed bodies, below),
-  `player_look_core.ts`, `form_visual_selection_core.ts`.
+  `player_look_core.ts`, `form_visual_selection_core.ts`,
+  `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the
+  baked far mesh stands in only once it exists AND its materials linked
+  behind the renderer's far-bake compile gate; `visual.ts` is a thin consumer
+  via `setFarBakeGate`, `tests/character_far_compile_gate.test.ts`). The far
+  mesh mounts its OWN tinted clones (`tintedMaterial(..., mount: 'far')`):
+  three's `compileAsync` polls a material's `currentProgram`, so a clone shared
+  with the skinned rig would let the far bake's gate settle on the rig's
+  variant (`tests/tinted_material.test.ts`).
 
 ## Keys & dispatch
 Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,
@@ -117,13 +198,16 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
   backstop that re-drives the base pose after 3 starved frames.
 
-## The visual reuse pool (`visual_pool.ts` + `visual_pool_policy.ts`)
+## The visual reuse pool (`visual_pool.ts` + `visual_pool_policy.ts` + `pooled_visual_lifecycle.ts`)
 `renderer.ts` routes non-player character visuals through a bounded,
 release-ordered (LRU) `CharacterVisualPool`: on despawn a poolable visual is
 detached and STORED instead of disposed, and `store` evicts + disposes
 least-recently-released entries past the `GFX.maxPooledCharacterVisuals` cap,
 so visiting new populations cannot grow GPU memory monotonically
-(`tests/character_visual_pool.test.ts`). Contract points:
+(`tests/character_visual_pool.test.ts`). The renderer's take/store halves
+(transform reset, near LOD, un-ghost, per-instance re-tint, the far-bake
+compile gate re-installed on re-acquire) are `PooledVisualLifecycle`, bound
+once to the pool and the live cap. Contract points:
 - Players deliberately never pool (their visual key varies with cosmetics/mech
   state): `characterVisualPoolKey` returns null and those visuals are disposed
   directly as before.

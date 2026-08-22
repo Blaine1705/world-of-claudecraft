@@ -37,6 +37,7 @@ import { loadKtx2Texture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX, type GfxSettings, type SurfaceMatOpts, surfaceMat } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
+import { markSharedMaterial } from './shared_resource';
 
 export type SurfaceFamily = 'stone' | 'rock' | 'wood' | 'plaster' | 'bark' | 'fabric' | 'metal';
 
@@ -1007,7 +1008,8 @@ export function reapplySurfaceDetailToClone(clone: THREE.Material): void {
  * Every resolved family detail texture (normal/AO/rough/disp/metal clones),
  * for the renderer's boot-prewarm window. These textures are shader UNIFORMS
  * attached in onBeforeCompile, not material properties, so the scene texture
- * sweep (renderer.ts collectObjectTextures reads map/normalMap/... keys) can
+ * sweep (material_texture_slots.ts collectObjectTextures reads the named map
+ * slots) can
  * never find them: without an explicit prewarm they upload on the first live
  * draw that binds them. The Displacement fields are the heavy case: they only
  * load on the parallax tiers (ultra+), and their first-draw decode+upload was
@@ -1057,6 +1059,12 @@ export function detailedSurfaceMat(
   if (!mat) {
     mat = base.clone();
     applySurfaceDetail(mat as THREE.MeshStandardMaterial, family, detail);
+    // Shared for the same reason surfaceMat's own cache is: one instance per
+    // key, reused process-wide. three's Material.copy deep-copies userData, so
+    // the clone already inherits the base's marker; marking it explicitly keeps
+    // that from being a silent dependency on three's copy semantics across a
+    // version bump, which is the kind of thing a bump would break quietly.
+    markSharedMaterial(mat);
     detailedMats.set(key, mat);
   }
   return mat;
