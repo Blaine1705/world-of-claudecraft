@@ -453,10 +453,41 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     objectives: [
       { type: 'kill', targetMobId: 'training_effigy', count: 1, label: 'Training Effigy felled' },
     ],
-    xpReward: 110,
+    xpReward: 60,
     copperReward: 60,
     itemRewards: {},
     requiresQuest: 'q_ps_the_gauntlet',
+  },
+  // The yard's second drill: the action bar. Strike True teaches the swing,
+  // which is not the game; a player who leaves the island auto-attacking has
+  // learned the wrong lesson. The objective is a sentinel interact with no
+  // ground entity of its own (the ps_gauntlet_flag idiom): credit rides the
+  // damage the class's OWN attack deals, in tutorial/ability_drill.ts, so an
+  // autoattack counts for nothing. The coach card names each class's button
+  // from the live kit rather than saying "press 1" at a mage, and a warrior
+  // standing in the yard is loaned the rage their press bills, because
+  // Reaver Strike is greyed out at zero rage exactly when the coach points
+  // at it.
+  q_ps_hone_the_edge: {
+    id: 'q_ps_hone_the_edge',
+    name: 'Hone the Edge',
+    giverNpcId: 'drillmaster_rook',
+    turnInNpcId: 'drillmaster_rook',
+    text: 'A swing is a swing, $N, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.',
+    completionText:
+      'Now you are fighting instead of flailing. That row grows every level you take, $N, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'ps_ability_drill',
+        count: 3,
+        label: 'Ability landed on an effigy',
+      },
+    ],
+    xpReward: 60,
+    copperReward: 60,
+    itemRewards: {},
+    requiresQuest: 'q_ps_strike_true',
   },
   // The first real fight: the wreck line's scuttlers pinch back, which is the
   // whole lesson after a target that never did.
@@ -474,7 +505,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     xpReward: 170,
     copperReward: 80,
     itemRewards: {},
-    requiresQuest: 'q_ps_strike_true',
+    requiresQuest: 'q_ps_hone_the_edge',
   },
   // The miniboss lesson: using an item from the bags, a fight that asks for
   // more than three swings, and looting a corpse for a QUEST item rather
@@ -609,6 +640,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
 export const PROVING_SHORE_QUEST_ORDER: string[] = [
   'q_ps_the_gauntlet',
   'q_ps_strike_true',
+  'q_ps_hone_the_edge',
   'q_ps_shell_and_claw',
   'q_ps_mother_of_pearl',
   'q_ps_the_wreck_line',

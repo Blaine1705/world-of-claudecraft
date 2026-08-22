@@ -106,6 +106,10 @@ export class BootcampOverlay {
   private ringDone = false;
   // Casters learn their slot-2 spell, not the melee Attack (Guy's note).
   private casterClass = false;
+  // The attack THIS class was taught (starting_attack.ts), resolved once per
+  // update beside casterClass so the card and the bubble read the same
+  // answer without either reaching for the world again.
+  private taughtAbilityId: string | null = null;
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -151,6 +155,7 @@ export class BootcampOverlay {
 
     this.lastFocus = focus;
     this.casterClass = CASTER_CLASSES.has(world.cfg.playerClass);
+    this.taughtAbilityId = startingAttackFor(world.cfg.playerClass).abilityId;
     if (focus?.questId === RING_LESSON_QUEST_ID) this.sawPearl = true;
     this.ringPhase = this.computeRingPhase(world, onIsland);
     const isGauntlet = focus?.questId === GAUNTLET_QUEST_ID;
@@ -499,6 +504,9 @@ export class BootcampOverlay {
       // Melee classes learn slot 0 (Attack, default Digit1); casters learn
       // slot 1, where their level-1 spell sits (default Digit2).
       attackKey: keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0') || unbound,
+      // The ability drill points at the class's OWN attack, which never
+      // sits on the Attack toggle: slot 1 for everyone (starting_attack.ts).
+      abilityKey: keybinds.primaryLabel('slot1') || unbound,
       bagsKey: keybinds.primaryLabel('bags') || unbound,
       charKey: keybinds.primaryLabel('char') || unbound,
     };
@@ -547,6 +555,7 @@ export class BootcampOverlay {
     const npc = tEntity({ kind: 'npc', id: plan.npcId, field: 'name' });
     const params: Record<string, string> = {};
     if (plan.bodyHasNpc) params.npc = npc;
+    if (plan.bodyHasAbility) params.ability = this.taughtAbilityName();
     for (const key of plan.params) params[key] = labels[key];
 
     this.titleEl.textContent = plan.titleKey
@@ -670,7 +679,7 @@ export class BootcampOverlay {
         const cap = keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0');
         chips = cap ? [{ cap }] : [];
       } else if (mode === 'touch') {
-        chips = [{ abilityIcon: this.promptAttackIconId(world) }];
+        chips = [{ abilityIcon: this.promptAttackIconId() }];
       } else {
         chips = [];
       }
@@ -732,12 +741,21 @@ export class BootcampOverlay {
     this.promptChipEl.style.display = chips.length > 0 ? '' : 'none';
   }
 
+  /** The localized name of the attack this class was taught, for the ability
+   *  drill's card. Falls back to the Attack toggle's own label for a class
+   *  the kit leaves with nothing but a swing. */
+  private taughtAbilityName(): string {
+    const abilityId = this.taughtAbilityId;
+    if (!abilityId) return t('hudChrome.bootcamp.promptAttack');
+    return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  }
+
   /** Which action-bar icon the touch combat bubble shows: the Attack toggle
    *  for a class that swings, and the taught spell for one that casts (a
    *  caster has no melee autoattack worth pointing a new player at). */
-  private promptAttackIconId(world: IWorld): string {
+  private promptAttackIconId(): string {
     if (!this.casterClass) return AUTO_ATTACK_ICON_ID;
-    return startingAttackFor(world.cfg.playerClass).abilityId ?? AUTO_ATTACK_ICON_ID;
+    return this.taughtAbilityId ?? AUTO_ATTACK_ICON_ID;
   }
 
   private hidePrompt(): void {

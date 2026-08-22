@@ -178,6 +178,9 @@ describe('the rail coach', () => {
         for (const mode of ['keyboard', 'touch', 'pad'] as const) {
           const plan = coachCardPlan({ questId, state }, mode);
           const params: Record<string, string> = { npc: 'X' };
+          // {ability} rides bodyHasAbility, not params, because the ability
+          // drill names the class's attack on touch and pad too.
+          if (plan.bodyHasAbility) params.ability = 'X';
           for (const p of plan.params) params[p] = 'X';
           const body = t(plan.bodyKey, params);
           expect(body, `${questId}/${state}/${mode}`).toBeTruthy();
@@ -238,6 +241,7 @@ describe('the rail coach', () => {
       mapKey: 'M',
       targetKey: 'Tab',
       attackKey: '1',
+      abilityKey: '2',
       bagsKey: 'B',
       charKey: 'C',
     };
@@ -276,6 +280,7 @@ describe('the rail coach', () => {
       mapKey: 'M',
       targetKey: 'Tab',
       attackKey: '1',
+      abilityKey: '2',
       bagsKey: 'B',
       charKey: 'C',
     };
@@ -384,6 +389,34 @@ describe('the closing bell card', () => {
       expect(body).not.toMatch(/\{\w+\}/);
       expect(t(plan.titleKey)).toBeTruthy();
       if (mode !== 'keyboard') expect(plan.params).toHaveLength(0);
+    }
+  });
+});
+
+describe('the ability drill card', () => {
+  it('names the class attack on EVERY input arm, not just the keyboard', () => {
+    // The keyboard arm chips a keycap; touch and pad have no key to name, so
+    // the ability's own name is what identifies the button there. A card
+    // that only spliced it on keyboard would leave a phone player reading
+    // "tap {ability} on the action bar".
+    for (const mode of ['keyboard', 'touch', 'pad'] as const) {
+      const plan = coachCardPlan({ questId: 'q_ps_hone_the_edge', state: 'active' }, mode);
+      expect(plan.bodyHasAbility, mode).toBe(true);
+      const body = t(plan.bodyKey, { ability: 'Cinderbolt', abilityKey: '2' });
+      expect(body, mode).toMatch(/Cinderbolt/);
+      expect(body, mode).not.toMatch(/\{\w+\}/);
+    }
+  });
+
+  it('is the only card that splices an ability name', () => {
+    // bodyHasAbility is opt-in; every other card would render a stray {ability}
+    // if it were ever set by accident.
+    for (const questId of PROVING_SHORE_QUEST_ORDER) {
+      if (questId === 'q_ps_hone_the_edge') continue;
+      for (const state of ['available', 'active', 'ready'] as CoachState[]) {
+        const plan = coachCardPlan({ questId, state }, 'keyboard');
+        expect(plan.bodyHasAbility, `${questId}/${state}`).toBe(false);
+      }
     }
   });
 });

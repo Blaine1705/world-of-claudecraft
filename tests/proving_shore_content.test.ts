@@ -290,6 +290,7 @@ describe('proving shore placement', () => {
     expect(PROVING_SHORE_QUEST_ORDER).toEqual([
       'q_ps_the_gauntlet',
       'q_ps_strike_true',
+      'q_ps_hone_the_edge',
       'q_ps_shell_and_claw',
       'q_ps_mother_of_pearl',
       'q_ps_the_wreck_line',
@@ -301,6 +302,9 @@ describe('proving shore placement', () => {
     expect(relay.map((q) => [q.giverNpcId, q.turnInNpcId])).toEqual([
       ['warden_tam', 'overseer_pell'],
       ['overseer_pell', 'drillmaster_rook'],
+      // Rook holds two stations: the yard drills the swing, then the
+      // action bar, both on the same effigies.
+      ['drillmaster_rook', 'drillmaster_rook'],
       ['drillmaster_rook', 'tidewarden_nel'],
       // Nel holds two stations: the miniboss detour leaves and returns to
       // her watch, then she hands the salvage haul out as before.

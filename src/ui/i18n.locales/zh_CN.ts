@@ -46,13 +46,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_mother_of_pearl.objectives.0.label': '击败螃蟹先生',
   'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '取得莹润珍珠',
   'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
-    '走到一个草人跟前，按 {targetKey}，或者用鼠标左键点击它，把它设为目标。然后按 {attackKey}，或者点击动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。',
+    '走到一个草人跟前，用鼠标左键点击它，把它设为目标：它的名字会出现在屏幕上方。然后按 {attackKey}，或者点击动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。',
   'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
     '走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。',
   'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
     '走到一个草人跟前，按下目标键把它设为目标。然后按下第二个动作键，施放你的法术。一直施放到一个散架为止。',
   'hudChrome.bootcamp.taskShellBodyCaster':
-    '掠蟹是会回击的。按 {targetKey}，或者用鼠标左键点击一只，把它设为目标，然后按 {attackKey} 施放法术，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+    '掠蟹是会回击的。用鼠标左键点击一只，把它设为目标，然后按 {attackKey} 施放法术，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
   'hudChrome.bootcamp.taskShellBodyCasterTouch':
     '掠蟹是会回击的。点按一只把它设为目标，然后点按动作条上的第二个按钮施放法术，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
   'hudChrome.bootcamp.taskShellBodyCasterPad':
@@ -12945,13 +12945,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.coachReadyBodyPad':
     '前往{npc}身边，按下互动键，交上差事，领取报酬。',
   'hudChrome.bootcamp.taskStrikeTrueBody':
-    '走到一个草人跟前，按 {targetKey}，或者用鼠标左键点击它，把它设为目标。然后按 {attackKey}，或者点击动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
+    '走到一个草人跟前，用鼠标左键点击它，把它设为目标：它的名字会出现在屏幕上方。然后按 {attackKey}，或者点击动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
   'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
     '走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.promptTurnIn':
+    '交任务',
+  'hudChrome.bootcamp.promptSelect':
+    '选择目标',
+  'hudChrome.bootcamp.promptUseAbility':
+    '使用技能',
+  'hudChrome.bootcamp.taskHoneBody':
+    '用鼠标左键点击一个草人把它设为目标，然后按 {abilityKey} 使用{ability}。那是你自己的本事，不是随手一挥。命中三次。',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    '点击一个草人把它设为目标，然后点击动作条上的{ability}。那是你自己的本事，不是随手一挥。命中三次。',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    '把一个草人设为目标，然后按放着{ability}的动作按钮。那是你自己的本事，不是随手一挥。命中三次。',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '走到一个草人跟前，按下目标键把它设为目标。然后按下第一个动作键，挥出这一刀。一直打到一个散架为止。',
   'hudChrome.bootcamp.taskShellBody':
-    '掠蟹是会回击的。按 {targetKey}，或者用鼠标左键点击一只，把它设为目标，然后按 {attackKey} 挥刀，不停攻击。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+    '掠蟹是会回击的。用鼠标左键点击一只，把它设为目标，然后按 {attackKey} 挥刀，不停攻击。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
   'hudChrome.bootcamp.taskShellBodyTouch':
     '掠蟹是会回击的。点按一只把它设为目标，然后点按动作条上的第一个按钮挥刀。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
   'hudChrome.bootcamp.taskShellBodyPad':

@@ -215,6 +215,9 @@ export function coachFocus(stateOf: (questId: string) => CoachState | null): Coa
  *  and the card says so. */
 export const COACH_ACTIVE_TARGETS: Readonly<Record<string, { x: number; z: number } | null>> = {
   q_ps_strike_true: { x: -336, z: -14 },
+  // The same effigy yard: the ability drill is the second lesson at one
+  // station (tutorial/ability_drill.ts ABILITY_DRILL_RING's centre).
+  q_ps_hone_the_edge: { x: -336, z: -14 },
   q_ps_shell_and_claw: { x: -380, z: -42 },
   // The tide pool (interactions/crab_summon.ts CRAB_SUMMON_SITE; a ui core
   // mirrors the coordinate, tests/bootcamp_view.test.ts pins them equal).
@@ -231,7 +234,11 @@ export type CoachParam =
   | 'targetKey'
   | 'attackKey'
   | 'bagsKey'
-  | 'charKey';
+  | 'charKey'
+  /** The ability lesson's own button: the keycap the class's taught attack
+   *  sits on. Distinct from attackKey, which is the autoattack toggle for a
+   *  melee class; the drill is about the OTHER button. */
+  | 'abilityKey';
 
 export interface CoachCardPlan {
   /** Null on the active state: the overlay titles that card with the quest's
@@ -245,6 +252,9 @@ export interface CoachCardPlan {
   params: readonly CoachParam[];
   /** The body splices {npc}. */
   bodyHasNpc: boolean;
+  /** The body splices {ability}: the localized name of the attack THIS class
+   *  was taught. True on every input mode, unlike params. */
+  bodyHasAbility: boolean;
   /** Whose localized name fills {npc}: the giver on the way in, the turn-in
    *  on the way back (also the active state's arrow fallback). */
   npcId: string;
@@ -286,6 +296,11 @@ interface CoachBodyOverride {
   bodyHasNpc: boolean;
   /** Whose localized name fills {npc} when bodyHasNpc: default 'turnIn'. */
   npcRole?: 'giver' | 'turnIn';
+  /** The body splices {ability}, the localized name of the attack THIS class
+   *  was taught (starting_attack.ts). Separate from params because params is
+   *  the keyboard-only keycap list, and the ability's name belongs in the
+   *  touch and pad bodies too. */
+  bodyHasAbility?: boolean;
 }
 
 const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
@@ -302,6 +317,16 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
     },
     params: ['attackKey'],
     bodyHasNpc: false,
+  },
+  q_ps_hone_the_edge: {
+    keys: {
+      keyboard: 'hudChrome.bootcamp.taskHoneBody',
+      touch: 'hudChrome.bootcamp.taskHoneBodyTouch',
+      pad: 'hudChrome.bootcamp.taskHoneBodyPad',
+    },
+    params: ['abilityKey'],
+    bodyHasNpc: false,
+    bodyHasAbility: true,
   },
   q_ps_shell_and_claw: {
     keys: {
@@ -374,6 +399,7 @@ export function coachCardPlan(
       bodyKey: COACH_BODY.available[mode],
       params: mode === 'keyboard' ? ['interactKey'] : [],
       bodyHasNpc: true,
+      bodyHasAbility: false,
       npcId: quest.giverNpcId,
       arrow: giver.pos,
     };
@@ -391,6 +417,7 @@ export function coachCardPlan(
       bodyKey: overrideKeys ? overrideKeys[mode] : COACH_BODY.active[mode],
       params: mode === 'keyboard' ? (override ? override.params : ['mapKey']) : [],
       bodyHasNpc: override?.bodyHasNpc ?? false,
+      bodyHasAbility: override?.bodyHasAbility ?? false,
       npcId: override?.npcRole === 'giver' ? quest.giverNpcId : quest.turnInNpcId,
       // An authored null means NO marker; only a missing entry falls back.
       arrow:
@@ -406,6 +433,7 @@ export function coachCardPlan(
     bodyKey: override ? override.keys[mode] : COACH_BODY.ready[mode],
     params: mode === 'keyboard' ? (override ? override.params : ['interactKey']) : [],
     bodyHasNpc: override?.bodyHasNpc ?? true,
+    bodyHasAbility: override?.bodyHasAbility ?? false,
     npcId: quest.turnInNpcId,
     arrow: turnIn.pos,
   };

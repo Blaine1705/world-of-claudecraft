@@ -20,6 +20,7 @@ import {
   isObjectOpenedByViewer,
   type OpenedObjectQuestRow,
 } from '../sim/quests/opened_object_view';
+import { ABILITY_DRILL_MOB_ID, ABILITY_DRILL_QUEST_ID } from '../sim/tutorial/ability_drill';
 import { INTERACT_RANGE } from '../sim/types';
 import { BELL_STEP_TARGET, type BootcampStep, type CoachFocus } from './bootcamp_view';
 import type { TranslationKey } from './i18n';
@@ -145,6 +146,7 @@ export function nearestDeadMob(
 /** The two kill lessons' quarry (the Attack bubble's scan target). */
 const KILL_LESSON_TEMPLATE: Readonly<Record<string, string>> = {
   q_ps_strike_true: 'training_effigy',
+  [ABILITY_DRILL_QUEST_ID]: ABILITY_DRILL_MOB_ID,
   q_ps_shell_and_claw: 'shore_scuttler',
   [CRAB_QUEST_ID]: CRAB_MOB_ID,
 };
@@ -313,7 +315,13 @@ export function coachPromptPlan(args: {
       // head, and both must stay visible (playtest).
       lift: KILL_BUBBLE_LIFT,
       range: KILL_PROMPT_RANGE,
-      verbKey: selected ? 'hudChrome.bootcamp.promptAttack' : 'hudChrome.bootcamp.promptSelect',
+      // The ability drill asks for a different press on the same effigies,
+      // so its second half names the ability rather than the swing.
+      verbKey: selected
+        ? focus.questId === ABILITY_DRILL_QUEST_ID
+          ? 'hudChrome.bootcamp.promptUseAbility'
+          : 'hudChrome.bootcamp.promptAttack'
+        : 'hudChrome.bootcamp.promptSelect',
       kind: selected ? 'kill' : 'select',
     };
   }

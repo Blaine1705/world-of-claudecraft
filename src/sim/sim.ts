@@ -561,6 +561,7 @@ import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
+import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
 import { resolveStartTutorial, updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
@@ -6435,6 +6436,11 @@ export class Sim {
     // The Gauntlet run sweep (tutorial island): per-tick flag credit for
     // q_ps_the_gauntlet, the same zero-rng argument as the greeting above.
     updateGauntletRuns(this.ctx);
+    // The ability drill's rage loan (tutorial island): keeps a warrior
+    // standing in the effigy yard able to press the button the coach is
+    // naming. Draws ZERO rng (it clamps one resource bar and emits nothing),
+    // so its position cannot fork the draw order.
+    updateAbilityDrill(this.ctx);
     // The one-time mastery reset notice (Professions 2.0): drains
     // the transient pendingMasteryResetNotice flag the load-time reset branch
     // set. Draws ZERO rng and emits nothing itself (it only books a letter
