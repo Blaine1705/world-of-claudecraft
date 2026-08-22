@@ -38,7 +38,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "es_ES": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -69,7 +70,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "fr_FR": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -100,7 +102,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "fr_CA": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -131,7 +134,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "en_CA": [],
   "it_IT": [
@@ -163,7 +167,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "de_DE": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -194,7 +199,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "zh_CN": [
     "hudChrome.controller.crossHotbarPosition"
@@ -237,7 +243,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "ru_RU": [
     "hudChrome.controller.crossHotbarPosition"
@@ -271,7 +278,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "nl_NL": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -302,7 +310,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "pl_PL": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -333,7 +342,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "id_ID": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -364,7 +374,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "tr_TR": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -395,7 +406,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "sv_SE": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -426,7 +438,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "vi_VN": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -457,7 +470,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ],
   "da_DK": [
     "guide.settingsPage.ifShowReliquaryTracker",
@@ -488,6 +502,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.reliquary.trackerToggleHideHint",
     "hudChrome.reliquary.trackerToggleLabel",
-    "hudChrome.reliquary.trackerToggleShowHint"
+    "hudChrome.reliquary.trackerToggleShowHint",
+    "sim.rift.lootRecoveryNotice"
   ]
 };

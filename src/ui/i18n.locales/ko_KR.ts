@@ -8302,6 +8302,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '파티가 아직 전투 중입니다. 전투가 끝나면 죽은 자도 다시 들어갈 수 있습니다.',
   'sim.rift.iceGoalLit': '서리 문양이 타오릅니다. 길이 꿈틀거립니다.',
   'sim.rift.levelGate': '레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다.',
+  'sim.rift.lootRecoveryNotice':
+    '균열의 입구는 한동안 열려 있습니다. 파티가 전멸하더라도, 돌아가 얻은 전리품을 되찾을 수 있습니다.',
   'sim.rift.portalCollapses': '{zone}의 {tier}등급 균열이 무너졌습니다.',
   'sim.rift.portalOpens': '{zone}에 {tier}등급 균열이 찢어져 열렸습니다!',
   'sim.rift.portalSealed': '{zone}의 {tier}등급 균열이 봉인되었습니다.',

@@ -7118,6 +7118,7 @@ export const id_ID: EnTranslations = {
       "portalOpens": "Sebuah rift peringkat {tier} terkoyak terbuka di {zone}!",
       "portalSealed": "Rift peringkat {tier} di {zone} telah tersegel.",
       "portalCollapses": "Rift peringkat {tier} di {zone} runtuh.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Hanya petualang level {level} ke atas yang boleh memasuki rift ini.",
       "deadEntry": "Kamu tidak dapat memasuki rift saat tewas.",
       "deadEntryCombat": "Party-mu masih dalam pertempuran. Yang tewas dapat masuk kembali begitu pertarungan berhenti.",

@@ -7118,6 +7118,7 @@ export const pt_BR: EnTranslations = {
       "portalOpens": "Uma fenda de nível {tier} se abre em {zone}!",
       "portalSealed": "A fenda de nível {tier} em {zone} foi selada.",
       "portalCollapses": "A fenda de nível {tier} em {zone} entra em colapso.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Somente aventureiros de nível {level} ou superior podem entrar nesta fenda.",
       "deadEntry": "Você não pode entrar em uma fenda enquanto estiver morto.",
       "deadEntryCombat": "Seu grupo ainda está em combate. Os mortos poderão reentrar quando a luta terminar.",

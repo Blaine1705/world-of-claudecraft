@@ -7118,6 +7118,7 @@ export const zh_CN: EnTranslations = {
       "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
       "portalSealed": "{zone}的{tier}级裂隙已被封印。",
       "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",
+      "lootRecoveryNotice": "裂隙的入口还将维持一段时间：即便队伍全灭，你仍可返回，取回自己应得的战利品。",
       "levelGate": "只有等级达到{level}级或以上的冒险者才能进入这道裂隙。",
       "deadEntry": "死亡状态下无法进入裂隙。",
       "deadEntryCombat": "你的队伍仍在战斗中。战斗结束后，死者方可重新进入。",

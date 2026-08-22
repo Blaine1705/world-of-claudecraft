@@ -7118,6 +7118,7 @@ export const vi_VN: EnTranslations = {
       "portalOpens": "Một Rạn Nứt hạng {tier} xé toạc mở ra tại {zone}!",
       "portalSealed": "Rạn Nứt hạng {tier} tại {zone} đã bị niêm phong.",
       "portalCollapses": "Rạn Nứt hạng {tier} tại {zone} sụp đổ.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Chỉ những nhà thám hiểm cấp độ {level} trở lên mới có thể vào Rạn Nứt này.",
       "deadEntry": "Bạn không thể vào Rạn Nứt khi đang chết.",
       "deadEntryCombat": "Nhóm của bạn vẫn đang trong giao tranh. Người đã chết có thể vào lại khi trận chiến kết thúc.",

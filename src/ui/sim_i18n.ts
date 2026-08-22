@@ -11506,6 +11506,10 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.portalCollapses', { tier: m[1], zone: locZone(m[2]) }),
   },
   {
+    re: /^The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned\.$/,
+    build: () => t('sim.rift.lootRecoveryNotice'),
+  },
+  {
     re: /^Only adventurers of level (\d+) or higher may enter this rift\.$/,
     build: (m) => t('sim.rift.levelGate', { level: m[1] }),
   },

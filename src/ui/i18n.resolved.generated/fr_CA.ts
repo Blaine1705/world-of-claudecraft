@@ -7118,6 +7118,7 @@ export const fr_CA: EnTranslations = {
       "portalOpens": "Une faille de rang {tier} se déchire dans {zone} !",
       "portalSealed": "La faille de rang {tier} dans {zone} a été scellée.",
       "portalCollapses": "La faille de rang {tier} dans {zone} s'effondre.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Seuls les aventuriers de niveau {level} ou plus peuvent entrer dans cette faille.",
       "deadEntry": "Vous ne pouvez pas entrer dans une faille tant que vous êtes mort.",
       "deadEntryCombat": "Votre groupe est encore en combat. Les morts peuvent entrer à nouveau une fois le combat terminé.",

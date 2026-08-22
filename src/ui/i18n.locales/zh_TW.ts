@@ -7976,6 +7976,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'sim.rift.deadEntryCombat': '你的隊伍仍在戰鬥中。戰鬥結束後，死者方可重新進入。',
   'sim.rift.iceGoalLit': '霜之印記熊熊燃起。去路隨之震動。',
   'sim.rift.levelGate': '只有等級達到{level}級或以上的冒險者才能進入這道裂隙。',
+  'sim.rift.lootRecoveryNotice':
+    '裂隙的入口還會維持一段時間：即使隊伍全滅，你仍可返回，取回自己應得的戰利品。',
   'sim.rift.portalCollapses': '{zone}的{tier}級裂隙坍塌了。',
   'sim.rift.portalOpens': '一道{tier}級裂隙在{zone}撕裂而開！',
   'sim.rift.portalSealed': '{zone}的{tier}級裂隙已被封印。',

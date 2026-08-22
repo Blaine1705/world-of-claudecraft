@@ -7118,6 +7118,7 @@ export const it_IT: EnTranslations = {
       "portalOpens": "Uno squarcio di rango {tier} si apre in {zone}!",
       "portalSealed": "Lo squarcio di rango {tier} in {zone} è stato sigillato.",
       "portalCollapses": "Lo squarcio di rango {tier} in {zone} collassa.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Solo gli avventurieri di livello {level} o superiore possono entrare in questo squarcio.",
       "deadEntry": "Non puoi entrare in uno squarcio mentre sei morto.",
       "deadEntryCombat": "Il tuo gruppo è ancora in combattimento. I morti potranno rientrare quando la battaglia sarà finita.",

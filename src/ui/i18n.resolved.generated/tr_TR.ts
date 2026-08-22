@@ -7118,6 +7118,7 @@ export const tr_TR: EnTranslations = {
       "portalOpens": "{zone} bölgesinde {tier} dereceli bir Yarık açılıyor!",
       "portalSealed": "{zone} bölgesindeki {tier} dereceli Yarık mühürlendi.",
       "portalCollapses": "{zone} bölgesindeki {tier} dereceli Yarık çöküyor.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Bu Yarığa yalnızca {level} seviyesinde veya üzerindeki maceracılar girebilir.",
       "deadEntry": "Ölüyken bir Yarığa giremezsin.",
       "deadEntryCombat": "Grubun hala savaşta. Ölüler, dövüş bittiğinde tekrar girebilir.",
