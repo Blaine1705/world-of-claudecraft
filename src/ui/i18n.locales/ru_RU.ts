@@ -13283,4 +13283,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.',
   'hudChrome.otaUpdate.progressLabel': 'Ход загрузки обновления',
   'hudChrome.otaUpdate.title': 'Обновление игры',
+  // v0.40 release i18n fill.
+  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
 };

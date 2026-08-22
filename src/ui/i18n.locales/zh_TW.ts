@@ -12880,4 +12880,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '需要更新後才能進行遊戲。下載完成後將立即套用。',
   'hudChrome.otaUpdate.progressLabel': '更新下載進度',
   'hudChrome.otaUpdate.title': '遊戲更新',
+  // v0.40 release i18n fill.
+  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
 };

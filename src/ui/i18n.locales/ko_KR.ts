@@ -13115,4 +13115,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',
   'hudChrome.otaUpdate.progressLabel': '업데이트 다운로드 진행률',
   'hudChrome.otaUpdate.title': '게임 업데이트',
+  // v0.40 release i18n fill.
+  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
 };

@@ -13106,4 +13106,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。',
   'hudChrome.otaUpdate.progressLabel': 'アップデートのダウンロード進行状況',
   'hudChrome.otaUpdate.title': 'ゲームアップデート',
+  // v0.40 release i18n fill.
+  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
 };
