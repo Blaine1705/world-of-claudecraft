@@ -10,8 +10,8 @@
     "fiesta lifesteal augment arm (~5499)",
     "multi-player fiesta meta"
   ],
-  "draws": 972,
-  "drawDigest": "fa3491de",
+  "draws": 979,
+  "drawDigest": "3ce48a54",
   "frames": [
     {
       "tick": 0,
@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1001,
-      "state": "43538b02",
+      "state": "c7ec0e46",
       "events": "2ba437e9",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1001,
-      "state": "7b2ad3e9",
+      "state": "7fb85c55",
       "events": "27775c8e",
       "rng": {
         "draws": 64,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1001,
-      "state": "4dc9a87b",
+      "state": "ada9ed47",
       "events": "a669b228",
       "rng": {
         "draws": 280,
@@ -64,18 +64,18 @@
       "tick": 100,
       "time": 5,
       "nextId": 1001,
-      "state": "d3112e3e",
+      "state": "318a6d22",
       "events": "9255b03e",
       "rng": {
-        "draws": 530,
-        "digest": "cddb4dde"
+        "draws": 531,
+        "digest": "5e5e6f86"
       }
     },
     {
       "tick": 101,
       "time": 5.05,
       "nextId": 1001,
-      "state": "ce010307",
+      "state": "ec9bc913",
       "events": "228b6605",
       "rng": {
         "draws": 542,
@@ -413,9 +413,9 @@
           "resource": 6.257758,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -461,9 +461,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -521,9 +521,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -572,9 +572,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {
@@ -598,7 +598,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1001,
-      "state": "68d92fc5",
+      "state": "28a809a9",
       "events": "98347538",
       "rng": {
         "draws": 542,
@@ -936,9 +936,9 @@
           "resource": 12.515515,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -984,9 +984,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -1042,9 +1042,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -1093,9 +1093,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {
@@ -1119,7 +1119,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1001,
-      "state": "f1de8fc2",
+      "state": "d505d2e6",
       "events": "1de6ab90",
       "rng": {
         "draws": 542,
@@ -1461,9 +1461,9 @@
           "resource": 12.515515,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1509,9 +1509,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -1567,9 +1567,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -1618,9 +1618,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {
@@ -1644,22 +1644,22 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1001,
-      "state": "d48a7a0e",
+      "state": "e2ff290a",
       "events": "741638a5",
       "rng": {
-        "draws": 788,
-        "digest": "0a152075"
+        "draws": 800,
+        "digest": "01b1b308"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
       "nextId": 1001,
-      "state": "c06341ef",
+      "state": "11222703",
       "events": "741638a5",
       "rng": {
-        "draws": 972,
-        "digest": "fa3491de"
+        "draws": 979,
+        "digest": "3ce48a54"
       },
       "label": "final",
       "players": [
@@ -1998,9 +1998,9 @@
           "resource": 12.515515,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2046,9 +2046,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -2105,9 +2105,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -2156,9 +2156,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {

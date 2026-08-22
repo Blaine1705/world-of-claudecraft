@@ -13,8 +13,8 @@
     "Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue",
     "class:warrior"
   ],
-  "draws": 6116,
-  "drawDigest": "73b08c60",
+  "draws": 6087,
+  "drawDigest": "1fae9376",
   "frames": [
     {
       "tick": 0,
@@ -34,7 +34,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1007,
-      "state": "368abf65",
+      "state": "ea3310bd",
       "events": "a4d43c53",
       "rng": {
         "draws": 4,
@@ -558,9 +558,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -606,9 +606,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -654,9 +654,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -702,9 +702,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -750,9 +750,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -842,7 +842,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1007,
-      "state": "7f8dcf85",
+      "state": "34166029",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -853,7 +853,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1007,
-      "state": "374709e8",
+      "state": "089f3314",
       "events": "5819e80c",
       "rng": {
         "draws": 4,
@@ -864,7 +864,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1007,
-      "state": "12bad728",
+      "state": "17bdda18",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -875,7 +875,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1007,
-      "state": "de4b9bbd",
+      "state": "6d96ba25",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -886,7 +886,7 @@
       "tick": 42,
       "time": 2.1,
       "nextId": 1009,
-      "state": "9734bd26",
+      "state": "b5fe4482",
       "events": "891ed52f",
       "rng": {
         "draws": 18,
@@ -1411,9 +1411,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1459,9 +1459,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -1507,9 +1507,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -1555,9 +1555,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -1603,9 +1603,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -1807,7 +1807,7 @@
       "tick": 43,
       "time": 2.15,
       "nextId": 1010,
-      "state": "1e8d7f73",
+      "state": "2ef59bbb",
       "events": "7e8fe2c6",
       "rng": {
         "draws": 28,
@@ -2342,9 +2342,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2402,9 +2402,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -2462,9 +2462,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -2522,9 +2522,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -2582,9 +2582,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -3008,7 +3008,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1010,
-      "state": "6192eae2",
+      "state": "caa8159e",
       "events": "741638a5",
       "rng": {
         "draws": 70,
@@ -3019,7 +3019,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1010,
-      "state": "b91706aa",
+      "state": "63723382",
       "events": "741638a5",
       "rng": {
         "draws": 131,
@@ -3030,7 +3030,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1010,
-      "state": "7451fc6d",
+      "state": "bf39e845",
       "events": "741638a5",
       "rng": {
         "draws": 231,
@@ -3041,7 +3041,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1010,
-      "state": "38b4b568",
+      "state": "e18fd468",
       "events": "fca955aa",
       "rng": {
         "draws": 325,
@@ -3052,7 +3052,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1010,
-      "state": "6759eb26",
+      "state": "43cd670a",
       "events": "08a0fc05",
       "rng": {
         "draws": 409,
@@ -3063,7 +3063,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1010,
-      "state": "e2f8940c",
+      "state": "38e1ae78",
       "events": "741638a5",
       "rng": {
         "draws": 523,
@@ -3074,7 +3074,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1010,
-      "state": "f2fa54ba",
+      "state": "becefa12",
       "events": "741638a5",
       "rng": {
         "draws": 629,
@@ -3085,7 +3085,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1010,
-      "state": "8ad26514",
+      "state": "4f45a94c",
       "events": "741638a5",
       "rng": {
         "draws": 750,
@@ -3096,7 +3096,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 1010,
-      "state": "4bb6f727",
+      "state": "d0d8fef3",
       "events": "7718d5f9",
       "rng": {
         "draws": 863,
@@ -3107,7 +3107,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1010,
-      "state": "63a96bdf",
+      "state": "8ecabe7b",
       "events": "ec8e9bfb",
       "rng": {
         "draws": 978,
@@ -3118,7 +3118,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1010,
-      "state": "c1573d3b",
+      "state": "7b545cef",
       "events": "741638a5",
       "rng": {
         "draws": 1073,
@@ -3129,7 +3129,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1010,
-      "state": "81e321bd",
+      "state": "57b99b8d",
       "events": "741638a5",
       "rng": {
         "draws": 1191,
@@ -3140,7 +3140,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 1010,
-      "state": "5835e85c",
+      "state": "942e6554",
       "events": "c8fea2e0",
       "rng": {
         "draws": 1309,
@@ -3151,44 +3151,44 @@
       "tick": 180,
       "time": 9,
       "nextId": 1010,
-      "state": "79780ad8",
-      "events": "0f026e06",
+      "state": "afa3eafe",
+      "events": "ce239004",
       "rng": {
-        "draws": 1460,
-        "digest": "99b05708"
+        "draws": 1459,
+        "digest": "e5e9a4c1"
       }
     },
     {
       "tick": 190,
       "time": 9.5,
       "nextId": 1010,
-      "state": "836a944f",
-      "events": "51b7f749",
+      "state": "8f383625",
+      "events": "9b23e5ed",
       "rng": {
-        "draws": 1606,
-        "digest": "27316190"
+        "draws": 1602,
+        "digest": "347d2350"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 1010,
-      "state": "d9167fff",
+      "state": "2aaa04c0",
       "events": "741638a5",
       "rng": {
-        "draws": 1731,
-        "digest": "e05b9dc7"
+        "draws": 1724,
+        "digest": "dec10388"
       }
     },
     {
       "tick": 203,
       "time": 10.15,
       "nextId": 1010,
-      "state": "e4252415",
+      "state": "201094da",
       "events": "741638a5",
       "rng": {
-        "draws": 1751,
-        "digest": "60c98ed2"
+        "draws": 1746,
+        "digest": "09e44d26"
       },
       "label": "phase2",
       "players": [
@@ -3208,7 +3208,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 9525
+            "damageTaken": 7911
           },
           "craftSkills": {},
           "deedStats": {
@@ -3682,7 +3682,7 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 1.1,
+          "combatTimer": 1.35,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -3709,9 +3709,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -3768,9 +3768,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -3827,9 +3827,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -3875,9 +3875,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -3934,9 +3934,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -3957,7 +3957,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
-          "combatTimer": 1.1,
+          "combatTimer": 3.75,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4341,11 +4341,11 @@
       "tick": 204,
       "time": 10.2,
       "nextId": 1010,
-      "state": "b6b8764f",
-      "events": "7447498a",
+      "state": "75106632",
+      "events": "83c7a4f2",
       "rng": {
-        "draws": 1759,
-        "digest": "9544c6a9"
+        "draws": 1752,
+        "digest": "f0942662"
       },
       "label": "soulrend",
       "players": [
@@ -4365,7 +4365,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 9525
+            "damageTaken": 7911
           },
           "craftSkills": {},
           "deedStats": {
@@ -4839,7 +4839,7 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 1.15,
+          "combatTimer": 1.4,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -4866,9 +4866,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -4925,9 +4925,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -4984,9 +4984,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -5043,9 +5043,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -5102,9 +5102,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -5125,7 +5125,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
-          "combatTimer": 1.15,
+          "combatTimer": 3.8,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -5161,11 +5161,11 @@
             "raiseFallenTimer": 30,
             "soulRendMarks": [
               {
-                "playerId": 999,
+                "playerId": 998,
                 "remaining": 8
               },
               {
-                "playerId": 998,
+                "playerId": 999,
                 "remaining": 8
               },
               {
@@ -5509,209 +5509,209 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 1010,
-      "state": "f0b02ac4",
+      "state": "091f1b94",
       "events": "741638a5",
       "rng": {
-        "draws": 1801,
-        "digest": "d9e11b4e"
+        "draws": 1795,
+        "digest": "358864a9"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 1010,
-      "state": "7f2384a1",
-      "events": "9f92f94d",
+      "state": "e2abe563",
+      "events": "8686ba35",
       "rng": {
-        "draws": 1880,
-        "digest": "3852457a"
+        "draws": 1875,
+        "digest": "b29ddf3a"
       }
     },
     {
       "tick": 230,
       "time": 11.5,
       "nextId": 1010,
-      "state": "cf69c332",
+      "state": "469f7c0c",
       "events": "741638a5",
       "rng": {
-        "draws": 1949,
-        "digest": "35ad4a84"
+        "draws": 1940,
+        "digest": "e72a5a39"
       }
     },
     {
       "tick": 240,
       "time": 12,
       "nextId": 1010,
-      "state": "6381d8ef",
-      "events": "2a36fc24",
+      "state": "2722ab49",
+      "events": "fd3b66c0",
       "rng": {
-        "draws": 2038,
-        "digest": "895255e8"
+        "draws": 2026,
+        "digest": "106ad5da"
       }
     },
     {
       "tick": 250,
       "time": 12.5,
       "nextId": 1010,
-      "state": "daa3a41c",
+      "state": "f549cffc",
       "events": "741638a5",
       "rng": {
-        "draws": 2123,
-        "digest": "f03b2014"
+        "draws": 2113,
+        "digest": "cdcfd6de"
       }
     },
     {
       "tick": 260,
       "time": 13,
       "nextId": 1010,
-      "state": "dcb0d7a0",
+      "state": "40a6b8df",
       "events": "741638a5",
       "rng": {
-        "draws": 2212,
-        "digest": "46dd012d"
+        "draws": 2192,
+        "digest": "c3a3be5d"
       }
     },
     {
       "tick": 270,
       "time": 13.5,
       "nextId": 1010,
-      "state": "0c747a7c",
-      "events": "590ac0eb",
+      "state": "fd319d0a",
+      "events": "c58663e9",
       "rng": {
-        "draws": 2309,
-        "digest": "23e68d4a"
+        "draws": 2287,
+        "digest": "f8bcf4b2"
       }
     },
     {
       "tick": 280,
       "time": 14,
       "nextId": 1010,
-      "state": "609b54a3",
+      "state": "2f9e4d0e",
       "events": "741638a5",
       "rng": {
-        "draws": 2399,
-        "digest": "185e50c8"
+        "draws": 2394,
+        "digest": "ec454880"
       }
     },
     {
       "tick": 290,
       "time": 14.5,
       "nextId": 1010,
-      "state": "b1175cb3",
-      "events": "8d65173a",
+      "state": "c9382980",
+      "events": "c6aaf58d",
       "rng": {
-        "draws": 2516,
-        "digest": "6b02ce6d"
+        "draws": 2503,
+        "digest": "d799d297"
       }
     },
     {
       "tick": 300,
       "time": 15,
       "nextId": 1010,
-      "state": "bb152ce6",
+      "state": "f2d86397",
       "events": "741638a5",
       "rng": {
-        "draws": 2606,
-        "digest": "f15267be"
+        "draws": 2598,
+        "digest": "6c6a5bea"
       }
     },
     {
       "tick": 310,
       "time": 15.5,
       "nextId": 1010,
-      "state": "7fb048b9",
-      "events": "d84fd299",
+      "state": "f40b8e3f",
+      "events": "be7dfbca",
       "rng": {
-        "draws": 2719,
-        "digest": "c79c1f4d"
+        "draws": 2706,
+        "digest": "38c36645"
       }
     },
     {
       "tick": 320,
       "time": 16,
       "nextId": 1010,
-      "state": "99f51d38",
+      "state": "0fcc4a2e",
       "events": "741638a5",
       "rng": {
-        "draws": 2831,
-        "digest": "0d71fe5a"
+        "draws": 2804,
+        "digest": "80f67aa0"
       }
     },
     {
       "tick": 330,
       "time": 16.5,
       "nextId": 1010,
-      "state": "2bea8683",
+      "state": "69748356",
       "events": "f200f358",
       "rng": {
-        "draws": 2922,
-        "digest": "39699128"
+        "draws": 2884,
+        "digest": "650adc8f"
       }
     },
     {
       "tick": 340,
       "time": 17,
       "nextId": 1010,
-      "state": "85504775",
-      "events": "50a4c73e",
+      "state": "2e35bda9",
+      "events": "928dc8db",
       "rng": {
-        "draws": 3018,
-        "digest": "fa1b779c"
+        "draws": 2988,
+        "digest": "b09d3093"
       }
     },
     {
       "tick": 350,
       "time": 17.5,
       "nextId": 1010,
-      "state": "b6b41c34",
+      "state": "9c78d46c",
       "events": "741638a5",
       "rng": {
-        "draws": 3099,
-        "digest": "dcec64f9"
+        "draws": 3059,
+        "digest": "52d91997"
       }
     },
     {
       "tick": 360,
       "time": 18,
       "nextId": 1010,
-      "state": "1198dedc",
-      "events": "0d4f010f",
+      "state": "10a45c2d",
+      "events": "e3b3ce14",
       "rng": {
-        "draws": 3185,
-        "digest": "e709bd39"
+        "draws": 3173,
+        "digest": "734ddeea"
       }
     },
     {
       "tick": 370,
       "time": 18.5,
       "nextId": 1010,
-      "state": "d9a3420d",
-      "events": "a3869490",
+      "state": "1e9b86ee",
+      "events": "76f6d6e8",
       "rng": {
-        "draws": 3267,
-        "digest": "d1f210cb"
+        "draws": 3254,
+        "digest": "4315ef6f"
       }
     },
     {
       "tick": 380,
       "time": 19,
       "nextId": 1010,
-      "state": "992cf1be",
+      "state": "7392d32c",
       "events": "741638a5",
       "rng": {
-        "draws": 3379,
-        "digest": "39a1527d"
+        "draws": 3346,
+        "digest": "654d03de"
       }
     },
     {
       "tick": 386,
       "time": 19.3,
       "nextId": 1010,
-      "state": "cfac8371",
+      "state": "ed329150",
       "events": "ec9f1389",
       "rng": {
-        "draws": 3425,
-        "digest": "112a2333"
+        "draws": 3380,
+        "digest": "93e4b3cf"
       },
       "label": "deathless-start",
       "players": [
@@ -5732,7 +5732,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 6276,
-            "damageTaken": 19975,
+            "damageTaken": 17842,
             "kills": 2,
             "xpGained": 166
           },
@@ -6241,6 +6241,15 @@
               "remaining": 3580.7,
               "school": "physical",
               "sourceId": 997
+            },
+            {
+              "duration": 10,
+              "id": "revenge_free",
+              "kind": "revenge_free",
+              "name": "Revenge!",
+              "remaining": 2.4,
+              "school": "physical",
+              "sourceId": 997
             }
           ],
           "blockChance": 0.05,
@@ -6272,9 +6281,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -6321,9 +6330,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -6370,9 +6379,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -6419,9 +6428,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -6467,9 +6476,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -6884,143 +6893,143 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 1010,
-      "state": "9b30cae0",
+      "state": "66be3e33",
       "events": "2d21fc50",
       "rng": {
-        "draws": 3460,
-        "digest": "21e5b515"
+        "draws": 3413,
+        "digest": "4df4d53e"
       }
     },
     {
       "tick": 400,
       "time": 20,
       "nextId": 1010,
-      "state": "db03b144",
+      "state": "1d6d493b",
       "events": "4dc09677",
       "rng": {
-        "draws": 3541,
-        "digest": "3a6ba4a1"
+        "draws": 3502,
+        "digest": "8c97e84f"
       }
     },
     {
       "tick": 410,
       "time": 20.5,
       "nextId": 1010,
-      "state": "86e1599b",
+      "state": "e116c587",
       "events": "4dc09677",
       "rng": {
-        "draws": 3611,
-        "digest": "b7662f37"
+        "draws": 3600,
+        "digest": "2eface63"
       }
     },
     {
       "tick": 420,
       "time": 21,
       "nextId": 1010,
-      "state": "032fc011",
+      "state": "7bb87d5b",
       "events": "4dc09677",
       "rng": {
-        "draws": 3705,
-        "digest": "3eb7f6bf"
+        "draws": 3670,
+        "digest": "b4437299"
       }
     },
     {
       "tick": 430,
       "time": 21.5,
       "nextId": 1010,
-      "state": "42bed8f9",
+      "state": "906fb50e",
       "events": "4dc09677",
       "rng": {
-        "draws": 3781,
-        "digest": "515d0cbf"
+        "draws": 3762,
+        "digest": "579ed4dd"
       }
     },
     {
       "tick": 440,
       "time": 22,
       "nextId": 1010,
-      "state": "e000d799",
-      "events": "4dc09677",
+      "state": "d0ae28fc",
+      "events": "07a58c26",
       "rng": {
-        "draws": 3884,
-        "digest": "bf8727c7"
+        "draws": 3851,
+        "digest": "90569f62"
       }
     },
     {
       "tick": 450,
       "time": 22.5,
       "nextId": 1010,
-      "state": "d6917295",
+      "state": "5a0af588",
       "events": "4dc09677",
       "rng": {
-        "draws": 3969,
-        "digest": "7c2d2632"
+        "draws": 3953,
+        "digest": "fa5d8e46"
       }
     },
     {
       "tick": 460,
       "time": 23,
       "nextId": 1010,
-      "state": "7fa19599",
+      "state": "f319e278",
       "events": "4dc09677",
       "rng": {
-        "draws": 4052,
-        "digest": "f8d941bb"
+        "draws": 4035,
+        "digest": "06ca622b"
       }
     },
     {
       "tick": 470,
       "time": 23.5,
       "nextId": 1010,
-      "state": "9cb8d6c4",
+      "state": "9427a335",
       "events": "4dc09677",
       "rng": {
-        "draws": 4157,
-        "digest": "4fbcae1e"
+        "draws": 4115,
+        "digest": "2b61fd6a"
       }
     },
     {
       "tick": 480,
       "time": 24,
       "nextId": 1010,
-      "state": "e6096450",
+      "state": "115f055d",
       "events": "4dc09677",
       "rng": {
-        "draws": 4226,
-        "digest": "14d0e9ee"
+        "draws": 4206,
+        "digest": "51d4f6ab"
       }
     },
     {
       "tick": 490,
       "time": 24.5,
       "nextId": 1010,
-      "state": "dcf825e4",
+      "state": "81b18b49",
       "events": "200b2a8e",
       "rng": {
-        "draws": 4337,
-        "digest": "5e6794d6"
+        "draws": 4290,
+        "digest": "07309005"
       }
     },
     {
       "tick": 500,
       "time": 25,
       "nextId": 1010,
-      "state": "0bd8d367",
+      "state": "4c1c6b6e",
       "events": "741638a5",
       "rng": {
-        "draws": 4424,
-        "digest": "06b295ee"
+        "draws": 4366,
+        "digest": "62bcfde3"
       }
     },
     {
       "tick": 506,
       "time": 25.3,
       "nextId": 1010,
-      "state": "53f054a8",
+      "state": "e23bcfc1",
       "events": "741638a5",
       "rng": {
-        "draws": 4480,
-        "digest": "979a9b4d"
+        "draws": 4440,
+        "digest": "10893bc9"
       },
       "label": "deathless-interrupt",
       "players": [
@@ -7041,7 +7050,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 6276,
-            "damageTaken": 19975,
+            "damageTaken": 17842,
             "kills": 2,
             "xpGained": 166
           },
@@ -7581,9 +7590,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -7630,9 +7639,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -7679,9 +7688,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -7728,9 +7737,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -7776,9 +7785,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -8204,143 +8213,143 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 1010,
-      "state": "ffad50d5",
+      "state": "dc994dc8",
       "events": "741638a5",
       "rng": {
-        "draws": 4525,
-        "digest": "ad3bf817"
+        "draws": 4472,
+        "digest": "5e98d107"
       }
     },
     {
       "tick": 520,
       "time": 26,
       "nextId": 1010,
-      "state": "369a4232",
+      "state": "23c32c5b",
       "events": "741638a5",
       "rng": {
-        "draws": 4620,
-        "digest": "96994798"
+        "draws": 4577,
+        "digest": "9222ca80"
       }
     },
     {
       "tick": 530,
       "time": 26.5,
       "nextId": 1010,
-      "state": "1a32529a",
+      "state": "e58126ab",
       "events": "741638a5",
       "rng": {
-        "draws": 4721,
-        "digest": "fec0e07a"
+        "draws": 4686,
+        "digest": "63951772"
       }
     },
     {
       "tick": 540,
       "time": 27,
       "nextId": 1010,
-      "state": "5be1d41d",
+      "state": "f2bd0480",
       "events": "741638a5",
       "rng": {
-        "draws": 4814,
-        "digest": "77279a9a"
+        "draws": 4767,
+        "digest": "350ee21b"
       }
     },
     {
       "tick": 550,
       "time": 27.5,
       "nextId": 1010,
-      "state": "3485af7b",
+      "state": "cff557b2",
       "events": "741638a5",
       "rng": {
-        "draws": 4890,
-        "digest": "baa26598"
+        "draws": 4850,
+        "digest": "2dd4b950"
       }
     },
     {
       "tick": 560,
       "time": 28,
       "nextId": 1010,
-      "state": "44faaf98",
+      "state": "2fdb86f5",
       "events": "741638a5",
       "rng": {
-        "draws": 4973,
-        "digest": "7704d0e4"
+        "draws": 4932,
+        "digest": "90556bb0"
       }
     },
     {
       "tick": 570,
       "time": 28.5,
       "nextId": 1010,
-      "state": "c2a71d6e",
+      "state": "295e580b",
       "events": "741638a5",
       "rng": {
-        "draws": 5062,
-        "digest": "85aef42a"
+        "draws": 5004,
+        "digest": "47ebe758"
       }
     },
     {
       "tick": 580,
       "time": 29,
       "nextId": 1010,
-      "state": "5cca77c3",
+      "state": "3581f0fe",
       "events": "741638a5",
       "rng": {
-        "draws": 5137,
-        "digest": "5eb85571"
+        "draws": 5092,
+        "digest": "7a1b6220"
       }
     },
     {
       "tick": 590,
       "time": 29.5,
       "nextId": 1010,
-      "state": "b9aab904",
+      "state": "12552a0d",
       "events": "c220cfe3",
       "rng": {
-        "draws": 5221,
-        "digest": "0c47103f"
+        "draws": 5181,
+        "digest": "9d57745e"
       }
     },
     {
       "tick": 600,
       "time": 30,
       "nextId": 1010,
-      "state": "f56c54b5",
-      "events": "2f2b3b10",
+      "state": "10d3c6d5",
+      "events": "979aef27",
       "rng": {
-        "draws": 5311,
-        "digest": "c7a1089e"
+        "draws": 5286,
+        "digest": "d59c0c2d"
       }
     },
     {
       "tick": 610,
       "time": 30.5,
       "nextId": 1010,
-      "state": "ca74aa5e",
+      "state": "c694f8de",
       "events": "741638a5",
       "rng": {
-        "draws": 5400,
-        "digest": "a5b3cedf"
+        "draws": 5360,
+        "digest": "c4c81f5d"
       }
     },
     {
       "tick": 620,
       "time": 31,
       "nextId": 1010,
-      "state": "a55bff23",
+      "state": "ef0f3f81",
       "events": "741638a5",
       "rng": {
-        "draws": 5485,
-        "digest": "c132a544"
+        "draws": 5453,
+        "digest": "053bb592"
       }
     },
     {
       "tick": 627,
       "time": 31.35,
       "nextId": 1010,
-      "state": "5a3822bc",
-      "events": "37cc32d1",
+      "state": "a615e693",
+      "events": "ac87b65c",
       "rng": {
-        "draws": 5535,
-        "digest": "409488e5"
+        "draws": 5516,
+        "digest": "9c2c7da0"
       },
       "label": "finalstand",
       "players": [
@@ -8361,7 +8370,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 6276,
-            "damageTaken": 19975,
+            "damageTaken": 19231,
             "kills": 2,
             "xpGained": 166
           },
@@ -8874,7 +8883,7 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 12.15,
+          "combatTimer": 1.55,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -8901,9 +8910,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -8950,9 +8959,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -8999,9 +9008,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -9048,9 +9057,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -9096,9 +9105,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -9131,7 +9140,7 @@
               "value": 1.45
             }
           ],
-          "combatTimer": 13.1,
+          "combatTimer": 1.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -9159,11 +9168,10 @@
               1001
             ],
             "deathlessTimer": 43.05,
-            "dialogueBusyUntil": 36.55,
+            "dialogueBusyUntil": 32.4,
             "dialogueToken": 6,
             "finalStand": true,
-            "gravebreakerCasts": 2,
-            "gravebreakerCharged": true,
+            "gravebreakerCasts": 3,
             "gravebreakerTimer": 8.95,
             "introSpoken": true,
             "phase": 2,
@@ -9526,11 +9534,11 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 1010,
-      "state": "b30a9576",
+      "state": "52b4cc27",
       "events": "876c80bd",
       "rng": {
-        "draws": 5549,
-        "digest": "be465247"
+        "draws": 5527,
+        "digest": "9100e8e9"
       },
       "label": "death",
       "players": [
@@ -9551,7 +9559,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 11076,
-            "damageTaken": 19975,
+            "damageTaken": 19231,
             "kills": 3,
             "xpGained": 249
           },
@@ -10196,9 +10204,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -10245,9 +10253,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -10294,9 +10302,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -10343,9 +10351,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -10391,9 +10399,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -10432,23 +10440,27 @@
           },
           "level": 20,
           "loot": {
-            "copper": 187042,
+            "copper": 197776,
             "items": [
               {
                 "count": 1,
-                "itemId": "bonewrought_greatsword"
+                "itemId": "soulflame_mantle"
               },
               {
                 "count": 1,
-                "itemId": "crownforged_warspaulders"
+                "itemId": "crownforged_dreadhelm"
               },
               {
                 "count": 1,
-                "itemId": "soulflame_cowl"
+                "itemId": "wraithfire_orb"
               },
               {
                 "count": 1,
                 "itemId": "nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "itemId": "maul_of_the_scourged_wilds"
               }
             ]
           },
@@ -10478,8 +10490,7 @@
             "dialogueBusyUntil": 36.6,
             "dialogueToken": 7,
             "finalStand": true,
-            "gravebreakerCasts": 2,
-            "gravebreakerCharged": true,
+            "gravebreakerCasts": 3,
             "gravebreakerTimer": 8.95,
             "introSpoken": true,
             "phase": "dead",
@@ -10838,77 +10849,77 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 1010,
-      "state": "940cfe56",
+      "state": "c1316d71",
       "events": "741638a5",
       "rng": {
-        "draws": 5570,
-        "digest": "392ea0e0"
+        "draws": 5549,
+        "digest": "be465247"
       }
     },
     {
       "tick": 640,
       "time": 32,
       "nextId": 1010,
-      "state": "264044fa",
+      "state": "3dbecfa7",
       "events": "741638a5",
       "rng": {
-        "draws": 5667,
-        "digest": "8ae5805d"
+        "draws": 5627,
+        "digest": "3f7e6a42"
       }
     },
     {
       "tick": 650,
       "time": 32.5,
       "nextId": 1010,
-      "state": "56167e98",
+      "state": "52ffa845",
       "events": "741638a5",
       "rng": {
-        "draws": 5751,
-        "digest": "04f2dfea"
+        "draws": 5721,
+        "digest": "96ca8399"
       }
     },
     {
       "tick": 660,
       "time": 33,
       "nextId": 1010,
-      "state": "da7cec84",
+      "state": "979885bf",
       "events": "741638a5",
       "rng": {
-        "draws": 5836,
-        "digest": "935a2d92"
+        "draws": 5808,
+        "digest": "6b9ae374"
       }
     },
     {
       "tick": 670,
       "time": 33.5,
       "nextId": 1010,
-      "state": "7b61263a",
+      "state": "ee18e945",
       "events": "741638a5",
       "rng": {
-        "draws": 5951,
-        "digest": "1dbdaf4a"
+        "draws": 5884,
+        "digest": "b34e2617"
       }
     },
     {
       "tick": 680,
       "time": 34,
       "nextId": 1010,
-      "state": "9d19bf7e",
+      "state": "6ccfbdef",
       "events": "741638a5",
       "rng": {
-        "draws": 6041,
-        "digest": "d78e6085"
+        "draws": 5997,
+        "digest": "810c8017"
       }
     },
     {
       "tick": 688,
       "time": 34.4,
       "nextId": 1010,
-      "state": "faa0cf56",
+      "state": "ce7616ed",
       "events": "b5673c2a",
       "rng": {
-        "draws": 6116,
-        "digest": "73b08c60"
+        "draws": 6087,
+        "digest": "1fae9376"
       },
       "label": "final",
       "players": [
@@ -10929,7 +10940,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 11076,
-            "damageTaken": 19975,
+            "damageTaken": 19231,
             "kills": 3,
             "xpGained": 249
           },
@@ -11574,9 +11585,9 @@
           "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -11623,9 +11634,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -11672,9 +11683,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -11721,9 +11732,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -11769,9 +11780,9 @@
           "resource": 1506,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -11810,23 +11821,27 @@
           },
           "level": 20,
           "loot": {
-            "copper": 187042,
+            "copper": 197776,
             "items": [
               {
                 "count": 1,
-                "itemId": "bonewrought_greatsword"
+                "itemId": "soulflame_mantle"
               },
               {
                 "count": 1,
-                "itemId": "crownforged_warspaulders"
+                "itemId": "crownforged_dreadhelm"
               },
               {
                 "count": 1,
-                "itemId": "soulflame_cowl"
+                "itemId": "wraithfire_orb"
               },
               {
                 "count": 1,
                 "itemId": "nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "itemId": "maul_of_the_scourged_wilds"
               }
             ]
           },
@@ -11856,8 +11871,7 @@
             "dialogueBusyUntil": 36.6,
             "dialogueToken": 7,
             "finalStand": true,
-            "gravebreakerCasts": 2,
-            "gravebreakerCharged": true,
+            "gravebreakerCasts": 3,
             "gravebreakerTimer": 8.95,
             "introSpoken": true,
             "phase": "dead",

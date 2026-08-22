@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "6549ef37",
+      "state": "891f7f6c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -105,7 +105,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 100,
           "id": 993,
@@ -120,16 +120,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -153,7 +153,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 998,
-      "state": "e5fc64fc",
+      "state": "f033a4ea",
       "events": "10a115cd",
       "rng": {
         "draws": 0,
@@ -164,7 +164,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 998,
-      "state": "25537737",
+      "state": "9f7679b9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -175,7 +175,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 998,
-      "state": "c248ea32",
+      "state": "ece15ea0",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -186,7 +186,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 998,
-      "state": "c248ea32",
+      "state": "ece15ea0",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -282,7 +282,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.559276,
+          "fallStartY": -0.316275,
           "fiveSecondRule": 102,
           "hp": 100,
           "id": 993,
@@ -297,16 +297,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12.5,
-            "y": 1.559276,
-            "z": 16.5
+            "x": -38,
+            "y": -0.316275,
+            "z": -88
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -330,7 +330,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 998,
-      "state": "e5b8f173",
+      "state": "c6dd06e1",
       "events": "da762927",
       "rng": {
         "draws": 149,
@@ -430,7 +430,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.559276,
+          "fallStartY": -0.316275,
           "fiveSecondRule": 102,
           "hp": 100,
           "id": 993,
@@ -445,16 +445,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12.5,
-            "y": 1.559276,
-            "z": 16.5
+            "x": -38,
+            "y": -0.316275,
+            "z": -88
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -478,7 +478,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 998,
-      "state": "8dd5dc88",
+      "state": "04b58c28",
       "events": "5f7a17a7",
       "rng": {
         "draws": 149,
@@ -579,7 +579,7 @@
           "critChance": 0.0605,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0605,
-          "fallStartY": 1.559276,
+          "fallStartY": -0.316275,
           "fiveSecondRule": 102,
           "hp": 138,
           "id": 993,
@@ -594,16 +594,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12.5,
-            "y": 1.559276,
-            "z": 16.5
+            "x": -38,
+            "y": -0.316275,
+            "z": -88
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -627,7 +627,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 998,
-      "state": "94bcf8e6",
+      "state": "dd72f95e",
       "events": "219d0235",
       "rng": {
         "draws": 149,
@@ -728,7 +728,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.559276,
+          "fallStartY": -0.316275,
           "fiveSecondRule": 102,
           "hp": 822,
           "id": 993,
@@ -743,16 +743,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12.5,
-            "y": 1.559276,
-            "z": 16.5
+            "x": -38,
+            "y": -0.316275,
+            "z": -88
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -776,7 +776,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 998,
-      "state": "0dac0383",
+      "state": "42caf69b",
       "events": "cb46e600",
       "rng": {
         "draws": 149,
@@ -877,7 +877,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.559276,
+          "fallStartY": -0.316275,
           "fiveSecondRule": 102,
           "hp": 822,
           "id": 993,
@@ -892,16 +892,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12.5,
-            "y": 1.559276,
-            "z": 16.5
+            "x": -38,
+            "y": -0.316275,
+            "z": -88
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -925,7 +925,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 998,
-      "state": "0dac0383",
+      "state": "42caf69b",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -1026,7 +1026,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.559276,
+          "fallStartY": -0.316275,
           "fiveSecondRule": 102,
           "hp": 822,
           "id": 993,
@@ -1041,16 +1041,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12.5,
-            "y": 1.559276,
-            "z": 16.5
+            "x": -38,
+            "y": -0.316275,
+            "z": -88
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1074,7 +1074,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 998,
-      "state": "0dac0383",
+      "state": "42caf69b",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -1175,7 +1175,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.559276,
+          "fallStartY": -0.316275,
           "fiveSecondRule": 102,
           "hp": 822,
           "id": 993,
@@ -1190,16 +1190,16 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12.5,
-            "y": 1.559276,
-            "z": 16.5
+            "x": -38,
+            "y": -0.316275,
+            "z": -88
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {

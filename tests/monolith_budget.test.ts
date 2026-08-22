@@ -148,7 +148,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/sim.ts',
-    ceiling: 12353,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    ceiling: 12457,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -187,7 +189,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/net/online.ts',
-    ceiling: 5769,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    ceiling: 5774,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -197,7 +201,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/world.ts',
-    ceiling: 5232,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    ceiling: 5318,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -207,12 +213,16 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 3951,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    ceiling: 4121,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
     file: 'src/sim/colliders.ts',
-    ceiling: 2581,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    ceiling: 2583,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
