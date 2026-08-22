@@ -20,7 +20,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 interface CapturedStream {
   path: unknown;
-  stream: { destroyed: boolean };
+  stream: { destroyed: boolean; closed: boolean };
 }
 
 const { captured } = vi.hoisted(() => ({ captured: [] as CapturedStream[] }));
@@ -44,9 +44,9 @@ mkdirSync(join(packRoot, 'blobs'));
 // read stream is still mid-flight when the client aborts.
 writeFileSync(join(packRoot, 'runtime-pack.json'), Buffer.alloc(16 * 1024 * 1024, 0x7b));
 
-const savedDatabaseUrl = process.env.DATABASE_URL;
+// DATABASE_URL needs no ceremony here: vite.config.ts test.env defaults it
+// for every test file. Only the pack dir override is load-bearing.
 const savedSfxPackDir = process.env.SFX_PACK_DIR;
-process.env.DATABASE_URL = 'postgres://test:test@127.0.0.1:5433/wocc_static_fd_test';
 process.env.SFX_PACK_DIR = packRoot;
 
 let routeHttpRequest: typeof import('../../server/main').routeHttpRequest;
@@ -57,8 +57,6 @@ beforeAll(async () => {
 
 afterAll(() => {
   rmSync(packRoot, { recursive: true, force: true });
-  if (savedDatabaseUrl === undefined) delete process.env.DATABASE_URL;
-  else process.env.DATABASE_URL = savedDatabaseUrl;
   if (savedSfxPackDir === undefined) delete process.env.SFX_PACK_DIR;
   else process.env.SFX_PACK_DIR = savedSfxPackDir;
 });
@@ -110,7 +108,10 @@ describe('static file streams on client abort', () => {
       expect(await until(() => packStream() !== undefined, 2000)).toBe(true);
       // The load-bearing assertion: an aborted response must tear the file
       // stream down (bare pipe() leaves it open and leaks the descriptor).
+      // `closed` pins the descriptor actually being released: `destroyed`
+      // alone would stay true even under a future { autoClose: false }.
       expect(await until(() => packStream()?.stream.destroyed === true, 3000)).toBe(true);
+      expect(packStream()?.stream.closed).toBe(true);
     } finally {
       await close(server);
     }
