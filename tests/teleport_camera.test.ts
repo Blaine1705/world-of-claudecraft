@@ -5,7 +5,11 @@
 // zone_transition.ts so "what is a teleport" has exactly one definition.
 
 import { describe, expect, it } from 'vitest';
-import { isIslandFerryTeleport, islandTeleportCameraYaw, teleportCameraYaw } from '../src/game/teleport_camera';
+import {
+  isIslandFerryTeleport,
+  islandTeleportCameraYaw,
+  teleportCameraYaw,
+} from '../src/game/teleport_camera';
 import { TELEPORT_DISPLACEMENT_YD, zoneWarmupMode } from '../src/game/zone_transition';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
 import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
