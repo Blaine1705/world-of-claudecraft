@@ -2856,6 +2856,11 @@ export class Sim {
       // never re-emits it). Stamped onto the entity so it rides the identity
       // wire (`app`) to every client in view. Opaque to the sim.
       appearance?: Record<string, unknown> | null;
+      // A synthetic participant (Vale Cup showcase/backfill, fiesta practice,
+      // /dev bots): created pre-welcomed so no mail is ever minted for it. Bot
+      // metas are session-only, but their letters would outlive them in the
+      // shared mail book forever (issue #3560).
+      bot?: boolean;
     },
   ): number {
     const savedState = opts?.state
@@ -3619,10 +3624,11 @@ export class Sim {
     }
     // One-time Ravenpost welcome (doubles as the service announcement for
     // characters saved before mail existed). Flipped before the send so a
-    // re-entrant save can never double-book the letter.
+    // re-entrant save can never double-book the letter. Bots flip WITHOUT the
+    // send: their letters would sit in the shared mail book forever.
     if (!meta.mailWelcomed) {
       meta.mailWelcomed = true;
-      this.postOffice.sendWelcome(meta);
+      if (!opts?.bot) this.postOffice.sendWelcome(meta);
     }
     // Book of Deeds retro-on-join, after the saved state is fully restored:
     // seed the discovery ledger from current holdings, apply the retro
@@ -3652,7 +3658,7 @@ export class Sim {
     if (!clean) return -1;
     for (const m of this.players.values())
       if (m.name.toLowerCase() === clean.toLowerCase()) return -1;
-    const pid = this.addPlayer('mage', clean);
+    const pid = this.addPlayer('mage', clean, { bot: true });
     const meta = this.players.get(pid);
     if (meta) meta.isDevBot = true;
     const me = this.entities.get(this.primaryId);
@@ -3679,7 +3685,7 @@ export class Sim {
   // A friendly stationary ally bot for the Cascada playtest scenario, dropped at an
   // exact spot (no name-uniqueness gate, so /dev cascade can be re-run). Dev only.
   private spawnScenarioAlly(name: string, x: number, z: number, cls: PlayerClass = 'mage'): number {
-    const id = this.addPlayer(cls, name);
+    const id = this.addPlayer(cls, name, { bot: true });
     const meta = this.players.get(id);
     if (meta) meta.isDevBot = true;
     // Level 20 like the mage: a level-1 ally has so little health that a single Echo
@@ -10352,7 +10358,7 @@ export class Sim {
         if (!taken) break;
         name = `${baseName}${n}`;
       }
-      const botPid = this.addPlayer(cls, name);
+      const botPid = this.addPlayer(cls, name, { bot: true });
       const meta = this.players.get(botPid);
       if (meta) meta.isDevBot = true;
       spawnSeq++;
