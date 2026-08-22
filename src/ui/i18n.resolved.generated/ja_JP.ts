@@ -2289,11 +2289,11 @@ export const ja_JP: EnTranslations = {
       "mail": "鎖"
     },
     "auraEffect": {
-      "sharedPyre": "サークル内に少なくとも{players}人のプレイヤーが必要",
-      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
-      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
-      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Match your symbol. Anvil: stand on the hollow inner receptor. Hammer: use the outer arrows to rotate the fire arm, then brake on the square when aligned. Hold for {hold} sec.",
+      "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
+      "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
+      "varkhulSentinelsGaze": "残り火の番兵に追われている。倒すまでレイドから離しておくこと。",
+      "varkhulMoltenCore": "このコアを炉へ運ぶ。溶融の重荷は{interval}秒ごとに最大体力の{min}%から{max}%まで増加するダメージを与える。",
+      "varkhulForgeLink": "部屋の外周で自分のシンボルと同じルーンを探す。内側の円に入ると左回転、外側のリングに入ると右回転する。外に出ると停止し、シンボルがソケットに届くと自動的に固定される。",
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
       "mendingCurrent": "{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する",
@@ -13406,16 +13406,16 @@ export const ja_JP: EnTranslations = {
         "name": "終焉の心臓"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "残り火の番兵"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "るつぼの守護者"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "火の粉の技工士"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "最後の炎の鍛造父、ヴァルクル"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
@@ -14072,9 +14072,9 @@ export const ja_JP: EnTranslations = {
         "greeting": "礼拝堂の墓地から世界の屋根まで... 足跡はここで終わります。山が耳を澄ませているのを感じます。"
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "残り火守りの記録官メイリン",
+        "title": "るつぼの記録官",
+        "greeting": "ここに残る槌の跡は、どれも一つの文だ。ヴァルクルが隠そうとしたことを読み解くのを手伝ってくれ。"
       },
       "brother_halven": {
         "name": "ハルヴェン修道士",
@@ -15185,50 +15185,50 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.",
-        "completion": "The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.",
+        "title": "鉄に響く記憶",
+        "text": "この自動人形たちは兵士ではない。試作品だ。最後の泉が彼の周りで枯れていく中、ヴァルクルは殻を何度も鍛え直した。三つの記録を読み、それらを守る造られし者を破壊せよ。失敗した身体の一つ一つに、答えの断片が残っているかもしれない。",
+        "completion": "記録はすべて一致している。ヴァルクルは死にかけた最後の泉の水を生ける金属に縛りつけた。この自動人形たちは鍛造に失敗したものだ。耐え抜いた設計はただ一つだけだった。",
         "objectives": {
           "0": {
-            "label": "Read the First Tempering record"
+            "label": "「最初の鍛造」の記録を読む"
           },
           "1": {
-            "label": "Read the Living Metal record"
+            "label": "「生ける金属」の記録を読む"
           },
           "2": {
-            "label": "Read the Herald-Key record"
+            "label": "「先触れの鍵」の記録を読む"
           },
           "3": {
-            "label": "Ember Sentinel defeated"
+            "label": "残り火の番兵を倒す"
           },
           "4": {
-            "label": "Crucible Warden defeated"
+            "label": "るつぼの守護者を倒す"
           },
           "5": {
-            "label": "Cinder Artificer defeated"
+            "label": "火の粉の技工士を倒す"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.",
+        "title": "先触れの心臓",
+        "text": "すべての記録に残った者の名はイグニヴァルだ。ヴァルクルは彼を先触れ、封印、鍵と呼んだ。イグニヴァルを倒し、残されたコアを調べよ。先触れが何を守るために造られたのかわかるはずだ。",
+        "completion": "イグニヴァルは単なる守護者ではなかった。彼の心臓は鍵であり、最後の装甲板は下に封じられたるつぼを指し示している。",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "イグニヴァルを倒す"
           },
           "1": {
-            "label": "Ignivar's core inspected"
+            "label": "イグニヴァルのコアを調べる"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "鍛造父",
+        "text": "下へ続く道の先には、最後の炎の鍛造父ヴァルクルがいる。彼は金属に命を与えるため最後の泉を幽閉し、その罪を封じるためイグニヴァルを鍛えた。内部るつぼに入り、彼の所業に終止符を打て。",
+        "completion": "ついに炉が静まった。泉は二度と元に戻らないかもしれない。しかしヴァルクルが命を再び鏖に鍛えることはない。",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "ヴァルクルを倒す"
           }
         }
       },
@@ -16983,9 +16983,9 @@ export const ja_JP: EnTranslations = {
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "最初の鍛造の大広間",
+        "enterText": "槌音が最初の鍛造の大広間に響き渡る。",
+        "leaveText": "最初の炉から離れ、再び自由に息をつく。"
       },
       "ignivar_raid_arena": {
         "name": "最後の泉のるつぼ",
@@ -16993,9 +16993,9 @@ export const ja_JP: EnTranslations = {
         "leaveText": "るつぼを離れ、再び自由に息をつきます。"
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "内部るつぼ",
+        "enterText": "開かれた門はるつぼのさらなる深部へ続いている。",
+        "leaveText": "るつぼの静まり返った深部を後にする。"
       },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",

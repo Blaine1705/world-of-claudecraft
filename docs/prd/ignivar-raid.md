@@ -308,9 +308,11 @@ At 50% health Varkhul becomes immune, moves to the grand forge, and begins a
   corner, walks toward Varkhul, and heals him for 15% maximum health if it
   arrives. Players can slow, root, and stun it.
 - The Ember Sentinel fixates a non-tank. A large eye over that player's head
-  identifies the chase target.
-- The Crucible Warden is an interruptible caster. It opens with Crucible Quake
-  after 1.5 seconds and repeats the cast every 12 seconds.
+  identifies the chase target. It melees while pursuing and every third landed
+  swing releases Tempered Sweep, applying Tempered Cinders to players it hits.
+- The Crucible Warden pursues and melees its target while casting. Its
+  interruptible Crucible Quake opens after 1.5 seconds and starts again every
+  12 seconds, measured from cast start.
 
 Each dead automaton drops one Molten Core. A nearby player automatically picks it
 up and must carry it within three yards of the forge. The carrier suffers Molten
@@ -325,19 +327,21 @@ phase.
 Breaking the forge pulls every living raider to the center of the room and begins
 a four-second Forge Convergence channel. No symbols are assigned during this
 transition. When the channel completes, Forge Links starts as a ten-player spatial
-interface. Five symbols are assigned to pairs of players and appear both above
-their heads and on five three-yard rune pads around the forge. Partners are joined
-only by their matching symbol, with no world-space guidance line. The Anvil player
-occupies the bright hollow-symbol receptacle inside their rune. The Hammer player
-uses three distinct outer plates: the left arrow rotates a visible fire arm
-counter-clockwise, the right arrow rotates it clockwise, and the square center
-plate brakes it. When the arm points at the inner receptacle, both players hold
-their positions for 1.5 seconds to lock the symbol. Normal gives one 25-second
+interface inspired by rotating-rune encounters. Ten distinct runes appear on a
+fixed 30-yard ring around the room center, not around the forge. Every living
+raider receives one unique symbol above their head and owns the matching rune.
+Each rune has a moving copy of that symbol on its circular track and a bright
+socket at a deterministic random angle outside the track. Standing in the inner
+control circle rotates the symbol counter-clockwise. Standing in the outer
+control ring rotates it clockwise. The neutral band and the space outside the
+rune stop it. Crossing the socket snaps the symbol into place and locks that rune
+automatically, with no brake control or hold timer. Other players cannot drive an
+assigned rune, and a dead assignee is not replaced. Normal gives one 25-second
 round; Heroic gives one 22-second round and sends five crossing fireballs through
-the room instead of three. A missing or dead partner is replaced by the forge echo.
-Five locks shatter Varkhul's shield, stun him for 15 seconds, and increase damage
-taken by 50%. Three or four locks still end the interface with an eight-second stun
-and 25% increased damage taken. Zero to two locks end it without a stun and deal
+the room instead of three. Ten locks shatter Varkhul's shield, stun him for 15
+seconds, and increase damage taken by 50%. Six to nine locks still end the
+interface with an eight-second stun and 25% increased damage taken. Zero to five
+locks end it without a stun and deal
 20% maximum-health raid damage on Normal or 25% on Heroic. The interface therefore
 always resolves when its timer expires and never waits indefinitely.
 

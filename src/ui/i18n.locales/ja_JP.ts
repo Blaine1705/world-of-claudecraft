@@ -7496,7 +7496,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖',
   'hudChrome.auraEffect.dot': '{interval}秒ごとに{value}の{school}ダメージを与える',
   'hudChrome.auraEffect.hot': '{interval}秒ごとに体力を{value}回復する',
-  'hudChrome.auraEffect.sharedPyre': 'サークル内に少なくとも{players}人のプレイヤーが必要',
+  'hudChrome.auraEffect.sharedPyre':
+    '各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    '部屋の外周で自分のシンボルと同じルーンを探す。内側の円に入ると左回転、外側のリングに入ると右回転する。外に出ると停止し、シンボルがソケットに届くと自動的に固定される。',
   'hudChrome.auraEffect.absorb': '{value}のダメージを吸収する',
   'hudChrome.auraEffect.healAbsorb': '受ける回復を{value}吸収する',
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',
@@ -13090,4 +13093,48 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。',
   'hudChrome.otaUpdate.progressLabel': 'アップデートのダウンロード進行状況',
   'hudChrome.otaUpdate.title': 'ゲームアップデート',
+  'hudChrome.auraEffect.makersBrand':
+    '{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    '残り火の番兵に追われている。倒すまでレイドから離しておくこと。',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    'このコアを炉へ運ぶ。溶融の重荷は{interval}秒ごとに最大体力の{min}%から{max}%まで増加するダメージを与える。',
+  'entities.mobs.ignivar_ember_sentinel.name': '残り火の番兵',
+  'entities.mobs.ignivar_crucible_warden.name': 'るつぼの守護者',
+  'entities.mobs.ignivar_cinder_artificer.name': '火の粉の技工士',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': '最後の炎の鍛造父、ヴァルクル',
+  'entities.npcs.archivist_maelin_emberward.name': '残り火守りの記録官メイリン',
+  'entities.npcs.archivist_maelin_emberward.title': 'るつぼの記録官',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    'ここに残る槌の跡は、どれも一つの文だ。ヴァルクルが隠そうとしたことを読み解くのを手伝ってくれ。',
+  'entities.quests.q_ignivar_echoes_in_iron.title': '鉄に響く記憶',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    'この自動人形たちは兵士ではない。試作品だ。最後の泉が彼の周りで枯れていく中、ヴァルクルは殻を何度も鍛え直した。三つの記録を読み、それらを守る造られし者を破壊せよ。失敗した身体の一つ一つに、答えの断片が残っているかもしれない。',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    '記録はすべて一致している。ヴァルクルは死にかけた最後の泉の水を生ける金属に縛りつけた。この自動人形たちは鍛造に失敗したものだ。耐え抜いた設計はただ一つだけだった。',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '「最初の鍛造」の記録を読む',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '「生ける金属」の記録を読む',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '「先触れの鍵」の記録を読む',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.3.label': '残り火の番兵を倒す',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.4.label': 'るつぼの守護者を倒す',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.5.label': '火の粉の技工士を倒す',
+  'entities.quests.q_ignivar_heralds_heart.title': '先触れの心臓',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    'すべての記録に残った者の名はイグニヴァルだ。ヴァルクルは彼を先触れ、封印、鍵と呼んだ。イグニヴァルを倒し、残されたコアを調べよ。先触れが何を守るために造られたのかわかるはずだ。',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    'イグニヴァルは単なる守護者ではなかった。彼の心臓は鍵であり、最後の装甲板は下に封じられたるつぼを指し示している。',
+  'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'イグニヴァルを倒す',
+  'entities.quests.q_ignivar_heralds_heart.objectives.1.label': 'イグニヴァルのコアを調べる',
+  'entities.quests.q_ignivar_the_forgefather.title': '鍛造父',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    '下へ続く道の先には、最後の炎の鍛造父ヴァルクルがいる。彼は金属に命を与えるため最後の泉を幽閉し、その罪を封じるためイグニヴァルを鍛えた。内部るつぼに入り、彼の所業に終止符を打て。',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    'ついに炉が静まった。泉は二度と元に戻らないかもしれない。しかしヴァルクルが命を再び鏖に鍛えることはない。',
+  'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'ヴァルクルを倒す',
+  'entities.dungeons.ignivar_forge_approach.name': '最初の鍛造の大広間',
+  'entities.dungeons.ignivar_forge_approach.enterText': '槌音が最初の鍛造の大広間に響き渡る。',
+  'entities.dungeons.ignivar_forge_approach.leaveText': '最初の炉から離れ、再び自由に息をつく。',
+  'entities.dungeons.ignivar_inner_crucible.name': '内部るつぼ',
+  'entities.dungeons.ignivar_inner_crucible.enterText': '開かれた門はるつぼのさらなる深部へ続いている。',
+  'entities.dungeons.ignivar_inner_crucible.leaveText': 'るつぼの静まり返った深部を後にする。',
 };

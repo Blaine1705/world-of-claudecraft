@@ -2289,11 +2289,11 @@ export const ru_RU: EnTranslations = {
       "mail": "Кольчуга"
     },
     "auraEffect": {
-      "sharedPyre": "В круге должно находиться не менее {players} игроков",
-      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
-      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
-      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Match your symbol. Anvil: stand on the hollow inner receptor. Hammer: use the outer arrows to rotate the fire arm, then brake on the square when aligned. Hold for {hold} sec.",
+      "sharedPyre": "Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках).",
+      "makersBrand": "В течение {duration} сек. каждый эффект повышает урон от Варкхула на {pct}%. Суммируется до {max} раз. Танкам следует сменяться при {swap} эффектах.",
+      "varkhulSentinelsGaze": "Пепельный часовой преследует вас. Держите его вдали от рейда, пока он не будет уничтожен.",
+      "varkhulMoltenCore": "Отнесите ядро к горну. Бремя расплава каждые {interval} сек. наносит возрастающий урон от {min}% до {max}% максимального здоровья.",
+      "varkhulForgeLink": "Найдите по краю комнаты руну со своим символом. Встаньте во внутренний круг, чтобы вращать влево, или во внешнее кольцо, чтобы вращать вправо. Выйдите, чтобы остановить вращение; символ автоматически зафиксируется, достигнув гнезда.",
       "dot": "Наносит {value} единиц урона ({school}) каждые {interval} сек",
       "hot": "Восстанавливает {value} здоровья каждые {interval} сек",
       "mendingCurrent": "Накапливает {value} исцеления, которое высвобождается со временем или расходуется Каскадным исцелением",
@@ -13406,16 +13406,16 @@ export const ru_RU: EnTranslations = {
         "name": "Сердце Конца"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Пепельный часовой"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Страж горнила"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Искровой механик"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Варкхул, отец ковки Последнего Пламени"
       },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"
@@ -14072,9 +14072,9 @@ export const ru_RU: EnTranslations = {
         "greeting": "От кладбища часовни до крыши мира... след заканчивается здесь. Я чувствую, как гора слушает."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Архивариус Мэйлин Углестраж",
+        "title": "Архивариус горнила",
+        "greeting": "Каждый след молота здесь — это фраза. Помогите мне прочесть то, что Варкхул пытался скрыть."
       },
       "brother_halven": {
         "name": "Брат Хальвен",
@@ -15185,50 +15185,50 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.",
-        "completion": "The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.",
+        "title": "Эхо в железе",
+        "text": "Эти автоматоны — не солдаты, а черновики. Варкхул закалял один корпус за другим, пока вокруг него угасал Последний Источник. Прочтите три записи и уничтожьте охраняющие их механизмы. Каждое неудачное тело может хранить часть ответа.",
+        "completion": "Записи сходятся. Варкхул сковал воду умирающего Последнего Источника с живым металлом. Эти автоматоны были его неудачными закалками. Выдержал лишь один замысел.",
         "objectives": {
           "0": {
-            "label": "Read the First Tempering record"
+            "label": "Прочесть запись о первой закалке"
           },
           "1": {
-            "label": "Read the Living Metal record"
+            "label": "Прочесть запись о живом металле"
           },
           "2": {
-            "label": "Read the Herald-Key record"
+            "label": "Прочесть запись о ключе Предвестника"
           },
           "3": {
-            "label": "Ember Sentinel defeated"
+            "label": "Пепельный часовой повержен"
           },
           "4": {
-            "label": "Crucible Warden defeated"
+            "label": "Страж горнила повержен"
           },
           "5": {
-            "label": "Cinder Artificer defeated"
+            "label": "Искровой механик повержен"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.",
+        "title": "Сердце Предвестника",
+        "text": "Выжившего, упомянутого в каждой записи, звали Игнивар. Варкхул называл его предвестником, печатью и ключом. Победите Игнивара, а затем изучите оставшееся ядро. Оно должно рассказать, что был создан охранять Предвестник.",
+        "completion": "Игнивар никогда не был просто стражем. Его сердце — это ключ, а последние пластины указывают на запечатанное горнило внизу.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Игнивар повержен"
           },
           "1": {
-            "label": "Ignivar's core inspected"
+            "label": "Ядро Игнивара изучено"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Отец ковки",
+        "text": "Путь вниз ведёт к Варкхулу, отцу ковки Последнего Пламени. Он заточил Последний Источник, чтобы оживить металл, а затем выковал Игнивара, чтобы сохранить преступление в тайне. Войдите во Внутреннее Горнило и положите конец его трудам.",
+        "completion": "Наконец горн замолчал. Возможно, источник уже никогда не восстановится, но Варкхул больше не скуёт жизни в цепи.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Варкхул повержен"
           }
         }
       },
@@ -16983,9 +16983,9 @@ export const ru_RU: EnTranslations = {
         "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Чертоги Первой Закалки",
+        "enterText": "Грохот молотов эхом разносится по Чертогам Первой Закалки.",
+        "leaveText": "Вы отходите от первого горна и снова дышите свободно."
       },
       "ignivar_raid_arena": {
         "name": "Горнило Последнего Источника",
@@ -16993,9 +16993,9 @@ export const ru_RU: EnTranslations = {
         "leaveText": "Вы покидаете Горнило и снова дышите свободно."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "Внутреннее Горнило",
+        "enterText": "Открытые врата ведут глубже в горнило.",
+        "leaveText": "Вы покидаете безмолвные глубины горнила."
       },
       "wildheart_basin": {
         "name": "Котловина Дикого Сердца",

@@ -149,33 +149,27 @@ describe('Varkhul encounter rendering', () => {
     expect(varkhulEncounterBypassesCharacterCulling(boss)).toBe(true);
   });
 
-  it('puts an eye, molten core, and one of five matching symbols over players', () => {
+  it('puts an eye, molten core, and one of ten matching symbols over players', () => {
     const group = new THREE.Group();
     const marked = player([
       { id: VARKHUL_ASSEMBLY_FIXATE_AURA_ID },
       { id: VARKHUL_ASSEMBLY_CORE_AURA_ID },
-      { id: VARKHUL_ASSEMBLY_LINK_AURA_ID, stacks: 4, charges: 2, value: 0 },
+      { id: VARKHUL_ASSEMBLY_LINK_AURA_ID, stacks: 10, value: 0 },
     ]);
     syncVarkhulEncounterVisuals(group, marked, 0.1);
     expect(group.getObjectByName(VARKHUL_FIXATE_VISUAL_NAME)?.visible).toBe(true);
     expect(group.getObjectByName(VARKHUL_CORE_CARRY_VISUAL_NAME)?.visible).toBe(true);
     const links = group.getObjectByName(VARKHUL_LINK_VISUAL_NAME) as THREE.Group;
     expect(links.visible).toBe(true);
-    expect(links.getObjectByName('varkhulAssemblyHammerSymbol3')?.visible).toBe(true);
-    expect(links.getObjectByName('varkhulAssemblyAnvilSymbol3')?.visible).toBe(false);
-    expect(
-      (links.getObjectByName('varkhulAssemblyHammerSymbol3') as THREE.Mesh).userData.hollow,
-    ).toBe(false);
+    expect(links.getObjectByName('varkhulAssemblyRuneSymbol9')?.visible).toBe(true);
+    expect(links.getObjectByName('varkhulAssemblyRuneSymbol3')?.visible).toBe(false);
     syncVarkhulEncounterVisuals(
       group,
-      player([{ id: VARKHUL_ASSEMBLY_LINK_AURA_ID, stacks: 4, charges: 1, value: 0 }]),
+      player([{ id: VARKHUL_ASSEMBLY_LINK_AURA_ID, stacks: 4, value: 0 }]),
       0.1,
     );
-    expect(links.getObjectByName('varkhulAssemblyHammerSymbol3')?.visible).toBe(false);
-    expect(links.getObjectByName('varkhulAssemblyAnvilSymbol3')?.visible).toBe(true);
-    expect(
-      (links.getObjectByName('varkhulAssemblyAnvilSymbol3') as THREE.Mesh).userData.hollow,
-    ).toBe(true);
+    expect(links.getObjectByName('varkhulAssemblyRuneSymbol9')?.visible).toBe(false);
+    expect(links.getObjectByName('varkhulAssemblyRuneSymbol3')?.visible).toBe(true);
     expect(varkhulEncounterBypassesCharacterCulling(marked)).toBe(true);
   });
 

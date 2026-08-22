@@ -6320,7 +6320,7 @@ describe('Varkhul Forgestorm snapshot parity', () => {
 });
 
 describe('Varkhul Cinder Orbs snapshot parity', () => {
-  it('rebuilds Heroic meteors and the pair interface after reconnect', () => {
+  it('rebuilds Heroic meteors and all ten room runes after reconnect', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       t: 'snap',
@@ -6339,23 +6339,18 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
           rounds: 2,
           rem: 18,
           cores: [],
-          assign: [{ pid: 1, sym: 2, role: 1, lock: 0 }],
-          pads: [
-            {
-              sym: 2,
-              x: 14,
-              z: 24,
-              r: 3,
-              p: 0.5,
-              ar: 0,
-              hr: 1,
-              ta: 1.2,
-              aa: 1.25,
-              c: 2,
-              al: 1,
-              lock: 0,
-            },
-          ],
+          assign: [{ pid: 1, sym: 2, lock: 0 }],
+          runes: Array.from({ length: 10 }, (_, sym) => ({
+            sym,
+            x: sym === 2 ? 14 : sym,
+            z: sym === 2 ? 24 : -sym,
+            r: 3.3,
+            ta: sym === 2 ? 1.2 : 0,
+            ga: sym === 2 ? 1.25 : 1,
+            c: sym === 2 ? 2 : 0,
+            al: 0,
+            lock: 0,
+          })),
         },
       ],
     });
@@ -6366,6 +6361,11 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
     expect(client.activeVarkhulAssemblies).toEqual([
       expect.objectContaining({ bossId: 7, phase: 'links', round: 1, rounds: 2 }),
     ]);
+    expect(client.activeVarkhulAssemblies[0].runes).toHaveLength(10);
+    expect(client.activeVarkhulAssemblies[0].runes[2]).toMatchObject({
+      assignedPlayerId: 1,
+      control: 'clockwise',
+    });
     (client as any).applySnapshot({ t: 'snap', ents: [] });
     expect(client.activeVarkhulAnvilMeteors).toEqual([]);
     expect(client.activeVarkhulAssemblies).toEqual([]);

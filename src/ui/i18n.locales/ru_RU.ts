@@ -7605,7 +7605,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': 'Кольчуга',
   'hudChrome.auraEffect.dot': 'Наносит {value} единиц урона ({school}) каждые {interval} сек',
   'hudChrome.auraEffect.hot': 'Восстанавливает {value} здоровья каждые {interval} сек',
-  'hudChrome.auraEffect.sharedPyre': 'В круге должно находиться не менее {players} игроков',
+  'hudChrome.auraEffect.sharedPyre':
+    'Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках).',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    'Найдите по краю комнаты руну со своим символом. Встаньте во внутренний круг, чтобы вращать влево, или во внешнее кольцо, чтобы вращать вправо. Выйдите, чтобы остановить вращение; символ автоматически зафиксируется, достигнув гнезда.',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',
@@ -13269,4 +13272,48 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.',
   'hudChrome.otaUpdate.progressLabel': 'Ход загрузки обновления',
   'hudChrome.otaUpdate.title': 'Обновление игры',
+  'hudChrome.auraEffect.makersBrand':
+    'В течение {duration} сек. каждый эффект повышает урон от Варкхула на {pct}%. Суммируется до {max} раз. Танкам следует сменяться при {swap} эффектах.',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    'Пепельный часовой преследует вас. Держите его вдали от рейда, пока он не будет уничтожен.',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    'Отнесите ядро к горну. Бремя расплава каждые {interval} сек. наносит возрастающий урон от {min}% до {max}% максимального здоровья.',
+  'entities.mobs.ignivar_ember_sentinel.name': 'Пепельный часовой',
+  'entities.mobs.ignivar_crucible_warden.name': 'Страж горнила',
+  'entities.mobs.ignivar_cinder_artificer.name': 'Искровой механик',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': 'Варкхул, отец ковки Последнего Пламени',
+  'entities.npcs.archivist_maelin_emberward.name': 'Архивариус Мэйлин Углестраж',
+  'entities.npcs.archivist_maelin_emberward.title': 'Архивариус горнила',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    'Каждый след молота здесь — это фраза. Помогите мне прочесть то, что Варкхул пытался скрыть.',
+  'entities.quests.q_ignivar_echoes_in_iron.title': 'Эхо в железе',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    'Эти автоматоны — не солдаты, а черновики. Варкхул закалял один корпус за другим, пока вокруг него угасал Последний Источник. Прочтите три записи и уничтожьте охраняющие их механизмы. Каждое неудачное тело может хранить часть ответа.',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    'Записи сходятся. Варкхул сковал воду умирающего Последнего Источника с живым металлом. Эти автоматоны были его неудачными закалками. Выдержал лишь один замысел.',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': 'Прочесть запись о первой закалке',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': 'Прочесть запись о живом металле',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': 'Прочесть запись о ключе Предвестника',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.3.label': 'Пепельный часовой повержен',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.4.label': 'Страж горнила повержен',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.5.label': 'Искровой механик повержен',
+  'entities.quests.q_ignivar_heralds_heart.title': 'Сердце Предвестника',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    'Выжившего, упомянутого в каждой записи, звали Игнивар. Варкхул называл его предвестником, печатью и ключом. Победите Игнивара, а затем изучите оставшееся ядро. Оно должно рассказать, что был создан охранять Предвестник.',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    'Игнивар никогда не был просто стражем. Его сердце — это ключ, а последние пластины указывают на запечатанное горнило внизу.',
+  'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'Игнивар повержен',
+  'entities.quests.q_ignivar_heralds_heart.objectives.1.label': 'Ядро Игнивара изучено',
+  'entities.quests.q_ignivar_the_forgefather.title': 'Отец ковки',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    'Путь вниз ведёт к Варкхулу, отцу ковки Последнего Пламени. Он заточил Последний Источник, чтобы оживить металл, а затем выковал Игнивара, чтобы сохранить преступление в тайне. Войдите во Внутреннее Горнило и положите конец его трудам.',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    'Наконец горн замолчал. Возможно, источник уже никогда не восстановится, но Варкхул больше не скуёт жизни в цепи.',
+  'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'Варкхул повержен',
+  'entities.dungeons.ignivar_forge_approach.name': 'Чертоги Первой Закалки',
+  'entities.dungeons.ignivar_forge_approach.enterText': 'Грохот молотов эхом разносится по Чертогам Первой Закалки.',
+  'entities.dungeons.ignivar_forge_approach.leaveText': 'Вы отходите от первого горна и снова дышите свободно.',
+  'entities.dungeons.ignivar_inner_crucible.name': 'Внутреннее Горнило',
+  'entities.dungeons.ignivar_inner_crucible.enterText': 'Открытые врата ведут глубже в горнило.',
+  'entities.dungeons.ignivar_inner_crucible.leaveText': 'Вы покидаете безмолвные глубины горнила.',
 };

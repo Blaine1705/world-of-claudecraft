@@ -6,7 +6,7 @@ import type { GatheringProfessionId, ToolEffectId } from './content/professions'
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
-import type { VarkhulAssemblyHammerControl, VarkhulAssemblyPhase } from './varkhul_assembly';
+import type { VarkhulAssemblyPhase, VarkhulAssemblyRuneControl } from './varkhul_assembly';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -5090,23 +5090,19 @@ export interface VarkhulEncounterState {
   assemblyDeliveredCoreIds: string[];
   assemblyArtificerRepaired: boolean;
   assemblyFixateTargetId: number | null;
-  assemblyLinkAssignments: Array<{
+  assemblyRuneCenter: Vec3 | null;
+  assemblyRuneAssignments: Array<{
     playerId: number;
     symbol: number;
-    role: 'anvil' | 'hammer';
     locked: boolean;
   }>;
-  assemblyLinkPadProgress: number[];
-  assemblyLinkPadSlots: number[];
-  assemblyLinkArmAngles: number[];
-  assemblyLinkHammerControls: VarkhulAssemblyHammerControl[];
-  assemblyLinkAnvilReady: boolean[];
-  assemblyLinkHammerReady: boolean[];
+  assemblyRuneAngles: number[];
+  assemblyRuneControls: VarkhulAssemblyRuneControl[];
   assemblyLinkFireballTimer: number;
   assemblyLinkFireballWave: number;
-  assemblyLinkRound: number;
-  assemblyLinkRounds: number;
-  assemblyLinkRemaining: number;
+  assemblyRuneRound: number;
+  assemblyRuneRounds: number;
+  assemblyRuneRemaining: number;
   assemblyStunRemaining: number;
   masterpieceTriggered: boolean;
   masterpieceRemaining: number;

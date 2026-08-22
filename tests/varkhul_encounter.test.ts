@@ -65,20 +65,20 @@ import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../src/sim/mob/healer_channel';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, type PlayerClass } from '../src/sim/types';
+import { DT, dist2d, type Entity, type PlayerClass } from '../src/sim/types';
 import {
   VARKHUL_ANVIL_METEOR_CAST_ID,
   VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP,
   VARKHUL_ANVIL_METEOR_RADIUS,
 } from '../src/sim/varkhul_anvil_meteors';
 import {
-  VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS,
-  VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS,
-  VARKHUL_ASSEMBLY_LINK_SYMBOLS,
-  varkhulAssemblyAnvilTarget,
-  varkhulAssemblyAnvilTargetAngle,
-  varkhulAssemblyHammerControlPoints,
-  varkhulAssemblyLinkPadAtSlot,
+  VARKHUL_ASSEMBLY_RUNE_COUNT,
+  VARKHUL_ASSEMBLY_RUNE_INNER_CONTROL_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
+  varkhulAssemblyRuneStartAngle,
+  varkhulAssemblyRuneStation,
+  varkhulAssemblyRuneTargetAngle,
 } from '../src/sim/varkhul_assembly';
 
 function claimedEncounter(seed = 42): { sim: Sim; boss: Entity } {
@@ -129,7 +129,7 @@ function isolateMechanics(boss: Entity): NonNullable<Entity['varkhul']> {
 function forceAssemblyLinks(
   sim: Sim,
   boss: Entity,
-  assignments: NonNullable<Entity['varkhul']>['assemblyLinkAssignments'],
+  assignments: NonNullable<Entity['varkhul']>['assemblyRuneAssignments'],
   difficulty: 'normal' | 'heroic' = 'normal',
 ): NonNullable<Entity['varkhul']> {
   updateVarkhulEncounter(sim.ctx, boss);
@@ -141,21 +141,20 @@ function forceAssemblyLinks(
   state.assemblyPhase = 'links';
   state.assemblyRemaining = 45;
   state.assemblyWipeResolved = false;
-  state.assemblyLinkAssignments = assignments;
-  state.assemblyLinkPadProgress = Array.from({ length: 5 }, () => 0);
-  state.assemblyLinkPadSlots = [0, 1, 2, 3, 4];
-  state.assemblyLinkArmAngles = Array.from(
-    { length: 5 },
-    (_, symbol) => varkhulAssemblyAnvilTargetAngle(symbol, 0) + Math.PI / 2,
+  state.assemblyRuneAssignments = assignments;
+  state.assemblyRuneCenter = varkhulRoomCenter(sim);
+  state.assemblyRuneAngles = Array.from({ length: VARKHUL_ASSEMBLY_RUNE_COUNT }, (_, symbol) =>
+    varkhulAssemblyRuneStartAngle(boss.id, symbol, 0),
   );
-  state.assemblyLinkHammerControls = Array.from({ length: 5 }, () => 'off' as const);
-  state.assemblyLinkAnvilReady = Array.from({ length: 5 }, () => false);
-  state.assemblyLinkHammerReady = Array.from({ length: 5 }, () => false);
+  state.assemblyRuneControls = Array.from(
+    { length: VARKHUL_ASSEMBLY_RUNE_COUNT },
+    () => 'off' as const,
+  );
   state.assemblyLinkFireballTimer = 999;
   state.assemblyLinkFireballWave = 0;
-  state.assemblyLinkRound = 0;
-  state.assemblyLinkRounds = 1;
-  state.assemblyLinkRemaining = 25;
+  state.assemblyRuneRound = 0;
+  state.assemblyRuneRounds = 1;
+  state.assemblyRuneRemaining = 25;
   boss.damageImmune = true;
   boss.knockbackResistance = 1;
   const origin = sim.ctx.instanceOriginOf(instance);
@@ -165,6 +164,33 @@ function forceAssemblyLinks(
   );
   boss.prevPos = { ...boss.pos };
   return state;
+}
+
+function varkhulRoomCenter(sim: Sim): { x: number; y: number; z: number } {
+  const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
+  if (!instance) throw new Error('Inner Crucible instance disappeared');
+  const origin = sim.ctx.instanceOriginOf(instance);
+  return sim.ctx.groundPos(origin.x, origin.z);
+}
+
+function spawnedAssemblyWarden(seed: number): { sim: Sim; boss: Entity; warden: Entity } {
+  const { sim, boss } = claimedEncounter(seed);
+  sim.setPlayerLevel(20);
+  updateVarkhulEncounter(sim.ctx, boss);
+  const state = isolateMechanics(boss);
+  boss.hp = Math.floor(boss.maxHp * 0.5);
+  updateVarkhulEncounter(sim.ctx, boss);
+  const warden = state.assemblyAddIds
+    .map((id) => sim.entities.get(id))
+    .find((add) => add?.templateId === VARKHUL_CRUCIBLE_WARDEN_ID);
+  if (!warden) throw new Error('Crucible Warden did not spawn');
+  for (const addId of state.assemblyAddIds) {
+    const add = sim.entities.get(addId);
+    if (add && add !== warden) add.dead = true;
+  }
+  sim.player.targetId = warden.id;
+  sim.player.autoAttack = false;
+  return { sim, boss, warden };
 }
 
 function deterministicCinderOrbRun(seed: number) {
@@ -1043,25 +1069,52 @@ describe('Varkhul encounter behavior', () => {
     expect(artificer.pos).toEqual(beforeStun);
   });
 
-  it('reliably casts Warden Crucible Quake and lets a raider interrupt it', () => {
-    const { sim, boss } = claimedEncounter(465);
-    sim.setPlayerLevel(20);
-    updateVarkhulEncounter(sim.ctx, boss);
-    const state = isolateMechanics(boss);
-    boss.hp = Math.floor(boss.maxHp * 0.5);
-    updateVarkhulEncounter(sim.ctx, boss);
-    const warden = state.assemblyAddIds
-      .map((id) => sim.entities.get(id))
-      .find((add) => add?.templateId === VARKHUL_CRUCIBLE_WARDEN_ID);
-    if (!warden) throw new Error('Crucible Warden did not spawn');
-    sim.player.pos = sim.ctx.groundPos(warden.pos.x, warden.pos.z + 1);
+  it('makes the Warden pursue before Quake and melee while casting it', () => {
+    const { sim, warden } = spawnedAssemblyWarden(465);
+    sim.player.damageImmune = true;
+    sim.player.pos = sim.ctx.groundPos(warden.pos.x, warden.pos.z + 12);
     sim.player.prevPos = { ...sim.player.pos };
-    sim.player.targetId = warden.id;
     sim.player.facing = Math.atan2(
       warden.pos.x - sim.player.pos.x,
       warden.pos.z - sim.player.pos.z,
     );
-    for (let tick = 0; tick < 40 && warden.castingAbility === null; tick++) sim.tick();
+    const distanceAtSpawn = dist2d(warden.pos, sim.player.pos);
+    sim.tick();
+    expect(dist2d(warden.pos, sim.player.pos)).toBeLessThan(distanceAtSpawn);
+    expect(warden.castingAbility).toBeNull();
+    for (let tick = 1; tick < 29; tick++) sim.tick();
+    expect(warden.castingAbility).toBeNull();
+    sim.tick();
+    expect(warden.castingAbility).toBe(VARKHUL_CRUCIBLE_QUAKE_CAST_ID);
+    sim.player.pos = sim.ctx.groundPos(warden.pos.x, warden.pos.z + 12);
+    sim.player.prevPos = { ...sim.player.pos };
+    const distanceBeforeCastStep = dist2d(warden.pos, sim.player.pos);
+    sim.tick();
+    expect(dist2d(warden.pos, sim.player.pos)).toBeLessThan(distanceBeforeCastStep);
+    expect(warden.castRemaining).toBeCloseTo(2.5 - DT, 5);
+
+    sim.player.pos = sim.ctx.groundPos(warden.pos.x, warden.pos.z + 1);
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.damageImmune = false;
+    sim.player.hp = sim.player.maxHp;
+    warden.swingTimer = 0;
+    const hpBeforeSwing = sim.player.hp;
+    sim.tick();
+    expect(sim.player.hp).toBeLessThan(hpBeforeSwing);
+    expect(warden.castingAbility).toBe(VARKHUL_CRUCIBLE_QUAKE_CAST_ID);
+  });
+
+  it('interrupts Quake, applies a fire lockout, and preserves the twelve-second recast', () => {
+    const { sim, warden } = spawnedAssemblyWarden(466);
+    sim.player.damageImmune = true;
+    sim.player.pos = sim.ctx.groundPos(warden.pos.x, warden.pos.z + 1);
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.facing = Math.atan2(
+      warden.pos.x - sim.player.pos.x,
+      warden.pos.z - sim.player.pos.z,
+    );
+    warden.swingTimer = Number.POSITIVE_INFINITY;
+    for (let tick = 0; tick < 30; tick++) sim.tick();
     expect(warden.castingAbility).toBe(VARKHUL_CRUCIBLE_QUAKE_CAST_ID);
 
     sim.castAbility('pummel', sim.player.id);
@@ -1072,23 +1125,46 @@ describe('Varkhul encounter behavior', () => {
         (aura) => aura.kind === 'lockout' && aura.school === 'fire' && aura.remaining === 4,
       ),
     ).toBe(true);
-
-    warden.auras = warden.auras.filter((aura) => aura.kind !== 'lockout');
-    warden.bigCastTimer = DT;
-    updateVarkhulAssemblyAutomaton(sim.ctx, warden);
+    for (let tick = 0; tick < 239; tick++) {
+      sim.tick();
+      expect(warden.castingAbility).toBeNull();
+    }
+    sim.tick();
     expect(warden.castingAbility).toBe(VARKHUL_CRUCIBLE_QUAKE_CAST_ID);
-    expect(warden.castTotal).toBe(2.5);
-    expect(warden.castRemaining).toBe(2.5);
-    sim.player.maxHp = 1_000;
-    sim.player.hp = 1_000;
-    sim.player.pos = { ...warden.pos };
-    warden.castRemaining = DT;
-    updateVarkhulAssemblyAutomaton(sim.ctx, warden);
-    expect(warden.castingAbility).toBeNull();
-    expect(sim.player.hp).toBeLessThan(1_000);
   });
 
-  it('drops three cores, breaks the forge through a synchronized reaction, and pairs ten raiders', () => {
+  it('completes Quake for damage and naturally starts the next cast twelve seconds later', () => {
+    const trace = (seed: number) => {
+      const { sim, warden } = spawnedAssemblyWarden(seed);
+      sim.player.pos = sim.ctx.groundPos(warden.pos.x, warden.pos.z + 1);
+      sim.player.prevPos = { ...sim.player.pos };
+      sim.player.damageImmune = false;
+      warden.swingTimer = Number.POSITIVE_INFINITY;
+      const hpAtSpawn = sim.player.hp;
+      for (let tick = 0; tick < 30; tick++) sim.tick();
+      expect(warden.castingAbility).toBe(VARKHUL_CRUCIBLE_QUAKE_CAST_ID);
+      let hpAfterFirstQuake = hpAtSpawn;
+      let completed = false;
+      for (let tick = 1; tick <= 239; tick++) {
+        const wasCasting = warden.castingAbility === VARKHUL_CRUCIBLE_QUAKE_CAST_ID;
+        sim.tick();
+        if (wasCasting && warden.castingAbility === null) {
+          completed = true;
+          hpAfterFirstQuake = sim.player.hp;
+        }
+        if (completed) expect(warden.castingAbility).toBeNull();
+      }
+      expect(completed).toBe(true);
+      expect(hpAfterFirstQuake).toBeLessThan(hpAtSpawn);
+      sim.tick();
+      expect(warden.castingAbility).toBe(VARKHUL_CRUCIBLE_QUAKE_CAST_ID);
+      return hpAtSpawn - hpAfterFirstQuake;
+    };
+
+    expect(trace(468)).toBe(trace(468));
+  });
+
+  it('drops three cores, converges the raid, and assigns one unique rune per living raider', () => {
     const { sim, boss } = claimedEncounter(460);
     const players = [sim.player];
     for (let index = 1; index < 10; index++) {
@@ -1139,8 +1215,8 @@ describe('Varkhul encounter behavior', () => {
 
     expect(state.assemblyForgeHp).toBe(0);
     expect(state.assemblyPhase).toBe('convergence');
-    expect(state.assemblyLinkAssignments).toEqual([]);
-    expect(state.assemblyLinkRemaining).toBe(4);
+    expect(state.assemblyRuneAssignments).toEqual([]);
+    expect(state.assemblyRuneRemaining).toBe(4);
     expect(state.assemblyWipeResolved).toBe(false);
     expect(boss.castingAbility).toBe(VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID);
     const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
@@ -1168,268 +1244,242 @@ describe('Varkhul encounter behavior', () => {
       new Set(players.filter((player) => !player.dead).map((player) => player.id)),
     );
 
-    state.assemblyLinkRemaining = DT * 2;
+    state.assemblyRuneRemaining = DT * 2;
     updateVarkhulEncounter(sim.ctx, boss);
     expect(state.assemblyPhase).toBe('convergence');
-    expect(state.assemblyLinkAssignments).toEqual([]);
-    state.assemblyLinkRemaining = DT;
+    expect(state.assemblyRuneAssignments).toEqual([]);
+    state.assemblyRuneRemaining = DT;
     updateVarkhulEncounter(sim.ctx, boss);
 
     expect(state.assemblyPhase).toBe('links');
-    expect(state.assemblyLinkAssignments).toHaveLength(9);
+    expect(state.assemblyRuneAssignments).toHaveLength(9);
+    const projected = sim.activeVarkhulAssemblies[0];
+    expect(projected.runes).toHaveLength(10);
     expect(
-      state.assemblyLinkAssignments.some((entry) => entry.playerId === deadBeforeAssignment.id),
+      projected.runes.every(
+        (rune) => Math.abs(Math.hypot(rune.x - center.x, rune.z - center.z) - 30) < 0.0001,
+      ),
+    ).toBe(true);
+    expect(Math.hypot(projected.forgeX - center.x, projected.forgeZ - center.z)).toBeCloseTo(22, 5);
+    expect(
+      state.assemblyRuneAssignments.some((entry) => entry.playerId === deadBeforeAssignment.id),
     ).toBe(false);
-    const assignmentsBySymbol = Array.from({ length: VARKHUL_ASSEMBLY_LINK_SYMBOLS }, (_, symbol) =>
-      state.assemblyLinkAssignments.filter((entry) => entry.symbol === symbol),
-    );
-    expect(assignmentsBySymbol.filter((assignments) => assignments.length === 2)).toHaveLength(4);
-    expect(assignmentsBySymbol.filter((assignments) => assignments.length === 1)).toHaveLength(1);
-    for (const assignment of state.assemblyLinkAssignments) {
+    expect(new Set(state.assemblyRuneAssignments.map((entry) => entry.symbol)).size).toBe(9);
+    for (const assignment of state.assemblyRuneAssignments) {
       const aura = sim.entities
         .get(assignment.playerId)
         ?.auras.find((entry) => entry.id === VARKHUL_ASSEMBLY_LINK_AURA_ID);
       expect(aura?.value).toBe(0);
       expect(aura?.stacks).toBe(assignment.symbol + 1);
-      expect(aura?.charges).toBe(assignment.role === 'hammer' ? 2 : 1);
+      expect(aura?.charges).toBeUndefined();
     }
-    const soloAssignments = assignmentsBySymbol.find((assignments) => assignments.length === 1);
-    if (!soloAssignments) throw new Error('Link assignments did not include a forge-echo pair');
-    expect(soloAssignments[0].role).toBe('anvil');
-    for (const assignment of state.assemblyLinkAssignments) {
-      const player = sim.entities.get(assignment.playerId);
-      if (!player) throw new Error('Link assignment lost its player');
-      const pad = varkhulAssemblyLinkPadAtSlot(
-        boss.pos,
-        state.assemblyLinkPadSlots[assignment.symbol],
-        state.assemblyLinkRound,
-      );
-      const point =
-        assignment.role === 'hammer'
-          ? varkhulAssemblyHammerControlPoints(boss.pos, pad).brake
-          : varkhulAssemblyAnvilTarget(pad, assignment.symbol, state.assemblyLinkRound);
-      player.pos = sim.ctx.groundPos(point.x, point.z);
-      state.assemblyLinkArmAngles[assignment.symbol] = varkhulAssemblyAnvilTargetAngle(
+    for (const assignment of state.assemblyRuneAssignments) {
+      state.assemblyRuneAngles[assignment.symbol] = varkhulAssemblyRuneTargetAngle(
+        boss.id,
         assignment.symbol,
-        state.assemblyLinkRound,
+        state.assemblyRuneRound,
       );
     }
-    state.assemblyLinkPadProgress.fill(VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS - DT);
-    const soloSymbol = soloAssignments[0].symbol;
-    const soloTargetAngle = varkhulAssemblyAnvilTargetAngle(soloSymbol, state.assemblyLinkRound);
-    state.assemblyLinkArmAngles[soloSymbol] = soloTargetAngle + 0.35;
-    state.assemblyLinkPadProgress[soloSymbol] = 0;
-    const soloStartAngle = state.assemblyLinkArmAngles[soloSymbol];
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.assemblyLinkArmAngles[soloSymbol]).not.toBe(soloStartAngle);
-    expect(state.assemblyLinkHammerControls[soloSymbol]).toMatch(/clockwise/);
-    for (let tick = 0; tick < 60 && state.assemblyPhase === 'links'; tick++) {
-      updateVarkhulEncounter(sim.ctx, boss);
-    }
-
+    expect(state.assemblyRuneAssignments.every((assignment) => assignment.locked)).toBe(true);
+    expect(state.assemblyPhase).toBe('links');
+    state.assemblyRuneRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
     expect(state.assemblyPhase).toBe('stunned');
+    expect(state.assemblyStunRemaining).toBe(8);
     expect(deadBeforeAssignment.dead).toBe(true);
-    expect(state.assemblyLinkAssignments.every((assignment) => assignment.locked)).toBe(true);
-    expect(soloAssignments[0].locked).toBe(true);
     expect(boss.auras.some((aura) => aura.id === VARKHUL_MASTERS_ASSEMBLY_AURA_ID)).toBe(false);
-    expect(boss.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_STUN_AURA_ID)?.value).toBe(0.5);
+    expect(boss.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_STUN_AURA_ID)?.value).toBe(0.25);
     expect(boss.damageImmune).toBe(false);
   });
 
-  it('lets Hammer rotate, brake, and lock the arm with Anvil on the bright receptacle', () => {
+  it('lets one assigned player rotate left or right and auto-lock at the socket', () => {
     const { sim, boss } = claimedEncounter(465);
-    const hammer = addEncounterPlayer(sim, boss, 'Forge Hammer');
     const state = forceAssemblyLinks(sim, boss, [
-      { playerId: sim.player.id, symbol: 0, role: 'anvil', locked: false },
-      { playerId: hammer.id, symbol: 0, role: 'hammer', locked: false },
+      { playerId: sim.player.id, symbol: 0, locked: false },
     ]);
-    const pad = varkhulAssemblyLinkPadAtSlot(boss.pos, 0, 0);
-    const target = varkhulAssemblyAnvilTarget(pad, 0, 0);
-    const controls = varkhulAssemblyHammerControlPoints(boss.pos, pad);
-    sim.player.pos = sim.ctx.groundPos(target.x, target.z);
-    hammer.pos = sim.ctx.groundPos(controls.counterclockwise.x, controls.counterclockwise.z);
-    const before = state.assemblyLinkArmAngles[0];
+    const center = varkhulRoomCenter(sim);
+    const station = varkhulAssemblyRuneStation(center, 0, 0);
+    const target = varkhulAssemblyRuneTargetAngle(boss.id, 0, 0);
+    state.assemblyRuneAngles[0] = target + 0.5;
+    sim.player.pos = sim.ctx.groundPos(station.x, station.z);
+    const before = state.assemblyRuneAngles[0];
 
     updateVarkhulEncounter(sim.ctx, boss);
 
-    expect(state.assemblyLinkArmAngles[0]).toBeLessThan(before);
-    expect(state.assemblyLinkHammerControls[0]).toBe('counterclockwise');
-    expect(state.assemblyLinkAnvilReady[0]).toBe(true);
-    expect(state.assemblyLinkPadProgress[0]).toBe(0);
+    expect(state.assemblyRuneAngles[0]).toBeLessThan(before);
+    expect(state.assemblyRuneControls[0]).toBe('counterclockwise');
 
-    state.assemblyLinkArmAngles[0] = varkhulAssemblyAnvilTargetAngle(0, 0);
-    hammer.pos = sim.ctx.groundPos(pad.x, pad.z);
-    const anvilHealth = sim.player.hp;
-    for (let tick = 0; tick < 25; tick++) updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.assemblyLinkPadProgress[0]).toBe(0);
-    expect(sim.player.hp).toBe(anvilHealth);
-
-    hammer.pos = sim.ctx.groundPos(controls.brake.x, controls.brake.z);
-    for (let tick = 0; tick < Math.round(VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS / DT) - 1; tick++) {
-      updateVarkhulEncounter(sim.ctx, boss);
-    }
-    expect(state.assemblyLinkAssignments.some((assignment) => assignment.locked)).toBe(false);
+    state.assemblyRuneAngles[0] = target - 0.01;
+    const outerRadius =
+      (VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS +
+        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS) /
+      2;
+    sim.player.pos = sim.ctx.groundPos(station.x + outerRadius, station.z);
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.assemblyLinkAssignments.every((assignment) => assignment.locked)).toBe(true);
-    expect(state.assemblyPhase).toBe('stunned');
+    expect(state.assemblyRuneControls[0]).toBe('clockwise');
+    expect(state.assemblyRuneAngles[0]).toBe(target);
+    expect(state.assemblyRuneAssignments[0].locked).toBe(true);
+    expect(state.assemblyPhase).toBe('links');
   });
 
   it('ignores unassigned occupants and gives clear positional feedback without punishment', () => {
     const { sim, boss } = claimedEncounter(467);
-    const hammer = addEncounterPlayer(sim, boss, 'Assigned Hammer');
     const intruder = addEncounterPlayer(sim, boss, 'Rune Intruder');
     const state = forceAssemblyLinks(sim, boss, [
-      { playerId: sim.player.id, symbol: 0, role: 'anvil', locked: false },
-      { playerId: hammer.id, symbol: 0, role: 'hammer', locked: false },
+      { playerId: sim.player.id, symbol: 0, locked: false },
     ]);
-    const pad = varkhulAssemblyLinkPadAtSlot(boss.pos, 0, 0);
-    sim.player.pos = sim.ctx.groundPos(pad.x, pad.z);
-    hammer.pos = sim.ctx.groundPos(pad.x, pad.z);
-    intruder.pos = sim.ctx.groundPos(pad.x, pad.z);
-    const health = [sim.player.hp, hammer.hp, intruder.hp];
-    const remaining = state.assemblyLinkRemaining;
-
-    updateVarkhulEncounter(sim.ctx, boss);
-
-    expect([sim.player.hp, hammer.hp, intruder.hp]).toEqual(health);
-    expect(state.assemblyLinkRemaining).toBeCloseTo(remaining - DT, 5);
-    expect(state.assemblyLinkPadProgress[0]).toBe(0);
-  });
-
-  it('requires both the inner receptacle and the stopped aligned arm for the full hold', () => {
-    const { sim, boss } = claimedEncounter(469);
-    const hammer = addEncounterPlayer(sim, boss, 'Brake Hammer');
-    const state = forceAssemblyLinks(sim, boss, [
-      { playerId: sim.player.id, symbol: 0, role: 'anvil', locked: false },
-      { playerId: hammer.id, symbol: 0, role: 'hammer', locked: false },
-    ]);
-    const pad = varkhulAssemblyLinkPadAtSlot(boss.pos, 0, 0);
-    const target = varkhulAssemblyAnvilTarget(pad, 0, 0);
-    const brake = varkhulAssemblyHammerControlPoints(boss.pos, pad).brake;
-    state.assemblyLinkArmAngles[0] = varkhulAssemblyAnvilTargetAngle(0, 0);
-    hammer.pos = sim.ctx.groundPos(brake.x, brake.z);
+    const station = varkhulAssemblyRuneStation(varkhulRoomCenter(sim), 0, 0);
     sim.player.pos = sim.ctx.groundPos(
-      target.x + VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS + 0.01,
-      target.z,
+      station.x + VARKHUL_ASSEMBLY_RUNE_INNER_CONTROL_RADIUS + 0.2,
+      station.z,
     );
-    updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.assemblyLinkPadProgress[0]).toBe(0);
+    intruder.pos = sim.ctx.groundPos(station.x, station.z);
+    const health = [sim.player.hp, intruder.hp];
+    const remaining = state.assemblyRuneRemaining;
+    const angle = state.assemblyRuneAngles[0];
 
-    sim.player.pos = sim.ctx.groundPos(target.x, target.z);
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.assemblyLinkPadProgress[0]).toBeCloseTo(DT, 5);
 
-    hammer.pos = sim.ctx.groundPos(pad.x, pad.z);
-    updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.assemblyLinkPadProgress[0]).toBe(0);
+    expect([sim.player.hp, intruder.hp]).toEqual(health);
+    expect(state.assemblyRuneRemaining).toBeCloseTo(remaining - DT, 5);
+    expect(state.assemblyRuneControls[0]).toBe('off');
+    expect(state.assemblyRuneAngles[0]).toBe(angle);
   });
 
-  it('does not let an assigned death turn the forge echo into an automatic success', () => {
+  it('stops the rune in neutral space between the two concentric controls', () => {
+    const { sim, boss } = claimedEncounter(469);
+    const state = forceAssemblyLinks(sim, boss, [
+      { playerId: sim.player.id, symbol: 0, locked: false },
+    ]);
+    const station = varkhulAssemblyRuneStation(varkhulRoomCenter(sim), 0, 0);
+    const angle = state.assemblyRuneAngles[0];
+    sim.player.pos = sim.ctx.groundPos(station.x + 2, station.z);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyRuneControls[0]).toBe('off');
+    expect(state.assemblyRuneAngles[0]).toBe(angle);
+  });
+
+  it('does not let an assigned death turn its rune into an automatic success', () => {
     const { sim, boss } = claimedEncounter(472);
-    const hammer = addEncounterPlayer(sim, boss, 'Fallen Hammer');
+    const fallen = addEncounterPlayer(sim, boss, 'Fallen Rune Bearer');
     const state = forceAssemblyLinks(sim, boss, [
-      { playerId: sim.player.id, symbol: 0, role: 'anvil', locked: false },
-      { playerId: hammer.id, symbol: 0, role: 'hammer', locked: false },
+      { playerId: fallen.id, symbol: 0, locked: false },
     ]);
-    const pad = varkhulAssemblyLinkPadAtSlot(boss.pos, 0, 0);
-    const target = varkhulAssemblyAnvilTarget(pad, 0, 0);
-    sim.player.pos = sim.ctx.groundPos(target.x, target.z);
-    state.assemblyLinkArmAngles[0] = varkhulAssemblyAnvilTargetAngle(0, 0);
-    hammer.dead = true;
+    state.assemblyRuneAngles[0] = varkhulAssemblyRuneTargetAngle(boss.id, 0, 0) + 0.2;
+    fallen.dead = true;
 
     updateVarkhulEncounter(sim.ctx, boss);
 
-    expect(state.assemblyLinkHammerControls[0]).toBe('off');
-    expect(state.assemblyLinkPadProgress[0]).toBe(0);
-    expect(state.assemblyLinkAssignments.every((assignment) => assignment.locked)).toBe(false);
+    expect(state.assemblyRuneControls[0]).toBe('off');
+    expect(state.assemblyRuneAssignments[0].locked).toBe(false);
 
-    state.assemblyLinkRemaining = DT;
+    state.assemblyRuneRemaining = DT;
     updateVarkhulEncounter(sim.ctx, boss);
     expect(state.assemblyPhase).toBe('done');
     expect(boss.damageImmune).toBe(false);
   });
 
-  it('does not replace a dead assigned Anvil while the living Hammer brakes correctly', () => {
+  it('does not let another living raider control a dead player assignment', () => {
     const { sim, boss } = claimedEncounter(473);
-    const fallenAnvil = addEncounterPlayer(sim, boss, 'Fallen Anvil');
+    const fallen = addEncounterPlayer(sim, boss, 'Fallen Rune Bearer');
     const state = forceAssemblyLinks(sim, boss, [
-      { playerId: fallenAnvil.id, symbol: 0, role: 'anvil', locked: false },
-      { playerId: sim.player.id, symbol: 0, role: 'hammer', locked: false },
+      { playerId: fallen.id, symbol: 0, locked: false },
     ]);
-    const pad = varkhulAssemblyLinkPadAtSlot(boss.pos, 0, 0);
-    const brake = varkhulAssemblyHammerControlPoints(boss.pos, pad).brake;
-    state.assemblyLinkArmAngles[0] = varkhulAssemblyAnvilTargetAngle(0, 0);
-    sim.player.pos = sim.ctx.groundPos(brake.x, brake.z);
-    fallenAnvil.dead = true;
+    const station = varkhulAssemblyRuneStation(varkhulRoomCenter(sim), 0, 0);
+    sim.player.pos = sim.ctx.groundPos(station.x, station.z);
+    fallen.dead = true;
 
     updateVarkhulEncounter(sim.ctx, boss);
 
-    expect(state.assemblyLinkHammerControls[0]).toBe('brake');
-    expect(state.assemblyLinkAnvilReady[0]).toBe(false);
-    expect(state.assemblyLinkPadProgress[0]).toBe(0);
-    expect(state.assemblyLinkAssignments.every((assignment) => assignment.locked)).toBe(false);
+    expect(state.assemblyRuneControls[0]).toBe('off');
+    expect(state.assemblyRuneAssignments[0].locked).toBe(false);
 
-    state.assemblyLinkRemaining = DT;
+    state.assemblyRuneRemaining = DT;
     updateVarkhulEncounter(sim.ctx, boss);
     expect(state.assemblyPhase).toBe('done');
     expect(boss.damageImmune).toBe(false);
   });
 
-  it('keeps solved Heroic controls stable while launching five crossing fireballs', () => {
+  it('keeps a solved Heroic rune locked while launching five crossing fireballs', () => {
     const { sim, boss } = claimedEncounter(466);
-    const hammerZero = addEncounterPlayer(sim, boss, 'Heroic Hammer Zero');
-    const anvilOne = addEncounterPlayer(sim, boss, 'Heroic Anvil One');
-    const hammerOne = addEncounterPlayer(sim, boss, 'Heroic Hammer One');
+    const second = addEncounterPlayer(sim, boss, 'Heroic Rune Two');
     const state = forceAssemblyLinks(
       sim,
       boss,
       [
-        { playerId: sim.player.id, symbol: 0, role: 'anvil', locked: false },
-        { playerId: hammerZero.id, symbol: 0, role: 'hammer', locked: false },
-        { playerId: anvilOne.id, symbol: 1, role: 'anvil', locked: false },
-        { playerId: hammerOne.id, symbol: 1, role: 'hammer', locked: false },
+        { playerId: sim.player.id, symbol: 0, locked: false },
+        { playerId: second.id, symbol: 1, locked: false },
       ],
       'heroic',
     );
-    const pad = varkhulAssemblyLinkPadAtSlot(boss.pos, 0, 0);
-    const target = varkhulAssemblyAnvilTarget(pad, 0, 0);
-    const brake = varkhulAssemblyHammerControlPoints(boss.pos, pad).brake;
-    sim.player.pos = sim.ctx.groundPos(target.x, target.z);
-    hammerZero.pos = sim.ctx.groundPos(brake.x, brake.z);
-    state.assemblyLinkArmAngles[0] = varkhulAssemblyAnvilTargetAngle(0, 0);
-    state.assemblyLinkPadProgress[0] = VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS - DT;
+    state.assemblyRuneAngles[0] = varkhulAssemblyRuneTargetAngle(boss.id, 0, 0);
     state.assemblyLinkFireballTimer = DT;
 
     updateVarkhulEncounter(sim.ctx, boss);
 
-    expect(state.assemblyLinkAssignments.filter((entry) => entry.symbol === 0)).toEqual([
-      expect.objectContaining({ locked: true }),
-      expect.objectContaining({ locked: true }),
-    ]);
-    expect(state.assemblyLinkPadSlots).toEqual([0, 1, 2, 3, 4]);
+    expect(state.assemblyRuneAssignments.find((entry) => entry.symbol === 0)?.locked).toBe(true);
+    expect(state.assemblyRuneAssignments.find((entry) => entry.symbol === 1)?.locked).toBe(false);
     const fireballs = sim.activeVarkhulCinderOrbProjectiles.filter((projectile) =>
       projectile.id.startsWith(`${boss.id}:assembly-links:`),
     );
     expect(fireballs).toHaveLength(5);
     expect(fireballs.every((fireball) => fireball.radius === 1.45)).toBe(true);
     expect(fireballs.every((fireball) => fireball.duration === 7)).toBe(true);
-    expect(anvilOne.dead).toBe(false);
-    expect(hammerOne.dead).toBe(false);
+    expect(second.dead).toBe(false);
   });
 
-  it('ends the interface with a partial stun when three pairs are aligned at timeout', () => {
+  it('immediately grants the full vulnerability when all ten assigned runes are locked', () => {
+    const { sim, boss } = claimedEncounter(474);
+    const state = forceAssemblyLinks(
+      sim,
+      boss,
+      Array.from({ length: 10 }, (_, symbol) => ({
+        playerId: 30_000 + symbol,
+        symbol,
+        locked: true,
+      })),
+    );
+    sim.ctx.applyAura(boss, {
+      id: VARKHUL_MASTERS_ASSEMBLY_AURA_ID,
+      name: "Master's Assembly",
+      kind: 'absorb',
+      remaining: 999,
+      duration: 999,
+      value: boss.maxHp,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    const hpBefore = sim.player.hp;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.assemblyPhase).toBe('stunned');
+    expect(state.assemblyStunRemaining).toBe(15);
+    expect(state.assemblyRuneRemaining).toBe(0);
+    expect(boss.damageImmune).toBe(false);
+    expect(boss.auras.some((aura) => aura.id === VARKHUL_MASTERS_ASSEMBLY_AURA_ID)).toBe(false);
+    expect(boss.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_STUN_AURA_ID)).toMatchObject({
+      remaining: 15,
+      duration: 15,
+      value: 0.5,
+    });
+    expect(sim.player.hp).toBe(hpBefore);
+  });
+
+  it('ends the interface with a partial stun when six of ten runes are aligned at timeout', () => {
     const { sim, boss } = claimedEncounter(470);
     const state = forceAssemblyLinks(
       sim,
       boss,
-      Array.from({ length: 5 }, (_, symbol) => ({
-        playerId: symbol < 3 ? 10_000 + symbol : sim.player.id,
+      Array.from({ length: 10 }, (_, symbol) => ({
+        playerId: 10_000 + symbol,
         symbol,
-        role: 'anvil' as const,
-        locked: symbol < 3,
+        locked: symbol < 6,
       })),
     );
-    state.assemblyLinkRemaining = DT;
+    state.assemblyRuneRemaining = DT;
 
     updateVarkhulEncounter(sim.ctx, boss);
 
@@ -1447,16 +1497,15 @@ describe('Varkhul encounter behavior', () => {
     const state = forceAssemblyLinks(
       sim,
       boss,
-      Array.from({ length: 5 }, (_, symbol) => ({
-        playerId: symbol < 2 ? 20_000 + symbol : sim.player.id,
+      Array.from({ length: 10 }, (_, symbol) => ({
+        playerId: 20_000 + symbol,
         symbol,
-        role: 'anvil' as const,
-        locked: symbol < 2,
+        locked: symbol < 5,
       })),
       difficulty,
     );
     const hpBefore = sim.player.hp;
-    state.assemblyLinkRemaining = DT;
+    state.assemblyRuneRemaining = DT;
 
     updateVarkhulEncounter(sim.ctx, boss);
 

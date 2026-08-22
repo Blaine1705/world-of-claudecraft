@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { VARKHUL_CINDER_FIRE_RADIUS } from '../sim/varkhul_cinder_orbs';
-import { buildVarkhulLinkSymbol } from './varkhul_assembly_visual';
+import { buildVarkhulRuneSymbol } from './varkhul_assembly_visual';
 import {
   buildVarkhulCinderFire,
   buildVarkhulCinderOrbProjectile,
@@ -96,14 +96,12 @@ function buildLinkMark(): THREE.Group {
   group.name = VARKHUL_LINK_VISUAL_NAME;
   group.userData.renderCategory = 'ui3d';
   group.userData.actionable = true;
-  for (let symbol = 0; symbol < 5; symbol++) {
-    for (const role of ['anvil', 'hammer'] as const) {
-      const mesh = buildVarkhulLinkSymbol(symbol, role === 'anvil' ? 0.92 : 0.78, role);
-      mesh.name = `varkhulAssembly${role === 'anvil' ? 'Anvil' : 'Hammer'}Symbol${symbol}`;
-      mesh.rotation.x = -Math.PI / 2;
-      mesh.visible = false;
-      group.add(mesh);
-    }
+  for (let symbol = 0; symbol < 10; symbol++) {
+    const mesh = buildVarkhulRuneSymbol(symbol, 0.84);
+    mesh.name = `varkhulAssemblyRuneSymbol${symbol}`;
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.visible = false;
+    group.add(mesh);
   }
   group.position.y = 4.3;
   group.visible = false;
@@ -260,13 +258,9 @@ export function syncVarkhulEncounterVisuals(
   if (link) {
     link.visible = plan.linkSymbol !== null;
     link.scale.setScalar(plan.inverseEntityScale);
-    for (let symbol = 0; symbol < 5; symbol++) {
-      for (const role of ['anvil', 'hammer'] as const) {
-        const mark = link.getObjectByName(
-          `varkhulAssembly${role === 'anvil' ? 'Anvil' : 'Hammer'}Symbol${symbol}`,
-        );
-        if (mark) mark.visible = symbol === plan.linkSymbol && role === plan.linkRole;
-      }
+    for (let symbol = 0; symbol < 10; symbol++) {
+      const mark = link.getObjectByName(`varkhulAssemblyRuneSymbol${symbol}`);
+      if (mark) mark.visible = symbol === plan.linkSymbol;
     }
     if (!reducedMotion) link.rotation.y += Math.max(0, dt) * 0.65;
   }

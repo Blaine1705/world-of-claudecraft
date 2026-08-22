@@ -55,30 +55,27 @@ import {
   VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_NORMAL,
   VARKHUL_ASSEMBLY_LINK_FIREBALL_DURATION,
   VARKHUL_ASSEMBLY_LINK_FIREBALL_RADIUS,
-  VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS,
-  VARKHUL_ASSEMBLY_LINK_PAD_DISTANCE,
-  VARKHUL_ASSEMBLY_LINK_PAD_RADIUS,
-  VARKHUL_ASSEMBLY_LINK_SYMBOLS,
   VARKHUL_ASSEMBLY_PARTIAL_DAMAGE_TAKEN_BONUS,
   VARKHUL_ASSEMBLY_PARTIAL_STUN_SECONDS,
+  VARKHUL_ASSEMBLY_RUNE_COUNT,
+  VARKHUL_ASSEMBLY_RUNE_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_STATION_DISTANCE,
   VARKHUL_ASSEMBLY_STUN_DAMAGE_TAKEN_BONUS,
   VARKHUL_ASSEMBLY_STUN_SECONDS,
   VARKHUL_ASSEMBLY_UNSTABLE_REACTION_DAMAGE,
-  varkhulAssemblyAnvilTarget,
-  varkhulAssemblyAnvilTargetAngle,
-  varkhulAssemblyAnvilTargetReady,
-  varkhulAssemblyArmAligned,
-  varkhulAssemblyBestHammerControl,
   varkhulAssemblyBurdenDamageMaxHp,
   varkhulAssemblyFireballCadence,
   varkhulAssemblyFireballPattern,
-  varkhulAssemblyHammerControlAt,
-  varkhulAssemblyLinkAssignments,
-  varkhulAssemblyLinkOutcome,
-  varkhulAssemblyLinkPadAtSlot,
-  varkhulAssemblyLinkSeconds,
   varkhulAssemblyRounds,
-  varkhulAssemblyStepArm,
+  varkhulAssemblyRuneAligned,
+  varkhulAssemblyRuneAssignments,
+  varkhulAssemblyRuneControlAt,
+  varkhulAssemblyRuneOutcome,
+  varkhulAssemblyRuneSeconds,
+  varkhulAssemblyRuneStartAngle,
+  varkhulAssemblyRuneStation,
+  varkhulAssemblyRuneTargetAngle,
+  varkhulAssemblyStepRune,
 } from '../varkhul_assembly';
 import {
   VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
@@ -306,18 +303,15 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       assemblyDeliveredCoreIds: [],
       assemblyArtificerRepaired: false,
       assemblyFixateTargetId: null,
-      assemblyLinkAssignments: [],
-      assemblyLinkPadProgress: [],
-      assemblyLinkPadSlots: [],
-      assemblyLinkArmAngles: [],
-      assemblyLinkHammerControls: [],
-      assemblyLinkAnvilReady: [],
-      assemblyLinkHammerReady: [],
+      assemblyRuneCenter: null,
+      assemblyRuneAssignments: [],
+      assemblyRuneAngles: [],
+      assemblyRuneControls: [],
       assemblyLinkFireballTimer: 0,
       assemblyLinkFireballWave: 0,
-      assemblyLinkRound: 0,
-      assemblyLinkRounds: 1,
-      assemblyLinkRemaining: 0,
+      assemblyRuneRound: 0,
+      assemblyRuneRounds: 1,
+      assemblyRuneRemaining: 0,
       assemblyStunRemaining: 0,
       masterpieceTriggered: false,
       masterpieceRemaining: 0,
@@ -1114,20 +1108,17 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   st.assemblyDeliveryWindowRemaining = 0;
   st.assemblyDeliveredCoreIds = [];
   st.assemblyArtificerRepaired = false;
-  st.assemblyLinkAssignments = [];
-  st.assemblyLinkPadProgress = [];
-  st.assemblyLinkPadSlots = [];
-  st.assemblyLinkArmAngles = [];
-  st.assemblyLinkHammerControls = [];
-  st.assemblyLinkAnvilReady = [];
-  st.assemblyLinkHammerReady = [];
+  st.assemblyRuneCenter = null;
+  st.assemblyRuneAssignments = [];
+  st.assemblyRuneAngles = [];
+  st.assemblyRuneControls = [];
   st.assemblyLinkFireballTimer = 0;
   st.assemblyLinkFireballWave = 0;
-  st.assemblyLinkRound = 0;
-  st.assemblyLinkRounds = varkhulAssemblyRounds(
+  st.assemblyRuneRound = 0;
+  st.assemblyRuneRounds = varkhulAssemblyRounds(
     encounterInstance(ctx, boss)?.difficulty ?? 'normal',
   );
-  st.assemblyLinkRemaining = 0;
+  st.assemblyRuneRemaining = 0;
   st.assemblyStunRemaining = 0;
   boss.damageImmune = true;
   boss.knockbackResistance = 1;
@@ -1218,18 +1209,17 @@ function ejectDeliveredCores(ctx: SimContext, boss: Entity, st: VarkhulEncounter
 }
 
 function applyLinkAuras(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  for (const assignment of st.assemblyLinkAssignments) {
+  for (const assignment of st.assemblyRuneAssignments) {
     const player = ctx.entities.get(assignment.playerId);
     if (player?.kind !== 'player' || player.dead) continue;
     ctx.applyAura(player, {
       id: VARKHUL_ASSEMBLY_LINK_AURA_ID,
       name: 'Forge Link',
       kind: 'vulnerability',
-      remaining: st.assemblyLinkRemaining,
-      duration: st.assemblyLinkRemaining,
+      remaining: st.assemblyRuneRemaining,
+      duration: st.assemblyRuneRemaining,
       value: 0,
       stacks: assignment.symbol + 1,
-      charges: assignment.role === 'hammer' ? 2 : 1,
       sourceId: boss.id,
       school: 'fire',
       encounterOwned: true,
@@ -1254,18 +1244,15 @@ function startAssemblyConvergence(ctx: SimContext, boss: Entity, st: VarkhulEnco
     ctx.rebucket(player);
   }
   clearAssemblyPlayerAuras(ctx, boss);
+  st.assemblyRuneCenter = { ...center };
   st.assemblyPhase = 'convergence';
   st.assemblyWipeResolved = false;
-  st.assemblyLinkAssignments = [];
-  st.assemblyLinkPadProgress = [];
-  st.assemblyLinkPadSlots = [];
-  st.assemblyLinkArmAngles = [];
-  st.assemblyLinkHammerControls = [];
-  st.assemblyLinkAnvilReady = [];
-  st.assemblyLinkHammerReady = [];
+  st.assemblyRuneAssignments = [];
+  st.assemblyRuneAngles = [];
+  st.assemblyRuneControls = [];
   st.assemblyLinkFireballTimer = 0;
   st.assemblyLinkFireballWave = 0;
-  st.assemblyLinkRemaining = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
+  st.assemblyRuneRemaining = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
   boss.castingAbility = VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID;
   boss.castTotal = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
   boss.castRemaining = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
@@ -1285,10 +1272,10 @@ function startAssemblyConvergence(ctx: SimContext, boss: Entity, st: VarkhulEnco
 }
 
 function updateAssemblyConvergence(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  st.assemblyLinkRemaining = Math.max(0, st.assemblyLinkRemaining - DT);
+  st.assemblyRuneRemaining = Math.max(0, st.assemblyRuneRemaining - DT);
   boss.castingAbility = VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID;
-  boss.castRemaining = st.assemblyLinkRemaining;
-  if (st.assemblyLinkRemaining <= CAST_COMPLETE_EPS) startAssemblyLinkRound(ctx, boss, st, 0);
+  boss.castRemaining = st.assemblyRuneRemaining;
+  if (st.assemblyRuneRemaining <= CAST_COMPLETE_EPS) startAssemblyLinkRound(ctx, boss, st, 0);
 }
 
 function startAssemblyLinkRound(
@@ -1301,35 +1288,24 @@ function startAssemblyLinkRound(
   const players = playersInEncounter(ctx, boss);
   st.assemblyPhase = 'links';
   st.assemblyWipeResolved = false;
-  st.assemblyLinkRound = round;
-  st.assemblyLinkRemaining = varkhulAssemblyLinkSeconds(difficulty);
-  st.assemblyLinkAssignments = varkhulAssemblyLinkAssignments(
+  st.assemblyRuneRound = round;
+  st.assemblyRuneRemaining = varkhulAssemblyRuneSeconds(difficulty);
+  st.assemblyRuneAssignments = varkhulAssemblyRuneAssignments(
     players.map((player) => player.id),
     boss.id,
     round,
   ).map((assignment) => ({ ...assignment, locked: false }));
-  st.assemblyLinkPadProgress = Array.from({ length: VARKHUL_ASSEMBLY_LINK_SYMBOLS }, () => 0);
-  st.assemblyLinkPadSlots = Array.from(
-    { length: VARKHUL_ASSEMBLY_LINK_SYMBOLS },
-    (_, slot) => slot,
+  st.assemblyRuneAngles = Array.from({ length: VARKHUL_ASSEMBLY_RUNE_COUNT }, (_, symbol) =>
+    varkhulAssemblyRuneStartAngle(boss.id, symbol, round),
   );
-  st.assemblyLinkArmAngles = Array.from(
-    { length: VARKHUL_ASSEMBLY_LINK_SYMBOLS },
-    (_, symbol) => varkhulAssemblyAnvilTargetAngle(symbol, round) + Math.PI / 2,
-  );
-  st.assemblyLinkHammerControls = Array.from(
-    { length: VARKHUL_ASSEMBLY_LINK_SYMBOLS },
-    () => 'off',
-  );
-  st.assemblyLinkAnvilReady = Array.from({ length: VARKHUL_ASSEMBLY_LINK_SYMBOLS }, () => false);
-  st.assemblyLinkHammerReady = Array.from({ length: VARKHUL_ASSEMBLY_LINK_SYMBOLS }, () => false);
+  st.assemblyRuneControls = Array.from({ length: VARKHUL_ASSEMBLY_RUNE_COUNT }, () => 'off');
   st.assemblyLinkFireballTimer = 1.2;
   st.assemblyLinkFireballWave = 0;
   clearAssemblyPlayerAuras(ctx, boss);
   applyLinkAuras(ctx, boss, st);
   boss.castingAbility = VARKHUL_ASSEMBLY_LINK_CAST_ID;
-  boss.castTotal = st.assemblyLinkRemaining;
-  boss.castRemaining = st.assemblyLinkRemaining;
+  boss.castTotal = st.assemblyRuneRemaining;
+  boss.castRemaining = st.assemblyRuneRemaining;
   boss.castTargetId = null;
   boss.castAim = null;
   boss.channeling = true;
@@ -1345,7 +1321,7 @@ function shatterAssemblyForge(
   finishAssembly(ctx, boss, st);
   st.assemblyPhase = 'stunned';
   st.assemblyStunRemaining = stunSeconds;
-  st.assemblyLinkRemaining = 0;
+  st.assemblyRuneRemaining = 0;
   boss.aiState = 'idle';
   boss.aggroTargetId = null;
   clearBossCast(boss);
@@ -1486,11 +1462,11 @@ function spawnAssemblyLinkFireballs(
   for (const [index, fireball] of varkhulAssemblyFireballPattern(
     forge,
     difficulty,
-    st.assemblyLinkRound,
+    st.assemblyRuneRound,
     st.assemblyLinkFireballWave,
   ).entries()) {
     st.cinderOrbProjectiles.push({
-      id: `${boss.id}:assembly-links:${st.assemblyLinkRound}:${st.assemblyLinkFireballWave}:${index}`,
+      id: `${boss.id}:assembly-links:${st.assemblyRuneRound}:${st.assemblyLinkFireballWave}:${index}`,
       ownerId: boss.id,
       pos: ctx.groundPos(fireball.x, fireball.z),
       dir: { x: fireball.dirX, z: fireball.dirZ },
@@ -1511,111 +1487,79 @@ function spawnAssemblyLinkFireballs(
 }
 
 function updateAssemblyLinks(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  st.assemblyLinkRemaining = Math.max(0, st.assemblyLinkRemaining - DT);
+  st.assemblyRuneRemaining = Math.max(0, st.assemblyRuneRemaining - DT);
   boss.castingAbility = VARKHUL_ASSEMBLY_LINK_CAST_ID;
-  boss.castRemaining = st.assemblyLinkRemaining;
+  boss.castRemaining = st.assemblyRuneRemaining;
   const forge = anvilWorldPosition(ctx, boss);
-  positionVarkhulLinkPracticeBots(ctx, forge, st);
+  const instance = encounterInstance(ctx, boss);
+  if (!instance) return;
+  const origin = ctx.instanceOriginOf(instance);
+  const roomCenter = ctx.groundPos(origin.x, origin.z);
+  positionVarkhulLinkPracticeBots(ctx, roomCenter, boss.id, st);
   const players = playersInEncounter(ctx, boss);
-  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  const difficulty = instance.difficulty ?? 'normal';
   st.assemblyLinkFireballTimer -= DT;
   if (st.assemblyLinkFireballTimer <= CAST_COMPLETE_EPS) {
     spawnAssemblyLinkFireballs(ctx, boss, st, forge);
   }
-  for (const assignment of st.assemblyLinkAssignments) {
+  for (const assignment of st.assemblyRuneAssignments) {
     const player = ctx.entities.get(assignment.playerId);
     const aura = player?.auras.find((entry) => entry.id === VARKHUL_ASSEMBLY_LINK_AURA_ID);
-    if (aura) aura.remaining = st.assemblyLinkRemaining;
+    if (aura) aura.remaining = st.assemblyRuneRemaining;
   }
-  for (let symbol = 0; symbol < VARKHUL_ASSEMBLY_LINK_SYMBOLS; symbol++) {
-    const assignments = st.assemblyLinkAssignments.filter(
-      (assignment) => assignment.symbol === symbol && !assignment.locked,
+  for (const assignment of st.assemblyRuneAssignments) {
+    if (assignment.locked) continue;
+    const player = ctx.entities.get(assignment.playerId);
+    const station = varkhulAssemblyRuneStation(roomCenter, assignment.symbol, st.assemblyRuneRound);
+    const targetAngle = varkhulAssemblyRuneTargetAngle(
+      boss.id,
+      assignment.symbol,
+      st.assemblyRuneRound,
     );
-    if (assignments.length === 0) continue;
-    const living = assignments.flatMap((assignment) => {
-      const player = ctx.entities.get(assignment.playerId);
-      return player?.kind === 'player' && !player.dead ? [{ assignment, player }] : [];
-    });
-    const pad = varkhulAssemblyLinkPadAtSlot(
-      forge,
-      st.assemblyLinkPadSlots[symbol] ?? symbol,
-      st.assemblyLinkRound,
-    );
-    const target = varkhulAssemblyAnvilTarget(pad, symbol, st.assemblyLinkRound);
-    const targetAngle = varkhulAssemblyAnvilTargetAngle(symbol, st.assemblyLinkRound);
-    const assignedAnvil = assignments.find((assignment) => assignment.role === 'anvil');
-    const assignedHammer = assignments.find((assignment) => assignment.role === 'hammer');
-    const anvil = living.find(({ assignment }) => assignment.role === 'anvil')?.player ?? null;
-    const hammer = living.find(({ assignment }) => assignment.role === 'hammer')?.player ?? null;
-    const anvilReady =
-      assignedAnvil === undefined ||
-      (anvil !== null && varkhulAssemblyAnvilTargetReady(anvil.pos, target));
-    const previousArmAngle = st.assemblyLinkArmAngles[symbol] ?? targetAngle + Math.PI / 2;
+    const previousAngle =
+      st.assemblyRuneAngles[assignment.symbol] ??
+      varkhulAssemblyRuneStartAngle(boss.id, assignment.symbol, st.assemblyRuneRound);
     const control =
-      assignedHammer === undefined
-        ? varkhulAssemblyBestHammerControl(previousArmAngle, targetAngle)
-        : hammer === null
-          ? 'off'
-          : varkhulAssemblyHammerControlAt(forge, pad, hammer.pos);
-    let armAngle = varkhulAssemblyStepArm(previousArmAngle, control, difficulty, DT);
-    if (assignedHammer === undefined && varkhulAssemblyArmAligned(armAngle, targetAngle)) {
-      armAngle = targetAngle;
-    }
-    const aligned = varkhulAssemblyArmAligned(armAngle, targetAngle);
-    const hammerReady = control === 'brake';
-    st.assemblyLinkArmAngles[symbol] = armAngle;
-    st.assemblyLinkHammerControls[symbol] = control;
-    st.assemblyLinkAnvilReady[symbol] = anvilReady;
-    st.assemblyLinkHammerReady[symbol] = hammerReady;
-    if (anvilReady && hammerReady && aligned) {
-      st.assemblyLinkPadProgress[symbol] = Math.min(
-        VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS,
-        (st.assemblyLinkPadProgress[symbol] ?? 0) + DT,
+      player?.kind === 'player' && !player.dead
+        ? varkhulAssemblyRuneControlAt(station, player.pos)
+        : 'off';
+    const glyphAngle = varkhulAssemblyStepRune(previousAngle, control, difficulty, DT, targetAngle);
+    st.assemblyRuneAngles[assignment.symbol] = glyphAngle;
+    st.assemblyRuneControls[assignment.symbol] = control;
+    if (!varkhulAssemblyRuneAligned(glyphAngle, targetAngle)) continue;
+    assignment.locked = true;
+    if (player) {
+      player.auras = player.auras.filter(
+        (aura) => aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID || aura.sourceId !== boss.id,
       );
-    } else {
-      st.assemblyLinkPadProgress[symbol] = 0;
-    }
-    if (st.assemblyLinkPadProgress[symbol] < VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS) continue;
-    for (const assignment of assignments) {
-      assignment.locked = true;
-      const player = ctx.entities.get(assignment.playerId);
-      if (player) {
-        player.auras = player.auras.filter(
-          (aura) => aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID || aura.sourceId !== boss.id,
-        );
-      }
     }
     ctx.emit({
       type: 'spellfxAt',
-      x: pad.x,
-      z: pad.z,
+      x: station.x,
+      z: station.z,
       school: 'fire',
       fx: 'nova',
       sourceId: boss.id,
-      radius: VARKHUL_ASSEMBLY_LINK_PAD_RADIUS,
+      radius: VARKHUL_ASSEMBLY_RUNE_RADIUS,
       ability: VARKHUL_ASSEMBLY_LINK_CAST_ID,
     });
   }
   if (
-    st.assemblyLinkAssignments.length > 0 &&
-    st.assemblyLinkAssignments.every((assignment) => assignment.locked)
+    st.assemblyRuneAssignments.length === VARKHUL_ASSEMBLY_RUNE_COUNT &&
+    st.assemblyRuneAssignments.every((assignment) => assignment.locked)
   ) {
-    if (st.assemblyLinkRound + 1 < st.assemblyLinkRounds) {
-      startAssemblyLinkRound(ctx, boss, st, st.assemblyLinkRound + 1);
+    if (st.assemblyRuneRound + 1 < st.assemblyRuneRounds) {
+      startAssemblyLinkRound(ctx, boss, st, st.assemblyRuneRound + 1);
     } else {
       shatterAssemblyForge(ctx, boss, st);
     }
     return;
   }
-  boss.castRemaining = st.assemblyLinkRemaining;
-  if (st.assemblyLinkRemaining <= CAST_COMPLETE_EPS && !st.assemblyWipeResolved) {
+  boss.castRemaining = st.assemblyRuneRemaining;
+  if (st.assemblyRuneRemaining <= CAST_COMPLETE_EPS && !st.assemblyWipeResolved) {
     st.assemblyWipeResolved = true;
-    const lockedSymbols = new Set(
-      st.assemblyLinkAssignments
-        .filter((assignment) => assignment.locked)
-        .map((assignment) => assignment.symbol),
-    ).size;
-    const outcome = varkhulAssemblyLinkOutcome(lockedSymbols);
+    const lockedRunes = st.assemblyRuneAssignments.filter((assignment) => assignment.locked).length;
+    const outcome = varkhulAssemblyRuneOutcome(lockedRunes);
     if (outcome === 'partial') {
       shatterAssemblyForge(
         ctx,
@@ -1647,7 +1591,7 @@ function updateAssemblyLinks(ctx: SimContext, boss: Entity, st: VarkhulEncounter
       school: 'fire',
       fx: 'meteorImpact',
       sourceId: boss.id,
-      radius: VARKHUL_ASSEMBLY_LINK_PAD_DISTANCE,
+      radius: VARKHUL_ASSEMBLY_RUNE_STATION_DISTANCE,
       ability: VARKHUL_ASSEMBLY_LINK_CAST_ID,
     });
   }
@@ -1773,6 +1717,25 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
     const target = add.aggroTargetId === null ? null : ctx.entities.get(add.aggroTargetId);
     if (target && !target.dead) add.facing = steadyAngleTo(add.pos, target.pos, add.facing);
     if (ctx.isStunned(add)) return true;
+    add.bigCastTimer = Math.max(0, add.bigCastTimer - DT);
+    add.swingTimer = Math.max(0, add.swingTimer - DT);
+    if (target && !target.dead) {
+      const profile = mobCombatProfile(add);
+      tryMobMeleeSwingInRange(ctx, add, target);
+      if (dist2d(add.pos, target.pos) > profile.meleeRange) {
+        if (!ctx.isRooted(add)) {
+          ctx.moveToward(
+            add,
+            target.pos,
+            add.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(add),
+          );
+        } else {
+          add.facing = steadyAngleTo(add.pos, target.pos, add.facing);
+        }
+      }
+      tryMobMeleeSwingInRange(ctx, add, target);
+      add.aiState = dist2d(add.pos, target.pos) <= profile.meleeRange ? 'attack' : 'chase';
+    }
     if (add.castingAbility === bigCast.castId) {
       add.castRemaining = Math.max(0, add.castRemaining - DT);
       if (add.castRemaining <= CAST_COMPLETE_EPS) {
@@ -1789,9 +1752,8 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
       }
       return true;
     }
-    add.bigCastTimer = Math.max(0, add.bigCastTimer - DT);
     if (add.bigCastTimer <= CAST_COMPLETE_EPS && add.castingAbility === null) {
-      add.bigCastTimer = bigCast.every + bigCast.castTime;
+      add.bigCastTimer = bigCast.every;
       add.castingAbility = bigCast.castId;
       add.castTotal = bigCast.castTime;
       add.castRemaining = bigCast.castTime;

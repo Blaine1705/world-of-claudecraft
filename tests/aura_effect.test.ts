@@ -77,7 +77,7 @@ describe('auraEffectDescriptor', () => {
     });
     expect(desc({ id: VARKHUL_ASSEMBLY_LINK_AURA_ID, kind: 'vulnerability', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.varkhulForgeLink',
-      nums: { hold: 1.5 },
+      nums: {},
     });
   });
 

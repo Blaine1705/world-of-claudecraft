@@ -59,10 +59,7 @@ import {
   RECKLESSNESS_RAGE_GEN,
   SUNDER_ARMOR_PCT_PER_STACK,
 } from '../sim/types';
-import {
-  VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS,
-  VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS,
-} from '../sim/varkhul_assembly';
+import { VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS } from '../sim/varkhul_assembly';
 
 export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 
@@ -129,7 +126,7 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === VARKHUL_ASSEMBLY_LINK_AURA_ID) {
     return {
       key: `${KEY}.varkhulForgeLink`,
-      nums: { hold: VARKHUL_ASSEMBLY_LINK_HOLD_SECONDS },
+      nums: {},
     };
   }
   if (a.id === 'shaman_mending_current') {

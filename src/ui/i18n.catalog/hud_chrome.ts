@@ -2671,7 +2671,7 @@ export const hudChromeStrings = {
     varkhulMoltenCore:
       'Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.',
     varkhulForgeLink:
-      'Match your symbol. Anvil: stand on the hollow inner receptor. Hammer: use the outer arrows to rotate the fire arm, then brake on the square when aligned. Hold for {hold} sec.',
+      'Find your matching rune around the room. Stand in its inner circle to rotate left or its outer ring to rotate right. Step out to stop; the symbol locks automatically when it reaches the socket.',
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
     mendingCurrent: 'Stores {value} healing, released over time or consumed by Cascading Mend',

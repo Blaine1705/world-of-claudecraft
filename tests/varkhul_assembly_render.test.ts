@@ -2,220 +2,213 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   buildVarkhulAssemblyPrewarmVisual,
+  buildVarkhulRuneControlArrowGeometry,
+  buildVarkhulRuneSymbol,
   VarkhulAssemblyVisuals,
 } from '../src/render/varkhul_assembly_visual';
 import type { ActiveVarkhulAssembly } from '../src/sim/varkhul_assembly';
 import {
-  VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_ORBIT,
-  VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS,
-  VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ORBIT,
-  VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_GLYPH_ORBIT,
+  VARKHUL_ASSEMBLY_RUNE_INNER_CONTROL_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_TARGET_ORBIT,
 } from '../src/sim/varkhul_assembly';
+
+const RUNES = Array.from({ length: 10 }, (_, symbol) => ({
+  symbol,
+  x: Math.sin(Math.PI / 10 + (symbol * Math.PI) / 5) * 30,
+  z: Math.cos(Math.PI / 10 + (symbol * Math.PI) / 5) * 30,
+  radius: 3.3,
+  assignedPlayerId: symbol + 100,
+  locked: symbol === 1,
+  targetAngle: 0.4 + symbol * 0.1,
+  glyphAngle: 0.7 + symbol * 0.1,
+  control: symbol === 0 ? ('counterclockwise' as const) : ('off' as const),
+  aligned: false,
+}));
 
 const ASSEMBLY: ActiveVarkhulAssembly = {
   bossId: 42,
   phase: 'links',
-  forgeX: 10,
-  forgeZ: 20,
-  forgeHp: 40,
+  forgeX: 0,
+  forgeZ: 22,
+  forgeHp: 60,
   forgeMaxHp: 100,
-  cores: [{ id: 'core:1', x: 4, z: 5, carrierId: 1, delivered: false }],
-  deliveryWindowRemaining: 3,
-  assignments: [
-    { playerId: 1, symbol: 0, role: 'anvil', locked: false },
-    { playerId: 2, symbol: 0, role: 'hammer', locked: false },
-  ],
-  pads: Array.from({ length: 5 }, (_, symbol) => ({
-    symbol,
-    x: 10 + symbol * 4,
-    z: 34,
-    radius: 3,
-    progress: symbol === 0 ? 0.5 : 0,
-    locked: false,
-    anvilReady: symbol === 0,
-    hammerReady: false,
-    targetAngle: symbol === 0 ? 0.4 : symbol,
-    armAngle: symbol === 0 ? 0.7 : symbol + 0.5,
-    control: symbol === 0 ? ('counterclockwise' as const) : ('off' as const),
-    aligned: false,
+  cores: [{ id: 'core', x: 1, z: 2, carrierId: null, delivered: false }],
+  deliveryWindowRemaining: 0,
+  assignments: RUNES.map((rune) => ({
+    playerId: rune.assignedPlayerId ?? 0,
+    symbol: rune.symbol,
+    locked: rune.locked,
   })),
-  round: 1,
+  runes: RUNES,
+  round: 0,
   rounds: 1,
-  remaining: 20,
+  remaining: 18,
 };
 
-describe("Varkhul Master's Assembly rendering", () => {
-  it('shows five self-explanatory receptor and three-control stations without guidance threads', () => {
+describe('Varkhul Assembly rune rendering', () => {
+  it('authors ten geometry-distinct symbols instead of relying on color', () => {
+    const signatures = Array.from({ length: 10 }, (_, symbol) => {
+      const mesh = buildVarkhulRuneSymbol(symbol);
+      const positions = mesh.geometry.getAttribute('position');
+      const signature = Array.from({ length: positions.count }, (_, index) =>
+        Math.hypot(positions.getX(index), positions.getY(index)).toFixed(3),
+      )
+        .sort()
+        .join('|');
+      mesh.geometry.dispose();
+      (mesh.material as THREE.Material).dispose();
+      return signature;
+    });
+    expect(new Set(signatures).size).toBe(10);
+  });
+
+  it('draws opposite arrows in physically separate inner and outer control zones', () => {
+    const inner = buildVarkhulRuneControlArrowGeometry('counterclockwise');
+    const outer = buildVarkhulRuneControlArrowGeometry('clockwise');
+    inner.computeBoundingBox();
+    outer.computeBoundingBox();
+    const innerBounds = inner.boundingBox;
+    const outerBounds = outer.boundingBox;
+    if (!innerBounds || !outerBounds) throw new Error('Rune arrow geometry has no bounds');
+    expect(Math.abs(innerBounds.min.x)).toBeGreaterThan(innerBounds.max.x);
+    expect(outerBounds.max.x).toBeGreaterThan(Math.abs(outerBounds.min.x));
+    expect((innerBounds.min.z + innerBounds.max.z) / 2).toBeCloseTo(0, 5);
+    expect((outerBounds.min.z + outerBounds.max.z) / 2).toBeCloseTo(
+      (VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS +
+        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS) /
+        2,
+      5,
+    );
+    inner.dispose();
+    outer.dispose();
+  });
+
+  it('builds ten room stations with exact radial controls and powerful lock VFX', () => {
     const scene = new THREE.Scene();
-    const visuals = new VarkhulAssemblyVisuals(scene, () => 2);
+    const visuals = new VarkhulAssemblyVisuals(scene, () => 0);
     visuals.sync([ASSEMBLY]);
     const root = scene.getObjectByName('varkhul-assembly-42') as THREE.Group;
     expect(root).toBeDefined();
-    expect(root.getObjectByName('varkhul-molten-core')?.position.y).toBe(5);
-    expect(root.getObjectByName('varkhul-link-partner-0')).toBeUndefined();
-    expect(root.getObjectByProperty('type', 'Line')).toBeUndefined();
-    for (let symbol = 0; symbol < 5; symbol++) {
-      const pad = root.getObjectByName(`varkhul-link-pad-${symbol}`) as THREE.Group;
-      expect(pad.visible).toBe(true);
-      expect(pad.userData).toMatchObject({ actionable: true, symbol });
-      expect(pad.userData).toMatchObject({
-        anvilTargetOrbit: VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_ORBIT,
-        anvilTargetRadius: VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS,
-        hammerControlOrbit: VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ORBIT,
-        hammerControlRadius: VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_RADIUS,
-      });
-      expect(
-        (pad.getObjectByName('varkhul-link-anvil-target-rim') as THREE.Mesh).userData,
-      ).toMatchObject({ role: 'anvil', hollow: true });
-      for (const control of ['counterclockwise', 'brake', 'clockwise']) {
-        const plate = pad.getObjectByName(`varkhul-link-control-${control}`) as THREE.Group;
-        expect(plate).toBeDefined();
-        expect(Math.hypot(plate.position.x, plate.position.z)).toBeCloseTo(
-          VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ORBIT,
-          5,
+    expect(root.children.filter((child) => child.name.startsWith('varkhul-rune-'))).toHaveLength(
+      10,
+    );
+    for (let symbol = 0; symbol < 10; symbol++) {
+      const rune = root.getObjectByName(`varkhul-rune-${symbol}`) as THREE.Group;
+      expect(rune.position.x).toBeCloseTo(RUNES[symbol].x, 5);
+      expect(rune.position.z).toBeCloseTo(RUNES[symbol].z, 5);
+      expect(rune.userData.innerControlRadius).toBe(VARKHUL_ASSEMBLY_RUNE_INNER_CONTROL_RADIUS);
+      expect(rune.userData.outerControlInnerRadius).toBe(
+        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
+      );
+      expect(rune.userData.outerControlOuterRadius).toBe(
+        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
+      );
+      expect(rune.getObjectByName('varkhul-rune-control-counterclockwise')).toBeDefined();
+      expect(rune.getObjectByName('varkhul-rune-control-clockwise')).toBeDefined();
+      expect(rune.getObjectByName('varkhul-rune-target-socket')).toBeDefined();
+      expect(rune.getObjectByName('varkhul-rune-moving-glyph')).toBeDefined();
+      expect(rune.getObjectByName('varkhul-rune-embers')).toBeDefined();
+      expect(rune.getObjectByName('varkhul-rune-lock-burst')).toBeDefined();
+      const inner = rune.getObjectByName('varkhul-rune-control-counterclockwise') as THREE.Mesh;
+      const outer = rune.getObjectByName('varkhul-rune-control-clockwise') as THREE.Mesh;
+      const radialExtents = (mesh: THREE.Mesh) => {
+        const positions = mesh.geometry.getAttribute('position');
+        const radii = Array.from({ length: positions.count }, (_, index) =>
+          Math.hypot(positions.getX(index), positions.getZ(index)),
         );
-        expect(plate.userData).toMatchObject({
-          control,
-          radius: VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_RADIUS,
-        });
-      }
-      const left = pad.getObjectByName('varkhul-link-control-counterclockwise') as THREE.Group;
-      const brake = pad.getObjectByName('varkhul-link-control-brake') as THREE.Group;
-      const right = pad.getObjectByName('varkhul-link-control-clockwise') as THREE.Group;
-      expect(left.position.x).toBeLessThan(0);
-      expect(brake.position.x).toBeCloseTo(0, 5);
-      expect(right.position.x).toBeGreaterThan(0);
-      const interiorXs = (control: THREE.Group): number[] => {
-        const surface = control.getObjectByName('varkhul-link-control-surface') as THREE.Mesh;
-        const positions = surface.geometry.getAttribute('position') as THREE.BufferAttribute;
-        const xs: number[] = [];
-        for (let index = 0; index < positions.count; index++) {
-          const x = positions.getX(index);
-          const z = positions.getZ(index);
-          if (Math.hypot(x, z) < 0.55) xs.push(x);
-        }
-        return xs;
+        return { min: Math.min(...radii), max: Math.max(...radii) };
       };
-      const leftIconXs = interiorXs(left);
-      const brakeIconXs = interiorXs(brake);
-      const rightIconXs = interiorXs(right);
-      expect(Math.min(...leftIconXs)).toBeLessThan(-0.45);
-      expect(Math.max(...leftIconXs)).toBeLessThanOrEqual(0.441);
-      expect(brakeIconXs.length).toBeGreaterThan(0);
-      expect(Math.max(...brakeIconXs.map(Math.abs))).toBeGreaterThanOrEqual(0.3);
-      expect(Math.max(...brakeIconXs.map(Math.abs))).toBeLessThanOrEqual(0.311);
-      expect(Math.max(...rightIconXs)).toBeGreaterThan(0.45);
-      expect(Math.min(...rightIconXs)).toBeGreaterThanOrEqual(-0.441);
-      expect(pad.getObjectByName('varkhul-link-fire-arm')).toBeDefined();
-      expect(pad.getObjectByName('varkhul-link-pad-entry-window')).toBeUndefined();
-      const visibleDraws: THREE.Object3D[] = [];
-      pad.traverse((child) => {
-        if (child.visible && child instanceof THREE.Mesh) visibleDraws.push(child);
-      });
-      expect(visibleDraws.length).toBeLessThanOrEqual(8);
+      expect(radialExtents(inner).max).toBeCloseTo(VARKHUL_ASSEMBLY_RUNE_INNER_CONTROL_RADIUS, 4);
+      expect(radialExtents(outer).min).toBeCloseTo(
+        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
+        4,
+      );
+      expect(radialExtents(outer).max).toBeCloseTo(
+        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
+        4,
+      );
     }
+    expect(root.getObjectByName('varkhul-rune-lock-burst')?.visible).toBe(false);
     expect(
-      root.children.filter((child) => child.name.startsWith('varkhul-assembly-forge-health')),
-    ).toHaveLength(0);
-    const forge = root.getObjectByName('varkhul-assembly-forge') as THREE.Group;
+      root.getObjectByName('varkhul-rune-1')?.getObjectByName('varkhul-rune-lock-burst')?.visible,
+    ).toBe(true);
+    const lockEffect = root
+      .getObjectByName('varkhul-rune-1')
+      ?.getObjectByName('varkhul-rune-lock-effect') as THREE.Mesh;
+    lockEffect.geometry.computeBoundingBox();
+    expect(lockEffect.geometry.getAttribute('position').count).toBeGreaterThan(500);
     expect(
-      forge.children.filter(
-        (child) => child.name.startsWith('varkhul-assembly-forge-health-') && child.visible,
-      ),
-    ).toHaveLength(8);
+      (lockEffect.geometry.boundingBox?.max.y ?? 0) - (lockEffect.geometry.boundingBox?.min.y ?? 0),
+    ).toBeGreaterThan(3.5);
+    let visibleDraws = 0;
+    root.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      let current: THREE.Object3D | null = object;
+      while (current) {
+        if (!current.visible) return;
+        current = current.parent;
+      }
+      visibleDraws++;
+    });
+    expect(visibleDraws).toBeLessThanOrEqual(95);
     visuals.dispose();
     expect(scene.children).toHaveLength(0);
   });
 
-  it('prewarms every actionable control, receptor, and fire-arm material without a thread', () => {
-    const root = buildVarkhulAssemblyPrewarmVisual();
-    expect(root.getObjectByProperty('type', 'Line')).toBeUndefined();
-    expect(root.getObjectByName('varkhul-link-control-counterclockwise')).toBeDefined();
-    expect(root.getObjectByName('varkhul-link-control-brake')).toBeDefined();
-    expect(root.getObjectByName('varkhul-link-control-clockwise')).toBeDefined();
-    expect(root.getObjectByName('varkhul-link-anvil-target')).toBeDefined();
-    expect(root.getObjectByName('varkhul-link-fire-arm')).toBeDefined();
-    const progress = root.getObjectByName('varkhul-link-progress') as THREE.InstancedMesh;
-    expect(progress.visible).toBe(true);
-    expect(progress.count).toBe(8);
-    expect(root.getObjectByName('varkhul-link-lock-burst')?.visible).toBe(true);
-  });
-
-  it('places the receptor exactly, rotates the arm, and lights the occupied control', () => {
+  it('places the socket and moving glyph at their authoritative angles and lights the occupied zone', () => {
     const scene = new THREE.Scene();
     const visuals = new VarkhulAssemblyVisuals(scene, () => 0);
     visuals.sync([ASSEMBLY]);
-    const pad = scene.getObjectByName('varkhul-link-pad-0') as THREE.Group;
-    const target = pad.getObjectByName('varkhul-link-anvil-target') as THREE.Group;
-    const targetRim = target.getObjectByName('varkhul-link-anvil-target-rim') as THREE.Mesh;
-    const arm = pad.getObjectByName('varkhul-link-fire-arm') as THREE.Group;
-    const counterclockwise = pad.getObjectByName(
-      'varkhul-link-control-counterclockwise',
-    ) as THREE.Group;
-    const counterclockwiseRim = counterclockwise.getObjectByName(
-      'varkhul-link-control-surface',
-    ) as THREE.Mesh;
-    const brakeRim = pad
-      .getObjectByName('varkhul-link-control-brake')
-      ?.getObjectByName('varkhul-link-control-surface') as THREE.Mesh;
+    const rune = scene.getObjectByName('varkhul-rune-0') as THREE.Group;
+    const target = rune.getObjectByName('varkhul-rune-target') as THREE.Group;
+    const rotor = rune.getObjectByName('varkhul-rune-rotor') as THREE.Group;
     expect(Math.hypot(target.position.x, target.position.z)).toBeCloseTo(
-      VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_ORBIT,
+      VARKHUL_ASSEMBLY_RUNE_TARGET_ORBIT,
       5,
     );
-    expect(Math.atan2(target.position.x, target.position.z)).toBeCloseTo(0.4, 5);
-    expect(arm.rotation.y).toBeCloseTo(0.7, 5);
-    expect((targetRim.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xffffff);
-    expect((counterclockwiseRim.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xffffff);
-    expect((brakeRim.material as THREE.MeshBasicMaterial).color.getHex()).not.toBe(0xffffff);
-    visuals.sync([
-      {
-        ...ASSEMBLY,
-        pads: ASSEMBLY.pads.map((state) =>
-          state.symbol === 0
-            ? {
-                ...state,
-                anvilReady: false,
-                hammerReady: true,
-                armAngle: state.targetAngle,
-                control: 'brake' as const,
-                aligned: true,
-                progress: 0.75,
-              }
-            : state,
-        ),
-      },
-    ]);
-    expect((targetRim.material as THREE.MeshBasicMaterial).color.getHex()).not.toBe(0xffffff);
-    expect((brakeRim.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xffffff);
-    expect(arm.rotation.y).toBeCloseTo(0.4, 5);
-    const progress = target.getObjectByName('varkhul-link-progress') as THREE.InstancedMesh;
-    expect(progress.visible).toBe(true);
-    expect(progress.count).toBe(6);
-    expect(progress.boundingSphere?.radius).toBeGreaterThan(0.84);
+    expect(Math.atan2(target.position.x, target.position.z)).toBeCloseTo(RUNES[0].targetAngle, 5);
+    expect(Math.hypot(rotor.position.x, rotor.position.z)).toBeCloseTo(
+      VARKHUL_ASSEMBLY_RUNE_GLYPH_ORBIT,
+      5,
+    );
+    expect(Math.atan2(rotor.position.x, rotor.position.z)).toBeCloseTo(RUNES[0].glyphAngle, 5);
+    expect(VARKHUL_ASSEMBLY_RUNE_TARGET_ORBIT).toBeGreaterThan(VARKHUL_ASSEMBLY_RUNE_GLYPH_ORBIT);
+    const inner = rune.getObjectByName('varkhul-rune-control-counterclockwise') as THREE.Mesh;
+    const outer = rune.getObjectByName('varkhul-rune-control-clockwise') as THREE.Mesh;
+    expect((inner.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xffffff);
+    expect((outer.material as THREE.MeshBasicMaterial).color.getHex()).not.toBe(0xffffff);
 
-    visuals.sync([
-      {
-        ...ASSEMBLY,
-        pads: ASSEMBLY.pads.map((state) =>
-          state.symbol === 0 ? { ...state, locked: true, progress: 1 } : state,
-        ),
-      },
-    ]);
-    expect(progress.visible).toBe(false);
-    expect(target.getObjectByName('varkhul-link-lock-burst')?.visible).toBe(true);
-    const lockedDraws: THREE.Object3D[] = [];
-    pad.traverse((child) => {
-      if (child.visible && child instanceof THREE.Mesh) lockedDraws.push(child);
-    });
-    expect(lockedDraws.length).toBeLessThanOrEqual(8);
+    visuals.update(0.1, false);
+    expect((rune.getObjectByName('varkhul-rune-embers') as THREE.Object3D).rotation.y).not.toBe(0);
+    const targetScaleBeforeReduction = target.scale.x;
+    expect(targetScaleBeforeReduction).not.toBe(1);
+    visuals.update(0.1, true);
+    expect(target.scale.x).toBe(1);
   });
 
-  it('hides the rune interface outside the links phase without hiding core transport', () => {
+  it('prewarms all ten symbols, both controls, embers, and lock effects', () => {
+    const root = buildVarkhulAssemblyPrewarmVisual();
+    expect(root.children.filter((child) => child.name.startsWith('varkhul-rune-'))).toHaveLength(
+      10,
+    );
+    for (let symbol = 0; symbol < 10; symbol++) {
+      const rune = root.getObjectByName(`varkhul-rune-${symbol}`);
+      expect(rune?.getObjectByName('varkhul-rune-control-counterclockwise')).toBeDefined();
+      expect(rune?.getObjectByName('varkhul-rune-control-clockwise')).toBeDefined();
+      expect(rune?.getObjectByName('varkhul-rune-embers')).toBeDefined();
+      expect(rune?.getObjectByName('varkhul-rune-lock-burst')?.visible).toBe(true);
+    }
+  });
+
+  it('hides the rune interface outside links without hiding core transport', () => {
     const scene = new THREE.Scene();
     const visuals = new VarkhulAssemblyVisuals(scene, () => 0);
     visuals.sync([{ ...ASSEMBLY, phase: 'cores' }]);
     const root = scene.getObjectByName('varkhul-assembly-42') as THREE.Group;
-    expect(root.getObjectByName('varkhul-link-pad-0')?.visible).toBe(false);
+    expect(root.getObjectByName('varkhul-rune-0')?.visible).toBe(false);
     expect(root.getObjectByName('varkhul-molten-core')).toBeDefined();
   });
 });

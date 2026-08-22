@@ -5,11 +5,12 @@ import { resetRaidDevBot, reviveRaidDevBotInPlace } from './raid_dev_bot';
 import type { SimContext } from './sim_context';
 import type { DungeonDifficulty, Entity, VarkhulEncounterState, Vec3 } from './types';
 import {
-  varkhulAssemblyAnvilTarget,
-  varkhulAssemblyAnvilTargetAngle,
-  varkhulAssemblyBestHammerControl,
-  varkhulAssemblyHammerControlPoints,
-  varkhulAssemblyLinkPadAtSlot,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
+  varkhulAssemblyBestRuneControl,
+  varkhulAssemblyRuneStartAngle,
+  varkhulAssemblyRuneStation,
+  varkhulAssemblyRuneTargetAngle,
 } from './varkhul_assembly';
 
 const VARKHUL_DEV_FORMATION = [
@@ -43,43 +44,50 @@ function movePracticeBot(ctx: SimContext, bot: Entity, point: Vec3): void {
 /** Lets sanctioned stationary bots demonstrate the physical controls while the human solves. */
 export function positionVarkhulLinkPracticeBots(
   ctx: SimContext,
-  forge: Vec3,
+  roomCenter: Vec3,
+  bossId: number,
   state: Pick<
     VarkhulEncounterState,
-    | 'assemblyLinkAssignments'
-    | 'assemblyLinkPadSlots'
-    | 'assemblyLinkArmAngles'
-    | 'assemblyLinkRound'
+    'assemblyRuneAssignments' | 'assemblyRuneAngles' | 'assemblyRuneRound'
   >,
 ): void {
-  for (let symbol = 0; symbol < 5; symbol++) {
-    const assignments = state.assemblyLinkAssignments.filter(
-      (assignment) => assignment.symbol === symbol && !assignment.locked,
+  for (const assignment of state.assemblyRuneAssignments) {
+    if (assignment.locked) continue;
+    const meta = ctx.players.get(assignment.playerId);
+    const bot = ctx.entities.get(assignment.playerId);
+    if (!meta?.isDevBot || !meta.devAnchored || bot?.kind !== 'player' || bot.dead) continue;
+    const station = varkhulAssemblyRuneStation(
+      roomCenter,
+      assignment.symbol,
+      state.assemblyRuneRound,
     );
-    const pad = varkhulAssemblyLinkPadAtSlot(
-      forge,
-      state.assemblyLinkPadSlots[symbol] ?? symbol,
-      state.assemblyLinkRound,
+    const targetAngle = varkhulAssemblyRuneTargetAngle(
+      bossId,
+      assignment.symbol,
+      state.assemblyRuneRound,
     );
-    for (const assignment of assignments) {
-      const meta = ctx.players.get(assignment.playerId);
-      const bot = ctx.entities.get(assignment.playerId);
-      if (!meta?.isDevBot || !meta.devAnchored || bot?.kind !== 'player' || bot.dead) continue;
-      if (assignment.role === 'anvil') {
-        const target = varkhulAssemblyAnvilTarget(pad, symbol, state.assemblyLinkRound);
-        movePracticeBot(ctx, bot, ctx.groundPos(target.x, target.z));
-        continue;
-      }
-      const targetAngle = varkhulAssemblyAnvilTargetAngle(symbol, state.assemblyLinkRound);
-      const control = varkhulAssemblyBestHammerControl(
-        state.assemblyLinkArmAngles[symbol] ?? targetAngle + Math.PI / 2,
-        targetAngle,
-      );
-      const point = varkhulAssemblyHammerControlPoints(forge, pad)[
-        control === 'off' ? 'brake' : control
-      ];
-      movePracticeBot(ctx, bot, ctx.groundPos(point.x, point.z));
+    const control = varkhulAssemblyBestRuneControl(
+      state.assemblyRuneAngles[assignment.symbol] ??
+        varkhulAssemblyRuneStartAngle(bossId, assignment.symbol, state.assemblyRuneRound),
+      targetAngle,
+    );
+    if (control === 'counterclockwise') {
+      movePracticeBot(ctx, bot, ctx.groundPos(station.x, station.z));
+      continue;
     }
+    const outwardAngle = Math.atan2(station.x - roomCenter.x, station.z - roomCenter.z);
+    const outerRadius =
+      (VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS +
+        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS) /
+      2;
+    movePracticeBot(
+      ctx,
+      bot,
+      ctx.groundPos(
+        station.x + Math.sin(outwardAngle) * outerRadius,
+        station.z + Math.cos(outwardAngle) * outerRadius,
+      ),
+    );
   }
 }
 

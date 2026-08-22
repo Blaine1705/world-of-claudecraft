@@ -7201,7 +7201,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖甲',
   'hudChrome.auraEffect.dot': '每 {interval} 秒造成 {value} 點{school}傷害',
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢復 {value} 點生命值',
-  'hudChrome.auraEffect.sharedPyre': '圈內至少需要 {players} 名玩家',
+  'hudChrome.auraEffect.sharedPyre':
+    '造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    '在房間周圍找到與你符號相符的符文。站進內圈可向左旋轉，站進外環可向右旋轉。離開控制區即可停止；符號到達插槽時會自動鎖定。',
   'hudChrome.auraEffect.absorb': '吸收 {value} 點傷害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 點受到的治療',
   'hudChrome.auraEffect.thorns': '對攻擊者造成 {value} 點{school}傷害',
@@ -12865,4 +12868,48 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '需要更新後才能進行遊戲。下載完成後將立即套用。',
   'hudChrome.otaUpdate.progressLabel': '更新下載進度',
   'hudChrome.otaUpdate.title': '遊戲更新',
+  'hudChrome.auraEffect.makersBrand':
+    '持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    '餘燼哨兵正在追擊你。將它帶離團隊，直到它被消滅。',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    '將核心運到鍛爐。熔融重壓每 {interval} 秒造成不斷提高的傷害，從最大生命值的 {min}% 增至 {max}%。',
+  'entities.mobs.ignivar_ember_sentinel.name': '餘燼哨兵',
+  'entities.mobs.ignivar_crucible_warden.name': '熔爐守衛',
+  'entities.mobs.ignivar_cinder_artificer.name': '燼火工匠',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': '末焰鍛父瓦爾庫爾',
+  'entities.npcs.archivist_maelin_emberward.name': '餘燼守望者梅琳',
+  'entities.npcs.archivist_maelin_emberward.title': '熔爐檔案員',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    '這裡的每一道槌印都是一句話。幫我讀懂瓦爾庫爾想隱藏的真相。',
+  'entities.quests.q_ignivar_echoes_in_iron.title': '鐵中回響',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    '這些自動機械不是士兵，而是草稿。當末泉在瓦爾庫爾身邊衰竭時，他一具又一具地淬鍊外殼。閱讀三份記錄，並摧毀守衛它們的構造體。每一具失敗的軀殼都可能藏著部分答案。',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    '記錄彼此吻合。瓦爾庫爾將垂死末泉的水束縛進活體金屬。這些自動機械是他失敗的淬鍊品，只有一種設計撐了下來。',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '閱讀「首次淬鍊」記錄',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '閱讀「活體金屬」記錄',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '閱讀「先驅之鑰」記錄',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.3.label': '擊敗餘燼哨兵',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.4.label': '擊敗熔爐守衛',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.5.label': '擊敗燼火工匠',
+  'entities.quests.q_ignivar_heralds_heart.title': '先驅之心',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    '每份記錄都提到了唯一的幸存者——伊格尼瓦爾。瓦爾庫爾稱他為先驅、封印和鑰匙。擊敗伊格尼瓦爾，然後檢查留下的核心。它應該能告訴我們，先驅原本要守護什麼。',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    '伊格尼瓦爾從來不只是守護者。他的心臟是一把鑰匙，最後的甲片指向下方封閉的熔爐。',
+  'entities.quests.q_ignivar_heralds_heart.objectives.0.label': '擊敗伊格尼瓦爾',
+  'entities.quests.q_ignivar_heralds_heart.objectives.1.label': '檢查伊格尼瓦爾的核心',
+  'entities.quests.q_ignivar_the_forgefather.title': '鍛父',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    '下方的道路通向末焰鍛父瓦爾庫爾。他囚禁末泉以賦予金屬生命，又鍛造伊格尼瓦爾來封存這罪行。進入內環熔爐，結束他的工作。',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    '鍛爐終於寂靜了。泉水也許永遠無法復原，但瓦爾庫爾再也不能將生命鍛成鎖鏈。',
+  'entities.quests.q_ignivar_the_forgefather.objectives.0.label': '擊敗瓦爾庫爾',
+  'entities.dungeons.ignivar_forge_approach.name': '首鍛大廳',
+  'entities.dungeons.ignivar_forge_approach.enterText': '鍛槌的轟鳴在首鍛大廳中回盪。',
+  'entities.dungeons.ignivar_forge_approach.leaveText': '你離開第一座鍛爐，終於又能自由呼吸。',
+  'entities.dungeons.ignivar_inner_crucible.name': '內環熔爐',
+  'entities.dungeons.ignivar_inner_crucible.enterText': '已打開的大門通往熔爐更深處。',
+  'entities.dungeons.ignivar_inner_crucible.leaveText': '你離開熔爐寂靜的深處。',
 };

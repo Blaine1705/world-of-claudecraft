@@ -35,7 +35,6 @@ export interface VarkhulEncounterVisualPlan {
   fixateVisible: boolean;
   moltenCoreVisible: boolean;
   linkSymbol: number | null;
-  linkRole: 'anvil' | 'hammer' | null;
   inverseEntityScale: number;
 }
 
@@ -106,8 +105,7 @@ export function varkhulEncounterVisualPlan(
       : 0,
     fixateVisible: fixate !== undefined,
     moltenCoreVisible: moltenCore !== undefined,
-    linkSymbol: link ? Math.max(0, Math.min(4, Math.floor((link.stacks ?? 1) - 1))) : null,
-    linkRole: link ? (link.charges === 2 ? 'hammer' : 'anvil') : null,
+    linkSymbol: link ? Math.max(0, Math.min(9, Math.floor((link.stacks ?? 1) - 1))) : null,
     inverseEntityScale: 1 / Math.max(0.01, entity.scale ?? 1),
   };
 }

@@ -2289,11 +2289,11 @@ export const zh_TW: EnTranslations = {
       "mail": "鎖甲"
     },
     "auraEffect": {
-      "sharedPyre": "圈內至少需要 {players} 名玩家",
-      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
-      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
-      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Match your symbol. Anvil: stand on the hollow inner receptor. Hammer: use the outer arrows to rotate the fire arm, then brake on the square when aligned. Hold for {hold} sec.",
+      "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
+      "makersBrand": "持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。",
+      "varkhulSentinelsGaze": "餘燼哨兵正在追擊你。將它帶離團隊，直到它被消滅。",
+      "varkhulMoltenCore": "將核心運到鍛爐。熔融重壓每 {interval} 秒造成不斷提高的傷害，從最大生命值的 {min}% 增至 {max}%。",
+      "varkhulForgeLink": "在房間周圍找到與你符號相符的符文。站進內圈可向左旋轉，站進外環可向右旋轉。離開控制區即可停止；符號到達插槽時會自動鎖定。",
       "dot": "每 {interval} 秒造成 {value} 點{school}傷害",
       "hot": "每 {interval} 秒恢復 {value} 點生命值",
       "mendingCurrent": "儲存 {value} 點治療量，隨時間釋放或由湧流癒合消耗",
@@ -13406,16 +13406,16 @@ export const zh_TW: EnTranslations = {
         "name": "終焉之心"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "餘燼哨兵"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "熔爐守衛"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "燼火工匠"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "末焰鍛父瓦爾庫爾"
       },
       "reliquary_ledger_wraith": {
         "name": "名冊幽靈"
@@ -14072,9 +14072,9 @@ export const zh_TW: EnTranslations = {
         "greeting": "從禮拜堂墓地到世界屋脊... 線索到這裡結束。我感覺山正在聆聽。"
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "餘燼守望者梅琳",
+        "title": "熔爐檔案員",
+        "greeting": "這裡的每一道槌印都是一句話。幫我讀懂瓦爾庫爾想隱藏的真相。"
       },
       "brother_halven": {
         "name": "哈爾文修士",
@@ -15185,50 +15185,50 @@ export const zh_TW: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.",
-        "completion": "The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.",
+        "title": "鐵中回響",
+        "text": "這些自動機械不是士兵，而是草稿。當末泉在瓦爾庫爾身邊衰竭時，他一具又一具地淬鍊外殼。閱讀三份記錄，並摧毀守衛它們的構造體。每一具失敗的軀殼都可能藏著部分答案。",
+        "completion": "記錄彼此吻合。瓦爾庫爾將垂死末泉的水束縛進活體金屬。這些自動機械是他失敗的淬鍊品，只有一種設計撐了下來。",
         "objectives": {
           "0": {
-            "label": "Read the First Tempering record"
+            "label": "閱讀「首次淬鍊」記錄"
           },
           "1": {
-            "label": "Read the Living Metal record"
+            "label": "閱讀「活體金屬」記錄"
           },
           "2": {
-            "label": "Read the Herald-Key record"
+            "label": "閱讀「先驅之鑰」記錄"
           },
           "3": {
-            "label": "Ember Sentinel defeated"
+            "label": "擊敗餘燼哨兵"
           },
           "4": {
-            "label": "Crucible Warden defeated"
+            "label": "擊敗熔爐守衛"
           },
           "5": {
-            "label": "Cinder Artificer defeated"
+            "label": "擊敗燼火工匠"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.",
+        "title": "先驅之心",
+        "text": "每份記錄都提到了唯一的幸存者——伊格尼瓦爾。瓦爾庫爾稱他為先驅、封印和鑰匙。擊敗伊格尼瓦爾，然後檢查留下的核心。它應該能告訴我們，先驅原本要守護什麼。",
+        "completion": "伊格尼瓦爾從來不只是守護者。他的心臟是一把鑰匙，最後的甲片指向下方封閉的熔爐。",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "擊敗伊格尼瓦爾"
           },
           "1": {
-            "label": "Ignivar's core inspected"
+            "label": "檢查伊格尼瓦爾的核心"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "鍛父",
+        "text": "下方的道路通向末焰鍛父瓦爾庫爾。他囚禁末泉以賦予金屬生命，又鍛造伊格尼瓦爾來封存這罪行。進入內環熔爐，結束他的工作。",
+        "completion": "鍛爐終於寂靜了。泉水也許永遠無法復原，但瓦爾庫爾再也不能將生命鍛成鎖鏈。",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "擊敗瓦爾庫爾"
           }
         }
       },
@@ -16983,9 +16983,9 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你回到荊峰的寒冷空氣中。"
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "首鍛大廳",
+        "enterText": "鍛槌的轟鳴在首鍛大廳中回盪。",
+        "leaveText": "你離開第一座鍛爐，終於又能自由呼吸。"
       },
       "ignivar_raid_arena": {
         "name": "最後泉源熔爐",
@@ -16993,9 +16993,9 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你離開熔爐，終於再次暢快呼吸。"
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "內環熔爐",
+        "enterText": "已打開的大門通往熔爐更深處。",
+        "leaveText": "你離開熔爐寂靜的深處。"
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",

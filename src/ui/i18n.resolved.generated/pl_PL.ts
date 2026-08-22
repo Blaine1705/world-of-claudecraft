@@ -2293,7 +2293,7 @@ export const pl_PL: EnTranslations = {
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
       "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
       "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Match your symbol. Anvil: stand on the hollow inner receptor. Hammer: use the outer arrows to rotate the fire arm, then brake on the square when aligned. Hold for {hold} sec.",
+      "varkhulForgeLink": "Find your matching rune around the room. Stand in its inner circle to rotate left or its outer ring to rotate right. Step out to stop; the symbol locks automatically when it reaches the socket.",
       "dot": "Zadaje {value} obrażeń od {school} co {interval} s",
       "hot": "Przywraca {value} zdrowia co {interval} s",
       "mendingCurrent": "Gromadzi {value} leczenia, uwalnianego z czasem lub zużywanego przez Kaskadowe Cerowanie",

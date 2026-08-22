@@ -1,30 +1,24 @@
-// Master's Assembly spatial interface. Every actionable element lives in the
-// world: forge health, carry cores, matching runes, and locks.
+// Master's Assembly spatial interface. Ten player-owned runes surround the
+// room; exact inner and outer control zones stay visible on every graphics tier.
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import {
   type ActiveVarkhulAssembly,
-  VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_ORBIT,
-  VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS,
-  VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ANGLE,
-  VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ORBIT,
-  VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_RADIUS,
-  VARKHUL_ASSEMBLY_LINK_PAD_RADIUS,
-  type VarkhulAssemblyHammerControl,
-  type VarkhulAssemblyLinkRole,
+  VARKHUL_ASSEMBLY_RUNE_COUNT,
+  VARKHUL_ASSEMBLY_RUNE_GLYPH_ORBIT,
+  VARKHUL_ASSEMBLY_RUNE_INNER_CONTROL_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_TARGET_ORBIT,
 } from '../sim/varkhul_assembly';
 
-const SYMBOL_COLORS = [0x47d7ff, 0xff4ecb, 0xffd23f, 0x68ff72, 0xb578ff] as const;
-
-function mergeFloorGeometries(geometries: THREE.BufferGeometry[]): THREE.BufferGeometry {
-  const nonIndexed = geometries.map((geometry) =>
-    geometry.index === null ? geometry : geometry.toNonIndexed(),
-  );
-  const merged = mergeGeometries(nonIndexed, false);
-  if (!merged) throw new Error('Varkhul Assembly floor geometry could not be merged');
-  return merged;
-}
+const SYMBOL_COLORS = [
+  0x47d7ff, 0xff4ecb, 0xffd23f, 0x68ff72, 0xb578ff, 0xff812d, 0x4b79ff, 0xff4d50, 0xa8ff3d,
+  0xf4f1ff,
+] as const;
+const GROUND_LIFT = 0.08;
 
 interface AssemblyVisual {
   root: THREE.Group;
@@ -32,8 +26,19 @@ interface AssemblyVisual {
   forgeSegments: THREE.Mesh[];
   barrierMaterial: THREE.MeshBasicMaterial;
   cores: Map<string, THREE.Group>;
-  pads: THREE.Group[];
+  runes: RuneVisual[];
   phase: number;
+}
+
+interface RuneVisual {
+  root: THREE.Group;
+  target: THREE.Group;
+  rotor: THREE.Group;
+  inner: THREE.Mesh;
+  outer: THREE.Mesh;
+  socket: THREE.Mesh;
+  embers: THREE.InstancedMesh;
+  lock: THREE.Group;
 }
 
 function additive(color: number, opacity: number): THREE.MeshBasicMaterial {
@@ -47,54 +52,141 @@ function additive(color: number, opacity: number): THREE.MeshBasicMaterial {
   });
 }
 
-function traceSymbol(
-  path: THREE.Shape | THREE.Path,
-  symbol: number,
-  radius: number,
-  clockwise = false,
-): void {
-  if (symbol === 0) {
-    path.absarc(0, 0, radius, 0, Math.PI * 2, clockwise);
-    return;
-  }
-  const points = symbol === 1 ? 3 : symbol === 2 ? 4 : symbol === 3 ? 4 : 10;
-  for (let index = 0; index < points; index++) {
-    const pointIndex = clockwise ? points - 1 - index : index;
-    const angle =
-      -Math.PI / 2 + (pointIndex / points) * Math.PI * 2 + (symbol === 3 ? Math.PI / 4 : 0);
-    const pointRadius = symbol === 4 && pointIndex % 2 === 1 ? radius * 0.42 : radius;
-    const x = Math.cos(angle) * pointRadius;
-    const y = Math.sin(angle) * pointRadius;
-    if (index === 0) path.moveTo(x, y);
-    else path.lineTo(x, y);
-  }
-  path.closePath();
+function floorGeometry(geometry: THREE.BufferGeometry, y = 0): THREE.BufferGeometry {
+  return geometry.rotateX(-Math.PI / 2).translate(0, y, 0);
 }
 
-function symbolShape(symbol: number, radius = 1, hollow = false): THREE.Shape {
+function polygon(points: readonly [number, number][]): THREE.Shape {
   const shape = new THREE.Shape();
-  traceSymbol(shape, symbol, radius);
-  if (hollow) {
-    const hole = new THREE.Path();
-    traceSymbol(hole, symbol, radius * 0.55, true);
-    shape.holes.push(hole);
-  }
+  points.forEach(([x, y], index) => {
+    if (index === 0) shape.moveTo(x, y);
+    else shape.lineTo(x, y);
+  });
+  shape.closePath();
   return shape;
 }
 
-export function buildVarkhulLinkSymbol(
-  symbol: number,
-  radius = 1,
-  role: VarkhulAssemblyLinkRole = 'hammer',
-): THREE.Mesh {
+function regularPolygon(points: number, radius: number, rotation = -Math.PI / 2): THREE.Shape {
+  return polygon(
+    Array.from({ length: points }, (_, index) => {
+      const angle = rotation + (index / points) * Math.PI * 2;
+      return [Math.cos(angle) * radius, Math.sin(angle) * radius] as [number, number];
+    }),
+  );
+}
+
+function symbolShape(symbol: number, radius = 1): THREE.Shape {
+  switch (Math.max(0, Math.floor(symbol)) % VARKHUL_ASSEMBLY_RUNE_COUNT) {
+    case 0: {
+      const shape = new THREE.Shape();
+      shape.absarc(0, 0, radius, 0, Math.PI * 2, false);
+      return shape;
+    }
+    case 1:
+      return regularPolygon(3, radius);
+    case 2:
+      return regularPolygon(5, radius);
+    case 3:
+      return regularPolygon(4, radius);
+    case 4:
+      return polygon(
+        Array.from({ length: 10 }, (_, index) => {
+          const angle = -Math.PI / 2 + (index / 10) * Math.PI * 2;
+          const pointRadius = index % 2 === 0 ? radius : radius * 0.42;
+          return [Math.cos(angle) * pointRadius, Math.sin(angle) * pointRadius] as [number, number];
+        }),
+      );
+    case 5:
+      return regularPolygon(6, radius);
+    case 6:
+      return polygon([
+        [-radius, radius * 0.72],
+        [0, -radius],
+        [radius, radius * 0.72],
+        [radius * 0.42, radius],
+        [0, -radius * 0.18],
+        [-radius * 0.42, radius],
+      ]);
+    case 7:
+      return polygon([
+        [-radius * 0.28, -radius],
+        [radius * 0.28, -radius],
+        [radius * 0.28, -radius * 0.28],
+        [radius, -radius * 0.28],
+        [radius, radius * 0.28],
+        [radius * 0.28, radius * 0.28],
+        [radius * 0.28, radius],
+        [-radius * 0.28, radius],
+        [-radius * 0.28, radius * 0.28],
+        [-radius, radius * 0.28],
+        [-radius, -radius * 0.28],
+        [-radius * 0.28, -radius * 0.28],
+      ]);
+    case 8:
+      return polygon([
+        [-radius, -radius],
+        [radius, -radius],
+        [radius * 0.28, 0],
+        [radius, radius],
+        [-radius, radius],
+        [-radius * 0.28, 0],
+      ]);
+    default:
+      return polygon([
+        [-radius * 0.2, -radius],
+        [radius * 0.72, -radius * 0.18],
+        [radius * 0.16, -radius * 0.08],
+        [radius * 0.38, radius],
+        [-radius * 0.76, radius * 0.02],
+        [-radius * 0.12, -radius * 0.08],
+      ]);
+  }
+}
+
+export function buildVarkhulRuneSymbol(symbol: number, radius = 1): THREE.Mesh {
   const mesh = new THREE.Mesh(
-    new THREE.ShapeGeometry(symbolShape(symbol, radius, role === 'anvil')),
-    additive(SYMBOL_COLORS[symbol % SYMBOL_COLORS.length], 0.9),
+    new THREE.ShapeGeometry(symbolShape(symbol, radius)),
+    additive(SYMBOL_COLORS[symbol % SYMBOL_COLORS.length], 0.94),
   );
   mesh.userData.symbol = symbol;
-  mesh.userData.role = role;
-  mesh.userData.hollow = role === 'anvil';
   return mesh;
+}
+
+function mergeFloorGeometries(geometries: THREE.BufferGeometry[]): THREE.BufferGeometry {
+  const nonIndexed = geometries.map((geometry) =>
+    geometry.index === null ? geometry : geometry.toNonIndexed(),
+  );
+  const merged = mergeGeometries(nonIndexed, false);
+  if (!merged) throw new Error('Varkhul rune floor geometry could not be merged');
+  return merged;
+}
+
+export function buildVarkhulRuneControlArrowGeometry(
+  control: 'counterclockwise' | 'clockwise',
+): THREE.BufferGeometry {
+  const direction = control === 'counterclockwise' ? -1 : 1;
+  const arrow = polygon(
+    [
+      [-0.46, -0.13],
+      [0.08, -0.13],
+      [0.08, -0.34],
+      [0.5, 0],
+      [0.08, 0.34],
+      [0.08, 0.13],
+      [-0.46, 0.13],
+    ].map(([x, y]) => [x * direction, y] as [number, number]),
+  );
+  const geometry = floorGeometry(new THREE.ShapeGeometry(arrow).scale(0.88, 0.88, 0.88), 0.035);
+  if (control === 'clockwise') {
+    geometry.translate(
+      0,
+      0,
+      (VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS +
+        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS) /
+        2,
+    );
+  }
+  return geometry;
 }
 
 function buildForge(): {
@@ -105,12 +197,8 @@ function buildForge(): {
   const group = new THREE.Group();
   group.name = 'varkhul-assembly-forge';
   const barrier = additive(0xff6b13, 0.54);
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(3.15, 3.55, 64).rotateX(-Math.PI / 2),
-    barrier,
-  );
+  const ring = new THREE.Mesh(floorGeometry(new THREE.RingGeometry(3.15, 3.55, 64), 0.12), barrier);
   ring.name = 'varkhul-assembly-forge-boundary';
-  ring.position.y = 0.12;
   group.add(ring);
 
   const segments: THREE.Mesh[] = [];
@@ -142,169 +230,156 @@ function buildCore(): THREE.Group {
   return group;
 }
 
-function buildPad(symbol: number): THREE.Group {
+function buildRune(symbol: number): RuneVisual {
+  const color = SYMBOL_COLORS[symbol];
   const group = new THREE.Group();
-  group.name = `varkhul-link-pad-${symbol}`;
+  group.name = `varkhul-rune-${symbol}`;
   group.userData.renderCategory = 'ui3d';
   group.userData.actionable = true;
   group.userData.symbol = symbol;
-  group.userData.anvilTargetOrbit = VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_ORBIT;
-  group.userData.anvilTargetRadius = VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS;
-  group.userData.hammerControlOrbit = VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ORBIT;
-  group.userData.hammerControlRadius = VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_RADIUS;
-  const color = SYMBOL_COLORS[symbol];
+  group.userData.innerControlRadius = VARKHUL_ASSEMBLY_RUNE_INNER_CONTROL_RADIUS;
+  group.userData.outerControlInnerRadius = VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS;
+  group.userData.outerControlOuterRadius = VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS;
 
-  const footprint = new THREE.Mesh(
-    new THREE.RingGeometry(
-      VARKHUL_ASSEMBLY_LINK_PAD_RADIUS - 0.08,
-      VARKHUL_ASSEMBLY_LINK_PAD_RADIUS,
-      64,
-    ).rotateX(-Math.PI / 2),
-    additive(color, 0.22),
+  const backing = new THREE.Mesh(
+    floorGeometry(new THREE.CircleGeometry(VARKHUL_ASSEMBLY_RUNE_RADIUS, 64), 0),
+    new THREE.MeshBasicMaterial({
+      color: 0x130805,
+      transparent: true,
+      opacity: 0.72,
+      depthWrite: false,
+    }),
   );
-  footprint.name = 'varkhul-link-pad-footprint';
+  backing.name = 'varkhul-rune-backing';
+  backing.renderOrder = 3;
+
+  const fieldLines = new THREE.Mesh(
+    mergeFloorGeometries([
+      floorGeometry(
+        new THREE.RingGeometry(
+          VARKHUL_ASSEMBLY_RUNE_RADIUS - 0.1,
+          VARKHUL_ASSEMBLY_RUNE_RADIUS,
+          64,
+        ),
+        0.025,
+      ),
+      floorGeometry(
+        new THREE.RingGeometry(
+          VARKHUL_ASSEMBLY_RUNE_GLYPH_ORBIT - 0.09,
+          VARKHUL_ASSEMBLY_RUNE_GLYPH_ORBIT + 0.09,
+          64,
+        ),
+        0.05,
+      ),
+    ]),
+    additive(color, 0.75),
+  );
+  fieldLines.name = 'varkhul-rune-field-lines';
+  fieldLines.renderOrder = 5;
+
+  const inner = new THREE.Mesh(
+    mergeFloorGeometries([
+      floorGeometry(
+        new THREE.CircleGeometry(VARKHUL_ASSEMBLY_RUNE_INNER_CONTROL_RADIUS, 56),
+        0.018,
+      ),
+      buildVarkhulRuneControlArrowGeometry('counterclockwise'),
+    ]),
+    additive(color, 0.3),
+  );
+  inner.name = 'varkhul-rune-control-counterclockwise';
+  inner.userData.control = 'counterclockwise';
+  inner.renderOrder = 4;
+
+  const outer = new THREE.Mesh(
+    mergeFloorGeometries([
+      floorGeometry(
+        new THREE.RingGeometry(
+          VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
+          VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
+          64,
+        ),
+        0.018,
+      ),
+      buildVarkhulRuneControlArrowGeometry('clockwise'),
+    ]),
+    additive(color, 0.3),
+  );
+  outer.name = 'varkhul-rune-control-clockwise';
+  outer.userData.control = 'clockwise';
+  outer.renderOrder = 4;
 
   const target = new THREE.Group();
-  target.name = 'varkhul-link-anvil-target';
-  target.userData.radius = VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS;
-  const targetRimGeometry = new THREE.RingGeometry(
-    VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS - 0.11,
-    VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_RADIUS,
-    48,
-  ).rotateX(-Math.PI / 2);
-  const targetRuneGeometry = new THREE.ShapeGeometry(symbolShape(symbol, 0.42, true))
-    .rotateX(-Math.PI / 2)
-    .translate(0, 0.06, 0);
+  target.name = 'varkhul-rune-target';
   const targetRim = new THREE.Mesh(
-    mergeFloorGeometries([targetRimGeometry, targetRuneGeometry]),
+    mergeFloorGeometries([
+      floorGeometry(new THREE.RingGeometry(0.5, 0.67, 48), 0.07),
+      floorGeometry(new THREE.ShapeGeometry(symbolShape(symbol, 0.32)), 0.075),
+      new THREE.TorusGeometry(0.8, 0.055, 8, 36).rotateX(Math.PI / 2).translate(0, 0.28, 0),
+    ]),
     additive(color, 0.92),
   );
-  targetRim.name = 'varkhul-link-anvil-target-rim';
-  targetRim.userData.symbol = symbol;
-  targetRim.userData.role = 'anvil';
-  targetRim.userData.hollow = true;
+  targetRim.name = 'varkhul-rune-target-socket';
+  targetRim.renderOrder = 8;
   target.add(targetRim);
-  const progress = new THREE.InstancedMesh(
-    new THREE.BoxGeometry(0.16, 0.035, 0.08),
-    additive(0xffffff, 0.96),
-    8,
+
+  const rotor = new THREE.Group();
+  rotor.name = 'varkhul-rune-rotor';
+  const glyph = new THREE.Mesh(
+    mergeFloorGeometries([
+      floorGeometry(new THREE.ShapeGeometry(symbolShape(symbol, 0.64)), 0.12),
+      new THREE.OctahedronGeometry(0.25, 0).translate(0, 0.52, 0),
+    ]),
+    additive(color, 0.96),
   );
-  progress.name = 'varkhul-link-progress';
-  progress.instanceMatrix.setUsage(THREE.StaticDrawUsage);
-  const progressMatrix = new THREE.Matrix4();
-  const progressPosition = new THREE.Vector3();
-  const progressRotation = new THREE.Quaternion();
-  const progressScale = new THREE.Vector3(1, 1, 1);
-  for (let index = 0; index < 8; index++) {
-    const angle = (index / 8) * Math.PI * 2;
-    progressPosition.set(Math.sin(angle) * 0.84, 0.05, Math.cos(angle) * 0.84);
-    progressRotation.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-    progressMatrix.compose(progressPosition, progressRotation, progressScale);
-    progress.setMatrixAt(index, progressMatrix);
-  }
-  progress.instanceMatrix.needsUpdate = true;
-  // Compute against all eight static transforms before the runtime count is hidden.
-  // Otherwise Three can cache a one-tick sphere and cull later progress ticks.
-  progress.computeBoundingSphere();
-  progress.count = 0;
-  progress.visible = false;
-  target.add(progress);
-
-  const arrowShape = (direction: -1 | 1): THREE.Shape => {
-    const shape = new THREE.Shape();
-    const points: Array<[number, number]> = [
-      [-0.44, -0.12],
-      [0.08, -0.12],
-      [0.08, -0.32],
-      [0.46, 0],
-      [0.08, 0.32],
-      [0.08, 0.12],
-      [-0.44, 0.12],
-    ].map(([x, y]) => [x * direction, y]);
-    points.forEach(([x, y], index) => {
-      if (index === 0) shape.moveTo(x, y);
-      else shape.lineTo(x, y);
-    });
-    shape.closePath();
-    return shape;
-  };
-  const brakeShape = (): THREE.Shape => {
-    const shape = new THREE.Shape();
-    shape.moveTo(-0.31, -0.31);
-    shape.lineTo(0.31, -0.31);
-    shape.lineTo(0.31, 0.31);
-    shape.lineTo(-0.31, 0.31);
-    shape.closePath();
-    const hole = new THREE.Path();
-    hole.moveTo(-0.16, -0.16);
-    hole.lineTo(-0.16, 0.16);
-    hole.lineTo(0.16, 0.16);
-    hole.lineTo(0.16, -0.16);
-    hole.closePath();
-    shape.holes.push(hole);
-    return shape;
-  };
-  const controls: readonly [VarkhulAssemblyHammerControl, number][] = [
-    ['counterclockwise', -VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ANGLE],
-    ['brake', 0],
-    ['clockwise', VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ANGLE],
-  ];
-  for (const [control, angle] of controls) {
-    const plate = new THREE.Group();
-    plate.name = `varkhul-link-control-${control}`;
-    plate.userData.control = control;
-    plate.userData.radius = VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_RADIUS;
-    plate.position.set(
-      Math.sin(angle) * VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ORBIT,
-      0,
-      Math.cos(angle) * VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_ORBIT,
-    );
-    // Keep the icon in an empty centre so it stays legible when the additive
-    // control material turns fully white while occupied.
-    const plateGeometry = new THREE.RingGeometry(
-      VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_RADIUS - 0.12,
-      VARKHUL_ASSEMBLY_LINK_HAMMER_CONTROL_RADIUS,
-      40,
-    ).rotateX(-Math.PI / 2);
-    const iconGeometry = new THREE.ShapeGeometry(
-      control === 'brake' ? brakeShape() : arrowShape(control === 'counterclockwise' ? -1 : 1),
-    )
-      .rotateX(-Math.PI / 2)
-      .translate(0, 0.06, 0);
-    const surface = new THREE.Mesh(
-      mergeFloorGeometries([plateGeometry, iconGeometry]),
-      additive(color, 0.68),
-    );
-    surface.name = 'varkhul-link-control-surface';
-    plate.add(surface);
-    group.add(plate);
-  }
-
-  const arm = new THREE.Group();
-  arm.name = 'varkhul-link-fire-arm';
-  arm.userData.actionable = true;
-  const armCore = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.09, 2.05), additive(0xff6418, 0.96));
-  armCore.name = 'varkhul-link-fire-arm-core';
-  armCore.position.set(0, 0.08, 1.025);
-  const armTip = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34, 1), additive(0xffed8a, 1));
-  armTip.name = 'varkhul-link-fire-arm-tip';
-  armTip.position.set(0, 0.13, 2.05);
-  arm.add(armCore, armTip);
-
-  const lock = new THREE.Mesh(
-    new THREE.RingGeometry(0.94, 1.12, 48).rotateX(-Math.PI / 2),
-    additive(0xffffff, 1),
+  glyph.name = 'varkhul-rune-moving-glyph';
+  glyph.renderOrder = 8;
+  const embers = new THREE.InstancedMesh(
+    new THREE.IcosahedronGeometry(0.075, 0),
+    additive(color, 0.78),
+    6,
   );
-  lock.name = 'varkhul-link-lock-burst';
-  lock.visible = false;
-  target.add(lock);
-  group.add(footprint, target, arm);
-  return group;
+  embers.name = 'varkhul-rune-embers';
+  const matrix = new THREE.Matrix4();
+  for (let index = 0; index < 6; index++) {
+    const angle = (index / 6) * Math.PI * 2;
+    matrix.makeTranslation(
+      Math.sin(angle) * 0.78,
+      0.25 + (index % 2) * 0.22,
+      Math.cos(angle) * 0.78,
+    );
+    embers.setMatrixAt(index, matrix);
+  }
+  embers.instanceMatrix.needsUpdate = true;
+  rotor.add(glyph, embers);
+
+  const lockBurst = new THREE.Group();
+  lockBurst.name = 'varkhul-rune-lock-burst';
+  lockBurst.visible = false;
+  const lockGeometry = mergeFloorGeometries([
+    new THREE.TorusGeometry(1.15, 0.08, 8, 48).rotateX(Math.PI / 2).translate(0, 0.22, 0),
+    new THREE.CylinderGeometry(0.22, 0.72, 3.8, 16, 1, true).translate(0, 1.9, 0),
+  ]);
+  const lockEffect = new THREE.Mesh(lockGeometry, additive(0xffe49a, 0.72));
+  lockEffect.name = 'varkhul-rune-lock-effect';
+  lockBurst.add(lockEffect);
+
+  group.add(backing, fieldLines, inner, outer, target, rotor, lockBurst);
+  return {
+    root: group,
+    target,
+    rotor,
+    inner,
+    outer,
+    socket: targetRim,
+    embers,
+    lock: lockBurst,
+  };
 }
 
 function disposeRoot(root: THREE.Object3D): void {
   root.traverse((child) => {
-    const mesh = child as THREE.Mesh | THREE.Line;
+    const mesh = child as THREE.Mesh;
     if (mesh instanceof THREE.InstancedMesh) mesh.dispose();
     if ('geometry' in mesh && mesh.geometry) mesh.geometry.dispose();
     if ('material' in mesh && mesh.material) {
@@ -321,8 +396,10 @@ function createVisual(scene: THREE.Scene, bossId: number): AssemblyVisual {
   root.userData.renderCategory = 'ui3d';
   const forge = buildForge();
   root.add(forge.group);
-  const pads = Array.from({ length: 5 }, (_, symbol) => buildPad(symbol));
-  root.add(...pads);
+  const runes = Array.from({ length: VARKHUL_ASSEMBLY_RUNE_COUNT }, (_, symbol) =>
+    buildRune(symbol),
+  );
+  root.add(...runes.map((rune) => rune.root));
   scene.add(root);
   return {
     root,
@@ -330,25 +407,24 @@ function createVisual(scene: THREE.Scene, bossId: number): AssemblyVisual {
     forgeSegments: forge.segments,
     barrierMaterial: forge.barrier,
     cores: new Map(),
-    pads,
+    runes,
     phase: 0,
   };
 }
 
-/** Stages the global Assembly material set at Inner Crucible attach. */
+/** Stages the complete Assembly material set when the Inner Crucible attaches. */
 export function buildVarkhulAssemblyPrewarmVisual(): THREE.Group {
   const root = new THREE.Group();
   root.name = 'varkhul-assembly-prewarm';
   const forge = buildForge();
   root.add(forge.group);
-  for (let symbol = 0; symbol < 5; symbol++) {
-    const pad = buildPad(symbol);
-    pad.position.set((symbol - 2) * 6.5, 0, 8);
-    pad.traverse((child) => {
+  for (let symbol = 0; symbol < VARKHUL_ASSEMBLY_RUNE_COUNT; symbol++) {
+    const { root: rune } = buildRune(symbol);
+    rune.position.set((symbol - 4.5) * 7.2, 0, 8);
+    rune.traverse((child) => {
       child.visible = true;
-      if (child instanceof THREE.InstancedMesh) child.count = 8;
     });
-    root.add(pad);
+    root.add(rune);
   }
   const core = buildCore();
   core.position.set(0, 2, 2);
@@ -408,60 +484,40 @@ export class VarkhulAssemblyVisuals {
         disposeRoot(core);
         visual.cores.delete(id);
       }
-      for (const pad of state.pads) {
-        const padVisual = visual.pads[pad.symbol];
-        padVisual.visible = state.phase === 'links';
-        padVisual.position.set(pad.x, this.groundY(pad.x, pad.z) + 0.08, pad.z);
-        const outwardAngle = Math.atan2(pad.x - state.forgeX, pad.z - state.forgeZ);
-        padVisual.rotation.y = outwardAngle;
-        const targetAngle = pad.targetAngle - outwardAngle;
-        const target = padVisual.getObjectByName('varkhul-link-anvil-target') as THREE.Group;
-        target.position.set(
-          Math.sin(targetAngle) * VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_ORBIT,
-          0.02,
-          Math.cos(targetAngle) * VARKHUL_ASSEMBLY_LINK_ANVIL_TARGET_ORBIT,
-        );
-        const targetRim = target.getObjectByName('varkhul-link-anvil-target-rim') as THREE.Mesh;
-        const targetMaterial = targetRim.material as THREE.MeshBasicMaterial;
-        targetMaterial.color.setHex(
-          pad.locked || pad.anvilReady ? 0xffffff : SYMBOL_COLORS[pad.symbol],
-        );
-        targetMaterial.opacity = pad.anvilReady || pad.locked ? 1 : 0.86;
-        // The lock burst replaces the progress ticks instead of adding a ninth
-        // draw at the exact moment the station completes.
-        const visibleProgress = pad.locked ? 0 : Math.floor(Math.max(0, pad.progress) * 8 + 0.001);
-        const progress = target.getObjectByName('varkhul-link-progress') as THREE.InstancedMesh;
-        progress.count = visibleProgress;
-        progress.visible = visibleProgress > 0;
-        const lock = target.getObjectByName('varkhul-link-lock-burst');
-        if (lock) lock.visible = pad.locked;
 
-        for (const control of ['counterclockwise', 'brake', 'clockwise'] as const) {
-          const plate = padVisual.getObjectByName(`varkhul-link-control-${control}`) as THREE.Group;
-          const active = pad.control === control;
-          const surface = plate.getObjectByName('varkhul-link-control-surface') as THREE.Mesh;
-          const material = surface.material as THREE.MeshBasicMaterial;
-          material.color.setHex(pad.locked || active ? 0xffffff : SYMBOL_COLORS[pad.symbol]);
-          material.opacity = active ? 1 : 0.68;
-        }
-        const arm = padVisual.getObjectByName('varkhul-link-fire-arm') as THREE.Group;
-        arm.rotation.y = pad.armAngle - outwardAngle;
-        arm.traverse((child) => {
-          const mesh = child as THREE.Mesh;
-          if (!mesh.material) return;
-          const material = mesh.material as THREE.MeshBasicMaterial;
-          material.color.setHex(
-            pad.locked || (pad.aligned && pad.control === 'brake')
-              ? 0xffffff
-              : pad.aligned
-                ? 0xffe45c
-                : child.name.endsWith('tip')
-                  ? 0xffed8a
-                  : child.name.endsWith('core')
-                    ? 0xff8a18
-                    : 0xff3300,
-          );
-        });
+      for (const rune of state.runes) {
+        const runeVisual = visual.runes[rune.symbol];
+        runeVisual.root.visible = state.phase === 'links';
+        runeVisual.root.position.set(rune.x, this.groundY(rune.x, rune.z) + GROUND_LIFT, rune.z);
+        const color = SYMBOL_COLORS[rune.symbol];
+        const target = runeVisual.target;
+        target.position.set(
+          Math.sin(rune.targetAngle) * VARKHUL_ASSEMBLY_RUNE_TARGET_ORBIT,
+          0,
+          Math.cos(rune.targetAngle) * VARKHUL_ASSEMBLY_RUNE_TARGET_ORBIT,
+        );
+        target.rotation.y = rune.targetAngle;
+        const rotor = runeVisual.rotor;
+        rotor.position.set(
+          Math.sin(rune.glyphAngle) * VARKHUL_ASSEMBLY_RUNE_GLYPH_ORBIT,
+          0,
+          Math.cos(rune.glyphAngle) * VARKHUL_ASSEMBLY_RUNE_GLYPH_ORBIT,
+        );
+        rotor.rotation.y = rune.glyphAngle;
+        const innerMaterial = runeVisual.inner.material as THREE.MeshBasicMaterial;
+        const innerActive = rune.control === 'counterclockwise';
+        innerMaterial.color.setHex(rune.locked || innerActive ? 0xffffff : color);
+        innerMaterial.opacity = rune.assignedPlayerId === null ? 0.12 : innerActive ? 0.78 : 0.3;
+        const outerMaterial = runeVisual.outer.material as THREE.MeshBasicMaterial;
+        const outerActive = rune.control === 'clockwise';
+        outerMaterial.color.setHex(rune.locked || outerActive ? 0xffffff : color);
+        outerMaterial.opacity = rune.assignedPlayerId === null ? 0.12 : outerActive ? 0.78 : 0.3;
+        const socket = runeVisual.socket;
+        const socketMaterial = socket.material as THREE.MeshBasicMaterial;
+        socketMaterial.color.setHex(rune.locked || rune.aligned ? 0xffffff : color);
+        socketMaterial.opacity = rune.assignedPlayerId === null ? 0.18 : rune.aligned ? 1 : 0.92;
+        runeVisual.lock.visible = rune.locked;
+        rotor.visible = rune.assignedPlayerId !== null;
       }
     }
     for (const [bossId, visual] of this.visuals) {
@@ -478,6 +534,13 @@ export class VarkhulAssemblyVisuals {
       for (const core of visual.cores.values()) {
         core.rotation.y = reducedMotion ? 0 : visual.phase;
         core.scale.setScalar(pulse);
+      }
+      for (const rune of visual.runes) {
+        rune.target.scale.setScalar(reducedMotion ? 1 : pulse);
+        rune.embers.rotation.y = reducedMotion ? 0 : visual.phase * 0.7;
+        if (rune.lock.visible) {
+          rune.lock.scale.setScalar(reducedMotion ? 1 : 1 + Math.sin(visual.phase * 1.4) * 0.08);
+        }
       }
       visual.forge.scale.setScalar(visual.root.userData.phase === 'stunned' ? 1 + pulse * 0.1 : 1);
     }

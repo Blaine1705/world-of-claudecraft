@@ -120,10 +120,10 @@ export type {
 // discriminator. Changing the authoritative town layout requires a new epoch:
 // the strict discriminator makes both rolling-deploy directions fail closed
 // before either binary loads a character into a differently shaped world.
-// 8 = Varkhul's Forge Links gained distinct Anvil/Hammer roles and a timed
-// pairing window. Mixed binaries disagree about actionable raid instructions,
+// 9 = Varkhul's Forge Links became ten individual room runes with concentric
+// movement controls. Mixed binaries disagree about actionable raid instructions,
 // so they must fail closed before entering the world.
-export const ONLINE_WORLD_LAYOUT_VERSION = 8 as const;
+export const ONLINE_WORLD_LAYOUT_VERSION = 9 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

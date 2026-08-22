@@ -5,12 +5,12 @@
 import type { ActiveVarkhulAnvilMeteorWarning } from '../sim/varkhul_anvil_meteors';
 import {
   type ActiveVarkhulAssembly,
-  type ActiveVarkhulLinkAssignment,
-  type ActiveVarkhulLinkPad,
   type ActiveVarkhulMoltenCore,
-  VARKHUL_ASSEMBLY_LINK_SYMBOLS,
-  type VarkhulAssemblyHammerControl,
+  type ActiveVarkhulRune,
+  type ActiveVarkhulRuneAssignment,
+  VARKHUL_ASSEMBLY_RUNE_COUNT,
   type VarkhulAssemblyPhase,
+  type VarkhulAssemblyRuneControl,
 } from '../sim/varkhul_assembly';
 
 const PHASES = new Set<VarkhulAssemblyPhase>([
@@ -68,8 +68,9 @@ function decodeCore(value: unknown): ActiveVarkhulMoltenCore | null {
     !finite(core.z) ||
     !(core.cid === null || nonNegativeInteger(core.cid)) ||
     !(core.del === 0 || core.del === 1)
-  )
+  ) {
     return null;
+  }
   return {
     id: core.id,
     x: core.x,
@@ -79,62 +80,64 @@ function decodeCore(value: unknown): ActiveVarkhulMoltenCore | null {
   };
 }
 
-function decodeAssignment(value: unknown): ActiveVarkhulLinkAssignment | null {
+function decodeAssignment(value: unknown): ActiveVarkhulRuneAssignment | null {
   if (!value || typeof value !== 'object') return null;
   const assignment = value as Record<string, unknown>;
   if (
     !nonNegativeInteger(assignment.pid) ||
     !nonNegativeInteger(assignment.sym) ||
-    assignment.sym >= VARKHUL_ASSEMBLY_LINK_SYMBOLS ||
-    !(assignment.role === 0 || assignment.role === 1) ||
+    assignment.sym >= VARKHUL_ASSEMBLY_RUNE_COUNT ||
     !(assignment.lock === 0 || assignment.lock === 1)
-  )
+  ) {
     return null;
+  }
   return {
     playerId: assignment.pid,
     symbol: assignment.sym,
-    role: assignment.role === 1 ? 'hammer' : 'anvil',
     locked: assignment.lock === 1,
   };
 }
 
-function decodePad(value: unknown): ActiveVarkhulLinkPad | null {
+function decodeRune(value: unknown): ActiveVarkhulRune | null {
   if (!value || typeof value !== 'object') return null;
-  const pad = value as Record<string, unknown>;
+  const rune = value as Record<string, unknown>;
   if (
-    !nonNegativeInteger(pad.sym) ||
-    pad.sym >= VARKHUL_ASSEMBLY_LINK_SYMBOLS ||
-    ![pad.x, pad.z, pad.r, pad.p, pad.ta, pad.aa].every(finite) ||
-    (pad.r as number) <= 0 ||
-    (pad.p as number) < 0 ||
-    (pad.p as number) > 1 ||
-    !(pad.ar === 0 || pad.ar === 1) ||
-    !(pad.hr === 0 || pad.hr === 1) ||
-    !(pad.c === 0 || pad.c === 1 || pad.c === 2 || pad.c === 3) ||
-    !(pad.al === 0 || pad.al === 1) ||
-    !(pad.lock === 0 || pad.lock === 1)
-  )
+    !nonNegativeInteger(rune.sym) ||
+    rune.sym >= VARKHUL_ASSEMBLY_RUNE_COUNT ||
+    ![rune.x, rune.z, rune.r, rune.ta, rune.ga].every(finite) ||
+    (rune.r as number) <= 0 ||
+    !(rune.c === 0 || rune.c === 1 || rune.c === 2) ||
+    !(rune.al === 0 || rune.al === 1) ||
+    !(rune.lock === 0 || rune.lock === 1)
+  ) {
     return null;
-  const controls: readonly VarkhulAssemblyHammerControl[] = [
-    'off',
-    'counterclockwise',
-    'brake',
-    'clockwise',
-  ];
+  }
+  const controls: readonly VarkhulAssemblyRuneControl[] = ['off', 'counterclockwise', 'clockwise'];
   return {
-    symbol: pad.sym,
-    x: pad.x as number,
-    z: pad.z as number,
-    radius: pad.r as number,
-    progress: pad.p as number,
-    locked: pad.lock === 1,
-    anvilReady: pad.ar === 1,
-    hammerReady: pad.hr === 1,
-    targetAngle: pad.ta as number,
-    armAngle: pad.aa as number,
-    control: controls[pad.c as number],
-    aligned: pad.al === 1,
+    symbol: rune.sym,
+    x: rune.x as number,
+    z: rune.z as number,
+    radius: rune.r as number,
+    assignedPlayerId: null,
+    locked: rune.lock === 1,
+    targetAngle: rune.ta as number,
+    glyphAngle: rune.ga as number,
+    control: controls[rune.c as number],
+    aligned: rune.al === 1,
   };
+}
+
+function uniqueRows(rows: readonly { playerId?: number; symbol: number }[]): boolean {
+  const symbols = new Set<number>();
+  const players = new Set<number>();
+  for (const row of rows) {
+    if (symbols.has(row.symbol)) return false;
+    symbols.add(row.symbol);
+    if (row.playerId === undefined) continue;
+    if (players.has(row.playerId)) return false;
+    players.add(row.playerId);
+  }
+  return true;
 }
 
 export function decodeVarkhulAssemblies(value: unknown): ActiveVarkhulAssembly[] {
@@ -158,13 +161,33 @@ export function decodeVarkhulAssemblies(value: unknown): ActiveVarkhulAssembly[]
       (assembly.rounds as number) <= 0 ||
       !Array.isArray(assembly.cores) ||
       !Array.isArray(assembly.assign) ||
-      !Array.isArray(assembly.pads)
-    )
+      !Array.isArray(assembly.runes)
+    ) {
       return [];
+    }
     const cores = assembly.cores.map(decodeCore);
     const assignments = assembly.assign.map(decodeAssignment);
-    const pads = assembly.pads.map(decodePad);
-    if (cores.includes(null) || assignments.includes(null) || pads.includes(null)) return [];
+    const runes = assembly.runes.map(decodeRune);
+    if (cores.includes(null) || assignments.includes(null) || runes.includes(null)) return [];
+    const decodedAssignments = assignments as ActiveVarkhulRuneAssignment[];
+    const decodedRunes = runes as ActiveVarkhulRune[];
+    if (
+      !uniqueRows(decodedAssignments) ||
+      !uniqueRows(decodedRunes) ||
+      decodedAssignments.length > VARKHUL_ASSEMBLY_RUNE_COUNT ||
+      decodedRunes.length > VARKHUL_ASSEMBLY_RUNE_COUNT ||
+      (assembly.phase === 'links' && decodedRunes.length !== VARKHUL_ASSEMBLY_RUNE_COUNT)
+    ) {
+      return [];
+    }
+    const assignmentBySymbol = new Map(
+      decodedAssignments.map((assignment) => [assignment.symbol, assignment]),
+    );
+    for (const rune of decodedRunes) {
+      const assignment = assignmentBySymbol.get(rune.symbol);
+      rune.assignedPlayerId = assignment?.playerId ?? null;
+      if (rune.locked !== (assignment?.locked ?? false)) return [];
+    }
     return [
       {
         bossId: assembly.bossId,
@@ -175,8 +198,8 @@ export function decodeVarkhulAssemblies(value: unknown): ActiveVarkhulAssembly[]
         forgeMaxHp: assembly.mhp as number,
         cores: cores as ActiveVarkhulMoltenCore[],
         deliveryWindowRemaining: assembly.win as number,
-        assignments: assignments as ActiveVarkhulLinkAssignment[],
-        pads: pads as ActiveVarkhulLinkPad[],
+        assignments: decodedAssignments,
+        runes: decodedRunes,
         round: assembly.round,
         rounds: assembly.rounds,
         remaining: assembly.rem as number,

@@ -3,10 +3,10 @@ import { updateVarkhulEncounter, VARKHUL_FORGE_LOCAL_POS } from '../src/sim/enco
 import { IGNIVAR_SECOND_WING_ID, VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
 import { Sim } from '../src/sim/sim';
 import {
-  varkhulAssemblyAnvilTarget,
-  varkhulAssemblyAnvilTargetAngle,
-  varkhulAssemblyHammerControlPoints,
-  varkhulAssemblyLinkPadAtSlot,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
+  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
+  varkhulAssemblyRuneStation,
+  varkhulAssemblyRuneTargetAngle,
 } from '../src/sim/varkhul_assembly';
 import { positionVarkhulLinkPracticeBots } from '../src/sim/varkhul_dev_raid';
 
@@ -134,56 +134,61 @@ describe('/dev varkhulraid', () => {
     ).toBe('normal');
   });
 
-  it('drives the missing control role immediately and brakes when the fire arm aligns', () => {
+  it('moves anchored bots between their assigned inner and outer rune controls', () => {
     const sim = devSim();
     sim.chat('/dev varkhulraid normal');
     const boss = [...sim.entities.values()].find((entity) => entity.templateId === VARKHUL_BOSS_ID);
-    const bot = sim.entities.get(raidBots(sim)[0]?.entityId ?? -1);
-    if (!boss || !bot) throw new Error('Varkhul practice room is incomplete');
-    const state = {
-      assemblyLinkAssignments: [
-        { playerId: sim.player.id, symbol: 0, role: 'anvil' as const, locked: false },
-        { playerId: bot.id, symbol: 0, role: 'hammer' as const, locked: false },
-      ],
-      assemblyLinkPadSlots: [0, 1, 2, 3, 4],
-      assemblyLinkArmAngles: [varkhulAssemblyAnvilTargetAngle(0, 0) + Math.PI / 2, 0, 0, 0, 0],
-      assemblyLinkRound: 0,
-    };
-
-    positionVarkhulLinkPracticeBots(sim.ctx, boss.pos, state);
-    const pad = varkhulAssemblyLinkPadAtSlot(boss.pos, 0, 0);
-    const counterclockwise = varkhulAssemblyHammerControlPoints(boss.pos, pad).counterclockwise;
-    expect(bot.pos).toMatchObject(counterclockwise);
-
-    state.assemblyLinkArmAngles[0] = varkhulAssemblyAnvilTargetAngle(0, 0);
-    positionVarkhulLinkPracticeBots(sim.ctx, boss.pos, state);
-    const brake = varkhulAssemblyHammerControlPoints(boss.pos, pad).brake;
-    expect(bot.pos).toMatchObject(brake);
-
-    const reversedState = {
-      assemblyLinkAssignments: [
-        { playerId: sim.player.id, symbol: 3, role: 'hammer' as const, locked: false },
-        { playerId: bot.id, symbol: 3, role: 'anvil' as const, locked: false },
-      ],
-      assemblyLinkPadSlots: [0, 1, 2, 3, 4],
-      assemblyLinkArmAngles: [0, 0, 0, varkhulAssemblyAnvilTargetAngle(3, 0), 0],
-      assemblyLinkRound: 0,
-    };
-    const reversedPad = varkhulAssemblyLinkPadAtSlot(boss.pos, 3, 0);
-    positionVarkhulLinkPracticeBots(sim.ctx, boss.pos, reversedState);
-    expect(bot.pos).toMatchObject(varkhulAssemblyAnvilTarget(reversedPad, 3, 0));
-
+    const bots = raidBots(sim)
+      .slice(0, 2)
+      .map((meta) => sim.entities.get(meta.entityId));
+    const [clockwiseBot, counterclockwiseBot] = bots;
+    if (!boss || !clockwiseBot || !counterclockwiseBot) {
+      throw new Error('Varkhul practice room is incomplete');
+    }
     const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
     if (!instance) throw new Error('Inner Crucible instance disappeared');
     const origin = sim.ctx.instanceOriginOf(instance);
+    const roomCenter = sim.ctx.groundPos(origin.x, origin.z);
+    const clockwiseTarget = varkhulAssemblyRuneTargetAngle(boss.id, 0, 0);
+    const counterclockwiseTarget = varkhulAssemblyRuneTargetAngle(boss.id, 4, 0);
+    const state = {
+      assemblyRuneAssignments: [
+        { playerId: clockwiseBot.id, symbol: 0, locked: false },
+        { playerId: counterclockwiseBot.id, symbol: 4, locked: false },
+      ],
+      assemblyRuneAngles: [clockwiseTarget - 1, 0, 0, 0, counterclockwiseTarget + 1, 0, 0, 0, 0, 0],
+      assemblyRuneRound: 0,
+    };
+
+    positionVarkhulLinkPracticeBots(sim.ctx, roomCenter, boss.id, state);
+    const clockwiseStation = varkhulAssemblyRuneStation(roomCenter, 0, 0);
+    const counterclockwiseStation = varkhulAssemblyRuneStation(roomCenter, 4, 0);
+    const outerDistance = Math.hypot(
+      clockwiseBot.pos.x - clockwiseStation.x,
+      clockwiseBot.pos.z - clockwiseStation.z,
+    );
+    expect(outerDistance).toBeGreaterThan(VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS);
+    expect(outerDistance).toBeLessThan(VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS);
+    expect(counterclockwiseBot.pos).toMatchObject(counterclockwiseStation);
+
+    state.assemblyRuneAngles[0] = clockwiseTarget + 1;
+    state.assemblyRuneAngles[4] = counterclockwiseTarget - 1;
+    positionVarkhulLinkPracticeBots(sim.ctx, roomCenter, boss.id, state);
+    expect(clockwiseBot.pos).toMatchObject(clockwiseStation);
+    const secondOuterDistance = Math.hypot(
+      counterclockwiseBot.pos.x - counterclockwiseStation.x,
+      counterclockwiseBot.pos.z - counterclockwiseStation.z,
+    );
+    expect(secondOuterDistance).toBeGreaterThan(VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS);
+    expect(secondOuterDistance).toBeLessThan(VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS);
+
     boss.pos = sim.ctx.groundPos(
       origin.x + VARKHUL_FORGE_LOCAL_POS.x,
       origin.z + VARKHUL_FORGE_LOCAL_POS.z,
     );
     boss.prevPos = { ...boss.pos };
-    const authoritativePad = varkhulAssemblyLinkPadAtSlot(boss.pos, 0, 0);
-    sim.player.pos = sim.ctx.groundPos(authoritativePad.x, authoritativePad.z);
-    bot.pos = { ...boss.pos };
+    clockwiseBot.pos = { ...boss.pos };
+    counterclockwiseBot.pos = { ...boss.pos };
     updateVarkhulEncounter(sim.ctx, boss);
     if (!boss.varkhul) throw new Error('Varkhul state did not initialize');
     boss.varkhul.makersBrandTimer = 999;
@@ -195,21 +200,31 @@ describe('/dev varkhulraid', () => {
     boss.varkhul.assemblyPhase = 'links';
     boss.varkhul.assemblyRemaining = 45;
     boss.varkhul.assemblyWipeResolved = false;
-    boss.varkhul.assemblyLinkAssignments = state.assemblyLinkAssignments;
-    boss.varkhul.assemblyLinkPadSlots = state.assemblyLinkPadSlots;
-    boss.varkhul.assemblyLinkPadProgress = [0, 0, 0, 0, 0];
-    boss.varkhul.assemblyLinkArmAngles = [...state.assemblyLinkArmAngles];
-    boss.varkhul.assemblyLinkHammerControls = ['off', 'off', 'off', 'off', 'off'];
-    boss.varkhul.assemblyLinkAnvilReady = [false, false, false, false, false];
-    boss.varkhul.assemblyLinkHammerReady = [false, false, false, false, false];
+    boss.varkhul.assemblyRuneAssignments = state.assemblyRuneAssignments;
+    boss.varkhul.assemblyRuneAngles = [
+      clockwiseTarget - 0.01,
+      0,
+      0,
+      0,
+      counterclockwiseTarget + 0.01,
+      0,
+      0,
+      0,
+      0,
+      0,
+    ];
+    boss.varkhul.assemblyRuneControls = Array.from({ length: 10 }, () => 'off');
     boss.varkhul.assemblyLinkFireballTimer = 999;
-    boss.varkhul.assemblyLinkRound = 0;
-    boss.varkhul.assemblyLinkRounds = 1;
-    boss.varkhul.assemblyLinkRemaining = 25;
+    boss.varkhul.assemblyRuneRound = 0;
+    boss.varkhul.assemblyRuneRounds = 1;
+    boss.varkhul.assemblyRuneRemaining = 25;
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(bot.pos).toMatchObject(
-      varkhulAssemblyHammerControlPoints(boss.pos, authoritativePad).brake,
-    );
+    expect(clockwiseBot.pos).not.toMatchObject(clockwiseStation);
+    expect(counterclockwiseBot.pos).toMatchObject(counterclockwiseStation);
+    expect(boss.varkhul.assemblyRuneAssignments).toEqual([
+      { playerId: clockwiseBot.id, symbol: 0, locked: true },
+      { playerId: counterclockwiseBot.id, symbol: 4, locked: true },
+    ]);
   });
 
   it('is inert when development commands are disabled', () => {

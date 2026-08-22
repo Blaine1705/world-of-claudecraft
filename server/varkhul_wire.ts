@@ -70,13 +70,13 @@ export function varkhulEncounterWireJson(
       );
       const assignments = assembly.assignments.map(
         (assignment) =>
-          `{"pid":${assignment.playerId},"sym":${assignment.symbol},"role":${assignment.role === 'hammer' ? 1 : 0},"lock":${assignment.locked ? 1 : 0}}`,
+          `{"pid":${assignment.playerId},"sym":${assignment.symbol},"lock":${assignment.locked ? 1 : 0}}`,
       );
-      const pads = assembly.pads.map(
-        (pad) =>
-          `{"sym":${pad.symbol},"x":${round2(pad.x)},"z":${round2(pad.z)},"r":${round2(pad.radius)},"p":${round2(pad.progress)},"ar":${pad.anvilReady ? 1 : 0},"hr":${pad.hammerReady ? 1 : 0},"ta":${round2(pad.targetAngle)},"aa":${round2(pad.armAngle)},"c":${pad.control === 'counterclockwise' ? 1 : pad.control === 'brake' ? 2 : pad.control === 'clockwise' ? 3 : 0},"al":${pad.aligned ? 1 : 0},"lock":${pad.locked ? 1 : 0}}`,
+      const runes = assembly.runes.map(
+        (rune) =>
+          `{"sym":${rune.symbol},"x":${round2(rune.x)},"z":${round2(rune.z)},"r":${round2(rune.radius)},"ta":${round2(rune.targetAngle)},"ga":${round2(rune.glyphAngle)},"c":${rune.control === 'counterclockwise' ? 1 : rune.control === 'clockwise' ? 2 : 0},"al":${rune.aligned ? 1 : 0},"lock":${rune.locked ? 1 : 0}}`,
       );
-      return `{"bossId":${assembly.bossId},"phase":${JSON.stringify(assembly.phase)},"fx":${round2(assembly.forgeX)},"fz":${round2(assembly.forgeZ)},"hp":${round2(assembly.forgeHp)},"mhp":${round2(assembly.forgeMaxHp)},"win":${round2(assembly.deliveryWindowRemaining)},"round":${assembly.round},"rounds":${assembly.rounds},"rem":${round2(assembly.remaining)},"cores":[${cores.join(',')}],"assign":[${assignments.join(',')}],"pads":[${pads.join(',')}]}`;
+      return `{"bossId":${assembly.bossId},"phase":${JSON.stringify(assembly.phase)},"fx":${round2(assembly.forgeX)},"fz":${round2(assembly.forgeZ)},"hp":${round2(assembly.forgeHp)},"mhp":${round2(assembly.forgeMaxHp)},"win":${round2(assembly.deliveryWindowRemaining)},"round":${assembly.round},"rounds":${assembly.rounds},"rem":${round2(assembly.remaining)},"cores":[${cores.join(',')}],"assign":[${assignments.join(',')}],"runes":[${runes.join(',')}]}`;
     });
   const forgestormJson =
     forgestorm.length > 0 ? `,"varkhulForgestorm":[${forgestorm.join(',')}]` : '';

@@ -2289,11 +2289,11 @@ export const ko_KR: EnTranslations = {
       "mail": "사슬"
     },
     "auraEffect": {
-      "sharedPyre": "원 안에 최소 {players}명의 플레이어가 있어야 합니다",
-      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
-      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
-      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Match your symbol. Anvil: stand on the hollow inner receptor. Hammer: use the outer arrows to rotate the fire arm, then brake on the square when aligned. Hold for {hold} sec.",
+      "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
+      "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
+      "varkhulSentinelsGaze": "잔불 감시자가 당신을 추격합니다. 처치할 때까지 공격대에서 멀리 떨어뜨리세요.",
+      "varkhulMoltenCore": "이 핵을 용광로로 운반하세요. 용융물의 무게는 {interval}초마다 최대 생명력의 {min}%에서 {max}%까지 증가하는 피해를 입힙니다.",
+      "varkhulForgeLink": "방 가장자리에서 자신의 문양과 일치하는 룬을 찾으세요. 안쪽 원에 들어가면 왼쪽으로, 바깥쪽 고리에 들어가면 오른쪽으로 회전합니다. 영역에서 나오면 멈추고, 문양이 소켓에 닿으면 자동으로 고정됩니다.",
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
       "mendingCurrent": "치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다",
@@ -13406,16 +13406,16 @@ export const ko_KR: EnTranslations = {
         "name": "종말의 심장"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "잔불 감시자"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "용광로 수호자"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "불씨 기계공"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "마지막 불꽃의 대장장이 발쿨"
       },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
@@ -14072,9 +14072,9 @@ export const ko_KR: EnTranslations = {
         "greeting": "예배당 묘지에서 세상의 지붕까지... 흔적은 여기서 끝납니다. 산이 듣고 있음을 느낍니다."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "잔불지기 기록관 메일린",
+        "title": "용광로 기록관",
+        "greeting": "이곳의 망치 자국 하나하나가 하나의 문장이야. 발쿨이 숨기려 한 내용을 읽어 내는 것을 도와줘."
       },
       "brother_halven": {
         "name": "브라더 할벤",
@@ -15185,50 +15185,50 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.",
-        "completion": "The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.",
+        "title": "철 속의 메아리",
+        "text": "이 자동 기계들은 병사가 아니라 시작품이야. 마지막 샘이 그의 겨화에서 메말라 갈 동안 발쿨은 껍질을 하나씩 단련했지. 세 개의 기록을 읽고 그것을 지키는 구조물을 파괴해. 실패한 몸체마다 답의 조각을 품고 있을지도 몰라.",
+        "completion": "기록은 모두 일치해. 발쿨은 죽어 가는 마지막 샘의 물을 살아 있는 금속에 묶었어. 이 자동 기계들은 그의 실패한 단련작이야. 견돌 수 있었던 설계는 하나뿐이었지.",
         "objectives": {
           "0": {
-            "label": "Read the First Tempering record"
+            "label": "첫 단련 기록 읽기"
           },
           "1": {
-            "label": "Read the Living Metal record"
+            "label": "살아 있는 금속 기록 읽기"
           },
           "2": {
-            "label": "Read the Herald-Key record"
+            "label": "선구자의 열쇠 기록 읽기"
           },
           "3": {
-            "label": "Ember Sentinel defeated"
+            "label": "잔불 감시자 처치"
           },
           "4": {
-            "label": "Crucible Warden defeated"
+            "label": "용광로 수호자 처치"
           },
           "5": {
-            "label": "Cinder Artificer defeated"
+            "label": "불씨 기계공 처치"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.",
+        "title": "선구자의 심장",
+        "text": "모든 기록에서 살아남은 자로 적힌 이름은 이그니바르야. 발쿨은 그를 선구자이자 봉인이며 열쇠라고 불렀지. 이그니바르를 쓰러뜨리고 남은 핵을 조사해. 선구자가 무엇을 지키도록 만들어졌는지 알려 줄 거야.",
+        "completion": "이그니바르는 단순한 수호자가 아니었어. 그의 심장은 열쇠이고, 마지막 갑주 판은 아래에 봉인된 용광로를 가리키고 있어.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "이그니바르 처치"
           },
           "1": {
-            "label": "Ignivar's core inspected"
+            "label": "이그니바르의 핵 조사"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "대장장이",
+        "text": "아래로 이어진 길은 마지막 불꽃의 대장장이 발쿨에게 이어져. 그는 금속에 생명을 불어넣으려 마지막 샘을 가두고, 그 죄를 봉인하려 이그니바르를 단조했어. 내부 용광로에 들어가 그의 일을 끝내.",
+        "completion": "마침내 대장간이 조용해졌어. 샘은 다시 회복되지 못할지도 모르지만, 발쿨이 다시 생명을 사슬로 빚을 일은 없을 거야.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "발쿨 처치"
           }
         }
       },
@@ -16983,9 +16983,9 @@ export const ko_KR: EnTranslations = {
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "첫 단련의 회랑",
+        "enterText": "첫 단련의 회랑에 망치질 소리가 울려 퍼집니다.",
+        "leaveText": "첫 번째 대장간에서 벗어나 다시 한번 자유롭게 숨을 쉽니다."
       },
       "ignivar_raid_arena": {
         "name": "마지막 샘의 도가니",
@@ -16993,9 +16993,9 @@ export const ko_KR: EnTranslations = {
         "leaveText": "도가니를 벗어나 다시 편히 숨을 쉽니다."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "내부 용광로",
+        "enterText": "열린 문이 용광로의 더 깊은 곳으로 이어집니다.",
+        "leaveText": "용광로의 고요한 깊은 곳을 떠납니다."
       },
       "wildheart_basin": {
         "name": "야생심장 분지",
