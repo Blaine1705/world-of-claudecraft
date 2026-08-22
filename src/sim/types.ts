@@ -834,6 +834,10 @@ export type ItemUse =
   // Thrown at the nearest murloc hut to torch it (q_deepfen_purge); see
   // src/sim/interactions/firebottle_hut.ts. Reusable, so it is never consumed.
   | { type: 'throw' }
+  // Used at its quest's summon site to call the named foe out (the Proving
+  // Shore's tide-pool miniboss); see src/sim/interactions/crab_summon.ts.
+  // Reusable like the firebottle, so a wipe can always retry.
+  | { type: 'summon' }
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
@@ -3303,6 +3307,13 @@ export interface NpcDef {
   // sells its stock for free when the realm has ALLOW_DEV_COMMANDS. Never placed
   // as permanent content; spawned on demand by /dev vendor.
   devVendor?: boolean;
+  // Quest-gated vendor rows: itemId -> the quest that must be in the buyer's
+  // log (or done) before the row is sold OR shown. Validated sim-side in
+  // items.ts buyItem and filtered client-side by ui/vendor_stock_gate_core.ts,
+  // both off this same def, so no wire field is needed. First user: the
+  // tutorial island's Linen Pouch (q_ps_pouch_and_purse), so an early
+  // purchase cannot strand the lesson's copper.
+  vendorQuestGates?: Record<string, string>;
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
@@ -3638,11 +3649,21 @@ export interface ZonePropsDef {
     x: number;
     z: number;
     rot: number;
+    /** Uniform size multiplier for the whole pier (planks, posts, dressing,
+     *  rowboat). Omitted means the classic 1; the walkable deck maths in
+     *  dock_layout.ts normalizes through it, so render, collision ground,
+     *  and footstep routing all scale together. */
+    scale?: number;
     hutLocal: { x: number; z: number; hw: number; hd: number };
   }[];
   tents: { x: number; z: number; rot: number; scale: number }[];
   marshReeds: [number, number][];
-  crates: [number, number][];
+  /** [x, z, stack?]: camp clutter crates/barrels. The optional third element
+   *  stacks that many identical units at the point (default 1); a stack of 2
+   *  puts the top in the ledge-climb band (src/sim/climb.ts), the Gauntlet's
+   *  parkour lesson. Collider top and drawn meshes stay in lockstep through
+   *  campCrateShape (prop_layout.ts). */
+  crates: [number, number, number?][];
   campfires: [number, number][];
   mudHuts: [number, number][];
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
@@ -3840,6 +3861,15 @@ export interface QuestDef {
   // (e.g. the paladin-only Divine Tome chain). Availability enforced in computeQuestState.
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
+  // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
+  // includes copies worn in a bag socket (quests/quest_owned_count.ts) and the
+  // turn-in never consumes them. For a quest that asks the player to acquire
+  // and KEEP a thing rather than fetch it, e.g. the tutorial island's Pouch
+  // and Purse: it tells the player to buy a Linen Pouch and buckle it on, so
+  // taking it back at the turn-in would undo the lesson it just taught, and
+  // counting carried copies alone made the objective unfinishable the moment
+  // they equipped it.
+  keepsCollectedItems?: boolean;
   shareable?: boolean; // quest-link sharing allowed (default true; set false to opt out)
   suggestedPlayers?: number; // group quests ("Suggested players: 5")
   // Repeatable quests remain in questsDone as history but become available
@@ -5309,7 +5339,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'bank' }
   // Interacting with a town noticeboard. Structured and personal: the client
   // owns localized feedback, and online routing sends it only to the reader.
+  // 'listings' carries the board's posted notices verbatim (guild names and
+  // notes are world data, spliced by the client like player names, never
+  // translated); a board with nothing posted stays the bare 'empty' shape.
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
+  | {
+      type: 'noticeboard';
+      noticeboardId: string;
+      state: 'listings';
+      listings: readonly NoticeboardListing[];
+    }
   | {
       // A world object (a torched murloc hut, q_deepfen_purge) bursts into flames.
       // The renderer plays a fire burst at (x, z). Visual-only.
@@ -6465,6 +6504,26 @@ export type SimEvent = { pid?: number } & (
   // the client renders its own one-shot tier-up explainer. Carries no ids beyond
   // the recipient; the persisted one-shot flag guarantees it never re-fires.
   | { type: 'profTierTutorial'; pid: number }
+  // Spawn greeting (tutorial island): fired exactly once per character, on a
+  // genuinely fresh character's first swept tick (sim/tutorial/greeting.ts).
+  // Personal (pid = the newcomer) and text-free: the client renders the
+  // greeter dialog itself, choosing first-character vs refresher copy off
+  // `firstCharacter` (a server-recomputed account fact, never persisted).
+  // The persisted one-shot flag guarantees it never re-fires.
+  | { type: 'tutorialGreeting'; pid: number; firstCharacter: boolean }
+  // Ferry bell homecoming (tutorial island): fired every time the island's
+  // bell sets a player down in Eastbrook town (interactions/ferry_bell.ts).
+  // Personal and text-free: the client decides ONCE per device (localStorage)
+  // to point out the town's twin bell, in case the ride was a misclick.
+  | { type: 'ferryBellHome'; pid: number }
+  // Ferry island arrival (tutorial island): fired every time a ride sets a
+  // player down at the Proving Shore arrival (the greeting ferry and the town
+  // bell alike). Personal and text-free: the client renders Ferryman Odo's
+  // welcome note, which carries the walk and talk controls, whenever
+  // `firstVisit` says this character has not started the shore's rail yet
+  // (interactions/ferry_bell.ts isFirstIslandVisit). Per CHARACTER, not per
+  // device: a new character on a browser that has seen it still gets taught.
+  | { type: 'ferryIslandArrival'; pid: number; firstVisit: boolean }
   // Attunement celebration, personal copy (Professions 2.0): a
   // quest-validated pair attunement (new OR return) landed for this player
   // (professions/attunement_events.ts). Personal (pid = the celebrant) and
@@ -6581,6 +6640,10 @@ export interface StationDef {
 export interface MailboxDef {
   x: number;
   z: number;
+  /** Optional yaw for the spawned pillar entity (the renderer rotates every
+   *  object by its facing). Omitted means the default 0 the pillars have
+   *  always had; content sets it only where a slot faces the wrong way. */
+  facing?: number;
 }
 
 // Noticeboards currently have one complete cross-platform implementation. Keep
@@ -6620,6 +6683,14 @@ export interface NoticeboardDef {
   height: (typeof EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS)['height'];
   interactionRadius: typeof EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS;
   frontStandingPoint: { x: number; z: number };
+}
+
+/** One posted notice on an interactable noticeboard, carried verbatim on the
+ *  'listings' arm of the noticeboard event: guild names and notes are world
+ *  data the client splices like player names, never translation keys. */
+export interface NoticeboardListing {
+  guild: string;
+  note: string;
 }
 
 /** A non-interactive authored muster board whose visible footprint is solid. */
@@ -6766,6 +6837,12 @@ export interface SimConfig {
   // scheduler (rift/portals.ts). Default OFF so deterministic tests, parity
   // traces, and the RL env keep a portal-free world unless they opt in.
   riftPortals?: boolean;
+  // Live worlds (server + offline client): the tutorial is COMPULSORY for a
+  // genuinely fresh character (never asked, never skippable): the greeting
+  // sweep ferries a fresh mainland character straight to the Proving Shore.
+  // Default OFF so deterministic tests, parity traces, and the RL env never
+  // teleport a fresh character mid-scenario unless they opt in.
+  compulsoryTutorial?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
@@ -7031,7 +7108,10 @@ export type DeedStatKey =
   | 'masterworksCrafted'
   | 'salvagesPerformed'
   | 'riftClears'
-  | 'riftSRankClears';
+  | 'riftSRankClears'
+  // Rides home rung on the island ferry bell AFTER the Proving Shore rail is
+  // fully handed in (interactions/ferry_bell.ts): the graduation moment.
+  | 'tutorialGraduations';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -7062,6 +7142,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'salvagesPerformed',
   'riftClears',
   'riftSRankClears',
+  'tutorialGraduations',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new

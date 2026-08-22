@@ -1000,18 +1000,21 @@ function staticWorldColliders(seed: number): Collider[] {
       r: 1.5 * t.scale,
       cameraTopY: topY(seed, t.x, t.z, 3.4 * t.scale),
     });
-  PROPS.crates.forEach(([x, z], i) => {
+  PROPS.crates.forEach(([x, z, stack], i) => {
     // Camp clutter renders as a wooden crate OR (every third) a barrel, with
     // a per-point scale roll: the collider takes the SAME roll, so its
-    // footprint and top match the exact mesh drawn at this point.
+    // footprint and top match the exact mesh drawn at this point. A stacked
+    // point (the Gauntlet's parkour ledge) multiplies the same unit height,
+    // exactly what the renderer draws.
     const shape = campCrateShape(x, z, i);
+    const top = shape.top * (stack ?? 1);
     out.push({
       type: 'circle',
       x,
       z,
       r: shape.r,
-      cameraTopY: topY(seed, x, z, shape.top),
-      moveTopY: topY(seed, x, z, shape.top),
+      cameraTopY: topY(seed, x, z, top),
+      moveTopY: topY(seed, x, z, top),
       standable: true,
     });
   });

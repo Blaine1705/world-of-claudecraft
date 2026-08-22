@@ -266,6 +266,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the tutorial hint overlay',
   },
   {
+    call: 'this.bootcamp.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the island movement-bootcamp overlay; a cheap latch check off-island',
+  },
+  {
     call: 'this.lootRolls.update',
     band: 'frame',
     gate: '',
@@ -1609,7 +1616,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // the minimap column; tracker_stack_anchor.ts).
       // window 47 -> 43, chrome 84 -> 81: the Vale Cup retirement (the New
       // Eastbrook program) removed the cup rows on the other side of this merge.
-    ).toEqual({ window: 43, chrome: 81, none: 17 });
+      // chrome 81 -> 82: the Proving Shore tutorial's coach strip apply.
+    ).toEqual({ window: 43, chrome: 82, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -61,40 +61,20 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    // Raised for the controller cross hotbar, on top of the moved-base v0.39
-    // re-pin. The additions are thin-consumer wiring to an extracted domain
-    // (src/ui/hud/cross_hotbar/): the overlay's construction, its per-frame paint,
-    // and the one public seam the pad drives it through. Everything with substance
-    // (the view, painter, resolvers, panel-hooks shape) lives in that domain, and
-    // the earlier attempt to buy these lines by extracting UNRELATED pre-existing
-    // helpers out of hud.ts was reverted: refactoring code a change does not own to
-    // fit a budget inflates the diff and risks regressions elsewhere. A maintainer
-    // decision, taken rather than paid for with someone else's code. The last
-    // line is openSpellbook, which the pad needs so a confirm on an empty cell can
-    // reach the ability list; the toggle beside it would have closed it instead.
-    // castCrossHotbarAction is the other: it routes a pad press back through
-    // castSlot so a cross-hotbar cast keeps the SAME semantics a key press has
-    // (reticle, empower, sport, mouseover) instead of growing a second cast path,
-    // with the Attack branch beside it: Attack is the fixed slot-0 toggle rather
-    // than an ability, so it is the one action the seed cannot copy off the bar.
-    // Raised for the cross-hotbar cast-fallback fix: the fallback grows an item
-    // arm and a spoken refusal beside the ability one, and the shared item-use
-    // seam castSlot and the pad now both call. Exact merged count, zero slack:
-    // any further growth reds again.
-    // Lowered after extracting the Reliquary-tracker input construction into
-    // makeReliquaryTrackerInput (reliquary_tracker_view.ts), which paid for the
-    // tracker-stack anchor wiring and the window's tracker-visibility deps in
-    // the same change. Exact count, zero slack.
-    // Lowered again (to 19476 on the merged base) after the stale-focus Space
-    // fix (PR #3506) extracted its chrome focus wiring (the tracker drops plus
-    // the panel key-guard loop) into src/ui/chrome_focus_wiring.ts, leaving
-    // hud.ts a one-line consumer (wireChromeFocus($)). The ratchet's own rule:
-    // an extraction lowers the ceiling. Exact merged count, zero slack: any
-    // further growth reds again.
-    // Re-pinned to the eastbrook-plus-v0.40.0 integration merge output: the
+    // Re-pinned 19488 -> 19620 for the Proving Shore tutorial island, a
+    // maintainer decision prepared for PR review: the island's logic lives in
+    // extracted modules (bootcamp.ts + bootcamp_view.ts, noticeboard_popup.ts,
+    // the sim-side credit modules) and hud.ts carries only their drive calls,
+    // the noticeboard event arm, and the vendor-stock hoist the tool-gate
+    // source scan needs. Re-pinned 19620 -> 19623 by the review fixes: the
+    // greeting's island prewarm takes the idle-pace two-call streaming idiom
+    // (three lines). LOWERED 19623 -> 19517 by the v0.39.0 base merge: the
+    // release lowered its own arm to 19387, and the island wiring lands on top
+    // of that smaller file. Exact merged count: any further growth reds again.
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
     // combined tree lands below the branch ceilings, so keep the exact merged
     // count.
-    ceiling: 19097,
+    ceiling: 19232,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -148,136 +128,22 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
-    // keeps the delve tracker and mount prewarm extractions while preserving
-    // the wrapper's later renderer wiring, so the ceiling is the exact
-    // resolved count.
-    // PR #3468 changes the shadow-depth prewarm material contract, but this
-    // wrapper's combined renderer remains at the same resolved count.
-    // Lowered again on the integration branch, which combines three extractions
-    // out of the renderer: the shadow-depth prewarm material factory
-    // (src/render/prewarm_depth_material.ts, PR #3468), the character-visual
-    // pool take/store halves (src/render/characters/pooled_visual_lifecycle.ts,
-    // PR #3473) and the material texture-slot walk
-    // (src/render/material_texture_slots.ts, the streamed-decor reveal gate).
-    // The merged file lands below all three branches' own pins, so the ceiling
-    // is the exact merged count per the ratchet's rule: any growth reds again.
-    // Lowered again by the foliage reveal-gate wiring, which paid for its four
-    // lines by extracting the millisecond rollup into
-    // src/render/frame_ms_stats_core.ts (net -15).
-    // Lowered again by the GPU-preparation admission wiring, which paid for its
-    // lines by extracting the perfStats return-type literal and the renderer's
-    // frame/phase stat shapes into src/render/renderer_perf_stats.ts, so the
-    // report's contract is nameable instead of inline (net -32).
-    // The compile-gate stand-in wiring paid for itself in place: the form/base
-    // visibility fan-out moved to src/render/entity_gate_stand_in_core.ts, which
-    // covers the lines the shapeshift and base-swap stand-ins added (net 0).
-    // Lowered again by the piecewise reveal-gate wiring, which paid for its
-    // soft-deadline binding by extracting the shared reveal compile host
-    // (link, shadow arm, touch tail, learned soft deadline) into
-    // src/render/reveal_compile_host.ts (net -15).
-    // Lowered again by the prewarm slot generalization: the landmark and
-    // weather manifest entries became createPrewarmGroupSlot bindings and the
-    // impact-site prewarm clone moved to its own subsystem module,
-    // buildImpactSitePrewarmGroup in src/render/impact_site.ts (net -2).
-    // Lowered again by the GPU-preparation pacing fixes: three dead type
-    // imports went, and moving the budget's frame boundary into the sync
-    // prologue traded a five-line rationale in the governor for the one that
-    // now sits beside the queue's own noteFrame (net -3).
-    // Lowered again by the live-program telemetry, which paid for its arm by
-    // extracting the renderer's info.programs readouts into
-    // src/render/live_program_watch.ts; the per-draw bracket lives in
-    // frame_present.ts, where the draw is (net -5).
-    // Lowered again when the watch moved onto the injected present host: the
-    // host's placeholder fields went with it (net -1 with the zero-env
-    // prefilter size comment).
-    // Lowered again by the production-named coverage fixes, which paid their
-    // wiring by moving the empty phase-ms fixtures into
-    // renderer_frame_telemetry_core.ts and canvasDataUrlAsync into
-    // canvas_data_url.ts (net -26); the post-effect prewarm lane was then
-    // removed after the bench (its entry never ran inside the boot budget and
-    // resumed live), keeping the extraction (net -24).
-    // The touch tail's readiness threading (the gate result down to
-    // src/render/linked_program_readiness.ts) paid for itself in place: the
-    // single-use compilePriorityFor wrapper folded into the one gate that
-    // called it, the core it delegated to being its whole body (net 0).
-    // Lowered again by the build-ledger instrumentation, which paid for its
-    // producers (timed view and zone feature builds, the arrival mark, the
-    // hitch sample's two new fields) by moving the zone prepare report and its
-    // stat shapes into src/render/zone_prepare_stats.ts and the hitch scratch
-    // factory into scene_census_core.ts (net -1).
-    // Lowered again by the composed-look pieces hold (the live candidate path
-    // consults characters/look_pieces.ts), which paid for its wiring by moving
-    // the zero foliage readout into renderer_frame_telemetry_core.ts beside
-    // the other zero fixtures and the created-view type sampler into
-    // view_candidate_pool_core.ts (net -16).
-    // Lowered again by the gc hitch cause, whose heap read (heap_sample.ts)
-    // paid for its import and sample line by folding the key-light follow
-    // beside it onto its single statement (net -1).
-    // Lowered again by the deferred-decal stand-in (the live candidate path
-    // builds the body without its face decals and attaches them on the
-    // pieces' arrival), which paid for its wiring by moving the mobile
-    // opening render scale into dynamic_resolution_core.ts (net -1).
-    // Lowered again by the compile gate's piece cut (one queue unit per
-    // material group of the target, compile_gate_pieces.ts): the enumeration
-    // and the per-piece work live in that module, and the gate's rationale
-    // comment was rewritten to the design that ships (net -10).
-    // Lowered again by the hitch sample alignment (hitch_frame_align_core.ts:
-    // the start-of-sync reading and the aligned end-of-sync sample), which
-    // paid for its wiring by extracting the perfStats last-frame deep copy
-    // into src/render/renderer_frame_stats_snapshot.ts (net -21).
-    // Lowered again by the compile gate's variant settle
-    // (program_variant_settle.ts, the third piece arm both gates bind), which
-    // paid for its wiring by moving the open-air fog predicate beside the
-    // FogSceneState it classifies (interior_light_rig.ts isOpenAirFogState),
-    // landing with the shadow arm's every-mesh twin swap in the same change
-    // (net -3).
-    // Lowered again when the world gates' touch tail moved behind
-    // linked_program_touch_lane.ts runWorldGateTouchLane (no walk mark, the
-    // unproven walk recorded as a touch-unproven event) (net -2).
-    // The upstream/main merge landed upstream's own growth (the mount-program
-    // prewarm entry, the delve tracker extraction) on top of this branch's
-    // extractions, so the pin is the exact merged count, still lower than
-    // upstream main's own (13744), and any growth reds again.
-    // RAISED 13546 -> 13548 (+2) by the streamed-prewarm branch. A raise, not a
-    // lowering, and stated as one: the branch extracts the compile SUBMIT LOOP
-    // with its deadline rule and never-drop contract
-    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
-    // beside the per-unit submit that module already owned) and the weapon-skin
-    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
-    // beside the stage whose failure boundary shares its unit ids), and those
-    // two extractions still do not quite cover what it adds.
-    //
-    // The history matters because it is the failure mode this ratchet exists to
-    // catch. An earlier revision of this branch reported a NET REDUCTION while
-    // deleting 41 lines of load-bearing comments, 11 blank lines and folding
-    // three `let` declarations into one comma statement: the extractions were
-    // real but the number was bought with formatting. Every comment is restored,
-    // the blank lines are back, the declarations are separate again, and the
-    // count below is what the extractions alone earn. Maintainer decision, and
-    // deliberately a visible +2 rather than an invisible -9.
-    // Re-pinned 13548 -> 13563 (+15) when the fast-loading-screen-variety
-    // branch merged release/v0.40.0 (its rebase onto the release had already
-    // paid this row's zero-slack pin once, at 13561 over the pre-streamed-
-    // prewarm base). The branch's additions here are thin-consumer wiring to
-    // extracted seams: the onCharacterAssetReady subscription plus its
-    // handler, which only enqueues a re-apply for views whose weapon skin GLB
-    // just landed. The substance lives in src/render/characters/assets.ts
-    // (the ready registry) and src/render/characters/visual.ts
-    // (refreshWeaponSkin), so no clean branch-owned extraction remains.
-    // Maintainer decision, exact merged count: any further growth reds again.
-    // Re-pinned 13563 -> 13573 (+10) for the review-fix round: the nearby-view
-    // floor on the shared prewarm budget (the decision lives in
-    // src/render/prewarm_policy.ts portalPrewarmViewBudget and
-    // nearbyPrewarmViewBudget; the renderer carries the two call sites and the
-    // rationale comment) and the weapon-skin early-out in onCharacterAssetReady
-    // (the predicate lives in src/render/characters/assets.ts). Both additions
-    // are thin-consumer wiring to their extracted seams. Exact count, zero
-    // slack: any further growth reds again.
-    // Re-pinned to the eastbrook-plus-v0.40.0 integration merge output: the
+    // Re-pinned 13689 -> 13716 for the Proving Shore tutorial island: the
+    // island's visuals live in extracted modules (quest_beacon_core.ts,
+    // decor_torch_fx.ts) and the renderer carries their hookup, the beacon's
+    // per-frame memo, and the entity-loop sparkle arm. Re-pinned
+    // 13716 -> 13729 by the review fixes: the beacon memo gains its island
+    // rectangle gate and the shared off-island empty set. LOWERED
+    // 13729 -> 13712 by the noob-friendliness pass: the beacon memo, the
+    // sparkle arm, and the new golden-trail hookup all moved out into
+    // island_guidance.ts, leaving two one-line call sites. Re-pinned
+    // 13712 -> 13767 by the v0.39.0 base merge: the release arm sat at 13744
+    // (delve tracker, mount prewarm, shadow-depth prewarm) and the island's
+    // two call sites ride on top of it. Exact merged count.
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
     // combined tree lands below the branch ceilings, so keep the exact merged
     // count.
-    ceiling: 13338,
+    ceiling: 13361,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -287,32 +153,36 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    // Pinned at the exact merged count. This branch's extractions (the blocking
-    // arrival chain into src/game/arrival_warmup.ts, the world-entry settle
-    // cover joining it) net against the base's pad-selection extraction plus
-    // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
-    // landing below both parents' pins. Any further growth reds again.
-    // Re-pinned 11516 -> 11522 (+6) for the fast-loading-screen-variety rebase
-    // onto release/v0.40.0, whose pin above is this file's exact size (zero
-    // slack). The branch is net-extractive here: it MOVES the eager mob-body
-    // stream, far-vista settle and background preload lane out of the entry
-    // path into src/game/post_entry_warmups_core.ts, and the backdrop rotation
-    // into src/ui/loading_backdrop.ts. What is left in main.ts is the call
-    // wiring for both (the controller construction and the runPostEntryWarmups
-    // options object), which is the firewall's job. Maintainer decision, exact
-    // merged count: any further growth reds again.
-    // Re-pinned 11522 -> 11534 (+12) for the review-fix round: the mob-body
-    // stream kick moved from the post-fade callback to the first-paint
-    // checkpoint (kickCharacterPreloadStream, the seam stays in
-    // src/game/post_entry_warmups_core.ts), which costs the call wiring plus
-    // the placement rationale where the reader needs it. Exact count, zero
-    // slack: any further growth reds again.
-    ceiling: 11534,
+    // Re-pinned 11490 -> 11533 for the Proving Shore tutorial island: the
+    // arrival cinematic and teleport camera snap live in src/game/ modules
+    // (arrival_cinematic.ts, teleport_camera.ts, ferry_prewarm.ts) and
+    // main.ts carries their frame-loop and warm-lane wiring. Re-pinned
+    // 11533 -> 11583 by the review fixes: the cinematic step moved out of
+    // maybeWarmCurrentZone into its own frame-loop block (real frameDt, the
+    // look/zoom cancel arms), the ferry warm gained its idle-pace and
+    // hidden-shell arms, the camera snap its origin tracking, and the
+    // greeting hook its reduce-motion gate; all consumers of the extracted
+    // modules, kept here because each needs the frame loop's private state.
+    // Re-pinned 11583 -> 11590 by the v0.39.0 base merge: the release adds
+    // seven lines of its own bootstrap wiring, which auto-merged alongside the
+    // island's. Exact merged count.
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
+    // combined tree lands below the branch ceilings, so keep the exact merged
+    // count.
+    ceiling: 11621,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
     file: 'server/game.ts',
-    ceiling: 10650,
+    // Re-pinned 10900 -> 10909 for the Proving Shore branch: the +9 is the
+    // tutorial_start dispatch case (a thin delegate onto sim.startTutorial,
+    // where the real gates live) and the firstCharacter field on the join
+    // meta plumb; the island's ferry and greeting logic itself lives in sim
+    // modules. Exact merged count.
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
+    // combined tree lands below the branch ceilings, so keep the exact merged
+    // count.
+    ceiling: 10655,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

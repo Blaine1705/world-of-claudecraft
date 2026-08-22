@@ -166,6 +166,19 @@ import {
 import { PRACTICE_DUMMY_CAMPS, PRACTICE_DUMMY_MOBS } from './content/practice_dummies';
 import { STATIONS } from './content/professions';
 import {
+  PROVING_SHORE_CAMPS,
+  PROVING_SHORE_ITEMS,
+  PROVING_SHORE_MOBS,
+  PROVING_SHORE_NPCS,
+  PROVING_SHORE_OBJECTS,
+  PROVING_SHORE_PORTALS,
+  PROVING_SHORE_PROPS,
+  PROVING_SHORE_QUEST_ORDER,
+  PROVING_SHORE_QUESTS,
+  PROVING_SHORE_ROADS,
+  PROVING_SHORE_ZONE,
+} from './content/proving_shore';
+import {
   REALM_CAMPS,
   REALM_ITEMS,
   REALM_MOBS,
@@ -355,6 +368,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
 );
 
@@ -387,6 +401,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...EVERGARDEN_MOBS,
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
+  ...PROVING_SHORE_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and
@@ -415,6 +430,9 @@ export const NPCS: Record<string, NpcDef> = {
   ...EVERGARDEN_NPCS,
   ...GALECREST_NPCS,
   ...FARSHORE_NPCS,
+  // The Proving Shore cast (tutorial island) appends after every shipped NPC
+  // for the same insertion-order stability reason as the realms above.
+  ...PROVING_SHORE_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
@@ -441,6 +459,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...EVERGARDEN_QUESTS,
   ...GALECREST_QUESTS,
   ...FARSHORE_QUESTS,
+  ...PROVING_SHORE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -459,6 +478,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...PROVING_SHORE_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -508,12 +528,19 @@ export const CAMPS: CampDef[] = [
   // The Drakelands dragonkin brood belt (v0.35 rework) arrived after the
   // knights: same append-last rule, so every camp above keeps its draws.
   ...DRAKELANDS_BROOD_CAMPS,
-  // The Highwatch practice row (content/practice_dummies.ts) is last of all,
-  // same append-last rule. These three draw no world-gen rng at all (the spawn
+  // The Highwatch practice row (content/practice_dummies.ts) follows, same
+  // append-last rule. These three draw no world-gen rng at all (the spawn
   // loop's dummy branch is rng-free), so they cannot move an earlier camp even
   // in principle; they sit here so the array's one ordering rule has no
   // exceptions to remember.
   ...PRACTICE_DUMMY_CAMPS,
+  // The Proving Shore's camps are all offStream (private rng sub-streams), so
+  // their position in this array cannot shift any earlier camp's SHARED-STREAM
+  // draws; they still append LAST by the standing rule. Entity ids after the
+  // camps loop DO shift (+1 per new construction-time entity), so id-seeded
+  // private streams (mob/idle_rng.ts) move: a content append like this one
+  // legitimately re-mints the parity goldens without touching a draw digest.
+  ...PROVING_SHORE_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
@@ -541,6 +568,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...EVERGARDEN_OBJECTS,
   ...GALECREST_OBJECTS,
   ...FARSHORE_OBJECTS,
+  ...PROVING_SHORE_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
@@ -567,6 +595,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...EVERGARDEN_ROADS,
   ...GALECREST_ROADS,
   ...FARSHORE_ROADS,
+  ...PROVING_SHORE_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -581,6 +610,7 @@ export const PORTALS: PortalDef[] = [
   ...EVERGARDEN_PORTALS,
   ...GALECREST_PORTALS,
   ...FARSHORE_PORTALS,
+  ...PROVING_SHORE_PORTALS,
 ];
 
 export const PROPS: ZonePropsDef = mergeProps([
@@ -599,6 +629,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   EVERGARDEN_PROPS,
   GALECREST_PROPS,
   FARSHORE_PROPS,
+  PROVING_SHORE_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -680,6 +711,7 @@ export const ZONES: ZoneDef[] = [
   EVERGARDEN_ZONE,
   GALECREST_ZONE,
   FARSHORE_ZONE,
+  PROVING_SHORE_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // the original strip's width (one grid column)

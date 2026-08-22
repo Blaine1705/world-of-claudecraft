@@ -2698,7 +2698,9 @@ export async function bankBonusFactsForAccount(accountId: number): Promise<BankB
             AND EXISTS(
               SELECT 1 FROM characters c
               WHERE c.account_id = r.referee_account_id AND c.level >= 10
-            )) AS qualified_referrals
+            )) AS qualified_referrals,
+       (SELECT count(*)::int FROM characters cc
+          WHERE cc.account_id = $1) AS character_count
      FROM accounts a
      WHERE a.id = $1`,
     [accountId],
@@ -2709,6 +2711,7 @@ export async function bankBonusFactsForAccount(accountId: number): Promise<BankB
     discordLinked: !!row?.discord_linked,
     walletLinked: !!row?.wallet_linked,
     qualifiedReferrals: row?.qualified_referrals ?? 0,
+    characterCount: row?.character_count ?? 0,
   };
 }
 

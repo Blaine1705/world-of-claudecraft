@@ -58,6 +58,7 @@ import {
   TRIGGER_THRESHOLD,
 } from './gamepad_map';
 import type { Input } from './input';
+import { markPadActivity } from './input_hint_mode';
 import { focusedPadAction } from './pad_focus_action';
 import { clickPadMouse, hidePadMouse, updatePadMouse } from './pad_mouse_cursor';
 
@@ -557,6 +558,15 @@ export class GamepadManager {
     // Once per poll, never once per edge: the shell only needs to hear that the
     // player is there, and the notifier throttles anyway.
     if (acted) this.cb.onActivity?.();
+
+    // Real pad input this frame flips on-screen hint text to gamepad phrasing
+    // (input_hint_mode.ts); a key or mouse press flips it back.
+    if (
+      cur.some(Boolean) ||
+      Math.max(Math.abs(lx), Math.abs(ly), Math.abs(rx), Math.abs(ry)) > this.deadzone
+    ) {
+      markPadActivity();
+    }
 
     this.prevPressed = cur;
   }

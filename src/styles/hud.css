@@ -428,7 +428,11 @@
     max-width: 420px;
     box-sizing: border-box;
     pointer-events: auto;
-    background: var(--panel-bg);
+    /* Pinned literals, deliberately NOT var(--panel-bg): the coach card must
+       read as the SAME box for every player, scene, and UI theme (playtests
+       flagged the themeable token rendering it dark in one shot and grey in
+       the next), and near-opaque so the backdrop cannot restyle it. */
+    background: linear-gradient(170deg, #15151ffa 0%, #0b0b12fa 60%, #08080dfa 100%);
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow:
@@ -475,6 +479,35 @@
     font-weight: 600;
     color: var(--gold-dim);
   }
+  /* Ferryman Odo's caption row (bootcamp.ts showCaption): the on-screen half
+     of a guide voice line, shown under the card body for a few seconds. */
+  .tut-voice {
+    margin-top: 8px;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--gold-dim);
+  }
+  /* The bootcamp card's on-screen keycap chips (bootcamp.ts): the physical
+     keys the current lesson asks for, drawn as caps under the body copy. */
+  .tut-keys {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .tut-keycap {
+    background: linear-gradient(180deg, #2c2c35, #15151c);
+    border: 1px solid #4a4a58;
+    border-bottom-width: 3px;
+    border-radius: 4px;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1;
+    padding: 5px 8px 4px;
+    min-width: 14px;
+    text-align: center;
+  }
   .tut-next-tips {
     margin: 0;
     padding: 0;
@@ -517,6 +550,52 @@
     outline: 2px solid var(--gold);
     outline-offset: 2px;
   }
+  /* While the island coach card is up (bootcamp.ts toggles bc-coach-up on
+     body), the quest dialog opens BELOW the card instead of at its default
+     10vh, so an NPC's dialogue never covers the lesson. Desktop only: the
+     mobile sheet layout owns its own quest-dialog pin. */
+  body.bc-coach-up:not(.mobile-touch) #quest-dialog {
+    /* 235px is the coach card family's tallest rendered height plus its top
+       margin (the three-line lesson card). Clamped against the JS-synced app
+       viewport (--app-vh, the tree's clamp idiom in layout.css), never raw
+       vh, and capped at 40% of it so a short landscape window can never push
+       the dialog's buttons below the fold. */
+    top: clamp(calc(var(--app-vh, 100vh) * 0.1), 235px, calc(var(--app-vh, 100vh) * 0.4));
+  }
+  /* The guild-signpost popup (noticeboard_popup.ts): the tutorial card
+     family's chrome, centered rather than top-pinned, one block per posted
+     notice. */
+  .tut-card.nb-popup {
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 380px;
+    animation: none;
+  }
+  .nb-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(var(--app-vh, 100vh) * 0.5);
+    overflow-y: auto;
+  }
+  .nb-item {
+    border: 1px solid #ffffff14;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #00000022;
+  }
+  .nb-guild {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .nb-note {
+    margin-top: 3px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #d8d0bc;
+  }
   .tut-arrow {
     position: absolute;
     left: 0;
@@ -536,6 +615,71 @@
   .tut-arrow .ui-icon {
     width: 30px;
     height: 30px;
+  }
+  /* The island coach's floating interact bubble (bootcamp.ts updatePrompt):
+     a keycap chip plus a one-word verb over the current target, visible only
+     inside interact reach. Sibling of .tut-arrow: absolute in #ui, painter
+     positioned, never interactive. */
+  .tut-prompt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    transform: translate(-50%, -100%);
+    pointer-events: none;
+    background: linear-gradient(170deg, #15151ff2 0%, #0b0b12f2 100%);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    box-shadow:
+      0 0 12px #ffc86055,
+      0 4px 14px #000a;
+    padding: 6px 10px;
+    color: #e8e2d0;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 21;
+    animation: tut-pulse 1100ms ease-in-out infinite;
+  }
+  .tut-prompt .tut-keycap {
+    font-size: 13px;
+    padding: 4px 7px 3px;
+  }
+  .tut-prompt-chips {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  /* The word between sequenced keycaps ("D then W"): quiet, lowercase, never
+     mistaken for a key itself. */
+  .tut-keycap-then {
+    font-size: 11px;
+    font-weight: 400;
+    color: #b8ad8e;
+    padding: 0 2px;
+    text-shadow: 0 1px 2px #000;
+  }
+  .tut-keys {
+    align-items: center;
+  }
+  .tut-prompt-verb {
+    text-shadow: 0 1px 2px #000;
+  }
+  /* The movement lessons' screen-anchored variant: no world target to stand
+     on, so the bubble sits low-center above the action bar where the hands
+     already look. Overrides the world-anchored transform. */
+  .tut-prompt.tut-prompt-center {
+    left: 50%;
+    top: auto;
+    bottom: 26%;
+    transform: translateX(-50%);
+    font-size: 15px;
+  }
+  .tut-prompt.tut-prompt-center .tut-keycap {
+    font-size: 16px;
+    padding: 6px 10px 5px;
   }
   @keyframes tut-in {
     from {
@@ -561,6 +705,9 @@
       animation: none;
     }
     .tut-arrow {
+      animation: none;
+    }
+    .tut-prompt {
       animation: none;
     }
   }

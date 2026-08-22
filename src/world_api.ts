@@ -600,6 +600,11 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // The tutorial greeting's accept: the ferry ride to the Proving Shore
+  // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
+  // life, and band server-side). Appended because wire tokens are never
+  // reordered.
+  'tutorial_start',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

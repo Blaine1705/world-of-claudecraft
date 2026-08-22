@@ -13,6 +13,57 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.promptAttack': '攻击',
+  'hudChrome.bootcamp.keycapThen': '然后',
+  'hudChrome.bootcamp.promptSummon': '召唤',
+  'hudChrome.bootcamp.taskPearlBody':
+    '沿着金色路径走到沙滩最西端的潮池。站在水边，按 {bagsKey} 打开背包，用鼠标左键点击咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，对着它的蟹壳按 {interactKey}，取走莹润珍珠。',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '沿着金色路径走到沙滩最西端的潮池。站在水边，打开背包点按咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，点按它的蟹壳，取走莹润珍珠。',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '沿着金色路径走到沙滩最西端的潮池。站在水边，打开背包选择咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，对着它的蟹壳按下互动键，取走莹润珍珠。',
+  'hudChrome.bootcamp.ringEquipTitle': '戴上你的战利品',
+  'hudChrome.bootcamp.ringEquipBody':
+    '珍珠之母就在你的背包里。按 {bagsKey} 打开背包，然后用鼠标左键点击戒指，把它戴上手指。',
+  'hudChrome.bootcamp.ringEquipBodyTouch': '珍珠之母就在你的背包里。打开背包，点按戒指把它戴上手指。',
+  'hudChrome.bootcamp.ringEquipBodyPad': '珍珠之母就在你的背包里。打开背包，选择戒指把它戴上手指。',
+  'hudChrome.bootcamp.ringAdmireTitle': '瞧瞧你',
+  'hudChrome.bootcamp.ringAdmireBody':
+    '很衬你。按 {charKey} 打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    '很衬你。从菜单打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    '很衬你。从菜单打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。',
+  'entities.mobs.mister_crabs.name': '螃蟹先生',
+  'entities.items.ps_briny_lure.name': '咸水诱饵',
+  'entities.items.ps_lustrous_pearl.name': '莹润珍珠',
+  'entities.items.mother_of_pearl.name': '珍珠之母',
+  'entities.quests.q_ps_mother_of_pearl.title': '珍珠之母',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '三只蟹壳都敲开了，{playerName}。但沉船线上还有一位王，他守着的宝贝比这片沙滩上所有木箱加起来还值钱。带上这枚咸水诱饵，穿过残骸，去沙滩最西端的潮池。站在水边，按 B 打开背包，用鼠标左键点击诱饵，把他唤醒。螃蟹先生的钳子比他那些小个子亲戚狠得多，盯紧你的生命条，别停下攻击，喘不过气就沿着沙滩往后退。等他倒下，走到他的蟹壳前直到名字浮现，按 F 或用左键点击，取走他攥着的莹润珍珠。把那颗珍珠带回来给我。',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '莹润珍珠，还是从浅滩老王自己身上撬下来的。我父亲干活的每个清晨都会对那只螃蟹脱帽致意；该给的敬意总要给。别动... 好了。穿好线，镶好座，归你了，{playerName}：珍珠之母。按 B 打开背包，用左键点击戒指戴上它，再按 C 打开角色面板，看看它戴在你手上的样子。小小一件东西，戴上它，你的每一分都会更强。',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': '击败螃蟹先生',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '取得莹润珍珠',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '走到一个草人跟前，按 {targetKey}，或者用鼠标左键点击它，把它设为目标。然后按 {attackKey}，或者点击动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '走到一个草人跟前，按下目标键把它设为目标。然后按下第二个动作键，施放你的法术。一直施放到一个散架为止。',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '掠蟹是会回击的。按 {targetKey}，或者用鼠标左键点击一只，把它设为目标，然后按 {attackKey} 施放法术，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '掠蟹是会回击的。点按一只把它设为目标，然后点按动作条上的第二个按钮施放法术，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '掠蟹是会回击的。按下目标键，再按下第二个动作键施放法术，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.voiceGraduate': '钟为你敲响了。海那头的东溪正等着你，你也准备好了。',
+  'hudChrome.bootcamp.voiceVeerOff': '慢着，朋友，走反了。金色路径在你身后呢。',
+  'hudChrome.bootcamp.voiceStationDoneB': '你越来越上手了，错不了。',
+  'hudChrome.bootcamp.voiceStationDoneA': '干得好。往下一处去吧，路已经为你点亮了。',
+  'hudChrome.bootcamp.voiceRunDone': '跑得干净利落。奖赏在监工佩尔那里，去领吧。',
+  'hudChrome.bootcamp.voiceFirstFlag': '过了一面旗了。腿别停，还剩两面。',
+  'hudChrome.bootcamp.voiceArrival': '平安上岸啦，朋友。看见脚下这条金色路径了吗？它比我还认得路，跟着走就是。',
   'hudChrome.lastkeepMap.title': '{keep}：{story}',
   'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': '狼形态',
@@ -8231,6 +8282,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': '积分不足。',
   'hudChrome.mailbox.title': '邮箱',
   'hudChrome.noticeboard.empty': '看起来没有张贴任何内容。',
+  'hudChrome.noticeboard.popupTitle': '公会告示柱',
+  'hudChrome.noticeboard.close': '关闭',
   'hudChrome.mailbox.subtitle': '渡鸦邮驿',
   'hudChrome.mailbox.close': '关闭邮箱',
   'hudChrome.mailbox.tabInbox': '收件箱',
@@ -12670,6 +12723,218 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '不可用',
   'hudChrome.perf.diagnostics.report.status.critical': '严重',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '这张面孔我可没见过，朋友。在这片土地上，初次踏上冒险之路的人照传统都会去试炼之滨走一趟，那是海峡对面的一座安静小岛。在那里你可以先磨练身手、熟悉这个世界，再去迎接它的挑战。渡船来回都通，去或不去都没人会小看你。',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '又换了一副新面孔回来了？那你知道该怎么做。不过，出发前若想温习一遍，试炼之滨从不拒绝回炉的学生，渡船随时候着你。',
+  'hudChrome.tutorialGreeting.play': '进行新手教学',
+  'hudChrome.tutorialGreeting.skip': '跳过新手教学',
+  'hudChrome.tutorialGreeting.declineNote':
+    '随你的意，朋友。哪天改了主意，鸦邮信箱旁的渡船铃随时都能送你去试炼之滨，不分昼夜。狼群不等人，它等。',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '刚下渡船吗？欢迎来到试炼之滨。看守塔姆就在你正前方的海滩上守着试炼跑道：走到他跟前，直到他的名字显示出来，然后按 F，或者用鼠标左键点击他，他的跑道会把你双腿该会的都教给你。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
+  'hudChrome.tutorialGreeting.noteClose': '明白了',
+  'hudChrome.bootcamp.title': '最初的脚步',
+  'hudChrome.bootcamp.talkTitle': '与看守塔姆交谈',
+  'hudChrome.bootcamp.talkBody':
+    '看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击他，与他交谈：他会给你安排这趟跑道。',
+  'hudChrome.bootcamp.talkBodyTouch':
+    '看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后点按他，或点按使用按钮，与他交谈：他会给你安排这趟跑道。',
+  'hudChrome.bootcamp.talkBodyPad':
+    '看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后按下互动键与他交谈：他会给你安排这趟跑道。',
+  'hudChrome.bootcamp.forwardTitle': '走过第一条跑道',
+  'hudChrome.bootcamp.forwardBody':
+    '走进塔姆身旁的跑道，按住 {forwardKey}，沿跑道向西走到旗帜处。',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    '走进塔姆身旁的跑道，把移动摇杆推向上方，沿跑道向西走到旗帜处。',
+  'hudChrome.bootcamp.forwardBodyPad':
+    '走进塔姆身旁的跑道，把左摇杆推向上方，沿跑道向西走到旗帜处。',
+  'hudChrome.bootcamp.turnwalkTitle': '转身，再走',
+  'hudChrome.bootcamp.turnwalkBody':
+    '第一面旗到手。按住 {turnKey} 原地转身，直到正对向南延伸的围栏跑道，然后再次按住 {forwardKey}，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '第一面旗到手。用手指拖动世界画面（不是移动摇杆）来转身，直到正对向南延伸的围栏跑道，然后把摇杆推向上方，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '第一面旗到手。推动右摇杆转身，直到正对向南延伸的围栏跑道，然后把左摇杆推向上方，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.strafeTitle':
+    '转身，然后前进',
+  'hudChrome.bootcamp.strafeBody':
+    '只剩最后一个弯。按住 {turnLeftKey} 原地转身，直到正对最后一条跑道，然后再次按住 {forwardKey}，一直走到红旗被你甩在身后。',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '只剩最后一个弯。用手指划动画面（不是移动摇杆）转身，直到正对最后一条跑道，然后把摇杆上推，一直走到红旗被你甩在身后。',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '只剩最后一个弯。推动右摇杆转身，直到正对最后一条跑道，然后把左摇杆上推，一直走到红旗被你甩在身后。',
+  'hudChrome.bootcamp.cameraTitle': '转动视角',
+  'hudChrome.bootcamp.cameraBody':
+    '交上成绩之前还有最后一课：按住鼠标右键并拖动，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '交上成绩之前还有最后一课：用手指拖动世界画面，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '交上成绩之前还有最后一课：推动右摇杆，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
+  'hudChrome.bootcamp.courseProgress': '旗帜 {current}/{total}',
+  'hudChrome.bootcamp.doneTitle': '跑完全程',
+  'hudChrome.bootcamp.doneBody':
+    '腿上的功夫就这些了。监工佩尔就站在红旗旁边：对着他按 {interactKey}，或者用鼠标左键点击他，交上你的成绩，领取你的第一份报酬。',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '腿上的功夫就这些了。监工佩尔就站在红旗旁边：点按他，交上你的成绩，领取你的第一份报酬。',
+  'hudChrome.bootcamp.doneBodyPad':
+    '腿上的功夫就这些了。监工佩尔就站在红旗旁边：按下互动键，交上你的成绩，领取你的第一份报酬。',
+  'hudChrome.bootcamp.coachNextTitle': '下一位：{npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后按 {interactKey}，或者用鼠标左键点击对方，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后点按对方，或点按使用按钮，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后按下互动键，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachTaskBody':
+    '沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就按 {mapKey} 打开地图。',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就点按地图按钮看路。',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就按下地图按钮看路。',
+  'hudChrome.bootcamp.coachReadyTitle': '差事办妥',
+  'hudChrome.bootcamp.coachReadyBody':
+    '前往{npc}身边，按 {interactKey}，或者用鼠标左键点击对方，交上差事，领取报酬。',
+  'hudChrome.bootcamp.coachReadyBodyTouch': '前往{npc}身边，点按对方，交上差事，领取报酬。',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '前往{npc}身边，按下互动键，交上差事，领取报酬。',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '走到一个草人跟前，按 {targetKey}，或者用鼠标左键点击它，把它设为目标。然后按 {attackKey}，或者点击动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '走到一个草人跟前，按下目标键把它设为目标。然后按下第一个动作键，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskShellBody':
+    '掠蟹是会回击的。按 {targetKey}，或者用鼠标左键点击一只，把它设为目标，然后按 {attackKey} 挥刀，不停攻击。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '掠蟹是会回击的。点按一只把它设为目标，然后点按动作条上的第一个按钮挥刀。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '掠蟹是会回击的。按下目标键，再按下第一个动作键挥刀。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击货箱，把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后点按货箱，或点按使用按钮，把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按下互动键把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskPouchBody':
+    '对着{npc}按 {interactKey}，或者用鼠标左键点击对方，打开货摊，然后用鼠标左键点击亚麻小袋买下它。',
+  'hudChrome.bootcamp.taskPouchBodyTouch': '点按{npc}打开货摊，然后点按亚麻小袋买下它。',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '对着{npc}按下互动键打开货摊，然后选中亚麻小袋买下它。',
+  'hudChrome.bootcamp.readyPouchBody':
+    '小袋已买下。按 {bagsKey} 打开背包，用鼠标左键点击亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按 {interactKey}，把小袋亮给对方看。',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    '小袋已买下。打开背包，点按亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，点按对方，把小袋亮给对方看。',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    '小袋已买下。打开背包，选中亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按下互动键，把小袋亮给对方看。',
+  'hudChrome.bootcamp.bellTitle': '敲响渡船铃',
+  'hudChrome.bootcamp.bellBody':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，按 {interactKey}，或者用鼠标左键点击它，扬帆前往东溪镇。',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，点按它，扬帆前往东溪镇。',
+  'hudChrome.bootcamp.bellBodyPad':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，按下互动键，扬帆前往东溪镇。',
+  'entities.zones.proving_shore.pois.4.label': '试炼跑道',
+  'entities.items.ps_castaway_crate.name': '漂流货箱',
+  'entities.items.ps_ferry_bell.name': '渡船铃',
+  'entities.mobs.training_effigy.name': '训练草人',
+  'entities.mobs.shore_scuttler.name': '滩涂掠蟹',
+  'entities.npcs.wayfarer_bryn.name': '旅人布琳',
+  'entities.npcs.wayfarer_bryn.title': '港口向导',
+  'entities.npcs.wayfarer_bryn.greeting':
+    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：鸦邮信箱旁的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。',
+  'entities.npcs.instructor_maren.name': '教官玛伦',
+  'entities.npcs.instructor_maren.title': '试炼导师',
+  'entities.npcs.instructor_maren.greeting':
+    '谷地感激过的每一位英雄，都曾站在你现在站的地方，{className}，而且当时没有一个人分得清剑该握哪头。这片海滨就是为此而设。尽管问，尽管练，在失败不要紧的地方尽管失败。',
+  'entities.npcs.quartermaster_finch.name': '军需官芬奇',
+  'entities.npcs.quartermaster_finch.title': '营地补给商',
+  'entities.npcs.quartermaster_finch.greeting':
+    '我的柜台只卖一样东西，{playerName}：一只装路上零碎的备用小袋，等课业用得着它的时候才卖。这里其余的都是要运回谷地的打捞货。铜板能买下小袋，而铜板要靠干活挣来。这就是全部的经济学，它永远不会变得更复杂。只会变得更大。',
+  'entities.npcs.ferryman_odo.name': '渡船人奥多',
+  'entities.npcs.ferryman_odo.title': '渡口看守',
+  'entities.npcs.ferryman_odo.greeting':
+    '刚下渡船吗，{playerName}？看守塔姆就在码头正南的海滩上守着试炼跑道：先去跑一趟他的跑道，你的双腿会感谢你的。这片海滨的每一位看守都会在你办完差事后把你交给下一位，屏幕顶端的那张卡片永远知道下一步该往哪儿走。等谷地召唤你回去时，敲响立在我码头旁的那口铃，渡航会把你送到东溪镇上。',
+  'entities.npcs.warden_tam.name': '看守塔姆',
+  'entities.npcs.warden_tam.title': '试炼跑道的看守',
+  'entities.npcs.warden_tam.greeting':
+    '这几条跑道就是试炼跑道，{playerName}，谷地敬重的每一位冒险者都跑过它。栏杆上的灯柱整夜不灭，跑道从不打烊。',
+  'entities.npcs.overseer_pell.name': '监工佩尔',
+  'entities.npcs.overseer_pell.title': '试炼跑道监工',
+  'entities.npcs.overseer_pell.greeting':
+    '每一趟从这几条跑道下来的成绩都由我掐表，{playerName}，比这难看得多的脚步我也见过。我身后的路通往练武场：脚上功夫变成剑上功夫，就在那里。',
+  'entities.npcs.drillmaster_rook.name': '操练官鲁克',
+  'entities.npcs.drillmaster_rook.title': '练武场主管',
+  'entities.npcs.drillmaster_rook.greeting':
+    '先打稻草，再打壳，{playerName}。草人教你的手臂怎么挥刀；海滩那头的掠蟹教它落在一个会计较的对象身上。',
+  'entities.npcs.tidewarden_nel.name': '守潮人奈尔',
+  'entities.npcs.tidewarden_nel.title': '海滩的看守',
+  'entities.npcs.tidewarden_nel.greeting':
+    '潮水会拿走，潮水也会偿还，{playerName}。这两笔账都由我来记：掠蟹从残骸里夹走的，和诚实的双手沿这条路扛上来的。',
+  'entities.quests.q_ps_the_gauntlet.title': '跑过试炼跑道',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '谷地敬重的每一双腿，都是先从这几条跑道跑出来的，{playerName}。沿第一条跑道向西走到旗帜处，原地转过身来，沿南边的跑道走到第二面旗，最后沿末尾的跑道横移到红旗处。旗帜要按顺序经过；屏幕上方的卡片会随时告诉你该按哪个键。监工佩尔在跑道尽头掐着每一趟的表：等红旗被你甩在身后，他就站在那里等着收你的成绩。',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '这一趟我掐了表，{playerName}，比你脚快的人我也刷下去过。试炼跑道是你的了。我身后的路通往练武场，操练官鲁克在那里把脚上功夫变成剑上功夫：你的下一件差事在他手里。',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': '经过试炼跑道旗帜',
+  'entities.npcs.bursar_wick.name': '司库威克',
+  'entities.npcs.bursar_wick.title': '镀金保险箱',
+  'entities.npcs.bursar_wick.greeting':
+    '镀金保险箱连这里也设了一张桌子，{playerName}。凡是存到我这里的东西，都躺在每座城镇每位司库身后的同一座金库里，狼咬不着，水泡不着，连你自己的糊涂决定也碰不着。',
+  'entities.quests.q_ps_strike_true.title': '击中要害',
+  'entities.quests.q_ps_strike_true.text':
+    '练完了脚，该练手臂了，{playerName}。练武场就在我身后沿路而上的地方，那里的草人生来就是挨打的。要是找不着路，按 M 打开地图：你身上的每件差事都会标在上面。走到一个草人跟前，按 Tab 或用鼠标左键点击它，把它设为目标，然后按 1，或者点击屏幕底部动作条上的第一个图标，挥出这一刀。一直打到一个散架为止；它不会还手，草人从来不还手。操练官鲁克在练武场西侧、通往海滩的小路启程的地方看着场子：对着他按 F，交上这份战果。',
+  'entities.quests.q_ps_strike_true.completion':
+    '干净利落的一击，手也已经稳多了。记住这种感觉，{playerName}：选定目标，挥刀，然后一直打下去。稻草挨打从不计较。你下一个挥刀的对象可就计较了。',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '击倒训练草人',
+  'entities.quests.q_ps_shell_and_claw.title': '甲壳与利螯',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '稻草从不计较，{playerName}，所以给你找个计较的。滩涂掠蟹正在远滩的沉船滩上翻拣残骸：从我的练武场沿小路向西走，它会一直把你领到它们跟前。它们会夹回来，所以盯着你的生命条，别停下挥刀：用 Tab 或鼠标左键选定一只，按 1，打到它的壳裂开为止。三只就够。然后沿路爬上北边的坡：守潮人奈尔管着海滩的账，你的蟹壳她都记数。',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '敲开三只壳，十根手指一根没少：头一仗打得不赖，{playerName}。掠蟹从残骸里夹走东西的速度，比潮水送来的还快，所以你每除掉一只，就有人多保住一枚铜板。',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '除灭滩涂掠蟹',
+  'entities.quests.q_ps_the_wreck_line.title': '沉船滩',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '我的搬运工把海货从旧沉船上卸下来，沿坡道扛往晨憩营地，{playerName}，可半数货箱从来到不了坡顶：它们被搁在路边，就此没人记得。沿我这条路朝营地走，你正好会从这些落单的货箱旁边经过。开箱很简单：走到货箱跟前，直到它的名字显示出来，然后按 F，或者用鼠标左键点击货箱本身，它就会把里面的东西交出来。开六只就能清完这条线，并且记住：你今后遇到的每一只箱子、每一处采集点、每一道门扉，用的都是同一个 F 键。军需官芬奇守着营地的货摊，残骸海货连一根木棍都收：把这批货交给她。',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    '绳子、焦油，还有半轮大海竟然放过的奶酪：我全要了，{playerName}。一副肯弯腰扛货的脊背，对这座营地来说比任何刀剑都值钱，而你这一趟就把整条线清了个干净。',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '开启漂流货箱',
+  'entities.quests.q_ps_pouch_and_purse.title': '钱囊与背袋',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    '去谷地之前还有最后一课，{playerName}，也是保住冒险者性命的一课：你随身带的东西。你的背包有十六格，旁边还空着四个袋扣；每系上一只袋子，它的空间就并入总容量。所以：再对我按一次 F，打开我的货摊，在我的货品里用鼠标左键点击亚麻小袋买下它，然后按 B 打开背包，再用鼠标左键点击袋中的亚麻小袋，把它系进一个空着的袋扣。教官玛伦就在东边几步外的集合篝火旁操练：把你腰带上的小袋给她看看。',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    '好袋子。要是还没系上，现在就系：按 B 打开背包，用鼠标左键点击小袋，把它系进一个空着的袋扣，多出的六格就归你装麻烦了。接下来是任何袋子都装不下的另一半课，{playerName}：背不下的，交给镀金保险箱。司库威克的保险箱桌就设在西边沿路而上的地方，他为你打开的正是每座城镇每位司库共用的同一座金库；等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '购买亚麻小袋',
+  'entities.quests.q_ps_the_signpost.title': '风中传信',
+  'entities.quests.q_ps_the_signpost.text':
+    '还剩最后一个习惯要学，{playerName}，而且用不着刀剑：读告示板。公会告示柱就立在营地大门口，离我的篝火西南边几步远，公会和过路的队伍都把召集令贴在上面。走到柱面跟前，按 F，或者用鼠标左键点击它，读一读贴着的内容，然后回来告诉我风里捎来了什么。你今后走进的每一座城镇，都立着一块这样的告示板。',
+  'entities.quests.q_ps_the_signpost.completion':
+    '这下你知道消息在谷地里是怎么传的了，{playerName}：不靠信使，靠告示板。每过一座城镇都去看看；半数冒险的开头，不过是板上三行墨字。',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': '读过公会告示柱',
+  'entities.quests.q_ps_set_sail.title': '扬帆起航',
+  'entities.quests.q_ps_set_sail.text':
+    '这片海滨上已经没有你没跑过、没打倒过、没打开过、没买下过的东西了，{playerName}。你准备好了，而东溪谷有真正的差事在等着。沿海滨大道走回码头，对着渡船人奥多按 F，告诉他，就说是我说的，你挣到了这趟航程。什么时候记不清自己欠了谁什么，随时按 L：那是你的任务日志。',
+  'entities.quests.q_ps_set_sail.completion':
+    '玛伦这么说了？能从一个曾让我练了一星期系缆绳的女人嘴里说出来，这可是极高的评价。等你准备好了就敲响立在我码头旁的那口铃，{playerName}，渡航会把你送到东溪镇的正中央。当心狼群。',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '向渡船人奥多报到',
+  'entities.zones.proving_shore.name': '试炼之滨',
+  'entities.zones.proving_shore.welcome':
+    '试炼之滨对你别无所求，只求时间。熟悉营地，砍倒草人，走一趟沉船滩，等你准备好了，渡船人奥多会送你过海去谷地。',
+  'entities.zones.proving_shore.pois.0.label': '晨憩营地',
+  'entities.zones.proving_shore.pois.1.label': '旧码头',
+  'entities.zones.proving_shore.pois.2.label': '练武场',
+  'entities.zones.proving_shore.pois.3.label': '沉船滩',
+  'guide.home.world.provingName': '试炼之滨',
+  'guide.home.world.provingBlurb': '海峡对面一座安静的训练之岛，新冒险者在谷地对他们提出任何要求之前，先在这里站稳脚跟。',
+  'guide.worldPage.provingBlurb':
+    '谷地海峡对面的一座安静小岛，被辟为训练场：一处营地、一片练武场、一段布满残骸的海滩，还有一班双向通行的渡船。',
+  'guide.worldPage.provingGreeting': '谷地感激过的每一位英雄，都曾站在你现在站的地方，而且当时没有一个人分得清剑该握哪头。',
+  'guide.worldPage.provingGreeter': '教官玛伦，晨憩营地',
+  'guide.worldPage.provingPlaceNotes':
+    '晨憩营地是岛上唯一的聚居点：几顶帐篷、一个货摊和一堆集合篝火。旧码头面向谷地，渡送法阵从那里送毕业生跨过海峡；营地以南的练武场为任何需要的人立着稻草人；沉船滩则是潮水用漂流货箱付账的那段满是残骸的海岸。',
   'hudChrome.perf.diagnostics.report.status.healthy': '正常',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':

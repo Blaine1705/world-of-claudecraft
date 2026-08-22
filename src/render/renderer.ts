@@ -230,6 +230,7 @@ import {
   usesLiveDayNightLighting,
   warmDuskGrade,
 } from './day_night_core';
+import { buildDecorTorchFx, type DecorTorchFxView } from './decor_torch_fx';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { DelveInteriorTracker } from './delve_interior_tracker';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
@@ -357,6 +358,7 @@ import {
   type FogSceneState,
   isOpenAirFogState,
 } from './interior_light_rig';
+import { IslandGuidance } from './island_guidance';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -534,6 +536,7 @@ import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
+
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -1561,6 +1564,9 @@ export class Renderer {
   private streetlamps: StreetlampsView | null = null;
   private emberPools: EmberPoolsView | null = null;
   private campBraziers: CampBraziersView | null = null;
+  private decorTorchFx: DecorTorchFxView | null = null;
+  // The island rail's guidance coordinator (beacon fizz + golden trail).
+  private islandGuidance!: IslandGuidance;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
   // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
@@ -2602,6 +2608,13 @@ export class Renderer {
     this.attachZoneFeature(this.campBraziers);
     for (const flame of this.campBraziers.flames) flame.matrixAutoUpdate = true;
     this.flames.push(...this.campBraziers.flames);
+    // Live fire for authored torch decor (the Gauntlet's fence lanterns):
+    // flames on the shared scenery pass, ground light through the night
+    // light field, no point lights (decor_torch_fx.ts).
+    this.decorTorchFx = buildDecorTorchFx(this.sim.cfg.seed);
+    this.attachZoneFeature(this.decorTorchFx);
+    for (const flame of this.decorTorchFx.flames) flame.matrixAutoUpdate = true;
+    this.flames.push(...this.decorTorchFx.flames);
     // The streamed wilderness layer (glow flora + fireflies) follows the camera
     // and rebuilds on a cell crossing, so it is NOT a zone feature.
     this.nightAccents = buildNightAccents(this.sim.cfg.seed);
@@ -3062,6 +3075,8 @@ export class Renderer {
     this.raceLine = new RaceLine(this.scene, this.groundSample);
     // Riding-lesson start platform: the glowing square behind the start arch.
     this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
+    // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
+    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -3819,8 +3834,7 @@ export class Renderer {
     onProgress?: (done: number, total: number) => void,
   ): Promise<void> {
     if (this.shutdownStarted) return;
-    const worldZones = this.sim.cfg.world?.zones ?? ZONES;
-    const zones = zonesWithinStreamingHorizon(worldZones, x, z, radius);
+    const zones = zonesWithinStreamingHorizon(this.sim.cfg.world?.zones ?? ZONES, x, z, radius);
     let done = 0;
     for (const zone of zones) {
       await this.prepareZoneAt(zone.hub.x, zone.hub.z);
@@ -3860,8 +3874,9 @@ export class Renderer {
     this.skyResidency.updateSkyResidency(cameraX, cameraZ);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
+    // The ACTIVE world's zones, never the module list.
     this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
-      ZONES,
+      this.sim.cfg.world?.zones ?? ZONES,
       cameraX,
       cameraZ,
       horizon,
@@ -3875,14 +3890,14 @@ export class Renderer {
   private evictFarZoneIfConstrained(currentZoneId: string, playerX: number, playerZ: number): void {
     if (!GFX.constrainedMemory) return;
     const zoneId = zonesEligibleForEviction(
-      ZONES,
+      this.sim.cfg.world?.zones ?? ZONES,
       this.preparedZones,
       currentZoneId,
       playerX,
       playerZ,
     )[0];
     if (!zoneId) return;
-    const zone = ZONES.find((z) => z.id === zoneId);
+    const zone = (this.sim.cfg.world?.zones ?? ZONES).find((z) => z.id === zoneId);
     if (!zone) return;
     this.terrainView.unloadZone(zone);
     this.waterView.unloadZone(zone.id);
@@ -9721,7 +9736,7 @@ export class Renderer {
       // ~53 yd pinned the view at the floor until that entire rectangle (and
       // its HDRI) finished: 198 s of 45-yard wall after a Drakelands portal.
       // Read live rather than cached: an editor rebuildTerrain swaps the view.
-      const ground = this.terrainView.groundResidency();
+      const ground = this.terrainView.groundResidency(this.camera.position);
       const detailSource = vista ? this.detailFogFar : fog.far;
       const atmosphericFar = dampedValue(detailSource, requestedFar, dt, ZONE_ENVIRONMENT_RESPONSE);
       // Ask the clamp only about ground the camera can see. Radially, the
@@ -9751,7 +9766,7 @@ export class Renderer {
         // chunks land, exactly as streaming always behaved; the far mesh
         // stands beneath it, so no fog wall and no hole is ever visible.
         if (settleVistaEntry) {
-          const entryHaze = horizonHazePlan(this.farVista.envelopeFar);
+          const entryHaze = horizonHazePlan(this.farVista.envelopeFar, this.camera.position);
           fog.far = entryHaze.far;
           fog.near = entryHaze.near;
         }
@@ -9760,7 +9775,7 @@ export class Renderer {
         // every gameplay distance, a gentle realm-tinted aerial blend where
         // the open sea meets the sky, so the horizon melts instead of
         // cutting a razor line (and interiors still hand off smoothly).
-        const haze = horizonHazePlan(this.farVista.envelopeFar);
+        const haze = horizonHazePlan(this.farVista.envelopeFar, this.camera.position);
         fog.far = dampedValue(fog.far, haze.far, dt, ZONE_ENVIRONMENT_RESPONSE);
         fog.near = dampedValue(fog.near, haze.near, dt, ZONE_ENVIRONMENT_RESPONSE);
       } else {
@@ -10620,8 +10635,8 @@ export class Renderer {
         const isPortalObject = isPersistentPortalObject(e);
         const vis = syncDelveInteractableVisibility(
           v.group,
-          e.templateId,
-          e.lootable,
+          e,
+          this.sim.questLog,
           v.compilePending,
           !isPortalObject || d2 <= this.entityViewCreateRangeSq,
         );
@@ -10710,6 +10725,11 @@ export class Renderer {
           syncSoulwellVisual(v.objectMesh, this.time, e.id);
         }
         continue;
+      }
+      if (e.kind === 'npc') {
+        // The island rail's go-here-next fizz (island_guidance.ts): gentle
+        // holy sparkle over beacon NPCs, gold over the current target.
+        this.islandGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
       }
       const sunVerdictPlan = paladinSunVerdictVisualPlanForAuraInto(
         e.dead,
@@ -12016,6 +12036,7 @@ export class Renderer {
     this.streetlamps?.update(lampGlow, this.time);
     this.emberPools?.update(lampGlow, this.time);
     this.campBraziers?.update(lampGlow, this.time);
+    this.decorTorchFx?.update(lampGlow, this.time);
     // The night light field: every lamp and camp fire plus the nearby bodies
     // collected above, packed into the terrain shader's uniform slots. Indoors
     // the world clock does not govern the ground either, so the same fogState
@@ -12046,6 +12067,8 @@ export class Renderer {
     this.vfx.update(dt);
     // Racing line (cosmetic; reads the self race view only).
     this.raceLine.update(this.sim.mountRaceView(), this.time, dt);
+    // Island guidance trail (actionable on every tier; island-gated inside).
+    this.islandGuidance.update(this.sim, this.time, dt);
     // Start platform: visible while the riding quest is active and no race is live.
     this.mountBeacon.update(
       this.sim.questState('q_riding_lessons') === 'active' && !this.sim.mountRaceView(),

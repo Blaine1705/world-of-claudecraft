@@ -803,6 +803,46 @@
     outline: 3px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  /* The Proving Shore's press-this-next glow: a breathing golden border on
+     whichever control is the step's next click, so a brand-new player never
+     hunts for it. Island-only by the class; applied by the quest dialog
+     controller (its rows and Accept/Complete) and by the bootcamp overlay's
+     glow applicator (tracker titles, quest-log rows, the vendor buy row,
+     the bag stack), all sharing this one rule. */
+  .qd-coach {
+    border: 2px solid var(--gold);
+    border-radius: 6px;
+    box-shadow:
+      0 0 14px #ffc860aa,
+      inset 0 0 8px #ffc86033;
+    animation: qd-coach-pulse 900ms ease-in-out infinite;
+  }
+  /* Playtest verdict: the first cut was too subtle to notice mid-flow. The
+     swing is deliberately loud (dim gold to near-white-hot, wide bloom, a
+     background wash) because on the island THIS control is the lesson. */
+  @keyframes qd-coach-pulse {
+    0%,
+    100% {
+      border-color: var(--gold);
+      background-color: #ffc86014;
+      box-shadow:
+        0 0 8px #ffc86077,
+        inset 0 0 6px #ffc86022;
+    }
+    50% {
+      border-color: #ffe9b0;
+      background-color: #ffc8602e;
+      box-shadow:
+        0 0 26px #ffc860ee,
+        0 0 6px #fff3d088,
+        inset 0 0 12px #ffc86055;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qd-coach {
+      animation: none;
+    }
+  }
   .btn {
     background: linear-gradient(#8a3326, #5a1d12 55%, #471409);
     color: #ffd9a0;
@@ -6091,26 +6131,34 @@
      bounded, centered modal; body-appended (see the layout.css --window-scale:1
      group), and the JS floors its z-index above the mobile sheet (the
      scoped-popup 96 rule). Sized from existing tokens, no new ones. */
-  #profession-tutorial {
+  /* #tutorial-greeting (the tutorial island spawn greeting,
+     tutorial_greeting_window.ts) shares every rule: the same once-ever modal
+     shape, reusing the same confirm-dialog family chrome. */
+  #profession-tutorial,
+  #tutorial-greeting {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     width: 380px;
     --window-pad: 14px;
   }
-  #profession-tutorial .cd-body {
+  #profession-tutorial .cd-body,
+  #tutorial-greeting .cd-body {
     padding: 10px 0;
   }
-  #profession-tutorial .cd-para {
+  #profession-tutorial .cd-para,
+  #tutorial-greeting .cd-para {
     margin: 0 0 8px;
     color: var(--color-text-light);
     font-size: 12.5px;
     line-height: 1.55;
   }
-  #profession-tutorial .cd-para:last-child {
+  #profession-tutorial .cd-para:last-child,
+  #tutorial-greeting .cd-para:last-child {
     margin-bottom: 0;
   }
-  #profession-tutorial .cd-actions {
+  #profession-tutorial .cd-actions,
+  #tutorial-greeting .cd-actions {
     display: flex;
     justify-content: flex-end;
     margin-top: 4px;

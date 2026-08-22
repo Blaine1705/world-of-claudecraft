@@ -52,6 +52,7 @@ import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
+import { PROVING_SHORE_ARRIVAL } from '../sim/content/proving_shore';
 import { recipeById } from '../sim/content/recipes';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
@@ -175,6 +176,7 @@ import {
   bannerSubtextLines,
 } from './banner_queue';
 import { blockLandingLogKey } from './block_landing_feedback_core';
+import { BootcampOverlay } from './bootcamp';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
@@ -573,6 +575,7 @@ import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
+import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
 import {
@@ -727,6 +730,14 @@ import { renderTownFocusWindow } from './town_focus_window';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
 import { TutorialOverlay } from './tutorial';
+import {
+  buildFerryBellHomeNote,
+  buildFerryIslandArrivalNote,
+  buildTutorialDeclineNote,
+  buildTutorialGreetingModel,
+  type TutorialGreetingNote,
+} from './tutorial_greeting_view';
+import { renderTutorialGreeting, renderTutorialGreetingNote } from './tutorial_greeting_window';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from './unit_frame';
@@ -735,6 +746,7 @@ import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { knownItemIconHtml, unknownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
+import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
@@ -1291,6 +1303,10 @@ export class Hud {
   // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
   onQuestDialogStateChange: ((open: boolean) => void) | null = null;
+  // First-ever landing on the tutorial island (the sim's per-character
+  // firstVisit): main.ts wires the arrival camera cinematic here
+  // (game/arrival_cinematic.ts). The HUD owns the event arm, not the camera.
+  onIslandFirstArrival: (() => void) | null = null;
   // The healer button lives in the non-blocking ghost overlay, but successful
   // resurrection must still flow through main.ts so authoritative outcomes can
   // stop autorun without making Hud own Input or MobileControls.
@@ -1950,9 +1966,12 @@ export class Hud {
   private confirmOnCancel: (() => void) | null = null;
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
+  private tutorialGreetingTrap: FocusTrapHandle | null = null;
   private meters: Meters;
   private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
+  private bootcamp = new BootcampOverlay();
+  private noticeboardPopup = new NoticeboardPopup();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -3367,6 +3386,11 @@ export class Hud {
         // (focus returns to the opener, WCAG 2.2 AA) and the modal is removed,
         // never left hidden with a live trap (the confirm-dialog precedent).
         this.closeProfessionTutorial();
+        break;
+      case 'tutorial-greeting':
+        // Route through closeTutorialGreeting so the focus trap is released
+        // and the modal is removed (the profession-tutorial precedent).
+        this.closeTutorialGreeting();
         break;
       case 'options-menu':
         this.closeOptions();
@@ -6386,6 +6410,8 @@ export class Hud {
     this.spellbookWindow.relocalize();
     this.lockpickController.relocalize();
     this.tutorial.relocalize(this.sim, this.keybinds);
+    this.bootcamp.relocalize(this.sim, this.keybinds);
+    this.noticeboardPopup.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
     this.mobileActionRingPainter?.relocalize();
@@ -8805,6 +8831,7 @@ export class Hud {
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
+    this.bootcamp.update(sim, this.renderer, this.keybinds);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();
@@ -12049,6 +12076,36 @@ export class Hud {
           if (this.professionsWindow.isOpen) this.professionsWindow.render();
           break;
         }
+        case 'tutorialGreeting':
+          // The spawn greeting (tutorial island): the sim guarantees
+          // once-ever; this arm only opens the choice dialog with the
+          // first-character vs refresher copy the event decided.
+          this.openTutorialGreeting(ev.firstCharacter);
+          break;
+        case 'ferryBellHome':
+          // The island bell just set this player down in town: point out the
+          // town's twin bell ONCE per device (the ride may have been a
+          // misclick), the woc.tutorial.v1 presentation-only one-shot idiom.
+          try {
+            if (localStorage.getItem('woc.ferrybellhint.v1') !== 'seen') {
+              localStorage.setItem('woc.ferrybellhint.v1', 'seen');
+              this.openTutorialGreetingNote(buildFerryBellHomeNote());
+            }
+          } catch {
+            /* private mode: skip the hint rather than throw */
+          }
+          break;
+        case 'ferryIslandArrival':
+          // Landing on the Proving Shore with the rail not yet started:
+          // Ferryman Odo's welcome note teaches walking and talking and points
+          // up the road to Maren. Gated by the SIM's per-character firstVisit
+          // (interactions/ferry_bell.ts), not a per-device flag, so every new
+          // character is taught even on a browser that has seen it before.
+          if (ev.firstVisit) {
+            this.openTutorialGreetingNote(buildFerryIslandArrivalNote());
+            this.onIslandFirstArrival?.();
+          }
+          break;
         case 'profTrendNudge':
         case 'profTierTutorial':
         case 'attuned':
@@ -12395,12 +12452,16 @@ export class Hud {
           this.openBank();
           break;
         case 'noticeboard':
-          // The board has no posted content yet. The structured private event
-          // keeps this feedback localized and identical offline and online.
-          // Mobile keeps the chat log collapsed during normal play, so mirror
-          // the durable/live-announced log line into the shared transient
-          // banner instead of making a successful interaction look inert.
-          {
+          // The structured private event keeps this feedback localized and
+          // identical offline and online. A board carrying listings opens
+          // the signpost popup (guild names and notes are world data,
+          // spliced verbatim like player names); an empty board mirrors the
+          // durable log line into the shared transient banner instead of
+          // making a successful interaction look inert (mobile keeps the
+          // chat log collapsed during normal play).
+          if (ev.state === 'listings') {
+            this.noticeboardPopup.show(ev.listings);
+          } else {
             const message = t('hudChrome.noticeboard.empty');
             this.showBanner(message);
             this.log(message, '#c8b98f');
@@ -13831,6 +13892,74 @@ export class Hud {
     document.getElementById('profession-tutorial')?.remove();
   }
 
+  // The one-time spawn greeting dialog (tutorial island): fired by
+  // tutorialGreeting (the sim guarantees once-ever). Reuses the confirm-dialog
+  // modal family via the tutorial_greeting_window painter; the Hud owns the
+  // focus trap and the z-index floor, the openProfessionTutorial precedent.
+  private openTutorialGreeting(firstCharacter: boolean): void {
+    this.tutorialGreetingTrap?.release(false);
+    this.tutorialGreetingTrap = null;
+    // Warm the island WHILE the choice is read: main.ts skips the blocking
+    // loading screen entirely once renderer.isZoneReadyAt is true at the
+    // arrival, so the seconds a player spends on this dialog buy a seamless
+    // ferry ride. IDLE pace: this fires in live play behind a dialog, not a
+    // loading curtain, so the gating arm's synchronous sky PMREM and fast
+    // terrain batches would cost visible frames (the ferry-prewarm lane's
+    // rule). Fire-and-forget; an instant click degrades to the classic
+    // screen rather than a void drop.
+    void Promise.all([
+      this.renderer.prepareZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, undefined, {
+        pace: 'idle',
+      }),
+      this.renderer.prewarmZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, {
+        background: true,
+      }),
+    ]).catch(() => {
+      /* offline asset hiccup: the arrival falls back to the loading screen */
+    });
+    const el = renderTutorialGreeting(buildTutorialGreetingModel(firstCharacter), {
+      onPlay: () => {
+        // Fire-and-forget by design: the server re-validates and the >30 yd
+        // displacement drives the arrival flow. The Eastbrook coachmark is
+        // NOT latched here; it simply never engages while the player stands
+        // on the island (isFreshCharacter's position guard), so a dropped
+        // command costs nothing.
+        this.sim.startTutorial();
+        this.closeTutorialGreeting();
+      },
+      // Declining gets a follow-up note: the bell beside Bryn still rings
+      // the crossing any time, so a "no" is never a locked door.
+      onSkip: () => this.openTutorialGreetingNote(buildTutorialDeclineNote()),
+    });
+    this.bringWindowToFront(el);
+    // Above the mobile sheet (z-95) and the armory inspect overlay (z-90):
+    // the scoped-popup floor, so the one-shot never opens buried.
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.tutorialGreetingTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
+  }
+
+  private closeTutorialGreeting(): void {
+    this.tutorialGreetingTrap?.release();
+    this.tutorialGreetingTrap = null;
+    document.getElementById('tutorial-greeting')?.remove();
+  }
+
+  // The greeting dialog's single-button note variant (decline follow-up,
+  // first bell homecoming): same shell, trap, and z-index floor as the
+  // two-choice dialog, so the managed-close registry covers it unchanged.
+  private openTutorialGreetingNote(note: TutorialGreetingNote): void {
+    this.tutorialGreetingTrap?.release(false);
+    this.tutorialGreetingTrap = null;
+    const el = renderTutorialGreetingNote(note, {
+      onClose: () => this.closeTutorialGreeting(),
+    });
+    this.bringWindowToFront(el);
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.tutorialGreetingTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
+  }
+
   // Reliquary catalog fill: planned purely (buildReliquaryUnlockPlan). Each
   // unlock gets a gold log line; rank-up outranks Illumination outranks a plain
   // unlock for the single banner slot; one sound per drain; reducedMotion trims
@@ -15214,11 +15343,17 @@ export class Hud {
       // tick (offline has no authoritative-delta hook to ride).
       this.refreshOpenCraftingIfReagentsChanged();
     };
+    // Quest-gated rows (vendorQuestGates) hide until their quest is in the
+    // log; the sim's buyItem enforces the same gate authoritatively. Hoisted
+    // out of the call so the tool-gate source scan
+    // (tests/professions_tool_gate.test.ts) reads the buildVendorView
+    // argument list whole, with no nested call closing a line inside it.
+    const visibleStock = visibleVendorStock(npc, this.sim.questLog, this.sim.questsDone);
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
       buildVendorView(
-        npc.vendorItems,
+        visibleStock,
         this.sim.vendorBuyback,
         ITEMS,
         {

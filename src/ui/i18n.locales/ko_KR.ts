@@ -13,6 +13,59 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.promptAttack': '공격',
+  'hudChrome.bootcamp.keycapThen': '다음',
+  'hudChrome.bootcamp.promptSummon': '소환',
+  'hudChrome.bootcamp.taskPearlBody':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 {bagsKey}를 눌러 가방을 열고, 짠물 미끼를 왼쪽 클릭해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기에 대고 {interactKey}를 눌러 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 가방을 열고 짠물 미끼를 탭해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기를 탭해 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 가방을 열고 짠물 미끼를 선택해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기에 대고 상호작용 버튼을 눌러 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.ringEquipTitle': '전리품을 착용하세요',
+  'hudChrome.bootcamp.ringEquipBody':
+    '진주의 어머니가 가방 안에 있습니다. {bagsKey}를 눌러 가방을 열고, 반지를 왼쪽 클릭해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    '진주의 어머니가 가방 안에 있습니다. 가방을 열고 반지를 탭해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    '진주의 어머니가 가방 안에 있습니다. 가방을 열고 반지를 선택해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringAdmireTitle': '잘 어울리네요',
+  'hudChrome.bootcamp.ringAdmireBody':
+    '잘 어울립니다. {charKey}를 눌러 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    '잘 어울립니다. 메뉴에서 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    '잘 어울립니다. 메뉴에서 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'entities.mobs.mister_crabs.name': '미스터 크랩스',
+  'entities.items.ps_briny_lure.name': '짠물 미끼',
+  'entities.items.ps_lustrous_pearl.name': '영롱한 진주',
+  'entities.items.mother_of_pearl.name': '진주의 어머니',
+  'entities.quests.q_ps_mother_of_pearl.title': '진주의 어머니',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '껍데기 셋을 깼군요, {playerName}. 하지만 난파선 해안에는 왕이 있고, 그 왕은 이 백사장의 어느 상자보다 값진 보물을 깔고 앉아 있습니다. 이 짠물 미끼를 들고 난파선 너머, 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 B를 눌러 가방을 열고, 미끼를 왼쪽 클릭해 왕을 깨우세요. 미스터 크랩스의 집게는 작은 사촌들보다 훨씬 아픕니다. 생명력 막대를 살피고, 계속 공격하고, 숨을 돌려야 하면 모래 위로 물러나세요. 왕이 쓰러지면 이름이 보일 때까지 껍데기로 다가가 F를 누르거나 왼쪽 클릭해, 왕이 껴안고 있던 영롱한 진주를 차지하세요. 그 진주를 제게 가져오세요.',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '영롱한 진주, 그것도 얕은 바다의 늙은 왕에게서 직접 떼어 낸 것이군요. 제 아버지는 일 나가는 아침마다 그 게에게 모자를 들어 인사했습니다. 존경은 마땅히 치러야지요. 가만히... 됐습니다. 실에 꿰고, 고정하고, 이제 당신 것입니다, {playerName}. 진주의 어머니입니다. B를 눌러 가방을 열고 반지를 왼쪽 클릭해 끼워 보세요. 그런 다음 C를 눌러 캐릭터 창을 열면 손에 낀 반지가 보일 겁니다. 작은 물건이지만, 끼고 있으면 당신의 모든 것이 조금씩 나아집니다.',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': '미스터 크랩스 처치',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '영롱한 진주 획득',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '짚 허수아비에게 다가가 {targetKey}를 누르거나 왼쪽 클릭해 대상으로 잡으세요. 그런 다음 {attackKey}를 누르거나 행동 단축바의 두 번째 버튼을 클릭해 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 두 번째 버튼을 탭해 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 두 번째 행동 버튼을 눌러 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '종종게는 마주 집게를 휘두릅니다. {targetKey}를 누르거나 왼쪽 클릭해 한 마리를 대상으로 잡고, {attackKey}를 눌러 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 두 번째 버튼을 탭해 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '종종게는 마주 집게를 휘두릅니다. 대상 버튼을 누르고, 이어서 두 번째 행동 버튼을 눌러 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.voiceGraduate': '자네를 위해 종이 울렸네. 바다 건너 이스트브룩이 기다리고 있고, 자네는 준비가 되었네.',
+  'hudChrome.bootcamp.voiceVeerOff': '잠깐, 친구. 그쪽이 아닐세. 황금 길은 뒤에 있네.',
+  'hudChrome.bootcamp.voiceStationDoneB': '제법 손에 익어 가는군, 틀림없네.',
+  'hudChrome.bootcamp.voiceStationDoneA': '잘했네. 다음으로 가게, 길은 이미 밝혀 두었으니.',
+  'hudChrome.bootcamp.voiceRunDone': '깔끔한 질주였네. 보상은 감독관 펠이 갖고 있으니 가서 받게.',
+  'hudChrome.bootcamp.voiceFirstFlag': '깃발 하나를 지났군. 다리를 멈추지 말게, 이제 둘 남았네.',
+  'hudChrome.bootcamp.voiceArrival': '무사히 뭍에 올랐군. 발밑의 황금 길이 보이나? 나보다 길을 잘 아니 그대로 따라가게.',
   'hudChrome.lastkeepMap.title': '{keep}: {story}',
   'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.classPage.formName.form_cat': '늑대 변신',
@@ -8572,6 +8625,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': '포인트가 부족합니다.',
   'hudChrome.mailbox.title': '우편함',
   'hudChrome.noticeboard.empty': '게시된 내용이 없는 것 같습니다.',
+  'hudChrome.noticeboard.popupTitle': '길드 게시 기둥',
+  'hudChrome.noticeboard.close': '닫기',
   'hudChrome.mailbox.subtitle': '레이븐포스트',
   'hudChrome.mailbox.close': '우편함 닫기',
   'hudChrome.mailbox.tabInbox': '받은 편지함',
@@ -12903,6 +12958,222 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '사용할 수 없음',
   'hudChrome.perf.diagnostics.report.status.critical': '심각',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '주의 필요',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '처음 보는 얼굴이군요, 친구. 이 땅에서는 모험을 시작하는 이들이 수련의 해안을 찾는 것이 전통이에요. 해협 너머의 조용한 섬이죠. 그곳에서 세상의 시련에 맞서기 전에 실력을 갈고닦고 이곳에 익숙해질 수 있어요. 나룻배는 양방향으로 다니고, 가든 안 가든 누구도 당신을 얕보지 않을 거예요.',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '새 얼굴로 또 오셨군요? 그럼 어떻게 돌아가는지 아시겠네요. 그래도 떠나기 전에 복습을 원하신다면, 수련의 해안은 돌아온 학생을 내치는 법이 없답니다. 나룻배는 언제든 준비되어 있어요.',
+  'hudChrome.tutorialGreeting.play': '튜토리얼 진행하기',
+  'hudChrome.tutorialGreeting.declineNote':
+    '뜻대로 하세요, 친구. 언제든 마음이 바뀌면, 레이븐포스트 우편함 옆의 나룻배 종이 밤낮없이 수련의 해안으로 데려다줍니다. 늑대는 기다려 주지 않지만, 그 종은 기다려 준답니다.',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    '벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 저기 레이븐포스트 우편함 옆에 걸려 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '방금 건너오셨나요? 수련의 해안에 온 것을 환영합니다. 바로 앞 바닷가에서 워든 탐이 건틀릿을 지키고 있어요. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면, 그의 길이 몸 쓰는 법을 전부 가르쳐 줄 겁니다. 그리고 떠날 준비가 되면 제 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩의 집으로 데려다줄 겁니다.',
+  'hudChrome.tutorialGreeting.noteClose': '알겠어요',
+  'hudChrome.tutorialGreeting.skip': '튜토리얼 건너뛰기',
+  'hudChrome.bootcamp.title': '첫걸음',
+  'hudChrome.bootcamp.talkTitle': '워든 탐에게 말 걸기',
+  'hudChrome.bootcamp.talkBody':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
+  'hudChrome.bootcamp.talkBodyTouch':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 그를 탭하거나 사용 버튼을 탭해 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
+  'hudChrome.bootcamp.talkBodyPad':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
+  'hudChrome.bootcamp.forwardTitle': '첫 번째 길 걷기',
+  'hudChrome.bootcamp.forwardBody':
+    '탐 옆의 길에 들어서서 {forwardKey}를 누른 채 서쪽 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    '탐 옆의 길에 들어서서 이동 스틱을 위로 민 채 서쪽 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.forwardBodyPad':
+    '탐 옆의 길에 들어서서 왼쪽 스틱을 위로 민 채 서쪽 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkTitle': '돌아선 다음 걷기',
+  'hudChrome.bootcamp.turnwalkBody':
+    '깃발 하나 통과. {turnKey}를 누른 채 제자리에서 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 다시 {forwardKey}를 누른 채 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '깃발 하나 통과. (이동 스틱이 아니라) 세상 화면을 손가락으로 드래그해 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '깃발 하나 통과. 오른쪽 스틱을 밀어 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.strafeTitle':
+    '돌아서 걷기',
+  'hudChrome.bootcamp.strafeBody':
+    '모퉁이 하나 남았습니다. {turnLeftKey}를 누른 채 제자리에서 돌아 마지막 길을 정면에 두고, 다시 {forwardKey}를 누른 채 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '모퉁이 하나 남았습니다. (이동 스틱이 아니라) 화면을 손가락으로 쓸어 방향을 돌려 마지막 길을 정면에 두고, 스틱을 위로 밀어 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '모퉁이 하나 남았습니다. 오른쪽 스틱을 밀어 방향을 돌려 마지막 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
+  'hudChrome.bootcamp.cameraTitle': '시점 돌리기',
+  'hudChrome.bootcamp.cameraBody':
+    '완주를 보고하기 전 마지막 가르침입니다. 마우스 오른쪽 버튼을 누른 채 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '완주를 보고하기 전 마지막 가르침입니다. 세상 화면을 손가락으로 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '완주를 보고하기 전 마지막 가르침입니다. 오른쪽 스틱을 밀어 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.',
+  'hudChrome.bootcamp.courseProgress': '깃발 {current} / {total}',
+  'hudChrome.bootcamp.doneTitle': '완주',
+  'hudChrome.bootcamp.doneBody':
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 그에게 {interactKey}를 누르거나 왼쪽 클릭해 완주를 보고하고 첫 보상을 받으세요.',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 그를 탭해 완주를 보고하고 첫 보상을 받으세요.',
+  'hudChrome.bootcamp.doneBodyPad':
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 상호작용 버튼을 눌러 완주를 보고하고 첫 보상을 받으세요.',
+  'hudChrome.bootcamp.coachNextTitle': '다음: {npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 다음 임무를 받으세요.',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상대를 탭하거나 사용 버튼을 탭해 다음 임무를 받으세요.',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 다음 임무를 받으세요.',
+  'hudChrome.bootcamp.coachTaskBody':
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 {mapKey}로 지도를 열 수 있습니다.',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
+  'hudChrome.bootcamp.coachReadyTitle': '임무 완료',
+  'hudChrome.bootcamp.coachReadyBody':
+    '{npc}에게 가서 {interactKey}를 누르거나 왼쪽 클릭해 임무를 보고하고 보상을 받으세요.',
+  'hudChrome.bootcamp.coachReadyBodyTouch':
+    '{npc}에게 가서 상대를 탭해 임무를 보고하고 보상을 받으세요.',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '{npc}에게 가서 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '짚 허수아비에게 다가가 {targetKey}를 누르거나 왼쪽 클릭해 대상으로 잡으세요. 그런 다음 {attackKey}를 누르거나 행동 단축바의 첫 번째 버튼을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 첫 번째 행동 버튼을 눌러 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskShellBody':
+    '종종게는 마주 집게를 휘두릅니다. {targetKey}를 누르거나 왼쪽 클릭해 한 마리를 대상으로 잡고, {attackKey}를 눌러 내리치며 계속 공격하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '종종게는 마주 집게를 휘두릅니다. 대상 버튼을 누르고, 이어서 첫 번째 행동 버튼을 눌러 내리치세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 {interactKey}를 누르거나 상자를 왼쪽 클릭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 상자를 탭하거나 사용 버튼을 탭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 상호작용 버튼을 눌러 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskPouchBody':
+    '{npc}에게 {interactKey}를 누르거나 상대를 왼쪽 클릭해 좌판을 열고, 아마천 주머니를 왼쪽 클릭해 구입하세요.',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    '{npc}를 탭해 좌판을 열고, 아마천 주머니를 탭해 구입하세요.',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '{npc}에게 상호작용 버튼을 눌러 좌판을 열고, 아마천 주머니를 골라 구입하세요.',
+  'hudChrome.bootcamp.readyPouchBody':
+    '주머니를 샀습니다. {bagsKey}를 눌러 가방을 열고 아마천 주머니를 왼쪽 클릭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 {interactKey}를 눌러 보여 주세요.',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 탭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 상대를 탭해 보여 주세요.',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 골라 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 상호작용 버튼을 눌러 보여 주세요.',
+  'hudChrome.bootcamp.bellTitle': '종 울리기',
+  'hudChrome.bootcamp.bellBody':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 {interactKey}를 누르거나 왼쪽 클릭해 이스트브룩으로 출항하세요.',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 종을 탭해 이스트브룩으로 출항하세요.',
+  'hudChrome.bootcamp.bellBodyPad':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 상호작용 버튼을 눌러 이스트브룩으로 출항하세요.',
+  'entities.zones.proving_shore.pois.4.label': '건틀릿',
+  'entities.items.ps_castaway_crate.name': '표류 상자',
+  'entities.items.ps_ferry_bell.name': '나룻배 종',
+  'entities.mobs.training_effigy.name': '훈련용 허수아비',
+  'entities.mobs.shore_scuttler.name': '해변 종종게',
+  'entities.npcs.wayfarer_bryn.name': '방랑자 브린',
+  'entities.npcs.wayfarer_bryn.title': '항구 안내인',
+  'entities.npcs.wayfarer_bryn.greeting':
+    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 레이븐포스트 우편함 옆의 나룻배 종이 일 년 내내 언제든 건너다 주고, 섬의 쌍둥이 종이 다시 집으로 울려 보내 준답니다.',
+  'entities.npcs.instructor_maren.name': '교관 마렌',
+  'entities.npcs.instructor_maren.title': '수련 사범',
+  'entities.npcs.instructor_maren.greeting':
+    '골짜기가 고마워했던 영웅은 모두 지금 당신이 선 자리에 서 있었어요, {className}. 그리고 그때는 하나같이 칼의 어느 쪽을 쥐어야 하는지도 몰랐죠. 이 해안은 그러라고 있는 곳이에요. 묻고, 연습하고, 실패해도 되는 곳에서 마음껏 실패하세요.',
+  'entities.npcs.quartermaster_finch.name': '보급관 핀치',
+  'entities.npcs.quartermaster_finch.title': '야영지 물자상',
+  'entities.npcs.quartermaster_finch.greeting':
+    '내 좌판에 파는 물건은 딱 하나예요, {playerName}. 길에서 주운 것들을 담을 여분의 주머니, 그것도 수업이 필요로 할 때만요. 그 밖의 것들은 전부 골짜기로 보낼 인양품이죠. 동전이 주머니를 사고, 일이 동전을 벌어요. 그게 경제의 전부예요. 더 복잡해지는 일은 없어요. 더 커질 뿐이지.',
+  'entities.npcs.ferryman_odo.name': '뱃사공 오도',
+  'entities.npcs.ferryman_odo.title': '나루터지기',
+  'entities.npcs.ferryman_odo.greeting':
+    '방금 건너오셨나요, {playerName}? 워든 탐이 부두 바로 남쪽 바닷가에서 건틀릿을 지키고 있습니다. 먼저 그의 길을 달려 보세요. 다리가 고마워할 겁니다. 이 해안의 지기들은 맡은 일이 끝날 때마다 당신을 다음 사람에게 넘겨주고, 화면 위쪽의 카드는 언제나 다음 길을 알고 있죠. 골짜기가 다시 부르거든 내 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩 마을에 내려 줄 겁니다.',
+  'entities.npcs.warden_tam.name': '워든 탐',
+  'entities.npcs.warden_tam.title': '건틀릿의 파수꾼',
+  'entities.npcs.warden_tam.greeting':
+    '이 길들이 건틀릿입니다, {playerName}. 골짜기가 인정하는 모험가는 모두 여길 달렸죠. 울타리의 등불은 밤새 꺼지지 않으니, 길이 닫히는 일은 없습니다.',
+  'entities.npcs.overseer_pell.name': '감독관 펠',
+  'entities.npcs.overseer_pell.title': '건틀릿 감독관',
+  'entities.npcs.overseer_pell.greeting':
+    '이 길을 내려오는 완주는 전부 내가 잽니다, {playerName}. 그리고 훨씬 형편없는 발놀림도 숱하게 봤죠. 내 뒤의 길은 수련장으로 오릅니다. 발놀림이 칼놀림으로 바뀌는 곳이 바로 거기죠.',
+  'entities.npcs.drillmaster_rook.name': '교련관 루크',
+  'entities.npcs.drillmaster_rook.title': '수련장의 주인',
+  'entities.npcs.drillmaster_rook.greeting':
+    '짚이 먼저, 껍데기는 그다음입니다, {playerName}. 허수아비는 팔에 휘두르는 법을 가르치고, 바닷가의 종종게들은 싫어하는 상대에게 맞히는 법을 가르치죠.',
+  'entities.npcs.tidewarden_nel.name': '조수지기 넬',
+  'entities.npcs.tidewarden_nel.title': '바닷가의 파수꾼',
+  'entities.npcs.tidewarden_nel.greeting':
+    '조수는 앗아 가고, 조수는 값을 치릅니다, {playerName}. 나는 그 양쪽 장부를 다 맡고 있죠. 종종게들이 난파선에서 집어 가는 것과, 정직한 손이 이 길로 날라 오는 것을요.',
+  'entities.quests.q_ps_the_gauntlet.title': '건틀릿 완주',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 몸을 빙 돌려 남쪽 길을 두 번째 깃발까지 걸은 다음, 마지막 길은 옆걸음으로 붉은 깃발까지 가세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 감독관 펠이 길 끝에서 모든 완주를 재고 있습니다. 붉은 깃발을 지나면 바로 그 자리에 서서 당신의 완주를 받아 줄 겁니다.',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '방금 그 완주, 제대로 쟀습니다, {playerName}. 더 빠른 발도 떨어뜨려 본 적이 있죠. 건틀릿은 이제 당신 것입니다. 내 뒤의 길은 수련장으로 오릅니다. 거기서 교련관 루크가 발놀림을 칼놀림으로 바꿔 주죠. 다음 임무는 그가 갖고 있습니다.',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': '건틀릿 깃발 통과',
+  'entities.npcs.bursar_wick.name': '경리관 윅',
+  'entities.npcs.bursar_wick.title': '도금 금고',
+  'entities.npcs.bursar_wick.greeting':
+    '도금 금고는 이런 곳에도 책상 하나를 두고 있답니다, {playerName}. 내게 맡긴 것은 모든 마을 모든 경리관 뒤에 있는 같은 금고에서 기다립니다. 늑대도, 바닷물도, 당신 자신의 섣부른 판단도 손대지 못하죠.',
+  'entities.quests.q_ps_strike_true.title': '정확한 일격',
+  'entities.quests.q_ps_strike_true.text':
+    '발 다음은 팔입니다, {playerName}. 수련장은 내 뒤 길을 오른 곳에 있고, 그곳의 짚 허수아비들은 맞으라고 만든 것들이죠. 길을 잃겠거든 M을 눌러 지도를 여세요. 맡은 임무는 모두 지도에 표시됩니다. 허수아비에게 다가가 Tab을 누르거나 왼쪽 클릭해 대상으로 잡고, 그런 다음 1을 누르거나 화면 아래쪽 행동 단축바의 첫 번째 아이콘을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요. 반격은 없습니다. 허수아비란 원래 그런 법이니까요. 교련관 루크가 바닷가 길이 시작되는 수련장 서쪽 끝에서 지켜보고 있습니다. 그에게 F를 눌러 결과를 보고하세요.',
+  'entities.quests.q_ps_strike_true.completion':
+    '깔끔하게 하나 쓰러뜨렸고, 손아귀도 벌써 단단해졌군요. 그 감각을 기억하세요, {playerName}. 대상을 잡고, 내리치고, 계속 내리치기. 짚은 아무래도 상관하지 않지만, 다음에 당신이 칼을 휘두를 상대는 그렇지 않을 겁니다.',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '훈련용 허수아비 쓰러뜨리기',
+  'entities.quests.q_ps_shell_and_claw.title': '껍데기와 집게발',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '짚은 상관하지 않죠, {playerName}. 그러니 이번엔 상관하는 놈들입니다. 해변 종종게들이 먼 바닷가의 난파선 해안에서 잔해를 뒤지고 있어요. 내 수련장에서 서쪽으로 길을 따라가면 곧장 놈들에게 닿습니다. 놈들은 되꼬집으니 체력 막대를 살피며 계속 휘두르세요. Tab이나 왼쪽 클릭으로 한 마리를 대상으로 잡고, 1을 누르고, 껍데기가 갈라질 때까지 멈추지 마세요. 셋이면 충분합니다. 그런 다음 북쪽 언덕길을 오르세요. 조수지기 넬이 바닷가 장부를 맡고 있고, 당신의 껍데기도 세어 줄 겁니다.',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '껍데기 셋을 깨고도 손가락은 하나도 잃지 않았군요. 첫 싸움치고는 훌륭해요, {playerName}. 저 게들은 조수가 표류물을 실어 오는 것보다 빨리 난파선을 털어 가니, 당신이 한 마리 솎아 낼 때마다 누군가의 동전이 지켜진답니다.',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '해변 종종게 솎아내기',
+  'entities.quests.q_ps_the_wreck_line.title': '난파선 해안',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '내 짐꾼들이 옛 난파선에서 표류물을 내려 새벽쉼터 야영지로 오르는 언덕길로 나릅니다, {playerName}. 그런데 상자 절반은 끝내 언덕을 다 오르지 못해요. 길가에 내려놓인 채 잊히고 말죠. 내 길을 따라 야영지 쪽으로 가면 그 낙오한 상자들 곁을 바로 지나게 됩니다. 여는 건 간단해요. 이름이 보일 때까지 상자에 다가가 F를 누르거나 상자를 왼쪽 클릭하면, 품고 있던 것을 내어 줍니다. 여섯이면 이 길이 말끔해지고, 앞으로 만날 모든 상자와 채집물과 문도 전부 같은 F 하나로 연다는 걸 기억하세요. 보급관 핀치가 야영지 좌판을 지키며 표류물이라면 나뭇가지 하나까지 사들입니다. 거둔 것을 그녀에게 넘기세요.',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    '밧줄과 타르, 그리고 바다가 어쩐 일로 남겨 준 치즈 반 덩이. 전부 사죠, {playerName}. 주운 것을 지고 나를 줄 아는 등은 이 야영지에 어떤 칼보다 값진데, 당신의 등은 방금 한 번의 오르막으로 이 길을 통째로 치워 냈군요.',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '표류 상자 열기',
+  'entities.quests.q_ps_pouch_and_purse.title': '주머니와 돈주머니',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    '골짜기로 떠나기 전 마지막 가르침이에요, {playerName}. 모험가의 목숨을 지켜 주는 가르침이죠. 바로 당신이 지고 다니는 짐 얘기입니다. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 그러니 내게 다시 F를 눌러 좌판을 열고, 물건 중에서 아마천 주머니를 왼쪽 클릭해 사세요. 그런 다음 B를 눌러 가방을 열고, 거기 있는 주머니를 왼쪽 클릭해 빈 고리에 채우세요. 교관 마렌이 몇 걸음 동쪽 집합 모닥불 곁에서 훈련을 이끌고 있습니다. 허리에 걸린 주머니를 보여 드리세요.',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    '좋은 주머니군요. 아직 차지 않았다면 지금 차세요. B를 눌러 가방을 열고, 주머니를 왼쪽 클릭해 빈 가방 고리에 채우면, 말썽거리를 담을 칸이 여섯 늘어납니다. 이제 어떤 가방에도 담기지 않는 나머지 절반의 가르침입니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 경리관 윅이 서쪽 길을 오른 곳에 금고 책상을 두고 있는데, 그가 열어 주는 금고는 어느 마을의 어느 경리관과도 같은 금고이고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '아마천 주머니 구입하기',
+  'entities.quests.q_ps_the_signpost.title': '바람결 소식',
+  'entities.quests.q_ps_the_signpost.text':
+    '배울 습관이 하나 남았어요, {playerName}. 칼은 필요 없죠. 게시판 읽기입니다. 길드 게시 기둥이 내 모닥불에서 남서쪽으로 몇 걸음, 야영지 정문에 서 있고, 길드와 떠도는 무리들이 거기에 부름의 글을 붙입니다. 기둥 앞까지 다가가 F를 누르거나 왼쪽 클릭해 붙은 글을 읽고, 돌아와 바람이 무엇을 실어 왔는지 들려주세요. 앞으로 당신이 걸어 들어갈 모든 마을에 똑같은 게시판이 서 있답니다.',
+  'entities.quests.q_ps_the_signpost.completion':
+    '이제 골짜기에서 소식이 어떻게 도는지 알겠죠, {playerName}. 파발꾼이 아니라 게시판으로 돕니다. 지나는 마을마다 들여다보세요. 모험의 절반은 게시판 위 세 줄 먹글에서 시작된답니다.',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': '길드 게시 기둥 읽기',
+  'entities.quests.q_ps_set_sail.title': '출항',
+  'entities.quests.q_ps_set_sail.text':
+    '이 해안에는 당신이 이미 달리지 않았거나, 쓰러뜨리지 않았거나, 열지 않았거나, 사지 않은 것이 하나도 남지 않았어요, {playerName}. 준비는 끝났고, 이스트브룩에는 진짜 일이 기다립니다. 해안길을 따라 부두로 되돌아 내려가 뱃사공 오도에게 F를 누르고, 내가 당신이 건너갈 자격을 얻었다 했다고 전하세요. 누구에게 무엇을 빚졌는지 헷갈릴 때는 언제든 L을 누르세요. 그것이 당신의 퀘스트 일지입니다.',
+  'entities.quests.q_ps_set_sail.completion':
+    '마렌이 그렇게 말했다고요? 내게 일주일 내내 밧줄 매듭 연습을 시킨 사람의 입에서 나온 말치고는 대단한 칭찬이군요. 준비가 되면 내 부두 옆에 선 종을 울리세요, {playerName}. 건너기가 이스트브룩 마을 한복판에 내려 줄 겁니다. 늑대를 조심하세요.',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '뱃사공 오도에게 보고',
+  'entities.zones.proving_shore.name': '수련의 해안',
+  'entities.zones.proving_shore.welcome':
+    '수련의 해안이 당신에게 바라는 것은 시간뿐입니다. 야영지를 익히고, 허수아비를 치고, 난파선 해안을 걸어 보세요. 준비가 되면 뱃사공 오도가 골짜기까지 건네줄 겁니다.',
+  'entities.zones.proving_shore.pois.0.label': '새벽쉼터 야영지',
+  'entities.zones.proving_shore.pois.1.label': '낡은 부두',
+  'entities.zones.proving_shore.pois.2.label': '수련장',
+  'entities.zones.proving_shore.pois.3.label': '난파선 해안',
+  'guide.home.world.provingName': '수련의 해안',
+  'guide.home.world.provingBlurb':
+    '해협 건너의 조용한 훈련 섬. 골짜기가 무언가를 요구하기 전에, 새내기 모험가들이 이곳에서 첫걸음을 다집니다.',
+  'guide.worldPage.provingBlurb':
+    '골짜기에서 해협을 건넌 곳에 있는 조용한 섬으로, 훈련장으로 쓰입니다. 야영지 하나, 수련장 하나, 잔해가 널린 바닷가, 그리고 양방향으로 다니는 나룻배가 있습니다.',
+  'guide.worldPage.provingGreeting':
+    '골짜기가 고마워했던 영웅은 모두 지금 당신이 선 자리에 서 있었어요. 그리고 그때는 하나같이 칼의 어느 쪽을 쥐어야 하는지도 몰랐죠.',
+  'guide.worldPage.provingGreeter': '교관 마렌, 새벽쉼터 야영지',
+  'guide.worldPage.provingPlaceNotes':
+    '새벽쉼터 야영지가 섬의 유일한 정착지로, 천막 몇 동과 좌판 하나, 모임 모닥불이 전부입니다. 낡은 부두는 골짜기를 마주하며 건너기 마법진이 졸업생을 해협 너머로 실어 나르고, 야영지 남쪽 수련장에는 필요한 이를 위해 짚 허수아비가 서 있으며, 난파선 해안은 조수가 표류 상자로 섬에 값을 치르는 잔해투성이 바닷가입니다.',
   'hudChrome.perf.diagnostics.report.status.healthy': '정상',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':

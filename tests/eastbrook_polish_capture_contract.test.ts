@@ -299,6 +299,13 @@ interface AttributionTargetFixture {
 // release tip (spell-icon revert, sky KTX2, druid auto-unshift): both parents'
 // renderer and layout bytes combine in one tree, so the composite mints a
 // value matching neither parent. No capture was retaken.
+// Re-minted for the release/v0.39.0 base merge into feature/tutorial-island: the
+// resolved renderer.ts and prewarm_policy.ts combine the release's delve tracker,
+// mount prewarm and shadow-depth bytes with the Proving Shore island_guidance
+// call sites, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the island far-shore haze band: renderer.ts passes the camera
+// to horizonHazePlan at its two call sites, so the composite follows those
+// bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   'e922918ac730f196234a3d450f04845affc5d5986804dff6135fe36efe94b4d2';
 

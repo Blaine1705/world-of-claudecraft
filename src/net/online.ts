@@ -4135,6 +4135,12 @@ export class ClientWorld implements IWorld {
     this.pendingQuestCommands.delete(questId);
     this.cmd({ cmd: 'abandon', quest: questId });
   }
+  startTutorial(): void {
+    if (!this.canSendCommand()) return;
+    // Command only, never predicted: the server validates and the >30 yd
+    // displacement in the next snapshot drives the client's arrival flow.
+    this.cmd({ cmd: 'tutorial_start' });
+  }
   acceptLinkedQuest(questId: string, fromPid: number): void {
     this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });
   }

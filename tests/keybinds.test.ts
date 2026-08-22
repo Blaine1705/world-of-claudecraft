@@ -342,6 +342,8 @@ describe('Attack Move (shared key)', () => {
     expect(actionAllowsShared('turnLeft')).toBe(false);
     expect(kb.codeAt('attackMove', 0)).toBe('KeyA');
     expect(kb.codeAt('turnLeft', 0)).toBe('KeyA');
+    // Classic-era layout: A/D turn, Q/E strafe.
+    expect(kb.codeAt('strafeLeft', 0)).toBe('KeyQ');
     // actionForCode prefers Turn Left (earlier in the registry); Attack Move is
     // dispatched ahead of it by Input only while its mode is on.
     expect(kb.actionForCode('KeyA')).toBe('turnLeft');

@@ -23,7 +23,11 @@ const BUILTIN_NOTICEBOARDS = BUILTIN_WORLD.services?.noticeboards ?? [];
 describe('Eastbrook town grass exclusion', () => {
   it('snapshots every built-in town footprint, service apron, civic prop, and wall chord', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
-    expect(BUILTIN_NOTICEBOARDS).toHaveLength(1);
+    // Eastbrook's board plus the Proving Shore tutorial island's camp
+    // signpost (content/noticeboards.ts): the island board rides the same
+    // canonical def, so it enters the built-in service list and earns its
+    // own grass exclusion like any other civic prop.
+    expect(BUILTIN_NOTICEBOARDS).toHaveLength(2);
     // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see fenbridge_layout).
     // Re-pinned 2026-08: the harbor-move layout v3 retired the ring wall
     // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), dropping the
@@ -43,8 +47,9 @@ describe('Eastbrook town grass exclusion', () => {
     // into this snapshot. Re-pinned again for the same round's harbour
     // quarter: the town gained three coastal buildings along the dock road,
     // and each one contributes exactly two rows, a footprint OBB and a
-    // service-apron circle (65 obb + 30 circle).
-    expect(exclusions).toHaveLength(95);
+    // service-apron circle (65 obb + 30 circle). The island signpost's board
+    // and reading-spot exclusions add two more on top.
+    expect(exclusions).toHaveLength(97);
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,

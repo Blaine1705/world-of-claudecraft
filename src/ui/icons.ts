@@ -5276,7 +5276,11 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // future development-only item may still use it temporarily. tests/item_icons.test.ts holds
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
-// Empty again after the hunter quiver art landed in the same branch that enumerated it.
+// Empty again after the hunter quiver art landed in the same branch that enumerated it,
+// and still empty with the Proving Shore pair: the island's castaway crate and ferry
+// bell icons are rendered from their own world models
+// (scripts/render_island_item_icons.mjs), so they ship with committed art like
+// every other item.
 export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
@@ -5307,6 +5311,9 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
+  // The Proving Shore graduation deed rides the deed_cat_progression crest
+  // until its commissioned art lands (docs/achievements/icon-brief.md).
+  'prog_ready_for_an_adventure',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

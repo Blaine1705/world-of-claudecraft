@@ -13,6 +13,59 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.promptAttack': '攻撃',
+  'hudChrome.bootcamp.keycapThen': 'つぎに',
+  'hudChrome.bootcamp.promptSummon': '召喚',
+  'hudChrome.bootcamp.taskPearlBody':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、{bagsKey}を押してバッグを開き、潮の疑似餌を左クリックして奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻の上で{interactKey}を押して輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、バッグを開いて潮の疑似餌をタップし、奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻をタップして輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、バッグを開いて潮の疑似餌を選び、奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻の上でインタラクトボタンを押して輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.ringEquipTitle': '戦利品を身につけよう',
+  'hudChrome.bootcamp.ringEquipBody':
+    '真珠の母はバッグの中にある。{bagsKey}を押してバッグを開き、指輪を左クリックして指にはめよう。',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    '真珠の母はバッグの中にある。バッグを開いて指輪をタップし、指にはめよう。',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    '真珠の母はバッグの中にある。バッグを開いて指輪を選び、指にはめよう。',
+  'hudChrome.bootcamp.ringAdmireTitle': 'よく似合っている',
+  'hudChrome.bootcamp.ringAdmireBody':
+    'よく似合う。{charKey}を押してキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    'よく似合う。メニューからキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    'よく似合う。メニューからキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'entities.mobs.mister_crabs.name': 'ミスター・クラブス',
+  'entities.items.ps_briny_lure.name': '潮の疑似餌',
+  'entities.items.ps_lustrous_pearl.name': '輝く真珠',
+  'entities.items.mother_of_pearl.name': '真珠の母',
+  'entities.quests.q_ps_mother_of_pearl.title': '真珠の母',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '殻を三つ割ったな、{playerName}。だが難破線には王がいて、この浜のどの木箱よりも値打ちのある宝を抱え込んでいる。この潮の疑似餌を持って、難破船の先、浜の西の果てにある潮だまりへ行け。水際に立ち、Bを押してバッグを開き、疑似餌を左クリックして王を起こすんだ。ミスター・クラブスの挟みは小物どもよりずっと重い。体力バーから目を離さず、打ち続け、息が要るなら砂の上へ下がれ。王が倒れたら、名前が見えるまで殻に歩み寄り、Fを押すか左クリックして、王が抱え込む輝く真珠をもぎ取れ。その真珠をわたしのところへ持ち帰るんだ。',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '輝く真珠、それも浅瀬の老王その者からもぎ取ったものだ。わたしの父は働きに出る朝のたびに、あのカニに帽子を傾けて挨拶していた。敬意は払われるべきものだ。じっとして...ほら。糸を通し、留めて、おまえのものだ、{playerName}。真珠の母だよ。Bを押してバッグを開き、指輪を左クリックしてはめてみろ。それからCを押してキャラクターシートを開けば、手に収まった指輪が見えるはずだ。ささやかな品だが、身につければ全てが少しずつ強くなる。',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': 'ミスター・クラブス討伐',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '輝く真珠を入手',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '藁のかかしに歩み寄り、{targetKey}を押すか、左クリックしてターゲットにしよう。次に{attackKey}を押すか、アクションバーの二番目のボタンをクリックして呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの二番目のボタンをタップして呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に二番目のアクションボタンを押して呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '浜辺ガニは挟み返してくる。{targetKey}を押すか、左クリックして一匹をターゲットにし、{attackKey}を押して呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの二番目のボタンをタップして呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '浜辺ガニは挟み返してくる。ターゲットボタンを押し、次に二番目のアクションボタンを押して呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.voiceGraduate': '鐘はおまえさんのために鳴った。海の向こうでイーストブルックが待っておる。もう大丈夫だ。',
+  'hudChrome.bootcamp.voiceVeerOff': '待ちなさい、そっちは違う。金色の道は後ろだよ。',
+  'hudChrome.bootcamp.voiceStationDoneB': 'だいぶ様になってきたな、間違いない。',
+  'hudChrome.bootcamp.voiceStationDoneA': 'よくやった。次へ進みなさい、道はもう照らしてある。',
+  'hudChrome.bootcamp.voiceRunDone': '見事な走りだった。褒美は監督官ペルが持っておる。受け取りに行きなさい。',
+  'hudChrome.bootcamp.voiceFirstFlag': '旗をひとつ越えたな。その調子で足を止めるな、残りはふたつだ。',
+  'hudChrome.bootcamp.voiceArrival': '無事の上陸だ。足元の金色の道が見えるか？わしよりよほど道を知っておる。あれをたどりなさい。',
   'hudChrome.lastkeepMap.title': '{keep}：{story}',
   'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': 'ウルフフォーム',
@@ -8601,6 +8654,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': 'ポイントが足りません。',
   'hudChrome.mailbox.title': 'メールボックス',
   'hudChrome.noticeboard.empty': '何も貼られていないようだ。',
+  'hudChrome.noticeboard.popupTitle': 'ギルドの掲示柱',
+  'hudChrome.noticeboard.close': '閉じる',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',
   'hudChrome.mailbox.close': 'メールボックスを閉じる',
   'hudChrome.mailbox.tabInbox': '受信箱',
@@ -12897,6 +12952,222 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '利用不可',
   'hudChrome.perf.diagnostics.report.status.critical': '重大',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '見かけない顔だね、旅の人。この土地では、冒険を始める者が修練の浜を訪れるのが習わしだ。海峡の先にある静かな島だよ。あそこなら世界の試練に挑む前に腕を磨き、この土地に慣れることができる。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
+  'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
+  'hudChrome.tutorialGreeting.declineNote':
+    'お好きにどうぞ、旅の人。気が変わったら、レイヴンポストの郵便柱のそばの渡しの鐘がいつでも修練の浜へ運んでくれる。昼でも夜でもね。狼は待ってくれないが、あの鐘は待っていてくれるよ。',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、そのレーンが体の動かし方を全部教えてくれる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
+  'hudChrome.tutorialGreeting.noteClose': 'わかった',
+  'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
+  'hudChrome.bootcamp.title': '最初の一歩',
+  'hudChrome.bootcamp.talkTitle': 'ウォーデン・タムと話す',
+  'hudChrome.bootcamp.talkBody':
+    'ウォーデン・タムがすぐ先でガントレットの門を守っている。名前が見えるところまで歩み寄り、{interactKey}を押すか、左クリックして話しかけよう。走りの課題を出してくれる。',
+  'hudChrome.bootcamp.talkBodyTouch':
+    'ウォーデン・タムがすぐ先でガントレットの門を守っている。名前が見えるところまで歩み寄り、彼をタップするか、使用ボタンをタップして話しかけよう。走りの課題を出してくれる。',
+  'hudChrome.bootcamp.talkBodyPad':
+    'ウォーデン・タムがすぐ先でガントレットの門を守っている。名前が見えるところまで歩み寄り、インタラクトボタンを押して話しかけよう。走りの課題を出してくれる。',
+  'hudChrome.bootcamp.forwardTitle': '最初のレーンを歩く',
+  'hudChrome.bootcamp.forwardBody':
+    'タムの横のレーンに入り、{forwardKey}を押したまま西の旗まで歩こう。',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    'タムの横のレーンに入り、移動スティックを上に倒したまま西の旗まで歩こう。',
+  'hudChrome.bootcamp.forwardBodyPad':
+    'タムの横のレーンに入り、左スティックを上に倒したまま西の旗まで歩こう。',
+  'hudChrome.bootcamp.turnwalkTitle': '向きを変えて歩く',
+  'hudChrome.bootcamp.turnwalkBody':
+    '旗一本目、よし。{turnKey}を押したままその場で回り、南へ延びる柵のレーンを正面に見たら、もう一度{forwardKey}を押したまま二本目の旗まで歩こう。',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '旗一本目、よし。（移動スティックではなく）世界を指でドラッグして回り、南へ延びる柵のレーンを正面に見たら、スティックを上に倒して二本目の旗まで歩こう。',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '旗一本目、よし。右スティックを倒して回り、南へ延びる柵のレーンを正面に見たら、左スティックを上に倒して二本目の旗まで歩こう。',
+  'hudChrome.bootcamp.strafeTitle':
+    '向きを変えて歩く',
+  'hudChrome.bootcamp.strafeBody':
+    '残るは角ひとつ。{turnLeftKey}を押したままその場で回り、最後のレーンを正面に見たら、もう一度{forwardKey}を押したまま赤い旗が背後に来るまで歩こう。',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '残るは角ひとつ。（移動スティックではなく）画面を指でなぞって向きを変え、最後のレーンを正面に見たら、スティックを上に倒して赤い旗が背後に来るまで歩こう。',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '残るは角ひとつ。右スティックを倒して向きを変え、最後のレーンを正面に見たら、左スティックを上に倒して赤い旗が背後に来るまで歩こう。',
+  'hudChrome.bootcamp.cameraTitle': '視点を回す',
+  'hudChrome.bootcamp.cameraBody':
+    '走りを納める前に最後の一課だ。マウスの右ボタンを押したままドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '走りを納める前に最後の一課だ。世界を指でドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '走りを納める前に最後の一課だ。右スティックを倒して、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
+  'hudChrome.bootcamp.courseProgress': '旗 {current} / {total}',
+  'hudChrome.bootcamp.doneTitle': '走破',
+  'hudChrome.bootcamp.doneBody':
+    '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。彼に{interactKey}を押すか、左クリックして走りを納め、最初の報酬を受け取ろう。',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。彼をタップして走りを納め、最初の報酬を受け取ろう。',
+  'hudChrome.bootcamp.doneBodyPad':
+    '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。インタラクトボタンを押して走りを納め、最初の報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachNextTitle': '次は{npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、{interactKey}を押すか、左クリックして次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、相手をタップするか、使用ボタンをタップして次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、インタラクトボタンを押して次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachTaskBody':
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら{mapKey}で地図が開ける。',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
+  'hudChrome.bootcamp.coachReadyTitle': '任務完了',
+  'hudChrome.bootcamp.coachReadyBody':
+    '{npc}のもとへ行き、{interactKey}を押すか、左クリックして納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachReadyBodyTouch':
+    '{npc}のもとへ行き、相手をタップして納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '{npc}のもとへ行き、インタラクトボタンを押して納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '藁のかかしに歩み寄り、{targetKey}を押すか、左クリックしてターゲットにしよう。次に{attackKey}を押すか、アクションバーの最初のボタンをクリックして打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの最初のボタンをタップして打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に最初のアクションボタンを押して打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskShellBody':
+    '浜辺ガニは挟み返してくる。{targetKey}を押すか、左クリックして一匹をターゲットにし、{attackKey}を押して打ち込み、そのまま打ち続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの最初のボタンをタップして打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '浜辺ガニは挟み返してくる。ターゲットボタンを押し、次に最初のアクションボタンを押して打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '漂着した木箱は暁の野営地へ続く道沿いに並んでいる。名前が見えるところまで漂着した木箱に歩み寄り、{interactKey}を押すか、木箱を左クリックして拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '漂着した木箱は暁の野営地へ続く道沿いに並んでいる。名前が見えるところまで漂着した木箱に歩み寄り、木箱をタップするか、使用ボタンをタップして拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '漂着した木箱は暁の野営地へ続く道沿いに並んでいる。名前が見えるところまで漂着した木箱に歩み寄り、インタラクトボタンを押して拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskPouchBody':
+    '{npc}に向かって{interactKey}を押すか、左クリックして露店を開き、亜麻のポーチを左クリックして買おう。',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    '{npc}をタップして露店を開き、亜麻のポーチをタップして買おう。',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '{npc}に向かってインタラクトボタンを押して露店を開き、亜麻のポーチを選んで買おう。',
+  'hudChrome.bootcamp.readyPouchBody':
+    'ポーチは買えた。{bagsKey}を押してバッグを開き、亜麻のポーチを左クリックして空いた鞄留めに締めよう。それから{npc}のもとへ行き、{interactKey}を押して見せよう。',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    'ポーチは買えた。バッグを開き、亜麻のポーチをタップして空いた鞄留めに締めよう。それから{npc}のもとへ行き、相手をタップして見せよう。',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    'ポーチは買えた。バッグを開き、亜麻のポーチを選んで空いた鞄留めに締めよう。それから{npc}のもとへ行き、インタラクトボタンを押して見せよう。',
+  'hudChrome.bootcamp.bellTitle': '鐘を鳴らす',
+  'hudChrome.bootcamp.bellBody':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、{interactKey}を押すか、左クリックして、イーストブルックへ出航しよう。',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、鐘をタップして、イーストブルックへ出航しよう。',
+  'hudChrome.bootcamp.bellBodyPad':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、インタラクトボタンを押して、イーストブルックへ出航しよう。',
+  'entities.zones.proving_shore.pois.4.label': 'ガントレット',
+  'entities.items.ps_castaway_crate.name': '漂着した木箱',
+  'entities.items.ps_ferry_bell.name': '渡しの鐘',
+  'entities.mobs.training_effigy.name': '訓練用のかかし',
+  'entities.mobs.shore_scuttler.name': '浜辺ガニ',
+  'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
+  'entities.npcs.wayfarer_bryn.title': '港の案内人',
+  'entities.npcs.wayfarer_bryn.greeting':
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。レイヴンポストの郵便柱のそばの渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
+  'entities.npcs.instructor_maren.name': '教官マレン',
+  'entities.npcs.instructor_maren.title': '修練の師',
+  'entities.npcs.instructor_maren.greeting':
+    '渓谷が感謝を捧げてきた英雄は皆、今君が立っているその場所に立っていた、{className}。そして当時は誰一人、剣のどちらを握るのかさえ知らなかった。この浜はそのためにある。問い、鍛え、失敗しても構わない場所で存分に失敗するといい。',
+  'entities.npcs.quartermaster_finch.name': '補給係フィンチ',
+  'entities.npcs.quartermaster_finch.title': '野営地の商人',
+  'entities.npcs.quartermaster_finch.greeting':
+    '私の店先に並ぶ売り物はきっかり一つだけだよ、{playerName}。道すがら拾ったものを入れる予備のポーチ、それも課題がそれを求めたときだけ。ほかにここにあるのは全部、渓谷へ送る引き揚げ品さ。銅貨がポーチを買い、働きが銅貨を稼ぐ。それが経済のすべてで、これ以上難しくはならない。大きくなるだけさ。',
+  'entities.npcs.ferryman_odo.name': '渡し守オド',
+  'entities.npcs.ferryman_odo.title': '渡し場の番人',
+  'entities.npcs.ferryman_odo.greeting':
+    '渡ってきたばかりかい、{playerName}？ウォーデン・タムが桟橋のすぐ南の浜でガントレットを預かっている。まず彼のレーンを走ってくれば、足が礼を言うだろう。この浜の番人たちは、仕事を終えるたびに君を次の一人へ引き継いでくれるし、画面の上のカードはいつでも次の道を知っている。渓谷が君を呼び戻したら、私の桟橋のそばに立つ鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。',
+  'entities.npcs.warden_tam.name': 'ウォーデン・タム',
+  'entities.npcs.warden_tam.title': 'ガントレットの番人',
+  'entities.npcs.warden_tam.greeting':
+    'このレーンがガントレットだ、{playerName}。渓谷に名を知られた冒険者は皆ここを走った。柵のランタンは夜通し灯っているから、レーンが閉まることはない。',
+  'entities.npcs.overseer_pell.name': '監督官ペル',
+  'entities.npcs.overseer_pell.title': 'ガントレットの監督官',
+  'entities.npcs.overseer_pell.greeting':
+    'このレーンを下ってくる走りは全部私が計っている、{playerName}。もっとひどい足さばきなら山ほど見てきたよ。私の後ろの道は練習場へ続いている。足さばきが剣さばきに変わるのは、あそこだ。',
+  'entities.npcs.drillmaster_rook.name': '訓練長ルーク',
+  'entities.npcs.drillmaster_rook.title': '練習場の主',
+  'entities.npcs.drillmaster_rook.greeting':
+    'まず藁、次に甲羅だ、{playerName}。かかしは腕に振り方を教え、浜の先の蟹どもは、嫌がる相手に当てる術を教えてくれる。',
+  'entities.npcs.tidewarden_nel.name': '潮守ネル',
+  'entities.npcs.tidewarden_nel.title': '浜辺の番人',
+  'entities.npcs.tidewarden_nel.greeting':
+    '潮は奪い、潮は払う、{playerName}。私はその両方の帳簿をつけている。蟹どもが難破船から掠め取るものと、正直な手がこの道を運び上げてくるものとをね。',
+  'entities.quests.q_ps_the_gauntlet.title': 'ガントレットを走れ',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '渓谷に名を知られた者は皆、まずこのレーンを走った、{playerName}。最初のレーンを西へ旗まで歩き、その場で向きを変え、南のレーンを二本目の旗まで歩き、それから最後のレーンを赤い旗まで横歩きで進むんだ。旗は順番どおりに通ること。画面上部のカードが、そのつど必要なボタンを見せてくれる。監督官ペルがレーンの先で走りをすべて計っている。赤い旗を越えれば、彼がすぐそこに立って走りを受け取ってくれるよ。',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '今の走り、しかと計った、{playerName}。もっと速い足を落第させたこともある。ガントレットは君のものだ。私の後ろの道を上れば練習場で、そこでは訓練長ルークが足さばきを剣さばきに変えてくれる。次の仕事は彼が持っているよ。',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': 'ガントレットの旗を通過',
+  'entities.npcs.bursar_wick.name': '出納係ウィック',
+  'entities.npcs.bursar_wick.title': '金張りの金庫',
+  'entities.npcs.bursar_wick.greeting':
+    '金張りの金庫は、こんな浜にも机を置いているんだよ、{playerName}。私に預けたものは、どの町のどの出納係の後ろにもある同じ金庫で待っている。狼にも、水にも、君自身のまずい思いつきにも手は届かない。',
+  'entities.quests.q_ps_strike_true.title': '確かな一撃',
+  'entities.quests.q_ps_strike_true.text':
+    '足の次は腕だ、{playerName}。練習場は私の後ろの道を上った先にあって、そこの藁のかかしは打たれるために作られている。道に迷ったらMを押して地図を開きなさい。引き受けた仕事はすべてそこに印がつく。かかしに歩み寄ってTabを押すか、左クリックすれば、それが君のターゲットになる。次に1を押すか、画面下のアクションバーの最初のアイコンをクリックすれば、刃が振れる。一体が崩れるまで打ち続けること。かかしは打ち返してこない。かかしとはそういうものだ。訓練長ルークは、浜辺への道が始まる練習場の西の肩から場を見ている。彼にFを押して、討ち取りの報告を納めなさい。',
+  'entities.quests.q_ps_strike_true.completion':
+    '見事に一体、握りももう確かになってきた。その感覚を忘れるな、{playerName}。狙いを定め、打ち込み、打ち続ける。藁は何をされても気にしない。だが次に君が刃を向ける相手は、そうはいかないぞ。',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',
+  'entities.quests.q_ps_shell_and_claw.title': '甲羅と爪',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '藁は気にしないが、{playerName}、今度は気にする相手だ。浜辺ガニが遠い浜の難破の浜で残骸を漁っている。練習場から西へ道なりに進めば、まっすぐ奴らのところへ出る。奴らは挟み返してくるから、体力バーに気を配りつつ打ち続けろ。Tabか左クリックで一匹をターゲットにして、1を押し、甲羅が割れるまで手を止めるな。三匹で足りる。終わったら北の丘へ道を上りなさい。潮守ネルが浜の帳簿をつけていて、君の甲羅も数えてくれる。',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '甲羅を三つ割って、指は一本も欠けていない。初陣としては上出来だよ、{playerName}。あの蟹どもは潮が漂着物を運ぶより速く難破船から掠め取っていくから、君が一匹間引くたびに、誰かの銅貨が守られるんだ。',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '浜辺ガニを間引く',
+  'entities.quests.q_ps_the_wreck_line.title': '難破の浜',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '私の運び手たちは古い難破船から漂着物を下ろし、暁の野営地へ向かう丘を運び上げるんだ、{playerName}。ところが木箱の半分は登り切らない。道すがら置かれて、そのまま忘れられてしまう。私の道を野営地のほうへ辿れば、そのはぐれ荷のすぐ脇を通る。開けるのは簡単だよ。名前が見えるところまで木箱に歩み寄って、Fを押すか、木箱そのものを左クリックすれば、中身を差し出してくれる。六つ開ければ道は片づく。そしてFは、この先出会うどんな宝箱にも、採集場所にも、扉にも使う同じキーだと覚えておきなさい。補給係フィンチが野営地の露店を構えていて、漂着物なら棒切れ一本でも買い取ってくれる。獲物は彼女に渡すんだ。',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    'ロープに、タールに、海がなぜか見逃したチーズが半玉。全部引き取ろう、{playerName}。拾ったものを担いで運べる背中は、この野営地にとってどんな刃より値打ちがある。そして君のその背中は、たった一登りで道を丸ごと片づけてくれた。',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '漂着した木箱を開ける',
+  'entities.quests.q_ps_pouch_and_purse.title': 'ポーチと財布',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    '渓谷へ発つ前にもうひとつ、冒険者の命を守る授業だよ、{playerName}。君の持ち物の話だ。背嚢には十六の枠があり、その横に空の鞄留めが四つ待っている。鞄を留めるたびに、その分の空きが全体に加わる。では、もう一度私にFを押して店を開き、並んだ品の中の亜麻のポーチを左クリックして買い、それからBを押してバッグを開き、そこのポーチを左クリックして空いた留めに締めなさい。教官マレンは数歩東の集合の焚き火のそばで稽古をつけている。腰のポーチを彼女に見せておいで。',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    '良いポーチだ。まだ締めていないなら締めておきなさい。Bを押してバッグを開き、ポーチを左クリックして空いた鞄留めに収めれば、厄介ごとを詰める枠が六つ増える。ここからは、どんな鞄にも収まらない残り半分の授業だよ、{playerName}。持ちきれないものは金張りの金庫が預かる。出納係ウィックが西の道を上った先に金庫の机を構えていて、どの町のどの出納係とも共通の金庫を開けてくれる。財布が育てば金庫の枠も買い足せる。値打ち物は金庫へ、鞄には余裕を。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだ。',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '亜麻のポーチを購入する',
+  'entities.quests.q_ps_the_signpost.title': '風の便り',
+  'entities.quests.q_ps_the_signpost.text':
+    '学ぶ習慣はあとひとつ、{playerName}、これに刃は要らない。掲示板を読むことだ。ギルドの掲示柱は私の焚き火から南西へ数歩、野営地の門のところに立っていて、ギルドや旅の一団が呼びかけを貼っていく。柱の正面まで歩み寄ってFを押すか、左クリックして貼られたものを読み、それから戻って、風が何を運んできたか聞かせておくれ。この先君が足を踏み入れるどの町にも、同じような掲示板が立っているよ。',
+  'entities.quests.q_ps_the_signpost.completion':
+    'これで渓谷での知らせの巡り方が分かったね、{playerName}。使者ではなく、掲示板で巡るんだ。通る町ごとに確かめなさい。冒険の半分は、板の上の三行の墨から始まるのだから。',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': 'ギルドの掲示柱を読む',
+  'entities.quests.q_ps_set_sail.title': '出航',
+  'entities.quests.q_ps_set_sail.text':
+    'この浜には、君がまだ走っていない、倒していない、開けていない、買っていないものは何も残っていないよ、{playerName}。準備はできた。イーストブルックには本物の仕事が待っている。浜の道を下って桟橋へ戻り、渡し守オドにFを押して、マレンが、君は渡りを勝ち取ったと言っていた、と伝えなさい。誰に何を頼まれていたか分からなくなったら、いつでもLを押しなさい。それが君のクエストログだよ。',
+  'entities.quests.q_ps_set_sail.completion':
+    'マレンがそう言ったのかい？私に一週間も舫い結びの稽古をさせた人からの、これは大した誉め言葉だ。支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい、{playerName}。渡しがイーストブルックの町の真ん中に降ろしてくれる。狼には気をつけて。',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '渡し守オドに報告する',
+  'entities.zones.proving_shore.name': '修練の浜',
+  'entities.zones.proving_shore.welcome':
+    '修練の浜が君に求めるのは時間だけ。野営地を覚え、かかしを打ち、難破の浜を歩き、支度ができたら渡し守オドが渓谷まで送り届けてくれる。',
+  'entities.zones.proving_shore.pois.0.label': '暁の野営地',
+  'entities.zones.proving_shore.pois.1.label': '古い桟橋',
+  'entities.zones.proving_shore.pois.2.label': '練習場',
+  'entities.zones.proving_shore.pois.3.label': '難破の浜',
+  'guide.home.world.provingName': '修練の浜',
+  'guide.home.world.provingBlurb':
+    '海峡の向こうの静かな訓練の島。渓谷が何かを求めてくる前に、新米冒険者はここで足場を固める。',
+  'guide.worldPage.provingBlurb':
+    '渓谷から海峡を隔てた静かな島で、訓練場として保たれている。野営地がひとつ、練習場がひとつ、残骸の散らばる浜、そして行きも帰りも通う渡し船。',
+  'guide.worldPage.provingGreeting':
+    '渓谷が感謝を捧げてきた英雄は皆、今君が立っているその場所に立っていた。そして当時は誰一人、剣のどちらを握るのかさえ知らなかった。',
+  'guide.worldPage.provingGreeter': '教官マレン、暁の野営地',
+  'guide.worldPage.provingPlaceNotes':
+    '暁の野営地が島の集落のすべてで、テントが数張り、売店がひとつ、集いの焚き火がひとつ。古い桟橋は渓谷に面し、渡しの円環が卒業生を海峡の向こうへ運ぶ。野営地の南の練習場には、必要とする者のために藁のかかしが立ち続け、難破の浜は潮が漂着した木箱で島に払いをする、残骸の散らばる海岸だ。',
   'hudChrome.perf.diagnostics.report.status.healthy': '正常',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':

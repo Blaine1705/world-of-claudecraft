@@ -60,9 +60,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
 // are, and the numbers below were set from a run, not from this narrative.
 // The New Eastbrook program then retires the Vale Cup minigame, removing its
-// six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md).
-const EXPECTED_SEND_COUNT = 193;
-const EXPECTED_DISPATCH_COUNT = 206;
+// six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md);
+// the Proving Shore tutorial adds its one start_tutorial pair back on top.
+const EXPECTED_SEND_COUNT = 194;
+const EXPECTED_DISPATCH_COUNT = 207;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -26,6 +26,14 @@ export interface QuestTrackerControllerDeps {
 export class QuestTrackerController {
   constructor(private readonly deps: QuestTrackerControllerDeps) {}
 
+  // The repaint memo compares against the LAST BUILT html, never the live
+  // innerHTML: overlays decorate the painted rows in place (the island
+  // coach's .qd-coach pulse adds a class and an animation-delay style), and
+  // a live compare reads every such decoration as a content change, so the
+  // tracker rewrote itself each update and the pulse strobed as it was
+  // stripped and re-added in a fight.
+  private lastHtml: string | null = null;
+
   update(): void {
     let collapsed = this.deps.settings.collapsed();
     const quests: TrackedQuest[] = [];
@@ -62,7 +70,13 @@ export class QuestTrackerController {
       collapsed = false;
     }
     const html = this.renderHtml(questTrackerView(quests, collapsed));
-    if (this.deps.element.innerHTML !== html) this.deps.element.innerHTML = html;
+    // First update adopts the live DOM as the baseline, so a host that
+    // pre-seeded the element (or an empty tracker) still elides the write.
+    if (this.lastHtml === null) this.lastHtml = this.deps.element.innerHTML;
+    if (this.lastHtml !== html) {
+      this.lastHtml = html;
+      this.deps.element.innerHTML = html;
+    }
   }
 
   toggleCollapsed(): void {

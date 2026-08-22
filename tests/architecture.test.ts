@@ -314,6 +314,10 @@ const UI_PURE_CORES = [
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
+  'src/ui/tutorial_greeting_view.ts',
+  'src/ui/bootcamp_view.ts',
+  'src/ui/coach_prompt_view.ts',
+  'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_view.ts',
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',
@@ -456,6 +460,9 @@ const RENDER_PURE_CORES = [
   'src/render/initial_frame_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
+  'src/render/quest_beacon_core.ts',
+  'src/render/coach_trail_core.ts',
+  'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
@@ -1891,6 +1898,7 @@ const UI_DOM_MODULES = [
   'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
+  'src/ui/noticeboard_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',
@@ -1906,6 +1914,7 @@ const UI_DOM_MODULES = [
   'src/ui/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',
   'src/ui/prompt_dialog.ts',
+  'src/ui/tutorial_greeting_window.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it
@@ -1936,6 +1945,7 @@ const UI_DOM_MODULES = [
   // pure core.
   'src/ui/tracker_stack_anchor.ts',
   'src/ui/tutorial.ts',
+  'src/ui/bootcamp.ts',
   'src/ui/ui_effects_applier.ts',
   'src/ui/ui_icons.ts',
   'src/ui/ui_scale.ts',

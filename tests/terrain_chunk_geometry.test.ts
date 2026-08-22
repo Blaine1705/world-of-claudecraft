@@ -80,9 +80,10 @@ describe('generated chunk geometry is stable', () => {
     await task;
 
     const meshes = terrain.group.children.filter((c) => (c as THREE.Mesh).isMesh) as THREE.Mesh[];
-    // 36 in-rect chunks plus the 12 merged super-chunk meshes over the 21 gap
-    // cells nearest-rect ownership hands the Vale (the rects do not tile).
-    expect(meshes.length).toBe(48);
+    // 36 in-rect chunks and no gap super-chunks any more: the Proving Shore
+    // tutorial island claimed the west cell, so nearest-rect ownership no
+    // longer hands the Vale any gap cells (was 48 with 12 merged gap meshes).
+    expect(meshes.length).toBe(36);
 
     // Order the chunks by their own geometry bounds, so the pin does not depend
     // on build ORDER (which the worker move is expressly going to change).
@@ -117,7 +118,10 @@ describe('generated chunk geometry is stable', () => {
     const inRect = keyed.filter(({ box }) => box.min.x >= -181);
     const gapFill = keyed.filter(({ box }) => box.min.x < -181);
     expect(inRect.length).toBe(36);
-    expect(gapFill.length).toBe(12);
+    // The Proving Shore tutorial island owns every former Vale gap cell, so a
+    // Vale build produces zero gap-fill super-chunks now; the island's own
+    // chunks arrive only with its zone build.
+    expect(gapFill.length).toBe(0);
 
     // Re-minted for the natural-relief heightfield plus the shared height
     // lattice in terrain_chunk_build.ts (vertex normals now difference the
@@ -130,15 +134,24 @@ describe('generated chunk geometry is stable', () => {
     // height atlas (tests/terrain_height_parity.test.ts fixture, re-minted
     // in the same commit): the whole ten-node placement fix moves 146 of
     // its 140639 points, 0.1 percent, all inside the moved nodes' pad
-    // footprints.
-    // Re-minted again for the northwest coast spit carve in applyValeCoast
-    // (src/sim/world.ts): the low beach shelf that aproned the grey cliff foot
-    // is submerged so the bay water meets the cliff, an intended, looked-at
-    // visual change. The carve only ever lowers and stays local: sampled on a
-    // 0.5yd lattice over the vale and its gap cells it moves 8704 of 1589721
-    // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
-    // and nothing rises anywhere. Both digests move because that window
-    // straddles the rect edge at x = -180.
+    // footprints. Re-minted again for the Proving Shore tutorial island
+    // (provingCoast/provingMoat reshape the Vale's west strand) and once more
+    // on the v0.37.0 merge, which added the northwest coast spit carve in
+    // applyValeCoast (the low beach shelf under the grey cliff foot submerged
+    // so the bay water meets the cliff; its window x -211.5..-132.5,
+    // z 116.5..145.5 straddles the rect edge into the island's cell, where it
+    // composes with the island appliers). Re-minted once more on the
+    // release/v0.39.0 castles merge, whose vale terrain edits (the
+    // walk-in castle grounds era; the release's own terrain-height fixture
+    // moved in the same merge) reshape these chunks again on the merged
+    // tree, AND because the island's zone rect adds two BORDER_EDGES rows
+    // whose gaussian ridge walls (RIDGE_SIGMA 26, both sides of each new
+    // edge) reshape the Willowfen's south shore band (z 204..244, moves up
+    // to +7.2yd), the vale's north-west corner past the carve at x -176
+    // (up to 7.5yd), and a few Mirefen points on the same edge; nothing in
+    // those bands crosses the waterline and the town centre is
+    // bit-identical (PR #3467 review, finding 2 measured base vs head).
+    // Digest stable across two runs.
     // Re-minted for the Copper Dig relocation to the dig headland (New
     // Eastbrook program, docs/design/eastbrook-revamp/master-plan.md): the
     // dig-headland coast lobe, the site's mode level terrain stamp, the
@@ -313,9 +326,15 @@ describe('generated chunk geometry is stable', () => {
     // the bay south of town (roads are height appliers). All inside the rect,
     // east of x = -180. Computed twice in separate processes, identical both
     // times. An intended, looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('e4d3c0c435e13599cdebf10b44e9a213');
     // The gap super-chunks did NOT take this re-mint: see above.
-    expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
+    // Re-minted on the integration merge of the eastbrook program and the
+    // Proving Shore island: both sides' intended terrain changes combine, so
+    // the digest matches neither parent (set from a suite run on the merged
+    // tree).
+    expect(digestOf(inRect)).toBe('1f26294da5b10f2dcf8bbce9572f6e4f');
+    // The gap super-chunk digest pin is gone with the gap chunks themselves
+    // (the island claims the old vale gap cells); gapFill.length above pins
+    // their absence.
 
     terrain.cancelStreaming();
   });

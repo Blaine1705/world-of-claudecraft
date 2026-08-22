@@ -1001,6 +1001,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // release tip (spell-icon revert, sky KTX2, druid auto-unshift): both parents'
 // renderer and layout bytes combine in one tree, so the composite mints a
 // value matching neither parent. No capture was retaken.
+// Re-minted for the release/v0.39.0 base merge into feature/tutorial-island: the
+// first-order composite follows the resolved renderer.ts and prewarm_policy.ts
+// bytes, then these seals follow the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for the island far-shore haze band (renderer.ts passes the camera
+// to horizonHazePlan): the first-order composite follows those bytes, then
+// these seals follow the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   'b30ad6d964b24f8570d35bfbc389d05ce1b720bcd10b8f0052d5dc5b90d4126c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
@@ -2131,6 +2138,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // release tip. The first-order composite follows both parents' combined
     // bytes, then this second-order performance seal follows the swept
     // evidence bytes. No capture was retaken.
+    // Re-minted for the release/v0.39.0 base merge into feature/tutorial-island.
+    // The first-order composite follows the resolved renderer.ts and
+    // prewarm_policy.ts bytes, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
+    // Re-minted for the island far-shore haze band: the first-order composite
+    // follows renderer.ts, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,

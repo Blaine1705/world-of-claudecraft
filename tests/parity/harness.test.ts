@@ -173,6 +173,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'craftThrottle',
       'fiestaMods',
       'fiestaSpecial',
+      'firstCharacter',
       'guildMembership',
       'joinedAt',
       'known',
