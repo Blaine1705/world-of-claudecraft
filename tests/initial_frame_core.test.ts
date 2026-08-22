@@ -81,4 +81,25 @@ describe('the renderer wires the policy into the world.initial-frame entry', () 
     // still never sacrificed to the soft deadline: the decision is the policy's, not the clock's
     expect(entry).toContain('deadlineExempt: true,');
   });
+
+  it('refuses optional sky and settle draws while compile debt is still outstanding', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    for (const [id, nextId] of [
+      ['sky.current-zone', 'render.settle-passes'],
+      ['render.settle-passes', 'diagnostics.baseline'],
+    ] as const) {
+      const start = renderer.indexOf(`id: '${id}'`);
+      const end = renderer.indexOf(`id: '${nextId}'`, start);
+      const entry = renderer.slice(start, end);
+      expect(start).toBeGreaterThan(-1);
+      expect(end).toBeGreaterThan(start);
+      expect(entry).toContain('initialFrameDeferral(compileLifecycle.records)');
+      expect(entry.indexOf('initialFrameDeferral(compileLifecycle.records)')).toBeLessThan(
+        entry.indexOf('this.renderPrewarmPass(1 / 60)'),
+      );
+    }
+  });
 });

@@ -207,35 +207,34 @@ describe('startGame wiring', () => {
     expect(localeAwaitAt).toBeGreaterThan(beginAt);
   });
 
-  // The background lane must open strictly later than everything above: it is
-  // only safe once the boot gate has already resolved and a real frame has
-  // painted, or a 'background' thunk could still stall world entry.
-  it('opens the background lane only once the first frame is on screen', () => {
-    const beginCriticalAt = mainSource.indexOf('beginDeferredPreloads()');
-    const awaitAssetsAt = mainSource.indexOf('await assetsReady(');
-    const firstPaintAt = mainSource.indexOf("checkpoint('first-paint')");
-    const schedulerAt = mainSource.indexOf('void runPostEntryWarmups({', firstPaintAt);
-    const beginBackgroundAt = mainSource.indexOf(
-      'startBackgroundPreloads: beginBackgroundPreloads,',
-      schedulerAt,
-    );
-    expect(beginCriticalAt).toBeGreaterThan(-1);
-    expect(awaitAssetsAt).toBeGreaterThan(-1);
-    expect(firstPaintAt).toBeGreaterThan(-1);
-    expect(schedulerAt).toBeGreaterThan(firstPaintAt);
-    expect(beginBackgroundAt).toBeGreaterThan(-1);
-    expect(beginBackgroundAt).toBeGreaterThan(beginCriticalAt);
-    expect(beginBackgroundAt).toBeGreaterThan(awaitAssetsAt);
-    expect(beginBackgroundAt).toBeGreaterThan(firstPaintAt);
+  it('does not open unrelated background asset work at the first interactive frame', () => {
+    expect(mainSource).not.toContain('beginBackgroundPreloads');
   });
 });
 
-describe('background-tier retag: only a build path that tolerates late assets', () => {
-  it('tags Thornhollow Fields art background: buildBattleground streams its own pieces in on demand', () => {
+describe('Thornhollow intent-driven preload', () => {
+  it('does not register Thornhollow art in the automatic post-entry background lane', () => {
     const src = readFileSync(new URL('../src/render/battleground.ts', import.meta.url), 'utf8');
-    expect(src).toMatch(
-      /registerDeferredPreload\(\(\) => ensureBattlegroundAssets\(\),\s*'background'\)/,
+    expect(src).not.toMatch(/registerDeferredPreload\([^;]*'background'/);
+    expect(src).toContain('createBattlegroundAssetPrewarm(');
+  });
+
+  it('starts from the resolved Thornhollow tab and commits before sending queue join', () => {
+    const arena = readFileSync(new URL('../src/ui/arena_window.ts', import.meta.url), 'utf8');
+    const thornhollowArm = arena.slice(
+      arena.indexOf("if (this.tab === 'ravenrift')"),
+      arena.indexOf('this.renderArena(', arena.indexOf("if (this.tab === 'ravenrift')")),
     );
+    expect(thornhollowArm).toContain('thornhollowPrewarm?.startPreview();');
+
+    const queueHandler = arena.slice(
+      arena.indexOf('el.querySelector(\'[data-act="queue"]\')'),
+      arena.indexOf('el.querySelector(\'[data-act="leave"]\')'),
+    );
+    expect(queueHandler.indexOf('thornhollowPrewarm?.commit();')).toBeLessThan(
+      queueHandler.indexOf('this.deps.world().bgQueueJoin();'),
+    );
+    expect(mainSource).toContain('setThornhollowPrewarmHooks({');
   });
 
   // dungeon.ts's kit/bits GLBs and vale_cup_stadium.ts's kit pieces are both read

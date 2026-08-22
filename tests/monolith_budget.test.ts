@@ -271,7 +271,9 @@ const MONOLITHS: MonolithRow[] = [
     // (the predicate lives in src/render/characters/assets.ts). Both additions
     // are thin-consumer wiring to their extracted seams. Exact count, zero
     // slack: any further growth reds again.
-    ceiling: 13573,
+    // Entry-detail admission moved the settle step ahead of compile/texture
+    // collection while deleting the old reveal-time arm: exact count, no slack.
+    ceiling: 13564,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

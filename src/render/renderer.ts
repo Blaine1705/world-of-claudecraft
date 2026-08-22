@@ -258,6 +258,7 @@ import {
   entityViewShouldDrop as shouldDropView,
   viewBuildClass,
 } from './entity_view_policy_core';
+import { EntryDetailHorizonAdmission } from './entry_detail_horizon';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
   createEnvironmentMapTransition,
@@ -634,7 +635,7 @@ import {
   type TemporalHourglassVisual,
 } from './temporal_hourglass_visual';
 import { buildTerrain, hasTerrainSplatAssets, type TerrainView } from './terrain';
-import { runTexturePrepLane } from './texture_prep_lane';
+import { runTexturePrepLane, texturePieceLabel } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { uploadDataTextureInChunks } from './texture_upload';
 import { sparkleTexture } from './textures';
@@ -1752,6 +1753,7 @@ export class Renderer {
   private farVista: FarVistaPlan;
   private farTerrainView!: FarTerrainView;
   private detailFogFar: number;
+  private entryDetailHorizon = new EntryDetailHorizonAdmission(FOGLESS_DETAIL_FAR);
   // Scratch for the residency clamp's view wedge: the camera forward the clamp
   // reads, kept off the shared tmpV pool because updateAmbience runs in the
   // middle of sync's entity work and must not disturb it.
@@ -4392,6 +4394,7 @@ export class Renderer {
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
       lastFrame: snapshotRendererFrameStats(this.lastFrameStats),
       prewarm: this.lastPrewarmStats,
+      entryDetailHorizon: this.entryDetailHorizon.snapshot(),
       gpuQueue: this.backgroundGpuWork.stats(),
       gpuPrep: { budget: this.gpuPrepBudget.snapshot(), events: gpuPrepEventsSnapshot() },
       buildLedger: this.buildLedger.snapshot(),
@@ -4405,6 +4408,11 @@ export class Renderer {
     this.gpuHitchCompileLifecycle?.markReveal();
     markPrewarmPacingReveal(this.gpuHitchPacing, this.lastPrewarmStats);
     liveProgramWatch.armLiveProgramWatch(this.webgl);
+  }
+
+  /** Contract the entry-only detail field while the loading cover still owns presentation. */
+  armEntryDetailHorizon(): void {
+    this.detailFogFar = this.entryDetailHorizon.arm(this.detailFogFar, this.farVista.enabled);
   }
 
   /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
@@ -6298,8 +6306,8 @@ export class Renderer {
       idPrefix: string,
       textures: readonly THREE.Texture[],
     ): PrewarmResumeUnit[] =>
-      [...new Set(textures)].map((texture, index) => ({
-        id: `${idPrefix}:${index}`,
+      [...new Set(textures)].map((texture) => ({
+        id: texturePieceLabel(`upload:${idPrefix}`, texture),
         run: () => this.prewarmTexture(texture),
       }));
 
@@ -6612,6 +6620,19 @@ export class Renderer {
         detail: () => `objects=${greatTreePrewarmGroup?.children.length ?? 0}`,
       },
       {
+        // Set the capped camera and subsystem visibility before collecting any
+        // scene compile or texture work. This is paint-free and deadline-exempt:
+        // without it the 240-yard entry policy still prewarms the old 700-yard scene.
+        id: 'world.settle-state',
+        category: 'world',
+        priority: 45,
+        required: true,
+        deadlineExempt: true,
+        run: () => {
+          this.prewarmWorldFrame(1 / 60);
+        },
+      },
+      {
         // Early compile submission (see submitCompileUnits above): every
         // group staged by the entries before this one fires its compileAsync
         // units NOW, so the driver links them off-thread underneath the
@@ -6681,51 +6702,24 @@ export class Renderer {
         detail: landmarkSlot.detail,
       },
       {
-        // One full non-submitting frame tick (prewarmWorldFrame advances the
-        // renderer clock, camera smoothing, LOD bands, fog, zone visibility
-        // and lazily built terrain/water content; it never touches sim
-        // state), so every later collection (textures.scene's texture walk,
-        // the compile units) sees the visibility state world.initial-frame
-        // will actually draw.
-        // Measured on a full offline entry: collected before this update the
-        // compile lane visited 2807 roots yet still left the frame a
-        // 230-program, 185-texture residue costing 16.9 s; collected after,
-        // 801 roots and the frame residue fell to 64 programs and 3.8 s.
-        id: 'world.settle-state',
-        category: 'world',
-        priority: 49,
-        required: true,
-        // No resumeUnits: after the reveal this would double-advance the
-        // renderer clock, LOD bands and fog off the LIVE camera.
-        run: () => {
-          this.prewarmWorldFrame(1 / 60);
-        },
-      },
-      {
         id: 'textures.scene',
         category: 'world',
         priority: 50,
         required: true,
+        deadlineExempt: true,
         resumeUnits: () => textureResumeUnits('scene', this.collectInitialSceneTextures()),
         run: async () => {
-          if (constrainedPrewarm) {
-            const batched = await this.prewarmInitialSceneTexturesBatched(
-              policy.textureBatchSize,
-              policy.textureMaxMs,
-            );
-            textureUploads = batched.uploaded;
-            sceneTexturesInitialized = batched.initialized;
-            // done matches planned's unit (textures examined): the uploaded
-            // GPU-residency delta never moves for an already-resident texture,
-            // so it would misreport a shortfall on a fully successful run.
-            sceneTextureProgress = {
-              done: batched.initialized,
-              planned: batched.planned,
-              trimmed: batched.trimmed,
-            };
-            return;
-          }
-          textureUploads = this.prewarmObjectTextures(this.scene);
+          const batched = await this.prewarmInitialSceneTexturesBatched(
+            Math.max(1, policy.textureBatchSize),
+            Math.max(0, gpuSubmitDeadline - performance.now()),
+          );
+          textureUploads = batched.uploaded;
+          sceneTexturesInitialized = batched.initialized;
+          sceneTextureProgress = {
+            done: batched.initialized,
+            planned: batched.planned,
+            trimmed: batched.trimmed,
+          };
         },
         progress: () => sceneTextureProgress,
         detail: () =>
@@ -7146,6 +7140,7 @@ export class Renderer {
         run: () => {
           for (const point of skyZonePoints) {
             if (performance.now() >= gpuSubmitDeadline) break;
+            if (initialFrameDeferral(compileLifecycle.records)) break;
             this.skyView.setCameraPos(point.x, point.z, 1 / 20);
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
@@ -7166,7 +7161,11 @@ export class Renderer {
         required: false,
         // No resumeUnits, and none needed: after the reveal the live frames ARE the passes.
         run: () => {
-          while (renderPasses < settleMinPasses && performance.now() < gpuSubmitDeadline) {
+          while (
+            renderPasses < settleMinPasses &&
+            performance.now() < gpuSubmitDeadline &&
+            !initialFrameDeferral(compileLifecycle.records)
+          ) {
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
           }
@@ -9917,28 +9916,13 @@ export class Renderer {
     if (desired === 'outdoor') {
       const g = this.dnGrade;
       const preset = this.outdoorFogPreset();
-      // Vista tiers run WITHOUT outdoor fog: the detail horizon is a uniform
-      // envelope in every realm (the presets' murk walls are retired), and
-      // scene fog parks past the camera far plane where it occludes nothing.
-      // The residency clamp keeps gating the DETAIL horizon while zones
-      // stream in; the far mesh stands beneath, so an unbuilt chunk reads as
-      // coarse ground, never a hole.
       const vista = this.vistaLive();
       const requestedFar = vista ? FOGLESS_DETAIL_FAR : preset.far * (this.lowGfx ? 1 : g.farScale);
       this.lastRequestedFogFar = requestedFar;
       this.lastRequestedFogNear = preset.near;
-      // Residency is read per CHUNK, through the terrain view's own accessor.
-      // Asking per ZONE meant an unprepared 36-to-54 chunk rectangle within
-      // ~53 yd pinned the view at the floor until that entire rectangle (and
-      // its HDRI) finished: 198 s of 45-yard wall after a Drakelands portal.
-      // Read live rather than cached: an editor rebuildTerrain swaps the view.
       const ground = this.terrainView.groundResidency();
-      const detailSource = vista ? this.detailFogFar : fog.far;
-      const atmosphericFar = dampedValue(detailSource, requestedFar, dt, ZONE_ENVIRONMENT_RESPONSE);
-      // Ask the clamp only about ground the camera can see. Radially, the
-      // binding chunk orbits with the third-person boom, so standing still and
-      // turning on the spot dragged the detail horizon between 170 and 700
-      // yards and deleted mid-field scenery and shadows with it.
+      // Directional rather than radial, so orbiting the camera does not let an
+      // off-screen pending chunk collapse visible scenery.
       this.camera.getWorldDirection(this.residencyForward);
       this.residencyCone.forwardX = this.residencyForward.x;
       this.residencyCone.forwardZ = this.residencyForward.z;
@@ -9951,22 +9935,29 @@ export class Renderer {
         ground.isPending,
         this.camera.position.x,
         this.camera.position.z,
-        atmosphericFar,
+        requestedFar,
         this.residencyCone,
       );
+      const detailHorizonDemandFar = this.entryDetailHorizon.advanceFromFrame(
+        vista,
+        requestedFar,
+        this.gpuHitchCompileLifecycle?.records ?? null,
+        residencyFar,
+        Math.max(0, dt * 1000),
+      );
       if (vista) {
-        // Entry settle (one-shot, armed by farVistaReady behind the opaque
-        // curtain): start scene fog AT the horizon haze band instead of
-        // easing it out over the first seconds on screen. Fog only: the
-        // detail horizon stays residency-governed below and expands as
-        // chunks land, exactly as streaming always behaved; the far mesh
-        // stands beneath it, so no fog wall and no hole is ever visible.
+        // Settle fog behind the curtain; detail expands separately by readiness.
         if (settleVistaEntry) {
           const entryHaze = horizonHazePlan(this.farVista.envelopeFar);
           fog.far = entryHaze.far;
           fog.near = entryHaze.near;
         }
-        this.detailFogFar = easedFogFar(this.detailFogFar, requestedFar, residencyFar, dt);
+        this.detailFogFar = easedFogFar(
+          this.detailFogFar,
+          detailHorizonDemandFar,
+          residencyFar,
+          dt,
+        );
         // Fog itself eases out to the horizon haze band: zero effect across
         // every gameplay distance, a gentle realm-tinted aerial blend where
         // the open sea meets the sky, so the horizon melts instead of
@@ -12383,7 +12374,7 @@ export class Renderer {
       // the artifact this trades frame time for does not exist there, and its
       // tiers are the ones least able to afford the trade.
       const vistaOutdoor = this.farVista.enabled && this.fogState === 'outdoor';
-      if (vistaOutdoor && detailHorizonStarved(fogFar, this.lastRequestedFogFar)) {
+      if (vistaOutdoor && detailHorizonStarved(fogFar, this.entryDetailHorizon.demandFar())) {
         for (const zoneId of this.pendingZonePrepares.keys()) {
           this.terrainView.escalateZone(zoneId);
         }

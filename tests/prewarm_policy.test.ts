@@ -111,11 +111,11 @@ const MANIFEST_IDS = [
   'entities.character-effect-variants',
   'foliage.materials',
   'foliage.great-tree-materials',
+  'world.settle-state',
   'programs.compile-submit',
   'surface-detail.textures',
   'weather.materials',
   'landmarks.impact-site',
-  'world.settle-state',
   'textures.scene',
   'vfx.atlas',
   'vfx.weapon-skins',
@@ -154,6 +154,28 @@ describe('graphics rebuild reveal wiring', () => {
     expect(initialRevealAt).toBeGreaterThan(-1);
     expect(initialMarkAt).toBeGreaterThan(initialRevealAt);
     expect(initialHideAt).toBeGreaterThan(initialMarkAt);
+  });
+});
+
+describe('initial entry detail admission wiring', () => {
+  it('arms the capped horizon before the manifest collects compile and texture work', () => {
+    const armAt = MAIN_SOURCE.indexOf('renderer.armEntryDetailHorizon();');
+    const prewarmAt = MAIN_SOURCE.indexOf('const prewarm = await renderer.prewarmInitialScene({');
+    const firstFrameAt = MAIN_SOURCE.indexOf('requestAnimationFrame(frame);', prewarmAt);
+    expect(armAt).toBeGreaterThan(-1);
+    expect(prewarmAt).toBeGreaterThan(armAt);
+    expect(firstFrameAt).toBeGreaterThan(prewarmAt);
+  });
+
+  it('keeps the live diagnostic marker separate from horizon admission', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const markAt = renderer.indexOf('markGpuHitchReveal(): void {');
+    const markEnd = renderer.indexOf('\n  /**', markAt);
+    const mark = renderer.slice(markAt, markEnd);
+    expect(mark).not.toContain('entryDetailHorizon.');
   });
 });
 
@@ -1221,6 +1243,7 @@ describe('archetype and scene-texture progress hooks stay honest (review round 2
 
   it('reports scene textures in matching units: initialized done against examined planned', () => {
     const entry = block('textures.scene', 'vfx.atlas');
+    expect(entry).toContain('deadlineExempt: true');
     expect(entry).toContain('done: batched.initialized');
     expect(entry).toContain('planned: batched.planned');
     // The regression shape: workDone as a GPU-residency delta an
@@ -1581,9 +1604,9 @@ describe('constrained entry view creation ramp', () => {
     ).replace(/\r\n/g, '\n');
     expect(renderer).toContain(
       `await this.prewarmInitialSceneTexturesBatched(
-              policy.textureBatchSize,
-              policy.textureMaxMs,
-            )`,
+            Math.max(1, policy.textureBatchSize),
+            Math.max(0, gpuSubmitDeadline - performance.now()),
+          );`,
     );
     const collectionStart = renderer.indexOf('private collectInitialSceneTextures(');
     const collectionEnd = renderer.indexOf(
@@ -1615,6 +1638,17 @@ describe('constrained entry view creation ramp', () => {
     expect(uploadAt).toBeGreaterThan(batchLoopAt);
     expect(yieldAt).toBeGreaterThan(uploadAt);
     expect(method.slice(yieldAt - 100, yieldAt)).toContain('performance.now() < deadline');
+  });
+
+  it('settles the capped world before early compile submission and texture collection', () => {
+    const entries = parsedManifestEntries();
+    const settleAt = entries.findIndex((entry) => entry.id === 'world.settle-state');
+    const submitAt = entries.findIndex((entry) => entry.id === 'programs.compile-submit');
+    const texturesAt = entries.findIndex((entry) => entry.id === 'textures.scene');
+    expect(settleAt).toBeGreaterThan(-1);
+    expect(settleAt).toBeLessThan(submitAt);
+    expect(settleAt).toBeLessThan(texturesAt);
+    expect(entries[settleAt]?.deadlineExempt).toBe(true);
   });
 });
 

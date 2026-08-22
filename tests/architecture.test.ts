@@ -460,6 +460,7 @@ const RENDER_PURE_CORES = [
   'src/render/build_ledger_core.ts',
   'src/render/hitch_frame_align_core.ts',
   'src/render/initial_frame_core.ts',
+  'src/render/entry_detail_horizon_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',

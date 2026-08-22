@@ -246,11 +246,8 @@ import {
   ktx2MipsRestored,
 } from './render/assets/ktx2_mip_release';
 import { assetUrl } from './render/assets/media';
-import {
-  assetsReady,
-  beginBackgroundPreloads,
-  beginDeferredPreloads,
-} from './render/assets/preload';
+import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
+import { battlegroundAssetPrewarm } from './render/battleground';
 import {
   CharacterPreview,
   npcLookFor,
@@ -358,6 +355,7 @@ import {
   noteAppearancePanelMounted,
   relocalizeAppearancePanels,
 } from './ui/appearance_panel_locale';
+import { setThornhollowPrewarmHooks } from './ui/arena_window';
 import {
   handleKeyboardActivation,
   syncInputAriaState,
@@ -1546,6 +1544,11 @@ async function startGame(
       dailyRewardsEnabled: NATIVE_APP ? await walletCapabilityReady : true,
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
+    });
+    setThornhollowPrewarmHooks({
+      startPreview: () => battlegroundAssetPrewarm.startPreview(),
+      pausePreview: () => battlegroundAssetPrewarm.pausePreview(),
+      commit: () => void battlegroundAssetPrewarm.commit(),
     });
     mapMarkerPaletteLifecycle = installMapMarkerPaletteLifecycle(window, () =>
       hud.refreshMapMarkerArtPalette(),
@@ -4982,6 +4985,7 @@ async function startGame(
   }
   setLoadingPercent(90, t('loading.enteringWorld'));
   loadPhaseStart('prewarm-initial');
+  renderer.armEntryDetailHorizon();
   try {
     const prewarm = await renderer.prewarmInitialScene({
       onEntryStart: (id, category) =>
@@ -5014,8 +5018,7 @@ async function startGame(
     console.warn('Renderer prewarm failed', err);
   }
   loadPhaseEnd('prewarm-initial');
-  // The paperdoll and portrait preview prewarms no longer hold the curtain:
-  // they start after the reveal (see revealWorld below) as paced background
+  // Paperdoll and portrait preview prewarms start after reveal as paced background
   // GPU units. Measured on the reference desktop, awaiting the paperdoll,
   // armory and portrait prewarms here cost 11 to 26 s of the entry, spent on
   // secondary contexts for windows the player may never open. The ARMORY is
@@ -5174,7 +5177,7 @@ async function startGame(
               },
             );
           }
-          // The remaining fail-soft lanes start only after the revealed world is
+          // The far-vista stand-in settles after the revealed world is
           // interactive (the mob-body stream already left at first paint above).
           // The classic fog remains the complete fallback while the far grid
           // finishes in parallel. Optional secondary WebGL previews stay lazy:
@@ -5186,12 +5189,6 @@ async function startGame(
                 ...renderEntryDiagnostics(),
                 farVistaReady,
               });
-            },
-            startBackgroundPreloads: beginBackgroundPreloads,
-            onBackgroundPreloadsStarted: (count) => {
-              if (count > 0) {
-                console.info(`[entry-guard] world assets: started ${count} background preloads`);
-              }
             },
             onWarmupError: (source, error) => {
               if (source === 'far-vista') console.warn('Far vista settlement failed', error);

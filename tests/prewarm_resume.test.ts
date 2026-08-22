@@ -580,6 +580,7 @@ describe('resumeDroppedPrewarmEntries', () => {
 
     expect(helper).toContain('new Set(textures)');
     expect(helper).toContain('run: () => this.prewarmTexture(texture)');
+    expect(helper).toContain('id: texturePieceLabel(`upload:${idPrefix}`, texture)');
     expect(surface).toContain("textureResumeUnits('surface-detail'");
     expect(scene).toContain("textureResumeUnits('scene', this.collectInitialSceneTextures())");
     expect(surface).not.toContain('renderPrewarmPass');
