@@ -916,6 +916,41 @@ describe('real catalog integration', () => {
     const gatherer = view.entries.find((e) => e.id === 'chr_vale_gatherer');
     expect(gatherer?.missingPoiMarkIds).toEqual([]);
   });
+
+  it('pins the exact set of live deeds an all-poi visits trigger admits', () => {
+    // A literal, not a computed re-check: a content change that adds a new
+    // poi:-only visits deed (or retires one of these) should have to move
+    // this pin deliberately, so the missing-places line's real coverage is a
+    // visible decision rather than a silent side effect of a catalog edit.
+    const admitted = Object.values(DEEDS)
+      .filter((def) => {
+        if (def.trigger.kind !== 'visits') return false;
+        const marks = def.trigger.markIds;
+        return marks.length > 0 && marks.every((m) => m.startsWith('poi:'));
+      })
+      .map((def) => def.id)
+      .sort();
+    expect(admitted).toEqual([
+      'exp_long_road_north',
+      'exp_marsh_wayfarer',
+      'exp_peaks_wayfarer',
+      'exp_vale_wayfarer',
+    ]);
+  });
+
+  it('lists the missing hub settlements for the cross-zone Long Road North deed', () => {
+    const longRoad = DEEDS.exp_long_road_north;
+    if (longRoad.trigger.kind !== 'visits') throw new Error('fixture drift');
+    const s = stats((st) => st.visited.add('poi:eastbrook_vale:eastbrook'));
+    const view = buildDeedsView(
+      makeInput({ deeds: DEEDS, order: DEED_ORDER, deedStats: s, category: 'exploration' }),
+    );
+    const entry = view.entries.find((e) => e.id === 'exp_long_road_north');
+    expect(entry?.missingPoiMarkIds).toEqual([
+      'poi:mirefen_marsh:fenbridge',
+      'poi:thornpeak_heights:highwatch',
+    ]);
+  });
 });
 
 // ---------------------------------------------------------------------------

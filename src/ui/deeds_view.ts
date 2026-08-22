@@ -188,10 +188,12 @@ function progressFraction(progress: DeedProgress | null): number {
 }
 
 /** The unvisited markIds for an all-poi 'visits' trigger (an exploration
- *  wayfarer deed: "visit every named place in this zone"), in authored
- *  order. Returns [] for every other trigger kind and for a 'visits'
- *  trigger that mixes poi: marks with another namespace (gather:/slain:/
- *  npc:), since those have no single place name to surface. */
+ *  wayfarer deed: every markId is a poi: mark, whether the checklist is one
+ *  zone's named places, like Wayfarer of the Heights, or spans several,
+ *  like The Long Road North), in authored order. Returns [] for every other
+ *  trigger kind and for a 'visits' trigger that mixes poi: marks with
+ *  another namespace (gather:/slain:/npc:), since those have no single
+ *  place name to surface. */
 function missingPoiVisits(trigger: DeedTrigger, stats: Readonly<DeedStats>): readonly string[] {
   if (trigger.kind !== 'visits') return [];
   if (!trigger.markIds.every((markId) => markId.startsWith('poi:'))) return [];
