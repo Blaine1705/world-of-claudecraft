@@ -8,8 +8,8 @@
     "hazard ring burn (fiestaRingDamage) outside the closing ring",
     "down + respawn-timer revive (fiestaRevive)"
   ],
-  "draws": 4897,
-  "drawDigest": "bdd4b4de",
+  "draws": 4908,
+  "drawDigest": "050c4406",
   "frames": [
     {
       "tick": 0,
@@ -461,8 +461,8 @@
       "state": "4d775d52",
       "events": "741638a5",
       "rng": {
-        "draws": 3419,
-        "digest": "690d2769"
+        "draws": 3420,
+        "digest": "b9e00fc8"
       }
     },
     {
@@ -483,8 +483,8 @@
       "state": "a5f0c716",
       "events": "741638a5",
       "rng": {
-        "draws": 3580,
-        "digest": "84a59322"
+        "draws": 3582,
+        "digest": "c6457fa2"
       }
     },
     {
@@ -505,8 +505,8 @@
       "state": "63a76fcf",
       "events": "671927f3",
       "rng": {
-        "draws": 3740,
-        "digest": "b2ba438a"
+        "draws": 3744,
+        "digest": "052a0313"
       }
     },
     {
@@ -516,8 +516,8 @@
       "state": "d8d5d92a",
       "events": "c100bd23",
       "rng": {
-        "draws": 3852,
-        "digest": "2f98d9cb"
+        "draws": 3854,
+        "digest": "19ed5090"
       }
     },
     {
@@ -527,8 +527,8 @@
       "state": "b75b4e17",
       "events": "671927f3",
       "rng": {
-        "draws": 3927,
-        "digest": "933e260a"
+        "draws": 3934,
+        "digest": "89aa42c3"
       }
     },
     {
@@ -538,8 +538,8 @@
       "state": "2aae4eab",
       "events": "bc220164",
       "rng": {
-        "draws": 4015,
-        "digest": "e957f615"
+        "draws": 4024,
+        "digest": "1d02ecad"
       }
     },
     {
@@ -549,8 +549,8 @@
       "state": "b1f24f8c",
       "events": "997780f4",
       "rng": {
-        "draws": 4085,
-        "digest": "3dab8b44"
+        "draws": 4092,
+        "digest": "0503dd7e"
       }
     },
     {
@@ -560,8 +560,8 @@
       "state": "bb1007f7",
       "events": "b89ddb6f",
       "rng": {
-        "draws": 4152,
-        "digest": "81e9088d"
+        "draws": 4153,
+        "digest": "7f4ec8ea"
       }
     },
     {
@@ -571,8 +571,8 @@
       "state": "9d535f87",
       "events": "b9524ad4",
       "rng": {
-        "draws": 4241,
-        "digest": "ae20978c"
+        "draws": 4250,
+        "digest": "2a0abfae"
       }
     },
     {
@@ -582,8 +582,8 @@
       "state": "10c14d58",
       "events": "b9524ad4",
       "rng": {
-        "draws": 4346,
-        "digest": "9fbfb77e"
+        "draws": 4345,
+        "digest": "671be639"
       }
     },
     {
@@ -593,8 +593,8 @@
       "state": "1fc938d2",
       "events": "b9524ad4",
       "rng": {
-        "draws": 4442,
-        "digest": "fbd2c0b1"
+        "draws": 4438,
+        "digest": "abc4a047"
       }
     },
     {
@@ -604,8 +604,8 @@
       "state": "f11d2261",
       "events": "afc93d42",
       "rng": {
-        "draws": 4524,
-        "digest": "b7c355b4"
+        "draws": 4511,
+        "digest": "f10c0e69"
       }
     },
     {
@@ -615,8 +615,8 @@
       "state": "72557746",
       "events": "416522d3",
       "rng": {
-        "draws": 4628,
-        "digest": "8c3162e6"
+        "draws": 4610,
+        "digest": "56a6a800"
       }
     },
     {
@@ -626,8 +626,8 @@
       "state": "f95485a8",
       "events": "7e086b86",
       "rng": {
-        "draws": 4718,
-        "digest": "11d94c91"
+        "draws": 4716,
+        "digest": "62906330"
       }
     },
     {
@@ -637,8 +637,8 @@
       "state": "e206c65c",
       "events": "7b5bfea5",
       "rng": {
-        "draws": 4786,
-        "digest": "9f35c27c"
+        "draws": 4794,
+        "digest": "18fc46b5"
       }
     },
     {
@@ -648,8 +648,8 @@
       "state": "185f4ed6",
       "events": "671927f3",
       "rng": {
-        "draws": 4872,
-        "digest": "173e8f0b"
+        "draws": 4894,
+        "digest": "62cb274e"
       }
     },
     {
@@ -659,8 +659,8 @@
       "state": "f9d83944",
       "events": "741638a5",
       "rng": {
-        "draws": 4897,
-        "digest": "bdd4b4de"
+        "draws": 4908,
+        "digest": "050c4406"
       },
       "label": "final",
       "players": [

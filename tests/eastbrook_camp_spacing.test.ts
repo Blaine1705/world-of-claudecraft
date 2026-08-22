@@ -121,8 +121,12 @@ const SHIPPED_PLACEMENT: { x: number; z: number }[] = [
   // travelled because the bandit disc does not fit the meadow while the second
   // boar camp holds its corner. The guard keeps its teeth for every later
   // change: any drift from THESE spots still has to stay inside 15 degrees.
-  { x: 76, z: -51 },
-  { x: 118, z: -34 },
+  // Camps 3 and 4 re-pinned again in round 6c: the owner sited the meadow at
+  // the west road's END so the path leads somewhere, another deliberate
+  // relocation on the camp-0 precedent. The guard keeps its teeth from
+  // THESE spots: any later drift still has to stay inside 15 degrees.
+  { x: 58, z: -72 },
+  { x: 97, z: -43 },
   { x: -60, z: 5 },
   { x: -75, z: 57 },
   { x: 80, z: 15 },

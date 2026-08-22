@@ -300,7 +300,13 @@ describe('generated chunk geometry is stable', () => {
     // gap-fill digest below HOLDS, recomputed byte-identical on the live tree.
     // Computed twice in separate processes, identical both times. An intended,
     // looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('b73968cf6ebbcaff271edd3ceb5d1bd5');
+    // Re-minted once more in round 6c: the owner sited the boar meadow at the
+    // west road's end, so both boar camps' flatten discs and calm rings
+    // moved again, the Boar Meadow poi pad followed, and the meadow gained
+    // flower drifts whose walk-through props each mint an optional calm
+    // pad. Computed twice in separate processes, identical both times. An
+    // intended, looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('008311a2fb5e3f3a41139e8d0f1aace4');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 

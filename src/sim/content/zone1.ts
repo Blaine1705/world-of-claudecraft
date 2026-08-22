@@ -133,6 +133,11 @@ export const SOWFIELD_SEABED_TERRAIN_EDITS: HeightStamp[] = [
 // water, steep ground, and roads, so the drifts read as blooming verges.
 export const ZONE1_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: -22, z: -100, r: 7 }, // the civic green, west of the square
+  // Round 6c (owner): the boar meadow at the west road's end blooms, so the
+  // walk out of town pays off in ground cover rather than plain grass
+  { x: 52, z: -62, r: 9 },
+  { x: 66, z: -79, r: 8 },
+  { x: 47, z: -80, r: 7 },
   { x: -4, z: -73, r: 8 }, // the chapel rise, blooms among the headstones
   { x: -36, z: -103, r: 6 }, // the main-street verge by the market home
   { x: -6, z: -116, r: 6 }, // the beach promenade's east verge
@@ -162,7 +167,7 @@ export const ZONE1_ZONE: ZoneDef = {
     // follows the boars to their new downs (round 6 swap, then the westward push)
     // pulled off the causeway's latitude: both labels sat at z -46 and the
     // world map drew them on the same line, overlapping
-    { x: 100, z: -28, label: 'Boar Meadow', id: 'boar_meadow' },
+    { x: 60, z: -64, label: 'Boar Meadow', id: 'boar_meadow' },
     { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
     { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
     { x: -34, z: 142, label: 'Copper Dig', id: 'copper_dig' },
@@ -1694,8 +1699,15 @@ export const ZONE1_CAMPS: CampDef[] = [
   // flatten discs, Gorrak's dressing is well clear, camp A's edge is 76 yd from
   // town, and camp B rejoins Mogger on the downs, who was left behind by the
   // first move.
-  { mobId: 'wild_boar', center: { x: 76, z: -51 }, radius: 26, count: 5 },
-  { mobId: 'wild_boar', center: { x: 118, z: -34 }, radius: 23.5, count: 4 },
+  // Round 6c (owner): the meadow settles where the west road actually ENDS,
+  // (65,-65), so the path leads a player somewhere instead of petering out
+  // in empty grass. Camp A holds the road-end meadow; camp B sits on the
+  // downs at the same-population spacing floor, keeping Mogger 27 yd off
+  // its disc so the rare still patrols his boars. The A centre keeps the
+  // vale-road probe at (30,-30) outside its flatten reach (50.5 vs 47.8),
+  // the trap this corridor sprang once already this round.
+  { mobId: 'wild_boar', center: { x: 58, z: -72 }, radius: 26, count: 5 },
+  { mobId: 'wild_boar', center: { x: 97, z: -43 }, radius: 23.5, count: 4 },
   { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
   // Spiders: eastern woods
   { mobId: 'webwood_spider', center: { x: -70, z: 2 }, radius: 28.5, count: 6 },
@@ -1995,6 +2007,12 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { key: 'fence', x: -46.7, z: -106.4, rot: -0.63, scale: 3 },
     { key: 'shrubFlowering', x: -76.2, z: -97.6, rot: 0.3, scale: 0.9 },
     { key: 'shrubFlowering', x: -44.2, z: -107.6, rot: -0.8, scale: 0.95 },
+    // Round 6c (owner): blooms where the west road ends in the boar meadow,
+    // walk-through like every flower, set off the painted track
+    { key: 'flowerGlow', x: 61, z: -70, rot: 0.7, scale: 1.6 },
+    { key: 'shrubFlowering', x: 55, z: -66, rot: -1.2, scale: 0.95 },
+    { key: 'flowerGlow', x: 68, z: -73, rot: 2.1, scale: 1.5 },
+    { key: 'shrubFlowering', x: 50, z: -76, rot: 0.3, scale: 0.9 },
     { key: 'kcasBench', x: -86.4, z: -105.2, rot: -2.2, scale: 1.6 },
     { key: 'kcasBench', x: -72.4, z: -111.2, rot: -2.2, scale: 1.6 },
     { key: 'kcasBench', x: -54.4, z: -115.2, rot: -2.2, scale: 1.6 },
