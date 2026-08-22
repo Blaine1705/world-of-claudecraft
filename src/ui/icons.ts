@@ -4447,6 +4447,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'instant_poison',
   'adrenaline_rush',
   'deadly_poison',
+  'melting_acid',
+  'nightshade_coating',
   'stealth',
   // warrior (CraftPix premium "RPG Warrior" + "RPG Berserker" packs; rage/fury abilities
   // drew from berserker). taunt has no provoke art and stays procedural.
