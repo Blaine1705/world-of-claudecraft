@@ -7896,6 +7896,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': 'Открыть окно крафта: {craft}',
   'hudChrome.crafting.close': 'Закрыть крафт',
   'hudChrome.crafting.reagentsNeeded': 'Требуется:',
+  'hudChrome.crafting.craftFeeLine': 'Плата за крафт: {fee}',
   'hudChrome.crafting.empty': 'Известных рецептов пока нет.',
   'hudChrome.crafting.resultAria': 'Создать {name}',
   'hudChrome.crafting.craftedToast': 'Создано: {name}',

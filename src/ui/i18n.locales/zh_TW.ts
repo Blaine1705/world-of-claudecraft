@@ -7479,6 +7479,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': '開啟{craft}製作視窗',
   'hudChrome.crafting.close': '關閉製作',
   'hudChrome.crafting.reagentsNeeded': '需要:',
+  'hudChrome.crafting.craftFeeLine': '製作費用：{fee}',
   'hudChrome.crafting.empty': '尚無已知配方。',
   'hudChrome.crafting.resultAria': '製作{name}',
   'hudChrome.crafting.craftedToast': '已製作:{name}',

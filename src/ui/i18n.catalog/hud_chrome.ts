@@ -4105,6 +4105,11 @@ export const hudChromeStrings = {
     // D8 downward substitution, 2x gather value), so the spend is stated
     // before the click instead of silent after it.
     reagentFineSub: '(spends {count} fine-grade)',
+    // The #1301 gold-sink fee (src/sim/professions/crafting.ts
+    // resolveCraftForRecipe), charged on every successful craft but never
+    // shown anywhere before this: {fee} is the already-localized formatMoney
+    // string, so no separate number param is needed.
+    craftFeeLine: 'Craft fee: {fee}',
     empty: 'No recipes known yet.',
     resultAria: 'Craft {name}',
     // The SOLE player-visible line for a craft grant (#2430). The grant hub's
