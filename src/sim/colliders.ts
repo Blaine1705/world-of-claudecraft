@@ -2487,6 +2487,11 @@ export function pathCrossesFence(
 // conservative default, and MOVEMENT collision is untouched everywhere.
 export const SIGHT_HEIGHT = 1.6;
 
+interface TrustedSightFeet {
+  from?: number;
+  to?: number;
+}
+
 // Does any collider at (x,z) rise above `sightY` (absolute world Y of the
 // sight line at that sample)? Mirrors resolvePosition's zone routing so
 // interiors, delves and the arena keep their wall sets, but tests pure overlap
@@ -2574,6 +2579,7 @@ export function lineOfSightClear(
   r = 0.05,
   delveModules?: readonly string[],
   riftToken = 0,
+  trustedFeet?: TrustedSightFeet,
 ): boolean {
   const dx = to.x - from.x;
   const dz = to.z - from.z;
@@ -2582,23 +2588,14 @@ export function lineOfSightClear(
   // The sight line runs eye-to-eye: lerp the endpoint eye heights per sample so
   // a low prop only blocks when its top actually crosses the line.
   //
-  // Eye height is TERRAIN-DERIVED everywhere except the battleground band, and
-  // that scoping is deliberate. Taking the caller's own `y` is the honest rule
-  // ("what you stand on, you see over"), and the band needs it: its field is
-  // the one instanced region with real sculpted terrain and standable decks,
-  // and its cover was authored against tops measured from the body's real
-  // height. But BOTH live callers pass an Entity.pos, which always carries a
-  // y, so applying it everywhere would silently retune open-world spell line
-  // of sight for every player: a caster standing on a knee-high standable prop
-  // (or mid-jump) would start seeing over cover that blocks them today. That
-  // is a global combat change, not a battleground one, so it stays scoped here
-  // and the open world keeps its historical behavior byte for byte. Widening
-  // it is a deliberate change of its own, with its own tests.
-  const eyeAt = (p: { x: number; y?: number; z: number }): number =>
-    (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed)) +
+  // Raw caller y remains untrusted outside the battleground. Entity-aware
+  // callers may opt in only after proving the feet rest on authored support.
+  const eyeAt = (p: { x: number; y?: number; z: number }, trustedY?: number): number =>
+    (trustedY ??
+      (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed))) +
     SIGHT_HEIGHT;
-  const eyeFrom = eyeAt(from);
-  const eyeTo = eyeAt(to);
+  const eyeFrom = eyeAt(from, trustedFeet?.from);
+  const eyeTo = eyeAt(to, trustedFeet?.to);
   const steps = Math.max(2, Math.ceil(d / 0.5));
   if (isDelvePos(from.x)) {
     const delve = delveAt(from.x);

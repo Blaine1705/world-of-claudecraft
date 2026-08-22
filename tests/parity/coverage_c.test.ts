@@ -664,4 +664,32 @@ describe('coverage: each scenario fires its subsystem', () => {
     const deaths = (rec.allEvents as Ev[]).filter((e) => e.type === 'death');
     expect(deaths.length).toBeGreaterThanOrEqual(2);
   });
+
+  it('supported_elevation_line_of_sight: heals from the stall and denies airborne cover sight', () => {
+    const rec = run('supported_elevation_line_of_sight');
+    const events = rec.allEvents as Ev[];
+    const healerId = rec.notes.healerId as number;
+    const allyId = rec.notes.allyId as number;
+
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'castStart' &&
+          event.entityId === healerId &&
+          event.ability === 'lesser_heal',
+      ),
+    ).toBe(true);
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'heal2' &&
+          event.sourceId === healerId &&
+          event.targetId === allyId &&
+          event.ability === 'Whispered Prayer',
+      ),
+    ).toBe(true);
+    expect(events.some((event) => event.type === 'error' && event.text === 'Line of sight.')).toBe(
+      true,
+    );
+  });
 });
