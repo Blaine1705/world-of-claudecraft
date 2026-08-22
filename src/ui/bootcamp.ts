@@ -35,6 +35,7 @@ import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { IWorld } from '../world_api';
 import {
+  BELL_STEP_TARGET,
   type BootcampParam,
   type BootcampStep,
   bellCardPlan,
@@ -75,6 +76,11 @@ import {
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 import { iconDataUrl } from './icons';
+import { objectiveGlowPlanAt } from './objective_glow_view';
+
+/** Peak opacity of the wrong-way bloom at full intensity. Deliberately shy of
+ *  opaque: it is a hint at the edge of vision, never a curtain. */
+const GLOW_MAX_OPACITY = 0.72;
 
 /** The Attack toggle's icon id (hud.ts resolves ATTACK_ICON_KEY to it). */
 const AUTO_ATTACK_ICON_ID = 'attack';
@@ -128,6 +134,9 @@ export class BootcampOverlay {
   private promptPainted = { visible: false, sx: Number.NaN, sy: Number.NaN };
   private promptGroundKey = '';
   private promptGroundY = 0;
+  // The wrong-way edge glow's element and its repaint memo.
+  private glowEl: HTMLElement | null = null;
+  private glowPainted = '';
 
   // Called every HUD frame. Cheap no-op while no rail quest is moving.
   update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
@@ -204,6 +213,7 @@ export class BootcampOverlay {
     }
 
     this.updatePrompt(world, renderer, keybinds);
+    this.paintObjectiveGlow(world, renderer);
     this.applyUiGlow();
     this.updateGuideVoice(world, focus);
   }
@@ -468,6 +478,60 @@ export class BootcampOverlay {
     this.prompt = prompt;
     this.promptChipEl = chips;
     this.promptVerbEl = verb;
+
+    // The wrong-way glow (objective_glow_view.ts): a golden bloom down the
+    // edge the objective lies past. Pointer-transparent and aria-hidden by
+    // construction; it is a direction cue, and the coach card already says
+    // where to go in words.
+    const glow = document.createElement('div');
+    glow.className = 'tut-objective-glow';
+    glow.setAttribute('aria-hidden', 'true');
+    ui.appendChild(glow);
+    this.glowEl = glow;
+  }
+
+  /**
+   * Paint (or clear) the wrong-way edge glow for this frame.
+   *
+   * Reads the CAMERA's yaw, not the character's facing: a player can run one
+   * way while looking another, and the cue is about what they can see. The
+   * objective is the coach's own arrow target, so the glow and the card can
+   * never point at different things.
+   */
+  private paintObjectiveGlow(world: IWorld, renderer: Renderer): void {
+    const el = this.glowEl;
+    if (!el) return;
+    const objective = this.currentObjectivePos();
+    const p = world.player;
+    const plan = objective && p ? objectiveGlowPlanAt(renderer.camYaw, p.pos, objective) : null;
+    // Memoized: this runs every HUD frame, and writing identical style
+    // strings would dirty the compositor for nothing.
+    const key = plan ? `${plan.side}:${Math.round(plan.intensity * 20)}` : '';
+    if (key === this.glowPainted) return;
+    this.glowPainted = key;
+    if (!plan) {
+      el.style.opacity = '0';
+      return;
+    }
+    el.classList.toggle('tut-glow-right', plan.side === 'right');
+    el.classList.toggle('tut-glow-left', plan.side === 'left');
+    el.style.opacity = String(GLOW_MAX_OPACITY * plan.intensity);
+  }
+
+  /** Where the coach is currently pointing, or null when it points nowhere
+   *  (the crate line, which is deliberately arrow-free). */
+  private currentObjectivePos(): { x: number; z: number } | null {
+    if (this.bellPhase) return BELL_STEP_TARGET;
+    // The ring lesson is an INVENTORY lesson (buckle the ring on, open the
+    // sheet): there is nowhere to walk, so there is no wrong way to face.
+    if (this.ringPhase !== null) return null;
+    const focus = this.lastFocus;
+    if (!focus) return null;
+    // The coach card's own arrow, deliberately: the glow and the card can
+    // then never point at different things. It covers the Gauntlet too (its
+    // active leg falls back to the course's finish), which is where a new
+    // player is most likely to be facing the wrong way.
+    return coachCardPlan(focus, 'keyboard', this.casterClass).arrow;
   }
 
   private renderPanel(keybinds: Keybinds): void {
@@ -774,6 +838,8 @@ export class BootcampOverlay {
     this.prompt?.remove();
     this.root = null;
     this.prompt = null;
+    this.glowEl = null;
+    this.glowPainted = '';
     this.promptChipEl = null;
     this.promptVerbEl = null;
     this.promptContentKey = '';

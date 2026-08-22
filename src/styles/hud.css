@@ -662,6 +662,46 @@
     align-items: center;
     gap: 4px;
   }
+  /* The wrong-way cue (ui/objective_glow_view.ts): a golden bloom down the
+     edge the objective lies past, so a player who has turned away has
+     something to steer back by. Pointer-transparent, and its opacity is
+     driven from the plan's intensity, so turning toward the objective fades
+     it out on its own. */
+  .tut-objective-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 19;
+    transition: opacity 220ms ease-out;
+    background-repeat: no-repeat;
+    background-size: 28% 100%;
+  }
+  .tut-objective-glow.tut-glow-left {
+    background-position: left center;
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 208, 112, 0.98),
+      rgba(255, 184, 68, 0.42) 42%,
+      rgba(255, 184, 68, 0) 100%
+    );
+  }
+  .tut-objective-glow.tut-glow-right {
+    background-position: right center;
+    background-image: linear-gradient(
+      to left,
+      rgba(255, 208, 112, 0.98),
+      rgba(255, 184, 68, 0.42) 42%,
+      rgba(255, 184, 68, 0) 100%
+    );
+  }
+  /* A player who has asked for less motion still gets the cue; it simply
+     appears rather than easing in. */
+  @media (prefers-reduced-motion: reduce) {
+    .tut-objective-glow {
+      transition: none;
+    }
+  }
   /* The word between sequenced keycaps ("D then W"): quiet, lowercase, never
      mistaken for a key itself. */
   .tut-keycap-then {
