@@ -390,7 +390,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
             (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
-    } else {
+    } else if (mob.aiState !== 'evade') {
+      // inCombat deliberately survives startEvadeHome (other systems key on
+      // it), so the kit is gated on the evade state instead: a mob walking home
+      // is damage-immune and untargetable, and must not heal, ward, or enrage
+      // its camp back up while nothing can touch it.
       ctx.updateBossMechanics(mob);
     }
   }
