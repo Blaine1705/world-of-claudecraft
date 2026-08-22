@@ -828,8 +828,15 @@ export class BootcampOverlay {
     this.engaged = false;
     this.step = null;
     this.bellPhase = false;
-    this.root?.remove();
+    // root is the BORROWED shared #ui container (the whole HUD) since the
+    // no-card refactor, so teardown removes only the nodes the coach minted
+    // into it and drops the reference. Removing root here deleted the entire
+    // HUD on the graduation ferry and froze every later frame on a null
+    // lookup (the v0.40 crossing freeze).
     this.prompt?.remove();
+    this.glowEl?.remove();
+    this.captionEl?.remove();
+    this.captionEl = null;
     this.root = null;
     this.prompt = null;
     this.glowEl = null;
