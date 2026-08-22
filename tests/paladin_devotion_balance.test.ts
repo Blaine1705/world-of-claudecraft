@@ -30,10 +30,13 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // ground, the harbour quarter and churchyard landed, the delve and its POI
 // moved to the Mirror Lake shore, three town NPCs were redistributed), which
 // forks the shared stream again: protection 38.65 to 42.7; holy and
-// retribution unmoved. The wide 35-65s design band still holds.
+// retribution unmoved. Re-pinned on the eastbrook-plus-tutorial integration
+// merge (the harbor town and the Proving Shore island land in one world),
+// which forks the shared stream again: holy 42.45 to 41.25, protection 42.7
+// to 41.7; retribution unmoved. The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
-  holy: 42.45,
-  protection: 42.7,
+  holy: 41.25,
+  protection: 41.7,
   retribution: 52.45,
 };
 

@@ -1202,6 +1202,10 @@ function buildFromTemplates(
       const built = buildKitBuilding(building, kitTemplate.raw, groundAt);
       group.add(built.group);
       roofHideTargets.push(built.hideTarget);
+      // A kit building is a reveal root like any other: its kit materials are
+      // unshared with the batches, and roofHideTargets stays index-aligned
+      // with buildingGroups (the footprint anchors are built from that pair).
+      buildingGroups.push(built.group);
       continue;
     }
     const template = templates.get(building.assetId);

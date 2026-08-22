@@ -307,7 +307,7 @@ interface AttributionTargetFixture {
 // to horizonHazePlan at its two call sites, so the composite follows those
 // bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5a7518babf3623098c146a88ac40841b9adc1ac61831191c6ca178b566d0ee87';
+  '5c9fb10292e5b4f2f4bb0619eb201721bc515dbc3e4ab870575d8fa8936872cd';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

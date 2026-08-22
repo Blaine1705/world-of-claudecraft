@@ -295,16 +295,15 @@ describe('nameplate_view - compile-gate stand-in', () => {
   it('still hides what no gate is hiding: a looted corpse and the label-less carve-outs', () => {
     const corpse = ent({ kind: 'mob', dead: true, lootable: false });
     expect(plan(corpse, viewer(), 2, true, false, true, true).hidden).toBe(true);
-    // The sealed crypt door reads as back wall and the Vale Cup ball is a toy:
-    // both are deliberately label-less, gate or no gate.
+    // The sealed crypt door reads as back wall: deliberately label-less, gate
+    // or no gate. (The Vale Cup ball was the other carve-out until the New
+    // Eastbrook program retired it.)
     const sealed = ent({
       kind: 'object',
       templateId: 'dungeon_door',
       dungeonId: 'nythraxis_boss_arena',
     });
     expect(plan(sealed, viewer(), 2, true, false, true, true).hidden).toBe(true);
-    const ball = ent({ kind: 'mob', templateId: 'vale_cup_ball' });
-    expect(plan(ball, viewer(), 2, true, false, true, true).hidden).toBe(true);
   });
 
   it('never overrides the self plate (the local player view is never gated)', () => {
