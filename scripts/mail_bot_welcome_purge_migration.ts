@@ -32,7 +32,12 @@
 // exists per character IN WORLD, so an idle-but-running realm holds none while
 // flushPeriodicSaves still rewrites the book every cycle):
 //   1. the mail row's own updated_at must be older than several autosave
-//      cycles, which an idle-but-running server can never satisfy;
+//      cycles, which an idle-but-running server can never satisfy. Strictly
+//      this proves "no write in the last 90 seconds", not "no process": a
+//      server started moments ago that has not reached its first autosave
+//      slips both guards, so the operator still owns the stop. (A fresh row
+//      right after a successful --apply is the same signal from the other
+//      side: the apply itself stamped updated_at.);
 //   2. the UPDATE compare-and-swaps on that same updated_at, so an autosave
 //      racing the run makes the write fail loudly instead of silently losing.
 // The lease lock/reap stays as the secondary guard for the populated case.
@@ -200,13 +205,16 @@ export async function runMailBotWelcomePurgeMigration(
       data: MailBookLike;
       updated_at: string;
       age_seconds: number;
+      bytes: number;
     }>(
       realm
         ? `SELECT key, data, updated_at::text AS updated_at,
-             EXTRACT(EPOCH FROM now() - updated_at)::float8 AS age_seconds
+             EXTRACT(EPOCH FROM now() - updated_at)::float8 AS age_seconds,
+             octet_length(data::text) AS bytes
            FROM world_state WHERE key = $1 ORDER BY key ASC`
         : `SELECT key, data, updated_at::text AS updated_at,
-             EXTRACT(EPOCH FROM now() - updated_at)::float8 AS age_seconds
+             EXTRACT(EPOCH FROM now() - updated_at)::float8 AS age_seconds,
+             octet_length(data::text) AS bytes
            FROM world_state WHERE key LIKE 'mail:%' ORDER BY key ASC`,
       realm ? [MAIL_KEY_PREFIX + realm] : [],
     );
@@ -227,7 +235,8 @@ export async function runMailBotWelcomePurgeMigration(
           throw new Error(
             `Realm "${rowRealm}"'s mail row was written ${Math.round(row.age_seconds)}s ago ` +
               `(fresher than ${FRESH_WRITE_WINDOW_SECONDS}s): its game server is still running. ` +
-              'Stop it before --apply.',
+              'Stop it before --apply. (A fresh row can also mean an --apply just ' +
+              'committed here: re-running is safe once the window passes.)',
           );
         }
         // Secondary: no character may be in world (lease-fenced).
@@ -247,14 +256,17 @@ export async function runMailBotWelcomePurgeMigration(
         [rowRealm],
       );
 
-      const before = JSON.stringify(row.data).length;
       const result = purgeBotWelcomeLetters(row.data, characters.rows);
-      const after = result.changed ? JSON.stringify(result.value).length : before;
+      // One stringify shared by the report and the UPDATE payload: before
+      // comes from octet_length in SQL, so the 89MB book that motivated this
+      // migration is never re-serialized just to print a number.
+      const serialized = result.changed ? JSON.stringify(result.value) : null;
+      const after = serialized === null ? row.bytes : serialized.length;
       // Printed as produced, so a throw on a later realm keeps earlier lines.
       console.log(
-        `  ${row.key}: kept=${result.kept} removed=${result.removed} bytes ${before} -> ${after}`,
+        `  ${row.key}: kept=${result.kept} removed=${result.removed} bytes ${row.bytes} -> ${after}`,
       );
-      if (!result.changed) continue;
+      if (serialized === null) continue;
 
       if (apply) {
         // CAS on the exact updated_at we read (text round-trip preserves the
@@ -263,7 +275,7 @@ export async function runMailBotWelcomePurgeMigration(
         const updated = await client.query(
           `UPDATE world_state SET data = $1, updated_at = now()
            WHERE key = $2 AND updated_at::text = $3`,
-          [JSON.stringify(result.value), row.key, row.updated_at],
+          [serialized, row.key, row.updated_at],
         );
         if (updated.rowCount !== 1) {
           throw new Error(
@@ -285,6 +297,9 @@ export async function runMailBotWelcomePurgeMigration(
         await client.query('ROLLBACK');
       } catch {
         // Ignore rollback errors after a failed or already closed transaction.
+      }
+      if (apply) {
+        console.log('Aborted and rolled back: nothing reported above was written.');
       }
     }
     throw err;

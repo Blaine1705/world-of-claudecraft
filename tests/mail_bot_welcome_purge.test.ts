@@ -127,7 +127,7 @@ function queryResult(rows: unknown[] = []) {
   return { rows, rowCount: rows.length };
 }
 
-const STALE_ROW = { updated_at: '2026-08-22 01:00:00.123456+00', age_seconds: 3600 };
+const STALE_ROW = { updated_at: '2026-08-22 01:00:00.123456+00', age_seconds: 3600, bytes: 4096 };
 
 function purgeHarness(options: HarnessOptions = {}) {
   const statements: string[] = [];
@@ -209,6 +209,11 @@ describe('runMailBotWelcomePurgeMigration', () => {
     expect(written.mail).toHaveLength(1);
     expect(written.mail[0].recipientName).toBe('PhoneBoy');
     expect(written.nextMailId).toBe(9);
+    // The CAS predicate itself is load-bearing SQL for a destructive prod
+    // script: pin the literal and that $3 is the exact updated_at the SELECT
+    // returned, so dropping either turns this red (proven by mutation).
+    expect(update[0]).toContain('AND updated_at::text = $3');
+    expect((update[1] as string[])[2]).toBe(STALE_ROW.updated_at);
   });
 
   it('apply refuses while the realm holds a live lease and rolls back', async () => {
