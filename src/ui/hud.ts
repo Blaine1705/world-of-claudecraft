@@ -7141,7 +7141,7 @@ export class Hud {
             abilityStartsAutoAttack(resolved.effects) &&
             hasAutoAttackTarget(
               target,
-              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo),
+              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo, this.sim.bgInfo),
             )
           ) {
             // A TIMED cast must not engage yet: startAutoAttack aggros the target
@@ -13938,7 +13938,12 @@ export class Hud {
             if (ev.success) {
               const castTid = sim.player.targetId;
               const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
-              const castPvpHostile = isPvpHostileTarget(castTid, sim.duelInfo, sim.arenaInfo);
+              const castPvpHostile = isPvpHostileTarget(
+                castTid,
+                sim.duelInfo,
+                sim.arenaInfo,
+                sim.bgInfo,
+              );
               if (hasAutoAttackTarget(castTarget, castPvpHostile)) this.sim.startAutoAttack();
             }
           }
