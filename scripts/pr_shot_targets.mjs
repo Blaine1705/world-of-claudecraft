@@ -8750,6 +8750,51 @@ export const TARGETS = [
     },
   },
   {
+    key: 'deed-missing-poi-places',
+    label:
+      'Book of Deeds: an unearned wayfarer deed names which places are still missing, not just a bare count',
+    when: ['sim/deeds.ts', 'ui/deeds_window', 'ui/deeds_view', 'ui/entity_i18n'],
+    // Nine of Thornpeak Heights' ten named places already visited, one held
+    // back deliberately (Gravewyrm Sanctum), so the card's new missing-places
+    // line has exactly one name to show instead of an empty or ten-item list.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      let opened = false;
+      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (sim?.primary?.deedStats?.visited) {
+            const visited = [
+              'poi:thornpeak_heights:highwatch',
+              'poi:thornpeak_heights:stalker_ridge',
+              'poi:thornpeak_heights:deeprock_burrows',
+              'poi:thornpeak_heights:ogre_foothills',
+              'poi:thornpeak_heights:drogmars_war_camp',
+              'poi:thornpeak_heights:stormcrag',
+              'poi:thornpeak_heights:the_glimmermere',
+              'poi:thornpeak_heights:wyrmcult_tents',
+              'poi:thornpeak_heights:revenant_fields',
+            ];
+            for (const id of visited) sim.primary.deedStats.visited.add(id);
+          }
+          const el = document.querySelector('#deeds-window');
+          if (el) el.style.display = 'none';
+          window.__game?.hud?.openDeeds?.('exploration');
+        });
+        opened = await pollForSize(page, '#deeds-window', 10, 500);
+      }
+      if (!opened) throw new Error('deeds window did not open');
+      await page.evaluate(() => {
+        const input = document.querySelector('#deeds-window .deed-search');
+        if (!(input instanceof HTMLInputElement)) return;
+        input.value = 'Thornpeak Heights';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      await wait(400);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
     key: 'vale-cup-unrated-notes',
     label: 'Vale Cup window: 1v1/2v2 all-rounder note and practice unrated note (#2767)',
     when: ['ui/vale_cup_window'],
