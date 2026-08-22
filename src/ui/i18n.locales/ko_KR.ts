@@ -54,11 +54,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
     '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 두 번째 행동 버튼을 눌러 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
   'hudChrome.bootcamp.taskShellBodyCaster':
-    '종종게는 마주 집게를 휘두릅니다. 왼쪽 클릭해 한 마리를 대상으로 잡고, {attackKey}를 눌러 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+    '종종게는 마주 집게를 휘두릅니다. 왼쪽 클릭해 한 마리를 대상으로 잡고, {abilityKey}를 눌러 {ability} 기술을 쓰며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
   'hudChrome.bootcamp.taskShellBodyCasterTouch':
-    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 두 번째 버튼을 탭해 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
   'hudChrome.bootcamp.taskShellBodyCasterPad':
-    '종종게는 마주 집게를 휘두릅니다. 대상 버튼을 누르고, 이어서 두 번째 행동 버튼을 눌러 주문을 시전하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
   'hudChrome.bootcamp.voiceGraduate': '자네를 위해 종이 울렸네. 바다 건너 이스트브룩이 기다리고 있고, 자네는 준비가 되었네.',
   'hudChrome.bootcamp.voiceVeerOff': '잠깐, 친구. 그쪽이 아닐세. 황금 길은 뒤에 있네.',
   'hudChrome.bootcamp.voiceStationDoneB': '제법 손에 익어 가는군, 틀림없네.',
@@ -13202,10 +13202,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '허수아비를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
   'hudChrome.bootcamp.taskHoneBodyPad':
     '허수아비를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
+  'hudChrome.bootcamp.promptOpenBags': '가방 열기',
+  'hudChrome.bootcamp.promptCharacterSheet': '캐릭터 창 열기',
+  'hudChrome.bootcamp.promptLookAround': '오른쪽 버튼을 누른 채 끌어서 둘러보기',
   'hudChrome.bootcamp.promptKneel':
     '무릎 꿇기',
   'hudChrome.bootcamp.taskLongWalkBody':
-    '해안 길을 따라 남쪽으로 걸어가 안식의 돌 앞에서 {interactKey}를 눌러 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
+    '{bagsKey}를 눌러 가방을 열고 안식의 돌을 왼쪽 클릭하세요. 그 자리에서 당신을 눕혀 줍니다. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
   'hudChrome.bootcamp.taskLongWalkBodyTouch':
     '해안 길을 따라 남쪽으로 걸어가 안식의 돌을 탭해 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
   'hudChrome.bootcamp.taskLongWalkBodyPad':
@@ -13222,14 +13225,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 탭하면 아무런 대가 없이 온전해집니다.',
   'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
     '이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 고르면 아무런 대가 없이 온전해집니다.',
+  'hudChrome.bootcamp.promptLootPearl':
+    '진주 획득',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 첫 번째 행동 버튼을 눌러 내리치세요. 하나가 무너질 때까지 계속 치세요.',
   'hudChrome.bootcamp.taskShellBody':
-    '종종게는 마주 집게를 휘두릅니다. 왼쪽 클릭해 한 마리를 대상으로 잡고, {attackKey}를 눌러 내리치며 계속 공격하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+    '종종게는 마주 집게를 휘두릅니다. 왼쪽 클릭해 한 마리를 대상으로 잡고, {abilityKey}를 눌러 {ability} 기술을 쓰며 계속 공격하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
   'hudChrome.bootcamp.taskShellBodyTouch':
-    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
   'hudChrome.bootcamp.taskShellBodyPad':
-    '종종게는 마주 집게를 휘두릅니다. 대상 버튼을 누르고, 이어서 첫 번째 행동 버튼을 눌러 내리치세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
   'hudChrome.bootcamp.taskWreckLineBody':
     '표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 {interactKey}를 누르거나 상자를 왼쪽 클릭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
   'hudChrome.bootcamp.taskWreckLineBodyTouch':
@@ -13310,7 +13315,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_strike_true.objectives.0.label': '훈련용 허수아비 쓰러뜨리기',
   'entities.quests.q_ps_shell_and_claw.title': '껍데기와 집게발',
   'entities.quests.q_ps_shell_and_claw.text':
-    '짚은 상관하지 않죠, {playerName}. 그러니 이번엔 상관하는 놈들입니다. 해변 종종게들이 먼 바닷가의 난파선 해안에서 잔해를 뒤지고 있어요. 내 수련장에서 서쪽으로 길을 따라가면 곧장 놈들에게 닿습니다. 놈들은 되꼬집으니 체력 막대를 살피며 계속 휘두르세요. Tab이나 왼쪽 클릭으로 한 마리를 대상으로 잡고, 1을 누르고, 껍데기가 갈라질 때까지 멈추지 마세요. 셋이면 충분합니다. 그런 다음 북쪽 언덕길을 오르세요. 조수지기 넬이 바닷가 장부를 맡고 있고, 당신의 껍데기도 세어 줄 겁니다.',
+    '짚은 상관하지 않죠, {playerName}. 그러니 이번엔 상관하는 놈들입니다. 해변 종종게들이 먼 바닷가의 난파선 해안에서 잔해를 뒤지고 있어요. 내 수련장에서 서쪽으로 길을 따라가면 곧장 놈들에게 닿습니다. 놈들은 되꼬집으니 체력 막대를 살피며 계속 휘두르세요. 왼쪽 클릭으로 한 마리를 대상으로 잡고, 수련장에서 배운 기술을 쓰며, 껍데기가 갈라질 때까지 멈추지 마세요. 셋이면 충분합니다. 그런 다음 북쪽 언덕길을 오르세요. 조수지기 넬이 바닷가 장부를 맡고 있고, 당신의 껍데기도 세어 줄 겁니다.',
   'entities.quests.q_ps_shell_and_claw.completion':
     '껍데기 셋을 깨고도 손가락은 하나도 잃지 않았군요. 첫 싸움치고는 훌륭해요, {playerName}. 저 게들은 조수가 표류물을 실어 오는 것보다 빨리 난파선을 털어 가니, 당신이 한 마리 솎아 낼 때마다 누군가의 동전이 지켜진답니다.',
   'entities.quests.q_ps_shell_and_claw.objectives.0.label': '해변 종종게 솎아내기',
@@ -13326,6 +13331,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_pouch_and_purse.completion':
     '좋은 주머니군요. 아직 차지 않았다면 지금 차세요. B를 눌러 가방을 열고, 주머니를 왼쪽 클릭해 빈 가방 고리에 채우면, 말썽거리를 담을 칸이 여섯 늘어납니다. 이제 어떤 가방에도 담기지 않는 나머지 절반의 가르침입니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 경리관 윅이 서쪽 길을 오른 곳에 금고 책상을 두고 있는데, 그가 열어 주는 금고는 어느 마을의 어느 경리관과도 같은 금고이고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '아마천 주머니 구입하기',
+  'entities.quests.q_ps_hone_the_edge.title':
+    '날을 세우다',
+  'entities.quests.q_ps_hone_the_edge.text':
+    '휘두르는 건 휘두르는 것일 뿐입니다, {playerName}. 짚은 하루 종일이라도 받아 주지만, 그걸로는 아무것도 얻지 못합니다. 화면 아래에 늘어선 버튼들을 보세요. 그 줄이 당신의 기술이고, 하나하나가 팔만으로는 할 수 없는 일을 해냅니다. 이미 하나 가지고 있습니다. 허수아비로 돌아가 그것을 쓰세요. 대상을 잡고, 이 훈련장이 알려 주는 버튼을 누르는 겁니다. 세 번. 짚을 그냥 두들기지 말고, 당신이 아는 그 기술을 실제로 일으키세요. 그런 다음 제게 오세요.',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    '이제야 허우적대는 대신 싸우고 있군요. 그 줄은 레벨을 올릴 때마다 길어집니다, {playerName}. 가장 오래 살아남는 이들은 그 줄을 읽는 사람들입니다. 짚은 당신이 어떤 버튼을 썼든 신경 쓰지 않습니다. 골짜기는 신경 씁니다.',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    '허수아비에 기술 명중',
+  'entities.quests.q_ps_the_long_walk.title':
+    '먼 귀로',
+  'entities.quests.q_ps_the_long_walk.text':
+    '남은 가르침은 하나입니다, {playerName}. 그리고 이건 말로 전할 수 없어요. 한 번은 겪어 봐야 합니다. 당신은 바깥에서 죽게 됩니다. 누구나 그렇고, 그게 무엇의 끝도 아닙니다. 이 안식의 돌을 가져가세요. B를 눌러 가방을 열고 왼쪽 클릭하면, 선 자리에서 당신을 눕혀 줍니다. 그다음에는 화면에 뜨는 안내를 따르세요. 영혼을 해방하고, 당신의 시신까지 걸어가서, 그 안으로 들어가는 겁니다. 시신은 기다립니다. 그 길은 공짜이고, 걸어도 잃는 것은 없습니다.',
+  'entities.quests.q_ps_the_long_walk.completion':
+    '그리고 이렇게 돌아왔군요, 아무 탈 없이. 그 느낌을 기억하세요, {playerName}. 다음번에는 이빨이 끼어 있을 테고, 옆에서 설명해 줄 사람도 없을 테니까요. 시신은 기다립니다. 길은 공짜이고, 죽음이 정말로 앗아가는 건 돌아오는 데 걸리는 시간뿐입니다.',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    '죽음에서 걸어 돌아옴',
+  'entities.items.ps_passing_stone.name':
+    '안식의 돌',
   'entities.quests.q_ps_the_signpost.title': '바람결 소식',
   'entities.quests.q_ps_the_signpost.text':
     '배울 습관이 하나 남았어요, {playerName}. 칼은 필요 없죠. 게시판 읽기입니다. 길드 게시 기둥이 내 모닥불에서 남서쪽으로 몇 걸음, 야영지 정문에 서 있고, 길드와 떠도는 무리들이 거기에 부름의 글을 붙입니다. 기둥 앞까지 다가가 F를 누르거나 왼쪽 클릭해 붙은 글을 읽고, 돌아와 바람이 무엇을 실어 왔는지 들려주세요. 앞으로 당신이 걸어 들어갈 모든 마을에 똑같은 게시판이 서 있답니다.',

@@ -255,7 +255,7 @@ describe('the rail coach', () => {
     // One chip, not two: the combat lessons ask for a click and then ONE
     // key, so no targeting bind is ever chipped.
     expect(at('q_ps_strike_true', 'active', 'keyboard')).toEqual(['1']);
-    expect(at('q_ps_shell_and_claw', 'active', 'keyboard')).toEqual(['1']);
+    expect(at('q_ps_shell_and_claw', 'active', 'keyboard')).toEqual(['2']);
     expect(at('q_ps_mother_of_pearl', 'active', 'keyboard')).toEqual(['B', 'F']);
     expect(at('q_ps_the_wreck_line', 'active', 'keyboard')).toEqual(['F']);
     expect(at('q_ps_pouch_and_purse', 'active', 'keyboard')).toEqual(['F']);
@@ -318,8 +318,10 @@ describe('the rail coach', () => {
     expect(t(wreck.bodyKey, { interactKey: 'F' })).toMatch(/crate/i);
     // The scuttler cull's card carries the retreat warning.
     const shell = coachCardPlan({ questId: 'q_ps_shell_and_claw', state: 'active' }, 'keyboard');
-    expect(shell.params).toEqual(['attackKey']);
-    const shellBody = t(shell.bodyKey, { attackKey: '1' });
+    // Names the ABILITY, not slot 1: this lesson follows the drill, and
+    // "press 1" is the plain attack (CX).
+    expect(shell.params).toEqual(['abilityKey']);
+    const shellBody = t(shell.bodyKey, { abilityKey: '2', ability: 'Reaver Strike' });
     expect(shellBody).toMatch(/retreat/i);
     expect(shellBody).toMatch(/left-click/i);
     expect(shellBody).not.toMatch(/\{\w+\}/);
@@ -356,11 +358,20 @@ describe('the rail coach', () => {
         const melee = coachCardPlan({ questId, state: 'active' }, mode, false);
         expect(caster.bodyKey, `${questId}/${mode}`).toMatch(/Caster/);
         expect(melee.bodyKey, `${questId}/${mode}`).not.toMatch(/Caster/);
-        const body = t(caster.bodyKey, { targetKey: 'Tab', attackKey: '2' });
+        const body = t(caster.bodyKey, {
+          targetKey: 'Tab',
+          attackKey: '2',
+          abilityKey: '2',
+          ability: 'Cinderbolt',
+        });
         expect(body, `${questId}/${mode}`).toMatch(/cast/i);
-        // Touch and pad have no key label to name, so their copy must say
-        // which button; the keyboard arm names the interpolated key itself.
-        if (mode !== 'keyboard') expect(body, `${questId}/${mode}`).toMatch(/second/i);
+        // Strike True is still the "which button" lesson, so its touch and
+        // pad copy has to say WHICH one. Shell and Claw comes after the
+        // drill and names the ability instead, which is more specific still.
+        if (mode !== 'keyboard') {
+          const wanted = questId === 'q_ps_strike_true' ? /second/i : /Cinderbolt/;
+          expect(body, `${questId}/${mode}`).toMatch(wanted);
+        }
         expect(body).not.toMatch(/\{\w+\}/);
       }
     }
@@ -408,11 +419,12 @@ describe('the ability drill card', () => {
     }
   });
 
-  it('is the only card that splices an ability name', () => {
-    // bodyHasAbility is opt-in; every other card would render a stray {ability}
-    // if it were ever set by accident.
+  it('splices an ability name on exactly the two combat lessons that name one', () => {
+    // bodyHasAbility is opt-in; every other card would render a stray
+    // {ability} if it were ever set by accident.
+    const namesAbility = new Set(['q_ps_hone_the_edge', 'q_ps_shell_and_claw']);
     for (const questId of PROVING_SHORE_QUEST_ORDER) {
-      if (questId === 'q_ps_hone_the_edge') continue;
+      if (namesAbility.has(questId)) continue;
       for (const state of ['available', 'active', 'ready'] as CoachState[]) {
         const plan = coachCardPlan({ questId, state }, 'keyboard');
         expect(plan.bodyHasAbility, `${questId}/${state}`).toBe(false);

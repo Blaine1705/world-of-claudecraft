@@ -135,9 +135,18 @@ export function islandVistaBounds(): {
  * the pearl cove) sits well inside 130 units of the arrival and is never
  * touched. tests/island_isolation_core.test.ts re-measures both distances
  * from the live terrain rather than trusting these numbers.
+ *
+ * The FAR edge was 900 and is now 420, because 900 was tuned from the
+ * arrival and the camp tells a different story: Dawnrest sits 152 units from
+ * the mainland, where a 130-to-900 ramp applies about 3% haze. The far shore
+ * came out uniformly pale with no depth gradient at all, and read as
+ * geometry that had failed to load rather than as distance (CX). 420 gives
+ * the same band a real falloff across the strait from both viewpoints, and
+ * still sits far short of the view envelope, so the horizon melts into the
+ * sky instead of hitting a wall.
  */
 export const ISLAND_HAZE_NEAR_YD = 130;
-export const ISLAND_HAZE_FAR_YD = 900;
+export const ISLAND_HAZE_FAR_YD = 420;
 
 export function islandHorizonHaze(): { near: number; far: number } {
   return { near: ISLAND_HAZE_NEAR_YD, far: ISLAND_HAZE_FAR_YD };

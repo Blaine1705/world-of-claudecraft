@@ -852,6 +852,11 @@ export type ItemUse =
   // Shore's tide-pool miniboss); see src/sim/interactions/crab_summon.ts.
   // Reusable like the firebottle, so a wipe can always retry.
   | { type: 'summon' }
+  // The Proving Shore's death lesson (src/sim/tutorial/death_lesson.ts): a
+  // single-use rite stone that lays its user down where they stand, so a new
+  // player meets their first death somewhere nothing is hunting them.
+  // Consumed on use and refused unless the lesson is active.
+  | { type: 'passingStone' }
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.

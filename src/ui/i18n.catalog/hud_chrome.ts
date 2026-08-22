@@ -600,8 +600,12 @@ export const hudChromeStrings = {
       'Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
     // Ferryman Odo's island welcome, shown once per device on the first
     // arrival: the greeting ferry lands beside his pier.
+    // Deliberately short (CX: the old note was a wall of text at the exact
+    // moment a new player wants to look at the world). It says where they
+    // are and who to talk to; the coach card, the golden trail and the
+    // floating bubble carry the rest, in place, as they need it.
     islandArrivalNote:
-      'Fresh off the crossing? Welcome to the Proving Shore. Warden Tam keeps the Gauntlet on the strand right ahead of you: walk up to him until his name shows, then press F, or left-click him, and his lanes will teach your legs everything they need. And when you are ready to leave, ring the bell standing beside my pier and the crossing will carry you home to Eastbrook.',
+      'Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.',
     noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
@@ -732,7 +736,7 @@ export const hudChromeStrings = {
     // Wreck Line, and the buckle-on for the pouch before Maren's hand-in.
     // WORDY by M16, so the five non-Latin overlays carry real fills.
     taskStrikeTrueBody:
-      'Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.',
+      'Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.',
     taskStrikeTrueBodyTouch:
       'Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.',
     taskStrikeTrueBodyPad:
@@ -753,31 +757,31 @@ export const hudChromeStrings = {
     // two of them: walk to the stone, release the spirit, walk back. The
     // copy names the literal buttons the death screen shows.
     taskLongWalkBody:
-      'Walk south down the shore road to the Passing Stone and press {interactKey} to kneel. Nothing out here can hurt you, and this costs you nothing.',
+      'Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.',
     taskLongWalkBodyTouch:
-      'Walk south down the shore road to the Passing Stone and tap it to kneel. Nothing out here can hurt you, and this costs you nothing.',
+      'Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.',
     taskLongWalkBodyPad:
-      'Walk south down the shore road to the Passing Stone and press your interact button to kneel. Nothing out here can hurt you, and this costs you nothing.',
+      'Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.',
     // Dead, spirit not yet released.
     taskLongWalkDeadBody:
-      'You have died. Nothing is lost. Press Release Spirit to rise as a ghost at the graveyard behind the camp.',
+      'You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.',
     taskLongWalkDeadBodyTouch:
-      'You have died. Nothing is lost. Tap Release Spirit to rise as a ghost at the graveyard behind the camp.',
+      'You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.',
     taskLongWalkDeadBodyPad:
-      'You have died. Nothing is lost. Choose Release Spirit to rise as a ghost at the graveyard behind the camp.',
+      'You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.',
     // A ghost walking back to the body.
     taskLongWalkGhostBody:
-      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Press it and you are whole again, with no penalty at all.',
+      'Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.',
     taskLongWalkGhostBodyTouch:
-      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Tap it and you are whole again, with no penalty at all.',
+      'Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.',
     taskLongWalkGhostBodyPad:
-      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Choose it and you are whole again, with no penalty at all.',
+      'Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.',
     taskShellBody:
-      'The scuttlers pinch back. Left-click one to make it your target, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyTouch:
-      'The scuttlers pinch back. Tap one to target it, then tap the first action bar button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyPad:
-      'The scuttlers pinch back. Press your target button, then your first action button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     // Caster arms (mage, warlock, priest, druid): their first real button is
     // the slot-2 spell, so the combat lessons teach the second button and
     // speak of casting. WORDY by M16, so the five non-Latin overlays carry
@@ -789,11 +793,11 @@ export const hudChromeStrings = {
     taskStrikeTrueBodyCasterPad:
       'Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.',
     taskShellBodyCaster:
-      'The scuttlers pinch back. Left-click one to make it your target, then press {attackKey} to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyCasterTouch:
-      'The scuttlers pinch back. Tap one to target it, then tap the second button on the action bar to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyCasterPad:
-      'The scuttlers pinch back. Press your target button, then your second action button to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     // The pearl detour (q_ps_mother_of_pearl): using a bag item at a marked
     // spot, a real fight, and looting a quest prize off the corpse. WORDY by
     // M16, so the five non-Latin overlays carry fills.
@@ -826,6 +830,9 @@ export const hudChromeStrings = {
     promptTalk: 'Talk',
     promptTurnIn: 'Turn in quest',
     promptPickUp: 'Pick up',
+    // The pearl on Mister Crabs' shell: name the prize, so a new player knows
+    // the corpse still owes them something (CX).
+    promptLootPearl: 'Loot the pearl',
     promptRead: 'Read',
     promptRing: 'Ring',
     promptHold: 'Hold',
@@ -839,6 +846,12 @@ export const hudChromeStrings = {
     promptUseAbility: 'Use ability',
     // The death lesson's rite: kneeling at the Passing Stone.
     promptKneel: 'Kneel',
+    // Screen-anchored asks: the lessons whose answer is a press on the
+    // interface rather than a place in the world. With the coach card gone
+    // these ARE the instruction, so each names its own press.
+    promptOpenBags: 'Open your bags',
+    promptCharacterSheet: 'Open your character sheet',
+    promptLookAround: 'Hold right-click and drag to look around',
     promptJump: 'Jump',
     promptSummon: 'Summon',
     // The ring equip lesson (bootcamp_view.ts ringCardPlan): the pearl
@@ -847,18 +860,18 @@ export const hudChromeStrings = {
     // fills.
     ringEquipTitle: 'Wear your prize',
     ringEquipBody:
-      'The Mother of Pearl is in your bags. Press {bagsKey} to open them, then left-click the ring to slide it onto your finger.',
+      'You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.',
     ringEquipBodyTouch:
-      'The Mother of Pearl is in your bags. Open them and tap the ring to slide it onto your finger.',
+      'You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.',
     ringEquipBodyPad:
-      'The Mother of Pearl is in your bags. Open them and choose the ring to slide it onto your finger.',
+      'You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.',
     ringAdmireTitle: 'Look at you',
     ringAdmireBody:
-      'It suits you. Press {charKey} to open your character sheet and see the ring on your hand, and every number it lifts.',
+      'Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.',
     ringAdmireBodyTouch:
-      'It suits you. Open your character sheet from the menu and see the ring on your hand, and every number it lifts.',
+      'Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.',
     ringAdmireBodyPad:
-      'It suits you. Open your character sheet from the menu and see the ring on your hand, and every number it lifts.',
+      'Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.',
     // The word between sequenced keycap chips ("D then W"): press order made
     // explicit, the playtest ask.
     keycapThen: 'then',

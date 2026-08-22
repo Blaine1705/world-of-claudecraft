@@ -29,6 +29,11 @@ export interface CoachGuideReader {
     string,
     { state: string; counts?: readonly number[]; creditedObjects?: readonly string[] }
   >;
+  /** The viewer's own position, and their corpse while they are a ghost.
+   *  Optional so the existing callers and fixtures are unchanged; the death
+   *  lesson's route back is the only thing that reads them. */
+  playerPos?: { x: number; z: number };
+  corpsePos?: { x: number; z: number } | null;
 }
 
 export interface CoachTrailPlan {
@@ -107,6 +112,19 @@ export function coachTrailPlan(
   world: CoachGuideReader,
   gauntletCounts: number,
 ): CoachTrailPlan | null {
+  // A ghost has exactly one route worth painting: back to its own body. It
+  // beats every station route below, because while you are dead nothing else
+  // on the island is reachable anyway (CX asked for this walk to be shown,
+  // not just described).
+  if (world.corpsePos && world.playerPos) {
+    return {
+      key: 'corpse-run',
+      points: [
+        { x: world.playerPos.x, z: world.playerPos.z },
+        { x: world.corpsePos.x, z: world.corpsePos.z },
+      ],
+    };
+  }
   const focus = railFocus(world);
   if (!focus) {
     // Graduated and still ashore: paint the walk to the ferry bell.
@@ -229,6 +247,13 @@ export interface CoachGuides {
   /** True on the crate haul: the beam follows the nearest LIVE crate, which
    *  only the consumer can resolve (it needs the entity roster). */
   beamAtNearestCrate: boolean;
+  /** True on the pearl detour: once the king is DOWN the beam leaves the pool
+   *  and stands on his corpse, because the pearl is on him and looting it is
+   *  the step players were missing (CX: "still doesn't tell me to loot Mister
+   *  Crabs to pick up the quest item. This is key."). Resolved by the
+   *  consumer, which has the entity roster; falls back to `beamAt` (the pool)
+   *  while no corpse is on the sand. */
+  beamAtCrabCorpse: boolean;
   /** The kill lessons' quarry ground: a wide pulsing ring around the whole
    *  camp (the effigy yard, the scuttler strand), so "go fight THERE" reads
    *  from across the shore. */
@@ -249,29 +274,41 @@ const KILL_AREA_RINGS: Readonly<Record<string, { x: number; z: number; radius: n
 function beamTarget(
   world: CoachGuideReader,
   gauntletCounts: number,
-): { at: { x: number; z: number } | null; nearestCrate: boolean } {
+): { at: { x: number; z: number } | null; nearestCrate: boolean; crabCorpse: boolean } {
   const focus = railFocus(world);
   if (!focus) {
     const last = PROVING_SHORE_QUEST_ORDER[PROVING_SHORE_QUEST_ORDER.length - 1];
-    if (world.questState(last) === 'done') return { at: bellPoint(), nearestCrate: false };
-    return { at: null, nearestCrate: false };
+    if (world.questState(last) === 'done')
+      return { at: bellPoint(), nearestCrate: false, crabCorpse: false };
+    return { at: null, nearestCrate: false, crabCorpse: false };
   }
-  if (focus.state !== 'active') return { at: null, nearestCrate: false };
+  if (focus.state !== 'active') return { at: null, nearestCrate: false, crabCorpse: false };
   if (focus.questId === PROVING_SHORE_QUEST_ORDER[0]) {
     // Mid-lanes: the beam stands on the CURRENT flag. Once every flag is
     // tagged the target is Overseer Pell, an NPC: aura, not beam.
     if (gauntletCounts < BOOTCAMP_COURSE_CHECKPOINTS.length) {
-      return { at: BOOTCAMP_COURSE_CHECKPOINTS[gauntletCounts] ?? null, nearestCrate: false };
+      return {
+        at: BOOTCAMP_COURSE_CHECKPOINTS[gauntletCounts] ?? null,
+        nearestCrate: false,
+        crabCorpse: false,
+      };
     }
-    return { at: null, nearestCrate: false };
+    return { at: null, nearestCrate: false, crabCorpse: false };
   }
   // The pearl detour's target is a spot of water, never a character: the
-  // beam stands on the pool for the whole active leg (the summoned king
-  // spawns inside it, so the beam keeps marking the fight too).
-  if (focus.questId === 'q_ps_mother_of_pearl') return { at: CRAB_POOL, nearestCrate: false };
-  if (focus.questId === 'q_ps_the_wreck_line') return { at: null, nearestCrate: true };
-  if (focus.questId === 'q_ps_the_signpost') return { at: SIGNPOST_SPOT, nearestCrate: false };
-  return { at: null, nearestCrate: false };
+  // beam stands on the pool while the king is up (he spawns inside it, so it
+  // keeps marking the fight too), and moves onto his CORPSE once he is down,
+  // because the prize is on him and the loot is the step players missed.
+  if (focus.questId === 'q_ps_mother_of_pearl') {
+    return { at: CRAB_POOL, nearestCrate: false, crabCorpse: true };
+  }
+  if (focus.questId === 'q_ps_the_wreck_line') {
+    return { at: null, nearestCrate: true, crabCorpse: false };
+  }
+  if (focus.questId === 'q_ps_the_signpost') {
+    return { at: SIGNPOST_SPOT, nearestCrate: false, crabCorpse: false };
+  }
+  return { at: null, nearestCrate: false, crabCorpse: false };
 }
 
 /** One per-frame read for the renderer: the trail plan plus the golden
@@ -289,6 +326,7 @@ export function coachGuides(world: CoachGuideReader): CoachGuides {
     glowNpcPos: glowNpcId ? PROVING_SHORE_NPCS[glowNpcId].pos : null,
     beamAt: beam.at,
     beamAtNearestCrate: beam.nearestCrate,
+    beamAtCrabCorpse: beam.crabCorpse,
     areaRing,
   };
 }

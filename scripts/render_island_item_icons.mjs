@@ -1,6 +1,7 @@
-// One-off: render the Proving Shore's two interact-prop item icons from the
-// REAL world models the player clicks (the castaway crate's supply_crate GLB
-// and the ferry bell's marsh_bell_gallows GLB), composited over the item-icon
+// One-off: render the Proving Shore's interact-prop item icons from the
+// REAL world models the player clicks (the castaway crate's supply_crate GLB,
+// the ferry bell's marsh_bell_gallows GLB, and the death lesson's Passing
+// Stone, which reuses the round gravestone), composited over the item-icon
 // vignette at the shipped 128px. A sibling of render_finder_portraits.mjs
 // (same bundled stills entry, same server, same sharp finishing); the outputs
 // land in public/ui/items/ and are committed like any painted icon.
@@ -22,6 +23,7 @@ const OUT_PX = 128;
 const JOBS = [
   { itemId: 'ps_castaway_crate', spec: { url: '/models/quest/supply_crate.glb' } },
   { itemId: 'ps_ferry_bell', spec: { url: '/models/props/marsh_bell_gallows.glb' } },
+  { itemId: 'ps_passing_stone', spec: { url: '/models/props/gravestone_round.glb' } },
 ];
 
 const bundled = await esbuild.build({

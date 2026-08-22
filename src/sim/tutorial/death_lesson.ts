@@ -7,10 +7,11 @@
 // and nothing tells them that the way back is to walk to their own body. So
 // the island stages it, on purpose, somewhere nothing is hunting them.
 //
-// The death is SCRIPTED and consented to: the player walks to the Passing
-// Stone and presses interact, exactly like every other lesson's press. It is
-// free of consequence by construction, since this game charges no durability
-// on death, and the corpse lies a short run from the island graveyard.
+// The death is SCRIPTED and consented to: Instructor Maren hands over a
+// single-use Passing Stone, and using it from the bags lays the player down
+// where they stand. It is free of consequence by construction, since this
+// game charges no durability on death, and the corpse is left wherever they
+// chose to use it.
 //
 // Two things keep it from ever stranding a character:
 //   - The rite refuses unless the quest is active, so nobody can click the
@@ -34,9 +35,9 @@ import type { Entity } from '../types';
 export const DEATH_LESSON_QUEST_ID = 'q_ps_the_long_walk';
 export const DEATH_LESSON_OBJECT_ITEM_ID = 'ps_passing_stone';
 
-/** The rite's own object id, the thing the player presses. Shares the
- *  sentinel id with the objective: one stone, one lesson. */
-export const PASSING_STONE_OBJECT_ID = DEATH_LESSON_OBJECT_ITEM_ID;
+/** The carried rite item. Shares the sentinel id with the objective: one
+ *  stone, one lesson. */
+export const PASSING_STONE_ITEM_ID = DEATH_LESSON_OBJECT_ITEM_ID;
 
 /** Is this player mid-lesson? The gate both halves share. */
 function lessonActive(meta: PlayerMeta): boolean {
@@ -44,32 +45,34 @@ function lessonActive(meta: PlayerMeta): boolean {
 }
 
 /**
- * The staged death, routed from the object-interaction dispatcher before the
- * pickup path (the ferry bell's precedent) so a click on the stone always
- * performs the rite rather than trying to loot it.
+ * The staged death, routed from the item-use dispatcher (items.ts).
  *
- * Returns true when the click was consumed. A click WITHOUT the lesson
- * active is consumed too, with an explanatory refusal: a bare stone that
- * silently did nothing would read as a bug, and one that killed a passer-by
- * would be a griefing tool.
+ * A CARRIED single-use item rather than a fixture to walk to: a new player
+ * told "go and die" needs the thing that does it in their hand, and the bags
+ * press is one they have already learned by this point in the rail (CX).
+ *
+ * Refuses anyone who has not been asked, with an explanation, so a stray
+ * click can never cost someone a corpse run they did not sign up for.
  */
-export function tryPassingStone(ctx: SimContext, p: Entity, meta: PlayerMeta): boolean {
-  if (p.dead || p.ghost) return true;
+export function usePassingStone(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  if (p.dead || p.ghost) return;
   if (!lessonActive(meta)) {
     ctx.error(p.id, 'The stone is cold. Instructor Maren has not asked this of you.');
-    return true;
+    return;
   }
+  // Consumed on use: one death, one stone. requiredItems on the quest
+  // re-grants it if the lesson somehow needs running again.
+  ctx.removeItem(PASSING_STONE_ITEM_ID, 1, meta.entityId);
   ctx.emit({
     type: 'log',
-    text: 'You kneel at the Passing Stone, and the shore lets you go.',
+    text: 'You close your hand on the Passing Stone, and the shore lets you go.',
     color: '#c8b8ff',
     entityId: p.id,
   });
-  // The shared death path: corpse placed where they knelt, spirit released
-  // by the player as usual. No killer, so nothing takes credit and no threat
-  // or loot table is involved.
+  // The shared death path: corpse left where they stood, spirit released by
+  // the player as usual. No killer, so nothing takes credit and no threat or
+  // loot table is involved.
   ctx.handleDeath(p, null, null);
-  return true;
 }
 
 /**

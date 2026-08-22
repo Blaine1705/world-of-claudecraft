@@ -190,6 +190,21 @@ describe('coachGuides: the objective beam', () => {
       PROVING_SHORE_NPCS.tidewarden_nel.pos,
     ]);
   });
+
+  it('hands the KING DOWN case to the consumer, so the beam lights his shell', () => {
+    // CX: "still doesn't tell me to loot Mister Crabs to pick up the quest
+    // item. This is key." The pool is where he is summoned; the pearl is on
+    // his corpse, and the corpse is an entity only the consumer can see, so
+    // the core raises the flag and the pool stays the fallback.
+    const active = coachGuides(reader({ q_ps_mother_of_pearl: 'active' }));
+    expect(active.beamAtCrabCorpse).toBe(true);
+    expect(active.beamAt).toEqual({ x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z });
+    // Nowhere else: no other station should chase a crab corpse.
+    for (const station of [GAUNTLET, 'q_ps_strike_true', 'q_ps_the_wreck_line'] as const) {
+      expect(coachGuides(reader({ [station]: 'active' })).beamAtCrabCorpse, station).toBe(false);
+    }
+    expect(coachGuides(reader({ q_ps_mother_of_pearl: 'ready' })).beamAtCrabCorpse).toBe(false);
+  });
 });
 
 describe('coachGuides: the one per-frame read', () => {
@@ -204,5 +219,50 @@ describe('coachGuides: the one per-frame read', () => {
     const counts = BOOTCAMP_COURSE_CHECKPOINTS.length;
     const guides = coachGuides(reader({ [GAUNTLET]: 'active' }, { [GAUNTLET]: counts }));
     expect(guides.plan!.key).toBe(`${GAUNTLET}:handoff`);
+  });
+});
+
+describe('the corpse run owns the trail while you are a ghost', () => {
+  // CX: the death lesson should PAINT the walk back, not just describe it.
+  const reader = (over: Record<string, unknown> = {}) => ({
+    questState: () => 'unavailable',
+    questLog: new Map(),
+    ...over,
+  });
+
+  it('routes straight from the ghost to its own body', () => {
+    const plan = coachTrailPlan(
+      reader({ playerPos: { x: -324, z: 58 }, corpsePos: { x: -300, z: 10 } }),
+      0,
+    );
+    expect(plan).not.toBeNull();
+    expect(plan!.key).toBe('corpse-run');
+    expect(plan!.points[0]).toEqual({ x: -324, z: 58 });
+    expect(plan!.points[plan!.points.length - 1]).toEqual({ x: -300, z: 10 });
+  });
+
+  it('beats every station route, because nothing else is reachable while dead', () => {
+    // A live rail quest would normally own the ribbon; the corpse does not
+    // just get added to the list, it replaces it.
+    const plan = coachTrailPlan(
+      reader({
+        questState: (id: string) => (id === 'q_ps_the_gauntlet' ? 'active' : 'unavailable'),
+        questLog: new Map([['q_ps_the_gauntlet', { state: 'active', counts: [0] }]]),
+        playerPos: { x: -324, z: 58 },
+        corpsePos: { x: -300, z: 10 },
+      }),
+      0,
+    );
+    expect(plan!.key).toBe('corpse-run');
+  });
+
+  it('leaves the ordinary routes alone once the body is reclaimed', () => {
+    const alive = coachTrailPlan(reader({ playerPos: { x: -324, z: 58 }, corpsePos: null }), 0);
+    expect(alive?.key).not.toBe('corpse-run');
+  });
+
+  it('needs BOTH ends: a corpse with no viewer position paints nothing', () => {
+    const plan = coachTrailPlan(reader({ corpsePos: { x: -300, z: 10 } }), 0);
+    expect(plan?.key).not.toBe('corpse-run');
   });
 });

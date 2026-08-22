@@ -37,7 +37,7 @@ import { emitQuestProgress } from '../quests/quest_credit';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
-import { startingAttackFor } from './starting_attack';
+import { isAttackAbility, startingAttackFor } from './starting_attack';
 
 export const ABILITY_DRILL_QUEST_ID = 'q_ps_hone_the_edge';
 export const ABILITY_DRILL_OBJECT_ITEM_ID = 'ps_ability_drill';
@@ -88,8 +88,16 @@ export function creditAbilityDrill(
   if (source.kind !== 'player') return;
   const meta = ctx.players.get(source.id);
   if (!meta || !drillActive(meta)) return;
-  const taught = startingAttackFor(meta.cls).abilityId;
-  if (!taught || abilityId !== taught) return;
+  // ANY authored attack counts, not just the one the coach names.
+  //
+  // Keying on the taught id alone looked tidy and was wrong three ways: a
+  // warrior's Reaver Strike is onNextSwing and lands through the auto-attack
+  // path, a talent action-replacement swaps the button's id out from under
+  // the player (a rogue's Wicked Slash becomes Haymaker under Redline), and
+  // a player who dings mid-drill may press something they only just learned.
+  // The lesson is "use an ability instead of a plain swing", and an
+  // autoattack carries no abilityId at all, so that is the honest test.
+  if (!isAttackAbility(abilityId)) return;
 
   const qp = meta.questLog.get(ABILITY_DRILL_QUEST_ID);
   if (!qp) return;

@@ -1,16 +1,18 @@
-// The Proving Shore coach overlay: the island sibling of the Eastbrook
-// new-adventurer coachmark (tutorial.ts), sharing its card CSS family, and
-// the ONE top-of-screen helper for the whole island tutorial. Every card is
-// a numbered step of a single sequence (islandStepInfo): the Gauntlet's
-// lesson ladder (talk to Tam, forward, turn-and-walk, strafe, the camera
-// swing, hand in), then three coach cards per later rail quest (walk to the
-// giver, do the task, return to the turn-in; quests with their own mechanics
-// carry bespoke lesson bodies: targeting and the swing for Strike True, the
-// pickup press for the Wreck Line, the buckle-on for the pouch), and the
-// closing card that points at the ferry bell once Ferryman Odo has taken the
-// last hand-in. There is deliberately NO skip button: the card is compact,
-// stays out of the way at the top, and folds itself when the island is done
-// or left.
+// The Proving Shore coach overlay: the island tutorial's guidance, carried
+// ENTIRELY by things in the world rather than by prose.
+//
+// There used to be a card pinned to the top of the screen narrating every
+// step. It was the thing new players read least and disliked most (CX), so
+// it is gone rather than shrunk, and everything it said now has a visual
+// home:
+//   the golden ground trail            where to walk (render/coach_trail_core)
+//   the target's aura and beam         which thing is the objective
+//   the floating keycap bubble         which button, on the thing itself
+//   the CENTRED keycap bubble          the same, for an interface press with
+//                                      no world anchor (bags, sheet, camera)
+//   the pulsing bag stack / buttons    which item or menu to click
+//   the quest tracker's own counts     how many are left
+// There is deliberately no skip button and nothing to dismiss.
 //
 // The flag tally is the QUEST'S OWN objective count (the sim credits one
 // count per flag passed in order, tutorial/gauntlet_run.ts), so the card,
@@ -50,6 +52,7 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
+  DEATH_LESSON_QUEST_ID,
   type DeathLessonPhase,
   RING_LESSON_ITEM_ID,
   RING_LESSON_QUEST_ID,
@@ -69,19 +72,29 @@ import {
   GUIDE_VOICE_LINES,
   type GuideVoiceLineName,
   parkourPromptPlan,
+  pouchLessonActive,
+  turnAskOwnsBubble,
   VEER_GRACE_MS,
   VEER_NUDGE_COOLDOWN_MS,
   VEER_NUDGES_PER_STATION,
   VEER_OFF_YD,
 } from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
-import { formatNumber, t } from './i18n';
+import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl } from './icons';
-import { objectiveGlowPlanAt } from './objective_glow_view';
+import {
+  type ObjectiveGlowPlan,
+  objectiveGlowFromScreen,
+  uiLessonGlow,
+} from './objective_glow_view';
 
 /** Peak opacity of the wrong-way bloom at full intensity. Deliberately shy of
  *  opaque: it is a hint at the edge of vision, never a curtain. */
 const GLOW_MAX_OPACITY = 0.72;
+
+/** Eye height for the objective's projection: a nameplate's worth above the
+ *  ground, so "on screen" means the marker a player would actually see. */
+const GLOW_TARGET_LIFT = 2;
 
 /** The Attack toggle's icon id (hud.ts resolves ATTACK_ICON_KEY to it). */
 const AUTO_ATTACK_ICON_ID = 'attack';
@@ -93,7 +106,6 @@ const AUTO_ATTACK_ICON_ID = 'attack';
 export class BootcampOverlay {
   private engaged = false;
   private step: BootcampStep | null = null;
-  private renderKey: string | null = null;
   private lastCounts = 0;
   // The camera lesson's client-side tally: accumulated view-yaw travel.
   private cameraTravel = 0;
@@ -120,11 +132,6 @@ export class BootcampOverlay {
   private deathPhase: DeathLessonPhase = 'alive';
 
   private root: HTMLElement | null = null;
-  private titleEl!: HTMLElement;
-  private stepEl!: HTMLElement;
-  private bodyEl!: HTMLElement;
-  private keysEl!: HTMLElement;
-  private progressEl!: HTMLElement;
   private lastFocus: CoachFocus | null = null;
   // The floating interact bubble (coach_prompt_view.ts): shown only while
   // standing in interact reach of the coach's current target, so the one
@@ -212,14 +219,9 @@ export class BootcampOverlay {
       nextRenderKey = `${focus!.questId}:${focus!.state}:${mode}`;
     }
 
-    if (this.renderKey !== nextRenderKey) {
-      this.renderKey = nextRenderKey;
-      this.renderPanel(keybinds);
-    }
-
     this.updatePrompt(world, renderer, keybinds);
     this.paintObjectiveGlow(world, renderer);
-    this.applyUiGlow();
+    this.applyUiGlow(world);
     this.updateGuideVoice(world, focus);
   }
 
@@ -277,7 +279,19 @@ export class BootcampOverlay {
     this.guideVeerCheckedAt = now;
     const p = world.player;
     if (!p) return;
-    const plan = coachTrailPlan(world, this.lastCounts);
+    const ghostBody =
+      world.player?.ghost && world.player.corpsePos
+        ? { x: world.player.corpsePos.x, z: world.player.corpsePos.z }
+        : null;
+    const plan = coachTrailPlan(
+      {
+        questState: (id) => world.questState(id),
+        questLog: world.questLog,
+        playerPos: world.player ? { x: world.player.pos.x, z: world.player.pos.z } : undefined,
+        corpsePos: ghostBody,
+      },
+      this.lastCounts,
+    );
     if (!plan) {
       this.guideOffPathSince = null;
       return;
@@ -372,13 +386,13 @@ export class BootcampOverlay {
     return phase;
   }
 
-  private applyUiGlow(): void {
+  private applyUiGlow(world: IWorld): void {
     this.glowTick = (this.glowTick + 1) % 10;
     if (this.glowTick !== 0) return;
     const focus = this.lastFocus;
     const questId = coachGlowQuestId(focus);
     const vendorItem = coachGlowVendorItemId(focus);
-    const bagItem = coachGlowBagItemId(focus);
+    const bagItem = coachGlowBagItemId(focus, world.bags);
     syncGlow('#quest-tracker .qt-title', (el) => el.dataset.quest === questId);
     syncGlow('#quest-log .ql-item', (el) => el.dataset.quest === questId);
     syncGlow(
@@ -403,16 +417,27 @@ export class BootcampOverlay {
     // once it is on the finger.
     syncGlow('#mm-bag', () => ringEquip);
     syncGlow('#mm-char', () => this.ringPhase === 'admire');
+
+    // The death lesson's own screen. While the island is teaching the corpse
+    // run, the button that ends it pulses the moment it appears, and the
+    // Keeper's paid alternative is dimmed out of the way: a first-timer
+    // offered two buttons will take whichever they see first, and the whole
+    // lesson is that the walk back is free (CX).
+    const teachingCorpseRun =
+      this.deathPhase !== 'alive' && this.lastFocus?.questId === DEATH_LESSON_QUEST_ID;
+    syncGlow('#resurrect-corpse-btn', () => teachingCorpseRun);
+    for (const el of document.querySelectorAll<HTMLElement>('#resurrect-healer-btn')) {
+      el.classList.toggle('bc-dimmed', teachingCorpseRun);
+    }
   }
 
   /** Re-localize after an in-game language switch (the Hud's woc:languagechange
-   *  fan-out). Self-gated on a card being up, the tutorial.ts precedent. */
-  relocalize(_world: IWorld, keybinds: Keybinds): void {
-    if (!this.engaged || this.renderKey === null) return;
-    this.renderPanel(keybinds);
-    // The interact bubble's content memo digests no locale, so a language
-    // switch would leave the verb in the old tongue until the target moved;
-    // clearing it makes the next frame repaint the localized verb.
+   *  fan-out). With the card gone the only localized surface left is the
+   *  bubble's verb, whose content memo digests no locale: a switch would
+   *  leave it in the old tongue until the target moved, so clearing the memo
+   *  makes the next frame repaint it. */
+  relocalize(_world: IWorld, _keybinds: Keybinds): void {
+    if (!this.engaged) return;
     this.promptContentKey = '';
   }
 
@@ -426,46 +451,18 @@ export class BootcampOverlay {
   }
 
   private ensureDom(): void {
-    if (this.root) return;
+    if (this.prompt) return;
     const ui = document.getElementById('ui');
     if (!ui) return;
 
-    const root = document.createElement('div');
-    // The tutorial card family's chrome, plus its own hook for the keycap row.
-    root.className = 'tut-card bc-card';
-    root.setAttribute('role', 'status');
-    root.setAttribute('aria-live', 'polite');
-    root.setAttribute('aria-labelledby', 'bc-title');
-
-    const header = document.createElement('div');
-    header.className = 'tut-head';
-    this.titleEl = document.createElement('div');
-    this.titleEl.className = 'tut-title';
-    this.titleEl.id = 'bc-title';
-    this.stepEl = document.createElement('div');
-    this.stepEl.className = 'tut-step';
-    header.append(this.titleEl, this.stepEl);
-
-    this.bodyEl = document.createElement('div');
-    this.bodyEl.className = 'tut-body';
-
-    this.keysEl = document.createElement('div');
-    this.keysEl.className = 'tut-keys';
-    this.keysEl.setAttribute('aria-hidden', 'true'); // chips repeat the body copy
-
-    this.progressEl = document.createElement('div');
-    this.progressEl.className = 'tut-progress';
-
-    root.append(header, this.bodyEl, this.keysEl, this.progressEl);
-    ui.appendChild(root);
-    this.root = root;
-    // The quest dialog shifts down below the card while this class is up.
-    document.body.classList.add('bc-coach-up');
-
-    // No guidance arrow here (the Eastbrook coachmark keeps its own): the
-    // island guides with the golden ground trail, the target NPC's aura, and
-    // the objective beam (render/island_guidance.ts), which playtests read
-    // far better than a screen-space pointer.
+    // NO card. The coach's whole instruction is carried in the world now:
+    // the golden ground trail, the objective's own aura and beam, the
+    // floating keycap bubble on the target (or the centred one for an
+    // interface press), the pulsing bag stack and menu buttons, and the
+    // quest tracker's own objective counts. A block of prose pinned to the
+    // top of the screen was the thing new players read least and disliked
+    // most (CX), so it is gone rather than shrunk.
+    this.root = ui;
 
     // The prompt bubble: keycap chip(s) plus a one-word verb. World-anchored
     // over interact targets; screen-anchored low-center for the movement
@@ -506,9 +503,26 @@ export class BootcampOverlay {
   private paintObjectiveGlow(world: IWorld, renderer: Renderer): void {
     const el = this.glowEl;
     if (!el) return;
-    const objective = this.currentObjectivePos();
+    // A bag or character-sheet lesson has no world direction: the answer is
+    // at the bottom of the screen, not past an edge (CX).
     const p = world.player;
-    const plan = objective && p ? objectiveGlowPlanAt(renderer.camYaw, p.pos, objective) : null;
+    const uiLesson = this.uiLesson(world);
+    const objective = uiLesson ? null : this.currentObjectivePos();
+    let plan: ObjectiveGlowPlan | null = null;
+    if (uiLesson) {
+      plan = uiLessonGlow();
+    } else if (objective && p) {
+      // Ask the renderer where the objective actually lands, so the cue
+      // appears ONLY when it is genuinely off screen and points the way the
+      // pixels went (CX: it used to fire on visible objectives, and on the
+      // wrong side).
+      const groundY = Math.max(groundHeight(objective.x, objective.z, WORLD_SEED), WATER_LEVEL);
+      const v = renderer.worldToScreen(objective.x, groundY + GLOW_TARGET_LIFT, objective.z);
+      plan = objectiveGlowFromScreen(v, {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }
     // Memoized: this runs every HUD frame, and writing identical style
     // strings would dirty the compositor for nothing.
     const key = plan ? `${plan.side}:${Math.round(plan.intensity * 20)}` : '';
@@ -520,7 +534,26 @@ export class BootcampOverlay {
     }
     el.classList.toggle('tut-glow-right', plan.side === 'right');
     el.classList.toggle('tut-glow-left', plan.side === 'left');
+    el.classList.toggle('tut-glow-behind', plan.side === 'behind');
+    el.classList.toggle('tut-glow-bottom', plan.side === 'bottom');
     el.style.opacity = String(GLOW_MAX_OPACITY * plan.intensity);
+  }
+
+  /** True while the coach is asking for a BAGS or CHARACTER-SHEET press: the
+   *  ring's two steps, and the pouch buckle-on. Both already pulse the menu
+   *  buttons and the bag stack; the edge glow joins them at the bottom
+   *  rather than pointing across the island at a turn-in NPC. */
+  private uiLesson(world: IWorld): boolean {
+    if (this.ringPhase !== null) return true;
+    const focus = this.lastFocus;
+    // Only while the pouch is still in the bags: once it is socketed the
+    // lesson is over and the answer is the walk to the turn-in, not the row
+    // of buttons along the bottom (CX).
+    if (pouchLessonActive(focus, world.bags)) return true;
+    // The death lesson's first beat is "open your bags and use the stone";
+    // once they are dead or a ghost the answer is the death screen's own
+    // buttons, which are also centre/bottom, so the bloom stays put.
+    return focus?.questId === DEATH_LESSON_QUEST_ID && focus.state === 'active';
   }
 
   /** Where the coach is currently pointing, or null when it points nowhere
@@ -539,125 +572,38 @@ export class BootcampOverlay {
     return coachCardPlan(focus, 'keyboard', this.casterClass, this.deathPhase).arrow;
   }
 
-  private renderPanel(keybinds: Keybinds): void {
-    this.ensureDom();
-    if (!this.root) return;
-    if (this.bellPhase) this.renderBellPanel(keybinds);
-    else if (this.ringPhase !== null) this.renderRingPanel(keybinds);
-    else if (this.step !== null) this.renderLadderPanel(keybinds);
-    else this.renderCoachPanel(keybinds);
-  }
-
-  /** The ring equip lesson's card (wear it, then see it on the sheet). */
-  private renderRingPanel(keybinds: Keybinds): void {
-    if (this.ringPhase === null) return;
-    const mode = currentInputHintMode();
-    const labels = this.coachLabels(keybinds);
-    const plan = ringCardPlan(this.ringPhase, mode);
-    const params: Record<string, string> = {};
-    for (const key of plan.params) params[key] = labels[key];
-    this.titleEl.textContent = t(plan.titleKey);
-    this.bodyEl.textContent = t(plan.bodyKey, params);
-    this.paintKeycaps(coachKeycaps(plan, mode, labels));
-    this.stepEl.textContent = '';
-    this.progressEl.style.display = 'none';
-    this.root!.classList.remove('tut-done');
-  }
-
-  private coachLabels(keybinds: Keybinds): Readonly<Record<CoachParam, string>> {
-    const unbound = t('hud.options.unbound');
-    return {
-      interactKey: keybinds.primaryLabel('interact') || unbound,
-      mapKey: keybinds.primaryLabel('map') || unbound,
-      targetKey: keybinds.primaryLabel('target') || unbound,
-      // Melee classes learn slot 0 (Attack, default Digit1); casters learn
-      // slot 1, where their level-1 spell sits (default Digit2).
-      attackKey: keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0') || unbound,
-      // The ability drill points at the class's OWN attack, which never
-      // sits on the Attack toggle: slot 1 for everyone (starting_attack.ts).
-      abilityKey: keybinds.primaryLabel('slot1') || unbound,
-      bagsKey: keybinds.primaryLabel('bags') || unbound,
-      charKey: keybinds.primaryLabel('char') || unbound,
-    };
-  }
-
-  /** The Gauntlet's own lesson-ladder card (the rail's head quest). */
-  private renderLadderPanel(keybinds: Keybinds): void {
-    const mode = currentInputHintMode();
-
-    const unbound = t('hud.options.unbound');
-    const labels = {
-      forwardKey: keybinds.primaryLabel('forward') || unbound,
-      turnKey: keybinds.primaryLabel('turnRight') || unbound,
-      turnLeftKey: keybinds.primaryLabel('turnLeft') || unbound,
-      strafeKey: keybinds.primaryLabel('strafeLeft') || unbound,
-      interactKey: keybinds.primaryLabel('interact') || unbound,
-    };
-
-    const plan = bootcampBodyPlan(this.step!, mode);
-    const params: Partial<Record<BootcampParam, string>> = {};
-    for (const key of plan.params) params[key] = labels[key];
-
-    this.titleEl.textContent = t(bootcampTitleKey(this.step!));
-    this.bodyEl.textContent = t(plan.bodyKey, params);
-
-    this.paintKeycaps(bootcampKeycaps(this.step!, mode, labels));
-    this.stepEl.textContent = '';
-
-    if (this.step !== 'done' && this.step !== 'talk' && this.step !== 'camera') {
-      this.progressEl.textContent = this.courseProgress();
-      this.progressEl.style.display = '';
-    } else {
-      this.progressEl.style.display = 'none';
+  /**
+   * The lessons whose answer is a press on the INTERFACE, not a place: they
+   * have no world point to stand a bubble on, so they take the centred
+   * variant. These used to live ONLY on the coach card, so this branch is
+   * what keeps them from teaching nothing now the card is gone.
+   */
+  private centeredAsk(
+    keybinds: Keybinds,
+    mode: ReturnType<typeof currentInputHintMode>,
+  ): { caps: readonly string[]; verbKey: TranslationKey } | null {
+    const key = (id: string): string[] =>
+      mode === 'keyboard' ? [keybinds.primaryLabel(id) || ''].filter(Boolean) : [];
+    if (this.ringPhase === 'equip') {
+      return { caps: key('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
     }
-    this.root!.classList.toggle('tut-done', this.step === 'done');
-  }
-
-  /** The generic three-state coach card for every later rail quest. */
-  private renderCoachPanel(keybinds: Keybinds): void {
-    const focus = this.lastFocus;
-    if (!focus) return;
-    const mode = currentInputHintMode();
-
-    const labels = this.coachLabels(keybinds);
-    const plan = coachCardPlan(focus, mode, this.casterClass, this.deathPhase);
-    const npc = tEntity({ kind: 'npc', id: plan.npcId, field: 'name' });
-    const params: Record<string, string> = {};
-    if (plan.bodyHasNpc) params.npc = npc;
-    if (plan.bodyHasAbility) params.ability = this.taughtAbilityName();
-    for (const key of plan.params) params[key] = labels[key];
-
-    this.titleEl.textContent = plan.titleKey
-      ? t(plan.titleKey, plan.titleHasNpc ? { npc } : undefined)
-      : tEntity({ kind: 'quest', id: focus.questId, field: 'title' });
-    this.bodyEl.textContent = t(plan.bodyKey, params);
-
-    this.paintKeycaps(coachKeycaps(plan, mode, labels));
-    this.stepEl.textContent = '';
-    this.progressEl.style.display = 'none';
-    this.root!.classList.remove('tut-done');
-  }
-
-  /** The closing card: the rail is done, ring the bell home. */
-  private renderBellPanel(keybinds: Keybinds): void {
-    const mode = currentInputHintMode();
-    const labels = this.coachLabels(keybinds);
-    const plan = bellCardPlan(mode);
-    const params: Record<string, string> = {};
-    for (const key of plan.params) params[key] = labels[key];
-
-    this.titleEl.textContent = t(plan.titleKey);
-    this.bodyEl.textContent = t(plan.bodyKey, params);
-    this.paintKeycaps(coachKeycaps(plan, mode, labels));
-    this.stepEl.textContent = '';
-    this.progressEl.style.display = 'none';
-    this.root!.classList.add('tut-done');
-  }
-
-  private paintKeycaps(caps: readonly string[]): void {
-    this.keysEl.replaceChildren();
-    paintChipSequence(this.keysEl, caps);
-    this.keysEl.style.display = this.keysEl.childElementCount > 0 ? '' : 'none';
+    if (this.ringPhase === 'admire') {
+      return { caps: key('char'), verbKey: 'hudChrome.bootcamp.promptCharacterSheet' };
+    }
+    // The death lesson's first beat: the stone is in the bags.
+    if (
+      this.deathPhase === 'alive' &&
+      this.lastFocus?.questId === DEATH_LESSON_QUEST_ID &&
+      this.lastFocus.state === 'active'
+    ) {
+      return { caps: key('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+    }
+    // The Gauntlet's closing camera lesson teaches the VIEW itself, so it
+    // has never had a world anchor and had only the card to carry it.
+    if (this.step === 'camera') {
+      return { caps: [], verbKey: 'hudChrome.bootcamp.promptLookAround' };
+    }
+    return null;
   }
 
   // The interact bubble's per-frame drive: the per-frame painter contracts
@@ -666,10 +612,6 @@ export class BootcampOverlay {
   // interact reach, so appearing IS the signal to press.
   private updatePrompt(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
     if (!this.prompt || !this.promptChipEl || !this.promptVerbEl) return;
-    if (this.ringPhase !== null) {
-      this.hidePrompt();
-      return;
-    }
     const p = world.player;
     const mode = currentInputHintMode();
 
@@ -677,7 +619,42 @@ export class BootcampOverlay {
     // plan in range beats the centered movement chips, or the Space ask
     // would never surface on keyboard (the movement variant returns early).
     const jumpPlan = this.step === 'turnwalk' && p ? parkourPromptPlan(p.pos) : null;
-    const jumpAskVisible = jumpPlan !== null && p !== null && coachPromptInRange(jumpPlan, p.pos);
+    // ...except right AT the corner, where the turn instruction is what the
+    // moment is about. Lane 2's hurdle sits inside the jump ask's range of
+    // its own checkpoint, so without this the bubble skipped "D then W"
+    // entirely and went straight to Jump.
+    const atCorner =
+      this.step === 'turnwalk' &&
+      p !== null &&
+      turnAskOwnsBubble(this.lastCounts, p.pos, BOOTCAMP_COURSE_CHECKPOINTS);
+    const jumpAskVisible =
+      jumpPlan !== null && p !== null && !atCorner && coachPromptInRange(jumpPlan, p.pos);
+
+    // The interface lessons (bags, character sheet, the camera swing) have no
+    // world point to stand a bubble on, so they take the centred variant.
+    // These used to live ONLY on the coach card, so with the card gone this
+    // branch is what keeps them from teaching nothing at all.
+    const centered = jumpAskVisible ? null : this.centeredAsk(keybinds, mode);
+    if (centered) {
+      const contentKey = `centered:${centered.verbKey}:${centered.caps.join(',')}`;
+      if (this.promptContentKey !== contentKey) {
+        this.promptContentKey = contentKey;
+        this.paintPromptChips(centered.caps.map((cap) => ({ cap })));
+        this.promptVerbEl.textContent = t(centered.verbKey);
+      }
+      this.prompt.classList.add('tut-prompt-center');
+      if (!this.promptPainted.visible) {
+        this.prompt.style.display = 'flex';
+        this.promptPainted.visible = true;
+      }
+      if (!Number.isNaN(this.promptPainted.sx)) {
+        this.prompt.style.left = '';
+        this.prompt.style.top = '';
+        this.promptPainted.sx = Number.NaN;
+        this.promptPainted.sy = Number.NaN;
+      }
+      return;
+    }
 
     // The movement lessons carry a screen-anchored bubble (there is no world
     // point to stand it on: the lesson is the player's own hands), so the W
@@ -745,11 +722,23 @@ export class BootcampOverlay {
     if (plan.kind === 'select') {
       chips = [];
     } else if (plan.kind === 'kill') {
+      // The ability drill asks for the class's OWN button, which is never
+      // the Attack toggle: chipping slot0 there put a "1" under a bubble
+      // reading "Use ability", which is exactly the wrong instruction. The
+      // plan says which press it wants; the chip follows it.
+      const abilityAsk = plan.verbKey === 'hudChrome.bootcamp.promptUseAbility';
+      const slot = abilityAsk || this.casterClass ? 'slot1' : 'slot0';
       if (mode === 'keyboard') {
-        const cap = keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0');
+        const cap = keybinds.primaryLabel(slot);
         chips = cap ? [{ cap }] : [];
       } else if (mode === 'touch') {
-        chips = [{ abilityIcon: this.promptAttackIconId() }];
+        chips = [
+          {
+            abilityIcon: abilityAsk
+              ? (this.taughtAbilityId ?? AUTO_ATTACK_ICON_ID)
+              : this.promptAttackIconId(),
+          },
+        ];
       } else {
         chips = [];
       }
@@ -838,7 +827,6 @@ export class BootcampOverlay {
   private disengage(): void {
     this.engaged = false;
     this.step = null;
-    this.renderKey = null;
     this.bellPhase = false;
     this.root?.remove();
     this.prompt?.remove();
@@ -863,7 +851,6 @@ export class BootcampOverlay {
     this.guidePrevStation = null;
     this.guidePrevCounts = -1;
     this.guideOffPathSince = null;
-    document.body.classList.remove('bc-coach-up');
   }
 }
 

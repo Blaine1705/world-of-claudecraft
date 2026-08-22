@@ -633,7 +633,7 @@ const baseEnTable = {
   'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
   'error.tutorialFromHere': 'You cannot set sail from here.',
   'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
-  'log.passingStoneKneel': 'You kneel at the Passing Stone, and the shore lets you go.',
+  'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
   'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
   'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
   'log.longWalkHealer':
@@ -791,7 +791,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
     'error.tutorialFromHere': 'You cannot set sail from here.',
     'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
-    'log.passingStoneKneel': 'You kneel at the Passing Stone, and the shore lets you go.',
+    'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
     'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
     'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
     'log.longWalkHealer':
@@ -2848,7 +2848,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
     'error.tutorialFromHere': 'You cannot set sail from here.',
     'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
-    'log.passingStoneKneel': 'You kneel at the Passing Stone, and the shore lets you go.',
+    'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
     'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
     'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
     'log.longWalkHealer':

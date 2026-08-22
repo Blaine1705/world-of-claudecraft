@@ -285,7 +285,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: -299, z: 49 },
     facing: (-3 * Math.PI) / 4,
     color: 0x6b4a8a,
-    questIds: ['q_ps_pouch_and_purse', 'q_ps_the_signpost', 'q_ps_set_sail'],
+    questIds: ['q_ps_pouch_and_purse', 'q_ps_the_signpost', 'q_ps_the_long_walk', 'q_ps_set_sail'],
     greeting:
       'Every hero the vale has ever thanked stood where you stand now, $C, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free.',
   },
@@ -386,7 +386,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     // south-west down that path.
     facing: (3 * Math.PI) / 4,
     color: 0x7a4a4a,
-    questIds: ['q_ps_strike_true', 'q_ps_shell_and_claw'],
+    questIds: ['q_ps_strike_true', 'q_ps_hone_the_edge', 'q_ps_shell_and_claw'],
     greeting:
       'Straw first, shells second, $N. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds.',
   },
@@ -496,7 +496,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Shell and Claw',
     giverNpcId: 'drillmaster_rook',
     turnInNpcId: 'tidewarden_nel',
-    text: 'Straw never minds, $N, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, press 1, and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.',
+    text: 'Straw never minds, $N, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, then use the ability the yard taught you (the coach names your button), and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.',
     completionText:
       'Three shells cracked and all your fingers kept: a fair first fight, $N. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.',
     objectives: [
@@ -520,7 +520,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Mother of Pearl',
     giverNpcId: 'tidewarden_nel',
     turnInNpcId: 'tidewarden_nel',
-    text: "Three shells cracked, $N, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk to his shell until its name shows and press F, or left-click it, to claim the Lustrous Pearl he hoards. Bring that pearl back to me.",
+    text: "Three shells cracked, $N, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk right up to his shell and press F to loot the Lustrous Pearl off him. Bring that pearl back to me.",
     completionText:
       'The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, $N: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.',
     objectives: [
@@ -530,7 +530,21 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     requiredItems: ['ps_briny_lure'],
     xpReward: 150,
     copperReward: 60,
-    itemRewards: { warrior: 'mother_of_pearl', rogue: 'mother_of_pearl', mage: 'mother_of_pearl' },
+    // EVERY class, not three. The ring is the island's keepsake and the
+    // vehicle for its equip lesson, so a paladin or a druid finishing the
+    // detour used to get the completion text about sliding it on and no ring
+    // to slide (and the equip lesson never fired for them at all).
+    itemRewards: {
+      warrior: 'mother_of_pearl',
+      paladin: 'mother_of_pearl',
+      rogue: 'mother_of_pearl',
+      hunter: 'mother_of_pearl',
+      mage: 'mother_of_pearl',
+      warlock: 'mother_of_pearl',
+      priest: 'mother_of_pearl',
+      shaman: 'mother_of_pearl',
+      druid: 'mother_of_pearl',
+    },
     requiresQuest: 'q_ps_shell_and_claw',
   },
   q_ps_the_wreck_line: {
@@ -624,7 +638,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'The Long Walk',
     giverNpcId: 'instructor_maren',
     turnInNpcId: 'instructor_maren',
-    text: 'One lesson left, $N, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Walk south down the shore road to the Passing Stone, kneel at it, and let the shore take you. You will wake as a spirit at the yard behind my camp, grey and quiet, and nothing there can touch you. Then walk back to your own body and step into it. That is the whole of it: your body waits, the walk is free, and you lose nothing by making it.',
+    text: 'One lesson left, $N, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Take this Passing Stone. Press B to open your bags and left-click it, and it will lay you down right where you stand. Then follow the instructions on your screen: release your spirit, walk back to your own body, and step into it. Your body waits, the walk is free, and you lose nothing by making it.',
     completionText:
       'And back you come, no worse for it. Remember what that felt like, $N, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.',
     objectives: [
@@ -635,6 +649,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Walked back from the dead',
       },
     ],
+    requiredItems: ['ps_passing_stone'],
     xpReward: 60,
     copperReward: 30,
     itemRewards: {},
@@ -697,14 +712,20 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     noVendorSell: true,
   },
-  // The death lesson's rite stone (q_ps_the_long_walk). Like the bells, it
-  // is a world fixture that is never picked up; the item def exists so the
-  // ground object has a name to show.
+  // The death lesson's rite stone (q_ps_the_long_walk): Instructor Maren
+  // hands it over on accept, and using it from the bags lays the player down
+  // where they stand. A carried single-use item rather than a fixture in the
+  // world, because a new player who has been told to "go and die" needs the
+  // thing that does it in their hand, not somewhere to walk to (CX).
+  // requiredItems re-grants it if it is somehow lost, so the lesson can
+  // never strand.
   ps_passing_stone: {
     id: 'ps_passing_stone',
     name: 'Passing Stone',
     kind: 'quest',
     sellValue: 0,
+    questId: 'q_ps_the_long_walk',
+    use: { type: 'passingStone' },
     noVendorSell: true,
   },
   // The tide-pool summon (q_ps_mother_of_pearl): the reusable lure Nel hands
@@ -795,24 +816,6 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
       { x: -327, z: 24 },
       { x: -320, z: 31 },
     ],
-  },
-  {
-    itemId: 'ps_passing_stone',
-    name: 'Passing Stone',
-    // The death lesson (q_ps_the_long_walk, tutorial/death_lesson.ts): the
-    // island stages a player's first death somewhere nothing is hunting
-    // them, because the alternative is learning it in the vale with a wolf
-    // still chewing. interaction.ts routes the click to the rite BEFORE the
-    // pickup path (the ferry bell's precedent), and the rite refuses unless
-    // the lesson is active, so the stone can never be a griefing tool.
-    //
-    // Sited on the shore road between the camp and the Gauntlet: dry
-    // ground, on the walk the player already knows, and 65 yd from the
-    // island graveyard, which leaves about a 30 yd ghost run once the
-    // 35 yd corpse-resurrect reach is subtracted. Long enough to teach the
-    // walk back, short enough that a first death is not a punishment.
-    // tests/death_lesson.test.ts pins both distances.
-    positions: [{ x: -312, z: -6 }],
   },
   {
     itemId: 'ps_ferry_bell',
