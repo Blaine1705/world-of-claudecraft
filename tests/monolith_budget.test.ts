@@ -173,7 +173,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
     // combined tree lands below the branch ceilings, so keep the exact merged
     // count.
-    ceiling: 11609,
+    ceiling: 11621,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -1,12 +1,14 @@
 // Which ferry destination is worth streaming in ahead of time.
 //
-// The Proving Shore crossing is a CLICKED bell (sim/interactions/ferry_bell.ts),
-// so unlike the greeting dialog there is no reading time to hide a cold
-// destination behind: click and you are on the far shore, and main.ts's
-// teleport rule (game/zone_transition.ts) drops the blocking loading screen in
-// front of you. Warming the far shore while the player is still walking up to
-// the bell means the arrival zone is already resident, main.ts's
-// isZoneReadyAt bail fires, and the crossing is seamless.
+// The Proving Shore crossing is a CLICKED bell (sim/interactions/ferry_bell.ts):
+// click and you are on the far shore, and the crossing ALWAYS rides the
+// blocking loading screen (main.ts's isIslandFerryTeleport arm; the town side
+// is the whole harbor kit, whose building programs link across the first
+// frames even when the zone is resident, so the curtain holds through the
+// reveal settle instead of hitching in front of the player). Warming the far
+// shore while the player is still walking up to the bell is what keeps that
+// screen SHORT: the structural prepare is already done and the curtain only
+// pays the link settle.
 //
 // The destination pairing is READ from the same content the sim rings: a bell
 // on the island column sails to town, a bell in town sails to the island,

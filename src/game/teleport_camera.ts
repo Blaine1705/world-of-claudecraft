@@ -38,6 +38,21 @@ export function teleportCameraYaw(
   return displacementYd > TELEPORT_DISPLACEMENT_YD ? landedFacing : currentYaw;
 }
 
+/** The one authority for "this frame's displacement is a ferry ride": a
+ *  teleport-scale jump that starts or ends on the Proving Shore. The camera
+ *  snap and main.ts's always-cover arrival rule both read it, so the two can
+ *  never disagree about which jumps are the crossing. */
+export function isIslandFerryTeleport(
+  fromX: number,
+  fromZ: number,
+  toX: number,
+  toZ: number,
+  displacementYd: number,
+): boolean {
+  if (displacementYd <= TELEPORT_DISPLACEMENT_YD) return false;
+  return isOnProvingShore(fromX, fromZ) || isOnProvingShore(toX, toZ);
+}
+
 /** The live entry point: the snap decision plus the ferry scoping. A
  *  displacement that neither starts nor ends on the Proving Shore keeps the
  *  current yaw no matter its size. */
@@ -50,6 +65,6 @@ export function islandTeleportCameraYaw(
   landedFacing: number,
   currentYaw: number,
 ): number {
-  if (!isOnProvingShore(fromX, fromZ) && !isOnProvingShore(toX, toZ)) return currentYaw;
-  return teleportCameraYaw(displacementYd, landedFacing, currentYaw);
+  if (!isIslandFerryTeleport(fromX, fromZ, toX, toZ, displacementYd)) return currentYaw;
+  return landedFacing;
 }

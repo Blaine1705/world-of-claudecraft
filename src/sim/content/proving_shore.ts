@@ -824,8 +824,10 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
     name: 'Ferry Bell',
     // The clicked crossing (interactions/ferry_bell.ts): the Old Pier's bell
     // rings a player to Eastbrook town, and its twin INSIDE town (beside the
-    // Ravenpost mailbox at (0, -7.5), on its far side from the road) rings a
-    // returning player back to the island arrival.
+    // harbor's Ravenpost mailbox at (-10, -98), on its seaward side, clear of
+    // the posting spot at (-10, -96.9)) rings a returning player back to the
+    // island arrival. The twin moved with the mailbox when the New Eastbrook
+    // program rebuilt the town around the quay.
     //
     // The island bell stands on the dry ground between the pier head and the
     // Gauntlet's mouth, a few steps from Ferryman Odo (his completion note
@@ -833,7 +835,7 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
     // of the arrival point at (-281, -18).
     positions: [
       { x: -279, z: -10 },
-      { x: 3, z: -7.5 },
+      { x: -7.5, z: -100 },
     ],
   },
 ];

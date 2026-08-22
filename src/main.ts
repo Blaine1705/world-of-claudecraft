@@ -175,7 +175,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { islandTeleportCameraYaw } from './game/teleport_camera';
+import { isIslandFerryTeleport, islandTeleportCameraYaw } from './game/teleport_camera';
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
@@ -3922,6 +3922,18 @@ async function startGame(
     // ferry crossings: a snap on every portal, dungeon door and hearthstone
     // would be a global feel change riding in a tutorial change
     // (game/teleport_camera.ts owns the pure decision and the scoping).
+    // The same predicate forces the blocking loading screen below: the town
+    // side of the crossing is the whole harbor kit, and even a prewarmed
+    // arrival links its building programs across the first live frames, so
+    // the crossing always rides the curtain and lets the reveal settle behind
+    // it instead of hitching in front of the player.
+    const ferryRide = isIslandFerryTeleport(
+      camSnapPrevX,
+      camSnapPrevZ,
+      player.pos.x,
+      player.pos.z,
+      displacement,
+    );
     input.camYaw = islandTeleportCameraYaw(
       camSnapPrevX,
       camSnapPrevZ,
@@ -3934,10 +3946,10 @@ async function startGame(
     camSnapPrevX = player.pos.x;
     camSnapPrevZ = player.pos.z;
     if (zoneWarmup) return;
-    if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
+    if (!riftExit && !ferryRide && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
     const zoneZ = player.pos.z;
-    if (!riftExit && zoneWarmupMode(displacement) === 'background') {
+    if (!riftExit && !ferryRide && zoneWarmupMode(displacement) === 'background') {
       // A walked crossing: the visible-zone streaming lane normally has the
       // destination resident long before the boundary, so landing here means
       // the build is still catching up (or a prepare failed). Finish it in the

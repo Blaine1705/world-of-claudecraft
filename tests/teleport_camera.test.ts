@@ -5,7 +5,7 @@
 // zone_transition.ts so "what is a teleport" has exactly one definition.
 
 import { describe, expect, it } from 'vitest';
-import { islandTeleportCameraYaw, teleportCameraYaw } from '../src/game/teleport_camera';
+import { isIslandFerryTeleport, islandTeleportCameraYaw, teleportCameraYaw } from '../src/game/teleport_camera';
 import { TELEPORT_DISPLACEMENT_YD, zoneWarmupMode } from '../src/game/zone_transition';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
 import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
@@ -64,5 +64,28 @@ describe('islandTeleportCameraYaw (the ferry scoping)', () => {
     // Including one that lands in the island's x COLUMN but not its z band
     // (the Willowfen strand): the scoping is the zone rectangle, both axes.
     expect(islandTeleportCameraYaw(120, 40, -232, 220, JUMP, 2.4, 0.1)).toBe(0.1);
+  });
+});
+
+describe('isIslandFerryTeleport (the shared crossing predicate)', () => {
+  const JUMP = TELEPORT_DISPLACEMENT_YD + 1;
+  // main.ts reads this for the always-cover arrival rule (the harbor kit
+  // links its building programs across the first frames even when the zone
+  // is resident), and the camera snap reads it for the yaw. One authority.
+  it('is true for a teleport-scale jump that starts or ends on the island', () => {
+    // Out: the Old Pier bell to the town landing.
+    expect(
+      isIslandFerryTeleport(-280, 0, FERRY_BELL_TOWN_LANDING.x, FERRY_BELL_TOWN_LANDING.z, JUMP),
+    ).toBe(true);
+    // Back: the town bell to the island arrival.
+    expect(
+      isIslandFerryTeleport(-7.5, -100, PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, JUMP),
+    ).toBe(true);
+  });
+
+  it('is false for a mainland teleport and for any walked displacement', () => {
+    expect(isIslandFerryTeleport(120, 40, 4, -6, JUMP)).toBe(false);
+    // A walked frame on the island itself never reads as the crossing.
+    expect(isIslandFerryTeleport(-280, 0, -279, -1, 1.4)).toBe(false);
   });
 });
