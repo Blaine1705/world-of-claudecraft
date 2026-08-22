@@ -144,7 +144,9 @@ pattern), plus a thin DOM/side-effect consumer if it needs one (`gamepad.ts` ove
   cross-clip gain and speed through the Studio-backed checked-in maps, never by
   editing the generated manifest or baking those values into the asset.
 - **A new music cue/zone:** add a `MusicZone`, compose its theme (a `composeX()`
-  registered in `buildMusicThemes()`, music.ts) so the editor and render
+  registered in `buildMusicThemes()`; the composition itself lands in a sibling
+  theme module, the `music_themes_proving_shore.ts` pattern, because music.ts is
+  a monolith ratchet target) so the editor and render
   pipeline know it, render and remaster it to `public/audio/music/<zone>.mp3`,
   map it in `ZONE_STREAM_URLS` (music_tracks.ts, pinned by
   `tests/music_tracks.test.ts`), and drive it from `music.update(zone, inCombat)`.

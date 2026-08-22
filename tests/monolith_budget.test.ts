@@ -196,7 +196,10 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/game/music.ts',
-    ceiling: 5058,
+    // Re-pinned for the Proving Shore dawn-cue merge: the zone wiring lands in
+    // the coordinator while the themes live in music_themes_proving_shore.ts;
+    // exact merged count.
+    ceiling: 5076,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
