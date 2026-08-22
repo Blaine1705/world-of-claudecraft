@@ -77,6 +77,11 @@ export interface WocListingView {
   minNextBidCents: number;
   minNextBidBondCents: number;
   buyNowLocked: boolean;
+  /** The price a resolved-sold listing actually closed at (the sales table's
+   *  figure), non-null only on the seller's own activity rows: a buy-now that
+   *  outran the bidding sells above currentBidCents. Absent from an older
+   *  server. */
+  soldCents?: number | null;
   /** The seller asked to cancel a locked listing; it closes automatically
    *  after an unpaid window. Absent from an older server. */
   cancelPending?: boolean;

@@ -105,6 +105,7 @@ function listingRow(over: Partial<WocListingRow> = {}): WocListingRow {
     itemDisposed: false,
     currentBidCents: 5000,
     currentBidId: 8,
+    soldCents: null,
     endsAtMs: FAR_FUTURE_MS,
     baseEndsAtMs: FAR_FUTURE_MS,
     buyNowLockAccount: 1234,

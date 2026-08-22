@@ -7231,6 +7231,7 @@ async function seedDeliveredResidue(h: Harness): Promise<{ listingId: number }> 
     status: 'active',
     resolution: null,
     itemDisposed: false,
+    soldCents: null,
     currentBidCents: null,
     currentBidId: null,
     endsAtMs: h.now() + 24 * HOUR_MS,

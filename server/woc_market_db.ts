@@ -1000,6 +1000,9 @@ function toListing(row: Row): WocListingRow {
     itemDisposed: row.item_disposed === true,
     currentBidCents: row.current_bid_cents ?? null,
     currentBidId: row.current_bid_id === null ? null : Number(row.current_bid_id),
+    // Present only on listingsBySeller's joined read; every other query has no
+    // sold_cents column and reads undefined -> null.
+    soldCents: row.sold_cents ?? null,
     endsAtMs: ms(row.ends_at),
     baseEndsAtMs: ms(row.base_ends_at),
     buyNowLockAccount: row.buy_now_lock_account ?? null,
@@ -1691,7 +1694,10 @@ export class PgWocMarketDb implements WocMarketDb {
   async listingsBySeller(realm: string, account: number): Promise<WocListingRow[]> {
     // Ordered by the woc_market_listings_seller_created index.
     const res = await this.pool.query(
-      `SELECT ${LISTING_COLS} FROM woc_market_listings
+      `SELECT ${LISTING_COLS},
+          (SELECT s.price_cents FROM woc_market_sales s
+            WHERE s.listing_id = woc_market_listings.id AND s.excluded = false) AS sold_cents
+        FROM woc_market_listings
         WHERE realm = $1 AND seller_account = $2
         ORDER BY created_at DESC LIMIT 50`,
       [realm, account],

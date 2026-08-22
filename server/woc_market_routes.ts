@@ -402,6 +402,11 @@ function listingView(row: WocListingRow, viewerAccount: number | null): Record<s
     status: row.status,
     resolution: row.resolution,
     currentBidCents: row.currentBidCents,
+    // The sale's closing price (sales-table join), non-null only on the
+    // seller's own activity rows once a listing resolves sold; browse rows
+    // are live and always carry null. Lets the "Sold" row name the price the
+    // sale closed at instead of the last bid a buy-now outran.
+    soldCents: row.soldCents ?? null,
     minNextBidCents: minNextBidCents(row.currentBidCents, row.startCents),
     minNextBidBondCents: bondCents(minNextBidCents(row.currentBidCents, row.startCents)),
     // The lock EXPIRY is withheld on purpose (only the boolean crosses):

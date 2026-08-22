@@ -510,6 +510,28 @@ describe('activity mapping', () => {
     return model.activity;
   };
 
+  it('carries the sale price to the row; an older server without it reads null', () => {
+    // The listing row keeps current_bid_cents forever ($1 in the shipped bug),
+    // while the sales table holds the actual sale price ($3 on a buy-now that
+    // outran the bidding). The activity read joins it through as soldCents so
+    // the seller's "Sold" row can name the price the sale actually closed at.
+    const a = activityModel(
+      makeActivity({
+        listings: [
+          makeListing({
+            id: 1,
+            status: 'closed',
+            resolution: 'sold',
+            currentBidCents: 100,
+            soldCents: 300,
+          }),
+          makeListing({ id: 2, status: 'closed', resolution: 'sold', currentBidCents: 100 }),
+        ],
+      }),
+    );
+    expect(a.listings.map((l) => l.soldCents)).toEqual([300, null]);
+  });
+
   it('passes a null bond quote expiry through and clamps a live one', () => {
     const a = activityModel(
       makeActivity({

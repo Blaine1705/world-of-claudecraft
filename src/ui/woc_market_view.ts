@@ -71,6 +71,9 @@ export interface WocListingView {
   status: string;
   resolution: string | null;
   currentBidCents: number | null;
+  /** The sale's closing price on the seller's sold rows; absent from an
+   *  older server and null on live rows. */
+  soldCents?: number | null;
   minNextBidCents: number;
   /** Server-computed bond for a bid at minNextBidCents (client computes none). */
   minNextBidBondCents: number;
@@ -183,6 +186,9 @@ export interface WocListingRowModel {
   sellerName: string;
   mine: boolean;
   currentCents: number | null;
+  /** The sale's closing price when resolved sold (null from an older server
+   *  or on live rows); prefer it over currentCents on a sold row. */
+  soldCents: number | null;
   startCents: number;
   minNextBidCents: number;
   minNextBidBondCents: number;
@@ -383,6 +389,7 @@ function listingRow(
     sellerName: listing.sellerName,
     mine: listing.mine,
     currentCents: listing.currentBidCents,
+    soldCents: listing.soldCents ?? null,
     startCents: listing.startCents,
     minNextBidCents: listing.minNextBidCents,
     minNextBidBondCents: listing.minNextBidBondCents,

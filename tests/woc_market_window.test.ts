@@ -1466,6 +1466,26 @@ describe('woc_market_window: the Sell form offers only what the format permits',
   });
 });
 
+describe('woc_market_window: a sold listing names the price it sold at', () => {
+  // What shipped: the My Listings row rendered currentCents ?? startCents for
+  // every listing, so an auction bought out at its buy-now price showed the
+  // losing high bid ("$1.00 Sold" on a $3.00 sale). The sale price rides the
+  // wire as soldCents (joined from the sales provenance table); the row
+  // prefers it whenever the listing resolved sold.
+  it('prefers soldCents on the activity row, keeping the live price otherwise', () => {
+    const listings = between('const listings = a.listings', 'const bids = a.bids');
+    const soldGate = listings.indexOf("l.resolution === 'sold'");
+    expect(soldGate, 'the price cell gates on the sold resolution').toBeGreaterThanOrEqual(0);
+    expect(listings, 'the sold arm reads the sale price').toContain('l.soldCents');
+    // Token-level pins, not the exact ternary text: the formatter is free to
+    // wrap the expression. The sold gate must come BEFORE the live fallback
+    // (prefers), and both live tokens must survive.
+    expect(soldGate).toBeLessThan(listings.indexOf('l.startCents'));
+    expect(listings, 'live rows keep the current price').toContain('l.currentCents');
+    expect(listings, 'and the start price fallback').toContain('l.startCents');
+  });
+});
+
 describe('woc_market_window: a bond awaiting the chain cannot be paid twice', () => {
   // What shipped: the Pay Bond button was rendered for every pending_bond bid and
   // disabled only on `this.busy`. busy covers a call in flight and clears the

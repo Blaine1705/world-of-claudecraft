@@ -269,6 +269,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       resolution: null,
       itemDisposed: false,
       currentBidCents: null,
+      soldCents: null,
       currentBidId: null,
       endsAtMs: listing.endsAtMs,
       baseEndsAtMs: listing.endsAtMs,

@@ -105,6 +105,12 @@ export interface WocListingRow {
   itemDisposed: boolean;
   currentBidCents: number | null;
   currentBidId: number | null;
+  /** The price the sale actually closed at, joined from the sales provenance
+   *  table. Populated ONLY by listingsBySeller (the activity read); every
+   *  other listing read leaves it null. The listing row itself keeps
+   *  current_bid_cents forever, which for a buy-now that outran the bidding
+   *  is the losing high bid, not the sale. */
+  soldCents: number | null;
   endsAtMs: number;
   baseEndsAtMs: number;
   buyNowLockAccount: number | null;

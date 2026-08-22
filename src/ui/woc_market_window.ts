@@ -1412,7 +1412,20 @@ export class WocMarketWindow {
           : '';
         return row(
           this.itemCellHtml(l.itemId, l.quality, `activity:${l.id}`, l.instance),
-          esc(this.usd(l.currentCents === null ? l.startCents : l.currentCents)),
+          // A sold row names the price the sale CLOSED at (the sales table's
+          // figure): a buy-now that outran the bidding sells above the last
+          // bid, and currentCents would show that losing bid forever. Live
+          // rows (and older servers that send no soldCents) keep the
+          // current-else-start price.
+          esc(
+            this.usd(
+              l.resolution === 'sold' && l.soldCents !== null
+                ? l.soldCents
+                : l.currentCents === null
+                  ? l.startCents
+                  : l.currentCents,
+            ),
+          ),
           `<span>${esc(listingStatus(l.status, l.resolution))}</span>${directedBadge}${cancelBadge}`,
           cancel,
         );
