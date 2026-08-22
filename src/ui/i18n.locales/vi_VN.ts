@@ -9745,6 +9745,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.hint': 'Nhờ cộng đồng giúp đỡ',
   'hudChrome.options.hideUnusedActionSlots': 'Ẩn Ô Hành Động Chưa Sử Dụng',
   'hudChrome.options.showSecondaryActionBar': 'Hiện Thanh Hành Động Phụ',
+  'desktop.titlebar.exitGame': 'Thoát trò chơi',
   'desktop.crash.body': 'Khung trò chơi đã ngừng hoạt động. Tải lại chứ?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại.',
   'desktop.crash.quit': 'Thoát',

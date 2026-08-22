@@ -9120,6 +9120,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'Zweite Aktionsleiste anzeigen',
   'errors.api.desktopCodeInvalid':
     'Der Desktop-Anmeldecode ist ungültig oder abgelaufen. Bitte versuche es erneut.',
+  'desktop.titlebar.exitGame': 'Spiel beenden',
   'desktop.crash.body': 'Die Spielansicht funktioniert nicht mehr. Neu laden?',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft ist auf einen unerwarteten Fehler gestoßen und muss geschlossen werden.',

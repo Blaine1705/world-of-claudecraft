@@ -9810,6 +9810,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'İkincil Eylem Çubuğunu Göster',
   'errors.api.desktopCodeInvalid':
     'Masaüstü giriş kodu geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.',
+  'desktop.titlebar.exitGame': 'Oyundan Çık',
   'desktop.crash.body': 'Oyun görünümü çalışmayı durdurdu. Yeniden yüklensin mi?',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor.',

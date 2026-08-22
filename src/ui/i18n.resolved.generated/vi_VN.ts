@@ -7828,8 +7828,8 @@ export const vi_VN: EnTranslations = {
       "quit": "Thoát",
       "fatalBody": "World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại."
     },
-    "window": {
-      "exitToDesktop": "Exit to Desktop"
+    "titlebar": {
+      "exitGame": "Thoát trò chơi"
     }
   },
   "gpuNotice": {

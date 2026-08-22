@@ -9066,6 +9066,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showPlayerNameplates': 'Vis spillernavneskilte',
   'hudChrome.options.hideUnusedActionSlots': 'Skjul ubrugte handlingsfelter',
   'hudChrome.options.showSecondaryActionBar': 'Vis sekundær handlingslinje',
+  'desktop.titlebar.exitGame': 'Afslut spillet',
   'desktop.crash.body': 'Spilvisningen holdt op med at virke. Genindlæs den?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft stødte på en uventet fejl og skal lukke.',
   'desktop.crash.quit': 'Afslut',

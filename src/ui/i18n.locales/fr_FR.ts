@@ -9834,6 +9834,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': "Afficher la barre d'action secondaire",
   'errors.api.desktopCodeInvalid':
     "Le code de connexion de l'application de bureau est invalide ou expiré. Veuillez réessayer.",
+  'desktop.titlebar.exitGame': 'Quitter le jeu',
   'desktop.crash.body': "L'affichage du jeu a cessé de fonctionner. Le recharger ?",
   'desktop.crash.fatalBody':
     'World of ClaudeCraft a rencontré une erreur inattendue et doit se fermer.',

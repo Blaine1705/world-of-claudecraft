@@ -4011,6 +4011,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'mobilePreflight.rotateSub': 'Pro nejlepší mobilní zážitek hraj na šířku a na celou obrazovku.',
   'mobilePreflight.rotateTitle': 'Otoč na šířku',
   'mobilePreflight.title': 'Hrát na šířku a na celou obrazovku',
+  'desktop.titlebar.exitGame': 'Ukončit hru',
   'desktop.crash.body': 'Herní zobrazení přestalo fungovat. Načíst ho znovu?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít.',
   'desktop.crash.quit': 'Ukončit',

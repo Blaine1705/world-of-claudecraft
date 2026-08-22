@@ -7828,8 +7828,8 @@ export const ko_KR: EnTranslations = {
       "quit": "종료",
       "fatalBody": "World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다."
     },
-    "window": {
-      "exitToDesktop": "바탕 화면으로 나가기"
+    "titlebar": {
+      "exitGame": "게임 종료"
     }
   },
   "gpuNotice": {

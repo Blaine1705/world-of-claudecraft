@@ -7828,8 +7828,8 @@ export const id_ID: EnTranslations = {
       "quit": "Keluar",
       "fatalBody": "World of ClaudeCraft mengalami kesalahan tak terduga dan perlu ditutup."
     },
-    "window": {
-      "exitToDesktop": "Exit to Desktop"
+    "titlebar": {
+      "exitGame": "Keluar dari Gim"
     }
   },
   "gpuNotice": {

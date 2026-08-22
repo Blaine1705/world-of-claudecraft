@@ -9350,6 +9350,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'Mostra la barra delle azioni secondaria',
   'errors.api.desktopCodeInvalid':
     'Il codice di accesso desktop non è valido o è scaduto. Riprova.',
+  'desktop.titlebar.exitGame': 'Esci dal gioco',
   'desktop.crash.body': 'La vista di gioco ha smesso di funzionare. Ricaricarla?',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft ha riscontrato un errore imprevisto e deve chiudersi.',

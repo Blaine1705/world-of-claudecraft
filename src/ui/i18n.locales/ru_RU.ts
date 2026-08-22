@@ -7984,7 +7984,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Выйти',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
-  'desktop.window.exitToDesktop': 'Выйти на рабочий стол',
+  'desktop.titlebar.exitGame': 'Выйти из игры',
   'gpuNotice.bodyDesktop':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
   'gpuNotice.bodyDiscreteInactive':

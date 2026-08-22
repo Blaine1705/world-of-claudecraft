@@ -7828,8 +7828,8 @@ export const es_ES: EnTranslations = {
       "quit": "Salir",
       "fatalBody": "World of ClaudeCraft tuvo un error inesperado y debe cerrarse."
     },
-    "window": {
-      "exitToDesktop": "Exit to Desktop"
+    "titlebar": {
+      "exitGame": "Salir del juego"
     }
   },
   "gpuNotice": {

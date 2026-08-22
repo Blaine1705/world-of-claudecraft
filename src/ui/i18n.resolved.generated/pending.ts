@@ -9,55 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "desktop.window.exitToDesktop"
-  ],
-  "es_ES": [
-    "desktop.window.exitToDesktop"
-  ],
-  "fr_FR": [
-    "desktop.window.exitToDesktop"
-  ],
-  "fr_CA": [
-    "desktop.window.exitToDesktop"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "desktop.window.exitToDesktop"
-  ],
-  "de_DE": [
-    "desktop.window.exitToDesktop"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "desktop.window.exitToDesktop"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "desktop.window.exitToDesktop"
-  ],
-  "nl_NL": [
-    "desktop.window.exitToDesktop"
-  ],
-  "pl_PL": [
-    "desktop.window.exitToDesktop"
-  ],
-  "id_ID": [
-    "desktop.window.exitToDesktop"
-  ],
-  "tr_TR": [
-    "desktop.window.exitToDesktop"
-  ],
-  "sv_SE": [
-    "desktop.window.exitToDesktop"
-  ],
-  "vi_VN": [
-    "desktop.window.exitToDesktop"
-  ],
-  "da_DK": [
-    "desktop.window.exitToDesktop"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

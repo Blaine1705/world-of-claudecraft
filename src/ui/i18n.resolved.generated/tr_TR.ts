@@ -7828,8 +7828,8 @@ export const tr_TR: EnTranslations = {
       "quit": "Çık",
       "fatalBody": "World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor."
     },
-    "window": {
-      "exitToDesktop": "Exit to Desktop"
+    "titlebar": {
+      "exitGame": "Oyundan Çık"
     }
   },
   "gpuNotice": {

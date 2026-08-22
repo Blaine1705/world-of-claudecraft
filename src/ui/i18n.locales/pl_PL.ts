@@ -9315,6 +9315,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'Pokaż dodatkowy pasek akcji',
   'errors.api.desktopCodeInvalid':
     'Kod logowania do aplikacji jest nieprawidłowy lub wygasł. Spróbuj ponownie.',
+  'desktop.titlebar.exitGame': 'Zakończ grę',
   'desktop.crash.body': 'Widok gry przestał działać. Załadować ponownie?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft napotkał nieoczekiwany błąd i musi się zamknąć.',
   'desktop.crash.quit': 'Zakończ',

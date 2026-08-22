@@ -11,6 +11,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es_ES: Partial<Record<TranslationKey, string>> = {
+  'desktop.titlebar.exitGame': 'Salir del juego',
   'hud.errors.tradeAlreadyTrading': 'Ese jugador ya está tradeando.',
   'hudChrome.emotes.question': '¿Tío?',
   'hudChrome.professions.ctaRaiseSpecialized':

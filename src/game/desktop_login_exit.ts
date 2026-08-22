@@ -1,4 +1,4 @@
-// Owns the desktop-only pre-game Exit to Desktop control. The HTML starts
+// Owns the desktop-only pre-game Exit Game control. The HTML starts
 // hidden, and this module reveals it only when a current shell exposes both
 // narrow capabilities and reports the stored borderless display mode.
 
