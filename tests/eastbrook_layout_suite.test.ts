@@ -599,6 +599,10 @@ describe('authoritative Eastbrook replacement plan', () => {
     // docs/design/eastbrook-revamp/site-plan.md): the civic square, its
     // offset well beacon, the benches, and both stalls now sit on the market
     // square west of the quay arrival lane.
+    // Stall rows re-pinned again for owner round 6b: the two stalls stood 9 yd
+    // apart on one line, so they were opened out across the square (world
+    // market to (-20.5, -94), provisions to (-19, -108)), which also moves both
+    // radiusFromCivic values and both derived front standing points.
     expect(EASTBROOK_LAYOUT.civic.center).toEqual({ x: -14, z: -102 });
     expect(EASTBROOK_LAYOUT.civic.ring).toEqual({ radius: 4.75, pathHalfWidth: 1.5 });
     expect(EASTBROOK_LAYOUT.civic.wellBeacon).toEqual({
@@ -664,23 +668,23 @@ describe('authoritative Eastbrook replacement plan', () => {
         id: 'eastbrook_market_stall_world_market',
         assetId: '/models/props/eastbrook_market_stall.glb',
         canopyVariant: 'gold',
-        radiusFromCivic: 5.70087712549569,
-        position: { x: -17.5, z: -97.5 },
+        radiusFromCivic: 10.307764064044152,
+        position: { x: -20.5, z: -94 },
         width: 2.8,
         depth: 2.2,
         rotation: 2.4805494847391065,
-        frontStandingPoint: { x: -16.517695018376127, z: -98.76296354780212 },
+        frontStandingPoint: { x: -19.517695018376127, z: -95.26296354780212 },
       },
       {
         id: 'eastbrook_market_stall_provisions',
         assetId: '/models/props/eastbrook_market_stall.glb',
         canopyVariant: 'green',
-        radiusFromCivic: 5.70087712549569,
-        position: { x: -17.5, z: -106.5 },
+        radiusFromCivic: 7.810249675906656,
+        position: { x: -19, z: -108 },
         width: 2.8,
         depth: 2.2,
         rotation: 0.6610431688506869,
-        frontStandingPoint: { x: -16.517695018376127, z: -105.23703645219788 },
+        frontStandingPoint: { x: -18.017695018376127, z: -106.73703645219788 },
       },
     ]);
     expect(EASTBROOK_LAYOUT.market.stalls.map((stall) => stall.id)).not.toContain(
@@ -1159,6 +1163,12 @@ describe('layout clearance and service anchors', () => {
     // the harbour market, apothecary_lin to the quayside home (her facing is
     // derived from facingToward(CIVIC_CENTER) now, not a hand-set angle), and
     // card_master across to the bank.
+    // Re-pinned once more for owner round 6b, which de-clustered the remaining
+    // huddles: both market stalls opened out across the square (carrying
+    // the_merchant and trader_wilkes with them), fury moved off the chapel step
+    // out to the town's edge at (16, -78), and forgemistress_darva and
+    // tinker_gizzel now stand out to OPPOSITE sides of their own benches, which
+    // widens the station-to-master band below from 3 yd to 4.5 yd.
     expect(EASTBROOK_LAYOUT.services.playerStart).toEqual({
       id: 'eastbrook_player_start',
       position: { x: -94, z: -58 },
@@ -1277,16 +1287,16 @@ describe('layout clearance and service anchors', () => {
     ).toEqual([
       [
         'the_merchant',
-        -16.333512834321652,
-        -98.99976921301501,
+        -19.333512834321652,
+        -95.49976921301501,
         2.4805494847391065,
         'eastbrook_market_stall_world_market',
       ],
       ['marshal_redbrook', -58, -102, 1.5707963267948966, 'eastbrook_harbour_market'],
       [
         'trader_wilkes',
-        -16.333512834321652,
-        -105.00023078698499,
+        -17.833512834321652,
+        -106.50023078698499,
         0.6610431688506869,
         'eastbrook_market_stall_provisions',
       ],
@@ -1312,8 +1322,8 @@ describe('layout clearance and service anchors', () => {
       ['chronicler_saul', 10.2, -87.5, 0.5880026035475675, 'mailbox_eastbrook'],
       [
         'forgemistress_darva',
-        -7.4112845055494905,
-        -121.91055728090001,
+        -8.171547617899419,
+        -120.39003105620014,
         -2.0344439357957027,
         'station_eastbrook_forge',
       ],
@@ -1333,12 +1343,12 @@ describe('layout clearance and service anchors', () => {
       ],
       [
         'tinker_gizzel',
-        -11.950688567555828,
-        -125.53158412679772,
+        -16.277350098112613,
+        -122.64714310642654,
         0.5880026035475675,
         'station_eastbrook_toolworks',
       ],
-      ['fury', -2, -74, -2.7367008673047097, 'eastbrook_chapel'],
+      ['fury', 16, -78, -2.2455372690184494, 'eastbrook_chapel'],
     ]);
 
     const pointAnchors = [
@@ -1379,7 +1389,11 @@ describe('layout clearance and service anchors', () => {
       if (!master) throw new Error(`missing station master ${station.masterNpcId}`);
       const masterDistance = distance(station.position, master.position);
       expect(masterDistance).toBeGreaterThanOrEqual(1);
-      expect(masterDistance).toBeLessThanOrEqual(3);
+      // Band widened from 3 to 4.5 for owner round 6b: darva stands 4.2 out and
+      // gizzel 3.2 out, on opposite sides of their adjacent benches, so the
+      // crafts lane stops reading as one huddle. Each master still works their
+      // own station, which is what this bound exists to catch.
+      expect(masterDistance).toBeLessThanOrEqual(4.5);
     }
     const loom = EASTBROOK_LAYOUT.services.stations.find((station) => station.type === 'loom');
     if (!loom) throw new Error('missing Eastbrook loom station');

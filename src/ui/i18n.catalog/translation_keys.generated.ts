@@ -4378,6 +4378,7 @@ export type TranslationKeyFlat =
   | 'entities.zones.eastbrook_vale.pois.1.label'
   | 'entities.zones.eastbrook_vale.pois.10.label'
   | 'entities.zones.eastbrook_vale.pois.11.label'
+  | 'entities.zones.eastbrook_vale.pois.12.label'
   | 'entities.zones.eastbrook_vale.pois.2.label'
   | 'entities.zones.eastbrook_vale.pois.3.label'
   | 'entities.zones.eastbrook_vale.pois.4.label'

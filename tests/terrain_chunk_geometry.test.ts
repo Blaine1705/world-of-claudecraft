@@ -287,7 +287,20 @@ describe('generated chunk geometry is stable', () => {
     // height only, and a building mints no calm pad or height stamp. Computed
     // twice in separate processes, identical both times. An intended,
     // looked-at world change, not drift.
-    expect(digestOf(inRect)).toBe('206fba366edcfc5160616fe87f3ec1d5');
+    // Re-minted once more for owner round 6b's own wave. Four intended world
+    // edits reshape ground here: the second vale bandit camp moved from
+    // (90,-90) to (115,42) and Gorrak's boss camp from (92,-92) to (118,45), so
+    // both flatten discs (a camp levels a disc of radius*1.8) left the old
+    // ground and re-land northeast; the moved NPC calm pads travelled with the
+    // two market stalls, forgemistress_darva, tinker_gizzel and FURY; and the
+    // retired Vale Chapel graveyard took its anchor at (4,-56) and its spirit
+    // healer off this ground. The camp dressing (two tents, two crates, one
+    // campfire) moved with the band and carries colliders, so it re-seats too.
+    // Every one of those sites is east of the x = -180 rect edge, so the
+    // gap-fill digest below HOLDS, recomputed byte-identical on the live tree.
+    // Computed twice in separate processes, identical both times. An intended,
+    // looked-at world change, not drift.
+    expect(digestOf(inRect)).toBe('b73968cf6ebbcaff271edd3ceb5d1bd5');
     // The gap super-chunks did NOT take this re-mint: see above.
     expect(digestOf(gapFill)).toBe('603adfb626f72da5b04386ead05fe1e9');
 

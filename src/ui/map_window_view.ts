@@ -889,6 +889,11 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   if (labels) {
     for (let poiIndex = 0; poiIndex < zone.pois.length; poiIndex++) {
       const poi = zone.pois[poiIndex];
+      // A hidden POI keeps its record and its deed mark, it just stops drawing
+      // a label; the index is NOT skipped, because poi labels resolve through
+      // POSITIONAL locale keys and renumbering would mistranslate every later
+      // landmark in the zone.
+      if (poi.hideOnMap) continue;
       if (!inView(poi.x, poi.z)) continue;
       const { mx, my } = toMap(poi.x, poi.z);
       pois.push({ mx, my, zoneId: zone.id, poiIndex });

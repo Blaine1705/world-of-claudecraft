@@ -16300,6 +16300,9 @@ export const es_ES: EnTranslations = {
           },
           "11": {
             "label": "La Calzada del Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

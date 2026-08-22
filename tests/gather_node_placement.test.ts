@@ -1117,6 +1117,15 @@ describe('gather node placement: every node sits on ground a player can work', (
     // already tells players to bring friends to; level-first is the path
     // (R32 family), and no tutorial quest sends anyone to this patch.
     'herb_eastbrook_5:mogger',
+    // New in owner round 6b: Gorrak's camp left (92,-92) and rejoined the main
+    // vale bandit band at (118,45), which walks the ringleader's aggro out to
+    // this patch at (99,57). Allowlisted on the same reading as Mogger two
+    // lines up: Gorrak the Ruthless is himself a quest target (the bandit
+    // ringleader fight), the patch shares the danger of a fight the zone
+    // already sends players to, and no tutorial quest routes anyone here. The
+    // overlap is 4.53 yd, in the same band as the wood_eastbrook_4 stand in
+    // Old Greyjaw's woods (4.48), not a deep-inside-the-camp placement.
+    'herb_eastbrook_6:gorrak',
     // The drowned bank: t2 ore beside the marsh's named lurker.
     'ore_mirefen_4:sloomtooth_the_drowned',
     // The cult side of the marsh: t2 ore inside Sister Nhalia's vigil.
@@ -1177,6 +1186,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // while any real relocation reds and forces a fresh decision here.
     const EXPECTED_CLEARANCE: Record<string, number> = {
       'herb_eastbrook_5:mogger': -0.98,
+      'herb_eastbrook_6:gorrak': -4.53,
       'ore_mirefen_4:sloomtooth_the_drowned': -5.0,
       'ore_mirefen_t2b:sister_nhalia': -8.98,
       'ore_thornpeak_1:ironvein_foreman': -13.05,

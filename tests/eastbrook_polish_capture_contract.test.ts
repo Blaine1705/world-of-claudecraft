@@ -203,8 +203,16 @@ interface AttributionTargetFixture {
 // captureContract leaf, so the composite mints anew. No capture was retaken:
 // the accepted evidence keeps its frozen framing and only the swept provenance
 // bytes follow the merged inputs.
+// Re-minted again for owner round 6b's world wave: the authoritativeLayout leaf
+// moves once more (the two market stalls opened out across the square, and
+// forgemistress_darva, tinker_gizzel and FURY moved off their neighbours), so
+// the composite mints anew. No capture was retaken: the accepted evidence keeps
+// its frozen framing and only the swept provenance bytes follow the inputs.
+// The same round re-aimed the captureContract leaf: the two market stall views
+// and FURY's portrait view follow their moved subjects, so the composite mints
+// once more on top of the layout move.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ba6e6072fdf28dd43539951a630e18e562ff5393c61b029873875ac03ee76373';
+  'b6fa2e0e7bbde05a87615d05294a3eaba462cb672c086ba1974624b06035177a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -586,6 +594,10 @@ describe('Eastbrook polish capture contract', () => {
     // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): every override
     // re-derived to the v3 lots (targets on the buildings' front standing
     // points, cameras collision-clear on the public faces).
+    // Re-pinned for owner round 6b's world wave: the stall-world-market
+    // override moves with its stall to the opened-out market square, in
+    // lockstep with the polish view it mirrors, so the matched shot still
+    // frames the stall rather than the ground it left.
     expect(EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES).toEqual({
       'armoury-relation': {
         camera: { x: 34, y: 15, z: 25 },
@@ -612,8 +624,8 @@ describe('Eastbrook polish capture contract', () => {
         target: { x: -13.614789156231515, y: 5, z: -124.42218373434727 },
       },
       'stall-world-market': {
-        camera: { x: -13, y: 6, z: -96.5 },
-        target: { x: -16.517695018376127, y: 2.5, z: -98.76296354780212 },
+        camera: { x: -16, y: 6, z: -93 },
+        target: { x: -19.517695018376127, y: 2.5, z: -95.26296354780212 },
       },
     });
     expect(EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS).toHaveLength(23);
@@ -899,6 +911,11 @@ describe('Eastbrook polish capture contract', () => {
     // green to the quayside home at (-72, -96). Her portrait view follows her
     // (target on the authored stand, camera 7 yd out along her facing);
     // Saul and FURY did not move, so their rows are unchanged.
+    // Re-pinned again for owner round 6b's world wave: FURY moved off the
+    // chapel step out to the town's eastern edge at (16, -78), so his portrait
+    // row follows him (target on the authored stand, camera holding its former
+    // 4.47 yd offset on his re-derived public-facing side). Lin and Saul did
+    // not move this round.
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
@@ -912,8 +929,8 @@ describe('Eastbrook polish capture contract', () => {
       },
       'west-wall-quartermaster': {
         subject: 'fury',
-        camera: { x: -6, y: 6, z: -76 },
-        target: { x: -2, y: 2.5, z: -74 },
+        camera: { x: 12, y: 6, z: -80 },
+        target: { x: 16, y: 2.5, z: -78 },
       },
     };
     for (const [name, expected] of Object.entries(expectedViews)) {

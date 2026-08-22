@@ -317,8 +317,12 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // quarter and churchyard landed, the quay was regraded and re-berthed, the
     // Collapsed Reliquary delve and its POI moved to the Mirror Lake shore, and
     // three town NPCs were redistributed): all of those are world-gen inputs,
-    // so the shared stream forks again and the koi lands on session index 35.
-    expect(koiSession).toBe(35);
+    // so the shared stream forks again. Re-hunted once more for owner round 6b
+    // (Gorrak's camp and its dressing rejoined the main bandit band, the
+    // duplicate Vale Chapel graveyard retired with its spirit healer, and the
+    // market stalls and four town NPCs moved), all world-gen inputs again: the
+    // koi now lands on session index 7.
+    expect(koiSession).toBe(7);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -361,19 +365,26 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // shore, three town NPCs were redistributed), the same cause once more:
     // every index below is re-recorded in order, because each hunt's own loop
     // length feeds the next one's stream position.
+    // Re-hunted a final time for owner round 6b's own wave: Gorrak's camp and
+    // its tents, crates and fire rejoined the main bandit band northeast, the
+    // duplicate Vale Chapel graveyard retired (one fewer spirit healer in the
+    // world), and the market stalls plus four town NPCs moved. All world-gen
+    // inputs, so the shared stream forks again and all three indices below
+    // were re-recorded ONE AT A TIME, in order, each after the one above it
+    // was already green.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 137 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 148 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 10,
+        hitAt: 226,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 165,
+        hitAt: 95,
       },
     ];
     for (const hunt of hunts) {
@@ -437,9 +448,12 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // harbor move, layout v3, d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md, then again 2026-08 for the
     // round 3 town refinement, same cause as the beat 12 to 14 hunts, then
-    // once more for owner refinement rounds 6 and 6b, again the same cause:
-    // the specimen now lands on attempt index 1.
-    expect(hitAt).toBe(1);
+    // once more for owner refinement rounds 6 and 6b, again the same cause.
+    // Re-hunted a final time for owner round 6b's own wave (Gorrak's camp and
+    // dressing rejoined the bandit band, the duplicate Vale Chapel graveyard
+    // and its spirit healer retired, the market stalls and four town NPCs
+    // moved): the specimen now lands on attempt index 5.
+    expect(hitAt).toBe(5);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

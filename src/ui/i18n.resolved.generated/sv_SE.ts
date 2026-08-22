@@ -16300,6 +16300,9 @@ export const sv_SE: EnTranslations = {
           },
           "11": {
             "label": "Fjärrkustens vägbank"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

@@ -16300,6 +16300,9 @@ export const tr_TR: EnTranslations = {
           },
           "11": {
             "label": "Uzak Kıyı Geçidi"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

@@ -16300,6 +16300,9 @@ export const en_CA: EnTranslations = {
           },
           "11": {
             "label": "The Farshore Causeway"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

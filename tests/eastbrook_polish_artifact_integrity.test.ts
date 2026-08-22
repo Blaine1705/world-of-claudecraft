@@ -903,10 +903,18 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // apothecary-lin view moves the captureContract leaf, so the composite mints
 // anew and this metadata authority sha follows the swept bytes. No capture was
 // retaken; the records keep their frozen pre-move framing.
+// Re-minted again for owner round 6b's world wave: the authoritativeLayout leaf
+// moves once more (the two market stalls opened out across the square, and
+// forgemistress_darva, tinker_gizzel and FURY moved off their neighbours), so
+// the composite mints anew and this metadata authority sha follows the swept bytes. No capture was retaken: the accepted evidence keeps
+// its frozen framing and only the swept provenance bytes follow the inputs.
+// The same round re-aimed the captureContract leaf: the two market stall views
+// and FURY's portrait view follow their moved subjects, so the composite mints
+// once more on top of the layout move.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '649461943d183a62a48a37460b28abff2da6bd1acf7379637b16fa80dc9ef85d';
+  '74e1f191303b9dae9bddc1693d776d830b4254554ecaca913c930d60d897b525';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'ba6e6072fdf28dd43539951a630e18e562ff5393c61b029873875ac03ee76373';
+  'b6fa2e0e7bbde05a87615d05294a3eaba462cb672c086ba1974624b06035177a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1953,10 +1961,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // authoritativeLayout leaf plus the re-aimed apothecary-lin view in the
     // captureContract leaf, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
+    // Re-minted again for owner round 6b's world wave: the first-order
+    // composite follows the opened-out market stalls and the moved darva,
+    // gizzel and FURY anchors in the authoritativeLayout leaf, then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('58145504ffca0228618d9e1d74f3ca77874dec3dcc39979a9a140d86da5d4cf1');
+    ).toBe('00094d50a0cf47c207724ed720bb7b15f0df46723be1cec3a341c79432f6294c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

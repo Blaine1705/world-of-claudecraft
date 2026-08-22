@@ -603,18 +603,56 @@ describe('buildOverworldMapModel (pure draw model)', () => {
 
   it('projects only current-zone POIs and portals by the zone-local transform', () => {
     // ZONE (eastbrook_vale) carries POIs and one overworld dungeon entrance.
-    // At the opening zoom all vale POIs are present and no neighbouring zone can
-    // contribute a marker.
+    // At the opening zoom every DRAWN vale POI is present and no neighbouring
+    // zone can contribute a marker. A hideOnMap record keeps its slot in the
+    // zone's poi list (deed visit marks reference it, and the labels resolve
+    // through POSITIONAL locale keys) but draws nothing, so the marker list is
+    // the visible subset and each marker still carries its original index.
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
-    expect(model.pois).toHaveLength(ZONE.pois.length);
+    const drawnPoiIndices = ZONE.pois
+      .map((poi, index) => ({ poi, index }))
+      .filter(({ poi }) => !poi.hideOnMap)
+      .map(({ index }) => index);
+    expect(model.pois).toHaveLength(drawnPoiIndices.length);
     expect(new Set(model.pois.map((p) => p.zoneId))).toEqual(new Set([ZONE.id]));
-    expect(model.pois.map((p) => p.poiIndex)).toEqual(ZONE.pois.map((_, i) => i));
+    expect(model.pois.map((p) => p.poiIndex)).toEqual(drawnPoiIndices);
     const r = model.region;
     const poi0 = ZONE.pois[0];
     expect(model.pois[0].mx).toBeCloseTo(((r.maxX - poi0.x) / (r.maxX - r.minX)) * CANVAS, 6);
     expect(model.pois[0].my).toBeCloseTo(((r.maxZ - poi0.z) / (r.maxZ - r.minZ)) * CANVAS, 6);
     // dungeon portals in view are finite-projected (portals show at every zoom)
     expect(model.portals.every((p) => Number.isFinite(p.mx) && Number.isFinite(p.my))).toBe(true);
+  });
+
+  it('draws no marker for a hideOnMap POI and leaves its neighbours their poiIndex', () => {
+    // A retired landmark (the demolished Sowfield is the shipped case) keeps
+    // its record so its deed visit mark still resolves, and only stops drawing
+    // a label. The index must NOT be re-packed: poi labels resolve through the
+    // positional locale key entities.zones.<zone>.pois.<index>.label, so
+    // renumbering would mistranslate every landmark after the hidden one.
+    const [first, second, third] = ZONE.pois;
+    const zone = {
+      ...ZONE,
+      pois: [first, { ...second, hideOnMap: true }, third],
+    };
+    const model = buildOverworldMapModel({
+      ...input(makeOverworldWorld('sim'), LABELS_ZOOM),
+      zone,
+    });
+    expect(model.pois.map((p) => p.poiIndex)).toEqual([0, 2]);
+
+    // The same three POIs with nothing hidden draw all three, and the two
+    // survivors project to exactly the pixels they carried above: hiding a
+    // neighbour moves no other marker.
+    const shown = buildOverworldMapModel({
+      ...input(makeOverworldWorld('sim'), LABELS_ZOOM),
+      zone: { ...ZONE, pois: [first, second, third] },
+    });
+    expect(shown.pois.map((p) => p.poiIndex)).toEqual([0, 1, 2]);
+    expect(model.pois.map((p) => [p.mx, p.my])).toEqual([
+      [shown.pois[0].mx, shown.pois[0].my],
+      [shown.pois[2].mx, shown.pois[2].my],
+    ]);
   });
 
   it('projects every authored delve door and both sides of overworld passages in their zones', () => {

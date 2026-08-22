@@ -4538,6 +4538,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': '引き裂かれた断崖',
   'entities.zones.farshore_isle.pois.4.label': '裂け目野',
   'entities.zones.eastbrook_vale.pois.11.label': '遠つ岸の砂州道',
+  'entities.zones.eastbrook_vale.pois.12.label': 'イーストブルック波止場',
   'entities.mobs.moor_ram.name': 'ムーアラム',
   'entities.mobs.gale_wisp.name': 'ゲイルウィスプ',
   'entities.mobs.shoal_scuttler.name': 'ショールスカトラー',

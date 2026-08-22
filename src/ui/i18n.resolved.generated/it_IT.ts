@@ -16300,6 +16300,9 @@ export const it_IT: EnTranslations = {
           },
           "11": {
             "label": "La Strada Rialzata di Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

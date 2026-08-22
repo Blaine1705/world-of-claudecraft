@@ -16300,6 +16300,9 @@ export const vi_VN: EnTranslations = {
           },
           "11": {
             "label": "Đường Đê Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

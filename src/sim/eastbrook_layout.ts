@@ -797,8 +797,11 @@ const BENCHES = [
 ];
 
 const MARKET_STALL_SPECS = [
-  ['eastbrook_market_stall_world_market', 'gold', { x: -17.5, z: -97.5 }, 2.4805494847391065],
-  ['eastbrook_market_stall_provisions', 'green', { x: -17.5, z: -106.5 }, 0.6610431688506869],
+  // Round 6b (owner): the two stalls stood 9 yd apart on one line, which put
+  // their keepers 6 yd apart, the tightest pair in town. Opened out across the
+  // square instead, so the market reads as a square rather than a queue.
+  ['eastbrook_market_stall_world_market', 'gold', { x: -20.5, z: -94 }, 2.4805494847391065],
+  ['eastbrook_market_stall_provisions', 'green', { x: -19, z: -108 }, 0.6610431688506869],
 ] as const;
 const MARKET_STALLS = MARKET_STALL_SPECS.map(([id, canopyVariant, position, rotation]) => {
   const base = makeObbPlacement(
@@ -1092,7 +1095,11 @@ const APOTHECARY_POSITION = { x: -72, z: -96 } as const;
 // the shop. Forgemistress Darva keeps the crafting station.
 const BLACKSMITH_SHOP_CENTER = { x: 2, z: -112 } as const;
 const SMITH_POSITION = { x: -3.4, z: -112.5 } as const;
-const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 2.5, 0);
+// Round 6b (owner): the forge and toolworks benches sit close together in the
+// crafts lane, so their masters stand out to OPPOSITE sides of their own
+// stations rather than both toward the middle. Each still works its bench;
+// they just stop reading as one huddle.
+const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 4.2, 0);
 // Round 4: the cook works the prep side, a stride clear of the open flame
 // (the kitchens campfire, the town's only open fire, burns at station +
 // (-1.7, +0.9)). The prep offset holds z at -1.5 rather than the drafted
@@ -1107,9 +1114,12 @@ const COOK_POSITION = {
   z: KITCHENS_STATION.position.z - 1.5,
 } as const;
 const WEAVER_POSITION = localToWorld(LOOM_STATION.position, WEAVING_HOUSE.rotation, 2, 0);
-const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS.rotation, 2, 0);
+const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS.rotation, -3.2, 0);
 const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
-const FURY_POSITION = { x: -2, z: -74 } as const;
+// Round 6b (owner): off the chapel step, where he stood 7 yd from Brother
+// Aldric. FURY is a service NPC (the honor quartermaster), so he belongs on
+// the town's edge rather than in the churchyard approach.
+const FURY_POSITION = { x: 16, z: -78 } as const;
 
 // Round 4: the marshal keeps watch beside his notice board, a clear stride
 // from the bursar's queue and outside the board's posting envelope (the

@@ -16300,6 +16300,9 @@ export const ko_KR: EnTranslations = {
           },
           "11": {
             "label": "먼바다 해안 모래톱 둑길"
+          },
+          "12": {
+            "label": "이스트브룩 부두"
           }
         }
       },

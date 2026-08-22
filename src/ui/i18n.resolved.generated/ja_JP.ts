@@ -16300,6 +16300,9 @@ export const ja_JP: EnTranslations = {
           },
           "11": {
             "label": "遠つ岸の砂州道"
+          },
+          "12": {
+            "label": "イーストブルック波止場"
           }
         }
       },

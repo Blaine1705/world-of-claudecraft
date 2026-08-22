@@ -160,17 +160,26 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: -14, z: -102, label: 'Eastbrook', id: 'eastbrook' },
     { x: 2, z: -4, label: 'Wolf Run', id: 'wolf_run' },
     // follows the boars to their new downs (round 6 swap, then the westward push)
-    { x: 84, z: -47, label: 'Boar Meadow', id: 'boar_meadow' },
+    // pulled off the causeway's latitude: both labels sat at z -46 and the
+    // world map drew them on the same line, overlapping
+    { x: 100, z: -28, label: 'Boar Meadow', id: 'boar_meadow' },
     { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
     { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
     { x: -34, z: 142, label: 'Copper Dig', id: 'copper_dig' },
     // stays with Gorrak's camp, which did not move in the round 6 swap
-    { x: 86, z: -86, label: 'Bandit Camp', id: 'bandit_camp' },
+    { x: 98, z: 28, label: 'Bandit Camp', id: 'bandit_camp' },
     { x: 80, z: 80, label: 'Fallen Chapel', id: 'fallen_chapel' },
     { x: -136, z: 112, label: 'Reliquary Hill', id: 'reliquary_hill' },
     { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
-    { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
+    // The stadium is demolished and the ground is town now, so the label stops
+    // drawing. The RECORD stays: the shipped exp_vale_wayfarer deed counts a
+    // visit to this id, and the deeds catalog is append-only, so deleting the
+    // entry would strand a frozen trigger.
+    { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield', hideOnMap: true },
     { x: 150, z: -46, label: 'The Farshore Causeway', id: 'the_farshore_causeway' },
+    // APPENDED, never inserted: poi labels resolve through positional locale
+    // keys, so a mid-list insert renumbers every later landmark's translation.
+    { x: -101, z: -54, label: 'Eastbrook Docks', id: 'eastbrook_docks' },
   ],
   welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
@@ -1717,8 +1726,11 @@ export const ZONE1_CAMPS: CampDef[] = [
   // boars stood. Gorrak's own camp below stays put with the boss, so the
   // Bandit Camp landmark and the ringleader fight keep their ground.
   { mobId: 'vale_bandit', center: { x: 80, z: 15 }, radius: 28.5, count: 6 },
-  { mobId: 'vale_bandit', center: { x: 90, z: -90 }, radius: 16, count: 5 },
-  { mobId: 'gorrak', center: { x: 92, z: -92 }, radius: 2, count: 1 },
+  // Round 6b (owner): Gorrak's camp joins the main band. The two bandit
+  // camps were 105 yd apart with the boar meadow sitting between them, so
+  // half the vale bandits read as a separate population with no camp.
+  { mobId: 'vale_bandit', center: { x: 115, z: 42 }, radius: 16, count: 5 },
+  { mobId: 'gorrak', center: { x: 118, z: 45 }, radius: 2, count: 1 },
   // Undead: ruins northwest. The chapel guardians below are the same population, so
   // they may still flank the altar inside this disc.
   { mobId: 'restless_bones', center: { x: 82, z: 78 }, radius: 28.5, count: 6 },
@@ -1994,8 +2006,8 @@ export const ZONE1_PROPS: ZonePropsDef = {
   tents: [
     { x: 58, z: 25, rot: 0.4, scale: 1 },
     { x: 68, z: 16, rot: 2.1, scale: 1 },
-    { x: 88, z: -86, rot: 1.2, scale: 1.3 },
-    { x: 95, z: -94, rot: -0.6, scale: 1 },
+    { x: 113, z: 47, rot: 1.2, scale: 1.3 },
+    { x: 119, z: 39, rot: -0.6, scale: 1 },
     // Round 6 (owner): a fisherman's camp on the strand south of the quay,
     // sharing its fire with the rowboats hauled up beside it
     { x: -90.5, z: -78.5, rot: -0.9, scale: 1 },
@@ -2003,15 +2015,15 @@ export const ZONE1_PROPS: ZonePropsDef = {
   crates: [
     [56, 22],
     [64, 26],
-    [87, -88],
-    [93, -90],
+    [112, 44],
+    [118, 40],
     [66, 14],
   ],
   campfires: [
     // off the camp centre on purpose: a campfire carries a collider, and a
     // camp whose centre is blocked cannot seat its spawns
     [59, 17],
-    [90, -90],
+    [111, 46],
     // the shore camp's fire, beside the beached rowboats (round 6)
     [-93.5, -76.5],
     [-30, 146],
@@ -2066,7 +2078,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
   // (content/graveyards.ts gy_vale_north).
   graveyards: [
     { ...EASTBROOK_LAYOUT.services.graveyard.position },
-    { x: 4, z: -56 },
     { x: -22, z: 118 },
     // Round 6 (owner): a second plot filling the west half of the churchyard
     // enclosure. Anchors here render six more standable headstones; only the

@@ -16300,6 +16300,9 @@ export const pt_BR: EnTranslations = {
           },
           "11": {
             "label": "A Calçada de Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

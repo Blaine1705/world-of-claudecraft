@@ -148,8 +148,13 @@ describe('station and master placement safety (derived from content)', () => {
       // Beside, not merely near: the master is the station's one visible
       // anchor today, so they must read as attached to it (and trivially
       // stand inside its STATION_RADIUS gate circle).
+      // Band widened from 3 to 4.5 for owner round 6b: forgemistress_darva now
+      // stands 4.2 yd out and tinker_gizzel 3.2 yd out, on opposite sides of
+      // their adjacent benches, so the crafts lane stops reading as one huddle.
+      // Each master still works their own station and still stands well inside
+      // its STATION_RADIUS gate circle, which is what this bound guards.
       expect(distTo(master.pos, station.pos), `${station.masterNpcId} strayed`).toBeLessThanOrEqual(
-        3,
+        4.5,
       );
       expect(distTo(station.pos, entry.zone.hub), `${station.id} outside hub`).toBeLessThanOrEqual(
         entry.zone.hub.radius + DISTRICT_PAD,

@@ -16300,6 +16300,9 @@ export const pl_PL: EnTranslations = {
           },
           "11": {
             "label": "Grobla Dalekiego Wybrzeża"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

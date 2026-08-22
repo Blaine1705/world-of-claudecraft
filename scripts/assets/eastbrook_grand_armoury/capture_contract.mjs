@@ -337,18 +337,23 @@ export const EASTBROOK_TOWN_PERF_SCENARIOS = Object.freeze([
 // camera was re-seated collision-clear on the subject's public side. View
 // names stay immutable evidence naming ('west-wall-quartermaster' included:
 // FURY now stands by the graveyard, wall or no wall).
+// Re-aimed for owner round 6b's world wave: the two market stalls opened out
+// across the square (world market to (-20.5, -94), provisions to (-19, -108)),
+// so each target follows its stall's derived front standing point and each
+// camera rides the same move, holding its former offset from the target. Both
+// targets and both cameras re-probed collision-clear at camera height.
 export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   Object.freeze({
     name: 'stall-world-market',
     subject: 'eastbrook_market_stall_world_market',
-    camera: Object.freeze({ x: -13, y: 6, z: -96.5 }),
-    target: Object.freeze({ x: -16.517695018376127, y: 2.5, z: -98.76296354780212 }),
+    camera: Object.freeze({ x: -16, y: 6, z: -93 }),
+    target: Object.freeze({ x: -19.517695018376127, y: 2.5, z: -95.26296354780212 }),
   }),
   Object.freeze({
     name: 'stall-provisions',
     subject: 'eastbrook_market_stall_provisions',
-    camera: Object.freeze({ x: -13, y: 6, z: -107.5 }),
-    target: Object.freeze({ x: -16.517695018376127, y: 2.5, z: -105.23703645219788 }),
+    camera: Object.freeze({ x: -14.5, y: 6, z: -109 }),
+    target: Object.freeze({ x: -18.017695018376127, y: 2.5, z: -106.73703645219788 }),
   }),
   // Re-aimed for owner refinement round 6b: the town's NPCs were redistributed
   // by role along the dock road and Lin moved from the civic green to the
@@ -386,11 +391,17 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
     camera: Object.freeze({ x: 10.5, y: 6.5, z: -85 }),
     target: Object.freeze({ x: 10.2, y: 2.5, z: -87.5 }),
   }),
+  // Re-aimed for owner round 6b's world wave: FURY is a service NPC (the honor
+  // quartermaster), so he left the chapel step for the town's eastern edge at
+  // (16, -78). The view is re-seated, never retired: same name, same subject,
+  // target on his authored stand and the camera carrying its former 4.47 yd
+  // offset, which still lands on his (re-derived) public-facing side and probes
+  // collision-clear at camera height.
   Object.freeze({
     name: 'west-wall-quartermaster',
     subject: 'fury',
-    camera: Object.freeze({ x: -6, y: 6, z: -76 }),
-    target: Object.freeze({ x: -2, y: 2.5, z: -74 }),
+    camera: Object.freeze({ x: 12, y: 6, z: -80 }),
+    target: Object.freeze({ x: 16, y: 2.5, z: -78 }),
   }),
 ]);
 
@@ -433,9 +444,12 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
     camera: Object.freeze({ x: -11, y: 7, z: -120 }),
     target: Object.freeze({ x: -13.614789156231515, y: 5, z: -124.42218373434727 }),
   }),
+  // Moved in lockstep with the polish view above for owner round 6b: this entry
+  // has always mirrored that view exactly, and a matched shot aimed at the
+  // stall's vacated ground would photograph empty square.
   'stall-world-market': Object.freeze({
-    camera: Object.freeze({ x: -13, y: 6, z: -96.5 }),
-    target: Object.freeze({ x: -16.517695018376127, y: 2.5, z: -98.76296354780212 }),
+    camera: Object.freeze({ x: -16, y: 6, z: -93 }),
+    target: Object.freeze({ x: -19.517695018376127, y: 2.5, z: -95.26296354780212 }),
   }),
 });
 

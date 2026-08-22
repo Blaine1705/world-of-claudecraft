@@ -16300,6 +16300,9 @@ export const id_ID: EnTranslations = {
           },
           "11": {
             "label": "Jalan Lintas Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

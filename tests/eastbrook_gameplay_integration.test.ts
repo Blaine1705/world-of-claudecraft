@@ -177,7 +177,10 @@ function placeEntity(sim: Sim, entity: Entity, point: { x: number; z: number }):
 // class of collider that forked the wolf projection). Round 4 dropped the
 // armoury landmark row: the live town no longer places it, and the barracks
 // garrison that took the lot rides through unchanged as decorProps in BOTH
-// worlds via the ...current spread.
+// worlds via the ...current spread. Round 6b re-probed the two stall rows to
+// the opened-out market square: this fixture only holds if its plain rows carry
+// the SAME collision as the live authored stalls, so a stale position here
+// forks the wolf projection at the bottom of this file rather than the town.
 function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   const townBuildingIds = new Set(
     [...EASTBROOK_LAYOUT.preservedBuildings, ...EASTBROOK_LAYOUT.buildings].map(
@@ -209,8 +212,8 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
     ],
     stalls: [
       {
-        x: -17.5,
-        z: -97.5,
+        x: -20.5,
+        z: -94,
         rot: 2.4805494847391065,
         r: 1.7804493814764857,
         w: 2.8,
@@ -218,8 +221,8 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
         height: 2.7,
       },
       {
-        x: -17.5,
-        z: -106.5,
+        x: -19,
+        z: -108,
         rot: 0.6610431688506869,
         r: 1.7804493814764857,
         w: 2.8,
@@ -315,23 +318,26 @@ describe('Eastbrook authored gameplay data integration', () => {
     // with it, while Gorrak's rows stayed put. The same round added a
     // fisherman's camp on the strand south of the quay, one tent and one fire
     // beside the beached rowboats.
+    // Re-pinned again for owner round 6b: Gorrak's camp joined the main bandit
+    // band northeast, so his two tents, his two crates and his fire travelled
+    // with the boss to the reunited camp around (115, 42).
     expect(ZONE1_PROPS.tents).toEqual([
       { x: 58, z: 25, rot: 0.4, scale: 1 },
       { x: 68, z: 16, rot: 2.1, scale: 1 },
-      { x: 88, z: -86, rot: 1.2, scale: 1.3 },
-      { x: 95, z: -94, rot: -0.6, scale: 1 },
+      { x: 113, z: 47, rot: 1.2, scale: 1.3 },
+      { x: 119, z: 39, rot: -0.6, scale: 1 },
       { x: -90.5, z: -78.5, rot: -0.9, scale: 1 },
     ]);
     expect(ZONE1_PROPS.crates).toEqual([
       [56, 22],
       [64, 26],
-      [87, -88],
-      [93, -90],
+      [112, 44],
+      [118, 40],
       [66, 14],
     ]);
     expect(ZONE1_PROPS.campfires).toEqual([
       [59, 17],
-      [90, -90],
+      [111, 46],
       [-93.5, -76.5],
       [-30, 146],
       [-61, 56],
@@ -352,9 +358,11 @@ describe('Eastbrook authored gameplay data integration', () => {
     // road that gives the new gy_vale_north release its headstones, and a
     // second chapel-green plot filling the west half of the wrought-iron
     // churchyard enclosure.
+    // Re-pinned for owner round 6b: the retired Vale Chapel Yard anchor at
+    // (4, -56) is gone with its graveyard record, because its Pale Keeper stood
+    // 15 yd from the rebuilt Eastbrook Rest and read as a duplicate.
     expect(ZONE1_PROPS.graveyards).toEqual([
       { x: -2, z: -70 },
-      { x: 4, z: -56 },
       { x: -22, z: 118 },
       { x: -9, z: -70 },
     ]);
@@ -484,18 +492,21 @@ describe('Eastbrook authored gameplay data integration', () => {
   // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76,
   // docs/design/eastbrook-revamp/site-plan.md): FURY moved with the chapel
   // to the chapel green; position and facing probed from the live layout.
+  // Re-pinned for owner round 6b: FURY is the honor quartermaster, a service
+  // NPC, so he left the chapel step (7 yd from Brother Aldric) for the town's
+  // eastern edge; his facing is still derived, so it moved with him.
   it('spawns layout-authored FURY under a reserved id without shifting nextId or RNG', () => {
     expect(EASTBROOK_NPC_PLACEMENTS_BY_ID.fury).toEqual({
       id: 'fury',
-      position: { x: -2, z: -74 },
-      facing: -2.7367008673047097,
+      position: { x: 16, z: -78 },
+      facing: -2.2455372690184494,
       anchorId: 'eastbrook_chapel',
       bodyRadius: 0.6,
     });
     expect(BUILTIN_WORLD.npcs[FURY_NPC_ID]).toMatchObject({
       id: 'fury',
-      pos: { x: -2, z: -74 },
-      facing: -2.7367008673047097,
+      pos: { x: 16, z: -78 },
+      facing: -2.2455372690184494,
       dynamic: true,
     });
     expect(FURY_ENTITY_ID).toBe(1_000_000_001);
@@ -530,12 +541,12 @@ describe('Eastbrook authored gameplay data integration', () => {
       id: 1_000_000_001,
       kind: 'npc',
       templateId: 'fury',
-      x: -2,
-      z: -74,
-      spawnX: -2,
-      spawnZ: -74,
-      facing: -2.7367008673047097,
-      prevFacing: -2.7367008673047097,
+      x: 16,
+      z: -78,
+      spawnX: 16,
+      spawnZ: -78,
+      facing: -2.2455372690184494,
+      prevFacing: -2.2455372690184494,
     });
     expect([...withFury.entities.keys()].filter((id) => id !== FURY_ENTITY_ID)).toEqual([
       ...withoutFury.entities.keys(),
@@ -544,6 +555,11 @@ describe('Eastbrook authored gameplay data integration', () => {
     expect(withFury.rng.next()).toBe(withoutFury.rng.next());
   });
 
+  // Owner round 6b widened the station-to-master band from 3 yd to 4.5 yd:
+  // forgemistress_darva now stands 4.2 yd out and tinker_gizzel 3.2 yd out, on
+  // opposite sides of their adjacent benches, so the crafts lane stops reading
+  // as one huddle. Each master still works their own station, which is the
+  // failure this bound exists to catch.
   it('moves the four Eastbrook stations with their masters and preserves every other station field', () => {
     for (const station of STATIONS.slice(0, 4)) {
       const placement = EASTBROOK_STATIONS_BY_ID[station.id];
@@ -561,7 +577,7 @@ describe('Eastbrook authored gameplay data integration', () => {
           station.pos.x - ZONE1_NPCS[station.masterNpcId].pos.x,
           station.pos.z - ZONE1_NPCS[station.masterNpcId].pos.z,
         ),
-      ).toBeLessThanOrEqual(3);
+      ).toBeLessThanOrEqual(4.5);
     }
     expect(STATIONS.slice(4)).toEqual([
       {
@@ -1019,7 +1035,22 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
       props: legacyEastbrookProps(BUILTIN_WORLD.props),
       services: {
         ...BUILTIN_WORLD.services,
-        mailboxes: [{ x: 7, z: -8 }, ...MAILBOXES.slice(1)],
+        // Re-probed from the live layout for owner round 6b. The fixture used
+        // to hold the OLD town's mailbox literal (7, -8) in this slot, and that
+        // is the same trap the legacy town campfire fell into above: the old
+        // post spot is Wolf Run open country now, so it was a collider present
+        // in this world and nowhere else. It went unnoticed until this round's
+        // camp and graveyard moves reflowed the shared wander stream and walked
+        // wolf 88 across it at tick 547, deflecting it in the legacy world
+        // only. The premise here is identical collision in both worlds, so the
+        // row follows the live pillar.
+        mailboxes: [
+          {
+            x: EASTBROOK_LAYOUT.services.mailbox.position.x,
+            z: EASTBROOK_LAYOUT.services.mailbox.position.z,
+          },
+          ...MAILBOXES.slice(1),
+        ],
       },
     };
     setActiveWorldContent(legacyWorld);

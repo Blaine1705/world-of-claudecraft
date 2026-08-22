@@ -4515,6 +4515,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': '찢겨진 절벽',
   'entities.zones.farshore_isle.pois.4.label': '균열의 들판',
   'entities.zones.eastbrook_vale.pois.11.label': '먼바다 해안 모래톱 둑길',
+  'entities.zones.eastbrook_vale.pois.12.label': '이스트브룩 부두',
   'entities.mobs.moor_ram.name': '황무지 숫양',
   'entities.mobs.gale_wisp.name': '돌풍 정령',
   'entities.mobs.shoal_scuttler.name': '여울 게',

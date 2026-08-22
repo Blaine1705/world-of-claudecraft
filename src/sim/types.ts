@@ -3498,7 +3498,11 @@ export interface ZoneDef {
   // it, so it must never change once shipped); label is display-only and may be
   // re-worded freely. Optional because user-authored custom maps (MapDocContent
   // reuses ZoneDef) omit it; every static ZONES poi carries one (content-guarded).
-  pois: { x: number; z: number; label: string; id?: string }[];
+  /** Named places. `id` is a STABLE key: deed visit marks reference it, so a
+   *  shipped id is never renamed or removed. `hideOnMap` drops the label from
+   *  the world map while keeping the record (and its marks) alive, for a place
+   *  that no longer reads as a landmark. */
+  pois: { x: number; z: number; label: string; id?: string; hideOnMap?: boolean }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
   // The zone's southern border ridge has NO road pass and is raised past the

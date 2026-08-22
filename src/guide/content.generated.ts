@@ -2059,7 +2059,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Reliquary Hill",
       "Brightwood Glade",
       "The Sowfield",
-      "The Farshore Causeway"
+      "The Farshore Causeway",
+      "Eastbrook Docks"
     ],
     "welcome": "Find Marshal Redbrook in town - he has work for you.",
     "families": [

@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 966,
-      "state": "9bd35c71",
+      "nextId": 965,
+      "state": "b80dde9b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -52,7 +52,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 961,
+          "entityId": 960,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -91,7 +91,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 961,
+          "id": 960,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -136,9 +136,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 969,
-      "state": "6a50a210",
-      "events": "8fce602a",
+      "nextId": 968,
+      "state": "551556f5",
+      "events": "80a42a75",
       "rng": {
         "draws": 10,
         "digest": "cc772239"
@@ -147,8 +147,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 969,
-      "state": "5ba0b48b",
+      "nextId": 968,
+      "state": "2c02aa98",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -158,9 +158,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 969,
-      "state": "3331f69d",
-      "events": "f695afd6",
+      "nextId": 968,
+      "state": "c2071976",
+      "events": "dffde301",
       "rng": {
         "draws": 174,
         "digest": "4d2cc9f8"
@@ -169,8 +169,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 969,
-      "state": "6ada6bde",
+      "nextId": 968,
+      "state": "bafdd157",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -180,9 +180,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 969,
-      "state": "fdb011f5",
-      "events": "5c452d40",
+      "nextId": 968,
+      "state": "295fb2ce",
+      "events": "c92dc11f",
       "rng": {
         "draws": 533,
         "digest": "db23c13c"
@@ -191,8 +191,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 969,
-      "state": "a08d6ed2",
+      "nextId": 968,
+      "state": "b5146d83",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -202,8 +202,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 969,
-      "state": "a08d6ed2",
+      "nextId": 968,
+      "state": "b5146d83",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -241,6 +241,9 @@
               "baked_bread",
               "footpad_jerkin",
               "rusty_hatchet"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -259,7 +262,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 961,
+          "entityId": 960,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -301,7 +304,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 105,
           "hp": 49949,
-          "id": 961,
+          "id": 960,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -336,7 +339,7 @@
             "str": 25
           },
           "swingTimer": 0.9,
-          "targetId": 967,
+          "targetId": 966,
           "templateId": "hunter",
           "weapon": {
             "max": 5,
@@ -345,7 +348,7 @@
           }
         },
         {
-          "aggroTargetId": 967,
+          "aggroTargetId": 966,
           "aiState": "idle",
           "combatTimer": 1.95,
           "comboUntil": -1,
@@ -356,7 +359,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 56,
-          "id": 966,
+          "id": 965,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -365,7 +368,7 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 961,
+          "ownerId": 960,
           "petMode": "aggressive",
           "pos": {
             "x": -93,
@@ -390,7 +393,7 @@
           }
         },
         {
-          "aggroTargetId": 966,
+          "aggroTargetId": 965,
           "aiState": "attack",
           "combatTimer": 1.35,
           "comboUntil": -1,
@@ -402,7 +405,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49898,
-          "id": 967,
+          "id": 966,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -432,16 +435,16 @@
             "armor": 70
           },
           "swingTimer": 0.05,
-          "tappedById": 961,
-          "targetId": 961,
+          "tappedById": 960,
+          "targetId": 960,
           "templateId": "forest_wolf",
           "threat": [
             [
-              961,
+              960,
               48
             ],
             [
-              966,
+              965,
               54
             ]
           ],
@@ -452,7 +455,7 @@
           }
         },
         {
-          "aggroTargetId": 961,
+          "aggroTargetId": 960,
           "aiState": "attack",
           "combatTimer": 1.95,
           "comboUntil": -1,
@@ -464,7 +467,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 968,
+          "id": 967,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -489,7 +492,7 @@
             "armor": 35
           },
           "swingTimer": 0.05,
-          "targetId": 961,
+          "targetId": 960,
           "templateId": "warlock_imp",
           "weapon": {
             "max": 9,

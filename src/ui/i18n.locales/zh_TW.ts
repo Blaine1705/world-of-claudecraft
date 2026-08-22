@@ -4375,6 +4375,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': '碎裂斷崖',
   'entities.zones.farshore_isle.pois.4.label': '裂隙原野',
   'entities.zones.eastbrook_vale.pois.11.label': '遠岸沙洲堤道',
+  'entities.zones.eastbrook_vale.pois.12.label': '東溪碼頭',
   'entities.mobs.moor_ram.name': '荒原羊',
   'entities.mobs.gale_wisp.name': '疾風精',
   'entities.mobs.shoal_scuttler.name': '淺灘蟹',

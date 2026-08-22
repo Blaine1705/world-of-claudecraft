@@ -16300,6 +16300,9 @@ export const cs_CZ: EnTranslations = {
           },
           "11": {
             "label": "Hráz Vzdáleného pobřeží"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

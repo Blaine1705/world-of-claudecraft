@@ -16300,6 +16300,9 @@ export const da_DK: EnTranslations = {
           },
           "11": {
             "label": "Fjernkyst-Dæmningen"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

@@ -43,10 +43,19 @@ describe('zone1 quest text direction (issue #2680)', () => {
     expect(resolved).not.toContain('Copper Dig, northwest of town');
   });
 
-  it('places the Bandit Camp southwest of town (positive x, negative z)', () => {
+  // Re-anchored 2026-08 with the owner's bandit reunification: the two bandit
+  // camps used to sit 105 yd apart with the boar meadow between them, so the
+  // boss camp moved north to join the main band and the landmark followed. The
+  // old form of this test read the ORIGIN frame (x > 0, z < 0), which was only
+  // ever a proxy for the claim Trader Wilkes actually makes. It now checks that
+  // claim directly, against the live town hub, which is both truer and immune
+  // to the camp moving again inside the northwest quarter.
+  it("places the Bandit Camp northwest of town, as Wilkes's quest text says", () => {
     const camp = poi('bandit_camp');
-    expect(camp.x).toBeGreaterThan(0); // +x is west
-    expect(camp.z).toBeLessThan(0); // south
+    const hub = ZONE1_ZONE.hub;
+    // +x is west and +z is north, so northwest of the hub is dx > 0 and dz > 0
+    expect(camp.x - hub.x).toBeGreaterThan(0);
+    expect(camp.z - hub.z).toBeGreaterThan(0);
   });
 
   it("names the bandit camp's real direction in Trader Wilkes's quest text", () => {

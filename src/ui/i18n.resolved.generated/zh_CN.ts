@@ -16300,6 +16300,9 @@ export const zh_CN: EnTranslations = {
           },
           "11": {
             "label": "远岸沙洲堤道"
+          },
+          "12": {
+            "label": "东溪码头"
           }
         }
       },

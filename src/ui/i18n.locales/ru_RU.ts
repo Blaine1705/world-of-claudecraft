@@ -4567,6 +4567,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': 'Расколотые Утёсы',
   'entities.zones.farshore_isle.pois.4.label': 'Поля Разломов',
   'entities.zones.eastbrook_vale.pois.11.label': 'Коса Дальнего Берега',
+  'entities.zones.eastbrook_vale.pois.12.label': 'Истврукские причалы',
   'entities.mobs.moor_ram.name': 'Вересковый баран',
   'entities.mobs.gale_wisp.name': 'Штормовой дух',
   'entities.mobs.shoal_scuttler.name': 'Отмельный краб',
