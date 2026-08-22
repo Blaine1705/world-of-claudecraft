@@ -183,6 +183,7 @@ export async function runMailBotWelcomePurgeMigration(
   const pool = runtime.createPool(databaseUrl);
   let client: PoolClient | null = null;
   let transactionOpen = false;
+  let printedRows = 0;
 
   try {
     // One pinned client for the whole run: BEGIN/COMMIT on a bare pool are
@@ -259,13 +260,18 @@ export async function runMailBotWelcomePurgeMigration(
       const result = purgeBotWelcomeLetters(row.data, characters.rows);
       // One stringify shared by the report and the UPDATE payload: before
       // comes from octet_length in SQL, so the 89MB book that motivated this
-      // migration is never re-serialized just to print a number.
+      // migration is never re-serialized just to print a number. The two
+      // figures use different rulers: before is Postgres's jsonb rendering
+      // (a space after every colon and comma, about 4.5 percent wider), after
+      // is compact JSON.stringify. Close enough for an operator report; not
+      // worth buying back with a second stringify of the full book.
       const serialized = result.changed ? JSON.stringify(result.value) : null;
       const after = serialized === null ? row.bytes : serialized.length;
       // Printed as produced, so a throw on a later realm keeps earlier lines.
       console.log(
         `  ${row.key}: kept=${result.kept} removed=${result.removed} bytes ${row.bytes} -> ${after}`,
       );
+      printedRows += 1;
       if (serialized === null) continue;
 
       if (apply) {
@@ -298,7 +304,7 @@ export async function runMailBotWelcomePurgeMigration(
       } catch {
         // Ignore rollback errors after a failed or already closed transaction.
       }
-      if (apply) {
+      if (apply && printedRows > 0) {
         console.log('Aborted and rolled back: nothing reported above was written.');
       }
     }
