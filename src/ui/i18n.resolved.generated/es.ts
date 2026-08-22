@@ -1025,7 +1025,6 @@ export const es: EnTranslations = {
       "targetFriendlyNext": "Objetivo amistoso siguiente",
       "targetPrev": "Objetivo anterior",
       "discord": "Discord",
-      "valecup": "Copa del Valle",
       "bgFlag": "Acción de bandera de campo de batalla",
       "sheathe": "Envainar/Desenvainar arma",
       "dive": "Nadar hacia abajo",
@@ -1191,146 +1190,6 @@ export const es: EnTranslations = {
         "azureKeep": "Fortaleza Azur",
         "ruinCourtyard": "El Patio en Ruinas",
         "graveyard": "Cementerio"
-      }
-    },
-    "vcup": {
-      "title": "La Copa del Valle",
-      "shootPower": "POTENCIA",
-      "close": "Cerrar la ventana de la Copa del Valle",
-      "offlineNote": "El libro de encuentros está cerrado. La Copa del Valle no está disponible ahora mismo.",
-      "recordLine": "Tu historial: {wins} victorias, {losses} derrotas, {draws} empates.",
-      "bracketsAria": "Categoría del partido",
-      "bracketLabel": "{n}v{n}",
-      "waitingCount": "{count} en espera",
-      "nationsHeading": "Nación de estandarte",
-      "nation": {
-        "vale": "Valle de Eastbrook",
-        "mirefen": "El Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "El Coliseo Cinéreo",
-        "choir": "El Coro Pálido",
-        "ogre": "Los Clanes Ogros",
-        "moon": "La Luna Pálida",
-        "copperdig": "La Excavación de Cobre"
-      },
-      "awayNote": "Si ambos bandos lucen el mismo estandarte, el visitante juega con la paleta invertida.",
-      "rolesHeading": "Rol deportivo",
-      "rolesSmallBracketNote": "En las categorías 1v1 y 2v2 todos los combatientes juegan con la equipación de Polivalente. Las gestas que exigen la categoría 3v3 o mayor no se pueden conseguir aquí.",
-      "role": {
-        "allrounder": {
-          "name": "Polivalente",
-          "desc": "Un poco de cada cosa: patada, patadón y un hombrazo limpio."
-        },
-        "striker": {
-          "name": "Delantero",
-          "desc": "Vive para el patadón largo y el quiebro rápido."
-        },
-        "sweeper": {
-          "name": "Líbero",
-          "desc": "Aparta a los corredores del balón y lo despeja lejos."
-        },
-        "keeper": {
-          "name": "Guardameta",
-          "desc": "Defiende el área con agarre, estirada y saque largo."
-        }
-      },
-      "queue": "Unirse a la cola",
-      "leaveQueue": "Salir de la cola",
-      "queueNote": "Ponte en cola desde cualquier lugar; el silbato te llamará al Sembradal.",
-      "queuedStatus": "En cola para {bracket}: posición {position} de {count}.",
-      "blockNation": "Primero elige una nación de estandarte.",
-      "blockPartySize": "Esa categoría requiere un grupo más pequeño.",
-      "blockNotLeader": "Solo el líder del grupo puede poner al equipo en cola.",
-      "inMatchNote": "Tu equipo está en el campo. ¡A jugar!",
-      "deserterNote": "El Guardacampo lo recuerda. Podrás volver a la cola en {seconds} s.",
-      "liveHeading": "Ahora en el Sembradal",
-      "liveAria": "Copa del Valle: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Acércate al Sembradal para mirar desde las gradas.",
-      "noLive": "El campo está en silencio. No se juega ningún partido.",
-      "boardHeading": "Tablón de vencedores",
-      "boardEmpty": "Aún no hay vencedores registrados. El Cubo de Cobre espera.",
-      "boardWins": "{count} victorias",
-      "enterAsGuild": "Entrar bajo el estandarte de {guild}",
-      "guildRecordLine": "Historial de tu hermandad: {wins} victorias, {losses} derrotas.",
-      "guildBoardHeading": "Estandartes de hermandad",
-      "guildBoardEmpty": "Ninguna hermandad ha saltado al campo aún. ¡Iza tu estandarte!",
-      "guildBoardWl": "{wins} V, {losses} D",
-      "practice": "Práctica contra bots",
-      "practiceNote": "Inicia de inmediato un partido privado contra bots en tu propio campo de práctica.",
-      "practiceUnratedNote": "Los encuentros de práctica no son puntuables: la clasificación y el progreso del Libro de Gestas no cuentan.",
-      "practicingNow": "Practicando ahora ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Cola de la Copa del Valle: {bracket}, posición {position} de {count}",
-      "indicatorLive": "Copa del Valle",
-      "indicatorOpen": "Abrir la ventana de la Copa del Valle",
-      "phaseCountdown": "Saque inicial en {seconds}",
-      "phaseGoal": "¡GOL!",
-      "phaseGolden": "GOL DE ORO",
-      "phaseOver": "FINAL DEL PARTIDO",
-      "bannerFound": "¡La Copa del Valle llama: {nationA} contra {nationB}!",
-      "bannerCountdown": "Saque inicial en {seconds}...",
-      "bannerKickoff": "¡SAQUE INICIAL!",
-      "bannerGoal": "¡GOL! ¡{nation} marca!",
-      "bannerSave": "¡{name} LA PARA!",
-      "bannerGolden": "GOL DE ORO: ¡el próximo tanto gana!",
-      "bannerEnd": "Final: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "¡Victoria en el Sembradal!",
-      "bannerDraw": "Empate en el Sembradal.",
-      "bannerLoss": "Derrota en el Sembradal.",
-      "logQueued": "Entras en la cola de la Copa del Valle para {bracket} (posición {position}).",
-      "logUnqueued": "Sales de la cola de la Copa del Valle.",
-      "logFound": "Tu partido de la Copa del Valle está listo: {nationA} contra {nationB}.",
-      "logRoster": "Tu bando: {allies}. Su bando: {enemies}.",
-      "logGoal": "¡{name} marca para {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "¡{name} hace la parada!",
-      "logWin": "Ganas el encuentro en el Sembradal.",
-      "logDraw": "El encuentro en el Sembradal termina en empate.",
-      "logLoss": "Pierdes el encuentro en el Sembradal.",
-      "gossipOpen": "El libro de encuentros",
-      "gossipOpenAria": "Abrir la ventana de la Copa del Valle",
-      "mobileLabel": "Copa",
-      "briefing": {
-        "subtitle": "Charla previa al partido",
-        "vs": "vs",
-        "rulesHeading": "Cómo se juega",
-        "rule1": "Mete el balón en la portería rival de una patada o un pase para marcar.",
-        "rule2": "Gana el primero en llegar a 5 goles, o quien tenga más goles cuando suene el final.",
-        "rule3": "Un partido igualado al final del tiempo se decide con gol de oro: el próximo tanto gana.",
-        "rule4": "Las entradas solo te hacen rodar. Nadie sale herido bajo la tregua de la cosecha.",
-        "rule5": "Cualquiera puede acercarse y animarte desde las gradas.",
-        "kitHeading": "Tu equipación",
-        "kitNote": "Estos movimientos sustituyen a tus habilidades de clase durante el partido.",
-        "unratedNote": "Hay bots en el campo, así que este encuentro no es puntuable: la clasificación no se mueve y las gestas por goles, paradas y porterías a cero no cuentan.",
-        "practiceUnratedNote": "Este es un encuentro de práctica, así que no es puntuable: la clasificación no se mueve y el progreso del Libro de Gestas no cuenta.",
-        "rosterHeading": "La alineación",
-        "you": "Tú",
-        "bot": "Bot",
-        "ready": "Estoy listo",
-        "readyDone": "Listo",
-        "readyAria": "Prepararse para el saque inicial",
-        "waiting": "Esperando a que el otro bando se prepare...",
-        "whistle": "El silbato sonará en {seconds} s.",
-        "readyCount": "{ready} de {total} preparados"
-      },
-      "bet": {
-        "title": "Apuestas del partido",
-        "aria": "Apuestas del partido de la Copa del Valle",
-        "closesIn": "Las apuestas cierran en {seconds} s",
-        "closed": "Apuestas cerradas",
-        "prize": "Bote {amount}",
-        "splitAria": "Proporción del bote de apuestas en cada equipo",
-        "expand": "Ver apuestas y apostar",
-        "collapse": "Ocultar apuestas",
-        "oddsLabel": "Paga",
-        "back": "Apostar por {team}",
-        "form": "{wins}V-{losses}D",
-        "mine": "Tu apuesta: {amount} a {team}",
-        "none": "Aún no tienes apuesta en este partido.",
-        "record": "Historial de apuestas: {wins}V-{losses}D, {sign}{net}",
-        "wonBanner": "¡Tu apuesta ganó!",
-        "wonLog": "Tu apuesta de la Copa del Valle ganó: recibes {amount}.",
-        "lostLog": "Perdiste tu apuesta de la Copa del Valle: {amount}.",
-        "refundLog": "Apuestas anuladas: se devolvió tu apuesta de {amount}."
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const es: EnTranslations = {
       "combat": "Combate",
       "talents": "Talentos",
       "arena": "Arena y JcJ",
-      "valeCup": "Copa del Valle",
       "thornhollow": "Campos Espinosos",
       "deeds": "Libro de Gestas",
       "reliquary": "El Relicario",
@@ -4210,7 +4068,6 @@ export const es: EnTranslations = {
       "reliquary": "El Relicario",
       "sheathe": "Envainar/Desenvainar arma",
       "crafting": "Artesanía",
-      "valeCup": "Copa del Valle",
       "mount": "Montar / Desmontar",
       "calendar": "Calendario de eventos",
       "dungeonFinder": "Buscador de Mazmorras",
@@ -5287,36 +5144,6 @@ export const es: EnTranslations = {
       "ladderBody": "Cada combate mueve una clasificación de campo de batalla persistente y propia del personaje, se gane o se pierda, y la tabla de todos los tiempos ordena a los campeones del reino.",
       "rewardsHeading": "Lo que paga una partida",
       "rewardsBody": "Cada partida terminada paga Honor: más por una victoria, una compensación menor por una derrota o un empate, además de una pequeña cantidad por cada golpe de gracia que asestes y cada uno en el que ayudes, así que luchar lejos de las banderas también merece la pena. Tu primera victoria de cada día paga una bonificación adicional, y el panel te avisa mientras esa bonificación sigue esperándote. Ese día es propio del Honor, y se reinicia según su propio reloj en vez de con el restablecimiento de instancias del reino. Enfrentarte al mismo equipo una y otra vez paga menos por la partida en sí a partir de la segunda vez, asentándose pronto en un mínimo en lugar de caer hasta cero, y una partida abandonada no paga nada en absoluto. Gasta lo que ganes con cualquiera de los dos intendentes de Pericia Bélica."
-    },
-    "valeCupPage": {
-      "heading": "La Copa del Valle",
-      "intro": "Balonjabalí en el Sembradal: elige un estandarte, elige un rol y cuela una piel de jabalí rellena más allá del guardameta para ganar el Cubo de Cobre. Sin sangre, sin botín, solo el rugido de las gradas.",
-      "loreHeading": "El balonjabalí y la tregua de la cosecha",
-      "loreOldSow": "Mucho antes de que despertaran los muertos, los peones de Eastbrook jugaban al balonjabalí en los rastrojos tras la cosecha: dos cuadrillas, una piel de jabalí rellena de paja y dos portones de carreta arrastrados a cada extremo del prado. El primer balón, la Vieja Cerda, cuelga, bañado en bronce, sobre la chimenea de la taberna.",
-      "loreTruce": "Cuando el Coliseo Cinéreo empezó a sancionar juegos de guerra, el mariscal Redbrook respondió con algo más amable: una tregua de la cosecha permanente sobre el viejo prado. Los portones de carreta se volvieron porterías; el prado ganó muros, gradas y un nombre, el Sembradal; y el premio fue siempre el mismo cubo de leche abollado del que bebían los vencedores: el Cubo de Cobre.",
-      "howHeading": "Cómo se juega",
-      "howQueue": "Ponte en cola desde cualquier lugar mediante la ventana de la Copa del Valle, o habla con el Guardacampo Bram en la puerta del Sembradal. Elige una categoría, desde uno contra uno hasta cinco contra cinco, una nación de estandarte y un rol deportivo; entra en cola en solitario o trae a tu grupo.",
-      "howMatch": "Al saque inicial, tus habilidades de clase se cambian por una equipación deportiva y se restauran exactamente al terminar. Las patadas apuntan a la retícula del suelo, el balón rebota en las vallas y regatear es simplemente correr con el balón. Marca más goles que el rival antes del final del tiempo; un empate se decide con gol de oro.",
-      "howTruce": "Nadie sangra en el Sembradal: las entradas solo te hacen rodar, nada duele y las mascotas se quedan fuera del partido.",
-      "spectateBody": "En el estadio se juega un partido a la vez, y cualquiera puede acercarse y mirar desde las gradas.",
-      "bettingHeading": "Una apuestilla en la baranda",
-      "bettingBody": "Los espectadores en el Sembradal pueden apostar por un bando mientras se forma un partido: las apuestas se juntan en un fondo, y al pitido final los ganadores se reparten el fondo de los perdedores en proporción a lo que apostaron. Un partido empatado, o una sorpresa que nadie apostó, reembolsa cada moneda. Los jugadores sentados en el partido no pueden apostar en él, y la baranda guarda tu historial de por vida de victorias, derrotas y saldo neto de monedas.",
-      "practiceHeading": "Combates de práctica y el campo inactivo",
-      "practiceBody": "La ventana de la Copa del Valle también ofrece entrenamiento: una copia privada del campo donde los bots llenan ambos bandos y nada cuenta para tu historial. ¿Te falta un jugador o dos para lo de verdad? Tras una breve espera, los bots completan los equipos, y cualquier partido con bots en el campo es amistoso, nunca clasificatorio. Y cuando el Sembradal está inactivo, los bots montan una exhibición que puedes ver, y apostar, desde las gradas; en cuanto jugadores reales se declaran listos, la exhibición cede el campo y se devuelve cada apuesta.",
-      "nationsHeading": "Las ocho naciones de estandarte",
-      "nationsBody": "Cada equipo juega bajo un estandarte. El capitán elige la nación, y si ambos bandos lucen el mismo, el equipo visitante juega con la paleta invertida.",
-      "nationVale": "Verde y oro, con la gavilla de trigo al viento: el equipo local, peones de campo hasta la médula.",
-      "nationMirefen": "Verde azulado y gris bajo la garza: pacientes, zancudos, nunca con prisa.",
-      "nationThornpeak": "Azul hielo y blanco bajo el pico de la montaña: de paso firme y tozudos.",
-      "nationColiseum": "Rojo y negro con espadas cruzadas: juegan como si aún fuera un juego de guerra.",
-      "nationChoir": "Azul pálido y plata bajo la campana: inquietantes, precisos y muy silenciosos.",
-      "nationOgre": "Naranja y tierra tras el puño: hombro por delante, y orgullosos de ello.",
-      "nationMoon": "Violeta y plata bajo la luna creciente: jugadores nocturnos, de pies ligeros.",
-      "nationCopperdig": "Cobre y marrón con el pico: excavadores que nunca dejan de correr.",
-      "rolesHeading": "Roles deportivos",
-      "rolesBody": "Tu rol decide la equipación que llevas al campo. Todos patean; el resto es cuestión de temperamento. En las categorías de uno contra uno y dos contra dos todos juegan con la equipación polivalente, así que la elección de rol cobra sentido a partir de tres contra tres.",
-      "rewardsHeading": "Reglas de la tregua",
-      "rewardsBody": "Las reglas de la tregua implican que no hay experiencia ni botín: un partido decidido cuenta para tu historial y el tablón de vencedores, y una victoria también cuenta para las tareas de recompensa del día. Desertar de un partido suspende tu plaza, y el Guardacampo lo recuerda."
     },
     "deedsPage": {
       "intro": "El Libro de Gestas es donde el mundo lleva la cuenta de todos tus hechos, desde tus primeros pasos fuera del valle inicial hasta los combates más duros que el reino puede ofrecer. Consigue gestas mientras juegas, luce los títulos que otorgan y mira cómo asciende tu Renombre.",
@@ -13439,9 +13266,6 @@ export const es: EnTranslations = {
       "tolling_bell": {
         "name": "Campana doliente"
       },
-      "vale_cup_ball": {
-        "name": "Balón de jabalí"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, el Pico Despierto"
       },
@@ -14038,11 +13862,6 @@ export const es: EnTranslations = {
         "name": "El Guardián Pálido",
         "title": "Custodio de los Muertos",
         "greeting": "Descansa, espíritu. Puedo devolverte a tu cuerpo, pero el cruce de vuelta te deja débil."
-      },
-      "groundskeeper_bram": {
-        "name": "Guardacampo Bram",
-        "title": "Guarda del Sembradal",
-        "greeting": "La tregua se respeta en el Sembradal, {className}: solo patadas y hombrazos. ¿Te animas a jugar por el Cubo de Cobre?"
       },
       "chronicler_saul": {
         "name": "Saul el Cronista",
@@ -16492,6 +16311,9 @@ export const es: EnTranslations = {
           },
           "11": {
             "label": "La Calzada del Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

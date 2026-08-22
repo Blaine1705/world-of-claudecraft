@@ -1388,14 +1388,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.actionBar.resetConfirmTitle': "Réinitialiser les touches de la barre d'action ?",
   'hudChrome.actionBar.resetConfirmBody':
     'La première barre retrouve ses touches par défaut. Les deuxième et troisième barres deviennent non assignées. Cette action est irréversible.',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    "Dans les formats 1c1 et 2c2, chaque combattant joue la panoplie Polyvalent. Les hauts faits qui exigent le format 3c3 ou plus ne peuvent pas s'obtenir ici.",
-  'hudChrome.vcup.practiceUnratedNote':
-    "Les rencontres d'entraînement ne sont pas classées : le classement et la progression du Livre des hauts faits ne comptent pas.",
-  'hudChrome.vcup.briefing.unratedNote':
-    "Des bots sont sur le terrain, cette rencontre n'est donc pas classée : le classement ne bouge pas, et les hauts faits de buts, d'arrêts et de cages inviolées ne comptent pas.",
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    "Cette rencontre est un entraînement, elle n'est donc pas classée : le classement ne bouge pas, et la progression du Livre des hauts faits ne compte pas.",
   'hudChrome.bags.filterTool': 'Outils',
   'hudChrome.materialHint.fineGrade':
     'Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.',
@@ -3135,58 +3127,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoulder.description':
     "Un coup d'épaule loyal, dans l'esprit de la trêve des moissons. Envoie l'adversaire culbuter loin du ballon.",
   'entities.abilities.sport_shoulder.name': "Coup d'épaule",
-  'entities.npcs.groundskeeper_bram.greeting':
-    'La trêve tient au Pré de la Truie, {className} : des bottes et des épaules, rien de plus. Envie de jouer pour le Seau de cuivre ?',
-  'entities.npcs.groundskeeper_bram.name': 'Intendant Bram',
-  'entities.npcs.groundskeeper_bram.title': 'Gardien du Pré de la Truie',
   'entities.zones.eastbrook_vale.pois.10.label': 'Le Pré de la Truie',
   'guide.nav.professions': 'Métiers',
-  'guide.nav.valeCup': 'Coupe du Val',
   'guide.professions.intro':
     "Au-delà des combats et des quêtes, le monde vous récompense de travailler la terre et la forge : récolter des matières premières, les transformer en équipement et en biens à travers dix métiers d'artisanat, et vous installer dans une identité, celle de l'un des dix archétypes que ces métiers incarnent.",
-  'guide.valeCupPage.heading': 'La Coupe du Val',
-  'guide.valeCupPage.howHeading': 'Comment jouer',
-  'guide.valeCupPage.howMatch':
-    "Au coup d'envoi, votre panoplie de classe est remplacée par une panoplie sportive, puis restaurée à l'identique après le match. Les frappes visent le réticule au sol, le ballon rebondit sur les bandes, et dribbler consiste simplement à courir avec le ballon. Marquez plus de buts que l'autre camp avant la fin du temps réglementaire ; en cas d'égalité, on joue le but en or.",
-  'guide.valeCupPage.howQueue':
-    "Mettez-vous en file depuis n'importe où via la fenêtre de la Coupe du Val, ou parlez à l'intendant Bram à la porte du Pré de la Truie. Choisissez un format, du un contre un au cinq contre cinq, une nation de bannière et un rôle sportif ; entrez en file en solo ou avec votre groupe.",
-  'guide.valeCupPage.howTruce':
-    'Personne ne saigne au Pré de la Truie : les tacles font culbuter, rien ne blesse, et les familiers regardent le match depuis le banc.',
-  'guide.valeCupPage.intro':
-    'La balle au sanglier au Pré de la Truie : choisissez une bannière, choisissez un rôle, et envoyez une peau de sanglier empaillée derrière un gardien pour remporter le Seau de cuivre. Pas de sang, pas de butin, juste la clameur des tribunes.',
-  'guide.valeCupPage.loreHeading': 'La balle au sanglier et la trêve des moissons',
-  'guide.valeCupPage.loreOldSow':
-    "Bien avant que les morts ne s'éveillent, les valets de ferme d'Eastbrook jouaient à la balle au sanglier sur les chaumes après la moisson : deux bandes de joueurs, une peau de sanglier bourrée de paille, et deux portails de chariot traînés aux deux bouts du pré. Le premier ballon, la Vieille Truie, pend, bronzé, au-dessus de l'âtre de la taverne.",
-  'guide.valeCupPage.loreTruce':
-    'Quand le Colisée cendré se mit à organiser des jeux de guerre, le maréchal Redbrook répondit par quelque chose de plus doux : une trêve des moissons permanente sur le vieux pré. Les portails de chariot devinrent des poteaux de but, le pré gagna des murs, des tribunes et un nom, le Pré de la Truie, et le prix fut toujours le même seau à lait cabossé dans lequel buvaient les vainqueurs : le Seau de cuivre.',
-  'guide.valeCupPage.nationChoir':
-    'Bleu pâle et argent sous la cloche : inquiétants, précis et très silencieux.',
-  'guide.valeCupPage.nationColiseum':
-    "Rouge et noir aux épées croisées : ils jouent comme si c'était encore un jeu de guerre.",
-  'guide.valeCupPage.nationCopperdig':
-    "Cuivre et brun sous la pioche : des piocheurs qui ne s'arrêtent jamais de courir.",
-  'guide.valeCupPage.nationMirefen':
-    'Sarcelle et gris sous le héron : patients, hauts sur pattes, jamais pressés.',
-  'guide.valeCupPage.nationMoon':
-    'Violet et argent sous le croissant : des joueurs de nuit, légers sur leurs appuis.',
-  'guide.valeCupPage.nationOgre':
-    "Orange et terre d'ombre derrière le poing : l'épaule d'abord, et fiers de l'être.",
-  'guide.valeCupPage.nationThornpeak':
-    'Bleu glacier et blanc sous le pic : le pied sûr et la tête dure.',
-  'guide.valeCupPage.nationVale':
-    "Vert et or, sous la gerbe de blé : l'équipe locale, valets de ferme jusqu'à la moelle.",
-  'guide.valeCupPage.nationsBody':
-    "Chaque équipe joue sous une bannière. Le capitaine choisit la nation, et si les deux camps arborent la même, l'équipe visiteuse joue avec la palette inversée.",
-  'guide.valeCupPage.nationsHeading': 'Les huit nations de bannière',
-  'guide.valeCupPage.rewardsBody':
-    "Règles de trêve obligent : ni expérience ni butin. Un match décidé compte pour votre palmarès et le tableau des vainqueurs, et une victoire compte aussi pour les tâches de récompense du jour. Déserter un match vous met sur le banc, et le gardien du terrain s'en souvient.",
-  'guide.valeCupPage.rewardsHeading': 'Règles de trêve',
-  'guide.valeCupPage.rolesBody':
-    'Votre rôle décide de la panoplie que vous emportez sur le terrain. Tout le monde frappe le ballon ; le reste est affaire de tempérament. Dans les catégories à un et à deux joueurs par camp, chacun joue la panoplie polyvalente, si bien que le choix du rôle prend tout son sens à partir de trois joueurs par camp.',
-  'guide.valeCupPage.rolesHeading': 'Rôles sportifs',
-  'guide.valeCupPage.spectateBody':
-    "Un seul match se joue à la fois au stade, et chacun peut s'approcher et regarder depuis les tribunes.",
-  'hudChrome.keybinds.valecup': 'Coupe du Val',
   'hudChrome.mobile.dailyRewards': 'Boutique',
   'hudChrome.perf.labels.predLead': 'Avance de prédiction',
   'hudChrome.townFocus.budgetLabel': 'Points restants : {remaining} / {budget}',
@@ -3201,144 +3145,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.title': 'Priorités de la ville',
   'hudChrome.townFocus.townOnlyHint':
     'Le focus ne peut être modifié que lorsque vous êtes en ville.',
-  'hudChrome.vcup.awayNote':
-    "Si les deux camps arborent la même bannière, l'équipe visiteuse joue avec la palette inversée.",
-  'hudChrome.vcup.bannerCountdown': "Coup d'envoi dans {seconds}...",
-  'hudChrome.vcup.bannerDraw': 'Match nul au Pré de la Truie.',
-  'hudChrome.vcup.bannerEnd': 'Fin du match : {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerFound': 'La Coupe du Val appelle : {nationA} contre {nationB} !',
-  'hudChrome.vcup.bannerGoal': 'BUT ! {nation} marque !',
-  'hudChrome.vcup.bannerGolden': 'BUT EN OR : le prochain but gagne !',
-  'hudChrome.vcup.bannerKickoff': "COUP D'ENVOI !",
-  'hudChrome.vcup.bannerLoss': 'Défaite au Pré de la Truie.',
-  'hudChrome.vcup.bannerSave': 'ARRÊT DE {name} !',
-  'hudChrome.vcup.bannerWin': 'Victoire au Pré de la Truie !',
-  'hudChrome.vcup.bet.aria': 'Paris sur le match de la Coupe du Val',
-  'hudChrome.vcup.bet.back': 'Miser sur {team}',
-  'hudChrome.vcup.bet.closed': 'Paris clos',
-  'hudChrome.vcup.bet.closesIn': 'Les paris ferment dans {seconds}s',
-  'hudChrome.vcup.bet.collapse': 'Masquer les paris',
-  'hudChrome.vcup.bet.expand': 'Voir les paris et miser',
-  'hudChrome.vcup.bet.form': '{wins}V-{losses}D',
-  'hudChrome.vcup.bet.lostLog': 'Votre pari de la Coupe du Val est perdu : {amount}.',
-  'hudChrome.vcup.bet.mine': 'Votre pari : {amount} sur {team}',
-  'hudChrome.vcup.bet.none': "Vous n'avez pas encore de pari sur ce match.",
-  'hudChrome.vcup.bet.oddsLabel': 'Rapporte',
-  'hudChrome.vcup.bet.prize': 'Cagnotte {amount}',
-  'hudChrome.vcup.bet.record': 'Bilan de paris : {wins}V-{losses}D, {sign}{net}',
-  'hudChrome.vcup.bet.refundLog': 'Paris annulés, votre mise de {amount} vous a été rendue.',
-  'hudChrome.vcup.bet.splitAria': 'Part de la cagnotte misée sur chaque équipe',
-  'hudChrome.vcup.bet.title': 'Paris du match',
-  'hudChrome.vcup.bet.wonBanner': 'Votre pari est gagné !',
-  'hudChrome.vcup.bet.wonLog': 'Votre pari de la Coupe du Val est gagné : {amount} récupérés.',
-  'hudChrome.vcup.blockNation': "Choisissez d'abord une nation de bannière.",
-  'hudChrome.vcup.blockNotLeader': "Seul le chef du groupe peut inscrire l'équipe en file.",
-  'hudChrome.vcup.blockPartySize': 'Ce format demande un groupe plus petit.',
-  'hudChrome.vcup.boardEmpty':
-    "Aucun vainqueur enregistré pour l'instant. Le Seau de cuivre attend.",
-  'hudChrome.vcup.boardHeading': 'Tableau des vainqueurs',
-  'hudChrome.vcup.boardWins': '{count} victoires',
-  'hudChrome.vcup.bracketLabel': '{n}c{n}',
-  'hudChrome.vcup.bracketsAria': 'Format du match',
-  'hudChrome.vcup.briefing.bot': 'Bot',
-  'hudChrome.vcup.briefing.kitHeading': 'Votre panoplie',
-  'hudChrome.vcup.briefing.kitNote':
-    'Ces techniques remplacent vos capacités de classe le temps du match.',
-  'hudChrome.vcup.briefing.ready': 'Je suis prêt',
-  'hudChrome.vcup.briefing.readyAria': "Se déclarer prêt pour le coup d'envoi",
-  'hudChrome.vcup.briefing.readyCount': '{ready} sur {total} prêts',
-  'hudChrome.vcup.briefing.readyDone': 'Prêt',
-  'hudChrome.vcup.briefing.rosterHeading': 'La feuille de match',
-  'hudChrome.vcup.briefing.rule1':
-    "Envoyez le ballon dans le but adverse, d'une frappe ou d'une passe, pour marquer.",
-  'hudChrome.vcup.briefing.rule2':
-    'Le premier à 5 buts gagne, ou celui qui en a le plus au coup de sifflet final.',
-  'hudChrome.vcup.briefing.rule3':
-    'Un match à égalité à la fin du temps réglementaire se joue au but en or : le prochain but gagne.',
-  'hudChrome.vcup.briefing.rule4':
-    "Les tacles ne font que vous faire culbuter. Personne n'est blessé sous la trêve des moissons.",
-  'hudChrome.vcup.briefing.rule5':
-    "Chacun peut s'approcher et vous encourager depuis les tribunes.",
-  'hudChrome.vcup.briefing.rulesHeading': 'Comment jouer',
-  'hudChrome.vcup.briefing.subtitle': "Briefing d'avant-match",
-  'hudChrome.vcup.briefing.vs': 'contre',
-  'hudChrome.vcup.briefing.waiting': "En attente que l'autre camp se déclare prêt...",
-  'hudChrome.vcup.briefing.whistle': 'Le coup de sifflet retentit dans {seconds}s.',
-  'hudChrome.vcup.briefing.you': 'Vous',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.close': 'Fermer la fenêtre de la Coupe du Val',
-  'hudChrome.vcup.deserterNote':
-    "L'intendant s'en souvient. Vous pourrez reprendre la file dans {seconds} sec.",
-  'hudChrome.vcup.enterAsGuild': 'Entrer sous la bannière de {guild}',
-  'hudChrome.vcup.gossipOpen': 'Le livre des rencontres',
-  'hudChrome.vcup.gossipOpenAria': 'Ouvrir la fenêtre de la Coupe du Val',
-  'hudChrome.vcup.guildBoardEmpty':
-    "Aucune guilde n'est encore entrée sur le terrain. Hissez votre bannière !",
-  'hudChrome.vcup.guildBoardHeading': 'Bannières de guilde',
-  'hudChrome.vcup.guildBoardWl': '{wins} V, {losses} D',
-  'hudChrome.vcup.guildRecordLine':
-    'Palmarès de votre guilde : {wins} victoires, {losses} défaites.',
-  'hudChrome.vcup.inMatchNote': 'Votre équipe est sur le terrain. Jouez !',
-  'hudChrome.vcup.indicatorLive': 'Coupe du Val',
-  'hudChrome.vcup.indicatorOpen': 'Ouvrir la fenêtre de la Coupe du Val',
-  'hudChrome.vcup.indicatorQueued':
-    'File de la Coupe du Val : {bracket}, position {position} sur {count}',
-  'hudChrome.vcup.leaveQueue': 'Quitter la file',
-  'hudChrome.vcup.liveAria': 'Coupe du Val : {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': 'En ce moment au Pré de la Truie',
-  'hudChrome.vcup.logDraw': 'La rencontre au Pré de la Truie se termine sur un match nul.',
-  'hudChrome.vcup.logFound':
-    'Votre match de la Coupe du Val est prêt : {nationA} contre {nationB}.',
-  'hudChrome.vcup.logGoal': '{name} marque pour {nation} ! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': 'Vous perdez la rencontre au Pré de la Truie.',
-  'hudChrome.vcup.logQueued':
-    'Vous rejoignez la file de la Coupe du Val en {bracket} (position {position}).',
-  'hudChrome.vcup.logRoster': 'Votre camp : {allies}. Leur camp : {enemies}.',
-  'hudChrome.vcup.logSave': "{name} fait l'arrêt !",
-  'hudChrome.vcup.logUnqueued': 'Vous quittez la file de la Coupe du Val.',
-  'hudChrome.vcup.logWin': 'Vous gagnez la rencontre au Pré de la Truie.',
-  'hudChrome.vcup.mobileLabel': 'Coupe',
-  'hudChrome.vcup.nation.choir': 'Le Chœur pâle',
-  'hudChrome.vcup.nation.coliseum': 'Le Colisée cendré',
-  'hudChrome.vcup.nation.copperdig': 'La Fouille du cuivre',
-  'hudChrome.vcup.nation.mirefen': 'Le Mirefen',
-  'hudChrome.vcup.nation.moon': 'La Lune pâle',
-  'hudChrome.vcup.nation.ogre': 'Les Clans ogres',
-  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
-  'hudChrome.vcup.nation.vale': "Val d'Eastbrook",
-  'hudChrome.vcup.nationsHeading': 'Nation de bannière',
-  'hudChrome.vcup.noLive': 'Le terrain est calme. Aucun match en cours.',
-  'hudChrome.vcup.offlineNote':
-    "Le livre des rencontres est fermé. La Coupe du Val n'est pas disponible pour le moment.",
-  'hudChrome.vcup.phaseCountdown': "Coup d'envoi dans {seconds}",
-  'hudChrome.vcup.phaseGoal': 'BUT !',
-  'hudChrome.vcup.phaseGolden': 'BUT EN OR',
-  'hudChrome.vcup.phaseOver': 'FIN DU MATCH',
-  'hudChrome.vcup.practice': 'Entraînement contre des bots',
-  'hudChrome.vcup.practiceNote':
-    "Lance aussitôt un match privé contre des bots sur votre propre terrain d'entraînement.",
-  'hudChrome.vcup.practicingNow': "À l'entraînement ({count}) :",
-  'hudChrome.vcup.queue': 'Rejoindre la file',
-  'hudChrome.vcup.queueNote':
-    "Entrez en file depuis n'importe où ; le coup de sifflet vous appellera au Pré de la Truie.",
-  'hudChrome.vcup.queuedStatus': 'En file pour {bracket} : position {position} sur {count}.',
-  'hudChrome.vcup.recordLine':
-    'Votre palmarès : {wins} victoires, {losses} défaites, {draws} nuls.',
-  'hudChrome.vcup.role.allrounder.desc':
-    "Un peu de tout : frappe, botte et un coup d'épaule loyal.",
-  'hudChrome.vcup.role.allrounder.name': 'Polyvalent',
-  'hudChrome.vcup.role.keeper.desc':
-    'Garde la surface de but à coups de prises, de plongeons et de dégagements.',
-  'hudChrome.vcup.role.keeper.name': 'Gardien',
-  'hudChrome.vcup.role.striker.desc': 'Vit pour la longue botte et le crochet éclair.',
-  'hudChrome.vcup.role.striker.name': 'Attaquant',
-  'hudChrome.vcup.role.sweeper.desc': 'Bouscule les porteurs loin du ballon et dégage au loin.',
-  'hudChrome.vcup.role.sweeper.name': 'Libéro',
-  'hudChrome.vcup.rolesHeading': 'Rôle sportif',
-  'hudChrome.vcup.shootPower': 'PUISSANCE',
-  'hudChrome.vcup.title': 'La Coupe du Val',
-  'hudChrome.vcup.waitingCount': '{count} en attente',
-  'hudChrome.vcup.walkUp': 'Approchez-vous du Pré de la Truie pour regarder depuis les tribunes.',
   'hudChrome.archetypeTitle.label': 'Titre',
   'hudChrome.archetypeTitle.none': 'Aucun',
   'entities.itemSets.crownforged.bonus4':
@@ -3995,7 +3801,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': "Sac d'œufs d'araignée",
   'entities.mobs.sump_troll_devourer.name': 'Dévoreur troll du cloaque',
   'entities.mobs.tolling_bell.name': 'Cloche du glas',
-  'entities.mobs.vale_cup_ball.name': 'Ballon de sanglier',
   'entities.npcs.brother_halven_marsh.greeting':
     "La piste menait au nord. Un autre reliquaire, un autre rite. Choisis ton palier, et je tiendrai la corde jusqu'à ton retour.",
   'entities.npcs.brother_halven_marsh.name': 'Frère Halven',
@@ -11245,7 +11050,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petBar':
     'Barre du familier : Attaquer, Arrêter, Provoquer, Défensif, Agressif (avec un familier de chasseur ou de démoniste sorti)',
   'guide.controls.runForward': 'Avancer',
-  'guide.controls.valeCup': 'Coupe du Val',
   'guide.dungeonsPage.heroicBody':
     "Chaque donjon à cinq joueurs, et le raid lui-même, possède une version héroïque qui vous attend au-delà du plafond de niveau. Les mêmes salles, refaçonnées pour un groupe de fin de partie bien équipé : tout frappe plus fort, plus rien ne se distance à la course, et les boss ignorent complètement étourdissements et entraves. Dépassez d'abord les versions normales ; l'héroïque suppose que c'est fait.",
   'guide.dungeonsPage.heroicHowBody': "Choisissez la difficulté avant que votre groupe ne réserve l'instance : tapez /dungeon heroic, ou choisissez Définir la difficulté du donjon dans le menu de votre propre portrait. Seul, vous la réglez vous-même ; en groupe, seul le chef le peut, et le choix vaut pour tout le monde et se verrouille à la porte, si bien qu'un parcours reste ce pour quoi il a été réservé.",
@@ -11341,12 +11145,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "La Hâte est une caractéristique qui accélère tout ce que vous faites : coups de mêlée, tirs à distance et incantations gagnent tous en vitesse de concert. Elle provient de l'équipement, notamment des bonus de set d'armure, tandis que quelques capacités accordent une brève bouffée de coups plus rapides. Votre feuille l'affiche sous le nom de Score de hâte.",
   'guide.stats.hasteTitle': 'Hâte',
   'guide.talentsPage.choiceNote': "Chaque rangée est un carrefour : elle propose trois options et vous vous engagez sur l'une d'elles. Votre prochaine réinitialisation rouvre chacun de ces choix.",
-  'guide.valeCupPage.bettingBody':
-    "Les spectateurs au Pré de la Truie peuvent miser sur un camp pendant qu'un match se forme : les mises sont mises en commun, et au coup de sifflet final les gagnants se partagent la cagnotte des perdants au prorata de ce qu'ils ont misé. Un match nul, ou une surprise que personne n'avait soutenue, rembourse chaque pièce. Les joueurs alignés dans le match ne peuvent pas parier dessus, et la rambarde conserve votre bilan à vie de victoires, de défaites et de gains nets.",
-  'guide.valeCupPage.bettingHeading': 'Un petit pari à la rambarde',
-  'guide.valeCupPage.practiceBody':
-    "La fenêtre de la Coupe du Val propose aussi l'entraînement : une copie privée du terrain où des bots remplissent les deux camps et où rien ne compte pour votre palmarès. Il vous manque un joueur ou deux pour la vraie chose ? Après une courte attente, des bots complètent les équipes, et tout match avec des bots sur le terrain est amical, jamais classé. Et quand le Pré de la Truie reste inoccupé, les bots donnent une exhibition que vous pouvez regarder, et sur laquelle parier, depuis les gradins ; dès que de vrais joueurs se déclarent prêts, l'exhibition libère le terrain et chaque mise est rendue.",
-  'guide.valeCupPage.practiceHeading': "Matchs d'entraînement et terrain au repos",
   'guide.worldPage.worldBossBody':
     "Tout là-haut sur Thornpeak, la tempête au-dessus de Stormcrag prend parfois forme. Thunzharr, le Pic éveillé s'y dresse à un rythme régulier, un élémentaire de la puissance d'un raid affronté en monde ouvert par quiconque répond à l'appel, et il devient d'autant plus redoutable que les prétendants se dressent nombreux contre lui. Chacun de ceux qui rejoignent le combat gagne son propre tirage de son butin, honoré selon les règles de verrouillage de raid, et sa chute s'attarde assez longtemps pour que les tombés reviennent en courant réclamer leur dû. Rassemblez plus d'épées que vous ne le pensez nécessaire.",
   'guide.worldPage.worldBossTitle': "Quand le pic s'éveille : le boss de monde",

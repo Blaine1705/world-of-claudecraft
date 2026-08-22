@@ -271,7 +271,6 @@ function controllerFor(
     talentSpec: () => spec,
     knownAbilityIds: () => [...known],
     hasAura: () => false,
-    isInSportMatch: () => false,
     showAttackButton: () => true,
   });
 }

@@ -1081,12 +1081,18 @@ describe('hunter pets', () => {
     sim.player.targetId = null;
     sim.player.autoAttack = false;
     rogue.inCombat = false;
-    teleport(sim, pet, 0, 0);
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the forest_wolf camp moved to
+    // (-10, 6) r28.5, covering the old (0, 0) anchor, so an aggressive-stance
+    // pet pick grabbed a wild wolf instead of exercising the stealth boundary.
+    // Anchor at (200, 0) — this file's "far away first" offset — where the
+    // nearest wild mob sits ~52yd out, beyond PET_AGGRESSIVE_RANGE.
+    teleport(sim, pet, 200, 0);
     sim.castAbility('stealth', rogue.id);
     expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
 
     const radius = stealthDetectionRadius(pet, rogue, PET_AGGRESSIVE_RANGE);
-    teleport(sim, rogue, radius + 0.25, 0);
+    teleport(sim, rogue, 200 + radius + 0.25, 0);
     sim.ctx.grid.refresh(sim.entities.values());
     const outsideHp = rogue.hp;
 
@@ -1094,7 +1100,7 @@ describe('hunter pets', () => {
     hit(sim, pet, rogue, 100);
     expect(rogue.hp).toBe(outsideHp);
 
-    teleport(sim, rogue, radius - 0.25, 0);
+    teleport(sim, rogue, 200 + radius - 0.25, 0);
     sim.ctx.grid.refresh(sim.entities.values());
 
     expect(petPickTarget(sim.ctx, pet, sim.player)?.id).toBe(rogue.id);

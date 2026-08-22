@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 233,
+  "portraitCount": 232,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -7525,40 +7525,6 @@
         "path": "public/ui/mobs/vale_bandit.webp",
         "bytes": 2200,
         "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
-      }
-    },
-    {
-      "id": "vale_cup_ball",
-      "family": "beast",
-      "finderEncounter": false,
-      "visualKey": "mob_wolf",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/wolf_basic.glb",
-          "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
-        },
-        "idle": "Idle",
-        "height": 1.6,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#f4f4f4",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "dd1d16f350606d3b9ddb4bf96c23c842b13aee182107232647f43d801bac859e",
-      "output": {
-        "path": "public/ui/mobs/vale_cup_ball.webp",
-        "bytes": 1984,
-        "sha256": "213697db841ff257a90bbfd29f44c208a3bc7a77f9f04eb2ea612810b9f73f57"
       }
     },
     {

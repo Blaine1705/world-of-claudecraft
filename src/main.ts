@@ -1616,11 +1616,6 @@ async function startGame(
     entryDiagnostics.markStable('[entry-guard] world entry stable; runtime probe armed');
   }, ENTRY_PROBE_STABLE_MS);
 
-  // The Vale Cup practice-vs-bots button (the window calls world.vcupPracticeStart
-  // through IWorld). Private instanced practice works online AND offline, so the
-  // button is always available.
-  hud.setVcupPracticeAvailable(true);
-
   const chatInput = $('#chat-input') as unknown as HTMLTextAreaElement;
   const clickMoveMarker = $('#click-move-marker') as HTMLDivElement;
   // Grow the chat bar to fit what it is displaying (typed text, or the
@@ -1959,9 +1954,6 @@ async function startGame(
           case 'dungeonFinder':
             hud.toggleDungeonFinder();
             break;
-          case 'valecup':
-            hud.toggleValeCup();
-            break;
           case 'bgFlag':
             bgFlagKey();
             break;
@@ -2073,7 +2065,6 @@ async function startGame(
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onDungeonFinder: () => hud.toggleDungeonFinder(),
-    onValeCup: () => hud.toggleValeCup(),
     onQuestLog: () => hud.toggleQuestLog(),
     onCharacter: () => {
       hud.toggleChar();
@@ -2245,9 +2236,6 @@ async function startGame(
         break;
       case 'arena':
         hud.toggleArena();
-        break;
-      case 'valecup':
-        hud.toggleValeCup();
         break;
       case 'bgFlag':
         bgFlagKey();
@@ -2893,7 +2881,7 @@ async function startGame(
     activateProfile: (target) =>
       activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
     resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
-    buildRenderer: (target, recycled) => {
+    buildRenderer: (_target, recycled) => {
       const next = new Renderer(world, recycled.canvas, nameplates, {
         context: recycled.context,
         initializeGfx: false,
@@ -5195,7 +5183,6 @@ async function startOffline(
         // The offline world runs the ranked rift portal scheduler like the live
         // server (custom editor play-test maps keep it off: their zones differ).
         riftPortals: world === undefined,
-        valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
         // Match the live server's proven-safe idle-AI interest throttle. Ordinary
         // entity rigs are gone by 96 yd and mob aggro caps at 20 yd, so this removes
         // full-world wilderness AI from the browser's 20 Hz tick without changing

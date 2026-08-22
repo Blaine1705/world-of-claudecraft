@@ -1025,7 +1025,6 @@ export const fr_CA: EnTranslations = {
       "targetFriendlyNext": "Changer de cible alliée",
       "targetPrev": "Revenir à la cible précédente",
       "discord": "Discord",
-      "valecup": "Coupe du Val",
       "bgFlag": "Champ de bataille : drapeau",
       "sheathe": "Ranger/Dégainer l'arme",
       "dive": "Nager vers le bas",
@@ -1191,146 +1190,6 @@ export const fr_CA: EnTranslations = {
         "azureKeep": "Donjon azur",
         "ruinCourtyard": "La Cour en ruine",
         "graveyard": "Cimetière"
-      }
-    },
-    "vcup": {
-      "title": "La Coupe du Val",
-      "shootPower": "PUISSANCE",
-      "close": "Fermer la fenêtre de la Coupe du Val",
-      "offlineNote": "Le livre des rencontres est fermé. La Coupe du Val n'est pas disponible pour le moment.",
-      "recordLine": "Votre palmarès : {wins} victoires, {losses} défaites, {draws} nuls.",
-      "bracketsAria": "Format du match",
-      "bracketLabel": "{n}c{n}",
-      "waitingCount": "{count} en attente",
-      "nationsHeading": "Nation de bannière",
-      "nation": {
-        "vale": "Val d'Eastbrook",
-        "mirefen": "Le Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "Le Colisée cendré",
-        "choir": "Le Chœur pâle",
-        "ogre": "Les Clans ogres",
-        "moon": "La Lune pâle",
-        "copperdig": "La Fouille du cuivre"
-      },
-      "awayNote": "Si les deux camps arborent la même bannière, l'équipe visiteuse joue avec la palette inversée.",
-      "rolesHeading": "Rôle sportif",
-      "rolesSmallBracketNote": "Dans les formats 1c1 et 2c2, chaque combattant joue la panoplie Polyvalent. Les hauts faits qui exigent le format 3c3 ou plus ne peuvent pas s'obtenir ici.",
-      "role": {
-        "allrounder": {
-          "name": "Polyvalent",
-          "desc": "Un peu de tout : frappe, botte et un coup d'épaule loyal."
-        },
-        "striker": {
-          "name": "Attaquant",
-          "desc": "Vit pour la longue botte et le crochet éclair."
-        },
-        "sweeper": {
-          "name": "Libéro",
-          "desc": "Bouscule les porteurs loin du ballon et dégage au loin."
-        },
-        "keeper": {
-          "name": "Gardien",
-          "desc": "Garde la surface de but à coups de prises, de plongeons et de dégagements."
-        }
-      },
-      "queue": "Rejoindre la file",
-      "leaveQueue": "Quitter la file",
-      "queueNote": "Entrez en file depuis n'importe où ; le coup de sifflet vous appellera au Pré de la Truie.",
-      "queuedStatus": "En file pour {bracket} : position {position} sur {count}.",
-      "blockNation": "Choisissez d'abord une nation de bannière.",
-      "blockPartySize": "Ce format demande un groupe plus petit.",
-      "blockNotLeader": "Seul le chef du groupe peut inscrire l'équipe en file.",
-      "inMatchNote": "Votre équipe est sur le terrain. Jouez !",
-      "deserterNote": "L'intendant s'en souvient. Vous pourrez reprendre la file dans {seconds} sec.",
-      "liveHeading": "En ce moment au Pré de la Truie",
-      "liveAria": "Coupe du Val : {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Approchez-vous du Pré de la Truie pour regarder depuis les tribunes.",
-      "noLive": "Le terrain est calme. Aucun match en cours.",
-      "boardHeading": "Tableau des vainqueurs",
-      "boardEmpty": "Aucun vainqueur enregistré pour l'instant. Le Seau de cuivre attend.",
-      "boardWins": "{count} victoires",
-      "enterAsGuild": "Entrer sous la bannière de {guild}",
-      "guildRecordLine": "Palmarès de votre guilde : {wins} victoires, {losses} défaites.",
-      "guildBoardHeading": "Bannières de guilde",
-      "guildBoardEmpty": "Aucune guilde n'est encore entrée sur le terrain. Hissez votre bannière !",
-      "guildBoardWl": "{wins} V, {losses} D",
-      "practice": "Entraînement contre des bots",
-      "practiceNote": "Lance aussitôt un match privé contre des bots sur votre propre terrain d'entraînement.",
-      "practiceUnratedNote": "Les rencontres d'entraînement ne sont pas classées : le classement et la progression du Livre des hauts faits ne comptent pas.",
-      "practicingNow": "À l'entraînement ({count}) :",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "File de la Coupe du Val : {bracket}, position {position} sur {count}",
-      "indicatorLive": "Coupe du Val",
-      "indicatorOpen": "Ouvrir la fenêtre de la Coupe du Val",
-      "phaseCountdown": "Coup d'envoi dans {seconds}",
-      "phaseGoal": "BUT !",
-      "phaseGolden": "BUT EN OR",
-      "phaseOver": "FIN DU MATCH",
-      "bannerFound": "La Coupe du Val appelle : {nationA} contre {nationB} !",
-      "bannerCountdown": "Coup d'envoi dans {seconds}...",
-      "bannerKickoff": "COUP D'ENVOI !",
-      "bannerGoal": "BUT ! {nation} marque !",
-      "bannerSave": "ARRÊT DE {name} !",
-      "bannerGolden": "BUT EN OR : le prochain but gagne !",
-      "bannerEnd": "Fin du match : {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Victoire au Pré de la Truie !",
-      "bannerDraw": "Match nul au Pré de la Truie.",
-      "bannerLoss": "Défaite au Pré de la Truie.",
-      "logQueued": "Vous rejoignez la file de la Coupe du Val en {bracket} (position {position}).",
-      "logUnqueued": "Vous quittez la file de la Coupe du Val.",
-      "logFound": "Votre match de la Coupe du Val est prêt : {nationA} contre {nationB}.",
-      "logRoster": "Votre camp : {allies}. Leur camp : {enemies}.",
-      "logGoal": "{name} marque pour {nation} ! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} fait l'arrêt !",
-      "logWin": "Vous gagnez la rencontre au Pré de la Truie.",
-      "logDraw": "La rencontre au Pré de la Truie se termine sur un match nul.",
-      "logLoss": "Vous perdez la rencontre au Pré de la Truie.",
-      "gossipOpen": "Le livre des rencontres",
-      "gossipOpenAria": "Ouvrir la fenêtre de la Coupe du Val",
-      "mobileLabel": "Coupe",
-      "briefing": {
-        "subtitle": "Briefing d'avant-match",
-        "vs": "contre",
-        "rulesHeading": "Comment jouer",
-        "rule1": "Envoyez le ballon dans le but adverse, d'une frappe ou d'une passe, pour marquer.",
-        "rule2": "Le premier à 5 buts gagne, ou celui qui en a le plus au coup de sifflet final.",
-        "rule3": "Un match à égalité à la fin du temps réglementaire se joue au but en or : le prochain but gagne.",
-        "rule4": "Les tacles ne font que vous faire culbuter. Personne n'est blessé sous la trêve des moissons.",
-        "rule5": "Chacun peut s'approcher et vous encourager depuis les tribunes.",
-        "kitHeading": "Votre panoplie",
-        "kitNote": "Ces techniques remplacent vos capacités de classe le temps du match.",
-        "unratedNote": "Des bots sont sur le terrain, cette rencontre n'est donc pas classée : le classement ne bouge pas, et les hauts faits de buts, d'arrêts et de cages inviolées ne comptent pas.",
-        "practiceUnratedNote": "Cette rencontre est un entraînement, elle n'est donc pas classée : le classement ne bouge pas, et la progression du Livre des hauts faits ne compte pas.",
-        "rosterHeading": "La feuille de match",
-        "you": "Vous",
-        "bot": "Bot",
-        "ready": "Je suis prêt",
-        "readyDone": "Prêt",
-        "readyAria": "Se déclarer prêt pour le coup d'envoi",
-        "waiting": "En attente que l'autre camp se déclare prêt...",
-        "whistle": "Le coup de sifflet retentit dans {seconds}s.",
-        "readyCount": "{ready} sur {total} prêts"
-      },
-      "bet": {
-        "title": "Paris du match",
-        "aria": "Paris sur le match de la Coupe du Val",
-        "closesIn": "Les paris ferment dans {seconds}s",
-        "closed": "Paris clos",
-        "prize": "Cagnotte {amount}",
-        "splitAria": "Part de la cagnotte misée sur chaque équipe",
-        "expand": "Voir les paris et miser",
-        "collapse": "Masquer les paris",
-        "oddsLabel": "Rapporte",
-        "back": "Miser sur {team}",
-        "form": "{wins}V-{losses}D",
-        "mine": "Votre pari : {amount} sur {team}",
-        "none": "Vous n'avez pas encore de pari sur ce match.",
-        "record": "Bilan de paris : {wins}V-{losses}D, {sign}{net}",
-        "wonBanner": "Votre pari est gagné !",
-        "wonLog": "Votre pari de la Coupe du Val est gagné : {amount} récupérés.",
-        "lostLog": "Votre pari de la Coupe du Val est perdu : {amount}.",
-        "refundLog": "Paris annulés, votre mise de {amount} vous a été rendue."
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const fr_CA: EnTranslations = {
       "combat": "Combat",
       "talents": "Talents",
       "arena": "Arène et JcJ",
-      "valeCup": "Coupe du Val",
       "thornhollow": "Champs de Thornhollow",
       "deeds": "Livre des hauts faits",
       "reliquary": "Le Reliquaire",
@@ -4210,7 +4068,6 @@ export const fr_CA: EnTranslations = {
       "reliquary": "Le Reliquaire",
       "sheathe": "Ranger/Dégainer l'arme",
       "crafting": "Artisanat",
-      "valeCup": "Coupe du Val",
       "mount": "Monter / Descendre",
       "calendar": "Calendrier des événements",
       "dungeonFinder": "Chercheur de donjons",
@@ -5287,36 +5144,6 @@ export const fr_CA: EnTranslations = {
       "ladderBody": "Chaque match fait bouger un classement de champ de bataille persistant, propre au personnage, victoire ou défaite, et le tableau de tous les temps range les champions du royaume.",
       "rewardsHeading": "Ce que rapporte un match",
       "rewardsBody": "Chaque match terminé rapporte de l'honneur : davantage pour une victoire, une compensation pour une défaite ou un match nul, plus un petit montant pour chaque coup fatal que vous portez et chaque coup fatal auquel vous prêtez main-forte, si bien que se battre loin des drapeaux reste toujours utile. Votre première victoire de la journée rapporte un bonus supplémentaire, et le panneau vous indique tant que ce bonus vous attend encore. Cette journée appartient à l'honneur : elle tourne sur sa propre horloge plutôt que sur la réinitialisation des instances du royaume. Affronter la même équipe encore et encore rapporte moins pour le match lui-même après la première fois, se stabilisant vite à un plancher plutôt que de tomber jusqu'à rien, et un match abandonné ne rapporte absolument rien. Dépensez ce que vous gagnez auprès de l'un ou l'autre quartier-maître de Guerre."
-    },
-    "valeCupPage": {
-      "heading": "La Coupe du Val",
-      "intro": "La balle au sanglier au Pré de la Truie : choisissez une bannière, choisissez un rôle, et envoyez une peau de sanglier empaillée derrière un gardien pour remporter le Seau de cuivre. Pas de sang, pas de butin, juste la clameur des tribunes.",
-      "loreHeading": "La balle au sanglier et la trêve des moissons",
-      "loreOldSow": "Bien avant que les morts ne s'éveillent, les valets de ferme d'Eastbrook jouaient à la balle au sanglier sur les chaumes après la moisson : deux bandes de joueurs, une peau de sanglier bourrée de paille, et deux portails de chariot traînés aux deux bouts du pré. Le premier ballon, la Vieille Truie, pend, bronzé, au-dessus de l'âtre de la taverne.",
-      "loreTruce": "Quand le Colisée cendré se mit à organiser des jeux de guerre, le maréchal Redbrook répondit par quelque chose de plus doux : une trêve des moissons permanente sur le vieux pré. Les portails de chariot devinrent des poteaux de but, le pré gagna des murs, des tribunes et un nom, le Pré de la Truie, et le prix fut toujours le même seau à lait cabossé dans lequel buvaient les vainqueurs : le Seau de cuivre.",
-      "howHeading": "Comment jouer",
-      "howQueue": "Mettez-vous en file depuis n'importe où via la fenêtre de la Coupe du Val, ou parlez à l'intendant Bram à la porte du Pré de la Truie. Choisissez un format, du un contre un au cinq contre cinq, une nation de bannière et un rôle sportif ; entrez en file en solo ou avec votre groupe.",
-      "howMatch": "Au coup d'envoi, votre panoplie de classe est remplacée par une panoplie sportive, puis restaurée à l'identique après le match. Les frappes visent le réticule au sol, le ballon rebondit sur les bandes, et dribbler consiste simplement à courir avec le ballon. Marquez plus de buts que l'autre camp avant la fin du temps réglementaire ; en cas d'égalité, on joue le but en or.",
-      "howTruce": "Personne ne saigne au Pré de la Truie : les tacles font culbuter, rien ne blesse, et les familiers regardent le match depuis le banc.",
-      "spectateBody": "Un seul match se joue à la fois au stade, et chacun peut s'approcher et regarder depuis les tribunes.",
-      "bettingHeading": "Un petit pari à la rambarde",
-      "bettingBody": "Les spectateurs au Pré de la Truie peuvent miser sur un camp pendant qu'un match se forme : les mises sont mises en commun, et au coup de sifflet final les gagnants se partagent la cagnotte des perdants au prorata de ce qu'ils ont misé. Un match nul, ou une surprise que personne n'avait soutenue, rembourse chaque pièce. Les joueurs alignés dans le match ne peuvent pas parier dessus, et la rambarde conserve votre bilan à vie de victoires, de défaites et de gains nets.",
-      "practiceHeading": "Matchs d'entraînement et terrain au repos",
-      "practiceBody": "La fenêtre de la Coupe du Val propose aussi l'entraînement : une copie privée du terrain où des bots remplissent les deux camps et où rien ne compte pour votre palmarès. Il vous manque un joueur ou deux pour la vraie chose ? Après une courte attente, des bots complètent les équipes, et tout match avec des bots sur le terrain est amical, jamais classé. Et quand le Pré de la Truie reste inoccupé, les bots donnent une exhibition que vous pouvez regarder, et sur laquelle parier, depuis les gradins ; dès que de vrais joueurs se déclarent prêts, l'exhibition libère le terrain et chaque mise est rendue.",
-      "nationsHeading": "Les huit nations de bannière",
-      "nationsBody": "Chaque équipe joue sous une bannière. Le capitaine choisit la nation, et si les deux camps arborent la même, l'équipe visiteuse joue avec la palette inversée.",
-      "nationVale": "Vert et or, sous la gerbe de blé : l'équipe locale, valets de ferme jusqu'à la moelle.",
-      "nationMirefen": "Sarcelle et gris sous le héron : patients, hauts sur pattes, jamais pressés.",
-      "nationThornpeak": "Bleu glacier et blanc sous le pic : le pied sûr et la tête dure.",
-      "nationColiseum": "Rouge et noir aux épées croisées : ils jouent comme si c'était encore un jeu de guerre.",
-      "nationChoir": "Bleu pâle et argent sous la cloche : inquiétants, précis et très silencieux.",
-      "nationOgre": "Orange et terre d'ombre derrière le poing : l'épaule d'abord, et fiers de l'être.",
-      "nationMoon": "Violet et argent sous le croissant : des joueurs de nuit, légers sur leurs appuis.",
-      "nationCopperdig": "Cuivre et brun sous la pioche : des piocheurs qui ne s'arrêtent jamais de courir.",
-      "rolesHeading": "Rôles sportifs",
-      "rolesBody": "Votre rôle décide de la panoplie que vous emportez sur le terrain. Tout le monde frappe le ballon ; le reste est affaire de tempérament. Dans les catégories à un et à deux joueurs par camp, chacun joue la panoplie polyvalente, si bien que le choix du rôle prend tout son sens à partir de trois joueurs par camp.",
-      "rewardsHeading": "Règles de trêve",
-      "rewardsBody": "Règles de trêve obligent : ni expérience ni butin. Un match décidé compte pour votre palmarès et le tableau des vainqueurs, et une victoire compte aussi pour les tâches de récompense du jour. Déserter un match vous met sur le banc, et le gardien du terrain s'en souvient."
     },
     "deedsPage": {
       "intro": "Le Livre des hauts faits est l'endroit où le monde tient le compte de tout ce que vous avez accompli, de vos premiers pas hors de la vallée de départ aux combats les plus rudes que le royaume puisse offrir. Obtenez des hauts faits au fil du jeu, portez les titres qu'ils confèrent et regardez votre Renommée grimper.",
@@ -13439,9 +13266,6 @@ export const fr_CA: EnTranslations = {
       "tolling_bell": {
         "name": "Cloche du glas"
       },
-      "vale_cup_ball": {
-        "name": "Ballon de sanglier"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, le Pic Éveillé"
       },
@@ -14038,11 +13862,6 @@ export const fr_CA: EnTranslations = {
         "name": "Le Veilleur pâle",
         "title": "Gardien des morts",
         "greeting": "Repose-toi maintenant, esprit. Je peux te rendre à ton corps, mais la traversée du retour te laisse affaibli."
-      },
-      "groundskeeper_bram": {
-        "name": "Intendant Bram",
-        "title": "Gardien du Pré de la Truie",
-        "greeting": "La trêve tient au Pré de la Truie, {className} : des bottes et des épaules, rien de plus. Envie de jouer pour le Seau de cuivre ?"
       },
       "chronicler_saul": {
         "name": "Saul le Chroniqueur",
@@ -16492,6 +16311,9 @@ export const fr_CA: EnTranslations = {
           },
           "11": {
             "label": "La Chaussée du Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

@@ -124,10 +124,6 @@ describe('registry', () => {
     });
     // The Vale Cup window is a rebindable Interface toggle (default T; J and
     // G are taken by targetFriendlyNext and the arena on this branch).
-    const valecup = BIND_ACTIONS.find((a) => a.id === 'valecup');
-    expect(valecup?.category).toBe('Interface');
-    expect(valecup?.kind).toBe('edge');
-    expect(valecup?.defaults).toEqual(['KeyY']);
     // The Book of Deeds is a rebindable Interface toggle on the shifted layer of
     // KeyZ, like Damage Meters does on H and the Shift+digit secondary bar.
     const deeds = BIND_ACTIONS.find((a) => a.id === 'deeds');
@@ -172,7 +168,7 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
     expect(kb.actionForCode('KeyU')).toBe('discord');
     expect(kb.actionForCode('KeyT')).toBe('crafting');
-    expect(kb.actionForCode('KeyY')).toBe('valecup');
+    expect(kb.actionForCode('KeyY')).toBe(null);
     // Bare Z sheathes; the Book of Deeds ships on the shifted layer of the same key.
     expect(kb.actionForCode('KeyZ')).toBe('sheathe');
     expect(kb.actionForCode('Shift+KeyZ')).toBe('deeds');

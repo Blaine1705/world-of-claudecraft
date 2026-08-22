@@ -231,20 +231,6 @@ export function isDungeonDifficulty(value: unknown): value is DungeonDifficulty 
   return value === 'normal' || value === 'heroic';
 }
 
-// The Vale Cup boarball minigame (docs/prd/vale-cup.md): transient match
-// sides pick a banner nation and each fighter picks a sport role.
-export type VcNationId =
-  | 'vale'
-  | 'mirefen'
-  | 'thornpeak'
-  | 'coliseum'
-  | 'choir'
-  | 'ogre'
-  | 'moon'
-  | 'copperdig';
-export type SportRole = 'allrounder' | 'striker' | 'sweeper' | 'keeper';
-export type VcBracket = 1 | 2 | 3 | 4 | 5;
-
 export interface ArenaStanding {
   rating: number;
   wins: number;
@@ -2926,20 +2912,6 @@ export type AbilityEffect =
       dazeMult: number;
       dazeDuration: number;
     }
-  // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
-  // match ball toward the caster's castAim (power = ground speed yd/s, loft =
-  // initial vertical speed); sportDash is a targetless directional lunge along
-  // the aim direction (catchBall lets a keeper's Dive catch a crossing ball);
-  // sportShove bumps the target back via the knockback walker. ballPass rolls a
-  // firm auto-paced ground pass to the caster's targeted teammate (else the best
-  // teammate toward the aim), leading their run. All no-damage.
-  | { type: 'ballKick'; power: number; loft: number }
-  | { type: 'ballPass'; power: number; loft: number }
-  // ballShoot fires the ball at the enemy goal; power (ground speed) and loft
-  // both scale with the caster's charge, so a max-power shot sails OVER the bar.
-  | { type: 'ballShoot'; power: number; loft: number }
-  | { type: 'sportDash'; distance: number; catchBall?: boolean }
-  | { type: 'sportShove'; distance: number }
   | {
       type: 'consumeAura';
       auraIds?: string[];
@@ -3535,7 +3507,11 @@ export interface ZoneDef {
   // it, so it must never change once shipped); label is display-only and may be
   // re-worded freely. Optional because user-authored custom maps (MapDocContent
   // reuses ZoneDef) omit it; every static ZONES poi carries one (content-guarded).
-  pois: { x: number; z: number; label: string; id?: string }[];
+  /** Named places. `id` is a STABLE key: deed visit marks reference it, so a
+   *  shipped id is never renamed or removed. `hideOnMap` drops the label from
+   *  the world map while keeping the record (and its marks) alive, for a place
+   *  that no longer reads as a landmark. */
+  pois: { x: number; z: number; label: string; id?: string; hideOnMap?: boolean }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
   // The zone's southern border ridge has NO road pass and is raised past the
@@ -5587,57 +5563,6 @@ export type SimEvent = { pid?: number } & (
       duration: number;
     }
   // The Vale Cup (docs/prd/vale-cup.md). Queue lifecycle events carry pid
-  // (personal). Match-theatre events (kickoff/goal/save/golden/end) carry a
-  // WORLD x/z anchor at the pitch instead, so walk-up spectators in the
-  // Sowfield stands see the banners and fireworks too (routeEvents delivers
-  // anchored pid-less events to everyone within 90yd).
-  | { type: 'vcupQueued'; bracket: VcBracket; position: number }
-  | { type: 'vcupUnqueued' }
-  | {
-      type: 'vcupFound';
-      bracket: VcBracket;
-      nationA: VcNationId;
-      nationB: VcNationId;
-      team: 'A' | 'B';
-      allies: ArenaCombatant[];
-      enemies: ArenaCombatant[];
-    }
-  | { type: 'vcupCountdown'; seconds: number; x: number; z: number }
-  | { type: 'vcupKickoff'; x: number; z: number }
-  | {
-      type: 'vcupGoal';
-      scorerName: string;
-      team: 'A' | 'B';
-      scoreA: number;
-      scoreB: number;
-      nationA: VcNationId;
-      nationB: VcNationId;
-      x: number;
-      z: number;
-    }
-  | { type: 'vcupSave'; keeperName: string; x: number; z: number }
-  // A spectator's parimutuel wager settled: pid-scoped so it refreshes their purse
-  // and toasts the outcome. payout is the total copper credited (0 on a loss).
-  | {
-      type: 'vcupBetSettled';
-      pid: number;
-      outcome: 'won' | 'lost' | 'refunded';
-      stake: number;
-      payout: number;
-    }
-  | { type: 'vcupGolden'; x: number; z: number }
-  | {
-      type: 'vcupEnd';
-      scoreA: number;
-      scoreB: number;
-      nationA: VcNationId;
-      nationB: VcNationId;
-      winner: 'A' | 'B' | null;
-      x: number;
-      z: number;
-    }
-  // personal outcome line for each fighter (rides beside the anchored vcupEnd)
-  | { type: 'vcupResult'; won: boolean; draw: boolean }
   // Card Duel minigame (src/sim/social/card_duel.ts). Personal (pid), text-free
   // on purpose (the client picks its own audio/copy off the structured
   // fields, same as gatherResult/craftResult above).
@@ -6872,7 +6797,6 @@ export interface SimConfig {
   // of no queue activity, so a walk-up spectator always has a game to watch (and
   // bet on). Server + offline game enable it; tests/goldens leave it off so the
   // idle timer never perturbs a deterministic scenario.
-  valeCupShowcase?: boolean;
 }
 
 export function emptyMoveInput(): MoveInput {

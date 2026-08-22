@@ -326,17 +326,6 @@ export const VOICE_PROMPTS = [
       'forgive a wandering hand, so I will tell you plain before you swear anything.',
   },
   {
-    npcId: 'groundskeeper_bram',
-    name: 'Groundskeeper Bram',
-    voiceDescription:
-      'Keeper of the village sporting field, deep field green: a broad, weather-cured country ' +
-      'baritone, gruff and grinning, the tone of a man who referees a rough game and enjoys it. ' +
-      'Rolling rural vowels, easy laugh, firm on the rules. Age 40s to 50s. Male.',
-    sampleText:
-      'The truce holds at the Sowfield: boots and shoulders only. Care to play for the Copper ' +
-      'Pail? Mind the rules and mind your elbows, and we will get along famously.',
-  },
-  {
     npcId: 'tinker_gizzel',
     name: 'Tinker Gizzel',
     voiceDescription:

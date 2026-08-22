@@ -1025,7 +1025,6 @@ export const de_DE: EnTranslations = {
       "targetFriendlyNext": "Freundliches Ziel wechseln",
       "targetPrev": "Ziel rückwärts wechseln",
       "discord": "Discord",
-      "valecup": "Talpokal",
       "bgFlag": "Schlachtfeld-Flaggenaktion",
       "sheathe": "Waffe einstecken/ziehen",
       "dive": "Nach unten schwimmen",
@@ -1191,146 +1190,6 @@ export const de_DE: EnTranslations = {
         "azureKeep": "Azurfeste",
         "ruinCourtyard": "Der Ruinenhof",
         "graveyard": "Friedhof"
-      }
-    },
-    "vcup": {
-      "title": "Der Talpokal",
-      "shootPower": "KRAFT",
-      "close": "Das Talpokal-Fenster schließen",
-      "offlineNote": "Das Spielplanbuch ist geschlossen. Der Talpokal ist gerade nicht verfügbar.",
-      "recordLine": "Deine Bilanz: {wins} Siege, {losses} Niederlagen, {draws} Unentschieden.",
-      "bracketsAria": "Spielstaffel",
-      "bracketLabel": "{n}v{n}",
-      "waitingCount": "Wartende: {count}",
-      "nationsHeading": "Bannernation",
-      "nation": {
-        "vale": "Eastbrook-Tal",
-        "mirefen": "Das Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "Das Aschene Kolosseum",
-        "choir": "Der Bleiche Chor",
-        "ogre": "Die Oger-Clans",
-        "moon": "Der Bleiche Mond",
-        "copperdig": "Die Kupfergrube"
-      },
-      "awayNote": "Fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.",
-      "rolesHeading": "Sportrolle",
-      "rolesSmallBracketNote": "In den Staffeln 1v1 und 2v2 spielt jeder Kämpfer das Allrounder-Repertoire. Taten, die die Staffel 3v3 oder größer verlangen, lassen sich hier nicht erringen.",
-      "role": {
-        "allrounder": {
-          "name": "Allrounder",
-          "desc": "Von allem etwas: Kick, Weitschlag und ein fairer Rempler."
-        },
-        "striker": {
-          "name": "Stürmer",
-          "desc": "Lebt für den weiten Schlag und den schnellen Haken."
-        },
-        "sweeper": {
-          "name": "Ausputzer",
-          "desc": "Rempelt Läufer vom Ball und schlägt ihn weit nach vorn."
-        },
-        "keeper": {
-          "name": "Torhüter",
-          "desc": "Hütet den Torraum mit Griff, Hechtsprung und Abschlag."
-        }
-      },
-      "queue": "In die Warteschlange",
-      "leaveQueue": "Warteschlange verlassen",
-      "queueNote": "Stell dich von überall an; der Anpfiff ruft dich zum Saufeld.",
-      "queuedStatus": "In der Warteschlange für {bracket}: Position {position} von {count}.",
-      "blockNation": "Wähle zuerst eine Bannernation.",
-      "blockPartySize": "Diese Staffel braucht eine kleinere Gruppe.",
-      "blockNotLeader": "Nur der Gruppenanführer kann das Team in die Warteschlange stellen.",
-      "inMatchNote": "Dein Team steht auf dem Platz. Weiterspielen!",
-      "deserterNote": "Der Platzwart vergisst nicht. Du kannst dich in {seconds} Sek. wieder anstellen.",
-      "liveHeading": "Jetzt auf dem Saufeld",
-      "liveAria": "Talpokal: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Komm zum Saufeld, um von den Rängen aus zuzusehen.",
-      "noLive": "Der Platz ruht. Es wird gerade kein Spiel gespielt.",
-      "boardHeading": "Siegertafel",
-      "boardEmpty": "Noch keine Sieger verzeichnet. Der Kupfereimer wartet.",
-      "boardWins": "{count} Siege",
-      "enterAsGuild": "Unter dem Banner von {guild} antreten",
-      "guildRecordLine": "Deine Gildenbilanz: {wins} Siege, {losses} Niederlagen.",
-      "guildBoardHeading": "Gildenbanner",
-      "guildBoardEmpty": "Noch keine Gilde hat den Platz betreten. Zeig dein Banner!",
-      "guildBoardWl": "{wins} S, {losses} N",
-      "practice": "Training gegen Bots",
-      "practiceNote": "Startet sofort ein privates Bot-Spiel auf deinem eigenen Trainingsplatz.",
-      "practiceUnratedNote": "Trainingsspiele sind ungewertet: Siegertafel und Fortschritt im Buch der Taten zählen nicht.",
-      "practicingNow": "Gerade im Training ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Talpokal-Warteschlange: {bracket}, Position {position} von {count}",
-      "indicatorLive": "Talpokal",
-      "indicatorOpen": "Das Talpokal-Fenster öffnen",
-      "phaseCountdown": "Anstoß in {seconds}",
-      "phaseGoal": "TOR!",
-      "phaseGolden": "GOLDEN GOAL",
-      "phaseOver": "ABPFIFF",
-      "bannerFound": "Der Talpokal ruft: {nationA} gegen {nationB}!",
-      "bannerCountdown": "Anstoß in {seconds}...",
-      "bannerKickoff": "ANSTOSS!",
-      "bannerGoal": "TOR! {nation} trifft!",
-      "bannerSave": "{name} HÄLT!",
-      "bannerGolden": "GOLDEN GOAL: Der nächste Treffer gewinnt!",
-      "bannerEnd": "Abpfiff: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Sieg auf dem Saufeld!",
-      "bannerDraw": "Unentschieden auf dem Saufeld.",
-      "bannerLoss": "Niederlage auf dem Saufeld.",
-      "logQueued": "Du reihst dich in die Talpokal-Warteschlange für {bracket} ein (Position {position}).",
-      "logUnqueued": "Du verlässt die Talpokal-Warteschlange.",
-      "logFound": "Dein Talpokal-Spiel ist bereit: {nationA} gegen {nationB}.",
-      "logRoster": "Deine Seite: {allies}. Die Gegenseite: {enemies}.",
-      "logGoal": "{name} trifft für {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} hält den Ball!",
-      "logWin": "Du gewinnst die Partie auf dem Saufeld.",
-      "logDraw": "Die Partie auf dem Saufeld endet unentschieden.",
-      "logLoss": "Du verlierst die Partie auf dem Saufeld.",
-      "gossipOpen": "Das Spielplanbuch",
-      "gossipOpenAria": "Das Talpokal-Fenster öffnen",
-      "mobileLabel": "Pokal",
-      "briefing": {
-        "subtitle": "Besprechung vor dem Spiel",
-        "vs": "gegen",
-        "rulesHeading": "So wird gespielt",
-        "rule1": "Schieße oder passe den Ball ins gegnerische Tor, um zu punkten.",
-        "rule2": "Wer zuerst 5 Tore erzielt, gewinnt, oder wer beim Abpfiff die meisten Tore hat.",
-        "rule3": "Steht es beim Abpfiff unentschieden, geht es ins Golden Goal: Der nächste Treffer gewinnt.",
-        "rule4": "Tacklings werfen dich nur um. Unter dem Erntefrieden wird niemand verletzt.",
-        "rule5": "Jeder kann vorbeikommen und dich von den Rängen aus anfeuern.",
-        "kitHeading": "Deine Ausrüstung",
-        "kitNote": "Diese Manöver ersetzen für das Spiel deine Klassenfähigkeiten.",
-        "unratedNote": "Bots stehen auf dem Platz, daher ist diese Partie ungewertet: Die Siegertafel bewegt sich nicht, und Taten für Tore, Paraden und Spiele ohne Gegentor zählen nicht.",
-        "practiceUnratedNote": "Dies ist ein Trainingsspiel und damit ungewertet: Die Siegertafel bewegt sich nicht, und Fortschritt im Buch der Taten zählt nicht.",
-        "rosterHeading": "Die Aufstellung",
-        "you": "Du",
-        "bot": "Bot",
-        "ready": "Ich bin bereit",
-        "readyDone": "Bereit",
-        "readyAria": "Bereit machen für den Anstoß",
-        "waiting": "Warte, bis die andere Seite bereit ist...",
-        "whistle": "Der Anpfiff ertönt in {seconds}s.",
-        "readyCount": "{ready} von {total} bereit"
-      },
-      "bet": {
-        "title": "Spielwetten",
-        "aria": "Talpokal-Spielwetten",
-        "closesIn": "Wettschluss in {seconds}s",
-        "closed": "Wetten geschlossen",
-        "prize": "Topf {amount}",
-        "splitAria": "Anteil des Wett-Topfs je Team",
-        "expand": "Wetten ansehen und setzen",
-        "collapse": "Wetten ausblenden",
-        "oddsLabel": "Quote",
-        "back": "Auf {team} setzen",
-        "form": "{wins}S-{losses}N",
-        "mine": "Deine Wette: {amount} auf {team}",
-        "none": "Du hast auf dieses Spiel noch keine Wette platziert.",
-        "record": "Wettbilanz: {wins}S-{losses}N, {sign}{net}",
-        "wonBanner": "Deine Wette hat gewonnen!",
-        "wonLog": "Deine Talpokal-Wette hat gewonnen: {amount} ausgezahlt.",
-        "lostLog": "Deine Talpokal-Wette ist verloren: {amount}.",
-        "refundLog": "Wetten annulliert, dein Einsatz von {amount} wurde zurückgezahlt."
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const de_DE: EnTranslations = {
       "combat": "Kampf",
       "talents": "Talente",
       "arena": "Arena und PvP",
-      "valeCup": "Talpokal",
       "thornhollow": "Thornhollow-Felder",
       "deeds": "Buch der Taten",
       "reliquary": "Das Reliquiar",
@@ -4210,7 +4068,6 @@ export const de_DE: EnTranslations = {
       "reliquary": "Das Reliquiar",
       "sheathe": "Waffe einstecken/ziehen",
       "crafting": "Handwerk",
-      "valeCup": "Talpokal",
       "mount": "Aufsitzen / Absitzen",
       "calendar": "Ereigniskalender",
       "dungeonFinder": "Instanzfinder",
@@ -5287,36 +5144,6 @@ export const de_DE: EnTranslations = {
       "ladderBody": "Jedes Spiel verändert eine dauerhafte, charaktergebundene Schlachtfeld-Wertung, ob Sieg oder Niederlage, und die Bestenliste aller Zeiten führt die Champions des Reichs.",
       "rewardsHeading": "Was ein Spiel einbringt",
       "rewardsBody": "Jedes beendete Spiel zahlt Ehre: mehr für einen Sieg, einen Trost für eine Niederlage oder ein Unentschieden, dazu einen kleinen Betrag für jeden tödlichen Treffer, den du landest, und jeden, an dem du beteiligt warst, sodass sich das Kämpfen abseits der Flaggen weiterhin lohnt. Dein erster Sieg jedes Tages zahlt zusätzlich einen Bonus, und das Panel zeigt dir an, solange dieser Bonus noch auf dich wartet. Dieser Tag gehört allein der Ehre und läuft nach seiner eigenen Uhr, statt mit der Instanz-Zurücksetzung des Reichs. Triffst du immer wieder auf dasselbe Team, zahlt das Spiel selbst nach dem ersten Mal weniger, pendelt sich aber rasch auf einem Sockel ein, statt auf null abzusinken, und ein aufgegebenes Spiel zahlt überhaupt nichts. Gib, was du verdienst, bei einem der beiden Kriegsführungs-Quartiermeister aus."
-    },
-    "valeCupPage": {
-      "heading": "Der Talpokal",
-      "intro": "Keilerball auf dem Saufeld: Wähle ein Banner, wähle eine Rolle und schieß eine ausgestopfte Eberhaut an einem Torhüter vorbei, um den Kupfereimer zu holen. Kein Blut, keine Beute, nur das Tosen der Ränge.",
-      "loreHeading": "Keilerball und der Erntefrieden",
-      "loreOldSow": "Lange bevor die Toten erwachten, spielten Eastbrooks Feldarbeiter nach der Ernte Keilerball auf den Stoppelfeldern: zwei Haufen Leute, eine mit Stroh ausgestopfte Eberhaut und zwei Wagentore, an beide Enden des Angers gezerrt. Der erste Ball, die Alte Sau, hängt in Bronze über dem Kamin der Taverne.",
-      "loreTruce": "Als das Aschene Kolosseum begann, Kriegsspiele auszurichten, antwortete Marschall Redbrook mit etwas Sanfterem: einem ständigen Erntefrieden auf dem alten Anger. Die Wagentore wurden zu Torpfosten, der Anger bekam Wände, Ränge und einen Namen, das Saufeld, und der Preis war immer derselbe verbeulte Milcheimer, aus dem die Sieger tranken: der Kupfereimer.",
-      "howHeading": "So wird gespielt",
-      "howQueue": "Stell dich von überall über das Talpokal-Fenster an, oder sprich mit Platzwart Bram am Tor des Saufelds. Wähle eine Staffel von eins gegen eins bis fünf gegen fünf, eine Bannernation und eine Sportrolle; stell dich allein an oder bring deine Gruppe mit.",
-      "howMatch": "Beim Anstoß werden deine Klassenfähigkeiten gegen eine Sportausrüstung getauscht und danach exakt wiederhergestellt. Kicks zielen auf das Fadenkreuz am Boden, der Ball prallt von der Bande ab, und Dribbeln heißt einfach, mit dem Ball zu laufen. Erziele bis zum Abpfiff mehr Tore als die Gegenseite; ein Unentschieden geht ins Golden Goal.",
-      "howTruce": "Auf dem Saufeld blutet niemand: Tacklings lassen dich nur purzeln, nichts tut weh, und Begleiter setzen das Spiel aus.",
-      "spectateBody": "Im Stadion läuft immer nur ein Spiel, und jeder kann einfach vorbeikommen und von den Rängen aus zusehen.",
-      "bettingHeading": "Ein kleiner Einsatz an der Bande",
-      "bettingBody": "Zuschauer am Saufeld können auf eine Seite setzen, während sich ein Spiel zusammenfindet: Die Einsätze werden zusammengelegt, und beim Schlusspfiff teilen sich die Gewinner den Topf der Verlierer im Verhältnis zu ihrem Einsatz. Ein Unentschieden, oder eine Überraschung, auf die niemand gesetzt hat, erstattet jede Münze zurück. Spieler, die im Spiel sitzen, können nicht darauf wetten, und die Bande führt deine Gesamtbilanz aus Siegen, Niederlagen und Nettomünzen.",
-      "practiceHeading": "Übungsspiele und das leere Feld",
-      "practiceBody": "Das Talpokal-Fenster bietet auch ein Training: eine private Kopie des Platzes, auf der Bots beide Seiten füllen und nichts für deine Bilanz zählt. Fehlt dir für das echte Spiel ein Spieler oder zwei? Nach einer kurzen Wartezeit füllen Bots die Mannschaften auf, und jedes Spiel mit Bots auf dem Platz ist ein Freundschaftsspiel, nie gewertet. Und wenn das Saufeld leer steht, geben die Bots eine Vorführung, die du von den Rängen aus ansehen und beim Wetten begleiten kannst; sobald echte Spieler sich bereit melden, gibt die Vorführung den Platz frei und jeder Einsatz wird zurückerstattet.",
-      "nationsHeading": "Die acht Bannernationen",
-      "nationsBody": "Jedes Team spielt unter einem Banner. Der Kapitän wählt die Nation, und fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.",
-      "nationVale": "Grün und Gold unter der Weizengarbe: die Heimmannschaft, Feldarbeiter bis ins Mark.",
-      "nationMirefen": "Blaugrün und Grau unter dem Reiher: geduldig, langbeinig, nie in Eile.",
-      "nationThornpeak": "Eisblau und Weiß unter dem Berggipfel: trittsicher und stur.",
-      "nationColiseum": "Rot und Schwarz mit gekreuzten Schwertern: Sie spielen, als wäre es noch immer ein Kriegsspiel.",
-      "nationChoir": "Fahlblau und Silber unter der Glocke: unheimlich, präzise und sehr still.",
-      "nationOgre": "Orange und Umbra hinter der Faust: Schulter voran und stolz darauf.",
-      "nationMoon": "Violett und Silber unter der Mondsichel: Nachtspieler, leicht auf den Beinen.",
-      "nationCopperdig": "Kupfer und Braun mit der Spitzhacke: Schaufler, die nie aufhören zu rennen.",
-      "rolesHeading": "Sportrollen",
-      "rolesBody": "Deine Rolle bestimmt die Ausrüstung, die du auf den Platz trägst. Kicken kann jeder; der Rest ist Temperament. In den Wertungsklassen eins gegen eins und zwei gegen zwei spielen alle das Allrounder-Repertoire, sodass die Rollenwahl erst ab drei gegen drei zur Geltung kommt.",
-      "rewardsHeading": "Friedensregeln",
-      "rewardsBody": "Friedensregeln bedeuten keine Erfahrung und keine Beute: Ein entschiedenes Spiel zählt für deine Bilanz und die Siegertafel, und ein Sieg zählt zudem für die täglichen Belohnungsaufgaben. Wer ein Spiel im Stich lässt, kassiert eine Sperre auf seinem Platz, und der Platzwart vergisst nicht."
     },
     "deedsPage": {
       "intro": "Im Buch der Taten führt die Welt Buch über alles, was du vollbracht hast: von deinen ersten Schritten aus dem Starttal bis zu den härtesten Kämpfen, die das Reich zu bieten hat. Erringe Taten, während du spielst, trage die Titel, die sie verleihen, und sieh zu, wie dein Ansehen wächst.",
@@ -13439,9 +13266,6 @@ export const de_DE: EnTranslations = {
       "tolling_bell": {
         "name": "Läutende Glocke"
       },
-      "vale_cup_ball": {
-        "name": "Keilerball"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, der Erwachende Gipfel"
       },
@@ -14038,11 +13862,6 @@ export const de_DE: EnTranslations = {
         "name": "Der Bleiche Hüter",
         "title": "Wächter der Toten",
         "greeting": "Ruhe nun, Geist. Ich kann dich in deinen Körper zurückbringen, doch die Rückkehr lässt dich geschwächt zurück."
-      },
-      "groundskeeper_bram": {
-        "name": "Platzwart Bram",
-        "title": "Hüter des Saufelds",
-        "greeting": "Auf dem Saufeld gilt der Erntefrieden, {className}: nur Kicks und Rempler. Lust auf ein Spiel um den Kupfereimer?"
       },
       "chronicler_saul": {
         "name": "Saul der Chronist",
@@ -16492,6 +16311,9 @@ export const de_DE: EnTranslations = {
           },
           "11": {
             "label": "Der Farshore-Damm"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

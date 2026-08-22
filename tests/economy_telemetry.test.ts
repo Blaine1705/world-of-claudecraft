@@ -36,7 +36,6 @@ describe('copper flow source classification', () => {
       craft_item: 'craft',
       train_recipe: 'craft',
       trade_accept: 'trade',
-      vcup_bet: 'wager',
       dev_give: 'dev',
       // The two movers the whole-branch review found booking under 'other':
       // the riding lesson is a training fee, the companion upgrade a delve
@@ -244,7 +243,6 @@ describe('the classifier map is complete and its keys are real commands', () => 
       trade_confirm: 'trade',
       turnin: 'quest',
       unbind_item: 'craft',
-      vcup_bet: 'wager',
     });
   });
 

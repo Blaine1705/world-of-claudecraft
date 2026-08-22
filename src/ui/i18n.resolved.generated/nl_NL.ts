@@ -1025,7 +1025,6 @@ export const nl_NL: EnTranslations = {
       "targetFriendlyNext": "Door Bondgenoten Bladeren",
       "targetPrev": "Achteruit Door Doelwitten Bladeren",
       "discord": "Discord",
-      "valecup": "Dalbeker",
       "bgFlag": "Slagveldvlag-actie",
       "sheathe": "Wapen Schede In/Uit",
       "dive": "Omlaag Zwemmen",
@@ -1191,146 +1190,6 @@ export const nl_NL: EnTranslations = {
         "azureKeep": "Azuur Burcht",
         "ruinCourtyard": "Het Ruïnehof",
         "graveyard": "Begraafplaats"
-      }
-    },
-    "vcup": {
-      "title": "De Dalbeker",
-      "shootPower": "KRACHT",
-      "close": "Sluit het Dalbeker-venster",
-      "offlineNote": "Het wedstrijdboek is gesloten. De Dalbeker is op dit moment niet beschikbaar.",
-      "recordLine": "Jouw staat van dienst: {wins} overwinningen, {losses} nederlagen, {draws} gelijke spelen.",
-      "bracketsAria": "Wedstrijdcategorie",
-      "bracketLabel": "{n}v{n}",
-      "waitingCount": "{count} wachtend",
-      "nationsHeading": "Baniernatie",
-      "nation": {
-        "vale": "Oostbeekdal",
-        "mirefen": "Het Slijkveen",
-        "thornpeak": "Doorntop",
-        "coliseum": "Het Asgrauwe Colosseum",
-        "choir": "Het Bleke Koor",
-        "ogre": "De Ogerclans",
-        "moon": "De Bleke Maan",
-        "copperdig": "De Kopergroeve"
-      },
-      "awayNote": "Als beide kanten dezelfde banier voeren, speelt de uitploeg in het omgekeerde kleurenpalet.",
-      "rolesHeading": "Sportrol",
-      "rolesSmallBracketNote": "In de categorieën 1v1 en 2v2 speelt elke vechter met de Allrounder-uitrusting. Daden die de categorie 3v3 of groter vragen, kun je hier niet behalen.",
-      "role": {
-        "allrounder": {
-          "name": "Allrounder",
-          "desc": "Van alles wat: trappen, uithalen en een eerlijke schouderduw."
-        },
-        "striker": {
-          "name": "Spits",
-          "desc": "Leeft voor de verre uithaal en de snelle zijstap."
-        },
-        "sweeper": {
-          "name": "Laatste Man",
-          "desc": "Duwt lopers van de bal en pegelt hem weg."
-        },
-        "keeper": {
-          "name": "Keeper",
-          "desc": "Bewaakt het doelgebied met grip, duik en uittrap."
-        }
-      },
-      "queue": "Sluit je aan in de wachtrij",
-      "leaveQueue": "Wachtrij verlaten",
-      "queueNote": "Meld je aan vanaf elke plek; de fluit roept je naar het Zeugveld.",
-      "queuedStatus": "In de wachtrij voor {bracket}: plaats {position} van {count}.",
-      "blockNation": "Kies eerst een baniernatie.",
-      "blockPartySize": "Die categorie vraagt een kleinere groep.",
-      "blockNotLeader": "Alleen de groepsleider kan het team aanmelden.",
-      "inMatchNote": "Je team staat op het veld. Doorspelen!",
-      "deserterNote": "De Terreinmeester onthoudt het. Je mag je over {seconds} sec weer aanmelden.",
-      "liveHeading": "Nu op het Zeugveld",
-      "liveAria": "Dalbeker: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Loop naar het Zeugveld om toe te kijken vanaf de tribunes.",
-      "noLive": "Het veld ligt er stil bij. Er wordt geen wedstrijd gespeeld.",
-      "boardHeading": "Winnaarsbord",
-      "boardEmpty": "Nog geen winnaars opgetekend. De Koperen Emmer wacht.",
-      "boardWins": "{count} overwinningen",
-      "enterAsGuild": "Treed aan onder de banier van {guild}",
-      "guildRecordLine": "Staat van dienst van je gilde: {wins} overwinningen, {losses} nederlagen.",
-      "guildBoardHeading": "Gildebanieren",
-      "guildBoardEmpty": "Nog geen gilde heeft het veld betreden. Hijs je banier!",
-      "guildBoardWl": "{wins} W, {losses} V",
-      "practice": "Oefenen tegen bots",
-      "practiceNote": "Start meteen een besloten botwedstrijd op je eigen oefenveld.",
-      "practiceUnratedNote": "Oefenpartijen tellen niet mee voor de ranglijst: standen en voortgang in het Boek der Daden tellen niet.",
-      "practicingNow": "Nu aan het oefenen ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Dalbeker-wachtrij: {bracket}, plaats {position} van {count}",
-      "indicatorLive": "Dalbeker",
-      "indicatorOpen": "Open het Dalbeker-venster",
-      "phaseCountdown": "Aftrap over {seconds}",
-      "phaseGoal": "GOAL!",
-      "phaseGolden": "GOUDEN GOAL",
-      "phaseOver": "EINDSIGNAAL",
-      "bannerFound": "De Dalbeker roept: {nationA} tegen {nationB}!",
-      "bannerCountdown": "Aftrap over {seconds}...",
-      "bannerKickoff": "AFTRAP!",
-      "bannerGoal": "GOAL! {nation} scoort!",
-      "bannerSave": "{name} REDT!",
-      "bannerGolden": "GOUDEN GOAL: de volgende treffer wint!",
-      "bannerEnd": "Eindstand: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Overwinning op het Zeugveld!",
-      "bannerDraw": "Een gelijkspel op het Zeugveld.",
-      "bannerLoss": "Nederlaag op het Zeugveld.",
-      "logQueued": "Je sluit je aan bij de Dalbeker-wachtrij voor {bracket} (plaats {position}).",
-      "logUnqueued": "Je verlaat de Dalbeker-wachtrij.",
-      "logFound": "Je Dalbeker-wedstrijd staat klaar: {nationA} tegen {nationB}.",
-      "logRoster": "Jouw kant: {allies}. Hun kant: {enemies}.",
-      "logGoal": "{name} scoort voor {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} redt de bal!",
-      "logWin": "Je wint de partij op het Zeugveld.",
-      "logDraw": "De partij op het Zeugveld eindigt in een gelijkspel.",
-      "logLoss": "Je verliest de partij op het Zeugveld.",
-      "gossipOpen": "Het wedstrijdboek",
-      "gossipOpenAria": "Open het Dalbeker-venster",
-      "mobileLabel": "Beker",
-      "briefing": {
-        "subtitle": "Wedstrijdbespreking",
-        "vs": "tegen",
-        "rulesHeading": "Hoe je speelt",
-        "rule1": "Trap of speel de bal in het vijandelijke doel om te scoren.",
-        "rule2": "Wie het eerst 5 doelpunten maakt wint, of wie de meeste heeft bij het eindsignaal.",
-        "rule3": "Staat het gelijk bij het eindsignaal, dan volgt de gouden goal: de volgende treffer wint.",
-        "rule4": "Tackles laten je alleen omtuimelen. Niemand raakt gewond onder het oogstbestand.",
-        "rule5": "Iedereen kan aan komen lopen en je aanmoedigen vanaf de tribunes.",
-        "kitHeading": "Jouw uitrusting",
-        "kitNote": "Deze zetten vervangen je klassevaardigheden voor de duur van de wedstrijd.",
-        "unratedNote": "Er staan bots op het veld, dus deze partij telt niet mee voor de ranglijst: de standen bewegen niet en daden voor goals, reddingen en het houden van de nul tellen niet.",
-        "practiceUnratedNote": "Dit is een oefenpartij en telt dus niet mee voor de ranglijst: de standen bewegen niet en voortgang in het Boek der Daden telt niet.",
-        "rosterHeading": "De opstelling",
-        "you": "Jij",
-        "bot": "Bot",
-        "ready": "Ik ben er klaar voor",
-        "readyDone": "Klaar",
-        "readyAria": "Meld je klaar voor de aftrap",
-        "waiting": "Wachten tot de tegenpartij zich klaar meldt...",
-        "whistle": "De fluit klinkt over {seconds}s.",
-        "readyCount": "{ready} van {total} klaar"
-      },
-      "bet": {
-        "title": "Wedstrijdweddenschappen",
-        "aria": "Weddenschappen op de Dalbeker-wedstrijd",
-        "closesIn": "Inzetten sluiten over {seconds}s",
-        "closed": "Inzetten gesloten",
-        "prize": "Pot {amount}",
-        "splitAria": "Aandeel van de wedpot per team",
-        "expand": "Weddenschappen bekijken en inzetten",
-        "collapse": "Weddenschappen verbergen",
-        "oddsLabel": "Keert uit",
-        "back": "Zet in op {team}",
-        "form": "{wins}W-{losses}V",
-        "mine": "Jouw inzet: {amount} op {team}",
-        "none": "Je hebt nog geen weddenschap op deze wedstrijd.",
-        "record": "Wedbalans: {wins}W-{losses}V, {sign}{net}",
-        "wonBanner": "Je weddenschap is gewonnen!",
-        "wonLog": "Je Dalbeker-weddenschap is gewonnen: {amount} uitgekeerd.",
-        "lostLog": "Je Dalbeker-weddenschap is verloren: {amount}.",
-        "refundLog": "Weddenschappen nietig verklaard, je inzet van {amount} is teruggegeven."
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const nl_NL: EnTranslations = {
       "combat": "Gevecht",
       "talents": "Talenten",
       "arena": "Arena & PvP",
-      "valeCup": "Dalbeker",
       "thornhollow": "Doornholte-Velden",
       "deeds": "Boek der Daden",
       "reliquary": "Het Reliquarium",
@@ -4210,7 +4068,6 @@ export const nl_NL: EnTranslations = {
       "reliquary": "Het Reliquarium",
       "sheathe": "Wapen Schede In/Uit",
       "crafting": "Vervaardigen",
-      "valeCup": "De Dalbeker",
       "mount": "Opstijgen / Afstijgen",
       "calendar": "Evenementenkalender",
       "dungeonFinder": "Kerkerzoeker",
@@ -5287,36 +5144,6 @@ export const nl_NL: EnTranslations = {
       "ladderBody": "Elke partij verschuift een blijvende, aan het personage gebonden slagveldwaardering, of je nu wint of verliest, en het aller-tijden-bord rangschikt de kampioenen van het rijk.",
       "rewardsHeading": "Wat een wedstrijd oplevert",
       "rewardsBody": "Elke afgeronde wedstrijd betaalt Eer uit: meer voor een overwinning, een troostprijs voor een nederlaag of een gelijkspel, plus een klein bedrag voor elke fatale klap die je uitdeelt en elke waar je aan bijdraagt, dus vechten ver van de vlaggen blijft de moeite waard. Je eerste overwinning van elke dag levert daarbovenop een bonus op, en het paneel laat je weten zolang die bonus nog op je wacht. Die dag is van Eer zelf, en hij vernieuwt zich op zijn eigen klok in plaats van met de instantiereset van het rijk. Hetzelfde team steeds opnieuw tegenkomen levert na de eerste keer minder op voor de wedstrijd zelf, en zakt snel naar een bodem in plaats van weg te vallen naar niets, en een opgegeven wedstrijd levert helemaal niets op. Geef uit wat je verdient bij een van beide Erekwartiermeesters."
-    },
-    "valeCupPage": {
-      "heading": "De Dalbeker",
-      "intro": "Zwijnenbal op het Zeugveld: kies een banier, kies een rol, en trap een opgezette zwijnenhuid langs een keeper voor de Koperen Emmer. Geen bloed, geen buit, alleen het gebrul van de tribunes.",
-      "loreHeading": "Zwijnenbal en het oogstbestand",
-      "loreOldSow": "Lang voordat de doden ontwaakten, speelden de boerenknechten van Oostbeek zwijnenbal op de stoppelvelden na de oogst: twee horden, één zwijnenhuid gevuld met stro, en twee wagenhekken die naar de uiteinden van het veld werden gesleept. De eerste bal, de Oude Zeug, hangt in brons boven de taveernehaard.",
-      "loreTruce": "Toen het Asgrauwe Colosseum oorlogsspelen begon te sanctioneren, antwoordde Maarschalk Redbrook met iets zachtaardigers: een blijvend oogstbestand op het oude veld. De wagenhekken werden doelpalen, het veld kreeg muren, tribunes en een naam, het Zeugveld, en de prijs was altijd dezelfde gedeukte melkemmer waar de winnaars uit dronken: de Koperen Emmer.",
-      "howHeading": "Hoe je speelt",
-      "howQueue": "Meld je vanaf elke plek aan via het Dalbeker-venster, of praat met Terreinmeester Bram bij de poort van het Zeugveld. Kies een categorie van één tegen één tot vijf tegen vijf, een baniernatie en een sportrol; meld je solo aan of neem je groep mee.",
-      "howMatch": "Bij de aftrap wordt je klasse-uitrusting omgeruild voor een sportuitrusting en daarna exact hersteld. Trappen mikken op het grondvizier, de bal kaatst tegen de boarding, en dribbelen is gewoon rennen met de bal. Maak meer doelpunten dan de tegenpartij voor het eindsignaal; bij een gelijkspel volgt de gouden goal.",
-      "howTruce": "Niemand bloedt op het Zeugveld: tackles laten je tuimelen, niets doet pijn, en huisdieren zitten de wedstrijd uit.",
-      "spectateBody": "Er wordt één wedstrijd tegelijk gespeeld in het stadion, en iedereen kan aan komen lopen en toekijken vanaf de tribunes.",
-      "bettingHeading": "Een gokje bij de balustrade",
-      "bettingBody": "Toeschouwers bij het Zeugveld kunnen een kant steunen terwijl een wedstrijd zich vormt: de inzetten worden samengevoegd, en bij het eindsignaal verdelen de winnaars de pot van de verliezers naar rato van wat ze inzetten. Een gelijkspel, of een verrassing die niemand steunde, betaalt elke munt terug. Spelers die in de wedstrijd staan, kunnen er niet op wedden, en de balustrade houdt je levenslange record van winst, verlies en nettomunten bij.",
-      "practiceHeading": "Oefenpartijen en het stille veld",
-      "practiceBody": "Het venster van De Dalbeker biedt ook oefening: een privékopie van het veld waar bots beide kanten vullen en niets meetelt voor je record. Kom je een speler of twee tekort voor het echte werk? Na een korte wachttijd vullen bots de teams aan, en elke wedstrijd met bots op het veld is een vriendschappelijke, nooit voor de ranglijst. En wanneer het Zeugveld stilligt, geven de bots een demonstratie die je vanaf de tribune kunt bekijken, en waarop je kunt wedden; zodra echte spelers zich gereedmelden, geeft de demonstratie het veld vrij en wordt elke inzet teruggegeven.",
-      "nationsHeading": "De acht baniernaties",
-      "nationsBody": "Elk team speelt onder een banier. De aanvoerder kiest de natie, en als beide kanten dezelfde banier voeren, speelt de uitploeg in het omgekeerde kleurenpalet.",
-      "nationVale": "Groen en goud, onder de korenschoof: de thuisploeg, boerenknechten in hart en nieren.",
-      "nationMirefen": "Groenblauw en grijs onder de reiger: geduldig, met lange benen, nooit gehaast.",
-      "nationThornpeak": "IJsblauw en wit onder de bergtop: vast ter been en koppig.",
-      "nationColiseum": "Rood en zwart met gekruiste zwaarden: ze spelen alsof het nog steeds een oorlogsspel is.",
-      "nationChoir": "Bleekblauw en zilver onder de klok: onheilspellend, precies en heel stil.",
-      "nationOgre": "Oranje en omber achter de vuist: schouder eerst, en er trots op.",
-      "nationMoon": "Violet en zilver onder de maansikkel: nachtspelers, licht op de voeten.",
-      "nationCopperdig": "Koper en bruin met het houweel: delvers die nooit stoppen met rennen.",
-      "rolesHeading": "Sportrollen",
-      "rolesBody": "Je rol bepaalt de uitrusting die je het veld op draagt. Iedereen trapt; de rest is temperament. In de categorieën één-tegen-één en twee-tegen-twee speelt iedereen de allrounder-uitrusting, dus rolkeuzes komen pas vanaf drie-tegen-drie tot hun recht.",
-      "rewardsHeading": "Bestandsregels",
-      "rewardsBody": "Bestandsregels betekenen geen ervaring en geen buit: een besliste wedstrijd telt mee voor je staat van dienst en het winnaarsbord, en een overwinning telt ook mee voor de beloningstaken van de dag. Wie een wedstrijd in de steek laat, zet zijn plek op de bank, en de Terreinmeester onthoudt het."
     },
     "deedsPage": {
       "intro": "In het Boek der Daden houdt de wereld de stand bij van alles wat je hebt verricht, van je eerste stappen buiten het dal waar je begon tot de zwaarste gevechten die het rijk te bieden heeft. Behaal daden terwijl je speelt, draag de titels die ze schenken en zie je Roem stijgen.",
@@ -13439,9 +13266,6 @@ export const nl_NL: EnTranslations = {
       "tolling_bell": {
         "name": "Luidende Klok"
       },
-      "vale_cup_ball": {
-        "name": "Zwijnenbal"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, de Ontwakende Piek"
       },
@@ -14038,11 +13862,6 @@ export const nl_NL: EnTranslations = {
         "name": "De Bleke Hoeder",
         "title": "Wachter van de Doden",
         "greeting": "Rust nu, geest. Ik kan je terugbrengen naar je lichaam, maar de overtocht terug laat je verzwakt achter."
-      },
-      "groundskeeper_bram": {
-        "name": "Terreinmeester Bram",
-        "title": "Hoeder van het Zeugveld",
-        "greeting": "Het bestand houdt stand op het Zeugveld, {className}: alleen trappen en schouders. Zin om te spelen voor de Koperen Emmer?"
       },
       "chronicler_saul": {
         "name": "Saul de Kroniekschrijver",
@@ -16492,6 +16311,9 @@ export const nl_NL: EnTranslations = {
           },
           "11": {
             "label": "De Verrekust-Dam"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

@@ -1025,7 +1025,6 @@ export const id_ID: EnTranslations = {
       "targetFriendlyNext": "Putar Bidikan Sekutu",
       "targetPrev": "Putar Bidikan Mundur",
       "discord": "Discord",
-      "valecup": "Piala Lembah",
       "bgFlag": "Aksi Bendera Medan Pertempuran",
       "sheathe": "Sarungkan/Cabut Senjata",
       "dive": "Berenang ke Bawah",
@@ -1191,146 +1190,6 @@ export const id_ID: EnTranslations = {
         "azureKeep": "Benteng Biru",
         "ruinCourtyard": "Halaman Reruntuhan",
         "graveyard": "Kuburan"
-      }
-    },
-    "vcup": {
-      "title": "Piala Lembah",
-      "shootPower": "TENAGA",
-      "close": "Tutup jendela Piala Lembah",
-      "offlineNote": "Buku jadwal sedang tutup. Piala Lembah tidak tersedia saat ini.",
-      "recordLine": "Rekormu: {wins} menang, {losses} kalah, {draws} imbang.",
-      "bracketsAria": "Format pertandingan",
-      "bracketLabel": "{n}v{n}",
-      "waitingCount": "{count} menunggu",
-      "nationsHeading": "Negeri panji",
-      "nation": {
-        "vale": "Lembah Eastbrook",
-        "mirefen": "Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "Koloseum Abu",
-        "choir": "Paduan Suara Pucat",
-        "ogre": "Klan Ogre",
-        "moon": "Bulan Pucat",
-        "copperdig": "Galian Tembaga"
-      },
-      "awayNote": "Jika kedua tim mengibarkan panji yang sama, tim tandang memakai palet warna terbalik.",
-      "rolesHeading": "Peran olahraga",
-      "rolesSmallBracketNote": "Di bracket 1v1 dan 2v2 setiap petarung memakai perangkat Serba Bisa. Jasa yang mensyaratkan bracket 3v3 atau lebih besar tidak bisa diraih di sini.",
-      "role": {
-        "allrounder": {
-          "name": "Serba Bisa",
-          "desc": "Serba bisa: tendang, sepak jauh, dan benturan bahu yang adil."
-        },
-        "striker": {
-          "name": "Penyerang",
-          "desc": "Hidup untuk tendangan jauh dan gerak elak cepat."
-        },
-        "sweeper": {
-          "name": "Penyapu",
-          "desc": "Membenturkan pelari menjauh dari bola dan menyapunya jauh-jauh."
-        },
-        "keeper": {
-          "name": "Kiper",
-          "desc": "Menjaga kotak gawang dengan tangkapan, terjunan, dan sepakan jauh."
-        }
-      },
-      "queue": "Masuk Antrean",
-      "leaveQueue": "Keluar dari Antrean",
-      "queueNote": "Mengantrelah dari mana saja; peluit akan memanggilmu ke Sowfield.",
-      "queuedStatus": "Mengantre untuk {bracket}: posisi {position} dari {count}.",
-      "blockNation": "Pilih negeri panji dulu.",
-      "blockPartySize": "Format itu membutuhkan party yang lebih kecil.",
-      "blockNotLeader": "Hanya pemimpin party yang bisa mengantrekan tim.",
-      "inMatchNote": "Timmu sedang di lapangan. Teruskan permainan!",
-      "deserterNote": "Sang Penjaga Lapangan mengingatnya. Kamu boleh mengantre lagi dalam {seconds} detik.",
-      "liveHeading": "Kini di Sowfield",
-      "liveAria": "Piala Lembah: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Datanglah ke Sowfield untuk menonton dari tribun.",
-      "noLive": "Lapangan sunyi. Tak ada pertandingan yang berlangsung.",
-      "boardHeading": "Papan pemenang",
-      "boardEmpty": "Belum ada pemenang tercatat. Ember Tembaga menanti.",
-      "boardWins": "{count} kemenangan",
-      "enterAsGuild": "Masuk di bawah panji {guild}",
-      "guildRecordLine": "Rekor guild-mu: {wins} menang, {losses} kalah.",
-      "guildBoardHeading": "Panji guild",
-      "guildBoardEmpty": "Belum ada guild yang turun ke lapangan. Kibarkan panjimu!",
-      "guildBoardWl": "{wins} M, {losses} K",
-      "practice": "Latihan vs. Bot",
-      "practiceNote": "Langsung memulai pertandingan bot pribadi di lapangan latihanmu sendiri.",
-      "practiceUnratedNote": "Laga latihan tidak berperingkat: klasemen dan kemajuan Kitab Jasa tidak dihitung.",
-      "practicingNow": "Sedang berlatih ({count}):",
-      "clock": "{minutes}.{seconds}",
-      "indicatorQueued": "Antrean Piala Lembah: {bracket}, posisi {position} dari {count}",
-      "indicatorLive": "Piala Lembah",
-      "indicatorOpen": "Buka jendela Piala Lembah",
-      "phaseCountdown": "Sepak mula dalam {seconds}",
-      "phaseGoal": "GOL!",
-      "phaseGolden": "GOL EMAS",
-      "phaseOver": "PELUIT PANJANG",
-      "bannerFound": "Piala Lembah memanggil: {nationA} vs {nationB}!",
-      "bannerCountdown": "Sepak mula dalam {seconds}...",
-      "bannerKickoff": "SEPAK MULA!",
-      "bannerGoal": "GOL! {nation} mencetak gol!",
-      "bannerSave": "{name} MENEPIS!",
-      "bannerGolden": "GOL EMAS: gol berikutnya menang!",
-      "bannerEnd": "Peluit panjang: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Kemenangan di Sowfield!",
-      "bannerDraw": "Imbang di Sowfield.",
-      "bannerLoss": "Kekalahan di Sowfield.",
-      "logQueued": "Kamu masuk antrean Piala Lembah untuk {bracket} (posisi {position}).",
-      "logUnqueued": "Kamu keluar dari antrean Piala Lembah.",
-      "logFound": "Pertandingan Piala Lembah-mu sudah siap: {nationA} vs {nationB}.",
-      "logRoster": "Timmu: {allies}. Tim lawan: {enemies}.",
-      "logGoal": "{name} mencetak gol untuk {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} melakukan penyelamatan!",
-      "logWin": "Kamu memenangkan laga di Sowfield.",
-      "logDraw": "Laga di Sowfield berakhir imbang.",
-      "logLoss": "Kamu kalah dalam laga di Sowfield.",
-      "gossipOpen": "Buku jadwal pertandingan",
-      "gossipOpenAria": "Buka jendela Piala Lembah",
-      "mobileLabel": "Piala",
-      "briefing": {
-        "subtitle": "Pengarahan prapertandingan",
-        "vs": "vs",
-        "rulesHeading": "Cara bermain",
-        "rule1": "Tendang atau umpan bola ke gawang lawan untuk mencetak gol.",
-        "rule2": "Yang pertama mencetak 5 gol menang, atau yang golnya terbanyak saat peluit panjang berbunyi.",
-        "rule3": "Skor imbang saat peluit panjang berlanjut ke gol emas: gol berikutnya menang.",
-        "rule4": "Tekel hanya membuatmu terjungkal. Tak ada yang terluka di bawah gencatan panen.",
-        "rule5": "Siapa pun bisa datang dan menyemangatimu dari tribun.",
-        "kitHeading": "Perangkatmu",
-        "kitNote": "Gerakan-gerakan ini menggantikan kemampuan kelasmu selama pertandingan.",
-        "unratedNote": "Ada bot di lapangan, jadi laga ini tidak berperingkat: klasemen tidak bergerak, dan jasa untuk gol, penyelamatan, serta gawang nirbobol tidak dihitung.",
-        "practiceUnratedNote": "Ini laga latihan, jadi tidak berperingkat: klasemen tidak bergerak, dan kemajuan Kitab Jasa tidak dihitung.",
-        "rosterHeading": "Susunan pemain",
-        "you": "Kamu",
-        "bot": "Bot",
-        "ready": "Aku siap",
-        "readyDone": "Siap",
-        "readyAria": "Nyatakan siap untuk sepak mula",
-        "waiting": "Menunggu tim lawan menyatakan siap...",
-        "whistle": "Peluit berbunyi dalam {seconds} dtk.",
-        "readyCount": "{ready} dari {total} siap"
-      },
-      "bet": {
-        "title": "Taruhan Pertandingan",
-        "aria": "Taruhan pertandingan Piala Lembah",
-        "closesIn": "Taruhan ditutup dalam {seconds} dtk",
-        "closed": "Taruhan ditutup",
-        "prize": "Pundi {amount}",
-        "splitAria": "Porsi pundi taruhan pada tiap tim",
-        "expand": "Lihat taruhan dan pasang",
-        "collapse": "Sembunyikan taruhan",
-        "oddsLabel": "Bayaran",
-        "back": "Dukung {team}",
-        "form": "{wins}M-{losses}K",
-        "mine": "Taruhanmu: {amount} pada {team}",
-        "none": "Kamu belum bertaruh di pertandingan ini.",
-        "record": "Rekor taruhan: {wins}M-{losses}K, {sign}{net}",
-        "wonBanner": "Taruhanmu menang!",
-        "wonLog": "Taruhan Piala Lembah-mu menang: {amount} dikembalikan.",
-        "lostLog": "Taruhan Piala Lembah-mu kalah: {amount}.",
-        "refundLog": "Taruhan dibatalkan, uang taruhanmu sebesar {amount} dikembalikan."
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const id_ID: EnTranslations = {
       "combat": "Pertarungan",
       "talents": "Talent",
       "arena": "Arena & PvP",
-      "valeCup": "Piala Lembah",
       "thornhollow": "Medan Thornhollow",
       "deeds": "Kitab Jasa",
       "reliquary": "Relikuari",
@@ -4210,7 +4068,6 @@ export const id_ID: EnTranslations = {
       "reliquary": "Relikuari",
       "sheathe": "Sarungkan/Cabut Senjata",
       "crafting": "Kriya",
-      "valeCup": "Piala Lembah",
       "mount": "Naiki / Turun",
       "calendar": "Kalender Acara",
       "dungeonFinder": "Pencari Dungeon",
@@ -5287,36 +5144,6 @@ export const id_ID: EnTranslations = {
       "ladderBody": "Setiap pertandingan menggerakkan peringkat medan pertempuran yang menetap dan melekat pada karakter, menang atau kalah, dan papan sepanjang masa mengurutkan para juara alam ini.",
       "rewardsHeading": "Apa yang dibayar sebuah pertandingan",
       "rewardsBody": "Setiap pertandingan yang selesai membayar Kehormatan: lebih banyak untuk kemenangan, sekadar penghibur untuk kekalahan atau hasil seri, ditambah sejumlah kecil untuk setiap pukulan pamungkas yang kamu daratkan dan setiap yang kamu bantu, sehingga bertarung jauh dari bendera tetap sepadan untuk dilakukan. Kemenangan pertamamu tiap hari membayar bonus tambahan di atasnya, dan panel akan memberitahumu selama bonus itu masih menunggumu. Hari itu adalah milik Kehormatan sendiri, dan ia berputar ulang menurut jamnya sendiri, bukan mengikuti reset instans realm. Bertemu tim yang sama berulang kali membayar lebih sedikit untuk pertandingan itu sendiri setelah yang pertama, dengan cepat menetap di sebuah batas bawah alih-alih menyusut sampai nol, dan pertandingan yang menyerah sama sekali tidak membayar apa pun. Belanjakan hasil yang kamu peroleh di salah satu dari kedua Kepala Perbekalan Perang."
-    },
-    "valeCupPage": {
-      "heading": "Piala Lembah",
-      "intro": "Bola babi hutan di Sowfield: pilih panji, pilih peran, dan tendang kulit babi hutan berisi jerami melewati kiper demi Ember Tembaga. Tanpa darah, tanpa jarahan, hanya gemuruh tribun.",
-      "loreHeading": "Bola babi hutan dan gencatan panen",
-      "loreOldSow": "Jauh sebelum orang mati terbangun, buruh tani Eastbrook bermain bola babi hutan di ladang jerami usai panen: dua gerombolan, satu kulit babi hutan berisi jerami, dan dua gerbang pedati yang diseret ke kedua ujung lapangan hijau. Bola pertama, Si Induk Tua, digantung berlapis perunggu di atas perapian kedai.",
-      "loreTruce": "Ketika Koloseum Abu mulai merestui permainan perang, Marsekal Redbrook menjawab dengan sesuatu yang lebih lembut: gencatan panen tetap di lapangan hijau tua itu. Gerbang pedati menjadi tiang gawang, lapangan hijau itu mendapat tembok, tribun, dan sebuah nama, Sowfield, dan hadiahnya selalu sama, ember susu penyok yang dipakai minum para pemenang: Ember Tembaga.",
-      "howHeading": "Cara bermain",
-      "howQueue": "Masuk antrean dari mana saja lewat jendela Piala Lembah, atau bicaralah dengan Penjaga Lapangan Bram di gerbang Sowfield. Pilih format dari satu lawan satu hingga lima lawan lima, sebuah negeri panji, dan peran olahraga; masuk antrean sendirian atau bawa party-mu.",
-      "howMatch": "Saat sepak mula, perangkat kelasmu ditukar dengan perangkat olahraga dan dikembalikan persis seperti semula setelahnya. Tendangan mengarah ke retikel di tanah, bola memantul dari papan pembatas, dan menggiring bola hanyalah berlari bersama bola. Cetak gol lebih banyak dari lawan sebelum waktu habis; hasil imbang berlanjut ke gol emas.",
-      "howTruce": "Tak ada yang berdarah di Sowfield: tekel hanya membuat terjungkal, tak ada yang terluka, dan peliharaan menunggu di luar lapangan.",
-      "spectateBody": "Satu pertandingan berlangsung pada satu waktu di stadion, dan siapa pun bisa datang menonton dari tribun.",
-      "bettingHeading": "Taruhan kecil di pinggir lapangan",
-      "bettingBody": "Penonton di Sowfield bisa mendukung satu sisi saat pertandingan sedang terbentuk: taruhan dikumpulkan bersama, dan pada peluit terakhir para pemenang membagi kumpulan pihak yang kalah sesuai proporsi taruhan mereka. Pertandingan seri, atau kejutan yang tak didukung siapa pun, mengembalikan tiap koin. Pemain yang duduk dalam pertandingan tak bisa bertaruh padanya, dan pagar pembatas menyimpan rekor seumur hidupmu berupa menang, kalah, dan koin bersih.",
-      "practiceHeading": "Pertandingan latihan dan lapangan yang menganggur",
-      "practiceBody": "Jendela Piala Lembah juga menawarkan latihan: salinan pribadi lapangan tempat bot mengisi kedua sisi dan tak ada yang dihitung ke rekormu. Kurang satu-dua pemain untuk pertandingan sungguhan? Setelah menunggu sebentar, bot melengkapi tim, dan pertandingan apa pun dengan bot di lapangan bersifat persahabatan, tak pernah berperingkat. Dan saat Sowfield menganggur, bot menggelar pertunjukan yang bisa kamu tonton, dan taruhkan, dari tribun; begitu pemain sungguhan menyatakan siap, pertunjukan menyerahkan lapangan dan tiap taruhan dikembalikan.",
-      "nationsHeading": "Delapan negeri panji",
-      "nationsBody": "Setiap tim bermain di bawah sebuah panji. Kapten memilih negerinya, dan jika kedua tim mengibarkan panji yang sama, tim tandang memakai palet warna terbalik.",
-      "nationVale": "Hijau dan emas, mengibarkan berkas gandum: tim tuan rumah, buruh tani sejati.",
-      "nationMirefen": "Toska dan kelabu di bawah burung bangau: sabar, berkaki panjang, tak pernah terburu-buru.",
-      "nationThornpeak": "Biru es dan putih di bawah puncak gunung: berpijak mantap dan keras kepala.",
-      "nationColiseum": "Merah dan hitam dengan pedang bersilang: mereka bermain seakan ini masih permainan perang.",
-      "nationChoir": "Biru pucat dan perak di bawah lonceng: menyeramkan, presisi, dan sangat pendiam.",
-      "nationOgre": "Jingga dan cokelat tua di balik kepalan: bahu duluan, dan bangga akan itu.",
-      "nationMoon": "Ungu dan perak di bawah bulan sabit: pemain malam, ringan langkahnya.",
-      "nationCopperdig": "Tembaga dan cokelat dengan beliung: para penggali yang tak pernah berhenti berlari.",
-      "rolesHeading": "Peran olahraga",
-      "rolesBody": "Peranmu menentukan perangkat yang kau bawa ke lapangan. Semua orang menendang; sisanya soal watak. Di bracket satu lawan satu dan dua lawan dua semua orang memainkan perangkat serba bisa, jadi pemilihan peran baru benar-benar berperan mulai dari tiga lawan tiga ke atas.",
-      "rewardsHeading": "Aturan gencatan",
-      "rewardsBody": "Aturan gencatan berarti tanpa pengalaman dan tanpa jarahan: pertandingan yang tuntas dihitung ke dalam rekormu dan papan pemenang, dan kemenangan juga dihitung untuk tugas hadiah hari itu. Meninggalkan pertandingan membekukan slotmu, dan Sang Penjaga Lapangan mengingatnya."
     },
     "deedsPage": {
       "intro": "Kitab Jasa adalah tempat dunia mencatat segala yang telah kamu lakukan, dari langkah pertamamu keluar dari lembah permulaan hingga pertarungan tersulit yang bisa disodorkan realm ini. Raih jasa sembari bermain, sandang gelar yang dianugerahkannya, dan saksikan Kemasyhuranmu menanjak.",
@@ -13439,9 +13266,6 @@ export const id_ID: EnTranslations = {
       "tolling_bell": {
         "name": "Lonceng Berdentang"
       },
-      "vale_cup_ball": {
-        "name": "Bola Babi Hutan"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Puncak yang Terjaga"
       },
@@ -14038,11 +13862,6 @@ export const id_ID: EnTranslations = {
         "name": "Sang Penjaga Pucat",
         "title": "Penjaga Para Mati",
         "greeting": "Beristirahatlah, arwah. Aku bisa mengembalikanmu ke tubuhmu, tapi penyeberangan kembali akan membuatmu lemah."
-      },
-      "groundskeeper_bram": {
-        "name": "Penjaga Lapangan Bram",
-        "title": "Penjaga Sowfield",
-        "greeting": "Gencatan tetap berlaku di Sowfield, {className}: hanya tendangan dan benturan bahu. Mau bermain memperebutkan Ember Tembaga?"
       },
       "chronicler_saul": {
         "name": "Saul sang Juru Kronik",
@@ -16492,6 +16311,9 @@ export const id_ID: EnTranslations = {
           },
           "11": {
             "label": "Jalan Lintas Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

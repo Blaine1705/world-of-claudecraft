@@ -1025,7 +1025,6 @@ export const da_DK: EnTranslations = {
       "targetFriendlyNext": "Skift allieret mål",
       "targetPrev": "Skift mål baglæns",
       "discord": "Discord",
-      "valecup": "Dalpokalen",
       "bgFlag": "Flaghandling på slagmarken",
       "sheathe": "Gem/fremvis våben",
       "dive": "Svøm ned",
@@ -1191,146 +1190,6 @@ export const da_DK: EnTranslations = {
         "azureKeep": "Azurblå Borg",
         "ruinCourtyard": "Ruingården",
         "graveyard": "Kirkegård"
-      }
-    },
-    "vcup": {
-      "title": "Dalpokalen",
-      "shootPower": "KRAFT",
-      "close": "Luk Dalpokal-vinduet",
-      "offlineNote": "Kampbogen er lukket. Dalpokalen er ikke tilgængelig lige nu.",
-      "recordLine": "Din statistik: {wins} sejre, {losses} nederlag, {draws} uafgjorte.",
-      "bracketsAria": "Kamprække",
-      "bracketLabel": "{n} mod {n}",
-      "waitingCount": "{count} venter",
-      "nationsHeading": "Bannernation",
-      "nation": {
-        "vale": "Østbæk Dal",
-        "mirefen": "Mosekæret",
-        "thornpeak": "Tornetop",
-        "coliseum": "Askekolosseet",
-        "choir": "Det Blege Kor",
-        "ogre": "Ogreklanerne",
-        "moon": "Den Blege Måne",
-        "copperdig": "Kobbergraven"
-      },
-      "awayNote": "Fører begge sider det samme banner, spiller udeholdet i den omvendte palet.",
-      "rolesHeading": "Sportsrolle",
-      "rolesSmallBracketNote": "I 1v1- og 2v2-rækkerne spiller alle kæmpere med Allrounder-sættet. Bedrifter, der kræver 3v3-rækken eller større, kan ikke opnås her.",
-      "role": {
-        "allrounder": {
-          "name": "Allrounder",
-          "desc": "Lidt af det hele: spark, kæmpespark og et fair skulderpuf."
-        },
-        "striker": {
-          "name": "Angriber",
-          "desc": "Lever for det lange spark og det hurtige sidespring."
-        },
-        "sweeper": {
-          "name": "Libero",
-          "desc": "Puffer løbere væk fra bolden og rydder den langt op ad banen."
-        },
-        "keeper": {
-          "name": "Målmand",
-          "desc": "Vogter målfeltet med greb, dyk og udspark."
-        }
-      },
-      "queue": "Stil dig i kø",
-      "leaveQueue": "Forlad køen",
-      "queueNote": "Stil dig i kø hvor som helst; fløjten kalder dig til Somarken.",
-      "queuedStatus": "I kø til {bracket}: plads {position} af {count}.",
-      "blockNation": "Vælg en bannernation først.",
-      "blockPartySize": "Den række kræver en mindre gruppe.",
-      "blockNotLeader": "Kun gruppelederen kan sætte holdet i kø.",
-      "inMatchNote": "Dit hold er på banen. Spil videre!",
-      "deserterNote": "Banemesteren husker det. Du kan stille dig i kø igen om {seconds} sek.",
-      "liveHeading": "Lige nu på Somarken",
-      "liveAria": "Dalpokalen: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Gå hen til Somarken for at se med fra tribunerne.",
-      "noLive": "Banen er stille. Der spilles ingen kamp.",
-      "boardHeading": "Vindertavlen",
-      "boardEmpty": "Ingen vindere noteret endnu. Kobberspanden venter.",
-      "boardWins": "{count} sejre",
-      "enterAsGuild": "Stil op under {guild}s banner",
-      "guildRecordLine": "Dit laugs statistik: {wins} sejre, {losses} nederlag.",
-      "guildBoardHeading": "Laugsbannere",
-      "guildBoardEmpty": "Intet laug har endnu været på banen. Hejs jeres banner!",
-      "guildBoardWl": "{wins} S, {losses} N",
-      "practice": "Træning mod bots",
-      "practiceNote": "Starter straks en privat botkamp på din egen træningsbane.",
-      "practiceUnratedNote": "Træningskampe er urangerede: stilling og fremgang i Bedrifternes Bog tæller ikke.",
-      "practicingNow": "Træner lige nu ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Dalpokal-kø: {bracket}, plads {position} af {count}",
-      "indicatorLive": "Dalpokalen",
-      "indicatorOpen": "Åbn Dalpokal-vinduet",
-      "phaseCountdown": "Kampstart om {seconds}",
-      "phaseGoal": "MÅL!",
-      "phaseGolden": "GYLDENT MÅL",
-      "phaseOver": "FULD TID",
-      "bannerFound": "Dalpokalen kalder: {nationA} mod {nationB}!",
-      "bannerCountdown": "Kampstart om {seconds}...",
-      "bannerKickoff": "KAMPSTART!",
-      "bannerGoal": "MÅL! {nation} scorer!",
-      "bannerSave": "{name} REDDER!",
-      "bannerGolden": "GYLDENT MÅL: næste scoring vinder!",
-      "bannerEnd": "Fuld tid: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Sejr på Somarken!",
-      "bannerDraw": "Uafgjort på Somarken.",
-      "bannerLoss": "Nederlag på Somarken.",
-      "logQueued": "Du stiller dig i Dalpokal-køen til {bracket} (plads {position}).",
-      "logUnqueued": "Du forlader Dalpokal-køen.",
-      "logFound": "Din Dalpokal-kamp er klar: {nationA} mod {nationB}.",
-      "logRoster": "Din side: {allies}. Deres side: {enemies}.",
-      "logGoal": "{name} scorer for {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} redder!",
-      "logWin": "Du vinder dysten på Somarken.",
-      "logDraw": "Dysten på Somarken ender uafgjort.",
-      "logLoss": "Du taber dysten på Somarken.",
-      "gossipOpen": "Kampbogen",
-      "gossipOpenAria": "Åbn Dalpokal-vinduet",
-      "mobileLabel": "Pokal",
-      "briefing": {
-        "subtitle": "Briefing før kampen",
-        "vs": "mod",
-        "rulesHeading": "Sådan spiller du",
-        "rule1": "Spark eller aflever bolden i modstandernes mål for at score.",
-        "rule2": "Først til 5 mål vinder, eller flest mål når der fløjtes af.",
-        "rule3": "Står det lige ved fuld tid, går kampen til gyldent mål: næste scoring vinder.",
-        "rule4": "Tacklinger vælter dig kun omkuld. Ingen kommer til skade under høstfreden.",
-        "rule5": "Enhver kan gå hen og heppe på dig fra tribunerne.",
-        "kitHeading": "Dit sæt",
-        "kitNote": "Disse træk erstatter dine klasseevner under kampen.",
-        "unratedNote": "Der er bots på banen, så denne kamp er urangeret: stillingen rykker sig ikke, og bedrifter for mål, redninger og kampe uden mål imod tæller ikke.",
-        "practiceUnratedNote": "Dette er en træningskamp, så den er urangeret: stillingen rykker sig ikke, og fremgang i Bedrifternes Bog tæller ikke.",
-        "rosterHeading": "Holdkortet",
-        "you": "Dig",
-        "bot": "Bot",
-        "ready": "Jeg er klar",
-        "readyDone": "Klar",
-        "readyAria": "Meld dig klar til kampstart",
-        "waiting": "Venter på, at den anden side melder klar...",
-        "whistle": "Fløjten lyder om {seconds}s.",
-        "readyCount": "{ready} af {total} klar"
-      },
-      "bet": {
-        "title": "Kampvæddemål",
-        "aria": "Væddemål på Dalpokal-kamp",
-        "closesIn": "Væddemål lukker om {seconds}s",
-        "closed": "Væddemål lukket",
-        "prize": "Pulje {amount}",
-        "splitAria": "Andel af væddepuljen på hvert hold",
-        "expand": "Se væddemål og sats",
-        "collapse": "Skjul væddemål",
-        "oddsLabel": "Udbetaler",
-        "back": "Hold på {team}",
-        "form": "{wins}S-{losses}N",
-        "mine": "Dit væddemål: {amount} på {team}",
-        "none": "Du har endnu ikke væddet på denne kamp.",
-        "record": "Væddestatistik: {wins}S-{losses}N, {sign}{net}",
-        "wonBanner": "Dit væddemål vandt!",
-        "wonLog": "Dit Dalpokal-væddemål vandt: {amount} retur.",
-        "lostLog": "Dit Dalpokal-væddemål tabte: {amount}.",
-        "refundLog": "Væddemål annulleret, din indsats på {amount} blev returneret."
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const da_DK: EnTranslations = {
       "combat": "Kamp",
       "talents": "Talenter",
       "arena": "Arena & PvP",
-      "valeCup": "Dalpokalen",
       "thornhollow": "Tornehulemarkerne",
       "deeds": "Bedrifternes Bog",
       "reliquary": "Relikvariet",
@@ -4210,7 +4068,6 @@ export const da_DK: EnTranslations = {
       "reliquary": "Relikvariet",
       "sheathe": "Gem/fremvis våben",
       "crafting": "Håndværk",
-      "valeCup": "Dalpokalen",
       "mount": "Stig op / Stig af",
       "calendar": "Begivenhedskalender",
       "dungeonFinder": "Fangekældersfinder",
@@ -5287,36 +5144,6 @@ export const da_DK: EnTranslations = {
       "ladderBody": "Hver kamp flytter en vedvarende slagmarksrangering knyttet til figuren, sejr eller nederlag, og tavlen gennem alle tider rangordner rigets mestre.",
       "rewardsHeading": "Hvad en kamp udbetaler",
       "rewardsBody": "Hver afsluttet kamp udbetaler Ære: mere for en sejr, en trøstepræmie for et nederlag eller en uafgjort, plus et lille beløb for hvert dræbende slag, du lander, og hvert ét, du medvirker til, så det stadig kan betale sig at kæmpe væk fra flagene. Din første sejr hver dag udbetaler en bonus oveni, og panelet fortæller dig det, mens den bonus stadig venter på dig. Den dag er Ærens egen, og den ruller videre efter sit eget ur i stedet for med rigets instans-nulstilling. At møde det samme hold igen og igen betaler mindre for selve kampen efter den første gang, og det falder hurtigt til ro på et gulv i stedet for at forsvinde helt, og en opgivet kamp betaler slet intet. Brug det, du tjener, hos en af Krigsførelsens kvartermestre."
-    },
-    "valeCupPage": {
-      "heading": "Dalpokalen",
-      "intro": "Vildsvinebold på Somarken: vælg et banner, vælg en rolle, og spark et udstoppet vildsvineskind forbi en målmand for at vinde Kobberspanden. Intet blod, intet bytte, kun tribunernes brøl.",
-      "loreHeading": "Vildsvinebold og høstfreden",
-      "loreOldSow": "Længe før de døde vågnede, spillede Østbæks karle vildsvinebold på stubmarkerne efter høst: to flokke, ét vildsvineskind stoppet med halm og to vognporte slæbt til hver sin ende af grønningen. Den første bold, Den Gamle So, hænger bronzeret over kroens ildsted.",
-      "loreTruce": "Da Askekolosseet begyndte at godkende krigslege, svarede Marskal Redbrook med noget mildere: en stående høstfred på den gamle grønning. Vognportene blev til målstolper, grønningen fik mure, tribuner og et navn, Somarken, og præmien var altid den samme bulede mælkespand, som vinderne drak af: Kobberspanden.",
-      "howHeading": "Sådan spiller du",
-      "howQueue": "Stil dig i kø hvor som helst gennem Dalpokal-vinduet, eller tal med Banemester Bram ved Somarkens port. Vælg en række fra en mod en op til fem mod fem, en bannernation og en sportsrolle; stil op alene, eller tag din gruppe med.",
-      "howMatch": "Ved kampstart byttes dit klassesæt ud med et sportssæt og gendannes nøjagtigt bagefter. Spark sigter mod jordsigtet, bolden preller af på banderne, og driblinger er bare at løbe med bolden. Scor flere mål end den anden side inden fuld tid; uafgjort går til gyldent mål.",
-      "howTruce": "Ingen bløder på Somarken: tacklinger ender i kolbøtter, intet gør ondt, og kæledyr sidder kampen over.",
-      "spectateBody": "Én kamp spilles ad gangen på stadion, og enhver kan gå hen og se med fra tribunerne.",
-      "bettingHeading": "Et lille væddemål ved rækværket",
-      "bettingBody": "Tilskuere ved Somarken kan bakke en side op, mens en kamp danner sig: indsatserne samles i en pulje, og ved slutfløjtet deler vinderne tabernes pulje i forhold til, hvad de satsede. En uafgjort kamp, eller en overraskelse, som ingen bakkede op, refunderer hver mønt. Spillere, der er sat ind i kampen, kan ikke vædde på den, og rækværket fører din livstidsstatistik over sejre, nederlag og nettomønter.",
-      "practiceHeading": "Træningskampe og den tomme bane",
-      "practiceBody": "Dalpokal-vinduet tilbyder også træning: en privat kopi af banen, hvor bots fylder begge sider ud, og intet tæller med i din statistik. Mangler du en spiller eller to til det virkelige? Efter en kort ventetid runder bots holdene af, og enhver kamp med bots på banen er en venskabskamp, aldrig rangeret. Og når Somarken står tom, giver botsene en opvisning, du kan se, og vædde på, fra tribunerne; i det øjeblik rigtige spillere melder sig klar, overlader opvisningen banen, og hver indsats gives tilbage.",
-      "nationsHeading": "De otte bannernationer",
-      "nationsBody": "Hvert hold spiller under et banner. Anføreren vælger nationen, og fører begge sider det samme, spiller udeholdet i den omvendte palet.",
-      "nationVale": "Grøn og guld under hvedeneget: hjemmeholdet, bondekarle ind til benet.",
-      "nationMirefen": "Blågrøn og grå under hejren: tålmodige, langbenede, aldrig forjagede.",
-      "nationThornpeak": "Isblå og hvid under bjergtinden: sikre på fødderne og stædige.",
-      "nationColiseum": "Rød og sort med korslagte sværd: de spiller, som var det stadig en krigsleg.",
-      "nationChoir": "Lyseblå og sølv under klokken: uhyggelige, præcise og meget stille.",
-      "nationOgre": "Orange og umbra bag næven: skulderen først, og stolte af det.",
-      "nationMoon": "Violet og sølv under halvmånen: natspillere, lette på fødderne.",
-      "nationCopperdig": "Kobber og brun med hakken: gravere, der aldrig holder op med at løbe.",
-      "rolesHeading": "Sportsroller",
-      "rolesBody": "Din rolle afgør det sæt, du bærer med ind på banen. Alle sparker; resten er temperament. I kategorierne en-mod-en og to-mod-to spiller alle allround-sættet, så rollevalg kommer først til deres ret fra tre-mod-tre og opefter.",
-      "rewardsHeading": "Fredens regler",
-      "rewardsBody": "Fredens regler betyder ingen erfaring og intet bytte: en afgjort kamp tæller med i din statistik og på vindertavlen, og en sejr tæller også med i dagens belønningsopgaver. Deserterer du en kamp, sættes din plads på bænken, og Banemesteren husker det."
     },
     "deedsPage": {
       "intro": "Bedrifternes Bog er stedet, hvor verden holder regnskab med alt, hvad du har udrettet, fra dine første skridt ud af startdalen til de hårdeste kampe, riget kan byde på. Opnå bedrifter, mens du spiller, bær de titler, de skænker, og se din hæder stige.",
@@ -13439,9 +13266,6 @@ export const da_DK: EnTranslations = {
       "tolling_bell": {
         "name": "Klemtende Klokke"
       },
-      "vale_cup_ball": {
-        "name": "Vildsvinebold"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den Vågnende Tinde"
       },
@@ -14038,11 +13862,6 @@ export const da_DK: EnTranslations = {
         "name": "Den Blege Vogter",
         "title": "De Dødes Vogter",
         "greeting": "Hvil nu, ånd. Jeg kan føre dig tilbage til din krop, men overfarten tilbage efterlader dig svækket."
-      },
-      "groundskeeper_bram": {
-        "name": "Banemester Bram",
-        "title": "Somarkens Vogter",
-        "greeting": "Freden holder på Somarken, {className}: kun spark og skulderpuf. Har du lyst til at spille om Kobberspanden?"
       },
       "chronicler_saul": {
         "name": "Krønikeskriveren Saul",
@@ -16492,6 +16311,9 @@ export const da_DK: EnTranslations = {
           },
           "11": {
             "label": "Fjernkyst-Dæmningen"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

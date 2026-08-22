@@ -1025,7 +1025,6 @@ export const zh_TW: EnTranslations = {
       "targetFriendlyNext": "切換友方目標",
       "targetPrev": "反向切換目標",
       "discord": "Discord",
-      "valecup": "溪谷盃",
       "bgFlag": "戰場奪旗動作",
       "sheathe": "收起/拔出武器",
       "dive": "下潛",
@@ -1191,146 +1190,6 @@ export const zh_TW: EnTranslations = {
         "azureKeep": "蔚藍要塞",
         "ruinCourtyard": "廢墟庭院",
         "graveyard": "墓地"
-      }
-    },
-    "vcup": {
-      "title": "溪谷盃",
-      "shootPower": "力道",
-      "close": "關閉溪谷盃視窗",
-      "offlineNote": "賽程簿已闔上。溪谷盃目前無法使用。",
-      "recordLine": "你的戰績：{wins} 勝，{losses} 敗，{draws} 平。",
-      "bracketsAria": "比賽賽級",
-      "bracketLabel": "{n}對{n}",
-      "waitingCount": "{count} 人等待中",
-      "nationsHeading": "旗幟國度",
-      "nation": {
-        "vale": "東溪谷",
-        "mirefen": "泥沼",
-        "thornpeak": "荊峰",
-        "coliseum": "灰燼競技場",
-        "choir": "蒼白唱詩班",
-        "ogre": "食人魔氏族",
-        "moon": "蒼白之月",
-        "copperdig": "銅礦坑"
-      },
-      "awayNote": "若雙方舉同一面旗幟，客隊將使用反轉配色。",
-      "rolesHeading": "運動位置",
-      "rolesSmallBracketNote": "在1對1和2對2賽級中，所有選手都以全能型出賽。要求3對3或更大賽級的功績在此無法達成。",
-      "role": {
-        "allrounder": {
-          "name": "全能型",
-          "desc": "樣樣都會：踢球、長傳，還有一記正當的肩撞。"
-        },
-        "striker": {
-          "name": "前鋒",
-          "desc": "為大腳開球和靈巧側身而生。"
-        },
-        "sweeper": {
-          "name": "清道夫",
-          "desc": "把持球者撞開，再把球大腳解圍。"
-        },
-        "keeper": {
-          "name": "守門員",
-          "desc": "用抓球、撲救和長踢守住球門區。"
-        }
-      },
-      "queue": "加入佇列",
-      "leaveQueue": "離開佇列",
-      "queueNote": "隨時隨地排隊；哨聲會召喚你前往母豬場。",
-      "queuedStatus": "已排入 {bracket}：第 {position} 位，共 {count} 人。",
-      "blockNation": "請先選擇一個旗幟國度。",
-      "blockPartySize": "這個賽級需要更小的隊伍。",
-      "blockNotLeader": "只有隊長才能為隊伍排隊。",
-      "inMatchNote": "你的隊伍正在場上。繼續比賽！",
-      "deserterNote": "場地管理員記著呢。{seconds} 秒後才能再次排隊。",
-      "liveHeading": "母豬場現況",
-      "liveAria": "溪谷盃：{nationA} {scoreA}，{nationB} {scoreB}",
-      "walkUp": "走到母豬場，從看台上觀賽。",
-      "noLive": "球場很安靜。目前沒有比賽。",
-      "boardHeading": "優勝者榜",
-      "boardEmpty": "尚無優勝紀錄。銅奶桶還在等待。",
-      "boardWins": "{count} 勝",
-      "enterAsGuild": "以 {guild} 的旗號參賽",
-      "guildRecordLine": "你的公會戰績：{wins} 勝，{losses} 敗。",
-      "guildBoardHeading": "公會旗幟榜",
-      "guildBoardEmpty": "還沒有公會上場。揚起你的旗幟吧！",
-      "guildBoardWl": "{wins} 勝，{losses} 敗",
-      "practice": "與機器人練習賽",
-      "practiceNote": "立即在母豬場開始一場完整的機器人比賽。",
-      "practiceUnratedNote": "練習賽不計入積分：戰績與功績之書進度均不計算。",
-      "practicingNow": "正在練習（{count}）：",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "溪谷盃佇列：{bracket}，第 {position} 位，共 {count} 人",
-      "indicatorLive": "溪谷盃",
-      "indicatorOpen": "開啟溪谷盃視窗",
-      "phaseCountdown": "{seconds} 秒後開球",
-      "phaseGoal": "進球！",
-      "phaseGolden": "黃金進球",
-      "phaseOver": "全場結束",
-      "bannerFound": "溪谷盃開賽：{nationA} 對戰 {nationB}！",
-      "bannerCountdown": "{seconds} 秒後開球...",
-      "bannerKickoff": "開球！",
-      "bannerGoal": "進球！{nation} 破門！",
-      "bannerSave": "{name} 撲救成功！",
-      "bannerGolden": "黃金進球：下一球定勝負！",
-      "bannerEnd": "全場結束：{nationA} {scoreA}，{nationB} {scoreB}",
-      "bannerWin": "母豬場的勝利！",
-      "bannerDraw": "母豬場的比賽以平手收場。",
-      "bannerLoss": "在母豬場落敗。",
-      "logQueued": "你加入了 {bracket} 溪谷盃佇列（第 {position} 位）。",
-      "logUnqueued": "你離開了溪谷盃佇列。",
-      "logFound": "你的溪谷盃比賽已就緒：{nationA} 對戰 {nationB}。",
-      "logRoster": "你方：{allies}。對方：{enemies}。",
-      "logGoal": "{name} 為 {nation} 破門！{nationA} {scoreA}，{nationB} {scoreB}。",
-      "logSave": "{name} 完成撲救！",
-      "logWin": "你贏下了母豬場的這一戰。",
-      "logDraw": "母豬場的這一戰以平手告終。",
-      "logLoss": "你輸掉了母豬場的這一戰。",
-      "gossipOpen": "賽程簿",
-      "gossipOpenAria": "開啟溪谷盃視窗",
-      "mobileLabel": "盃賽",
-      "briefing": {
-        "subtitle": "賽前簡報",
-        "vs": "對",
-        "rulesHeading": "玩法",
-        "rule1": "把球踢或傳進對方球門即可得分。",
-        "rule2": "先進 5 球者勝，或全場結束時進球最多者勝。",
-        "rule3": "全場打平則進入金球賽：下一個進球者獲勝。",
-        "rule4": "鏟球只會把人撞倒，沒有人會受傷，豐收休戰為證。",
-        "rule5": "任何人都可以走上前，在看台上為你加油。",
-        "kitHeading": "你的技能",
-        "kitNote": "比賽期間，這些動作將取代你的職業技能。",
-        "unratedNote": "場上有機器人，因此本場為非積分賽：戰績不會變動，進球、撲救與零封的功績均不計算。",
-        "practiceUnratedNote": "這是練習賽，因此不計入積分：戰績不會變動，功績之書進度也不計算。",
-        "rosterHeading": "出場名單",
-        "you": "你",
-        "bot": "電腦",
-        "ready": "我準備好了",
-        "readyDone": "已準備",
-        "readyAria": "準備開球",
-        "waiting": "正在等待對方準備……",
-        "whistle": "開球哨將在 {seconds} 秒後吹響。",
-        "readyCount": "已準備 {ready}/{total}"
-      },
-      "bet": {
-        "title": "本場投注",
-        "aria": "溪谷盃比賽投注",
-        "closesIn": "{seconds} 秒後停止投注",
-        "closed": "投注已截止",
-        "prize": "獎池 {amount}",
-        "splitAria": "兩隊投注池佔比",
-        "expand": "查看並下注",
-        "collapse": "收起投注",
-        "oddsLabel": "賠率",
-        "back": "押注 {team}",
-        "form": "{wins}勝-{losses}負",
-        "mine": "你的投注：{amount} 押 {team}",
-        "none": "你還沒有在本場比賽下注。",
-        "record": "投注戰績：{wins}勝-{losses}負，{sign}{net}",
-        "wonBanner": "你贏了這注！",
-        "wonLog": "你的溪谷盃投注贏了：返還 {amount}。",
-        "lostLog": "你的溪谷盃投注輸了：{amount}。",
-        "refundLog": "投注作廢，已退還你的 {amount} 本金。"
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const zh_TW: EnTranslations = {
       "combat": "戰鬥",
       "talents": "天賦",
       "arena": "競技場與PvP",
-      "valeCup": "溪谷盃",
       "thornhollow": "荊谷原野",
       "deeds": "功績之書",
       "reliquary": "聖物庫",
@@ -4210,7 +4068,6 @@ export const zh_TW: EnTranslations = {
       "reliquary": "聖物庫",
       "sheathe": "收起/拔出武器",
       "crafting": "製作",
-      "valeCup": "溪谷盃",
       "mount": "騎乘 / 下騎",
       "calendar": "活動日曆",
       "dungeonFinder": "地城搜尋器",
@@ -5287,36 +5144,6 @@ export const zh_TW: EnTranslations = {
       "ladderBody": "每場比賽都會牽動一份與角色綁定的持久戰場評級，無論勝負，而歷代榜單則為國度的勇士們排定名次。",
       "rewardsHeading": "一場比賽的報酬",
       "rewardsBody": "每一場結束的比賽都會發放榮譽：勝利給得更多，落敗或平手則有一份安慰獎，另外你每打出一次致命一擊、每協助一次擊殺也都會拿到少量榮譽，因此在遠離旗幟的地方作戰依然值得。你每天的第一場勝利會額外加發一份獎勵，而面板會在那份獎勵仍等著你的時候告訴你。那個「一天」屬於榮譽自己，它依自己的時鐘換日，而不是跟著王國的副本重置。反覆遇上同一支隊伍時，比賽本身的報酬在第一場之後會降低，並很快穩定在一個底線，而不是一路歸零，至於棄權的比賽則完全不給報酬。你掙得的一切都能在任一位戰爭軍需官處花用。"
-    },
-    "valeCupPage": {
-      "heading": "溪谷盃",
-      "intro": "母豬場上的野豬球：選一面旗幟、選一個位置，把塞滿稻草的野豬皮球踢過守門員，去爭奪銅奶桶。不流血，無戰利品，只有看台的歡呼。",
-      "loreHeading": "野豬球與豐收休戰",
-      "loreOldSow": "早在亡者甦醒之前，東溪的農工們就在收割後的麥茬地上玩野豬球：兩群人，一張塞滿稻草的野豬皮，和拖到綠地兩端的兩扇貨車門。第一顆球「老母豬」，如今鍍銅掛在酒館壁爐上方。",
-      "loreTruce": "當灰燼競技場開始批准戰爭競技時，紅溪元帥以更溫和的方式回應：在老綠地上立下長期的豐收休戰。貨車門變成了球門，綠地有了圍牆、看台和一個名字：母豬場。而獎品始終是優勝者們共飲的那只癟了的奶桶：銅奶桶。",
-      "howHeading": "怎麼玩",
-      "howQueue": "透過溪谷盃視窗隨處排隊，或到母豬場大門找場地管理員布拉姆。選擇從一對一到五對五的賽級、一面旗幟國度和一個運動位置；可以單排，也可以帶上隊伍。",
-      "howMatch": "開球時你的職業技能會被換成運動技能，賽後原樣恢復。踢球以地面準星瞄準，球會在擋板上反彈，帶球就是推著球跑。在全場結束前比對方進更多球；平手進入黃金進球。",
-      "howTruce": "母豬場上無人流血：鏟搶只會讓人翻滾，什麼都不會造成傷害，寵物也會場外休息。",
-      "spectateBody": "球場同一時間只進行一場比賽，任何人都可以走到看台觀賽。",
-      "bettingHeading": "欄杆邊的小賭一把",
-      "bettingBody": "比賽成形期間，母豬場的觀眾可以押注其中一方：賭注匯成獎池，終場哨響時，勝方按各自押注的比例瓜分敗方的獎池。平局，或是無人押中的冷門，會退還每一枚錢幣。上場比賽的球員不得押注自己的比賽，而欄杆邊會記下你勝、負與淨賺錢幣的生涯紀錄。",
-      "practiceHeading": "練習賽與閒置的球場",
-      "practiceBody": "溪谷盃視窗也提供練習：一座球場的私人複本，由機器人補滿雙方，任何內容都不計入你的戰績。正式比賽還差一兩個人？稍候片刻，機器人便會補齊隊伍，而任何有機器人上場的比賽都是友誼賽，絕不計入排名。而當母豬場閒置時，機器人會上演一場表演賽，你可以從看台上觀賞、也可以下注；一旦真正的玩家準備就緒，表演賽便會讓出球場，所有賭注全數退還。",
-      "nationsHeading": "八個旗幟國度",
-      "nationsBody": "每支隊伍都在一面旗幟下比賽。隊長選擇國度；若雙方舉同一面旗，客隊使用反轉配色。",
-      "nationVale": "綠與金，揚著麥捆旗：主場球隊，骨子裡都是農工。",
-      "nationMirefen": "青與灰，蒼鷺旗下：耐心、腿長、從不著急。",
-      "nationThornpeak": "冰藍與白，山峰旗下：步伐穩健、性子倔強。",
-      "nationColiseum": "紅與黑，交叉雙劍：他們踢起球來仍像在打仗。",
-      "nationChoir": "淡藍與銀，鈴鐺旗下：詭異、精準、非常安靜。",
-      "nationOgre": "橙與棕，鐵拳當先：肩膀開路，並引以為傲。",
-      "nationMoon": "紫與銀，彎月旗下：夜行的球員，腳步輕盈。",
-      "nationCopperdig": "銅與褐，別著鎬頭：跑不停歇的礦工。",
-      "rolesHeading": "運動位置",
-      "rolesBody": "你的位置決定你帶上球場的技能。人人都會踢球；其餘看性情。在一人制與二人制的級別中，每個人都使用全能配套，因此位置的選擇要從三人制起才真正發揮作用。",
-      "rewardsHeading": "休戰規矩",
-      "rewardsBody": "休戰規矩意味著沒有經驗也沒有戰利品：一場分出勝負的比賽會計入你的戰績和優勝者榜，而一場勝利也會計入當日的獎勵任務。中途棄賽會讓你的位置空缺，而場地管理員可記著呢。"
     },
     "deedsPage": {
       "intro": "功績之書記錄著你在這個世界所做的一切，從走出新手山谷的第一步，到王國所能提供的最艱難的戰鬥。一邊遊玩一邊贏得功績，佩戴它們授予的頭銜，看著你的名望不斷攀升。",
@@ -13439,9 +13266,6 @@ export const zh_TW: EnTranslations = {
       "tolling_bell": {
         "name": "鳴鐘"
       },
-      "vale_cup_ball": {
-        "name": "野豬皮球"
-      },
       "thunzharr_waking_peak": {
         "name": "桑扎爾，覺醒之峰"
       },
@@ -14038,11 +13862,6 @@ export const zh_TW: EnTranslations = {
         "name": "靈魂醫者",
         "title": "亡者的守護者",
         "greeting": "安息吧，靈魂。我可以讓你重返軀體，但歸途會讓你變得虛弱。"
-      },
-      "groundskeeper_bram": {
-        "name": "場地管理員布拉姆",
-        "title": "母豬場看守",
-        "greeting": "休戰約定在母豬場依然有效，{className}：只許用腳和肩膀。想為銅奶桶一戰嗎？"
       },
       "chronicler_saul": {
         "name": "編年史者紹爾",
@@ -16492,6 +16311,9 @@ export const zh_TW: EnTranslations = {
           },
           "11": {
             "label": "遠岸沙洲堤道"
+          },
+          "12": {
+            "label": "東溪碼頭"
           }
         }
       },

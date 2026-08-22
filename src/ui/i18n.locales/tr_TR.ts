@@ -1352,14 +1352,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.actionBar.resetConfirmTitle': 'Eylem çubuğu tuşları sıfırlansın mı?',
   'hudChrome.actionBar.resetConfirmBody':
     'İlk çubuk varsayılan tuşlarına döner. İkinci ve üçüncü çubukların tuş atamaları kaldırılır. Bu geri alınamaz.',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    '1v1 ve 2v2 kategorilerinde her dövüşçü Çok Yönlü donanımıyla oynar. 3v3 ve üzeri kategori isteyen yiğitlikler burada kazanılamaz.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Antrenman maçları derecesizdir: puan durumu ve Yiğitlikler Kitabı ilerlemesi sayılmaz.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'Sahada botlar var, bu yüzden bu maç derecesiz: puan durumu değişmez; gol, kurtarış ve gol yememe yiğitlikleri sayılmaz.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Bu bir antrenman maçı, bu yüzden derecesiz: puan durumu değişmez ve Yiğitlikler Kitabı ilerlemesi sayılmaz.',
   'hudChrome.bags.filterTool': 'Aletler',
   'hudChrome.materialHint.fineGrade':
     'Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.',
@@ -2722,57 +2714,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoulder.description':
     'Hasat ateşkesine yakışır dürüst bir omuz. Rakibi toptan yuvarlayarak uzaklaştırır.',
   'entities.abilities.sport_shoulder.name': 'Omuzlama',
-  'entities.npcs.groundskeeper_bram.greeting':
-    "Domuz Tarlası'nda ateşkes geçerli, {className}: yalnızca vuruş ve omuz. Bakır Kova için oynamaya var mısın?",
-  'entities.npcs.groundskeeper_bram.name': 'Saha Bekçisi Bram',
-  'entities.npcs.groundskeeper_bram.title': "Domuz Tarlası'nın Bekçisi",
   'entities.zones.eastbrook_vale.pois.10.label': 'Domuz Tarlası',
   'guide.nav.professions': 'Meslekler',
-  'guide.nav.valeCup': 'Vadi Kupası',
   'guide.professions.intro':
     'Dünya seni savaşın ve görevlerin ötesinde, toprağı ve ocağı işlediğin için de ödüllendirir: ham madde toplamak, on ayrı zanaat kolunda onları teçhizata ve mallara dönüştürmek ve bu zanaatların temsil ettiği on arketipten birinin kimliğine yerleşmek.',
-  'guide.valeCupPage.heading': 'Vadi Kupası',
-  'guide.valeCupPage.howHeading': 'Nasıl oynanır',
-  'guide.valeCupPage.howMatch':
-    'Başlama vuruşuyla birlikte sınıf yeteneklerin bir spor donanımıyla değiştirilir ve maçtan sonra aynen geri yüklenir. Vuruşlar yerdeki nişangaha nişan alır, top bantlardan seker ve top sürmek topla birlikte koşmaktan ibarettir. Normal süre dolmadan karşı taraftan çok gol at; beraberlik altın gole gider.',
-  'guide.valeCupPage.howQueue':
-    'Vadi Kupası penceresinden her yerden sıraya gir ya da Domuz Tarlası kapısındaki Saha Bekçisi Bram ile konuş. Teke tekten beşe beşe kadar bir kategori, bir sancak ulusu ve bir spor rolü seç; tek başına sıraya gir ya da grubunu getir.',
-  'guide.valeCupPage.howTruce':
-    "Domuz Tarlası'nda kimse kanamaz: müdahaleler yalnızca yere yuvarlar, hiçbir şey acıtmaz ve evcil hayvanlar maçı dışarıdan izler.",
-  'guide.valeCupPage.intro':
-    "Domuz Tarlası'nda Domuztopu: bir sancak seç, bir rol seç ve saman doldurulmuş domuz derisini kalecinin yanından geçirip Bakır Kova'yı kap. Kan yok, ganimet yok; yalnızca tribünlerin uğultusu.",
-  'guide.valeCupPage.loreHeading': 'Domuztopu ve hasat ateşkesi',
-  'guide.valeCupPage.loreOldSow':
-    "Ölüler uyanmadan çok önce, Doğudere'nin ırgatları hasattan sonra anız tarlalarında domuztopu oynardı: iki kalabalık, samanla doldurulmuş bir domuz derisi ve çayırın iki ucuna çekilmiş iki araba kapısı. İlk top, Koca Domuz, bronzlanmış halde meyhane ocağının üstünde asılıdır.",
-  'guide.valeCupPage.loreTruce':
-    'Kül Koliseumu savaş oyunlarına resmiyet kazandırmaya başlayınca, Mareşal Redbrook buna daha yumuşak bir şeyle karşılık verdi: eski çayırda kalıcı bir hasat ateşkesi. Araba kapıları kale direği oldu; çayır duvarlara, tribünlere ve bir isme kavuştu: Domuz Tarlası. Ödülse hep aynıydı: kazananların içinden içtiği o ezik süt kovası, Bakır Kova.',
-  'guide.valeCupPage.nationChoir':
-    'Çanın altında uçuk mavi ve gümüş: ürkütücü, isabetli ve çok sessiz.',
-  'guide.valeCupPage.nationColiseum':
-    'Çapraz kılıçlarla kırmızı ve siyah: hâlâ bir savaş oyunuymuş gibi oynarlar.',
-  'guide.valeCupPage.nationCopperdig':
-    'Kazma armalı bakır ve kahverengi: koşmayı hiç bırakmayan kazıcılar.',
-  'guide.valeCupPage.nationMirefen':
-    'Balıkçılın altında petrol mavisi ve gri: sabırlı, uzun bacaklı, hiç acele etmez.',
-  'guide.valeCupPage.nationMoon': 'Hilalin altında mor ve gümüş: gece oyuncuları, ayakları hafif.',
-  'guide.valeCupPage.nationOgre':
-    'Yumruğun ardında turuncu ve koyu kahve: önce omuz atarlar ve bununla gurur duyarlar.',
-  'guide.valeCupPage.nationThornpeak':
-    'Dağ zirvesinin altında buz mavisi ve beyaz: ayağı sağlam ve inatçı.',
-  'guide.valeCupPage.nationVale':
-    'Yeşil ve altın, başak demeti sancağıyla: ev sahibi taraf, iliklerine kadar ırgat.',
-  'guide.valeCupPage.nationsBody':
-    'Her takım bir sancak altında oynar. Ulusu kaptan seçer ve iki taraf da aynı sancağı taşıyorsa deplasman tarafı ters renk paletiyle oynar.',
-  'guide.valeCupPage.nationsHeading': 'Sekiz sancak ulusu',
-  'guide.valeCupPage.rewardsBody':
-    'Ateşkes kuralları deneyim ve ganimet olmadığı anlamına gelir: sonuçlanan bir maç siciline ve kazananlar panosuna işlenir, bir galibiyet günün ödül görevlerine de sayılır. Maçı terk etmek yerini kızağa alır ve Saha Bekçisi unutmaz.',
-  'guide.valeCupPage.rewardsHeading': 'Ateşkes kuralları',
-  'guide.valeCupPage.rolesBody':
-    'Rolün, sahaya çıkarken taşıyacağın donanımı belirler. Herkes vuruş yapar; gerisi mizaç meselesidir. Bire bir ve ikiye iki kademelerde herkes çok yönlü donanımı oynar, bu yüzden rol seçimleri asıl üçe üçten yukarısında öne çıkar.',
-  'guide.valeCupPage.rolesHeading': 'Spor rolleri',
-  'guide.valeCupPage.spectateBody':
-    'Stadyumda aynı anda tek maç oynanır ve isteyen herkes gelip tribünlerden izleyebilir.',
-  'hudChrome.keybinds.valecup': 'Vadi Kupası',
   'hudChrome.mobile.dailyRewards': 'Mağaza',
   'hudChrome.perf.labels.predLead': 'Tahmin Avansı',
   'hudChrome.townFocus.budgetLabel': 'Kalan puan: {remaining} / {budget}',
@@ -2786,133 +2731,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.townOnlyHint': 'Odak yalnızca kasabadayken değiştirilebilir.',
   'hudChrome.townFocus.saveButton': 'Odağı Kaydet',
   'hudChrome.townFocus.title': 'Kasaba Odağı',
-  'hudChrome.vcup.awayNote':
-    'İki taraf da aynı sancağı taşıyorsa deplasman tarafı ters renk paletiyle oynar.',
-  'hudChrome.vcup.bannerCountdown': 'Başlama vuruşuna {seconds}...',
-  'hudChrome.vcup.bannerDraw': "Domuz Tarlası'nda beraberlik.",
-  'hudChrome.vcup.bannerEnd': 'Maç sonu: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerFound': 'Vadi Kupası çağırıyor: {nationA} ile {nationB} karşı karşıya!',
-  'hudChrome.vcup.bannerGoal': 'GOL! {nation} attı!',
-  'hudChrome.vcup.bannerGolden': 'ALTIN GOL: sıradaki gol kazandırır!',
-  'hudChrome.vcup.bannerKickoff': 'BAŞLAMA VURUŞU!',
-  'hudChrome.vcup.bannerLoss': "Domuz Tarlası'nda yenilgi.",
-  'hudChrome.vcup.bannerSave': '{name} KURTARDI!',
-  'hudChrome.vcup.bannerWin': "Domuz Tarlası'nda zafer!",
-  'hudChrome.vcup.bet.aria': 'Vadi Kupası maç bahisleri',
-  'hudChrome.vcup.bet.back': '{team} tarafını tut',
-  'hudChrome.vcup.bet.closed': 'Bahisler kapandı',
-  'hudChrome.vcup.bet.closesIn': 'Bahisler {seconds} sn içinde kapanır',
-  'hudChrome.vcup.bet.collapse': 'Bahisleri gizle',
-  'hudChrome.vcup.bet.expand': 'Bahisleri gör ve oyna',
-  'hudChrome.vcup.bet.form': '{wins}G-{losses}M',
-  'hudChrome.vcup.bet.lostLog': 'Vadi Kupası bahsin kaybetti: {amount}.',
-  'hudChrome.vcup.bet.mine': 'Bahsin: {team} üzerine {amount}',
-  'hudChrome.vcup.bet.none': 'Bu maçta henüz bahsin yok.',
-  'hudChrome.vcup.bet.oddsLabel': 'Kazandırır',
-  'hudChrome.vcup.bet.prize': 'Havuz {amount}',
-  'hudChrome.vcup.bet.record': 'Bahis sicili: {wins}G-{losses}M, {sign}{net}',
-  'hudChrome.vcup.bet.refundLog': 'Bahisler iptal edildi, {amount} tutarındaki bahsin iade edildi.',
-  'hudChrome.vcup.bet.splitAria': 'Bahis havuzunun takımlara göre payı',
-  'hudChrome.vcup.bet.title': 'Maç Bahisleri',
-  'hudChrome.vcup.bet.wonBanner': 'Bahsin kazandı!',
-  'hudChrome.vcup.bet.wonLog': 'Vadi Kupası bahsin kazandı: {amount} ödendi.',
-  'hudChrome.vcup.blockNation': 'Önce bir sancak ulusu seç.',
-  'hudChrome.vcup.blockNotLeader': 'Takımı sıraya yalnızca grup lideri sokabilir.',
-  'hudChrome.vcup.blockPartySize': 'Bu kategori daha küçük bir grup gerektiriyor.',
-  'hudChrome.vcup.boardEmpty': 'Henüz kayıtlı kazanan yok. Bakır Kova bekliyor.',
-  'hudChrome.vcup.boardHeading': 'Kazananlar panosu',
-  'hudChrome.vcup.boardWins': '{count} galibiyet',
-  'hudChrome.vcup.bracketLabel': '{n}v{n}',
-  'hudChrome.vcup.bracketsAria': 'Maç kategorisi',
-  'hudChrome.vcup.briefing.bot': 'Bot',
-  'hudChrome.vcup.briefing.kitHeading': 'Donanımın',
-  'hudChrome.vcup.briefing.kitNote': 'Bu hareketler maç boyunca sınıf yeteneklerinin yerine geçer.',
-  'hudChrome.vcup.briefing.ready': 'Hazırım',
-  'hudChrome.vcup.briefing.readyAria': 'Başlama vuruşu için hazır ol',
-  'hudChrome.vcup.briefing.readyCount': '{ready} / {total} hazır',
-  'hudChrome.vcup.briefing.readyDone': 'Hazır',
-  'hudChrome.vcup.briefing.rosterHeading': 'Kadro listesi',
-  'hudChrome.vcup.briefing.rule1': 'Gol atmak için topu vurarak ya da pasla rakip kaleye gönder.',
-  'hudChrome.vcup.briefing.rule2':
-    '5 gole ilk ulaşan kazanır; süre dolduğunda ise en çok golü atan.',
-  'hudChrome.vcup.briefing.rule3':
-    'Normal süre sonunda eşitlik altın gole gider: sıradaki gol kazandırır.',
-  'hudChrome.vcup.briefing.rule4':
-    'Müdahaleler seni yalnızca yere yuvarlar. Hasat ateşkesi altında kimseye zarar gelmez.',
-  'hudChrome.vcup.briefing.rule5': 'İsteyen herkes gelip tribünlerden seni destekleyebilir.',
-  'hudChrome.vcup.briefing.rulesHeading': 'Nasıl oynanır',
-  'hudChrome.vcup.briefing.subtitle': 'Maç öncesi brifing',
-  'hudChrome.vcup.briefing.vs': 'vs',
-  'hudChrome.vcup.briefing.waiting': 'Karşı tarafın hazır olması bekleniyor...',
-  'hudChrome.vcup.briefing.whistle': 'Düdük {seconds} sn içinde çalacak.',
-  'hudChrome.vcup.briefing.you': 'Sen',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.close': 'Vadi Kupası penceresini kapat',
-  'hudChrome.vcup.deserterNote':
-    'Saha Bekçisi unutmaz. {seconds} sn sonra yeniden sıraya girebilirsin.',
-  'hudChrome.vcup.enterAsGuild': '{guild} sancağı altında katıl',
-  'hudChrome.vcup.gossipOpen': 'Fikstür defteri',
-  'hudChrome.vcup.gossipOpenAria': 'Vadi Kupası penceresini aç',
-  'hudChrome.vcup.guildBoardEmpty': 'Henüz sahaya çıkan lonca yok. Sancağını dalgalandır!',
-  'hudChrome.vcup.guildBoardHeading': 'Lonca sancakları',
-  'hudChrome.vcup.guildBoardWl': '{wins} G, {losses} M',
-  'hudChrome.vcup.guildRecordLine': 'Lonca sicilin: {wins} galibiyet, {losses} mağlubiyet.',
-  'hudChrome.vcup.inMatchNote': 'Takımın sahada. Oyuna devam!',
-  'hudChrome.vcup.indicatorLive': 'Vadi Kupası',
-  'hudChrome.vcup.indicatorOpen': 'Vadi Kupası penceresini aç',
-  'hudChrome.vcup.indicatorQueued': 'Vadi Kupası sırası: {bracket}, sıra {position} / {count}',
-  'hudChrome.vcup.leaveQueue': 'Sıradan Ayrıl',
-  'hudChrome.vcup.liveAria': 'Vadi Kupası: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': "Şimdi Domuz Tarlası'nda",
-  'hudChrome.vcup.logDraw': "Domuz Tarlası'ndaki karşılaşma beraberlikle bitti.",
-  'hudChrome.vcup.logFound': 'Vadi Kupası maçın hazır: {nationA} ile {nationB} karşı karşıya.',
-  'hudChrome.vcup.logGoal':
-    '{name}, {nation} adına gol attı! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': "Domuz Tarlası'ndaki karşılaşmayı kaybettin.",
-  'hudChrome.vcup.logQueued': '{bracket} için Vadi Kupası sırasına girdin (sıra {position}).',
-  'hudChrome.vcup.logRoster': 'Senin taraf: {allies}. Karşı taraf: {enemies}.',
-  'hudChrome.vcup.logSave': '{name} kurtarışı yaptı!',
-  'hudChrome.vcup.logUnqueued': 'Vadi Kupası sırasından ayrıldın.',
-  'hudChrome.vcup.logWin': "Domuz Tarlası'ndaki karşılaşmayı kazandın.",
-  'hudChrome.vcup.mobileLabel': 'Kupa',
-  'hudChrome.vcup.nation.choir': 'Soluk Koro',
-  'hudChrome.vcup.nation.coliseum': 'Kül Koliseumu',
-  'hudChrome.vcup.nation.copperdig': 'Bakır Kazısı',
-  'hudChrome.vcup.nation.mirefen': 'Mirefen',
-  'hudChrome.vcup.nation.moon': 'Soluk Ay',
-  'hudChrome.vcup.nation.ogre': 'Ogre Klanları',
-  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
-  'hudChrome.vcup.nation.vale': 'Doğudere Vadisi',
-  'hudChrome.vcup.nationsHeading': 'Sancak ulusu',
-  'hudChrome.vcup.noLive': 'Saha sessiz. Şu an oynanan maç yok.',
-  'hudChrome.vcup.offlineNote': 'Fikstür defteri kapalı. Vadi Kupası şu anda kullanılamıyor.',
-  'hudChrome.vcup.phaseCountdown': 'Başlama vuruşuna {seconds}',
-  'hudChrome.vcup.phaseGoal': 'GOL!',
-  'hudChrome.vcup.phaseGolden': 'ALTIN GOL',
-  'hudChrome.vcup.phaseOver': 'MAÇ SONU',
-  'hudChrome.vcup.practice': 'Botlara Karşı Antrenman',
-  'hudChrome.vcup.practiceNote': 'Kendi antrenman sahanda hemen özel bir bot maçı başlatır.',
-  'hudChrome.vcup.practicingNow': 'Şu an antrenmanda ({count}):',
-  'hudChrome.vcup.queue': 'Sıraya Gir',
-  'hudChrome.vcup.queueNote':
-    "Her yerden sıraya girebilirsin; düdük seni Domuz Tarlası'na çağırır.",
-  'hudChrome.vcup.queuedStatus': '{bracket} için sırada: sıra {position} / {count}.',
-  'hudChrome.vcup.recordLine':
-    'Sicilin: {wins} galibiyet, {losses} mağlubiyet, {draws} beraberlik.',
-  'hudChrome.vcup.role.allrounder.desc': 'Her şeyden biraz: vuruş, aşırtma ve dürüst bir omuz.',
-  'hudChrome.vcup.role.allrounder.name': 'Çok Yönlü',
-  'hudChrome.vcup.role.keeper.desc': 'Kale sahasını tutuş, dalış ve degajla korur.',
-  'hudChrome.vcup.role.keeper.name': 'Kaleci',
-  'hudChrome.vcup.role.striker.desc': 'Uzun vuruş ve hızlı çalım için yaşar.',
-  'hudChrome.vcup.role.striker.name': 'Golcü',
-  'hudChrome.vcup.role.sweeper.desc':
-    'Koşucuları toptan omuzlayıp uzaklaştırır ve topu sertçe temizler.',
-  'hudChrome.vcup.role.sweeper.name': 'Libero',
-  'hudChrome.vcup.rolesHeading': 'Spor rolü',
-  'hudChrome.vcup.shootPower': 'GÜÇ',
-  'hudChrome.vcup.title': 'Vadi Kupası',
-  'hudChrome.vcup.waitingCount': '{count} bekliyor',
-  'hudChrome.vcup.walkUp': "Tribünlerden izlemek için Domuz Tarlası'na gel.",
   'hudChrome.archetypeTitle.label': 'Unvan',
   'hudChrome.archetypeTitle.none': 'Yok',
   'entities.itemSets.crownforged.bonus4':
@@ -3549,7 +3367,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.stable_horse.name': 'Ahır Atı',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Uyanan Zirve',
   'entities.mobs.tolling_bell.name': 'Çalan Çan',
-  'entities.mobs.vale_cup_ball.name': 'Yaban Domuzu Topu',
   'entities.npcs.brother_halven_marsh.greeting':
     'İz kuzeye çıktı. Bir emanetlik daha, bir ayin daha. Kademeni seç, sen dönene dek ipi ben tutarım.',
   'entities.npcs.brother_halven_marsh.name': 'Birader Halven',
@@ -10327,7 +10144,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petBar':
     'Evcil çubuğu: Saldır, Dur, Tahrik, Savunmacı, Saldırgan (bir Avcı ya da Karabüyücü evcili çıkınca)',
   'guide.controls.runForward': 'İleri koş',
-  'guide.controls.valeCup': 'Vadi Kupası',
   'guide.dungeonsPage.heroicBody':
     'Her beş oyunculu zindanın ve akının kendisinin, seviye tavanının ötesinde bekleyen bir kahramanca sürümü vardır. Aynı koridorlar, donanımlı bir son oyun grubu için yeniden yapılmış: her şey daha sert vurur, hiçbir şeyden yürüyerek kaçılamaz ve şefler sersemletmelere ve engellemelere hiç aldırmaz. Önce normal sürümleri geride bırak; kahramanca, bıraktığını varsayar.',
   'guide.dungeonsPage.heroicHowBody': "Grubun instance'ı üstlenmeden önce zorluğu seç: /dungeon heroic yaz ya da kendi portre menünden Zindan Zorluğunu Ayarla'yı seç. Tek başınayken onu sen ayarlarsın; grupta bunu yalnızca lider yapabilir ve seçim herkesi kapsar ve kapıda kilitlenir, böylece bir sefer neyle üstlenildiyse o olarak kalır.",
@@ -10426,12 +10242,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hız, yaptığın her şeyi çabuklaştıran bir istatistiktir: yakın dövüş savuruşları, menzilli atışlar ve büyü okuma hep birlikte hızlanır. Teçhizattan, en çok da zırh seti bonuslarından gelir; birkaç yetenek de kısa bir süreliğine daha hızlı savuruşlar bahşeder. Karakter sayfan onu Hız Derecesi olarak gösterir.',
   'guide.stats.hasteTitle': 'Hız',
   'guide.talentsPage.choiceNote': 'Her sıra bir yol ayrımıdır: üç seçenek sunar ve sen birine bağlanırsın. Bir sonraki sıfırlaman o tercihlerin her birini yeniden açar.',
-  'guide.valeCupPage.bettingBody':
-    "Domuz Tarlası'ndaki seyirciler, bir maç kurulurken bir tarafı destekleyebilir: bahisler bir havuzda toplanır ve son düdükte kazananlar, kaybedenlerin havuzunu yatırdıkları oranında paylaşır. Berabere biten bir maç ya da kimsenin desteklemediği bir sürpriz, her parayı geri öder. Maçta sahaya oturan oyuncular ona bahis oynayamaz ve korkuluk, galibiyet, mağlubiyet ve net para ömür boyu kaydını tutar.",
-  'guide.valeCupPage.bettingHeading': 'Korkulukta ufak bir bahis',
-  'guide.valeCupPage.practiceBody':
-    'Vadi Kupası penceresi antrenman da sunar: botların her iki tarafı doldurduğu ve hiçbir şeyin siciline sayılmadığı, sahanın özel bir kopyası. Gerçeği için bir iki oyuncu mu eksik? Kısa bir bekleyişin ardından botlar takımları tamamlar ve sahada bot bulunan her maç dostçadır, asla dereceli değildir. Ve Domuz Tarlası boş kaldığında, botlar tribünden izleyip bahis oynayabileceğin bir gösteri sergiler; gerçek oyuncular hazır olur olmaz, gösteri sahayı bırakır ve her bahis iade edilir.',
-  'guide.valeCupPage.practiceHeading': 'Antrenman müsabakaları ve boş saha',
   'guide.worldPage.worldBossBody':
     "Dikenzirve'nin yükseklerinde, Fırtınakaya'nın üzerindeki fırtına bazen bir biçim toplar. Uyanan Zirve Thunzharr orada düzenli bir ritimle yükselir; açık dünyada, çağrıya yanıt veren herkesçe dövüşülen, akın gücünde bir elemental ve karşısına ne kadar çok meydan okuyan dikilirse o kadar güçlenir. Dövüşe katılan herkes, akın kilidi koşullarında saygı gören kendi ganimet payını kazanır ve düşüşü, devrilenlerin geri koşup hakkını almasına yetecek kadar sürer. İhtiyacın olduğunu düşündüğünden daha fazla kılıç topla.",
   'guide.worldPage.worldBossTitle': 'Zirve uyandığında: dünya şefi',

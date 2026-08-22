@@ -106,6 +106,8 @@
   "tasks": {
     "i18n:gen": {
       "inputs": [
+        "src/sim/**",
+        "server/**",
         "src/ui/i18n.catalog/**",
         "src/ui/i18n.locales/**",
         "src/ui/i18n.ts",

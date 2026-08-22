@@ -687,9 +687,6 @@ import {
 import * as fiestaBotsMod from './social/fiesta_bots';
 import { PartyMachine } from './social/party';
 import * as readyCheckMod from './social/ready_check';
-import * as valeCupMod from './social/vale_cup';
-import { createVcState, type VcState } from './social/vale_cup';
-import * as valeCupBotsMod from './social/vale_cup_bots';
 import { SpatialGrid } from './spatial';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
@@ -776,12 +773,9 @@ import {
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
-  type SportRole,
   SUNDER_ARMOR_PCT_PER_STACK,
   steadyAngleTo,
   swingMissChance,
-  type VcBracket,
-  type VcNationId,
   type Vec3,
   virtualLevel,
   type WeaponSkinLoadout,
@@ -1462,12 +1456,11 @@ export interface PlayerMeta {
   bgLosses: number;
   bgDraws: number;
   bgCaptures: number;
-  // The Vale Cup (docs/prd/vale-cup.md). `sportRole` is the temporary sport-kit
-  // role while seated in a Sowfield match: SESSION-ONLY, never serialized
-  // (known is derived on load, so persistence is naturally safe with no restore
-  // snapshot). The W/L/D standing persists in CharacterState, absent until the
-  // first result so pre-cup saves and the parity samples are untouched.
-  sportRole: SportRole | null;
+  // The retired Vale Cup's persisted standings (the minigame left with the
+  // New Eastbrook program; docs/design/eastbrook-revamp/master-plan.md). The
+  // W/L/D standing persists in CharacterState, absent until the first result,
+  // so historical earners keep their record and the retired deed catalog rows
+  // keep reading real progress.
   vcupWins: number;
   vcupLosses: number;
   vcupDraws: number;
@@ -2100,10 +2093,6 @@ export class Sim {
   readonly bgProposals: bgProposalMod.BgProposal[] = [];
   readonly bgProposalLockouts = new Map<number, number>();
   nextBgProposalId = 1;
-  // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
-  // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
-  // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
-  vcup: VcState = createVcState();
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -2293,7 +2282,6 @@ export class Sim {
       riftPortals: cfg.riftPortals ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
-      valeCupShowcase: cfg.valeCupShowcase ?? false,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
@@ -2546,19 +2534,6 @@ export class Sim {
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
-
-    // Groundskeeper Bram at the Sowfield gate (Vale Cup). Placed through the
-    // SAME findSafePos path as the generic NPC loop above, but under a RESERVED
-    // entity id outside the nextId sequence (and after the rng-drawing camp
-    // loop), so world-gen determinism AND the parity goldens' pinned id
-    // sequence are both preserved. See social/vale_cup.ts VALE_CUP_BRAM_ID.
-    {
-      const bramDef = worldContent.npcs.groundskeeper_bram;
-      if (bramDef) {
-        const safe = this.findSafePos(bramDef.pos.x, bramDef.pos.z, waterLevel() + 0.6);
-        valeCupMod.spawnGroundskeeper(this.ctx, bramDef, safe);
-      }
-    }
 
     // FURY uses a reserved id and spawns after the rng-driven world roster, so
     // the Honor Quartermaster cannot perturb existing entity ids or replay RNG.
@@ -2997,7 +2972,6 @@ export class Sim {
       bgCaptures: Number.isFinite(savedState?.bgCaptures)
         ? Math.max(0, savedState?.bgCaptures as number)
         : 0,
-      sportRole: null,
       vcupWins: savedState?.vcupWins ?? 0,
       vcupLosses: savedState?.vcupLosses ?? 0,
       vcupDraws: savedState?.vcupDraws ?? 0,
@@ -3896,12 +3870,6 @@ export class Sim {
     // the offline Sim / headless env from leaking cardDuels/cardDuelQueue
     // entries for a departed pid).
     this.leaveCardMinigameEntirely(pid);
-    // Vale Cup: leaving the queue is free; deserting a counted match benches
-    // the fighter (the team plays short), takes the loss, and arms the
-    // Groundskeeper's lockout. Idempotent: the server already resolved it
-    // before the leave save (vcupResolveDesertion is a public delegate).
-    valeCupMod.vcupDequeue(this.ctx, pid);
-    valeCupMod.vcupResolveDesertion(this.ctx, pid);
     this.party.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -4033,11 +4001,6 @@ export class Sim {
     // forces a fresh re-summon instead of laundering the summon cooldown for free.
     // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
     const petSnapshot = this.serializePet(pid);
-    // Seated in a Vale Cup match: persist the pre-match RETURN spot, never a
-    // mid-pitch position (a mid-match save or desertion must not strand the
-    // character on the Sowfield). The stowed pet persists via serializePet's
-    // delvePetStash fallback; known/sportRole are session-derived, not saved.
-    const cupReturn = valeCupMod.vcupReturnFor(this.ctx, pid);
     // One fold serves both persisted proficiency keys below: the live counters
     // plus any still-queued grants (foldPendingGatherGrants), so a leave-time
     // save landing between the tick that queued a grant and the tick that
@@ -4110,8 +4073,8 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: cupReturn ? { x: cupReturn.x, z: cupReturn.z } : { x: e.pos.x, z: e.pos.z },
-      facing: cupReturn ? cupReturn.facing : e.facing,
+      pos: { x: e.pos.x, z: e.pos.z },
+      facing: e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
       dead: e.dead,
@@ -4560,7 +4523,6 @@ export class Sim {
   renamePlayerGuild(pid: number, oldName: string, newName: string): void {
     const e = this.entities.get(pid);
     if (!e || e.guild !== oldName) return;
-    valeCupMod.vcupRenameGuild(this.ctx, pid, oldName, newName);
     e.guild = newName;
   }
 
@@ -5363,11 +5325,6 @@ export class Sim {
       get guildBanks() {
         return sim.guildBanks;
       },
-      // The Vale Cup holder (queues/deserters/botPids mutated in place; the
-      // match slot reassigned inside the holder, so no setter is needed).
-      get vcup() {
-        return sim.vcup;
-      },
       // Book of Deeds live views (all mutated in place, never reassigned).
       get deedDirtyPids() {
         return sim.deedDirtyPids;
@@ -5781,21 +5738,6 @@ export class Sim {
       markVisited: (meta, markId) => deedsMod.markVisited(sim.ctx, meta, markId),
       markDeedsDirty: (pid) => deedsMod.markDeedsDirty(sim.ctx, pid),
       grantDeed: (meta, deedId, opts) => deedsMod.grantDeed(sim.ctx, meta, deedId, opts),
-      // Vale Cup <-> Arena queue exclusion (owned by social/vale_cup.ts).
-      // Late-bound arrow so sim.ctx resolves at call time (the Q1 pattern).
-      vcupSeatedOrQueued: (pid) => valeCupMod.vcupSeatedOrQueued(sim.ctx, pid),
-      // The Vale Cup sport-move arms (owned by social/vale_cup.ts). Late-bound
-      // arrows so sim.ctx resolves at call time (the Q1 pattern).
-      vcupBallKick: (caster, power, loft, range) =>
-        valeCupMod.vcupBallKick(sim.ctx, caster, power, loft, range),
-      vcupBallPass: (caster, power, loft, range) =>
-        valeCupMod.vcupBallPass(sim.ctx, caster, power, loft, range),
-      vcupShoot: (caster, power, loft, range) =>
-        valeCupMod.vcupShoot(sim.ctx, caster, power, loft, range),
-      vcupSportDash: (caster, distance, catchBall) =>
-        valeCupMod.vcupSportDash(sim.ctx, caster, distance, catchBall),
-      vcupSportShove: (caster, target, distance) =>
-        valeCupMod.vcupSportShove(sim.ctx, caster, target, distance),
       // Thornhollow Fields battleground hooks (social/battleground.ts).
       bgOnPlayerDeath: (e, killer) => bgMod.bgOnPlayerDeath(sim.ctx, e, killer),
       bgOnPlayerDamaged: (victim, source) => bgMod.bgOnPlayerDamaged(sim.ctx, victim, source),
@@ -6332,10 +6274,6 @@ export class Sim {
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
-    // The Vale Cup phase draws ZERO shared rng (pure ball physics + timers +
-    // tick-staggered bots), so appending it here cannot fork the draw order.
-    this.updateValeCup();
-    lap?.('valecup');
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
     // tick-math wave and rune clocks; the one seeded draw is the power-rune
     // face at match START), so its tick position cannot fork the draw order
@@ -10145,16 +10083,7 @@ export class Sim {
       // bounces off GM invulnerability. Audited punishment stays /kill; this
       // is for roughing up the cellblock.
       if (attackerPlayer.gm && target.jailed) return true;
-      // The Vale Cup: opposing fighters are hostile only while play is live so
-      // the harvest-truce Shoulder can land on them (targeting also opens during
-      // the countdown via targeting.ts; damage between seated fighters is
-      // floored to 0 in combat/damage.ts, boots and shoulders only).
-      const cupMatch = this.vcup.match;
-      return (
-        !!cupMatch &&
-        (cupMatch.phase === 'active' || cupMatch.phase === 'golden') &&
-        valeCupMod.isVcupCrossTeam(cupMatch, attackerPlayer.id, target.id)
-      );
+      return false;
     }
     return false;
   }
@@ -10860,77 +10789,6 @@ export class Sim {
 
   updateFiestaBots(): void {
     fiestaBotsMod.updateFiestaBots(this);
-  }
-
-  // -------------------------------------------------------------------------
-  // The Vale Cup: boarball at the Sowfield (social/vale_cup.ts +
-  // social/vale_cup_bots.ts). State stays on Sim (`this.vcup`); Sim keeps thin
-  // same-named delegates for the IWorld facet, the server, and tests. The bots
-  // are driven inside the same tick phase (they need Sim-only affordances), so
-  // the server's queue backfill and the offline Practice run identical code.
-  // -------------------------------------------------------------------------
-
-  private updateValeCup(): void {
-    valeCupMod.updateValeCup(this.ctx);
-    valeCupBotsMod.updateValeCupBots(this);
-  }
-
-  vcupQueueJoin(
-    bracket: VcBracket,
-    nation: VcNationId,
-    role: SportRole,
-    enterAsGuild = false,
-    pid?: number,
-  ): void {
-    valeCupMod.vcupQueueJoin(this.ctx, bracket, nation, role, enterAsGuild, pid);
-  }
-
-  vcupQueueLeave(pid?: number): void {
-    valeCupMod.vcupQueueLeave(this.ctx, pid);
-  }
-
-  vcupSetRole(role: SportRole, pid?: number): void {
-    valeCupMod.vcupSetRole(this.ctx, role, pid);
-  }
-
-  vcupReady(pid?: number): void {
-    valeCupMod.vcupReady(this.ctx, pid);
-  }
-
-  vcupBet(side: 'A' | 'B', amount: number, pid?: number): void {
-    valeCupMod.vcupPlaceBet(this.ctx, pid ?? this.primaryId, side, amount);
-  }
-
-  // Private practice bout vs bots on an instanced pitch copy (parallel to the
-  // real match). Runs identically offline and on the server (via vcup_practice).
-  vcupPracticeStart(bracket: VcBracket, pid?: number): void {
-    valeCupBotsMod.startValeCupPractice(this, bracket, pid);
-  }
-
-  /** The live cup match this pid is seated in, if any (server helpers). */
-  vcupMatchOf(pid: number): valeCupMod.VcMatch | null {
-    return valeCupMod.vcupMatchOf(this.ctx, pid);
-  }
-
-  /** Idempotent desertion resolution; the server calls it BEFORE the leave
-   *  save so the counted loss reaches the persisted standing. */
-  vcupResolveDesertion(pid: number): void {
-    valeCupMod.vcupResolveDesertion(this.ctx, pid);
-  }
-
-  cupInfoFor(
-    pid: number,
-    shared?: import('../world_api/vale_cup').VcSharedCupInfo,
-  ): import('../world_api/vale_cup').CupInfo | null {
-    return valeCupMod.cupInfoFor(this.ctx, pid, shared);
-  }
-
-  cupSharedInfoFor(): import('../world_api/vale_cup').VcSharedCupInfo {
-    return valeCupMod.cupSharedInfoFor(this.ctx);
-  }
-
-  get cupInfo(): import('../world_api/vale_cup').CupInfo | null {
-    return this.primaryId === -1 ? null : this.cupInfoFor(this.primaryId);
   }
 
   private fiestaMatchInfo(

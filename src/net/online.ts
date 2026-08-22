@@ -25,7 +25,6 @@ import {
   type TalentAllocation,
   type TalentRowLevel,
 } from '../sim/content/talents';
-import { resolveSportKit } from '../sim/content/vale_cup';
 import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import {
@@ -85,10 +84,7 @@ import {
   type RiftTier,
   type RiteIntensity,
   type SimEvent,
-  type SportRole,
   TICK_RATE,
-  type VcBracket,
-  type VcNationId,
   type WeaponSkinType,
 } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
@@ -107,7 +103,6 @@ import {
   type ClientCommand,
   type CraftingIdentityView,
   type CraftResultView,
-  type CupInfo,
   type DailyRewardHistory,
   type DailyRewardLeaderboardPage,
   type DailyRewardSpinResult,
@@ -150,8 +145,6 @@ import {
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
-  type VcSharedCupInfo,
-  type VcViewerReadout,
 } from '../world_api';
 import {
   type ActionBarLayout,
@@ -1087,9 +1080,9 @@ export class Api {
   // ONE request. In-flight only, keyed by the realm base: nothing is memoized
   // past settle, so every non-overlapping call still reads the server fresh,
   // and a realm switch mid-flight never serves the old realm's document.
-  private statusDocInFlight: { base: string; doc: Promise<any> } | null = null;
+  private statusDocInFlight: { base: string; doc: Promise<Record<string, unknown>> } | null = null;
 
-  private statusDoc(): Promise<any> {
+  private statusDoc(): Promise<Record<string, unknown>> {
     const hit = this.statusDocInFlight;
     if (hit !== null && hit.base === this.base) return hit.doc;
     const doc = this.get('/api/status').finally(() => {
@@ -1596,21 +1589,6 @@ export class ClientWorld implements IWorld {
   // --- IWorldCardMinigame: Card Duel queue/match state, mirrored from the
   // snapshot self (`s.cardDuel`, delta-omitted). ---
   cardMinigameInfo: CardMinigameInfo = { queued: false, available: true, match: null };
-  // --- IWorldValeCup: Vale Cup queue/match state, recomposed from two
-  // delta-omitted self keys: `s.vcup` (the per-viewer remainder plus a wire-only
-  // liveHidden flag) and `s.vcupb` (the realm-wide fragment, serialized once
-  // server-side and shared across viewers). We keep the last of each mirror and
-  // rebuild cupInfo whenever either changes; a missing key keeps its prior mirror
-  // (never default to empty, that would wipe the other fragment). ---
-  private lastVcupRemainder: VcViewerReadout | null = null;
-  private lastVcupShared: VcSharedCupInfo | null = null;
-  cupInfo: CupInfo | null = null;
-  // My live sport role, mirrored from the wireRev-gated heavy self field
-  // `s.sport` ({ role } | null, delta-omitted). NON-IWorld mirror: while set,
-  // the per-snapshot known rebuild resolves the role kit via the ONE shared
-  // resolveSportKit instead of the class/level/talent derivation, so the
-  // ONLINE action bar shows the sport kit (docs/prd/vale-cup.md wire trap).
-  sportRole: SportRole | null = null;
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
@@ -3661,16 +3639,7 @@ export class ClientWorld implements IWorld {
       const talentMods = computeTalentModifiers(this.cfg.playerClass, talents, e.level);
       this.talentSpec = talentMods.spec;
       this.talentRole = talentMods.role;
-      // IWorldValeCup sport-kit swap (the wire trap, docs/prd/vale-cup.md): a
-      // server-side meta.known swap is invisible to this derived rebuild, so
-      // the server flags the live role via the wireRev-gated heavy `sport`
-      // field. While the mirrored role is set, known is the role kit from the
-      // shared resolver (identical to the Sim's swap); otherwise the normal
-      // class/level/talent derivation below applies.
-      if (s.sport !== undefined) this.sportRole = s.sport ? (s.sport.role ?? null) : null;
-      this.known = this.sportRole
-        ? resolveSportKit(this.sportRole)
-        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
+      this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -3688,9 +3657,6 @@ export class ClientWorld implements IWorld {
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
-      if (s.vcup !== undefined) this.lastVcupRemainder = s.vcup as VcViewerReadout | null;
-      if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
-      if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
       if (s.mail !== undefined) this.mailInfo = s.mail;
@@ -3934,31 +3900,6 @@ export class ClientWorld implements IWorld {
     const v = this.cosmeticsChanged;
     this.cosmeticsChanged = false;
     return v;
-  }
-
-  // Rebuild the public cupInfo from the two mirrored wire fragments. A null
-  // remainder (the viewer has no readout, or an explicit vcup:null) clears it; a
-  // remainder with no shared fragment yet (should not happen, they ship together
-  // on every gate-open pass and every resync) keeps the prior value rather than
-  // emitting a half-built readout. liveHidden reapplies the per-viewer practice
-  // suppression the server derived and is never surfaced on CupInfo.
-  private recomputeCupInfo(): void {
-    const rem = this.lastVcupRemainder;
-    const shared = this.lastVcupShared;
-    if (rem === null) {
-      this.cupInfo = null;
-      return;
-    }
-    if (shared === null) return;
-    const { liveHidden, ...viewer } = rem;
-    this.cupInfo = {
-      ...viewer,
-      queueSizes: shared.queueSizes,
-      live: liveHidden ? null : shared.live,
-      board: shared.board,
-      guildBoard: shared.guildBoard,
-      practicing: shared.practicing,
-    };
   }
 
   // Refuse a hostile-target cast at an already-dead target: near-monotonic +
@@ -4914,34 +4855,6 @@ export class ClientWorld implements IWorld {
   }
   forfeitCardDuel(): void {
     this.cmd({ cmd: 'card_forfeit' });
-  }
-  // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
-  // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---
-  vcupQueueJoin(
-    bracket: VcBracket,
-    nation: VcNationId,
-    role: SportRole,
-    enterAsGuild: boolean,
-  ): void {
-    this.cmd({ cmd: 'vcup_queue', bracket, nation, role, guild: enterAsGuild });
-  }
-  vcupQueueLeave(): void {
-    this.cmd({ cmd: 'vcup_leave' });
-  }
-  vcupSetRole(role: SportRole): void {
-    this.cmd({ cmd: 'vcup_role', role });
-  }
-  vcupReady(): void {
-    this.cmd({ cmd: 'vcup_ready' });
-  }
-  vcupBet(side: 'A' | 'B', amount: number): void {
-    this.cmd({ cmd: 'vcup_bet', side, amount });
-  }
-  // Private practice bout against bots: the server seats it on an instanced pitch
-  // copy far from the Sowfield, so it runs in parallel with the real match and
-  // every other practice. Same command online and off.
-  vcupPracticeStart(bracket: VcBracket): void {
-    this.cmd({ cmd: 'vcup_practice', bracket });
   }
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the

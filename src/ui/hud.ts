@@ -125,7 +125,6 @@ import {
   type ItemDef,
   isMechWearer,
   MAX_LEVEL,
-  MELEE_RANGE,
   MILESTONES,
   SALVAGE_CAST_ID,
   type SimEvent,
@@ -134,7 +133,6 @@ import {
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
 import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
@@ -727,17 +725,6 @@ import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { knownItemIconHtml, unknownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
-import { ValeCupBetting } from './vale_cup_betting';
-import { buildVcupBettingView } from './vale_cup_betting_view';
-import { ValeCupBriefing } from './vale_cup_briefing';
-import { buildVcupBriefingView } from './vale_cup_briefing_view';
-import { ValeCupCharge } from './vale_cup_charge';
-import { buildVcupChargeView } from './vale_cup_charge_view';
-import { ValeCupHud } from './vale_cup_hud';
-import { buildVcupHudView } from './vale_cup_hud_view';
-import { ValeCupIndicator } from './vale_cup_indicator';
-import { buildVcupIndicatorView } from './vale_cup_indicator_view';
-import { ValeCupWindow, vcupNationName } from './vale_cup_window';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
@@ -885,29 +872,7 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
-// Vale Cup hold-to-charge shoot: full power after this long held, and the charge
-// a NON-held tap (touch / gamepad / a mouse click on the slot) fires at.
-const SHOOT_CHARGE_MS = 850;
-const SHOOT_TAP_CHARGE = 0.6;
 const MOBILE_CONTEXT_LONG_PRESS_MS = 650;
-// Vale Cup walk-up "theatre": the anchored kickoff/goal/save/golden/end/countdown
-// banners + crowd fx. The real Sowfield match's theatre is gated to the stadium
-// footprint (isAtSowfield, the same predicate that arms the stadium music), so no
-// alert leaves the football ground; a private practice pitch (a far, isolated
-// instance) shows its theatre only to someone within VCUP_THEATRE_RADIUS of that
-// pitch. Personal events (vcupFound/Result/BetSettled) are NOT here and always
-// reach their owner.
-const VCUP_WALKUP_EVENTS = new Set([
-  'vcupCountdown',
-  'vcupKickoff',
-  'vcupGoal',
-  'vcupSave',
-  'vcupGolden',
-  'vcupEnd',
-]);
-// Stadium-scale: covers the pitch + stands + approach, but nowhere near another
-// match's pitch (the real Sowfield and practice instances are >600yd apart).
-const VCUP_THEATRE_RADIUS = 200;
 // The number of combo pips, named so the per-frame player paint carries no bare
 // literal at the call site.
 const COMBO_PIP_COUNT = 5;
@@ -1336,13 +1301,6 @@ export class Hud {
   private groundAim: GroundAimState = createGroundAimState();
   private groundAimPoint: AimPoint | null = null;
   private groundAimClamped = false;
-  // Vale Cup hold-to-charge shoot: the bar slot being held and when the hold
-  // started; the power meter fills to chargeFrac() while held and the shot fires
-  // at that fraction on release. The meter itself is the ValeCupCharge painter
-  // (declared with the other Vale Cup painters, after writerFacet) driven off
-  // the pure vale_cup_charge_view core; only the input timing state lives here.
-  private shootChargeSlot: number | null = null;
-  private shootChargeStartMs = 0;
   private empowerCharge: { slot: number; abilityId: string } | null = null;
   private dragAction: {
     action: Exclude<HotbarAction, null>;
@@ -2097,10 +2055,6 @@ export class Hud {
       talentSpec: () => this.sim.talentSpec,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
-      isInSportMatch: () => {
-        const match = this.sim.cupInfo?.match;
-        return !!match && match.team !== null;
-      },
       showAttackButton: () => this.optionsHooks?.settings.get('showAttackButton') ?? true,
       // Persistence seam: online, the ClientWorld debounces a per-character wire
       // save; offline, Sim.saveActionBarLayout is a no-op (localStorage is the
@@ -2219,7 +2173,6 @@ export class Hud {
       openCrafting: (craftId) => this.openCrafting(craftId),
       openMarket: () => this.openMarket(),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
-      openValeCup: () => this.toggleValeCup(),
       openCardDuel: () => this.toggleCardDuel(),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
       voice: {
@@ -2980,7 +2933,6 @@ export class Hud {
     $('#mm-wiki')?.addEventListener('click', () => this.openWiki());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
-    $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
@@ -3485,10 +3437,6 @@ export class Hud {
       case 'dungeon-finder-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.dungeonFinderWindow.close();
-        break;
-      case 'valecup-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.valeCupWindow.close();
         break;
       case 'card-duel-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -4921,21 +4869,11 @@ export class Hud {
     root: () => $('#bg-proposal-popup'),
     world: () => this.sim,
   });
-  // Vale Cup window painter (vale_cup_window_view.ts model + vale_cup_window.ts
-  // painter, the ArenaWindow shape). It owns the bracket / nation / role
-  // selections, the render-skip signature, and focus-return; Hud forwards the
-  // keybind toggle and drives render() from the mediumHud band.
-  private readonly valeCupWindow = new ValeCupWindow({
-    root: () => $('#valecup-window'),
-    world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#valecup-window'),
-    ...this.windowFocus('#valecup-window'),
-  });
   // Card Duel window painter (card_duel_view.ts model + card_duel_window.ts
   // painter, the ValeCupWindow shape scaled down). The Card Master NPC's gossip
   // menu AND the persistent #mm-cardduel micromenu button (the sim allows
   // playing a card once matched without proximity, so the window must stay
-  // reachable away from the NPC too, matching the #mm-valecup family) both
+  // reachable away from the NPC too) both
   // toggle it; Hud drives render() from the mediumHud band while open, and
   // auto-opens it the moment a match starts (see the mediumHud band below).
   private readonly cardDuelWindow = new CardDuelWindow({
@@ -4943,21 +4881,6 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#card-duel-window'),
     ...this.windowFocus('#card-duel-window'),
-  });
-  // Persistent Vale Cup indicator button (queued / live-at-the-Sowfield states;
-  // hidden inside my own match). Never tier-shed: queue position and the live
-  // score are information, not cosmetics (gameplay-neutral graphics invariant).
-  private readonly vcupIndicator = new ValeCupIndicator({
-    root: () => $('#vcup-indicator'),
-    open: () => this.toggleValeCup(),
-    writers: this.writerFacet,
-  });
-  // In-match Vale Cup score strip (flags, score, count-down clock, phase line),
-  // snapshot-driven from cupInfo.match on the mediumHud band; one-shot juice
-  // (banners, horn) rides the vcup SimEvents in handleEvents.
-  private readonly vcupMatchHud = new ValeCupHud({
-    layer: () => document.getElementById('ui'),
-    writers: this.writerFacet,
   });
 
   // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting,
@@ -4971,30 +4894,6 @@ export class Hud {
   private readonly bgKillFeed = new BattlegroundKillFeed({
     layer: () => document.getElementById('ui'),
   });
-  // Pre-match Vale Cup briefing overlay (rules + role kit + team sheet + Ready).
-  // Self-mounting full-screen card shown only while cupInfo.match.phase is
-  // 'briefing'; drives itself off view.visible (no toggle wiring), rides the
-  // mediumHud band, and readies up through the IWorld command.
-  private readonly vcupBriefing = new ValeCupBriefing({
-    layer: () => document.getElementById('ui'),
-    writers: this.writerFacet,
-    onReady: () => this.sim.vcupReady(),
-  });
-  // Spectator parimutuel betting banner + card (walk-up at the Sowfield).
-  private readonly vcupBetting = new ValeCupBetting({
-    layer: () => document.getElementById('ui'),
-    writers: this.writerFacet,
-    onBet: (side, copper) => this.sim.vcupBet(side, copper),
-  });
-  // The shoot power meter (hold-to-charge): the charge input state lives on the
-  // Hud (shootChargeSlot / shootChargeStartMs); this painter only draws it.
-  private readonly vcupCharge = new ValeCupCharge({
-    layer: () => document.getElementById('ui'),
-    rootId: 'vcup-charge',
-    writers: this.writerFacet,
-  });
-  // Latch for the kickoff auto-close of the queue window (arena pattern).
-  private vcupMatchSeen = false;
   // Character window painter (char_view.ts paperdoll core + char_window.ts painter).
   // It composes the presentation bag (icon/tooltip) for the equip slots and routes
   // the HUD-built stat / talent / progression fragments plus the unequip + drag
@@ -6457,12 +6356,6 @@ export class Hud {
     this.bgProposalPopup.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
     // sigs so the next render/update rebuilds with fresh t().
-    this.valeCupWindow.relocalize();
-    this.vcupBetting.relocalize();
-    this.vcupIndicator.relocalize();
-    this.vcupMatchHud.relocalize();
-    this.vcupBriefing.relocalize();
-    this.vcupCharge.relocalize();
     this.questDialog.relocalize();
     // Same text-independent-sig contract, one surface at a time (#2529). Every
     // one of these was rebuilding only when its own data moved, so an open one
@@ -6739,79 +6632,14 @@ export class Hud {
     return { x: me.pos.x, z: me.pos.z };
   }
 
-  // The Vale Cup sport moves are AUTOCAST on press: no ground-target reticle, no
-  // point-and-click. Pressing the key fires the move at once toward where the
-  // player faces (a kick/boot/slide down the field), so the football controls are
-  // press-to-play. The sim still resolves the natural target (sport_pass seeks the
-  // selected teammate first; the kicks scale power by the aim's distance, so a
-  // facing-length aim is a full-power "empowered" kick).
-  private isSportAbilityId(id: string): boolean {
-    return id.startsWith('sport_');
-  }
-
-  private castSportMove(abilityId: string, range: number): void {
-    const me = this.sim.player;
-    const r = range > 0 ? range : MELEE_RANGE;
-    this.sim.castAbilityAt(abilityId, {
-      x: me.pos.x + Math.sin(me.facing) * r,
-      z: me.pos.z + Math.cos(me.facing) * r,
-    });
-  }
-
-  // A direct (non-held) sport cast: a Shoot fired this way (touch / gamepad /
-  // mouse click) has no charge, so it uses a medium default power instead of the
-  // full-range aim, which would balloon over the bar.
-  private castSportTap(abilityId: string, range: number): void {
-    this.castSportMove(abilityId, abilityId === 'sport_shoot' ? SHOOT_TAP_CHARGE * range : range);
-  }
-
-  // My first sport move (Shoot) while seated in a Vale Cup match, else null. The
-  // fixed primary action seat uses this same resolved record for its cast, art,
-  // cooldown, range state, accessible name, and tooltip.
-  private firstSportAbility(): ResolvedAbility | null {
-    // Seated in a match => my known list IS the sport kit (Shoot first). Keyed off
-    // cupInfo.match, not the bar form, so it holds the instant the whistle swaps
-    // the kit in (the bar-form flip can lag a frame behind).
-    if (!this.sim.cupInfo?.match) return null;
-    const first = this.sim.known[0];
-    return first && this.isSportAbilityId(first.def.id) ? first : null;
-  }
-
-  private firstSportAbilityId(): string | null {
-    return this.firstSportAbility()?.def.id ?? null;
-  }
-
-  // The ability a bar slot would cast right now (slot 0 remaps to the first sport
-  // move on the pitch). Used to decide whether a slot press charges (shoot).
-  private abilityIdForSlot(slot: number): string | null {
-    if (slot === 0) return this.firstSportAbilityId();
-    return this.abilityForSlot(slot)?.def.id ?? null;
-  }
-
   private empoweredAbilityIdForSlot(slot: number): string | null {
     const known = this.abilityForSlot(slot);
     return known?.def.empowerStages ? known.def.id : null;
   }
 
-  private shootRangeForSlot(slot: number): number {
-    if (slot === 0) return this.firstSportAbility()?.def.range ?? MELEE_RANGE;
-    return this.abilityForSlot(slot)?.def.range ?? MELEE_RANGE;
-  }
-
-  // The held-charge fraction 0..1 (time held / SHOOT_CHARGE_MS).
-  private shootChargeFrac(): number {
-    return Math.min(1, (performance.now() - this.shootChargeStartMs) / SHOOT_CHARGE_MS);
-  }
-
-  // Slot key DOWN: a shoot slot starts CHARGING (hold to build power); every
-  // other slot fires immediately (a tap is down + up, so this is the press).
+  // Slot key DOWN: every slot fires immediately (a tap is down + up, so this
+  // is the press).
   pressSlot(slot: number): void {
-    if (this.abilityIdForSlot(slot) === 'sport_shoot') {
-      this.shootChargeSlot = slot;
-      this.shootChargeStartMs = performance.now();
-      this.updateShootCharge(); // show the meter at 0 this frame
-      return;
-    }
     const empowered = this.empoweredAbilityIdForSlot(slot);
     if (empowered) {
       if (this.empowerCharge) return;
@@ -6822,8 +6650,8 @@ export class Hud {
     this.castSlot(slot);
   }
 
-  // Slot key UP: release a charging shoot at the built power (aim distance encodes
-  // the charge). A non-charging slot already fired on press, so this is a no-op.
+  // Slot key UP: release an empowered hold. A non-charging slot already fired
+  // on press, so this is a no-op.
   releaseSlot(slot: number): void {
     if (this.empowerCharge?.slot === slot) {
       const charge = this.empowerCharge;
@@ -6831,16 +6659,6 @@ export class Hud {
       this.sim.releaseEmpoweredAbility(charge.abilityId);
       this.flashActionSlot(slot);
       return;
-    }
-    if (this.shootChargeSlot !== slot) return;
-    const frac = this.shootChargeFrac();
-    const id = this.abilityIdForSlot(slot);
-    const range = this.shootRangeForSlot(slot);
-    this.shootChargeSlot = null;
-    this.updateShootCharge(); // hide the meter this frame
-    if (id === 'sport_shoot') {
-      this.castSportMove(id, Math.max(1, frac * range));
-      this.flashActionSlot(slot);
     }
   }
 
@@ -6874,21 +6692,6 @@ export class Hud {
     };
     btn.addEventListener('pointerup', (event) => release(event, true));
     btn.addEventListener('pointercancel', (event) => release(event, false));
-  }
-
-  // Per-frame: paint the power meter off the pure view core; the core's `cancel`
-  // auto-releases if I leave the match or die mid-charge so the meter never sticks.
-  private updateShootCharge(): void {
-    const charging = this.shootChargeSlot !== null;
-    const view = buildVcupChargeView(
-      charging,
-      !!this.sim.cupInfo?.match,
-      this.sim.player.dead,
-      // Only read the charge clock while a slot is actually held.
-      charging ? this.shootChargeFrac() : 0,
-    );
-    if (view.cancel) this.shootChargeSlot = null;
-    this.vcupCharge.update(view);
   }
 
   private groundReticleEnabled(abilityId: string): boolean {
@@ -6979,15 +6782,6 @@ export class Hud {
   }
 
   private activateFixedAttackSlot(): void {
-    // On the pitch, key 1 casts your first sport move (Kick) instead of the
-    // harvest-truce-inert auto-attack, which would be a dead key with no useful
-    // effect. Off the pitch it is the normal auto-attack toggle.
-    const sportFirst = this.firstSportAbility();
-    if (sportFirst) {
-      this.castSportTap(sportFirst.def.id, sportFirst.def.range);
-      this.flashActionSlot(0);
-      return;
-    }
     if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
     else this.sim.startAutoAttack();
     this.flashActionSlot(0);
@@ -7024,10 +6818,7 @@ export class Hud {
         // A self-centered channel (Bladestorm) casts at the caster's own feet:
         // no ground-aim reticle, straight to the normal cast path.
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
-          if (this.isSportAbilityId(action.id)) {
-            // Sport moves autocast toward facing (no reticle, no point-and-click).
-            this.castSportTap(action.id, resolved.def.range);
-          } else if (this.groundReticleEnabled(action.id)) {
+          if (this.groundReticleEnabled(action.id)) {
             this.beginGroundAim(action.id, barSlot);
           } else {
             this.sim.castAbilityAt(action.id, this.groundTargetAim());
@@ -7266,8 +7057,6 @@ export class Hud {
       });
       this.attachTooltip(btn, () => {
         if (slot === 0 && this.attackSlotIsAttack()) {
-          const sportFirst = this.firstSportAbility();
-          if (sportFirst) return this.abilityTooltip(sportFirst);
           return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
         }
         const known = this.abilityForSlot(slot);
@@ -7495,16 +7284,13 @@ export class Hud {
             slotIndex: i,
             // Live accessor: slot 0 stops being the Attack toggle when the player
             // removes it (Interface option showAttackButton off / right-click).
-            isAttack: () =>
-              i === 0 && this.attackSlotIsAttack() && this.firstSportAbility() === null,
+            isAttack: () => i === 0 && this.attackSlotIsAttack(),
             // Raw binding presence (any assigned slot, even one whose ability is
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
             hasAction: () => this.actionForSlot(i) !== null,
             ability: () =>
-              i === 0 && this.attackSlotIsAttack()
-                ? this.firstSportAbility()
-                : this.abilityForSlot(i),
+              i === 0 && this.attackSlotIsAttack() ? null : this.abilityForSlot(i),
             item: () => this.itemForSlot(i),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };
@@ -7603,11 +7389,6 @@ export class Hud {
       this.hideTooltip();
       audio.click();
       const p = this.sim.player;
-      if (this.firstSportAbility()) {
-        this.activateFixedAttackSlot();
-        attackBtn.blur();
-        return;
-      }
       const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
       const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
       handleMobileAttackTap(
@@ -7659,9 +7440,9 @@ export class Hud {
         slots: [
           {
             slotIndex: 0,
-            isAttack: () => this.firstSportAbility() === null,
-            hasAction: () => this.firstSportAbility() !== null,
-            ability: () => this.firstSportAbility(),
+            isAttack: () => true,
+            hasAction: () => false,
+            ability: () => null,
             item: () => null,
             keybindLabel: () => '',
           },
@@ -8089,7 +7870,6 @@ export class Hud {
       ['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],
       ['#mm-arena', 'arena', 'hudChrome.pvp.launcherTitle'],
       ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
-      ['#mm-valecup', 'valecup', 'hudChrome.keybinds.valecup'],
       ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
       ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
       ['#mm-social', 'social', 'hud.social.friendsTab'],
@@ -8914,7 +8694,7 @@ export class Hud {
     this.lootRolls.update(now);
     // The zone/combat/boss music state machine, hoisted above the cut (phase 4
     // QA F1): music keeps PLAYING on hidden frames, so its transitions (combat
-    // over, zone change, boss engage, Sowfield) must keep executing or a
+    // over, zone change, boss engage) must keep executing or a
     // minimized player hears the stale track until restore. Same medium
     // cadence the painted path always drove it at; the paint half reads the
     // stored decision instead of driving the machine itself.
@@ -8928,7 +8708,6 @@ export class Hud {
         zone: zoneAt(p.pos.x, p.pos.z),
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
-        cupInfo: sim.cupInfo,
         riftFloor: sim.riftFloor,
       });
     }
@@ -9610,7 +9389,6 @@ export class Hud {
       // mediumHud divider); this half only reads its decision.
       const musicState = this.lastMusicDecision;
       const inCombat = musicState?.inCombat === true;
-      const atSowfield = musicState?.atSowfield === true;
 
       // classic combat indicator: crossed swords + red ring on the player portrait.
       // Routed through the cached ref + the elided toggleClass writer: a counted,
@@ -9645,19 +9423,11 @@ export class Hud {
       this.bgScoreboard.update(buildBgScoreboardView(this.sim.bgInfo, this.sim.playerId));
       this.bgKillFeed.update(performance.now() / 1000);
       this.yumiPainter.update(this.sim.arenaInfo);
-      // Vale Cup surfaces (mediumHud like the arena/fiesta ones): the indicator
-      // button, the in-match strip, and the open window redraw.
-      this.vcupIndicator.update(buildVcupIndicatorView(this.sim.cupInfo, atSowfield));
-      this.vcupMatchHud.update(buildVcupHudView(this.sim.cupInfo));
-      this.vcupBriefing.update(buildVcupBriefingView(this.sim.cupInfo));
-      this.vcupBetting.update(buildVcupBettingView(this.sim.cupInfo));
-      this.updateShootCharge();
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
       if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if (this.bgProposalPopup.isOpen) this.bgProposalPopup.render();
-      if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
       // Auto-open the Card Duel window the instant a queued match starts (a
       // false->true transition on match presence), mirroring updateTradeWindow's
       // transition-based auto-open: the sim allows playing a card from anywhere
@@ -9705,11 +9475,6 @@ export class Hud {
     this.arenaMatchSeen = inArenaMatch;
     // Same for the Vale Cup: when the whistle calls, get the queue window out of
     // the way of the pitch. Route through close() (focus-return), never a raw hide.
-    const inVcupMatch = !!this.sim.cupInfo?.match;
-    if (inVcupMatch && !this.vcupMatchSeen && $('#valecup-window').style.display === 'block') {
-      this.valeCupWindow.close();
-    }
-    this.vcupMatchSeen = inVcupMatch;
     // Same for Thornhollow Fields: when the match seats, the PvP window steps aside.
     const inBgMatch = !!this.sim.bgInfo?.match;
     if (inBgMatch && !this.bgMatchSeen && $('#arena-window').style.display === 'block') {
@@ -10741,17 +10506,8 @@ export class Hud {
     this.dungeonFinderWindow.toggle();
   }
 
-  toggleValeCup(): void {
-    this.valeCupWindow.toggle();
-  }
-
   toggleCardDuel(): void {
     this.cardDuelWindow.toggle();
-  }
-
-  /** Offline builds enable the Vale Cup practice-vs-bots button (main.ts). */
-  setVcupPracticeAvailable(on: boolean): void {
-    this.valeCupWindow.setPracticeAvailable(on);
   }
 
   // The pinned in-match banner: opponent name + countdown / live match timer.
@@ -11459,29 +11215,6 @@ export class Hud {
       // server/game.ts), so an event a bystander should see must be pid-less
       // by construction on every host.
       if (ev.pid !== undefined && ev.pid !== sim.playerId) continue;
-      // Vale Cup walk-up theatre (kickoff/goal/save/golden/end/countdown) is
-      // anchored at its own match's pitch. Only play it when that pitch is NEAR
-      // the local player, so you see the game in front of you (the Sowfield when
-      // you walk up, or your OWN private practice pitch) and never another
-      // match's alerts leaking in, e.g. a bot showcase on the main pitch spamming
-      // a player off in a distant practice instance. Offline hands the whole tick
-      // batch here, so this proximity gate is what keeps matches from crossing.
-      if (VCUP_WALKUP_EVENTS.has(ev.type)) {
-        const a = ev as unknown as { x: number; z: number };
-        if (isAtSowfield(a.x, a.z)) {
-          // Real Sowfield match: its theatre is gated to the stadium footprint,
-          // the same predicate that arms the stadium music, so no kickoff/goal
-          // banner leaks into Eastbrook or the wider map.
-          if (!isAtSowfield(sim.player.pos.x, sim.player.pos.z)) continue;
-        } else {
-          // A private practice instance (a far, isolated pitch): show its
-          // theatre only to someone standing on that same pitch, never the main
-          // match's audience.
-          const dx = a.x - sim.player.pos.x;
-          const dz = a.z - sim.player.pos.z;
-          if (dx * dx + dz * dz > VCUP_THEATRE_RADIUS * VCUP_THEATRE_RADIUS) continue;
-        }
-      }
       // visual effects (swings, projectiles, glows) — for everyone nearby,
       // not just events involving this player
       this.renderer.handleEvent(ev);
@@ -13421,118 +13154,6 @@ export class Hud {
         // save/golden/end) are pid-LESS with a world anchor so walk-up
         // bystanders at the Sowfield see the same banners; every string here
         // reads correctly for a spectator (nations + score ride the event).
-        case 'vcupQueued':
-          this.log(
-            t('hudChrome.vcup.logQueued', {
-              bracket: t('hudChrome.vcup.bracketLabel', {
-                n: formatNumber(ev.bracket, { maximumFractionDigits: 0 }),
-              }),
-              position: formatNumber(ev.position, { maximumFractionDigits: 0 }),
-            }),
-            '#ffa040',
-          );
-          break;
-        case 'vcupUnqueued':
-          this.log(t('hudChrome.vcup.logUnqueued'), '#ffa040');
-          break;
-        case 'vcupFound': {
-          const nationA = vcupNationName(ev.nationA);
-          const nationB = vcupNationName(ev.nationB);
-          this.showBanner(t('hudChrome.vcup.bannerFound', { nationA, nationB }));
-          this.log(t('hudChrome.vcup.logFound', { nationA, nationB }), '#ffa040');
-          const allies = [t('hud.core.you'), ...ev.allies.map((c) => c.name)].join(', ');
-          const enemies = ev.enemies.map((c) => c.name).join(', ');
-          if (enemies) this.log(t('hudChrome.vcup.logRoster', { allies, enemies }), '#ffa040');
-          audio.duelChallenge();
-          break;
-        }
-        case 'vcupCountdown':
-          this.showBanner(
-            t('hudChrome.vcup.bannerCountdown', {
-              seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
-            }),
-          );
-          audio.duelCountdownTick();
-          break;
-        case 'vcupKickoff':
-          this.showBanner(t('hudChrome.vcup.bannerKickoff'));
-          audio.vcupKickoff();
-          break;
-        case 'vcupGoal': {
-          const scoringNation = vcupNationName(ev.team === 'A' ? ev.nationA : ev.nationB);
-          this.showBanner(t('hudChrome.vcup.bannerGoal', { nation: scoringNation }));
-          this.combatLog(
-            t('hudChrome.vcup.logGoal', {
-              name: ev.scorerName,
-              nation: scoringNation,
-              nationA: vcupNationName(ev.nationA),
-              scoreA: formatNumber(ev.scoreA, { maximumFractionDigits: 0 }),
-              nationB: vcupNationName(ev.nationB),
-              scoreB: formatNumber(ev.scoreB, { maximumFractionDigits: 0 }),
-            }),
-            '#ffd24a',
-          );
-          this.renderer.addShake(0.4);
-          // the Sowfield's own horn + crowd (src/game/sfx.ts, render handoff)
-          sfx.goalHorn();
-          sfx.crowdRoar();
-          break;
-        }
-        case 'vcupSave':
-          this.showBanner(t('hudChrome.vcup.bannerSave', { name: ev.keeperName }));
-          this.combatLog(t('hudChrome.vcup.logSave', { name: ev.keeperName }), '#7fd4ff');
-          audio.fiestaScorePing(true);
-          sfx.crowdRoar(0.5);
-          break;
-        case 'vcupBetSettled': {
-          const amount = formatLocalizedMoney(ev.payout);
-          if (ev.outcome === 'won') {
-            this.showBanner(t('hudChrome.vcup.bet.wonBanner'));
-            this.combatLog(t('hudChrome.vcup.bet.wonLog', { amount }), '#ffd24a');
-            sfx.crowdRoar(0.5);
-          } else if (ev.outcome === 'refunded') {
-            this.combatLog(t('hudChrome.vcup.bet.refundLog', { amount }), '#7fd4ff');
-          } else {
-            this.combatLog(
-              t('hudChrome.vcup.bet.lostLog', {
-                amount: formatLocalizedMoney(ev.stake),
-              }),
-              '#fa6',
-            );
-          }
-          break;
-        }
-        case 'vcupGolden':
-          this.showBanner(t('hudChrome.vcup.bannerGolden'));
-          audio.fiestaWave();
-          break;
-        case 'vcupEnd':
-          this.showBanner(
-            t('hudChrome.vcup.bannerEnd', {
-              nationA: vcupNationName(ev.nationA),
-              scoreA: formatNumber(ev.scoreA, { maximumFractionDigits: 0 }),
-              nationB: vcupNationName(ev.nationB),
-              scoreB: formatNumber(ev.scoreB, { maximumFractionDigits: 0 }),
-            }),
-          );
-          audio.duelEnd();
-          sfx.crowdRoar();
-          break;
-        case 'vcupResult':
-          if (ev.draw) {
-            this.showBanner(t('hudChrome.vcup.bannerDraw'));
-            this.combatLog(t('hudChrome.vcup.logDraw'), '#fa6');
-            audio.duelEnd();
-          } else if (ev.won) {
-            this.showBanner(t('hudChrome.vcup.bannerWin'));
-            this.combatLog(t('hudChrome.vcup.logWin'), '#7fdc4f');
-            audio.duelEnd();
-          } else {
-            this.showBanner(t('hudChrome.vcup.bannerLoss'));
-            this.combatLog(t('hudChrome.vcup.logLoss'), '#ff7a6a');
-            audio.death();
-          }
-          break;
         case 'cardDuelMatchStart':
           audio.cardShuffle();
           break;

@@ -1025,7 +1025,6 @@ export const cs_CZ: EnTranslations = {
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "targetPrev": "Přepínat cíl zpět",
       "discord": "Discord",
-      "valecup": "Pohár údolí",
       "bgFlag": "Akce s vlajkou na bojišti",
       "sheathe": "Zasunout/Vytasit zbraň",
       "dive": "Potopit se",
@@ -1191,146 +1190,6 @@ export const cs_CZ: EnTranslations = {
         "azureKeep": "Blankytná tvrz",
         "ruinCourtyard": "Zpustlé nádvoří",
         "graveyard": "Hřbitov"
-      }
-    },
-    "vcup": {
-      "title": "Pohár údolí",
-      "shootPower": "SÍLA",
-      "close": "Zavřít okno Poháru údolí",
-      "offlineNote": "Kniha zápasů je zavřená. Pohár údolí teď není dostupný.",
-      "recordLine": "Tvá bilance: {wins} výher, {losses} proher, {draws} remíz.",
-      "bracketsAria": "Kategorie zápasu",
-      "bracketLabel": "{n} na {n}",
-      "waitingCount": "{count} čeká",
-      "nationsHeading": "Národní zástava",
-      "nation": {
-        "vale": "Eastbrookské údolí",
-        "mirefen": "Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "Popelavé koloseum",
-        "choir": "Bledý chór",
-        "ogre": "Zlobří klany",
-        "moon": "Bledý měsíc",
-        "copperdig": "Měděný důl"
-      },
-      "awayNote": "Pokud obě strany hrají pod stejnou zástavou, hostující strana nastoupí v obrácených barvách.",
-      "rolesHeading": "Sportovní role",
-      "rolesSmallBracketNote": "V kategoriích 1 na 1 a 2 na 2 hraje každý bojovník s výbavou Univerzála. Skutky, které vyžadují kategorii 3 na 3 nebo větší, tu získat nelze.",
-      "role": {
-        "allrounder": {
-          "name": "Univerzál",
-          "desc": "Od všeho trochu: kop, odkop a férové rameno."
-        },
-        "striker": {
-          "name": "Útočník",
-          "desc": "Žije pro dlouhý odkop a rychlou kličku."
-        },
-        "sweeper": {
-          "name": "Zadák",
-          "desc": "Odstrkuje běžce od míče a odkopává ho do bezpečí."
-        },
-        "keeper": {
-          "name": "Brankář",
-          "desc": "Střeží brankoviště chytáním, rybičkou a výkopem."
-        }
-      },
-      "queue": "Vstoupit do fronty",
-      "leaveQueue": "Opustit frontu",
-      "queueNote": "Do fronty se zapiš odkudkoli; píšťalka tě zavolá na Prasečí pole.",
-      "queuedStatus": "Ve frontě na {bracket}: pozice {position} z {count}.",
-      "blockNation": "Nejdřív si vyber národní zástavu.",
-      "blockPartySize": "Tato kategorie vyžaduje menší skupinu.",
-      "blockNotLeader": "Tým může do fronty zapsat jen vůdce skupiny.",
-      "inMatchNote": "Tvůj tým je na hřišti. Hraje se dál!",
-      "deserterNote": "Správce hřiště si to pamatuje. Do fronty se můžeš znovu zapsat za {seconds} s.",
-      "liveHeading": "Právě na Prasečím poli",
-      "liveAria": "Pohár údolí: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Přijď k Prasečímu poli a sleduj zápas z tribun.",
-      "noLive": "Hřiště je tiché. Žádný zápas se nehraje.",
-      "boardHeading": "Tabule vítězů",
-      "boardEmpty": "Zatím nejsou zaznamenáni žádní vítězové. Měděný kbelík čeká.",
-      "boardWins": "{count} výher",
-      "enterAsGuild": "Nastoupit pod zástavou cechu {guild}",
-      "guildRecordLine": "Bilance tvého cechu: {wins} výher, {losses} proher.",
-      "guildBoardHeading": "Cechovní zástavy",
-      "guildBoardEmpty": "Žádný cech zatím nenastoupil na hřiště. Vyvěs svou zástavu!",
-      "guildBoardWl": "{wins} V, {losses} P",
-      "practice": "Trénink proti botům",
-      "practiceNote": "Okamžitě spustí soukromý zápas s boty na tvém vlastním tréninkovém hřišti.",
-      "practiceUnratedNote": "Tréninkové zápasy jsou nehodnocené: tabulka ani postup v Knize skutků se nepočítají.",
-      "practicingNow": "Právě trénují ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Fronta Poháru údolí: {bracket}, pozice {position} z {count}",
-      "indicatorLive": "Pohár údolí",
-      "indicatorOpen": "Otevřít okno Poháru údolí",
-      "phaseCountdown": "Výkop za {seconds}",
-      "phaseGoal": "GÓL!",
-      "phaseGolden": "ZLATÝ GÓL",
-      "phaseOver": "KONEC ZÁPASU",
-      "bannerFound": "Pohár údolí volá: {nationA} proti {nationB}!",
-      "bannerCountdown": "Výkop za {seconds}...",
-      "bannerKickoff": "VÝKOP!",
-      "bannerGoal": "GÓL! {nation} skóruje!",
-      "bannerSave": "{name} CHYTÁ!",
-      "bannerGolden": "ZLATÝ GÓL: další branka vítězí!",
-      "bannerEnd": "Konec zápasu: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Vítězství na Prasečím poli!",
-      "bannerDraw": "Remíza na Prasečím poli.",
-      "bannerLoss": "Porážka na Prasečím poli.",
-      "logQueued": "Zapisuješ se do fronty Poháru údolí na {bracket} (pozice {position}).",
-      "logUnqueued": "Opouštíš frontu Poháru údolí.",
-      "logFound": "Tvůj zápas Poháru údolí je připraven: {nationA} proti {nationB}.",
-      "logRoster": "Tvá strana: {allies}. Jejich strana: {enemies}.",
-      "logGoal": "{name} skóruje za {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} předvádí zákrok!",
-      "logWin": "Vyhráváš zápas na Prasečím poli.",
-      "logDraw": "Zápas na Prasečím poli končí remízou.",
-      "logLoss": "Prohráváš zápas na Prasečím poli.",
-      "gossipOpen": "Kniha zápasů",
-      "gossipOpenAria": "Otevřít okno Poháru údolí",
-      "mobileLabel": "Pohár",
-      "briefing": {
-        "subtitle": "Předzápasová porada",
-        "vs": "proti",
-        "rulesHeading": "Jak hrát",
-        "rule1": "Skóruj kopnutím nebo přihrávkou míče do soupeřovy branky.",
-        "rule2": "Vyhrává, kdo první dá 5 gólů, nebo kdo jich má víc, když zazní konec.",
-        "rule3": "Nerozhodný stav na konci jde do zlatého gólu: další branka vítězí.",
-        "rule4": "Skluzy tě jen povalí. Pod žňovým příměřím se nikomu nic nestane.",
-        "rule5": "Kdokoli může přijít a fandit ti z tribun.",
-        "kitHeading": "Tvá výbava",
-        "kitNote": "Tyto dovednosti po dobu zápasu nahrazují tvé třídní schopnosti.",
-        "unratedNote": "Na hřišti jsou boti, takže je tento zápas nehodnocený: tabulkou to nepohne a skutky za góly, zákroky a čistá konta se nepočítají.",
-        "practiceUnratedNote": "Tohle je tréninkový zápas, takže je nehodnocený: tabulkou to nepohne a postup v Knize skutků se nepočítá.",
-        "rosterHeading": "Soupiska",
-        "you": "Ty",
-        "bot": "Bot",
-        "ready": "Jsem připraven(a)",
-        "readyDone": "Připraven(a)",
-        "readyAria": "Připravit se na výkop",
-        "waiting": "Čeká se, až se připraví druhá strana...",
-        "whistle": "Píšťalka zazní za {seconds} s.",
-        "readyCount": "{ready} z {total} připraveno"
-      },
-      "bet": {
-        "title": "Sázky na zápas",
-        "aria": "Sázky na zápas Poháru údolí",
-        "closesIn": "Sázky se uzavírají za {seconds} s",
-        "closed": "Sázky uzavřeny",
-        "prize": "Bank {amount}",
-        "splitAria": "Rozdělení sázkového banku mezi jednotlivé týmy",
-        "expand": "Zobrazit sázky a vsadit",
-        "collapse": "Skrýt sázky",
-        "oddsLabel": "Vyplácí",
-        "back": "Vsadit na {team}",
-        "form": "{wins}V-{losses}P",
-        "mine": "Tvá sázka: {amount} na {team}",
-        "none": "Na tento zápas zatím nemáš žádnou sázku.",
-        "record": "Sázkařská bilance: {wins}V-{losses}P, {sign}{net}",
-        "wonBanner": "Tvá sázka vyhrála!",
-        "wonLog": "Tvá sázka na Pohár údolí vyhrála: vráceno {amount}.",
-        "lostLog": "Tvá sázka na Pohár údolí prohrála: {amount}.",
-        "refundLog": "Sázky zrušeny, tvůj vklad {amount} byl vrácen."
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const cs_CZ: EnTranslations = {
       "combat": "Boj",
       "talents": "Talenty",
       "arena": "Aréna a PvP",
-      "valeCup": "Pohár údolí",
       "thornhollow": "Thornhollowská pole",
       "deeds": "Kniha skutků",
       "reliquary": "Relikviář",
@@ -4210,7 +4068,6 @@ export const cs_CZ: EnTranslations = {
       "reliquary": "Relikviář",
       "sheathe": "Zasunout/Vytasit zbraň",
       "crafting": "Výroba",
-      "valeCup": "Pohár údolí",
       "mount": "Nasednout / Sesednout",
       "calendar": "Kalendář událostí",
       "dungeonFinder": "Hledač dungeonů",
@@ -5287,36 +5144,6 @@ export const cs_CZ: EnTranslations = {
       "ladderBody": "Každý zápas pohne trvalým hodnocením bojiště vázaným na postavu, ať vyhraješ nebo prohraješ, a tabulka všech dob řadí šampiony říše.",
       "rewardsHeading": "Odměny za zápas",
       "rewardsBody": "Každý dokončený zápas vyplácí čest: víc za výhru, útěchu za prohru nebo remízu, a navíc drobnou částku za každý smrtící úder, který zasadíš, i za každý, na kterém se podílíš, takže boj mimo vlajky se pořád vyplácí. Tvá první výhra dne navíc vyplácí bonus a panel ti ukazuje, dokud na tebe tento bonus ještě čeká. Tento den patří jen cti a přetáčí se podle vlastních hodin, ne podle resetu instancí říše. Opakované střetnutí se stejným týmem vyplácí za samotný zápas méně po tom prvním, rychle se ustálí na dně místo toho, aby se propadlo k nule, a odstoupený zápas nevyplácí nic. Utrať, co si vyděláš, u kteréhokoli intendanta Válečnictví."
-    },
-    "valeCupPage": {
-      "heading": "Pohár údolí",
-      "intro": "Kančbal na Prasečím poli: vyber si zástavu, vyber si roli a dostaň vycpanou kančí kůži za brankáře. Hraje se o Měděný kbelík: žádná krev, žádná kořist, jen řev tribun.",
-      "loreHeading": "Kančbal a žňové příměří",
-      "loreOldSow": "Dávno předtím, než se mrtví probudili, hrávali eastbrookští čeledíni kančbal na strništích po žních: dva houfy, jedna kančí kůže vycpaná slámou a dvě vozové brány dovlečené na oba konce louky. První míč, Stará prasnice, visí pokrytý bronzem nad krbem v hospodě.",
-      "loreTruce": "Když Popelavé koloseum začalo pořádat válečné hry, maršál Redbrook odpověděl něčím laskavějším: stálým žňovým příměřím na staré louce. Z vozových bran se staly branky, louka dostala mantinely, tribuny i jméno, Prasečí pole, a cenou byl vždycky tentýž promáčklý kbelík na mléko, ze kterého vítězové pili: Měděný kbelík.",
-      "howHeading": "Jak hrát",
-      "howQueue": "Do fronty se zapiš odkudkoli přes okno Poháru údolí, nebo si promluv se správcem hřiště Bramem u brány Prasečího pole. Vyber kategorii od jednoho hráče na každé straně až po pět, národní zástavu a sportovní roli; do fronty se postav sám, nebo přiveď svou skupinu.",
-      "howMatch": "Při výkopu se tvá třídní výbava vymění za sportovní a po zápase se přesně obnoví. Kopy míří na zaměřovač na zemi, míč se odráží od mantinelů a driblink je prostě běh s míčem. Dej víc gólů než druhá strana, než zazní konec; remíza jde do zlatého gólu.",
-      "howTruce": "Na Prasečím poli nikdo nekrvácí: skluzy jen povalí, nic nebolí a mazlíčci zápas prosedí venku.",
-      "spectateBody": "Na stadionu se hraje vždy jen jeden zápas a kdokoli může přijít a sledovat ho z tribun.",
-      "bettingHeading": "Sázka u zábradlí",
-      "bettingBody": "Diváci na Prasečím poli mohou vsadit na jednu stranu, dokud se zápas teprve utváří: sázky se slévají dohromady a při závěrečném hvizdu si vítězové rozdělí balík poražených v poměru k tomu, co vsadili. Remíza, nebo překvapení, na které nikdo nevsadil, vrátí každou minci. Hráči nasazení v zápase na něj sázet nemohou a zábradlí uchovává tvou celoživotní bilanci výher, proher a čistého zisku.",
-      "practiceHeading": "Tréninkové zápasy a zahálející hřiště",
-      "practiceBody": "Okno Poháru údolí nabízí i trénink: soukromou kopii hřiště, kde obě strany zaplní boti a nic se nepočítá do tvé bilance. Chybí ti hráč nebo dva na skutečný zápas? Po krátkém čekání týmy doplní boti a jakýkoli zápas s boty na hřišti je přátelák, nikdy hodnocený. A když Prasečí pole zahálí, boti předvedou exhibici, na kterou se můžeš z tribuny dívat, i sázet; v okamžiku, kdy se skuteční hráči připraví, exhibice hřiště uvolní a každá sázka se vrátí.",
-      "nationsHeading": "Osm národních zástav",
-      "nationsBody": "Každý tým hraje pod zástavou. Národ vybírá kapitán, a pokud obě strany hrají pod stejnou, hostující strana nastoupí v obrácených barvách.",
-      "nationVale": "Zelená a zlatá pod snopem pšenice: domácí strana, čeledíni tělem i duší.",
-      "nationMirefen": "Modrozelená a šedá pod volavkou: trpěliví, dlouhonozí, nikdy ve spěchu.",
-      "nationThornpeak": "Ledově modrá a bílá pod horským štítem: jistí v kroku a tvrdohlaví.",
-      "nationColiseum": "Červená a černá se zkříženými meči: hrají, jako by to pořád byla válečná hra.",
-      "nationChoir": "Bledě modrá a stříbrná pod zvonem: strašidelní, přesní a velmi tiší.",
-      "nationOgre": "Oranžová a umbrová za pěstí: napřed ramenem a jsou na to hrdí.",
-      "nationMoon": "Fialová a stříbrná pod srpkem měsíce: noční hráči, lehcí na nohou.",
-      "nationCopperdig": "Měděná a hnědá s krumpáčem: kopáči, kteří nikdy nepřestanou běhat.",
-      "rolesHeading": "Sportovní role",
-      "rolesBody": "Tvá role určuje výbavu, kterou si neseš na hřiště. Kopou všichni; zbytek je povaha. V bracketech jeden na jednoho a dva na dva hrají všichni všestrannou výbavu, takže volba role přijde ke slovu až od tří na tři výš.",
-      "rewardsHeading": "Pravidla příměří",
-      "rewardsBody": "Pravidla příměří znamenají žádné zkušenosti a žádnou kořist: rozhodnutý zápas se počítá do tvé bilance a na tabuli vítězů a výhra se počítá i do denních úkolů o odměny. Dezerce ze zápasu ti zablokuje místo a správce hřiště si to pamatuje."
     },
     "deedsPage": {
       "intro": "Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.",
@@ -13439,9 +13266,6 @@ export const cs_CZ: EnTranslations = {
       "tolling_bell": {
         "name": "Zvonící zvon"
       },
-      "vale_cup_ball": {
-        "name": "Kančbal"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, probouzející se štít"
       },
@@ -14038,11 +13862,6 @@ export const cs_CZ: EnTranslations = {
         "name": "Bledá strážkyně",
         "title": "Strážkyně mrtvých",
         "greeting": "Odpočívej, duchu. Mohu tě vrátit do těla, ale přechod zpět tě oslabí."
-      },
-      "groundskeeper_bram": {
-        "name": "Správce hřiště Bram",
-        "title": "Správce Prasečího pole",
-        "greeting": "Na Prasečím poli platí příměří, {className}: jen kopy a ramena. Chceš si zahrát o Měděný kbelík?"
       },
       "chronicler_saul": {
         "name": "Kronikář Saul",
@@ -16492,6 +16311,9 @@ export const cs_CZ: EnTranslations = {
           },
           "11": {
             "label": "Hráz Vzdáleného pobřeží"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

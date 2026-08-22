@@ -10,7 +10,7 @@ export const BAKED_MAP_BG = {
   "eastbrook_vale": {
     "w": 480,
     "h": 480,
-    "rowHash": "5348677c"
+    "rowHash": "ed439929"
   },
   "mirefen_marsh": {
     "w": 480,

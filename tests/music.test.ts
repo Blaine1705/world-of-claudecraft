@@ -188,14 +188,6 @@ describe('MusicDirector streamed combat / background mix', () => {
     expect(el.currentTime).toBe(55);
     expect(el.play).toHaveBeenCalledTimes(2);
   });
-
-  it('plays the vale_cup zone as silence on the zone bus (the Sowfield mp3s own it)', () => {
-    director.update('vale', false);
-    director.update('vale_cup', false);
-    expect(internals(director).zoneStreams.vale?.target).toBe(0);
-    expect(internals(director).zoneStreams.vale_cup).toBeUndefined();
-    expect(FakeAudio.instances.map((el) => el.src)).not.toContain('/audio/music/vale_cup.mp3');
-  });
 });
 
 describe('MusicDirector random combat theme pick', () => {

@@ -41,10 +41,6 @@ describe('remastered soundtrack catalog', () => {
     }
   });
 
-  it('leaves vale_cup streamless: the Sowfield mp3 pair owns that mix', () => {
-    expect(ZONE_STREAM_URLS.vale_cup).toBeNull();
-  });
-
   it('routes each supplied new-zone remaster to its matching music cue', () => {
     const supplied = {
       amber: [
@@ -127,7 +123,6 @@ describe('remastered soundtrack catalog', () => {
       'garden',
       'gale',
       'farshore',
-      'vale_cup',
       'dungeon_hollow_crypt',
       'dungeon_sunken_bastion',
       'dungeon_gravewyrm_sanctum',

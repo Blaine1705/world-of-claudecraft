@@ -1367,14 +1367,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.actionBar.resetConfirmTitle': 'Actiebalktoetsen herstellen?',
   'hudChrome.actionBar.resetConfirmBody':
     'De eerste balk keert terug naar zijn standaardtoetsen. De tweede en derde balk raken hun toewijzing kwijt. Dit kan niet ongedaan worden gemaakt.',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    'In de categorieën 1v1 en 2v2 speelt elke vechter met de Allrounder-uitrusting. Daden die de categorie 3v3 of groter vragen, kun je hier niet behalen.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Oefenpartijen tellen niet mee voor de ranglijst: standen en voortgang in het Boek der Daden tellen niet.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'Er staan bots op het veld, dus deze partij telt niet mee voor de ranglijst: de standen bewegen niet en daden voor goals, reddingen en het houden van de nul tellen niet.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Dit is een oefenpartij en telt dus niet mee voor de ranglijst: de standen bewegen niet en voortgang in het Boek der Daden telt niet.',
   'hudChrome.bags.filterTool': 'Gereedschap',
   'hudChrome.materialHint.fineGrade':
     'Fijne kwaliteit. Verzameld uit een grondstoffenpunt op volle rang met gereedschap boven de rang van het materiaal, en telt overal waar de gewone versie vereist is als die versie.',
@@ -2733,57 +2725,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoulder.description':
     'Een eerlijke schouderduw onder het oogstbestand. Stuurt ze tuimelend van de bal.',
   'entities.abilities.sport_shoulder.name': 'Schouderduw',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'Het bestand houdt stand op het Zeugveld, {className}: alleen trappen en schouders. Zin om te spelen voor de Koperen Emmer?',
-  'entities.npcs.groundskeeper_bram.name': 'Terreinmeester Bram',
-  'entities.npcs.groundskeeper_bram.title': 'Hoeder van het Zeugveld',
   'entities.zones.eastbrook_vale.pois.10.label': 'Het Zeugveld',
   'guide.nav.professions': 'Beroepen',
-  'guide.nav.valeCup': 'Dalbeker',
   'guide.professions.intro':
     'Naast gevecht en quests beloont de wereld je voor het bewerken van het land en de smidse: grondstoffen verzamelen, ze in tien ambachtsvakken tot uitrusting en goederen maken, en een identiteit aannemen als een van de tien archetypen die deze vakken vertegenwoordigen.',
-  'guide.valeCupPage.heading': 'De Dalbeker',
-  'guide.valeCupPage.howHeading': 'Hoe je speelt',
-  'guide.valeCupPage.howMatch':
-    'Bij de aftrap wordt je klasse-uitrusting omgeruild voor een sportuitrusting en daarna exact hersteld. Trappen mikken op het grondvizier, de bal kaatst tegen de boarding, en dribbelen is gewoon rennen met de bal. Maak meer doelpunten dan de tegenpartij voor het eindsignaal; bij een gelijkspel volgt de gouden goal.',
-  'guide.valeCupPage.howQueue':
-    'Meld je vanaf elke plek aan via het Dalbeker-venster, of praat met Terreinmeester Bram bij de poort van het Zeugveld. Kies een categorie van één tegen één tot vijf tegen vijf, een baniernatie en een sportrol; meld je solo aan of neem je groep mee.',
-  'guide.valeCupPage.howTruce':
-    'Niemand bloedt op het Zeugveld: tackles laten je tuimelen, niets doet pijn, en huisdieren zitten de wedstrijd uit.',
-  'guide.valeCupPage.intro':
-    'Zwijnenbal op het Zeugveld: kies een banier, kies een rol, en trap een opgezette zwijnenhuid langs een keeper voor de Koperen Emmer. Geen bloed, geen buit, alleen het gebrul van de tribunes.',
-  'guide.valeCupPage.loreHeading': 'Zwijnenbal en het oogstbestand',
-  'guide.valeCupPage.loreOldSow':
-    'Lang voordat de doden ontwaakten, speelden de boerenknechten van Oostbeek zwijnenbal op de stoppelvelden na de oogst: twee horden, één zwijnenhuid gevuld met stro, en twee wagenhekken die naar de uiteinden van het veld werden gesleept. De eerste bal, de Oude Zeug, hangt in brons boven de taveernehaard.',
-  'guide.valeCupPage.loreTruce':
-    'Toen het Asgrauwe Colosseum oorlogsspelen begon te sanctioneren, antwoordde Maarschalk Redbrook met iets zachtaardigers: een blijvend oogstbestand op het oude veld. De wagenhekken werden doelpalen, het veld kreeg muren, tribunes en een naam, het Zeugveld, en de prijs was altijd dezelfde gedeukte melkemmer waar de winnaars uit dronken: de Koperen Emmer.',
-  'guide.valeCupPage.nationChoir':
-    'Bleekblauw en zilver onder de klok: onheilspellend, precies en heel stil.',
-  'guide.valeCupPage.nationColiseum':
-    'Rood en zwart met gekruiste zwaarden: ze spelen alsof het nog steeds een oorlogsspel is.',
-  'guide.valeCupPage.nationCopperdig':
-    'Koper en bruin met het houweel: delvers die nooit stoppen met rennen.',
-  'guide.valeCupPage.nationMirefen':
-    'Groenblauw en grijs onder de reiger: geduldig, met lange benen, nooit gehaast.',
-  'guide.valeCupPage.nationMoon':
-    'Violet en zilver onder de maansikkel: nachtspelers, licht op de voeten.',
-  'guide.valeCupPage.nationOgre':
-    'Oranje en omber achter de vuist: schouder eerst, en er trots op.',
-  'guide.valeCupPage.nationThornpeak': 'IJsblauw en wit onder de bergtop: vast ter been en koppig.',
-  'guide.valeCupPage.nationVale':
-    'Groen en goud, onder de korenschoof: de thuisploeg, boerenknechten in hart en nieren.',
-  'guide.valeCupPage.nationsBody':
-    'Elk team speelt onder een banier. De aanvoerder kiest de natie, en als beide kanten dezelfde banier voeren, speelt de uitploeg in het omgekeerde kleurenpalet.',
-  'guide.valeCupPage.nationsHeading': 'De acht baniernaties',
-  'guide.valeCupPage.rewardsBody':
-    'Bestandsregels betekenen geen ervaring en geen buit: een besliste wedstrijd telt mee voor je staat van dienst en het winnaarsbord, en een overwinning telt ook mee voor de beloningstaken van de dag. Wie een wedstrijd in de steek laat, zet zijn plek op de bank, en de Terreinmeester onthoudt het.',
-  'guide.valeCupPage.rewardsHeading': 'Bestandsregels',
-  'guide.valeCupPage.rolesBody':
-    'Je rol bepaalt de uitrusting die je het veld op draagt. Iedereen trapt; de rest is temperament. In de categorieën één-tegen-één en twee-tegen-twee speelt iedereen de allrounder-uitrusting, dus rolkeuzes komen pas vanaf drie-tegen-drie tot hun recht.',
-  'guide.valeCupPage.rolesHeading': 'Sportrollen',
-  'guide.valeCupPage.spectateBody':
-    'Er wordt één wedstrijd tegelijk gespeeld in het stadion, en iedereen kan aan komen lopen en toekijken vanaf de tribunes.',
-  'hudChrome.keybinds.valecup': 'Dalbeker',
   'hudChrome.mobile.dailyRewards': 'Winkel',
   'hudChrome.perf.labels.predLead': 'Predictievoorsprong',
   'hudChrome.townFocus.budgetLabel': 'Punten over: {remaining} / {budget}',
@@ -2798,137 +2743,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.title': 'Stadsfocus',
   'hudChrome.townFocus.townOnlyHint':
     'Focus kan alleen worden gewijzigd terwijl je in de stad bent.',
-  'hudChrome.vcup.awayNote':
-    'Als beide kanten dezelfde banier voeren, speelt de uitploeg in het omgekeerde kleurenpalet.',
-  'hudChrome.vcup.bannerCountdown': 'Aftrap over {seconds}...',
-  'hudChrome.vcup.bannerDraw': 'Een gelijkspel op het Zeugveld.',
-  'hudChrome.vcup.bannerEnd': 'Eindstand: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerFound': 'De Dalbeker roept: {nationA} tegen {nationB}!',
-  'hudChrome.vcup.bannerGoal': 'GOAL! {nation} scoort!',
-  'hudChrome.vcup.bannerGolden': 'GOUDEN GOAL: de volgende treffer wint!',
-  'hudChrome.vcup.bannerKickoff': 'AFTRAP!',
-  'hudChrome.vcup.bannerLoss': 'Nederlaag op het Zeugveld.',
-  'hudChrome.vcup.bannerSave': '{name} REDT!',
-  'hudChrome.vcup.bannerWin': 'Overwinning op het Zeugveld!',
-  'hudChrome.vcup.bet.aria': 'Weddenschappen op de Dalbeker-wedstrijd',
-  'hudChrome.vcup.bet.back': 'Zet in op {team}',
-  'hudChrome.vcup.bet.closed': 'Inzetten gesloten',
-  'hudChrome.vcup.bet.closesIn': 'Inzetten sluiten over {seconds}s',
-  'hudChrome.vcup.bet.collapse': 'Weddenschappen verbergen',
-  'hudChrome.vcup.bet.expand': 'Weddenschappen bekijken en inzetten',
-  'hudChrome.vcup.bet.form': '{wins}W-{losses}V',
-  'hudChrome.vcup.bet.lostLog': 'Je Dalbeker-weddenschap is verloren: {amount}.',
-  'hudChrome.vcup.bet.mine': 'Jouw inzet: {amount} op {team}',
-  'hudChrome.vcup.bet.none': 'Je hebt nog geen weddenschap op deze wedstrijd.',
-  'hudChrome.vcup.bet.oddsLabel': 'Keert uit',
-  'hudChrome.vcup.bet.prize': 'Pot {amount}',
-  'hudChrome.vcup.bet.record': 'Wedbalans: {wins}W-{losses}V, {sign}{net}',
-  'hudChrome.vcup.bet.refundLog':
-    'Weddenschappen nietig verklaard, je inzet van {amount} is teruggegeven.',
-  'hudChrome.vcup.bet.splitAria': 'Aandeel van de wedpot per team',
-  'hudChrome.vcup.bet.title': 'Wedstrijdweddenschappen',
-  'hudChrome.vcup.bet.wonBanner': 'Je weddenschap is gewonnen!',
-  'hudChrome.vcup.bet.wonLog': 'Je Dalbeker-weddenschap is gewonnen: {amount} uitgekeerd.',
-  'hudChrome.vcup.blockNation': 'Kies eerst een baniernatie.',
-  'hudChrome.vcup.blockNotLeader': 'Alleen de groepsleider kan het team aanmelden.',
-  'hudChrome.vcup.blockPartySize': 'Die categorie vraagt een kleinere groep.',
-  'hudChrome.vcup.boardEmpty': 'Nog geen winnaars opgetekend. De Koperen Emmer wacht.',
-  'hudChrome.vcup.boardHeading': 'Winnaarsbord',
-  'hudChrome.vcup.boardWins': '{count} overwinningen',
-  'hudChrome.vcup.bracketLabel': '{n}v{n}',
-  'hudChrome.vcup.bracketsAria': 'Wedstrijdcategorie',
-  'hudChrome.vcup.briefing.bot': 'Bot',
-  'hudChrome.vcup.briefing.kitHeading': 'Jouw uitrusting',
-  'hudChrome.vcup.briefing.kitNote':
-    'Deze zetten vervangen je klassevaardigheden voor de duur van de wedstrijd.',
-  'hudChrome.vcup.briefing.ready': 'Ik ben er klaar voor',
-  'hudChrome.vcup.briefing.readyAria': 'Meld je klaar voor de aftrap',
-  'hudChrome.vcup.briefing.readyCount': '{ready} van {total} klaar',
-  'hudChrome.vcup.briefing.readyDone': 'Klaar',
-  'hudChrome.vcup.briefing.rosterHeading': 'De opstelling',
-  'hudChrome.vcup.briefing.rule1': 'Trap of speel de bal in het vijandelijke doel om te scoren.',
-  'hudChrome.vcup.briefing.rule2':
-    'Wie het eerst 5 doelpunten maakt wint, of wie de meeste heeft bij het eindsignaal.',
-  'hudChrome.vcup.briefing.rule3':
-    'Staat het gelijk bij het eindsignaal, dan volgt de gouden goal: de volgende treffer wint.',
-  'hudChrome.vcup.briefing.rule4':
-    'Tackles laten je alleen omtuimelen. Niemand raakt gewond onder het oogstbestand.',
-  'hudChrome.vcup.briefing.rule5':
-    'Iedereen kan aan komen lopen en je aanmoedigen vanaf de tribunes.',
-  'hudChrome.vcup.briefing.rulesHeading': 'Hoe je speelt',
-  'hudChrome.vcup.briefing.subtitle': 'Wedstrijdbespreking',
-  'hudChrome.vcup.briefing.vs': 'tegen',
-  'hudChrome.vcup.briefing.waiting': 'Wachten tot de tegenpartij zich klaar meldt...',
-  'hudChrome.vcup.briefing.whistle': 'De fluit klinkt over {seconds}s.',
-  'hudChrome.vcup.briefing.you': 'Jij',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.close': 'Sluit het Dalbeker-venster',
-  'hudChrome.vcup.deserterNote':
-    'De Terreinmeester onthoudt het. Je mag je over {seconds} sec weer aanmelden.',
-  'hudChrome.vcup.enterAsGuild': 'Treed aan onder de banier van {guild}',
-  'hudChrome.vcup.gossipOpen': 'Het wedstrijdboek',
-  'hudChrome.vcup.gossipOpenAria': 'Open het Dalbeker-venster',
-  'hudChrome.vcup.guildBoardEmpty': 'Nog geen gilde heeft het veld betreden. Hijs je banier!',
-  'hudChrome.vcup.guildBoardHeading': 'Gildebanieren',
-  'hudChrome.vcup.guildBoardWl': '{wins} W, {losses} V',
-  'hudChrome.vcup.guildRecordLine':
-    'Staat van dienst van je gilde: {wins} overwinningen, {losses} nederlagen.',
-  'hudChrome.vcup.inMatchNote': 'Je team staat op het veld. Doorspelen!',
-  'hudChrome.vcup.indicatorLive': 'Dalbeker',
-  'hudChrome.vcup.indicatorOpen': 'Open het Dalbeker-venster',
-  'hudChrome.vcup.indicatorQueued': 'Dalbeker-wachtrij: {bracket}, plaats {position} van {count}',
-  'hudChrome.vcup.leaveQueue': 'Wachtrij verlaten',
-  'hudChrome.vcup.liveAria': 'Dalbeker: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': 'Nu op het Zeugveld',
-  'hudChrome.vcup.logDraw': 'De partij op het Zeugveld eindigt in een gelijkspel.',
-  'hudChrome.vcup.logFound': 'Je Dalbeker-wedstrijd staat klaar: {nationA} tegen {nationB}.',
-  'hudChrome.vcup.logGoal': '{name} scoort voor {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': 'Je verliest de partij op het Zeugveld.',
-  'hudChrome.vcup.logQueued':
-    'Je sluit je aan bij de Dalbeker-wachtrij voor {bracket} (plaats {position}).',
-  'hudChrome.vcup.logRoster': 'Jouw kant: {allies}. Hun kant: {enemies}.',
-  'hudChrome.vcup.logSave': '{name} redt de bal!',
-  'hudChrome.vcup.logUnqueued': 'Je verlaat de Dalbeker-wachtrij.',
-  'hudChrome.vcup.logWin': 'Je wint de partij op het Zeugveld.',
-  'hudChrome.vcup.mobileLabel': 'Beker',
-  'hudChrome.vcup.nation.choir': 'Het Bleke Koor',
-  'hudChrome.vcup.nation.coliseum': 'Het Asgrauwe Colosseum',
-  'hudChrome.vcup.nation.copperdig': 'De Kopergroeve',
-  'hudChrome.vcup.nation.mirefen': 'Het Slijkveen',
-  'hudChrome.vcup.nation.moon': 'De Bleke Maan',
-  'hudChrome.vcup.nation.ogre': 'De Ogerclans',
-  'hudChrome.vcup.nation.thornpeak': 'Doorntop',
-  'hudChrome.vcup.nation.vale': 'Oostbeekdal',
-  'hudChrome.vcup.nationsHeading': 'Baniernatie',
-  'hudChrome.vcup.noLive': 'Het veld ligt er stil bij. Er wordt geen wedstrijd gespeeld.',
-  'hudChrome.vcup.offlineNote':
-    'Het wedstrijdboek is gesloten. De Dalbeker is op dit moment niet beschikbaar.',
-  'hudChrome.vcup.phaseCountdown': 'Aftrap over {seconds}',
-  'hudChrome.vcup.phaseGoal': 'GOAL!',
-  'hudChrome.vcup.phaseGolden': 'GOUDEN GOAL',
-  'hudChrome.vcup.phaseOver': 'EINDSIGNAAL',
-  'hudChrome.vcup.practice': 'Oefenen tegen bots',
-  'hudChrome.vcup.practiceNote': 'Start meteen een besloten botwedstrijd op je eigen oefenveld.',
-  'hudChrome.vcup.practicingNow': 'Nu aan het oefenen ({count}):',
-  'hudChrome.vcup.queue': 'Sluit je aan in de wachtrij',
-  'hudChrome.vcup.queueNote': 'Meld je aan vanaf elke plek; de fluit roept je naar het Zeugveld.',
-  'hudChrome.vcup.queuedStatus': 'In de wachtrij voor {bracket}: plaats {position} van {count}.',
-  'hudChrome.vcup.recordLine':
-    'Jouw staat van dienst: {wins} overwinningen, {losses} nederlagen, {draws} gelijke spelen.',
-  'hudChrome.vcup.role.allrounder.desc':
-    'Van alles wat: trappen, uithalen en een eerlijke schouderduw.',
-  'hudChrome.vcup.role.allrounder.name': 'Allrounder',
-  'hudChrome.vcup.role.keeper.desc': 'Bewaakt het doelgebied met grip, duik en uittrap.',
-  'hudChrome.vcup.role.keeper.name': 'Keeper',
-  'hudChrome.vcup.role.striker.desc': 'Leeft voor de verre uithaal en de snelle zijstap.',
-  'hudChrome.vcup.role.striker.name': 'Spits',
-  'hudChrome.vcup.role.sweeper.desc': 'Duwt lopers van de bal en pegelt hem weg.',
-  'hudChrome.vcup.role.sweeper.name': 'Laatste Man',
-  'hudChrome.vcup.rolesHeading': 'Sportrol',
-  'hudChrome.vcup.shootPower': 'KRACHT',
-  'hudChrome.vcup.title': 'De Dalbeker',
-  'hudChrome.vcup.waitingCount': '{count} wachtend',
-  'hudChrome.vcup.walkUp': 'Loop naar het Zeugveld om toe te kijken vanaf de tribunes.',
   'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Geen',
   'entities.itemSets.crownforged.bonus4':
@@ -3694,7 +3508,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.stable_horse.name': 'Stalpaard',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, de Ontwakende Piek',
   'entities.mobs.tolling_bell.name': 'Luidende Klok',
-  'entities.mobs.vale_cup_ball.name': 'Zwijnenbal',
   'entities.npcs.brother_halven_marsh.greeting':
     'Het spoor leidde noordwaarts. Weer een reliekschrijn, weer een ritueel. Kies je moeilijkheid, en ik houd het touw vast tot je terugkeert.',
   'entities.npcs.brother_halven_marsh.name': 'Broeder Halven',
@@ -10482,7 +10295,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petBar':
     'Huisdierbalk: Aanvallen, Stoppen, Provoceren, Defensief, Agressief (met een huisdier van een jager of heksenmeester actief)',
   'guide.controls.runForward': 'Vooruit rennen',
-  'guide.controls.valeCup': 'De Dalbeker',
   'guide.dungeonsPage.heroicBody':
     'Elke kerker voor vijf spelers, en de raid zelf, heeft een heroïsche versie die voorbij de niveaulimiet op je wacht. Dezelfde zalen, herbouwd voor een goed uitgeruste endgame-groep: alles slaat harder toe, niets valt te voet te ontlopen, en de bazen schudden verdovingen en vertragingen volledig van zich af. Ontgroei eerst de gewone versies; heroïsch gaat ervan uit dat je dat hebt gedaan.',
   'guide.dungeonsPage.heroicHowBody': 'Kies de moeilijkheid voordat je groep de instantie opeist: typ /dungeon heroic, of kies Kerkermoeilijkheid instellen in het menu van je eigen portret. In je eentje stel je hem zelf in; in een groep kan alleen de leider dat, en de keuze geldt voor iedereen en klikt vast bij de deur, zodat een tocht blijft waarvoor hij is opgeëist.',
@@ -10582,12 +10394,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Haast is een statistiek die alles wat je doet versnelt: meleezwaaien, schoten op afstand en het spreuken versnellen allemaal samen. Het komt van uitrusting, vooral van bonussen van pantsersets, terwijl een paar vaardigheden een korte uitbarsting van snellere zwaaien schenken. Je blad toont het als Haastwaardering.',
   'guide.stats.hasteTitle': 'Haast',
   'guide.talentsPage.choiceNote': 'Elke rij is een tweesprong: hij biedt drie opties en je legt je op één ervan vast. Je volgende herstel opent elk van die keuzes opnieuw.',
-  'guide.valeCupPage.bettingBody':
-    'Toeschouwers bij het Zeugveld kunnen een kant steunen terwijl een wedstrijd zich vormt: de inzetten worden samengevoegd, en bij het eindsignaal verdelen de winnaars de pot van de verliezers naar rato van wat ze inzetten. Een gelijkspel, of een verrassing die niemand steunde, betaalt elke munt terug. Spelers die in de wedstrijd staan, kunnen er niet op wedden, en de balustrade houdt je levenslange record van winst, verlies en nettomunten bij.',
-  'guide.valeCupPage.bettingHeading': 'Een gokje bij de balustrade',
-  'guide.valeCupPage.practiceBody':
-    'Het venster van De Dalbeker biedt ook oefening: een privékopie van het veld waar bots beide kanten vullen en niets meetelt voor je record. Kom je een speler of twee tekort voor het echte werk? Na een korte wachttijd vullen bots de teams aan, en elke wedstrijd met bots op het veld is een vriendschappelijke, nooit voor de ranglijst. En wanneer het Zeugveld stilligt, geven de bots een demonstratie die je vanaf de tribune kunt bekijken, en waarop je kunt wedden; zodra echte spelers zich gereedmelden, geeft de demonstratie het veld vrij en wordt elke inzet teruggegeven.',
-  'guide.valeCupPage.practiceHeading': 'Oefenpartijen en het stille veld',
   'guide.worldPage.worldBossBody':
     'Hoog op Doorntop verzamelt de storm boven Stormcrag soms een gedaante. Thunzharr, de Ontwakende Piek verrijst daar met een vast ritme, een elementaal met de kracht van een raid, bevochten in de open wereld door wie de roep beantwoordt, en hij wordt machtiger naarmate meer uitdagers tegen hem opstaan. Iedereen die zich in het gevecht mengt, verdient zijn eigen worp van zijn buit, geëerd op raidlockout-voorwaarden, en zijn val blijft lang genoeg hangen zodat de gevallenen kunnen terugrennen om hun deel op te eisen. Verzamel meer zwaarden dan je denkt nodig te hebben.',
   'guide.worldPage.worldBossTitle': 'Wanneer de piek ontwaakt: de wereldbaas',

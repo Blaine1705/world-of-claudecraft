@@ -233,18 +233,15 @@ describe('background-tier retag: only a build path that tolerates late assets', 
     );
   });
 
-  // dungeon.ts's kit/bits GLBs and vale_cup_stadium.ts's kit pieces are both read
-  // SYNCHRONOUSLY from the module-local cache by a build step that still runs
-  // BEFORE the first frame: dungeon's interior-shader prewarm entry in
-  // renderer.ts re-awaits ensureDungeonAssets() itself (so tagging it
-  // 'background' would buy nothing, since that await forces the fetch back
-  // before first frame anyway, just serialized after other boot work instead
-  // of overlapped with it), and vale_cup_stadium's buildValeCupStadium() runs
-  // unconditionally in the Renderer constructor and throws "vale cup kit piece
-  // not preloaded" the instant its cache is still empty. Both must stay on the
-  // default critical lane.
-  it('keeps dungeon.ts and vale_cup_stadium.ts on the critical lane', () => {
-    for (const file of ['../src/render/dungeon.ts', '../src/render/vale_cup_stadium.ts']) {
+  // dungeon.ts's kit/bits GLBs are read SYNCHRONOUSLY from the module-local
+  // cache by a build step that still runs BEFORE the first frame: dungeon's
+  // interior-shader prewarm entry in renderer.ts re-awaits
+  // ensureDungeonAssets() itself (so tagging it 'background' would buy
+  // nothing, since that await forces the fetch back before first frame
+  // anyway, just serialized after other boot work instead of overlapped with
+  // it). It must stay on the default critical lane.
+  it('keeps dungeon.ts on the critical lane', () => {
+    for (const file of ['../src/render/dungeon.ts']) {
       const src = readFileSync(new URL(file, import.meta.url), 'utf8');
       expect(src, file).not.toMatch(/registerDeferredPreload\([^;]*'background'/);
     }

@@ -102,14 +102,12 @@ import { type PlacedStreetlamp, planStreetlamps, styleStreetlampSites } from './
 import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetlamp_style';
 import { townPropPlacements } from './town_props';
 import type { WorldContent } from './types';
-import { valeCupColliders } from './vale_cup_layout';
 import { WILDHEART_FIELD_COLLIDER_SPECS, WILDHEART_FIELD_WALLS } from './wildheart_field';
 import {
   crossesSealedBorder,
   type Decoration,
   farshorePalmSpots,
   gardenMazeCellPieces,
-  generateDecorations,
   generateDecorationsInBounds,
   groundHeight,
   MAZE_CELL,
@@ -1261,14 +1259,6 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, x, z, BLOCKER_WALL_HEIGHT),
     });
   }
-
-  // The Sowfield boards, goal posts, net pockets, stand fronts, and plinth
-  // (Vale Cup). ONE layout module (vale_cup_layout.ts) drives this movement
-  // set, the ball's analytic wall reflection, the terrain flatten, and the
-  // render dressing, so they can never drift. Deliberately NOT fences: boards
-  // must not be jump-through mid-match (the north gate is the way in). Applies
-  // for any active content, matching the flatten arm (crater-precedent leak).
-  out.push(...valeCupColliders());
 
   // The banker's strongbox, LAST: its placement algorithm samples the chest
   // footprint against every collider above (the same choice the renderer used

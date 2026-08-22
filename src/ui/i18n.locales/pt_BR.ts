@@ -1379,14 +1379,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.actionBar.resetConfirmTitle': 'Redefinir as teclas da barra de ação?',
   'hudChrome.actionBar.resetConfirmBody':
     'A primeira barra volta às teclas padrão. A segunda e a terceira ficam sem atribuição. Isso não pode ser desfeito.',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    'Nas chaves 1x1 e 2x2, todo combatente joga com o kit Polivalente. Feitos que exigem a chave 3x3 ou maior não podem ser conquistados aqui.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Partidas de treino não são ranqueadas: a classificação e o progresso no Livro dos Feitos não contam.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'Há bots em campo, portanto esta partida não é ranqueada: a classificação não muda e os feitos de gols, defesas e jogos sem sofrer gols não contam.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Esta é uma partida de treino, portanto não é ranqueada: a classificação não muda e o progresso no Livro dos Feitos não conta.',
   'hudChrome.bags.filterTool': 'Ferramentas',
   'hudChrome.materialHint.fineGrade':
     'Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.',
@@ -2705,58 +2697,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoulder.description':
     'Uma ombrada limpa da trégua da colheita. Derruba o adversário e o tira da bola.',
   'entities.abilities.sport_shoulder.name': 'Ombrada',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'A trégua vale no Sowfield, {className}: só chutes e ombradas. Quer jogar pelo Balde de Cobre?',
-  'entities.npcs.groundskeeper_bram.name': 'Zelador Bram',
-  'entities.npcs.groundskeeper_bram.title': 'Zelador do Sowfield',
   'entities.zones.eastbrook_vale.pois.10.label': 'O Sowfield',
   'guide.nav.professions': 'Profissões',
-  'guide.nav.valeCup': 'Copa do Vale',
   'guide.professions.intro':
     'Além do combate e das missões, o mundo recompensa quem trabalha a terra e a forja: coletando matérias-primas, transformando-as em equipamento e bens ao longo de dez ofícios de criação e assumindo uma identidade como um dos dez arquétipos que esses ofícios representam.',
-  'guide.valeCupPage.heading': 'A Copa do Vale',
-  'guide.valeCupPage.howHeading': 'Como jogar',
-  'guide.valeCupPage.howMatch':
-    'No pontapé inicial, o kit da sua classe é trocado por um kit esportivo e restaurado com exatidão depois. Os chutes miram no retículo no chão, a bola rebate nas placas laterais, e driblar é só correr com a bola. Marque mais gols que o outro lado antes do fim do tempo; um empate vai para o gol de ouro.',
-  'guide.valeCupPage.howQueue':
-    'Entre na fila de qualquer lugar pela janela da Copa do Vale, ou fale com o Zelador Bram no portão do Sowfield. Escolha uma chave de um contra um até cinco contra cinco, uma nação de estandarte e uma função esportiva; entre na fila sozinho ou traga seu grupo.',
-  'guide.valeCupPage.howTruce':
-    'Ninguém sangra no Sowfield: as ombradas derrubam, nada machuca, e os mascotes ficam de fora da partida.',
-  'guide.valeCupPage.intro':
-    'Boarball no Sowfield: escolha um estandarte, escolha uma função e chute um couro de javali empalhado para além do goleiro pelo Balde de Cobre. Sem sangue, sem saque, só o rugido das arquibancadas.',
-  'guide.valeCupPage.loreHeading': 'O Boarball e a trégua da colheita',
-  'guide.valeCupPage.loreOldSow':
-    'Muito antes de os mortos despertarem, os lavradores de Eastbrook jogavam Boarball nos restolhos depois da colheita: dois bandos, um couro de javali recheado de palha e dois portões de carroça arrastados para cada ponta do gramado. A primeira bola, a Velha Porca, pende coberta de bronze sobre a lareira da taverna.',
-  'guide.valeCupPage.loreTruce':
-    'Quando o Coliseu Cinzento passou a sancionar jogos de guerra, o marechal Redbrook respondeu com algo mais gentil: uma trégua de colheita permanente no velho gramado. Os portões de carroça viraram traves, o gramado ganhou muros, arquibancadas e um nome, o Sowfield, e o prêmio sempre foi o mesmo balde de leite amassado do qual os vencedores bebiam: o Balde de Cobre.',
-  'guide.valeCupPage.nationChoir':
-    'Azul-claro e prata sob o sino: etéreos, precisos e muito calados.',
-  'guide.valeCupPage.nationColiseum':
-    'Vermelho e preto com espadas cruzadas: jogam como se ainda fosse um jogo de guerra.',
-  'guide.valeCupPage.nationCopperdig':
-    'Cobre e marrom com a picareta: escavadores que nunca param de correr.',
-  'guide.valeCupPage.nationMirefen':
-    'Azul-petróleo e cinza sob a garça: pacientes, de pernas longas, nunca apressados.',
-  'guide.valeCupPage.nationMoon':
-    'Violeta e prata sob o crescente: jogadores da noite, leves nos pés.',
-  'guide.valeCupPage.nationOgre':
-    'Laranja e ocre atrás do punho: ombro na frente e orgulhosos disso.',
-  'guide.valeCupPage.nationThornpeak':
-    'Azul-gelo e branco sob o pico da montanha: de passo firme e teimosos.',
-  'guide.valeCupPage.nationVale':
-    'Verde e dourado, hasteando o feixe de trigo: o time da casa, lavradores até o osso.',
-  'guide.valeCupPage.nationsBody':
-    'Cada time joga sob um estandarte. O capitão escolhe a nação, e se os dois lados hasteiam o mesmo, o time visitante joga com a paleta invertida.',
-  'guide.valeCupPage.nationsHeading': 'As oito nações de estandarte',
-  'guide.valeCupPage.rewardsBody':
-    'As regras da trégua significam nada de experiência e nada de saque: uma partida decidida conta para o seu histórico e para o quadro de vencedores, e uma vitória também conta para as tarefas de recompensa do dia. Desertar de uma partida suspende sua vaga, e o Zelador não esquece.',
-  'guide.valeCupPage.rewardsHeading': 'Regras da trégua',
-  'guide.valeCupPage.rolesBody':
-    'Sua função decide o kit que você leva a campo. Todos chutam; o resto é temperamento. Nas categorias de um contra um e dois contra dois, todos jogam com o kit versátil, então a escolha de função ganha peso a partir do três contra três.',
-  'guide.valeCupPage.rolesHeading': 'Funções esportivas',
-  'guide.valeCupPage.spectateBody':
-    'Uma partida acontece por vez no estádio, e qualquer um pode chegar e assistir das arquibancadas.',
-  'hudChrome.keybinds.valecup': 'Copa do Vale',
   'hudChrome.mobile.dailyRewards': 'Loja',
   'hudChrome.perf.labels.predLead': 'Avanço da Predição',
   'hudChrome.townFocus.budgetLabel': 'Pontos restantes: {remaining} / {budget}',
@@ -2767,139 +2711,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Você precisa estar na cidade para definir seu foco.',
   'hudChrome.townFocus.saveButton': 'Salvar Foco',
   'hudChrome.townFocus.title': 'Foco da Cidade',
-  'hudChrome.vcup.awayNote':
-    'Se os dois lados hasteiam o mesmo estandarte, o time visitante joga com a paleta invertida.',
-  'hudChrome.vcup.bannerCountdown': 'Bola rolando em {seconds}...',
-  'hudChrome.vcup.bannerDraw': 'Empate no Sowfield.',
-  'hudChrome.vcup.bannerEnd': 'Fim de jogo: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerFound': 'A Copa do Vale convoca: {nationA} x {nationB}!',
-  'hudChrome.vcup.bannerGoal': 'GOL! {nation} marca!',
-  'hudChrome.vcup.bannerGolden': 'GOL DE OURO: o próximo gol vence!',
-  'hudChrome.vcup.bannerKickoff': 'BOLA ROLANDO!',
-  'hudChrome.vcup.bannerLoss': 'Derrota no Sowfield.',
-  'hudChrome.vcup.bannerSave': '{name} DEFENDE!',
-  'hudChrome.vcup.bannerWin': 'Vitória no Sowfield!',
-  'hudChrome.vcup.bet.aria': 'Apostas da partida da Copa do Vale',
-  'hudChrome.vcup.bet.back': 'Apostar em {team}',
-  'hudChrome.vcup.bet.closed': 'Apostas encerradas',
-  'hudChrome.vcup.bet.closesIn': 'Apostas encerram em {seconds}s',
-  'hudChrome.vcup.bet.collapse': 'Ocultar apostas',
-  'hudChrome.vcup.bet.expand': 'Ver apostas e apostar',
-  'hudChrome.vcup.bet.form': '{wins}V-{losses}D',
-  'hudChrome.vcup.bet.lostLog': 'Sua aposta na Copa do Vale perdeu: {amount}.',
-  'hudChrome.vcup.bet.mine': 'Sua aposta: {amount} em {team}',
-  'hudChrome.vcup.bet.none': 'Você ainda não apostou nesta partida.',
-  'hudChrome.vcup.bet.oddsLabel': 'Paga',
-  'hudChrome.vcup.bet.prize': 'Bolão {amount}',
-  'hudChrome.vcup.bet.record': 'Histórico de apostas: {wins}V-{losses}D, {sign}{net}',
-  'hudChrome.vcup.bet.refundLog': 'Apostas anuladas, sua entrada de {amount} foi devolvida.',
-  'hudChrome.vcup.bet.splitAria': 'Parcela do bolão de apostas em cada time',
-  'hudChrome.vcup.bet.title': 'Apostas da Partida',
-  'hudChrome.vcup.bet.wonBanner': 'Sua aposta venceu!',
-  'hudChrome.vcup.bet.wonLog': 'Sua aposta na Copa do Vale venceu: {amount} de retorno.',
-  'hudChrome.vcup.blockNation': 'Escolha primeiro uma nação de estandarte.',
-  'hudChrome.vcup.blockNotLeader': 'Só o líder do grupo pode colocar o time na fila.',
-  'hudChrome.vcup.blockPartySize': 'Essa chave exige um grupo menor.',
-  'hudChrome.vcup.boardEmpty': 'Nenhum vencedor registrado ainda. O Balde de Cobre espera.',
-  'hudChrome.vcup.boardHeading': 'Quadro de vencedores',
-  'hudChrome.vcup.boardWins': '{count} vitórias',
-  'hudChrome.vcup.bracketLabel': '{n}x{n}',
-  'hudChrome.vcup.bracketsAria': 'Chave da partida',
-  'hudChrome.vcup.briefing.bot': 'Bot',
-  'hudChrome.vcup.briefing.kitHeading': 'Seu kit',
-  'hudChrome.vcup.briefing.kitNote':
-    'Estes movimentos substituem as habilidades da sua classe durante a partida.',
-  'hudChrome.vcup.briefing.ready': 'Estou pronto',
-  'hudChrome.vcup.briefing.readyAria': 'Ficar pronto para o pontapé inicial',
-  'hudChrome.vcup.briefing.readyCount': '{ready} de {total} prontos',
-  'hudChrome.vcup.briefing.readyDone': 'Pronto',
-  'hudChrome.vcup.briefing.rosterHeading': 'A escalação',
-  'hudChrome.vcup.briefing.rule1':
-    'Chute ou passe a bola para dentro do gol adversário para marcar.',
-  'hudChrome.vcup.briefing.rule2':
-    'Vence quem fizer 5 gols primeiro, ou quem tiver mais gols quando o apito final soar.',
-  'hudChrome.vcup.briefing.rule3':
-    'Partida empatada no fim do tempo vai para o gol de ouro: o próximo gol vence.',
-  'hudChrome.vcup.briefing.rule4':
-    'As ombradas só derrubam você. Ninguém se machuca sob a trégua da colheita.',
-  'hudChrome.vcup.briefing.rule5': 'Qualquer um pode chegar e torcer por você das arquibancadas.',
-  'hudChrome.vcup.briefing.rulesHeading': 'Como jogar',
-  'hudChrome.vcup.briefing.subtitle': 'Preleção pré-jogo',
-  'hudChrome.vcup.briefing.vs': 'x',
-  'hudChrome.vcup.briefing.waiting': 'Aguardando o outro lado ficar pronto...',
-  'hudChrome.vcup.briefing.whistle': 'O apito soa em {seconds}s.',
-  'hudChrome.vcup.briefing.you': 'Você',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.close': 'Fechar a janela da Copa do Vale',
-  'hudChrome.vcup.deserterNote':
-    'O Zelador não esquece. Você pode entrar na fila de novo em {seconds} s.',
-  'hudChrome.vcup.enterAsGuild': 'Entrar sob o estandarte de {guild}',
-  'hudChrome.vcup.gossipOpen': 'A tabela de jogos',
-  'hudChrome.vcup.gossipOpenAria': 'Abrir a janela da Copa do Vale',
-  'hudChrome.vcup.guildBoardEmpty': 'Nenhuma guilda entrou em campo ainda. Hasteie seu estandarte!',
-  'hudChrome.vcup.guildBoardHeading': 'Estandartes de guilda',
-  'hudChrome.vcup.guildBoardWl': '{wins} V, {losses} D',
-  'hudChrome.vcup.guildRecordLine': 'Histórico da sua guilda: {wins} vitórias, {losses} derrotas.',
-  'hudChrome.vcup.inMatchNote': 'Seu time está em campo. Bola pra frente!',
-  'hudChrome.vcup.indicatorLive': 'Copa do Vale',
-  'hudChrome.vcup.indicatorOpen': 'Abrir a janela da Copa do Vale',
-  'hudChrome.vcup.indicatorQueued':
-    'Fila da Copa do Vale: {bracket}, posição {position} de {count}',
-  'hudChrome.vcup.leaveQueue': 'Sair da Fila',
-  'hudChrome.vcup.liveAria': 'Copa do Vale: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': 'Agora no Sowfield',
-  'hudChrome.vcup.logDraw': 'A disputa no Sowfield termina empatada.',
-  'hudChrome.vcup.logFound': 'Sua partida da Copa do Vale está pronta: {nationA} x {nationB}.',
-  'hudChrome.vcup.logGoal': '{name} marca para {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': 'Você perde a disputa no Sowfield.',
-  'hudChrome.vcup.logQueued':
-    'Você entra na fila da Copa do Vale para {bracket} (posição {position}).',
-  'hudChrome.vcup.logRoster': 'Seu lado: {allies}. O lado deles: {enemies}.',
-  'hudChrome.vcup.logSave': '{name} faz a defesa!',
-  'hudChrome.vcup.logUnqueued': 'Você sai da fila da Copa do Vale.',
-  'hudChrome.vcup.logWin': 'Você vence a disputa no Sowfield.',
-  'hudChrome.vcup.mobileLabel': 'Copa',
-  'hudChrome.vcup.nation.choir': 'O Coro Pálido',
-  'hudChrome.vcup.nation.coliseum': 'O Coliseu Cinzento',
-  'hudChrome.vcup.nation.copperdig': 'A Cava de Cobre',
-  'hudChrome.vcup.nation.mirefen': 'Mirefen',
-  'hudChrome.vcup.nation.moon': 'A Lua Pálida',
-  'hudChrome.vcup.nation.ogre': 'Os Clãs Ogros',
-  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
-  'hudChrome.vcup.nation.vale': 'Vale de Eastbrook',
-  'hudChrome.vcup.nationsHeading': 'Nação do estandarte',
-  'hudChrome.vcup.noLive': 'O campo está quieto. Nenhuma partida em andamento.',
-  'hudChrome.vcup.offlineNote':
-    'A tabela de jogos está fechada. A Copa do Vale não está disponível agora.',
-  'hudChrome.vcup.phaseCountdown': 'Bola rolando em {seconds}',
-  'hudChrome.vcup.phaseGoal': 'GOL!',
-  'hudChrome.vcup.phaseGolden': 'GOL DE OURO',
-  'hudChrome.vcup.phaseOver': 'FIM DE JOGO',
-  'hudChrome.vcup.practice': 'Treino contra Bots',
-  'hudChrome.vcup.practiceNote':
-    'Inicia na hora uma partida privada contra bots no seu próprio campo de treino.',
-  'hudChrome.vcup.practicingNow': 'Treinando agora ({count}):',
-  'hudChrome.vcup.queue': 'Entrar na Fila',
-  'hudChrome.vcup.queueNote': 'Entre na fila de qualquer lugar; o apito chama você ao Sowfield.',
-  'hudChrome.vcup.queuedStatus': 'Na fila para {bracket}: posição {position} de {count}.',
-  'hudChrome.vcup.recordLine':
-    'Seu histórico: {wins} vitórias, {losses} derrotas, {draws} empates.',
-  'hudChrome.vcup.role.allrounder.desc':
-    'Um pouco de cada coisa: chute, chutão e uma ombrada limpa.',
-  'hudChrome.vcup.role.allrounder.name': 'Polivalente',
-  'hudChrome.vcup.role.keeper.desc':
-    'Protege a pequena área com agarrada, mergulho e tiro de meta.',
-  'hudChrome.vcup.role.keeper.name': 'Goleiro',
-  'hudChrome.vcup.role.striker.desc': 'Vive do chutão longo e da finta rápida.',
-  'hudChrome.vcup.role.striker.name': 'Atacante',
-  'hudChrome.vcup.role.sweeper.desc':
-    'Tira os corredores da bola na ombrada e afasta o perigo no bicão.',
-  'hudChrome.vcup.role.sweeper.name': 'Líbero',
-  'hudChrome.vcup.rolesHeading': 'Função esportiva',
-  'hudChrome.vcup.shootPower': 'FORÇA',
-  'hudChrome.vcup.title': 'A Copa do Vale',
-  'hudChrome.vcup.waitingCount': '{count} na espera',
-  'hudChrome.vcup.walkUp': 'Vá até o Sowfield para assistir das arquibancadas.',
   'hudChrome.archetypeTitle.label': 'Título',
   'hudChrome.archetypeTitle.none': 'Nenhum',
   'entities.itemSets.crownforged.bonus4':
@@ -3543,7 +3354,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Saco de Ovos de Aranha',
   'entities.mobs.sump_troll_devourer.name': 'Troll Devorador do Sumidouro',
   'entities.mobs.tolling_bell.name': 'Sino Badalante',
-  'entities.mobs.vale_cup_ball.name': 'Bola de Javali',
   'entities.npcs.brother_halven_marsh.greeting':
     'A trilha levou ao norte. Outro relicário, outro rito. Escolha sua dificuldade, e eu seguro a corda até você voltar.',
   'entities.npcs.brother_halven_marsh.name': 'Irmão Halven',
@@ -10598,7 +10408,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.petBar':
     'Barra do mascote: Atacar, Parar, Provocar, Defensivo, Agressivo (com um mascote de caçador ou bruxo invocado)',
   'guide.controls.runForward': 'Correr para frente',
-  'guide.controls.valeCup': 'Copa do Vale',
   'guide.dungeonsPage.heroicBody':
     'Cada masmorra de cinco jogadores, e a própria raide, tem uma versão heroica à espera além do nível máximo. Os mesmos salões, refeitos para um grupo de fim de jogo bem equipado: tudo golpeia mais forte, nada pode ser despistado a pé, e os chefes ignoram por completo atordoamentos e imobilizações. Deixe para trás as versões normais primeiro; o heroico presume que você já as superou.',
   'guide.dungeonsPage.heroicHowBody': 'Escolha a dificuldade antes de o grupo reivindicar a instância: digite /dungeon heroic, ou escolha Definir dificuldade da masmorra no menu do seu próprio retrato. Sozinho você a define; em grupo só o líder pode, e a escolha vale para todos e trava na porta, então uma sessão continua sendo aquilo pelo que foi reivindicada.',
@@ -10698,12 +10507,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A Aceleração é um atributo que agiliza tudo o que você faz: golpes corpo a corpo, disparos à distância e conjurações aceleram todos juntos. Ela vem do equipamento, sobretudo dos bônus de conjunto de armadura, enquanto algumas habilidades concedem um breve surto de golpes mais rápidos. Sua ficha a mostra como Índice de Aceleração.',
   'guide.stats.hasteTitle': 'Aceleração',
   'guide.talentsPage.choiceNote': 'Cada fileira é uma encruzilhada: ela oferece três opções e você se compromete com uma delas. Sua próxima redefinição reabre todas e cada uma dessas escolhas.',
-  'guide.valeCupPage.bettingBody':
-    'Os espectadores no Sowfield podem apostar em um lado enquanto uma partida se forma: as apostas se juntam num bolo, e ao apito final os vencedores dividem o bolo dos perdedores na proporção do que apostaram. Uma partida empatada, ou uma zebra em que ninguém apostou, devolve cada moeda. Jogadores escalados na partida não podem apostar nela, e a grade guarda seu registro vitalício de vitórias, derrotas e saldo de moedas.',
-  'guide.valeCupPage.bettingHeading': 'Uma aposta na grade',
-  'guide.valeCupPage.practiceBody':
-    'A janela da Copa do Vale também oferece treino: uma cópia privada do campo onde bots preenchem os dois lados e nada conta para o seu histórico. Faltando um jogador ou dois para valer? Depois de uma curta espera, bots completam os times, e qualquer partida com bots em campo é amistosa, nunca ranqueada. E quando o Sowfield fica ocioso, os bots fazem uma exibição que você pode assistir, e apostar, das arquibancadas; no instante em que jogadores reais ficam prontos, a exibição cede o campo e cada aposta é devolvida.',
-  'guide.valeCupPage.practiceHeading': 'Partidas de treino e o campo ocioso',
   'guide.worldPage.worldBossBody':
     'No alto de Thornpeak, a tempestade sobre Stormcrag às vezes toma forma. Thunzharr, o Pico Desperto se ergue ali em um ritmo constante, um elemental com força de raide enfrentado no mundo aberto por quem quer que atenda ao chamado, e ele fica mais poderoso quanto mais desafiantes se erguem contra ele. Cada um que entra na luta ganha o próprio sorteio dos despojos dele, honrado nos termos do bloqueio de raide, e sua queda perdura o bastante para que os tombados corram de volta e reivindiquem o que lhes cabe. Reúna mais espadas do que você acha que precisa.',
   'guide.worldPage.worldBossTitle': 'Quando o pico desperta: o chefe mundial',

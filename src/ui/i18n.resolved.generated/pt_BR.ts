@@ -1025,7 +1025,6 @@ export const pt_BR: EnTranslations = {
       "targetFriendlyNext": "Alternar alvo aliado",
       "targetPrev": "Alternar alvo para trás",
       "discord": "Discord",
-      "valecup": "Copa do Vale",
       "bgFlag": "Ação da Bandeira do Campo de Batalha",
       "sheathe": "Embainhar/Desembainhar Arma",
       "dive": "Nadar para Baixo",
@@ -1191,146 +1190,6 @@ export const pt_BR: EnTranslations = {
         "azureKeep": "Reduto Azul",
         "ruinCourtyard": "O Pátio das Ruínas",
         "graveyard": "Cemitério"
-      }
-    },
-    "vcup": {
-      "title": "A Copa do Vale",
-      "shootPower": "FORÇA",
-      "close": "Fechar a janela da Copa do Vale",
-      "offlineNote": "A tabela de jogos está fechada. A Copa do Vale não está disponível agora.",
-      "recordLine": "Seu histórico: {wins} vitórias, {losses} derrotas, {draws} empates.",
-      "bracketsAria": "Chave da partida",
-      "bracketLabel": "{n}x{n}",
-      "waitingCount": "{count} na espera",
-      "nationsHeading": "Nação do estandarte",
-      "nation": {
-        "vale": "Vale de Eastbrook",
-        "mirefen": "Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "O Coliseu Cinzento",
-        "choir": "O Coro Pálido",
-        "ogre": "Os Clãs Ogros",
-        "moon": "A Lua Pálida",
-        "copperdig": "A Cava de Cobre"
-      },
-      "awayNote": "Se os dois lados hasteiam o mesmo estandarte, o time visitante joga com a paleta invertida.",
-      "rolesHeading": "Função esportiva",
-      "rolesSmallBracketNote": "Nas chaves 1x1 e 2x2, todo combatente joga com o kit Polivalente. Feitos que exigem a chave 3x3 ou maior não podem ser conquistados aqui.",
-      "role": {
-        "allrounder": {
-          "name": "Polivalente",
-          "desc": "Um pouco de cada coisa: chute, chutão e uma ombrada limpa."
-        },
-        "striker": {
-          "name": "Atacante",
-          "desc": "Vive do chutão longo e da finta rápida."
-        },
-        "sweeper": {
-          "name": "Líbero",
-          "desc": "Tira os corredores da bola na ombrada e afasta o perigo no bicão."
-        },
-        "keeper": {
-          "name": "Goleiro",
-          "desc": "Protege a pequena área com agarrada, mergulho e tiro de meta."
-        }
-      },
-      "queue": "Entrar na Fila",
-      "leaveQueue": "Sair da Fila",
-      "queueNote": "Entre na fila de qualquer lugar; o apito chama você ao Sowfield.",
-      "queuedStatus": "Na fila para {bracket}: posição {position} de {count}.",
-      "blockNation": "Escolha primeiro uma nação de estandarte.",
-      "blockPartySize": "Essa chave exige um grupo menor.",
-      "blockNotLeader": "Só o líder do grupo pode colocar o time na fila.",
-      "inMatchNote": "Seu time está em campo. Bola pra frente!",
-      "deserterNote": "O Zelador não esquece. Você pode entrar na fila de novo em {seconds} s.",
-      "liveHeading": "Agora no Sowfield",
-      "liveAria": "Copa do Vale: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Vá até o Sowfield para assistir das arquibancadas.",
-      "noLive": "O campo está quieto. Nenhuma partida em andamento.",
-      "boardHeading": "Quadro de vencedores",
-      "boardEmpty": "Nenhum vencedor registrado ainda. O Balde de Cobre espera.",
-      "boardWins": "{count} vitórias",
-      "enterAsGuild": "Entrar sob o estandarte de {guild}",
-      "guildRecordLine": "Histórico da sua guilda: {wins} vitórias, {losses} derrotas.",
-      "guildBoardHeading": "Estandartes de guilda",
-      "guildBoardEmpty": "Nenhuma guilda entrou em campo ainda. Hasteie seu estandarte!",
-      "guildBoardWl": "{wins} V, {losses} D",
-      "practice": "Treino contra Bots",
-      "practiceNote": "Inicia na hora uma partida privada contra bots no seu próprio campo de treino.",
-      "practiceUnratedNote": "Partidas de treino não são ranqueadas: a classificação e o progresso no Livro dos Feitos não contam.",
-      "practicingNow": "Treinando agora ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Fila da Copa do Vale: {bracket}, posição {position} de {count}",
-      "indicatorLive": "Copa do Vale",
-      "indicatorOpen": "Abrir a janela da Copa do Vale",
-      "phaseCountdown": "Bola rolando em {seconds}",
-      "phaseGoal": "GOL!",
-      "phaseGolden": "GOL DE OURO",
-      "phaseOver": "FIM DE JOGO",
-      "bannerFound": "A Copa do Vale convoca: {nationA} x {nationB}!",
-      "bannerCountdown": "Bola rolando em {seconds}...",
-      "bannerKickoff": "BOLA ROLANDO!",
-      "bannerGoal": "GOL! {nation} marca!",
-      "bannerSave": "{name} DEFENDE!",
-      "bannerGolden": "GOL DE OURO: o próximo gol vence!",
-      "bannerEnd": "Fim de jogo: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Vitória no Sowfield!",
-      "bannerDraw": "Empate no Sowfield.",
-      "bannerLoss": "Derrota no Sowfield.",
-      "logQueued": "Você entra na fila da Copa do Vale para {bracket} (posição {position}).",
-      "logUnqueued": "Você sai da fila da Copa do Vale.",
-      "logFound": "Sua partida da Copa do Vale está pronta: {nationA} x {nationB}.",
-      "logRoster": "Seu lado: {allies}. O lado deles: {enemies}.",
-      "logGoal": "{name} marca para {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} faz a defesa!",
-      "logWin": "Você vence a disputa no Sowfield.",
-      "logDraw": "A disputa no Sowfield termina empatada.",
-      "logLoss": "Você perde a disputa no Sowfield.",
-      "gossipOpen": "A tabela de jogos",
-      "gossipOpenAria": "Abrir a janela da Copa do Vale",
-      "mobileLabel": "Copa",
-      "briefing": {
-        "subtitle": "Preleção pré-jogo",
-        "vs": "x",
-        "rulesHeading": "Como jogar",
-        "rule1": "Chute ou passe a bola para dentro do gol adversário para marcar.",
-        "rule2": "Vence quem fizer 5 gols primeiro, ou quem tiver mais gols quando o apito final soar.",
-        "rule3": "Partida empatada no fim do tempo vai para o gol de ouro: o próximo gol vence.",
-        "rule4": "As ombradas só derrubam você. Ninguém se machuca sob a trégua da colheita.",
-        "rule5": "Qualquer um pode chegar e torcer por você das arquibancadas.",
-        "kitHeading": "Seu kit",
-        "kitNote": "Estes movimentos substituem as habilidades da sua classe durante a partida.",
-        "unratedNote": "Há bots em campo, portanto esta partida não é ranqueada: a classificação não muda e os feitos de gols, defesas e jogos sem sofrer gols não contam.",
-        "practiceUnratedNote": "Esta é uma partida de treino, portanto não é ranqueada: a classificação não muda e o progresso no Livro dos Feitos não conta.",
-        "rosterHeading": "A escalação",
-        "you": "Você",
-        "bot": "Bot",
-        "ready": "Estou pronto",
-        "readyDone": "Pronto",
-        "readyAria": "Ficar pronto para o pontapé inicial",
-        "waiting": "Aguardando o outro lado ficar pronto...",
-        "whistle": "O apito soa em {seconds}s.",
-        "readyCount": "{ready} de {total} prontos"
-      },
-      "bet": {
-        "title": "Apostas da Partida",
-        "aria": "Apostas da partida da Copa do Vale",
-        "closesIn": "Apostas encerram em {seconds}s",
-        "closed": "Apostas encerradas",
-        "prize": "Bolão {amount}",
-        "splitAria": "Parcela do bolão de apostas em cada time",
-        "expand": "Ver apostas e apostar",
-        "collapse": "Ocultar apostas",
-        "oddsLabel": "Paga",
-        "back": "Apostar em {team}",
-        "form": "{wins}V-{losses}D",
-        "mine": "Sua aposta: {amount} em {team}",
-        "none": "Você ainda não apostou nesta partida.",
-        "record": "Histórico de apostas: {wins}V-{losses}D, {sign}{net}",
-        "wonBanner": "Sua aposta venceu!",
-        "wonLog": "Sua aposta na Copa do Vale venceu: {amount} de retorno.",
-        "lostLog": "Sua aposta na Copa do Vale perdeu: {amount}.",
-        "refundLog": "Apostas anuladas, sua entrada de {amount} foi devolvida."
       }
     },
     "options": {
@@ -4000,7 +3859,6 @@ export const pt_BR: EnTranslations = {
       "combat": "Combate",
       "talents": "Talentos",
       "arena": "Arena e JcJ",
-      "valeCup": "Copa do Vale",
       "thornhollow": "Campos de Thornhollow",
       "deeds": "Livro dos Feitos",
       "reliquary": "O Relicário",
@@ -4210,7 +4068,6 @@ export const pt_BR: EnTranslations = {
       "reliquary": "O Relicário",
       "sheathe": "Embainhar/Desembainhar Arma",
       "crafting": "Criação",
-      "valeCup": "Copa do Vale",
       "mount": "Montar / Desmontar",
       "calendar": "Calendário de eventos",
       "dungeonFinder": "Localizador de Masmorras",
@@ -5287,36 +5144,6 @@ export const pt_BR: EnTranslations = {
       "ladderBody": "Cada partida move uma classificação de campo de batalha persistente e ligada ao personagem, com vitória ou derrota, e o quadro de todos os tempos ordena os campeões do reino.",
       "rewardsHeading": "O que uma partida paga",
       "rewardsBody": "Toda partida concluída paga Honra: mais por uma vitória, uma consolação por uma derrota ou um empate, além de uma pequena quantia por cada abate que você desfere e por cada um em que presta assistência, então lutar longe das bandeiras ainda vale a pena. Sua primeira vitória de cada dia paga um bônus extra, e o painel avisa enquanto esse bônus ainda está à sua espera. Esse dia pertence só à Honra, e reinicia no seu próprio relógio, não junto com o reinício de instâncias do reino. Enfrentar a mesma equipe repetidamente paga menos pela partida em si depois da primeira vez, estabilizando rápido em um piso em vez de cair a nada, e uma partida abandonada não paga absolutamente nada. Gaste o que você ganhar em qualquer um dos intendentes de Guerra."
-    },
-    "valeCupPage": {
-      "heading": "A Copa do Vale",
-      "intro": "Boarball no Sowfield: escolha um estandarte, escolha uma função e chute um couro de javali empalhado para além do goleiro pelo Balde de Cobre. Sem sangue, sem saque, só o rugido das arquibancadas.",
-      "loreHeading": "O Boarball e a trégua da colheita",
-      "loreOldSow": "Muito antes de os mortos despertarem, os lavradores de Eastbrook jogavam Boarball nos restolhos depois da colheita: dois bandos, um couro de javali recheado de palha e dois portões de carroça arrastados para cada ponta do gramado. A primeira bola, a Velha Porca, pende coberta de bronze sobre a lareira da taverna.",
-      "loreTruce": "Quando o Coliseu Cinzento passou a sancionar jogos de guerra, o marechal Redbrook respondeu com algo mais gentil: uma trégua de colheita permanente no velho gramado. Os portões de carroça viraram traves, o gramado ganhou muros, arquibancadas e um nome, o Sowfield, e o prêmio sempre foi o mesmo balde de leite amassado do qual os vencedores bebiam: o Balde de Cobre.",
-      "howHeading": "Como jogar",
-      "howQueue": "Entre na fila de qualquer lugar pela janela da Copa do Vale, ou fale com o Zelador Bram no portão do Sowfield. Escolha uma chave de um contra um até cinco contra cinco, uma nação de estandarte e uma função esportiva; entre na fila sozinho ou traga seu grupo.",
-      "howMatch": "No pontapé inicial, o kit da sua classe é trocado por um kit esportivo e restaurado com exatidão depois. Os chutes miram no retículo no chão, a bola rebate nas placas laterais, e driblar é só correr com a bola. Marque mais gols que o outro lado antes do fim do tempo; um empate vai para o gol de ouro.",
-      "howTruce": "Ninguém sangra no Sowfield: as ombradas derrubam, nada machuca, e os mascotes ficam de fora da partida.",
-      "spectateBody": "Uma partida acontece por vez no estádio, e qualquer um pode chegar e assistir das arquibancadas.",
-      "bettingHeading": "Uma aposta na grade",
-      "bettingBody": "Os espectadores no Sowfield podem apostar em um lado enquanto uma partida se forma: as apostas se juntam num bolo, e ao apito final os vencedores dividem o bolo dos perdedores na proporção do que apostaram. Uma partida empatada, ou uma zebra em que ninguém apostou, devolve cada moeda. Jogadores escalados na partida não podem apostar nela, e a grade guarda seu registro vitalício de vitórias, derrotas e saldo de moedas.",
-      "practiceHeading": "Partidas de treino e o campo ocioso",
-      "practiceBody": "A janela da Copa do Vale também oferece treino: uma cópia privada do campo onde bots preenchem os dois lados e nada conta para o seu histórico. Faltando um jogador ou dois para valer? Depois de uma curta espera, bots completam os times, e qualquer partida com bots em campo é amistosa, nunca ranqueada. E quando o Sowfield fica ocioso, os bots fazem uma exibição que você pode assistir, e apostar, das arquibancadas; no instante em que jogadores reais ficam prontos, a exibição cede o campo e cada aposta é devolvida.",
-      "nationsHeading": "As oito nações de estandarte",
-      "nationsBody": "Cada time joga sob um estandarte. O capitão escolhe a nação, e se os dois lados hasteiam o mesmo, o time visitante joga com a paleta invertida.",
-      "nationVale": "Verde e dourado, hasteando o feixe de trigo: o time da casa, lavradores até o osso.",
-      "nationMirefen": "Azul-petróleo e cinza sob a garça: pacientes, de pernas longas, nunca apressados.",
-      "nationThornpeak": "Azul-gelo e branco sob o pico da montanha: de passo firme e teimosos.",
-      "nationColiseum": "Vermelho e preto com espadas cruzadas: jogam como se ainda fosse um jogo de guerra.",
-      "nationChoir": "Azul-claro e prata sob o sino: etéreos, precisos e muito calados.",
-      "nationOgre": "Laranja e ocre atrás do punho: ombro na frente e orgulhosos disso.",
-      "nationMoon": "Violeta e prata sob o crescente: jogadores da noite, leves nos pés.",
-      "nationCopperdig": "Cobre e marrom com a picareta: escavadores que nunca param de correr.",
-      "rolesHeading": "Funções esportivas",
-      "rolesBody": "Sua função decide o kit que você leva a campo. Todos chutam; o resto é temperamento. Nas categorias de um contra um e dois contra dois, todos jogam com o kit versátil, então a escolha de função ganha peso a partir do três contra três.",
-      "rewardsHeading": "Regras da trégua",
-      "rewardsBody": "As regras da trégua significam nada de experiência e nada de saque: uma partida decidida conta para o seu histórico e para o quadro de vencedores, e uma vitória também conta para as tarefas de recompensa do dia. Desertar de uma partida suspende sua vaga, e o Zelador não esquece."
     },
     "deedsPage": {
       "intro": "O Livro dos Feitos é onde o mundo anota tudo o que você já fez, dos primeiros passos fora do vale inicial às lutas mais duras que o reino pode oferecer. Conquiste feitos enquanto joga, ostente os títulos que eles concedem e veja seu Renome subir.",
@@ -13439,9 +13266,6 @@ export const pt_BR: EnTranslations = {
       "tolling_bell": {
         "name": "Sino Badalante"
       },
-      "vale_cup_ball": {
-        "name": "Bola de Javali"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, o Pico Desperto"
       },
@@ -14038,11 +13862,6 @@ export const pt_BR: EnTranslations = {
         "name": "O Guardião Pálido",
         "title": "Vigia dos Mortos",
         "greeting": "Descanse agora, espírito. Posso devolver você ao seu corpo, mas a travessia de volta deixa você fraco."
-      },
-      "groundskeeper_bram": {
-        "name": "Zelador Bram",
-        "title": "Zelador do Sowfield",
-        "greeting": "A trégua vale no Sowfield, {className}: só chutes e ombradas. Quer jogar pelo Balde de Cobre?"
       },
       "chronicler_saul": {
         "name": "Saul, o Cronista",
@@ -16492,6 +16311,9 @@ export const pt_BR: EnTranslations = {
           },
           "11": {
             "label": "A Calçada de Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },

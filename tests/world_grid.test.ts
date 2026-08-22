@@ -50,8 +50,13 @@ describe('the continent derives the right border set', () => {
   });
 
   it('keeps the production terrain path sparse at town coordinates', () => {
+    // camps 17 to 16 (2026-08): the Copper Dig kobold camp relocated to the
+    // dig headland (docs/design/eastbrook-revamp/master-plan.md), carrying
+    // its flatten disc out of the town sample's candidate radius.
+    // appliers 9 to 8 (2026-08): the Sowfield flatten applier left with the
+    // stadium (the New Eastbrook program demolition).
     expect(terrainRegionCandidateCountsAt(2, -2)).toEqual({
-      appliers: 9,
+      appliers: 8,
       camps: 17,
       hubs: 1,
     });

@@ -615,18 +615,19 @@ describe('GameServer sessions', () => {
     server.sim.partyInvite(third.pid, leaver.pid);
     server.sim.partyAccept(third.pid);
 
-    const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the spawn moved to the quay,
+    // so corpses at the origin fell out of INTERACT_RANGE; drop them at the
+    // players instead (all three sessions join at the identical spawn point).
+    const at = server.sim.entities.get(leaver.pid)!.pos;
+    const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { ...at });
     mob.dead = true;
     mob.lootable = true;
     mob.tappedById = leaver.pid;
     mob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
     server.sim.entities.set(mob.id, mob);
-    const lateMob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
-      x: 0,
-      y: 0,
-      z: 0,
-    });
+    const lateMob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { ...at });
     lateMob.dead = true;
     lateMob.lootable = true;
     lateMob.tappedById = leaver.pid;
@@ -690,7 +691,13 @@ describe('GameServer sessions', () => {
     server.sim.partyInvite(third.pid, leaver.pid);
     server.sim.partyAccept(third.pid);
 
-    const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the corpse lands at the
+    // stayer (the eventual looter); the old origin literal fell ~110yd out of
+    // INTERACT_RANGE when the spawn moved to the quay.
+    const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
+      ...server.sim.entities.get(stayer.pid)!.pos,
+    });
     mob.dead = true;
     mob.lootable = true;
     mob.tappedById = leaver.pid;

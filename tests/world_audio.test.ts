@@ -1,14 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   buildWorldAmbientSources,
-  crowdAmbienceAt,
   footstepSurfaceAt,
   isOnDockDeck,
 } from '../src/render/world_audio';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
-import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -70,13 +68,6 @@ describe('world audio routing', () => {
 
   it('keeps dungeon floors stone', () => {
     expect(footstepSurfaceAt(SEED, DUNGEON_X_THRESHOLD + 1, 0, 0, true)).toBe('stone');
-  });
-
-  it('preserves the Sowfield crowd bed and live-match swell', () => {
-    expect(crowdAmbienceAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z, false, false)).toBe(0.4);
-    expect(crowdAmbienceAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z, false, true)).toBe(1);
-    expect(crowdAmbienceAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z, true, true)).toBe(0);
-    expect(crowdAmbienceAt(0, 0, false, true)).toBe(0);
   });
 
   it('builds stable point sources for every campfire and both built-in smithies', () => {
