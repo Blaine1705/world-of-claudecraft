@@ -6640,10 +6640,10 @@ export class Sim {
   // Bloodlust 1.3 x Wildfang Rally 1.05 x Enrage 1.25 = 1.71x attack speed
   // instead of the additive 1.6x. Single-source cases are unchanged
   // (1/(1 + x) === 1/mult for one aura). Slows keep their own multiplicative
-  // axis so layered slows are not weakened by the haste change.
-  swingIntervalMult(e: Entity): number {
+  // axis so layered slows are not weakened by the haste change; `channel` picks the seed stat.
+  swingIntervalMult(e: Entity, channel: 'melee' | 'ranged' = 'melee'): number {
     let slow = 1;
-    let haste = e.meleeHaste;
+    let haste = channel === 'ranged' ? e.rangedHaste : e.meleeHaste;
     for (const a of e.auras) {
       if (a.kind === 'attackspeed' || a.kind === 'sanguine') slow *= a.value;
       if (a.kind === 'buff_haste') haste += a.value - 1;
