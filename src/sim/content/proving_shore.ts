@@ -549,7 +549,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Castaway Crate opened',
       },
     ],
-    xpReward: 190,
+    xpReward: 160,
     copperReward: 80,
     itemRewards: {},
     requiresQuest: 'q_ps_mother_of_pearl',
@@ -608,10 +608,37 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
         label: 'Guild signpost read',
       },
     ],
-    xpReward: 100,
+    xpReward: 70,
     copperReward: 30,
     itemRewards: {},
     requiresQuest: 'q_ps_pouch_and_purse',
+  },
+  // The last lesson, and the one nobody wants to meet for the first time
+  // with a wolf still chewing on them. The death is SCRIPTED and consented
+  // to (walk to the stone, press interact) and free of consequence: this
+  // game charges no durability on death. Credit lands on either
+  // resurrection path so the lesson cannot strand a player who took the
+  // Spirit Healer, though the copy sends them to their body.
+  q_ps_the_long_walk: {
+    id: 'q_ps_the_long_walk',
+    name: 'The Long Walk',
+    giverNpcId: 'instructor_maren',
+    turnInNpcId: 'instructor_maren',
+    text: 'One lesson left, $N, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Walk south down the shore road to the Passing Stone, kneel at it, and let the shore take you. You will wake as a spirit at the yard behind my camp, grey and quiet, and nothing there can touch you. Then walk back to your own body and step into it. That is the whole of it: your body waits, the walk is free, and you lose nothing by making it.',
+    completionText:
+      'And back you come, no worse for it. Remember what that felt like, $N, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'ps_passing_stone',
+        count: 1,
+        label: 'Walked back from the dead',
+      },
+    ],
+    xpReward: 60,
+    copperReward: 30,
+    itemRewards: {},
+    requiresQuest: 'q_ps_the_signpost',
   },
   q_ps_set_sail: {
     id: 'q_ps_set_sail',
@@ -627,7 +654,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     xpReward: 150,
     copperReward: 50,
     itemRewards: {},
-    requiresQuest: 'q_ps_the_signpost',
+    requiresQuest: 'q_ps_the_long_walk',
   },
 };
 
@@ -646,6 +673,7 @@ export const PROVING_SHORE_QUEST_ORDER: string[] = [
   'q_ps_the_wreck_line',
   'q_ps_pouch_and_purse',
   'q_ps_the_signpost',
+  'q_ps_the_long_walk',
   'q_ps_set_sail',
 ];
 
@@ -665,6 +693,16 @@ export const PROVING_SHORE_ITEMS: Record<string, ItemDef> = {
   ps_ferry_bell: {
     id: 'ps_ferry_bell',
     name: 'Ferry Bell',
+    kind: 'quest',
+    sellValue: 0,
+    noVendorSell: true,
+  },
+  // The death lesson's rite stone (q_ps_the_long_walk). Like the bells, it
+  // is a world fixture that is never picked up; the item def exists so the
+  // ground object has a name to show.
+  ps_passing_stone: {
+    id: 'ps_passing_stone',
+    name: 'Passing Stone',
     kind: 'quest',
     sellValue: 0,
     noVendorSell: true,
@@ -757,6 +795,24 @@ export const PROVING_SHORE_OBJECTS: GroundObjectDef[] = [
       { x: -327, z: 24 },
       { x: -320, z: 31 },
     ],
+  },
+  {
+    itemId: 'ps_passing_stone',
+    name: 'Passing Stone',
+    // The death lesson (q_ps_the_long_walk, tutorial/death_lesson.ts): the
+    // island stages a player's first death somewhere nothing is hunting
+    // them, because the alternative is learning it in the vale with a wolf
+    // still chewing. interaction.ts routes the click to the rite BEFORE the
+    // pickup path (the ferry bell's precedent), and the rite refuses unless
+    // the lesson is active, so the stone can never be a griefing tool.
+    //
+    // Sited on the shore road between the camp and the Gauntlet: dry
+    // ground, on the walk the player already knows, and 65 yd from the
+    // island graveyard, which leaves about a 30 yd ghost run once the
+    // 35 yd corpse-resurrect reach is subtracted. Long enough to teach the
+    // walk back, short enough that a first death is not a punishment.
+    // tests/death_lesson.test.ts pins both distances.
+    positions: [{ x: -312, z: -6 }],
   },
   {
     itemId: 'ps_ferry_bell',

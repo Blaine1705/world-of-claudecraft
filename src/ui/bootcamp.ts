@@ -50,6 +50,7 @@ import {
   coachFocus,
   coachKeycaps,
   computeBootcampStep,
+  type DeathLessonPhase,
   RING_LESSON_ITEM_ID,
   RING_LESSON_QUEST_ID,
   type RingLessonPhase,
@@ -116,6 +117,7 @@ export class BootcampOverlay {
   // update beside casterClass so the card and the bubble read the same
   // answer without either reaching for the world again.
   private taughtAbilityId: string | null = null;
+  private deathPhase: DeathLessonPhase = 'alive';
 
   private root: HTMLElement | null = null;
   private titleEl!: HTMLElement;
@@ -165,6 +167,9 @@ export class BootcampOverlay {
     this.lastFocus = focus;
     this.casterClass = CASTER_CLASSES.has(world.cfg.playerClass);
     this.taughtAbilityId = startingAttackFor(world.cfg.playerClass).abilityId;
+    // The death lesson's arc, read straight off the player: alive, dead but
+    // not yet released, or walking back as a spirit.
+    this.deathPhase = p.ghost ? 'ghost' : p.dead ? 'dead' : 'alive';
     if (focus?.questId === RING_LESSON_QUEST_ID) this.sawPearl = true;
     this.ringPhase = this.computeRingPhase(world, onIsland);
     const isGauntlet = focus?.questId === GAUNTLET_QUEST_ID;
@@ -531,7 +536,7 @@ export class BootcampOverlay {
     // then never point at different things. It covers the Gauntlet too (its
     // active leg falls back to the course's finish), which is where a new
     // player is most likely to be facing the wrong way.
-    return coachCardPlan(focus, 'keyboard', this.casterClass).arrow;
+    return coachCardPlan(focus, 'keyboard', this.casterClass, this.deathPhase).arrow;
   }
 
   private renderPanel(keybinds: Keybinds): void {
@@ -615,7 +620,7 @@ export class BootcampOverlay {
     const mode = currentInputHintMode();
 
     const labels = this.coachLabels(keybinds);
-    const plan = coachCardPlan(focus, mode, this.casterClass);
+    const plan = coachCardPlan(focus, mode, this.casterClass, this.deathPhase);
     const npc = tEntity({ kind: 'npc', id: plan.npcId, field: 'name' });
     const params: Record<string, string> = {};
     if (plan.bodyHasNpc) params.npc = npc;
@@ -721,6 +726,7 @@ export class BootcampOverlay {
           playerPos: p.pos,
           questLog: world.questLog,
           targetId: p.targetId,
+          deathPhase: this.deathPhase,
         })
       : null;
     if (!plan || !p || !coachPromptInRange(plan, p.pos)) {

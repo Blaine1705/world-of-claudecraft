@@ -22,7 +22,13 @@ import {
 } from '../sim/quests/opened_object_view';
 import { ABILITY_DRILL_MOB_ID, ABILITY_DRILL_QUEST_ID } from '../sim/tutorial/ability_drill';
 import { INTERACT_RANGE } from '../sim/types';
-import { BELL_STEP_TARGET, type BootcampStep, type CoachFocus } from './bootcamp_view';
+import {
+  BELL_STEP_TARGET,
+  type BootcampStep,
+  type CoachFocus,
+  DEATH_LESSON_QUEST_ID,
+  type DeathLessonPhase,
+} from './bootcamp_view';
 import type { TranslationKey } from './i18n';
 
 /** Planar distance (sim dist2d needs full Vec3s; the prompt only has x/z). */
@@ -181,6 +187,10 @@ export function nearestCrate(
  *  noticeboard is a sentinel object, not a live entity the client can key). */
 const SIGNPOST_SPOT = { x: -312, z: 42.5 };
 
+/** The Passing Stone's spot (mirrors PROVING_SHORE_OBJECTS; pinned equal in
+ *  tests/coach_prompt_view.test.ts). */
+const PASSING_STONE_SPOT = { x: -312, z: -6 };
+
 /** Lane 2's parkour obstacles in running order (lane 2 runs SOUTH, so -z):
  *  the hurdle rail the player jumps OVER, then the crate step they jump
  *  ONTO. Each anchor sits mid-lane on its obstacle's line; both mirror the
@@ -236,6 +246,10 @@ export function coachPromptPlan(args: {
   /** The viewer's quest log, for the opened-crate skip (optional so the
    *  bell/ladder callers stay unchanged). */
   questLog?: ReadonlyMap<string, OpenedObjectQuestRow>;
+  /** Where the viewer is in the death lesson's arc: the stone's bubble is
+   *  for the living only. Defaults to 'alive' so every other caller is
+   *  unchanged. */
+  deathPhase?: DeathLessonPhase;
   /** The viewer's current target (entity.targetId), which splits every kill
    *  lesson into its two halves: pick the quarry, then hit it. Optional so
    *  the bell/ladder callers stay unchanged; absent reads as "nothing
@@ -261,6 +275,7 @@ export function coachPromptPlan(args: {
     return null;
   }
   const focus = args.focus;
+  const deathPhase = args.deathPhase ?? 'alive';
   if (!focus) return null;
   const quest = PROVING_SHORE_QUESTS[focus.questId];
   if (!quest) return null;
@@ -334,6 +349,19 @@ export function coachPromptPlan(args: {
       lift: OBJECT_LIFT,
       range: PROMPT_OBJECT_RANGE,
       verbKey: 'hudChrome.bootcamp.promptPickUp',
+      kind: 'interact',
+    };
+  }
+  if (focus.questId === DEATH_LESSON_QUEST_ID) {
+    // Only while alive: a ghost has already knelt, and its business is with
+    // its own corpse, which the death screen's own button owns.
+    if (deathPhase !== 'alive') return null;
+    return {
+      x: PASSING_STONE_SPOT.x,
+      z: PASSING_STONE_SPOT.z,
+      lift: OBJECT_LIFT,
+      range: PROMPT_OBJECT_RANGE,
+      verbKey: 'hudChrome.bootcamp.promptKneel',
       kind: 'interact',
     };
   }

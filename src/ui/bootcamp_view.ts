@@ -225,6 +225,9 @@ export const COACH_ACTIVE_TARGETS: Readonly<Record<string, { x: number; z: numbe
   q_ps_the_wreck_line: null,
   q_ps_pouch_and_purse: PROVING_SHORE_NPCS.quartermaster_finch.pos,
   q_ps_the_signpost: { x: -312, z: 42.5 },
+  // The Passing Stone (content/proving_shore.ts PROVING_SHORE_OBJECTS); a ui
+  // core mirrors the coordinate, tests/bootcamp_view.test.ts pins them equal.
+  q_ps_the_long_walk: { x: -312, z: -6 },
   q_ps_set_sail: PROVING_SHORE_NPCS.ferryman_odo.pos,
 };
 
@@ -360,6 +363,15 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
     params: ['interactKey'],
     bodyHasNpc: false,
   },
+  q_ps_the_long_walk: {
+    keys: {
+      keyboard: 'hudChrome.bootcamp.taskLongWalkBody',
+      touch: 'hudChrome.bootcamp.taskLongWalkBodyTouch',
+      pad: 'hudChrome.bootcamp.taskLongWalkBodyPad',
+    },
+    params: ['interactKey'],
+    bodyHasNpc: false,
+  },
   q_ps_pouch_and_purse: {
     keys: {
       keyboard: 'hudChrome.bootcamp.taskPouchBody',
@@ -384,10 +396,40 @@ const COACH_READY_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
   },
 };
 
+/** Where the death lesson's card is in its own three-beat arc. The player's
+ *  live/dead/ghost state, resolved by the consumer and passed in, because a
+ *  pure core cannot read the world. */
+export type DeathLessonPhase = 'alive' | 'dead' | 'ghost';
+
+/** The death lesson's bodies per phase and input arm: walk to the stone,
+ *  release the spirit, then walk back to the body. */
+const LONG_WALK_BODIES: Readonly<
+  Record<DeathLessonPhase, Record<BootcampInputMode, TranslationKey>>
+> = {
+  alive: {
+    keyboard: 'hudChrome.bootcamp.taskLongWalkBody',
+    touch: 'hudChrome.bootcamp.taskLongWalkBodyTouch',
+    pad: 'hudChrome.bootcamp.taskLongWalkBodyPad',
+  },
+  dead: {
+    keyboard: 'hudChrome.bootcamp.taskLongWalkDeadBody',
+    touch: 'hudChrome.bootcamp.taskLongWalkDeadBodyTouch',
+    pad: 'hudChrome.bootcamp.taskLongWalkDeadBodyPad',
+  },
+  ghost: {
+    keyboard: 'hudChrome.bootcamp.taskLongWalkGhostBody',
+    touch: 'hudChrome.bootcamp.taskLongWalkGhostBodyTouch',
+    pad: 'hudChrome.bootcamp.taskLongWalkGhostBodyPad',
+  },
+};
+
+export const DEATH_LESSON_QUEST_ID = 'q_ps_the_long_walk';
+
 export function coachCardPlan(
   focus: CoachFocus,
   mode: BootcampInputMode,
   caster = false,
+  deathPhase: DeathLessonPhase = 'alive',
 ): CoachCardPlan {
   const quest = PROVING_SHORE_QUESTS[focus.questId];
   const giver = PROVING_SHORE_NPCS[quest.giverNpcId];
@@ -405,6 +447,23 @@ export function coachCardPlan(
     };
   }
   if (focus.state === 'active') {
+    // The death lesson swaps its whole body once the player is dead: the
+    // card that said "go kneel" is useless to a corpse, and the one that
+    // says "walk back" is useless to someone still alive.
+    if (focus.questId === DEATH_LESSON_QUEST_ID && deathPhase !== 'alive') {
+      return {
+        titleKey: null,
+        titleHasNpc: false,
+        bodyKey: LONG_WALK_BODIES[deathPhase][mode],
+        params: [],
+        bodyHasNpc: false,
+        bodyHasAbility: false,
+        npcId: quest.turnInNpcId,
+        // A ghost steers by its own corpse marker, not by the stone it
+        // already knelt at.
+        arrow: null,
+      };
+    }
     const override = COACH_ACTIVE_OVERRIDES[focus.questId];
     const overrideKeys = override
       ? caster && override.casterKeys

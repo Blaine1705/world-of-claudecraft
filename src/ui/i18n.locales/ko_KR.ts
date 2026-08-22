@@ -13202,6 +13202,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '허수아비를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
   'hudChrome.bootcamp.taskHoneBodyPad':
     '허수아비를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
+  'hudChrome.bootcamp.promptKneel':
+    '무릎 꿇기',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    '해안 길을 따라 남쪽으로 걸어가 안식의 돌 앞에서 {interactKey}를 눌러 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    '해안 길을 따라 남쪽으로 걸어가 안식의 돌을 탭해 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    '해안 길을 따라 남쪽으로 걸어가 안식의 돌 앞에서 상호작용 버튼을 눌러 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    '당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 누르면 야영지 뒤 묘지에서 영혼으로 일어납니다.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    '당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 탭하면 야영지 뒤 묘지에서 영혼으로 일어납니다.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    '당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 고르면 야영지 뒤 묘지에서 영혼으로 일어납니다.',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    '이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 누르면 아무런 대가 없이 온전해집니다.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    '이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 탭하면 아무런 대가 없이 온전해집니다.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    '이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 고르면 아무런 대가 없이 온전해집니다.',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 첫 번째 행동 버튼을 눌러 내리치세요. 하나가 무너질 때까지 계속 치세요.',
   'hudChrome.bootcamp.taskShellBody':

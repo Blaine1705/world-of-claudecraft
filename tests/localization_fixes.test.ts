@@ -1041,6 +1041,14 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // the combat denial are matched by the sim_i18n EXACT map
     // (log.provingEnter, log.provingLeave, error.tutorialFromHere).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interactions/ferry_bell.ts'), 'utf8'),
+    // The death lesson (tutorial island): the rite's kneel line and refusal,
+    // and the two resurrection notes, matched by the sim_i18n EXACT map
+    // (log.passingStoneKneel, error.passingStoneCold, log.longWalkCorpse,
+    // log.longWalkHealer). Scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/death_lesson.ts'), 'utf8'),
+    // The ability drill (tutorial island): it emits no literals of its own
+    // (credit rides emitQuestProgress), and scanning keeps that true.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/ability_drill.ts'), 'utf8'),
     // Swim fatigue (the Hollow's open-sea turn-back): the warning literal is
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.

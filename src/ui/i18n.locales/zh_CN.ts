@@ -12960,6 +12960,26 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '点击一个草人把它设为目标，然后点击动作条上的{ability}。那是你自己的本事，不是随手一挥。命中三次。',
   'hudChrome.bootcamp.taskHoneBodyPad':
     '把一个草人设为目标，然后按放着{ability}的动作按钮。那是你自己的本事，不是随手一挥。命中三次。',
+  'hudChrome.bootcamp.promptKneel':
+    '跪下',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    '沿着海岸路往南走到往生石前，按 {interactKey} 跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    '沿着海岸路往南走到往生石前，点击它跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    '沿着海岸路往南走到往生石前，按互动按钮跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    '你死了。什么也没丢。按下释放灵魂，你会在营地后面的墓地化作幽魂站起来。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    '你死了。什么也没丢。点击释放灵魂，你会在营地后面的墓地化作幽魂站起来。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    '你死了。什么也没丢。选择释放灵魂，你会在营地后面的墓地化作幽魂站起来。',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    '你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。按下它，你就完好如初，没有任何惩罚。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    '你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。点击它，你就完好如初，没有任何惩罚。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    '你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。选择它，你就完好如初，没有任何惩罚。',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '走到一个草人跟前，按下目标键把它设为目标。然后按下第一个动作键，挥出这一刀。一直打到一个散架为止。',
   'hudChrome.bootcamp.taskShellBody':

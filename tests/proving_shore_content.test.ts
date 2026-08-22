@@ -296,6 +296,7 @@ describe('proving shore placement', () => {
       'q_ps_the_wreck_line',
       'q_ps_pouch_and_purse',
       'q_ps_the_signpost',
+      'q_ps_the_long_walk',
       'q_ps_set_sail',
     ]);
     const relay = PROVING_SHORE_QUEST_ORDER.map((id) => PROVING_SHORE_QUESTS[id]);
@@ -311,6 +312,9 @@ describe('proving shore placement', () => {
       ['tidewarden_nel', 'tidewarden_nel'],
       ['tidewarden_nel', 'quartermaster_finch'],
       ['quartermaster_finch', 'instructor_maren'],
+      ['instructor_maren', 'instructor_maren'],
+      // Maren holds three stations: the board, the death lesson, and the
+      // crossing that sends a graduate off the island.
       ['instructor_maren', 'instructor_maren'],
       ['instructor_maren', 'ferryman_odo'],
     ]);

@@ -748,6 +748,30 @@ export const hudChromeStrings = {
       'Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.',
     taskHoneBodyPad:
       'Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.',
+    // The death lesson (q_ps_the_long_walk). Three bodies, because the
+    // lesson has three moments and a single static card would be wrong for
+    // two of them: walk to the stone, release the spirit, walk back. The
+    // copy names the literal buttons the death screen shows.
+    taskLongWalkBody:
+      'Walk south down the shore road to the Passing Stone and press {interactKey} to kneel. Nothing out here can hurt you, and this costs you nothing.',
+    taskLongWalkBodyTouch:
+      'Walk south down the shore road to the Passing Stone and tap it to kneel. Nothing out here can hurt you, and this costs you nothing.',
+    taskLongWalkBodyPad:
+      'Walk south down the shore road to the Passing Stone and press your interact button to kneel. Nothing out here can hurt you, and this costs you nothing.',
+    // Dead, spirit not yet released.
+    taskLongWalkDeadBody:
+      'You have died. Nothing is lost. Press Release Spirit to rise as a ghost at the graveyard behind the camp.',
+    taskLongWalkDeadBodyTouch:
+      'You have died. Nothing is lost. Tap Release Spirit to rise as a ghost at the graveyard behind the camp.',
+    taskLongWalkDeadBodyPad:
+      'You have died. Nothing is lost. Choose Release Spirit to rise as a ghost at the graveyard behind the camp.',
+    // A ghost walking back to the body.
+    taskLongWalkGhostBody:
+      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Press it and you are whole again, with no penalty at all.',
+    taskLongWalkGhostBodyTouch:
+      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Tap it and you are whole again, with no penalty at all.',
+    taskLongWalkGhostBodyPad:
+      'You are a spirit now, and nothing can touch you. Your body is marked on your map: walk back to it, and when you are close the Resurrect at Corpse button appears. Choose it and you are whole again, with no penalty at all.',
     taskShellBody:
       'The scuttlers pinch back. Left-click one to make it your target, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyTouch:
@@ -813,6 +837,8 @@ export const hudChromeStrings = {
     // The ability drill's second half: the press it wants is the class's own
     // button, not the swing the previous lesson taught.
     promptUseAbility: 'Use ability',
+    // The death lesson's rite: kneeling at the Passing Stone.
+    promptKneel: 'Kneel',
     promptJump: 'Jump',
     promptSummon: 'Summon',
     // The ring equip lesson (bootcamp_view.ts ringCardPlan): the pearl

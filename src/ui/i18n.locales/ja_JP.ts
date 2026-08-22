@@ -13193,6 +13193,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'かかしをタップしてターゲットにし、アクションバーの{ability}をタップしよう。ただの一振りではなく、君自身の技だ。三回当てること。',
   'hudChrome.bootcamp.taskHoneBodyPad':
     'かかしをターゲットにし、{ability}が入ったアクションボタンを押そう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.promptKneel':
+    'ひざまずく',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    '浜辺の道を南へ進み、たましいの石まで歩いて{interactKey}を押し、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    '浜辺の道を南へ進み、たましいの石まで歩いてタップし、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    '浜辺の道を南へ進み、たましいの石まで歩いて操作ボタンを押し、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    '君は死んだ。だが失ったものはない。「魂を解放」を押せば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    '君は死んだ。だが失ったものはない。「魂を解放」をタップすれば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    '君は死んだ。だが失ったものはない。「魂を解放」を選べば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。それを押せば、何の代償もなく元どおりだ。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。タップすれば、何の代償もなく元どおりだ。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。それを選べば、何の代償もなく元どおりだ。',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に最初のアクションボタンを押して打ち込もう。一体が崩れるまで打ち続けること。',
   'hudChrome.bootcamp.taskShellBody':
