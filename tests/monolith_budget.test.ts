@@ -253,7 +253,25 @@ const MONOLITHS: MonolithRow[] = [
     // the blank lines are back, the declarations are separate again, and the
     // count below is what the extractions alone earn. Maintainer decision, and
     // deliberately a visible +2 rather than an invisible -9.
-    ceiling: 13548,
+    // Re-pinned 13548 -> 13563 (+15) when the fast-loading-screen-variety
+    // branch merged release/v0.40.0 (its rebase onto the release had already
+    // paid this row's zero-slack pin once, at 13561 over the pre-streamed-
+    // prewarm base). The branch's additions here are thin-consumer wiring to
+    // extracted seams: the onCharacterAssetReady subscription plus its
+    // handler, which only enqueues a re-apply for views whose weapon skin GLB
+    // just landed. The substance lives in src/render/characters/assets.ts
+    // (the ready registry) and src/render/characters/visual.ts
+    // (refreshWeaponSkin), so no clean branch-owned extraction remains.
+    // Maintainer decision, exact merged count: any further growth reds again.
+    // Re-pinned 13563 -> 13573 (+10) for the review-fix round: the nearby-view
+    // floor on the shared prewarm budget (the decision lives in
+    // src/render/prewarm_policy.ts portalPrewarmViewBudget and
+    // nearbyPrewarmViewBudget; the renderer carries the two call sites and the
+    // rationale comment) and the weapon-skin early-out in onCharacterAssetReady
+    // (the predicate lives in src/render/characters/assets.ts). Both additions
+    // are thin-consumer wiring to their extracted seams. Exact count, zero
+    // slack: any further growth reds again.
+    ceiling: 13573,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -268,7 +286,22 @@ const MONOLITHS: MonolithRow[] = [
     // cover joining it) net against the base's pad-selection extraction plus
     // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
     // landing below both parents' pins. Any further growth reds again.
-    ceiling: 11516,
+    // Re-pinned 11516 -> 11522 (+6) for the fast-loading-screen-variety rebase
+    // onto release/v0.40.0, whose pin above is this file's exact size (zero
+    // slack). The branch is net-extractive here: it MOVES the eager mob-body
+    // stream, far-vista settle and background preload lane out of the entry
+    // path into src/game/post_entry_warmups_core.ts, and the backdrop rotation
+    // into src/ui/loading_backdrop.ts. What is left in main.ts is the call
+    // wiring for both (the controller construction and the runPostEntryWarmups
+    // options object), which is the firewall's job. Maintainer decision, exact
+    // merged count: any further growth reds again.
+    // Re-pinned 11522 -> 11534 (+12) for the review-fix round: the mob-body
+    // stream kick moved from the post-fade callback to the first-paint
+    // checkpoint (kickCharacterPreloadStream, the seam stays in
+    // src/game/post_entry_warmups_core.ts), which costs the call wiring plus
+    // the placement rationale where the reader needs it. Exact count, zero
+    // slack: any further growth reds again.
+    ceiling: 11534,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

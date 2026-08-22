@@ -845,10 +845,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
 // extraction. The renderer leaf moved; no capture was retaken because both
 // changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'fea5b37ef6f8fac950afcb725af5d45538b8ef6f29fb0492f81a96d2cdb02b04';
+  'b30ad6d964b24f8570d35bfbc389d05ce1b720bcd10b8f0052d5dc5b90d4126c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '87e05c784ce1ffacd9b2b23682361692bce89942dbdea3bc699efd878ce906bf';
+  'e922918ac730f196234a3d450f04845affc5d5986804dff6135fe36efe94b4d2';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1916,10 +1923,16 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the second three patch-hash bump (pnpm-lock.yaml, the count
     // 0 instanced-mesh render-list skip): same order, the composite first, then
     // this seal. No capture was retaken.
+    // Re-minted for the fast-loading-screen-variety merge with release/v0.40.0
+    // (renderer.ts moved on both sides): same order, the composite first, then
+    // this seal. No capture was retaken.
+    // Re-minted for the review-fix round (prewarm_policy.ts and renderer.ts
+    // moved): same order, the composite first, then this seal. No capture
+    // was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('9c8f6ca46773e33ca2af25b5fa4e03b3fbf494bcf923226df1562372f4e1c65f');
+    ).toBe('0d3ec7db52b2b6b3502aa38c63fa6639e69b2fb3abeaacd6be8dea5a1d950f35');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
