@@ -7390,8 +7390,7 @@ export class Hud {
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
             hasAction: () => this.actionForSlot(i) !== null,
-            ability: () =>
-              i === 0 && this.attackSlotIsAttack() ? null : this.abilityForSlot(i),
+            ability: () => (i === 0 && this.attackSlotIsAttack() ? null : this.abilityForSlot(i)),
             item: () => this.itemForSlot(i),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };
