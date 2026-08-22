@@ -235,7 +235,11 @@ import {
   createApiDispatcher,
   selectApiEntry,
 } from './http/dispatch';
-import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
+import {
+  type GameStateSource,
+  registerGameStateMetrics,
+  WOC_TICK_PHASES,
+} from './http/game_metrics';
 import { setGameMetricsCounters } from './http/game_signals';
 import {
   handleLivez,
@@ -3288,7 +3292,10 @@ export async function startServer(): Promise<http.Server> {
     wsConnections: () => wss.clients.size,
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
-    tickPhaseMillis: () => game.tickPhaseMillis(),
+    // Narrowed to the exported set: the readout sorts a 1200-sample ring per
+    // phase inside the scrape's synchronous collect(), and the exporter keeps
+    // only these. The detail phases are dozens and empty outside a capture.
+    tickPhaseMillis: () => game.tickPhaseMillis(WOC_TICK_PHASES),
     // Coerced at the untyped boundary: @types/pg hand-declares these getters,
     // so a pg upgrade that drops one type-checks clean and would otherwise
     // fail the ENTIRE scrape at collect time (one bad collector rejects

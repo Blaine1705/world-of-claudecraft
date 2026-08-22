@@ -35,10 +35,10 @@ export class TickProfiler {
   private head = 0;
   private count = 0;
 
-  // `total` is always tracked alongside the caller-named phases.
+  // `total` and `ticksRun` are always tracked alongside the caller-named phases.
   constructor(phaseNames: readonly string[], windowTicks = 1200) {
     this.windowTicks = Math.max(1, Math.floor(windowTicks));
-    this.phaseNames = [...phaseNames, 'total'];
+    this.phaseNames = [...phaseNames, 'total', 'ticksRun'];
     for (const name of this.phaseNames) this.rings.set(name, new Float64Array(this.windowTicks));
   }
 
@@ -60,12 +60,25 @@ export class TickProfiler {
     this.cur.clear();
   }
 
-  // Close out the current tick: push each phase's accumulated ms into its ring,
-  // recording `totalMs` for the whole loop body, then reset the scratch state.
-  commit(totalMs: number): void {
+  /**
+   * Close out the current sample: push each phase's accumulated ms into its ring,
+   * record `totalMs` for the whole loop body, then reset the scratch state.
+   *
+   * `ticksRun` is the DIVISOR, and it is recorded because omitting it misleads.
+   * A sample is one loop CALLBACK, not one sim tick, and `add` sums a phase over
+   * every catch-up tick in that callback (see its note). So a phase's p99 is
+   * routinely N times its p50 for no reason other than N ticks having run
+   * together, and a reader with no divisor reads that as "this phase got slow".
+   * That misreading is not hypothetical: it sent a production stall investigation
+   * after the movement phase for a day. Percentiles of this series say how many
+   * ticks the worst samples actually carried, which is the number that turns an
+   * alarming p99 into an ordinary one (or confirms it is not).
+   */
+  commit(totalMs: number, ticksRun = 1): void {
     for (const name of this.phaseNames) {
       const ring = this.rings.get(name)!;
-      ring[this.head] = name === 'total' ? totalMs : (this.cur.get(name) ?? 0);
+      ring[this.head] =
+        name === 'total' ? totalMs : name === 'ticksRun' ? ticksRun : (this.cur.get(name) ?? 0);
     }
     this.head = (this.head + 1) % this.windowTicks;
     this.count = Math.min(this.count + 1, this.windowTicks);
@@ -95,9 +108,22 @@ export class TickProfiler {
     };
   }
 
-  profile(): TickProfile {
+  /**
+   * Percentiles per phase. `only` narrows the readout to the named phases, and
+   * that matters: statsFor copies a windowTicks-long ring into a JS array and
+   * SORTS it, per phase, with no await to break it up. The /metrics collector
+   * runs on every scrape and publishes a handful of phases, so computing all of
+   * them (the detail phases are dozens, and empty unless a capture is running)
+   * spends most of a contiguous block on results the caller discards.
+   * An unknown name is skipped rather than reported as zero, so a caller cannot
+   * mistake "not registered" for "never cost anything".
+   */
+  profile(only?: readonly string[]): TickProfile {
     const phases: Record<string, PhaseStats> = {};
-    for (const name of this.phaseNames) phases[name] = this.statsFor(name);
+    for (const name of only ?? this.phaseNames) {
+      if (only && !this.rings.has(name)) continue;
+      phases[name] = this.statsFor(name);
+    }
     return { samples: this.count, windowTicks: this.windowTicks, phases };
   }
 }

@@ -1968,7 +1968,9 @@ export class GameServer {
   // queue a leave flush behind an autosave batch. The depth watch below makes
   // that collapse loud; if the warn fires in production, the escalation path
   // is a per-guild serializer for the autosave arm (state.md records it).
-  private readonly marketSerialWriter = createSerialWriter();
+  // Lazy on purpose: this runs at field-init time, before tickProfiler exists.
+  private readonly onSaveMs = (ms: number) => this.tickProfiler.add('saves', ms);
+  private readonly marketSerialWriter = createSerialWriter(this.onSaveMs);
   private marketWriteQueueDepth = 0;
   private lastMarketQueueWarnMs = 0;
   private readonly enqueueMarketWrite = <T>(write: () => Promise<T>): Promise<T> => {
@@ -1986,7 +1988,7 @@ export class GameServer {
       this.marketWriteQueueDepth--;
     });
   };
-  private readonly enqueueRiftWrite = createSerialWriter();
+  private readonly enqueueRiftWrite = createSerialWriter(this.onSaveMs);
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
   private readonly startedAt = Date.now();
@@ -2022,6 +2024,8 @@ export class GameServer {
     'bcastGrid',
     'bcastSelf',
     'social',
+    'saves',
+    'lateness',
     // sim.tick() internal phases, fed by the injected cfg.perfLap probe below.
     // Populated only while the detailed capture is active (an on-demand admin
     // capture or PERF_TICK_LOG=1); zero otherwise.
@@ -2848,6 +2852,8 @@ export class GameServer {
           const now = process.hrtime.bigint();
           let dt = Number(now - last) / 1e9;
           last = now;
+          // Ahead of the clamp, which discards exactly what a stall reading must keep.
+          this.tickProfiler.add('lateness', Math.max(0, dt * 1000 - DT * 1000));
           if (dt > 0.5) dt = 0.5;
           acc += dt;
           // Feed the authoritative calendar to the sim so its daily windows work
@@ -2929,15 +2935,15 @@ export class GameServer {
             this.broadcastSocialPositions();
           }
           lap('social');
+          this.flushPeriodicSaves(dt);
           const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
-          this.tickProfiler.commit(tickMs);
+          this.tickProfiler.commit(tickMs, ticksRun);
           this.maybeLogTickPerf(tickMs);
           this.finalizePerfCaptureIfDue();
           this.tickMsAvg =
             this.tickMsAvg === 0
               ? tickMs
               : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
-          this.flushPeriodicSaves(dt);
           // LAST statement of the guarded body, deliberately: this timestamp is the
           // liveness signal /livez reads, so only a pass that ran to completion may
           // refresh it (a body that throws every tick must go stale, not look alive).
@@ -5823,8 +5829,8 @@ export class GameServer {
   // Per-phase loop timing (p95 + max, in MILLISECONDS) for the /metrics exporter,
   // keyed by phase name. The exporter converts to seconds and surfaces only its
   // fixed WOC_TICK_PHASES subset, so the exported label set stays bounded.
-  tickPhaseMillis(): Record<string, { p95: number; max: number }> {
-    const { phases } = this.tickProfiler.profile();
+  tickPhaseMillis(only?: readonly string[]): Record<string, { p95: number; max: number }> {
+    const { phases } = this.tickProfiler.profile(only);
     const out: Record<string, { p95: number; max: number }> = {};
     for (const [name, stats] of Object.entries(phases)) {
       out[name] = { p95: stats.p95, max: stats.max };
