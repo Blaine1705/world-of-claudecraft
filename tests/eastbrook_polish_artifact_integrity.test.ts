@@ -842,20 +842,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
-// Re-minted for the Duskfall gate occluder-fade merge: renderer.ts wires
-// hollowGates into the shared per-frame occluder update on top of the current
-// release renderer bytes, so the seals follow the swept evidence bytes. No
-// capture was retaken.
-// Re-minted for the PR #3497 merge repair: the integration-side Eastbrook
-// evidence is retained while entity_view_policy_core.ts keeps the decayed-
-// corpse admission rule and its lifecycle repair. No capture was retaken.
-// Re-minted for the PR #3528 merge repair: the integration-side Eastbrook
-// evidence is retained while renderer.ts and entity_view_policy_core.ts add
-// the heroic Nythraxis wardstone distance-cull exemption. No capture was
-// retaken.
-// Re-minted for the v0.40 loot repair follow-up: the prior integration-side
-// entity_view_policy_core.ts bytes were already sealed in evidence but the
-// literal pins were stale. No capture was retaken.
 // Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
 // extraction. The renderer leaf moved; no capture was retaken because both
 // changes are behavior-neutral for the accepted visual evidence.
@@ -866,13 +852,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the review-fix round (the nearby-view floor in
 // prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
 // both runtime leaves moved. No capture was retaken.
-// Re-minted for the v0.40 base merge-forward: the release-batch renderer bytes
-// and the fast-loading-screen-variety renderer/prewarm bytes now seal the same
-// merged tree. No capture was retaken.
+// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
+// renderer.ts combines mandatory entry admission with the release's rift
+// long-session resource lifecycle changes. No capture was retaken.
+// Re-minted for the v0.40 batch merge-forward over the loading review fixes:
+// renderer.ts and prewarm_policy.ts now seal the combined release-batch tree.
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '7262d00c1f751f046938e47117f2708481ce7afb711d8bff04b2f431d5378264';
+  'fe7daba76d51271a00f6b8aa610507bf43ffbb09fe40723d78c9a126d0976cec';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'd3cbbfc0c21741f9c09e7bee455b5737dcaeec55eca4ecd415798d7d55e2ae0b';
+  'c8d4055f59403f58660ee17aa8ea194c939fe32ba29aa1ef33e00ac66e748f2e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1946,13 +1935,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the review-fix round (prewarm_policy.ts and renderer.ts
     // moved): same order, the composite first, then this seal. No capture
     // was retaken.
-    // Re-minted for the v0.40 base merge-forward (renderer.ts and
-    // prewarm_policy.ts moved): same order, the composite first, then this
-    // seal. No capture was retaken.
+    // Re-minted after merging release/v0.40.0 into the loading-hitch branch
+    // (renderer.ts moved on both sides): same order, the composite first,
+    // then this seal. No capture was retaken.
+    // Re-minted for the loading review fixes (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('0a325b513638ab72d24ed83d127162acea22cf8332256ebea94e8673d6f22d26');
+    ).toBe('42490ee3b653ac419794777e418128fa1cf24065eb7619cb812aed68b26c7a33');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -258,20 +258,6 @@ interface AttributionTargetFixture {
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
-// Re-minted for the Duskfall gate occluder-fade merge: renderer.ts wires
-// hollowGates into the shared per-frame occluder update on top of the current
-// release renderer bytes, so the composite follows the merged bytes. No
-// capture was retaken.
-// Re-minted for the PR #3497 merge repair: the integration-side Eastbrook
-// evidence is retained while entity_view_policy_core.ts keeps the decayed-
-// corpse admission rule and its lifecycle repair. No capture was retaken.
-// Re-minted for the PR #3528 merge repair: the integration-side Eastbrook
-// evidence is retained while renderer.ts and entity_view_policy_core.ts add
-// the heroic Nythraxis wardstone distance-cull exemption. No capture was
-// retaken.
-// Re-minted for the v0.40 loot repair follow-up: the prior integration-side
-// entity_view_policy_core.ts bytes were already sealed in evidence but the
-// literal pin was stale. No capture was retaken.
 // Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
 // extraction. The renderer leaf moved; no capture was retaken because both
 // changes are behavior-neutral for the accepted visual evidence.
@@ -282,11 +268,14 @@ interface AttributionTargetFixture {
 // Re-minted for the review-fix round (the nearby-view floor in
 // prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
 // both runtime leaves moved. No capture was retaken.
-// Re-minted for the v0.40 base merge-forward: the release-batch renderer bytes
-// and the fast-loading-screen-variety renderer/prewarm bytes now seal the same
-// merged tree. No capture was retaken.
+// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
+// renderer.ts combines mandatory entry admission with the release's rift
+// long-session resource lifecycle changes. No capture was retaken.
+// Re-minted for the v0.40 batch merge-forward over the loading review fixes:
+// renderer.ts and prewarm_policy.ts now seal the combined release-batch tree.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd3cbbfc0c21741f9c09e7bee455b5737dcaeec55eca4ecd415798d7d55e2ae0b';
+  'c8d4055f59403f58660ee17aa8ea194c939fe32ba29aa1ef33e00ac66e748f2e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

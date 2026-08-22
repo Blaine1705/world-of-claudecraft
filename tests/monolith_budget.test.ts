@@ -263,29 +263,44 @@ const MONOLITHS: MonolithRow[] = [
     // the blank lines are back, the declarations are separate again, and the
     // count below is what the extractions alone earn. Maintainer decision, and
     // deliberately a visible +2 rather than an invisible -9.
-    // Re-pinned 13548 -> 13563 (+15) when the fast-loading-screen-variety
-    // branch merged release/v0.40.0 (its rebase onto the release had already
-    // paid this row's zero-slack pin once, at 13561 over the pre-streamed-
-    // prewarm base). The branch's additions here are thin-consumer wiring to
-    // extracted seams: the onCharacterAssetReady subscription plus its
-    // handler, which only enqueues a re-apply for views whose weapon skin GLB
-    // just landed. The substance lives in src/render/characters/assets.ts
-    // (the ready registry) and src/render/characters/visual.ts
-    // (refreshWeaponSkin), so no clean branch-owned extraction remains.
-    // Maintainer decision, exact merged count: any further growth reds again.
-    // Re-pinned 13563 -> 13573 (+10) for the review-fix round: the nearby-view
-    // floor on the shared prewarm budget (the decision lives in
-    // src/render/prewarm_policy.ts portalPrewarmViewBudget and
-    // nearbyPrewarmViewBudget; the renderer carries the two call sites and the
-    // rationale comment) and the weapon-skin early-out in onCharacterAssetReady
-    // (the predicate lives in src/render/characters/assets.ts). Both additions
-    // are thin-consumer wiring to their extracted seams. Exact count, zero
+    // Re-pinned 13548 -> 13551 when the rift long-session perf branch merged
+    // this base: both parents grew the file independently (upstream's interior
+    // resource registry wiring, this branch's object-view material disposal,
+    // sparkle tags and the rift build-key cooldown, all thin consumers of
+    // extracted modules). Exact merged count, zero slack: any further growth
+    // reds again.
+    // Raised +8 in the same branch's review round: the rift build-failure
+    // cooldown swapped its untracked setTimeout (a handle that outlives
+    // teardown and can fire into a recycled renderer) for a timestamp gate.
+    // The gate logic lives in src/render/build_retry_gate.ts; this is the
+    // coordinator's thin-wiring cost (import, field + rationale comment, the
+    // wrapped attempt condition). Exact count, zero slack.
+    // Meanwhile on the release base: re-pinned 13548 -> 13563 (+15) when the
+    // fast-loading-screen-variety branch merged release/v0.40.0 (thin-consumer
+    // wiring to the onCharacterAssetReady seam; substance in
+    // src/render/characters/assets.ts and visual.ts), then 13563 -> 13573
+    // (+10) for its review-fix round (the nearby-view floor on the shared
+    // prewarm budget, decision in src/render/prewarm_policy.ts, and the
+    // weapon-skin early-out predicate in characters/assets.ts).
+    // Re-pinned to the exact count of the merged file: the base's 13573 plus
+    // this branch's +11 across its two arms above. Exact merged count, zero
     // slack: any further growth reds again.
-    // Re-pinned 13573 -> 13566 after merging current release/v0.40.0 into the
-    // v0.40 batch branch: the batch-side renderer repairs and the loading
-    // branch wiring combine below the release-side ceiling. Exact merged count,
-    // zero slack.
-    ceiling: 13566,
+    // Entry-detail admission moved the settle step ahead of compile/texture
+    // collection while deleting the old reveal-time arm: exact count, no slack.
+    // Lowered by extracting the initial-scene texture collection and shared
+    // admission cursor into initial_scene_texture_admission.ts.
+    // Lowered again by extracting the compile-root collection, near-first
+    // ordering and program-content dedupe into initial_scene_compile_units.ts.
+    // The release's rift lifecycle wiring brings the combined renderer to this
+    // exact count after formatting, with zero slack.
+    // Review hardening restores the measured residency rationale at its live
+    // call site and adds only thin wiring for rebuild reveal-gate installation,
+    // entry-barrier cleanup and observed display pacing; the policy and timer
+    // ownership remain in sibling modules. Exact count, zero slack.
+    // Re-pinned to the exact v0.40 batch merge-forward count after combining
+    // those release-base loading changes with the batch branch renderer
+    // repairs. Exact merged count, zero slack.
+    ceiling: 13534,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -307,7 +322,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 11516 -> 11522 (+6) for the fast-loading-screen-variety rebase
     // onto release/v0.40.0, whose pin above is this file's exact size (zero
     // slack). The branch is net-extractive here: it MOVES the eager mob-body
-    // stream, far-vista settle and background preload lane out of the entry
+    // stream and far-vista settle out of the entry
     // path into src/game/post_entry_warmups_core.ts, and the backdrop rotation
     // into src/ui/loading_backdrop.ts. What is left in main.ts is the call
     // wiring for both (the controller construction and the runPostEntryWarmups
@@ -319,11 +334,13 @@ const MONOLITHS: MonolithRow[] = [
     // src/game/post_entry_warmups_core.ts), which costs the call wiring plus
     // the placement rationale where the reader needs it. Exact count, zero
     // slack: any further growth reds again.
-    // Re-pinned 11534 -> 11508 after merging current release/v0.40.0 into the
-    // v0.40 batch branch: the account-portal painter extraction still pays for
-    // its wiring on top of the loading branch changes. Exact merged count, zero
-    // slack.
-    ceiling: 11508,
+    // The bounded first-paint gate is now owned per startGame invocation rather
+    // than by a mutable render-core singleton. Its browser timer lives in the
+    // sibling adapter; main pays only factory/arm wiring. Exact count, zero slack.
+    // Re-pinned to the exact v0.40 batch merge-forward count after combining
+    // the account-portal painter extraction and the moved-base entry gate
+    // wiring. Exact merged count, zero slack.
+    ceiling: 11510,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -368,7 +385,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/colliders.ts',
-    ceiling: 2660,
+    // Lowered from 2660 after the cell-index math moved out to
+    // collider_cells.ts (the ratchet rule: extraction lowers the ceiling).
+    ceiling: 2630,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
