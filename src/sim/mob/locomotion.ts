@@ -1422,6 +1422,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.firedSummons = 0;
   mob.enraged = false;
   mob.healedThisPull = false;
+  mob.pulseTimer = MOBS[mob.templateId]?.aoePulse?.every ?? 0;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   // The shared spacing lock dies with the pull like the timers around it.
