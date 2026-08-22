@@ -30,6 +30,7 @@ import { coachTrailPlan, distanceToTrail } from '../render/coach_trail_core';
 import type { Renderer } from '../render/renderer';
 import { BOOTCAMP_COURSE_CHECKPOINTS, isOnProvingShore } from '../sim/content/proving_shore';
 import { GAUNTLET_QUEST_ID } from '../sim/tutorial/gauntlet_run';
+import { startingAttackFor } from '../sim/tutorial/starting_attack';
 import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { IWorld } from '../world_api';
@@ -73,6 +74,10 @@ import {
 } from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
+import { iconDataUrl } from './icons';
+
+/** The Attack toggle's icon id (hud.ts resolves ATTACK_ICON_KEY to it). */
+const AUTO_ATTACK_ICON_ID = 'attack';
 
 // The island rectangle: the card never shows off the Proving Shore. Both
 // axes matter; the x column alone also covers four mainland zones
@@ -615,7 +620,7 @@ export class BootcampOverlay {
       const contentKey = `move:${this.step}:${caps.join(',')}`;
       if (this.promptContentKey !== contentKey) {
         this.promptContentKey = contentKey;
-        this.paintPromptChips(caps);
+        this.paintPromptChips(caps.map((cap) => ({ cap })));
         this.promptVerbEl.textContent = t('hudChrome.bootcamp.promptHold');
       }
       this.prompt.classList.add('tut-prompt-center');
@@ -642,6 +647,7 @@ export class BootcampOverlay {
           entities: world.entities.values(),
           playerPos: p.pos,
           questLog: world.questLog,
+          targetId: p.targetId,
         })
       : null;
     if (!plan || !p || !coachPromptInRange(plan, p.pos)) {
@@ -649,32 +655,42 @@ export class BootcampOverlay {
       return;
     }
 
-    // Kill lessons chip the target and attack binds (Tab, 1); the parkour
-    // asks chip the jump bind (Space, or the pad's literal bottom face
-    // button); everything else chips the interact bind per input family.
-    let chips: readonly string[];
-    if (plan.kind === 'kill') {
-      chips =
-        mode === 'keyboard'
-          ? [
-              keybinds.primaryLabel('target'),
-              keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0'),
-            ].filter(Boolean)
-          : [];
+    // The kill lessons' first half asks for a CLICK, which needs no chip on
+    // any input family: the bubble sits on the quarry and the verb reads
+    // Select. Its second half names the button that hits: the keycap on a
+    // keyboard, and on touch the action-bar ICON itself, because a phone
+    // player has no key to be told about and is looking for the picture.
+    // The parkour asks chip the jump bind (Space, or the pad's literal
+    // bottom face button); everything else chips interact per input family.
+    let chips: readonly PromptChip[];
+    if (plan.kind === 'select') {
+      chips = [];
+    } else if (plan.kind === 'kill') {
+      if (mode === 'keyboard') {
+        const cap = keybinds.primaryLabel(this.casterClass ? 'slot1' : 'slot0');
+        chips = cap ? [{ cap }] : [];
+      } else if (mode === 'touch') {
+        chips = [{ abilityIcon: this.promptAttackIconId(world) }];
+      } else {
+        chips = [];
+      }
     } else if (plan.kind === 'jump') {
       chips =
         mode === 'keyboard'
-          ? [keybinds.primaryLabel('jump')].filter(Boolean)
+          ? [keybinds.primaryLabel('jump')].filter(Boolean).map((cap) => ({ cap }))
           : mode === 'pad'
-            ? ['A']
+            ? [{ cap: 'A' }]
             : [];
     } else if (plan.kind === 'use') {
-      chips = mode === 'keyboard' ? [keybinds.primaryLabel('bags')].filter(Boolean) : [];
+      chips =
+        mode === 'keyboard'
+          ? [keybinds.primaryLabel('bags')].filter(Boolean).map((cap) => ({ cap }))
+          : [];
     } else {
       const { chip } = coachPromptChip(mode, keybinds.primaryLabel('interact'));
-      chips = chip ? [chip] : [];
+      chips = chip ? [{ cap: chip }] : [];
     }
-    const contentKey = `${plan.verbKey}:${chips.join(',')}:${mode}`;
+    const contentKey = `${plan.verbKey}:${chips.map(chipKey).join(',')}:${mode}`;
     if (this.promptContentKey !== contentKey) {
       this.promptContentKey = contentKey;
       this.paintPromptChips(chips);
@@ -709,11 +725,19 @@ export class BootcampOverlay {
     }
   }
 
-  private paintPromptChips(caps: readonly string[]): void {
+  private paintPromptChips(chips: readonly PromptChip[]): void {
     if (!this.promptChipEl) return;
     this.promptChipEl.replaceChildren();
-    paintChipSequence(this.promptChipEl, caps);
-    this.promptChipEl.style.display = caps.length > 0 ? '' : 'none';
+    paintPromptChipSequence(this.promptChipEl, chips);
+    this.promptChipEl.style.display = chips.length > 0 ? '' : 'none';
+  }
+
+  /** Which action-bar icon the touch combat bubble shows: the Attack toggle
+   *  for a class that swings, and the taught spell for one that casts (a
+   *  caster has no melee autoattack worth pointing a new player at). */
+  private promptAttackIconId(world: IWorld): string {
+    if (!this.casterClass) return AUTO_ATTACK_ICON_ID;
+    return startingAttackFor(world.cfg.playerClass).abilityId ?? AUTO_ATTACK_ICON_ID;
   }
 
   private hidePrompt(): void {
@@ -769,20 +793,47 @@ function railQuestState(world: IWorld, questId: string): CoachState | null {
 }
 
 /** Keycap chips with a localized "then" between them: every multi-key row
- *  on the island is a press SEQUENCE (D then W, Tab then 1, B then F), and
- *  the playtest showed the order must be explicit. */
+ *  on the island is a press SEQUENCE (D then W, B then F), and the playtest
+ *  showed the order must be explicit. */
 function paintChipSequence(host: HTMLElement, caps: readonly string[]): void {
-  caps.forEach((cap, i) => {
+  paintPromptChipSequence(
+    host,
+    caps.map((cap) => ({ cap })),
+  );
+}
+
+/** One bubble chip: a keycap the player presses, or the action-bar icon they
+ *  tap. Touch has no keys to name, so its combat bubble shows the button's
+ *  own picture rather than a word for a key that does not exist there. */
+type PromptChip = { readonly cap: string } | { readonly abilityIcon: string };
+
+/** Repaint identity for a chip row (the memo key). */
+function chipKey(chip: PromptChip): string {
+  return 'cap' in chip ? chip.cap : `icon:${chip.abilityIcon}`;
+}
+
+function paintPromptChipSequence(host: HTMLElement, chips: readonly PromptChip[]): void {
+  chips.forEach((chip, i) => {
     if (i > 0) {
       const sep = document.createElement('span');
       sep.className = 'tut-keycap-then';
       sep.textContent = t('hudChrome.bootcamp.keycapThen');
       host.appendChild(sep);
     }
-    const chip = document.createElement('span');
-    chip.className = 'tut-keycap';
-    chip.textContent = cap;
-    host.appendChild(chip);
+    if ('cap' in chip) {
+      const el = document.createElement('span');
+      el.className = 'tut-keycap';
+      el.textContent = chip.cap;
+      host.appendChild(el);
+      return;
+    }
+    const el = document.createElement('span');
+    el.className = 'tut-keycap tut-keycap-icon';
+    el.style.backgroundImage = `url(${iconDataUrl('ability', chip.abilityIcon)})`;
+    // Decorative: the verb beside it already says what the press does, and
+    // the icon repeats the action bar the player is looking at.
+    el.setAttribute('aria-hidden', 'true');
+    host.appendChild(el);
   });
 }
 

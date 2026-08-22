@@ -647,6 +647,16 @@
     font-size: 13px;
     padding: 4px 7px 3px;
   }
+  /* The touch combat bubble's chip is the action-bar button's own picture,
+     not a word for a key a phone does not have. Sized to read at arm's
+     length beside the verb, and square so the icon art is never squashed. */
+  .tut-prompt .tut-keycap-icon {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background-size: cover;
+    background-position: center;
+  }
   .tut-prompt-chips {
     display: flex;
     align-items: center;

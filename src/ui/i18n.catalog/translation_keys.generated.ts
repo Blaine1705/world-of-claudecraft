@@ -7954,6 +7954,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bootcamp.promptPickUp'
   | 'hudChrome.bootcamp.promptRead'
   | 'hudChrome.bootcamp.promptRing'
+  | 'hudChrome.bootcamp.promptSelect'
   | 'hudChrome.bootcamp.promptSummon'
   | 'hudChrome.bootcamp.promptTalk'
   | 'hudChrome.bootcamp.promptTurnIn'

@@ -732,13 +732,13 @@ export const hudChromeStrings = {
     // Wreck Line, and the buckle-on for the pouch before Maren's hand-in.
     // WORDY by M16, so the five non-Latin overlays carry real fills.
     taskStrikeTrueBody:
-      'Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.',
+      'Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the first button on the action bar, to swing. Keep striking until one gives out.',
     taskStrikeTrueBodyTouch:
       'Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.',
     taskStrikeTrueBodyPad:
       'Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.',
     taskShellBody:
-      'The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Left-click one to make it your target, then press {attackKey} to swing, and keep striking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyTouch:
       'The scuttlers pinch back. Tap one to target it, then tap the first action bar button to swing. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyPad:
@@ -748,13 +748,13 @@ export const hudChromeStrings = {
     // speak of casting. WORDY by M16, so the five non-Latin overlays carry
     // fills.
     taskStrikeTrueBodyCaster:
-      'Walk up to a straw effigy and press {targetKey}, or left-click it, to make it your target. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.',
+      'Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.',
     taskStrikeTrueBodyCasterTouch:
       'Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.',
     taskStrikeTrueBodyCasterPad:
       'Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.',
     taskShellBodyCaster:
-      'The scuttlers pinch back. Target one with {targetKey}, or left-click it, then press {attackKey} to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+      'The scuttlers pinch back. Left-click one to make it your target, then press {attackKey} to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyCasterTouch:
       'The scuttlers pinch back. Tap one to target it, then tap the second button on the action bar to cast your spell, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
     taskShellBodyCasterPad:
@@ -789,11 +789,15 @@ export const hudChromeStrings = {
     // (bootcamp.ts + coach_prompt_view.ts): one keycap chip plus one short
     // verb, readable without reading the card. Deliberately terse.
     promptTalk: 'Talk',
-    promptTurnIn: 'Turn in',
+    promptTurnIn: 'Turn in quest',
     promptPickUp: 'Pick up',
     promptRead: 'Read',
     promptRing: 'Ring',
     promptHold: 'Hold',
+    // The kill lessons' first half: click or tap the quarry to make it your
+    // target. Deliberately carries no keycap, because the press it asks for
+    // is the one a new player already owns.
+    promptSelect: 'Select',
     promptAttack: 'Attack',
     promptJump: 'Jump',
     promptSummon: 'Summon',

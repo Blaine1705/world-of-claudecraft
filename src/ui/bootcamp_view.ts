@@ -300,7 +300,7 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
       touch: 'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch',
       pad: 'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad',
     },
-    params: ['targetKey', 'attackKey'],
+    params: ['attackKey'],
     bodyHasNpc: false,
   },
   q_ps_shell_and_claw: {
@@ -314,7 +314,7 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
       touch: 'hudChrome.bootcamp.taskShellBodyCasterTouch',
       pad: 'hudChrome.bootcamp.taskShellBodyCasterPad',
     },
-    params: ['targetKey', 'attackKey'],
+    params: ['attackKey'],
     bodyHasNpc: false,
   },
   q_ps_mother_of_pearl: {

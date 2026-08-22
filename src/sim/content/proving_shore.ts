@@ -447,7 +447,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Strike True',
     giverNpcId: 'overseer_pell',
     turnInNpcId: 'drillmaster_rook',
-    text: 'Footwork first, now the arm, $N. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and press Tab, or left-click it, to make it your target, then press 1, or click the first icon on the action bar along the bottom of your screen, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.',
+    text: 'Footwork first, now the arm, $N. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.',
     completionText:
       'One clean fell, and your grip already surer. Remember the feel of it, $N: target, strike, and keep striking. Straw never minds. The next thing you swing at will.',
     objectives: [
@@ -465,7 +465,7 @@ export const PROVING_SHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Shell and Claw',
     giverNpcId: 'drillmaster_rook',
     turnInNpcId: 'tidewarden_nel',
-    text: 'Straw never minds, $N, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: target one with Tab or a left-click, press 1, and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.',
+    text: 'Straw never minds, $N, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, press 1, and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.',
     completionText:
       'Three shells cracked and all your fingers kept: a fair first fight, $N. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.',
     objectives: [
