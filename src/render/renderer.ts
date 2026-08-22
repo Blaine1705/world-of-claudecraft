@@ -6091,7 +6091,11 @@ export class Renderer {
       // its counts, never 'completed'.
       const progress = entry.progress?.() ?? null;
       if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
-      if (status === 'partial') {
+      // Entries that explicitly expose a partial resume are also allowed to
+      // recover from a failed indivisible unit. Their cursor/progress owner
+      // keeps the failed item in this remainder; entries without this hook
+      // retain the historical fail-once behavior.
+      if (status === 'partial' || status === 'failed') {
         const partialUnits = entry.resumePartialUnits?.() ?? [];
         if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });
       }

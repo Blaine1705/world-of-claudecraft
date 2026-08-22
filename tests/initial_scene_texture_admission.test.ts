@@ -108,4 +108,23 @@ describe('InitialSceneTextureAdmission', () => {
     expect(admission.remaining()).toEqual(['far']);
     expect(admission.admitOneBefore(2)).toBe(false);
   });
+
+  it('keeps a failed upload in the explicit resume remainder', () => {
+    let attempts = 0;
+    const admission = new InitialSceneTextureAdmission(
+      ['near', 'far'],
+      (texture) => {
+        attempts++;
+        if (texture === 'near' && attempts === 1) throw new Error('transient GPU failure');
+      },
+      () => 0,
+    );
+
+    expect(() => admission.admitOneBefore(1)).toThrow('transient GPU failure');
+    expect(admission.progress()).toEqual({ initialized: 0, planned: 2, trimmed: true });
+    expect(admission.remaining()).toEqual(['near', 'far']);
+
+    expect(admission.admitOneBefore(1)).toBe(true);
+    expect(admission.remaining()).toEqual(['far']);
+  });
 });

@@ -75,7 +75,11 @@ export class InitialSceneTextureAdmission<T> {
   /** Admit at most one indivisible texture before the absolute deadline. */
   admitOneBefore(deadlineMs: number): boolean {
     if (this.cursor >= this.textures.length || this.now() >= deadlineMs) return false;
-    this.upload(this.textures[this.cursor++]);
+    // Commit the cursor only after a successful upload. A transient GPU error
+    // must leave this texture in remaining() so the explicit manifest resume
+    // lane can retry it rather than paying the cold upload on a live draw.
+    this.upload(this.textures[this.cursor]);
+    this.cursor++;
     return true;
   }
 
