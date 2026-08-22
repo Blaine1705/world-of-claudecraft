@@ -261,8 +261,19 @@ interface AttributionTargetFixture {
 // Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
 // extraction. The renderer leaf moved; no capture was retaken because both
 // changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
+// Re-minted for the rift long-session perf merge with release/v0.40.0:
+// renderer.ts moved on both sides (this branch's material disposal and
+// retry-gate wiring, the release's loading-screen-variety work). No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '90515c74f28f80274a168002006de73d008f46a13c30ce61c6964d5d63795260';
+  '0ae18f49a7e84da560792fa91765e96a4ea4731fb11f28524f9e1b2f3e15cdc7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
