@@ -19,7 +19,7 @@
 // Three, rng-only) so tests/architecture.test.ts still passes.
 
 import { rangedAutoProfile } from '../combat/form_swing';
-import { arenaOrigin, CLASSES, DUNGEON_X_THRESHOLD } from '../data';
+import { arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import type { PlayerMeta, Sim } from '../sim';
 import {
   angleTo,

@@ -198,7 +198,8 @@ describe('runMailBotWelcomePurgeMigration', () => {
     expect(h.statements.at(-1)).toBe('COMMIT');
     // The written blob keeps the real letter and the book shape.
     const update = h.querySpy.mock.calls.find(([text]) => text.startsWith('UPDATE world_state'));
-    const written = JSON.parse((update?.[1] as string[])[0]);
+    if (!update) throw new Error('no world_state UPDATE was issued');
+    const written = JSON.parse((update[1] as string[])[0]);
     expect(written.mail).toHaveLength(1);
     expect(written.mail[0].recipientName).toBe('PhoneBoy');
     expect(written.nextMailId).toBe(9);

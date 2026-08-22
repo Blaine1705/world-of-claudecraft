@@ -25,7 +25,6 @@ import {
   type VcNationId,
 } from '../types';
 import {
-  GOAL_BOX_DEPTH,
   GOAL_HALF_W,
   GOAL_LINE_EAST_X,
   GOAL_LINE_WEST_X,
