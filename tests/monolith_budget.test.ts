@@ -173,7 +173,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
     // combined tree lands below the branch ceilings, so keep the exact merged
     // count.
-    ceiling: 11621,
+    ceiling: 11609,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -198,10 +198,10 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/game/music.ts',
-    // Re-pinned for the Proving Shore dawn-cue merge: the zone wiring lands in
-    // the coordinator while the themes live in music_themes_proving_shore.ts;
-    // exact merged count.
-    ceiling: 5076,
+    // Re-pinned for the Proving Shore dawn-cue merge, then again when the
+    // final render replaced the composed themes with a supplied stream-only
+    // track; exact merged count.
+    ceiling: 5064,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {

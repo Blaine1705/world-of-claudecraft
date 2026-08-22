@@ -479,14 +479,29 @@
     font-weight: 600;
     color: var(--gold-dim);
   }
-  /* Ferryman Odo's caption row (bootcamp.ts showCaption): the on-screen half
-     of a guide voice line, shown under the card body for a few seconds. */
+  /* Ferryman Odo's caption (bootcamp.ts showCaption): the on-screen half of a
+     guide voice line, up for a few seconds at a time. It used to be a row
+     inside the coach card; with the card gone it fell back to document flow
+     and landed in the top-left corner (CX: "why is the narrator's voice up in
+     the top left lol"). It is a subtitle, so it sits where subtitles sit:
+     low-center, above the movement bubble, clear of the unit frames. */
   .tut-voice {
-    margin-top: 8px;
-    font-size: 13px;
+    position: absolute;
+    left: 50%;
+    bottom: 33%;
+    transform: translateX(-50%);
+    max-width: min(46rem, 76vw);
+    text-align: center;
+    text-wrap: balance;
+    pointer-events: none;
+    font-size: 15px;
     font-style: italic;
-    line-height: 1.4;
+    line-height: 1.45;
     color: var(--gold-dim);
+    text-shadow:
+      0 2px 6px #000,
+      0 0 14px #000c;
+    z-index: 20;
   }
   /* The bootcamp card's on-screen keycap chips (bootcamp.ts): the physical
      keys the current lesson asks for, drawn as caps under the body copy. */
@@ -695,6 +710,51 @@
       rgba(255, 184, 68, 0) 100%
     );
   }
+  /* Straight behind the camera: BOTH edges, which reads as "turn around".
+     A single edge here is a coin toss on a mirrored projection, and it tells
+     a player who is facing exactly backwards to turn one particular way when
+     either way is equally right (CX). */
+  .tut-objective-glow.tut-glow-behind {
+    background-position:
+      left center,
+      right center;
+    background-size:
+      22% 100%,
+      22% 100%;
+    background-image:
+      linear-gradient(
+        to right,
+        rgba(255, 208, 112, 0.98),
+        rgba(255, 184, 68, 0.42) 42%,
+        rgba(255, 184, 68, 0) 100%
+      ),
+      linear-gradient(
+        to left,
+        rgba(255, 208, 112, 0.98),
+        rgba(255, 184, 68, 0.42) 42%,
+        rgba(255, 184, 68, 0) 100%
+      );
+  }
+  /* The death lesson dims the Keeper's paid revive so the free corpse walk
+     it is teaching is the obvious one. Still clickable: a player who wants
+     to pay may, this only takes it out of the eye's path. */
+  .bc-dimmed {
+    opacity: 0.35;
+    filter: grayscale(0.8);
+  }
+  /* The interface lessons (bags, character sheet) have no world direction:
+     the answer is the row of buttons along the bottom, so the bloom sits
+     there instead of past a side edge. */
+  .tut-objective-glow.tut-glow-bottom {
+    background-position: center bottom;
+    background-size: 100% 24%;
+    background-image: linear-gradient(
+      to top,
+      rgba(255, 208, 112, 0.98),
+      rgba(255, 184, 68, 0.42) 42%,
+      rgba(255, 184, 68, 0) 100%
+    );
+  }
   /* A player who has asked for less motion still gets the cue; it simply
      appears rather than easing in. */
   @media (prefers-reduced-motion: reduce) {
@@ -748,6 +808,15 @@
     }
     50% {
       opacity: 1;
+    }
+  }
+  /* Phones: the caption rides higher, clear of the touch sticks and the
+     movement bubble, and gives up a little width to the narrower screen. */
+  @media (max-width: 720px) {
+    .tut-voice {
+      bottom: 42%;
+      max-width: 86vw;
+      font-size: 13px;
     }
   }
   @media (prefers-reduced-motion: reduce) {

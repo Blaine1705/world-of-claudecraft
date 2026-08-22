@@ -60,6 +60,7 @@ import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { usePassingStone } from './tutorial/death_lesson';
 import {
   ALL_EQUIP_SLOTS,
   CONSUME_DURATION,
@@ -769,6 +770,10 @@ export function useItem(
   }
   if (def.use?.type === 'summon') {
     useBrinyLure(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'passingStone') {
+    usePassingStone(ctx, p, meta);
     return;
   }
   if (def.kind === 'food' || def.kind === 'drink') {

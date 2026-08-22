@@ -11,6 +11,7 @@ import { EXTRA_LINES } from '../scripts/voices/extra_lines.mjs';
 import { CLIMB_MIN_OVERHEAD } from '../src/sim/climb';
 import { MANTLE_REACH } from '../src/sim/colliders';
 import {
+  BOOTCAMP_COURSE_CHECKPOINTS,
   PROVING_SHORE_NPCS,
   PROVING_SHORE_PROPS,
   PROVING_SHORE_QUESTS,
@@ -25,14 +26,21 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 import { BELL_STEP_TARGET } from '../src/ui/bootcamp_view';
 import {
   BOOTCAMP_PARKOUR,
+  CORNER_ASK_YD,
   type CoachPromptEntity,
+  coachGlowBagItemId,
   coachPromptChip,
   coachPromptInRange,
   coachPromptPlan,
   GUIDE_VOICE_LINES,
+  JUMP_PROMPT_RANGE,
   nearestCrate,
+  POUCH_ITEM_ID,
+  POUCH_QUEST_ID,
   PROMPT_NPC_RANGE,
   PROMPT_OBJECT_RANGE,
+  pouchLessonActive,
+  turnAskOwnsBubble,
 } from '../src/ui/coach_prompt_view';
 import { en } from '../src/ui/i18n.catalog';
 
@@ -211,10 +219,54 @@ describe('coachPromptPlan: which target carries the bubble', () => {
     // the loot (the pearl is on it), never a re-summon over its shell.
     const corpse = plan({ focus, entities: [{ ...boss, dead: true }] });
     expect(corpse!.kind).toBe('interact');
-    expect(corpse!.verbKey).toBe('hudChrome.bootcamp.promptPickUp');
+    // Names the prize, not the generic "Pick up": a new player standing on
+    // a corpse needs to know it still owes them something (CX).
+    expect(corpse!.verbKey).toBe('hudChrome.bootcamp.promptLootPearl');
     expect({ x: corpse!.x, z: corpse!.z }).toEqual(boss.pos);
     // Corpse gone (despawned unlooted): the lure ask returns for the retry.
     expect(plan({ focus, entities: [] })!.kind).toBe('use');
+  });
+
+  it('finds the corpse when handed the LIVE one-shot entity iterator', () => {
+    // The shipped bug (CX: "still doesn't tell me to loot Mister Crabs to
+    // pick up the quest item. This is key."). Every fixture above passes an
+    // array, which can be walked twice; the real caller passes
+    // world.entities.values(), a Map iterator that is spent after ONE walk.
+    // The live-boss scan drained it, so the corpse scan behind it saw an
+    // empty world and the bubble fell through to "B Summon" while two
+    // Mister Crabs corpses lay in frame. Anything re-scanning args.entities
+    // has the same hole, so the fix materializes once inside the plan.
+    const focus = { questId: 'q_ps_mother_of_pearl', state: 'active' as const };
+    const corpse: CoachPromptEntity = {
+      id: nextId++,
+      kind: 'mob',
+      templateId: 'mister_crabs',
+      dead: true,
+      pos: { x: CRAB_SUMMON_SITE.x, z: CRAB_SUMMON_SITE.z + 3 },
+    };
+    const world = new Map<number, CoachPromptEntity>([[corpse.id, corpse]]);
+    const p = coachPromptPlan({
+      bellPhase: false,
+      step: null,
+      focus,
+      entities: world.values(),
+      playerPos: corpse.pos,
+    });
+    expect(p!.verbKey).toBe('hudChrome.bootcamp.promptLootPearl');
+    expect({ x: p!.x, z: p!.z }).toEqual(corpse.pos);
+  });
+
+  it('shows the loot ask at LOOT reach, not the fight reach it came from', () => {
+    // The second half of the same lesson failing: corpse loot is gated on
+    // INTERACT_RANGE, so keeping the kill bubble's 12 yards would put "Loot
+    // the pearl" on screen from seven yards out of reach and teach a
+    // first-timer that pressing the button does nothing.
+    const focus = { questId: 'q_ps_mother_of_pearl', state: 'active' as const };
+    const corpse = mob('mister_crabs', CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z, true);
+    const p = plan({ focus, entities: [corpse] })!;
+    expect(p.range).toBe(PROMPT_OBJECT_RANGE);
+    expect(coachPromptInRange(p, { x: corpse.pos.x + 4, z: corpse.pos.z })).toBe(true);
+    expect(coachPromptInRange(p, { x: corpse.pos.x + 9, z: corpse.pos.z })).toBe(false);
   });
 
   it('asks for the hurdle jump, then the crate step, then goes quiet', () => {
@@ -353,5 +405,82 @@ describe('coachPromptChip: one chip per input family', () => {
 
   it('hides the chip when the interact action is unbound', () => {
     expect(coachPromptChip('keyboard', '')).toEqual({ chip: null, chipIsKey: true });
+  });
+});
+
+describe('turnAskOwnsBubble: the corner keeps its own instruction', () => {
+  // The CX report: at the first checkpoint the CARD said "D then W" but the
+  // loud floating bubble went straight to "Jump", because lane 2's hurdle
+  // sits inside the jump ask's range of that very checkpoint. Lane 3 has no
+  // obstacle, which is exactly why it read correctly and lane 2 did not.
+  const cps = BOOTCAMP_COURSE_CHECKPOINTS;
+
+  it('holds the bubble while the player stands at the corner just tagged', () => {
+    const corner = cps[0];
+    expect(turnAskOwnsBubble(1, { x: corner.x, z: corner.z }, cps)).toBe(true);
+    expect(turnAskOwnsBubble(1, { x: corner.x, z: corner.z - CORNER_ASK_YD + 1 }, cps)).toBe(true);
+  });
+
+  it('hands over once the player has run on toward the obstacle', () => {
+    const corner = cps[0];
+    expect(turnAskOwnsBubble(1, { x: corner.x, z: corner.z - CORNER_ASK_YD - 1 }, cps)).toBe(false);
+  });
+
+  it('hands over well before the hurdle, never fighting the jump ask for it', () => {
+    // The whole point of sizing it under the jump range: both asks get their
+    // own stretch of lane instead of flickering against each other.
+    expect(CORNER_ASK_YD).toBeLessThan(JUMP_PROMPT_RANGE);
+  });
+
+  it('owns nothing before the first checkpoint is tagged', () => {
+    expect(turnAskOwnsBubble(0, { x: cps[0].x, z: cps[0].z }, cps)).toBe(false);
+  });
+
+  it('tracks the SECOND corner once that one is tagged', () => {
+    const second = cps[1];
+    expect(turnAskOwnsBubble(2, { x: second.x, z: second.z }, cps)).toBe(true);
+    // ...and not the first one any more.
+    expect(turnAskOwnsBubble(2, { x: cps[0].x, z: cps[0].z }, cps)).toBe(false);
+  });
+
+  it('is safe past the end of the checkpoint list', () => {
+    expect(turnAskOwnsBubble(99, { x: 0, z: 0 }, cps)).toBe(false);
+  });
+});
+
+describe('pouchLessonActive: the buckle-on lesson knows when it is over', () => {
+  // CX round 10: "what is up with the quest 'Pouch and Purse', gold trim is
+  // always at the bottom here, no matter what". The lesson keyed on the
+  // quest STATE alone, and 'ready' holds from the moment the pouch is bought
+  // until it is handed back, so the bottom bloom and the pulsing bag stack
+  // both stayed up long after the pouch was on. The end of the lesson is the
+  // pouch being WORN, not the quest being turned in.
+  const ready = { questId: POUCH_QUEST_ID, state: 'ready' as const };
+  const empty: (string | null)[] = [null, null, null, null];
+
+  it('is on while the bought pouch is still sitting in the bags', () => {
+    expect(pouchLessonActive(ready, empty)).toBe(true);
+    expect(coachGlowBagItemId(ready, empty)).toBe(POUCH_ITEM_ID);
+  });
+
+  it('is OFF the moment the pouch is socketed, quest still un-handed-in', () => {
+    const worn = [POUCH_ITEM_ID, null, null, null];
+    expect(pouchLessonActive(ready, worn)).toBe(false);
+    expect(coachGlowBagItemId(ready, worn)).toBeNull();
+  });
+
+  it('ignores any other bag in a socket', () => {
+    expect(pouchLessonActive(ready, ['travelers_knapsack', null, null, null])).toBe(true);
+  });
+
+  it('is off before the pouch is bought, when the lesson is the vendor', () => {
+    expect(pouchLessonActive({ questId: POUCH_QUEST_ID, state: 'active' }, empty)).toBe(false);
+  });
+
+  it('is off for every other station, and for no station at all', () => {
+    expect(pouchLessonActive({ questId: 'q_ps_the_wreck_line', state: 'ready' }, empty)).toBe(
+      false,
+    );
+    expect(pouchLessonActive(null, empty)).toBe(false);
   });
 });

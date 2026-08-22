@@ -5,7 +5,7 @@
 // exactly when the coach is pointing at it.
 
 import { describe, expect, it } from 'vitest';
-import { CLASSES } from '../src/sim/content/classes';
+import { ABILITIES, CLASSES } from '../src/sim/content/classes';
 import { PROVING_SHORE_QUESTS } from '../src/sim/content/proving_shore';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -106,12 +106,33 @@ describe('creditAbilityDrill', () => {
     expect(qp.counts[0]).toBe(0);
   });
 
-  it("ignores an ability that is not THIS class's taught attack", () => {
+  it('accepts ANY attack, not just the one the coach happens to name', () => {
+    // Deliberately wide. Keying on the taught id alone broke the warrior in
+    // a real playthrough (onNextSwing lands elsewhere), and would break any
+    // talent action-replacement or a player who dinged mid-drill.
     const sim = makeSim('mage');
     const qp = seedActiveDrill(sim);
     const p = sim.entities.get(sim.playerId)!;
-    // A real ability, and a real damage ability, but a warrior's.
     creditAbilityDrill(sim.ctx, p, effigy(), 'heroic_strike');
+    expect(qp.counts[0]).toBe(1);
+  });
+
+  it('still ignores a heal or a buff pressed at the effigy', () => {
+    // The lesson is "use an ATTACK instead of a plain swing", so a paladin
+    // healing themselves in the yard must not tick it along.
+    const sim = makeSim('paladin');
+    const qp = seedActiveDrill(sim);
+    const p = sim.entities.get(sim.playerId)!;
+    creditAbilityDrill(sim.ctx, p, effigy(), 'holy_light');
+    creditAbilityDrill(sim.ctx, p, effigy(), 'battle_shout');
+    expect(qp.counts[0]).toBe(0);
+  });
+
+  it('ignores an unknown ability id rather than crediting it', () => {
+    const sim = makeSim('mage');
+    const qp = seedActiveDrill(sim);
+    const p = sim.entities.get(sim.playerId)!;
+    creditAbilityDrill(sim.ctx, p, effigy(), 'no_such_ability');
     expect(qp.counts[0]).toBe(0);
   });
 
@@ -262,6 +283,47 @@ describe('the live damage path credits the drill', () => {
     expect(swings, 'the autoattack never landed a swing').toBeGreaterThan(0);
     // It has been swinging the whole time; the drill wants the OTHER button,
     // so the count is still zero.
+    expect(qp.counts[0]).toBe(0);
+  });
+});
+
+describe('the on-next-swing path credits too', () => {
+  // The bug this suite missed the first time. A warrior's Reaver Strike is
+  // onNextSwing: it QUEUES, and its damage lands through the auto-attack
+  // swing (combat/auto_attack.ts), never through runEffects where the other
+  // credit site lives. The mage test above passed the whole time while the
+  // warrior's drill sat at 0/3 in a real playthrough.
+  it('a warrior queueing Reaver Strike moves the count when the swing lands', () => {
+    const sim = makeSim('warrior');
+    const qp = seedActiveDrill(sim);
+    const p = standInRing(sim);
+    const target = spawnEffigy(sim, 90201, p.pos.x + 1, p.pos.z);
+    sim.targetEntity(target.id);
+    const taught = startingAttackFor('warrior').abilityId!;
+    expect(ABILITIES[taught].onNextSwing, 'the premise: it queues').toBe(true);
+
+    // The yard's rage loan runs on the tick sweep, so the queue can afford it.
+    for (let i = 0; i < 400 && qp.counts[0] === 0; i++) {
+      if (!p.queuedOnSwing) sim.castAbility(taught);
+      sim.tick();
+    }
+    expect(qp.counts[0]).toBeGreaterThan(0);
+  });
+
+  it('a plain warrior swing still credits nothing', () => {
+    const sim = makeSim('warrior');
+    const qp = seedActiveDrill(sim);
+    const p = standInRing(sim);
+    const target = spawnEffigy(sim, 90202, p.pos.x + 1, p.pos.z);
+    sim.targetEntity(target.id);
+    sim.startAutoAttack();
+    let swings = 0;
+    for (let i = 0; i < 200; i++) {
+      for (const ev of sim.tick()) {
+        if (ev.type === 'damage' && ev.sourceId === p.id && ev.targetId === target.id) swings++;
+      }
+    }
+    expect(swings, 'the autoattack never landed').toBeGreaterThan(0);
     expect(qp.counts[0]).toBe(0);
   });
 });

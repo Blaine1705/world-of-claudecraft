@@ -52,11 +52,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
     '走到一個草人跟前，按下目標鍵把它設為目標。然後按下第二個動作鍵，施放你的法術。一直施放到一個散架為止。',
   'hudChrome.bootcamp.taskShellBodyCaster':
-    '掠蟹是會回擊的。用滑鼠左鍵點擊一隻，把牠設為目標，然後按 {attackKey} 施放法術，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+    '掠蟹是會回擊的。用滑鼠左鍵點擊一隻，把牠設為目標，然後按 {abilityKey} 使用{ability}，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
   'hudChrome.bootcamp.taskShellBodyCasterTouch':
-    '掠蟹是會回擊的。點按一隻把牠設為目標，然後點按動作列上的第二個按鈕施放法術，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+    '掠蟹是會回擊的。點擊一隻把牠設為目標，然後點擊動作列上的{ability}，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
   'hudChrome.bootcamp.taskShellBodyCasterPad':
-    '掠蟹是會回擊的。按下目標鍵，再按下第二個動作鍵施放法術，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+    '掠蟹是會回擊的。把一隻設為目標，然後按放著{ability}的動作按鈕，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
   'hudChrome.bootcamp.voiceGraduate': '鐘為你敲響了。海那頭的東溪正等著你，你也準備好了。',
   'hudChrome.bootcamp.voiceVeerOff': '慢著，朋友，走反了。金色路徑在你身後呢。',
   'hudChrome.bootcamp.voiceStationDoneB': '你越來越上手了，錯不了。',
@@ -12823,10 +12823,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '點擊一個草人把它設為目標，然後點擊動作列上的{ability}。那是你自己的本事，不是隨手一揮。命中三次。',
   'hudChrome.bootcamp.taskHoneBodyPad':
     '把一個草人設為目標，然後按放著{ability}的動作按鈕。那是你自己的本事，不是隨手一揮。命中三次。',
+  'hudChrome.bootcamp.promptOpenBags': '打開背包',
+  'hudChrome.bootcamp.promptCharacterSheet': '打開角色面板',
+  'hudChrome.bootcamp.promptLookAround': '按住右鍵拖曳來環視四周',
   'hudChrome.bootcamp.promptKneel':
     '跪下',
   'hudChrome.bootcamp.taskLongWalkBody':
-    '沿著海岸路往南走到往生石前，按 {interactKey} 跪下。這裡沒有任何東西能傷到你，這麼做也不會讓你損失什麼。',
+    '按 {bagsKey} 打開背包，然後點擊往生石。它會讓你就地倒下。這裡沒有任何東西能傷到你，這麼做也不會讓你損失什麼。',
   'hudChrome.bootcamp.taskLongWalkBodyTouch':
     '沿著海岸路往南走到往生石前，點擊它跪下。這裡沒有任何東西能傷到你，這麼做也不會讓你損失什麼。',
   'hudChrome.bootcamp.taskLongWalkBodyPad':
@@ -12843,14 +12846,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你現在是幽魂，沒有東西碰得到你。你的屍體在地圖上有標記：走回去，靠近之後就會出現在屍體處復活的按鈕。點擊它，你就完好如初，沒有任何懲罰。',
   'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
     '你現在是幽魂，沒有東西碰得到你。你的屍體在地圖上有標記：走回去，靠近之後就會出現在屍體處復活的按鈕。選擇它，你就完好如初，沒有任何懲罰。',
+  'hudChrome.bootcamp.promptLootPearl':
+    '拾取珍珠',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '走到一個草人跟前，按下目標鍵把它設為目標。然後按下第一個動作鍵，揮出這一刀。一直打到一個散架為止。',
   'hudChrome.bootcamp.taskShellBody':
-    '掠蟹是會回擊的。用滑鼠左鍵點擊一隻，把牠設為目標，然後按 {attackKey} 揮刀，不停攻擊。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+    '掠蟹是會回擊的。用滑鼠左鍵點擊一隻，把牠設為目標，然後按 {abilityKey} 使用{ability}，不停攻擊。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
   'hudChrome.bootcamp.taskShellBodyTouch':
-    '掠蟹是會回擊的。點按一隻把牠設為目標，然後點按動作列上的第一個按鈕揮刀。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+    '掠蟹是會回擊的。點擊一隻把牠設為目標，然後點擊動作列上的{ability}。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
   'hudChrome.bootcamp.taskShellBodyPad':
-    '掠蟹是會回擊的。按下目標鍵，再按下第一個動作鍵揮刀。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+    '掠蟹是會回擊的。把一隻設為目標，然後按放著{ability}的動作按鈕。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
   'hudChrome.bootcamp.taskWreckLineBody':
     '漂流貨箱沿著通往晨憩營地的小路一路排開。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊貨箱，把它撿起來。湊滿六只，這批海貨就齊了。',
   'hudChrome.bootcamp.taskWreckLineBodyTouch':
@@ -12930,7 +12935,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_strike_true.objectives.0.label': '擊倒訓練草人',
   'entities.quests.q_ps_shell_and_claw.title': '甲殼與利螯',
   'entities.quests.q_ps_shell_and_claw.text':
-    '稻草從不計較，{playerName}，所以給你找個計較的。灘塗掠蟹正在遠灘的沉船灘上翻揀殘骸：從我的練武場沿小路向西走，它會一直把你領到牠們跟前。牠們會夾回來，所以盯著你的生命條，別停下揮刀：用 Tab 或滑鼠左鍵選定一隻，按 1，打到牠的殼裂開為止。三隻就夠。然後沿路爬上北邊的坡：守潮人奈爾管著海灘的帳，你的蟹殼她都記數。',
+    '稻草從不計較，{playerName}，所以給你找個計較的。灘塗掠蟹正在遠灘的沉船灘上翻揀殘骸：從我的練武場沿小路向西走，它會一直把你領到牠們跟前。牠們會夾回來，所以盯著你的生命條，別停下揮刀：用滑鼠左鍵選定一隻，然後使用校場教你的那個技能，打到牠的殼裂開為止。三隻就夠。然後沿路爬上北邊的坡：守潮人奈爾管著海灘的帳，你的蟹殼她都記數。',
   'entities.quests.q_ps_shell_and_claw.completion':
     '敲開三隻殼，十根手指一根沒少：頭一仗打得不賴，{playerName}。掠蟹從殘骸裡夾走東西的速度，比潮水送來的還快，所以你每除掉一隻，就有人多保住一枚銅板。',
   'entities.quests.q_ps_shell_and_claw.objectives.0.label': '除滅灘塗掠蟹',
@@ -12946,6 +12951,24 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_pouch_and_purse.completion':
     '好袋子。要是還沒繫上，現在就繫：按 B 打開背包，用滑鼠左鍵點擊小袋，把它繫進一個空著的袋扣，多出的六格就歸你裝麻煩了。接下來是任何袋子都裝不下的另一半課，{playerName}：背不下的，交給鍍金保險箱。司庫威克的保險箱桌就設在西邊沿路而上的地方，他為你打開的正是每座城鎮每位司庫共用的同一座金庫；等你的錢袋鼓起來，還能購買更多金庫空間。貴重的存進金庫，袋子留出空當。塞滿的行囊斷送過的冒險，比任何狼都多。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '購買亞麻小袋',
+  'entities.quests.q_ps_hone_the_edge.title':
+    '磨利鋒刃',
+  'entities.quests.q_ps_hone_the_edge.text':
+    '揮砍就只是揮砍，{playerName}，草人能挨上一整天，可那贏不來任何東西。看看螢幕下方那一排按鈕：那一排才是你的本事，每一個都能做到你光靠胳膊做不到的事。你已經有一個了。回到草人跟前用出來：選好目標，按下這座校場為你標出的那個按鈕，做滿三次。別只是亂砍草垛，要真正把你會的那一手打出來。做完就回來找我。',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    '現在你是在戰鬥，而不是在瞎揮了。那一排會隨著你每升一級變長，{playerName}，活得最久的，永遠是會讀那一排的人。草人不在乎你用了哪個按鈕。山谷會在乎。',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    '對草人命中技能',
+  'entities.quests.q_ps_the_long_walk.title':
+    '漫長的歸途',
+  'entities.quests.q_ps_the_long_walk.text':
+    '只剩最後一課了，{playerName}，而這一課我說不明白：你得親自經歷一次。你在外頭一定會死。誰都會死，而那並不是任何事情的終點。拿上這塊往生石。按 B 打開背包，用滑鼠左鍵點它，它就會讓你在原地倒下。接著照螢幕上的指示做：釋放靈魂，走回你自己的屍體，再走進去。屍體會等著你，那段路不要錢，走完它你什麼也不會失去。',
+  'entities.quests.q_ps_the_long_walk.completion':
+    '你就這樣回來了，一點沒少。記住那種感覺，{playerName}，因為下一次會牽扯到獠牙，而且沒人站在旁邊給你解釋。屍體會等著你，那段路不要錢，死亡真正拿走的，只有你走回來的那點時間。',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    '從死亡中走了回來',
+  'entities.items.ps_passing_stone.name':
+    '往生石',
   'entities.quests.q_ps_the_signpost.title': '風中傳信',
   'entities.quests.q_ps_the_signpost.text':
     '還剩最後一個習慣要學，{playerName}，而且用不著刀劍：讀告示板。公會告示柱就立在營地大門口，離我的篝火西南邊幾步遠，公會和過路的隊伍都把召集令貼在上面。走到柱面跟前，按 F，或用滑鼠左鍵點擊它，讀一讀貼著的內容，然後回來告訴我風裡捎來了什麼。你今後走進的每一座城鎮，都立著一塊這樣的告示板。',

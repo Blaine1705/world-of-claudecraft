@@ -43,10 +43,12 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   garden: '/audio/music/garden.mp3?v=9ec0e18f6d81',
   gale: '/audio/music/gale.mp3?v=a940defc3275',
   farshore: '/audio/music/farshore.mp3?v=69d713cd3f3c',
-  // The tutorial island's dawn cue, candidate A of the three composed for the
-  // Proving Shore (music_themes_proving_shore.ts); the alternate candidate
-  // renders live under docs/music/proving-shore-candidates/ for audition.
-  proving_shore: '/audio/music/proving_shore.mp3?v=1e84b5a83d79',
+  // The tutorial island's own cue ("A First Light at Dawnrest"). The one
+  // supplied track with NO composed counterpart in buildMusicThemes(): it was
+  // written for the island rather than remastered from the procedural score,
+  // so the music editor and scripts/render_music.mjs do not know about it.
+  // That is deliberate, not a missing theme; the runtime only ever streams.
+  proving_shore: '/audio/music/proving_shore.mp3?v=485a6985c03b',
   dungeon_hollow_crypt: '/audio/music/dungeon_hollow_crypt.mp3?v=4bb48c2d90fc',
   dungeon_sunken_bastion: '/audio/music/dungeon_sunken_bastion.mp3?v=db67d7df0f4b',
   dungeon_gravewyrm_sanctum: '/audio/music/dungeon_gravewyrm_sanctum.mp3?v=19f49e28f3af',

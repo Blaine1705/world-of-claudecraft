@@ -16,7 +16,7 @@ import {
   LURE_ITEM_ID,
 } from '../src/sim/interactions/crab_summon';
 import { Sim } from '../src/sim/sim';
-import type { Entity, SimEvent } from '../src/sim/types';
+import { ALL_CLASSES, type Entity, type SimEvent } from '../src/sim/types';
 
 const PEARL_ITEM_ID = 'ps_lustrous_pearl';
 const RING_ITEM_ID = 'mother_of_pearl';
@@ -209,16 +209,16 @@ describe('the Mother of Pearl chain in a real sim', () => {
 
   it('pins the anti-grief and reward wiring on the content records', () => {
     // Only quest holders can damage him (nobody can grief a summon), the
-    // pearl drops for quest holders only, and every class archetype is paid
-    // the same ring.
+    // pearl drops for quest holders only, and EVERY class is paid the same
+    // ring. Not three archetypes: the ring is the island's keepsake and the
+    // vehicle for its equip lesson, so a paladin or a druid used to finish
+    // the detour, be told to slide it on, and have no ring to slide.
     expect(MOBS[CRAB_MOB_ID].requiresQuestId).toBe(CRAB_QUEST_ID);
     const pearlEntry = (MOBS[CRAB_MOB_ID].loot ?? []).find((l) => l.itemId === PEARL_ITEM_ID);
     expect(pearlEntry).toMatchObject({ chance: 1, questId: CRAB_QUEST_ID });
-    expect(QUESTS[CRAB_QUEST_ID].itemRewards).toEqual({
-      warrior: RING_ITEM_ID,
-      rogue: RING_ITEM_ID,
-      mage: RING_ITEM_ID,
-    });
+    expect(QUESTS[CRAB_QUEST_ID].itemRewards).toEqual(
+      Object.fromEntries(ALL_CLASSES.map((cls) => [cls, RING_ITEM_ID])),
+    );
     expect(QUESTS[CRAB_QUEST_ID].requiredItems).toEqual([LURE_ITEM_ID]);
   });
 });

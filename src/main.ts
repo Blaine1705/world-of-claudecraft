@@ -376,11 +376,7 @@ import {
 } from './ui/auth_utils';
 import { BreathBar } from './ui/breath_bar';
 import { assembleBugReportMeta } from './ui/bug_report';
-import {
-  cameraPromptOpen,
-  dismissCameraPrompt,
-  maybeShowFirstRunCameraPrompt,
-} from './ui/camera_prompt';
+import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
 import { loadCharselectNews } from './ui/charselect_news';
@@ -2217,7 +2213,6 @@ async function startGame(
       return;
     }
     if (id === 'escape') {
-      if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
       return;
@@ -5204,13 +5199,6 @@ async function startGame(
           // 4 GB-class tight profile still skips the secondary contexts
           // entirely and keeps their documented lazy first-open path.
           if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();
-          // First-run camera-mode prompt (issue #1727): show once per browser on a
-          // mouse-driven interface, after any spawn cinematic has finished. Applies
-          // the choice through the same applySetting path as the Key Bindings toggle.
-          maybeShowFirstRunCameraPrompt({
-            applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
-            isBlocked: () => intro !== null,
-          });
           (
             window as Window &
               typeof globalThis & {

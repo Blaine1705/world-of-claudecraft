@@ -1,105 +1,92 @@
-// "You are facing the wrong way": a golden bloom down one edge of the screen
-// pointing at the objective the coach is currently asking for.
+// "The thing you want is off that edge": a golden bloom down one side of the
+// screen, shown ONLY while the current objective is entirely off-screen.
 //
-// The island already paints a golden ground ribbon toward the next station
-// (render/coach_trail_core.ts), but a ribbon is only useful once you are
-// LOOKING at it. New players turn the camera away and then have nothing to
-// steer by, which is what the CX pass caught. This is the affordance for
-// exactly that moment: turn toward the objective and the glow fades out on
-// its own, so the cue teaches the correction rather than nagging about it.
+// The first cut of this keyed on a bearing dead zone, and was wrong twice
+// over (CX): it lit up while the objective was plainly visible on screen,
+// and it sometimes lit the wrong edge, because a bearing measured against
+// the compass rose is not the same thing as where the camera actually
+// projects a point. This version asks the renderer where the objective
+// LANDS on screen and answers from that, so the cue can only appear when
+// there is genuinely nothing to look at, and can only point the way the
+// pixels went.
 //
-// Bearings, not projection: the objective can be behind the camera, where
-// worldToScreen's x is meaningless, so the side is decided from the angle
-// between where the view points and where the objective lies. The convention
-// is compass.ts's, reused rather than re-derived: facing 0 = +Z = north,
-// turning right DECREASES facing, and angleDelta > 0 means "to the right".
-//
-// Pure: no DOM, no Three, no wall clock, no rng. Registered in UI_PURE_CORES
-// (tests/architecture.test.ts); driven directly by
-// tests/objective_glow_view.test.ts. The thin painter is bootcamp.ts.
+// Pure: no DOM, no Three, no wall clock, no rng. The caller does the
+// projection (renderer.worldToScreen) and hands in the result, which is what
+// keeps this testable. Registered in UI_PURE_CORES
+// (tests/architecture.test.ts); driven by tests/objective_glow_view.test.ts.
 
-import { bearingDegrees } from './compass';
-
-export type GlowSide = 'left' | 'right';
+export type GlowSide = 'left' | 'right' | 'behind' | 'bottom';
 
 export interface ObjectiveGlowPlan {
-  /** Which edge blooms: the side the player has to turn TOWARD. */
+  /** Which edge blooms: the side the player has to turn TOWARD, or 'behind'
+   *  for BOTH side edges at once. */
   side: GlowSide;
-  /** 0 (just past the dead zone) to 1 (the objective is behind them). */
+  /** 0 (just past the edge) to 1 (fully away). */
   intensity: number;
 }
 
-/**
- * How far off-centre the objective may sit before the glow starts.
- *
- * A player is not "facing the wrong way" merely because the objective is not
- * dead centre: at a 60 degree horizontal field of view anything inside about
- * 30 degrees is already on screen. 40 leaves a margin past that, so walking
- * a curved path never strobes the edge.
- */
-export const GLOW_ONSET_DEG = 40;
+/** A projected objective, the shape renderer.worldToScreen returns. */
+export interface ProjectedObjective {
+  x: number;
+  y: number;
+  /** True when the point is behind the camera plane, where x and y are
+   *  mirrored nonsense and must not be read as a position. */
+  behind: boolean;
+}
 
-/**
- * Where the glow reaches full strength. Past 140 degrees the objective is
- * behind the player's shoulder and no amount of squinting will find it, so
- * that is the loudest the cue ever needs to be.
- */
-export const GLOW_FULL_DEG = 140;
-
-/** Signed shortest angular distance b-a in degrees, wrapped to (-180, 180].
- *  Positive means b lies to the RIGHT of a (compass.ts's convention). */
-function angleDelta(a: number, b: number): number {
-  let d = ((b - a + 540) % 360) - 180;
-  if (d <= -180) d += 360;
-  return d;
+export interface Viewport {
+  width: number;
+  height: number;
 }
 
 /**
- * The facing that would point from `from` at `to`.
- *
- * Facing 0 is +Z and turning right decreases it, so a target at +X (due east,
- * bearing 90) has to come out as -PI/2. That is atan2(-dx, dz), NOT the
- * atan2(dx, dz) a camera-space derivation would give.
+ * How far past the viewport edge the objective must sit before the cue
+ * starts. A small margin, so an objective hugging the edge does not flicker
+ * the bloom on and off as the player walks.
  */
-export function facingToward(from: { x: number; z: number }, to: { x: number; z: number }): number {
-  return Math.atan2(-(to.x - from.x), to.z - from.z);
-}
+export const OFFSCREEN_MARGIN_PX = 24;
+
+/** How far past the edge the bloom reaches full strength, as a fraction of
+ *  viewport width. Anything behind the camera is full strength outright. */
+export const FULL_INTENSITY_FRAC = 0.5;
 
 /**
- * The glow for this view, or null while the player is looking near enough at
- * the objective (including standing on top of it, where there is no
- * meaningful direction to point).
+ * The glow for this frame, or null while the objective is on screen.
  *
- * `viewFacing` is the CAMERA's facing, not the character's: a player can run
- * one way while looking another, and the cue is about what they can see.
+ * `behind` is its own answer, not a side. A point behind the camera projects
+ * to a MIRRORED x, so reading it as a left/right edge is guesswork on a
+ * value that means nothing; worse, it tells a player who has turned right
+ * around to keep turning one particular way when either way is equally
+ * correct and one of them is a longer turn. CX put it plainly: the cue "still
+ * isn't working when it's behind my character, it sticks to left and right
+ * side". So behind blooms BOTH side edges, which reads as "turn around" and
+ * cannot point the wrong way.
  */
-export function objectiveGlowPlan(
-  viewFacing: number,
-  objectiveFacing: number,
+export function objectiveGlowFromScreen(
+  screen: ProjectedObjective,
+  viewport: Viewport,
 ): ObjectiveGlowPlan | null {
-  if (!Number.isFinite(viewFacing) || !Number.isFinite(objectiveFacing)) return null;
-  const delta = angleDelta(bearingDegrees(viewFacing), bearingDegrees(objectiveFacing));
-  const off = Math.abs(delta);
-  if (off <= GLOW_ONSET_DEG) return null;
-  const span = GLOW_FULL_DEG - GLOW_ONSET_DEG;
-  const intensity = Math.min(1, (off - GLOW_ONSET_DEG) / span);
-  return { side: delta > 0 ? 'right' : 'left', intensity };
+  if (!Number.isFinite(screen.x) || viewport.width <= 0) return null;
+
+  if (screen.behind) return { side: 'behind', intensity: 1 };
+
+  const offLeft = -screen.x - OFFSCREEN_MARGIN_PX;
+  const offRight = screen.x - viewport.width - OFFSCREEN_MARGIN_PX;
+  // On screen (or within the margin): nothing to point at, so no cue.
+  if (offLeft < 0 && offRight < 0) return null;
+
+  const past = Math.max(offLeft, offRight);
+  const full = viewport.width * FULL_INTENSITY_FRAC;
+  const intensity = full > 0 ? Math.min(1, past / full) : 1;
+  return { side: offLeft > offRight ? 'left' : 'right', intensity };
 }
 
 /**
- * The same decision from world positions, the shape the painter actually
- * has. Null when the player is standing essentially on the objective, where
- * the bearing is noise and an edge would flicker as they shuffle.
+ * Is the coach's current instruction about the INTERFACE rather than a place?
+ *
+ * The bag and character-sheet lessons have no world direction, so they bloom
+ * the BOTTOM, where those buttons live.
  */
-export const GLOW_MIN_DISTANCE_YD = 3;
-
-export function objectiveGlowPlanAt(
-  viewFacing: number,
-  playerPos: { x: number; z: number },
-  objective: { x: number; z: number },
-): ObjectiveGlowPlan | null {
-  const dx = objective.x - playerPos.x;
-  const dz = objective.z - playerPos.z;
-  if (Math.hypot(dx, dz) < GLOW_MIN_DISTANCE_YD) return null;
-  return objectiveGlowPlan(viewFacing, facingToward(playerPos, objective));
+export function uiLessonGlow(): ObjectiveGlowPlan {
+  return { side: 'bottom', intensity: 1 };
 }

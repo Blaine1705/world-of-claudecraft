@@ -342,8 +342,12 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
       touch: 'hudChrome.bootcamp.taskShellBodyCasterTouch',
       pad: 'hudChrome.bootcamp.taskShellBodyCasterPad',
     },
-    params: ['attackKey'],
+    // Names the ABILITY, not slot 1. This lesson comes after the drill, so
+    // sending a player back to the plain attack would unteach it, and "press
+    // 1" is flatly wrong for a caster whose spell sits on 2 (CX).
+    params: ['abilityKey'],
     bodyHasNpc: false,
+    bodyHasAbility: true,
   },
   q_ps_mother_of_pearl: {
     keys: {
@@ -369,7 +373,7 @@ const COACH_ACTIVE_OVERRIDES: Readonly<Record<string, CoachBodyOverride>> = {
       touch: 'hudChrome.bootcamp.taskLongWalkBodyTouch',
       pad: 'hudChrome.bootcamp.taskLongWalkBodyPad',
     },
-    params: ['interactKey'],
+    params: ['bagsKey'],
     bodyHasNpc: false,
   },
   q_ps_pouch_and_purse: {

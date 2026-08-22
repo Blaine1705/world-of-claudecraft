@@ -581,19 +581,25 @@ describe('world music zone selection', () => {
     expect(musicZoneForLocation('farshore_isle', 'vale', true, false)).toBe('farshore');
   });
 
-  it('gives the Proving Shore its own dawn cue instead of the vale loop', () => {
+  it('gives the Proving Shore its own cue, camp included, not the vale loop', () => {
+    // The island paints as vale, so without its own ZONE_MUSIC row the first
+    // music a new player ever hears would be the mainland's. Dawnrest Camp is
+    // a hub with no town theme, which is the path that falls through to
+    // ZONE_MUSIC, so one row has to cover both the strand and the camp.
     expect(musicZoneForLocation('proving_shore', 'vale', false, false)).toBe('proving_shore');
-    expect(buildMusicThemes().proving_shore).toBeDefined();
-  });
-
-  it('keeps Dawnrest Camp (the island hub, no town theme) on the dawn cue too', () => {
     expect(musicZoneForLocation('proving_shore', 'vale', true, false)).toBe('proving_shore');
+    // ...and a dungeon still outranks it, exactly as everywhere else.
+    expect(musicZoneForLocation('proving_shore', 'vale', false, true, 'hollow_crypt')).toBe(
+      'dungeon_hollow_crypt',
+    );
   });
 
-  it('registers both alternate Proving Shore candidates for the editor and render pipeline', () => {
-    const themes = buildMusicThemes();
-    expect(themes.proving_shore_b).toBeDefined();
-    expect(themes.proving_shore_c).toBeDefined();
+  it('streams the island cue rather than composing it', () => {
+    // The one supplied track with no composed counterpart: it was written for
+    // the island, not remastered from the procedural score. Pinned so the
+    // absence reads as deliberate and nobody "fixes" it by inventing a theme.
+    expect(ZONE_STREAM_URLS.proving_shore).toBe('/audio/music/proving_shore.mp3?v=485a6985c03b');
+    expect(buildMusicThemes().proving_shore).toBeUndefined();
   });
 
   it('borrows the nearest-mood cue for paint-only biomes', () => {

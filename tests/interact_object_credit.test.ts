@@ -177,7 +177,7 @@ describe('every multi-count interact objective has enough distinct objects to fi
     ),
   );
 
-  it('covers the 23 multi-count objectives the exploit applied to', () => {
+  it('covers the 24 multi-count objectives the exploit applied to', () => {
     // 20 at the ledger's introduction, plus the quest-dedupe murloc-hut burn
     // (q_deepfen_purge, count 5 over 5 authored huts). The huts route to the
     // firebottle handler before the generic interact path, so their re-credit
@@ -188,15 +188,21 @@ describe('every multi-count interact objective has enough distinct objects to fi
     // by ORDERED POSITION in tutorial/gauntlet_run.ts, never by this
     // ledger's object path: its count doubles as the next-flag index, so a
     // flag can only ever credit once and only in sequence).
-    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(23);
+    //
+    // Plus the ability drill (q_ps_hone_the_edge, count 3), a fourth
+    // sentinel: tutorial/ability_drill.ts credits it off the DAMAGE the
+    // class's taught attack delivers, never through this ledger's object
+    // path, so it has no objects to be distinct about.
+    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(24);
   });
 
-  it.each(interactObjectives.filter((o) => o.count > 1 && o.itemId !== 'ps_gauntlet_flag'))(
-    '$questId can reach $count on distinct $itemId objects',
-    ({ itemId, count }) => {
-      expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
-    },
-  );
+  it.each(
+    interactObjectives.filter(
+      (o) => o.count > 1 && o.itemId !== 'ps_gauntlet_flag' && o.itemId !== 'ps_ability_drill',
+    ),
+  )('$questId can reach $count on distinct $itemId objects', ({ itemId, count }) => {
+    expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
+  });
 
   it('the Gauntlet flag sentinel can reach its count on distinct authored checkpoints', () => {
     // No ground objects exist for ps_gauntlet_flag: the run's "objects" are
@@ -239,20 +245,31 @@ describe('every multi-count interact objective has enough distinct objects to fi
     }
   });
 
-  it('places every interact target in the world table, bar the three sentinels', () => {
+  it('places every interact target in the world table, bar the five sentinels', () => {
     // train_valorsteed (mounts_training.ts credits it off the trainer NPC),
     // ps_gauntlet_flag (tutorial/gauntlet_run.ts credits it by ordered
-    // position against the authored checkpoints), and ps_guild_signpost
+    // position against the authored checkpoints), ps_guild_signpost
     // (tutorial/signpost_read.ts credits it off the camp noticeboard's own
-    // interaction arm) are sentinels with no object of their own, so they
-    // never reach the ledger. Anything ELSE missing from the world table
+    // interaction arm) and ps_ability_drill (tutorial/ability_drill.ts
+    // credits it off the damage the class's taught attack delivers) are
+    // sentinels with no object of their own, so they never reach the ledger.
+    // ps_passing_stone joined them when the death lesson became a CARRIED
+    // single-use item instead of a fixture to walk to (CX): its objective is
+    // credited by the resurrection that ends the corpse run
+    // (tutorial/death_lesson.ts), never by an object click. Anything ELSE missing from the world table
     // would mean an objective whose object spawns somewhere this reasoning
     // has not checked.
     const worldItemIds = new Set(GROUND_OBJECTS.map((d) => d.itemId));
     const unplaced = [...new Set(interactObjectives.map((o) => o.itemId))].filter(
       (id) => !worldItemIds.has(id),
     );
-    expect(unplaced.sort()).toEqual(['ps_gauntlet_flag', 'ps_guild_signpost', 'train_valorsteed']);
+    expect(unplaced.sort()).toEqual([
+      'ps_ability_drill',
+      'ps_gauntlet_flag',
+      'ps_guild_signpost',
+      'ps_passing_stone',
+      'train_valorsteed',
+    ]);
   });
 });
 

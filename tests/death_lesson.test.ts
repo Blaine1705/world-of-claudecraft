@@ -7,19 +7,15 @@
 // who took the Spirit Healer has no corpse left to walk to.
 
 import { describe, expect, it } from 'vitest';
-import {
-  PROVING_SHORE_OBJECTS,
-  PROVING_SHORE_QUESTS,
-  PROVING_SHORE_ZONE,
-} from '../src/sim/content/proving_shore';
+import { PROVING_SHORE_ITEMS, PROVING_SHORE_QUESTS } from '../src/sim/content/proving_shore';
 import { Sim } from '../src/sim/sim';
 import { CORPSE_REZ_RANGE } from '../src/sim/spirit';
 import {
   creditDeathLesson,
   DEATH_LESSON_OBJECT_ITEM_ID,
   DEATH_LESSON_QUEST_ID,
-  PASSING_STONE_OBJECT_ID,
-  tryPassingStone,
+  PASSING_STONE_ITEM_ID,
+  usePassingStone,
 } from '../src/sim/tutorial/death_lesson';
 import type { Entity, QuestProgress, SimEvent } from '../src/sim/types';
 
@@ -34,36 +30,34 @@ function seedActiveLesson(sim: Sim): QuestProgress {
   return qp;
 }
 
+/** The stone works wherever the player is standing, so the fixture just
+ *  grounds them somewhere on the island. */
 function standAtStone(sim: Sim): Entity {
   const p = sim.entities.get(sim.playerId)!;
-  const g = sim.groundPos(stone().x, stone().z);
+  const g = sim.groundPos(-312, -6);
   p.pos.x = g.x;
   p.pos.y = g.y;
   p.pos.z = g.z;
   p.prevPos = { ...p.pos };
+  // The quest hands one over; the fixtures below seed it directly.
+  sim.ctx.addItem(PASSING_STONE_ITEM_ID, 1, sim.playerId);
   return p;
 }
 
-function stone(): { x: number; z: number } {
-  const def = PROVING_SHORE_OBJECTS.find((o) => o.itemId === PASSING_STONE_OBJECT_ID);
-  if (!def) throw new Error('no Passing Stone authored');
-  return def.positions[0];
-}
-
-describe('the Passing Stone is sited so the walk back teaches something', () => {
-  it('stands on dry ground far enough from the graveyard to need a run', () => {
-    const gy = PROVING_SHORE_ZONE.graveyard!;
-    const d = Math.hypot(stone().x - gy.x, stone().z - gy.z);
-    // Further than the corpse-resurrect reach, or the ghost could revive on
-    // the spot and learn nothing about walking back...
-    expect(d).toBeGreaterThan(CORPSE_REZ_RANGE);
-    // ...but not so far that a first death is a punishment.
-    expect(d).toBeLessThan(CORPSE_REZ_RANGE * 2.5);
+describe('the Passing Stone is a carried, single-use rite', () => {
+  it('is a usable quest item, not a fixture to walk to', () => {
+    // CX: a new player told to go and die needs the thing that does it in
+    // their hand, not a rock somewhere on the map.
+    const def = PROVING_SHORE_ITEMS[PASSING_STONE_ITEM_ID];
+    expect(def).toBeTruthy();
+    expect(def.use?.type).toBe('passingStone');
+    expect(def.questId).toBe(DEATH_LESSON_QUEST_ID);
   });
 
-  it('is exactly one stone: the rite is a place, not a scatter', () => {
-    const def = PROVING_SHORE_OBJECTS.find((o) => o.itemId === PASSING_STONE_OBJECT_ID);
-    expect(def!.positions).toHaveLength(1);
+  it('is handed over by the quest, and re-granted if lost', () => {
+    expect(PROVING_SHORE_QUESTS[DEATH_LESSON_QUEST_ID].requiredItems).toContain(
+      PASSING_STONE_ITEM_ID,
+    );
   });
 });
 
@@ -85,14 +79,14 @@ describe('the quest is authored the way the credit arm reads it', () => {
   });
 });
 
-describe('tryPassingStone', () => {
+describe('usePassingStone', () => {
   it('kills the kneeling player, leaving the body where they knelt', () => {
     const sim = makeSim();
     seedActiveLesson(sim);
     const p = standAtStone(sim);
     const meta = sim.players.get(sim.playerId)!;
     const where = { x: p.pos.x, z: p.pos.z };
-    expect(tryPassingStone(sim.ctx, p, meta)).toBe(true);
+    usePassingStone(sim.ctx, p, meta);
     expect(p.dead).toBe(true);
     expect(p.hp).toBe(0);
     // corpsePos is captured when the SPIRIT is released (spirit.ts), not at
@@ -109,7 +103,7 @@ describe('tryPassingStone', () => {
     const p = standAtStone(sim);
     const meta = sim.players.get(sim.playerId)!;
     sim.tick();
-    expect(tryPassingStone(sim.ctx, p, meta)).toBe(true);
+    usePassingStone(sim.ctx, p, meta);
     expect(p.dead).toBe(false);
     const errs = sim
       .tick()
@@ -122,10 +116,10 @@ describe('tryPassingStone', () => {
     seedActiveLesson(sim);
     const p = standAtStone(sim);
     const meta = sim.players.get(sim.playerId)!;
-    tryPassingStone(sim.ctx, p, meta);
+    usePassingStone(sim.ctx, p, meta);
     expect(p.dead).toBe(true);
     // A second click while dead is consumed but changes nothing.
-    expect(tryPassingStone(sim.ctx, p, meta)).toBe(true);
+    usePassingStone(sim.ctx, p, meta);
     expect(p.hp).toBe(0);
   });
 
@@ -134,7 +128,7 @@ describe('tryPassingStone', () => {
     const sim = makeSim();
     const qp = seedActiveLesson(sim);
     const p = standAtStone(sim);
-    tryPassingStone(sim.ctx, p, sim.players.get(sim.playerId)!);
+    usePassingStone(sim.ctx, p, sim.players.get(sim.playerId)!);
     expect(qp.counts[0]).toBe(0);
   });
 });
@@ -204,7 +198,7 @@ describe('the whole lesson, end to end through the real sim', () => {
     const p = standAtStone(sim);
     const meta = sim.players.get(sim.playerId)!;
 
-    tryPassingStone(sim.ctx, p, meta);
+    usePassingStone(sim.ctx, p, meta);
     expect(p.dead).toBe(true);
     sim.releaseSpirit();
     expect(p.ghost).toBe(true);

@@ -54,11 +54,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
     '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に二番目のアクションボタンを押して呪文を唱えよう。一体が崩れるまで唱え続けること。',
   'hudChrome.bootcamp.taskShellBodyCaster':
-    '浜辺ガニは挟み返してくる。左クリックで一匹をターゲットにし、{attackKey}を押して呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+    '浜辺ガニは挟み返してくる。左クリックで一匹をターゲットにし、{abilityKey}を押して{ability}を使い、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskShellBodyCasterTouch':
-    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの二番目のボタンをタップして呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの{ability}をタップして、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskShellBodyCasterPad':
-    '浜辺ガニは挟み返してくる。ターゲットボタンを押し、次に二番目のアクションボタンを押して呪文を唱え、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+    '浜辺ガニは挟み返してくる。一匹をターゲットにし、{ability}が入ったアクションボタンを押して、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.voiceGraduate': '鐘はおまえさんのために鳴った。海の向こうでイーストブルックが待っておる。もう大丈夫だ。',
   'hudChrome.bootcamp.voiceVeerOff': '待ちなさい、そっちは違う。金色の道は後ろだよ。',
   'hudChrome.bootcamp.voiceStationDoneB': 'だいぶ様になってきたな、間違いない。',
@@ -13047,10 +13047,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'かかしをタップしてターゲットにし、アクションバーの{ability}をタップしよう。ただの一振りではなく、君自身の技だ。三回当てること。',
   'hudChrome.bootcamp.taskHoneBodyPad':
     'かかしをターゲットにし、{ability}が入ったアクションボタンを押そう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.promptOpenBags': 'かばんを開く',
+  'hudChrome.bootcamp.promptCharacterSheet': 'キャラクター画面を開く',
+  'hudChrome.bootcamp.promptLookAround': '右クリックを押したまま動かして見回す',
   'hudChrome.bootcamp.promptKneel':
     'ひざまずく',
   'hudChrome.bootcamp.taskLongWalkBody':
-    '浜辺の道を南へ進み、たましいの石まで歩いて{interactKey}を押し、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+    '{bagsKey}を押して持ち物を開き、たましいの石を左クリックしよう。その場で君を横たえてくれる。ここでは何にも襲われないし、これで失うものは何もない。',
   'hudChrome.bootcamp.taskLongWalkBodyTouch':
     '浜辺の道を南へ進み、たましいの石まで歩いてタップし、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
   'hudChrome.bootcamp.taskLongWalkBodyPad':
@@ -13067,14 +13070,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。タップすれば、何の代償もなく元どおりだ。',
   'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
     '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。それを選べば、何の代償もなく元どおりだ。',
+  'hudChrome.bootcamp.promptLootPearl':
+    '真珠を回収',
   'hudChrome.bootcamp.taskStrikeTrueBodyPad':
     '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に最初のアクションボタンを押して打ち込もう。一体が崩れるまで打ち続けること。',
   'hudChrome.bootcamp.taskShellBody':
-    '浜辺ガニは挟み返してくる。左クリックで一匹をターゲットにし、{attackKey}を押して打ち込み、そのまま打ち続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+    '浜辺ガニは挟み返してくる。左クリックで一匹をターゲットにし、{abilityKey}を押して{ability}を使い、攻撃を続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskShellBodyTouch':
-    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの最初のボタンをタップして打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの{ability}をタップしよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskShellBodyPad':
-    '浜辺ガニは挟み返してくる。ターゲットボタンを押し、次に最初のアクションボタンを押して打ち込もう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+    '浜辺ガニは挟み返してくる。一匹をターゲットにし、{ability}が入ったアクションボタンを押そう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
   'hudChrome.bootcamp.taskWreckLineBody':
     '漂着した木箱は暁の野営地へ続く道沿いに並んでいる。名前が見えるところまで漂着した木箱に歩み寄り、{interactKey}を押すか、木箱を左クリックして拾い上げよう。六つで荷は満ちる。',
   'hudChrome.bootcamp.taskWreckLineBodyTouch':
@@ -13155,7 +13160,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',
   'entities.quests.q_ps_shell_and_claw.title': '甲羅と爪',
   'entities.quests.q_ps_shell_and_claw.text':
-    '藁は気にしないが、{playerName}、今度は気にする相手だ。浜辺ガニが遠い浜の難破の浜で残骸を漁っている。練習場から西へ道なりに進めば、まっすぐ奴らのところへ出る。奴らは挟み返してくるから、体力バーに気を配りつつ打ち続けろ。Tabか左クリックで一匹をターゲットにして、1を押し、甲羅が割れるまで手を止めるな。三匹で足りる。終わったら北の丘へ道を上りなさい。潮守ネルが浜の帳簿をつけていて、君の甲羅も数えてくれる。',
+    '藁は気にしないが、{playerName}、今度は気にする相手だ。浜辺ガニが遠い浜の難破の浜で残骸を漁っている。練習場から西へ道なりに進めば、まっすぐ奴らのところへ出る。奴らは挟み返してくるから、体力バーに気を配りつつ打ち続けろ。左クリックで一匹をターゲットにして、練習場で覚えた技を使い、甲羅が割れるまで手を止めるな。三匹で足りる。終わったら北の丘へ道を上りなさい。潮守ネルが浜の帳簿をつけていて、君の甲羅も数えてくれる。',
   'entities.quests.q_ps_shell_and_claw.completion':
     '甲羅を三つ割って、指は一本も欠けていない。初陣としては上出来だよ、{playerName}。あの蟹どもは潮が漂着物を運ぶより速く難破船から掠め取っていくから、君が一匹間引くたびに、誰かの銅貨が守られるんだ。',
   'entities.quests.q_ps_shell_and_claw.objectives.0.label': '浜辺ガニを間引く',
@@ -13171,6 +13176,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ps_pouch_and_purse.completion':
     '良いポーチだ。まだ締めていないなら締めておきなさい。Bを押してバッグを開き、ポーチを左クリックして空いた鞄留めに収めれば、厄介ごとを詰める枠が六つ増える。ここからは、どんな鞄にも収まらない残り半分の授業だよ、{playerName}。持ちきれないものは金張りの金庫が預かる。出納係ウィックが西の道を上った先に金庫の机を構えていて、どの町のどの出納係とも共通の金庫を開けてくれる。財布が育てば金庫の枠も買い足せる。値打ち物は金庫へ、鞄には余裕を。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだ。',
   'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '亜麻のポーチを購入する',
+  'entities.quests.q_ps_hone_the_edge.title':
+    '刃を研ぐ',
+  'entities.quests.q_ps_hone_the_edge.text':
+    '振るだけなら誰でもできる、{playerName}。藁は一日中でも受け止めてくれるが、それで勝てるものは何もない。画面の下に並んだボタンの列を見ろ。あれが君の技だ。どれも腕一本ではできないことをやってのける。君はもう一つ持っている。かかしに向き直って使え。ターゲットを取り、この庭が示すボタンを押す。それを三度。藁をただ叩くな、君の知っている技を実際に起こすんだ。それができたら戻ってこい。',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    'これでようやく、めちゃくちゃに振り回すのではなく戦っている。あの列はレベルを上げるたびに増えていく、{playerName}。長生きするのは、あれを読む者だ。藁はどのボタンを使われようが気にしない。谷は気にする。',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    'かかしに技を当てた',
+  'entities.quests.q_ps_the_long_walk.title':
+    '長い帰り道',
+  'entities.quests.q_ps_the_long_walk.text':
+    '残る教えは一つ、{playerName}。そしてこれは口では伝えられない。一度やってみるしかないものだ。君は外で必ず死ぬ。誰もが死ぬし、それで終わりになるわけではない。このたましいの石を持っていけ。Bを押して持ち物を開き、左クリックすれば、その場で君を横たえてくれる。あとは画面の指示に従え。魂を解放し、自分の亡骸まで歩いて戻り、そこへ踏み入る。亡骸は待っている。その道のりに代償はなく、歩いても失うものは何もない。',
+  'entities.quests.q_ps_the_long_walk.completion':
+    'そして君は戻ってきた、何ひとつ悪くならずに。あの感じを覚えておけ、{playerName}。次に起きるときには牙が絡んでいるし、横で説明してくれる者もいない。亡骸は待っている。道のりは無料で、死が本当に奪うのは戻るまでの時間だけだ。',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    '死から歩いて戻った',
+  'entities.items.ps_passing_stone.name':
+    'たましいの石',
   'entities.quests.q_ps_the_signpost.title': '風の便り',
   'entities.quests.q_ps_the_signpost.text':
     '学ぶ習慣はあとひとつ、{playerName}、これに刃は要らない。掲示板を読むことだ。ギルドの掲示柱は私の焚き火から南西へ数歩、野営地の門のところに立っていて、ギルドや旅の一団が呼びかけを貼っていく。柱の正面まで歩み寄ってFを押すか、左クリックして貼られたものを読み、それから戻って、風が何を運んできたか聞かせておくれ。この先君が足を踏み入れるどの町にも、同じような掲示板が立っているよ。',

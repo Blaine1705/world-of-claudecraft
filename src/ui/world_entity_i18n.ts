@@ -554,11 +554,13 @@ const QUEST_IDS = [
   // the Proving Shore (tutorial island)
   'q_ps_the_gauntlet',
   'q_ps_strike_true',
+  'q_ps_hone_the_edge',
   'q_ps_shell_and_claw',
   'q_ps_mother_of_pearl',
   'q_ps_the_wreck_line',
   'q_ps_pouch_and_purse',
   'q_ps_the_signpost',
+  'q_ps_the_long_walk',
   'q_ps_set_sail',
   // the Galecrest
   'q_gc_down_the_windway',

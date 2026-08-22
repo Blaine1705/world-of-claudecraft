@@ -14,11 +14,6 @@ import { resumeWhenAllowed } from './audio_unlock';
 import type { MusicMixState } from './music_mix_policy';
 import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
-import {
-  composeProvingShoreCrossing,
-  composeProvingShoreDawnrest,
-  composeProvingShoreGauntlet,
-} from './music_themes_proving_shore';
 import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
 
 export type MusicZone =
@@ -64,9 +59,11 @@ const TOWN_MUSIC: Record<string, MusicZone> = {
 // its own vigil theme instead of the vale's playful loop.
 const ZONE_MUSIC: Partial<Record<string, MusicZone>> = {
   farshore_isle: 'farshore',
-  // The tutorial island also renders in the vale biome, but it is the first
-  // ground a new player ever stands on, so it opens on its own dawn cue
-  // (composed in music_themes_proving_shore.ts) instead of the vale loop.
+  // The tutorial island paints as vale, but it is the first thing a new
+  // player ever hears and it deserves its own cue rather than the mainland's.
+  // One entry covers the whole island: Dawnrest Camp is a hub with no town
+  // theme, and that path falls through to ZONE_MUSIC (same as Gullhaven on
+  // the Farshore).
   proving_shore: 'proving_shore',
 };
 
@@ -3864,9 +3861,6 @@ export function buildMusicThemes(withOverrides = true): Record<string, Theme> {
     garden: composeGarden(),
     gale: composeGale(),
     farshore: composeFarshore(),
-    proving_shore: composeProvingShoreDawnrest(),
-    proving_shore_b: composeProvingShoreGauntlet(),
-    proving_shore_c: composeProvingShoreCrossing(),
     dungeon_hollow_crypt: composeDungeonHollowCrypt(),
     dungeon_sunken_bastion: composeDungeonSunkenBastion(),
     dungeon_gravewyrm_sanctum: composeDungeonGravewyrmSanctum(),
@@ -3920,12 +3914,6 @@ export const THEME_TRIM: Record<string, number> = {
   garden: 2.86,
   gale: 2.24,
   farshore: 1.57,
-  // The three Proving Shore candidates, MEASURED by the same gated-RMS pass
-  // (render at trim 1 via scripts/render_music.mjs, then
-  // scripts/music_gated_rms.mjs against the Eastbrook town reference).
-  proving_shore: 1.38,
-  proving_shore_b: 3.27,
-  proving_shore_c: 1.58,
   rift_frost: 1.98,
   rift_ember: 2.58,
   rift_venom: 2.36,

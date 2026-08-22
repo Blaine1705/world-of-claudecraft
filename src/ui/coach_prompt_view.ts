@@ -15,12 +15,18 @@
 // guidance arrow.
 
 import { PROVING_SHORE_NPCS, PROVING_SHORE_QUESTS } from '../sim/content/proving_shore';
-import { CRAB_MOB_ID, CRAB_QUEST_ID, CRAB_SUMMON_SITE } from '../sim/interactions/crab_summon';
+import {
+  CRAB_MOB_ID,
+  CRAB_QUEST_ID,
+  CRAB_SUMMON_SITE,
+  LURE_ITEM_ID,
+} from '../sim/interactions/crab_summon';
 import {
   isObjectOpenedByViewer,
   type OpenedObjectQuestRow,
 } from '../sim/quests/opened_object_view';
 import { ABILITY_DRILL_MOB_ID, ABILITY_DRILL_QUEST_ID } from '../sim/tutorial/ability_drill';
+import { PASSING_STONE_ITEM_ID } from '../sim/tutorial/death_lesson';
 import { INTERACT_RANGE } from '../sim/types';
 import {
   BELL_STEP_TARGET,
@@ -157,6 +163,36 @@ const KILL_LESSON_TEMPLATE: Readonly<Record<string, string>> = {
   [CRAB_QUEST_ID]: CRAB_MOB_ID,
 };
 
+/**
+ * How close to the corner it just turned the TURN ask keeps the bubble.
+ *
+ * Lane 2's hurdle sits inside JUMP_PROMPT_RANGE of its own checkpoint, so
+ * without this the bubble skipped straight from "Hold W" to "Jump" the
+ * instant a player rounded the first corner: the card said "D then W" and
+ * the loud floating prompt never did (CX). Lane 3 has no obstacle, which is
+ * exactly why it read correctly and lane 2 did not.
+ *
+ * Sized under JUMP_PROMPT_RANGE so the handover still happens well before
+ * the hurdle: turn at the flag, then the jump ask takes the bubble as you
+ * run at the rail.
+ */
+export const CORNER_ASK_YD = 5;
+
+/**
+ * Does the turn-and-walk ask own the bubble right now? True while the player
+ * is still standing at the checkpoint they just tagged, which is the moment
+ * the instruction is actually about.
+ */
+export function turnAskOwnsBubble(
+  checkpointsReached: number,
+  playerPos: { x: number; z: number },
+  checkpoints: readonly { x: number; z: number }[],
+): boolean {
+  const corner = checkpoints[checkpointsReached - 1];
+  if (!corner) return false;
+  return planar(corner.x, corner.z, playerPos.x, playerPos.z) <= CORNER_ASK_YD;
+}
+
 /** How close to the tide pool the lure bubble shows (a step wider than the
  *  summon gate itself, so the ask reads on approach). */
 export const LURE_PROMPT_RANGE = 10;
@@ -186,10 +222,6 @@ export function nearestCrate(
 /** The signpost lesson's reading spot (mirrors COACH_ACTIVE_TARGETS: the
  *  noticeboard is a sentinel object, not a live entity the client can key). */
 const SIGNPOST_SPOT = { x: -312, z: 42.5 };
-
-/** The Passing Stone's spot (mirrors PROVING_SHORE_OBJECTS; pinned equal in
- *  tests/coach_prompt_view.test.ts). */
-const PASSING_STONE_SPOT = { x: -312, z: -6 };
 
 /** Lane 2's parkour obstacles in running order (lane 2 runs SOUTH, so -z):
  *  the hurdle rail the player jumps OVER, then the crate step they jump
@@ -241,6 +273,9 @@ export function coachPromptPlan(args: {
   bellPhase: boolean;
   step: BootcampStep | null;
   focus: CoachFocus | null;
+  /** The world's entities. Accepts any iterable, INCLUDING a one-shot
+   *  iterator (the live caller hands over `world.entities.values()`), which
+   *  is why the plan materializes it before scanning: see the walk below. */
   entities: Iterable<CoachPromptEntity>;
   playerPos: { x: number; z: number };
   /** The viewer's quest log, for the opened-crate skip (optional so the
@@ -285,25 +320,36 @@ export function coachPromptPlan(args: {
   if (focus.state === 'ready') {
     return npcPlan(quest.turnInNpcId, 'hudChrome.bootcamp.promptTurnIn');
   }
+  // Materialize ONCE, past the arms that never scan. The live caller hands
+  // over `world.entities.values()`, a Map iterator that is spent after a
+  // single walk: the pearl detour scans twice (live boss, then his corpse),
+  // so the second scan saw an empty world and the bubble asked for a
+  // re-summon while the corpse it should have pointed at lay in frame (CX).
+  // A list here makes every arm below re-scannable by construction.
+  const entities = [...args.entities];
   // Active tasks: interact-press lessons bubble their target; the kill
   // lessons bubble the nearest live quarry with the target and attack chips
   // (the playtest ask: Strike True's instruction comes up like the others).
   const quarry = KILL_LESSON_TEMPLATE[focus.questId];
   if (quarry) {
-    const mob = nearestMob(args.entities, quarry, args.playerPos);
+    const mob = nearestMob(entities, quarry, args.playerPos);
     // The pearl detour's quarry is SUMMONED: while the king's corpse still
     // lies on the sand the press that matters is the loot (the pearl is on
     // it), and only with no corpse at all does the bubble stand on the tide
     // pool asking for the lure (bags bind).
     if (!mob && focus.questId === CRAB_QUEST_ID) {
-      const corpse = nearestDeadMob(args.entities, CRAB_MOB_ID, args.playerPos);
+      const corpse = nearestDeadMob(entities, CRAB_MOB_ID, args.playerPos);
       if (corpse) {
         return {
           x: corpse.pos.x,
           z: corpse.pos.z,
           lift: KILL_BUBBLE_LIFT,
-          range: KILL_PROMPT_RANGE,
-          verbKey: 'hudChrome.bootcamp.promptPickUp',
+          // The LOOT reach, not the wide kill reach: corpse loot is gated on
+          // INTERACT_RANGE (game/nearby_interaction.ts), so a bubble carried
+          // over from the fight's 12 yards would ask for a press that does
+          // nothing, which is how a first-timer decides the game is broken.
+          range: PROMPT_OBJECT_RANGE,
+          verbKey: 'hudChrome.bootcamp.promptLootPearl',
           kind: 'interact',
         };
       }
@@ -341,7 +387,7 @@ export function coachPromptPlan(args: {
     };
   }
   if (focus.questId === 'q_ps_the_wreck_line') {
-    const crate = nearestCrate(args.entities, args.playerPos, args.questLog);
+    const crate = nearestCrate(entities, args.playerPos, args.questLog);
     if (!crate) return null;
     return {
       x: crate.pos.x,
@@ -349,19 +395,6 @@ export function coachPromptPlan(args: {
       lift: OBJECT_LIFT,
       range: PROMPT_OBJECT_RANGE,
       verbKey: 'hudChrome.bootcamp.promptPickUp',
-      kind: 'interact',
-    };
-  }
-  if (focus.questId === DEATH_LESSON_QUEST_ID) {
-    // Only while alive: a ghost has already knelt, and its business is with
-    // its own corpse, which the death screen's own button owns.
-    if (deathPhase !== 'alive') return null;
-    return {
-      x: PASSING_STONE_SPOT.x,
-      z: PASSING_STONE_SPOT.z,
-      lift: OBJECT_LIFT,
-      range: PROMPT_OBJECT_RANGE,
-      verbKey: 'hudChrome.bootcamp.promptKneel',
       kind: 'interact',
     };
   }
@@ -375,7 +408,7 @@ export function coachPromptPlan(args: {
       kind: 'interact',
     };
   }
-  if (focus.questId === 'q_ps_pouch_and_purse') {
+  if (focus.questId === POUCH_QUEST_ID) {
     return npcPlan(quest.giverNpcId, 'hudChrome.bootcamp.promptTalk');
   }
   if (focus.questId === 'q_ps_set_sail') {
@@ -404,18 +437,50 @@ export function coachGlowQuestId(focus: CoachFocus | null): string | null {
   return focus?.questId ?? null;
 }
 
+/** The bag-lesson quest and the bag it teaches. */
+export const POUCH_QUEST_ID = 'q_ps_pouch_and_purse';
+export const POUCH_ITEM_ID = 'linen_pouch';
+
 /** The vendor stock row that pulses (the pouch purchase lesson). */
 export function coachGlowVendorItemId(focus: CoachFocus | null): string | null {
-  return focus?.questId === 'q_ps_pouch_and_purse' && focus.state === 'active'
-    ? 'linen_pouch'
-    : null;
+  return focus?.questId === POUCH_QUEST_ID && focus.state === 'active' ? POUCH_ITEM_ID : null;
 }
 
-/** The bag stack that pulses (the pouch buckle-on lesson). */
-export function coachGlowBagItemId(focus: CoachFocus | null): string | null {
-  return focus?.questId === 'q_ps_pouch_and_purse' && focus.state === 'ready'
-    ? 'linen_pouch'
-    : null;
+/**
+ * Is the buckle-the-pouch-on lesson still owed?
+ *
+ * The end of this lesson is the pouch being WORN, not the quest being handed
+ * back. Keying on the 'ready' state alone left the bag stack pulsing and the
+ * bottom edge blooming for the whole walk to the turn-in, long after the
+ * player had done the thing being taught (CX: "gold trim is always at the
+ * bottom here, no matter what").
+ *
+ * @param bags the four equippable bag sockets (IWorld.bags).
+ */
+export function pouchLessonActive(
+  focus: CoachFocus | null,
+  bags: readonly (string | null)[],
+): boolean {
+  if (focus?.questId !== POUCH_QUEST_ID || focus.state !== 'ready') return false;
+  return !bags.includes(POUCH_ITEM_ID);
+}
+
+/** The bag stack that pulses: the pouch buckle-on lesson, and the Briny Lure
+ *  while the pearl detour still wants the king summoned. A new player was
+ *  told in prose to open their bags and click an item, which is not something
+ *  they have ever done: the stack itself has to ask (CX). */
+export function coachGlowBagItemId(
+  focus: CoachFocus | null,
+  bags: readonly (string | null)[],
+): string | null {
+  if (pouchLessonActive(focus, bags)) return POUCH_ITEM_ID;
+  if (focus?.questId === CRAB_QUEST_ID && focus.state === 'active') return LURE_ITEM_ID;
+  // The death lesson's rite stone lives in the bags now, so the stack itself
+  // asks rather than the prose alone (CX).
+  if (focus?.questId === DEATH_LESSON_QUEST_ID && focus.state === 'active') {
+    return PASSING_STONE_ITEM_ID;
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
