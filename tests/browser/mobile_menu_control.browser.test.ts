@@ -11,10 +11,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { placeConsumableStrip } from '../../src/ui/hud/action_bar/radial_action_core';
+import { buildMobileMenuControl } from '../../src/ui/hud/menu/menu_control_controller';
 import {
   MENU_STRIP_COUNT,
   MENU_STRIP_DIRECTION,
   MENU_STRIP_ITEMS,
+  MENU_STRIP_PITCH_PX,
 } from '../../src/ui/hud/menu/menu_strip_core';
 import { MenuStripPainter } from '../../src/ui/hud/menu/menu_strip_painter';
 import { resolveMobileHudLayout } from '../../src/ui/mobile_hud_layout';
@@ -658,5 +660,116 @@ describe('left-column reflow at 844x390', () => {
     const anchor = rig.anchor.getBoundingClientRect();
     const target = rig.target.getBoundingClientRect();
     expect(overlaps(target, anchor)).toBe(false);
+  });
+});
+
+// The LEFT-HANDED mirror (body.mobile-left-handed) reseats the whole control
+// against the opposite screen edge, and the row has to grow the other way with
+// it. With the direction hard-coded 'right' the placement clamped the ten items
+// back over the anchor while the travel that highlights them and the dim band
+// still counted rightward, so the highlight, the dim and the drawn row all
+// disagreed. Driven through the REAL gesture here, because that disagreement
+// only exists once real layout decides where the anchor actually sits.
+describe.each(VIEWPORTS)('the left-handed mirror at $label', ({ width, height }) => {
+  /** Past STRIP_DEADZONE_PX (22), so a move commits without a reveal timer. */
+  const SWIPE_PX = 30;
+
+  async function setup(leftHanded: boolean) {
+    await page.viewport(width, height);
+    document.body.className = `mobile-touch game-active ${tierClasses(width, height)}${
+      leftHanded ? ' mobile-left-handed' : ''
+    }`;
+    document.documentElement.style.setProperty('--app-vw', `${width}px`);
+    document.documentElement.style.setProperty('--app-vh', `${height}px`);
+    const rig = mountControl();
+    const control = buildMobileMenuControl({ writers: writers() });
+    if (!control) throw new Error('the shipped markup did not build the control');
+    return { ...rig, control };
+  }
+
+  function pointer(type: string, target: Element, x: number, pointerId: number): void {
+    target.dispatchEvent(
+      new PointerEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        pointerId,
+        pointerType: 'touch',
+        clientX: x,
+        clientY: target.getBoundingClientRect().top + 1,
+      }),
+    );
+  }
+
+  it('seats the control against the RIGHT edge, which is what flips the row', async () => {
+    const mirrored = await setup(true);
+    const box = mirrored.anchor.getBoundingClientRect();
+    expect(box.right).toBeLessThanOrEqual(width + EDGE_TOLERANCE_PX);
+    expect(width - box.right).toBeLessThan(box.left);
+  });
+
+  it('grows the row LEFT of the anchor, every item on screen', async () => {
+    const rig = await setup(true);
+    const anchorBox = rig.anchor.getBoundingClientRect();
+    const startX = anchorBox.x + anchorBox.width / 2;
+    pointer('pointerdown', rig.anchor, startX, 1);
+    pointer('pointermove', rig.anchor, startX - SWIPE_PX, 1);
+    expect(rig.control.gesture.isOpen()).toBe(true);
+
+    expect(getComputedStyle(rig.strip).display).toBe('block');
+    const boxes = rig.items.map((btn) => btn.getBoundingClientRect());
+    for (const [i, box] of boxes.entries()) {
+      expect(box.right, `item ${i} is right of the anchor`).toBeLessThan(
+        anchorBox.left + EDGE_TOLERANCE_PX,
+      );
+      expect(box.left, `item ${i} runs off the left edge`).toBeGreaterThan(-EDGE_TOLERANCE_PX);
+      expect(box.width, `item ${i} must render`).toBeGreaterThanOrEqual(TOUCH_FLOOR_PX);
+    }
+    // Leftward and strictly decreasing: the roster order IS the swipe order.
+    for (let i = 1; i < boxes.length; i++) expect(boxes[i].x).toBeLessThan(boxes[i - 1].x);
+    pointer('pointercancel', rig.anchor, startX, 1);
+  });
+
+  it('highlights the item the LEFTWARD travel is actually over', async () => {
+    const rig = await setup(true);
+    const anchorBox = rig.anchor.getBoundingClientRect();
+    const startX = anchorBox.x + anchorBox.width / 2;
+    pointer('pointerdown', rig.anchor, startX, 1);
+    // Two pitches of finger travel past the deadzone: item 2, and the rightward
+    // reading of the same drag would have answered -1 (a cancel).
+    const travel = SWIPE_PX + MENU_STRIP_PITCH_PX * 2;
+    pointer('pointermove', rig.anchor, startX - travel, 1);
+    const live = rig.control.gesture.liveIndex();
+    expect(live).toBe(2);
+    // The HIGHLIGHT the player sees is on that same item, and on no other.
+    const lit = rig.items.filter((btn) => btn.classList.contains('live'));
+    expect(lit).toEqual([rig.items[live]]);
+    // And the caption names it, over that item rather than over another.
+    const capBox = rig.caption.getBoundingClientRect();
+    const itemBox = rig.items[live].getBoundingClientRect();
+    expect(capBox.x + capBox.width / 2).toBeCloseTo(itemBox.x + itemBox.width / 2, 0);
+    pointer('pointercancel', rig.anchor, startX, 1);
+  });
+
+  it('flips the dim band so its fade starts at the anchor, not across the screen', async () => {
+    const mirrored = await setup(true);
+    const anchorBox = mirrored.anchor.getBoundingClientRect();
+    const startX = anchorBox.x + anchorBox.width / 2;
+    pointer('pointerdown', mirrored.anchor, startX, 1);
+    pointer('pointermove', mirrored.anchor, startX - SWIPE_PX, 1);
+    expect(mirrored.strip.classList.contains('dim-flip')).toBe(true);
+    pointer('pointercancel', mirrored.anchor, startX, 1);
+
+    cleanup();
+    const plain = await setup(false);
+    const plainBox = plain.anchor.getBoundingClientRect();
+    const plainStart = plainBox.x + plainBox.width / 2;
+    pointer('pointerdown', plain.anchor, plainStart, 1);
+    pointer('pointermove', plain.anchor, plainStart + SWIPE_PX, 1);
+    expect(plain.control.gesture.isOpen()).toBe(true);
+    expect(plain.strip.classList.contains('dim-flip')).toBe(false);
+    // The unmirrored control is unchanged: the row still grows RIGHT.
+    const first = plain.items[0].getBoundingClientRect();
+    expect(first.left).toBeGreaterThan(plainBox.right - EDGE_TOLERANCE_PX);
+    pointer('pointercancel', plain.anchor, plainStart, 1);
   });
 });

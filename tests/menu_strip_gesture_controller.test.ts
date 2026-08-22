@@ -13,7 +13,7 @@
 // action the control does not have).
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { MENU_STRIP_COUNT } from '../src/ui/hud/menu/menu_strip_core';
+import { MENU_STRIP_COUNT, MENU_STRIP_PITCH_PX } from '../src/ui/hud/menu/menu_strip_core';
 import {
   MenuStripGesture,
   type MenuStripGestureDeps,
@@ -23,13 +23,15 @@ import { closeOpenTouchMenu } from '../src/ui/hud/tap_menu';
 import { makeWriterFacet } from '../src/ui/painter_host';
 
 /** A private facet per rig: the class takes Hud's shared one in production, and
- *  a test only needs the elision behaviour, not the shared skip counters. */
-function writers() {
+ *  a test only needs the elision behaviour, not the shared skip counters. The
+ *  ATTRIBUTE cache is handed back, because a write that reached the DOM without
+ *  going through the facet leaves no entry in it. */
+function writers(attrCache: Map<HTMLElement, Map<string, string>> = new Map()) {
   return makeWriterFacet(
     new Map(),
     new Map(),
     new Map(),
-    new Map(),
+    attrCache,
     () => {},
     () => {},
   );
@@ -54,9 +56,22 @@ interface Rig {
   repaints: number;
   /** settings.touchTapMenus, flipped per test. */
   tapMenus: boolean;
+  /** body.mobile-left-handed, flipped per test: it reseats the anchor against
+   *  the opposite edge, so the row has to grow the other way. */
+  leftHanded: boolean;
+  /** The facet's own attribute cache: an entry per (element, attr) it wrote. */
+  attrCache: Map<HTMLElement, Map<string, string>>;
 }
 
-function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: boolean } = {}): Rig {
+function makeRig(
+  options: {
+    appVw?: string;
+    safeAreaPx?: string;
+    tapMenus?: boolean;
+    leftHanded?: boolean;
+    anchorX?: number;
+  } = {},
+): Rig {
   const host = document.createElement('div');
   host.style.setProperty('--strip-gap', '8px');
   host.style.setProperty('--strip-margin', '6px');
@@ -69,15 +84,16 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
   const anchor = document.createElement('button');
   anchor.type = 'button';
   document.body.append(anchor);
+  const anchorX = options.anchorX ?? ANCHOR_X;
   anchor.getBoundingClientRect = () =>
     ({
-      x: ANCHOR_X,
+      x: anchorX,
       y: 300,
-      left: ANCHOR_X,
+      left: anchorX,
       top: 300,
       width: ANCHOR_SIZE_PX,
       height: ANCHOR_SIZE_PX,
-      right: ANCHOR_X + ANCHOR_SIZE_PX,
+      right: anchorX + ANCHOR_SIZE_PX,
       bottom: 300 + ANCHOR_SIZE_PX,
     }) as DOMRect;
 
@@ -102,15 +118,18 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
     cancels: 0,
     repaints: 0,
     tapMenus: options.tapMenus ?? false,
+    leftHanded: options.leftHanded ?? false,
+    attrCache: new Map<HTMLElement, Map<string, string>>(),
     gesture: null as unknown as MenuStripGesture,
   };
   const deps: MenuStripGestureDeps = {
     anchor,
-    writers: writers(),
+    writers: writers(rig.attrCache),
     metricsHost: host,
     items,
     cancel,
     tapMenus: () => rig.tapMenus,
+    leftHanded: () => rig.leftHanded,
     pick: (index, source) => {
       rig.picks.push(index);
       rig.pickSources.push(source);
@@ -513,5 +532,143 @@ describe('MenuStripGesture: where a pick came from', () => {
     rig.items[2].dispatchEvent(pointer('pointerup', 1, 200));
     rig.items[2].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(rig.picks).toEqual([2]);
+  });
+});
+
+// The left-handed HUD mirror (body.mobile-left-handed) reseats the control
+// against the OPPOSITE screen edge, where a rightward row runs off the screen and
+// placeConsumableStrip clamps it back over the anchor. The direction is resolved
+// per GESTURE for exactly that reason: with it hard-coded 'right', the drawn
+// items, the travel that highlights them and the dim band all disagreed.
+describe('MenuStripGesture: the left-handed mirror', () => {
+  /** The landscape phone box the touch HUD ships to, wide enough to seat the
+   *  whole ten-item row without a clamp, so the direction is what is under test. */
+  const MIRROR_APP_VW = '844px';
+  /** The mirrored seat: 152px in from the RIGHT edge, as hud.mobile.css puts it. */
+  const MIRRORED_ANCHOR_X = 844 - 152 - ANCHOR_SIZE_PX;
+
+  it('grows the row LEFT of the anchor under the mirror', () => {
+    const rig = makeRig({ appVw: MIRROR_APP_VW, leftHanded: true, anchorX: MIRRORED_ANCHOR_X });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 - SWIPE_PX));
+    const open = rig.gesture.openState();
+    const anchorX = open?.anchorX ?? 0;
+    for (const center of open?.placement.centers ?? []) expect(center).toBeLessThan(anchorX);
+  });
+
+  it('reads the LEFTWARD travel as the walk along the row', () => {
+    const rig = makeRig({ appVw: MIRROR_APP_VW, leftHanded: true, anchorX: MIRRORED_ANCHOR_X });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 300));
+    // One pitch past the deadzone, LEFTWARD: the item under the finger is the
+    // second one, and the rightward reading would have answered -1 (a cancel).
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 300 - (MENU_STRIP_PITCH_PX + SWIPE_PX)));
+    expect(rig.gesture.liveIndex()).toBe(1);
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 300 - (MENU_STRIP_PITCH_PX + SWIPE_PX)));
+    expect(rig.picks).toEqual([1]);
+  });
+
+  it('a RIGHTWARD drag under the mirror is a bare tap, not item 0', () => {
+    const rig = makeRig({ appVw: MIRROR_APP_VW, leftHanded: true, anchorX: MIRRORED_ANCHOR_X });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 300));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 300 + SWIPE_PX * 3));
+    expect(rig.gesture.isOpen()).toBe(false);
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 300 + SWIPE_PX * 3));
+    expect(rig.picks).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+  });
+
+  // The dim band is measured from the placement, so the mirror reaches it for
+  // free: what is pinned here is that the two can never disagree.
+  it('puts the anchor at the RIGHT edge of the dim band under the mirror', () => {
+    const mirrored = makeRig({
+      appVw: MIRROR_APP_VW,
+      leftHanded: true,
+      anchorX: MIRRORED_ANCHOR_X,
+    });
+    mirrored.anchor.dispatchEvent(pointer('pointerdown', 1, 300));
+    mirrored.anchor.dispatchEvent(pointer('pointermove', 1, 300 - SWIPE_PX));
+    const open = mirrored.gesture.openState();
+    const last = open?.placement.centers[MENU_STRIP_COUNT - 1] ?? 0;
+    expect(last).toBeLessThan(open?.anchorX ?? 0);
+
+    document.body.replaceChildren();
+    const plain = makeRig({ appVw: MIRROR_APP_VW });
+    plain.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    plain.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    const plainOpen = plain.gesture.openState();
+    expect(plainOpen?.placement.centers[MENU_STRIP_COUNT - 1] ?? 0).toBeGreaterThan(
+      plainOpen?.anchorX ?? 0,
+    );
+  });
+
+  // The mirror is the ONLY thing that flips it: a right-handed anchor sitting
+  // right of the viewport centre (a narrow portrait phone) keeps growing right,
+  // which a room comparison would have got wrong.
+  it('keeps growing RIGHT for a right-handed anchor past the viewport centre', () => {
+    // A narrow portrait phone: the anchor's 152px seat puts it right of centre,
+    // where the side with more ROOM is the left one. The row still grows right,
+    // which a room comparison would have got backwards.
+    const rig = makeRig({ appVw: '360px', anchorX: 200 });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    const centers = rig.gesture.openState()?.placement.centers ?? [];
+    expect(centers).toHaveLength(MENU_STRIP_COUNT);
+    // Increasing centres ARE the rightward row; the clamp shifts the whole row
+    // without reordering it, so this survives a row too long for the viewport.
+    for (let i = 1; i < centers.length; i++) expect(centers[i]).toBeGreaterThan(centers[i - 1]);
+    // And a rightward flick is what walks it, rather than reading as a cancel.
+    expect(rig.gesture.liveIndex()).toBe(0);
+  });
+});
+
+// Focusability rides the shared elided writer as the tabindex ATTRIBUTE rather
+// than as a raw tabIndex IDL write, which is what every other write this layer
+// makes already does.
+describe('MenuStripGesture: row focusability goes through the writer facet', () => {
+  it('opens the row into the tab order and closes it out again', () => {
+    const rig = makeRig();
+    expect(rig.items.every((el) => el.getAttribute('tabindex') === '-1')).toBe(true);
+    rig.gesture.openSticky();
+    expect(rig.items.every((el) => el.getAttribute('tabindex') === '0')).toBe(true);
+    expect(rig.cancel.getAttribute('tabindex')).toBe('0');
+    // Reflected onto the IDL property, which is what the tab order reads.
+    expect(rig.items[0].tabIndex).toBe(0);
+    // And it went through the FACET: a raw tabIndex write leaves the shared
+    // elision cache empty, so a later identical write would hit the DOM again.
+    expect(rig.attrCache.get(rig.items[0])?.get('tabindex')).toBe('0');
+    expect(rig.attrCache.get(rig.cancel)?.get('tabindex')).toBe('0');
+
+    rig.gesture.closeSticky();
+    expect(rig.items.every((el) => el.getAttribute('tabindex') === '-1')).toBe(true);
+    expect(rig.cancel.getAttribute('tabindex')).toBe('-1');
+    expect(rig.attrCache.get(rig.items[0])?.get('tabindex')).toBe('-1');
+  });
+});
+
+// A second finger's pointercancel on the anchor must not drop the first finger's
+// live row: the anchor handler used to drop the drag whatever pointer the cancel
+// named, while the window backstop beneath it and the radial twin both match.
+describe('MenuStripGesture: pointercancel is matched on the pointer id', () => {
+  it('drops the drag when the cancel names the pointer that armed it', () => {
+    const rig = makeRig();
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    expect(rig.gesture.isOpen()).toBe(true);
+    rig.anchor.dispatchEvent(pointer('pointercancel', 1, 100 + SWIPE_PX));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.gesture.openState()).toBeNull();
+    expect(rig.picks).toEqual([]);
+  });
+
+  it('leaves the live row alone when the cancel names another pointer', () => {
+    const rig = makeRig();
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    rig.anchor.dispatchEvent(pointer('pointercancel', 2, 100));
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.openState()?.live).toBe(0);
+    // And the row still resolves its own release afterwards.
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
+    expect(rig.picks).toEqual([0]);
   });
 });

@@ -46,6 +46,10 @@ export interface ConsumableStripGestureDeps {
   use(index: number): void;
   /** The player opened the row and chose nothing. */
   onCancel(): void;
+  /** Repaint from openState(); called on every state change. The seat also
+   *  paints from Hud's frame, but a sticky open moves focus onto the first item
+   *  in the same call, and an item still carrying display:none refuses it. */
+  repaint?(): void;
 }
 
 /** The row's release rule in the shared outcome shape. A bare tap resolves to
@@ -80,6 +84,7 @@ export class ConsumableStripGesture {
       // consumable, so the tap path and the release path quaff the same thing.
       onDefault: () => deps.use(0),
       onCancel: () => deps.onCancel(),
+      repaint: () => deps.repaint?.(),
     });
   }
 
@@ -107,6 +112,12 @@ export class ConsumableStripGesture {
   /** True while the row is showing, from either path. */
   isOpen(): boolean {
     return this.gesture.isOpen();
+  }
+
+  /** True from the moment a press arms, which is what the carried-item list is
+   *  frozen on (see StripGesture.isArmed). */
+  isArmed(): boolean {
+    return this.gesture.isArmed();
   }
 
   /** What the painter needs to seat the row, or null while it is closed. The

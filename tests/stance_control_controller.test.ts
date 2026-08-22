@@ -159,6 +159,29 @@ describe('the touch stance control', () => {
     expect(rig.casts).toEqual([]);
   });
 
+  // A sticky open moves focus onto the first petal in the same call, and a petal
+  // the frame has not painted yet is display:none and refuses it. The control
+  // rides Hud's frame for its ordinary paints, so it hands the shared gesture a
+  // repaint of its own for this one moment.
+  it('paints the radial before focus lands on the first petal', () => {
+    const rig = makeRig();
+    render(rig, STANCES[0]);
+    const overlay = document.getElementById('mobile-stance-radial') as HTMLElement;
+    expect(overlay.classList.contains('open')).toBe(false);
+    let openAtFocus: boolean | null = null;
+    const focus = rig.petals[0].focus.bind(rig.petals[0]);
+    rig.petals[0].focus = () => {
+      openAtFocus = overlay.classList.contains('open');
+      focus();
+    };
+
+    press(rig.anchor);
+    expect(openAtFocus).toBe(true);
+    expect(document.activeElement).toBe(rig.petals[0]);
+    // And the petal was seated by that same paint rather than left at the origin.
+    expect(rig.petals[0].style.left).not.toBe('');
+  });
+
   it('re-reads the live model at press time, so a stance switch is never stale', () => {
     const rig = makeRig();
     render(rig, STANCES[0]);

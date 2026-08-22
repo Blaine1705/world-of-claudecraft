@@ -25,6 +25,7 @@ import { buildQuestStrip } from '../src/ui/hud/quest/quest_strip_controller';
 import { QUEST_STRIP_MAX_OBJECTIVES } from '../src/ui/hud/quest/quest_strip_core';
 import type { TrackedQuest } from '../src/ui/hud/quest/quest_tracker';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
+import * as i18nModule from '../src/ui/i18n';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import type { IWorld } from '../src/world_api';
 
@@ -541,5 +542,68 @@ describe('a quest that progresses takes the strip', () => {
     rig.controller.update([counted('a', 0)], 1000);
     rig.controller.update([counted('a', 0), counted('b', 0)], 2000);
     expect(rig.title.textContent).toBe('Title a');
+  });
+});
+
+// The strip used to run its full t()/formatNumber resolve on every medium-band
+// tick, keyed off the RENDERED strings it had just produced, so it could only
+// ever elide the DOM write and never the resolve behind it. It now gates the
+// resolve on a raw pre-resolve key (quest id, objective current/total/done,
+// counter position/total, the overflow count, plus a locale generation) and
+// reuses the last resolved model whenever that key holds.
+describe('the resolve is elided against a raw pre-resolve key', () => {
+  it('performs zero t() calls on a tick with unchanged quest data', () => {
+    const rig = mountStrip();
+    const quests = [quest('a', 1)];
+    rig.controller.update(quests, 0);
+    const tSpy = vi.spyOn(i18nModule, 't');
+    // A fresh array with byte-identical quest data, not the same reference:
+    // the key is built from raw fields, never object identity.
+    rig.controller.update([quest('a', 1)], 50);
+    expect(tSpy).not.toHaveBeenCalled();
+    tSpy.mockRestore();
+  });
+
+  it('resolves exactly once when a quest-progress tick actually changes the data', () => {
+    const rig = mountStrip();
+    rig.controller.update([quest('a', 1)], 0);
+    const warmSpy = vi.spyOn(i18nModule, 't');
+    rig.controller.update([quest('a', 1)], 50);
+    const coldResolveCallCount = warmSpy.mock.calls.length;
+    warmSpy.mockRestore();
+    expect(coldResolveCallCount).toBe(0);
+
+    const baselineSpy = vi.spyOn(i18nModule, 't');
+    // Re-resolve once from a clean cache to learn how many t() calls one full
+    // resolve of this exact model performs, without hardcoding that count.
+    rig.controller.relocalize();
+    const oneResolveCallCount = baselineSpy.mock.calls.length;
+    baselineSpy.mockRestore();
+    expect(oneResolveCallCount).toBeGreaterThan(0);
+
+    const progressed = {
+      ...quest('a', 1),
+      objectives: [{ label: 'Objective 0', current: 2, total: 3 }],
+    };
+    const progressSpy = vi.spyOn(i18nModule, 't');
+    rig.controller.update([progressed], 100);
+    expect(progressSpy).toHaveBeenCalledTimes(oneResolveCallCount);
+    progressSpy.mockRestore();
+    expect(rig.objectives[0]?.textContent).toContain('2');
+  });
+
+  it('relocalize() forces a resolve with identical quest data', () => {
+    const rig = mountStrip();
+    const quests = [quest('a', 1)];
+    rig.controller.update(quests, 0);
+    const settledSpy = vi.spyOn(i18nModule, 't');
+    rig.controller.update(quests, 50);
+    expect(settledSpy).not.toHaveBeenCalled();
+    settledSpy.mockRestore();
+
+    const relocalizeSpy = vi.spyOn(i18nModule, 't');
+    rig.controller.relocalize();
+    expect(relocalizeSpy.mock.calls.length).toBeGreaterThan(0);
+    relocalizeSpy.mockRestore();
   });
 });

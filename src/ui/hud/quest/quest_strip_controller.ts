@@ -40,6 +40,7 @@ import {
   type QuestStripObjectiveLine,
   type QuestStripPaintDescriptor,
   QuestStripPainter,
+  type QuestStripPaintModel,
 } from './quest_strip_painter';
 import type { TrackedQuest } from './quest_tracker';
 
@@ -116,10 +117,22 @@ export class QuestStripController {
   private pressed = false;
   private flash: QuestStripFlash | null = null;
   private flashPhase: 0 | 1 = 0;
-  /** The last painted content, so an unchanged medium-band tick paints nothing
-   *  and the gated measure below stays untouched. Built from the RENDERED
-   *  strings, so a locale change repaints without a relocalize hook. */
+  /** The last painted content, kept for seat()'s own gate below (which needs
+   *  the full rendered text, not just the raw key resolve() is gated on). */
   private signature = '';
+  /** The raw, pre-t() fingerprint resolve() is gated on: which quest is shown,
+   *  its objective counts, and the counter/overflow numbers, plus the locale
+   *  generation below. None of those move on a medium-band tick unless the
+   *  player's progress or selection actually changed, so a steady strip costs
+   *  no t()/formatNumber call at all. */
+  private resolveKey = '';
+  /** The last resolve() output, reused verbatim while resolveKey holds. */
+  private resolved: Omit<QuestStripPaintModel, 'pressed' | 'flash'> | null = null;
+  /** Bumped by relocalize(): every field resolveKey is built from is a raw id,
+   *  number or flag that a language switch alone never moves, so the
+   *  generation is the only signal that a translated string underneath it
+   *  changed. */
+  private localeGeneration = 0;
   private seatKey = '';
   private ticksSinceSeatMeasure = 0;
   /** The last frame time the tracker handed down, and when the player last
@@ -189,6 +202,16 @@ export class QuestStripController {
     }
   }
 
+  /** Language switch: bump the generation so the next repaint re-resolves every
+   *  t()/formatNumber call even though the raw quest data behind resolveKey may
+   *  not have moved (a translated string differing is not something that key
+   *  can see on its own). Repaints immediately so the caption is never left one
+   *  tick stale in the old language. */
+  relocalize(): void {
+    this.localeGeneration++;
+    this.repaint();
+  }
+
   /** Move the selection, wrapping in both directions. */
   cycle(step: QuestStripStep): void {
     if (this.quests.length < 2) return;
@@ -203,6 +226,46 @@ export class QuestStripController {
   private repaint(): void {
     const view = questStripView(this.quests, this.index);
     this.index = view.index;
+    const key = this.rawKey(view);
+    if (this.resolved === null || key !== this.resolveKey) {
+      this.resolved = this.resolve(view);
+      this.resolveKey = key;
+    }
+    // The press and the chevron pulse are transient, so they always paint even
+    // on a tick the resolve above was skipped; the content behind them rides
+    // the elided writers either way.
+    this.painter.paint({ ...this.resolved, pressed: this.pressed, flash: this.flash });
+    // Entered EVERY repaint and gated inside: the band's occupants (the buff
+    // bars, the party stack, the minimap's zone label) come and go without the
+    // quest text moving, and so do a rotation and a tier flip, so gating the
+    // ENTRY on the rendered text left every one of those unseated until the
+    // next quest event.
+    this.seat(false);
+  }
+
+  /** Every raw input the resolve below reads, before a single t()/formatNumber
+   *  call: which quest (by id; the title/label strings TrackedQuest carries are
+   *  already locale-resolved by the tracker and cannot themselves be compared
+   *  for free), its complete flag, the counter's position/total, the overflow
+   *  count, and each objective's current/total/done. The locale generation
+   *  covers what the strip resolves itself, which none of those raw fields
+   *  would otherwise move on a language switch alone (see relocalize()). */
+  private rawKey(view: QuestStripView): string {
+    return [
+      this.localeGeneration,
+      view.visible ? '1' : '0',
+      view.id,
+      view.complete ? '1' : '0',
+      view.counter.visible ? '1' : '0',
+      view.counter.position,
+      view.counter.total,
+      view.hiddenObjectives,
+      ...view.objectives.map((o) => `${o.current}/${o.total}/${o.done ? '1' : '0'}`),
+    ].join('|');
+  }
+
+  /** The t()/formatNumber resolve, run only when rawKey() moved. */
+  private resolve(view: QuestStripView): Omit<QuestStripPaintModel, 'pressed' | 'flash'> {
     const objectives = view.objectives.map<QuestStripObjectiveLine>((objective) => ({
       text: t('questUi.detail.objectiveProgress', {
         label: objective.label,
@@ -229,12 +292,11 @@ export class QuestStripController {
         view.hiddenObjectives > 0
           ? t('hudChrome.mobile.questStripMore', { count: this.number(view.hiddenObjectives) })
           : '',
-      pressed: this.pressed,
-      flash: this.flash,
     };
-    // The signature covers every rendered string, so a locale swap repaints even
-    // when the numbers behind it did not move.
-    const signature = [
+    // Kept for seat()'s own gate, which needs the full rendered text (a buff
+    // icon's stack text or the minimap zone label can change width without a
+    // quest event, which rawKey() above never sees).
+    this.signature = [
       model.visible ? '1' : '0',
       model.title,
       model.completeLabel,
@@ -243,16 +305,7 @@ export class QuestStripController {
       model.more,
       ...objectives.map((line) => `${line.done ? '1' : '0'}${line.text}`),
     ].join('\u0000');
-    this.signature = signature;
-    // The press and the chevron pulse are transient, so they always paint; the
-    // content behind them rides the elided writers either way.
-    this.painter.paint(model);
-    // Entered EVERY repaint and gated inside: the band's occupants (the buff
-    // bars, the party stack, the minimap's zone label) come and go without the
-    // quest text moving, and so do a rotation and a tier flip, so gating the
-    // ENTRY on the rendered text left every one of those unseated until the
-    // next quest event.
-    this.seat(false);
+    return model;
   }
 
   /** The off-screen description: what the strip is and what activating it does.

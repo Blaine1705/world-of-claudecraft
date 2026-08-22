@@ -162,6 +162,9 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
   wireAttackButton(attackBtn, deps);
 
   const overlay = document.getElementById(RADIAL_ID);
+  // Assigned once the painter exists (it needs the petal layer the gesture is
+  // handed to). The gesture only reaches it on a state change, never at build.
+  let ringPainter: MobileActionRingPainter | null = null;
   const gesture = new RadialGesture({
     buttons: slotBtns,
     // Hud's shared facet, the same one the ring and petal painters write
@@ -189,6 +192,10 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
       deps.consumePeekGuard();
       deps.hideTooltip();
     },
+    // A sticky open moves focus onto the first petal in the same call, and a
+    // petal the frame has not painted yet is display:none and refuses it. The
+    // drag paths keep riding Hud's frame.
+    repaint: () => ringPainter?.paintPetals(),
   });
 
   slotBtns.forEach((btn, i) => {
@@ -253,6 +260,7 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
     t,
     petals?.ring,
   );
+  ringPainter = painter;
 
   return {
     // The petal layer reads the SAME world snapshot the ring ticks against, so

@@ -130,7 +130,23 @@ export function buildStanceControl(deps: StanceControlDeps): StanceControl | nul
     pressClaimed: () => false,
     takeSuppressedPress: () => false,
     onCancel: () => deps.onCancel?.(),
+    // A sticky open moves focus onto the first petal in the same call, and a
+    // petal the frame has not painted yet is display:none and refuses it. The
+    // drag paths keep riding the frame loop through render().
+    repaint: () => paintRadial(),
   });
+
+  /** Paint or hide the radial from the gesture's own readouts. render() below
+   *  runs it every frame after the anchor; the gesture runs it on a state
+   *  change that has to land before focus moves. */
+  const paintRadial = (): void => {
+    const placement = gesture.placement();
+    if (!gesture.isOpen() || placement === null) {
+      painter.hide();
+      return;
+    }
+    painter.paintOpen(placement, gesture.liveDirection(), gesture.cancelIsLive());
+  };
   gesture.attach();
   gesture.attachPetals(
     STANCE_PETAL_DIRECTIONS.map((direction, i) => ({ direction, el: seats[i].btn })),
@@ -142,12 +158,7 @@ export function buildStanceControl(deps: StanceControlDeps): StanceControl | nul
     render(next: StanceRadialModel): void {
       model = next;
       painter.paintAnchor(next);
-      const placement = gesture.placement();
-      if (!gesture.isOpen() || placement === null) {
-        painter.hide();
-        return;
-      }
-      painter.paintOpen(placement, gesture.liveDirection(), gesture.cancelIsLive());
+      paintRadial();
     },
   };
 }

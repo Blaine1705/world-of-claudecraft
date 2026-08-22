@@ -43,6 +43,16 @@ export class QuestTrackerController {
     this.strip = buildQuestStrip({ writers: deps.writers, click: () => this.deps.click() });
   }
 
+  /** Language switch: the desktop rows already re-resolve unconditionally in
+   *  renderHtml, but the strip is gated on a raw pre-resolve key that a locale
+   *  switch alone cannot move, so it needs its own nudge. Bumping the strip's
+   *  generation first, then rebuilding the tracked quests so their titles and
+   *  objective labels re-resolve too, covers both halves in one call. */
+  relocalize(): void {
+    this.strip?.relocalize();
+    this.update(this.lastNow);
+  }
+
   update(now: number): void {
     this.lastNow = now;
     let collapsed = this.deps.settings.collapsed();

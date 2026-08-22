@@ -38,6 +38,10 @@ const CANCEL_ID = 'mobile-menu-cancel';
 const CAPTION_ID = 'mobile-menu-caption';
 const CAPTION_TEXT_SELECTOR = '.tt-title';
 const ARIA_LABEL_ATTR = 'aria-label';
+/** The left-handed HUD mirror, which reseats the control against the opposite
+ *  screen edge (hud.mobile.css). Read as the CLASS rather than as the setting so
+ *  the row can only ever grow the way the anchor was actually placed. */
+const LEFT_HANDED_CLASS = 'mobile-left-handed';
 /** The two accessible names, one per mode. The gesture one is also the static
  *  markup's `data-i18n-aria`, so an unbuilt control still says something true. */
 const GESTURE_ARIA_KEY: TranslationKey = 'hudChrome.mobile.quickActionsAria';
@@ -104,6 +108,7 @@ export function buildMobileMenuControl(deps: MobileMenuControlDeps = {}): Mobile
     cancel,
     writers,
     tapMenus: () => tapMenusEnabled(),
+    leftHanded: () => document.body.classList.contains(LEFT_HANDED_CLASS),
     pick: (index, source) => {
       // A gesture release never touched the item, so activating the real button
       // is what runs the action, through the handler the old row or the More

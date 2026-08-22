@@ -44,6 +44,15 @@ interface Rig {
   claimed: Set<number>;
   /** settings.touchTapMenus, flipped per test. */
   tapMenus: boolean;
+  /** Every repaint the gesture asked for, each recording whether the petals were
+   *  open at that moment: a sticky open must paint BEFORE it moves focus onto
+   *  the first petal. */
+  repaints: boolean[];
+  /** What held focus at each repaint, so the ORDER of the two is pinned. */
+  focusedAtRepaint: (Element | null)[];
+  /** The facet's own attribute cache: an entry per (element, attr) it wrote, so
+   *  a write that reached the DOM around the facet leaves no trace here. */
+  attrCache: Map<HTMLElement, Map<string, string>>;
 }
 
 function rect(btn: HTMLElement, x: number, y: number): void {
@@ -115,6 +124,9 @@ function makeRig(
     suppressed: { value: false, takes: 0 },
     claimed: new Set<number>(),
     tapMenus: options.tapMenus ?? false,
+    repaints: [],
+    focusedAtRepaint: [],
+    attrCache: new Map<HTMLElement, Map<string, string>>(),
     gesture: null as unknown as RadialGesture,
   };
   const deps: RadialGestureDeps = {
@@ -123,7 +135,7 @@ function makeRig(
       new Map(),
       new Map(),
       new Map(),
-      new Map(),
+      rig.attrCache,
       () => {},
       () => {},
     ),
@@ -141,6 +153,10 @@ function makeRig(
     },
     onCancel: () => {
       rig.cancels++;
+    },
+    repaint: () => {
+      rig.repaints.push(rig.gesture.isOpen());
+      rig.focusedAtRepaint.push(document.activeElement);
     },
   };
   rig.gesture = new RadialGesture(deps);
@@ -734,5 +750,86 @@ describe('RadialGesture: a petal activation casts exactly once', () => {
     down(rig, 0, 1, 100, 100);
     rig.petals[3].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(rig.casts).toEqual([[0, PETAL_DIRECTIONS[3]]]);
+  });
+});
+
+// The sticky menu owns the ring while it is showing, exactly as the strip twin's
+// sticky row owns its anchor. Without the guard a drag on ANOTHER button armed
+// underneath the open overlay, so one button cast while the petals on screen
+// showed a second one's slots. Reachable with tap menus OFF too: assistive
+// activation opens the sticky menu in either mode.
+describe('RadialGesture: a sticky menu refuses a drag underneath it', () => {
+  it('refuses a drag on another button while the petals are sticky-open', () => {
+    const rig = makeRig();
+    // The assistive path with the setting OFF: the menu is opened directly,
+    // exactly as the click handler opens it for a screen reader.
+    rig.gesture.openSticky(0);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.heldButtonIndex()).toBe(0);
+
+    down(rig, 1, 1, 100, 100);
+    move(rig, 1, 1, 100 + FLICK_PX, 100);
+    up(rig, 1, 1, 100 + FLICK_PX, 100);
+    // Nothing cast, and the open menu still belongs to the button that opened it.
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.heldButtonIndex()).toBe(0);
+  });
+
+  it('arms again once the sticky menu is closed', () => {
+    const rig = makeRig();
+    rig.gesture.openSticky(0);
+    rig.gesture.closeSticky();
+    down(rig, 1, 1, 100, 100);
+    move(rig, 1, 1, 100 + FLICK_PX, 100);
+    up(rig, 1, 1, 100 + FLICK_PX, 100);
+    expect(rig.casts).toEqual([[1, 'right']]);
+  });
+});
+
+// A sticky open focuses the first petal in the same call, and a petal the frame
+// has not painted yet is display:none, which refuses focus and leaves it on the
+// ring button. The owner (the ring, the stance control) hands the gesture a
+// repaint for exactly this moment; the drag paths keep riding its frame.
+describe('RadialGesture: the sticky open paints before it focuses', () => {
+  it('repaints with the petals already open, before focus moves', () => {
+    const rig = makeRig();
+    rig.gesture.openSticky(0);
+    expect(rig.repaints).toContain(true);
+    const openAt = rig.repaints.indexOf(true);
+    expect(rig.focusedAtRepaint[openAt]).not.toBe(rig.petals[0]);
+    expect(document.activeElement).toBe(rig.petals[0]);
+  });
+
+  it('repaints on the close as well, before focus returns to the button', () => {
+    const rig = makeRig();
+    rig.gesture.openSticky(0);
+    const before = rig.repaints.length;
+    rig.gesture.closeSticky();
+    expect(rig.repaints.length).toBeGreaterThan(before);
+    expect(rig.repaints[rig.repaints.length - 1]).toBe(false);
+    expect(document.activeElement).toBe(rig.buttons[0]);
+  });
+});
+
+// Focusability rides the shared elided writer as the tabindex ATTRIBUTE rather
+// than as a raw tabIndex IDL write, which is what every other write this layer
+// makes already does.
+describe('RadialGesture: petal focusability goes through the writer facet', () => {
+  it('opens the petals to the tab order and closes them out of it again', () => {
+    const rig = makeRig();
+    expect(rig.petals.every((el) => el.getAttribute('tabindex') === '-1')).toBe(true);
+    rig.gesture.openSticky(0);
+    expect(rig.petals.every((el) => el.getAttribute('tabindex') === '0')).toBe(true);
+    expect(rig.petalCancel.getAttribute('tabindex')).toBe('0');
+    // Reflected onto the IDL property, which is what the tab order reads.
+    expect(rig.petals[0].tabIndex).toBe(0);
+    // And it went through the FACET: a raw tabIndex write leaves the shared
+    // elision cache empty, so a later identical write would hit the DOM again.
+    expect(rig.attrCache.get(rig.petals[0])?.get('tabindex')).toBe('0');
+    expect(rig.attrCache.get(rig.petalCancel)?.get('tabindex')).toBe('0');
+    rig.gesture.closeSticky();
+    expect(rig.petals.every((el) => el.getAttribute('tabindex') === '-1')).toBe(true);
+    expect(rig.petalCancel.getAttribute('tabindex')).toBe('-1');
   });
 });

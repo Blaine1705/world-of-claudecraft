@@ -124,7 +124,11 @@ const MONOLITHS: MonolithRow[] = [
     // in-bags sub-line moved into hud/action_bar/item_bags_line_core.ts, which
     // the consumables row's restored item tooltip shares, and paid for its own
     // two callback lines with nine to spare. Exact count, zero slack.
-    ceiling: 19032,
+    // LOWERED 19032 -> 19031: the bar editor's swapSlots/clearSlot callbacks now
+    // share placeAbility's spellbook-refresh through one commitHotbarActions
+    // helper, fixing a stale assign toggle when a bound spell is cleared or
+    // swapped with the spellbook open behind the editor. Exact count, zero slack.
+    ceiling: 19031,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

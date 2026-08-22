@@ -22,6 +22,7 @@ import {
   STRIP_CAPTION_HALF_PX,
   STRIP_PITCH_PX,
   type StripCaptionInput,
+  type StripDirection,
   shouldRevealStrip,
   stripCancelIsLive,
   stripCaptionCenterX,
@@ -72,10 +73,34 @@ export const MENU_STRIP_ITEMS: readonly MenuStripItem[] = [
 export const MENU_STRIP_COUNT = MENU_STRIP_ITEMS.length;
 
 /** The row grows rightward: the control sits at the left of the bottom band, so
- *  the whole screen width is in front of it. Fixed rather than resolved per
- *  gesture, because the muscle memory the roster order buys depends on the
- *  direction never changing under the player. */
+ *  the whole screen width is in front of it. This is the direction for the
+ *  shipped right-handed HUD, and resolveMenuStripDirection below is the only
+ *  thing allowed to answer otherwise. */
 export const MENU_STRIP_DIRECTION = 'right' as const;
+
+export interface MenuStripDirectionInput {
+  /** Whether the left-handed HUD mirror is on (body.mobile-left-handed), which
+   *  is what moves the control to the opposite edge. */
+  leftHanded: boolean;
+}
+
+/**
+ * Which way the row grows. The mirror is the ONE thing that changes it, so the
+ * muscle memory the roster order buys survives every other move: the control is
+ * seated 152px in from one screen edge, and the left-handed mirror seats it in
+ * from the other, where a rightward row would run off the screen and be clamped
+ * back over the anchor while the travel, the dim and the caption still counted
+ * rightward.
+ *
+ * Deliberately NOT the consumables row's room comparison
+ * (resolveConsumableStripDirection): that seat sits hard against the edge, so
+ * which side holds the row is an honest readout there, while this control sits
+ * near the middle of a narrow portrait viewport and a room comparison flips it
+ * on a right-handed phone barely narrower than the ones we ship.
+ */
+export function resolveMenuStripDirection(input: MenuStripDirectionInput): StripDirection {
+  return input.leftHanded ? 'left' : MENU_STRIP_DIRECTION;
+}
 
 /** The shared strip pitch under this row's own name. Re-exported rather than
  *  restated, so the menu strip and the consumables row cannot drift apart on the

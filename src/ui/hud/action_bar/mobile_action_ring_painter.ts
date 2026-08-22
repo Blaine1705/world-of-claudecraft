@@ -114,8 +114,11 @@ export class MobileActionRingPainter {
 
   /** Paint or close the direction petals. Closed is the steady state, and the
    *  close routes through the same elided toggle, so an idle frame writes
-   *  nothing at all; only a held button costs the petal work. */
-  private paintPetals(): void {
+   *  nothing at all; only a held button costs the petal work. PUBLIC because the
+   *  gesture layer repaints through it on a sticky open, which has to seat the
+   *  petals before focus moves onto one; every ordinary paint still arrives from
+   *  paint() above. */
+  paintPetals(): void {
     if (!this.petals) return;
     const placement = this.petals.source.placement();
     if (!this.petals.source.isOpen() || !placement) {

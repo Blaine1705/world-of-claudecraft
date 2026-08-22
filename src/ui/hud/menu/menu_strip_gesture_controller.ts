@@ -2,11 +2,12 @@
 // (../strip_gesture_controller.ts), which owns pointer capture, the reveal
 // timer, the anchor measure, the window release backstop, sticky/tap mode, the
 // aria-expanded state and the Escape closer. This module supplies only what is
-// genuinely this menu's: the row grows RIGHT (fixed, because the muscle memory
-// the roster order buys depends on the direction never changing under the
-// player), the roster is a constant ten, and the control runs no action of its
-// own, so a bare tap OPENS the row and the next press closes it again
-// (anchorRole 'toggle', whose whole meaning lives in tap_menu_core.ts).
+// genuinely this menu's: the row grows RIGHT and flips only for the left-handed
+// mirror that reseats the control against the opposite edge (nothing else may
+// move it, because the muscle memory the roster order buys depends on that), the
+// roster is a constant ten, and the control runs no action of its own, so a bare
+// tap OPENS the row and the next press closes it again (anchorRole 'toggle',
+// whose whole meaning lives in tap_menu_core.ts).
 //
 // It was a near-verbatim copy of the consumables row's gesture layer until the
 // rule of three was reached: identical drag state, metric reads, fallbacks,
@@ -23,8 +24,8 @@ import {
 } from '../strip_gesture_controller';
 import {
   MENU_STRIP_COUNT,
-  MENU_STRIP_DIRECTION,
   MENU_STRIP_PITCH_PX,
+  resolveMenuStripDirection,
   resolveMenuStripRelease,
 } from './menu_strip_core';
 import type { MenuStripOpenState } from './menu_strip_painter';
@@ -42,6 +43,10 @@ export interface MenuStripGestureDeps {
   writers: PainterHostWriters;
   /** Tap mode (settings.touchTapMenus), read live at press time. */
   tapMenus(): boolean;
+  /** Whether the left-handed HUD mirror is on, read live at press time: it moves
+   *  the anchor to the opposite edge, and the row has to grow the other way with
+   *  it or the travel, the dim and the drawn items disagree. */
+  leftHanded(): boolean;
   /** Open the item at `index`. `source` says whether the item's own button has
    *  already been activated by the pick, which decides how the owner routes it. */
   pick(index: number, source: StripPickSource): void;
@@ -74,7 +79,10 @@ export class MenuStripGesture {
       anchorRole: 'toggle',
       count: () => MENU_STRIP_COUNT,
       pitch: MENU_STRIP_PITCH_PX,
-      direction: () => MENU_STRIP_DIRECTION,
+      // Per GESTURE, like the consumables row: the mirror can be toggled mid
+      // session, and the whole open row (placement, travel, dim, caption) is
+      // resolved from this one answer.
+      direction: () => resolveMenuStripDirection({ leftHanded: deps.leftHanded() }),
       release,
       onPick: (index, source) => deps.pick(index, source),
       // No onDefault: resolveMenuStripRelease answers 'open' wherever another

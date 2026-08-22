@@ -79,6 +79,10 @@ const FALLBACK_MARGIN_PX = 6;
  *  are showing. It is written on the BUTTON the petals belong to, never on the
  *  overlay: the button is the control a screen reader is standing on. */
 const ARIA_EXPANDED_ATTR = 'aria-expanded';
+/** Focusability of the petals, written as the ATTRIBUTE through the shared
+ *  elided writer rather than as the tabIndex IDL property: the facet has no
+ *  property writer, and the attribute is what the IDL property reflects. */
+const TABINDEX_ATTR = 'tabindex';
 
 /** A keyboard-activated click reports detail 0; a pointer-driven one does not.
  *  The pointer path below owns mouse and touch, so the click listener exists
@@ -128,6 +132,11 @@ export interface RadialGestureDeps {
   takeSuppressedPress(): boolean;
   /** The player opened the radial and chose nothing. */
   onCancel(): void;
+  /** Repaint from the readouts above. Supplied so an opening that is chosen by
+   *  FOCUS (sticky/tap mode) paints the petals BEFORE focus moves onto one:
+   *  petals still carrying display:none refuse focus and it stays on the ring
+   *  button. The drag paths ride the owner's frame loop instead. */
+  repaint?(): void;
 }
 
 interface DragState {
@@ -319,6 +328,7 @@ export class RadialGesture {
         () => this.dismissSticky(),
       );
     }
+    this.deps.repaint?.();
     this.petals[0]?.el.focus();
   }
 
@@ -332,6 +342,7 @@ export class RadialGesture {
     this.disarmOutside?.();
     this.disarmOutside = null;
     this.setExpanded(sticky.btn, false);
+    this.deps.repaint?.();
     sticky.btn.focus();
   }
 
@@ -411,9 +422,11 @@ export class RadialGesture {
   }
 
   private setPetalsFocusable(on: boolean): void {
-    const tabIndex = on ? 0 : -1;
-    for (const petal of this.petals) petal.el.tabIndex = tabIndex;
-    if (this.petalCancel) this.petalCancel.tabIndex = tabIndex;
+    const tabIndex = on ? '0' : '-1';
+    for (const petal of this.petals) {
+      this.deps.writers.setAttr(petal.el, TABINDEX_ATTR, tabIndex);
+    }
+    if (this.petalCancel) this.deps.writers.setAttr(this.petalCancel, TABINDEX_ATTR, tabIndex);
   }
 
   /** The drag the petal overlay belongs to. A second thumb's press casts but
@@ -438,6 +451,12 @@ export class RadialGesture {
       this.resolveAnchorPress(buttonIndex);
       return;
     }
+    // A sticky menu owns the ring while it is showing, exactly as it owns the row
+    // in the strip twin (strip_gesture_controller.ts onDown): with tap menus off
+    // the petals are still reachable by assistive activation, and a drag armed on
+    // ANOTHER button underneath would cast from one button while the overlay
+    // showed a second one's slots.
+    if (this.sticky) return;
     // A claim (an empowered hold, bind mode) owns the POINTER, so the drag never
     // arms under one. It is refused HERE rather than at the head of the handler
     // on purpose: the tap-driven paths above open and close the petals without a

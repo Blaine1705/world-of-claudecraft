@@ -88,7 +88,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.syncDailyRewardsSurfaceLabels|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
-  'this.updateQuestTracker|',
+  'this.questTracker.relocalize|',
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
   'this.partyFramesPainter.relocalize|',

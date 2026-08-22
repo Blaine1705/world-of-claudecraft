@@ -274,3 +274,80 @@ describe('the carried-consumables scan is gated, never per frame', () => {
     expect(scanSpy.mock.calls.length).toBe(beforeOpenPaints + 1);
   });
 });
+
+// The freeze is armed by the PRESS, not by the reveal. A press spends
+// RADIAL_REVEAL_MS armed and unrevealed, and the row it will choose from is
+// already decided there: a loot or a use landing inside that window used to
+// re-sort the id list between the press and the index it resolved to, so the
+// seat quaffed something other than what the player pressed on.
+describe('the frozen list starts at the press, not at the reveal', () => {
+  it('uses the item the press armed on, after the inventory re-sorts mid-press', () => {
+    const rig = makeRig();
+    // Carrying only a mana potion, so a bare tap on the seat uses index 0.
+    rig.paint([{ itemId: 'mana_potion', count: 2 }]);
+    // A USE forces the next painted frame to rescan rather than wait out the
+    // divider, which is exactly how a rescan lands inside the NEXT press's armed
+    // window: the player taps twice in a row.
+    rig.seat.seatBtn.dispatchEvent(pointer('pointerdown', 100));
+    rig.seat.seatBtn.dispatchEvent(pointer('pointerup', 100));
+    expect(rig.used).toEqual(['mana_potion']);
+
+    // Second press, and a healing potion arrives DURING its armed window; it
+    // sorts AHEAD of the mana one, so an unfrozen list moves index 0 under the
+    // finger and the release quaffs something the player never pressed on.
+    rig.seat.seatBtn.dispatchEvent(pointer('pointerdown', 100));
+    rig.paint(CARRIED);
+    rig.seat.seatBtn.dispatchEvent(pointer('pointerup', 100));
+    expect(rig.used).toEqual(['mana_potion', 'mana_potion']);
+  });
+
+  it('takes no scan at all while the press is armed but unrevealed', () => {
+    const rig = makeRig();
+    rig.paint();
+    rig.seat.seatBtn.dispatchEvent(pointer('pointerdown', 100));
+    expect(rig.seat.gesture.isArmed()).toBe(true);
+    expect(rig.seat.gesture.isOpen()).toBe(false);
+    const before = scanSpy.mock.calls.length;
+    for (let frame = 0; frame < 20; frame++) rig.paint();
+    expect(scanSpy.mock.calls.length).toBe(before);
+  });
+
+  it('rescans on the frame after the press ends', () => {
+    const rig = makeRig();
+    rig.paint();
+    rig.seat.seatBtn.dispatchEvent(pointer('pointerdown', 100));
+    rig.paint();
+    const before = scanSpy.mock.calls.length;
+    rig.seat.gesture.cancelDrag();
+    rig.paint();
+    expect(scanSpy.mock.calls.length).toBe(before + 1);
+  });
+});
+
+// The sticky path chooses by FOCUS, so the row has to be painted before focus
+// moves onto its first item: an item still carrying display:none refuses focus
+// and it stays on the seat. The seat rides Hud's frame, so it hands the gesture
+// a repaint of its own.
+describe('the sticky open paints the row before it focuses the first item', () => {
+  it('has the row open at the moment focus lands on the first item', () => {
+    const rig = makeRig();
+    rig.paint();
+    const strip = document.getElementById('mobile-consumable-strip') as HTMLElement;
+    const items = [...document.querySelectorAll<HTMLElement>('.mobile-consumable-item')];
+    expect(strip.classList.contains('open')).toBe(false);
+    // The stylesheet hides an unopened row, so what decides whether the focus
+    // move lands is whether the paint has already run when it happens.
+    let openAtFocus: boolean | null = null;
+    const focus = items[0].focus.bind(items[0]);
+    items[0].focus = () => {
+      openAtFocus = strip.classList.contains('open');
+      focus();
+    };
+
+    rig.seat.gesture.openSticky();
+    expect(openAtFocus).toBe(true);
+    expect(document.activeElement).toBe(items[0]);
+    // And the item was seated by that same paint, not left at the origin.
+    expect(items[0].style.left).not.toBe('');
+  });
+});

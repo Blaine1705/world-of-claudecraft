@@ -18,6 +18,7 @@ import {
   MENU_STRIP_PITCH_PX,
   menuCaptionCenterX,
   menuStripCancelIsLive,
+  resolveMenuStripDirection,
   resolveMenuStripRelease,
   shouldRevealMenuStrip,
 } from '../src/ui/hud/menu/menu_strip_core';
@@ -109,6 +110,15 @@ describe('the menu strip roster', () => {
 
   it('grows rightward from a control seated at the left of the bottom band', () => {
     expect(MENU_STRIP_DIRECTION).toBe('right');
+    expect(resolveMenuStripDirection({ leftHanded: false })).toBe(MENU_STRIP_DIRECTION);
+  });
+
+  // The left-handed mirror reseats the whole control against the opposite edge
+  // (hud.mobile.css body.mobile-left-handed #mobile-combat-controls), where a
+  // rightward row is clamped back over its own anchor while the travel, the dim
+  // and the caption still count rightward.
+  it('flips leftward under the left-handed mirror', () => {
+    expect(resolveMenuStripDirection({ leftHanded: true })).toBe('left');
   });
 
   it('walks the whole row inside a thumb arc at the gesture pitch', () => {

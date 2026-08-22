@@ -7,10 +7,12 @@ export {
   MENU_STRIP_ITEMS,
   MENU_STRIP_PITCH_PX,
   type MenuActionId,
+  type MenuStripDirectionInput,
   type MenuStripItem,
   type MenuStripOutcome,
   menuCaptionCenterX,
   menuStripCancelIsLive,
+  resolveMenuStripDirection,
   resolveMenuStripRelease,
   shouldRevealMenuStrip,
 } from './menu_strip_core';

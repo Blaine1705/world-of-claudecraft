@@ -5314,6 +5314,12 @@ export class Hud {
     clearActionDropTargets: () => this.clearActionDropTargets(),
     openBarEditor: (abilityId) => this.openBarEditor(abilityId),
   });
+  // Shared so a swap or clear also refreshes the spellbook's hotbar toggles.
+  private commitHotbarActions(actions: HotbarAction[]): void {
+    this.hotbarActions = actions;
+    this.saveSlotMap();
+    this.spellbookWindow.refreshHotbarControls();
+  }
   // The touch bar editor (hud/action_bar/bar_editor/): the ONLY binding path on
   // touch, replacing the retired long-press rearrange. Both mutations land on the
   // SAME helpers the desktop HTML5 drop uses, so no second write path exists.
@@ -5328,18 +5334,11 @@ export class Hud {
     editAllowed: () => isActionBarEditAllowed(this.actionBarsLocked(), 'drop'),
     placeAbility: (abilityId, slot) => {
       if (!this.actionBarController.isAssignableAction({ type: 'ability', id: abilityId })) return;
-      this.hotbarActions = placeAbilityOnSlot(this.hotbarActions, abilityId, slot - 1);
-      this.saveSlotMap();
-      this.spellbookWindow.refreshHotbarControls();
+      this.commitHotbarActions(placeAbilityOnSlot(this.hotbarActions, abilityId, slot - 1));
     },
-    swapSlots: (slotA, slotB) => {
-      this.hotbarActions = swapHotbarSlots(this.hotbarActions, slotA - 1, slotB - 1);
-      this.saveSlotMap();
-    },
-    clearSlot: (slot) => {
-      this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
-      this.saveSlotMap();
-    },
+    swapSlots: (slotA, slotB) =>
+      this.commitHotbarActions(swapHotbarSlots(this.hotbarActions, slotA - 1, slotB - 1)),
+    clearSlot: (slot) => this.commitHotbarActions(clearHotbarSlot(this.hotbarActions, slot - 1)),
   });
   // Quest-log window painter (questlog_view.ts core + questlog_window.ts painter).
   // It composes the presentation bag (icon/money/tooltip) for the reward row and
@@ -6433,7 +6432,7 @@ export class Hud {
     this.mountRaceStrip.relocalize();
     this.mountRaceControls.relocalize();
     this.refreshKeybindLabels();
-    this.updateQuestTracker(performance.now());
+    this.questTracker.relocalize(); // the strip key cannot see a locale-only change.
     // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
     // a plain update() early-returns here and re-emits nothing. relocalize()
     // clears it for exactly one rebuild (#2529).

@@ -855,6 +855,14 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     expect(hud).toContain('takeSuppressedClick: () => {');
   });
 
+  it('hands the gesture a petal repaint, so a sticky open paints before it focuses', () => {
+    // The petals are display:none until the overlay is painted open, and the
+    // sticky path moves focus onto the first one in the same call, so the paint
+    // has to be reachable from the gesture rather than only from Hud's frame.
+    expect(ring).toContain('repaint: () => ringPainter?.paintPetals(),');
+    expect(gesture).toContain('this.deps.repaint?.();');
+  });
+
   it('arms NO rearrange gesture on the live ring', () => {
     // The long-press rearrange this replaces opened under the radial: a hold
     // long enough to reveal the petals could also pick the slot up and swap it

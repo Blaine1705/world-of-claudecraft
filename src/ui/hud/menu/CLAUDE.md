@@ -7,11 +7,21 @@
 One gesture control replacing the old five-button touch row (Chat, Social,
 Quests, Settings, More). It runs NO action of its own: a tap opens the ten-item
 strip (Mount, Chat, Map, Bags, Social, Quests, Character, Spells, Settings,
-More), a hold or a rightward swipe opens it and picks in one gesture, and the
+More), a hold or a swipe along the row opens it and picks in one gesture, and the
 next press on the control closes it again.
 
 ## Load-bearing rules
 
+- **The row's direction follows the MIRROR, and nothing else.** It grows right,
+  and flips left only under `body.mobile-left-handed`, which reseats the whole
+  control against the opposite screen edge; the gesture reads that class live and
+  `resolveMenuStripDirection` is the one place that answers. Deliberately NOT the
+  consumables row's room comparison (`resolveConsumableStripDirection`): that seat
+  sits hard against the edge, while this control sits 152px in, where the side
+  with more room flips on a narrow portrait phone the mirror never touched. A
+  hard-coded direction is the other failure: it clamped the row back over its own
+  anchor under the mirror while the travel, the dim and the caption still counted
+  the other way.
 - **The roster order IS the design.** It is sorted by how often a player reaches
   for it, because swipe distance is the cost. Mount leads it (issue #2739). Do
   not reorder `MENU_STRIP_ITEMS` for tidiness.
@@ -39,7 +49,7 @@ next press on the control closes it again.
 | File | What it is |
 |---|---|
 | `menu_strip_core.ts` | PURE. Roster, release rules, reveal rule, caption clamp. Registered in `UI_PURE_CORES`. |
-| `menu_strip_gesture_controller.ts` | A thin instantiation of the SHARED `../strip_gesture_controller.ts` (pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, `aria-expanded`, the Escape closer, and the sticky path). It supplies only this menu's four parameters: the fixed rightward direction, the ten-item roster, the pitch, and the `anchorRole: 'toggle'` that turns a bare tap into an open. |
+| `menu_strip_gesture_controller.ts` | A thin instantiation of the SHARED `../strip_gesture_controller.ts` (pointer capture, the reveal timer, ONE anchor measure per gesture, the window release backstop, `aria-expanded`, the Escape closer, and the sticky path). It supplies only this menu's four parameters: the direction resolved per gesture by `resolveMenuStripDirection`, the ten-item roster, the pitch, and the `anchorRole: 'toggle'` that turns a bare tap into an open. |
 | `menu_strip_painter.ts` | Thin painter: item seating, live highlight, caption text and position. Takes no layout read. |
 | `menu_control_controller.ts` | Builds it from the static markup and routes picks to the real buttons. |
 

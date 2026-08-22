@@ -30,7 +30,12 @@ import type { PainterHostWriters } from '../../painter_host';
 import { StripCaptionPainter } from '../strip_caption_painter';
 import { tapMenusEnabled } from '../tap_menu';
 import type { ActionBarSlotElements } from './action_bar_painter';
-import { type ActionBarWorldInput, createActionBarView, inventoryCount } from './action_bar_view';
+import {
+  type ActionBarState,
+  type ActionBarWorldInput,
+  createActionBarView,
+  inventoryCount,
+} from './action_bar_view';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
 import { ConsumableStripGesture } from './consumable_strip_gesture_controller';
 import { ConsumableStripPainter } from './consumable_strip_painter';
@@ -124,20 +129,25 @@ export function buildMobileConsumableSeat(
   if (!seatBtn || !strip || !cancel || itemBtns.length !== CONSUMABLE_BAR_SLOTS) return null;
   if (!caption || !captionText) return null;
 
-  // The ONE reused array the pure core fills. It is FROZEN while the row is open
-  // so an item never shifts out from under the thumb travelling toward it (a
-  // depleted stack stays in place, greyed at count 0, exactly like a desktop bar
-  // item shortcut), and refreshed on every closed frame so the seat always shows
-  // what the player is actually carrying.
+  // The ONE reused array the pure core fills. It is FROZEN from the moment a
+  // press ARMS so an item never shifts out from under the thumb travelling
+  // toward it (a depleted stack stays in place, greyed at count 0, exactly like a
+  // desktop bar item shortcut), and refreshed on every idle frame so the seat
+  // always shows what the player is actually carrying. Armed, never open: the
+  // reveal is RADIAL_REVEAL_MS behind the press, and a loot landing inside that
+  // window used to re-sort the row between the press and the use it resolved to.
   const ids: string[] = [];
   // The most recent inventory snapshot the paint saw, so a tooltip resolved on a
   // long press reads the same stack counts the row was painted from.
   let inventory: readonly { itemId: string; count: number }[] = [];
   let framesSinceScan = CLOSED_RESCAN_FRAMES;
-  let wasOpen = false;
-  // The caption's resolve, not just its write, is elided: the row is frozen
-  // while open, so the localized name can only change when the finger moves to
-  // another item.
+  let wasArmed = false;
+  /** The last state the view ticked, so a gesture-driven repaint between frames
+   *  paints the row without a second tick of Hud's snapshot. */
+  let lastState: ActionBarState | null = null;
+  // The caption's resolve, not just its write, is elided: the row is frozen for
+  // the whole press, so the localized name can only change when the finger moves
+  // to another item.
   let captionLive = -1;
   let captionName = '';
 
@@ -223,44 +233,57 @@ export function buildMobileConsumableSeat(
       deps.consumePeekGuard();
       deps.hideTooltip();
     },
+    // The row rides Hud's frame for its ordinary paints, but a sticky open moves
+    // focus onto the first item in the same call, and an item the frame has not
+    // shown yet is display:none and refuses focus.
+    repaint: () => render(),
   });
+
+  /** Paint the seat, the row and the caption from the last ticked state. Called
+   *  every frame by paint() below, and by the gesture on a state change. */
+  const render = (): void => {
+    if (lastState === null) return;
+    const open = gesture.openState();
+    painter.paint(lastState, open);
+    // ONE caption for the item under the finger: the row's icons alone cannot
+    // tell a healing potion from a mana one at a glance mid-fight.
+    const live = open ? open.live : -1;
+    if (live !== captionLive) {
+      captionLive = live;
+      const item = live >= 0 ? itemAt(deps, ids, live) : null;
+      captionName = item ? itemDisplayName(item) : '';
+    }
+    captionPainter.paint(
+      captionName,
+      open
+        ? stripCaptionCenterX({
+            centers: open.placement.centers,
+            live,
+            viewportWidth: open.viewportWidth,
+            margin: open.margin,
+          })
+        : null,
+      open?.anchorY ?? 0,
+    );
+  };
   gesture.attach();
 
   return {
     paint(world: ActionBarWorldInput): void {
       inventory = world.inventory;
-      const open = gesture.openState();
-      // Frozen while the row is open (an item must not shift out from under a
-      // travelling thumb), rescanned on the frame the row closes, and otherwise
+      // Frozen from the press (an item must not shift out from under a
+      // travelling thumb), rescanned on the frame the press ends, and otherwise
       // on the divider above rather than on every frame.
-      if (open === null) {
-        if (wasOpen || ++framesSinceScan >= CLOSED_RESCAN_FRAMES) {
+      const armed = gesture.isArmed();
+      if (!armed) {
+        if (wasArmed || ++framesSinceScan >= CLOSED_RESCAN_FRAMES) {
           consumableBarItems(world.inventory, (id) => deps.lookupItem(id), ids);
           framesSinceScan = 0;
         }
       }
-      wasOpen = open !== null;
-      painter.paint(view.tick(world), open);
-      // ONE caption for the item under the finger: the row's icons alone cannot
-      // tell a healing potion from a mana one at a glance mid-fight.
-      const live = open ? open.live : -1;
-      if (live !== captionLive) {
-        captionLive = live;
-        const item = live >= 0 ? itemAt(deps, ids, live) : null;
-        captionName = item ? itemDisplayName(item) : '';
-      }
-      captionPainter.paint(
-        captionName,
-        open
-          ? stripCaptionCenterX({
-              centers: open.placement.centers,
-              live,
-              viewportWidth: open.viewportWidth,
-              margin: open.margin,
-            })
-          : null,
-        open?.anchorY ?? 0,
-      );
+      wasArmed = armed;
+      lastState = view.tick(world);
+      render();
     },
     gesture,
     seatBtn,

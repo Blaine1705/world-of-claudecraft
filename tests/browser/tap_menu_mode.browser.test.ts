@@ -342,6 +342,10 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
       onCancel: () => {
         cancels.radial++;
       },
+      // A sticky open focuses the first petal in the same call, and an unpainted
+      // petal is display:none, which refuses focus. The owner supplies this in
+      // production (mobile_action_ring_controller / stance_control_controller).
+      repaint: () => paintRadial(),
     });
     radialGesture.attach();
     radialGesture.attachPetals(
@@ -385,6 +389,9 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
       onCancel: () => {
         cancels.strip++;
       },
+      // The seat rides Hud's frame for its ordinary paints, so the sticky open
+      // hands it a repaint of its own; see the radial's above.
+      repaint: () => paintStrip(),
     });
     stripGesture.attach();
     const stripPainter = new ConsumableStripPainter(
@@ -414,6 +421,7 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
       metricsHost: rig.menuStrip,
       items: rig.menuItems,
       cancel: rig.menuCancel,
+      leftHanded: () => false,
       pick: (index) => {
         picks.push(index);
       },
@@ -607,6 +615,34 @@ describe(`tap mode at ${VIEWPORT.width}x${VIEWPORT.height}`, () => {
     expect(rig.used).toEqual([]);
     expect(rig.picks).toEqual([]);
     expect(rig.cancels).toEqual({ radial: 1, strip: 1, menu: 1 });
+  });
+
+  // Tap mode opens a persistent menu of real buttons, and the point of that is
+  // that a keyboard or Switch Control user lands INSIDE it. The focus move
+  // happens in the same call as the open, so a menu whose items the frame has
+  // not painted yet is display:none and refuses focus, silently leaving it on
+  // the anchor. Only real layout can show that, which is why it is pinned here.
+  it('lands focus inside the row and the petals it just opened', async () => {
+    const rig = await setup(true);
+
+    tap(rig.slotBtns[0]);
+    expect(rig.radialGesture.isOpen()).toBe(true);
+    expect(getComputedStyle(rig.petals[0]).display).not.toBe('none');
+    expect(document.activeElement).toBe(rig.petals[0]);
+    rig.radialGesture.closeSticky();
+    expect(document.activeElement).toBe(rig.slotBtns[0]);
+
+    tap(rig.seat, 2);
+    expect(rig.stripGesture.isOpen()).toBe(true);
+    expect(getComputedStyle(rig.stripItems[0]).display).not.toBe('none');
+    expect(document.activeElement).toBe(rig.stripItems[0]);
+    rig.stripGesture.closeSticky();
+    expect(document.activeElement).toBe(rig.seat);
+
+    tap(rig.anchor, 3);
+    expect(rig.menuGesture.isOpen()).toBe(true);
+    expect(getComputedStyle(rig.menuItems[0]).display).not.toBe('none');
+    expect(document.activeElement).toBe(rig.menuItems[0]);
   });
 
   it('exposes the open state on every anchor, so assistive tech is told', async () => {

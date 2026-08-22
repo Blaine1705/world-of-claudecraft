@@ -51,6 +51,13 @@ interface Rig {
   cancels: number;
   /** settings.touchTapMenus, flipped per test. */
   tapMenus: boolean;
+  /** Every repaint the gesture asked for, in order, each recording whether the
+   *  row was open at that moment: a sticky open must paint BEFORE it moves focus
+   *  onto the first item. */
+  repaints: boolean[];
+  /** The element focus landed on at each repaint, so the ORDER of the two is
+   *  pinned rather than only their occurrence. */
+  focusedAtRepaint: (Element | null)[];
 }
 
 function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: boolean } = {}): Rig {
@@ -96,6 +103,8 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
     cancel,
     used: [],
     cancels: 0,
+    repaints: [],
+    focusedAtRepaint: [],
     tapMenus: options.tapMenus ?? false,
     gesture: null as unknown as ConsumableStripGesture,
   };
@@ -110,6 +119,10 @@ function makeRig(options: { appVw?: string; safeAreaPx?: string; tapMenus?: bool
     use: (index) => rig.used.push(index),
     onCancel: () => {
       rig.cancels++;
+    },
+    repaint: () => {
+      rig.repaints.push(rig.gesture.isOpen());
+      rig.focusedAtRepaint.push(document.activeElement);
     },
   };
   rig.gesture = new ConsumableStripGesture(deps);
@@ -373,5 +386,84 @@ describe('ConsumableStripGesture: an activation uses the item exactly once', () 
     rig.seat.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
     rig.seat.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
     expect(rig.used).toEqual([0]);
+  });
+});
+
+// A second finger's pointercancel on the seat must not drop the first finger's
+// live row: the seat handler used to drop the drag whatever pointer the cancel
+// named, while the window backstop beneath it and the radial twin both match.
+describe('ConsumableStripGesture: pointercancel is matched on the pointer id', () => {
+  it('drops the drag when the cancel names the pointer that armed it', () => {
+    const rig = makeRig();
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.seat.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    expect(rig.gesture.isOpen()).toBe(true);
+    rig.seat.dispatchEvent(pointer('pointercancel', 1, 100 + SWIPE_PX));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.gesture.openState()).toBeNull();
+    expect(rig.used).toEqual([]);
+  });
+
+  it('leaves the live row alone when the cancel names another pointer', () => {
+    const rig = makeRig();
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.seat.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    rig.seat.dispatchEvent(pointer('pointercancel', 2, 100));
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.gesture.openState()?.live).toBe(0);
+    // And the row still resolves its own release afterwards.
+    rig.seat.dispatchEvent(pointer('pointerup', 1, 100 + SWIPE_PX));
+    expect(rig.used).toEqual([0]);
+  });
+});
+
+// A sticky open focuses the first item in the same call that opens the row, and
+// a row the frame has not painted yet is display:none, which refuses focus and
+// leaves it on the seat. The seat rides Hud's frame for its ordinary paints, so
+// it has to hand the gesture a repaint of its own for this one.
+describe('ConsumableStripGesture: the sticky open paints before it focuses', () => {
+  it('repaints with the row already OPEN, before focus moves', () => {
+    const rig = makeRig();
+    rig.gesture.openSticky();
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.repaints).toContain(true);
+    // The repaint that reported the row open ran while focus was still off the
+    // row, which is the whole ordering contract.
+    const openAt = rig.repaints.indexOf(true);
+    expect(rig.focusedAtRepaint[openAt]).not.toBe(rig.items[0]);
+    expect(document.activeElement).toBe(rig.items[0]);
+  });
+
+  it('repaints on the close as well, before focus returns to the seat', () => {
+    const rig = makeRig();
+    rig.gesture.openSticky();
+    const before = rig.repaints.length;
+    rig.gesture.closeSticky();
+    expect(rig.repaints.length).toBeGreaterThan(before);
+    expect(rig.repaints[rig.repaints.length - 1]).toBe(false);
+    expect(document.activeElement).toBe(rig.seat);
+  });
+});
+
+// The row is frozen from the moment a press ARMS, not from the reveal: the
+// consumables list is re-sorted by the world, and the 180ms reveal window used to
+// let it move between the press and the index that press resolves to.
+describe('ConsumableStripGesture: isArmed reports the press, not the reveal', () => {
+  it('is armed from the pointerdown, before the row is showing', () => {
+    const rig = makeRig();
+    expect(rig.gesture.isArmed()).toBe(false);
+    rig.seat.dispatchEvent(pointer('pointerdown', 1, 100));
+    expect(rig.gesture.isArmed()).toBe(true);
+    expect(rig.gesture.isOpen()).toBe(false);
+    rig.seat.dispatchEvent(pointer('pointerup', 1, 100));
+    expect(rig.gesture.isArmed()).toBe(false);
+  });
+
+  it('is armed while a sticky row is showing too', () => {
+    const rig = makeRig();
+    rig.gesture.openSticky();
+    expect(rig.gesture.isArmed()).toBe(true);
+    rig.gesture.closeSticky();
+    expect(rig.gesture.isArmed()).toBe(false);
   });
 });

@@ -77,6 +77,10 @@ const FALLBACK_MARGIN_PX = 6;
 /** The anchor's open state, so assistive tech is told the row is showing. The
  *  control it replaced carried it and the gesture menus dropped it (#seam). */
 const ARIA_EXPANDED_ATTR = 'aria-expanded';
+/** Focusability of the row's own buttons, written as the ATTRIBUTE through the
+ *  shared elided writer rather than as the tabIndex IDL property: the facet has
+ *  no property writer, and the attribute is what the IDL property reflects. */
+const TABINDEX_ATTR = 'tabindex';
 
 /** The measured row metrics a direction rule is resolved against. Every distance
  *  here is in the overlay's padding-box frame (see measure()), which is the frame
@@ -242,7 +246,12 @@ export class StripGesture {
     anchor.addEventListener('pointerdown', (e) => this.onDown(e as PointerEvent));
     anchor.addEventListener('pointermove', (e) => this.onMove(e as PointerEvent));
     anchor.addEventListener('pointerup', (e) => this.onUp(e as PointerEvent));
-    anchor.addEventListener('pointercancel', () => this.cancelDrag());
+    // Matched on the pointer ID like the window backstop below and the radial's
+    // twin: a SECOND finger's cancel on the anchor must never drop the first
+    // finger's live row.
+    anchor.addEventListener('pointercancel', (e) => {
+      if ((e as PointerEvent).pointerId === this.drag?.pointerId) this.cancelDrag();
+    });
     // The backstop for a release the anchor never sees. It runs AFTER the
     // anchor's own handler on an ordinary release (the event bubbles), so the
     // gesture resolves first and this finds nothing left to drop.
@@ -373,6 +382,15 @@ export class StripGesture {
     return this.sticky !== null || this.drag?.revealed === true;
   }
 
+  /** True from the moment a press ARMS, which is earlier than isOpen(): a drag
+   *  spends RADIAL_REVEAL_MS armed but unrevealed, and the row it will choose
+   *  from is already decided. A caller whose item list can be re-sorted by the
+   *  world freezes it on THIS, never on isOpen(), or the index the release
+   *  resolves names a different item than the press did. */
+  isArmed(): boolean {
+    return this.sticky !== null || this.drag !== null;
+  }
+
   /** The item the finger is over, or -1 for none. */
   liveIndex(): number {
     return this.sticky ? -1 : (this.drag?.index ?? -1);
@@ -394,9 +412,9 @@ export class StripGesture {
   }
 
   private setRowFocusable(on: boolean): void {
-    const tabIndex = on ? 0 : -1;
-    for (const btn of this.deps.items) btn.tabIndex = tabIndex;
-    this.deps.cancel.tabIndex = tabIndex;
+    const tabIndex = on ? '0' : '-1';
+    for (const btn of this.deps.items) this.deps.writers.setAttr(btn, TABINDEX_ATTR, tabIndex);
+    this.deps.writers.setAttr(this.deps.cancel, TABINDEX_ATTR, tabIndex);
   }
 
   /** The anchor's popup state, written on every transition that opens or closes
