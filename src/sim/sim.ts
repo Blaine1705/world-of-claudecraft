@@ -3654,7 +3654,7 @@ export class Sim {
     if (!clean) return -1;
     for (const m of this.players.values())
       if (m.name.toLowerCase() === clean.toLowerCase()) return -1;
-    const pid = this.addPlayer('mage', clean);
+    const pid = this.addPlayer('mage', clean, { bot: true });
     const meta = this.players.get(pid);
     if (meta) meta.isDevBot = true;
     const me = this.entities.get(this.primaryId);
@@ -3681,7 +3681,7 @@ export class Sim {
   // A friendly stationary ally bot for the Cascada playtest scenario, dropped at an
   // exact spot (no name-uniqueness gate, so /dev cascade can be re-run). Dev only.
   private spawnScenarioAlly(name: string, x: number, z: number, cls: PlayerClass = 'mage'): number {
-    const id = this.addPlayer(cls, name);
+    const id = this.addPlayer(cls, name, { bot: true });
     const meta = this.players.get(id);
     if (meta) meta.isDevBot = true;
     // Level 20 like the mage: a level-1 ally has so little health that a single Echo

@@ -16,25 +16,40 @@
 //     from before the stable-id key existed).
 // A bot letter can never satisfy either arm: its key is a transient pid that
 // at best collides with some character's id while carrying a bot roster name.
-// Like the old-cragmaw migration (and unlike the rift forge rollback), the
-// matching condition cannot legitimately reappear once the send-side fix is
-// deployed, so re-running is safe; no completion marker is needed.
+// The worst possible false remove is bounded by the letter itself: the welcome
+// carries 50 copper and no items, so no player parcel or escrow is ever at
+// stake. Like the old-cragmaw migration (and unlike the rift forge rollback),
+// the matching condition cannot legitimately reappear once the send-side fix
+// is deployed, so re-running is safe; no completion marker is needed.
 //
 // Run with no flags for an all-realm dry run; --realm NAME scopes it. --apply
-// writes, and belongs in the deploy window while the game server is stopped:
+// writes, and is a MANUAL deploy-window step with the game server stopped:
 // the server re-persists its in-memory book every 30 seconds, so a purge
 // applied under a live server would be clobbered on the next autosave. The
-// apply path refuses while any character lease is still held for the realm.
+// apply path locks character_leases, reaps expired crash orphans, and refuses
+// while any live lease remains for the realm.
 
-import { Pool } from 'pg';
+import { Pool, type PoolClient } from 'pg';
 
 export const WELCOME_LETTER_ID = 'ravenpost_welcome';
 const MAIL_KEY_PREFIX = 'mail:';
 
-interface Options {
+export interface PurgeOptions {
   apply: boolean;
   realm?: string;
 }
+
+export interface MailBotWelcomePurgeRuntime {
+  loadEnvFile(): void;
+  databaseUrl(): string | undefined;
+  createPool(connectionString: string): Pool;
+}
+
+const DEFAULT_RUNTIME: MailBotWelcomePurgeRuntime = {
+  loadEnvFile: () => process.loadEnvFile?.(),
+  databaseUrl: () => process.env.DATABASE_URL,
+  createPool: (connectionString) => new Pool({ connectionString, max: 2 }),
+};
 
 export interface MailLetterLike {
   letterId?: unknown;
@@ -99,7 +114,10 @@ export function purgeBotWelcomeLetters(
   };
 }
 
-function parseArgs(argv: readonly string[]): Options {
+/** A destructive command must never guess: a bare trailing --realm, or one
+ *  whose "value" is actually the next flag, would silently widen the run to
+ *  all realms (or silently swallow --apply), so both throw instead. */
+export function parseArgs(argv: readonly string[]): PurgeOptions {
   let realm: string | undefined;
   let apply = false;
   for (let i = 0; i < argv.length; i += 1) {
@@ -109,40 +127,62 @@ function parseArgs(argv: readonly string[]): Options {
       continue;
     }
     if (arg === '--realm') {
-      realm = argv[i + 1]?.trim();
+      const value = argv[i + 1];
+      if (value === undefined || value.startsWith('--') || !value.trim()) {
+        throw new Error('--realm requires a realm name');
+      }
+      realm = value.trim();
       i += 1;
       continue;
     }
     if (arg.startsWith('--realm=')) {
       realm = arg.slice('--realm='.length).trim();
+      if (!realm) throw new Error('--realm requires a realm name');
       continue;
     }
     throw new Error(`Unknown argument: ${arg}`);
   }
-  return { apply, realm: realm || undefined };
+  return { apply, realm };
 }
 
-export async function runMailBotWelcomePurgeMigration(argv: readonly string[]): Promise<void> {
+export async function runMailBotWelcomePurgeMigration(
+  argv: readonly string[],
+  runtime: MailBotWelcomePurgeRuntime = DEFAULT_RUNTIME,
+): Promise<void> {
+  const { apply, realm } = parseArgs(argv);
+
   try {
-    process.loadEnvFile?.();
+    runtime.loadEnvFile();
   } catch {
     // .env is optional; production injects DATABASE_URL through Docker Compose.
   }
-
-  const { apply, realm } = parseArgs(argv);
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = runtime.databaseUrl();
   if (!databaseUrl) {
     throw new Error('DATABASE_URL is required.');
   }
 
-  const pool = new Pool({ connectionString: databaseUrl, max: 2 });
-  let committed = false;
+  const pool = runtime.createPool(databaseUrl);
+  let client: PoolClient | null = null;
+  let transactionOpen = false;
   const report: string[] = [];
 
   try {
-    await pool.query('BEGIN');
+    // One pinned client for the whole run: BEGIN/COMMIT on a bare pool are
+    // independent checkouts that only form a transaction by accident.
+    client = await pool.connect();
+    await client.query('BEGIN');
+    transactionOpen = true;
 
-    const mailRows = await pool.query<{ key: string; data: MailBookLike }>(
+    if (apply) {
+      // A live server re-persists its in-memory book every 30 seconds and
+      // would clobber this purge. The SHARE MODE lock keeps a realm process
+      // from acquiring a lease after the check; reaping expired rows first
+      // keeps a crash orphan from wedging the deploy window forever.
+      await client.query('LOCK TABLE character_leases IN SHARE MODE');
+      await client.query('DELETE FROM character_leases WHERE expires_at <= now()');
+    }
+
+    const mailRows = await client.query<{ key: string; data: MailBookLike }>(
       realm
         ? 'SELECT key, data FROM world_state WHERE key = $1 ORDER BY key ASC'
         : "SELECT key, data FROM world_state WHERE key LIKE 'mail:%' ORDER BY key ASC",
@@ -153,20 +193,18 @@ export async function runMailBotWelcomePurgeMigration(argv: readonly string[]): 
       const rowRealm = row.key.slice(MAIL_KEY_PREFIX.length);
 
       if (apply) {
-        // A live server re-persists its in-memory book every 30 seconds and
-        // would clobber this purge; refuse while its character leases exist.
-        const leases = await pool.query<{ count: string }>(
+        const leases = await client.query<{ count: string }>(
           'SELECT count(*)::text AS count FROM character_leases WHERE realm = $1',
           [rowRealm],
         );
         if (Number(leases.rows[0]?.count ?? 0) > 0) {
           throw new Error(
-            `Realm "${rowRealm}" still holds character leases: stop its game server before --apply.`,
+            `Realm "${rowRealm}" still holds live character leases: stop its game server before --apply.`,
           );
         }
       }
 
-      const characters = await pool.query<CharacterRow>(
+      const characters = await client.query<CharacterRow>(
         'SELECT id, name FROM characters WHERE realm = $1',
         [rowRealm],
       );
@@ -180,7 +218,7 @@ export async function runMailBotWelcomePurgeMigration(argv: readonly string[]): 
       if (!result.changed) continue;
 
       if (apply) {
-        await pool.query('UPDATE world_state SET data = $1, updated_at = now() WHERE key = $2', [
+        await client.query('UPDATE world_state SET data = $1, updated_at = now() WHERE key = $2', [
           JSON.stringify(result.value),
           row.key,
         ]);
@@ -188,21 +226,22 @@ export async function runMailBotWelcomePurgeMigration(argv: readonly string[]): 
     }
 
     if (apply) {
-      await pool.query('COMMIT');
-      committed = true;
+      await client.query('COMMIT');
     } else {
-      await pool.query('ROLLBACK');
+      await client.query('ROLLBACK');
     }
+    transactionOpen = false;
   } catch (err) {
-    if (!committed) {
+    if (client && transactionOpen) {
       try {
-        await pool.query('ROLLBACK');
+        await client.query('ROLLBACK');
       } catch {
         // Ignore rollback errors after a failed or already closed transaction.
       }
     }
     throw err;
   } finally {
+    client?.release();
     await pool.end();
   }
 

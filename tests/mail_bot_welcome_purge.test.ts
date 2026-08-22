@@ -4,11 +4,15 @@
 // (id, current name) pair or the legacy name-key; everything that is not a
 // welcome letter is untouchable regardless of addressee.
 
-import { describe, expect, it } from 'vitest';
+import type { Pool, PoolClient } from 'pg';
+import { describe, expect, it, vi } from 'vitest';
 import {
   type CharacterRow,
+  type MailBotWelcomePurgeRuntime,
   type MailLetterLike,
+  parseArgs,
   purgeBotWelcomeLetters,
+  runMailBotWelcomePurgeMigration,
   WELCOME_LETTER_ID,
 } from '../scripts/mail_bot_welcome_purge_migration';
 
@@ -85,5 +89,127 @@ describe('purgeBotWelcomeLetters', () => {
     const result = purgeBotWelcomeLetters({ mail: undefined }, CHARACTERS);
     expect(result.changed).toBe(false);
     expect(result.removed).toBe(0);
+  });
+});
+
+describe('parseArgs', () => {
+  it('parses both realm forms and apply', () => {
+    expect(parseArgs([])).toEqual({ apply: false, realm: undefined });
+    expect(parseArgs(['--apply', '--realm', 'Claudemoon'])).toEqual({
+      apply: true,
+      realm: 'Claudemoon',
+    });
+    expect(parseArgs(['--realm=Claudemoon'])).toEqual({ apply: false, realm: 'Claudemoon' });
+  });
+
+  it('throws instead of widening a destructive run on a valueless --realm', () => {
+    // A bare trailing --realm used to silently mean all realms; --realm --apply
+    // used to consume the flag as the realm name and silently disable apply.
+    expect(() => parseArgs(['--apply', '--realm'])).toThrow('--realm requires a realm name');
+    expect(() => parseArgs(['--realm', '--apply'])).toThrow('--realm requires a realm name');
+    expect(() => parseArgs(['--realm='])).toThrow('--realm requires a realm name');
+    expect(() => parseArgs(['--wat'])).toThrow('Unknown argument');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Runner arm: fake pinned-client pool (the rift forge rollback harness idiom).
+// ---------------------------------------------------------------------------
+
+interface HarnessOptions {
+  liveLeases?: string;
+  mailRows?: Array<{ key: string; data: unknown }>;
+  characters?: CharacterRow[];
+}
+
+function queryResult(rows: unknown[] = []) {
+  return { rows, rowCount: rows.length };
+}
+
+function purgeHarness(options: HarnessOptions = {}) {
+  const statements: string[] = [];
+  const querySpy = vi.fn(async (text: string, _values?: unknown[]) => {
+    statements.push(text);
+    if (text.includes('SELECT key, data FROM world_state')) {
+      return queryResult(options.mailRows ?? []);
+    }
+    if (text.includes('count(*)') && text.includes('character_leases')) {
+      return queryResult([{ count: options.liveLeases ?? '0' }]);
+    }
+    if (text.includes('SELECT id, name FROM characters')) {
+      return queryResult(options.characters ?? []);
+    }
+    return queryResult();
+  });
+  const release = vi.fn();
+  const client = {
+    query: querySpy as unknown as PoolClient['query'],
+    release,
+  } as unknown as PoolClient;
+  const poolQuery = vi.fn(() => {
+    throw new Error('runner must not use pool.query: the transaction needs one pinned client');
+  });
+  const pool = {
+    connect: vi.fn(async () => client),
+    end: vi.fn(async () => undefined),
+    query: poolQuery,
+  } as unknown as Pool;
+  const runtime: MailBotWelcomePurgeRuntime = {
+    loadEnvFile: vi.fn(),
+    databaseUrl: () => 'postgres://unit.test/mail',
+    createPool: vi.fn(() => pool),
+  };
+  return { statements, querySpy, release, runtime };
+}
+
+const BOT_BOOK = {
+  key: 'mail:Claudemoon',
+  data: { mail: [welcome('987654', 'Reeve Marlow'), welcome('10774', 'PhoneBoy')], nextMailId: 9 },
+};
+
+describe('runMailBotWelcomePurgeMigration', () => {
+  it('dry run rolls back, takes no lease lock, and never writes', async () => {
+    const h = purgeHarness({ mailRows: [BOT_BOOK], characters: CHARACTERS });
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      await runMailBotWelcomePurgeMigration([], h.runtime);
+    } finally {
+      log.mockRestore();
+    }
+    expect(h.statements[0]).toBe('BEGIN');
+    expect(h.statements.at(-1)).toBe('ROLLBACK');
+    expect(h.statements.some((s) => s.startsWith('UPDATE world_state'))).toBe(false);
+    expect(h.statements.some((s) => s.startsWith('LOCK TABLE'))).toBe(false);
+    expect(h.release).toHaveBeenCalled();
+  });
+
+  it('apply locks leases, reaps expired ones, writes the purged row, and commits', async () => {
+    const h = purgeHarness({ mailRows: [BOT_BOOK], characters: CHARACTERS });
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      await runMailBotWelcomePurgeMigration(['--apply'], h.runtime);
+    } finally {
+      log.mockRestore();
+    }
+    expect(h.statements[0]).toBe('BEGIN');
+    expect(h.statements[1]).toBe('LOCK TABLE character_leases IN SHARE MODE');
+    expect(h.statements[2]).toBe('DELETE FROM character_leases WHERE expires_at <= now()');
+    expect(h.statements.some((s) => s.startsWith('UPDATE world_state'))).toBe(true);
+    expect(h.statements.at(-1)).toBe('COMMIT');
+    // The written blob keeps the real letter and the book shape.
+    const update = h.querySpy.mock.calls.find(([text]) => text.startsWith('UPDATE world_state'));
+    const written = JSON.parse((update?.[1] as string[])[0]);
+    expect(written.mail).toHaveLength(1);
+    expect(written.mail[0].recipientName).toBe('PhoneBoy');
+    expect(written.nextMailId).toBe(9);
+  });
+
+  it('apply refuses while the realm holds a live lease and rolls back', async () => {
+    const h = purgeHarness({ mailRows: [BOT_BOOK], characters: CHARACTERS, liveLeases: '1' });
+    await expect(runMailBotWelcomePurgeMigration(['--apply'], h.runtime)).rejects.toThrow(
+      'still holds live character leases',
+    );
+    expect(h.statements.at(-1)).toBe('ROLLBACK');
+    expect(h.statements.some((s) => s.startsWith('UPDATE world_state'))).toBe(false);
   });
 });
