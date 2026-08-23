@@ -10678,21 +10678,16 @@ export class Renderer {
         combatTargetId,
         combatTarget?.ownerId ?? null,
       );
-      // Online remote entities interpolate on a per-entity clock that saturates
-      // once network updates stop. A stale raw pos/prevPos delta must not keep
-      // the far-LOD rig held out forever after that clock has settled.
       const ea = isSelf
         ? Math.min(1, alpha)
         : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
-      const farHoldoutAlphaCap =
-        !isSelf && e.netUpdatedAt !== undefined && e.netInterval !== undefined
-          ? POS_EXTRAPOLATION_CAP
-          : 1;
       const movingFarHoldout = movingHoldoutActive(
         e.pos,
         e.prevPos,
         ea,
-        farHoldoutAlphaCap,
+        !isSelf && e.netUpdatedAt !== undefined && e.netInterval !== undefined
+          ? POS_EXTRAPOLATION_CAP
+          : 1,
         e.vx !== 0 || e.vz !== 0,
       );
       let wantShadow = true;
@@ -10706,14 +10701,9 @@ export class Renderer {
         }
       }
       if (!isSelf) {
-        // Per-frame visibility uses the same create/destroy hysteresis as view
-        // retention (above) so a rig hovering right at the draw edge
-        // doesn't toggle visible/invisible every frame, that hard cutoff is the
-        // actual on-screen boundary flicker. group.visible carries last frame's
-        // state: once shown, keep it until past the 96yd destroy radius (where
-        // the view is torn down anyway); while hidden, show only within 80yd.
-        // hidden until its shaders finish linking off-thread (async-compile gate);
-        // the object branch below may still re-hide loot
+        // Per-frame visibility follows the create/destroy hysteresis above so
+        // rigs at the draw edge do not flicker. The object branch below may
+        // still re-hide loot.
         v.group.visible = !v.compilePending;
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
