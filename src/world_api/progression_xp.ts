@@ -39,6 +39,14 @@ export interface GuildLeaderboardEntry {
   totalLifetimeXp: number;
   topLevel: number;
   realm?: string; // present on the global (cross-realm) board
+  // Guild pledge board (docs/prd/guild-pledge-board.md): the recruiting status
+  // the Guild Master sets. pledgesOpen absent means the server predates the
+  // pledge board, so the client shows NO pledge affordances at all (never a
+  // guessed default). The note is the Master's free-text recruiting line
+  // ('' omitted from the wire); minLevel 1 means no floor.
+  pledgesOpen?: boolean;
+  pledgeMinLevel?: number;
+  pledgeNote?: string;
 }
 
 // One ranked row of the DEVELOPER high-score board: contributors ranked by how

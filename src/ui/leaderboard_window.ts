@@ -38,7 +38,11 @@ import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_t
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { buildGuildLeaderboardView, type GuildLeaderboardRow } from './guild_leaderboard_view';
+import {
+  buildGuildLeaderboardView,
+  type GuildBoardViewer,
+  type GuildLeaderboardRow,
+} from './guild_leaderboard_view';
 import { formatNumber, t } from './i18n';
 import {
   buildLeaderboardView,
@@ -72,7 +76,7 @@ export interface LeaderboardWindowDeps {
 /** Where focus should land after a (re)render: into the window on open, back onto
  *  the page control the keyboard user just activated, or onto the freshly active
  *  tab (a tab switch rebuilds the strip, so the roving focus must follow). */
-type FocusTarget = 'open' | 'prev' | 'next' | 'tab' | null;
+type FocusTarget = 'open' | 'prev' | 'next' | 'tab' | 'action' | null;
 
 export class LeaderboardWindow {
   // The current tab + a page index PER board. The server clamps the requested
@@ -91,6 +95,11 @@ export class LeaderboardWindow {
   // pager state (this.page dispatches on the CURRENT this.board).
   private renderSeq = 0;
   private openerFocus: HTMLElement | null = null;
+  // The guild the viewer clicked Pledge on THIS open (optimistic display only:
+  // the server answers via chat + the social frame, and the mirror's myPledge
+  // wins whenever it is set). Cleared on open so a server rejection never
+  // outlives the window.
+  private pledgeSentTo: string | null = null;
 
   constructor(private readonly deps: LeaderboardWindowDeps) {}
 
@@ -136,6 +145,7 @@ export class LeaderboardWindow {
     this.deedsPage = 0;
     this.devPage = 0;
     this.dailyPage = 0;
+    this.pledgeSentTo = null;
     this.deps.root().style.display = 'flex';
     this.deps.onVisibilityChange?.();
     void this.render('open');
@@ -267,8 +277,21 @@ export class LeaderboardWindow {
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
+    // The viewer facts the per-row pledge affordance depends on. A click this
+    // open (pledgeSentTo) outranks the mirror's myPledge because it is newer:
+    // the social frame confirming it lands a beat later (and a re-pledge click
+    // must not keep reading as the OLD guild until it does). The mirror wins
+    // again on the next open, when pledgeSentTo is cleared.
+    const social = world.socialInfo;
+    const viewer: GuildBoardViewer | null = social
+      ? {
+          guildName: social.guild?.name ?? null,
+          level: world.player.level,
+          pledgedTo: this.pledgeSentTo ?? social.myPledge?.guildName ?? null,
+        }
+      : null;
     const view = buildGuildLeaderboardView(
-      result === null ? { kind: 'error' } : { kind: 'page', page: result },
+      result === null ? { kind: 'error' } : { kind: 'page', page: result, viewer },
     );
 
     if (view.kind === 'error') {
@@ -288,6 +311,26 @@ export class LeaderboardWindow {
       view.rows.map((r) => this.guildRowHtml(r)).join('') +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
+    this.wirePledgeButtons(body as HTMLElement);
+    // A pledge click destroyed the button it was on (the row re-renders as the
+    // Pledged chip); keep keyboard focus inside the window.
+    if (focus === 'action') this.focusCloseAfterPage(focus);
+  }
+
+  // Send the pledge and repaint so the clicked row flips to its Pledged chip.
+  // Fire-and-forget like every social command: the server answers via chat
+  // (acceptance is an officer decision later), and the social frame's myPledge
+  // corrects the optimistic chip if the pledge was refused.
+  private wirePledgeButtons(body: HTMLElement): void {
+    body.querySelectorAll<HTMLButtonElement>('[data-guild-pledge]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const name = button.dataset.guildPledge ?? '';
+        if (!name) return;
+        this.pledgeSentTo = name;
+        this.deps.world().guildPledge(name);
+        void this.render('action');
+      });
+    });
   }
 
   // The Renown tab: same async + page-control shape as the other boards, but
@@ -536,14 +579,47 @@ export class LeaderboardWindow {
     );
   }
 
+  // One guild entry: the ranked grid row, then (on a pledge-board server) the
+  // recruiting sub-line: accepting/closed status, the level floor when one is
+  // set, the Guild Master's note, and the viewer's pledge affordance. The name
+  // carries the guild's lifetime-XP colour tier (the nameplate ladder) as a
+  // class; the colours live in the stylesheet, never here.
   private guildRowHtml(r: GuildLeaderboardRow): string {
-    return (
+    const row =
       `<div class="lb-row lb-row-guild"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
-      `<span class="lb-name">${esc(r.name)}</span>` +
+      `<span class="lb-name guild-tier-${r.tier}">${esc(r.name)}</span>` +
       `<span class="lb-members">${formatNumber(r.memberCount, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-vlvl">${formatNumber(r.topLevel, { maximumFractionDigits: 0 })}</span>` +
-      `<span class="lb-xp">${formatXp(r.totalLifetimeXp)}</span></div>`
-    );
+      `<span class="lb-xp">${formatXp(r.totalLifetimeXp)}</span></div>`;
+    // A pre-pledge-board server sends no status: the entry is the bare row.
+    if (r.open === null) return `<div class="lb-guild-entry">${row}</div>`;
+    const status = r.open
+      ? `<span class="lb-pledge-status open">${esc(t('hudChrome.pledge.open'))}</span>`
+      : `<span class="lb-pledge-status closed">${esc(t('hudChrome.pledge.closed'))}</span>`;
+    const floor =
+      r.open && r.minLevel > 1
+        ? `<span class="lb-pledge-floor">${esc(t('hudChrome.pledge.minLevel', { level: formatNumber(r.minLevel, { maximumFractionDigits: 0 }) }))}</span>`
+        : '';
+    // The note is Guild-Master-controlled text: escaped, never linkified.
+    const note = r.note ? `<span class="lb-guild-note">${esc(r.note)}</span>` : '';
+    return `<div class="lb-guild-entry">${row}<div class="lb-guild-sub">${status}${floor}${note}${this.pledgeCellHtml(r)}</div></div>`;
+  }
+
+  // The pledge affordance at the sub-line's right edge. 'closed' / 'belowLevel'
+  // render no extra element: the status chip and the level-floor chip already
+  // say why there is no button.
+  private pledgeCellHtml(r: GuildLeaderboardRow): string {
+    if (r.pledge === 'pledge') {
+      return (
+        `<button type="button" class="btn lb-pledge-btn" data-guild-pledge="${esc(r.name)}" ` +
+        `title="${esc(t('hudChrome.pledge.actionTitle', { guild: r.name }))}">${esc(t('hudChrome.pledge.action'))}</button>`
+      );
+    }
+    if (r.pledge === 'pledged')
+      return `<span class="lb-pledge-chip on">${esc(t('hudChrome.pledge.pledged'))}</span>`;
+    if (r.pledge === 'yours')
+      return `<span class="lb-pledge-chip">${esc(t('hudChrome.pledge.yourGuild'))}</span>`;
+    return '';
   }
 
   // Developer-board header: rank, contributor (GitHub login), earned tier,
@@ -741,11 +817,13 @@ export class LeaderboardWindow {
     }
   }
 
-  // After an async page-change swap that has no pager (the error / empty / single-page
-  // states), keep keyboard focus inside the window by landing it on the close button
-  // rather than letting it fall to <body> (WCAG 2.4.3).
+  // After an async swap that destroyed the activated control (a page change
+  // with no pager in the error / empty / single-page states, or a guild-board
+  // pledge click whose button re-rendered as a chip), keep keyboard focus
+  // inside the window by landing it on the close button rather than letting it
+  // fall to <body> (WCAG 2.4.3).
   private focusCloseAfterPage(focus: FocusTarget): void {
-    if (focus !== 'prev' && focus !== 'next') return;
+    if (focus !== 'prev' && focus !== 'next' && focus !== 'action') return;
     (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
   }
 }

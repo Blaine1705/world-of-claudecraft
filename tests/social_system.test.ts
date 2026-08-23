@@ -2382,9 +2382,7 @@ describe('guild pledges', () => {
     h.tx.setOnline(3);
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
-    const leaderLines = (h.tx.delivered.get(1) ?? []).map((e) =>
-      e.type === 'log' ? e.text : '',
-    );
+    const leaderLines = (h.tx.delivered.get(1) ?? []).map((e) => (e.type === 'log' ? e.text : ''));
     expect(leaderLines).toContain('Aspirant has pledged to your guild.');
     // Officer 2 is OFFLINE: nothing delivered.
     expect(h.tx.delivered.get(2) ?? []).toEqual([]);

@@ -184,9 +184,7 @@ export interface SocialDb {
     settings: { enabled: boolean; minLevel: number; note: string },
   ): Promise<void>;
   guildPledges(guildId: number): Promise<(CharInfo & { sinceMs: number })[]>;
-  pledgeOf(
-    charId: number,
-  ): Promise<{ guildId: number; guildName: string; sinceMs: number } | null>;
+  pledgeOf(charId: number): Promise<{ guildId: number; guildName: string; sinceMs: number } | null>;
   upsertPledge(charId: number, guildId: number): Promise<void>;
   deletePledge(charId: number): Promise<void>;
   accountIdForCharacter(charId: number): Promise<number | null>;
@@ -1067,10 +1065,7 @@ export class SocialService {
     const me = await this.db.getCharacter(actor.characterId);
     if (!me) return;
     if (me.level < settings.minLevel) {
-      this.err(
-        actor.characterId,
-        `${guild.name} accepts pledges from level ${settings.minLevel}.`,
-      );
+      this.err(actor.characterId, `${guild.name} accepts pledges from level ${settings.minLevel}.`);
       return;
     }
     const accountId = await this.db.accountIdForCharacter(actor.characterId);
@@ -1147,7 +1142,11 @@ export class SocialService {
     this.info(actor.characterId, `You have declined ${target.name}'s pledge.`);
     if (this.tx.isOnline(target.id)) {
       this.tx.deliver(target.id, [
-        { type: 'log', text: `${membership.guildName} has declined your pledge.`, color: '#ff8080' },
+        {
+          type: 'log',
+          text: `${membership.guildName} has declined your pledge.`,
+          color: '#ff8080',
+        },
       ]);
     }
     await this.refreshPledgeBadge(target.id);
@@ -1169,7 +1168,14 @@ export class SocialService {
       return;
     }
     const minLevel = Math.max(1, Math.min(60, Math.floor(settings.minLevel) || 1));
-    const note = settings.note.slice(0, 90);
+    // The guildSetMotd clamp treatment: the slice cuts UTF-16 code units, so a
+    // boundary landing inside a surrogate pair would store a lone surrogate
+    // that pg encodes as U+FFFD; drop the orphaned half instead.
+    let note = String(settings.note ?? '')
+      .trim()
+      .slice(0, 90);
+    const last = note.charCodeAt(note.length - 1);
+    if (last >= 0xd800 && last <= 0xdbff) note = note.slice(0, -1);
     await this.db.setGuildPledgeSettings(membership.guildId, {
       enabled: !!settings.enabled,
       minLevel,
@@ -1183,7 +1189,9 @@ export class SocialService {
   private async refreshPledgeBadge(charId: number): Promise<void> {
     if (!this.tx.isOnline(charId)) return;
     const pledge = await this.db.pledgeOf(charId);
-    const tier = pledge ? guildTierForLifetimeXp(await this.db.guildLifetimeXpTotal(pledge.guildId)) : 0;
+    const tier = pledge
+      ? guildTierForLifetimeXp(await this.db.guildLifetimeXpTotal(pledge.guildId))
+      : 0;
     this.tx.applyPledge(charId, pledge?.guildName ?? '', tier);
   }
 

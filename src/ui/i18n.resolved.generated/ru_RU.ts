@@ -1097,6 +1097,31 @@ export const ru_RU: EnTranslations = {
       "mergedPrs": "Слито PR",
       "devEmpty": "Пока нет участников в рейтинге."
     },
+    "pledge": {
+      "open": "Принимает присяги",
+      "closed": "Не принимает присяги",
+      "minLevel": "Уровень {level}+",
+      "action": "Присягнуть",
+      "actionTitle": "Присягнуть гильдии {guild}",
+      "pledged": "Присяга принесена",
+      "yourGuild": "Ваша гильдия",
+      "tab": "Присяги",
+      "tabWithCount": "Присяги ({count})",
+      "empty": "Пока никто не присягнул вашей гильдии.",
+      "accept": "Принять",
+      "acceptTitle": "Принять присягу {name}",
+      "reject": "Отклонить",
+      "rejectTitle": "Отклонить присягу {name}",
+      "settings": "Набор",
+      "acceptingLabel": "Принимать присяги",
+      "minLevelLabel": "Минимальный уровень",
+      "noteLabel": "Заметка на доске",
+      "notePlaceholder": "Расскажите соискателям, кого ищет ваша гильдия",
+      "save": "Сохранить",
+      "yourPledge": "Ваша присяга: {guild}",
+      "since": "Присяга от {date}",
+      "withdraw": "Отозвать присягу"
+    },
     "raidLockout": {
       "title": "Блокировки рейдов",
       "allReady": "Все рейды доступны",
@@ -2534,7 +2559,8 @@ export const ru_RU: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Читер >"
+      "cheaterTag": "< Читер >",
+      "pledgeTag": "Присяга: {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Уровень {level} {family}",

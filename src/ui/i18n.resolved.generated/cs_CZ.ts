@@ -1097,6 +1097,31 @@ export const cs_CZ: EnTranslations = {
       "mergedPrs": "Sloučené PR",
       "devEmpty": "Zatím žádní hodnocení přispěvatelé."
     },
+    "pledge": {
+      "open": "Accepting pledges",
+      "closed": "Not accepting pledges",
+      "minLevel": "Level {level}+",
+      "action": "Pledge",
+      "actionTitle": "Pledge to {guild}",
+      "pledged": "Pledged",
+      "yourGuild": "Your guild",
+      "tab": "Pledges",
+      "tabWithCount": "Pledges ({count})",
+      "empty": "No one has pledged to your guild yet.",
+      "accept": "Accept",
+      "acceptTitle": "Accept {name}'s pledge",
+      "reject": "Decline",
+      "rejectTitle": "Decline {name}'s pledge",
+      "settings": "Recruitment",
+      "acceptingLabel": "Accept pledges",
+      "minLevelLabel": "Minimum level",
+      "noteLabel": "Board note",
+      "notePlaceholder": "Tell aspiring members what your guild is looking for",
+      "save": "Save",
+      "yourPledge": "Your pledge: {guild}",
+      "since": "Pledged {date}",
+      "withdraw": "Withdraw pledge"
+    },
     "raidLockout": {
       "title": "Raidové zámky",
       "allReady": "Všechny raidy připravené",
@@ -2534,7 +2559,8 @@ export const cs_CZ: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "PRYČ",
-      "cheaterTag": "< Podvodník >"
+      "cheaterTag": "< Podvodník >",
+      "pledgeTag": "Pledge of {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",

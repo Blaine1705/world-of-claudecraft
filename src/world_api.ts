@@ -264,7 +264,10 @@ export type {
   GuildEventInfo,
   GuildInfo,
   GuildMemberInfo,
+  GuildPledgeInfo,
+  GuildPledgeSettings,
   GuildRank,
+  MyPledgeInfo,
   PresenceStatus,
   SocialInfo,
 } from './world_api/social_graph';

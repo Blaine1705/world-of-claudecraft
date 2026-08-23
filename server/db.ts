@@ -3998,6 +3998,11 @@ export interface GuildLeaderRow {
   memberCount: number;
   totalLifetimeXp: number;
   topLevel: number;
+  // Guild pledge board recruiting status (docs/prd/guild-pledge-board.md),
+  // shown per row on the high-score board so aspirants know who is looking.
+  pledgesEnabled: boolean;
+  pledgeMinLevel: number;
+  pledgeNote: string;
 }
 
 export async function topGuilds(
@@ -4007,7 +4012,7 @@ export async function topGuilds(
   // Capped at LEADERBOARD_MAX (1000) like the player board, so a realm with many
   // guilds is fully ranked through the cached window.
   const cap = Math.max(1, Math.min(LEADERBOARD_MAX, limit));
-  const selectAgg = `g.name, g.realm,
+  const selectAgg = `g.name, g.realm, g.pledges_enabled, g.pledge_min_level, g.pledge_note,
                 COUNT(gm.character_id)                                AS member_count,
                 COALESCE(SUM(COALESCE((c.state->>'lifetimeXp')::bigint, 0)), 0) AS total_lifetime_xp,
                 COALESCE(MAX(COALESCE((c.state->>'level')::int, 0)), 0)         AS top_level`;
@@ -4047,6 +4052,9 @@ export async function topGuilds(
     memberCount: Number(r.member_count),
     totalLifetimeXp: Number(r.total_lifetime_xp),
     topLevel: Number(r.top_level),
+    pledgesEnabled: !!r.pledges_enabled,
+    pledgeMinLevel: Number(r.pledge_min_level) || 1,
+    pledgeNote: typeof r.pledge_note === 'string' ? r.pledge_note : '',
   }));
 }
 

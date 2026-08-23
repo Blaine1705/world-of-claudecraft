@@ -1097,6 +1097,31 @@ export const en_CA: EnTranslations = {
       "mergedPrs": "Merged PRs",
       "devEmpty": "No ranked contributors yet."
     },
+    "pledge": {
+      "open": "Accepting pledges",
+      "closed": "Not accepting pledges",
+      "minLevel": "Level {level}+",
+      "action": "Pledge",
+      "actionTitle": "Pledge to {guild}",
+      "pledged": "Pledged",
+      "yourGuild": "Your guild",
+      "tab": "Pledges",
+      "tabWithCount": "Pledges ({count})",
+      "empty": "No one has pledged to your guild yet.",
+      "accept": "Accept",
+      "acceptTitle": "Accept {name}'s pledge",
+      "reject": "Decline",
+      "rejectTitle": "Decline {name}'s pledge",
+      "settings": "Recruitment",
+      "acceptingLabel": "Accept pledges",
+      "minLevelLabel": "Minimum level",
+      "noteLabel": "Board note",
+      "notePlaceholder": "Tell aspiring members what your guild is looking for",
+      "save": "Save",
+      "yourPledge": "Your pledge: {guild}",
+      "since": "Pledged {date}",
+      "withdraw": "Withdraw pledge"
+    },
     "raidLockout": {
       "title": "Raid Lockouts",
       "allReady": "All raids ready",
@@ -2534,7 +2559,8 @@ export const en_CA: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Cheater >",
+      "pledgeTag": "Pledge of {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Level {level} {family}",

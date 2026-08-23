@@ -1097,6 +1097,31 @@ export const en_XA: EnTranslations = {
       "mergedPrs": "[Ɱéŕĝéð ÞŔš]",
       "devEmpty": "[Ñó ŕáñķéð çóñţŕíƀúţóŕš ýéţ.]"
     },
+    "pledge": {
+      "open": "[Áççéþţíñĝ þļéðĝéš]",
+      "closed": "[Ñóţ áççéþţíñĝ þļéðĝéš]",
+      "minLevel": "[Ļéʋéļ {level}+]",
+      "action": "[Þļéðĝé]",
+      "actionTitle": "[Þļéðĝé ţó {guild}]",
+      "pledged": "[Þļéðĝéð]",
+      "yourGuild": "[Ýóúŕ ĝúíļð]",
+      "tab": "[Þļéðĝéš]",
+      "tabWithCount": "[Þļéðĝéš ({count})]",
+      "empty": "[Ñó óñé ĥáš þļéðĝéð ţó ýóúŕ ĝúíļð ýéţ.]",
+      "accept": "[Áççéþţ]",
+      "acceptTitle": "[Áççéþţ {name}'š þļéðĝé]",
+      "reject": "[Ðéçļíñé]",
+      "rejectTitle": "[Ðéçļíñé {name}'š þļéðĝé]",
+      "settings": "[Ŕéçŕúíţɱéñţ]",
+      "acceptingLabel": "[Áççéþţ þļéðĝéš]",
+      "minLevelLabel": "[Ɱíñíɱúɱ ļéʋéļ]",
+      "noteLabel": "[Ɓóáŕð ñóţé]",
+      "notePlaceholder": "[Ţéļļ ášþíŕíñĝ ɱéɱƀéŕš ŵĥáţ ýóúŕ ĝúíļð íš ļóóķíñĝ ƒóŕ]",
+      "save": "[Šáʋé]",
+      "yourPledge": "[Ýóúŕ þļéðĝé: {guild}]",
+      "since": "[Þļéðĝéð {date}]",
+      "withdraw": "[Ŵíţĥðŕáŵ þļéðĝé]"
+    },
     "raidLockout": {
       "title": "[Ŕáíð Ļóçķóúţš]",
       "allReady": "[Áļļ ŕáíðš ŕéáðý]",
@@ -2534,7 +2559,8 @@ export const en_XA: EnTranslations = {
       "mobLevel": "[{level}]",
       "mobEliteLevel": "[{level}+]",
       "afkTag": "[ÁƑĶ]",
-      "cheaterTag": "[< Çĥéáţéŕ >]"
+      "cheaterTag": "[< Çĥéáţéŕ >]",
+      "pledgeTag": "[Þļéðĝé óƒ {guild}]"
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",

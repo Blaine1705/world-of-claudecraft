@@ -63,7 +63,9 @@ const MONOLITHS: MonolithRow[] = [
     // count: any further growth reds again.
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 18790,
+    // Re-pinned for the tutorial mobile-coach fixes that followed that merge
+    // (SCOPED_POPUP_IDS + the greeting-close window-state resync); exact count.
+    ceiling: 18804,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -128,7 +130,10 @@ const MONOLITHS: MonolithRow[] = [
     // both parents' additions combine, so keep the exact merged count.
     // Re-pinned for the local tutorial-tweaks merge (the staged first death and
     // the ability drill hook into the coordinator); exact merged count.
-    ceiling: 12492,
+    // Re-pinned +14 for the guild pledge board: setPlayerPledge (the server's
+    // nameplate stamp entry) and the four IWorld facet no-op stubs, the
+    // sanctioned both-worlds implementation seam. Exact count.
+    ceiling: 12506,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -148,14 +153,22 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
     // combined tree lands below the branch ceilings, so keep the exact merged
     // count.
-    ceiling: 10655,
+    // Re-pinned +43 for the guild pledge board: four dispatch cases (thin
+    // validated delegates onto SocialService), the applyPledge transport arm,
+    // and the join-time pledge stamp in sendSocialSnapshot; the service logic
+    // itself lives in server/social.ts. Exact count.
+    ceiling: 10698,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
     file: 'src/net/online.ts',
     // Re-pinned to the eastbrook-plus-tutorial integration merge output:
     // both parents' additions combine, so keep the exact merged count.
-    ceiling: 5774,
+    // Re-pinned +29 for the guild pledge board: the four one-line command
+    // senders, the entity pg/gt decode, and the social-frame pledge-field
+    // normalization (wire mirror code that must live on ClientWorld). Exact
+    // count.
+    ceiling: 5803,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

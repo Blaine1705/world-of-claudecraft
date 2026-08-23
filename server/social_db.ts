@@ -596,9 +596,7 @@ export class PgSocialDb implements SocialDb {
     );
   }
 
-  async guildPledges(
-    guildId: number,
-  ): Promise<(CharInfo & { sinceMs: number })[]> {
+  async guildPledges(guildId: number): Promise<(CharInfo & { sinceMs: number })[]> {
     const res = await this.pool.query(
       `SELECT c.id, c.name, c.class AS cls, c.level, c.realm,
               (EXTRACT(EPOCH FROM p.created_at) * 1000)::float8 AS "sinceMs"

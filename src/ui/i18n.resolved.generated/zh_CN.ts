@@ -1097,6 +1097,31 @@ export const zh_CN: EnTranslations = {
       "mergedPrs": "已合并 PR",
       "devEmpty": "还没有上榜的贡献者。"
     },
+    "pledge": {
+      "open": "接受宣誓",
+      "closed": "不接受宣誓",
+      "minLevel": "{level}级以上",
+      "action": "宣誓",
+      "actionTitle": "向{guild}宣誓",
+      "pledged": "已宣誓",
+      "yourGuild": "你的公会",
+      "tab": "宣誓",
+      "tabWithCount": "宣誓（{count}）",
+      "empty": "还没有人向你的公会宣誓。",
+      "accept": "接受",
+      "acceptTitle": "接受{name}的宣誓",
+      "reject": "拒绝",
+      "rejectTitle": "拒绝{name}的宣誓",
+      "settings": "招募",
+      "acceptingLabel": "接受宣誓",
+      "minLevelLabel": "最低等级",
+      "noteLabel": "榜单留言",
+      "notePlaceholder": "告诉有意加入的玩家你的公会在寻找什么",
+      "save": "保存",
+      "yourPledge": "你的宣誓：{guild}",
+      "since": "宣誓于{date}",
+      "withdraw": "撤回宣誓"
+    },
     "raidLockout": {
       "title": "团队副本锁定",
       "allReady": "所有团队副本就绪",
@@ -2534,7 +2559,8 @@ export const zh_CN: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "暂离",
-      "cheaterTag": "< 作弊者 >"
+      "cheaterTag": "< 作弊者 >",
+      "pledgeTag": "{guild}的宣誓者"
     },
     "mobTooltip": {
       "levelFamily": "等级 {level} {family}",

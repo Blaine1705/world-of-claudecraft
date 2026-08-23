@@ -1097,6 +1097,31 @@ export const vi_VN: EnTranslations = {
       "mergedPrs": "PR đã hợp nhất",
       "devEmpty": "Chưa có người đóng góp nào được xếp hạng."
     },
+    "pledge": {
+      "open": "Accepting pledges",
+      "closed": "Not accepting pledges",
+      "minLevel": "Level {level}+",
+      "action": "Pledge",
+      "actionTitle": "Pledge to {guild}",
+      "pledged": "Pledged",
+      "yourGuild": "Your guild",
+      "tab": "Pledges",
+      "tabWithCount": "Pledges ({count})",
+      "empty": "No one has pledged to your guild yet.",
+      "accept": "Accept",
+      "acceptTitle": "Accept {name}'s pledge",
+      "reject": "Decline",
+      "rejectTitle": "Decline {name}'s pledge",
+      "settings": "Recruitment",
+      "acceptingLabel": "Accept pledges",
+      "minLevelLabel": "Minimum level",
+      "noteLabel": "Board note",
+      "notePlaceholder": "Tell aspiring members what your guild is looking for",
+      "save": "Save",
+      "yourPledge": "Your pledge: {guild}",
+      "since": "Pledged {date}",
+      "withdraw": "Withdraw pledge"
+    },
     "raidLockout": {
       "title": "Khóa Raid",
       "allReady": "Mọi raid đã sẵn sàng",
@@ -2534,7 +2559,8 @@ export const vi_VN: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
-      "cheaterTag": "< Kẻ Gian Lận >"
+      "cheaterTag": "< Kẻ Gian Lận >",
+      "pledgeTag": "Pledge of {guild}"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",

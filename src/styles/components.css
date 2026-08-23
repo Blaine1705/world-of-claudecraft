@@ -2705,6 +2705,84 @@
     color: var(--color-text-muted);
     font-size: 11px;
   }
+  /* Guild colour tiers (src/sim/guild_tier.ts, by the guild's collective
+     lifetime XP): shared by the guild board's name cell and the social
+     window's guild surfaces, and matching GUILD_TIER_FILLS on the overhead
+     nameplate canvas (which cannot read CSS vars per plate per frame, the
+     deed_border_view precedent) so the two surfaces agree. Tier 0 is the
+     classic guild blue every fresh guild has always had. */
+  .guild-tier-0 {
+    color: #c9dcfb;
+  }
+  .guild-tier-1 {
+    color: #9fe8a8;
+  }
+  .guild-tier-2 {
+    color: #5fd3e8;
+  }
+  .guild-tier-3 {
+    color: #e8b45f;
+  }
+  .guild-tier-4 {
+    color: #ffcf40;
+  }
+  /* One guild-board entry: the ranked grid row plus the pledge-board recruiting
+     sub-line (status, level floor, the Guild Master's note, the pledge
+     affordance). The wrapper takes the odd-row striping (its inner .lb-row
+     would otherwise ALWAYS be its parent's first child and stripe every row);
+     matching the player board's rhythm, the header is child one, so odd
+     children are the even-ranked entries. */
+  .lb-guild-entry:nth-child(odd) {
+    background: #ffffff08;
+  }
+  .lb-guild-entry {
+    border-radius: 3px;
+  }
+  /* Three-class specificity on purpose: the generic .lb-row:nth-child(odd)
+     stripe below would otherwise win the tie (it is later in the file) and
+     stripe every wrapped row, since a wrapped row is always its entry's first
+     child. */
+  .lb-guild-entry .lb-row.lb-row-guild {
+    background: none;
+  }
+  .lb-guild-sub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px 5px 58px;
+    font-size: 11px;
+    min-height: 22px;
+  }
+  .lb-pledge-status.open {
+    color: #9fe8a8;
+  }
+  .lb-pledge-status.closed {
+    color: var(--color-text-muted);
+  }
+  .lb-pledge-floor {
+    color: #ffe27a;
+  }
+  .lb-guild-note {
+    color: var(--color-text-muted);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lb-pledge-btn {
+    margin-left: auto;
+    font-size: 11px;
+    padding: 2px 10px;
+  }
+  .lb-pledge-chip {
+    margin-left: auto;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .lb-pledge-chip.on {
+    color: var(--gold);
+  }
   .lb-renown {
     text-align: right;
     color: #ffe27a;
@@ -9935,6 +10013,84 @@
   .soc-billboard-edit .btn {
     margin: 0;
     padding: 5px 12px;
+    font-size: 11px;
+  }
+  /* Guild pledge board (docs/prd/guild-pledge-board.md): the officer Pledges
+     tab's recruiting settings editor (the .soc-billboard family look) and the
+     unguilded viewer's own-pledge line under the guild tab's empty state. */
+  .soc-pledge-settings {
+    grid-column: 1 / -1;
+    margin: 0 4px 6px;
+    padding: 7px 9px;
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+  }
+  .soc-pledge-open,
+  .soc-pledge-minlvl {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 14px 3px 0;
+    font-size: 12px;
+    color: #f0ead8;
+    cursor: var(--cursor-point);
+  }
+  .soc-pledge-minlvl input {
+    width: 52px;
+    background: #120f0c;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    color: #f0ead8;
+    padding: 4px 6px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .soc-pledge-note-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .soc-pledge-note-row input {
+    flex: 1;
+    min-width: 0;
+    background: #120f0c;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    color: #f0ead8;
+    padding: 5px 7px;
+    font-size: 12px;
+  }
+  .soc-pledge-note-row .btn {
+    margin: 0;
+    padding: 5px 12px;
+    font-size: 11px;
+  }
+  .soc-pledge-accept {
+    color: #9fe8a8;
+  }
+  .soc-my-pledge {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 4px 6px;
+    padding: 7px 9px;
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    font-size: 12px;
+    color: #f0ead8;
+  }
+  .soc-my-pledge-since {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    flex: 1;
+  }
+  .soc-my-pledge .btn {
+    margin: 0;
+    padding: 4px 10px;
     font-size: 11px;
   }
   /* Guild roster: the persisted "hide offline" toggle (an aria-pressed button with a

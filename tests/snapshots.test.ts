@@ -2768,7 +2768,11 @@ describe('guild nameplate wire', () => {
         motdSetBy: '',
         members: [],
         events: [],
+        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledges: [],
+        tier: 0,
       },
+      myPledge: null,
     };
     (client as any).socialDirty = false;
     const internals = client as unknown as { onMessage(raw: string): void };
@@ -2780,7 +2784,7 @@ describe('guild nameplate wire', () => {
       }),
     );
 
-    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.socialInfo?.guild?.name).toBe('Dawn Guard');
     expect(client.consumeSocialChanged()).toBe(true);
 
     internals.onMessage(
@@ -2789,7 +2793,7 @@ describe('guild nameplate wire', () => {
         list: [{ type: 'guildRenamed', guildId: 8, newName: 'Wrong Guild' }],
       }),
     );
-    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.socialInfo?.guild?.name).toBe('Dawn Guard');
     expect(client.consumeSocialChanged()).toBe(false);
   });
 

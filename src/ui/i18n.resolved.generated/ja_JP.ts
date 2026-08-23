@@ -1097,6 +1097,31 @@ export const ja_JP: EnTranslations = {
       "mergedPrs": "マージ済みPR",
       "devEmpty": "ランク入りのコントリビューターはまだいません。"
     },
+    "pledge": {
+      "open": "誓約受付中",
+      "closed": "誓約停止中",
+      "minLevel": "レベル{level}以上",
+      "action": "誓約",
+      "actionTitle": "{guild}に誓約する",
+      "pledged": "誓約済み",
+      "yourGuild": "所属ギルド",
+      "tab": "誓約",
+      "tabWithCount": "誓約（{count}）",
+      "empty": "まだ誰もギルドに誓約していません。",
+      "accept": "承認",
+      "acceptTitle": "{name}の誓約を承認",
+      "reject": "辞退",
+      "rejectTitle": "{name}の誓約を辞退",
+      "settings": "募集設定",
+      "acceptingLabel": "誓約を受け付ける",
+      "minLevelLabel": "最低レベル",
+      "noteLabel": "掲示メッセージ",
+      "notePlaceholder": "ギルドが求める仲間について書きましょう",
+      "save": "保存",
+      "yourPledge": "あなたの誓約：{guild}",
+      "since": "{date}に誓約",
+      "withdraw": "誓約を取り下げる"
+    },
     "raidLockout": {
       "title": "レイドロックアウト",
       "allReady": "すべてのレイドが利用可能",
@@ -2534,7 +2559,8 @@ export const ja_JP: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "退席",
-      "cheaterTag": "< チーター >"
+      "cheaterTag": "< チーター >",
+      "pledgeTag": "{guild}への誓約者"
     },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",

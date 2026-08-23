@@ -2609,11 +2609,24 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'social') {
+      // The pledge-board fields are normalized with defaults so an older
+      // server's frame (no pledge board) still yields a fully-shaped mirror:
+      // settings read as accepting (the feature's default), no open pledges,
+      // tier 0, no standing pledge.
+      const guild = msg.guild
+        ? {
+            ...msg.guild,
+            pledgeSettings: msg.guild.pledgeSettings ?? { enabled: true, minLevel: 1, note: '' },
+            pledges: msg.guild.pledges ?? [],
+            tier: msg.guild.tier ?? 0,
+          }
+        : null;
       this.socialInfo = {
         friends: msg.friends ?? [],
         blocks: msg.blocks ?? [],
         ignores: msg.ignores ?? [],
-        guild: msg.guild ?? null,
+        guild,
+        myPledge: msg.myPledge ?? null,
       };
       this.socialDirty = true;
       return;

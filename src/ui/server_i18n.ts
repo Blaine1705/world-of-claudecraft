@@ -347,7 +347,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.notInOne': 'No perteneces a ninguna hermandad.',
     'pledge.noGuild': 'No existe una hermandad con ese nombre.',
     'pledge.noneToWithdraw': 'No tienes ninguna promesa que retirar.',
-    'pledge.onlyOfficers': 'Solo los oficiales y el Maestro de Hermandad pueden gestionar las promesas.',
+    'pledge.onlyOfficers':
+      'Solo los oficiales y el Maestro de Hermandad pueden gestionar las promesas.',
     'pledge.made': 'Has prometido unirte a {name}.',
     'pledge.notAccepting': '{name} no acepta promesas.',
     'pledge.minLevel': '{name} acepta promesas a partir del nivel {level}.',
@@ -488,7 +489,8 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.notInOne': 'No perteneces a ninguna hermandad.',
     'pledge.noGuild': 'No existe una hermandad con ese nombre.',
     'pledge.noneToWithdraw': 'No tienes ninguna promesa que retirar.',
-    'pledge.onlyOfficers': 'Solo los oficiales y el Maestro de Hermandad pueden gestionar las promesas.',
+    'pledge.onlyOfficers':
+      'Solo los oficiales y el Maestro de Hermandad pueden gestionar las promesas.',
     'pledge.made': 'Has prometido unirte a {name}.',
     'pledge.notAccepting': '{name} no acepta promesas.',
     'pledge.minLevel': '{name} acepta promesas a partir del nivel {level}.',

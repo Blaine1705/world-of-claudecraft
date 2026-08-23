@@ -607,6 +607,13 @@ async function refreshGuildLeaderboard(
     memberCount: r.memberCount,
     totalLifetimeXp: r.totalLifetimeXp,
     topLevel: r.topLevel,
+    // The pledge-board recruiting status (docs/prd/guild-pledge-board.md).
+    // pledgesOpen always rides (its presence is how the client knows this
+    // server HAS a pledge board); the optional fields keep the '' / 1
+    // defaults off the wire, the `guild` treatment on the player board.
+    pledgesOpen: r.pledgesEnabled,
+    ...(r.pledgeMinLevel > 1 ? { pledgeMinLevel: r.pledgeMinLevel } : {}),
+    ...(r.pledgeNote ? { pledgeNote: r.pledgeNote } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).

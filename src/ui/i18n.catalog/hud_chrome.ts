@@ -1088,6 +1088,45 @@ export const hudChromeStrings = {
     mergedPrs: 'Merged PRs',
     devEmpty: 'No ranked contributors yet.',
   },
+  // Guild pledge board (docs/prd/guild-pledge-board.md): shared strings for the
+  // guild high-score tab's pledge affordances AND the social window's Pledges
+  // tab, so the two surfaces can never word the same state differently. Wordy
+  // values (M16) ship their five non-Latin fills in the same change.
+  pledge: {
+    // The per-guild recruiting status on the board: set by the Guild Master
+    // (setGuildPledgeSettings), defaults to accepting.
+    open: 'Accepting pledges',
+    closed: 'Not accepting pledges',
+    // Level floor chip beside the status when the guild set one (> 1).
+    minLevel: 'Level {level}+',
+    // The board row's action button, and the chip shown once the viewer's own
+    // pledge stands with this guild.
+    action: 'Pledge',
+    actionTitle: 'Pledge to {guild}',
+    pledged: 'Pledged',
+    yourGuild: 'Your guild',
+    // The social window's officer tab: title, empty state, decision buttons.
+    tab: 'Pledges',
+    // The tab label while pledges are waiting ({count} pre-formatted).
+    tabWithCount: 'Pledges ({count})',
+    empty: 'No one has pledged to your guild yet.',
+    accept: 'Accept',
+    acceptTitle: "Accept {name}'s pledge",
+    reject: 'Decline',
+    rejectTitle: "Decline {name}'s pledge",
+    // The recruiting settings editor (Guild Master + officers): the accepting
+    // toggle, the level floor, and the free-text note shown on the board.
+    settings: 'Recruitment',
+    acceptingLabel: 'Accept pledges',
+    minLevelLabel: 'Minimum level',
+    noteLabel: 'Board note',
+    notePlaceholder: 'Tell aspiring members what your guild is looking for',
+    save: 'Save',
+    // The unguilded viewer's own standing pledge (social window guild tab).
+    yourPledge: 'Your pledge: {guild}',
+    since: 'Pledged {date}',
+    withdraw: 'Withdraw pledge',
+  },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
   // (digits run through formatNumber; the units reorder per locale).
@@ -3189,6 +3228,12 @@ export const hudChromeStrings = {
     // tag differently owns its own wrapper instead of inheriting an English one.
     // Wordy (M16), so the five non-Latin fills ship in this same change.
     cheaterTag: '< Cheater >',
+    // The guild line of a player who PLEDGED to a guild without being a member
+    // (docs/prd/guild-pledge-board.md): replaces the `<Guild>` member wrapper so
+    // an aspirant never reads as a member. Like cheaterTag the whole drawn form
+    // is the VALUE (no wrapper added in code), so a locale owns its own shape.
+    // Wordy (M16), so the five non-Latin fills ship in this same change.
+    pledgeTag: 'Pledge of {guild}',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}

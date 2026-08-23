@@ -4356,10 +4356,20 @@
   }
   body.mobile-touch .soc-add input,
   body.mobile-touch .soc-billboard-edit input,
+  body.mobile-touch .soc-pledge-note-row input,
+  body.mobile-touch .soc-pledge-minlvl input,
   body.mobile-touch .trade-money input {
     min-height: 40px;
     font-size: 16px;
     box-sizing: border-box;
+  }
+  /* The pledge-settings accepting toggle and the board's Pledge button join the
+     40px touch floor (the checkbox rides its label's padded hit area). */
+  body.mobile-touch .soc-pledge-open,
+  body.mobile-touch .soc-my-pledge .btn,
+  body.mobile-touch .soc-pledge-note-row .btn,
+  body.mobile-touch .lb-pledge-btn {
+    min-height: 40px;
   }
   body.mobile-touch .soc-x,
   body.mobile-touch .soc-name.soc-link {

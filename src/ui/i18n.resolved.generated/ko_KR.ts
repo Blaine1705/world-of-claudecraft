@@ -1097,6 +1097,31 @@ export const ko_KR: EnTranslations = {
       "mergedPrs": "병합된 PR",
       "devEmpty": "아직 순위에 오른 기여자가 없습니다."
     },
+    "pledge": {
+      "open": "서약 받는 중",
+      "closed": "서약 받지 않음",
+      "minLevel": "레벨 {level} 이상",
+      "action": "서약",
+      "actionTitle": "{guild}에 서약하기",
+      "pledged": "서약함",
+      "yourGuild": "내 길드",
+      "tab": "서약",
+      "tabWithCount": "서약 ({count})",
+      "empty": "아직 길드에 서약한 사람이 없습니다.",
+      "accept": "수락",
+      "acceptTitle": "{name}의 서약 수락",
+      "reject": "거절",
+      "rejectTitle": "{name}의 서약 거절",
+      "settings": "모집 설정",
+      "acceptingLabel": "서약 받기",
+      "minLevelLabel": "최소 레벨",
+      "noteLabel": "게시판 메모",
+      "notePlaceholder": "길드가 어떤 동료를 찾는지 알려 주세요",
+      "save": "저장",
+      "yourPledge": "내 서약: {guild}",
+      "since": "{date}에 서약",
+      "withdraw": "서약 철회"
+    },
     "raidLockout": {
       "title": "공격대 잠금",
       "allReady": "모든 공격대 준비됨",
@@ -2534,7 +2559,8 @@ export const ko_KR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "자리비움",
-      "cheaterTag": "< 부정행위자 >"
+      "cheaterTag": "< 부정행위자 >",
+      "pledgeTag": "{guild} 서약자"
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",
