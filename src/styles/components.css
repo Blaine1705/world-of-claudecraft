@@ -817,11 +817,14 @@
       inset 0 0 8px #ffc86033;
     animation: qd-coach-pulse 900ms ease-in-out infinite;
   }
-  /* The mobile cluster buttons are circles: the coach ring follows the
-     button's own shape instead of squaring it off. */
+  /* The mobile cluster, ring, and Quick Actions controls are circles: the
+     coach ring follows each button's own shape instead of squaring it off. */
   #mobile-interact.qd-coach,
   #mobile-jump.qd-coach,
-  #mobile-action-attack.qd-coach {
+  #mobile-action-attack.qd-coach,
+  #mobile-menu-anchor.qd-coach,
+  .mobile-menu-item.qd-coach,
+  .mobile-action-slot.qd-coach {
     border-radius: 50%;
   }
   /* Playtest verdict: the first cut was too subtle to notice mid-flow. The

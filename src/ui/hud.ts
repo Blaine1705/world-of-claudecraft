@@ -13499,6 +13499,11 @@ export class Hud {
     this.tutorialGreetingTrap?.release();
     this.tutorialGreetingTrap = null;
     document.getElementById('tutorial-greeting')?.remove();
+    // The greeting is a body-appended one-shot outside the show/hide path, so
+    // removing it must resync body.mobile-window-open itself or the mobile
+    // window backdrop (z 85) stays up eating every touch until closeAll runs
+    // (the stuck-veil bug: Escape was the only way out).
+    this.syncAnyWindowOpenState();
   }
 
   // The greeting dialog's single-button note variant (decline follow-up,

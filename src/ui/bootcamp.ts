@@ -149,8 +149,12 @@ export class BootcampOverlay {
   private promptGroundY = 0;
   // Which mobile cluster button pulses gold for the visible ask (touch only;
   // coachGlowButtonId). Cleared whenever the bubble hides.
-  private promptButtonGlow: 'mobile-interact' | 'mobile-jump' | 'mobile-action-attack' | null =
-    null;
+  private promptButtonGlow:
+    | 'mobile-interact'
+    | 'mobile-jump'
+    | 'mobile-action-attack'
+    | 'mobile-slot-primary'
+    | null = null;
   // The wrong-way edge glow's element and its repaint memo.
   private glowEl: HTMLElement | null = null;
   private glowPainted = '';
@@ -432,6 +436,42 @@ export class BootcampOverlay {
     syncGlow('#mobile-interact', () => this.promptButtonGlow === 'mobile-interact');
     syncGlow('#mobile-jump', () => this.promptButtonGlow === 'mobile-jump');
     syncGlow('#mobile-action-attack', () => this.promptButtonGlow === 'mobile-action-attack');
+    // The drill and caster kill asks: the primary ring slot (bar slot 1)
+    // whose art the bubble's chip repeats.
+    syncGlow(
+      '.mobile-action-slot[data-mobile-index="0"]',
+      () => this.promptButtonGlow === 'mobile-slot-primary',
+    );
+
+    // Touch: the bags and the character sheet live behind the Quick Actions
+    // strip, so the PATH glows, not just the destination (CX: "it is not
+    // clear at all what I need to do"). The anchor pulses while a bag or
+    // sheet lesson waits and the strip is closed; the strip's own Bags or
+    // Character item pulses once it is open (a closed strip's items are
+    // unrendered, so the always-on want is harmless); the item's context
+    // menu row pulses once the bags are up and the menu is open.
+    const touch = currentInputHintMode() === 'touch';
+    const bagsEl = document.getElementById('bags');
+    const bagsOpen = bagsEl !== null && bagsEl.style.display === 'block';
+    const charEl = document.getElementById('char-window');
+    const charOpen = charEl !== null && charEl.style.display === 'block';
+    const wantsBags = (bagItem !== null || ringEquip) && !vendorOpen && !bagsOpen;
+    const wantsChar = this.ringPhase === 'admire' && !charOpen;
+    const anchorEl = document.getElementById('mobile-menu-anchor');
+    const stripOpen = anchorEl?.getAttribute('aria-expanded') === 'true';
+    syncGlow('#mobile-menu-anchor', () => touch && (wantsBags || wantsChar) && !stripOpen);
+    syncGlow('#mobile-menu-bags', () => touch && wantsBags);
+    syncGlow('#mobile-menu-char', () => touch && wantsChar);
+    // The lesson item's own menu row (Use for the lure and the rite stone,
+    // Equip for the pouch and the ring): the default row IS that verb.
+    syncGlow(
+      '#ctx-menu .ctx-item[data-act="default"]',
+      () => (bagItem !== null || ringEquip) && bagsOpen,
+    );
+    // The pouch purchase's first step: Finch's browse-goods gossip row, the
+    // one button between the player and the stall (CX: "way more obvious
+    // that the user actually needs to browse the shop").
+    syncGlow('#quest-dialog .qd-list-item[data-vendor="1"]', () => vendorItem !== null);
 
     // The death lesson's own screen. While the island is teaching the corpse
     // run, the button that ends it pulses the moment it appears, and the
@@ -861,8 +901,22 @@ export class BootcampOverlay {
         el.classList.remove('qd-coach');
       }
     }
-    for (const id of ['mobile-interact', 'mobile-jump', 'mobile-action-attack']) {
+    for (const id of [
+      'mobile-interact',
+      'mobile-jump',
+      'mobile-action-attack',
+      'mobile-menu-anchor',
+      'mobile-menu-bags',
+      'mobile-menu-char',
+    ]) {
       document.getElementById(id)?.classList.remove('qd-coach');
+    }
+    for (const sel of [
+      '.mobile-action-slot.qd-coach',
+      '#ctx-menu .ctx-item.qd-coach',
+      '#quest-dialog .qd-list-item.qd-coach',
+    ]) {
+      for (const el of document.querySelectorAll<HTMLElement>(sel)) el.classList.remove('qd-coach');
     }
     if (this.captionTimer) clearTimeout(this.captionTimer);
     this.captionTimer = null;

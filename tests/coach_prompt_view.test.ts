@@ -511,13 +511,13 @@ describe('coachPromptChips + coachGlowButtonId (the touch button mapping)', () =
     expect(coachGlowButtonId('kill', 'touch', inputs)).toBe('mobile-action-attack');
   });
 
-  it('leaves the caster and drill bubbles on the ring slot art (the "2 spell")', () => {
+  it('keeps the caster and drill bubbles on the ring slot art, and glows that slot', () => {
     const caster = { ...inputs, caster: true, killIconId: 'smite' };
     expect(coachPromptChips('kill', 'touch', caster)).toEqual([{ abilityIcon: 'smite' }]);
-    expect(coachGlowButtonId('kill', 'touch', caster)).toBeNull();
+    expect(coachGlowButtonId('kill', 'touch', caster)).toBe('mobile-slot-primary');
     const drill = { ...inputs, abilityAsk: true, killIconId: 'heroic_strike' };
     expect(coachPromptChips('kill', 'touch', drill)).toEqual([{ abilityIcon: 'heroic_strike' }]);
-    expect(coachGlowButtonId('kill', 'touch', drill)).toBeNull();
+    expect(coachGlowButtonId('kill', 'touch', drill)).toBe('mobile-slot-primary');
   });
 
   it('maps the parkour ask to the Jump button on touch, the bind elsewhere', () => {

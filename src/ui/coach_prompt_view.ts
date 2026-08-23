@@ -595,16 +595,18 @@ export function coachPromptChips(
   return chip ? [{ cap: chip }] : [];
 }
 
-/** Which mobile cluster button pulses gold for the visible ask. Touch only:
- *  the desktop keycap already names its key, and the drill and caster kill
- *  bubbles point at the action RING slot whose art the chip repeats. */
+/** Which mobile cluster control pulses gold for the visible ask. Touch only:
+ *  the desktop keycap already names its key. The drill and caster kill
+ *  bubbles point at the primary action RING slot (bar slot 1, the "2" bind)
+ *  whose art the chip repeats, so the slot itself wears the ring too. */
 export function coachGlowButtonId(
   kind: CoachPromptPlan['kind'] | null,
   mode: 'keyboard' | 'touch' | 'pad',
   i: Pick<CoachPromptChipInputs, 'abilityAsk' | 'caster'>,
-): 'mobile-interact' | 'mobile-jump' | 'mobile-action-attack' | null {
+): 'mobile-interact' | 'mobile-jump' | 'mobile-action-attack' | 'mobile-slot-primary' | null {
   if (mode !== 'touch' || kind === null || kind === 'select' || kind === 'use') return null;
-  if (kind === 'kill') return i.abilityAsk || i.caster ? null : 'mobile-action-attack';
+  if (kind === 'kill')
+    return i.abilityAsk || i.caster ? 'mobile-slot-primary' : 'mobile-action-attack';
   if (kind === 'jump') return 'mobile-jump';
   return 'mobile-interact';
 }
