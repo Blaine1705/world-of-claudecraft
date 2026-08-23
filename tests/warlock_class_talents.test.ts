@@ -153,6 +153,23 @@ describe('warlock class talent tree', () => {
     });
   });
 
+  it('keeps Hard Bargain a symmetric conversion under the viability floors', () => {
+    // The 2026-08-23 spellDmgPct floors must not reach the mana economy: the
+    // scaleEffect lifeTap arm passes through untouched, so the authored
+    // hp == mana symmetry the tooltip promises survives the damage knob.
+    const { sim, player } = rig({});
+    const tap = sim.resolvedAbility('life_tap');
+    const effect = tap?.effects.find((candidate) => candidate.type === 'lifeTap');
+    if (effect?.type !== 'lifeTap') throw new Error('missing Hard Bargain effect');
+    expect(effect).toMatchObject({ hp: 85, mana: 85 });
+
+    player.resource = 100;
+    const hpBefore = player.hp;
+    sim.castAbility('life_tap');
+    expect(player.hp).toBe(hpBefore - 85);
+    expect(player.resource).toBe(185);
+  });
+
   it('makes Pact Deepened reduce magic damage by 5% only while Fiendhide is active', () => {
     const { sim, player } = rig({ 11: 'wlk_r11_improved_life_tap' });
     const source = addTarget(sim);

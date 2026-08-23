@@ -63,9 +63,10 @@ was never rotation knowledge.
 
 - scripts/warlock_balance_probe.ts: WARLOCK_FULL_BIS_GEAR re-anchored to the
   live consensus kit; new WARLOCK_HEROIC_NYTHRAXIS_SCENARIO (level-22 target
-  wearing the real Nythraxis armor curve, mirroring the owned-class raid
-  probes) threaded through runWarlockBalanceProbe with the level-20 dummy
-  still the default.
+  wearing the real Nythraxis armor curve including the heroic tuning's 1.2
+  armorMultiplier, exactly as src/sim/instances/difficulty.ts scales the live
+  heroic spawn) threaded through runWarlockBalanceProbe with the level-20
+  dummy still the default.
 - src/sim/content/spec_baselines.ts (the invisible hotfix-floor layer, the
   same knob surface the druid and rogue re-bands used):
   - affliction: global spellDmgPct 0.07
@@ -82,25 +83,33 @@ was never rotation knowledge.
 
 ## 4. Where the specs land (probe four-seed mean, 120 s, best real kit)
 
-| spec | heroic Nythraxis (L22, real armor) | level-20 dummy | 300 s seed-42 |
+| spec | heroic Nythraxis (L22, 1.2x armor) | level-20 dummy | 300 s seed-42 |
 |---|---|---|---|
 | affliction | 204.8 (was 155.4 kit-corrected, 169.5 live top) | 208.8 | 206.0 |
-| destruction | 207.2 (was 143.9) | 209.8 | 199.1 |
-| demonology | 192.2 (was 135.0) | 228.3 | 178.9 |
+| destruction | 207.0 (was 143.9) | 209.8 | 198.5 |
+| demonology | 190.1 (was 135.0) | 228.3 | 179.2 |
 
 24-seed confirmation at the heroic profile: affliction 202.3, destruction
-202.8, demonology 201.6. Demonology's level-20 dummy number runs hottest
-because undead neither miss a level-20 target nor meet armor on the
-zero-armor shell; its heroic number is the contract.
+202.8, demonology 199.3 (the pinned four seeds run a few points cold for
+demonology; the wide-seed mean sits on the target). Demonology's level-20
+dummy number runs hottest because undead neither miss a level-20 target nor
+meet armor on the zero-armor shell; its heroic number is the contract.
 
 Cross-class context: enhancement landed 212.7 heroic / 221 level-20 after
 its 2026-08-23 softening round; combat was re-banded to its 200 band top;
-live combat and fire heroic tops are 217 to 222. Warlock at about 202 heroic
+live combat and fire heroic tops are 217 to 222. Warlock at about 200 heroic
 sits at the table's top band without exceeding it.
 
-Mana economy is untouched (the knobs change damage percentages, not costs):
-all three specs still spend the pool by five minutes (end mana under 5% at
-300 s) with starvation well inside the corridor.
+Collateral, stated and accepted with the round: the shared damage multiplier
+also reaches the flat-magnitude buff kinds, so Fiendhide's armor resolves
+88/176 instead of 80/160 (pinned in tests/warlock_class_talents.test.ts).
+Hard Bargain's health-to-mana conversion is deliberately EXCLUDED from the
+floors (the scaleEffect lifeTap arm passes through untouched, pinned by the
+Hard Bargain symmetry test), so the mana economy itself is unchanged: all
+three specs still spend the pool by five minutes (end mana under 5% at
+300 s) with starvation well inside the corridor. Two spec-locked tooltip
+literals were updated to their floor-resolved values (Hex of Violence 16 to
+17, Pyre Colossus impact 58-72 to 64-79).
 
 ## 5. Follow-ups deliberately out of scope
 

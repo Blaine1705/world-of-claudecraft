@@ -1,6 +1,7 @@
 import { pathToFileURL } from 'node:url';
 import { ruinAmount } from '../src/sim/combat/destruction';
 import { addSoulFragments, soulFragmentCount } from '../src/sim/combat/necromancy';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { MOBS } from '../src/sim/data';
 import { createMob, type PlayerEquipment, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -106,11 +107,15 @@ function addBossDummy(sim: ProbeSim, scenario: WarlockProbeScenario): Entity {
   target.aiState = 'idle';
   target.aggroTargetId = null;
   if (scenario.nythraxisArmor) {
-    // The named raid template supplies its real armor curve while the
-    // training-dummy shell prevents boss casts, adds, and movement, same as
-    // the owned-class raid probe.
+    // The named raid template supplies its real armor curve, scaled by the
+    // heroic tuning's armorMultiplier exactly as src/sim/instances/difficulty.ts
+    // scales the live heroic spawn, while the training-dummy shell prevents
+    // boss casts, adds, and movement.
     const armorTemplate = MOBS.nythraxis_scourge_of_thornpeak;
-    target.stats.armor = Math.round(armorTemplate.armorPerLevel * (scenario.targetLevel - 1));
+    const heroicArmorMult = HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.armorMultiplier;
+    target.stats.armor = Math.round(
+      armorTemplate.armorPerLevel * heroicArmorMult * (scenario.targetLevel - 1),
+    );
   }
   sim.addEntity(target);
   sim.targetEntity(target.id);

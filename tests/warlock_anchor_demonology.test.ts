@@ -39,10 +39,10 @@ describe('demonology 200 DPS anchors at 120 seconds', () => {
       rows.reduce((sum, row) => sum + row[key], 0) / rows.length;
 
     // 228.3 measured at the 2026-08-23 re-anchor (see the header note on why
-    // the zero-armor dummy flatters undead); the band catches a collapse or a
-    // runaway without flaking on engine drift.
-    expect(mean('dps')).toBeGreaterThanOrEqual(213);
-    expect(mean('dps')).toBeLessThanOrEqual(243);
+    // the zero-armor dummy flatters undead); about plus or minus 5%, so the
+    // tripwire trips on a real collapse or runaway, not on engine drift.
+    expect(mean('dps')).toBeGreaterThanOrEqual(217);
+    expect(mean('dps')).toBeLessThanOrEqual(240);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 });

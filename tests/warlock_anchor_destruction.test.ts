@@ -37,10 +37,10 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
     const mean = (key: 'dps' | 'starvedPct') =>
       rows.reduce((sum, row) => sum + row[key], 0) / rows.length;
 
-    // 209.8 measured at the 2026-08-23 re-anchor; the band catches a collapse
-    // or a runaway without flaking on engine drift.
-    expect(mean('dps')).toBeGreaterThanOrEqual(195);
-    expect(mean('dps')).toBeLessThanOrEqual(225);
+    // 209.8 measured at the 2026-08-23 re-anchor; about plus or minus 5%, so
+    // the tripwire trips on a real collapse or runaway, not on engine drift.
+    expect(mean('dps')).toBeGreaterThanOrEqual(199);
+    expect(mean('dps')).toBeLessThanOrEqual(220);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 });

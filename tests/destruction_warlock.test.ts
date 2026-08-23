@@ -605,9 +605,10 @@ describe('Destruction finishers and target switching', () => {
 
     resetGcd(p);
     p.hitBonus = 1;
-    // 199 keeps the dummy inside the sub-20% execute window (maxHp 1000) with
-    // room for the 2026-08-23 viability-floor damage raise to land non-lethally.
-    mob.hp = 199;
+    // 150 sits clearly inside the sub-20% execute window (maxHp 1000, not a
+    // boundary value) with room for the 2026-08-23 viability-floor damage
+    // raise to land non-lethally.
+    mob.hp = 150;
     const events = castAndLand(sim, 'shadowburn', 2);
     expect(
       events.some(
@@ -627,7 +628,7 @@ describe('Destruction finishers and target switching', () => {
     inside.sim.targetEntity(insideMob.id);
     inside.p.facing = 0;
     inside.p.hitBonus = 1;
-    insideMob.hp = 199;
+    insideMob.hp = 150;
     giveRuin(inside.p, 1);
     inside.sim.castAbility('shadowburn');
     expect(ruinAmount(inside.p)).toBe(0);
@@ -649,7 +650,7 @@ describe('Destruction finishers and target switching', () => {
     const expiredMob = addDummy(expired.sim, 9713, 0, 1_000);
     expired.sim.targetEntity(expiredMob.id);
     expired.p.facing = 0;
-    expiredMob.hp = 199;
+    expiredMob.hp = 150;
     giveRuin(expired.p, 1);
     expired.sim.castAbility('shadowburn');
     expect(ruinAmount(expired.p)).toBe(0);

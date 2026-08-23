@@ -1442,10 +1442,11 @@ describe('Affliction Warlock', () => {
     ctx(sim).dealDamage(target, victim, 10, false, 'physical', 'Claw', 'hit');
 
     expect(doomValue(sim.player)).toBe(9);
-    // 16 authored (the description keeps the authored figure), 17 dealt
-    // through the 2026-08-23 viability floor's spellDmgPct 0.07.
+    // 16 authored, 17 dealt and advertised: the 2026-08-23 viability floor's
+    // spellDmgPct 0.07 always applies (the ability is affliction-locked), so
+    // the copy states the resolved value per the tooltip-writing rule.
     expect(target.hp).toBe(hpBefore - 17);
-    expect(ABILITIES.hex_of_violence.description).toContain('16 Shadow damage');
+    expect(ABILITIES.hex_of_violence.description).toContain('17 Shadow damage');
   });
 
   it('safely clears Hex of Violence when its reprisal kills the acting enemy', () => {

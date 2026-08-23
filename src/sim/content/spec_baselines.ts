@@ -154,6 +154,14 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     // demonology pet top-up, since pets scale with neither spell knob) size
     // each spec to the 200 DPS heroic anchor in
     // tests/warlock_anchor_*: measured slopes, not invented numbers.
+    // Stated collateral, accepted with the round: dmgMult also reaches the
+    // flat-magnitude buff kinds (SCALABLE_BUFF_KINDS in content/classes.ts),
+    // so Fiendhide armor resolves 88/176 instead of 80/160 (pinned in
+    // tests/warlock_class_talents.test.ts); Hard Bargain's mana yield is
+    // deliberately excluded (the lifeTap arm of scaleEffect). Rounding on
+    // small authored magnitudes makes the delivered percent wobble around the
+    // knob (Litany 9 to 11 is +10% under the 0.07 floor). The floors apply in
+    // PvP too (no PvE/PvP scaling split); flagged for the PvP review.
     affliction: {
       stats: { int: 6 },
       global: { spellDmgPct: 0.07 },
