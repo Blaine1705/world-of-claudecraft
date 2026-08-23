@@ -265,6 +265,39 @@ describe('interaction.interact dispatch', () => {
     expect(errors(sim)).not.toContain("You don't have permission to loot that.");
   });
 
+  it('target-path: skips a decayed corpse and falls through to a nearby object', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 21, a, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.corpseTimer = 0;
+    const obj = groundObj(sim, 'wolf_fang', 20, 21.5);
+    const player = sim.entities.get(a) as AnyEntity;
+    player.targetId = mob.id;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    expect(obj.lootable).toBe(false);
+  });
+
+  it('target-path: skips an owned tagged corpse and falls through to a nearby object', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 21, a, []);
+    mob.ownerId = a;
+    mob.lootable = false;
+    mob.loot = null;
+    const obj = groundObj(sim, 'wolf_fang', 20, 21.5);
+    const player = sim.entities.get(a) as AnyEntity;
+    player.targetId = mob.id;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(sim.countItem('rough_hide', a)).toBe(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    expect(obj.lootable).toBe(false);
+  });
+
   it('nearest-scan: with no target, picks up the nearest lootable object', () => {
     const { sim, a } = twoPlayers();
     const obj = groundObj(sim, 'wolf_fang', 20, 21);

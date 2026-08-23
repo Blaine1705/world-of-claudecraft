@@ -26,7 +26,7 @@
 import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
-import { corpseInteractionAvailability } from './corpse_interaction';
+import { corpseCanInteract, corpseInteractionAvailability } from './corpse_interaction';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -297,8 +297,7 @@ export function harvestCorpse(
     return;
   }
   const mob = ctx.entities.get(mobId);
-  if (mob?.kind !== 'mob' || !mob.dead) return;
-  if (corpseHasDecayed(true, mob.corpseTimer)) return;
+  if (!mob || !corpseCanInteract(mob)) return;
   const componentTags = MOBS[mob.templateId]?.componentTags;
   if (!isHarvestableCorpse(componentTags)) {
     ctx.error(meta.entityId, 'That corpse has nothing to harvest.');
