@@ -1369,6 +1369,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'Показывать сундук ежедневных наград',
   'hudChrome.options.mobileCameraJoystick': 'Джойстик камеры',
   'hudChrome.options.mobileLeftHanded': 'Раскладка для левшей',
+  'hudChrome.options.touchTapMenus': 'Меню по нажатию',
+  'hudChrome.options.touchTapMenusNote': 'Открывайте элементы действий, расходников и меню нажатием вместо смахивания. Нажмите на предмет, чтобы использовать его, нажмите на элемент ещё раз для обычного действия или нажмите за его пределами, чтобы закрыть.',
   'hudChrome.options.itemLevelLine': 'Уровень предмета {level}',
   'hudChrome.options.itemScoreLine': 'Оценка {score}',
   'hudChrome.landing.highContrast': 'Высокая контрастность',
@@ -2606,7 +2608,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'Вне глобального восстановления',
   'abilityUi.tooltip.friendlyTarget': 'Дружественная цель',
   'abilityUi.tooltip.enemyTarget': 'Вражеская цель',
-  'abilityUi.tooltip.anyTarget': 'Врага или союзника',
   'abilityUi.tooltip.selfOnly': 'Только на себя',
   'abilityUi.tooltip.damageRange': 'от {min} до {max}',
   'abilityUi.tooltip.finisherDamage': '{base} плюс {perCombo} за прием серии',
@@ -3087,12 +3088,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': 'Свинцовый яд',
   'entities.abilities.crippling_poison.description':
     'Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек.',
-  'entities.abilities.melting_acid.name': 'Разъедающая кислота',
-  'entities.abilities.melting_acid.description':
-    'Обливает цель едким ядом, нанося {damage} ед. урона от сил природы и снижая ее броню на 5% на 12 сек.',
-  'entities.abilities.nightshade_coating.name': 'Паслёновая обмазка',
-  'entities.abilities.nightshade_coating.description':
-    'Покрывает цель паслёновым ядом, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек.',
   'entities.abilities.expose_armor.name': 'Пролом брони',
   'entities.abilities.expose_armor.description': 'Завершающий приём, обнажающий цель на 30 сек.: каждая потраченная серия приёмов снижает её броню на 2% (5 серий приёмов: {damage}%).',
   'entities.abilities.rupture.name': 'Истечение кровью',
@@ -5788,13 +5783,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s} сек.',
   'hudChrome.meters.breakdownRow': '{value} ({percent})',
   'hudChrome.meters.threatFallback': 'Нет данных об угрозе: показан урон по {name}',
-  'hudChrome.meters.threatFrozen': 'Финальная угроза: {name}',
   'hudChrome.meters.breakdownSummary': '{tab}: {value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}: {ability}',
   'hudChrome.meters.autoShowHint':
     'Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя.',
   'hudChrome.mobile.actionPageToggle': 'Переключить страницу действий',
+  'hudChrome.mobile.actionRadial': 'Направления действий',
+  'hudChrome.mobile.actionRadialCancel': 'Отменить действие',
+  'hudChrome.mobile.radialCenter': 'Центр',
+  'hudChrome.mobile.radialRight': 'Вправо',
   'hudChrome.mobile.actionRing': 'Боевые действия',
   'hudChrome.mobile.haptics': 'Вибрация',
   'hudChrome.mobile.hapticsOff': 'Вибрация выкл.',
@@ -5969,12 +5967,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordLong': 'Новый пароль должен содержать не более 128 символов.',
   'hudChrome.account.errPasswordUnchanged': 'Новый пароль должен отличаться от текущего.',
   'hudChrome.account.errPasswordConfirm': 'Новые пароли не совпадают.',
-  'hudChrome.account.setPasswordTitle': 'Установить пароль',
-  'hudChrome.account.setPasswordHint':
-    'Эта учётная запись была создана через вход через Apple или Discord, и у неё ещё нет пароля. Установите пароль, чтобы входить с других устройств, например настольных приложений для Mac и Windows или через веб, а также чтобы привязать дополнительные способы входа.',
-  'hudChrome.account.setPasswordSubmit': 'Установить пароль',
-  'hudChrome.account.passwordSet':
-    'Пароль установлен. Теперь вы можете входить с логином и паролем на любом устройстве.',
   'hudChrome.account.emailLabel': 'Эл. почта (необязательно)',
   'hudChrome.account.emailHint':
     'Используется только для восстановления аккаунта. Мы не рассылаем рекламные письма.',
@@ -7910,7 +7902,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': 'Открыть окно крафта: {craft}',
   'hudChrome.crafting.close': 'Закрыть крафт',
   'hudChrome.crafting.reagentsNeeded': 'Требуется:',
-  'hudChrome.crafting.craftFeeLine': 'Плата за крафт: {fee}',
   'hudChrome.crafting.empty': 'Известных рецептов пока нет.',
   'hudChrome.crafting.resultAria': 'Создать {name}',
   'hudChrome.crafting.craftedToast': 'Создано: {name}',
@@ -8017,9 +8008,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': 'Игровой экран перестал отвечать. Перезагрузить его?',
   'desktop.crash.reload': 'Перезагрузить',
   'desktop.crash.quit': 'Выйти',
+  'desktop.titlebar.exitGame': 'Выйти из игры',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
-  'desktop.titlebar.exitGame': 'Выйти из игры',
   'gpuNotice.bodyDesktop':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
   'gpuNotice.bodyDiscreteInactive':
@@ -8463,8 +8454,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.rift.iceGoalLit': 'Морозная печать вспыхивает. Путь пробуждается.',
   'sim.rift.levelGate':
     'Войти в этот разлом могут лишь искатели приключений уровня {level} и выше.',
-  'sim.rift.lootRecoveryNotice':
-    'Вход в разлом продержится ещё некоторое время: даже если ваша группа падёт, вы сможете вернуться за честно заработанной добычей.',
   'sim.rift.portalCollapses': 'Разлом ранга {tier} в {zone} обрушился.',
   'sim.rift.portalOpens': 'В {zone} разверзся разлом ранга {tier}!',
   'sim.rift.portalSealed': 'Разлом ранга {tier} в {zone} запечатан.',
@@ -8706,8 +8695,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.account.deactivated':
     'Этот аккаунт деактивирован. Для восстановления обратитесь к администратору.',
   'apiError.account.not_found': 'Аккаунт не найден.',
-  'apiError.account.password_already_set':
-    'У этой учётной записи уже есть пароль. Используйте вместо этого смену пароля.',
   'apiError.character.name_invalid': 'Недопустимое имя персонажа. Используйте 2-16 букв.',
   'apiError.character.name_not_allowed': 'Это имя персонажа запрещено.',
   'apiError.character.invalid_class': 'Недопустимый класс.',
@@ -9093,6 +9080,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': 'Страница {page}',
   'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
   'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение... (! команды сообщества)',
+  'hudChrome.mobile.consumableSeat': 'Расходники',
+  'hudChrome.mobile.menuControl': 'Меню',
+  'hudChrome.mobile.menuControlAria':
+    'Меню. Нажмите, чтобы открыть чат, или удерживайте и проведите вправо для транспорта, карты, сумок и других разделов.',
+  'hudChrome.mobile.menuControlAriaTap':
+    'Меню. Нажмите, чтобы открыть ряд меню: транспорт, карта, сумки и другие разделы. Нажмите ещё раз, чтобы открыть чат.',
+  'hudChrome.mobile.quickActions': 'Быстрые действия',
+  'hudChrome.mobile.quickActionsAria':
+    'Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, либо удерживайте и проведите вправо, чтобы выбрать.',
+  'hudChrome.mobile.quickActionsAriaTap':
+    'Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, затем нажмите нужный значок. Нажмите на элемент управления ещё раз, чтобы закрыть.',
+  'hudChrome.mobile.quickActionsLabel': 'Действия',
+  'hudChrome.mobile.stanceRadial': 'Стойки',
+  'hudChrome.mobile.stanceAnchorAria': 'Стойка: {stance}. Нажмите, чтобы открыть круг стоек, затем выберите другую стойку.',
+  'hudChrome.mobile.stanceAnchorEmptyAria': 'Без стойки. Нажмите, чтобы открыть круг стоек, затем выберите стойку.',
+  'hudChrome.mobile.questStripAria':
+    'Отслеживаемое задание {position} из {total}: {title}. Нажмите, чтобы перейти к следующему.',
+  'hudChrome.mobile.questStripAriaSingle': 'Отслеживаемое задание: {title}',
+  'hudChrome.mobile.questStripMore': 'ещё {count}',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.keybinds.categoryPet': 'Питомец',
@@ -9727,7 +9733,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Летопись наверстала упущенное: записано деяний: {count}.',
   'hudChrome.deeds.broadcastLine': '{name} совершает деяние: {deed}',
   'hudChrome.deeds.rarityLine': 'Совершили {percent} искателей приключений',
-  'hudChrome.deeds.stillToVisit': 'Ещё предстоит посетить: {places}',
   'hudChrome.deeds.trackerLabel': 'Деяния',
   'hudChrome.deeds.collapseHint': 'Свернуть список деяний',
   'hudChrome.deeds.expandHint': 'Развернуть список деяний',
@@ -10035,7 +10040,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваше следующее заклинание со временем произнесения становится мгновенным. Действует 60 сек. (Талант мага)',
   'entities.abilities.psychic_scream.description': 'Приводит в ужас врагов в пределах 8 м на срок до 4 сек. Урон может разрушить эффект.',
   'entities.abilities.shadowstep.description':
-    'Вы проходите сквозь тени к цели, будь то союзник или враг, не нарушая Сумрачную завесу. (талант разбойника)',
+    'Вы проходите сквозь тени к своей цели. (талант разбойника)',
   'entities.abilities.silence.description':
     'Лишает цель возможности произносить заклинания на 4 сек. (талант жреца)',
   'entities.abilities.tranquility.description':
@@ -13287,6 +13292,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.',
   'hudChrome.otaUpdate.progressLabel': 'Ход загрузки обновления',
   'hudChrome.otaUpdate.title': 'Обновление игры',
-  // v0.40 release i18n fill.
-  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.mobile.barEditorAria': 'Изменить раскладку панели действий',
+  'hudChrome.barEditor.title': 'Редактор панели действий',
+  'hudChrome.barEditor.close': 'Закрыть редактор панели',
+  'hudChrome.barEditor.pages': 'Страницы панели действий',
+  'hudChrome.barEditor.buttonHeader': 'Кнопка {button}',
+  'hudChrome.barEditor.cellAria': 'Кнопка {button}, {direction}: {action}',
+  'hudChrome.barEditor.emptyCellAria': 'Кнопка {button}, {direction}: пусто',
+  'hudChrome.barEditor.hint': 'Коснитесь одной ячейки, затем другой, чтобы поменять их местами.',
+  'hudChrome.barEditor.armed': 'Коснитесь ячейки, чтобы поместить туда {name}.',
+  'hudChrome.barEditor.picked': 'Коснитесь другой ячейки, чтобы поменять местами с {name}.',
+  'hudChrome.barEditor.locked': 'Панели действий заблокированы в настройках интерфейса.',
+  'hudChrome.barEditor.clear': 'Очистить',
+  'hudChrome.barEditor.clearAria': 'Очистить ячейку',
+  'hudChrome.barEditor.clearArmed': 'Нажмите на ячейку, чтобы очистить её.',
+  'hudChrome.spellbook.assignAria': 'Выберите ячейку для {name}',
 };

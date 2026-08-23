@@ -866,11 +866,52 @@ export const zh_CN: EnTranslations = {
       "actionRing": "战斗动作",
       "actionPageToggle": "切换动作页",
       "actionPageIndicator": "第{page}页",
+      "actionRadial": "技能方向",
+      "actionRadialCancel": "取消动作",
+      "radialCenter": "中心",
+      "radialUp": "Up",
+      "radialRight": "右",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "消耗品",
+      "menuControl": "菜单",
+      "menuControlAria": "菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。",
+      "menuControlAriaTap": "菜单。点按打开菜单行：坐骑、地图、背包等。再次点按可打开聊天。",
+      "menuLabel": "Menu",
+      "quickActions": "快捷操作",
+      "quickActionsAria": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，或按住并向右滑动进行选择。",
+      "quickActionsAriaTap": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，然后点按其中一项。再次点按该控件可关闭。",
+      "quickActionsLabel": "操作",
+      "stanceRadial": "姿态",
+      "stanceAnchorAria": "姿态：{stance}。点按打开姿态环，然后选择其他姿态。",
+      "stanceAnchorEmptyAria": "无姿态。点按打开姿态环，然后选择一种姿态。",
+      "questStripAria": "追踪任务 {position}/{total}：{title}。点按可切换到下一个任务。",
+      "questStripAriaSingle": "追踪任务：{title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "还有 {count} 项",
       "targetCycle": "切换目标",
       "targetCycleShort": "目标",
       "spellbookPageLabel": "页{page}",
       "hideKeyboard": "隐藏键盘",
-      "chatPlaceholder": "说点什么...（! 显示社区指令）"
+      "chatPlaceholder": "说点什么...（! 显示社区指令）",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "编辑动作条布局"
+    },
+    "barEditor": {
+      "title": "编辑动作条",
+      "close": "关闭动作条编辑器",
+      "pages": "动作条页面",
+      "pageTab": "Page {page}",
+      "buttonHeader": "按钮{button}",
+      "cellAria": "按钮{button}，{direction}：{action}",
+      "emptyCellAria": "按钮{button}，{direction}：空",
+      "hint": "点按一个栏位，再点按另一个，即可交换。",
+      "armed": "点按一个栏位以放置{name}。",
+      "picked": "点按另一个栏位以与{name}交换。",
+      "locked": "动作条已在界面选项中锁定。",
+      "clear": "清除",
+      "clearAria": "清除一个槽位",
+      "clearArmed": "点击一个槽位即可清除。"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -986,7 +1027,7 @@ export const zh_CN: EnTranslations = {
       "seconds": "{s}秒",
       "autoShowHint": "一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。",
       "threatFallback": "无实时仇恨：显示对{name}造成的伤害",
-      "threatFrozen": "最终仇恨：{name}",
+      "threatFrozen": "Final threat vs {name}",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
@@ -1416,7 +1457,9 @@ export const zh_CN: EnTranslations = {
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局"
+      "mobileLeftHanded": "左手布局",
+      "touchTapMenus": "点击菜单",
+      "touchTapMenusNote": "用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。"
     },
     "talentRows": {
       "tab": "抉择",
@@ -2064,10 +2107,10 @@ export const zh_CN: EnTranslations = {
       "errPasswordLong": "新密码最多只能包含 128 个字符。",
       "errPasswordUnchanged": "新密码必须与当前密码不同。",
       "errPasswordConfirm": "两次输入的新密码不一致。",
-      "setPasswordTitle": "设置密码",
-      "setPasswordHint": "该账户是通过\"通过 Apple 登录\"或 Discord 创建的，尚未设置密码。设置密码后即可在其他设备（例如 Mac 和 Windows 桌面客户端）或网页上使用用户名和密码登录，也可以绑定其他登录方式。",
-      "setPasswordSubmit": "设置密码",
-      "passwordSet": "密码已设置。现在可以在任何设备上使用用户名和密码登录。",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "邮箱（可选）",
       "emailHint": "仅用于账户找回。我们绝不发送营销邮件。",
       "saveEmail": "保存邮箱",
@@ -2509,7 +2552,8 @@ export const zh_CN: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
-      "removeFromBarAria": "从动作条移除{name}"
+      "removeFromBarAria": "从动作条移除{name}",
+      "assignAria": "为{name}选择一个栏位"
     },
     "nameplate": {
       "mobLevel": "{level}",
@@ -3281,7 +3325,7 @@ export const zh_CN: EnTranslations = {
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 个优质品级）",
-      "craftFeeLine": "制作费用：{fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "尚无已知配方。",
       "resultAria": "制作{name}",
       "craftedToast": "已制作:{name}",
@@ -3833,7 +3877,7 @@ export const zh_CN: EnTranslations = {
       "unlockedBorderHint": "获得新边框：{name}。可在功绩之书中佩戴。",
       "broadcastLine": "{name} 达成了功绩：{deed}",
       "rarityLine": "{percent} 的冒险者已达成",
-      "stillToVisit": "尚待探访：{places}",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "功绩",
       "collapseHint": "折叠功绩追踪器",
       "expandHint": "展开功绩追踪器",
@@ -3911,7 +3955,7 @@ export const zh_CN: EnTranslations = {
       "characters_online": "请先登出所有角色再进行注销。",
       "deactivated": "此账户已注销。请联系管理员以恢复。",
       "not_found": "未找到账户。",
-      "password_already_set": "该账户已设置密码，请改用\"修改密码\"。"
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "角色名称无效。请使用 2-16 个字母。",
@@ -7126,7 +7170,7 @@ export const zh_CN: EnTranslations = {
       "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
       "portalSealed": "{zone}的{tier}级裂隙已被封印。",
       "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",
-      "lootRecoveryNotice": "裂隙的入口还将维持一段时间：即便队伍全灭，你仍可返回，取回自己应得的战利品。",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "只有等级达到{level}级或以上的冒险者才能进入这道裂隙。",
       "deadEntry": "死亡状态下无法进入裂隙。",
       "deadEntryCombat": "你的队伍仍在战斗中。战斗结束后，死者方可重新进入。",
@@ -8805,7 +8849,7 @@ export const zh_CN: EnTranslations = {
       "offGlobalCooldown": "不触发公共冷却",
       "friendlyTarget": "友方目标",
       "enemyTarget": "敌方目标",
-      "anyTarget": "敌方或友方目标",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "仅对自己",
       "damageRange": "{min} 到 {max}",
       "finisherDamage": "{base} 加每个连击点 {perCombo}"
@@ -9595,12 +9639,12 @@ export const zh_CN: EnTranslations = {
         "description": "以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。"
       },
       "melting_acid": {
-        "name": "熔蚀之酸",
-        "description": "以腐蚀性毒液泼洒目标，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。"
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
       },
       "nightshade_coating": {
-        "name": "夜影涂层",
-        "description": "为目标涂上夜影毒，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。"
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "护甲突破",
@@ -10790,7 +10834,7 @@ export const zh_CN: EnTranslations = {
       },
       "shadowstep": {
         "name": "影步",
-        "description": "穿过暗影，向你的目标迈进，不论敌友，且不会打破暮幕。（潜行者天赋）"
+        "description": "穿过暗影，向你的目标迈进。（潜行者天赋）"
       },
       "silence": {
         "name": "沉默",

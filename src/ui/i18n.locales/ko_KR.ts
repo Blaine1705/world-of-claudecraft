@@ -1347,6 +1347,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
   'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',
   'hudChrome.options.mobileLeftHanded': '왼손잡이 레이아웃',
+  'hudChrome.options.touchTapMenus': '탭 메뉴',
+  'hudChrome.options.touchTapMenusNote': '스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다.',
   'hudChrome.options.itemLevelLine': '아이템 레벨 {level}',
   'hudChrome.options.itemScoreLine': '점수 {score}',
   'hudChrome.landing.highContrast': '고대비',
@@ -2554,7 +2556,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '공용 재사용 대기시간 없음',
   'abilityUi.tooltip.friendlyTarget': '아군 대상',
   'abilityUi.tooltip.enemyTarget': '적 대상',
-  'abilityUi.tooltip.anyTarget': '적 또는 아군 대상',
   'abilityUi.tooltip.selfOnly': '자신에게만',
   'abilityUi.tooltip.damageRange': '{min}에서 {max}',
   'abilityUi.tooltip.finisherDamage': '기본 {base}, 연계 점수당 {perCombo}',
@@ -3036,12 +3037,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': '둔중한 독',
   'entities.abilities.crippling_poison.description':
     '둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다.',
-  'entities.abilities.melting_acid.name': '녹이는 산',
-  'entities.abilities.melting_acid.description':
-    '대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 입히고 12초 동안 방어도를 5% 감소시킵니다.',
-  'entities.abilities.nightshade_coating.name': '밤그늘 도포',
-  'entities.abilities.nightshade_coating.description':
-    '대상에게 밤그늘 독을 발라 {damage}의 자연 피해를 입히고 12초 동안 받는 치유량을 25% 감소시킵니다.',
   'entities.abilities.expose_armor.name': '방어구 돌파',
   'entities.abilities.expose_armor.description': '대상의 방비를 30초 동안 드러내는 마무리 기술. 소모한 연계 점수 하나당 방어도를 2% 낮춥니다 (연계 점수 5: {damage}%).',
   'entities.abilities.rupture.name': '과다출혈',
@@ -5714,13 +5709,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}초',
   'hudChrome.meters.breakdownRow': '{value} ({percent})',
   'hudChrome.meters.threatFallback': '실시간 위협 없음: {name}에게 입힌 피해 표시',
-  'hudChrome.meters.threatFrozen': '최종 위협: {name}',
   'hudChrome.meters.breakdownSummary': '{tab}: {value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}: {ability}',
   'hudChrome.meters.autoShowHint':
     '파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.',
   'hudChrome.mobile.actionPageToggle': '행동 페이지 전환',
+  'hudChrome.mobile.actionRadial': '액션 방향',
+  'hudChrome.mobile.actionRadialCancel': '동작 취소',
+  'hudChrome.mobile.radialCenter': '가운데',
+  'hudChrome.mobile.radialRight': '오른쪽',
   'hudChrome.mobile.actionRing': '전투 행동',
   'hudChrome.mobile.haptics': '진동',
   'hudChrome.mobile.hapticsOff': '진동 꺼짐',
@@ -5900,12 +5898,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordLong': '새 비밀번호는 128자 이하여야 합니다.',
   'hudChrome.account.errPasswordUnchanged': '새 비밀번호는 현재 비밀번호와 달라야 합니다.',
   'hudChrome.account.errPasswordConfirm': '새 비밀번호가 서로 일치하지 않습니다.',
-  'hudChrome.account.setPasswordTitle': '비밀번호 설정',
-  'hudChrome.account.setPasswordHint':
-    '이 계정은 Apple로 로그인 또는 Discord로 생성되어 아직 비밀번호가 설정되지 않았습니다. 비밀번호를 설정하면 Mac 및 Windows 데스크톱 앱이나 웹 등 다른 기기에서 로그인하거나 추가 로그인 방법을 연결할 수 있습니다.',
-  'hudChrome.account.setPasswordSubmit': '비밀번호 설정',
-  'hudChrome.account.passwordSet':
-    '비밀번호가 설정되었습니다. 이제 어디서나 사용자 이름과 비밀번호로 로그인할 수 있습니다.',
   'hudChrome.account.emailLabel': '이메일(선택 사항)',
   'hudChrome.account.emailHint': '계정 복구에만 사용됩니다. 마케팅 이메일은 보내지 않습니다.',
   'hudChrome.account.saveEmail': '이메일 저장',
@@ -7783,7 +7775,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': '{craft} 제작 창 열기',
   'hudChrome.crafting.close': '제작 닫기',
   'hudChrome.crafting.reagentsNeeded': '필요 재료:',
-  'hudChrome.crafting.craftFeeLine': '제작 비용: {fee}',
   'hudChrome.crafting.empty': '알려진 제작법이 없습니다.',
   'hudChrome.crafting.resultAria': '{name} 제작',
   'hudChrome.crafting.craftedToast': '제작 완료:{name}',
@@ -7891,8 +7882,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': '게임 화면이 응답하지 않습니다. 다시 불러올까요?',
   'desktop.crash.reload': '다시 불러오기',
   'desktop.crash.quit': '종료',
-  'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',
   'desktop.titlebar.exitGame': '게임 종료',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',
   'gpuNotice.bodyDesktop':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
   'gpuNotice.bodyDiscreteInactive':
@@ -8318,8 +8309,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '파티가 아직 전투 중입니다. 전투가 끝나면 죽은 자도 다시 들어갈 수 있습니다.',
   'sim.rift.iceGoalLit': '서리 문양이 타오릅니다. 길이 꿈틀거립니다.',
   'sim.rift.levelGate': '레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다.',
-  'sim.rift.lootRecoveryNotice':
-    '균열의 입구는 한동안 열려 있습니다. 파티가 전멸하더라도, 돌아가 얻은 전리품을 되찾을 수 있습니다.',
   'sim.rift.portalCollapses': '{zone}의 {tier}등급 균열이 무너졌습니다.',
   'sim.rift.portalOpens': '{zone}에 {tier}등급 균열이 찢어져 열렸습니다!',
   'sim.rift.portalSealed': '{zone}의 {tier}등급 균열이 봉인되었습니다.',
@@ -8556,8 +8545,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.account.characters_online': '비활성화하기 전에 모든 캐릭터에서 로그아웃하세요.',
   'apiError.account.deactivated': '이 계정은 비활성화되었습니다. 복원하려면 관리자에게 문의하세요.',
   'apiError.account.not_found': '계정을 찾을 수 없습니다.',
-  'apiError.account.password_already_set':
-    '이 계정에는 이미 비밀번호가 설정되어 있습니다. 대신 비밀번호 변경을 이용하세요.',
   'apiError.character.name_invalid': '캐릭터 이름이 올바르지 않습니다. 2-16자의 글자를 사용하세요.',
   'apiError.character.name_not_allowed': '이 캐릭터 이름은 사용할 수 없습니다.',
   'apiError.character.invalid_class': '유효하지 않은 직업입니다.',
@@ -8943,6 +8930,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': '페이지 {page}',
   'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
   'hudChrome.mobile.chatPlaceholder': '메시지 입력... (! 커뮤니티 명령어)',
+  'hudChrome.mobile.consumableSeat': '소모품',
+  'hudChrome.mobile.menuControl': '메뉴',
+  'hudChrome.mobile.menuControlAria':
+    '메뉴. 탭하면 대화창이 열리고, 길게 누른 뒤 오른쪽으로 밀면 탈것, 지도, 가방 등을 열 수 있습니다.',
+  'hudChrome.mobile.menuControlAriaTap':
+    '메뉴. 탭하면 탈것, 지도, 가방 등의 메뉴 줄이 열립니다. 다시 탭하면 대화창이 열립니다.',
+  'hudChrome.mobile.quickActions': '빠른 실행',
+  'hudChrome.mobile.quickActionsAria':
+    '빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리고, 길게 누른 뒤 오른쪽으로 밀면 항목을 선택할 수 있습니다.',
+  'hudChrome.mobile.quickActionsAriaTap':
+    '빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리며, 항목을 탭해 선택합니다. 컨트롤을 다시 탭하면 닫힙니다.',
+  'hudChrome.mobile.quickActionsLabel': '실행',
+  'hudChrome.mobile.stanceRadial': '태세',
+  'hudChrome.mobile.stanceAnchorAria': '태세: {stance}. 탭하여 태세 링을 열고 다른 태세를 선택하세요.',
+  'hudChrome.mobile.stanceAnchorEmptyAria': '태세 없음. 탭하여 태세 링을 열고 태세를 선택하세요.',
+  'hudChrome.mobile.questStripAria':
+    '추적 중인 퀘스트 {total}개 중 {position}번째: {title}. 다음 퀘스트를 보려면 누르십시오.',
+  'hudChrome.mobile.questStripAriaSingle': '추적 중인 퀘스트: {title}',
+  'hudChrome.mobile.questStripMore': '외 {count}개',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '베일 컵',
   'hudChrome.keybinds.categoryPet': '펫',
@@ -9561,7 +9567,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.deedsRetroSummary.other': '연대기가 따라잡았습니다: 업적 {count}개 기록.',
   'hudChrome.deeds.broadcastLine': '{name} 님이 업적을 달성했습니다: {deed}',
   'hudChrome.deeds.rarityLine': '모험가 중 {percent} 달성',
-  'hudChrome.deeds.stillToVisit': '아직 방문하지 않은 곳: {places}',
   'hudChrome.deeds.trackerLabel': '업적',
   'hudChrome.deeds.collapseHint': '업적 추적기 접기',
   'hudChrome.deeds.expandHint': '업적 추적기 펼치기',
@@ -9862,8 +9867,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '시전 시간이 있는 다음 주문을 즉시 시전합니다. 60초 동안 지속됩니다. (마법사 특성)',
   'entities.abilities.psychic_scream.description': '8미터 안의 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다.',
-  'entities.abilities.shadowstep.description':
-    '그림자를 가로질러 대상이 아군이든 적이든 다가가며, 황혼장막을 깨지 않습니다. (도적 특성)',
+  'entities.abilities.shadowstep.description': '그림자를 가로질러 대상에게 다가갑니다. (도적 특성)',
   'entities.abilities.tranquility.description':
     '4초 동안 회복 에너지를 집중해 30미터 안의 아군을 매초 42에서 52만큼 치유합니다. (드루이드 특성)',
   'hudChrome.auraEffect.combustionCrit': '화염 주문이 항상 치명타로 적중합니다',
@@ -13119,6 +13123,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',
   'hudChrome.otaUpdate.progressLabel': '업데이트 다운로드 진행률',
   'hudChrome.otaUpdate.title': '게임 업데이트',
-  // v0.40 release i18n fill.
-  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.mobile.barEditorAria': '행동 단축바 배치 편집',
+  'hudChrome.barEditor.title': '행동 단축바 편집',
+  'hudChrome.barEditor.close': '행동 단축바 편집 닫기',
+  'hudChrome.barEditor.pages': '행동 단축바 페이지',
+  'hudChrome.barEditor.buttonHeader': '버튼 {button}',
+  'hudChrome.barEditor.cellAria': '버튼 {button}, {direction}: {action}',
+  'hudChrome.barEditor.emptyCellAria': '버튼 {button}, {direction}: 비어 있음',
+  'hudChrome.barEditor.hint': '칸을 누른 뒤 다른 칸을 누르면 서로 바뀝니다.',
+  'hudChrome.barEditor.armed': '칸을 눌러 {name}을(를) 배치하세요.',
+  'hudChrome.barEditor.picked': '다른 칸을 눌러 {name}과(와) 바꾸세요.',
+  'hudChrome.barEditor.locked': '행동 단축바가 인터페이스 설정에서 잠겨 있습니다.',
+  'hudChrome.barEditor.clear': '비우기',
+  'hudChrome.barEditor.clearAria': '슬롯 비우기',
+  'hudChrome.barEditor.clearArmed': '슬롯을 탭하면 비워집니다.',
+  'hudChrome.spellbook.assignAria': '{name}을(를) 놓을 칸 선택',
 };

@@ -1308,6 +1308,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '显示每日奖励宝箱',
   'hudChrome.options.mobileCameraJoystick': '摄像机摇杆',
   'hudChrome.options.mobileLeftHanded': '左手布局',
+  'hudChrome.options.touchTapMenus': '点击菜单',
+  'hudChrome.options.touchTapMenusNote': '用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。',
   'hudChrome.options.itemLevelLine': '物品等级 {level}',
   'hudChrome.options.itemScoreLine': '评分 {score}',
   'hudChrome.landing.highContrast': '高对比度',
@@ -2468,7 +2470,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '不触发公共冷却',
   'abilityUi.tooltip.friendlyTarget': '友方目标',
   'abilityUi.tooltip.enemyTarget': '敌方目标',
-  'abilityUi.tooltip.anyTarget': '敌方或友方目标',
   'abilityUi.tooltip.selfOnly': '仅对自己',
   'abilityUi.tooltip.damageRange': '{min} 到 {max}',
   'abilityUi.tooltip.finisherDamage': '{base} 加每个连击点 {perCombo}',
@@ -2936,12 +2937,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': '沉铅毒液',
   'entities.abilities.crippling_poison.description':
     '以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。',
-  'entities.abilities.melting_acid.name': '熔蚀之酸',
-  'entities.abilities.melting_acid.description':
-    '以腐蚀性毒液泼洒目标，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。',
-  'entities.abilities.nightshade_coating.name': '夜影涂层',
-  'entities.abilities.nightshade_coating.description':
-    '为目标涂上夜影毒，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。',
   'entities.abilities.expose_armor.name': '护甲突破',
   'entities.abilities.expose_armor.description': '终结技，破开目标的防护 30 秒：每消耗 1 点连击点使其护甲降低 2%（5 点连击点：{damage}%）。',
   'entities.abilities.rupture.name': '血流不止',
@@ -5547,13 +5542,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.meters.breakdownRow': '{value}（{percent}）',
   'hudChrome.meters.threatFallback': '无实时仇恨：显示对{name}造成的伤害',
-  'hudChrome.meters.threatFrozen': '最终仇恨：{name}',
   'hudChrome.meters.breakdownSummary': '{tab}：{value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}：{ability}',
   'hudChrome.meters.autoShowHint':
     '一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。',
   'hudChrome.mobile.actionPageToggle': '切换动作页',
+  'hudChrome.mobile.actionRadial': '技能方向',
+  'hudChrome.mobile.actionRadialCancel': '取消动作',
+  'hudChrome.mobile.radialCenter': '中心',
+  'hudChrome.mobile.radialRight': '右',
   'hudChrome.mobile.actionRing': '战斗动作',
   'hudChrome.mobile.haptics': '震动反馈',
   'hudChrome.mobile.hapticsOff': '震动反馈：关',
@@ -5717,11 +5715,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordLong': '新密码最多只能包含 128 个字符。',
   'hudChrome.account.errPasswordUnchanged': '新密码必须与当前密码不同。',
   'hudChrome.account.errPasswordConfirm': '两次输入的新密码不一致。',
-  'hudChrome.account.setPasswordTitle': '设置密码',
-  'hudChrome.account.setPasswordHint':
-    '该账户是通过"通过 Apple 登录"或 Discord 创建的，尚未设置密码。设置密码后即可在其他设备（例如 Mac 和 Windows 桌面客户端）或网页上使用用户名和密码登录，也可以绑定其他登录方式。',
-  'hudChrome.account.setPasswordSubmit': '设置密码',
-  'hudChrome.account.passwordSet': '密码已设置。现在可以在任何设备上使用用户名和密码登录。',
   'hudChrome.account.emailLabel': '邮箱（可选）',
   'hudChrome.account.emailHint': '仅用于账户找回。我们绝不发送营销邮件。',
   'hudChrome.account.saveEmail': '保存邮箱',
@@ -7493,7 +7486,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': '打开{craft}制作窗口',
   'hudChrome.crafting.close': '关闭制作',
   'hudChrome.crafting.reagentsNeeded': '需要:',
-  'hudChrome.crafting.craftFeeLine': '制作费用：{fee}',
   'hudChrome.crafting.empty': '尚无已知配方。',
   'hudChrome.crafting.resultAria': '制作{name}',
   'hudChrome.crafting.craftedToast': '已制作:{name}',
@@ -7596,8 +7588,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': '游戏画面已停止响应。要重新加载吗？',
   'desktop.crash.reload': '重新加载',
   'desktop.crash.quit': '退出',
-  'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'desktop.titlebar.exitGame': '退出游戏',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'gpuNotice.bodyDesktop':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
   'gpuNotice.bodyDiscreteInactive':
@@ -7991,8 +7983,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'sim.rift.deadEntryCombat': '你的队伍仍在战斗中。战斗结束后，死者方可重新进入。',
   'sim.rift.iceGoalLit': '霜之印记熊熊燃起。去路随之震动。',
   'sim.rift.levelGate': '只有等级达到{level}级或以上的冒险者才能进入这道裂隙。',
-  'sim.rift.lootRecoveryNotice':
-    '裂隙的入口还将维持一段时间：即便队伍全灭，你仍可返回，取回自己应得的战利品。',
   'sim.rift.portalCollapses': '{zone}的{tier}级裂隙坍塌了。',
   'sim.rift.portalOpens': '一道{tier}级裂隙在{zone}撕裂而开！',
   'sim.rift.portalSealed': '{zone}的{tier}级裂隙已被封印。',
@@ -8215,7 +8205,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.account.characters_online': '请先登出所有角色再进行注销。',
   'apiError.account.deactivated': '此账户已注销。请联系管理员以恢复。',
   'apiError.account.not_found': '未找到账户。',
-  'apiError.account.password_already_set': '该账户已设置密码，请改用"修改密码"。',
   'apiError.character.name_invalid': '角色名称无效。请使用 2-16 个字母。',
   'apiError.character.name_not_allowed': '该角色名称不可使用。',
   'apiError.character.invalid_class': '职业无效。',
@@ -8569,6 +8558,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': '页{page}',
   'hudChrome.mobile.hideKeyboard': '隐藏键盘',
   'hudChrome.mobile.chatPlaceholder': '说点什么...（! 显示社区指令）',
+  'hudChrome.mobile.consumableSeat': '消耗品',
+  'hudChrome.mobile.menuControl': '菜单',
+  'hudChrome.mobile.menuControlAria':
+    '菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。',
+  'hudChrome.mobile.menuControlAriaTap':
+    '菜单。点按打开菜单行：坐骑、地图、背包等。再次点按可打开聊天。',
+  'hudChrome.mobile.quickActions': '快捷操作',
+  'hudChrome.mobile.quickActionsAria':
+    '快捷操作。点按打开坐骑、聊天、地图、背包等操作行，或按住并向右滑动进行选择。',
+  'hudChrome.mobile.quickActionsAriaTap':
+    '快捷操作。点按打开坐骑、聊天、地图、背包等操作行，然后点按其中一项。再次点按该控件可关闭。',
+  'hudChrome.mobile.quickActionsLabel': '操作',
+  'hudChrome.mobile.stanceRadial': '姿态',
+  'hudChrome.mobile.stanceAnchorAria': '姿态：{stance}。点按打开姿态环，然后选择其他姿态。',
+  'hudChrome.mobile.stanceAnchorEmptyAria': '无姿态。点按打开姿态环，然后选择一种姿态。',
+  'hudChrome.mobile.questStripAria':
+    '追踪任务 {position}/{total}：{title}。点按可切换到下一个任务。',
+  'hudChrome.mobile.questStripAriaSingle': '追踪任务：{title}',
+  'hudChrome.mobile.questStripMore': '还有 {count} 项',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷杯',
   'hudChrome.keybinds.categoryPet': '宠物',
@@ -9171,7 +9179,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.deedsRetroSummary.other': '你的编年史已更新：补录 {count} 项功绩。',
   'hudChrome.deeds.broadcastLine': '{name} 达成了功绩：{deed}',
   'hudChrome.deeds.rarityLine': '{percent} 的冒险者已达成',
-  'hudChrome.deeds.stillToVisit': '尚待探访：{places}',
   'hudChrome.deeds.trackerLabel': '功绩',
   'hudChrome.deeds.collapseHint': '折叠功绩追踪器',
   'hudChrome.deeds.expandHint': '展开功绩追踪器',
@@ -9450,8 +9457,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '使你的下一个有施法时间的法术立即完成。持续 60 秒。（法师天赋）',
   'entities.abilities.psychic_scream.description': '使 8 米内的敌人陷入恐惧，最多持续 4 秒。伤害可能打断该效果。',
-  'entities.abilities.shadowstep.description':
-    '穿过暗影，向你的目标迈进，不论敌友，且不会打破暮幕。（潜行者天赋）',
+  'entities.abilities.shadowstep.description': '穿过暗影，向你的目标迈进。（潜行者天赋）',
   'entities.abilities.silence.description': '使目标沉默4秒。（牧师天赋）',
   'entities.abilities.tranquility.description':
     '引导恢复能量4秒，每秒为30码内的盟友恢复42至52点生命值。（德鲁伊天赋）',
@@ -12878,6 +12884,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '需要更新后才能进行游戏。下载完成后将立即应用。',
   'hudChrome.otaUpdate.progressLabel': '更新下载进度',
   'hudChrome.otaUpdate.title': '游戏更新',
-  // v0.40 release i18n fill.
-  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.mobile.barEditorAria': '编辑动作条布局',
+  'hudChrome.barEditor.title': '编辑动作条',
+  'hudChrome.barEditor.close': '关闭动作条编辑器',
+  'hudChrome.barEditor.pages': '动作条页面',
+  'hudChrome.barEditor.buttonHeader': '按钮{button}',
+  'hudChrome.barEditor.cellAria': '按钮{button}，{direction}：{action}',
+  'hudChrome.barEditor.emptyCellAria': '按钮{button}，{direction}：空',
+  'hudChrome.barEditor.hint': '点按一个栏位，再点按另一个，即可交换。',
+  'hudChrome.barEditor.armed': '点按一个栏位以放置{name}。',
+  'hudChrome.barEditor.picked': '点按另一个栏位以与{name}交换。',
+  'hudChrome.barEditor.locked': '动作条已在界面选项中锁定。',
+  'hudChrome.barEditor.clear': '清除',
+  'hudChrome.barEditor.clearAria': '清除一个槽位',
+  'hudChrome.barEditor.clearArmed': '点击一个槽位即可清除。',
+  'hudChrome.spellbook.assignAria': '为{name}选择一个栏位',
 };

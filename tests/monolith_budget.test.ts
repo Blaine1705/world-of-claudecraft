@@ -81,20 +81,56 @@ const MONOLITHS: MonolithRow[] = [
     // arm and a spoken refusal beside the ability one, and the shared item-use
     // seam castSlot and the pad now both call. Exact merged count, zero slack:
     // any further growth reds again.
-    // Lowered after extracting the Reliquary-tracker input construction into
-    // makeReliquaryTrackerInput (reliquary_tracker_view.ts), which paid for the
-    // tracker-stack anchor wiring and the window's tracker-visibility deps in
-    // the same change. Exact count, zero slack.
-    // Lowered again (to 19476 on the merged base) after the stale-focus Space
-    // fix (PR #3506) extracted its chrome focus wiring (the tracker drops plus
-    // the panel key-guard loop) into src/ui/chrome_focus_wiring.ts, leaving
-    // hud.ts a one-line consumer (wireChromeFocus($)). The ratchet's own rule:
-    // an extraction lowers the ceiling. Exact merged count, zero slack: any
-    // further growth reds again.
-    // Re-pinned during the PR #3528 merge resolution to the current merged
-    // worktree count. hud.ts is not part of this merge's code changes, but
-    // this conflicted ratchet file must reflect the tree it gates.
-    ceiling: 19482,
+    // LOWERED 19490 -> 19386 by the touch radial ring: buildMobileActionRing's
+    // whole body (the markup lookup, the slot-element minting, the attack /
+    // slot / page-toggle wiring and both view constructions) moved behind the
+    // action_bar seam into hud/action_bar/mobile_action_ring_controller.ts, and
+    // Hud kept only the page state, the callback bag and the per-frame paint.
+    // The ratchet's own rule: an extraction lowers the ceiling in the same
+    // change. Exact count, zero slack.
+    // LOWERED 19386 -> 19263 by the touch consumables seat: buildMobileConsumableBar
+    // and useConsumableSlot (the markup lookup, the slot-element minting, the
+    // toggle/slot wiring, the tooltip binding and the view construction) moved
+    // behind the action_bar seam into hud/action_bar/consumable_seat_controller.ts,
+    // and Hud kept only the item-use callback and one per-frame paint. Same rule
+    // as the ring above: an extraction lowers the ceiling in the same change.
+    // Exact count, zero slack.
+    // LOWERED 19263 -> 19078 by the touch bar editor: the mobile long-press
+    // rearrange (the MobileHotbarDrag type, the field, clearMobileHotbarDrag,
+    // bindMobileActionDrag, bindMobileRingDrag and the two point-to-slot hit
+    // tests) is DELETED, and the overlay that replaces it lives in
+    // hud/action_bar/bar_editor/. Hud kept only the window construction, its two
+    // mutation callbacks and the public opener, so the file lands 185 lines
+    // below its old pin even after the wiring. Exact count, zero slack.
+    // LOWERED 19078 -> 19076 by the bar editor's Clear control: the desktop
+    // slot's two shift-clear listeners moved behind action_bar_clear.ts's own
+    // bindShiftClear, and the editor's three mutation callbacks now share ONE
+    // tooltip hide inside the window, which pays for the new clearSlot callback
+    // with two lines to spare. Exact count, zero slack.
+    // LOWERED 19076 -> 19052 by the touch stance radial: renderStanceBar's whole
+    // body (the row's markup, its per-button tooltip and click wiring, and the
+    // signature latch) moved behind a new hud/stance seam, and Hud kept the
+    // one-line frame call plus the callback bag the module is built with. The
+    // ratchet's own rule: an extraction lowers the ceiling in the same change.
+    // Exact count, zero slack.
+    // Upstream lowered the SAME pin twice on its own arm: the Reliquary-tracker
+    // input construction moved into makeReliquaryTrackerInput
+    // (reliquary_tracker_view.ts), and the stale-focus Space fix (PR #3506)
+    // moved the chrome focus wiring (the tracker drops plus the panel key-guard
+    // loop) into src/ui/chrome_focus_wiring.ts, leaving hud.ts a one-line
+    // consumer (wireChromeFocus($)). The pin below is the MERGED reality of both
+    // arms of extraction. Exact count, zero slack: any further growth reds again.
+    // LOWERED 19038 -> 19032 by the touch review fixes: the action-bar tooltip's
+    // in-bags sub-line moved into hud/action_bar/item_bags_line_core.ts, which
+    // the consumables row's restored item tooltip shares, and paid for its own
+    // two callback lines with nine to spare. Exact count, zero slack.
+    // LOWERED 19032 -> 19031: the bar editor's swapSlots/clearSlot callbacks now
+    // share placeAbility's spellbook-refresh through one commitHotbarActions
+    // helper, fixing a stale assign toggle when a bound spell is cleared or
+    // swapped with the spellbook open behind the editor. Exact count, zero slack.
+    // Re-pinned to the exact merged count after combining the release touch
+    // extractions with the approved stale-focus Space wiring branch.
+    ceiling: 19037,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -239,13 +275,6 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    // The Duskfall gate occluder-fade merge keeps the hollowGates update call
-    // and current release renderer wiring while landing below the integration
-    // pin, so the ceiling follows the exact merged count.
-    // Raised +1 for the heroic Nythraxis wardstone view-priority fix: the
-    // renderer wires isDistanceCullExemptObject into both the create-range
-    // gate and the visibility hysteresis gate, preserving the current
-    // integration extraction history while pinning the exact merged count.
     // RAISED 13546 -> 13548 (+2) by the streamed-prewarm branch. A raise, not a
     // lowering, and stated as one: the branch extracts the compile SUBMIT LOOP
     // with its deadline rule and never-drop contract
@@ -297,10 +326,7 @@ const MONOLITHS: MonolithRow[] = [
     // call site and adds only thin wiring for rebuild reveal-gate installation,
     // entry-barrier cleanup and observed display pacing; the policy and timer
     // ownership remain in sibling modules. Exact count, zero slack.
-    // Re-pinned to the exact v0.40 batch merge-forward count after combining
-    // those release-base loading changes with the batch branch renderer
-    // repairs. Exact merged count, zero slack.
-    ceiling: 13534,
+    ceiling: 13541,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -315,46 +341,41 @@ const MONOLITHS: MonolithRow[] = [
     // cover joining it) net against the base's pad-selection extraction plus
     // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
     // landing below both parents' pins. Any further growth reds again.
-    // Lowered again after extracting the account-portal DOM painters
-    // (setAccountFieldMsg, paintTwoFactorStatus, paintAccountPortal) into the
-    // new src/ui/account_portal_painter.ts, which paid for the Set-a-Password
-    // account-portal wiring the same change adds (net -20).
-    // Re-pinned 11516 -> 11522 (+6) for the fast-loading-screen-variety rebase
-    // onto release/v0.40.0, whose pin above is this file's exact size (zero
-    // slack). The branch is net-extractive here: it MOVES the eager mob-body
-    // stream and far-vista settle out of the entry
-    // path into src/game/post_entry_warmups_core.ts, and the backdrop rotation
-    // into src/ui/loading_backdrop.ts. What is left in main.ts is the call
-    // wiring for both (the controller construction and the runPostEntryWarmups
-    // options object), which is the firewall's job. Maintainer decision, exact
-    // merged count: any further growth reds again.
-    // Re-pinned 11522 -> 11534 (+12) for the review-fix round: the mob-body
-    // stream kick moved from the post-fade callback to the first-paint
-    // checkpoint (kickCharacterPreloadStream, the seam stays in
-    // src/game/post_entry_warmups_core.ts), which costs the call wiring plus
-    // the placement rationale where the reader needs it. Exact count, zero
+    // Raised 11516 -> 11517 (+1) for the touch bar editor: the More tray's Edit
+    // control routes through MobileControlCallbacks, whose bag is wired here and
+    // nowhere else, so the ONE line is `onBarEditor: () => hud.toggleBarEditor()`.
+    // Everything with substance (the grid model, the tap state machine, the
+    // window) lives in src/ui/hud/action_bar/bar_editor/, and the same change
+    // LOWERS hud.ts by 185. Maintainer decision, exact merged count: any further
+    // growth reds again.
+    // RESTORED and LOWERED 11517 -> 11499 by tap mode: raising a ceiling is a
+    // maintainer decision, so that +1 is paid back with an extraction rather than
+    // kept. main.ts carried a private escapeHtml duplicating src/ui/esc.ts, the
+    // canonical escaper the repo already mandates for every interpolation, so the
+    // copy is deleted and its 36 call sites use esc(). Exact count, zero slack.
+    // Meanwhile on the release base: re-pinned 11516 -> 11522 (+6) for the
+    // fast-loading-screen-variety rebase, net-extractive (the eager mob-body
+    // stream and far-vista settle moved into src/game/post_entry_warmups_core.ts,
+    // the backdrop rotation into src/ui/loading_backdrop.ts; main keeps only the
+    // call wiring), then 11522 -> 11534 (+12) for its review-fix round (the
+    // mob-body stream kick moved to the first-paint checkpoint,
+    // kickCharacterPreloadStream), then 11534 -> 11536 for the per-invocation
+    // first-paint gate (browser timer in the sibling adapter; main pays only
+    // factory/arm wiring).
+    // Re-pinned to the exact count of the merged file: the base's +20 across the
+    // three arms above nets against this branch's -17 (the touch bar editor +1
+    // paid back by the escapeHtml -> esc() extraction). Exact merged count, zero
     // slack: any further growth reds again.
-    // The bounded first-paint gate is now owned per startGame invocation rather
-    // than by a mutable render-core singleton. Its browser timer lives in the
-    // sibling adapter; main pays only factory/arm wiring. Exact count, zero slack.
-    // Re-pinned to the exact v0.40 batch merge-forward count after combining
-    // the account-portal painter extraction and the moved-base entry gate
-    // wiring. Exact merged count, zero slack.
-    ceiling: 11510,
+    // Re-pinned to the exact merged count after preserving the branch's account
+    // portal/loading-gate intent and the release touch-menu wiring.
+    ceiling: 11493,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
     file: 'server/game.ts',
-    // Raised from 10900 for fix/chat-mute-resume-race: the account
-    // chat-moderation hydration fence (server/chat_mod_live.ts, a new
-    // sibling module) needed five call-site wire-ins (muteAccountChat,
-    // liftChatMuteLive, resetChatStrikesLive, enforceChatPolicy, and the
-    // begin-hydration accessor) that touch this file's private mutable
-    // session/client state directly, so they cannot move out further. Small
-    // margin over the file's real size per the ratchet policy.
-    // Re-pinned during the PR #3528 merge resolution to the current worktree
-    // count. server/game.ts is not part of this merge's code changes, but this
-    // conflicted ratchet file must reflect the tree it gates.
+    // Re-pinned to the exact merged release count. This conflict resolution
+    // did not alter server/game.ts, but the ratchet must reflect the merge
+    // result it gates.
     ceiling: 10918,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },

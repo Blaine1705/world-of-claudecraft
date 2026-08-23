@@ -866,11 +866,52 @@ export const ja_JP: EnTranslations = {
       "actionRing": "戦闘アクション",
       "actionPageToggle": "行動ページ切替",
       "actionPageIndicator": "{page}ページ",
+      "actionRadial": "アクション方向",
+      "actionRadialCancel": "アクションをキャンセル",
+      "radialCenter": "中央",
+      "radialUp": "Up",
+      "radialRight": "右",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "消耗品",
+      "menuControl": "メニュー",
+      "menuControlAria": "メニュー。タップでチャットを開き、長押しして右にスワイプすると騎乗、地図、バッグなどを開けます。",
+      "menuControlAriaTap": "メニュー。タップでメニュー列（騎乗、地図、バッグなど）を開きます。もう一度タップするとチャットが開きます。",
+      "menuLabel": "Menu",
+      "quickActions": "クイック操作",
+      "quickActionsAria": "クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開きます。長押しして右にスワイプすると項目を選べます。",
+      "quickActionsAriaTap": "クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開き、項目をタップして選びます。もう一度タップすると閉じます。",
+      "quickActionsLabel": "操作",
+      "stanceRadial": "スタンス",
+      "stanceAnchorAria": "スタンス：{stance}。タップしてスタンスリングを開き、別のスタンスを選びます。",
+      "stanceAnchorEmptyAria": "スタンスなし。タップしてスタンスリングを開き、スタンスを選びます。",
+      "questStripAria": "追跡中のクエスト {total} 件中 {position} 件目: {title}。次のクエストを表示するには操作してください。",
+      "questStripAriaSingle": "追跡中のクエスト: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "他 {count} 件",
       "targetCycle": "ターゲット切替",
       "targetCycleShort": "標的",
       "spellbookPageLabel": "ページ{page}",
       "hideKeyboard": "キーボードを隠す",
-      "chatPlaceholder": "発言する... (! でコミュニティコマンド)"
+      "chatPlaceholder": "発言する... (! でコミュニティコマンド)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "アクションバーの配置を編集"
+    },
+    "barEditor": {
+      "title": "アクションバーの編集",
+      "close": "アクションバー編集を閉じる",
+      "pages": "アクションバーのページ",
+      "pageTab": "Page {page}",
+      "buttonHeader": "ボタン{button}",
+      "cellAria": "ボタン{button}、{direction}：{action}",
+      "emptyCellAria": "ボタン{button}、{direction}：空き",
+      "hint": "スロットをタップし、もう一つタップすると入れ替わります。",
+      "armed": "スロットをタップして{name}を配置します。",
+      "picked": "別のスロットをタップして{name}と入れ替えます。",
+      "locked": "アクションバーはインターフェース設定でロックされています。",
+      "clear": "クリア",
+      "clearAria": "スロットをクリア",
+      "clearArmed": "スロットをタップするとクリアします。"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -986,7 +1027,7 @@ export const ja_JP: EnTranslations = {
       "seconds": "{s}秒",
       "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
       "threatFallback": "リアルタイムのヘイトなし：{name}へのダメージを表示",
-      "threatFrozen": "最終ヘイト: {name}",
+      "threatFrozen": "Final threat vs {name}",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "その他（{count}）",
@@ -1416,7 +1457,9 @@ export const ja_JP: EnTranslations = {
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト"
+      "mobileLeftHanded": "左利き用レイアウト",
+      "touchTapMenus": "タップメニュー",
+      "touchTapMenusNote": "アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。"
     },
     "talentRows": {
       "tab": "選択",
@@ -2064,10 +2107,10 @@ export const ja_JP: EnTranslations = {
       "errPasswordLong": "新しいパスワードは128文字以内にしてください。",
       "errPasswordUnchanged": "新しいパスワードは現在のものと異なる必要があります。",
       "errPasswordConfirm": "新しいパスワードが一致しません。",
-      "setPasswordTitle": "パスワードを設定",
-      "setPasswordHint": "このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードが設定されていません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他のデバイスでサインインしたり、追加のサインイン方法を連携したりできます。",
-      "setPasswordSubmit": "パスワードを設定",
-      "passwordSet": "パスワードを設定しました。ユーザー名とパスワードでどこからでもサインインできます。",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "メールアドレス（任意）",
       "emailHint": "アカウント復旧にのみ使用します。宣伝メールは一切送信しません。",
       "saveEmail": "メールを保存",
@@ -2509,7 +2552,8 @@ export const ja_JP: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
-      "removeFromBarAria": "{name}をアクションバーから削除"
+      "removeFromBarAria": "{name}をアクションバーから削除",
+      "assignAria": "{name}を配置するスロットを選択"
     },
     "nameplate": {
       "mobLevel": "{level}",
@@ -3281,7 +3325,7 @@ export const ja_JP: EnTranslations = {
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（上質な等級を{count}個消費）",
-      "craftFeeLine": "製作費用: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "既知のレシピはありません。",
       "resultAria": "{name}を製作",
       "craftedToast": "製作しました:{name}",
@@ -3833,7 +3877,7 @@ export const ja_JP: EnTranslations = {
       "unlockedBorderHint": "新しい枠飾りを獲得: {name}。功績の書で着用できます。",
       "broadcastLine": "{name}が功績「{deed}」を達成しました",
       "rarityLine": "冒険者の{percent}が達成",
-      "stillToVisit": "未訪問の地点：{places}",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "功績",
       "collapseHint": "功績トラッカーを折りたたむ",
       "expandHint": "功績トラッカーを展開",
@@ -3911,7 +3955,7 @@ export const ja_JP: EnTranslations = {
       "characters_online": "無効化する前にすべてのキャラクターからログアウトしてください。",
       "deactivated": "このアカウントは無効化されています。復元するには管理者に連絡してください。",
       "not_found": "アカウントが見つかりません。",
-      "password_already_set": "このアカウントには既にパスワードが設定されています。「パスワードの変更」をご利用ください。"
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "キャラクター名が無効です。2-16文字の英字を使用してください。",
@@ -7126,7 +7170,7 @@ export const ja_JP: EnTranslations = {
       "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
       "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
       "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
-      "lootRecoveryNotice": "裂け目の入り口はしばらく開いたままだ。パーティーが全滅しても、稼いだ戦利品を取りに戻れる。",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "この裂け目に入れるのはレベル{level}以上の冒険者だけだ。",
       "deadEntry": "死亡した状態では裂け目に入れない。",
       "deadEntryCombat": "パーティーはまだ戦闘中だ。戦いが終われば、死者も再び入れる。",
@@ -8805,7 +8849,7 @@ export const ja_JP: EnTranslations = {
       "offGlobalCooldown": "グローバルクールダウン外",
       "friendlyTarget": "味方対象",
       "enemyTarget": "敵対象",
-      "anyTarget": "敵味方いずれかの対象",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
@@ -9595,12 +9639,12 @@ export const ja_JP: EnTranslations = {
         "description": "対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。"
       },
       "melting_acid": {
-        "name": "融解の酸",
-        "description": "対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与えるとともに、12秒間、防御力を5%低下させます。"
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
       },
       "nightshade_coating": {
-        "name": "ナイトシェードの塗毒",
-        "description": "対象をナイトシェードの毒で覆い、{damage}の自然ダメージを与えるとともに、12秒間、受ける治癒量を25%低下させます。"
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "装甲破り",
@@ -10790,7 +10834,7 @@ export const ja_JP: EnTranslations = {
       },
       "shadowstep": {
         "name": "影すべり",
-        "description": "影を通り抜け、敵味方を問わず対象へ近づく。ダスクヴェイルは解除されない。（ローグのタレント）"
+        "description": "影を通り抜けて対象へ近づく。（ローグのタレント）"
       },
       "silence": {
         "name": "沈黙",

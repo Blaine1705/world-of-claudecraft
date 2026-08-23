@@ -866,11 +866,52 @@ export const ru_RU: EnTranslations = {
       "actionRing": "Боевые действия",
       "actionPageToggle": "Переключить страницу действий",
       "actionPageIndicator": "Стр. {page}",
+      "actionRadial": "Направления действий",
+      "actionRadialCancel": "Отменить действие",
+      "radialCenter": "Центр",
+      "radialUp": "Up",
+      "radialRight": "Вправо",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Расходники",
+      "menuControl": "Меню",
+      "menuControlAria": "Меню. Нажмите, чтобы открыть чат, или удерживайте и проведите вправо для транспорта, карты, сумок и других разделов.",
+      "menuControlAriaTap": "Меню. Нажмите, чтобы открыть ряд меню: транспорт, карта, сумки и другие разделы. Нажмите ещё раз, чтобы открыть чат.",
+      "menuLabel": "Menu",
+      "quickActions": "Быстрые действия",
+      "quickActionsAria": "Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, либо удерживайте и проведите вправо, чтобы выбрать.",
+      "quickActionsAriaTap": "Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, затем нажмите нужный значок. Нажмите на элемент управления ещё раз, чтобы закрыть.",
+      "quickActionsLabel": "Действия",
+      "stanceRadial": "Стойки",
+      "stanceAnchorAria": "Стойка: {stance}. Нажмите, чтобы открыть круг стоек, затем выберите другую стойку.",
+      "stanceAnchorEmptyAria": "Без стойки. Нажмите, чтобы открыть круг стоек, затем выберите стойку.",
+      "questStripAria": "Отслеживаемое задание {position} из {total}: {title}. Нажмите, чтобы перейти к следующему.",
+      "questStripAriaSingle": "Отслеживаемое задание: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "ещё {count}",
       "targetCycle": "Сменить цель",
       "targetCycleShort": "Цель",
       "spellbookPageLabel": "Страница {page}",
       "hideKeyboard": "Скрыть клавиатуру",
-      "chatPlaceholder": "Напишите сообщение... (! команды сообщества)"
+      "chatPlaceholder": "Напишите сообщение... (! команды сообщества)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Изменить раскладку панели действий"
+    },
+    "barEditor": {
+      "title": "Редактор панели действий",
+      "close": "Закрыть редактор панели",
+      "pages": "Страницы панели действий",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Кнопка {button}",
+      "cellAria": "Кнопка {button}, {direction}: {action}",
+      "emptyCellAria": "Кнопка {button}, {direction}: пусто",
+      "hint": "Коснитесь одной ячейки, затем другой, чтобы поменять их местами.",
+      "armed": "Коснитесь ячейки, чтобы поместить туда {name}.",
+      "picked": "Коснитесь другой ячейки, чтобы поменять местами с {name}.",
+      "locked": "Панели действий заблокированы в настройках интерфейса.",
+      "clear": "Очистить",
+      "clearAria": "Очистить ячейку",
+      "clearArmed": "Нажмите на ячейку, чтобы очистить её."
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -986,7 +1027,7 @@ export const ru_RU: EnTranslations = {
       "seconds": "{s} сек.",
       "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя.",
       "threatFallback": "Нет данных об угрозе: показан урон по {name}",
-      "threatFrozen": "Финальная угроза: {name}",
+      "threatFrozen": "Final threat vs {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Прочее ({count})",
@@ -1416,7 +1457,9 @@ export const ru_RU: EnTranslations = {
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
-      "mobileLeftHanded": "Раскладка для левшей"
+      "mobileLeftHanded": "Раскладка для левшей",
+      "touchTapMenus": "Меню по нажатию",
+      "touchTapMenusNote": "Открывайте элементы действий, расходников и меню нажатием вместо смахивания. Нажмите на предмет, чтобы использовать его, нажмите на элемент ещё раз для обычного действия или нажмите за его пределами, чтобы закрыть."
     },
     "talentRows": {
       "tab": "Выбор",
@@ -2064,10 +2107,10 @@ export const ru_RU: EnTranslations = {
       "errPasswordLong": "Новый пароль должен содержать не более 128 символов.",
       "errPasswordUnchanged": "Новый пароль должен отличаться от текущего.",
       "errPasswordConfirm": "Новые пароли не совпадают.",
-      "setPasswordTitle": "Установить пароль",
-      "setPasswordHint": "Эта учётная запись была создана через вход через Apple или Discord, и у неё ещё нет пароля. Установите пароль, чтобы входить с других устройств, например настольных приложений для Mac и Windows или через веб, а также чтобы привязать дополнительные способы входа.",
-      "setPasswordSubmit": "Установить пароль",
-      "passwordSet": "Пароль установлен. Теперь вы можете входить с логином и паролем на любом устройстве.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "Эл. почта (необязательно)",
       "emailHint": "Используется только для восстановления аккаунта. Мы не рассылаем рекламные письма.",
       "saveEmail": "Сохранить почту",
@@ -2509,7 +2552,8 @@ export const ru_RU: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Добавить {name} на панель действий",
-      "removeFromBarAria": "Убрать {name} с панели действий"
+      "removeFromBarAria": "Убрать {name} с панели действий",
+      "assignAria": "Выберите ячейку для {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
@@ -3281,7 +3325,7 @@ export const ru_RU: EnTranslations = {
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(потратит отборный сорт: {count})",
-      "craftFeeLine": "Плата за крафт: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Известных рецептов пока нет.",
       "resultAria": "Создать {name}",
       "craftedToast": "Создано: {name}",
@@ -3833,7 +3877,7 @@ export const ru_RU: EnTranslations = {
       "unlockedBorderHint": "Новая рамка: {name}. Наденьте её в Книге деяний.",
       "broadcastLine": "{name} совершает деяние: {deed}",
       "rarityLine": "Совершили {percent} искателей приключений",
-      "stillToVisit": "Ещё предстоит посетить: {places}",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Деяния",
       "collapseHint": "Свернуть список деяний",
       "expandHint": "Развернуть список деяний",
@@ -3911,7 +3955,7 @@ export const ru_RU: EnTranslations = {
       "characters_online": "Выйдите из всех персонажей перед деактивацией.",
       "deactivated": "Этот аккаунт деактивирован. Для восстановления обратитесь к администратору.",
       "not_found": "Аккаунт не найден.",
-      "password_already_set": "У этой учётной записи уже есть пароль. Используйте вместо этого смену пароля."
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "Недопустимое имя персонажа. Используйте 2-16 букв.",
@@ -7126,7 +7170,7 @@ export const ru_RU: EnTranslations = {
       "portalOpens": "В {zone} разверзся разлом ранга {tier}!",
       "portalSealed": "Разлом ранга {tier} в {zone} запечатан.",
       "portalCollapses": "Разлом ранга {tier} в {zone} обрушился.",
-      "lootRecoveryNotice": "Вход в разлом продержится ещё некоторое время: даже если ваша группа падёт, вы сможете вернуться за честно заработанной добычей.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Войти в этот разлом могут лишь искатели приключений уровня {level} и выше.",
       "deadEntry": "Мертвым нельзя войти в разлом.",
       "deadEntryCombat": "Ваша группа все еще в бою. Мертвые смогут вернуться, когда бой закончится.",
@@ -8805,7 +8849,7 @@ export const ru_RU: EnTranslations = {
       "offGlobalCooldown": "Вне глобального восстановления",
       "friendlyTarget": "Дружественная цель",
       "enemyTarget": "Вражеская цель",
-      "anyTarget": "Врага или союзника",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "Только на себя",
       "damageRange": "от {min} до {max}",
       "finisherDamage": "{base} плюс {perCombo} за прием серии"
@@ -9595,12 +9639,12 @@ export const ru_RU: EnTranslations = {
         "description": "Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек."
       },
       "melting_acid": {
-        "name": "Разъедающая кислота",
-        "description": "Обливает цель едким ядом, нанося {damage} ед. урона от сил природы и снижая ее броню на 5% на 12 сек."
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
       },
       "nightshade_coating": {
-        "name": "Паслёновая обмазка",
-        "description": "Покрывает цель паслёновым ядом, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек."
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "Пролом брони",
@@ -10790,7 +10834,7 @@ export const ru_RU: EnTranslations = {
       },
       "shadowstep": {
         "name": "Теневой шаг",
-        "description": "Вы проходите сквозь тени к цели, будь то союзник или враг, не нарушая Сумрачную завесу. (талант разбойника)"
+        "description": "Вы проходите сквозь тени к своей цели. (талант разбойника)"
       },
       "silence": {
         "name": "Безмолвие",

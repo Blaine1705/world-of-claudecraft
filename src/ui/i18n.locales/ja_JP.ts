@@ -1351,6 +1351,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'デイリー報酬の宝箱を表示',
   'hudChrome.options.mobileCameraJoystick': 'カメラスティック',
   'hudChrome.options.mobileLeftHanded': '左利き用レイアウト',
+  'hudChrome.options.touchTapMenus': 'タップメニュー',
+  'hudChrome.options.touchTapMenusNote': 'アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。',
   'hudChrome.options.itemLevelLine': 'アイテムレベル {level}',
   'hudChrome.options.itemScoreLine': 'スコア {score}',
   'hudChrome.landing.highContrast': '高コントラスト',
@@ -2576,7 +2578,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'グローバルクールダウン外',
   'abilityUi.tooltip.friendlyTarget': '味方対象',
   'abilityUi.tooltip.enemyTarget': '敵対象',
-  'abilityUi.tooltip.anyTarget': '敵味方いずれかの対象',
   'abilityUi.tooltip.selfOnly': '自分のみ',
   'abilityUi.tooltip.damageRange': '{min}から{max}',
   'abilityUi.tooltip.finisherDamage': '{base}にコンボポイントごと{perCombo}',
@@ -3062,12 +3063,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': '鉛の毒',
   'entities.abilities.crippling_poison.description':
     '対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。',
-  'entities.abilities.melting_acid.name': '融解の酸',
-  'entities.abilities.melting_acid.description':
-    '対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与えるとともに、12秒間、防御力を5%低下させます。',
-  'entities.abilities.nightshade_coating.name': 'ナイトシェードの塗毒',
-  'entities.abilities.nightshade_coating.description':
-    '対象をナイトシェードの毒で覆い、{damage}の自然ダメージを与えるとともに、12秒間、受ける治癒量を25%低下させます。',
   'entities.abilities.expose_armor.name': '装甲破り',
   'entities.abilities.expose_armor.description': '対象の守りを30秒間暴くフィニッシュ技。消費したコンボポイント1つにつき防御力を2%下げます（コンボポイント5：{damage}%）。',
   'entities.abilities.rupture.name': '止まらぬ出血',
@@ -5738,13 +5733,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.meters.breakdownRow': '{value}（{percent}）',
   'hudChrome.meters.threatFallback': 'リアルタイムのヘイトなし：{name}へのダメージを表示',
-  'hudChrome.meters.threatFrozen': '最終ヘイト: {name}',
   'hudChrome.meters.breakdownSummary': '{tab}：{value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}：{ability}',
   'hudChrome.meters.autoShowHint':
     'パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。',
   'hudChrome.mobile.actionPageToggle': '行動ページ切替',
+  'hudChrome.mobile.actionRadial': 'アクション方向',
+  'hudChrome.mobile.actionRadialCancel': 'アクションをキャンセル',
+  'hudChrome.mobile.radialCenter': '中央',
+  'hudChrome.mobile.radialRight': '右',
   'hudChrome.mobile.actionRing': '戦闘アクション',
   'hudChrome.mobile.haptics': '振動',
   'hudChrome.mobile.hapticsOff': '振動オフ',
@@ -5914,12 +5912,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordLong': '新しいパスワードは128文字以内にしてください。',
   'hudChrome.account.errPasswordUnchanged': '新しいパスワードは現在のものと異なる必要があります。',
   'hudChrome.account.errPasswordConfirm': '新しいパスワードが一致しません。',
-  'hudChrome.account.setPasswordTitle': 'パスワードを設定',
-  'hudChrome.account.setPasswordHint':
-    'このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードが設定されていません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他のデバイスでサインインしたり、追加のサインイン方法を連携したりできます。',
-  'hudChrome.account.setPasswordSubmit': 'パスワードを設定',
-  'hudChrome.account.passwordSet':
-    'パスワードを設定しました。ユーザー名とパスワードでどこからでもサインインできます。',
   'hudChrome.account.emailLabel': 'メールアドレス（任意）',
   'hudChrome.account.emailHint': 'アカウント復旧にのみ使用します。宣伝メールは一切送信しません。',
   'hudChrome.account.saveEmail': 'メールを保存',
@@ -7794,7 +7786,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': '{craft}の製作ウィンドウを開く',
   'hudChrome.crafting.close': '製作を閉じる',
   'hudChrome.crafting.reagentsNeeded': '必要素材:',
-  'hudChrome.crafting.craftFeeLine': '製作費用: {fee}',
   'hudChrome.crafting.empty': '既知のレシピはありません。',
   'hudChrome.crafting.resultAria': '{name}を製作',
   'hudChrome.crafting.craftedToast': '製作しました:{name}',
@@ -7901,8 +7892,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': 'ゲーム画面が停止しました。再読み込みしますか？',
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
-  'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'desktop.titlebar.exitGame': 'ゲームを終了',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
   'gpuNotice.bodyDiscreteInactive':
@@ -8344,8 +8335,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.rift.deadEntryCombat': 'パーティーはまだ戦闘中だ。戦いが終われば、死者も再び入れる。',
   'sim.rift.iceGoalLit': '霜の紋章が燃え上がる。道が動き出す。',
   'sim.rift.levelGate': 'この裂け目に入れるのはレベル{level}以上の冒険者だけだ。',
-  'sim.rift.lootRecoveryNotice':
-    '裂け目の入り口はしばらく開いたままだ。パーティーが全滅しても、稼いだ戦利品を取りに戻れる。',
   'sim.rift.portalCollapses': '{zone}の{tier}ランクの裂け目が崩れ落ちた。',
   'sim.rift.portalOpens': '{zone}に{tier}ランクの裂け目が裂け開いた！',
   'sim.rift.portalSealed': '{zone}の{tier}ランクの裂け目が封印された。',
@@ -8581,8 +8570,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.account.deactivated':
     'このアカウントは無効化されています。復元するには管理者に連絡してください。',
   'apiError.account.not_found': 'アカウントが見つかりません。',
-  'apiError.account.password_already_set':
-    'このアカウントには既にパスワードが設定されています。「パスワードの変更」をご利用ください。',
   'apiError.character.name_invalid': 'キャラクター名が無効です。2-16文字の英字を使用してください。',
   'apiError.character.name_not_allowed': 'そのキャラクター名は使用できません。',
   'apiError.character.invalid_class': '無効なクラスです。',
@@ -8962,6 +8949,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': 'ページ{page}',
   'hudChrome.mobile.hideKeyboard': 'キーボードを隠す',
   'hudChrome.mobile.chatPlaceholder': '発言する... (! でコミュニティコマンド)',
+  'hudChrome.mobile.consumableSeat': '消耗品',
+  'hudChrome.mobile.menuControl': 'メニュー',
+  'hudChrome.mobile.menuControlAria':
+    'メニュー。タップでチャットを開き、長押しして右にスワイプすると騎乗、地図、バッグなどを開けます。',
+  'hudChrome.mobile.menuControlAriaTap':
+    'メニュー。タップでメニュー列（騎乗、地図、バッグなど）を開きます。もう一度タップするとチャットが開きます。',
+  'hudChrome.mobile.quickActions': 'クイック操作',
+  'hudChrome.mobile.quickActionsAria':
+    'クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開きます。長押しして右にスワイプすると項目を選べます。',
+  'hudChrome.mobile.quickActionsAriaTap':
+    'クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開き、項目をタップして選びます。もう一度タップすると閉じます。',
+  'hudChrome.mobile.quickActionsLabel': '操作',
+  'hudChrome.mobile.stanceRadial': 'スタンス',
+  'hudChrome.mobile.stanceAnchorAria': 'スタンス：{stance}。タップしてスタンスリングを開き、別のスタンスを選びます。',
+  'hudChrome.mobile.stanceAnchorEmptyAria': 'スタンスなし。タップしてスタンスリングを開き、スタンスを選びます。',
+  'hudChrome.mobile.questStripAria':
+    '追跡中のクエスト {total} 件中 {position} 件目: {title}。次のクエストを表示するには操作してください。',
+  'hudChrome.mobile.questStripAriaSingle': '追跡中のクエスト: {title}',
+  'hudChrome.mobile.questStripMore': '他 {count} 件',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'ヴェイルカップ',
   'hudChrome.keybinds.categoryPet': 'ペット',
@@ -9576,7 +9582,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.deedsRetroSummary.other': '年代記が追いつきました: {count} 件の功績を記録。',
   'hudChrome.deeds.broadcastLine': '{name}が功績「{deed}」を達成しました',
   'hudChrome.deeds.rarityLine': '冒険者の{percent}が達成',
-  'hudChrome.deeds.stillToVisit': '未訪問の地点：{places}',
   'hudChrome.deeds.trackerLabel': '功績',
   'hudChrome.deeds.collapseHint': '功績トラッカーを折りたたむ',
   'hudChrome.deeds.expandHint': '功績トラッカーを展開',
@@ -9880,8 +9885,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）',
   'entities.abilities.psychic_scream.description': '8ヤード以内の敵を最大4秒間おののかせます。ダメージで効果が解けることがあります。',
-  'entities.abilities.shadowstep.description':
-    '影を通り抜け、敵味方を問わず対象へ近づく。ダスクヴェイルは解除されない。（ローグのタレント）',
+  'entities.abilities.shadowstep.description': '影を通り抜けて対象へ近づく。（ローグのタレント）',
   'entities.abilities.silence.description': '対象を4秒間沈黙させる。（プリーストのタレント）',
   'entities.abilities.tranquility.description':
     '4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）',
@@ -13110,6 +13114,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。',
   'hudChrome.otaUpdate.progressLabel': 'アップデートのダウンロード進行状況',
   'hudChrome.otaUpdate.title': 'ゲームアップデート',
-  // v0.40 release i18n fill.
-  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.mobile.barEditorAria': 'アクションバーの配置を編集',
+  'hudChrome.barEditor.title': 'アクションバーの編集',
+  'hudChrome.barEditor.close': 'アクションバー編集を閉じる',
+  'hudChrome.barEditor.pages': 'アクションバーのページ',
+  'hudChrome.barEditor.buttonHeader': 'ボタン{button}',
+  'hudChrome.barEditor.cellAria': 'ボタン{button}、{direction}：{action}',
+  'hudChrome.barEditor.emptyCellAria': 'ボタン{button}、{direction}：空き',
+  'hudChrome.barEditor.hint': 'スロットをタップし、もう一つタップすると入れ替わります。',
+  'hudChrome.barEditor.armed': 'スロットをタップして{name}を配置します。',
+  'hudChrome.barEditor.picked': '別のスロットをタップして{name}と入れ替えます。',
+  'hudChrome.barEditor.locked': 'アクションバーはインターフェース設定でロックされています。',
+  'hudChrome.barEditor.clear': 'クリア',
+  'hudChrome.barEditor.clearAria': 'スロットをクリア',
+  'hudChrome.barEditor.clearArmed': 'スロットをタップするとクリアします。',
+  'hudChrome.spellbook.assignAria': '{name}を配置するスロットを選択',
 };

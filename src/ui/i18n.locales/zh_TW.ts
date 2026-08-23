@@ -1310,6 +1310,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '顯示每日獎勵寶箱',
   'hudChrome.options.mobileCameraJoystick': '攝影機搖桿',
   'hudChrome.options.mobileLeftHanded': '左手配置',
+  'hudChrome.options.touchTapMenus': '點擊選單',
+  'hudChrome.options.touchTapMenusNote': '用點擊代替滑動來開啟動作、消耗品與選單控制項。點擊項目即可使用，再次點擊控制項執行其一般操作，點擊外部則關閉。',
   'hudChrome.options.itemLevelLine': '物品等級 {level}',
   'hudChrome.options.itemScoreLine': '評分 {score}',
   'hudChrome.landing.highContrast': '高對比度',
@@ -2470,7 +2472,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '不觸發公共冷卻',
   'abilityUi.tooltip.friendlyTarget': '友方目標',
   'abilityUi.tooltip.enemyTarget': '敵方目標',
-  'abilityUi.tooltip.anyTarget': '敵方或友方目標',
   'abilityUi.tooltip.selfOnly': '僅對自己',
   'abilityUi.tooltip.damageRange': '{min} 到 {max}',
   'abilityUi.tooltip.finisherDamage': '{base} 加每個連擊點 {perCombo}',
@@ -2938,12 +2939,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.name': '沉鉛之毒',
   'entities.abilities.crippling_poison.description':
     '用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。',
-  'entities.abilities.melting_acid.name': '熔蝕之酸',
-  'entities.abilities.melting_acid.description':
-    '以腐蝕性毒液潑灑目標，造成 {damage} 點自然傷害，並使其護甲降低 5%，持續 12 秒。',
-  'entities.abilities.nightshade_coating.name': '夜影塗層',
-  'entities.abilities.nightshade_coating.description':
-    '為目標塗上夜影之毒，造成 {damage} 點自然傷害，並使其受到的治療降低 25%，持續 12 秒。',
   'entities.abilities.expose_armor.name': '裂甲',
   'entities.abilities.expose_armor.description': '終結技，破開目標的防護 30 秒：每消耗 1 點連擊點使其護甲降低 2%（5 點連擊點：{damage}%）。',
   'entities.abilities.rupture.name': '血竭',
@@ -5549,13 +5544,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.meters.breakdownRow': '{value}（{percent}）',
   'hudChrome.meters.threatFallback': '無即時仇恨：顯示對{name}造成的傷害',
-  'hudChrome.meters.threatFrozen': '最終仇恨：{name}',
   'hudChrome.meters.breakdownSummary': '{tab}：{value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}：{ability}',
   'hudChrome.meters.autoShowHint':
     '一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。',
   'hudChrome.mobile.actionPageToggle': '切換動作頁',
+  'hudChrome.mobile.actionRadial': '技能方向',
+  'hudChrome.mobile.actionRadialCancel': '取消動作',
+  'hudChrome.mobile.radialCenter': '中心',
+  'hudChrome.mobile.radialRight': '右',
   'hudChrome.mobile.actionRing': '戰鬥動作',
   'hudChrome.mobile.haptics': '觸覺回饋',
   'hudChrome.mobile.hapticsOff': '觸覺回饋已關閉',
@@ -5719,11 +5717,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordLong': '新密碼最多只能包含 128 個字元。',
   'hudChrome.account.errPasswordUnchanged': '新密碼必須與目前密碼不同。',
   'hudChrome.account.errPasswordConfirm': '兩次輸入的新密碼不一致。',
-  'hudChrome.account.setPasswordTitle': '設定密碼',
-  'hudChrome.account.setPasswordHint':
-    '此帳號是透過「透過 Apple 登入」或 Discord 建立的，尚未設定密碼。設定密碼後即可在其他裝置（例如 Mac 與 Windows 桌面版）或網頁上使用使用者名稱和密碼登入，也可以連結其他登入方式。',
-  'hudChrome.account.setPasswordSubmit': '設定密碼',
-  'hudChrome.account.passwordSet': '密碼已設定。您現在可以在任何裝置上使用使用者名稱和密碼登入。',
   'hudChrome.account.emailLabel': '電子郵件（選填）',
   'hudChrome.account.emailHint': '僅用於帳號復原。我們絕不寄送行銷郵件。',
   'hudChrome.account.saveEmail': '儲存電子郵件',
@@ -7492,7 +7485,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': '開啟{craft}製作視窗',
   'hudChrome.crafting.close': '關閉製作',
   'hudChrome.crafting.reagentsNeeded': '需要:',
-  'hudChrome.crafting.craftFeeLine': '製作費用：{fee}',
   'hudChrome.crafting.empty': '尚無已知配方。',
   'hudChrome.crafting.resultAria': '製作{name}',
   'hudChrome.crafting.craftedToast': '已製作:{name}',
@@ -7595,8 +7587,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': '遊戲畫面已停止運作。要重新載入嗎？',
   'desktop.crash.reload': '重新載入',
   'desktop.crash.quit': '離開',
-  'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
   'desktop.titlebar.exitGame': '離開遊戲',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
   'gpuNotice.bodyDesktop':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
   'gpuNotice.bodyDiscreteInactive':
@@ -7991,8 +7983,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'sim.rift.deadEntryCombat': '你的隊伍仍在戰鬥中。戰鬥結束後，死者方可重新進入。',
   'sim.rift.iceGoalLit': '霜之印記熊熊燃起。去路隨之震動。',
   'sim.rift.levelGate': '只有等級達到{level}級或以上的冒險者才能進入這道裂隙。',
-  'sim.rift.lootRecoveryNotice':
-    '裂隙的入口還會維持一段時間：即使隊伍全滅，你仍可返回，取回自己應得的戰利品。',
   'sim.rift.portalCollapses': '{zone}的{tier}級裂隙坍塌了。',
   'sim.rift.portalOpens': '一道{tier}級裂隙在{zone}撕裂而開！',
   'sim.rift.portalSealed': '{zone}的{tier}級裂隙已被封印。',
@@ -8215,7 +8205,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.account.characters_online': '請先登出所有角色再進行停用。',
   'apiError.account.deactivated': '此帳號已停用。請聯絡管理員以還原。',
   'apiError.account.not_found': '找不到帳號。',
-  'apiError.account.password_already_set': '此帳號已設定密碼，請改用「變更密碼」。',
   'apiError.character.name_invalid': '角色名稱無效。請使用 2-16 個字母。',
   'apiError.character.name_not_allowed': '此角色名稱不可使用。',
   'apiError.character.invalid_class': '職業無效。',
@@ -8569,6 +8558,25 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': '頁{page}',
   'hudChrome.mobile.hideKeyboard': '隱藏鍵盤',
   'hudChrome.mobile.chatPlaceholder': '說點什麼...（! 顯示社群指令）',
+  'hudChrome.mobile.consumableSeat': '消耗品',
+  'hudChrome.mobile.menuControl': '選單',
+  'hudChrome.mobile.menuControlAria':
+    '選單。點按開啟聊天，或按住並向右滑動以使用坐騎、地圖、背包等。',
+  'hudChrome.mobile.menuControlAriaTap':
+    '選單。點按開啟選單列：坐騎、地圖、背包等。再次點按可開啟聊天。',
+  'hudChrome.mobile.quickActions': '快捷操作',
+  'hudChrome.mobile.quickActionsAria':
+    '快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，或按住並向右滑動進行選擇。',
+  'hudChrome.mobile.quickActionsAriaTap':
+    '快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，然後點按其中一項。再次點按此控制項可關閉。',
+  'hudChrome.mobile.quickActionsLabel': '操作',
+  'hudChrome.mobile.stanceRadial': '姿態',
+  'hudChrome.mobile.stanceAnchorAria': '姿態：{stance}。點按開啟姿態環，然後選擇其他姿態。',
+  'hudChrome.mobile.stanceAnchorEmptyAria': '無姿態。點按開啟姿態環，然後選擇一種姿態。',
+  'hudChrome.mobile.questStripAria':
+    '追蹤任務 {position}/{total}：{title}。點按可切換至下一個任務。',
+  'hudChrome.mobile.questStripAriaSingle': '追蹤任務：{title}',
+  'hudChrome.mobile.questStripMore': '還有 {count} 項',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷盃',
   'hudChrome.keybinds.categoryPet': '寵物',
@@ -9171,7 +9179,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.deedsRetroSummary.other': '你的編年史已更新：補錄 {count} 項功績。',
   'hudChrome.deeds.broadcastLine': '{name} 達成了功績：{deed}',
   'hudChrome.deeds.rarityLine': '{percent} 的冒險者已達成',
-  'hudChrome.deeds.stillToVisit': '尚待探訪：{places}',
   'hudChrome.deeds.trackerLabel': '功績',
   'hudChrome.deeds.collapseHint': '摺疊功績追蹤器',
   'hudChrome.deeds.expandHint': '展開功績追蹤器',
@@ -9450,8 +9457,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）',
   'entities.abilities.psychic_scream.description': '使 8 公尺內的敵人陷入恐懼，最多持續 4 秒。傷害可能打斷該效果。',
-  'entities.abilities.shadowstep.description':
-    '穿過暗影，向你的目標邁進，不論敵友，且不會打破暮幕。（潛行者天賦）',
+  'entities.abilities.shadowstep.description': '穿過暗影，向你的目標邁進。（潛行者天賦）',
   'entities.abilities.silence.description': '使目標沉默4秒。（牧師天賦）',
   'entities.abilities.tranquility.description':
     '引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）',
@@ -12884,6 +12890,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '需要更新後才能進行遊戲。下載完成後將立即套用。',
   'hudChrome.otaUpdate.progressLabel': '更新下載進度',
   'hudChrome.otaUpdate.title': '遊戲更新',
-  // v0.40 release i18n fill.
-  "hudChrome.controller.crossHotbarPosition": "{trigger} + {button}",
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.mobile.barEditorAria': '編輯動作列配置',
+  'hudChrome.barEditor.title': '編輯動作列',
+  'hudChrome.barEditor.close': '關閉動作列編輯器',
+  'hudChrome.barEditor.pages': '動作列頁面',
+  'hudChrome.barEditor.buttonHeader': '按鈕 {button}',
+  'hudChrome.barEditor.cellAria': '按鈕 {button}，{direction}：{action}',
+  'hudChrome.barEditor.emptyCellAria': '按鈕 {button}，{direction}：空',
+  'hudChrome.barEditor.hint': '點按一個欄位，再點按另一個即可交換。',
+  'hudChrome.barEditor.armed': '點按一個欄位以放置 {name}。',
+  'hudChrome.barEditor.picked': '點按另一個欄位以與 {name} 交換。',
+  'hudChrome.barEditor.locked': '動作列已在介面選項中鎖定。',
+  'hudChrome.barEditor.clear': '清除',
+  'hudChrome.barEditor.clearAria': '清除一個欄位',
+  'hudChrome.barEditor.clearArmed': '點擊一個欄位即可清除。',
+  'hudChrome.spellbook.assignAria': '為 {name} 選擇一個欄位',
 };

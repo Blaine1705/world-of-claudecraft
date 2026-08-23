@@ -866,11 +866,52 @@ export const ko_KR: EnTranslations = {
       "actionRing": "전투 행동",
       "actionPageToggle": "행동 페이지 전환",
       "actionPageIndicator": "{page}페이지",
+      "actionRadial": "액션 방향",
+      "actionRadialCancel": "동작 취소",
+      "radialCenter": "가운데",
+      "radialUp": "Up",
+      "radialRight": "오른쪽",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "소모품",
+      "menuControl": "메뉴",
+      "menuControlAria": "메뉴. 탭하면 대화창이 열리고, 길게 누른 뒤 오른쪽으로 밀면 탈것, 지도, 가방 등을 열 수 있습니다.",
+      "menuControlAriaTap": "메뉴. 탭하면 탈것, 지도, 가방 등의 메뉴 줄이 열립니다. 다시 탭하면 대화창이 열립니다.",
+      "menuLabel": "Menu",
+      "quickActions": "빠른 실행",
+      "quickActionsAria": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리고, 길게 누른 뒤 오른쪽으로 밀면 항목을 선택할 수 있습니다.",
+      "quickActionsAriaTap": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리며, 항목을 탭해 선택합니다. 컨트롤을 다시 탭하면 닫힙니다.",
+      "quickActionsLabel": "실행",
+      "stanceRadial": "태세",
+      "stanceAnchorAria": "태세: {stance}. 탭하여 태세 링을 열고 다른 태세를 선택하세요.",
+      "stanceAnchorEmptyAria": "태세 없음. 탭하여 태세 링을 열고 태세를 선택하세요.",
+      "questStripAria": "추적 중인 퀘스트 {total}개 중 {position}번째: {title}. 다음 퀘스트를 보려면 누르십시오.",
+      "questStripAriaSingle": "추적 중인 퀘스트: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "외 {count}개",
       "targetCycle": "대상 전환",
       "targetCycleShort": "대상",
       "spellbookPageLabel": "페이지 {page}",
       "hideKeyboard": "키보드 숨기기",
-      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)"
+      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "행동 단축바 배치 편집"
+    },
+    "barEditor": {
+      "title": "행동 단축바 편집",
+      "close": "행동 단축바 편집 닫기",
+      "pages": "행동 단축바 페이지",
+      "pageTab": "Page {page}",
+      "buttonHeader": "버튼 {button}",
+      "cellAria": "버튼 {button}, {direction}: {action}",
+      "emptyCellAria": "버튼 {button}, {direction}: 비어 있음",
+      "hint": "칸을 누른 뒤 다른 칸을 누르면 서로 바뀝니다.",
+      "armed": "칸을 눌러 {name}을(를) 배치하세요.",
+      "picked": "다른 칸을 눌러 {name}과(와) 바꾸세요.",
+      "locked": "행동 단축바가 인터페이스 설정에서 잠겨 있습니다.",
+      "clear": "비우기",
+      "clearAria": "슬롯 비우기",
+      "clearArmed": "슬롯을 탭하면 비워집니다."
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -986,7 +1027,7 @@ export const ko_KR: EnTranslations = {
       "seconds": "{s}초",
       "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.",
       "threatFallback": "실시간 위협 없음: {name}에게 입힌 피해 표시",
-      "threatFrozen": "최종 위협: {name}",
+      "threatFrozen": "Final threat vs {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "기타 ({count})",
@@ -1416,7 +1457,9 @@ export const ko_KR: EnTranslations = {
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
-      "mobileLeftHanded": "왼손잡이 레이아웃"
+      "mobileLeftHanded": "왼손잡이 레이아웃",
+      "touchTapMenus": "탭 메뉴",
+      "touchTapMenusNote": "스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다."
     },
     "talentRows": {
       "tab": "선택",
@@ -2064,10 +2107,10 @@ export const ko_KR: EnTranslations = {
       "errPasswordLong": "새 비밀번호는 128자 이하여야 합니다.",
       "errPasswordUnchanged": "새 비밀번호는 현재 비밀번호와 달라야 합니다.",
       "errPasswordConfirm": "새 비밀번호가 서로 일치하지 않습니다.",
-      "setPasswordTitle": "비밀번호 설정",
-      "setPasswordHint": "이 계정은 Apple로 로그인 또는 Discord로 생성되어 아직 비밀번호가 설정되지 않았습니다. 비밀번호를 설정하면 Mac 및 Windows 데스크톱 앱이나 웹 등 다른 기기에서 로그인하거나 추가 로그인 방법을 연결할 수 있습니다.",
-      "setPasswordSubmit": "비밀번호 설정",
-      "passwordSet": "비밀번호가 설정되었습니다. 이제 어디서나 사용자 이름과 비밀번호로 로그인할 수 있습니다.",
+      "setPasswordTitle": "Set a Password",
+      "setPasswordHint": "This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.",
+      "setPasswordSubmit": "Set Password",
+      "passwordSet": "Password set. You can now sign in with your username and password anywhere.",
       "emailLabel": "이메일(선택 사항)",
       "emailHint": "계정 복구에만 사용됩니다. 마케팅 이메일은 보내지 않습니다.",
       "saveEmail": "이메일 저장",
@@ -2509,7 +2552,8 @@ export const ko_KR: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
-      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
+      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거",
+      "assignAria": "{name}을(를) 놓을 칸 선택"
     },
     "nameplate": {
       "mobLevel": "{level}",
@@ -3281,7 +3325,7 @@ export const ko_KR: EnTranslations = {
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
-      "craftFeeLine": "제작 비용: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
@@ -3833,7 +3877,7 @@ export const ko_KR: EnTranslations = {
       "unlockedBorderHint": "새 테두리 획득: {name}. 업적의 서에서 착용할 수 있습니다.",
       "broadcastLine": "{name} 님이 업적을 달성했습니다: {deed}",
       "rarityLine": "모험가 중 {percent} 달성",
-      "stillToVisit": "아직 방문하지 않은 곳: {places}",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "업적",
       "collapseHint": "업적 추적기 접기",
       "expandHint": "업적 추적기 펼치기",
@@ -3911,7 +3955,7 @@ export const ko_KR: EnTranslations = {
       "characters_online": "비활성화하기 전에 모든 캐릭터에서 로그아웃하세요.",
       "deactivated": "이 계정은 비활성화되었습니다. 복원하려면 관리자에게 문의하세요.",
       "not_found": "계정을 찾을 수 없습니다.",
-      "password_already_set": "이 계정에는 이미 비밀번호가 설정되어 있습니다. 대신 비밀번호 변경을 이용하세요."
+      "password_already_set": "This account already has a password. Use Change Password instead."
     },
     "character": {
       "name_invalid": "캐릭터 이름이 올바르지 않습니다. 2-16자의 글자를 사용하세요.",
@@ -7126,7 +7170,7 @@ export const ko_KR: EnTranslations = {
       "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
       "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
       "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
-      "lootRecoveryNotice": "균열의 입구는 한동안 열려 있습니다. 파티가 전멸하더라도, 돌아가 얻은 전리품을 되찾을 수 있습니다.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다.",
       "deadEntry": "죽은 상태로는 균열에 들어갈 수 없습니다.",
       "deadEntryCombat": "파티가 아직 전투 중입니다. 전투가 끝나면 죽은 자도 다시 들어갈 수 있습니다.",
@@ -8805,7 +8849,7 @@ export const ko_KR: EnTranslations = {
       "offGlobalCooldown": "공용 재사용 대기시간 없음",
       "friendlyTarget": "아군 대상",
       "enemyTarget": "적 대상",
-      "anyTarget": "적 또는 아군 대상",
+      "anyTarget": "Enemy or friendly target",
       "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
@@ -9595,12 +9639,12 @@ export const ko_KR: EnTranslations = {
         "description": "둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "melting_acid": {
-        "name": "녹이는 산",
-        "description": "대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 입히고 12초 동안 방어도를 5% 감소시킵니다."
+        "name": "Melting Acid",
+        "description": "Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec."
       },
       "nightshade_coating": {
-        "name": "밤그늘 도포",
-        "description": "대상에게 밤그늘 독을 발라 {damage}의 자연 피해를 입히고 12초 동안 받는 치유량을 25% 감소시킵니다."
+        "name": "Nightshade Coating",
+        "description": "Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec."
       },
       "expose_armor": {
         "name": "방어구 돌파",
@@ -10790,7 +10834,7 @@ export const ko_KR: EnTranslations = {
       },
       "shadowstep": {
         "name": "그림자걸음",
-        "description": "그림자를 가로질러 대상이 아군이든 적이든 다가가며, 황혼장막을 깨지 않습니다. (도적 특성)"
+        "description": "그림자를 가로질러 대상에게 다가갑니다. (도적 특성)"
       },
       "silence": {
         "name": "침묵",
