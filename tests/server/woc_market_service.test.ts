@@ -4483,6 +4483,39 @@ describe('bond lapse', () => {
   });
 });
 
+describe('the kill switch covers the operator writes', () => {
+  // WOC_MARKET_ENABLED=0 is the incident lever: it must freeze every write,
+  // operator arms included (a suspend returns the item via custody mail, an
+  // exclusion rewrites history, a strike clear changes standing). Operator
+  // READS stay live on purpose: an incident responder still needs to see
+  // residue rows while the market is dark.
+  it('refuses the three operator writes and keeps the operator read live', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const disabled = new WocMarketService({
+      ...h.deps,
+      config: { ...h.deps.config, enabled: false },
+    });
+    expect(await disabled.adminSuspendListing(listing.id)).toEqual({
+      ok: false,
+      reason: 'disabled',
+    });
+    expect(await disabled.adminSetSaleExcluded(1, true)).toEqual({
+      ok: false,
+      reason: 'disabled',
+    });
+    expect(await disabled.adminClearStrikes(SELLER)).toEqual({
+      ok: false,
+      reason: 'disabled',
+    });
+    // The suspend refusal changed nothing.
+    expect((await getListing(h, listing.id)).status).toBe('active');
+    // The support read still answers while the market is dark.
+    const rows = await disabled.adminListingsBySeller(SELLER);
+    expect(rows.map((r) => r.id)).toContain(listing.id);
+  });
+});
+
 describe('adminSuspendListing', () => {
   it('cancels open bids, refunds held bonds, expires the live settlement, and returns the item', async () => {
     const h = makeHarness();

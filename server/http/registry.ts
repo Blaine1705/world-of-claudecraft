@@ -120,8 +120,10 @@ export interface ApiRegistry {
  *    status/browse/detail/estimate/me/history reads, the mutating
  *    listing/bid/bond/buy-now/settlement routes on per-action limiters with
  *    owner loaders, and the moderation.read/act operator arms on the admin
- *    surface; the whole family answers woc_market.disabled until
- *    WOC_MARKET_ENABLED=1);
+ *    surface; every player route and every operator WRITE answers
+ *    woc_market.disabled until WOC_MARKET_ENABLED=1, while the operator
+ *    reads, admin and internal, stay live so incident work can see residue
+ *    rows while the market is dark);
  * the oauth and internal surfaces are each served through their own flag-gated
  * dispatcher in main.ts.
  */

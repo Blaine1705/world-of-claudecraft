@@ -990,6 +990,7 @@ async function adminSuspendListingHandler(ctx: Ctx): Promise<void> {
     // retryable classes; `contended` is plain row contention (a guard
     // transaction briefly holds the listing), where a 404 would read as
     // "gone" and stop the operator retrying.
+    if (out.reason === 'disabled') throwRefusal(out);
     if (out.reason === 'settlement_in_flight') {
       throw new HttpError(409, 'woc_market.settlement_in_flight');
     }
@@ -1012,6 +1013,7 @@ async function adminSaleExcludedHandler(ctx: Ctx): Promise<void> {
     // serializer carries the code; operators are users): a missing row
     // versus a correction blocked by a standing non-excluded sale row for
     // the same listing.
+    if (out.reason === 'disabled') throwRefusal(out);
     if (out.reason === 'sale_conflict') throw new HttpError(409, 'woc_market.sale_conflict');
     throw new HttpError(404, 'woc_market.not_found');
   }
@@ -1022,7 +1024,8 @@ async function adminSaleExcludedHandler(ctx: Ctx): Promise<void> {
 }
 
 async function adminClearStrikesHandler(ctx: Ctx): Promise<void> {
-  await useService().adminClearStrikes(adminTargetId(ctx));
+  const out = await useService().adminClearStrikes(adminTargetId(ctx));
+  if (!out.ok) throwRefusal(out);
   // Moderation bust: the target's activity readout carries the strike row.
   readCache()?.bustMe(adminTargetId(ctx));
   json(ctx.res, 200, { success: true, data: { cleared: true } });

@@ -3068,6 +3068,10 @@ export class WocMarketService {
    *  retries once the settlement resolves; the item return still rides the
    *  sweep's reconciliation of closed undisposed listings. */
   async adminSuspendListing(listingId: number): Promise<{ ok: true } | Refused> {
+    // The kill switch freezes operator WRITES too: a suspend returns the item
+    // via custody mail, which is exactly the movement WOC_MARKET_ENABLED=0 is
+    // pulled to stop. The operator READS above stay live for incident work.
+    if (!this.cfg.enabled) return refuse('disabled');
     const out = await this.deps.db.suspendListingIfSafe(this.cfg.realm, listingId, this.now());
     if (out === 'not_found') return refuse('not_found');
     if (out === 'not_active') return refuse('not_active');
@@ -3079,6 +3083,7 @@ export class WocMarketService {
   }
 
   async adminSetSaleExcluded(saleId: number, excluded: boolean): Promise<{ ok: true } | Refused> {
+    if (!this.cfg.enabled) return refuse('disabled');
     const done = await this.deps.db.setSaleExcluded(saleId, excluded);
     if (done === 'ok') return { ok: true };
     // Distinct refusals: a missing row and a correction blocked by a standing
@@ -3086,7 +3091,8 @@ export class WocMarketService {
     return done === 'conflict' ? refuse('sale_conflict') : refuse('not_found');
   }
 
-  async adminClearStrikes(account: number): Promise<{ ok: true }> {
+  async adminClearStrikes(account: number): Promise<{ ok: true } | Refused> {
+    if (!this.cfg.enabled) return refuse('disabled');
     await this.deps.db.clearStrikes(account);
     return { ok: true };
   }
