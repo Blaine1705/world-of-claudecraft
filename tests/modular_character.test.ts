@@ -1101,6 +1101,67 @@ describe('head shading', () => {
   });
 });
 
+// Regression pin for the "mullet clips through the forehead" bug report: one
+// vertex on H2_mullet's front-fringe centerline (index 253) sat noticeably
+// further from its own topological neighbors than the fringe otherwise does,
+// reading on screen as a sharp downward notch cutting into the browline.
+// scripts/fix_mullet_forehead_clip.mjs pulls it back toward its neighbor
+// average. This decodes the shipped position directly rather than depending
+// on any other test's helper, since it targets one specific known vertex.
+describe('mullet front-fringe fit', () => {
+  const def = VISUALS[MODULAR_WARRIOR_KEY];
+  const path = fileURLToPath(new URL(`../public/${def.url}`, import.meta.url));
+
+  it('vertex 253 stays close to its neighbor average, not overshot into the browline', async () => {
+    const { NodeIO } = await import('@gltf-transform/core');
+    const { ALL_EXTENSIONS } = await import('@gltf-transform/extensions');
+    const { MeshoptDecoder } = await import('meshoptimizer');
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const doc = await io.read(path);
+    const node = doc
+      .getRoot()
+      .listNodes()
+      .find((n) => n.getName() === 'H2_mullet');
+    expect(node, 'H2_mullet present').toBeTruthy();
+    const prim = node?.getMesh()?.listPrimitives()[0];
+    const pos = prim?.getAttribute('POSITION');
+    const idx = prim?.getIndices();
+    expect(pos, 'H2_mullet positions').toBeTruthy();
+    expect(idx, 'H2_mullet indices').toBeTruthy();
+
+    const count = pos?.getCount() ?? 0;
+    const P: number[][] = [];
+    for (let i = 0; i < count; i++) P.push(pos?.getElement(i, [0, 0, 0]) as number[]);
+
+    const idxArr = Array.from(idx?.getArray() ?? []);
+    const neighbors = new Set<number>();
+    const TARGET = 253;
+    for (let t = 0; t < idxArr.length / 3; t++) {
+      const tri = [idxArr[t * 3], idxArr[t * 3 + 1], idxArr[t * 3 + 2]];
+      if (!tri.includes(TARGET)) continue;
+      for (const v of tri) if (v !== TARGET) neighbors.add(v);
+    }
+    expect(neighbors.size, 'v253 topological neighbors').toBeGreaterThan(0);
+
+    const avg = [0, 0, 0];
+    for (const n of neighbors) {
+      avg[0] += P[n][0];
+      avg[1] += P[n][1];
+      avg[2] += P[n][2];
+    }
+    avg[0] /= neighbors.size;
+    avg[1] /= neighbors.size;
+    avg[2] /= neighbors.size;
+
+    const p = P[TARGET];
+    const dist = Math.hypot(p[0] - avg[0], p[1] - avg[1], p[2] - avg[2]);
+    // Unfixed, this measures ~0.173; fixed, ~0.052. 0.10 sits cleanly between.
+    expect(dist, 'v253 distance from its neighbor average').toBeLessThan(0.1);
+  });
+});
+
 describe('randomizeAppearance', () => {
   // Seeded, so this asserts the actual behaviour rather than "it changed".
   const seeded = (start = 0.123) => {
