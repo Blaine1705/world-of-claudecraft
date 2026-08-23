@@ -842,20 +842,26 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
-// Re-minted for the Duskfall gate occluder-fade fix merged into
-// release/v0.40.0: the first-order composite follows renderer.ts on top of
-// the v0.40.0 renderer bytes, then this seal follows the swept evidence
-// bytes. No capture was retaken.
-// Re-minted for the PR #3470 merge into the release branch: the first-order
-// composite follows the resolved renderer bytes, then this seal follows the
-// swept evidence bytes. No capture was retaken.
-// Re-minted for the PR #3497 merge into the release branch: the #3470
-// renderer bytes combine with the updated entity-view policy leaf, then this
-// seal follows the swept evidence bytes. No capture was retaken.
+// Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
+// extraction. The renderer leaf moved; no capture was retaken because both
+// changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
+// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
+// renderer.ts combines mandatory entry admission with the release's rift
+// long-session resource lifecycle changes. No capture was retaken.
+// Re-minted for the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission, and restored rationale): the
+// renderer integration leaf moved. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '0c8956ed3807ca870ef195c6f94544d0bd78004eccc9420a1565b47d56eb1c66';
+  '28aa94cb473c77db7aab9c416f0e7d6aa11b78f9e4565aff8e2ee840f3c065f6';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '44f7e5150a6c11433849981e2d7299aadce4bbe7a55c68be6bdb5906eb9462b6';
+  '72c6ec186b47e8bf06ac5920ff6909c6c585fcdb5e8ee21e6ced9d80100e0ff9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1923,21 +1929,21 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the second three patch-hash bump (pnpm-lock.yaml, the count
     // 0 instanced-mesh render-list skip): same order, the composite first, then
     // this seal. No capture was retaken.
-    // Re-minted for the Duskfall gate occluder-fade fix merged into
-    // release/v0.40.0. The first-order composite follows renderer.ts on top of
-    // the v0.40.0 renderer bytes, then this second-order performance seal
-    // follows the swept evidence bytes. No capture was retaken.
-    // Re-minted for the PR #3470 merge into the release branch. The
-    // first-order composite follows the resolved renderer bytes, then this
-    // second-order performance seal follows the swept evidence bytes. No
-    // capture was retaken.
-    // Re-minted for the PR #3497 merge into the release branch: same order,
-    // after the #3470 renderer bytes combine with the updated entity-view
-    // policy leaf. No capture was retaken.
+    // Re-minted for the fast-loading-screen-variety merge with release/v0.40.0
+    // (renderer.ts moved on both sides): same order, the composite first, then
+    // this seal. No capture was retaken.
+    // Re-minted for the review-fix round (prewarm_policy.ts and renderer.ts
+    // moved): same order, the composite first, then this seal. No capture
+    // was retaken.
+    // Re-minted after merging release/v0.40.0 into the loading-hitch branch
+    // (renderer.ts moved on both sides): same order, the composite first,
+    // then this seal. No capture was retaken.
+    // Re-minted for the loading review fixes (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('c7e7d7463b12160d3bdef6df7e5d00acf63b98e6aa494c1679f1c3e70e4ba2da');
+    ).toBe('49bb043e11c05bcdeccef0ff849571cbcf0e1e0d5de23591ee1da2d418ddb5c7');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
