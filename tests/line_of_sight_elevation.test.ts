@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import {
-  colliderInternalsForTest,
-  lineOfSightClear,
-  MOVE_TOP_EPS,
-  supportHeightAt,
-} from '../src/sim/colliders';
+import { colliderInternalsForTest, lineOfSightClear, supportHeightAt } from '../src/sim/colliders';
 import { RESURRECTION_RANGE, resurrectionReachError } from '../src/sim/combat/resurrection_reach';
 import { MOBS } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
-import { trustedGroundedSightFeet } from '../src/sim/line_of_sight_elevation';
+import { entityLineOfSightClear } from '../src/sim/line_of_sight_elevation';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -342,59 +337,28 @@ describe('grounded line-of-sight elevation', () => {
     expect(hunter.swingTimer).toBeGreaterThan(0);
   });
 
-  it('does not trust unsupported or airborne player elevation', () => {
+  it('does not grant canopy support to non-player line-of-sight endpoints', () => {
     const sim = makeSim('priest');
-    const playerId = sim.addPlayer('priest', 'Probe');
-    const probe = player(sim, playerId);
-
-    placeOnCanopy(sim, probe);
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBe(canopyHeight());
-    expect(MOVE_TOP_EPS).toBe(1e-3);
-
-    probe.pos.y = canopyHeight() + 0.0005;
-    probe.prevPos = { ...probe.pos };
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBe(probe.pos.y);
-
-    probe.pos.y = canopyHeight() + 0.0011;
-    probe.prevPos = { ...probe.pos };
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBeUndefined();
-
-    probe.pos.y = canopyHeight() - 0.0005;
-    probe.prevPos = { ...probe.pos };
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBe(probe.pos.y);
-
-    probe.pos.y = canopyHeight() - 0.0011;
-    probe.prevPos = { ...probe.pos };
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBeUndefined();
-  });
-
-  it('requires grounded and non-jumping state independently', () => {
-    const sim = makeSim('priest');
-    const playerId = sim.addPlayer('priest', 'Probe');
-    const probe = player(sim, playerId);
-
-    placeOnCanopy(sim, probe);
-    probe.onGround = false;
-    probe.jumping = false;
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBeUndefined();
-
-    placeOnCanopy(sim, probe);
-    probe.onGround = true;
-    probe.jumping = true;
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBeUndefined();
-  });
-
-  it('does not trust supported elevation for a grounded non-player', () => {
-    const sim = makeSim('priest');
+    const watcherId = sim.addPlayer('priest', 'Watcher');
+    const watcher = player(sim, watcherId);
     const stall = EASTBROOK_LAYOUT.market.stalls[0];
     const wolf = addWolf(sim, 990_352_303, stall.position.x, stall.position.z);
 
+    place(
+      sim,
+      watcher,
+      {
+        x: stall.position.x,
+        y: groundHeight(stall.position.x, stall.position.z + 8, WORLD_SEED),
+        z: stall.position.z + 8,
+      },
+      true,
+    );
     placeOnCanopy(sim, wolf);
 
     expect(wolf.kind).toBe('mob');
-    expect(wolf.onGround).toBe(true);
-    expect(wolf.jumping).toBe(false);
-    expect(trustedGroundedSightFeet(WORLD_SEED, wolf)).toBeUndefined();
+    expect(entityLineOfSightClear(WORLD_SEED, watcher, wolf)).toBe(false);
+    expect(entityLineOfSightClear(WORLD_SEED, wolf, watcher)).toBe(false);
   });
 
   it('keeps a jumping healer behind ordinary open-world cover blocked', () => {

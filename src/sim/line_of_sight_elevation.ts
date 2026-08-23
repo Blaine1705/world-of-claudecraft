@@ -23,44 +23,21 @@ function openWorldSightHeights(seed: number, pos: Vec3): OpenWorldSightHeights |
   };
 }
 
-function exactSupportedSightFeet(pos: Vec3, support: number): number | undefined {
-  return Math.abs(support - pos.y) <= MOVE_TOP_EPS ? pos.y : undefined;
-}
-
 function boundedSightFeet(pos: Vec3, heights: OpenWorldSightHeights): number {
-  // Airborne movement may retain the authored support beneath the current
-  // footprint, but never contribute raw jump height above that support.
+  // Open-world endpoints may retain authored support beneath their current
+  // footprint, but never contribute raw airborne height above that support.
   return Math.min(pos.y, Math.max(heights.ground, heights.support));
-}
-
-export function trustedGroundedSightFeet(seed: number, entity: Entity): number | undefined {
-  if (
-    entity.kind !== 'player' ||
-    !entity.onGround ||
-    entity.jumping ||
-    entity.pos.x > DUNGEON_X_THRESHOLD
-  ) {
-    return undefined;
-  }
-  const heights = openWorldSightHeights(seed, entity.pos);
-  return heights ? exactSupportedSightFeet(entity.pos, heights.support) : undefined;
 }
 
 function playerSightFeet(seed: number, entity: Entity): number | undefined {
   if (entity.kind !== 'player') return undefined;
   const heights = openWorldSightHeights(seed, entity.pos);
-  if (!heights) return undefined;
-  const trusted =
-    entity.onGround && !entity.jumping
-      ? exactSupportedSightFeet(entity.pos, heights.support)
-      : undefined;
-  return trusted ?? boundedSightFeet(entity.pos, heights);
+  return heights ? boundedSightFeet(entity.pos, heights) : undefined;
 }
 
 function bodySightFeet(seed: number, body: Vec3): number | undefined {
   const heights = openWorldSightHeights(seed, body);
-  if (!heights) return undefined;
-  return exactSupportedSightFeet(body, heights.support) ?? boundedSightFeet(body, heights);
+  return heights ? boundedSightFeet(body, heights) : undefined;
 }
 
 export function entityLineOfSightClear(
