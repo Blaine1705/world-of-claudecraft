@@ -782,6 +782,7 @@ describe('unstuck area identity', () => {
     const { sim, match, pid } = activeBattleground();
     const player = forceBattlegroundWallTrap(sim, match, pid);
     const origin = battlegroundOrigin(match.slot);
+    const trapped = { ...player.pos };
 
     const start = required(
       unstuckLocationAt(sim.ctx, pid, player.pos),
@@ -801,8 +802,10 @@ describe('unstuck area identity', () => {
     const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
     const completed = eventsOf(events).find((event) => event.phase === 'completed');
     expect(completed?.area).toMatchObject(start.area);
-    expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
-    expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    const destination = required(completed?.destination, 'battleground unstuck destination');
+    expect(destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    expect(Math.hypot(destination.x - trapped.x, destination.z - trapped.z)).toBeGreaterThan(10);
     expect(sim.bgMatchFor(pid)).toBe(match);
     expect(isBgPos(player.pos.x)).toBe(true);
 
@@ -813,6 +816,8 @@ describe('unstuck area identity', () => {
     const plot = BG_GRAVEYARDS[0];
     expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+    expect(Math.abs(destination.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+    expect(Math.abs(destination.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
   });
 
   it('reports content-local positions for dungeon, delve, and procedural rift clones', () => {
