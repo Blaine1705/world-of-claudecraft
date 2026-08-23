@@ -1,11 +1,11 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
-import { shellStrings } from '../src/ui/i18n.catalog/shell';
 import {
   QUEST_STRIP_MAX_OBJECTIVES,
   QUEST_STRIP_TARGET_FRAME_GAP_PX,
 } from '../src/ui/hud/quest/quest_strip_core';
+import { shellStrings } from '../src/ui/i18n.catalog/shell';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 // The CSS extraction moved the :root tokens and the reset/base
