@@ -433,6 +433,16 @@ export function enterDungeon(
   p.prevFacing = 0;
   p.targetId = null;
   p.autoAttack = false;
+  // Land settled: no carried-over jump arc or fall distance from the overworld
+  // side of the door (the same recipe as every other sim teleport, portals.ts
+  // included). Without this, a player who jumps into the door mid-air keeps
+  // its stale overworld fallStartY/onGround=false, and the next vertical pass
+  // computes a bogus drop against the unrelated instance floor height and
+  // deals fall damage that has nothing to do with any real fall.
+  p.vy = 0;
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
   inst.emptyFor = 0;
   // Session participation record for this run: awardHeroicMarks pays the mail
   // arm only to locked players who actually walked through the door.
@@ -562,6 +572,14 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   ctx.rebucket(p);
   p.targetId = null;
   p.autoAttack = false;
+  // Land settled (see the matching comment in enterDungeon above): the exit
+  // side of the door needs the same reset, or leaving mid-air over an
+  // instance's interior geometry carries that fall state back out onto the
+  // overworld door and deals the same bogus fall damage in reverse.
+  p.vy = 0;
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
   return true;
 }
