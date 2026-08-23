@@ -70,6 +70,9 @@ function ctx(sim: Sim): SimContext {
 function finishCast(sim: Sim, abilityId: string, target?: Entity): SimEvent[] {
   if (target) sim.targetEntity(target.id);
   sim.player.resource = sim.player.maxResource;
+  // An aura change between casts recalcs stats and drops the harness's never-resist
+  // hitBonus; restore it so no cast here is decided by an avoidance roll.
+  sim.player.hitBonus = 1;
   sim.castAbility(abilityId);
   const events: SimEvent[] = [];
   for (let i = 0; i < 20 * 10 && sim.player.castingAbility; i++) events.push(...sim.tick());
@@ -711,12 +714,12 @@ describe('Affliction Warlock', () => {
     expect(afterSecond).toBeLessThan(afterFirst ?? 0);
   });
 
-  it('applies Evil Eye immediately without a projectile or resist roll', () => {
+  it('applies Evil Eye immediately, with no projectile and no avoidance', () => {
     const sim = makeAffliction();
     const target = addTarget(sim);
     target.level = 60;
-    sim.player.hitBonus = 0;
-    const chance = vi.spyOn(ctx(sim).rng, 'chance').mockReturnValue(false);
+    // makeAffliction hit-caps the warlock, so the instant hostile spell's resist
+    // roll can never fail and the wildly higher-level target still takes the Eye.
 
     sim.targetEntity(target.id);
     sim.castAbility('evil_eye');
@@ -724,7 +727,6 @@ describe('Affliction Warlock', () => {
 
     expect(eye(target, sim.playerId)).toBe(true);
     expect(ctx(sim).pendingProjectiles).toHaveLength(0);
-    expect(chance).not.toHaveBeenCalled();
     expect(
       events.some(
         (event) =>
@@ -2006,16 +2008,16 @@ describe('Affliction Warlock', () => {
     expect(doomValue(sim.player)).toBe(3);
   });
 
-  it('applies Coven immediately without a projectile or resist roll', () => {
+  it('applies Coven immediately, with no projectile and no avoidance', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
     const secondary = addTarget(sim, 10);
     finishCast(sim, 'evil_eye', primary);
     sim.player.gcdRemaining = 0;
     sim.player.resource = sim.player.maxResource;
-    sim.player.hitBonus = 0;
     primary.level = 60;
-    const chance = vi.spyOn(ctx(sim).rng, 'chance').mockReturnValue(false);
+    // makeAffliction hit-caps the warlock, so the instant hostile spell's resist
+    // roll can never fail against the wildly higher-level primary.
 
     sim.targetEntity(primary.id);
     sim.castAbility('coven');
@@ -2023,7 +2025,6 @@ describe('Affliction Warlock', () => {
 
     expect(eye(secondary, sim.playerId, true)).toBe(true);
     expect(ctx(sim).pendingProjectiles).toHaveLength(0);
-    expect(chance).not.toHaveBeenCalled();
     expect(
       events.some(
         (event) =>

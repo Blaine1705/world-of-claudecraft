@@ -48,7 +48,6 @@ import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { hasEscapeStealth } from '../threat';
-import { creditAbilityDrill } from '../tutorial/ability_drill';
 import type { AbilityDef, AbilityEffect, Aura, Entity, Vec3 } from '../types';
 import {
   angleTo,
@@ -197,7 +196,7 @@ import {
   spellDamageMultFromAuras,
   spellHasteMult,
 } from './spell_combat';
-import { isSpellResisted } from './spell_resist';
+import { resolveHostileSpellResist } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 import {
@@ -2697,23 +2696,7 @@ function applyAbility(
               ),
           });
         }
-        if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
-          ctx.emit({
-            type: 'damage',
-            sourceId: src.id,
-            targetId: tgt.id,
-            amount: 0,
-            crit: false,
-            school: ability.school,
-            ability: ability.name,
-            kind: 'resist',
-          });
-          // A resisted bolt never reaches runEffects, but the player still
-          // pressed the button the island asked for, so the drill credits
-          // here too. Without this the lesson stalls on an unlucky roll and
-          // the coach keeps asking for a press that already happened.
-          creditAbilityDrill(ctx, src, tgt, ability.id);
-          ctx.enterCombat(src, tgt);
+        if (isSpell && !isTaunt && resolveHostileSpellResist(ctx, src, tgt, ability)) {
           restoreStormcastReservation(ctx, src, stormcastReservation);
           return;
         }
@@ -2766,8 +2749,21 @@ function applyAbility(
       ability: ability.id,
     });
   }
-  ctx.runEffects(p, meta, target, res);
-  completeStormcastReservation(ctx, p, stormcastReservation);
+  // An instant hostile spell (`projectile: false`) rolls the SAME resist a bolt
+  // rolls on impact; only the delivery differs. Taunts are exempt here for the
+  // reason they are exempt there: a resisted taunt silently breaks tanking.
+  const instantResisted =
+    target !== null &&
+    ability.school !== 'physical' &&
+    ctx.isHostileTo(p, target) &&
+    !res.effects.some((eff) => eff.type === 'taunt') &&
+    resolveHostileSpellResist(ctx, p, target, ability);
+  if (instantResisted) {
+    restoreStormcastReservation(ctx, p, stormcastReservation);
+  } else {
+    ctx.runEffects(p, meta, target, res);
+    completeStormcastReservation(ctx, p, stormcastReservation);
+  }
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
   // cloth-capable druid) and toggle-offs fall through here and must not roll.
   if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)
