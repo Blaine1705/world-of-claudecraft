@@ -258,19 +258,24 @@ interface AttributionTargetFixture {
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
-// Re-minted for the Duskfall gate occluder-fade fix merged into release/v0.40.0:
-// renderer.ts wires hollowGates into the shared per-frame occluder update on
-// top of the v0.40.0 renderer bytes, so the composite follows the merged
-// bytes. No capture was retaken.
-// Re-minted for the PR #3470 merge into the release branch: the hollow-gate
-// occluder fade survives on top of the GPU-preparation scheduler renderer
-// bytes, so the composite follows the resolved renderer. No capture was
-// retaken.
-// Re-minted for the PR #3497 merge into the release branch: the #3470
-// renderer bytes combine with the updated entity-view policy leaf. No capture
-// was retaken.
+// Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
+// extraction. The renderer leaf moved; no capture was retaken because both
+// changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
+// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
+// renderer.ts combines mandatory entry admission with the release's rift
+// long-session resource lifecycle changes. No capture was retaken.
+// Re-minted for the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission, and restored rationale): the
+// renderer integration leaf moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '44f7e5150a6c11433849981e2d7299aadce4bbe7a55c68be6bdb5906eb9462b6';
+  '72c6ec186b47e8bf06ac5920ff6909c6c585fcdb5e8ee21e6ced9d80100e0ff9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
