@@ -573,6 +573,36 @@ describeDb('woc market realm scoping against real Postgres', () => {
       expect(await marketDb.salesForSeller(alpha, 'S', 10)).toEqual([]);
     }, 20_000);
 
+    it('the category backfill stamps pre-round rows and the filter then reaches them', async () => {
+      // The dev repro end to end: a row seeded WITHOUT stamps (this suite's
+      // seedListing predates the columns, like the live pre-round listings)
+      // is invisible to a category-filtered browse; one backfill pass stamps
+      // it from the catalog derivation and the same query finds it.
+      const { alpha } = realmPair('cat-backfill');
+      const seller = await seedAccount();
+      const id = await seedListing(alpha, seller, { itemId: 'heroic_kingsbane_last_oath' });
+      const swordQuery = {
+        page: 0,
+        pageSize: 25,
+        quality: null,
+        format: null,
+        category: 'weapon',
+        subcategory: 'sword',
+        itemIds: null,
+        sort: 'ending',
+      } as const;
+      const before = await marketDb.browseListings(alpha, swordQuery);
+      expect(before.rows.map((r) => r.id)).not.toContain(id);
+      const { backfillListingCategoryStamps } = await import('../server/woc_market_backfill');
+      expect(await backfillListingCategoryStamps(marketDb)).toBeGreaterThanOrEqual(1);
+      const after = await marketDb.browseListings(alpha, swordQuery);
+      expect(after.rows.map((r) => r.id)).toContain(id);
+      // Converged for this item: the worklist no longer names it.
+      expect(await marketDb.listingItemIdsMissingCategory()).not.toContain(
+        'heroic_kingsbane_last_oath',
+      );
+    }, 20_000);
+
     it('sellerProfile resolves guild and creation only on the character realm', async () => {
       const { alpha, beta } = realmPair('seller-profile');
       const account = await seedAccount();

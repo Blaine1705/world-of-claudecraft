@@ -386,6 +386,7 @@ import {
 } from './woc_auth_guard_cache';
 import { cachedWocBalance, handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { WocMarketService } from './woc_market';
+import { backfillListingCategoryStamps } from './woc_market_backfill';
 import { createWocMarketCustody, wocEscrowSerializeStats } from './woc_market_custody';
 import {
   PgWocMarketDb,
@@ -3798,7 +3799,19 @@ export async function startServer(): Promise<http.Server> {
     onError: (err) => console.error('[woc_market] sweep pass failed:', err),
     watchdog: wocMarketSweepWatchdog,
   });
-  if (wocMarketConfig().enabled) wocMarketSweep.start();
+  if (wocMarketConfig().enabled) {
+    wocMarketSweep.start();
+    // One-shot: converge the category stamps on rows escrowed before the
+    // round that introduced the columns (derived display data; the pass
+    // reads an empty worklist on every later boot). Fire-and-forget with
+    // its own catch: a failed backfill costs filtered visibility on old
+    // rows, never the boot.
+    void backfillListingCategoryStamps(wocMarketDb)
+      .then((stamped) => {
+        if (stamped > 0) console.log(`[woc_market] category backfill stamped ${stamped} rows`);
+      })
+      .catch((err) => console.error('[woc_market] category backfill failed:', err));
+  }
   // The stuck-custody log beat starts even when the marketplace is DISABLED:
   // an operator who disables the market mid-incident still needs its parked
   // custody states to stay loud, and the read is minutes-scale over indexes

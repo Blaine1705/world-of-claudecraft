@@ -121,6 +121,13 @@ export class FakeWocMarketDb implements WocMarketDb {
   private readonly now: () => number;
 
   private readonly listings = new Map<number, WocListingRow>();
+  /** The category/subcategory stamps beside each listing row (the two table
+   *  columns; WocListingRow itself never carries them). Tests may seed a
+   *  null-category entry to model a pre-stamp legacy row. */
+  readonly listingCategories = new Map<
+    number,
+    { category: string | null; subcategory: string | null }
+  >();
   private readonly bids = new Map<number, BidRec>();
   private readonly settlements = new Map<number, SettlementRec>();
   private readonly sales = new Map<number, WocSaleRow>();
@@ -280,6 +287,12 @@ export class FakeWocMarketDb implements WocMarketDb {
       cancelRequestedAtMs: null,
     };
     this.listings.set(id, row);
+    // The category stamps live beside the row (WocListingRow carries no
+    // category field: the wire never reads it), mirroring the two columns.
+    this.listingCategories.set(id, {
+      category: listing.category,
+      subcategory: listing.subcategory,
+    });
     this.touchListing(id);
     if (listing.directedOfferId !== null) {
       const offer = this.offers.get(listing.directedOfferId);
@@ -2187,6 +2200,31 @@ export class FakeWocMarketDb implements WocMarketDb {
   /** Seeded by tests that drive the seller pane's profile line; absent
    *  names answer null, the renamed-or-deleted arm. Keyed realm\x1fname. */
   readonly sellerProfiles = new Map<string, WocSellerProfile>();
+
+  async listingItemIdsMissingCategory(): Promise<string[]> {
+    const ids = new Set<string>();
+    for (const [id, stamps] of this.listingCategories) {
+      if (stamps.category !== null) continue;
+      const row = this.listings.get(id);
+      if (row) ids.add(row.itemId);
+    }
+    return [...ids];
+  }
+
+  async stampListingCategory(
+    itemId: string,
+    category: string,
+    subcategory: string | null,
+  ): Promise<number> {
+    let stamped = 0;
+    for (const [id, stamps] of this.listingCategories) {
+      if (stamps.category !== null) continue;
+      if (this.listings.get(id)?.itemId !== itemId) continue;
+      this.listingCategories.set(id, { category, subcategory });
+      stamped += 1;
+    }
+    return stamped;
+  }
 
   async sellerProfile(realm: string, sellerName: string): Promise<WocSellerProfile | null> {
     return this.sellerProfiles.get(`${realm}\x1f${sellerName}`) ?? null;

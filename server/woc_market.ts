@@ -864,6 +864,14 @@ export interface WocMarketDb {
   /** The seller pane's public profile line, or null when the name no longer
    *  resolves to a character on this realm. */
   sellerProfile(realm: string, sellerName: string): Promise<WocSellerProfile | null>;
+  /** The category-stamp backfill pair (woc_market_backfill.ts): the item ids
+   *  on rows the stamps predate, and the stamp write itself. */
+  listingItemIdsMissingCategory(): Promise<string[]>;
+  stampListingCategory(
+    itemId: string,
+    category: string,
+    subcategory: string | null,
+  ): Promise<number>;
   /** 'conflict': re-including a voided row while a standing non-excluded row
    *  holds the listing's slot (woc_market_sales_listing_once). */
   setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'>;

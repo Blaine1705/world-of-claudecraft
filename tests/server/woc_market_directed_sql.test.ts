@@ -1234,7 +1234,8 @@ describe('every guard transaction bounds its idle holds', () => {
     const src = stripComments(
       readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
     );
-    expect(src.match(/this\.boundedWrite\(/g) ?? []).toHaveLength(38);
+    // 38 -> 39 with the category-stamp backfill write (stampListingCategory).
+    expect(src.match(/this\.boundedWrite\(/g) ?? []).toHaveLength(39);
     const poolCalls = src.split('this.pool.query(').slice(1);
     // CLASSIFICATION TOTALITY first: the verb test below can only read a
     // statement written INLINE, so a call whose first argument is an

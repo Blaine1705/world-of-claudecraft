@@ -207,8 +207,9 @@ ALTER TABLE woc_market_listings
 -- The Browse filter's category axes, stamped at escrow from the item def
 -- (exchangeBrowseCategory / exchangeBrowseSubcategory in
 -- src/sim/exchange_eligibility.ts): derived display data, never authority.
--- Nullable and unbackfilled BY DECISION: legacy rows predate the stamp and
--- simply sit outside category-filtered results (pre-enable data only).
+-- Nullable so the columns land additively; rows that PREDATE the stamp are
+-- converged by the one-shot boot backfill (woc_market_backfill.ts), so no
+-- listing sits outside the category filters for want of a stamp.
 -- Additive.
 ALTER TABLE woc_market_listings
   ADD COLUMN IF NOT EXISTS category TEXT;
@@ -4512,6 +4513,30 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, sellerName, limit],
     );
     return res.rows.map(toSale);
+  }
+
+  async listingItemIdsMissingCategory(): Promise<string[]> {
+    // The backfill worklist (woc_market_backfill.ts): item ids on rows the
+    // category stamp predates. Deliberately realm-agnostic: the stamp is
+    // derived from the item def alone and identical on every realm, so one
+    // pass converges the whole database.
+    const res = await this.pool.query(
+      `SELECT DISTINCT item_id FROM woc_market_listings WHERE category IS NULL`,
+    );
+    return res.rows.map((r) => String(r.item_id));
+  }
+
+  async stampListingCategory(
+    itemId: string,
+    category: string,
+    subcategory: string | null,
+  ): Promise<number> {
+    const res = await this.boundedWrite(
+      `UPDATE woc_market_listings SET category = $2, subcategory = $3
+        WHERE item_id = $1 AND category IS NULL`,
+      [itemId, category, subcategory],
+    );
+    return res.rowCount ?? 0;
   }
 
   async sellerProfile(realm: string, sellerName: string): Promise<WocSellerProfile | null> {
