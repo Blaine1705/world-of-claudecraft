@@ -39,6 +39,7 @@ import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { duelJustEndedBetween } from '../social/duel';
 import { summonSoulwell } from '../soulwell';
 import {
   abilityScalingPower,
@@ -1820,6 +1821,19 @@ export function runEffects(
       }
       case 'dot': {
         if (!target || target.dead) break;
+        // Any hostile dot must not outlive a duel between its caster and its
+        // target that ended on THIS tick: see duelJustEndedBetween (social/
+        // duel.ts). The reachable case today is a dot riding the SAME cast's
+        // own direct/AoE component (Fireball, Immolate): the direct hit
+        // resolves first in this same effects[] pass, so if IT is the
+        // clamp-and-end blow, endDuel() has already stripped everything the
+        // caster inflicted by the time this case runs, and the dot below
+        // would otherwise be stamped a beat later with no clamp left to
+        // catch it. A pure DoT (Corruption, SW:P) completing or refreshing
+        // on the same ending tick from an unrelated source is equally out of
+        // scope: it was never something the end's own clear was going to
+        // touch, so it correctly gates the same way.
+        if (duelJustEndedBetween(ctx, target, p)) break;
         // Snapshot Spell Power (or Ranged AP) into the per-tick value at cast time,
         // classic-style: the total DoT coefficient spread across its ticks. A DoT
         // that RIDES a direct/AoE nuke (Fireball, Pyroblast, Immolate) does NOT also
