@@ -896,6 +896,19 @@ async function historyHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, { sales: sales.map(saleView) });
 }
 
+/** Character names have no closed vocabulary to screen against (unlike item
+ *  ids), so the shape bound does the whole job: the read is parameterized
+ *  and capped underneath, and the cache arm behind it is a bounded LRU, so a
+ *  junk name costs one indexed empty read, never a poisoned key set. */
+const SELLER_NAME_SHAPE = /^[^\s%_][^%_]{0,31}$/;
+
+async function sellerHistoryHandler(ctx: Ctx): Promise<void> {
+  const name = stringField(ctx.params.name, 32);
+  if (!SELLER_NAME_SHAPE.test(name)) invalid();
+  const sales = await useService().sellerSalesHistory(name);
+  json(ctx.res, 200, { sales: sales.map(saleView) });
+}
+
 // ---------------------------------------------------------------------------
 // Operator handlers (/admin/api surface; legacy admin envelope)
 // ---------------------------------------------------------------------------
@@ -1258,6 +1271,14 @@ export const routes: RouteDef[] = [
     surface: 'api',
     middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     handler: myActivityHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/woc-market/seller-history/:name',
+    surface: 'api',
+    middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
+    meta: NO_OWNER,
+    handler: sellerHistoryHandler,
   },
   {
     method: 'GET',

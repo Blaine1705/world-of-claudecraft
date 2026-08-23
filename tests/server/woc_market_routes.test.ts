@@ -930,6 +930,41 @@ describe('browse query decoding', () => {
     },
   );
 
+  it.each([
+    ['a leading space', ' Lorak'],
+    ['a percent wildcard', 'Lor%ak'],
+    ['an underscore wildcard', 'Lor_ak'],
+    ['over-length', 'x'.repeat(33)],
+  ])('refuses a seller-history name with %s (the shape screen)', async (_label, hostile) => {
+    // Names have no closed vocabulary (unlike item ids), so the shape bound
+    // is the whole screen: the read is parameterized and capped underneath,
+    // and the cache arm behind it is a bounded LRU.
+    service({ sellerSalesHistory: async () => [] });
+    const ctx = readCtx({
+      url: `/api/woc-market/seller-history/${encodeURIComponent(hostile)}`,
+      params: { name: hostile },
+    });
+    await expect(
+      handlerFor('GET', '/api/woc-market/seller-history/:name')(ctx),
+    ).rejects.toMatchObject({ status: 400, code: 'woc_market.invalid_input' });
+  });
+
+  it('serves a seller history and passes the exact name through', async () => {
+    const seen: string[] = [];
+    service({
+      sellerSalesHistory: async (name: string) => {
+        seen.push(name);
+        return [];
+      },
+    });
+    const ctx = readCtx({
+      url: '/api/woc-market/seller-history/Lorak',
+      params: { name: 'Lorak' },
+    });
+    await handlerFor('GET', '/api/woc-market/seller-history/:name')(ctx);
+    expect(seen).toEqual(['Lorak']);
+  });
+
   it('caps the itemIds filter instead of building an unbounded IN list', async () => {
     // Collected into an array rather than a nullable local: assigning inside the
     // callback leaves the narrowed type at `null` for the property read below.
@@ -992,7 +1027,8 @@ describe('the :id parameter', () => {
 describe('the route table shape', () => {
   it('gates every route behind a guard, and every mutation behind a limiter too', () => {
     const api = routes.filter((r) => r.surface === 'api');
-    expect(api).toHaveLength(22);
+    // 22 -> 23 with the seller-history read (the Browse click-through).
+    expect(api).toHaveLength(23);
     for (const route of api) {
       expect(route.middleware?.length ?? 0, `${route.method} ${route.path}`).toBeGreaterThan(0);
     }
@@ -1019,7 +1055,8 @@ describe('the route table shape', () => {
     // a deliberately public one (anyone may bid on anyone's listing) needs the
     // publicRead marker. Neither means the route is silently unguarded.
     const idRoutes = routes.filter((r) => r.surface === 'api' && r.path.includes('/:'));
-    expect(idRoutes).toHaveLength(13);
+    // 13 -> 14 with seller-history/:name (publicRead, the history precedent).
+    expect(idRoutes).toHaveLength(14);
     for (const route of idRoutes) {
       const meta = route.meta as { requireOwned?: unknown; publicRead?: boolean } | undefined;
       expect(

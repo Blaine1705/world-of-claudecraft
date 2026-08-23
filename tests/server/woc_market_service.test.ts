@@ -6757,6 +6757,13 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
     expect(mine[0].priceCents).toBe(5000);
     expect(mine[0].sellerName).toBeTruthy();
     expect(mine[0].buyerName).toBeTruthy();
+
+    // The seller pivot serves the SAME public rows keyed by the seller's
+    // name (the Browse click-through), and an unknown name answers empty
+    // rather than erring: the pane's empty face is a real answer.
+    const bySeller = await h.service.sellerSalesHistory(mine[0].sellerName);
+    expect(bySeller.some((s) => s.listingId === listing.id)).toBe(true);
+    expect(await h.service.sellerSalesHistory('NoSuchSeller')).toEqual([]);
   });
 });
 

@@ -409,6 +409,22 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     expect(plan).toContain('woc_market_sales_listing_once');
   }, 20_000);
 
+  it('the seller click-through history is an ordered index walk on its own composite', async () => {
+    // The whole justification for woc_market_sales_seller (built CONCURRENTLY
+    // post-commit) is that this public read is index-served: equality prefix
+    // (realm, seller_name), created_at DESC supplied by the index, LIMIT-cut,
+    // no sort node. The excluded=false predicate is a heap filter on purpose
+    // (rare operator voids; a partial would be a second structure on an
+    // insert-only provenance table).
+    take();
+    await marketDb.salesForSeller('plans-sales', 'PlanSeller1', 20);
+    const [read] = take();
+    const plan = await planOf(read.text, read.values);
+    expect(plan).not.toMatch(/Seq Scan on woc_market_sales/);
+    expect(plan).toContain('woc_market_sales_seller');
+    expect(plan).not.toMatch(/^\s*-> {2}Sort/m);
+  }, 20_000);
+
   it('the offer expiry and converge probes ride their partials', async () => {
     const realm = 'plans-probes';
     // Enough pending rows that the expiry seek is a real planner decision:

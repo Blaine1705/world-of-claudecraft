@@ -13,6 +13,7 @@ import {
   WOC_MARKET_HISTORY_CACHE_TTL_MS,
   WOC_MARKET_ME_CACHE_MAX_ENTRIES,
   WOC_MARKET_ME_CACHE_TTL_MS,
+  WOC_MARKET_SELLER_CACHE_MAX_ENTRIES,
   WocMarketReadCache,
   wocBrowseCacheKey,
 } from '../../server/woc_market_read_cache';
@@ -224,9 +225,14 @@ describe('bounds', () => {
     // staleness can last between busts; the caps bound realm memory.
     expect(WOC_MARKET_HISTORY_CACHE_TTL_MS).toBe(10_000);
     expect(WOC_MARKET_ME_CACHE_TTL_MS).toBe(2_000);
-    expect(WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES).toBe(128);
+    // 192: sized OVER the closed 144-key browse space (3 shallow pages x 4
+    // sorts x 3 quality values x 4 formats) now that the Browse filters
+    // ship; an LRU evicting inside a closed hot set re-buys OFFSET-walk
+    // reads every cycle (the arithmetic lives at the constant).
+    expect(WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES).toBe(192);
     expect(WOC_MARKET_DETAIL_CACHE_MAX_ENTRIES).toBe(256);
     expect(WOC_MARKET_HISTORY_CACHE_MAX_ENTRIES).toBe(256);
+    expect(WOC_MARKET_SELLER_CACHE_MAX_ENTRIES).toBe(256);
     expect(WOC_MARKET_ME_CACHE_MAX_ENTRIES).toBe(512);
   });
 });

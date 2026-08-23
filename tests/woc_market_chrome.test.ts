@@ -48,16 +48,35 @@ describe('woc_market_chrome: the status builders', () => {
 });
 
 describe('woc_market_chrome: the browse control row', () => {
+  const strip = (over: Partial<Parameters<typeof wocBrowseStripHtml>[0]> = {}): string =>
+    wocBrowseStripHtml({
+      page: 1,
+      hasMore: true,
+      sort: 'newest',
+      quality: null,
+      qualityOptions: ['epic', 'legendary'],
+      format: null,
+      itemQuery: '',
+      ...over,
+    });
+
   it('the sort control LEADS the row, and every hook the window owns survives', () => {
-    const html = wocBrowseStripHtml({ page: 1, hasMore: true, sort: 'newest' });
+    const html = strip();
     // Sort at the very far left (the 15 QA sign-off note): its label opens
-    // the row, before either pager button.
+    // the row, before the filters and either pager button.
     expect(html.indexOf('wm-sort')).toBeLessThan(html.indexOf('page-prev'));
-    // The focus keys and data hooks the restore ladder and the click handler
+    expect(html.indexOf('data-field="sort"')).toBeLessThan(html.indexOf('filter-quality'));
+    // The focus keys and data hooks the restore ladder and the handlers
     // resolve, byte for byte.
     for (const hook of [
       'data-field="sort"',
       'data-focus-key="wm-sort"',
+      'data-field="filter-quality"',
+      'data-focus-key="wm-filter-quality"',
+      'data-field="filter-format"',
+      'data-focus-key="wm-filter-format"',
+      'data-field="filter-item"',
+      'data-focus-key="wm-filter-item"',
       'data-action="page-prev"',
       'data-focus-key="wm-page-prev"',
       'data-action="page-next"',
@@ -69,12 +88,25 @@ describe('woc_market_chrome: the browse control row', () => {
   });
 
   it('disables exactly the pager arm the page position rules out', () => {
-    const first = wocBrowseStripHtml({ page: 0, hasMore: true, sort: 'ending' });
+    const first = strip({ page: 0, hasMore: true, sort: 'ending' });
     expect(/page-prev[^>]*disabled/.test(first)).toBe(true);
     expect(/page-next[^>]*disabled/.test(first)).toBe(false);
-    const last = wocBrowseStripHtml({ page: 3, hasMore: false, sort: 'ending' });
+    const last = strip({ page: 3, hasMore: false, sort: 'ending' });
     expect(/page-prev[^>]*disabled/.test(last)).toBe(false);
     expect(/page-next[^>]*disabled/.test(last)).toBe(true);
+  });
+
+  it('the filters reflect their state: Any when unset, the value when set', () => {
+    const unset = strip();
+    // The Any option is selected on both filter selects while no filter is
+    // applied (the '' value carries the null).
+    expect(/filter-quality[^]*?value="" selected/.test(unset)).toBe(true);
+    const set = strip({ quality: 'legendary', format: 'buy_now', itemQuery: 'sword' });
+    expect(set).toContain('value="legendary" selected');
+    expect(set).toContain('value="buy_now" selected');
+    expect(set).toContain('value="sword"');
+    // The quality vocabulary is the caller's floor-and-up list, in order.
+    expect(set.indexOf('value="epic"')).toBeLessThan(set.indexOf('value="legendary"'));
   });
 });
 
@@ -113,11 +145,12 @@ describe('woc_market_chrome: the exact end time', () => {
       'utf8',
     ).replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '');
     const calls = src.match(/formatDateTime\([^)]*\)/g) ?? [];
-    // Five: the two endsAt readings, the sales-history row date (the detail
-    // pane's recent-sales builder moved here with the hot-path work), and the
+    // Seven: the two endsAt readings, the sales-history row date (the detail
+    // pane's recent-sales builder moved here with the hot-path work), the
     // foot's two rate prints (live time-only; paused dated: the last KNOWN
-    // rate names its day), which followed at the Exchange UX round.
-    expect(calls.length, 'every reading comes from the shared formatter').toBe(5);
+    // rate names its day), the quote face's settlement deadline, and the
+    // seller pane's row date, all landed across the Exchange UX rounds.
+    expect(calls.length, 'every reading comes from the shared formatter').toBe(7);
     expect(calls.filter((c) => c.includes("timeZone: 'UTC'")).length).toBe(1);
     expect(src).toMatch(/utc:\s*formatDateTime\([^)]*timeZone: 'UTC'/);
   });

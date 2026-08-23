@@ -499,6 +499,10 @@ CREATE TABLE IF NOT EXISTS woc_market_sales (
 );
 CREATE INDEX IF NOT EXISTS woc_market_sales_item
   ON woc_market_sales(realm, item_id, created_at DESC);
+-- The seller click-through's read (salesForSeller) rides its own index,
+-- built CONCURRENTLY post-commit (woc_market_sales_seller_index.ts): sales
+-- is keep-forever, so a transactional CREATE INDEX here would grow into a
+-- boot-time write-blocking lock on the money path's insertSale.
 -- Pre-flight repair, same shape as the settlements one above: a historical
 -- double delivery left two non-excluded sale rows for one listing, and the
 -- unique index below would abort the boot on them. Keep the EARLIEST row and
@@ -4474,6 +4478,16 @@ export class PgWocMarketDb implements WocMarketDb {
         WHERE realm = $1 AND item_id = $2 AND excluded = false
         ORDER BY created_at DESC LIMIT $3`,
       [realm, itemId, limit],
+    );
+    return res.rows.map(toSale);
+  }
+
+  async salesForSeller(realm: string, sellerName: string, limit: number): Promise<WocSaleRow[]> {
+    const res = await this.pool.query(
+      `SELECT * FROM woc_market_sales
+        WHERE realm = $1 AND seller_name = $2 AND excluded = false
+        ORDER BY created_at DESC LIMIT $3`,
+      [realm, sellerName, limit],
     );
     return res.rows.map(toSale);
   }

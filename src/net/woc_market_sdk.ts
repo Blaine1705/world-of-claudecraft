@@ -496,6 +496,16 @@ export class WocMarketClient {
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
+  /** A seller's recent completed trades (the Browse seller click-through):
+   *  the same public sale rows as history, pivoted by seller name. */
+  async sellerHistory(name: string): Promise<{ ok: true; sales: WocSaleView[] } | WocMarketFail> {
+    const out = await this.request<{ sales: WocSaleView[] }>(
+      'GET',
+      `/api/woc-market/seller-history/${encodeURIComponent(name)}`,
+    );
+    return out.ok ? { ok: true, ...out.data } : out;
+  }
+
   async createListing(
     req: CreateListingRequest,
   ): Promise<{ ok: true; listing: WocListingView } | WocMarketFail> {

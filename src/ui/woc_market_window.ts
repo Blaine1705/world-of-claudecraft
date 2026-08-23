@@ -48,6 +48,7 @@ import {
   walletBridgeReasonText,
 } from './wallet_bridge_reason_text';
 import { overWalletBalance } from './woc_affordable_core';
+import { wocActivityHtml } from './woc_market_activity_html';
 import {
   wocBidDisclosuresHtml,
   wocBrowseStripHtml,
@@ -57,8 +58,10 @@ import {
   wocLoadingStatusHtml,
   wocMarketBannersHtml,
   wocMarketFootHtml,
+  wocQuoteFaceHtml,
   wocSalesHistoryHtml,
   wocSellEmptyHtml,
+  wocSellerPaneHtml,
   wocSpinnerHtml,
 } from './woc_market_chrome';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
@@ -68,6 +71,8 @@ import {
   wocSettlementFailText,
 } from './woc_market_reason_text';
 import {
+  browseItemFilterIds,
+  browseQualityOptions,
   buildWocMarketView,
   canCancelListing,
   type WocMarketTab,
@@ -223,6 +228,17 @@ export class WocMarketWindow {
   // checkbox and submit would then read the reset value. On a money surface
   // that means listing with the wrong format, duration, or terms flag.
   private sellFormat: 'auction' | 'buy_now' = 'auction';
+  // The Browse filters (the server's own browse params, held here like the
+  // sort so a poll rebuild repaints them and a change survives it). The item
+  // box holds the RAW query; loadBrowse resolves it to ids per request, so a
+  // language switch re-resolves against the names on screen.
+  private filterQuality: string | null = null;
+  private filterFormat: 'auction' | 'buy_now' | null = null;
+  private filterItemQuery = '';
+  /** The seller click-through pane: set replaces the Browse body until Back.
+   *  Null sales = the read is still out (the pane's loading face); failed
+   *  keeps the pane up with the error face and its Back control. */
+  private sellerPane: { name: string; sales: WocSaleView[] | null; failed?: boolean } | null = null;
   /** Sell-tab combobox: the typed query, whether the listbox is open, and the
    *  active (highlighted) option. All painter state, not DOM state: the window
    *  rebuilds from state on the slow poll band, so anything held only in the DOM
@@ -339,6 +355,7 @@ export class WocMarketWindow {
     this.busyLabel = null;
     this.busyGen++;
     this.bidTermsOpen = false;
+    this.sellerPane = null;
   }
 
   /** Full refetch (open, tab change, after a mutation). */
@@ -371,11 +388,26 @@ export class WocMarketWindow {
     const hooks = this.deps.hooks();
     if (!hooks) return;
     if (!silent) this.browseLoading = true;
+    const itemIds = browseItemFilterIds(
+      this.filterItemQuery,
+      (id) => this.itemName(id),
+      Object.keys(ITEMS),
+    );
+    if (itemIds !== null && itemIds.length === 0) {
+      // A real "nothing matches": the SDK omits an empty itemIds param
+      // (an empty filter would read as NO filter and show everything), so
+      // the empty answer paints locally and the server is never asked.
+      if (!silent) this.browseLoading = false;
+      this.browseFailed = false;
+      this.listings = [];
+      this.hasMore = false;
+      return;
+    }
     const out = await hooks.client.browse({
       page: this.page,
-      quality: null,
-      format: null,
-      itemIds: null,
+      quality: this.filterQuality,
+      format: this.filterFormat,
+      itemIds,
       sort: this.sort,
     });
     if (seq !== this.renderSeq) return;
@@ -502,7 +534,14 @@ export class WocMarketWindow {
     // The status read is deliberately not repeated here: it carries the feature
     // and pause configuration, which changes on an operator action rather than
     // on play, and reload() already refreshes it on every open and tab change.
-    void Promise.all([this.loadBrowse(seq, true), this.loadActivity(seq)]).finally(() => {
+    // The item-filtered browse deliberately sits OUT of the background poll:
+    // the service caches only itemIds === null pages, so a filtered re-ask
+    // every beat would be one uncached read per viewer per beat, forever.
+    // The player's own actions (typing, paging, sorting) still refresh a
+    // filtered view, and the countdowns tick from endsAtMs client-side.
+    const browseLeg =
+      this.filterItemQuery.trim() === '' ? this.loadBrowse(seq, true) : Promise.resolve();
+    void Promise.all([browseLeg, this.loadActivity(seq)]).finally(() => {
       // Cleared even on a stale or failed response: leaving it set would wedge
       // the poll off for the rest of the session, which is the failure this
       // whole method exists to prevent.
@@ -810,10 +849,37 @@ export class WocMarketWindow {
 
   /** The shared waiting ring (the trade arm's spinner, one primitive). */
   private browseHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
+    // The seller click-through replaces the whole Browse body until Back:
+    // the pane is class state, so a poll-band rebuild repaints it rather
+    // than dropping the player back into the table mid-read.
+    if (this.sellerPane) {
+      return wocSellerPaneHtml({
+        name: this.sellerPane.name,
+        failed: this.sellerPane.failed === true,
+        sales:
+          this.sellerPane.sales === null
+            ? null
+            : this.sellerPane.sales.map((s) => ({
+                atMs: s.atMs,
+                itemName: this.itemName(s.itemId),
+                buyerName: s.buyerName,
+                usdText: this.usd(s.priceCents),
+              })),
+      });
+    }
     const b = model.browse;
-    // The control row is a chrome builder (sort leading, then the pager,
-    // keyed so a keyboard player keeps their place across the rebuild).
-    const pager = wocBrowseStripHtml({ page: b.page, hasMore: b.hasMore, sort: this.sort });
+    // The control row is a chrome builder (sort leading, then the filters,
+    // then the pager, keyed so a keyboard player keeps their place across
+    // the rebuild). The quality vocabulary is the realm floor and up.
+    const pager = wocBrowseStripHtml({
+      page: b.page,
+      hasMore: b.hasMore,
+      sort: this.sort,
+      quality: this.filterQuality,
+      qualityOptions: browseQualityOptions(this.status?.ok ? this.status.qualityFloor : 'epic'),
+      format: this.filterFormat,
+      itemQuery: this.filterItemQuery,
+    });
     if (b.failed) {
       return `<div class="wm-browse">${pager}${wocErrorStatusHtml(t('hudChrome.wocMarket.browseError'))}</div>`;
     }
@@ -881,7 +947,12 @@ export class WocMarketWindow {
           `<td><button type="button" class="wm-row-open" data-listing="${r.id}" ` +
           `data-focus-key="wm-row-${r.id}" aria-label="${esc(t('hudChrome.wocMarket.rowOpenAria', { item: this.itemName(r.itemId) }))}">` +
           `${this.itemCellHtml(r.itemId, r.quality, `browse:${r.id}`, r.instance)}</button>${mine}${locked}</td>` +
-          `<td>${esc(r.sellerName)}</td>` +
+          // The seller cell is the click-through into their recent trades
+          // (its own data-action, so closest() takes it before the row).
+          `<td><button type="button" class="wm-seller-link" data-action="seller-view" ` +
+          `data-seller="${esc(r.sellerName)}" aria-label="${esc(
+            t('hudChrome.wocMarket.sellerLinkAria', { name: r.sellerName }),
+          )}">${esc(r.sellerName)}</button></td>` +
           `<td><span${r.currentCents === null ? '' : usdTip(r.currentCents, 'bidequiv')}>${currentCell}</span>${badge}</td>` +
           `<td>${r.buyNowCents === null ? '' : `<span${usdTip(r.buyNowCents, 'buyequiv')}>${esc(this.usd(r.buyNowCents))}</span>`}</td>` +
           // The countdown is one truncated unit; the exact end time (UTC and
@@ -1256,292 +1327,21 @@ export class WocMarketWindow {
     return `<div class="wm-sell"><h3>${esc(t('hudChrome.wocMarket.sellTitle'))}</h3><div class="wm-sell-list">${picker}</div>${lockedNote}${form}</div>`;
   }
 
+  /** The My Activities tab renders through its own pure builder
+   *  (woc_market_activity_html.ts): the window hands over its formatters,
+   *  tooltip binder and busy flag and paints the returned markup. */
   private activityHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
-    const a = model.activity;
-    if (!a || (a.listings.length === 0 && a.bids.length === 0 && a.settlements.length === 0)) {
-      return `<div class="wm-status" role="status">${esc(t('hudChrome.wocMarket.activityEmpty'))}</div>`;
-    }
-    const listingStatus = (status: string, resolution: string | null): string => {
-      if (status !== 'closed') {
-        return t(
-          status === 'settling' || status === 'ending'
-            ? 'hudChrome.wocMarket.listingStatusSettling'
-            : 'hudChrome.wocMarket.listingStatusActive',
-        );
-      }
-      switch (resolution) {
-        case 'sold':
-          return t('hudChrome.wocMarket.listingStatusSold');
-        case 'cancelled':
-          return t('hudChrome.wocMarket.listingStatusCancelled');
-        case 'suspended':
-          return t('hudChrome.wocMarket.listingStatusSuspended');
-        case 'no_bids':
-        case 'reserve_not_met':
-        case 'unsettled':
-          return t('hudChrome.wocMarket.listingStatusUnsold');
-        default:
-          return t('hudChrome.wocMarket.listingStatusReturned');
-      }
-    };
-    const bidStatusKey = (status: string): TranslationKey => {
-      switch (status) {
-        case 'pending_bond':
-          return 'hudChrome.wocMarket.bidStatusPending';
-        case 'active':
-          return 'hudChrome.wocMarket.bidStatusActive';
-        case 'outbid':
-          return 'hudChrome.wocMarket.bidStatusOutbid';
-        case 'won':
-          return 'hudChrome.wocMarket.bidStatusWon';
-        case 'defaulted':
-          return 'hudChrome.wocMarket.bidStatusDefaulted';
-        case 'cancelled':
-          return 'hudChrome.wocMarket.bidStatusCancelled';
-        default:
-          return 'hudChrome.wocMarket.bidStatusLapsed';
-      }
-    };
-    const settlementKey = (state: string): TranslationKey => {
-      switch (state) {
-        case 'confirming':
-          return 'hudChrome.wocMarket.settlementConfirming';
-        // Decided money whose delivery has not finished: not "confirming"
-        // any more (the chain answered), not "delivered" yet (the trade arm
-        // says the same for the same server state).
-        case 'confirmed':
-        case 'delivering':
-          return 'hudChrome.wocMarket.settlementConfirmedDelivering';
-        // The operator-review park: the payment is being verified by hand.
-        // Deliberately NOT the default arm ('Payment due' would invite a
-        // second payment for money that may already have landed).
-        case 'review':
-          return 'hudChrome.wocMarket.settlementReview';
-        case 'delivered':
-          return 'hudChrome.wocMarket.settlementDelivered';
-        case 'expired':
-          return 'hudChrome.wocMarket.settlementExpired';
-        case 'failed':
-          return 'hudChrome.wocMarket.settlementFailed';
-        default:
-          return 'hudChrome.wocMarket.settlementOffered';
-      }
-    };
-    // One row grammar for the three lists: item | amount | status (+ chips and
-    // countdowns) | controls, so amounts and statuses line up down the tab.
-    const row = (
-      item: string,
-      amount: string,
-      status: string,
-      actions: string,
-      tail = '',
-    ): string =>
-      `<li><span class="wm-act-item">${item}</span>` +
-      `<span class="wm-act-amount">${amount}</span>` +
-      `<span class="wm-act-status">${status}</span>` +
-      `<span class="wm-act-actions">${actions}</span>${tail}</li>`;
-    const listings = a.listings
-      .map((l) => {
-        // The two state booleans the wire carries for exactly this surface:
-        // without them a reloading seller cannot tell an accepted cancel
-        // intent from a plainly active listing, or a directed sale minted by
-        // a trade offer from a public auction.
-        const cancelBadge = l.cancelPending
-          ? `<span class="wm-inline-busy">${wocSpinnerHtml()}${esc(t('hudChrome.wocMarket.activityCancelPending'))}</span>`
-          : '';
-        const directedBadge = l.directed
-          ? `<span class="wm-mine">${esc(t('hudChrome.wocMarket.activityDirected'))}</span>`
-          : '';
-        // The seller's own cancel, HERE where their listings actually render:
-        // a directed listing never passes through the browse detail pane (the
-        // only prior cancel surface), so its seller had no way to reach the
-        // cancel the PRD promised. Same gate as the browse pane (active and
-        // unbid; the server's guards decide the rest, including the
-        // cancel-pending conversion on a locked window).
-        const cancel = canCancelListing(l)
-          ? `<button type="button" data-action="cancel-listing" data-listing="${l.id}" ${this.busy ? 'disabled' : ''} ` +
-            `aria-label="${esc(t('hudChrome.wocMarket.cancelAria', { item: this.itemName(l.itemId) }))}" data-focus-key="wm-activity-cancel-${l.id}">` +
-            `${esc(t('hudChrome.wocMarket.cancelButton'))}</button>`
-          : '';
-        return row(
-          this.itemCellHtml(l.itemId, l.quality, `activity:${l.id}`, l.instance),
-          // A sold row names the price the sale CLOSED at (the sales table's
-          // figure): a buy-now that outran the bidding sells above the last
-          // bid, and currentCents would show that losing bid forever. Live
-          // rows (and older servers that send no soldCents) keep the
-          // current-else-start price.
-          esc(
-            this.usd(
-              l.resolution === 'sold' && l.soldCents !== null
-                ? l.soldCents
-                : l.currentCents === null
-                  ? l.startCents
-                  : l.currentCents,
-            ),
-          ),
-          `<span>${esc(listingStatus(l.status, l.resolution))}</span>${directedBadge}${cancelBadge}`,
-          cancel,
-        );
-      })
-      .join('');
-    const bids = a.bids
-      .map((b) => {
-        const itemName = b.itemId != null && b.itemId !== '' ? this.itemName(b.itemId) : null;
-        // A submitted bond that the chain has not answered yet shows PROGRESS,
-        // never the pay control. `busy` alone could not carry this: it covers
-        // only a call in flight, and it clears the moment the server accepts the
-        // signature, while the bid legitimately stays pending_bond for as long
-        // as confirmation takes. That gap is exactly when a second press would
-        // send a second payment for a bond already paid.
-        const payBond =
-          b.status !== 'pending_bond'
-            ? ''
-            : b.bondConfirming
-              ? // The SHORT key, shared with the busy banner: a permanent
-                // inline label on every affected row must stay terse (the
-                // first-accepted toast names WHICH pending it is instead).
-                `<span class="wm-inline-busy" role="status">${wocSpinnerHtml()}${esc(t('hudChrome.wocMarket.confirming'))}</span>`
-              : `<button type="button" data-action="pay-bond" data-bid="${b.id}" ${this.busy ? 'disabled' : ''} ` +
-                // The accessible name names the item when the wire carries it
-                // (H13 put the item on the row), the listing id otherwise.
-                `aria-label="${esc(
-                  itemName === null
-                    ? t('hudChrome.wocMarket.bidBondPayAria', {
-                        id: formatNumber(b.listingId, { useGrouping: false }),
-                      })
-                    : t('hudChrome.wocMarket.bidBondPayItemAria', {
-                        bond: this.usd(b.bondCents),
-                        item: itemName,
-                      }),
-                )}" data-focus-key="wm-bond-${b.id}">` +
-                `${esc(t('hudChrome.wocMarket.bidBondPay'))}</button>`;
-        // The pay surface names its figure: the bond due beside 'Awaiting
-        // bond', and its quote's remaining time while one is open (both are
-        // on the model; the row used to render neither).
-        const bondLine =
-          b.status === 'pending_bond'
-            ? `<span class="wm-note">${esc(t('hudChrome.wocMarket.quoteBondFor', { usd: this.usd(b.bondCents) }))}</span>`
-            : '';
-        const bondCountdown =
-          b.status === 'pending_bond' &&
-          b.bondQuoteRemainingMs !== null &&
-          b.bondQuoteRemainingMs > 0
-            ? `<span class="wm-note">${esc(t('hudChrome.wocMarket.quoteExpires', { duration: this.countdown(b.bondQuoteRemainingMs / 1000) }))}</span>`
-            : '';
-        // Name WHAT the bid is for (H13: pay rows never named the item). The
-        // wire ships the joined item id; a null (older server, pruned
-        // listing) renders the row as before rather than an unknown-item box.
-        const item =
-          b.itemId != null && b.itemId !== ''
-            ? this.itemCellHtml(
-                b.itemId,
-                ITEMS[b.itemId]?.quality ?? 'common',
-                `activity:bid:${b.id}`,
-              )
-            : '';
-        return row(
-          item,
-          esc(this.usd(b.amountCents)),
-          `<span>${esc(t(bidStatusKey(b.status)))}</span>${bondLine}${bondCountdown}`,
-          payBond,
-        );
-      })
-      .join('');
-    const settlements = a.settlements
-      .map((s) => {
-        const itemName = s.itemId != null && s.itemId !== '' ? this.itemName(s.itemId) : null;
-        const payable = s.state === 'offered' || s.state === 'failed';
-        const pay = payable
-          ? `<button type="button" class="wm-primary" data-action="pay-settlement" data-settlement="${s.id}" ${this.busy ? 'disabled' : ''} ` +
-            `aria-label="${esc(
-              itemName === null
-                ? t('hudChrome.wocMarket.activityPayNowAria', {
-                    id: formatNumber(s.id, { useGrouping: false }),
-                  })
-                : t('hudChrome.wocMarket.activityPayNowItemAria', {
-                    usd: this.usd(s.amountCents),
-                    item: itemName,
-                  }),
-            )}" data-focus-key="wm-settle-${s.id}">` +
-            `${esc(t('hudChrome.wocMarket.activityPayNow'))}</button>`
-          : '';
-        // The countdown is one truncated unit; the exact deadline (UTC and
-        // local) rides its tooltip.
-        const deadline = payable
-          ? `<span class="wm-note"${this.tip(
-              `due:${s.id}`,
-              t('hudChrome.wocMarket.dueAt', {
-                utc: formatDateTime(s.deadlineAtMs, {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                  timeZone: 'UTC',
-                }),
-                local: formatDateTime(s.deadlineAtMs, { dateStyle: 'medium', timeStyle: 'short' }),
-              }),
-            )}>${esc(t('hudChrome.wocMarket.activityDeadline', { duration: this.countdown(s.deadlineRemainingMs / 1000) }))}</span>`
-          : '';
-        const quoteCountdown =
-          payable && s.quoteRemainingMs !== null && s.quoteRemainingMs > 0
-            ? `<span class="wm-note">${esc(t('hudChrome.wocMarket.quoteExpires', { duration: this.countdown(s.quoteRemainingMs / 1000) }))}</span>`
-            : '';
-        // WHY it failed: the view core owns the gate (failDetailReason is
-        // non-null on failed rows only; the expired-row exclusion is decided
-        // and tested there), the painter only renders its verdict. The WHY
-        // sentence takes its own row under the figures.
-        const failDetail =
-          s.failDetailReason != null
-            ? `<span class="wm-fail-why">${esc(wocSettlementFailText(s.failDetailReason) ?? '')}</span>`
-            : '';
-        // Item identity on the payment row itself (H13), same shape as the
-        // bid rows above.
-        const item =
-          s.itemId != null && s.itemId !== ''
-            ? this.itemCellHtml(
-                s.itemId,
-                ITEMS[s.itemId]?.quality ?? 'common',
-                `activity:settle:${s.id}`,
-              )
-            : '';
-        return row(
-          item,
-          esc(this.usd(s.amountCents)),
-          `<span>${esc(t(settlementKey(s.state)))}</span>${deadline}${quoteCountdown}`,
-          pay,
-          failDetail,
-        );
-      })
-      .join('');
-    // The strikes / suspension notice LEADS the tab: it is the one state that
-    // explains every refused control under it, so it never sits under 150
-    // rows. The count carries the definition of a strike and the ladder it
-    // climbs, on hover and focus.
-    const strikes =
-      a.strikes > 0
-        ? `<p class="wm-strikes"${this.tip('strikes', t('hudChrome.wocMarket.strikesTip'))}>${svgIcon('alert')}<span>${esc(t('hudChrome.wocMarket.activityStrikes', { count: formatNumber(a.strikes) }))}</span></p>` +
-          (a.suspendedRemainingMs !== null
-            ? `<p class="wm-strikes">${svgIcon('alert')}<span>${esc(t('hudChrome.wocMarket.activitySuspended', { duration: this.countdown(a.suspendedRemainingMs / 1000) }))}</span></p>`
-            : '')
-        : '';
-    // A section with nothing in it says so, instead of a heading over air.
-    const section = (title: TranslationKey, items: string, emptyKey: TranslationKey): string =>
-      `<h3>${esc(t(title))}</h3>` +
-      (items === '' ? `<p class="wm-activity-empty">${esc(t(emptyKey))}</p>` : `<ul>${items}</ul>`);
-    return (
-      `<div class="wm-activity">` +
-      strikes +
-      section(
-        'hudChrome.wocMarket.activityListings',
-        listings,
-        'hudChrome.wocMarket.activityNoListings',
-      ) +
-      section('hudChrome.wocMarket.activityBids', bids, 'hudChrome.wocMarket.activityNoBids') +
-      section(
-        'hudChrome.wocMarket.activitySettlements',
-        settlements,
-        'hudChrome.wocMarket.activityNoSettlements',
-      ) +
-      `</div>`
-    );
+    return wocActivityHtml(model.activity, {
+      busy: this.busy,
+      itemName: (id) => this.itemName(id),
+      // bind, not a wrapper call: the key-discipline scan checks every
+      // itemCellHtml CALL carries a literal namespaced key, and the keys for
+      // these rows are literals inside the builder.
+      itemCell: this.itemCellHtml.bind(this),
+      usd: (c) => this.usd(c),
+      countdown: (s) => this.countdown(s),
+      tip: (slot, text) => this.tip(slot, text),
+    });
   }
 
   private quoteHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
@@ -1550,7 +1350,6 @@ export class WocMarketWindow {
     void model;
     const q = pending.quote;
     const remainingMs = q.expiresAtMs === null ? 0 : Math.max(0, q.expiresAtMs - Date.now());
-    const expired = remainingMs <= 0;
     // With no cached USD label, the token legs below carry the amount rather
     // than a fabricated $0.00. A bond names its listing's item when the
     // painter knows it (a retry face after a declined wallet still says which
@@ -1569,50 +1368,44 @@ export class WocMarketWindow {
               item: this.itemName(pending.itemId),
               usd: this.usd(pending.usdCents),
             });
-    // The total leads at full weight; the fee legs name what each share is.
-    const legs =
-      (q.amount
-        ? `<p class="wm-quote-total">${esc(t('hudChrome.wocMarket.quoteTotal', { tokens: this.tokens(q.amount.tokens) }))}</p>`
-        : '') +
-      (q.seller
-        ? `<p>${esc(t('hudChrome.wocMarket.quoteSeller', { tokens: this.tokens(q.seller.tokens) }))}</p>`
-        : '') +
-      (q.burn
-        ? `<p>${esc(t('hudChrome.wocMarket.quoteBurn', { tokens: this.tokens(q.burn.tokens) }))}</p>`
-        : '') +
-      (q.treasury
-        ? `<p>${esc(t('hudChrome.wocMarket.quoteTreasury', { tokens: this.tokens(q.treasury.tokens) }))}</p>`
-        : '');
-    const countdown = expired
-      ? `<p class="wm-quote-expired">${svgIcon('alert')}<span>${esc(t('hudChrome.wocMarket.quoteExpired'))}</span></p>`
-      : `<p>${esc(t('hudChrome.wocMarket.quoteExpires', { duration: formatDuration(Math.ceil(remainingMs / 1000)) }))}</p>`;
-    // The claim's own payment deadline on a settlement quote (the trade arm's
-    // quote face shows its twin): 'Not now' keeps it running.
-    const dueLine =
-      pending.kind === 'settlement' && pending.deadlineAtMs !== null
-        ? `<p class="wm-note">${esc(
-            t('hudChrome.wocMarket.paymentDueAt', {
-              time: formatDateTime(pending.deadlineAtMs, { timeStyle: 'short' }),
-            }),
-          )}</p>`
-        : '';
-    return (
-      `<div class="wm-quote"><h3>${esc(t('hudChrome.wocMarket.quoteTitle'))}</h3>` +
-      `<p>${esc(title)}</p>${legs}${countdown}${dueLine}` +
-      // On the quote face the amount IS fixed until the quote expires: the
-      // note says that, not that a fresh quote may still move it.
-      `<p class="wm-note">${esc(t('hudChrome.wocMarket.quoteFixedNote'))}</p>` +
-      `<div class="wm-quote-actions">` +
-      `<button type="button" class="wm-primary" data-action="quote-sign" ${expired || this.busy ? 'disabled' : ''} data-focus-key="wm-quote-sign">${esc(
-        t('hudChrome.wocMarket.quoteSign'),
-      )}</button>` +
-      `<button type="button" data-action="quote-refresh" ${this.busy ? 'disabled' : ''} data-focus-key="wm-quote-refresh">${esc(
-        t('hudChrome.wocMarket.quoteRefresh'),
-      )}</button>` +
-      `<button type="button" data-action="quote-cancel" ${this.busy ? 'disabled' : ''} data-focus-key="wm-quote-cancel">${esc(
-        t('hudChrome.wocMarket.quoteCancel'),
-      )}</button></div></div>`
-    );
+    // The face itself is the chrome builder's; this painter resolves the
+    // title, the token legs and the clock (chrome holds none of them).
+    return wocQuoteFaceHtml({
+      title,
+      amountTokens: q.amount ? this.tokens(q.amount.tokens) : null,
+      sellerTokens: q.seller ? this.tokens(q.seller.tokens) : null,
+      burnTokens: q.burn ? this.tokens(q.burn.tokens) : null,
+      treasuryTokens: q.treasury ? this.tokens(q.treasury.tokens) : null,
+      remainingMs,
+      // The claim's own payment deadline on a settlement quote (the trade
+      // arm's quote face shows its twin): 'Not now' keeps it running.
+      dueAtMs: pending.kind === 'settlement' ? pending.deadlineAtMs : null,
+      busy: this.busy,
+    });
+  }
+
+  /** Open the seller click-through pane and fetch their recent trades. The
+   *  renderSeq guard is selectListing's: a reload started after this fetch
+   *  went out owns the epoch, and the stale answer drops. */
+  private openSellerPane(name: string): void {
+    if (name === '') return;
+    // Re-entry guard: the same seller with a read already outstanding is a
+    // no-op, so rapid clicks cannot burn the shared read bucket (the
+    // awaiting-chain payment poll spends from the same per-minute allowance).
+    if (this.sellerPane?.name === name && this.sellerPane.sales === null) return;
+    this.sellerPane = { name, sales: null };
+    this.render();
+    void (async () => {
+      const hooks = this.deps.hooks();
+      if (!hooks) return;
+      const seq = this.renderSeq;
+      const out = await hooks.client.sellerHistory(name);
+      if (seq !== this.renderSeq) return;
+      // Back (or a different seller) won the race: this answer has no home.
+      if (this.sellerPane?.name !== name) return;
+      this.sellerPane = out.ok ? { name, sales: out.sales } : { name, sales: null, failed: true };
+      this.render();
+    })();
   }
 
   // -------------------------------------------------------------------------
@@ -2013,6 +1806,30 @@ export class WocMarketWindow {
         this.page = 0;
         void this.reloadBrowseOnly();
       }
+      return;
+    }
+    // The Browse filters, on the sort's own pattern: every change restarts
+    // at page one, because the old page number indexed a different result
+    // set. The item box rides the change event (blur or Enter), never the
+    // input event: one browse request per settled query, not per keystroke.
+    if (field === 'filter-quality') {
+      const value = (target as HTMLSelectElement).value;
+      this.filterQuality = value === '' ? null : value;
+      this.page = 0;
+      void this.reloadBrowseOnly();
+      return;
+    }
+    if (field === 'filter-format') {
+      const value = (target as HTMLSelectElement).value;
+      this.filterFormat = value === 'auction' || value === 'buy_now' ? value : null;
+      this.page = 0;
+      void this.reloadBrowseOnly();
+      return;
+    }
+    if (field === 'filter-item') {
+      this.filterItemQuery = (target as HTMLInputElement).value;
+      this.page = 0;
+      void this.reloadBrowseOnly();
     }
   }
 
@@ -2100,6 +1917,15 @@ export class WocMarketWindow {
         // The shared connect flow owns everything from here (connect, verify,
         // link); the poll picks the linked state up and retires the banner.
         this.deps.openWallet();
+        break;
+      case 'seller-view':
+        this.openSellerPane(target.getAttribute('data-seller') ?? '');
+        break;
+      case 'seller-back':
+        // Back restores the exact browse the player left: page, sort and
+        // filters all live on the class, so dropping the pane is enough.
+        this.sellerPane = null;
+        this.render();
         break;
       default:
         break;

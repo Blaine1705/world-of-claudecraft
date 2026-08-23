@@ -24,7 +24,10 @@ auction, and only the token count at settlement moves with the market.
 
 Gold trading stays on the existing World Market (`src/sim/market.ts`),
 untouched. Gold and $WOC listings are separate books; the game provides no
-Gold/$WOC or Claudium/$WOC exchange.
+Gold/$WOC or Claudium/$WOC exchange. A direct Gold/$WOC lane was considered
+during the 2026-08 dev-test round and DECIDED AGAINST for now: the
+separate-books rule stands, and any future revisit is a deliberate PRD
+change, not a gap.
 
 ## Why it's a flywheel
 

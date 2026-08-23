@@ -30,6 +30,7 @@ import {
 import { createWocMarketDeliveryArms, type WocMarketDeliveryArms } from './woc_market_delivery';
 import { logSafe, WocWireDriftWarner } from './woc_market_drift_warn';
 import { pruneWocLocalLedgers, wocBackedOffIds, wocParkRow } from './woc_market_local_ledgers';
+import type { WocStuckCustodyClasses } from './woc_market_monitor_types';
 import type { WocMarketReadCache } from './woc_market_read_cache';
 import { WOC_MARKET_BROWSE_CACHE_MAX_PAGE } from './woc_market_read_cache';
 import {
@@ -828,6 +829,7 @@ export interface WocMarketDb {
    *  that index); this stays the primitive for corrections and tests. */
   insertSale(args: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>): Promise<number>;
   salesForItem(realm: string, itemId: string, limit: number): Promise<WocSaleRow[]>;
+  salesForSeller(realm: string, sellerName: string, limit: number): Promise<WocSaleRow[]>;
   /** 'conflict': re-including a voided row while a standing non-excluded row
    *  holds the listing's slot (woc_market_sales_listing_once). */
   setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'>;
@@ -986,72 +988,12 @@ export interface WocCustodyRefState {
   mailIntent: boolean;
 }
 
-/** The stuck classes the ops monitor surfaces (stuckCustodyReadout).
- *  Counts SATURATE at the readout's countCap; saturated makes the "cap or
- *  more" case explicit on the wire. Samples are separately capped. */
-export interface WocStuckCustodyClasses {
-  unbookedClaims: {
-    count: number;
-    saturated: boolean;
-    sample: {
-      custodyRef: string;
-      claimedAtMs: number;
-      grantCharacterId: number | null;
-      mailIntent: boolean;
-    }[];
-  };
-  stuckDelivering: {
-    count: number;
-    saturated: boolean;
-    /** updatedAtMs is the class's age signal (stamped at the delivering
-     *  claim); createdAtMs is kept for provenance (when the settlement
-     *  itself began). */
-    sample: { id: number; listingId: number; createdAtMs: number; updatedAtMs: number }[];
-  };
-  undisposedListings: {
-    count: number;
-    saturated: boolean;
-    sample: { id: number; resolution: string | null; updatedAtMs: number }[];
-  };
-  /** Settlements the overdue sweep parked in 'review' (the H15 bound): every
-   *  row is operator-actionable NOW, so this class carries no age filter.
-   *  Operator semantics: verify the payment reference on chain (the service
-   *  release tooling), then transitionSettlement review -> confirmed (paid:
-   *  delivery resumes) or review -> failed (unpaid: the overdue default pass
-   *  takes it from there). updatedAtMs is when the row entered review. */
-  reviewSettlements: {
-    count: number;
-    saturated: boolean;
-    sample: { id: number; listingId: number; createdAtMs: number; updatedAtMs: number }[];
-  };
-  /** Paid-but-undecided bonds (pending_bond with a recorded signature) older
-   *  than the same H15-scale bound: the poll still re-checks them, but past
-   *  this age the chain verdict is overdue and an operator should verify the
-   *  signature by hand (the exit paths are the chain deciding, or an operator
-   *  resolving via the service tooling; there is deliberately no automatic
-   *  time-based void, because the money may have landed). */
-  stuckBonds: {
-    count: number;
-    saturated: boolean;
-    /** stuckSinceMs is the class's AGE axis (the signature recording,
-     *  placed_at only for legacy rows): compute stuck age from it, never
-     *  from placedAtMs, which is placement provenance and always older. */
-    sample: {
-      id: number;
-      listingId: number;
-      account: number;
-      placedAtMs: number;
-      stuckSinceMs: number;
-    }[];
-  };
-}
-
-/** What the monitor serves: the classes plus the refresh stamp. The cached
- *  read stale-serves through a DB outage, so asOfMs is what lets a consumer
- *  (and the log beat) tell a fresh readout from an hour-old one. */
-export interface WocStuckCustodyReadout extends WocStuckCustodyClasses {
-  asOfMs: number;
-}
+// The stuck-custody monitor vocabulary lives in woc_market_monitor_types.ts
+// (the ratchet's sibling pattern); the pair keeps this import path.
+export type {
+  WocStuckCustodyClasses,
+  WocStuckCustodyReadout,
+} from './woc_market_monitor_types';
 
 /** The one bridge into the live Sim (game.ts wiring). Every method is
  *  synchronous-in-memory except persistMailParcel, which books at most once
@@ -1554,6 +1496,21 @@ export class WocMarketService {
     // history entries.
     return this.deps.readCache && limit === 20 && Object.hasOwn(ITEMS, itemId)
       ? this.deps.readCache.sales(itemId, refresh)
+      : refresh();
+  }
+
+  /** A seller's recent completed trades (the Browse seller click-through).
+   *  Seller names are FREE TEXT off the wire, so unlike the item read there
+   *  is no vocabulary to gate caching on: the route screens shape, and the
+   *  cache arm is its own bounded LRU whose worst case is churn, never an
+   *  unbounded key set. Names resolve case-sensitively: the stored
+   *  seller_name is the character's exact name, and the client always sends
+   *  a name it read off a listing row. */
+  async sellerSalesHistory(sellerName: string, limit = 20): Promise<WocSaleRow[]> {
+    if (!this.cfg.enabled) return [];
+    const refresh = () => this.deps.db.salesForSeller(this.cfg.realm, sellerName, limit);
+    return this.deps.readCache && limit === 20
+      ? this.deps.readCache.sellerSales(sellerName, refresh)
       : refresh();
   }
 

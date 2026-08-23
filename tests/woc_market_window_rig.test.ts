@@ -137,6 +137,7 @@ interface FakeClient {
     >;
     estimate: () => Promise<WocEstimateView | null>;
     history: () => Promise<{ ok: true; sales: WocSaleView[] } | { ok: false; code: string }>;
+    sellerHistory: () => Promise<{ ok: true; sales: WocSaleView[] } | { ok: false; code: string }>;
     me: () => Promise<{ ok: true; activity: WocActivityView } | { ok: false; code: string }>;
     stepUpChallenge: () => Promise<
       { ok: true; challenge: WocStepUpChallenge } | { ok: false; code: string }
@@ -176,6 +177,19 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
       split: { sellerCents: 90, burnCents: 3, treasuryCents: 7 },
     }),
     history: async () => ({ ok: true, sales: [] }),
+    sellerHistory: async () => ({
+      ok: true,
+      sales: [
+        {
+          id: 1,
+          itemId: EPIC,
+          priceCents: 2500,
+          sellerName: 'Aurelia',
+          buyerName: 'Borin',
+          atMs: NOW - 60_000,
+        },
+      ],
+    }),
     me: async () => ({ ok: true, activity: EMPTY_ACTIVITY }),
     stepUpChallenge: async () => ({
       ok: true,
@@ -196,6 +210,7 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
     detail: record('detail'),
     estimate: record('estimate'),
     history: record('history'),
+    sellerHistory: record('sellerHistory'),
     me: record('me'),
     stepUpChallenge: record('stepUpChallenge'),
     createListing: record('createListing'),
@@ -401,6 +416,84 @@ describe('WocMarketWindow live rig: open, browse, select', () => {
     await flush();
     expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
     expect(r.root.querySelector('button[data-action="connect-wallet"]')).toBeNull();
+  });
+
+  it('a filter change restarts at page one and rides the browse request', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    const quality = q<HTMLSelectElement>(r.root, 'select[data-field="filter-quality"]');
+    quality.value = 'legendary';
+    quality.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    expect(
+      r.fake.calls.some(
+        (c) =>
+          c.startsWith('browse:') && c.includes('"quality":"legendary"') && c.includes('"page":0'),
+      ),
+    ).toBe(true);
+    const format = q<HTMLSelectElement>(r.root, 'select[data-field="filter-format"]');
+    format.value = 'buy_now';
+    format.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    expect(
+      r.fake.calls.some((c) => c.startsWith('browse:') && c.includes('"format":"buy_now"')),
+    ).toBe(true);
+    // The rebuilt selects keep showing the applied filters (class state,
+    // never DOM state, the poll-rebuild rule). Asserted on the selected
+    // ATTRIBUTE the markup carries: happy-dom's select.value does not honor
+    // parsed selected attributes, while real browsers do.
+    expect(
+      q(r.root, 'select[data-field="filter-quality"] option[value="legendary"]').hasAttribute(
+        'selected',
+      ),
+    ).toBe(true);
+    expect(
+      q(r.root, 'select[data-field="filter-format"] option[value="buy_now"]').hasAttribute(
+        'selected',
+      ),
+    ).toBe(true);
+  });
+
+  it('the item search resolves names to ids on change; a no-match query paints empty and never asks', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    const input = q<HTMLInputElement>(r.root, 'input[data-field="filter-item"]');
+    input.value = NAME_OF(EPIC);
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    expect(r.fake.calls.some((c) => c.startsWith('browse:') && c.includes(`"${EPIC}"`))).toBe(true);
+    // A query matching nothing paints the empty face locally: the SDK omits
+    // an empty itemIds param (which would read as NO filter and show
+    // everything), so the server is never asked.
+    const asked = r.fake.calls.filter((c) => c.startsWith('browse:')).length;
+    const rebuilt = q<HTMLInputElement>(r.root, 'input[data-field="filter-item"]');
+    rebuilt.value = 'zzz no such item zzz';
+    rebuilt.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    expect(r.fake.calls.filter((c) => c.startsWith('browse:')).length).toBe(asked);
+    expect(r.root.querySelector('.wm-table')).toBeNull();
+  });
+
+  it('the seller cell opens their recent trades and Back restores the browse', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, 'button[data-action="seller-view"]').click();
+    await flush();
+    expect(r.fake.calls.some((c) => c.startsWith('sellerHistory:') && c.includes('Aurelia'))).toBe(
+      true,
+    );
+    const pane = q(r.root, '.wm-seller-pane');
+    expect(pane.textContent).toContain('Aurelia');
+    expect(pane.textContent).toContain(NAME_OF(EPIC));
+    expect(pane.textContent).toContain('Borin');
+    // Back restores the table: page, sort and filters all live on the class.
+    q<HTMLButtonElement>(r.root, 'button[data-action="seller-back"]').click();
+    await flush();
+    expect(r.root.querySelector('.wm-seller-pane')).toBeNull();
+    expect(r.root.querySelector('.wm-table')).not.toBeNull();
   });
 
   it('page-next asks the server for the next page and page-prev walks back', async () => {

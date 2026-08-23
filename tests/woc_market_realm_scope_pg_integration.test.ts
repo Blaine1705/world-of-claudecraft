@@ -561,9 +561,14 @@ describeDb('woc market realm scoping against real Postgres', () => {
       const rows = await marketDb.salesForItem(alpha, 'crown_of_embers', 10);
       // The exact set is the whole pin: it excludes the beta sale by equality.
       expect(ids(rows)).toEqual([a]);
-      // A voided sale leaves the price history too.
+      // The seller pivot (the Browse click-through) reads the same realm
+      // ledger by seller_name, and misses a different name entirely.
+      expect(ids(await marketDb.salesForSeller(alpha, 'S', 10))).toEqual([a]);
+      expect(await marketDb.salesForSeller(alpha, 'Nobody', 10)).toEqual([]);
+      // A voided sale leaves the price history too, on both pivots.
       expect(await marketDb.setSaleExcluded(a, true)).toBe('ok');
       expect(await marketDb.salesForItem(alpha, 'crown_of_embers', 10)).toEqual([]);
+      expect(await marketDb.salesForSeller(alpha, 'S', 10)).toEqual([]);
     }, 20_000);
 
     it('disposeSoldResidueListings converges only the realm residue', async () => {

@@ -61,8 +61,14 @@ const MONOLITHS: MonolithRow[] = [
     // wocBuyNowHtml), paying for the collapsed Bid terms toggle and the
     // banner's connect shortcut. This also cleared the 36 lines the file had
     // drifted over its own ceiling before this round.
+    // Down 2612 -> 2438 at the second Exchange UX round: the whole My
+    // Activities tab moved verbatim to src/ui/woc_market_activity_html.ts and
+    // the quote face to the chrome (wocQuoteFaceHtml), paying for the Browse
+    // filters, the seller click-through pane, and the hot-path review's
+    // poll-skip and click-dedupe guards, with room to spare. Exact count,
+    // zero headroom.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2612,
+    ceiling: 2438,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -386,7 +392,10 @@ const MONOLITHS: MonolithRow[] = [
     // Down 4036 -> 4032 at the Exchange UX round: the pass budgets and
     // deadlines moved to woc_market_budgets.ts (the sibling pattern), which
     // also cleared the 6 lines the file had drifted over this ceiling.
-    ceiling: 4032,
+    // Down 4032 -> 3989 at the second round: the stuck-custody monitor
+    // vocabulary moved to woc_market_monitor_types.ts (a leaf types module),
+    // paying for the seller-history read.
+    ceiling: 3989,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

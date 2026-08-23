@@ -1341,6 +1341,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.publicRead,
   },
   {
+    // The Browse seller click-through: a seller's recent completed trades,
+    // the same public sale rows the per-item history serves, pivoted.
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/woc-market/seller-history/:name',
+    handler: 'server/woc_market_routes.ts sellerHistoryHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.publicRead,
+  },
+  {
     // Step-up challenge issuance (B6/R1): mints the single-use wallet
     // challenge the two custody movers verify; its own rate bucket.
     dispatcher: DISPATCH.mainApi,

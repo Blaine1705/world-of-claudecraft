@@ -38,6 +38,20 @@ const betweenCode = (start: string, end: string): string => {
   return code.slice(from, to);
 };
 
+// The My Activities rows live in src/ui/woc_market_activity_html.ts (the
+// monolith ratchet's extraction, moved verbatim): the row slices anchor
+// there, comment-stripped for the same reason `code` is.
+const activitySrc = stripComments(
+  readFileSync(new URL('../src/ui/woc_market_activity_html.ts', import.meta.url), 'utf8'),
+);
+const activityBetween = (start: string, end: string): string => {
+  const from = activitySrc.indexOf(start);
+  expect(from, `anchor missing: ${start}`).toBeGreaterThanOrEqual(0);
+  const to = activitySrc.indexOf(end, from);
+  expect(to, `anchor missing after ${start}: ${end}`).toBeGreaterThan(from);
+  return activitySrc.slice(from, to);
+};
+
 describe('woc_market_window: no magic color values', () => {
   it('carries no raw hex color literal (QUALITY_COLOR + var(--...) are the only channels)', () => {
     // The (?<!&) guard skips the pager's numeric HTML entities (&#8249; and
@@ -237,9 +251,9 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     // have landed on chain. ASSOCIATIVE: the label must sit inside the
     // review arm itself, so a mis-wired case keeping both tokens elsewhere
     // still reds.
-    const arm = code.indexOf("case 'review':");
+    const arm = activitySrc.indexOf("case 'review':");
     expect(arm, "anchor missing: case 'review':").toBeGreaterThanOrEqual(0);
-    expect(code.slice(arm, arm + 200)).toContain("'hudChrome.wocMarket.settlementReview'");
+    expect(activitySrc.slice(arm, arm + 200)).toContain("'hudChrome.wocMarket.settlementReview'");
   });
 
   it('labels a CONFIRMED or DELIVERING settlement as decided money still delivering, never as confirming', () => {
@@ -247,14 +261,14 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     // the trade arm stopped making for the same server state. ASSOCIATIVE:
     // the label sits inside the confirmed/delivering arm, and confirming
     // keeps its own.
-    const arm = code.indexOf("case 'confirmed':\n        case 'delivering':");
+    const arm = activitySrc.indexOf("case 'confirmed':\n      case 'delivering':");
     expect(arm, 'anchor missing: the confirmed/delivering arm').toBeGreaterThanOrEqual(0);
-    const window = code.slice(arm, arm + 160);
+    const window = activitySrc.slice(arm, arm + 160);
     expect(window).toContain("'hudChrome.wocMarket.settlementConfirmedDelivering'");
     expect(window).not.toContain("'hudChrome.wocMarket.settlementConfirming'");
-    const confirming = code.indexOf("case 'confirming':\n          return");
+    const confirming = activitySrc.indexOf("case 'confirming':\n        return");
     expect(confirming).toBeGreaterThanOrEqual(0);
-    expect(code.slice(confirming, confirming + 120)).toContain(
+    expect(activitySrc.slice(confirming, confirming + 120)).toContain(
       "'hudChrome.wocMarket.settlementConfirming'",
     );
   });
@@ -300,7 +314,12 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     // Accessible names are t() output interpolated into HTML, so each one
     // must pass through esc(); a bare English aria-label would also dodge the
     // i18n catalog entirely.
-    const segments = painter.split('aria-label="').slice(1);
+    // BOTH sources: the My Activities rows carry their aria-labels in the
+    // extracted builder now, and the discipline follows the markup.
+    const segments = [
+      ...painter.split('aria-label="').slice(1),
+      ...activitySrc.split('aria-label="').slice(1),
+    ];
     // AT the real count (10), not "> 0", which one surviving attribute
     // satisfied. A floor rather than an exact count so adding a labelled
     // control does not red the suite, while deleting nine still does. It dropped
@@ -315,7 +334,8 @@ describe('woc_market_window: i18n and escaping discipline', () => {
       for (const hole of value.matchAll(/\$\{/g)) {
         expect(
           value.slice(hole.index).startsWith('${esc(') ||
-            value.slice(hole.index).startsWith('${this.'),
+            value.slice(hole.index).startsWith('${this.') ||
+            value.slice(hole.index).startsWith('${host.'),
           `unescaped interpolation in aria-label: ${value}`,
         ).toBe(true);
       }
@@ -516,16 +536,25 @@ describe('woc_market_window: the item inspector on hover', () => {
       // registered directly rather than through itemCellHtml, because an option
       // is an icon plus a name in its own layout, not a shared cell.
       '`opt:${r.index}`',
-      '`activity:${l.id}`',
-      // The item-named Activity pay rows (bids and settlements).
-      '`activity:bid:${b.id}`',
-      '`activity:settle:${s.id}`',
     ]) {
       expect(painter, `missing tooltip key ${key}`).toContain(key);
     }
+    // The My Activities rows key their cells in the extracted builder.
+    for (const key of [
+      '`activity:${l.id}`',
+      '`activity:bid:${b.id}`',
+      '`activity:settle:${s.id}`',
+    ]) {
+      expect(activitySrc, `missing tooltip key ${key}`).toContain(key);
+    }
     // Every itemCellHtml call passes a key: a 3-arg call would register nothing
-    // and silently render an un-hoverable cell.
-    const calls = painter.match(/this\.itemCellHtml\([^)]*\)/g) ?? [];
+    // and silently render an un-hoverable cell. The builder renders through
+    // host.itemCell with its own literal keys (pinned above); the window's
+    // delegate is a bind, not a call, so it cannot dodge this scan.
+    const calls = [
+      ...(painter.match(/this\.itemCellHtml\([^)]*\)/g) ?? []),
+      ...(activitySrc.match(/host\.itemCell\([^)]*\)/g) ?? []),
+    ];
     expect(calls.length).toBeGreaterThanOrEqual(4);
     for (const call of calls) {
       expect(call, `itemCellHtml without a key: ${call}`).toMatch(
@@ -1476,7 +1505,7 @@ describe('woc_market_window: a sold listing names the price it sold at', () => {
   // wire as soldCents (joined from the sales provenance table); the row
   // prefers it whenever the listing resolved sold.
   it('prefers soldCents on the activity row, keeping the live price otherwise', () => {
-    const listings = between('const listings = a.listings', 'const bids = a.bids');
+    const listings = activityBetween('const listings = a.listings', 'const bids = a.bids');
     const soldGate = listings.indexOf("l.resolution === 'sold'");
     expect(soldGate, 'the price cell gates on the sold resolution').toBeGreaterThanOrEqual(0);
     expect(listings, 'the sold arm reads the sale price').toContain('l.soldCents');
@@ -1496,7 +1525,7 @@ describe('woc_market_window: a bond awaiting the chain cannot be paid twice', ()
   // pending_bond until the chain confirms. In that gap the button came back,
   // enabled, on a bond that was already paid, and pressing it sent a second
   // payment for the same bond.
-  const bids = between('const bids = a.bids', 'const settlements = a.settlements');
+  const bids = activityBetween('const bids = a.bids', 'const settlements = a.settlements');
 
   it('renders progress INSTEAD of the pay control while confirming', () => {
     // The two arms must be mutually exclusive. A test that only checked the
@@ -1516,7 +1545,7 @@ describe('woc_market_window: a bond awaiting the chain cannot be paid twice', ()
     // The two guards answer different questions (a call in flight vs a chain
     // awaiting), so keeping both is the point; dropping busy would re-open the
     // double-submit window this fix is about, one layer down.
-    expect(bids).toContain("this.busy ? 'disabled' : ''");
+    expect(bids).toContain("host.busy ? 'disabled' : ''");
   });
 
   it('shows nothing at all for a bid that is not pending a bond', () => {
@@ -1582,11 +1611,8 @@ describe('woc_market_window: payment verdicts reach the player', () => {
   // tests/woc_market_view.test.ts); the painter pin only proves the render
   // consumes the core's verdict.
   it('renders the WHY line from the view core verdict, through the mapper', () => {
-    const from = code.indexOf('private activityHtml(');
-    const to = code.indexOf('private quoteHtml(', from);
-    expect(from).toBeGreaterThanOrEqual(0);
-    expect(to).toBeGreaterThan(from);
-    const activity = code.slice(from, to);
+    // The rows live in the extracted builder (activitySrc, the whole module).
+    const activity = activitySrc;
     expect(activity).toContain('s.failDetailReason != null');
     expect(activity).toContain('wocSettlementFailText(s.failDetailReason)');
     // The class pairs with the components.css rule that gives the sentence
@@ -1599,9 +1625,7 @@ describe('woc_market_window: payment verdicts reach the player', () => {
     // cancelPending and directed exist for exactly this render: a reloading
     // seller must see an accepted cancel intent, and a directed sale must not
     // read as a public auction. Gated on the view-core booleans, keyed copy.
-    const from = code.indexOf('private activityHtml(');
-    const to = code.indexOf('private quoteHtml(', from);
-    const activity = code.slice(from, to);
+    const activity = activitySrc;
     expect(activity).toContain('l.cancelPending');
     expect(activity).toContain('hudChrome.wocMarket.activityCancelPending');
     expect(activity).toContain('l.directed');
@@ -1690,7 +1714,18 @@ describe('woc_market_window: payment verdicts reach the player', () => {
 });
 
 describe('woc_market_window: the Activity tab is an honest, actionable ledger (H13)', () => {
-  const activity = betweenCode('private activityHtml(', 'private quoteHtml(');
+  // The tab's markup moved verbatim to its own pure builder on the monolith
+  // ratchet; the discipline pins follow it there, and the window keeps one
+  // pin: it renders the tab through that builder.
+  const activity = stripComments(
+    readFileSync(new URL('../src/ui/woc_market_activity_html.ts', import.meta.url), 'utf8'),
+  );
+
+  it('the window renders the tab through the extracted builder', () => {
+    expect(betweenCode('private activityHtml(', 'private quoteHtml(')).toContain(
+      'wocActivityHtml(model.activity',
+    );
+  });
 
   it('pay rows name the item: bid and settlement rows render the item cell off the wire id', () => {
     // The wire ships the joined listing item id; a row without one (older

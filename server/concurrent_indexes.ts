@@ -55,6 +55,11 @@ import {
   PLAYER_REPORTS_RETENTION_INVALID_INDEX_CHECK_SQL,
   PLAYER_REPORTS_RETENTION_INVALID_INDEX_DROP_SQL,
 } from './player_reports_retention_index';
+import {
+  WOC_MARKET_SALES_SELLER_INDEX_SQL,
+  WOC_MARKET_SALES_SELLER_INVALID_INDEX_CHECK_SQL,
+  WOC_MARKET_SALES_SELLER_INVALID_INDEX_DROP_SQL,
+} from './woc_market_sales_seller_index';
 
 export interface ConcurrentIndexMigration {
   name: string;
@@ -130,5 +135,13 @@ export const CONCURRENT_INDEX_MIGRATIONS: readonly ConcurrentIndexMigration[] = 
     createSql: CHAT_VIOLATIONS_RETENTION_INDEX_SQL,
     checkSql: CHAT_VIOLATIONS_RETENTION_INVALID_INDEX_CHECK_SQL,
     dropSql: CHAT_VIOLATIONS_RETENTION_INVALID_INDEX_DROP_SQL,
+  },
+  // The Exchange's seller click-through read (woc_market_db.ts
+  // salesForSeller). See woc_market_sales_seller_index.ts.
+  {
+    name: 'woc_market_sales_seller',
+    createSql: WOC_MARKET_SALES_SELLER_INDEX_SQL,
+    checkSql: WOC_MARKET_SALES_SELLER_INVALID_INDEX_CHECK_SQL,
+    dropSql: WOC_MARKET_SALES_SELLER_INVALID_INDEX_DROP_SQL,
   },
 ];

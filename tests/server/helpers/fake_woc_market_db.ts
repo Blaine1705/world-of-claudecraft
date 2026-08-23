@@ -2175,6 +2175,14 @@ export class FakeWocMarketDb implements WocMarketDb {
       .map((s) => structuredClone(s));
   }
 
+  async salesForSeller(realm: string, sellerName: string, limit: number): Promise<WocSaleRow[]> {
+    return [...this.sales.values()]
+      .filter((s) => s.realm === realm && s.sellerName === sellerName && !s.excluded)
+      .sort((a, b) => b.atMs - a.atMs || b.id - a.id)
+      .slice(0, limit)
+      .map((s) => structuredClone(s));
+  }
+
   async setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'> {
     const row = this.sales.get(id);
     if (!row) return 'miss';

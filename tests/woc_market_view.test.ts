@@ -3,6 +3,8 @@ import { ITEMS } from '../src/sim/data';
 import { exchangeHardLock, exchangeItemCategory } from '../src/sim/exchange_eligibility';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
+  browseItemFilterIds,
+  browseQualityOptions,
   buildWocMarketView,
   canCancelListing,
   countdownSigBucket,
@@ -810,5 +812,30 @@ describe('resolved policy figures on the model', () => {
     expect(model.sell.qualityFloor).toBe('rare');
     expect(model.sell.allowMounts).toBe(true);
     expect(model.sell.allowMechChromas).toBe(false);
+  });
+});
+
+describe('the Browse filters resolve in the view core', () => {
+  it('offers the realm floor and up as the quality vocabulary, in rank order', () => {
+    expect(browseQualityOptions('rare')).toEqual(['rare', 'epic', 'legendary']);
+    expect(browseQualityOptions('legendary')).toEqual(['legendary']);
+    // An unknown floor word falls back to the epic default rather than
+    // offering everything (the sellableRows fallback, one rule).
+    expect(browseQualityOptions('mythic-nonsense')).toEqual(['epic', 'legendary']);
+  });
+
+  it('resolves an item query to ids by localized-name substring, with the three distinct answers', () => {
+    const name = (id: string): string =>
+      ({ a_sword: 'Kingsbane Sword', b_sword: 'Sword of Dawn', c_helm: 'Iron Helm' })[id] ?? id;
+    const ids = ['a_sword', 'b_sword', 'c_helm'];
+    // null: no filter (empty query).
+    expect(browseItemFilterIds('   ', name, ids)).toBeNull();
+    // ids: the matching subset, case-insensitively.
+    expect(browseItemFilterIds('SWORD', name, ids)).toEqual(['a_sword', 'b_sword']);
+    // []: a real "nothing matches" the caller paints as empty.
+    expect(browseItemFilterIds('zzz', name, ids)).toEqual([]);
+    // Past the cap the query is too broad to narrow: null (no filter), never
+    // a truncated arbitrary subset that would silently hide listings.
+    expect(browseItemFilterIds('sword', name, ids, 1)).toBeNull();
   });
 });

@@ -1315,10 +1315,12 @@ describe('cache bounds under key churn', () => {
       await cache.browse({ ...BROWSE_Q, page }, async () => ({ rows: [], hasMore: false }));
     }
     const stats = cache.stats().browse;
-    // The LRU holds its cap; the thunk registry is pruned against it at the
-    // documented 2x bound, so per-request closures can never accumulate.
-    expect(stats.entries).toBe(128);
-    expect(stats.refreshRegistry).toBeLessThanOrEqual(257);
+    // The LRU holds its cap (192: sized OVER the closed 144-key browse space
+    // now that the filters ship, see WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES);
+    // the thunk registry is pruned against it at the documented 2x bound, so
+    // per-request closures can never accumulate.
+    expect(stats.entries).toBe(192);
+    expect(stats.refreshRegistry).toBeLessThanOrEqual(385);
     expect(stats.evictions).toBeGreaterThan(0);
   });
 });

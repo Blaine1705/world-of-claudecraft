@@ -374,6 +374,48 @@ function rowsPassing(
   return rows;
 }
 
+/** The Browse quality filter's closed vocabulary: the realm floor and up, in
+ *  rank order. Below-floor listings cannot exist, so offering those ranks
+ *  would be dead options that read as a broken filter. */
+export function browseQualityOptions(qualityFloor: string): string[] {
+  const floor = QUALITY_RANK[qualityFloor] ?? QUALITY_RANK.epic;
+  return Object.entries(QUALITY_RANK)
+    .filter(([, rank]) => rank >= floor)
+    .sort((a, b) => a[1] - b[1])
+    .map(([quality]) => quality);
+}
+
+/**
+ * Resolve the Browse item filter's free-text query to catalog item ids, the
+ * sell combobox's matching rule (case-insensitive substring over the
+ * localized display name).
+ *
+ * Three answers, each meaning something different to the caller:
+ * - null: no filter (an empty query, or one too broad to narrow: past the
+ *   cap a truncated arbitrary subset would silently HIDE matching listings,
+ *   which is worse than not filtering yet).
+ * - []: a real "nothing matches" (the caller paints the empty face and
+ *   skips the fetch: the SDK omits an empty itemIds param, so sending it
+ *   would mean NO filter and show everything).
+ * - ids: the filter the browse request carries.
+ */
+export function browseItemFilterIds(
+  query: string,
+  itemName: (itemId: string) => string,
+  itemIds: readonly string[],
+  cap = 40,
+): readonly string[] | null {
+  const q = query.trim().toLowerCase();
+  if (q === '') return null;
+  const out: string[] = [];
+  for (const id of itemIds) {
+    if (!itemName(id).toLowerCase().includes(q)) continue;
+    out.push(id);
+    if (out.length > cap) return null;
+  }
+  return out;
+}
+
 function listingRow(
   listing: WocListingView,
   nowMs: number,

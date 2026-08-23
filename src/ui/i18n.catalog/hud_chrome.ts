@@ -5254,7 +5254,9 @@ export const hudChromeStrings = {
     launcherLabel: '$WOC Exchange',
     tabBrowse: 'Browse',
     tabSell: 'Sell',
-    tabActivity: 'Activity',
+    // "My", said outright: the tab is the viewer's own bids and listings, and
+    // the bare "Activity" read as a market-wide feed (Zyzz's dev-test note).
+    tabActivity: 'My Activities',
     // The tab strip's own accessible name (the store's 'WOC Store sections'
     // precedent), never the window title twice.
     tabsLabel: '$WOC Exchange sections',
@@ -5311,6 +5313,25 @@ export const hudChromeStrings = {
     sortNewest: 'Newest',
     sortPriceAsc: 'Price: low to high',
     sortPriceDesc: 'Price: high to low',
+    // The Browse filters (the server-validated browse params, finally on the
+    // strip): quality and format are closed vocabularies, the item box is a
+    // free-text name search resolved to item ids client-side and applied on
+    // change (Enter or blur), never per keystroke.
+    filterQuality: 'Quality',
+    filterFormat: 'Format',
+    filterAny: 'Any',
+    filterFormatAuction: 'Auction',
+    filterFormatBuyNow: 'Buy now',
+    filterItemLabel: 'Item',
+    filterItemPlaceholder: 'Search by item name',
+    // The seller click-through: a seller's recent completed trades, opened
+    // from any Browse row's seller cell, with its own way back.
+    sellerLinkAria: 'View recent trades by {name}',
+    sellerTitle: 'Recent trades by {name}',
+    sellerBack: 'Back to Browse',
+    sellerEmpty: 'No completed trades yet.',
+    sellerError: 'Recent trades could not be loaded.',
+    sellerSaleRow: '{time}: {item} to {buyer} for {usd}',
     detailTitle: 'Listing',
     detailSeller: 'Sold by {name}',
     detailEndsAt: 'Ends {utc} UTC ({local} local)',
@@ -5482,7 +5503,10 @@ export const hudChromeStrings = {
     activityListings: 'My listings',
     activityBids: 'My bids',
     activitySettlements: 'My settlements',
-    activityEmpty: 'Nothing yet. Bids, listings, and settlements appear here.',
+    // YOUR-scoped on both sentences: "Nothing yet. Bids ... appear here."
+    // read as an empty market-wide feed rather than "you have none".
+    activityEmpty:
+      'You have no bids, listings, or settlements yet. Your Exchange activity appears here.',
     // A section with nothing in it says so instead of a heading over air.
     activityNoListings: 'You have no listings.',
     activityNoBids: 'You have no bids.',

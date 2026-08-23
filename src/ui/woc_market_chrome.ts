@@ -12,27 +12,66 @@
 
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
-import { formatDateTime, formatNumber, t } from './i18n';
+import { formatDateTime, formatDuration, formatNumber, t } from './i18n';
 import { ITEM_QUALITY_LABEL_KEYS, itemQualityLabel } from './item_kind_label';
 import { svgIcon } from './ui_icons';
 
 /** The browse faces' control row: the sort control LEADS the row (the 15 QA
- *  sign-off note), the pager follows. Pure over its inputs like every builder
- *  here; the focus keys and data hooks are the ones the window's restore
- *  ladder and click handler already own. It renders on EVERY browse face so
- *  an empty page or a failed reach still leaves a way back and a live sort. */
-export function wocBrowseStripHtml(opts: { page: number; hasMore: boolean; sort: string }): string {
-  const option = (value: string, label: string): string =>
-    `<option value="${value}" ${opts.sort === value ? 'selected' : ''}>${esc(label)}</option>`;
+ *  sign-off note), the filters follow it, the pager closes the row. Pure
+ *  over its inputs like every builder here; the focus keys and data hooks
+ *  are the ones the window's restore ladder and handlers already own. It
+ *  renders on EVERY browse face so an empty page or a failed reach still
+ *  leaves a way back, a live sort, and live filters. The filter values ride
+ *  the server's own browse params (validated there); the item box is free
+ *  text the window resolves to ids on the change event. */
+export function wocBrowseStripHtml(opts: {
+  page: number;
+  hasMore: boolean;
+  sort: string;
+  quality: string | null;
+  qualityOptions: readonly string[];
+  format: string | null;
+  itemQuery: string;
+}): string {
+  const option =
+    (selected: string | null) =>
+    (value: string, label: string): string =>
+      `<option value="${value}" ${selected === value || (value === '' && selected === null) ? 'selected' : ''}>${esc(label)}</option>`;
+  const sortOption = option(opts.sort);
+  const qualityOption = option(opts.quality);
+  const formatOption = option(opts.format);
   return (
     `<div class="wm-pager">` +
     `<label class="wm-sort">${esc(t('hudChrome.wocMarket.sortLabel'))}` +
     `<select data-field="sort" ${FOCUS_KEY_ATTR}="wm-sort">` +
-    option('ending', t('hudChrome.wocMarket.sortEnding')) +
-    option('newest', t('hudChrome.wocMarket.sortNewest')) +
-    option('price_asc', t('hudChrome.wocMarket.sortPriceAsc')) +
-    option('price_desc', t('hudChrome.wocMarket.sortPriceDesc')) +
+    sortOption('ending', t('hudChrome.wocMarket.sortEnding')) +
+    sortOption('newest', t('hudChrome.wocMarket.sortNewest')) +
+    sortOption('price_asc', t('hudChrome.wocMarket.sortPriceAsc')) +
+    sortOption('price_desc', t('hudChrome.wocMarket.sortPriceDesc')) +
     `</select></label>` +
+    `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterQuality'))}` +
+    `<select data-field="filter-quality" ${FOCUS_KEY_ATTR}="wm-filter-quality">` +
+    qualityOption('', t('hudChrome.wocMarket.filterAny')) +
+    opts.qualityOptions
+      .map((q) =>
+        qualityOption(
+          q,
+          QUALITY_WORDS.has(q) ? itemQualityLabel(q as Parameters<typeof itemQualityLabel>[0]) : q,
+        ),
+      )
+      .join('') +
+    `</select></label>` +
+    `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterFormat'))}` +
+    `<select data-field="filter-format" ${FOCUS_KEY_ATTR}="wm-filter-format">` +
+    formatOption('', t('hudChrome.wocMarket.filterAny')) +
+    formatOption('auction', t('hudChrome.wocMarket.filterFormatAuction')) +
+    formatOption('buy_now', t('hudChrome.wocMarket.filterFormatBuyNow')) +
+    `</select></label>` +
+    `<label class="wm-sort wm-filter-item">${esc(t('hudChrome.wocMarket.filterItemLabel'))}` +
+    `<input type="text" data-field="filter-item" ${FOCUS_KEY_ATTR}="wm-filter-item" ` +
+    `value="${esc(opts.itemQuery)}" placeholder="${esc(
+      t('hudChrome.wocMarket.filterItemPlaceholder'),
+    )}" /></label>` +
     `<button type="button" data-action="page-prev" ${FOCUS_KEY_ATTR}="wm-page-prev" ${opts.page <= 0 ? 'disabled' : ''} aria-label="${esc(t('hudChrome.wocMarket.pagePrev'))}">${svgIcon('prev')}</button>` +
     `<span>${esc(t('hudChrome.wocMarket.pageNumber', { current: formatNumber(opts.page + 1) }))}</span>` +
     `<button type="button" data-action="page-next" ${FOCUS_KEY_ATTR}="wm-page-next" ${opts.hasMore ? '' : 'disabled'} aria-label="${esc(t('hudChrome.wocMarket.pageNext'))}">${svgIcon('next')}</button>` +
@@ -315,6 +354,106 @@ export function wocBuyNowHtml(args: {
     (args.overBalance
       ? `<p class="wm-over-balance">${esc(t('hudChrome.trade.woc.hintInsufficientBalance'))}</p>`
       : '')
+  );
+}
+
+/**
+ * The Browse seller click-through pane: a seller's recent completed trades,
+ * with its own way back (the Back control leads, so the escape is never
+ * below the fold). Null sales means the read is still out; [] is a real
+ * empty answer, and the two faces must not look alike.
+ */
+export function wocSellerPaneHtml(args: {
+  name: string;
+  failed: boolean;
+  sales: readonly { atMs: number; itemName: string; buyerName: string; usdText: string }[] | null;
+}): string {
+  const body = args.failed
+    ? wocErrorStatusHtml(t('hudChrome.wocMarket.sellerError'))
+    : args.sales === null
+      ? `<p class="wm-sales-empty">${esc(t('hudChrome.wocMarket.detailSalesLoading'))}</p>`
+      : args.sales.length === 0
+        ? `<p class="wm-sales-empty">${esc(t('hudChrome.wocMarket.sellerEmpty'))}</p>`
+        : `<ul class="wm-sales">${args.sales
+            .map(
+              (s) =>
+                `<li>${esc(
+                  t('hudChrome.wocMarket.sellerSaleRow', {
+                    time: formatDateTime(s.atMs, { dateStyle: 'medium' }),
+                    item: s.itemName,
+                    buyer: s.buyerName,
+                    usd: s.usdText,
+                  }),
+                )}</li>`,
+            )
+            .join('')}</ul>`;
+  return (
+    `<div class="wm-seller-pane">` +
+    `<button type="button" data-action="seller-back" ${FOCUS_KEY_ATTR}="wm-seller-back">${esc(
+      t('hudChrome.wocMarket.sellerBack'),
+    )}</button>` +
+    `<h3>${esc(t('hudChrome.wocMarket.sellerTitle', { name: args.name }))}</h3>` +
+    body +
+    `</div>`
+  );
+}
+
+/**
+ * The pending-quote face: the resolved title, the token legs (the total at
+ * full weight, the fee legs named), the expiry countdown or the expired
+ * face, the settlement deadline when one applies, the fixed-amount note,
+ * and the three actions. The caller resolves the title and computes
+ * remainingMs (this module holds no clock); a null leg renders nothing.
+ */
+export function wocQuoteFaceHtml(args: {
+  title: string;
+  amountTokens: string | null;
+  sellerTokens: string | null;
+  burnTokens: string | null;
+  treasuryTokens: string | null;
+  remainingMs: number;
+  dueAtMs: number | null;
+  busy: boolean;
+}): string {
+  const expired = args.remainingMs <= 0;
+  const legs =
+    (args.amountTokens === null
+      ? ''
+      : `<p class="wm-quote-total">${esc(t('hudChrome.wocMarket.quoteTotal', { tokens: args.amountTokens }))}</p>`) +
+    (args.sellerTokens === null
+      ? ''
+      : `<p>${esc(t('hudChrome.wocMarket.quoteSeller', { tokens: args.sellerTokens }))}</p>`) +
+    (args.burnTokens === null
+      ? ''
+      : `<p>${esc(t('hudChrome.wocMarket.quoteBurn', { tokens: args.burnTokens }))}</p>`) +
+    (args.treasuryTokens === null
+      ? ''
+      : `<p>${esc(t('hudChrome.wocMarket.quoteTreasury', { tokens: args.treasuryTokens }))}</p>`);
+  const countdown = expired
+    ? `<p class="wm-quote-expired">${svgIcon('alert')}<span>${esc(t('hudChrome.wocMarket.quoteExpired'))}</span></p>`
+    : `<p>${esc(t('hudChrome.wocMarket.quoteExpires', { duration: formatDuration(Math.ceil(args.remainingMs / 1000)) }))}</p>`;
+  const dueLine =
+    args.dueAtMs === null
+      ? ''
+      : `<p class="wm-note">${esc(
+          t('hudChrome.wocMarket.paymentDueAt', {
+            time: formatDateTime(args.dueAtMs, { timeStyle: 'short' }),
+          }),
+        )}</p>`;
+  return (
+    `<div class="wm-quote"><h3>${esc(t('hudChrome.wocMarket.quoteTitle'))}</h3>` +
+    `<p>${esc(args.title)}</p>${legs}${countdown}${dueLine}` +
+    `<p class="wm-note">${esc(t('hudChrome.wocMarket.quoteFixedNote'))}</p>` +
+    `<div class="wm-quote-actions">` +
+    `<button type="button" class="wm-primary" data-action="quote-sign" ${expired || args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-sign">${esc(
+      t('hudChrome.wocMarket.quoteSign'),
+    )}</button>` +
+    `<button type="button" data-action="quote-refresh" ${args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-refresh">${esc(
+      t('hudChrome.wocMarket.quoteRefresh'),
+    )}</button>` +
+    `<button type="button" data-action="quote-cancel" ${args.busy ? 'disabled' : ''} ${FOCUS_KEY_ATTR}="wm-quote-cancel">${esc(
+      t('hudChrome.wocMarket.quoteCancel'),
+    )}</button></div></div>`
   );
 }
 

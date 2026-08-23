@@ -635,6 +635,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'bank_ledger_container_recent',
       'player_reports_retention_created',
       'chat_violations_retention_created',
+      'woc_market_sales_seller',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -700,6 +701,20 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
     expect(chatViolationsRetention?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS chat_violations_retention_created',
+    );
+    // The Exchange seller click-through read (salesForSeller): concurrent,
+    // never boot DDL, because woc_market_sales is keep-forever and a
+    // transactional build would grow into a boot-time write-blocking lock on
+    // the money path's insertSale.
+    const wocSalesSeller = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'woc_market_sales_seller',
+    );
+    expect(wocSalesSeller?.createSql).toContain(
+      'ON woc_market_sales(realm, seller_name, created_at DESC)',
+    );
+    expect(wocSalesSeller?.checkSql).toContain("to_regclass('woc_market_sales_seller')");
+    expect(wocSalesSeller?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS woc_market_sales_seller',
     );
   });
 

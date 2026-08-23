@@ -62,12 +62,17 @@ import type { WocBrowseQuery } from './woc_market';
 /** Browse and detail: the win is CROSS-PLAYER sharing (every viewer of a
  *  page or a hot listing rides one read per TTL window), so the TTL matching
  *  the 3s awaiting-chain poll is fine: one player's own cadence missing the
- *  window does not matter when N players share the entry. With filtered
- *  queries AND deep pages bypassing, the cacheable browse key space is small
- *  (sorts x qualities x formats x the shallow pages), so 128 holds the hot
- *  set. */
+ *  window does not matter when N players share the entry. With item-filtered
+ *  queries AND deep pages bypassing, the cacheable browse key space is
+ *  CLOSED and countable: 3 shallow pages x 4 sorts x 3 quality values
+ *  (null/epic/legendary) x 4 formats = 144 keys now that the Browse UI
+ *  actually sends the quality/format filters. The cap sits above that whole
+ *  space with headroom, because an LRU evicting inside a closed hot set
+ *  re-buys OFFSET-walk reads on every cycle; whoever adds a filter axis
+ *  re-does this arithmetic and re-prices the memory (each live entry holds a
+ *  page of 25 full listing rows, the me-cache rule). */
 export const WOC_MARKET_BROWSE_CACHE_TTL_MS = 3_000;
-export const WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES = 128;
+export const WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES = 192;
 /** Only the SHALLOW pages are cached (page <= this). The page number is
  *  caller-chosen up to the route's 400-page clamp, so without the fence one
  *  reader inside the 240/min budget could mint enough distinct page keys to
@@ -80,6 +85,11 @@ export const WOC_MARKET_DETAIL_CACHE_TTL_MS = 3_000;
 export const WOC_MARKET_DETAIL_CACHE_MAX_ENTRIES = 256;
 export const WOC_MARKET_HISTORY_CACHE_TTL_MS = 10_000;
 export const WOC_MARKET_HISTORY_CACHE_MAX_ENTRIES = 256;
+// Seller keys are FREE TEXT (the route screens shape, not vocabulary), so
+// unlike the item arm there is no closed key set: the LRU bound is what makes
+// junk names churn, never grow, and a churned entry degrades to the indexed
+// capped read underneath.
+export const WOC_MARKET_SELLER_CACHE_MAX_ENTRIES = 256;
 /** The activity readout is per account, so there is no cross-player win and
  *  the TTL is DELIBERATELY at the poll cadence, not above it: its job is to
  *  collapse bursts (open() racing the poll, a second window), while every
@@ -235,6 +245,7 @@ export class WocMarketReadCache {
   private readonly browsePages: ThunkKeyedCache<string>;
   private readonly listingRows: ThunkKeyedCache<number>;
   private readonly salesByItem: ThunkKeyedCache<string>;
+  private readonly salesBySeller: ThunkKeyedCache<string>;
   private readonly meByAccount: ThunkKeyedCache<number>;
 
   constructor(opts: WocMarketReadCacheOptions = {}) {
@@ -251,6 +262,11 @@ export class WocMarketReadCache {
     this.salesByItem = new ThunkKeyedCache({
       ttlMs: opts.historyTtlMs ?? WOC_MARKET_HISTORY_CACHE_TTL_MS,
       maxEntries: WOC_MARKET_HISTORY_CACHE_MAX_ENTRIES,
+      now: opts.now,
+    });
+    this.salesBySeller = new ThunkKeyedCache({
+      ttlMs: opts.historyTtlMs ?? WOC_MARKET_HISTORY_CACHE_TTL_MS,
+      maxEntries: WOC_MARKET_SELLER_CACHE_MAX_ENTRIES,
       now: opts.now,
     });
     this.meByAccount = new ThunkKeyedCache({
@@ -270,6 +286,10 @@ export class WocMarketReadCache {
 
   sales<T>(itemId: string, refresh: () => Promise<T>): Promise<T> {
     return this.salesByItem.read(itemId, refresh);
+  }
+
+  sellerSales<T>(sellerName: string, refresh: () => Promise<T>): Promise<T> {
+    return this.salesBySeller.read(sellerName, refresh);
   }
 
   myActivity<T>(account: number, refresh: () => Promise<T>): Promise<T> {
@@ -304,6 +324,9 @@ export class WocMarketReadCache {
    *  production caller needed. */
   bustHistoryAll(): void {
     this.salesByItem.bustAll();
+    // The seller pivot restates the same sale rows, so every history bust
+    // (sale exclusion, eager delivery) drops it in the same stroke.
+    this.salesBySeller.bustAll();
   }
 
   /** Everything at once (tests; also the honest lever if an operator action
@@ -312,6 +335,7 @@ export class WocMarketReadCache {
     this.browsePages.bustAll();
     this.listingRows.bustAll();
     this.salesByItem.bustAll();
+    this.salesBySeller.bustAll();
     this.meByAccount.bustAll();
   }
 
@@ -319,12 +343,14 @@ export class WocMarketReadCache {
     browse: KeyedCachedReadStats & { refreshRegistry: number };
     detail: KeyedCachedReadStats & { refreshRegistry: number };
     history: KeyedCachedReadStats & { refreshRegistry: number };
+    seller: KeyedCachedReadStats & { refreshRegistry: number };
     me: KeyedCachedReadStats & { refreshRegistry: number };
   } {
     return {
       browse: this.browsePages.stats(),
       detail: this.listingRows.stats(),
       history: this.salesByItem.stats(),
+      seller: this.salesBySeller.stats(),
       me: this.meByAccount.stats(),
     };
   }
