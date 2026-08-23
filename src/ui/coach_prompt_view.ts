@@ -538,3 +538,73 @@ export function coachPromptChip(
   if (mode === 'pad') return { chip: 'B', chipIsKey: true };
   return { chip: null, chipIsKey: false };
 }
+
+/** One bubble chip: a keycap the player presses, the action-bar icon they
+ *  tap, or a mobile cluster BUTTON's own glyph. Touch has no keys to name,
+ *  so its bubbles show the button's own picture, and the matching cluster
+ *  button pulses gold (coachGlowButtonId) so the picture and the control
+ *  find each other (CX: "on mobile you don't know what that button means"). */
+export type PromptChip =
+  | { readonly cap: string }
+  | { readonly abilityIcon: string }
+  | { readonly buttonIcon: 'interact' | 'jump' | 'attack' };
+
+/** The resolved inputs the chip row needs; the caller owns the lookups so
+ *  this stays pure. */
+export interface CoachPromptChipInputs {
+  /** The ability drill asks for the class's OWN button, never Attack. */
+  abilityAsk: boolean;
+  /** Caster classes' first real button is their spell on slot 2; their kill
+   *  bubble keeps that spell's icon (it matches the ring slot art). */
+  caster: boolean;
+  /** Icon id for the kill/drill bubble's ability art (touch). */
+  killIconId: string;
+  /** Resolved keycap labels (keyboard); empty string hides the chip. */
+  slotLabel: string;
+  jumpLabel: string;
+  bagsLabel: string;
+  interactLabel: string;
+}
+
+/** The chip row for a visible ask, per input family. Every desktop interact
+ *  keycap (the F family: Talk, Turn in quest, Pick up, Read, Ring) maps on
+ *  touch to the Interact button's own glyph; the melee kill ask maps to the
+ *  Attack button's glyph; the parkour ask to the Jump button's. */
+export function coachPromptChips(
+  kind: CoachPromptPlan['kind'],
+  mode: 'keyboard' | 'touch' | 'pad',
+  i: CoachPromptChipInputs,
+): readonly PromptChip[] {
+  if (kind === 'select') return [];
+  if (kind === 'kill') {
+    if (mode === 'keyboard') return i.slotLabel ? [{ cap: i.slotLabel }] : [];
+    if (mode !== 'touch') return [];
+    if (i.abilityAsk || i.caster) return [{ abilityIcon: i.killIconId }];
+    return [{ buttonIcon: 'attack' }];
+  }
+  if (kind === 'jump') {
+    if (mode === 'keyboard') return i.jumpLabel ? [{ cap: i.jumpLabel }] : [];
+    if (mode === 'pad') return [{ cap: 'A' }];
+    return [{ buttonIcon: 'jump' }];
+  }
+  if (kind === 'use') {
+    return mode === 'keyboard' && i.bagsLabel ? [{ cap: i.bagsLabel }] : [];
+  }
+  if (mode === 'touch') return [{ buttonIcon: 'interact' }];
+  const { chip } = coachPromptChip(mode, i.interactLabel);
+  return chip ? [{ cap: chip }] : [];
+}
+
+/** Which mobile cluster button pulses gold for the visible ask. Touch only:
+ *  the desktop keycap already names its key, and the drill and caster kill
+ *  bubbles point at the action RING slot whose art the chip repeats. */
+export function coachGlowButtonId(
+  kind: CoachPromptPlan['kind'] | null,
+  mode: 'keyboard' | 'touch' | 'pad',
+  i: Pick<CoachPromptChipInputs, 'abilityAsk' | 'caster'>,
+): 'mobile-interact' | 'mobile-jump' | 'mobile-action-attack' | null {
+  if (mode !== 'touch' || kind === null || kind === 'select' || kind === 'use') return null;
+  if (kind === 'kill') return i.abilityAsk || i.caster ? null : 'mobile-action-attack';
+  if (kind === 'jump') return 'mobile-jump';
+  return 'mobile-interact';
+}

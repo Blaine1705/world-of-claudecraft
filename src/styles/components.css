@@ -817,6 +817,13 @@
       inset 0 0 8px #ffc86033;
     animation: qd-coach-pulse 900ms ease-in-out infinite;
   }
+  /* The mobile cluster buttons are circles: the coach ring follows the
+     button's own shape instead of squaring it off. */
+  #mobile-interact.qd-coach,
+  #mobile-jump.qd-coach,
+  #mobile-action-attack.qd-coach {
+    border-radius: 50%;
+  }
   /* Playtest verdict: the first cut was too subtle to notice mid-flow. The
      swing is deliberately loud (dim gold to near-white-hot, wide bloom, a
      background wash) because on the island THIS control is the lesson. */

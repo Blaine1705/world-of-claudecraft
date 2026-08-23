@@ -29,7 +29,9 @@ import {
   CORNER_ASK_YD,
   type CoachPromptEntity,
   coachGlowBagItemId,
+  coachGlowButtonId,
   coachPromptChip,
+  coachPromptChips,
   coachPromptInRange,
   coachPromptPlan,
   GUIDE_VOICE_LINES,
@@ -482,5 +484,52 @@ describe('pouchLessonActive: the buckle-on lesson knows when it is over', () => 
       false,
     );
     expect(pouchLessonActive(null, empty)).toBe(false);
+  });
+});
+
+describe('coachPromptChips + coachGlowButtonId (the touch button mapping)', () => {
+  const inputs = {
+    abilityAsk: false,
+    caster: false,
+    killIconId: 'attack',
+    slotLabel: '1',
+    jumpLabel: 'Space',
+    bagsLabel: 'B',
+    interactLabel: 'F',
+  };
+
+  it('maps every desktop interact keycap to the Interact button on touch', () => {
+    // Talk, Turn in quest, Pick up, Read, Ring: all kind interact.
+    expect(coachPromptChips('interact', 'touch', inputs)).toEqual([{ buttonIcon: 'interact' }]);
+    expect(coachPromptChips('interact', 'keyboard', inputs)).toEqual([{ cap: 'F' }]);
+    expect(coachGlowButtonId('interact', 'touch', inputs)).toBe('mobile-interact');
+    expect(coachGlowButtonId('interact', 'keyboard', inputs)).toBeNull();
+  });
+
+  it('maps the melee kill ask to the Attack button, and glows it', () => {
+    expect(coachPromptChips('kill', 'touch', inputs)).toEqual([{ buttonIcon: 'attack' }]);
+    expect(coachGlowButtonId('kill', 'touch', inputs)).toBe('mobile-action-attack');
+  });
+
+  it('leaves the caster and drill bubbles on the ring slot art (the "2 spell")', () => {
+    const caster = { ...inputs, caster: true, killIconId: 'smite' };
+    expect(coachPromptChips('kill', 'touch', caster)).toEqual([{ abilityIcon: 'smite' }]);
+    expect(coachGlowButtonId('kill', 'touch', caster)).toBeNull();
+    const drill = { ...inputs, abilityAsk: true, killIconId: 'heroic_strike' };
+    expect(coachPromptChips('kill', 'touch', drill)).toEqual([{ abilityIcon: 'heroic_strike' }]);
+    expect(coachGlowButtonId('kill', 'touch', drill)).toBeNull();
+  });
+
+  it('maps the parkour ask to the Jump button on touch, the bind elsewhere', () => {
+    expect(coachPromptChips('jump', 'touch', inputs)).toEqual([{ buttonIcon: 'jump' }]);
+    expect(coachPromptChips('jump', 'keyboard', inputs)).toEqual([{ cap: 'Space' }]);
+    expect(coachPromptChips('jump', 'pad', inputs)).toEqual([{ cap: 'A' }]);
+    expect(coachGlowButtonId('jump', 'touch', inputs)).toBe('mobile-jump');
+  });
+
+  it('keeps select chipless and glowless: the ask is the tap on the quarry', () => {
+    expect(coachPromptChips('select', 'touch', inputs)).toEqual([]);
+    expect(coachGlowButtonId('select', 'touch', inputs)).toBeNull();
+    expect(coachGlowButtonId(null, 'touch', inputs)).toBeNull();
   });
 });

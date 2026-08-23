@@ -902,6 +902,14 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
 const MOBILE_CONTEXT_LONG_PRESS_MS = 650;
+// The modal one-shots that stay above every banded window AND the mobile
+// window backdrop (z 85): the confirm/input prompt plus the confirm-dialog
+// family's once-ever explainers (the scoped-popup 96 rule).
+const SCOPED_POPUP_IDS: ReadonlySet<string> = new Set([
+  'confirm-dialog',
+  'tutorial-greeting',
+  'profession-tutorial',
+]);
 // The number of combo pips, named so the per-frame player paint carries no bare
 // literal at the call site.
 const COMBO_PIP_COUNT = 5;
@@ -3221,12 +3229,13 @@ export class Hud {
   }
 
   private bringWindowToFront(el: HTMLElement): void {
-    // The confirm/input prompt is the topmost modal by definition and never
-    // joins the 50-89 window band: banding it (a pointerdown raise, or the
-    // normalize sweep) drops it BEHIND the armory inspect overlay (z 90), so a
-    // real mouse press on the dialog demotes it mid-click and its own OK
-    // button becomes unclickable (the "phantom dead confirm" bug).
-    if (el.id === 'confirm-dialog') {
+    // The scoped-popup modals are topmost by definition and never join the
+    // 50-89 window band: banding one (a pointerdown raise, or the normalize
+    // sweep) drops it BEHIND the armory inspect overlay (z 90) AND the
+    // mobile window backdrop (z 85), so its own OK button becomes
+    // unclickable (the "phantom dead confirm" bug on desktop; the
+    // untappable tutorial greeting under the mobile veil).
+    if (SCOPED_POPUP_IDS.has(el.id)) {
       el.style.zIndex = String(Math.max(this.windowZValue(el), 95));
       return;
     }
@@ -3236,7 +3245,7 @@ export class Hud {
 
   private normalizeWindowZ(): void {
     const open = [...document.querySelectorAll<HTMLElement>('.window.panel')]
-      .filter((el) => el.id !== 'confirm-dialog' && this.isWindowVisible(el))
+      .filter((el) => !SCOPED_POPUP_IDS.has(el.id) && this.isWindowVisible(el))
       .sort((a, b) => this.windowZValue(a) - this.windowZValue(b));
     this.windowZ = 50;
     for (const el of open) el.style.zIndex = String(++this.windowZ);

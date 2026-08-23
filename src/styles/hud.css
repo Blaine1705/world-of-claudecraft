@@ -672,6 +672,22 @@
     background-size: cover;
     background-position: center;
   }
+  /* The touch bubble's cluster-button chip: the mobile button's own svg
+     glyph (ui_icons svgIcon, the same markup the button hydrates), gold on
+     the keycap plate so the picture in the bubble IS the button to press. */
+  .tut-prompt .tut-keycap-button {
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+  }
+  .tut-prompt .tut-keycap-button .ui-icon {
+    width: 100%;
+    height: 100%;
+  }
   .tut-prompt-chips {
     display: flex;
     align-items: center;

@@ -64,13 +64,16 @@ import {
   CASTER_CLASSES,
   type CoachPromptPlan,
   coachGlowBagItemId,
+  coachGlowButtonId,
   coachGlowQuestId,
   coachGlowVendorItemId,
   coachPromptChip,
+  coachPromptChips,
   coachPromptInRange,
   coachPromptPlan,
   GUIDE_VOICE_LINES,
   type GuideVoiceLineName,
+  type PromptChip,
   parkourPromptPlan,
   pouchLessonActive,
   turnAskOwnsBubble,
@@ -87,6 +90,7 @@ import {
   objectiveGlowFromScreen,
   uiLessonGlow,
 } from './objective_glow_view';
+import { svgIcon } from './ui_icons';
 
 /** Peak opacity of the wrong-way bloom at full intensity. Deliberately shy of
  *  opaque: it is a hint at the edge of vision, never a curtain. */
@@ -143,6 +147,10 @@ export class BootcampOverlay {
   private promptPainted = { visible: false, sx: Number.NaN, sy: Number.NaN };
   private promptGroundKey = '';
   private promptGroundY = 0;
+  // Which mobile cluster button pulses gold for the visible ask (touch only;
+  // coachGlowButtonId). Cleared whenever the bubble hides.
+  private promptButtonGlow: 'mobile-interact' | 'mobile-jump' | 'mobile-action-attack' | null =
+    null;
   // The wrong-way edge glow's element and its repaint memo.
   private glowEl: HTMLElement | null = null;
   private glowPainted = '';
@@ -418,6 +426,13 @@ export class BootcampOverlay {
     syncGlow('#mm-bag', () => ringEquip);
     syncGlow('#mm-char', () => this.ringPhase === 'admire');
 
+    // The visible ask's own mobile cluster button (coachGlowButtonId): the
+    // bubble shows the button's picture, the button itself pulses gold, and
+    // the two find each other (CX: the picture alone did not read).
+    syncGlow('#mobile-interact', () => this.promptButtonGlow === 'mobile-interact');
+    syncGlow('#mobile-jump', () => this.promptButtonGlow === 'mobile-jump');
+    syncGlow('#mobile-action-attack', () => this.promptButtonGlow === 'mobile-action-attack');
+
     // The death lesson's own screen. While the island is teaching the corpse
     // run, the button that ends it pulses the moment it appears, and the
     // Keeper's paid alternative is dimmed out of the way: a first-timer
@@ -612,6 +627,16 @@ export class BootcampOverlay {
   // interact reach, so appearing IS the signal to press.
   private updatePrompt(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
     if (!this.prompt || !this.promptChipEl || !this.promptVerbEl) return;
+    // A scoped-popup modal (the spawn greeting, the profession explainer)
+    // owns the screen while it is up: the only ask is its own button, and
+    // the world bubble used to float over the dialog text (CX, mobile).
+    for (const id of ['tutorial-greeting', 'profession-tutorial']) {
+      const modal = document.getElementById(id);
+      if (modal && modal.style.display !== 'none') {
+        this.hidePrompt();
+        return;
+      }
+    }
     const p = world.player;
     const mode = currentInputHintMode();
 
@@ -636,6 +661,7 @@ export class BootcampOverlay {
     // branch is what keeps them from teaching nothing at all.
     const centered = jumpAskVisible ? null : this.centeredAsk(keybinds, mode);
     if (centered) {
+      this.promptButtonGlow = null;
       const contentKey = `centered:${centered.verbKey}:${centered.caps.join(',')}`;
       if (this.promptContentKey !== contentKey) {
         this.promptContentKey = contentKey;
@@ -664,6 +690,7 @@ export class BootcampOverlay {
       !jumpAskVisible &&
       (this.step === 'forward' || this.step === 'turnwalk' || this.step === 'strafe')
     ) {
+      this.promptButtonGlow = null;
       const unbound = t('hud.options.unbound');
       const caps = bootcampKeycaps(this.step, mode, {
         forwardKey: keybinds.primaryLabel('forward') || unbound,
@@ -718,46 +745,26 @@ export class BootcampOverlay {
     // player has no key to be told about and is looking for the picture.
     // The parkour asks chip the jump bind (Space, or the pad's literal
     // bottom face button); everything else chips interact per input family.
-    let chips: readonly PromptChip[];
-    if (plan.kind === 'select') {
-      chips = [];
-    } else if (plan.kind === 'kill') {
-      // The ability drill asks for the class's OWN button, which is never
-      // the Attack toggle: chipping slot0 there put a "1" under a bubble
-      // reading "Use ability", which is exactly the wrong instruction. The
-      // plan says which press it wants; the chip follows it.
-      const abilityAsk = plan.verbKey === 'hudChrome.bootcamp.promptUseAbility';
-      const slot = abilityAsk || this.casterClass ? 'slot1' : 'slot0';
-      if (mode === 'keyboard') {
-        const cap = keybinds.primaryLabel(slot);
-        chips = cap ? [{ cap }] : [];
-      } else if (mode === 'touch') {
-        chips = [
-          {
-            abilityIcon: abilityAsk
-              ? (this.taughtAbilityId ?? AUTO_ATTACK_ICON_ID)
-              : this.promptAttackIconId(),
-          },
-        ];
-      } else {
-        chips = [];
-      }
-    } else if (plan.kind === 'jump') {
-      chips =
-        mode === 'keyboard'
-          ? [keybinds.primaryLabel('jump')].filter(Boolean).map((cap) => ({ cap }))
-          : mode === 'pad'
-            ? [{ cap: 'A' }]
-            : [];
-    } else if (plan.kind === 'use') {
-      chips =
-        mode === 'keyboard'
-          ? [keybinds.primaryLabel('bags')].filter(Boolean).map((cap) => ({ cap }))
-          : [];
-    } else {
-      const { chip } = coachPromptChip(mode, keybinds.primaryLabel('interact'));
-      chips = chip ? [{ cap: chip }] : [];
-    }
+    // The ability drill asks for the class's OWN button, which is never
+    // the Attack toggle: chipping slot0 there put a "1" under a bubble
+    // reading "Use ability", which is exactly the wrong instruction. The
+    // plan says which press it wants; the chip follows it.
+    const abilityAsk = plan.verbKey === 'hudChrome.bootcamp.promptUseAbility';
+    const chips = coachPromptChips(plan.kind, mode, {
+      abilityAsk,
+      caster: this.casterClass,
+      killIconId: abilityAsk
+        ? (this.taughtAbilityId ?? AUTO_ATTACK_ICON_ID)
+        : this.promptAttackIconId(),
+      slotLabel: keybinds.primaryLabel(abilityAsk || this.casterClass ? 'slot1' : 'slot0') || '',
+      jumpLabel: keybinds.primaryLabel('jump') || '',
+      bagsLabel: keybinds.primaryLabel('bags') || '',
+      interactLabel: keybinds.primaryLabel('interact'),
+    });
+    this.promptButtonGlow = coachGlowButtonId(plan.kind, mode, {
+      abilityAsk,
+      caster: this.casterClass,
+    });
     const contentKey = `${plan.verbKey}:${chips.map(chipKey).join(',')}:${mode}`;
     if (this.promptContentKey !== contentKey) {
       this.promptContentKey = contentKey;
@@ -818,6 +825,7 @@ export class BootcampOverlay {
   }
 
   private hidePrompt(): void {
+    this.promptButtonGlow = null;
     if (!this.prompt || !this.promptPainted.visible) return;
     this.prompt.style.display = 'none';
     this.promptPainted.visible = false;
@@ -846,11 +854,15 @@ export class BootcampOverlay {
     this.promptContentKey = '';
     this.promptPainted = { visible: false, sx: Number.NaN, sy: Number.NaN };
     this.promptGroundKey = '';
+    this.promptButtonGlow = null;
     // Leaving the island: no control is the next press any more.
     for (const scope of ['#quest-tracker', '#quest-log', '#vendor-window', '#bags']) {
       for (const el of document.querySelectorAll<HTMLElement>(`${scope} .qd-coach`)) {
         el.classList.remove('qd-coach');
       }
+    }
+    for (const id of ['mobile-interact', 'mobile-jump', 'mobile-action-attack']) {
+      document.getElementById(id)?.classList.remove('qd-coach');
     }
     if (this.captionTimer) clearTimeout(this.captionTimer);
     this.captionTimer = null;
@@ -886,14 +898,11 @@ function paintChipSequence(host: HTMLElement, caps: readonly string[]): void {
   );
 }
 
-/** One bubble chip: a keycap the player presses, or the action-bar icon they
- *  tap. Touch has no keys to name, so its combat bubble shows the button's
- *  own picture rather than a word for a key that does not exist there. */
-type PromptChip = { readonly cap: string } | { readonly abilityIcon: string };
-
 /** Repaint identity for a chip row (the memo key). */
 function chipKey(chip: PromptChip): string {
-  return 'cap' in chip ? chip.cap : `icon:${chip.abilityIcon}`;
+  if ('cap' in chip) return chip.cap;
+  if ('abilityIcon' in chip) return `icon:${chip.abilityIcon}`;
+  return `button:${chip.buttonIcon}`;
 }
 
 function paintPromptChipSequence(host: HTMLElement, chips: readonly PromptChip[]): void {
@@ -911,11 +920,21 @@ function paintPromptChipSequence(host: HTMLElement, chips: readonly PromptChip[]
       host.appendChild(el);
       return;
     }
+    if ('abilityIcon' in chip) {
+      const el = document.createElement('span');
+      el.className = 'tut-keycap tut-keycap-icon';
+      el.style.backgroundImage = `url(${iconDataUrl('ability', chip.abilityIcon)})`;
+      // Decorative: the verb beside it already says what the press does, and
+      // the icon repeats the action bar the player is looking at.
+      el.setAttribute('aria-hidden', 'true');
+      host.appendChild(el);
+      return;
+    }
+    // A mobile cluster button's own glyph (svgIcon is what the button itself
+    // hydrates with), so the picture in the bubble IS the button to press.
     const el = document.createElement('span');
-    el.className = 'tut-keycap tut-keycap-icon';
-    el.style.backgroundImage = `url(${iconDataUrl('ability', chip.abilityIcon)})`;
-    // Decorative: the verb beside it already says what the press does, and
-    // the icon repeats the action bar the player is looking at.
+    el.className = 'tut-keycap tut-keycap-button';
+    el.innerHTML = svgIcon(chip.buttonIcon);
     el.setAttribute('aria-hidden', 'true');
     host.appendChild(el);
   });
