@@ -3281,7 +3281,7 @@ export const nl_NL: EnTranslations = {
       "reagentsNeeded": "Vereist:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(verbruikt {count} van fijne kwaliteit)",
-      "craftFeeLine": "Craft fee: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",

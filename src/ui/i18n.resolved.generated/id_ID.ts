@@ -3281,7 +3281,7 @@ export const id_ID: EnTranslations = {
       "reagentsNeeded": "Memerlukan:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(menghabiskan {count} bahan halus)",
-      "craftFeeLine": "Craft fee: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",

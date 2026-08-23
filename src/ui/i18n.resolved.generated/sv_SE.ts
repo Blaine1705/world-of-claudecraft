@@ -3281,7 +3281,7 @@ export const sv_SE: EnTranslations = {
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(förbrukar {count} av fin kvalitet)",
-      "craftFeeLine": "Craft fee: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Inga recept kända än.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",

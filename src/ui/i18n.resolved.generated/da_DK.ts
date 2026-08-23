@@ -3281,7 +3281,7 @@ export const da_DK: EnTranslations = {
       "reagentsNeeded": "Kræver:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(bruger {count} af fin kvalitet)",
-      "craftFeeLine": "Craft fee: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Ingen opskrifter kendt endnu.",
       "resultAria": "Håndværk {name}",
       "craftedToast": "Udformet: {name}",

@@ -3281,7 +3281,7 @@ export const en_CA: EnTranslations = {
       "reagentsNeeded": "Requires:",
       "reagentLine": "{name} x{have}/{required}",
       "reagentFineSub": "(spends {count} fine-grade)",
-      "craftFeeLine": "Craft fee: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "No recipes known yet.",
       "resultAria": "Craft {name}",
       "craftedToast": "Crafted: {name}",

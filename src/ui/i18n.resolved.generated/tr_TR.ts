@@ -3281,7 +3281,7 @@ export const tr_TR: EnTranslations = {
       "reagentsNeeded": "Gereklilikler:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "({count} adet kaliteli harcar)",
-      "craftFeeLine": "Craft fee: {fee}",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",

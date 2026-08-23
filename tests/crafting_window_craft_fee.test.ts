@@ -38,13 +38,13 @@ function feeRecipe(itemLevelBudget?: number): RecipeDefLike {
   };
 }
 
-function craftingDeps(): CraftingWindowDeps {
+function craftingDeps(qty = 1): CraftingWindowDeps {
   return {
     hideTooltip: () => {},
     onCraft: () => {},
     onClose: () => {},
     onOpenOrders: () => {},
-    craftQty: () => 1,
+    craftQty: () => qty,
     onCraftQty: () => {},
     announce: () => {},
     itemIcon: () => '',
@@ -58,9 +58,9 @@ function craftingDeps(): CraftingWindowDeps {
   };
 }
 
-function viewFor(itemLevelBudget?: number) {
+function viewFor(itemLevelBudget?: number, leatherHeld = 5) {
   const items = table(item('leather'), item('recipe_fee_result'));
-  const inventory: InvSlot[] = [{ itemId: 'leather', count: 5 }];
+  const inventory: InvSlot[] = [{ itemId: 'leather', count: leatherHeld }];
   return buildCraftingView([feeRecipe(itemLevelBudget)], inventory, items);
 }
 
@@ -70,7 +70,7 @@ describe('renderCraftingWindow: craft fee visibility (#1301 gold sink)', () => {
     renderCraftingWindow(el, viewFor(16), craftingDeps());
     const feeLine = el.querySelector('.crafting-fee-line');
     expect(feeLine?.textContent).toBe(
-      `Craft fee: ${formatCopper(Math.ceil(16 * CRAFT_GOLD_SINK_COPPER_PER_BUDGET))}`,
+      `Craft fee: ${formatCopper(Math.ceil(16 * CRAFT_GOLD_SINK_COPPER_PER_BUDGET))} each`,
     );
   });
 
@@ -78,7 +78,7 @@ describe('renderCraftingWindow: craft fee visibility (#1301 gold sink)', () => {
     const el = document.createElement('div');
     renderCraftingWindow(el, viewFor(16), craftingDeps());
     const btn = el.querySelector('.crafting-recipe-btn');
-    expect(btn?.getAttribute('aria-label')).toContain('Craft fee: 32c');
+    expect(btn?.getAttribute('aria-label')).toContain('Craft fee: 32c each');
   });
 
   it('includes the fee in the hover tooltip content', () => {
@@ -88,7 +88,30 @@ describe('renderCraftingWindow: craft fee visibility (#1301 gold sink)', () => {
     const attach = deps.attachTooltip as ReturnType<typeof vi.fn>;
     expect(attach).toHaveBeenCalled();
     const tooltipFactory = attach.mock.calls[0][1] as () => string;
-    expect(tooltipFactory()).toContain('Craft fee: 32c');
+    expect(tooltipFactory()).toContain('Craft fee: 32c each');
+  });
+
+  it('keeps the fee worded as per-craft when Craft qty and Create All submit batches', () => {
+    const el = document.createElement('div');
+    const deps = { ...craftingDeps(3), onCraft: vi.fn() };
+    renderCraftingWindow(el, viewFor(16, 5), deps);
+
+    const feeLine = el.querySelector('.crafting-fee-line');
+    expect(feeLine?.textContent).toBe('Craft fee: 32c each');
+    const craftBtn = el.querySelector<HTMLButtonElement>('.crafting-recipe-btn');
+    expect(craftBtn?.getAttribute('aria-label')).toContain('Craft fee: 32c each');
+    const attach = deps.attachTooltip as ReturnType<typeof vi.fn>;
+    const tooltipFactory = attach.mock.calls[0][1] as () => string;
+    expect(tooltipFactory()).toContain('Craft fee: 32c each');
+
+    expect(craftBtn).not.toBeNull();
+    craftBtn?.click();
+    expect(deps.onCraft).toHaveBeenCalledWith('recipe_fee', 3);
+    deps.onCraft.mockClear();
+    const createAllBtn = el.querySelector<HTMLButtonElement>('.crafting-create-all-btn');
+    expect(createAllBtn?.textContent).toBe('Create All');
+    createAllBtn?.click();
+    expect(deps.onCraft).toHaveBeenCalledWith('recipe_fee', 5);
   });
 
   it('renders no fee line, no tooltip fee, and no aria fee text for a recipe with no itemLevelBudget', () => {

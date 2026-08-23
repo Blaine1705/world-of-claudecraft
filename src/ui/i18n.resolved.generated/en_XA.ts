@@ -3281,7 +3281,7 @@ export const en_XA: EnTranslations = {
       "reagentsNeeded": "[Ŕéɋúíŕéš:]",
       "reagentLine": "[{name} ẋ{have}/{required}]",
       "reagentFineSub": "[(šþéñðš {count} ƒíñé-ĝŕáðé)]",
-      "craftFeeLine": "[Çŕáƒţ ƒéé: {fee}]",
+      "craftFeeLine": "[Çŕáƒţ ƒéé: {fee} éáçĥ]",
       "empty": "[Ñó ŕéçíþéš ķñóŵñ ýéţ.]",
       "resultAria": "[Çŕáƒţ {name}]",
       "craftedToast": "[Çŕáƒţéð: {name}]",

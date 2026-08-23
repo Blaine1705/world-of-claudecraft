@@ -385,8 +385,9 @@ export function renderCraftingWindow(
       // The #1301 gold-sink fee (crafting.ts resolveCraftForRecipe): charged
       // on every successful craft but never shown anywhere before this
       // (issue: crafting reads as a guaranteed net loss when the fee is
-      // invisible). Zero for a recipe with no itemLevelBudget, so a fee-free
-      // recipe renders no line at all rather than "Craft fee: 0c".
+      // invisible). The line is worded as a per-craft amount because Create
+      // and Create All can submit batches. Zero for a recipe with no
+      // itemLevelBudget, so a fee-free recipe renders no line at all.
       const craftFeeLine =
         row.craftFeeCopper > 0
           ? t('hudChrome.crafting.craftFeeLine', { fee: formatMoney(row.craftFeeCopper) })

@@ -4121,8 +4121,9 @@ export const hudChromeStrings = {
     // The #1301 gold-sink fee (src/sim/professions/crafting.ts
     // resolveCraftForRecipe), charged on every successful craft but never
     // shown anywhere before this: {fee} is the already-localized formatMoney
-    // string, so no separate number param is needed.
-    craftFeeLine: 'Craft fee: {fee}',
+    // string, so no separate number param is needed. "Each" matters because
+    // the row's Create and Create All controls can submit multi-craft batches.
+    craftFeeLine: 'Craft fee: {fee} each',
     empty: 'No recipes known yet.',
     resultAria: 'Craft {name}',
     // The SOLE player-visible line for a craft grant (#2430). The grant hub's
