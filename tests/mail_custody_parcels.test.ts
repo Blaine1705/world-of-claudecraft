@@ -7,6 +7,7 @@
 // or flattening it, and the persistence round trip keeps the payload (the
 // loadMail sanitize used to drop `instance` wholesale).
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { WOC_MARKET_DELIVERY_LETTER, WOC_MARKET_RETURN_LETTER } from '../src/sim/content/letters';
@@ -148,6 +149,22 @@ describe('mailSystemParcel refuses rather than booking an empty letter', () => {
 });
 
 describe('custodyRef book-once dedupe', () => {
+  it('answers presence off the index, never a whole-book scan', () => {
+    // hasCustodyParcel runs on every Exchange delivery booking and twice per
+    // custody retry, on the world loop; on a grown book (the production
+    // six-figure-letter class) a this.mail scan is a hot-path walk. The
+    // behavior half lives in tests/mail_index.test.ts; this pins that the
+    // PostOffice read actually rides it.
+    const src = readFileSync(
+      new URL('../src/sim/mail/post_office.ts', import.meta.url),
+      'utf8',
+    );
+    const body = /hasCustodyParcel\(custodyRef: string\): boolean \{([\s\S]*?)\n {2}\}/.exec(src);
+    expect(body, 'hasCustodyParcel body not found').not.toBeNull();
+    expect(body?.[1]).toContain('this.index.hasCustodyRef(custodyRef)');
+    expect(body?.[1]).not.toContain('this.mail');
+  });
+
   it('books a referenced parcel once and refuses the duplicate', () => {
     const sim = makeWorld();
     const items: InvSlot[] = [{ itemId: 'rusty_hatchet', count: 1, instance: { signer: 'A' } }];

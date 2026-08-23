@@ -762,7 +762,11 @@ export class PostOffice {
   // True when a custody parcel with this broker reference is in the book
   // (delivered, still in flight, or already emptied but not yet deleted).
   hasCustodyParcel(custodyRef: string): boolean {
-    return this.mail.some((m) => m.custodyRef === custodyRef);
+    // Rides the index, never a book scan: this is called on every Exchange
+    // delivery booking and twice per custody retry, and a grown book (the
+    // production six-figure-letter class) would put a whole-array walk on
+    // the world loop. Pinned by tests/mail_custody_parcels.test.ts.
+    return this.index.hasCustodyRef(custodyRef);
   }
 
   // The one-time service letter; the caller flips meta.mailWelcomed.
