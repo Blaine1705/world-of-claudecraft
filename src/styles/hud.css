@@ -3432,7 +3432,11 @@
   /* ---------- right tracker stack (quest tracker + delve tracker) ----------
      One absolutely-positioned flex column so the delve tracker always stacks
      BELOW the quest tracker's actual rendered height instead of a hardcoded
-     top offset that could collide with a long quest list. */
+     top offset that could collide with a long quest list. The `top` here (and
+     every per-tier override in hud.mobile.css) is only the no-JS resting seat:
+     tracker_stack_anchor.ts re-seats the stack below the minimap column's
+     real rendered bottom, which a wrapping zone label or the mobile chrome
+     scale can move past any constant. */
   #right-tracker-stack {
     position: absolute;
     right: 14px;
@@ -3450,6 +3454,15 @@
        z-index bump changes paint order only: it never lets a full-width
        tracker row steal a click or hover meant for a rail button under it. */
     z-index: 20;
+  }
+  /* An empty tracker leaves the flex flow entirely so it cannot spend a gap:
+     with no quests the quest tracker renders an empty string, and without this
+     the reliquary/deed strip below it sat one phantom 14px gap lower than the
+     quest tracker itself would. The painter-managed trackers hide via their
+     own root display and keep a skeleton, so only the genuinely empty ones
+     match. */
+  #right-tracker-stack > :empty {
+    display: none;
   }
   /* ---------- quest tracker ---------- */
   #quest-tracker {
@@ -5140,7 +5153,14 @@
     font-size: 12px;
     line-height: 1.5;
   }
-  #tooltip .tt-title {
+  /* Named per consumer rather than left unscoped: the touch menu and
+     consumable captions reuse the tooltip's title metrics, but an unscoped
+     .tt-title rule would tie on source order with any future single-class
+     rule elsewhere. The --tooltip-scale rule below and the mob-tooltip
+     variant still out-specify this. */
+  #tooltip .tt-title,
+  #mobile-menu-caption .tt-title,
+  #mobile-consumable-caption .tt-title {
     font-family: var(--title-font);
     font-size: 13.5px;
     color: #fff;
@@ -5491,7 +5511,9 @@
   #tooltip {
     font-size: calc(12px * var(--tooltip-scale, 1));
   }
-  #tooltip .tt-title {
+  #tooltip .tt-title,
+  #mobile-menu-caption .tt-title,
+  #mobile-consumable-caption .tt-title {
     font-size: calc(13.5px * var(--tooltip-scale, 1));
   }
   #tooltip .tt-sub {

@@ -830,7 +830,7 @@ const classAbilityNamesEn = {
       [
         'ignition',
         'Ignition',
-        'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+        'Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)',
       ],
       [
         'mass_barrier',
@@ -1557,7 +1557,7 @@ const classAbilityNamesEn = {
       [
         'hex_of_violence',
         'Hex of Violence',
-        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage.',
+        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
       ],
       [
         'cruel_pact',
@@ -1804,7 +1804,7 @@ const classAbilityNamesEn = {
       [
         'warspirit_cadence',
         'Warspirit Cadence',
-        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
       ],
       [
         'stormsurge',
@@ -2069,7 +2069,7 @@ const classAbilityNamesEn = {
       [
         'summon_infernal',
         'Summon Pyre Colossus',
-        'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
+        'Calls a Pyre Colossus down at the target area, dealing 64-79 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
       ],
       [
         'summon_doomguard',

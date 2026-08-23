@@ -672,7 +672,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'the stance/form bar; rebuilds its buttons behind a signature latch',
+    why: 'the stance/form bar, behind the hud/stance seam: the desktop row rebuilds its buttons behind a signature latch, and the touch shape paints the ring anchor through the shared write-elision facet with the icon RESOLVE key-diffed inside the painter',
   },
   {
     call: 'this.flushPendingProcAuraNotes',
@@ -729,11 +729,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the touch action ring; desktop skips the tick and the paint entirely',
   },
   {
-    call: 'this.consumableBarPainter.paint',
+    call: 'this.mobileConsumableSeat.paint',
     band: 'frame',
-    gate: 'this.isMobileLayout() && this.consumablesOpen && this.consumableBarView && this.consumableBarPainter',
+    gate: 'this.isMobileLayout()',
     surface: 'chrome',
-    why: 'the touch consumables quick bar, only while the row is expanded',
+    why: 'the touch consumables seat (the ring arc position showing the first carried consumable) plus the row it opens; desktop skips both',
   },
   {
     call: 'this.xpBarPainter.paint',
@@ -1339,6 +1339,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the always-on Reliquary tracker (not gated on a window): pinned pages fill from normal play and an illuminated page drops off',
   },
   {
+    call: 'this.trackerStackAnchor.apply',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'seats #right-tracker-stack below the minimap column, whose rendered height moves with the zone label and mobile chrome scale; a bounded layout read, elided write (tracker_stack_anchor.ts owns the cadence contract)',
+  },
+  {
     call: 'this.calendarWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.calendarWindow.isOpen',
@@ -1662,10 +1669,12 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // (the branch's woc_market window row against the release's own
       // window/chrome churn), so it cannot be reconciled by arithmetic across
       // a merge. The numbers below were counted from the merged table itself,
-      // not from either side's narrative. At the v0.40.0 sync the release's
-      // gamepad work took chrome to 83 while the branch keeps its 48th
-      // window row; the merged table counts window 48, chrome 83, none 17.
-    ).toEqual({ window: 48, chrome: 83, none: 17 });
+      // not from either side's narrative. At the third v0.40.0 sync the
+      // release's tracker-stack anchor apply (seats the stack below the
+      // minimap column; tracker_stack_anchor.ts) took chrome 83 -> 84 while
+      // the branch keeps its 48th window row (woc_market); the merged table
+      // counts window 48, chrome 84, none 17.
+    ).toEqual({ window: 48, chrome: 84, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -952,11 +952,52 @@ export const en_CA: EnTranslations = {
       "actionRing": "Combat actions",
       "actionPageToggle": "Switch action page",
       "actionPageIndicator": "{page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Swap target",
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Page {page}",
       "hideKeyboard": "Hide keyboard",
-      "chatPlaceholder": "Say something... (! for community commands)"
+      "chatPlaceholder": "Say something... (! for community commands)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -1488,6 +1529,7 @@ export const en_CA: EnTranslations = {
       "mouseoverCast": "Mouseover Cast on Party Frames",
       "stickyTarget": "Keep Target on Ground Click",
       "showItemLevel": "Show Item Level",
+      "showReliquaryTracker": "Show Reliquary Tracker",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
@@ -1500,7 +1542,9 @@ export const en_CA: EnTranslations = {
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileLeftHanded": "Left-handed layout",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Choices",
@@ -2601,7 +2645,8 @@ export const en_CA: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Add {name} to action bar",
-      "removeFromBarAria": "Remove {name} from action bar"
+      "removeFromBarAria": "Remove {name} from action bar",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
@@ -3861,6 +3906,9 @@ export const en_CA: EnTranslations = {
       "pinFull": "The tracker is full (up to {cap} pages)",
       "pinAria": "Pin {name} to the HUD tracker",
       "unpinAria": "Unpin {name}",
+      "trackerToggleLabel": "HUD tracker",
+      "trackerToggleShowHint": "Show the Reliquary tracker on your screen",
+      "trackerToggleHideHint": "Hide the Reliquary tracker from your screen",
       "rarityLine": "Found by {percent} of collectors",
       "pageRarityLine": "Illuminated by {percent} of collectors",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -4725,6 +4773,7 @@ export const en_CA: EnTranslations = {
       "ifHighContrastBackground": "A plainer, higher-contrast background behind the start and character screens.",
       "ifInvertLookY": "Flips the up and down direction of mouse look.",
       "ifShowItemLevel": "Adds an item level line to every item tooltip. Off by default, which keeps the classic stat-only tooltip.",
+      "ifShowReliquaryTracker": "Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.",
       "ifShowPlaytime": "Shows your lifetime time played on the character sheet. On by default, and the sheet has an eye button that flips it per device, which is handy if you stream or take screenshots. The total keeps counting either way.",
       "ifShowOwnNameplate": "Draws your own overhead nameplate exactly as other players see it, flair and all. Turn it off for the classic view.",
       "ifShowPlayerNameplates": "Draws other players nameplates. Off declutters a crowded hub, and your current target stays readable either way.",
@@ -9762,7 +9811,7 @@ export const en_CA: EnTranslations = {
       },
       "ignition": {
         "name": "Ignition",
-        "description": "Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)"
+        "description": "Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)"
       },
       "mass_barrier": {
         "name": "Mass Barrier",
@@ -10360,7 +10409,7 @@ export const en_CA: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -10566,7 +10615,7 @@ export const en_CA: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Warspirit Cadence",
-        "description": "Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "description": "Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
       },
       "stormsurge": {
         "name": "Stormsurge",
@@ -10778,7 +10827,7 @@ export const en_CA: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Summon Pyre Colossus",
-        "description": "Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec."
+        "description": "Calls a Pyre Colossus down at the target area, dealing 64-79 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec."
       },
       "summon_doomguard": {
         "name": "Summon Wraithborn",

@@ -1305,6 +1305,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.uiScale': '介面縮放',
   'hudChrome.options.highContrastBackground': '高對比度背景',
   'hudChrome.options.showItemLevel': '顯示物品等級',
+  'hudChrome.options.showReliquaryTracker': '顯示聖物庫追蹤器',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showThirdActionBar': '顯示第三動作列',
   'hudChrome.options.hideUnusedActionSlots': '隱藏未使用的動作欄位',
@@ -1312,6 +1313,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '顯示每日獎勵寶箱',
   'hudChrome.options.mobileCameraJoystick': '攝影機搖桿',
   'hudChrome.options.mobileLeftHanded': '左手配置',
+  'hudChrome.options.touchTapMenus': '點擊選單',
+  'hudChrome.options.touchTapMenusNote': '用點擊代替滑動來開啟動作、消耗品與選單控制項。點擊項目即可使用，再次點擊控制項執行其一般操作，點擊外部則關閉。',
   'hudChrome.options.itemLevelLine': '物品等級 {level}',
   'hudChrome.options.itemScoreLine': '評分 {score}',
   'hudChrome.landing.highContrast': '高對比度',
@@ -5550,6 +5553,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.autoShowHint':
     '一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。',
   'hudChrome.mobile.actionPageToggle': '切換動作頁',
+  'hudChrome.mobile.actionRadial': '技能方向',
+  'hudChrome.mobile.actionRadialCancel': '取消動作',
+  'hudChrome.mobile.radialCenter': '中心',
+  'hudChrome.mobile.radialRight': '右',
   'hudChrome.mobile.actionRing': '戰鬥動作',
   'hudChrome.mobile.haptics': '觸覺回饋',
   'hudChrome.mobile.hapticsOff': '觸覺回饋已關閉',
@@ -8842,6 +8849,25 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': '頁{page}',
   'hudChrome.mobile.hideKeyboard': '隱藏鍵盤',
   'hudChrome.mobile.chatPlaceholder': '說點什麼...（! 顯示社群指令）',
+  'hudChrome.mobile.consumableSeat': '消耗品',
+  'hudChrome.mobile.menuControl': '選單',
+  'hudChrome.mobile.menuControlAria':
+    '選單。點按開啟聊天，或按住並向右滑動以使用坐騎、地圖、背包等。',
+  'hudChrome.mobile.menuControlAriaTap':
+    '選單。點按開啟選單列：坐騎、地圖、背包等。再次點按可開啟聊天。',
+  'hudChrome.mobile.quickActions': '快捷操作',
+  'hudChrome.mobile.quickActionsAria':
+    '快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，或按住並向右滑動進行選擇。',
+  'hudChrome.mobile.quickActionsAriaTap':
+    '快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，然後點按其中一項。再次點按此控制項可關閉。',
+  'hudChrome.mobile.quickActionsLabel': '操作',
+  'hudChrome.mobile.stanceRadial': '姿態',
+  'hudChrome.mobile.stanceAnchorAria': '姿態：{stance}。點按開啟姿態環，然後選擇其他姿態。',
+  'hudChrome.mobile.stanceAnchorEmptyAria': '無姿態。點按開啟姿態環，然後選擇一種姿態。',
+  'hudChrome.mobile.questStripAria':
+    '追蹤任務 {position}/{total}：{title}。點按可切換至下一個任務。',
+  'hudChrome.mobile.questStripAriaSingle': '追蹤任務：{title}',
+  'hudChrome.mobile.questStripMore': '還有 {count} 項',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷盃',
   'hudChrome.keybinds.categoryPet': '寵物',
@@ -10536,6 +10562,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pinFull': '追蹤器已滿（最多 {cap} 個頁面）',
   'hudChrome.reliquary.pinAria': '將{name}釘選到介面追蹤器',
   'hudChrome.reliquary.unpinAria': '取消釘選{name}',
+  'hudChrome.reliquary.trackerToggleLabel': '介面追蹤器',
+  'hudChrome.reliquary.trackerToggleShowHint': '在畫面上顯示聖物庫追蹤器',
+  'hudChrome.reliquary.trackerToggleHideHint': '在畫面上隱藏聖物庫追蹤器',
   'hudChrome.reliquary.rarityLine': '{percent} 的收藏家已發現',
   'hudChrome.reliquary.pageRarityLine': '{percent} 的收藏家已點亮',
   'hudChrome.reliquary.cellAriaWithRarity': '{base}，{rarity}',
@@ -12664,6 +12693,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAttackButton': '在你的動作列上放一個明確的「攻擊」按鈕。',
   'guide.settingsPage.ifShowItemLevel':
     '在每個物品提示框上加一行裝備等級。預設關閉，以保留經典的純屬性提示框。',
+  'guide.settingsPage.ifShowReliquaryTracker': '控制聖物庫追蹤器（你釘選的書頁及其進度）是否顯示在介面上。聖物庫視窗中有對應的眼睛按鈕，釘選書頁時追蹤器也會重新開啟。',
   'guide.settingsPage.ifShowOwnNameplate':
     '把你自己頭上的名條，完全照別的玩家看到的樣子畫出來，連裝飾都一併呈現。想要經典的視野就把它關掉。',
   'guide.settingsPage.ifShowPlayerNameplates':
@@ -13231,4 +13261,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '需要更新後才能進行遊戲。下載完成後將立即套用。',
   'hudChrome.otaUpdate.progressLabel': '更新下載進度',
   'hudChrome.otaUpdate.title': '遊戲更新',
+  'hudChrome.mobile.barEditorAria': '編輯動作列配置',
+  'hudChrome.barEditor.title': '編輯動作列',
+  'hudChrome.barEditor.close': '關閉動作列編輯器',
+  'hudChrome.barEditor.pages': '動作列頁面',
+  'hudChrome.barEditor.buttonHeader': '按鈕 {button}',
+  'hudChrome.barEditor.cellAria': '按鈕 {button}，{direction}：{action}',
+  'hudChrome.barEditor.emptyCellAria': '按鈕 {button}，{direction}：空',
+  'hudChrome.barEditor.hint': '點按一個欄位，再點按另一個即可交換。',
+  'hudChrome.barEditor.armed': '點按一個欄位以放置 {name}。',
+  'hudChrome.barEditor.picked': '點按另一個欄位以與 {name} 交換。',
+  'hudChrome.barEditor.locked': '動作列已在介面選項中鎖定。',
+  'hudChrome.barEditor.clear': '清除',
+  'hudChrome.barEditor.clearAria': '清除一個欄位',
+  'hudChrome.barEditor.clearArmed': '點擊一個欄位即可清除。',
+  'hudChrome.spellbook.assignAria': '為 {name} 選擇一個欄位',
 };

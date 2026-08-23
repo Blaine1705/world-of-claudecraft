@@ -4607,7 +4607,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+      'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
   },
   stormsurge: {
     id: 'stormsurge',
@@ -5111,7 +5111,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage.',
+      'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
   },
   cruel_pact: {
     id: 'cruel_pact',
@@ -5721,7 +5721,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'summonPyreColossus', duration: 30 },
     ],
     description:
-      'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
+      'Calls a Pyre Colossus down at the target area, dealing 64-79 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
   },
   soul_harvest: {
     id: 'soul_harvest',
@@ -8251,7 +8251,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+      'Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)',
   },
   hot_streak: {
     id: 'hot_streak',
@@ -8583,7 +8583,13 @@ function scaleEffect(
         ? { ...eff, value: Math.round(eff.value * dmgMult + flat) }
         : eff;
     case 'lifeTap':
-      return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
+      // Same policy as gainResource below: a health-to-mana conversion is
+      // economy, not damage. Scaling only the mana half would also break the
+      // authored hp == mana symmetry the Hard Bargain tooltip promises
+      // ("Converts {damage} health into {damage} mana"). Intentional yield
+      // scaling rides the per-ability buffPct (Blood Credit), applied at the
+      // effect_dispatch lifeTap arm.
+      return eff;
     case 'gainResource':
       // Resource generation is economy, not damage. Damage modifiers must not
       // alter an authored Focus, Rage, or Energy gain.

@@ -131,7 +131,14 @@ const MONOLITHS: MonolithRow[] = [
     // dispatch moved to src/ui/wallet_verify_request.ts on the rule of three
     // (the Exchange banner's connect shortcut was the fourth copy), paying
     // for that shortcut's dep. Exact count, zero headroom kept.
-    ceiling: 19152,
+    // Re-pinned 19152 -> 18693 at the third v0.40.0 sync merge (release tip
+    // b39b16022e): the release ran its own extraction campaign on hud.ts (the
+    // touch radial ring, the consumables seat, the bar editor, the stance
+    // radial and the chrome focus wiring all moved behind their seams, taking
+    // the release row 19490 -> 19031), and those deletions land on top of this
+    // branch's arm, so the merged file lands far BELOW both parents. Exact
+    // merged count, zero headroom: the next line added fails.
+    ceiling: 18693,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -276,7 +283,58 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    ceiling: 13546,
+    // RAISED 13546 -> 13548 (+2) by the streamed-prewarm branch. A raise, not a
+    // lowering, and stated as one: the branch extracts the compile SUBMIT LOOP
+    // with its deadline rule and never-drop contract
+    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
+    // beside the per-unit submit that module already owned) and the weapon-skin
+    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
+    // beside the stage whose failure boundary shares its unit ids), and those
+    // two extractions still do not quite cover what it adds.
+    //
+    // The history matters because it is the failure mode this ratchet exists to
+    // catch. An earlier revision of this branch reported a NET REDUCTION while
+    // deleting 41 lines of load-bearing comments, 11 blank lines and folding
+    // three `let` declarations into one comma statement: the extractions were
+    // real but the number was bought with formatting. Every comment is restored,
+    // the blank lines are back, the declarations are separate again, and the
+    // count below is what the extractions alone earn. Maintainer decision, and
+    // deliberately a visible +2 rather than an invisible -9.
+    // Re-pinned 13548 -> 13551 when the rift long-session perf branch merged
+    // this base: both parents grew the file independently (upstream's interior
+    // resource registry wiring, this branch's object-view material disposal,
+    // sparkle tags and the rift build-key cooldown, all thin consumers of
+    // extracted modules). Exact merged count, zero slack: any further growth
+    // reds again.
+    // Raised +8 in the same branch's review round: the rift build-failure
+    // cooldown swapped its untracked setTimeout (a handle that outlives
+    // teardown and can fire into a recycled renderer) for a timestamp gate.
+    // The gate logic lives in src/render/build_retry_gate.ts; this is the
+    // coordinator's thin-wiring cost (import, field + rationale comment, the
+    // wrapped attempt condition). Exact count, zero slack.
+    // Meanwhile on the release base: re-pinned 13548 -> 13563 (+15) when the
+    // fast-loading-screen-variety branch merged release/v0.40.0 (thin-consumer
+    // wiring to the onCharacterAssetReady seam; substance in
+    // src/render/characters/assets.ts and visual.ts), then 13563 -> 13573
+    // (+10) for its review-fix round (the nearby-view floor on the shared
+    // prewarm budget, decision in src/render/prewarm_policy.ts, and the
+    // weapon-skin early-out predicate in characters/assets.ts).
+    // Re-pinned to the exact count of the merged file: the base's 13573 plus
+    // this branch's +11 across its two arms above. Exact merged count, zero
+    // slack: any further growth reds again.
+    // Entry-detail admission moved the settle step ahead of compile/texture
+    // collection while deleting the old reveal-time arm: exact count, no slack.
+    // Lowered by extracting the initial-scene texture collection and shared
+    // admission cursor into initial_scene_texture_admission.ts.
+    // Lowered again by extracting the compile-root collection, near-first
+    // ordering and program-content dedupe into initial_scene_compile_units.ts.
+    // The release's rift lifecycle wiring brings the combined renderer to this
+    // exact count after formatting, with zero slack.
+    // Review hardening restores the measured residency rationale at its live
+    // call site and adds only thin wiring for rebuild reveal-gate installation,
+    // entry-barrier cleanup and observed display pacing; the policy and timer
+    // ownership remain in sibling modules. Exact count, zero slack.
+    ceiling: 13541,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -320,7 +378,15 @@ const MONOLITHS: MonolithRow[] = [
     // added lines (the Exchange wiring import plus its attach call, and the
     // checkout error text now resolved through the shared wallet-bridge
     // module). Exact merged count, zero headroom: the next line added fails.
-    ceiling: 11519,
+    // Re-pinned 11519 -> 11522 at the third v0.40.0 sync merge (release tip
+    // b39b16022e): the release's fast-loading-screen-variety round plus its
+    // review fixes moved its own row 11516 -> 11519, and this branch's three
+    // Exchange lines (the wiring import, its attach call, the shared
+    // wallet-bridge checkout error text) ride on top of it. The merged file
+    // counts exactly 11522. Re-derived from the merged tree, not taken from
+    // either side, keeping the zero-headroom posture: the next line added
+    // fails.
+    ceiling: 11522,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -410,8 +476,21 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/colliders.ts',
-    ceiling: 2660,
+    // Lowered from 2660 after the cell-index math moved out to
+    // collider_cells.ts (the ratchet rule: extraction lowers the ceiling).
+    ceiling: 2630,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
+  },
+  {
+    // Newly tracked. It was already larger than several budgeted files and had
+    // no row at all, so it was drifting unwatched: this branch's interior
+    // resource-lifecycle work grew it from 2807 to the count below even after
+    // extracting src/render/interior_resource_lifecycle.ts. Pinned at the exact
+    // current count per the ratchet's rule; any further growth reds, and the
+    // fix is extraction behind the seam named here.
+    file: 'src/render/dungeon.ts',
+    ceiling: 2882,
+    seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];
 
