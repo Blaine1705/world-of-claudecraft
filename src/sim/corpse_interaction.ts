@@ -12,7 +12,12 @@ export interface CorpseInteractionAvailability {
 }
 
 export function corpseCanInteract(mob: Entity): boolean {
-  return mob.kind === 'mob' && mob.dead && !corpseHasDecayed(mob.dead, mob.corpseTimer);
+  return (
+    mob.kind === 'mob' &&
+    mob.ownerId === null &&
+    mob.dead &&
+    !corpseHasDecayed(mob.dead, mob.corpseTimer)
+  );
 }
 
 export function corpseInteractionAvailability(

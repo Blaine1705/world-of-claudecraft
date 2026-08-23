@@ -8,6 +8,7 @@ function corpse(overrides: Partial<Entity>): Entity {
     id: 2,
     kind: 'mob',
     templateId: 'test',
+    ownerId: null,
     loot: null,
     harvestClaimedBy: null,
     ...overrides,
@@ -50,6 +51,17 @@ describe('corpseLootAvailability', () => {
     expect(result.hasLoot).toBe(false);
     expect(result.harvestable).toBe(true);
     expect(result.canOpen).toBe(true);
+  });
+
+  it('keeps an owned skinnable pet corpse closed', () => {
+    const result = corpseLootAvailability(
+      corpse({ templateId: 'forest_wolf', ownerId: 1, loot: null, harvestClaimedBy: null }),
+      1,
+    );
+
+    expect(result.hasLoot).toBe(false);
+    expect(result.harvestable).toBe(false);
+    expect(result.canOpen).toBe(false);
   });
 
   it('closes a decayed corpse even when stale loot fields remain mirrored', () => {
