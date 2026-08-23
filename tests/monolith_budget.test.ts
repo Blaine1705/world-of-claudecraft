@@ -131,6 +131,11 @@ const MONOLITHS: MonolithRow[] = [
     // dispatch moved to src/ui/wallet_verify_request.ts on the rule of three
     // (the Exchange banner's connect shortcut was the fourth copy), paying
     // for that shortcut's dep. Exact count, zero headroom kept.
+    // LOWERED 18693 -> 18688 by the PR 3606 review fixes: the dead
+    // closeWocMarket() is deleted (its sole occurrence was its definition)
+    // and the mobile More-tray launcher's raw listener moved behind
+    // MobileControls.bindButton with its tray siblings, leaving a comment.
+    // Exact count, zero headroom.
     // Re-pinned 19152 -> 18693 at the third v0.40.0 sync merge (release tip
     // b39b16022e): the release ran its own extraction campaign on hud.ts (the
     // touch radial ring, the consumables seat, the bar editor, the stance
@@ -138,7 +143,7 @@ const MONOLITHS: MonolithRow[] = [
     // the release row 19490 -> 19031), and those deletions land on top of this
     // branch's arm, so the merged file lands far BELOW both parents. Exact
     // merged count, zero headroom: the next line added fails.
-    ceiling: 18693,
+    ceiling: 18688,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -384,6 +389,12 @@ const MONOLITHS: MonolithRow[] = [
     // added lines (the Exchange wiring import plus its attach call, and the
     // checkout error text now resolved through the shared wallet-bridge
     // module). Exact merged count, zero headroom: the next line added fails.
+    // Raised 11522 -> 11523 (+1) for the PR 3606 review fixes: the Exchange's
+    // More-tray launcher routes through MobileControlCallbacks, whose bag is
+    // wired here and nowhere else, so the ONE line is
+    // `onWocMarket: () => hud.toggleWocMarket()` (the onBarEditor precedent
+    // exactly; the same change deletes five lines from hud.ts). Maintainer
+    // decision, exact merged count: any further growth reds again.
     // Re-pinned 11519 -> 11522 at the third v0.40.0 sync merge (release tip
     // b39b16022e): the release's fast-loading-screen-variety round plus its
     // review fixes moved its own row 11516 -> 11519, and this branch's three
@@ -392,7 +403,7 @@ const MONOLITHS: MonolithRow[] = [
     // counts exactly 11522. Re-derived from the merged tree, not taken from
     // either side, keeping the zero-headroom posture: the next line added
     // fails.
-    ceiling: 11522,
+    ceiling: 11523,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

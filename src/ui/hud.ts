@@ -2966,12 +2966,11 @@ export class Hud {
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-wocmarket')?.addEventListener('click', () => this.toggleWocMarket());
-    // The mobile More tray is the ONLY reachable launcher under
-    // body.mobile-touch (#side-buttons is display:none there), and mobile web
-    // is in the PRD's scope, so both entry points are wired.
-    document
-      .getElementById('mobile-wocmarket')
-      ?.addEventListener('click', () => this.toggleWocMarket());
+    // The mobile More tray launcher (#mobile-wocmarket) binds through
+    // MobileControls like its tray siblings, so tapping it runs the tray's
+    // modal handoff (closeMoreModal plus the focus-return establishment); a
+    // raw listener here left the tray's aria-modal trap live behind the
+    // window (PR 3606 review).
     $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
     const emoteBtn = $('#mm-emote');
     emoteBtn.addEventListener('click', (ev) => {
@@ -17080,10 +17079,6 @@ export class Hud {
   toggleWocMarket(): void {
     if (this.wocMarketHooks === null) return;
     this.wocMarketWindow.toggle();
-  }
-
-  closeWocMarket(): void {
-    this.wocMarketWindow.close();
   }
 
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */

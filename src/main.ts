@@ -2082,6 +2082,7 @@ async function startGame(
     onCrafting: () => hud.toggleCrafting(),
     onSpellbook: () => hud.toggleSpellbook(),
     onBarEditor: () => hud.toggleBarEditor(),
+    onWocMarket: () => hud.toggleWocMarket(),
     onTalents: () => hud.toggleTalents(),
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
