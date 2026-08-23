@@ -189,6 +189,9 @@ export interface CharacterLodBands {
  * showed up. Anything `animatesEveryFrame` exempts therefore keeps its rig out to
  * the uncrowded base range no matter how dense the scene is (or how loaded the
  * machine is: this floor is deliberately independent of the frame budget).
+ * `showsStaticFarMesh`'s caller widens the SAME floor to a moving entity (see its
+ * own doc comment): unrelated reason, same bounded cost, so it rides this field
+ * rather than a second one.
  */
 export function characterLodBands(
   visibleRigs: number,
@@ -236,13 +239,49 @@ export function characterLodBandsInto(
   return out;
 }
 
-/** Whether a rig at `distSq` draws as the frozen far mesh instead of its rig. */
+/**
+ * Whether an entity's world position advanced since last sim tick, horizontally.
+ * `pos`/`prevPos` only change once per tick (the renderer's own interpolation
+ * source, see `renderer.ts`), so this needs no smoothing the way the render-space
+ * `loco.moving` locomotion signal does, and it is cheap enough to read at the
+ * far-mesh swap site, well before `loco.moving` is even computed for the frame.
+ * Vertical-only movement (falling, jumping in place) does not count: the
+ * "sliding statue" artifact this exists to prevent is specifically a body
+ * gliding across the GROUND while its pose is frozen.
+ */
+export function positionAdvancedThisTick(
+  pos: { x: number; z: number },
+  prevPos: { x: number; z: number },
+): boolean {
+  return pos.x !== prevPos.x || pos.z !== prevPos.z;
+}
+
+/**
+ * Whether a rig at `distSq` draws as the frozen far mesh instead of its rig.
+ *
+ * Widens the frozen-mesh edge to `bands.actionableStaticRangeSq` (the uncrowded
+ * base LOD range, immune to the crowd/tier/pressure squeeze) for two unrelated
+ * reasons that share the same floor: an ACTIONABLE pose (the fairness carve-out,
+ * see `animatesEveryFrame`) and an entity that is currently MOVING
+ * (`positionAdvancedThisTick`). A moving entity must never freeze: the renderer
+ * keeps advancing its `group` position every frame regardless of LOD, so a frozen
+ * idle-pose mesh reads as a statue sliding across the ground rather than a static
+ * character. A genuinely parked entity looks identical whether its mixer runs or
+ * not, so ordinary crowd-driven freezing is untouched for it. `pos`/`prevPos` are
+ * optional: a caller with no movement signal (or exercising the fairness
+ * carve-out alone) omits them, and the entity is treated as not moving.
+ */
 export function showsStaticFarMesh(
   distSq: number,
   bands: CharacterLodBands,
   actionable: boolean,
+  pos?: { x: number; z: number },
+  prevPos?: { x: number; z: number },
 ): boolean {
-  return distSq > (actionable ? bands.actionableStaticRangeSq : bands.staticRangeSq);
+  const moving =
+    pos !== undefined && prevPos !== undefined && positionAdvancedThisTick(pos, prevPos);
+  const heldOut = actionable || moving;
+  return distSq > (heldOut ? bands.actionableStaticRangeSq : bands.staticRangeSq);
 }
 
 /**

@@ -274,8 +274,11 @@ interface AttributionTargetFixture {
 // Re-minted for the loading review fixes (rebuild reveal gates, inactive
 // horizon fast path, display-pacing admission, and restored rationale): the
 // renderer integration leaf moved. No capture was retaken.
+// Re-minted for the sliding-far-mob-freeze fix (the far-mesh swap now also
+// holds out a moving entity): the renderer integration leaf moved. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9c27fa70eb3c517d53238235c4d7baeb3f539fd68c6dfa3e2e1165129140e556';
+  '349ee8b9c58a7d8658da9333a74d7fcc527b48571226d9cb63ef7b8f567d7b9a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -11,6 +11,7 @@ import {
   farAnimCadence,
   farAnimRangeScale,
   midAnimCadence,
+  positionAdvancedThisTick,
   showsStaticFarMesh,
 } from '../src/render/crowd_lod';
 import { assertAllocationStable } from './util/alloc_probe';
@@ -320,5 +321,50 @@ describe('showsStaticFarMesh', () => {
     const pressured = characterLodBands(48, SHADOW_BASE_SQ, LOD_BASE_SQ, 1, 4);
     expect(showsStaticFarMesh(yd(50), pressured, true)).toBe(false);
     expect(showsStaticFarMesh(yd(50), pressured, false)).toBe(true);
+  });
+});
+
+// The sliding-statue bug: `heldOut` (the third argument above) is read by the
+// renderer as `actionable || positionAdvancedThisTick(...)`, so a walking mob the
+// crowd pulled into the frozen band gets the SAME uncrowded floor a caster's
+// fairness carve-out does. A parked mob (position unchanged tick to tick) is
+// untouched: it looks identical whether its mixer runs or not, so ordinary
+// crowd-driven freezing still applies to it.
+describe('positionAdvancedThisTick', () => {
+  it('is false for a position unchanged since last tick', () => {
+    expect(positionAdvancedThisTick({ x: 12, z: -4 }, { x: 12, z: -4 })).toBe(false);
+  });
+
+  it('is true for any horizontal delta, however small', () => {
+    expect(positionAdvancedThisTick({ x: 12.001, z: -4 }, { x: 12, z: -4 })).toBe(true);
+    expect(positionAdvancedThisTick({ x: 12, z: -3.5 }, { x: 12, z: -4 })).toBe(true);
+  });
+
+  it('ignores a vertical-only change (falling or jumping in place)', () => {
+    // showsStaticFarMesh never sees y, but the predicate itself must agree:
+    // a body dropping straight down is not the ground-sliding artifact.
+    expect(positionAdvancedThisTick({ x: 5, z: 5 }, { x: 5, z: 5 })).toBe(false);
+  });
+
+  it('flags a large jump the same as a small step (a teleport still deserves its rig)', () => {
+    expect(positionAdvancedThisTick({ x: 500, z: 500 }, { x: 5, z: 5 })).toBe(true);
+  });
+});
+
+describe('the frozen-mesh swap exempts a moving mob the crowd pulled in', () => {
+  const dense = characterLodBands(48, SHADOW_BASE_SQ, LOD_BASE_SQ, FAR_ANIM_RANGE_SCALE_MAX);
+
+  it('reproduces the bug report: a walking bandit at 40yd in a packed camp used to freeze', () => {
+    const prevPos = { x: 39.9, z: 0 };
+    const pos = { x: 40, z: 0 };
+    // no movement signal at all (a caller that omits pos/prevPos): unchanged legacy behaviour
+    expect(showsStaticFarMesh(yd(40), dense, false)).toBe(true);
+    // the same distance, but the renderer now also passes this tick's position delta
+    expect(showsStaticFarMesh(yd(40), dense, false, pos, prevPos)).toBe(false);
+  });
+
+  it('still freezes the same mob the instant it stops (no residual unfreeze)', () => {
+    const pos = { x: 40, z: 0 };
+    expect(showsStaticFarMesh(yd(40), dense, false, pos, pos)).toBe(true);
   });
 });
