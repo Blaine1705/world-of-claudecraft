@@ -468,6 +468,7 @@ function setup(cfg: { isNameOffensive?: (name: string) => boolean } = {}) {
     advance: (ms: number) => {
       clock += ms;
     },
+    now: () => clock,
   };
 }
 
@@ -2350,5 +2351,157 @@ describe('guild bank guard on last-member guildLeave (Guild Bank Phase 3)', () =
     expect(await h.db.guildMembership(2)).toBeNull(); // the leave went through
     expect(h.db.guildCount()).toBe(1); // guild survives with its bank
     expect(h.tx.disbanded).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guild pledges (docs/prd/guild-pledge-board.md)
+// ---------------------------------------------------------------------------
+
+describe('guild pledges', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+
+  async function seed() {
+    const h = setup();
+    h.add(1, 'Leader');
+    h.add(2, 'Officer');
+    h.add(3, 'Plain');
+    h.add(4, 'Aspirant', { level: 10 });
+    const created = await h.db.createGuildWithLeader('Bookbinders', 1);
+    if ('error' in created) throw new Error('guild seed failed');
+    await h.db.addGuildMemberAtomic(created.guildId, 2, 'officer', 50);
+    await h.db.addGuildMemberAtomic(created.guildId, 3, 'member', 50);
+    return { ...h, guildId: created.guildId };
+  }
+
+  it('pledges to an open guild, notifies online officers only, stamps the badge', async () => {
+    const h = await seed();
+    h.tx.setOnline(1);
+    h.tx.setOnline(4);
+    // Plain member 3 online too: never notified, wrong rank.
+    h.tx.setOnline(3);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+    const leaderLines = (h.tx.delivered.get(1) ?? []).map((e) =>
+      e.type === 'log' ? e.text : '',
+    );
+    expect(leaderLines).toContain('Aspirant has pledged to your guild.');
+    // Officer 2 is OFFLINE: nothing delivered.
+    expect(h.tx.delivered.get(2) ?? []).toEqual([]);
+    const plainLines = (h.tx.delivered.get(3) ?? []).map((e) => (e.type === 'log' ? e.text : ''));
+    expect(plainLines).not.toContain('Aspirant has pledged to your guild.');
+    // The badge stamp rode the pledge (tier 0: the fake guild has no xp).
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({
+      characterId: 4,
+      pledgeGuild: 'Bookbinders',
+      guildTier: 0,
+    });
+  });
+
+  it('refuses a closed guild, an under-level pledger, and a member', async () => {
+    const h = await seed();
+    await h.db.setGuildPledgeSettings(h.guildId, { enabled: false, minLevel: 1, note: '' });
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    await h.db.setGuildPledgeSettings(h.guildId, { enabled: true, minLevel: 20, note: '' });
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    await h.db.setGuildPledgeSettings(h.guildId, { enabled: true, minLevel: 1, note: '' });
+    await h.svc.guildPledge(h.actor(3), 'Bookbinders');
+    expect(await h.db.pledgeOf(3)).toBeNull();
+  });
+
+  it('walks the rejection ladder: a day, a week, then forever', async () => {
+    const h = await seed();
+    const account = await h.db.accountIdForCharacter(4);
+    const pledgeAndReject = async () => {
+      await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+      expect(await h.db.pledgeOf(4)).not.toBeNull();
+      h.db.nowMs = h.now();
+      await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', false);
+      expect(await h.db.pledgeOf(4)).toBeNull();
+    };
+    await pledgeAndReject();
+    // Inside the day: refused. Past it: allowed.
+    h.advance(23 * 60 * 60 * 1000);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    h.advance(2 * 60 * 60 * 1000);
+    await pledgeAndReject();
+    // Second rejection: a week.
+    h.advance(6 * DAY);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    h.advance(2 * DAY);
+    await pledgeAndReject();
+    // Third rejection: forever.
+    h.advance(365 * DAY);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect((await h.db.pledgeLadder(h.guildId, account!))?.rejectCount).toBe(3);
+  });
+
+  it('a real guild invite wipes the ladder', async () => {
+    const h = await seed();
+    const account = await h.db.accountIdForCharacter(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    h.db.nowMs = h.now();
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', false);
+    expect(await h.db.pledgeLadder(h.guildId, account!)).not.toBeNull();
+    h.tx.setOnline(4);
+    await h.svc.guildInvite(h.actor(2), 'Aspirant');
+    expect(await h.db.pledgeLadder(h.guildId, account!)).toBeNull();
+    // And the aspirant may pledge again at once.
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).not.toBeNull();
+  });
+
+  it('accept resolves the pledge into the standard invite', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    const invites = (h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInvite');
+    expect(invites).toHaveLength(1);
+    // Accepting the invite seats them; joining clears any pledge state.
+    await h.svc.guildAccept(h.actor(4));
+    expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
+  });
+
+  it('withdraw clears the pledge and restamps the badge', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeWithdraw(h.actor(4));
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
+  });
+
+  it('officer-plus gates and note truncation on settings', async () => {
+    const h = await seed();
+    await h.svc.setGuildPledgeSettings(h.actor(3), { enabled: false, minLevel: 5, note: 'x' });
+    expect((await h.db.guildPledgeSettings(h.guildId)).enabled).toBe(true);
+    await h.svc.setGuildPledgeSettings(h.actor(1), {
+      enabled: false,
+      minLevel: 5,
+      note: 'a'.repeat(200),
+    });
+    const after = await h.db.guildPledgeSettings(h.guildId);
+    expect(after.enabled).toBe(false);
+    expect(after.minLevel).toBe(5);
+    expect(after.note).toHaveLength(90);
+  });
+
+  it('the snapshot shows pledges to officers only, and myPledge to the pledger', async () => {
+    const h = await seed();
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    const officer = await h.svc.snapshot(2);
+    expect(officer.guild?.pledges.map((r) => r.name)).toEqual(['Aspirant']);
+    const plain = await h.svc.snapshot(3);
+    expect(plain.guild?.pledges).toEqual([]);
+    expect(plain.guild?.pledgeSettings.enabled).toBe(true);
+    const mine = await h.svc.snapshot(4);
+    expect(mine.myPledge?.guildName).toBe('Bookbinders');
   });
 });
