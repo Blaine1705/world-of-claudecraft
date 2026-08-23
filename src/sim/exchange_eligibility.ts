@@ -42,6 +42,7 @@
 // (tests/architecture.test.ts) still holds with this file inside it.
 // ---------------------------------------------------------------------------
 
+import { weaponTypeForItem } from './content/weapon_skin_rules';
 import { isItemLocked } from './item_lock_flag';
 import { isTransferLockedInstance } from './transfer_lock';
 import type { ItemDef, ItemInstancePayload } from './types';
@@ -67,6 +68,40 @@ export function exchangeItemCategory(def: ItemDef): ExchangeItemCategory {
   if (def.use?.type === 'mechChroma') return 'mech_chroma';
   if (def.slot !== undefined) return 'equipment';
   return 'other';
+}
+
+/**
+ * The Browse filter's PLAYER-facing category split, distinct from
+ * ExchangeItemCategory on purpose: eligibility groups all gear as
+ * 'equipment' because one policy floor covers it, while a browsing player
+ * filters weapons and armor apart. Derived, never stored on the def, and
+ * shared by the server (which stamps it onto the listing row at escrow) and
+ * the client (which builds the filter controls from the same vocabulary).
+ */
+export type ExchangeBrowseCategory = 'weapon' | 'armor' | 'mount' | 'chroma' | 'other';
+
+export function exchangeBrowseCategory(def: ItemDef): ExchangeBrowseCategory {
+  if (def.kind === 'mount') return 'mount';
+  if (def.use?.type === 'mechChroma') return 'chroma';
+  if (def.kind === 'weapon') return 'weapon';
+  // held_offhand rides the armor arm: it equips in an armor slot and a
+  // browsing player looks for it there, not under weapons.
+  if (def.kind === 'armor' || def.kind === 'held_offhand') return 'armor';
+  return 'other';
+}
+
+/**
+ * The category's finer axis: a weapon's type (the weapon-skin vocabulary
+ * plus polearm) or an armor piece's slot (the def's own ItemSlot: items
+ * declare the slot KIND, 'ring', never ring1/ring2). Null for the
+ * categories with no finer axis, and for a weapon whose type the vocabulary
+ * cannot name (the filter simply cannot reach it, which is honest).
+ */
+export function exchangeBrowseSubcategory(def: ItemDef): string | null {
+  const category = exchangeBrowseCategory(def);
+  if (category === 'weapon') return weaponTypeForItem(def.id);
+  if (category === 'armor') return def.slot ?? null;
+  return null;
 }
 
 /**

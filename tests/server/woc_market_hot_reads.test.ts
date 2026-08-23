@@ -51,6 +51,8 @@ const BROWSE_Q = {
   pageSize: 25,
   quality: null,
   format: null,
+  category: null,
+  subcategory: null,
   itemIds: null,
   sort: 'ending',
 } as const;

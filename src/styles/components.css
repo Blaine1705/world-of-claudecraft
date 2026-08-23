@@ -16578,6 +16578,20 @@
   #woc-market-window .wm-seller-pane h3 {
     margin: 0;
   }
+  /* The `<Guild>` tag beside the title (the shared guild_tag builder, the
+     hs-guild treatment) and the character-age line under it: both quiet,
+     the title keeps the weight. */
+  #woc-market-window .wm-seller-guild {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    font-weight: 400;
+  }
+  #woc-market-window .wm-seller-meta {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 17px;
+  }
   /* Fixed geometry: the countdown column is rebuilt every second inside the
      anti-snipe window and a poll can land a longer bid, so under auto layout
      every column re-flowed and long names re-wrapped under the pointer.

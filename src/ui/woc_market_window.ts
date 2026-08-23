@@ -20,8 +20,10 @@ import type {
   WocMarketStatus,
   WocQuoteView,
   WocSaleView,
+  WocSellerView,
 } from '../net/woc_market_sdk';
 import { ITEMS } from '../sim/data';
+import type { ExchangeBrowseCategory } from '../sim/exchange_eligibility';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { userFacingApiError } from './api_error_i18n';
@@ -234,11 +236,22 @@ export class WocMarketWindow {
   // language switch re-resolves against the names on screen.
   private filterQuality: string | null = null;
   private filterFormat: 'auction' | 'buy_now' | null = null;
+  /** The stamped category axes; picking a category drops an incompatible
+   *  subcategory (a sword filter under Armor would silently show nothing). */
+  private filterCategory: ExchangeBrowseCategory | null = null;
+  private filterSubcategory: string | null = null;
   private filterItemQuery = '';
   /** The seller click-through pane: set replaces the Browse body until Back.
    *  Null sales = the read is still out (the pane's loading face); failed
    *  keeps the pane up with the error face and its Back control. */
-  private sellerPane: { name: string; sales: WocSaleView[] | null; failed?: boolean } | null = null;
+  private sellerPane: {
+    name: string;
+    sales: WocSaleView[] | null;
+    /** The seller's public line (guild, character age): null until the read
+     *  lands or when the name no longer resolves (renamed or deleted). */
+    profile: WocSellerView | null;
+    failed?: boolean;
+  } | null = null;
   /** Sell-tab combobox: the typed query, whether the listbox is open, and the
    *  active (highlighted) option. All painter state, not DOM state: the window
    *  rebuilds from state on the slow poll band, so anything held only in the DOM
@@ -407,6 +420,8 @@ export class WocMarketWindow {
       page: this.page,
       quality: this.filterQuality,
       format: this.filterFormat,
+      category: this.filterCategory,
+      subcategory: this.filterSubcategory,
       itemIds,
       sort: this.sort,
     });
@@ -534,13 +549,19 @@ export class WocMarketWindow {
     // The status read is deliberately not repeated here: it carries the feature
     // and pause configuration, which changes on an operator action rather than
     // on play, and reload() already refreshes it on every open and tab change.
-    // The item-filtered browse deliberately sits OUT of the background poll:
-    // the service caches only itemIds === null pages, so a filtered re-ask
-    // every beat would be one uncached read per viewer per beat, forever.
-    // The player's own actions (typing, paging, sorting) still refresh a
-    // filtered view, and the countdowns tick from endsAtMs client-side.
-    const browseLeg =
-      this.filterItemQuery.trim() === '' ? this.loadBrowse(seq, true) : Promise.resolve();
+    // EVERY filtered browse deliberately sits OUT of the background poll:
+    // the service caches only the unfiltered shallow pages, so a filtered
+    // re-ask every beat would be one uncached read per viewer per beat,
+    // forever. The player's own actions (typing, paging, sorting, changing a
+    // filter) still refresh a filtered view, and the countdowns tick from
+    // endsAtMs client-side.
+    const filtered =
+      this.filterItemQuery.trim() !== '' ||
+      this.filterQuality !== null ||
+      this.filterFormat !== null ||
+      this.filterCategory !== null ||
+      this.filterSubcategory !== null;
+    const browseLeg = filtered ? Promise.resolve() : this.loadBrowse(seq, true);
     void Promise.all([browseLeg, this.loadActivity(seq)]).finally(() => {
       // Cleared even on a stale or failed response: leaving it set would wedge
       // the poll off for the rest of the session, which is the failure this
@@ -856,6 +877,7 @@ export class WocMarketWindow {
       return wocSellerPaneHtml({
         name: this.sellerPane.name,
         failed: this.sellerPane.failed === true,
+        profile: this.sellerPane.profile,
         sales:
           this.sellerPane.sales === null
             ? null
@@ -876,8 +898,13 @@ export class WocMarketWindow {
       hasMore: b.hasMore,
       sort: this.sort,
       quality: this.filterQuality,
-      qualityOptions: browseQualityOptions(this.status?.ok ? this.status.qualityFloor : 'epic'),
+      qualityOptions: browseQualityOptions(this.status?.ok ? this.status.qualityFloor : 'epic', {
+        mounts: this.status?.ok ? this.status.allowMounts : false,
+        mechChromas: this.status?.ok ? this.status.allowMechChromas : false,
+      }),
       format: this.filterFormat,
+      category: this.filterCategory,
+      subcategory: this.filterSubcategory,
       itemQuery: this.filterItemQuery,
     });
     if (b.failed) {
@@ -1393,7 +1420,7 @@ export class WocMarketWindow {
     // no-op, so rapid clicks cannot burn the shared read bucket (the
     // awaiting-chain payment poll spends from the same per-minute allowance).
     if (this.sellerPane?.name === name && this.sellerPane.sales === null) return;
-    this.sellerPane = { name, sales: null };
+    this.sellerPane = { name, sales: null, profile: null };
     this.render();
     void (async () => {
       const hooks = this.deps.hooks();
@@ -1403,7 +1430,9 @@ export class WocMarketWindow {
       if (seq !== this.renderSeq) return;
       // Back (or a different seller) won the race: this answer has no home.
       if (this.sellerPane?.name !== name) return;
-      this.sellerPane = out.ok ? { name, sales: out.sales } : { name, sales: null, failed: true };
+      this.sellerPane = out.ok
+        ? { name, sales: out.sales, profile: out.seller }
+        : { name, sales: null, profile: null, failed: true };
       this.render();
     })();
   }
@@ -1822,6 +1851,26 @@ export class WocMarketWindow {
     if (field === 'filter-format') {
       const value = (target as HTMLSelectElement).value;
       this.filterFormat = value === 'auction' || value === 'buy_now' ? value : null;
+      this.page = 0;
+      void this.reloadBrowseOnly();
+      return;
+    }
+    if (field === 'filter-category') {
+      const value = (target as HTMLSelectElement).value;
+      this.filterCategory =
+        value === 'weapon' || value === 'armor' || value === 'mount' || value === 'chroma'
+          ? value
+          : null;
+      // The finer axis belongs to its category: a sword filter surviving a
+      // switch to Armor would silently show nothing.
+      this.filterSubcategory = null;
+      this.page = 0;
+      void this.reloadBrowseOnly();
+      return;
+    }
+    if (field === 'filter-subcategory') {
+      const value = (target as HTMLSelectElement).value;
+      this.filterSubcategory = value === '' ? null : value;
       this.page = 0;
       void this.reloadBrowseOnly();
       return;

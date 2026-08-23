@@ -38,6 +38,7 @@ import type {
   WocMarketDb,
   WocOpsP2pTradeRow,
   WocSaleRow,
+  WocSellerProfile,
   WocSettlementRow,
   WocStrikeRow,
   WocStuckCustodyClasses,
@@ -203,6 +204,16 @@ CREATE INDEX IF NOT EXISTS woc_market_listings_directed_buyer
 -- seller's worst-case cancel denial at exactly one lock window. Additive.
 ALTER TABLE woc_market_listings
   ADD COLUMN IF NOT EXISTS cancel_requested_at TIMESTAMPTZ;
+-- The Browse filter's category axes, stamped at escrow from the item def
+-- (exchangeBrowseCategory / exchangeBrowseSubcategory in
+-- src/sim/exchange_eligibility.ts): derived display data, never authority.
+-- Nullable and unbackfilled BY DECISION: legacy rows predate the stamp and
+-- simply sit outside category-filtered results (pre-enable data only).
+-- Additive.
+ALTER TABLE woc_market_listings
+  ADD COLUMN IF NOT EXISTS category TEXT;
+ALTER TABLE woc_market_listings
+  ADD COLUMN IF NOT EXISTS subcategory TEXT;
 -- The converge arm's read, on the shared rotation order (a stamped listing
 -- whose buyer PAID skips every pass until that settlement resolves, which
 -- can be operator-scale time; rotation plus the caller's backoff exclusion
@@ -1462,9 +1473,10 @@ export class PgWocMarketDb implements WocMarketDb {
           `INSERT INTO woc_market_listings (
            realm, seller_account, seller_character, seller_name, seller_wallet,
            item, item_id, quality, format, start_cents, reserve_cents,
-           buy_now_cents, offer_next, ends_at, base_ends_at, directed_buyer_account
+           buy_now_cents, offer_next, ends_at, base_ends_at, directed_buyer_account,
+           category, subcategory
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
-                   to_timestamp($14 / 1000.0), to_timestamp($14 / 1000.0), $15)
+                   to_timestamp($14 / 1000.0), to_timestamp($14 / 1000.0), $15, $16, $17)
          RETURNING id`,
           [
             listing.realm,
@@ -1482,6 +1494,8 @@ export class PgWocMarketDb implements WocMarketDb {
             listing.params.offerNext,
             listing.endsAtMs,
             listing.params.directedBuyerAccount,
+            listing.category,
+            listing.subcategory,
           ],
         );
         const listingId = Number(inserted.rows[0].id);
@@ -1551,6 +1565,14 @@ export class PgWocMarketDb implements WocMarketDb {
     if (q.format) {
       params.push(q.format);
       where.push(`format = $${params.length}`);
+    }
+    if (q.category) {
+      params.push(q.category);
+      where.push(`category = $${params.length}`);
+    }
+    if (q.subcategory) {
+      params.push(q.subcategory);
+      where.push(`subcategory = $${params.length}`);
     }
     if (q.itemIds && q.itemIds.length > 0) {
       params.push(q.itemIds.slice(0, 50));
@@ -4490,6 +4512,31 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, sellerName, limit],
     );
     return res.rows.map(toSale);
+  }
+
+  async sellerProfile(realm: string, sellerName: string): Promise<WocSellerProfile | null> {
+    // The seller pane's public profile line: facts the world already shows
+    // (the nameplate guild tag) plus the character's creation date. LEFT
+    // JOIN so an unguilded character resolves with a null guild; a name
+    // that no longer exists resolves null outright (the sales are
+    // provenance and stand alone). characters.name is UNIQUE, so the realm
+    // qual is scoping, not disambiguation; LIMIT 1 mirrors the
+    // guildNameForCharacter join it descends from (db.ts).
+    const res = await this.pool.query(
+      `SELECT c.created_at, g.name AS guild_name
+         FROM characters c
+         LEFT JOIN guild_members gm ON gm.character_id = c.id
+         LEFT JOIN guilds g ON g.id = gm.guild_id AND g.realm = c.realm
+        WHERE c.realm = $1 AND c.name = $2
+        LIMIT 1`,
+      [realm, sellerName],
+    );
+    const row = res.rows[0];
+    if (!row) return null;
+    return {
+      createdAtMs: new Date(row.created_at).getTime(),
+      guildName: row.guild_name ?? null,
+    };
   }
 
   async setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'> {

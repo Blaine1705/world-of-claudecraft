@@ -17,6 +17,7 @@
 
 import { createHash } from 'node:crypto';
 import { ITEMS } from '../src/sim/data';
+import { exchangeBrowseCategory, exchangeBrowseSubcategory } from '../src/sim/exchange_eligibility';
 import type { ExtractRef, ExtractRefusal } from '../src/sim/inventory_extract';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { CharacterState } from '../src/sim/sim';
@@ -77,6 +78,11 @@ import {
   stepUpProofRefusal,
   type WocStepUpFlowCtx,
 } from './woc_market_stepup_flow';
+import type {
+  WocDeliveryScope,
+  WocSweepErrorTag,
+  WocSweepPassStats,
+} from './woc_market_sweep_types';
 
 // ---------------------------------------------------------------------------
 // Row shapes (persisted by woc_market_db.ts)
@@ -268,6 +274,12 @@ export interface WocBrowseQuery {
   pageSize: number;
   quality: string | null;
   format: WocListingFormat | null;
+  /** The stamped category axes (exchangeBrowseCategory /
+   *  exchangeBrowseSubcategory): closed vocabularies, validated at the
+   *  route. Legacy rows carry NULL stamps and sit outside filtered results
+   *  (pre-enable data only; no backfill by decision). */
+  category: string | null;
+  subcategory: string | null;
   /** Client-resolved item ids for a name search (the server stays
    *  language-agnostic; the client owns localized names). */
   itemIds: readonly string[] | null;
@@ -287,6 +299,11 @@ export interface NewWocListing {
   item: InvSlot;
   itemId: string;
   quality: string;
+  /** The Browse filter's category axes, derived once at escrow from the def
+   *  (the sim helpers); null when the catalog no longer names the def, which
+   *  the filter then simply cannot reach. */
+  category: string | null;
+  subcategory: string | null;
   params: WocListingParams;
   endsAtMs: number;
   /** The directed offer this listing consummates, or null for a public
@@ -295,6 +312,20 @@ export interface NewWocListing {
    *  stamped), the invariant the accepted-offer converge arm proves rollback
    *  by; a zero-row stamp CAS aborts the whole transaction 'not_pending'. */
   directedOfferId: number | null;
+}
+
+/** The seller click-through's public profile line: facts the game already
+ *  shows in the world (the guild tag on nameplates and rosters) plus the
+ *  character's creation date. Derived per read, never stored on sale rows. */
+export interface WocSellerProfile {
+  createdAtMs: number;
+  guildName: string | null;
+}
+
+/** The seller click-through's one cached readout: sales plus profile. */
+export interface WocSellerHistoryReadout {
+  sales: WocSaleRow[];
+  profile: WocSellerProfile | null;
 }
 
 export interface CharacterSaveArgs {
@@ -830,6 +861,9 @@ export interface WocMarketDb {
   insertSale(args: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>): Promise<number>;
   salesForItem(realm: string, itemId: string, limit: number): Promise<WocSaleRow[]>;
   salesForSeller(realm: string, sellerName: string, limit: number): Promise<WocSaleRow[]>;
+  /** The seller pane's public profile line, or null when the name no longer
+   *  resolves to a character on this realm. */
+  sellerProfile(realm: string, sellerName: string): Promise<WocSellerProfile | null>;
   /** 'conflict': re-including a voided row while a standing non-excluded row
    *  holds the listing's slot (woc_market_sales_listing_once). */
   setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'>;
@@ -1211,80 +1245,13 @@ export interface WocOpsP2pTradeRow extends WocDirectedOfferRow {
   txSignature: string | null;
 }
 
-export interface WocSweepPassStats {
-  lapsedBids: number;
-  /** Directed p2p offers that timed out unanswered. */
-  expiredOffers: number;
-  /** Accepted offers whose escrow provably rolled back (aged, no stamped
-   *  listing), converged back to pending or straight to expired. The unwind
-   *  half of the atomic listing stamp. */
-  convergedOffers: number;
-  reclaimed: number;
-  closed: number;
-  /** Over-bound 'confirming' rows parked in the operator 'review' state
-   *  (the H15 exit; its own arm so a confirming backlog cannot starve the
-   *  deadline expiry batch). */
-  reviewed: number;
-  expired: number;
-  /** Cancel-pending listings whose lock window ended unpaid, closed
-   *  'cancelled' with the return flight home (the cancel-intent converge). */
-  cancelClosed: number;
-  polled: number;
-  /** Bonds paid but not yet decided by the chain, re-checked this pass. */
-  polledBonds: number;
-  delivered: number;
-  reconciled: number;
-  /** Delivered-but-unclosed settlements whose close tail was re-driven
-   *  forward (an older binary's crash residue converging). */
-  redriven: number;
-  /** Sold-but-undisposed residue rows whose dispose flag converged (the
-   *  sibling residue class; counted apart from redriven so a page-walk beat
-   *  and a dispose beat cannot trip the saturation signal together). */
-  disposed: number;
-  returned: number;
-  /** Rows PARKED this pass (delivery or return refusals rotating to the
-   *  tail). Parked work is real work: without this a fully parked pass
-   *  scored zero everywhere and the pass looked idle exactly when wedged. */
-  parked: number;
-  bonds: number;
-}
-
-/** Sweep failure tags: every per-arm stats key, plus the delivery sub-steps
- *  that report row-level failures from inside an arm (the grant commit and
- *  the seller notice), which carry their own tags so an operator can tell
- *  WHERE in the delivery a row is failing. 'offer_reopen' is the one
- *  request-thread tag: the acceptance path's in-request reopen swallows its
- *  own transport failures (the escrow root cause and the typed refusal are
- *  the caller-facing truths), and this report is what connects a
- *  reopen-latency symptom to that swallow. */
-export type WocSweepErrorTag =
-  | keyof WocSweepPassStats
-  | 'deliver_grant'
-  | 'deliver_notice'
-  | 'offer_reopen';
-
-/** Contention and park accounting for ONE delivery entry: the sweep pass
- *  owns one scope across its arm sequence, and the eager confirm entry mints
- *  its own, so a request-thread delivery can neither clobber a pass's
- *  contention verdict mid-flight nor inherit a stale one. */
-export interface WocDeliveryScope {
-  /** One 'contended' outcome stops the scope's remaining SETTLEMENT work
-   *  (the claim, both runDeliveryBatch arms, and the two residue beats):
-   *  the rows a break leaves behind are already 'delivering', and retrying
-   *  them seconds later only spends the lock_timeout budget the break
-   *  conserved. The return arm deliberately ignores it: it writes different
-   *  listings and only contributes park events here. */
-  contended: boolean;
-  /** Park EVENTS in this scope (rows newly parked or re-parked on a retry). */
-  parked: number;
-  /** FIFO-busy grant parks in this scope (the delivered-save entry found the
-   *  buyer's save queue wedged past its deadline). Budgeted: past
-   *  WOC_GRANT_BUSY_BUDGET the delivery arms stop the scope's settlement
-   *  work like a contended pass, so a save-wave wedge costs the LOCKED sweep
-   *  segment a bounded number of deadlines, never one per row. Optional so
-   *  the eager entry's inline literal stays unchanged; absent reads as 0. */
-  busyParks?: number;
-}
+// The sweep's pass-accounting vocabulary lives in woc_market_sweep_types.ts
+// (the ratchet's leaf-types pattern); the trio keeps this import path.
+export type {
+  WocDeliveryScope,
+  WocSweepErrorTag,
+  WocSweepPassStats,
+} from './woc_market_sweep_types';
 
 export class WocMarketService {
   constructor(private readonly deps: WocMarketDeps) {}
@@ -1381,15 +1348,23 @@ export class WocMarketService {
     // Viewer-identical per query tuple (the SQL excludes directed listings and
     // carries nothing viewer-scoped), so the page is shared through the read
     // cache; listingView's `mine` is computed per request over the shared rows.
-    // Item-filtered searches AND deep pages BYPASS the cache on purpose: both
-    // are caller-chosen key entropy (screened, but still an open combination
-    // space; the page number alone spans the 400-page clamp), and caching
-    // them would let one account's distinct keys evict the hot shallow pages
-    // every player shares while each eviction re-buys an OFFSET-walk read.
-    // A filtered search or a deep page is a per-user lookup; the limiter is
-    // its bound.
+    // EVERY filtered search AND every deep page BYPASSES the cache on
+    // purpose: the cached set is exactly the unfiltered shallow pages, the
+    // one view every browsing player shares and the client poll re-asks.
+    // Filter axes multiply the key space (quality x format x category x
+    // subcategory x itemIds spans thousands of combinations), so caching
+    // them would let one account's distinct keys evict the hot shared pages
+    // while each eviction re-buys an OFFSET-walk read. A filtered browse is
+    // a per-user, click-driven lookup (the client keeps it OUT of its poll);
+    // the limiter is its bound.
     const refresh = () => this.deps.db.browseListings(this.cfg.realm, q);
-    return this.deps.readCache && q.itemIds === null && q.page <= WOC_MARKET_BROWSE_CACHE_MAX_PAGE
+    const unfiltered =
+      q.itemIds === null &&
+      q.quality === null &&
+      q.format === null &&
+      q.category === null &&
+      q.subcategory === null;
+    return this.deps.readCache && unfiltered && q.page <= WOC_MARKET_BROWSE_CACHE_MAX_PAGE
       ? this.deps.readCache.browse(q, refresh)
       : refresh();
   }
@@ -1499,16 +1474,23 @@ export class WocMarketService {
       : refresh();
   }
 
-  /** A seller's recent completed trades (the Browse seller click-through).
-   *  Seller names are FREE TEXT off the wire, so unlike the item read there
-   *  is no vocabulary to gate caching on: the route screens shape, and the
-   *  cache arm is its own bounded LRU whose worst case is churn, never an
-   *  unbounded key set. Names resolve case-sensitively: the stored
+  /** A seller's recent completed trades PLUS their public profile line
+   *  (guild, character age), the Browse seller click-through's ONE readout:
+   *  resolved together and cached as one entry so the pane costs one request
+   *  and one cache slot. A null profile means the name no longer resolves to
+   *  a character (renamed or deleted); the sales are provenance and stand
+   *  alone. Seller names are FREE TEXT off the wire, so unlike the item read
+   *  there is no vocabulary to gate caching on: the route screens shape, and
+   *  the cache arm is its own bounded LRU whose worst case is churn, never
+   *  an unbounded key set. Names resolve case-sensitively: the stored
    *  seller_name is the character's exact name, and the client always sends
    *  a name it read off a listing row. */
-  async sellerSalesHistory(sellerName: string, limit = 20): Promise<WocSaleRow[]> {
-    if (!this.cfg.enabled) return [];
-    const refresh = () => this.deps.db.salesForSeller(this.cfg.realm, sellerName, limit);
+  async sellerSalesHistory(sellerName: string, limit = 20): Promise<WocSellerHistoryReadout> {
+    if (!this.cfg.enabled) return { sales: [], profile: null };
+    const refresh = async (): Promise<WocSellerHistoryReadout> => ({
+      sales: await this.deps.db.salesForSeller(this.cfg.realm, sellerName, limit),
+      profile: await this.deps.db.sellerProfile(this.cfg.realm, sellerName),
+    });
     return this.deps.readCache && limit === 20
       ? this.deps.readCache.sellerSales(sellerName, refresh)
       : refresh();
@@ -1791,6 +1773,8 @@ export class WocMarketService {
           item: extract.extracted,
           itemId: extract.extracted.itemId,
           quality: extract.extracted.instance?.rolled?.quality ?? def?.quality ?? 'common',
+          category: def ? exchangeBrowseCategory(def) : null,
+          subcategory: def ? exchangeBrowseSubcategory(def) : null,
           params: args.params,
           // A directed hold is the settlement window, not an auction duration
           // (H12): the named buyer pays now or the item flies home. The

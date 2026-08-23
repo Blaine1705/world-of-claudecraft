@@ -374,13 +374,21 @@ function rowsPassing(
   return rows;
 }
 
-/** The Browse quality filter's closed vocabulary: the realm floor and up, in
- *  rank order. Below-floor listings cannot exist, so offering those ranks
- *  would be dead options that read as a broken filter. */
-export function browseQualityOptions(qualityFloor: string): string[] {
+/** The Browse quality filter's closed vocabulary, in rank order. Equipment
+ *  floors at the realm's quality floor, but the collectible categories
+ *  bypass it (sellableRows' own rule) and rank down to uncommon (SkinRank),
+ *  so allowing either widens the vocabulary to uncommon: those listings
+ *  genuinely exist. Ranks below every listable thing stay out; dead options
+ *  read as a broken filter. */
+export function browseQualityOptions(
+  qualityFloor: string,
+  categories: { mounts: boolean; mechChromas: boolean },
+): string[] {
   const floor = QUALITY_RANK[qualityFloor] ?? QUALITY_RANK.epic;
+  const lowest =
+    categories.mounts || categories.mechChromas ? Math.min(floor, QUALITY_RANK.uncommon) : floor;
   return Object.entries(QUALITY_RANK)
-    .filter(([, rank]) => rank >= floor)
+    .filter(([, rank]) => rank >= lowest)
     .sort((a, b) => a[1] - b[1])
     .map(([quality]) => quality);
 }

@@ -10,10 +10,15 @@
 // DOM-free and deterministic apart from the caller's own timestamps
 // (registered in tests/architecture.test.ts UI_PURE_CORES).
 
+import type { ItemWeaponType } from '../sim/content/weapon_skin_rules';
+import type { ItemSlot } from '../sim/types';
+import { weaponTypeLabel } from './armory_labels';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
+import { guildTagHtml } from './guild_tag';
 import { formatDateTime, formatDuration, formatNumber, t } from './i18n';
 import { ITEM_QUALITY_LABEL_KEYS, itemQualityLabel } from './item_kind_label';
+import { itemSlotLabel } from './item_slot_labels';
 import { svgIcon } from './ui_icons';
 
 /** The browse faces' control row: the sort control LEADS the row (the 15 QA
@@ -24,6 +29,36 @@ import { svgIcon } from './ui_icons';
  *  leaves a way back, a live sort, and live filters. The filter values ride
  *  the server's own browse params (validated there); the item box is free
  *  text the window resolves to ids on the change event. */
+/** The weapon-type and armor-slot vocabularies the subcategory select offers
+ *  per category, mirrored from the stamped axes
+ *  (src/sim/exchange_eligibility.ts exchangeBrowseSubcategory): weapon types
+ *  are the skin vocabulary plus polearm; armor slots are the def's ItemSlot
+ *  kinds an armor piece can declare (offhand covers held pieces; 'ring' is
+ *  the slot KIND, never ring1/ring2). */
+const BROWSE_WEAPON_TYPES: readonly ItemWeaponType[] = [
+  'sword',
+  'axe',
+  'mace',
+  'dagger',
+  'staff',
+  'wand',
+  'bow',
+  'crossbow',
+  'polearm',
+];
+const BROWSE_ARMOR_SLOTS: readonly ItemSlot[] = [
+  'helmet',
+  'neck',
+  'shoulder',
+  'chest',
+  'waist',
+  'legs',
+  'gloves',
+  'feet',
+  'ring',
+  'offhand',
+];
+
 export function wocBrowseStripHtml(opts: {
   page: number;
   hasMore: boolean;
@@ -31,6 +66,8 @@ export function wocBrowseStripHtml(opts: {
   quality: string | null;
   qualityOptions: readonly string[];
   format: string | null;
+  category: string | null;
+  subcategory: string | null;
   itemQuery: string;
 }): string {
   const option =
@@ -40,6 +77,21 @@ export function wocBrowseStripHtml(opts: {
   const sortOption = option(opts.sort);
   const qualityOption = option(opts.quality);
   const formatOption = option(opts.format);
+  const categoryOption = option(opts.category);
+  const subcategoryOption = option(opts.subcategory);
+  // The finer axis renders only while a category with one is picked, and its
+  // vocabulary follows that category; the window drops an incompatible
+  // subcategory when the category changes.
+  const subcategorySelect =
+    opts.category === 'weapon' || opts.category === 'armor'
+      ? `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterSubcategory'))}` +
+        `<select data-field="filter-subcategory" ${FOCUS_KEY_ATTR}="wm-filter-subcategory">` +
+        subcategoryOption('', t('hudChrome.wocMarket.filterAny')) +
+        (opts.category === 'weapon'
+          ? BROWSE_WEAPON_TYPES.map((w) => subcategoryOption(w, weaponTypeLabel(w))).join('')
+          : BROWSE_ARMOR_SLOTS.map((s) => subcategoryOption(s, itemSlotLabel(s))).join('')) +
+        `</select></label>`
+      : '';
   return (
     `<div class="wm-pager">` +
     `<label class="wm-sort">${esc(t('hudChrome.wocMarket.sortLabel'))}` +
@@ -49,6 +101,14 @@ export function wocBrowseStripHtml(opts: {
     sortOption('price_asc', t('hudChrome.wocMarket.sortPriceAsc')) +
     sortOption('price_desc', t('hudChrome.wocMarket.sortPriceDesc')) +
     `</select></label>` +
+    `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterCategory'))}` +
+    `<select data-field="filter-category" ${FOCUS_KEY_ATTR}="wm-filter-category">` +
+    categoryOption('', t('hudChrome.wocMarket.filterAny')) +
+    categoryOption('weapon', t('hudChrome.wocMarket.filterCategoryWeapon')) +
+    categoryOption('armor', t('hudChrome.wocMarket.filterCategoryArmor')) +
+    categoryOption('mount', t('hudChrome.wocMarket.filterCategoryMount')) +
+    `</select></label>` +
+    subcategorySelect +
     `<label class="wm-sort">${esc(t('hudChrome.wocMarket.filterQuality'))}` +
     `<select data-field="filter-quality" ${FOCUS_KEY_ATTR}="wm-filter-quality">` +
     qualityOption('', t('hudChrome.wocMarket.filterAny')) +
@@ -366,6 +426,10 @@ export function wocBuyNowHtml(args: {
 export function wocSellerPaneHtml(args: {
   name: string;
   failed: boolean;
+  /** The seller's public profile line, or null when the name no longer
+   *  resolves to a character (renamed or deleted): the meta rows simply do
+   *  not render, and the sales stand alone. */
+  profile: { guildName: string | null; createdAtMs: number } | null;
   sales: readonly { atMs: number; itemName: string; buyerName: string; usdText: string }[] | null;
 }): string {
   const body = args.failed
@@ -387,12 +451,27 @@ export function wocSellerPaneHtml(args: {
                 )}</li>`,
             )
             .join('')}</ul>`;
+  // The classic `<Guild>` tag (the shared builder) rides the title line
+  // beside the name; the character-age line sits under it. Both render only
+  // when the profile resolved.
+  const meta =
+    args.profile === null
+      ? ''
+      : `<p class="wm-seller-meta">${esc(
+          t('hudChrome.wocMarket.sellerSince', {
+            date: formatDateTime(args.profile.createdAtMs, { dateStyle: 'long' }),
+          }),
+        )}</p>`;
   return (
     `<div class="wm-seller-pane">` +
     `<button type="button" data-action="seller-back" ${FOCUS_KEY_ATTR}="wm-seller-back">${esc(
       t('hudChrome.wocMarket.sellerBack'),
     )}</button>` +
-    `<h3>${esc(t('hudChrome.wocMarket.sellerTitle', { name: args.name }))}</h3>` +
+    `<h3>${esc(t('hudChrome.wocMarket.sellerTitle', { name: args.name }))}${guildTagHtml(
+      args.profile?.guildName,
+      'wm-seller-guild',
+    )}</h3>` +
+    meta +
     body +
     `</div>`
   );

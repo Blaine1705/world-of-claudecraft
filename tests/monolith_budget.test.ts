@@ -65,10 +65,15 @@ const MONOLITHS: MonolithRow[] = [
     // Activities tab moved verbatim to src/ui/woc_market_activity_html.ts and
     // the quote face to the chrome (wocQuoteFaceHtml), paying for the Browse
     // filters, the seller click-through pane, and the hot-path review's
-    // poll-skip and click-dedupe guards, with room to spare. Exact count,
-    // zero headroom.
+    // poll-skip and click-dedupe guards, with room to spare.
+    // Up 2438 -> 2487 at the third round (a maintainer-requested feature
+    // pair): the category/subcategory filter axes and the seller pane's
+    // profile line, whose markup all landed in the chrome builders; the
+    // window carries only state, handler arms and passthroughs. Exact
+    // count, zero headroom; the sell-tab combobox block is the next
+    // standing extraction candidate.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2438,
+    ceiling: 2487,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {

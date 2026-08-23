@@ -383,6 +383,8 @@ describeDb('woc market realm scoping against real Postgres', () => {
         pageSize: 50,
         quality: null,
         format: null,
+        category: null,
+        subcategory: null,
         itemIds: null,
         sort: 'newest',
       });
@@ -569,6 +571,32 @@ describeDb('woc market realm scoping against real Postgres', () => {
       expect(await marketDb.setSaleExcluded(a, true)).toBe('ok');
       expect(await marketDb.salesForItem(alpha, 'crown_of_embers', 10)).toEqual([]);
       expect(await marketDb.salesForSeller(alpha, 'S', 10)).toEqual([]);
+    }, 20_000);
+
+    it('sellerProfile resolves guild and creation only on the character realm', async () => {
+      const { alpha, beta } = realmPair('seller-profile');
+      const account = await seedAccount();
+      const characterId = await seedCharacter(alpha, account);
+      const name = await characterName(characterId);
+      const guild = await pool.query(
+        `INSERT INTO guilds (name, realm) VALUES ($1, $2) RETURNING id`,
+        [`Monarchs-${seq}`, alpha],
+      );
+      await pool.query(`INSERT INTO guild_members (character_id, guild_id) VALUES ($1, $2)`, [
+        characterId,
+        Number(guild.rows[0].id),
+      ]);
+      const profile = await marketDb.sellerProfile(alpha, name);
+      expect(profile?.guildName).toBe(`Monarchs-${seq}`);
+      expect(profile?.createdAtMs).toBeGreaterThan(0);
+      // The realm qual is a scoping predicate: the SAME name probed on the
+      // other realm resolves nothing (the renamed-or-deleted arm's shape).
+      expect(await marketDb.sellerProfile(beta, name)).toBeNull();
+      // An unguilded character still resolves, with a null guild.
+      const loner = await seedCharacter(alpha, account);
+      const lonerProfile = await marketDb.sellerProfile(alpha, await characterName(loner));
+      expect(lonerProfile).not.toBeNull();
+      expect(lonerProfile?.guildName).toBeNull();
     }, 20_000);
 
     it('disposeSoldResidueListings converges only the realm residue', async () => {
@@ -963,6 +991,8 @@ describeDb('woc market realm scoping against real Postgres', () => {
         item: { itemId: 'crown_of_embers', count: 1 },
         itemId: 'crown_of_embers',
         quality: 'epic' as const,
+        category: null,
+        subcategory: null,
         params: {
           format: 'auction' as const,
           directedBuyerAccount: null,

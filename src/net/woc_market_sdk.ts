@@ -287,8 +287,19 @@ export interface WocBrowseRequest {
   page: number;
   quality: string | null;
   format: string | null;
+  /** The stamped category axes (the exchangeBrowseCategory vocabulary and
+   *  its finer weapon-type/armor-slot axis), server-validated. */
+  category: string | null;
+  subcategory: string | null;
   itemIds: readonly string[] | null;
   sort: 'ending' | 'newest' | 'price_asc' | 'price_desc';
+}
+
+/** The seller pane's public profile line, or null when the seller's name no
+ *  longer resolves to a character (renamed or deleted). */
+export interface WocSellerView {
+  guildName: string | null;
+  createdAtMs: number;
 }
 
 export class WocMarketClient {
@@ -366,6 +377,8 @@ export class WocMarketClient {
     params.set('sort', req.sort);
     if (req.quality) params.set('quality', req.quality);
     if (req.format) params.set('format', req.format);
+    if (req.category) params.set('category', req.category);
+    if (req.subcategory) params.set('subcategory', req.subcategory);
     if (req.itemIds && req.itemIds.length > 0) params.set('itemIds', req.itemIds.join(','));
     const out = await this.request<{ hasMore: boolean; page: number; listings: WocListingView[] }>(
       'GET',
@@ -497,9 +510,12 @@ export class WocMarketClient {
   }
 
   /** A seller's recent completed trades (the Browse seller click-through):
-   *  the same public sale rows as history, pivoted by seller name. */
-  async sellerHistory(name: string): Promise<{ ok: true; sales: WocSaleView[] } | WocMarketFail> {
-    const out = await this.request<{ sales: WocSaleView[] }>(
+   *  the same public sale rows as history, pivoted by seller name, plus
+   *  their public profile line (guild, character age). */
+  async sellerHistory(
+    name: string,
+  ): Promise<{ ok: true; sales: WocSaleView[]; seller: WocSellerView | null } | WocMarketFail> {
+    const out = await this.request<{ sales: WocSaleView[]; seller: WocSellerView | null }>(
       'GET',
       `/api/woc-market/seller-history/${encodeURIComponent(name)}`,
     );

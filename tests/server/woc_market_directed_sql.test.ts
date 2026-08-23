@@ -101,6 +101,8 @@ const browseQuery = {
   page: 0,
   pageSize: 20,
   quality: null,
+  category: null,
+  subcategory: null,
   format: null,
   itemIds: null,
   sort: 'ending',
@@ -458,6 +460,8 @@ describe('the listing-id stamp rides the escrow transaction, atomically', () => 
     item: { itemId: 'crown_of_embers', count: 1 },
     itemId: 'crown_of_embers',
     quality: 'epic' as const,
+    category: null,
+    subcategory: null,
     params: {
       format: 'buy_now' as const,
       directedBuyerAccount: 9,
@@ -2148,6 +2152,8 @@ describe('the escrow listing transaction, in SQL', () => {
     item: { itemId: 'crown_of_embers', count: 1 },
     itemId: 'crown_of_embers',
     quality: 'epic' as const,
+    category: null,
+    subcategory: null,
     params: {
       format: 'auction' as const,
       directedBuyerAccount: null,

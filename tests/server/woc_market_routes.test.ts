@@ -939,7 +939,7 @@ describe('browse query decoding', () => {
     // Names have no closed vocabulary (unlike item ids), so the shape bound
     // is the whole screen: the read is parameterized and capped underneath,
     // and the cache arm behind it is a bounded LRU.
-    service({ sellerSalesHistory: async () => [] });
+    service({ sellerSalesHistory: async () => ({ sales: [], profile: null }) });
     const ctx = readCtx({
       url: `/api/woc-market/seller-history/${encodeURIComponent(hostile)}`,
       params: { name: hostile },
@@ -954,7 +954,7 @@ describe('browse query decoding', () => {
     service({
       sellerSalesHistory: async (name: string) => {
         seen.push(name);
-        return [];
+        return { sales: [], profile: null };
       },
     });
     const ctx = readCtx({

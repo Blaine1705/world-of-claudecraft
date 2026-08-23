@@ -111,6 +111,8 @@ describe('directedOffersForAccount mirrors the two Pg grace clauses', () => {
         item: { itemId: 'crown_of_embers', count: 1 },
         itemId: 'crown_of_embers',
         quality: 'epic',
+        category: null,
+        subcategory: null,
         params: {
           format: 'buy_now',
           directedBuyerAccount: 9,
@@ -160,6 +162,8 @@ describe('fidelity fixes: twin guard, signature order, cap clamp, copies', () =>
       item: { itemId: 'itm_test', count: 1 },
       itemId: 'itm_test',
       quality: 'epic',
+      category: null,
+      subcategory: null,
       params: {
         format: 'buy_now' as const,
         directedBuyerAccount: null,

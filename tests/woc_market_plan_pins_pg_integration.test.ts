@@ -254,7 +254,15 @@ describeDb('woc market plan-class pins against real Postgres', () => {
       [realm],
     );
     await pool.query('ANALYZE woc_market_listings');
-    const q = { page: 0, pageSize: 24, quality: null, format: null, itemIds: null } as const;
+    const q = {
+      page: 0,
+      pageSize: 24,
+      quality: null,
+      format: null,
+      category: null,
+      subcategory: null,
+      itemIds: null,
+    } as const;
     for (const [sort, index] of [
       ['price_desc', 'woc_market_listings_live_price_desc'],
       ['price_asc', 'woc_market_listings_live_price'],

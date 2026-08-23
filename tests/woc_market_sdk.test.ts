@@ -163,6 +163,8 @@ describe('browse()', () => {
       page: 2,
       sort: 'ending',
       quality: 'epic',
+      category: null,
+      subcategory: null,
       format: 'auction',
       itemIds: ['iron_sword', 'oak_staff'],
     });
@@ -177,7 +179,15 @@ describe('browse()', () => {
 
   it('omits null filters from the query string', async () => {
     stubFetch(() => ({ status: 200, body: { total: 0, page: 0, listings: [] } }));
-    await client().browse({ page: 0, sort: 'newest', quality: null, format: null, itemIds: null });
+    await client().browse({
+      page: 0,
+      sort: 'newest',
+      quality: null,
+      format: null,
+      category: null,
+      subcategory: null,
+      itemIds: null,
+    });
     expect(calls[0]?.url.endsWith('/api/woc-market/listings?page=0&sort=newest')).toBe(true);
   });
 
@@ -185,14 +195,30 @@ describe('browse()', () => {
     const listings = [{ id: 1, itemId: 'iron_sword' }];
     stubFetch(() => ({ status: 200, body: { total: 40, page: 1, listings } }));
     await expect(
-      client().browse({ page: 1, sort: 'ending', quality: null, format: null, itemIds: null }),
+      client().browse({
+        page: 1,
+        sort: 'ending',
+        quality: null,
+        format: null,
+        category: null,
+        subcategory: null,
+        itemIds: null,
+      }),
     ).resolves.toEqual({ ok: true, total: 40, page: 1, listings });
   });
 
   it('surfaces the stable server code from a non-2xx body', async () => {
     stubFetch(() => ({ status: 409, body: { code: 'woc_market.paused' } }));
     await expect(
-      client().browse({ page: 0, sort: 'ending', quality: null, format: null, itemIds: null }),
+      client().browse({
+        page: 0,
+        sort: 'ending',
+        quality: null,
+        format: null,
+        category: null,
+        subcategory: null,
+        itemIds: null,
+      }),
     ).resolves.toEqual({
       ok: false,
       code: 'woc_market.paused',
@@ -205,7 +231,15 @@ describe('browse()', () => {
   it('falls back to WOC_MARKET_UNAVAILABLE on a non-2xx with no code', async () => {
     stubFetch(() => ({ status: 503, body: null }));
     await expect(
-      client().browse({ page: 0, sort: 'ending', quality: null, format: null, itemIds: null }),
+      client().browse({
+        page: 0,
+        sort: 'ending',
+        quality: null,
+        format: null,
+        category: null,
+        subcategory: null,
+        itemIds: null,
+      }),
     ).resolves.toEqual({ ok: false, code: WOC_MARKET_UNAVAILABLE });
   });
 });

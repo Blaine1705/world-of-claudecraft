@@ -589,7 +589,40 @@ const BROWSE_SORTS = new Set(['ending', 'newest', 'price_asc', 'price_desc']);
 // re-allowing it a two-place change rather than one. Whatever a seller can make,
 // a buyer can filter for.
 const LISTING_FORMATS = new Set(['auction', 'buy_now', 'auction_buy_now']);
-const QUALITIES = new Set(['epic', 'legendary']);
+// uncommon and rare joined the vocabulary with the collectible categories:
+// mounts and chromas bypass the equipment quality floor (sellableRows' own
+// rule) and rank down to uncommon, so those listings genuinely exist. A
+// quality no live listing carries just answers empty.
+const QUALITIES = new Set(['uncommon', 'rare', 'epic', 'legendary']);
+// The stamped category axes (exchangeBrowseCategory and its finer axis):
+// closed vocabularies mirrored from src/sim/exchange_eligibility.ts and the
+// item model (weapon types plus armor slots). Mirrored as literals, pinned
+// by the routes suite, because the route validates WORDS, not defs.
+const BROWSE_CATEGORIES = new Set(['weapon', 'armor', 'mount', 'chroma', 'other']);
+const BROWSE_SUBCATEGORIES = new Set([
+  // Weapon types (the weapon-skin vocabulary plus polearm).
+  'sword',
+  'axe',
+  'mace',
+  'dagger',
+  'staff',
+  'wand',
+  'bow',
+  'crossbow',
+  'polearm',
+  // Armor slots (the def's ItemSlot: the slot KIND, 'ring', never ring1/2).
+  'mainhand',
+  'offhand',
+  'helmet',
+  'neck',
+  'shoulder',
+  'chest',
+  'waist',
+  'legs',
+  'gloves',
+  'feet',
+  'ring',
+]);
 
 async function browseHandler(ctx: Ctx): Promise<void> {
   const one = (v: string | string[] | undefined): string | null =>
@@ -597,9 +630,13 @@ async function browseHandler(ctx: Ctx): Promise<void> {
   const sortRaw = one(ctx.query.sort) ?? 'ending';
   const qualityRaw = one(ctx.query.quality);
   const formatRaw = one(ctx.query.format);
+  const categoryRaw = one(ctx.query.category);
+  const subcategoryRaw = one(ctx.query.subcategory);
   if (!BROWSE_SORTS.has(sortRaw)) invalid();
   if (qualityRaw !== null && !QUALITIES.has(qualityRaw)) invalid();
   if (formatRaw !== null && !LISTING_FORMATS.has(formatRaw)) invalid();
+  if (categoryRaw !== null && !BROWSE_CATEGORIES.has(categoryRaw)) invalid();
+  if (subcategoryRaw !== null && !BROWSE_SUBCATEGORIES.has(subcategoryRaw)) invalid();
   const itemIdsRaw = one(ctx.query.itemIds);
   // Shape-screened, sorted, de-duplicated, and normalized to null when empty:
   // item ids are a closed machine vocabulary, so anything outside the id
@@ -631,6 +668,8 @@ async function browseHandler(ctx: Ctx): Promise<void> {
     pageSize: 25,
     quality: qualityRaw,
     format: formatRaw as WocListingFormat | null,
+    category: categoryRaw,
+    subcategory: subcategoryRaw,
     itemIds,
     sort: sortRaw as WocBrowseQuery['sort'],
   };
@@ -905,8 +944,17 @@ const SELLER_NAME_SHAPE = /^[^\s%_][^%_]{0,31}$/;
 async function sellerHistoryHandler(ctx: Ctx): Promise<void> {
   const name = stringField(ctx.params.name, 32);
   if (!SELLER_NAME_SHAPE.test(name)) invalid();
-  const sales = await useService().sellerSalesHistory(name);
-  json(ctx.res, 200, { sales: sales.map(saleView) });
+  const out = await useService().sellerSalesHistory(name);
+  // The profile line carries only facts the world already shows (the
+  // nameplate guild tag) plus the character's creation date; null when the
+  // name no longer resolves (renamed or deleted), and the sales stand alone.
+  json(ctx.res, 200, {
+    sales: out.sales.map(saleView),
+    seller:
+      out.profile === null
+        ? null
+        : { guildName: out.profile.guildName, createdAtMs: out.profile.createdAtMs },
+  });
 }
 
 // ---------------------------------------------------------------------------

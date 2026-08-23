@@ -33,6 +33,7 @@ import type {
   WocMarketDb,
   WocOpsP2pTradeRow,
   WocSaleRow,
+  WocSellerProfile,
   WocSettlementRow,
   WocStrikeRow,
   WocStuckCustodyClasses,
@@ -2181,6 +2182,14 @@ export class FakeWocMarketDb implements WocMarketDb {
       .sort((a, b) => b.atMs - a.atMs || b.id - a.id)
       .slice(0, limit)
       .map((s) => structuredClone(s));
+  }
+
+  /** Seeded by tests that drive the seller pane's profile line; absent
+   *  names answer null, the renamed-or-deleted arm. Keyed realm\x1fname. */
+  readonly sellerProfiles = new Map<string, WocSellerProfile>();
+
+  async sellerProfile(realm: string, sellerName: string): Promise<WocSellerProfile | null> {
+    return this.sellerProfiles.get(`${realm}\x1f${sellerName}`) ?? null;
   }
 
   async setSaleExcluded(id: number, excluded: boolean): Promise<'ok' | 'miss' | 'conflict'> {

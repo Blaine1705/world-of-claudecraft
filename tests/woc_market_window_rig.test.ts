@@ -17,6 +17,7 @@ import type {
   WocMarketClient,
   WocMarketStatus,
   WocSaleView,
+  WocSellerView,
   WocStepUpChallenge,
 } from '../src/net/woc_market_sdk';
 import { ITEMS } from '../src/sim/data';
@@ -137,7 +138,9 @@ interface FakeClient {
     >;
     estimate: () => Promise<WocEstimateView | null>;
     history: () => Promise<{ ok: true; sales: WocSaleView[] } | { ok: false; code: string }>;
-    sellerHistory: () => Promise<{ ok: true; sales: WocSaleView[] } | { ok: false; code: string }>;
+    sellerHistory: () => Promise<
+      { ok: true; sales: WocSaleView[]; seller: WocSellerView | null } | { ok: false; code: string }
+    >;
     me: () => Promise<{ ok: true; activity: WocActivityView } | { ok: false; code: string }>;
     stepUpChallenge: () => Promise<
       { ok: true; challenge: WocStepUpChallenge } | { ok: false; code: string }
@@ -189,6 +192,7 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
           atMs: NOW - 60_000,
         },
       ],
+      seller: { guildName: 'Monarchs', createdAtMs: NOW - 90 * 24 * 3_600_000 },
     }),
     me: async () => ({ ok: true, activity: EMPTY_ACTIVITY }),
     stepUpChallenge: async () => ({
@@ -489,11 +493,75 @@ describe('WocMarketWindow live rig: open, browse, select', () => {
     expect(pane.textContent).toContain('Aurelia');
     expect(pane.textContent).toContain(NAME_OF(EPIC));
     expect(pane.textContent).toContain('Borin');
+    // The public profile line: the classic <Guild> tag beside the title and
+    // the character-age line under it.
+    expect(q(r.root, '.wm-seller-guild').textContent).toBe('<Monarchs>');
+    expect(q(r.root, '.wm-seller-meta').textContent).toContain('Character created');
     // Back restores the table: page, sort and filters all live on the class.
     q<HTMLButtonElement>(r.root, 'button[data-action="seller-back"]').click();
     await flush();
     expect(r.root.querySelector('.wm-seller-pane')).toBeNull();
     expect(r.root.querySelector('.wm-table')).not.toBeNull();
+  });
+
+  it('a seller whose name no longer resolves renders no profile rows', async () => {
+    const r = rig();
+    r.fake.answers.sellerHistory = async () => ({ ok: true, sales: [], seller: null });
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, 'button[data-action="seller-view"]').click();
+    await flush();
+    expect(r.root.querySelector('.wm-seller-guild')).toBeNull();
+    expect(r.root.querySelector('.wm-seller-meta')).toBeNull();
+    expect(q(r.root, '.wm-seller-pane').textContent).toContain(
+      t('hudChrome.wocMarket.sellerEmpty'),
+    );
+  });
+
+  it('the category filter rides the browse request and drops its subcategory on change', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    const category = q<HTMLSelectElement>(r.root, 'select[data-field="filter-category"]');
+    category.value = 'weapon';
+    category.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    expect(
+      r.fake.calls.some((c) => c.startsWith('browse:') && c.includes('"category":"weapon"')),
+    ).toBe(true);
+    // The dependent Type select appears for weapons and carries the weapon
+    // vocabulary; picking one rides the request.
+    const sub = q<HTMLSelectElement>(r.root, 'select[data-field="filter-subcategory"]');
+    sub.value = 'sword';
+    sub.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    expect(
+      r.fake.calls.some((c) => c.startsWith('browse:') && c.includes('"subcategory":"sword"')),
+    ).toBe(true);
+    // Switching category DROPS the finer axis: a sword filter under Armor
+    // would silently show nothing.
+    const again = q<HTMLSelectElement>(r.root, 'select[data-field="filter-category"]');
+    again.value = 'armor';
+    again.dispatchEvent(new Event('change', { bubbles: true }));
+    await flush();
+    expect(
+      r.fake.calls.some(
+        (c) =>
+          c.startsWith('browse:') &&
+          c.includes('"category":"armor"') &&
+          c.includes('"subcategory":null'),
+      ),
+    ).toBe(true);
+  });
+
+  it('the quality vocabulary widens to uncommon while mounts are allowed', async () => {
+    const r = rig();
+    r.fake.answers.status = async () => status({ allowMounts: true });
+    r.win.open();
+    await flush();
+    const quality = q<HTMLSelectElement>(r.root, 'select[data-field="filter-quality"]');
+    expect(quality.querySelector('option[value="uncommon"]')).not.toBeNull();
+    expect(quality.querySelector('option[value="rare"]')).not.toBeNull();
   });
 
   it('page-next asks the server for the next page and page-prev walks back', async () => {

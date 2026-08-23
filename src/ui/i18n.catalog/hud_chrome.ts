@@ -5324,6 +5324,15 @@ export const hudChromeStrings = {
     filterFormatBuyNow: 'Buy now',
     filterItemLabel: 'Item',
     filterItemPlaceholder: 'Search by item name',
+    // The stamped category axes: the player split (weapons and armor apart,
+    // unlike the policy's one equipment bucket) plus the finer weapon-type /
+    // armor-slot axis, whose option labels come from the shared families
+    // (weaponTypeLabel, itemSlotLabel).
+    filterCategory: 'Category',
+    filterCategoryWeapon: 'Weapons',
+    filterCategoryArmor: 'Armor',
+    filterCategoryMount: 'Mounts',
+    filterSubcategory: 'Type',
     // The seller click-through: a seller's recent completed trades, opened
     // from any Browse row's seller cell, with its own way back.
     sellerLinkAria: 'View recent trades by {name}',
@@ -5331,6 +5340,9 @@ export const hudChromeStrings = {
     sellerBack: 'Back to Browse',
     sellerEmpty: 'No completed trades yet.',
     sellerError: 'Recent trades could not be loaded.',
+    // The pane's character-age line (the guild tag rides the title through
+    // the shared builder and needs no key of its own here).
+    sellerSince: 'Character created {date}',
     sellerSaleRow: '{time}: {item} to {buyer} for {usd}',
     detailTitle: 'Listing',
     detailSeller: 'Sold by {name}',

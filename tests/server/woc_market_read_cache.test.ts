@@ -23,6 +23,8 @@ const Q: WocBrowseQuery = {
   pageSize: 25,
   quality: null,
   format: null,
+  category: null,
+  subcategory: null,
   itemIds: null,
   sort: 'ending',
 };
@@ -68,11 +70,20 @@ describe('the browse cache key', () => {
 
   it('the key shape is the pinned literal (separator and component order are load-bearing)', () => {
     // The \x1f separator and the field order are what keep distinct tuples
-    // distinct; a reordered builder must fail HERE, not in production.
-    expect(wocBrowseCacheKey(Q)).toBe('0\x1f25\x1fending\x1f\x1f\x1f');
+    // distinct; a reordered builder must fail HERE, not in production. The
+    // category axes joined the tuple with the Browse filters (defensive:
+    // live keys are unfiltered-only, the service gate).
+    expect(wocBrowseCacheKey(Q)).toBe('0\x1f25\x1fending\x1f\x1f\x1f\x1f\x1f');
     expect(
-      wocBrowseCacheKey({ ...Q, quality: 'epic', format: 'auction', itemIds: ['a', 'b'] }),
-    ).toBe('0\x1f25\x1fending\x1fepic\x1fauction\x1fa,b');
+      wocBrowseCacheKey({
+        ...Q,
+        quality: 'epic',
+        format: 'auction',
+        category: 'weapon',
+        subcategory: 'sword',
+        itemIds: ['a', 'b'],
+      }),
+    ).toBe('0\x1f25\x1fending\x1fepic\x1fauction\x1fweapon\x1fsword\x1fa,b');
   });
 });
 

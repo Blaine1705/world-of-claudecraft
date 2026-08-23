@@ -303,6 +303,23 @@ async function historySaleView(): Promise<Record<string, unknown>> {
   return (body.sales as Record<string, unknown>[])[0];
 }
 
+async function sellerHistoryBody(): Promise<Record<string, unknown>> {
+  service({
+    sellerSalesHistory: async () => ({
+      sales: [saleRow()],
+      profile: { createdAtMs: 1_820_000_000_000, guildName: 'Monarchs' },
+    }),
+  });
+  const ctx = readCtx({
+    url: '/api/woc-market/seller-history/Selara',
+    params: { name: 'Selara' },
+  });
+  await handlerFor('GET', '/api/woc-market/seller-history/:name')(ctx);
+  const { status, body } = sent(ctx);
+  expect(status).toBe(200);
+  return body;
+}
+
 async function offersOfferView(): Promise<Record<string, unknown>> {
   service({ directedOffers: async () => [offerRow()] });
   const ctx = readCtx({ url: '/api/woc-market/offers' });
@@ -399,6 +416,20 @@ describe('market wire views expose exactly their pinned key sets', () => {
     expect(Object.keys(await historySaleView()).sort()).toEqual(
       // No `item`: the full InvSlot was dead wire weight (no client reader);
       // itemId is the identity the history caller already keys by.
+      ['atMs', 'buyerName', 'id', 'itemId', 'priceCents', 'sellerName'].sort(),
+    );
+  });
+
+  it('sellerHistoryView', async () => {
+    // The seller click-through's readout: the same saleView rows plus the
+    // public profile line (facts the world already shows: the nameplate
+    // guild tag, plus the character's creation date). EXACTLY these keys.
+    const body = await sellerHistoryBody();
+    expect(Object.keys(body).sort()).toEqual(['sales', 'seller'].sort());
+    expect(Object.keys(body.seller as Record<string, unknown>).sort()).toEqual(
+      ['createdAtMs', 'guildName'].sort(),
+    );
+    expect(Object.keys((body.sales as Record<string, unknown>[])[0]).sort()).toEqual(
       ['atMs', 'buyerName', 'id', 'itemId', 'priceCents', 'sellerName'].sort(),
     );
   });

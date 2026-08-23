@@ -817,11 +817,31 @@ describe('resolved policy figures on the model', () => {
 
 describe('the Browse filters resolve in the view core', () => {
   it('offers the realm floor and up as the quality vocabulary, in rank order', () => {
-    expect(browseQualityOptions('rare')).toEqual(['rare', 'epic', 'legendary']);
-    expect(browseQualityOptions('legendary')).toEqual(['legendary']);
+    const noCollectibles = { mounts: false, mechChromas: false };
+    expect(browseQualityOptions('rare', noCollectibles)).toEqual(['rare', 'epic', 'legendary']);
+    expect(browseQualityOptions('legendary', noCollectibles)).toEqual(['legendary']);
     // An unknown floor word falls back to the epic default rather than
     // offering everything (the sellableRows fallback, one rule).
-    expect(browseQualityOptions('mythic-nonsense')).toEqual(['epic', 'legendary']);
+    expect(browseQualityOptions('mythic-nonsense', noCollectibles)).toEqual(['epic', 'legendary']);
+  });
+
+  it('widens down to uncommon while a collectible category is allowed', () => {
+    // Mounts and chromas bypass the equipment floor (sellableRows) and rank
+    // down to uncommon (SkinRank), so those listings genuinely exist and the
+    // filter must be able to reach them. Either switch alone widens; the
+    // floor never RAISES past itself (a rare floor stays reachable).
+    expect(browseQualityOptions('epic', { mounts: true, mechChromas: false })).toEqual([
+      'uncommon',
+      'rare',
+      'epic',
+      'legendary',
+    ]);
+    expect(browseQualityOptions('epic', { mounts: false, mechChromas: true })).toEqual([
+      'uncommon',
+      'rare',
+      'epic',
+      'legendary',
+    ]);
   });
 
   it('resolves an item query to ids by localized-name substring, with the three distinct answers', () => {

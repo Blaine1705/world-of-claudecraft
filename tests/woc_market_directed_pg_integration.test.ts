@@ -490,6 +490,8 @@ describeDb('woc market directed rail against real Postgres', () => {
           item: { itemId: 'amber_crimson_armor_plate', count: 1 },
           itemId: 'amber_crimson_armor_plate',
           quality: 'epic',
+          category: null,
+          subcategory: null,
           params: {
             format: 'buy_now',
             startCents: 1000,
@@ -1060,6 +1062,8 @@ describeDb('woc market directed rail against real Postgres', () => {
         item: { itemId: 'amber_crimson_armor_plate', count: 1 },
         itemId: 'amber_crimson_armor_plate',
         quality: 'epic' as const,
+        category: null,
+        subcategory: null,
         params: {
           format: 'buy_now' as const,
           directedBuyerAccount: null,
@@ -1285,6 +1289,8 @@ describeDb('woc market directed rail against real Postgres', () => {
               item: { itemId: 'amber_crimson_armor_plate', count: 1 },
               itemId: 'amber_crimson_armor_plate',
               quality: 'epic',
+              category: null,
+              subcategory: null,
               params: {
                 format: 'buy_now',
                 startCents: 1000,

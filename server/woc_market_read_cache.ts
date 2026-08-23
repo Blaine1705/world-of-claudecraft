@@ -62,15 +62,15 @@ import type { WocBrowseQuery } from './woc_market';
 /** Browse and detail: the win is CROSS-PLAYER sharing (every viewer of a
  *  page or a hot listing rides one read per TTL window), so the TTL matching
  *  the 3s awaiting-chain poll is fine: one player's own cadence missing the
- *  window does not matter when N players share the entry. With item-filtered
- *  queries AND deep pages bypassing, the cacheable browse key space is
- *  CLOSED and countable: 3 shallow pages x 4 sorts x 3 quality values
- *  (null/epic/legendary) x 4 formats = 144 keys now that the Browse UI
- *  actually sends the quality/format filters. The cap sits above that whole
- *  space with headroom, because an LRU evicting inside a closed hot set
- *  re-buys OFFSET-walk reads on every cycle; whoever adds a filter axis
- *  re-does this arithmetic and re-prices the memory (each live entry holds a
- *  page of 25 full listing rows, the me-cache rule). */
+ *  window does not matter when N players share the entry. The cached set is
+ *  exactly the UNFILTERED shallow pages (EVERY filter axis bypasses, the
+ *  service gate): 3 pages x 4 sorts = 12 live keys, the one view every
+ *  browsing player shares and the client poll re-asks. The cap is generous
+ *  against that space on purpose; a filtered browse is a per-user,
+ *  click-driven, uncached lookup whose bound is the read limiter. Whoever
+ *  loosens the service gate re-does this arithmetic and re-prices the
+ *  memory (each live entry holds a page of 25 full listing rows, the
+ *  me-cache rule). */
 export const WOC_MARKET_BROWSE_CACHE_TTL_MS = 3_000;
 export const WOC_MARKET_BROWSE_CACHE_MAX_ENTRIES = 192;
 /** Only the SHALLOW pages are cached (page <= this). The page number is
@@ -120,6 +120,8 @@ export function wocBrowseCacheKey(q: WocBrowseQuery): string {
     q.sort,
     q.quality ?? '',
     q.format ?? '',
+    q.category ?? '',
+    q.subcategory ?? '',
     q.itemIds === null ? '' : q.itemIds.join(','),
   ].join('\x1f');
 }

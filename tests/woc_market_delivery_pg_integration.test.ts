@@ -1486,6 +1486,8 @@ describeDb('woc market delivery finalization against real Postgres', () => {
         item: { itemId: 'crown_of_embers', count: 1 },
         itemId: 'crown_of_embers',
         quality: 'epic' as const,
+        category: null,
+        subcategory: null,
         params: {
           format: 'auction' as const,
           directedBuyerAccount: over.directedBuyerAccount ?? null,
