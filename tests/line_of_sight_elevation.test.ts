@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { colliderInternalsForTest, lineOfSightClear, supportHeightAt } from '../src/sim/colliders';
+import {
+  colliderInternalsForTest,
+  lineOfSightClear,
+  MOVE_TOP_EPS,
+  supportHeightAt,
+} from '../src/sim/colliders';
 import { RESURRECTION_RANGE, resurrectionReachError } from '../src/sim/combat/resurrection_reach';
 import { MOBS } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
-import {
-  SIGHT_SUPPORT_EPSILON,
-  trustedGroundedSightFeet,
-} from '../src/sim/line_of_sight_elevation';
+import { trustedGroundedSightFeet } from '../src/sim/line_of_sight_elevation';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -175,6 +177,58 @@ describe('grounded line-of-sight elevation', () => {
     );
   });
 
+  it('keeps a player visible throughout a jump from the supported canopy', () => {
+    const sim = makeSim('priest');
+    const watcherId = sim.addPlayer('priest', 'Watcher');
+    const hopperId = sim.addPlayer('priest', 'Hopper');
+    const watcher = player(sim, watcherId);
+    const hopper = player(sim, hopperId);
+    const hopperMeta = sim.players.get(hopperId);
+    if (!hopperMeta) throw new Error('missing hopper metadata');
+    const stall = EASTBROOK_LAYOUT.market.stalls[0];
+    const supportedY = canopyHeight();
+
+    place(
+      sim,
+      watcher,
+      {
+        x: stall.position.x,
+        y: groundHeight(stall.position.x, stall.position.z + 8, WORLD_SEED),
+        z: stall.position.z + 8,
+      },
+      true,
+    );
+    placeOnCanopy(sim, hopper);
+    const hasLineOfSight = (source: Entity, target: Entity): boolean =>
+      (
+        sim as unknown as {
+          hasLineOfSight(source: Entity, target: Entity): boolean;
+        }
+      ).hasLineOfSight(source, target);
+
+    expect(hasLineOfSight(watcher, hopper)).toBe(true);
+    hopperMeta.moveInput.jump = true;
+    let airborneTicks = 0;
+    let apexY = supportedY;
+    for (let tick = 0; tick <= 14; tick++) {
+      sim.tick();
+      hopperMeta.moveInput.jump = false;
+      if (!hopper.onGround) airborneTicks++;
+      apexY = Math.max(apexY, hopper.pos.y);
+      expect(hasLineOfSight(watcher, hopper), `watcher lost hopper at jump tick ${tick}`).toBe(
+        true,
+      );
+      expect(hasLineOfSight(hopper, watcher), `hopper lost watcher at jump tick ${tick}`).toBe(
+        true,
+      );
+    }
+
+    expect(airborneTicks).toBeGreaterThan(0);
+    expect(apexY).toBeGreaterThan(supportedY);
+    expect(hopper.pos.y).toBe(supportedY);
+    expect(hopper.onGround).toBe(true);
+  });
+
   it('lets a hostile ranged spell complete from the same supported canopy', () => {
     const sim = makeSim('mage');
     const casterId = sim.addPlayer('mage', 'Caster');
@@ -294,12 +348,12 @@ describe('grounded line-of-sight elevation', () => {
     const probe = player(sim, playerId);
 
     placeOnCanopy(sim, probe);
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBeCloseTo(canopyHeight());
-    expect(SIGHT_SUPPORT_EPSILON).toBe(1e-3);
+    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBe(canopyHeight());
+    expect(MOVE_TOP_EPS).toBe(1e-3);
 
     probe.pos.y = canopyHeight() + 0.0005;
     probe.prevPos = { ...probe.pos };
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBeCloseTo(probe.pos.y);
+    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBe(probe.pos.y);
 
     probe.pos.y = canopyHeight() + 0.0011;
     probe.prevPos = { ...probe.pos };
@@ -307,7 +361,7 @@ describe('grounded line-of-sight elevation', () => {
 
     probe.pos.y = canopyHeight() - 0.0005;
     probe.prevPos = { ...probe.pos };
-    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBeCloseTo(probe.pos.y);
+    expect(trustedGroundedSightFeet(WORLD_SEED, probe)).toBe(probe.pos.y);
 
     probe.pos.y = canopyHeight() - 0.0011;
     probe.prevPos = { ...probe.pos };

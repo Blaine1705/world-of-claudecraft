@@ -1,21 +1,36 @@
-import { lineOfSightClear, supportHeightAt } from './colliders';
+import { lineOfSightClear, MOVE_TOP_EPS, supportHeightAt } from './colliders';
 import { DUNGEON_X_THRESHOLD } from './data';
 import { PLAYER_BODY_RADIUS } from './pathfind';
 import type { Entity, Vec3 } from './types';
+import { groundHeight } from './world';
 
-// Matches the movement support tolerance: a larger gap is airborne, not footing.
-export const SIGHT_SUPPORT_EPSILON = 1e-3;
+// Pet recovery deliberately remains on raw collider LOS in pet/pet_ai.ts: it
+// gates only the long-distance teleport heuristic, not a combat decision.
 
-function trustedSupportedSightFeet(seed: number, pos: Vec3): number | undefined {
+interface OpenWorldSightHeights {
+  ground: number;
+  support: number;
+}
+
+function openWorldSightHeights(seed: number, pos: Vec3): OpenWorldSightHeights | undefined {
+  // Every instanced band lies beyond this threshold. Leaving those endpoints
+  // undefined preserves lineOfSightClear's zone policy, including the
+  // battleground's deliberate caller-y behavior.
   if (pos.x > DUNGEON_X_THRESHOLD) return undefined;
-  const support = supportHeightAt(
-    seed,
-    pos.x,
-    pos.z,
-    PLAYER_BODY_RADIUS,
-    pos.y + SIGHT_SUPPORT_EPSILON,
-  );
-  return Math.abs(support - pos.y) <= SIGHT_SUPPORT_EPSILON ? pos.y : undefined;
+  return {
+    ground: groundHeight(pos.x, pos.z, seed),
+    support: supportHeightAt(seed, pos.x, pos.z, PLAYER_BODY_RADIUS, pos.y + MOVE_TOP_EPS),
+  };
+}
+
+function exactSupportedSightFeet(pos: Vec3, support: number): number | undefined {
+  return Math.abs(support - pos.y) <= MOVE_TOP_EPS ? pos.y : undefined;
+}
+
+function boundedSightFeet(pos: Vec3, heights: OpenWorldSightHeights): number {
+  // Airborne movement may retain the authored support beneath the current
+  // footprint, but never contribute raw jump height above that support.
+  return Math.min(pos.y, Math.max(heights.ground, heights.support));
 }
 
 export function trustedGroundedSightFeet(seed: number, entity: Entity): number | undefined {
@@ -27,7 +42,25 @@ export function trustedGroundedSightFeet(seed: number, entity: Entity): number |
   ) {
     return undefined;
   }
-  return trustedSupportedSightFeet(seed, entity.pos);
+  const heights = openWorldSightHeights(seed, entity.pos);
+  return heights ? exactSupportedSightFeet(entity.pos, heights.support) : undefined;
+}
+
+function playerSightFeet(seed: number, entity: Entity): number | undefined {
+  if (entity.kind !== 'player') return undefined;
+  const heights = openWorldSightHeights(seed, entity.pos);
+  if (!heights) return undefined;
+  const trusted =
+    entity.onGround && !entity.jumping
+      ? exactSupportedSightFeet(entity.pos, heights.support)
+      : undefined;
+  return trusted ?? boundedSightFeet(entity.pos, heights);
+}
+
+function bodySightFeet(seed: number, body: Vec3): number | undefined {
+  const heights = openWorldSightHeights(seed, body);
+  if (!heights) return undefined;
+  return exactSupportedSightFeet(body, heights.support) ?? boundedSightFeet(body, heights);
 }
 
 export function entityLineOfSightClear(
@@ -38,11 +71,11 @@ export function entityLineOfSightClear(
   delveModules?: readonly string[],
   riftToken = 0,
 ): boolean {
-  const trustedFeet = {
-    from: trustedGroundedSightFeet(seed, source),
-    to: trustedGroundedSightFeet(seed, target),
+  const sightFeet = {
+    from: playerSightFeet(seed, source),
+    to: playerSightFeet(seed, target),
   };
-  return lineOfSightClear(seed, source.pos, target.pos, r, delveModules, riftToken, trustedFeet);
+  return lineOfSightClear(seed, source.pos, target.pos, r, delveModules, riftToken, sightFeet);
 }
 
 export function entityToBodyLineOfSightClear(
@@ -53,9 +86,9 @@ export function entityToBodyLineOfSightClear(
   delveModules?: readonly string[],
   riftToken = 0,
 ): boolean {
-  const trustedFeet = {
-    from: trustedGroundedSightFeet(seed, source),
-    to: trustedSupportedSightFeet(seed, body),
+  const sightFeet = {
+    from: playerSightFeet(seed, source),
+    to: bodySightFeet(seed, body),
   };
-  return lineOfSightClear(seed, source.pos, body, r, delveModules, riftToken, trustedFeet);
+  return lineOfSightClear(seed, source.pos, body, r, delveModules, riftToken, sightFeet);
 }

@@ -271,7 +271,7 @@ export function colliderTopAt(c: Collider, x: number, z: number): number {
  */
 export const MANTLE_REACH = 0.9;
 /** Float slack when comparing feet height against a collider top. */
-const MOVE_TOP_EPS = 1e-3;
+export const MOVE_TOP_EPS = 1e-3;
 // How much of the body radius must overlap a standable top before it supports
 // the mover: standing needs the center meaningfully over the prop, while the
 // full collision radius still gates entry, so a jump can graze past a rim
@@ -2487,7 +2487,7 @@ export function pathCrossesFence(
 // conservative default, and MOVEMENT collision is untouched everywhere.
 export const SIGHT_HEIGHT = 1.6;
 
-interface TrustedSightFeet {
+interface SightFeetOverride {
   from?: number;
   to?: number;
 }
@@ -2579,7 +2579,7 @@ export function lineOfSightClear(
   r = 0.05,
   delveModules?: readonly string[],
   riftToken = 0,
-  trustedFeet?: TrustedSightFeet,
+  sightFeet?: SightFeetOverride,
 ): boolean {
   const dx = to.x - from.x;
   const dz = to.z - from.z;
@@ -2588,14 +2588,17 @@ export function lineOfSightClear(
   // The sight line runs eye-to-eye: lerp the endpoint eye heights per sample so
   // a low prop only blocks when its top actually crosses the line.
   //
-  // Raw caller y remains untrusted outside the battleground. Entity-aware
-  // callers may opt in only after proving the feet rest on authored support.
+  // The battleground keeps caller y because its sculpted terrain, standable
+  // decks, and cover were authored against real fighter height. Raw caller y
+  // remains untrusted everywhere else: entity-aware open-world callers may
+  // opt in only after constraining feet height to terrain or authored support,
+  // so a jump cannot lift the sight line above intended cover.
   const eyeAt = (p: { x: number; y?: number; z: number }, trustedY?: number): number =>
     (trustedY ??
       (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed))) +
     SIGHT_HEIGHT;
-  const eyeFrom = eyeAt(from, trustedFeet?.from);
-  const eyeTo = eyeAt(to, trustedFeet?.to);
+  const eyeFrom = eyeAt(from, sightFeet?.from);
+  const eyeTo = eyeAt(to, sightFeet?.to);
   const steps = Math.max(2, Math.ceil(d / 0.5));
   if (isDelvePos(from.x)) {
     const delve = delveAt(from.x);

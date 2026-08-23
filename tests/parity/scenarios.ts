@@ -5843,6 +5843,7 @@ function supportedElevationLineOfSight(): Scenario {
     name: 'supported_elevation_line_of_sight',
     coverage: [
       'Eastbrook standable canopy supplies grounded player eye elevation for a completed heal',
+      'Eastbrook standable canopy keeps a jumping target visible without granting jump height',
       'airborne player elevation is rejected behind ordinary open-world cover',
       'shared Sim cast entry point and completion LOS recheck',
     ],
@@ -5896,6 +5897,29 @@ function supportedElevationLineOfSight(): Scenario {
       rec.snapshot('supported-heal-start');
       rec.tick(40);
       rec.snapshot('supported-heal-complete');
+
+      place(
+        healer,
+        {
+          x: stall.position.x,
+          y: groundHeight(stall.position.x, stall.position.z + 8, WORLD_SEED),
+          z: stall.position.z + 8,
+        },
+        true,
+      );
+      place(ally, { x: stall.position.x, y: canopyY, z: stall.position.z }, true);
+      ally.hp = 1;
+      healer.resource = healer.maxResource;
+      healer.gcdRemaining = 0;
+      const allyMeta = sim.players.get(allyId);
+      if (!allyMeta) throw new Error('missing line-of-sight ally metadata');
+      allyMeta.moveInput.jump = true;
+      rec.tick();
+      allyMeta.moveInput.jump = false;
+      sim.castAbilityOn('lesser_heal', allyId, healerId);
+      rec.snapshot('canopy-jump-heal-start');
+      rec.tick(40);
+      rec.snapshot('canopy-jump-heal-complete');
 
       const from = { x: -224, z: 200 };
       const to = { x: -224, z: 224 };
