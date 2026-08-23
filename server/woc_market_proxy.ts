@@ -89,14 +89,56 @@ interface ServiceRequest {
   timeoutMs?: number;
 }
 
+/** May the shared economy secret ride PLAIN HTTP to this host? Only hosts
+ *  that cannot be the open internet: loopback, a single-label docker service
+ *  name, the docker host alias, an RFC1918 address, or a reserved suffix
+ *  (.test/.internal/.local/.localhost). Everything else must be HTTPS, or
+ *  a typo'd public URL ships the secret cleartext on every call (the
+ *  validatedSeekerRpcUrl posture, adapted for the compose topologies the
+ *  deploy actually uses: host.docker.internal and bare service names). */
+function privateHttpHostAllowed(hostname: string): boolean {
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') return true;
+  if (hostname === 'host.docker.internal') return true;
+  if (!hostname.includes('.')) return true;
+  if (/\.(?:test|internal|local|localhost)$/.test(hostname)) return true;
+  if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) return true;
+  if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname)) return true;
+  if (/^172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(hostname)) return true;
+  return false;
+}
+
+/** Null (unavailable) unless the base is safe to carry the secret: HTTPS, or
+ *  HTTP to a private host, and never a URL with embedded credentials. */
+function validatedServiceBase(base: string): URL | null {
+  let url: URL;
+  try {
+    url = new URL(base.endsWith('/') ? base : `${base}/`);
+  } catch {
+    logFailure(new Error('WOC_MARKET_SERVICE_URL is not a valid URL'));
+    return null;
+  }
+  if (url.username !== '' || url.password !== '') {
+    logFailure(new Error('WOC_MARKET_SERVICE_URL must not embed credentials'));
+    return null;
+  }
+  if (url.protocol === 'https:') return url;
+  if (url.protocol === 'http:' && privateHttpHostAllowed(url.hostname)) return url;
+  logFailure(
+    new Error('WOC_MARKET_SERVICE_URL must be https, or http to a private host'),
+  );
+  return null;
+}
+
 /** The one fetch wrapper (the claudium_proxy shape): parsed JSON on 2xx, null
  *  on any failure. It NEVER throws; every caller maps null to unavailable. */
 async function callService<T>(req: ServiceRequest): Promise<T | null> {
   const base = serviceUrl();
   const secret = serviceSecret();
   if (base === '' || secret === '') return null;
+  const validBase = validatedServiceBase(base);
+  if (validBase === null) return null;
   try {
-    const url = new URL(req.path.replace(/^\//, ''), base.endsWith('/') ? base : `${base}/`);
+    const url = new URL(req.path.replace(/^\//, ''), validBase);
     const headers: Record<string, string> = { 'x-woc-economy-secret': secret };
     let body: string | undefined;
     if (req.body !== undefined) {

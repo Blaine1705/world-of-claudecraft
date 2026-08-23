@@ -94,6 +94,40 @@ describe('the exchange base URL is its own, not the claudium one', () => {
   });
 });
 
+describe('the base URL may not carry the secret onto the open internet', () => {
+  // Every call ships WOC_ECONOMY_INTERNAL_SECRET in a header, so plain HTTP
+  // is allowed only to hosts that cannot be public: loopback, a single-label
+  // docker service name, host.docker.internal, RFC1918 addresses, and the
+  // reserved suffixes (.test keeps this suite's own base legal). Anything
+  // else must be HTTPS; a refusal maps to the normal unavailable shape and
+  // makes NO request.
+  it.each([
+    ['a public http host', 'http://economy.example.com/v1/market/'],
+    ['embedded credentials', 'https://user:pw@economy.example.com/v1/market/'],
+    ['a non-http scheme', 'ftp://economy.test/v1/market/'],
+    ['an unparseable base', 'not a url'],
+  ])('refuses %s without calling out', async (_label, base) => {
+    process.env.WOC_MARKET_SERVICE_URL = base;
+    const price = await createWocMarketEconomyProxy().price();
+    expect(seen, base).toHaveLength(0);
+    expect(price.available).toBe(false);
+    expect(price.reason).toBe('service_unavailable');
+  });
+
+  it.each([
+    ['https to a public host', 'https://economy.example.com/v1/market/'],
+    ['http to loopback', 'http://127.0.0.1:8798/v1/market/'],
+    ['http to a docker service name', 'http://economy:8798/v1/market/'],
+    ['http to the docker host alias', 'http://host.docker.internal:8798/v1/market/'],
+    ['http to an RFC1918 address', 'http://10.0.0.7:8798/v1/market/'],
+  ])('allows %s', async (_label, base) => {
+    process.env.WOC_MARKET_SERVICE_URL = base;
+    respond = () => ({ status: 200, body: { healthy: true, tokensPerUsd: 1000, asOfMs: 1 } });
+    await createWocMarketEconomyProxy().price();
+    expect(seen, base).toHaveLength(1);
+  });
+});
+
 describe('the wire contract with the service', () => {
   it('sends the shared internal secret as x-woc-economy-secret on every call', async () => {
     respond = () => ({ status: 200, body: { ok: true, amount: { base: '1', tokens: 1 } } });
