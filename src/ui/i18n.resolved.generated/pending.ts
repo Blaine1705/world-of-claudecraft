@@ -10,27 +10,33 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "es_ES": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "fr_FR": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "fr_CA": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "de_DE": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
@@ -39,39 +45,48 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "nl_NL": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "pl_PL": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "id_ID": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "tr_TR": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "sv_SE": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "vi_VN": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ],
   "da_DK": [
+    "hudChrome.crafting.craftFeeLine",
     "hudChrome.deeds.stillToVisit",
     "sim.rift.lootRecoveryNotice"
   ]

@@ -7493,6 +7493,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': '打开{craft}制作窗口',
   'hudChrome.crafting.close': '关闭制作',
   'hudChrome.crafting.reagentsNeeded': '需要:',
+  'hudChrome.crafting.craftFeeLine': '制作费用：{fee}',
   'hudChrome.crafting.empty': '尚无已知配方。',
   'hudChrome.crafting.resultAria': '制作{name}',
   'hudChrome.crafting.craftedToast': '已制作:{name}',

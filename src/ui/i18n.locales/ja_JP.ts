@@ -7794,6 +7794,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOptionAria': '{craft}の製作ウィンドウを開く',
   'hudChrome.crafting.close': '製作を閉じる',
   'hudChrome.crafting.reagentsNeeded': '必要素材:',
+  'hudChrome.crafting.craftFeeLine': '製作費用: {fee}',
   'hudChrome.crafting.empty': '既知のレシピはありません。',
   'hudChrome.crafting.resultAria': '{name}を製作',
   'hudChrome.crafting.craftedToast': '製作しました:{name}',
