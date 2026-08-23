@@ -9,8 +9,8 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import type { SimConfig } from '../src/sim/types';
 import { startFiestaPractice } from '../src/sim/social/fiesta_bots';
+import type { SimConfig } from '../src/sim/types';
 
 // The retired vale_cup_util factory, minus its prebuilt cup world: a plain
 // no-player Sim is all these cases need.

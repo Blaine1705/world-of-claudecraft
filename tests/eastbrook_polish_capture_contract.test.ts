@@ -313,7 +313,7 @@ interface AttributionTargetFixture {
 // horizon fast path, display-pacing admission, and restored rationale): the
 // renderer integration leaf moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5c9fb10292e5b4f2f4bb0619eb201721bc515dbc3e4ab870575d8fa8936872cd';
+  'b61f074a4e1b9c0cd4a0cfe9c69da256fa022bef5528f3d19b32b48feaded080';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
