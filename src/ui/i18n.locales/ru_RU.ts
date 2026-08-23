@@ -8462,6 +8462,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.rift.iceGoalLit': 'Морозная печать вспыхивает. Путь пробуждается.',
   'sim.rift.levelGate':
     'Войти в этот разлом могут лишь искатели приключений уровня {level} и выше.',
+  'sim.rift.lootRecoveryNotice':
+    'Вход в разлом продержится ещё некоторое время: даже если ваша группа падёт, вы сможете вернуться за честно заработанной добычей.',
   'sim.rift.portalCollapses': 'Разлом ранга {tier} в {zone} обрушился.',
   'sim.rift.portalOpens': 'В {zone} разверзся разлом ранга {tier}!',
   'sim.rift.portalSealed': 'Разлом ранга {tier} в {zone} запечатан.',

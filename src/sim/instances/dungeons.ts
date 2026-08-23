@@ -50,6 +50,21 @@ const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door telepor
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
 const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
 const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
+// A claim whose final boss is already dead (inst.clearedBy is non-empty) idles
+// this much longer than INSTANCE_EMPTY_TIMEOUT before the reaper frees it: a
+// clean kill that wipes the whole party, with nobody left to resurrect, must
+// not be an unrecoverable total loss for the boss's dropped gear. The door
+// itself never despawns (unlike a Rift portal), so this timeout alone decides
+// how long a corpse run has to make it back. Every other claim state (still
+// being fought, or freed and reclaimed at a new difficulty) keeps the
+// shorter, standard timeout so an abandoned attempt frees its slot promptly.
+// Deliberately HEROIC-ONLY: clearedBy is the only cheap "the final boss is
+// genuinely dead" signal that exists today (lockToHeroicClaim, stamped only
+// from the heroic mark payout), so a normal-difficulty or raid final-boss
+// kill still relies on the shorter INSTANCE_EMPTY_TIMEOUT alone. Extending
+// this further would need its own finalBossDeadAt-style marker on every
+// InstanceSlot, not just the heroic ledger; out of scope here.
+export const INSTANCE_CLEARED_EMPTY_TIMEOUT = 15 * 60;
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
@@ -1000,7 +1015,9 @@ export function updateInstances(ctx: SimContext): void {
       inst.emptyFor = 0;
     } else {
       inst.emptyFor += 1;
-      if (inst.emptyFor >= INSTANCE_EMPTY_TIMEOUT) freeInstance(ctx, inst);
+      const emptyTimeout =
+        inst.clearedBy.size > 0 ? INSTANCE_CLEARED_EMPTY_TIMEOUT : INSTANCE_EMPTY_TIMEOUT;
+      if (inst.emptyFor >= emptyTimeout) freeInstance(ctx, inst);
     }
   }
 }

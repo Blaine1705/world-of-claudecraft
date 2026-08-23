@@ -7125,6 +7125,7 @@ export const ja_JP: EnTranslations = {
       "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
       "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
       "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
+      "lootRecoveryNotice": "裂け目の入り口はしばらく開いたままだ。パーティーが全滅しても、稼いだ戦利品を取りに戻れる。",
       "levelGate": "この裂け目に入れるのはレベル{level}以上の冒険者だけだ。",
       "deadEntry": "死亡した状態では裂け目に入れない。",
       "deadEntryCombat": "パーティーはまだ戦闘中だ。戦いが終われば、死者も再び入れる。",

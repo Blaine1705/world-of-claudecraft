@@ -10,54 +10,69 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "es_ES": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "fr_FR": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "fr_CA": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "de_DE": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "nl_NL": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "pl_PL": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "id_ID": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "tr_TR": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "sv_SE": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "vi_VN": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ],
   "da_DK": [
-    "hudChrome.deeds.stillToVisit"
+    "hudChrome.deeds.stillToVisit",
+    "sim.rift.lootRecoveryNotice"
   ]
 };

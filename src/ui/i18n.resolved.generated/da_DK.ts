@@ -7125,6 +7125,7 @@ export const da_DK: EnTranslations = {
       "portalOpens": "En {tier}-rangs rift river sig åben i {zone}!",
       "portalSealed": "{tier}-rangs riften i {zone} er blevet forseglet.",
       "portalCollapses": "{tier}-rangs riften i {zone} kollapser.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Kun eventyrere på niveau {level} eller højere må gå ind i denne rift.",
       "deadEntry": "Du kan ikke gå ind i en rift, mens du er død.",
       "deadEntryCombat": "Din gruppe er stadig i kamp. De døde kan gå ind igen, når kampen stopper.",

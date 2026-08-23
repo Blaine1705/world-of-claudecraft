@@ -21,6 +21,7 @@ import { COMBAT_EXIT_MEMORY_SECONDS } from '../src/sim/instance_exit_memory';
 import {
   awardHeroicMarks,
   enterDungeon,
+  INSTANCE_CLEARED_EMPTY_TIMEOUT,
   instanceKeyFor,
   instanceLockoutMetas,
   instanceOriginOf,
@@ -2668,6 +2669,51 @@ describe('dungeons: empty-instance reset', () => {
     updateInstances(sim.ctx);
     expect(inst.partyKey).not.toBeNull();
     expect(inst.emptyFor).toBe(0);
+  });
+});
+
+// A clean heroic final-boss kill that also wipes the whole party (nobody left
+// to resurrect) must not be an unrecoverable total loss of the boss's dropped
+// gear: unlike a Rift portal, the door never despawns, but the claim's own
+// empty-timeout still tore the corpse and its loot down after only 5 minutes.
+describe('dungeons: a cleared heroic claim outlives the ordinary empty-timeout', () => {
+  it('survives past the ordinary 5-minute timeout once the final boss is dead, and the extended one still frees it', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'Lead');
+    sim.setDungeonDifficulty('heroic', leader);
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    const inst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
+    const morthen = mobInInstance(sim, inst, 'morthen');
+    const le = sim.entities.get(leader) as AnyEntity;
+    teleport(sim, le, morthen.pos.x + 1, morthen.pos.z);
+    (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
+    expect(morthen.dead).toBe(true);
+    expect(inst.clearedBy.size, 'the final-boss kill stamps clearedBy').toBeGreaterThan(0);
+
+    // Move the party out, and push emptyFor past the ORDINARY timeout: a
+    // cleared claim must not free here.
+    teleport(sim, le, 0, 0);
+    inst.emptyFor = INSTANCE_EMPTY_TIMEOUT + 1;
+    updateInstances(sim.ctx);
+    expect(inst.partyKey, 'a cleared claim survives the ordinary timeout').not.toBeNull();
+
+    // Past the extended loot-recovery window, the reaper finally frees it.
+    inst.emptyFor = INSTANCE_CLEARED_EMPTY_TIMEOUT + 1;
+    updateInstances(sim.ctx);
+    expect(inst.partyKey, 'freed once the extended grace elapses').toBeNull();
+  });
+
+  it('a normal-difficulty run never earns the extended grace (clearedBy is heroic-only)', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Solo');
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+    expect(inst.clearedBy.size).toBe(0);
+    const p = sim.entities.get(pid) as AnyEntity;
+    teleport(sim, p, 0, 0);
+    inst.emptyFor = INSTANCE_EMPTY_TIMEOUT + 1;
+    updateInstances(sim.ctx);
+    expect(inst.partyKey, 'no heroic clear means the ordinary timeout still applies').toBeNull();
   });
 });
 

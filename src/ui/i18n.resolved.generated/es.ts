@@ -7125,6 +7125,7 @@ export const es: EnTranslations = {
       "portalOpens": "¡Una brecha de rango {tier} se abre en {zone}!",
       "portalSealed": "La brecha de rango {tier} en {zone} ha sido sellada.",
       "portalCollapses": "La brecha de rango {tier} en {zone} colapsa.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Solo aventureros de nivel {level} o superior pueden entrar en esta brecha.",
       "deadEntry": "No puedes entrar en una brecha estando muerto.",
       "deadEntryCombat": "Tu grupo sigue en combate. Los caídos pueden volver a entrar cuando termine la lucha.",

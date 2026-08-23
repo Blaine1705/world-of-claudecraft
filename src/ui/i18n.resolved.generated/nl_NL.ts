@@ -7125,6 +7125,7 @@ export const nl_NL: EnTranslations = {
       "portalOpens": "Een {tier}-rangs rift scheurt open in {zone}!",
       "portalSealed": "De {tier}-rangs rift in {zone} is verzegeld.",
       "portalCollapses": "De {tier}-rangs rift in {zone} stort in.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Alleen avonturiers van niveau {level} of hoger mogen deze rift betreden.",
       "deadEntry": "Je kunt geen rift betreden terwijl je dood bent.",
       "deadEntryCombat": "Je groep is nog in gevecht. De doden kunnen opnieuw binnengaan zodra het gevecht stopt.",

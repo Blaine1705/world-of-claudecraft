@@ -7125,6 +7125,7 @@ export const sv_SE: EnTranslations = {
       "portalOpens": "En reva av grad {tier} rivs upp i {zone}!",
       "portalSealed": "Revan av grad {tier} i {zone} har förseglats.",
       "portalCollapses": "Revan av grad {tier} i {zone} kollapsar.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Endast äventyrare på nivå {level} eller högre får gå in i denna reva.",
       "deadEntry": "Du kan inte gå in i en reva medan du är död.",
       "deadEntryCombat": "Din grupp är fortfarande i strid. De döda kan gå in igen när striden upphör.",

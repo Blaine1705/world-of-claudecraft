@@ -10903,6 +10903,7 @@ export type TranslationKeyFlat =
   | 'sim.rift.gateOpen'
   | 'sim.rift.iceGoalLit'
   | 'sim.rift.levelGate'
+  | 'sim.rift.lootRecoveryNotice'
   | 'sim.rift.orbOpensGate'
   | 'sim.rift.orbSealed'
   | 'sim.rift.orbWakes'
