@@ -236,10 +236,21 @@ export class MeterData {
     const targetInParty = partyPids.has(ev.targetId);
     if (!sourceInParty && !targetInParty) return;
 
-    // any party-involved combat keeps the encounter alive (tanking without
+    // A HoT's periodic tick (ev.hot) is passive residual healing, not fresh party
+    // activity: left alone it holds the segment open indefinitely (a HoT still
+    // ticking down after the kill, or kept rolling by the healer into the next
+    // pull, never let the 5s inactivity clock elapse), merging pulls together
+    // instead of resetting between them. A lone tick with no segment open must
+    // not spawn one either, so residual healing between pulls stays inert; while
+    // a segment IS open its healing still tallies, just without touching the
+    // clock that closes it.
+    const isPassiveHotTick = ev.type === 'heal2' && ev.hot === true;
+    if (isPassiveHotTick && !this.current) return;
+
+    // any other party-involved combat keeps the encounter alive (tanking without
     // dealing damage must not end the segment)
     if (!this.current) this.current = newEncounter(now);
-    this.lastActivity = now;
+    if (!isPassiveHotTick) this.lastActivity = now;
     this.refreshThreatSnapshots(world, partyPids);
 
     if (ev.type === 'damage' && sourceInParty && ev.kind === 'hit' && ev.amount > 0) {

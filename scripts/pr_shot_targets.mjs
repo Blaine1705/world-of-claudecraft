@@ -4291,6 +4291,100 @@ export const TARGETS = [
     },
   },
   {
+    key: 'meters-hot-cooldown-reset',
+    label:
+      "Damage meters: the Current segment resets between pulls instead of being held open by a healer's lingering HoT",
+    // The encounter-close clock lives in MeterData.onEvent/update (ui/meters.ts): a
+    // HoT's periodic tick must not keep refreshing it, or a second pull silently
+    // merges into the first's totals. Drives MeterData directly with synthetic
+    // timestamps (the same deterministic-injection approach the threat-meter
+    // target above uses) instead of waiting out the real 5s+ window: this is a
+    // TIMING bug, so the same script run against the base commit and this
+    // branch is what actually shows the fix, per the before/after protocol.
+    when: ['ui/meters.ts'],
+    variants: [{ key: 'desktop', charClass: 'warrior', charName: 'Rurik' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        let mob = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId == null && !e.dead) {
+            mob = e;
+            break;
+          }
+        }
+        const meters = game?.hud?.meters;
+        if (!meters || !mob) return;
+        meters.resetFrames?.();
+        const world = sim;
+        const party = new Set([player.id]);
+        const dmg = (amount, ability, t) =>
+          meters.data.onEvent(
+            {
+              type: 'damage',
+              sourceId: player.id,
+              targetId: mob.id,
+              amount,
+              crit: false,
+              school: 'physical',
+              ability,
+              kind: 'hit',
+            },
+            world,
+            party,
+            t,
+          );
+        const hotTick = (t) =>
+          meters.data.onEvent(
+            {
+              type: 'heal2',
+              sourceId: player.id,
+              targetId: player.id,
+              amount: 60,
+              crit: false,
+              ability: 'Renew',
+              hot: true,
+            },
+            world,
+            party,
+            t,
+          );
+        // Pull 1: the kill.
+        dmg(240, 'Mortal Strike', 1000);
+        mob.dead = true;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.aggroTargetId === player.id) e.aggroTargetId = null;
+        }
+        // The healer keeps a Renew rolling on the tank well past the kill.
+        hotTick(3000);
+        hotTick(5000);
+        // 5s past the LAST REAL activity (the kill at 1000): the segment must
+        // already be closed here, regardless of the ticks at 3000/5000.
+        meters.data.update(world, party, 6001);
+        // Pull 2 starts, well after the close.
+        mob.dead = false;
+        mob.aggroTargetId = player.id;
+        dmg(95, 'Whirlwind', 10_000);
+        meters.data.update(world, party, 10_001);
+        meters.render(true);
+        const el = document.querySelector('#meters-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleMeters?.();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+      });
+      const open = await pollForSize(page, '#meters-window');
+      if (!open) return {};
+      await wait(600);
+      return { clip: '#meters-window' };
+    },
+  },
+  {
     key: 'meters',
     label: 'Damage meters: bars plus the per-ability hover breakdown',
     when: ['ui/meters', 'meters_breakdown'],
