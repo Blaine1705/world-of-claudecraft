@@ -10,6 +10,60 @@ import { classifyDiff, diffChangedPaths, resolveTargets } from '../scripts/pr_sh
 import { ABILITIES } from '../src/sim/data';
 
 describe('classifyDiff', () => {
+  it('clears the intentional prior-page entry probe before every isolated screenshot boot', () => {
+    const script = readFileSync(join(__dirname, '../scripts/pr_screenshots.mjs'), 'utf8');
+    expect(script).toContain("const ENTRY_PROBE_KEY = 'woc_entry_probe';");
+    expect(script).toContain('async function clearIntentionalPageCloseProbe(page)');
+    expect(script.match(/await clearIntentionalPageCloseProbe\((?:page|mobile)\);/g)).toHaveLength(
+      4,
+    );
+    expect(script).toContain('localStorage.removeItem(key)');
+
+    const sliceBetween = (start: string, end: string, from = 0) => {
+      const startIndex = script.indexOf(start, from);
+      const endIndex = script.indexOf(end, startIndex + start.length);
+      expect(startIndex).toBeGreaterThanOrEqual(0);
+      expect(endIndex).toBeGreaterThan(startIndex);
+      return script.slice(startIndex, endIndex);
+    };
+    const expectClearBeforeLoad = (
+      block: string,
+      pageName: 'page' | 'mobile',
+      firstLoad: string,
+    ) => {
+      const createdAt = block.indexOf(`await browser.newPage()`);
+      const clearedAt = block.indexOf(`await clearIntentionalPageCloseProbe(${pageName});`);
+      const loadedAt = block.indexOf(firstLoad);
+      expect(createdAt).toBeGreaterThanOrEqual(0);
+      expect(clearedAt).toBeGreaterThan(createdAt);
+      expect(loadedAt).toBeGreaterThan(clearedAt);
+    };
+
+    const specificStart = script.indexOf('async function shootSpecific');
+    const standalone = sliceBetween('if (standalone) {', '} else if (!page) {', specificStart);
+    const shared = sliceBetween(
+      '} else if (!page) {',
+      'const region = await t.capture',
+      specificStart,
+    );
+    const genericStart = script.indexOf('async function shootGenericHud');
+    const desktop = sliceBetween(
+      "if (frames.includes('hud-desktop')) {",
+      "if (frames.includes('hud-mobile')) {",
+      genericStart,
+    );
+    const mobile = sliceBetween(
+      "if (frames.includes('hud-mobile')) {",
+      '\n}\n\ntry {',
+      genericStart,
+    );
+
+    expectClearBeforeLoad(standalone, 'page', 'await variant.beforeLoad?.(page);');
+    expectClearBeforeLoad(shared, 'page', 'await page.goto(');
+    expectClearBeforeLoad(desktop, 'page', 'await page.goto(');
+    expectClearBeforeLoad(mobile, 'mobile', 'await mobile.goto(');
+  });
+
   it('treats a backend/data-only diff as non-visual (captures nothing)', () => {
     const plan = classifyDiff(['server/game.ts', 'src/sim/spirit.ts', 'server/db.ts']);
     expect(plan.isVisual).toBe(false);
